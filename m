@@ -7,94 +7,116 @@ X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B31BC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 03:36:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB754C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 07:11:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6C15224B1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 03:36:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69045229C5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 07:11:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1726834AbhAYDgS (ORCPT
+        id S1727122AbhAYHAw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 24 Jan 2021 22:36:18 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45618 "EHLO
+        Mon, 25 Jan 2021 02:00:52 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57170 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1726630AbhAYDgP (ORCPT
+        with ESMTP id S1727142AbhAYGmp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 24 Jan 2021 22:36:15 -0500
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62E31C061573
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jan 2021 19:35:35 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id 36so11489093otp.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jan 2021 19:35:35 -0800 (PST)
+        Mon, 25 Jan 2021 01:42:45 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26B9EC061756
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jan 2021 22:42:05 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id e17so8989898qto.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 24 Jan 2021 22:42:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=sWCIZkNG9V5891xrVruyNqQCmhK58wXe75MOyr6ERJw=;
-        b=jCCCcesqWXFGWL98nemCjnWrOjrF5+8FAYgxaAAeQZkJcY3yysNUMdPNNLmm4JO2o1
-         +NyZ5Q6aUqSmtpef9cxUPaUSvsvlhYgcjq8upnlbwl2GyZzJSLLxX3OJC8xGo/B+Rjtf
-         jKVdUefeZmYk36Iaw9QNGhgWccXFhllRmeexbisPn5X6OXi7rEtmdcxL1UPj011aiXye
-         0LdE1f8y2EQb7hDli/dtJavmYScwK/mnddwE5vkVmJn22ysPUYrmJXhEInhs5QRavzkv
-         DVDbA8Q2bqfq469e9sT0DkTQmjS6FxbAXaVXu4XSfM/VaEOhBIzVJqyT7ggzotPK33mP
-         OpjA==
+        bh=VWxPCOWE4nVOCUe330fdsIiyZ6zF5Mqd+3aCb9h18Nc=;
+        b=U9wpChPTB/SsSbl62DJ29zy3chleD7of65QEW0O78luygxiONwyqw3coe8W7Y26l+e
+         RiMRXtTjusu3lhc/E+7FoeL+a+SnUoI49vFPvcE3fRpmy3NNwCALGGCjiILFUmng9hqC
+         HyT1G7w+hFOcYH8Jf0VAI2T6SjFzY2m6h3ijnolFoicGFI9q2+WvWppl0XDITv/tvXDb
+         ayVy7yICwjqQnYlqAEyAy8uO7vrA5nfwwWJHkZPsLiUeMPhFVFdE9X3aX1YoCgXgjV/I
+         gikwsxK8IkF0hZ+JXI4YM5Ix2MdGW3L7AKOOpDJAsRL2zNpW1PcyY97GHzgoKqX7uU24
+         T2Zg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=sWCIZkNG9V5891xrVruyNqQCmhK58wXe75MOyr6ERJw=;
-        b=oZmaCKiAGQWaMiCPPMzATwvTdlPkKkznAUa5wxp2MzZ0M2iw519ghr5bTRGK6+dgf9
-         O21eXiOyyXZrraEx+S4zxymZOVNgN0jZcrVswaUxLP0FQdn0EBY1CYEbrlsJfcinztI8
-         rfgydC6COALP/JvswtAxd+uzjPkDqQZScx8rFTqwCB8oa3vc33wc6UaYtpzsW2S2emRh
-         T5iFPephp3nT5XA/exobvI407BYbQL5cIzZAMMpBlHidA7uelTi/dtGGDQLOaUOQ6nkC
-         eySAEJTF1cvqE5/9k7CKuCrSzDWtXQ9SZIgpN6d5LUV1I6BuFIv437qg9nx8yzUWkw/V
-         cSNw==
-X-Gm-Message-State: AOAM530feOvp8wWXn3KoMkspxFOAOreiWhqmIR9GMKst8GOXF4P1wki7
-        2sz0smcpxWvWjDuN1HSmtMBjGIVxmbSu5H3oqg0=
-X-Google-Smtp-Source: ABdhPJzSfLJOY2r5riuB+QVtLIYRZuekNhzAFY+k/0yU3wh23pTIr83Cb7ZMPpbd3mqQ502dZvtaa793wv0l3q90/4s=
-X-Received: by 2002:a9d:2035:: with SMTP id n50mr10428908ota.44.1611545734757;
- Sun, 24 Jan 2021 19:35:34 -0800 (PST)
+        bh=VWxPCOWE4nVOCUe330fdsIiyZ6zF5Mqd+3aCb9h18Nc=;
+        b=A3yYsyUZj7ody/Gyin5p5VujXaT8EiOEoTewyQRa9wwevMVnu+wUrWouOaHlYldlBS
+         Is7aoN+B4Oc+o7M5YmBdYUIYKb/K7WKzOc5cHF8a9g9DsoanuFurjnl5UWS577eECqy+
+         AUJXZ5O4EAgaso+yo1DS1hJVPr8hp5CxO9khmek3l4EgQqueILbHebrwOboHBnW9JfFL
+         WtOweOcOPRrJB4d/YxQ+mGV/HekQGqEbTBt5AKCtGt6cbBph43ItfIgNtF05RasVi/jx
+         4dRa/+tITlLcUK9QK4xh+rIIqfRiR/McMWqPs0uCe8A33qCUN7IPJ3V9S1jxEUYSBqtg
+         XRBA==
+X-Gm-Message-State: AOAM533Rg6OJNDpSEvtd+Y22v5trIifMuYYwY22mDJQwIU41DNBp4z6q
+        CRnc+VgLmaYmfyFNGqKmtTh9fllvsj4GoEnTRw==
+X-Google-Smtp-Source: ABdhPJztSBP8RPc3gKtGADnMGPCBpogcCZJfLPNex1Xtm1OuJLo20SVfxagGP+xAqhAP8boQUAB/I9XvIXRIMbRvKFw=
+X-Received: by 2002:ac8:3508:: with SMTP id y8mr90047qtb.58.1611556924225;
+ Sun, 24 Jan 2021 22:42:04 -0800 (PST)
 MIME-Version: 1.0
 References: <CAC9s0NazfjTcapy52XSdJSKSmoAQmBom_JTfgROKRkVmAbaMDg@mail.gmail.com>
-In-Reply-To: <CAC9s0NazfjTcapy52XSdJSKSmoAQmBom_JTfgROKRkVmAbaMDg@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 24 Jan 2021 19:35:23 -0800
-Message-ID: <CABBYNZJrb=jpuaUAC9DxRSnRrReZRQgPTKwgqQYBN-3KWoUxQA@mail.gmail.com>
+ <CABBYNZJrb=jpuaUAC9DxRSnRrReZRQgPTKwgqQYBN-3KWoUxQA@mail.gmail.com>
+In-Reply-To: <CABBYNZJrb=jpuaUAC9DxRSnRrReZRQgPTKwgqQYBN-3KWoUxQA@mail.gmail.com>
+From:   Kenny Bian <kennybian@gmail.com>
+Date:   Sun, 24 Jan 2021 22:41:48 -0800
+Message-ID: <CAC9s0NYvmRHQ1qrbpQtKrACi2Mp7YCTPA4oYF-TwgpnCN-vhPg@mail.gmail.com>
 Subject: Re: How to add "Service Changed Indication"
-To:     Kenny Bian <kennybian@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kenny,
+Hi Luiz,
 
-On Sun, Jan 24, 2021 at 12:45 AM Kenny Bian <kennybian@gmail.com> wrote:
+Thank you so much for your reply. I appreciate it.
+
+By "registering the services", do you mean "RegisterApplication()" in
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server#n656?
+If that is the case, I believe I already registered the services.
+I checked the files in /var/lib/bluetooth. According to
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/settings-storage.txt#n321,
+there should be a "[ServiceChanged]" section in the "info" file. But I
+don't see it in the "info" file. Is there a way to tell the "Service
+Changed Indication" is actually working?
+Let's suppose the "Service Changed Indication" is already enabled, is
+there a way for the mobile app to check on their side to tell which
+service(s) got changed?
+
+Thanks again for your help.
+
+On Sun, Jan 24, 2021 at 7:35 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> Hello,
+> Hi Kenny,
 >
-> We implemented a GATT server on Linux in Python. The code is based on
-> the code sample(https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server).
-> The BlueZ version is 5.48. But we found a problem. The cached data in
-> /var/lib/bluetooth caused the mobile app to crash if some
-> characteristics are changed. After some research, we found "Under BLE
-> standard 'Generic Attribute'(0x1801), there is a Characteristic
-> 'Service Changed' (0x2A05) with 'indicate' property", see
-> https://github.com/espressif/esp-idf/issues/1777.
+> On Sun, Jan 24, 2021 at 12:45 AM Kenny Bian <kennybian@gmail.com> wrote:
+> >
+> > Hello,
+> >
+> > We implemented a GATT server on Linux in Python. The code is based on
+> > the code sample(https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/test/example-gatt-server).
+> > The BlueZ version is 5.48. But we found a problem. The cached data in
+> > /var/lib/bluetooth caused the mobile app to crash if some
+> > characteristics are changed. After some research, we found "Under BLE
+> > standard 'Generic Attribute'(0x1801), there is a Characteristic
+> > 'Service Changed' (0x2A05) with 'indicate' property", see
+> > https://github.com/espressif/esp-idf/issues/1777.
+> >
+> > The questions we have:
+> > How to enable the "Service Changed Indication"(0x2A05) in the
+> > bluetooth? Is there any code example in Python?
 >
-> The questions we have:
-> How to enable the "Service Changed Indication"(0x2A05) in the
-> bluetooth? Is there any code example in Python?
-
-If you are registering the services with Bluetoothd then it should
-generate the service change automatically:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n1185
-
-When a new service is registered it is indicated here:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n1452
-
-
--- 
-Luiz Augusto von Dentz
+> If you are registering the services with Bluetoothd then it should
+> generate the service change automatically:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n1185
+>
+> When a new service is registered it is indicated here:
+>
+> https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n1452
+>
+>
+> --
+> Luiz Augusto von Dentz
