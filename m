@@ -2,98 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E17C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 08:42:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A74AEC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 15:47:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B167224F9
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 08:42:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71C7C229C5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 15:47:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1725860AbhAYImH convert rfc822-to-8bit (ORCPT
+        id S1730267AbhAYPrF convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Jan 2021 03:42:07 -0500
-Received: from rtits2.realtek.com ([211.75.126.72]:53020 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1725789AbhAYIln (ORCPT
+        Mon, 25 Jan 2021 10:47:05 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:34198 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730377AbhAYPq3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Jan 2021 03:41:43 -0500
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 10P810gI4010597, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexmbs04.realtek.com.tw[172.21.6.97])
-        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 10P810gI4010597
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Mon, 25 Jan 2021 16:01:00 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 25 Jan 2021 16:00:59 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::ecca:80ca:53:e833]) by
- RTEXMBS04.realtek.com.tw ([fe80::ecca:80ca:53:e833%12]) with mapi id
- 15.01.2106.006; Mon, 25 Jan 2021 16:00:59 +0800
-From:   Hilda Wu <hildawu@realtek.com>
-To:     Claire Chang <tientzu@chromium.org>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "johan.hedberg@gmail.com" <johan.hedberg@gmail.com>,
-        "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Max Chou <max.chou@realtek.com>
-Subject: RE: [PATCH] Bluetooth: hci_h5: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for btrtl
-Thread-Topic: [PATCH] Bluetooth: hci_h5: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY
- for btrtl
-Thread-Index: AQHW7ljZ0ruzXjVhcUyIIArQ93ltkao34Wxg
-Date:   Mon, 25 Jan 2021 08:00:59 +0000
-Message-ID: <7df5d8b68525403ba1a252d0cd8eafe0@realtek.com>
-References: <20210119114700.3662156-1-tientzu@chromium.org>
-In-Reply-To: <20210119114700.3662156-1-tientzu@chromium.org>
-Accept-Language: zh-TW, en-US
-Content-Language: zh-TW
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-originating-ip: [172.21.132.158]
-Content-Type: text/plain; charset="us-ascii"
+        Mon, 25 Jan 2021 10:46:29 -0500
+Received: from marcel-macbook.holtmann.net (p4ff9f11c.dip0.t-ipconnect.de [79.249.241.28])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 44C42CECC6;
+        Mon, 25 Jan 2021 16:16:34 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
+Subject: Re: [PATCH v6 0/7] MSFT offloading support for advertisement monitor
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210122083617.3163489-1-apusaka@google.com>
+Date:   Mon, 25 Jan 2021 16:09:08 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-MIME-Version: 1.0
+Message-Id: <6C36E164-E3DC-44D3-A223-E75DC33CC090@holtmann.org>
+References: <20210122083617.3163489-1-apusaka@google.com>
+To:     Archie Pusaka <apusaka@google.com>
+X-Mailer: Apple Mail (2.3654.40.0.2.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Claire. Patch looks good to me.
+Hi Archie,
 
-Reviewed-by: Hilda Wu <hildawu@realtek.com>
+> This series of patches manages the hardware offloading part of MSFT
+> extension API. The full documentation can be accessed by this link:
+> https://docs.microsoft.com/en-us/windows-hardware/drivers/bluetooth/microsoft-defined-bluetooth-hci-commands-and-events
+> 
+> Only four of the HCI commands are planned to be implemented:
+> HCI_VS_MSFT_Read_Supported_Features (implemented in previous patch),
+> HCI_VS_MSFT_LE_Monitor_Advertisement,
+> HCI_VS_MSFT_LE_Cancel_Monitor_Advertisement, and
+> HCI_VS_MSFT_LE_Set_Advertisement_Filter_Enable.
+> These are the commands which would be used for advertisement monitor
+> feature. Only if the controller supports the MSFT extension would
+> these commands be sent. Otherwise, software-based monitoring would be
+> performed in the user space instead.
+> 
+> Thanks in advance for your feedback!
+> 
+> Archie
+> 
+> Changes in v6:
+> * New patch "advmon offload MSFT interleave scanning integration"
+> * New patch "disable advertisement filters during suspend"
+> 
+> Changes in v5:
+> * Discard struct flags on msft_data and use it's members directly
+> 
+> Changes in v4:
+> * Change the logic of merging add_adv_patterns_monitor with rssi
+> * Aligning variable declaration on mgmt.h
+> * Replacing the usage of BT_DBG with bt_dev_dbg
+> 
+> Changes in v3:
+> * Flips the order of rssi and pattern_count on mgmt struct
+> * Fix return type of msft_remove_monitor
+> 
+> Changes in v2:
+> * Add a new opcode instead of modifying an existing one
+> * Also implement the new MGMT opcode and merge the functionality with
+>  the old one.
+> 
+> Archie Pusaka (6):
+>  Bluetooth: advmon offload MSFT add rssi support
+>  Bluetooth: advmon offload MSFT add monitor
+>  Bluetooth: advmon offload MSFT remove monitor
+>  Bluetooth: advmon offload MSFT handle controller reset
+>  Bluetooth: advmon offload MSFT handle filter enablement
+>  Bluetooth: advmon offload MSFT interleave scanning integration
+> 
+> Howard Chung (1):
+>  Bluetooth: disable advertisement filters during suspend
+> 
+> include/net/bluetooth/hci_core.h |  36 ++-
+> include/net/bluetooth/mgmt.h     |  16 ++
+> net/bluetooth/hci_core.c         | 174 +++++++++---
+> net/bluetooth/hci_request.c      |  49 +++-
+> net/bluetooth/mgmt.c             | 391 +++++++++++++++++++-------
+> net/bluetooth/msft.c             | 460 ++++++++++++++++++++++++++++++-
+> net/bluetooth/msft.h             |  30 ++
+> 7 files changed, 1015 insertions(+), 141 deletions(-)
 
------Original Message-----
-From: Claire Chang <tientzu@chromium.org> 
-Sent: Tuesday, January 19, 2021 7:47 PM
-To: marcel@holtmann.org; johan.hedberg@gmail.com; luiz.dentz@gmail.com
-Cc: linux-bluetooth@vger.kernel.org; linux-kernel@vger.kernel.org; Max Chou <max.chou@realtek.com>; Hilda Wu <hildawu@realtek.com>; Claire Chang <tientzu@chromium.org>
-Subject: [PATCH] Bluetooth: hci_h5: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for btrtl
+all 7 patches have been applied to bluetooth-next tree.
 
-Realtek Bluetooth controllers can do both LE scan and BR/EDR inquiry at once, need to set HCI_QUIRK_SIMULTANEOUS_DISCOVERY quirk.
+Regards
 
-Signed-off-by: Claire Chang <tientzu@chromium.org>
----
- drivers/bluetooth/hci_h5.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c index fb9817f97d45..27e96681d583 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -906,6 +906,11 @@ static int h5_btrtl_setup(struct h5 *h5)
- 	/* Give the device some time before the hci-core sends it a reset */
- 	usleep_range(10000, 20000);
- 
-+	/* Enable controller to do both LE scan and BR/EDR inquiry
-+	 * simultaneously.
-+	 */
-+	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
-+
- out_free:
- 	btrtl_free(btrtl_dev);
- 
---
-2.30.0.284.gd98b1dd5eaa7-goog
+Marcel
 
