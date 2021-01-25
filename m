@@ -2,350 +2,191 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F18EDC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 21:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 19877C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 21:54:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE1B121BE5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 21:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAD9222573
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Jan 2021 21:54:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1731305AbhAYVsl (ORCPT
+        id S1732926AbhAYVyN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Jan 2021 16:48:41 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55704 "EHLO
+        Mon, 25 Jan 2021 16:54:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56460 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1732600AbhAYVsR (ORCPT
+        with ESMTP id S1732753AbhAYVvq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Jan 2021 16:48:17 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59B86C061573
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 13:47:34 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id u4so470246pjn.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 13:47:34 -0800 (PST)
+        Mon, 25 Jan 2021 16:51:46 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03F7C061573
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 13:51:05 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id 63so14328303oty.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 13:51:05 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VlX1Ba077hyvWDmmjxJ782rrfB4TJc4X/oYfs2uNiKo=;
-        b=IhXIA4spGYfcwpD06M0h0qvUHPA2scgyCC3Zpe9CQFiok4NTzIXfwth9V9MSSjISXc
-         MnX9iGfPG1n1sWHC4KG5IMLnjl1GEHs9ommryDKrdQNmAyM5AztDQMyRsuw2jViXdRUC
-         I2ejQEN4gWhxdAk+sg+JapMkC2OxWnXGP2rt70bAXD18XsUfK7pic4zLbV5kFa7yoic4
-         JVWI0vz/KZzAh1BD7rKFORtm8IBsfWZNk6HLJZOpyb2fq1MuZkrhnhgqz3fFqX5gt9BL
-         HWZUOMkyHEKK/ABX7NX/psZPLlhpEVKlHSNjQBil9M1jDSBhLxyxl0O2rjcNzqztE4xJ
-         r4Sg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=HTA3kB/Mydaw2KlrLqqpgLE+MoVNDdVc9J2h89r6tlM=;
+        b=PMKkXmbk8O6VgmemFY1N3BZztCRiX9hDnJSGbjFE4bcjz3wvUlREHJYJRs2hSjMp2j
+         CZOVBrEkCCPeJ+7mRQrR2WpBjM1IFGB/jhTiyd7flLQzQj1GgTKR1X+e5NmR24zT0Kn0
+         iAR3Spk+fiLqrkcxykIKLuPihhlsidAMZtI7WMHj3UkhBuISWpvbVBzDcrsGxRIuEmHs
+         rLql0qCU35qaTLxQhTKPnyzVXbg5yD3/9CbUS4fVJk6KHkJ54tEfWd6rO1pm5YymqtTo
+         5c45bRlbizbZHdW8A2FvPljVyxZaz5c7W+ItZpw/AuL1fwH8r17KNpKWoTD0Zs53GyfU
+         vX8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VlX1Ba077hyvWDmmjxJ782rrfB4TJc4X/oYfs2uNiKo=;
-        b=jWaapttFy/resvdAeH1hPWcR89OmA7ztETd7vjdb0ThbF2jbxPfvXLZqZ8gweL7yfK
-         R5AVcgjdntu6g4uSnOI/6OMYv5zFsRX2q+OQ2eyQ3OH6sCPHHpHa5Y8IJCEuqCEbvZhb
-         aEb2K7YiBejYny0VZFMcI99omGkhRlx1fdYFaSM7i9dXz9s7bS68XMVzfwqm5ZEVldmv
-         cAqlDz2u3glT+iL59j4L88Y+bQA+N9IV+dHgKnfvnmeYP6/7tyi0LgtZd7BmLXTZHfhY
-         lO9V1j7Er7jR0Dh1K2hAmAqU6y3pGZgVEqW5mg58kw1ef2mFvmFRWno3t8cHgJeDc1/q
-         khMw==
-X-Gm-Message-State: AOAM531UmHNOavv+dV0mJWtK4e4ox4+B2ZQf+4LjxvJAifAWmGFWtJf4
-        W2YBm25+QWQm/Ubi+YP/2mwY/i5BTjqhCw==
-X-Google-Smtp-Source: ABdhPJw6QTbU9S9KMlghMQGL7Jawk9Gv8srJ2Wu1g+adXbB5xYgyJyu/HmVk2as6YXXiHc/B2D2Eqw==
-X-Received: by 2002:a17:90b:2352:: with SMTP id ms18mr2298710pjb.138.1611611253478;
-        Mon, 25 Jan 2021 13:47:33 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id d10sm17166879pfn.218.2021.01.25.13.47.32
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Jan 2021 13:47:32 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: btusb: Add support for queuing during polling interval
-Date:   Mon, 25 Jan 2021 13:47:31 -0800
-Message-Id: <20210125214731.1650546-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.26.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=HTA3kB/Mydaw2KlrLqqpgLE+MoVNDdVc9J2h89r6tlM=;
+        b=mwQY6c48z6AawWwoD68GOVy64mEehMgAWpnoT6ZylStn862/ExjOFrtt7517wOk3HM
+         7ggBmMY/nqkefDAcPV5gpRjgcXDnoUPnqUukuSd1P697c/jzWmLAoj4CNVtr+plBBUXh
+         r9pd4kts56lronkj4kmNo5QiveV7BHmsDrLJgFf4x53hwDa5KUDfY1TIfjBdtyl5X6AL
+         pu37mgvrThWlZjnONrSQ1efCbTefJH3w+nu+lHKdGYsgN2mfsI7y8ebGaM+AwgxAdUjF
+         Tl4aDc1Dyyphc4iaCnWpQd8VvpLjaDwilM7bxYR3AeWfq3w3/imdVCGKjQURu6w3On49
+         twcQ==
+X-Gm-Message-State: AOAM531AOYYVcUkI5CKvJ00PCSXWlzoOZIya8xZOtJ+3VfuJ7J9/phP2
+        uMmVvLVJ4HmKIGD1YvYZ+d9LmfrfPZmd+reJARU=
+X-Google-Smtp-Source: ABdhPJzltjrJ2iUEZeXqxQZYRsSPcuatLmXmitijpiseaGD1gfiwN341nqpCH6z98Kr5y92JmOp5Wc/NmikrZteZmeU=
+X-Received: by 2002:a9d:2035:: with SMTP id n50mr1757874ota.44.1611611465271;
+ Mon, 25 Jan 2021 13:51:05 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210122001326.14263-1-sonnysasaka@chromium.org>
+ <20210122001326.14263-2-sonnysasaka@chromium.org> <CABBYNZJs_rzBSHOjvqg5F4u6gxX7LcNUc77KtzHEr5L7Y5Zd-A@mail.gmail.com>
+ <CAO271mkMtmDm_MayCX-+Dddg3aL1uv=GD3egCGJ6gDCEHowp8g@mail.gmail.com> <CAO271mkhpd8KOA=a3E66VpJUj01PONjmpS=m+U9MtwSWnUQ6BA@mail.gmail.com>
+In-Reply-To: <CAO271mkhpd8KOA=a3E66VpJUj01PONjmpS=m+U9MtwSWnUQ6BA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 25 Jan 2021 13:50:54 -0800
+Message-ID: <CABBYNZ+GazVResDzTtP4Oyt+duG4iNnPEC7CDu8JB5iPsrfzCw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2 2/2] input/hog: Do not create UHID if report map
+ is broken
+To:     Sonny Sasaka <sonnysasaka@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Sonny,
 
-This makes btusb to queue ACL and events during a polling interval
-by using of a delayed work, with the interval working as a time window
-where frames received from different endpoints are considered to be
-arrived at same time and then attempt to resolve potential conflics by
-processing the events ahead of ACL packets.
+On Mon, Jan 25, 2021 at 11:36 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+>
+> Hi Luiz,
+>
+> I have been trying to reproduce the issue again but it turns out to be
+> very rare. Let's defer this patch until I can get a clear log of what
+> is happening and why we get the corrupted cache.
 
-It worth noting though that priorizing events over ACL data may result
-in inverting the order compared to how they appeared over the air, for
-instance there may be packets received before a disconnect event that
-will be discarded and unencrypted packets received before encryption
-change which would considered encrypted, because of these potential
-changes on the order the support for queuing during the polling
-interval is not enabled by default so platforms have the following
-means to enable it:
+Ok, let me update in the pw, if you see this again let me know.
 
-At build-time:
+>
+>
+> On Thu, Jan 21, 2021 at 5:24 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> >
+> > Hi Luiz,
+> >
+> > On Thu, Jan 21, 2021 at 4:37 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Sonny,
+> > >
+> > > On Thu, Jan 21, 2021 at 4:18 PM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
+> > > >
+> > > > The report map in the cache could be dirty, for example when reading a
+> > > > report map from peer was cancelled, we should be able to detect it and
+> > > > not try to create UHID. Instead we will read it again from the peer.
+> > >
+> > > Don't we clean the cache if it had failed? Or you meant to say the
+> > > read long procedure was not complete so we got just part of the report
+> > > map?
+> > Looks like this is the case. It happened to me once when I cancel
+> > reconnection (trigger pairing mode during reconnection) from the
+> > keyboard side. It's hard to confirm since I have to get the timing
+> > right.
+> >
+> > > In that case we should have failed
+> > I agree. However it seems that the code already tries to fail by
+> > looking at the status inside report_map_read_cb, but somehow it still
+> > gets through. It could be the keyboard bug that we have to detect
+> > anyway?
+> >
+> > > also if we need to protect
+> > > uhid from malformed report map, which sounds like a kernel bug, then
+> > > we should at least have it inside bt_uhid instance so we can at least
+> > > attempt to have some unit testing done with broken report maps.
+> > >
+> > > > ---
+> > > >  profiles/input/hog-lib.c | 21 ++++++++++++++++++---
+> > > >  1 file changed, 18 insertions(+), 3 deletions(-)
+> > > >
+> > > > diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+> > > > index 089f42826..d6a3bda4d 100644
+> > > > --- a/profiles/input/hog-lib.c
+> > > > +++ b/profiles/input/hog-lib.c
+> > > > @@ -946,7 +946,7 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+> > > >         struct uhid_event ev;
+> > > >         ssize_t vlen = report_map_len;
+> > > >         char itemstr[20]; /* 5x3 (data) + 4 (continuation) + 1 (null) */
+> > > > -       int i, err;
+> > > > +       int i, err, collection_depth = 0;
+> > > >         GError *gerr = NULL;
+> > > >
+> > > >         DBG("Report MAP:");
+> > > > @@ -960,6 +960,14 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+> > > >                         if (!long_item && (value[i] & 0xfc) == 0x84)
+> > > >                                 hog->has_report_id = TRUE;
+> > > >
+> > > > +                       // Start Collection
+> > > > +                       if (value[i] == 0xa1)
+> > > > +                               collection_depth++;
+> > > > +
+> > > > +                       // End Collection
+> > > > +                       if (value[i] == 0xc0)
+> > > > +                               collection_depth--;
+> > > > +
+> > > >                         DBG("\t%s", item2string(itemstr, &value[i], ilen));
+> > > >
+> > > >                         i += ilen;
+> > > > @@ -968,10 +976,15 @@ static void uhid_create(struct bt_hog *hog, uint8_t *report_map,
+> > > >
+> > > >                         /* Just print remaining items at once and break */
+> > > >                         DBG("\t%s", item2string(itemstr, &value[i], vlen - i));
+> > > > -                       break;
+> > > > +                       return;
+> > > >                 }
+> > > >         }
+> > > >
+> > > > +       if (collection_depth != 0) {
+> > > > +               error("Report Map error: unbalanced collection");
+> > > > +               return;
+> > > > +       }
+> > > > +
+> > > >         /* create uHID device */
+> > > >         memset(&ev, 0, sizeof(ev));
+> > > >         ev.type = UHID_CREATE;
+> > > > @@ -1365,7 +1378,9 @@ static void foreach_hog_chrc(struct gatt_db_attribute *attr, void *user_data)
+> > > >                          * UHID to optimize reconnection.
+> > > >                          */
+> > > >                         uhid_create(hog, report_map.value, report_map.length);
+> > > > -               } else {
+> > > > +               }
+> > > > +
+> > > > +               if (!hog->uhid_created) {
+> > > >                         read_char(hog, hog->attrib, value_handle,
+> > > >                                                 report_map_read_cb, hog);
+> > > >                 }
+> > > > --
+> > > > 2.29.2
+> > > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
 
-    CONFIG_BT_HCIBTUSB_INTERVAL=y
 
-At runtime with use of module option:
 
-    enable_interval
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
-
-v2: Calculate the delayed_work interval based on the intr urb->interval which
-is derived from endpoint bInterval.
-
- drivers/bluetooth/Kconfig |   7 +++
- drivers/bluetooth/btusb.c | 102 ++++++++++++++++++++++++++++++++++----
- 2 files changed, 98 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 4e73a531b377..2f20a853d946 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -41,6 +41,13 @@ config BT_HCIBTUSB_AUTOSUSPEND
- 	  This can be overridden by passing btusb.enable_autosuspend=[y|n]
- 	  on the kernel commandline.
- 
-+config BT_HCIBTUSB_INTERVAL
-+	bool "Enable notification of USB polling interval"
-+	depends on BT_HCIBTUSB
-+	help
-+	  Say Y here to enable notification of USB polling interval for
-+	  Bluetooth USB devices by default.
-+
- config BT_HCIBTUSB_BCM
- 	bool "Broadcom protocol support"
- 	depends on BT_HCIBTUSB
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b14102fba601..f2208a219b89 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -30,7 +30,7 @@
- static bool disable_scofix;
- static bool force_scofix;
- static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
--
-+static bool enable_interval = IS_ENABLED(CONFIG_BT_HCIBTUSB_INTERVAL);
- static bool reset = true;
- 
- static struct usb_driver btusb_driver;
-@@ -519,8 +519,13 @@ struct btusb_data {
- 
- 	unsigned long flags;
- 
--	struct work_struct work;
--	struct work_struct waker;
-+	int intr_interval;
-+	struct work_struct  work;
-+	struct work_struct  waker;
-+	struct delayed_work rx_work;
-+
-+	struct sk_buff_head acl_q;
-+	struct sk_buff_head evt_q;
- 
- 	struct usb_anchor deferred;
- 	struct usb_anchor tx_anchor;
-@@ -557,7 +562,7 @@ struct btusb_data {
- 	int isoc_altsetting;
- 	int suspend_count;
- 
--	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
-+	int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
- 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
- 
- 	int (*setup_on_usb)(struct hci_dev *hdev);
-@@ -707,7 +712,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
- 
- 		if (!hci_skb_expect(skb)) {
- 			/* Complete frame */
--			data->recv_event(data->hdev, skb);
-+			data->recv_event(data, skb);
- 			skb = NULL;
- 		}
- 	}
-@@ -718,6 +723,25 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
- 	return err;
- }
- 
-+static int btusb_rx_queue(struct btusb_data *data, struct sk_buff *skb,
-+			  struct sk_buff_head *queue, unsigned int interval)
-+{
-+	skb_queue_tail(queue, skb);
-+
-+	schedule_delayed_work(&data->rx_work, interval);
-+
-+	return 0;
-+}
-+
-+static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
-+{
-+	if (!enable_interval)
-+		return hci_recv_frame(data->hdev, skb);
-+
-+	return btusb_rx_queue(data, skb, &data->acl_q,
-+			      usecs_to_jiffies(data->intr_interval));
-+}
-+
- static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
- {
- 	struct sk_buff *skb;
-@@ -765,7 +789,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
- 
- 		if (!hci_skb_expect(skb)) {
- 			/* Complete frame */
--			hci_recv_frame(data->hdev, skb);
-+			btusb_recv_acl(data, skb);
- 			skb = NULL;
- 		}
- 	}
-@@ -917,6 +941,19 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
- 		usb_unanchor_urb(urb);
- 	}
- 
-+	/* The units are frames (milliseconds) for full and low speed devices,
-+	 * and microframes (1/8 millisecond) for highspeed and SuperSpeed
-+	 * devices.
-+	 */
-+	switch (urb->dev->speed) {
-+	case USB_SPEED_SUPER_PLUS:
-+	case USB_SPEED_SUPER:	/* units are 125us */
-+		data->intr_interval = urb->interval * 125;
-+		break;
-+	default:
-+		data->intr_interval = urb->interval * 1000;
-+	}
-+
- 	usb_free_urb(urb);
- 
- 	return err;
-@@ -1383,9 +1420,13 @@ static int btusb_close(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work(&data->rx_work);
- 	cancel_work_sync(&data->work);
- 	cancel_work_sync(&data->waker);
- 
-+	skb_queue_purge(&data->acl_q);
-+	skb_queue_purge(&data->evt_q);
-+
- 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
- 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
- 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
-@@ -1417,6 +1458,11 @@ static int btusb_flush(struct hci_dev *hdev)
- 
- 	BT_DBG("%s", hdev->name);
- 
-+	cancel_delayed_work(&data->rx_work);
-+
-+	skb_queue_purge(&data->acl_q);
-+	skb_queue_purge(&data->evt_q);
-+
- 	usb_kill_anchored_urbs(&data->tx_anchor);
- 	btusb_free_frags(data);
- 
-@@ -1769,6 +1815,25 @@ static void btusb_waker(struct work_struct *work)
- 	usb_autopm_put_interface(data->intf);
- }
- 
-+static void btusb_rx_dequeue(struct btusb_data *data,
-+			     struct sk_buff_head *queue)
-+{
-+	struct sk_buff *skb;
-+
-+	while ((skb = skb_dequeue(queue)))
-+		hci_recv_frame(data->hdev, skb);
-+}
-+
-+static void btusb_rx_work(struct work_struct *work)
-+{
-+	struct btusb_data *data = container_of(work, struct btusb_data,
-+					       rx_work.work);
-+
-+	/* Process HCI event packets so states changes are synchronized first */
-+	btusb_rx_dequeue(data, &data->evt_q);
-+	btusb_rx_dequeue(data, &data->acl_q);
-+}
-+
- static int btusb_setup_bcm92035(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -2304,10 +2369,8 @@ static void btusb_intel_secure_send_result(struct btusb_data *data,
- 		wake_up_bit(&data->flags, BTUSB_DOWNLOADING);
- }
- 
--static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
-+static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
- {
--	struct btusb_data *data = hci_get_drvdata(hdev);
--
- 	if (test_bit(BTUSB_BOOTLOADER, &data->flags)) {
- 		struct hci_event_hdr *hdr = (void *)skb->data;
- 
-@@ -2336,7 +2399,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
- 
--	return hci_recv_frame(hdev, skb);
-+	return hci_recv_frame(data->hdev, skb);
- }
- 
- static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
-@@ -4279,6 +4342,15 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
-+{
-+	if (!enable_interval)
-+		return hci_recv_frame(data->hdev, skb);
-+
-+	/* Don't delay event processing */
-+	return btusb_rx_queue(data, skb, &data->evt_q, 0);
-+}
-+
- static int btusb_probe(struct usb_interface *intf,
- 		       const struct usb_device_id *id)
- {
-@@ -4362,6 +4434,11 @@ static int btusb_probe(struct usb_interface *intf,
- 
- 	INIT_WORK(&data->work, btusb_work);
- 	INIT_WORK(&data->waker, btusb_waker);
-+	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
-+
-+	skb_queue_head_init(&data->acl_q);
-+	skb_queue_head_init(&data->evt_q);
-+
- 	init_usb_anchor(&data->deferred);
- 	init_usb_anchor(&data->tx_anchor);
- 	spin_lock_init(&data->txlock);
-@@ -4378,7 +4455,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		data->recv_bulk = btusb_recv_bulk_intel;
- 		set_bit(BTUSB_BOOTLOADER, &data->flags);
- 	} else {
--		data->recv_event = hci_recv_frame;
-+		data->recv_event = btusb_recv_evt;
- 		data->recv_bulk = btusb_recv_bulk;
- 	}
- 
-@@ -4867,6 +4944,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
- module_param(enable_autosuspend, bool, 0644);
- MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
- 
-+module_param(enable_interval, bool, 0644);
-+MODULE_PARM_DESC(enable_interval, "Enable USB polling interval by default");
-+
- module_param(reset, bool, 0644);
- MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
- 
 -- 
-2.26.2
-
+Luiz Augusto von Dentz
