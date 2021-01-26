@@ -2,215 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 157E0C4332D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jan 2021 18:46:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 244AAC4332B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D115422A85
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jan 2021 18:46:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02F9C22D58
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Jan 2021 19:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S2390543AbhAZRTN (ORCPT
+        id S1732367AbhAZFcu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jan 2021 12:19:13 -0500
-Received: from mga07.intel.com ([134.134.136.100]:13279 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S2389200AbhAZHYX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jan 2021 02:24:23 -0500
-IronPort-SDR: fcniHJHIhMZKScLmRFmNws8YLiZ3dHPCeI2CABG53z+B/vSa7ucO4ZcIW9cN6fH/8vhv5Y9s40
- u/GG/okKNUFA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9875"; a="243941322"
-X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="243941322"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jan 2021 23:23:33 -0800
-IronPort-SDR: Y0G9jqW/7OD9mQvryVgCFxmFV6P93PkdqW2sa704lPOzqtW7g+LmOIeKtO3+JAx6dG6bbj/468
- TA9CRknpHKpg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,375,1602572400"; 
-   d="scan'208";a="361883899"
-Received: from lkp-server02.sh.intel.com (HELO 625d3a354f04) ([10.239.97.151])
-  by fmsmga008.fm.intel.com with ESMTP; 25 Jan 2021 23:23:31 -0800
-Received: from kbuild by 625d3a354f04 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1l4IhH-0000hp-Cq; Tue, 26 Jan 2021 07:23:31 +0000
-Date:   Tue, 26 Jan 2021 15:23:27 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 98d2c3e1731007acf03addf83c863df6694beb95
-Message-ID: <600fc36f.HHgiWe9LV0Ezgeh6%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Tue, 26 Jan 2021 00:32:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1728597AbhAZBbv (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 25 Jan 2021 20:31:51 -0500
+Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0652CC061A86
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 17:11:43 -0800 (PST)
+Received: by mail-pg1-x534.google.com with SMTP id o16so540517pgg.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 17:11:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Rd61baDo1O8agTqfKzI1LVnjDA9xt1ECM38/G+bIWJ4=;
+        b=RzKcQ5oVCP6kxQQptiP4bMvEGBoaa3Dg0+VkY9pws24AaEmhezUUF4Z2GlgxYYoHiW
+         qFhWGsI+HAmtQjzCO//8uQOA1mMG1Vc8CakpiPRdhgNCQTFATBCT5HfoUsL52bAK0nba
+         Xt/r2ptbey0nQ4w3NJLV/ieiiSWuYAKaAqWj4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Rd61baDo1O8agTqfKzI1LVnjDA9xt1ECM38/G+bIWJ4=;
+        b=YIoYLxpYNkBqO0ZioleiiQn2KOUJdua9P/VgvU+OVamqpLQXHGFzyiL8vvragEidWW
+         bMVx504umLUaURcHMP7kLTrIuENp4v/oWGsN8oYqWQXsiYU8sqyrKMc3Fj3XxxNYG8dL
+         IYBtwZ2/Lj42y4uwXvL8MkQqAxMlQ2iAB6bZi8Xle/Jly17c7ZPHSNw++kj2zkHD1Buo
+         kJB2WRJb+wXhxqFiAvEYx7KmIhJzwAw2Q3amVjQuhomqHghcg1hBZRbB2INZk1poWlFi
+         Yg6/EewF1IqvmNIadSy8D4NT1nF8a8oO5a8PFI8gRtlB2Oe1eMv9CxLNg4SN2BgMPMVD
+         V9Pg==
+X-Gm-Message-State: AOAM533O6Acq3rEJRxMQcmKQTJF4b5cgEnrJmiWhlexESSiI5hUgdYX7
+        itr7YKaEhMHqo2HbF5RnUH9HS5srrmTM0A==
+X-Google-Smtp-Source: ABdhPJw6DT2NVWSz/fwB+JVdInE0tl/SKLYNLx3U4Xbe0bxAPCVPrCpvq95Z3ieNEEblaQkxYhyfHw==
+X-Received: by 2002:aa7:909a:0:b029:1bc:22d3:9e58 with SMTP id i26-20020aa7909a0000b02901bc22d39e58mr2837675pfa.29.1611623502288;
+        Mon, 25 Jan 2021 17:11:42 -0800 (PST)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:7c08:2ccf:8f7c:2eed])
+        by smtp.gmail.com with ESMTPSA id d76sm17776543pfd.193.2021.01.25.17.11.41
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 25 Jan 2021 17:11:41 -0800 (PST)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] input/hog: Fix crashes of UAF of hog->attr
+Date:   Mon, 25 Jan 2021 17:11:30 -0800
+Message-Id: <20210126011130.5233-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 98d2c3e1731007acf03addf83c863df6694beb95  Bluetooth: L2CAP: Try harder to accept device not knowing options
+hog->attr does not own pointer, so it may be invalid when hog object
+gets re-attached at bt_hog_attach(). To solve this, this patch
+intentionally clears hog->attr at bt_hog_detach() to mark it as invalid
+so that it can be repopulated with the valid pointer at bt_hog_attach().
+The same applies to all sub-instances.
 
-elapsed time: 727m
-
-configs tested: 144
-configs skipped: 2
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-arm                         axm55xx_defconfig
-arc                        nsim_700_defconfig
-arm                         palmz72_defconfig
-mips                           ci20_defconfig
-arm                       mainstone_defconfig
-sh                           se7712_defconfig
-arm                        keystone_defconfig
-powerpc                     ksi8560_defconfig
-sh                          rsk7201_defconfig
-powerpc                   bluestone_defconfig
-arm                  colibri_pxa270_defconfig
-riscv                             allnoconfig
-sh                           se7722_defconfig
-mips                         db1xxx_defconfig
-m68k                       m5249evb_defconfig
-powerpc                          g5_defconfig
-sh                           se7343_defconfig
-ia64                             allyesconfig
-mips                         rt305x_defconfig
-powerpc                      arches_defconfig
-mips                        omega2p_defconfig
-mips                          ath25_defconfig
-powerpc                     skiroot_defconfig
-powerpc                 mpc8315_rdb_defconfig
-powerpc                     rainier_defconfig
-arc                    vdk_hs38_smp_defconfig
-mips                       capcella_defconfig
-mips                            gpr_defconfig
-powerpc                   motionpro_defconfig
-i386                             alldefconfig
-mips                  maltasmvp_eva_defconfig
-sh                   sh7770_generic_defconfig
-nios2                               defconfig
-sh                           se7705_defconfig
-mips                  cavium_octeon_defconfig
-powerpc                     tqm5200_defconfig
-sparc                               defconfig
-arm                          lpd270_defconfig
-arm                         bcm2835_defconfig
-powerpc                      walnut_defconfig
-c6x                              allyesconfig
-mips                  decstation_64_defconfig
-sh                          lboxre2_defconfig
-arm                         lpc18xx_defconfig
-s390                             allyesconfig
-sh                        sh7763rdp_defconfig
-powerpc                     tqm8555_defconfig
-powerpc                    amigaone_defconfig
-mips                      fuloong2e_defconfig
-arm                       aspeed_g5_defconfig
-arm                         nhk8815_defconfig
-sh                               alldefconfig
-sh                               j2_defconfig
-mips                      pistachio_defconfig
-openrisc                    or1ksim_defconfig
-sh                          polaris_defconfig
-arm                           corgi_defconfig
-arm                        mvebu_v7_defconfig
-mips                         mpc30x_defconfig
-powerpc                         ps3_defconfig
-arm                  colibri_pxa300_defconfig
-arm                     eseries_pxa_defconfig
-sparc64                          alldefconfig
-sh                        dreamcast_defconfig
-xtensa                  cadence_csp_defconfig
-m68k                            q40_defconfig
-mips                malta_qemu_32r6_defconfig
-arm                        multi_v7_defconfig
-m68k                                defconfig
-ia64                             allmodconfig
-ia64                                defconfig
-m68k                             allmodconfig
-m68k                             allyesconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-i386                               tinyconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a003-20210125
-x86_64               randconfig-a002-20210125
-x86_64               randconfig-a001-20210125
-x86_64               randconfig-a005-20210125
-x86_64               randconfig-a006-20210125
-x86_64               randconfig-a004-20210125
-i386                 randconfig-a002-20210125
-i386                 randconfig-a004-20210125
-i386                 randconfig-a005-20210125
-i386                 randconfig-a003-20210125
-i386                 randconfig-a001-20210125
-i386                 randconfig-a006-20210125
-x86_64               randconfig-a012-20210126
-x86_64               randconfig-a016-20210126
-x86_64               randconfig-a015-20210126
-x86_64               randconfig-a011-20210126
-x86_64               randconfig-a013-20210126
-x86_64               randconfig-a014-20210126
-i386                 randconfig-a013-20210125
-i386                 randconfig-a011-20210125
-i386                 randconfig-a012-20210125
-i386                 randconfig-a015-20210125
-i386                 randconfig-a014-20210125
-i386                 randconfig-a016-20210125
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                                   rhel
-x86_64                           allyesconfig
-x86_64                    rhel-7.6-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
-
-clang tested configs:
-x86_64               randconfig-a012-20210125
-x86_64               randconfig-a016-20210125
-x86_64               randconfig-a015-20210125
-x86_64               randconfig-a011-20210125
-x86_64               randconfig-a013-20210125
-x86_64               randconfig-a014-20210125
+Sample stack trace:
+* thread #1, stop reason = signal SIGSEGV
+  * frame #0: 0x05ad49f2 bluetoothd`<name omitted> at gatt-db.c:1428
+    frame #1: 0x05a91922 bluetoothd`bt_hog_attach at hog-lib.c:1694
+    frame #2: 0x05a9160e bluetoothd`hog_accept at hog.c:212
+    frame #3: 0x05ab4784 bluetoothd`service_accept at service.c:203
+    frame #4: 0x05aba1e6 bluetoothd`device_attach_att at device.c:4542
+    frame #5: 0x05a9c4a2 bluetoothd`connect_cb at gatt-database.c:656
+    frame #6: 0x05a98e8c bluetoothd`server_cb at btio.c:264
+    frame #7: 0xec8e6a1a libglib-2.0.so.0`g_main_context_dispatch at gmain.c:3325
+    frame #8: 0xec8e6c58 libglib-2.0.so.0`g_main_context_iterate at gmain.c:4119
+    frame #9: 0xec8e6e52 libglib-2.0.so.0`g_main_loop_run at gmain.c:4317
+    frame #10: 0x05ad582e bluetoothd`mainloop_run at mainloop-glib.c:79
+    frame #11: 0x05ad5a64 bluetoothd`mainloop_run_with_signal at mainloop-notify.c:201
+    frame #12: 0x05ac35ac bluetoothd`main at main.c:1103
+    frame #13: 0xec6ed0a2 libc.so.6`__libc_start_main at libc-start.c:308
 
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ profiles/input/hog-lib.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
+
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 1f132aa4c..7d1ea53bd 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -1651,12 +1651,19 @@ static void primary_cb(uint8_t status, GSList *services, void *user_data)
+ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ {
+ 	GSList *l;
++	bt_uuid_t uuid;
+ 
+ 	if (hog->attrib)
+ 		return false;
+ 
+ 	hog->attrib = g_attrib_ref(gatt);
+ 
++	if (!hog->attr && hog->gatt_db) {
++		bt_uuid16_create(&uuid, HOG_UUID16);
++		gatt_db_foreach_service(hog->gatt_db, &uuid,
++					foreach_hog_service, hog);
++	}
++
+ 	if (!hog->attr && !hog->primary) {
+ 		discover_primary(hog, hog->attrib, NULL, primary_cb, hog);
+ 		return true;
+@@ -1744,6 +1751,14 @@ void bt_hog_detach(struct bt_hog *hog)
+ 		bt_hog_detach(instance);
+ 	}
+ 
++	/* hog->attr doesn't own pointer, so it may be invalid when this hog
++	 * object gets re-attached with bt_hog_attach(). So intentionally mark
++	 * it as invalid and remove all instances so that the instances can be
++	 * re-attached at bt_hog_attach().
++	 */
++	hog->attr = NULL;
++	g_slist_free_full(hog->instances, hog_free);
++
+ 	for (l = hog->reports; l; l = l->next) {
+ 		struct report *r = l->data;
+ 
+-- 
+2.29.2
+
