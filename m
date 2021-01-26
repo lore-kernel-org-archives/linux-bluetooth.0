@@ -7,63 +7,63 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B57ECC433E9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:25:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88952C4332E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:25:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9325C20771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:25:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F18820771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:25:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S313772AbhAZW6I (ORCPT
+        id S313260AbhAZW5r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:58:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60648 "EHLO
+        Tue, 26 Jan 2021 17:57:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S2393413AbhAZRt5 (ORCPT
+        with ESMTP id S2388743AbhAZFpz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jan 2021 12:49:57 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44E1DC061788
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jan 2021 09:49:15 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id lw17so1618489pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jan 2021 09:49:15 -0800 (PST)
+        Tue, 26 Jan 2021 00:45:55 -0500
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70E0EC061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 21:45:15 -0800 (PST)
+Received: by mail-pf1-x429.google.com with SMTP id q131so9840281pfq.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Jan 2021 21:45:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=u2aZKfq5FCs/M0zy6bHJijugjpc9A2MRnegy9e+obYM=;
-        b=p4G0a2rmaquFE6Ms20pgOeOOQM4kxs/T8wphU4G0tuj0T+CFN1+782LaoFbNFcskty
-         ILDJbLMuFWd1Bok0VCaWoSwhwtwcSQKe/Jiw4C2hCq9MEwo8aBUgfeuX7cNdghLRGdEx
-         TZzMxILjabS35etvPP/kaIEaWe5lYYbi/GOONABHVYsNB/moixBHpZOfuF9j3Fx2ZUYm
-         BndYUUrpw2mizHpFMJyyLWnfq2RKKAdMyBcWJzU8KNh1VqVaCBBU1IZMNd3Dr9EWh8cS
-         jLTfC3FeyBnPwD4kWMkLjNRqkftIU47Hagtz0ERayU5QqN5qroEuDL329h6l8Ls8SHr9
-         KRDA==
+        bh=ODUGC4hdJeRdlEleX5VDVkve51htproVIDZ5AyPYN1o=;
+        b=uI5tCJmhdcCS+tZs2j813/EZ1bZJOIrGWjILaTQRcZPpCBgFtKmGJRYqqx/wdTumMG
+         4Gmg7HH1HWdkQ7sC2bnbgdlhluKeRmpQSFadmzjJ0TFSHNwAH7YB0G+1He4WIc1T8A+V
+         3EDWBgSvfrgYSakESsiWf88gL3SYIS9bHptQ7dWII2cidpyi+wAqPy/GGTYuclKcR3Lj
+         ihefRUYUDhOxVmGZaNrkDVfklfbEzNvwR9XhKfG3XkrswL3cHHCzW9uNm1tUepNnAh/R
+         ZesZXmRq0Nwbo2oOOkYyKa0e3Ffw6ukDS3UizYX11auerMwYUOwo4GNZ85WqeKQkvRgo
+         J11w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=u2aZKfq5FCs/M0zy6bHJijugjpc9A2MRnegy9e+obYM=;
-        b=qj8tqt+9LdFMT82InTKLJ81IX0IS3AFAy9A5ToW7X7+UhA8laOkXzE8J987BO0+QBU
-         y8Ln/LY1Nm5r+5Fag9eT3fgsPz75q3hGzfG/KGhpnSZ9eieOjwPbfylBl1GOFLyLr0Nk
-         /I/uzcz/dSvwT7sGV7O8v8Ug9Rh/JaQZMTXesJYcHGrgZb19QA0tiC6hDSl7R6J6jynA
-         SI6FilUSP7aU3fhMtBEbZK45pbQeTWPk7QFsdRkoEkmUDhU32OX0yNq4mzX+Ws2ZK3W5
-         5+tEpI+ZSWz0fRt0HbrMib7NyYnSQ9OjIVJvbhL67auY/36kxRCkdaeadsQl1xjXQ5T8
-         6NUw==
-X-Gm-Message-State: AOAM533Npx5KVgtfbIc+gFxOzEHYNyLSd7Tvv7MLDIqm0lUtkp5Ot32J
-        9M4VAIEP2ZpC8sKDjQgWGZ40IifsFuQ5Dw==
-X-Google-Smtp-Source: ABdhPJwhPkOJSizEogr3CiVc8ZQsdZTW2h0xCMF/6oGlrl7m5JKI5nUqfJrniZpDUDGaHzgE/H1Fxw==
-X-Received: by 2002:a17:902:c14d:b029:de:3a7f:2c08 with SMTP id 13-20020a170902c14db02900de3a7f2c08mr7022176plj.7.1611683354586;
-        Tue, 26 Jan 2021 09:49:14 -0800 (PST)
+        bh=ODUGC4hdJeRdlEleX5VDVkve51htproVIDZ5AyPYN1o=;
+        b=ausLsgw2qkwghjjHhttMMI5zXX/3A0a1oufHQou7vLamcY7VpzO8wd1ex9otcvOPjr
+         iNJQuMV0DfjG0AIa3a5HRPzOPlC+CtakpLpRxozZeKabAxgCTrN8Fkj2o7VuuVSBwF4l
+         UzrHuKI/EGSQpbDA7Dwz2eiUX/DdFgArb11+TCnMjrI1Y4gbzy0Z0xyVVY72qXtXJda8
+         SClEgEe/gEGbEpIKirZ9rSpHVr79WdVoWUw0IVhpwZ5ODyMlBVamF5G4OiDVYqi8DTq/
+         V5hbYYjnQsrvyZm6QKYHNismR+HCPQthHQAst/veoQ6nBSTTgxStRX4cQGmnNxYnlAGO
+         fgZQ==
+X-Gm-Message-State: AOAM530YQgGz+oZ/G6+LufWA19GTUdo7FOsVF3m4I9pJaKZq5c5RKdJ/
+        d+ukh0YuMjxbG7/2Z4qw074gOdawkc3oLcdR
+X-Google-Smtp-Source: ABdhPJzCTdzbv97W5FaHBreNKUlLXiBb8kYujtHOYAVSksIFBuMDmzMA7QNqbVk5Z9eCgikD01Ct4A==
+X-Received: by 2002:a63:7402:: with SMTP id p2mr4125705pgc.101.1611639914876;
+        Mon, 25 Jan 2021 21:45:14 -0800 (PST)
 Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:30d0:3127:d904:e93e:f6b7])
-        by smtp.gmail.com with ESMTPSA id e17sm2901765pjh.39.2021.01.26.09.49.13
-        for <linux-bluetooth@vger.kernel.org>
+        by smtp.gmail.com with ESMTPSA id v1sm19037213pga.63.2021.01.25.21.45.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Jan 2021 09:49:13 -0800 (PST)
+        Mon, 25 Jan 2021 21:45:14 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 X-Google-Original-From: Tedd Ho-Jeong An <tedd.an@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2] tools/bluemoon: Display FW version of firmware file
-Date:   Tue, 26 Jan 2021 09:49:12 -0800
-Message-Id: <20210126174912.83822-1-tedd.an@intel.com>
+Cc:     tedd.an@intel.com
+Subject: [PATCH] tools/bluemoon: Display FW version of firmware file
+Date:   Mon, 25 Jan 2021 21:45:12 -0800
+Message-Id: <20210126054512.76870-1-tedd.an@intel.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -79,7 +79,7 @@ Module vendor and Date in the CSS header to hex for easy read.
  1 file changed, 21 insertions(+), 3 deletions(-)
 
 diff --git a/tools/bluemoon.c b/tools/bluemoon.c
-index 8b62b1e7b..912f4f2a9 100644
+index 8b62b1e7b..773e891cf 100644
 --- a/tools/bluemoon.c
 +++ b/tools/bluemoon.c
 @@ -805,8 +805,10 @@ static void analyze_firmware(const char *path)
@@ -110,16 +110,16 @@ index 8b62b1e7b..912f4f2a9 100644
 +			params = (void *)&firmware_data[firmware_offset + 3];
 +			printf("Boot Parameters\n");
 +			printf("Boot Address:\t0x%08x\n",
-+					le32_to_cpu(params->boot_addr));
-+			printf("FW Version(yy):\t%d (0x%02X)\n",
-+					params->fw_build_yy + 2000,
-+					params->fw_build_yy);
-+			printf("FW Version(cw):\t%d (0x%02X)\n",
-+					params->fw_build_cw,
-+					params->fw_build_cw);
-+			printf("FW Version(nn):\t%d (0x%02X)\n",
-+					params->fw_build_nn,
-+					params->fw_build_nn);
++						le32_to_cpu(params->boot_addr));
++			printf("FW Version(YY):\t%d (0x%02X)\n",
++						params->fw_build_yy + 2000,
++						params->fw_build_yy);
++			printf("FW Version(WW):\t%d (0x%02X)\n",
++						params->fw_build_cw,
++						params->fw_build_cw);
++			printf("FW Version(NN):\t%d (0x%02X)\n",
++						params->fw_build_nn,
++						params->fw_build_nn);
 +
 +			printf("\n");
 +		case CMD_NO_OPERATION:
