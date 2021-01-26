@@ -2,163 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1037DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 10:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 758F2C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 10:37:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B56A420786
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 10:35:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1848720789
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 10:37:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S314142AbhAZW7a (ORCPT
+        id S314129AbhAZW66 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jan 2021 17:59:30 -0500
-Received: from mga04.intel.com ([192.55.52.120]:54518 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1727036AbhAZVeJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jan 2021 16:34:09 -0500
-IronPort-SDR: lr4mueA5UR4jwtrcbkhXYa+gif95OjzqRwjxPXq8yU5qAzaFFSu2qZT+MNVdfQceg8WQB8zCr5
- LRS8WItV+Hwg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="177406686"
-X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
-   d="scan'208";a="177406686"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 13:33:25 -0800
-IronPort-SDR: m5TOsxvtv8i4q6LheXPj1GCyBPRPhr7r4L6nfZYMx16glqXXfe77AJtHEE6A/7fLr5lyP5dt2v
- JQ120Pted7mQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.79,377,1602572400"; 
-   d="scan'208";a="410297386"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 26 Jan 2021 13:33:25 -0800
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Tue, 26 Jan 2021 13:33:24 -0800
-Received: from orsmsx607.amr.corp.intel.com (10.22.229.20) by
- ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.1713.5; Tue, 26 Jan 2021 13:33:24 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx607.amr.corp.intel.com (10.22.229.20) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.1713.5
- via Frontend Transport; Tue, 26 Jan 2021 13:33:24 -0800
-Received: from NAM04-BN3-obe.outbound.protection.outlook.com (104.47.46.59) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.1713.5; Tue, 26 Jan 2021 13:33:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AkwRmkMRAS/RjriLYHMR5Vt49PQE+969JZI7qozmUJUYmdN8F8Etp2GTAFhqFoCdbq+5Kikt6x+JC/Guji8LqNjMcBPf8OULB85LbF/fqMTo0bmtvdJyx6K/qdMuie5EO50OAAe+xElChWJLp3+JW5d3G24CFY7N7uL619XYziDBoaKukP3h8MOEqIKYG+5dhMF13u+vjGYJxtGdrmnvxRffQ/F4oAWj2oUSJdWG9uu1IEgYSz/xkbz2NtJYQVWHQVurmVFkZrxwOunO+Z183umLLxuVazxXjNwIpC+yLsELQgnzfW3PzHONEcMX5ptEmRLg7AdSpU/anWYjKZx6NQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eJnm1cs82BCcX6G7wT817xwQPNpIBrQl+Oj/fIgrK90=;
- b=BmX7xzvOxOnE//m0/rT+wajk8wnXP6s5UYJQm1+mcxKbFCtW4M/xSgue24gCP57itZe3SEg9forGB668kUGvfdRTejhrwnMoaZcNxOvRTcqRJyBUN8VkWNEZ9EsBLPo7/mSe/xwQYuataCEkbn4XtkiUWj3aJQ4Axp7kCviHeWWxp6YgHmnHxzMrAgkqWgraRnoE2RbHmfBxoo3hA8dQ1wSg//NmU3gw+qd4UF5/CkkK+g3bHaKMe0+E822sMUkfiajp4d6cQTOZCGpRirFY6IdU8+zYwPRsRpUxCw7rL4alLsjkXjLwOYBHToEPzxMyVTQRInmU/LJbVzr+tp5imw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=eJnm1cs82BCcX6G7wT817xwQPNpIBrQl+Oj/fIgrK90=;
- b=pUp1Tms7acTf64oExIe9YqAWG5DLlq0oxaytwRlyczCGG7cIYpyUFB3OqA74+HbvSYFiLN16LHZGBf2z2sGkbVa7W++Bmoya18X/g7bQzZlhqiKXguF4fVFRXQvjJr35j541z53HaEdy9tQa6b2kAHTbPCEVrmbZv0TvqvKr0U0=
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com (2603:10b6:303:2f::13)
- by MWHPR11MB1981.namprd11.prod.outlook.com (2603:10b6:300:111::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.3784.12; Tue, 26 Jan
- 2021 21:33:22 +0000
-Received: from MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::30c6:ea80:eabe:2aab]) by MW3PR11MB4539.namprd11.prod.outlook.com
- ([fe80::30c6:ea80:eabe:2aab%8]) with mapi id 15.20.3784.019; Tue, 26 Jan 2021
- 21:33:21 +0000
-From:   "Gix, Brian" <brian.gix@intel.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-CC:     "luiz.dentz@gmail.com" <luiz.dentz@gmail.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>
-Subject: Re: [PATCH BlueZ] ELL: Up-rev the ELL file list to version Rel 0.37
-Thread-Topic: [PATCH BlueZ] ELL: Up-rev the ELL file list to version Rel 0.37
-Thread-Index: AQHW9Crek2m3PxdImEOmsXRWK9r39w==
-Date:   Tue, 26 Jan 2021 21:33:21 +0000
-Message-ID: <cddd91d955531cb3268dbbd7cea5b6ddcfbb25db.camel@intel.com>
-References: <20210114211322.328712-1-brian.gix@intel.com>
-In-Reply-To: <20210114211322.328712-1-brian.gix@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.34.4 (3.34.4-1.fc31) 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none header.from=intel.com;
-x-originating-ip: [192.55.54.38]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 841daaed-3141-4ae3-87dd-08d8c2420163
-x-ms-traffictypediagnostic: MWHPR11MB1981:
-x-microsoft-antispam-prvs: <MWHPR11MB19811C98328FD611D18CA728E1BC9@MWHPR11MB1981.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6108;
-x-ms-exchange-senderadcheck: 1
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: zCIjLXUmxyujNCtAzV+pR9RduoH1CZfy/fkbIkHwU8xj2mal3j0gYnVhf2dRLnDk0EBK+9NjhKBqIZMd/0Y39AbUPKFdDexi6Js/IIfPG+i3plJNExLgQt+RoJiM7mPYMWfJHOpPnN1A6FmZzdKe3cm1bt7fM7Z2sc+E4oumTgMMYrnvFkJlZqZb6d60GgfQMopqsuUBLUz/LvAnSDHNHMv1yltQ7C0lYGxAG1S5BRK98WE5PPQgh4yz5Xx9ViEUqdhXwQB9jXZSZnZFi0sAWdlkqR4vBQ+Hvuav48l6ilbsZmaG2H+gZy02a75astDeDTOC3PoOF8/CJOYs5ZxzIEVZMy6QrtvExeGieQPeDnDB8mK+WIqNWEDosN3mHI/sRS2/C7CszC5MysrKoui6Y4Va2fdoS95qnzaOkMxXzuQVAOwR93DJQrFoTHvaKGQ8dmodGbAYAPgK6VcdnHvUHMVxm2mDSVWIrMGD/MSgp/hJbknDFjMwyv8RDkv6wgwHTIkLmQw7YVp2zY4+DbnLjg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4539.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(376002)(39860400002)(346002)(136003)(366004)(396003)(36756003)(76116006)(91956017)(8936002)(316002)(6916009)(71200400001)(6512007)(54906003)(2906002)(66446008)(66556008)(64756008)(66946007)(66476007)(86362001)(8676002)(4744005)(6486002)(478600001)(5660300002)(6506007)(186003)(26005)(2616005)(83380400001)(4326008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata: =?utf-8?B?SHo1N0hMbzVBZnhkVVpyc3AzUUhsQkNEUWlvaG0xQ1poK2hPcHl4K29YY0xK?=
- =?utf-8?B?cElmak9ubGgyc3UrR0NRcG5DdUQrZmExQ1lMdGs5aG8rMjB2WndML1R3ZzZ5?=
- =?utf-8?B?anFNWGYzVE4xRjVIaFBiU0dBOEJkL0hLRkhYM0RuN0JTQVcwUDU1bkwwK2o5?=
- =?utf-8?B?WTJNTU5BZUlNSm1aM3VvemF5TXU2U3p5TjNHK09YRUl1VERJMUs3UkRPRnFL?=
- =?utf-8?B?emYrcGJMc1lzQ2ZsRHBNK1NMOFJQZ0pYSXVGOTA0dG5raXpXS3pRd3pjd0ZR?=
- =?utf-8?B?WGJkN2ROOUxsaWszK2tpaXMyVWRhMnIrVlFrbmIyZ056S3V6b3hUQnpJajZ0?=
- =?utf-8?B?TDJZbkhpUktqTml2WTJ5TXBYWGYyZWtYdm4rVmJBMnVHdThSbDNkeVVCWi9F?=
- =?utf-8?B?RWZOU1F4WVdEQ3BiUnhnejNjM0FOU1U2a3JERDRMbEhhdnZwd1FkUllLcTQ1?=
- =?utf-8?B?bi91Wis4UGwrK1UySGNzOW5qa3hxVnZvUWZLMXdDU3BBMXRKNTNJVitodGdM?=
- =?utf-8?B?YUpTVWNycml4bGlkNksrL2FoSHhZUnM4MFBRdXRMUS83NjR1QVhtbHRmQ3po?=
- =?utf-8?B?MmorODIxRVh6dVgzNDBMT2lGMEFzcTdyK0N3eXJXOGtBZHpqQVRSZHNDekl0?=
- =?utf-8?B?a0RxQWhZRjBsb2paWTlVdEE1d2VGUXJ1eGh3aTUrU3ErQjZCVVl2L2ZmcTg1?=
- =?utf-8?B?cVFIaE52RmVRUDhVM045UlZuYkVxWHJFWXMyL1ZaaTdlUzA1aVZRM25Hd3V0?=
- =?utf-8?B?aTJwWnQyU1FrR0pwc3NnRDZqak9qNEtHSmJlNXJwYnpRR3JWdlo4ZDJxbUwx?=
- =?utf-8?B?ZlhCRzNJUmgrSnlBL0I3ZDRGK1pEY1A0REh0RFdManRkMGs0blRjS0FEZjMw?=
- =?utf-8?B?TVRRRTVUYjViR1FhL2xmQlpmNzRvSWZIbUhvUll6dGc5N29LeTVwaUtmd2Zk?=
- =?utf-8?B?c0dOclZiaXRxUWpGRk9oekJnNG5xMGx2OXRpR0VRQjk0RGZib1pRWFFOZ3dI?=
- =?utf-8?B?bjAxbDBDcllHMEFaUjgxZUdrcUlZUW9SVjNkZkZaNklHTm9KaURVb0FHYVF4?=
- =?utf-8?B?emJDaWJqbGJqUGJvSk5pSzlYRmdCWGFnWGtYMXErbjFZdHZoVTJZZERINmR4?=
- =?utf-8?B?RDVvV1VKeWxRSWM5a2NYeUpxS1g5ajE0ZmNkOVU2Q09aNmlDME9qZC9jSnpp?=
- =?utf-8?B?S01JMENIblp6ZXlWUzFyTTlDU3NuUGNpT2lpUUJWN2VGSGQydnEzdTNSL1RM?=
- =?utf-8?B?ZnFyMmhFRDRKUWJjS1hWTDdnT0RHQVhRVDBoS2d1aXlVTngxTmtaeUFOdEdL?=
- =?utf-8?B?bWNYZm94ZDU0NFhjWXVmbHJJTForUWhOK3F2NjNKVFNJK1g3M2NzbkZ1REFw?=
- =?utf-8?B?T3NpbVNueThCYjBqRC94VW1vRnZiaDEyM1B0anJNNzhHYUl1VU9JMEU1aDBS?=
- =?utf-8?Q?emuGy1Vq?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <E480104EA3AA984B9D29B4F2429308DE@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Tue, 26 Jan 2021 17:58:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1730247AbhAZVYn (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 26 Jan 2021 16:24:43 -0500
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F2CDC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jan 2021 13:24:03 -0800 (PST)
+Received: by mail-pg1-x529.google.com with SMTP id t25so92869pga.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Jan 2021 13:24:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:subject:from:to:cc:date:user-agent:mime-version
+         :content-transfer-encoding;
+        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
+        b=tJjfVjKYsM8vmWfPUwu9KpX/84PdyOgBOqS0Bq6crUf8D9XrxCj9a3UFugttTWp+X/
+         72sE8VSY2Hi6gWcNnkeSQQz4Zgnzak8Nv0o3uVOScUJLzQjdPMNQPFdZ+3WZBfWSd43x
+         La72hDqrmUkm/VTlk06QZajnoG5lRg9X5nC68igfgWHJiH3tEfSWtF5DRD5G5eNsG4Je
+         YRm577s0yNFlrje3kRKEx49TjCuZMgpX9IsZXp3YedIfnLolx8j7JwTtCHB74f62BmyI
+         diazoN0pqxfmR2GOQqFVniZJsYrXNfYUnpCC6z3VI3qIhI2rdEJVAgXEqH681OF8pSeF
+         fHSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:user-agent
+         :mime-version:content-transfer-encoding;
+        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
+        b=PXseQ8aOgV9KAKJuO4Z4oIaVcRPfxPakHaJkbZmveC2PzpA8sxxRjpi4v4AFdm4Jo+
+         UWth83A+2nm3zGiB1PFTWdEzftEFmZhwWaQzmy0m7ckBNeRVhKu8pJH9OjjOTmDnReoh
+         P1TxaiM8H+dwJdT14LZjgHifv6jKxGplQu7+jYUqedqSCzp8ANtY8BsbwrwyFr14O9B4
+         3Xm2nEHILIbgj3BUsm3vFbmpTPWkTxZGOwB9GQ56BZoweOZ4I4Kd1r/fQC16rJGh8RXV
+         EPi+CVkpfChX+CFVN2hn3/l4ECWFlDfgqhsCfseiakiUn0INyg9lO5smxto9gi8L0lXV
+         MV7Q==
+X-Gm-Message-State: AOAM530PT3WmpfDqMxnUW97tw0SonMQW/uS2BaL3wDM7X4M7XQXWAwzB
+        RWvUq5LvSNk331ILHGp/+qgvGgYpRyNpzPGy
+X-Google-Smtp-Source: ABdhPJwNRcYEijUpM/Rw44hjKb7y28D9+MYWX9puiQYVRnFU3XKdeimLmUxaM7oBUSQmYaEhoHhIRA==
+X-Received: by 2002:a65:5884:: with SMTP id d4mr7507244pgu.303.1611696242467;
+        Tue, 26 Jan 2021 13:24:02 -0800 (PST)
+Received: from han1-XPS-13-9350 ([2601:1c0:6a01:30d0:3127:d904:e93e:f6b7])
+        by smtp.gmail.com with ESMTPSA id q126sm48333pfb.111.2021.01.26.13.24.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Jan 2021 13:24:01 -0800 (PST)
+Message-ID: <0abc1bb90aa6426c6030c06e8a95beff5e521707.camel@gmail.com>
+Subject: [PATCH BlueZ v3] tools/bluemoon: Display FW version of firmware file
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     Linux Bluetooth Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     tedd.an@intel.com
+Date:   Tue, 26 Jan 2021 13:24:01 -0800
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.4-0ubuntu1 
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4539.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 841daaed-3141-4ae3-87dd-08d8c2420163
-X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jan 2021 21:33:21.8949
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qAlL+bREQkGCPLw5A0PFZaNBM04N8vvju0uqccHENzpq4ZSLErFbBQX2zgCxcpHQ+/MXfviQuaZEM29u4eKG1Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MWHPR11MB1981
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-QXBwbGllZA0KDQpPbiBUaHUsIDIwMjEtMDEtMTQgYXQgMTM6MTMgLTA4MDAsIEJyaWFuIEdpeCB3
-cm90ZToNCj4gVGhpcyBoYXMgbm8gZnVuY3Rpb25hbCBjaGFuZ2UuICBJdCBzaW1wbHkgY2hhbmdl
-cyB0aGUgRUxMIGZpbGUgbGlzdCB1c2VkDQo+ID4gZm9yIHRoZSBzdGF0aWNhbGx5IGxpbmtlZCB2
-ZXJzaW9uIG9mIEVMTCBpbnRvIEJsdWVaIGV4ZWN1dGFibGVzLg0KLS0tDQogTWFrZWZpbGUuYW0g
-fCAzICstLQ0KIDEgZmlsZSBjaGFuZ2VkLCAxDQo+IGluc2VydGlvbigrKSwgMiBkZWxldGlvbnMo
-LSkNCg0KZGlmZiAtLWdpdCBhL01ha2VmaWxlLmFtIGIvTWFrZWZpbGUuYW0NCmluZGV4IDk1OTE3
-ZjY5NS4uODNhYzM2NDg1IDEwMDY0NA0KLS0tIGEvTWFrZWZpbGUuYW0NCisrKyBiL01ha2VmaWxl
-LmFtDQpAQCAtMTM0LDcgKzEzNCw2IEBAIGVsbF9oZWFkZXJzID0gZWxsL3V0aWwuaCBcDQogCQkJ
-ZWxsL2Jhc2U2NC5oIFwNCiAJCQllbGwvcGtjczUuaCBcDQogCQkJZWxsL2FzbjEtcHJpdmF0ZS5o
-IFwNCi0JCQllbGwvcGtjczUtcHJpdmF0ZS5oIFwNCiAJCQllbGwvY2VydC1wcml2YXRlLmggXA0K
-IAkJCWVsbC9wZW0tcHJpdmF0ZS5oDQogDQpAQCAtMTU2LDggKzE1NSw4IEBAIGVsbF9zb3VyY2Vz
-ID0gZWxsL3ByaXZhdGUuaCBlbGwvbWlzc2luZy5oIFwNCiAJCQllbGwvY2hlY2tzdW0uYyBcDQog
-CQkJZWxsL3BlbS5jIFwNCiAJCQllbGwvY2VydC5jIFwNCisJCQllbGwvY2VydC1jcnlwdG8uYyBc
-DQogCQkJZWxsL2tleS5jIFwNCi0JCQllbGwvcGtjczUuYyBcDQogCQkJZWxsL2Jhc2U2NC5jIFwN
-CiAJCQllbGwvdXRmOC5jIFwNCiAJCQllbGwvZGJ1cy1wcml2YXRlLmggXA0K
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
+
+This patch displays a FW version after parsing the WRITE_BOOT_PARAMS
+command in the firmeare file. It also change the display type for
+Module vendor and Date in the CSS header to hex for easy read.
+---
+ tools/bluemoon.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
+
+diff --git a/tools/bluemoon.c b/tools/bluemoon.c
+index 8b62b1e7b..912f4f2a9 100644
+--- a/tools/bluemoon.c
++++ b/tools/bluemoon.c
+@@ -805,8 +805,10 @@ static void analyze_firmware(const char *path)
+ 				le32_to_cpu(css->header_version) >> 16,
+ 				le32_to_cpu(css->header_version) & 0xffff);
+ 	printf("Module ID:\t%u\n", le32_to_cpu(css->module_id));
+-	printf("Module vendor:\t%u\n", le32_to_cpu(css->module_vendor));
+-	printf("Date:\t\t%u\n", le32_to_cpu(css->date));
++	printf("Module vendor:\t0x%x\n", le32_to_cpu(css->module_vendor));
++	printf("Date:\t\t%04x-%02x-%02x\n", le32_to_cpu(css->date) >> 16,
++				le32_to_cpu(css->date) >> 8 & 0xff,
++				le32_to_cpu(css->date) & 0xff);
+ 	printf("Size:\t\t%u DWORDs / %u bytes\n", le32_to_cpu(css->size),
+ 						le32_to_cpu(css->size) * 4);
+ 	printf("Key size:\t%u DWORDs / %u bytes\n",
+@@ -840,13 +842,29 @@ static void analyze_firmware(const char *path)
+ 	while (firmware_offset < firmware_size) {
+ 		uint16_t opcode;
+ 		uint8_t dlen;
++		struct cmd_write_boot_params *params;
+ 
+ 		opcode = get_le16(firmware_data + firmware_offset);
+ 		dlen = firmware_data[firmware_offset + 2];
+ 
+ 		switch (opcode) {
+-		case CMD_NO_OPERATION:
+ 		case CMD_WRITE_BOOT_PARAMS:
++			params = (void *)&firmware_data[firmware_offset + 3];
++			printf("Boot Parameters\n");
++			printf("Boot Address:\t0x%08x\n",
++					le32_to_cpu(params->boot_addr));
++			printf("FW Version(yy):\t%d (0x%02X)\n",
++					params->fw_build_yy + 2000,
++					params->fw_build_yy);
++			printf("FW Version(cw):\t%d (0x%02X)\n",
++					params->fw_build_cw,
++					params->fw_build_cw);
++			printf("FW Version(nn):\t%d (0x%02X)\n",
++					params->fw_build_nn,
++					params->fw_build_nn);
++
++			printf("\n");
++		case CMD_NO_OPERATION:
+ 		case CMD_MEMORY_WRITE:
+ 			break;
+ 		default:
+-- 
+2.25.1
+
+
