@@ -2,146 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A560C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DE5CC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4986F20643
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5EA7205CA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238733AbhA0E2f (ORCPT
+        id S238709AbhA0E2T (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jan 2021 23:28:35 -0500
-Received: from rtits2.realtek.com ([211.75.126.72]:42340 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232160AbhA0DDC (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jan 2021 22:03:02 -0500
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 10R31uiA6028033, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexmbs03.realtek.com.tw[172.21.6.96])
-        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 10R31uiA6028033
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Wed, 27 Jan 2021 11:01:56 +0800
-Received: from localhost.localdomain (172.21.132.186) by
- RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Wed, 27 Jan 2021 11:01:56 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC:     <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
-        <kidman@realtek.com>, <max.chou@realtek.com>,
-        <abhishekpandit@chromium.org>, <josephsih@chromium.org>
-Subject: [PATCH v6] Bluetooth: btrtl: Enable WBS for the specific Realtek devices
-Date:   Wed, 27 Jan 2021 11:01:52 +0800
-Message-ID: <20210127030152.3940-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Tue, 26 Jan 2021 23:28:19 -0500
+Received: from mga14.intel.com ([192.55.52.115]:17986 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S2403887AbhA0ARc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 26 Jan 2021 19:17:32 -0500
+IronPort-SDR: djyi1vQajMxpB91RSPRAUIFxeCdxEuuEaBSgfFdlu98vYBOeX5Vb+qmPlq9UqN4Lb3zxPiFSFh
+ x8Ru8p7bBFpw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9876"; a="179211498"
+X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
+   d="scan'208";a="179211498"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:15:43 -0800
+IronPort-SDR: hwSXtC0KdproYtL656VkJA9TweRH5w5yLV7aoy4PN5rmjf/cHvdJC2t7q71/m0g5O1/4/tXgVW
+ /YcTsz0nfUhw==
+X-IronPort-AV: E=Sophos;i="5.79,378,1602572400"; 
+   d="scan'208";a="472938005"
+Received: from rkfoote-mobl1.amr.corp.intel.com ([10.251.7.251])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2021 16:15:43 -0800
+Message-ID: <7ce3b84389e123d1d09dc110377ec369cf7825d7.camel@linux.intel.com>
+Subject: [PATCH BlueZ] tools/bluemoon: Display FW version of firmware file
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Tedd An <tedd.an@intel.com>
+Cc:     hj.tedd.an@gmail.com, Luiz Von Dentz <luiz.von.dentz@intel.com>
+Date:   Tue, 26 Jan 2021 16:15:41 -0800
+Organization: Intel Corporation
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-1.fc32) 
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.186]
-X-ClientProxiedBy: RTEXMBS01.realtek.com.tw (172.21.6.94) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-By this change, it will enable WBS supported on the specific Realtek BT
-devices, such as RTL8822C and RTL8852A.
-In the future, it's able to maintain what the Realtek devices support WBS
-here.
-
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Max Chou <max.chou@realtek.com>
-
+This patch displays a FW version after parsing the WRITE_BOOT_PARAMS
+command in the firmeare file. It also change the display type for
+Module vendor and Date in the CSS header to hex for easy read.
 ---
-change in v6
- -remove lable 'done' in btrtl_setup_realtek()
----
- drivers/bluetooth/btrtl.c | 30 +++++++++++++++++++++++-------
- 1 file changed, 23 insertions(+), 7 deletions(-)
+ tools/bluemoon.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 24f03a1f8d57..e7fe5fb22753 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -38,6 +38,19 @@
- 	.hci_ver = (hciv), \
- 	.hci_bus = (bus)
+diff --git a/tools/bluemoon.c b/tools/bluemoon.c
+index 8b62b1e7b..912f4f2a9 100644
+--- a/tools/bluemoon.c
++++ b/tools/bluemoon.c
+@@ -805,8 +805,10 @@ static void analyze_firmware(const char *path)
+ 				le32_to_cpu(css->header_version) >> 16,
+ 				le32_to_cpu(css->header_version) & 0xffff);
+ 	printf("Module ID:\t%u\n", le32_to_cpu(css->module_id));
+-	printf("Module vendor:\t%u\n", le32_to_cpu(css->module_vendor));
+-	printf("Date:\t\t%u\n", le32_to_cpu(css->date));
++	printf("Module vendor:\t0x%x\n", le32_to_cpu(css->module_vendor));
++	printf("Date:\t\t%04x-%02x-%02x\n", le32_to_cpu(css->date) >> 16,
++				le32_to_cpu(css->date) >> 8 & 0xff,
++				le32_to_cpu(css->date) & 0xff);
+ 	printf("Size:\t\t%u DWORDs / %u bytes\n", le32_to_cpu(css->size),
+ 						le32_to_cpu(css->size) * 4);
+ 	printf("Key size:\t%u DWORDs / %u bytes\n",
+@@ -840,13 +842,29 @@ static void analyze_firmware(const char *path)
+ 	while (firmware_offset < firmware_size) {
+ 		uint16_t opcode;
+ 		uint8_t dlen;
++		struct cmd_write_boot_params *params;
  
-+enum btrtl_chip_id {
-+	CHIP_ID_8723A,
-+	CHIP_ID_8723B,
-+	CHIP_ID_8821A,
-+	CHIP_ID_8761A,
-+	CHIP_ID_8822B = 8,
-+	CHIP_ID_8723D,
-+	CHIP_ID_8821C,
-+	CHIP_ID_8822C = 13,
-+	CHIP_ID_8761B,
-+	CHIP_ID_8852A = 18,
-+};
+ 		opcode = get_le16(firmware_data + firmware_offset);
+ 		dlen = firmware_data[firmware_offset + 2];
+ 
+ 		switch (opcode) {
+-		case CMD_NO_OPERATION:
+ 		case CMD_WRITE_BOOT_PARAMS:
++			params = (void *)&firmware_data[firmware_offset + 3];
++			printf("Boot Parameters\n");
++			printf("Boot Address:\t0x%08x\n",
++					le32_to_cpu(params->boot_addr));
++			printf("FW Version(yy):\t%d (0x%02X)\n",
++					params->fw_build_yy + 2000,
++					params->fw_build_yy);
++			printf("FW Version(cw):\t%d (0x%02X)\n",
++					params->fw_build_cw,
++					params->fw_build_cw);
++			printf("FW Version(nn):\t%d (0x%02X)\n",
++					params->fw_build_nn,
++					params->fw_build_nn);
 +
- struct id_table {
- 	__u16 match_flags;
- 	__u16 lmp_subver;
-@@ -58,6 +71,7 @@ struct btrtl_device_info {
- 	u8 *cfg_data;
- 	int cfg_len;
- 	bool drop_fw;
-+	int project_id;
- };
- 
- static const struct id_table ic_id_table[] = {
-@@ -307,8 +321,10 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
- 
- 	/* Find project_id in table */
- 	for (i = 0; i < ARRAY_SIZE(project_id_to_lmp_subver); i++) {
--		if (project_id == project_id_to_lmp_subver[i].id)
-+		if (project_id == project_id_to_lmp_subver[i].id) {
-+			btrtl_dev->project_id = project_id;
++			printf("\n");
++		case CMD_NO_OPERATION:
+ 		case CMD_MEMORY_WRITE:
  			break;
-+		}
- 	}
- 
- 	if (i >= ARRAY_SIZE(project_id_to_lmp_subver)) {
-@@ -719,22 +735,22 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 
--	if (!btrtl_dev->ic_info)
--		goto done;
--
- 	/* Enable central-peripheral role (able to create new connections with
- 	 * an existing connection in slave role).
- 	 */
--	switch (btrtl_dev->ic_info->lmp_subver) {
--	case RTL_ROM_LMP_8822B:
-+	/* Enable WBS supported for the specific Realtek devices. */
-+	switch (btrtl_dev->project_id) {
-+	case CHIP_ID_8822C:
-+	case CHIP_ID_8852A:
- 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
- 		break;
- 	default:
- 		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
-+		rtl_dev_dbg(hdev, "WBS supported not enabled.");
- 		break;
- 	}
- 
--done:
- 	btrtl_free(btrtl_dev);
- 	return ret;
- }
+ 		default:
 -- 
-2.17.1
+2.26.2
+
 
