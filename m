@@ -2,273 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88AA0C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:32:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A560C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 222EE2070A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:32:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4986F20643
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 04:55:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238757AbhA0E2r (ORCPT
+        id S238733AbhA0E2f (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Jan 2021 23:28:47 -0500
-Received: from out30-45.freemail.mail.aliyun.com ([115.124.30.45]:60572 "EHLO
-        out30-45.freemail.mail.aliyun.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237233AbhA0Dto (ORCPT
+        Tue, 26 Jan 2021 23:28:35 -0500
+Received: from rtits2.realtek.com ([211.75.126.72]:42340 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232160AbhA0DDC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Jan 2021 22:49:44 -0500
-X-Alimail-AntiSpam: AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=e01e04423;MF=abaci-bugfix@linux.alibaba.com;NM=1;PH=DS;RN=9;SR=0;TI=SMTPD_---0UN.u3o9_1611719322;
-Received: from j63c13417.sqa.eu95.tbsite.net(mailfrom:abaci-bugfix@linux.alibaba.com fp:SMTPD_---0UN.u3o9_1611719322)
-          by smtp.aliyun-inc.com(127.0.0.1);
-          Wed, 27 Jan 2021 11:48:46 +0800
-From:   Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-To:     marcel@holtmann.org
-Cc:     johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
-Subject: [PATCH v2] net/bluetooth/hci_debugfs.c:  fix coccicheck warnings
-Date:   Wed, 27 Jan 2021 11:48:40 +0800
-Message-Id: <1611719320-87593-1-git-send-email-abaci-bugfix@linux.alibaba.com>
-X-Mailer: git-send-email 1.8.3.1
+        Tue, 26 Jan 2021 22:03:02 -0500
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 10R31uiA6028033, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmbs03.realtek.com.tw[172.21.6.96])
+        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 10R31uiA6028033
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Wed, 27 Jan 2021 11:01:56 +0800
+Received: from localhost.localdomain (172.21.132.186) by
+ RTEXMBS03.realtek.com.tw (172.21.6.96) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 27 Jan 2021 11:01:56 +0800
+From:   <max.chou@realtek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC:     <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
+        <kidman@realtek.com>, <max.chou@realtek.com>,
+        <abhishekpandit@chromium.org>, <josephsih@chromium.org>
+Subject: [PATCH v6] Bluetooth: btrtl: Enable WBS for the specific Realtek devices
+Date:   Wed, 27 Jan 2021 11:01:52 +0800
+Message-ID: <20210127030152.3940-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.17.1
+MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.186]
+X-ClientProxiedBy: RTEXMBS01.realtek.com.tw (172.21.6.94) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use DEFINE_DEBUGFS_ATTRIBUTE rather than DEFINE_SIMPLE_ATTRIBUTE
-for debugfs files.
+From: Max Chou <max.chou@realtek.com>
 
-Reported-by: Abaci Robot<abaci@linux.alibaba.com>
-Signed-off-by: Jiapeng Zhong <abaci-bugfix@linux.alibaba.com>
+By this change, it will enable WBS supported on the specific Realtek BT
+devices, such as RTL8822C and RTL8852A.
+In the future, it's able to maintain what the Realtek devices support WBS
+here.
+
+Tested-by: Hilda Wu <hildawu@realtek.com>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Signed-off-by: Max Chou <max.chou@realtek.com>
+
 ---
-Changes in v2:
-  -Modifying row alignment.
+change in v6
+ -remove lable 'done' in btrtl_setup_realtek()
+---
+ drivers/bluetooth/btrtl.c | 30 +++++++++++++++++++++++-------
+ 1 file changed, 23 insertions(+), 7 deletions(-)
 
- net/bluetooth/hci_debugfs.c | 80 ++++++++++++++++++++++-----------------------
- 1 file changed, 40 insertions(+), 40 deletions(-)
-
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 4626e02..cd400a0 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -237,8 +237,8 @@ static int conn_info_min_age_get(void *data, u64 *val)
- 	return 0;
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 24f03a1f8d57..e7fe5fb22753 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -38,6 +38,19 @@
+ 	.hci_ver = (hciv), \
+ 	.hci_bus = (bus)
+ 
++enum btrtl_chip_id {
++	CHIP_ID_8723A,
++	CHIP_ID_8723B,
++	CHIP_ID_8821A,
++	CHIP_ID_8761A,
++	CHIP_ID_8822B = 8,
++	CHIP_ID_8723D,
++	CHIP_ID_8821C,
++	CHIP_ID_8822C = 13,
++	CHIP_ID_8761B,
++	CHIP_ID_8852A = 18,
++};
++
+ struct id_table {
+ 	__u16 match_flags;
+ 	__u16 lmp_subver;
+@@ -58,6 +71,7 @@ struct btrtl_device_info {
+ 	u8 *cfg_data;
+ 	int cfg_len;
+ 	bool drop_fw;
++	int project_id;
+ };
+ 
+ static const struct id_table ic_id_table[] = {
+@@ -307,8 +321,10 @@ static int rtlbt_parse_firmware(struct hci_dev *hdev,
+ 
+ 	/* Find project_id in table */
+ 	for (i = 0; i < ARRAY_SIZE(project_id_to_lmp_subver); i++) {
+-		if (project_id == project_id_to_lmp_subver[i].id)
++		if (project_id == project_id_to_lmp_subver[i].id) {
++			btrtl_dev->project_id = project_id;
+ 			break;
++		}
+ 	}
+ 
+ 	if (i >= ARRAY_SIZE(project_id_to_lmp_subver)) {
+@@ -719,22 +735,22 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+ 	 */
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
+-	if (!btrtl_dev->ic_info)
+-		goto done;
+-
+ 	/* Enable central-peripheral role (able to create new connections with
+ 	 * an existing connection in slave role).
+ 	 */
+-	switch (btrtl_dev->ic_info->lmp_subver) {
+-	case RTL_ROM_LMP_8822B:
++	/* Enable WBS supported for the specific Realtek devices. */
++	switch (btrtl_dev->project_id) {
++	case CHIP_ID_8822C:
++	case CHIP_ID_8852A:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
++		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 		break;
+ 	default:
+ 		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
++		rtl_dev_dbg(hdev, "WBS supported not enabled.");
+ 		break;
+ 	}
+ 
+-done:
+ 	btrtl_free(btrtl_dev);
+ 	return ret;
  }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
--			conn_info_min_age_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
-+			 conn_info_min_age_set, "%llu\n");
- 
- static int conn_info_max_age_set(void *data, u64 val)
- {
-@@ -265,8 +265,8 @@ static int conn_info_max_age_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
--			conn_info_max_age_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_info_max_age_fops, conn_info_max_age_get,
-+			 conn_info_max_age_set, "%llu\n");
- 
- static ssize_t use_debug_keys_read(struct file *file, char __user *user_buf,
- 				   size_t count, loff_t *ppos)
-@@ -419,8 +419,8 @@ static int voice_setting_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(voice_setting_fops, voice_setting_get,
--			NULL, "0x%4.4llx\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(voice_setting_fops, voice_setting_get,
-+			 NULL, "0x%4.4llx\n");
- 
- static ssize_t ssp_debug_mode_read(struct file *file, char __user *user_buf,
- 				   size_t count, loff_t *ppos)
-@@ -476,9 +476,9 @@ static int min_encrypt_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(min_encrypt_key_size_fops,
--			min_encrypt_key_size_get,
--			min_encrypt_key_size_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(min_encrypt_key_size_fops,
-+			 min_encrypt_key_size_get,
-+			 min_encrypt_key_size_set, "%llu\n");
- 
- static int auto_accept_delay_get(void *data, u64 *val)
- {
-@@ -491,8 +491,8 @@ static int auto_accept_delay_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
--			auto_accept_delay_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(auto_accept_delay_fops, auto_accept_delay_get,
-+			 auto_accept_delay_set, "%llu\n");
- 
- static ssize_t force_bredr_smp_read(struct file *file,
- 				    char __user *user_buf,
-@@ -558,8 +558,8 @@ static int idle_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
--			idle_timeout_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
-+			 idle_timeout_set, "%llu\n");
- 
- static int sniff_min_interval_set(void *data, u64 val)
- {
-@@ -586,8 +586,8 @@ static int sniff_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
--			sniff_min_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
-+			 sniff_min_interval_set, "%llu\n");
- 
- static int sniff_max_interval_set(void *data, u64 val)
- {
-@@ -614,8 +614,8 @@ static int sniff_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
--			sniff_max_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(sniff_max_interval_fops, sniff_max_interval_get,
-+			 sniff_max_interval_set, "%llu\n");
- 
- void hci_debugfs_create_bredr(struct hci_dev *hdev)
- {
-@@ -706,8 +706,8 @@ static int rpa_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
--			rpa_timeout_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
-+			 rpa_timeout_set, "%llu\n");
- 
- static int random_address_show(struct seq_file *f, void *p)
- {
-@@ -869,8 +869,8 @@ static int conn_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
--			conn_min_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
-+			 conn_min_interval_set, "%llu\n");
- 
- static int conn_max_interval_set(void *data, u64 val)
- {
-@@ -897,8 +897,8 @@ static int conn_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
--			conn_max_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
-+			 conn_max_interval_set, "%llu\n");
- 
- static int conn_latency_set(void *data, u64 val)
- {
-@@ -925,8 +925,8 @@ static int conn_latency_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(conn_latency_fops, conn_latency_get,
--			conn_latency_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(conn_latency_fops, conn_latency_get,
-+			 conn_latency_set, "%llu\n");
- 
- static int supervision_timeout_set(void *data, u64 val)
- {
-@@ -953,8 +953,8 @@ static int supervision_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
--			supervision_timeout_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
-+			 supervision_timeout_set, "%llu\n");
- 
- static int adv_channel_map_set(void *data, u64 val)
- {
-@@ -981,8 +981,8 @@ static int adv_channel_map_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
--			adv_channel_map_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
-+			 adv_channel_map_set, "%llu\n");
- 
- static int adv_min_interval_set(void *data, u64 val)
- {
-@@ -1009,8 +1009,8 @@ static int adv_min_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
--			adv_min_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
-+			 adv_min_interval_set, "%llu\n");
- 
- static int adv_max_interval_set(void *data, u64 val)
- {
-@@ -1037,8 +1037,8 @@ static int adv_max_interval_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
--			adv_max_interval_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
-+			 adv_max_interval_set, "%llu\n");
- 
- static int min_key_size_set(void *data, u64 val)
- {
-@@ -1065,8 +1065,8 @@ static int min_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(min_key_size_fops, min_key_size_get,
--			min_key_size_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
-+			 min_key_size_set, "%llu\n");
- 
- static int max_key_size_set(void *data, u64 val)
- {
-@@ -1093,8 +1093,8 @@ static int max_key_size_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(max_key_size_fops, max_key_size_get,
--			max_key_size_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(max_key_size_fops, max_key_size_get,
-+			 max_key_size_set, "%llu\n");
- 
- static int auth_payload_timeout_set(void *data, u64 val)
- {
-@@ -1121,9 +1121,9 @@ static int auth_payload_timeout_get(void *data, u64 *val)
- 	return 0;
- }
- 
--DEFINE_SIMPLE_ATTRIBUTE(auth_payload_timeout_fops,
--			auth_payload_timeout_get,
--			auth_payload_timeout_set, "%llu\n");
-+DEFINE_DEBUGFS_ATTRIBUTE(auth_payload_timeout_fops,
-+			 auth_payload_timeout_get,
-+			 auth_payload_timeout_set, "%llu\n");
- 
- static ssize_t force_no_mitm_read(struct file *file,
- 				  char __user *user_buf,
 -- 
-1.8.3.1
+2.17.1
 
