@@ -6,38 +6,38 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E39DBC433E9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AE35DC43381
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97E2464DAB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 815F764DB0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:42:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235919AbhA0RmH (ORCPT
+        id S236224AbhA0RmS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jan 2021 12:42:07 -0500
-Received: from mga12.intel.com ([192.55.52.136]:56862 "EHLO mga12.intel.com"
+        Wed, 27 Jan 2021 12:42:18 -0500
+Received: from mga12.intel.com ([192.55.52.136]:56864 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1344049AbhA0RmF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jan 2021 12:42:05 -0500
-IronPort-SDR: dbCJiphUdhydiZDNB5JTxpLqZNEtHBLyR2Qw5Zxztj2D+wIghP2RN2KPJlZeOjwF+/R4t5C8cr
- 9ZJsgAa0o0jg==
-X-IronPort-AV: E=McAfee;i="6000,8403,9877"; a="159278760"
+        id S236093AbhA0RmJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Jan 2021 12:42:09 -0500
+IronPort-SDR: lkv0oo7ykysg+b8hmC65Zp/7lowO8c3BhLOD3+w2HoOzD/kXZeqoxjyLMxob1znTYKkHITeeZR
+ D8IR4ZgRz4Fg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9877"; a="159278767"
 X-IronPort-AV: E=Sophos;i="5.79,380,1602572400"; 
-   d="scan'208";a="159278760"
+   d="scan'208";a="159278767"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 09:41:24 -0800
-IronPort-SDR: C3L6m4CCTSS3P21lFB4KBfaMfRScCp0aXDJRXgamFY/rj11aFG3/yEl5GcNpl20SnzzLL3VIN5
- pGKi1kt7LXww==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 09:41:29 -0800
+IronPort-SDR: 0O9tS+l9n+Yo3xPvwOp5oJVe3B6GCI6acxEtRO5rBP7fggUYTmCGpvCPpucTwj/3yG7DzOzxbw
+ Et2zXWmz+kAw==
 X-IronPort-AV: E=Sophos;i="5.79,380,1602572400"; 
-   d="scan'208";a="410604387"
+   d="scan'208";a="410604407"
 Received: from bgi1-mobl2.amr.corp.intel.com ([10.212.3.187])
-  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 09:41:24 -0800
+  by fmsmga003-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jan 2021 09:41:29 -0800
 From:   Brian Gix <brian.gix@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, brian.gix@intel.com
-Subject: [PATCH BlueZ 1/2] advertising: Make data size explicit for formats
-Date:   Wed, 27 Jan 2021 09:40:49 -0800
-Message-Id: <20210127174050.1536152-2-brian.gix@intel.com>
+Subject: [PATCH BlueZ 2/2] tools/mgmt-tester: Make data size explicit for formats
+Date:   Wed, 27 Jan 2021 09:40:50 -0800
+Message-Id: <20210127174050.1536152-3-brian.gix@intel.com>
 X-Mailer: git-send-email 2.25.4
 In-Reply-To: <20210127174050.1536152-1-brian.gix@intel.com>
 References: <20210127174050.1536152-1-brian.gix@intel.com>
@@ -48,39 +48,36 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On some 32 bit systems sizeof does not return (unsigned long)
+On 32 bit systems, sizeof macro doesn't always return (unsigned long)
 
-Fixes the error:
+Fix following error:
 
-In file included from src/advertising.c:30:
-src/advertising.c: In function ‘read_controller_cap_complete’:
-src/log.h:60:20: error: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 5 has type ‘unsigned int’ [-Werror=format=]
-   60 |  btd_error(0xffff, "%s:%s() " fmt, __FILE__, __func__, ## arg)
-      |                    ^~~~~~~~~~
-src/advertising.c:1757:3: note: in expansion of macro ‘error’
- 1757 |   error("Controller capabilities malformed, size %lu != %u",
-      |   ^~~~~
-src/advertising.c:1757:52: note: format string is defined here
- 1757 |   error("Controller capabilities malformed, size %lu != %u",
-      |                                                  ~~^
-      |                                                    |
-      |                                                    long unsigned int
-      |                                                  %u
+tools/mgmt-tester.c: In function ‘read_50_controller_cap_complete’:
+tools/mgmt-tester.c:9124:58: error: format ‘%lu’ expects argument of type ‘long unsigned int’, but argument 2 has type ‘unsigned int’ [-Werror=format=]
+ 9124 |   tester_warn("Controller capabilities malformed, size %lu != %u",
+      |                                                        ~~^
+      |                                                          |
+      |                                                          long unsigned int
+      |                                                        %u
+ 9125 |     sizeof(rp->cap_len) + rp->cap_len, length);
+      |     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                         |
+      |                         unsigned int
 ---
- src/advertising.c | 2 +-
+ tools/mgmt-tester.c | 2 +-
  1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/src/advertising.c b/src/advertising.c
-index 4f5123fa1..36e737987 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -1755,7 +1755,7 @@ static void read_controller_cap_complete(uint8_t status, uint16_t length,
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index fe73a6d89..6bc40181e 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -9122,7 +9122,7 @@ static void read_50_controller_cap_complete(uint8_t status, uint16_t length,
  
  	if (sizeof(rp->cap_len) + rp->cap_len != length) {
- 		error("Controller capabilities malformed, size %lu != %u",
+ 		tester_warn("Controller capabilities malformed, size %lu != %u",
 -				sizeof(rp->cap_len) + rp->cap_len, length);
 +			(long) sizeof(rp->cap_len) + rp->cap_len, length);
- 		return;
+ 		tester_test_failed();
  	}
  
 -- 
