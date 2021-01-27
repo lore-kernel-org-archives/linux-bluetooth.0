@@ -2,176 +2,167 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 014B1C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 15:14:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0260C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:19:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A36F620771
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 15:14:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69D4B64DA6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 17:19:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343677AbhA0PNJ (ORCPT
+        id S235156AbhA0RTk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jan 2021 10:13:09 -0500
-Received: from out2-smtp.messagingengine.com ([66.111.4.26]:40047 "EHLO
-        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235751AbhA0PG1 (ORCPT
+        Wed, 27 Jan 2021 12:19:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52722 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235711AbhA0RRy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jan 2021 10:06:27 -0500
-Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
-        by mailout.nyi.internal (Postfix) with ESMTP id 892995C00CF;
-        Wed, 27 Jan 2021 10:05:34 -0500 (EST)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute2.internal (MEProxy); Wed, 27 Jan 2021 10:05:34 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
-        from:to:cc:subject:date:message-id:mime-version
-        :content-transfer-encoding; s=fm2; bh=NZ/BL+CX8ZrUPwXj4Uh/86z40F
-        CVpFJbpqPIuN9jSec=; b=atQgHX2qSgfP06U5kuFU7gTfr/kLpf5lCsCIareSSO
-        uNn+nnfsY/ohOStNFDVfX+lqvJmgj/5t1D81GtsJ72dYwVtwu6x8Y2ZJGXle29uw
-        NEQuGlaZz0ByWg7OQW+I5RMwnlDYaMedZlGQkxvoykWTBIpZfUS1LPxI/e8taCrD
-        g4pzSY/YPEoiMvpNPLpxVaEx72d1Xm5VPSxbGLUkNLEjTy41aNUIyIzgyUOMU8jN
-        VdvQVmrO6ajbPedslhd6LzSoMU8Bj30/pyamRPlfBxr2XIwzA6Gh5kd2b7h8Fcno
-        5IdCB2jFYqtZGcnAwv/fTNwjfNz/Z+8HaSapg6MfotUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:date:from
-        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
-        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=NZ/BL+CX8ZrUPwXj4
-        Uh/86z40FCVpFJbpqPIuN9jSec=; b=o2b1WHHivF88bjoSUXLVS9NQGPOZzAEMN
-        DsA+lSWD1Lat7D2sA5TGROZadoWRBXNw+i3ObTPiD3JeaRgIa+50BVqFgrskL0qg
-        aJao/AANLn4pU1t9lkD3BSaPnPbpsLh1xWuaUiK9RNxhSzzlN3ktSalzRh/UvlIX
-        AptkpWvrkP0A1JLVxwjCx44oxSR6xc8OTm0+1wz2BacI2my17j00EVKA8+qYLLWl
-        xW4MzM7ipsppbomdN3KW8bYkDKp/1cDqO3c81/35nr1s+H0W3V/XG4SQls0LVhD2
-        orFE5lYZOaMF0iteBj4PpExXfNIMAM3z8NQ1NqUmq9oJC2Sb3p0Bg==
-X-ME-Sender: <xms:PYERYOPOtb6_NVTq2pkNxQ4IS0TWpKNXFr1j15WBT0wJ7q3TkN2VeQ>
-    <xme:PYERYEYAX9D32Tj-GYlCTnN6eeQXKTodQbvMHVSgJj9UEjHGZ9Hz4niTSxvV135k3
-    KZ3vKNCbY79ogFQ8Ds>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdekgdejudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffoggfgsedtkeertdertd
-    dtnecuhfhrohhmpefvohhmohihuhhkihcuofgrthhsuhhshhhithgruceogihorhhphhhi
-    thhushesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeetgeffuefghe
-    fftedvtefgjeejjeelhedtfeekveejtedtkedvhfelfedvieeugeenucfkphepuddtfedr
-    vddrvdegledrudduleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpeigohhrphhhihhtuhhssehfrghsthhmrghilhdrtghomh
-X-ME-Proxy: <xmx:PYERYCoKuDuUnF2io7Zrml9W4cqA445jyBjQuNxAeNyzZLYNtj_EUA>
-    <xmx:PYERYIaTAHqVQvE5pd69GdF1nnYqyQX2gjkR0aCr9jwBck6x8fnWkA>
-    <xmx:PYERYKSvshS-IiTxT0tA_TLTO1FXxDRJvA4l8Q4I4AcVdyixqKl_YA>
-    <xmx:PoERYA78B2AX3kVB0CNgvghBlgYKxVBDSgPoCOfA4lahqw5OR7azag>
-Received: from xorphitus-arch.flets-east.jp (119.249.2.103.shared.user.transix.jp [103.2.249.119])
-        by mail.messagingengine.com (Postfix) with ESMTPA id D308B1080067;
-        Wed, 27 Jan 2021 10:05:31 -0500 (EST)
-From:   Tomoyuki Matsushita <xorphitus@fastmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, kuba@kernel.org
-Cc:     Tomoyuki Matsushita <xorphitus@fastmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: af_bluetooth: checkpatch: fix indentation and alignment
-Date:   Thu, 28 Jan 2021 00:05:20 +0900
-Message-Id: <20210127150520.3459346-1-xorphitus@fastmail.com>
-X-Mailer: git-send-email 2.30.0
+        Wed, 27 Jan 2021 12:17:54 -0500
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C61EFC061797
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 09:17:14 -0800 (PST)
+Received: by mail-pg1-x536.google.com with SMTP id g15so2013325pgu.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 09:17:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9fC6ts20yKV4bzlJx7IpwEHMXNBp8xI9QfFWOht0bGc=;
+        b=NM4AHvu1x7e38zoonn+GYjYHhJxMxvVXmC3YRcpAjhdXTlLJJxJnSV9NE+3OlAe3+j
+         ykUeOmgxtAKCPPmMHlTJBN3TjeLZxMvld5THx6nRI3WjyOSNfV02vxNag12YSSg90Q3a
+         pjd8y7ISKXpmk+b5jcTDC1RhHrj6sOcQQR0Ls=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9fC6ts20yKV4bzlJx7IpwEHMXNBp8xI9QfFWOht0bGc=;
+        b=n+oFPAPrurJMf9WfB2TFKxGpuXaA9XjJ0GWn++Mq4UQte4qmm/kJ/DympT1jPEJYsd
+         MECiPZHlW15gtxF/W4qr6x+WwEv3544XfMnpzD88070a5F85j0Y/nn4DjpWc2irakVYE
+         Hd9DGc1mns3xCG8XOAo0hKU6aEnqHikAHq6qT8lTf3VvukiT7lfW01fekAKOD4oHw+KA
+         9yfgEbr1g6C6v7HU+gSimbUJzvE0vzGs0j40Pq3MNp/utqqYfe1nhUeQ3ELZJNwt7YCo
+         DETtLJHqH3UsO2tjk9/1QlF524t1qojCCFMFKg1MWzuNctDyg+7UQ/9bH6tTemgFL8t4
+         cMfA==
+X-Gm-Message-State: AOAM532D6lr7G5XqTq47emSQnYySMAnxC7AeQgKpJfaCFOfFToD4mU9P
+        loqCW8JSSaOI62Yc+uJH7omvWycBKuhccw==
+X-Google-Smtp-Source: ABdhPJx4/PC0sya58MSmJSowX/6IYjoSLQS8WfvtMtUmiCJPrJruY7D1XAiNpmHWp0mGtdxxUOnxEQ==
+X-Received: by 2002:a63:ca45:: with SMTP id o5mr12194630pgi.48.1611767833941;
+        Wed, 27 Jan 2021 09:17:13 -0800 (PST)
+Received: from localhost ([2620:15c:202:201:58a2:e0e6:6d20:24bd])
+        by smtp.gmail.com with ESMTPSA id t25sm3154709pgv.30.2021.01.27.09.17.12
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 27 Jan 2021 09:17:13 -0800 (PST)
+From:   Miao-chen Chou <mcchou@chromium.org>
+To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
+Cc:     Alain Michaud <alainm@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle
+Date:   Wed, 27 Jan 2021 09:17:07 -0800
+Message-Id: <20210127091600.v4.1.Id9bc5434114de07512661f002cdc0ada8b3d6d02@changeid>
+X-Mailer: git-send-email 2.30.0.280.ga3ce27912f-goog
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Signed-off-by: Tomoyuki Matsushita <xorphitus@fastmail.com>
----
- net/bluetooth/af_bluetooth.c | 20 ++++++++++----------
- 1 file changed, 10 insertions(+), 10 deletions(-)
+This moves msft_do_close() from hci_dev_do_close() to
+hci_unregister_dev() to avoid clearing MSFT extension info. This also
+re-reads MSFT info upon every msft_do_open() even if MSFT extension has
+been initialized.
 
-diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
-index 4ef6a54403aa..968ea03d863f 100644
---- a/net/bluetooth/af_bluetooth.c
-+++ b/net/bluetooth/af_bluetooth.c
-@@ -72,8 +72,8 @@ void bt_sock_reclassify_lock(struct sock *sk, int proto)
- 	BUG_ON(!sock_allow_reclassification(sk));
+The following test steps were performed.
+(1) boot the test device and verify the MSFT support debug log in syslog
+(2) restart bluetoothd and verify msft_do_close() doesn't get invoked
+    and msft_do_open re-reads the MSFT support.
+
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+---
+
+Changes in v4:
+- Re-read the MSFT data instead of skipping if it's initiated already
+
+Changes in v3:
+- Remove the accepted commits from the series
+
+ net/bluetooth/hci_core.c |  4 ++--
+ net/bluetooth/msft.c     | 21 ++++++++++++++++++---
+ 2 files changed, 20 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index eeafed2efc0da..8056f0d4ae172 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1764,8 +1764,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
  
- 	sock_lock_init_class_and_name(sk,
--			bt_slock_key_strings[proto], &bt_slock_key[proto],
--				bt_key_strings[proto], &bt_lock_key[proto]);
-+				      bt_slock_key_strings[proto], &bt_slock_key[proto],
-+				      bt_key_strings[proto], &bt_lock_key[proto]);
- }
- EXPORT_SYMBOL(bt_sock_reclassify_lock);
+ 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
  
-@@ -451,7 +451,7 @@ static inline __poll_t bt_accept_poll(struct sock *parent)
- }
+-	msft_do_close(hdev);
+-
+ 	if (hdev->flush)
+ 		hdev->flush(hdev);
  
- __poll_t bt_sock_poll(struct file *file, struct socket *sock,
--			  poll_table *wait)
-+		      poll_table *wait)
+@@ -3844,6 +3842,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	unregister_pm_notifier(&hdev->suspend_notifier);
+ 	cancel_work_sync(&hdev->suspend_prepare);
+ 
++	msft_do_close(hdev);
++
+ 	hci_dev_do_close(hdev);
+ 
+ 	if (!test_bit(HCI_INIT, &hdev->flags) &&
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 8579bfeb28364..4465d018280eb 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -73,16 +73,31 @@ static bool read_supported_features(struct hci_dev *hdev,
+ 
+ void msft_do_open(struct hci_dev *hdev)
  {
- 	struct sock *sk = sock->sk;
- 	__poll_t mask = 0;
-@@ -478,7 +478,7 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
- 		mask |= EPOLLHUP;
+-	struct msft_data *msft;
++	struct msft_data *msft = NULL;
  
- 	if (sk->sk_state == BT_CONNECT ||
--			sk->sk_state == BT_CONNECT2 ||
-+	    sk->sk_state == BT_CONNECT2 ||
- 			sk->sk_state == BT_CONFIG)
- 		return mask;
+ 	if (hdev->msft_opcode == HCI_OP_NOP)
+ 		return;
  
-@@ -508,7 +508,7 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 		amount = sk->sk_sndbuf - sk_wmem_alloc_get(sk);
- 		if (amount < 0)
- 			amount = 0;
--		err = put_user(amount, (int __user *) arg);
-+		err = put_user(amount, (int __user *)arg);
- 		break;
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
  
- 	case TIOCINQ:
-@@ -519,7 +519,7 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
- 		skb = skb_peek(&sk->sk_receive_queue);
- 		amount = skb ? skb->len : 0;
- 		release_sock(sk);
--		err = put_user(amount, (int __user *) arg);
-+		err = put_user(amount, (int __user *)arg);
- 		break;
+-	msft = kzalloc(sizeof(*msft), GFP_KERNEL);
+-	if (!msft)
++	/* If MSFT data exists, reset its members */
++	if (hdev->msft_data) {
++		msft = hdev->msft_data;
++		hdev->msft_data = NULL;
++
++		msft->features = 0;
++		kfree(msft->evt_prefix);
++		msft->evt_prefix = NULL;
++		msft->evt_prefix_len = 0;
++
++	} else {
++		msft = kzalloc(sizeof(*msft), GFP_KERNEL);
++	}
++
++	if (!msft) {
++		bt_dev_err(hdev, "Failed to init MSFT extension");
+ 		return;
++	}
  
- 	default:
-@@ -637,7 +637,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 	struct bt_sock_list *l = PDE_DATA(file_inode(seq->file));
- 
- 	if (v == SEQ_START_TOKEN) {
--		seq_puts(seq ,"sk               RefCnt Rmem   Wmem   User   Inode  Parent");
-+		seq_puts(seq, "sk               RefCnt Rmem   Wmem   User   Inode  Parent");
- 
- 		if (l->custom_seq_show) {
- 			seq_putc(seq, ' ');
-@@ -657,7 +657,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
- 			   sk_wmem_alloc_get(sk),
- 			   from_kuid(seq_user_ns(seq), sock_i_uid(sk)),
- 			   sock_i_ino(sk),
--			   bt->parent? sock_i_ino(bt->parent): 0LU);
-+			   bt->parent ? sock_i_ino(bt->parent) : 0LU);
- 
- 		if (l->custom_seq_show) {
- 			seq_putc(seq, ' ');
-@@ -678,7 +678,7 @@ static const struct seq_operations bt_seq_ops = {
- 
- int bt_procfs_init(struct net *net, const char *name,
- 		   struct bt_sock_list *sk_list,
--		   int (* seq_show)(struct seq_file *, void *))
-+		   int (*seq_show)(struct seq_file *, void *))
- {
- 	sk_list->custom_seq_show = seq_show;
- 
-@@ -694,7 +694,7 @@ void bt_procfs_cleanup(struct net *net, const char *name)
- #else
- int bt_procfs_init(struct net *net, const char *name,
- 		   struct bt_sock_list *sk_list,
--		   int (* seq_show)(struct seq_file *, void *))
-+		   int (*seq_show)(struct seq_file *, void *))
- {
- 	return 0;
- }
+ 	if (!read_supported_features(hdev, msft)) {
+ 		kfree(msft);
 -- 
-2.30.0
+2.30.0.280.ga3ce27912f-goog
 
