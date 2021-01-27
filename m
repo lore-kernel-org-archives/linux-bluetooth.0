@@ -2,107 +2,176 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7D78C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:41:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 014B1C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 15:14:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8794B2075B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 11:41:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A36F620771
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Jan 2021 15:14:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236945AbhA0LlP (ORCPT
+        id S1343677AbhA0PNJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Jan 2021 06:41:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236800AbhA0LkP (ORCPT
+        Wed, 27 Jan 2021 10:13:09 -0500
+Received: from out2-smtp.messagingengine.com ([66.111.4.26]:40047 "EHLO
+        out2-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235751AbhA0PG1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Jan 2021 06:40:15 -0500
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A13C7C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 03:39:35 -0800 (PST)
-Received: by mail-qt1-x836.google.com with SMTP id t17so1127080qtq.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 03:39:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=pyCF32agDEAMlhGlMCOCdtbjTBDuH2jBQu/eKiTY6eI=;
-        b=NDA9BzjMcdLZLFBqNbljsTCrOYXhGvfD5g8XAcQDMhWvD/lKPTm3qNTPliKHFiPTEc
-         lKc/uU+gHUOyB5KBD9Me9oRLSlcuuNdyJpM7S8YX9ZSkOQchHRDio9AeVE2aRakAOELm
-         7LQhk8YFX7TkEsBzGcIfn8R7AvhkpY0MYPtDktdcKIFg2fqjisEWaz8d6Ciphwwt3ei4
-         4lll03wxOz3UPumkfL5s+G9WYfcxY5p/W4yWKuVInps35Yw5SNlojx12CkFeR+/Al9Lu
-         0LUxbcvHhSHEXxfz7+/4fHe44oADOfgFZcxYDonqmAuckDrW4at2iGyoDKslCAgNxE8c
-         BT/A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=pyCF32agDEAMlhGlMCOCdtbjTBDuH2jBQu/eKiTY6eI=;
-        b=KSTOUBrYJkwVll+S371Y7M9+0ual/iXwv164V+JShx3vQtADd6G49AMfO7lLzy0gVg
-         L/tgYl3Q3YctCh2cD3QGfcrTBGBXopqxbtZwLPtr2I3xC15+AOlq1dKaJ/AGP5wpN4dP
-         bQxfgvcOnfhjgl/uOFRuqz5CilZ/5WWDr2M1uhLd36mdcGQfrwhu4s1LU0Ip39pz0S28
-         R/N/WiVJKUeUSbzT8GOLLCG6Qm3VVWocVS1CGFyNzqCmccMJCZwxjUoL2VouR2og/EAV
-         +Ss//bvEZzj/VgeKemCsN5qCoKj5FOM+Vf7K3BVRz255laR9Fl9M57NgFF1CJtxwc59x
-         Fzaw==
-X-Gm-Message-State: AOAM5322P8EXZrQWEcZWOiVHGLML2lEPWuW6og63YNnd8ZQVyap04Vkt
-        D+Gg+7YCCEgAgv0Dwyf8CW6DJ5sOLSipZSjV
-X-Google-Smtp-Source: ABdhPJyU4rCjKE5z+fieDQhw1lermKex+MlTsv+J0xkrg6JWMOoK/89l4AjoyEXHO02MgL8TnCDxTA==
-X-Received: by 2002:aed:2146:: with SMTP id 64mr9151666qtc.296.1611747574589;
-        Wed, 27 Jan 2021 03:39:34 -0800 (PST)
-Received: from [172.17.0.2] ([52.254.68.157])
-        by smtp.gmail.com with ESMTPSA id k12sm975018qkj.72.2021.01.27.03.39.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 03:39:34 -0800 (PST)
-Message-ID: <601150f6.1c69fb81.98300.5c59@mx.google.com>
-Date:   Wed, 27 Jan 2021 03:39:34 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7809246336632472749=="
+        Wed, 27 Jan 2021 10:06:27 -0500
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.42])
+        by mailout.nyi.internal (Postfix) with ESMTP id 892995C00CF;
+        Wed, 27 Jan 2021 10:05:34 -0500 (EST)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Wed, 27 Jan 2021 10:05:34 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fastmail.com; h=
+        from:to:cc:subject:date:message-id:mime-version
+        :content-transfer-encoding; s=fm2; bh=NZ/BL+CX8ZrUPwXj4Uh/86z40F
+        CVpFJbpqPIuN9jSec=; b=atQgHX2qSgfP06U5kuFU7gTfr/kLpf5lCsCIareSSO
+        uNn+nnfsY/ohOStNFDVfX+lqvJmgj/5t1D81GtsJ72dYwVtwu6x8Y2ZJGXle29uw
+        NEQuGlaZz0ByWg7OQW+I5RMwnlDYaMedZlGQkxvoykWTBIpZfUS1LPxI/e8taCrD
+        g4pzSY/YPEoiMvpNPLpxVaEx72d1Xm5VPSxbGLUkNLEjTy41aNUIyIzgyUOMU8jN
+        VdvQVmrO6ajbPedslhd6LzSoMU8Bj30/pyamRPlfBxr2XIwzA6Gh5kd2b7h8Fcno
+        5IdCB2jFYqtZGcnAwv/fTNwjfNz/Z+8HaSapg6MfotUg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+        messagingengine.com; h=cc:content-transfer-encoding:date:from
+        :message-id:mime-version:subject:to:x-me-proxy:x-me-proxy
+        :x-me-sender:x-me-sender:x-sasl-enc; s=fm1; bh=NZ/BL+CX8ZrUPwXj4
+        Uh/86z40FCVpFJbpqPIuN9jSec=; b=o2b1WHHivF88bjoSUXLVS9NQGPOZzAEMN
+        DsA+lSWD1Lat7D2sA5TGROZadoWRBXNw+i3ObTPiD3JeaRgIa+50BVqFgrskL0qg
+        aJao/AANLn4pU1t9lkD3BSaPnPbpsLh1xWuaUiK9RNxhSzzlN3ktSalzRh/UvlIX
+        AptkpWvrkP0A1JLVxwjCx44oxSR6xc8OTm0+1wz2BacI2my17j00EVKA8+qYLLWl
+        xW4MzM7ipsppbomdN3KW8bYkDKp/1cDqO3c81/35nr1s+H0W3V/XG4SQls0LVhD2
+        orFE5lYZOaMF0iteBj4PpExXfNIMAM3z8NQ1NqUmq9oJC2Sb3p0Bg==
+X-ME-Sender: <xms:PYERYOPOtb6_NVTq2pkNxQ4IS0TWpKNXFr1j15WBT0wJ7q3TkN2VeQ>
+    <xme:PYERYEYAX9D32Tj-GYlCTnN6eeQXKTodQbvMHVSgJj9UEjHGZ9Hz4niTSxvV135k3
+    KZ3vKNCbY79ogFQ8Ds>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrvdekgdejudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecunecujfgurhephffvufffkffoggfgsedtkeertdertd
+    dtnecuhfhrohhmpefvohhmohihuhhkihcuofgrthhsuhhshhhithgruceogihorhhphhhi
+    thhushesfhgrshhtmhgrihhlrdgtohhmqeenucggtffrrghtthgvrhhnpeetgeffuefghe
+    fftedvtefgjeejjeelhedtfeekveejtedtkedvhfelfedvieeugeenucfkphepuddtfedr
+    vddrvdegledrudduleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
+    hlfhhrohhmpeigohhrphhhihhtuhhssehfrghsthhmrghilhdrtghomh
+X-ME-Proxy: <xmx:PYERYCoKuDuUnF2io7Zrml9W4cqA445jyBjQuNxAeNyzZLYNtj_EUA>
+    <xmx:PYERYIaTAHqVQvE5pd69GdF1nnYqyQX2gjkR0aCr9jwBck6x8fnWkA>
+    <xmx:PYERYKSvshS-IiTxT0tA_TLTO1FXxDRJvA4l8Q4I4AcVdyixqKl_YA>
+    <xmx:PoERYA78B2AX3kVB0CNgvghBlgYKxVBDSgPoCOfA4lahqw5OR7azag>
+Received: from xorphitus-arch.flets-east.jp (119.249.2.103.shared.user.transix.jp [103.2.249.119])
+        by mail.messagingengine.com (Postfix) with ESMTPA id D308B1080067;
+        Wed, 27 Jan 2021 10:05:31 -0500 (EST)
+From:   Tomoyuki Matsushita <xorphitus@fastmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     Tomoyuki Matsushita <xorphitus@fastmail.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: af_bluetooth: checkpatch: fix indentation and alignment
+Date:   Thu, 28 Jan 2021 00:05:20 +0900
+Message-Id: <20210127150520.3459346-1-xorphitus@fastmail.com>
+X-Mailer: git-send-email 2.30.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ,v2] tools/bluemoon: Display FW version of firmware file
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210126174912.83822-1-tedd.an@intel.com>
-References: <20210126174912.83822-1-tedd.an@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7809246336632472749==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=422831
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
+Signed-off-by: Tomoyuki Matsushita <xorphitus@fastmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/af_bluetooth.c | 20 ++++++++++----------
+ 1 file changed, 10 insertions(+), 10 deletions(-)
 
+diff --git a/net/bluetooth/af_bluetooth.c b/net/bluetooth/af_bluetooth.c
+index 4ef6a54403aa..968ea03d863f 100644
+--- a/net/bluetooth/af_bluetooth.c
++++ b/net/bluetooth/af_bluetooth.c
+@@ -72,8 +72,8 @@ void bt_sock_reclassify_lock(struct sock *sk, int proto)
+ 	BUG_ON(!sock_allow_reclassification(sk));
+ 
+ 	sock_lock_init_class_and_name(sk,
+-			bt_slock_key_strings[proto], &bt_slock_key[proto],
+-				bt_key_strings[proto], &bt_lock_key[proto]);
++				      bt_slock_key_strings[proto], &bt_slock_key[proto],
++				      bt_key_strings[proto], &bt_lock_key[proto]);
+ }
+ EXPORT_SYMBOL(bt_sock_reclassify_lock);
+ 
+@@ -451,7 +451,7 @@ static inline __poll_t bt_accept_poll(struct sock *parent)
+ }
+ 
+ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+-			  poll_table *wait)
++		      poll_table *wait)
+ {
+ 	struct sock *sk = sock->sk;
+ 	__poll_t mask = 0;
+@@ -478,7 +478,7 @@ __poll_t bt_sock_poll(struct file *file, struct socket *sock,
+ 		mask |= EPOLLHUP;
+ 
+ 	if (sk->sk_state == BT_CONNECT ||
+-			sk->sk_state == BT_CONNECT2 ||
++	    sk->sk_state == BT_CONNECT2 ||
+ 			sk->sk_state == BT_CONFIG)
+ 		return mask;
+ 
+@@ -508,7 +508,7 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		amount = sk->sk_sndbuf - sk_wmem_alloc_get(sk);
+ 		if (amount < 0)
+ 			amount = 0;
+-		err = put_user(amount, (int __user *) arg);
++		err = put_user(amount, (int __user *)arg);
+ 		break;
+ 
+ 	case TIOCINQ:
+@@ -519,7 +519,7 @@ int bt_sock_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
+ 		skb = skb_peek(&sk->sk_receive_queue);
+ 		amount = skb ? skb->len : 0;
+ 		release_sock(sk);
+-		err = put_user(amount, (int __user *) arg);
++		err = put_user(amount, (int __user *)arg);
+ 		break;
+ 
+ 	default:
+@@ -637,7 +637,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 	struct bt_sock_list *l = PDE_DATA(file_inode(seq->file));
+ 
+ 	if (v == SEQ_START_TOKEN) {
+-		seq_puts(seq ,"sk               RefCnt Rmem   Wmem   User   Inode  Parent");
++		seq_puts(seq, "sk               RefCnt Rmem   Wmem   User   Inode  Parent");
+ 
+ 		if (l->custom_seq_show) {
+ 			seq_putc(seq, ' ');
+@@ -657,7 +657,7 @@ static int bt_seq_show(struct seq_file *seq, void *v)
+ 			   sk_wmem_alloc_get(sk),
+ 			   from_kuid(seq_user_ns(seq), sock_i_uid(sk)),
+ 			   sock_i_ino(sk),
+-			   bt->parent? sock_i_ino(bt->parent): 0LU);
++			   bt->parent ? sock_i_ino(bt->parent) : 0LU);
+ 
+ 		if (l->custom_seq_show) {
+ 			seq_putc(seq, ' ');
+@@ -678,7 +678,7 @@ static const struct seq_operations bt_seq_ops = {
+ 
+ int bt_procfs_init(struct net *net, const char *name,
+ 		   struct bt_sock_list *sk_list,
+-		   int (* seq_show)(struct seq_file *, void *))
++		   int (*seq_show)(struct seq_file *, void *))
+ {
+ 	sk_list->custom_seq_show = seq_show;
+ 
+@@ -694,7 +694,7 @@ void bt_procfs_cleanup(struct net *net, const char *name)
+ #else
+ int bt_procfs_init(struct net *net, const char *name,
+ 		   struct bt_sock_list *sk_list,
+-		   int (* seq_show)(struct seq_file *, void *))
++		   int (*seq_show)(struct seq_file *, void *))
+ {
+ 	return 0;
+ }
+-- 
+2.30.0
 
---===============7809246336632472749==--
