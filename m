@@ -7,55 +7,50 @@ X-Spam-Status: No, score=-16.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EAC1C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 16:36:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EFA83C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 16:36:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AA3764E0E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 16:36:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B4A2D64E0C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 16:36:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232618AbhA1QgR (ORCPT
+        id S232599AbhA1Qgj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jan 2021 11:36:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:32893 "EHLO
+        Thu, 28 Jan 2021 11:36:39 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:41866 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232578AbhA1Qfg (ORCPT
+        by vger.kernel.org with ESMTP id S232591AbhA1Qfa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jan 2021 11:35:36 -0500
+        Thu, 28 Jan 2021 11:35:30 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1611851649;
+        s=mimecast20190719; t=1611851643;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2IPZyAYpapBF8BqK19nNG7kbsPa0a8ESJujLK+gQEZc=;
-        b=YZfcj9Q03nw8AJEo+mm7OGV3zIsMCL8YiHJvNHnPG78Mae8z+pa7yKL0HsVxqiLHmWDmuv
-        pyr5cHXx4ixswP4pL1o6ZOQnFMrxBniR0u3jAGq9I1uBgGn8aaj1fJazZ6sJfwiagJUCgS
-        JVLRnutwQDp6OW1ygWkbDebti5BO25I=
+         content-transfer-encoding:content-transfer-encoding;
+        bh=wgqGSQYCYG8H3B0wjSS50/8sCVB6kJcp1awJG1izGGw=;
+        b=RkYS/LGmRL6thdcmJl4N7LB/M+gUxV9lsYvhS0t4LYDsG5D9ob9rWCmIhAyRnEiGAL4jdA
+        92I5AKSU9lg2Dn8TmYAeONIVQuS+tjNSiaYofkZVC819uBgpvtKbjTge5ZSz+UhuIW2YAi
+        BztZDJQKAqSd+/4jh27Yr+ygnPZilYc=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-125-hFO-Y1RqM9OvILHs-ugsPg-1; Thu, 28 Jan 2021 11:34:05 -0500
-X-MC-Unique: hFO-Y1RqM9OvILHs-ugsPg-1
+ us-mta-338-7VObSRMXPJWvXeaPy8XEdQ-1; Thu, 28 Jan 2021 11:34:01 -0500
+X-MC-Unique: 7VObSRMXPJWvXeaPy8XEdQ-1
 Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.phx2.redhat.com [10.5.11.16])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E4CDD1081B2C;
-        Thu, 28 Jan 2021 16:33:17 +0000 (UTC)
-Received: from x1.localdomain (ovpn-114-250.ams2.redhat.com [10.36.114.250])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 63E1E5C233;
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 4BD901005419;
         Thu, 28 Jan 2021 16:33:16 +0000 (UTC)
+Received: from x1.localdomain (ovpn-114-250.ams2.redhat.com [10.36.114.250])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D42595C1BB;
+        Thu, 28 Jan 2021 16:33:14 +0000 (UTC)
 From:   Hans de Goede <hdegoede@redhat.com>
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>
 Cc:     Hans de Goede <hdegoede@redhat.com>,
         linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH v2 2/2] Bluetooth: hci_h5: Disable the hci_suspend_notifier for btrtl devices
-Date:   Thu, 28 Jan 2021 17:33:13 +0100
-Message-Id: <20210128163313.426404-2-hdegoede@redhat.com>
-In-Reply-To: <20210128163313.426404-1-hdegoede@redhat.com>
-References: <20210128163313.426404-1-hdegoede@redhat.com>
+Subject: [PATCH v2 1/2] Bluetooth: Add new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk
+Date:   Thu, 28 Jan 2021 17:33:12 +0100
+Message-Id: <20210128163313.426404-1-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 2.79 on 10.5.11.16
@@ -63,124 +58,87 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The hci_suspend_notifier which was introduced last year, is causing
-problems for uart attached btrtl devices. These devices may loose their
-firmware and their baudrate setting over a suspend/resume.
+Some devices, e.g. the RTL8723BS bluetooth part, some USB attached devices,
+completely drop from the bus on a system-suspend. These devices will
+have their driver unbound and rebound on resume (when the dropping of
+the bus gets detected) and will show up as a new HCI after resume.
 
-Since we don't even know the baudrate after a suspend/resume recovering
-from this is tricky. The driver solves this by treating these devices
-the same as USB BT HCIs which drop of the bus during suspend.
+These devices do not benefit from the suspend / resume handling work done
+by the hci_suspend_notifier. At best this unnecessarily adds some time to
+the suspend/resume time. But this may also actually cause problems, if the
+code doing the driver unbinding runs after the pm-notifier then the
+hci_suspend_notifier code will try to talk to a device which is now in
+an uninitialized state.
 
-Specifically the driver:
-1. Simply unconditionally turns the device fully off during
-   system-suspend to save maximum power.
-2. Calls device_reprobe() from a workqueue to fully re-init the device
-   from scratch on system-resume (unregistering the old HCI and
-   registering a new HCI).
+This commit adds a new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk which allows
+drivers to opt-out of the hci_suspend_notifier when they know beforehand
+that their device will be fully re-initialized / reprobed on resume.
 
-This means that these devices do not benefit from the suspend / resume
-handling work done by the hci_suspend_notifier. At best this unnecessarily
-adds some time to the suspend/resume time.
-
-But in practice this is actually causing problems:
-
-1. These btrtl devices seem to not like the HCI_OP_WRITE_SCAN_ENABLE(
-SCAN_DISABLED) request being send to them when entering the
-BT_SUSPEND_CONFIGURE_WAKE state. The same request send on
-BT_SUSPEND_DISCONNECT works fine, but the second one send (unnecessarily?)
-from the BT_SUSPEND_CONFIGURE_WAKE transition causes the device to hang:
-
-[  573.497754] PM: suspend entry (s2idle)
-[  573.554615] Filesystems sync: 0.056 seconds
-[  575.837753] Bluetooth: hci0: Timed out waiting for suspend events
-[  575.837801] Bluetooth: hci0: Suspend timeout bit: 4
-[  575.837925] Bluetooth: hci0: Suspend notifier action (3) failed: -110
-
-2. The PM_POST_SUSPEND / BT_RUNNING transition races with the
-driver-unbinding done by the device_reprobe() work.
-If the hci_suspend_notifier wins the race it is talking to a dead
-device leading to the following errors being logged:
-
-[  598.686060] Bluetooth: hci0: Timed out waiting for suspend events
-[  598.686124] Bluetooth: hci0: Suspend timeout bit: 5
-[  598.686237] Bluetooth: hci0: Suspend notifier action (4) failed: -110
-
-In both cases things still work, but the suspend-notifier is causing
-these ugly errors getting logged and ut increase both the suspend- and
-the resume-time by 2 seconds.
-
-This commit avoids these problems by disabling the hci_suspend_notifier.
-
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Vasily Khoruzhick <anarsoul@gmail.com>
 Cc: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
 Changes in v2:
-- Use the new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk, instead of directly
-  unregistering the notifier from hci_h5.c
+- This is a new patch in v2 of this patch-set
 ---
- drivers/bluetooth/hci_h5.c     |  7 +++++++
- drivers/bluetooth/hci_serdev.c |  3 +++
- drivers/bluetooth/hci_uart.h   | 13 +++++++------
- 3 files changed, 17 insertions(+), 6 deletions(-)
+ include/net/bluetooth/hci.h |  8 ++++++++
+ net/bluetooth/hci_core.c    | 18 +++++++++++-------
+ 2 files changed, 19 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 7be16a7f653b..e8f3afab6587 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -914,6 +914,13 @@ static int h5_btrtl_setup(struct h5 *h5)
- 
- static void h5_btrtl_open(struct h5 *h5)
- {
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index c1504aa3d9cf..ba2f439bc04d 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -238,6 +238,14 @@ enum {
+ 	 * during the hdev->setup vendor callback.
+ 	 */
+ 	HCI_QUIRK_BROKEN_ERR_DATA_REPORTING,
++
 +	/*
-+	 * Since h5_btrtl_resume() does a device_reprobe() the suspend handling
-+	 * done by the hci_suspend_notifier is not necessary; it actually causes
-+	 * delays and a bunch of errors to get logged, so disable it.
++	 * When this quirk is set, then the hci_suspend_notifier is not
++	 * registered. This is intended for devices which drop completely
++	 * from the bus on system-suspend and which will show up as a new
++	 * HCI after resume.
 +	 */
-+	set_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &h5->hu->hdev_flags);
-+
- 	/* Devices always start with these fixed parameters */
- 	serdev_device_set_flow_control(h5->hu->serdev, false);
- 	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
-diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index ef96ad06fa54..dbc14b8ac477 100644
---- a/drivers/bluetooth/hci_serdev.c
-+++ b/drivers/bluetooth/hci_serdev.c
-@@ -349,6 +349,9 @@ int hci_uart_register_device(struct hci_uart *hu,
- 	if (test_bit(HCI_UART_EXT_CONFIG, &hu->hdev_flags))
- 		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
++	HCI_QUIRK_NO_SUSPEND_NOTIFIER,
+ };
  
-+	if (test_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &hu->hdev_flags))
-+		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
-+
- 	if (test_bit(HCI_UART_CREATE_AMP, &hu->hdev_flags))
- 		hdev->dev_type = HCI_AMP;
- 	else
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 4e039d7a16f8..4df2330ac103 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -35,12 +35,13 @@
- #define HCI_UART_NOKIA	10
- #define HCI_UART_MRVL	11
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 9d2c9a1c552f..9d8dbb38585c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3827,10 +3827,12 @@ int hci_register_dev(struct hci_dev *hdev)
+ 	hci_sock_dev_event(hdev, HCI_DEV_REG);
+ 	hci_dev_hold(hdev);
  
--#define HCI_UART_RAW_DEVICE	0
--#define HCI_UART_RESET_ON_INIT	1
--#define HCI_UART_CREATE_AMP	2
--#define HCI_UART_INIT_PENDING	3
--#define HCI_UART_EXT_CONFIG	4
--#define HCI_UART_VND_DETECT	5
-+#define HCI_UART_RAW_DEVICE		0
-+#define HCI_UART_RESET_ON_INIT		1
-+#define HCI_UART_CREATE_AMP		2
-+#define HCI_UART_INIT_PENDING		3
-+#define HCI_UART_EXT_CONFIG		4
-+#define HCI_UART_VND_DETECT		5
-+#define HCI_UART_NO_SUSPEND_NOTIFIER	6
+-	hdev->suspend_notifier.notifier_call = hci_suspend_notifier;
+-	error = register_pm_notifier(&hdev->suspend_notifier);
+-	if (error)
+-		goto err_wqueue;
++	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
++		hdev->suspend_notifier.notifier_call = hci_suspend_notifier;
++		error = register_pm_notifier(&hdev->suspend_notifier);
++		if (error)
++			goto err_wqueue;
++	}
  
- struct hci_uart;
- struct serdev_device;
+ 	queue_work(hdev->req_workqueue, &hdev->power_on);
+ 
+@@ -3865,9 +3867,11 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
+-	hci_suspend_clear_tasks(hdev);
+-	unregister_pm_notifier(&hdev->suspend_notifier);
+-	cancel_work_sync(&hdev->suspend_prepare);
++	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
++		hci_suspend_clear_tasks(hdev);
++		unregister_pm_notifier(&hdev->suspend_notifier);
++		cancel_work_sync(&hdev->suspend_prepare);
++	}
+ 
+ 	hci_dev_do_close(hdev);
+ 
 -- 
 2.29.2
 
