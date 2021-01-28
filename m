@@ -2,130 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39B12C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 07:36:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 331F3C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 11:54:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E186564DD1
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 07:36:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC27864DD8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 11:54:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231918AbhA1HgK (ORCPT
+        id S231181AbhA1Lxy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jan 2021 02:36:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232080AbhA1HeC (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jan 2021 02:34:02 -0500
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B635DC061573
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 23:31:00 -0800 (PST)
-Received: by mail-qv1-xf33.google.com with SMTP id n3so2359244qvf.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Jan 2021 23:31:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=3gvbAPmDZrJ8z4ark2lmseJw62VlIU2H5t61tLwy9Jc=;
-        b=Y5K1D43q+WLgT+SLiE9BRGLnYcvfNIvwzZXTPXFVW1yKeiw3RwUOzHvR+rLhFen3Ln
-         uAQGVylL/r6cVSlTi9+gdSMMawRjHGw/EENpHYoHFiI6Vto58r0EeExE/8YtWMG8NB8r
-         Ik/4yBzTBJZdwz5wbENutdcj/uAy7D4U8LhuXdUx0nr+iV/mzSkcCn1tr+/8tLcxY0EB
-         rfXG5XAlCVgNpWgO6Jt3Oz8Kspapu5+/U9lAlbJhQ8k8yVYTpjg75+r4GWYjCVnhkEXp
-         QCnsqb+NbPtZwCph1xKvspQvmDjrnLLpDEswpRgxm0pniNKAKmtYBMHl5hwD9L4s9x6o
-         LrKQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=3gvbAPmDZrJ8z4ark2lmseJw62VlIU2H5t61tLwy9Jc=;
-        b=nrNI0QA6H5Sl8eybEmu3OAWaARQZBajPTMHSAI0Nx0LHvMoTJBvdrDLaJmdG3zs4FH
-         +FbFX7fMw4jRM40GceN0yLAIDLEduX+tcf7lWEpzkpJUeZeKEtwDqOLRzPu41lw4GLNL
-         8kONfC+WczGlI2oAuarBJMGyhy77B6SRY5iVWGfCyWNhiO6TEIITUu6LWSuei2jfl1Kg
-         uVMirXJNny8k9pzTWt34Qs2WJmSiVsloH/YAgfJn9qbT65Tf87oKTI3GvRSsnQLARNg2
-         /Lj8TXJPnluxstZ43X3UMQUO2olCAyhFmb8bFlXA+Pv8VkDOMNnMHEAR9UEi5uyr1ymb
-         Y7Gw==
-X-Gm-Message-State: AOAM5337lf7bEwCZuVuocLOJRnK/cU1QVDVLFJmB682eW3+euxaCA+gf
-        2HGjhWERGC0Q4WFZ7fO/NO8k9En1Q0UwOljN
-X-Google-Smtp-Source: ABdhPJwcoWWuylnFpR8PJooTKMhgyPARJeDHxE6KTXZTf3KPxNRvwo+HqwRIcl4MKRnF52YGiHAH6Q==
-X-Received: by 2002:a0c:8485:: with SMTP id m5mr9933449qva.14.1611819059848;
-        Wed, 27 Jan 2021 23:30:59 -0800 (PST)
-Received: from [172.17.0.2] ([52.179.166.64])
-        by smtp.gmail.com with ESMTPSA id o10sm2802330qtg.37.2021.01.27.23.30.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Jan 2021 23:30:59 -0800 (PST)
-Message-ID: <60126833.1c69fb81.612e1.26ba@mx.google.com>
-Date:   Wed, 27 Jan 2021 23:30:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1789246990046480211=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
-Subject: RE: [BlueZ,v2] input/hog: Fix crashes of UAF of hog->attr
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210128063901.1362-1-sonnysasaka@chromium.org>
-References: <20210128063901.1362-1-sonnysasaka@chromium.org>
+        Thu, 28 Jan 2021 06:53:54 -0500
+Received: from m12-18.163.com ([220.181.12.18]:44102 "EHLO m12-18.163.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231151AbhA1Lxw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Jan 2021 06:53:52 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=From:Subject:Date:Message-Id; bh=d4bdEBtebjJQfdESJ6
+        Z0hhcQ6ufp7HGXXUDy8MsIUEQ=; b=S7xfy4Rsm/kdbH9Fut/CS0fNSkt8KERRAF
+        d1RlLpkYm4pE9DoaveLYRb8UY2up4vrkmA9sRHkED+WOV5m1ccj5QmtrroNEB6fB
+        rbSyUFvvCStX5JXV44Sf1wUOh2QVckP2CvtfjuWO8eXzjmz/fM5am//kNjS9aFOo
+        Mlb5+kx5o=
+Received: from zhongjupeng.ccdomain.com (unknown [218.17.89.92])
+        by smtp14 (Coremail) with SMTP id EsCowAC3YdQ7mhJg7zvHRQ--.6094S2;
+        Thu, 28 Jan 2021 19:04:28 +0800 (CST)
+From:   zjp734690220@163.com
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        zhongjupeng <zhongjupeng@yulong.com>
+Subject: [PATCH] bluetooth: fix typo
+Date:   Thu, 28 Jan 2021 19:04:36 +0800
+Message-Id: <20210128110436.43092-1-zjp734690220@163.com>
+X-Mailer: git-send-email 2.15.0.windows.1
+X-CM-TRANSID: EsCowAC3YdQ7mhJg7zvHRQ--.6094S2
+X-Coremail-Antispam: 1Uf129KBjvdXoWrKr47Cr13AF1UGry3Cr4xXrb_yoW3Jrc_u3
+        4xZr4xtFWUCrZ7AF1jyrZFvry5K345WFs7ZrnIq34rur9Fgr4DCFyqgryFqF47CwnYgr92
+        yay5Wr4Ivr1UGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnBc_7UUUUU==
+X-Originating-IP: [218.17.89.92]
+X-CM-SenderInfo: 52msljauwzijisq6il2tof0z/xtbBohwoFFaD+qC2uAAAsD
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1789246990046480211==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: zhongjupeng <zhongjupeng@yulong.com>
 
-This is automated email and please do not reply to this email!
+change 'deivice' to 'device'
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=423455
-
----Test result---
-
-##############################
-Test: CheckPatch - FAIL
-Output:
-input/hog: Fix crashes of UAF of hog->attr
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#21: 
-    frame #7: 0xec8e6a1a libglib-2.0.so.0`g_main_context_dispatch at gmain.c:3325
-
-- total: 0 errors, 1 warnings, 34 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] input/hog: Fix crashes of UAF of hog->attr" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - FAIL
-Output:
-input/hog: Fix crashes of UAF of hog->attr
-18: B1 Line exceeds max length (81>80): "    frame #7: 0xec8e6a1a libglib-2.0.so.0`g_main_context_dispatch at gmain.c:3325"
-22: B1 Line exceeds max length (86>80): "    frame #11: 0x05ad5a64 bluetoothd`mainloop_run_with_signal at mainloop-notify.c:201"
-
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
+Signed-off-by: zhongjupeng <zhongjupeng@yulong.com>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/btusb.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 03b83aa..ffec6bc 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3465,7 +3465,7 @@ static int btusb_mtk_setup_firmware(struct hci_dev *hdev, const char *fwname)
+ 	while (fw_size > 0) {
+ 		dlen = min_t(int, 250, fw_size);
+ 
+-		/* Tell deivice the position in sequence */
++		/* Tell device the position in sequence */
+ 		if (fw_size - dlen <= 0)
+ 			flag = 3;
+ 		else if (fw_size < fw->size - 30)
+-- 
+1.9.1
 
 
---===============1789246990046480211==--
