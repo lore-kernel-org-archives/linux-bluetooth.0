@@ -2,76 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 331F3C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 11:54:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0980DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 12:02:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC27864DD8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 11:54:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B904B64DD8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Jan 2021 12:02:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231181AbhA1Lxy (ORCPT
+        id S231359AbhA1MCQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Jan 2021 06:53:54 -0500
-Received: from m12-18.163.com ([220.181.12.18]:44102 "EHLO m12-18.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231151AbhA1Lxw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Jan 2021 06:53:52 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id; bh=d4bdEBtebjJQfdESJ6
-        Z0hhcQ6ufp7HGXXUDy8MsIUEQ=; b=S7xfy4Rsm/kdbH9Fut/CS0fNSkt8KERRAF
-        d1RlLpkYm4pE9DoaveLYRb8UY2up4vrkmA9sRHkED+WOV5m1ccj5QmtrroNEB6fB
-        rbSyUFvvCStX5JXV44Sf1wUOh2QVckP2CvtfjuWO8eXzjmz/fM5am//kNjS9aFOo
-        Mlb5+kx5o=
-Received: from zhongjupeng.ccdomain.com (unknown [218.17.89.92])
-        by smtp14 (Coremail) with SMTP id EsCowAC3YdQ7mhJg7zvHRQ--.6094S2;
-        Thu, 28 Jan 2021 19:04:28 +0800 (CST)
-From:   zjp734690220@163.com
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        zhongjupeng <zhongjupeng@yulong.com>
-Subject: [PATCH] bluetooth: fix typo
-Date:   Thu, 28 Jan 2021 19:04:36 +0800
-Message-Id: <20210128110436.43092-1-zjp734690220@163.com>
-X-Mailer: git-send-email 2.15.0.windows.1
-X-CM-TRANSID: EsCowAC3YdQ7mhJg7zvHRQ--.6094S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrKr47Cr13AF1UGry3Cr4xXrb_yoW3Jrc_u3
-        4xZr4xtFWUCrZ7AF1jyrZFvry5K345WFs7ZrnIq34rur9Fgr4DCFyqgryFqF47CwnYgr92
-        yay5Wr4Ivr1UGjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnBc_7UUUUU==
-X-Originating-IP: [218.17.89.92]
-X-CM-SenderInfo: 52msljauwzijisq6il2tof0z/xtbBohwoFFaD+qC2uAAAsD
+        Thu, 28 Jan 2021 07:02:16 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60612 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229569AbhA1MBj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Jan 2021 07:01:39 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1611835212;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=xDkyZvkL5/FV8/3DNW7wgIsPXPOvVBPwOXxWUlvHiK4=;
+        b=BasTmll2WJhC+awjGcutrC4szqElEzmCpZ2SXoGx++Y7+f+LzgEoV5Wq0ev6TTLwyux0om
+        Riw0fyVisKpKltsh1YDS8Wuh51+0S4gCjMl1EDCokzkGbD8MFqBYxAVPCx4OKeIV2n5Wz7
+        eiSBAUo1S+oz8gnEqoxP9b1yYDvqNwo=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-575-36QffA_yO72GoH1AIJI50w-1; Thu, 28 Jan 2021 07:00:10 -0500
+X-MC-Unique: 36QffA_yO72GoH1AIJI50w-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.12])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id AD5598144E2;
+        Thu, 28 Jan 2021 12:00:09 +0000 (UTC)
+Received: from x1.localdomain (ovpn-114-250.ams2.redhat.com [10.36.114.250])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 60D0B60C13;
+        Thu, 28 Jan 2021 12:00:08 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: Recent(ish) bluetooth hci_suspend_notifier() changes
+Date:   Thu, 28 Jan 2021 13:00:07 +0100
+Message-Id: <20210128120007.5676-1-hdegoede@redhat.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.12
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: zhongjupeng <zhongjupeng@yulong.com>
+Hi All,
 
-change 'deivice' to 'device'
+While debugging an rtl8723bs bluetooth issue I noticed that last year
+the bluetooth core has grown a new hci_suspend_notifier() mechanism and
+I noticed a number of possible issues / improvements with that mechanism
+which I noticed:
 
-Signed-off-by: zhongjupeng <zhongjupeng@yulong.com>
----
- drivers/bluetooth/btusb.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+1. HCI_OP_WRITE_SCAN_ENABLE gets send to the HCI in some places without
+   a hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) check
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 03b83aa..ffec6bc 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3465,7 +3465,7 @@ static int btusb_mtk_setup_firmware(struct hci_dev *hdev, const char *fwname)
- 	while (fw_size > 0) {
- 		dlen = min_t(int, 250, fw_size);
- 
--		/* Tell deivice the position in sequence */
-+		/* Tell device the position in sequence */
- 		if (fw_size - dlen <= 0)
- 			flag = 3;
- 		else if (fw_size < fw->size - 30)
--- 
-1.9.1
+2. HCI_OP_SET_EVENT_FLT gets end to the HCI in some places without
+   a hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) check
 
+3. hci_req_set_event_filter sends the following requests:
+   1 HCI_OP_SET_EVENT_FLT
+   2 HCI_OP_WRITE_SCAN_ENABLE (if the scan parameters have changed only)
+   3 HCI_OP_SET_EVENT_FLT (if their are relevant whitelist entries_
+   4 HCI_OP_WRITE_SCAN_ENABLE unconditionally
+
+   It seems to me that 2. is unnecessary since it will immediately be
+   followed by 4. and 4. misses the check to see if the scan parameters
+   need updating which 2 does (this check is done in __hci_req_update_scan()
+
+
+4. There is another unconditional, possibly unnecessary  HCI_OP_WRITE_SCAN_ENABLE
+   in the if (next == BT_SUSPEND_DISCONNECT) {} block of hci_req_prepare_suspend()
+   Note if this is made conditional then the:
+    set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
+   should also be made conditional since then req might not contain any requests
+   in which case suspend_req_complete() will not run.
+
+Regards,
+
+Hans
 
