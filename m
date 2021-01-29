@@ -2,69 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B146C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jan 2021 23:52:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5170C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jan 2021 23:52:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7C4564DFB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jan 2021 23:52:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4B45164E00
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Jan 2021 23:52:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbhA2Xwr (ORCPT
+        id S231316AbhA2Xwt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Jan 2021 18:52:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48752 "EHLO
+        Fri, 29 Jan 2021 18:52:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48760 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230009AbhA2Xwm (ORCPT
+        with ESMTP id S231138AbhA2Xwm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 29 Jan 2021 18:52:42 -0500
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C296AC061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 15:52:01 -0800 (PST)
-Received: by mail-pf1-x431.google.com with SMTP id y205so7213129pfc.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 15:52:01 -0800 (PST)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 851E5C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 15:52:02 -0800 (PST)
+Received: by mail-pf1-x42e.google.com with SMTP id o20so7236977pfu.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 15:52:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
-        b=VCv21ZA/gs03bLm6rjA+A8dgzWyq0af7VtQI/aPKlVhUNJRRT+fMULUQc0nPCNok6F
-         N/TlymzOvzewAKfHP2pTXMHHdkGdL9SbNVHFNkd54iCEeuJI3F4aHSkbw5lKjA6HLLaA
-         W4R68teo/BNsv9LqbC8Z81I0FjLMMqqtOIvzmkW/K0QI0fiHgwRMvABNXNCYFRLbZmdi
-         dXCwzXmlrnT35Ltn8bnWoHoFLEHjhhGcV34H8dGZwPbX85r22MDvICJfmK/xrEROoJM3
-         GHUCXhLhULPY5ABJie/qfn4aQKQUKhh0IXbyVBkrUETaFWvbnvbI6r5uX+Pp5eQBloa4
-         sS8A==
+        bh=VeAnf3C0fNBxBCOWFyTyptsCrkdSHRzUPX3+BIcsGqg=;
+        b=Ysj/N7Q51arbpPPlle5bxtjeF405w5CFXQsf5BIY1o8zzL/0D0GP1b72oOAMfsW70M
+         Sx1jBnjMVedhUrtjdMacKwlw00aS9nEjmEG9PQ0V+MU1mwtRQE0qR4PD6V1kafKanGx/
+         6sRqBwkNL+BQpHe08gJ39olAlHwr4U2IwXK5y/v8XLetejKYG7e5xBpDu/fwctsFWBcY
+         8ffYYonsjx02w6JaXYuXVcWLLFR2RqTRaXJF06MWOpR53k3k1Hm5QIMrznPfH9Grzsgm
+         YfqqcUII7NAce9p03GxFInyVp7BWyKQM1J4k5DKyglvxfptfMLuaj2UAm3VFweprxBFZ
+         /X1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
-        b=ZUKtGbDnjQdbdHKJnqWylJ/I1KdqK/dD2oYjzSyT0S0CVlkk6BrvMjNifBtqT+tfpK
-         3Duz3oU0MhOUXPOuJU8qTjBjdONUaNJzmXMd5bbmHuXMy/EWazMD23V7lLpsaDziDBZd
-         obAM4wSVNxi4iQmpINk9e15RwHbscQv84i60zd+pHeXYIQrYQa8dy9qzAHL522/h9fZV
-         P5/zDq4B94IbVBtd1ySp4Hh/0a66zSlZicW5YF38NBxiDCDmWQNd37a2BqO7fv/zV4zW
-         g1VPunVT1b6CInZWZyf6Ij/RCR5XZsqP3f19cIuvpmpuKtd2qBPlA/ATesi6Os8IubwB
-         f7yQ==
-X-Gm-Message-State: AOAM531j7uh3I/flisjJ6wnacdy70XZ6Znv7GrPgmOWf485j65m7VQTH
-        AnMUIjTPiQJ51CRZ2q7ylRbF3aWNsfQzEA==
-X-Google-Smtp-Source: ABdhPJzk5YL+w0PeaYd/fKXsagDp8d5Ojnaq97gRDKrOzvMzeNgll7qVNpFCLb+rp0Jacq/c2/4yJA==
-X-Received: by 2002:a62:ddd1:0:b029:1b7:5651:f6ea with SMTP id w200-20020a62ddd10000b02901b75651f6eamr6736632pff.62.1611964321167;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VeAnf3C0fNBxBCOWFyTyptsCrkdSHRzUPX3+BIcsGqg=;
+        b=qXliz73w/t0pR7yq25fCc4GQGpBDZf7eIyRSkvmGKkhhQN542jm4+uzirCp4m+N7pO
+         zMAdOCKJx8n1NhKV7vAw/YIrfwwUc+n8lngkLrSCn9F6vA0EW9kdqivDrJAJ/SO3oH5Y
+         717+mCumB4XfQTdUXIiA5mi4OuHZoKOwb59CJ7nFLrXbiSMVLpfucfn8mAxCyR+okzGK
+         S7mSEa/s53gR8xwfvsFOGeztSwKXAIdLhZcDymwG4VXykAcQyaZaQjpgCz+arrsRrhz+
+         0cIFEjoVJ/m7jcA0E6OHh3ifdpFxTj1fA0FAyK+S9hT/6JqXpw2+rQoxXuXYU+oyZLzw
+         ERkw==
+X-Gm-Message-State: AOAM532O54WAreAnx5/cuGgr2ZWml/vqS01IrCnfONq2Qed+C/OLJsxm
+        Tw5oeCeXVyddeYyemv3lqhbiTA64dKCI2w==
+X-Google-Smtp-Source: ABdhPJzwOXtjprkQpgmsQgfvDRLgpEVplBb0JcAw210CvHqlGHcwxosU/KnLYLovzDIbXLlHyvjgEw==
+X-Received: by 2002:aa7:978e:0:b029:1bd:f965:66dd with SMTP id o14-20020aa7978e0000b02901bdf96566ddmr6516140pfp.46.1611964321865;
         Fri, 29 Jan 2021 15:52:01 -0800 (PST)
 Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:30d0:c047:f587:7300:6549])
-        by smtp.gmail.com with ESMTPSA id z11sm8963190pjn.5.2021.01.29.15.52.00
+        by smtp.gmail.com with ESMTPSA id z11sm8963190pjn.5.2021.01.29.15.52.01
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 15:52:00 -0800 (PST)
+        Fri, 29 Jan 2021 15:52:01 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ v2 1/2] tools/bluemoon: Display FW version of firmware file
-Date:   Fri, 29 Jan 2021 15:51:58 -0800
-Message-Id: <20210129235159.90017-1-hj.tedd.an@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] tools/bluemoon: Add support for checking other firware file types.
+Date:   Fri, 29 Jan 2021 15:51:59 -0800
+Message-Id: <20210129235159.90017-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210129235159.90017-1-hj.tedd.an@gmail.com>
+References: <20210129235159.90017-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -73,61 +75,190 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch displays a FW version after parsing the WRITE_BOOT_PARAMS
-command in the firmeare file. It also change the display type for
-Module vendor and Date in the CSS header to hex for easy read.
+There are more firmware files for Intel devices like .ddc, and .bseq.
+This patch checks the file extenstion and analyze the firmware file.
 ---
- tools/bluemoon.c | 24 +++++++++++++++++++++---
- 1 file changed, 21 insertions(+), 3 deletions(-)
+ tools/bluemoon.c | 131 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 131 insertions(+)
 
 diff --git a/tools/bluemoon.c b/tools/bluemoon.c
-index 8b62b1e7b..912f4f2a9 100644
+index 912f4f2a9..5940fec9d 100644
 --- a/tools/bluemoon.c
 +++ b/tools/bluemoon.c
-@@ -805,8 +805,10 @@ static void analyze_firmware(const char *path)
- 				le32_to_cpu(css->header_version) >> 16,
- 				le32_to_cpu(css->header_version) & 0xffff);
- 	printf("Module ID:\t%u\n", le32_to_cpu(css->module_id));
--	printf("Module vendor:\t%u\n", le32_to_cpu(css->module_vendor));
--	printf("Date:\t\t%u\n", le32_to_cpu(css->date));
-+	printf("Module vendor:\t0x%x\n", le32_to_cpu(css->module_vendor));
-+	printf("Date:\t\t%04x-%02x-%02x\n", le32_to_cpu(css->date) >> 16,
-+				le32_to_cpu(css->date) >> 8 & 0xff,
-+				le32_to_cpu(css->date) & 0xff);
- 	printf("Size:\t\t%u DWORDs / %u bytes\n", le32_to_cpu(css->size),
- 						le32_to_cpu(css->size) * 4);
- 	printf("Key size:\t%u DWORDs / %u bytes\n",
-@@ -840,13 +842,29 @@ static void analyze_firmware(const char *path)
- 	while (firmware_offset < firmware_size) {
- 		uint16_t opcode;
- 		uint8_t dlen;
-+		struct cmd_write_boot_params *params;
+@@ -127,6 +127,8 @@ struct cmd_trigger_exception {
+ 	uint8_t  type;
+ } __attribute__ ((packed));
  
- 		opcode = get_le16(firmware_data + firmware_offset);
- 		dlen = firmware_data[firmware_offset + 2];
- 
- 		switch (opcode) {
--		case CMD_NO_OPERATION:
- 		case CMD_WRITE_BOOT_PARAMS:
-+			params = (void *)&firmware_data[firmware_offset + 3];
-+			printf("Boot Parameters\n");
-+			printf("Boot Address:\t0x%08x\n",
-+					le32_to_cpu(params->boot_addr));
-+			printf("FW Version(yy):\t%d (0x%02X)\n",
-+					params->fw_build_yy + 2000,
-+					params->fw_build_yy);
-+			printf("FW Version(cw):\t%d (0x%02X)\n",
-+					params->fw_build_cw,
-+					params->fw_build_cw);
-+			printf("FW Version(nn):\t%d (0x%02X)\n",
-+					params->fw_build_nn,
-+					params->fw_build_nn);
++#define CMD_DDC_CONFIG_WRITE	0xfc8b
 +
-+			printf("\n");
-+		case CMD_NO_OPERATION:
- 		case CMD_MEMORY_WRITE:
- 			break;
- 		default:
+ #define CMD_MEMORY_WRITE	0xfc8e
+ 
+ static struct bt_hci *hci_dev;
+@@ -608,7 +610,10 @@ static const struct {
+ 	{ 0x0a, "iBT 2.1 (AG620)"	},
+ 	{ 0x0b, "iBT 3.0 (LnP)"		},
+ 	{ 0x0c, "iBT 3.0 (WsP)"		},
++	{ 0x11, "iBT 3.5 (JfP)"		},
+ 	{ 0x12, "iBT 3.5 (ThP)"		},
++	{ 0x13, "iBT 3.5 (HrP)"		},
++	{ 0x14, "iBT 3.5 (CcP)"		},
+ 	{ }
+ };
+ 
+@@ -657,6 +662,16 @@ static void read_version_complete(const void *data, uint8_t size,
+ 	}
+ 
+ 	if (load_firmware) {
++		/* This option is only suppored for the legacy ROM produce,
++		 * which can be identified by the fw_variant == 0x01
++		 */
++		if (rsp->fw_variant != 0x01) {
++			printf("FW Variant: 0x%02x\n", rsp->fw_variant);
++			fprintf(stderr, "This device is not supported\n");
++			mainloop_quit();
++			return;
++		}
++
+ 		if (load_firmware_value) {
+ 			printf("Firmware: %s\n", load_firmware_value);
+ 			request_firmware(load_firmware_value);
+@@ -735,6 +750,95 @@ static void read_version_complete(const void *data, uint8_t size,
+ 	mainloop_quit();
+ }
+ 
++struct ddc {
++	uint8_t  size;
++	uint16_t id;
++	uint8_t  value[0];
++} __attribute__ ((packed));
++
++static unsigned int analyze_ddc(uint8_t *data, ssize_t len)
++{
++	unsigned int ddc_num;
++	ssize_t offset;
++	struct ddc *ddc;
++
++	ddc_num = 0;
++	offset = 0;
++
++	while (offset < len) {
++		ddc = (void *)&data[offset];
++		offset += ddc->size + 1;
++		ddc_num++;
++	}
++
++	return ddc_num;
++}
++
++static void analyze_firmware_bseq(uint8_t *data, ssize_t len)
++{
++	struct cmd_write_bd_data *bddata = NULL;
++	unsigned int cmd_num;
++	unsigned int evt_num;
++	unsigned int ddc_num;
++	ssize_t offset;
++
++	offset = 0;
++	cmd_num = 0;
++	evt_num = 0;
++	ddc_num = 0;
++
++	while (offset < len) {
++		uint8_t type;
++		struct bt_hci_cmd_hdr *cmd_hdr;
++		struct bt_hci_evt_hdr *evt_hdr;
++
++		type = data[offset];
++		offset += 1;
++
++		/* Command */
++		if (type == 0x01) {
++			cmd_hdr = (void *)&data[offset];
++
++			if (cmd_hdr->opcode == CMD_WRITE_BD_DATA)
++				bddata = (void *)&data[offset + 3];
++
++			if (cmd_hdr->opcode == CMD_DDC_CONFIG_WRITE)
++				ddc_num = analyze_ddc((void *)&data[offset + 3],
++						      cmd_hdr->plen);
++
++			offset += cmd_hdr->plen + sizeof(*cmd_hdr);
++			cmd_num++;
++
++		} else if (type == 0x02) {
++			evt_hdr = (void *)&data[offset];
++			offset += evt_hdr->plen + sizeof(*evt_hdr);
++			evt_num++;
++		} else {
++			fprintf(stderr, "Unknown type: 0x%02x\n", type);
++			return;
++		}
++
++	}
++
++	printf("Command count:\t%d\n", cmd_num);
++	printf("Event count:\t%d\n", evt_num);
++
++	if (bddata) {
++		printf("\n");
++		printf("BD Data Configuration\n");
++		printf("Features:\t%02X%02X %02X%02X %02X%02X %02X%02X\n",
++		       bddata->features[7], bddata->features[6],
++		       bddata->features[5], bddata->features[4],
++		       bddata->features[3], bddata->features[2],
++		       bddata->features[1], bddata->features[0]);
++		printf("LE Features:\t%02x\n", bddata->le_features);
++		printf("LMP Version:\t0x%02x\n", bddata->lmp_version);
++	}
++
++	if (ddc_num)
++		printf("Total DDC:\t%d\n", ddc_num);
++}
++
+ struct css_hdr {
+ 	uint32_t module_type;
+ 	uint32_t header_len;
+@@ -753,6 +857,7 @@ static void analyze_firmware(const char *path)
+ {
+ 	unsigned int cmd_num = 0;
+ 	struct css_hdr *css;
++	const char *ext;
+ 	struct stat st;
+ 	ssize_t len;
+ 	int fd;
+@@ -790,6 +895,32 @@ static void analyze_firmware(const char *path)
+ 		goto done;
+ 	}
+ 
++	/* Check the file extension for file type */
++	ext = strrchr(path, '.');
++	if (!ext) {
++		fprintf(stderr, "Unable to get the file extension from path\n");
++		goto done;
++	}
++
++	if (!strncmp(ext, ".ddc", 4)) {
++		printf("Firmware file type: DDC file\n\n");
++		cmd_num = analyze_ddc(firmware_data, len);
++		printf("Total DDC:\t%d\n", cmd_num);
++		goto done;
++
++	} else if (!strncmp(ext, ".bseq", 5)) {
++		printf("Firmware file type: BSEQ file\n\n");
++		analyze_firmware_bseq(firmware_data, len);
++		goto done;
++
++	} else if (!strncmp(ext, ".sfi", 4))
++		printf("Firmware file type: SFI file\n\n");
++
++	else {
++		fprintf(stderr, "Unknown file extension: %s\n", ext);
++		goto done;
++	}
++
+ 	if ((size_t) len < sizeof(*css)) {
+ 		fprintf(stderr, "Firmware file is too short\n");
+ 		goto done;
 -- 
 2.25.1
 
