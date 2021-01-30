@@ -2,144 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A2AC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Jan 2021 00:06:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0FBBC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Jan 2021 00:16:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B402B64E11
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Jan 2021 00:06:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AC5764E13
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 30 Jan 2021 00:16:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231174AbhA3AGr (ORCPT
+        id S231705AbhA3AQJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Jan 2021 19:06:47 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51760 "EHLO
+        Fri, 29 Jan 2021 19:16:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53728 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229676AbhA3AGq (ORCPT
+        with ESMTP id S231184AbhA3AQC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Jan 2021 19:06:46 -0500
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CFA6C061573
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 16:06:06 -0800 (PST)
-Received: by mail-qt1-x831.google.com with SMTP id t17so8083504qtq.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 16:06:06 -0800 (PST)
+        Fri, 29 Jan 2021 19:16:02 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809BFC061573
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 16:15:21 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id u67so7249857pfb.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Jan 2021 16:15:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=PFpMmXFY3YeFYcDSZUr5qwale7BhsZ0G/pFWEwfqc/g=;
-        b=DHYzBf5ZG1sjLk2IIDUlAPGHQLGNilgkHuC+3eZCoKXK6mMRJL+Oh23zkG2eg+su1N
-         lynd7592SlMkoHFjFg+yKASFhuhjyWgtAVMMxNVc834JfEg7DtYnLQ7Td9A9QFFuXBEc
-         eJ9lAulU+zOTGEduywlHPzRjzrTcNV519mX5ox0FKg8sqNX52oWLkU00YuiK4Eve4AV8
-         DkoXSbssrs8JLd5xMd2xQTCpOwqPWelHLUZ0mhF/9yFT9KF6r/GZx0/G/SMMAV65dm/O
-         fp7N5nEmXPU98OAr/hSw/wGW5iKUMXTdVJekmFT2L+Jc7AZeiJe+LZmcRejM5l1L7OHQ
-         AJpw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
+        b=mGcQqLb7I9Na0HX3TKrcWD7aOik0PxqPi1NGJ+eDfKN2ywTCjW0RPrjCH+ZaSh1R+e
+         iD3WzVQk0FlsdHowvU5SnAIgHcPqdLR4MmLFI+l+LJAYTV9ixUkoo6Ed6/Gkpaf0fMcM
+         J8nuxJR/s/5AFCQjHkjnyMPIT1i678SPvWv97XinMDyhNYfBCmQIm1+kLOFqMbJRRjB5
+         S0x2QEv2FoJszwjvwUV8F4oXp+FBVaR0lPqthWVcNzDYSrOXJYFnmYFCAiQ7V5er1iUA
+         zVXzUrDz8a7aK0zsTkkaUGZaswf5jtySBBQapDlEbkmAs5jA4XLTXYmFuRPDDLBQgLDy
+         onrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=PFpMmXFY3YeFYcDSZUr5qwale7BhsZ0G/pFWEwfqc/g=;
-        b=iWMGQx4UBcVsLl5V/UI5QqluDJ7R4v+9SGlx3+2xx3GuHDVVpmCPKo3376K32M+mJK
-         w2LNbg9kvaFRp0xXQY9vVUSRZFgqsw4p2RjmT5XX7WnceQRQbyBtBWg+uTIqFyubVYAT
-         ZMJYj8g3WhQL3tYJ5Db/3SslTeezx6wk47Wy/l9GGtCNtCH5QmA9X9GiB427USp29HiX
-         noFpArdvWzxrvGQ3+yru/p1SaJTSyrQ1jt+mWNKIORrbph4jq6POsu1YXtlAz3p9LGW+
-         JjpfzhNUFJW8mv6Kl0RAbrdtbz9RjF0Vldn+OlT2MVmcKjbvr7AfuWPHpHgUaM/pTVa8
-         7NgQ==
-X-Gm-Message-State: AOAM532OhcTktV0A9KnCGtv0zfvvkIabildsJIDQRq2/Jaffnt3O9NNp
-        MhYPrwLaBCgczlmGeCc1Pws4HaMHMUk=
-X-Google-Smtp-Source: ABdhPJzn9AAEZPPBJ2TyNaZRbd9uEuu02aTjhv30GL6ADJbNmCylCQhwKKT2rhvX9TbJuJvu2FNGbA==
-X-Received: by 2002:ac8:6b8a:: with SMTP id z10mr7030554qts.384.1611965165220;
-        Fri, 29 Jan 2021 16:06:05 -0800 (PST)
-Received: from [172.17.0.2] ([20.44.106.163])
-        by smtp.gmail.com with ESMTPSA id v12sm7230025qkg.63.2021.01.29.16.06.04
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=1VPUesuAg4eJfWzK3lH54NswLymedCxjr1zvsNN7POo=;
+        b=osmYbxB3vN+JEzZZunvnZ9tz3AB+mzAKnGMMLLmUtR6Xu76aMzHHD+Quh8MdhJbadV
+         ipn2e1RYPhd/Ls9e8lOdwOpn/6HwLbUlL3RsQpsJHjsK6v2TJj0ZS1dbZSdlc5svKOuJ
+         DJeH1d3o7eS6XREHKUAgUd6Ef1mcVSq6JSZRiLm14QfEPPhGa68h6bNMkcVAVK+NAeTZ
+         Hp14qlHjkEPM1hjmB657RwJNJXu9y4ba9cdvCf6BCox7+Wc0LehaPs13j7DDb6hjLG8u
+         Hz34xBIcr9yfV0F/Ob+Vtr3edb8ceA4a7X+woFf3VkPce8R+o9iOCx11H0DiTOsa3RZj
+         YhLA==
+X-Gm-Message-State: AOAM532Cow+hwxmvmfP9qS69YtR4pjpJKpzIPBpku4UvcFuXghEX/p1x
+        aP04g8DKRIZK4WTjpJzmvyG1kwtJdSjE9g==
+X-Google-Smtp-Source: ABdhPJyX63nnhgyytCmQi2wXxfnKjd7/4Ztxyikyls6321fmNC/LByMMvwoQqImpKfced/zSnNnk0g==
+X-Received: by 2002:a65:6152:: with SMTP id o18mr6922939pgv.392.1611965720686;
+        Fri, 29 Jan 2021 16:15:20 -0800 (PST)
+Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:30d0:c047:f587:7300:6549])
+        by smtp.gmail.com with ESMTPSA id v9sm8619432pju.33.2021.01.29.16.15.19
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 29 Jan 2021 16:06:04 -0800 (PST)
-Message-ID: <6014a2ec.1c69fb81.9d20.cee3@mx.google.com>
-Date:   Fri, 29 Jan 2021 16:06:04 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============7492900923050889288=="
+        Fri, 29 Jan 2021 16:15:20 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v3 1/2] tools/bluemoon: Display FW version of firmware file
+Date:   Fri, 29 Jan 2021 16:15:18 -0800
+Message-Id: <20210130001519.91190-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ,v2,1/2] tools/bluemoon: Display FW version of firmware file
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210129235159.90017-1-hj.tedd.an@gmail.com>
-References: <20210129235159.90017-1-hj.tedd.an@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7492900923050889288==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=424645
-
----Test result---
-
-##############################
-Test: CheckPatch - FAIL
-Output:
-tools/bluemoon: Add support for checking other firware file types.
-WARNING:TYPO_SPELLING: 'firware' may be misspelled - perhaps 'firmware'?
-#4: 
-Subject: [PATCH] tools/bluemoon: Add support for checking other firware file
-                                                                ^^^^^^^
-
-WARNING:TYPO_SPELLING: 'extenstion' may be misspelled - perhaps 'extension'?
-#8: 
-This patch checks the file extenstion and analyze the firmware file.
-                           ^^^^^^^^^^
-
-WARNING:TYPO_SPELLING: 'suppored' may be misspelled - perhaps 'supported'?
-#38: FILE: tools/bluemoon.c:665:
-+		/* This option is only suppored for the legacy ROM produce,
- 		                       ^^^^^^^^
-
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#59: FILE: tools/bluemoon.c:757:
-+} __attribute__ ((packed));
-
-- total: 0 errors, 4 warnings, 168 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] tools/bluemoon: Add support for checking other firware file" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - FAIL
-Output:
-tools/bluemoon: Add support for checking other firware file types.
-1: T3 Title has trailing punctuation (.): "tools/bluemoon: Add support for checking other firware file types."
-
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
-
-
+This patch displays a FW version after parsing the WRITE_BOOT_PARAMS
+command in the firmeare file. It also change the display type for
+Module vendor and Date in the CSS header to hex for easy read.
 ---
-Regards,
-Linux Bluetooth
+ tools/bluemoon.c | 24 +++++++++++++++++++++---
+ 1 file changed, 21 insertions(+), 3 deletions(-)
 
+diff --git a/tools/bluemoon.c b/tools/bluemoon.c
+index 8b62b1e7b..912f4f2a9 100644
+--- a/tools/bluemoon.c
++++ b/tools/bluemoon.c
+@@ -805,8 +805,10 @@ static void analyze_firmware(const char *path)
+ 				le32_to_cpu(css->header_version) >> 16,
+ 				le32_to_cpu(css->header_version) & 0xffff);
+ 	printf("Module ID:\t%u\n", le32_to_cpu(css->module_id));
+-	printf("Module vendor:\t%u\n", le32_to_cpu(css->module_vendor));
+-	printf("Date:\t\t%u\n", le32_to_cpu(css->date));
++	printf("Module vendor:\t0x%x\n", le32_to_cpu(css->module_vendor));
++	printf("Date:\t\t%04x-%02x-%02x\n", le32_to_cpu(css->date) >> 16,
++				le32_to_cpu(css->date) >> 8 & 0xff,
++				le32_to_cpu(css->date) & 0xff);
+ 	printf("Size:\t\t%u DWORDs / %u bytes\n", le32_to_cpu(css->size),
+ 						le32_to_cpu(css->size) * 4);
+ 	printf("Key size:\t%u DWORDs / %u bytes\n",
+@@ -840,13 +842,29 @@ static void analyze_firmware(const char *path)
+ 	while (firmware_offset < firmware_size) {
+ 		uint16_t opcode;
+ 		uint8_t dlen;
++		struct cmd_write_boot_params *params;
+ 
+ 		opcode = get_le16(firmware_data + firmware_offset);
+ 		dlen = firmware_data[firmware_offset + 2];
+ 
+ 		switch (opcode) {
+-		case CMD_NO_OPERATION:
+ 		case CMD_WRITE_BOOT_PARAMS:
++			params = (void *)&firmware_data[firmware_offset + 3];
++			printf("Boot Parameters\n");
++			printf("Boot Address:\t0x%08x\n",
++					le32_to_cpu(params->boot_addr));
++			printf("FW Version(yy):\t%d (0x%02X)\n",
++					params->fw_build_yy + 2000,
++					params->fw_build_yy);
++			printf("FW Version(cw):\t%d (0x%02X)\n",
++					params->fw_build_cw,
++					params->fw_build_cw);
++			printf("FW Version(nn):\t%d (0x%02X)\n",
++					params->fw_build_nn,
++					params->fw_build_nn);
++
++			printf("\n");
++		case CMD_NO_OPERATION:
+ 		case CMD_MEMORY_WRITE:
+ 			break;
+ 		default:
+-- 
+2.25.1
 
---===============7492900923050889288==--
