@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 821FDC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 02:12:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E88AC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 15:20:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4613E64E1A
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 02:12:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D531B64E33
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 15:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232470AbhAaCMG (ORCPT
+        id S232403AbhAaOdX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 30 Jan 2021 21:12:06 -0500
-Received: from mail.kernel.org ([198.145.29.99]:55086 "EHLO mail.kernel.org"
+        Sun, 31 Jan 2021 09:33:23 -0500
+Received: from mail.kernel.org ([198.145.29.99]:47274 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230168AbhAaCME (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 30 Jan 2021 21:12:04 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 5654764E2E
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Jan 2021 02:11:24 +0000 (UTC)
+        id S232452AbhAaOT3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 31 Jan 2021 09:19:29 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 353B064E35
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Jan 2021 14:18:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612059084;
-        bh=j1K+ib2w4ULaS756yH8S5/YN42YKAadkJ0IJ54C5S4c=;
+        s=k20201202; t=1612102728;
+        bh=NeubNGIaZd8jiyKtE4GU8TOOvEBBaib1OGYNRbzPSHY=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=TaL6my70br9mIfjlI0WcwIyb1iURvfvRWG1nGQqZwkF0hrh8tbJ6shiBQBM7Ep+PW
-         A0h+JVkBB/aThpwHMuXvFDDdGldu7pwDqrS5/YNSasZ3IWXvBiBM96srHBikX5Fioa
-         C0oxgRUc3EOb6sCosDD+9Pnr538dh6FUxEX+WcutuRBc2UicDCbMvYPCXa3cGY+v1G
-         ymHoowRC1+xMdxGWZbLwvhqGpe5UYedY4SrJVKzfUE/8RNh+khaanJCZVXaopsj46V
-         +YHglzyOe0PwVk9EA4Tde6/Lh+cl0GrKzF+obYpPPOpKrsiowutsCv1evuEEtcVMG7
-         WFarDnqc1XNWQ==
+        b=Zd5+krnyAQaX/2lm/o3AMMKP9VcKUXT1ggnDAk0scx5bCVRtE1/SYqJaWDJq3Zuip
+         RUn6lVnz6HtBes8Hx1RD9zQ7i4Yx2s1hm/SPjam0iONGO6LV8V/loh8iwBXhtr0VJf
+         zFgFGTfOhNS1xLy+M0qQEEr0LoJAmydQNWtvizZfSgndbIADpc+JBXvBn4FM4GmbyH
+         qkNGDJsidTLKwI7EOz8X90p7fy2CJUFYG74ILsAWuPVuNwIi6CSTpzL6MSVlL1k0zp
+         5NTrekH0pFM0rX2NBIdlTG8/J/sP4tehxena24oOn4t0jMb+LGGI5frvABJr3DAnXZ
+         j6ADMu6USqV+Q==
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
  0x31010000
-Date:   Sun, 31 Jan 2021 02:11:23 +0000
+Date:   Sun, 31 Jan 2021 14:18:47 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -44,14 +44,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: igorognev@mail.ru
+X-Bugzilla-Who: steeve.mccauley@gmail.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-210681-62941-GjRPJ3h7pq@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-210681-62941-LLbUGWqG6k@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
 References: <bug-210681-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -65,19 +65,8 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D210681
 
-igorog (igorognev@mail.ru) changed:
-
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |igorognev@mail.ru
-
---- Comment #23 from igorog (igorognev@mail.ru) ---
-Bluetooth: hci0: don't support firmware rome 0x1020200
->--------------------------------------------------------
-Arch Linux 5.10.11-arch1-1
->03:00.0 Network controller: Qualcomm Atheros AR9485 Wireless Network Adapt=
-er
->(rev 01)
+--- Comment #26 from Steeve McCauley (steeve.mccauley@gmail.com) ---
+I'm composing something now.
 
 --=20
 You may reply to this email to add a comment.
