@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE6D9C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 15:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A89C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Feb 2021 01:23:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AD9264E22
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Jan 2021 15:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F118F64E22
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Feb 2021 01:23:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229808AbhAaPrz (ORCPT
+        id S230439AbhBABXZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 Jan 2021 10:47:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:37448 "EHLO mail.kernel.org"
+        Sun, 31 Jan 2021 20:23:25 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56218 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229641AbhAaPrv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 Jan 2021 10:47:51 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 2874B64E2B
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Jan 2021 15:47:06 +0000 (UTC)
+        id S231196AbhBABWM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 31 Jan 2021 20:22:12 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id AA30964E3D
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Feb 2021 01:21:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612108026;
-        bh=vUTxVjaVyehaS+VDLVAufJBaSWHFiflvTGc6ekpj3uA=;
+        s=k20201202; t=1612142491;
+        bh=T9NoDW89lOSARoVOHI8MaJoQq+eA5GZiZpqthPHVUOg=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=j5sb8aJdAmkOT8bFXI/zlOm2PT7EdnjSISmX/GA+kv5NBLpV7VpF20t7C+F5CIRDI
-         ghWJDQIMVqKWkJ5n4hc4rBHNy4SQ0Rw8c+IOUEYgBO03TIb5X+1w3iXGulX7rqeWBG
-         4Mo9VZcdqR4zjiJ7rqRCyFLozdJHyx9W14Ew/wDh3mqD7+Kt/vVnrcNQ7o2ce6lI4K
-         rLyI5T7pSmmNqPUYTzzdO3bbupk6KEWGQ4hRSOM3mmRP+8xSQaeYclKsjm2zTB3keI
-         mIt1mSflZgSDJm6dIn28xRNZXa9A7XqJOgXH6UqK5mSSSGVJRlX2DNCVYSMvxF+6Eq
-         0AyIODBAQXtTQ==
+        b=j2pf1YpNiRcTjd/eN8InY5uFDygjgAvW0tn0YfH8N+aCieYJX8ejobsah/aFiiosJ
+         tVC/KHVco4Bbt/dgvWzmPTAtyigCFo+bpse1v96fJco9m1B2gO2ld9vFhaMtS3KVJ/
+         R+QhPv92uD28g52FVlgAqTHgTZYPX388LCDVZe7MgVJCNZOWzWif9Dc0upm8q6Y6YT
+         J2JdcEt/uadP5qFUWSAPWcZ3rycq2K6n+BFiF5V9KLkC1B+VE1HqOEN0exexvjMXGz
+         jRY3lcu2oVKMS6YHErSqqQN0hfuDuVWoPzM+6vk20xOmBMejbobk8v9HpuFw4sYiSA
+         2rqXJAGOhEx+g==
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Sun, 31 Jan 2021 15:47:03 +0000
+Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
+ 0x31010000
+Date:   Mon, 01 Feb 2021 01:21:30 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -43,17 +43,17 @@ X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: virtuousfox@gmail.com
-X-Bugzilla-Status: REOPENED
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: igorognev@mail.ru
+X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-cpJhqCF0CE@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Message-ID: <bug-210681-62941-93HDHlsiSy@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
+References: <bug-210681-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -63,40 +63,10 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+https://bugzilla.kernel.org/show_bug.cgi?id=3D210681
 
---- Comment #171 from Sergey Kondakov (virtuousfox@gmail.com) ---
-(In reply to fredleb from comment #170)
-> Hi !
->=20
-> Not sure it helps but this is the one I bought: https://ebay.us/Om8h1k
->=20
-> Of course, before I discovered this thread...
->=20
-> Should I get another stick or is there any chance that this will ever wor=
-k ?
-> Anything I can do to help ?
->=20
-> Thanks for your efforts all !
->=20
-> Cheers,
-> FL
-
-Likely. After all fiddling about, I gave up on that thing.
-
-Instead I bought Orico BTA-508 (on BT5 RTL8761B chip) from
-https://www.aliexpress.com/item/1005001273586697.html They also have previo=
-us
-BT4 version of a dongle based on real CSR8510 chip and proper firmware:
-https://www.aliexpress.com/item/32734449020.html - I've seen reports that t=
-his
-one actually works too.
-
-For BT5 RTL8761B I had to manually extract firmware file from its Windows
-driver, current release kernel does not have any and one known from Github =
-did
-not work for me:
-https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/572#note_776534
+--- Comment #27 from igorog (igorognev@mail.ru) ---
+linux-bluetooth@vger.kernel.org - not available
 
 --=20
 You may reply to this email to add a comment.
