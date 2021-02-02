@@ -2,69 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AE01C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:22:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 783DAC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:26:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4B9B64F74
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:22:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4742A64E31
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:26:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236294AbhBBQWb (ORCPT
+        id S236192AbhBBQ0N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Feb 2021 11:22:31 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:40380 "EHLO
+        Tue, 2 Feb 2021 11:26:13 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:42717 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236132AbhBBQUW (ORCPT
+        with ESMTP id S236139AbhBBQXo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Feb 2021 11:20:22 -0500
+        Tue, 2 Feb 2021 11:23:44 -0500
 Received: from marcel-macbook.holtmann.net (p4fefcdd8.dip0.t-ipconnect.de [79.239.205.216])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 6C0A9CECDE;
-        Tue,  2 Feb 2021 17:27:00 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3631DCECDE;
+        Tue,  2 Feb 2021 17:30:19 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.40.0.2.32\))
-Subject: Re: [PATCH v2] Bluetooth: hci_qca: check for SSR triggered flag while
- suspend
+Subject: Re: [PATCH v4 0/2] Bluetooth: btusb: Add protocol for MediaTek
+ bluetooth devices
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1612277862-13022-1-git-send-email-gubbaven@codeaurora.org>
-Date:   Tue, 2 Feb 2021 17:19:33 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        LKML <linux-kernel@vger.kernel.org>,
+In-Reply-To: <20210202102618.27640-1-mark-yw.chen@mediatek.com>
+Date:   Tue, 2 Feb 2021 17:22:52 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, Sean.Wang@mediatek.com,
         Bluetooth Kernel Mailing List 
         <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org
+        linux-mediatek@lists.infradead.org,
+        LKML <linux-kernel@vger.kernel.org>, robin.chiu@mediatek.com,
+        Eric.liang@mediatek.com
 Content-Transfer-Encoding: 7bit
-Message-Id: <A1CB9294-E624-40A2-A081-BC6B998E9BF8@holtmann.org>
-References: <1612277862-13022-1-git-send-email-gubbaven@codeaurora.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Message-Id: <F933AA60-A9AA-48FC-8F59-4338891C50B6@holtmann.org>
+References: <20210202102618.27640-1-mark-yw.chen@mediatek.com>
+To:     Mark-YW.Chen@mediatek.com
 X-Mailer: Apple Mail (2.3654.40.0.2.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Venkata,
+Hi Mark,
 
-> QCA_IBS_DISABLED flag will be set after memorydump started from
-> controller.Currently qca_suspend() is waiting for SSR to complete
-> based on flag QCA_IBS_DISABLED.Added to check for QCA_SSR_TRIGGERED
-> flag too.
+> v4:
+> 1. add read chip info. from MediaTek bluetooth devices.
+> 2. support download firmware for MT7921U.
 > 
-> Fixes: 2be43abac5a8 ("Bluetooth: hci_qca: Wait for timeout during suspend")
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> ---
-> drivers/bluetooth/hci_qca.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
+> mark-yw.chen (2):
+>  Bluetooth: btusb: Fine-tune mt7663 mechanism.
+>  Bluetooth: btusb: Add protocol support for MediaTek MT7921U USB
+>    devices
+> 
+> drivers/bluetooth/btusb.c | 211 +++++++++++++++++++++++++++++++++++++-
+> 1 file changed, 206 insertions(+), 5 deletions(-)
 
-patch has been applied to bluetooth-next tree.
+both patches have been applied to bluetooth-next tree.
 
 Regards
 
