@@ -2,117 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49B43C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:52:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 570B8C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 18:41:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F133564E3F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 16:52:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1C73C64E4F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 18:41:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236391AbhBBQvz (ORCPT
+        id S238815AbhBBSlb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Feb 2021 11:51:55 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:58219 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236793AbhBBQty (ORCPT
+        Tue, 2 Feb 2021 13:41:31 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53344 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233759AbhBBSk1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Feb 2021 11:49:54 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612284506;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=WAxy8HPIZPNXxjH2vYFDCyRbLRDQFHQGmTFGhczWMVw=;
-        b=DmwwFPQ80B6xk/nR+W4Xd8/9xbTV7GTQp2CX+j8ocpxC4BykiP51zj9Z6jiZjK14YwVoRZ
-        vLvtyCgYsm563ZCAp/UdEt5NNFAmeHdxOB5Ee5OFU9fkqRGaQyxABD2/RV+GqJiqXq9NHH
-        AqxM4Xzu2ixRhdr4qxRS5V2z6jaMEfM=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-275-wpH8bqqMMa-nUNvpD903Yw-1; Tue, 02 Feb 2021 11:48:24 -0500
-X-MC-Unique: wpH8bqqMMa-nUNvpD903Yw-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BCF9D107ACE4;
-        Tue,  2 Feb 2021 16:48:23 +0000 (UTC)
-Received: from colo-mx.corp.redhat.com (colo-mx02.intmail.prod.int.phx2.redhat.com [10.5.11.21])
-        by smtp.corp.redhat.com (Postfix) with ESMTPS id B4C9B2BFC7;
-        Tue,  2 Feb 2021 16:48:23 +0000 (UTC)
-Received: from zmail20.collab.prod.int.phx2.redhat.com (zmail20.collab.prod.int.phx2.redhat.com [10.5.83.23])
-        by colo-mx.corp.redhat.com (Postfix) with ESMTP id A89094BB7B;
-        Tue,  2 Feb 2021 16:48:23 +0000 (UTC)
-Date:   Tue, 2 Feb 2021 11:48:23 -0500 (EST)
-From:   Gopal Tiwari <gtiwari@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Message-ID: <26183197.29138771.1612284503316.JavaMail.zimbra@redhat.com>
-In-Reply-To: <868E89B9-CC86-469A-8C43-22F314EFB038@holtmann.org>
-References: <20210202094230.13659-1-gtiwari@redhat.com> <868E89B9-CC86-469A-8C43-22F314EFB038@holtmann.org>
-Subject: Re: [PATCH] Bluetooth: Fix null pointer dereference in
- amp_read_loc_assoc_final_data
+        Tue, 2 Feb 2021 13:40:27 -0500
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61027C0613ED
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Feb 2021 10:39:46 -0800 (PST)
+Received: by mail-lf1-x133.google.com with SMTP id a8so29432217lfi.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Feb 2021 10:39:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=iKC+SjpHdf96i7OtD28cm7wxzxirDWCLYW62mNx6jsg=;
+        b=KnayXvag6CMExiLBVjSjUNTD+J9XtxorPM+SslYnHmJQeHu5foNIeCfwKYVNhbMEYI
+         fZRYULyttVDwul/JNOiZCBzp0BSsHooj2OUdppmH3oGYb6J98CGq9cqCrj7lLNirE3K5
+         KfT3AQgIiXXw2xei1sAqa5F1pWSo3ZjoXVM3hllzKG+4H98ArIxQ9maxyipqSHRCjJ0Y
+         5Uza2/S1xkJvcBCW9p+1SbSV25Vtrp8xlFVWQDrryCeHUOeSbQhgdXKmWXljMJoHK4r+
+         jfU1acBTNpssp3K4SiD8KbfFbGucPx2iWMKJkRXHuSmD7ZKlz2/mJe5aIaVmVNbIw6pS
+         C5pg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=iKC+SjpHdf96i7OtD28cm7wxzxirDWCLYW62mNx6jsg=;
+        b=VhyFrdltGt315qeeFiZWaqhcGbjuul20wU3rReplD980B7wFV31mXQJnNjFkLmyel+
+         /YLrBGVBflOZBEdvcy/Gdwl+KEahXgK0OUpt5MyT3V5e0zIVFtO5O7s3qcnUsG27m91u
+         iZFw56QMkrUEgcNEC6tsvMqggh9CmEBPbNUSrpSQ67jqzVGMfnKzQS0rhSzVBPmCnYdS
+         dvHD8FhDZdsgSUblQGxC7A5ld83ymOo0KSflNwE3qEFD7Yb+k0kXa7WmbwS18cYZJNmS
+         Npy7hCZezhBa8Lb59F6M1mpVGg0cxUyOITrn2SrMWyBpU7xhw/ImVLk19oEuvQU8utF7
+         qd7w==
+X-Gm-Message-State: AOAM531iaQDw9lPneU0j+0yRHEzkP+154xL/bSb5AMmYy1BzcY+S1Lu2
+        bRXfqHnmOWzEdHIcm0wqkQMDsgJazC9985g24FWMx2rkW2E=
+X-Google-Smtp-Source: ABdhPJxsZkn4kJ1T779huyW/oWRa4+tXz/fbdJF2F0og1BllxapXEqQE5t4QkcpUx5eMzVC2+30+JA+8oFgafUs4jC4=
+X-Received: by 2002:a19:5056:: with SMTP id z22mr1566777lfj.226.1612291184516;
+ Tue, 02 Feb 2021 10:39:44 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.64.242.181, 10.4.195.2]
-Thread-Topic: Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Thread-Index: C+/u+hDYthAVamREg+wF5OTAtBUM0g==
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
+References: <38532f57a6446d2aebc4276fbba42c97bd214042.camel@fedoraproject.org> <CAO6ejrnXcnkhjbRE1V8xz++TiT_DxEfJ1wH4fmF+YnUUPxQmtw@mail.gmail.com>
+In-Reply-To: <CAO6ejrnXcnkhjbRE1V8xz++TiT_DxEfJ1wH4fmF+YnUUPxQmtw@mail.gmail.com>
+From:   murph nj <murphnj+fedora@gmail.com>
+Date:   Tue, 2 Feb 2021 13:39:08 -0500
+Message-ID: <CAO6ejr=bv7wOU9LEtYrodUGBPrL+zUsNkoRhw+7mZUB735OiLQ@mail.gmail.com>
+Subject: Fwd: Kernel version related bluetooth issue.
+To:     linux-bluetooth@vger.kernel.org, rjliao@codeaurora.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Marcel.
+Hello:
 
-Regards,
-Gopal 
+I've noticed a problem attaching a bluetooth mouse. (or enabling
+bluetooth at all)
 
------ Original Message -----
-From: "Marcel Holtmann" <marcel@holtmann.org>
-To: "Gopal Tiwari" <gtiwari@redhat.com>
-Cc: "Bluetooth Kernel Mailing List" <linux-bluetooth@vger.kernel.org>, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>, "Johan Hedberg" <johan.hedberg@gmail.com>
-Sent: Tuesday, February 2, 2021 9:53:57 PM
-Subject: Re: [PATCH] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+I have a laptop that I don't depend on, and use for testing, or
+playing around.  It's a converted Chromebook, an Acer C710.
+In the past, I've used bluetooth, primarily for a mouse.  Converted it
+to use the Fedora rawhide branch a while ago, and everything seemed OK.
+My use case for it has changed, so it has spent more time plugged into
+devices, including a trackball, so I'm not sure exactly when this
+change happened.
 
-Hi Gopal,
+At some point, the bluetooth mouse stopped working, and I was unable
+to turn on the bluetooth adapter on the laptop at all.  I figured that
+it was my fault, I had done some questionable removals of packages to
+get things to upgrade.  No problem, I'll wipe and reload, and get it
+working.
 
-> kernel panic trace looks like: 
-> 
-> #5 [ffffb9e08698fc80] do_page_fault at ffffffffb666e0d7
-> #6 [ffffb9e08698fcb0] page_fault at ffffffffb70010fe
->    [exception RIP: amp_read_loc_assoc_final_data+63]
->    RIP: ffffffffc06ab54f  RSP: ffffb9e08698fd68  RFLAGS: 00010246
->    RAX: 0000000000000000  RBX: ffff8c8845a5a000  RCX: 0000000000000004
->    RDX: 0000000000000000  RSI: ffff8c8b9153d000  RDI: ffff8c8845a5a000
->    RBP: ffffb9e08698fe40   R8: 00000000000330e0   R9: ffffffffc0675c94
->    R10: ffffb9e08698fe58  R11: 0000000000000001  R12: ffff8c8b9cbf6200
->    R13: 0000000000000000  R14: 0000000000000000  R15: ffff8c8b2026da0b
->    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
-> #7 [ffffb9e08698fda8] hci_event_packet at ffffffffc0676904 [bluetooth]
-> #8 [ffffb9e08698fe50] hci_rx_work at ffffffffc06629ac [bluetooth]
-> #9 [ffffb9e08698fe98] process_one_work at ffffffffb66f95e7
-> 
-> hcon->amp_mgr seems NULL triggered kernel panic in following line inside
-> function amp_read_loc_assoc_final_data
-> 
->        set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
-> 
-> Fixed by checking NULL for mgr.
-> 
-> Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
-> ---
-> net/bluetooth/amp.c | 3 +++
-> 1 file changed, 3 insertions(+)
+While booting off the Fedora 33 USB drive, no problem, I was able to use the
+mouse.  Installed, and booted up the system, same.
 
-patch has been applied to bluetooth-next tree.
+After I did a full system upgrade, it is back to not working again.
 
-Regards
+If I boot from an older kernel  (the 5.8.15 from the install image)  no problem.
 
-Marcel
+If I boot from the 5.10.10 kernel, the bluetooth module does not work.
 
+I've seen the same results with KDE, gnome, and XFCE, so I'm pretty
+sure it's not the DE.
+
+I get the following:
+
+dmesg | grep hci0
+[  11.031856 ] Bluetooth: hci0: don't support firmware rome 0x11020000
+
+Like the following shows:  https://bugzilla.kernel.org/show_bug.cgi?id=210681
+
+
+Not sure where else to go from here, wait until the fix is committed
+in the kernel?
+
+If a bug report needs to be made, if someone could point me in the
+right direction.
+
+Thanks,
+  --murph
