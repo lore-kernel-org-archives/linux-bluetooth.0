@@ -2,102 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CABC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 09:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33692C4332E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 14:47:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E40964DA8
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 09:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 061DD64F55
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 14:47:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbhBBJpR (ORCPT
+        id S234615AbhBBOrf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Feb 2021 04:45:17 -0500
-Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56699 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229525AbhBBJoN (ORCPT
+        Tue, 2 Feb 2021 09:47:35 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:50648 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232227AbhBBOqS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Feb 2021 04:44:13 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1612258966;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=Vzm/mrc1ZFOkXdj+KdSvny4GrPp0T66LcDMochKWx2U=;
-        b=GV9RG0cXGZ+rAhuxzlDqFdPpIwAvLhjLKHufBg+46UdMh789w0nf0hQa/YdfBN9/PANuKW
-        yQ+hHDP6tBVjFW20duBgrt8mz/MHAGIpnzPxI3RkLqQ7L892RzTpBDEdMM7FCAz4khNZ9p
-        Ne96wlXYOfixUE2SJaFUECKHMJ0xNPc=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-594-i3zj0tY-Mf6c7OQ7kzMxFg-1; Tue, 02 Feb 2021 04:42:44 -0500
-X-MC-Unique: i3zj0tY-Mf6c7OQ7kzMxFg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA6AE10054FF;
-        Tue,  2 Feb 2021 09:42:43 +0000 (UTC)
-Received: from localhost.localdomain.com (unknown [10.64.242.181])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id D34EF57995;
-        Tue,  2 Feb 2021 09:42:40 +0000 (UTC)
-From:   Gopal Tiwari <gtiwari@redhat.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        johan.hedberg@gmail.com, marcel@holtmann.org
-Cc:     gtiwari@redhat.com
-Subject: [PATCH] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Date:   Tue,  2 Feb 2021 15:12:30 +0530
-Message-Id: <20210202094230.13659-1-gtiwari@redhat.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+        Tue, 2 Feb 2021 09:46:18 -0500
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 02 Feb 2021 06:45:34 -0800
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 02 Feb 2021 06:45:33 -0800
+X-QCInternal: smtphost
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 02 Feb 2021 20:15:09 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id EB59521DF9; Tue,  2 Feb 2021 20:15:08 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v1] Bluetooth: hci_qca: check for SSR triggered flag while suspend
+Date:   Tue,  2 Feb 2021 20:15:07 +0530
+Message-Id: <1612277107-12163-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-kernel panic trace looks like: 
+QCA_IBS_DISABLED flag will be set after memorydump started from
+controller.Currently qca_suspend() is waiting for SSR to complete
+based on flag QCA_IBS_DISABLED.Added to check for QCA_SSR_TRIGGERED
+flag too.
 
- #5 [ffffb9e08698fc80] do_page_fault at ffffffffb666e0d7
- #6 [ffffb9e08698fcb0] page_fault at ffffffffb70010fe
-    [exception RIP: amp_read_loc_assoc_final_data+63]
-    RIP: ffffffffc06ab54f  RSP: ffffb9e08698fd68  RFLAGS: 00010246
-    RAX: 0000000000000000  RBX: ffff8c8845a5a000  RCX: 0000000000000004
-    RDX: 0000000000000000  RSI: ffff8c8b9153d000  RDI: ffff8c8845a5a000
-    RBP: ffffb9e08698fe40   R8: 00000000000330e0   R9: ffffffffc0675c94
-    R10: ffffb9e08698fe58  R11: 0000000000000001  R12: ffff8c8b9cbf6200
-    R13: 0000000000000000  R14: 0000000000000000  R15: ffff8c8b2026da0b
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #7 [ffffb9e08698fda8] hci_event_packet at ffffffffc0676904 [bluetooth]
- #8 [ffffb9e08698fe50] hci_rx_work at ffffffffc06629ac [bluetooth]
- #9 [ffffb9e08698fe98] process_one_work at ffffffffb66f95e7
-
-hcon->amp_mgr seems NULL triggered kernel panic in following line inside
-function amp_read_loc_assoc_final_data
-
-        set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
-
-Fixed by checking NULL for mgr.
-
-Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 ---
- net/bluetooth/amp.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/hci_qca.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 9c711f0dfae3..be2d469d6369 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -297,6 +297,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
- 	struct hci_request req;
- 	int err;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index 17a3859..ff2fb68 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -2111,7 +2111,8 @@ static int __maybe_unused qca_suspend(struct device *dev)
+ 	    !test_bit(QCA_SSR_TRIGGERED, &qca->flags))
+ 		return 0;
  
-+	if (!mgr)
-+		return;
-+
- 	cp.phy_handle = hcon->handle;
- 	cp.len_so_far = cpu_to_le16(0);
- 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
+-	if (test_bit(QCA_IBS_DISABLED, &qca->flags)) {
++	if (test_bit(QCA_IBS_DISABLED, &qca->flags) ||
++	    test_bit(QCA_SSR_TRIGGERED, &qca->flags)) {
+ 		wait_timeout = test_bit(QCA_SSR_TRIGGERED, &qca->flags) ?
+ 					IBS_DISABLE_SSR_TIMEOUT_MS :
+ 					FW_DOWNLOAD_TIMEOUT_MS;
 -- 
-2.21.1
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
