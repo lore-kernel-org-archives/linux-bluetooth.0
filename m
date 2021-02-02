@@ -2,107 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15A47C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 08:13:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68CABC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 09:45:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3CB664EC3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 08:13:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1E40964DA8
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Feb 2021 09:45:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231225AbhBBINX (ORCPT
+        id S230338AbhBBJpR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Feb 2021 03:13:23 -0500
-Received: from aserp2120.oracle.com ([141.146.126.78]:40704 "EHLO
-        aserp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229462AbhBBINU (ORCPT
+        Tue, 2 Feb 2021 04:45:17 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([63.128.21.124]:56699 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229525AbhBBJoN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Feb 2021 03:13:20 -0500
-Received: from pps.filterd (aserp2120.oracle.com [127.0.0.1])
-        by aserp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 1128551F176778;
-        Tue, 2 Feb 2021 08:12:26 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=EkFId3LnqSUIZCRZEfLsq8g/NEaDT5HxkdBh5mNoFA0=;
- b=KvIReKLgixr1tRSxPZfvw4ofwH9EhJFRerXsWKHh7AMhB7MnvWUg16j9CWvDT8+f9BbM
- kwYjXX6ne+nFCl76OCh9DKNdq+APyJH4hJkAsygyQMgABiix1vd439Vna6MEQGT6q8Nh
- 3/I/64MXROgC6SZQFah9pfIpnIbDoGEgp7SWSGRm8Pz5kF3qfW0dFhyXXRd9fVoh2B9x
- 86AhJBaCTmmRRr72sSF0x7iFFatPugm7VsjtMC14Csfxla9d4puti9eDxzeoJbPRiMAV
- fTPpdA6Izn7EyNkrQs7ZsplxrjmTfvJr5HgIJjIt4SNkAFKoRWMinUltLGdOMOCN41hJ 2A== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by aserp2120.oracle.com with ESMTP id 36cydkscf5-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Feb 2021 08:12:26 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 11285Shx032944;
-        Tue, 2 Feb 2021 08:10:23 GMT
-Received: from userv0121.oracle.com (userv0121.oracle.com [156.151.31.72])
-        by aserp3030.oracle.com with ESMTP id 36dh1nmd2w-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 02 Feb 2021 08:10:23 +0000
-Received: from abhmp0013.oracle.com (abhmp0013.oracle.com [141.146.116.19])
-        by userv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 1128AJjs006525;
-        Tue, 2 Feb 2021 08:10:19 GMT
-Received: from kadam (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 02 Feb 2021 00:10:18 -0800
-Date:   Tue, 2 Feb 2021 11:10:10 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     Hillf Danton <hdanton@sina.com>, Sasha Levin <sashal@kernel.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Cc:     syzbot <syzbot+3ed6361bf59830ca9138@syzkaller.appspotmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, Miao-chen Chou <mcchou@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: KASAN: slab-out-of-bounds Read in add_adv_patterns_monitor
-Message-ID: <20210202081010.GZ20820@kadam>
-References: <00000000000076ecf305b9f8efb1@google.com>
- <20210131100154.14452-1-hdanton@sina.com>
- <20210202075110.GR2696@kadam>
+        Tue, 2 Feb 2021 04:44:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1612258966;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=Vzm/mrc1ZFOkXdj+KdSvny4GrPp0T66LcDMochKWx2U=;
+        b=GV9RG0cXGZ+rAhuxzlDqFdPpIwAvLhjLKHufBg+46UdMh789w0nf0hQa/YdfBN9/PANuKW
+        yQ+hHDP6tBVjFW20duBgrt8mz/MHAGIpnzPxI3RkLqQ7L892RzTpBDEdMM7FCAz4khNZ9p
+        Ne96wlXYOfixUE2SJaFUECKHMJ0xNPc=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-594-i3zj0tY-Mf6c7OQ7kzMxFg-1; Tue, 02 Feb 2021 04:42:44 -0500
+X-MC-Unique: i3zj0tY-Mf6c7OQ7kzMxFg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id BA6AE10054FF;
+        Tue,  2 Feb 2021 09:42:43 +0000 (UTC)
+Received: from localhost.localdomain.com (unknown [10.64.242.181])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id D34EF57995;
+        Tue,  2 Feb 2021 09:42:40 +0000 (UTC)
+From:   Gopal Tiwari <gtiwari@redhat.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
+        johan.hedberg@gmail.com, marcel@holtmann.org
+Cc:     gtiwari@redhat.com
+Subject: [PATCH] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+Date:   Tue,  2 Feb 2021 15:12:30 +0530
+Message-Id: <20210202094230.13659-1-gtiwari@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210202075110.GR2696@kadam>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-IMR: 1
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9882 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 spamscore=0 phishscore=0
- suspectscore=0 mlxlogscore=999 bulkscore=0 mlxscore=0 malwarescore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2009150000
- definitions=main-2102020055
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9882 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 adultscore=0
- priorityscore=1501 impostorscore=0 malwarescore=0 clxscore=1015
- spamscore=0 lowpriorityscore=0 phishscore=0 mlxlogscore=999 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2009150000 definitions=main-2102020055
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 36211f7fc1e7 ("Bluetooth: Pause service discovery for suspend")
-seems like a bugfix as well but there is no Fixes tag there either.  The
-commit message should be more clear what the effect of the bug looks
-like to the user.  I like to write something like this:
+kernel panic trace looks like: 
 
-[PATCH] Bluetooth: Pause service discovery for suspend
+ #5 [ffffb9e08698fc80] do_page_fault at ffffffffb666e0d7
+ #6 [ffffb9e08698fcb0] page_fault at ffffffffb70010fe
+    [exception RIP: amp_read_loc_assoc_final_data+63]
+    RIP: ffffffffc06ab54f  RSP: ffffb9e08698fd68  RFLAGS: 00010246
+    RAX: 0000000000000000  RBX: ffff8c8845a5a000  RCX: 0000000000000004
+    RDX: 0000000000000000  RSI: ffff8c8b9153d000  RDI: ffff8c8845a5a000
+    RBP: ffffb9e08698fe40   R8: 00000000000330e0   R9: ffffffffc0675c94
+    R10: ffffb9e08698fe58  R11: 0000000000000001  R12: ffff8c8b9cbf6200
+    R13: 0000000000000000  R14: 0000000000000000  R15: ffff8c8b2026da0b
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #7 [ffffb9e08698fda8] hci_event_packet at ffffffffc0676904 [bluetooth]
+ #8 [ffffb9e08698fe50] hci_rx_work at ffffffffc06629ac [bluetooth]
+ #9 [ffffb9e08698fe98] process_one_work at ffffffffb66f95e7
 
-Just like MGMT_OP_START_DISCOVERY, we should reject
-MGMT_OP_START_SERVICE_DISCOVERY with MGMT_STATUS_BUSY when we are paused
-for suspend.  This bug was discovered by auditing the software and no
-one has complained about it, but presumably it leads to a hanged process
-because the cmd cannot complete.
+hcon->amp_mgr seems NULL triggered kernel panic in following line inside
+function amp_read_loc_assoc_final_data
 
-Sometimes it's hard to know what the affect of a bug is, but since
-you're working in the subsystem then you probably have a better guess
-than the rest of us so even a guess is useful.
+        set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
 
-regards,
-dan carpenter
+Fixed by checking NULL for mgr.
+
+Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
+---
+ net/bluetooth/amp.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index 9c711f0dfae3..be2d469d6369 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -297,6 +297,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	struct hci_request req;
+ 	int err;
+ 
++	if (!mgr)
++		return;
++
+ 	cp.phy_handle = hcon->handle;
+ 	cp.len_so_far = cpu_to_le16(0);
+ 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
+-- 
+2.21.1
 
