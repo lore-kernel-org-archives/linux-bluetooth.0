@@ -5,64 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4246BC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 06:58:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 833A0C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 07:10:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3EF964F9A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 06:58:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38F5264F5D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 07:10:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231722AbhBCG5x (ORCPT
+        id S232238AbhBCHKV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Feb 2021 01:57:53 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42480 "EHLO
+        Wed, 3 Feb 2021 02:10:21 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231624AbhBCG5v (ORCPT
+        with ESMTP id S231902AbhBCHKS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Feb 2021 01:57:51 -0500
+        Wed, 3 Feb 2021 02:10:18 -0500
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1930EC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Feb 2021 22:57:11 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id l197so17744128ybf.17
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Feb 2021 22:57:11 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03775C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Feb 2021 23:09:37 -0800 (PST)
+Received: by mail-yb1-xb4a.google.com with SMTP id l10so26862976ybt.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Feb 2021 23:09:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=sender:date:message-id:mime-version:subject:from:to:cc;
         bh=/wnbMtD0oy336W9EDCGq60PMZiiWzWFv7G6400JHFhs=;
-        b=tfjQFmZuBFZHJuQTjSVhg3ixz+DnPLN/S9VEIvqbIxFzeoWNgV77XNtiyL9ixPO4Tb
-         dz0un2MfXWvAwVLGdjRh/++XmGFZd948pQuQFXv6vBXBjSlmZWraR0aKplDotFXISRP3
-         PeaaH93UfYOEVLcTJI3ORIUPgyXvtocYdiJV0Rzzn/CVwSvbupy+oy554e7WbzRO8+sk
-         mBMRaneAEtmswh0W3dKwol0esz25Gaupy0pjB6oF9Z2y+Gx8h+HzW/iChV83VZoVLDMJ
-         ehusselEhRZwCjTxFbKkR7wDR4RiJEaZHPGDsLcrWuNkLWdNWH0IIC74zkgZdeTrh0BK
-         sZ5A==
+        b=ORpIZ9KqvA5JySv1a+xUn5mihk221WQUpgWJVo0oGIZRv5FvZ6QiHJy/rWa+IdEYjI
+         /8JHAUH81DnuGXTBISe7MuVXH1UcJOWYwxV1PZGf3qGUR5pivDIDyLTY1K5RB3RfjS8C
+         qdmy0O+f1yM9NW7yygT+6B3madCzZB+CdnwsAuZo5aU39rSboYuAaW580muhTehu4V3E
+         cigMubeYmMeWUvEC+mhwwHzpJVVgmmeuKNL4xxK0En3ZLAIZpDJxe/TO420R8rs1oIma
+         kUzrgy9y8ml3LVwxWfHb01cEiFrYwFZ5EH0TevmKlL2AdtqBUN0UMrChtJytP1Vhzq2q
+         7K6g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
          :to:cc;
         bh=/wnbMtD0oy336W9EDCGq60PMZiiWzWFv7G6400JHFhs=;
-        b=XTDVjIewcH1y9YAae1xlGcjA3uD7WBlXmePWH7oYbNTv29HR/1oJv2THgIE6+HMUPt
-         aJC4TchNQRmguD7Ewp94ScBRhROS2BAddLYPkgDfnjCS1usfWUmIpGC3C9J8gTKqPFn3
-         wA3Zj1KMRrc1PjYNo0DpirTEWP0YOBBZOICcNh4gMimljdCZ9Ffu9mJc3w6IL8HyxXEG
-         a3QbLFVLKM5+KPRD6l7yWfY3B31AvKvDoI9GJ8dh59kzrzw/ma1RaYmLtbepeqIf2i8u
-         Wy72qEzrdCz5bH7nIgKvB5E9XA0XmwBcQjU3vWqPhe0LslLxPNgSNE67uE9h58sQOBja
-         Sklw==
-X-Gm-Message-State: AOAM531uR6gR3LuVLQyeioExccFfAlg95L+Hf7xRqa6F3ejTyr+cDuPm
-        5UuSDbjopaP6BbZbFXWCbmTWnBplFHGuESehHw3ErXzULMbZRLb89ps+kQ9pjUzEyxGe6HuMYCq
-        dB13N9o3YqqFv6Fl8u9KvIqm+kVcjLbx+z68MxkAKoUCQYnzd+6MfkWnB59t63krD0oDfFOB1bG
-        mo9lMiVH4V9AM=
-X-Google-Smtp-Source: ABdhPJxSiqk8gZYYdNVJFLC3BUkDqUVnJelM3j+yz+P8URDuHFvJS7qJyIaFDqLtAWy+TUl7m+Am741X6VRHRXrL9A==
+        b=N8GlJd+nPteHhV/ywYEP2UsC73n7Fuq/uqlMM/0u8izhEFR1Qn9MLvA4ElvZ7Tb9B+
+         wJ5suLmqivfqwmuiDAtdOOFENxeDxl67l7ejiOgP5TxIaFUsYUG4BS0DRYGddCNOfCpw
+         HwSb7mWVIUqNMXOhg4lngqkuwZhltn11fOYqAa4Kd2ESF7XUsA4Zsp/Ra+kpijZLSIeE
+         Amg8mE/T83ocIzTVKC4V0BzWT+n2saJnx+NkLt+5bl/MM4r2ZYubEinWFw2aRAVKXWJq
+         MXrJVAd9CYGhyU7jq2UqEJOVeY6is4bKZZd1w7TVe9TK1qvyofXqrbs13z0G76Termb6
+         LGAQ==
+X-Gm-Message-State: AOAM531IB6x8pQy6rfwZGv71CZAec0IGZtWjmPSS1vrk1Vi95PewcwNY
+        gtAgJxUOQonpIJOkomhvYgA1sk1L9ylybcqrd3nnHZoFQfLgAfoQQVnHefD+T+okLxh3nvWoy6+
+        F6NU9tXu8dVAXal3MtfOf9m6TqIFmtBNLdo9AfAYGRdIezZh2vrVS6+X3GPCGAywgzgCeYQP1z4
+        0z4w4+H6s2ExI=
+X-Google-Smtp-Source: ABdhPJypZNI/m4g+qfZiw1c1Kl/BP/d7kUrd1HrLK8IrMqiQE82/eoWXzK8jRUdUY1sUw071wrH5VFpy2dvkgYlXwA==
 Sender: "howardchung via sendgmr" 
         <howardchung@howardchung-p920.tpe.corp.google.com>
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:c8ff:4e4a:dbd4:e8a6])
- (user=howardchung job=sendgmr) by 2002:a25:ca8c:: with SMTP id
- a134mr2589170ybg.106.1612335430056; Tue, 02 Feb 2021 22:57:10 -0800 (PST)
-Date:   Wed,  3 Feb 2021 14:56:44 +0800
-Message-Id: <20210203145558.Bluez.v1.1.I23ab3f91f23508bf84908e62d470bfab1d844f63@changeid>
+ (user=howardchung job=sendgmr) by 2002:a25:5cd7:: with SMTP id
+ q206mr2627199ybb.150.1612336177210; Tue, 02 Feb 2021 23:09:37 -0800 (PST)
+Date:   Wed,  3 Feb 2021 15:09:29 +0800
+Message-Id: <20210203150907.v1.1.I23ab3f91f23508bf84908e62d470bfab1d844f63@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
-Subject: [Bluez PATCH v1] Bluetooth: Fix crash in mgmt_add_adv_patterns_monitor_complete
+Subject: [PATCH v1] Bluetooth: Fix crash in mgmt_add_adv_patterns_monitor_complete
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
 Cc:     Howard Chung <howardchung@google.com>,
