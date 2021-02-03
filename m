@@ -2,156 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 833A0C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 07:10:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C54D3C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 08:04:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38F5264F5D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 07:10:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68C0964F4E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Feb 2021 08:04:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232238AbhBCHKV (ORCPT
+        id S232160AbhBCID5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Feb 2021 02:10:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45160 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231902AbhBCHKS (ORCPT
+        Wed, 3 Feb 2021 03:03:57 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:55841 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231738AbhBCIDx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Feb 2021 02:10:18 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03775C0613D6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Feb 2021 23:09:37 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id l10so26862976ybt.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Feb 2021 23:09:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=/wnbMtD0oy336W9EDCGq60PMZiiWzWFv7G6400JHFhs=;
-        b=ORpIZ9KqvA5JySv1a+xUn5mihk221WQUpgWJVo0oGIZRv5FvZ6QiHJy/rWa+IdEYjI
-         /8JHAUH81DnuGXTBISe7MuVXH1UcJOWYwxV1PZGf3qGUR5pivDIDyLTY1K5RB3RfjS8C
-         qdmy0O+f1yM9NW7yygT+6B3madCzZB+CdnwsAuZo5aU39rSboYuAaW580muhTehu4V3E
-         cigMubeYmMeWUvEC+mhwwHzpJVVgmmeuKNL4xxK0En3ZLAIZpDJxe/TO420R8rs1oIma
-         kUzrgy9y8ml3LVwxWfHb01cEiFrYwFZ5EH0TevmKlL2AdtqBUN0UMrChtJytP1Vhzq2q
-         7K6g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=/wnbMtD0oy336W9EDCGq60PMZiiWzWFv7G6400JHFhs=;
-        b=N8GlJd+nPteHhV/ywYEP2UsC73n7Fuq/uqlMM/0u8izhEFR1Qn9MLvA4ElvZ7Tb9B+
-         wJ5suLmqivfqwmuiDAtdOOFENxeDxl67l7ejiOgP5TxIaFUsYUG4BS0DRYGddCNOfCpw
-         HwSb7mWVIUqNMXOhg4lngqkuwZhltn11fOYqAa4Kd2ESF7XUsA4Zsp/Ra+kpijZLSIeE
-         Amg8mE/T83ocIzTVKC4V0BzWT+n2saJnx+NkLt+5bl/MM4r2ZYubEinWFw2aRAVKXWJq
-         MXrJVAd9CYGhyU7jq2UqEJOVeY6is4bKZZd1w7TVe9TK1qvyofXqrbs13z0G76Termb6
-         LGAQ==
-X-Gm-Message-State: AOAM531IB6x8pQy6rfwZGv71CZAec0IGZtWjmPSS1vrk1Vi95PewcwNY
-        gtAgJxUOQonpIJOkomhvYgA1sk1L9ylybcqrd3nnHZoFQfLgAfoQQVnHefD+T+okLxh3nvWoy6+
-        F6NU9tXu8dVAXal3MtfOf9m6TqIFmtBNLdo9AfAYGRdIezZh2vrVS6+X3GPCGAywgzgCeYQP1z4
-        0z4w4+H6s2ExI=
-X-Google-Smtp-Source: ABdhPJypZNI/m4g+qfZiw1c1Kl/BP/d7kUrd1HrLK8IrMqiQE82/eoWXzK8jRUdUY1sUw071wrH5VFpy2dvkgYlXwA==
-Sender: "howardchung via sendgmr" 
-        <howardchung@howardchung-p920.tpe.corp.google.com>
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:c8ff:4e4a:dbd4:e8a6])
- (user=howardchung job=sendgmr) by 2002:a25:5cd7:: with SMTP id
- q206mr2627199ybb.150.1612336177210; Tue, 02 Feb 2021 23:09:37 -0800 (PST)
-Date:   Wed,  3 Feb 2021 15:09:29 +0800
-Message-Id: <20210203150907.v1.1.I23ab3f91f23508bf84908e62d470bfab1d844f63@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.30.0.365.g02bc693789-goog
-Subject: [PATCH v1] Bluetooth: Fix crash in mgmt_add_adv_patterns_monitor_complete
-From:   Howard Chung <howardchung@google.com>
+        Wed, 3 Feb 2021 03:03:53 -0500
+Received: from [123.112.66.186] (helo=localhost.localdomain)
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <hui.wang@canonical.com>)
+        id 1l7D82-0005tB-Bz; Wed, 03 Feb 2021 08:03:11 +0000
+From:   Hui Wang <hui.wang@canonical.com>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
-Cc:     Howard Chung <howardchung@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Manish Mandlik <mmandlik@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     hui.wang@canonical.com
+Subject: [PATCH] Bluetooth: btusb: Fix the autosuspend enable and disable
+Date:   Wed,  3 Feb 2021 16:02:45 +0800
+Message-Id: <20210203080245.5168-1-hui.wang@canonical.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-If hci_add_adv_monitor is a pending command(e.g. forward to
-msft_add_monitor_pattern), it is possible that
-mgmt_add_adv_patterns_monitor_complete gets called before
-cmd->user_data gets set, which will cause a crash when we
-try to get the moniter handle through cmd->user_data in
-mgmt_add_adv_patterns_monitor_complete.
+I tried to disable the autosuspend on btusb through the module
+parameter enable_autosuspend, this parameter is set to N, but the usb
+bluetooth device is still runtime suspended.
+$ cat /sys/module/btusb/parameters/enable_autosuspend
+N
+$ cat /sys/bus/usb/devices/3-10/power/runtime_status
+suspended
+$ cat /sys/bus/usb/devices/3-10/power/runtime_suspended_time
+65187
 
-This moves the cmd->user_data assignment earlier than
-hci_add_adv_monitor.
+We already set ".supports_autosuspend = 1" in the usb_driver, this
+device will be set autosuspend enabled by usb core, we don't need
+to call usb_enable_autosuspend() in the btusb_probe(). Instead if
+users set the parameter enable_autosuspend to N, we need to call
+usb_disable_autosuspend() in the btusb_probe(). After this change
+and set the parameter to N, we could see the device is not runtime
+suspended anymore.
+$ cat /sys/module/btusb/parameters/enable_autosuspend
+N
+$ cat /sys/bus/usb/devices/3-10/power/runtime_status
+active
+$ cat /sys/bus/usb/devices/3-10/power/runtime_suspended_time
+0
 
-RIP: 0010:mgmt_add_adv_patterns_monitor_complete+0x82/0x187 [bluetooth]
-Code: 1e bf 03 00 00 00 be 52 00 00 00 4c 89 ea e8 9e
-e4 02 00 49 89 c6 48 85 c0 0f 84 06 01 00 00 48 89 5d b8 4c 89 fb 4d 8b
-7e 30 <41> 0f b7 47 18 66 89 45 c0 45 84 e4 75 5a 4d 8b 56 28 48 8d 4d
-c8
-RSP: 0018:ffffae81807dbcb8 EFLAGS: 00010286
-RAX: ffff91c4bdf723c0 RBX: 0000000000000000 RCX: ffff91c4e5da5b80
-RDX: ffff91c405680000 RSI: 0000000000000052 RDI: ffff91c49d654c00
-RBP: ffffae81807dbd00 R08: ffff91c49fb157e0 R09: ffff91c49fb157e0
-R10: 000000000002a4f0 R11: ffffffffc0819cfd R12: 0000000000000000
-R13: ffff91c405680000 R14: ffff91c4bdf723c0 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff91c4ea300000(0000)
-knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000018 CR3: 0000000133612002 CR4:
-00000000003606e0
-Call Trace:
- ? msft_le_monitor_advertisement_cb+0x111/0x141
-[bluetooth]
- hci_event_packet+0x425e/0x631c [bluetooth]
- ? printk+0x59/0x73
- ? __switch_to_asm+0x41/0x70
- ?
-msft_le_set_advertisement_filter_enable_cb+0xa6/0xa6 [bluetooth]
- ? bt_dbg+0xb4/0xbb [bluetooth]
- ? __switch_to_asm+0x41/0x70
- hci_rx_work+0x101/0x319 [bluetooth]
- process_one_work+0x257/0x506
- worker_thread+0x10d/0x284
- kthread+0x14c/0x154
- ? process_one_work+0x506/0x506
- ? kthread_blkcg+0x2c/0x2c
- ret_from_fork+0x1f/0x40
+And if we disable the autosuspend in the btusb_probe(), we need to
+enable the autosuspend in the disconnect(), this could guarantee
+that the device could be runtime suspended after we rmmod the btusb.
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-Signed-off-by: Howard Chung <howardchung@google.com>
+Signed-off-by: Hui Wang <hui.wang@canonical.com>
 ---
+ drivers/bluetooth/btusb.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 8ff9c4bb43d11..74971b4bd4570 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4303,6 +4303,7 @@ static int __add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b14102fba601..e019a6d6e934 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4639,8 +4639,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 			data->diag = NULL;
  	}
  
-+	cmd->user_data = m;
- 	pending = hci_add_adv_monitor(hdev, m, &err);
- 	if (err) {
- 		if (err == -ENOSPC || err == -ENOMEM)
-@@ -4330,7 +4331,6 @@ static int __add_adv_patterns_monitor(struct sock *sk, struct hci_dev *hdev,
+-	if (enable_autosuspend)
+-		usb_enable_autosuspend(data->udev);
++	if (!enable_autosuspend)
++		usb_disable_autosuspend(data->udev);
  
- 	hci_dev_unlock(hdev);
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0)
+@@ -4700,6 +4700,9 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 		gpiod_put(data->reset_gpio);
  
--	cmd->user_data = m;
- 	return 0;
+ 	hci_free_dev(hdev);
++
++	if (!enable_autosuspend)
++		usb_enable_autosuspend(data->udev);
+ }
  
- unlock:
+ #ifdef CONFIG_PM
 -- 
-2.30.0.365.g02bc693789-goog
+2.25.1
 
