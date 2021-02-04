@@ -2,163 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BF86FC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 15:49:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E4F7EC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 16:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 98CA664F51
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 15:49:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A638C64F44
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 16:57:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237569AbhBDPsz (ORCPT
+        id S237870AbhBDQ5g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Feb 2021 10:48:55 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34376 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237516AbhBDPsF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Feb 2021 10:48:05 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3ABC464F45;
-        Thu,  4 Feb 2021 15:47:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1612453642;
-        bh=bNTrM8aWtufVI7iPcQTsXQghRKvyHRISmKItSiQtqR4=;
-        h=From:To:Cc:Subject:Date:From;
-        b=tdipZSETEVhKcd4sLIG9VlK9G/cahXZ/CPQZdx9ldR/1hPRp5B/XihZonqakev8zn
-         MllWQsvppx/2dhisCT3w13qVx68QyU+1Q5iLAIGaOWzR8HG79QNzJJmnwlfOaYxId3
-         n4MC4lnygGIA8+32taJQQOpNx6DPYdsNFmP4mzneFXqV+N4bieJ7YgqBBhfCYjUScR
-         E18w+T79v/vLEg9dRhJFtBU/rgQCk1ofl4Dpj7L4iIbZYkLkj1iNCrrlxReFISFkpd
-         nHXTdp3SEf/NkLMJf3KZlENm/v/WYPK0UHl9AuOV7T4YIDxXM7prw3CKy1JZiDPqbN
-         Q5YOrgXrpcnYg==
-From:   Arnd Bergmann <arnd@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Mark Chen <Mark-YW.Chen@mediatek.com>
-Cc:     Arnd Bergmann <arnd@arndb.de>, Kiran K <kiran.k@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Sathish Narasimman <nsathish41@gmail.com>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Ismael Ferreras Morezuelas <swyterzone@gmail.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        Trent Piepho <tpiepho@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: fix excessive stack usage
-Date:   Thu,  4 Feb 2021 16:47:07 +0100
-Message-Id: <20210204154716.1823454-1-arnd@kernel.org>
-X-Mailer: git-send-email 2.29.2
+        Thu, 4 Feb 2021 11:57:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56740 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238202AbhBDQxK (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Feb 2021 11:53:10 -0500
+Received: from mail-oi1-x231.google.com (mail-oi1-x231.google.com [IPv6:2607:f8b0:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CBAEC06178A
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Feb 2021 08:52:30 -0800 (PST)
+Received: by mail-oi1-x231.google.com with SMTP id m13so4356600oig.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Feb 2021 08:52:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=AtuZOhMi4hQjT2dJo5KrrumoG23OPJ3RaM+8xUkroQQ=;
+        b=n1TOOG006NIj0Y3TcJdHbFv2dD1K9E2nJ7AOOKK1divBndlQQHW5V35LuRHXJnsg2X
+         LOa3mx6EGZqj05cj9pZmKkYIN7lvQiFqIcM4zo4y7wzFnqsWPB/ka0bRMhErBy2MjBHF
+         o1wp8hcxOC77B2GFKL5fRECi/MymMzHXuDom7ymj4gXBt62iPEwpTmkV759QovGa3m4u
+         h7p9bAtfth10oXf/TsUt3qlWKS2nQ7N7fUIQpB68QW077ENlmqvbCzWs1ozzRT5cAo8n
+         BpTS1TARxapzJN3iJaZFxNOs6OGcgjxgYMWMiZnMs5RZrYpCl/1L2hIRNQWg3h52VkqV
+         B0sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=AtuZOhMi4hQjT2dJo5KrrumoG23OPJ3RaM+8xUkroQQ=;
+        b=KYRFHZxjApj3HoH3HxvPgySSH5khhs28YxfvFbh6AW//cmyQkCNT1INdvXpT0Xx/3E
+         wKFiHvsIFgNZ7AWuZewNVujuGmpC+zyXF9HRYkXcY7r6DKVCuwLoHIqw/6aOlJ7VqnkJ
+         LPoWeLQ1w/Z64QNYYCErcs0kr3Rfom2g1d0l0keGDI27Cl+P5YAUUSdIvhHLrS/9kCPE
+         OH3KH/hawRyHYp0YhVNzdA7su1f/t9i/Q6lCpjUNIkpxpVtOO1a24IHIC25vyKjF/Rn9
+         XN0l5dQbHNBlSTPoTUR2LGzQxglYx1dDuM3fFuuCLESP8es6fJTaMygMo5YuEXjTK1DP
+         7K0A==
+X-Gm-Message-State: AOAM531G+/sue02VAoZxM8+hB21QN9AJjSnCXssGhOMVmAf3GE/jPFIE
+        9anEtKhMta2275MeLDpOQqpeVywQwxYuAQB5SGk=
+X-Google-Smtp-Source: ABdhPJxCTko1izSk0tcabiwU0tj9dCvN89X9FL/6np8By+jShxm1UYOJj7HteEUgk4y8q85mOGPCqg8WU0ElbCYb7Zg=
+X-Received: by 2002:aca:c693:: with SMTP id w141mr248126oif.58.1612457549740;
+ Thu, 04 Feb 2021 08:52:29 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CAC9s0NaGXXVcZ_mDf9=QFp18BT7Ke-nduUCgx9u4zMOxuW0yeA@mail.gmail.com>
+In-Reply-To: <CAC9s0NaGXXVcZ_mDf9=QFp18BT7Ke-nduUCgx9u4zMOxuW0yeA@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 4 Feb 2021 08:52:19 -0800
+Message-ID: <CABBYNZJh8y8NJ2b=wOo33Zp1pqD52uA47ORw_bO2F97QOcccYA@mail.gmail.com>
+Subject: Re: How to disable cache?
+To:     Kenny Bian <kennybian@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Arnd Bergmann <arnd@arndb.de>
+Hi Kenny,
 
-Enlarging the size of 'struct btmtk_hci_wmt_cmd' makes it no longer
-fit on the kernel stack, as seen from this compiler warning:
+On Wed, Feb 3, 2021 at 9:20 PM Kenny Bian <kennybian@gmail.com> wrote:
+>
+> Hello,
+>
+> In "/etc/bluetooth/main.conf", there seems a way to disable the cache:
+> [GATT]
+> Cache = no
+>
+> What does exactly the "disable cache" mean? It means the
+> "/var/lib/bluetooth/[MAC_ADDRESS]/cache" folder won't be created?
 
-drivers/bluetooth/btusb.c:3365:12: error: stack frame size of 1036 bytes in function 'btusb_mtk_hci_wmt_sync' [-Werror,-Wframe-larger-than=]
+That means it won't cache any GATT attribute found when discovering,
+the cache folder has other information as well.
 
-Change the function to dynamically allocate the buffer instead.
-As there are other sleeping functions called from the same location,
-using GFP_KERNEL should be fine here, and the runtime overhead should
-not matter as this is rarely called.
+> We tried to disable the cache by changing the
+> "/etc/bluetooth/main.conf". It seems the
+> "/var/lib/bluetooth/[MAC_ADDRESS]/cache" folder is still created even
+> if it was deleted.
+> However, we noticed that the "[Attributes]" section in
+> "/var/lib/bluetooth/[MAC_ADDRESS]/cache/[iPHONE_MAC]" file is gone.
+> Does it mean the "disable cache" is working? Does it mean the handles
+> used between the bluetooth and the mobile app won't be cached?
 
-Unfortunately, I could not figure out why the message size is
-increased in the previous patch. Using dynamic allocation means
-any size is possible now, but there is still a range check that
-limits the total size (including the five-byte header) to 255
-bytes, so whatever was intended there is now undone.
+Yes, that is the result of not caching anything.
 
-Fixes: 48c13301e6ba ("Bluetooth: btusb: Fine-tune mt7663 mechanism.")
-Signed-off-by: Arnd Bergmann <arnd@arndb.de>
----
- drivers/bluetooth/btusb.c | 24 +++++++++++++++---------
- 1 file changed, 15 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index eeafb8432c0f..838e6682301e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3161,7 +3161,7 @@ struct btmtk_wmt_hdr {
- 
- struct btmtk_hci_wmt_cmd {
- 	struct btmtk_wmt_hdr hdr;
--	u8 data[1000];
-+	u8 data[];
- } __packed;
- 
- struct btmtk_hci_wmt_evt {
-@@ -3369,7 +3369,7 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	struct btmtk_hci_wmt_evt_funcc *wmt_evt_funcc;
- 	u32 hlen, status = BTMTK_WMT_INVALID;
- 	struct btmtk_hci_wmt_evt *wmt_evt;
--	struct btmtk_hci_wmt_cmd wc;
-+	struct btmtk_hci_wmt_cmd *wc;
- 	struct btmtk_wmt_hdr *hdr;
- 	int err;
- 
-@@ -3383,20 +3383,24 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	if (hlen > 255)
- 		return -EINVAL;
- 
--	hdr = (struct btmtk_wmt_hdr *)&wc;
-+	wc = kzalloc(hlen, GFP_KERNEL);
-+	if (!wc)
-+		return -ENOMEM;
-+
-+	hdr = &wc->hdr;
- 	hdr->dir = 1;
- 	hdr->op = wmt_params->op;
- 	hdr->dlen = cpu_to_le16(wmt_params->dlen + 1);
- 	hdr->flag = wmt_params->flag;
--	memcpy(wc.data, wmt_params->data, wmt_params->dlen);
-+	memcpy(wc->data, wmt_params->data, wmt_params->dlen);
- 
- 	set_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
- 
--	err = __hci_cmd_send(hdev, 0xfc6f, hlen, &wc);
-+	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
- 
- 	if (err < 0) {
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
--		return err;
-+		goto err_free_wc;
- 	}
- 
- 	/* The vendor specific WMT commands are all answered by a vendor
-@@ -3413,13 +3417,14 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	if (err == -EINTR) {
- 		bt_dev_err(hdev, "Execution of wmt command interrupted");
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
--		return err;
-+		goto err_free_wc;
- 	}
- 
- 	if (err) {
- 		bt_dev_err(hdev, "Execution of wmt command timed out");
- 		clear_bit(BTUSB_TX_WAIT_VND_EVT, &data->flags);
--		return -ETIMEDOUT;
-+		err = -ETIMEDOUT;
-+		goto err_free_wc;
- 	}
- 
- 	/* Parse and handle the return WMT event */
-@@ -3463,7 +3468,8 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- err_free_skb:
- 	kfree_skb(data->evt_skb);
- 	data->evt_skb = NULL;
--
-+err_free_wc:
-+	kfree(wc);
- 	return err;
- }
- 
 -- 
-2.29.2
-
+Luiz Augusto von Dentz
