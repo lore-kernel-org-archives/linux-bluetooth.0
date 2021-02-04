@@ -7,126 +7,177 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EC00C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 21:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB0EFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 21:30:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C765F64F7C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 21:03:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6408A64F58
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 21:30:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230114AbhBDVDf (ORCPT
+        id S229731AbhBDVaj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Feb 2021 16:03:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54594 "EHLO
+        Thu, 4 Feb 2021 16:30:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhBDVDc (ORCPT
+        with ESMTP id S229518AbhBDVai (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Feb 2021 16:03:32 -0500
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67BB3C061786;
-        Thu,  4 Feb 2021 13:02:52 -0800 (PST)
-Received: by mail-ej1-x635.google.com with SMTP id a9so7988887ejr.2;
-        Thu, 04 Feb 2021 13:02:52 -0800 (PST)
+        Thu, 4 Feb 2021 16:30:38 -0500
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10257C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Feb 2021 13:29:58 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id r13so2458190qvm.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Feb 2021 13:29:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=QM4H+AOas/ZTy6sjkxPDpMs06k7xsx9Ag86HzbisD/s=;
-        b=t7bAOfG9L1hfW8+U/sXI6TTV51MXxM7GIKim3muln2dxUXGfSCjq0wc/cOXeX5FNoV
-         Um2nreccGtzYdruUKiokkxMK4BaftyfKb4uPPcqRe4qAoh/Oi1qiyaUv2WaZ6UrEc4H4
-         w/Y+BBfcEXOz8UH+iwU6Izl7YpDelBBNEMk25KqeQF93tKER8vSPfPsUiFQwuo2sRqpz
-         D4TXAIdJqJEu9Dfx4KnDwanp7QDjORcT1HkQ/Bfdt6GMU6e+RUZH4+YkwfyLKY7YhM7t
-         pU5RfjM1/cjtqEch+dzqgKzVxdKim8BT2QWO3D/d1qhz7WMeytS4gRgJxW386U+qe3Re
-         CKQQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=i6fWql2D4Bz/JGSMkuXstuh1L4YFCNcQi2R+5G2d5iU=;
+        b=qd6jqqCAN2jWp8o9fnXdHQRrYzv5S4h5X++1IIOZOeWsByL7HKICJb89cFhc7OVNmM
+         WMQBAeE+4+40fSsQTiGakogOKKhW/gUJ9ZdQ0M3ROPZHt0jPs1eaXPUDMmAEzp3Q71qg
+         +YUk51hV2fD2XRSJsrfm1ibsFBCwRUKA934Jh/LeXujWnG+eATindb46Q6zAGH1iq6Be
+         +1fS5muhMs7ci1K5pafpY4gLceltmJ0CBPaXMubSISS4ETS7lFHNKdVmdYAkKniEF+Oe
+         E4dIOa7vXCUOxVN8hzWczqf2nTzneyReKO460sJlU6pn2UNvMzKNb3Otz+gVFIw+qa6r
+         Ns5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=QM4H+AOas/ZTy6sjkxPDpMs06k7xsx9Ag86HzbisD/s=;
-        b=dYel6g3PwuAPVCmmAMRXZqQ0l4YRwgVLLsac8DS+tOVBv2A6rwZGPgxxsvu/A+7XsM
-         IEaCQJyWSZSR4y3N33tlZPhMFiEyblDtV8N+9bqSBroUN60h7BQ2ofqEkjUTJ59dG2/n
-         KHWXA/BuwQ86kpKs6nJj5UlmhyNe2snBA2FLekTc8vqE9jF67df0nHNBRMF6GE0618N4
-         TOE4EO8cNCXTR8auWZ9fNJjAVc1MkRyJVlmctjvE63sdCAe4/nJUebfvvxBlZbprKPze
-         Vl1ZZyNy5pQyyjZTNusUz5t/RmHSaOkR3XXqT4o/tcG3rzHIml/x84HSOItsdjgi5i/Q
-         esSA==
-X-Gm-Message-State: AOAM53106uGlr0UjvGS81QMe06sjq5K0wYgSchWfYha/L5tY0Ggcvru/
-        TJJ4XOw/m0FTLhtzElrHf80u9eXMtWO13WnwfC4=
-X-Google-Smtp-Source: ABdhPJz48/Zvb8jOqshxuPl7OAhtiddClB2itrWe0Ka+BpWHWkCP6Zwb95XKwOR73Ng3MHnXus3YQXdrm8x52RuT3wk=
-X-Received: by 2002:a17:906:958f:: with SMTP id r15mr915426ejx.360.1612472571112;
- Thu, 04 Feb 2021 13:02:51 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=i6fWql2D4Bz/JGSMkuXstuh1L4YFCNcQi2R+5G2d5iU=;
+        b=oIY2FpgwzZhlAFMbW0R5VKJwq3JIgNysZ3NRqIbUEXzkiMZYy1I9YorFljdr4UMzMz
+         CBVIj61cReRYZPQDQmuZyDC/sXMXB8OhNZpPpxAFZT7TTuznt13Gt690UQasRgyYOSCa
+         q/nlww/lba2GLbHpTtdnt2Omo5E+SsWgcQN53CtVH4S1bF2xC+qy2wJwe9nTeNXfORBm
+         t+M3TwExqs2HGcSKBzbt7qr6Oz3yC0321vwHpPPQLT7bRTJDUJnIjc4ZdRiKI6TpgZeG
+         MiqqyM8z/gAGRFfkBpTBBPLIYg/z96FMKEoonnOP8nmkLy8LTCZjogkxGKbKiH/v5zEC
+         NSew==
+X-Gm-Message-State: AOAM5330DFhRVbQccaBdU7DIdqhm4/qAUNvRzZUFw8NQn+qbMKMcm75R
+        bBrEPAsS+eHk07TmLKpsBXPUYDxLXBORFQ==
+X-Google-Smtp-Source: ABdhPJwZpWg/twL0RWQ2Pr8j7pj0dPaXZf7K9JiJyhOPqYGcNsROPo/+NxDMerHBDzGWKHpF8Z9llQ==
+X-Received: by 2002:a0c:ee2b:: with SMTP id l11mr1518940qvs.7.1612474197195;
+        Thu, 04 Feb 2021 13:29:57 -0800 (PST)
+Received: from [172.17.0.2] ([40.75.25.52])
+        by smtp.gmail.com with ESMTPSA id l35sm5518668qtd.90.2021.02.04.13.29.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Feb 2021 13:29:56 -0800 (PST)
+Message-ID: <601c6754.1c69fb81.99438.a783@mx.google.com>
+Date:   Thu, 04 Feb 2021 13:29:56 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============4475494085123615121=="
 MIME-Version: 1.0
-References: <20210204154716.1823454-1-arnd@kernel.org>
-In-Reply-To: <20210204154716.1823454-1-arnd@kernel.org>
-From:   Trent Piepho <tpiepho@gmail.com>
-Date:   Thu, 4 Feb 2021 13:02:39 -0800
-Message-ID: <CA+7tXii4h+GPp-+qG3m+zhDORLtU_ZS=eer_wCkxrWs6sZqT5A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: fix excessive stack usage
-To:     Arnd Bergmann <arnd@kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Mark Chen <Mark-YW.Chen@mediatek.com>,
-        Arnd Bergmann <arnd@arndb.de>, Kiran K <kiran.k@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Sathish Narasimman <nsathish41@gmail.com>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Ismael Ferreras Morezuelas <swyterzone@gmail.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, cdwhite13@gmail.com
+Subject: RE: emulator: Periodic Advertising and Create BIG Command
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210204210222.69767-1-cdwhite13@gmail.com>
+References: <20210204210222.69767-1-cdwhite13@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Feb 4, 2021 at 7:47 AM Arnd Bergmann <arnd@kernel.org> wrote:
->
-> Enlarging the size of 'struct btmtk_hci_wmt_cmd' makes it no longer
->
-> Unfortunately, I could not figure out why the message size is
-> increased in the previous patch. Using dynamic allocation means
+--===============4475494085123615121==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-That patch appears to be have been split out of fc342c4dc40
-"Bluetooth: btusb: Add protocol support for MediaTek MT7921U USB
-devices".  But there is no clear reason why those changes were split
-out, which is not helped by vague patch description, and size increase
-appears to be a totally random change to unrelated code.  This struct
-is used by that latter commit to download firmware with a new format
-for mt7921.
+This is automated email and please do not reply to this email!
 
-But new firmware download function uses code that is just copied from
-existing fw download function (should be refactored to share code),
-which has a max packet data size of "dlen = min_t(int, 250,
-dl_size);", so there was no need to increase size at all.  I'd guess
-someone experimented with larger chunks for firmware download, but
-then did not use them, but left the larger max size in because it was
-a separate commit.
+Dear submitter,
 
-It looks like the new firmware download function will crash if the
-firmware file is not consistent:
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=428267
 
-sectionmap = (struct btmtk_section_map *)(fw_ptr +
-MTK_FW_ROM_PATCH_HEADER_SIZE +
-              MTK_FW_ROM_PATCH_GD_SIZE + MTK_FW_ROM_PATCH_SEC_MAP_SIZE * i);
-section_offset = sectionmap->secoffset;
-dl_size = sectionmap->bin_info_spec.dlsize;
-...
-fw_ptr += section_offset;
-/* send fw_ptr[0] to fw_ptr[dl_size] via wmt_cmd(s) */
+---Test result---
 
-Both section_offset and dl_size are used unsanitized from the firmware
-blob and could point outside the blob.
+##############################
+Test: CheckPatch - FAIL
+Output:
+emulator: Periodic Advertising and Create BIG Command
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#18: FILE: emulator/btdev.c:144:
++        uint8_t  le_periodic_adv_enable;$
 
-And the manually calculated struct sizes aren't necessary, if the
-structs for the firmware were correct, it could just be:
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#18: FILE: emulator/btdev.c:144:
++        uint8_t  le_periodic_adv_enable;$
 
-struct btmtk_firmware {
-       struct btmtk_patch_header header;
-       struct btmtk_global_desc desc;
-       struct btmtk_section_map sections[];
-} __packed;
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#19: FILE: emulator/btdev.c:145:
++        uint16_t le_periodic_adv_properties;$
 
-struct btmtk_firmware* fw_ptr = fw->data;
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#19: FILE: emulator/btdev.c:145:
++        uint16_t le_periodic_adv_properties;$
 
-sectionmap = &fw_ptr->sections[i];
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#20: FILE: emulator/btdev.c:146:
++        uint16_t le_periodic_min_interval;$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#20: FILE: emulator/btdev.c:146:
++        uint16_t le_periodic_min_interval;$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#21: FILE: emulator/btdev.c:147:
++        uint16_t le_periodic_max_interval;$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#21: FILE: emulator/btdev.c:147:
++        uint16_t le_periodic_max_interval;$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#22: FILE: emulator/btdev.c:148:
++        uint8_t  le_periodic_data_len;$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#22: FILE: emulator/btdev.c:148:
++        uint8_t  le_periodic_data_len;$
+
+ERROR:CODE_INDENT: code indent should use tabs where possible
+#23: FILE: emulator/btdev.c:149:
++        uint8_t  le_periodic_data[31];$
+
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#23: FILE: emulator/btdev.c:149:
++        uint8_t  le_periodic_data[31];$
+
+ERROR:ELSE_AFTER_BRACE: else should follow close brace '}'
+#47: FILE: emulator/btdev.c:3948:
++	}
++	else {
+
+ERROR:ELSE_AFTER_BRACE: else should follow close brace '}'
+#87: FILE: emulator/btdev.c:3984:
++	}
++	else {
+
+- total: 8 errors, 6 warnings, 124 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+NOTE: Whitespace errors detected.
+      You may wish to use scripts/cleanpatch or scripts/cleanfile
+
+"[PATCH] emulator: Periodic Advertising and Create BIG Command" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============4475494085123615121==--
