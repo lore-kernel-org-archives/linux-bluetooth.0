@@ -2,92 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F825C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 01:14:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89C31C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 05:17:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E07EE64F41
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 01:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EA7A64F47
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Feb 2021 05:17:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234385AbhBDBNx (ORCPT
+        id S230037AbhBDFRu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Feb 2021 20:13:53 -0500
-Received: from szxga05-in.huawei.com ([45.249.212.191]:12018 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234240AbhBDBNw (ORCPT
+        Thu, 4 Feb 2021 00:17:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48914 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229806AbhBDFRu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Feb 2021 20:13:52 -0500
-Received: from DGGEMS413-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4DWL9f17CqzjJlD;
-        Thu,  4 Feb 2021 09:11:50 +0800 (CST)
-Received: from huawei.com (10.175.127.227) by DGGEMS413-HUB.china.huawei.com
- (10.3.19.213) with Microsoft SMTP Server id 14.3.498.0; Thu, 4 Feb 2021
- 09:12:58 +0800
-From:   Ye Bin <yebin10@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <matthias.bgg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>
-CC:     Ye Bin <yebin10@huawei.com>, Hulk Robot <hulkci@huawei.com>
-Subject: [PATCH] Bluetooth: btusb: remove set but not used variable in btusb_mtk_setup_firmware_79xx
-Date:   Thu, 4 Feb 2021 09:18:56 +0800
-Message-ID: <20210204011856.3685334-1-yebin10@huawei.com>
-X-Mailer: git-send-email 2.25.4
+        Thu, 4 Feb 2021 00:17:50 -0500
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44753C0613D6
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Feb 2021 21:17:10 -0800 (PST)
+Received: by mail-qk1-x72d.google.com with SMTP id x81so2297394qkb.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Feb 2021 21:17:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=fBDSancv4Z7n+5iAPrGDSQxTXPZCFUyduSA9pZkH7Gg=;
+        b=HulFc6a3biWks1bdAtNDF8/u1E2Y+7A9N0+wrH3Phs1W3btpLhd6YRsYa1urAf1x6+
+         H93RmlJ39M1aTvtzOwBmw5XDl10qn1HsTZXbz+NrVbu+iPxvrJtyB/c7orFOSh/jbn8T
+         nWpQ5I6tmrV/sH9FJVeRSyg8uPvrNd9Ve4NggBwVZe5FQbVaw1tBTr7Op2kx62UB1O0C
+         4ts7aU8pZJDqsNFkhFu6jCMKNa+m/UF/fR24JAQ1NjuhSE/aIicjcrJiwVu50Qqyksur
+         pv2yhCQypqKzCOtGrPn1cG+UCUF9RR5whI02PYPhszLI+IdHCh9qAglwXCoIusrjUTDQ
+         Dc8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=fBDSancv4Z7n+5iAPrGDSQxTXPZCFUyduSA9pZkH7Gg=;
+        b=X+iQYiXJevmFyIz5Uf/sLzm05B4RdDCp921hIaCjmmH3EvCSLpu8czhbVgUpQJzdZv
+         sYPZkT86Ii1eQhNqd0teyrFwSIHWn2hwXYvGmO+nRWXZBSTrKX9vCvzhtq5iacU6ikH9
+         97iEkOIvSsfdKavAL3tnMgZW0lg8fwcPpEHl7PjVYkMgAb/oxga6usHUzEVJUvQqWHol
+         lf0Ntfr8WaJzzhXsTbq7F0hu6Tfpp7aNE8owe3aSq/C3mK7ZgQiyujqjAzdDQDwSHB3k
+         b2A1aZ28NTBe4Lz/4j/4w+hdHzCYYQ0i9TDgof9DvgJ8foWt03bEGaubLqTi2ZQn/PTJ
+         QUsw==
+X-Gm-Message-State: AOAM5316gR52h7+qyihMSPVFIkzdVIc084o9iLkc7d3gI6n8E1koUYZF
+        LmDemHoY5HfmX8LwdF+BPw5HCXULhH4SEsKPzV+85AJWZAxP
+X-Google-Smtp-Source: ABdhPJxxgO2UF2RKkwH4qhmwvPtjJwEGIDVsKI+4VF3ZFUYBgmfFYZXqcn0zK0OmMLPZaUQlQfBROmJz+WMBEeqq+iY=
+X-Received: by 2002:a37:6897:: with SMTP id d145mr6094137qkc.168.1612415829303;
+ Wed, 03 Feb 2021 21:17:09 -0800 (PST)
 MIME-Version: 1.0
+From:   Kenny Bian <kennybian@gmail.com>
+Date:   Wed, 3 Feb 2021 21:16:58 -0800
+Message-ID: <CAC9s0NaGXXVcZ_mDf9=QFp18BT7Ke-nduUCgx9u4zMOxuW0yeA@mail.gmail.com>
+Subject: How to disable cache?
+To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.175.127.227]
-X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix follow warning:
-drivers/bluetooth/btusb.c:3479:9: warning: variable ‘fw_size’ set but not used [-Wunused-but-set-variable]
-  size_t fw_size;
-         ^~~~~~~
-drivers/bluetooth/btusb.c:3473:29: warning: variable ‘patchhdr’ set but not used [-Wunused-but-set-variable]
-  struct btmtk_patch_header *patchhdr = NULL;
-                             ^~~~~~~~
+Hello,
 
-Reported-by: Hulk Robot <hulkci@huawei.com>
-Signed-off-by: Ye Bin <yebin10@huawei.com>
----
- drivers/bluetooth/btusb.c | 4 ----
- 1 file changed, 4 deletions(-)
+In "/etc/bluetooth/main.conf", there seems a way to disable the cache:
+[GATT]
+Cache = no
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index eeafb8432c0f..9609b6cbf20f 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3470,13 +3470,11 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- static int btusb_mtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname)
- {
- 	struct btmtk_hci_wmt_params wmt_params;
--	struct btmtk_patch_header *patchhdr = NULL;
- 	struct btmtk_global_desc *globaldesc = NULL;
- 	struct btmtk_section_map *sectionmap;
- 	const struct firmware *fw;
- 	const u8 *fw_ptr;
- 	const u8 *fw_bin_ptr;
--	size_t fw_size;
- 	int err, dlen, i, status;
- 	u8 flag, first_block, retry;
- 	u32 section_num, dl_size, section_offset;
-@@ -3490,8 +3488,6 @@ static int btusb_mtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwnam
- 
- 	fw_ptr = fw->data;
- 	fw_bin_ptr = fw_ptr;
--	fw_size = fw->size;
--	patchhdr = (struct btmtk_patch_header *)fw_ptr;
- 	globaldesc = (struct btmtk_global_desc *)(fw_ptr + MTK_FW_ROM_PATCH_HEADER_SIZE);
- 	section_num = globaldesc->section_num;
- 
--- 
-2.25.4
+What does exactly the "disable cache" mean? It means the
+"/var/lib/bluetooth/[MAC_ADDRESS]/cache" folder won't be created?
 
+We tried to disable the cache by changing the
+"/etc/bluetooth/main.conf". It seems the
+"/var/lib/bluetooth/[MAC_ADDRESS]/cache" folder is still created even
+if it was deleted.
+However, we noticed that the "[Attributes]" section in
+"/var/lib/bluetooth/[MAC_ADDRESS]/cache/[iPHONE_MAC]" file is gone.
+Does it mean the "disable cache" is working? Does it mean the handles
+used between the bluetooth and the mobile app won't be cached?
+
+Thanks!
