@@ -2,107 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A97CC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 04:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F01C1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 13:31:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AD3164FC2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 04:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E46464E0B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 13:31:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230127AbhBEEkp (ORCPT
+        id S229731AbhBENa4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Feb 2021 23:40:45 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39804 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhBEEkl (ORCPT
+        Fri, 5 Feb 2021 08:30:56 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:59746 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229991AbhBEN2h (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Feb 2021 23:40:41 -0500
-Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC1CC0613D6
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Feb 2021 20:40:01 -0800 (PST)
-Received: by mail-qk1-x732.google.com with SMTP id r77so5733642qka.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Feb 2021 20:40:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=hAVPqFw6vu+ZlUjp4Qcu+3QbQRQMEHH8y7kbRktmSnk=;
-        b=ZxZTvFe+rZ6wI0NwdzhuA+hRAZ2IpRV1qKrcN5mn2TNcvp/QJVmIQ99VgpBI7Tvnoi
-         lx8/GudZyvk6Zl6GMP3+VPw7SPxnEA7rW4rWEmADTE02Wz3RfWTQgiMcUP0J9rKNQgco
-         nnxDk+j3K4fnVfE0vAe/Xda/E2a5StuQmwTGVd7wf7E9qtxthuJ6mnJ9MZlNXTBUf++R
-         sxUBy9Fn4rpvFyvhEoDzB8R2kQKrD1QsGwKZqSS4s8U2bNeCvRg3VH55WzrS0cwOfowZ
-         G2fpeQ68zVh01CuGQjVeqn3KXKdXZtXby4E0rJKsLqHdNzrwHrTyCpzoZb2BV2RF3fbR
-         2VbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=hAVPqFw6vu+ZlUjp4Qcu+3QbQRQMEHH8y7kbRktmSnk=;
-        b=nSFCEAl7QIzeI9ExjQEXjfhEnOCORl4+DB8UpxyV5H8ySvi77iyMDiWX7IVZJ4LCO9
-         PO/mruJ8lFYRKm9B+6IdwecmN9eu9dZKB90QZI7SxXAjMceseKYReF145drq0g08TMW9
-         LPUnChEgOkdQTOB1sPy0E+dlUN3+Kx6VFjObKqR5jlTSzazY4pwB4DOK+yJdhWXkRECZ
-         MevdtrfUqaUyKUnv/VKdcMpgdFNu9Ta0XwFJ6ZEM2+jwJ/kPSHbK3dZQJk9lLLVQH9V+
-         /ttfoE7u8oZkFS9LZyV15s/eNok8wazgcOXFacjT1Rv3Uvgg4Jbn1vQTimCGJ1kc8ekI
-         2zhw==
-X-Gm-Message-State: AOAM532XfRzcGcZdEmqJHEqfm09aze4+AmrBvFErMx222gM9q5DeLc8I
-        M2C3nieumw7AmnndpXgD8rO8XlN9aiiz1w==
-X-Google-Smtp-Source: ABdhPJzo8wNUhIfDgDC88+YPV6VWfYtBCUMnQXE3av7bGA9ofV/NNSttS99cVBW3etiQqGIuhtzHDw==
-X-Received: by 2002:a37:5c3:: with SMTP id 186mr2717729qkf.32.1612500000650;
-        Thu, 04 Feb 2021 20:40:00 -0800 (PST)
-Received: from [172.17.0.2] ([13.77.78.126])
-        by smtp.gmail.com with ESMTPSA id h8sm6558041qtm.5.2021.02.04.20.39.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 04 Feb 2021 20:39:59 -0800 (PST)
-Message-ID: <601ccc1f.1c69fb81.4084.e3cb@mx.google.com>
-Date:   Thu, 04 Feb 2021 20:39:59 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1382273541480888672=="
+        Fri, 5 Feb 2021 08:28:37 -0500
+Received: from [123.112.66.2] (helo=[192.168.0.103])
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <hui.wang@canonical.com>)
+        id 1l818T-0001op-RB; Fri, 05 Feb 2021 13:26:58 +0000
+Subject: Re: [PATCH] Bluetooth: btusb: Add a parameter to load fw forcibly for
+ Intel BT
+From:   Hui Wang <hui.wang@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+References: <20201130052753.111742-1-hui.wang@canonical.com>
+ <116CA1BC-A38E-4622-99D7-91C7DF6EA463@holtmann.org>
+ <efdddc31-bf46-42e6-8edd-710835ed3f4b@canonical.com>
+Message-ID: <10c5e78c-3f07-2891-cbeb-7130ec5d7895@canonical.com>
+Date:   Fri, 5 Feb 2021 21:26:50 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v1] a2dp: set session to NULL when freeing channel
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210205114735.Bluez.v1.1.I68cf9b7c0c0c3c0e069011976e3008ff11374a28@changeid>
-References: <20210205114735.Bluez.v1.1.I68cf9b7c0c0c3c0e069011976e3008ff11374a28@changeid>
+In-Reply-To: <efdddc31-bf46-42e6-8edd-710835ed3f4b@canonical.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1382273541480888672==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=428439
-
----Test result---
-
-##############################
-Test: CheckPatch - PASS
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
 
 
+>>>
+>>>     /* controller is already having an operational firmware */
+>>> -    if (ver.fw_variant == 0x23)
+>>> +    if (ver.fw_variant == 0x23) {
+>>> +        if (force_load_fw) {
+>>> +            btintel_reset_to_bootloader(hdev);
+>>> +            force_load_fw = false;
+>>> +            return -EAGAIN;
+>>> +        }
+>>> +        bt_dev_info(hdev, "already in operational mode, not load 
+>>> fw. Set force_load_fw=1 to load fw forcibly");
+>>>         goto finish;
+>>> +    }
+>> I don’t like this approach. I rather do this in a more generic way 
+>> that resets the controller and puts it into boot loader support if 
+>> support. We can use the experimental mgmt setting for this.
+> OK, got it, will investigate it. Thanks.
 
----
-Regards,
-Linux Bluetooth
+Hi Marcel,
 
+Do you mean use experimental features in the mgmt? Recently I read the 
+mgmt exp_features related code, looks like the userspace tool btmgmt 
+only supports 2 commands so far, they are expinfo and exp-debug, it 
+looks like expinfo read some info from kernel, exp-debug set one bool 
+value to kernel, but exp-debug sends the hard-coded uuid to kernel, my 
+understanding is this could only set FEATURE_DEBUG. If i add a new 
+feature like reset_controller_to_bootloader, I can't call it through 
+expinfo or exp-debug.
 
---===============1382273541480888672==--
+And the kernel commit (cbbdfa6f3319 Bluetooth: Enable controller RPA 
+resolution using Experimental feature) add a new feature, how to set 
+this feature via expinfo and exp-debug or some userspace tool?
+
+Thanks,
+
+Hui.
+
+>>
+>> Regards
+>>
+>> Marcel
+>>
