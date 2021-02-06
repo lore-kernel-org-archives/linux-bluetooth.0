@@ -2,44 +2,43 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EB594C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 04:47:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A8FC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 04:48:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF70564F97
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 04:47:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8DA9E64DFF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 04:48:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231432AbhBFErG (ORCPT
+        id S230184AbhBFErj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Feb 2021 23:47:06 -0500
-Received: from mga14.intel.com ([192.55.52.115]:19905 "EHLO mga14.intel.com"
+        Fri, 5 Feb 2021 23:47:39 -0500
+Received: from mga14.intel.com ([192.55.52.115]:19906 "EHLO mga14.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231330AbhBFEou (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Feb 2021 23:44:50 -0500
-IronPort-SDR: +2+/YJYkvYpT2jIJmgqdq/VGW5dc9PTHVq8wyWXOHXWpCXuHJ7RXZ+yXkWw7SWGHF3Mn3A1kCa
- vPT/gLpgoASQ==
-X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="180745501"
+        id S231348AbhBFEov (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 5 Feb 2021 23:44:51 -0500
+IronPort-SDR: 83sC6r8QzRjcBb7NwgpuCeCsVE4AJCfmrrJnOeO9GPRUmYszCpoiDrjheS+LbY1KffZ05rV3Zp
+ BCvdE6dC3YDw==
+X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="180745503"
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="180745501"
+   d="scan'208";a="180745503"
 Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 20:43:58 -0800
-IronPort-SDR: b1tt8ciO0Hh/IzwE1guo+yzp1CTMx2fpTOpgY0cOjfvtgVr/D2U7J+KJ5eIMAjgkYsNXc1j1Ce
- 6LD+o41Wj+ig==
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 20:43:59 -0800
+IronPort-SDR: xXcjnZcn02AP7Zy/n47PbfcR+DqVpiEc3NZWuRgusN5YOzODmHRDPuzyW0HWHO9lI+7fWRpctO
+ F3Umhlv4Eufg==
 X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
-   d="scan'208";a="484717251"
+   d="scan'208";a="484717255"
 Received: from yxiong5-mobl2.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.99.79])
-  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 20:43:58 -0800
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 20:43:59 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, luiz.dentz@gmail.com,
-        Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ v2 1/3] shared/tester: Create ell-based version of tester code
-Date:   Fri,  5 Feb 2021 20:43:38 -0800
-Message-Id: <20210206044340.396467-2-inga.stotland@intel.com>
+Cc:     brian.gix@intel.com, luiz.dentz@gmail.com
+Subject: [PATCH BlueZ v2 2/3] mesh: Add unit test IO
+Date:   Fri,  5 Feb 2021 20:43:39 -0800
+Message-Id: <20210206044340.396467-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210206044340.396467-1-inga.stotland@intel.com>
 References: <20210206044340.396467-1-inga.stotland@intel.com>
@@ -49,60 +48,144 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Create a version of tester that uses ell primitives instead of glib:
-tester-ell.c. This source is included to generate lishared-ell library.
-The original tester.c is built as part of libshared-glib library.
----
- Makefile.am             |   8 +-
- src/shared/tester-ell.c | 887 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 892 insertions(+), 3 deletions(-)
- create mode 100644 src/shared/tester-ell.c
+From: Brian Gix <brian.gix@intel.com>
 
-diff --git a/Makefile.am b/Makefile.am
-index d0f979586..5fa9706c8 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -189,7 +189,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
- 			src/shared/crypto.h src/shared/crypto.c \
- 			src/shared/ecc.h src/shared/ecc.c \
- 			src/shared/ringbuf.h src/shared/ringbuf.c \
--			src/shared/tester.h src/shared/tester.c \
-+			src/shared/tester.h\
- 			src/shared/hci.h src/shared/hci.c \
- 			src/shared/hci-crypto.h src/shared/hci-crypto.c \
- 			src/shared/hfp.h src/shared/hfp.c \
-@@ -216,7 +216,8 @@ src_libshared_glib_la_SOURCES = $(shared_sources) \
- 				src/shared/timeout-glib.c \
- 				src/shared/mainloop-glib.c \
- 				src/shared/mainloop-notify.h \
--				src/shared/mainloop-notify.c
-+				src/shared/mainloop-notify.c \
-+				src/shared/tester.c
+This adds a new type of mesh IO that is used for non-interactive testing.
+The new io option can be specified on command line as:
+--io unit:<socket_name>
+
+When the bluetooth-meshd daemon starts with the "unit" IO type,
+the daemon opens a socket (fd to open is provided after "unit:"
+in <socket_name>). The communication with the daemon is done either
+through the loop-back using mesh DBus-based APIs or the specified
+named socket.
+---
+ Makefile.mesh       |   2 +
+ mesh/main.c         |  41 +++-
+ mesh/mesh-io-unit.c | 533 ++++++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-io-unit.h |  20 ++
+ mesh/mesh-io.c      |   9 +-
+ mesh/mesh-io.h      |   3 +-
+ 6 files changed, 591 insertions(+), 17 deletions(-)
+ create mode 100644 mesh/mesh-io-unit.c
+ create mode 100644 mesh/mesh-io-unit.h
+
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 228dd1b5f..73eaded4a 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -17,6 +17,8 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/error.h mesh/mesh-io-api.h \
+ 				mesh/mesh-io-generic.h \
+ 				mesh/mesh-io-generic.c \
++				mesh/mesh-io-unit.h \
++				mesh/mesh-io-unit.c \
+ 				mesh/net.h mesh/net.c \
+ 				mesh/crypto.h mesh/crypto.c \
+ 				mesh/friend.h mesh/friend.c \
+diff --git a/mesh/main.c b/mesh/main.c
+index 4356e3f65..1b466598b 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -61,7 +61,7 @@ static void usage(void)
+ 	       "\t--help            Show %s information\n", __func__);
+ 	fprintf(stderr,
+ 	       "io:\n"
+-	       "\t([hci]<index> | generic[:[hci]<index>])\n"
++	       "\t([hci]<index> | generic[:[hci]<index>] | unit:<fd_path>)\n"
+ 	       "\t\tUse generic HCI io on interface hci<index>, or the first\n"
+ 	       "\t\tavailable one\n");
+ }
+@@ -77,6 +77,7 @@ static void mesh_ready_callback(void *user_data, bool success)
+ {
+ 	struct l_dbus *dbus = user_data;
  
- src_libshared_mainloop_la_SOURCES = $(shared_sources) \
- 				src/shared/io-mainloop.c \
-@@ -230,7 +231,8 @@ src_libshared_ell_la_SOURCES = $(shared_sources) \
- 				src/shared/io-ell.c \
- 				src/shared/timeout-ell.c \
- 				src/shared/mainloop.h \
--				src/shared/mainloop-ell.c
-+				src/shared/mainloop-ell.c \
-+				src/shared/tester-ell.c
- endif
++	l_info("mesh_ready_callback");
+ 	if (!success) {
+ 		l_error("Failed to start mesh");
+ 		l_main_quit();
+@@ -92,10 +93,8 @@ static void mesh_ready_callback(void *user_data, bool success)
+ static void request_name_callback(struct l_dbus *dbus, bool success,
+ 					bool queued, void *user_data)
+ {
+-	l_info("Request name %s",
+-		success ? "success": "failed");
+-
+-	if (!success) {
++	if (!success && io_type != MESH_IO_TYPE_UNIT_TEST) {
++		l_info("Request name failed");
+ 		l_main_quit();
+ 		return;
+ 	}
+@@ -159,6 +158,21 @@ static bool parse_io(const char *optarg, enum mesh_io_type *type, void **opts)
+ 			return true;
  
- attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
-diff --git a/src/shared/tester-ell.c b/src/shared/tester-ell.c
+ 		return false;
++
++	} else if (strstr(optarg, "unit") == optarg) {
++		char *test_path;
++
++		*type = MESH_IO_TYPE_UNIT_TEST;
++
++		optarg += strlen("unit");
++		if (*optarg != ':')
++			return false;
++
++		optarg++;
++		test_path = strdup(optarg);
++
++		*opts = test_path;
++		return true;
+ 	}
+ 
+ 	return false;
+@@ -187,11 +201,19 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "i:s:c:ndbh", main_options, NULL);
++		opt = getopt_long(argc, argv, "u:i:s:c:ndbh", main_options,
++									NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+ 		switch (opt) {
++		case 'u':
++			if (sscanf(optarg, "%d", &hci_index) == 1 ||
++					sscanf(optarg, "%d", &hci_index) == 1)
++				io = l_strdup_printf("unit:%d", hci_index);
++			else
++				io = l_strdup(optarg);
++			break;
+ 		case 'i':
+ 			if (sscanf(optarg, "hci%d", &hci_index) == 1 ||
+ 					sscanf(optarg, "%d", &hci_index) == 1)
+@@ -261,11 +283,8 @@ int main(int argc, char *argv[])
+ 	status = l_main_run_with_signal(signal_handler, NULL);
+ 
+ done:
+-	if (io)
+-		l_free(io);
+-
+-	if (io_opts)
+-		l_free(io_opts);
++	l_free(io);
++	l_free(io_opts);
+ 
+ 	mesh_cleanup();
+ 	l_dbus_destroy(dbus);
+diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
 new file mode 100644
-index 000000000..6fa7e5250
+index 000000000..c5aae6741
 --- /dev/null
-+++ b/src/shared/tester-ell.c
-@@ -0,0 +1,887 @@
++++ b/mesh/mesh-io-unit.c
+@@ -0,0 +1,533 @@
 +// SPDX-License-Identifier: LGPL-2.1-or-later
 +/*
 + *
 + *  BlueZ - Bluetooth protocol stack for Linux
 + *
-+ *  Copyright (C) 2012-2014, 2021  Intel Corporation. All rights reserved.
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
 + *
 + *
 + */
@@ -111,879 +194,597 @@ index 000000000..6fa7e5250
 +#include <config.h>
 +#endif
 +
-+#define _GNU_SOURCE
-+#include <getopt.h>
-+#include <stdio.h>
 +#include <errno.h>
-+#include <syslog.h>
-+#include <unistd.h>
-+#include <stdlib.h>
 +#include <string.h>
-+#include <signal.h>
-+#include <sys/signalfd.h>
-+#include <sys/socket.h>
 +#include <sys/time.h>
-+
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
++#include <stdio.h>
 +#include <ell/ell.h>
 +
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
++#include "mesh/mesh-defs.h"
++#include "mesh/dbus.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh-io-api.h"
++#include "mesh/mesh-io-generic.h"
 +
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+#include <valgrind/memcheck.h>
-+#endif
-+
-+#include "src/shared/mainloop.h"
-+#include "src/shared/util.h"
-+#include "src/shared/tester.h"
-+#include "src/shared/log.h"
-+
-+#define COLOR_OFF	"\x1B[0m"
-+#define COLOR_BLACK	"\x1B[0;30m"
-+#define COLOR_RED	"\x1B[0;31m"
-+#define COLOR_GREEN	"\x1B[0;32m"
-+#define COLOR_YELLOW	"\x1B[0;33m"
-+#define COLOR_BLUE	"\x1B[0;34m"
-+#define COLOR_MAGENTA	"\x1B[0;35m"
-+#define COLOR_CYAN	"\x1B[0;36m"
-+#define COLOR_WHITE	"\x1B[0;37m"
-+#define COLOR_HIGHLIGHT	"\x1B[1;39m"
-+
-+#define print_text(color, fmt, args...) \
-+		tester_log(color fmt COLOR_OFF, ## args)
-+
-+#define print_summary(label, color, value, fmt, args...) \
-+		tester_log("%-52s " color "%-10s" COLOR_OFF fmt, \
-+							label, value, ## args)
-+
-+#define print_progress(name, color, fmt, args...) \
-+		tester_log(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
-+				color fmt COLOR_OFF, name, ## args)
-+
-+enum test_result {
-+	TEST_RESULT_NOT_RUN,
-+	TEST_RESULT_PASSED,
-+	TEST_RESULT_FAILED,
-+	TEST_RESULT_TIMED_OUT,
-+};
-+
-+enum test_stage {
-+	TEST_STAGE_INVALID,
-+	TEST_STAGE_PRE_SETUP,
-+	TEST_STAGE_SETUP,
-+	TEST_STAGE_RUN,
-+	TEST_STAGE_TEARDOWN,
-+	TEST_STAGE_POST_TEARDOWN,
-+};
-+
-+struct test_case {
-+	char *name;
-+	enum test_result result;
-+	enum test_stage stage;
-+	const void *test_data;
-+	tester_data_func_t pre_setup_func;
-+	tester_data_func_t setup_func;
-+	tester_data_func_t test_func;
-+	tester_data_func_t teardown_func;
-+	tester_data_func_t post_teardown_func;
-+	double start_time;
-+	double end_time;
-+	unsigned int timeout;
-+	struct l_timeout *run_timer;
-+	tester_destroy_func_t destroy;
++struct mesh_io_private {
++	struct l_io *sio;
 +	void *user_data;
-+	bool teardown;
++	char *unique_name;
++	mesh_io_ready_func_t ready_callback;
++	struct l_timeout *tx_timeout;
++	struct l_queue *rx_regs;
++	struct l_queue *tx_pkts;
++	struct sockaddr_un addr;
++	int fd;
++	uint16_t interval;
 +};
 +
-+static char *tester_name;
-+
-+static struct l_queue *test_list;
-+static const struct l_queue_entry *test_entry;
-+static struct timeval tester_start;
-+
-+static bool option_quiet;
-+static bool option_debug;
-+static bool option_monitor;
-+static bool option_list;
-+static const char *option_prefix;
-+static const char *option_string;
-+
-+static bool terminated;
-+
-+struct monitor_hdr {
-+	uint16_t opcode;
-+	uint16_t index;
-+	uint16_t len;
-+	uint8_t  priority;
-+	uint8_t  ident_len;
-+} __attribute__((packed));
-+
-+struct monitor_l2cap_hdr {
-+	uint16_t cid;
-+	uint16_t psm;
-+} __attribute__((packed));
-+
-+static void test_destroy(void *data)
-+{
-+	struct test_case *test = data;
-+
-+	l_timeout_remove(test->run_timer);
-+
-+	if (test->destroy)
-+		test->destroy(test->user_data);
-+
-+	l_free(test->name);
-+	l_free(test);
-+}
-+
-+static void tester_vprintf(const char *format, va_list ap)
-+{
-+	if (tester_use_quiet())
-+		return;
-+
-+	printf("  %s", COLOR_WHITE);
-+	vprintf(format, ap);
-+	printf("%s\n", COLOR_OFF);
-+}
-+
-+static void tester_log(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	vprintf(format, ap);
-+	printf("\n");
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
-+	va_end(ap);
-+}
-+
-+void tester_print(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
-+	va_end(ap);
-+}
-+
-+void tester_debug(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_DEBUG, format, ap);
-+	va_end(ap);
-+}
-+
-+void tester_warn(const char *format, ...)
-+{
-+	va_list ap;
-+
-+	va_start(ap, format);
-+	tester_vprintf(format, ap);
-+	va_end(ap);
-+
-+	va_start(ap, format);
-+	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_WARNING, format, ap);
-+	va_end(ap);
-+}
-+
-+static void monitor_debug(const char *str, void *user_data)
-+{
-+	const char *label = user_data;
-+
-+	tester_debug("%s: %s", label, str);
-+}
-+
-+static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	struct iovec iov[3];
-+	struct monitor_l2cap_hdr hdr;
-+	uint8_t term = 0x00;
-+	char label[16];
-+
-+	if (snprintf(label, sizeof(label), "%c %s", dir, tester_name) < 0)
-+		return;
-+
-+	hdr.cid = cpu_to_le16(cid);
-+	hdr.psm = cpu_to_le16(psm);
-+
-+	iov[0].iov_base = &hdr;
-+	iov[0].iov_len = sizeof(hdr);
-+
-+	iov[1].iov_base = (void *) data;
-+	iov[1].iov_len = len;
-+
-+	/* Kernel won't forward if data is no NULL terminated */
-+	iov[2].iov_base = &term;
-+	iov[2].iov_len = sizeof(term);
-+
-+	bt_log_sendmsg(HCI_DEV_NONE, label, LOG_INFO, iov, 3);
-+}
-+
-+void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
-+								size_t len)
-+{
-+	monitor_log(dir, cid, psm, data, len);
-+
-+	if (!tester_use_debug())
-+		return;
-+
-+	util_hexdump(dir, data, len, monitor_debug, (void *) tester_name);
-+}
-+
-+static void default_pre_setup(const void *test_data)
-+{
-+	tester_pre_setup_complete();
-+}
-+
-+static void default_setup(const void *test_data)
-+{
-+	tester_setup_complete();
-+}
-+
-+static void default_teardown(const void *test_data)
-+{
-+	tester_teardown_complete();
-+}
-+
-+static void default_post_teardown(const void *test_data)
-+{
-+	tester_post_teardown_complete();
-+}
-+
-+void tester_add_full(const char *name, const void *test_data,
-+				tester_data_func_t pre_setup_func,
-+				tester_data_func_t setup_func,
-+				tester_data_func_t test_func,
-+				tester_data_func_t teardown_func,
-+				tester_data_func_t post_teardown_func,
-+				unsigned int timeout,
-+				void *user_data, tester_destroy_func_t destroy)
-+{
-+	struct test_case *test;
-+
-+	if (!test_func)
-+		return;
-+
-+	if (option_prefix && !l_str_has_prefix(name, option_prefix)) {
-+		if (destroy)
-+			destroy(user_data);
-+		return;
-+	}
-+
-+	if (option_string && !strstr(name, option_string)) {
-+		if (destroy)
-+			destroy(user_data);
-+		return;
-+	}
-+
-+	if (option_list) {
-+		tester_log("%s", name);
-+		if (destroy)
-+			destroy(user_data);
-+		return;
-+	}
-+
-+	test = l_new(struct test_case, 1);
-+	test->name = l_strdup(name);
-+	test->result = TEST_RESULT_NOT_RUN;
-+	test->stage = TEST_STAGE_INVALID;
-+
-+	test->test_data = test_data;
-+
-+	if (pre_setup_func)
-+		test->pre_setup_func = pre_setup_func;
-+	else
-+		test->pre_setup_func = default_pre_setup;
-+
-+	if (setup_func)
-+		test->setup_func = setup_func;
-+	else
-+		test->setup_func = default_setup;
-+
-+	test->test_func = test_func;
-+
-+	if (teardown_func)
-+		test->teardown_func = teardown_func;
-+	else
-+		test->teardown_func = default_teardown;
-+
-+	if (post_teardown_func)
-+		test->post_teardown_func = post_teardown_func;
-+	else
-+		test->post_teardown_func = default_post_teardown;
-+
-+	test->timeout = timeout;
-+
-+	test->destroy = destroy;
-+	test->user_data = user_data;
-+
-+	l_queue_push_tail(test_list, test);
-+}
-+
-+void tester_add(const char *name, const void *test_data,
-+					tester_data_func_t setup_func,
-+					tester_data_func_t test_func,
-+					tester_data_func_t teardown_func)
-+{
-+	tester_add_full(name, test_data, NULL, setup_func, test_func,
-+					teardown_func, NULL, 0, NULL, NULL);
-+}
-+
-+void *tester_get_data(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return NULL;
-+
-+	test = test_entry->data;
-+
-+	return test->user_data;
-+}
-+
-+static double get_elapsed_time(struct timeval *base)
-+{
-+	static struct timeval now, elapsed;
-+
-+	gettimeofday(&now, NULL);
-+	timersub(&now, base, &elapsed);
-+
-+	return elapsed.tv_sec + ((double) elapsed.tv_usec) / 1000000;
-+}
-+
-+static int tester_summarize(void)
-+{
-+	unsigned int not_run = 0, passed = 0, failed = 0;
-+	double execution_time;
-+	const struct l_queue_entry *entry;
-+
-+	tester_log("");
-+	print_text(COLOR_HIGHLIGHT, "");
-+	print_text(COLOR_HIGHLIGHT, "Test Summary");
-+	print_text(COLOR_HIGHLIGHT, "------------");
-+
-+	entry = l_queue_get_entries(test_list);
-+
-+	for (; entry; entry = entry->next) {
-+		struct test_case *test = entry->data;
-+		double exec_time;
-+
-+		exec_time = test->end_time - test->start_time;
-+
-+		switch (test->result) {
-+		case TEST_RESULT_NOT_RUN:
-+			print_summary(test->name, COLOR_YELLOW, "Not Run", "");
-+			not_run++;
-+			break;
-+		case TEST_RESULT_PASSED:
-+			print_summary(test->name, COLOR_GREEN, "Passed",
-+						"%8.3f seconds", exec_time);
-+			passed++;
-+			break;
-+		case TEST_RESULT_FAILED:
-+			print_summary(test->name, COLOR_RED, "Failed",
-+						"%8.3f seconds", exec_time);
-+			failed++;
-+			break;
-+		case TEST_RESULT_TIMED_OUT:
-+			print_summary(test->name, COLOR_RED, "Timed out",
-+						"%8.3f seconds", exec_time);
-+			failed++;
-+			break;
-+		}
-+	}
-+
-+	tester_log("Total: %d, "
-+		COLOR_GREEN "Passed: %d (%.1f%%)" COLOR_OFF ", "
-+		COLOR_RED "Failed: %d" COLOR_OFF ", "
-+		COLOR_YELLOW "Not Run: %d" COLOR_OFF,
-+			not_run + passed + failed, passed,
-+			(not_run + passed + failed) ?
-+			(float) passed * 100 / (not_run + passed + failed) : 0,
-+			failed, not_run);
-+
-+	execution_time = get_elapsed_time(&tester_start);
-+	tester_log("Overall execution time: %.3g seconds", execution_time);
-+
-+	return failed;
-+}
-+
-+static void teardown_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->stage = TEST_STAGE_TEARDOWN;
-+	test->teardown = false;
-+
-+	print_progress(test->name, COLOR_MAGENTA, "teardown");
-+	test->teardown_func(test->test_data);
-+
-+#ifdef HAVE_VALGRIND_MEMCHECK_H
-+	VALGRIND_DO_ADDED_LEAK_CHECK;
-+#endif
-+}
-+
-+static void test_timeout(struct l_timeout *timer, void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	l_timeout_remove(timer);
-+	test->run_timer = NULL;
-+
-+	test->result = TEST_RESULT_TIMED_OUT;
-+	print_progress(test->name, COLOR_RED, "test timed out");
-+
-+	l_idle_oneshot(teardown_callback, test, NULL);
-+}
-+
-+static void next_test_case(void)
-+{
-+	struct test_case *test;
-+
-+	if (test_entry)
-+		test_entry = test_entry->next;
-+	else
-+		test_entry = l_queue_get_entries(test_list);
-+
-+	if (!test_entry) {
-+		mainloop_quit();
-+		return;
-+	}
-+
-+	test = test_entry->data;
-+
-+	tester_log("");
-+	print_progress(test->name, COLOR_BLACK, "init");
-+
-+	test->start_time = get_elapsed_time(&tester_start);
-+
-+	if (test->timeout > 0)
-+		test->run_timer = l_timeout_create(test->timeout, test_timeout,
-+								test, NULL);
-+
-+	test->stage = TEST_STAGE_PRE_SETUP;
-+
-+	test->pre_setup_func(test->test_data);
-+}
-+
-+static void setup_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->stage = TEST_STAGE_SETUP;
-+
-+	print_progress(test->name, COLOR_BLUE, "setup");
-+	test->setup_func(test->test_data);
-+}
-+
-+static void run_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->stage = TEST_STAGE_RUN;
-+
-+	print_progress(test->name, COLOR_BLACK, "run");
-+	test->test_func(test->test_data);
-+}
-+
-+static void done_callback(void *user_data)
-+{
-+	struct test_case *test = user_data;
-+
-+	test->end_time = get_elapsed_time(&tester_start);
-+
-+	print_progress(test->name, COLOR_BLACK, "done");
-+	next_test_case();
-+}
-+
-+void tester_pre_setup_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_PRE_SETUP)
-+		return;
-+
-+	l_idle_oneshot(setup_callback, test, NULL);
-+}
-+
-+void tester_pre_setup_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_PRE_SETUP)
-+		return;
-+
-+	print_progress(test->name, COLOR_RED, "pre setup failed");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+void tester_setup_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_SETUP)
-+		return;
-+
-+	print_progress(test->name, COLOR_BLUE, "setup complete");
-+
-+	l_idle_oneshot(run_callback, test, NULL);
-+}
-+
-+void tester_setup_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_SETUP)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	l_timeout_remove(test->run_timer);
-+	test->run_timer = NULL;
-+
-+	print_progress(test->name, COLOR_RED, "setup failed");
-+	print_progress(test->name, COLOR_MAGENTA, "teardown");
-+
-+	test->post_teardown_func(test->test_data);
-+}
-+
-+static void test_result(enum test_result result)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_RUN)
-+		return;
-+
-+	l_timeout_remove(test->run_timer);
-+	test->run_timer = NULL;
-+
-+	test->result = result;
-+	switch (result) {
-+	case TEST_RESULT_PASSED:
-+		print_progress(test->name, COLOR_GREEN, "test passed");
-+		break;
-+	case TEST_RESULT_FAILED:
-+		print_progress(test->name, COLOR_RED, "test failed");
-+		break;
-+	case TEST_RESULT_NOT_RUN:
-+		print_progress(test->name, COLOR_YELLOW, "test not run");
-+		break;
-+	case TEST_RESULT_TIMED_OUT:
-+		print_progress(test->name, COLOR_RED, "test timed out");
-+		break;
-+	}
-+
-+	if (test->teardown)
-+		return;
-+
-+	test->teardown = true;
-+
-+	l_idle_oneshot(teardown_callback, test, NULL);
-+}
-+
-+void tester_test_passed(void)
-+{
-+	test_result(TEST_RESULT_PASSED);
-+}
-+
-+void tester_test_failed(void)
-+{
-+	test_result(TEST_RESULT_FAILED);
-+}
-+
-+void tester_test_abort(void)
-+{
-+	test_result(TEST_RESULT_NOT_RUN);
-+}
-+
-+void tester_teardown_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_TEARDOWN)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	test->post_teardown_func(test->test_data);
-+}
-+
-+void tester_teardown_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_TEARDOWN)
-+		return;
-+
-+	test->stage = TEST_STAGE_POST_TEARDOWN;
-+
-+	tester_post_teardown_failed();
-+}
-+
-+void tester_post_teardown_complete(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_POST_TEARDOWN)
-+		return;
-+
-+	print_progress(test->name, COLOR_MAGENTA, "teardown complete");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+void tester_post_teardown_failed(void)
-+{
-+	struct test_case *test;
-+
-+	if (!test_entry)
-+		return;
-+
-+	test = test_entry->data;
-+
-+	if (test->stage != TEST_STAGE_POST_TEARDOWN)
-+		return;
-+
-+	print_progress(test->name, COLOR_RED, "teardown failed");
-+
-+	l_idle_oneshot(done_callback, test, NULL);
-+}
-+
-+static void start_tester(void *user_data)
-+{
-+	gettimeofday(&tester_start, NULL);
-+	next_test_case();
-+}
-+
-+struct wait_data {
-+	unsigned int seconds;
-+	struct test_case *test;
-+	tester_wait_func_t func;
++struct pvt_rx_reg {
++	mesh_io_recv_func_t cb;
 +	void *user_data;
++	uint8_t len;
++	uint8_t filter[0];
 +};
 +
-+static void wait_callback(struct l_timeout *timer, void *user_data)
++struct process_data {
++	struct mesh_io_private		*pvt;
++	const uint8_t			*data;
++	uint8_t				len;
++	struct mesh_io_recv_info	info;
++};
++
++struct tx_pkt {
++	struct mesh_io_send_info	info;
++	bool				delete;
++	uint8_t				len;
++	uint8_t				pkt[30];
++};
++
++struct tx_pattern {
++	const uint8_t			*data;
++	uint8_t				len;
++};
++
++static uint32_t get_instant(void)
 +{
-+	struct wait_data *wait = user_data;
-+	struct test_case *test = wait->test;
++	struct timeval tm;
++	uint32_t instant;
 +
-+	wait->seconds--;
++	gettimeofday(&tm, NULL);
++	instant = tm.tv_sec * 1000;
++	instant += tm.tv_usec / 1000;
 +
-+	if (wait->seconds > 0) {
-+		print_progress(test->name, COLOR_BLACK, "%u seconds left",
-+								wait->seconds);
++	return instant;
++}
++
++static uint32_t instant_remaining_ms(uint32_t instant)
++{
++	instant -= get_instant();
++	return instant;
++}
++
++static void process_rx_callbacks(void *v_reg, void *v_rx)
++{
++	struct pvt_rx_reg *rx_reg = v_reg;
++	struct process_data *rx = v_rx;
++
++	if (!memcmp(rx->data, rx_reg->filter, rx_reg->len))
++		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
++}
++
++static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++					uint32_t instant, const uint8_t *addr,
++					const uint8_t *data, uint8_t len)
++{
++	struct process_data rx = {
++		.pvt = pvt,
++		.data = data,
++		.len = len,
++		.info.instant = instant,
++		.info.addr = addr,
++		.info.chan = 7,
++		.info.rssi = rssi,
++	};
++
++	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
++}
++
++static bool incoming(struct l_io *sio, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	uint32_t instant;
++	uint8_t buf[31];
++	size_t size;
++
++	instant = get_instant();
++
++	size = recv(pvt->fd, buf, sizeof(buf), MSG_DONTWAIT);
++
++	if (size > 9 && buf[0]) {
++		process_rx(pvt, -20, instant, NULL, buf + 1, (uint8_t)size);
++	} else if (size == 1 && !buf[0] && pvt->unique_name) {
++
++		/* Return DBUS unique name */
++		size = strlen(pvt->unique_name);
++
++		if (size > sizeof(buf) - 2)
++			return true;
++
++		buf[0] = 0;
++		memcpy(buf + 1, pvt->unique_name, size + 1);
++		send(pvt->fd, buf, size + 2, MSG_DONTWAIT);
++	}
++
++	return true;
++}
++
++static bool find_by_ad_type(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	uint8_t ad_type = L_PTR_TO_UINT(b);
++
++	return !ad_type || ad_type == tx->pkt[0];
++}
++
++static bool find_by_pattern(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	const struct tx_pattern *pattern = b;
++
++	if (tx->len < pattern->len)
++		return false;
++
++	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++}
++
++static void free_socket(struct mesh_io_private *pvt)
++{
++	l_io_destroy(pvt->sio);
++	close(pvt->fd);
++	unlink(pvt->addr.sun_path);
++}
++
++static void hello_callback(struct l_dbus_message *msg, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++
++	pvt->unique_name = l_strdup(l_dbus_message_get_destination(msg));
++	l_debug("User-Daemon unique name: %s", pvt->unique_name);
++}
++
++static void get_name(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++
++	l_timeout_remove(timeout);
++	if (!dbus) {
++		l_timeout_create_ms(20, get_name, pvt, NULL);
 +		return;
 +	}
 +
-+	print_progress(test->name, COLOR_BLACK, "waiting done");
++	/* Retrieve unique name */
++	msg = l_dbus_message_new_method_call(dbus, "org.freedesktop.DBus",
++							"/org/freedesktop/DBus",
++							"org.freedesktop.DBus",
++							"GetId");
 +
-+	wait->func(wait->user_data);
++	l_dbus_message_set_arguments(msg, "");
 +
-+	free(wait);
-+
-+	l_timeout_remove(timer);
++	l_dbus_send_with_reply(dbus, msg, hello_callback, pvt, NULL);
 +}
 +
-+void tester_wait(unsigned int seconds, tester_wait_func_t func,
-+							void *user_data)
++static void unit_up(void *user_data)
 +{
-+	struct test_case *test;
-+	struct wait_data *wait;
++	struct mesh_io_private *pvt = user_data;
 +
-+	if (!func || seconds < 1)
-+		return;
++	l_debug("Started io-unit");
 +
-+	if (!test_entry)
-+		return;
++	if (pvt->ready_callback)
++		pvt->ready_callback(pvt->user_data, true);
 +
-+	test = test_entry->data;
-+
-+	wait = new0(struct wait_data, 1);
-+	wait->seconds = seconds;
-+	wait->test = test;
-+	wait->func = func;
-+	wait->user_data = user_data;
-+
-+	l_timeout_create(seconds, wait_callback, wait, NULL);
-+
-+	print_progress(test->name, COLOR_BLACK, "waiting %u seconds", seconds);
++	l_timeout_create_ms(1, get_name, pvt, NULL);
 +}
 +
-+static void signal_callback(int signum, void *user_data)
++static bool unit_init(struct mesh_io *io, void *opt,
++				mesh_io_ready_func_t cb, void *user_data)
 +{
-+	switch (signum) {
-+	case SIGINT:
-+	case SIGTERM:
-+		if (!terminated)
-+			mainloop_quit();
++	struct mesh_io_private *pvt;
++	char *sk_path;
++	size_t size;
 +
-+		terminated = true;
-+		break;
++	l_debug("Starting Unit test IO");
++	if (!io || io->pvt)
++		return false;
++
++	sk_path = (char *) opt;
++
++	pvt = l_new(struct mesh_io_private, 1);
++
++	pvt->addr.sun_family = AF_LOCAL;
++	snprintf(pvt->addr.sun_path, sizeof(pvt->addr.sun_path), "%s",
++								sk_path);
++
++	pvt->fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++	if (pvt->fd < 0)
++		goto fail;
++
++	unlink(pvt->addr.sun_path);
++	size = offsetof(struct sockaddr_un, sun_path) +
++						strlen(pvt->addr.sun_path);
++
++	if (bind(pvt->fd, (struct sockaddr *) &pvt->addr, size) < 0)
++		goto fail;
++
++	/* Setup socket handlers */
++	pvt->sio = l_io_new(pvt->fd);
++	if (!l_io_set_read_handler(pvt->sio, incoming, pvt, NULL))
++		goto fail;
++
++	pvt->rx_regs = l_queue_new();
++	pvt->tx_pkts = l_queue_new();
++
++	pvt->ready_callback = cb;
++	pvt->user_data = user_data;
++
++	io->pvt = pvt;
++
++	l_idle_oneshot(unit_up, pvt, NULL);
++
++	return true;
++
++fail:
++	l_error("Failed to bind Unit Test socket");
++	free_socket(pvt);
++	l_free(pvt);
++
++	return false;
++}
++
++static bool unit_destroy(struct mesh_io *io)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt)
++		return true;
++
++	l_free(pvt->unique_name);
++	l_timeout_remove(pvt->tx_timeout);
++	l_queue_destroy(pvt->rx_regs, l_free);
++	l_queue_destroy(pvt->tx_pkts, l_free);
++
++	free_socket(pvt);
++
++	l_free(pvt);
++	io->pvt = NULL;
++
++	return true;
++}
++
++static bool unit_caps(struct mesh_io *io, struct mesh_io_caps *caps)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt || !caps)
++		return false;
++
++	caps->max_num_filters = 255;
++	caps->window_accuracy = 50;
++
++	return true;
++}
++
++static bool simple_match(const void *a, const void *b)
++{
++	return a == b;
++}
++
++static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
++							uint16_t interval)
++{
++	send(pvt->fd, tx->pkt, tx->len, MSG_DONTWAIT);
++
++	if (tx->delete) {
++		l_queue_remove_if(pvt->tx_pkts, simple_match, tx);
++		l_free(tx);
 +	}
 +}
 +
-+bool tester_use_quiet(void)
++static void tx_to(struct l_timeout *timeout, void *user_data)
 +{
-+	return option_quiet;
-+}
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint16_t ms;
++	uint8_t count;
 +
-+bool tester_use_debug(void)
-+{
-+	return option_debug;
-+}
++	if (!pvt)
++		return;
 +
-+static const struct option options[] = {
-+	{ "version",	no_argument,		NULL, 'v' },
-+	{ "quiet",	no_argument,		NULL, 'q' },
-+	{ "debug",	no_argument,		NULL, 'd' },
-+	{ "monitor",	no_argument,		NULL, 'm' },
-+	{ "list",	no_argument,		NULL, 'l' },
-+	{ "prefix",	required_argument,	NULL, 'p' },
-+	{ "string",	required_argument,	NULL, 's' },
-+	{ }
-+};
++	tx = l_queue_pop_head(pvt->tx_pkts);
++	if (!tx) {
++		l_timeout_remove(timeout);
++		pvt->tx_timeout = NULL;
++		return;
++	}
 +
-+static void usage(void)
-+{
-+	fprintf(stderr,
-+		"Usage:\n"
-+		"\%s [options]\n", tester_name);
-+	fprintf(stderr,
-+		"Options:\n"
-+		"\t-v, --version	Show version information and exit\n"
-+		"\t-q, --quiet	Run tests without logging\n"
-+		"\t-d, --debug	Run tests with debug output\n"
-+		"\t-m, --monitor	Enable monitor output\n"
-+		"\t-l, --list	Only list the tests to be run\n"
-+		"\t-p, --prefix	Run tests matching provided prefix\n"
-+		"\t-s, --string	Run tests matching provided string\n");
-+}
++	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
++		ms = tx->info.u.gen.interval;
++		count = tx->info.u.gen.cnt;
++		if (count != MESH_IO_TX_COUNT_UNLIMITED)
++			tx->info.u.gen.cnt--;
++	} else {
++		ms = 25;
++		count = 1;
++	}
 +
-+void tester_init(int *argc, char ***argv)
-+{
-+	tester_name = strrchr(*argv[0], '/');
-+	if (!tester_name)
-+		tester_name = strdup(*argv[0]);
-+	else
-+		tester_name = strdup(++tester_name);
++	tx->delete = !!(count == 1);
 +
-+	for (;;) {
-+		int opt;
++	send_pkt(pvt, tx, ms);
 +
-+		opt = getopt_long(*argc, *argv, "ps:vqdml", options, NULL);
-+		if (opt < 0)
-+			break;
++	if (count == 1) {
++		/* Recalculate wakeup if we are responding to POLL */
++		tx = l_queue_peek_head(pvt->tx_pkts);
 +
-+		switch (opt) {
-+		case 'v':
-+			printf("%s\n", VERSION);
-+			exit(EXIT_SUCCESS);
-+		case 'q':
-+			option_quiet = true;
-+			break;
-+		case 'd':
-+			option_debug = true;
-+			break;
-+		case 'm':
-+			option_monitor = true;
-+			break;
-+		case 'l':
-+			option_list = true;
-+			break;
-+		case 'p':
-+			option_prefix = optarg;
-+			break;
-+		case 's':
-+			option_string = optarg;
-+			break;
-+		default:
-+			usage();
-+			exit(EXIT_SUCCESS);
++		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
++			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
 +		}
-+	}
++	} else
++		l_queue_push_tail(pvt->tx_pkts, tx);
 +
-+	mainloop_init();
-+
-+	test_list = l_queue_new();
++	if (timeout) {
++		pvt->tx_timeout = timeout;
++		l_timeout_modify_ms(timeout, ms);
++	} else
++		pvt->tx_timeout = l_timeout_create_ms(ms, tx_to, pvt, NULL);
 +}
 +
-+int tester_run(void)
++static void tx_worker(void *user_data)
 +{
-+	int ret;
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint32_t delay;
 +
-+	if (option_list) {
-+		mainloop_quit();
-+		return EXIT_SUCCESS;
++	tx = l_queue_peek_head(pvt->tx_pkts);
++	if (!tx)
++		return;
++
++	switch (tx->info.type) {
++	case MESH_IO_TIMING_TYPE_GENERAL:
++		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
++			delay = tx->info.u.gen.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.gen.max_delay -
++						tx->info.u.gen.min_delay;
++			delay += tx->info.u.gen.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL:
++		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
++			delay = tx->info.u.poll.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.poll.max_delay -
++						tx->info.u.poll.min_delay;
++			delay += tx->info.u.poll.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL_RSP:
++		/* Delay until Instant + Delay */
++		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		if (delay > 255)
++			delay = 0;
++		break;
++
++	default:
++		return;
 +	}
 +
-+	l_idle_oneshot(start_tester, NULL, NULL);
-+
-+	mainloop_run_with_signal(signal_callback, NULL);
-+
-+	ret = tester_summarize();
-+
-+	l_queue_destroy(test_list, test_destroy);
-+
-+	if (option_monitor)
-+		bt_log_close();
-+
-+	return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
++	if (!delay)
++		tx_to(pvt->tx_timeout, pvt);
++	else if (pvt->tx_timeout)
++		l_timeout_modify_ms(pvt->tx_timeout, delay);
++	else
++		pvt->tx_timeout = l_timeout_create_ms(delay, tx_to, pvt, NULL);
 +}
++
++static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++	bool sending = false;
++
++	if (!info || !data || !len || len > sizeof(tx->pkt))
++		return false;
++
++	tx = l_new(struct tx_pkt, 1);
++
++	memcpy(&tx->info, info, sizeof(tx->info));
++	memcpy(&tx->pkt, data, len);
++	tx->len = len;
++
++	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
++		l_queue_push_head(pvt->tx_pkts, tx);
++	else {
++		sending = !l_queue_isempty(pvt->tx_pkts);
++
++		l_queue_push_tail(pvt->tx_pkts, tx);
++	}
++
++	if (!sending) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++		l_idle_oneshot(tx_worker, pvt, NULL);
++	}
++
++	return true;
++}
++
++static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++
++	if (!data)
++		return false;
++
++	if (len == 1) {
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
++							L_UINT_TO_PTR(data[0]));
++			l_free(tx);
++
++		} while (tx);
++	} else {
++		struct tx_pattern pattern = {
++			.data = data,
++			.len = len
++		};
++
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
++								&pattern);
++			l_free(tx);
++
++		} while (tx);
++	}
++
++	if (l_queue_isempty(pvt->tx_pkts)) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++	}
++
++	return true;
++}
++
++static bool find_by_filter(const void *a, const void *b)
++{
++	const struct pvt_rx_reg *rx_reg = a;
++	const uint8_t *filter = b;
++
++	return !memcmp(rx_reg->filter, filter, rx_reg->len);
++}
++
++static bool recv_register(struct mesh_io *io, const uint8_t *filter,
++			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct pvt_rx_reg *rx_reg;
++
++	if (!cb || !filter || !len)
++		return false;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
++
++	l_free(rx_reg);
++	rx_reg = l_malloc(sizeof(*rx_reg) + len);
++
++	memcpy(rx_reg->filter, filter, len);
++	rx_reg->len = len;
++	rx_reg->cb = cb;
++	rx_reg->user_data = user_data;
++
++	l_queue_push_head(pvt->rx_regs, rx_reg);
++
++	return true;
++}
++
++static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len)
++{
++	return true;
++}
++
++const struct mesh_io_api mesh_io_unit = {
++	.init = unit_init,
++	.destroy = unit_destroy,
++	.caps = unit_caps,
++	.send = send_tx,
++	.reg = recv_register,
++	.dereg = recv_deregister,
++	.cancel = tx_cancel,
++};
+diff --git a/mesh/mesh-io-unit.h b/mesh/mesh-io-unit.h
+new file mode 100644
+index 000000000..65f02e26a
+--- /dev/null
++++ b/mesh/mesh-io-unit.h
+@@ -0,0 +1,20 @@
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2018  Intel Corporation. All rights reserved.
++ *
++ *
++ *  This library is free software; you can redistribute it and/or
++ *  modify it under the terms of the GNU Lesser General Public
++ *  License as published by the Free Software Foundation; either
++ *  version 2.1 of the License, or (at your option) any later version.
++ *
++ *  This library is distributed in the hope that it will be useful,
++ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
++ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ *  Lesser General Public License for more details.
++ *
++ */
++
++extern const struct mesh_io_api mesh_io_unit;
+diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
+index 62fc5d12e..96891313a 100644
+--- a/mesh/mesh-io.c
++++ b/mesh/mesh-io.c
+@@ -22,10 +22,12 @@
+ 
+ /* List of Mesh-IO Type headers */
+ #include "mesh/mesh-io-generic.h"
++#include "mesh/mesh-io-unit.h"
+ 
+ /* List of Supported Mesh-IO Types */
+ static const struct mesh_io_table table[] = {
+-	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic}
++	{MESH_IO_TYPE_GENERIC, &mesh_io_generic},
++	{MESH_IO_TYPE_UNIT_TEST, &mesh_io_unit},
+ };
+ 
+ static struct l_queue *io_list;
+@@ -64,12 +66,9 @@ struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
+ 
+ 	io = l_new(struct mesh_io, 1);
+ 
+-	if (!io)
+-		return NULL;
+-
+ 	io->type = type;
+-
+ 	io->api = api;
++
+ 	if (!api->init(io, opts, cb, user_data))
+ 		goto fail;
+ 
+diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
+index b11c6c6e1..80ef3fa3e 100644
+--- a/mesh/mesh-io.h
++++ b/mesh/mesh-io.h
+@@ -14,7 +14,8 @@ struct mesh_io;
+ 
+ enum mesh_io_type {
+ 	MESH_IO_TYPE_NONE = 0,
+-	MESH_IO_TYPE_GENERIC
++	MESH_IO_TYPE_GENERIC,
++	MESH_IO_TYPE_UNIT_TEST
+ };
+ 
+ enum mesh_io_timing_type {
 -- 
 2.26.2
 
