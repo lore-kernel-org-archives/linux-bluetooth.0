@@ -2,109 +2,988 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E181C433E9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 22:32:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD22C43381
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 02:47:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 773F164F9F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Feb 2021 22:32:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4C6F964F91
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 02:47:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231391AbhBEWcK (ORCPT
+        id S231178AbhBFCpd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Feb 2021 17:32:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39656 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231673AbhBEOOq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Feb 2021 09:14:46 -0500
-Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 805FDC061A86
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Feb 2021 07:52:27 -0800 (PST)
-Received: by mail-pl1-x629.google.com with SMTP id d13so3781683plg.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Feb 2021 07:52:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mime-version:content-disposition;
-        bh=7xx8pWkh3n+iBuXpmAVObC559q53Rc9MHbJQRudHTKg=;
-        b=l7vkxPNqqCooCkc9U1eVJ6xEP90+iPReCEdUI9A4vpVs8AZpV3G/C9CZ2lbM2vmN5e
-         nLjgJ+CFsZAW3fPlguz8qv9iSnNWeOTKzLyYmxK6WrGpBM/O++ahoA+I6d2HF7UXB+rY
-         heO1aLzAIMtKIdMksopP5veqx2zgVfxQT4DcMGQi+cVMHUu4Z9g6ZvszCQjqdsUL76UT
-         LoVOb782UX1AdA6iL4zMwVUzdfqdFp/ARlQOXtTAW9fErSBrJibAtBAlE5QYd3BGBjp0
-         KpHCcUrxoW0HVdWr77D/ylRqjVKq/HP/gQomZVarYDfgpjkyEINE68Cj4wMlYFZESDrX
-         ruXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
-         :content-disposition;
-        bh=7xx8pWkh3n+iBuXpmAVObC559q53Rc9MHbJQRudHTKg=;
-        b=EhEqz+sqQ3TaJbmlLs/+lVkg4GI4RQTJVB6WexT8iC6d7RDD4cJpJTYee9kQsYBd/y
-         JLR0PYdyEQOnt96IXZ15MqNu+blBAfPG4uZHqxCLBA3LYxspsM/5uIoZaA05LablCObo
-         ggqBYOjHPKGrM1iBuXJwoEPo+TlTCGRMXcfc88j4kn/Tv86WPOgWOHQERFsbNk5rp4b0
-         Ts/yCt2q/G4OlIRrnaKQxbjVN2W0fIDTGx6G9LuNmLbLuflqjOpsgC0ThFK7dX/AmYjb
-         1/a1qHC/Td1Mde75JL3jjqRD0W6s2IADm2sIT5/2BNUC6jW8MS+yHGsy6XP2M52QkF5N
-         /RGA==
-X-Gm-Message-State: AOAM531CgDZ6TU+r5hxUrN+2U+/sKrF/Xsv4Sq3DMzn8QtaYr6w2iqEK
-        QHKSsn7SdmNwFLXSU/2w98htL0hlA8k=
-X-Google-Smtp-Source: ABdhPJyf953WlY858O9wI90LNi0XBeW4IWW6eRzZ7v9IkDXVEO4lEVBwDSK6WZ5wx1rIORaUp383FQ==
-X-Received: by 2002:a17:90b:17c8:: with SMTP id me8mr4982655pjb.197.1612540346777;
-        Fri, 05 Feb 2021 07:52:26 -0800 (PST)
-Received: from localhost ([122.172.229.231])
-        by smtp.gmail.com with ESMTPSA id u31sm12056408pgl.9.2021.02.05.07.52.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 07:52:26 -0800 (PST)
-Date:   Fri, 5 Feb 2021 21:22:23 +0530
-From:   Sanchayan <maitysanchayan@gmail.com>
+        Fri, 5 Feb 2021 21:45:33 -0500
+Received: from mga12.intel.com ([192.55.52.136]:51699 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230071AbhBFClq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 5 Feb 2021 21:41:46 -0500
+IronPort-SDR: j3BSDpZE7xbIdo037IRTTl+WMfB/UrDA/lZPFcGRkwcbZjpP87ElxffCJlMdpyqeJyntS5deM/
+ A0EYwwG7/3+w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9886"; a="160668387"
+X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
+   d="scan'208";a="160668387"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 17:32:00 -0800
+IronPort-SDR: aR44iRI0WFXlOwjAdG/xiyJSMApF0++CMexWt8P0wjqG9nu+fL6z5bCWsb+yd0ERk83Q8lfS8k
+ KGrMNO1FUZBA==
+X-IronPort-AV: E=Sophos;i="5.81,156,1610438400"; 
+   d="scan'208";a="508736126"
+Received: from yxiong5-mobl2.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.99.79])
+  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2021 17:31:59 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     "Igor V. Kovalenko" <igor.v.kovalenko@gmail.com>
-Subject: Query on the patch series "define HCI packet size of USB Alts"
-Message-ID: <YB1pt8WXsHO2gP5A@core-precision>
+Cc:     brian.gix@intel.com, luiz.dentz@gmail.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/3] shared/tester: Create ell-based version of tester code
+Date:   Fri,  5 Feb 2021 17:31:38 -0800
+Message-Id: <20210206013140.390219-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210206013140.390219-1-inga.stotland@intel.com>
+References: <20210206013140.390219-1-inga.stotland@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Create a version of tester that uses ell primitives instead of glib:
+tester-ell.c. This source is included to generate lishared-ell library.
+The original tester.c is built as part of libshared-glib library.
+---
+ Makefile.am             |   8 +-
+ src/shared/tester-ell.c | 887 ++++++++++++++++++++++++++++++++++++++++
+ 2 files changed, 892 insertions(+), 3 deletions(-)
+ create mode 100644 src/shared/tester-ell.c
 
-We currently have an opened merge request on adding mSBC support to PulseAudio.
-https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/254
-
-There currently seems to be an issue in getting the correct MTU. In the test
-setup it works with the ofono backend, except for the assumed MTU. For getting
-it to work, we had to use a MTU of 24. 48 does not work and renders silence.
-getsockopt(card->fd, SOL_SCO, SCO_OPTIONS ... returns 64 which is too large.
-
-The missing bits on the kernel side seems to be the below patch.
-https://lore.kernel.org/patchwork/patch/1303411/
-
-Second patch in the above series seem to have been applied but not the first.
-
-The first patch in the series above, when applied seems to fix getsockopt
-returning 24 bytes for the MTU. An additional correction on top of that
-below
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index fd0dcfa9a390..35f9c0743014 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1669,6 +1669,8 @@ static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts)
-                err = __set_isoc_interface(hdev, new_alts);
-                if (err < 0)
-                        return err;
+diff --git a/Makefile.am b/Makefile.am
+index d0f979586..5fa9706c8 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -189,7 +189,7 @@ shared_sources = src/shared/io.h src/shared/timeout.h \
+ 			src/shared/crypto.h src/shared/crypto.c \
+ 			src/shared/ecc.h src/shared/ecc.c \
+ 			src/shared/ringbuf.h src/shared/ringbuf.c \
+-			src/shared/tester.h src/shared/tester.c \
++			src/shared/tester.h\
+ 			src/shared/hci.h src/shared/hci.c \
+ 			src/shared/hci-crypto.h src/shared/hci-crypto.c \
+ 			src/shared/hfp.h src/shared/hfp.c \
+@@ -216,7 +216,8 @@ src_libshared_glib_la_SOURCES = $(shared_sources) \
+ 				src/shared/timeout-glib.c \
+ 				src/shared/mainloop-glib.c \
+ 				src/shared/mainloop-notify.h \
+-				src/shared/mainloop-notify.c
++				src/shared/mainloop-notify.c \
++				src/shared/tester.c
+ 
+ src_libshared_mainloop_la_SOURCES = $(shared_sources) \
+ 				src/shared/io-mainloop.c \
+@@ -230,7 +231,8 @@ src_libshared_ell_la_SOURCES = $(shared_sources) \
+ 				src/shared/io-ell.c \
+ 				src/shared/timeout-ell.c \
+ 				src/shared/mainloop.h \
+-				src/shared/mainloop-ell.c
++				src/shared/mainloop-ell.c \
++				src/shared/tester-ell.c
+ endif
+ 
+ attrib_sources = attrib/att.h attrib/att-database.h attrib/att.c \
+diff --git a/src/shared/tester-ell.c b/src/shared/tester-ell.c
+new file mode 100644
+index 000000000..6b2afa689
+--- /dev/null
++++ b/src/shared/tester-ell.c
+@@ -0,0 +1,887 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2012-2014, 2021  Intel Corporation. All rights reserved.
++ *
++ *
++ */
 +
-+               hdev->sco_mtu = hci_packet_size_usb_alt[new_alts];
-        }
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#define _GNU_SOURCE
++#include <getopt.h>
++#include <stdio.h>
++#include <errno.h>
++#include <syslog.h>
++#include <unistd.h>
++#include <stdlib.h>
++#include <string.h>
++#include <signal.h>
++#include <sys/signalfd.h>
++#include <sys/socket.h>
++#include <sys/time.h>
++
++#include <ell/ell.h>
++
++#include "lib/bluetooth.h"
++#include "lib/hci.h"
++
++#ifdef HAVE_VALGRIND_MEMCHECK_H
++#include <valgrind/memcheck.h>
++#endif
++
++#include "src/shared/mainloop.h"
++#include "src/shared/util.h"
++#include "src/shared/tester.h"
++#include "src/shared/log.h"
++
++#define COLOR_OFF	"\x1B[0m"
++#define COLOR_BLACK	"\x1B[0;30m"
++#define COLOR_RED	"\x1B[0;31m"
++#define COLOR_GREEN	"\x1B[0;32m"
++#define COLOR_YELLOW	"\x1B[0;33m"
++#define COLOR_BLUE	"\x1B[0;34m"
++#define COLOR_MAGENTA	"\x1B[0;35m"
++#define COLOR_CYAN	"\x1B[0;36m"
++#define COLOR_WHITE	"\x1B[0;37m"
++#define COLOR_HIGHLIGHT	"\x1B[1;39m"
++
++#define print_text(color, fmt, args...) \
++		tester_log(color fmt COLOR_OFF, ## args)
++
++#define print_summary(label, color, value, fmt, args...) \
++		tester_log("%-52s " color "%-10s" COLOR_OFF fmt, \
++							label, value, ## args)
++
++#define print_progress(name, color, fmt, args...) \
++		tester_log(COLOR_HIGHLIGHT "%s" COLOR_OFF " - " \
++				color fmt COLOR_OFF, name, ## args)
++
++enum test_result {
++	TEST_RESULT_NOT_RUN,
++	TEST_RESULT_PASSED,
++	TEST_RESULT_FAILED,
++	TEST_RESULT_TIMED_OUT,
++};
++
++enum test_stage {
++	TEST_STAGE_INVALID,
++	TEST_STAGE_PRE_SETUP,
++	TEST_STAGE_SETUP,
++	TEST_STAGE_RUN,
++	TEST_STAGE_TEARDOWN,
++	TEST_STAGE_POST_TEARDOWN,
++};
++
++struct test_case {
++	char *name;
++	enum test_result result;
++	enum test_stage stage;
++	const void *test_data;
++	tester_data_func_t pre_setup_func;
++	tester_data_func_t setup_func;
++	tester_data_func_t test_func;
++	tester_data_func_t teardown_func;
++	tester_data_func_t post_teardown_func;
++	double start_time;
++	double end_time;
++	unsigned int timeout;
++	struct l_timeout *run_timer;
++	tester_destroy_func_t destroy;
++	void *user_data;
++	bool teardown;
++};
++
++static char *tester_name;
++
++static struct l_queue *test_list;
++static const struct l_queue_entry *test_entry;
++static struct timeval tester_start;
++
++static bool option_quiet;
++static bool option_debug;
++static bool option_monitor;
++static bool option_list;
++static const char *option_prefix;
++static const char *option_string;
++
++struct monitor_hdr {
++	uint16_t opcode;
++	uint16_t index;
++	uint16_t len;
++	uint8_t  priority;
++	uint8_t  ident_len;
++} __attribute__((packed));
++
++struct monitor_l2cap_hdr {
++	uint16_t cid;
++	uint16_t psm;
++} __attribute__((packed));
++
++static void test_destroy(void *data)
++{
++	struct test_case *test = data;
++
++	l_timeout_remove(test->run_timer);
++
++	if (test->destroy)
++		test->destroy(test->user_data);
++
++	l_free(test->name);
++	l_free(test);
++}
++
++static void tester_vprintf(const char *format, va_list ap)
++{
++	if (tester_use_quiet())
++		return;
++
++	printf("  %s", COLOR_WHITE);
++	vprintf(format, ap);
++	printf("%s\n", COLOR_OFF);
++}
++
++static void tester_log(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++	vprintf(format, ap);
++	printf("\n");
++	va_end(ap);
++
++	va_start(ap, format);
++	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
++	va_end(ap);
++}
++
++void tester_print(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++	tester_vprintf(format, ap);
++	va_end(ap);
++
++	va_start(ap, format);
++	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_INFO, format, ap);
++	va_end(ap);
++}
++
++void tester_debug(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++	tester_vprintf(format, ap);
++	va_end(ap);
++
++	va_start(ap, format);
++	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_DEBUG, format, ap);
++	va_end(ap);
++}
++
++void tester_warn(const char *format, ...)
++{
++	va_list ap;
++
++	va_start(ap, format);
++	tester_vprintf(format, ap);
++	va_end(ap);
++
++	va_start(ap, format);
++	bt_log_vprintf(HCI_DEV_NONE, tester_name, LOG_WARNING, format, ap);
++	va_end(ap);
++}
++
++static void monitor_debug(const char *str, void *user_data)
++{
++	const char *label = user_data;
++
++	tester_debug("%s: %s", label, str);
++}
++
++static void monitor_log(char dir, uint16_t cid, uint16_t psm, const void *data,
++								size_t len)
++{
++	struct iovec iov[3];
++	struct monitor_l2cap_hdr hdr;
++	uint8_t term = 0x00;
++	char label[16];
++
++	if (snprintf(label, sizeof(label), "%c %s", dir, tester_name) < 0)
++		return;
++
++	hdr.cid = cpu_to_le16(cid);
++	hdr.psm = cpu_to_le16(psm);
++
++	iov[0].iov_base = &hdr;
++	iov[0].iov_len = sizeof(hdr);
++
++	iov[1].iov_base = (void *) data;
++	iov[1].iov_len = len;
++
++	/* Kernel won't forward if data is no NULL terminated */
++	iov[2].iov_base = &term;
++	iov[2].iov_len = sizeof(term);
++
++	bt_log_sendmsg(HCI_DEV_NONE, label, LOG_INFO, iov, 3);
++}
++
++void tester_monitor(char dir, uint16_t cid, uint16_t psm, const void *data,
++								size_t len)
++{
++	monitor_log(dir, cid, psm, data, len);
++
++	if (!tester_use_debug())
++		return;
++
++	util_hexdump(dir, data, len, monitor_debug, (void *) tester_name);
++}
++
++static void default_pre_setup(const void *test_data)
++{
++	tester_pre_setup_complete();
++}
++
++static void default_setup(const void *test_data)
++{
++	tester_setup_complete();
++}
++
++static void default_teardown(const void *test_data)
++{
++	tester_teardown_complete();
++}
++
++static void default_post_teardown(const void *test_data)
++{
++	tester_post_teardown_complete();
++}
++
++void tester_add_full(const char *name, const void *test_data,
++				tester_data_func_t pre_setup_func,
++				tester_data_func_t setup_func,
++				tester_data_func_t test_func,
++				tester_data_func_t teardown_func,
++				tester_data_func_t post_teardown_func,
++				unsigned int timeout,
++				void *user_data, tester_destroy_func_t destroy)
++{
++	struct test_case *test;
++
++	if (!test_func)
++		return;
++
++	if (option_prefix && !l_str_has_prefix(name, option_prefix)) {
++		if (destroy)
++			destroy(user_data);
++		return;
++	}
++
++	if (option_string && !strstr(name, option_string)) {
++		if (destroy)
++			destroy(user_data);
++		return;
++	}
++
++	if (option_list) {
++		tester_log("%s", name);
++		if (destroy)
++			destroy(user_data);
++		return;
++	}
++
++	test = l_new(struct test_case, 1);
++	test->name = l_strdup(name);
++	test->result = TEST_RESULT_NOT_RUN;
++	test->stage = TEST_STAGE_INVALID;
++
++	test->test_data = test_data;
++
++	if (pre_setup_func)
++		test->pre_setup_func = pre_setup_func;
++	else
++		test->pre_setup_func = default_pre_setup;
++
++	if (setup_func)
++		test->setup_func = setup_func;
++	else
++		test->setup_func = default_setup;
++
++	test->test_func = test_func;
++
++	if (teardown_func)
++		test->teardown_func = teardown_func;
++	else
++		test->teardown_func = default_teardown;
++
++	if (post_teardown_func)
++		test->post_teardown_func = post_teardown_func;
++	else
++		test->post_teardown_func = default_post_teardown;
++
++	test->timeout = timeout;
++
++	test->destroy = destroy;
++	test->user_data = user_data;
++
++	l_queue_push_tail(test_list, test);
++}
++
++void tester_add(const char *name, const void *test_data,
++					tester_data_func_t setup_func,
++					tester_data_func_t test_func,
++					tester_data_func_t teardown_func)
++{
++	tester_add_full(name, test_data, NULL, setup_func, test_func,
++					teardown_func, NULL, 0, NULL, NULL);
++}
++
++void *tester_get_data(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return NULL;
++
++	test = test_entry->data;
++
++	return test->user_data;
++}
++
++static double get_elapsed_time(struct timeval *base)
++{
++	static struct timeval now, elapsed;
++
++	gettimeofday(&now, NULL);
++	timersub(&now, base, &elapsed);
++
++	return elapsed.tv_sec + ((double) elapsed.tv_usec) / 1000000;
++}
++
++static int tester_summarize(void)
++{
++	unsigned int not_run = 0, passed = 0, failed = 0;
++	double execution_time;
++	const struct l_queue_entry *entry;
++
++	tester_log("");
++	print_text(COLOR_HIGHLIGHT, "");
++	print_text(COLOR_HIGHLIGHT, "Test Summary");
++	print_text(COLOR_HIGHLIGHT, "------------");
++
++	entry = l_queue_get_entries(test_list);
++
++	for (; entry; entry = entry->next) {
++		struct test_case *test = entry->data;
++		double exec_time;
++
++		exec_time = test->end_time - test->start_time;
++
++		switch (test->result) {
++		case TEST_RESULT_NOT_RUN:
++			print_summary(test->name, COLOR_YELLOW, "Not Run", "");
++			not_run++;
++			break;
++		case TEST_RESULT_PASSED:
++			print_summary(test->name, COLOR_GREEN, "Passed",
++						"%8.3f seconds", exec_time);
++			passed++;
++			break;
++		case TEST_RESULT_FAILED:
++			print_summary(test->name, COLOR_RED, "Failed",
++						"%8.3f seconds", exec_time);
++			failed++;
++			break;
++		case TEST_RESULT_TIMED_OUT:
++			print_summary(test->name, COLOR_RED, "Timed out",
++						"%8.3f seconds", exec_time);
++			failed++;
++			break;
++		}
++	}
++
++	tester_log("Total: %d, "
++		COLOR_GREEN "Passed: %d (%.1f%%)" COLOR_OFF ", "
++		COLOR_RED "Failed: %d" COLOR_OFF ", "
++		COLOR_YELLOW "Not Run: %d" COLOR_OFF,
++			not_run + passed + failed, passed,
++			(not_run + passed + failed) ?
++			(float) passed * 100 / (not_run + passed + failed) : 0,
++			failed, not_run);
++
++	execution_time = get_elapsed_time(&tester_start);
++	tester_log("Overall execution time: %.3g seconds", execution_time);
++
++	return failed;
++}
++
++static void teardown_callback(void *user_data)
++{
++	struct test_case *test = user_data;
++
++	test->stage = TEST_STAGE_TEARDOWN;
++	test->teardown = false;
++
++	print_progress(test->name, COLOR_MAGENTA, "teardown");
++	test->teardown_func(test->test_data);
++
++#ifdef HAVE_VALGRIND_MEMCHECK_H
++	VALGRIND_DO_ADDED_LEAK_CHECK;
++#endif
++}
++
++static void test_timeout(struct l_timeout *timer, void *user_data)
++{
++	struct test_case *test = user_data;
++
++	l_timeout_remove(timer);
++	test->run_timer = NULL;
++
++	test->result = TEST_RESULT_TIMED_OUT;
++	print_progress(test->name, COLOR_RED, "test timed out");
++
++	l_idle_oneshot(teardown_callback, test, NULL);
++}
++
++static void next_test_case(void)
++{
++	struct test_case *test;
++
++	if (test_entry)
++		test_entry = test_entry->next;
++	else
++		test_entry = l_queue_get_entries(test_list);
++
++	if (!test_entry) {
++		mainloop_quit();
++		return;
++	}
++
++	test = test_entry->data;
++
++	tester_log("");
++	print_progress(test->name, COLOR_BLACK, "init");
++
++	test->start_time = get_elapsed_time(&tester_start);
++
++	if (test->timeout > 0)
++		test->run_timer = l_timeout_create(test->timeout, test_timeout,
++								test, NULL);
++
++	test->stage = TEST_STAGE_PRE_SETUP;
++
++	test->pre_setup_func(test->test_data);
++}
++
++static void setup_callback(void *user_data)
++{
++	struct test_case *test = user_data;
++
++	test->stage = TEST_STAGE_SETUP;
++
++	print_progress(test->name, COLOR_BLUE, "setup");
++	test->setup_func(test->test_data);
++}
++
++static void run_callback(void *user_data)
++{
++	struct test_case *test = user_data;
++
++	test->stage = TEST_STAGE_RUN;
++
++	print_progress(test->name, COLOR_BLACK, "run");
++	test->test_func(test->test_data);
++}
++
++static void done_callback(void *user_data)
++{
++	struct test_case *test = user_data;
++
++	test->end_time = get_elapsed_time(&tester_start);
++
++	print_progress(test->name, COLOR_BLACK, "done");
++	next_test_case();
++}
++
++void tester_pre_setup_complete(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_PRE_SETUP)
++		return;
++
++	l_idle_oneshot(setup_callback, test, NULL);
++}
++
++void tester_pre_setup_failed(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_PRE_SETUP)
++		return;
++
++	print_progress(test->name, COLOR_RED, "pre setup failed");
++
++	l_idle_oneshot(done_callback, test, NULL);
++}
++
++void tester_setup_complete(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_SETUP)
++		return;
++
++	print_progress(test->name, COLOR_BLUE, "setup complete");
++
++	l_idle_oneshot(run_callback, test, NULL);
++}
++
++void tester_setup_failed(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_SETUP)
++		return;
++
++	test->stage = TEST_STAGE_POST_TEARDOWN;
++
++	l_timeout_remove(test->run_timer);
++	test->run_timer = NULL;
++
++	print_progress(test->name, COLOR_RED, "setup failed");
++	print_progress(test->name, COLOR_MAGENTA, "teardown");
++
++	test->post_teardown_func(test->test_data);
++}
++
++static void test_result(enum test_result result)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_RUN)
++		return;
++
++	l_timeout_remove(test->run_timer);
++	test->run_timer = NULL;
++
++	test->result = result;
++	switch (result) {
++	case TEST_RESULT_PASSED:
++		print_progress(test->name, COLOR_GREEN, "test passed");
++		break;
++	case TEST_RESULT_FAILED:
++		print_progress(test->name, COLOR_RED, "test failed");
++		break;
++	case TEST_RESULT_NOT_RUN:
++		print_progress(test->name, COLOR_YELLOW, "test not run");
++		break;
++	case TEST_RESULT_TIMED_OUT:
++		print_progress(test->name, COLOR_RED, "test timed out");
++		break;
++	}
++
++	if (test->teardown)
++		return;
++
++	test->teardown = true;
++
++	l_idle_oneshot(teardown_callback, test, NULL);
++}
++
++void tester_test_passed(void)
++{
++	test_result(TEST_RESULT_PASSED);
++}
++
++void tester_test_failed(void)
++{
++	test_result(TEST_RESULT_FAILED);
++}
++
++void tester_test_abort(void)
++{
++	test_result(TEST_RESULT_NOT_RUN);
++}
++
++void tester_teardown_complete(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_TEARDOWN)
++		return;
++
++	test->stage = TEST_STAGE_POST_TEARDOWN;
++
++	test->post_teardown_func(test->test_data);
++}
++
++void tester_teardown_failed(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_TEARDOWN)
++		return;
++
++	test->stage = TEST_STAGE_POST_TEARDOWN;
++
++	tester_post_teardown_failed();
++}
++
++void tester_post_teardown_complete(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_POST_TEARDOWN)
++		return;
++
++	print_progress(test->name, COLOR_MAGENTA, "teardown complete");
++
++	l_idle_oneshot(done_callback, test, NULL);
++}
++
++void tester_post_teardown_failed(void)
++{
++	struct test_case *test;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	if (test->stage != TEST_STAGE_POST_TEARDOWN)
++		return;
++
++	print_progress(test->name, COLOR_RED, "teardown failed");
++
++	l_idle_oneshot(done_callback, test, NULL);
++}
++
++static void start_tester(void *user_data)
++{
++	gettimeofday(&tester_start, NULL);
++	next_test_case();
++}
++
++struct wait_data {
++	unsigned int seconds;
++	struct test_case *test;
++	tester_wait_func_t func;
++	void *user_data;
++};
++
++static void wait_callback(struct l_timeout *timer, void *user_data)
++{
++	struct wait_data *wait = user_data;
++	struct test_case *test = wait->test;
++
++	wait->seconds--;
++
++	if (wait->seconds > 0) {
++		print_progress(test->name, COLOR_BLACK, "%u seconds left",
++								wait->seconds);
++		return;
++	}
++
++	print_progress(test->name, COLOR_BLACK, "waiting done");
++
++	wait->func(wait->user_data);
++
++	free(wait);
++
++	l_timeout_remove(timer);
++}
++
++void tester_wait(unsigned int seconds, tester_wait_func_t func,
++							void *user_data)
++{
++	struct test_case *test;
++	struct wait_data *wait;
++
++	if (!func || seconds < 1)
++		return;
++
++	if (!test_entry)
++		return;
++
++	test = test_entry->data;
++
++	wait = new0(struct wait_data, 1);
++	wait->seconds = seconds;
++	wait->test = test;
++	wait->func = func;
++	wait->user_data = user_data;
++
++	l_timeout_create(seconds, wait_callback, wait, NULL);
++
++	print_progress(test->name, COLOR_BLACK, "waiting %u seconds", seconds);
++}
++
++static void signal_callback(int signum, void *user_data)
++{
++	static bool terminated = false;
++
++	switch (signum) {
++	case SIGINT:
++	case SIGTERM:
++		if (!terminated)
++			mainloop_quit();
++
++		terminated = true;
++		break;
++	}
++}
++
++bool tester_use_quiet(void)
++{
++	return option_quiet;
++}
++
++bool tester_use_debug(void)
++{
++	return option_debug;
++}
++
++static const struct option options[] = {
++	{ "version",	no_argument,		NULL, 'v' },
++	{ "quiet",	no_argument,		NULL, 'q' },
++	{ "debug",	no_argument,		NULL, 'd' },
++	{ "monitor",	no_argument,		NULL, 'm' },
++	{ "list",	no_argument,		NULL, 'l' },
++	{ "prefix",	required_argument,	NULL, 'p' },
++	{ "string",	required_argument,	NULL, 's' },
++	{ }
++};
++
++static void usage(void)
++{
++	fprintf(stderr,
++		"Usage:\n"
++		"\%s [options]\n", tester_name);
++	fprintf(stderr,
++		"Options:\n"
++		"\t-v, --version	Show version information and exit\n"
++		"\t-q, --quiet	Run tests without logging\n"
++		"\t-d, --debug	Run tests with debug output\n"
++		"\t-m, --monitor	Enable monitor output\n"
++		"\t-l, --list	Only list the tests to be run\n"
++		"\t-p, --prefix	Run tests matching provided prefix\n"
++		"\t-s, --string	Run tests matching provided string\n");
++}
++
++void tester_init(int *argc, char ***argv)
++{
++	tester_name = strrchr(*argv[0], '/');
++	if (!tester_name)
++		tester_name = strdup(*argv[0]);
++	else
++		tester_name = strdup(++tester_name);
++
++	for (;;) {
++		int opt;
++
++		opt = getopt_long(*argc, *argv, "ps:vqdml", options, NULL);
++		if (opt < 0)
++			break;
++
++		switch (opt) {
++		case 'v':
++			printf("%s\n", VERSION);
++			exit(EXIT_SUCCESS);
++		case 'q':
++			option_quiet = true;
++			break;
++		case 'd':
++			option_debug = true;
++			break;
++		case 'm':
++			option_monitor = true;
++			break;
++		case 'l':
++			option_list = true;
++			break;
++		case 'p':
++			option_prefix = optarg;
++			break;
++		case 's':
++			option_string = optarg;
++			break;
++		default:
++			usage();
++			exit(EXIT_SUCCESS);
++		}
++	}
++
++	mainloop_init();
++
++	test_list = l_queue_new();
++}
++
++int tester_run(void)
++{
++	int ret;
++
++	if (option_list) {
++		mainloop_quit();
++		return EXIT_SUCCESS;
++	}
++
++	l_idle_oneshot(start_tester, NULL, NULL);
++
++	mainloop_run_with_signal(signal_callback, NULL);
++
++	ret = tester_summarize();
++
++	l_queue_destroy(test_list, test_destroy);
++
++	if (option_monitor)
++		bt_log_close();
++
++	return ret == 0 ? EXIT_SUCCESS : EXIT_FAILURE;
++}
+-- 
+2.26.2
 
-        if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
-
-
-seems to make it work for all bluetooth usb devices.
-
-Has there been any further development or way to push this forward?
-
-- Sanchayan.
