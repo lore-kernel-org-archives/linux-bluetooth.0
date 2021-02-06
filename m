@@ -2,150 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC49C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 06:37:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9EA58C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 08:37:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7101964F70
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 06:37:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B52264FCA
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 08:37:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229508AbhBFGhk (ORCPT
+        id S229772AbhBFIg6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Feb 2021 01:37:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229492AbhBFGhj (ORCPT
+        Sat, 6 Feb 2021 03:36:58 -0500
+Received: from mail-io1-f72.google.com ([209.85.166.72]:53057 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229717AbhBFIg5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Feb 2021 01:37:39 -0500
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A092BC06174A
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Feb 2021 22:36:59 -0800 (PST)
-Received: by mail-qk1-x734.google.com with SMTP id d85so9296231qkg.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Feb 2021 22:36:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=pkoCam5OTeDaijW/MNCAdIK3e0HPNL6FDgSX7wq+bgE=;
-        b=f5SNTfX30hJDPpaoxEN6aaTh35zz0ITmXMxEZ7cEJ8c1RssFoCJyvJcLhLpZdY2kcS
-         klF+PH+9pq+LTIE/ZiON1g/Yap3+j8snoTssDyXMkpY7osVu5gPJ9Fxbp3y2NxUaYTDP
-         aByzXgh/UpcTIl5ILCrqaB+NofbsgiGq+aMnE8Hv8vB7xz0rmZgsUmucP2xUMwW5PuUe
-         oP1bkZt7kuIV1VFC3QZYWcoL/VMPuNKUVDaYQRUDNH+nXvIaxCxweKz6i5ruSUQGiDOV
-         MbwFpBct2oVv7PRxlDhCMV7gkecNSS6zbuQzH6Na4kzTYJtqArkqTlHwa2GGkwl5mzL5
-         4v1A==
+        Sat, 6 Feb 2021 03:36:57 -0500
+Received: by mail-io1-f72.google.com with SMTP id x17so8278920iov.19
+        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Feb 2021 00:36:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=pkoCam5OTeDaijW/MNCAdIK3e0HPNL6FDgSX7wq+bgE=;
-        b=AWFvtHJI+aKkni0QTpuR52yQ7xkmYOkT77xf+9gU3nYdi+7Fdu/d+2wTWxN+rTxV3u
-         WVwtm9xMMl5tvml9SEB4rVwKuhMD82RGbLVHnFkxX+8etzBF2DJOUk90SWBn0L5Igsdi
-         SJbL3X58BAYqypJnPPUDggFl7ZKKuzPu0fU17TFINL5IrbroFwpIyGzFlLsJuRc9DPUo
-         BhU8jEXywG7n7fC/3lPJK/pNsEeKWDoYWdKDfornZF8qa2hlLH/6bfKW91k7TKfu+ngk
-         lXxrFMDi7ramFjaYOtOCjJHjjEoyn9egrzOpZeDQL8xA7MxLLZ/xxQRVMlAy/IJslLlX
-         omNQ==
-X-Gm-Message-State: AOAM531mDEM4XVqaOuRquDHJNqRY4zBGQy2mY1wt0k2xC5jdiXWIOMLj
-        qtMljOnT4+gF9XcEpqZxQKLrn8UyKgeOKQ==
-X-Google-Smtp-Source: ABdhPJy4AKsB8F0ByfKbWHJ1KRJ98i/HSbtIhvfaULTYUdW+hDg4GVA9aS2/bNSJMx+sOcigh3Fzzw==
-X-Received: by 2002:ae9:ed82:: with SMTP id c124mr7670234qkg.399.1612593418587;
-        Fri, 05 Feb 2021 22:36:58 -0800 (PST)
-Received: from [172.17.0.2] ([40.70.45.125])
-        by smtp.gmail.com with ESMTPSA id z187sm12258978qkb.52.2021.02.05.22.36.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Feb 2021 22:36:58 -0800 (PST)
-Message-ID: <601e390a.1c69fb81.12cbb.3559@mx.google.com>
-Date:   Fri, 05 Feb 2021 22:36:58 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0235350681536866538=="
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=Vjllui7uaJPc8hueRFxPXFS2fUrnK2hwtttKy49Se7c=;
+        b=eFPcz7HVl6ob7PT6YGbsYpxf0ieBpK1oHkrv94tf2ltHQHJlRRCUmqApnOqqDXeJSk
+         x3KDkWOrBjp9dlH8VSosEphkCop0xPIj4gmbXLuAsu75W7dfAuQuaqSgoBEPFP6+QDjO
+         tvqXR4KGstRHVixkj7XAwSDZ6yuc2nAMWxK1sKrgClFU5bSGWE3OyL6Dsq7twlYciMmO
+         Zqo6C4sWWcdGT5MGx+hj7ykIL/c38ne4CPsZiGcUsOVAcroGiWZMU8DfkxhRhLX0vm0X
+         rVK1gnJ7h8l41nWpepr5H27FJsL7VYwFBmbe9anQmtod7Kl8JddAnBN23YcP6nIZhRkA
+         sBig==
+X-Gm-Message-State: AOAM5319LoaSeBYx6kYYl7qwBK5BrEWLjUhL0463aEJTVEcg4JAZm7st
+        RXyPnJYyWOZsqwS24nYm5q3eyKTD3grfvzhk9cEngl9kLmwg
+X-Google-Smtp-Source: ABdhPJxdYczRveQpCPBHDtTkJB7uRbqfviBPRd7k0i4Q1KOsXvzGLGjVkTTmxVFUU3t6/hf80LeKtMR7PaCztG8NUy+cBum5e6ty
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: Framework for non-interactive mesh test
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210206055023.401381-2-inga.stotland@intel.com>
-References: <20210206055023.401381-2-inga.stotland@intel.com>
+X-Received: by 2002:a6b:fb0f:: with SMTP id h15mr7682245iog.27.1612600573798;
+ Sat, 06 Feb 2021 00:36:13 -0800 (PST)
+Date:   Sat, 06 Feb 2021 00:36:13 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000005dacd805baa6d46e@google.com>
+Subject: KASAN: wild-memory-access Write in l2cap_chan_put
+From:   syzbot <syzbot+a384548b03ddcbbaf619@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0235350681536866538==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    88bb507a Merge tag 'media/v5.11-3' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=112bab6f500000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6e95b9873f64b36c
+dashboard link: https://syzkaller.appspot.com/bug?extid=a384548b03ddcbbaf619
+userspace arch: i386
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=429191
+Unfortunately, I don't have any reproducer for this issue yet.
 
----Test result---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a384548b03ddcbbaf619@syzkaller.appspotmail.com
 
-##############################
-Test: CheckPatch - FAIL
-Output:
-shared/tester: Create ell-based version of tester code
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#168: FILE: src/shared/tester-ell.c:120:
-+} __attribute__((packed));
+==================================================================
+BUG: KASAN: wild-memory-access in instrument_atomic_read_write include/linux/instrumented.h:101 [inline]
+BUG: KASAN: wild-memory-access in atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
+BUG: KASAN: wild-memory-access in __refcount_sub_and_test include/linux/refcount.h:272 [inline]
+BUG: KASAN: wild-memory-access in __refcount_dec_and_test include/linux/refcount.h:315 [inline]
+BUG: KASAN: wild-memory-access in refcount_dec_and_test include/linux/refcount.h:333 [inline]
+BUG: KASAN: wild-memory-access in kref_put include/linux/kref.h:64 [inline]
+BUG: KASAN: wild-memory-access in l2cap_chan_put+0x35/0x2e0 net/bluetooth/l2cap_core.c:502
+Write of size 4 at addr aaaa00aaaaaaaac2 by task kworker/2:22/10838
 
-WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-#173: FILE: src/shared/tester-ell.c:125:
-+} __attribute__((packed));
-
-- total: 0 errors, 2 warnings, 913 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] shared/tester: Create ell-based version of tester code" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-mesh: Add unit test IO
-WARNING:SPDX_LICENSE_TAG: Improper SPDX comment style for 'mesh/mesh-io-unit.h', please use '/*' instead
-#665: FILE: mesh/mesh-io-unit.h:1:
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#665: FILE: mesh/mesh-io-unit.h:1:
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-
-- total: 0 errors, 2 warnings, 668 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] mesh: Add unit test IO" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: CheckGitLint - PASS
-
-##############################
-Test: CheckBuild - PASS
-
-##############################
-Test: MakeCheck - PASS
-
+CPU: 2 PID: 10838 Comm: kworker/2:22 Not tainted 5.11.0-rc6-syzkaller #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+Workqueue: events l2cap_chan_timeout
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ __kasan_report mm/kasan/report.c:400 [inline]
+ kasan_report.cold+0x5f/0xd5 mm/kasan/report.c:413
+ check_memory_region_inline mm/kasan/generic.c:179 [inline]
+ check_memory_region+0x13d/0x180 mm/kasan/generic.c:185
+ instrument_atomic_read_write include/linux/instrumented.h:101 [inline]
+ atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
+ __refcount_sub_and_test include/linux/refcount.h:272 [inline]
+ __refcount_dec_and_test include/linux/refcount.h:315 [inline]
+ refcount_dec_and_test include/linux/refcount.h:333 [inline]
+ kref_put include/linux/kref.h:64 [inline]
+ l2cap_chan_put+0x35/0x2e0 net/bluetooth/l2cap_core.c:502
+ l2cap_sock_kill+0xd0/0x240 net/bluetooth/l2cap_sock.c:1217
+ l2cap_chan_timeout+0x1cc/0x2f0 net/bluetooth/l2cap_core.c:438
+ process_one_work+0x98d/0x15f0 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
+==================================================================
+Kernel panic - not syncing: panic_on_warn set ...
+CPU: 2 PID: 10838 Comm: kworker/2:22 Tainted: G    B             5.11.0-rc6-syzkaller #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.14.0-2 04/01/2014
+Workqueue: events l2cap_chan_timeout
+Call Trace:
+ __dump_stack lib/dump_stack.c:79 [inline]
+ dump_stack+0x107/0x163 lib/dump_stack.c:120
+ panic+0x306/0x73d kernel/panic.c:231
+ end_report+0x58/0x5e mm/kasan/report.c:100
+ __kasan_report mm/kasan/report.c:403 [inline]
+ kasan_report.cold+0x67/0xd5 mm/kasan/report.c:413
+ check_memory_region_inline mm/kasan/generic.c:179 [inline]
+ check_memory_region+0x13d/0x180 mm/kasan/generic.c:185
+ instrument_atomic_read_write include/linux/instrumented.h:101 [inline]
+ atomic_fetch_sub_release include/asm-generic/atomic-instrumented.h:220 [inline]
+ __refcount_sub_and_test include/linux/refcount.h:272 [inline]
+ __refcount_dec_and_test include/linux/refcount.h:315 [inline]
+ refcount_dec_and_test include/linux/refcount.h:333 [inline]
+ kref_put include/linux/kref.h:64 [inline]
+ l2cap_chan_put+0x35/0x2e0 net/bluetooth/l2cap_core.c:502
+ l2cap_sock_kill+0xd0/0x240 net/bluetooth/l2cap_sock.c:1217
+ l2cap_chan_timeout+0x1cc/0x2f0 net/bluetooth/l2cap_core.c:438
+ process_one_work+0x98d/0x15f0 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:296
+Dumping ftrace buffer:
+   (ftrace buffer empty)
+Kernel Offset: disabled
+Rebooting in 1 seconds..
+ACPI MEMORY or I/O RESET_REG.
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
---===============0235350681536866538==--
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
