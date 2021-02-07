@@ -2,83 +2,225 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,PDS_LITECOIN_ID,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5121BC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 15:57:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38D5C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Feb 2021 21:00:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0AE7E64EAD
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  6 Feb 2021 15:57:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 837FD64E40
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Feb 2021 21:00:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230063AbhBFP5k (ORCPT
+        id S229506AbhBGVAB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 6 Feb 2021 10:57:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40436 "EHLO
+        Sun, 7 Feb 2021 16:00:01 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229558AbhBFP5j (ORCPT
+        with ESMTP id S229445AbhBGVAB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 6 Feb 2021 10:57:39 -0500
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DBB2C06174A;
-        Sat,  6 Feb 2021 07:56:58 -0800 (PST)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-        (Authenticated sender: sjoerd)
-        with ESMTPSA id D0E811F40E84
-Received: by dawn.luon.net (Postfix, from userid 1000)
-        id 084DEC62B06; Sat,  6 Feb 2021 16:56:54 +0100 (CET)
-Date:   Sat, 6 Feb 2021 16:56:53 +0100
-From:   Sjoerd Simons <sjoerd@collabora.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Trent Piepho <tpiepho@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Hilda Wu <hildawu@realtek.com>,
-        Sathish Narasimman <sathish.narasimman@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Hsin-Yu Chao <hychao@chromium.org>,
-        Amit K Bag <amit.k.bag@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        kernel@collabora.com
-Subject: Re: [PATCH] Bluetooth: btusb: Always fallback to alt 1 for WBS
-Message-ID: <YB68RUVLRGQKS+yH@dawn.lan>
-References: <20201210012003.133000-1-tpiepho@gmail.com>
- <7ADF39E2-647E-49E2-9C5B-B0BF6A303B95@holtmann.org>
+        Sun, 7 Feb 2021 16:00:01 -0500
+Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2E1BC06174A
+        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Feb 2021 12:59:20 -0800 (PST)
+Received: by mail-ot1-x32e.google.com with SMTP id 63so12380745oty.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Feb 2021 12:59:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=tU6BbMqjEaitdyZJszOVpD7ndDOu3xAl7ppZyHvpYYk=;
+        b=r+L/DxmXF4WbCe4RPN8OZeTSA/wg+6o44QM5OGaTqj4SsWxTSNMWwHUO3Bs7ZU/pbC
+         w9J8V+OytXx8UVVcfl4yJL461OdrapxOzMrXEvsKF6aWwAqKQ54Ze6FM6AmUyoNpDKnM
+         GqQFrU+xzO63OOi6uZsJ61YZDHStAEtyIqEROmJMqF3ekYJPRYl4yxK0Hr//CObpQYJJ
+         MibIoLuswHk63T4DPmIPkNgE2R+Gdmi31od6RyKaAK74fSkGnRcQ/QCuuQBSn6lrYpqJ
+         QMVNRJSisJA1zNWNzdprhPV5G2rxnbFpdX1RNj4kYYL3cjT6K8XJeH6x2bIUnSsHbKAq
+         cweQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to
+         :content-transfer-encoding;
+        bh=tU6BbMqjEaitdyZJszOVpD7ndDOu3xAl7ppZyHvpYYk=;
+        b=l0TpB7DizOMyUFevHxDqiKhddNU1ruhUAsjeNZe9tAZTFKuFoxEkv4gEs9ldM4hMKB
+         8/7l3Bfr+zaStZklLOEonIDM+5K7XLUw10bYVPeQ9nPJk67fnvDuKPS6xmTa3W6y6Bqi
+         oCGU3IQvJbJlFFgiWzC3EMZHBSRkMGF0/1DTdrMCfXZa2Iqyj40K84f97NT7h/uJkqoY
+         +GG8FNra8FVNB9jx5FgDDUCPAnbmoq8azfkKbSvjbCvHQ5csK5BcdqkCyDJAiiR4u2a3
+         AC54vGYBu50AZu32ik5K4yPrAoURLtt291WGZMSyXu3SuYRvSadt0F0AzdufgRaJYnex
+         KUdA==
+X-Gm-Message-State: AOAM532KRef+GtBjyYIVo579CsbBMtGOMPmC9irenpuoJKMo/QGvm088
+        wZ878lJ3FfChKKiNXU6ann1WkCpl1jTdIg5L1qqsSz7ojqk=
+X-Google-Smtp-Source: ABdhPJyU7QbY2AaMrm3vMrytPegqp43WcYzHIXsO1WhQRGwsK5eiPR1bWggA2O1Wf/CKaUw8w4db4n09ZIu2mXjept4=
+X-Received: by 2002:a9d:7e87:: with SMTP id m7mr11003432otp.128.1612731559974;
+ Sun, 07 Feb 2021 12:59:19 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <7ADF39E2-647E-49E2-9C5B-B0BF6A303B95@holtmann.org>
+From:   KeithG <ys3al35l@gmail.com>
+Date:   Sun, 7 Feb 2021 14:59:09 -0600
+Message-ID: <CAG17S_Nhp2DtP0jqHkdq51ZXOgGmLwRhzvqH0wmj2jSao7pZLQ@mail.gmail.com>
+Subject: keyboard pairing railures
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Dec 18, 2020 at 10:23:08PM +0100, Marcel Holtmann wrote:
-> Hi Trent,
-> 
-> > When alt mode 6 is not available, fallback to the kernel <= 5.7 behavior
-> > of always using alt mode 1.
-> > 
-> > Prior to kernel 5.8, btusb would always use alt mode 1 for WBS (Wide
-> > Band Speech aka mSBC aka transparent SCO).  In commit baac6276c0a9
-> > ("Bluetooth: btusb: handle mSBC audio over USB Endpoints") this
-> > was changed to use alt mode 6, which is the recommended mode in the
-> > Bluetooth spec (Specifications of the Bluetooth System, v5.0, Vol 4.B
-> > §2.2.1).  However, many if not most BT USB adapters do not support alt
-> > mode 6.  In fact, I have been unable to find any which do.
+I have an HP keyboard and have paired it with my RPI3B. I can
+eventually get it to pair, but it takes many many attempts until it
+finally pairs so I can trust it and use it. The latest bluez on Arch
+Linux is 5.55 which is installed and bluez-tools is 0.2.0 I get this
+when I attempt a pair:
+[bluetooth]# pair  08:B7:38:11:A6:C2
+Attempting to pair with 08:B7:38:11:A6:C2
+[CHG] Device 08:B7:38:11:A6:C2 Connected: yes
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+[agent] Passkey: 104817
+Failed to pair: org.bluez.Error.AuthenticationFailed
+[CHG] Device 08:B7:38:11:A6:C2 Connected: no
+I restart bluetooth, restart the keyboard and still get this. I keep
+trying until it finally pairs. It feels like some sort of race
+condition or timing or something that it sometimes connects and
+sometimes not. Once paired/trusted, it seems to always work.
 
-> patch has been applied to bluetooth-next tree.
+In the journal, I always get these messages when I start bluetooth. My
+main.conf has only one change from the repo "AutoEnable=3Dtrue" added at
+the end:
+Feb 07 14:04:46 rune64 systemd[1]: Starting Bluetooth service...
+Feb 07 14:04:46 rune64 bluetoothd[4106]: Bluetooth daemon 5.55
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRPageScanType=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRPageScanInterval=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRPageScanWindow=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRInquiryScanType=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRInquiryScanInterval=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRInquiryScanWindow=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRLinkSupervisionTimeout=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRPageTimeout=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRMinSniffInterval=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CBRMaxSniffInterval=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEMinAdvertisementInterval=E2=80=9D in group =E2=80=9CController=
+=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEMaxAdvertisementInterval=E2=80=9D in group =E2=80=9CController=
+=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEMultiAdvertisementRotationInterval=E2=80=9D in group =E2=80=9CCo=
+ntroller=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanIntervalAutoConnect=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanWindowAutoConnect=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanIntervalSuspend=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanWindowSuspend=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanIntervalDiscovery=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanWindowDiscovery=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanIntervalAdvMonitor=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanWindowAdvMonitor=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanIntervalConnect=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEScanWindowConnect=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEMinConnectionInterval=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEMaxConnectionInterval=E2=80=9D in group =E2=80=9CController=E2=
+=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEConnectionLatency=E2=80=9D in group =E2=80=9CController=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEConnectionSupervisionTimeout=E2=80=9D in group =E2=80=9CControll=
+er=E2=80=9D
+Feb 07 14:04:46 rune64 bluetoothd[4106]:
+src/main.c:parse_controller_config() Key file does not have key
+=E2=80=9CLEAutoconnecttimeout=E2=80=9D in group =E2=80=9CController=E2=80=
+=9D
+Feb 07 14:04:46 rune64 systemd[1]: Started Bluetooth service.
+Feb 07 14:04:46 rune64 bluetoothd[4106]: Starting SDP server
+Feb 07 14:04:46 rune64 bluetoothd[4106]: Bluetooth management
+interface 1.14 initialized
 
-For easier application to the stable tree(s) this should probably get:
-  Fixes: baac6276c0a9 ("Bluetooth: btusb: handle mSBC audio over USB Endpoints")
+When I finally connect it I get this which looks normal:
+Feb 07 14:09:19 rune64 bluetoothd[4106]: Set device flags return
+status: Unknown Command
+Feb 07 14:09:50 rune64 kernel: Bluetooth: HIDP (Human Interface
+Emulation) ver 1.2
+Feb 07 14:09:50 rune64 kernel: Bluetooth: HIDP socket layer initialized
+Feb 07 14:09:50 rune64 kernel: hid-generic 0005:04CA:0079.0001:
+unknown main item tag 0x0
+Feb 07 14:09:50 rune64 kernel: input: HP Bluetooth Keyboard K4000
+Keyboard as /devices/platform/soc/3f201000.serial/serial0/serial0-0/bluetoo=
+th/hci0/hci0:11/0005:04CA:0079.0001/input/in>
+Feb 07 14:09:50 rune64 kernel: input: HP Bluetooth Keyboard K4000
+Consumer Control as
+/devices/platform/soc/3f201000.serial/serial0/serial0-0/bluetooth/hci0/hci0=
+:11/0005:04CA:0079.0001/>
+Feb 07 14:09:50 rune64 kernel: input: HP Bluetooth Keyboard K4000
+System Control as
+/devices/platform/soc/3f201000.serial/serial0/serial0-0/bluetooth/hci0/hci0=
+:11/0005:04CA:0079.0001/in>
+Feb 07 14:09:50 rune64 kernel: hid-generic 0005:04CA:0079.0001:
+input,hidraw0: BLUETOOTH HID v5.01 Keyboard [HP Bluetooth Keyboard
+K4000] on 43:45:c0:00:1f:ac
 
-In my testing this indeed fixes mSBC audio with both a Belkin (Broadcom
-BCM20702A, 050d:065a) and an Intel Bluetooth (8087:0a2b) adapters.
+I do not remember this being a problem in the past.
 
-  Tested-By: Sjoerd Simons <sjoerd@collabora.com>
-
-Regards,
-  Sjoerd
+Thanks!
