@@ -4,103 +4,71 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31984C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:50:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F24A5C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:54:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C8A5A64E6B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:50:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99B5464E6B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231342AbhBHNuv convert rfc822-to-8bit (ORCPT
+        id S231697AbhBHNyL convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Feb 2021 08:50:51 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:34854 "EHLO
+        Mon, 8 Feb 2021 08:54:11 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:56845 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230476AbhBHNuq (ORCPT
+        with ESMTP id S231462AbhBHNxw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Feb 2021 08:50:46 -0500
+        Mon, 8 Feb 2021 08:53:52 -0500
 Received: from marcel-macbook.holtmann.net (p4ff9f5d2.dip0.t-ipconnect.de [79.249.245.210])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 91B33CED06;
-        Mon,  8 Feb 2021 14:57:32 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2DAA5CED06;
+        Mon,  8 Feb 2021 15:00:36 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH 1/1] Bluetooth: Fix Just-Works re-pairing
+Subject: Re: [PATCH] Bluetooth: btusb: Some Qualcomm Bluetooth adapters stop
+ working
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210206141423.13593-2-matias.karhumaa@gmail.com>
-Date:   Mon, 8 Feb 2021 14:50:03 +0100
+In-Reply-To: <20210208050237.42179-1-hui.wang@canonical.com>
+Date:   Mon, 8 Feb 2021 14:53:07 +0100
 Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        rjliao@codeaurora.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1F3AE31B-17F0-4FEA-AC75-472DC7C8E1B0@holtmann.org>
-References: <20210206141423.13593-1-matias.karhumaa@gmail.com>
- <20210206141423.13593-2-matias.karhumaa@gmail.com>
-To:     Matias Karhumaa <matias.karhumaa@gmail.com>
+Message-Id: <CA2C8796-11CA-4E6F-A603-AE764516C850@holtmann.org>
+References: <20210208050237.42179-1-hui.wang@canonical.com>
+To:     Hui Wang <hui.wang@canonical.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matias,
+Hi Hui,
 
-> Fix Just-Works pairing responder role in case where LTK already exists.
-> Currently when trying to initiate re-pairing from another device
-> against Linux using Just-Works, pairing fails due to DHKey check failure
-> on Linux side. This happens because mackey calculation is skipped
-> totally if LTK already exists due to logic flaw in
-> smp_cmd_pairing_random() function.
+> This issue starts from linux-5.10-rc1, I reproduced this issue on my
+> Dell Inspiron 7447 with BT adapter 0cf3:e005, the kernel will print
+> out: "Bluetooth: hci0: don't support firmware rome 0x31010000", and
+> someone else also reported the similar issue to bugzilla #211571.
 > 
-> With this fix mackey is calculated right before requesting confirmation
-> for Just-Works pairing from userspace which in turn fixes the DHKey
-> calculation.
+> I found this is a regression introduced by 'commit b40f58b97386
+> ("Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855 support"), the
+> patch assumed that if high ROM version is not zero, it is an adapter
+> on WCN6855, but many old adapters don't need to load rampatch or nvm,
+> and they have non-zero high ROM version.
 > 
-> Fixes: eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
-> Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
+> To fix it, let the driver match the rom_version in the
+> qca_devices_table first, if there is no entry matched, check the
+> high ROM version, if it is not zero, we assume this adapter is ready
+> to work and no need to load rampatch and nvm like previously.
+> 
+> BugLink: https://bugzilla.kernel.org/show_bug.cgi?id=211571
+> Fixes: b40f58b97386 ("Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855 support")
+> Signed-off-by: Hui Wang <hui.wang@canonical.com>
 > ---
-> net/bluetooth/smp.c | 37 +++++++++----------------------------
-> 1 file changed, 9 insertions(+), 28 deletions(-)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index b0c1ee110eff..c3ea50fcac6d 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2122,7 +2122,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-> 	struct smp_chan *smp = chan->data;
-> 	struct hci_conn *hcon = conn->hcon;
-> 	u8 *pkax, *pkbx, *na, *nb, confirm_hint;
-> -	u32 passkey;
-> +	u32 passkey = 0;
-> 	int err;
-> 
-> 	BT_DBG("conn %p", conn);
-> @@ -2174,24 +2174,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
-> 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
-> 			     smp->prnd);
-> 		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
-> -
-> -		/* Only Just-Works pairing requires extra checks */
-> -		if (smp->method != JUST_WORKS)
-> -			goto mackey_and_ltk;
-> -
-> -		/* If there already exists long term key in local host, leave
-> -		 * the decision to user space since the remote device could
-> -		 * be legitimate or malicious.
-> -		 */
-> -		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
-> -				 hcon->role)) {
-> -			/* Set passkey to 0. The value can be any number since
-> -			 * it'll be ignored anyway.
-> -			 */
-> -			passkey = 0;
-> -			confirm_hint = 1;
-> -			goto confirm;
-> -		}
-> 	}
+> drivers/bluetooth/btusb.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
 
-I have a concern if we just remove such a comment. I think the commit message needs a bit more explanatory and this needs a few more reviews.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
