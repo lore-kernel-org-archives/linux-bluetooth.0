@@ -7,76 +7,100 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4FFAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 22:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEB21C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 22:14:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5387D64E8C
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 22:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A00CB64E9A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 22:14:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbhBHWIz (ORCPT
+        id S230515AbhBHWOd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Feb 2021 17:08:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56902 "EHLO
+        Mon, 8 Feb 2021 17:14:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58110 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhBHWIw (ORCPT
+        with ESMTP id S230213AbhBHWOb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Feb 2021 17:08:52 -0500
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBCCC061786
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Feb 2021 14:08:12 -0800 (PST)
-Received: by mail-pg1-x52b.google.com with SMTP id t11so7469269pgu.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Feb 2021 14:08:12 -0800 (PST)
+        Mon, 8 Feb 2021 17:14:31 -0500
+Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F69BC061786
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Feb 2021 14:13:51 -0800 (PST)
+Received: by mail-oi1-x22d.google.com with SMTP id m7so17291502oiw.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Feb 2021 14:13:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=EfGJM1B9OIrbuPlkv98uDVFWRd1DV0wM9reH2v8c/Co=;
-        b=kXrIaAK+nULmMEool5khncbyj62V605Wy8lXRfH8z0wdtraZtOZzEKTmYPzIXZe2ij
-         hmTdKzOxRsazUWJdXb/76ttwX5yX9vtqMUWizruqsMKpWJSYBE2j5IEGhb/v2EeIw2mk
-         Y9Fh1wj9rSpphY34+70cXDlbBI8RloIgBdqvYrfQZQg8Nyob3sSk4jFI9LmjaW7UaJnD
-         3G3BYqmONVI+QSGUNeBFoAJxj94YVRTnJX0ectE68uzMQTX+e/3L+Xk5gD+/U09ZG+Cf
-         B9XP0x7e3ZGKe5uKL5Acmbxd4jxvjhAxXR0FAQCek31Txe4pSD8imqQ1C2Wn5TEBbByb
-         vWLA==
+        bh=vtBNNC+mHWLPqon+2os7p/gSQH9H51aBzaYKCv0aWvc=;
+        b=OpyxTH/hpLN9qXoW7I0GE20RU75Zg612eS00GJhH8m89BA+7qqIaXzwh+s28am751v
+         7dnELakFuc1zqMu5pxY3S9/tL4X73RMy1fbG+JQy72YvXC/6/4U9lWUMaCeHBB4JrSmh
+         qup2mR3qD15+yE8R8MOcnJfZ+MyZZ2NeM+3iCcKql97/5ZrxDNPET1OHaWQz6TV+iWkF
+         WMFnbLz24Pkcy9Q9coRH7iUIyTOnncWVLb2K9QGdf5olWIGb7tWaWSrjXjpxpvTqEFTi
+         qJEkYnhgiFV5OnhdGPWwWpOpduXHr4hDZ/kIrAUhPebXClXTVaTsg7knpXuOK+W7reu/
+         Jw2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=EfGJM1B9OIrbuPlkv98uDVFWRd1DV0wM9reH2v8c/Co=;
-        b=fg3wM6XROX7T6ObKKsgqf07l6IV07kaRijOrCk6RxykndxhtkNFxjLc1Hij1ZOQyvf
-         I4ItVztg2BX5FP71ex9wGeGNFUE2uqNstUaJpnx1o/0ZBzOP2GWvSZbOEFH49aM62MXv
-         qyw6vY9qcuKeNRfN6j5FCYeG+kvHcu62h3jEQX/+lEEFipZgk8gw9zg6jEwBctVeCHE+
-         /RkXizcf6427IQQIGL2RMxABt1MAxzHyiSfNyYB7oAjF4hruGgRomTJ0GDAwlPfii7X5
-         kMVmpxxWdMZpkefM2KqQPyQyUMiUHS0TIrhg7i/0vsid2ij1QpRDBmv1WVkJkiX3GV1m
-         0LTQ==
-X-Gm-Message-State: AOAM533PGDSjfDR3dcsFzS3Z2VEohQcxUh0yyGbvFTMhR+ka/IdT+LTK
-        dU3aOA7DKiuYiCd86Jyxag+zrbIF7v7P9sLXnPY=
-X-Google-Smtp-Source: ABdhPJzX2uZjHHgk4utD1wL4He9/ktcXcx5FlNB9DIzCuBkb5wOiWGVl8IfhsiVtAo8VOLEAM5Zox1nVgRLAAdrepik=
-X-Received: by 2002:a05:6a00:7c7:b029:1de:80cd:46b8 with SMTP id
- n7-20020a056a0007c7b02901de80cd46b8mr4892095pfu.63.1612822091793; Mon, 08 Feb
- 2021 14:08:11 -0800 (PST)
+        bh=vtBNNC+mHWLPqon+2os7p/gSQH9H51aBzaYKCv0aWvc=;
+        b=uIl8SHuEPX708o1Zxk/+6nRUz9UKVQASYaEKjUjNW3mMzz/K0rtrhCUyXB9JaSHMM2
+         rVPGLVilvQGrBxpkaQu38D6+0vBp8Io+SGmzOTk/8DchQ57GBGTRh5xTC7Ej8d2UXg+3
+         ESeTHlxTASbToGCeyMtOdpFvveOGyhKdK5V6QmSvjHSeBVDczLzUboAbZtIGjnExXRTF
+         KIS3NtAyi6KLjirjbjWRGfQe9JIK776HFHGjsLFRSXll8AK49IIfm+zBIN2RAMTe258i
+         ol9Q+kQ7aE9gOvMd6W+eaC5EAniTxziTvOdkyLJKL+ZX1u5wtrprI7pSadHZGffnfru/
+         AIQA==
+X-Gm-Message-State: AOAM530mMEngkNZJPrK1xOMKy0XHk1CcLEcLMKC94EiDltVnYTG4QVy8
+        czRov1o3XYG9jecBShl1nMomxsYKAYbCDIq+tf/hXUiAJzg=
+X-Google-Smtp-Source: ABdhPJwgmeZgLHLIBf1Is/CNFr1aeoUgeaqpHfiTjtyhGE+YM6MfMdbmoOFjjoZkxU6Kqww6CuJ+B5zvwKiFXvlbvcY=
+X-Received: by 2002:a05:6808:1290:: with SMTP id a16mr565722oiw.161.1612822430508;
+ Mon, 08 Feb 2021 14:13:50 -0800 (PST)
 MIME-Version: 1.0
-References: <20210206141423.13593-1-matias.karhumaa@gmail.com>
- <20210206141423.13593-2-matias.karhumaa@gmail.com> <1F3AE31B-17F0-4FEA-AC75-472DC7C8E1B0@holtmann.org>
-In-Reply-To: <1F3AE31B-17F0-4FEA-AC75-472DC7C8E1B0@holtmann.org>
-From:   Matias Karhumaa <matias.karhumaa@gmail.com>
-Date:   Tue, 9 Feb 2021 00:08:00 +0200
-Message-ID: <CAMCGoNwZe+veGUpa-A3W-4y_t2A6f7ovtnmzre3P8NnLQn7iiQ@mail.gmail.com>
-Subject: Re: [PATCH 1/1] Bluetooth: Fix Just-Works re-pairing
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+References: <20210205114735.Bluez.v1.1.I68cf9b7c0c0c3c0e069011976e3008ff11374a28@changeid>
+ <601ccc1f.1c69fb81.4084.e3cb@mx.google.com>
+In-Reply-To: <601ccc1f.1c69fb81.4084.e3cb@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 8 Feb 2021 14:13:39 -0800
+Message-ID: <CABBYNZJJY+GgGzQHj_xTMUr_8ui7FVyGfU=9JmJB+L05bPToVA@mail.gmail.com>
+Subject: Re: [Bluez,v1] a2dp: set session to NULL when freeing channel
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Archie Pusaka <apusaka@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Archie,
 
-> I have a concern if we just remove such a comment. I think the commit message needs a bit more explanatory and this needs a few more reviews.
+On Thu, Feb 4, 2021 at 8:44 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=428439
+>
+> ---Test result---
+>
+> ##############################
+> Test: CheckPatch - PASS
+>
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-Thanks for taking time to look into this. I have just sent v2
-addressing your comments.
+Applied, thanks.
 
-Best regards,
-Matias Karhumaa
+-- 
+Luiz Augusto von Dentz
