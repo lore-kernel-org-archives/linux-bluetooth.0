@@ -2,79 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.3 required=3.0 tests=BAYES_05,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60E92C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Feb 2021 23:02:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37545C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 00:21:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2888664DD8
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Feb 2021 23:02:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF3D364E3A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 00:21:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229537AbhBGXC2 (ORCPT
+        id S229720AbhBHAUu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Feb 2021 18:02:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41978 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbhBGXC2 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Feb 2021 18:02:28 -0500
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B8D2C06174A
-        for <linux-bluetooth@vger.kernel.org>; Sun,  7 Feb 2021 15:01:48 -0800 (PST)
-Received: by mail-oo1-xc34.google.com with SMTP id f1so183107oou.0
-        for <linux-bluetooth@vger.kernel.org>; Sun, 07 Feb 2021 15:01:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=anjpz/Vnvrbav6pLH7NBUnIh8nN23GLILjVYByAoaUY=;
-        b=pICZ6xk7quOjjHq0ibXfEPxaa4QkSzaRe/+KHMBAPZV6pkKt3BhI74UXCYei3cL66v
-         F+IEj4UeJgkBP5bqRKGrwmwzDmP5W7scSOftnY3sA6sWyMYYHcwpaWiZqIL/Dpx0YvK2
-         7iG2tCUTS3XgYjSUIDXcW8Ri0t/CfNy86TOShqJuNyGXtf8JP/GUUkPD9o2S9P8+P6Bs
-         Dn0uGE5NomJIooOEAf5M959VyZ7O7U7fxlOH911CCZvPenfvPWjFF8/Nks6vi3xM4J/4
-         pgdqyyW+uLulH+iF6zSpdNrU8ffFu2IMy0qbEBzZzbqko1N9RrBLWoCWhUEIUiPUEWuQ
-         Fvsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=anjpz/Vnvrbav6pLH7NBUnIh8nN23GLILjVYByAoaUY=;
-        b=QEtusxReixy7W2FTQdJRWTYby7yGOKYiI0XIeM07etOekO0HilSudJVWcJd7vYIdBt
-         bmF6l7r4kLoYEiTll1N4AGvJVaaila71xo3eKPmwGWAMkxsGapXTSCV8bnc4j+Ilw5/I
-         Hz1s/xtBpASM+YR5l/mTolpkcCv1mqhaTRKQn2kmG0BNJpV/UOGAo5+JkmJoj05Wholn
-         Sd2cRXPIxBWD2e3er7NKLXTMwDlQvS1ZcMbbzISiN03h6oMRk4+RC1YgDH9sWb2Elyou
-         hP9ykcnIFYvzKqkQRaQEmnYr/F4itsoJKPnCloqZer5c5R9PBQ95gbQOPjNqUoNLCK8E
-         w/sA==
-X-Gm-Message-State: AOAM5320I/ArDqfkoaAXs3DYHV2Lm0KP+ZzYfT0c4rMxsmCcxSmNwg45
-        cgOSGsALh4NXGVn3NnPRseZEZEbdIOSM/izYB6w=
-X-Google-Smtp-Source: ABdhPJxE3F48mEcPwFMGfW3BmWYPHPPB8dhsXLOCUeYXTechbU/jDHkScfQxenx3RzDqyva8tfE0Z5/zurhktyQwsQM=
-X-Received: by 2002:a4a:9d0e:: with SMTP id w14mr10606901ooj.7.1612738907381;
- Sun, 07 Feb 2021 15:01:47 -0800 (PST)
-MIME-Version: 1.0
-References: <CAG17S_Nhp2DtP0jqHkdq51ZXOgGmLwRhzvqH0wmj2jSao7pZLQ@mail.gmail.com>
- <CAHdu5-69z1S0YcOmRMn7MnfvSAWt5H5oZzkZNCtj5tVp-MfOfg@mail.gmail.com>
-In-Reply-To: <CAHdu5-69z1S0YcOmRMn7MnfvSAWt5H5oZzkZNCtj5tVp-MfOfg@mail.gmail.com>
-From:   KeithG <ys3al35l@gmail.com>
-Date:   Sun, 7 Feb 2021 17:01:36 -0600
-Message-ID: <CAG17S_Pik_ThMqPGyvu6mviy1Htr+Yhs_AAAxpXFOJ3Q9E0g3A@mail.gmail.com>
-Subject: Re: keyboard pairing railures
-To:     "mathieu.stephan@gmail.com" <mathieu.stephan@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+        Sun, 7 Feb 2021 19:20:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:40608 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229623AbhBHAUt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 7 Feb 2021 19:20:49 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 02D7964E3A
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Feb 2021 00:20:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1612743608;
+        bh=rr+FWiw8R4zRZXKsasimBWorM3oSRi1QmclCtqvbtZw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=EHHvMbhZLFWTVyWMQdiU7hvlb4Ld6li6IalZJh/55D3A/DoWUmlR7n3NI+u6BoMdD
+         Ll8UkJLS6IcXAo9wLJQhdw18V0NeOAZxOw9hfTy5KudhCXgw2SGSsRpswPQf6UC5hw
+         5bCbLsM+SoccGSmWhiCwIml4SrGDyuCO0Fg6V8Q0dENIZnwf3LRtMfxabYDx2KcI28
+         cYVAO9zAkhl25X3Ylbe96UrAqiN816FPar2svYlCuPfKC9esevijOsFw9hpqTGTPdl
+         bs5WAc9F43pGIrfaaKxeeoZ0VXEjDYG98rXpOf5q027FeVqfkyONmD+JBpbYkq7xq+
+         uh5QLv5aWwWAQ==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 211571] Bluetooth: hci0: don't support firmware rome 0x1020200
+Date:   Mon, 08 Feb 2021 00:20:07 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sinekonata@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-211571-62941-puKkek8zwM@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-211571-62941@https.bugzilla.kernel.org/>
+References: <bug-211571-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Sun, Feb 7, 2021 at 3:12 PM mathieu.stephan@gmail.com
-<mathieu.stephan@gmail.com> wrote:
->
-> Hello,
->
-> The Mooltipass team has indeed seen this quite often recently.
-> https://github.com/mooltipass/minible/issues/205
-> https://github.com/bluez/bluez/issues/55
+https://bugzilla.kernel.org/show_bug.cgi?id=3D211571
 
-Trace posted to github issue 55.
+sinekonata@gmail.com changed:
+
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |sinekonata@gmail.com
+
+--- Comment #2 from sinekonata@gmail.com ---
+I have the same problem=20
+
+sudo dmesg |grep Bluetooth
+[    1.376617] usb 1-1.1: Product: Bluetooth USB Host Controller
+[   13.557022] Bluetooth: Core ver 2.22
+[   13.557043] Bluetooth: HCI device and connection manager initialized
+[   13.557047] Bluetooth: HCI socket layer initialized
+[   13.557050] Bluetooth: L2CAP socket layer initialized
+[   13.557054] Bluetooth: SCO socket layer initialized
+[   13.623406] Bluetooth: hci0: don't support firmware rome 0x1020200
+[   18.084063] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   18.084067] Bluetooth: BNEP filters: protocol multicast
+[   18.084072] Bluetooth: BNEP socket layer initialized
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
