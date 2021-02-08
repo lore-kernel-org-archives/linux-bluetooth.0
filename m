@@ -2,100 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC63C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:28:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31984C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5CCEC64E7E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:28:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C8A5A64E6B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Feb 2021 13:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230192AbhBHN2z (ORCPT
+        id S231342AbhBHNuv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Feb 2021 08:28:55 -0500
-Received: from so15.mailgun.net ([198.61.254.15]:25847 "EHLO so15.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229759AbhBHN1A (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Feb 2021 08:27:00 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1612790787; h=Content-Type: MIME-Version: Message-ID:
- In-Reply-To: Date: References: Subject: Cc: To: From: Sender;
- bh=fswM5y6W+PBXhZObXryia2PwKlc/w0gNTSrV11Ri0dA=; b=kqke+oHnDWvWxVXnJDybNfXtBgBJoJiF0x3voF3z/V9PKfYkKDaqxJ/K+2jcP6dxeGMDWJMT
- aCZxbzRRl6t2gW3jWB/+xM0SiJxbgQLjVwcrKuPnXXq4sWmqE0GV2yxWjsNiupUuHkE1r+RR
- aEIzyR/i6YqRGs2hPQ9X7hcCenY=
-X-Mailgun-Sending-Ip: 198.61.254.15
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 60213bddd5a7a3baae448e61 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 08 Feb 2021 13:25:49
- GMT
-Sender: kvalo=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id D00E2C43462; Mon,  8 Feb 2021 13:25:48 +0000 (UTC)
-Received: from tynnyri.adurom.net (tynnyri.adurom.net [51.15.11.48])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: kvalo)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id BC709C433CA;
-        Mon,  8 Feb 2021 13:25:45 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org BC709C433CA
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=kvalo@codeaurora.org
-From:   Kalle Valo <kvalo@codeaurora.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, rjliao@codeaurora.org,
-        hbandi@codeaurora.org, abhishekpandit@chromium.org
-Subject: Re: [PATCH v1] Bluetooth: hci_qca:Fixed issue during suspend
-References: <1612539436-8498-1-git-send-email-gubbaven@codeaurora.org>
-Date:   Mon, 08 Feb 2021 15:25:42 +0200
-In-Reply-To: <1612539436-8498-1-git-send-email-gubbaven@codeaurora.org>
-        (Venkata Lakshmi Narayana Gubba's message of "Fri, 5 Feb 2021 21:07:16
-        +0530")
-Message-ID: <87k0rik7xl.fsf@tynnyri.adurom.net>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/26.1 (gnu/linux)
-MIME-Version: 1.0
-Content-Type: text/plain
+        Mon, 8 Feb 2021 08:50:51 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:34854 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230476AbhBHNuq (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Feb 2021 08:50:46 -0500
+Received: from marcel-macbook.holtmann.net (p4ff9f5d2.dip0.t-ipconnect.de [79.249.245.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 91B33CED06;
+        Mon,  8 Feb 2021 14:57:32 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
+Subject: Re: [PATCH 1/1] Bluetooth: Fix Just-Works re-pairing
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210206141423.13593-2-matias.karhumaa@gmail.com>
+Date:   Mon, 8 Feb 2021 14:50:03 +0100
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1F3AE31B-17F0-4FEA-AC75-472DC7C8E1B0@holtmann.org>
+References: <20210206141423.13593-1-matias.karhumaa@gmail.com>
+ <20210206141423.13593-2-matias.karhumaa@gmail.com>
+To:     Matias Karhumaa <matias.karhumaa@gmail.com>
+X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org> writes:
+Hi Matias,
 
-> If BT SoC is running with ROM FW then just return in
-> qca_suspend function as ROM FW does not support
-> in-band sleep.
->
-> Fixes: 2be43abac5a8 ("Bluetooth: hci_qca: Wait for timeout during suspend")
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> Fix Just-Works pairing responder role in case where LTK already exists.
+> Currently when trying to initiate re-pairing from another device
+> against Linux using Just-Works, pairing fails due to DHKey check failure
+> on Linux side. This happens because mackey calculation is skipped
+> totally if LTK already exists due to logic flaw in
+> smp_cmd_pairing_random() function.
+> 
+> With this fix mackey is calculated right before requesting confirmation
+> for Just-Works pairing from userspace which in turn fixes the DHKey
+> calculation.
+> 
+> Fixes: eed467b517e8 ("Bluetooth: fix passkey uninitialized when used")
+> Signed-off-by: Matias Karhumaa <matias.karhumaa@gmail.com>
+> ---
+> net/bluetooth/smp.c | 37 +++++++++----------------------------
+> 1 file changed, 9 insertions(+), 28 deletions(-)
+> 
+> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+> index b0c1ee110eff..c3ea50fcac6d 100644
+> --- a/net/bluetooth/smp.c
+> +++ b/net/bluetooth/smp.c
+> @@ -2122,7 +2122,7 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+> 	struct smp_chan *smp = chan->data;
+> 	struct hci_conn *hcon = conn->hcon;
+> 	u8 *pkax, *pkbx, *na, *nb, confirm_hint;
+> -	u32 passkey;
+> +	u32 passkey = 0;
+> 	int err;
+> 
+> 	BT_DBG("conn %p", conn);
+> @@ -2174,24 +2174,6 @@ static u8 smp_cmd_pairing_random(struct l2cap_conn *conn, struct sk_buff *skb)
+> 		smp_send_cmd(conn, SMP_CMD_PAIRING_RANDOM, sizeof(smp->prnd),
+> 			     smp->prnd);
+> 		SMP_ALLOW_CMD(smp, SMP_CMD_DHKEY_CHECK);
+> -
+> -		/* Only Just-Works pairing requires extra checks */
+> -		if (smp->method != JUST_WORKS)
+> -			goto mackey_and_ltk;
+> -
+> -		/* If there already exists long term key in local host, leave
+> -		 * the decision to user space since the remote device could
+> -		 * be legitimate or malicious.
+> -		 */
+> -		if (hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type,
+> -				 hcon->role)) {
+> -			/* Set passkey to 0. The value can be any number since
+> -			 * it'll be ignored anyway.
+> -			 */
+> -			passkey = 0;
+> -			confirm_hint = 1;
+> -			goto confirm;
+> -		}
+> 	}
 
-This patch does not apply neither to v5.11-rc7 or v5.11-rc5. What tree
-did you use as the baseline?
+I have a concern if we just remove such a comment. I think the commit message needs a bit more explanatory and this needs a few more reviews.
 
-$ patch -p1 < raw
-patching file drivers/bluetooth/hci_qca.c
-Hunk #1 succeeded at 76 (offset -1 lines).
-Hunk #2 succeeded at 1662 (offset -3 lines).
-Hunk #3 succeeded at 1720 (offset -3 lines).
-Hunk #4 FAILED at 2107.
-1 out of 4 hunks FAILED -- saving rejects to file
-drivers/bluetooth/hci_qca.c.rej
+Regards
 
-$ git am -s -3 raw
-Applying: Bluetooth: hci_qca:Fixed issue during suspend
-error: sha1 information is lacking or useless
-(drivers/bluetooth/hci_qca.c).
-error: could not build fake ancestor
-Patch failed at 0001 Bluetooth: hci_qca:Fixed issue during suspend
+Marcel
 
--- 
-https://patchwork.kernel.org/project/linux-wireless/list/
-
-https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
