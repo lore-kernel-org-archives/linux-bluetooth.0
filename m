@@ -4,31 +4,31 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F461C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 05:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58C35C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 08:39:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B81464E30
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 05:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CC4964E79
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 08:39:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229752AbhBIFv1 (ORCPT
+        id S229623AbhBIIjP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Feb 2021 00:51:27 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:46766 "EHLO
+        Tue, 9 Feb 2021 03:39:15 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49707 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229521AbhBIFv0 (ORCPT
+        with ESMTP id S229992AbhBIIij (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Feb 2021 00:51:26 -0500
+        Tue, 9 Feb 2021 03:38:39 -0500
 Received: from localhost.localdomain (p4ff9f72d.dip0.t-ipconnect.de [79.249.247.45])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3B383CED14
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Feb 2021 06:58:08 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 8EC37CED18
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Feb 2021 09:45:24 +0100 (CET)
 From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add helper for serialized HCI command execution
-Date:   Tue,  9 Feb 2021 06:50:35 +0100
-Message-Id: <20210209055035.152087-1-marcel@holtmann.org>
+Subject: [RFC PATCH v2] Bluetooth: Add helper for serialized HCI command execution
+Date:   Tue,  9 Feb 2021 09:37:51 +0100
+Message-Id: <20210209083751.160549-1-marcel@holtmann.org>
 X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -61,9 +61,9 @@ other tasks that should be simplified as well.
 
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- include/net/bluetooth/hci_core.h | 12 ++++++++
- net/bluetooth/hci_core.c         | 48 ++++++++++++++++++++++++++++++++
- 2 files changed, 60 insertions(+)
+ include/net/bluetooth/hci_core.h | 12 +++++++
+ net/bluetooth/hci_core.c         | 61 ++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
 index ebdd4afe30d2..6288518fe096 100644
@@ -103,10 +103,10 @@ index ebdd4afe30d2..6288518fe096 100644
  
  /* ----- HCI Sockets ----- */
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b0d9c36acc03..2657c2e35080 100644
+index b0d9c36acc03..6f171f47c82c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -2325,6 +2325,50 @@ static void hci_error_reset(struct work_struct *work)
+@@ -2325,6 +2325,60 @@ static void hci_error_reset(struct work_struct *work)
  	hci_dev_do_open(hdev);
  }
  
@@ -154,10 +154,20 @@ index b0d9c36acc03..2657c2e35080 100644
 +	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
 +}
 +
++static void hci_cmd_sync_clear(struct hci_dev *hdev)
++{
++	struct cmd_sync_work_entry *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++}
++
  void hci_uuids_clear(struct hci_dev *hdev)
  {
  	struct bt_uuid *uuid, *tmp;
-@@ -3821,6 +3865,10 @@ struct hci_dev *hci_alloc_dev(void)
+@@ -3821,6 +3875,10 @@ struct hci_dev *hci_alloc_dev(void)
  	INIT_WORK(&hdev->error_reset, hci_error_reset);
  	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
  
@@ -168,6 +178,16 @@ index b0d9c36acc03..2657c2e35080 100644
  	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
  
  	skb_queue_head_init(&hdev->rx_q);
+@@ -3980,6 +4038,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
++	cancel_work_sync(&hdev->cmd_sync_work);
++	hci_cmd_sync_clear(hdev);
++
+ 	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
+ 		hci_suspend_clear_tasks(hdev);
+ 		unregister_pm_notifier(&hdev->suspend_notifier);
 -- 
 2.29.2
 
