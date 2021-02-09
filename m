@@ -2,64 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5ECEDC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 03:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F461C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 05:51:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BCB164E66
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 03:14:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3B81464E30
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Feb 2021 05:51:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229824AbhBIDNP convert rfc822-to-8bit (ORCPT
+        id S229752AbhBIFv1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Feb 2021 22:13:15 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:52531 "EHLO
+        Tue, 9 Feb 2021 00:51:27 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46766 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229881AbhBIDMe (ORCPT
+        with ESMTP id S229521AbhBIFv0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Feb 2021 22:12:34 -0500
-Received: from marcel-macbook.holtmann.net (p4ff9f72d.dip0.t-ipconnect.de [79.249.247.45])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 20CC1CED14;
-        Tue,  9 Feb 2021 04:18:43 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH v2] Bluetooth: btintel: Check firmware version before
- download
+        Tue, 9 Feb 2021 00:51:26 -0500
+Received: from localhost.localdomain (p4ff9f72d.dip0.t-ipconnect.de [79.249.247.45])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3B383CED14
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Feb 2021 06:58:08 +0100 (CET)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210204213414.1417675-1-luiz.dentz@gmail.com>
-Date:   Tue, 9 Feb 2021 04:11:14 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <229D4827-CB04-421D-8F10-032CAFB92F7C@holtmann.org>
-References: <20210204213414.1417675-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3654.60.0.2.21)
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: Add helper for serialized HCI command execution
+Date:   Tue,  9 Feb 2021 06:50:35 +0100
+Message-Id: <20210209055035.152087-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+The usage of __hci_cmd_sync() within the hdev->setup() callback allows for
+a nice and simple serialized execution of HCI commands. More importantly
+it allows for result processing before issueing the next command.
 
-> This checks the firmware build number, week and year matches with
-> repective version loaded and then skip the download process.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> 
-> 
-> drivers/bluetooth/btintel.c   | 94 +++++++++++++++++++++++++++--------
-> drivers/bluetooth/btintel.h   |  5 +-
-> drivers/bluetooth/btusb.c     | 16 +++++-
-> drivers/bluetooth/hci_intel.c |  7 ++-
-> 4 files changed, 96 insertions(+), 26 deletions(-)
+With the current usage of hci_req_run() it is possible to batch up
+commands and execute them, but it is impossible to react to their
+results or errors.
 
-Looks good to me. It would be however good to have some Tested-by and Reviewed-by tags added here to ensure that it doesn’t break any other assumptions.
+This is an attempt to generalize the hdev->setup() handling and provide
+a simple way of running multiple HCI commands from a single function
+context.
 
-Regards
+There are multiple struct work that are decdicated to certain tasks
+already used right now. It is add a lot of bloat to hci_dev struct and
+extra handling code. So it might be possible to put all of these behind
+a common HCI command infrastructure and just execute the HCI commands
+from the same work context in a serialized fashion.
 
-Marcel
+For example updating the white list and resolving list can be done now
+without having to know the list size ahead of time. Also preparing for
+suspend or resume shouldn't require a state machine anymore. There are
+other tasks that should be simplified as well.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/net/bluetooth/hci_core.h | 12 ++++++++
+ net/bluetooth/hci_core.c         | 48 ++++++++++++++++++++++++++++++++
+ 2 files changed, 60 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index ebdd4afe30d2..6288518fe096 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -302,6 +302,13 @@ struct amp_assoc {
+ 
+ #define HCI_MAX_PAGES	3
+ 
++typedef void (*cmd_sync_work_func_t)(struct hci_dev *hdev);
++
++struct cmd_sync_work_entry {
++	struct list_head list;
++	cmd_sync_work_func_t func;
++};
++
+ struct hci_dev {
+ 	struct list_head list;
+ 	struct mutex	lock;
+@@ -463,6 +470,9 @@ struct hci_dev {
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
+ 	struct work_struct	error_reset;
++	struct work_struct	cmd_sync_work;
++	struct list_head	cmd_sync_work_list;
++	struct mutex		cmd_sync_work_lock;
+ 
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+@@ -1687,6 +1697,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			     const void *param, u32 timeout);
+ 
++void hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func);
++
+ u32 hci_conn_get_phy(struct hci_conn *conn);
+ 
+ /* ----- HCI Sockets ----- */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index b0d9c36acc03..2657c2e35080 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2325,6 +2325,50 @@ static void hci_error_reset(struct work_struct *work)
+ 	hci_dev_do_open(hdev);
+ }
+ 
++static void hci_cmd_sync_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
++	struct cmd_sync_work_entry *entry;
++	cmd_sync_work_func_t func;
++
++	bt_dev_dbg(hdev, "");
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	entry = list_first_entry(&hdev->cmd_sync_work_list,
++				 struct cmd_sync_work_entry, list);
++	if (entry) {
++		list_del(&entry->list);
++		func = entry->func;
++		kfree(entry);
++	} else {
++		func = NULL;
++	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	if (func) {
++		hci_req_sync_lock(hdev);
++		func(hdev);
++		hci_req_sync_unlock(hdev);
++	}
++}
++
++void hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func)
++{
++	struct cmd_sync_work_entry *entry;
++
++	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	entry->func = func;
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
++}
++
+ void hci_uuids_clear(struct hci_dev *hdev)
+ {
+ 	struct bt_uuid *uuid, *tmp;
+@@ -3821,6 +3865,10 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
+ 
++	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
++	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
++	mutex_init(&hdev->cmd_sync_work_lock);
++
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
+-- 
+2.29.2
 
