@@ -2,145 +2,212 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25EFAC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 10:40:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F4CFC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 10:44:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DB88164E0B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 10:40:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DFA464E3B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 10:44:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230414AbhBJKkf (ORCPT
+        id S231253AbhBJKoA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Feb 2021 05:40:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48266 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231394AbhBJKiR (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Feb 2021 05:38:17 -0500
-Received: from mail-il1-x12b.google.com (mail-il1-x12b.google.com [IPv6:2607:f8b0:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B710C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 02:37:37 -0800 (PST)
-Received: by mail-il1-x12b.google.com with SMTP id q5so1346597ilc.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 02:37:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=lxifE+FrLS1X49k5wbrrTitDpayGrp62aCO6ryDI7Ww=;
-        b=i2KxmGhXP6mgzJ4o3Hkme9qaNz+eEabHQ/j8pIstBP/gR9Vm5XjvC8gajIBEp/mxO9
-         7sSinnC1jCtrnJIQ6KmjPCj/JKLZ/tRTmWOza0Tzbi7N6Zq2/cAcrvMubQTKnIe9BfQZ
-         jEnBsY+U9hdMjtHtlgRMYE6WYMnLsIKeTFuLSNSzirxMTopOb0nPviyPRF1B/kHOhlfe
-         XK25af/T7zUkeHURYEKmh5lTY9M4HBtIoZD4qp/7FlzB/kNYBVsSKPUd/wgKRclipn0S
-         a5GqA8K+nrt6cN+h35VV/rjGSLqunn/OA88eFuqvsRQewTanLM/+1d7LLi9GaDXvvEZf
-         yOxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=lxifE+FrLS1X49k5wbrrTitDpayGrp62aCO6ryDI7Ww=;
-        b=d2KyymD9rE2WrScKrIYKS402SX4IJAmT8Q6xYzxitOAHbdf6OzGLq52FwOzE8OMkst
-         bNbfjY8TWu4RT8ETjrCTkFDlkFD6GnhS4qOhFaTjhOLdHgWCJelke+GotvryymxJwP5G
-         Ktj2k5Wb71/QKUdQESLklR6Yc38OYJwlEXz8vIN0mDdbLpCUsiV8D6JhKzYPRJmTJGf1
-         VasJ9ONG4zNrHwV+FhlA8sQkKfF6VBiVg9Yr3lRzfDhuC9A7bsyL9rGGoJBpsOsQV8eH
-         EJcEIEdt9IrRtwubc0b6M4wSpe6x6MosLuqR529+OGQI5yHmgMseSEfw2jRZmYf+ywkC
-         Dh2g==
-X-Gm-Message-State: AOAM531W3Bo5b2Xj/bRDJCRKYkfhm8vb/uKdVke7KeIz01dWUyhuTOWo
-        nZbAIAdi7iSjwRYsVsoQ5D3/Mnxol0u28MORiPWFFcxrBoB78A==
-X-Google-Smtp-Source: ABdhPJx4MvM2z2MTxjI3/2xhLBoMU2Tb6tr5p+yGUuTMIDWh9wt/RhiGUmxaTkGY5Wii4/oSmOcrJPtx77rBFffs1MQ=
-X-Received: by 2002:a92:d485:: with SMTP id p5mr405445ilg.114.1612953456531;
- Wed, 10 Feb 2021 02:37:36 -0800 (PST)
-MIME-Version: 1.0
-References: <20210209114024.2910-1-falbrechtskirchinger@gmail.com>
- <20210209114024.2910-2-falbrechtskirchinger@gmail.com> <94DD2143-175D-4FAC-B001-D4F362DC604C@holtmann.org>
-In-Reply-To: <94DD2143-175D-4FAC-B001-D4F362DC604C@holtmann.org>
-From:   Florian Albrechtskirchinger <falbrechtskirchinger@gmail.com>
-Date:   Wed, 10 Feb 2021 11:37:24 +0100
-Message-ID: <CAHOGuTyuxdrtBe339aOczsVjXOmyMLYoGu6Dd25X_bt8a-rZ2w@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Fallback to 16 bit ROM version lookup
+        Wed, 10 Feb 2021 05:44:00 -0500
+Received: from mga01.intel.com ([192.55.52.88]:28920 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231390AbhBJKly (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 10 Feb 2021 05:41:54 -0500
+IronPort-SDR: 59HOV1B3RiRF7svuZGTVo+6bcRnkc+7qFcCw8IPz4Eg1KHvUUuqKZcCWFC7mKIEaTVbNaZmSWI
+ /gi597G3xdBQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9890"; a="201152472"
+X-IronPort-AV: E=Sophos;i="5.81,168,1610438400"; 
+   d="scan'208";a="201152472"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 02:39:44 -0800
+IronPort-SDR: UvUS9xRWcZBkryWQLTlQ4UUzLMkm5hP02JTxmgdRkbsyQcHfyyy4zApNqpjomZHqGUPloEcEjY
+ rndnkJgG2Adg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,168,1610438400"; 
+   d="scan'208";a="421003207"
+Received: from lkp-server02.sh.intel.com (HELO cd560a204411) ([10.239.97.151])
+  by fmsmga002.fm.intel.com with ESMTP; 10 Feb 2021 02:39:42 -0800
+Received: from kbuild by cd560a204411 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1l9muM-0002uV-7x; Wed, 10 Feb 2021 10:39:42 +0000
+Date:   Wed, 10 Feb 2021 18:39:39 +0800
+From:   kernel test robot <lkp@intel.com>
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 55c0bd77479b60ea29fd390faf4545cfb3a1d79e
+Message-ID: <6023b7eb.Yj8DGKSGH163KpLv%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Feb 9, 2021 at 2:42 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Florian,
->
-> > Commit b40f58b97386 ("Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
-> > support") changes ROM version lookup from 16 bit to 32 bit. Previously, the
-> > upper 16 bit of the version number were ignored. This breaks setups, where the
-> > upper 16 bits are non-zero, but are now assumed to be zero.
-> >
-> > An example of such a device would be
-> > 0cf3:3008 Qualcomm Atheros Communications Bluetooth (AR3011)
-> > with ROM version 0x1020200 and this corresponding entry in the device table:
-> > { 0x00000200, 28, 4, 16 }, /* Rome 2.0 */
-> >
-> > This patch adds a potential second round of lookups that mimics the old
-> > behavior, should no version have been matched by comparing the full 32 bits.
-> > During this second round only the lower 16 bits are compared, but only where
-> > the upper 16 bits are defined zero in the lookup table.
-> >
-> > Fixes: b40f58b97386 ("Bluetooth: btusb: Add Qualcomm Bluetooth SoC WCN6855
-> > support")
-> >
-> > Signed-off-by: Florian Albrechtskirchinger <falbrechtskirchinger@gmail.com>
-> > ---
-> > drivers/bluetooth/btusb.c | 17 ++++++++++++++++-
-> > 1 file changed, 16 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 03b83aa91277..d8c4c6474f14 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -4054,6 +4054,7 @@ static int btusb_setup_qca(struct hci_dev *hdev)
-> >       const struct qca_device_info *info = NULL;
-> >       struct qca_version ver;
-> >       u32 ver_rom;
-> > +     u16 ver_rom_low;
-> >       u8 status;
-> >       int i, err;
-> >
-> > @@ -4065,8 +4066,22 @@ static int btusb_setup_qca(struct hci_dev *hdev)
-> >       ver_rom = le32_to_cpu(ver.rom_version);
-> >
-> >       for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
-> > -             if (ver_rom == qca_devices_table[i].rom_version)
-> > +             if (ver_rom == qca_devices_table[i].rom_version) {
-> >                       info = &qca_devices_table[i];
-> > +                     break;
-> > +             }
-> > +     }
-> > +     if (!info) {
-> > +             // If we don't find an exact version match, try with
-> > +             // the lower half, but only where the upper half is 0
->
-> please use correct comment style.
-Noted for next time. I would've expected checkpatch.pl to catch issues
-like that?
-A proper fix by Hui Wang has already been committed to bluetooth-next.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 55c0bd77479b60ea29fd390faf4545cfb3a1d79e  Bluetooth: hci_qca: Fixed issue during suspend
 
-> > +             ver_rom_low = ver_rom & 0xffff;
-> > +             for (i = 0; i < ARRAY_SIZE(qca_devices_table); i++) {
-> > +                     if (!(qca_devices_table[i].rom_version & 0xffff0000) &&
-> > +                         ver_rom_low == qca_devices_table[i].rom_version) {
-> > +                             info = &qca_devices_table[i];
-> > +                             break;
-> > +                     }
-> > +             }
-> >       }
-> >       if (!info) {
-> >               bt_dev_err(hdev, "don't support firmware rome 0x%x", ver_rom);
->
-> Regards
->
-> Marcel
+elapsed time: 750m
 
-- Florian
+configs tested: 141
+configs skipped: 2
+
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+arm                     davinci_all_defconfig
+s390                          debug_defconfig
+arm                         hackkit_defconfig
+powerpc                    socrates_defconfig
+sh                           se7721_defconfig
+sh                          r7785rp_defconfig
+sparc64                             defconfig
+arm                     am200epdkit_defconfig
+sh                            shmin_defconfig
+powerpc                     tqm8540_defconfig
+mips                           ci20_defconfig
+m68k                       m5249evb_defconfig
+sh                   sh7770_generic_defconfig
+c6x                        evmc6472_defconfig
+mips                         cobalt_defconfig
+arc                        nsimosci_defconfig
+sh                      rts7751r2d1_defconfig
+powerpc                    klondike_defconfig
+arm                           sunxi_defconfig
+nios2                         3c120_defconfig
+arc                        vdk_hs38_defconfig
+arm                         s3c6400_defconfig
+arm                         vf610m4_defconfig
+arc                              alldefconfig
+c6x                        evmc6474_defconfig
+s390                       zfcpdump_defconfig
+powerpc                 mpc836x_rdk_defconfig
+arm                  colibri_pxa270_defconfig
+sh                            migor_defconfig
+riscv                    nommu_k210_defconfig
+xtensa                         virt_defconfig
+sh                 kfr2r09-romimage_defconfig
+powerpc                 mpc8560_ads_defconfig
+mips                           rs90_defconfig
+arm                         s5pv210_defconfig
+mips                     cu1000-neo_defconfig
+um                             i386_defconfig
+sh                        sh7757lcr_defconfig
+arm                           sama5_defconfig
+sh                        sh7763rdp_defconfig
+mips                        bcm47xx_defconfig
+openrisc                    or1ksim_defconfig
+sh                           se7751_defconfig
+mips                     decstation_defconfig
+arm                        magician_defconfig
+m68k                        m5272c3_defconfig
+xtensa                  audio_kc705_defconfig
+sh                               allmodconfig
+powerpc                     sequoia_defconfig
+powerpc                     taishan_defconfig
+alpha                               defconfig
+mips                      maltaaprp_defconfig
+arc                              allyesconfig
+m68k                       m5475evb_defconfig
+arm                           stm32_defconfig
+mips                          malta_defconfig
+m68k                        mvme147_defconfig
+arm                       cns3420vb_defconfig
+alpha                            allyesconfig
+sh                             shx3_defconfig
+arm                          ixp4xx_defconfig
+xtensa                  nommu_kc705_defconfig
+sh                          rsk7201_defconfig
+m68k                             allyesconfig
+arm                       imx_v4_v5_defconfig
+powerpc                        cell_defconfig
+microblaze                      mmu_defconfig
+sh                  sh7785lcr_32bit_defconfig
+powerpc                     powernv_defconfig
+sh                     sh7710voipgw_defconfig
+ia64                             allmodconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+nios2                               defconfig
+nds32                             allnoconfig
+c6x                              allyesconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+parisc                              defconfig
+s390                             allyesconfig
+s390                             allmodconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                               tinyconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+x86_64               randconfig-a006-20210209
+x86_64               randconfig-a001-20210209
+x86_64               randconfig-a005-20210209
+x86_64               randconfig-a004-20210209
+x86_64               randconfig-a002-20210209
+x86_64               randconfig-a003-20210209
+i386                 randconfig-a001-20210209
+i386                 randconfig-a005-20210209
+i386                 randconfig-a003-20210209
+i386                 randconfig-a002-20210209
+i386                 randconfig-a006-20210209
+i386                 randconfig-a004-20210209
+i386                 randconfig-a016-20210209
+i386                 randconfig-a013-20210209
+i386                 randconfig-a012-20210209
+i386                 randconfig-a014-20210209
+i386                 randconfig-a011-20210209
+i386                 randconfig-a015-20210209
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                                   rhel
+x86_64                           allyesconfig
+x86_64                    rhel-7.6-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                      rhel-8.3-kbuiltin
+x86_64                                  kexec
+
+clang tested configs:
+x86_64               randconfig-a013-20210209
+x86_64               randconfig-a014-20210209
+x86_64               randconfig-a015-20210209
+x86_64               randconfig-a012-20210209
+x86_64               randconfig-a016-20210209
+x86_64               randconfig-a011-20210209
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
