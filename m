@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93F72C4332E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 20:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DE046C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 20:21:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B2DE64EDA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 20:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA6D664D9A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Feb 2021 20:21:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233370AbhBJUUM (ORCPT
+        id S233461AbhBJUUp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Feb 2021 15:20:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60514 "EHLO
+        Wed, 10 Feb 2021 15:20:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60694 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233244AbhBJUTg (ORCPT
+        with ESMTP id S233406AbhBJUU0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Feb 2021 15:19:36 -0500
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C5F3C061786
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 12:18:56 -0800 (PST)
-Received: by mail-pg1-x52d.google.com with SMTP id t11so1963327pgu.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 12:18:56 -0800 (PST)
+        Wed, 10 Feb 2021 15:20:26 -0500
+Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 671A4C06178A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 12:18:58 -0800 (PST)
+Received: by mail-pf1-x42d.google.com with SMTP id t29so2011383pfg.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Feb 2021 12:18:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=uBCUmG0HC+H/OmutPSoFa4PAmtJW1vZ8PYZ2ygMWdyA=;
-        b=UjAht1HLbECXLOrjgLdfA4PZsB8Qa9SSxOFJVOJRB8iSTk9+ojjIwyh6sP6KUhy23S
-         0j9tM+DK7p7lknuu8dxIx5Q4WS3cSkdMk557OJUKONTaN+ZJvrB944b1gkquxF6c/0QV
-         Tbxde6ZZB4OMEhUi5Nf7oH1nQELgP0sCH/ZgcnuAouticP70ileCrbMqGCDUnkyr/3bP
-         GjN3yEistIZ/vHkW86muVK74KHL6pzWiautE8DaEybOEUijJ/hYAqxqGFv1hSMHVieoF
-         dr3zIg1agVl+IK7KlFMPVZCl9FOgmHRYYuwxTZcB7wl8Fla79+DATNjq2AAFEAd305v4
-         sYTQ==
+        bh=Jw0Mpln9Nl/p8cgCEiGZT0o+PCtmHxO4qmiDUhA0/Kw=;
+        b=klMFwcASEwBqQT64JX59Zc6v/aQwc1iAOUZZgTrtFiEm5cALF8uCKRlCp3htAJ3VTJ
+         l0/rZa+KZkED+9o/ULBG68UqO/W4bvtPGNc70g3xS0ovqZK/XM1U6q22f/tMMoCVMg/l
+         Jcxcz/7PMkUYHL04rAebLNsx9629w5ACtQcxMwvXpOlBV9oU7j/NMbrb9CglEfKJpEKF
+         6T714sXMaylF75mwYmsb5bQy04w/PIv0Uc35nnIH5MSjd3Nk5YIIb/dkjuhdGULTWZet
+         BLzt4HKKzd3vFnJ9Y4f1VKJZWM8/tnhFcc7kuVyKcQHoiuzQxwFiNRvgr6JgZHdM69mX
+         Rolw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=uBCUmG0HC+H/OmutPSoFa4PAmtJW1vZ8PYZ2ygMWdyA=;
-        b=IDRdvcXlKWbmyOFR/ip26lZzdZ8ut0l3QJLzy+tVdqYSF2F+i1ws/fUGFfBzPJsYPh
-         1qrO30v2sfdivznC3UfFG3OEoDjQIojeKhLLmBdmzoynFfMzq7ILBzP2+IR1GUaUgGqS
-         TszissPw20qNzwvzuE5/ObU+xt/vESncRdZzeB34TWv2DG7qN8szayaqZlWo2/La+l7a
-         +kmIFSBRadcDKRZIdhUa8AHux1t4+ajx/fH6P6/ggzqPuyU1rZy4+4/3CIJ0/jEk/7TO
-         XpPlhzdS3pfpZszBKOXQXDbZTJ9AWi3CfCt6Ovw4lSAbu5OBkHWHxbiOsntgD+BVDRU7
-         a7ew==
-X-Gm-Message-State: AOAM533ZJdyQ8HdvcPiSOVvQ/IEfa6x9upiG2jpsovYliexM3oT5UL8w
-        gMoMTBROyNbAK9+PLsb/HxWk1MRribOf8g==
-X-Google-Smtp-Source: ABdhPJyuml7DMxR6Ju8+7/YDiuwoOmgloZephdTSiRyBunvcfWnKC2oqTq+845Cr5EfH9rf5i9Lfcg==
-X-Received: by 2002:a63:fb18:: with SMTP id o24mr4604878pgh.55.1612988335866;
-        Wed, 10 Feb 2021 12:18:55 -0800 (PST)
+        bh=Jw0Mpln9Nl/p8cgCEiGZT0o+PCtmHxO4qmiDUhA0/Kw=;
+        b=f3z36azMMwJnVytB//rJCPihB4vy0LNKH4tVKygHh9AUasgR63Hf08JgGxptbcJtaZ
+         4CUgHn09frze1iKHAMqI4b8vF2GuulxqYrAUS/VRbPYOaQs0ziiuDQziwXmYXsheHI98
+         51vfOFGQOIjM5wsceuQu/Ii6trnh46ahN0ron3HiR+C9O9ZtDDDTJ/+3owz5MuC5fNr5
+         TO5Tbwm5gDNWFMBEGStIuDYjUUDPcBIjgigiWqwRchPz2FZ8HL0V9PU82YYoLZeAN+Fu
+         FSuRTsNC3rjxquIQ1SHyKuWDmxV59qMZSquMDeDU+5gLHGt6gz3AkCx1df3aZC8/sU5C
+         lcMQ==
+X-Gm-Message-State: AOAM533p6BEvRieSImQyJMH0VXkCu014bk2yw0sUk8mtrTY8Ei0Cqqry
+        TxkY0/QV9gyrRjCFRTcFzeSe2qOYCjEv4Q==
+X-Google-Smtp-Source: ABdhPJzR23w2PYNVGcfcTWO5yquOubh5+YBzzLVVy0sgenF8RRPQWpKgThtzBxCvvjwaPqP1+niEKg==
+X-Received: by 2002:a63:dd42:: with SMTP id g2mr4697823pgj.285.1612988337610;
+        Wed, 10 Feb 2021 12:18:57 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id cu5sm3124696pjb.27.2021.02.10.12.18.55
+        by smtp.gmail.com with ESMTPSA id cu5sm3124696pjb.27.2021.02.10.12.18.56
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 10 Feb 2021 12:18:55 -0800 (PST)
+        Wed, 10 Feb 2021 12:18:57 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 4/6] Bluetooth: btintel: Consolidate intel_version parsing
-Date:   Wed, 10 Feb 2021 12:18:50 -0800
-Message-Id: <20210210201852.2246985-4-luiz.dentz@gmail.com>
+Subject: [PATCH v6 6/6] Bluetooth: btusb: Consolidate code for waiting firmware to boot
+Date:   Wed, 10 Feb 2021 12:18:52 -0800
+Message-Id: <20210210201852.2246985-6-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.26.2
 In-Reply-To: <20210210201852.2246985-1-luiz.dentz@gmail.com>
 References: <20210210201852.2246985-1-luiz.dentz@gmail.com>
@@ -75,129 +75,203 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This moves checks version checks of intel_version to
-btintel_version_info.
+This moves duplicated code for waiting firmware download to complete to
+a function that can then be reused.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btintel.c | 36 ++++++++++++++++++++++++++++++++++--
- drivers/bluetooth/btintel.h |  2 +-
- drivers/bluetooth/btusb.c   | 12 ++++--------
- 3 files changed, 39 insertions(+), 11 deletions(-)
+ drivers/bluetooth/btusb.c | 148 +++++++++++++++++---------------------
+ 1 file changed, 66 insertions(+), 82 deletions(-)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index c907a4d6b37c..452233a06aaa 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -216,10 +216,39 @@ void btintel_hw_error(struct hci_dev *hdev, u8 code)
- }
- EXPORT_SYMBOL_GPL(btintel_hw_error);
- 
--void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
-+int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
- {
- 	const char *variant;
- 
-+	/* The hardware platform number has a fixed value of 0x37 and
-+	 * for now only accept this single value.
-+	 */
-+	if (ver->hw_platform != 0x37) {
-+		bt_dev_err(hdev, "Unsupported Intel hardware platform (%u)",
-+			   ver->hw_platform);
-+		return -EINVAL;
-+	}
-+
-+	/* Check for supported iBT hardware variants of this firmware
-+	 * loading method.
-+	 *
-+	 * This check has been put in place to ensure correct forward
-+	 * compatibility options when newer hardware variants come along.
-+	 */
-+	switch (ver->hw_variant) {
-+	case 0x0b:      /* SfP */
-+	case 0x0c:      /* WsP */
-+	case 0x11:      /* JfP */
-+	case 0x12:      /* ThP */
-+	case 0x13:      /* HrP */
-+	case 0x14:      /* CcP */
-+		break;
-+	default:
-+		bt_dev_err(hdev, "Unsupported Intel hardware variant (%u)",
-+			   ver->hw_variant);
-+		return -EINVAL;
-+	}
-+
- 	switch (ver->fw_variant) {
- 	case 0x06:
- 		variant = "Bootloader";
-@@ -228,13 +257,16 @@ void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
- 		variant = "Firmware";
- 		break;
- 	default:
--		return;
-+		bt_dev_err(hdev, "Unsupported firmware variant(%02x)", ver->fw_variant);
-+		return -EINVAL;
- 	}
- 
- 	bt_dev_info(hdev, "%s revision %u.%u build %u week %u %u",
- 		    variant, ver->fw_revision >> 4, ver->fw_revision & 0x0f,
- 		    ver->fw_build_num, ver->fw_build_ww,
- 		    2000 + ver->fw_build_yy);
-+
-+	return 0;
- }
- EXPORT_SYMBOL_GPL(btintel_version_info);
- 
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 94a63e898826..7163170410a8 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -148,7 +148,7 @@ int btintel_set_diag(struct hci_dev *hdev, bool enable);
- int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable);
- void btintel_hw_error(struct hci_dev *hdev, u8 code);
- 
--void btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
-+int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver);
- int btintel_version_info_tlv(struct hci_dev *hdev, struct intel_version_tlv *version);
- int btintel_secure_send(struct hci_dev *hdev, u8 fragment_type, u32 plen,
- 			const void *param);
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 169e7d0739d1..e80f66825697 100644
+index 64a8edddfe15..d4b3d3a712df 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -2474,12 +2474,6 @@ static int btusb_setup_intel_new_get_fw_name(struct intel_version *ver,
- 					     char *fw_name, size_t len,
- 					     const char *suffix)
- {
--	/* The hardware platform number has a fixed value of 0x37 and
--	 * for now only accept this single value.
--	 */
--	if (ver->hw_platform != 0x37)
--		return -EINVAL;
--
- 	switch (ver->hw_variant) {
- 	case 0x0b:	/* SfP */
- 	case 0x0c:	/* WsP */
-@@ -2658,8 +2652,6 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
- 	if (!ver || !params)
- 		return -EINVAL;
+@@ -2810,6 +2810,68 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
+ 	return err;
+ }
  
--	btintel_version_info(hdev, ver);
--
- 	/* The firmware variant determines if the device is in bootloader
- 	 * mode or is running operational firmware. The value 0x06 identifies
- 	 * the bootloader and the value 0x23 identifies the operational
-@@ -2847,6 +2839,10 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 		return err;
- 	}
- 
-+	err = btintel_version_info(hdev, &ver);
-+	if (err)
-+		return err;
++static int btusb_boot_wait(struct hci_dev *hdev, ktime_t calltime, int msec)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	ktime_t delta, rettime;
++	unsigned long long duration;
++	int err;
 +
- 	err = btusb_intel_download_firmware(hdev, &ver, &params, &boot_param);
- 	if (err)
++	bt_dev_info(hdev, "Waiting for device to boot");
++
++	err = wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
++				  TASK_INTERRUPTIBLE,
++				  msecs_to_jiffies(msec));
++	if (err == -EINTR) {
++		bt_dev_err(hdev, "Device boot interrupted");
++		return -EINTR;
++	}
++
++	if (err) {
++		bt_dev_err(hdev, "Device boot timeout");
++		return -ETIMEDOUT;
++	}
++
++	rettime = ktime_get();
++	delta = ktime_sub(rettime, calltime);
++	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
++
++	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
++
++	return 0;
++}
++
++static int btusb_intel_boot(struct hci_dev *hdev, u32 boot_addr)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++	ktime_t calltime;
++	int err;
++
++	calltime = ktime_get();
++
++	set_bit(BTUSB_BOOTING, &data->flags);
++
++	err = btintel_send_intel_reset(hdev, boot_addr);
++	if (err) {
++		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
++		btintel_reset_to_bootloader(hdev);
++		return err;
++	}
++
++	/* The bootloader will not indicate when the device is ready. This
++	 * is done by the operational firmware sending bootup notification.
++	 *
++	 * Booting into operational firmware should not take longer than
++	 * 1 second. However if that happens, then just fail the setup
++	 * since something went wrong.
++	 */
++	err = btusb_boot_wait(hdev, calltime, 1000);
++	if (err == -ETIMEDOUT)
++		btintel_reset_to_bootloader(hdev);
++
++	return err;
++}
++
+ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ {
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+@@ -2817,8 +2879,6 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	struct intel_boot_params params;
+ 	u32 boot_param;
+ 	char ddcname[64];
+-	ktime_t calltime, delta, rettime;
+-	unsigned long long duration;
+ 	int err;
+ 	struct intel_debug_features features;
+ 
+@@ -2853,46 +2913,9 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	if (ver.fw_variant == 0x23)
+ 		goto finish;
+ 
+-	calltime = ktime_get();
+-
+-	set_bit(BTUSB_BOOTING, &data->flags);
+-
+-	err = btintel_send_intel_reset(hdev, boot_param);
+-	if (err) {
+-		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
+-		btintel_reset_to_bootloader(hdev);
++	err = btusb_intel_boot(hdev, boot_param);
++	if (err)
  		return err;
+-	}
+-
+-	/* The bootloader will not indicate when the device is ready. This
+-	 * is done by the operational firmware sending bootup notification.
+-	 *
+-	 * Booting into operational firmware should not take longer than
+-	 * 1 second. However if that happens, then just fail the setup
+-	 * since something went wrong.
+-	 */
+-	bt_dev_info(hdev, "Waiting for device to boot");
+-
+-	err = wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
+-				  TASK_INTERRUPTIBLE,
+-				  msecs_to_jiffies(1000));
+-
+-	if (err == -EINTR) {
+-		bt_dev_err(hdev, "Device boot interrupted");
+-		return -EINTR;
+-	}
+-
+-	if (err) {
+-		bt_dev_err(hdev, "Device boot timeout");
+-		btintel_reset_to_bootloader(hdev);
+-		return -ETIMEDOUT;
+-	}
+-
+-	rettime = ktime_get();
+-	delta = ktime_sub(rettime, calltime);
+-	duration = (unsigned long long) ktime_to_ns(delta) >> 10;
+-
+-	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
+@@ -2955,8 +2978,6 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+ 	struct btusb_data *data = hci_get_drvdata(hdev);
+ 	u32 boot_param;
+ 	char ddcname[64];
+-	ktime_t calltime, delta, rettime;
+-	unsigned long long duration;
+ 	int err;
+ 	struct intel_debug_features features;
+ 	struct intel_version_tlv version;
+@@ -2992,46 +3013,9 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+ 	if (version.img_type == 0x03)
+ 		goto finish;
+ 
+-	calltime = ktime_get();
+-
+-	set_bit(BTUSB_BOOTING, &data->flags);
+-
+-	err = btintel_send_intel_reset(hdev, boot_param);
+-	if (err) {
+-		bt_dev_err(hdev, "Intel Soft Reset failed (%d)", err);
+-		btintel_reset_to_bootloader(hdev);
++	err = btusb_intel_boot(hdev, boot_param);
++	if (err)
+ 		return err;
+-	}
+-
+-	/* The bootloader will not indicate when the device is ready. This
+-	 * is done by the operational firmware sending bootup notification.
+-	 *
+-	 * Booting into operational firmware should not take longer than
+-	 * 1 second. However if that happens, then just fail the setup
+-	 * since something went wrong.
+-	 */
+-	bt_dev_info(hdev, "Waiting for device to boot");
+-
+-	err = wait_on_bit_timeout(&data->flags, BTUSB_BOOTING,
+-				  TASK_INTERRUPTIBLE,
+-				  msecs_to_jiffies(1000));
+-
+-	if (err == -EINTR) {
+-		bt_dev_err(hdev, "Device boot interrupted");
+-		return -EINTR;
+-	}
+-
+-	if (err) {
+-		bt_dev_err(hdev, "Device boot timeout");
+-		btintel_reset_to_bootloader(hdev);
+-		return -ETIMEDOUT;
+-	}
+-
+-	rettime = ktime_get();
+-	delta = ktime_sub(rettime, calltime);
+-	duration = (unsigned long long)ktime_to_ns(delta) >> 10;
+-
+-	bt_dev_info(hdev, "Device booted in %llu usecs", duration);
+ 
+ 	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+ 
 -- 
 2.26.2
 
