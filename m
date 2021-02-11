@@ -2,88 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.6 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C9C73C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 07:35:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 187C1C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 15:26:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 930CB61490
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 07:35:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5EE664D9A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 15:26:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229749AbhBKHey (ORCPT
+        id S230314AbhBKPZb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Feb 2021 02:34:54 -0500
-Received: from mga11.intel.com ([192.55.52.93]:18382 "EHLO mga11.intel.com"
+        Thu, 11 Feb 2021 10:25:31 -0500
+Received: from mail.kernel.org ([198.145.29.99]:52624 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229752AbhBKHeo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Feb 2021 02:34:44 -0500
-IronPort-SDR: aLCxZ1fuD6TQe/bMBTb34GiOBSEK7ab5mOeoF1QCV7aADFvojsKVWZfEoOA3WDwvOnB5860TyJ
- PnUxP0O0tioA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9891"; a="178696053"
-X-IronPort-AV: E=Sophos;i="5.81,169,1610438400"; 
-   d="scan'208";a="178696053"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 23:32:53 -0800
-IronPort-SDR: RtlkM6Pbr1gp4IKbRZxhLLE5y0AtzVXbLSAl938dkdWoBMLZfRMC31XrI/jX/Zjk5YSQLJZ9yQ
- wER/Qd1DG7eg==
-X-IronPort-AV: E=Sophos;i="5.81,169,1610438400"; 
-   d="scan'208";a="397150253"
-Received: from wmays-mobl.amr.corp.intel.com ([10.255.231.21])
-  by orsmga008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2021 23:32:52 -0800
-Message-ID: <9e9b46f42acc828ab362ba7f85ec0850e2d65770.camel@linux.intel.com>
-Subject: Re: [PATCH v8 1/6] Bluetooth: btintel: Check firmware version
- before download
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Wed, 10 Feb 2021 23:32:52 -0800
-In-Reply-To: <20210211010900.2326531-1-luiz.dentz@gmail.com>
-References: <20210211010900.2326531-1-luiz.dentz@gmail.com>
-Organization: Intel Corporation
+        id S230494AbhBKPWw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Feb 2021 10:22:52 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 0563E64F4E
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Feb 2021 15:12:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613056333;
+        bh=hYUMARrhOw4/ZjlT0BM7/G3+YUyHzHb25HBkSPAYnHA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=esE5EAl749Io1VrUirn6fuLgfu6FY+bOYlCEvd5n/318FFZaLWT9kAhqwGf0jOIHZ
+         MmQYk13j+faTkmXXRVRy4WB3MxhyHEZhFRFty4YmUAHx0/uUhVxm7GcHpa992nEDCx
+         nwqHuWK+p6HWyYRfQRXdCJAQ1pgK1JOuoEjAmVOkRlrmPPwozT1+KplihLLgxIrQMO
+         ZEMza5avTVd1S2GoQ3f7YPCSLoZQqZ4ne52EMo3XAqczrsLVYRr4dsmWqtEISMVN4X
+         fSaAbEdGSVqn5gTrZBHgER+FGW9wOfa2p4PITV1aXX8Jgzp91lteYPmqLHsr+olCew
+         9qfw12aA+089g==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 211571] Bluetooth: hci0: don't support firmware rome 0x1020200
+Date:   Thu, 11 Feb 2021 15:12:12 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: helbermg@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-211571-62941-X19xxkLXli@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-211571-62941@https.bugzilla.kernel.org/>
+References: <bug-211571-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D211571
 
-On Wed, 2021-02-10 at 17:08 -0800, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This checks the firmware build number, week and year matches with
-> repective version loaded and then skip the download process.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> v2: Add patch that mover checks for operational mode after the version
-> checking.
-> v3: Fix not checking for operation mode before using btintel_read_boot_params
-> since some models depend on that to contruct the fw filename. Also attempt to
-> cleanup duplicated code.
-> v4: Fix forwarding -EALREADY when firmware has already been loaded.
-> v5: Fix not advancing fw_ptr.
-> v6: Fix btusb_setup_intel_new_get_fw_name error checking for ddc.
-> v7: Disable version checking for WsP/SfP.
-> v8: Really disables version checking for WsP/SfP.
-> 
->  drivers/bluetooth/btintel.c   | 105 +++++++++++++++++++++++++++-------
->  drivers/bluetooth/btintel.h   |   5 +-
->  drivers/bluetooth/btusb.c     |  18 +++++-
->  drivers/bluetooth/hci_intel.c |   7 ++-
->  4 files changed, 109 insertions(+), 26 deletions(-)
-> 
+Helber Maciel Guerra (helbermg@gmail.com) changed:
 
-I tested with ThP and no issue found.
-I also tested with WsP and fw loading fine and no upgrading as expected.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |helbermg@gmail.com
 
-More devices will be tested. Stay tune.
+--- Comment #6 from Helber Maciel Guerra (helbermg@gmail.com) ---
+I have tested this patch and works using latest kernel source:
 
-Regards,
-Tedd
+commit 291009f656e8eaebbdfd3a8d99f6b190a9ce9deb (HEAD -> master, origin/mas=
+ter)
+Merge: a3961497bd9c d11a1d08a082
+Author: Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Wed Feb 10 12:03:35 2021 -0800
 
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
