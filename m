@@ -2,274 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3CFBC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 16:16:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B97CC43381
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A6E1C64E92
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 16:16:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F0A2864E3B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbhBKQQ3 (ORCPT
+        id S230202AbhBKWXN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Feb 2021 11:16:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34232 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230438AbhBKQOW (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Feb 2021 11:14:22 -0500
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63666C061574;
-        Thu, 11 Feb 2021 08:13:42 -0800 (PST)
-Received: by mail-lf1-x133.google.com with SMTP id d24so8859586lfs.8;
-        Thu, 11 Feb 2021 08:13:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:mime-version
-         :content-disposition;
-        bh=PtM6Tv68YQwsbF74pb3s4bcYrMCYksWul3XAtogUcWU=;
-        b=hhBtLxzffXw/s5HGE9r/FUYX8J+A88Qw5wxx/00EIEznIZeoBmCGuVRb6ZamIM4KGO
-         a/88gYUhHf90Wdb3KWOJUUSniWQdzPFiQlIHM8aaXc28g0pY2RCQAY+nm5SeXDj/bu9V
-         z0cBvvP2n5a8iHLA23BJKlLbCoZDna4Xso+EVIM9pKkR88qY0qNGQUj4+jhUoBjJBveI
-         uzFmfkve/BTl20v73OkhSz2kbCnJYnepWddbk9VXl/PvobtO88wICUCDDU5doqRpTqxN
-         TBTWyBvBi/6jazAys1T6o4CEmdvdpvE7wwtzyf/wgDY4DRKXiXStZwP8TzgkN2eRrsIn
-         mWOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:mime-version:content-disposition;
-        bh=PtM6Tv68YQwsbF74pb3s4bcYrMCYksWul3XAtogUcWU=;
-        b=IoDMA4pKHc8iS50nTSKaHm4wK8YGxjR2WXC81/Axmb0VxUUk7kJ7YdEHnhDOA+PM2H
-         gMCft8HJXH6xnZXB+lJZaxXcRgdmELSA5jhxZKclmuVA1nhkdsHM4fN4bPf4kBy50y7z
-         1rgV8PH1KC3DGHiUkP9SN8MV6NMUEH6wi11B22GbmKd0NuSGzHM+hLmSzp4hhKZchy2Q
-         8fZpTiPGT2+l9SutJAiPVPdCXfyQvCH3YMdCfn/o7EMRLpBJXJCHW26AfxdipLkDLOmh
-         DidNtlhl3wOS1Zz+7bYktQz+NFVDUATTGP3n4c+G41hyqnfA0wPfQtqdkzMciCQEdecv
-         cEDw==
-X-Gm-Message-State: AOAM530YWh+adXrUSnxivTJ7T2tAA8G1trN0g2+JCW56wCSewOk4+4l5
-        1mEEjM1i7l5btNQyGEU+7uhMs/feAO1SsLX9
-X-Google-Smtp-Source: ABdhPJw86wyb+R7A/te63IoIktKs7ap9wGTuD0olwKpCjrRHVg5aimTQzeB/deXlXhyYbZB8yKe3MQ==
-X-Received: by 2002:a19:357:: with SMTP id 84mr4598340lfd.68.1613060020856;
-        Thu, 11 Feb 2021 08:13:40 -0800 (PST)
-Received: from localhost (91-154-113-38.elisa-laajakaista.fi. [91.154.113.38])
-        by smtp.gmail.com with ESMTPSA id t20sm218756lfl.116.2021.02.11.08.13.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Feb 2021 08:13:39 -0800 (PST)
-Date:   Thu, 11 Feb 2021 18:13:38 +0200
-From:   Johan Hedberg <johan.hedberg@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2021-02-11
-Message-ID: <YCVXKF1pn6N8p0CK@lschmidt-MOBL.ger.corp.intel.com>
-Mail-Followup-To: davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+        Thu, 11 Feb 2021 17:23:13 -0500
+Received: from mga07.intel.com ([134.134.136.100]:1738 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230101AbhBKWWj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Feb 2021 17:22:39 -0500
+IronPort-SDR: FVXTJAZTXc8/kEdLbLwYQw3cRMER5IT2aWWQFD5zLTys6qHik8l217c3K9BGuoIM2ISXdxiPrN
+ xDspJbX42Sjg==
+X-IronPort-AV: E=McAfee;i="6000,8403,9892"; a="246392968"
+X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
+   d="scan'208";a="246392968"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:56 -0800
+IronPort-SDR: 4MFSBrUMTXIlw2vdkllRPxegfMZDJzgmuhSaQUh9XpMpBhQm8JZnkQVpaBQ9BD6bxgaPRCWTBa
+ gLNQa0E4OFuw==
+X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
+   d="scan'208";a="381070043"
+Received: from binman-mobl4.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.251.152.23])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:55 -0800
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 1/4] doc/mesh-api: Add notion of Device UUID compliance
+Date:   Thu, 11 Feb 2021 14:21:40 -0800
+Message-Id: <20210211222143.39986-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210211222143.39986-1-inga.stotland@intel.com>
+References: <20210211222143.39986-1-inga.stotland@intel.com>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="N127i058iNjEYKqT"
-Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-
---N127i058iNjEYKqT
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-Hi Dave, Jakub,
-
-Here's the main bluetooth-next pull request for 5.12:
-
- - Add support for advertising monitor offliading using Microsoft
-   vendor extensions
- - Add firmware download support for MediaTek MT7921U USB devices
- - Suspend-related fixes for Qualcomm devices
- - Add support for Intel GarfieldPeak controller
- - Various other smaller fixes & cleanups
-
-Please let me know if there are any issues pulling. Thanks.
-
-Johan
-
+Add requirement that the value of Device UUID supplied in
+CreateNetwork/Join/Import methods should be compliant with
+RFC 4122.
 ---
-The following changes since commit 3db1a3fa98808aa90f95ec3e0fa2fc7abf28f5c9:
+ doc/mesh-api.txt | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-  Merge tag 'staging-5.11-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/gregkh/staging (2020-12-15 14:18:40 -0800)
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index 254ccbd7f..f2c6b9e5c 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -27,7 +27,8 @@ Methods:
+ 		The uuid parameter is a 16-byte array that contains Device UUID.
+ 		This UUID must be unique (at least from the daemon perspective),
+ 		therefore attempting to call this function using already
+-		registered UUID results in an error.
++		registered UUID results in an error. The composition of the UUID
++		octets must be in compliance with RFC 4122.
+ 
+ 		When provisioning finishes, the daemon will call either
+ 		JoinComplete or JoinFailed method on object implementing
+@@ -149,7 +150,8 @@ Methods:
+ 		The uuid parameter is a 16-byte array that contains Device UUID.
+ 		This UUID must be unique (at least from the daemon perspective),
+ 		therefore attempting to call this function using already
+-		registered UUID results in an error.
++		registered UUID results in an error. The composition of the UUID
++		octets must be in compliance with RFC 4122.
+ 
+ 		The other information the bluetooth-meshd daemon will preserve
+ 		about the initial node, is to give it the initial primary
+@@ -179,7 +181,8 @@ Methods:
+ 		The uuid parameter is a 16-byte array that contains Device UUID.
+ 		This UUID must be unique (at least from the daemon perspective),
+ 		therefore attempting to call this function using already
+-		registered UUID results in an error.
++		registered UUID results in an error. The composition of the UUID
++		octets must be in compliance with RFC 4122.
+ 
+ 		The dev_key parameter is the 16-byte value of the dev key of
+ 		the imported mesh node.
+-- 
+2.26.2
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git for-upstream
-
-for you to fetch changes up to 55c0bd77479b60ea29fd390faf4545cfb3a1d79e:
-
-  Bluetooth: hci_qca: Fixed issue during suspend (2021-02-08 14:54:07 +0100)
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (4):
-      Bluetooth: Remove hci_req_le_suspend_config
-      Bluetooth: Pause service discovery for suspend
-      Bluetooth: btrtl: Enable central-peripheral role
-      Bluetooth: btrtl: Add null check in setup
-
-Archie Pusaka (6):
-      Bluetooth: advmon offload MSFT add rssi support
-      Bluetooth: advmon offload MSFT add monitor
-      Bluetooth: advmon offload MSFT remove monitor
-      Bluetooth: advmon offload MSFT handle controller reset
-      Bluetooth: advmon offload MSFT handle filter enablement
-      Bluetooth: advmon offload MSFT interleave scanning integration
-
-Ard Biesheuvel (1):
-      Bluetooth: avoid u128_xor() on potentially misaligned inputs
-
-Arnd Bergmann (1):
-      Bluetooth: btusb: fix excessive stack usage
-
-Bastien Nocera (1):
-      Bluetooth: L2CAP: Try harder to accept device not knowing options
-
-Christophe JAILLET (1):
-      Bluetooth: btqcomsmd: Fix a resource leak in error handling paths in the probe function
-
-Christopher William Snowhill (1):
-      Bluetooth: Fix initializing response id after clearing struct
-
-Claire Chang (2):
-      Bluetooth: hci_uart: Fix a race for write_work scheduling
-      Bluetooth: hci_h5: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for btrtl
-
-Dinghao Liu (1):
-      Bluetooth: hci_qca: Fix memleak in qca_controller_memdump
-
-Geert Uytterhoeven (1):
-      dt-bindings: net: btusb: DT fix s/interrupt-name/interrupt-names/
-
-Gopal Tiwari (1):
-      Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-
-Hans de Goede (1):
-      Bluetooth: Add new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk
-
-Howard Chung (2):
-      Bluetooth: disable advertisement filters during suspend
-      Bluetooth: Fix crash in mgmt_add_adv_patterns_monitor_complete
-
-Hui Wang (2):
-      Bluetooth: btusb: Fix the autosuspend enable and disable
-      Bluetooth: btusb: Some Qualcomm Bluetooth adapters stop working
-
-Jagdish Tirumala (1):
-      Bluetooth: btmtksdio: Fixed switch and case should be at the same indent
-
-Jakub Pawlowski (1):
-      Bluetooth: hci_bcm: Add support for ISO packets
-
-Jiapeng Zhong (1):
-      Bluetooth: fix coccicheck warnings debugfs
-
-Joe Perches (1):
-      Bluetooth: btusb: Remove duplicate newlines from logging
-
-John-Eric Kamps (1):
-      Bluetooth: hci_h5: Add support for binding RTL8723DS with device tree
-
-Jupeng Zhong (2):
-      Bluetooth: btusb: Fix memory leak in btusb_mtk_wmt_recv
-      Bluetooth: btusb: Fix typo and correct the log print
-
-Kiran K (2):
-      Revert "Bluetooth: btintel: Fix endianness issue for TLV version information"
-      Bluetooth: btusb: Add support for GarfieldPeak controller
-
-Luiz Augusto von Dentz (1):
-      Bluetooth: L2CAP: Fix handling fragmented length
-
-Mark Chen (2):
-      Bluetooth: btusb: Fine-tune mt7663 mechanism.
-      Bluetooth: btusb: Add protocol support for MediaTek MT7921U USB devices
-
-Max Chou (1):
-      Bluetooth: btrtl: Enable WBS for the specific Realtek devices
-
-Miao-chen Chou (3):
-      Bluetooth: btqca: Enable MSFT extension for Qualcomm WCN399x
-      Bluetooth: btusb: Enable MSFT extension for Intel controllers
-      Bluetooth: btrtl: Enable MSFT extension for RTL8822CE controller
-
-Pan Bian (2):
-      Bluetooth: drop HCI device reference before return
-      Bluetooth: Put HCI device if inquiry procedure interrupts
-
-Sonny Sasaka (1):
-      Bluetooth: Cancel Inquiry before Create Connection
-
-Tim Jiang (1):
-      Bluetooth: btusb: add shutdown function for wcn6855
-
-Tomoyuki Matsushita (1):
-      Bluetooth: fix indentation and alignment reported by checkpatch
-
-Trent Piepho (1):
-      Bluetooth: btusb: Always fallback to alt 1 for WBS
-
-Vamshi K Sthambamkadi (1):
-      Bluetooth: btusb: fix memory leak on suspend and resume
-
-Venkata Lakshmi Narayana Gubba (4):
-      Bluetooth: btqca: Add support to read FW build version for WCN3991 BTSoC
-      Bluetooth: hci_qca: Wait for SSR completion during suspend
-      Bluetooth: hci_qca: check for SSR triggered flag while suspend
-      Bluetooth: hci_qca: Fixed issue during suspend
-
-Ye Bin (1):
-      Bluetooth: btusb: remove set but not used variable in btusb_mtk_setup_firmware_79xx
-
-Yu Liu (1):
-      Bluetooth: Skip eSCO 2M params when not supported
-
- Documentation/devicetree/bindings/net/btusb.txt |   2 +-
- drivers/bluetooth/btintel.c                     |  21 +-
- drivers/bluetooth/btmtksdio.c                   |  16 +-
- drivers/bluetooth/btqca.c                       |  67 ++++
- drivers/bluetooth/btqca.h                       |   1 +
- drivers/bluetooth/btqcomsmd.c                   |  27 +-
- drivers/bluetooth/btrtl.c                       |  43 ++-
- drivers/bluetooth/btusb.c                       | 313 +++++++++++++---
- drivers/bluetooth/hci_bcm.c                     |   1 +
- drivers/bluetooth/hci_h5.c                      |   7 +
- drivers/bluetooth/hci_ldisc.c                   |   7 +-
- drivers/bluetooth/hci_qca.c                     |  33 +-
- drivers/bluetooth/hci_serdev.c                  |   4 +-
- include/net/bluetooth/hci.h                     |   8 +
- include/net/bluetooth/hci_core.h                |  37 +-
- include/net/bluetooth/l2cap.h                   |   1 +
- include/net/bluetooth/mgmt.h                    |  16 +
- net/bluetooth/a2mp.c                            |   3 +-
- net/bluetooth/af_bluetooth.c                    |  22 +-
- net/bluetooth/amp.c                             |   3 +
- net/bluetooth/hci_conn.c                        |  37 +-
- net/bluetooth/hci_core.c                        | 201 ++++++++---
- net/bluetooth/hci_debugfs.c                     |  80 ++---
- net/bluetooth/hci_request.c                     |  74 ++--
- net/bluetooth/l2cap_core.c                      | 119 ++++--
- net/bluetooth/mgmt.c                            | 399 +++++++++++++++-----
- net/bluetooth/msft.c                            | 460 +++++++++++++++++++++++-
- net/bluetooth/msft.h                            |  30 ++
- net/bluetooth/smp.c                             |   5 +-
- 29 files changed, 1694 insertions(+), 343 deletions(-)
-
---N127i058iNjEYKqT
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQQ8m6QjaLXd1XJ73Dsfyv3T9pQ3KgUCYCVXsgAKCRAfyv3T9pQ3
-KnZcAQDwRUSlrnmH9jIU3nuowj4nLtq/xAhjkX9X1ET7V420uwEAqjmGXtoTq/Dx
-z2Isy+ViN3OK/LUQvwCijNmXzrV5rwM=
-=LwR2
------END PGP SIGNATURE-----
-
---N127i058iNjEYKqT--
