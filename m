@@ -2,104 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6BB6FC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BA6C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:37:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3D0C964E3B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8558C64DCD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:37:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229521AbhBKWXx (ORCPT
+        id S229564AbhBKWhc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Feb 2021 17:23:53 -0500
-Received: from mga07.intel.com ([134.134.136.100]:1738 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230080AbhBKWXJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Feb 2021 17:23:09 -0500
-IronPort-SDR: JfNbUWUJG1nTupVKlG16+5RXPy1zjWYSyYbQh5WxbB/swFJCZsk5OEGsjI7f37lW/VW9MLr6No
- H0BxqXyIFo9Q==
-X-IronPort-AV: E=McAfee;i="6000,8403,9892"; a="246392981"
-X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
-   d="scan'208";a="246392981"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:22:01 -0800
-IronPort-SDR: X8td3B/+fMnHk0RuGkNRaf7cI1lZFLtVxGqekCRucC2Jufh0AWsXO6zrdKR+pv76oS11AZomaH
- G42o3gEp5h+g==
-X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
-   d="scan'208";a="381070074"
-Received: from binman-mobl4.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.251.152.23])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:22:00 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 4/4] tools/mesh-cfg-client:
-Date:   Thu, 11 Feb 2021 14:21:43 -0800
-Message-Id: <20210211222143.39986-5-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.2
-In-Reply-To: <20210211222143.39986-1-inga.stotland@intel.com>
-References: <20210211222143.39986-1-inga.stotland@intel.com>
+        Thu, 11 Feb 2021 17:37:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60060 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229469AbhBKWhc (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Feb 2021 17:37:32 -0500
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1869DC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Feb 2021 14:36:52 -0800 (PST)
+Received: by mail-qk1-x72d.google.com with SMTP id v206so7010239qkb.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Feb 2021 14:36:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=+bIcKQbSFQ6ZVdLxWrqdhz/ygfFy88imXn8E/keKANw=;
+        b=AIOH9g2mwHLAqbANVYKg+D1jlQ4DZ4YrQR4/ZZIkUFKet0wygzRawNkqQ67A3R5SDV
+         2WJiDk6anSAKc/vC4CpZErFOT0ZTxQn8W7OJtcO6Bfnvaz36hCfm1n5RfaRksTJhrW7/
+         0ObuGGAxdQd+CrdZFYxQUSVY+qcS9G5vQL1C208oKdri7b9qcDdHAQ7ikPwgKkfkaiMg
+         bcMsBzXwAGIXwnaQYLY6hIJmmqDlK9QIfrRibslzLJDe/a+jvpFBG/E0i5WHSHT9HPFm
+         Jsv4F7j10r+73YT+rr0+tcd53vLVI4s2nnllKK9bQvIo453DlCEf/pHPUtq2hYwsA9Hb
+         PQWw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=+bIcKQbSFQ6ZVdLxWrqdhz/ygfFy88imXn8E/keKANw=;
+        b=djTyi9BUazr7KfIY5mLBTEX57ckRDlquvXaTZ390O1ihY3njU1+yR+rjgWPLRPsIJb
+         qvBOm4LXTYfcZ6YddGOC1aqUT1TA4MUOA84p2pwKOaLXUp/hCYcAlOyHBSZ56e5k6vYU
+         7qdjDkjr1KcyS1nhqTHqzPzgZWNb+jyYqBCi+BHcCjQSk2sSOvq2hJRskMHM3Txk94Yo
+         UGOIWzu40NEcqFxe7AhfCKw75ib8oeI/BfUvr79QXExCKapxZDMeMfZjmc3T2ES+vdw6
+         prgT9OGc7GvSQKwe+vbya+8rXseCaO0Rwhxw16NwkeRZw1uLYhcI7AFmyArxk3SRO1v7
+         6Swg==
+X-Gm-Message-State: AOAM531wfnYiHEr9M0gEEi2+deNPtmnbhFgj7Er9BbdT134l2ucy5PUw
+        Gpm+pr4lOgap98Pu+HzIrUa2UkdxF30=
+X-Google-Smtp-Source: ABdhPJy5lQm0YCRBhdIsgjGStY1uCYOjuIwNZiO/TB05gvzuE1s6Sv3vV8QBeT0rkrdslOD13IP8Rg==
+X-Received: by 2002:a05:620a:13ae:: with SMTP id m14mr13608qki.35.1613083011059;
+        Thu, 11 Feb 2021 14:36:51 -0800 (PST)
+Received: from [172.17.0.2] ([52.242.91.177])
+        by smtp.gmail.com with ESMTPSA id p68sm3959172qkb.69.2021.02.11.14.36.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 11 Feb 2021 14:36:50 -0800 (PST)
+Message-ID: <6025b182.1c69fb81.47d5f.9b6d@mx.google.com>
+Date:   Thu, 11 Feb 2021 14:36:50 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0815216893528667904=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: Use compliant UUID for mesh
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210211222143.39986-2-inga.stotland@intel.com>
+References: <20210211222143.39986-2-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Make sure that the values of Device UUID supplied in
-CreateNetwork and AddRemoteNode methods are compliant with
-RFC 4122.
-Also, use a compliant value for Mesh UUID.
+--===============0815216893528667904==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=432455
+
+---Test result---
+
+##############################
+Test: CheckPatch - PASS
+
+##############################
+Test: CheckGitLint - FAIL
+Output:
+tools/mesh-cfg-client:
+1: T3 Title has trailing punctuation (:): "tools/mesh-cfg-client:"
+
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
+
+
+
 ---
- tools/mesh-cfgclient.c | 6 +++---
- tools/mesh/mesh-db.c   | 2 +-
- 2 files changed, 4 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index 28465a679..1eeed2a1a 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -731,7 +731,7 @@ static void create_net_setup(struct l_dbus_message *msg, void *user_data)
- 	struct l_dbus_message_builder *builder;
- 
- 	/* Generate random UUID */
--	l_getrandom(app.uuid, sizeof(app.uuid));
-+	l_uuid_v4(app.uuid);
- 
- 	builder = l_dbus_message_builder_new(msg);
- 
-@@ -899,7 +899,7 @@ static void cmd_import_node(int argc, char *argv[])
- 
- 	/* Device UUID */
- 	req->data1 = l_util_from_hexstring(argv[1], &sz);
--	if (!req->data1 || sz != 16) {
-+	if (!req->data1 || sz != 16 || !l_uuid_is_valid(req->data1)) {
- 		l_error("Failed to generate UUID array from %s", argv[1]);
- 		goto fail;
- 	}
-@@ -1298,7 +1298,7 @@ static void add_node_setup(struct l_dbus_message *msg, void *user_data)
- 	struct l_dbus_message_builder *builder;
- 
- 	uuid = l_util_from_hexstring(str, &sz);
--	if (!uuid || sz != 16) {
-+	if (!uuid || sz != 16 || !l_uuid_is_valid(uuid)) {
- 		l_error("Failed to generate UUID array from %s", str);
- 		return;
- 	}
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index d86913006..46f0c6075 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -1407,7 +1407,7 @@ bool mesh_db_create(const char *fname, const uint8_t token[8],
- 	if (!add_u8_8(jcfg, "token", token))
- 		goto fail;
- 
--	l_getrandom(uuid, 16);
-+	l_uuid_v4(uuid);
- 
- 	if (!add_u8_16(jcfg, "uuid", uuid))
- 		goto fail;
--- 
-2.26.2
 
+--===============0815216893528667904==--
