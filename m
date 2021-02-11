@@ -7,63 +7,132 @@ X-Spam-Status: No, score=-11.7 required=3.0 tests=BAYES_00,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F3D3C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20C08C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2D81601FD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9CD664E38
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Feb 2021 22:23:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230078AbhBKWXI (ORCPT
+        id S230209AbhBKWXR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Feb 2021 17:23:08 -0500
-Received: from mga07.intel.com ([134.134.136.100]:1736 "EHLO mga07.intel.com"
+        Thu, 11 Feb 2021 17:23:17 -0500
+Received: from mga07.intel.com ([134.134.136.100]:1741 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230097AbhBKWWg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Feb 2021 17:22:36 -0500
-IronPort-SDR: xRad+BLhv2bEV0BxSgNeIqIwDgobb31tqcChP9tQMwXBBndoBKw0RtSeoPq7jeExV9J+q6KQ8j
- RZVsomMQqWyA==
-X-IronPort-AV: E=McAfee;i="6000,8403,9892"; a="246392967"
+        id S230108AbhBKWWm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 11 Feb 2021 17:22:42 -0500
+IronPort-SDR: W3RNKm8+QM8tGHP5iX5POGbBaBwjox0xOJ2ZqtnH/gBU7gAhBPq72kCLZKwClnCP1Br0Ae3j2X
+ D/RuZ5wxn/yQ==
+X-IronPort-AV: E=McAfee;i="6000,8403,9892"; a="246392971"
 X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
-   d="scan'208";a="246392967"
+   d="scan'208";a="246392971"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:55 -0800
-IronPort-SDR: 2va7SIprbnYuJCyYSDY9v6NuXRUqbR0HfcL6NW6Kb160vfg9UsUE92xXZ4K88hjAYWfY8LKG19
- XO4hEMg5FkrQ==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:57 -0800
+IronPort-SDR: KIm47ofDlTCCjMV8d3fAQWMQaUnHRzdkhPsxsfFwuQhvadnFciNUnh+gqkkOwf285xzcoGH0hV
+ uFD9olfwkpXw==
 X-IronPort-AV: E=Sophos;i="5.81,171,1610438400"; 
-   d="scan'208";a="381070034"
+   d="scan'208";a="381070051"
 Received: from binman-mobl4.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.251.152.23])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:53 -0800
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2021 14:21:57 -0800
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 0/4] Use compliant UUID for mesh
-Date:   Thu, 11 Feb 2021 14:21:39 -0800
-Message-Id: <20210211222143.39986-1-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/4] mesh: Add validation of Device UUID value
+Date:   Thu, 11 Feb 2021 14:21:41 -0800
+Message-Id: <20210211222143.39986-3-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210211222143.39986-1-inga.stotland@intel.com>
+References: <20210211222143.39986-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Mesh profile spec states that the values use for Device UUIDs
-folow format and generation procedures outlined in RFC 4122.
-This patch set addresses this requirement.
+Validate that the value of Device UUID supplied in
+CreateNetwork/Join/Import methods is compliant with RFC 4122.
+---
+ Makefile.am |  6 ++++--
+ mesh/mesh.c | 18 +++++++++---------
+ 2 files changed, 13 insertions(+), 11 deletions(-)
 
-Inga Stotland (4):
-  doc/mesh-api: Add notion of Device UUID compliance
-  mesh: Add validation of Device UUID value
-  test/test-mesh: Generate correct value for Device UUID
-  tools/mesh-cfg-client:
-
- Makefile.am            |  6 ++++--
- doc/mesh-api.txt       |  9 ++++++---
- mesh/mesh.c            | 18 +++++++++---------
- test/test-mesh         |  5 +++++
- tools/mesh-cfgclient.c |  6 +++---
- tools/mesh/mesh-db.c   |  2 +-
- 6 files changed, 28 insertions(+), 18 deletions(-)
-
+diff --git a/Makefile.am b/Makefile.am
+index d0f979586..86f3409c3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -134,7 +134,8 @@ ell_headers = ell/util.h \
+ 			ell/base64.h \
+ 			ell/asn1-private.h \
+ 			ell/cert-private.h \
+-			ell/pem-private.h
++			ell/pem-private.h \
++			ell/uuid.h
+ 
+ ell_sources = ell/private.h ell/missing.h \
+ 			ell/util.c \
+@@ -169,7 +170,8 @@ ell_sources = ell/private.h ell/missing.h \
+ 			ell/gvariant-private.h \
+ 			ell/gvariant-util.c \
+ 			ell/siphash-private.h \
+-			ell/siphash.c
++			ell/siphash.c \
++			ell/uuid.c
+ 
+ ell_libell_internal_la_SOURCES = $(ell_headers) $(ell_sources)
+ endif
+diff --git a/mesh/mesh.c b/mesh/mesh.c
+index f29e8b6be..62d650328 100644
+--- a/mesh/mesh.c
++++ b/mesh/mesh.c
+@@ -533,7 +533,7 @@ static struct l_dbus_message *join_network_call(struct l_dbus *dbus,
+ 						void *user_data)
+ {
+ 	const char *app_path, *sender;
+-	struct l_dbus_message_iter iter_uuid;
++	struct l_dbus_message_iter iter;
+ 	uint32_t n;
+ 
+ 	l_debug("Join network request");
+@@ -543,14 +543,13 @@ static struct l_dbus_message *join_network_call(struct l_dbus *dbus,
+ 						"Provisioning in progress");
+ 
+ 	if (!l_dbus_message_get_arguments(msg, "oay", &app_path,
+-								&iter_uuid))
++								&iter))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+ 
+ 	join_pending = l_new(struct join_data, 1);
+ 
+-	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid,
+-						&join_pending->uuid, &n)
+-								|| n != 16) {
++	if (!l_dbus_message_iter_get_fixed_array(&iter, &join_pending->uuid, &n)
++			|| n != 16 || !l_uuid_is_valid(join_pending->uuid)) {
+ 		l_free(join_pending);
+ 		join_pending = NULL;
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+@@ -785,8 +784,8 @@ static struct l_dbus_message *create_network_call(struct l_dbus *dbus,
+ 								&iter_uuid))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+ 
+-	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid, &uuid, &n)
+-								|| n != 16)
++	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid, &uuid, &n) ||
++					n != 16 || !l_uuid_is_valid(uuid))
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
+ 							"Bad device UUID");
+ 
+@@ -835,8 +834,9 @@ static struct l_dbus_message *import_call(struct l_dbus *dbus,
+ 		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, NULL);
+ 
+ 	if (!l_dbus_message_iter_get_fixed_array(&iter_uuid, &uuid, &n) ||
+-									n != 16)
+-		return dbus_error(msg, MESH_ERROR_INVALID_ARGS, "Bad dev UUID");
++					n != 16 || !l_uuid_is_valid(uuid))
++		return dbus_error(msg, MESH_ERROR_INVALID_ARGS,
++							"Bad device UUID");
+ 
+ 	if (node_find_by_uuid(uuid))
+ 		return dbus_error(msg, MESH_ERROR_ALREADY_EXISTS,
 -- 
 2.26.2
 
