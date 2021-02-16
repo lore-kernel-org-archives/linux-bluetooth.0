@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 810A5C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 73630C433E6
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Feb 2021 23:34:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B61C64E10
+	by mail.kernel.org (Postfix) with ESMTP id 4475E64EAD
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Feb 2021 23:34:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230420AbhBPXeX (ORCPT
+        id S230389AbhBPXeV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Feb 2021 18:34:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55372 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230400AbhBPXeV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 16 Feb 2021 18:34:21 -0500
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E7CEC061756
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Feb 2021 15:33:41 -0800 (PST)
-Received: by mail-pl1-x635.google.com with SMTP id s16so2464055plr.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Feb 2021 15:33:41 -0800 (PST)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55368 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230210AbhBPXeU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Feb 2021 18:34:20 -0500
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 825E2C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Feb 2021 15:33:40 -0800 (PST)
+Received: by mail-pl1-x631.google.com with SMTP id b8so6360110plh.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Feb 2021 15:33:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=rjRUuZ6S9CazXw1JtrK9M/ukL9kp/i3skiRIFM9vCfU=;
-        b=AIT3VFj1IFDPqgAZ9uQK8XEHbfnCYptGNWBYVE5sNa8cbDfVc0mHDfUSxYBAwsVHLK
-         b3ULuQlEBq468u7IvkxM+++Rs07c3HfdQDjIBfnZptG5U2Lg+I571JTbzNVyoT0UpzoO
-         RNjdbEU9L+hd66O9RBRRCwE0GXEQz/AeFKm/qZ9dh5CTh6y8TbYO5YSxT7kMmztNaTSx
-         8L9sHC1YQaRfTsOGADt4bxGWI7T+DUdTgF0wkibjZamLvHDxIxR0qtg+9u6+4SAFbCMm
-         AfVVyYiQA32f5VRqoOZmSynRMB4cjwUvkTbYEfQTGTGIj9v9G4kYPDah2wnhHtTzDBIN
-         JF3w==
+        bh=NV4mCh1O2tdKISHhIpj/kqto2I7ZrYdJg+KpJgpm6q8=;
+        b=NOwdCgmhcyWap+LCGyhSvYKKjsIu/chKFvvKLk7MqS75z8qDreMtrWMqSePyAq/psO
+         Mo6JGjfDHejq4mP5J0rZHj6/JPZko6eMOat54fXFMXatKX06T25KXq01BocfK/bHMEu7
+         XssKiUOEioF6JDjbxF7Im1SEbEDKgcutgQENC0G52vM9EVUTUWS8WSS7Dp0rXMVS9gtp
+         HA1zzi1K9oPHE/vPSth/S0AjJErhid1yjasMf8PxgP4pPzBD6I1HRgOS8FpH8Kz8gLus
+         KUxTtkSoSkpnXVP/r8FSxVFtNUeitEjr8TPeQGXgyvhnTP5mtjOUqF5Rz8SlMnChwD5x
+         Ts1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rjRUuZ6S9CazXw1JtrK9M/ukL9kp/i3skiRIFM9vCfU=;
-        b=QMZftHYrWbkWCTx/RARLF/cTIPmsbzO6gVsPgCHQgHE2M6zgpWp8N4Q/tNZJI61ogw
-         dKSqYm0+P1BVACzE6HD0fq+kvqYasxwHJCZshKYDsJ6qUkCW53cDZk2sH9gjuGb1ZcMe
-         aX4xYiquTBAvDuVD6DQ7ZNB6A/pjufODIj0VgfneD4V4PS1h8ObWPgdk7BCWFvWhH/97
-         a8eIN19J+hrb/shsWawPEV5DM/v7dbJVo8qAfcOgJx9Up25lbmnPrwoGAlMxmdfTH1wp
-         UB/lucus6WihwuYfPT7IkV0w8F6YWt00ApoyveiVW83yFhIWUNDwNZ3FV8hyQi/YVgHt
-         KUgg==
-X-Gm-Message-State: AOAM53306bjyPRhGnpeHsiYvFdg9dsZxtCDAlmvAi96JijjApdaXc0qA
-        5nauuXnlCKmdP9M20oJ/iFUTM+ZG+2o1eg==
-X-Google-Smtp-Source: ABdhPJzLfiQH5aYw6J7H68+dD5DeEBlvJ/S5GT5hO3tHKNxoVbnjLzu+fy1CouOSHi4yXtPrBUOWEg==
-X-Received: by 2002:a17:90a:9288:: with SMTP id n8mr6369904pjo.91.1613518420803;
-        Tue, 16 Feb 2021 15:33:40 -0800 (PST)
+        bh=NV4mCh1O2tdKISHhIpj/kqto2I7ZrYdJg+KpJgpm6q8=;
+        b=ovp0b9FbPIvu3+NgRCSYUiB2uR149mACmvQqtrA5xdOc1S2ExvZtdkVivisAoT+mQ+
+         LrBbRfQt8xJp+avAKUXWcU3unIkZZn1D6dS7L1OAP1FQ2Wq033lYvNIOgzx6U8EdEkLE
+         Y2V6tQqld/n6vxRqoX8j2BAkvm42rbDMhmfmc7CLnnaNcJhZDCYtm//5pVurpoL65h05
+         qp8J1H8WfyUQk2/iolCIfCBwWJgeeODl4Geybn0H53G2rQFxzTHRxnB1pHAP9KJXPNqT
+         IVzFv/ZqwT1lWuhteLd65Cf0mkElmPF9bG4OME9XYCc1MCv22PvOdCjulM27Bl/rqWpQ
+         4w5Q==
+X-Gm-Message-State: AOAM530sAjmBAvi7ZtymajLWE8cHkaRk8mT2i27/xJDXb0FQOBBHUw/2
+        ITp+hQk7JG9e/jwkooCTe0kZCCscx8yyxw==
+X-Google-Smtp-Source: ABdhPJykyiN1JX04dBw44ZSS0LTC7dDQ4OdBNlyb3F4lixLQUj7UWSwZfI/9eTYFrRqDqc1u8FGV/g==
+X-Received: by 2002:a17:90a:f981:: with SMTP id cq1mr6193589pjb.167.1613518419792;
+        Tue, 16 Feb 2021 15:33:39 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h5sm99956pgv.87.2021.02.16.15.33.40
+        by smtp.gmail.com with ESMTPSA id h5sm99956pgv.87.2021.02.16.15.33.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Feb 2021 15:33:40 -0800 (PST)
+        Tue, 16 Feb 2021 15:33:39 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/3] avdtp: Remove use of G_PRIORITY_LOW
-Date:   Tue, 16 Feb 2021 15:33:37 -0800
-Message-Id: <20210216233337.859955-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/3] btio: Use G_PRIORITY_HIGH for watches
+Date:   Tue, 16 Feb 2021 15:33:36 -0800
+Message-Id: <20210216233337.859955-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.29.2
 In-Reply-To: <20210216233337.859955-1-luiz.dentz@gmail.com>
 References: <20210216233337.859955-1-luiz.dentz@gmail.com>
@@ -75,41 +75,44 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-G_PRIORITY_LOW was used in order to prioritize the AVDTP media transport
-channel over the signalling channel but this has the side effect of
-delaying the dispatching of other conditions such as HUP/NVAL, so now
-that BtIO use G_PRIORITY_HIGH for its watches we no longer need to
-deprioritize session_cb.
+This makes btio watches default to G_PRIORITY_HIGH instead of
+G_PRIORITY_DEFAULT so it takes priority over regular traffic or
+timeout handling.
 ---
- profiles/audio/avdtp.c | 13 ++-----------
- 1 file changed, 2 insertions(+), 11 deletions(-)
+ btio/btio.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 9ddcd6464..088ca58b3 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -2378,19 +2378,10 @@ static void avdtp_connect_cb(GIOChannel *chan, GError *err, gpointer user_data)
- 		if (session->io_id)
- 			g_source_remove(session->io_id);
+diff --git a/btio/btio.c b/btio/btio.c
+index 8230212b4..1f1c374bc 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -274,7 +274,7 @@ static void server_add(GIOChannel *io, BtIOConnect connect,
+ 	server->destroy = destroy;
  
--		/* This watch should be low priority since otherwise the
--		 * connect callback might be dispatched before the session
--		 * callback if the kernel wakes us up at the same time for
--		 * them. This could happen if a headset is very quick in
--		 * sending the Start command after connecting the stream
--		 * transport channel.
--		 */
--		session->io_id = g_io_add_watch_full(chan,
--						G_PRIORITY_LOW,
-+		session->io_id = g_io_add_watch(chan,
- 						G_IO_IN | G_IO_ERR | G_IO_HUP
- 						| G_IO_NVAL,
--						(GIOFunc) session_cb, session,
--						NULL);
-+						(GIOFunc) session_cb, session);
+ 	cond = G_IO_IN | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+-	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, server_cb, server,
++	g_io_add_watch_full(io, G_PRIORITY_HIGH, cond, server_cb, server,
+ 					(GDestroyNotify) server_remove);
+ }
  
- 		if (session->stream_setup)
- 			set_disconnect_timer(session);
+@@ -291,7 +291,7 @@ static void connect_add(GIOChannel *io, BtIOConnect connect, bdaddr_t dst,
+ 	conn->dst = dst;
+ 
+ 	cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+-	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, connect_cb, conn,
++	g_io_add_watch_full(io, G_PRIORITY_HIGH, cond, connect_cb, conn,
+ 					(GDestroyNotify) connect_remove);
+ }
+ 
+@@ -307,7 +307,7 @@ static void accept_add(GIOChannel *io, BtIOConnect connect, gpointer user_data,
+ 	accept->destroy = destroy;
+ 
+ 	cond = G_IO_OUT | G_IO_ERR | G_IO_HUP | G_IO_NVAL;
+-	g_io_add_watch_full(io, G_PRIORITY_DEFAULT, cond, accept_cb, accept,
++	g_io_add_watch_full(io, G_PRIORITY_HIGH, cond, accept_cb, accept,
+ 					(GDestroyNotify) accept_remove);
+ }
+ 
 -- 
 2.29.2
 
