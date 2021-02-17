@@ -2,158 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5FE9C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Feb 2021 14:25:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504B1C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Feb 2021 17:26:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FB9B64DE0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Feb 2021 14:25:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DB1964E4B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Feb 2021 17:26:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233419AbhBQOZ6 (ORCPT
+        id S231873AbhBQR0W (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Feb 2021 09:25:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47500 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233418AbhBQOZ4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Feb 2021 09:25:56 -0500
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180DBC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Feb 2021 06:25:16 -0800 (PST)
-Received: by mail-vk1-xa33.google.com with SMTP id j188so2891236vke.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Feb 2021 06:25:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dIQ6aHGg8HcH1+n09aKvn5XXToN4WSs6zi/spnd4RUA=;
-        b=Wt4C0OZXBWCNDN0AEBb0VB0YW4qqrCnaCZ/yOkC+nm9DUMW9WAghxHfnAa+IL1/BOV
-         khvOWjQAlZdlcR8bnMu+aGmmtjiEk/mJM3cjmuj7REGDo5jK0jL8jvLU7Gqaa9gM0aDk
-         R6oGCcXazy/m1CrXr6T5CohFYmvGAROvYkVSc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=dIQ6aHGg8HcH1+n09aKvn5XXToN4WSs6zi/spnd4RUA=;
-        b=aM1fvm4azeXP4BVU29YXy3UjParaIrePeoq48Vp6avqdV6AqJyJcuSa26Dr9OUD3Zz
-         pnzTxcyx4aYH95YmQNUN+nQGfOQQ/A5FX+M3lMV6TCGW6EsuqdZw6Rs4fxV0zEu/FFOM
-         lKJffGHFtPItdRWYW+xWWDpgSiq9dA2stcL8W72AmdHroUBr/MpITg+xj8bhdmgOfy7V
-         IySKOV2Q3IOU2SgL0wsUzjzah9MdtHbAgwm81PoTFo7PEkNF3V8t8KZpKMlufqb9UyHs
-         jqWt9qwydyP0J7Qa+ExRBbvQik6ghJYqZ6/5Nq9R0xH7QjBAQ58JeH+jbbIrkGZBCDTc
-         ku8g==
-X-Gm-Message-State: AOAM531TycgQ1wZsOgsyLxn6rh3UpEFg+5i/aN3TB+3foJxEqnEJ0l2E
-        dnYhMPkTA02EW33QJLxNl9G7fGEHX/6mJcR5
-X-Google-Smtp-Source: ABdhPJwC4iElAnRqCiAi6RBblsB41C21s/ahI+WrLKGsCnj0VZYKD9K/1evuFg/ARwAbLaYE2kvG/w==
-X-Received: by 2002:a1f:9fc8:: with SMTP id i191mr14002307vke.5.1613571913951;
-        Wed, 17 Feb 2021 06:25:13 -0800 (PST)
-Received: from alain.c.googlers.com.com (245.7.75.34.bc.googleusercontent.com. [34.75.7.245])
-        by smtp.gmail.com with ESMTPSA id r130sm252484vke.29.2021.02.17.06.25.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 17 Feb 2021 06:25:13 -0800 (PST)
-From:   Alain Michaud <alainm@chromium.org>
+        Wed, 17 Feb 2021 12:26:22 -0500
+Received: from mail.kernel.org ([198.145.29.99]:48708 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230179AbhBQR0V (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Feb 2021 12:26:21 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 276E564E4A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Feb 2021 17:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613582741;
+        bh=ZWoYPyGjQoCTy031d3zKbKyY1TzxS2z3bACphiVhwlc=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=msmoEYyrpujC/QpeJpEqdVJfpudBiGhZjShW/vet+4S7JHdLcK1tuYl8FLdf+eApo
+         bv6VnpDKY2MYq7AI3qmyQ243+D1yOzcelfUihoVQ2KMFj54xXH9Ze8FXLs2TwV2hyI
+         a53ZR/YLuxm+9mXIPRzX1DUG91lfgS1fCmDu+c1roFtfLvm9Gu+8HCYlnc6aFSAQUH
+         JixEWXgs+jSBALOqVH3EmQ31B8tGdOlZGCmSu9Kkeypt1mar4+3GAF0dF3u5QdN4Hn
+         gTPBuAcvmMf582X7YnF568Rbn/kxoiu6qlgirFavJGOhckzYD60boxccMB5r0fwnN2
+         f9BhMINp2urmA==
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Alain Michaud <alainm@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Harry Cutts <hcutts@chromium.org>
-Subject: [PATCH v1] Bluetooth: Tolerate valid pre 4.2 conn params
-Date:   Wed, 17 Feb 2021 14:25:11 +0000
-Message-Id: <20210217142511.3221605-1-alainm@chromium.org>
-X-Mailer: git-send-email 2.30.0.478.g8a0d178c01-goog
+Subject: [Bug 203753] Bluetooth: hci0: advertising data len corrected
+Date:   Wed, 17 Feb 2021 17:25:40 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: m_pashka@mail.ru
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-203753-62941-gMuRhIqfgl@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203753-62941@https.bugzilla.kernel.org/>
+References: <bug-203753-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch tolerates connection parameters that were valid before
-ESR08_v1.0.0 which was also incoporated into the 4.2 core specification.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D203753
 
-In particular, this addresses compatibility issues with the Lenovo Yoga
-Mouse that sees its connection parameters rejected by the max_latency
-computation in hci_conn_check_params, but was perfectly valid at the
-time this mouse was qualified.
+Pavel Mukhataev (m_pashka@mail.ru) changed:
 
-Before the patch, the mouse was extremely laggy, after the patch, the
-mouse worked as expected.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |m_pashka@mail.ru
 
-Signed-off-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Tested-by: Harry Cutts <hcutts@chromium.org>
+--- Comment #5 from Pavel Mukhataev (m_pashka@mail.ru) ---
+Observe the same issue on raspberry pi 4b (2G)
 
----
+lsb_release -d: Raspbian GNU/Linux 10 (buster)
+uname -a: Linux raspberrypi 5.10.16-v7l+ #1402 SMP Tue Feb 16 14:12:18 GMT =
+2021
+armv7l GNU/Linux
+bluetoothd -v: 5.50
+hciconfig hci0:=20
+Type: Primary  Bus: UART
+ACL MTU: 1021:8  SCO MTU: 64:1
+UP RUNNING=20
+RX bytes:8883 acl:74 sco:0 events:473 errors:0
+TX bytes:4783 acl:74 sco:0 commands:251 errors:0
 
- include/net/bluetooth/hci_core.h | 30 ++++++++++++++++++++++++++++++
- net/bluetooth/l2cap_core.c       | 12 ++++++++++++
- 2 files changed, 42 insertions(+)
+dmesg:
+[   14.925896] Bluetooth: HCI device and connection manager initialized
+[   14.925926] Bluetooth: HCI socket layer initialized
+[   14.925948] Bluetooth: L2CAP socket layer initialized
+[   14.925984] Bluetooth: SCO socket layer initialized
+[   14.938333] Bluetooth: HCI UART driver ver 2.3
+[   14.938356] Bluetooth: HCI UART protocol H4 registered
+[   14.938471] Bluetooth: HCI UART protocol Three-wire (H5) registered
+[   14.938792] Bluetooth: HCI UART protocol Broadcom registered
+[   15.121724] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   15.121733] Bluetooth: BNEP filters: protocol multicast
+[   15.121746] Bluetooth: BNEP socket layer initialized
+[ 4080.572228] Bluetooth: hci0: advertising data len corrected 28 -> 27
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index ebdd4afe30d2..67b75077c82e 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1646,6 +1646,36 @@ static inline struct smp_irk *hci_get_irk(struct hci_dev *hdev,
- 	return hci_find_irk_by_rpa(hdev, bdaddr);
- }
- 
-+/* Erratum 5412 which has been fixed in 4.2 changed the validation of
-+ * connection parameters.  For backwards compatibility reasons, the old
-+ * calculation must be tolerated.
-+ * For further details :
-+ * https://www.bluetooth.org/errata/errata_view.cfm?errata_id=5419
-+ */
-+static inline int hci_check_conn_params_legacy(u16 min, u16 max, u16 latency,
-+					u16 to_multiplier)
-+{
-+	u16 max_latency;
-+
-+	if (min > max || min < 6 || max > 3200)
-+		return -EINVAL;
-+
-+	if (to_multiplier < 10 || to_multiplier > 3200)
-+		return -EINVAL;
-+
-+	if (max >= to_multiplier * 8)
-+		return -EINVAL;
-+
-+	max_latency = (to_multiplier * 8 / max) - 1;
-+	if (latency > 499 || latency > max_latency)
-+		return -EINVAL;
-+
-+	return 0;
-+}
-+
-+/* Connection Parameter Validation Helper.
-+ * See Vol 6, Part B, section 4.5.1.
-+ */
- static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
- 					u16 to_multiplier)
- {
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 72c2f5226d67..726e78bd85ff 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -5553,6 +5553,18 @@ static inline int l2cap_conn_param_update_req(struct l2cap_conn *conn,
- 	memset(&rsp, 0, sizeof(rsp));
- 
- 	err = hci_check_conn_params(min, max, latency, to_multiplier);
-+	if (err) {
-+		BT_WARN("Invalid conn params min 0x%4.4x max 0x%4.4x latency: 0x%4.4x TO: 0x%4.4x",
-+			min, max, latency, to_multiplier);
-+
-+		err = hci_check_conn_params_legacy(min, max, latency,
-+						   to_multiplier);
-+		if (!err) {
-+			/* latency is invalid, cap it to the max allowed */
-+			latency = min(499, (to_multiplier * 4 / max) - 1);
-+		}
-+	}
-+
- 	if (err)
- 		rsp.result = cpu_to_le16(L2CAP_CONN_PARAM_REJECTED);
- 	else
--- 
-2.30.0.478.g8a0d178c01-goog
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
