@@ -2,111 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D068CC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 14:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 76066C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 17:25:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7A21264EAD
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 14:01:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2423264E3E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 17:25:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232489AbhBROAu (ORCPT
+        id S234238AbhBRRYu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Feb 2021 09:00:50 -0500
-Received: from youngberry.canonical.com ([91.189.89.112]:34270 "EHLO
-        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230499AbhBRNd4 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Feb 2021 08:33:56 -0500
-Received: from [123.112.65.49] (helo=[192.168.2.108])
-        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.86_2)
-        (envelope-from <hui.wang@canonical.com>)
-        id 1lCjQI-0007Mq-EE; Thu, 18 Feb 2021 13:32:50 +0000
-Subject: Re: [PATCH 5.12 regression fix 0/1] Bluetooth: btusb: Revert "Fix the
- autosuspend enable and disable"
-To:     Hans de Goede <hdegoede@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-References: <20210218123728.17067-1-hdegoede@redhat.com>
-From:   Hui Wang <hui.wang@canonical.com>
-Message-ID: <4762ccc8-457b-ae35-29ad-39a4e7e4d80e@canonical.com>
-Date:   Thu, 18 Feb 2021 21:32:36 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.5.0
+        Thu, 18 Feb 2021 12:24:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33056 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233128AbhBROGB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 18 Feb 2021 09:06:01 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id DEB5D64EAF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Feb 2021 13:53:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1613656423;
+        bh=ROnvhmI2YHMLSu6DQGJtJMzQpqfoIv08hM2eGJnyOgQ=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=VSFU9B1MKQps3KRgSZMoR6gx/iVdNzBskFEZFcYFG45rBmEfW0009jTMp0ye58CEu
+         i5fJ5mXP8vFaObYJx0EBjq80tYYCQ/17MkNUQRkTXjRAtVl7hOjDlzEY2aK5wabxY+
+         rxVohzUWhgtrpTGee9jBtYRi29WSewft8V69PjvsvB2e4LVb3D7RvkpkPS69tzRO1o
+         Ix4OvfkjY3xpOe/6W7ZmrQemJRzTOOstcis5amxjgo9REslkhBFhcfl5fXWlovSQzv
+         tRMf67/ormj60gQLcpJe+re/TBTpBOOzTAOi2pEH+/so5g4LiTBRKSCkcs0e0F/Wqt
+         FalcKM/lxhkSg==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
+ 0x31010000
+Date:   Thu, 18 Feb 2021 13:53:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: jwrdegoede@fedoraproject.org
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-210681-62941-xGRnAmRxVw@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
+References: <bug-210681-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-In-Reply-To: <20210218123728.17067-1-hdegoede@redhat.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D210681
 
-On 2/18/21 8:37 PM, Hans de Goede wrote:
-> Hi All,
->
-> >From the commit msg:
->
-> """
-> drivers/usb/core/hub.c: usb_new_device() contains the following:
->
->          /* By default, forbid autosuspend for all devices.  It will be
->           * allowed for hubs during binding.
->           */
->          usb_disable_autosuspend(udev);
->
-> So for anything which is not a hub, such as btusb devices, autosuspend is
-> disabled by default and we MUST call usb_enable_autosuspend(udev) to
-> enable it.
->
-> This means that the "Fix the autosuspend enable and disable" commit,
-> which drops the usb_enable_autosuspend() call when the enable_autosuspend
-> module option is true, is completely wrong, revert it.
-> """
->
-> Hui, I guess that what you were seeing is caused by:
-> /lib/udev/hwdb.d/60-autosuspend-chromiumos.hwdb
+--- Comment #38 from Hans de Goede (jwrdegoede@fedoraproject.org) ---
+Unfortunately it is taking quite a long time to get the fix for this into
+Linus' tree and the stable rules say that only fixes which are in Linus' tr=
+ee
+can be cherry-picked into the stable series.
 
-Hi Hans,
+For Fedora users I've added the upstream patch:
+https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.gi=
+t/commit/?id=3D234f414efd1164786269849b4fbb533d6c9cdbbf
 
-You are right, the VID:PID of the BT adapter on my machine is in that 
-file, the autosuspend is enabled by udev instead of kernel. I tested on 
-another machine whose BT adapter's ID is not in that file, the 
-autosuspend is controlled by btusb.enable_autosuspend=0.
+Fixing this as a downstream patch for the Fedora kernels. So this should be
+fixed in the next F32 and F33 kernel builds, which will likely be the 5.10.=
+18
+builds.
 
-Your reverting patch is correct.
+--=20
+You may reply to this email to add a comment.
 
-> Which enables autosuspend on a bunch of USB devices based on VID:PID,
-> overruling the kernel defaults. This is done to get better power-consumption
-> with devices where it is known that it is safe to do this.
->   
-> I guess that that the device you were testing this with is on that list.
-> So the proper fix would be to edit that file and remove your VID:PID from it.
->
-> Hui, also next time please try to Cc the original author of the code you
-> are modifying. A simple "git blame drivers/bluetooth/btusb.c" would have
-> found you commit eff2d68ca738 ("Bluetooth: btusb: Add a Kconfig option to
-> enable USB autosuspend by default") and then you could have added me to
-> the Cc and I could have nacked the patch before it got merged.
-OK, got it. will be careful and will Cc to the original author next time.
-> I happen to spot this this time since I was looking into some other
-> btusb issue. But if I had not spotted this, this would have caused
-> a significant power-consumption regression on many laptops.
->
-> Btusb might not look like a big consumer, but if it does not autosuspend
-> it often is the only USB device not autosuspending, keeping the XHCI
-> controller awake, which in turn is keeping a whole power-plane awake on
-> what once used to be the southbridge. At least on Skylake era hw this
-> could lead to an extra idle powerconsumption of 1W. So a small change
-> can cause a big impact.
->
-> Regards,
->
-> Hans
->     
->
+You are receiving this mail because:
+You are the assignee for the bug.=
