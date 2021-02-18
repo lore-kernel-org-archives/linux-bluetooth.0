@@ -2,127 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BAB5C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 13:59:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49591C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 14:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40D6364E5F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 13:59:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED98460C3D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Feb 2021 14:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230472AbhBRN7Y (ORCPT
+        id S232038AbhBRN7p (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Feb 2021 08:59:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37690 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231667AbhBRLjY (ORCPT
+        Thu, 18 Feb 2021 08:59:45 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:39392 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232489AbhBRMj1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Feb 2021 06:39:24 -0500
-Received: from mail-lf1-x12b.google.com (mail-lf1-x12b.google.com [IPv6:2a00:1450:4864:20::12b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7599AC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Feb 2021 03:11:55 -0800 (PST)
-Received: by mail-lf1-x12b.google.com with SMTP id h26so5994259lfm.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Feb 2021 03:11:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=nns.ee; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=N7C2rq42FKfMXFKLBllYdNimfFLg/j5EKB2u9DM8VVA=;
-        b=KumThAblz21RkL6AZphkFJvZObob7oS5koxTNShXzKH+bNusERJUSMCpc3LhKEIkk4
-         om+Ba6VDK+V3qdPZdTq4YGBAisEEABvU/Av92imWws38+l5bjkDYr7JureGfGHy5Syr0
-         ICeCpZNU1NXhXu2ItSaWeky3KrHQKN2eKlPHRQcFUf5V3cqMHA/4oNmVCT0zEzCiM2zK
-         /XsU2kkLooPY0ahO/V9FMvXK3gE0T5YysoVFo8CMYJ6LMJdfz3n6gzw5eIg7jsFRdXDt
-         LX8pC5JZO+JHGnmBvXZ+Q++HrJ3bNVpRT8pwDkmhT02BKNTd+5FBwJZR2aWM/jyLi6Sh
-         qP2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=N7C2rq42FKfMXFKLBllYdNimfFLg/j5EKB2u9DM8VVA=;
-        b=t5kR755iVEgvlrsMnmb4YjacvzCL52eSAnUtYKZakiyaC9LSfwpArLri/Y6hXQ7pTy
-         fNgdZfhVPJDbWWT5pOHxAKOAkRxoym8pR+7/t4GA1a7Hni1YUD0osnvewwu7NZaWrM9M
-         3e+CGQR0atRInH4ohPEvO/0Ff4tZmu42cA0gkavNREB58NokPiSGDgve+A2h4fx8Y1HD
-         fkrMhJYY2UWUsgSVFoUy7kDJ87PcajdtKIpCaTUQaHegMMyIDz2S5r+wB8HvGdDxJDkz
-         AJTB7EpNcuVFx64mgxlHsYJU8oS56CkwuVrCUVkq3kK33FbR2Ogfka+tefdqLWcLtfoA
-         gZ7Q==
-X-Gm-Message-State: AOAM53010/ef8O68FYzTayTfLpbTsyJuM+haUxMkotK6aerNJnEeS/Yp
-        FYNdKSFQxBdcSRxtd3krl+TFlQ==
-X-Google-Smtp-Source: ABdhPJyvQmCQMUGBGmU7bas+z66yZJMwBXfzt9lgV/QE7fPlHkcDfK5yVqHl9ba962u6jjZ3AQmukw==
-X-Received: by 2002:ac2:4d87:: with SMTP id g7mr1714012lfe.31.1613646713852;
-        Thu, 18 Feb 2021 03:11:53 -0800 (PST)
-Received: from book.hoh.ee (08c8-403c-451c-6712-db04-700d-07d0-2001.sta.estpak.ee. [2001:7d0:700d:db04:6712:451c:403c:8c8])
-        by smtp.gmail.com with ESMTPSA id p24sm573137lfe.27.2021.02.18.03.11.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 18 Feb 2021 03:11:53 -0800 (PST)
-From:   Rasmus Moorats <xx@nns.ee>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org, Rasmus Moorats <xx@nns.ee>
-Subject: [PATCH] Bluetooth: btusb: support 0cb5:c547 Realtek 8822CE device
-Date:   Thu, 18 Feb 2021 13:11:24 +0200
-Message-Id: <20210218111124.12612-1-xx@nns.ee>
-X-Mailer: git-send-email 2.27.0
+        Thu, 18 Feb 2021 07:39:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1613651854;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=oGAKR0pMp3ocE7nYm5fDfzy9O8ltjTM5+OT9cr9OSt4=;
+        b=UN2ZJynJQPwqTdvrS56Cn+p3tCF4SIXBworUi0pfhhQlRTFhOyjv8f+UVXe8M7rx2+2C6P
+        kgCi1fMRo2Qcj8w64pI1ZZh8hmfYfkyAfWdHjD4zdFHRwfsRcU7A0sZOXE0Z8W4cPjjWqo
+        Cq71paaeEi7y7VQt91N6cAocyq4j1mk=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-93-63kkG3ENNvK9PF2PQ-e0Jg-1; Thu, 18 Feb 2021 07:37:33 -0500
+X-MC-Unique: 63kkG3ENNvK9PF2PQ-e0Jg-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id E2E001966324;
+        Thu, 18 Feb 2021 12:37:31 +0000 (UTC)
+Received: from x1.localdomain (ovpn-115-22.ams2.redhat.com [10.36.115.22])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id C96C960877;
+        Thu, 18 Feb 2021 12:37:30 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        Hui Wang <hui.wang@canonical.com>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5.12 regression fix] Bluetooth: btusb: Revert Fix the autosuspend enable and disable
+Date:   Thu, 18 Feb 2021 13:37:28 +0100
+Message-Id: <20210218123728.17067-2-hdegoede@redhat.com>
+In-Reply-To: <20210218123728.17067-1-hdegoede@redhat.com>
+References: <20210218123728.17067-1-hdegoede@redhat.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some Xiaomi RedmiBook laptop models use the 0cb5:c547 USB identifier
-for their Bluetooth device, so load the appropriate firmware for
-Realtek 8822CE.
+drivers/usb/core/hub.c: usb_new_device() contains the following:
 
--Device(0cb5:c547) from /sys/kernel/debug/usb/devices
-T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0cb5 ProdID=c547 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+        /* By default, forbid autosuspend for all devices.  It will be
+         * allowed for hubs during binding.
+         */
+        usb_disable_autosuspend(udev);
 
-Signed-off-by: Rasmus Moorats <xx@nns.ee>
+So for anything which is not a hub, such as btusb devices, autosuspend is
+disabled by default and we must call usb_enable_autosuspend(udev) to
+enable it.
+
+This means that the "Fix the autosuspend enable and disable" commit,
+which drops the usb_enable_autosuspend() call when the enable_autosuspend
+module option is true, is completely wrong, revert it.
+
+This reverts commit 7bd9fb058d77213130e4b3e594115c028b708e7e.
+
+Cc: Hui Wang <hui.wang@canonical.com>
+Fixes: 7bd9fb058d77 ("Bluetooth: btusb: Fix the autosuspend enable and disable")
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btusb.c | 7 ++-----
+ 1 file changed, 2 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 03b83aa91277..89a92951180f 100644
+index 54a4f86f32e2..03b83aa91277 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -453,6 +453,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH },
- 	{ USB_DEVICE(0x0bda, 0xc123), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0cb5, 0xc547), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+@@ -4627,8 +4627,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 			data->diag = NULL;
+ 	}
  
- 	/* Silicon Wave based devices */
- 	{ USB_DEVICE(0x0c10, 0x0000), .driver_info = BTUSB_SWAVE },
+-	if (!enable_autosuspend)
+-		usb_disable_autosuspend(data->udev);
++	if (enable_autosuspend)
++		usb_enable_autosuspend(data->udev);
+ 
+ 	err = hci_register_dev(hdev);
+ 	if (err < 0)
+@@ -4688,9 +4688,6 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 		gpiod_put(data->reset_gpio);
+ 
+ 	hci_free_dev(hdev);
+-
+-	if (!enable_autosuspend)
+-		usb_enable_autosuspend(data->udev);
+ }
+ 
+ #ifdef CONFIG_PM
 -- 
-2.27.0
+2.30.1
 
