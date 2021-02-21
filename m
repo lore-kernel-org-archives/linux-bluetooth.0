@@ -2,139 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A1C5C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Feb 2021 20:36:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 271ADC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Feb 2021 23:48:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B57764E86
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Feb 2021 20:36:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DAC3564E2E
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Feb 2021 23:48:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230455AbhBUUgl (ORCPT
+        id S234206AbhBUXr4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Feb 2021 15:36:41 -0500
-Received: from mail.kernel.org ([198.145.29.99]:41176 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230174AbhBUUgl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Feb 2021 15:36:41 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B768B64E86;
-        Sun, 21 Feb 2021 20:35:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1613939759;
-        bh=62pblr5PKwtl7r1W6CVV/N21T1Y68VBAk4kKZYHcIw8=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=EMmpefgwQiboemyixGKxEA/xqCYHSvI32QBR0mJDthQTSsp2gByDsefnDLHZme3p0
-         Z50dYGskwtcrXpk+g1xS0nJgRqs6t29g/zcdG2EZ6u9eO/fTHy0mSw7jx0e9Yx0aWY
-         zkVPwFnLkksfYC1CDFl7QP5bLqC2emTP36WL30MDZcoLBnm2E+itHBITLZ+ZOLq1ca
-         6iobcUGb/ek+hPKB0wMP0LAPp6yoj+u/ZRu2nv/edXsrIFFqBn0wG61cvoT7pJImUF
-         f6iFGymgNHOa7K9p32UWLfnrlk2ERzTaVq8GrjO3Cn59FGtLsUcuphVAcn1P2dQUSy
-         ItTUUiXx5GlBg==
-Received: by earth.universe (Postfix, from userid 1000)
-        id C1F5F3C0C96; Sun, 21 Feb 2021 21:35:57 +0100 (CET)
-Date:   Sun, 21 Feb 2021 21:35:57 +0100
-From:   Sebastian Reichel <sre@kernel.org>
-To:     stable@vger.kernel.org
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Trent Piepho <tpiepho@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Hilda Wu <hildawu@realtek.com>,
-        Sathish Narasimman <sathish.narasimman@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Hsin-Yu Chao <hychao@chromium.org>,
-        Amit K Bag <amit.k.bag@intel.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        kernel@collabora.com, Sjoerd Simons <sjoerd@collabora.com>
-Subject: Re: [PATCH] Bluetooth: btusb: Always fallback to alt 1 for WBS
-Message-ID: <20210221203557.wcmukv77sng25bql@earth.universe>
-References: <20201210012003.133000-1-tpiepho@gmail.com>
- <7ADF39E2-647E-49E2-9C5B-B0BF6A303B95@holtmann.org>
- <YB68RUVLRGQKS+yH@dawn.lan>
+        Sun, 21 Feb 2021 18:47:56 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40082 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234199AbhBUXry (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 21 Feb 2021 18:47:54 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFEC2C061786
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Feb 2021 15:47:13 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id q186so12240073oig.12
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Feb 2021 15:47:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=aGP3r2f4zPW3GtaZ9hFWR2PWzu1ogKxejTXf/7WVcyQ=;
+        b=ZQEG8oOwrz+IyPbefiACvnZy26YQL1b5cqZlYXRcHzZPJ6E8w/YIpMxKQPbcoa/8Ej
+         2pqOXAKLBNZmABIHqPrUwmlenNEXSG2ahuN7Mm6i62Z+NiF+qE34kLvIuqKhdxysm4Bc
+         SquhzH1VGE2a89p1wYVmubReWVL+urGMMvfP9vGsvire08NNNiJc9YKU3E/MxE07IYt9
+         koXJc5e0qUTY++ME/6ziaa7J/QZZ0o3tTI0AkuGbuNiPoxoi35ReNQNhIkgePcTJTPYF
+         Qd77xSo0BaTeMb/PLUXVhjhJCV0UIXJhovLwfhJjkIX6FnSANqSfzlm3V/vOoHdUdgm8
+         i78A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=aGP3r2f4zPW3GtaZ9hFWR2PWzu1ogKxejTXf/7WVcyQ=;
+        b=rYQskXKTud7QNdqBgZ8MkhkFeZaKznPFBjQPZBdO0UJgPp9TwFcpy3jvUIOOeqp4CP
+         usQ8hGRR6OeJEyzT1W7Yg7WzTYN58Zcn/0Sm0/lulzp8Z4rGW0cgUB2m175IKsvHYkoU
+         w/xRPeD/qWi4XSwvvF7W+Vb62Q/qntf1YefvGLnUnnWG5hYQ5KHhDgHe9Zrka/0YkKxE
+         +zkArCnbfurCG8e53pZl+L7dpNKp37ZpOx63d8YFFVyQZmsZhfacJGpZkKuV4kOVFXsz
+         cFWB8yPXMMFdNnnfFsBLL3pNhsc1JVlIAeGvSgUZEtO3/w88LvipNpj+m0dW2EF7+LcD
+         zA3w==
+X-Gm-Message-State: AOAM5334uGLmSLEnKIytz0z2zs8OLBkb+gigL6L5oZMKOGszryxuY0Z5
+        EZn8x+JsVpi/EJMe0ECRF6b8vj8b5MQ3jL9/E84=
+X-Google-Smtp-Source: ABdhPJx1/1gYyHxsaLrV3Yz0aFIlDnAo8fZFEvP4t6Jbwcv6hdUTj/hQRONLMHf3VTZ+Jl2rN23d7qrmUdFx3EYx+3E=
+X-Received: by 2002:aca:c109:: with SMTP id r9mr13817576oif.64.1613951233228;
+ Sun, 21 Feb 2021 15:47:13 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="wercdu6qitq2sblv"
-Content-Disposition: inline
-In-Reply-To: <YB68RUVLRGQKS+yH@dawn.lan>
+References: <CAP_L5iP4vuasHk6qF4KYrPUwE33n3NVzwA28E559bykM9+GnOw@mail.gmail.com>
+In-Reply-To: <CAP_L5iP4vuasHk6qF4KYrPUwE33n3NVzwA28E559bykM9+GnOw@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sun, 21 Feb 2021 15:47:02 -0800
+Message-ID: <CABBYNZ+qMec0KbGx4Gfjb5yygXYzxz5WESReo3FS3_WNuqw1UA@mail.gmail.com>
+Subject: Re: How to receive notifications after calling StartNotify
+To:     Mihai Emilian <be.mihai22@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Mihai,
 
---wercdu6qitq2sblv
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+On Sun, Feb 21, 2021 at 9:13 AM Mihai Emilian <be.mihai22@gmail.com> wrote:
+>
+> Dear linux-bluetooth community,
+>
+> I am writing a bluetooth client in C which receives notifications from
+> a bluetooth device (server). I am able to call StartNotify() from the
+> bluez api and the Notifying property changes to true. However, I am
+> not sure how I should listen for the notifications, or where.
+>
+> There are several questions:
+> a) How do I provide a callback function to this?
+> b) async or sync method call? Does it matter?
+> c) Do I need the main loop to do this and why?
 
-[+cc stable@vger.kernel.org]
+You will need to subscribe for signals, e.g. using g_signal_connect:
 
-Hi,
+https://www.freedesktop.org/software/gstreamer-sdk/data/docs/latest/gio/GDBusProxy.html
 
-On Sat, Feb 06, 2021 at 04:56:53PM +0100, Sjoerd Simons wrote:
-> On Fri, Dec 18, 2020 at 10:23:08PM +0100, Marcel Holtmann wrote:
-> > Hi Trent,
-> >=20
-> > > When alt mode 6 is not available, fallback to the kernel <=3D 5.7 beh=
-avior
-> > > of always using alt mode 1.
-> > >=20
-> > > Prior to kernel 5.8, btusb would always use alt mode 1 for WBS (Wide
-> > > Band Speech aka mSBC aka transparent SCO).  In commit baac6276c0a9
-> > > ("Bluetooth: btusb: handle mSBC audio over USB Endpoints") this
-> > > was changed to use alt mode 6, which is the recommended mode in the
-> > > Bluetooth spec (Specifications of the Bluetooth System, v5.0, Vol 4.B
-> > > =A72.2.1).  However, many if not most BT USB adapters do not support =
-alt
-> > > mode 6.  In fact, I have been unable to find any which do.
->=20
-> > patch has been applied to bluetooth-next tree.
->=20
-> For easier application to the stable tree(s) this should probably get:
->   Fixes: baac6276c0a9 ("Bluetooth: btusb: handle mSBC audio over USB Endp=
-oints")
->=20
-> In my testing this indeed fixes mSBC audio with both a Belkin (Broadcom
-> BCM20702A, 050d:065a) and an Intel Bluetooth (8087:0a2b) adapters.
->=20
->   Tested-By: Sjoerd Simons <sjoerd@collabora.com>
+Signals are async so typically that would be handled by a mainloop.
 
-Tested on Intel AX200 Bluetooth (8087:0029):
+> Here's my source code https://pastebin.com/KEGTatsL
+>
+> Is there an example? I tried looking at the different files such as
+> client in bluez kernel source and gatttool source, but I couldn't
+> figure this out.
+>
+> Many thanks,
+> Regards,
+> Mihai
 
-Tested-by: Sebastian Reichel <sre@kernel.org>
 
-The patch has been merged to Linus' tree today and I think it should
-be applied to the 5.10 tree, which is used by Debian. This patch is
-required to use BT headset with bidirectional-audio in acceptable
-quality (That also requires proper userspace software, e.g. pipewire
-0.3.22, which Sjoerd uploaded to Debian experimental).
 
-Patch applies cleanly on 5.10.
-
-Thanks,
-
--- Sebastian
-
---wercdu6qitq2sblv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCgAdFiEE72YNB0Y/i3JqeVQT2O7X88g7+poFAmAyxCEACgkQ2O7X88g7
-+poTOA/7BIfVEMLI8RRz7+F2HQiJXwieTVgLSHIVc6EADDgK/K0BCkFYUX+bHSkL
-BQ7PbVqhS77A9EtDrP0aMNioC126fKKMJ4uePBnhCzyHN0YpZwPmriagu6MlOMUh
-xYGNMAjLk3e6jBusaGSGkIzN43LkjDJmIwYn4NDrUxceJa+VGoTkEVhGhPMOa2zj
-AbVIGetuWY5Q9pqzzUgJnaFnqNflsA6NZQ3IuCrD0pi2SKwkzKOglk1+MgxUmUVa
-HdSIeLNyOJLoGDS0Qr6Nytma3S0frYrcru2w1zQ0S1/fujWvSP+io4PNuceXo6Vj
-+c71oggRPjRbZowXvPkYvJN7yAKr07h7YfsCf6nXAf0XHSSea3kxmQrn3xgYRNTG
-Pf0Xx7IGPptpOLt/Lym8b0dDQc8483I42QLQxtwDvrk9hCjC5ifFu3jNfBdoZF8K
-/kFtIHWk/1FVNoyRWSeCf/Wi1/Z4zkoEzkzBdufcujY05vj/43HSxZb7ttlZRmkB
-1uG/I3JIdJUOdUU9EWqea65NKd8HnU+zMyb6LjXhfI0eyy7FyhAuP6n/qnRdoKfM
-M/RE3PtnuZPsk98OMgpJ4TPJnyFyoOA9zxn+wtfTbaxmRy6hIFHf4alB8FPaWg04
-H2vJG5xfugXrOln8u5wwtl2ZckmzFAUY58ylQsvpy1QlWG0qxNE=
-=K/qZ
------END PGP SIGNATURE-----
-
---wercdu6qitq2sblv--
+-- 
+Luiz Augusto von Dentz
