@@ -2,271 +2,210 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A403C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Feb 2021 17:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDBDDC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Feb 2021 18:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 57E9D64F00
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Feb 2021 17:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6324264DDA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Feb 2021 18:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231469AbhBVRrV (ORCPT
+        id S232370AbhBVSZp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Feb 2021 12:47:21 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45110 "EHLO
+        Mon, 22 Feb 2021 13:25:45 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53554 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230379AbhBVRrT (ORCPT
+        with ESMTP id S232441AbhBVSZm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Feb 2021 12:47:19 -0500
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85A47C061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Feb 2021 09:46:39 -0800 (PST)
-Received: by mail-ot1-x332.google.com with SMTP id b16so12823495otq.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Feb 2021 09:46:39 -0800 (PST)
+        Mon, 22 Feb 2021 13:25:42 -0500
+Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55DD6C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Feb 2021 10:25:01 -0800 (PST)
+Received: by mail-oi1-x236.google.com with SMTP id d20so14925573oiw.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Feb 2021 10:25:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ZNcGkeUzVjixpuVyco2yj7vpaXgIisaqvdaFOnqvkQM=;
-        b=Z10ZoHcPgDR6hzLIQ09EFcC+2Aq5zCdqePMubHAjMKG0lbL7jyVtSzYZz3UZAlaiFX
-         5XOE/LNYN7dfAfMJ8J+OxwLsjTdzMrRS2Xf5xbg3JVdZKilsLwvW4lctyL6cCjxQMu5O
-         jZrKuJ2LweDA/SbAs7LToHaw6vjMdvYwxCKkAIWhbu8v1q+lnwqgP1xZgl4GkFwLLYgg
-         KFnHlNXycGJr9q4Kll7N/A9TJVC91fWrM1gO52AT6m8idDbg/hiCDNVNLbeP+LmTFr8Z
-         vsCtvQqoLLQ4LErDu+TCj/f2Ad7OOFeH0fUIBwRI8qY7r4JNQbPRQBTTWtn2VN8smlPi
-         F7EA==
+        bh=VQucvZBZ6vVu+FNzQTPnBDhxy3QOvokfHD2+kN8K6pA=;
+        b=pJ/WM8Exp5xSJ1QpOOW1rCHWPslEvposCLJbj9visBrqXgBUcVFoiR8yEXCzBETveF
+         syQ3oBvucJ72pjCtU62GOylZ1+kuGOtyxCwvnWIfS1lDAsClSMiXUzufsQJDffYCD5ci
+         GQw+elcWteto/gJnyE2BA+j95uccLkNvHCT42kRit7j/Aa0KhjipY9ru/tSzpkgKkhJs
+         K2UXvkRFm11cL8KplZXYQMtDue18z6eW7lsmpMjDpx8u91PXJMl50qqQ5EHichAIcp3i
+         2XoruuQ32ZzhdNpTkOgQSmenyeMgEjRy4caIdTnyieSaPfXXA1tH32hi5tnxUCQI30Bb
+         PbNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ZNcGkeUzVjixpuVyco2yj7vpaXgIisaqvdaFOnqvkQM=;
-        b=I1aAVAXE2jxv5UR9cVZEB7zjePf+DhGcMaGC9zSMFXUe055BUh5uZyC1H7qchInJ2d
-         VnvNKd744E7KWmSdfBb5chKbk3x3In5Dc4/sWsy0TbUAF6I0hGXSqtGRrHcy5GRHYU8h
-         r4ca4NLZZi9Sr8ThoW5Un9OLDd6BgWi9yy67r4IUr+0vgSnZIRlFpg9rjzIuSfrPJ6XE
-         5yS11FdE4goQdK6pR6vuByXLScnkRV4IF8YxAElUYzOCGReZHD3vx2R64yVhN4hncJQp
-         L69GbXGZl9sVU6zG9JF3wXMKuJcZjCTNO2PmmJdTc+8Ttmk04tRfbqv/AgbkUHhEFiX0
-         MCIw==
-X-Gm-Message-State: AOAM5311ec2LkM2a+SyaFHAxzq1I5nUFHYxGcWmUaKb2afDaFy1688iD
-        4aF2UgV1ErmfHvVaEL9tRHDIwnFcsIrzckZ+4+Iu/GPtfaE=
-X-Google-Smtp-Source: ABdhPJy6mDcmu7m8/ozLfPi4N3lGMkbukfaL9tIYEo0oKz7DUZZJtr7GrvEiDoAyx8UX4N8uYKYvfAhtrQNrmqoEN/4=
-X-Received: by 2002:a9d:60c9:: with SMTP id b9mr17859961otk.371.1614015998838;
- Mon, 22 Feb 2021 09:46:38 -0800 (PST)
+        bh=VQucvZBZ6vVu+FNzQTPnBDhxy3QOvokfHD2+kN8K6pA=;
+        b=r/P6tnEKV9LkrcGS9cIHScRj777BxmqdYBnahUFXT5BZGP1YjtihQ7qEqMLx1i9RVF
+         DAWlgyR0UgiOtWYGDTRf5iv/inHok6jBJ+cPrReNQnDc67KgfGel3UE/+GjVmnyRyOIv
+         DYynJD6EKlwRTxp4RvUP2asoeoA36iuQ9uNCwaD0QzmSr/shtEahw4/BehFTb/gEa1aZ
+         Mz3OriC4EIi/Agg6ZoLpU/tTI1/ttzLunn/Yya9GBbRntGGOqPgyMt1SHpZ4RKUcCTeS
+         qQO9SZVhJbFeqD+OcO83mkBzz5pXSJE4G9PSkW4x6xO84KcTrGOlq9Qu5yZI8MNyduxM
+         vePQ==
+X-Gm-Message-State: AOAM532PlvV7vAckjLFJ1LzseP8AN0U+oiTaChqw6h4hefMyLN7xO6L6
+        xO0YDkDhLmrZucpJoN+/8s9t+dfg1AxOC8HQeXX4ZeIm
+X-Google-Smtp-Source: ABdhPJxXmDqJSMSIqO4tX8VFXqcroz3nLgqusiQ5bdwCCN7BcZt/pZTzejG2N4h97cLu9SuHEUb6MXanHSsuLEy/5lU=
+X-Received: by 2002:a54:468f:: with SMTP id k15mr16499023oic.58.1614018300647;
+ Mon, 22 Feb 2021 10:25:00 -0800 (PST)
 MIME-Version: 1.0
-References: <20210222103021.20923-1-magdalena.kasenberg@codecoup.pl>
-In-Reply-To: <20210222103021.20923-1-magdalena.kasenberg@codecoup.pl>
+References: <20210219174946.599144-1-curtis@maves.io> <CABBYNZKakfpzTOdZaoa0tZ5Umqu9MKMmkMfNN51XY5owC_KWwQ@mail.gmail.com>
+ <177bd04559f.d1a7c05c116102.319856870975137121@maves.io> <CABBYNZJJiXJJqtRMXKEvpwN-mj=eht9wdTgrK1p_Fo_36gK4Zw@mail.gmail.com>
+ <177c0b3e32a.c0b69e35170119.443115256308628377@maves.io>
+In-Reply-To: <177c0b3e32a.c0b69e35170119.443115256308628377@maves.io>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 22 Feb 2021 09:46:28 -0800
-Message-ID: <CABBYNZKnDGQM_0GY5OwQg6KD=NigeWf+3pSJU3tDsJpc4cQibw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix for L2CAP/LE/CFC/BV-15-C
-To:     Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Szymon Janc <szymon.janc@codecoup.pl>
+Date:   Mon, 22 Feb 2021 10:24:49 -0800
+Message-ID: <CABBYNZ++t8Hu2b--jCwMkTwB5WeCDuMv_EU0z-cBetCjJpaZcA@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] gatt-database: Fix notifying on indicatable attr
+To:     Curtis Maves <curtis@maves.io>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Magdalena,
+Hi Curtis,
 
-On Mon, Feb 22, 2021 at 2:34 AM Magdalena Kasenberg
-<magdalena.kasenberg@codecoup.pl> wrote:
+On Sat, Feb 20, 2021 at 10:29 AM Curtis Maves <curtis@maves.io> wrote:
 >
-> This is required for the qualification test L2CAP/LE/CFC/BV-15-C
+> Hi Luiz,
+> ---- On Sat, 20 Feb 2021 01:07:57 -0500 Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote ----
 >
-> Implementation does not allow to set different key size for SMP and
-> L2CAP, which is needed for a current specification of the test. This fix
-> workarounds it with the debugfs variable le_l2cap_min_key_size.
+>  > Hi Curtis,
+>  >
+>  > On Fri, Feb 19, 2021 at 5:18 PM Curtis Maves <curtis@maves.io> wrote:
+>  > >
+>  > > Hi Luiz,
+>  > > ---- On Fri, 19 Feb 2021 19:55:06 -0500 Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote ----
+>  > >
+>  > >  > Hi Curtis,
+>  > >  >
+>  > >  > On Fri, Feb 19, 2021 at 10:11 AM Curtis <curtis@maves.io> wrote:
+>  > >  > >
+>  > >  > > When a local GATT characteristic has both the indicate and notify
+>  > >  > > properties, notifications will not be send to clients requesting them.
+>  > >  > > This change fixes this, allowing for notifications to be sent.
+>  > >  > >
+>  > >  > > Also simplifies logic about when notifications/indications should
+>  > >  > > be sent.
+>  > >  > > ---
+>  > >  > >  src/gatt-database.c | 15 ++++++---------
+>  > >  > >  1 file changed, 6 insertions(+), 9 deletions(-)
+>  > >  > >
+>  > >  > > diff --git a/src/gatt-database.c b/src/gatt-database.c
+>  > >  > > index d635c3214..bd5864bcd 100644
+>  > >  > > --- a/src/gatt-database.c
+>  > >  > > +++ b/src/gatt-database.c
+>  > >  > > @@ -1344,10 +1344,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>  > >  > >         }
+>  > >  > >
+>  > >  > >         ccc = find_ccc_state(device_state, notify->ccc_handle);
+>  > >  > > -       if (!ccc)
+>  > >  > > -               return;
+>  > >  > > -
+>  > >  > > -       if (!ccc->value || (notify->conf && !(ccc->value & 0x0002)))
+>  > >  > > +       if (!ccc || !(ccc->value & 0x0003))
+>  > >  > >                 return;
+>  > >  > >
+>  > >  > >         device = btd_adapter_find_device(notify->database->adapter,
+>  > >  > > @@ -1374,7 +1371,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>  > >  > >          * TODO: If the device is not connected but bonded, send the
+>  > >  > >          * notification/indication when it becomes connected.
+>  > >  > >          */
+>  > >  > > -       if (!notify->conf) {
+>  > >  > > +       if (!(ccc->value & 0x0002)) {
+>  > >  > >                 DBG("GATT server sending notification");
+>  > >  > >                 bt_gatt_server_send_notification(server,
+>  > >  > >                                         notify->handle, notify->value,
+>  > >  > > @@ -2415,8 +2412,8 @@ static bool sock_io_read(struct io *io, void *user_data)
+>  > >  > >                                 gatt_db_attribute_get_handle(chrc->attrib),
+>  > >  > >                                 buf, bytes_read,
+>  > >  > >                                 gatt_db_attribute_get_handle(chrc->ccc),
+>  > >  > > -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
+>  > >  > > -                               conf_cb : NULL, chrc->proxy);
+>  > >  > > +                               conf_cb,
+>  > >  > > +                               chrc->proxy);
+>  > >  >
+>  > >  > Not why are you changing this code to always set the conf_cb? This
+>  > >  > would then always send indication rather then notifications:
+>  > >  >
+>  > >  > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c#n1387
+>  > >  >
+>  > >  > We might need to check what value it stored in the ccc state if both
+>  > >  > indication and notification is supported.
+>  > >  >
+>  > >  > >
+>  > >  > >         return true;
+>  > >  > >  }
+>  > >  > > @@ -2725,8 +2722,8 @@ static void property_changed_cb(GDBusProxy *proxy, const char *name,
+>  > >  > >                                 gatt_db_attribute_get_handle(chrc->attrib),
+>  > >  > >                                 value, len,
+>  > >  > >                                 gatt_db_attribute_get_handle(chrc->ccc),
+>  > >  > > -                               chrc->props & BT_GATT_CHRC_PROP_INDICATE ?
+>  > >  > > -                               conf_cb : NULL, proxy);
+>  > >  > > +                               conf_cb,
+>  > >  > > +                               proxy);
+>  > >  > >  }
+>  > >  > >
+>  > >  > >  static bool database_add_ccc(struct external_service *service,
+>  > >  > > --
+>  > >  > > 2.30.1
+>  > >  > >
+>  > >  > >
+>  > >  >
+>  > >  >
+>  > >  > --
+>  > >  > Luiz Augusto von Dentz
+>  > >  >
+>  > >
+>  > > This patch changes the if-statement around sending notifications to check that the
+>  > > ccc->value is not indicating rather than checking if conf_cb (notify->conf) is null.
+>  > > This change makes unnecessary to conditionally pass the conf_cb. It's now simpler to always pass it.
+>  >
+>  > What Im saying is that we can't do this:
+>  >
+>  > if (!notify->conf) {
+>  > DBG("GATT server sending notification");
+>  >
+>  > conf callback will always be set so instead we need to change that to:
+>  >
+>  > if (ccc->value != 0x02)
+>  >
+>  >
+>  >
+>  > > --
+>  > > Curtis Maves
+>  >
+>  >
+>  >
+>  > --
+>  > Luiz Augusto von Dentz
+>  >
+> I agree that we can no longer do the following on line 1377:
+>  > if (!notify->conf) {
+>  > DBG("GATT server sending notification");
 >
-> Logs from the test when the IUT uses a min and max l2cap encryption key size 16.
-> $ echo 16 > /sys/kernel/debug/bluetooth/hci0/le_l2cap_min_key_size
-> The lower tester uses a key size 7.
->
-> > ACL Data RX: Handle 99 flags 0x02 dlen 11                #34 [hci0] 25.007392
->       SMP: Pairing Request (0x01) len 6
->         IO capability: DisplayYesNo (0x01)
->         OOB data: Authentication data not present (0x00)
->         Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x09)
->         Max encryption key size: 7
->         Initiator key distribution: <none> (0x00)
->         Responder key distribution: <none> (0x00)
-> < ACL Data TX: Handle 99 flags 0x00 dlen 11                #35 [hci0] 25.007591
->       SMP: Pairing Response (0x02) len 6
->         IO capability: KeyboardDisplay (0x04)
->         OOB data: Authentication data not present (0x00)
->         Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x09)
->         Max encryption key size: 16
->         Initiator key distribution: <none> (0x00)
->         Responder key distribution: <none> (0x00)
-> @ MGMT Event: New Long Term Key (0x000a) plen 37      {0x0001} [hci0] 28.788872
->         Store hint: Yes (0x01)
->         LE Address: C0:DE:C0:FF:FF:01 (OUI C0-DE-C0)
->         Key type: Unauthenticated key from P-256 (0x02)
->         Master: 0x00
->         Encryption size: 7
->         Diversifier: 0000
->         Randomizer: 0000000000000000
->         Key: 529e11e8c7b9f5000000000000000000
->
-> <snip>
->
-> After pairing with key size 7, L2CAP connection is requested which
-> requires key size 16.
->
-> > ACL Data RX: Handle 99 flags 0x02 dlen 18                #56 [hci0] 34.998084
->       LE L2CAP: LE Connection Request (0x14) ident 3 len 10
->         PSM: 244 (0x00f4)
->         Source CID: 64
->         MTU: 256
->         MPS: 284
->         Credits: 1
-> < ACL Data TX: Handle 99 flags 0x00 dlen 18                #57 [hci0] 34.998325
->       LE L2CAP: LE Connection Response (0x15) ident 3 len 10
->         Destination CID: 0
->         MTU: 0
->         MPS: 0
->         Credits: 0
->         Result: Connection refused - insufficient encryption key size (0x0007)
->
-> Signed-off-by: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-> Reviewed-by: Szymon Janc <szymon.janc@codecoup.pl>
+> As you said the ccc value needs to be tested instead.
+> This part of the patch  already makes a change similar to what you suggested:
+>  > >  > > @@ -1374,7 +1371,7 @@ static void send_notification_to_device(void *data, void *user_data)
+>  > >  > >          * TODO: If the device is not connected but bonded, send the
+>  > >  > >          * notification/indication when it becomes connected.
+>  > >  > >          */
+>  > >  > > -       if (!notify->conf) {
+>  > >  > > +       if (!(ccc->value & 0x0002)) {
+> Is there anywhere else where notify->conf is checked?
 
-Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+I see, I probably overlooked this change when reviewing the first time.
 
-> Cc: Szymon Janc <szymon.janc@codecoup.pl>
-> ---
->  include/net/bluetooth/hci_core.h |  1 +
->  net/bluetooth/hci_core.c         |  1 +
->  net/bluetooth/hci_debugfs.c      | 30 ++++++++++++++++++++++++++++++
->  net/bluetooth/l2cap_core.c       | 25 +++++++++++++++++++++++++
->  4 files changed, 57 insertions(+)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index ebdd4afe30d2..0bf0543efec5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -379,6 +379,7 @@ struct hci_dev {
->         __u16           auth_payload_timeout;
->         __u8            min_enc_key_size;
->         __u8            max_enc_key_size;
-> +       __u8            le_l2cap_min_key_size;
->         __u8            pairing_opts;
->         __u8            ssp_debug_mode;
->         __u8            hw_error_code;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b0d9c36acc03..9ef4b39b380c 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3788,6 +3788,7 @@ struct hci_dev *hci_alloc_dev(void)
->         hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
->         hdev->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
->         hdev->min_enc_key_size = HCI_MIN_ENC_KEY_SIZE;
-> +       hdev->le_l2cap_min_key_size = HCI_MIN_ENC_KEY_SIZE;
->
->         /* default 1.28 sec page scan */
->         hdev->def_page_scan_type = PAGE_SCAN_TYPE_STANDARD;
-> diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-> index 1a0ab58bfad0..dec8b96b8427 100644
-> --- a/net/bluetooth/hci_debugfs.c
-> +++ b/net/bluetooth/hci_debugfs.c
-> @@ -1096,6 +1096,34 @@ static int max_key_size_get(void *data, u64 *val)
->  DEFINE_DEBUGFS_ATTRIBUTE(max_key_size_fops, max_key_size_get,
->                           max_key_size_set, "%llu\n");
->
-> +static int le_l2cap_min_key_size_set(void *data, u64 val)
-> +{
-> +       struct hci_dev *hdev = data;
-> +
-> +       if (val > SMP_MAX_ENC_KEY_SIZE || val < SMP_MIN_ENC_KEY_SIZE)
-> +               return -EINVAL;
-> +
-> +       hci_dev_lock(hdev);
-> +       hdev->le_l2cap_min_key_size = val;
-> +       hci_dev_unlock(hdev);
-> +
-> +       return 0;
-> +}
-> +
-> +static int le_l2cap_min_key_size_get(void *data, u64 *val)
-> +{
-> +       struct hci_dev *hdev = data;
-> +
-> +       hci_dev_lock(hdev);
-> +       *val = hdev->le_l2cap_min_key_size;
-> +       hci_dev_unlock(hdev);
-> +
-> +       return 0;
-> +}
-> +
-> +DEFINE_DEBUGFS_ATTRIBUTE(le_l2cap_min_key_size_fops, le_l2cap_min_key_size_get,
-> +                        le_l2cap_min_key_size_set, "%llu\n");
-> +
->  static int auth_payload_timeout_set(void *data, u64 val)
->  {
->         struct hci_dev *hdev = data;
-> @@ -1226,6 +1254,8 @@ void hci_debugfs_create_le(struct hci_dev *hdev)
->                             &min_key_size_fops);
->         debugfs_create_file("max_key_size", 0644, hdev->debugfs, hdev,
->                             &max_key_size_fops);
-> +       debugfs_create_file("le_l2cap_min_key_size", 0644, hdev->debugfs, hdev,
-> +                           &le_l2cap_min_key_size_fops);
->         debugfs_create_file("auth_payload_timeout", 0644, hdev->debugfs, hdev,
->                             &auth_payload_timeout_fops);
->         debugfs_create_file("force_no_mitm", 0644, hdev->debugfs, hdev,
-> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-> index 72c2f5226d67..d9a3a1c1f366 100644
-> --- a/net/bluetooth/l2cap_core.c
-> +++ b/net/bluetooth/l2cap_core.c
-> @@ -5742,6 +5742,20 @@ static inline int l2cap_bredr_sig_cmd(struct l2cap_conn *conn,
->         return err;
->  }
->
-> +static bool le_l2cap_key_size_sufficient(struct hci_conn *hcon, u8 sec_level)
-> +{
-> +       struct smp_ltk *ltk;
-> +
-> +       if (sec_level == BT_SECURITY_LOW)
-> +               return true;
-> +
-> +       ltk = hci_find_ltk(hcon->hdev, &hcon->dst, hcon->dst_type, hcon->role);
-> +       if (ltk && ltk->enc_size >= hcon->hdev->le_l2cap_min_key_size)
-> +               return true;
-> +
-> +       return false;
-> +}
-> +
->  static int l2cap_le_connect_req(struct l2cap_conn *conn,
->                                 struct l2cap_cmd_hdr *cmd, u16 cmd_len,
->                                 u8 *data)
-> @@ -5788,6 +5802,12 @@ static int l2cap_le_connect_req(struct l2cap_conn *conn,
->                 goto response_unlock;
->         }
->
-> +       if (!le_l2cap_key_size_sufficient(conn->hcon, pchan->sec_level)) {
-> +               result = L2CAP_CR_LE_BAD_KEY_SIZE;
-> +               chan = NULL;
-> +               goto response_unlock;
-> +       }
-> +
->         /* Check for valid dynamic CID range */
->         if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_LE_DYN_END) {
->                 result = L2CAP_CR_LE_INVALID_SCID;
-> @@ -5969,6 +5989,11 @@ static inline int l2cap_ecred_conn_req(struct l2cap_conn *conn,
->                 goto unlock;
->         }
->
-> +       if (!le_l2cap_key_size_sufficient(conn->hcon, pchan->sec_level)) {
-> +               result = L2CAP_CR_LE_BAD_KEY_SIZE;
-> +               goto unlock;
-> +       }
-> +
->         result = L2CAP_CR_LE_SUCCESS;
->         cmd_len -= sizeof(*req);
->         num_scid = cmd_len / sizeof(u16);
+> I looked around but did not find any on my own.
 > --
-> 2.25.1
+> Curtis Maves
 >
 
 
