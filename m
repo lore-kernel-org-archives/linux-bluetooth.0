@@ -7,79 +7,91 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 96185C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Feb 2021 10:13:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 141EAC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Feb 2021 17:27:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5250E64E31
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Feb 2021 10:13:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ACD6364E85
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Feb 2021 17:27:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230142AbhBWKMw (ORCPT
+        id S232810AbhBWR13 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Feb 2021 05:12:52 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58540 "EHLO
+        Tue, 23 Feb 2021 12:27:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39088 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232441AbhBWKLz (ORCPT
+        with ESMTP id S232578AbhBWR1Y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Feb 2021 05:11:55 -0500
-Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0F0FC06178B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Feb 2021 02:11:14 -0800 (PST)
-Received: by mail-vs1-xe2f.google.com with SMTP id j14so2615323vsi.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Feb 2021 02:11:14 -0800 (PST)
+        Tue, 23 Feb 2021 12:27:24 -0500
+Received: from mail-oi1-x22c.google.com (mail-oi1-x22c.google.com [IPv6:2607:f8b0:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B062FC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Feb 2021 09:26:44 -0800 (PST)
+Received: by mail-oi1-x22c.google.com with SMTP id l64so5615148oig.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Feb 2021 09:26:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=XeRGwrVDGUzWSSD6C/GZwIpZi77q3XrWcjogMf5WaAk=;
-        b=dsHeUjD1vENQMbIIAlKnIDEmav8NBtizSS27QwI4hRPgLevQdpcENE97xSQm43dAiU
-         gXnIdF0RwWBol55PP4WJsDQq6TVFe8R+qboTTwnQxNWD6AowL1DA7QV13dSH1kddh28W
-         aWJ7lN1q31/U7AJwuaGqCYHH5MsLs2pGUqouDN+7DVObv0ACxFJncJqib9qLa51rdYSe
-         1VENsxJC4458OHMGTKKI43LIjrYy+TY0+3JyDtEunqdBeJJU2s5Hb/SB1Ul3RfziictP
-         UEEKxzvxLle5wf2Jr/k/4+/XzA9udI/DU24FV2sVr1d6hFE8FvfxKtyD1gfm5eogKbfK
-         kXjg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JGkbhy1ZsvlhP4cM2EPL2Jq+zKZZSmQ6RXilh0LVqgw=;
+        b=rngk8atD1OgIFWTLkXXp3AoUy8MTIHr58xpuusFpkBcDjV5xiC9E02au6rYbdO3Eox
+         8/WZKbBPu3XtgJgG3RyBmJZlNyYCu8OEXDq4Ygwt2TNndcyt7TpbDFfJ/ebDtu0a6NaI
+         UzTQK0cZL0UF6PtchsWw+dJYMvWaWJ7qLqtlJElytXlgiRg2TT7mFQTnJ/vlbU80QUo1
+         KUGs+STpyvV8PiJNKPY3thYOpUMTY+FANJLz8i+O3uYZdu8CHqRM+o+wLx3OgI4vY+dL
+         Q2DQo33KZXX5MvYVQSkuaTgZwXVsoi0kZxodEkhA+54OqjrT5BY5ajKLBzlxjFJ8s3D8
+         995g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=XeRGwrVDGUzWSSD6C/GZwIpZi77q3XrWcjogMf5WaAk=;
-        b=eG/1P/tLPflRtHjESPTCEG3856Z64eTL/9+zfeDF8+ZwjRz+4O5/oGgnDYPpY2BQns
-         EY34siW3EBG1zRvaUCLhFqq8CgUSZjn6v+oCwO7gvJBL80LrWO0M16F9TAOrQNPa9TkX
-         tXaUk7AD3LLZq983QIF56DsHGRA/HYY4Nu6szun1B6ZZQ1GgDBMAlfU/SG3h4YhYWcMJ
-         uH5gTeE0dEfKAy9T0ZQn5oqb4qdAZJYc4+ne0xniuWhttDwShbrjA2Q980sbsWduoB1Y
-         3P6iDlXWQNQpKkqRmIT+KJDBHjFdjMZWdmgGGrtxFOh12DswJUsKd1ZV6Q9bAuhcM3/Y
-         uZ0w==
-X-Gm-Message-State: AOAM533RK9RkPJ1UzDVymP8oBLtk6SCGcgAXl84Yq0XbnREPCr7pD4Bc
-        4Zvw+416j5VICoSwHL4742RzPIGgiG+fTTYAESNB5QyXt+o=
-X-Google-Smtp-Source: ABdhPJwQNjQX/ewZx79ezcFAWwz0Z9KGkgrW6pmnVQZTHA+RPvkheqFjViNkVOjWkiG2xJ2L0qQereXw3trgecfw0Wk=
-X-Received: by 2002:a67:7788:: with SMTP id s130mr15589372vsc.48.1614075074067;
- Tue, 23 Feb 2021 02:11:14 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=JGkbhy1ZsvlhP4cM2EPL2Jq+zKZZSmQ6RXilh0LVqgw=;
+        b=hsYuSxEsv8LH6BHNh9j3zhNPiIxsxDDSExeoQ0wD4bCmY7YVNGPyBO4YRD6S7bL67C
+         wO4Tnc5ATaKS0KgtgfGTqwMK8QwfCWggF7HNNfPRgnlxfWGyuy2W8G0I6NU+44QxMftB
+         9MHeCQdxbXRDqfrnlcxb+l3WZdSsM+25AltYozZoRwkEWcqsn5gB3LrpyvCZt8g2HKzc
+         yASK8izX0inTA4qkyVg8+BuUtPKHTBbtrdQ6uJPeBeo5pVBxJ/A7St1zjMH4PcbQZLXv
+         FmW3sijD9VjddM0EmUxs5Mw2QWP4AfJWFa0h5sVdI3pZ0oksOvb9TS/RvujOhjDj/Z1I
+         pnPA==
+X-Gm-Message-State: AOAM532CtI2Aq9JMSvCjSQyHqk2m/cfk6Hq00//Q3wIzls1mNRLzcpqX
+        VttpI5w9XzdBB2TVIBO02gGk74GaeYf7S3gM7IUr2UTj
+X-Google-Smtp-Source: ABdhPJycaanqTNe03vHbSAj/BimFfZGA+AmCD1qyPdhyfMR96pLa8IgUW5h5egPHzlOXXUMOX4+C3I+gxYiJPzEH3Hk=
+X-Received: by 2002:a54:468f:: with SMTP id k15mr19227793oic.58.1614101204157;
+ Tue, 23 Feb 2021 09:26:44 -0800 (PST)
 MIME-Version: 1.0
 References: <CALaQ_hpL36xwJ3zujD6DsRKzQw_54TucEif=icMgN1CUpk9TNA@mail.gmail.com>
-In-Reply-To: <CALaQ_hpL36xwJ3zujD6DsRKzQw_54TucEif=icMgN1CUpk9TNA@mail.gmail.com>
-From:   Nathan Royce <nroycea+kernel@gmail.com>
-Date:   Tue, 23 Feb 2021 04:11:03 -0600
-Message-ID: <CALaQ_hpGDdmLTrccsTDnquw-+5BVy2-c2nem_ncLHzF7k=ac-w@mail.gmail.com>
+ <CALaQ_hpGDdmLTrccsTDnquw-+5BVy2-c2nem_ncLHzF7k=ac-w@mail.gmail.com>
+In-Reply-To: <CALaQ_hpGDdmLTrccsTDnquw-+5BVy2-c2nem_ncLHzF7k=ac-w@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 23 Feb 2021 09:26:33 -0800
+Message-ID: <CABBYNZL=97WonEB++tgPLM9uUaRHkHc5b9ed2a6FSxCb1mRJCw@mail.gmail.com>
 Subject: Re: avdtp.c:cancel_request Times Out, Plus Other Failures
-To:     linux-bluetooth@vger.kernel.org
+To:     Nathan Royce <nroycea+kernel@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Just to put it out there, I switched back to my previous 5.8.7-dirty
-kernel and haven't had any issues.
-It's on the same upgraded system, but just the kernel was rolled back.
+Hi Nathan,
 
-On Mon, Feb 22, 2021 at 1:27 PM Nathan Royce <nroycea+kernel@gmail.com> wrote:
+On Tue, Feb 23, 2021 at 2:17 AM Nathan Royce <nroycea+kernel@gmail.com> wrote:
 >
-> System updated 2021-02-19
-> Previous update 2020-12-18
+> Just to put it out there, I switched back to my previous 5.8.7-dirty
+> kernel and haven't had any issues.
+> It's on the same upgraded system, but just the kernel was rolled back.
 >
-> Kernel:
->     Current: Linux computerName 5.11.0-dirty #1 SMP PREEMPT Fri Feb 19
-> 06:30:22 CST 2021 x86_64 GNU/Linux
->     Previous: 5.8.7
->
-> Bluez:
->     Current: 5.55-3
->     Previous: 5.55-1
->...
+> On Mon, Feb 22, 2021 at 1:27 PM Nathan Royce <nroycea+kernel@gmail.com> wrote:
+> >
+> > System updated 2021-02-19
+> > Previous update 2020-12-18
+> >
+> > Kernel:
+> >     Current: Linux computerName 5.11.0-dirty #1 SMP PREEMPT Fri Feb 19
+> > 06:30:22 CST 2021 x86_64 GNU/Linux
+> >     Previous: 5.8.7
+> >
+> > Bluez:
+> >     Current: 5.55-3
+> >     Previous: 5.55-1
+> >...
+
+I would like to see the whole log, can you attach it?
+
+-- 
+Luiz Augusto von Dentz
