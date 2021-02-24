@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 024A5C433E6
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BF35C43381
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3C5764F08
+	by mail.kernel.org (Postfix) with ESMTP id 0517564F09
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229622AbhBXNx4 (ORCPT
+        id S235440AbhBXNyv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:53:56 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58404 "EHLO mail.kernel.org"
+        Wed, 24 Feb 2021 08:54:51 -0500
+Received: from mail.kernel.org ([198.145.29.99]:58406 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235668AbhBXNEd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:04:33 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DFEB764F64;
-        Wed, 24 Feb 2021 12:53:51 +0000 (UTC)
+        id S235989AbhBXNIW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:08:22 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7445664F22;
+        Wed, 24 Feb 2021 12:54:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171232;
-        bh=wwMo0pdUmecDKwcm6c57J39Oepyme73T+Tc5wPhpHE4=;
+        s=k20201202; t=1614171287;
+        bh=uDZmNtOCR0af5Vih+lIIoVyn5mRJ5LleGBe+kdhXbqs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=qiZ6R+ynTaCijdPYKGhUsjywclPxhtpvz2+7eXNICO1WtngjfT2BKdeIOCv4iE5m6
-         zclHNqJFit7JIIDZw1fVpFASea+tH1JarzTh3xav6ce9B+QPvOkXbOUMQO89fHEalq
-         OUkBhZ8IWZ8XhyhkjOredgz5TQi+cOwJOkKNpZ4+WVFq4xiDMfxbr41eWX4zR7CoHR
-         6tE4IvY2jxnM0EVo0TTbYlWReiA7nK/7+ggSgnfE3ZVcgtFBZSY7dWvPKZD5m/yQT8
-         EXvXH2hFGa3LTcK7yoj768bSu6IREZ2NQY9eVNhbggKhpTUAXR7/8/qQKhhGoP5R5W
-         7EFMAI9UFyNGg==
+        b=cRs/gGr/AFDQDFWS+tOjM0O/vmvc44O+36hWW7byBorUQri1j3MXqCTuivaDuAday
+         wTwa7VOKnbGYew3M6Ophh496Lcxh2RVYY9iSZh1UDermnPbIa1g1K1LgTReTvgz+m5
+         mtIi4u/3a42pH4lPoAkJLkDvuks6sdb1EQ6CJ1IqbCTE91cWZC7prZircqPiI4etHj
+         kIr9EmsOD3D3DezfzQJVs+5ZIP235FN7bXzfdmgXa/YOZOF1TitfVnh5TcCEro5Bd1
+         lklpgq1sYVFbklBrQkGcFfvsZ0CGoptqi3s9JENJDHtTP0Jv6ImdkZP/wHTZ3m4VYY
+         OkgDjrVLSa+EQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Gopal Tiwari <gtiwari@redhat.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 09/40] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Date:   Wed, 24 Feb 2021 07:53:09 -0500
-Message-Id: <20210224125340.483162-9-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 09/26] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+Date:   Wed, 24 Feb 2021 07:54:17 -0500
+Message-Id: <20210224125435.483539-9-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125340.483162-1-sashal@kernel.org>
-References: <20210224125340.483162-1-sashal@kernel.org>
+In-Reply-To: <20210224125435.483539-1-sashal@kernel.org>
+References: <20210224125435.483539-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,10 +87,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index 9c711f0dfae35..be2d469d6369d 100644
+index 78bec8df8525b..72ef967c56630 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
-@@ -297,6 +297,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+@@ -305,6 +305,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
  	struct hci_request req;
  	int err;
  
