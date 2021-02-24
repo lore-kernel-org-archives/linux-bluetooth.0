@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C14C4332B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5F9C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3589564ECB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF5FB64E2B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235564AbhBXNy7 (ORCPT
+        id S235684AbhBXNzH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:54:59 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59876 "EHLO mail.kernel.org"
+        Wed, 24 Feb 2021 08:55:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235317AbhBXNLR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:11:17 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 98A3564FA6;
-        Wed, 24 Feb 2021 12:55:24 +0000 (UTC)
+        id S236124AbhBXNOB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:14:01 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B6A4364FAE;
+        Wed, 24 Feb 2021 12:55:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171325;
-        bh=9f9+E1nDpPpKhWKIgBN6Py5wg1Vs4kD8KDFjDfwNc+Q=;
+        s=k20201202; t=1614171351;
+        bh=2VEWJFvAyHgCa3YCluySt2gJ7YbrW0/7fKfgFoWYJMs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QzVuRxZEVsnKjIHqj31rT0u4bg76zaGIOop697d+2ITitHjfK52VRbi6b/OmhW4Lp
-         btUTFeXviBjTuxDjpnCZD4WTjexc4U/TcagFdDzLXx3UoapV1TPKZCIX999n7URpDy
-         i4+TJrJP7aVFdAzi2s7nkKqG2m1COBKgipp01BxzukRtOt1tPL0nQNR3+07JJA5jbX
-         r9KXrqVg5i8ZEuvNxwMW6bDODWg0i5P5X40/oReV5slAqc8IMNaUn8V1iYpswdsAih
-         u3T8O/7g0e+UpjvxCHayAZYVvkGejfNA4bAqbUIYtHe9v0AULakAEbaWP0l063JcUG
-         TBIWp1pKj3vRQ==
+        b=izrQly0xxQ7VbZTznW3nyoRxkIvS25xY5q48NpPYolNve+4IwcnoSSWb12FdfB6m0
+         C+MZcjTfkDwtg/aDMd2B7FdwELjkcKvCLt6lkabcOPxZ82FDtG5lKgJm3PFvq+IILC
+         WF5tlZItXaZuHbN0pbJWwkchyO9+grLF5wEy3SkYKh5kUqDBQiZKUzIZ7Zx1Lwrvir
+         pBdHxRQ4ta1IybxNIL1+OgO4+ag1HtftsCZ8gIeI2D/H0zk2X36Si4n3RxFQsG+wYf
+         hNZoqJXpZcEqKylfYLBYMQqJ9Lb96693qhydBflSdVRKaRUvW+4sMZtpfESZdsuzQe
+         ktOS2V4AR4hlA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Gopal Tiwari <gtiwari@redhat.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 08/16] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Date:   Wed, 24 Feb 2021 07:55:05 -0500
-Message-Id: <20210224125514.483935-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 08/12] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+Date:   Wed, 24 Feb 2021 07:55:36 -0500
+Message-Id: <20210224125540.484221-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125514.483935-1-sashal@kernel.org>
-References: <20210224125514.483935-1-sashal@kernel.org>
+In-Reply-To: <20210224125540.484221-1-sashal@kernel.org>
+References: <20210224125540.484221-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -87,12 +87,12 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 3 insertions(+)
 
 diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index ebcab5bbadd7e..9f645a1d0202d 100644
+index e32f341890079..b01b43ab6f834 100644
 --- a/net/bluetooth/amp.c
 +++ b/net/bluetooth/amp.c
 @@ -305,6 +305,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
  	struct hci_request req;
- 	int err;
+ 	int err = 0;
  
 +	if (!mgr)
 +		return;
