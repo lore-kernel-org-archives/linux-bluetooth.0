@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3C5F9C433DB
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A47C433E6
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF5FB64E2B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19D6F601FB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235684AbhBXNzH (ORCPT
+        id S235733AbhBXNzn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:55:07 -0500
-Received: from mail.kernel.org ([198.145.29.99]:59858 "EHLO mail.kernel.org"
+        Wed, 24 Feb 2021 08:55:43 -0500
+Received: from mail.kernel.org ([198.145.29.99]:60442 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236124AbhBXNOB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:14:01 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id B6A4364FAE;
-        Wed, 24 Feb 2021 12:55:50 +0000 (UTC)
+        id S232560AbhBXNSk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:18:40 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5225764FBD;
+        Wed, 24 Feb 2021 12:56:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171351;
+        s=k20201202; t=1614171371;
         bh=2VEWJFvAyHgCa3YCluySt2gJ7YbrW0/7fKfgFoWYJMs=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=izrQly0xxQ7VbZTznW3nyoRxkIvS25xY5q48NpPYolNve+4IwcnoSSWb12FdfB6m0
-         C+MZcjTfkDwtg/aDMd2B7FdwELjkcKvCLt6lkabcOPxZ82FDtG5lKgJm3PFvq+IILC
-         WF5tlZItXaZuHbN0pbJWwkchyO9+grLF5wEy3SkYKh5kUqDBQiZKUzIZ7Zx1Lwrvir
-         pBdHxRQ4ta1IybxNIL1+OgO4+ag1HtftsCZ8gIeI2D/H0zk2X36Si4n3RxFQsG+wYf
-         hNZoqJXpZcEqKylfYLBYMQqJ9Lb96693qhydBflSdVRKaRUvW+4sMZtpfESZdsuzQe
-         ktOS2V4AR4hlA==
+        b=OCli3l0FsSmJvk14bhqzDxUidV/EnwiuKNIspqBVmG+yVAi8DFhUo2fX72GxQBl2T
+         NUhl9dNUxHD7wgGSJTl5XIHX52oLVQh0uNTxq2Ev4edZ6uHzcK/BvjJ8i8cOHPFwIS
+         24uPHVfbAyGwrAKCT3aEUGWNEHiCwvo/8LrhdN51sbsCbAE7YWtS3VNW9DePagjtkQ
+         drmnLmEVvrFMBmAhJFzlSapOo/00dHt1g8VD97lq09dqyPoM7k65QqczVkGUAR5aQm
+         raZSbHfPqf9JEnqWYC1zLFm/os/f9fAYKmBxgo/ZlCljDx1lM0yoFPeCOfcZAnogjm
+         Q/zq+cc/kQjmg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Gopal Tiwari <gtiwari@redhat.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 08/12] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Date:   Wed, 24 Feb 2021 07:55:36 -0500
-Message-Id: <20210224125540.484221-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.4 08/11] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+Date:   Wed, 24 Feb 2021 07:55:56 -0500
+Message-Id: <20210224125600.484437-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125540.484221-1-sashal@kernel.org>
-References: <20210224125540.484221-1-sashal@kernel.org>
+In-Reply-To: <20210224125600.484437-1-sashal@kernel.org>
+References: <20210224125600.484437-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
