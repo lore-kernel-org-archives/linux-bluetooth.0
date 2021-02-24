@@ -2,104 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71A47C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA315C433E9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 15:49:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19D6F601FB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:57:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8526E64ED4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 15:49:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235733AbhBXNzn (ORCPT
+        id S236101AbhBXPrV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:55:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:60442 "EHLO mail.kernel.org"
+        Wed, 24 Feb 2021 10:47:21 -0500
+Received: from mail.kernel.org ([198.145.29.99]:42520 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232560AbhBXNSk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:18:40 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5225764FBD;
-        Wed, 24 Feb 2021 12:56:10 +0000 (UTC)
+        id S232821AbhBXOpI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Feb 2021 09:45:08 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id F01A064F18
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Feb 2021 14:44:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171371;
-        bh=2VEWJFvAyHgCa3YCluySt2gJ7YbrW0/7fKfgFoWYJMs=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=OCli3l0FsSmJvk14bhqzDxUidV/EnwiuKNIspqBVmG+yVAi8DFhUo2fX72GxQBl2T
-         NUhl9dNUxHD7wgGSJTl5XIHX52oLVQh0uNTxq2Ev4edZ6uHzcK/BvjJ8i8cOHPFwIS
-         24uPHVfbAyGwrAKCT3aEUGWNEHiCwvo/8LrhdN51sbsCbAE7YWtS3VNW9DePagjtkQ
-         drmnLmEVvrFMBmAhJFzlSapOo/00dHt1g8VD97lq09dqyPoM7k65QqczVkGUAR5aQm
-         raZSbHfPqf9JEnqWYC1zLFm/os/f9fAYKmBxgo/ZlCljDx1lM0yoFPeCOfcZAnogjm
-         Q/zq+cc/kQjmg==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Gopal Tiwari <gtiwari@redhat.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 08/11] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
-Date:   Wed, 24 Feb 2021 07:55:56 -0500
-Message-Id: <20210224125600.484437-8-sashal@kernel.org>
-X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125600.484437-1-sashal@kernel.org>
-References: <20210224125600.484437-1-sashal@kernel.org>
+        s=k20201202; t=1614177868;
+        bh=7Do31jvCjJS8qkBDf4hxUqoYZZAYh2rXpSDEXaRcs78=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=VxPu9/XZ772Nx+kRRkwx88t3DQxsK5achNmSDHC8g4tfh3z6In+Xw08IN78h+aoIu
+         bTJSFDPKqEtrWy1c7KCRMxZr4sdiMQ30/NjI/09ySL00DeCmZrpWlsTsCqrQiEi2O8
+         oj1X6uBl1Beh5T70MiN2ZcCWaJUBDOUyGm93zVky55tYXoZquvQzwuTUF6e8ixZ10y
+         /M8Cc/dCMKeG34M1w835cZKvmtWk6IesIfBxnqBWcVykaCNcTvhjWAcckuDn2PluLZ
+         8aE43Xm/eb0vYNBTdD8s6fg69f8sl/cSqqr5/jbJJ2C6FnI2tbiumvZ9XhvOdt4vN5
+         RB9xWp4cSqzRw==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 210681] kernel: Bluetooth: hci0: don't support firmware rome
+ 0x31010000
+Date:   Wed, 24 Feb 2021 14:44:26 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: antdev66@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-210681-62941-WHQEoRKcTT@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-210681-62941@https.bugzilla.kernel.org/>
+References: <bug-210681-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Gopal Tiwari <gtiwari@redhat.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D210681
 
-[ Upstream commit e8bd76ede155fd54d8c41d045dda43cd3174d506 ]
+--- Comment #43 from Antonio (antdev66@gmail.com) ---
+kernel 5.11.1: problem still exists, need to patch.
 
-kernel panic trace looks like:
+--=20
+You may reply to this email to add a comment.
 
- #5 [ffffb9e08698fc80] do_page_fault at ffffffffb666e0d7
- #6 [ffffb9e08698fcb0] page_fault at ffffffffb70010fe
-    [exception RIP: amp_read_loc_assoc_final_data+63]
-    RIP: ffffffffc06ab54f  RSP: ffffb9e08698fd68  RFLAGS: 00010246
-    RAX: 0000000000000000  RBX: ffff8c8845a5a000  RCX: 0000000000000004
-    RDX: 0000000000000000  RSI: ffff8c8b9153d000  RDI: ffff8c8845a5a000
-    RBP: ffffb9e08698fe40   R8: 00000000000330e0   R9: ffffffffc0675c94
-    R10: ffffb9e08698fe58  R11: 0000000000000001  R12: ffff8c8b9cbf6200
-    R13: 0000000000000000  R14: 0000000000000000  R15: ffff8c8b2026da0b
-    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
- #7 [ffffb9e08698fda8] hci_event_packet at ffffffffc0676904 [bluetooth]
- #8 [ffffb9e08698fe50] hci_rx_work at ffffffffc06629ac [bluetooth]
- #9 [ffffb9e08698fe98] process_one_work at ffffffffb66f95e7
-
-hcon->amp_mgr seems NULL triggered kernel panic in following line inside
-function amp_read_loc_assoc_final_data
-
-        set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
-
-Fixed by checking NULL for mgr.
-
-Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/amp.c | 3 +++
- 1 file changed, 3 insertions(+)
-
-diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
-index e32f341890079..b01b43ab6f834 100644
---- a/net/bluetooth/amp.c
-+++ b/net/bluetooth/amp.c
-@@ -305,6 +305,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
- 	struct hci_request req;
- 	int err = 0;
- 
-+	if (!mgr)
-+		return;
-+
- 	cp.phy_handle = hcon->handle;
- 	cp.len_so_far = cpu_to_le16(0);
- 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
--- 
-2.27.0
-
+You are receiving this mail because:
+You are the assignee for the bug.=
