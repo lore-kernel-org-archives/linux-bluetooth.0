@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1EF49C433E9
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66C14C4332B
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBC57601FB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3589564ECB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 13:55:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235290AbhBXNyc (ORCPT
+        id S235564AbhBXNy7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 08:54:32 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58120 "EHLO mail.kernel.org"
+        Wed, 24 Feb 2021 08:54:59 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59876 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235948AbhBXNIO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 08:08:14 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 09C7764F98;
-        Wed, 24 Feb 2021 12:54:40 +0000 (UTC)
+        id S235317AbhBXNLR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Feb 2021 08:11:17 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 98A3564FA6;
+        Wed, 24 Feb 2021 12:55:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614171281;
-        bh=9Rq7KWCcCUPnvqijRARGEMCbqCB8cVuoigjXce4svJM=;
+        s=k20201202; t=1614171325;
+        bh=9f9+E1nDpPpKhWKIgBN6Py5wg1Vs4kD8KDFjDfwNc+Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=NbX0VzMXeVMbU9ValvF+TgLArGIny1setx0oWoMZ0hhjYC/XIO4NtD+eNaz8Ste9M
-         YdsWenfzbWc1ra96rA0umyZhu0kE25IcdOGUmbVxHC3PJuI1dKaI1LFYlj9UXjLFy+
-         p4Mt5hI9nQN91Y/wJqtYWXge7whaK3pJExYUiAEbzYCvkdTMRuLprYLmWLMwdaJBOc
-         kFt2IqRUTqJAZ+M5w9r7w8kmCayzH300VpkOa+mC705lhnEjlT5NAXz0X89jBvTwdj
-         cypv6/NVLdKBABi18xxNo0d/9J/e3bo34Qfv6V905up1G6JuuW/QaYRh0F2QWXZNW2
-         dbp+k7h6NRe7g==
+        b=QzVuRxZEVsnKjIHqj31rT0u4bg76zaGIOop697d+2ITitHjfK52VRbi6b/OmhW4Lp
+         btUTFeXviBjTuxDjpnCZD4WTjexc4U/TcagFdDzLXx3UoapV1TPKZCIX999n7URpDy
+         i4+TJrJP7aVFdAzi2s7nkKqG2m1COBKgipp01BxzukRtOt1tPL0nQNR3+07JJA5jbX
+         r9KXrqVg5i8ZEuvNxwMW6bDODWg0i5P5X40/oReV5slAqc8IMNaUn8V1iYpswdsAih
+         u3T8O/7g0e+UpjvxCHayAZYVvkGejfNA4bAqbUIYtHe9v0AULakAEbaWP0l063JcUG
+         TBIWp1pKj3vRQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Claire Chang <tientzu@chromium.org>,
+Cc:     Gopal Tiwari <gtiwari@redhat.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 05/26] Bluetooth: hci_h5: Set HCI_QUIRK_SIMULTANEOUS_DISCOVERY for btrtl
-Date:   Wed, 24 Feb 2021 07:54:13 -0500
-Message-Id: <20210224125435.483539-5-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 4.14 08/16] Bluetooth: Fix null pointer dereference in amp_read_loc_assoc_final_data
+Date:   Wed, 24 Feb 2021 07:55:05 -0500
+Message-Id: <20210224125514.483935-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.27.0
-In-Reply-To: <20210224125435.483539-1-sashal@kernel.org>
-References: <20210224125435.483539-1-sashal@kernel.org>
+In-Reply-To: <20210224125514.483935-1-sashal@kernel.org>
+References: <20210224125514.483935-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,36 +52,54 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Claire Chang <tientzu@chromium.org>
+From: Gopal Tiwari <gtiwari@redhat.com>
 
-[ Upstream commit 7f9f2c3f7d99b8ae773459c74ac5e99a0dd46db9 ]
+[ Upstream commit e8bd76ede155fd54d8c41d045dda43cd3174d506 ]
 
-Realtek Bluetooth controllers can do both LE scan and BR/EDR inquiry
-at once, need to set HCI_QUIRK_SIMULTANEOUS_DISCOVERY quirk.
+kernel panic trace looks like:
 
-Signed-off-by: Claire Chang <tientzu@chromium.org>
+ #5 [ffffb9e08698fc80] do_page_fault at ffffffffb666e0d7
+ #6 [ffffb9e08698fcb0] page_fault at ffffffffb70010fe
+    [exception RIP: amp_read_loc_assoc_final_data+63]
+    RIP: ffffffffc06ab54f  RSP: ffffb9e08698fd68  RFLAGS: 00010246
+    RAX: 0000000000000000  RBX: ffff8c8845a5a000  RCX: 0000000000000004
+    RDX: 0000000000000000  RSI: ffff8c8b9153d000  RDI: ffff8c8845a5a000
+    RBP: ffffb9e08698fe40   R8: 00000000000330e0   R9: ffffffffc0675c94
+    R10: ffffb9e08698fe58  R11: 0000000000000001  R12: ffff8c8b9cbf6200
+    R13: 0000000000000000  R14: 0000000000000000  R15: ffff8c8b2026da0b
+    ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
+ #7 [ffffb9e08698fda8] hci_event_packet at ffffffffc0676904 [bluetooth]
+ #8 [ffffb9e08698fe50] hci_rx_work at ffffffffc06629ac [bluetooth]
+ #9 [ffffb9e08698fe98] process_one_work at ffffffffb66f95e7
+
+hcon->amp_mgr seems NULL triggered kernel panic in following line inside
+function amp_read_loc_assoc_final_data
+
+        set_bit(READ_LOC_AMP_ASSOC_FINAL, &mgr->state);
+
+Fixed by checking NULL for mgr.
+
+Signed-off-by: Gopal Tiwari <gtiwari@redhat.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/hci_h5.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ net/bluetooth/amp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 7ffeb37e8f202..79b96251de806 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -885,6 +885,11 @@ static int h5_btrtl_setup(struct h5 *h5)
- 	/* Give the device some time before the hci-core sends it a reset */
- 	usleep_range(10000, 20000);
+diff --git a/net/bluetooth/amp.c b/net/bluetooth/amp.c
+index ebcab5bbadd7e..9f645a1d0202d 100644
+--- a/net/bluetooth/amp.c
++++ b/net/bluetooth/amp.c
+@@ -305,6 +305,9 @@ void amp_read_loc_assoc_final_data(struct hci_dev *hdev,
+ 	struct hci_request req;
+ 	int err;
  
-+	/* Enable controller to do both LE scan and BR/EDR inquiry
-+	 * simultaneously.
-+	 */
-+	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
++	if (!mgr)
++		return;
 +
- out_free:
- 	btrtl_free(btrtl_dev);
- 
+ 	cp.phy_handle = hcon->handle;
+ 	cp.len_so_far = cpu_to_le16(0);
+ 	cp.max_len = cpu_to_le16(hdev->amp_assoc_size);
 -- 
 2.27.0
 
