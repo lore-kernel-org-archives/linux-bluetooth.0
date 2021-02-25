@@ -2,140 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12410C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 19:00:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD5D2C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Feb 2021 04:38:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B02B464F11
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Feb 2021 19:00:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8911964ED6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Feb 2021 04:38:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235835AbhBXTAU (ORCPT
+        id S233158AbhBYEiI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Feb 2021 14:00:20 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56894 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235368AbhBXS6e (ORCPT
+        Wed, 24 Feb 2021 23:38:08 -0500
+Received: from youngberry.canonical.com ([91.189.89.112]:50520 "EHLO
+        youngberry.canonical.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232197AbhBYEiG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Feb 2021 13:58:34 -0500
-Received: from mail-lf1-x12d.google.com (mail-lf1-x12d.google.com [IPv6:2a00:1450:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48FEFC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Feb 2021 10:57:52 -0800 (PST)
-Received: by mail-lf1-x12d.google.com with SMTP id p21so4620292lfu.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Feb 2021 10:57:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=/GX33ld/zCPziFqqadOxurpTzLAR15WqFyHWvUgoEXw=;
-        b=jxLvtYwg8xZZYAZ+eMjULhv9aL3kXiKxWkTvHgJ/K1zy3YEYJZqsQqJlarZtnAkWkb
-         PdVXMn+k62lttvfL2ncmj23wmUrGO22mJCDVaxM3Dmc5vzlJQ+R6HST7+apLTkWlnAEZ
-         JP7/iDpsvBMaqFNqn1A3uHgIzNN1g28wd6DXNPb32Cd5hPur2unk96pOI7OHWIL/GiB2
-         u2+wd+CZc98hbat16b7lVvBmB1C+NQEoaiJjevtFcwXootcPUNTtWqexI2pWh38+Z8K0
-         3C19cKAumxpSelpaGZHOTc4J7Lt0GK8sHxBg7DZHw3W2W8C6J32ANmOul4zbgELyHR5j
-         7V5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=/GX33ld/zCPziFqqadOxurpTzLAR15WqFyHWvUgoEXw=;
-        b=bj1r01jkYJusL8CryOHj0BRWZMKSNGWOkd++MXUPwtw7bwGp79vy8fxD+C8svIHB9T
-         kAfHOvCuklcKm2IJhqA9chz6jZ4jdSo6JZNUyDVjooneYOxgCeFVn2qe4oWlu6siwjLo
-         FpZvcfcxN8qsndmUNqnadvUDGl7MIYOgkeHdDKenjQBGhu4nhS2mUQNd2Q+PXKhJvcfJ
-         73OIt5N9xywlnnsmlIv86NTOFZJ6DqxDxk87tAzmmtODsHbcxR6vhyhgMUrDOoCCYBNg
-         jkA71z5l681G0v2dsYO10aj6dJ7F5tr+qnav9VJ2awf+aOJuX7GUwLzcotVJze3/CxLh
-         jGUQ==
-X-Gm-Message-State: AOAM5332wRRPCSnic5TM6xDdLYYBxrXTfb/+/JeUv/I0XcjEIIUMNKe/
-        tg8lEwJy5yC3SI/Gifm69JPaKUItgj8R/3iBrNxTb7MHvfM=
-X-Google-Smtp-Source: ABdhPJyeQxjHomLwKulgmX4i7t4Jz74OSijDWC8y0LAcowKq1LWXPiMbmucF9TKsEv/K9ta9xq1uDp/bAehAAN9qgzo=
-X-Received: by 2002:ac2:5603:: with SMTP id v3mr4652637lfd.67.1614193070107;
- Wed, 24 Feb 2021 10:57:50 -0800 (PST)
+        Wed, 24 Feb 2021 23:38:06 -0500
+Received: from [123.112.65.122] (helo=[192.168.0.106])
+        by youngberry.canonical.com with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        (Exim 4.86_2)
+        (envelope-from <hui.wang@canonical.com>)
+        id 1lF8Ov-0006AJ-Df; Thu, 25 Feb 2021 04:37:21 +0000
+Subject: Re: [PATCH 5.12 regression fix] Bluetooth: btusb: Revert Fix the
+ autosuspend enable and disable
+To:     Hans de Goede <hdegoede@redhat.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <20210218123728.17067-1-hdegoede@redhat.com>
+ <20210218123728.17067-2-hdegoede@redhat.com>
+ <90d8996d-a376-2e9c-37ce-ce50b8660fd1@canonical.com>
+ <4510935f-a30b-445d-a048-683619f2855b@redhat.com>
+ <6CE927B6-449A-472C-9196-AF98895AA5E1@holtmann.org>
+ <2bf12891-eeae-e55f-ab46-7434dffbad76@redhat.com>
+ <CABBYNZ+euV5rwx=LeLKOGSL0AwnPfE7paEHhNhMiUpXGYixgBw@mail.gmail.com>
+ <2fc373c2-0255-63b6-3e4a-9aa83f6986e1@redhat.com>
+From:   Hui Wang <hui.wang@canonical.com>
+Message-ID: <d14b2eac-c09d-8ca1-fcb6-a7cc13e84b6a@canonical.com>
+Date:   Thu, 25 Feb 2021 12:37:14 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-References: <20210217142511.3221605-1-alainm@chromium.org> <602d321b.1c69fb81.3fe48.4e13@mx.google.com>
- <CALWDO_XuBfnvY4jSbCFVmec63S3-V_iW3nG+TkcDKtU-t=h5rA@mail.gmail.com>
-In-Reply-To: <CALWDO_XuBfnvY4jSbCFVmec63S3-V_iW3nG+TkcDKtU-t=h5rA@mail.gmail.com>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Wed, 24 Feb 2021 13:57:33 -0500
-Message-ID: <CALWDO_UNbWSchjYanspW5Abgh8f+yJNDyBBVDGr71oUppU_ozw@mail.gmail.com>
-Subject: Re: [v1] Bluetooth: Tolerate valid pre 4.2 conn params
-To:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Alain Michaud <alainm@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <2fc373c2-0255-63b6-3e4a-9aa83f6986e1@redhat.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Friendly ping.
 
+On 2/19/21 5:24 PM, Hans de Goede wrote:
+> Hi,
+>
+> On 2/19/21 12:41 AM, Luiz Augusto von Dentz wrote:
+>> Hi Hans,
+>>
+>> On Thu, Feb 18, 2021 at 2:08 PM Hans de Goede <hdegoede@redhat.com> wrote:
+>>> Hi Marcel,
+>>>
+>>> On 2/18/21 9:01 PM, Marcel Holtmann wrote:
+>>>> Hi Hans,
+>>>>
+>>>>
+Hi Marcel and Hans,
 
-On Thu, Feb 18, 2021 at 3:06 PM Alain Michaud <alainmichaud@google.com> wrote:
+Looks like this reverting patch is not applied yet, If it is already 
+applied, please ignore the below content.
+
+My patch really introduces a regression, that makes the autosuspend 
+can't be enabled by btusb.c anymore.
+
+When the usb core layer calls the usb_driver->probe(), the autosuspend 
+is disabled by pm_runtime_forbid(), if users set 
+btusb.enable_autosuspend=1 or enable the CONFIG_BT_HCIBTUSB_AUTOSUSPEND, 
+the probe() should enable the autosuspend by calling 
+usb_enable_autosuspend() which will call pm_runtime_allow().
+
+For keeping balance, when executing disconnect(), if probe() enabled the 
+autosuspend, disconect() should disable it by calling 
+usb_disable_autosuspend() which will call pm_runtime_forbid(). This 
+could guarantee the kernel parameter enable_autosuspend works as 
+expected when users repeatedly run "rmmod btusb;modporbe btusb 
+enable_autosuspend=1/0".
+
+The users could also enable or disable autosuspend by echoing "auto" or 
+"on" to /sys/.../power/control, btusb doesn't know users change the 
+autosuspend from userspace, so btusb only keeps the autosuspend balanced 
+in itself, and userspace should keep balance from userspace, btusb has 
+no capability to detect and control the userspace operation.
+
+According to this idea, the fixing patch is like below:
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 52683fd22e05..a0811e00a5a7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4849,8 +4849,8 @@ static int btusb_probe(struct usb_interface *intf,
+                         data->diag = NULL;
+         }
+
+-       if (!enable_autosuspend)
+-               usb_disable_autosuspend(data->udev);
++       if (enable_autosuspend)
++               usb_enable_autosuspend(data->udev);
+
+         err = hci_register_dev(hdev);
+         if (err < 0)
+@@ -4888,6 +4888,10 @@ static void btusb_disconnect(struct usb_interface 
+*intf)
+
+         hci_unregister_dev(hdev);
+
++       /* if the autosuspend is enabled in _probe, we disable it here 
+for keeping balance */
++       if (enable_autosuspend)
++               usb_disable_autosuspend(data->udev);
++
+         if (intf == data->intf) {
+                 if (data->isoc)
+usb_driver_release_interface(&btusb_driver, data->isoc);
+@@ -4910,9 +4914,6 @@ static void btusb_disconnect(struct usb_interface 
+*intf)
+                 gpiod_put(data->reset_gpio);
+
+         hci_free_dev(hdev);
+-
+-       if (!enable_autosuspend)
+-               usb_enable_autosuspend(data->udev);
+  }
+
+Regards,
+
+Hui.
+
+> }
 >
-> +Marcel for viz
+> static int btusb_close(struct hci_dev *hdev)
+> {
+> 	...
+> 	data->intf->needs_remote_wakeup = 0;
+> 	...
+> }
 >
+> Regards,
 >
-> On Wed, Feb 17, 2021 at 10:11 AM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=434523
-> >
-> > ---Test result---
-> >
-> > ##############################
-> >     Test: CheckPatch - PASS
-> >
-> >
-> >     ##############################
-> >     Test: CheckGitLint - PASS
-> >
-> >
-> >     ##############################
-> >     Test: CheckBuildK - PASS
-> >
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: Setup - PASS
-> >
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: l2cap-tester - PASS
-> >     Total: 40, Passed: 34 (85.0%), Failed: 0, Not Run: 6
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: bnep-tester - PASS
-> >     Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: mgmt-tester - PASS
-> >     Total: 416, Passed: 402 (96.6%), Failed: 0, Not Run: 14
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: rfcomm-tester - PASS
-> >     Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: sco-tester - PASS
-> >     Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: smp-tester - PASS
-> >     Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-> >
-> >     ##############################
-> >     Test: CheckTestRunner: userchan-tester - PASS
-> >     Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
-> >
-> >
-> >
-> > ---
-> > Regards,
-> > Linux Bluetooth
-> >
+> Hans
+>
