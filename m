@@ -7,136 +7,120 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FDBC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:22:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F2F5C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:33:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55A6C64F1F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:22:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1EAB64DA3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230083AbhBZVWz (ORCPT
+        id S230438AbhBZVcu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Feb 2021 16:22:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55500 "EHLO
+        Fri, 26 Feb 2021 16:32:50 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57618 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230024AbhBZVWz (ORCPT
+        with ESMTP id S229823AbhBZVcn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Feb 2021 16:22:55 -0500
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA08AC061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:22:14 -0800 (PST)
-Received: by mail-oi1-x232.google.com with SMTP id x20so11160992oie.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:22:14 -0800 (PST)
+        Fri, 26 Feb 2021 16:32:43 -0500
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1CC7C06174A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:32:02 -0800 (PST)
+Received: by mail-qt1-x831.google.com with SMTP id w6so7701645qti.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:32:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=zhHIycLRtDNycFxBGkxbacwMa3/oZxn6aW9OFnO7O6I=;
-        b=RgS191np9XsTEb/Ar6DfrbOTZHC7SHdnySyi3RBmuCwAGFAlrDDgmggshv4iJzt5SZ
-         +HuEekrS6SBGnKqzlF7De6I/U2uTigWUqDPlpNiSIG3eDdvN8PNZGIQHNUqAoE9oZryY
-         UR7eW7N3tyuh37EMr0grxbfop352ebkaBW0cFdJJgUssUzm8tgH8MNUPEcSPGhS8aoDW
-         UK4/DGDwKEJuSUE2bLKdtD941l/Yccn3+8Rrn6HPwQxuvmg7oMl/L80KJH+Zr7Oe4fph
-         pGGnmwwWZM4cpx1FbPmUK8xxSdO1Tk29vg65mgpdgPQ+5xas8oj9yNlmWzD/OpJIOz7d
-         q5Ng==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=RVVJMXI17ZEHB2p4G0ymEQXucPjvMjDngJN0eo6ZUfQ=;
+        b=a1LfUR9KHgEL8Cn3j9MWOoKaF4IhBeo6fLyHl12rFw2d9+kKPzl4uDvQqaeHdFxHnk
+         +TAJYlBp/CwNy5g8am79L2VocWwBTVUjVahZsLp/oqRov4sRmdEgU8rTnBziOHrNoJPn
+         8dDKtdCesD8cqOM88FgseN61Ws/cne1bBMxnr3JUS9bI8CXvI/ouoGRkFfG982lIyN9e
+         0hdO+f6NQwuWfFWSj0k2QdB7rAmlxmzUL3Pws6P1ql7nFQCenvP0wK8FpBncS3tqhY8p
+         iLv7oQ2mEE6z3jZYE5d7IQt2xynTNNSwRX6vqas3L8YRtElouRcBGapp72ILHfEAxa82
+         ToAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=zhHIycLRtDNycFxBGkxbacwMa3/oZxn6aW9OFnO7O6I=;
-        b=odpvxSMLGU66/awgYAIiMdgvwIG3A7HvgoZTr12YSVkRBWU0JnsSKY/rIkZQUclVev
-         waQGbVkhvpDTzFZ9fO984wPZXx4oOJQ9vHz3o+oIOD4uFVTzBvhuXn0Kqsg3fUQDs0/t
-         HRLzVVtC4DycMipmvPl6PRy5o1AVA0onQGLUUXS4EL8uprVB/kbPvi8dohVKAR4ZUs1+
-         /auOscvzICY5FuH6+0YYr3diW+gZNPKv6azL2YO15VuSKJT4hg+TlIABTNZfeWIY9mFK
-         3ZhPOHQAhTJRyPunfOhsopP/qnXdfO75bU7IjwNuRtSr6xT8fpded5gXUGKcj5ZLFl87
-         Rpkg==
-X-Gm-Message-State: AOAM5328rtz9QFn+kcYEMCH3p+BQ01TR5HCeylAGh+YBppohRc3vzhR8
-        cthxbC62fU7g/58nuuRf1kyY7BYIIxA7Bw9KCk0=
-X-Google-Smtp-Source: ABdhPJxsKooA5giIoQbMGzusf2dXLApu2z+wTHqePI39mo6JaEwNQBcxsZkZ3h3Pu2XfDQJsAQnZfV/Ml2jKMjKhoOw=
-X-Received: by 2002:aca:c109:: with SMTP id r9mr3467952oif.64.1614374534299;
- Fri, 26 Feb 2021 13:22:14 -0800 (PST)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=RVVJMXI17ZEHB2p4G0ymEQXucPjvMjDngJN0eo6ZUfQ=;
+        b=gnsqpylVOpdrLN/484YRYN+dA0cJIS0hU5HN7goHE+GGZq/CfYWF+/M0WDq3n5gemZ
+         5Lfg7++DGtuZ0MPCfklp1dLHPEsIaxNk+Jh6Lfs9920B7QRczhdjlmIWArFxKidB3l6U
+         AFvO0FwjYMtq2M2XlFr9hGs/W7Jayz75E20dLN0ZQK4lFfkHnGDYz4ReZIQH1JVpidMP
+         ysgD3bo8PkgHcnzGSC5MEOeU2fE+RCkspG2uesqIsu2gWhqoGXrdc2ZSus0UPFgpkr00
+         xjmXMSyj78cYmQrdXzZe1K5762AYFt6yeU+XqjtHJoncXeD2wtj63VlWMv+dGWihCenh
+         ZXUw==
+X-Gm-Message-State: AOAM530AlSmZjothKNfJ33LuOETI5CTi6LI1afpk8dDHzG8HvmsiBMDt
+        s/HcSpE00L9lUywpT6xrPS/xbk1QYx9sIw==
+X-Google-Smtp-Source: ABdhPJx/M/kvFcwOcXvA+UuN9W5g6SsYYh3X9czK0NP0Iylr3LZxtpWrrroCKr0lKRRm00AXa/Yn4A==
+X-Received: by 2002:ac8:7514:: with SMTP id u20mr4491781qtq.66.1614375121910;
+        Fri, 26 Feb 2021 13:32:01 -0800 (PST)
+Received: from [172.17.0.2] ([20.57.120.149])
+        by smtp.gmail.com with ESMTPSA id m30sm5490290qtd.30.2021.02.26.13.32.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 26 Feb 2021 13:32:01 -0800 (PST)
+Message-ID: <603968d1.1c69fb81.f4cb8.33b8@mx.google.com>
+Date:   Fri, 26 Feb 2021 13:32:01 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3084821196163398287=="
 MIME-Version: 1.0
-References: <YDkP07ts5xokM1um@t2b3>
-In-Reply-To: <YDkP07ts5xokM1um@t2b3>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 26 Feb 2021 13:22:03 -0800
-Message-ID: <CABBYNZLYwS0vgxZHs+=bXZP+KOe05kKwYOQ2jcT1x3MtmQ58wg@mail.gmail.com>
-Subject: Re: Bluez 5.56 segfaulting while A2DP
-To:     "Tobias S. Predel" <tobias.predel@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, sonnysasaka@chromium.org
+Subject: RE: [BlueZ,v3] monitor: Add option to set fallback width
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210226205232.6844-1-sonnysasaka@chromium.org>
+References: <20210226205232.6844-1-sonnysasaka@chromium.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tobias,
+--===============3084821196163398287==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 26, 2021 at 7:17 AM Tobias S. Predel
-<tobias.predel@gmail.com> wrote:
->
-> Dear all,
->
-> I experienced a SEGFAULT from bluez 5.56-1
-> on Arch Linux - linux 5.11.1.arch1-1:
->
-> It happened during having A2DP connection with pipewire-git 0.3.22.76.g08=
-445d2c-1.
->
-> This is the backtrace:
->
-> # coredumpctl debug
-> (gdb) thread apply all bt
->
-> Thread 1 (Thread 0x7fb8325f67c0 (LWP 663)):
-> #0  0x00007fb832c74f19 in __strcasecmp_l_avx () from /usr/lib/libc.so.6
-> #1  0x000055d78e38c3b1 in play_status_to_val (status=3D0x0) at profiles/a=
-udio/avrcp.c:729
-> #2  0x000055d78e38ce3e in avrcp_player_event (player=3Dplayer@entry=3D0x5=
-5d78f058a20, id=3D<optimized out>, data=3Ddata@entry=3D0x0) at profiles/aud=
-io/avrcp.c:807
-> #3  0x000055d78e38ced6 in avrcp_player_event (data=3D0x0, id=3D<optimized=
- out>, player=3D0x55d78f058a20) at profiles/audio/avrcp.c:783
-> #4  notify_addressed_player_changed (user_data=3Duser_data@entry=3D0x55d7=
-8f058a20) at profiles/audio/avrcp.c:1804
-> #5  0x000055d78e3906ad in avrcp_unregister_player (player=3D0x55d78f058a2=
-0) at profiles/audio/avrcp.c:4452
+This is automated email and please do not reply to this email!
 
-This looks like it is related to AVRCP not A2DP, does pipewire
-register a player?
+Dear submitter,
 
-> #6  0x000055d78e3830c8 in media_player_remove (data=3D0x55d78f050ff0) at =
-profiles/audio/media.c:1052
-> #7  unregister_player (conn=3D<optimized out>, msg=3D0x55d78f0079d0, data=
-=3D<optimized out>) at profiles/audio/media.c:1902
-> #8  0x000055d78e404fe9 in process_message (connection=3D0x55d78f005e00, m=
-essage=3D0x55d78f0079d0, method=3D0x55d78e47b778 <media_methods+120>, iface=
-_user_data=3D<optimized out>) at gdbus/object.c:246
-> #9  0x00007fb832df17d6 in ?? () from /usr/lib/libdbus-1.so.3
-> #10 0x00007fb832de13bd in dbus_connection_dispatch () from /usr/lib/libdb=
-us-1.so.3
-> #11 0x000055d78e401681 in message_dispatch (data=3D0x55d78f005e00) at gdb=
-us/mainloop.c:59
-> #12 0x00007fb832e72b84 in g_main_context_dispatch () from /usr/lib/libgli=
-b-2.0.so.0
-> #13 0x00007fb832ec6c21 in ?? () from /usr/lib/libglib-2.0.so.0
-> #14 0x00007fb832e720d3 in g_main_loop_run () from /usr/lib/libglib-2.0.so=
-.0
-> #15 0x000055d78e41acc6 in mainloop_run () at src/shared/mainloop-glib.c:6=
-6
-> #16 0x000055d78e41b148 in mainloop_run_with_signal (func=3Dfunc@entry=3D0=
-x55d78e3acf70 <signal_callback>, user_data=3Duser_data@entry=3D0x0) at src/=
-shared/mainloop-notify.c:188
-> #17 0x000055d78e36fac0 in main (argc=3D<optimized out>, argv=3D<optimized=
- out>) at src/main.c:1084
->
-> Regards,
-> Tobias Predel
-> --
-> La perfection est atteinte, non pas lorsqu'il n'y a plus rien =C3=A0 ajou=
-ter,
-> mais lorsqu'il n'y a plus rien =C3=A0 retirer. =E2=80=94 Antoine de Saint=
--Exup=C3=A9ry
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=439199
+
+---Test result---
+
+##############################
+Test: CheckPatch - FAIL
+Output:
+monitor: Add option to set fallback width
+WARNING:FUNCTION_ARGUMENTS: function definition argument 'int' should also have an identifier name
+#95: FILE: monitor/display.h:78:
++void open_pager(int);
+
+- total: 0 errors, 1 warnings, 107 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] monitor: Add option to set fallback width" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: CheckGitLint - PASS
+
+##############################
+Test: CheckBuild - PASS
+
+##############################
+Test: MakeCheck - PASS
 
 
 
---=20
-Luiz Augusto von Dentz
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3084821196163398287==--
