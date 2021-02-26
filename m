@@ -2,188 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C77DFC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:43:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8189C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 22:46:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E80664E60
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 21:43:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80E0364EDC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 26 Feb 2021 22:46:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229745AbhBZVnY (ORCPT
+        id S230079AbhBZWpu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 26 Feb 2021 16:43:24 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59896 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbhBZVnX (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 26 Feb 2021 16:43:23 -0500
-Received: from mail-ot1-x32e.google.com (mail-ot1-x32e.google.com [IPv6:2607:f8b0:4864:20::32e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 054F8C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:42:43 -0800 (PST)
-Received: by mail-ot1-x32e.google.com with SMTP id v12so9336475ott.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 13:42:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=WuRYzHFNhvWXrwK1WlZn+x6PP6eCL2/a7LmhBfBlxHA=;
-        b=herVQz1ecWJPibpItmUE6DXEElK7Qy4kTYEiV/i1STDWjqLokm92y4b1tNOhgm+Wvt
-         eHJKf9JKksdMA9t96FYq9nXC4OX4T4dlKMfRFy6nBe8F2PVqt9ewZkA6kxxBo3sMr4Mw
-         CgXbuHE5al+EU2nG6+XWUYEkUiCD0ztoUFoZYGxnBPAdVX9p3ibRDfokXRvK4yurULmH
-         juOJEqAKomqRRVVqsuDhuc69Np/H4WixsYb6G86fFZQBbgLtuYDjg8oXVhxzuXwUFVAn
-         HzP/eDhDgzHSBxdj6ODZQcrSkB7ZFgutapGJSwqJXHlYoRxJP57vP5mwnrAPr0SO3/A4
-         ebTA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=WuRYzHFNhvWXrwK1WlZn+x6PP6eCL2/a7LmhBfBlxHA=;
-        b=dvvMHGUOQVLvVCIOhk1+bNlzez50w+KSQ8N9T5Tq1qHsBA3J/CWC4ocydQNwlrwYDo
-         kWKGNBc1lrcIon8Geh0sTQYU0TGs7b4+4h2Uy5NlE+5HtPPsgA+X+z0NSkPtuexhtqX3
-         rhKrtb3Ec/bBFJOvjvhcizUxJf95vHx9R3wnrJwjJRJJXeI3WwIFcgO8K5MFam2cOg1R
-         7GSd3e0WLpW8l8OttIraWEXPRMnCQz4jbtYh7QSIziXUxe5v2Wfr1dhI6dox3GLcwiAU
-         y6x/U5eAQQ7UJwiF6/dih08N690rMhSwuktl5I4e/oMJvABmNat/MqjAqqoQrKxhxByv
-         2slA==
-X-Gm-Message-State: AOAM530vPeWZJyk7fE7ezEadV9EAfhJ5hOz5riimm0kQbR2nv8fbJIcZ
-        oQmUPFUCJg55yDRQYjnJdIaBAWwSLjEB9uwQAQbg8696/uOCbg==
-X-Google-Smtp-Source: ABdhPJxpojwos5RPHdmCJOH8habdMvr0ituotZN8SI9fEAkVUuzpspZza5BY8RPB0u2rvk8Uf3z7dx3uQOXqBgLiMt4=
-X-Received: by 2002:a9d:7b44:: with SMTP id f4mr4089532oto.240.1614375762315;
- Fri, 26 Feb 2021 13:42:42 -0800 (PST)
-MIME-Version: 1.0
-References: <20210222103021.20923-1-magdalena.kasenberg@codecoup.pl> <124AEB1E-158A-4CFB-BD5D-2DCA4C86ECD2@holtmann.org>
-In-Reply-To: <124AEB1E-158A-4CFB-BD5D-2DCA4C86ECD2@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 26 Feb 2021 13:42:31 -0800
-Message-ID: <CABBYNZ+3njOxCGKE0cvxkw574=U5Uv7+HHn885MrVFaoO3NpNQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix for L2CAP/LE/CFC/BV-15-C
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Szymon Janc <szymon.janc@codecoup.pl>
+        Fri, 26 Feb 2021 17:45:50 -0500
+Received: from mail.kernel.org ([198.145.29.99]:59746 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229863AbhBZWpu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 26 Feb 2021 17:45:50 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id 2B12464F17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 26 Feb 2021 22:45:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1614379509;
+        bh=+Gh9acfV2iG/8kZ/jfS6pYSLTV0El7VHpfG5wZEqY/E=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=mWBAdgxqEj3XSfvCGexRi48K3E+a70zd6cOKB87xVjKb0Hj4zoztvj6Q5M8yrVA42
+         CGPvrweTSXIc2QH55d6JqsA3adEwg0xV6QyC2dhllWnaqtvYUcluEcPvZP+vYWs2FL
+         Qxx5HuEq/kh3hjWgBf71+k5DQuq9RBnqkggSb6QOoXG66/g3TUtTxJoYnijkjGjdYA
+         64v1VHzXpPZBVRMpPEUN8sP5t7PXJiytsJZ0hBdBOLctXz4ZyCMiTy1tU51LoKFTFN
+         XS95vbwRDisIZE0E6yqyxwoCtnHRxcoDAmUvZn9kDKmryj+ifIzyM072kzhVsDp5rp
+         Fs94StLHS7KjQ==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 203753] Bluetooth: hci0: advertising data len corrected
+Date:   Fri, 26 Feb 2021 22:45:08 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: priit@ww.ee
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-203753-62941-mTKp9FHhOy@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203753-62941@https.bugzilla.kernel.org/>
+References: <bug-203753-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D203753
 
-On Fri, Feb 26, 2021 at 12:23 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Magdalena,
->
-> > This is required for the qualification test L2CAP/LE/CFC/BV-15-C
-> >
-> > Implementation does not allow to set different key size for SMP and
-> > L2CAP, which is needed for a current specification of the test. This fix
-> > workarounds it with the debugfs variable le_l2cap_min_key_size.
-> >
-> > Logs from the test when the IUT uses a min and max l2cap encryption key size 16.
-> > $ echo 16 > /sys/kernel/debug/bluetooth/hci0/le_l2cap_min_key_size
-> > The lower tester uses a key size 7.
-> >
-> >> ACL Data RX: Handle 99 flags 0x02 dlen 11                #34 [hci0] 25.007392
-> >      SMP: Pairing Request (0x01) len 6
-> >        IO capability: DisplayYesNo (0x01)
-> >        OOB data: Authentication data not present (0x00)
-> >        Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x09)
-> >        Max encryption key size: 7
-> >        Initiator key distribution: <none> (0x00)
-> >        Responder key distribution: <none> (0x00)
-> > < ACL Data TX: Handle 99 flags 0x00 dlen 11                #35 [hci0] 25.007591
-> >      SMP: Pairing Response (0x02) len 6
-> >        IO capability: KeyboardDisplay (0x04)
-> >        OOB data: Authentication data not present (0x00)
-> >        Authentication requirement: Bonding, No MITM, SC, No Keypresses (0x09)
-> >        Max encryption key size: 16
-> >        Initiator key distribution: <none> (0x00)
-> >        Responder key distribution: <none> (0x00)
-> > @ MGMT Event: New Long Term Key (0x000a) plen 37      {0x0001} [hci0] 28.788872
-> >        Store hint: Yes (0x01)
-> >        LE Address: C0:DE:C0:FF:FF:01 (OUI C0-DE-C0)
-> >        Key type: Unauthenticated key from P-256 (0x02)
-> >        Master: 0x00
-> >        Encryption size: 7
-> >        Diversifier: 0000
-> >        Randomizer: 0000000000000000
-> >        Key: 529e11e8c7b9f5000000000000000000
-> >
-> > <snip>
-> >
-> > After pairing with key size 7, L2CAP connection is requested which
-> > requires key size 16.
-> >
-> >> ACL Data RX: Handle 99 flags 0x02 dlen 18                #56 [hci0] 34.998084
-> >      LE L2CAP: LE Connection Request (0x14) ident 3 len 10
-> >        PSM: 244 (0x00f4)
-> >        Source CID: 64
-> >        MTU: 256
-> >        MPS: 284
-> >        Credits: 1
-> > < ACL Data TX: Handle 99 flags 0x00 dlen 18                #57 [hci0] 34.998325
-> >      LE L2CAP: LE Connection Response (0x15) ident 3 len 10
-> >        Destination CID: 0
-> >        MTU: 0
-> >        MPS: 0
-> >        Credits: 0
-> >        Result: Connection refused - insufficient encryption key size (0x0007)
-> >
-> > Signed-off-by: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-> > Reviewed-by: Szymon Janc <szymon.janc@codecoup.pl>
-> > Cc: Szymon Janc <szymon.janc@codecoup.pl>
-> > ---
-> > include/net/bluetooth/hci_core.h |  1 +
-> > net/bluetooth/hci_core.c         |  1 +
-> > net/bluetooth/hci_debugfs.c      | 30 ++++++++++++++++++++++++++++++
-> > net/bluetooth/l2cap_core.c       | 25 +++++++++++++++++++++++++
-> > 4 files changed, 57 insertions(+)
-> >
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> > index ebdd4afe30d2..0bf0543efec5 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -379,6 +379,7 @@ struct hci_dev {
-> >       __u16           auth_payload_timeout;
-> >       __u8            min_enc_key_size;
-> >       __u8            max_enc_key_size;
-> > +     __u8            le_l2cap_min_key_size;
-> >       __u8            pairing_opts;
-> >       __u8            ssp_debug_mode;
-> >       __u8            hw_error_code;
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index b0d9c36acc03..9ef4b39b380c 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -3788,6 +3788,7 @@ struct hci_dev *hci_alloc_dev(void)
-> >       hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
-> >       hdev->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
-> >       hdev->min_enc_key_size = HCI_MIN_ENC_KEY_SIZE;
-> > +     hdev->le_l2cap_min_key_size = HCI_MIN_ENC_KEY_SIZE;
->
-> so I am not a fan of doing this with another variable and managing through debugfs. Can we pass the qualification test case by using BT_SECURITY_FIPS (which will enforce 128-bit key size)?
+Priit O. (priit@ww.ee) changed:
 
-I guess that will depend if PTS supports MITM which afaik it is
-required with BT_SECURITY_FIPS, from the logs it looks like it doesn't
-support it so we end up with an unauthenticated key so the error would
-probably be different.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |priit@ww.ee
 
-> If not then we might want to add a socket option to set min/max encryption key size requirement on a per socket basis.
+--- Comment #6 from Priit O. (priit@ww.ee) ---
+uname -a : Linux Zen 5.10.15-1-MANJARO #1 SMP PREEMPT Wed Feb 10 10:42:47 U=
+TC
+2021 x86_64 GNU/Linux
 
-Yep, it seems to be a common trend to have such tests on upper layers
-(ATT/GATT also have such encryption key size), even though it is more
-of a GAP test and perhaps could have been done at SMP level.
+$ dmesg -W
+[106376.949553] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106378.833756] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106379.909741] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106380.195521] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106380.346552] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106380.528606] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106380.685527] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106380.843539] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106381.118745] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106381.449509] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106382.544736] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106382.978739] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106385.310497] bt_err_ratelimited: 4 callbacks suppressed
+[106385.310499] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106385.800722] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106387.169452] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106387.810468] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106388.250687] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106388.739449] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106389.175451] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106389.948625] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106390.103438] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106390.441649] Bluetooth: hci0: advertising data len corrected 31 -> 16
+[106390.599420] Bluetooth: hci0: advertising data len corrected 31 -> 16
 
->
-> Regards
->
-> Marcel
->
+it just continiously spams this, several messages in a second.
 
+--=20
+You may reply to this email to add a comment.
 
--- 
-Luiz Augusto von Dentz
+You are receiving this mail because:
+You are the assignee for the bug.=
