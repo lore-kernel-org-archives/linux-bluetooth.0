@@ -5,251 +5,174 @@ X-Spam-Level:
 X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CA5FC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Mar 2021 20:15:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCDAC433E6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Mar 2021 22:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C92C564ECF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Mar 2021 20:15:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF32B64F2D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Mar 2021 22:56:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241521AbhCAUPO (ORCPT
+        id S1351211AbhCBWf0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Mar 2021 15:15:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55876 "EHLO
+        Tue, 2 Mar 2021 17:35:26 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236171AbhCAUJs (ORCPT
+        with ESMTP id S1345394AbhCBAlI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Mar 2021 15:09:48 -0500
-Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01BF4C061797
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Mar 2021 12:06:18 -0800 (PST)
-Received: by mail-pj1-x102f.google.com with SMTP id i14so292734pjz.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Mar 2021 12:06:17 -0800 (PST)
+        Mon, 1 Mar 2021 19:41:08 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3856EC061756
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Mar 2021 16:40:28 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id s16so10978023plr.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Mar 2021 16:40:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=U+yZn5oAcut/C/aebOJ16/bGakvc9MpdGSWik0h5VXc=;
-        b=WoqBGSdMrcG7i8F+POoakKo8qZE6yUVQgoE3Y8qtfWvdLpMLOZCPTFFQKFSpR4E/L7
-         0cYCUSTthhZ89M8yRs/gH4Gk6O/9YuTsqFPhhW+v3MNPl7ZKrHGLDN4HhlKScp2QTYX2
-         gOIBafTn/FrYPZkfvWQBE7NlZk1pEUmwAWO2E=
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eaWQ9ofDP5pUPPuiyfJHoupQKH7hrKU1Fz/HCg3Dn8M=;
+        b=Q3+zPq+P+ToAILo0WMvsQs7AjNtPfHAzLS/kqKlGiHK240YRNo5UDNnSLHK8vhYAqZ
+         Aay6390sivV/0bopsh9exMsUw6ev89y2YoW8W/KumnPS/PJGx/1W2vhTouCZNd9epWs+
+         n5mEpSzPYgy73uB/Lhzc6eEELtyLAtenURNPg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=U+yZn5oAcut/C/aebOJ16/bGakvc9MpdGSWik0h5VXc=;
-        b=AqSzItbt4lomanfYmW4vgIfyD7Gc6Hkm9wHHNYjiXWZ+K/mTIjTClX/fwteE+LR3lA
-         8CtU+YH50eHVXiC525uMsnrhWamZKcvldc2oJ6q9oTQD4vreAW6GY/5jUSN00OR8rSDs
-         laXiz3nFJ78HQKGcKoXkdR9IhKY7UQLrMw8Nz1qhwBne+BDzm3d6RE+pRa/Jytxjj4yy
-         KRGoxMoNsTTuinDzFeN+JZ2Ta02gB08C1fTAS7QX+zBX1AxGJMcRzEdDedLopeQI4o9g
-         jpaoP+Vn2xO8uJ+2wvWHpX+oD9jLjmE19YbCn0gTfA2Bzvv1M0ZW4M2VgOdRW7mvY6iZ
-         gZlw==
-X-Gm-Message-State: AOAM532h11G5W8gI7yAOd43rLx2TDyWKxa0y5tm2yBkFcGcPxgpOZEhe
-        aNuiaCf6Gim7i2ef+h/C8Doq+g==
-X-Google-Smtp-Source: ABdhPJyNiWBUOGz2CemLY+WQB6z0EWQ7Xrcxm+QMYPJbcIFbDa2D/IXXStrtHhATfs0WLrfwaI2Xgg==
-X-Received: by 2002:a17:90a:ba16:: with SMTP id s22mr646925pjr.88.1614629177608;
-        Mon, 01 Mar 2021 12:06:17 -0800 (PST)
-Received: from apsdesk.mtv.corp.google.com ([2620:15c:202:1:d800:e660:6ed:356a])
-        by smtp.gmail.com with ESMTPSA id t4sm238256pjs.12.2021.03.01.12.06.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Mar 2021 12:06:17 -0800 (PST)
-From:   Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-To:     marcel@holtmann.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        Jakub Kicinski <kuba@kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH 2/2] Bluetooth: Remove unneeded commands for suspend
-Date:   Mon,  1 Mar 2021 12:06:05 -0800
-Message-Id: <20210301120602.2.Ifcac8bd85b5339135af8e08370bacecc518b1c35@changeid>
-X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-In-Reply-To: <20210301200605.106607-1-abhishekpandit@chromium.org>
-References: <20210301200605.106607-1-abhishekpandit@chromium.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=eaWQ9ofDP5pUPPuiyfJHoupQKH7hrKU1Fz/HCg3Dn8M=;
+        b=o4IJ2H1kXZPLe5NJp4F2nBntr1stFOnNrQOX/fgR8sHm3Fyh5OlZ5LcD02dljuzcak
+         Cjc4YEsHmd1lCJN2fSjlhSOKDLULhgex2kl0fe6ICZ4XlSNeHOe8mXObNhy5DGV4W+97
+         rf+2nwt9RjYkhUIIupeEAN31NStjS3Efg5GihpvQY2zWlY/AUzbeeJiy9P2O/YpP84NQ
+         4ef3er9JKQBTIbkYsXQGGB13rnFkbE5DJEGijlqmb648HcOeZM+uqGF93I2bgpr4F57/
+         f4rfIQ3kdTpQrCUdFfnp3ehmOzKwXncxMuqICK5owHvvaUEySv64eReFn/dlLv228Qax
+         +Vvg==
+X-Gm-Message-State: AOAM5318cPrU9UB6e0D8BziZlT7xeEaRcxJmsGP7xiuvx9ne2GbZd+lK
+        +Z7e0X6Lh7OmauQSAX/NB92ruffKWVlqPQ==
+X-Google-Smtp-Source: ABdhPJwmkh2LfAaTpb1HYT/nbMVd1OOuoY/3etz1vdDfXIhMeSvlQPrNmn4KFXcPyuhgk/09pYqkjw==
+X-Received: by 2002:a17:90a:e97:: with SMTP id 23mr1546274pjx.136.1614645627547;
+        Mon, 01 Mar 2021 16:40:27 -0800 (PST)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:6d7e:f36e:c2fc:82cb])
+        by smtp.gmail.com with ESMTPSA id m4sm17119286pgu.4.2021.03.01.16.40.26
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Mon, 01 Mar 2021 16:40:26 -0800 (PST)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
+        Daniel Winkler <danielwinkler@google.com>
+Subject: [PATCH BlueZ v4] monitor: Add option to set fallback width
+Date:   Mon,  1 Mar 2021 16:40:19 -0800
+Message-Id: <20210302004019.7150-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-During suspend, there are a few scan enable and set event filter
-commands that don't need to be sent unless there are actual BR/EDR
-devices capable of waking the system. Check the HCI_PSCAN bit before
-writing scan enable and use a new dev flag, HCI_EVENT_FILTER_CONFIGURED
-to control whether to clear the event filter.
+Sometimes we want to be able to pipe the output of btmon to a
+non-terminal device. The current fallback width is usually not long
+enough so this patch adds an option to specify the column width. This is
+especially needed for text logs from bluetoothd.
 
-Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Daniel Winkler <danielwinkler@google.com>
+
 ---
+ monitor/display.c | 8 +++++++-
+ monitor/display.h | 1 +
+ monitor/main.c    | 8 +++++++-
+ 3 files changed, 15 insertions(+), 2 deletions(-)
 
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_event.c   | 31 ++++++++++++++++++++++++++
- net/bluetooth/hci_request.c | 44 +++++++++++++++++++++++--------------
- 3 files changed, 59 insertions(+), 17 deletions(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ba2f439bc04d34..ea4ae551c42687 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -320,6 +320,7 @@ enum {
- 	HCI_BREDR_ENABLED,
- 	HCI_LE_SCAN_INTERRUPTED,
- 	HCI_WIDEBAND_SPEECH_ENABLED,
-+	HCI_EVENT_FILTER_CONFIGURED,
+diff --git a/monitor/display.c b/monitor/display.c
+index b11b71d5d..4e5693b04 100644
+--- a/monitor/display.c
++++ b/monitor/display.c
+@@ -28,6 +28,7 @@
+ #include "display.h"
  
- 	HCI_DUT_MODE,
- 	HCI_VENDOR_DIAG,
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 67668be3461e93..17847e672b98cf 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -395,6 +395,33 @@ static void hci_cc_write_scan_enable(struct hci_dev *hdev, struct sk_buff *skb)
- 	hci_dev_unlock(hdev);
+ static pid_t pager_pid = 0;
++int default_pager_num_columns = FALLBACK_TERMINAL_WIDTH;
+ 
+ bool use_color(void)
+ {
+@@ -39,6 +40,11 @@ bool use_color(void)
+ 	return cached_use_color;
  }
  
-+static void hci_cc_set_event_filter(struct hci_dev *hdev, struct sk_buff *skb)
++void set_default_pager_num_columns(int num_columns)
 +{
-+	__u8 status = *((__u8 *)skb->data);
-+	struct hci_cp_set_event_filter *cp;
-+	void *sent;
-+
-+	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-+
-+	sent = hci_sent_cmd_data(hdev, HCI_OP_SET_EVENT_FLT);
-+	if (!sent)
-+		return;
-+
-+	cp = (struct hci_cp_set_event_filter *)sent;
-+
-+	hci_dev_lock(hdev);
-+
-+	if (status)
-+		goto done;
-+
-+	if (cp->flt_type == HCI_FLT_CLEAR_ALL)
-+		hci_dev_clear_flag(hdev, HCI_EVENT_FILTER_CONFIGURED);
-+	else
-+		hci_dev_set_flag(hdev, HCI_EVENT_FILTER_CONFIGURED);
-+done:
-+	hci_dev_unlock(hdev);
++	default_pager_num_columns = num_columns;
 +}
 +
- static void hci_cc_read_class_of_dev(struct hci_dev *hdev, struct sk_buff *skb)
+ int num_columns(void)
  {
- 	struct hci_rp_read_class_of_dev *rp = (void *) skb->data;
-@@ -3328,6 +3355,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cc_write_scan_enable(hdev, skb);
- 		break;
+ 	static int cached_num_columns = -1;
+@@ -48,7 +54,7 @@ int num_columns(void)
  
-+	case HCI_OP_SET_EVENT_FLT:
-+		hci_cc_set_event_filter(hdev, skb);
-+		break;
-+
- 	case HCI_OP_READ_CLASS_OF_DEV:
- 		hci_cc_read_class_of_dev(hdev, skb);
- 		break;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index e55976db4403e7..75a42178c82d9b 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1131,14 +1131,14 @@ static void hci_req_clear_event_filter(struct hci_request *req)
- {
- 	struct hci_cp_set_event_filter f;
- 
--	memset(&f, 0, sizeof(f));
--	f.flt_type = HCI_FLT_CLEAR_ALL;
--	hci_req_add(req, HCI_OP_SET_EVENT_FLT, 1, &f);
-+	if (!hci_dev_test_flag(req->hdev, HCI_BREDR_ENABLED))
-+		return;
- 
--	/* Update page scan state (since we may have modified it when setting
--	 * the event filter).
--	 */
--	__hci_req_update_scan(req);
-+	if (hci_dev_test_flag(req->hdev, HCI_EVENT_FILTER_CONFIGURED)) {
-+		memset(&f, 0, sizeof(f));
-+		f.flt_type = HCI_FLT_CLEAR_ALL;
-+		hci_req_add(req, HCI_OP_SET_EVENT_FLT, 1, &f);
-+	}
- }
- 
- static void hci_req_set_event_filter(struct hci_request *req)
-@@ -1147,6 +1147,10 @@ static void hci_req_set_event_filter(struct hci_request *req)
- 	struct hci_cp_set_event_filter f;
- 	struct hci_dev *hdev = req->hdev;
- 	u8 scan = SCAN_DISABLED;
-+	bool scanning = test_bit(HCI_PSCAN, &hdev->flags);
-+
-+	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
-+		return;
- 
- 	/* Always clear event filter when starting */
- 	hci_req_clear_event_filter(req);
-@@ -1167,12 +1171,13 @@ static void hci_req_set_event_filter(struct hci_request *req)
- 		scan = SCAN_PAGE;
+ 		if (ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) < 0 ||
+ 								ws.ws_col == 0)
+-			cached_num_columns = FALLBACK_TERMINAL_WIDTH;
++			cached_num_columns = default_pager_num_columns;
+ 		else
+ 			cached_num_columns = ws.ws_col;
  	}
- 
--	if (scan)
-+	if (scan && !scanning) {
- 		set_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
--	else
-+		hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	} else if (!scan && scanning) {
- 		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
--
--	hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+		hci_req_add(req, HCI_OP_WRITE_SCAN_ENABLE, 1, &scan);
-+	}
+diff --git a/monitor/display.h b/monitor/display.h
+index f3a614b81..cba39ec7f 100644
+--- a/monitor/display.h
++++ b/monitor/display.h
+@@ -73,6 +73,7 @@ static inline uint64_t print_bitfield(int indent, uint64_t val,
+ 	return mask;
  }
  
- static void cancel_adv_timeout(struct hci_dev *hdev)
-@@ -1315,9 +1320,14 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
++void set_default_pager_num_columns(int num_columns);
+ int num_columns(void);
  
- 		hdev->advertising_paused = true;
- 		hdev->advertising_old_state = old_state;
--		/* Disable page scan */
--		page_scan = SCAN_DISABLED;
--		hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1, &page_scan);
-+
-+		/* Disable page scan if enabled */
-+		if (test_bit(HCI_PSCAN, &hdev->flags)) {
-+			page_scan = SCAN_DISABLED;
-+			hci_req_add(&req, HCI_OP_WRITE_SCAN_ENABLE, 1,
-+				    &page_scan);
-+			set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
-+		}
+ void open_pager(void);
+diff --git a/monitor/main.c b/monitor/main.c
+index 0f5eb4a3b..969c88103 100644
+--- a/monitor/main.c
++++ b/monitor/main.c
+@@ -30,6 +30,7 @@
+ #include "analyze.h"
+ #include "ellisys.h"
+ #include "control.h"
++#include "display.h"
  
- 		/* Disable LE passive scan if enabled */
- 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
-@@ -1328,9 +1338,6 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
- 		/* Disable advertisement filters */
- 		hci_req_add_set_adv_filter_enable(&req, false);
+ static void signal_callback(int signum, void *user_data)
+ {
+@@ -67,6 +68,7 @@ static void usage(void)
+ 		"\t                       Read data from RTT\n"
+ 		"\t-R  --rtt [<address>],[<area>],[<name>]\n"
+ 		"\t                       RTT control block parameters\n"
++		"\t-C, --columns [width]  Output width if not a terminal\n"
+ 		"\t-h, --help             Show help options\n");
+ }
  
--		/* Mark task needing completion */
--		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
--
- 		/* Prevent disconnects from causing scanning to be re-enabled */
- 		hdev->scanning_paused = true;
+@@ -90,6 +92,7 @@ static const struct option main_options[] = {
+ 	{ "no-pager",  no_argument,       NULL, 'P' },
+ 	{ "jlink",     required_argument, NULL, 'J' },
+ 	{ "rtt",       required_argument, NULL, 'R' },
++	{ "columns",   required_argument, NULL, 'C' },
+ 	{ "todo",      no_argument,       NULL, '#' },
+ 	{ "version",   no_argument,       NULL, 'v' },
+ 	{ "help",      no_argument,       NULL, 'h' },
+@@ -121,7 +124,7 @@ int main(int argc, char *argv[])
+ 		struct sockaddr_un addr;
  
-@@ -1364,7 +1371,10 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
- 		hdev->suspended = false;
- 		hdev->scanning_paused = false;
- 
-+		/* Clear any event filters and restore scan state */
- 		hci_req_clear_event_filter(&req);
-+		__hci_req_update_scan(&req);
-+
- 		/* Reset passive/background scanning to normal */
- 		__hci_update_background_scan(&req);
- 		/* Enable all of the advertisement filters */
+ 		opt = getopt_long(argc, argv,
+-					"r:w:a:s:p:i:d:B:V:MNtTSAE:PJ:R:vh",
++					"r:w:a:s:p:i:d:B:V:MNtTSAE:PJ:R:C:vh",
+ 					main_options, NULL);
+ 		if (opt < 0)
+ 			break;
+@@ -205,6 +208,9 @@ int main(int argc, char *argv[])
+ 		case 'R':
+ 			rtt = optarg;
+ 			break;
++		case 'C':
++			set_default_pager_num_columns(atoi(optarg));
++			break;
+ 		case '#':
+ 			packet_todo();
+ 			lmp_todo();
 -- 
-2.30.1.766.gb4fecdf3b7-goog
+2.29.2
 
