@@ -8,107 +8,154 @@ X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6281CC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:13:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BF2C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:38:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3563064F6F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:13:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FB5164F64
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:38:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233672AbhCDTNX (ORCPT
+        id S230409AbhCDThX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 14:13:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39830 "EHLO
+        Thu, 4 Mar 2021 14:37:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230492AbhCDTNA (ORCPT
+        with ESMTP id S231377AbhCDThV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 14:13:00 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10220C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:12:20 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id a17so3691872oto.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:12:20 -0800 (PST)
+        Thu, 4 Mar 2021 14:37:21 -0500
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFCFC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:36:41 -0800 (PST)
+Received: by mail-ot1-x334.google.com with SMTP id g8so24779000otk.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:36:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=ROB+e94PZYF5HfrdwspdymB3hHAj58GLqoaaRUOBRO0=;
-        b=DSA6MTtZLeOaDoHESMipBaYBptys63afAd3BAP+bPTH5QQOKnxSdW+7Q9iYgR2eET2
-         H9qmw804MmRAc/FAkNctWCdC1hK8zRmjiekdgNyUgS0VXYi1USkOurJmlgD32jwTaLUH
-         agHEwUKZiR7fvFN8uMDryFUkpBxzMnqC3Lz9u5xjPFtD9pPfRM16++pMUKq3WdWimb1D
-         3/3z+4TpI3XfqFdUUMRH+uHiSLblh1myRsOr2Rj0Pbr2skjJaEkV2i0Ogl8H0r0wnFNM
-         cXGDtHGYgcLLdYM2oa0qhU7uEAXLFfg9jkjFKV0DykbiVOC3VVA/LgZ2l2Df9p7+wgGx
-         lUbA==
+         :cc;
+        bh=3d/KgEl9QUe90khqefYWOdb+Vv7VzRwVzmRvMqaLJx8=;
+        b=ltrs+s8/Ez9NHZg8I/R08aQpeTKiyxk7yzpyXN9NWjkn8Ix2Vr0GrCYXMwDbCSicDU
+         XATjHf6WnA/OI+G7t8Ictdul7xAuh3osoxvEPQ2+b5cfERwhgoae2bEsYTTZmhKMchlK
+         kItFX77clnCEG5Ev1kk1MseCstli41+/AWHUxHtsBclu/qKURJgHlGSU3ngOBLpzkX24
+         s4HKNtNtlLZaDWbYQzFnSGPutoEgTzoR6BN63fe5yk+5wUAxh5pY7kP7L/yQAgTKdfru
+         hECIrjsHWGV7EyFYxxg5eOuJui8tLJGFKko/HJAA8Ychzzbo+exrU9CYk2rgW4bzNkKJ
+         UpQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=ROB+e94PZYF5HfrdwspdymB3hHAj58GLqoaaRUOBRO0=;
-        b=Ye/ePXXE0b4QGQ8EahKdyUYD9FEe+hsFc8/U7SPmaRfT5qArHPtytllGusxf4DtP+Z
-         PusC+MHJC/sXmxl3MZ8FNvXbqLUGpmuxvEpiP/btwsJe1rZfa8YsyzCZTuTLnN1eUrmQ
-         G67/+0o8986hkZnUBmHU2f9d+M6akY4MdQ4UJFituBOkoOtZELl9ra9agio4MtGu2pyf
-         4bCXJ3IXeBZADFhQhqz7n3qx/94Tk+SzXvF5SwDhYCIUPxwKyO+iSF8znPUAhy6Ie1XE
-         cql1KdeMREJIlOVVf6CcSNIZIrq3N8UhZ0qWASMSR5q9/fbayZ05bEf+x52vNgGUIg4k
-         ENgg==
-X-Gm-Message-State: AOAM531BtZ6fZWL26T+Ut0wsZaCDcG0WUQVI1ZxqNjvTsNtE8olJy74g
-        WNMA3xs7uLXWe5UNTKAHvA1D2G2LbV8gue+REss=
-X-Google-Smtp-Source: ABdhPJxCJMNwX/ybxDBOH1LE+HUiBF21rhEr8tw8sD1X7obUVGm8SXrRni1I3qR3SRTK8qA664fUF+fEhPsoN7hpfho=
-X-Received: by 2002:a9d:69c6:: with SMTP id v6mr4693620oto.371.1614885139474;
- Thu, 04 Mar 2021 11:12:19 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=3d/KgEl9QUe90khqefYWOdb+Vv7VzRwVzmRvMqaLJx8=;
+        b=GkCROX+ZjMzLm80aiONFOaFlotZ5pYEl/uXXi6PLIEThD85/M9Qd6mrZJXlvt87vGN
+         6x2dDOjopS/qBVhhcdGfKn18kwm5g6X8qOCXqSm8trMITPOwIiKHNDwa1z8mn1we77P0
+         5XzsmgCs/5a+9H3fpYEZXLphtJ0z+51t38DTJ2ujpH2r742svnnmyfanDpO53abL4Fs9
+         KSag4VDFJmKa83mbnbaXeQc5m6Rw7ZcclXHyzGEkjZt5Z054tU75Rm5lxB2Kd9ZKJR0+
+         ucPRJX/+2xgQJRngLCTE1SdA+lOOvMpX22FhqvINY55TU/6kbfLSyKZc/yIGAxshZGTR
+         1gWA==
+X-Gm-Message-State: AOAM533c/gHPMp58RUtfPAybABAJoa0Ydn0aLDwfZ2chk+LlzsQ7skSU
+        sUkEdeAyc2kH8F1aS2ms83iq1k1CdTjPWZbrj6lqfP86B876pQ==
+X-Google-Smtp-Source: ABdhPJwiksghA1qyjiH4/LHnNVL12uxtxbyKFOy7efI9hC4cbhhvR0yP+DumbAMjazNC412fVgZLL7y0I6e4B0betfc=
+X-Received: by 2002:a9d:335:: with SMTP id 50mr4548260otv.44.1614886600929;
+ Thu, 04 Mar 2021 11:36:40 -0800 (PST)
 MIME-Version: 1.0
-References: <f6764fe94d45ff9211674c5799b193d15385a056.camel@collabora.com>
- <CABBYNZLp9pOopbEfONc=oOh=ODFi55YzA6BKoN4ABuSzuZdPbw@mail.gmail.com> <8ede2f3e7593cbbd78e5aa4d3b28257a75e17b63.camel@collabora.com>
-In-Reply-To: <8ede2f3e7593cbbd78e5aa4d3b28257a75e17b63.camel@collabora.com>
+References: <CA+0z1OhRZcC0F8kq4HFduJTZqehfaUfNowQBjoR1-vCk6w9Kng@mail.gmail.com>
+In-Reply-To: <CA+0z1OhRZcC0F8kq4HFduJTZqehfaUfNowQBjoR1-vCk6w9Kng@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Mar 2021 11:12:08 -0800
-Message-ID: <CABBYNZ+hEgLHitH4zF6M2Qh2Rm29E8D3Qgkh5EQ27Sa91Wr=Tg@mail.gmail.com>
-Subject: Re: Bug caused by moving to BlueZ 5.56 (bytes stripped from HoG reports)
-To:     =?UTF-8?Q?Ricardo_Ca=C3=B1uelo?= <ricardo.canuelo@collabora.com>
+Date:   Thu, 4 Mar 2021 11:36:29 -0800
+Message-ID: <CABBYNZK-Nf-aEsKxjCyGYm1-6nSyxRHCa1eZ3be6CqyYxHAeTw@mail.gmail.com>
+Subject: Re: BlueZ Creates conflicting deviceinfo service.
+To:     Ryan Walmsley <ryan@pi-supply.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ricardo,
+Hi Ryan,
 
-On Thu, Mar 4, 2021 at 10:57 AM Ricardo Ca=C3=B1uelo
-<ricardo.canuelo@collabora.com> wrote:
+On Thu, Mar 4, 2021 at 11:10 AM Ryan Walmsley <ryan@pi-supply.com> wrote:
 >
-> Hi Luiz
+> Hi,
 >
-> On Thu, 2021-03-04 at 10:44 -0800, Luiz Augusto von Dentz wrote:
-> > Nope, you are the first one to report a problem with this change, so
-> > chances are that what Dean stated probably still holds since the vast
-> > majority of devices didn't care about the report ID. So I suppose the
-> > following code shall take care of it or does it not?
-> >
-> >
-> https://github.com/fwupd/fwupd/blob/master/plugins/pixart-rf/fu-pxi-devic=
-e.c#L170
-> >
+> We've been working on something that uses Bluetooth to provide GATT
+> services and recently have updated to BlueZ 5.55 from 5.53 and have
+> found an issue.
 >
-> Yes, that's how we're dealing with it for now. It's a quick fix, a more g=
-eneral
-> solution would be to detect the BlueZ version and parse the reports accor=
-dingly.
-> By the way, is there a way to query the version of the running daemon oth=
-er than
-> running it with '-v' and parsing the result?
+> It seems that in the newer version a commit was made
+> (d5e07945c4aa36a83addc3c269f55c720c28afdb) that enabled the service
+> 0x180A with characteristic 0x2A50.
 
-Not really, we could possibly add a version over D-Bus but that
-wouldn't help for 5.56 anyway.
+Yep, DIS is controlled by the daemon since you can set the vendor,
+product and version using main.conf.
 
-> I just wanted to let you know that this can actually happen so you're rea=
-dy for
-> it, as there might be more code like this in other projects, although I d=
-on't
-> know how frequent it is for a device to use vendor-specific report IDs.
+> However as our software creates a service on 0x180A it causes a
+> conflict, as the application we are making our software with reads
+> from the first service available which is the one generated by BlueZ.
+
+You should probably stop doing that and just use main.conf to set the
+values you want to be published, we should actually blacklist DIS to
+be registered by applications since that is defined by the platform
+having the application to override may actually cause problems.
+
+> It looks like it was discussed about a kill switch being added of
+> "DeviceIdOverLE" to then disable this but I can't find any reference
+> to this at all.
 >
-> Cheers,
-> Ricardo
+> How would be best to disable this?
+
+Disable DIS on the application, you can actually check if the adapter
+has enabled it already using its UUIDs:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n321
+
+bluetoothctl also can be use to print the list of UUIDs that the
+adapter is exposing (0000180a-0000-1000-8000-00805f9b34fb is DIS):
+
+[bluetooth]# show
+Controller 00:AA:01:01:00:24 (public)
+Name:
+Alias:
+Class: 0x00000000
+Powered: no
+Discoverable: no
+DiscoverableTimeout: 0x000000b4
+Pairable: yes
+UUID: Message Notification Se.. (00001133-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
+UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
+UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+UUID: IrMC Sync                 (00001104-0000-1000-8000-00805f9b34fb)
+UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
+UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
+UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
+UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
+UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
+UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
+UUID: OBEX File Transfer        (00001106-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v1D6Bp0246d0538
+Discovering: no
+Roles: central
+Roles: peripheral
+Advertising Features:
+ActiveInstances: 0x00 (0)
+SupportedInstances: 0x01 (1)
+SupportedIncludes: tx-power
+SupportedIncludes: appearance
+SupportedIncludes: local-name
+SupportedSecondaryChannels: 1M
+SupportedSecondaryChannels: 2M
+SupportedSecondaryChannels: Coded
+
+> --
+> Ryan Walmsley
 >
+> Engineer
+>
+> Pi Supply Unit 4 Bells Yew Green Business Court,
+> Bells Yew Green, East Sussex, TN3 9BJ, United Kingdom
 
 
---=20
+
+-- 
 Luiz Augusto von Dentz
