@@ -2,96 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98EFAC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 10:57:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4684C433E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 12:53:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FC4564F38
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 10:57:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 904F364F37
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 12:53:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239102AbhCDK5D (ORCPT
+        id S237581AbhCDMxI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 05:57:03 -0500
-Received: from relay3-d.mail.gandi.net ([217.70.183.195]:39571 "EHLO
-        relay3-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239108AbhCDK4d (ORCPT
+        Thu, 4 Mar 2021 07:53:08 -0500
+Received: from mslow2.mail.gandi.net ([217.70.178.242]:56987 "EHLO
+        mslow2.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237757AbhCDMxA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 05:56:33 -0500
+        Thu, 4 Mar 2021 07:53:00 -0500
+Received: from relay9-d.mail.gandi.net (unknown [217.70.183.199])
+        by mslow2.mail.gandi.net (Postfix) with ESMTP id AD54B3BAE18
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 12:50:03 +0000 (UTC)
 X-Originating-IP: 78.199.60.242
-Received: from [192.168.1.150] (unknown [78.199.60.242])
+Received: from classic.redhat.com (unknown [78.199.60.242])
         (Authenticated sender: hadess@hadess.net)
-        by relay3-d.mail.gandi.net (Postfix) with ESMTPSA id 22E1260003;
-        Thu,  4 Mar 2021 10:55:40 +0000 (UTC)
-Message-ID: <0f80d7ef92366fde06f3b24fe060066e01933980.camel@hadess.net>
-Subject: Re: Autopairing
+        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 6D1F6FF80C
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 12:48:52 +0000 (UTC)
 From:   Bastien Nocera <hadess@hadess.net>
-To:     Mihai Emilian <be.mihai22@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Date:   Thu, 04 Mar 2021 11:55:40 +0100
-In-Reply-To: <CAP_L5iPNbYrni-U_EH=Yf5Tb3b7tGN6wFKp-h+HNE8ob028k5w@mail.gmail.com>
-References: <CAP_L5iPNbYrni-U_EH=Yf5Tb3b7tGN6wFKp-h+HNE8ob028k5w@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 3/3] tools/mesh-cfglient: Work-around compilation failure
+Date:   Thu,  4 Mar 2021 13:48:51 +0100
+Message-Id: <20210304124851.219154-3-hadess@hadess.net>
+X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210304124851.219154-1-hadess@hadess.net>
+References: <20210304124851.219154-1-hadess@hadess.net>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 2021-03-02 at 18:07 +0100, Mihai Emilian wrote:
-> Dear bluetooth community,
-> 
-> I am trying to create a pairing agent using bluez API in C.
-> 
-> The problem that I am trying to solve is autopairing from a known list
-> of MAC addresses (i.e auto-accept pairing for known devices in the
-> list).
-> 
-> I tried registering a bluetooth agent with NoInputNoOutput capability.
-> However, when I try to access Pair, I receive Authentication Failed
-> error.
-> 
-> Another problem here is that even if I call RequestDefaultAgent after
-> registration, it seems that the bluetooth settings agent (UI) is still
-> called and prompts me to yes/no.
-> 
-> I have the following questions:
-> 
-> From the api doc:
-> "Special permission might be required to become the default agent"
-> 
-> - Is there anything else I have to do to acquire these permissions?
-> - The return value from RequestDefaultAgent and RegisterAgent is void.
-> How can I check whether my agent has been registered/became default?
-> - I also tried trusting the discovered device after registering the
-> agent and trying to make it default, which didn't make any difference
-> - is this required?
+tools/mesh-cfgclient.c: In function ‘disp_numeric_call’:
+tools/mesh-cfgclient.c:543:10: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]
+  543 |          n);
+      |          ^
+---
+ tools/mesh-cfgclient.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-You might want to look at ready made pairing tools, such as bt-agent in
-bluez-tools:
-https://github.com/khvzak/bluez-tools
-
-This is an example of using static pincode with unattended pairing:
-https://github.com/hadess/CHIP-bluetooth-speaker/blob/master/setup.sh#L73
-
-The bt-agent pin code file can accommodate using bluetooth addresses,
-so something like:
-AA:BB:CC:DD:EE:FF *
-in the pin code file should work.
-
-Cheers
-
-> 
-> Here's my source code:
-> https://pastebin.com/Wj3rdHy3
-> 
-> Thank you for your time.
-> 
-> Best regards,
-> Mihai
-
+diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
+index 1eeed2a1a..ab5026e9b 100644
+--- a/tools/mesh-cfgclient.c
++++ b/tools/mesh-cfgclient.c
+@@ -530,8 +530,11 @@ static struct l_dbus_message *disp_numeric_call(struct l_dbus *dbus,
+ 	if (action_index < 0)
+ 		return l_dbus_message_new_error(msg, dbus_err_support, NULL);
+ 
++#pragma GCC diagnostic push
++#pragma GCC diagnostic ignored "-Wformat-nonliteral"
+ 	str = l_strdup_printf(display_numeric_table[action_index].description,
+ 									n);
++#pragma GCC diagnostic pop
+ 	bt_shell_printf(COLOR_YELLOW "%s\n" COLOR_OFF, str);
+ 	l_free(str);
+ 
+-- 
+2.29.2
 
