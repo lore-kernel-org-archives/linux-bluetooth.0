@@ -7,70 +7,67 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A9C0C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:42:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DDD34C4332B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:43:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB29A64F60
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:42:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9AFED64F70
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:43:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231377AbhCDTlj (ORCPT
+        id S236166AbhCDTmn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 14:41:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45970 "EHLO
+        Thu, 4 Mar 2021 14:42:43 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46114 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229715AbhCDTlc (ORCPT
+        with ESMTP id S229715AbhCDTmM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 14:41:32 -0500
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D2CC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:40:52 -0800 (PST)
-Received: by mail-oi1-x22e.google.com with SMTP id z126so31410312oiz.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:40:52 -0800 (PST)
+        Thu, 4 Mar 2021 14:42:12 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BFADC061756
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:41:32 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id h10so17773891otm.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:41:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=+tH9SiWbR7mbBMPr/Kpt4Qq0s7hSg7wfPiX6kQm/uWk=;
-        b=WLInGgg8W6ywWPCwoTGxzHhQy6/DtdIIhbJ+eDbS+V7yVWtH4bqOR5k06UwmT8x3IC
-         gJtO5d2vJDvr1/WlceM20BmJR2h56+7qYT44JsLpFhJ+VPCNNyfihEHn0Zu79hkAWm9N
-         Kn6q3PQjt/Fyp8RES/+WIDZLRlqtf4/r+CzUnAVbBs6Gc8xddHeYS/hWIHGG7wsj6/r9
-         bH25NxMJ8oQTSUdL0OS3JjyWUU93xjmn7E5Jk4UnR1sQOHxxuPUxDVRR9wE7G17yWHno
-         +I9hsNeN3z4LB5kMO19LTk8EAL/smk4wzrN/D1j76uu40/GRymnI8nfDzQ7asbx980Yl
-         lxgQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=XG5if/1ISz4cZtLblUM3u7CxRnHr3zS2IiMkkRLcbBs=;
+        b=tAnmBcoD0g4L/BDgOinBvJ0+JtLMXkpR98MBn6rMLfdWB0l+Ato2CgPzgtg9xABp3b
+         p79TJ1u1D4sDM3NQe3dd7xlJnZJUGAWbUQg40ip7oGijcskvqKMrhu6iV9qVeo3WZ2JI
+         D9NWWJLZC56qOnxhnFKETSGTyfpu55BoZKJGR9IRADBCVFC9Ki8B7fmHPl11zSvq7qLM
+         cCJTiqbVeTzIvc6RBRA6rd0l4UMBMbXLqGRVdnVrmLh0Gnp+eDEh37kXqmehKtpA2d6A
+         CxbTwv5UYay1521ZacVCgwYgJg6OqCDY8kvdjjznv79vca5LamaFyxz6TH1fX2luqNQo
+         fT5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=+tH9SiWbR7mbBMPr/Kpt4Qq0s7hSg7wfPiX6kQm/uWk=;
-        b=J0aZy26tmz/Qa97l3FemSxAqLSMn/l/uI0qB1zsW2B4uHGtLAliIRseRfKu2kQ6arw
-         TmsINMGTOJaxP5Vr/8CKNDWxO2BHdXNyBQ3r5Ghej9bl1pw9yg8eVCIzc/n9qUPCCya/
-         jJ9BRuz59/VlvsQtMtj/IdlVkzwqkbSzF/RZ+oHjn6+XYJK5fDrZwwcWFjn8aPBvv2QD
-         AWAnfMU91nehywdUXjPQCosw2U3nDRvwf44pMQTnOPpv/qk2+PWo45BxLsPznEynOqam
-         rII3wHbpSMxPnCzHq5MCDmF7CvijKkZK669NPHBP8xVvtWTff31WMyDr8+QsU4r1Y6o0
-         Jy6w==
-X-Gm-Message-State: AOAM531HAxfjjuY+OugZnIuWDFX33A+uWiYWZg4qoI2e+KZEoWvViKo0
-        VlUDLY3nNQ/LHKoG6usO22fnY/FPuJ3v4DaRacL6NTolYE8=
-X-Google-Smtp-Source: ABdhPJyxWoL503KwI3yI0QR4oKC/8UZKZNA0VuUzRCc+PuxN/g263YQ8x9HmHbq4oywxiQBuzvxUrAU1tVZ5wAiyEfU=
-X-Received: by 2002:a05:6808:1290:: with SMTP id a16mr4163100oiw.161.1614886851775;
- Thu, 04 Mar 2021 11:40:51 -0800 (PST)
+         :message-id:subject:to;
+        bh=XG5if/1ISz4cZtLblUM3u7CxRnHr3zS2IiMkkRLcbBs=;
+        b=i/H0KX3PPxKfAQojdidH3FbO9v6RnMC54xKhtbiNoJVfwA1+gYQ7VgebvMsW8iKJew
+         78DC6Cz7Lgz4F+7509z1e14/cX58sXOwYun902wdziXRMyHMeIaBaUdmMZD5VomzJS2e
+         2Hbqb/DKCOGUIvymZs5JjO7tI2rZUn9qZ0VwdzgjQY9QRUXHvYwz5heA1BOcz8ZT4Py9
+         p+Q87dhyloeg0MNmnTZ82dQbZ/EmiHF9vAuWro2D3EZv3G/JHn/x3tV3btT5ZqWtQ4nE
+         StSG907+D0oYuyOBy4H+2sqQIX3K5wC2aO8osAsCB7L2bSZT5HgcAY63UPHOfI8tRqAN
+         2UFA==
+X-Gm-Message-State: AOAM532dEj9rPHdRhxsnsIzOJWpBzfKnEQ/c04e2VQsIn+1aQjszehJt
+        QJtNR2OCVd0J0Aovk+Cs6aarHTXOo6/XfaIpsO9rihy4VWY=
+X-Google-Smtp-Source: ABdhPJyo9pLndqlqu4IR715ylgmILT0M9bnqRMma6wPh5Uehak1xRR98t5S+d8nh0xyhtOzbZEIWjarMrD5HwpPXqho=
+X-Received: by 2002:a9d:69c6:: with SMTP id v6mr4794563oto.371.1614886891762;
+ Thu, 04 Mar 2021 11:41:31 -0800 (PST)
 MIME-Version: 1.0
-References: <20210302102506.Bluez.1.I4b5a2f5249af5dbb7234c6831943dbd8de7c271c@changeid>
- <603ed12e.1c69fb81.b0c65.097d@mx.google.com>
-In-Reply-To: <603ed12e.1c69fb81.b0c65.097d@mx.google.com>
+References: <20210303002944.3444644-1-luiz.dentz@gmail.com> <603f9264.1c69fb81.f6ea8.c865@mx.google.com>
+In-Reply-To: <603f9264.1c69fb81.f6ea8.c865@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Mar 2021 11:40:40 -0800
-Message-ID: <CABBYNZK3k=yqWt2NMHf2qbxQOeEuFcR3ARFJ9khrDKOeN+TNVw@mail.gmail.com>
-Subject: Re: [Bluez] core: fix a typo in dev_connect
+Date:   Thu, 4 Mar 2021 11:41:20 -0800
+Message-ID: <CABBYNZLnOSdFmnwQOoUAFGZd4CPZYKa8WwCSv4SxUcX+SyJehg@mail.gmail.com>
+Subject: Re: [BlueZ] shared/gatt-server: Fix not properly checking for secure flags
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Yun-hao Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi,
 
-On Thu, Mar 4, 2021 at 1:02 AM <bluez.test.bot@gmail.com> wrote:
+On Wed, Mar 3, 2021 at 5:43 AM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -78,7 +75,7 @@ On Thu, Mar 4, 2021 at 1:02 AM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=440757
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=441167
 >
 > ---Test result---
 >
@@ -100,7 +97,7 @@ On Thu, Mar 4, 2021 at 1:02 AM <bluez.test.bot@gmail.com> wrote:
 > Regards,
 > Linux Bluetooth
 
-Applied, thanks.
+Pushed.
 
 -- 
 Luiz Augusto von Dentz
