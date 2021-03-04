@@ -2,56 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68682C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 16:44:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C201C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:27:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3806F64F40
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 16:44:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AB1E64F64
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229756AbhCDQnc (ORCPT
+        id S234219AbhCDS1Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 11:43:32 -0500
-Received: from relay1-d.mail.gandi.net ([217.70.183.193]:7953 "EHLO
-        relay1-d.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232951AbhCDQnM (ORCPT
+        Thu, 4 Mar 2021 13:27:24 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57382 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234205AbhCDS07 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 11:43:12 -0500
-X-Originating-IP: 78.199.60.242
-Received: from [192.168.1.150] (unknown [78.199.60.242])
-        (Authenticated sender: hadess@hadess.net)
-        by relay1-d.mail.gandi.net (Postfix) with ESMTPSA id C36FC24000B;
-        Thu,  4 Mar 2021 16:42:20 +0000 (UTC)
-Message-ID: <78003e9ffc8aa7305116f05707b221b66bfa75bd.camel@hadess.net>
-Subject: Re: patch to fix conflict with unistd.h
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Zbigniew =?UTF-8?Q?J=C4=99drzejewski-Szmek?= <zbyszek@in.waw.pl>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Thu, 04 Mar 2021 17:42:19 +0100
-In-Reply-To: <CABBYNZLYiGwYCQcihs9x-AJ33jS5dmUoY45GM4sk0PbmQW-iLg@mail.gmail.com>
-References: <20210303081942.GH7348@in.waw.pl>
-         <CABBYNZLYiGwYCQcihs9x-AJ33jS5dmUoY45GM4sk0PbmQW-iLg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.38.4 (3.38.4-1.fc33) 
+        Thu, 4 Mar 2021 13:26:59 -0500
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C2D3C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 10:26:19 -0800 (PST)
+Received: by mail-ot1-x332.google.com with SMTP id f33so28157353otf.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 10:26:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=pi-supply-com.20150623.gappssmtp.com; s=20150623;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=Ut+OJIeYwS7bibIZXl4bil+QMeWrKldJe3nKpsr3rg4=;
+        b=WHyMVXFIDcJQ2TKvUGB05D3VDlqP9JEgG3G51HWe+bKfC8mjmBYCPpElYbHJynoihi
+         epH00TRH8P5XFtCPugSxBrv6lP0e5W5HmCJLxHI6/vIkXADGNC+s7WgXQwhhTcOu58DJ
+         6ckjONzBCZVQV19R1YbliT/yyfJ3E6n4I3qK6FmQ0FnQpgO+9CydsGyNHtbgLVYJBQ2x
+         vq40sLFZ9OkbsRl9pTWGCA51c4DHWr1ICYUDkqsXr7e+xILG02QYcCJnDQNPxZGDMtxs
+         IF1jS1rV3CbAmfQe5BYmKAxOCMySwizHXqhBXR7p/sxdtBr/6ay9QlJjknLt6HGDXdsr
+         OreA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=Ut+OJIeYwS7bibIZXl4bil+QMeWrKldJe3nKpsr3rg4=;
+        b=hnQldwSqbUYbc5JKJjgkBU+33iQ5UA6gQTAtz0nXl3cw1jBRRbZEyWRzvNXLHHgDF1
+         mJnX278gYZfOhDQSEp2zQ5NS4+x16Q8N5K2I0pqh9EhiZ4FIK9SPkv7KBB1OMuvmCQCW
+         wbNiTWpXXBPbWYrGgXMjmUztQxVuveo/t+zneQRfREoRisjjw8qdooJv7jFYnBx8ZW0G
+         iZyte644wJ5o8LB/6Zr5s4yaXtkX2iw2EPSorE6x3HryrP8k4pNk7+VcHPlqYCsI3Xi4
+         qmFF4MfKcTgub2LsbnAH74tGUE8upzjoBTFHJQtOrH9dmUnZ6iSTVEWFw1TXzkUbPgYz
+         NFDQ==
+X-Gm-Message-State: AOAM532rWQM96BSEyAA0Ppi+pPbO6/fja2syhisIUsbI0vuUKtSA/bsv
+        fKDk7tMFQ1hE9jpcW45aA7TqHzg2o5w7Q18X2Q6uS6HgCajk3g==
+X-Google-Smtp-Source: ABdhPJyEIkZj0nFU3jw9Ov2FUIbyZKXej/oxxvnbfrOHiCpFCkl6PnZm70RuSOMzmod+cQHtedLoJmncbmdu2sr0IE0=
+X-Received: by 2002:a9d:74cc:: with SMTP id a12mr2781975otl.135.1614882378446;
+ Thu, 04 Mar 2021 10:26:18 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   Ryan Walmsley <ryan@pi-supply.com>
+Date:   Thu, 4 Mar 2021 18:26:07 +0000
+Message-ID: <CA+0z1OhRZcC0F8kq4HFduJTZqehfaUfNowQBjoR1-vCk6w9Kng@mail.gmail.com>
+Subject: BlueZ Creates conflicting deviceinfo service.
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 2021-03-04 at 08:37 -0800, Luiz Augusto von Dentz wrote:
-> Hi Zbigniew,
-> 
-> On Thu, Mar 4, 2021 at 1:02 AM Zbigniew Jędrzejewski-Szmek
-> <zbyszek@in.waw.pl> wrote:
-> > 
-> 
-> Can you send it as a proper patch, look at HACKING if you don't know
-> how to send it using e.g. git send-patch.
+Hi,
 
-Let me know if you want me to do it, I have all that already set up.
+We've been working on something that uses Bluetooth to provide GATT
+services and recently have updated to BlueZ 5.55 from 5.53 and have
+found an issue.
 
+It seems that in the newer version a commit was made
+(d5e07945c4aa36a83addc3c269f55c720c28afdb) that enabled the service
+0x180A with characteristic 0x2A50.
+
+However as our software creates a service on 0x180A it causes a
+conflict, as the application we are making our software with reads
+from the first service available which is the one generated by BlueZ.
+
+It looks like it was discussed about a kill switch being added of
+"DeviceIdOverLE" to then disable this but I can't find any reference
+to this at all.
+
+How would be best to disable this?
+
+-- 
+Ryan Walmsley
+
+Engineer
+
+Pi Supply Unit 4 Bells Yew Green Business Court,
+Bells Yew Green, East Sussex, TN3 9BJ, United Kingdom
