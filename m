@@ -4,105 +4,133 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88313C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:46:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 28F44C433E9
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:56:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B8EC64F69
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:46:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5C9264F62
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 18:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234676AbhCDSqM (ORCPT
+        id S235351AbhCDSzr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 13:46:12 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33134 "EHLO
+        Thu, 4 Mar 2021 13:55:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234671AbhCDSpn (ORCPT
+        with ESMTP id S231468AbhCDSz0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 13:45:43 -0500
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5A4C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 10:45:03 -0800 (PST)
-Received: by mail-ot1-x32d.google.com with SMTP id h22so28266717otr.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 10:45:03 -0800 (PST)
+        Thu, 4 Mar 2021 13:55:26 -0500
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 353AFC061756
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 10:54:46 -0800 (PST)
+Received: by mail-oi1-x234.google.com with SMTP id q203so8219677oih.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 10:54:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=grhB78IL0+DgPEpS6M2BSpCFrfDCXBeoHLIxKvlQunA=;
-        b=TLw93h57Jj4fH347wpdyIM85M83gIZag4zWFsR+MElQXEdXxgg+NSoss9lgNwl94tg
-         3rlKx6E+VGGl+wn6KW2sZNgVnjM4Vjtd/xnoxeqWCxstuwWuImVgsH+djLW+9XemxBGe
-         S49i6qx97TIlgqccN93NMsF3wuYFC7fZD4v0zoOfry/xIT1n5P8vy+s1OeMehAh9I5gb
-         ruOXXz10AS2dI6trJXolJotEMqZkp1DQM8JndBovbX+p3szFvvXVOqz0KfR+oLSZSNmZ
-         Gw+gmZDLRt5XA9lp9b9S8lZWM6OkZ7n/MpMQdo4L+bL/aATYb5gefQYr+fsu3l8CjGez
-         1k9g==
+         :cc;
+        bh=05W9YzXLfbmI2jr3bh2VuYvmWVoJ69L6SYPF8zYG2Yo=;
+        b=TpA++jDag9+SdiH6PSurnKvXorxS/n21rsfAnTJJckyDjav/3HKxAOboIAF+z8ADfI
+         7CO+N7Jgtqm0kDvlc15TFSStj2WPfpB/KaUv2TMvQepfv878H7TNlPrh0b2UIWZcJT64
+         i+801ji96udO1xRUtXc8Uxn1KhP7sRWlNqxJ3ddw5Io5ra9Bp4X0sIxJpwWFZetU+aVx
+         YftlBDNGWtRtG6dkiOb98kahjCaSiqFFkRQUc5onhrQ4LebSqheSEJDtAAnTz5USmrAE
+         G1bg+1bFvoz9eIcvMjNSInlOQR7nmBBfGBFzpm5CTzOWcZAaDovsARdMJu5RBIYa/mq3
+         xOrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=grhB78IL0+DgPEpS6M2BSpCFrfDCXBeoHLIxKvlQunA=;
-        b=I73LwBUku7WFQMzOoswXhigw1Yek9zfptuSVVvRuNS8o9atarNENT1ah700QEkbzyM
-         pY9WMS1WcenZagfpLhUA/60CdKuI4QYnMAWNjSxVehNtRV+omwIo249ggDBnnP8MrjZV
-         gNvb4G5vXanVPQtloOuMTKNTYk94XYURGv8Hcj3i+pqqBWe3d4z1VH4EbPAu5oZn7L2q
-         BbhoI9k72m1ww1NUsoNR2o/ePOuj4VEX9nnuyLKHBzYA3nTgGyPTUZLLvuVF9YeydIAl
-         H/OboDR1MwAh2ycGmyUd28RSqt3vW0vtPUJRdApNqII1PX2NnxwCWt7DajQj0GfiKMPC
-         +6+Q==
-X-Gm-Message-State: AOAM5336Pxy4zlnorh2QN97LIxViPZ3aL7JiP/8L9TSWOq7hh/yN2CJF
-        YSv79djU2tVC2tu6IlTc4xKBHn7TvL0BfmoaVFA=
-X-Google-Smtp-Source: ABdhPJxkl2Jn/V5FfGC6dL3HEcxpD4sKGysaXdso/ie41WKTk/fcqWEKxcAi6D3SPiyI5owPjww+s+XXRRK8JQYr524=
-X-Received: by 2002:a9d:69c6:: with SMTP id v6mr4598606oto.371.1614883502914;
- Thu, 04 Mar 2021 10:45:02 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=05W9YzXLfbmI2jr3bh2VuYvmWVoJ69L6SYPF8zYG2Yo=;
+        b=j1kP1nrmcjSUfFjfzO0dfa93jOnYuJ11Pqnl6kWaYBsKTNRPwchGpWoEpzMkun5yp1
+         Vso5ddaE1msni/hC4LHVNWaBjpaoiyxEBjT6x6dzjYxSvIGs3E1dmhHeaRENodIhZgTy
+         VAEzaHkChPDqJy9Cu24FXAKSSPy+82+tcgFP+pmyzk2ZhDV8Gd/YdTLNhHV7WdPK+gtT
+         CUslaMVFQgtwxFrRb/uqVhZ6Bxhxx4NzPvOK66TsPqJ5Mvg2V3HspUAWQvhiopbLFqkN
+         +midOm/pOluwKl48D+BSdJXkqctvhKdkFi/6SAph/Q5peaQUxUUEOBnjVq0pldSLAvSs
+         dsJQ==
+X-Gm-Message-State: AOAM531ERNF4MAV8uM7O4BeiyKdd+UBvM5ySuGFuP75Zn6Mc+BCTIDy6
+        N9VvU5wckw1XITwlY7S297ysrmxnluMv5HQiQxlMO7NlxLg=
+X-Google-Smtp-Source: ABdhPJy+hZQKZLrDlHAmiWEFTzcynN2POteUcN29KYv7KqDWlPJ6Ni4N0Agd5E4/Ic5iuHmhnjeed4CpgM5iRaBvyTM=
+X-Received: by 2002:a54:468f:: with SMTP id k15mr4022438oic.58.1614884085547;
+ Thu, 04 Mar 2021 10:54:45 -0800 (PST)
 MIME-Version: 1.0
-References: <f6764fe94d45ff9211674c5799b193d15385a056.camel@collabora.com>
-In-Reply-To: <f6764fe94d45ff9211674c5799b193d15385a056.camel@collabora.com>
+References: <20210304124851.219154-1-hadess@hadess.net> <CABBYNZ+yY6=WsFhA45fy2Tr33sLq0hgw7zJ3L15o3E7SQop84A@mail.gmail.com>
+ <ffe1130b13ab6e8b8b35e5f8cc560bd8497faa6d.camel@hadess.net>
+In-Reply-To: <ffe1130b13ab6e8b8b35e5f8cc560bd8497faa6d.camel@hadess.net>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Mar 2021 10:44:52 -0800
-Message-ID: <CABBYNZLp9pOopbEfONc=oOh=ODFi55YzA6BKoN4ABuSzuZdPbw@mail.gmail.com>
-Subject: Re: Bug caused by moving to BlueZ 5.56 (bytes stripped from HoG reports)
-To:     =?UTF-8?Q?Ricardo_Ca=C3=B1uelo?= <ricardo.canuelo@collabora.com>
+Date:   Thu, 4 Mar 2021 10:54:34 -0800
+Message-ID: <CABBYNZ+FQRJm-OUv-J6byNMzK8W0znU18FB3fwDVvFPGa=d2XQ@mail.gmail.com>
+Subject: Re: [PATCH 1/3] build: Add warnings for non-literal strings
+To:     Bastien Nocera <hadess@hadess.net>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ricardo,
+Hi Bastien,
 
-On Thu, Mar 4, 2021 at 9:40 AM Ricardo Ca=C3=B1uelo
-<ricardo.canuelo@collabora.com> wrote:
+On Thu, Mar 4, 2021 at 10:46 AM Bastien Nocera <hadess@hadess.net> wrote:
 >
-> Hi all,
+> On Thu, 2021-03-04 at 10:35 -0800, Luiz Augusto von Dentz wrote:
+> > Hi Bastien,
+> >
+> > On Thu, Mar 4, 2021 at 9:21 AM Bastien Nocera <hadess@hadess.net>
+> > wrote:
+> > >
+> > > ---
+> > >  acinclude.m4 | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/acinclude.m4 b/acinclude.m4
+> > > index 529848357..6ae34b8ae 100644
+> > > --- a/acinclude.m4
+> > > +++ b/acinclude.m4
+> > > @@ -21,7 +21,7 @@ AC_DEFUN([COMPILER_FLAGS], [
+> > >                 with_cflags="$with_cflags -Wredundant-decls"
+> > >                 with_cflags="$with_cflags -Wcast-align"
+> > >                 with_cflags="$with_cflags -Wswitch-enum"
+> > > -               with_cflags="$with_cflags -Wformat -Wformat-security"
+> > > +               with_cflags="$with_cflags -Wformat -Wformat-security
+> > > -Wformat-nonliteral"
+> >
+> > Does it actually have any benefit of having the format as always
+> > string literal? I'm not really a big fan of using pragmas.
 >
-> I discovered this fix https://github.com/bluez/bluez/commit/35a2c50 while
-> debugging a fwupd plugin for a HoG device that implements its FW upgrade
-> mechanism using vendor-specific HID reports (
-> https://github.com/fwupd/fwupd/blob/master/plugins/pixart-rf/fu-pxi-devic=
-e.c).
+> It's a security feature[1], so it's pretty important that we avoid
+> using non-literals when some of the arguments are user controlled,
+> especially in a networked daemon. We already enabled
+> "-Wformat-security", so not that much of a difference.
 >
-> Initially, the developers were using BlueZ versions prior to 5.56, which =
-is the
-> first release that includes that fix, so their code was written with that
-> behavior in mind. After moving to 5.56 we found out it crashed and we nee=
-ded to
-> adapt the code to the proper report format. I think this is the kind of i=
-ssues
-> that Dean mentioned here
-> https://marc.info/?l=3Dlinux-bluetooth&m=3D160590969013204&w=3D2
+> This warning is also enabled by default on Fedora's GCC, so I get to
+> see it whether I want to or not.
 >
-> Have there been any more reports like this? Is this expected to have a gr=
-eater
-> impact than initially thought?
+> I'd be happy actually fixing those warnings if you don't want pragmas
+> at all, it would just be more code movement. If we can get those
+> patches in, I can do a follow-up.
+>
+> [1]: Quick search gave me this explanation:
+> https://owasp.org/www-community/attacks/Format_string_attack
 
-Nope, you are the first one to report a problem with this change, so
-chances are that what Dean stated probably still holds since the vast
-majority of devices didn't care about the report ID. So I suppose the
-following code shall take care of it or does it not?
+You should probably add the above link in the patch description,
+regarding the use of pragma. I'd say we need to convert to use
+literals directly then since otherwise we are not actually fixing
+anything just returning it back to ignore the error where we don't use
+literals.
 
-https://github.com/fwupd/fwupd/blob/master/plugins/pixart-rf/fu-pxi-device.=
-c#L170
+> > >                 with_cflags="$with_cflags -DG_DISABLE_DEPRECATED"
+> > >                 with_cflags="$with_cflags -
+> > > DGLIB_VERSION_MIN_REQUIRED=GLIB_VERSION_2_28"
+> > >                 with_cflags="$with_cflags -
+> > > DGLIB_VERSION_MAX_ALLOWED=GLIB_VERSION_2_32"
+> > > --
+> > > 2.29.2
+> > >
+> >
+> >
+>
+>
 
---=20
+
+-- 
 Luiz Augusto von Dentz
