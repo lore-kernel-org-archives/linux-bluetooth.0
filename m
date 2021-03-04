@@ -2,160 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 78BF2C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:38:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A9C0C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:42:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FB5164F64
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:38:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB29A64F60
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 19:42:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230409AbhCDThX (ORCPT
+        id S231377AbhCDTlj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 14:37:23 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45082 "EHLO
+        Thu, 4 Mar 2021 14:41:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45970 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231377AbhCDThV (ORCPT
+        with ESMTP id S229715AbhCDTlc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 14:37:21 -0500
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFFCFC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:36:41 -0800 (PST)
-Received: by mail-ot1-x334.google.com with SMTP id g8so24779000otk.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:36:41 -0800 (PST)
+        Thu, 4 Mar 2021 14:41:32 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A9D2CC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 11:40:52 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id z126so31410312oiz.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 11:40:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=3d/KgEl9QUe90khqefYWOdb+Vv7VzRwVzmRvMqaLJx8=;
-        b=ltrs+s8/Ez9NHZg8I/R08aQpeTKiyxk7yzpyXN9NWjkn8Ix2Vr0GrCYXMwDbCSicDU
-         XATjHf6WnA/OI+G7t8Ictdul7xAuh3osoxvEPQ2+b5cfERwhgoae2bEsYTTZmhKMchlK
-         kItFX77clnCEG5Ev1kk1MseCstli41+/AWHUxHtsBclu/qKURJgHlGSU3ngOBLpzkX24
-         s4HKNtNtlLZaDWbYQzFnSGPutoEgTzoR6BN63fe5yk+5wUAxh5pY7kP7L/yQAgTKdfru
-         hECIrjsHWGV7EyFYxxg5eOuJui8tLJGFKko/HJAA8Ychzzbo+exrU9CYk2rgW4bzNkKJ
-         UpQw==
+        bh=+tH9SiWbR7mbBMPr/Kpt4Qq0s7hSg7wfPiX6kQm/uWk=;
+        b=WLInGgg8W6ywWPCwoTGxzHhQy6/DtdIIhbJ+eDbS+V7yVWtH4bqOR5k06UwmT8x3IC
+         gJtO5d2vJDvr1/WlceM20BmJR2h56+7qYT44JsLpFhJ+VPCNNyfihEHn0Zu79hkAWm9N
+         Kn6q3PQjt/Fyp8RES/+WIDZLRlqtf4/r+CzUnAVbBs6Gc8xddHeYS/hWIHGG7wsj6/r9
+         bH25NxMJ8oQTSUdL0OS3JjyWUU93xjmn7E5Jk4UnR1sQOHxxuPUxDVRR9wE7G17yWHno
+         +I9hsNeN3z4LB5kMO19LTk8EAL/smk4wzrN/D1j76uu40/GRymnI8nfDzQ7asbx980Yl
+         lxgQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=3d/KgEl9QUe90khqefYWOdb+Vv7VzRwVzmRvMqaLJx8=;
-        b=GkCROX+ZjMzLm80aiONFOaFlotZ5pYEl/uXXi6PLIEThD85/M9Qd6mrZJXlvt87vGN
-         6x2dDOjopS/qBVhhcdGfKn18kwm5g6X8qOCXqSm8trMITPOwIiKHNDwa1z8mn1we77P0
-         5XzsmgCs/5a+9H3fpYEZXLphtJ0z+51t38DTJ2ujpH2r742svnnmyfanDpO53abL4Fs9
-         KSag4VDFJmKa83mbnbaXeQc5m6Rw7ZcclXHyzGEkjZt5Z054tU75Rm5lxB2Kd9ZKJR0+
-         ucPRJX/+2xgQJRngLCTE1SdA+lOOvMpX22FhqvINY55TU/6kbfLSyKZc/yIGAxshZGTR
-         1gWA==
-X-Gm-Message-State: AOAM533c/gHPMp58RUtfPAybABAJoa0Ydn0aLDwfZ2chk+LlzsQ7skSU
-        sUkEdeAyc2kH8F1aS2ms83iq1k1CdTjPWZbrj6lqfP86B876pQ==
-X-Google-Smtp-Source: ABdhPJwiksghA1qyjiH4/LHnNVL12uxtxbyKFOy7efI9hC4cbhhvR0yP+DumbAMjazNC412fVgZLL7y0I6e4B0betfc=
-X-Received: by 2002:a9d:335:: with SMTP id 50mr4548260otv.44.1614886600929;
- Thu, 04 Mar 2021 11:36:40 -0800 (PST)
+        bh=+tH9SiWbR7mbBMPr/Kpt4Qq0s7hSg7wfPiX6kQm/uWk=;
+        b=J0aZy26tmz/Qa97l3FemSxAqLSMn/l/uI0qB1zsW2B4uHGtLAliIRseRfKu2kQ6arw
+         TmsINMGTOJaxP5Vr/8CKNDWxO2BHdXNyBQ3r5Ghej9bl1pw9yg8eVCIzc/n9qUPCCya/
+         jJ9BRuz59/VlvsQtMtj/IdlVkzwqkbSzF/RZ+oHjn6+XYJK5fDrZwwcWFjn8aPBvv2QD
+         AWAnfMU91nehywdUXjPQCosw2U3nDRvwf44pMQTnOPpv/qk2+PWo45BxLsPznEynOqam
+         rII3wHbpSMxPnCzHq5MCDmF7CvijKkZK669NPHBP8xVvtWTff31WMyDr8+QsU4r1Y6o0
+         Jy6w==
+X-Gm-Message-State: AOAM531HAxfjjuY+OugZnIuWDFX33A+uWiYWZg4qoI2e+KZEoWvViKo0
+        VlUDLY3nNQ/LHKoG6usO22fnY/FPuJ3v4DaRacL6NTolYE8=
+X-Google-Smtp-Source: ABdhPJyxWoL503KwI3yI0QR4oKC/8UZKZNA0VuUzRCc+PuxN/g263YQ8x9HmHbq4oywxiQBuzvxUrAU1tVZ5wAiyEfU=
+X-Received: by 2002:a05:6808:1290:: with SMTP id a16mr4163100oiw.161.1614886851775;
+ Thu, 04 Mar 2021 11:40:51 -0800 (PST)
 MIME-Version: 1.0
-References: <CA+0z1OhRZcC0F8kq4HFduJTZqehfaUfNowQBjoR1-vCk6w9Kng@mail.gmail.com>
-In-Reply-To: <CA+0z1OhRZcC0F8kq4HFduJTZqehfaUfNowQBjoR1-vCk6w9Kng@mail.gmail.com>
+References: <20210302102506.Bluez.1.I4b5a2f5249af5dbb7234c6831943dbd8de7c271c@changeid>
+ <603ed12e.1c69fb81.b0c65.097d@mx.google.com>
+In-Reply-To: <603ed12e.1c69fb81.b0c65.097d@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 4 Mar 2021 11:36:29 -0800
-Message-ID: <CABBYNZK-Nf-aEsKxjCyGYm1-6nSyxRHCa1eZ3be6CqyYxHAeTw@mail.gmail.com>
-Subject: Re: BlueZ Creates conflicting deviceinfo service.
-To:     Ryan Walmsley <ryan@pi-supply.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 4 Mar 2021 11:40:40 -0800
+Message-ID: <CABBYNZK3k=yqWt2NMHf2qbxQOeEuFcR3ARFJ9khrDKOeN+TNVw@mail.gmail.com>
+Subject: Re: [Bluez] core: fix a typo in dev_connect
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yun-hao Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Ryan,
+Hi Howard,
 
-On Thu, Mar 4, 2021 at 11:10 AM Ryan Walmsley <ryan@pi-supply.com> wrote:
+On Thu, Mar 4, 2021 at 1:02 AM <bluez.test.bot@gmail.com> wrote:
 >
-> Hi,
+> This is automated email and please do not reply to this email!
 >
-> We've been working on something that uses Bluetooth to provide GATT
-> services and recently have updated to BlueZ 5.55 from 5.53 and have
-> found an issue.
+> Dear submitter,
 >
-> It seems that in the newer version a commit was made
-> (d5e07945c4aa36a83addc3c269f55c720c28afdb) that enabled the service
-> 0x180A with characteristic 0x2A50.
-
-Yep, DIS is controlled by the daemon since you can set the vendor,
-product and version using main.conf.
-
-> However as our software creates a service on 0x180A it causes a
-> conflict, as the application we are making our software with reads
-> from the first service available which is the one generated by BlueZ.
-
-You should probably stop doing that and just use main.conf to set the
-values you want to be published, we should actually blacklist DIS to
-be registered by applications since that is defined by the platform
-having the application to override may actually cause problems.
-
-> It looks like it was discussed about a kill switch being added of
-> "DeviceIdOverLE" to then disable this but I can't find any reference
-> to this at all.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=440757
 >
-> How would be best to disable this?
-
-Disable DIS on the application, you can actually check if the adapter
-has enabled it already using its UUIDs:
-
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/adapter-api.txt#n321
-
-bluetoothctl also can be use to print the list of UUIDs that the
-adapter is exposing (0000180a-0000-1000-8000-00805f9b34fb is DIS):
-
-[bluetooth]# show
-Controller 00:AA:01:01:00:24 (public)
-Name:
-Alias:
-Class: 0x00000000
-Powered: no
-Discoverable: no
-DiscoverableTimeout: 0x000000b4
-Pairable: yes
-UUID: Message Notification Se.. (00001133-0000-1000-8000-00805f9b34fb)
-UUID: A/V Remote Control        (0000110e-0000-1000-8000-00805f9b34fb)
-UUID: OBEX Object Push          (00001105-0000-1000-8000-00805f9b34fb)
-UUID: Message Access Server     (00001132-0000-1000-8000-00805f9b34fb)
-UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
-UUID: IrMC Sync                 (00001104-0000-1000-8000-00805f9b34fb)
-UUID: Headset                   (00001108-0000-1000-8000-00805f9b34fb)
-UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
-UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
-UUID: Phonebook Access Server   (0000112f-0000-1000-8000-00805f9b34fb)
-UUID: Audio Sink                (0000110b-0000-1000-8000-00805f9b34fb)
-UUID: Device Information        (0000180a-0000-1000-8000-00805f9b34fb)
-UUID: Generic Access Profile    (00001800-0000-1000-8000-00805f9b34fb)
-UUID: Headset AG                (00001112-0000-1000-8000-00805f9b34fb)
-UUID: Audio Source              (0000110a-0000-1000-8000-00805f9b34fb)
-UUID: OBEX File Transfer        (00001106-0000-1000-8000-00805f9b34fb)
-Modalias: usb:v1D6Bp0246d0538
-Discovering: no
-Roles: central
-Roles: peripheral
-Advertising Features:
-ActiveInstances: 0x00 (0)
-SupportedInstances: 0x01 (1)
-SupportedIncludes: tx-power
-SupportedIncludes: appearance
-SupportedIncludes: local-name
-SupportedSecondaryChannels: 1M
-SupportedSecondaryChannels: 2M
-SupportedSecondaryChannels: Coded
-
-> --
-> Ryan Walmsley
+> ---Test result---
 >
-> Engineer
+> ##############################
+> Test: CheckPatch - PASS
 >
-> Pi Supply Unit 4 Bells Yew Green Business Court,
-> Bells Yew Green, East Sussex, TN3 9BJ, United Kingdom
+> ##############################
+> Test: CheckGitLint - PASS
+>
+> ##############################
+> Test: CheckBuild - PASS
+>
+> ##############################
+> Test: MakeCheck - PASS
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
