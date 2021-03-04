@@ -2,170 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 912D0C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 13:10:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E343C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 13:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52BBF60200
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 13:10:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63C8464F04
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Mar 2021 13:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241145AbhCDNJj (ORCPT
+        id S241154AbhCDNKL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Mar 2021 08:09:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:43478 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241138AbhCDNJT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Mar 2021 08:09:19 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2A3BE60200;
-        Thu,  4 Mar 2021 13:08:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1614863318;
-        bh=2QR5McJgn4rfMKUP2x+w+ee1woXk/Fx6uAArQBOUhZk=;
-        h=Date:From:To:cc:Subject:From;
-        b=KXr20cgjKyUOLfbRMXjPhr3ZbvtClRo2LROxYyA69BgHWZgiSTBe4yeibbupe5u8n
-         3k9e6iKZlMYYk6+5SV741lDisVHEmRD2TZbj4pcZwkAe5wTVfiWZ+Cp+G3jLz/RvkY
-         Uix2yjpgKW0x1yGC1s9/CvkPDr1p3Q1//Ycn1rl5mkSRRshQe7JSN1lvvilR9qlPDU
-         Ybxh2SSD/kd2rZSiArP3/zV5s9VomvD5LbTOrCRSB3K8GRznrVxFVddmSP3aFoyNaj
-         61iCgtEudFdm7wP4LqsusR4rMlHvYGcGZ9tPdM6fbbuy0i+4GFfzZb4ms3h6gVEjOK
-         /Bq5TBP/K7COQ==
-Date:   Thu, 4 Mar 2021 14:08:34 +0100 (CET)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Lockdep report for hci_conn_get_phy()
-Message-ID: <nycvar.YFH.7.76.2103041405420.12405@cbobk.fhfr.pm>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+        Thu, 4 Mar 2021 08:10:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241169AbhCDNKL (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Mar 2021 08:10:11 -0500
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3C0CC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Mar 2021 05:09:30 -0800 (PST)
+Received: by mail-qt1-x82d.google.com with SMTP id 2so11202355qtw.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 04 Mar 2021 05:09:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=h87GCathDQNmtPjMc6wSJepGMItAUTKlBX624UWwxGI=;
+        b=EYfIDgNp4/XgEdhw8CiGLZT1FdU3jMz32kGdjWRQCdMXD1oXd7HS6eirqpWNDZtOu8
+         4n+pxy90gu5W9V6uYhniSamhgIhP1kjq2zv6G0v2SbQTbTiUD7S1BlW8HIunWhFY33Yi
+         1AoeDefk9ylIWQc7ICIZVVR9SkEE7KOusW0bcrtqbNvL3E0dHq/ZPl1F4AvJ4NZer5Mo
+         JWPMfTZl7h8sw2u0yPwV3SGli/wpVvm4vOj+a/yEgxPl1E7NYFfez4hgv/0nJ20wBxx0
+         T9h3slP9zrNJ7kA1byD1a+hAd5w2Gf6VtKmVVZqXdYPjdZ9hnOBH9gS6Cj39Dqb1Ji+Z
+         yQ5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=h87GCathDQNmtPjMc6wSJepGMItAUTKlBX624UWwxGI=;
+        b=JAIfb2QcZ+ZrfKWvvt6BGRRbtzqn0s7BNJUPESiwce0LaiIT8eDBVZVbDK8wQKIHaQ
+         fyte4sMGWmPqIAGzV3WsFNmfTio/YVe+mOp79BtMnUYJIwElPQ2z68/QZvEcmxHigpgV
+         kzoC4St06IbT79dyA+sdUytpyH/jtOuwK4PgEDPZmxmz7lWoECKvoITIFjCIkd8x9TBi
+         9GTTeG9MnfNUXQboc03Xmzy+NT/zzX45Xv6+RPBFlhSfC8D7q5D9aN5F7lsT6MFQzFSx
+         /Qnl6fPOLilUZjUojTdPyIIfSq/DYWTMRawZok+wvt8za7zpgUyvUneie9G+GkpyJJXc
+         4Rww==
+X-Gm-Message-State: AOAM532lFZuNCGCMmD6GVVetcxSdiC4cwzkUBp9zynHN1G3loKJnabc9
+        I6N4gnpctJyMD46vYXwTBckWcK7SOtgjMQ==
+X-Google-Smtp-Source: ABdhPJwEGm1kTpzAIyvA2AT4EHJMLuNc01USF4xHLk6zt7D5JMZHM07Ia3yEZLOvzV7Eoq3pYNOOSA==
+X-Received: by 2002:ac8:5390:: with SMTP id x16mr3897420qtp.194.1614863369374;
+        Thu, 04 Mar 2021 05:09:29 -0800 (PST)
+Received: from [172.17.0.2] ([52.254.50.13])
+        by smtp.gmail.com with ESMTPSA id x14sm17707578qtq.47.2021.03.04.05.09.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 04 Mar 2021 05:09:28 -0800 (PST)
+Message-ID: <6040dc08.1c69fb81.88693.e0fa@mx.google.com>
+Date:   Thu, 04 Mar 2021 05:09:28 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3257602178730776163=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hadess@hadess.net
+Subject: RE: [1/3] build: Add warnings for non-literal strings
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210304124851.219154-1-hadess@hadess.net>
+References: <20210304124851.219154-1-hadess@hadess.net>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+--===============3257602178730776163==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-I am getting the lockdep splat below with current Linus' tree (5.12-rc1). 
-I haven't yet analyzed the dependency chain and the code, but sending out 
-early in case someone has seen this before and analyzed / fixed it 
-already.
+This is automated email and please do not reply to this email!
 
-Thanks.
+Dear submitter,
 
- ======================================================
- WARNING: possible circular locking dependency detected
- 5.12.0-rc1-00026-g73d464503354 #10 Not tainted
- ------------------------------------------------------
- bluetoothd/1118 is trying to acquire lock:
- ffff8f078383c078 (&hdev->lock){+.+.}-{3:3}, at: hci_conn_get_phy+0x1c/0x150 [bluetooth]
- 
- but task is already holding lock:
- ffff8f07e831d920 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: l2cap_sock_getsockopt+0x8b/0x610 
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=442025
 
- 
- which lock already depends on the new lock.
+---Test result---
 
- 
- the existing dependency chain (in reverse order) is:
- 
- -> #3 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}:
-        lock_sock_nested+0x72/0xa0
-        l2cap_sock_ready_cb+0x18/0x70 [bluetooth]
-        l2cap_config_rsp+0x27a/0x520 [bluetooth]
-        l2cap_sig_channel+0x658/0x1330 [bluetooth]
-        l2cap_recv_frame+0x1ba/0x310 [bluetooth]
-        hci_rx_work+0x1cc/0x640 [bluetooth]
-        process_one_work+0x244/0x5f0
-        worker_thread+0x3c/0x380
-        kthread+0x13e/0x160
-        ret_from_fork+0x22/0x30
- 
- -> #2 (&chan->lock#2/1){+.+.}-{3:3}:
-        __mutex_lock+0xa3/0xa10
-        l2cap_chan_connect+0x33a/0x940 [bluetooth]
-        l2cap_sock_connect+0x141/0x2a0 [bluetooth]
-        __sys_connect+0x9b/0xc0
-        __x64_sys_connect+0x16/0x20
-        do_syscall_64+0x33/0x80
-        entry_SYSCALL_64_after_hwframe+0x44/0xae
- 
- -> #1 (&conn->chan_lock){+.+.}-{3:3}:
-        __mutex_lock+0xa3/0xa10
-        l2cap_chan_connect+0x322/0x940 [bluetooth]
-        l2cap_sock_connect+0x141/0x2a0 [bluetooth]
-        __sys_connect+0x9b/0xc0
-        __x64_sys_connect+0x16/0x20
-        do_syscall_64+0x33/0x80
-        entry_SYSCALL_64_after_hwframe+0x44/0xae
- 
- -> #0 (&hdev->lock){+.+.}-{3:3}:
-        __lock_acquire+0x147a/0x1a50
-        lock_acquire+0x277/0x3d0
-        __mutex_lock+0xa3/0xa10
-        hci_conn_get_phy+0x1c/0x150 [bluetooth]
-        l2cap_sock_getsockopt+0x5a9/0x610 [bluetooth]
-        __sys_getsockopt+0xcc/0x200
-        __x64_sys_getsockopt+0x20/0x30
-        do_syscall_64+0x33/0x80
-        entry_SYSCALL_64_after_hwframe+0x44/0xae
- 
- other info that might help us debug this:
+##############################
+Test: CheckPatch - PASS
 
- Chain exists of:
-   &hdev->lock --> &chan->lock#2/1 --> sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP
-  Possible unsafe locking scenario:
+##############################
+Test: CheckGitLint - FAIL
+Output:
+build: Add warnings for non-literal strings
+3: B6 Body message is missing
 
-        CPU0                    CPU1
-        ----                    ----
-   lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-                                lock(&chan->lock#2/1);
-                                lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
-   lock(&hdev->lock);
- 
-  *** DEADLOCK ***
+obex: Work-around compilation failure
+4: B1 Line exceeds max length (123>80): "obexd/plugins/bluetooth.c:310:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]"
+7: B1 Line exceeds max length (123>80): "obexd/plugins/bluetooth.c:314:7: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]"
 
- 1 lock held by bluetoothd/1118:
-  #0: ffff8f07e831d920 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: l2cap_sock_getsockopt+0x8b/0x610 [bluetooth]
- 
- stack backtrace:
- CPU: 3 PID: 1118 Comm: bluetoothd Not tainted 5.12.0-rc1-00026-g73d464503354 #10
- Hardware name: LENOVO 20K5S22R00/20K5S22R00, BIOS R0IET38W (1.16 ) 05/31/2017
- Call Trace:
-  dump_stack+0x7f/0xa1
-  check_noncircular+0x105/0x120
-  ? __lock_acquire+0x147a/0x1a50
-  __lock_acquire+0x147a/0x1a50
-  lock_acquire+0x277/0x3d0
-  ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
-  ? __lock_acquire+0x2e1/0x1a50
-  ? lock_is_held_type+0xb4/0x120
-  ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
-  __mutex_lock+0xa3/0xa10
-  ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
-  ? lock_acquire+0x277/0x3d0
-  ? mark_held_locks+0x49/0x70
-  ? mark_held_locks+0x49/0x70
-  ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
-  hci_conn_get_phy+0x1c/0x150 [bluetooth]
-  l2cap_sock_getsockopt+0x5a9/0x610 [bluetooth]
-  __sys_getsockopt+0xcc/0x200
-  __x64_sys_getsockopt+0x20/0x30
-  do_syscall_64+0x33/0x80
-  entry_SYSCALL_64_after_hwframe+0x44/0xae
- RIP: 0033:0x7fb73df33eee
- Code: 48 8b 0d 85 0f 0c 00 f7 d8 64 89 01 48 83 c8 ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 49 89 ca b8 37 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 52 0f 0c 00 f7 d8 64 89 01 48
- RSP: 002b:00007fffcfbbbf08 EFLAGS: 00000203 ORIG_RAX: 0000000000000037
- RAX: ffffffffffffffda RBX: 0000000000000019 RCX: 00007fb73df33eee
- RDX: 000000000000000e RSI: 0000000000000112 RDI: 0000000000000018
- RBP: 0000000000000000 R08: 00007fffcfbbbf44 R09: 0000000000000000
- R10: 00007fffcfbbbf3c R11: 0000000000000203 R12: 0000000000000000
- R13: 0000000000000018 R14: 0000000000000000 R15: 0000556fcefc70d0
+tools/mesh-cfglient: Work-around compilation failure
+4: B1 Line exceeds max length (121>80): "tools/mesh-cfgclient.c:543:10: error: format not a string literal, argument types not checked [-Werror=format-nonliteral]"
 
 
--- 
-Jiri Kosina
-SUSE Labs
+##############################
+Test: CheckBuild - PASS
 
+##############################
+Test: MakeCheck - PASS
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3257602178730776163==--
