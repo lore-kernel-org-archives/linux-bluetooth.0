@@ -2,69 +2,71 @@ Return-Path: <SRS0=2LFz=ID=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB0DC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 22:26:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E9FEC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 23:00:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D994650B2
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 22:26:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 39AFC6509B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 23:00:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229701AbhCEWZz (ORCPT
+        id S230046AbhCEXAX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Mar 2021 17:25:55 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52138 "EHLO
+        Fri, 5 Mar 2021 18:00:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbhCEWZr (ORCPT
+        with ESMTP id S230027AbhCEXAH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Mar 2021 17:25:47 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AAF3C06175F
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Mar 2021 14:25:47 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id g20so2143125plo.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Mar 2021 14:25:47 -0800 (PST)
+        Fri, 5 Mar 2021 18:00:07 -0500
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73B9DC06175F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Mar 2021 15:00:07 -0800 (PST)
+Received: by mail-pj1-x1029.google.com with SMTP id m8so40176pjs.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Mar 2021 15:00:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=GLSACR2rGLj4GMP/8Poeu6HCwTLgbb1l/hD8kBqfPT0=;
-        b=g74B9Z58w/NbMw7a6gl/r2a3TdKqOT5LEvff1DF7gS8N7RVoVIImEX0IXLaEOWrfck
-         BKeVNMWVc0Ctx3JfbrzbfceVa28Zi4E0+smC5mAt22T2keemUC3Idw3cbdGe894rcU98
-         TT6Jn+ZeB6dxQUSwEspwANxoJFh+FePdsrV3m8YVTLWn2RbvE6Z4S/zeiQb6k2IGAODr
-         NzLt27y/KXX2/mwT/LqXaFIsM3yiF/7Kl49Z8ojm7F/5Qe6xq+mc5Wuy2aJFUnVYRfP4
-         OpU6J33PM/SvQdSC4b2NBfD/AMTUVRGsvQgPGgtxrtjMotsLzjbeRUf0dDu4faMOofyp
-         wwng==
+        bh=GDtOAbNEiMQsJu7rqlIJ8wTu/VMRVhdyIetw5QxZ5Uo=;
+        b=oBtzh/4BHtrxwmtKLZ2fS8csf+arlSwc6OM7t3u8eTngBH4y1/wr7d2qtp8KvoXWix
+         N6mEKsZLLRDjRo7x9tY53JsDxKjYp2kUW/BM9HC0S4K/dWmjVGocXj4pS2RyO7QQDv2/
+         oPGc82+Cm8/faOKkYi2MZToOEm2CA4kUU7zq2dAqdyX7mzgsN9fOOvLWEM5VEV09kvXn
+         4nPjgxWQKtfFT0iG3NcLMK2IdA8H6ug+ELvZ+cpitk0B+HAlAbM4161BGM7znssyXlyz
+         HRX6eBhCRpK5kQIhc2l+nWWgsq7t6K7ouT+ESwDzlpys2sVu0LIq+zrOkSiNBJv6goOS
+         J3Ug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GLSACR2rGLj4GMP/8Poeu6HCwTLgbb1l/hD8kBqfPT0=;
-        b=At+4wltAGINMFpQERb/0ifY3XFeCAyGJoqDE7/KGOXdQj6rqwaJcUAuLyV1ceQHk7w
-         4eIPpZkiGmas/K0ItF0yVhE1UZN28FnlUoprInVfA+8L4PUDuHBHeYDmysvBk3EJsCr+
-         VQ95iI+F1WZmUiuPdLs1HKGJj/KI0VLtnUGJkM7ie8CKVj01yFXLk72HlnnvIrJDLbiG
-         /6CBn2WDkyxEVF7g+Qiat2U6hJao4dFglI6gZwNPOsqbR4u77fhYsOw4z7gjiRRvjdxg
-         AvrRqgYfzjxRSkYD9SuTtUrOROno17iKlj0e8VsaWTXppUgfEnWjZMPt3tX4M8MzgUuK
-         Rt9g==
-X-Gm-Message-State: AOAM53371TDmiHzjbyjEkGLqBRn7ydSwdE0VGQB2eoRb4D2z/Fpe8HEF
-        bK4Ig5jN9t2b86Rp3U/NM/Sg7KY3RtB3+g==
-X-Google-Smtp-Source: ABdhPJwNTGuKIb4cRMWnTM0/l8150TNEKWvaOcMeiXuG3Cpd4DpPTngqfOjDBEKij83vTMdlZcL3hA==
-X-Received: by 2002:a17:902:503:b029:e4:2ce1:f0c9 with SMTP id 3-20020a1709020503b02900e42ce1f0c9mr10334689plf.52.1614983146404;
-        Fri, 05 Mar 2021 14:25:46 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=GDtOAbNEiMQsJu7rqlIJ8wTu/VMRVhdyIetw5QxZ5Uo=;
+        b=BbGMlAIFxfsaizDvp1oXGpLu+tIqcGhHvvml5LMQ+/DPZ5Pxpig0Z05/ukX0+5EnxP
+         lNTPIn0hfvMrbwQJwMhDyCz/e1ZtdRyXvpV3ovDJlopndZVc9ubHRX72g9taryBUrvDH
+         DgiqdKhEmjJW1yLY2b6e1h/YRNCeXaJIZJFPg43n7lLmIGFu47LMsgAaIOQE010dHLlB
+         BJEhvhaR2cnNHMAidQWySTjq6M2HxC0ONox12T3VtcejgkSvtlmF73gOvkpOM/ngoEqT
+         ie5gHMu84e2egrA0UFHUhColLWo13J7X0vIFyOWn449mPB5X0O4jBLfyzh81vdFmUD3J
+         fZxA==
+X-Gm-Message-State: AOAM531iUCmve5lIjBoKlA/yD1x1+UduGRwtqdD0MJAMbwZTyvF8IXsk
+        Zalhw3XCzHL0f9pixCK/Gkt9sI5Gs0sdyA==
+X-Google-Smtp-Source: ABdhPJzMDlrCnXaUVGUEzZedynEqVOHmggldBO+NfdwZ6tvABBeH4UrHlhnAmyLIQrTxoqlxAlHI1w==
+X-Received: by 2002:a17:90a:5417:: with SMTP id z23mr12324518pjh.111.1614985206840;
+        Fri, 05 Mar 2021 15:00:06 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id gw20sm3106893pjb.3.2021.03.05.14.25.45
+        by smtp.gmail.com with ESMTPSA id e1sm3483546pfi.175.2021.03.05.15.00.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 05 Mar 2021 14:25:46 -0800 (PST)
+        Fri, 05 Mar 2021 15:00:06 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] gatt: Fix registering DIS without a valid source
-Date:   Fri,  5 Mar 2021 14:25:44 -0800
-Message-Id: <20210305222544.4005053-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] gatt: Fix registering DIS without a valid source
+Date:   Fri,  5 Mar 2021 15:00:04 -0800
+Message-Id: <20210305230004.4010887-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.29.2
+In-Reply-To: <20210305230004.4010887-1-luiz.dentz@gmail.com>
+References: <20210305230004.4010887-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -76,24 +78,21 @@ From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 If source has not been set don't register DIS as it would not contain
 any useful information and by doing this it actually allows systems to
 register their own DIS instance.
-
-Fixes https://github.com/bluez/bluez/issues/101
 ---
- src/gatt-database.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
+ src/gatt-database.c | 19 ++++++++-----------
+ 1 file changed, 8 insertions(+), 11 deletions(-)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index bd5864bcd..6c9e19ff3 100644
+index bd5864bcd..be6dfb265 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
-@@ -1241,22 +1241,23 @@ static void device_info_read_pnp_id_cb(struct gatt_db_attribute *attrib,
+@@ -1241,22 +1241,22 @@ static void device_info_read_pnp_id_cb(struct gatt_db_attribute *attrib,
  static void populate_devinfo_service(struct btd_gatt_database *database)
  {
  	struct gatt_db_attribute *service;
 +	struct gatt_db_attribute *attrib;
  	bt_uuid_t uuid;
  
-+	/* Only register DIS if source has been set */
 +	if (!btd_opts.did_source)
 +		return;
 +
@@ -117,6 +116,18 @@ index bd5864bcd..6c9e19ff3 100644
  
  	gatt_db_service_set_active(service, true);
  
+@@ -1267,10 +1267,7 @@ static void register_core_services(struct btd_gatt_database *database)
+ {
+ 	populate_gap_service(database);
+ 	populate_gatt_service(database);
+-
+-	if (btd_opts.did_source > 0)
+-		populate_devinfo_service(database);
+-
++	populate_devinfo_service(database);
+ }
+ 
+ static void conf_cb(void *user_data)
 -- 
 2.29.2
 
