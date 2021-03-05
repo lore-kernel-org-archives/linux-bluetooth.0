@@ -2,106 +2,130 @@ Return-Path: <SRS0=2LFz=ID=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 11B35C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20507C433E0
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 23:53:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7427650B1
+	by mail.kernel.org (Postfix) with ESMTP id EA0AC650B5
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Mar 2021 23:53:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229976AbhCEXwk (ORCPT
+        id S230007AbhCEXwl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Mar 2021 18:52:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42448 "EHLO
+        Fri, 5 Mar 2021 18:52:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229714AbhCEXwX (ORCPT
+        with ESMTP id S229972AbhCEXw3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Mar 2021 18:52:23 -0500
+        Fri, 5 Mar 2021 18:52:29 -0500
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E350C06175F
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Mar 2021 15:52:23 -0800 (PST)
-Received: by mail-yb1-xb49.google.com with SMTP id n10so4225339ybb.12
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Mar 2021 15:52:23 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA4B4C06175F
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Mar 2021 15:52:28 -0800 (PST)
+Received: by mail-yb1-xb49.google.com with SMTP id l10so4308454ybt.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Mar 2021 15:52:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=sender:date:message-id:mime-version:subject:from:to:cc;
-        bh=O8D9yjp5NrnAmw7mHxxnVW7HVXLeeetf18uRfkud3OI=;
-        b=ZyZrOh/J9NsRzKFUIsP2sZPIh3dFppXkeZViXNrU86cwVNGIGUk7EMVayoe11DMhfI
-         /oy0tr7AGSc+5ta76e4fbKDPWAgTEgzsP4p25+6kEGP/J0M8VsJqCrE4aH4gJv70eB3E
-         T7QmiKSTct183Ptl9Mey4aJTHt8LsfxhFicbb/NhnwGU6wxX3woK4gyN+JLrRqEgfPAz
-         EYcb80nFaoprxh40+zC5gPnGxEGRswhfg/agjwnQ465W7Tj6GGZuhiWQb7zMZKAjTWvw
-         CgnvFMnhmbrrNLhEX7dw6udDUyHm7S0Ss5oMHOPoJ6Dv9ZYW27A5clA7GhNeyb9+b2gH
-         WM9g==
+        h=sender:date:in-reply-to:message-id:mime-version:references:subject
+         :from:to:cc;
+        bh=JCTB0flAHIiTjBr3HF9i0mcV0r9v1jIF+xjdrPpa554=;
+        b=F93N82ZsdvnQtbsS61zG8vWx9O9iRuTMamFMdS1E++9oy6xINuSmCrri29huTG5zkq
+         tF05ohehPyFhlqOtERFRvU6uId05RqPszA1KYbnDMKRvsiMSmAL348ZV5PHEWmk2U6l1
+         /fP0nheoDt5gCqJLnMwDBYCbZhXi4vho2Cfoe63SK+dq24HPwetZ/0el1nBoN0dpnPN0
+         bdV1Kq2gdwWQgDE9I8q6rIX1D7l1H+RrJMhESVk83fV97J83yRckSKSEVeiSmmBCF5z2
+         LhD+vlKq/kZmVpbhIa8t0IN/ydcCS74CmV7uo7NR13qv1IxNoLomjNNZ0Kmh2RVGLNnt
+         GEfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:date:message-id:mime-version:subject:from
-         :to:cc;
-        bh=O8D9yjp5NrnAmw7mHxxnVW7HVXLeeetf18uRfkud3OI=;
-        b=S9zHkR3kO/GIQXwfzvf267RhhyjVq2/sJgUVa6QWUzk/hnmS52cv5UlIB/QBSxFhcP
-         75iro2msi1COCxK5AXt1ztdcZt91i3o/tNCQyWJ+NfLXMuPjtLg0kJeajpIruCoQstbF
-         Tn8i6L7PmzMGKVoJMA+EqynHoa7dhGAJmcPHC5W2G5JCmF/QyA/YWWmNKaavBxUjJdfe
-         7QDIxMCpIBrjhQWh1nX+8+5EmNc/tgfE/2IPv7cr5hK3Lu0kR2hKYU6MOWhjtNeeh+Lp
-         w8oOn9JRyVitibsSpTVm50D0H/OIpXQWp8i4mOHSbXL5I3gX4YQSNO1OodZkz0quHZSw
-         xrow==
-X-Gm-Message-State: AOAM533hCI9fhlaQjoge7rhzkQmu9MoPtB/VfJ42l5WoCkZ0xk50VluF
-        BTCTs69nwqIE2HUZ8FwP2SJ5fuJ3QVn99dxJrjsJi+ixq8RzFdDipPUUbp87ULsg8lMwOfiNSS8
-        iIFsLqNUM7ub8p/+JtacGceQ2yMFjmV/nwRN4NSutZG7Iqf1R1+tSWelE9HhHIgbtp/WRG6ZzXP
-        DY5z/AZ8XibplDsjyo
-X-Google-Smtp-Source: ABdhPJxpiiGAPCQnseluXOA+2V7pNEMf4TwNsTN92H+a3g2p1sbLm2TW0K1LupxKvVl2TnwdL/EFJal7dXRi2I2sDOoO
+        h=x-gm-message-state:sender:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=JCTB0flAHIiTjBr3HF9i0mcV0r9v1jIF+xjdrPpa554=;
+        b=Gha1vZbcsaGLVN9SdLUb6RFZdpO6wCqD83yJKMf6tm+wEveB9lqxrCbn4QKyQ5dPSd
+         j4WA367GiXh99DWd4XjwMAPQdxgx2ZsxiDp+34f4V113YQco6OzH3Qrtu23JVlisu6X0
+         3E91SaapCgI0kslxhuypvZK613J0IUT4kzjtWygHVLtq89jLNoBVI6GFcmx9tsXHFZKj
+         zQGCJQUAhA8pT520QExOXkB0pbJsT84a/aenVX66vue4lr+Ikn6405l35mOT3kGJld4g
+         lnhxQbROvuTp2yDMCW+2z3xc2G+pSaFGzPZvZmEVdrPEC7St+46J79sZCmn/opCIVIil
+         d0Ng==
+X-Gm-Message-State: AOAM5323jKMqFslP8rEstuagXmkBRc7hyJaGgfzTqvvu6IcJ7OySUW+o
+        99j5a6TGZzKEwcEcUqCiAZIU8zous+FOqAG3MTb70++0ImfSjg9IuYiqkgNNSokHCjKKFR9g5y0
+        sKQ5ewJwiQFDydYQ+RycLA2S6LnUlGGw8sbnRfQsmsOTUml6Y1i4yGuEii8va/rbVEtTPFnLu0f
+        2o3kSomQ3netpI2VVi
+X-Google-Smtp-Source: ABdhPJxQf3TqPID8DT62iE1azdzACdSUa4z39fEx/xl4XGTgT39JZUrj7hnBwTI6pRyAge/XaSeDAZfUvWP7iFeNJxgj
 Sender: "danielwinkler via sendgmr" 
         <danielwinkler@danielwinkler-linux.mtv.corp.google.com>
 X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:94dd:309a:2fcb:13a])
- (user=danielwinkler job=sendgmr) by 2002:a25:dfcc:: with SMTP id
- w195mr17606349ybg.210.1614988342293; Fri, 05 Mar 2021 15:52:22 -0800 (PST)
-Date:   Fri,  5 Mar 2021 15:52:14 -0800
-Message-Id: <20210305235217.2382976-1-danielwinkler@google.com>
+ (user=danielwinkler job=sendgmr) by 2002:a25:a441:: with SMTP id
+ f59mr17873902ybi.245.1614988348010; Fri, 05 Mar 2021 15:52:28 -0800 (PST)
+Date:   Fri,  5 Mar 2021 15:52:17 -0800
+In-Reply-To: <20210305235217.2382976-1-danielwinkler@google.com>
+Message-Id: <20210305155113.Bluez.v3.3.Ieb6522963e3f54b0d63dd88ed3ce24a8942ed73e@changeid>
 Mime-Version: 1.0
+References: <20210305235217.2382976-1-danielwinkler@google.com>
 X-Mailer: git-send-email 2.30.1.766.gb4fecdf3b7-goog
-Subject: [Bluez PATCH v3 0/3] Expose extended adv feature support via bluez API
+Subject: [Bluez PATCH v3 3/3] doc/advertising-api: Add adv SupportedFeatures
+ to doc
 From:   Daniel Winkler <danielwinkler@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>
+        Daniel Winkler <danielwinkler@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Maintainers,
+Add supported features to advertising dbus api.
 
-I believe this series fell through the cracks. It is listed on
-patchworks as "Accepted", but I have not been able to find it in the
-tree. I am re-posting it here, please advise if I am mistaken.
-
-This change adds a SupportedFeatures member to the LEAdvertisingManager
-interface, which allows us to expose support for hardware offloading and
-setting TX power on advertisements.
-
-Best,
-Daniel
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
 
 Changes in v3:
 - Rebased onto master
 
 Changes in v2:
-- Expose empty SupportedFeatures if no support available
 - Doc: Expect empty SupportedFeatures if no support available
 
-Daniel Winkler (3):
-  advertising: Add SupportedFeatures to LEAdvertisingManager1
-  client: Add adv SupportedFeatures to bluetoothctl
-  doc/advertising-api: Add adv SupportedFeatures to doc
+ doc/advertising-api.txt | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
- client/main.c           |  1 +
- doc/advertising-api.txt | 20 +++++++++++++++++++
- lib/mgmt.h              |  2 ++
- src/advertising.c       | 43 +++++++++++++++++++++++++++++++++++++++--
- 4 files changed, 64 insertions(+), 2 deletions(-)
-
+diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
+index 541c57004..ba9eacaae 100644
+--- a/doc/advertising-api.txt
++++ b/doc/advertising-api.txt
+@@ -235,6 +235,7 @@ Properties	byte ActiveInstances
+ 					 "2M"
+ 					 "Coded"
+ 
++
+ 		dict SupportedCapabilities [Experimental]
+ 
+ 			Enumerates Advertising-related controller capabilities
+@@ -257,3 +258,22 @@ Properties	byte ActiveInstances
+ 				int16 MaxTxPower
+ 
+ 					Max advertising tx power (dBm)
++
++
++		array{string} SupportedFeatures [readonly, optional]
++
++			List of supported platform features. If no features
++			are available on the platform, the SupportedFeatures
++			array will be empty.
++
++			Possible values: "CanSetTxPower"
++
++						Indicates whether platform can
++						specify tx power on each
++						advertising instance.
++
++					 "HardwareOffload"
++
++						Indicates whether multiple
++						advertising will be offloaded
++						to the controller.
 -- 
 2.30.1.766.gb4fecdf3b7-goog
 
