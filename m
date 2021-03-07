@@ -2,123 +2,105 @@ Return-Path: <SRS0=Ypkk=IF=vger.kernel.org=linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E831FC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Mar 2021 07:35:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BEFCC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Mar 2021 09:16:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3FCD6511D
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Mar 2021 07:35:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3C5465136
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  7 Mar 2021 09:16:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230247AbhCGHes (ORCPT
+        id S231314AbhCGJPi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 7 Mar 2021 02:34:48 -0500
-Received: from mail-io1-f71.google.com ([209.85.166.71]:38807 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230200AbhCGHeO (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 7 Mar 2021 02:34:14 -0500
-Received: by mail-io1-f71.google.com with SMTP id x9so2991056iob.5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 06 Mar 2021 23:34:14 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=WBQ/EAYCbN0tLwutD0WrUqw4VY+LDOs0Bm/BlJkcyZw=;
-        b=kvPRcS3DfILBMi/hCgbLn8FaDUDqexd1zHB0HY0a657EfF/0Fp8a7Modce/e23pD0j
-         KwW8u5qWpbusyLzYZBaQlSxZgd2zyrrDU45Nqwmq/M9O2huW2DmdMRiXG2LfO//0WPkt
-         quZ2RGJBo9VTk4K+XgBpN4UXVoTWMKXNx4t4hkuGNy4B6WSJB5PhiAJn6oYD45uoUCUg
-         r29rB4kfyXiZtgH0e02NhGjBx18dK+QuXBguETd0bmtiBtodkInur3RKyLyS1B3NOiFq
-         ZwvBy/GdQt/JlRZSDB/80opId6JqAaAKShG/wxxErSVn8rkG4ouRpK2FKV5dX9eUSfzS
-         IFMA==
-X-Gm-Message-State: AOAM533wwkbOdowmrX+M3kD6ozKWmjOyAfF/fi6H1No38M3ZN3KsESl2
-        JzlDv7QyTXN94gAqECGiP2KF8PezH/lklHJb/yw+kV/yNwX5
-X-Google-Smtp-Source: ABdhPJxgpQsWEf/5SsXz2WjydRJQf7N1i7LbrLl4oJ4qPP87uszQI27mICsw3SfpRxX5NWE55yvfpjnWIDsS5dHGrBwN3xXTqjmd
-MIME-Version: 1.0
-X-Received: by 2002:a6b:db15:: with SMTP id t21mr14298466ioc.133.1615102454214;
- Sat, 06 Mar 2021 23:34:14 -0800 (PST)
-Date:   Sat, 06 Mar 2021 23:34:14 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000000f35a405bced58e3@google.com>
-Subject: [syzbot] general protection fault in bt_accept_unlink (2)
-From:   syzbot <syzbot+582be673ab4f59f68c5e@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Sun, 7 Mar 2021 04:15:38 -0500
+Received: from mga11.intel.com ([192.55.52.93]:53411 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230451AbhCGJPX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 7 Mar 2021 04:15:23 -0500
+IronPort-SDR: P7B3jWvVic6qWGBWkwNG1mJsB5xefG7DsG+BPfWvSrSvbMtTLvoBDTYRmqmdKi0oRrilwdiRzX
+ uIdJ9zugPElA==
+X-IronPort-AV: E=McAfee;i="6000,8403,9915"; a="184507820"
+X-IronPort-AV: E=Sophos;i="5.81,230,1610438400"; 
+   d="scan'208";a="184507820"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Mar 2021 01:15:18 -0800
+IronPort-SDR: prKT0yurHber87lbuoZfaF1wc/pWlOSpN3B58Gdutby3VZT7xVNtDq3gHDo9+Pu40An0nJP2l2
+ VUacK1EdhZXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.81,230,1610438400"; 
+   d="scan'208";a="429994479"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga004.fm.intel.com with ESMTP; 07 Mar 2021 01:15:17 -0800
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] monitor: Fix decoding Read Local Supported Codec Capabilities
+Date:   Sun,  7 Mar 2021 14:48:45 +0530
+Message-Id: <20210307091845.13269-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Codec capabilities wern't properly decoded due to wrong offset
 
-syzbot found the following issue on:
-
-HEAD commit:    95b39f07 net: ethernet: mtk-star-emac: fix wrong unmap in ..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=13658a5cd00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=e2d5ba72abae4f14
-dashboard link: https://syzkaller.appspot.com/bug?extid=582be673ab4f59f68c5e
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+582be673ab4f59f68c5e@syzkaller.appspotmail.com
-
-general protection fault, probably for non-canonical address 0xf7775c0000001777: 0000 [#1] PREEMPT SMP KASAN
-KASAN: maybe wild-memory-access in range [0xbbbb00000000bbb8-0xbbbb00000000bbbf]
-CPU: 0 PID: 6057 Comm: kworker/0:6 Not tainted 5.11.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-RIP: 0010:__list_del_entry_valid+0x81/0xf0 lib/list_debug.c:51
-Code: 0f 84 af d4 08 05 48 b8 22 01 00 00 00 00 ad de 49 39 c4 0f 84 b0 d4 08 05 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75 51 49 8b 14 24 48 39 ea 0f 85 67 d4 08 05 49 8d 7d
-RSP: 0018:ffffc90002bafb28 EFLAGS: 00010a06
-RAX: dffffc0000000000 RBX: ffff8880283424b8 RCX: 0000000000000000
-RDX: 1777600000001777 RSI: ffffffff87ebecff RDI: ffff8880283424c0
-RBP: ffff8880283424b8 R08: ffffffff8a7af760 R09: ffffffff87f99626
-R10: 0000000000000004 R11: 0000000000000005 R12: bbbb00000000bbbb
-R13: bb00000000000000 R14: ffff888028341020 R15: 0000000000000005
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000002349848 CR3: 0000000018f19000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- __list_del_entry include/linux/list.h:132 [inline]
- list_del_init include/linux/list.h:204 [inline]
- bt_accept_unlink+0x35/0x2f0 net/bluetooth/af_bluetooth.c:187
- l2cap_sock_teardown_cb+0x197/0x660 net/bluetooth/l2cap_sock.c:1542
- l2cap_chan_del+0xbc/0xa80 net/bluetooth/l2cap_core.c:618
- l2cap_chan_close+0x1bc/0xaf0 net/bluetooth/l2cap_core.c:823
- l2cap_chan_timeout+0x17e/0x2f0 net/bluetooth/l2cap_core.c:436
- process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
- kthread+0x3b1/0x4a0 kernel/kthread.c:292
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-Modules linked in:
----[ end trace 7d7f7782958a606a ]---
-RIP: 0010:__list_del_entry_valid+0x81/0xf0 lib/list_debug.c:51
-Code: 0f 84 af d4 08 05 48 b8 22 01 00 00 00 00 ad de 49 39 c4 0f 84 b0 d4 08 05 48 b8 00 00 00 00 00 fc ff df 4c 89 e2 48 c1 ea 03 <80> 3c 02 00 75 51 49 8b 14 24 48 39 ea 0f 85 67 d4 08 05 49 8d 7d
-RSP: 0018:ffffc90002bafb28 EFLAGS: 00010a06
-RAX: dffffc0000000000 RBX: ffff8880283424b8 RCX: 0000000000000000
-RDX: 1777600000001777 RSI: ffffffff87ebecff RDI: ffff8880283424c0
-RBP: ffff8880283424b8 R08: ffffffff8a7af760 R09: ffffffff87f99626
-R10: 0000000000000004 R11: 0000000000000005 R12: bbbb00000000bbbb
-R13: bb00000000000000 R14: ffff888028341020 R15: 0000000000000005
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f53667bf000 CR3: 000000002623d000 CR4: 00000000001506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-
-
+< HCI Command: Read Local Supported Codec Capabilities (0x04|0x000e) plen 7
+        Codec: A-law log (0x01)
+        Logical Transport Type: 0x01
+          Codec supported over BR/EDR ACL
+        Direction: Input (Host to Controller) (0x00)
+> HCI Event: Command Complete (0x0e) plen 18
+      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
+        Status: Success (0x00)
+        Number of codec capabilities: 3
+         Capabilities #0:
+        aa bb cc dd                                      ....
+         Capabilities #1:
+        11 22 33 44 55                                   ."3DU
+         Capabilities #2:
+        ff                                               .
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ monitor/packet.c | 12 ++++++------
+ 1 file changed, 6 insertions(+), 6 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/monitor/packet.c b/monitor/packet.c
+index fb265028c213..75b61d57aa7c 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -6032,23 +6032,23 @@ static void read_local_codec_caps_rsp(const void *data, uint8_t size)
+ 	print_status(rsp->status);
+ 	print_field("Number of codec capabilities: %d", rsp->num);
+ 
+-	data += sizeof(rsp);
+-	size -= sizeof(rsp);
++	data += sizeof(*rsp);
++	size -= sizeof(*rsp);
+ 
+ 	for (i = 0; i < rsp->num; i++) {
+ 		const struct bt_hci_codec_caps *caps = data;
+ 
+-		if (size < sizeof(caps)) {
++		if (size < sizeof(*caps)) {
+ 			print_field("Invalid capabilities: %u < %zu",
+-						size, sizeof(caps));
++						size, sizeof(*caps));
+ 			return;
+ 		}
+ 
+ 		print_field(" Capabilities #%u:", i);
+ 		packet_hexdump(caps->data, caps->len);
+ 
+-		data += caps->len;
+-		size -= caps->len;
++		data += 1 + caps->len;
++		size -= 1 + caps->len;
+ 	}
+ }
+ 
+-- 
+2.17.1
+
