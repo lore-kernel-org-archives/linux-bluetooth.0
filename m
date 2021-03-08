@@ -8,60 +8,59 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CCDF1C4332E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 18:37:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20674C433E9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 18:39:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8EEC165202
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 18:37:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3983652B7
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 18:39:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229646AbhCHSg2 (ORCPT
+        id S231202AbhCHSjI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Mar 2021 13:36:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54110 "EHLO
+        Mon, 8 Mar 2021 13:39:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230126AbhCHSgN (ORCPT
+        with ESMTP id S229646AbhCHSii (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Mar 2021 13:36:13 -0500
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0CBFC06174A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Mar 2021 10:36:13 -0800 (PST)
-Received: by mail-ot1-x333.google.com with SMTP id j22so4353408otp.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Mar 2021 10:36:13 -0800 (PST)
+        Mon, 8 Mar 2021 13:38:38 -0500
+Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69E6CC06174A
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Mar 2021 10:38:38 -0800 (PST)
+Received: by mail-oi1-x232.google.com with SMTP id z126so12010056oiz.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Mar 2021 10:38:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=IokpKDXy0gIiZadJsX6stztbVXLb8FYGSIlq5mkLaBg=;
-        b=dCyKxvkKzFnGbQ2FpHemgDl1i112MPz+RIdwPvbiZAlf8BXAhh16ae3rTCYMRgdVtT
-         GNKPbw0HuqSX4GkYHAnDXGw2ZswWhn73xC5ysstVnzx3rfbE8o/VXIyH0Qsv5G2URml6
-         Tu4f0vcGfCPf7sl5wpCkydiPAWDQq6xZ9bLv3+u+si80b+1GPlYe13N9vWI7Cvfq586b
-         mOcOhdEUU5hUSJbQU8oqD+Q6DO+mZ22aBbyl//6zpuJWMLxouWxcEWxdlTMuIpETdHcE
-         dVvOv+JYtWKPawfHyyCkj8dNIxxJb7ZTV0RbT99QT+UN4MoImNtZnNoO4IE+aQmcp3lb
-         uQwA==
+        bh=WVhzNT0R75Vb776in/lQfHHjf7gKVBYrk5VLjHEXNW0=;
+        b=NISlYcVpJPXaSBAysJs4yqTQ4/VKXIUlH6LVjJu0OERd4kgiNFYgk0YVSUYT8dmDJB
+         1i5mSgjTk1eitrIDEhq8snZd3Ylx3Vx3yLHQnK5kspyI/IHB41Jhdi5b+Mx5g62DI6Xs
+         ie1LSz69C/TadPQevMZwbioWQUNvK4rvNqtaWAawOml9g9LcODhgHO1lKOaxGeb63TF4
+         hL+FAnMlr9ldZyHIRrQ1FuGxiS742a95bvAkwpIlCDBHXFnQI4JPmTdpsmeHkEB4b72l
+         hHNRU4ED9D0Fk31hBiP2mnR+ZM+qshx1m0abroWXQXjMijrXRSMlJ+rqSzmeAB7+Y6bz
+         TBzA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=IokpKDXy0gIiZadJsX6stztbVXLb8FYGSIlq5mkLaBg=;
-        b=G/adcx8xlakCu4usUvksdXNwsQANqogaOT/jqzU3dGR1XpJIO7p5CbuvCZoVaT0rmg
-         jyiepT3jYTAcNTuHZ+sYUyBrOPnQBT4pV0GNQaJhksaw+IpH23Lhnjgc4HimqWZBkbGC
-         MpdQX8Y0WfUg12UQfmrszVJh2NmcRU7LYfRIlQ6CDgEY4HogCaR6DS0k+FetAWm5TLCK
-         A2f35BLpfAmG+ETV4NvhDeL7ICvlD/u/MTE6joBYBz5JLqPiFXhaLXiz7EM9YkoNxx6x
-         P1C2EqLrNhqCmzo6MXa7okpz/1wTg6ZQ1BHhbP1Mxl1ATcWuMnGRMfk49U4O8rKET5UL
-         AhOw==
-X-Gm-Message-State: AOAM530wgD/FXkbRVQLaqNnEk2QIV/30+8eecMt6gntkfV4LFfbT+2Xr
-        sy+TfkftNgTJ2F5SDBeQU8MNZpVSkZRpUFWS888=
-X-Google-Smtp-Source: ABdhPJy5HbFmNK4L/jUxoKY4FwK1RC6YuakpPTe8wLdDiOhKpsH612Jbx2YBQc7kRsORUpZsBDTyAm8ofYabEogK/NU=
-X-Received: by 2002:a9d:7b44:: with SMTP id f4mr21852803oto.240.1615228573079;
- Mon, 08 Mar 2021 10:36:13 -0800 (PST)
+        bh=WVhzNT0R75Vb776in/lQfHHjf7gKVBYrk5VLjHEXNW0=;
+        b=eMUELX4XTrEb2jiZb2wmhD6MwfNZ/9IXSE0eRSxDYFCzENGHoc1aJehfp/p9P0htTi
+         TdIIvgaVLpsJsNuTzHVhMPKtKIN4/96zvXZHINDLrVBGhu4ds9xg6p4b4A5Lt6vEfR9e
+         qV2FcLk73ccar5cX64RLxarm5Iuns6p+CTiM7QOUvx++SSU6PiOBXsUUSZResKdNh/vE
+         ROetxsPN7xZyAzp0JIJhGc6GExut0inUc0dkcpwnP7Uu1sI9M901EHvVAskqPwoQ0asa
+         6YMlRnJJ+ManKcz9r0F+/OOyxPqJcHodS9nnqP9k1eBL7IRW+wy9htJVLJFMp1kbiQ5H
+         zuaQ==
+X-Gm-Message-State: AOAM532i6Ua4C0f0d00J2GgJyAexp4hUy8nvAgvTU+9cvc0E7C7fiF3D
+        I4BW6pZEvvUuG1Lh1/395AmYSdS9ASiPqKraBgU=
+X-Google-Smtp-Source: ABdhPJwOi3RkT9nN17U22ctTkd2NuEgbmVshpsdiOuL8W6k+rCBz9TDzPVgjikHe5NiN1rtVWavEK0msWzJqz727Qjs=
+X-Received: by 2002:a54:468f:: with SMTP id k15mr162154oic.58.1615228717839;
+ Mon, 08 Mar 2021 10:38:37 -0800 (PST)
 MIME-Version: 1.0
-References: <20210305235217.2382976-1-danielwinkler@google.com> <20210305155113.Bluez.v3.3.Ieb6522963e3f54b0d63dd88ed3ce24a8942ed73e@changeid>
-In-Reply-To: <20210305155113.Bluez.v3.3.Ieb6522963e3f54b0d63dd88ed3ce24a8942ed73e@changeid>
+References: <20210305235217.2382976-1-danielwinkler@google.com> <20210305155113.Bluez.v3.1.Idf2f9f409a4df20b466ba723dd9b729275a5afbf@changeid>
+In-Reply-To: <20210305155113.Bluez.v3.1.Idf2f9f409a4df20b466ba723dd9b729275a5afbf@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 8 Mar 2021 10:36:02 -0800
-Message-ID: <CABBYNZKeiHhiro2tryrku=3vjWMXuBsWfGvgnJB6Ka-7orf-Pw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 3/3] doc/advertising-api: Add adv
- SupportedFeatures to doc
+Date:   Mon, 8 Mar 2021 10:38:27 -0800
+Message-ID: <CABBYNZLWOrzuY=WnAxxxyPK8Q4RxwBCA8qQRZO_wFOHcaswUHw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 1/3] advertising: Add SupportedFeatures to LEAdvertisingManager1
 To:     Daniel Winkler <danielwinkler@google.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         ChromeOS Bluetooth Upstreaming 
@@ -76,61 +75,111 @@ Hi Daniel,
 
 On Fri, Mar 5, 2021 at 3:59 PM Daniel Winkler <danielwinkler@google.com> wrote:
 >
-> Add supported features to advertising dbus api.
+> The new SupportedFeatures member tells advertising clients whether the
+> platform has hardware support for advertising or capability to set tx
+> power of advertisements.
+>
+> Additionally, fix small typo in "secondary_exists" function name.
+>
+> Change is tested on hatch and kukui chromebooks by using dbus-send to
+> verify that SupportedFeatures always exists, and is only populated when
+> extended advertising is available.
 >
 > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 > ---
 >
-> Changes in v3:
-> - Rebased onto master
->
+> Changes in v3: None
 > Changes in v2:
-> - Doc: Expect empty SupportedFeatures if no support available
+> - Expose empty SupportedFeatures if no support available
 >
->  doc/advertising-api.txt | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
+>  lib/mgmt.h        |  2 ++
+>  src/advertising.c | 43 +++++++++++++++++++++++++++++++++++++++++--
+>  2 files changed, 43 insertions(+), 2 deletions(-)
 >
-> diff --git a/doc/advertising-api.txt b/doc/advertising-api.txt
-> index 541c57004..ba9eacaae 100644
-> --- a/doc/advertising-api.txt
-> +++ b/doc/advertising-api.txt
-> @@ -235,6 +235,7 @@ Properties  byte ActiveInstances
->                                          "2M"
->                                          "Coded"
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index 76a03c9c2..c0021abd8 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -503,6 +503,8 @@ struct mgmt_rp_add_advertising {
+>  #define MGMT_ADV_FLAG_SEC_1M           (1 << 7)
+>  #define MGMT_ADV_FLAG_SEC_2M           (1 << 8)
+>  #define MGMT_ADV_FLAG_SEC_CODED                (1 << 9)
+> +#define MGMT_ADV_FLAG_CAN_SET_TX_POWER (1 << 10)
+> +#define MGMT_ADV_FLAG_HW_OFFLOAD       (1 << 11)
+>  #define MGMT_ADV_PARAM_DURATION                (1 << 12)
+>  #define MGMT_ADV_PARAM_TIMEOUT         (1 << 13)
+>  #define MGMT_ADV_PARAM_INTERVALS       (1 << 14)
+> diff --git a/src/advertising.c b/src/advertising.c
+> index 15a343e52..dd6008cb9 100644
+> --- a/src/advertising.c
+> +++ b/src/advertising.c
+> @@ -1616,7 +1616,8 @@ static void append_secondary(struct btd_adv_manager *manager,
+>         }
+>  }
 >
+> -static gboolean secondary_exits(const GDBusPropertyTable *property, void *data)
+> +static gboolean secondary_exists(const GDBusPropertyTable *property,
+> +                                               void *data)
+>  {
+>         struct btd_adv_manager *manager = data;
+>
+> @@ -1640,6 +1641,43 @@ static gboolean get_supported_secondary(const GDBusPropertyTable *property,
+>         return TRUE;
+>  }
+>
+> +static struct adv_feature {
+> +       int flag;
+> +       const char *name;
+> +} features[] = {
+> +       { MGMT_ADV_FLAG_CAN_SET_TX_POWER, "CanSetTxPower" },
+> +       { MGMT_ADV_FLAG_HW_OFFLOAD, "HardwareOffload" },
+> +       { },
+> +};
 > +
+> +static void append_features(struct btd_adv_manager *manager,
+> +                                               DBusMessageIter *iter)
+> +{
+> +       struct adv_feature *feat;
+> +
+> +       for (feat = features; feat->name; feat++) {
+> +               if (manager->supported_flags & feat->flag)
+> +                       dbus_message_iter_append_basic(iter, DBUS_TYPE_STRING,
+> +                                                               &feat->name);
+> +       }
+> +}
+> +
+> +static gboolean get_supported_features(const GDBusPropertyTable *property,
+> +                                       DBusMessageIter *iter, void *data)
+> +{
+> +       struct btd_adv_manager *manager = data;
+> +       DBusMessageIter entry;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                                       DBUS_TYPE_STRING_AS_STRING, &entry);
+> +
+> +       append_features(manager, &entry);
+> +
+> +       dbus_message_iter_close_container(iter, &entry);
+> +
+> +       return TRUE;
+> +}
+> +
+>  static gboolean get_supported_cap(const GDBusPropertyTable *property,
+>                                         DBusMessageIter *iter, void *data)
+>  {
+> @@ -1678,7 +1716,8 @@ static const GDBusPropertyTable properties[] = {
+>         { "SupportedInstances", "y", get_instances, NULL, NULL },
+>         { "SupportedIncludes", "as", get_supported_includes, NULL, NULL },
+>         { "SupportedSecondaryChannels", "as", get_supported_secondary, NULL,
+> -                                                       secondary_exits },
+> +                                                       secondary_exists },
+> +       { "SupportedFeatures", "as", get_supported_features, NULL, NULL },
 
-Extra empty line.
+Missing G_DBUS_PROPERTY_FLAG_EXPERIMENTAL.
 
->                 dict SupportedCapabilities [Experimental]
->
->                         Enumerates Advertising-related controller capabilities
-> @@ -257,3 +258,22 @@ Properties byte ActiveInstances
->                                 int16 MaxTxPower
->
->                                         Max advertising tx power (dBm)
-> +
-> +
-> +               array{string} SupportedFeatures [readonly, optional]
-
-This shall probably be marked as experimental for now.
-
-> +
-> +                       List of supported platform features. If no features
-> +                       are available on the platform, the SupportedFeatures
-> +                       array will be empty.
-> +
-> +                       Possible values: "CanSetTxPower"
-> +
-> +                                               Indicates whether platform can
-> +                                               specify tx power on each
-> +                                               advertising instance.
-> +
-> +                                        "HardwareOffload"
-> +
-> +                                               Indicates whether multiple
-> +                                               advertising will be offloaded
-> +                                               to the controller.
+>         { "SupportedCapabilities", "a{sv}", get_supported_cap, NULL, NULL,
+>                                         G_DBUS_PROPERTY_FLAG_EXPERIMENTAL},
+>         { }
 > --
 > 2.30.1.766.gb4fecdf3b7-goog
 >
