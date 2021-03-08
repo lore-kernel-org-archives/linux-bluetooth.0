@@ -7,37 +7,36 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9C38C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 09:27:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7301CC433E9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 09:28:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9082A65062
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 09:27:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3485565062
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Mar 2021 09:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbhCHJ1X (ORCPT
+        id S230002AbhCHJ1z convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Mar 2021 04:27:23 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:37440 "EHLO
+        Mon, 8 Mar 2021 04:27:55 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:44411 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230039AbhCHJ1L (ORCPT
+        with ESMTP id S229813AbhCHJ1q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Mar 2021 04:27:11 -0500
+        Mon, 8 Mar 2021 04:27:46 -0500
 Received: from marcel-macbook.holtmann.net (p4fefc126.dip0.t-ipconnect.de [79.239.193.38])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9E8F3CED12;
-        Mon,  8 Mar 2021 10:34:44 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3C692CED12;
+        Mon,  8 Mar 2021 10:35:20 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH 2/2 v3] Bluetooth: btbcm: Obtain and handle reset GPIO
+Subject: Re: [PATCH 1/2 v3] Bluetooth: btbcm: Rewrite bindings in YAML and add
+ reset
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210305183736.2123083-2-linus.walleij@linaro.org>
-Date:   Mon, 8 Mar 2021 10:27:09 +0100
+In-Reply-To: <20210305183736.2123083-1-linus.walleij@linaro.org>
+Date:   Mon, 8 Mar 2021 10:27:45 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 7bit
-Message-Id: <3EBC4984-E388-46B8-9ECB-068B0CD88F55@holtmann.org>
+        linux-bluetooth@vger.kernel.org, devicetree@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F171CD75-ACD3-44BD-AAB5-6BE89FBBEC9E@holtmann.org>
 References: <20210305183736.2123083-1-linus.walleij@linaro.org>
- <20210305183736.2123083-2-linus.walleij@linaro.org>
 To:     Linus Walleij <linus.walleij@linaro.org>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
@@ -46,23 +45,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Linus,
 
-> Obtain and drive the optional reset GPIO line if this is
-> not hardwired in the platform. This is needed on the
-> Samsung GT-I9070 mobile phone.
+> This rewrites the Broadcom bluetooth bindings in YAML and
+> adds a GPIO handle for the BT_RST_N line as used on some
+> platforms.
 > 
-> The invers of power is used, this should be OK to apply
-> simultaneously as the power signal according to
-> figures 47-51 on pages 159-161 in the BCM4330 datasheet.
+> The Ingenic UART binding was using this binding in its
+> example DTS fragment, however mistakenly using "vcc-supply"
+> for what is called "vbat-supply". The proper DTS files
+> and the code in the kernel all use "vbat-supply" so
+> fix up the example in this patch so we ge a clean
+> check.
 > 
+> Cc: devicetree@vger.kernel.org
 > Signed-off-by: Linus Walleij <linus.walleij@linaro.org>
 > ---
 > ChangeLog v2->v3:
-> - Resend with the other patch.
+> - Actually fold in the required fix.
 > ChangeLog v1->v2:
-> - Rebase on v5.12-rc1
+> - Fix the error in the Ingenic UART binding example as
+>  part of adding this patch.
 > ---
-> drivers/bluetooth/hci_bcm.c | 17 +++++++++++++++++
-> 1 file changed, 17 insertions(+)
+> .../bindings/net/broadcom-bluetooth.txt       |  56 ---------
+> .../bindings/net/broadcom-bluetooth.yaml      | 117 ++++++++++++++++++
+> .../bindings/serial/ingenic,uart.yaml         |   2 +-
+> 3 files changed, 118 insertions(+), 57 deletions(-)
+> delete mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+> create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
 
 patch has been applied to bluetooth-next tree.
 
