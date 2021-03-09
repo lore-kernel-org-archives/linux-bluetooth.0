@@ -2,258 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 958D2C433E6
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Mar 2021 18:39:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DE06C4332E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Mar 2021 18:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6539C6522E
+	by mail.kernel.org (Postfix) with ESMTP id B011165100
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Mar 2021 18:39:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230372AbhCISgH (ORCPT
+        id S230081AbhCISjQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Mar 2021 13:36:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55898 "EHLO
+        Tue, 9 Mar 2021 13:39:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56614 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbhCISfs (ORCPT
+        with ESMTP id S229815AbhCISjN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Mar 2021 13:35:48 -0500
-Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF723C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Mar 2021 10:35:48 -0800 (PST)
-Received: by mail-oi1-x22e.google.com with SMTP id u6so8689664oic.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Mar 2021 10:35:48 -0800 (PST)
+        Tue, 9 Mar 2021 13:39:13 -0500
+Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E5A7C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Mar 2021 10:39:13 -0800 (PST)
+Received: by mail-pj1-x1031.google.com with SMTP id t9so1333219pjl.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Mar 2021 10:39:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=phA5oFmlzYN4armu3CqSxhN7rhDtGh8GkN4yABeKjy4=;
-        b=AgmyLpC54W5D9sAuljJVQX8gU7YafdrdgY7gpTFvwlno3labApPJ+u7eHOODqRr/wE
-         620/qXrbZ6x/RRih1C+PnIxJuPAeNL3EK+1CEsQd83i+fzcyZr1CZ/8KuqzlxyFjtEJA
-         8m3J948rBIOpAu99sMpuHLDv+0ELp1P63gzpwMDcIsjsRs1k54uLZIRula1E+yrHCmR/
-         DryU1bRFHslTTAUSk8XhRB7ENgc7JBH2FDgt35GIXSTQnIGYt8YyAoj1ZXfE+0OlXxHR
-         i3ZohAzKR6CjOkBspV1cEV7WPNzS0+UsL7nwy+O99SD9ZmaOUPRu6AN2gd+UHQSpiI8d
-         ++gg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ePi5MC25QxxgKrTmbVK5rbwegcbfhbj+u16H6VOeUr8=;
+        b=ndxKkFBF4ouCpSQw96fgvIs0y2IPBmiJ79Wa5SD9rXAKAZcnkGoFUgCfJ7LS9YS+bu
+         nc954qSBixnnKwvCNAQ/paapwbqAXseCyWohPtOpA5hQeAM7cGL+Uiq0NyrRNSO8mFbr
+         qIfoHW1UiiJ0wefm4Lslrz1zKOgvhllxqJbUSdrvMOWXa8io1R8q73BQwy4m1nLcaEoK
+         cSPuxh3CLpFlHVPE9Jlq2lqOLlYTZHbBS9wConXo9obVrWAFM9rvBcTmTO3VeoeBaC4i
+         wLyohrWhQkpT1Rcm2OuEcL+5nH4bGifilV5nd1IwCotxxYTmbkiDFm+rp7nxzjGhzgnl
+         AL7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=phA5oFmlzYN4armu3CqSxhN7rhDtGh8GkN4yABeKjy4=;
-        b=MIgK8j52ih/yZZiuXGMC850sNdgTU2eEu486/myyPcf4hly6uLSwMVZGOueZ1M4WZw
-         afYcdqwf8SXz3Bl/9/FquQUzpeT5iP7/IAHEhx5bII6N0WTA9xQweZIFn7IQZ5yL7zoj
-         z31jES0Aeo9Ok8XdFLrkpvplIiGAxBVtNToyZbaSRAQZ0tXc4x70NU6+sSJgZTyInsKx
-         wjlS011MKEhYId96rcCH8tSf7BFMHF25DjOy6v6IOQ1ppRIrRqRvHn9m1xnTpZNheukg
-         EAPY3E0+Q4MAcYXxm2+zq5E2e+qJAyT7X4d4ALQbJqBeW+Bg39c2dgXlN+1GxrW7h8YX
-         Bgww==
-X-Gm-Message-State: AOAM531rZrFnPedtzHrcYxj1QE9l1Ndjo28Z8pOD93a1+Z3jDFSPJm9P
-        eL7dFwa4YHjRely91v/eoi9126KnUxsOtK9ARJg=
-X-Google-Smtp-Source: ABdhPJz2aZN69oUeLSuL0C3Bnal66rSY2FqWoGogg56ZWkoZliQhJmssrWSatrW+TOULQoD61Qj0kKsCzygIhXRosWw=
-X-Received: by 2002:aca:c109:: with SMTP id r9mr3911527oif.64.1615314947864;
- Tue, 09 Mar 2021 10:35:47 -0800 (PST)
-MIME-Version: 1.0
-References: <20210222103021.20923-1-magdalena.kasenberg@codecoup.pl>
- <CABBYNZ+3njOxCGKE0cvxkw574=U5Uv7+HHn885MrVFaoO3NpNQ@mail.gmail.com>
- <ECCE8B1E-C097-4FED-B11F-6294E22E6009@holtmann.org> <5591810.MhkbZ0Pkbq@ix>
-In-Reply-To: <5591810.MhkbZ0Pkbq@ix>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ePi5MC25QxxgKrTmbVK5rbwegcbfhbj+u16H6VOeUr8=;
+        b=euXmVz1IBYEQ2UKyFvgS2sKSCMJJ1vRWUfp6ipB4yNApCMD2Al1Tfn+PeQCYCvDZP2
+         r8N09YRiCCO9xlT40tLpf5wkr9zQzvmYgwmZGTM6IxNh5bTKCRNMm9aSS14s29D6TqYf
+         IN0eKfLlmacfrPX5GZWIEKQnG9oo3V+gjK1q6rt9jvr8ZgfltZqMVuIfgtk7Ra71XABb
+         A9eL4QJiyNWwHh4xJ9wxtP1x5S8HGWJ9DL/BUBNBvb+dZPtcCFnrKWQo8CaPQM7S3RCS
+         T4jnxNQqCvKm0nkO3K9d188ELamlLWo4w6OfhNKUlVEKZSpUeYH76YeAl9gc+EJRwyAI
+         c7Cw==
+X-Gm-Message-State: AOAM533lgpx4dPN8urVho5nlT9qQiDXv70G8+PbdQdbJ5Ho8/PjY5HAO
+        m8570u8Ip/dRMaofaToRBA9JLvxVdl4JJA==
+X-Google-Smtp-Source: ABdhPJwmC+L/ZJQXD4NZH0yRLlf3HU0H3BOh3wbT5sz82IYIo+Q05MyC6c6f4DHBNTTShES84D0qgw==
+X-Received: by 2002:a17:902:7597:b029:e3:f7e2:eb36 with SMTP id j23-20020a1709027597b02900e3f7e2eb36mr5151647pll.42.1615315152304;
+        Tue, 09 Mar 2021 10:39:12 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id 186sm13159074pfb.143.2021.03.09.10.39.11
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 09 Mar 2021 10:39:11 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 9 Mar 2021 10:35:36 -0800
-Message-ID: <CABBYNZ+=uF6ouH0G3JPHNSKbLKwfAcnGfoFPj2vUhGdBkwhKgw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix for L2CAP/LE/CFC/BV-15-C
-To:     Szymon Janc <szymon.janc@codecoup.pl>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: SMP: Fail if remote and local public keys are identical
+Date:   Tue,  9 Mar 2021 10:39:11 -0800
+Message-Id: <20210309183911.514959-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.29.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Mar 9, 2021 at 2:27 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
->
-> Hi Marcel, Luiz,
->
-> On Saturday, 27 February 2021 21:14:57 CET Marcel Holtmann wrote:
-> > Hi Luiz,
-> >
-> > >>> This is required for the qualification test L2CAP/LE/CFC/BV-15-C
-> > >>>
-> > >>> Implementation does not allow to set different key size for SMP and
-> > >>> L2CAP, which is needed for a current specification of the test. This fix
-> > >>> workarounds it with the debugfs variable le_l2cap_min_key_size.
-> > >>>
-> > >>> Logs from the test when the IUT uses a min and max l2cap encryption key
-> > >>> size 16. $ echo 16 >
-> > >>> /sys/kernel/debug/bluetooth/hci0/le_l2cap_min_key_size The lower tester
-> > >>> uses a key size 7.
-> > >>>
-> > >>>> ACL Data RX: Handle 99 flags 0x02 dlen 11                #34 [hci0]
-> > >>>> 25.007392>>>>
-> > >>>     SMP: Pairing Request (0x01) len 6
-> > >>>
-> > >>>       IO capability: DisplayYesNo (0x01)
-> > >>>       OOB data: Authentication data not present (0x00)
-> > >>>       Authentication requirement: Bonding, No MITM, SC, No Keypresses
-> > >>>       (0x09)
-> > >>>       Max encryption key size: 7
-> > >>>       Initiator key distribution: <none> (0x00)
-> > >>>       Responder key distribution: <none> (0x00)
-> > >>>
-> > >>> < ACL Data TX: Handle 99 flags 0x00 dlen 11                #35 [hci0]
-> > >>> 25.007591>>>
-> > >>>     SMP: Pairing Response (0x02) len 6
-> > >>>
-> > >>>       IO capability: KeyboardDisplay (0x04)
-> > >>>       OOB data: Authentication data not present (0x00)
-> > >>>       Authentication requirement: Bonding, No MITM, SC, No Keypresses
-> > >>>       (0x09)
-> > >>>       Max encryption key size: 16
-> > >>>       Initiator key distribution: <none> (0x00)
-> > >>>       Responder key distribution: <none> (0x00)
-> > >>>
-> > >>> @ MGMT Event: New Long Term Key (0x000a) plen 37      {0x0001} [hci0]
-> > >>> 28.788872>>>
-> > >>>       Store hint: Yes (0x01)
-> > >>>       LE Address: C0:DE:C0:FF:FF:01 (OUI C0-DE-C0)
-> > >>>       Key type: Unauthenticated key from P-256 (0x02)
-> > >>>       Master: 0x00
-> > >>>       Encryption size: 7
-> > >>>       Diversifier: 0000
-> > >>>       Randomizer: 0000000000000000
-> > >>>       Key: 529e11e8c7b9f5000000000000000000
-> > >>>
-> > >>> <snip>
-> > >>>
-> > >>> After pairing with key size 7, L2CAP connection is requested which
-> > >>> requires key size 16.
-> > >>>
-> > >>>> ACL Data RX: Handle 99 flags 0x02 dlen 18                #56 [hci0]
-> > >>>> 34.998084>>>>
-> > >>>     LE L2CAP: LE Connection Request (0x14) ident 3 len 10
-> > >>>
-> > >>>       PSM: 244 (0x00f4)
-> > >>>       Source CID: 64
-> > >>>       MTU: 256
-> > >>>       MPS: 284
-> > >>>       Credits: 1
-> > >>>
-> > >>> < ACL Data TX: Handle 99 flags 0x00 dlen 18                #57 [hci0]
-> > >>> 34.998325>>>
-> > >>>     LE L2CAP: LE Connection Response (0x15) ident 3 len 10
-> > >>>
-> > >>>       Destination CID: 0
-> > >>>       MTU: 0
-> > >>>       MPS: 0
-> > >>>       Credits: 0
-> > >>>       Result: Connection refused - insufficient encryption key size
-> > >>>       (0x0007)
-> > >>>
-> > >>> Signed-off-by: Magdalena Kasenberg <magdalena.kasenberg@codecoup.pl>
-> > >>> Reviewed-by: Szymon Janc <szymon.janc@codecoup.pl>
-> > >>> Cc: Szymon Janc <szymon.janc@codecoup.pl>
-> > >>> ---
-> > >>> include/net/bluetooth/hci_core.h |  1 +
-> > >>> net/bluetooth/hci_core.c         |  1 +
-> > >>> net/bluetooth/hci_debugfs.c      | 30 ++++++++++++++++++++++++++++++
-> > >>> net/bluetooth/l2cap_core.c       | 25 +++++++++++++++++++++++++
-> > >>> 4 files changed, 57 insertions(+)
-> > >>>
-> > >>> diff --git a/include/net/bluetooth/hci_core.h
-> > >>> b/include/net/bluetooth/hci_core.h index ebdd4afe30d2..0bf0543efec5
-> > >>> 100644
-> > >>> --- a/include/net/bluetooth/hci_core.h
-> > >>> +++ b/include/net/bluetooth/hci_core.h
-> > >>> @@ -379,6 +379,7 @@ struct hci_dev {
-> > >>>
-> > >>>      __u16           auth_payload_timeout;
-> > >>>      __u8            min_enc_key_size;
-> > >>>      __u8            max_enc_key_size;
-> > >>>
-> > >>> +     __u8            le_l2cap_min_key_size;
-> > >>>
-> > >>>      __u8            pairing_opts;
-> > >>>      __u8            ssp_debug_mode;
-> > >>>      __u8            hw_error_code;
-> > >>>
-> > >>> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > >>> index b0d9c36acc03..9ef4b39b380c 100644
-> > >>> --- a/net/bluetooth/hci_core.c
-> > >>> +++ b/net/bluetooth/hci_core.c
-> > >>> @@ -3788,6 +3788,7 @@ struct hci_dev *hci_alloc_dev(void)
-> > >>>
-> > >>>      hdev->conn_info_max_age = DEFAULT_CONN_INFO_MAX_AGE;
-> > >>>      hdev->auth_payload_timeout = DEFAULT_AUTH_PAYLOAD_TIMEOUT;
-> > >>>      hdev->min_enc_key_size = HCI_MIN_ENC_KEY_SIZE;
-> > >>>
-> > >>> +     hdev->le_l2cap_min_key_size = HCI_MIN_ENC_KEY_SIZE;
-> > >>
-> > >> so I am not a fan of doing this with another variable and managing
-> > >> through debugfs. Can we pass the qualification test case by using
-> > >> BT_SECURITY_FIPS (which will enforce 128-bit key size)?>
-> > > I guess that will depend if PTS supports MITM which afaik it is
-> > > required with BT_SECURITY_FIPS, from the logs it looks like it doesn't
-> > > support it so we end up with an unauthenticated key so the error would
-> > > probably be different.
-> >
-> > we should give this a try ..
->
-> PTS is not supporting GAP in this test at all, but since it is cat D test we
-> can run it with our own LT (nimBLE).
->
-> Using BT_SECURITY_FIPS will not do since it requires 128bit key to get to
-> FIPS level so with lower key size it fails on SMP.
->
-> BTW We are going to propose TSE which would allow to have alternative pass
-> case in this test with early fail on SMP so that it can be handled as GAP
-> configuration, not L2CAP. But for now, we have to handle it as defined in test
-> spec.
+This fails the pairing procedure when both remote and local non-debug
+public keys are identical.
 
-Do we have a ticket for that already? It sounds rather strange that
-test like this are being added when the security level already have
-requirements for key size, it is as if the spec is testing that the
-stack support the use of custom security level e.g. use level 3 but
-requires 128-bit keys, which imo breaks the security level as one can
-no longer expect the levels work the same regardless the
-implementation.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/smp.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-> >
-> > >> If not then we might want to add a socket option to set min/max
-> > >> encryption key size requirement on a per socket basis.>
-> > > Yep, it seems to be a common trend to have such tests on upper layers
-> > > (ATT/GATT also have such encryption key size), even though it is more
-> > > of a GAP test and perhaps could have been done at SMP level.
-> >
-> > .. however maybe we just deprecate BT_SECURITY or migrate it into something
-> > that allows specifying the details of a security level with extra
-> > parameters. I made the BT_SECURITY implementation in the kernel extendable.
-> > So we could also just add extra possible settings.
->
-> I'd not do it on per socket basis, pretty much the same as bluetoothd is not
-> handling keysize on per characteristic but as a global setting. If one needs
-> to use only full key size he will rather be set it globally. And apparently
-> no-one is using that anyway..
-
-IMO it shouldn't, the spec is very clear on the requirements for
-security mode/level, adding different requirements on top of the level
-is the real problem here and adding it may possible create IOP
-problems as we are experiencing here since when we bump the security
-level it is no longer able to pair so the whole idea of having a
-dedicated error for key size seems flawed since it breaks the security
-level model.
-
->
-> --
-> pozdrawiam
-> Szymon Janc
->
->
-
-
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index b0c1ee110eff..9e7e3655e4ec 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -2732,6 +2732,15 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
+ 	if (skb->len < sizeof(*key))
+ 		return SMP_INVALID_PARAMS;
+ 
++	/* Check if remote and local public keys are the same and debug key is
++	 * not in use.
++	 */
++	if (!test_bit(SMP_FLAG_DEBUG_KEY, &smp->flags) &&
++	    !memcmp(key, smp->local_pk, 64)) {
++		BT_ERR("Remote and local public keys are identical");
++		return SMP_UNSPECIFIED;
++	}
++
+ 	memcpy(smp->remote_pk, key, 64);
+ 
+ 	if (test_bit(SMP_FLAG_REMOTE_OOB, &smp->flags)) {
 -- 
-Luiz Augusto von Dentz
+2.29.2
+
