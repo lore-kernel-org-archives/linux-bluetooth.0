@@ -2,77 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 047DCC433E0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Mar 2021 06:59:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7242C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Mar 2021 11:42:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFBDC64FFA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Mar 2021 06:59:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88F1764FE5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 10 Mar 2021 11:42:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229544AbhCJG70 convert rfc822-to-8bit (ORCPT
+        id S231151AbhCJLmT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Mar 2021 01:59:26 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:54767 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbhCJG7R (ORCPT
+        Wed, 10 Mar 2021 06:42:19 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:63318 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230214AbhCJLmI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Mar 2021 01:59:17 -0500
-Received: from marcel-macbook.holtmann.net (p4fefc126.dip0.t-ipconnect.de [79.239.193.38])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 363E6CED8C;
-        Wed, 10 Mar 2021 08:06:51 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH] Bluetooth: SMP: Fail if remote and local public keys are
- identical
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210309183911.514959-1-luiz.dentz@gmail.com>
-Date:   Wed, 10 Mar 2021 07:59:15 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <08C85CC7-19F5-461F-A3B3-DBAB5A70588F@holtmann.org>
-References: <20210309183911.514959-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3654.60.0.2.21)
+        Wed, 10 Mar 2021 06:42:08 -0500
+Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
+  by alexa-out.qualcomm.com with ESMTP; 10 Mar 2021 03:42:07 -0800
+X-QCInternal: smtphost
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg09-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 10 Mar 2021 03:42:05 -0800
+X-QCInternal: smtphost
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 10 Mar 2021 17:11:39 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id 7098820F0F; Wed, 10 Mar 2021 17:11:38 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [RFC PATCH v1] Bluetooth: hci_qca: Add device_may_wakeup support
+Date:   Wed, 10 Mar 2021 17:11:36 +0530
+Message-Id: <1615376496-13577-1-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Added device_may_wakeup() support.
 
-> This fails the pairing procedure when both remote and local non-debug
-> public keys are identical.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/smp.c | 9 +++++++++
-> 1 file changed, 9 insertions(+)
-> 
-> diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-> index b0c1ee110eff..9e7e3655e4ec 100644
-> --- a/net/bluetooth/smp.c
-> +++ b/net/bluetooth/smp.c
-> @@ -2732,6 +2732,15 @@ static int smp_cmd_public_key(struct l2cap_conn *conn, struct sk_buff *skb)
-> 	if (skb->len < sizeof(*key))
-> 		return SMP_INVALID_PARAMS;
-> 
-> +	/* Check if remote and local public keys are the same and debug key is
-> +	 * not in use.
-> +	 */
-> +	if (!test_bit(SMP_FLAG_DEBUG_KEY, &smp->flags) &&
-> +	    !memcmp(key, smp->local_pk, 64)) {
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/hci_qca.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-lets use crypto_memneq here.
-
-> +		BT_ERR("Remote and local public keys are identical");
-
-And we need to start using bt_dev_err in SMP. I will apply v2, but then we need a cleanup patch to move this to bt_dev_{err,dbg,info}.
-
-Regards
-
-Marcel
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index de36af6..73af901 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1571,6 +1571,20 @@ static void qca_cmd_timeout(struct hci_dev *hdev)
+ 	mutex_unlock(&qca->hci_memdump_lock);
+ }
+ 
++static bool qca_prevent_wake(struct hci_dev *hdev)
++{
++	struct hci_uart *hu = hci_get_drvdata(hdev);
++	bool wakeup;
++
++	/* UART driver handles the interrupt from BT SoC.So we need to use
++	 * device handle of UART driver to get the status of device may wakeup.
++	 */
++	wakeup = device_may_wakeup(hu->serdev->ctrl->dev.parent);
++	bt_dev_dbg(hu->hdev, "wakeup status : %d", wakeup);
++
++	return !wakeup;
++}
++
+ static int qca_wcn3990_init(struct hci_uart *hu)
+ {
+ 	struct qca_serdev *qcadev;
+@@ -1721,6 +1735,7 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_debugfs_init(hdev);
+ 		hu->hdev->hw_error = qca_hw_error;
+ 		hu->hdev->cmd_timeout = qca_cmd_timeout;
++		hu->hdev->prevent_wake = qca_prevent_wake;
+ 	} else if (ret == -ENOENT) {
+ 		/* No patch/nvm-config found, run with original fw/config */
+ 		set_bit(QCA_ROM_FW, &qca->flags);
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
 
