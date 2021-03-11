@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6657C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Mar 2021 21:19:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D360DC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Mar 2021 23:03:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 73E1C64F8E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Mar 2021 21:19:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9415A64F8D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Mar 2021 23:03:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230491AbhCKVSg (ORCPT
+        id S229664AbhCKXCv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Mar 2021 16:18:36 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
+        Thu, 11 Mar 2021 18:02:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57212 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230425AbhCKVSe (ORCPT
+        with ESMTP id S229553AbhCKXC1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Mar 2021 16:18:34 -0500
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D1B3C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Mar 2021 13:18:34 -0800 (PST)
-Received: by mail-pl1-x62b.google.com with SMTP id u18so10846495plc.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Mar 2021 13:18:34 -0800 (PST)
+        Thu, 11 Mar 2021 18:02:27 -0500
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD064C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Mar 2021 15:02:26 -0800 (PST)
+Received: by mail-pf1-x430.google.com with SMTP id y67so575843pfb.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Mar 2021 15:02:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=jaAemKusRtjulWDvOLOE/LaXyRPUjVMAMtd6N45dQWI=;
-        b=F0VJXfHcuplSvKKtHdE//zT1fYe/jM46H7XleCTVPgmplynyJM/voCRX3BwMLO8se5
-         qOm6HeDRFHxL6kD2breyjLnMbKEstT5v3PdDfpKAnTAm/fKMSAjQi7xpp58wgy4Ri/MJ
-         81ysfq5br4Kz8sd0S329IvwumqlMoa7DBA9CX8sFV8JBmCL9o82LtzVK9m34fQuy0CAg
-         DLQFWRV/0Bv7aYz2mzXTzfTMf09ODIUBLq6yaZ8qOO/ILyLpY9KFdfpAw55s36IbTjzK
-         MnXgd39uCXxnIF/QRNvuUB6lEPmjq/pXZVdMKWHhPy3d24uNC6FryVqyxabJstWj4dlD
-         Hxpg==
+        bh=a7icICTJs0Fuhesm3i5CbQxdpSgea5J5bsIRCrkj9sg=;
+        b=bZvJ8A/cIMluUJAMUcpHEa5RhGAohfhi2oY09UyHW52ZkkgAyX4wj1sOe8hL966WBX
+         meAK5CBQj7XDnQLKoXMgVkmbtW9D7bwLfzuiGa1XwhePhjfE2bupo9wAMSbXwvWIRVBS
+         2PCUkMSW8YfD0TBXWBRl4aeEg1DYlZP3T0KRVHLg5aUgXE0y/0UOF7exFmM4j10WDhfo
+         hPhGpTIT82Obh76mc1SiZ9gp79dlsdBh545veG0VXrAWWsu8ruGmH/boe8vHUbTWyP4L
+         S1By96kjl9R3pjOdt12YNFl3IdR6igcaBZE2r8ZeFH5q5oIJeN/2s+Nhdfy6vqDGeY/G
+         1xsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=jaAemKusRtjulWDvOLOE/LaXyRPUjVMAMtd6N45dQWI=;
-        b=QaP+e5UVjvmdr+uTy7AIVgv2Zxg55eHUm+ds877n+YEE7wMy/tU2boa22Ul8bZSyV/
-         nV3xF0kEElx3xRnS5Ams333y9S4FSsXoGKWIQlRH0OMmVROjP2K7XirdMnyu4LB/xeUs
-         KxV8Xcef/vo1g5OtgqMzcTup76am92oNDvX5ldTBdJS1/Rv9XtKWzJ1PdaE/w3iSQtIT
-         5Lj+lw5GU/51q6nGOduoFbjX3D4inoEwZ2kTEwBk/NtAiTAzRHPhkDEo3yEly31P3B9M
-         XRiXtl3toog3TtMTH0IMlDpFUpDU/FGDZJ5sE/84d/4WwbGOP3yPZ0DwxlCR/H82iPrc
-         +lzQ==
-X-Gm-Message-State: AOAM5330HXGEf/hS2rIVXNOMzEHyxZihKHD+VngI32x9lFmhzdtqsNpe
-        taFoXSzN397aNeiKl9Y79e9TtvJXaWD9Vg==
-X-Google-Smtp-Source: ABdhPJz0V+IFu6A0Xo8pAqc4OFJzIS1Rxh/5n1rXaElAnGd2SZ7clEb7vXgpkY119AT3h7CUNNLWVg==
-X-Received: by 2002:a17:902:cb0b:b029:e5:b670:d905 with SMTP id c11-20020a170902cb0bb02900e5b670d905mr10329159ply.18.1615497513621;
-        Thu, 11 Mar 2021 13:18:33 -0800 (PST)
+        bh=a7icICTJs0Fuhesm3i5CbQxdpSgea5J5bsIRCrkj9sg=;
+        b=qUgVPKx7JhFLEPIz4JM17QREY3Pjp0swjxxPohun7RbdYbLX1NiPSQa+NUwIv+cgam
+         V3up89VtquxADR2EuKgBl/2XkklSPCP/ifuWEYA6uN68Y/BaHsHVw9ZtJt9HUZYAWsG7
+         TlkL5DxlQ/lDtLFK8TPo1pT601jbT2eoNPabyeOnKsYgp5Tr3HjnJ1LBfTBzad68OGGN
+         IbK0lEXOPuvrhUmb4aRKrt4uBp5kKl7ApkWwrW6JUgpCrqfdqt2ijPNvWMj+CIe1/tuy
+         zS0BmtjgugNeSJ9pf1OW1D+wBDAbltek3kRqbrznLj+tGVlU0yS5R/ZF3oAWwi1wd9nO
+         PBjg==
+X-Gm-Message-State: AOAM53148gPtcvHMe/dSOv3pat5+dwBy/aIoHHKnaf0sY6zl5R7J7KNP
+        ehJ+8EezJGTd0vBDtcBeDECoPp4ltfADHg==
+X-Google-Smtp-Source: ABdhPJwvWdkPN8E9ejD7GajBV2bNfrrRBN13Q3+K10oz5NEPESrQiPPSuNv/lRdMhWoP7fAdGuwt6w==
+X-Received: by 2002:a62:dd89:0:b029:1fd:d370:7a5e with SMTP id w131-20020a62dd890000b02901fdd3707a5emr7815560pff.61.1615503745513;
+        Thu, 11 Mar 2021 15:02:25 -0800 (PST)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y9sm31536pja.50.2021.03.11.13.18.32
+        by smtp.gmail.com with ESMTPSA id q205sm3517467pfc.126.2021.03.11.15.02.24
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 11 Mar 2021 13:18:33 -0800 (PST)
+        Thu, 11 Mar 2021 15:02:25 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
-Date:   Thu, 11 Mar 2021 13:18:30 -0800
-Message-Id: <20210311211830.1056746-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2] Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
+Date:   Thu, 11 Mar 2021 15:02:22 -0800
+Message-Id: <20210311230222.1079239-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.29.2
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -82,11 +82,13 @@ selftest.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/smp.c | 96 ++++++++++++++++++++++++---------------------
- 1 file changed, 51 insertions(+), 45 deletions(-)
+v2: Fix issues found by CI
+
+ net/bluetooth/smp.c | 98 ++++++++++++++++++++++++---------------------
+ 1 file changed, 52 insertions(+), 46 deletions(-)
 
 diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index e03cc284161c..83c8bdf00ad6 100644
+index e03cc284161c..3cc1ad042edf 100644
 --- a/net/bluetooth/smp.c
 +++ b/net/bluetooth/smp.c
 @@ -595,7 +595,7 @@ static void smp_send_cmd(struct l2cap_conn *conn, u8 code, u16 len, void *data)
@@ -103,8 +105,8 @@ index e03cc284161c..83c8bdf00ad6 100644
  	clear_bit(SMP_FLAG_TK_VALID, &smp->flags);
  
 -	BT_DBG("tk_request: auth:%d lcl:%d rem:%d", auth, local_io, remote_io);
-+	bt_dev_dbg(hcon->hdev, "tk_request: auth:%d lcl:%d rem:%d", auth,
-+		   local_io, remote_io);
++	bt_dev_dbg(hcon->hdev, "auth:%d lcl:%d rem:%d", auth, local_io,
++		   remote_io);
  
  	/* If neither side wants MITM, either "just" confirm an incoming
  	 * request or use just-works for outgoing ones. The JUST_CFM
@@ -195,15 +197,17 @@ index e03cc284161c..83c8bdf00ad6 100644
  
  	return smp;
  
-@@ -1564,7 +1567,7 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
+@@ -1564,8 +1567,8 @@ static u8 sc_passkey_round(struct smp_chan *smp, u8 smp_op)
  		if (!hcon->out)
  			return 0;
  
 -		BT_DBG("%s Starting passkey round %u", hdev->name,
+-		       smp->passkey_round + 1);
 +		bt_dev_dbg(hdev, "%s Starting passkey round %u", hdev->name,
- 		       smp->passkey_round + 1);
++			   smp->passkey_round + 1);
  
  		SMP_ALLOW_CMD(smp, SMP_CMD_PAIRING_CONFIRM);
+ 
 @@ -1625,7 +1628,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
  	u32 value;
  	int err;
