@@ -4,59 +4,245 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4165C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Mar 2021 13:57:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD51C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Mar 2021 08:59:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8978664EE8
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Mar 2021 13:57:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B4DE64E89
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Mar 2021 08:59:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232662AbhCNN4t (ORCPT
+        id S229672AbhCOI7P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 14 Mar 2021 09:56:49 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54943 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229539AbhCNN4P (ORCPT
+        Mon, 15 Mar 2021 04:59:15 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:38990 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229657AbhCOI7G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 14 Mar 2021 09:56:15 -0400
-Received: from localhost.localdomain (p4fefc126.dip0.t-ipconnect.de [79.239.193.38])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 8864CCECA3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 14 Mar 2021 15:03:49 +0100 (CET)
-From:   Marcel Holtmann <marcel@holtmann.org>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Fix wrong opcode error for read advertising features
-Date:   Sun, 14 Mar 2021 14:56:08 +0100
-Message-Id: <20210314135608.266264-1-marcel@holtmann.org>
-X-Mailer: git-send-email 2.30.2
+        Mon, 15 Mar 2021 04:59:06 -0400
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 12F8wkxbF027002, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexmbs04.realtek.com.tw[172.21.6.97])
+        by rtits2.realtek.com.tw (8.15.2/2.70/5.88) with ESMTPS id 12F8wkxbF027002
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Mon, 15 Mar 2021 16:58:46 +0800
+Received: from localhost.localdomain (172.21.132.99) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 15 Mar 2021 16:58:45 +0800
+From:   <hildawu@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <davem@davemloft.net>, <kuba@kernel.org>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <tientzu@chromium.org>,
+        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
+        <kidman@realtek.com>
+Subject: [PATCH] Bluetooth: hci_h5: btrtl: Add quirk for keep power during suspend/resume for specific devices
+Date:   Mon, 15 Mar 2021 16:58:40 +0800
+Message-ID: <20210315085840.4424-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.99]
+X-ClientProxiedBy: RTEXMBS01.realtek.com.tw (172.21.6.94) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The read advertising features error handling returns false the opcode
-for the set advertising command.
+From: hildawu <hildawu@realtek.com>
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+RTL8822C devices support BT wakeup Host. Add a quirk for these specific
+devices did not power off during suspend and resume.
+By this change, if the Host support that received BT device signal then
+it can be wakeup.
+
+Signed-off-by: hildawu <hildawu@realtek.com>
 ---
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btrtl.c   | 36 ------------------------------------
+ drivers/bluetooth/btrtl.h   | 35 +++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/hci_h5.c  | 35 ++++++++++++++++++++++++-----------
+ include/net/bluetooth/hci.h |  9 +++++++++
+ 4 files changed, 68 insertions(+), 47 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 105d0743735d..2426a0d38c80 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7478,7 +7478,7 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 	 * advertising.
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
-+		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES,
- 				       MGMT_STATUS_NOT_SUPPORTED);
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index e7fe5fb22753..94d1e7885aee 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -38,42 +38,6 @@
+ 	.hci_ver = (hciv), \
+ 	.hci_bus = (bus)
  
- 	hci_dev_lock(hdev);
+-enum btrtl_chip_id {
+-	CHIP_ID_8723A,
+-	CHIP_ID_8723B,
+-	CHIP_ID_8821A,
+-	CHIP_ID_8761A,
+-	CHIP_ID_8822B = 8,
+-	CHIP_ID_8723D,
+-	CHIP_ID_8821C,
+-	CHIP_ID_8822C = 13,
+-	CHIP_ID_8761B,
+-	CHIP_ID_8852A = 18,
+-};
+-
+-struct id_table {
+-	__u16 match_flags;
+-	__u16 lmp_subver;
+-	__u16 hci_rev;
+-	__u8 hci_ver;
+-	__u8 hci_bus;
+-	bool config_needed;
+-	bool has_rom_version;
+-	char *fw_name;
+-	char *cfg_name;
+-};
+-
+-struct btrtl_device_info {
+-	const struct id_table *ic_info;
+-	u8 rom_version;
+-	u8 *fw_data;
+-	int fw_len;
+-	u8 *cfg_data;
+-	int cfg_len;
+-	bool drop_fw;
+-	int project_id;
+-};
+-
+ static const struct id_table ic_id_table[] = {
+ 	/* 8723A */
+ 	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index 2a582682136d..0fa38c116762 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -12,6 +12,41 @@
+ #define rtl_dev_info(dev, fmt, ...) bt_dev_info(dev, "RTL: " fmt, ##__VA_ARGS__)
+ #define rtl_dev_dbg(dev, fmt, ...) bt_dev_dbg(dev, "RTL: " fmt, ##__VA_ARGS__)
+ 
++enum btrtl_chip_id {
++	CHIP_ID_8723A,
++	CHIP_ID_8723B,
++	CHIP_ID_8821A,
++	CHIP_ID_8761A,
++	CHIP_ID_8822B = 8,
++	CHIP_ID_8723D,
++	CHIP_ID_8821C,
++	CHIP_ID_8822C = 13,
++	CHIP_ID_8761B,
++	CHIP_ID_8852A = 18,
++};
++
++struct id_table {
++	__u16 match_flags;
++	__u16 lmp_subver;
++	__u16 hci_rev;
++	__u8 hci_ver;
++	__u8 hci_bus;
++	bool config_needed;
++	bool has_rom_version;
++	char *fw_name;
++	char *cfg_name;
++};
++
++struct btrtl_device_info {
++	const struct id_table *ic_info;
++	u8 rom_version;
++	u8 *fw_data;
++	int fw_len;
++	u8 *cfg_data;
++	int cfg_len;
++	int project_id;
++};
++
+ struct btrtl_device_info;
+ 
+ struct rtl_download_cmd {
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 27e96681d583..1ca4ff89ea14 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -909,7 +909,15 @@ static int h5_btrtl_setup(struct h5 *h5)
+ 	/* Enable controller to do both LE scan and BR/EDR inquiry
+ 	 * simultaneously.
+ 	 */
+-	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
++	switch (btrtl_dev->project_id) {
++	case CHIP_ID_8822C:
++	case CHIP_ID_8852A:
++		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
++		set_bit(HCI_QUIRK_DEVICES_WAKEUP_SUPPORTED, &h5->hu->hdev->quirks);
++		break;
++	default:
++		break;
++	}
+ 
+ out_free:
+ 	btrtl_free(btrtl_dev);
+@@ -945,8 +953,11 @@ static void h5_btrtl_close(struct h5 *h5)
+ static int h5_btrtl_suspend(struct h5 *h5)
+ {
+ 	serdev_device_set_flow_control(h5->hu->serdev, false);
+-	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
+-	gpiod_set_value_cansleep(h5->enable_gpio, 0);
++
++	if (!test_bit(HCI_QUIRK_DEVICES_WAKEUP_SUPPORTED, &h5->hu->hdev->quirks)) {
++		gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
++		gpiod_set_value_cansleep(h5->enable_gpio, 0);
++	}
+ 	return 0;
+ }
+ 
+@@ -972,17 +983,19 @@ static void h5_btrtl_reprobe_worker(struct work_struct *work)
+ 
+ static int h5_btrtl_resume(struct h5 *h5)
+ {
+-	struct h5_btrtl_reprobe *reprobe;
++	if (!test_bit(HCI_QUIRK_DEVICES_WAKEUP_SUPPORTED, &h5->hu->hdev->quirks)) {
++		struct h5_btrtl_reprobe *reprobe;
+ 
+-	reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
+-	if (!reprobe)
+-		return -ENOMEM;
++		reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
++		if (!reprobe)
++			return -ENOMEM;
+ 
+-	__module_get(THIS_MODULE);
++		__module_get(THIS_MODULE);
+ 
+-	INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
+-	reprobe->dev = get_device(&h5->hu->serdev->dev);
+-	queue_work(system_long_wq, &reprobe->work);
++		INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
++		reprobe->dev = get_device(&h5->hu->serdev->dev);
++		queue_work(system_long_wq, &reprobe->work);
++	}
+ 	return 0;
+ }
+ 
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ba2f439bc04d..2e88381b4a58 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -246,6 +246,15 @@ enum {
+ 	 * HCI after resume.
+ 	 */
+ 	HCI_QUIRK_NO_SUSPEND_NOTIFIER,
++
++	/* When this quirk is set, the controller does not power off
++	 * during suspend and resume. This mechanism lets BT devices wake
++	 * the Host up if the Host and chips support.
++	 *
++	 * This quirk can be set before hci_register_dev is called or
++	 * during the hdev->setup vendor callback.
++	 */
++	HCI_QUIRK_DEVICES_WAKEUP_SUPPORTED,
+ };
+ 
+ /* HCI device flags */
 -- 
-2.30.2
+2.17.1
 
