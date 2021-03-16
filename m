@@ -2,164 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B69AC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 10:28:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A165AC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 11:29:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5532665020
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 10:28:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A19E64FED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 11:29:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236402AbhCPK2V (ORCPT
+        id S231622AbhCPL2z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Mar 2021 06:28:21 -0400
-Received: from mail.kernel.org ([198.145.29.99]:34958 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236388AbhCPK2P (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Mar 2021 06:28:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CD23865025;
-        Tue, 16 Mar 2021 10:28:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1615890494;
-        bh=Ek1bMmgEROcrwltu3afjHikqeT9vUmjpYs+Ey8ul8Bo=;
-        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
-        b=MtLDUqpd3tt9CJ5JSTtoiqVd4C8Ho+dQL7vggxZnEI/Hlqd8u6xyrpoybM5MXnV/w
-         1uARuNw7ptB78+1ORMRSxKNRAtz7bEXr9t9sFKMgWtM6wsTJAQtgBXmssQ9Qy9+Bb3
-         BCtS1anUyOp10/Uhzp+YLyth368sOYcwFXsQv6ewqKbFE26c2PBeFfJmHSdANCka+y
-         Yd7ALKIYqCH7LnMf7nCDPvmFB03H8AMWN/dmqMqt/YR0SJBJ63NWEaN1L6H9sws11+
-         mBsgMlDf+pqqI7cQ3oG87wUtoV/Ot73vqICLFFhxtCqQLkRzMh/UrRgEmXTgknrsNY
-         IbDTFXAYsT2hQ==
-Date:   Tue, 16 Mar 2021 11:28:11 +0100 (CET)
-From:   Jiri Kosina <jikos@kernel.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Lockdep report for hci_conn_get_phy()
-In-Reply-To: <nycvar.YFH.7.76.2103041405420.12405@cbobk.fhfr.pm>
-Message-ID: <nycvar.YFH.7.76.2103161125530.12405@cbobk.fhfr.pm>
-References: <nycvar.YFH.7.76.2103041405420.12405@cbobk.fhfr.pm>
-User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+        Tue, 16 Mar 2021 07:28:55 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:25083 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234318AbhCPL2e (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Mar 2021 07:28:34 -0400
+Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210316112832epoutp02f602664733b8fd0a66e21c1e4ddc1167~szyJCg9y_1697816978epoutp02a
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Mar 2021 11:28:32 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210316112832epoutp02f602664733b8fd0a66e21c1e4ddc1167~szyJCg9y_1697816978epoutp02a
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+        s=mail20170921; t=1615894112;
+        bh=zGc5atV3koVrrJ1f8I+I20BcT3fQGdNqYM5l8Ad2P/U=;
+        h=From:To:Cc:Subject:Date:References:From;
+        b=vB7lLT+hZ/ObRCXBgPWikc9gQOICPMSMl2vhZLheLPXF9Te0kVObjCOogDpp9pzIK
+         ALbckIk6poby0anQ//E645SEb4HjWO3sYSe7Kw2ot2CnrjhL1j68j8hI8/tkTWGIg1
+         caUYJP+IDBFxtLBNFvtBtIFqfb1SEfMrd++MeT74=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTP id
+        20210316112830epcas5p25edac9b5f786c80bc4ef68e4cc76e28c~szyHjzlEN3251932519epcas5p2q;
+        Tue, 16 Mar 2021 11:28:30 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        30.10.50652.E5690506; Tue, 16 Mar 2021 20:28:30 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210316105746epcas5p49f71a18f26a567ed3f7e0b1445c1fda5~szXR9AkXg1476614766epcas5p4W;
+        Tue, 16 Mar 2021 10:57:46 +0000 (GMT)
+Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210316105746epsmtrp179a416b33748f351ce18effe5fe7de10~szXR8VNFZ0273802738epsmtrp1C;
+        Tue, 16 Mar 2021 10:57:46 +0000 (GMT)
+X-AuditID: b6c32a4a-6c9ff7000000c5dc-9f-6050965ecc3c
+Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
+        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        F0.97.13470.A2F80506; Tue, 16 Mar 2021 19:57:46 +0900 (KST)
+Received: from ayush.garg-20-10-15 (unknown [107.109.98.149]) by
+        epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
+        20210316105745epsmtip2f3ba903ac50f5e57c9672a2d5c99d266~szXRJh8PS0986009860epsmtip23;
+        Tue, 16 Mar 2021 10:57:45 +0000 (GMT)
+From:   Ayush Garg <ayush.garg@samsung.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     anupam.r@samsung.com, nitin.j@samsung.com
+Subject: [PATCH BlueZ] btmgmt: Fix typo in printing Set PHY Configuration
+ command error
+Date:   Tue, 16 Mar 2021 16:27:38 +0530
+Message-Id: <20210316105738.11560-1-ayush.garg@samsung.com>
+X-Mailer: git-send-email 2.17.1
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFtrKIsWRmVeSWpSXmKPExsWy7bCmpm7ctIAEg3X7dSzurLa2mHOtj9li
+        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MrYMOMfc0Efa8W2s4fZGxjnsnQxcnJI
+        CJhIzFm7irGLkYtDSGA3o8T5reuhnE+MEic3fWeFcL4xSsw/08gK0zJj81omiMReRokNjy8h
+        tDzev5kdpIpNQFPi9ccvTCC2iICyxLN9h8FsZgFdiTPv17F1MXJwCAtESiz65QtisgioSjy9
+        EgxSwStgLfH4fw8jxC55idUbDjCDjJcQ+M4msfH0LTaIhIvEi/9/2CFsYYlXx7dA2VISL/vb
+        2CEamhkldmzeCOX0MEo8+NEN1W0vca7pGSvIZmagQ9fv0ocIy0pMPbUO6k4+id7fT5gg4rwS
+        O+bB2CoSG1Z1wi37eGwhM4TtIXFgTg9YXEggVmLBsqfsExhlZyFsWMDIuIpRMrWgODc9tdi0
+        wCgvtVyvODG3uDQvXS85P3cTIzhmtbx2MD588EHvECMTB+MhRgkOZiURXtO8gAQh3pTEyqrU
+        ovz4otKc1OJDjNIcLErivDsMHsQLCaQnlqRmp6YWpBbBZJk4OKUamMTlz7o7WsTVV7UI7bjJ
+        Pt+Bt4svsOpJfkTT3f+6sZFdAksC13Pcjy+x/hIVsGPnVfOnM0S/Ju+W9E//z55TLmR9YdXq
+        XavN3vfseO9x4WfMt9yXD6rn6n45OYn7ElPb6ptrHA/6rJ/u/PLDJSGxdCvO2i4+316Pqa90
+        l18/45C7Ls9Yu8LJuW7vrxtXGbYG3QiSzllneTX5bZt24befdqvt53TubPk4d/PK+OidwrMD
+        WBtY8h3OXHztbj3V8wOzQHpSyP13Sy+v/2LJt3K+p4L/oTgDGbW1Ni+jvzhP2FiuLbT73ZyE
+        2AADZtXsqzPM1eZcO9Yt9do/TezZS5WApcVz77/UfFq/sj1QXE+aQ4mlOCPRUIu5qDgRAOS8
+        DhNIAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrJJMWRmVeSWpSXmKPExsWy7bCSvK5Wf0CCQXODhMWd1dYWc671MVts
+        W9fO7MDs0bdlFaPH501yAUxRXDYpqTmZZalF+nYJXBkbZvxjLuhjrdh29jB7A+Ncli5GTg4J
+        AROJGZvXMnUxcnEICexmlPi4bDZQggMoISXxeJkORI2wxMp/z9khaj4wSrS8WMQOkmAT0JR4
+        /fELE4gtIqAs8WzfYTCbWUBf4umF64wgtrBAuMSzhxcZQWayCKhKPL0SDBLmFbCWePy/hxFi
+        vrzE6g0HmCcw8ixgZFjFKJlaUJybnltsWGCYl1quV5yYW1yal66XnJ+7iRHsey3NHYzbV33Q
+        O8TIxMF4iFGCg1lJhNc0LyBBiDclsbIqtSg/vqg0J7X4EKM0B4uSOO+FrpPxQgLpiSWp2amp
+        BalFMFkmDk6pBqb+8tCsmHe2a3qDVoQqSWy4KhLRqbfi6LENws48b04lHFriKrqhaZrVgrq/
+        ym8EX51+XbGPe+8T/4ZbAdoa/Q52BlaMLZWBVd/ezjlXtF/ZLqd+0cXzD3PbH5/cM0Etd/3c
+        ltPLLLZOtJ5d19izYHXhVzfV1BdK2y70GEhkRZU92X66iJclXmC6y+rNAQcythzI/GeaZPij
+        t2/Tiuxk+dIGCacinzBGrTdeJ9h37zRcJvjohdArx2MK2id31SlKmazYcyQ4VfX1m60n+6co
+        JG09eGD5gustQcZ/j/mdjMxL1f9lf2szq6541/Mj9e5G65a+mFFrEl6VK+LBMuNbkWCtd7Po
+        d6OgmbbcrUlcM5VYijMSDbWYi4oTAa+s7t1sAgAA
+X-CMS-MailID: 20210316105746epcas5p49f71a18f26a567ed3f7e0b1445c1fda5
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+X-CMS-RootMailID: 20210316105746epcas5p49f71a18f26a567ed3f7e0b1445c1fda5
+References: <CGME20210316105746epcas5p49f71a18f26a567ed3f7e0b1445c1fda5@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 4 Mar 2021, Jiri Kosina wrote:
+Signed-off-by: Ayush Garg <ayush.garg@samsung.com>
+---
+ tools/btmgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
->  ======================================================
->  WARNING: possible circular locking dependency detected
->  5.12.0-rc1-00026-g73d464503354 #10 Not tainted
->  ------------------------------------------------------
->  bluetoothd/1118 is trying to acquire lock:
->  ffff8f078383c078 (&hdev->lock){+.+.}-{3:3}, at: hci_conn_get_phy+0x1c/0x150 [bluetooth]
->  
->  but task is already holding lock:
->  ffff8f07e831d920 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: l2cap_sock_getsockopt+0x8b/0x610 
-> 
->  
->  which lock already depends on the new lock.
-> 
->  
->  the existing dependency chain (in reverse order) is:
->  
->  -> #3 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}:
->         lock_sock_nested+0x72/0xa0
->         l2cap_sock_ready_cb+0x18/0x70 [bluetooth]
->         l2cap_config_rsp+0x27a/0x520 [bluetooth]
->         l2cap_sig_channel+0x658/0x1330 [bluetooth]
->         l2cap_recv_frame+0x1ba/0x310 [bluetooth]
->         hci_rx_work+0x1cc/0x640 [bluetooth]
->         process_one_work+0x244/0x5f0
->         worker_thread+0x3c/0x380
->         kthread+0x13e/0x160
->         ret_from_fork+0x22/0x30
->  
->  -> #2 (&chan->lock#2/1){+.+.}-{3:3}:
->         __mutex_lock+0xa3/0xa10
->         l2cap_chan_connect+0x33a/0x940 [bluetooth]
->         l2cap_sock_connect+0x141/0x2a0 [bluetooth]
->         __sys_connect+0x9b/0xc0
->         __x64_sys_connect+0x16/0x20
->         do_syscall_64+0x33/0x80
->         entry_SYSCALL_64_after_hwframe+0x44/0xae
->  
->  -> #1 (&conn->chan_lock){+.+.}-{3:3}:
->         __mutex_lock+0xa3/0xa10
->         l2cap_chan_connect+0x322/0x940 [bluetooth]
->         l2cap_sock_connect+0x141/0x2a0 [bluetooth]
->         __sys_connect+0x9b/0xc0
->         __x64_sys_connect+0x16/0x20
->         do_syscall_64+0x33/0x80
->         entry_SYSCALL_64_after_hwframe+0x44/0xae
->  
->  -> #0 (&hdev->lock){+.+.}-{3:3}:
->         __lock_acquire+0x147a/0x1a50
->         lock_acquire+0x277/0x3d0
->         __mutex_lock+0xa3/0xa10
->         hci_conn_get_phy+0x1c/0x150 [bluetooth]
->         l2cap_sock_getsockopt+0x5a9/0x610 [bluetooth]
->         __sys_getsockopt+0xcc/0x200
->         __x64_sys_getsockopt+0x20/0x30
->         do_syscall_64+0x33/0x80
->         entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-So looking at the code and digging a bit in the history, it seems like the 
-above dependency chain has been there since ever ...
-
->  other info that might help us debug this:
-> 
->  Chain exists of:
->    &hdev->lock --> &chan->lock#2/1 --> sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP
->   Possible unsafe locking scenario:
-> 
->         CPU0                    CPU1
->         ----                    ----
->    lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
->                                 lock(&chan->lock#2/1);
->                                 lock(sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP);
->    lock(&hdev->lock);
->  
->   *** DEADLOCK ***
-> 
->  1 lock held by bluetoothd/1118:
->   #0: ffff8f07e831d920 (sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP){+.+.}-{0:0}, at: l2cap_sock_getsockopt+0x8b/0x610 [bluetooth]
->  
->  stack backtrace:
->  CPU: 3 PID: 1118 Comm: bluetoothd Not tainted 5.12.0-rc1-00026-g73d464503354 #10
->  Hardware name: LENOVO 20K5S22R00/20K5S22R00, BIOS R0IET38W (1.16 ) 05/31/2017
->  Call Trace:
->   dump_stack+0x7f/0xa1
->   check_noncircular+0x105/0x120
->   ? __lock_acquire+0x147a/0x1a50
->   __lock_acquire+0x147a/0x1a50
->   lock_acquire+0x277/0x3d0
->   ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
->   ? __lock_acquire+0x2e1/0x1a50
->   ? lock_is_held_type+0xb4/0x120
->   ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
->   __mutex_lock+0xa3/0xa10
->   ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
->   ? lock_acquire+0x277/0x3d0
->   ? mark_held_locks+0x49/0x70
->   ? mark_held_locks+0x49/0x70
->   ? hci_conn_get_phy+0x1c/0x150 [bluetooth]
->   hci_conn_get_phy+0x1c/0x150 [bluetooth]
->   l2cap_sock_getsockopt+0x5a9/0x610 [bluetooth]
->   __sys_getsockopt+0xcc/0x200
->   __x64_sys_getsockopt+0x20/0x30
->   do_syscall_64+0x33/0x80
->   entry_SYSCALL_64_after_hwframe+0x44/0xae
-
-... but the sk_lock-AF_BLUETOOTH-BTPROTO_L2CAP -> conn->hdev dependency 
-has been added only in eab2404ba798 ("Bluetooth: Add BT_PHY socket 
-option") and I've started to see this splat only now as I've probably 
-recently acquired userspace that excercises this getsockopt(BT_PHY).
-
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index f4eb541fa..647c696f8 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -4725,7 +4725,7 @@ static void cmd_phy(int argc, char **argv)
+ 	if (mgmt_send(mgmt, MGMT_OP_SET_PHY_CONFIGURATION, index, sizeof(cp),
+ 					&cp, set_phy_rsp, NULL, NULL) == 0) {
+ 		error("Unable to send %s cmd",
+-				mgmt_opstr(MGMT_OP_GET_PHY_CONFIGURATION));
++				mgmt_opstr(MGMT_OP_SET_PHY_CONFIGURATION));
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
+ 	}
+ }
 -- 
-Jiri Kosina
-SUSE Labs
+2.17.1
 
