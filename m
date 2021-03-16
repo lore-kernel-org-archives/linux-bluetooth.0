@@ -7,32 +7,29 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
 	SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1911C43381
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBA01C433E9
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 14:27:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE70B65026
+	by mail.kernel.org (Postfix) with ESMTP id 7E7656507A
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Mar 2021 14:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236290AbhCPO06 (ORCPT
+        id S235346AbhCPO05 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Mar 2021 10:26:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50738 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236298AbhCPO0m (ORCPT
+        Tue, 16 Mar 2021 10:26:57 -0400
+Received: from bhuna.collabora.co.uk ([46.235.227.227]:41868 "EHLO
+        bhuna.collabora.co.uk" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236274AbhCPO0k (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Mar 2021 10:26:42 -0400
-Received: from bhuna.collabora.co.uk (bhuna.collabora.co.uk [IPv6:2a00:1098:0:82:1000:25:2eeb:e3e3])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DD24C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Mar 2021 07:26:41 -0700 (PDT)
+        Tue, 16 Mar 2021 10:26:40 -0400
 Received: from [127.0.0.1] (localhost [127.0.0.1])
         (Authenticated sender: fdanis)
-        with ESMTPSA id C83E91F44BCD
+        with ESMTPSA id 154BD1F44BE0
 From:   =?UTF-8?q?Fr=C3=A9d=C3=A9ric=20Danis?= 
         <frederic.danis@collabora.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH Bluez v3 1/4] shared/timeout: Add timeout_add_seconds abstraction
-Date:   Tue, 16 Mar 2021 15:26:24 +0100
-Message-Id: <20210316142627.23692-2-frederic.danis@collabora.com>
+Subject: [PATCH Bluez v3 3/4] plugins: Replace calls to g_timeout_add_seconds by timeout_add_seconds
+Date:   Tue, 16 Mar 2021 15:26:26 +0100
+Message-Id: <20210316142627.23692-4-frederic.danis@collabora.com>
 X-Mailer: git-send-email 2.18.0
 In-Reply-To: <20210316142627.23692-1-frederic.danis@collabora.com>
 References: <20210316142627.23692-1-frederic.danis@collabora.com>
@@ -43,160 +40,328 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-g_timeout_add_seconds() call doesn't ensure the time for the first call of
-the timer if the delay is less or equal to 1 second.
-In case of a 0 delay call g_idle_add() instead of g_timeout_add_seconds().
 ---
- src/shared/tester.c           | 16 +++++++++-------
- src/shared/timeout-ell.c      |  6 ++++++
- src/shared/timeout-glib.c     | 27 +++++++++++++++++++++++++++
- src/shared/timeout-mainloop.c |  6 ++++++
- src/shared/timeout.h          |  3 +++
- 5 files changed, 51 insertions(+), 7 deletions(-)
+ plugins/policy.c | 91 ++++++++++++++++++++++++------------------------
+ 1 file changed, 46 insertions(+), 45 deletions(-)
 
-diff --git a/src/shared/tester.c b/src/shared/tester.c
-index af33a79cd..c07cbc11c 100644
---- a/src/shared/tester.c
-+++ b/src/shared/tester.c
-@@ -36,6 +36,7 @@
- #include "src/shared/util.h"
- #include "src/shared/tester.h"
- #include "src/shared/log.h"
+diff --git a/plugins/policy.c b/plugins/policy.c
+index ba9e1be02..bf93df096 100644
+--- a/plugins/policy.c
++++ b/plugins/policy.c
+@@ -31,6 +31,7 @@
+ #include "src/service.h"
+ #include "src/profile.h"
+ #include "src/btd.h"
 +#include "src/shared/timeout.h"
  
- #define COLOR_OFF	"\x1B[0m"
- #define COLOR_BLACK	"\x1B[0;30m"
-@@ -126,7 +127,7 @@ static void test_destroy(gpointer data)
- 	struct test_case *test = data;
+ #define CONTROL_CONNECT_TIMEOUT 2
+ #define SOURCE_RETRY_TIMEOUT 2
+@@ -46,7 +47,7 @@ struct reconnect_data {
+ 	struct btd_device *dev;
+ 	bool reconnect;
+ 	GSList *services;
+-	guint timer;
++	unsigned int timer;
+ 	bool active;
+ 	unsigned int attempt;
+ 	bool on_resume;
+@@ -77,13 +78,13 @@ static bool auto_enable = false;
+ struct policy_data {
+ 	struct btd_device *dev;
  
- 	if (test->timeout_id > 0)
--		g_source_remove(test->timeout_id);
-+		timeout_remove(test->timeout_id);
+-	guint source_timer;
++	unsigned int source_timer;
+ 	uint8_t source_retries;
+-	guint sink_timer;
++	unsigned int sink_timer;
+ 	uint8_t sink_retries;
+-	guint ct_timer;
++	unsigned int ct_timer;
+ 	uint8_t ct_retries;
+-	guint tg_timer;
++	unsigned int tg_timer;
+ 	uint8_t tg_retries;
+ };
  
- 	if (test->teardown_id > 0)
- 		g_source_remove(test->teardown_id);
-@@ -429,7 +430,7 @@ static gboolean teardown_callback(gpointer user_data)
- 	return FALSE;
+@@ -126,7 +127,7 @@ static void policy_disconnect(struct policy_data *data,
+ 	btd_service_disconnect(service);
  }
  
--static gboolean test_timeout(gpointer user_data)
-+static bool test_timeout(gpointer user_data)
+-static gboolean policy_connect_ct(gpointer user_data)
++static bool policy_connect_ct(gpointer user_data)
  {
- 	struct test_case *test = user_data;
+ 	struct policy_data *data = user_data;
+ 	struct btd_service *service;
+@@ -144,10 +145,10 @@ static gboolean policy_connect_ct(gpointer user_data)
+ static void policy_set_ct_timer(struct policy_data *data, int timeout)
+ {
+ 	if (data->ct_timer > 0)
+-		g_source_remove(data->ct_timer);
++		timeout_remove(data->ct_timer);
  
-@@ -470,8 +471,9 @@ static void next_test_case(void)
- 	test->start_time = g_timer_elapsed(test_timer, NULL);
- 
- 	if (test->timeout > 0)
--		test->timeout_id = g_timeout_add_seconds(test->timeout,
--							test_timeout, test);
-+		test->timeout_id = timeout_add_seconds(test->timeout,
-+							test_timeout, test,
-+							NULL);
- 
- 	test->stage = TEST_STAGE_PRE_SETUP;
- 
-@@ -542,7 +544,7 @@ void tester_pre_setup_failed(void)
- 		return;
- 
- 	if (test->timeout_id > 0) {
--		g_source_remove(test->timeout_id);
-+		timeout_remove(test->timeout_id);
- 		test->timeout_id = 0;
- 	}
- 
-@@ -583,7 +585,7 @@ void tester_setup_failed(void)
- 	test->stage = TEST_STAGE_POST_TEARDOWN;
- 
- 	if (test->timeout_id > 0) {
--		g_source_remove(test->timeout_id);
-+		timeout_remove(test->timeout_id);
- 		test->timeout_id = 0;
- 	}
- 
-@@ -606,7 +608,7 @@ static void test_result(enum test_result result)
- 		return;
- 
- 	if (test->timeout_id > 0) {
--		g_source_remove(test->timeout_id);
-+		timeout_remove(test->timeout_id);
- 		test->timeout_id = 0;
- 	}
- 
-diff --git a/src/shared/timeout-ell.c b/src/shared/timeout-ell.c
-index 023364069..6416d8590 100644
---- a/src/shared/timeout-ell.c
-+++ b/src/shared/timeout-ell.c
-@@ -101,3 +101,9 @@ void timeout_remove(unsigned int id)
- 	if (to)
- 		l_timeout_remove(to);
+-	data->ct_timer = g_timeout_add_seconds(timeout, policy_connect_ct,
+-									data);
++	data->ct_timer = timeout_add_seconds(timeout, policy_connect_ct,
++						data, NULL);
  }
-+
-+unsigned int timeout_add_seconds(unsigned int timeout, timeout_func_t func,
-+			void *user_data, timeout_destroy_func_t destroy)
-+{
-+	return timeout_add(timeout * 1000, func, user_data, destroy);
-+}
-diff --git a/src/shared/timeout-glib.c b/src/shared/timeout-glib.c
-index 8bdb7a662..3268d480c 100644
---- a/src/shared/timeout-glib.c
-+++ b/src/shared/timeout-glib.c
-@@ -71,3 +71,30 @@ void timeout_remove(unsigned int id)
- 	if (source)
- 		g_source_destroy(source);
- }
-+
-+unsigned int timeout_add_seconds(unsigned int timeout, timeout_func_t func,
-+			void *user_data, timeout_destroy_func_t destroy)
-+{
-+	struct timeout_data *data;
-+	guint id;
-+
-+	data = g_try_new0(struct timeout_data, 1);
-+	if (!data)
-+		return 0;
-+
-+	data->func = func;
-+	data->destroy = destroy;
-+	data->user_data = user_data;
-+
-+	if (!timeout)
-+		id = g_idle_add_full(G_PRIORITY_DEFAULT_IDLE, timeout_callback,
-+							data, timeout_destroy);
-+	else
-+		id = g_timeout_add_seconds_full(G_PRIORITY_DEFAULT, timeout,
-+							timeout_callback, data,
-+							timeout_destroy);
-+	if (!id)
-+		g_free(data);
-+
-+	return id;
-+}
-diff --git a/src/shared/timeout-mainloop.c b/src/shared/timeout-mainloop.c
-index 5ffa65c2a..9be803cda 100644
---- a/src/shared/timeout-mainloop.c
-+++ b/src/shared/timeout-mainloop.c
-@@ -71,3 +71,9 @@ void timeout_remove(unsigned int id)
  
- 	mainloop_remove_timeout((int) id);
+ static struct policy_data *find_data(struct btd_device *dev)
+@@ -169,16 +170,16 @@ static void policy_remove(void *user_data)
+ 	struct policy_data *data = user_data;
+ 
+ 	if (data->source_timer > 0)
+-		g_source_remove(data->source_timer);
++		timeout_remove(data->source_timer);
+ 
+ 	if (data->sink_timer > 0)
+-		g_source_remove(data->sink_timer);
++		timeout_remove(data->sink_timer);
+ 
+ 	if (data->ct_timer > 0)
+-		g_source_remove(data->ct_timer);
++		timeout_remove(data->ct_timer);
+ 
+ 	if (data->tg_timer > 0)
+-		g_source_remove(data->tg_timer);
++		timeout_remove(data->tg_timer);
+ 
+ 	g_free(data);
  }
-+
-+unsigned int timeout_add_seconds(unsigned int timeout, timeout_func_t func,
-+			void *user_data, timeout_destroy_func_t destroy)
-+{
-+	return timeout_add(timeout * 1000, func, user_data, destroy);
-+}
-diff --git a/src/shared/timeout.h b/src/shared/timeout.h
-index 7e22345dd..0945c3318 100644
---- a/src/shared/timeout.h
-+++ b/src/shared/timeout.h
-@@ -16,3 +16,6 @@ typedef void (*timeout_destroy_func_t)(void *user_data);
- unsigned int timeout_add(unsigned int timeout, timeout_func_t func,
- 			void *user_data, timeout_destroy_func_t destroy);
- void timeout_remove(unsigned int id);
-+
-+unsigned int timeout_add_seconds(unsigned int timeout, timeout_func_t func,
-+			void *user_data, timeout_destroy_func_t destroy);
+@@ -199,7 +200,7 @@ static struct policy_data *policy_get_data(struct btd_device *dev)
+ 	return data;
+ }
+ 
+-static gboolean policy_connect_sink(gpointer user_data)
++static bool policy_connect_sink(gpointer user_data)
+ {
+ 	struct policy_data *data = user_data;
+ 	struct btd_service *service;
+@@ -217,11 +218,11 @@ static gboolean policy_connect_sink(gpointer user_data)
+ static void policy_set_sink_timer(struct policy_data *data)
+ {
+ 	if (data->sink_timer > 0)
+-		g_source_remove(data->sink_timer);
++		timeout_remove(data->sink_timer);
+ 
+-	data->sink_timer = g_timeout_add_seconds(SINK_RETRY_TIMEOUT,
++	data->sink_timer = timeout_add_seconds(SINK_RETRY_TIMEOUT,
+ 							policy_connect_sink,
+-							data);
++							data, NULL);
+ }
+ 
+ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
+@@ -240,7 +241,7 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
+ 	switch (new_state) {
+ 	case BTD_SERVICE_STATE_UNAVAILABLE:
+ 		if (data->sink_timer > 0) {
+-			g_source_remove(data->sink_timer);
++			timeout_remove(data->sink_timer);
+ 			data->sink_timer = 0;
+ 		}
+ 		break;
+@@ -255,13 +256,13 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
+ 					data->sink_retries = 0;
+ 				break;
+ 			} else if (data->sink_timer > 0) {
+-				g_source_remove(data->sink_timer);
++				timeout_remove(data->sink_timer);
+ 				data->sink_timer = 0;
+ 			}
+ 		}
+ 
+ 		if (data->ct_timer > 0) {
+-			g_source_remove(data->ct_timer);
++			timeout_remove(data->ct_timer);
+ 			data->ct_timer = 0;
+ 		} else if (btd_service_get_state(controller) !=
+ 						BTD_SERVICE_STATE_DISCONNECTED)
+@@ -271,7 +272,7 @@ static void sink_cb(struct btd_service *service, btd_service_state_t old_state,
+ 		break;
+ 	case BTD_SERVICE_STATE_CONNECTED:
+ 		if (data->sink_timer > 0) {
+-			g_source_remove(data->sink_timer);
++			timeout_remove(data->sink_timer);
+ 			data->sink_timer = 0;
+ 		}
+ 
+@@ -325,7 +326,7 @@ static void hs_cb(struct btd_service *service, btd_service_state_t old_state,
+ 	}
+ }
+ 
+-static gboolean policy_connect_tg(gpointer user_data)
++static bool policy_connect_tg(gpointer user_data)
+ {
+ 	struct policy_data *data = user_data;
+ 	struct btd_service *service;
+@@ -343,13 +344,13 @@ static gboolean policy_connect_tg(gpointer user_data)
+ static void policy_set_tg_timer(struct policy_data *data, int timeout)
+ {
+ 	if (data->tg_timer > 0)
+-		g_source_remove(data->tg_timer);
++		timeout_remove(data->tg_timer);
+ 
+-	data->tg_timer = g_timeout_add_seconds(timeout, policy_connect_tg,
+-							data);
++	data->tg_timer = timeout_add_seconds(timeout, policy_connect_tg,
++							data, NULL);
+ }
+ 
+-static gboolean policy_connect_source(gpointer user_data)
++static bool policy_connect_source(gpointer user_data)
+ {
+ 	struct policy_data *data = user_data;
+ 	struct btd_service *service;
+@@ -367,11 +368,11 @@ static gboolean policy_connect_source(gpointer user_data)
+ static void policy_set_source_timer(struct policy_data *data)
+ {
+ 	if (data->source_timer > 0)
+-		g_source_remove(data->source_timer);
++		timeout_remove(data->source_timer);
+ 
+-	data->source_timer = g_timeout_add_seconds(SOURCE_RETRY_TIMEOUT,
++	data->source_timer = timeout_add_seconds(SOURCE_RETRY_TIMEOUT,
+ 							policy_connect_source,
+-							data);
++							data, NULL);
+ }
+ 
+ static void source_cb(struct btd_service *service,
+@@ -391,7 +392,7 @@ static void source_cb(struct btd_service *service,
+ 	switch (new_state) {
+ 	case BTD_SERVICE_STATE_UNAVAILABLE:
+ 		if (data->source_timer > 0) {
+-			g_source_remove(data->source_timer);
++			timeout_remove(data->source_timer);
+ 			data->source_timer = 0;
+ 		}
+ 		break;
+@@ -406,13 +407,13 @@ static void source_cb(struct btd_service *service,
+ 					data->source_retries = 0;
+ 				break;
+ 			} else if (data->source_timer > 0) {
+-				g_source_remove(data->source_timer);
++				timeout_remove(data->source_timer);
+ 				data->source_timer = 0;
+ 			}
+ 		}
+ 
+ 		if (data->tg_timer > 0) {
+-			g_source_remove(data->tg_timer);
++			timeout_remove(data->tg_timer);
+ 			data->tg_timer = 0;
+ 		} else if (btd_service_get_state(target) !=
+ 						BTD_SERVICE_STATE_DISCONNECTED)
+@@ -422,7 +423,7 @@ static void source_cb(struct btd_service *service,
+ 		break;
+ 	case BTD_SERVICE_STATE_CONNECTED:
+ 		if (data->source_timer > 0) {
+-			g_source_remove(data->source_timer);
++			timeout_remove(data->source_timer);
+ 			data->source_timer = 0;
+ 		}
+ 
+@@ -454,7 +455,7 @@ static void controller_cb(struct btd_service *service,
+ 	switch (new_state) {
+ 	case BTD_SERVICE_STATE_UNAVAILABLE:
+ 		if (data->ct_timer > 0) {
+-			g_source_remove(data->ct_timer);
++			timeout_remove(data->ct_timer);
+ 			data->ct_timer = 0;
+ 		}
+ 		break;
+@@ -470,7 +471,7 @@ static void controller_cb(struct btd_service *service,
+ 					data->ct_retries = 0;
+ 				break;
+ 			} else if (data->ct_timer > 0) {
+-				g_source_remove(data->ct_timer);
++				timeout_remove(data->ct_timer);
+ 				data->ct_timer = 0;
+ 			}
+ 		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
+@@ -481,7 +482,7 @@ static void controller_cb(struct btd_service *service,
+ 		break;
+ 	case BTD_SERVICE_STATE_CONNECTED:
+ 		if (data->ct_timer > 0) {
+-			g_source_remove(data->ct_timer);
++			timeout_remove(data->ct_timer);
+ 			data->ct_timer = 0;
+ 		}
+ 		break;
+@@ -504,7 +505,7 @@ static void target_cb(struct btd_service *service,
+ 	switch (new_state) {
+ 	case BTD_SERVICE_STATE_UNAVAILABLE:
+ 		if (data->tg_timer > 0) {
+-			g_source_remove(data->tg_timer);
++			timeout_remove(data->tg_timer);
+ 			data->tg_timer = 0;
+ 		}
+ 		break;
+@@ -520,7 +521,7 @@ static void target_cb(struct btd_service *service,
+ 					data->tg_retries = 0;
+ 				break;
+ 			} else if (data->tg_timer > 0) {
+-				g_source_remove(data->tg_timer);
++				timeout_remove(data->tg_timer);
+ 				data->tg_timer = 0;
+ 			}
+ 		} else if (old_state == BTD_SERVICE_STATE_CONNECTED) {
+@@ -531,7 +532,7 @@ static void target_cb(struct btd_service *service,
+ 		break;
+ 	case BTD_SERVICE_STATE_CONNECTED:
+ 		if (data->tg_timer > 0) {
+-			g_source_remove(data->tg_timer);
++			timeout_remove(data->tg_timer);
+ 			data->tg_timer = 0;
+ 		}
+ 		break;
+@@ -546,7 +547,7 @@ static void reconnect_reset(struct reconnect_data *reconnect)
+ 	reconnect->active = false;
+ 
+ 	if (reconnect->timer > 0) {
+-		g_source_remove(reconnect->timer);
++		timeout_remove(reconnect->timer);
+ 		reconnect->timer = 0;
+ 	}
+ }
+@@ -592,7 +593,7 @@ static void reconnect_destroy(gpointer data)
+ 	struct reconnect_data *reconnect = data;
+ 
+ 	if (reconnect->timer > 0)
+-		g_source_remove(reconnect->timer);
++		timeout_remove(reconnect->timer);
+ 
+ 	g_slist_free_full(reconnect->services,
+ 					(GDestroyNotify) btd_service_unref);
+@@ -622,7 +623,7 @@ static void reconnect_remove(struct btd_service *service)
+ 	reconnects = g_slist_remove(reconnects, reconnect);
+ 
+ 	if (reconnect->timer > 0)
+-		g_source_remove(reconnect->timer);
++		timeout_remove(reconnect->timer);
+ 
+ 	g_free(reconnect);
+ }
+@@ -693,7 +694,7 @@ static void service_cb(struct btd_service *service,
+ 	DBG("Added %s reconnect %u", profile->name, reconnect->reconnect);
+ }
+ 
+-static gboolean reconnect_timeout(gpointer data)
++static bool reconnect_timeout(gpointer data)
+ {
+ 	struct reconnect_data *reconnect = data;
+ 	int err;
+@@ -734,8 +735,8 @@ static void reconnect_set_timer(struct reconnect_data *reconnect, int timeout)
+ 	DBG("attempt %u/%zu %d seconds", reconnect->attempt + 1,
+ 						reconnect_attempts, timeout);
+ 
+-	reconnect->timer = g_timeout_add_seconds(timeout, reconnect_timeout,
+-								reconnect);
++	reconnect->timer = timeout_add_seconds(timeout, reconnect_timeout,
++						reconnect, NULL);
+ }
+ 
+ static void disconnect_cb(struct btd_device *dev, uint8_t reason)
 -- 
 2.18.0
 
