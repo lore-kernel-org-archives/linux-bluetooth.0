@@ -2,117 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35531C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 18:30:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16FE9C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 18:36:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 00C9E64F50
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 18:30:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C2EA764E61
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 18:36:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232263AbhCQS3a (ORCPT
+        id S232836AbhCQSfe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Mar 2021 14:29:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50688 "EHLO
+        Wed, 17 Mar 2021 14:35:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232929AbhCQS3N (ORCPT
+        with ESMTP id S229601AbhCQSfC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Mar 2021 14:29:13 -0400
-Received: from mail-ot1-x333.google.com (mail-ot1-x333.google.com [IPv6:2607:f8b0:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B8C1C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 11:29:13 -0700 (PDT)
-Received: by mail-ot1-x333.google.com with SMTP id 31-20020a9d00220000b02901b64b9b50b1so2724926ota.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 11:29:13 -0700 (PDT)
+        Wed, 17 Mar 2021 14:35:02 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A713C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 11:35:02 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 31-20020a9d00220000b02901b64b9b50b1so2742390ota.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 11:35:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=1kqTYSW1zkFhWoKd2whbj0DDf8cBivFoSa1nZoO0JCo=;
-        b=XIrk/zfRYy3J2FN9ZcYTVnIozpEZuf2elW2OUs9LpkFQjfP9o3KX5YsivX2Iinj/sj
-         WULU9yB8ykLKJpfAxZVnB7+Ra7RhuNzWqaUt7TdnISW2t9zydKWt6yOieAMO8DJEARU0
-         bvwPXOyhE1C7gZMVVFRHcEcUxv0vbmmBTkNBJpMcOKP3JBKg+a3dusZyCbWgXiTAR3BS
-         qtORkWXuqw4TTiPdpF/9cV9C8/bacDRIg+rQfqceaTbU9rodsDIx93yEWQ194Yz30Ujz
-         JQTEXA8MD2iQhTq3F0vOcS3bOZ1UHX+jjvL7E0I9ViCcWdm9eIfHVVDiKIi8uYMHeUql
-         EPzQ==
+        bh=h6TC+h+B8fsAquoUBl6DkoV+YWVysaTGLibth1AgGTA=;
+        b=UatXQ/kzCOohZkJI82p7umWya5dy48OOUTheTdUjqs6eHiyw7EUgugkD71ZMO6NWYU
+         8jP3cswKRrDRS+thgJ1cMHYZOJ98IL7cGX/5V/wfV/5eZoFhMge/uH0rPgmccc4Ma7+8
+         Xbbc+yn1rq6oqeQbdQEq4RtYbzmzFbZdnW/wXgp1eNiH3TC3nEPtlswLEjL4ym4BJ/sO
+         RoZibtY1z4REVMqr2qPFZ2pGPs7s0zVlrgQSndwy0yI44Y5k+mIMKMtMfyJbjgaWBa7T
+         06CdnbgN2QLZlzPM8snvYa6TPPsr2BCouUb2KwEFcFuuOk1IKc3q8aEum2QDh6S6mwm7
+         r1fA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=1kqTYSW1zkFhWoKd2whbj0DDf8cBivFoSa1nZoO0JCo=;
-        b=B2dl+4b0XgoPLevlh0+fZBxEThlXIwRc6LAPGB6PVZM547e7U7jxS8or+hVNQtmJDi
-         dGpbbsJ7ntIuQTjsHFva21sw2kIePVP6BVTjBPo28enJDNapeW8MBtEM9Yv+wfhIou1v
-         l2A31St8FDIpTDfVHvNvSgtoSMW9pASCyO1y4WWrJTRhBDdLu7wvMy2lvN9uErnVWB36
-         OtR1e2lSqtkq6+f2gQ1sI2bryttOfysg5A5G2GuuzcSquYCn+qRuuNPcm82DFk3B8ROj
-         nZvAA/YUo+zqHMNo8pPQEVW93O5akmU6w2UjS0c383wNUVIYHJKq+hJokx86ywl+WaL9
-         hmgA==
-X-Gm-Message-State: AOAM533SjUXh41aoLN9ZxUscJv0KVRv2iE6ZHO4zHrmcUC1BzlTrDX5F
-        FK/eYfiTIW1pizOukwzTxUex567ciJzwBZ+Gh3UTayzN8OPB3A==
-X-Google-Smtp-Source: ABdhPJwPnZvrHjHJErAlsnHM0A6A6mQ6FdIabHjpQT/73IHLJCQikTpWjpWA00YPRbFa8x1AEMjO517r2JRK7TwUWio=
-X-Received: by 2002:a05:6830:619:: with SMTP id w25mr4377078oti.371.1616005752856;
- Wed, 17 Mar 2021 11:29:12 -0700 (PDT)
+        bh=h6TC+h+B8fsAquoUBl6DkoV+YWVysaTGLibth1AgGTA=;
+        b=jLwqhmNa8fyQ/T8HpCWmesvtj5VKc7xmpmDBu4rTkq/HZKQpcX4aWBQX77QtTrPnCZ
+         0BqWPUcdsdXhvpIxmX0L7uW1cch+tJNxU/4Ie9eTmaZ4AAgHRYPNmA2uHifH6G1kbkYL
+         A8IgB2F58vTrmGEV/lwjVcXyI6Mf0bXBeD9GyFFCrtbHxv4b6aFKMtbhq/VQVvc/O6CM
+         77IKHyOFE240Yj77F5re6BPFimMiOaEG4WFoPmCTJ2Pj6HRUcfkqRZbCtILdyVnuc1+4
+         NF0AGmk3Ur4eugN7MjAljlSxftZi9DaN8qTmIkVRo8AHrWxFzl++GqmV28/wAuyk0oC1
+         lt3Q==
+X-Gm-Message-State: AOAM532Uv0k59FMvBBcxWtgWmcdOeqXolxDYOQlUgzqPrgqqBStreLWO
+        GDaJLOztb3czJ81KtXPCghoEE6PTnkwSxoVXwyVAJidTBWQ=
+X-Google-Smtp-Source: ABdhPJzKCO2LVbn4t7f+8H5tvS7PGBMDUV9suCvMJy0txhBKP/vX2bXH8FW/MyLW7XgY7W3EYtB+qlQ+nXAocESKrus=
+X-Received: by 2002:a05:6830:619:: with SMTP id w25mr4393967oti.371.1616006101550;
+ Wed, 17 Mar 2021 11:35:01 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210316205838.2164464-1-luiz.dentz@gmail.com> <FD38AD5A-FADA-4EBB-AC7C-BD91F50EE248@holtmann.org>
-In-Reply-To: <FD38AD5A-FADA-4EBB-AC7C-BD91F50EE248@holtmann.org>
+References: <20210316232217.3344489-1-danielwinkler@google.com>
+In-Reply-To: <20210316232217.3344489-1-danielwinkler@google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 17 Mar 2021 11:29:02 -0700
-Message-ID: <CABBYNZ+zmuN+UKOXvSgh7EMbsoZTp=9gZ7-CCPpr0V3BT+qkbg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] build: Fix build with latest tree
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 17 Mar 2021 11:34:50 -0700
+Message-ID: <CABBYNZJ6Xvt_tAqST4EOz2z4Zom1kJ3goRfpPQ9BDwmBZf-iGw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v4 0/3] Expose extended adv feature support via
+ bluez API
+To:     Daniel Winkler <danielwinkler@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Daniel,
 
-On Wed, Mar 17, 2021 at 1:38 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+On Tue, Mar 16, 2021 at 4:27 PM Daniel Winkler <danielwinkler@google.com> wrote:
 >
-> Hi Luiz,
+> Hi Maintainers,
 >
-> > Latest ell tree has introduced useful.h and main-private.h which are
-> > required to build:
-> >
-> > ell/cert-crypto.c:35:10: fatal error: useful.h: No such file or
-> > directory
-> >   35 | #include "useful.h"
-> >         |          ^~~~~~~~~~
-> > ...
-> > ---
-> > Makefile.am | 4 +++-
-> > 1 file changed, 3 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/Makefile.am b/Makefile.am
-> > index ff0df2196..7fce2e7c0 100644
-> > --- a/Makefile.am
-> > +++ b/Makefile.am
-> > @@ -135,7 +135,9 @@ ell_headers = ell/util.h \
-> >                       ell/asn1-private.h \
-> >                       ell/cert-private.h \
-> >                       ell/pem-private.h \
-> > -                     ell/uuid.h
-> > +                     ell/uuid.h \
-> > +                     ell/useful.h \
-> > +                     ell/main-private.h
-> >
+> I believe this series fell through the cracks. It is listed on
+> patchworks as "Accepted", but I have not been able to find it in the
+> tree. I am re-posting it here, please advise if I am mistaken.
 >
-> this is the wrong fix. It will break in the tarballs. ELL will not install ell/useful.h ever. So every tarball needs to ensure that ell/useful.h is included. Which means you need to follow the fix from iwd here.
-
-Are you talking about this:
-
-https://git.kernel.org/pub/scm/network/wireless/iwd.git/commit/?id=ed05585063f2e6d8f2fcd5f008b861062ac7a429
-
-Shall we use the same mechanism to link the headers?
-
-> Regards
+> This change adds a SupportedFeatures member to the LEAdvertisingManager
+> interface, which allows us to expose support for hardware offloading and
+> setting TX power on advertisements.
 >
-> Marcel
+> Best,
+> Daniel
 >
+> Changes in v4:
+> - Mark SupportedFeatures as experimental
+>
+> Changes in v3:
+> - Rebased onto master
+>
+> Changes in v2:
+> - Expose empty SupportedFeatures if no support available
+> - Doc: Expect empty SupportedFeatures if no support available
+>
+> Daniel Winkler (3):
+>   advertising: Add SupportedFeatures to LEAdvertisingManager1
+>   client: Add adv SupportedFeatures to bluetoothctl
+>   doc/advertising-api: Add adv SupportedFeatures to doc
+>
+>  client/main.c           |  1 +
+>  doc/advertising-api.txt | 18 +++++++++++++++++
+>  lib/mgmt.h              |  2 ++
+>  src/advertising.c       | 44 +++++++++++++++++++++++++++++++++++++++--
+>  4 files changed, 63 insertions(+), 2 deletions(-)
+>
+> --
+> 2.31.0.rc2.261.g7f71774620-goog
 
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
