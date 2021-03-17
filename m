@@ -2,186 +2,75 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B37FC433DB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 07:38:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D028C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 08:38:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAFBE64E74
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 07:38:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A1D2B64F42
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Mar 2021 08:38:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230080AbhCQHhU (ORCPT
+        id S229585AbhCQIiW convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Mar 2021 03:37:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49292 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229707AbhCQHhC (ORCPT
+        Wed, 17 Mar 2021 04:38:22 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43152 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229564AbhCQIiD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Mar 2021 03:37:02 -0400
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F7F8C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 00:36:51 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id a7so39929180iok.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Mar 2021 00:36:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=DLYwGagxaA8XLtU1hZecPiveGLUuy3d+T9NVqP5dDYg=;
-        b=MdXvXmdIO5/tqEyZgUPmZ7yFz+NEGjims0LWbfL/lvKYOh1oDDi/btmsG1kCMHNOh+
-         n82NmSzI+hmomJpxq7NJmggrly6LYsxaa1J/IMBn17XATBSH3HBwIoBvmKDqWJe2Q94h
-         VzyqIKTdzGzt/ivE761FE4WSSM4XxutJJ+c/7hsweIo/7Lerde+Zy6z/B07WaflVv64D
-         ueBwIbF+i41FGnGyqAK1LmwyqSnTjImNnUVnbvAN3Z6B3ZwGyKRxRFv8bF+0JOJxSsdZ
-         0H9S98TEf2zzg75/CR/ZlUwc4GJyGDs9xR2vORAgx3nf1reVMXdCUJ34oPKpeFiKomas
-         M3jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=DLYwGagxaA8XLtU1hZecPiveGLUuy3d+T9NVqP5dDYg=;
-        b=hVj+zsUNYuTcT0wLsT1uSRKGpszBm239U+3njwsPxbCmx0xMxM0FlN5X0zmwEWyokB
-         iDstKPt5T/m5RcF3ll7b/gZTLg70yqtL2322Jv9gQx4g2rCwzf3RP9TAii9yXwVmQam0
-         0OOc5jEYC10wr19Pa2fbKyXewofkJTTEX3XcNIH+Tciaw914sOd2FePgKzyz9vMpOS5E
-         mTK7hs7MGdWLfN8QOKH0DGrAgZ2+Bn4QJgqgJh3Zyc4GBeMKtOStf5OpaYbks9c0KiRd
-         /stURc2Axs2szv5LR6JRypYKUcdGiFWPKcaGQS2UgpkuU6s4txdlFCfuDafdRVLX82GM
-         HRcw==
-X-Gm-Message-State: AOAM531ByVgEhuI1tKmrTc56cQnfgZdIC9zyW04uBxK0sEjCvTb1rcH5
-        WbrtQ3kMtmfZZtMZQejwZk2lvtvqBi3fVdPhjGs2yQIJi9t4
-X-Google-Smtp-Source: ABdhPJy+O4b54SzX35Ca3sdCTwSwAxZWheDpTQU3j1JjW3VYyeS7lHmB+dv3uYbFuBAkV6TKqh3h/x+mMiniQ9a5X3I=
-X-Received: by 2002:a02:a796:: with SMTP id e22mr1838837jaj.93.1615966610657;
- Wed, 17 Mar 2021 00:36:50 -0700 (PDT)
-MIME-Version: 1.0
-From:   Kenny Bian <kennybian@gmail.com>
-Date:   Wed, 17 Mar 2021 00:36:40 -0700
-Message-ID: <CAC9s0NZrReFB-6_JwHFqJtLwqSuYGzKbZMvDeKYzh+Jof9iUjg@mail.gmail.com>
-Subject: Have to delete "/var/lib/bluetooth" folder in order to get all
- service characteristics available
-To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Wed, 17 Mar 2021 04:38:03 -0400
+Received: from mac-pro.holtmann.net (p4fefcec1.dip0.t-ipconnect.de [79.239.206.193])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1BA95CECFD;
+        Wed, 17 Mar 2021 09:45:39 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
+Subject: Re: [PATCH BlueZ] build: Fix build with latest tree
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210316205838.2164464-1-luiz.dentz@gmail.com>
+Date:   Wed, 17 Mar 2021 09:38:01 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FD38AD5A-FADA-4EBB-AC7C-BD91F50EE248@holtmann.org>
+References: <20210316205838.2164464-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In order to keep the pairing information, we carry over the
-"/var/lib/bluetooth" folder from an older build to the new build in
-the Linux system when doing firmware upgrade. This way, our end user
-doesn't have to choose "Forget This Device" each time after the
-firmware upgrade. Otherwise, our end user has to "Forget This Device"
-and re-pair because the pairing info can't be found in the Linux
-device. We also set the GATT cache as "no" in
-"/etc/bluetooth/main.conf". Then the mobile app won't crash when there
-is any "service changed" such as adding notification to some existing
-characteristics.
+Hi Luiz,
 
-We organize our characteristics under the services. There are 10
-services on the Linux device. Each service has 5 to 10
-characteristics. However, we found a new problem recently. The problem
-is: the first 8 services are fine. But the last one or two services
-only have the service UUID listed in nRF or our mobile app. There are
-no characteristics showing up under these one or two services. This
-caused our mobile app can't read the characteristics data under these
-problematic services. I checked the nRF. It's the same thing. nRF only
-shows the last one or two services with the service UUIDs. There are
-no characteristics listed under those 2 services.
+> Latest ell tree has introduced useful.h and main-private.h which are
+> required to build:
+> 
+> ell/cert-crypto.c:35:10: fatal error: useful.h: No such file or
+> directory
+>   35 | #include "useful.h"
+>         |          ^~~~~~~~~~
+> ...
+> ---
+> Makefile.am | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Makefile.am b/Makefile.am
+> index ff0df2196..7fce2e7c0 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -135,7 +135,9 @@ ell_headers = ell/util.h \
+> 			ell/asn1-private.h \
+> 			ell/cert-private.h \
+> 			ell/pem-private.h \
+> -			ell/uuid.h
+> +			ell/uuid.h \
+> +			ell/useful.h \
+> +			ell/main-private.h
+> 
 
-In order to fix this issue, we have to do these(let's call it "The Steps"):
-- Remove the "/var/lib/bluetooth" folder from the Linux system
-- Restart our BlueZ based service in Python in the Linux system
-- Choose "Forget This Device" on the iPhone. After this operation, the
-"/var/lib/bluetooth" is generated in the Linux device.
-- Connect to the device from our mobile app or from nRF. We can see
-all of the 10 services in the list. Each characteristic under the
-service can be seen.
-- We are able to read the data by using our mobile app or by using nRF
+this is the wrong fix. It will break in the tarballs. ELL will not install ell/useful.h ever. So every tarball needs to ensure that ell/useful.h is included. Which means you need to follow the fix from iwd here.
 
-I compared the files in the "/var/lib/bluetooth" folder. As we
-disabled the GATT cache, there is no "cache" folder. There are only 2
-files in the folder. Here is the folder structure:
-/var/lib/bluetooth:
-    |
-    +----00:11:22:33:44:55/
-        |
-        +----6C:92:11:87:11:25/
-            |
-            +----attributes
-            +----info
+Regards
 
-I kept one copy of the files after the firmware upgrade. I also kept a
-copy of the files after the folder was re-generated. I compared the
-file "attributes" and "info". For the attributes, they are the same.
-For the "info" file, there are only 3 differences:
-[General]
-Name=PhoneX
-. . .
+Marcel
 
-[SlaveLongTermKey]
-Key=252256E19E26F3ED9FD0B99B7B5B0193
-. . .
-
-[LinkKey]
-Key=1B593296571E2C48CF6952E60395E304
-. . .
-
-
-I don't think these differences could cause the issue. But the fact
-is, if I delete the "/var/lib/bluetooth" folder and go thru "The
-Steps" above, the problem will be gone. All of the services will have
-their characteristics showing up in nRF. The data can be read from the
-characteristics. This means the folder "/var/lib/bluetooth" is related
-to the issue. But I don't know why.
-
-Here is also another thing. I subscribed to the "PropertiesChanged"
-signal. In the callback function "properties_changed", I print out the
-"changed". Here is the code to subscribe the "PropertiesChanged":
-
-        bus.add_signal_receiver(
-            properties_changed,
-            dbus_interface="org.freedesktop.DBus.Properties",
-            signal_name="PropertiesChanged",
-            arg0="org.bluez.Device1",
-            path_keyword="path",
-        )
-
-If the folder "/var/lib/bluetooth" is removed and go thru "The Steps",
-I saw the log like this:
-dbus.Dictionary({dbus.String('UUIDs'):
-dbus.Array([dbus.String('00000000-deca-fade-deca-deafdecacafe'),
-dbus.String('00001000-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000110a-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000110c-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000110e-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001116-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000111f-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000112f-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001132-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001200-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001800-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001801-0000-1000-8000-00805f9b34fb'),
-dbus.String('00001805-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000180a-0000-1000-8000-00805f9b34fb'),
-dbus.String('0000180f-0000-1000-8000-00805f9b34fb'),
-dbus.String('02030302-1d19-415f-86f2-22a2106a0a77'),
-dbus.String('7905f431-b5ce-4e99-a40f-4b1e122d00d0'),
-dbus.String('89d3502b-0f36-433a-8ef4-c502ad55f8dc'),
-dbus.String('9fa480e0-4967-4542-9390-d343dc5d04ae'),
-dbus.String('d0611e78-bbb4-4591-a5f8-487910ae4366')],
-signature=dbus.Signature('s'), variant_level=1),
-dbus.String('ServicesResolved'): dbus.Boolean(True, variant_level=1)},
-signature=dbus.Signature('sv'))
-
-If I check the log after the firmware is upgraded without deleting the
-"/var/lib/bluetooth" folder, the log looks like this:
-dbus.Dictionary({dbus.String('ServicesResolved'): dbus.Boolean(True,
-variant_level=1)}, signature=dbus.Signature('sv'))
-
-As we can see, they are different. Is it something to do with D-Bus?
-
-We understand that if we don't carry over the "/var/lib/bluetooth"
-folder, then there is no this issue. But our end user will have to
-choose "Forget This Device" each time after the firmware is upgraded.
-Otherwise, the end user can't connect to the Linux device because the
-pairing info can't be found. Is there a way to fix this issue? Namely,
-is there a way to keep the pairing info and also avoid this issue?
-
-Thanks in advance!
