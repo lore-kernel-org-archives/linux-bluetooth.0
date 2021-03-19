@@ -2,223 +2,779 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A775C433DB
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 20:17:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FE4EC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 20:39:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F68F61976
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 20:17:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01BD76195A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 20:39:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230226AbhCSURE (ORCPT
+        id S230218AbhCSUix (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Mar 2021 16:17:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45754 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229912AbhCSUQa (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Mar 2021 16:16:30 -0400
-Received: from mail-pf1-x44a.google.com (mail-pf1-x44a.google.com [IPv6:2607:f8b0:4864:20::44a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F271C06175F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Mar 2021 13:16:30 -0700 (PDT)
-Received: by mail-pf1-x44a.google.com with SMTP id s18so26870296pfe.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Mar 2021 13:16:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=FUzDMOWW+Puyz+SzWC3asQVTMfryGObB0RiZstJMIBU=;
-        b=sgWArQyN8QTzOSH9Gn+mPcH7CA0wlJw0WRwg9RtaZL0CGmB6vEB9B2qBK8dOqOBLrE
-         3skODy2P8GXExoLvB11OLR8A9a9eFvmvUgfIWgqOGkbPRcOq6aSrF7bZIfbZffKqVe8X
-         MV4r8sCleN+ffkVmElatTuxHqSKkCUVAChZjtZsZZPXL3GCY9/tvXL48MpImdKC2Rr8F
-         fX7klLvLWWY2wpI6/HQj7ic0UPyHbIl3YWo9eZkxmyAdXeE9wAE8Mi2Ob/b3DF8bWm+A
-         4+ByZfFIYh5/mdGmcierXQVxk+lJB640s3qszj3uMFrNqG+5AKak7AwLddg7rIY5JaJv
-         vVFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
-         :content-transfer-encoding;
-        bh=FUzDMOWW+Puyz+SzWC3asQVTMfryGObB0RiZstJMIBU=;
-        b=nVLczWxecUGeqgWIT0+FVrcWbmBIUxXBib4EOu8kM2vB1Yr8saOb6+9YHI9jUR3iqT
-         a88dM6Zsj/x+Id9ilK8kwZMrrvu4OM2LPHImrYe7K3ED9TwyGE3B+VEcNs1m2NMaaFAh
-         GfOTDj/Ujc3fWZz9psxgVgXIGymTO28iwrBfFkT8lkxVHVW9w6aLNisutzGaI3Nr4U1O
-         9EaBCmskjGE4BCIHHgBWVa1kj6wQhEZ2BrvC+uBC/C8weHbYWTdOgIIUtJ3WwnvT4oc6
-         edzloOeIkl8BHwYFpUxZOWP2ekxfIEN3wh1D2/OIoY9hLOPMRPUFSZi0QnF3er+6yRaJ
-         PlEQ==
-X-Gm-Message-State: AOAM533PzuRiuL4l++kACGIzUZhqN7H2216/0SYay3WqaxCbJkDcgKF1
-        kyWhprwl2xp4VFvU9mGlofDlA81exhH7Zg==
-X-Google-Smtp-Source: ABdhPJykgo0zi/4qXykDAAUNOjL3usMtXpHDx4UnroLaxR58IPx0WFL9INya2Ev6KCQndsb9j63LruS1nXJlbg==
-X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:fc1f:aed6:24c0:a9b0])
- (user=mmandlik job=sendgmr) by 2002:a17:902:c589:b029:e6:3a39:d4a0 with SMTP
- id p9-20020a170902c589b02900e63a39d4a0mr16153501plx.76.1616184989509; Fri, 19
- Mar 2021 13:16:29 -0700 (PDT)
-Date:   Fri, 19 Mar 2021 13:16:05 -0700
-Message-Id: <20210319131533.v1.1.I14da3750a343d8d48921fffb7c6561337b6e6082@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [PATCH v1] Bluetooth: Add ncmd=0 recovery handling
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     Alain Michaud <alainm@chromium.org>,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        linux-bluetooth@vger.kernel.org,
-        Manish Mandlik <mmandlik@google.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Fri, 19 Mar 2021 16:38:53 -0400
+Received: from mga05.intel.com ([192.55.52.43]:53937 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229974AbhCSUis (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 19 Mar 2021 16:38:48 -0400
+IronPort-SDR: vY3F1GSvOiFdCxziLQyMJfXQCltLeFZBDqbwLGtWzndRUQPDSxg5N3PDo5gH0gbfmxq9dQhNby
+ IQDU9sYWkF/w==
+X-IronPort-AV: E=McAfee;i="6000,8403,9928"; a="275035465"
+X-IronPort-AV: E=Sophos;i="5.81,262,1610438400"; 
+   d="scan'208";a="275035465"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 13:38:48 -0700
+IronPort-SDR: MJSJlcnzMw8oBvXACwnwE43n1xlwErvaROlh5DIJ9+Oyf1LaMwrQgOSUqJKY1+0Vfoa4ETGgfi
+ 1ANkVhitZdYg==
+X-IronPort-AV: E=Sophos;i="5.81,262,1610438400"; 
+   d="scan'208";a="406934909"
+Received: from rkuhnis-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.65.199])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 Mar 2021 13:38:47 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     brian.gix@intel.com, linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ v4 1/2] mesh: Add unit test IO
+Date:   Fri, 19 Mar 2021 13:38:24 -0700
+Message-Id: <20210319203825.459070-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.2
+In-Reply-To: <20210319203825.459070-1-inga.stotland@intel.com>
+References: <20210319203825.459070-1-inga.stotland@intel.com>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-During command status or command complete event, the controller may set
-ncmd=3D0 indicating that it is not accepting any more commands. In such a
-case, host holds off sending any more commands to the controller. If the
-controller doesn't recover from such condition, host will wait forever.
+From: Brian Gix <brian.gix@intel.com>
 
-This patch adds a timer when controller gets into such condition and
-resets the controller if controller doesn't recover within the timeout
-period.
+This adds a new type of mesh IO that is used for non-interactive testing.
+The new io option can be specified on command line as:
+--io unit:<socket_name>
 
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
+When the bluetooth-meshd daemon starts with the "unit" IO type,
+the daemon opens a socket (fd to open is provided after "unit:"
+in <socket_name>). The communication with the daemon is done either
+through the loop-back using mesh DBus-based APIs or the specified
+named socket.
 ---
-Hello Maintainers,
+ Makefile.mesh       |   2 +
+ mesh/main.c         |  41 +++-
+ mesh/mesh-io-unit.c | 533 ++++++++++++++++++++++++++++++++++++++++++++
+ mesh/mesh-io-unit.h |  11 +
+ mesh/mesh-io.c      |   9 +-
+ mesh/mesh-io.h      |   3 +-
+ 6 files changed, 582 insertions(+), 17 deletions(-)
+ create mode 100644 mesh/mesh-io-unit.c
+ create mode 100644 mesh/mesh-io-unit.h
 
-We noticed that during suspend, sometimes the controller firmware gets
-into a state where it is not accepting any more commands (it returns
-ncmd=3D0 in Command Status):
-
-< HCI Command: Disconnect (0x01|0x0006) plen 3 =C2=A0#398 [hci0] 83.760502
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Handle: 1
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Reason: Remote Device Terminated due to Power O=
-ff (0x15)
-> HCI Event: Command Status (0x0f) plen 4 =C2=A0 =C2=A0 =C2=A0 #399 [hci0] =
-83.761694
-=C2=A0 =C2=A0 =C2=A0 Disconnect (0x01|0x0006) ncmd 0
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 Status: Success (0x00)
-
-In such a case, the host holds off sending any more packets to the
-controller until it is ready to accept more commands.=C2=A0If the controlle=
-r
-doesn't recover from such a condition, Command Timeout does not get
-triggered as Command Timeout is queued only once the packet is sent to
-the controller; hence,=C2=A0the host will wait forever.=C2=A0
-
-This patch adds a timer to recover from this condition. Since the
-suspend timeout is 2 seconds, I'm using 4 seconds timeout to recover
-from ncmd=3D0. This should give ample amount of time for recovery and
-should not create any race conditions with the suspend. Once we resume
-from the suspend normally, the timer would expire and reset the
-controller. I have verified this patch locally and able to connect to
-peer device after resume from suspend. Please let me know your thoughts
-on this.
-
-Thanks,
-Manish.
-
- include/net/bluetooth/hci.h      |  1 +
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 15 +++++++++++++++
- net/bluetooth/hci_event.c        | 10 ++++++++++
- 4 files changed, 27 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ea4ae551c426..c4b0650fb9ae 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -339,6 +339,7 @@ enum {
- #define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
- #define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
- #define HCI_CMD_TIMEOUT		msecs_to_jiffies(2000)	/* 2 seconds */
-+#define HCI_NCMD_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
- #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
- #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
- #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_c=
-ore.h
-index ebdd4afe30d2..f14692b39fd5 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -470,6 +470,7 @@ struct hci_dev {
- 	struct delayed_work	service_cache;
-=20
- 	struct delayed_work	cmd_timer;
-+	struct delayed_work	ncmd_timer;
-=20
- 	struct work_struct	rx_work;
- 	struct work_struct	cmd_work;
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index b0d9c36acc03..5ee1609456bd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -2769,6 +2769,20 @@ static void hci_cmd_timeout(struct work_struct *work=
-)
- 	queue_work(hdev->workqueue, &hdev->cmd_work);
+diff --git a/Makefile.mesh b/Makefile.mesh
+index 228dd1b5f..73eaded4a 100644
+--- a/Makefile.mesh
++++ b/Makefile.mesh
+@@ -17,6 +17,8 @@ mesh_sources = mesh/mesh.h mesh/mesh.c \
+ 				mesh/error.h mesh/mesh-io-api.h \
+ 				mesh/mesh-io-generic.h \
+ 				mesh/mesh-io-generic.c \
++				mesh/mesh-io-unit.h \
++				mesh/mesh-io-unit.c \
+ 				mesh/net.h mesh/net.c \
+ 				mesh/crypto.h mesh/crypto.c \
+ 				mesh/friend.h mesh/friend.c \
+diff --git a/mesh/main.c b/mesh/main.c
+index 4356e3f65..1b466598b 100644
+--- a/mesh/main.c
++++ b/mesh/main.c
+@@ -61,7 +61,7 @@ static void usage(void)
+ 	       "\t--help            Show %s information\n", __func__);
+ 	fprintf(stderr,
+ 	       "io:\n"
+-	       "\t([hci]<index> | generic[:[hci]<index>])\n"
++	       "\t([hci]<index> | generic[:[hci]<index>] | unit:<fd_path>)\n"
+ 	       "\t\tUse generic HCI io on interface hci<index>, or the first\n"
+ 	       "\t\tavailable one\n");
  }
-=20
-+/* HCI ncmd timer function */
-+static void hci_ncmd_timeout(struct work_struct *work)
+@@ -77,6 +77,7 @@ static void mesh_ready_callback(void *user_data, bool success)
+ {
+ 	struct l_dbus *dbus = user_data;
+ 
++	l_info("mesh_ready_callback");
+ 	if (!success) {
+ 		l_error("Failed to start mesh");
+ 		l_main_quit();
+@@ -92,10 +93,8 @@ static void mesh_ready_callback(void *user_data, bool success)
+ static void request_name_callback(struct l_dbus *dbus, bool success,
+ 					bool queued, void *user_data)
+ {
+-	l_info("Request name %s",
+-		success ? "success": "failed");
+-
+-	if (!success) {
++	if (!success && io_type != MESH_IO_TYPE_UNIT_TEST) {
++		l_info("Request name failed");
+ 		l_main_quit();
+ 		return;
+ 	}
+@@ -159,6 +158,21 @@ static bool parse_io(const char *optarg, enum mesh_io_type *type, void **opts)
+ 			return true;
+ 
+ 		return false;
++
++	} else if (strstr(optarg, "unit") == optarg) {
++		char *test_path;
++
++		*type = MESH_IO_TYPE_UNIT_TEST;
++
++		optarg += strlen("unit");
++		if (*optarg != ':')
++			return false;
++
++		optarg++;
++		test_path = strdup(optarg);
++
++		*opts = test_path;
++		return true;
+ 	}
+ 
+ 	return false;
+@@ -187,11 +201,19 @@ int main(int argc, char *argv[])
+ 	for (;;) {
+ 		int opt;
+ 
+-		opt = getopt_long(argc, argv, "i:s:c:ndbh", main_options, NULL);
++		opt = getopt_long(argc, argv, "u:i:s:c:ndbh", main_options,
++									NULL);
+ 		if (opt < 0)
+ 			break;
+ 
+ 		switch (opt) {
++		case 'u':
++			if (sscanf(optarg, "%d", &hci_index) == 1 ||
++					sscanf(optarg, "%d", &hci_index) == 1)
++				io = l_strdup_printf("unit:%d", hci_index);
++			else
++				io = l_strdup(optarg);
++			break;
+ 		case 'i':
+ 			if (sscanf(optarg, "hci%d", &hci_index) == 1 ||
+ 					sscanf(optarg, "%d", &hci_index) == 1)
+@@ -261,11 +283,8 @@ int main(int argc, char *argv[])
+ 	status = l_main_run_with_signal(signal_handler, NULL);
+ 
+ done:
+-	if (io)
+-		l_free(io);
+-
+-	if (io_opts)
+-		l_free(io_opts);
++	l_free(io);
++	l_free(io_opts);
+ 
+ 	mesh_cleanup();
+ 	l_dbus_destroy(dbus);
+diff --git a/mesh/mesh-io-unit.c b/mesh/mesh-io-unit.c
+new file mode 100644
+index 000000000..c5aae6741
+--- /dev/null
++++ b/mesh/mesh-io-unit.c
+@@ -0,0 +1,533 @@
++// SPDX-License-Identifier: LGPL-2.1-or-later
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++#ifdef HAVE_CONFIG_H
++#include <config.h>
++#endif
++
++#include <errno.h>
++#include <string.h>
++#include <sys/time.h>
++#include <sys/socket.h>
++#include <sys/un.h>
++#include <unistd.h>
++#include <stdio.h>
++#include <ell/ell.h>
++
++#include "mesh/mesh-defs.h"
++#include "mesh/dbus.h"
++#include "mesh/mesh-io.h"
++#include "mesh/mesh-io-api.h"
++#include "mesh/mesh-io-generic.h"
++
++struct mesh_io_private {
++	struct l_io *sio;
++	void *user_data;
++	char *unique_name;
++	mesh_io_ready_func_t ready_callback;
++	struct l_timeout *tx_timeout;
++	struct l_queue *rx_regs;
++	struct l_queue *tx_pkts;
++	struct sockaddr_un addr;
++	int fd;
++	uint16_t interval;
++};
++
++struct pvt_rx_reg {
++	mesh_io_recv_func_t cb;
++	void *user_data;
++	uint8_t len;
++	uint8_t filter[0];
++};
++
++struct process_data {
++	struct mesh_io_private		*pvt;
++	const uint8_t			*data;
++	uint8_t				len;
++	struct mesh_io_recv_info	info;
++};
++
++struct tx_pkt {
++	struct mesh_io_send_info	info;
++	bool				delete;
++	uint8_t				len;
++	uint8_t				pkt[30];
++};
++
++struct tx_pattern {
++	const uint8_t			*data;
++	uint8_t				len;
++};
++
++static uint32_t get_instant(void)
 +{
-+	struct hci_dev *hdev =3D container_of(work, struct hci_dev,
-+					    ncmd_timer.work);
++	struct timeval tm;
++	uint32_t instant;
 +
-+	bt_dev_err(hdev, "ncmd timeout");
++	gettimeofday(&tm, NULL);
++	instant = tm.tv_sec * 1000;
++	instant += tm.tv_usec / 1000;
 +
-+	if (hci_dev_do_close(hdev))
-+		return;
-+
-+	hci_dev_do_open(hdev);
++	return instant;
 +}
 +
- struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
- 					  bdaddr_t *bdaddr, u8 bdaddr_type)
- {
-@@ -3831,6 +3845,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	init_waitqueue_head(&hdev->suspend_wait_q);
-=20
- 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-+	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
-=20
- 	hci_request_setup(hdev);
-=20
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cf2f4a0abdbd..114a9170d809 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -3635,6 +3635,11 @@ static void hci_cmd_complete_evt(struct hci_dev *hde=
-v, struct sk_buff *skb,
- 	if (*opcode !=3D HCI_OP_NOP)
- 		cancel_delayed_work(&hdev->cmd_timer);
-=20
-+	if (!ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
-+		schedule_delayed_work(&hdev->ncmd_timer, HCI_NCMD_TIMEOUT);
-+	else
-+		cancel_delayed_work(&hdev->ncmd_timer);
++static uint32_t instant_remaining_ms(uint32_t instant)
++{
++	instant -= get_instant();
++	return instant;
++}
 +
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
- 		atomic_set(&hdev->cmd_cnt, 1);
-=20
-@@ -3740,6 +3745,11 @@ static void hci_cmd_status_evt(struct hci_dev *hdev,=
- struct sk_buff *skb,
- 	if (*opcode !=3D HCI_OP_NOP)
- 		cancel_delayed_work(&hdev->cmd_timer);
-=20
-+	if (!ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
-+		schedule_delayed_work(&hdev->ncmd_timer, HCI_NCMD_TIMEOUT);
-+	else
-+		cancel_delayed_work(&hdev->ncmd_timer);
++static void process_rx_callbacks(void *v_reg, void *v_rx)
++{
++	struct pvt_rx_reg *rx_reg = v_reg;
++	struct process_data *rx = v_rx;
 +
- 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
- 		atomic_set(&hdev->cmd_cnt, 1);
-=20
---=20
-2.31.0.rc2.261.g7f71774620-goog
++	if (!memcmp(rx->data, rx_reg->filter, rx_reg->len))
++		rx_reg->cb(rx_reg->user_data, &rx->info, rx->data, rx->len);
++}
++
++static void process_rx(struct mesh_io_private *pvt, int8_t rssi,
++					uint32_t instant, const uint8_t *addr,
++					const uint8_t *data, uint8_t len)
++{
++	struct process_data rx = {
++		.pvt = pvt,
++		.data = data,
++		.len = len,
++		.info.instant = instant,
++		.info.addr = addr,
++		.info.chan = 7,
++		.info.rssi = rssi,
++	};
++
++	l_queue_foreach(pvt->rx_regs, process_rx_callbacks, &rx);
++}
++
++static bool incoming(struct l_io *sio, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	uint32_t instant;
++	uint8_t buf[31];
++	size_t size;
++
++	instant = get_instant();
++
++	size = recv(pvt->fd, buf, sizeof(buf), MSG_DONTWAIT);
++
++	if (size > 9 && buf[0]) {
++		process_rx(pvt, -20, instant, NULL, buf + 1, (uint8_t)size);
++	} else if (size == 1 && !buf[0] && pvt->unique_name) {
++
++		/* Return DBUS unique name */
++		size = strlen(pvt->unique_name);
++
++		if (size > sizeof(buf) - 2)
++			return true;
++
++		buf[0] = 0;
++		memcpy(buf + 1, pvt->unique_name, size + 1);
++		send(pvt->fd, buf, size + 2, MSG_DONTWAIT);
++	}
++
++	return true;
++}
++
++static bool find_by_ad_type(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	uint8_t ad_type = L_PTR_TO_UINT(b);
++
++	return !ad_type || ad_type == tx->pkt[0];
++}
++
++static bool find_by_pattern(const void *a, const void *b)
++{
++	const struct tx_pkt *tx = a;
++	const struct tx_pattern *pattern = b;
++
++	if (tx->len < pattern->len)
++		return false;
++
++	return (!memcmp(tx->pkt, pattern->data, pattern->len));
++}
++
++static void free_socket(struct mesh_io_private *pvt)
++{
++	l_io_destroy(pvt->sio);
++	close(pvt->fd);
++	unlink(pvt->addr.sun_path);
++}
++
++static void hello_callback(struct l_dbus_message *msg, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++
++	pvt->unique_name = l_strdup(l_dbus_message_get_destination(msg));
++	l_debug("User-Daemon unique name: %s", pvt->unique_name);
++}
++
++static void get_name(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct l_dbus *dbus = dbus_get_bus();
++	struct l_dbus_message *msg;
++
++	l_timeout_remove(timeout);
++	if (!dbus) {
++		l_timeout_create_ms(20, get_name, pvt, NULL);
++		return;
++	}
++
++	/* Retrieve unique name */
++	msg = l_dbus_message_new_method_call(dbus, "org.freedesktop.DBus",
++							"/org/freedesktop/DBus",
++							"org.freedesktop.DBus",
++							"GetId");
++
++	l_dbus_message_set_arguments(msg, "");
++
++	l_dbus_send_with_reply(dbus, msg, hello_callback, pvt, NULL);
++}
++
++static void unit_up(void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++
++	l_debug("Started io-unit");
++
++	if (pvt->ready_callback)
++		pvt->ready_callback(pvt->user_data, true);
++
++	l_timeout_create_ms(1, get_name, pvt, NULL);
++}
++
++static bool unit_init(struct mesh_io *io, void *opt,
++				mesh_io_ready_func_t cb, void *user_data)
++{
++	struct mesh_io_private *pvt;
++	char *sk_path;
++	size_t size;
++
++	l_debug("Starting Unit test IO");
++	if (!io || io->pvt)
++		return false;
++
++	sk_path = (char *) opt;
++
++	pvt = l_new(struct mesh_io_private, 1);
++
++	pvt->addr.sun_family = AF_LOCAL;
++	snprintf(pvt->addr.sun_path, sizeof(pvt->addr.sun_path), "%s",
++								sk_path);
++
++	pvt->fd = socket(PF_LOCAL, SOCK_DGRAM | SOCK_CLOEXEC, 0);
++	if (pvt->fd < 0)
++		goto fail;
++
++	unlink(pvt->addr.sun_path);
++	size = offsetof(struct sockaddr_un, sun_path) +
++						strlen(pvt->addr.sun_path);
++
++	if (bind(pvt->fd, (struct sockaddr *) &pvt->addr, size) < 0)
++		goto fail;
++
++	/* Setup socket handlers */
++	pvt->sio = l_io_new(pvt->fd);
++	if (!l_io_set_read_handler(pvt->sio, incoming, pvt, NULL))
++		goto fail;
++
++	pvt->rx_regs = l_queue_new();
++	pvt->tx_pkts = l_queue_new();
++
++	pvt->ready_callback = cb;
++	pvt->user_data = user_data;
++
++	io->pvt = pvt;
++
++	l_idle_oneshot(unit_up, pvt, NULL);
++
++	return true;
++
++fail:
++	l_error("Failed to bind Unit Test socket");
++	free_socket(pvt);
++	l_free(pvt);
++
++	return false;
++}
++
++static bool unit_destroy(struct mesh_io *io)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt)
++		return true;
++
++	l_free(pvt->unique_name);
++	l_timeout_remove(pvt->tx_timeout);
++	l_queue_destroy(pvt->rx_regs, l_free);
++	l_queue_destroy(pvt->tx_pkts, l_free);
++
++	free_socket(pvt);
++
++	l_free(pvt);
++	io->pvt = NULL;
++
++	return true;
++}
++
++static bool unit_caps(struct mesh_io *io, struct mesh_io_caps *caps)
++{
++	struct mesh_io_private *pvt = io->pvt;
++
++	if (!pvt || !caps)
++		return false;
++
++	caps->max_num_filters = 255;
++	caps->window_accuracy = 50;
++
++	return true;
++}
++
++static bool simple_match(const void *a, const void *b)
++{
++	return a == b;
++}
++
++static void send_pkt(struct mesh_io_private *pvt, struct tx_pkt *tx,
++							uint16_t interval)
++{
++	send(pvt->fd, tx->pkt, tx->len, MSG_DONTWAIT);
++
++	if (tx->delete) {
++		l_queue_remove_if(pvt->tx_pkts, simple_match, tx);
++		l_free(tx);
++	}
++}
++
++static void tx_to(struct l_timeout *timeout, void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint16_t ms;
++	uint8_t count;
++
++	if (!pvt)
++		return;
++
++	tx = l_queue_pop_head(pvt->tx_pkts);
++	if (!tx) {
++		l_timeout_remove(timeout);
++		pvt->tx_timeout = NULL;
++		return;
++	}
++
++	if (tx->info.type == MESH_IO_TIMING_TYPE_GENERAL) {
++		ms = tx->info.u.gen.interval;
++		count = tx->info.u.gen.cnt;
++		if (count != MESH_IO_TX_COUNT_UNLIMITED)
++			tx->info.u.gen.cnt--;
++	} else {
++		ms = 25;
++		count = 1;
++	}
++
++	tx->delete = !!(count == 1);
++
++	send_pkt(pvt, tx, ms);
++
++	if (count == 1) {
++		/* Recalculate wakeup if we are responding to POLL */
++		tx = l_queue_peek_head(pvt->tx_pkts);
++
++		if (tx && tx->info.type == MESH_IO_TIMING_TYPE_POLL_RSP) {
++			ms = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		}
++	} else
++		l_queue_push_tail(pvt->tx_pkts, tx);
++
++	if (timeout) {
++		pvt->tx_timeout = timeout;
++		l_timeout_modify_ms(timeout, ms);
++	} else
++		pvt->tx_timeout = l_timeout_create_ms(ms, tx_to, pvt, NULL);
++}
++
++static void tx_worker(void *user_data)
++{
++	struct mesh_io_private *pvt = user_data;
++	struct tx_pkt *tx;
++	uint32_t delay;
++
++	tx = l_queue_peek_head(pvt->tx_pkts);
++	if (!tx)
++		return;
++
++	switch (tx->info.type) {
++	case MESH_IO_TIMING_TYPE_GENERAL:
++		if (tx->info.u.gen.min_delay == tx->info.u.gen.max_delay)
++			delay = tx->info.u.gen.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.gen.max_delay -
++						tx->info.u.gen.min_delay;
++			delay += tx->info.u.gen.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL:
++		if (tx->info.u.poll.min_delay == tx->info.u.poll.max_delay)
++			delay = tx->info.u.poll.min_delay;
++		else {
++			l_getrandom(&delay, sizeof(delay));
++			delay %= tx->info.u.poll.max_delay -
++						tx->info.u.poll.min_delay;
++			delay += tx->info.u.poll.min_delay;
++		}
++		break;
++
++	case MESH_IO_TIMING_TYPE_POLL_RSP:
++		/* Delay until Instant + Delay */
++		delay = instant_remaining_ms(tx->info.u.poll_rsp.instant +
++						tx->info.u.poll_rsp.delay);
++		if (delay > 255)
++			delay = 0;
++		break;
++
++	default:
++		return;
++	}
++
++	if (!delay)
++		tx_to(pvt->tx_timeout, pvt);
++	else if (pvt->tx_timeout)
++		l_timeout_modify_ms(pvt->tx_timeout, delay);
++	else
++		pvt->tx_timeout = l_timeout_create_ms(delay, tx_to, pvt, NULL);
++}
++
++static bool send_tx(struct mesh_io *io, struct mesh_io_send_info *info,
++					const uint8_t *data, uint16_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++	bool sending = false;
++
++	if (!info || !data || !len || len > sizeof(tx->pkt))
++		return false;
++
++	tx = l_new(struct tx_pkt, 1);
++
++	memcpy(&tx->info, info, sizeof(tx->info));
++	memcpy(&tx->pkt, data, len);
++	tx->len = len;
++
++	if (info->type == MESH_IO_TIMING_TYPE_POLL_RSP)
++		l_queue_push_head(pvt->tx_pkts, tx);
++	else {
++		sending = !l_queue_isempty(pvt->tx_pkts);
++
++		l_queue_push_tail(pvt->tx_pkts, tx);
++	}
++
++	if (!sending) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++		l_idle_oneshot(tx_worker, pvt, NULL);
++	}
++
++	return true;
++}
++
++static bool tx_cancel(struct mesh_io *io, const uint8_t *data, uint8_t len)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct tx_pkt *tx;
++
++	if (!data)
++		return false;
++
++	if (len == 1) {
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_ad_type,
++							L_UINT_TO_PTR(data[0]));
++			l_free(tx);
++
++		} while (tx);
++	} else {
++		struct tx_pattern pattern = {
++			.data = data,
++			.len = len
++		};
++
++		do {
++			tx = l_queue_remove_if(pvt->tx_pkts, find_by_pattern,
++								&pattern);
++			l_free(tx);
++
++		} while (tx);
++	}
++
++	if (l_queue_isempty(pvt->tx_pkts)) {
++		l_timeout_remove(pvt->tx_timeout);
++		pvt->tx_timeout = NULL;
++	}
++
++	return true;
++}
++
++static bool find_by_filter(const void *a, const void *b)
++{
++	const struct pvt_rx_reg *rx_reg = a;
++	const uint8_t *filter = b;
++
++	return !memcmp(rx_reg->filter, filter, rx_reg->len);
++}
++
++static bool recv_register(struct mesh_io *io, const uint8_t *filter,
++			uint8_t len, mesh_io_recv_func_t cb, void *user_data)
++{
++	struct mesh_io_private *pvt = io->pvt;
++	struct pvt_rx_reg *rx_reg;
++
++	if (!cb || !filter || !len)
++		return false;
++
++	rx_reg = l_queue_remove_if(pvt->rx_regs, find_by_filter, filter);
++
++	l_free(rx_reg);
++	rx_reg = l_malloc(sizeof(*rx_reg) + len);
++
++	memcpy(rx_reg->filter, filter, len);
++	rx_reg->len = len;
++	rx_reg->cb = cb;
++	rx_reg->user_data = user_data;
++
++	l_queue_push_head(pvt->rx_regs, rx_reg);
++
++	return true;
++}
++
++static bool recv_deregister(struct mesh_io *io, const uint8_t *filter,
++								uint8_t len)
++{
++	return true;
++}
++
++const struct mesh_io_api mesh_io_unit = {
++	.init = unit_init,
++	.destroy = unit_destroy,
++	.caps = unit_caps,
++	.send = send_tx,
++	.reg = recv_register,
++	.dereg = recv_deregister,
++	.cancel = tx_cancel,
++};
+diff --git a/mesh/mesh-io-unit.h b/mesh/mesh-io-unit.h
+new file mode 100644
+index 000000000..846eea7bc
+--- /dev/null
++++ b/mesh/mesh-io-unit.h
+@@ -0,0 +1,11 @@
++/* SPDX-License-Identifier: LGPL-2.1-or-later */
++/*
++ *
++ *  BlueZ - Bluetooth protocol stack for Linux
++ *
++ *  Copyright (C) 2021  Intel Corporation. All rights reserved.
++ *
++ *
++ */
++
++extern const struct mesh_io_api mesh_io_unit;
+diff --git a/mesh/mesh-io.c b/mesh/mesh-io.c
+index 62fc5d12e..96891313a 100644
+--- a/mesh/mesh-io.c
++++ b/mesh/mesh-io.c
+@@ -22,10 +22,12 @@
+ 
+ /* List of Mesh-IO Type headers */
+ #include "mesh/mesh-io-generic.h"
++#include "mesh/mesh-io-unit.h"
+ 
+ /* List of Supported Mesh-IO Types */
+ static const struct mesh_io_table table[] = {
+-	{MESH_IO_TYPE_GENERIC,	&mesh_io_generic}
++	{MESH_IO_TYPE_GENERIC, &mesh_io_generic},
++	{MESH_IO_TYPE_UNIT_TEST, &mesh_io_unit},
+ };
+ 
+ static struct l_queue *io_list;
+@@ -64,12 +66,9 @@ struct mesh_io *mesh_io_new(enum mesh_io_type type, void *opts,
+ 
+ 	io = l_new(struct mesh_io, 1);
+ 
+-	if (!io)
+-		return NULL;
+-
+ 	io->type = type;
+-
+ 	io->api = api;
++
+ 	if (!api->init(io, opts, cb, user_data))
+ 		goto fail;
+ 
+diff --git a/mesh/mesh-io.h b/mesh/mesh-io.h
+index b11c6c6e1..80ef3fa3e 100644
+--- a/mesh/mesh-io.h
++++ b/mesh/mesh-io.h
+@@ -14,7 +14,8 @@ struct mesh_io;
+ 
+ enum mesh_io_type {
+ 	MESH_IO_TYPE_NONE = 0,
+-	MESH_IO_TYPE_GENERIC
++	MESH_IO_TYPE_GENERIC,
++	MESH_IO_TYPE_UNIT_TEST
+ };
+ 
+ enum mesh_io_timing_type {
+-- 
+2.26.2
 
