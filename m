@@ -2,1084 +2,246 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C362BC433E6
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 05:55:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AE02C433E0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 06:08:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5571764F6A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 05:55:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46F2964F1C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Mar 2021 06:08:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233976AbhCSFzR (ORCPT
+        id S233883AbhCSGH6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Mar 2021 01:55:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57338 "EHLO
+        Fri, 19 Mar 2021 02:07:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60126 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234010AbhCSFyz (ORCPT
+        with ESMTP id S233865AbhCSGH5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Mar 2021 01:54:55 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89102C06174A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Mar 2021 22:54:55 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id y19so3720874pll.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Mar 2021 22:54:55 -0700 (PDT)
+        Fri, 19 Mar 2021 02:07:57 -0400
+Received: from mail-il1-x130.google.com (mail-il1-x130.google.com [IPv6:2607:f8b0:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80727C06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Mar 2021 23:07:57 -0700 (PDT)
+Received: by mail-il1-x130.google.com with SMTP id r8so7058855ilo.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Mar 2021 23:07:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=a5SddcziN+SXq/e9c2C43FR1a03n01AkL9tiAmtFua8=;
-        b=g4ZG/1KthTx0gOTAC+pXfi+OwBuJA2GM/Ngpo+oove08yxlwdiQujBg9sZdxVgCTCj
-         hOEYQpVP1TPKclyIy1+tc2c4tmPA4XCmPb1vaaNJgik35qfPRvdNwFGdxfrHgyHr4HuU
-         Mn1EZIGkOxoFrPaNhXUKTDwajjHFb59a7ZfoYwhnhasGD+5k7rJJmy7WE/j1/tHIvfec
-         ouugkD8TTnG7V3oRjlxSDXRgOvIV6uSpe3ptBqdQode/6ttumOpWgrlrTDqpqJrjiZkM
-         VSJZJSSEoHM2rcIt+UkHRQsC7QQSTPPtlC6noYkiYhnUj0QWufJUaLyPBxtPOyew9svS
-         CmVg==
+        bh=MHMSmdMWfJgpRgLdS3+HxPjuM0d736RGr+p8SQtyz/A=;
+        b=obCQ2gUamqaQ399ZAF/mkEh7IItfMxWP/o2jlI7WtOFpVFDhjupnnwyjCnB5dTP7En
+         0jcKF3hLS5pt3ZVWEcXI3wt9SlSEGBp2wmLSwGzNCGPzUbQgNSt1l39HLj7W7KXYS4xA
+         AVp+B8R2aOT0uHLYpUEwoLqcwlowgvrEfPfOhqIYzsEFK757eWJY41/Nt+RxbT/CMwnb
+         /gGBdZ9DBBgQjOGmuQceNeqY4b+1JSJs8pUFRimhrcphjkBNu60rjHfduGf47t97aAzN
+         +SrKJZlv8x4nBf0FuyvePNJOjVO2sbTTNZLT1pUHatVU14ZHuKY7v1tuxXQgjl0Sn14d
+         51RQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=a5SddcziN+SXq/e9c2C43FR1a03n01AkL9tiAmtFua8=;
-        b=f4c9FvteuARq14yjgTRie4M/JR2MmoJgjVVjaEjUfAaxPTPzXqqs+8OxBX/XzkbgPa
-         etLRCk5UsJ4PfHm4oPxz7gAdqEmjpLtMMP3V5oKHAK77qsgaZ5vIzm9T1SjcJZz46Cv+
-         U0ZVPc6FrXWhteCWFvJFrZc2B5qYGWS/RdvGV4VtGt72a9rmUsT3izbtCYkksr8xSrRu
-         7nltmsrqMt1yB3nvXzT6FtMWNjod71u+LV3caIXFdO+XtlFFzL704KaHuCVnrqHzWMIv
-         zBgGJKD+Zsil/hhtLya/81i5ifPOtsdmbdqP8f95H0SaQwVMW8WWb+SySqkCkWNP2HnZ
-         hiog==
-X-Gm-Message-State: AOAM5326NoStGDD6GvYlaazSfKPqxAlM6/a6N0ORE6KDMthoGBR7zGKD
-        d6Z7mWmlOD2ShcAgzE5j08cp9iwpcXIsMoCCuL31SQpKbyf2KdlxCamcqjugnlTeIezI/3VMIOX
-        1jG7WnsOlZosR5jUid+XZkD66hyfbyR0lioVPS35CrICZi2q7bT3ZQJ+3mYusGpJsgr0EMVhazb
-        AP
-X-Google-Smtp-Source: ABdhPJzB1GVENW10ghQLMiCCs3H0jJbXzbWrRnh9oMheaDv4d+Y4DGe5z53sk44vnM6TeXNEeQ738g8ev58o
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:10ee:e87b:4f94:9c1a])
- (user=apusaka job=sendgmr) by 2002:aa7:881a:0:b029:1f1:6148:15c3 with SMTP id
- c26-20020aa7881a0000b02901f1614815c3mr7821014pfo.30.1616133294929; Thu, 18
- Mar 2021 22:54:54 -0700 (PDT)
-Date:   Fri, 19 Mar 2021 13:54:31 +0800
-In-Reply-To: <20210319135138.Bluez.1.I8797a75fcc7c1e997f177b08dc23a1df0272e0a5@changeid>
-Message-Id: <20210319135138.Bluez.2.I2aa61d391caefc5b67213911b5ef02b2ce191633@changeid>
-Mime-Version: 1.0
-References: <20210319135138.Bluez.1.I8797a75fcc7c1e997f177b08dc23a1df0272e0a5@changeid>
-X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
-Subject: [Bluez PATCH 2/2] adv_monitor: merge monitors with the same pattern
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MHMSmdMWfJgpRgLdS3+HxPjuM0d736RGr+p8SQtyz/A=;
+        b=rMgO8Tv3puoBFHcBrhV7TntaiIWzAP5I45BhL9MWLCf05+S3qMB+BwXtC5wNRgJre8
+         Ja2Ue52bpk2StaZk6dVgC8CgjjoJYnojiio17wAO5cg/n8au8uJEn3byV82jVpPlzl+f
+         3Gl5llWPmX6feY2+F3HfsTpo5pydIkY04DRb2pSUeDSiXRv5J9Ma0m1l2RYvOrBfcIVn
+         S/o+dtU4Kw1RQAoHZMqo5ENTzSuNoK/eBUFeZlx3HeoZ+CYEHLd2sPBcSC/kji2KlNEm
+         uH2ne9/KiCj0K15fLFAiCXHxGU1bLGkPkxMy0vCktUj8ZyCwhvEggy/HtstkU+qKm5lM
+         xEng==
+X-Gm-Message-State: AOAM532uYoH7ej9fb5E3EwtoMBL9whF+R/G/cvYwj2Myg02dWIsqi/yG
+        hLeXBw8sns5JRExnp5g8XK59+gzHwdJYl8W5OFTiTXWLBrWb
+X-Google-Smtp-Source: ABdhPJw/WQ9BSklihVtPRZv0kz7GV/QU5Vd2AL0mUefWPdMIzhpn/0jaywMSH6lP1gEtUzSVoUVFBwNEMcuQIf7e0L4=
+X-Received: by 2002:a92:7306:: with SMTP id o6mr1636019ilc.2.1616134076917;
+ Thu, 18 Mar 2021 23:07:56 -0700 (PDT)
+MIME-Version: 1.0
+References: <CAC9s0NZrReFB-6_JwHFqJtLwqSuYGzKbZMvDeKYzh+Jof9iUjg@mail.gmail.com>
+ <CABBYNZJJ5Jymk=51E-aeWE4VyXGvXsgSjftYRJY47_tNzzJWHA@mail.gmail.com>
+ <CAC9s0Nb3eiZ29OSPQOSn9cWqf4DA22Q-D_RL-htXnq7gCcfSug@mail.gmail.com> <CABBYNZK_0wJtK2YpVt81suLmVVv6iEK6AEQGNxUG5Q1Ru+gm0w@mail.gmail.com>
+In-Reply-To: <CABBYNZK_0wJtK2YpVt81suLmVVv6iEK6AEQGNxUG5Q1Ru+gm0w@mail.gmail.com>
+From:   Kenny Bian <kennybian@gmail.com>
+Date:   Thu, 18 Mar 2021 23:07:48 -0700
+Message-ID: <CAC9s0NZy7s_URDBU+cxJ7H+JX64FWx4LGZW4A=Ci5gzj8QnfqQ@mail.gmail.com>
+Subject: Re: Have to delete "/var/lib/bluetooth" folder in order to get all
+ service characteristics available
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Thank you so much, Luiz. I appreciate it.
 
-Some bluetooth chipset (e.g. Intel) doesn't support MSFT extension
-monitors with the same pattern. In order to make them work, and also
-to generally make their task easier, we merge monitors with the same
-pattern in the userspace. Therefore, each monitor sent to the kernel
-will all have different patterns.
+Yes, you're right. I counted the characteristics from the log. There
+are exactly 9 services which include 92 characteristics. Do you think
+it is "too many" by having 92 characteristics? Do you know if there is
+any limit in BlueZ? It seems someone mentioned the number of
+characteristics in this link:
+https://devzone.nordicsemi.com/f/nordic-q-a/16233/nrf-connect-fails-when-using-many-characteristics
 
-If the merged monitor have different RSSI parameter, we would choose
-the most lenient parameter of the two, since we can still do
-additional filtering in the userspace. This way, we wouldn't miss any
-information and can still get the benefit of offloading the filtering.
+For the write request for the non-exist handle, I've asked our mobile
+developer to check it on the mobile side.
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
+Thanks again!
 
- src/adv_monitor.c | 662 +++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 536 insertions(+), 126 deletions(-)
-
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 131dc80039..62c2710c86 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -62,6 +62,7 @@ struct btd_adv_monitor_manager {
- 	uint8_t max_num_patterns;
- 
- 	struct queue *apps;	/* apps who registered for Adv monitoring */
-+	struct queue *merged_patterns;
- };
- 
- struct adv_monitor_app {
-@@ -89,6 +90,12 @@ enum monitor_state {
- 	MONITOR_STATE_RELEASED,	/* Dbus Object removed by app */
- };
- 
-+enum merged_pattern_state {
-+	MERGED_PATTERN_STATE_ADDING,	/* Adding pattern to kernel */
-+	MERGED_PATTERN_STATE_REMOVING,	/* Removing pattern from kernel */
-+	MERGED_PATTERN_STATE_STABLE,	/* Idle */
-+};
-+
- struct rssi_parameters {
- 	int8_t high_rssi;		/* High RSSI threshold */
- 	uint16_t high_rssi_timeout;	/* High RSSI threshold timeout */
-@@ -106,13 +113,30 @@ struct adv_monitor {
- 	char *path;
- 
- 	enum monitor_state state;	/* MONITOR_STATE_* */
--	uint16_t monitor_handle;	/* Kernel Monitor Handle */
- 
- 	struct rssi_parameters rssi;	/* RSSI parameter for this monitor */
-+	struct adv_monitor_merged_pattern *merged_pattern;
-+
- 	struct queue *devices;		/* List of adv_monitor_device objects */
-+};
- 
-+/* Some chipsets doesn't support multiple monitors with the same pattern.
-+ * To solve that and to generally ease their task, we merge monitors with the
-+ * same pattern, so those monitors will only be sent once to the kernel.
-+ */
-+struct adv_monitor_merged_pattern {
-+	struct btd_adv_monitor_manager *manager;
-+	uint16_t monitor_handle;	/* Kernel Monitor Handle */
-+	struct rssi_parameters rssi;	/* Merged RSSI parameter for |monitors|,
-+					 * this will be sent to the kernel.
-+					 */
-+	struct queue *monitors;		/* List of adv_monitor objects which
-+					 * have this pattern
-+					 */
- 	enum monitor_type type;		/* MONITOR_TYPE_* */
- 	struct queue *patterns;		/* List of bt_ad_pattern objects */
-+	enum merged_pattern_state current_state; /* MERGED_PATTERN_STATE_* */
-+	enum merged_pattern_state next_state;	 /* MERGED_PATTERN_STATE_* */
- };
- 
- /* Some data like last_seen, timer/timeout values need to be maintained
-@@ -154,6 +178,11 @@ static void monitor_device_free(void *data);
- static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
- 					struct btd_device *device, int8_t rssi);
- 
-+static void merged_pattern_send_add(
-+			struct adv_monitor_merged_pattern *merged_pattern);
-+static void merged_pattern_send_remove(
-+			struct adv_monitor_merged_pattern *merged_pattern);
-+
- const struct adv_monitor_type {
- 	enum monitor_type type;
- 	const char *name;
-@@ -199,6 +228,278 @@ static void pattern_free(void *data)
- 	free(pattern);
- }
- 
-+static void merged_pattern_free(void *data)
-+{
-+	struct adv_monitor_merged_pattern *merged_pattern = data;
-+
-+	queue_destroy(merged_pattern->patterns, pattern_free);
-+	queue_destroy(merged_pattern->monitors, NULL);
-+
-+	if (merged_pattern->manager)
-+		queue_remove(merged_pattern->manager->merged_patterns,
-+							merged_pattern);
-+	free(merged_pattern);
-+}
-+
-+/* Returns the smaller of the two integers |a| and |b| which is not equal to the
-+ * |unset| value. If both are unset, return unset.
-+ */
-+static int get_smaller_not_unset(int a, int b, int unset)
-+{
-+	if (a == unset)
-+		return b;
-+	if (b == unset)
-+		return a;
-+
-+	return a < b ? a : b;
-+}
-+
-+/* Merges two RSSI parameters, return the result. The result is chosen to be
-+ * whichever is more lenient of the two inputs, so we can pass that to the
-+ * kernel and still do additional filtering in the user space without loss of
-+ * information while still receiving benefit from offloading some filtering to
-+ * the hardware.
-+ * It is allowed for |a|, |b|, and |merged| to point to the same object.
-+ */
-+static void merge_rssi(const struct rssi_parameters *a,
-+			const struct rssi_parameters *b,
-+			struct rssi_parameters *merged)
-+{
-+	/* For low rssi, low_timeout, and high_rssi, choose the minimum of the
-+	 * two values. Filtering the higher values is done on userspace.
-+	 */
-+	merged->low_rssi = get_smaller_not_unset(a->low_rssi, b->low_rssi,
-+						ADV_MONITOR_UNSET_RSSI);
-+	merged->high_rssi = get_smaller_not_unset(a->high_rssi, b->high_rssi,
-+						ADV_MONITOR_UNSET_RSSI);
-+	merged->low_rssi_timeout = get_smaller_not_unset(a->low_rssi_timeout,
-+						b->low_rssi_timeout,
-+						ADV_MONITOR_UNSET_TIMEOUT);
-+
-+	/* High timeout doesn't matter for now, it will be zeroed when it is
-+	 * forwarded to kernel anyway.
-+	 */
-+	merged->high_rssi_timeout = 0;
-+
-+	/* Sampling period is not implemented yet in userspace. There is no
-+	 * good value if the two values are different, so just choose 0 for
-+	 * always reporting, to avoid missing packets.
-+	 */
-+	if (a->sampling_period != b->sampling_period)
-+		merged->sampling_period = 0;
-+	else
-+		merged->sampling_period = a->sampling_period;
-+}
-+
-+/* Two merged_pattern are considered equal if all the following are true:
-+ * (1) both has the same monitor_type
-+ * (2) both has exactly the same pattern in the same order
-+ * Therefore, patterns A+B and B+A are considered different, as well as patterns
-+ * A and A+A. This shouldn't cause any issue, but solving this issue is a
-+ * potential improvement.
-+ */
-+static bool merged_pattern_is_equal(struct adv_monitor_merged_pattern *a,
-+					struct adv_monitor_merged_pattern *b)
-+{
-+	const struct queue_entry *a_entry, *b_entry;
-+	struct bt_ad_pattern *a_data, *b_data;
-+
-+	if (a->type != b->type)
-+		return false;
-+
-+	if (queue_length(a->patterns) != queue_length(b->patterns))
-+		return false;
-+
-+	a_entry = queue_get_entries(a->patterns);
-+	b_entry = queue_get_entries(b->patterns);
-+
-+	while (a_entry) {
-+		a_data = a_entry->data;
-+		b_data = b_entry->data;
-+
-+		if (a_data->type != b_data->type ||
-+		    a_data->offset != b_data->offset ||
-+		    a_data->len != b_data->len ||
-+		    memcmp(a_data->data, b_data->data, a_data->len) != 0)
-+			return false;
-+
-+		a_entry = a_entry->next;
-+		b_entry = b_entry->next;
-+	}
-+
-+	return true;
-+}
-+
-+/* Finds a merged_pattern in manager with a specific pattern/type */
-+struct adv_monitor_merged_pattern *merged_pattern_find(
-+			struct btd_adv_monitor_manager *manager,
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	const struct queue_entry *e;
-+	struct adv_monitor_merged_pattern *p;
-+
-+	for (e = queue_get_entries(manager->merged_patterns); e; e = e->next) {
-+		p = e->data;
-+
-+		if (merged_pattern_is_equal(p, merged_pattern))
-+			return p;
-+	}
-+
-+	return NULL;
-+}
-+
-+static char *get_merged_pattern_state_name(enum merged_pattern_state state)
-+{
-+	switch (state) {
-+	case MERGED_PATTERN_STATE_ADDING:
-+		return "Adding";
-+	case MERGED_PATTERN_STATE_REMOVING:
-+		return "Removing";
-+	case MERGED_PATTERN_STATE_STABLE:
-+		return "Stable";
-+	}
-+
-+	return NULL;
-+}
-+
-+/* Adds a new merged pattern */
-+static void merged_pattern_add(
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	/* This is only called when no merged_pattern found. Therefore, the
-+	 * state must be stable.
-+	 */
-+	if (merged_pattern->current_state != MERGED_PATTERN_STATE_STABLE) {
-+		btd_error(merged_pattern->manager->adapter_id,
-+			"Add merged_pattern request when state is not stable");
-+		return;
-+	}
-+
-+	merged_pattern->current_state = MERGED_PATTERN_STATE_ADDING;
-+	merged_pattern_send_add(merged_pattern);
-+
-+	DBG("Monitor state: %s -> %s",
-+		get_merged_pattern_state_name(merged_pattern->current_state),
-+		get_merged_pattern_state_name(merged_pattern->next_state));
-+}
-+
-+/* Removes merged pattern, or queues for removal if busy */
-+static void merged_pattern_remove(
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	rssi_unset(&merged_pattern->rssi);
-+
-+	/* If we currently are removing, cancel subsequent ADD command if any */
-+	if (merged_pattern->current_state == MERGED_PATTERN_STATE_REMOVING) {
-+		merged_pattern->next_state = MERGED_PATTERN_STATE_STABLE;
-+		goto print_state;
-+	}
-+
-+	/* If stable, we can proceed with removal right away */
-+	if (merged_pattern->current_state == MERGED_PATTERN_STATE_STABLE) {
-+		merged_pattern->current_state = MERGED_PATTERN_STATE_REMOVING;
-+		merged_pattern_send_remove(merged_pattern);
-+	} else {
-+		/* otherwise queue the removal */
-+		merged_pattern->next_state = MERGED_PATTERN_STATE_REMOVING;
-+	}
-+
-+print_state:
-+	DBG("Monitor state: %s -> %s",
-+		get_merged_pattern_state_name(merged_pattern->current_state),
-+		get_merged_pattern_state_name(merged_pattern->next_state));
-+}
-+
-+/* Replaces (removes and re-adds) merged pattern, or queues it if busy */
-+static void merged_pattern_replace(
-+			struct adv_monitor_merged_pattern *merged_pattern,
-+			const struct rssi_parameters *rssi)
-+{
-+	/* If the RSSI are the same then nothing needs to be done, except on
-+	 * the case where pattern is being removed. In that case, we need to
-+	 * re-add the pattern.
-+	 * high_rssi_timeout is purposedly left out in the comparison since
-+	 * the value is ignored upon submission to kernel.
-+	 */
-+	if (merged_pattern->rssi.high_rssi == rssi->high_rssi &&
-+	    merged_pattern->rssi.low_rssi == rssi->low_rssi &&
-+	    merged_pattern->rssi.low_rssi_timeout == rssi->low_rssi_timeout &&
-+	    merged_pattern->rssi.sampling_period == rssi->sampling_period &&
-+	    merged_pattern->current_state != MERGED_PATTERN_STATE_REMOVING)
-+		return;
-+
-+	merged_pattern->rssi = *rssi;
-+
-+	/* If stable, we can proceed with replacement. */
-+	if (merged_pattern->current_state == MERGED_PATTERN_STATE_STABLE) {
-+		/* Replacement is done by first removing, then re-adding */
-+		merged_pattern->current_state = MERGED_PATTERN_STATE_REMOVING;
-+		merged_pattern->next_state = MERGED_PATTERN_STATE_ADDING;
-+		merged_pattern_send_remove(merged_pattern);
-+	} else {
-+		/* otherwise queue the replacement */
-+		merged_pattern->next_state = MERGED_PATTERN_STATE_ADDING;
-+	}
-+
-+	DBG("Monitor state: %s -> %s",
-+		get_merged_pattern_state_name(merged_pattern->current_state),
-+		get_merged_pattern_state_name(merged_pattern->next_state));
-+}
-+
-+/* Current_state of merged_pattern is done, proceed to the next_state */
-+static void merged_pattern_process_next_step(
-+					struct adv_monitor_merged_pattern *mp)
-+{
-+	if (mp->current_state == MERGED_PATTERN_STATE_STABLE) {
-+		btd_error(mp->manager->adapter_id,
-+				"Merged pattern invalid current state");
-+		return;
-+	}
-+
-+	if (mp->current_state == MERGED_PATTERN_STATE_REMOVING) {
-+		/* We might need to follow-up with re-adding the pattern */
-+		if (mp->next_state == MERGED_PATTERN_STATE_ADDING) {
-+			mp->current_state = MERGED_PATTERN_STATE_ADDING;
-+			mp->next_state = MERGED_PATTERN_STATE_STABLE;
-+			merged_pattern_send_add(mp);
-+			goto print_state;
-+		}
-+
-+		/* We should never end up with remove-remove sequence */
-+		if (mp->next_state == MERGED_PATTERN_STATE_REMOVING)
-+			btd_error(mp->manager->adapter_id,
-+				"Merged pattern can't be removed again");
-+
-+		/* No more operations */
-+		mp->current_state = MERGED_PATTERN_STATE_STABLE;
-+		mp->next_state = MERGED_PATTERN_STATE_STABLE;
-+		goto print_state;
-+	}
-+
-+	/* current_state == MERGED_PATTERN_STATE_ADDING */
-+	if (mp->next_state == MERGED_PATTERN_STATE_REMOVING) {
-+		mp->current_state = MERGED_PATTERN_STATE_REMOVING;
-+		mp->next_state = MERGED_PATTERN_STATE_STABLE;
-+		merged_pattern_send_remove(mp);
-+		goto print_state;
-+	} else if (mp->next_state == MERGED_PATTERN_STATE_ADDING) {
-+		/* To re-add a just added pattern, we need to remove it first */
-+		mp->current_state = MERGED_PATTERN_STATE_REMOVING;
-+		mp->next_state = MERGED_PATTERN_STATE_ADDING;
-+		merged_pattern_send_remove(mp);
-+		goto print_state;
-+	}
-+
-+	/* No more operations */
-+	mp->current_state = MERGED_PATTERN_STATE_STABLE;
-+	mp->next_state = MERGED_PATTERN_STATE_STABLE;
-+
-+print_state:
-+	DBG("Monitor state: %s -> %s",
-+			get_merged_pattern_state_name(mp->current_state),
-+			get_merged_pattern_state_name(mp->next_state));
-+}
-+
- /* Frees a monitor object */
- static void monitor_free(struct adv_monitor *monitor)
- {
-@@ -208,8 +509,6 @@ static void monitor_free(struct adv_monitor *monitor)
- 	queue_destroy(monitor->devices, monitor_device_free);
- 	monitor->devices = NULL;
- 
--	queue_destroy(monitor->patterns, pattern_free);
--
- 	free(monitor);
- }
- 
-@@ -218,10 +517,12 @@ static void monitor_release(struct adv_monitor *monitor)
- {
- 	/* Release() method on a monitor can be called when -
- 	 * 1. monitor initialization failed
--	 * 2. app calls UnregisterMonitor and monitors held by app are released
-+	 * 2. app calls UnregisterMonitor and monitors held by app are released,
-+	 *    it may or may not be activated at this point
- 	 * 3. monitor is removed by kernel
- 	 */
- 	if (monitor->state != MONITOR_STATE_FAILED &&
-+	    monitor->state != MONITOR_STATE_INITED &&
- 	    monitor->state != MONITOR_STATE_ACTIVE &&
- 	    monitor->state != MONITOR_STATE_REMOVED) {
- 		return;
-@@ -234,53 +535,56 @@ static void monitor_release(struct adv_monitor *monitor)
- 					NULL);
- }
- 
--/* Handles the callback of Remove Adv Monitor command */
--static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
--				const void *param, void *user_data)
--{
--	const struct mgmt_rp_remove_adv_monitor *rp = param;
--
--	if (status != MGMT_STATUS_SUCCESS || !param) {
--		error("Failed to Remove Adv Monitor with status 0x%02x",
--				status);
--		return;
--	}
--
--	if (length < sizeof(*rp)) {
--		error("Wrong size of Remove Adv Monitor response");
--		return;
--	}
--
--	DBG("Adv monitor with handle:0x%04x removed from kernel",
--		le16_to_cpu(rp->monitor_handle));
--}
--
--/* Sends Remove Adv Monitor command to the kernel */
-+/* Removes monitor from the merged_pattern. This would result in removing it
-+ * from the kernel if there is only one such monitor with that pattern.
-+ */
- static void monitor_remove(struct adv_monitor *monitor)
- {
- 	struct adv_monitor_app *app = monitor->app;
- 	uint16_t adapter_id = app->manager->adapter_id;
--	struct mgmt_cp_remove_adv_monitor cp;
-+	struct adv_monitor_merged_pattern *merged_pattern;
-+	const struct queue_entry *e;
-+	struct rssi_parameters rssi;
- 
- 	/* Monitor from kernel can be removed when -
--	 * 1. already activated monitor object is deleted by app
-+	 * 1. monitor object is deleted by app - may or may not be activated
- 	 * 2. app is destroyed and monitors held by app are marked as released
- 	 */
--	if (monitor->state != MONITOR_STATE_ACTIVE &&
-+	if (monitor->state != MONITOR_STATE_INITED &&
-+	    monitor->state != MONITOR_STATE_ACTIVE &&
- 	    monitor->state != MONITOR_STATE_RELEASED) {
- 		return;
- 	}
- 
- 	monitor->state = MONITOR_STATE_REMOVED;
- 
--	cp.monitor_handle = cpu_to_le16(monitor->monitor_handle);
--
--	if (!mgmt_send(app->manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
--			adapter_id, sizeof(cp), &cp, remove_adv_monitor_cb,
--			app->manager, NULL)) {
-+	if (!monitor->merged_pattern) {
- 		btd_error(adapter_id,
--				"Unable to send Remove Advt Monitor command");
-+			"Merged_pattern not found when removing monitor");
-+		return;
- 	}
-+
-+	merged_pattern = monitor->merged_pattern;
-+	monitor->merged_pattern = NULL;
-+	queue_remove(merged_pattern->monitors, monitor);
-+
-+	/* No more monitors - just remove the pattern entirely */
-+	if (queue_length(merged_pattern->monitors) == 0) {
-+		merged_pattern_remove(merged_pattern);
-+		return;
-+	}
-+
-+	/* Calculate the merge result of the RSSIs of the monitors with the
-+	 * same pattern, minus the monitor being removed.
-+	 */
-+	rssi_unset(&rssi);
-+	for (e = queue_get_entries(merged_pattern->monitors); e; e = e->next) {
-+		struct adv_monitor *m = e->data;
-+
-+		merge_rssi(&rssi, &m->rssi, &rssi);
-+	}
-+
-+	merged_pattern_replace(merged_pattern, &rssi);
- }
- 
- /* Destroys monitor object */
-@@ -334,7 +638,8 @@ static void monitor_state_released(void *data, void *user_data)
- {
- 	struct adv_monitor *monitor = data;
- 
--	if (!monitor && monitor->state != MONITOR_STATE_ACTIVE)
-+	if (!monitor && monitor->state != MONITOR_STATE_INITED
-+				&& monitor->state != MONITOR_STATE_ACTIVE)
- 		return;
- 
- 	monitor->state = MONITOR_STATE_RELEASED;
-@@ -394,9 +699,6 @@ static struct adv_monitor *monitor_new(struct adv_monitor_app *app,
- 	rssi_unset(&monitor->rssi);
- 	monitor->devices = queue_new();
- 
--	monitor->type = MONITOR_TYPE_NONE;
--	monitor->patterns = NULL;
--
- 	return monitor;
- }
- 
-@@ -439,7 +741,7 @@ static bool parse_monitor_type(struct adv_monitor *monitor, const char *path)
- 
- 	for (t = supported_types; t->name; t++) {
- 		if (strcmp(t->name, type_str) == 0) {
--			monitor->type = t->type;
-+			monitor->merged_pattern->type = t->type;
- 			return true;
- 		}
- 	}
-@@ -560,6 +862,8 @@ done:
- 		monitor->rssi.low_rssi, monitor->rssi.low_rssi_timeout,
- 		monitor->rssi.sampling_period);
- 
-+	monitor->merged_pattern->rssi = monitor->rssi;
-+
- 	return true;
- 
- failed:
-@@ -586,14 +890,14 @@ static bool parse_patterns(struct adv_monitor *monitor, const char *path)
- 		return false;
- 	}
- 
--	monitor->patterns = queue_new();
--
- 	if (dbus_message_iter_get_arg_type(&array) != DBUS_TYPE_ARRAY ||
- 		dbus_message_iter_get_element_type(&array) !=
- 		DBUS_TYPE_STRUCT) {
- 		goto failed;
- 	}
- 
-+	monitor->merged_pattern->patterns = queue_new();
-+
- 	dbus_message_iter_recurse(&array, &array_iter);
- 
- 	while (dbus_message_iter_get_arg_type(&array_iter) ==
-@@ -637,21 +941,18 @@ static bool parse_patterns(struct adv_monitor *monitor, const char *path)
- 		if (!pattern)
- 			goto failed;
- 
--		queue_push_tail(monitor->patterns, pattern);
-+		queue_push_tail(monitor->merged_pattern->patterns, pattern);
- 
- 		dbus_message_iter_next(&array_iter);
- 	}
- 
- 	/* There must be at least one pattern. */
--	if (queue_isempty(monitor->patterns))
-+	if (queue_isempty(monitor->merged_pattern->patterns))
- 		goto failed;
- 
- 	return true;
- 
- failed:
--	queue_destroy(monitor->patterns, pattern_free);
--	monitor->patterns = NULL;
--
- 	btd_error(adapter_id, "Invalid argument of property Patterns of the "
- 			"Adv Monitor at path %s", path);
- 
-@@ -659,26 +960,99 @@ failed:
- }
- 
- /* Processes the content of the remote Adv Monitor */
--static bool monitor_process(struct adv_monitor *monitor,
--				struct adv_monitor_app *app)
-+static bool monitor_process(struct adv_monitor *monitor)
- {
- 	const char *path = g_dbus_proxy_get_path(monitor->proxy);
- 
- 	monitor->state = MONITOR_STATE_FAILED;
- 
-+	monitor->merged_pattern = malloc0(sizeof(*monitor->merged_pattern));
-+	monitor->merged_pattern->current_state = MERGED_PATTERN_STATE_STABLE;
-+	monitor->merged_pattern->next_state = MERGED_PATTERN_STATE_STABLE;
-+
- 	if (!parse_monitor_type(monitor, path))
--		goto done;
-+		goto fail;
- 
- 	if (!parse_rssi_and_timeout(monitor, path))
--		goto done;
-+		goto fail;
-+
-+	if (monitor->merged_pattern->type != MONITOR_TYPE_OR_PATTERNS ||
-+					!parse_patterns(monitor, path))
-+		goto fail;
-+
-+	monitor->state = MONITOR_STATE_INITED;
-+	monitor->merged_pattern->monitors = queue_new();
-+	queue_push_tail(monitor->merged_pattern->monitors, monitor);
-+
-+	return true;
-+
-+fail:
-+	merged_pattern_free(monitor->merged_pattern);
-+	monitor->merged_pattern = NULL;
-+	return false;
-+}
- 
--	if (monitor->type == MONITOR_TYPE_OR_PATTERNS &&
--		parse_patterns(monitor, path)) {
--		monitor->state = MONITOR_STATE_INITED;
-+static void merged_pattern_destroy_monitors(
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	const struct queue_entry *e;
-+
-+	for (e = queue_get_entries(merged_pattern->monitors); e; e = e->next) {
-+		struct adv_monitor *monitor = e->data;
-+
-+		monitor->merged_pattern = NULL;
-+		monitor_destroy(monitor);
- 	}
-+}
- 
--done:
--	return monitor->state != MONITOR_STATE_FAILED;
-+/* Handles the callback of Remove Adv Monitor command */
-+static void remove_adv_monitor_cb(uint8_t status, uint16_t length,
-+				const void *param, void *user_data)
-+{
-+	const struct mgmt_rp_remove_adv_monitor *rp = param;
-+	struct adv_monitor_merged_pattern *merged_pattern = user_data;
-+
-+	if (status != MGMT_STATUS_SUCCESS || !param) {
-+		error("Failed to Remove Adv Monitor with status 0x%02x",
-+				status);
-+		goto fail;
-+	}
-+
-+	if (length < sizeof(*rp)) {
-+		error("Wrong size of Remove Adv Monitor response");
-+		goto fail;
-+	}
-+
-+	DBG("Adv monitor with handle:0x%04x removed from kernel",
-+		le16_to_cpu(rp->monitor_handle));
-+
-+	merged_pattern_process_next_step(merged_pattern);
-+
-+	if (merged_pattern->current_state == MERGED_PATTERN_STATE_STABLE)
-+		merged_pattern_free(merged_pattern);
-+
-+	return;
-+
-+fail:
-+	merged_pattern_destroy_monitors(merged_pattern);
-+	merged_pattern_free(merged_pattern);
-+}
-+
-+/* sends MGMT_OP_REMOVE_ADV_MONITOR */
-+static void merged_pattern_send_remove(
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	struct mgmt_cp_remove_adv_monitor cp;
-+	struct btd_adv_monitor_manager *manager = merged_pattern->manager;
-+
-+	cp.monitor_handle = cpu_to_le16(merged_pattern->monitor_handle);
-+
-+	if (!mgmt_send(manager->mgmt, MGMT_OP_REMOVE_ADV_MONITOR,
-+			manager->adapter_id, sizeof(cp), &cp,
-+			remove_adv_monitor_cb, merged_pattern, NULL)) {
-+		btd_error(merged_pattern->manager->adapter_id,
-+				"Unable to send Remove Advt Monitor command");
-+	}
- }
- 
- /* Handles the callback of Add Adv Patterns Monitor command */
-@@ -686,64 +1060,81 @@ static void add_adv_patterns_monitor_cb(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
- 	const struct mgmt_rp_add_adv_patterns_monitor *rp = param;
--	struct adv_monitor *monitor = user_data;
--	uint16_t adapter_id = monitor->app->manager->adapter_id;
-+	struct adv_monitor_merged_pattern *merged_pattern = user_data;
-+	uint16_t adapter_id = merged_pattern->manager->adapter_id;
-+	const struct queue_entry *e;
- 
- 	if (status != MGMT_STATUS_SUCCESS || !param) {
- 		btd_error(adapter_id,
- 				"Failed to Add Adv Patterns Monitor with status"
- 				" 0x%02x", status);
--		monitor->state = MONITOR_STATE_FAILED;
--		monitor_destroy(monitor);
--		return;
-+		goto fail;
- 	}
- 
- 	if (length < sizeof(*rp)) {
- 		btd_error(adapter_id, "Wrong size of Add Adv Patterns Monitor "
- 				"response");
--		monitor->state = MONITOR_STATE_FAILED;
--		monitor_destroy(monitor);
--		return;
-+		goto fail;
- 	}
- 
--	monitor->monitor_handle = le16_to_cpu(rp->monitor_handle);
--	monitor->state = MONITOR_STATE_ACTIVE;
-+	merged_pattern->monitor_handle = le16_to_cpu(rp->monitor_handle);
-+	DBG("Adv monitor with handle:0x%04x added",
-+						merged_pattern->monitor_handle);
- 
--	DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
--		monitor->app->owner, monitor->path);
-+	merged_pattern_process_next_step(merged_pattern);
- 
--	g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL, NULL, NULL,
--					NULL);
-+	if (merged_pattern->current_state != MERGED_PATTERN_STATE_STABLE)
-+		return;
-+
-+	for (e = queue_get_entries(merged_pattern->monitors); e; e = e->next) {
-+		struct adv_monitor *monitor = e->data;
-+
-+		if (monitor->state != MONITOR_STATE_INITED)
-+			continue;
-+
-+		monitor->state = MONITOR_STATE_ACTIVE;
-+
-+		DBG("Calling Activate() on Adv Monitor of owner %s at path %s",
-+			monitor->app->owner, monitor->path);
- 
--	DBG("Adv monitor with handle:0x%04x added", monitor->monitor_handle);
-+		g_dbus_proxy_method_call(monitor->proxy, "Activate", NULL,
-+					NULL, NULL, NULL);
-+	}
-+
-+	return;
-+
-+fail:
-+	merged_pattern_destroy_monitors(merged_pattern);
-+	merged_pattern_free(merged_pattern);
- }
- 
- /* sends MGMT_OP_ADD_ADV_PATTERNS_MONITOR */
--static bool monitor_send_add_pattern(struct adv_monitor *monitor)
-+static bool merged_pattern_send_add_pattern(
-+			struct adv_monitor_merged_pattern *merged_pattern)
- {
- 	struct mgmt_cp_add_adv_monitor *cp = NULL;
- 	uint8_t pattern_count, cp_len;
- 	const struct queue_entry *e;
- 	bool success = true;
- 
--	pattern_count = queue_length(monitor->patterns);
-+	pattern_count = queue_length(merged_pattern->patterns);
- 	cp_len = sizeof(*cp) + pattern_count * sizeof(struct mgmt_adv_pattern);
- 
- 	cp = malloc0(cp_len);
- 	if (!cp)
- 		return false;
- 
--	for (e = queue_get_entries(monitor->patterns); e; e = e->next) {
-+	for (e = queue_get_entries(merged_pattern->patterns); e; e = e->next) {
- 		struct bt_ad_pattern *pattern = e->data;
- 
- 		memcpy(&cp->patterns[cp->pattern_count++], pattern,
- 							sizeof(*pattern));
- 	}
- 
--	if (!mgmt_send(monitor->app->manager->mgmt,
-+	if (!mgmt_send(merged_pattern->manager->mgmt,
- 			MGMT_OP_ADD_ADV_PATTERNS_MONITOR,
--			monitor->app->manager->adapter_id, cp_len, cp,
--			add_adv_patterns_monitor_cb, monitor, NULL)) {
-+			merged_pattern->manager->adapter_id, cp_len, cp,
-+			add_adv_patterns_monitor_cb, merged_pattern, NULL)) {
- 		error("Unable to send Add Adv Patterns Monitor command");
- 		success = false;
- 	}
-@@ -753,38 +1144,40 @@ static bool monitor_send_add_pattern(struct adv_monitor *monitor)
- }
- 
- /* sends MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI */
--static bool monitor_send_add_pattern_rssi(struct adv_monitor *monitor)
-+static bool merged_pattern_send_add_pattern_rssi(
-+			struct adv_monitor_merged_pattern *merged_pattern)
- {
- 	struct mgmt_cp_add_adv_patterns_monitor_rssi *cp = NULL;
- 	uint8_t pattern_count, cp_len;
- 	const struct queue_entry *e;
- 	bool success = true;
- 
--	pattern_count = queue_length(monitor->patterns);
-+	pattern_count = queue_length(merged_pattern->patterns);
- 	cp_len = sizeof(*cp) + pattern_count * sizeof(struct mgmt_adv_pattern);
- 
- 	cp = malloc0(cp_len);
- 	if (!cp)
- 		return false;
- 
--	cp->rssi.high_threshold = monitor->rssi.high_rssi;
-+	cp->rssi.high_threshold = merged_pattern->rssi.high_rssi;
- 	/* High threshold timeout is unsupported in kernel. Value must be 0. */
- 	cp->rssi.high_threshold_timeout = 0;
--	cp->rssi.low_threshold = monitor->rssi.low_rssi;
--	cp->rssi.low_threshold_timeout = htobs(monitor->rssi.low_rssi_timeout);
--	cp->rssi.sampling_period = monitor->rssi.sampling_period;
-+	cp->rssi.low_threshold = merged_pattern->rssi.low_rssi;
-+	cp->rssi.low_threshold_timeout =
-+				htobs(merged_pattern->rssi.low_rssi_timeout);
-+	cp->rssi.sampling_period = merged_pattern->rssi.sampling_period;
- 
--	for (e = queue_get_entries(monitor->patterns); e; e = e->next) {
-+	for (e = queue_get_entries(merged_pattern->patterns); e; e = e->next) {
- 		struct bt_ad_pattern *pattern = e->data;
- 
- 		memcpy(&cp->patterns[cp->pattern_count++], pattern,
- 							sizeof(*pattern));
- 	}
- 
--	if (!mgmt_send(monitor->app->manager->mgmt,
-+	if (!mgmt_send(merged_pattern->manager->mgmt,
- 			MGMT_OP_ADD_ADV_PATTERNS_MONITOR_RSSI,
--			monitor->app->manager->adapter_id, cp_len, cp,
--			add_adv_patterns_monitor_cb, monitor, NULL)) {
-+			merged_pattern->manager->adapter_id, cp_len, cp,
-+			add_adv_patterns_monitor_cb, merged_pattern, NULL)) {
- 		error("Unable to send Add Adv Patterns Monitor RSSI command");
- 		success = false;
- 	}
-@@ -793,14 +1186,26 @@ static bool monitor_send_add_pattern_rssi(struct adv_monitor *monitor)
- 	return success;
- }
- 
-+/* Sends mgmt command to kernel for adding monitor */
-+static void merged_pattern_send_add(
-+			struct adv_monitor_merged_pattern *merged_pattern)
-+{
-+	if (rssi_is_unset(&merged_pattern->rssi))
-+		merged_pattern_send_add_pattern(merged_pattern);
-+	else
-+		merged_pattern_send_add_pattern_rssi(merged_pattern);
-+}
-+
- /* Handles an Adv Monitor D-Bus proxy added event */
- static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- {
- 	struct adv_monitor *monitor;
- 	struct adv_monitor_app *app = user_data;
-+	struct adv_monitor_merged_pattern *existing_pattern;
- 	uint16_t adapter_id = app->manager->adapter_id;
- 	const char *path = g_dbus_proxy_get_path(proxy);
- 	const char *iface = g_dbus_proxy_get_interface(proxy);
-+	struct rssi_parameters rssi;
- 
- 	if (strcmp(iface, ADV_MONITOR_INTERFACE) != 0 ||
- 		!g_str_has_prefix(path, app->path)) {
-@@ -822,7 +1227,7 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 		return;
- 	}
- 
--	if (!monitor_process(monitor, app)) {
-+	if (!monitor_process(monitor)) {
- 		monitor_destroy(monitor);
- 		DBG("Adv Monitor at path %s released due to invalid content",
- 			path);
-@@ -831,10 +1236,23 @@ static void monitor_proxy_added_cb(GDBusProxy *proxy, void *user_data)
- 
- 	queue_push_tail(app->monitors, monitor);
- 
--	if (rssi_is_unset(&monitor->rssi))
--		monitor_send_add_pattern(monitor);
--	else
--		monitor_send_add_pattern_rssi(monitor);
-+	existing_pattern = merged_pattern_find(monitor->app->manager,
-+						monitor->merged_pattern);
-+
-+	if (!existing_pattern) {
-+		monitor->merged_pattern->manager = monitor->app->manager;
-+		queue_push_tail(monitor->app->manager->merged_patterns,
-+						monitor->merged_pattern);
-+		merged_pattern_add(monitor->merged_pattern);
-+	} else {
-+		/* Since there is a matching pattern, abandon the one we have */
-+		merged_pattern_free(monitor->merged_pattern);
-+		monitor->merged_pattern = existing_pattern;
-+		queue_push_tail(existing_pattern->monitors, monitor);
-+
-+		merge_rssi(&existing_pattern->rssi, &monitor->rssi, &rssi);
-+		merged_pattern_replace(existing_pattern, &rssi);
-+	}
- 
- 	DBG("Adv Monitor allocated for the object at path %s", path);
- }
-@@ -1064,54 +1482,39 @@ static const GDBusPropertyTable adv_monitor_properties[] = {
- 	{ }
- };
- 
--/* Matches a monitor based on its handle */
--static bool removed_monitor_match(const void *data, const void *user_data)
--{
--	const uint16_t *handle = user_data;
--	const struct adv_monitor *monitor = data;
--
--	if (!data || !handle)
--		return false;
--
--	return monitor->monitor_handle == *handle;
--}
--
- /* Updates monitor state to 'removed' */
- static void monitor_state_removed(void *data, void *user_data)
- {
- 	struct adv_monitor *monitor = data;
- 
--	if (!monitor && monitor->state != MONITOR_STATE_ACTIVE)
-+	if (!monitor && monitor->state != MONITOR_STATE_INITED
-+				&& monitor->state != MONITOR_STATE_ACTIVE)
- 		return;
- 
- 	monitor->state = MONITOR_STATE_REMOVED;
--
--	DBG("Adv monitor with handle:0x%04x removed by kernel",
--		monitor->monitor_handle);
-+	monitor->merged_pattern = NULL;
- }
- 
--/* Remove the matched monitor and reports the removal to the app */
--static void app_remove_monitor(void *data, void *user_data)
-+/* Remove the matched merged_pattern and remove the monitors */
-+static void remove_merged_pattern(void *data, void *user_data)
- {
--	struct adv_monitor_app *app = data;
-+	struct adv_monitor_merged_pattern *merged_pattern = data;
- 	struct adv_monitor *monitor;
- 	uint16_t *handle = user_data;
- 
--	if (handle && *handle == 0) {
--		/* handle = 0 indicates kernel has removed all monitors */
--		queue_foreach(app->monitors, monitor_state_removed, NULL);
--		queue_destroy(app->monitors, monitor_destroy);
-+	if (!handle)
-+		return;
- 
-+	/* handle = 0 indicates kernel has removed all monitors */
-+	if (handle != 0 && *handle != merged_pattern->monitor_handle)
- 		return;
--	}
- 
--	monitor = queue_find(app->monitors, removed_monitor_match, handle);
--	if (monitor) {
--		DBG("Adv Monitor at path %s removed", monitor->path);
-+	DBG("Adv monitor with handle:0x%04x removed by kernel",
-+		merged_pattern->monitor_handle);
- 
--		monitor_state_removed(monitor, NULL);
--		monitor_destroy(monitor);
--	}
-+	queue_foreach(merged_pattern->monitors, monitor_state_removed, NULL);
-+	queue_destroy(merged_pattern->monitors, monitor_destroy);
-+	merged_pattern_free(merged_pattern);
- }
- 
- /* Processes Adv Monitor removed event from kernel */
-@@ -1129,8 +1532,8 @@ static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
- 		return;
- 	}
- 
--	/* Traverse the apps to find the monitor */
--	queue_foreach(manager->apps, app_remove_monitor, &handle);
-+	/* Traverse the merged_patterns to find matching pattern */
-+	queue_foreach(manager->merged_patterns, remove_merged_pattern, &handle);
- 
- 	DBG("Adv Monitor removed event with handle 0x%04x processed",
- 		ev->monitor_handle);
-@@ -1154,6 +1557,7 @@ static struct btd_adv_monitor_manager *manager_new(
- 	manager->mgmt = mgmt_ref(mgmt);
- 	manager->adapter_id = btd_adapter_get_index(adapter);
- 	manager->apps = queue_new();
-+	manager->merged_patterns = queue_new();
- 
- 	mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_REMOVED,
- 			manager->adapter_id, adv_monitor_removed_callback,
-@@ -1168,6 +1572,7 @@ static void manager_free(struct btd_adv_monitor_manager *manager)
- 	mgmt_unref(manager->mgmt);
- 
- 	queue_destroy(manager->apps, app_destroy);
-+	queue_destroy(manager->merged_patterns, merged_pattern_free);
- 
- 	free(manager);
- }
-@@ -1274,6 +1679,7 @@ static void adv_match_per_monitor(void *data, void *user_data)
- {
- 	struct adv_monitor *monitor = data;
- 	struct adv_content_filter_info *info = user_data;
-+	struct queue *patterns;
- 
- 	if (!monitor) {
- 		error("Unexpected NULL adv_monitor object upon match");
-@@ -1283,8 +1689,12 @@ static void adv_match_per_monitor(void *data, void *user_data)
- 	if (monitor->state != MONITOR_STATE_ACTIVE)
- 		return;
- 
--	if (monitor->type == MONITOR_TYPE_OR_PATTERNS &&
--		bt_ad_pattern_match(info->ad, monitor->patterns)) {
-+	if (!monitor->merged_pattern)
-+		return;
-+
-+	patterns = monitor->merged_pattern->patterns;
-+	if (monitor->merged_pattern->type == MONITOR_TYPE_OR_PATTERNS &&
-+				bt_ad_pattern_match(info->ad, patterns)) {
- 		goto matched;
- 	}
- 
--- 
-2.31.0.rc2.261.g7f71774620-goog
-
+On Thu, Mar 18, 2021 at 9:30 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Kenny,
+>
+> On Wed, Mar 17, 2021 at 10:17 PM Kenny Bian <kennybian@gmail.com> wrote:
+> >
+> > Thank you so much for your reply, Luiz.
+> >
+> > We have a small device which runs a Linux system in it. In this
+> > embedded Linux system, there is GATT server runs BLE service which
+> > provides the services with the characteristics for reading and writing
+> > from the mobile device such as iPhone. The folder "/var/lib/bluetooth"
+> > is in the embedded Linux system. We call this embedded Linux as BLE
+> > Server, and the iPhone as the BLE Client. During the testing a few
+> > weeks ago, not only our mobile app crashed, but the nRF also crashed
+> > as the service was changed. Since we have no way to tell whether the
+> > ServiceChanged indication works or not. We disabled the bluetooth
+> > cache. Then we have this new issue.
+> >
+> > I never saw the "[ServiceChanged]" section from the "info" file. I
+> > tried to change the attributes of some characteristics. For example,
+> > adding notification in some characteristics. Then restart the BlE
+> > service from the Linux system. I did check the "info" file after that,
+> > but I didn't see the "[ServiceChanged]" section. Is there another way
+> > to have the "[ServiceChanged]" showing up?
+> >
+> > Today, I ran the testing again by doing the firmware upgrade. Right
+> > after the firmware upgrade, I used the btmon to capture the
+> > characteristics reading by using our mobile app. Please see the
+> > attached log. As you can see, there are a lot of errors because there
+> > are 5 services which only have the service itself listed(I checked it
+> > by using nRF). For about 30 characteristics under those services can't
+> > be seen. That's why there are errors when the mobile app tries to read
+> > the data. I double checked, the BLE python files between these two
+> > versions of the firmware are exactly the same. So there are no
+> > ServiceChanged. As the reading didn't work, I had to remove the
+> > "/var/lib/bluetooth" folder. Then this folder was recreated again. I
+> > compared the file "attributes" and "info" before and after removal of
+> > the "/var/lib/bluetooth" folder. The "attributes" files are exactly
+> > the same. The "info" files are different. But it makes sense because
+> > only the "[SlaveLongTermKey]" and "[LinkKey]" are different which is
+> > caused by re-pairing from the mobile side, I guess.
+> >
+> > So in this case, the BLE service python code is exactly the same. The
+> > "attributes" and "info" files are also the same or slightly different
+> > because of the re-pairing. How come some characteristics cannot be
+> > seen from nRF? As those characteristics are not listed in nRF, neither
+> > nRF or our mobile app can read the data.
+> >
+> > Honestly, this situation is pretty much the same as there is no
+> > firmware upgrade because the service file itself and those files under
+> > "/var/lib/bluetooth" are almost the same. How come the normal reading
+> > from the mobile app works fine? But after the firmware upgrade, some
+> > characteristics can't be seen? Is there anything wrong about
+> > advertisement? In fact, the firmware upgrade only copy over the
+> > "/var/lib/bluetooth" in order to keep the pairing information. I have
+> > no idea something went wrong. Are there anything else to look into?
+>
+> < ACL Data TX: Handle 64 flags 0x00 dlen 186
+>       ATT: Read By Group Type Response (0x11) len 181
+>         Attribute data length: 20
+>         Attribute group list: 9 entries
+>         Handle range: 0x000a-0x0013
+>         UUID: Vendor specific (efb39360-a7e3-438f-a20d-e9f00e0e22b1)
+>         Handle range: 0x0014-0x004c
+>         UUID: Vendor specific (f57793c9-9544-46dc-bfa0-5fd149953c86)
+>         Handle range: 0x004d-0x0061
+>         UUID: Vendor specific (5040556b-340f-4c6f-b411-448089694628)
+>         Handle range: 0x0062-0x00ac
+>         UUID: Vendor specific (e05ad2ac-9a01-45f5-a56d-9c3c889d4dc6)
+>         Handle range: 0x00ad-0x00ca
+>         UUID: Vendor specific (51e16ff1-20d3-45ec-915c-f18290a893c5)
+>         Handle range: 0x00cb-0x00fc
+>         UUID: Vendor specific (e03d645c-3f2b-4693-a2fb-99840ee2581d)
+>         Handle range: 0x00fd-0x0122
+>         UUID: Vendor specific (5526a99e-7975-42ff-a27b-94d5a1ad9986)
+>         Handle range: 0x0123-0x0144
+>         UUID: Vendor specific (d72ce428-ba8c-4061-b6de-6f682736fe08)
+>         Handle range: 0x0145-0x0151
+>         UUID: Vendor specific (76a136d4-29fc-4217-b358-9bff4d6601ce
+>
+> So if I got you right you are saying that characteristics under the
+> last 2 services are not listed? But they appeared on the logs:
+>
+> > ACL Data RX: Handle 64 flags 0x02 dlen 11
+>       ATT: Read By Type Request (0x08) len 6
+>         Handle range: 0x0123-0x0144
+>         Attribute type: Characteristic (0x2803)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 174
+>       ATT: Read By Type Response (0x09) len 169
+>         Attribute data length: 21
+>         Attribute data list: 8 entries
+>         Handle: 0x0124
+>         Value: 8225012a7609433923a6925d42d5d4bf9307c4
+>         Handle: 0x0127
+>         Value: 82280181c6d99e78e5409a26411b1570c9c420
+>         Handle: 0x012a
+>         Value: 822b01d56926acbb8915bcad433323d6d170f4
+>         Handle: 0x012d
+>         Value: 822e01ba148cb7ef078a8406420e179ac55080
+>         Handle: 0x0130
+>         Value: 8231017715d4d9cd34078f004286be53568f03
+>         Handle: 0x0133
+>         Value: 8234012d4ead967eb781bb25442973c6247972
+>         Handle: 0x0136
+>         Value: 8237019997e76edb16c4b0b347be4445ee259c
+>         Handle: 0x0139
+>         Value: 823a01cdef05a932746f85b44aa6b0b1f07b6
+> > ACL Data RX: Handle 64 flags 0x02 dlen 11
+>       ATT: Read By Type Request (0x08) len 6
+>         Handle range: 0x013b-0x0144
+>         Attribute type: Characteristic (0x2803)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 69
+>       ATT: Read By Type Response (0x09) len 64
+>         Attribute data length: 21
+>         Attribute data list: 3 entries
+>         Handle: 0x013c
+>         Value: 823d01f1406c52df184a929e44b967b5d5bba3
+>         Handle: 0x013f
+>         Value: 884001e85f5356a5e92a9a794cb5c0c68a90bd
+>         Handle: 0x0142
+>         Value: 8a430168db5fe9dcd35c8dec46efcb334ffa8
+>
+> So this informed the remote that there are a total of 11 (8+3)
+> characteristics in the range of 0x0123-0x0144.
+>
+> > ACL Data RX: Handle 64 flags 0x02 dlen 11
+>       ATT: Read By Type Request (0x08) len 6
+>         Handle range: 0x0145-0x0151
+>         Attribute type: Characteristic (0x2803)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 90
+>       ATT: Read By Type Response (0x09) len 85
+>         Attribute data length: 21
+>         Attribute data list: 4 entries
+>         Handle: 0x0146
+>         Value: 884701f09f9394856720a26047025b9ef90752
+>         Handle: 0x0149
+>         Value: 884a013fd59d9e09e280b95d4ef082b6251241
+>         Handle: 0x014c
+>         Value: 8a4d01f2b9f5d7d417f1bfb14fe66a4c9a476c
+>         Handle: 0x014f
+>         Value: 885001da299c6a9df1309f43421ece432e9233
+>
+> And there are 4 characteristics in the range of 0x0145-0x0151. In fact
+> all the services seem to contain characteristics so if the remote
+> cannot list them then the problem is on their side, also there are
+> writes on the handles 0x04xx where there are no services whatsoever,
+> so this tells me that the remote has a invalid cache even after
+> performing a discovery and found out there are no services in the
+> range 0x0152-0xffff:
+>
+> > ACL Data RX: Handle 64 flags 0x02 dlen 11
+>       ATT: Read By Group Type Request (0x10) len 6
+>         Handle range: 0x0152-0xffff
+>         Attribute group type: Primary Service (0x2800)
+> < ACL Data TX: Handle 64 flags 0x00 dlen 9
+>       ATT: Error Response (0x01) len 4
+>         Read By Group Type Request (0x10)
+>         Handle: 0x0152
+>         Error: Attribute Not Found (0x0a)
