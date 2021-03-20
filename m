@@ -2,84 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7573C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Mar 2021 11:35:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50D7DC433E0
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Mar 2021 12:00:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CC827619B3
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Mar 2021 11:35:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2734F6197E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Mar 2021 12:00:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230079AbhCTLei (ORCPT
+        id S230045AbhCTMAW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Mar 2021 07:34:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44234 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230040AbhCTLec (ORCPT
+        Sat, 20 Mar 2021 08:00:22 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:14412 "EHLO
+        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229583AbhCTMAI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Mar 2021 07:34:32 -0400
-Received: from mail-il1-x147.google.com (mail-il1-x147.google.com [IPv6:2607:f8b0:4864:20::147])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C1A5C0617AA
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Mar 2021 03:38:19 -0700 (PDT)
-Received: by mail-il1-x147.google.com with SMTP id o7so36269121ilt.5
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Mar 2021 03:38:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=TY6eWPej2xyMujUIiW14t6MNCP0JG96Bsng7hloAJn4=;
-        b=RqAbTTbBiiAE+lbJxwM27+M0rVdbKzqQj1SBwRotVbBQHtuQ19rjbTVrsfop/s8QAR
-         Vreo37J2gghorn0Zxg5fGTBSqA3iGsR1exhHEFn2OOeW6wcLwO3Fee1NRNoMYn+Yqtv2
-         tOAsl7JdUFqvs4nIw/Ht8WRXr+0kG9r7btDEgCBZoQrOfoF9WOFrCvLV6h21ZmBNnH7Z
-         10vGrsuC7PLPujLvTfWHErDLKRwGycezGGlqDgwjkwGibhXGA24qQdQppuIHFhhvPn68
-         zlkU4vCTkxkN4yvGBkUrVylz4hHb9ddnqASSRFiz5AXkHzUU3X/ipeSSXXFHIWn6QzEC
-         shrQ==
-X-Gm-Message-State: AOAM531C8hnDHu8jGx/PEYQwlYu33UpuTDMMXfDEL0fxPuLnu/cIRIq6
-        dCXR5tAaRtHVUCpwp1FFo867JDWdk/lPvvcyOR1GM20gG6hh
-X-Google-Smtp-Source: ABdhPJzd4Hj0631V/HLa6Uj7/62+FcuBi7Qtrnplas/d5g38qhibrBz0f8jwbnFRIVPYlFVkOb2/5wjN/P0+HfQ/VrrH9dXKJCjr
+        Sat, 20 Mar 2021 08:00:08 -0400
+Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.58])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4F2XGp00cVzkbLd;
+        Sat, 20 Mar 2021 15:20:33 +0800 (CST)
+Received: from localhost.localdomain (10.67.165.24) by
+ DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
+ 14.3.498.0; Sat, 20 Mar 2021 15:22:01 +0800
+From:   Meng Yu <yumeng18@huawei.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>, <wangzhou1@hisilicon.com>,
+        <yumeng18@huawei.com>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: Remove trailing semicolon in macros
+Date:   Sat, 20 Mar 2021 15:19:33 +0800
+Message-ID: <1616224773-41847-1-git-send-email-yumeng18@huawei.com>
+X-Mailer: git-send-email 2.8.1
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2184:: with SMTP id j4mr5426084ila.308.1616228824055;
- Sat, 20 Mar 2021 01:27:04 -0700 (PDT)
-Date:   Sat, 20 Mar 2021 01:27:04 -0700
-In-Reply-To: <00000000000076ecf305b9f8efb1@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000ef073a05bdf398e0@google.com>
-Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in add_adv_patterns_monitor
-From:   syzbot <syzbot+3ed6361bf59830ca9138@syzkaller.appspotmail.com>
-To:     apusaka@chromium.org, dan.carpenter@oracle.com,
-        davem@davemloft.net, finanzas1@logisticaenlinea.net,
-        hdanton@sina.com, howardchung@google.com, johan.hedberg@gmail.com,
-        johan.hedberg@intel.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, mcchou@chromium.org,
-        mmandlik@chromium.org, netdev@vger.kernel.org, sashal@kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+1. remove trailing semicolon in macros;
+2. fix some coding style.
 
-commit b4a221ea8a1f890b50838ef389d016c7ff280abc
-Author: Archie Pusaka <apusaka@chromium.org>
-Date:   Fri Jan 22 08:36:11 2021 +0000
+Signed-off-by: Meng Yu <yumeng18@huawei.com>
+---
+ net/bluetooth/smp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-    Bluetooth: advmon offload MSFT add rssi support
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 26e8cfad..07a193e 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -55,7 +55,7 @@
+ #define SMP_ALLOW_CMD(smp, code)	set_bit(code, &smp->allow_cmd)
+ 
+ /* Keys which are not distributed with Secure Connections */
+-#define SMP_SC_NO_DIST (SMP_DIST_ENC_KEY | SMP_DIST_LINK_KEY);
++#define SMP_SC_NO_DIST (SMP_DIST_ENC_KEY | SMP_DIST_LINK_KEY)
+ 
+ #define SMP_TIMEOUT	msecs_to_jiffies(30000)
+ 
+@@ -403,7 +403,7 @@ static int smp_e(const u8 *k, u8 *r)
+ 
+ 	SMP_DBG("r %16phN", r);
+ 
+-	memzero_explicit(&ctx, sizeof (ctx));
++	memzero_explicit(&ctx, sizeof(ctx));
+ 	return err;
+ }
+ 
+@@ -866,7 +866,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 	memset(smp->tk, 0, sizeof(smp->tk));
+ 	clear_bit(SMP_FLAG_TK_VALID, &smp->flags);
+ 
+-	BT_DBG("tk_request: auth:%d lcl:%d rem:%d", auth, local_io, remote_io);
++	BT_DBG("%s: auth:%d lcl:%d rem:%d", __func__, auth, local_io, remote_io);
+ 
+ 	/* If neither side wants MITM, either "just" confirm an incoming
+ 	 * request or use just-works for outgoing ones. The JUST_CFM
+-- 
+2.8.1
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14ef5ad6d00000
-start commit:   b491e6a7 net: lapb: Add locking to the lapb module
-git tree:       net
-kernel config:  https://syzkaller.appspot.com/x/.config?x=be33d8015c9de024
-dashboard link: https://syzkaller.appspot.com/bug?extid=3ed6361bf59830ca9138
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10628ae8d00000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12964b80d00000
-
-If the result looks correct, please mark the issue as fixed by replying with:
-
-#syz fix: Bluetooth: advmon offload MSFT add rssi support
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
