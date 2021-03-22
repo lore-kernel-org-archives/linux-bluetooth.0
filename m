@@ -2,137 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3AADC433C1
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 01:34:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E00A5C433C1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 06:01:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6B38161920
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 01:34:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5A076192E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 06:01:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229944AbhCVBeW (ORCPT
+        id S229875AbhCVGB2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Mar 2021 21:34:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51894 "EHLO
+        Mon, 22 Mar 2021 02:01:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52352 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbhCVBeF (ORCPT
+        with ESMTP id S229854AbhCVGBJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Mar 2021 21:34:05 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7BBC061574;
-        Sun, 21 Mar 2021 18:34:05 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id t5so7959518qvs.5;
-        Sun, 21 Mar 2021 18:34:05 -0700 (PDT)
+        Mon, 22 Mar 2021 02:01:09 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 753CEC061762
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Mar 2021 23:01:09 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id a63so59233138yba.2
+        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Mar 2021 23:01:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:mail-followup-to:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=D0VAsMBx9s6m1EfahMT+VBysZ6Gxa9IY/nOLkqBzFhk=;
-        b=eBaaTkLUCus7nTvlLiatH03Odbq9DQ+K5k3ne4E6gdVCDVggflDcqRM/jTRnR2e9Xo
-         /vQWuVOr8zK3Zfa4p74CgsWshUUJpqi/3smRun/4Pjjl3Jj/h6GYZmMWne5bQdJqtn6J
-         AODeDpdwrWYFKD7XW/1351AByKR2Xxnn2ZqYabGi+cEJ2DVRX4RnRT9vmSYDnWLcn0tM
-         EYzKX7DqSzRVvf/n9P3NznFYXppSkJjUMS1P2moT8xdvUUFAcH1MvFYTQJDn9z+FFrKQ
-         Aex4uXpfgLfynHi24LxPlKaGJSKBxoKw1c60BbJFe9szR0k7NkXqtMTdXuxIYYFt++mI
-         JzkQ==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=5I10KmTF85pJvFc7zWF/I23hQrUb++spC+kPfoWl0gs=;
+        b=c9XgGsl1zbqM2sva4joEfnSV7hDID7Lv3Hg9YmulQCxI46Pp32uMd+U93tz6FJcf9V
+         +dwPmAPherZPRSAPkRCBzDzYIYIu97H2V97Ttm5U4NWXfsUKtdsqFJgWVIBzAKCUcZTo
+         xBMxTdBDP8/4T09zUqXjktns3k7pmDbDTMghuXfiRMsHXCnRMIc5kq+Bnxn7Ul/uGbnv
+         hqMrlrHpY9fr05VsFp4rrpRL8GLQTfhnP46jRWB41y34YhEDaK+TR11g+1WarhhgRnyD
+         qk5I0dc+ciajtCCqUhXOrWwj58BMGhjxEO/UP5ll3cEIE0XQczrU2+2Cqbk5kI2RBzx1
+         k2Kw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id
-         :mail-followup-to:references:mime-version:content-disposition
-         :in-reply-to;
-        bh=D0VAsMBx9s6m1EfahMT+VBysZ6Gxa9IY/nOLkqBzFhk=;
-        b=XVCpJLHl7UXv8DC/SCItzHg2DJ5IPkKQ54GSTzdPTJv/xx8JYD/TYNQXNQa/N8dgW7
-         frbOdixPgPe7zOT8eNt+fea75+s2osFfnzpo+ReYraSTdXJ7qT8axsQEA27nhWCFi2Rc
-         bJpnWHzxIaM5FsLfMnsGBSrT6n8l6Zg1xLXcoquX13rQFJXmQlhcF0vSVcFE5CF6Str6
-         jD1RVdkKbd1MirCpi3V1BIFuhJ+28E4KcSKqGQLZJ7sCIYok9CjyQdlpaZCqMhsQbWEj
-         gTUbmQDfHPDbSTOjXOmSFvA97RCWrMlGTrn9lK2ipnyQzOOOamO13EIQLzEZtQqALjox
-         /ghA==
-X-Gm-Message-State: AOAM531fp8CKEXW6d6UVLKZfFR1w3zsUrByvhhQUnSCdvO/SHY3e2eW8
-        Kystwp54XXJCqm++buc8lCY=
-X-Google-Smtp-Source: ABdhPJzDPBHuVxDpqyKT1JgQJ1757/8uz6T/nnATCSXJ/aKaZnJMtQdzYC6hUL6z9eD5J1ot3Yae+w==
-X-Received: by 2002:ad4:4904:: with SMTP id bh4mr18953829qvb.53.1616376844461;
-        Sun, 21 Mar 2021 18:34:04 -0700 (PDT)
-Received: from ArchLinux ([156.146.54.190])
-        by smtp.gmail.com with ESMTPSA id c19sm9571055qkl.78.2021.03.21.18.34.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 21 Mar 2021 18:34:03 -0700 (PDT)
-Date:   Mon, 22 Mar 2021 07:03:54 +0530
-From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
-To:     Randy Dunlap <rdunlap@infradead.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] Bluetooth: hci_qca: Mundane typo fix
-Message-ID: <YFf0AmJN0fz5Z3Og@ArchLinux>
-Mail-Followup-To: Bhaskar Chowdhury <unixbhaskar@gmail.com>,
-        Randy Dunlap <rdunlap@infradead.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20210322010051.483622-1-unixbhaskar@gmail.com>
- <b1867efb-afcc-1f9e-fbab-75a7793a2649@infradead.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-        protocol="application/pgp-signature"; boundary="f+1bav2gwg7CE5Fk"
-Content-Disposition: inline
-In-Reply-To: <b1867efb-afcc-1f9e-fbab-75a7793a2649@infradead.org>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=5I10KmTF85pJvFc7zWF/I23hQrUb++spC+kPfoWl0gs=;
+        b=cAwF3dLNDR+UdVC+9REBXzrtjD7cmt9EaOd0+pZAeCS8Smmxunxh5KiEqTkR3l3Dlk
+         YqKnZA74RW3yME01mZDVyLJGeUo7oX88ZYN0oRZjVh7fuvEMEk2Gsa+F6xLK4N0Lh6cv
+         j0h6mkUZX1sHJaf8woFFOg3RAathroqXhF6BZZ/v8H923FzDiQ5I9lzLjdzg8yun2UP4
+         hW777o+k9xIhVwYbnwsQ9nUl9+bmgyTMQivBt85zKKkV/+RSAcxkYrqjik2fsvcKVecH
+         MSbuislSX+JzNJ7MgUN6OLyxRItxuGkXultnNg6AvPkVvoXH6AzkVGo7AA9a8BCuPT58
+         Z9aQ==
+X-Gm-Message-State: AOAM5334fyoJDOU8+srw3+SEUDNuh/oqqK9eoTp76f1lSajucZ5u53bQ
+        pkk8nBcsTWj5p4+4r/dvKeSItKZnPgAM+ReKsjBsYWhMghg8qLLCzhNs03X7xSkghnBrWrYjWk+
+        7QzSJ1a46aceQh/g7BomkxEy7cRKaS24DJt526DCzpfRVWlUWwbr4uGmCNTbUIcI2m8G6GaPJMP
+        XK
+X-Google-Smtp-Source: ABdhPJyOUjg2iuItG5KmaZ6zQLnZF+LuuNxppSFBsY6NFp8yarG7SYRJ+2b6G2g8e7XiyXxlGLdY8F2+ucC9
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:fdf3:9f7d:e4e3:ccad])
+ (user=apusaka job=sendgmr) by 2002:a25:390:: with SMTP id 138mr21736645ybd.130.1616392868490;
+ Sun, 21 Mar 2021 23:01:08 -0700 (PDT)
+Date:   Mon, 22 Mar 2021 14:01:01 +0800
+Message-Id: <20210322140046.1.I6c4306f6e8ba3ccc9106067d4eb70092f8cb2a49@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.rc2.261.g7f71774620-goog
+Subject: [PATCH] Bluetooth: check for zapped sk before connecting
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Guenter Roeck <groeck@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Archie Pusaka <apusaka@chromium.org>
 
---f+1bav2gwg7CE5Fk
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
+There is a possibility of receiving a zapped sock on
+l2cap_sock_connect(). This could lead to interesting crashes, one
+such case is tearing down an already tore l2cap_sock as is happened
+with this call trace:
 
-On 18:30 Sun 21 Mar 2021, Randy Dunlap wrote:
->On 3/21/21 6:00 PM, Bhaskar Chowdhury wrote:
->>
->> s/packat/packet/
->>
->> Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
->> ---
->>  drivers/bluetooth/hci_qca.c | 2 +-
->>  1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index de36af63e182..f2eee9112e41 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -1066,7 +1066,7 @@ static void qca_controller_memdump(struct work_struct *work)
->>  		 * packets in the buffer.
->>  		 */
->>  		/* For QCA6390, controller does not lost packets but
->
->		                                    lose
->
->> -		 * sequence number field of packat sometimes has error
->> +		 * sequence number field of packet sometimes has error
->>  		 * bits, so skip this checking for missing packet.
->>  		 */
->>  		while ((seq_no > qca_memdump->current_seq_no + 1) &&
->> --
->
->As Ingo said, please try to fix more than one thing at a time.
->
-Okay.
->--
->~Randy
+__dump_stack lib/dump_stack.c:15 [inline]
+dump_stack+0xc4/0x118 lib/dump_stack.c:56
+register_lock_class kernel/locking/lockdep.c:792 [inline]
+register_lock_class+0x239/0x6f6 kernel/locking/lockdep.c:742
+__lock_acquire+0x209/0x1e27 kernel/locking/lockdep.c:3105
+lock_acquire+0x29c/0x2fb kernel/locking/lockdep.c:3599
+__raw_spin_lock_bh include/linux/spinlock_api_smp.h:137 [inline]
+_raw_spin_lock_bh+0x38/0x47 kernel/locking/spinlock.c:175
+spin_lock_bh include/linux/spinlock.h:307 [inline]
+lock_sock_nested+0x44/0xfa net/core/sock.c:2518
+l2cap_sock_teardown_cb+0x88/0x2fb net/bluetooth/l2cap_sock.c:1345
+l2cap_chan_del+0xa3/0x383 net/bluetooth/l2cap_core.c:598
+l2cap_chan_close+0x537/0x5dd net/bluetooth/l2cap_core.c:756
+l2cap_chan_timeout+0x104/0x17e net/bluetooth/l2cap_core.c:429
+process_one_work+0x7e3/0xcb0 kernel/workqueue.c:2064
+worker_thread+0x5a5/0x773 kernel/workqueue.c:2196
+kthread+0x291/0x2a6 kernel/kthread.c:211
+ret_from_fork+0x4e/0x80 arch/x86/entry/entry_64.S:604
 
---f+1bav2gwg7CE5Fk
-Content-Type: application/pgp-signature; name="signature.asc"
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reported-by: syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
+---
 
------BEGIN PGP SIGNATURE-----
+ net/bluetooth/l2cap_sock.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
 
-iQEzBAABCAAdFiEEnwF+nWawchZUPOuwsjqdtxFLKRUFAmBX9AIACgkQsjqdtxFL
-KRVCogf/dBPIjlC1CpUjwXJHOylINjrXf7sBL7Mqfr85DLz6lyUGSj0rYo2JES4x
-OJFM0HkyFOoipZH1a36M2ajTrW0lGCOsYOPjZjqN2hXW4oxU8og+3nlcX6Dddoy3
-lLkO3/Reo9iB9mVXLPFJvGSVpPMw4Wk4hzyeNrVHugDjN9xi1/sbzEhp0ZCKjh2G
-P34si32rpjts2idzSi/GZmwlArsTl2UpOFXAU3p/npaAL375hBX3AC2ks/kCRG+D
-FHu50pbvC4Awbiah8kUkfSYvuW9rZ+mgehBv8m/RDh2H2IMJZBtC8GHxV8thqB6M
-VhV5U6ZQJHh7jT8Tt4Ze8tCwT21BbA==
-=xyPK
------END PGP SIGNATURE-----
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index f1b1edd0b697..b86fd8cc4dc1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -182,6 +182,13 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	lock_sock(sk);
++	if (sock_flag(sk, SOCK_ZAPPED)) {
++		release_sock(sk);
++		return -EINVAL;
++	}
++	release_sock(sk);
++
+ 	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
+-- 
+2.31.0.rc2.261.g7f71774620-goog
 
---f+1bav2gwg7CE5Fk--
