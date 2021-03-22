@@ -2,159 +2,169 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7FF84C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 17:26:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D7D2C433DB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 20:16:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D07C61998
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 17:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32FC061994
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Mar 2021 20:16:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231439AbhCVR0K (ORCPT
+        id S231473AbhCVUQT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Mar 2021 13:26:10 -0400
-Received: from mail.kernel.org ([198.145.29.99]:45940 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230198AbhCVRZi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Mar 2021 13:25:38 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 27A046192D
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Mar 2021 17:25:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616433938;
-        bh=E4nZo9oWSlEQ9WWfeBMwlLofaqbSTsEpcR0A90ikIUE=;
-        h=From:To:Subject:Date:From;
-        b=p9tx/ELnQQQ78elp1/9lZEp0sEx8agRxAY8n5gp7Gvfd3ItgiSyjmxQszz06wl7Kg
-         6iBrhT3p6t1vtTa1i3DkImrqNUykzBvNhxT+w0BAvv4KQDBoa8elhVCWlvRgdOhWHE
-         y/bc5RLJ7/y6rB4GXsaRMPhiLjrLcyRGYI4dpWFoof3PJ9tsPFDeNpiOl2E8v1Obj1
-         F+NIxdGss65GnGRGQx+rza8NtPxsmeeeVqPp4lGc4KbJeH29avoS8U8kI0XsoWKQ23
-         oyBrKeJFkgxaRofnKTFuVxHbyGb2UG/V3weedNOmH9zzUCDkAebRYElADBN7Ipay+w
-         FjVDUT5MrS2JA==
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Mon, 22 Mar 2021 16:16:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39708 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231146AbhCVUQS (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 22 Mar 2021 16:16:18 -0400
+Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F935C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Mar 2021 13:16:18 -0700 (PDT)
+Received: by mail-pj1-x102e.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so11178218pjh.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Mar 2021 13:16:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+2BglIFbcf2BYrYGph2xO1jzurwYUlKCOgvHw+A6UXg=;
+        b=CrnO7B3gS5LmpDLxOwj5qizRTUzYnauRSd9X0U5Rra0dXoSAIRhI+1cygbRLCyTzhp
+         B//NASjQjlrXz3XKPN0Vno7w/RqEzIJjsrTtHZy7bXJW4qviP0Kv1eaiilq5u5BIwrQR
+         S9rSIXe6cg386uJIPlOcAj417vCO1Uds1cpNO9BV20DfWGqytEDhNtahI3TDD1/hjCa5
+         fPtboU+xL5FixEwNwWtI/3mkbZWYUzzejwIKLR/Fpo8/6vR12bTDQT74KT2ldU60EpdB
+         xJilQA6hY1iycM4YWjCxmhjZD45uvQcogZycY2Aim93U8SJK7MzfSw9mec7qfzTqKNNk
+         JqMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+2BglIFbcf2BYrYGph2xO1jzurwYUlKCOgvHw+A6UXg=;
+        b=NV0cwFwmgiyt97ReRbqmXcMCWFflBkuhtcImkP3+7ENEq+U1ZNcWYhmZYi9YOIia6b
+         8sbcOIJnD6JxLXSXbZY7AO4U3xmH0cGM3VFueyzECInVqSBnPEjmCg+Ca55chfirJEV+
+         ES7IwfQs3u8Ej6vuTzogn39Wv7a9+KSxJp8jRsPGckzeWlQa8aZ+zVql5EAD2uLxNBIH
+         R/iAQ/gPg93sz1VIr8ONLIMWR+Q1qBSoPCTrFuk68gtij34fT1o1VOd6r72tUDAIxURn
+         VBiNv1fidJp4P8aMhfS0z91PT7BTLX7w26NGDoP6RXAQmzLBqkphv9s5zSZS4w1AKkhW
+         gnlw==
+X-Gm-Message-State: AOAM533+7yrTaf3TPttuWjEBN9vFFZX3TKPUQOePWGBhYjoLcd3qbSf8
+        MWg+FOOYiJV2tps9OsCMgRdyQUrN0NGt/w==
+X-Google-Smtp-Source: ABdhPJyo/C38mM+4pLVqVs7M5c72CAI0zzpWPvoCBQzEN6FAF3I4X0RANnwqefWIsNPERO3YNGiPsA==
+X-Received: by 2002:a17:90a:b293:: with SMTP id c19mr769610pjr.193.1616444177269;
+        Mon, 22 Mar 2021 13:16:17 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id y19sm15756003pfo.0.2021.03.22.13.16.16
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 22 Mar 2021 13:16:16 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 212387] New: Bluetooth: Connection Timeout
-Date:   Mon, 22 Mar 2021 17:25:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: yurii.matsiuk@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-212387-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Subject: [PATCH BlueZ] hog-lib: Fix crash when receiving UHID_GET_REPORT
+Date:   Mon, 22 Mar 2021 13:16:16 -0700
+Message-Id: <20210322201616.3118617-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D212387
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-            Bug ID: 212387
-           Summary: Bluetooth: Connection Timeout
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.11.7
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: yurii.matsiuk@gmail.com
-        Regression: No
+If UHID_GET_REPORT is received but a report cannot be found, etc, the
+would pass bt_hog as user_data instead of report to get_report_cb
+leading to a crash.
 
-Created attachment 295995
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D295995&action=3Dedit
-btmon on 20210315 firmware
+Fixes https://github.com/bluez/bluez/issues/112
+---
+ profiles/input/hog-lib.c | 49 ++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 19 deletions(-)
 
-Headphones intermittently disconnect on latest firmware.
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index 6ac14e401..e5e3d3e7f 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -786,11 +786,9 @@ fail:
+ 	set_report_cb(err, NULL, 0, hog);
+ }
+ 
+-static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
+-							gpointer user_data)
++static void report_reply(struct bt_hog *hog, uint8_t status, uint8_t id,
++				 uint16_t len, const uint8_t *data)
+ {
+-	struct report *report = user_data;
+-	struct bt_hog *hog = report->hog;
+ 	struct uhid_event rsp;
+ 	int err;
+ 
+@@ -800,6 +798,31 @@ static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	rsp.type = UHID_GET_REPORT_REPLY;
+ 	rsp.u.get_report_reply.id = hog->getrep_id;
+ 
++	if (status)
++		goto done;
++
++	if (hog->has_report_id && len > 0) {
++		rsp.u.get_report_reply.size = len + 1;
++		rsp.u.get_report_reply.data[0] = id;
++		memcpy(&rsp.u.get_report_reply.data[1], data, len);
++	} else {
++		rsp.u.get_report_reply.size = len;
++		memcpy(rsp.u.get_report_reply.data, data, len);
++	}
++
++done:
++	rsp.u.get_report_reply.err = status;
++	err = bt_uhid_send(hog->uhid, &rsp);
++	if (err < 0)
++		error("bt_uhid_send: %s", strerror(-err));
++}
++
++static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
++							gpointer user_data)
++{
++	struct report *report = user_data;
++	struct bt_hog *hog = report->hog;
++
+ 	if (status != 0) {
+ 		error("Error reading Report value: %s", att_ecode2str(status));
+ 		goto exit;
+@@ -820,20 +843,8 @@ static void get_report_cb(guint8 status, const guint8 *pdu, guint16 len,
+ 	--len;
+ 	++pdu;
+ 
+-	if (hog->has_report_id && len > 0) {
+-		rsp.u.get_report_reply.size = len + 1;
+-		rsp.u.get_report_reply.data[0] = report->id;
+-		memcpy(&rsp.u.get_report_reply.data[1], pdu, len);
+-	} else {
+-		rsp.u.get_report_reply.size = len;
+-		memcpy(rsp.u.get_report_reply.data, pdu, len);
+-	}
+-
+ exit:
+-	rsp.u.get_report_reply.err = status;
+-	err = bt_uhid_send(hog->uhid, &rsp);
+-	if (err < 0)
+-		error("bt_uhid_send: %s", strerror(-err));
++	report_reply(hog, status, report->id, len, pdu);
+ }
+ 
+ static void get_report(struct uhid_event *ev, void *user_data)
+@@ -868,8 +879,8 @@ static void get_report(struct uhid_event *ev, void *user_data)
+ 	return;
+ 
+ fail:
+-	/* cancel the request on failure */
+-	get_report_cb(err, NULL, 0, hog);
++	/* reply with an error on failure */
++	report_reply(hog, err, 0, 0, NULL);
+ }
+ 
+ static bool get_descriptor_item_info(uint8_t *buf, ssize_t blen, ssize_t *len,
+-- 
+2.30.2
 
-Workaround: rolling back to `2020-12-18`.
-
-Hardware: Dell XPS 9310 + Sony WH-1000MX3
-
-0000:00:00.0 Host bridge: Intel Corporation 11th Gen Core Processor Host
-Bridge/DRAM Registers (rev 01)
-0000:00:02.0 VGA compatible controller: Intel Corporation TigerLake GT2 [Ir=
-is
-Xe Graphics] (rev 01)
-0000:00:04.0 Signal processing controller: Intel Corporation Device 9a03 (r=
-ev
-01)
-0000:00:06.0 System peripheral: Intel Corporation Device 09ab
-0000:00:07.0 PCI bridge: Intel Corporation Tiger Lake-LP Thunderbolt 4 PCI
-Express Root Port #0 (rev 01)
-0000:00:07.2 PCI bridge: Intel Corporation Tiger Lake-LP Thunderbolt 4 PCI
-Express Root Port #2 (rev 01)
-0000:00:0a.0 Signal processing controller: Intel Corporation Device 9a0d (r=
-ev
-01)
-0000:00:0d.0 USB controller: Intel Corporation Tiger Lake-LP Thunderbolt 4 =
-USB
-Controller (rev 01)
-0000:00:0d.2 USB controller: Intel Corporation Tiger Lake-LP Thunderbolt 4 =
-NHI
-#0 (rev 01)
-0000:00:0d.3 USB controller: Intel Corporation Tiger Lake-LP Thunderbolt 4 =
-NHI
-#1 (rev 01)
-0000:00:0e.0 RAID bus controller: Intel Corporation Volume Management Device
-NVMe RAID Controller
-0000:00:12.0 Serial controller: Intel Corporation Tiger Lake-LP Integrated
-Sensor Hub (rev 20)
-0000:00:14.0 USB controller: Intel Corporation Tiger Lake-LP USB 3.2 Gen 2x1
-xHCI Host Controller (rev 20)
-0000:00:14.2 RAM memory: Intel Corporation Tiger Lake-LP Shared SRAM (rev 2=
-0)
-0000:00:14.3 Network controller: Intel Corporation Wi-Fi 6 AX201 (rev 20)
-0000:00:15.0 Serial bus controller [0c80]: Intel Corporation Tiger Lake-LP
-Serial IO I2C Controller #0 (rev 20)
-0000:00:15.1 Serial bus controller [0c80]: Intel Corporation Tiger Lake-LP
-Serial IO I2C Controller #1 (rev 20)
-0000:00:16.0 Communication controller: Intel Corporation Tiger Lake-LP
-Management Engine Interface (rev 20)
-0000:00:19.0 Serial bus controller [0c80]: Intel Corporation Tiger Lake-LP
-Serial IO I2C Controller #4 (rev 20)
-0000:00:19.1 Serial bus controller [0c80]: Intel Corporation Tiger Lake-LP
-Serial IO I2C Controller #5 (rev 20)
-0000:00:1d.0 PCI bridge: Intel Corporation Device a0b3 (rev 20)
-0000:00:1f.0 ISA bridge: Intel Corporation Tiger Lake-LP LPC Controller (rev
-20)
-0000:00:1f.3 Multimedia audio controller: Intel Corporation Tiger Lake-LP S=
-mart
-Sound Technology Audio Controller (rev 20)
-0000:00:1f.4 SMBus: Intel Corporation Tiger Lake-LP SMBus Controller (rev 2=
-0)
-0000:00:1f.5 Serial bus controller [0c80]: Intel Corporation Tiger Lake-LP =
-SPI
-Controller (rev 20)
-0000:71:00.0 Unassigned class [ff00]: Realtek Semiconductor Co., Ltd. RTS52=
-60
-PCI Express Card Reader (rev 01)
-10000:e0:06.0 PCI bridge: Intel Corporation 11th Gen Core Processor PCIe
-Controller (rev 01)
-10000:e1:00.0 Non-Volatile memory controller: Micron Technology Inc Device =
-5405
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
