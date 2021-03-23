@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36D47C433C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45CDEC433DB
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 19:00:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F257E619A3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 19:00:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 197346198C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 19:00:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232598AbhCWS7r (ORCPT
+        id S232742AbhCWS7s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Mar 2021 14:59:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51310 "EHLO
+        Tue, 23 Mar 2021 14:59:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51308 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232746AbhCWS7N (ORCPT
+        with ESMTP id S232741AbhCWS7N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 23 Mar 2021 14:59:13 -0400
 Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1821C061764
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 11:59:13 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id y5so15284624pfn.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 11:59:13 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7A8DC061763
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 11:59:12 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id h3so15273058pfr.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 11:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=3tA1Um38m4hYMnv9CGiuJA7SkPRldGIsASeqovUw/Yg=;
-        b=mSKNtZdNfji0zKO7l1792ESPrDU4DC1YWkrMTD0KG48LmeMATsSrDV31c+U41NAeKE
-         GWW66LGL8r4I+ibqTjbuhjRFTRLy6sceenNKvi2pQIO1BeA/Tz32boxT/8kd4xVgfz4m
-         mh6OjcKEo3VSQlawRjhQUF64FG8wQYs8eQVg2VeZgW0ptNT5OdPRgImIaibkEiOeVrbQ
-         sX8COcQAQ3+1Kptv7E6RKEHKb8ZZPII7K7MqKKFCzJNYttGiMy52WB1L9uobcdbm8XVW
-         /ByHKXvbf33rEh02/+QyDEoOhYznApPZYthnseLFHd6X6xFDDTquwhuQ4yWhZR191TXN
-         A0+A==
+        bh=mMJy1yhZReHkY2zk7BhuHTjzHoiiHD3MzV3UKZsessU=;
+        b=LkAW2oTK/5McVOBC1oKMc/NjDZWWy+l6UA7fVcMQAEJ6aoxEG6+t9atdEHsb9/gy+Q
+         SvjxBp7wDyobINLBlCVSk6mooN4wDFFNHhWTVZPfq87tG722ElaALQ/WNfpgvq+t9+/I
+         xWDtqrCbv66xqQTvyalmYULjt+ybuuEH7TOcBOgNw1QCXIMpcrgD2yjbSdezHreNLLud
+         KBSZGRKeNvo8voVCjY1Cd1/2oHCxdbEwj57RhtLKytonzFTH/ZbuM+WVzVAfRDpCu4cR
+         VHdYGxxArqPxVeYokc/sZb7QyNn4RtHEiAM2aWCkbOKWgKsqMO4SuCaH/oG7wuMu8nb5
+         CNBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=3tA1Um38m4hYMnv9CGiuJA7SkPRldGIsASeqovUw/Yg=;
-        b=MZtXwUINdUE/CoJ/U88kQEht5KV05W7WMEG2OjLUBPK+VFmYKCQ/kW9lRZR0CSZNRC
-         wFlOOEwn1kXq2HZ9mkg8V4BCu3vcZqBAuKH7GJppv+HtvFRhgW9QGnJ0CrTZ2Cgxrkia
-         OHfczeP3EOofVvP8nKimYAEZNBYWxgX1+W7QaYBnOY1wvdQQmqnqVtTQucMWvGIr/tRr
-         QpEnsnJ2zs2VdSIpzN3rZJycmK/9Ti24g4g0m+p5h+sXd+YVVPh94FIUD5ml35rRneLA
-         GSGTNC9w79750KY9uU9E9Aopt/f2APIrOiBA+0hfhtY2Z+/mIWlwWeFWNFv410jEM5Ky
-         tqlg==
-X-Gm-Message-State: AOAM531XqO1o7nE0r6Lvk+gl36eQFecZ45mIblSzvVMGqvdoC59PuSot
-        pp0f0vrk4bnBplXrpz+Ys5ktF9vom0sTsg==
-X-Google-Smtp-Source: ABdhPJz4BzKh2KvlmnRdYfQrYEH/bGMA8JP0QUPIXocfOuthO+Z/yTHxx/9PO7Pq46DPrNANJibbfQ==
-X-Received: by 2002:a65:6107:: with SMTP id z7mr5322160pgu.435.1616525952852;
+        bh=mMJy1yhZReHkY2zk7BhuHTjzHoiiHD3MzV3UKZsessU=;
+        b=FX6NT+3pTJ2HZQULo19rXb5t/0SM7SnXQrWNzvrP+h2DpaxoUJiPe+IMmxHiqSuIBM
+         1YbWYxGXac9sFerRAVHnt+n78PPqzJdf10HMv6CiZN+q+Wik2hp7iN66E3tlv7CoB5vv
+         l4ltOZ6tRld1c71Z2HFbA3ZdYUo5SiZ7F8DyGD7BTn4XKz10yX9gtWoqQSRx3XDSJjIv
+         sxFhwosMD0iAbJqbGQaf/96PnBTu8PcMUYtTs78cBoczSPba5OsNi12X1IJHOaxmhO0q
+         bJf0IOTZ5OS+7NjoZq7d4VkBxNznhA+db8XRd5yWmm9glADmCzIsCmPigPFxJlc6sZk6
+         nrtQ==
+X-Gm-Message-State: AOAM533xJnd4ZE7arN3uPLh/mPkJX1P/ZEy+VNWGycjCGkfY+oURP/1b
+        NrAd2f7TbPmPdWo9edL3dcses9ojRTJeJw==
+X-Google-Smtp-Source: ABdhPJy/R7E86K84H51qYkof8Lsb6pNWVRmT7qqyQ8P3V8CguXjq5TD0wGYb+JiJV9UGlOEw/998+g==
+X-Received: by 2002:a63:fe56:: with SMTP id x22mr5172437pgj.329.1616525952158;
         Tue, 23 Mar 2021 11:59:12 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b10sm16132325pgm.76.2021.03.23.11.59.12
+        by smtp.gmail.com with ESMTPSA id b10sm16132325pgm.76.2021.03.23.11.59.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Mar 2021 11:59:12 -0700 (PDT)
+        Tue, 23 Mar 2021 11:59:11 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v10 9/9] Bluetooth: btintel: Skip reading firmware file version while in bootloader mode
-Date:   Tue, 23 Mar 2021 11:59:04 -0700
-Message-Id: <20210323185904.3372987-9-luiz.dentz@gmail.com>
+Subject: [PATCH v10 8/9] Bluetooth: btintel: Collect tlv based active firmware build info in FW mode
+Date:   Tue, 23 Mar 2021 11:59:03 -0700
+Message-Id: <20210323185904.3372987-8-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210323185904.3372987-1-luiz.dentz@gmail.com>
 References: <20210323185904.3372987-1-luiz.dentz@gmail.com>
@@ -75,59 +75,44 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Lokendra Singh <lokendra.singh@intel.com>
 
-This skips parsing the firmware version information from the firmware
-file while controller is in bootloader mode. As in bootloader mode,
-we are supposed to patch unconditionally.
+In Operational firmware mode, 'Minimum FW version' TLV ID is not available.
+So, we cannot fetch already running firmware info for comparison against
+another build. However, It can be collected using a combination of other
+TLV ID's information.
 
 Signed-off-by: Lokendra Singh <lokendra.singh@intel.com>
 ---
- drivers/bluetooth/btintel.c | 26 +++++++++++++++++---------
- 1 file changed, 17 insertions(+), 9 deletions(-)
+ drivers/bluetooth/btintel.c | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 6442acba76d1..e44b6993cf91 100644
+index 4ddbf895c382..6442acba76d1 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -1031,6 +1031,10 @@ int btintel_download_firmware(struct hci_dev *hdev,
- 		/* Skip version checking */
- 		break;
- 	default:
-+		/* Skip reading firmware file version in bootloader mode */
-+		if (ver->fw_variant == 0x06)
-+			break;
-+
- 		/* Skip download if firmware has the same version */
- 		if (btintel_firmware_version(hdev, ver->fw_build_num,
- 					     ver->fw_build_ww, ver->fw_build_yy,
-@@ -1070,15 +1074,19 @@ int btintel_download_firmware_newgen(struct hci_dev *hdev,
- 	int err;
- 	u32 css_header_ver;
- 
--	/* Skip download if firmware has the same version */
--	if (btintel_firmware_version(hdev, ver->min_fw_build_nn,
--				     ver->min_fw_build_cw, ver->min_fw_build_yy,
--				     fw, boot_param)) {
--		bt_dev_info(hdev, "Firmware already loaded");
--		/* Return -EALREADY to indicate that firmware has already been
--		 * loaded.
--		 */
--		return -EALREADY;
-+	/* Skip reading firmware file version in bootloader mode */
-+	if (ver->img_type != 0x01) {
-+		/* Skip download if firmware has the same version */
-+		if (btintel_firmware_version(hdev, ver->min_fw_build_nn,
-+					     ver->min_fw_build_cw,
-+					     ver->min_fw_build_yy,
-+					     fw, boot_param)) {
-+			bt_dev_info(hdev, "Firmware already loaded");
-+			/* Return -EALREADY to indicate that firmware has
-+			 * already been loaded.
+@@ -537,12 +537,23 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+ 			version->img_type = tlv->val[0];
+ 			break;
+ 		case INTEL_TLV_TIME_STAMP:
++			/* If image type is Operational firmware (0x03), then
++			 * running FW Calendar Week and Year information can
++			 * be extracted from Timestamp information
 +			 */
-+			return -EALREADY;
-+		}
- 	}
- 
- 	/* The firmware variant determines if the device is in bootloader
++			version->min_fw_build_cw = tlv->val[0];
++			version->min_fw_build_yy = tlv->val[1];
+ 			version->timestamp = get_unaligned_le16(tlv->val);
+ 			break;
+ 		case INTEL_TLV_BUILD_TYPE:
+ 			version->build_type = tlv->val[0];
+ 			break;
+ 		case INTEL_TLV_BUILD_NUM:
++			/* If image type is Operational firmware (0x03), then
++			 * running FW build number can be extracted from the
++			 * Build information
++			 */
++			version->min_fw_build_nn = tlv->val[0];
+ 			version->build_num = get_unaligned_le32(tlv->val);
+ 			break;
+ 		case INTEL_TLV_SECURE_BOOT:
 -- 
 2.30.2
 
