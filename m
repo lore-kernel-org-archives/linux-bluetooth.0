@@ -2,80 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F61EC433C1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 06:27:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEAEC433C1
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 08:32:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E6F6619AB
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 06:27:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E856619B6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Mar 2021 08:32:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229972AbhCWG03 (ORCPT
+        id S229761AbhCWIc2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Mar 2021 02:26:29 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:14427 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229955AbhCWGZ7 (ORCPT
+        Tue, 23 Mar 2021 04:32:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229693AbhCWIc1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Mar 2021 02:25:59 -0400
-Received: from DGGEMS408-HUB.china.huawei.com (unknown [172.30.72.60])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4F4LtS1h6Mzkdgp;
-        Tue, 23 Mar 2021 14:24:16 +0800 (CST)
-Received: from localhost.localdomain (10.67.165.24) by
- DGGEMS408-HUB.china.huawei.com (10.3.19.208) with Microsoft SMTP Server id
- 14.3.498.0; Tue, 23 Mar 2021 14:25:51 +0800
-From:   Meng Yu <yumeng18@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>
-CC:     <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2] Bluetooth: Remove trailing semicolon in macros
-Date:   Tue, 23 Mar 2021 14:22:56 +0800
-Message-ID: <1616480576-5249-1-git-send-email-yumeng18@huawei.com>
-X-Mailer: git-send-email 2.8.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.67.165.24]
-X-CFilter-Loop: Reflected
+        Tue, 23 Mar 2021 04:32:27 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FCD3C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 01:32:26 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id j4so1259485pgs.18
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Mar 2021 01:32:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=KtQvqrz3w6xBtTxWdXYr5PEiVwRgjP+6HysrGaoX6eU=;
+        b=DlM4X9aAYWJc8Kcs/DrMzz5CAXYgCgxLO6eh8pdqDX8KSkfklA/9aW54+tDVNPAcHm
+         wIw0s6/IXg/axF4KydHQHgM87VjUuPtVS8otmgkic5ye4vMJ1SgnNc+Ex61qzV/wKvTL
+         JodG8sNLBwGvJvnnoP8B7d3xe4k4w/hGe2P1Slte6KbmxHtmB4Lg8KxLoKQMeH2joxmM
+         4CVtT8sLX4lAk5L/GL5pshLVYMczqGS+ySwTYJB3WpBbQttsElTZjg1fgXoRxlj4TFGY
+         6ZIu6I6hsJdbqZo9EctKYo1WfPFB019LRLA58gwe3NrH+WYYOvZeBEE1ZecCb7JDkCU/
+         GJfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=KtQvqrz3w6xBtTxWdXYr5PEiVwRgjP+6HysrGaoX6eU=;
+        b=WyCj2BivPANQhN/KvB18PeG9PiRAjdrkGQFuAfJj17csnM9WHRX4s25vt5n2gMo/kG
+         1wpCuov9qWxmgtKBR204ghSOP58BcLvfB0XIHz0G2ugNPBAfqk/gGvmDxwC6sEitVw6W
+         SSdRujzr31SQ/1wZKyKr/vE5AZOeK/AdfeWiCoPoNsLbk5AJdHaYY6Ky/Rc5SH+WUUIw
+         vP5MpMz7hDNeJa402GH8PmZZqQQ92GJ7zw2dVH5R2mfgUcnzIKQAcuxItYSAabBpfMPC
+         sB4PeH+HBDXoP/tsqNXg9TNIUKJ6M3yID3Nb2W3w0hTjP2dWjTyamDYPr1RqlhNAJRKT
+         A64w==
+X-Gm-Message-State: AOAM530chPMtQoeURyIS7JVPLI4VxEanuATsneEvN8TQom8Q683k9Ozk
+        zjdGE59+IN9x7iEecih+ezXGdDjppVV+TMLaDrGVP4uceGIX8sWvs9Ru7W1aYCJ8OXJ6QNPCj10
+        JoWFpY0MiIuSh2TnNKEMz0oFtByw7/yyxEQh/pVRd9bRk5baYO4CPOlY7cY5MT2zHIHl73FYHvN
+        gd
+X-Google-Smtp-Source: ABdhPJx/iVy/TATqUnzYQb+Zxn94peGSevSjnAX+s+QI7WSRkdje6wmgQl9jwrfCamXacJylhEIh0ThDStsh
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:fdf3:9f7d:e4e3:ccad])
+ (user=apusaka job=sendgmr) by 2002:a62:e708:0:b029:1f8:c092:ff93 with SMTP id
+ s8-20020a62e7080000b02901f8c092ff93mr3763813pfh.21.1616488345892; Tue, 23 Mar
+ 2021 01:32:25 -0700 (PDT)
+Date:   Tue, 23 Mar 2021 16:32:20 +0800
+Message-Id: <20210323163141.v2.1.I6c4306f6e8ba3ccc9106067d4eb70092f8cb2a49@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
+Subject: [PATCH v2] Bluetooth: check for zapped sk before connecting
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com,
+        Alain Michaud <alainm@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Guenter Roeck <groeck@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-remove trailing semicolon in macros and coding style fix.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Signed-off-by: Meng Yu <yumeng18@huawei.com>
+There is a possibility of receiving a zapped sock on
+l2cap_sock_connect(). This could lead to interesting crashes, one
+such case is tearing down an already tore l2cap_sock as is happened
+with this call trace:
+
+__dump_stack lib/dump_stack.c:15 [inline]
+dump_stack+0xc4/0x118 lib/dump_stack.c:56
+register_lock_class kernel/locking/lockdep.c:792 [inline]
+register_lock_class+0x239/0x6f6 kernel/locking/lockdep.c:742
+__lock_acquire+0x209/0x1e27 kernel/locking/lockdep.c:3105
+lock_acquire+0x29c/0x2fb kernel/locking/lockdep.c:3599
+__raw_spin_lock_bh include/linux/spinlock_api_smp.h:137 [inline]
+_raw_spin_lock_bh+0x38/0x47 kernel/locking/spinlock.c:175
+spin_lock_bh include/linux/spinlock.h:307 [inline]
+lock_sock_nested+0x44/0xfa net/core/sock.c:2518
+l2cap_sock_teardown_cb+0x88/0x2fb net/bluetooth/l2cap_sock.c:1345
+l2cap_chan_del+0xa3/0x383 net/bluetooth/l2cap_core.c:598
+l2cap_chan_close+0x537/0x5dd net/bluetooth/l2cap_core.c:756
+l2cap_chan_timeout+0x104/0x17e net/bluetooth/l2cap_core.c:429
+process_one_work+0x7e3/0xcb0 kernel/workqueue.c:2064
+worker_thread+0x5a5/0x773 kernel/workqueue.c:2196
+kthread+0x291/0x2a6 kernel/kthread.c:211
+ret_from_fork+0x4e/0x80 arch/x86/entry/entry_64.S:604
+
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reported-by: syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
 ---
 
-Changes in v2
--Re-base in bluetooth-next 
+Changes in v2:
+* Modify locking order for better visibility
 
- net/bluetooth/smp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/bluetooth/l2cap_sock.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index efc19f9..2def906 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -54,7 +54,7 @@
- #define SMP_ALLOW_CMD(smp, code)	set_bit(code, &smp->allow_cmd)
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index f1b1edd0b697..c99d65ef13b1 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -179,9 +179,17 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	struct sockaddr_l2 la;
+ 	int len, err = 0;
++	bool zapped;
  
- /* Keys which are not distributed with Secure Connections */
--#define SMP_SC_NO_DIST (SMP_DIST_ENC_KEY | SMP_DIST_LINK_KEY);
-+#define SMP_SC_NO_DIST (SMP_DIST_ENC_KEY | SMP_DIST_LINK_KEY)
+ 	BT_DBG("sk %p", sk);
  
- #define SMP_TIMEOUT	msecs_to_jiffies(30000)
- 
-@@ -398,7 +398,7 @@ static int smp_e(const u8 *k, u8 *r)
- 
- 	SMP_DBG("r %16phN", r);
- 
--	memzero_explicit(&ctx, sizeof (ctx));
-+	memzero_explicit(&ctx, sizeof(ctx));
- 	return err;
- }
- 
++	lock_sock(sk);
++	zapped = sock_flag(sk, SOCK_ZAPPED);
++	release_sock(sk);
++
++	if (zapped)
++		return -EINVAL;
++
+ 	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
 -- 
-2.8.1
+2.31.0.291.g576ba9dcdaf-goog
 
