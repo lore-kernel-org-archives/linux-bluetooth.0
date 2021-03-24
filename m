@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A98B5C433C1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 10:14:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9ACB2C433C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 14:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D21C61A04
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 10:14:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5487C61A23
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 14:11:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233151AbhCXKOU (ORCPT
+        id S235744AbhCXOLU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Mar 2021 06:14:20 -0400
-Received: from mx.flatmax.org ([13.55.16.222]:51044 "EHLO mx.flatmax.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235617AbhCXKOO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Mar 2021 06:14:14 -0400
-Received: from 41.68.233.220.static.exetel.com.au ([220.233.68.41] helo=[192.168.1.33])
-        by mx.flatmax.org with esmtpsa (TLS1.2:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        (Exim 4.89)
-        (envelope-from <flatmax@flatmax.org>)
-        id 1lP0Wg-00069s-0P
-        for linux-bluetooth@vger.kernel.org; Wed, 24 Mar 2021 21:14:10 +1100
-From:   Matt Flax <flatmax@flatmax.org>
-Subject: PAN howto
+        Wed, 24 Mar 2021 10:11:20 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38321 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236071AbhCXOLF (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Mar 2021 10:11:05 -0400
+Received: from localhost.localdomain (p4fefce19.dip0.t-ipconnect.de [79.239.206.25])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 97AB1CED01
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Mar 2021 15:18:43 +0100 (CET)
+From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Message-ID: <2bd8e808-c9ed-cf4a-6f17-7e1e2ead4088@flatmax.org>
-Date:   Wed, 24 Mar 2021 21:14:09 +1100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
+Subject: [PATCH v2 3/5] Bluetooth: Fix mgmt status for LL Privacy experimental feature
+Date:   Wed, 24 Mar 2021 15:10:57 +0100
+Message-Id: <20210324141059.88009-3-marcel@holtmann.org>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
-Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi there,
+The return error when trying to change the setting when a controller is
+powered up, shall be MGMT_STATUS_REJECTED. However instead now the error
+MGMT_STATUS_NOT_POWERED is used which is exactly the opposite.
 
-Can anyone point to a concise and known good PAN setup HOWTO ?
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-We have embedded devices and are aiming to enable WiFi setup over PAN, 
-as well as other PAN things.
-
-The target OS is buldroot and userspace config and setup is preferable. 
-We are using a kernel.fragment file to enable and disable CONFIG options 
-in the kernel.
-
-Buiidroot running Linux 5.8.xx
-
-Bluez-utils v5.55
-
-
-thanks
-
-Matt
-
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 6b5bdf1f39ca..105d0743735d 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3984,7 +3984,7 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 		if (hdev_is_powered(hdev))
+ 			return mgmt_cmd_status(sk, hdev->id,
+ 					       MGMT_OP_SET_EXP_FEATURE,
+-					       MGMT_STATUS_NOT_POWERED);
++					       MGMT_STATUS_REJECTED);
+ 
+ 		/* Parameters are limited to a single octet */
+ 		if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
+-- 
+2.30.2
 
