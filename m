@@ -7,88 +7,104 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91F9FC433C1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 07:05:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C213C433C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 07:07:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5919A619F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 07:05:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 469E9619F2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 07:07:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235664AbhCXHE7 convert rfc822-to-8bit (ORCPT
+        id S235680AbhCXHGm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Mar 2021 03:04:59 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39997 "EHLO
+        Wed, 24 Mar 2021 03:06:42 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:37100 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230333AbhCXHEv (ORCPT
+        with ESMTP id S235676AbhCXHGi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Mar 2021 03:04:51 -0400
+        Wed, 24 Mar 2021 03:06:38 -0400
 Received: from mac-pro.holtmann.net (p4fefce19.dip0.t-ipconnect.de [79.239.206.25])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9C550CECD2;
-        Wed, 24 Mar 2021 08:12:28 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4D665CECD2;
+        Wed, 24 Mar 2021 08:14:11 +0100 (CET)
 Content-Type: text/plain;
         charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH v10 1/9] Bluetooth: btintel: Check firmware version before
- download
+Subject: Re: [PATCH] Bluetooth: Always call advertising disable before setting
+ params
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <0702034E-2AC9-4AB3-89F1-0E282650F7D8@intel.com>
-Date:   Wed, 24 Mar 2021 08:04:49 +0100
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20210323141653.1.I53e6be1f7df0be198b7e55ae9fc45c7f5760132d@changeid>
+Date:   Wed, 24 Mar 2021 08:06:32 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <E1C1EF65-F692-41A1-86FD-7CA3485ECAB9@holtmann.org>
-References: <20210323185904.3372987-1-luiz.dentz@gmail.com>
- <0702034E-2AC9-4AB3-89F1-0E282650F7D8@intel.com>
-To:     "An, Tedd" <tedd.an@intel.com>
+Message-Id: <8E70C497-BDCE-471F-9ECD-790E2FE3B024@holtmann.org>
+References: <20210323141653.1.I53e6be1f7df0be198b7e55ae9fc45c7f5760132d@changeid>
+To:     Daniel Winkler <danielwinkler@google.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Daniel,
 
-> ﻿On 3/23/21, 12:00 PM, "Luiz Augusto von Dentz" <luiz.dentz@gmail.com> wrote:
+> In __hci_req_enable_advertising, the HCI_LE_ADV hdev flag is temporarily
+> cleared to allow the random address to be set, which exposes a race
+> condition when an advertisement is configured immediately (<10ms) after
+> software rotation starts to refresh an advertisement.
 > 
->    From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> In normal operation, the HCI_LE_ADV flag is updated as follows:
 > 
->    This checks the firmware build number, week and year against the
->    repective loaded version. If details are a match, skip the download
->    process.
+> 1. adv_timeout_expire is called, HCI_LE_ADV gets cleared in
+>   __hci_req_enable_advertising, but hci_req configures an enable
+>   request
+> 2. hci_req is run, enable callback re-sets HCI_LE_ADV flag
 > 
->    Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->    ---
->    v2: Add patch that mover checks for operational mode after the version
->    checking.
->    v3: Fix not checking for operation mode before using btintel_read_boot_params
->    since some models depend on that to contruct the fw filename. Also attempt to
->    cleanup duplicated code.
->    v4: Fix forwarding -EALREADY when firmware has already been loaded.
->    v5: Fix not advancing fw_ptr.
->    v6: Fix btusb_setup_intel_new_get_fw_name error checking for ddc.
->    v7: Disable version checking for WsP/SfP.
->    v8: Really disables version checking for WsP/SfP.
->    v9: Reintroduce bootloader checks and add workaround for version checking when
->    operation and version cannot be read.
->    v10: Fix build error when BT_CONFIG_INTEL is not set.
+> However, in this race condition, the following occurs:
 > 
->     drivers/bluetooth/btintel.c   | 106 +++++++++++++++++++++++++++-------
->     drivers/bluetooth/btintel.h   |   5 +-
->     drivers/bluetooth/btusb.c     |  18 +++++-
->     drivers/bluetooth/hci_intel.c |   7 ++-
->     4 files changed, 109 insertions(+), 27 deletions(-)
+> 1. adv_timeout_expire is called, HCI_LE_ADV gets cleared in
+>   __hci_req_enable_advertising, but hci_req configures an enable
+>   request
+> 2. add_advertising is called, which also calls
+>   __hci_req_enable_advertising. Because HCI_LE_ADV was cleared in Step
+>   1, no "disable" command is queued.
+> 3. hci_req for adv_timeout_expire is run, which enables advertising and
+>   re-sets HCI_LE_ADV
+> 4. hci_req for add_advertising is run, but because no "disable" command
+>   was queued, we try to set advertising parameters while advertising is
+>   active, causing a Command Disallowed error, failing the registration.
 > 
-> I did a quick check with v10 and all tests passed/expected.
+> To resolve the issue, this patch removes the check for the HCI_LE_ADV
+> flag, and always queues the "disable" request, since HCI_LE_ADV could be
+> very temporarily out-of-sync. According to the spec, there is no harm in
+> calling "disable" when advertising is not active.
 > 
-> Test Scenarios:
-> Cold boot: Expect to download firmware
-> Reboot: Expect no firmware downloading 
-> FW upgrade: Expect to detect firmware change and download new firmware.
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Signed-off-by: Daniel Winkler <danielwinkler@google.com>
+> ---
 > 
-> ThP, TyP: All 3 tests passed
-> WsP, SfP: Cold boot, Reboot passed. FW upgrade didn't work due to known issue.
+> net/bluetooth/hci_request.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 > 
-> Tested-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+> index 8ace5d34b01efe..2b4b99f4cedf21 100644
+> --- a/net/bluetooth/hci_request.c
+> +++ b/net/bluetooth/hci_request.c
+> @@ -1547,8 +1547,10 @@ void __hci_req_enable_advertising(struct hci_request *req)
+> 	if (!is_advertising_allowed(hdev, connectable))
+> 		return;
+> 
+> -	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+> -		__hci_req_disable_advertising(req);
+> +	/* Request that the controller stop advertising. This can be called
+> +	 * whether or not there is an active advertisement.
+> +	 */
+> +	__hci_req_disable_advertising(req);
 
-so the verdict is that we should go ahead and apply this set?
+can you include a btmon trace that shows that we don’t get a HCI error. Since if we get one, then the complete request will fail. And that has further side effects.
 
 Regards
 
