@@ -2,148 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B79C9C433E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 15:19:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEDEC433C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 16:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8A08561A1B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 15:19:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CFA161A12
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Mar 2021 16:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236525AbhCXPTJ (ORCPT
+        id S234343AbhCXQ6u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Mar 2021 11:19:09 -0400
-Received: from mail-io1-f51.google.com ([209.85.166.51]:45929 "EHLO
-        mail-io1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236428AbhCXPSz (ORCPT
+        Wed, 24 Mar 2021 12:58:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236399AbhCXQ6d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Mar 2021 11:18:55 -0400
-Received: by mail-io1-f51.google.com with SMTP id k8so21874851iop.12;
-        Wed, 24 Mar 2021 08:18:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=mHWIX01g5QwAZ8qLk5RpjZQyq2xV+NH9VhPdBzNv998=;
-        b=NLZ/SbkMReiudueDGuLUBu3Bae5GE0GT2v6AkGmQCVd6qdJZC4BVMniGDkHENt8VWd
-         qR4kOHTzyA2r1vjkMD3aJ5HeaOhHWWDW95fThiDSHKQ60aDoXAj5nYbaCsV04cMnav6W
-         t6FpBTMAuAij+J6pT2TD40LO3HjIlfepbMWQO/+/HrBEQ4FEt7GULM+WvcXXgUZhd9VK
-         sCXRPnVuBN3KMpUx6LiH8XI8AxOBstfNyRslpIczy9GDZUla9q9yEOWY6B8B2bD/xCzm
-         EvgNBdF1i0WbmTLWtpRgtff7RTOekiGztUulMxKDelClDgO9giCUeyPaVAKlRzp5AAQ6
-         y11g==
-X-Gm-Message-State: AOAM5300V1b4WTVKYqIzbI5AyBFOLlDvEkpY2VXNvbUX9kJgM4OXKaQi
-        PuUDyOqq1jusKgtil13FbU9HzIo3pg==
-X-Google-Smtp-Source: ABdhPJyYehFovzVqPSlDFqfKh5uY8GMU71gp2Kc8r4Nc+hKYTdtZOlPiFGXnKWZsYxztRDEZm1EN4A==
-X-Received: by 2002:a5d:87d5:: with SMTP id q21mr2809629ios.105.1616599134524;
-        Wed, 24 Mar 2021 08:18:54 -0700 (PDT)
-Received: from robh.at.kernel.org ([64.188.179.253])
-        by smtp.gmail.com with ESMTPSA id i67sm1264206ioa.3.2021.03.24.08.18.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 24 Mar 2021 08:18:52 -0700 (PDT)
-Received: (nullmailer pid 3084914 invoked by uid 1000);
-        Wed, 24 Mar 2021 15:18:50 -0000
-Date:   Wed, 24 Mar 2021 09:18:50 -0600
-From:   Rob Herring <robh@kernel.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        devicetree@vger.kernel.org, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        bgodavar@codeaurora.org, rjliao@codeaurora.org,
-        hbandi@codeaurora.org, abhishekpandit@chromium.org
-Subject: Re: [PATCH v1 2/2] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn6750
-Message-ID: <20210324151850.GA3083022@robh.at.kernel.org>
-References: <1615481904-9400-1-git-send-email-gubbaven@codeaurora.org>
- <1615481904-9400-3-git-send-email-gubbaven@codeaurora.org>
+        Wed, 24 Mar 2021 12:58:33 -0400
+Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AAA19C061763;
+        Wed, 24 Mar 2021 09:58:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:Content-Type:
+        In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+        :Reply-To:Content-ID:Content-Description;
+        bh=jafv0gazuyTSC4IKqAojqIlpdwE8g/2OqzXZ6qaK9qM=; b=Iw3KkCGuCbVP7EeFoTNUp8tgY7
+        44scb4S8dhiLzP9qYq6wPSjp5gBcwJlndeZBulKYY1x9TTr5nF/SPQw02CoePrDI2wkXjuwB8r9NW
+        Y7itHo0FqQdWQobekQwSvXKWpqmG3zSmgKUMXOD9TlXsGw6+bkag3GJcv6dYBDr6o+85YAlw9dj9l
+        XI7JxQwILss9feYUyN+i6Q1jM5fOhSx80j0dOKCX5tXf7B86wuw3ZWhH8j7UJTwTpr3BNApONG001
+        dQDf3Kv6qkukZwMmQVmfitp0X1Em+6hlF4qP+7ixiYT6UHgkqJYenm4FKMeigghZeKTcKxbBPPyhM
+        m+kgdMcg==;
+Received: from [2601:1c0:6280:3f0::3ba4]
+        by casper.infradead.org with esmtpsa (Exim 4.94 #2 (Red Hat Linux))
+        id 1lP6pN-00Bbg8-E0; Wed, 24 Mar 2021 16:58:02 +0000
+Subject: Re: [PATCH net-next] 6lowpan: Fix some typos in nhc_udp.c
+To:     Wang Hai <wanghai38@huawei.com>, alex.aring@gmail.com,
+        jukka.rissanen@linux.intel.com, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20210324062224.13032-1-wanghai38@huawei.com>
+From:   Randy Dunlap <rdunlap@infradead.org>
+Message-ID: <8b3f510f-3999-5775-e3b9-4720df77ad7a@infradead.org>
+Date:   Wed, 24 Mar 2021 09:57:49 -0700
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.8.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1615481904-9400-3-git-send-email-gubbaven@codeaurora.org>
+In-Reply-To: <20210324062224.13032-1-wanghai38@huawei.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Mar 11, 2021 at 10:28:24PM +0530, Venkata Lakshmi Narayana Gubba wrote:
-> This patch enables regulators and gpios for the Qualcomm Bluetooth wcn6750
-> controller.
+On 3/23/21 11:22 PM, Wang Hai wrote:
+> s/Orignal/Original/
+> s/infered/inferred/
 > 
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> Reported-by: Hulk Robot <hulkci@huawei.com>
+> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+
+Acked-by: Randy Dunlap <rdunlap@infradead.org>
+
 > ---
->  .../devicetree/bindings/net/qualcomm-bluetooth.txt | 43 ++++++++++++++++++++++
->  1 file changed, 43 insertions(+)
-
-This is a large change. Please convert to DT schema first.
-
+>  net/6lowpan/nhc_udp.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
 > 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> index 709ca6d..e70fcb7 100644
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> @@ -15,6 +15,7 @@ Required properties:
->     * "qcom,wcn3991-bt"
->     * "qcom,wcn3998-bt"
->     * "qcom,qca6390-bt"
-> +   * "qcom,wcn6750-bt"
+> diff --git a/net/6lowpan/nhc_udp.c b/net/6lowpan/nhc_udp.c
+> index 8a3507524f7b..33f17bd8cda7 100644
+> --- a/net/6lowpan/nhc_udp.c
+> +++ b/net/6lowpan/nhc_udp.c
+> @@ -5,7 +5,7 @@
+>   *	Authors:
+>   *	Alexander Aring	<aar@pengutronix.de>
+>   *
+> - *	Orignal written by:
+> + *	Original written by:
+>   *	Alexander Smirnov <alex.bluesman.smirnov@gmail.com>
+>   *	Jon Smirl <jonsmirl@gmail.com>
+>   */
+> @@ -82,7 +82,7 @@ static int udp_uncompress(struct sk_buff *skb, size_t needed)
+>  	if (fail)
+>  		return -EINVAL;
 >  
->  Optional properties for compatible string qcom,qca6174-bt:
->  
-> @@ -39,6 +40,26 @@ Optional properties for compatible string qcom,wcn399x-bt:
->   - firmware-name: specify the name of nvm firmware to load
->   - clocks: clock provided to the controller
->  
-> +Required properties for compatible string qcom,wcn6750-bt:
-> +
-> + - enable-gpios: gpio specifier used to enable chip
-> + - swctrl-gpios: gpio specifier is output from SoC,used to find status
-> +		 of clock supply to SoC.
-> + - vddio-supply: VDD_IO supply regulator handle.
-> + - vddaon-supply: VDD_AON supply regulator handle.
-> + - vddbtcxmx-suppl: VDD_BT_CXMX supply regualtor handle.
-> + - vddrfacmn-supply: VDD_RFA_CMN supply regulator handle.
-> + - vddrfa0p8-supply: VDD_RFA_0P8 suppply regulator handle.
-> + - vddrfa1p7-supply: VDD_RFA_1P7 supply regulator handle.
-> + - vddrfa1p2-supply: VDD_RFA_1P2 supply regulator handle.
-> + - vddrfa2p2-supply: VDD_RFA_2P2 supply regulator handle.
-> + - vddasd-supply: VDD_ASD supply regulator handle.
-> +
-> +Optional properties for compatible string qcom,wcn6750-bt:
-> +
-> + - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
-> + - firmware-name: specify the name of nvm firmware to load
-> +
->  Examples:
->  
->  serial@7570000 {
-> @@ -67,3 +88,25 @@ serial@898000 {
->  		clocks = <&rpmhcc RPMH_RF_CLK2>;
->  	};
->  };
-> +
-> +serial@99c000 {
-> +	bluetooth {
-> +		compatible = "qcom,wcn6750-bt";
-> +
-> +		pinctrl-names = "default";
-> +		pinctrl-0 = <&bt_en_default>;
-> +		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-> +		swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
-> +		vddio-supply = <&vreg_l19b_1p8>;
-> +		vddaon-supply = <&vreg_s7b_0p9>;
-> +		vddbtcxmx-supply = <&vreg_s7b_0p9>;
-> +		vddrfacmn-supply = <&vreg_s7b_0p9>;
-> +		vddrfa0p8-supply = <&vreg_s7b_0p9>;
-> +		vddrfa1p7-supply = <&vreg_s1b_1p8>;
-> +		vddrfa1p2-supply = <&vreg_s8b_1p2>;
-> +		vddrfa2p2-supply = <&vreg_s1c_2p2>;
-> +		vddasd-supply = <&vreg_l11c_2p8>;
-> +		max-speed = <3200000>;
-> +		firmware-name = "msnv11.bin";
-> +	};
-> +};
-> -- 
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
-> of Code Aurora Forum, hosted by The Linux Foundation
+> -	/* UDP length needs to be infered from the lower layers
+> +	/* UDP length needs to be inferred from the lower layers
+>  	 * here, we obtain the hint from the remaining size of the
+>  	 * frame
+>  	 */
 > 
+
+
+-- 
+~Randy
+
