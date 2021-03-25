@@ -2,75 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 10335C433E0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Mar 2021 01:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C34CC433DB
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Mar 2021 04:37:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C45FF619F3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Mar 2021 01:00:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DCE461A14
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Mar 2021 04:37:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239465AbhCYBAY (ORCPT
+        id S229572AbhCYEgg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Mar 2021 21:00:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51062 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239444AbhCYBAJ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Mar 2021 21:00:09 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id BBADC61A13;
-        Thu, 25 Mar 2021 01:00:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1616634008;
-        bh=c1GsxziC1SL/5Zo/0LfKJx/xYjd+9aMHtvY+RB2yUm0=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=jLyMYnJ65yDa41x7HeNc3IwlcJtvfjJ0UWO54PtbIuFKBY49WNVrxlO7jWGbcSz2i
-         dmxKbn0j9W/eQ2X0QKceB0PVWAkDHkS8oAP+CRXFgN0vPlWkF7CCthy4mUNZ+b87De
-         +9Hk8wGtm1T+MznCQZ0ssFaFat+LVkvGrrj7iXPxeJIf2ycqJwtTcrUVXfHmfK3wVA
-         fs2Dxdy5bVlBX15JKvajLJ8X0XrouX4yQzegbGjrbcqnrzmwkFoVXyfFulYFyfz1Ju
-         UbDlD77dJupfhh0aUC2DotNWIP0wYC1w55nQNPGhf6VPhTYchWqTcjUvDeF1l3cSBg
-         OOucnSM57Z9TQ==
-Content-Type: text/plain; charset="utf-8"
+        Thu, 25 Mar 2021 00:36:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35586 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229493AbhCYEga (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 25 Mar 2021 00:36:30 -0400
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46AA7C06174A;
+        Wed, 24 Mar 2021 21:36:30 -0700 (PDT)
+Received: by mail-qt1-x82e.google.com with SMTP id a11so836263qto.2;
+        Wed, 24 Mar 2021 21:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QNLSpuaSGZ7eZE6VAXF3CpdULepYwsL40rZNMMcwrng=;
+        b=KVhXXYddGdvdPW6Dii4Pagk4F2/LvqnRjvVmV2MDK+Xq5rxlBRvxxswaYcYozk+mDD
+         VTj0TytRgi+15R4u0Jh2SeDZpamF76AHQJGnDG8/1pgOoXPcp41iZBCPn4kq+WDexDuQ
+         ThWEPxflYbBxE5AvWdC1bfV8gY6E0u6tqgkT3kUjcHCNErkH9wo5Pl0xiWtIWKy9It6f
+         rHLLcb+oESyRDKY4QgumcOL13gmM+UmwA5s9I3KTx6/WHm5fP+em+rMQLpHQolJEyNPP
+         BzU+MR2WZPMmv8UfS/h/Ghekk+KNTiFFbM8HS7kDd7CZEhsZs41ZlibBa+oOYoqaF/1R
+         lY5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QNLSpuaSGZ7eZE6VAXF3CpdULepYwsL40rZNMMcwrng=;
+        b=C+nmmWxySYHcrUDvCORcS7sMmlbDTM+/ss+lsMpNdJm2pXp5qC9OUGd4WyJp+jtTZL
+         AKXcnOJUiaJFA6DDP7Wcl1Ur/M71bJzTjz9V4ELkNDzDEAzEtwoJmQEhdehTvi1zvMNr
+         csGRRh32rF5vwRjoAyY3mvVRbIbRNpl/pFpyujGTSnwnLJZ8egvr7EgYW+c0c2yqOvnM
+         1/h+DDuCoV1rwrmU5veOZkJAZTrApL6pZ4jI77I8HrnqIBMbiwvbZIaGpgSUZ0AMGJMH
+         gddeP/bnvnPfmHfD/7a8/3tbUpTQ97+cWn6OuALI54oMATvaljCzwDu+MVqaJPFHx57X
+         /Dvg==
+X-Gm-Message-State: AOAM531f/XA1fojO0zIliQD7w2/ZGLlIy1+kp920giZKaYEjAwBWy54g
+        F9p0XMOw3RdoONij2irRzBc=
+X-Google-Smtp-Source: ABdhPJwlIdLrbM1cFETdf6pCBkDbpOiozDh7cf3dBV+mCCaJL2XyjH0U7ti13g6V2oiPWzeGLWzTtw==
+X-Received: by 2002:ac8:734c:: with SMTP id q12mr6197611qtp.160.1616646989600;
+        Wed, 24 Mar 2021 21:36:29 -0700 (PDT)
+Received: from Slackware.localdomain ([156.146.55.176])
+        by smtp.gmail.com with ESMTPSA id 66sm3401656qkk.18.2021.03.24.21.36.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 24 Mar 2021 21:36:29 -0700 (PDT)
+From:   Bhaskar Chowdhury <unixbhaskar@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Cc:     rdunlap@infradead.org, Bhaskar Chowdhury <unixbhaskar@gmail.com>
+Subject: [PATCH] Bluetooth: L2CAP: Rudimentary typo fixes
+Date:   Thu, 25 Mar 2021 10:05:44 +0530
+Message-Id: <20210325043544.29248-1-unixbhaskar@gmail.com>
+X-Mailer: git-send-email 2.30.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] 6lowpan: Fix some typos in nhc_udp.c
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <161663400869.21739.6444031329527811807.git-patchwork-notify@kernel.org>
-Date:   Thu, 25 Mar 2021 01:00:08 +0000
-References: <20210324062224.13032-1-wanghai38@huawei.com>
-In-Reply-To: <20210324062224.13032-1-wanghai38@huawei.com>
-To:     Wang Hai <wanghai38@huawei.com>
-Cc:     alex.aring@gmail.com, jukka.rissanen@linux.intel.com,
-        davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-wpan@vger.kernel.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
 
-This patch was applied to netdev/net-next.git (refs/heads/master):
+s/minium/minimum/
+s/procdure/procedure/
 
-On Wed, 24 Mar 2021 14:22:24 +0800 you wrote:
-> s/Orignal/Original/
-> s/infered/inferred/
-> 
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> ---
->  net/6lowpan/nhc_udp.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+Signed-off-by: Bhaskar Chowdhury <unixbhaskar@gmail.com>
+---
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Here is the summary with links:
-  - [net-next] 6lowpan: Fix some typos in nhc_udp.c
-    https://git.kernel.org/netdev/net-next/c/da1da87fa7fc
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 72c2f5226d67..b38e80a0e819 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1690,7 +1690,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 		smp_conn_security(hcon, hcon->pending_sec_level);
 
-You are awesome, thank you!
+ 	/* For LE slave connections, make sure the connection interval
+-	 * is in the range of the minium and maximum interval that has
++	 * is in the range of the minimum and maximum interval that has
+ 	 * been configured for this connection. If not, then trigger
+ 	 * the connection update procedure.
+ 	 */
+@@ -7542,7 +7542,7 @@ static void l2cap_data_channel(struct l2cap_conn *conn, u16 cid,
+ 	BT_DBG("chan %p, len %d", chan, skb->len);
+
+ 	/* If we receive data on a fixed channel before the info req/rsp
+-	 * procdure is done simply assume that the channel is supported
++	 * procedure is done simply assume that the channel is supported
+ 	 * and mark it as ready.
+ 	 */
+ 	if (chan->chan_type == L2CAP_CHAN_FIXED)
 --
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.30.1
 
