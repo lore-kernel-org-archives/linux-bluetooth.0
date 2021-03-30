@@ -7,70 +7,70 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E159CC433C1
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ED2B6C433E0
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Mar 2021 19:26:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 92F4261996
+	by mail.kernel.org (Postfix) with ESMTP id AFBBF6198A
 	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Mar 2021 19:26:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233090AbhC3TZr (ORCPT
+        id S233086AbhC3TZr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Tue, 30 Mar 2021 15:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53600 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233084AbhC3TZq (ORCPT
+        with ESMTP id S232975AbhC3TZX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Mar 2021 15:25:46 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F47C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Mar 2021 12:25:46 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id y19-20020a0568301d93b02901b9f88a238eso16628700oti.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Mar 2021 12:25:46 -0700 (PDT)
+        Tue, 30 Mar 2021 15:25:23 -0400
+Received: from mail-oo1-xc2e.google.com (mail-oo1-xc2e.google.com [IPv6:2607:f8b0:4864:20::c2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2618C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Mar 2021 12:25:22 -0700 (PDT)
+Received: by mail-oo1-xc2e.google.com with SMTP id 125-20020a4a1a830000b02901b6a144a417so4021931oof.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Mar 2021 12:25:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tVJpxIh6GrideWNuWMiCW2tren8Pwf4Yo0vIdLSuvqo=;
-        b=cDn2v0O5WWioz5Q676Ad5Wooy57tVCIzRl8AvIbX2HeBAEZXXmdqKd2Zv21x85jOH5
-         EaFuatlkoLyIOgX0FtBiitYeguq2He7jdniA0GcmASVWUTQnVEAue/+9ebp7v1lpuJ9x
-         3cIY8EbKd2jV3nLFyPbVVBvxblm3s8Psox8uOZ2X4KzNqO7EXWBq7itjiScfh8Y5eFoN
-         klv8fERjozTM2uaQvF8aCcyQqP4HhvagQIw2JUocBEVfZR/lEx/A94XNTW1gxzGNLPd3
-         yG5XmG+76QU6a7sezRlphtRG0gAzHxV5cBcD1zmD3cJt31uViaqxK0i1GeAGLWxb6zU0
-         3lPw==
+        bh=cbND7jIB85sASvklQLnHVYj/BeMPkvTMaN1QB9dJrFU=;
+        b=Q+WctM4f/Fbbq9PwBqBuxHifEmB1MPwAoIbetUTf1MQD0T1+EPuPJJ0aPcpepIb2Zd
+         Emp+Tef5qbjc+JQ5h/wh+dLnJKsBvQc6BN2eygBfAX+VnMr9bQsXIs2fDYhtE+G7oVqM
+         eritpaU5xM0gNNALkl3C9bdm1fgB1+XTTWcwKVH3kO1Ohbf9YT31Oy35uUOqvlSVihDm
+         5Z4g9mTYXLgiUXZoA14mNw6mtBKW9G6NF5orbJPB2rtbX7eiBtpxS+fL/mkFe6wuSAdh
+         J25jIUafeP8h2sBvRS+x7WdWGXIntlGYaZTY16arQngJflS899ygixoXzWEWo43jFYCF
+         bjAw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tVJpxIh6GrideWNuWMiCW2tren8Pwf4Yo0vIdLSuvqo=;
-        b=Q7m7+/jblSWg/Sq1m72r7tzrmktHnh6ZoO5UdPuP+yZk/PuEhu9xxD8jm1JrdfMmwQ
-         lIl+P4jz8hIimeOy55MhCyrKUiRpRnxBOieOixNJgcBxGoxsyuatDm58FfwQMS8la3Yb
-         RrdQPcL703CUx5hxDy5M7zFENM6D91y1pu0ptlnudJs09zIvtdoum/+6Y4rb9lNr8GhZ
-         0PhpDnXA/4yocpK68iGDT493QlfZUPUtqLpbObc2ThJuhxWRabVWKFhofxE/UOhz6Mx6
-         8mSxWutUslyRn+2z83yK7dVmtNqvz6kRQXDvevYsoHjeUjsLcN2NereJH92VzidC+dlI
-         t9bw==
-X-Gm-Message-State: AOAM532ZQJ1+Jy2PmM2pX85gb6NaghDj2tnyPAmPuZr8eV7l9HiCc/Bf
-        AiKFH5iIXpjeMTqH5E0jO0o7fzo+NVFf6+OVbpGpyF78k4w=
-X-Google-Smtp-Source: ABdhPJzXFr9RRPfIRxZSCcrPSSm3CNQsJH+fFXntb4WXooRfkTeCg4m8S7hW/z1CHx0kaXd0CV9/+T3JXoO4cLU/cbw=
-X-Received: by 2002:a05:6830:57:: with SMTP id d23mr27625026otp.44.1617132345581;
- Tue, 30 Mar 2021 12:25:45 -0700 (PDT)
+        bh=cbND7jIB85sASvklQLnHVYj/BeMPkvTMaN1QB9dJrFU=;
+        b=rwHZcvcxRImWt+6DVq6g1J9LSu1K/3fJb0r/4R+fcP5z6cdz10V0HloAiicqD3Exv4
+         1gHHoWAIiIlmT2VyPk8YbBsqTOgIwcveemCOOWPZhG6/w4ARA9O7/BQG5Ih3QxwPnZOU
+         19GaXgskr0GG75DJvSI6VuXx5aMl0HIFfh1XwE8aPXQ0BI1nooxng4WTfUUpSppsR2Lh
+         uLzWmQCXonZUP3FMCT7laishLrvm2Hs4OCYK5TxU2slCdJTMmgCnW/UqFxR9Kv2Wade3
+         7zxsJw+b6AlXwVTMLxEzJPTO8ZUEOpiqWpgxT/I1YJEa6aft9zq5JC301H4428l6a1VT
+         eE1w==
+X-Gm-Message-State: AOAM531yTPoEGajTwVrVzta6Gmm5M1ICINhPW0PjS2jVHPNTvinR10c1
+        eb2FyjKo0Y8lJ9hrEFtREHukG5WT/hWj4C4Yofk3GUzbCeg=
+X-Google-Smtp-Source: ABdhPJwn4AhTwswCuJROPdAL9gOqlBdLpGf63IMCsSryiKrj7ue/pKIBsPP4QjQtM/VgNdPD6bZPq8t+pyeeHBRr6AA=
+X-Received: by 2002:a4a:55cc:: with SMTP id e195mr5892465oob.24.1617132321810;
+ Tue, 30 Mar 2021 12:25:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210329231544.bluez.v1.1.I18e234e0b4d11e2ee24a699e70bde7e0a84b0be7@changeid>
- <6062c87f.1c69fb81.a55c6.d49e@mx.google.com>
-In-Reply-To: <6062c87f.1c69fb81.a55c6.d49e@mx.google.com>
+References: <20210330121204.Bluez.v6.1.I8797a75fcc7c1e997f177b08dc23a1df0272e0a5@changeid>
+ <6062ad73.1c69fb81.63adf.df98@mx.google.com>
+In-Reply-To: <6062ad73.1c69fb81.63adf.df98@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 30 Mar 2021 12:25:34 -0700
-Message-ID: <CABBYNZKuhAR49WLcj=j_PPF=J_aqzjwcBFTZTD0rL5hwkRiUfg@mail.gmail.com>
-Subject: Re: [bluez,v1] test: Fix AdvMonitor RSSI filter properties
+Date:   Tue, 30 Mar 2021 12:25:10 -0700
+Message-ID: <CABBYNZJxOub=iS-ihSC456zXgBDnKYhNqZxmchaoctutrfi8ow@mail.gmail.com>
+Subject: Re: [Bluez,v6,1/2] adv_monitor: split rssi_parameters into its own struct
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Manish Mandlik <mmandlik@google.com>
+Cc:     Archie Pusaka <apusaka@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Archie,
 
-On Mon, Mar 29, 2021 at 11:45 PM <bluez.test.bot@gmail.com> wrote:
+On Mon, Mar 29, 2021 at 9:50 PM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -78,7 +78,7 @@ On Mon, Mar 29, 2021 at 11:45 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=457825
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=457783
 >
 > ---Test result---
 >
