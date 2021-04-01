@@ -8,63 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9264C4360C
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Apr 2021 10:28:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E03C4361A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Apr 2021 10:28:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A5951606A5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Apr 2021 10:28:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49C8761106
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Apr 2021 10:28:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234362AbhDAK2M (ORCPT
+        id S234080AbhDAK2M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 1 Apr 2021 06:28:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50580 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50704 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234238AbhDAK1u (ORCPT
+        with ESMTP id S234071AbhDAK1u (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 1 Apr 2021 06:27:50 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FFC5C061793
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Apr 2021 03:25:24 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id y19so2804379pll.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Apr 2021 03:25:24 -0700 (PDT)
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5572DC061797
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Apr 2021 03:25:32 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id l83so5282722ybf.22
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Apr 2021 03:25:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=cO4AVl4n279ebsWSUVFtNX9Qx+EUeBMaQw67JXUvSvY=;
-        b=OCei/5zVNsnGKUZw/jxr29YLvkaNFnXaGn9oEn8VZeExRh/oEitNruJq0TT/H6TMVP
-         CSdFhCApRUSTeUeRho4mWiRZnS4LNz8Fa/XrU3K0tLtPl8PC+9KVyBm/al/LpK2mBkiM
-         ipleuFc1WT4I2xh23BNAfXrYLgRUpsx4ntoRuppC4UjuhJzKEgKprH0Pl1bbh1g2mLKV
-         7PMM8KIRLXFAZx77k/zYWGGfqKW/BA7vqexli+EWxvHTS2LRExUarCWsK5jsjjgleRpt
-         Q4g5EtoUf7DpgfEr5GZ/Qr2wphwSA8gmae+Tb/aP2f5iRCljdPXjVAteFAPHGiJNqZqB
-         LeeQ==
+        bh=7Ua0WliPqrqCi5wQ2LPIjibksmzA56fcFfO1yAgxvpY=;
+        b=Ls3jgrkiwN1iVOtLfboEMAF91oH9HdiyjI2dkZQd1KftC69D1+xE8PvUpgW8I0TLrl
+         rERuQOqY7oy6xIDTk8/vGtrCpDbyfkvN8wdiZXzS2g8DbfT9B/hs3YLj1po/XUJyNbTR
+         /M179qZlCa5tQ7hNOidB2WCYVa65Nwjz2b1H36hJM80/43UHrqBLQRS9GypM50VqCYOE
+         WTmb78r6bt6TR2aJLlhYpofXnuRP3//yhFy52HGbfe9/s9vXQxGq20tyU5hMG/lUJoUY
+         m1t1R/wcvEwTRJ/Brxld/mukI7VZWTjuLFJOPNNCkM/9kOMgherFALZK1uTeRUCrinwX
+         fpEw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=cO4AVl4n279ebsWSUVFtNX9Qx+EUeBMaQw67JXUvSvY=;
-        b=FAXaMYoY7kRqKC891n1W7r+HoB3wzN+r/V/++867GndhefHMiR8eQ9qycjtO+dZ27n
-         8epB0D0zfdtHlYULDscpho4zECeTBwKq6lXiOF/f/l2QGuqUcGUUi1NHfkPN7Cmsj5kr
-         Y5bC/ns2z4EULaSYjXh2gNsm4tu7I4W8Vn7WTv7oKlMK7v0mNxYr21XsAtNrcJl6RqPD
-         ZNWxFkov3x/lBoJwFlqg+t0gzbiKAa2przNnJG9C1pLe3NGCCASgGlIrF46PJmRLv91w
-         vl2aF+CInUSNCtNVJsspVgKwECewLPZS+T4VXQS93qTh7ymlY4Bkz8ACfwbmHhf1Tq/E
-         8W2A==
-X-Gm-Message-State: AOAM5303C0tMxFXM13L6GlONTHfFQFnhD6QpY0ebp6SwgXryhwVs9fcE
-        nbYt1G/Rn5Tjv2lItzuKbP2eSw6ueYzq9Ne4iGwCjB8bxoia4we9HrwglSB6fTPPQxuGKKsa/Z0
-        NGl7w4TDV6EURQlu7yxl4fbv2rriq/Y6Z0HJOCb8WV5mAQ6ZtpSd9nyWQVIc9kdR1jER9cxD63W
-        D2jwV7B09/SEk=
-X-Google-Smtp-Source: ABdhPJxrmGyVPY6/ctS/LJ6ng7gEpEp623G11Mme8vTJgQ0RZE2FGlUu712qVrpFjYoqZww06MHPtbL2CInCxTRwtQ==
+        bh=7Ua0WliPqrqCi5wQ2LPIjibksmzA56fcFfO1yAgxvpY=;
+        b=H+8A++K7/ZiHviQ4xU4S1uuFIg5bRG+FpmPkuQUCzPguoWqGd4AmYawYfl0aZfCv9V
+         FiEnU4zKrDblVvWJyLk7EVREVNZVhqNjjCEWmdmYvyumwK2qwtdwTL3pbfnJZ31ulS3V
+         koDTRZ++nO55bA9mQllrLFWtXavPhCwoXG+etKncXc/6qiPcR/RXc6/I8+PlZi/BooIP
+         8hnYZeL5VuzoDHdJA5EfrvMnAxQjYUrW7x12zft59mQE+ldlpDA6ZwLOE75rxTOibCnE
+         e02xF3LBiY6L09hwhJUIoBKYzwSiy/5LXvVtjkUS3/YEft20EHm6OORfFfwu0L8LP0xT
+         +K4A==
+X-Gm-Message-State: AOAM533aR9JkEsafmuiyJw87FtGFI5W7YFDg3yVwcHuthBPyTc2CLD+N
+        Z1k3ApbDjDQ9359V6mK33IZ2N84tGjmzocodak6BCaYTJXTy2vpZ0nSvVvU5HiCXPS+ARhtJePT
+        9Q/hh0T7zA8Mvsto0x59HaRXOevEghZpyKkZJaV1H4CyvNwx1A4c1HFfZBaeA22YHwEOI5g4Zk7
+        ShYMOd19C6loU=
+X-Google-Smtp-Source: ABdhPJxlzfqgQoVOBQGvZodCQokQfmfPu6awgfesmE8yyGdu3witjlRL4evEuvOQEZIhxVVQJTuEtwn0QoVnDvmplQ==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ad88:abe:9fd5:a5fc])
- (user=howardchung job=sendgmr) by 2002:a62:7f86:0:b029:20a:a195:bb36 with
- SMTP id a128-20020a627f860000b029020aa195bb36mr6976280pfd.4.1617272723719;
- Thu, 01 Apr 2021 03:25:23 -0700 (PDT)
-Date:   Thu,  1 Apr 2021 18:24:41 +0800
+ (user=howardchung job=sendgmr) by 2002:a25:6a83:: with SMTP id
+ f125mr10235299ybc.120.1617272731442; Thu, 01 Apr 2021 03:25:31 -0700 (PDT)
+Date:   Thu,  1 Apr 2021 18:24:43 +0800
 In-Reply-To: <20210401102447.3958224-1-howardchung@google.com>
-Message-Id: <20210401182328.Bluez.2.I2d1b00997951634dac9ea09da39fc9340ba7256b@changeid>
+Message-Id: <20210401182328.Bluez.4.I6981df13b7eda6fd9e0a46f11211565a3826ec95@changeid>
 Mime-Version: 1.0
 References: <20210401102447.3958224-1-howardchung@google.com>
 X-Mailer: git-send-email 2.31.0.291.g576ba9dcdaf-goog
-Subject: [Bluez PATCH 2/8] lib: add hash functions for bt_uuid_t
+Subject: [Bluez PATCH 4/8] input/hog: block connection by policy
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Howard Chung <howardchung@google.com>,
@@ -74,77 +73,55 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds function GHashFunc and GEqualFunc for bt_uuid_t.
-With these functions, we can add uuids into a GHashTable with bt_uuid_t
-format.
+This blocks HoG connection if ServiceAllowList is set and some of the
+mandatory services are not in the allowlist.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
- lib/uuid.c | 21 +++++++++++++++++++++
- lib/uuid.h |  3 +++
- 2 files changed, 24 insertions(+)
+ profiles/input/hog.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index a09321dc6ed1..0b0ddb3fc9d2 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -16,6 +16,7 @@
- #include <string.h>
- #include <stdlib.h>
- #include <errno.h>
-+#include <glib.h>
- 
- #include "lib/bluetooth.h"
- #include "uuid.h"
-@@ -120,6 +121,26 @@ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2)
- 	return bt_uuid128_cmp(&u1, &u2);
+diff --git a/profiles/input/hog.c b/profiles/input/hog.c
+index d50b823213b5..af4f73daf2b1 100644
+--- a/profiles/input/hog.c
++++ b/profiles/input/hog.c
+@@ -168,6 +168,27 @@ static void hog_remove(struct btd_service *service)
+ 	hog_device_free(dev);
  }
  
-+guint bt_uuid_hash(gconstpointer key)
++static bool mandatory_services_are_allowed(struct btd_service *service)
 +{
-+	const bt_uuid_t *uuid = key;
-+	bt_uuid_t uuid_128;
-+	uint64_t *val;
++	static const char * const mandatory_uuids[] = {DEVICE_INFORMATION_UUID,
++						BATTERY_UUID, HOG_UUID, NULL};
++	struct btd_device *device = btd_service_get_device(service);
++	struct btd_adapter *adapter = device_get_adapter(device);
++	struct btd_profile *p = btd_service_get_profile(service);
 +
-+	bt_uuid_to_uuid128(uuid, &uuid_128);
-+	val = (uint64_t *)&uuid_128.value.u128;
++	int i;
 +
-+	return g_int64_hash(val) ^ g_int64_hash(val+1);
++	for (i = 0; mandatory_uuids[i] != NULL; i++) {
++		if (!btd_adapter_uuid_is_allowed(adapter, mandatory_uuids[i])) {
++			DBG("mandatory service %s is blocked by policy",
++							mandatory_uuids[i]);
++			return false;
++		}
++	}
++
++	return true;
 +}
 +
-+gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2)
-+{
-+	const bt_uuid_t *uuid1 = v1;
-+	const bt_uuid_t *uuid2 = v2;
-+
-+	return bt_uuid_cmp(uuid1, uuid2) == 0;
-+}
-+
- /*
-  * convert the UUID to string, copying a maximum of n characters.
-  */
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 1a4029b68730..e47ccccb9fd2 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -17,6 +17,7 @@ extern "C" {
- #endif
+ static int hog_accept(struct btd_service *service)
+ {
+ 	struct hog_device *dev = btd_service_get_user_data(service);
+@@ -221,6 +242,7 @@ static struct btd_profile hog_profile = {
+ 	.accept		= hog_accept,
+ 	.disconnect	= hog_disconnect,
+ 	.auto_connect	= true,
++	.mandatory_services_are_allowed = mandatory_services_are_allowed,
+ };
  
- #include <stdint.h>
-+#include <glib.h>
- 
- #define GENERIC_AUDIO_UUID	"00001203-0000-1000-8000-00805f9b34fb"
- 
-@@ -167,6 +168,8 @@ int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
- 
- int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
- void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
-+guint bt_uuid_hash(gconstpointer key);
-+gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2);
- 
- #define MAX_LEN_UUID_STR 37
- 
+ static int hog_init(void)
 -- 
 2.31.0.291.g576ba9dcdaf-goog
 
