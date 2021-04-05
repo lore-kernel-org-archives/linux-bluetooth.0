@@ -2,169 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A6395C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 21:13:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8DD1DC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 23:33:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7AC5F6128B
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 21:13:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56D216121E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 23:33:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232715AbhDEVOE (ORCPT
+        id S241735AbhDEXdf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Apr 2021 17:14:04 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41299 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229626AbhDEVOD (ORCPT
+        Mon, 5 Apr 2021 19:33:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45950 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241695AbhDEXdd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Apr 2021 17:14:03 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617657236;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=fHsXo0o7qlL2ZVcOVo9pCX3WptTTFrRmG38/jpMB3R0=;
-        b=gfD4YvOCqfMiY6USDJmn58Q4cU0bv5/8C+ooGBENSfrwTwOtZlY4G8NIDhoE9FTvz2k9u0
-        aNimIHj74NNPS67T7QEK2aKFP88DG5up9gQrw7AhNAAsnG5WS9NRlWKYUOeIEmwbYnaQLS
-        eVZDmuoFZ4kmCUn/asF3HuMAzl6sXgU=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-234-gC_HVWGUPD-GGbK56ST5oA-1; Mon, 05 Apr 2021 17:13:54 -0400
-X-MC-Unique: gC_HVWGUPD-GGbK56ST5oA-1
-Received: by mail-ej1-f69.google.com with SMTP id kx22so4700932ejc.17
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Apr 2021 14:13:53 -0700 (PDT)
+        Mon, 5 Apr 2021 19:33:33 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7BF9EC061756
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Apr 2021 16:33:25 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id v18so9318142qtx.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Apr 2021 16:33:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=iix/v2cJC9b8/wrwd7EH/KvNJQF53WPoD5HVyQhNhJI=;
+        b=PWuWgElMYtHYjSyuGEO6ucZsbDjGBg7VQEFwyAtX2nPGC8Vq0mnFEpGdifIavZomsW
+         KtYUty/PgMrBszumWX5Pd9hQlLOcqfnC4nJ/k8VozzFM3wf46mfWNmPTIWz8RVbmz7j/
+         0TIOT5d5MM+uLoK/sdcUVoK6bC99T8N66r9Gb80vAkxpLFpsa7eBWKTawWBNroI9dD3H
+         ol/+q4GLB7tapCPX0l6i2ApVWfZ4sSLvDRba62WcQV05+Hc8/2NVGMSxl1BqzsB4aOKy
+         JK3xNkaun8XA2gHy64xxqFfD2EhkIMLAcgv+S7TgLbhzHkvdSJEIKamhFa5bSiX9UGze
+         0VwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fHsXo0o7qlL2ZVcOVo9pCX3WptTTFrRmG38/jpMB3R0=;
-        b=WhD6TDEzCeODMw+9SbjOzCwQgPum1xsLoL7xdm9LRkrGtu+d51feurfO7Bc2RHrES1
-         k+CXTor+6a4Yf3YbDRZUEL1KlfvJxV1HqbOn5iIaYYyvpDNGvczlpu3etGVBsm/mON84
-         YUKmJo/vViOnxL+wRHdDIeLgQQyS79DFeN0WV0GsQPJiB8sCAH436HS2VmAnwY+28eUo
-         uW1u9kvDb0wql4qauczu7XWnWQ22Z8MMpmR0GmJrn37cqaE7aK6SID+e6TV3jyo0b4jB
-         QzTB3NzU7PCxlIAPNESa1swBlVfrI/kU+LbDL+DMYBRbvvRokUjsYS7zSOZWLFCFIrE6
-         BRgw==
-X-Gm-Message-State: AOAM532jBN8+yOHyAATXmj2UcJscwDPYVz22iK06et6WoLAyHUJWsZ7c
-        AYInTZcjwFXdGqIGGVFHXqc+DmCLm1FnLisfvZoLwonW/T6FLdK2vRYEX65A9+6qVkBjSqlxft/
-        mQZBORC6LPFsQHXi7mOm/xhGMNI3dWpbFwiLm65m7s26dxwALckT/GobXElmgLRLGl2XeMtsVpt
-        fOhmtA
-X-Received: by 2002:a17:906:f18d:: with SMTP id gs13mr17407885ejb.81.1617657232752;
-        Mon, 05 Apr 2021 14:13:52 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyEqYm3dENlhyUHgokAMAix6tdOHrSo4xH5m91arVOV14SKNSgpC5gWWfnvbqYxlgnVYcCxJQ==
-X-Received: by 2002:a17:906:f18d:: with SMTP id gs13mr17407872ejb.81.1617657232551;
-        Mon, 05 Apr 2021 14:13:52 -0700 (PDT)
-Received: from x1.localdomain (2001-1c00-0c1e-bf00-1054-9d19-e0f0-8214.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1054:9d19:e0f0:8214])
-        by smtp.gmail.com with ESMTPSA id x17sm9594528ejd.68.2021.04.05.14.13.52
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 05 Apr 2021 14:13:52 -0700 (PDT)
-Subject: Re: Bluetooth: btusb: Revert Fix the autosuspend enable and disable
-To:     linux-bluetooth@vger.kernel.org
-References: <20210405203533.17091-2-hdegoede@redhat.com>
- <606b7c81.1c69fb81.ee14a.21cf@mx.google.com>
-From:   Hans de Goede <hdegoede@redhat.com>
-Message-ID: <cc067b86-cf0f-3554-10c1-ac5dd3e23b6b@redhat.com>
-Date:   Mon, 5 Apr 2021 23:13:51 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.0
-MIME-Version: 1.0
-In-Reply-To: <606b7c81.1c69fb81.ee14a.21cf@mx.google.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=iix/v2cJC9b8/wrwd7EH/KvNJQF53WPoD5HVyQhNhJI=;
+        b=aTYxXCYXjy0B0VvVKqDYidmt/EoJI6FsLmjOe7Gs6QAs5RfkKy5Lfnw/ngz7zVq1L5
+         jOQk2B+r4X2k2kYl+YOAwuqMFhRWyC8HUxVlxo+By2J98GzmjxAuQwJEC94q+Ux5b+tq
+         KUD3YGCAEzRtLmGrsrrgZxDv5KSbc3cbIKpDGzN2nNQbcCspEcKnV5EVGmpN+Z9owD+r
+         ArNzqV4j8an5QPUVLAyKi95nffl8m+DMMjDG/KTO1kDoCCLPUU9rOPS2keZ1Ihu0LiM7
+         xEftoMMBEy6IE4wfJRxLX4Fxn1P2+Y68P2QRbb/b0jC2vKneUjPaOgwjGZ65CUANbwpp
+         OviQ==
+X-Gm-Message-State: AOAM533t/zjnPBzCOvn21TSvTmURTqdSgiorBd/ashWVj4NPUmYuUwhb
+        9mRujJ/8keRhobPS6HnG6IvwPWIJiLx+nn5cxgJ1
+X-Google-Smtp-Source: ABdhPJypo2nkY7qRmSPpYGVr8CAc+F+j4KKJ9X64kRJ8m77Hhve8ftYeL3Ovp7Ik4xyLMd3LH/sq+B9C27XwwHPyBDD+
+X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:1cb3:ad22:2ed6:7c62])
+ (user=danielwinkler job=sendgmr) by 2002:ad4:5593:: with SMTP id
+ e19mr14604643qvx.52.1617665604297; Mon, 05 Apr 2021 16:33:24 -0700 (PDT)
+Date:   Mon,  5 Apr 2021 16:33:03 -0700
+Message-Id: <20210405233305.92431-1-danielwinkler@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+Subject: [PATCH 0/2] Bluetooth: Avoid centralized adv handle tracking for
+ extended features
+From:   Daniel Winkler <danielwinkler@google.com>
+To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Daniel Winkler <danielwinkler@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Maintainers,
 
-On 4/5/21 11:09 PM, bluez.test.bot@gmail.com wrote:
-> This is automated email and please do not reply to this email!
-> 
-> Dear submitter,
-> 
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=461009
-> 
-> ---Test result---
-> 
-> ##############################
-> Test: CheckPatch - FAIL
-> Bluetooth: btusb: Revert Fix the autosuspend enable and disable
-> WARNING: Unknown commit id '7bd9fb058d77', maybe rebased or not pulled?
-> #25: 
+This series addresses a race condition where an advertisement
+registration can conflict with a software rotation advertisement
+refresh. I found that this issue was only occurring with the new
+extended MGMT advertising interface. A bad use of the
+hdev->cur_adv_instance caused every new instance to be immediately sent
+to the controller rather than queued for software rotation, opening a
+path for the race to occur.
 
-I just checked and '7bd9fb058d77' is the hash of the fixed (reverted) commit in Linus' tree.
+This series improves the way new extended advertising hci callbacks
+track the relevant adv handle, removing the need for the
+cur_adv_instance use. In a separate patch, the incorrect usage of
+cur_adv_instance is removed, to align the extended MGMT commands to the
+original add_advertising usage. The series was tested on both extended
+and non-extended bluetooth controllers to confirm that the race
+condition is resolved, and that multi- and single-advertising automated
+test scenarios are still successful.
 
-Regards,
-
-Hans
+Thanks in advance,
+Daniel
 
 
+Daniel Winkler (2):
+  Bluetooth: Use ext adv handle from requests in CCs
+  Bluetooth: Do not set cur_adv_instance in adv param MGMT request
 
-> Fixes: 7bd9fb058d77 ("Bluetooth: btusb: Fix the autosuspend enable and disable")
-> 
-> total: 0 errors, 1 warnings, 19 lines checked
-> 
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
-> 
-> "[PATCH] Bluetooth: btusb: Revert Fix the autosuspend enable and" has style problems, please review.
-> 
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> 
-> 
-> ##############################
-> Test: CheckGitLint - PASS
-> 
-> 
-> ##############################
-> Test: CheckBuildK - PASS
-> 
-> 
-> ##############################
-> Test: CheckTestRunner: Setup - PASS
-> 
-> 
-> ##############################
-> Test: CheckTestRunner: l2cap-tester - PASS
-> Total: 40, Passed: 34 (85.0%), Failed: 0, Not Run: 6
-> 
-> ##############################
-> Test: CheckTestRunner: bnep-tester - PASS
-> Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
-> 
-> ##############################
-> Test: CheckTestRunner: mgmt-tester - PASS
-> Total: 416, Passed: 402 (96.6%), Failed: 0, Not Run: 14
-> 
-> ##############################
-> Test: CheckTestRunner: rfcomm-tester - PASS
-> Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
-> 
-> ##############################
-> Test: CheckTestRunner: sco-tester - PASS
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-> 
-> ##############################
-> Test: CheckTestRunner: smp-tester - PASS
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-> 
-> ##############################
-> Test: CheckTestRunner: userchan-tester - PASS
-> Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
-> 
-> 
-> 
-> ---
-> Regards,
-> Linux Bluetooth
-> 
+ net/bluetooth/hci_event.c | 16 +++++++---------
+ net/bluetooth/mgmt.c      |  1 -
+ 2 files changed, 7 insertions(+), 10 deletions(-)
+
+-- 
+2.31.0.208.g409f899ff0-goog
 
