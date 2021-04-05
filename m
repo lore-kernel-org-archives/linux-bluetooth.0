@@ -2,153 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4D35C43461
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 20:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 001BBC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 20:42:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2840613CF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 20:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABEC9613C6
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 20:42:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236543AbhDEUjv (ORCPT
+        id S237209AbhDEUmP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Apr 2021 16:39:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:21030 "EHLO
+        Mon, 5 Apr 2021 16:42:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:41035 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S236597AbhDEUju (ORCPT
+        by vger.kernel.org with ESMTP id S237190AbhDEUmN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Apr 2021 16:39:50 -0400
+        Mon, 5 Apr 2021 16:42:13 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1617655183;
+        s=mimecast20190719; t=1617655326;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Y1fCmnZr6BR8aX0+gHUG0FeM5qO2eDytcn8WJ1wUJsk=;
-        b=E1bAfopddyB4P8CNkv7qNBhv9zeF3EqiQDOvd5Ji0liPhku/oNUUSBD9lAiE3OEJsbpfRp
-        kiE4xvvlomK6kXGcFPWE3djF6+AH0g29OA8xBXX+2H3GpTCP702BfdCNjB+KgQTamvY6cx
-        49Pu1EJ1hDcQmoVOlME2lHaHjrITwlw=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-55-krC7NW3PNeKgbWMNdk4zRg-1; Mon, 05 Apr 2021 16:39:39 -0400
-X-MC-Unique: krC7NW3PNeKgbWMNdk4zRg-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id F0F6A1853027;
-        Mon,  5 Apr 2021 20:39:37 +0000 (UTC)
-Received: from x1.localdomain (ovpn-112-31.ams2.redhat.com [10.36.112.31])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 3F14D60861;
-        Mon,  5 Apr 2021 20:39:36 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
+        bh=/J24YxSoEEoDm85XB+ubxbNmHGb18U3JcHHVQEjHvk0=;
+        b=BiI0StaFxKM2fW9qqPt3ks+trHzbsxHxSArbJFCDBVK9WcF+zTCFG41rMkxdUYD9n6tldN
+        ZltlMQyobYZNIb5LQcmG/5tLnXRXQy3pRC9qxSR4gvmCyAflZYKPx2uhvsx7IIHNAgXlYe
+        wVqzKEH9faplPRL/Et/VomvUs1JY0i0=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-559-tuonnd8tMsOzPFLpPLWyhw-1; Mon, 05 Apr 2021 16:42:05 -0400
+X-MC-Unique: tuonnd8tMsOzPFLpPLWyhw-1
+Received: by mail-ej1-f72.google.com with SMTP id bn26so4655143ejb.20
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Apr 2021 13:42:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=/J24YxSoEEoDm85XB+ubxbNmHGb18U3JcHHVQEjHvk0=;
+        b=J/DtF2TZJalLviD809d0geccgrZDMbOgbJOoDp7kjb1N2j9rWaIjlfch2wsEXJHYZY
+         61RIoilZZHEy1QDMNzVATnTSFfFCH0t1MlhvYNV+/xBtZ1sT1cKFpfXptZ4ZljScg9+x
+         Vp2q3OIYfZNIzz2OGJpmO7oTYxFc5KDdX8IJZBzrzaJv+ppFlM7gG/dY1SYoyR4lyO3y
+         LUMa05fUBQrh3Zm2Y/UFlpWIZ9gQ4mAEIx91YFts/UEJDGw0qVQlH+HSjK1tTHAdUBat
+         45FjFNgd2tAPGRtU1FWQZSfoyHiZmZ99gkSJqdnoeEMOKDnyfbag+Pu1LWCCvIUcdC7r
+         N7Ag==
+X-Gm-Message-State: AOAM5301VbJgGzRGEfM/+QnFyB/LjF5WXUjuYVqe7EGqFBlXv1ODcOg7
+        qxiUKb+HB+N4DnUizMsTMl4/4EI4DjVbWzni+XVdUBLrqmns/Yj5L+9sh8WHimPgfTUGlDhrZAZ
+        KzufzgPJ9j/HqdXK4/r+PrHCmWzLCUomkIPEwWmCuYeaA0KIRej7wmhy8wP1ShnP4P7MUJY/z+A
+        Im1HAz
+X-Received: by 2002:a17:906:f9cc:: with SMTP id lj12mr29668099ejb.544.1617655323007;
+        Mon, 05 Apr 2021 13:42:03 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJwm8nf1tqMzBZssk/U1kHFDLgecgilMGv1OH8SumtY+G1JuPzfClltzHuftsHABmo5YUFt1ow==
+X-Received: by 2002:a17:906:f9cc:: with SMTP id lj12mr29668087ejb.544.1617655322836;
+        Mon, 05 Apr 2021 13:42:02 -0700 (PDT)
+Received: from x1.localdomain (2001-1c00-0c1e-bf00-1054-9d19-e0f0-8214.cable.dynamic.v6.ziggo.nl. [2001:1c00:c1e:bf00:1054:9d19:e0f0:8214])
+        by smtp.gmail.com with ESMTPSA id i2sm12171726edy.72.2021.04.05.13.42.02
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 05 Apr 2021 13:42:02 -0700 (PDT)
+Subject: Re: [PATCH v2 resend 0/2] iio: documentation: Document
+ proximity/accel sensor label use
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org,
-        Dmitry Torokhov <dmitry.torokhov@gmail.com>,
-        Mark Pearson <mpearson@lenovo.com>,
-        Bastien Nocera <hadess@hadess.net>
-Subject: [PATCH v2 resend 1/2] iio: documentation: Document proximity sensor label use
-Date:   Mon,  5 Apr 2021 22:39:32 +0200
-Message-Id: <20210405203933.17282-2-hdegoede@redhat.com>
-In-Reply-To: <20210405203933.17282-1-hdegoede@redhat.com>
+Cc:     linux-bluetooth@vger.kernel.org
 References: <20210405203933.17282-1-hdegoede@redhat.com>
+From:   Hans de Goede <hdegoede@redhat.com>
+Message-ID: <de5cc2d9-9914-7d6d-f96c-e7d00758eb12@redhat.com>
+Date:   Mon, 5 Apr 2021 22:42:01 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
+In-Reply-To: <20210405203933.17282-1-hdegoede@redhat.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add an entry to Documentation/ABI/testing/sysfs-bus-iio for
-the new device label sysfs-attribute support.
+Hi,
 
-And document the standardized labels which may be used with proximity
-sensors to hint userspace about the intended use of the sensor.
+Ugh, I messed up the "To:" list for this resend, sorry, please ignore.
 
-Using labels to differentiate between the multiple proximity sensors
-which a modern laptop/tablet may have was discussed in this thread:
-https://lore.kernel.org/linux-iio/9f9b0ff6-3bf1-63c4-eb36-901cecd7c4d9@redhat.com/
+Regards,
 
-As mentioned there the "proximity-wifi*" labels are already being used
-in this manner on some chromebooks, see e.g.:
-arch/arm64/boot/dts/qcom/sc7180-trogdor.dtsi
-arch/arm64/boot/dts/qcom/sc7180-trogdor-lte-sku.dtsi
+Hans
 
-And the "proximity-palmrest" and "proximity-lap" labels are intended
-to be used with the lap and palmrest sensors found in recent Lenovo
-ThinkPad models.
 
-Cc: Dmitry Torokhov <dmitry.torokhov@gmail.com>
-Cc: Mark Pearson <mpearson@lenovo.com>
-Cc: Bastien Nocera <hadess@hadess.net>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
-Changes in v2:
-- Drop the too generic:
-  What:           /sys/bus/iio/devices/iio:deviceX/in_*_label
-  What:           /sys/bus/iio/devices/iio:deviceX/out_*_label
-  lines from the newly added documentation, if/when we start
-  using channel-labels with proximity sensors then those should
-  get a separate in_proximityX_label documentation.
----
- Documentation/ABI/testing/sysfs-bus-iio | 39 +++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
 
-diff --git a/Documentation/ABI/testing/sysfs-bus-iio b/Documentation/ABI/testing/sysfs-bus-iio
-index d957f5da5c04..7379e40d862d 100644
---- a/Documentation/ABI/testing/sysfs-bus-iio
-+++ b/Documentation/ABI/testing/sysfs-bus-iio
-@@ -33,6 +33,45 @@ Description:
- 		Description of the physical chip / device for device X.
- 		Typically a part number.
- 
-+What:		/sys/bus/iio/devices/iio:deviceX/label
-+KernelVersion:	5.8
-+Contact:	linux-iio@vger.kernel.org
-+Description:
-+		Optional symbolic label for a device.
-+		This is useful for userspace to be able to better identify an
-+		individual device.
-+
-+		The contents of the label are free-form, but there are some
-+		standardized uses:
-+
-+		For proximity sensors which give the proximity (of a person) to
-+		a certain wlan or wwan antenna the following standardized labels
-+		are used:
-+
-+		* "proximity-wifi"
-+		* "proximity-lte"
-+		* "proximity-wifi-lte"
-+		* "proximity-wifi-left"
-+		* "proximity-wifi-right"
-+
-+		These are used to indicate to userspace that these proximity
-+		sensors may be used to tune transmit power to ensure that
-+		Specific Absorption Rate (SAR) limits are honored.
-+		The "-left" and "-right" labels are for devices with multiple
-+		antennas.
-+
-+		In some laptops/tablets the standardized proximity sensor labels
-+		instead	indicate proximity to a specific part of the device:
-+
-+		* "proximity-palmrest" indicates proximity to the keyboard's palmrest
-+		* "proximity-palmrest-left" indicates proximity to the left part of the palmrest
-+		* "proximity-palmrest-right" indicates proximity to the right part of the palmrest
-+		* "proximity-lap" indicates the device is being used on someone's lap
-+
-+		Note "proximity-lap" is special in that its value may be
-+		calculated by firmware from other sensor readings, rather then
-+		being a raw sensor reading.
-+
- What:		/sys/bus/iio/devices/iio:deviceX/current_timestamp_clock
- KernelVersion:	4.5
- Contact:	linux-iio@vger.kernel.org
--- 
-2.30.2
+On 4/5/21 10:39 PM, Hans de Goede wrote:
+> Hi Jonathan,
+> 
+> AFAICT the v2 of this series is ready for merging, but I'm not seeing it here:
+> https://git.kernel.org/pub/scm/linux/kernel/git/jic23/iio.git/log/?h=testing
+> 
+> Hence this resend.
+> 
+> Regards,
+> 
+> Hans
+> 
+> 
+> 
+> Hans de Goede (2):
+>   iio: documentation: Document proximity sensor label use
+>   iio: documentation: Document accelerometer label use
+> 
+>  Documentation/ABI/testing/sysfs-bus-iio | 46 +++++++++++++++++++++++++
+>  1 file changed, 46 insertions(+)
+> 
 
