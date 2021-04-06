@@ -2,119 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F849C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 23:33:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CEA3C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 03:08:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 17665613DB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  5 Apr 2021 23:33:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 417D4613A0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 03:08:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241795AbhDEXdh (ORCPT
+        id S239677AbhDFDIc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 5 Apr 2021 19:33:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45968 "EHLO
+        Mon, 5 Apr 2021 23:08:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241776AbhDEXdg (ORCPT
+        with ESMTP id S238646AbhDFDIc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 5 Apr 2021 19:33:36 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0F7C06174A
-        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Apr 2021 16:33:29 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id f75so18483826yba.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Apr 2021 16:33:29 -0700 (PDT)
+        Mon, 5 Apr 2021 23:08:32 -0400
+Received: from mail-oo1-xc29.google.com (mail-oo1-xc29.google.com [IPv6:2607:f8b0:4864:20::c29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1436DC061574
+        for <linux-bluetooth@vger.kernel.org>; Mon,  5 Apr 2021 20:08:24 -0700 (PDT)
+Received: by mail-oo1-xc29.google.com with SMTP id 125-20020a4a1a830000b02901b6a144a417so3342262oof.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 05 Apr 2021 20:08:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=to6Vxja+Arjc3jgF2y75CIMjsTw24v2WgNqXzBAN2G4=;
-        b=jEYZqFK4qYXZjXqxm8kJnUCJ/HGf/4pQIRB3IfRcS9nSXWq37L5cg4Hi2cjXeoec+Y
-         QnyrSCmtSZLs/Wo+mR1kcl0lYR1DdUH485SifgpfypYPOhxj9SOOkLl5fZZ4tsAIQ9Qf
-         rDIgDY5ZuSYQt3oPjxqLelVRZdVuEfncudKq9I++0cqVs9dEy1LV5rCOV698B0jjw4J5
-         CI39vHBdXuePVt9HTbWvUfu/6q6I4jfkGC/jm8Hx/STZPVNilKzwWk3DvjDaHzxLqAEX
-         emx3YEzYVMaedIFqzd3/NrmWhZNUOa/AQb1U60F1GLzo9Bfpp6VOWQ8til8ccyzxFDBD
-         woDg==
+        bh=2L/NKKxc/QCQ+L+gM6vaooYvk4fG9nyap4uuHy5XjMA=;
+        b=JVdYylND5zZ9VlKWYKmVMgNfU0QnVcfBs5bdkC8LolWWtokPONoSOgkzKAQv1Xc9Mo
+         7bzUbAdpRP6C6rFg8EnsW38rwyBXxPFwvJU46aGlUDoqKNMRXzWDc+2WKuPljea9WwS5
+         Gd+biLdizWtecfsZFXwN3Aiu5rSS0Y01O6PZVMa+Uwp/6iECwEOe9NEBQNIzr0U96CgJ
+         TJblORXR6D8KHHxSjOTjBVTVP7lQigTPmM66/ATLYgMY0L8rFbWz8xzh7PjjUSUO33/4
+         DVetlQvCk886AfrEcZ0lzNKAAcR8WREc1shy3REsPiW2NogSbVCcU4gfbfNK+ox69470
+         p/EQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=to6Vxja+Arjc3jgF2y75CIMjsTw24v2WgNqXzBAN2G4=;
-        b=PByaCQugq5r6Il2q4vvZTra61OMZjlNj1gkQtI1+c9otmIYCmvHEYsEUpFsVf1sHo/
-         iAIgXMru3M0gHb43Zesgaxk8i/mot75+ntoB7IaDlxj9iN0P5BwFbEPKBNyTVRhg39Vx
-         r8+Rfd1cHbZXEAcA7vJsLaw4c6qF6+MZCqXyyVMy9uexlU9UyenCVjaoEHruc//h1d0s
-         lcpzwfzRnZWzDl7BeSf1UNsuL/ZJ+YohXswm5I0e8BOVKMfdPGRP8ZuYRU7n9y1Dk93X
-         EkrbFuuHbsuPsQarEREbtg49kcnTbH3Vgg4k+L8PCQ5DWK4XwMTF21n+9peQE1su4WgZ
-         6ntw==
-X-Gm-Message-State: AOAM533Ed6d7/B5MkygbyFU3AUHOU9UeoZZD7O0Pe5eLGUW9Y+JOClDY
-        BZyMND8ACyjwVG1nlnK6ocDbOCdyIomx7SLdAls4
-X-Google-Smtp-Source: ABdhPJxACUkz/6Pr+kJuu/6e3/KOIdlQcw8bE7vaqlYhTWwjONXYmo90PEfWYGytXsD0uf87TrfxIxGk2snIXjvSmRN5
-X-Received: from danielwinkler-linux.mtv.corp.google.com ([2620:15c:202:201:1cb3:ad22:2ed6:7c62])
- (user=danielwinkler job=sendgmr) by 2002:a5b:448:: with SMTP id
- s8mr37252543ybp.363.1617665608348; Mon, 05 Apr 2021 16:33:28 -0700 (PDT)
-Date:   Mon,  5 Apr 2021 16:33:05 -0700
-In-Reply-To: <20210405233305.92431-1-danielwinkler@google.com>
-Message-Id: <20210405162905.2.Iaac4fb40841e46f9ab815bffee439c91e44f0639@changeid>
-Mime-Version: 1.0
-References: <20210405233305.92431-1-danielwinkler@google.com>
-X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [PATCH 2/2] Bluetooth: Do not set cur_adv_instance in adv param MGMT request
-From:   Daniel Winkler <danielwinkler@google.com>
-To:     marcel@holtmann.org, linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Daniel Winkler <danielwinkler@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=2L/NKKxc/QCQ+L+gM6vaooYvk4fG9nyap4uuHy5XjMA=;
+        b=bOZ+42aiSvuo6F2eJz7QZR/q8lMg/ZKE5mrgkceHRP22eDN/kUUvpynZMKdS2n/Ndd
+         dt6mZM6JmTef1Dgm6vEJjLNrZN6DK6Nxfc90JEexx9cjtZKZanzYrisE+u67NkQe9hLU
+         n9F/ujoZSDFLP0Scu/mBkxU35PdJPn6bR3Gaw8Eqped9AI2gbSWPLu775/0Z+Z3//Q6H
+         rgRX56EIv84op2dKkYnpIGaG2qLDVlAdnezFFFKpU5QYQhGg/0HJHEYYiwLT5I1CMl9a
+         EaOm0ybZniOPLt9d7LbklcZCGwXCu8C11SwRpzvf3NxGezi0cm8nCiXahzCC/uROpF1m
+         nDCA==
+X-Gm-Message-State: AOAM531pSwf/mOOifqU6rbVpIIryQewJvsMggMO+XgJz2aL6oDGK/n1O
+        uL46sE6+R01ClQflfwh+vN26BVlcFu/4Ijkdy4A=
+X-Google-Smtp-Source: ABdhPJwutYlCYLwd8eMA3JuvJ0ZWEf4lMqnOaORUjxJa1vpGZ9WS+QgZC/258NqGXFWXUqIsXGbKx9fca2O/EZaadnA=
+X-Received: by 2002:a4a:c316:: with SMTP id c22mr24956887ooq.65.1617678503412;
+ Mon, 05 Apr 2021 20:08:23 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210405145802.27317-1-sathish.narasimman@intel.com>
+In-Reply-To: <20210405145802.27317-1-sathish.narasimman@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 5 Apr 2021 20:08:13 -0700
+Message-ID: <CABBYNZLTU1t=UEsvxsu8F0kP8f5-Nvi_Xysy8ftg57j9Snu99w@mail.gmail.com>
+Subject: Re: [Bluez PATCH] btmgmt: Add support to enable LL privacy
+To:     Sathish Narasimman <sathish.narasimman@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We set hdev->cur_adv_instance in the adv param MGMT request to allow the
-callback to the hci param request to set the tx power to the correct
-instance. Now that the callbacks use the advertising handle from the hci
-request (as they should), this workaround is no longer necessary.
+Hi Sathish,
 
-Furthermore, this change resolves a race condition that is more
-prevalent when using the extended advertising MGMT calls - if
-hdev->cur_adv_instance is set in the params request, then when the data
-request is called, we believe our new instance is already active. This
-treats it as an update and immediately schedules the instance with the
-controller, which has a potential race with the software rotation adv
-update. By not setting hdev->cur_adv_instance too early, the new
-instance is queued as it should be, to be used when the rotation comes
-around again.
+On Mon, Apr 5, 2021 at 3:40 PM Sathish Narasimman
+<sathish.narasimman@intel.com> wrote:
+>
+> If the Bluetooth controller supports LL privacy this command will be
+> used to test the same.
+> "sudo btmgmt power off"
+> "sudo btmgmt llprivacy on"
+> "sudo btmgmt power on"
+>
+> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> ---
+>  tools/btmgmt.c | 38 ++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 38 insertions(+)
+>
+> diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+> index 93d244ff8ec8..4a53c3768fe9 100644
+> --- a/tools/btmgmt.c
+> +++ b/tools/btmgmt.c
+> @@ -2261,6 +2261,42 @@ static void cmd_bredr(int argc, char **argv)
+>         cmd_setting(MGMT_OP_SET_BREDR, argc, argv);
+>  }
+>
+> +static void ll_rpa_resoln_rsp(uint8_t status, uint16_t len, const void *param,
+> +                             void *user_data)
+> +{
+> +       if (status != 0)
+> +               error("Could not set LL RPA resolution with status 0x%02x (%s)",
+> +                     status, mgmt_errstr(status));
+> +       else
+> +               print("LL RPA Resolution successfully set");
+> +
+> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +static void cmd_set_ll_rpa_resoln(int argc, char **argv)
+> +{
+> +       /* 15c0a148-c273-11ea-b3de-0242ac130004 */
+> +       static const uint8_t rpa_resolution_uuid[16] = {
+> +                               0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
+> +                               0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
+> +       };
+> +       struct mgmt_cp_set_exp_feature cp;
+> +       uint16_t index;
+> +
+> +       memset(&cp, 0, sizeof(cp));
+> +       memcpy(cp.uuid, rpa_resolution_uuid, 16);
+> +
+> +       index = mgmt_index;
+> +       if (index == MGMT_INDEX_NONE)
+> +               index = 0;
+> +
+> +       if (parse_setting(argc, argv, &cp.action) == false)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       mgmt_send(mgmt, MGMT_OP_SET_EXP_FEATURE, index,
+> +                 sizeof(cp), &cp, ll_rpa_resoln_rsp, NULL, NULL);
+> +}
+> +
+>  static void cmd_privacy(int argc, char **argv)
+>  {
+>         struct mgmt_cp_set_privacy cp;
+> @@ -5243,6 +5279,8 @@ static const struct bt_shell_menu main_menu = {
+>                 cmd_bredr,              "Toggle BR/EDR support",        },
+>         { "privacy",            "<on/off>",
+>                 cmd_privacy,            "Toggle privacy support"        },
+> +       { "llprivacy",          "<on/off>",
+> +               cmd_set_ll_rpa_resoln,  "Toggle LL privacy support"     },
 
-This change is tested on harrison peak to confirm that it resolves the
-race condition on registration, and that there is no regression in
-single- and multi-advertising automated tests.
+Let's have it as a parameter of privacy command <on/off/ll> so when a
+user enters ll it enables link-layer privacy.
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Daniel Winkler <danielwinkler@google.com>
----
+>         { "class",              "<major> <minor>",
+>                 cmd_class,              "Set device major/minor class"  },
+>         { "disconnect",         "[-t type] <remote address>",
+> --
+> 2.17.1
+>
 
- net/bluetooth/mgmt.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 09e099c419f251..59f8016c486626 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7979,7 +7979,6 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
- 
--	hdev->cur_adv_instance = cp->instance;
- 	/* Submit request for advertising params if ext adv available */
- 	if (ext_adv_capable(hdev)) {
- 		hci_req_init(&req, hdev);
 -- 
-2.31.0.208.g409f899ff0-goog
-
+Luiz Augusto von Dentz
