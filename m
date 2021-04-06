@@ -2,83 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 646D2C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 08:44:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89623C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 08:50:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10C85613C3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 08:44:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 535AF613C3
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Apr 2021 08:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244453AbhDFIo6 (ORCPT
+        id S244595AbhDFIud (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Apr 2021 04:44:58 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41320 "EHLO
+        Tue, 6 Apr 2021 04:50:33 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:48543 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244417AbhDFIo5 (ORCPT
+        with ESMTP id S232593AbhDFIu3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Apr 2021 04:44:57 -0400
+        Tue, 6 Apr 2021 04:50:29 -0400
 Received: from marcel-macbook.holtmann.net (p4ff9fed5.dip0.t-ipconnect.de [79.249.254.213])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D6E8ECED1D;
-        Tue,  6 Apr 2021 10:52:30 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 89761CED1D;
+        Tue,  6 Apr 2021 10:58:03 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH 0/2] Bluetooth: Avoid centralized adv handle tracking for
- extended features
+Subject: Re: [PATCH 1/2] Bluetooth: FIX: Own address type change with
+ HCI_ENABLE_LL_PRIVACY
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210405233305.92431-1-danielwinkler@google.com>
-Date:   Tue, 6 Apr 2021 10:44:48 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+In-Reply-To: <20210405143023.16120-1-sathish.narasimman@intel.com>
+Date:   Tue, 6 Apr 2021 10:50:20 +0200
+Cc:     linux-bluetooth@vger.kernel.org, chethan.tumkur.narayan@intel.com,
+        ravishankar.srivatsa@intel.com
 Content-Transfer-Encoding: 7bit
-Message-Id: <EAE9ED84-E693-4821-A44D-059FE3CE8665@holtmann.org>
-References: <20210405233305.92431-1-danielwinkler@google.com>
-To:     Daniel Winkler <danielwinkler@google.com>
+Message-Id: <C8E8AD70-2901-441E-AC1C-39D25B239BDB@holtmann.org>
+References: <20210405143023.16120-1-sathish.narasimman@intel.com>
+To:     Sathish Narasimman <sathish.narasimman@intel.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
+Hi Sathish,
 
-> This series addresses a race condition where an advertisement
-> registration can conflict with a software rotation advertisement
-> refresh. I found that this issue was only occurring with the new
-> extended MGMT advertising interface. A bad use of the
-> hdev->cur_adv_instance caused every new instance to be immediately sent
-> to the controller rather than queued for software rotation, opening a
-> path for the race to occur.
+> own_address_type has to changed to 0x02 and 0x03 only when
+> HCI_ENABLE_LL_PRIVACY flag is set.
 > 
-> This series improves the way new extended advertising hci callbacks
-> track the relevant adv handle, removing the need for the
-> cur_adv_instance use. In a separate patch, the incorrect usage of
-> cur_adv_instance is removed, to align the extended MGMT commands to the
-> original add_advertising usage. The series was tested on both extended
-> and non-extended bluetooth controllers to confirm that the race
-> condition is resolved, and that multi- and single-advertising automated
-> test scenarios are still successful.
-> 
-> Thanks in advance,
-> Daniel
-> 
-> 
-> Daniel Winkler (2):
->  Bluetooth: Use ext adv handle from requests in CCs
->  Bluetooth: Do not set cur_adv_instance in adv param MGMT request
-> 
-> net/bluetooth/hci_event.c | 16 +++++++---------
-> net/bluetooth/mgmt.c      |  1 -
-> 2 files changed, 7 insertions(+), 10 deletions(-)
+> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> ---
+> net/bluetooth/hci_request.c | 6 ++++--
+> 1 file changed, 4 insertions(+), 2 deletions(-)
 
-both patches have been applied to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
