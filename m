@@ -2,141 +2,284 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73753C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 00:14:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D60C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:17:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 445C1613C2
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 00:14:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DEE6C613A0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:17:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245292AbhDGAOw (ORCPT
+        id S244240AbhDGHRZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Apr 2021 20:14:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58426 "EHLO
+        Wed, 7 Apr 2021 03:17:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233917AbhDGAOw (ORCPT
+        with ESMTP id S239419AbhDGHRY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Apr 2021 20:14:52 -0400
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81CB9C06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue,  6 Apr 2021 17:14:42 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id y19-20020a0568301d93b02901b9f88a238eso16382518oti.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 06 Apr 2021 17:14:42 -0700 (PDT)
+        Wed, 7 Apr 2021 03:17:24 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27838C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Apr 2021 00:17:15 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id k15so16604617ybh.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Apr 2021 00:17:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=12z29Le0OqIrYkd2T+EsN1vGKtzkWv+LB8f1AOUgSyI=;
-        b=Wz1n8GFBPjbZNJBVPkvFvvmK/88NY94uPf6pjiQbzmiAoGzkxR6D8lzuMHoQPmWTzW
-         a+Fcy9ZNBUvirbNXnfS25r8bWwLl5MROb6L9hvGusNHjl1yIsBfT3Hoav/KaJybSKI3F
-         PhITCYqVvSlQq7Jdq+vTnfIdN8RB2S2zVSqSv9gYkmkUGMEvv8MbLc6fP/Ts8Ai4+/yz
-         HGSuwOQl4zJPmVdgurktprTGyB7XUItr3MlX4zrG+Bz2Zs1+hm/REi58nLA0b0hxR7Tj
-         170Kh4e1vA58gJ/WK2ASVone9L0B4d8WQ+1kQmmUtfQmcxlgckDC+kHLne1DBUJrcbTp
-         VG0A==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=q8b+vp+Kos0XCcWOwLv4FkdpawEhpj36zdSruePcwx0=;
+        b=IY4r7OiO09fjKOCPRoml8PY4t4WdK/4qABZFQ7oJKNPeLJZJ011ckzvq3FjItACY7P
+         DlmHeF90rwBTCHtf+YMZDZqCiMzfiOy/egQLQFoew1d8e4xoH0eQCqFO2z2wRoIgf5qD
+         g8S38uWfQJpZ7tAlls/NpWCrg3qAFCCXVAvx2Uj5snAgJL2XlJYYdvgrDIKCgYFzVHQA
+         0QD0Oh37UyQSEclLYuX6/gCvQHbzLyAtB9z38XMTNjtki/CWo1pRrD5JqhDlUYNYJ1k7
+         p2qncTSnU/u6XpGM4HBvAO7AqrQx+kpnvYXxMFFVrhgpYmZ/5T6YZvg88OprlHwLRX/M
+         5ngg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=12z29Le0OqIrYkd2T+EsN1vGKtzkWv+LB8f1AOUgSyI=;
-        b=I2Wh9TM4QTHGltMV7b8QsHfODYlt11ei2063WsG3S44XcoTaYDwna2pAIoxUW+8QoK
-         C/eD2WmA1NTF6utvZT3gvT/P5hyVaHzKnolpTItP4oaUc7P7K+3mUSENaASRRNyZg34x
-         PdbbF3xhCVGAJSpof1BgAs75n85no27R3nKdtPqixb31fuIqfQIds6o8Zf6heUtyT+uF
-         rv0b0IT5CcJVm3jfgJNkZnC5/cWBkxgGkAv2/kZJX8Z0XIU1svQ47D8xitDwMseJ53k+
-         7orrL3G2U548sGEUxPt0Lfu+n+z0eee53/WQ9dlcIhEK+SIK2QB2xHGQbbIebTb37q88
-         BcTw==
-X-Gm-Message-State: AOAM532+Amyge97HT2jhQ9cTm+a/bHOeMH/Dbo3CgGY21UsKox0Ok41a
-        it3oF5ZBcgNpFnctpIdDG2yCMV8gpDGxwTODlSB1J2kz1gI=
-X-Google-Smtp-Source: ABdhPJxi/ElbJAZQ7jTVrYcNlOuuDEH89Hph4PtAaa5ud+iYMKf1LyyWFZLLTaNJ3QsTdWrUPihcOSxAf0FdDhps0vk=
-X-Received: by 2002:a9d:7cd2:: with SMTP id r18mr597836otn.240.1617754481599;
- Tue, 06 Apr 2021 17:14:41 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210316144136.410-2-cdwhite13@gmail.com> <6050c8be.1c69fb81.680f3.60d3@mx.google.com>
- <CABBYNZK_97ebCpdDHMSDLubu6o_zJw1W0xndmU3zySMcxjJyDA@mail.gmail.com>
-In-Reply-To: <CABBYNZK_97ebCpdDHMSDLubu6o_zJw1W0xndmU3zySMcxjJyDA@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 6 Apr 2021 17:14:30 -0700
-Message-ID: <CABBYNZ+0MAVhUkMy+zGJ5LkCkB7KpyML7dEh0UcEGaeLpm44-Q@mail.gmail.com>
-Subject: Re: emulator: Add Create BIG command in emulator
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     cdwhite13@gmail.com
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=q8b+vp+Kos0XCcWOwLv4FkdpawEhpj36zdSruePcwx0=;
+        b=D3tGzktbbx6ohpo7PRDvptT9/V/sMt9E963Jd+ipTRKLObE6G3NfXOLvYmIffYPHTQ
+         4aQWcLpT8s2bJo9PZra024ie9usmGNQ4HVcVRtLgoxEOI5Rp0HKx1qR6x/qM98pyBc5L
+         //a3SB4ANAVm/SwAkVuGWiMJ+XPNYy9ndknYfM8Sd2WXplPvnQ9nyEFgYo3oo4VQ5GGv
+         +0pOWJGFn3i/04xzpT1mQfdSLd+/DgESBgPHVc0AjgGHxuSoDNrIJAonpTFFvACFSxOG
+         39mIiL5o/kdnGRrQqmTDr0kbs6EZu3sVhhiqrinCxiJcIbbwFIfg0NGhxaGVYIIRH1JI
+         bk0A==
+X-Gm-Message-State: AOAM5304RgzjAXjA7BoJokXhegamg4L/+55Qta62yjAY4W4ytofQgJGD
+        LJ2E6tNJ6UDUMtvFeFvUoEuHrfi5L0hIlNEzoz2Idj3XISyaJ5q1VH7YZA41lcPeJ/1Irw6DrlY
+        NT+21fMraY0FQ6iPtaSAM+NXs9Mek+lAUDB2Uk4l+Ddq68QqT3l8TZXyS7PDIebKoSfROxZxP9z
+        AC
+X-Google-Smtp-Source: ABdhPJy1igfU/WoiQ3OIHn1pfO7E62SSiPhvmDpsev+HomwK8SrlWd1yYSAp7VaxpExbeaDxKjHimyutJN8R
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:7515:f813:8ede:d08c])
+ (user=apusaka job=sendgmr) by 2002:a25:d914:: with SMTP id
+ q20mr2562987ybg.397.1617779834352; Wed, 07 Apr 2021 00:17:14 -0700 (PDT)
+Date:   Wed,  7 Apr 2021 15:17:08 +0800
+Message-Id: <20210407151649.Bluez.1.I4ff127dde9bc6adb2a07507af2bf2cc6b6bcf0f2@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
+Subject: [Bluez PATCH] input/hog: support multiple variable length notification
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Chris,
+From: Archie Pusaka <apusaka@chromium.org>
 
-On Tue, Mar 16, 2021 at 6:18 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Chris,
->
-> On Tue, Mar 16, 2021 at 3:46 PM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing lis=
-t.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D4=
-49125
-> >
-> > ---Test result---
-> >
-> > ##############################
-> > Test: CheckPatch - PASS
-> >
-> > ##############################
-> > Test: CheckGitLint - PASS
-> >
-> > ##############################
-> > Test: CheckBuild - FAIL
-> > Output:
-> > emulator/btdev.c: In function =E2=80=98cmd_create_big_complete=E2=80=99=
-:
-> > emulator/btdev.c:4529:6: error: =E2=80=98struct bt_hci_evt_le_big_compl=
-ete=E2=80=99 has no member named =E2=80=98big_id=E2=80=99
-> >  4529 |   evt.big_id =3D cmd->big_id;
-> >       |      ^
-> > emulator/btdev.c:4529:19: error: =E2=80=98const struct bt_hci_cmd_le_cr=
-eate_big=E2=80=99 has no member named =E2=80=98big_id=E2=80=99
-> >  4529 |   evt.big_id =3D cmd->big_id;
-> >       |                   ^~
-> > make[1]: *** [Makefile:6794: emulator/btdev.o] Error 1
-> > make: *** [Makefile:4023: all] Error 2
->
-> There is some build errors, big_id has been renamed to handle at some
-> point, you should always rebase on top to master before submitting
-> upstream otherwise these errors could happen.
+Processing Multiple Variable Length Notification is mandatory if EATT
+is enabled (Core Spec Vol 3 Part G Sec 4.2).
 
-Ive fixed these myself, they are not applied.
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+---
 
->
-> >
-> > ##############################
-> > Test: MakeCheck - SKIPPED
-> > Output:
-> > checkbuild not success
-> >
-> >
-> >
-> > ---
-> > Regards,
-> > Linux Bluetooth
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+ attrib/att.h             |   1 +
+ profiles/input/hog-lib.c | 105 ++++++++++++++++++++++++++++-----------
+ src/attrib-server.c      |   1 +
+ 3 files changed, 79 insertions(+), 28 deletions(-)
 
+diff --git a/attrib/att.h b/attrib/att.h
+index 13a0c3a31f..0dbfb14b83 100644
+--- a/attrib/att.h
++++ b/attrib/att.h
+@@ -42,6 +42,7 @@
+ #define ATT_OP_HANDLE_NOTIFY		0x1B
+ #define ATT_OP_HANDLE_IND		0x1D
+ #define ATT_OP_HANDLE_CNF		0x1E
++#define ATT_OP_HANDLE_NOTIFY_MULTI	0x23
+ #define ATT_OP_SIGNED_WRITE_CMD		0xD2
+ 
+ /* Error codes for Error response PDU */
+diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
+index e5e3d3e7f5..2b81ee5b28 100644
+--- a/profiles/input/hog-lib.c
++++ b/profiles/input/hog-lib.c
+@@ -65,7 +65,6 @@
+ 
+ #define HOG_REPORT_MAP_MAX_SIZE        512
+ #define HID_INFO_SIZE			4
+-#define ATT_NOTIFICATION_HEADER_SIZE	3
+ 
+ struct bt_hog {
+ 	int			ref_count;
+@@ -112,7 +111,8 @@ struct report {
+ 	uint16_t		value_handle;
+ 	uint8_t			properties;
+ 	uint16_t		ccc_handle;
+-	guint			notifyid;
++	guint			notify_id;
++	guint			notify_multi_id;
+ 	uint16_t		len;
+ 	uint8_t			*value;
+ };
+@@ -283,22 +283,14 @@ static void find_included(struct bt_hog *hog, GAttrib *attrib,
+ 	free(req);
+ }
+ 
+-static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
++static void process_notification(struct report *report, guint16 len,
++							const uint8_t *data)
+ {
+-	struct report *report = user_data;
+ 	struct bt_hog *hog = report->hog;
+ 	struct uhid_event ev;
+ 	uint8_t *buf;
+ 	int err;
+ 
+-	if (len < ATT_NOTIFICATION_HEADER_SIZE) {
+-		error("Malformed ATT notification");
+-		return;
+-	}
+-
+-	pdu += ATT_NOTIFICATION_HEADER_SIZE;
+-	len -= ATT_NOTIFICATION_HEADER_SIZE;
+-
+ 	memset(&ev, 0, sizeof(ev));
+ 	ev.type = UHID_INPUT;
+ 	buf = ev.u.input.data;
+@@ -306,19 +298,78 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
+ 	if (hog->has_report_id) {
+ 		buf[0] = report->id;
+ 		len = MIN(len, sizeof(ev.u.input.data) - 1);
+-		memcpy(buf + 1, pdu, len);
+-		ev.u.input.size = ++len;
++		memcpy(buf + 1, data, len);
++		ev.u.input.size = len + 1;
+ 	} else {
+ 		len = MIN(len, sizeof(ev.u.input.data));
+-		memcpy(buf, pdu, len);
++		memcpy(buf, data, len);
+ 		ev.u.input.size = len;
+ 	}
+ 
+ 	err = bt_uhid_send(hog->uhid, &ev);
+-	if (err < 0) {
++	if (err < 0)
+ 		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
+-		return;
++}
++
++static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
++{
++	struct report *report = user_data;
++	uint8_t opcode = pdu[0];
++	guint16 report_len;
++	guint16 header_len;
++
++	/* Skip opcode field */
++	pdu += 1;
++	len -= 1;
++
++	if (opcode == ATT_OP_HANDLE_NOTIFY_MULTI)
++		header_len = 4;
++	else
++		header_len = 2;
++
++	if (len < header_len)
++		goto fail;
++
++	while (len >= header_len) {
++		/* Skip first 2 bytes (handle) */
++		pdu += 2;
++		len -= 2;
++
++		if (opcode == ATT_OP_HANDLE_NOTIFY_MULTI) {
++			report_len = get_le16(pdu);
++			pdu += 2;
++			len -= 2;
++
++			if (report_len > len)
++				goto fail;
++		} else {
++			report_len = len;
++		}
++
++		process_notification(report, report_len, pdu);
++
++		pdu += report_len;
++		len -= report_len;
+ 	}
++
++	if (len == 0)
++		return;
++
++fail:
++	error("Malformed ATT notification");
++}
++
++static void register_notify_handler(struct bt_hog *hog, struct report *report)
++{
++	report->notify_id = g_attrib_register(hog->attrib,
++					ATT_OP_HANDLE_NOTIFY,
++					report->value_handle,
++					report_value_cb, report, NULL);
++
++	report->notify_multi_id = g_attrib_register(hog->attrib,
++					ATT_OP_HANDLE_NOTIFY_MULTI,
++					report->value_handle,
++					report_value_cb, report, NULL);
+ }
+ 
+ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+@@ -339,10 +390,7 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
+ 	if (report->notifyid)
+ 		return;
+ 
+-	report->notifyid = g_attrib_register(hog->attrib,
+-					ATT_OP_HANDLE_NOTIFY,
+-					report->value_handle,
+-					report_value_cb, report, NULL);
++	register_notify_handler(hog, report);
+ 
+ 	DBG("Report characteristic descriptor written: notifications enabled");
+ }
+@@ -1714,10 +1762,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
+ 		if (r->notifyid)
+ 			continue;
+ 
+-		r->notifyid = g_attrib_register(hog->attrib,
+-					ATT_OP_HANDLE_NOTIFY,
+-					r->value_handle,
+-					report_value_cb, r, NULL);
++		register_notify_handler(hog, r);
+ 	}
+ 
+ 	return true;
+@@ -1764,9 +1809,13 @@ void bt_hog_detach(struct bt_hog *hog)
+ 	for (l = hog->reports; l; l = l->next) {
+ 		struct report *r = l->data;
+ 
+-		if (r->notifyid > 0) {
+-			g_attrib_unregister(hog->attrib, r->notifyid);
+-			r->notifyid = 0;
++		if (r->notify_id > 0) {
++			g_attrib_unregister(hog->attrib, r->notify_id);
++			r->notify_id = 0;
++		}
++		if (r->notify_multi_id > 0) {
++			g_attrib_unregister(hog->attrib, r->notify_multi_id);
++			r->notify_multi_id = 0;
+ 		}
+ 	}
+ 
+diff --git a/src/attrib-server.c b/src/attrib-server.c
+index 5a178f95ea..fb11d3db2d 100644
+--- a/src/attrib-server.c
++++ b/src/attrib-server.c
+@@ -1085,6 +1085,7 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
+ 		return;
+ 	case ATT_OP_HANDLE_IND:
+ 	case ATT_OP_HANDLE_NOTIFY:
++	case ATT_OP_HANDLE_NOTIFY_MULTI:
+ 		/* The attribute client is already handling these */
+ 		return;
+ 	case ATT_OP_READ_MULTI_REQ:
+-- 
+2.31.0.208.g409f899ff0-goog
 
-
---=20
-Luiz Augusto von Dentz
