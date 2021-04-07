@@ -2,284 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09D60C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:17:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD0C0C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:37:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DEE6C613A0
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:17:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B35466139E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Apr 2021 07:37:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244240AbhDGHRZ (ORCPT
+        id S232822AbhDGHhw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Apr 2021 03:17:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37098 "EHLO
+        Wed, 7 Apr 2021 03:37:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41544 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239419AbhDGHRY (ORCPT
+        with ESMTP id S244547AbhDGHht (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Apr 2021 03:17:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27838C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Apr 2021 00:17:15 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id k15so16604617ybh.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Apr 2021 00:17:15 -0700 (PDT)
+        Wed, 7 Apr 2021 03:37:49 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C432C06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Apr 2021 00:37:39 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id y12so13072059qtx.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Apr 2021 00:37:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=q8b+vp+Kos0XCcWOwLv4FkdpawEhpj36zdSruePcwx0=;
-        b=IY4r7OiO09fjKOCPRoml8PY4t4WdK/4qABZFQ7oJKNPeLJZJ011ckzvq3FjItACY7P
-         DlmHeF90rwBTCHtf+YMZDZqCiMzfiOy/egQLQFoew1d8e4xoH0eQCqFO2z2wRoIgf5qD
-         g8S38uWfQJpZ7tAlls/NpWCrg3qAFCCXVAvx2Uj5snAgJL2XlJYYdvgrDIKCgYFzVHQA
-         0QD0Oh37UyQSEclLYuX6/gCvQHbzLyAtB9z38XMTNjtki/CWo1pRrD5JqhDlUYNYJ1k7
-         p2qncTSnU/u6XpGM4HBvAO7AqrQx+kpnvYXxMFFVrhgpYmZ/5T6YZvg88OprlHwLRX/M
-         5ngg==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=ufTceTG0LjfcBaUtxdaiqJIsVgLI8JS521ikvlxCja4=;
+        b=Tyjks/MDJhE7E5ZU662LFHhuHlpm2pdJmn/E/kxGW6TNKegmfz1EOg5lmS7tIoQ/FK
+         kdcBtS8jU8dmbrQ1AsFRe8ghecpjumY4mRhwevykOQh8KUzlmJ6GSpB/fZbBefQnT4m9
+         F5boQWlFrqFp1c03n75GcX3zTBlnKp8ewF9QXwoJ1HVW4E+M2dSS8gVXyu+bpk4PDxwx
+         RlG1AlX63F7DTTdk+BS5epC7CKSsl5fUcIhQAr5UyQeXdfPuCaub2ucHJwZiGaThlCfr
+         GbX3tRX9YVZU6NPsqyul8zW/tQY5CJCB4mc8LvdvYAmm+iEcVLB0lYHGuWk6iywUu/vK
+         FCJA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=q8b+vp+Kos0XCcWOwLv4FkdpawEhpj36zdSruePcwx0=;
-        b=D3tGzktbbx6ohpo7PRDvptT9/V/sMt9E963Jd+ipTRKLObE6G3NfXOLvYmIffYPHTQ
-         4aQWcLpT8s2bJo9PZra024ie9usmGNQ4HVcVRtLgoxEOI5Rp0HKx1qR6x/qM98pyBc5L
-         //a3SB4ANAVm/SwAkVuGWiMJ+XPNYy9ndknYfM8Sd2WXplPvnQ9nyEFgYo3oo4VQ5GGv
-         +0pOWJGFn3i/04xzpT1mQfdSLd+/DgESBgPHVc0AjgGHxuSoDNrIJAonpTFFvACFSxOG
-         39mIiL5o/kdnGRrQqmTDr0kbs6EZu3sVhhiqrinCxiJcIbbwFIfg0NGhxaGVYIIRH1JI
-         bk0A==
-X-Gm-Message-State: AOAM5304RgzjAXjA7BoJokXhegamg4L/+55Qta62yjAY4W4ytofQgJGD
-        LJ2E6tNJ6UDUMtvFeFvUoEuHrfi5L0hIlNEzoz2Idj3XISyaJ5q1VH7YZA41lcPeJ/1Irw6DrlY
-        NT+21fMraY0FQ6iPtaSAM+NXs9Mek+lAUDB2Uk4l+Ddq68QqT3l8TZXyS7PDIebKoSfROxZxP9z
-        AC
-X-Google-Smtp-Source: ABdhPJy1igfU/WoiQ3OIHn1pfO7E62SSiPhvmDpsev+HomwK8SrlWd1yYSAp7VaxpExbeaDxKjHimyutJN8R
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:7515:f813:8ede:d08c])
- (user=apusaka job=sendgmr) by 2002:a25:d914:: with SMTP id
- q20mr2562987ybg.397.1617779834352; Wed, 07 Apr 2021 00:17:14 -0700 (PDT)
-Date:   Wed,  7 Apr 2021 15:17:08 +0800
-Message-Id: <20210407151649.Bluez.1.I4ff127dde9bc6adb2a07507af2bf2cc6b6bcf0f2@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.0.208.g409f899ff0-goog
-Subject: [Bluez PATCH] input/hog: support multiple variable length notification
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=ufTceTG0LjfcBaUtxdaiqJIsVgLI8JS521ikvlxCja4=;
+        b=L+mYe/EAAbLziLEsBd7Zt1yyQWBvz8oEHevptVCZQUVMd1qmesZ+DBPmzx58w03tro
+         +rkjzowKWK5qIYKdLSmnf6DXOIBMn4hRQgdrXM6diC8v/UulBZ8o2YrvAo0t1IeHngNq
+         TI4ApIPNDbqtdWlGB0/hqhQWJKxbF/WPYkPmSXya79l8zTtkmQJZ6RFZsCicaJlr6e2e
+         g4X3BsEQw+K8TVY5TnUgLe9W+5ommpVUZJXCpppmA20Ol3co5Z/l/Ef+zTlmgTuSeE8W
+         hdMTbEaFq/CshjiQEamS6UQQYvgss7kfhQq5uvwm4OhNXLicoS5ywZQUkSd33wJZ2y7o
+         jO8A==
+X-Gm-Message-State: AOAM531amfWGccvrvIlzjmegBy9ZSd763Y+wYXrvyYkO5F0oM6SR5FTM
+        B+6+U0YkjM87qugNeYnzPAi8bVG33KHY1A==
+X-Google-Smtp-Source: ABdhPJzlFypNI3zyGDfKAzcwgvEPzM8uJ9MkCskZGHfGJ1iV9PSwBje3w7ZSQHqBbqBW7bFb9Fqeog==
+X-Received: by 2002:ac8:7b23:: with SMTP id l3mr1659699qtu.165.1617781058391;
+        Wed, 07 Apr 2021 00:37:38 -0700 (PDT)
+Received: from [172.17.0.2] ([13.77.107.179])
+        by smtp.gmail.com with ESMTPSA id z24sm17459743qkz.65.2021.04.07.00.37.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 07 Apr 2021 00:37:37 -0700 (PDT)
+Message-ID: <606d6141.1c69fb81.7f587.5fec@mx.google.com>
+Date:   Wed, 07 Apr 2021 00:37:37 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8298091406265178514=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [Bluez] input/hog: support multiple variable length notification
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210407151649.Bluez.1.I4ff127dde9bc6adb2a07507af2bf2cc6b6bcf0f2@changeid>
+References: <20210407151649.Bluez.1.I4ff127dde9bc6adb2a07507af2bf2cc6b6bcf0f2@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============8298091406265178514==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-Processing Multiple Variable Length Notification is mandatory if EATT
-is enabled (Core Spec Vol 3 Part G Sec 4.2).
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NDYyMTM1CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+UGF0Y2ggLSBQQVNTCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tH
+aXRMaW50IC0gUEFTUwoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNr
+QnVpbGQ6IFNldHVwIEVMTCAtIFBBU1MKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpU
+ZXN0OiBDaGVja0J1aWxkOiBTZXR1cCAtIFBBU1MKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IyMjIwpUZXN0OiBDaGVja0J1aWxkIC0gRkFJTApPdXRwdXQ6CnByb2ZpbGVzL2lucHV0L2hvZy1s
+aWIuYzogSW4gZnVuY3Rpb24g4oCYcmVwb3J0X2NjY193cml0dGVuX2Ni4oCZOgpwcm9maWxlcy9p
+bnB1dC9ob2ctbGliLmM6MzkwOjE0OiBlcnJvcjog4oCYc3RydWN0IHJlcG9ydOKAmSBoYXMgbm8g
+bWVtYmVyIG5hbWVkIOKAmG5vdGlmeWlk4oCZOyBkaWQgeW91IG1lYW4g4oCYbm90aWZ5X2lk4oCZ
+PwogIDM5MCB8ICBpZiAocmVwb3J0LT5ub3RpZnlpZCkKICAgICAgfCAgICAgICAgICAgICAgXn5+
+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgbm90aWZ5X2lkCnByb2ZpbGVzL2lucHV0L2hvZy1s
+aWIuYzogSW4gZnVuY3Rpb24g4oCYYnRfaG9nX2F0dGFjaOKAmToKcHJvZmlsZXMvaW5wdXQvaG9n
+LWxpYi5jOjE3NjI6MTA6IGVycm9yOiDigJhzdHJ1Y3QgcmVwb3J04oCZIGhhcyBubyBtZW1iZXIg
+bmFtZWQg4oCYbm90aWZ5aWTigJk7IGRpZCB5b3UgbWVhbiDigJhub3RpZnlfaWTigJk/CiAxNzYy
+IHwgICBpZiAoci0+bm90aWZ5aWQpCiAgICAgIHwgICAgICAgICAgXn5+fn5+fn4KICAgICAgfCAg
+ICAgICAgICBub3RpZnlfaWQKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo2ODAzOiBwcm9maWxlcy9p
+bnB1dC9ob2ctbGliLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MDI5OiBhbGxdIEVy
+cm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZUNoZWNrIC0g
+U0tJUFBFRApPdXRwdXQ6CmNoZWNrYnVpbGQgbm90IHN1Y2Nlc3MKCiMjIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIwpUZXN0OiBDaGVja0J1aWxkIHcvZXh0ZXJuYWwgZWxsIC0gRkFJTApPdXRw
+dXQ6CnByb2ZpbGVzL2lucHV0L2hvZy1saWIuYzogSW4gZnVuY3Rpb24g4oCYcmVwb3J0X2NjY193
+cml0dGVuX2Ni4oCZOgpwcm9maWxlcy9pbnB1dC9ob2ctbGliLmM6MzkwOjE0OiBlcnJvcjog4oCY
+c3RydWN0IHJlcG9ydOKAmSBoYXMgbm8gbWVtYmVyIG5hbWVkIOKAmG5vdGlmeWlk4oCZOyBkaWQg
+eW91IG1lYW4g4oCYbm90aWZ5X2lk4oCZPwogIDM5MCB8ICBpZiAocmVwb3J0LT5ub3RpZnlpZCkK
+ICAgICAgfCAgICAgICAgICAgICAgXn5+fn5+fn4KICAgICAgfCAgICAgICAgICAgICAgbm90aWZ5
+X2lkCnByb2ZpbGVzL2lucHV0L2hvZy1saWIuYzogSW4gZnVuY3Rpb24g4oCYYnRfaG9nX2F0dGFj
+aOKAmToKcHJvZmlsZXMvaW5wdXQvaG9nLWxpYi5jOjE3NjI6MTA6IGVycm9yOiDigJhzdHJ1Y3Qg
+cmVwb3J04oCZIGhhcyBubyBtZW1iZXIgbmFtZWQg4oCYbm90aWZ5aWTigJk7IGRpZCB5b3UgbWVh
+biDigJhub3RpZnlfaWTigJk/CiAxNzYyIHwgICBpZiAoci0+bm90aWZ5aWQpCiAgICAgIHwgICAg
+ICAgICAgXn5+fn5+fn4KICAgICAgfCAgICAgICAgICBub3RpZnlfaWQKbWFrZVsxXTogKioqIFtN
+YWtlZmlsZTo2ODAzOiBwcm9maWxlcy9pbnB1dC9ob2ctbGliLm9dIEVycm9yIDEKbWFrZTogKioq
+IFtNYWtlZmlsZTo0MDI5OiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdhcmRzLApMaW51eCBCbHVl
+dG9vdGgKCg==
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
----
-
- attrib/att.h             |   1 +
- profiles/input/hog-lib.c | 105 ++++++++++++++++++++++++++++-----------
- src/attrib-server.c      |   1 +
- 3 files changed, 79 insertions(+), 28 deletions(-)
-
-diff --git a/attrib/att.h b/attrib/att.h
-index 13a0c3a31f..0dbfb14b83 100644
---- a/attrib/att.h
-+++ b/attrib/att.h
-@@ -42,6 +42,7 @@
- #define ATT_OP_HANDLE_NOTIFY		0x1B
- #define ATT_OP_HANDLE_IND		0x1D
- #define ATT_OP_HANDLE_CNF		0x1E
-+#define ATT_OP_HANDLE_NOTIFY_MULTI	0x23
- #define ATT_OP_SIGNED_WRITE_CMD		0xD2
- 
- /* Error codes for Error response PDU */
-diff --git a/profiles/input/hog-lib.c b/profiles/input/hog-lib.c
-index e5e3d3e7f5..2b81ee5b28 100644
---- a/profiles/input/hog-lib.c
-+++ b/profiles/input/hog-lib.c
-@@ -65,7 +65,6 @@
- 
- #define HOG_REPORT_MAP_MAX_SIZE        512
- #define HID_INFO_SIZE			4
--#define ATT_NOTIFICATION_HEADER_SIZE	3
- 
- struct bt_hog {
- 	int			ref_count;
-@@ -112,7 +111,8 @@ struct report {
- 	uint16_t		value_handle;
- 	uint8_t			properties;
- 	uint16_t		ccc_handle;
--	guint			notifyid;
-+	guint			notify_id;
-+	guint			notify_multi_id;
- 	uint16_t		len;
- 	uint8_t			*value;
- };
-@@ -283,22 +283,14 @@ static void find_included(struct bt_hog *hog, GAttrib *attrib,
- 	free(req);
- }
- 
--static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-+static void process_notification(struct report *report, guint16 len,
-+							const uint8_t *data)
- {
--	struct report *report = user_data;
- 	struct bt_hog *hog = report->hog;
- 	struct uhid_event ev;
- 	uint8_t *buf;
- 	int err;
- 
--	if (len < ATT_NOTIFICATION_HEADER_SIZE) {
--		error("Malformed ATT notification");
--		return;
--	}
--
--	pdu += ATT_NOTIFICATION_HEADER_SIZE;
--	len -= ATT_NOTIFICATION_HEADER_SIZE;
--
- 	memset(&ev, 0, sizeof(ev));
- 	ev.type = UHID_INPUT;
- 	buf = ev.u.input.data;
-@@ -306,19 +298,78 @@ static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
- 	if (hog->has_report_id) {
- 		buf[0] = report->id;
- 		len = MIN(len, sizeof(ev.u.input.data) - 1);
--		memcpy(buf + 1, pdu, len);
--		ev.u.input.size = ++len;
-+		memcpy(buf + 1, data, len);
-+		ev.u.input.size = len + 1;
- 	} else {
- 		len = MIN(len, sizeof(ev.u.input.data));
--		memcpy(buf, pdu, len);
-+		memcpy(buf, data, len);
- 		ev.u.input.size = len;
- 	}
- 
- 	err = bt_uhid_send(hog->uhid, &ev);
--	if (err < 0) {
-+	if (err < 0)
- 		error("bt_uhid_send: %s (%d)", strerror(-err), -err);
--		return;
-+}
-+
-+static void report_value_cb(const guint8 *pdu, guint16 len, gpointer user_data)
-+{
-+	struct report *report = user_data;
-+	uint8_t opcode = pdu[0];
-+	guint16 report_len;
-+	guint16 header_len;
-+
-+	/* Skip opcode field */
-+	pdu += 1;
-+	len -= 1;
-+
-+	if (opcode == ATT_OP_HANDLE_NOTIFY_MULTI)
-+		header_len = 4;
-+	else
-+		header_len = 2;
-+
-+	if (len < header_len)
-+		goto fail;
-+
-+	while (len >= header_len) {
-+		/* Skip first 2 bytes (handle) */
-+		pdu += 2;
-+		len -= 2;
-+
-+		if (opcode == ATT_OP_HANDLE_NOTIFY_MULTI) {
-+			report_len = get_le16(pdu);
-+			pdu += 2;
-+			len -= 2;
-+
-+			if (report_len > len)
-+				goto fail;
-+		} else {
-+			report_len = len;
-+		}
-+
-+		process_notification(report, report_len, pdu);
-+
-+		pdu += report_len;
-+		len -= report_len;
- 	}
-+
-+	if (len == 0)
-+		return;
-+
-+fail:
-+	error("Malformed ATT notification");
-+}
-+
-+static void register_notify_handler(struct bt_hog *hog, struct report *report)
-+{
-+	report->notify_id = g_attrib_register(hog->attrib,
-+					ATT_OP_HANDLE_NOTIFY,
-+					report->value_handle,
-+					report_value_cb, report, NULL);
-+
-+	report->notify_multi_id = g_attrib_register(hog->attrib,
-+					ATT_OP_HANDLE_NOTIFY_MULTI,
-+					report->value_handle,
-+					report_value_cb, report, NULL);
- }
- 
- static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
-@@ -339,10 +390,7 @@ static void report_ccc_written_cb(guint8 status, const guint8 *pdu,
- 	if (report->notifyid)
- 		return;
- 
--	report->notifyid = g_attrib_register(hog->attrib,
--					ATT_OP_HANDLE_NOTIFY,
--					report->value_handle,
--					report_value_cb, report, NULL);
-+	register_notify_handler(hog, report);
- 
- 	DBG("Report characteristic descriptor written: notifications enabled");
- }
-@@ -1714,10 +1762,7 @@ bool bt_hog_attach(struct bt_hog *hog, void *gatt)
- 		if (r->notifyid)
- 			continue;
- 
--		r->notifyid = g_attrib_register(hog->attrib,
--					ATT_OP_HANDLE_NOTIFY,
--					r->value_handle,
--					report_value_cb, r, NULL);
-+		register_notify_handler(hog, r);
- 	}
- 
- 	return true;
-@@ -1764,9 +1809,13 @@ void bt_hog_detach(struct bt_hog *hog)
- 	for (l = hog->reports; l; l = l->next) {
- 		struct report *r = l->data;
- 
--		if (r->notifyid > 0) {
--			g_attrib_unregister(hog->attrib, r->notifyid);
--			r->notifyid = 0;
-+		if (r->notify_id > 0) {
-+			g_attrib_unregister(hog->attrib, r->notify_id);
-+			r->notify_id = 0;
-+		}
-+		if (r->notify_multi_id > 0) {
-+			g_attrib_unregister(hog->attrib, r->notify_multi_id);
-+			r->notify_multi_id = 0;
- 		}
- 	}
- 
-diff --git a/src/attrib-server.c b/src/attrib-server.c
-index 5a178f95ea..fb11d3db2d 100644
---- a/src/attrib-server.c
-+++ b/src/attrib-server.c
-@@ -1085,6 +1085,7 @@ static void channel_handler(const uint8_t *ipdu, uint16_t len,
- 		return;
- 	case ATT_OP_HANDLE_IND:
- 	case ATT_OP_HANDLE_NOTIFY:
-+	case ATT_OP_HANDLE_NOTIFY_MULTI:
- 		/* The attribute client is already handling these */
- 		return;
- 	case ATT_OP_READ_MULTI_REQ:
--- 
-2.31.0.208.g409f899ff0-goog
-
+--===============8298091406265178514==--
