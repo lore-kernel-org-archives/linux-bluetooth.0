@@ -2,193 +2,236 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-25.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DE178C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 08:10:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30403C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:45:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B6196115B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 08:10:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D31C61155
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:45:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229687AbhDHIKN convert rfc822-to-8bit (ORCPT
+        id S232363AbhDHQqE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Apr 2021 04:10:13 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48821 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhDHIKM (ORCPT
+        Thu, 8 Apr 2021 12:46:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231655AbhDHQqE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Apr 2021 04:10:12 -0400
-Received: from marcel-macbook.holtmann.net (p4ff9f418.dip0.t-ipconnect.de [79.249.244.24])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 07DD9CECEF;
-        Thu,  8 Apr 2021 10:17:43 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH v2] Bluetooth: Add ncmd=0 recovery handling
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210407193611.v2.1.I14da3750a343d8d48921fffb7c6561337b6e6082@changeid>
-Date:   Thu, 8 Apr 2021 10:09:59 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Alain Michaud <alainm@chromium.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>, netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <617F9F1B-E389-4843-9B70-5B2F477FA1F0@holtmann.org>
-References: <20210407193611.v2.1.I14da3750a343d8d48921fffb7c6561337b6e6082@changeid>
-To:     Manish Mandlik <mmandlik@google.com>
-X-Mailer: Apple Mail (2.3654.60.0.2.21)
+        Thu, 8 Apr 2021 12:46:04 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E45C061760;
+        Thu,  8 Apr 2021 09:45:52 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id o18so1451587pjs.4;
+        Thu, 08 Apr 2021 09:45:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DxWZHrB7Dy/O+7LXwb2Qucf8ozxIQJ06o04ctbQQIwU=;
+        b=mmaHmt+6PeTWQJbUrC9k9JBmrRu5tjJK3q7K51p2TtYnEiLf9+qjqlQ8E54bblZTxG
+         F8WpdETSVEWpRYwNck5N2QedXhlbiFX1HljidVuIuvLLaesy34/YJAoBihfmbKZ32EuL
+         WHEZI54q3F6HOeehEVEKzYoxcseNY5xRnIq9Vt3cCThFpXFgH1eCZ0mUmYceJgUwTw3I
+         kf5KP/ZHzS890Jls2RtLWxcrRoWzV41CQ7BSIRUWGokPSyF72IHtyHI0/ZvpdYO3DC6B
+         lVagfhM2ToZMwlSEHeIyuGATKaWGI01mRwI8bTbJXMoyARd0v8+HiJdVu8u3CSKZkNEy
+         YysA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DxWZHrB7Dy/O+7LXwb2Qucf8ozxIQJ06o04ctbQQIwU=;
+        b=fFe0CjdBlI/2QeiksteIQLDSnp2gg3NJ6xYKUPm5cHwAY6ewhUFsLtePkwW3RJrxWU
+         Qt0UNvxDRVOI+OQqZgGfCz1SKaND1OAHUC83UE4NtcdbbDqjnlC3FGQ/dxsdDrq2qh9I
+         1HgnLBaimbqfjXDHL0lPzN4SSquLvFf65Qd54Agy19Tok8sKRZ+V+0Ar3YVe3d9RKAYc
+         f+80QMqJMzfDXwVycTRkhaeU1Nv3xPK3nn2QxAN1K+nH+mtFNDLW1wwZDFz7Xxt/Njoy
+         KRuuUwrT3OmuzQlXzJ9botVZ13jgvH6kle159ucPbW+M2IHStPoySxeYei8H1S+X3zb+
+         aRvw==
+X-Gm-Message-State: AOAM530Vq3Mixo3bjOIlR9u+vmKvgEnV846sNRaT6nEAUKsu7ngL9fJr
+        ilqgWcLyqozAgp1Oocv0V/M=
+X-Google-Smtp-Source: ABdhPJwKfoUP53bQR49OiE8mSmOLHv8DCON6R2qWPUSLfwOi0iz3nqCPRoxCtNy59Vhzrf5B2Q2nGg==
+X-Received: by 2002:a17:902:d78a:b029:e6:e1f:f695 with SMTP id z10-20020a170902d78ab02900e60e1ff695mr8521378ply.82.1617900352256;
+        Thu, 08 Apr 2021 09:45:52 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id k10sm11895pfk.205.2021.04.08.09.45.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 08 Apr 2021 09:45:51 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: pull request: bluetooth-next 2021-04-08
+Date:   Thu,  8 Apr 2021 09:45:06 -0700
+Message-Id: <20210408164506.1686871-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+The following changes since commit d310ec03a34e92a77302edb804f7d68ee4f01ba0:
 
-> During command status or command complete event, the controller may set
-> ncmd=0 indicating that it is not accepting any more commands. In such a
-> case, host holds off sending any more commands to the controller. If the
-> controller doesn't recover from such condition, host will wait forever,
-> until the user decides that the Bluetooth is broken and may power cycles
-> the Bluetooth.
-> 
-> This patch triggers the hardware error to reset the controller and
-> driver when it gets into such state as there is no other wat out.
-> 
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> ---
-> 
-> Changes in v2:
-> - Emit the hardware error when ncmd=0 occurs
-> 
-> include/net/bluetooth/hci.h      |  1 +
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 15 +++++++++++++++
-> net/bluetooth/hci_event.c        | 10 ++++++++++
-> 4 files changed, 27 insertions(+)
-> 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ea4ae551c426..c4b0650fb9ae 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -339,6 +339,7 @@ enum {
-> #define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
-> #define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
-> #define HCI_CMD_TIMEOUT		msecs_to_jiffies(2000)	/* 2 seconds */
-> +#define HCI_NCMD_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
-> #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
-> #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
-> #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index ebdd4afe30d2..f14692b39fd5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -470,6 +470,7 @@ struct hci_dev {
-> 	struct delayed_work	service_cache;
-> 
-> 	struct delayed_work	cmd_timer;
-> +	struct delayed_work	ncmd_timer;
-> 
-> 	struct work_struct	rx_work;
-> 	struct work_struct	cmd_work;
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b0d9c36acc03..c102a8763cb5 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -2769,6 +2769,20 @@ static void hci_cmd_timeout(struct work_struct *work)
-> 	queue_work(hdev->workqueue, &hdev->cmd_work);
-> }
-> 
-> +/* HCI ncmd timer function */
-> +static void hci_ncmd_timeout(struct work_struct *work)
-> +{
-> +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> +					    ncmd_timer.work);
-> +
-> +	bt_dev_err(hdev, "Controller not accepting commands anymore: ncmd = 0");
-> +
-> +	/* This is an irrecoverable state. Inject hw error event to reset
-> +	 * the device and driver.
-> +	 */
-> +	hci_reset_dev(hdev);
+  Merge tag 'perf-core-2021-02-17' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2021-02-21 12:49:32 -0800)
 
-	/* This is an irrecoverable state, inject hardware error event */
-	hci_reset_dev(hdev);
+are available in the Git repository at:
 
-Since you will not be resetting the driver here. You just tell the core stack to reset itself and with HCI_Reset hopefully bring the hardware back to life. Or if the ncmd=0 is a hardware bug, just start sending a new command.
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-04-08
 
-> +}
-> +
-> struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
-> 					  bdaddr_t *bdaddr, u8 bdaddr_type)
-> {
-> @@ -3831,6 +3845,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	init_waitqueue_head(&hdev->suspend_wait_q);
-> 
-> 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-> +	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
-> 
-> 	hci_request_setup(hdev);
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index cf2f4a0abdbd..114a9170d809 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -3635,6 +3635,11 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 	if (*opcode != HCI_OP_NOP)
-> 		cancel_delayed_work(&hdev->cmd_timer);
-> 
-> +	if (!ev->ncmd &&!test_bit(HCI_RESET, &hdev->flags))
-> +		schedule_delayed_work(&hdev->ncmd_timer, HCI_NCMD_TIMEOUT);
-> +	else
-> +		cancel_delayed_work(&hdev->ncmd_timer);
-> +
-> 	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
-> 		atomic_set(&hdev->cmd_cnt, 1);
-> 
+for you to fetch changes up to a61d67188f29ff678e94fb3ffba6c6d292e852c7:
 
-	if (!test_bit(HCI_RESET, &hdev->flags)) {
-		if (ev->ncmd) {
-			cancel_delayed_work(&hdev->ncmd_timer);
-			atomic_set(&hdev->cmd_cnt, 1);
-		} else {
-			schedule_delayed_work(&hdev->ncmd_timer,
-					      HCI_NCMD_TIMEOUT);
-		}
-	}
+  Bluetooth: Allow Microsoft extension to indicate curve validation (2021-04-08 12:26:34 +0200)
 
-I think doing it this way is a bit cleaner and avoid the check of !ncmd and !HCI_RESET twice.
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
-And I wonder if there isn’t a cancel_delayed_work missing in hci_dev_do_close or some related location when we are shutting down.
+ - Proper support for BCM4330 and BMC4334
+ - Various improvements for firmware download of Intel controllers
+ - Update management interface revision to 20
+ - Support for AOSP HCI vendor commands
+ - Initial Virtio support
 
-What do we do when this happens during HCI_INIT. I think if ncmd_timer triggers during HCI_INIT, then hci_up needs to be aborted and no hardware error event to be injected.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-In addition since you are now calling hci_reset_dev also from the core stack (perviously, it was just up to the drivers to do that), I would add an extra error.
+----------------------------------------------------------------
+Abhishek Pandit-Subedi (2):
+      Bluetooth: Notify suspend on le conn failed
+      Bluetooth: Remove unneeded commands for suspend
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd12f1652bdf..1c9ef5608930 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -4073,6 +4073,8 @@ int hci_reset_dev(struct hci_dev *hdev)
-        hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-        skb_put_data(skb, hw_err, 3);
- 
-+       bt_dev_err(hdev, "Injecting HCI hardware error event");
-+
-        /* Send Hardware Error to upper stack */
-        return hci_recv_frame(hdev, skb);
- }
+Archie Pusaka (4):
+      Bluetooth: Set CONF_NOT_COMPLETE as l2cap_chan default
+      Bluetooth: verify AMP hci_chan before amp_destroy
+      Bluetooth: check for zapped sk before connecting
+      Bluetooth: Check inquiry status before sending one
 
-This has the advantage that if you take a btmon trace, you know this event is injected. Or more precisely eventually will be able to know since we haven’t merged my patches yet that will redirect bt_dev_{err,warn,..} into btmon as well.
+Arnd Bergmann (1):
+      Bluetooth: fix set_ecdh_privkey() prototype
 
-Regards
+Ayush Garg (1):
+      Bluetooth: Fix incorrect status handling in LE PHY UPDATE event
 
-Marcel
+Bhaskar Chowdhury (2):
+      Bluetooth: hci_qca: Mundane typo fix
+      Bluetooth: L2CAP: Rudimentary typo fixes
 
+Daniel Winkler (3):
+      Bluetooth: Allow scannable adv with extended MGMT APIs
+      Bluetooth: Use ext adv handle from requests in CCs
+      Bluetooth: Do not set cur_adv_instance in adv param MGMT request
+
+Jiri Kosina (1):
+      Bluetooth: avoid deadlock between hci_dev->lock and socket lock
+
+Kai Ye (1):
+      Bluetooth: use the correct print format for L2CAP debug statements
+
+Kiran K (2):
+      Bluetooth: btusb: print firmware file name on error loading firmware
+      Bluetooth: btintel: Fix offset calculation boot address parameter
+
+Linus Walleij (4):
+      Bluetooth: btbcm: Rewrite bindings in YAML and add reset
+      Bluetooth: btbcm: Obtain and handle reset GPIO
+      Bluetooth: btbcm: Add BCM4334 DT binding
+      Bluetooth: btbcm: Add BCM4330 and BCM4334 compatibles
+
+Lokendra Singh (3):
+      Bluetooth: btintel: Reorganized bootloader mode tlv checks in intel_version_tlv parsing
+      Bluetooth: btintel: Collect tlv based active firmware build info in FW mode
+      Bluetooth: btintel: Skip reading firmware file version while in bootloader mode
+
+Luiz Augusto von Dentz (10):
+      Bluetooth: SMP: Fail if remote and local public keys are identical
+      Bluetooth: L2CAP: Fix not checking for maximum number of DCID
+      Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
+      Bluetooth: btintel: Check firmware version before download
+      Bluetooth: btintel: Move operational checks after version check
+      Bluetooth: btintel: Consolidate intel_version_tlv parsing
+      Bluetooth: btintel: Consolidate intel_version parsing
+      Bluetooth: btusb: Consolidate code for waiting firmware download
+      Bluetooth: btusb: Consolidate code for waiting firmware to boot
+      Bluetooth: SMP: Fix variable dereferenced before check 'conn'
+
+Marcel Holtmann (10):
+      Bluetooth: Fix mgmt status for LL Privacy experimental feature
+      Bluetooth: Fix wrong opcode error for read advertising features
+      Bluetooth: Add missing entries for PHY configuration commands
+      Bluetooth: Move the advertisement monitor events to correct list
+      Bluetooth: Increment management interface revision
+      Bluetooth: Add support for reading AOSP vendor capabilities
+      Bluetooth: Add support for virtio transport driver
+      Bluetooth: Fix default values for advertising interval
+      Bluetooth: Set defaults for le_scan_{int,window}_adv_monitor
+      Bluetooth: Allow Microsoft extension to indicate curve validation
+
+Meng Yu (4):
+      Bluetooth: Remove trailing semicolon in macros
+      Bluetooth: Remove trailing semicolon in macros
+      Bluetooth: Remove 'return' in void function
+      Bluetooth: Coding style fix
+
+Rasmus Moorats (1):
+      Bluetooth: btusb: support 0cb5:c547 Realtek 8822CE device
+
+Sathish Narasimman (2):
+      Bluetooth: Handle own address type change with HCI_ENABLE_LL_PRIVACY
+      Bluetooth: LL privacy allow RPA
+
+Sonny Sasaka (1):
+      Bluetooth: Cancel le_scan_restart work when stopping discovery
+
+Tetsuo Handa (1):
+      Bluetooth: initialize skb_queue_head at l2cap_chan_create()
+
+Venkata Lakshmi Narayana Gubba (1):
+      Bluetooth: hci_qca: Add device_may_wakeup support
+
+mark-yw.chen (2):
+      Bluetooth: btusb: Fix incorrect type in assignment and uninitialized symbol
+      Bluetooth: btusb: Enable quirk boolean flag for Mediatek Chip.
+
+ .../devicetree/bindings/net/broadcom-bluetooth.txt |  56 ---
+ .../bindings/net/broadcom-bluetooth.yaml           | 118 ++++++
+ .../devicetree/bindings/serial/ingenic,uart.yaml   |   2 +-
+ drivers/bluetooth/Kconfig                          |  10 +
+ drivers/bluetooth/Makefile                         |   2 +
+ drivers/bluetooth/btintel.c                        | 232 ++++++++++--
+ drivers/bluetooth/btintel.h                        |  19 +-
+ drivers/bluetooth/btusb.c                          | 408 ++++++++-------------
+ drivers/bluetooth/hci_bcm.c                        |  19 +
+ drivers/bluetooth/hci_intel.c                      |   7 +-
+ drivers/bluetooth/hci_qca.c                        |  17 +-
+ drivers/bluetooth/virtio_bt.c                      | 401 ++++++++++++++++++++
+ include/net/bluetooth/hci.h                        |   1 +
+ include/net/bluetooth/hci_core.h                   |  17 +-
+ include/net/bluetooth/l2cap.h                      |   1 +
+ include/net/bluetooth/mgmt.h                       |   1 +
+ include/uapi/linux/virtio_bt.h                     |  31 ++
+ include/uapi/linux/virtio_ids.h                    |   1 +
+ net/bluetooth/6lowpan.c                            |   5 +-
+ net/bluetooth/Kconfig                              |   7 +
+ net/bluetooth/Makefile                             |   1 +
+ net/bluetooth/aosp.c                               |  35 ++
+ net/bluetooth/aosp.h                               |  16 +
+ net/bluetooth/ecdh_helper.h                        |   2 +-
+ net/bluetooth/hci_conn.c                           |  14 +-
+ net/bluetooth/hci_core.c                           |   5 +
+ net/bluetooth/hci_debugfs.c                        |   8 +-
+ net/bluetooth/hci_event.c                          |  50 ++-
+ net/bluetooth/hci_request.c                        |  67 ++--
+ net/bluetooth/l2cap_core.c                         |  43 ++-
+ net/bluetooth/l2cap_sock.c                         |   8 +
+ net/bluetooth/mgmt.c                               |  19 +-
+ net/bluetooth/msft.c                               |   8 +
+ net/bluetooth/msft.h                               |   6 +
+ net/bluetooth/sco.c                                |   4 +-
+ net/bluetooth/smp.c                                | 113 +++---
+ 36 files changed, 1289 insertions(+), 465 deletions(-)
+ delete mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
+ create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
+ create mode 100644 drivers/bluetooth/virtio_bt.c
+ create mode 100644 include/uapi/linux/virtio_bt.h
+ create mode 100644 net/bluetooth/aosp.c
+ create mode 100644 net/bluetooth/aosp.h
