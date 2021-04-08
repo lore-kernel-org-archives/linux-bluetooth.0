@@ -2,236 +2,182 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-25.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	INCLUDES_PULL_REQUEST,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30403C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:45:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BEE3C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:58:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D31C61155
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:45:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9C56610CB
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Apr 2021 16:58:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232363AbhDHQqE (ORCPT
+        id S231875AbhDHQ6Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Apr 2021 12:46:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231655AbhDHQqE (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Apr 2021 12:46:04 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8E45C061760;
-        Thu,  8 Apr 2021 09:45:52 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id o18so1451587pjs.4;
-        Thu, 08 Apr 2021 09:45:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DxWZHrB7Dy/O+7LXwb2Qucf8ozxIQJ06o04ctbQQIwU=;
-        b=mmaHmt+6PeTWQJbUrC9k9JBmrRu5tjJK3q7K51p2TtYnEiLf9+qjqlQ8E54bblZTxG
-         F8WpdETSVEWpRYwNck5N2QedXhlbiFX1HljidVuIuvLLaesy34/YJAoBihfmbKZ32EuL
-         WHEZI54q3F6HOeehEVEKzYoxcseNY5xRnIq9Vt3cCThFpXFgH1eCZ0mUmYceJgUwTw3I
-         kf5KP/ZHzS890Jls2RtLWxcrRoWzV41CQ7BSIRUWGokPSyF72IHtyHI0/ZvpdYO3DC6B
-         lVagfhM2ToZMwlSEHeIyuGATKaWGI01mRwI8bTbJXMoyARd0v8+HiJdVu8u3CSKZkNEy
-         YysA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=DxWZHrB7Dy/O+7LXwb2Qucf8ozxIQJ06o04ctbQQIwU=;
-        b=fFe0CjdBlI/2QeiksteIQLDSnp2gg3NJ6xYKUPm5cHwAY6ewhUFsLtePkwW3RJrxWU
-         Qt0UNvxDRVOI+OQqZgGfCz1SKaND1OAHUC83UE4NtcdbbDqjnlC3FGQ/dxsdDrq2qh9I
-         1HgnLBaimbqfjXDHL0lPzN4SSquLvFf65Qd54Agy19Tok8sKRZ+V+0Ar3YVe3d9RKAYc
-         f+80QMqJMzfDXwVycTRkhaeU1Nv3xPK3nn2QxAN1K+nH+mtFNDLW1wwZDFz7Xxt/Njoy
-         KRuuUwrT3OmuzQlXzJ9botVZ13jgvH6kle159ucPbW+M2IHStPoySxeYei8H1S+X3zb+
-         aRvw==
-X-Gm-Message-State: AOAM530Vq3Mixo3bjOIlR9u+vmKvgEnV846sNRaT6nEAUKsu7ngL9fJr
-        ilqgWcLyqozAgp1Oocv0V/M=
-X-Google-Smtp-Source: ABdhPJwKfoUP53bQR49OiE8mSmOLHv8DCON6R2qWPUSLfwOi0iz3nqCPRoxCtNy59Vhzrf5B2Q2nGg==
-X-Received: by 2002:a17:902:d78a:b029:e6:e1f:f695 with SMTP id z10-20020a170902d78ab02900e60e1ff695mr8521378ply.82.1617900352256;
-        Thu, 08 Apr 2021 09:45:52 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id k10sm11895pfk.205.2021.04.08.09.45.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 08 Apr 2021 09:45:51 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: pull request: bluetooth-next 2021-04-08
-Date:   Thu,  8 Apr 2021 09:45:06 -0700
-Message-Id: <20210408164506.1686871-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.30.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Thu, 8 Apr 2021 12:58:25 -0400
+Received: from mga07.intel.com ([134.134.136.100]:19271 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230522AbhDHQ6Z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 8 Apr 2021 12:58:25 -0400
+IronPort-SDR: jS0xWqN2qMsCFrayL/rSroZuCmevuY+CSBrULrhMFbNlQQlnNRKesuZJUkosrEb81AwTzbrQXk
+ oEpaf6eGNI6Q==
+X-IronPort-AV: E=McAfee;i="6000,8403,9948"; a="257567855"
+X-IronPort-AV: E=Sophos;i="5.82,207,1613462400"; 
+   d="scan'208";a="257567855"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Apr 2021 09:58:13 -0700
+IronPort-SDR: vcHjRw9EBMWSpX+/SpR69rkr53Lhbs9bcPBeHrKWKhgT4yryuCrgnw3xRO577vVWl4BsLBtzxT
+ zqL6aZHtEfSA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,207,1613462400"; 
+   d="scan'208";a="613407689"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga005.fm.intel.com with ESMTP; 08 Apr 2021 09:58:11 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        Kiran K <kiran.k@intel.com>,
+        Lokendra Singh <lokendra.singh@intel.com>
+Subject: [PATCH v1] Bluetooth: Fix alt settings for incoming SCO with transparent coding format
+Date:   Thu,  8 Apr 2021 22:31:59 +0530
+Message-Id: <20210408170159.19510-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit d310ec03a34e92a77302edb804f7d68ee4f01ba0:
+For incoming SCO connection with transparent coding format, alt setting
+of CVSD is getting applied instead of Transparent.
 
-  Merge tag 'perf-core-2021-02-17' of git://git.kernel.org/pub/scm/linux/kernel/git/tip/tip (2021-02-21 12:49:32 -0800)
+Before fix:
+< HCI Command: Accept Synchron.. (0x01|0x0029) plen 21  #2196 [hci0] 321.342548
+        Address: 1C:CC:D6:E2:EA:80 (Xiaomi Communications Co Ltd)
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x003f
+          HV1 may be used
+          HV2 may be used
+          HV3 may be used
+          EV3 may be used
+          EV4 may be used
+          EV5 may be used
+> HCI Event: Command Status (0x0f) plen 4               #2197 [hci0] 321.343585
+      Accept Synchronous Connection Request (0x01|0x0029) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Synchronous Connect Comp.. (0x2c) plen 17  #2198 [hci0] 321.351666
+        Status: Success (0x00)
+        Handle: 257
+        Address: 1C:CC:D6:E2:EA:80 (Xiaomi Communications Co Ltd)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x0c
+        Retransmission window: 0x04
+        RX packet length: 60
+        TX packet length: 60
+        Air mode: Transparent (0x03)
+........
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2336 [hci0] 321.383655
+< SCO Data TX: Handle 257 flags 0x00 dlen 60            #2337 [hci0] 321.389558
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2338 [hci0] 321.393615
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2339 [hci0] 321.393618
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2340 [hci0] 321.393618
+< SCO Data TX: Handle 257 flags 0x00 dlen 60            #2341 [hci0] 321.397070
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2342 [hci0] 321.403622
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2343 [hci0] 321.403625
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2344 [hci0] 321.403625
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2345 [hci0] 321.403625
+< SCO Data TX: Handle 257 flags 0x00 dlen 60            #2346 [hci0] 321.404569
+< SCO Data TX: Handle 257 flags 0x00 dlen 60            #2347 [hci0] 321.412091
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2348 [hci0] 321.413626
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2349 [hci0] 321.413630
+> SCO Data RX: Handle 257 flags 0x00 dlen 48            #2350 [hci0] 321.413630
+< SCO Data TX: Handle 257 flags 0x00 dlen 60            #2351 [hci0] 321.419674
 
-are available in the Git repository at:
+After fix:
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-04-08
+< HCI Command: Accept Synchronou.. (0x01|0x0029) plen 21  #309 [hci0] 49.439693
+        Address: 1C:CC:D6:E2:EA:80 (Xiaomi Communications Co Ltd)
+        Transmit bandwidth: 8000
+        Receive bandwidth: 8000
+        Max latency: 13
+        Setting: 0x0003
+          Input Coding: Linear
+          Input Data Format: 1's complement
+          Input Sample Size: 8-bit
+          # of bits padding at MSB: 0
+          Air Coding Format: Transparent Data
+        Retransmission effort: Optimize for link quality (0x02)
+        Packet type: 0x003f
+          HV1 may be used
+          HV2 may be used
+          HV3 may be used
+          EV3 may be used
+          EV4 may be used
+          EV5 may be used
+> HCI Event: Command Status (0x0f) plen 4                 #310 [hci0] 49.440308
+      Accept Synchronous Connection Request (0x01|0x0029) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Synchronous Connect Complete (0x2c) plen 17  #311 [hci0] 49.449308
+        Status: Success (0x00)
+        Handle: 257
+        Address: 1C:CC:D6:E2:EA:80 (Xiaomi Communications Co Ltd)
+        Link type: eSCO (0x02)
+        Transmission interval: 0x0c
+        Retransmission window: 0x04
+        RX packet length: 60
+        TX packet length: 60
+        Air mode: Transparent (0x03)
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #312 [hci0] 49.450421
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #313 [hci0] 49.457927
+> HCI Event: Max Slots Change (0x1b) plen 3               #314 [hci0] 49.460345
+        Handle: 256
+        Max slots: 5
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #315 [hci0] 49.465453
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #316 [hci0] 49.470502
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #317 [hci0] 49.470519
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #318 [hci0] 49.472996
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #319 [hci0] 49.480412
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #320 [hci0] 49.480492
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #321 [hci0] 49.487989
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #322 [hci0] 49.490303
+< SCO Data TX: Handle 257 flags 0x00 dlen 60              #323 [hci0] 49.495496
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #324 [hci0] 49.500304
+> SCO Data RX: Handle 257 flags 0x00 dlen 60              #325 [hci0] 49.500311
 
-for you to fetch changes up to a61d67188f29ff678e94fb3ffba6c6d292e852c7:
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Lokendra Singh <lokendra.singh@intel.com>
+---
+ net/bluetooth/hci_event.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-  Bluetooth: Allow Microsoft extension to indicate curve validation (2021-04-08 12:26:34 +0200)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 016b2999f219..47166cea68bb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4404,12 +4404,12 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+ 
+ 	bt_dev_dbg(hdev, "SCO connected with air mode: %02x", ev->air_mode);
+ 
+-	switch (conn->setting & SCO_AIRMODE_MASK) {
+-	case SCO_AIRMODE_CVSD:
++	switch (ev->air_mode) {
++	case 0x02:
+ 		if (hdev->notify)
+ 			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
+ 		break;
+-	case SCO_AIRMODE_TRANSP:
++	case 0x03:
+ 		if (hdev->notify)
+ 			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_TRANSP);
+ 		break;
+-- 
+2.17.1
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Proper support for BCM4330 and BMC4334
- - Various improvements for firmware download of Intel controllers
- - Update management interface revision to 20
- - Support for AOSP HCI vendor commands
- - Initial Virtio support
-
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-
-----------------------------------------------------------------
-Abhishek Pandit-Subedi (2):
-      Bluetooth: Notify suspend on le conn failed
-      Bluetooth: Remove unneeded commands for suspend
-
-Archie Pusaka (4):
-      Bluetooth: Set CONF_NOT_COMPLETE as l2cap_chan default
-      Bluetooth: verify AMP hci_chan before amp_destroy
-      Bluetooth: check for zapped sk before connecting
-      Bluetooth: Check inquiry status before sending one
-
-Arnd Bergmann (1):
-      Bluetooth: fix set_ecdh_privkey() prototype
-
-Ayush Garg (1):
-      Bluetooth: Fix incorrect status handling in LE PHY UPDATE event
-
-Bhaskar Chowdhury (2):
-      Bluetooth: hci_qca: Mundane typo fix
-      Bluetooth: L2CAP: Rudimentary typo fixes
-
-Daniel Winkler (3):
-      Bluetooth: Allow scannable adv with extended MGMT APIs
-      Bluetooth: Use ext adv handle from requests in CCs
-      Bluetooth: Do not set cur_adv_instance in adv param MGMT request
-
-Jiri Kosina (1):
-      Bluetooth: avoid deadlock between hci_dev->lock and socket lock
-
-Kai Ye (1):
-      Bluetooth: use the correct print format for L2CAP debug statements
-
-Kiran K (2):
-      Bluetooth: btusb: print firmware file name on error loading firmware
-      Bluetooth: btintel: Fix offset calculation boot address parameter
-
-Linus Walleij (4):
-      Bluetooth: btbcm: Rewrite bindings in YAML and add reset
-      Bluetooth: btbcm: Obtain and handle reset GPIO
-      Bluetooth: btbcm: Add BCM4334 DT binding
-      Bluetooth: btbcm: Add BCM4330 and BCM4334 compatibles
-
-Lokendra Singh (3):
-      Bluetooth: btintel: Reorganized bootloader mode tlv checks in intel_version_tlv parsing
-      Bluetooth: btintel: Collect tlv based active firmware build info in FW mode
-      Bluetooth: btintel: Skip reading firmware file version while in bootloader mode
-
-Luiz Augusto von Dentz (10):
-      Bluetooth: SMP: Fail if remote and local public keys are identical
-      Bluetooth: L2CAP: Fix not checking for maximum number of DCID
-      Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
-      Bluetooth: btintel: Check firmware version before download
-      Bluetooth: btintel: Move operational checks after version check
-      Bluetooth: btintel: Consolidate intel_version_tlv parsing
-      Bluetooth: btintel: Consolidate intel_version parsing
-      Bluetooth: btusb: Consolidate code for waiting firmware download
-      Bluetooth: btusb: Consolidate code for waiting firmware to boot
-      Bluetooth: SMP: Fix variable dereferenced before check 'conn'
-
-Marcel Holtmann (10):
-      Bluetooth: Fix mgmt status for LL Privacy experimental feature
-      Bluetooth: Fix wrong opcode error for read advertising features
-      Bluetooth: Add missing entries for PHY configuration commands
-      Bluetooth: Move the advertisement monitor events to correct list
-      Bluetooth: Increment management interface revision
-      Bluetooth: Add support for reading AOSP vendor capabilities
-      Bluetooth: Add support for virtio transport driver
-      Bluetooth: Fix default values for advertising interval
-      Bluetooth: Set defaults for le_scan_{int,window}_adv_monitor
-      Bluetooth: Allow Microsoft extension to indicate curve validation
-
-Meng Yu (4):
-      Bluetooth: Remove trailing semicolon in macros
-      Bluetooth: Remove trailing semicolon in macros
-      Bluetooth: Remove 'return' in void function
-      Bluetooth: Coding style fix
-
-Rasmus Moorats (1):
-      Bluetooth: btusb: support 0cb5:c547 Realtek 8822CE device
-
-Sathish Narasimman (2):
-      Bluetooth: Handle own address type change with HCI_ENABLE_LL_PRIVACY
-      Bluetooth: LL privacy allow RPA
-
-Sonny Sasaka (1):
-      Bluetooth: Cancel le_scan_restart work when stopping discovery
-
-Tetsuo Handa (1):
-      Bluetooth: initialize skb_queue_head at l2cap_chan_create()
-
-Venkata Lakshmi Narayana Gubba (1):
-      Bluetooth: hci_qca: Add device_may_wakeup support
-
-mark-yw.chen (2):
-      Bluetooth: btusb: Fix incorrect type in assignment and uninitialized symbol
-      Bluetooth: btusb: Enable quirk boolean flag for Mediatek Chip.
-
- .../devicetree/bindings/net/broadcom-bluetooth.txt |  56 ---
- .../bindings/net/broadcom-bluetooth.yaml           | 118 ++++++
- .../devicetree/bindings/serial/ingenic,uart.yaml   |   2 +-
- drivers/bluetooth/Kconfig                          |  10 +
- drivers/bluetooth/Makefile                         |   2 +
- drivers/bluetooth/btintel.c                        | 232 ++++++++++--
- drivers/bluetooth/btintel.h                        |  19 +-
- drivers/bluetooth/btusb.c                          | 408 ++++++++-------------
- drivers/bluetooth/hci_bcm.c                        |  19 +
- drivers/bluetooth/hci_intel.c                      |   7 +-
- drivers/bluetooth/hci_qca.c                        |  17 +-
- drivers/bluetooth/virtio_bt.c                      | 401 ++++++++++++++++++++
- include/net/bluetooth/hci.h                        |   1 +
- include/net/bluetooth/hci_core.h                   |  17 +-
- include/net/bluetooth/l2cap.h                      |   1 +
- include/net/bluetooth/mgmt.h                       |   1 +
- include/uapi/linux/virtio_bt.h                     |  31 ++
- include/uapi/linux/virtio_ids.h                    |   1 +
- net/bluetooth/6lowpan.c                            |   5 +-
- net/bluetooth/Kconfig                              |   7 +
- net/bluetooth/Makefile                             |   1 +
- net/bluetooth/aosp.c                               |  35 ++
- net/bluetooth/aosp.h                               |  16 +
- net/bluetooth/ecdh_helper.h                        |   2 +-
- net/bluetooth/hci_conn.c                           |  14 +-
- net/bluetooth/hci_core.c                           |   5 +
- net/bluetooth/hci_debugfs.c                        |   8 +-
- net/bluetooth/hci_event.c                          |  50 ++-
- net/bluetooth/hci_request.c                        |  67 ++--
- net/bluetooth/l2cap_core.c                         |  43 ++-
- net/bluetooth/l2cap_sock.c                         |   8 +
- net/bluetooth/mgmt.c                               |  19 +-
- net/bluetooth/msft.c                               |   8 +
- net/bluetooth/msft.h                               |   6 +
- net/bluetooth/sco.c                                |   4 +-
- net/bluetooth/smp.c                                | 113 +++---
- 36 files changed, 1289 insertions(+), 465 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.txt
- create mode 100644 Documentation/devicetree/bindings/net/broadcom-bluetooth.yaml
- create mode 100644 drivers/bluetooth/virtio_bt.c
- create mode 100644 include/uapi/linux/virtio_bt.h
- create mode 100644 net/bluetooth/aosp.c
- create mode 100644 net/bluetooth/aosp.h
