@@ -2,112 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75C4DC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:39:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43BD0C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:42:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 517DC610D1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:39:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AEE9610D1
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:42:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233288AbhDINji (ORCPT
+        id S233865AbhDINmq convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Apr 2021 09:39:38 -0400
-Received: from userp2120.oracle.com ([156.151.31.85]:52728 "EHLO
-        userp2120.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231638AbhDINji (ORCPT
+        Fri, 9 Apr 2021 09:42:46 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47414 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233700AbhDINmn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Apr 2021 09:39:38 -0400
-Received: from pps.filterd (userp2120.oracle.com [127.0.0.1])
-        by userp2120.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 139Dd2pb160673
-        for <linux-bluetooth@vger.kernel.org>; Fri, 9 Apr 2021 13:39:25 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to :
- subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=h56VINJys518SBrHJ/KsmE4/VqMzqSFYYELQR+6XRl0=;
- b=d4sQksBpkIupIeMTQVVzKtLrXCHcDcMFeWKaG1fczHv486mmrFzDYhdSIaicc0AHGTmD
- mafbC8yzVo/OyVjPPTaynfcqStnVH9SKVf1dx45wMMcjoch5dGPn0ApDMH9TGkX3nQwR
- C6+eS3Nd8PnF1kzsFW1LRAkfcArKxFhueTc0xRZ5i/5oOCzyBArAbdhGyAj/e8doZSPm
- uZ6zreMeQTJkTSlzAwU7VvxKtWO7su8A78GhYcNLkxKbHKE73BKnrJvgAUhge0o6IRFu
- O4xbHeBHl66O4GxE7+TA6OgjbRoO/7cfhjFSLpll8REd4zeCqyRj6W3FjTMHjk0Cv8Qu Cw== 
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by userp2120.oracle.com with ESMTP id 37rvas9egq-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK)
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Apr 2021 13:39:24 +0000
-Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
-        by aserp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 139DaDW4029211;
-        Fri, 9 Apr 2021 13:39:23 GMT
-Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
-        by aserp3030.oracle.com with ESMTP id 37rvbhmgdy-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Fri, 09 Apr 2021 13:39:22 +0000
-Received: from abhmp0010.oracle.com (abhmp0010.oracle.com [141.146.116.16])
-        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 139DdMjU029380;
-        Fri, 9 Apr 2021 13:39:22 GMT
-Received: from kadam (/102.36.221.92)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Fri, 09 Apr 2021 06:39:22 -0700
-Date:   Fri, 9 Apr 2021 16:39:14 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: Re: Bluetooth: btintel: prevent buffer overflow in
- btintel_read_version_tlv()
-Message-ID: <20210409133914.GP6048@kadam>
-References: <YHBCNqdojHJT2usi@mwanda>
- <60705678.1c69fb81.97cbe.bb64@mx.google.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <60705678.1c69fb81.97cbe.bb64@mx.google.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-IMR: 1
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9949 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxlogscore=999
- malwarescore=0 mlxscore=0 phishscore=0 spamscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104090101
-X-Proofpoint-GUID: JAXuTO6dOWjxuadvM9Y3epL0b21pJfo-
-X-Proofpoint-ORIG-GUID: JAXuTO6dOWjxuadvM9Y3epL0b21pJfo-
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9949 signatures=668683
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 lowpriorityscore=0 adultscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 clxscore=1015
- bulkscore=0 mlxscore=0 phishscore=0 spamscore=0 suspectscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2104060000 definitions=main-2104090102
+        Fri, 9 Apr 2021 09:42:43 -0400
+Received: from marcel-macbook.holtmann.net (p5b3d235a.dip0.t-ipconnect.de [91.61.35.90])
+        by mail.holtmann.org (Postfix) with ESMTPSA id CF757CECC3;
+        Fri,  9 Apr 2021 15:50:12 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
+Subject: Re: [PATCH resend] Bluetooth: hci_h5: Disable the
+ hci_suspend_notifier for btrtl devices
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210405203602.17151-1-hdegoede@redhat.com>
+Date:   Fri, 9 Apr 2021 15:42:28 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Vasily Khoruzhick <anarsoul@gmail.com>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <97C75BD6-0F0F-4030-8202-388BF4D8BA5F@holtmann.org>
+References: <20210405203602.17151-1-hdegoede@redhat.com>
+To:     Hans de Goede <hdegoede@redhat.com>
+X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Apr 09, 2021 at 06:28:24AM -0700, bluez.test.bot@gmail.com wrote:
-> This is automated email and please do not reply to this email!
-  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Hi Hans,
 
-LOL, just did! #ANARCHIST
+> The hci_suspend_notifier which was introduced last year, is causing
+> problems for uart attached btrtl devices. These devices may loose their
+> firmware and their baudrate setting over a suspend/resume.
+> 
+> Since we don't even know the baudrate after a suspend/resume recovering
+> from this is tricky. The driver solves this by treating these devices
+> the same as USB BT HCIs which drop of the bus during suspend.
+> 
+> Specifically the driver:
+> 1. Simply unconditionally turns the device fully off during
+>   system-suspend to save maximum power.
+> 2. Calls device_reprobe() from a workqueue to fully re-init the device
+>   from scratch on system-resume (unregistering the old HCI and
+>   registering a new HCI).
+> 
+> This means that these devices do not benefit from the suspend / resume
+> handling work done by the hci_suspend_notifier. At best this unnecessarily
+> adds some time to the suspend/resume time.
+> 
+> But in practice this is actually causing problems:
+> 
+> 1. These btrtl devices seem to not like the HCI_OP_WRITE_SCAN_ENABLE(
+> SCAN_DISABLED) request being send to them when entering the
+> BT_SUSPEND_CONFIGURE_WAKE state. The same request send on
+> BT_SUSPEND_DISCONNECT works fine, but the second one send (unnecessarily?)
+> from the BT_SUSPEND_CONFIGURE_WAKE transition causes the device to hang:
+> 
+> [  573.497754] PM: suspend entry (s2idle)
+> [  573.554615] Filesystems sync: 0.056 seconds
+> [  575.837753] Bluetooth: hci0: Timed out waiting for suspend events
+> [  575.837801] Bluetooth: hci0: Suspend timeout bit: 4
+> [  575.837925] Bluetooth: hci0: Suspend notifier action (3) failed: -110
+> 
+> 2. The PM_POST_SUSPEND / BT_RUNNING transition races with the
+> driver-unbinding done by the device_reprobe() work.
+> If the hci_suspend_notifier wins the race it is talking to a dead
+> device leading to the following errors being logged:
+> 
+> [  598.686060] Bluetooth: hci0: Timed out waiting for suspend events
+> [  598.686124] Bluetooth: hci0: Suspend timeout bit: 5
+> [  598.686237] Bluetooth: hci0: Suspend notifier action (4) failed: -110
+> 
+> In both cases things still work, but the suspend-notifier is causing
+> these ugly errors getting logged and ut increase both the suspend- and
+> the resume-time by 2 seconds.
+> 
+> This commit avoids these problems by disabling the hci_suspend_notifier.
+> 
+> Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Cc: Vasily Khoruzhick <anarsoul@gmail.com>
+> Cc: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> Changes in v2:
+> - Use the new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk, instead of directly
+>  unregistering the notifier from hci_h5.c
+> ---
+> drivers/bluetooth/hci_h5.c     |  7 +++++++
+> drivers/bluetooth/hci_serdev.c |  3 +++
+> drivers/bluetooth/hci_uart.h   | 13 +++++++------
+> 3 files changed, 17 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 27e96681d583..d79b7bbe6d94 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -919,6 +919,13 @@ static int h5_btrtl_setup(struct h5 *h5)
+> 
+> static void h5_btrtl_open(struct h5 *h5)
+> {
+> +	/*
+> +	 * Since h5_btrtl_resume() does a device_reprobe() the suspend handling
+> +	 * done by the hci_suspend_notifier is not necessary; it actually causes
+> +	 * delays and a bunch of errors to get logged, so disable it.
+> +	 */
+> +	set_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &h5->hu->hdev_flags);
+> +
+> 	/* Devices always start with these fixed parameters */
+> 	serdev_device_set_flow_control(h5->hu->serdev, false);
+> 	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
+> diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+> index 9e03402ef1b3..113045e98c19 100644
+> --- a/drivers/bluetooth/hci_serdev.c
+> +++ b/drivers/bluetooth/hci_serdev.c
+> @@ -349,6 +349,9 @@ int hci_uart_register_device(struct hci_uart *hu,
+> 	if (test_bit(HCI_UART_EXT_CONFIG, &hu->hdev_flags))
+> 		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
+> 
+> +	if (test_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &hu->hdev_flags))
+> +		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
+> +
+> 	if (test_bit(HCI_UART_CREATE_AMP, &hu->hdev_flags))
+> 		hdev->dev_type = HCI_AMP;
+> 	else
+> diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+> index 4e039d7a16f8..4df2330ac103 100644
+> --- a/drivers/bluetooth/hci_uart.h
+> +++ b/drivers/bluetooth/hci_uart.h
+> @@ -35,12 +35,13 @@
+> #define HCI_UART_NOKIA	10
+> #define HCI_UART_MRVL	11
+> 
+> -#define HCI_UART_RAW_DEVICE	0
+> -#define HCI_UART_RESET_ON_INIT	1
+> -#define HCI_UART_CREATE_AMP	2
+> -#define HCI_UART_INIT_PENDING	3
+> -#define HCI_UART_EXT_CONFIG	4
+> -#define HCI_UART_VND_DETECT	5
+> +#define HCI_UART_RAW_DEVICE		0
+> +#define HCI_UART_RESET_ON_INIT		1
+> +#define HCI_UART_CREATE_AMP		2
+> +#define HCI_UART_INIT_PENDING		3
+> +#define HCI_UART_EXT_CONFIG		4
+> +#define HCI_UART_VND_DETECT		5
+> +#define HCI_UART_NO_SUSPEND_NOTIFIER	6
 
-> 
-> Dear submitter,
-> 
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=464363 
-> 
-> ---Test result---
-> 
-> ##############################
-> Test: CheckPatch - FAIL
-> Bluetooth: btintel: prevent buffer overflow in btintel_read_version_tlv()
-> WARNING: Unknown commit id '57375beef71a', maybe rebased or not pulled?
-                              ^^^^^^^^^^^^
-This commit is from last Sept so probably the problem is on your end.
+not really happy using these values here. They are for the ioctl API. Any chance you can just use hu->flags for this?
 
-> #15: 
-> Fixes: 57375beef71a ("Bluetooth: btintel: Add infrastructure to read controller information")
-> 
-> total: 0 errors, 1 warnings, 16 lines checked
+Regards
 
-regards,
-dan carpenter
+Marcel
 
