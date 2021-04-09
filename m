@@ -2,65 +2,66 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C39C3C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 17:02:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC7EAC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 17:15:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9E64F610F7
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 17:02:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E978610A3
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 17:15:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234071AbhDIRCa (ORCPT
+        id S233896AbhDIRPn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Apr 2021 13:02:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33842 "EHLO
+        Fri, 9 Apr 2021 13:15:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36718 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233332AbhDIRC2 (ORCPT
+        with ESMTP id S231946AbhDIRPm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Apr 2021 13:02:28 -0400
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F39E6C061760
-        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Apr 2021 10:02:11 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id w21-20020a9d63950000b02901ce7b8c45b4so6332158otk.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Apr 2021 10:02:11 -0700 (PDT)
+        Fri, 9 Apr 2021 13:15:42 -0400
+Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C04EC061760
+        for <linux-bluetooth@vger.kernel.org>; Fri,  9 Apr 2021 10:15:28 -0700 (PDT)
+Received: by mail-ot1-x32c.google.com with SMTP id 101-20020a9d0d6e0000b02902816815ff62so505425oti.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 09 Apr 2021 10:15:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=AlcmUeHXPpsvej4Ys+csMJ9Vx7vt7TLl9vqazEWvbgI=;
-        b=dP6LAYrTKsr5VMtAJSbuZCwr7G8prXL/PO8nV4Q6JX0HzWzGoih74jlxyLOxCgaQyW
-         3q1sgd4PfaSvQeTyRrtt9thWA1v4FK98HdpuA0DW5OoV+qFk6E/VL4jXeMrBcrd8QI2k
-         lK8RR2Ds0jCU24SBDZujDnVY3gPBL6cXrmsmGyBkLYRkAtlptQNyXGrW4t3HtMv5oz8u
-         U5C1mWTYsTp5uDYQprGZ/cbMXqpbWhP2vgNBQuhIjT1MTOzXhhhRfgIi6P3Gc2aPmSpQ
-         QwtnEDtiOv/jfZnMTO15UrtAvGhC902XTWteoX9MpRPJ3QOdVOlqlXDjL2dawN+MnYBu
-         z40Q==
+        bh=YsGx5WpKFFlvGSMTwpXNxBD6YkC6mTr6sth5Z11B1Xg=;
+        b=hkAH0wWetpkkTkZdKU1ZYWwzT5QjEk9MFUjtuxEM4zzGGKHFGEkxMQeSFTfrIv/99E
+         860OPD7IQK/ANXtDTPbBlMuLpfmjO2OkcfCUKP9835RT1DaOPR/8fEXycPRFXKmN1yys
+         WzT5MPS/sJEVoY48OoO0Tcdz+6vgE25TeZD1v7LzDdpFxzgEXyg7oEgYCQ7ok3An1OAO
+         HBp6SaPzUIpIdHu4iGFN0vRPDySlpLfnzU9YZhx0ZlGgizvBJ2sE+EloWBm6uf+9OBcl
+         /9BHsnd3dBkyUfAThhLOHywIF14XQnIUZRFFEX3BEayyPPTFMtaY0zky044RuuVRMtsW
+         sG4Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=AlcmUeHXPpsvej4Ys+csMJ9Vx7vt7TLl9vqazEWvbgI=;
-        b=LZKA6Q3ilOml7t40epKpTPqxh5jRtez6ZtIE9YaHkKTAt8GRGhR4+Q8NrumttZpyT9
-         CuCUt+ObpAYRbduUawmc4TBAjipLX/+SQy9xrVhOvUPnVLr1GY66JE14fo9+nnb2bZR4
-         U60LjdDT7TT2XdYFkpHxo6sl7nHrTiQm48hISoMnGLL/QH1Cd0fUJnnjVVED8SzYkrdC
-         BfP0JcjlkNliN5h6qDa4h5FPMzyjjtEYoHLvNV/lV6XEXWSoHBZlhaDJdtllzBTdo50V
-         AXnPwesogGADfjmh/7r9YWijViGjSWRux2GOfjp0jsc0gjD8xA1DZy7g0XMNYO2JEMG8
-         Xsiw==
-X-Gm-Message-State: AOAM531vxkSaYuX9o4mEoBm3tSFABJ35HDgrst0qQbSSDofgMbjpPQBl
-        EAmplg+ci2coXnlXhLr70uTNF5xZ8FA6dyeBYeQ=
-X-Google-Smtp-Source: ABdhPJxAAPQpFCTQAyW3/wK2tbhO4KCGq41Xiuqr/kz0kK1oJRpn3y+y4TF/8eyG7eAB8usi4792Pg/09LdKEh8/IjU=
-X-Received: by 2002:a9d:7cd2:: with SMTP id r18mr13470730otn.240.1617987731252;
- Fri, 09 Apr 2021 10:02:11 -0700 (PDT)
+        bh=YsGx5WpKFFlvGSMTwpXNxBD6YkC6mTr6sth5Z11B1Xg=;
+        b=HzOrhuST1I5Brg8Z6REv0u/+/bdiuG26Wb4DftrEvHzpN/OeKn7eYPKmfzfUiMo3mZ
+         t8ZtFyQEptQsznf/gVLOtOGJsAKZOsJa8NdtCN2mTByFqxjy518dEu2ZNYUwThswiHgm
+         zKGWiJkYiCSy0Kfl+OLGkMxPO9QH2iV+8X26mKo5LmnP0HruceUpnE8RaHzCKFfktL/I
+         PEfeXw310T+XjAe2RpAN02Jws8nE7YosKEQC2G4FrrdX0xd2QgRKFq/KPz9jl/7yOWAl
+         QY0Ld05YB/ldpj9oTIIFln4olECbUCy6bkAV2zW0nmrR4tFY+DLkRLwinxPcXGYsX11n
+         qgJA==
+X-Gm-Message-State: AOAM533iKjAZDB6RxzturJIGj6SeOOFnS9vBPsRnr61gYjI4pRejW5S0
+        NCEqTib8tE88cC5MF11VXiHi5c8HACT/UCfCy4c=
+X-Google-Smtp-Source: ABdhPJzQmsy9Y4TIF8qhFP0U5p77n4YQLYpOViTSoTaSrmnLDgXzWi7jVYkZabQ2we3ibRNLYnuWh9bqeRNOBaj16vw=
+X-Received: by 2002:a9d:7cd2:: with SMTP id r18mr13517766otn.240.1617988527694;
+ Fri, 09 Apr 2021 10:15:27 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210409122405.29850-1-kiran.k@intel.com> <20210409122405.29850-2-kiran.k@intel.com>
-In-Reply-To: <20210409122405.29850-2-kiran.k@intel.com>
+References: <20210409122405.29850-1-kiran.k@intel.com> <20210409122405.29850-3-kiran.k@intel.com>
+In-Reply-To: <20210409122405.29850-3-kiran.k@intel.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 9 Apr 2021 10:02:00 -0700
-Message-ID: <CABBYNZLm5jqbzDVNLRG4G1bSgK8AwCPmz_gjGZ92Oo2EZxfpvQ@mail.gmail.com>
-Subject: Re: [PATCH v1 1/3] Bluetooth: add support to enumerate codec capabilities
+Date:   Fri, 9 Apr 2021 10:15:16 -0700
+Message-ID: <CABBYNZKBuUAB9-Sq72F_XJr57woD4tC2N01jtNnSLhsRsXkomw@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] Bluetooth: add support to enumerate local supports
+ codecs v2
 To:     Kiran K <kiran.k@intel.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
@@ -75,8 +76,39 @@ Hi Kiran,
 
 On Fri, Apr 9, 2021 at 5:21 AM Kiran K <kiran.k@intel.com> wrote:
 >
-> add support to enumerate local supported codec capabilities
+> Add support for HCI_Read_Local_Supported_Codecs_V2 and query codec
+> capabilities
 >
+> snoop:
+> > HCI Event: Command Complete (0x0e) plen 20
+>       Read Local Supported Codecs V2 (0x04|0x000d) ncmd 1
+>         Status: Success (0x00)
+>         Number of supported codecs: 7
+>           Codec: u-law log (0x00)
+>           Logical Transport Type: 0x02
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: A-law log (0x01)
+>           Logical Transport Type: 0x02
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: CVSD (0x02)
+>           Logical Transport Type: 0x02
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: Transparent (0x03)
+>           Logical Transport Type: 0x02
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: Linear PCM (0x04)
+>           Logical Transport Type: 0x02
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: Reserved (0x08)
+>           Logical Transport Type: 0x03
+>             Codec supported over BR/EDR ACL
+>             Codec supported over BR/EDR SCO and eSCO
+>           Codec: mSBC (0x05)
+>           Logical Transport Type: 0x03
+>             Codec supported over BR/EDR ACL
+>             Codec supported over BR/EDR SCO and eSCO
+>         Number of vendor codecs: 0
+> ......
 > < HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
 >         Codec: mSBC (0x05)
 >         Logical Transport Type: 0x00
@@ -92,40 +124,76 @@ On Fri, Apr 9, 2021 at 5:21 AM Kiran K <kiran.k@intel.com> wrote:
 > Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 > Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 > ---
->  include/net/bluetooth/hci.h |  7 +++++
->  net/bluetooth/hci_event.c   | 56 +++++++++++++++++++++++++++++++++++++
->  2 files changed, 63 insertions(+)
+>  include/net/bluetooth/hci.h      |  2 +
+>  include/net/bluetooth/hci_core.h | 10 ++++
+>  net/bluetooth/hci_core.c         |  4 +-
+>  net/bluetooth/hci_event.c        | 98 ++++++++++++++++++++++++++++++++
+>  4 files changed, 113 insertions(+), 1 deletion(-)
 >
 > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ea4ae551c426..e3f7771fe84f 100644
+> index e3f7771fe84f..34eb9f4b027f 100644
 > --- a/include/net/bluetooth/hci.h
 > +++ b/include/net/bluetooth/hci.h
-> @@ -1314,6 +1314,13 @@ struct hci_rp_read_local_pairing_opts {
+> @@ -1314,6 +1314,8 @@ struct hci_rp_read_local_pairing_opts {
 >         __u8     max_key_size;
 >  } __packed;
 >
-> +#define HCI_OP_READ_LOCAL_CODEC_CAPS   0x100e
-> +struct hci_op_read_local_codec_caps {
-> +       __u8    codec_id[5];
-> +       __u8    transport;
-> +       __u8    direction;
-> +} __packed;
+> +#define HCI_OP_READ_LOCAL_CODECS_V2    0x100d
 > +
->  #define HCI_OP_READ_PAGE_SCAN_ACTIVITY 0x0c1b
->  struct hci_rp_read_page_scan_activity {
->         __u8     status;
+>  #define HCI_OP_READ_LOCAL_CODEC_CAPS   0x100e
+>  struct hci_op_read_local_codec_caps {
+>         __u8    codec_id[5];
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index c73ac52af186..fa0c68fd3306 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1848,4 +1848,14 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+>  #define SCO_AIRMODE_CVSD       0x0000
+>  #define SCO_AIRMODE_TRANSP     0x0003
+>
+> +#define LOCAL_CODEC_ACL_MASK   BIT(0)
+> +#define LOCAL_CODEC_SCO_MASK   BIT(1)
+> +#define LOCAL_CODEC_LECIS_MASK BIT(2)
+> +#define LOCAL_CODEC_LEBIS_MASK BIT(3)
+
+Not need to use the LE prefix, just CIS and BIS alone should be clear.
+
+> +
+> +#define LOCAL_CODEC_ACL                0x00
+> +#define LOCAL_CODEC_SCO                0x01
+> +#define LOCAL_CODEC_LECIS      0x02
+> +#define LOCAL_CODEC_LEBIS      0x03
+
+Ditto.
+
+>  #endif /* __HCI_CORE_H */
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index fd12f1652bdf..230aeedd6d00 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -839,7 +839,9 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+>                 hci_set_event_mask_page_2(req);
+>
+>         /* Read local codec list if the HCI command is supported */
+> -       if (hdev->commands[29] & 0x20)
+> +       if (hdev->commands[45] & 0x04)
+> +               hci_req_add(req, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL);
+> +       else if (hdev->commands[29] & 0x20)
+>                 hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+>
+>         /* Read local pairing options if the HCI command is supported */
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 016b2999f219..ceed5a5d332b 100644
+> index ceed5a5d332b..a16723c89dc6 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -887,6 +887,58 @@ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
->                hdev->block_cnt, hdev->block_len);
+> @@ -939,6 +939,100 @@ static void hci_cc_read_local_codecs(struct hci_dev *hdev,
+>         }
 >  }
 >
-> +static void hci_cc_read_local_codecs(struct hci_dev *hdev,
-> +                                    struct sk_buff *skb)
+> +static void hci_cc_read_local_codecs_v2(struct hci_dev *hdev,
+> +                                       struct sk_buff *skb)
 > +{
-> +       __u8 num_codecs;
+> +       __u8 num_codecs, transport;
 > +       __u8 *ptr;
 > +       struct hci_op_read_local_codec_caps caps;
 > +
@@ -136,39 +204,58 @@ On Fri, Apr 9, 2021 at 5:21 AM Kiran K <kiran.k@intel.com> wrote:
 > +
 > +       /* enumerate standard codecs */
 > +       skb_pull(skb, 1);
-
-After each skb_pull check the expected length against skb->len.
-
 > +       num_codecs = skb->data[0];
 > +
-> +       bt_dev_dbg(hdev, "Number of standard codecs: %u", num_codecs);
+> +       bt_dev_info(hdev, "Number of standard codecs: %u", num_codecs);
 > +
 > +       skb_pull(skb, 1);
-
-Ditto.
-
 > +       ptr = (__u8 *)skb->data;
 > +
-> +       skb_pull(skb, num_codecs);
-> +
+> +       skb_pull(skb, num_codecs * 2);
+
+The above would likely cause crashes if the event is malformed
+(num_codecs exceeds the skb->len).
+
 > +       while (num_codecs--) {
 > +               caps.codec_id[0] = *ptr++;
+> +               transport = *ptr++;
 
-Lets just use skb_pull to advance on the codecs ids, that way we can
-properly check the remaining length with use of skb->len.
+Like I said in the other patch, let's not use another pointer to
+advance in the packet when we can use skb_pull after checking the
+skb->len.
 
-> +               caps.transport = 0x00;
 > +               caps.direction = 0x00;
 > +
-> +               hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
-> +                            &caps);
+> +               if (transport & LOCAL_CODEC_ACL_MASK) {
+> +                       caps.transport = LOCAL_CODEC_ACL;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_SCO_MASK) {
+> +                       caps.transport = LOCAL_CODEC_SCO;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_LEBIS_MASK) {
+> +                       caps.transport = LOCAL_CODEC_LEBIS;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_LECIS_MASK) {
+> +                       caps.transport = LOCAL_CODEC_LECIS;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
 > +       }
 > +
 > +       /* enumerate vendor specific codecs */
 > +       num_codecs = skb->data[0];
 > +       skb_pull(skb, 1);
 > +
-> +       bt_dev_dbg(hdev, "Number of vendor specific codecs: %u", num_codecs);
+> +       bt_dev_info(hdev, "Number of vendor specific codecs: %u", num_codecs);
 > +
 > +       ptr = (__u8 *)skb->data;
 > +
@@ -176,23 +263,44 @@ properly check the remaining length with use of skb->len.
 > +               caps.codec_id[0] = 0xFF;
 > +               memcpy(&caps.codec_id[1], ptr, 4);
 > +               ptr += 4;
-> +               caps.transport = 0x00;
+> +               transport = *ptr++;
 > +               caps.direction = 0x00;
 > +
-> +               hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
-> +                            &caps);
+> +               if (transport & LOCAL_CODEC_ACL_MASK) {
+> +                       caps.transport = LOCAL_CODEC_ACL;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_SCO_MASK) {
+> +                       caps.transport = LOCAL_CODEC_SCO;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_LEBIS) {
+> +                       caps.transport = LOCAL_CODEC_LEBIS;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
+> +
+> +               if (transport & LOCAL_CODEC_LECIS_MASK) {
+> +                       caps.transport = LOCAL_CODEC_LECIS;
+> +                       hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +                                    &caps);
+> +               }
 > +       }
 > +}
 > +
 >  static void hci_cc_read_clock(struct hci_dev *hdev, struct sk_buff *skb)
 >  {
 >         struct hci_rp_read_clock *rp = (void *) skb->data;
-> @@ -3437,6 +3489,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
->                 hci_cc_read_data_block_size(hdev, skb);
+> @@ -3493,6 +3587,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+>                 hci_cc_read_local_codecs(hdev, skb);
 >                 break;
 >
-> +       case HCI_OP_READ_LOCAL_CODECS:
-> +               hci_cc_read_local_codecs(hdev, skb);
+> +       case HCI_OP_READ_LOCAL_CODECS_V2:
+> +               hci_cc_read_local_codecs_v2(hdev, skb);
 > +               break;
 > +
 >         case HCI_OP_READ_FLOW_CONTROL_MODE:
