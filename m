@@ -7,75 +7,55 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22411C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:45:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A984C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:52:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E05476115B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:45:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EA2961056
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Apr 2021 13:52:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232286AbhDINp1 convert rfc822-to-8bit (ORCPT
+        id S233137AbhDINwM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Apr 2021 09:45:27 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:46857 "EHLO
+        Fri, 9 Apr 2021 09:52:12 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:40226 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231946AbhDINp0 (ORCPT
+        with ESMTP id S232642AbhDINwI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Apr 2021 09:45:26 -0400
+        Fri, 9 Apr 2021 09:52:08 -0400
 Received: from marcel-macbook.holtmann.net (p5b3d235a.dip0.t-ipconnect.de [91.61.35.90])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 57B1FCECC3;
-        Fri,  9 Apr 2021 15:52:56 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5C4A8CECC3;
+        Fri,  9 Apr 2021 15:59:37 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH 5.12 regression fix resend 1/1] Bluetooth: btusb: Revert
- Fix the autosuspend enable and disable
+Subject: Re: [PATCH] net/Bluetooth - delete unneeded variable initialization
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210405203533.17091-2-hdegoede@redhat.com>
-Date:   Fri, 9 Apr 2021 15:45:12 +0200
+In-Reply-To: <1617360389-42664-1-git-send-email-yekai13@huawei.com>
+Date:   Fri, 9 Apr 2021 15:51:53 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Hui Wang <hui.wang@canonical.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C8344B39-AED4-4F18-99F8-C822EA500FEC@holtmann.org>
-References: <20210405203533.17091-1-hdegoede@redhat.com>
- <20210405203533.17091-2-hdegoede@redhat.com>
-To:     Hans de Goede <hdegoede@redhat.com>
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <C1B92089-BE7C-4495-BAB3-8000EA3996BC@holtmann.org>
+References: <1617360389-42664-1-git-send-email-yekai13@huawei.com>
+To:     Kai Ye <yekai13@huawei.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hans,
+Hi Kai,
 
-> drivers/usb/core/hub.c: usb_new_device() contains the following:
+> Delete unneeded variable initialization.
 > 
->        /* By default, forbid autosuspend for all devices.  It will be
->         * allowed for hubs during binding.
->         */
->        usb_disable_autosuspend(udev);
-> 
-> So for anything which is not a hub, such as btusb devices, autosuspend is
-> disabled by default and we must call usb_enable_autosuspend(udev) to
-> enable it.
-> 
-> This means that the "Fix the autosuspend enable and disable" commit,
-> which drops the usb_enable_autosuspend() call when the enable_autosuspend
-> module option is true, is completely wrong, revert it.
-> 
-> This reverts commit 7bd9fb058d77213130e4b3e594115c028b708e7e.
-> 
-> Cc: Hui Wang <hui.wang@canonical.com>
-> Fixes: 7bd9fb058d77 ("Bluetooth: btusb: Fix the autosuspend enable and disable")
-> Acked-by: Hui Wang <hui.wang@canonical.com>
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> Signed-off-by: Kai Ye <yekai13@huawei.com>
 > ---
-> drivers/bluetooth/btusb.c | 7 ++-----
-> 1 file changed, 2 insertions(+), 5 deletions(-)
+> net/bluetooth/6lowpan.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-since we are already at -rc6, I think it makes more sense that you send it directly to Linus for inclusion.
-
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
+patch has been applied to bluetooth-next tree.
 
 Regards
 
