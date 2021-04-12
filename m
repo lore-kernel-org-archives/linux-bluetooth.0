@@ -2,169 +2,98 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F1647C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 01:18:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 122DDC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 03:34:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C591361210
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 01:18:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE0CA6120A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 03:34:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236329AbhDLBTP (ORCPT
+        id S236472AbhDLDfL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 11 Apr 2021 21:19:15 -0400
-Received: from mga05.intel.com ([192.55.52.43]:38958 "EHLO mga05.intel.com"
+        Sun, 11 Apr 2021 23:35:11 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43816 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235323AbhDLBTP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 11 Apr 2021 21:19:15 -0400
-IronPort-SDR: O7lp1TmJzlqrgi2oWJLOwFKIV82qRZzkznXn1L+u8X7JG2n6uCaZWNhQUxRco7xJRlftZ4wSXC
- enuaQdO9jDBw==
-X-IronPort-AV: E=McAfee;i="6000,8403,9951"; a="279382514"
-X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
-   d="scan'208";a="279382514"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Apr 2021 18:18:57 -0700
-IronPort-SDR: eHgA3nqMKyztDONxTGp4ov3XBXF6x4pRMoo5Y4ZmtCc6qqmtRJgwaQwpDSjmpY7wXt1I3sYFnb
- A1xPuPRtEwHQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,214,1613462400"; 
-   d="scan'208";a="423582051"
-Received: from lkp-server01.sh.intel.com (HELO 69d8fcc516b7) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 11 Apr 2021 18:18:56 -0700
-Received: from kbuild by 69d8fcc516b7 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1lVlE7-00004y-Mm; Mon, 12 Apr 2021 01:18:55 +0000
-Date:   Mon, 12 Apr 2021 09:18:53 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- c6bc94970af8d4eaef42491918a8cdf4f7510492
-Message-ID: <60739ffd.jqBGfRM6dqSnZZbb%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        id S235366AbhDLDfK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 11 Apr 2021 23:35:10 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 4CBF36120C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Apr 2021 03:34:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1618198493;
+        bh=hr0GXXG1DaMB+WBhpVPzf+HoOzD0rLZPmVbJ41CcdlA=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=na/OJynZQ6mQG4J7R18CCowDx4t9UAY1uzCa7zGjLti5rByyIhx1uRLhXffE4Rmv5
+         xU7ZFEhLXUD6Lo2TFBvt/XKQDdMQZBwgFgqVkt/IOYwOego5ue9NRAuv0IjhrIWDAQ
+         h8G7lJrbDYhEiceaoDof2pJIKQQe7lWGbpLUWj5vcICQnJwKlboQ8qkzKnE+tVVSVj
+         8IJ1c34Uxu+kRbes9auNIHp3tpxgdlvsp5PcREwYpt6Rv2nwOZiNrH4SEusWnz3EEU
+         vxIeBIB16JJsc7YMjKVrtfcCAaWbOut9NroE1Clq14TzyRFGEvBkP6VDFPKZKsHB2Y
+         2IJh+oTPQMBMQ==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 211969] AX200 Bluetooth audio devices disconnect after random
+ intervals
+Date:   Mon, 12 Apr 2021 03:34:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: high
+X-Bugzilla-Who: jacksondm33@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-211969-62941-pVo5SHwtVf@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-211969-62941@https.bugzilla.kernel.org/>
+References: <bug-211969-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: c6bc94970af8d4eaef42491918a8cdf4f7510492  Bluetooth: virtio_bt: add missing null pointer check on alloc_skb call return
+https://bugzilla.kernel.org/show_bug.cgi?id=3D211969
 
-elapsed time: 722m
+Jackson McClintock (jacksondm33@gmail.com) changed:
 
-configs tested: 99
-configs skipped: 2
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |jacksondm33@gmail.com
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #1 from Jackson McClintock (jacksondm33@gmail.com) ---
+I looked at the commits from version 20201218 to 20210208 of linux-firmware=
+ and
+found 3 commits which updated the firmware for Intel Bluetooth AX200, AX201,
+and AX210, which are the cards others and I seem to be having issues with. =
+I'm
+pretty sure this firmware is proprietary, so I don't know the best way to t=
+ry
+to get a fix for this bug, since kernel developers don't have access to the
+source code. I did notice that that these were updated again, though, but t=
+he
+bug stills exists as of linux-firmware version 20210315.
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-x86_64                           allyesconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-nios2                               defconfig
-sh                   sh7724_generic_defconfig
-sparc                            alldefconfig
-arm                            xcep_defconfig
-um                            kunit_defconfig
-powerpc                    klondike_defconfig
-mips                           rs90_defconfig
-powerpc                     taishan_defconfig
-arm                            hisi_defconfig
-arm                     am200epdkit_defconfig
-sh                                  defconfig
-sh                          landisk_defconfig
-h8300                    h8300h-sim_defconfig
-mips                  decstation_64_defconfig
-powerpc                 mpc8272_ads_defconfig
-nds32                             allnoconfig
-arm                           sama5_defconfig
-arm                          pxa910_defconfig
-powerpc                     ppa8548_defconfig
-arm                         cm_x300_defconfig
-sh                        edosk7760_defconfig
-sparc                       sparc64_defconfig
-csky                                defconfig
-sh                           se7343_defconfig
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-arc                              allyesconfig
-nds32                               defconfig
-nios2                            allyesconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-i386                 randconfig-a003-20210411
-i386                 randconfig-a001-20210411
-i386                 randconfig-a006-20210411
-i386                 randconfig-a005-20210411
-i386                 randconfig-a004-20210411
-i386                 randconfig-a002-20210411
-i386                 randconfig-a015-20210411
-i386                 randconfig-a014-20210411
-i386                 randconfig-a013-20210411
-i386                 randconfig-a012-20210411
-i386                 randconfig-a016-20210411
-i386                 randconfig-a011-20210411
-x86_64               randconfig-a003-20210411
-x86_64               randconfig-a002-20210411
-x86_64               randconfig-a001-20210411
-x86_64               randconfig-a005-20210411
-x86_64               randconfig-a006-20210411
-x86_64               randconfig-a004-20210411
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-um                               allmodconfig
-um                                allnoconfig
-um                               allyesconfig
-um                                  defconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
+These are the links to the original commits that probably created this bug:
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
+/commit/?id=3D3027ae40cf3e43725c45e53085b5e0484f09ea71
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
+/commit/?id=3D13979c3a51d068fc1b66df1065d9479bddcb418f
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
+/commit/?id=3Dd33d2d86ce3ad2ed1a4e196840fdd3a814d34433
 
-clang tested configs:
-x86_64               randconfig-a014-20210411
-x86_64               randconfig-a015-20210411
-x86_64               randconfig-a011-20210411
-x86_64               randconfig-a013-20210411
-x86_64               randconfig-a012-20210411
-x86_64               randconfig-a016-20210411
+--=20
+You may reply to this email to add a comment.
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+You are receiving this mail because:
+You are the assignee for the bug.=
