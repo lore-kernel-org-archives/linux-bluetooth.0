@@ -7,230 +7,160 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D8FDC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 19:08:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E2FC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 19:14:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 111D76120E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 19:08:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C1AE761249
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 19:14:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237361AbhDMTI0 convert rfc822-to-8bit (ORCPT
+        id S233000AbhDMTO7 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Apr 2021 15:08:26 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39578 "EHLO
+        Tue, 13 Apr 2021 15:14:59 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:49980 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244844AbhDMTIZ (ORCPT
+        with ESMTP id S231165AbhDMTO5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Apr 2021 15:08:25 -0400
+        Tue, 13 Apr 2021 15:14:57 -0400
 Received: from marcel-macbook.holtmann.net (p5b3d235a.dip0.t-ipconnect.de [91.61.35.90])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A94BECECCC;
-        Tue, 13 Apr 2021 21:15:47 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7E41ACECCD;
+        Tue, 13 Apr 2021 21:22:18 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [RFC 2/2] Bluetooth: HCI: Use bt_skb_pull to parse events
+Subject: Re: [PATCH v2 1/3] Bluetooth: add support to enumerate codec
+ capabilities
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210412184033.2504931-2-luiz.dentz@gmail.com>
-Date:   Tue, 13 Apr 2021 21:08:02 +0200
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210412083538.18600-1-kiran.k@intel.com>
+Date:   Tue, 13 Apr 2021 21:14:33 +0200
+Cc:     "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <D319A29F-E16F-469D-99D9-0770F87BC6D9@holtmann.org>
-References: <20210412184033.2504931-1-luiz.dentz@gmail.com>
- <20210412184033.2504931-2-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <3434AC21-8C36-435D-9D0F-3597FE434D54@holtmann.org>
+References: <20210412083538.18600-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Kiran,
 
-> This uses bt_skb_pull to check the events received have the minimum
-> required length, while at it also rework checks for flexible arrays to
-> use flex_array_size.
+> add support to enumerate local supported codec capabilities
 > 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> < HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
+>        Codec: mSBC (0x05)
+>        Logical Transport Type: 0x00
+>        Direction: Input (Host to Controller) (0x00)
+>> HCI Event: Command Complete (0x0e) plen 12
+>      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
+>        Status: Success (0x00)
+>        Number of codec capabilities: 1
+>         Capabilities #0:
+>        00 00 11 15 02 33
+> 
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 > ---
-> include/net/bluetooth/hci.h |  59 ++-
-> net/bluetooth/hci_event.c   | 848 ++++++++++++++++++++++++++++--------
-> 2 files changed, 722 insertions(+), 185 deletions(-)
+> * changes in v2
+>  add skb->len check before accessing event data
+> 
+> include/net/bluetooth/hci.h |  7 ++++
+> net/bluetooth/hci_event.c   | 68 +++++++++++++++++++++++++++++++++++++
+> 2 files changed, 75 insertions(+)
 > 
 > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ea4ae551c426..13b7c7747bd1 100644
+> index ea4ae551c426..e3f7771fe84f 100644
 > --- a/include/net/bluetooth/hci.h
 > +++ b/include/net/bluetooth/hci.h
-> @@ -1894,6 +1894,10 @@ struct hci_cp_le_reject_cis {
+> @@ -1314,6 +1314,13 @@ struct hci_rp_read_local_pairing_opts {
+> 	__u8     max_key_size;
 > } __packed;
 > 
-> /* ---- HCI Events ---- */
-> +struct hci_ev_status {
-> +	__u8    status;
+> +#define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
+> +struct hci_op_read_local_codec_caps {
+> +	__u8	codec_id[5];
+> +	__u8	transport;
+> +	__u8	direction;
 > +} __packed;
 > +
-> #define HCI_EV_INQUIRY_COMPLETE		0x01
-> 
-> #define HCI_EV_INQUIRY_RESULT		0x02
-> @@ -1906,6 +1910,11 @@ struct inquiry_info {
-> 	__le16   clock_offset;
-> } __packed;
-> 
-> +struct hci_ev_inquiry_result {
-> +	__u8    num;
-> +	struct inquiry_info info[];
-> +};
-> +
-> #define HCI_EV_CONN_COMPLETE		0x03
-> struct hci_ev_conn_complete {
+> #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
+> struct hci_rp_read_page_scan_activity {
 > 	__u8     status;
-> @@ -2017,7 +2026,7 @@ struct hci_comp_pkts_info {
-> } __packed;
-> 
-> struct hci_ev_num_comp_pkts {
-> -	__u8     num_hndl;
-> +	__u8     num;
-> 	struct hci_comp_pkts_info handles[];
-> } __packed;
-> 
-> @@ -2067,7 +2076,7 @@ struct hci_ev_pscan_rep_mode {
-> } __packed;
-> 
-> #define HCI_EV_INQUIRY_RESULT_WITH_RSSI	0x22
-> -struct inquiry_info_with_rssi {
-> +struct inquiry_info_rssi {
-> 	bdaddr_t bdaddr;
-> 	__u8     pscan_rep_mode;
-> 	__u8     pscan_period_mode;
-> @@ -2075,7 +2084,7 @@ struct inquiry_info_with_rssi {
-> 	__le16   clock_offset;
-> 	__s8     rssi;
-> } __packed;
-> -struct inquiry_info_with_rssi_and_pscan_mode {
-> +struct inquiry_info_rssi_pscan {
-> 	bdaddr_t bdaddr;
-> 	__u8     pscan_rep_mode;
-> 	__u8     pscan_period_mode;
-> @@ -2084,6 +2093,14 @@ struct inquiry_info_with_rssi_and_pscan_mode {
-> 	__le16   clock_offset;
-> 	__s8     rssi;
-> } __packed;
-> +struct hci_ev_inquiry_result_rssi {
-> +	__u8     num;
-> +	struct inquiry_info_rssi info[];
-> +} __packed;
-> +struct hci_ev_inquiry_result_rssi_pscan {
-> +	__u8     num;
-> +	struct inquiry_info_rssi_pscan info[];
-> +} __packed;
-> 
-> #define HCI_EV_REMOTE_EXT_FEATURES	0x23
-> struct hci_ev_remote_ext_features {
-> @@ -2138,6 +2155,11 @@ struct extended_inquiry_info {
-> 	__u8     data[240];
-> } __packed;
-> 
-> +struct hci_ev_ext_inquiry_result {
-> +	__u8     num;
-> +	struct extended_inquiry_info info[];
-> +} __packed;
-> +
-> #define HCI_EV_KEY_REFRESH_COMPLETE	0x30
-> struct hci_ev_key_refresh_complete {
-> 	__u8	status;
-> @@ -2305,13 +2327,18 @@ struct hci_ev_le_conn_complete {
-> 
-> #define HCI_EV_LE_ADVERTISING_REPORT	0x02
-> struct hci_ev_le_advertising_info {
-> -	__u8	 evt_type;
-> +	__u8	 type;
-> 	__u8	 bdaddr_type;
-> 	bdaddr_t bdaddr;
-> 	__u8	 length;
-> 	__u8	 data[];
-> } __packed;
-> 
-> +struct hci_ev_le_advertising_report {
-> +	__u8    num;
-> +	struct hci_ev_le_advertising_info info[];
-> +} __packed;
-> +
-> #define HCI_EV_LE_CONN_UPDATE_COMPLETE	0x03
-> struct hci_ev_le_conn_update_complete {
-> 	__u8     status;
-> @@ -2355,7 +2382,7 @@ struct hci_ev_le_data_len_change {
-> 
-> #define HCI_EV_LE_DIRECT_ADV_REPORT	0x0B
-> struct hci_ev_le_direct_adv_info {
-> -	__u8	 evt_type;
-> +	__u8	 type;
-
-these changes look unrelated. Prepare to send a prepare patch.
-
-> 	__u8	 bdaddr_type;
-> 	bdaddr_t bdaddr;
-> 	__u8	 direct_addr_type;
-> @@ -2363,6 +2390,11 @@ struct hci_ev_le_direct_adv_info {
-> 	__s8	 rssi;
-> } __packed;
-> 
-> +struct hci_ev_le_direct_adv_report {
-> +	__u8	 num;
-> +	struct hci_ev_le_direct_adv_info info[];
-> +} __packed;
-> +
-> #define HCI_EV_LE_PHY_UPDATE_COMPLETE	0x0c
-> struct hci_ev_le_phy_update_complete {
-> 	__u8  status;
-> @@ -2372,8 +2404,8 @@ struct hci_ev_le_phy_update_complete {
-> } __packed;
-> 
-> #define HCI_EV_LE_EXT_ADV_REPORT    0x0d
-> -struct hci_ev_le_ext_adv_report {
-> -	__le16 	 evt_type;
-> +struct hci_ev_le_ext_adv_info {
-> +	__le16   type;
-> 	__u8	 bdaddr_type;
-> 	bdaddr_t bdaddr;
-> 	__u8	 primary_phy;
-> @@ -2381,11 +2413,16 @@ struct hci_ev_le_ext_adv_report {
-> 	__u8	 sid;
-> 	__u8	 tx_power;
-> 	__s8	 rssi;
-> -	__le16 	 interval;
-> -	__u8  	 direct_addr_type;
-> +	__le16   interval;
-> +	__u8     direct_addr_type;
-> 	bdaddr_t direct_addr;
-> -	__u8  	 length;
-> -	__u8	 data[];
-> +	__u8     length;
-> +	__u8     data[];
-> +} __packed;
-> +
-> +struct hci_ev_le_ext_adv_report {
-> +	__u8     num;
-> +	struct hci_ev_le_ext_adv_info info[];
-> } __packed;
-> 
-> #define HCI_EV_LE_ENHANCED_CONN_COMPLETE    0x0a
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 5e99968939ce..db40358521fa 100644
+> index 5e99968939ce..a4b905a76c1b 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -45,9 +45,16 @@
-> static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb,
-> 				  u8 *new_status)
-> {
-> -	__u8 status = *((__u8 *) skb->data);
-> +	struct hci_ev_status *rp;
+> @@ -887,6 +887,70 @@ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
+> 	       hdev->block_cnt, hdev->block_len);
+> }
 > 
-> -	BT_DBG("%s status 0x%2.2x", hdev->name, status);
-> +	rp = bt_skb_pull(skb, sizeof(*rp));
-> +	if (!rp) {
-> +		bt_dev_err(hdev, "Malformed Command Complete: 0x%4.4x",
-> +			   HCI_OP_INQUIRY_CANCEL);
+> +static void hci_cc_read_local_codecs(struct hci_dev *hdev,
+> +				     struct sk_buff *skb)
+> +{
+> +	__u8 num_codecs;
+> +	struct hci_op_read_local_codec_caps caps;
+> +
+> +	if (skb->len < sizeof(caps))
 > +		return;
+> +
+> +	bt_dev_dbg(hdev, "status 0x%2.2x", skb->data[0]);
+> +
+> +	if (skb->data[0])
+> +		return;
+> +
+> +	/* enumerate standard codecs */
+> +	skb_pull(skb, 1);
+> +
+> +	if (skb->len < 1)
+> +		return;
+> +
+> +	num_codecs = skb->data[0];
+> +
+> +	bt_dev_dbg(hdev, "Number of standard codecs: %u", num_codecs);
+> +
+> +	skb_pull(skb, 1);
+> +
+> +	if (skb->len < num_codecs)
+> +		return;
+> +
+> +	while (num_codecs--) {
+> +		caps.codec_id[0] = skb->data[0];
+> +		caps.transport = 0x00;
+> +		caps.direction = 0x00;
+> +
+> +		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +			     &caps);
+> +
+> +		skb_pull(skb, 1);
+> +	}
+> +
+> +	/* enumerate vendor specific codecs */
+> +	if (skb->len < 1)
+> +		return;
+> +
+> +	num_codecs = skb->data[0];
+> +	skb_pull(skb, 1);
+> +
+> +	bt_dev_dbg(hdev, "Number of vendor specific codecs: %u", num_codecs);
+> +
+> +	if (skb->len < (num_codecs * 4))
+> +		return;
+> +
+> +	while (num_codecs--) {
+> +		caps.codec_id[0] = 0xFF;
+> +		memcpy(&caps.codec_id[1], skb->data, 4);
+> +		caps.transport = 0x00;
+> +		caps.direction = 0x00;
+> +
+> +		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +			     &caps);
+> +		skb_pull(skb, 4);
 > +	}
 
-So you are repeating this over and over again. The error needs to be part of bt_skb_pull and I would make bt_skb_pull static and local to hci_event.c.
+instead of sending hci_send_cmd here, I rather do this in a separate init stage. Since you want to cache the codec values anyway, start doing it now.
 
 Regards
 
