@@ -2,156 +2,182 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15599C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 21:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 486BFC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 21:57:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE4CD6128E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 21:24:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1EF0F61249
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 21:57:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240288AbhDMVZM (ORCPT
+        id S232489AbhDMV5n (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Apr 2021 17:25:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36974 "EHLO
+        Tue, 13 Apr 2021 17:57:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44098 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348464AbhDMVZI (ORCPT
+        with ESMTP id S232468AbhDMV5m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Apr 2021 17:25:08 -0400
-Received: from mail-oo1-xc34.google.com (mail-oo1-xc34.google.com [IPv6:2607:f8b0:4864:20::c34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C474C061756
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Apr 2021 14:24:48 -0700 (PDT)
-Received: by mail-oo1-xc34.google.com with SMTP id h3-20020a4ae8c30000b02901b68b39e2d3so4157460ooe.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Apr 2021 14:24:48 -0700 (PDT)
+        Tue, 13 Apr 2021 17:57:42 -0400
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F9FCC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Apr 2021 14:57:22 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id d12so18496201oiw.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Apr 2021 14:57:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=nl7s6WDFgNqYx7r5mFxfo999afx2zjCYP912c6el3U0=;
-        b=eZmD2lRGgi/bVfER9S1ZEmrzPG3jCgTLqw0s92jBPg1VZdlNVgZ7T5PGmzIawPzdTs
-         rkce+JmVruKHO9omRoMgIOJGwpYoxrsgVVJCBct7v5hBYLAwEx/2w4Uc32ky+hadQqHB
-         wFnjxFVfX4Jn+SFKVzrG/Gp0R1FyHkqwZUdCQ0sTWSyvc0Da2RD15WSbjZ4KBpW1YCNk
-         Bi+oLSXoXEikJcdH2tU5uOiW4InVJHH0vcN97nnOFuOuL67gcVu0wbwuPXP27L7f1ncN
-         JFkGr+RGwtGrLl+dPve0jqqjd7+D3foXPXb8Lf7nMUoM/1ZVL4SfoFhElbid9JP/Gpxe
-         rZtw==
+         :cc:content-transfer-encoding;
+        bh=sUWIt/7pRjW3IpMlWYsAMBcyzn4hw7rvu20e98BsW3A=;
+        b=sJOedLBYmawmkHTaGEXVWAxFz3ftqe+3fq6UDy2hzzbNQm+r5N8qtSwlkMaag6GZVS
+         jaPY9BuNX2VKhC/0mDXmC4ocaCpwMWyibjeUOLM7KO3dswNWVbMMpHkXJ/no6hq9frYs
+         3CKQ/IQtXriP2sQCXYIdTM5CpIo5BdpcQvfN+gUVWA71DqtlMPdAPlhRQ5x6yC7j7WCl
+         v0kAVIqD29s0GbC8PoUPTzHxWE1b75d+92JWX2mLNLFH3tk17aJ6DAHwb1rViAJrggmV
+         GuB8f0DTMDTPnbPEYkoOM103Bdyckl/iaM+sxWMGB2BnemguGD3d7xVzM32nxNfmQdi7
+         3RpA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nl7s6WDFgNqYx7r5mFxfo999afx2zjCYP912c6el3U0=;
-        b=qCOphbe0HalY2mumYCvzeRP4fvQj+BRLZM3hk7AMlb+zLoPXYzS888PsgyxjUI8bjN
-         qmxSsX29rz4PILrCT/a5/NM0HHtO8Zv7Bt33D50QrYRgQR8gvsZ0f94+SUzU0PzYw2zn
-         OUcMwhMoFPshPzMEHvAAfkoetd7LNa7KMsyJqQ/WUhQeXe5YAsVYzY2LG4s/XSlwrW0A
-         yC+UdN91yuKbcvLDRrfi5UCF9MMa+C5w9zaA4U98kJKT5I7wSfWJO5gEjNx/B6Vt79bZ
-         JpyXXFVfEyHfA3dUOeA+gJENET49Gq4d8ODoJbYOlH1Ysvog+CYGCIGKMMv9D7whUPY7
-         Z9rQ==
-X-Gm-Message-State: AOAM531kAzec2Rf3+aWzYENxR8HjZJtGjApfOBZUrZaFQrMYMzoqnIRU
-        obgpQI2s11sgDyvT7hWW6zXfn+VatXAdwamFfxRlCCtJetE=
-X-Google-Smtp-Source: ABdhPJwmwMvIFGYyjzkN78OWztODlpwQxJ2iI8ZDCrI2Q1j8VzJfoEMgkp1wLgmsF7c0RjRAD2FGvLLfJg12q7gT1S8=
-X-Received: by 2002:a4a:c316:: with SMTP id c22mr28508797ooq.65.1618349087607;
- Tue, 13 Apr 2021 14:24:47 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=sUWIt/7pRjW3IpMlWYsAMBcyzn4hw7rvu20e98BsW3A=;
+        b=Xl9UHmA5fCMWviPZOWsYyIWqmoRheiEocFCy0ZAyovhkTYz2fSVv2AWdThpLKg+Q25
+         pCtbdmSYEETrZwyNz0u0ji+QpBycKAPhTM88Om2vTosTUZmJboyCJkuVG2lUJnIyJzmc
+         uyexPuHKxcAI2QRh6Nlt0G9dwewmTmOXxvLqCqnefraofguMvokEFP9XL2dXHsTlshCx
+         D00TaLXBitdQ5YGiXHhS3w6GLSbol9szCG9T22I00XnAXXLBuDjwusOnSw6Fo6iGuy9a
+         puMCQUMupGqVxm/vTVVdFZg5k9K7byxeB1K0dqqxl80WmnxeABkWCHo5ygjTaPOIaJ45
+         5mkw==
+X-Gm-Message-State: AOAM532g56zOaU1ENsE22ILdvYgQKhJpuVYIWnMKoXUJ/9pZfp8CG7cA
+        j07p1k4D9sfVRAy9+gmJr3ZS1nGGImVDwSncXalI6x1xaT63PA==
+X-Google-Smtp-Source: ABdhPJxS29ejeDORgWFH3XBCc0IIFRy+6XgFq6LefDECiaakxqYb19F+2E+Ekp24gcCAP8FLRfMlhwUaNFVi2Y6aoPk=
+X-Received: by 2002:a05:6808:1313:: with SMTP id y19mr1516769oiv.161.1618351041596;
+ Tue, 13 Apr 2021 14:57:21 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210412203426.213872-1-curtis@maves.io> <6074b1ff.1c69fb81.287ef.5b83@mx.google.com>
-In-Reply-To: <6074b1ff.1c69fb81.287ef.5b83@mx.google.com>
+References: <CAC9s0NYWacb=SH8P9zr_66CZnD6HC4yHkY_o2wk08oeSwn+Syw@mail.gmail.com>
+ <BYAPR14MB2887AB8A9D781267F8F4B2EEE64F9@BYAPR14MB2887.namprd14.prod.outlook.com>
+In-Reply-To: <BYAPR14MB2887AB8A9D781267F8F4B2EEE64F9@BYAPR14MB2887.namprd14.prod.outlook.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 13 Apr 2021 14:24:36 -0700
-Message-ID: <CABBYNZJwrTWqPeU1khDMUj9m=bKXTo+u0CKG6skzNGxfoXxDNA@mail.gmail.com>
-Subject: Re: [Bluez,v2] gatt: Either notify or indicate, do not do both
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Curtis <curtis@maves.io>
+Date:   Tue, 13 Apr 2021 14:57:10 -0700
+Message-ID: <CABBYNZLDgfRarPODF+c2PWvgi1zeUiy5QfmXY5UVkwVkoLJ3zg@mail.gmail.com>
+Subject: Re: Disabled bluetooth cache. But the app still getting wrong data?
+To:     Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
+Cc:     Kenny Bian <kennybian@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Curtis,
+Hi Jamie, Brian,
 
-On Tue, Apr 13, 2021 at 12:07 AM <bluez.test.bot@gmail.com> wrote:
+On Tue, Apr 13, 2021 at 2:03 AM Jamie Mccrae
+<Jamie.Mccrae@lairdconnect.com> wrote:
 >
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=465885
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.30 seconds
-> GitLint                       PASS      0.10 seconds
-> Prep - Setup ELL              PASS      40.34 seconds
-> Build - Prep                  PASS      0.10 seconds
-> Build - Configure             PASS      7.08 seconds
-> Build - Make                  PASS      168.14 seconds
-> Make Check                    PASS      8.33 seconds
-> Make Dist                     PASS      11.23 seconds
-> Make Dist - Configure         PASS      4.40 seconds
-> Make Dist - Make              PASS      68.95 seconds
-> Build w/ext ELL - Configure   PASS      7.14 seconds
-> Build w/ext ELL - Make        PASS      161.10 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - PASS
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
->
-> ##############################
-> Test: GitLint - PASS
-> Desc: Run gitlint with rule in .gitlint
->
-> ##############################
-> Test: Prep - Setup ELL - PASS
-> Desc: Clone, build, and install ELL
->
-> ##############################
-> Test: Build - Prep - PASS
-> Desc: Prepare environment for build
->
-> ##############################
-> Test: Build - Configure - PASS
-> Desc: Configure the BlueZ source tree
->
-> ##############################
-> Test: Build - Make - PASS
-> Desc: Build the BlueZ source tree
->
-> ##############################
-> Test: Make Check - PASS
-> Desc: Run 'make check'
->
-> ##############################
-> Test: Make Dist - PASS
-> Desc: Run 'make dist' and build the distribution tarball
->
-> ##############################
-> Test: Make Dist - Configure - PASS
-> Desc: Configure the source from distribution tarball
->
-> ##############################
-> Test: Make Dist - Make - PASS
-> Desc: Build the source from distribution tarball
->
-> ##############################
-> Test: Build w/ext ELL - Configure - PASS
-> Desc: Configure BlueZ source with '--enable-external-ell' configuration
->
-> ##############################
-> Test: Build w/ext ELL - Make - PASS
-> Desc: Build BlueZ source with '--enable-external-ell' configuration
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+> Hi Kenny,
+> Why not just add the service changed indication as you refer to below? It=
+ was purposely designed for this specific purpose, you're trying to work ar=
+ound an issue created because you don't want to use the feature that preven=
+ts this issue. Any workaround is just that, a workaround, and might not wor=
+k as intended.
 
-Applied, thanks.
+Yep, and while at it implement the so called Robust Caching feature so
+we can detect if anything has changed by reading the DB Hash.
 
--- 
+> Thanks,
+> Jamie
+>
+> -----Original Message-----
+> From: Kenny Bian <kennybian@gmail.com>
+> Sent: 13 April 2021 06:59
+> To: linux-bluetooth@vger.kernel.org
+> Subject: Disabled bluetooth cache. But the app still getting wrong data?
+>
+> EXTERNAL EMAIL: Be careful with attachments and links.
+>
+> Previously we had an issue: if there is a change of characteristics in th=
+e new build of our firmware, then the app will get the wrong data.
+> By saying changed characteristics, it can be an added or removed characte=
+ristic, or adding notification to an existing characteristic.
+> In order to keep the pairing information, the "/var/lib/bluetooth"
+> folder is copied over to the new build's partition. We realized that ther=
+e is no "service changed indication". The app can't handle the changed serv=
+ices. So we disabled the bluetooth cache by set this in
+> "/etc/bluetooth/main.conf":
+> [GATT]
+> Cache =3D no
+
+When you say the app can't handle changed service do you mean BlueZ
+doesn't emit changes to the attributes (via Service Changed) or is it
+really the application not being able to handle the changes?
+
+> But recently, we saw the problem again even if the bluetooth cache is
+> disabled: in the build number 101, a characteristic is removed. But when =
+we upgrade the build from 100 to 101, the app gets the wrong data. We looke=
+d at the log. When the app tries to read temperature by using the temperatu=
+re UUID, somehow the bluetooth service we created received the request to r=
+ead the "device name"(device name UUID). So the "device name" is returned t=
+o the app as the temperature. This looks like the same behavior as the blue=
+tooth cache is not disabled. I looked at the "/var/lib/bluetooth/[BT_MAC]/c=
+ache" folder. There is no "[Attributes]" section in the files in the folder=
+. That means the disabled cache seems working.
+
+So BlueZ is acting as the server, right? The Cache only applies to the
+client portion, there is no such thing as disabling the remote cache.
+I don't see any incoming Read By Group Request from the remote so it
+is very likely that it has cached the values, there is no Read By Type
+for the DB Hash either which is quite surprising to me since that is
+required for stacks supporting Robust Caching which I believe is the
+case of iOS.
+
+Anyway, I would check that the following lines are being triggered:
+
+When starting:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c=
+#n3798
+
+On connect:
+
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/gatt-database.c=
+#n3741
+
+If those lines are not being triggered it is likely a client problem
+which for some reason had not subscribed to received service changes
+for some reason, if it doesn't subscribe to service changes then it
+shall not cache any attribute and attempt to rediscover on every
+connection.
+
+> The only way to fix this issue is to force exit the mobile app on the pho=
+ne and "Forget This Device" in iOS or "Unpair" in Android.
+>
+> I looked at the btmon(see attached). For the working btmon log, there is =
+"Attribute group list: XX entries" under "ACL Data TX". But there is no "At=
+tribute group list: XX entries" under "ACL Data TX" in the attached problem=
+atic btmon log.
+>
+> Questions:
+> 1. How is it possible that this still happens even if the bluetooth cache=
+ is disabled?
+> 2. Is this the problem on the Linux side which runs the GATT server or on=
+ the mobile side?
+> 3. Is there anything else we should look into?
+>
+> We're going to release our product soon. This is a critical issue for us.=
+ Please help if you have any suggestions.
+>
+> Thanks!
+> THIS MESSAGE, ANY ATTACHMENT(S), AND THE INFORMATION CONTAINED HEREIN MAY=
+ BE PROPRIETARY TO LAIRD CONNECTIVITY, INC. AND/OR ANOTHER PARTY, AND MAY F=
+URTHER BE INTENDED TO BE KEPT CONFIDENTIAL. IF YOU ARE NOT THE INTENDED REC=
+IPIENT, PLEASE DELETE THE EMAIL AND ANY ATTACHMENTS, AND IMMEDIATELY NOTIFY=
+ THE SENDER BY RETURN EMAIL. THIS MESSAGE AND ITS CONTENTS ARE THE PROPERTY=
+ OF LAIRD CONNECTIVITY, INC. AND MAY NOT BE REPRODUCED OR USED WITHOUT THE =
+EXPRESS WRITTEN CONSENT OF LAIRD CONNECTIVITY, INC.
+
+
+
+--=20
 Luiz Augusto von Dentz
