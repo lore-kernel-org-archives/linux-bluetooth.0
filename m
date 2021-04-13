@@ -2,137 +2,236 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CA03FC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 21:39:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 311C8C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 04:32:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4B5961369
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Apr 2021 21:39:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 10153613AF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Apr 2021 04:32:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239771AbhDLVjT (ORCPT
+        id S229954AbhDMEdE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Apr 2021 17:39:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36504 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237701AbhDLVjS (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Apr 2021 17:39:18 -0400
-Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63048C061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Apr 2021 14:39:00 -0700 (PDT)
-Received: by mail-ot1-x335.google.com with SMTP id t17-20020a9d77510000b0290287a5143b41so2993705otl.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Apr 2021 14:39:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=5HyXMPiMkrFFomW/9ASiPlnrj7LycEQTHpDQTsv/Ke4=;
-        b=eOw+vAzJMexnrKAahhfeMDDZtf+zJtuIC56HBN/njzjlG0HmBut23YhP/OJOz0Qj6C
-         z104uQriscjmpsZUjNwbfeGpMdK65H/TOFWNeaaVVPaqfOLX7JEYb1jbf6WMwH2pD30j
-         u+VMwROIBMEoQI64KQeELAJRwkpoSwOWGuzkthCe8BOQfCAOBDCobjQGSLjzC0X3mIwV
-         66ighzZ5wehUy5Vi4FOu1L8JYbCpckUAwqMJ/Yo+mRw9+y8HXLHXQT63cgUjBXGNQBEc
-         5lLe+qDzdzm0PBaM+0ldEK1gGIfIfVgpN8PBpz5cjqmp9J2Kn3z1U6LrmPJJpvjNUpH6
-         DN8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=5HyXMPiMkrFFomW/9ASiPlnrj7LycEQTHpDQTsv/Ke4=;
-        b=J20xhClwo4BM/FixID2sQTFc4eFSudTXYERD+ecLrEnUWSJEspW9ASfqh0X/qy5Cm4
-         GkyP2oO4j93z42fS1P/g9aNqwODJm/14QpbQ0lRnz5Py+lGVQEErIHBCGVrDPkdFvpae
-         NTeOlE42PXz1HqGNlmx8EBzUWVmsNBJTb6CBlAqry9G9+JknVZ63uturANWWuGVLmDJr
-         lEOpnMzhSNIzNbxiLj17jBCD91mhfFzpVj+JysdB21K8sLOyLU6Oqs+pF+52Q5vRC0DN
-         LKllGrmXP/ulXIZcJBMb8eOr6kNuUHKW1FmiYs1K317g/FTJFhYZGdE/V5x0PK2q31lr
-         XB1w==
-X-Gm-Message-State: AOAM531ONNVhn1K+xhWPTdhY4fEl7x4xd/YfCjItNTWfIjzyCCsZDVq+
-        xfIjYkqrOVOllqSAfSvTcQNkUfGB0HX/OwDJbWDsDXXUSbb0hg==
-X-Google-Smtp-Source: ABdhPJz3jYK7z6StHxsIHapNVvDtQScxzht6Fs7srirq1iHkSyftgE2mHlXbkjr2qcxT0klOet5jFWn+PPQ/D1hO1XQ=
-X-Received: by 2002:a9d:63d0:: with SMTP id e16mr10152064otl.44.1618263539339;
- Mon, 12 Apr 2021 14:38:59 -0700 (PDT)
+        Tue, 13 Apr 2021 00:33:04 -0400
+Received: from mga01.intel.com ([192.55.52.88]:38442 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229946AbhDMEdE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 13 Apr 2021 00:33:04 -0400
+IronPort-SDR: iP9AWVAXeDGHtPCbtJlenLZrSiAXm6wYXBL6VW0ItB+LMB5OqjNYQdgMFNgoVErDTy7ZuNbBML
+ +y+FpJNaW8TQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9952"; a="214807951"
+X-IronPort-AV: E=Sophos;i="5.82,218,1613462400"; 
+   d="scan'208";a="214807951"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Apr 2021 21:32:44 -0700
+IronPort-SDR: 7Ciyf44ACZShVjk411/cca/9fqDV74IVxJB6AHTbZ1EWJAu/zDTyPfrF6yGHGbXk87Na2Q53X+
+ 0y9gMapERTlw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,218,1613462400"; 
+   d="scan'208";a="417697457"
+Received: from lkp-server01.sh.intel.com (HELO 69d8fcc516b7) ([10.239.97.150])
+  by fmsmga008.fm.intel.com with ESMTP; 12 Apr 2021 21:32:42 -0700
+Received: from kbuild by 69d8fcc516b7 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1lWAjB-0000oz-TC; Tue, 13 Apr 2021 04:32:41 +0000
+Date:   Tue, 13 Apr 2021 12:32:22 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 13e66a52f780fd5523c5b27fda9c00c570f1b11e
+Message-ID: <60751ed6.wUe0ERZTOQ892HJf%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <20210412184033.2504931-1-luiz.dentz@gmail.com> <6074a15f.1c69fb81.778c7.5299@mx.google.com>
-In-Reply-To: <6074a15f.1c69fb81.778c7.5299@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 12 Apr 2021 14:38:48 -0700
-Message-ID: <CABBYNZJb8-M6cXNsFhOrsXESkz5zuLZ-Oepg2_2onbVfnt1rWw@mail.gmail.com>
-Subject: Re: [RFC,1/2] Bluetooth: Introduce bt_skb_pull
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 13e66a52f780fd5523c5b27fda9c00c570f1b11e  Bluetooth: btusb: Add support for Lite-On Mediatek Chip
 
-On Mon, Apr 12, 2021 at 12:37 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=465841
->
-> ---Test result---
->
-> ##############################
-> Test: CheckPatch - PASS
->
->
-> ##############################
-> Test: CheckGitLint - PASS
->
->
-> ##############################
-> Test: CheckBuildK - PASS
->
->
-> ##############################
-> Test: CheckTestRunner: Setup - PASS
->
->
-> ##############################
-> Test: CheckTestRunner: l2cap-tester - PASS
-> Total: 40, Passed: 34 (85.0%), Failed: 0, Not Run: 6
->
-> ##############################
-> Test: CheckTestRunner: bnep-tester - PASS
-> Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: CheckTestRunner: mgmt-tester - PASS
-> Total: 416, Passed: 402 (96.6%), Failed: 0, Not Run: 14
->
-> ##############################
-> Test: CheckTestRunner: rfcomm-tester - PASS
-> Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: CheckTestRunner: sco-tester - PASS
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: CheckTestRunner: smp-tester - PASS
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: CheckTestRunner: userchan-tester - PASS
-> Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+elapsed time: 721m
 
-This should fix issues found by szybot like:
+configs tested: 165
+configs skipped: 3
 
-[syzbot] KMSAN: uninit-value in hci_event_packet
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+x86_64                           allyesconfig
+riscv                            allmodconfig
+i386                             allyesconfig
+riscv                            allyesconfig
+nios2                            allyesconfig
+sh                         microdev_defconfig
+sh                             espt_defconfig
+riscv             nommu_k210_sdcard_defconfig
+mips                           ip32_defconfig
+arm                        oxnas_v6_defconfig
+h8300                       h8s-sim_defconfig
+arc                      axs103_smp_defconfig
+powerpc                    socrates_defconfig
+powerpc                   lite5200b_defconfig
+riscv                             allnoconfig
+mips                         cobalt_defconfig
+mips                         tb0219_defconfig
+mips                           mtx1_defconfig
+m68k                       m5249evb_defconfig
+mips                          malta_defconfig
+arm                          pxa168_defconfig
+arc                          axs103_defconfig
+openrisc                         alldefconfig
+mips                          rm200_defconfig
+powerpc                     skiroot_defconfig
+arm                            mps2_defconfig
+ia64                                defconfig
+um                                  defconfig
+powerpc                      pcm030_defconfig
+arm                         mv78xx0_defconfig
+arm                          exynos_defconfig
+arm                       multi_v4t_defconfig
+mips                           ip22_defconfig
+sh                           se7750_defconfig
+mips                           rs90_defconfig
+powerpc                    gamecube_defconfig
+arc                     nsimosci_hs_defconfig
+ia64                          tiger_defconfig
+powerpc                     tqm8555_defconfig
+arm                             pxa_defconfig
+xtensa                generic_kc705_defconfig
+arm                       imx_v6_v7_defconfig
+xtensa                    smp_lx200_defconfig
+sparc64                          alldefconfig
+arm                        spear3xx_defconfig
+arm                  colibri_pxa300_defconfig
+powerpc                    ge_imp3a_defconfig
+arm                        trizeps4_defconfig
+sh                          urquell_defconfig
+powerpc                 linkstation_defconfig
+mips                      malta_kvm_defconfig
+arm                             rpc_defconfig
+powerpc                      ppc64e_defconfig
+arm                            zeus_defconfig
+powerpc                 mpc832x_rdb_defconfig
+m68k                          atari_defconfig
+sh                   sh7724_generic_defconfig
+sh                             sh03_defconfig
+arm                         s5pv210_defconfig
+powerpc                     tqm8540_defconfig
+sh                   rts7751r2dplus_defconfig
+mips                      maltaaprp_defconfig
+powerpc                     powernv_defconfig
+sh                          r7785rp_defconfig
+powerpc                      arches_defconfig
+powerpc                      makalu_defconfig
+powerpc                 mpc8560_ads_defconfig
+mips                     cu1000-neo_defconfig
+mips                        jmr3927_defconfig
+sparc                       sparc64_defconfig
+arm                          ixp4xx_defconfig
+sh                          landisk_defconfig
+powerpc                      bamboo_defconfig
+xtensa                              defconfig
+mips                 decstation_r4k_defconfig
+arc                     haps_hs_smp_defconfig
+sh                           se7712_defconfig
+arm                            mmp2_defconfig
+arm                            xcep_defconfig
+arm                          ep93xx_defconfig
+m68k                            mac_defconfig
+arm                  colibri_pxa270_defconfig
+mips                           ci20_defconfig
+powerpc                     pq2fads_defconfig
+sh                           se7751_defconfig
+m68k                          amiga_defconfig
+arm                         vf610m4_defconfig
+arm                         lpc32xx_defconfig
+h8300                            alldefconfig
+ia64                             allmodconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+nds32                               defconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+s390                             allmodconfig
+parisc                           allyesconfig
+s390                                defconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+i386                 randconfig-a003-20210412
+i386                 randconfig-a001-20210412
+i386                 randconfig-a006-20210412
+i386                 randconfig-a005-20210412
+i386                 randconfig-a004-20210412
+i386                 randconfig-a002-20210412
+i386                 randconfig-a003-20210413
+i386                 randconfig-a001-20210413
+i386                 randconfig-a006-20210413
+i386                 randconfig-a005-20210413
+i386                 randconfig-a004-20210413
+i386                 randconfig-a002-20210413
+x86_64               randconfig-a014-20210412
+x86_64               randconfig-a015-20210412
+x86_64               randconfig-a011-20210412
+x86_64               randconfig-a013-20210412
+x86_64               randconfig-a012-20210412
+x86_64               randconfig-a016-20210412
+i386                 randconfig-a015-20210412
+i386                 randconfig-a014-20210412
+i386                 randconfig-a013-20210412
+i386                 randconfig-a012-20210412
+i386                 randconfig-a016-20210412
+i386                 randconfig-a011-20210412
+riscv                    nommu_k210_defconfig
+riscv                    nommu_virt_defconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+um                               allmodconfig
+um                                allnoconfig
+um                               allyesconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                      rhel-8.3-kbuiltin
+x86_64                                  kexec
 
--- 
-Luiz Augusto von Dentz
+clang tested configs:
+x86_64               randconfig-a003-20210412
+x86_64               randconfig-a002-20210412
+x86_64               randconfig-a001-20210412
+x86_64               randconfig-a005-20210412
+x86_64               randconfig-a006-20210412
+x86_64               randconfig-a004-20210412
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
