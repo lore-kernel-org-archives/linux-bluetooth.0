@@ -2,208 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 29160C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Apr 2021 08:22:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16334C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Apr 2021 10:06:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 062B361003
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Apr 2021 08:22:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E16A56128E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Apr 2021 10:06:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349938AbhDNIWg (ORCPT
+        id S232130AbhDNKHD convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Apr 2021 04:22:36 -0400
-Received: from mga02.intel.com ([134.134.136.20]:24874 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348780AbhDNIWg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Apr 2021 04:22:36 -0400
-IronPort-SDR: CI2YU4VGFO9AlBZI89+NYFpSCAVebbagwSm55Q7Kmvaxh4jpcfOjEW/J66cInIX4+yaD4ILS2O
- 6yOqjGELt3hw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9953"; a="181715153"
-X-IronPort-AV: E=Sophos;i="5.82,221,1613462400"; 
-   d="scan'208";a="181715153"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Apr 2021 01:22:14 -0700
-IronPort-SDR: GX0lyXW+SN2cEbHI2aN5tXE+ro5QVzaab+FEsa3xlAblad1a5ceQ2XwZ5U4MFg0f5s716EssFK
- aa5NRNC/oRSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,221,1613462400"; 
-   d="scan'208";a="424623196"
-Received: from lkp-server01.sh.intel.com (HELO abb8824c7ed7) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 14 Apr 2021 01:22:13 -0700
-Received: from kbuild by abb8824c7ed7 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1lWamq-000013-Ov; Wed, 14 Apr 2021 08:22:12 +0000
-Date:   Wed, 14 Apr 2021 16:22:00 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1c55c39f8232f02a742e6e84c812574f7c460a7b
-Message-ID: <6076a628.hYf5rykxVo79SKyG%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Wed, 14 Apr 2021 06:07:03 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41694 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232032AbhDNKHB (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Apr 2021 06:07:01 -0400
+Received: from mac-pro.holtmann.net (unknown [37.82.212.72])
+        by mail.holtmann.org (Postfix) with ESMTPSA id B4625CECDF;
+        Wed, 14 Apr 2021 12:14:23 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
+Subject: Re: [Bluez PATCH] btmgmt: Add support to enable LL privacy
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <SN6PR11MB27038FDA6A26F7A63370859A944E9@SN6PR11MB2703.namprd11.prod.outlook.com>
+Date:   Wed, 14 Apr 2021 12:06:37 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <E01306E4-FDD3-4A78-BAED-1C44C3218CEF@holtmann.org>
+References: <20210405145802.27317-1-sathish.narasimman@intel.com>
+ <CABBYNZLTU1t=UEsvxsu8F0kP8f5-Nvi_Xysy8ftg57j9Snu99w@mail.gmail.com>
+ <588F99C8-E5B4-47D3-84C3-72F9E6FCC9EC@holtmann.org>
+ <SN6PR11MB27038FDA6A26F7A63370859A944E9@SN6PR11MB2703.namprd11.prod.outlook.com>
+To:     "Narasimman, Sathish" <sathish.narasimman@intel.com>
+X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1c55c39f8232f02a742e6e84c812574f7c460a7b  Bluetooth: cmtp: fix file refcount when cmtp_attach_device fails
+Hi Sathish,
 
-elapsed time: 728m
+>>>> If the Bluetooth controller supports LL privacy this command will be
+>>>> used to test the same.
+>>>> "sudo btmgmt power off"
+>>>> "sudo btmgmt llprivacy on"
+>>>> "sudo btmgmt power on"
+>>>> 
+>>>> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+>>>> ---
+>>>> tools/btmgmt.c | 38 ++++++++++++++++++++++++++++++++++++++
+>>>> 1 file changed, 38 insertions(+)
+>>>> 
+>>>> diff --git a/tools/btmgmt.c b/tools/btmgmt.c index
+>>>> 93d244ff8ec8..4a53c3768fe9 100644
+>>>> --- a/tools/btmgmt.c
+>>>> +++ b/tools/btmgmt.c
+>>>> @@ -2261,6 +2261,42 @@ static void cmd_bredr(int argc, char **argv)
+>>>>       cmd_setting(MGMT_OP_SET_BREDR, argc, argv); }
+>>>> 
+>>>> +static void ll_rpa_resoln_rsp(uint8_t status, uint16_t len, const void *param,
+>>>> +                             void *user_data) {
+>>>> +       if (status != 0)
+>>>> +               error("Could not set LL RPA resolution with status 0x%02x (%s)",
+>>>> +                     status, mgmt_errstr(status));
+>>>> +       else
+>>>> +               print("LL RPA Resolution successfully set");
+>>>> +
+>>>> +       bt_shell_noninteractive_quit(EXIT_SUCCESS);
+>>>> +}
+>>>> +
+>>>> +static void cmd_set_ll_rpa_resoln(int argc, char **argv) {
+>>>> +       /* 15c0a148-c273-11ea-b3de-0242ac130004 */
+>>>> +       static const uint8_t rpa_resolution_uuid[16] = {
+>>>> +                               0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
+>>>> +                               0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
+>>>> +       };
+>>>> +       struct mgmt_cp_set_exp_feature cp;
+>>>> +       uint16_t index;
+>>>> +
+>>>> +       memset(&cp, 0, sizeof(cp));
+>>>> +       memcpy(cp.uuid, rpa_resolution_uuid, 16);
+>>>> +
+>>>> +       index = mgmt_index;
+>>>> +       if (index == MGMT_INDEX_NONE)
+>>>> +               index = 0;
+>>>> +
+>>>> +       if (parse_setting(argc, argv, &cp.action) == false)
+>>>> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+>>>> +
+>>>> +       mgmt_send(mgmt, MGMT_OP_SET_EXP_FEATURE, index,
+>>>> +                 sizeof(cp), &cp, ll_rpa_resoln_rsp, NULL, NULL); }
+>>>> +
+>>>> static void cmd_privacy(int argc, char **argv) {
+>>>>       struct mgmt_cp_set_privacy cp; @@ -5243,6 +5279,8 @@ static
+>>>> const struct bt_shell_menu main_menu = {
+>>>>               cmd_bredr,              "Toggle BR/EDR support",        },
+>>>>       { "privacy",            "<on/off>",
+>>>>               cmd_privacy,            "Toggle privacy support"        },
+>>>> +       { "llprivacy",          "<on/off>",
+>>>> +               cmd_set_ll_rpa_resoln,  "Toggle LL privacy support"     },
+>>> 
+>>> Let's have it as a parameter of privacy command <on/off/ll> so when a
+>>> user enters ll it enables link-layer privacy.
+>> 
+>> please don’t. The privacy setting means that we start using RPAs.
+>> 
+>> Also what is wrong with exp-privacy command that I already added.
+> 
+> Gentle Reminder.
 
-configs tested: 138
-configs skipped: 2
+gentle reminder of what? Please re-read my response.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+Regards
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-riscv                            allmodconfig
-x86_64                           allyesconfig
-riscv                            allyesconfig
-i386                             allyesconfig
-arm                       omap2plus_defconfig
-m68k                             alldefconfig
-sh                          rsk7203_defconfig
-powerpc                  storcenter_defconfig
-riscv                             allnoconfig
-sh                        sh7785lcr_defconfig
-arm                          pxa3xx_defconfig
-openrisc                         alldefconfig
-powerpc64                           defconfig
-sh                        apsh4ad0a_defconfig
-h8300                       h8s-sim_defconfig
-sh                           se7206_defconfig
-s390                             allmodconfig
-riscv             nommu_k210_sdcard_defconfig
-sh                           se7343_defconfig
-arc                         haps_hs_defconfig
-powerpc                     taishan_defconfig
-powerpc64                        alldefconfig
-powerpc                     ksi8560_defconfig
-xtensa                  cadence_csp_defconfig
-sh                          urquell_defconfig
-h8300                    h8300h-sim_defconfig
-arm                          collie_defconfig
-powerpc                    socrates_defconfig
-powerpc                   lite5200b_defconfig
-powerpc                      bamboo_defconfig
-arm                            xcep_defconfig
-mips                        nlm_xlp_defconfig
-powerpc                  iss476-smp_defconfig
-mips                         db1xxx_defconfig
-sh                            titan_defconfig
-m68k                         amcore_defconfig
-arm                       netwinder_defconfig
-m68k                        mvme147_defconfig
-ia64                            zx1_defconfig
-sh                          landisk_defconfig
-csky                             alldefconfig
-powerpc                     tqm8560_defconfig
-arm                       spear13xx_defconfig
-arc                     haps_hs_smp_defconfig
-mips                        maltaup_defconfig
-arm                        realview_defconfig
-arm                     am200epdkit_defconfig
-arm                     eseries_pxa_defconfig
-sparc                            allyesconfig
-xtensa                  nommu_kc705_defconfig
-arm                           corgi_defconfig
-mips                        omega2p_defconfig
-arm                          ixp4xx_defconfig
-powerpc                     tqm8540_defconfig
-powerpc                      ep88xc_defconfig
-powerpc                     rainier_defconfig
-arm                          pxa168_defconfig
-mips                           ci20_defconfig
-arm                       aspeed_g4_defconfig
-sh                         microdev_defconfig
-powerpc                     sequoia_defconfig
-sh                          lboxre2_defconfig
-arm                        clps711x_defconfig
-xtensa                generic_kc705_defconfig
-arm                      footbridge_defconfig
-sparc64                          alldefconfig
-arm                      jornada720_defconfig
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-parisc                           allyesconfig
-s390                                defconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a003-20210413
-x86_64               randconfig-a002-20210413
-x86_64               randconfig-a001-20210413
-x86_64               randconfig-a005-20210413
-x86_64               randconfig-a006-20210413
-x86_64               randconfig-a004-20210413
-i386                 randconfig-a003-20210413
-i386                 randconfig-a001-20210413
-i386                 randconfig-a006-20210413
-i386                 randconfig-a005-20210413
-i386                 randconfig-a004-20210413
-i386                 randconfig-a002-20210413
-i386                 randconfig-a015-20210413
-i386                 randconfig-a014-20210413
-i386                 randconfig-a013-20210413
-i386                 randconfig-a012-20210413
-i386                 randconfig-a016-20210413
-i386                 randconfig-a011-20210413
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-um                               allmodconfig
-um                                allnoconfig
-um                               allyesconfig
-um                                  defconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
+Marcel
 
-clang tested configs:
-x86_64               randconfig-a014-20210413
-x86_64               randconfig-a015-20210413
-x86_64               randconfig-a011-20210413
-x86_64               randconfig-a013-20210413
-x86_64               randconfig-a012-20210413
-x86_64               randconfig-a016-20210413
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
