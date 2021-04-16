@@ -2,132 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3404CC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 19:57:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC08C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:06:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C8D8611C2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 19:57:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ED0C6124B
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:06:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244475AbhDPT6H (ORCPT
+        id S238173AbhDPUHB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Apr 2021 15:58:07 -0400
-Received: from mout01.posteo.de ([185.67.36.65]:43293 "EHLO mout01.posteo.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S244367AbhDPT6G (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Apr 2021 15:58:06 -0400
-Received: from submission (posteo.de [89.146.220.130]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 45F37240029
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 21:57:39 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.de; s=2017;
-        t=1618603059; bh=3yzy215IycUe6EtG/3F2CBzelo/7OEe17yVAwtiEEPM=;
-        h=To:From:Subject:Date:From;
-        b=Z/TGfbBP6ce2T8oFG9o4wdt7mF5wFqsZayAm/2qBy97ofdpt/tk8MvMn4CxhgMSBa
-         PE3AHMOMXwMPMahYqfsnDVynEVGVtLfm9KdDyMfMTRQFpXFGkCEUKv5bBiOmOFi3hI
-         cXcsCKKch7B5//k2rbVF4zyiux58/BfU4wpgAnGnrHkLKOKfKXn8eAFFCuTbI+fDQN
-         OWpXDjXbT/UKWpaIvnZ8/vuzbwyLyTIu246CoG8Ds3HsVsSAO20d5qqPnf6EE0xO2o
-         3cghB0zgZ7aM9XzMaULzg33kzwUGS/inXUc4f7ELdZ5UXyFS+FMCVgC3kaiQ1Oj+jf
-         lf54BM3mOUE9A==
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4FMRnt6FQJz9rxK
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 21:57:38 +0200 (CEST)
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-From:   "mailinglisten@posteo.de" <mailinglisten@posteo.de>
-Subject: =?UTF-8?Q?bt_keyboard_won=c2=b4t_connect?=
-Message-ID: <3b645cc1-80c0-63a5-b283-57e101972456@posteo.de>
-Date:   Fri, 16 Apr 2021 19:57:38 +0000
+        Fri, 16 Apr 2021 16:07:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34186 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236363AbhDPUHA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 16 Apr 2021 16:07:00 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E61C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:06:34 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so17005133pjh.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:06:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=o2AGPONljbYZiX7hnBKFJGfWLt9TAIwGmTkRUL6wU2w=;
+        b=AGKj69K76XxTtvDJYknoHS4I0xSawurstVChWdHd/dDNKWC4J049ezXNULy3l2AdaF
+         8UgLJnw07rOSaPeeDU4pnJWYMdp4qzS/25NhEJ5RW7jHd+nEQ/t02OVXjwah2ggEysRi
+         Y0STit4un66523IaTXzgCdk4nbuFw5hJf3GkW+JdEspGmYq3x3c1wo1GwAhH1vg7cKcM
+         NLdvwgTXp/EtOGUkEYTCANjkmAINxYKeFJw2G+AUj3ZN6iauJ4B6/NTWSpNcyVkRZInq
+         Nb4Y/LUh+GY1HxJ7bJTns0bIlOnPbr7/9jnFkfJ2jDZbMiGHS4woYWPPA7F42Le2GvF5
+         vgmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=o2AGPONljbYZiX7hnBKFJGfWLt9TAIwGmTkRUL6wU2w=;
+        b=IoJgf88dE2lv2JyrIcLjhqyZRW560i2UKDhH7zYjO3EGj2RkH9OrQ+KgsAMmRP/Azv
+         NBsjlVJHKMDWjUjspBgTHrAav+LkCTABx89pcoUAV8dfM6gd78BHIrwDGBgqEEwH9fDX
+         LObOt3gOUYqVZTuo8eTRnXFDgVzmSn/uxMBDXgYv+Z74EAK4+/oY2w+k7S4Kmt1UevFf
+         FQdHKqvSMOCQ5Ns6nA58CJ/px4+HiBiYHyhTBcGdi9L/BKan/gCywG2AMwMwBWKZW2yr
+         KGsNzYDEDKkQEaeQddh53PTX98QwedQKE0QFPmUtDs8BXQv4+pW2U/6QlgiMlWasQfpx
+         EvYA==
+X-Gm-Message-State: AOAM530s11JABi4ZGoT9QJyv0qp74oLoijN3suJT5L05pqYzPJu5uSJ+
+        Eezev8HC94kW49MYAzibkVqPFpH3OcM=
+X-Google-Smtp-Source: ABdhPJxYVpNUTpHRexee97sKDWKpuhhYt7geMJiAGSYqpwUBHR/HafVlhIGIEmMOncqswnlhi4pkUA==
+X-Received: by 2002:a17:90a:540b:: with SMTP id z11mr3622371pjh.133.1618603593900;
+        Fri, 16 Apr 2021 13:06:33 -0700 (PDT)
+Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:d830:b679:8f6d:6528:e787])
+        by smtp.gmail.com with ESMTPSA id v8sm5369120pfm.128.2021.04.16.13.06.32
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 16 Apr 2021 13:06:33 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] monitor: Add Intel read supported VS features command
+Date:   Fri, 16 Apr 2021 13:06:32 -0700
+Message-Id: <20210416200632.621635-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <Tedd Ho-Jeong An <tedd.an@intel.com>
+References: <Tedd Ho-Jeong An <tedd.an@intel.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: de-DE
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear List,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-I have an iPazzport bt mini keyboard that won´t connect.
-
-Bluez is version 5.58, kernel 5.11.11.
-
-Below I put the output from btmon.
-The battery in the keyboard is charged, checked twice.
-
-BT adapter is an onboard Qualcomm/Atheros 0cf3:e500 device in a laptop.
-
-Could it be, the adapter needs to be put in HID mode?
-How can I find out, what mode the adapter uses? I could not see in lsusb
--v what mode the adapter uses.
-
-Below I put btmon output,
-the same output as screen shot, more eye friendly there:
-https://ibb.co/NZC3zKD
-
-Thanks a lot in advance !
-
-~$ btmon
-Bluetooth monitor ver 5.58
-= Note: Linux version 5.11.11-1.tpad (x86_64)
-
-             0.070249
-= Note: Bluetooth subsystem version 2.22
-
-             0.070257
-= New Index: 00:F4:8D:C9:40:5E (Primary,USB,hci0)
-
-      [hci0] 0.070261
-= Open Index: 00:F4:8D:C9:40:5E
-
-      [hci0] 0.070269
-= Index Info: 00:F4:8D:C9:40:5E (Qualcomm)
-
-      [hci0] 0.070273
-@ MGMT Open: bluetoothd (privileged) version 1.19
-
-    {0x0001} 0.070278
-= bluetoothd: profiles/input/device.c:ioctl_is_connected() Can't get
-HIDP connection info
-                46.562408
-< HCI Command: Create Connection (0x01|0x0005) plen 13
-
-  #1 [hci0] 46.562467
-        Address: 54:46:6B:01:99:DA (Shenzhen CZTIC Electronic Technology
-Co., Ltd)
-        Packet type: 0xcc18
-          DM1 may be used
-          DH1 may be used
-          DM3 may be used
-          DH3 may be used
-          DM5 may be used
-          DH5 may be used
-        Page scan repetition mode: R2 (0x02)
-        Page scan mode: Mandatory (0x00)
-        Clock offset: 0x0000
-        Role switch: Allow slave (0x01)
-> HCI Event: Command Status (0x0f) plen 4
-
-  #2 [hci0] 46.565296
-      Create Connection (0x01|0x0005) ncmd 1
+< HCI Command: Intel Read Supported VS Features (0x3f|0x00a6) plen 1
+        Page: 0x01
+> HCI Event: Command Complete (0x0e) plen 22
+      Intel Read Supported VS Features (0x3f|0x00a6) ncmd 1
         Status: Success (0x00)
-> HCI Event: Connect Complete (0x03) plen 11
+        Page: 0x01
+        Max Pages: 0x02
+        Supported Features:
+        1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+---
+ monitor/intel.c | 23 +++++++++++++++++++++++
+ 1 file changed, 23 insertions(+)
 
-  #3 [hci0] 51.687430
-        Status: Page Timeout (0x04)
-        Handle: 2
-        Address: 54:46:6B:01:99:DA (Shenzhen CZTIC Electronic Technology
-Co., Ltd)
-        Link type: ACL (0x01)
-        Encryption: Disabled (0x00)
-@ MGMT Event: Connect Failed (0x000d) plen 8
-
-{0x0001} [hci0] 51.687500
-        BR/EDR Address: 54:46:6B:01:99:DA (Shenzhen CZTIC Electronic
-Technology Co., Ltd)
-        Status: Connect Failed (0x04)
-= bluetoothd: profiles/input/device.c:control_connect_cb() connect to
-54:46:6B:01:99:DA: Host is down (112)
-               51.688047
+diff --git a/monitor/intel.c b/monitor/intel.c
+index 18840f3e7..1aee29cc8 100644
+--- a/monitor/intel.c
++++ b/monitor/intel.c
+@@ -471,6 +471,25 @@ static void memory_write_cmd(const void *data, uint8_t size)
+ 	packet_hexdump(data + 6, size - 6);
+ }
+ 
++static void read_supported_vs_features_cmd(const void *data, uint8_t size)
++{
++	uint8_t page = get_u8(data);
++	print_field("Page: 0x%2.2x", page);
++}
++
++static void read_supported_vs_features_rsp(const void *data, uint8_t size)
++{
++	uint8_t status = get_u8(data);
++	uint8_t page = get_u8(data + 1);
++	uint8_t max_pages = get_u8(data + 2);
++
++	print_status(status);
++	print_field("Page: 0x%2.2x", page);
++	print_field("Max Pages: 0x%2.2x", max_pages);
++	print_field("Supported Features:");
++	packet_hexdump(data + 3, size - 3);
++}
++
+ static const struct vendor_ocf vendor_ocf_table[] = {
+ 	{ 0x001, "Reset",
+ 			reset_cmd, 8, true,
+@@ -533,6 +552,10 @@ static const struct vendor_ocf vendor_ocf_table[] = {
+ 	{ 0x08e, "Memory Write",
+ 			memory_write_cmd, 6, false,
+ 			status_rsp, 1, true },
++	{ 0x0a6, "Read Supported VS Features",
++			read_supported_vs_features_cmd, 1, true,
++			read_supported_vs_features_rsp, 19, true },
++
+ 	{ }
+ };
+ 
+-- 
+2.25.1
 
