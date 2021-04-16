@@ -2,133 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DC08C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32C88C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:39:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0ED0C6124B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:06:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00E67613CE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 20:39:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238173AbhDPUHB (ORCPT
+        id S235672AbhDPUkV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Apr 2021 16:07:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34186 "EHLO
+        Fri, 16 Apr 2021 16:40:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41484 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236363AbhDPUHA (ORCPT
+        with ESMTP id S1344121AbhDPUkJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 16 Apr 2021 16:07:00 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 90E61C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:06:34 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id f2-20020a17090a4a82b02900c67bf8dc69so17005133pjh.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:06:34 -0700 (PDT)
+        Fri, 16 Apr 2021 16:40:09 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11C8AC061761
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:39:44 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id d1so2531346qvy.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 13:39:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=o2AGPONljbYZiX7hnBKFJGfWLt9TAIwGmTkRUL6wU2w=;
-        b=AGKj69K76XxTtvDJYknoHS4I0xSawurstVChWdHd/dDNKWC4J049ezXNULy3l2AdaF
-         8UgLJnw07rOSaPeeDU4pnJWYMdp4qzS/25NhEJ5RW7jHd+nEQ/t02OVXjwah2ggEysRi
-         Y0STit4un66523IaTXzgCdk4nbuFw5hJf3GkW+JdEspGmYq3x3c1wo1GwAhH1vg7cKcM
-         NLdvwgTXp/EtOGUkEYTCANjkmAINxYKeFJw2G+AUj3ZN6iauJ4B6/NTWSpNcyVkRZInq
-         Nb4Y/LUh+GY1HxJ7bJTns0bIlOnPbr7/9jnFkfJ2jDZbMiGHS4woYWPPA7F42Le2GvF5
-         vgmQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=x/5DA65IClzkqgZESepEkOP9e0Ldx5A5TYZDLBI80eM=;
+        b=PDD3rIbmHyfU0E4AB/rEeyMXGDY0Hu5ObvBe/PUhcVlVM1B9SrvCCIBgyVJsKRajTy
+         v7RX70loNhgDyWJnGrkRfLKLBAsdZZcsa6fRxKbbx7xy1CmR0W+oFXKA+61kdETdCkD7
+         0qetaxDxSeBO7hKhRW2L8GE04i+Yrk/biqUjzfu+3KrOtGOVA6IM8kndMBdzErn211s8
+         IJz4pVIH4xBedVjSnv4wgYgwsvlFesR4wpcPCS9siuLMpaGNJhJV+78g/O7809dbMG0t
+         Sbfef0c0xMUd//C6imJJTI/0RbWX+/CaeePQomtrrM7E2iVuDO07EC/9bPbW8kcHcsIs
+         uRdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=o2AGPONljbYZiX7hnBKFJGfWLt9TAIwGmTkRUL6wU2w=;
-        b=IoJgf88dE2lv2JyrIcLjhqyZRW560i2UKDhH7zYjO3EGj2RkH9OrQ+KgsAMmRP/Azv
-         NBsjlVJHKMDWjUjspBgTHrAav+LkCTABx89pcoUAV8dfM6gd78BHIrwDGBgqEEwH9fDX
-         LObOt3gOUYqVZTuo8eTRnXFDgVzmSn/uxMBDXgYv+Z74EAK4+/oY2w+k7S4Kmt1UevFf
-         FQdHKqvSMOCQ5Ns6nA58CJ/px4+HiBiYHyhTBcGdi9L/BKan/gCywG2AMwMwBWKZW2yr
-         KGsNzYDEDKkQEaeQddh53PTX98QwedQKE0QFPmUtDs8BXQv4+pW2U/6QlgiMlWasQfpx
-         EvYA==
-X-Gm-Message-State: AOAM530s11JABi4ZGoT9QJyv0qp74oLoijN3suJT5L05pqYzPJu5uSJ+
-        Eezev8HC94kW49MYAzibkVqPFpH3OcM=
-X-Google-Smtp-Source: ABdhPJxYVpNUTpHRexee97sKDWKpuhhYt7geMJiAGSYqpwUBHR/HafVlhIGIEmMOncqswnlhi4pkUA==
-X-Received: by 2002:a17:90a:540b:: with SMTP id z11mr3622371pjh.133.1618603593900;
-        Fri, 16 Apr 2021 13:06:33 -0700 (PDT)
-Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:d830:b679:8f6d:6528:e787])
-        by smtp.gmail.com with ESMTPSA id v8sm5369120pfm.128.2021.04.16.13.06.32
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=x/5DA65IClzkqgZESepEkOP9e0Ldx5A5TYZDLBI80eM=;
+        b=cHI6rZpAxU36VTV41oNgcISv/QAYarlSpiXLSVoM1/4AKGinqSrw738+QR5ncH/Y9H
+         rM1We70lhTPBtQIS16ynvvKd0LpsOpIvkbnyRXCjXaVyWJNO6FRQA1XoZM0Al5TfSlk8
+         vQAXTZ1G9uCxn7PFOC4hcYt57hXnDdSDK0xSfCX8jBFFiyFyKNgzWi9Zu9zJxud7AZ4E
+         /ToCKATvfmxqR42XYmaZ8pLo7HKMxFHRMESjoz2Fm1bLe7TakxDqEWpjxlUhSvZrlafv
+         zZMYR8+pqqHsF6YnR0jGVPJpm1mEG4tA4cSJRiHMfuC+UNZZOO3TIXKaNQ9CA+D1UaND
+         L8SQ==
+X-Gm-Message-State: AOAM5322jfgKzBxocG5mbu83zMth2xoGAHHLbWc7CixipKd358fDChQG
+        R/hraHNIm+6sc8Hej8rClY5+s0LaCCqNQz4z
+X-Google-Smtp-Source: ABdhPJx5iqLlIFJUcyqPdTNiEdCtu43Q1lKnMp61D6/aMveFla5sv6dHCuniEpZI7bEMuM2a7BxeFg==
+X-Received: by 2002:a0c:d40a:: with SMTP id t10mr592783qvh.19.1618605582854;
+        Fri, 16 Apr 2021 13:39:42 -0700 (PDT)
+Received: from [172.17.0.2] ([52.179.81.71])
+        by smtp.gmail.com with ESMTPSA id f2sm1742058qkh.76.2021.04.16.13.39.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 13:06:33 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH] monitor: Add Intel read supported VS features command
-Date:   Fri, 16 Apr 2021 13:06:32 -0700
-Message-Id: <20210416200632.621635-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <Tedd Ho-Jeong An <tedd.an@intel.com>
-References: <Tedd Ho-Jeong An <tedd.an@intel.com>
+        Fri, 16 Apr 2021 13:39:42 -0700 (PDT)
+Message-ID: <6079f60e.1c69fb81.7873f.c883@mx.google.com>
+Date:   Fri, 16 Apr 2021 13:39:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0169396341120464301=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ] monitor: Add Intel read supported VS features command
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210416200632.621635-1-hj.tedd.an@gmail.com>
+References: <20210416200632.621635-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+--===============0169396341120464301==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-< HCI Command: Intel Read Supported VS Features (0x3f|0x00a6) plen 1
-        Page: 0x01
-> HCI Event: Command Complete (0x0e) plen 22
-      Intel Read Supported VS Features (0x3f|0x00a6) ncmd 1
-        Status: Success (0x00)
-        Page: 0x01
-        Max Pages: 0x02
-        Supported Features:
-        1f 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
----
- monitor/intel.c | 23 +++++++++++++++++++++++
- 1 file changed, 23 insertions(+)
+This is automated email and please do not reply to this email!
 
-diff --git a/monitor/intel.c b/monitor/intel.c
-index 18840f3e7..1aee29cc8 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -471,6 +471,25 @@ static void memory_write_cmd(const void *data, uint8_t size)
- 	packet_hexdump(data + 6, size - 6);
- }
- 
-+static void read_supported_vs_features_cmd(const void *data, uint8_t size)
-+{
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=468819
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.38 seconds
+GitLint                       PASS      0.13 seconds
+Prep - Setup ELL              PASS      48.88 seconds
+Build - Prep                  PASS      0.15 seconds
+Build - Configure             PASS      8.45 seconds
+Build - Make                  PASS      205.84 seconds
+Make Check                    PASS      9.07 seconds
+Make Dist                     PASS      11.93 seconds
+Make Dist - Configure         PASS      5.23 seconds
+Make Dist - Make              PASS      83.00 seconds
+Build w/ext ELL - Configure   PASS      8.24 seconds
+Build w/ext ELL - Make        PASS      194.16 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+monitor: Add Intel read supported VS features command
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#27: FILE: monitor/intel.c:477:
 +	uint8_t page = get_u8(data);
 +	print_field("Page: 0x%2.2x", page);
-+}
-+
-+static void read_supported_vs_features_rsp(const void *data, uint8_t size)
-+{
-+	uint8_t status = get_u8(data);
-+	uint8_t page = get_u8(data + 1);
-+	uint8_t max_pages = get_u8(data + 2);
-+
-+	print_status(status);
-+	print_field("Page: 0x%2.2x", page);
-+	print_field("Max Pages: 0x%2.2x", max_pages);
-+	print_field("Supported Features:");
-+	packet_hexdump(data + 3, size - 3);
-+}
-+
- static const struct vendor_ocf vendor_ocf_table[] = {
- 	{ 0x001, "Reset",
- 			reset_cmd, 8, true,
-@@ -533,6 +552,10 @@ static const struct vendor_ocf vendor_ocf_table[] = {
- 	{ 0x08e, "Memory Write",
- 			memory_write_cmd, 6, false,
- 			status_rsp, 1, true },
-+	{ 0x0a6, "Read Supported VS Features",
-+			read_supported_vs_features_cmd, 1, true,
-+			read_supported_vs_features_rsp, 19, true },
-+
- 	{ }
- };
- 
--- 
-2.25.1
 
+- total: 0 errors, 1 warnings, 35 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] monitor: Add Intel read supported VS features command" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Dist - PASS
+Desc: Run 'make dist' and build the distribution tarball
+
+##############################
+Test: Make Dist - Configure - PASS
+Desc: Configure the source from distribution tarball
+
+##############################
+Test: Make Dist - Make - PASS
+Desc: Build the source from distribution tarball
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0169396341120464301==--
