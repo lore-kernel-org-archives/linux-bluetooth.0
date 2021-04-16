@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C6C11C43460
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 21:21:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74D71C43470
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 21:21:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE7F6613C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 21:21:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 546F5613CD
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 16 Apr 2021 21:21:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344300AbhDPVWF (ORCPT
+        id S1344208AbhDPVWG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 16 Apr 2021 17:22:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49926 "EHLO
+        Fri, 16 Apr 2021 17:22:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344179AbhDPVVq (ORCPT
+        with ESMTP id S233822AbhDPVVq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 16 Apr 2021 17:21:46 -0400
-Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CB20C06175F
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 14:18:29 -0700 (PDT)
-Received: by mail-pl1-x62a.google.com with SMTP id z22so9524944plo.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 14:18:29 -0700 (PDT)
+Received: from mail-pg1-x52e.google.com (mail-pg1-x52e.google.com [IPv6:2607:f8b0:4864:20::52e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFAFBC06138A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 14:18:31 -0700 (PDT)
+Received: by mail-pg1-x52e.google.com with SMTP id w10so20036520pgh.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 16 Apr 2021 14:18:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=w2i2EkuiHwy6UHQHgCZ3FLK8RP21LjHU09eKxBWV+Qk=;
-        b=LKP60iXdPnxLEoEawkgbIaYdUPjAxJVb2OggEQ8d1Ptv2zeIBw5VkalauqIMElSGs9
-         r6el0LAd7TeS8Oa3vmSTozkAUMWPST58nh7ZON+LSxDivqAxN6ToYShuxZwbKslUtJeP
-         p9EY2+qpjDswwx09y0EREiNBTzTVZLsjjTFI/lmQMQMnrB3KCHXC119M0nDbIU2jVZdM
-         fJDg+h4I0emKb6eHFEoc2Ao+vYZiJ1nLd7Pggufv4PYUMhSTM0UCyiiO7/3VOvczr3fE
-         FP8RXYx80M7Xyt3PYqcpJaZym6jmSb0aV/nXGvbox5qloFQ+ladU1+p48KMGJFv7eos+
-         RvDw==
+        bh=d0ZonNTHp8mR8G7j6/vhz+gEG9b37LmUnpHTcSX6kY0=;
+        b=dulTM5M3iwDDYX64bfHFQn2QvJtLKnlQwrD8QuzAFZfsXb155jn+S1P4Y7gGzmfkKB
+         P1uYPLvlFGI2ddUEM6lAPYtUdQBUbrWWm1dVkm7/vXZSxdwVIHZb8cwhvmYqwkRt9dOT
+         J+D8RuJUrVP9louNsd/AtywfJZMG9B1zWc77d4rxhvA7WVjLar/emKto6yfQKkg2aTEk
+         PqyEcPniO63eCfv+pWMqWqZMP2DIIMcFcybhwWYrVZUYk8PkOHsw3DyoCC0HxfagxAgB
+         RJ0W8eZRf/Wnburw9fV3pRsYZC6s3Cbbh/7GobgYRTaJw3pQdbexd0eMGAEJVgsFXQFv
+         hskg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=w2i2EkuiHwy6UHQHgCZ3FLK8RP21LjHU09eKxBWV+Qk=;
-        b=K9wvbP3JUNCCxv5q6q5L00NeDnCRwCC4jC9iX2vs989/CASvhFan4QDpr00YtuzX7I
-         rxJ6CQd9qteSoMXsY526Tzi0MPoKaC043oikNzXpTwemYkcWg3BcSnUljsIcB6ZCjqUJ
-         uZxJFizrwvye14Z8/7skaCEuYPzbEz7kjWBlkn1PN+OmxiEbymmyBmS27zAN8/icSFkl
-         dxXbDuvoFcUmmSJM0QmdQ1FvV+z4CLbZ7vavJky3XZrrfcG4yuXJSfEEPgCu0sLu/fG/
-         AdGanAPIPUYwgahMlixQAItRaz6LdtbVDa6RoIIDTfWkZYwEF0NCMzAxW7/0fes4yRoF
-         Xrrw==
-X-Gm-Message-State: AOAM531hY0sUmoJk6J4Sp4VEsHcaGLGleERHZsrJfaRsHSPAIOvJlBIE
-        BJivXD8XgVmKGJd2WeEt6Ek5pamRU4fnUg==
-X-Google-Smtp-Source: ABdhPJzYlL7rVdPjEggHShCXXynID21CTdltsVyHpJvrBJHwnBxyxU9e5fP1YiP60R1z+X8uIMLYag==
-X-Received: by 2002:a17:902:8f8d:b029:ea:e059:84a6 with SMTP id z13-20020a1709028f8db02900eae05984a6mr11604491plo.35.1618607908725;
-        Fri, 16 Apr 2021 14:18:28 -0700 (PDT)
+        bh=d0ZonNTHp8mR8G7j6/vhz+gEG9b37LmUnpHTcSX6kY0=;
+        b=FQW3Xu5YVdHPYWRu0s5XifZZ3NRKqa9d4D4816vvUymAO/LZG2VcYEuJhc/TRTTM7W
+         J10KjiBFZcNOeUpeP6hjPzHlVLj1nEFcnHTr/HD/heniZmaSpHnV4LgPPB0VZnY1vSZr
+         qi9+kFPfqT9FL3ed/Opt+6I+QCHsNefOZqf6Ed14N78//PmE0ahYpWNQMiEM/zD3Rhp2
+         /i3j318uGPDxYvVqjQWn7kFq3jYpu7GmIERI/5NpMmBT1mVTGe4UibU5yOlk0PdvqDZq
+         M5EtcLImrDhh8oQSpMreoo1i+/IxcvGAqXjAav6KpSvwCZmEWYNg9TJcGlU5l8e1CWgf
+         kj6A==
+X-Gm-Message-State: AOAM533IidXw9zMX3bqjHvDu7vSjrSWB/2ioeoRDcMrrqX5j5qKVC3WC
+        ks7l5M/IECZIBe3TnDgGO5mFbApBRpIZCg==
+X-Google-Smtp-Source: ABdhPJy7vG40+zdAxYCs0xWIHO2BX+Hz6MccqIMKqFpAuKfz5Ysh2ENnUenfl9CvlLSzbM/eMdgcag==
+X-Received: by 2002:a63:6c83:: with SMTP id h125mr884156pgc.50.1618607911116;
+        Fri, 16 Apr 2021 14:18:31 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z29sm5829843pga.52.2021.04.16.14.18.28
+        by smtp.gmail.com with ESMTPSA id z29sm5829843pga.52.2021.04.16.14.18.30
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 16 Apr 2021 14:18:28 -0700 (PDT)
+        Fri, 16 Apr 2021 14:18:30 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 03/10] Bluetooth: HCI: Use skb_pull to parse Number of Complete Packets event
-Date:   Fri, 16 Apr 2021 14:18:16 -0700
-Message-Id: <20210416211823.3776677-4-luiz.dentz@gmail.com>
+Subject: [PATCH 06/10] Bluetooth: HCI: Use skb_pull to parse Extended Inquiry Result event
+Date:   Fri, 16 Apr 2021 14:18:19 -0700
+Message-Id: <20210416211823.3776677-7-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210416211823.3776677-1-luiz.dentz@gmail.com>
 References: <20210416211823.3776677-1-luiz.dentz@gmail.com>
@@ -75,67 +75,73 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This uses skb_pull to check the Number of Complete Packets events
+This uses skb_pull to check the Extended Inquiry Result events
 received have the minimum required length.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci.h |  2 +-
- net/bluetooth/hci_event.c   | 20 +++++++++++---------
- 2 files changed, 12 insertions(+), 10 deletions(-)
+ include/net/bluetooth/hci.h |  5 +++++
+ net/bluetooth/hci_event.c   | 20 +++++++++++++++-----
+ 2 files changed, 20 insertions(+), 5 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index f1f505355e81..9251ae3a2ce0 100644
+index 53e16ad79698..f416ad71fd2d 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -2021,7 +2021,7 @@ struct hci_comp_pkts_info {
+@@ -2155,6 +2155,11 @@ struct extended_inquiry_info {
+ 	__u8     data[240];
  } __packed;
  
- struct hci_ev_num_comp_pkts {
--	__u8     num_hndl;
++struct hci_ev_ext_inquiry_result {
 +	__u8     num;
- 	struct hci_comp_pkts_info handles[];
- } __packed;
- 
++	struct extended_inquiry_info info[];
++} __packed;
++
+ #define HCI_EV_KEY_REFRESH_COMPLETE	0x30
+ struct hci_ev_key_refresh_complete {
+ 	__u8	status;
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 64f5931bfbbd..65b7194ae1ba 100644
+index d0e7744e9e7e..efa18a65ab80 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -4265,23 +4265,25 @@ static void hci_role_change_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- static void hci_num_comp_pkts_evt(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -4969,14 +4969,23 @@ static inline size_t eir_get_length(u8 *eir, size_t eir_len)
+ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ 					    struct sk_buff *skb)
  {
--	struct hci_ev_num_comp_pkts *ev = (void *) skb->data;
-+	struct hci_ev_num_comp_pkts *ev;
- 	int i;
- 
--	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
--		bt_dev_err(hdev, "wrong event for mode %d", hdev->flow_ctl_mode);
-+	ev = hci_ev_skb_pull(hdev, skb, HCI_EV_NUM_COMP_PKTS, sizeof(*ev));
-+	if (!ev)
- 		return;
--	}
- 
--	if (skb->len < sizeof(*ev) ||
--	    skb->len < struct_size(ev, handles, ev->num_hndl)) {
--		BT_DBG("%s bad parameters", hdev->name);
-+	if (!hci_ev_skb_pull(hdev, skb, HCI_EV_NUM_COMP_PKTS,
-+			     flex_array_size(ev, handles, ev->num)))
-+		return;
++	struct hci_ev_ext_inquiry_result *ev;
+ 	struct inquiry_data data;
+-	struct extended_inquiry_info *info = (void *) (skb->data + 1);
+-	int num_rsp = *((__u8 *) skb->data);
+ 	size_t eir_len;
++	int i;
 +
-+	if (hdev->flow_ctl_mode != HCI_FLOW_CTL_MODE_PACKET_BASED) {
-+		bt_dev_err(hdev, "wrong event for mode %d", hdev->flow_ctl_mode);
- 		return;
- 	}
++	ev = hci_ev_skb_pull(hdev, skb, HCI_EV_EXTENDED_INQUIRY_RESULT,
++			     sizeof(*ev));
++	if (!ev)
++		return;
  
--	BT_DBG("%s num_hndl %d", hdev->name, ev->num_hndl);
+-	BT_DBG("%s num_rsp %d", hdev->name, num_rsp);
++	if (!hci_ev_skb_pull(hdev, skb, HCI_EV_EXTENDED_INQUIRY_RESULT,
++			     flex_array_size(ev, info, ev->num)))
++	    return;
++
 +	BT_DBG("%s num %d", hdev->name, ev->num);
  
--	for (i = 0; i < ev->num_hndl; i++) {
+-	if (!num_rsp || skb->len < num_rsp * sizeof(*info) + 1)
++	if (!ev->num)
+ 		return;
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_PERIODIC_INQ))
+@@ -4984,7 +4993,8 @@ static void hci_extended_inquiry_result_evt(struct hci_dev *hdev,
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	for (; num_rsp; num_rsp--, info++) {
 +	for (i = 0; i < ev->num; i++) {
- 		struct hci_comp_pkts_info *info = &ev->handles[i];
- 		struct hci_conn *conn;
- 		__u16  handle, count;
++		struct extended_inquiry_info *info = &ev->info[i];
+ 		u32 flags;
+ 		bool name_known;
+ 
 -- 
 2.30.2
 
