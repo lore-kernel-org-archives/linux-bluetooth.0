@@ -2,637 +2,435 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F65C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 20:53:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7E2DC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 21:35:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02093613E7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 20:53:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 62BFC613F6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 21:35:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233957AbhDTUyB (ORCPT
+        id S233961AbhDTVgH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Apr 2021 16:54:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52238 "EHLO
+        Tue, 20 Apr 2021 17:36:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33226 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234011AbhDTUyA (ORCPT
+        with ESMTP id S233724AbhDTVgG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Apr 2021 16:54:00 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3900C06138B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 13:53:28 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id j7so18156530pgi.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 13:53:28 -0700 (PDT)
+        Tue, 20 Apr 2021 17:36:06 -0400
+Received: from mail-io1-xd32.google.com (mail-io1-xd32.google.com [IPv6:2607:f8b0:4864:20::d32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93B39C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 14:35:33 -0700 (PDT)
+Received: by mail-io1-xd32.google.com with SMTP id p8so18639367iol.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 14:35:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=VNs5veZkAaWVHEO64CZWmmR32WsmT417psC/8ZT5L9Y=;
-        b=Ji2x/F5Ls2MMMM0MMdjkM+T3tSqoaHKXxWujv1U6k2RsGLJAItyrMn11oslX0OHk9w
-         0kD2waSpDD9lZqsOFb8ul1H0VTeHfITCu9yKbWe8YoSBoigcoNJt6SvLJKerue8EM0Qi
-         jO/WSjVrMJLX78sQY8rxkShNzwW62depTGyFA=
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=zu6mUxlpPFVTRb+hWyoL35fhnJALVF4ZJqNBau8Z0is=;
+        b=sdl403zRghymXqyzne1oDb5gAN43dt73ngszwQfGYA002Wq+crOU9oimCCTGOmvKMl
+         JBP6gXQ5fj10K/bApBoWYk/zYDXdGSlcJL5+uMCfcaQnV1g010jTCeZ9JQgzGfI/9Tnm
+         2WFcXVWwvHNrP5nsNvmM6s8egQNXhhu2mPwffI4v+oeYplQBmF0QT7+Hgnqe5vRjvj44
+         5JF8A6sWsH1Frf1oy+2Tiv5FNQ1jfsPAixqRr63iluA6OvzI43DKQ+BzCXUnWgl9j+eJ
+         kTX+EN5x1wrcO7TA9vaxZmpMm115ZVh8YykbvTpi5ZRXDqr11+S9Hg5pof9gcCUOIK44
+         uHGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=VNs5veZkAaWVHEO64CZWmmR32WsmT417psC/8ZT5L9Y=;
-        b=mOk/VTHj4Es1oWemDJD7G0/InGuaNrGwGgBWP7XGlK18UiD+A0b7yA95I8DfxFvLYE
-         cg2Tp56TGFU/TVgCt9SwLc9eDZWIMeiQ44CCRDiPSnWXXDeqQMvkVfh60+oWBK5bpdhO
-         7gDbnl9O1RQTt2uEeqqQ/IzpGrAOMqPK/vSog16WqeqqP4gqmr21ULh8jgM6Jkp5/RGX
-         Dygp6Ok3qz4ShIoHZB4FSSx3a5t7zXersq7OUCHrO4FNj0bVX8QvezP4w0nAIe4NPaTj
-         de5jlphcWhywwPPdYonIqluF9vYvUtqxd8dO7J7cjuN3Nws8fPbtMnUtB/nS3t5HAtKw
-         27aA==
-X-Gm-Message-State: AOAM532e8SRddQnk7ZnbERR1gmM3JZSwoBJueZ5wt2FeT/zzt9c7lFXa
-        PbGzg/0eIDyw/vVd1zqRnEWa8NPudLxohw==
-X-Google-Smtp-Source: ABdhPJwCCmXA1eAyGnxxdiwBRSaoxKP/oi0aQ9QBLhev7RhICsjYXlriSLdvY1ebWrGKUIDFJ+l1Jw==
-X-Received: by 2002:a17:90b:1183:: with SMTP id gk3mr6785541pjb.172.1618952008043;
-        Tue, 20 Apr 2021 13:53:28 -0700 (PDT)
-Received: from localhost ([2620:15c:202:201:b1f0:79e0:c1ca:fd1])
-        by smtp.gmail.com with UTF8SMTPSA id 25sm17447239pgx.72.2021.04.20.13.53.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 13:53:27 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 13:53:26 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org
-Subject: Re: [PATCH v2 1/3] Bluetooth: hci_qca: Add support for QTI Bluetooth
- chip wcn6750
-Message-ID: <YH8/Ru4pP2L6RBn4@google.com>
-References: <1618936010-16579-1-git-send-email-gubbaven@codeaurora.org>
- <1618936010-16579-2-git-send-email-gubbaven@codeaurora.org>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=zu6mUxlpPFVTRb+hWyoL35fhnJALVF4ZJqNBau8Z0is=;
+        b=o6CMUWtTYfia6UCM3EdGEpsOnviWMjwmBLFOTqGvV8vclrJ6y2cThi/R83Hg827Xy7
+         IjyccaOQ3t4Gw3dnniOj5wxJiOF9f7Y7MgwedZYHyXNHj5FphrCAT1F/Jum9GjS4NC/k
+         hQjdXfCZ+rObwC1SWhC/1wQfyCBnEzPFjmHJM7hEz9us90AeAA9EdNaNEzjpAmEwuaYn
+         qhfqF2Uya/tPLwwKnr0Q7jJ7DjFoZePBdIJxspltidqTE+HJQyQePkt8LOudkDV5boG/
+         LUHrNAJqMZIxKAbGz9hkw2/Vf1W7NuRR43nUN7AhVraePUEQvFDXa2dLs9y+axgtyt7x
+         Lt8w==
+X-Gm-Message-State: AOAM530BgGBiyNqOQ/hetuGaPdcm+OK6GgC4xfrJzk7U1QmydoOKHGNg
+        gmFQfz/LsHEG1nXNeFyEAubadlg6tLISSBr0EA==
+X-Google-Smtp-Source: ABdhPJxJoNaObXWA/kJc3M2zJBA+x2jVaGNA5jHJNddCFg9kVidwu2e+jB9Aw640L3/wkxsLOIIei7YoeKNCdgdbwbk=
+X-Received: by 2002:a5e:8a0c:: with SMTP id d12mr11453578iok.152.1618954532885;
+ Tue, 20 Apr 2021 14:35:32 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1618936010-16579-2-git-send-email-gubbaven@codeaurora.org>
+References: <CAC9s0NYWacb=SH8P9zr_66CZnD6HC4yHkY_o2wk08oeSwn+Syw@mail.gmail.com>
+ <BYAPR14MB2887AB8A9D781267F8F4B2EEE64F9@BYAPR14MB2887.namprd14.prod.outlook.com>
+ <CABBYNZLDgfRarPODF+c2PWvgi1zeUiy5QfmXY5UVkwVkoLJ3zg@mail.gmail.com>
+ <CAC9s0Na0h5VRC8dc6sPmuQWOd0v2mvOfAnqq_sO0+BfLcjJAtw@mail.gmail.com>
+ <CAC9s0NYh+PLLDArNMQxKyjD-DZgS9u_4K1ynt_DxF91Vru+_2A@mail.gmail.com>
+ <CABBYNZLzu+subZu5L6FYmrLB=w7hK3_kJ51LDmd3aCufR-UVBQ@mail.gmail.com>
+ <CAC9s0NZtc_8fXQdZn_1USxixSzbaj2d1OcOn=EoJGFHhX75LjQ@mail.gmail.com>
+ <CABBYNZ+Tdxh+yecJgTLg3m=+QJHBVZqG=TSxF7bbJTAOYkjX8g@mail.gmail.com>
+ <CAC9s0NaMX0gZWam498_=r0gwHNrtmxoV00+0P=wLYhyf+3KCuA@mail.gmail.com>
+ <CAC9s0Nb26NAQ5DO6nB0epLCRHgNgwGOrLxGHe=FLzgrDtnUx8w@mail.gmail.com> <BYAPR14MB2887F71E99ECA046D4A63237E64C9@BYAPR14MB2887.namprd14.prod.outlook.com>
+In-Reply-To: <BYAPR14MB2887F71E99ECA046D4A63237E64C9@BYAPR14MB2887.namprd14.prod.outlook.com>
+From:   Kenny Bian <kennybian@gmail.com>
+Date:   Tue, 20 Apr 2021 14:35:21 -0700
+Message-ID: <CAC9s0NaV_-JAwu9GhGC1AtfFdMcih0-nv0gCritWpM5kNLrkyg@mail.gmail.com>
+Subject: Re: Disabled bluetooth cache. But the app still getting wrong data?
+To:     Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 09:56:48PM +0530, Venkata Lakshmi Narayana Gubba wrote:
-> Added regulators,GPIOs and changes required to power on/off wcn6750.
-> Added support for firmware download for wcn6750.
-> 
-> Changes done in detail:
-> 1. Added regulators and corresponding current values.
-> 2. Added sw_ctrl GPIO pin which is output from BT SoC and indicates
->    status of clock supply to BT SoC.
-> 3. Added inline function to check if the SoC type is wcn399x or wcn6750.
-> 4. Modified the function qca_wcn3990_init() to support wcn6750 and
->    renamed it to qca_regulator_init().
-> 5. Added BT_ON and BT_OFF macros.
-> 6. Added support to download mbn type firmware image as wcn6750 supports
->    mbn type image.
-> 7. If mbn type image is not present then we will check for tlv type image.
-> 8. Moved extracting rom version info to common place as this code is
->    common in all if else ladder in qca_uart_setup.
-> 
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> ---
->  drivers/bluetooth/btqca.c   |  88 ++++++++++++++++++++++++++----------
->  drivers/bluetooth/btqca.h   |  15 ++++++-
->  drivers/bluetooth/hci_qca.c | 106 ++++++++++++++++++++++++++++++++++----------
->  3 files changed, 161 insertions(+), 48 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index 25114f0..eec391a 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -182,7 +182,8 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->  }
->  EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
->  
-> -static void qca_tlv_check_data(struct qca_fw_config *config,
-> +static void qca_tlv_check_data(struct hci_dev *hdev,
-> +			       struct qca_fw_config *config,
->  		const struct firmware *fw, enum qca_btsoc_type soc_type)
->  {
->  	const u8 *data;
-> @@ -194,19 +195,21 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
->  	struct tlv_type_nvm *tlv_nvm;
->  	uint8_t nvm_baud_rate = config->user_baud_rate;
->  
-> -	tlv = (struct tlv_type_hdr *)fw->data;
-> -
-> -	type_len = le32_to_cpu(tlv->type_len);
-> -	length = (type_len >> 8) & 0x00ffffff;
-> -
-> -	BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
-> -	BT_DBG("Length\t\t : %d bytes", length);
-> -
->  	config->dnld_mode = QCA_SKIP_EVT_NONE;
->  	config->dnld_type = QCA_SKIP_EVT_NONE;
->  
->  	switch (config->type) {
-> +	case ELF_TYPE_PATCH:
-> +		config->dnld_mode = QCA_SKIP_EVT_VSE_CC;
-> +		config->dnld_type = QCA_SKIP_EVT_VSE_CC;
-> +
-> +		bt_dev_dbg(hdev, "File Class        : 0x%x", fw->data[4]);
-> +		bt_dev_dbg(hdev, "Data Encoding     : 0x%x", fw->data[5]);
-> +		bt_dev_dbg(hdev, "File version      : 0x%x", fw->data[6]);
-> +		break;
->  	case TLV_TYPE_PATCH:
-> +		tlv = (struct tlv_type_hdr *)fw->data;
-> +		type_len = le32_to_cpu(tlv->type_len);
->  		tlv_patch = (struct tlv_type_patch *)tlv->data;
->  
->  		/* For Rome version 1.1 to 3.1, all segment commands
-> @@ -218,6 +221,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
->  		config->dnld_mode = tlv_patch->download_mode;
->  		config->dnld_type = config->dnld_mode;
->  
-> +		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
->  		BT_DBG("Total Length           : %d bytes",
->  		       le32_to_cpu(tlv_patch->total_size));
->  		BT_DBG("Patch Data Length      : %d bytes",
-> @@ -243,6 +247,14 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
->  		break;
->  
->  	case TLV_TYPE_NVM:
-> +		tlv = (struct tlv_type_hdr *)fw->data;
-> +
-> +		type_len = le32_to_cpu(tlv->type_len);
-> +		length = (type_len >> 8) & 0x00ffffff;
-> +
-> +		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
-> +		BT_DBG("Length\t\t : %d bytes", length);
-> +
+Thank you so much, Jamie. That well explained it.
 
-To keep the wcn6750 shorther you could consider to have a separate patch
-for the ELF type and the additional logging.
-
->  		idx = 0;
->  		data = tlv->data;
->  		while (idx < length) {
-> @@ -387,7 +399,8 @@ static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
->  
->  static int qca_download_firmware(struct hci_dev *hdev,
->  				 struct qca_fw_config *config,
-> -				 enum qca_btsoc_type soc_type)
-> +				 enum qca_btsoc_type soc_type,
-> +				 u8 rom_ver)
->  {
->  	const struct firmware *fw;
->  	const u8 *segment;
-> @@ -397,12 +410,29 @@ static int qca_download_firmware(struct hci_dev *hdev,
->  
->  	ret = request_firmware(&fw, config->fwname, &hdev->dev);
->  	if (ret) {
-> -		bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
-> -			   config->fwname, ret);
-> -		return ret;
-> +		/* For WCN6750, if mbn file is not present then check for
-> +		 * tlv file.
-> +		 */
-> +		if (soc_type == QCA_WCN6750 && config->type == ELF_TYPE_PATCH) {
-> +			bt_dev_dbg(hdev, "QCA Failed to request file: %s (%d)",
-> +				   config->fwname, ret);
-> +			config->type = TLV_TYPE_PATCH;
-> +			snprintf(config->fwname, sizeof(config->fwname),
-> +				 "qca/msbtfw%02x.tlv", rom_ver);
-> +			ret = request_firmware(&fw, config->fwname, &hdev->dev);
-> +			if (ret) {
-> +				bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
-> +					   config->fwname, ret);
-> +				return ret;
-> +			}
-> +		} else {
-> +			bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
-> +				   config->fwname, ret);
-> +			return ret;
-> +		}
->  	}
->  
-> -	qca_tlv_check_data(config, fw, soc_type);
-> +	qca_tlv_check_data(hdev, config, fw, soc_type);
->  
->  	segment = fw->data;
->  	remain = fw->size;
-> @@ -502,27 +532,33 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  
->  	config.user_baud_rate = baudrate;
->  
-> +	/* Firmware files to download are based on ROM version.
-> +	 * ROM version is derived from last two bytes of soc_ver.
-> +	 */
-> +	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
-> +		    (soc_ver & 0x0000000f);
-> +
-
-This refactoring could also be done in a separate patch.
-
->  	/* Download rampatch file */
->  	config.type = TLV_TYPE_PATCH;
->  	if (qca_is_wcn399x(soc_type)) {
-> -		/* Firmware files to download are based on ROM version.
-> -		 * ROM version is derived from last two bytes of soc_ver.
-> -		 */
-> -		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
-> -			    (soc_ver & 0x0000000f);
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/crbtfw%02x.tlv", rom_ver);
->  	} else if (soc_type == QCA_QCA6390) {
-> -		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
-> -			    (soc_ver & 0x0000000f);
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/htbtfw%02x.tlv", rom_ver);
-> +	} else if (soc_type == QCA_WCN6750) {
-> +		/* Choose mbn file by default.If mbn file is not found
-> +		 * then choose tlv file
-> +		 */
-> +		config.type = ELF_TYPE_PATCH;
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/msbtfw%02x.mbn", rom_ver);
->  	} else {
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/rampatch_%08x.bin", soc_ver);
->  	}
->  
-> -	err = qca_download_firmware(hdev, &config, soc_type);
-> +	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
->  	if (err < 0) {
->  		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
->  		return err;
-> @@ -548,11 +584,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  	else if (soc_type == QCA_QCA6390)
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/htnv%02x.bin", rom_ver);
-> +	else if (soc_type == QCA_WCN6750)
-> +		snprintf(config.fwname, sizeof(config.fwname),
-> +			 "qca/msnv%02x.bin", rom_ver);
->  	else
->  		snprintf(config.fwname, sizeof(config.fwname),
->  			 "qca/nvm_%08x.bin", soc_ver);
->  
-> -	err = qca_download_firmware(hdev, &config, soc_type);
-> +	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
->  	if (err < 0) {
->  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
->  		return err;
-> @@ -564,13 +603,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->  			return err;
->  	}
->  
-> -	/* WCN399x supports the Microsoft vendor extension with 0xFD70 as the
-> +	/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
->  	 * VsMsftOpCode.
->  	 */
->  	switch (soc_type) {
->  	case QCA_WCN3990:
->  	case QCA_WCN3991:
->  	case QCA_WCN3998:
-> +	case QCA_WCN6750:
->  		hci_set_msft_opcode(hdev, 0xFD70);
->  		break;
->  	default:
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index b19add7..3057bf8 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -80,7 +80,8 @@ enum qca_tlv_dnld_mode {
->  
->  enum qca_tlv_type {
->  	TLV_TYPE_PATCH = 1,
-> -	TLV_TYPE_NVM
-> +	TLV_TYPE_NVM,
-> +	ELF_TYPE_PATCH
->  };
->  
->  struct qca_fw_config {
-> @@ -143,6 +144,7 @@ enum qca_btsoc_type {
->  	QCA_WCN3998,
->  	QCA_WCN3991,
->  	QCA_QCA6390,
-> +	QCA_WCN6750
->  };
->  
->  #if IS_ENABLED(CONFIG_BT_QCA)
-> @@ -160,6 +162,12 @@ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
->  	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
->  	       soc_type == QCA_WCN3998;
->  }
-> +static inline bool qca_is_wcn399x_wcn6750(enum qca_btsoc_type soc_type)
-> +{
-> +	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
-> +	       soc_type == QCA_WCN3998 || soc_type == QCA_WCN6750;
-> +}
-> +
-
-I anticipate that this would eventually need to be extended to
-'qca_is_wcn399x_wcn6750_wcn1234', 'qca_is_wcn399x_wcn6750_wcn1234_wcn9876',
-which isn't really practical. It might be better to just have 'qca_is_wcn399x()'
-and 'qca_is_wcn6750()' (or qca_is_wcn675x() if applicable)
-
-IMO
-
-  if (qca_is_wcn399x(type) || qca_is_wcn6750(type))
-
-isn't really worse than
-
-  if (qca_is_wcn399x_wcn6750(type))
-
-
-personally I find the formwer even easier to read.
-
->  #else
->  
->  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> @@ -192,6 +200,11 @@ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
->  	return false;
->  }
->  
-> +static inline bool qca_is_wcn399x_wcn6750(enum qca_btsoc_type soc_type)
-> +{
-> +	return false;
-> +}
-> +
->  static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->  {
->  	return -EOPNOTSUPP;
-> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> index 0a00569..0d25ba9 100644
-> --- a/drivers/bluetooth/hci_qca.c
-> +++ b/drivers/bluetooth/hci_qca.c
-> @@ -70,6 +70,10 @@
->  #define QCA_CRASHBYTE_PACKET_LEN	1096
->  #define QCA_MEMDUMP_BYTE		0xFB
->  
-> +/* BT_EN GPIO enable/disable */
-> +#define BT_ON		1
-> +#define BT_OFF		0
-
-These aren't really needed, passing 0 and 1 to gpio_set_value() is clear enough.
-
-> +
->  enum qca_flags {
->  	QCA_IBS_DISABLED,
->  	QCA_DROP_VENDOR_EVENT,
-> @@ -218,6 +222,7 @@ struct qca_power {
->  struct qca_serdev {
->  	struct hci_uart	 serdev_hu;
->  	struct gpio_desc *bt_en;
-> +	struct gpio_desc *sw_ctrl;
->  	struct clk	 *susclk;
->  	enum qca_btsoc_type btsoc_type;
->  	struct qca_power *bt_power;
-> @@ -604,7 +609,7 @@ static int qca_open(struct hci_uart *hu)
->  	if (hu->serdev) {
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
->  
-> -		if (qca_is_wcn399x(qcadev->btsoc_type))
-> +		if (qca_is_wcn399x_wcn6750(qcadev->btsoc_type))
->  			hu->init_speed = qcadev->init_speed;
->  
->  		if (qcadev->oper_speed)
-> @@ -1308,7 +1313,7 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
->  		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
->  
->  	/* Give the controller time to process the request */
-> -	if (qca_is_wcn399x(qca_soc_type(hu)))
-> +	if (qca_is_wcn399x_wcn6750(qca_soc_type(hu)))
->  		usleep_range(1000, 10000);
->  	else
->  		msleep(300);
-> @@ -1384,7 +1389,7 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
->  
->  static int qca_check_speeds(struct hci_uart *hu)
->  {
-> -	if (qca_is_wcn399x(qca_soc_type(hu))) {
-> +	if (qca_is_wcn399x_wcn6750(qca_soc_type(hu))) {
->  		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
->  		    !qca_get_speed(hu, QCA_OPER_SPEED))
->  			return -EINVAL;
-> @@ -1417,7 +1422,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		/* Disable flow control for wcn3990 to deassert RTS while
->  		 * changing the baudrate of chip and host.
->  		 */
-> -		if (qca_is_wcn399x(soc_type))
-> +		if (qca_is_wcn399x_wcn6750(soc_type))
->  			hci_uart_set_flow_control(hu, true);
->  
->  		if (soc_type == QCA_WCN3990) {
-> @@ -1434,7 +1439,7 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
->  		host_set_baudrate(hu, speed);
->  
->  error:
-> -		if (qca_is_wcn399x(soc_type))
-> +		if (qca_is_wcn399x_wcn6750(soc_type))
->  			hci_uart_set_flow_control(hu, false);
->  
->  		if (soc_type == QCA_WCN3990) {
-> @@ -1585,10 +1590,12 @@ static bool qca_prevent_wake(struct hci_dev *hdev)
->  	return !wakeup;
->  }
->  
-> -static int qca_wcn3990_init(struct hci_uart *hu)
-> +static int qca_regulator_init(struct hci_uart *hu)
->  {
-> +	enum qca_btsoc_type soc_type = qca_soc_type(hu);
->  	struct qca_serdev *qcadev;
->  	int ret;
-> +	bool sw_ctrl_state;
->  
->  	/* Check for vregs status, may be hci down has turned
->  	 * off the voltage regulator.
-> @@ -1607,16 +1614,31 @@ static int qca_wcn3990_init(struct hci_uart *hu)
->  		}
->  	}
->  
-> -	/* Forcefully enable wcn3990 to enter in to boot mode. */
-> -	host_set_baudrate(hu, 2400);
-> -	ret = qca_send_power_pulse(hu, false);
-> -	if (ret)
-> -		return ret;
-> +	if (qca_is_wcn399x(soc_type)) {
-> +		/* Forcefully enable wcn3990 to enter in to boot mode. */
-
-nit: s/wcn3990/wcn399x/ since you are already touching the code
-
-> +		host_set_baudrate(hu, 2400);
-> +		ret = qca_send_power_pulse(hu, false);
-> +		if (ret)
-> +			return ret;
-> +	}
-> +
-> +	/* For wcn6750 need to enable gpio bt_en */
-
-Does this really only apply to the wcn6750()?
-
-From the code it's evident that the enable pin is togged, I suggest
-to drop the comment.
-
-> +	if (qcadev->bt_en) {
-> +		gpiod_set_value_cansleep(qcadev->bt_en, BT_OFF);
-> +		msleep(50);
-> +		gpiod_set_value_cansleep(qcadev->bt_en, BT_ON);
-> +		msleep(50);
-> +		sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
-> +		bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
-
-Need to check if 'sw_ctrl' is a valid GPIO?
-
-What exactly is the role of 'SW_CTRL'?
-
-> +	}
->  
->  	qca_set_speed(hu, QCA_INIT_SPEED);
-> -	ret = qca_send_power_pulse(hu, true);
-> -	if (ret)
-> -		return ret;
-> +
-> +	if (qca_is_wcn399x(soc_type)) {
-> +		ret = qca_send_power_pulse(hu, true);
-> +		if (ret)
-> +			return ret;
-> +	}
->  
->  	/* Now the device is in ready state to communicate with host.
->  	 * To sync host with device we need to reopen port.
-> @@ -1649,12 +1671,12 @@ static int qca_power_on(struct hci_dev *hdev)
->  	if (!hu->serdev)
->  		return 0;
->  
-> -	if (qca_is_wcn399x(soc_type)) {
-> -		ret = qca_wcn3990_init(hu);
-> +	if (qca_is_wcn399x_wcn6750(soc_type)) {
-> +		ret = qca_regulator_init(hu);
->  	} else {
->  		qcadev = serdev_device_get_drvdata(hu->serdev);
->  		if (qcadev->bt_en) {
-> -			gpiod_set_value_cansleep(qcadev->bt_en, 1);
-> +			gpiod_set_value_cansleep(qcadev->bt_en, BT_ON);
->  			/* Controller needs time to bootup. */
->  			msleep(150);
->  		}
-> @@ -1689,7 +1711,8 @@ static int qca_setup(struct hci_uart *hu)
->  	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
->  
->  	bt_dev_info(hdev, "setting up %s",
-> -		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME/QCA6390");
-> +		qca_is_wcn399x(soc_type) ? "wcn399x" :
-> +		(soc_type == QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390");
->  
->  	qca->memdump_state = QCA_MEMDUMP_IDLE;
->  
-> @@ -1700,7 +1723,7 @@ static int qca_setup(struct hci_uart *hu)
->  
->  	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
->  
-> -	if (qca_is_wcn399x(soc_type)) {
-> +	if (qca_is_wcn399x_wcn6750(soc_type)) {
->  		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
->  
->  		ret = qca_read_soc_version(hdev, &ver, soc_type);
-> @@ -1720,7 +1743,7 @@ static int qca_setup(struct hci_uart *hu)
->  		qca_baudrate = qca_get_baudrate_value(speed);
->  	}
->  
-> -	if (!qca_is_wcn399x(soc_type)) {
-> +	if (!qca_is_wcn399x_wcn6750(soc_type)) {
->  		/* Get QCA version information */
->  		ret = qca_read_soc_version(hdev, &ver, soc_type);
->  		if (ret)
-> @@ -1828,12 +1851,30 @@ static const struct qca_device_data qca_soc_data_qca6390 = {
->  	.num_vregs = 0,
->  };
->  
-> +static const struct qca_device_data qca_soc_data_wcn6750 = {
-> +	.soc_type = QCA_WCN6750,
-> +	.vregs = (struct qca_vreg []) {
-> +		{ "vddio", 5000 },
-> +		{ "vddaon", 26000 },
-> +		{ "vddbtcxmx", 126000 },
-> +		{ "vddrfacmn", 12500 },
-> +		{ "vddrfa0p8", 102000 },
-> +		{ "vddrfa1p7", 302000 },
-> +		{ "vddrfa1p2", 257000 },
-> +		{ "vddrfa2p2", 1700000 },
-> +		{ "vddasd", 200 },
-> +	},
-> +	.num_vregs = 9,
-> +	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
-> +};
-> +
->  static void qca_power_shutdown(struct hci_uart *hu)
->  {
->  	struct qca_serdev *qcadev;
->  	struct qca_data *qca = hu->priv;
->  	unsigned long flags;
->  	enum qca_btsoc_type soc_type = qca_soc_type(hu);
-> +	bool sw_ctrl_state;
->  
->  	qcadev = serdev_device_get_drvdata(hu->serdev);
->  
-> @@ -1856,8 +1897,14 @@ static void qca_power_shutdown(struct hci_uart *hu)
->  		host_set_baudrate(hu, 2400);
->  		qca_send_power_pulse(hu, false);
->  		qca_regulator_disable(qcadev);
-> +	} else if (soc_type == QCA_WCN6750) {
-> +		gpiod_set_value_cansleep(qcadev->bt_en, BT_OFF);
-> +		msleep(100);
-> +		qca_regulator_disable(qcadev);
-> +		sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
-> +		bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
->  	} else if (qcadev->bt_en) {
-> -		gpiod_set_value_cansleep(qcadev->bt_en, 0);
-> +		gpiod_set_value_cansleep(qcadev->bt_en, BT_OFF);
->  	}
->  
->  	set_bit(QCA_BT_OFF, &qca->flags);
-> @@ -1978,7 +2025,7 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  	if (!qcadev->oper_speed)
->  		BT_DBG("UART will pick default operating speed");
->  
-> -	if (data && qca_is_wcn399x(data->soc_type)) {
-> +	if (data && qca_is_wcn399x_wcn6750(data->soc_type)) {
->  		qcadev->btsoc_type = data->soc_type;
->  		qcadev->bt_power = devm_kzalloc(&serdev->dev,
->  						sizeof(struct qca_power),
-> @@ -1996,6 +2043,18 @@ static int qca_serdev_probe(struct serdev_device *serdev)
->  
->  		qcadev->bt_power->vregs_on = false;
->  
-> +		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
-> +					       GPIOD_OUT_LOW);
-> +		if (!qcadev->bt_en && data->soc_type == QCA_WCN6750) {
-> +			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
-> +			power_ctrl_enabled = false;
-> +		}
-> +
-> +		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
-> +					       GPIOD_IN);
-> +		if (!qcadev->sw_ctrl && data->soc_type == QCA_WCN6750)
-> +			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
-> +
->  		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
->  		if (IS_ERR(qcadev->susclk)) {
->  			dev_err(&serdev->dev, "failed to acquire clk\n");
-> @@ -2068,7 +2127,7 @@ static void qca_serdev_remove(struct serdev_device *serdev)
->  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
->  	struct qca_power *power = qcadev->bt_power;
->  
-> -	if (qca_is_wcn399x(qcadev->btsoc_type) && power->vregs_on)
-> +	if (qca_is_wcn399x_wcn6750(qcadev->btsoc_type) && power->vregs_on)
->  		qca_power_shutdown(&qcadev->serdev_hu);
->  	else if (qcadev->susclk)
->  		clk_disable_unprepare(qcadev->susclk);
-> @@ -2244,6 +2303,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
->  	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
->  	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
->  	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
-> +	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
->  	{ /* sentinel */ }
->  };
->  MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
-> -- 
-> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
-> of Code Aurora Forum, hosted by The Linux Foundation
-> 
+On Thu, Apr 15, 2021 at 11:34 PM Jamie Mccrae
+<Jamie.Mccrae@lairdconnect.com> wrote:
+>
+> Hi Kenny,
+> The way it works is when a device connects (it might just be a normal con=
+nection, it might be only if it pairs, it's vender specific) it will genera=
+lly cache the GATT table of the remote device, this is so that future conne=
+ctions are faster as it won't need to send multiple read commands to get it=
+. The easy way for that device to know if the GATT table has changed is it =
+uses a specific GATT attribute with a GATT table hash and reads that, if it=
+'s changed then it needs to clear the cache and re-read the table. That onl=
+y works when a device connects and reads it, if the GATT table is updated d=
+uring a connection, then an indication can be sent to that device telling i=
+t the GATT table hash has changed and it can re-read it and clear it during=
+ a connection.
+> If you are connecting a phone to your embedded device with the GATT table=
+ being on the embedded device then the cache is stored on the phone, there =
+doesn't need to be a GATT table hash on the embedded device because the pho=
+ne doesn't have a GATT table and iOS/android will create the cache themselv=
+es, you cannot disable that from the embedded device side, whatever cache y=
+ou enable/disable on the embedded system is for that system only, it does n=
+ot propagate that configuration value to other devices.
+> Thanks,
+> Jamie
+>
+> -----Original Message-----
+> From: Kenny Bian <kennybian@gmail.com>
+> Sent: 16 April 2021 05:03
+> To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: Jamie Mccrae <Jamie.Mccrae@lairdconnect.com>; linux-bluetooth@vger.ke=
+rnel.org
+> Subject: Re: Disabled bluetooth cache. But the app still getting wrong da=
+ta?
+>
+> EXTERNAL EMAIL: Be careful with attachments and links.
+>
+> Hi Luiz,
+>
+> One more question. Once we upgrade our device to Ubuntu 20.04 LTS with Bl=
+ueZ 5.53, we'll test "Service Changed Indication". Is GATT cache related to=
+ "Service Changed Indication"? If they are related, then I guess we should =
+turn on the GATT cache in /etc/bluetooth/main.conf?
+> Right now, the GATT cache is turned off in our device.
+>
+> Thanks,
+> Kenny
+>
+> On Thu, Apr 15, 2021 at 8:06 PM Kenny Bian <kennybian@gmail.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > Thank you so much! You're absolutely right.
+> >
+> > I'll talk to our team to upgrade our Ubuntu to 20.04 LTS. Then I'll
+> > test the BlueZ 5.53 which is the latest version on Ubuntu 20.04 LTS.
+> >
+> > Thanks again!
+> > Kenny
+> >
+> > On Thu, Apr 15, 2021 at 5:49 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Kenny,
+> > >
+> > > On Thu, Apr 15, 2021 at 5:21 PM Kenny Bian <kennybian@gmail.com> wrot=
+e:
+> > > >
+> > > > Hi Luiz,
+> > > >
+> > > > Thank you so much. I appreciate it.
+> > > >
+> > > > That was my bad. I just checked. Our system is Ubuntu 18.04. The
+> > > > BlueZ version is "5.48-0ubuntu3.4" which is different from the
+> > > > versions in http://www.bluez.org/. I'm trying to figure out if
+> > > > this version includes the version 5.50. Do you know the
+> > > > corresponding BlueZ version for "5.48-0ubuntu3.4"?
+> > >
+> > > 5.48, which was the version available in 2018, more than 3 years/10
+> > > releases ago, a lot of things have been fixed over this time so Id
+> > > really recommend to upgrade to the latest if you want to have some
+> > > support.
+> > >
+> > > > Thanks!
+> > > > Kenny
+> > > >
+> > > > On Thu, Apr 15, 2021 at 1:31 PM Luiz Augusto von Dentz
+> > > > <luiz.dentz@gmail.com> wrote:
+> > > > >
+> > > > > Hi Kenny,
+> > > > >
+> > > > > On Wed, Apr 14, 2021 at 10:44 PM Kenny Bian <kennybian@gmail.com>=
+ wrote:
+> > > > > >
+> > > > > > Hi Luiz,
+> > > > > >
+> > > > > > There is a UI example of nRF Connect which shows the "Service
+> > > > > > Changed Indication" is under "Generic
+> > > > > > Attribute"(http://forum.espruino.com/conversations/357737/).
+> > > > > > We're using BlueZ 5.48. I tried to add it by modifying example-=
+gatt-server:
+> > > > >
+> > > > >
+> > > > > You should have mentioned that you are using 5.48, you need the f=
+ollowing patch:
+> > > > >
+> > > > > commit a0b886e26c83ad4dfbf0b2b2e024c8ce9ead9a7d
+> > > > > Author: Szymon Janc <szymon.janc@codecoup.pl>
+> > > > > Date:   Wed Mar 28 12:10:55 2018 +0200
+> > > > >
+> > > > >     gatt: Add support for storing Service Changed CCC value
+> > > > >
+> > > > >     This adds support for storing CCC value of Service Changed
+> > > > >     characteristic. Once bluetoothd is restart stored values are =
+read
+> > > > >     and any device subscribed to indications will receive Service=
+ Changed
+> > > > >     indication with 0x00010-0xffff value. This is to invalidate a=
+ny
+> > > > >     non-core services since there is no way to verify if applicat=
+ions
+> > > > >     will register their services in same order (or at all).
+> > > > >
+> > > > >     This fix accessing invalid handles by stacks that rely only o=
+n Service
+> > > > >     Changed indication for rediscovery ie. Apple iOS.
+> > > > >
+> > > > > Or upgrade to a BlueZ release that has the above patch, which sho=
+uld be 5.50:
+> > > > >
+> > > > > +ver 5.50:
+> > > > > +       Fix issue with GATT and reading long values.
+> > > > > +       Fix issue with GATT and reading multiple includes.
+> > > > > +       Fix issue with GATT and service changes when offline.
+> > > > > +       Fix issue with handling secondary service discovery.
+> > > > > +       Fix issue with handling persistency of CCC values.
+> > > > >
+> > > > > >
+> > > > > > class ServiceChangedChrc(Characteristic):
+> > > > > >     SCI_UUID =3D '00002a05-0000-1000-8000-00805f9b34fb'
+> > > > > >
+> > > > > >     def __init__(self, bus, index, service):
+> > > > > >         Characteristic.__init__(
+> > > > > >                 self, bus, index,
+> > > > > >                 self.SCI_UUID,
+> > > > > >                 ['indicate'],
+> > > > > >                 service)
+> > > > > >
+> > > > > >     def IndicateValue(self, options):
+> > > > > >         # This function doesn't exist. Just list it here.
+> > > > > >         pass
+> > > > > >
+> > > > > >
+> > > > > > class ServiceChangedService(Service):
+> > > > > >     MY_UUID =3D '00001801-0000-1000-8000-00805f9b34fb'
+> > > > > >
+> > > > > >     def __init__(self, bus, index):
+> > > > > >         Service.__init__(self, bus, index, self.MY_UUID, True)
+> > > > > >         self.add_characteristic(ServiceChangedChrc(bus, 0,
+> > > > > > self))
+> > > > > >
+> > > > > >
+> > > > > > class Application(dbus.service.Object):
+> > > > > >     """
+> > > > > >     org.bluez.GattApplication1 interface implementation
+> > > > > >     """
+> > > > > >     def __init__(self, bus):
+> > > > > >         self.path =3D '/'
+> > > > > >         self.services =3D []
+> > > > > >         dbus.service.Object.__init__(self, bus, self.path)
+> > > > > >         self.add_service(HeartRateService(bus, 0))
+> > > > > >         self.add_service(BatteryService(bus, 1))
+> > > > > >         self.add_service(TestService(bus, 2))
+> > > > > >         self.add_service(ServiceChangedService(bus, 3))
+> > > > > >
+> > > > > >
+> > > > > > When I run it, there is "Failed to register application:
+> > > > > > org.bluez.Error.Failed: Failed to create entry in database".
+> > > > > > That is in the function client_ready_cb() in gatt-database.c
+> > > > > > in BlueZ code. Do you know how to fix it?
+> > > > >
+> > > > > You don't need to register Service Changed, the daemon already
+> > > > > takes care of registering it and there could only be one Service
+> > > > > Changed in the database.
+> > > > >
+> > > > > > Thanks!
+> > > > > > Kenny
+> > > > > >
+> > > > > > On Tue, Apr 13, 2021 at 9:46 PM Kenny Bian <kennybian@gmail.com=
+> wrote:
+> > > > > > >
+> > > > > > > Hi Jamie, Luiz,
+> > > > > > >
+> > > > > > > Thanks for your info.
+> > > > > > >
+> > > > > > > Luiz, to answer your questions:
+> > > > > > > BlueZ doesn't seem to emit "Service Changed Indication". Or
+> > > > > > > it does emit it, but we don't know how to verify it.
+> > > > > > > Yes, BlueZ acts as a GATT server which runs on Linux.
+> > > > > > >
+> > > > > > > So my questions:
+> > > > > > > How can I tell if "Service Changed Indication" is working? I
+> > > > > > > need to show it to our app developers that the GATT server
+> > > > > > > does send the "Service Changed Indication" when there is a se=
+rvice change.
+> > > > > > > By disabling the GATT's cache in "/etc/bluetooth/main.conf",
+> > > > > > > the "Service Changed Indication" is disabled?
+> > > > > > > Can "Service Changed Indication" be enabled in a conf file?
+> > > > > > > Or should it be done in the Python code? Could you please
+> > > > > > > help find out that info?
+> > > > > > > Our GATT server is based on the Python code
+> > > > > > > examples(https://git.kernel.org/pub/scm/bluetooth/bluez.git/t=
+ree/test).
+> > > > > > > I don't know how to enable "Service Changed Indication" or
+> > > > > > > "Robust Caching" in Python code on the GATT server side.
+> > > > > > > There is no document or code samples about that. Please let
+> > > > > > > me know if there is any document or Python code example.
+> > > > > > >
+> > > > > > > Thanks!
+> > > > > > > Kenny
+> > > > > > >
+> > > > > > > On Tue, Apr 13, 2021 at 2:57 PM Luiz Augusto von Dentz
+> > > > > > > <luiz.dentz@gmail.com> wrote:
+> > > > > > > >
+> > > > > > > > Hi Jamie, Brian,
+> > > > > > > >
+> > > > > > > > On Tue, Apr 13, 2021 at 2:03 AM Jamie Mccrae
+> > > > > > > > <Jamie.Mccrae@lairdconnect.com> wrote:
+> > > > > > > > >
+> > > > > > > > > Hi Kenny,
+> > > > > > > > > Why not just add the service changed indication as you re=
+fer to below? It was purposely designed for this specific purpose, you're t=
+rying to work around an issue created because you don't want to use the fea=
+ture that prevents this issue. Any workaround is just that, a workaround, a=
+nd might not work as intended.
+> > > > > > > >
+> > > > > > > > Yep, and while at it implement the so called Robust
+> > > > > > > > Caching feature so we can detect if anything has changed by=
+ reading the DB Hash.
+> > > > > > > >
+> > > > > > > > > Thanks,
+> > > > > > > > > Jamie
+> > > > > > > > >
+> > > > > > > > > -----Original Message-----
+> > > > > > > > > From: Kenny Bian <kennybian@gmail.com>
+> > > > > > > > > Sent: 13 April 2021 06:59
+> > > > > > > > > To: linux-bluetooth@vger.kernel.org
+> > > > > > > > > Subject: Disabled bluetooth cache. But the app still gett=
+ing wrong data?
+> > > > > > > > >
+> > > > > > > > > EXTERNAL EMAIL: Be careful with attachments and links.
+> > > > > > > > >
+> > > > > > > > > Previously we had an issue: if there is a change of chara=
+cteristics in the new build of our firmware, then the app will get the wron=
+g data.
+> > > > > > > > > By saying changed characteristics, it can be an added or =
+removed characteristic, or adding notification to an existing characteristi=
+c.
+> > > > > > > > > In order to keep the pairing information, the "/var/lib/b=
+luetooth"
+> > > > > > > > > folder is copied over to the new build's partition. We
+> > > > > > > > > realized that there is no "service changed indication".
+> > > > > > > > > The app can't handle the changed services. So we
+> > > > > > > > > disabled the bluetooth cache by set this in
+> > > > > > > > > "/etc/bluetooth/main.conf":
+> > > > > > > > > [GATT]
+> > > > > > > > > Cache =3D no
+> > > > > > > >
+> > > > > > > > When you say the app can't handle changed service do you
+> > > > > > > > mean BlueZ doesn't emit changes to the attributes (via
+> > > > > > > > Service Changed) or is it really the application not being =
+able to handle the changes?
+> > > > > > > >
+> > > > > > > > > But recently, we saw the problem again even if the
+> > > > > > > > > bluetooth cache is
+> > > > > > > > > disabled: in the build number 101, a characteristic is re=
+moved. But when we upgrade the build from 100 to 101, the app gets the wron=
+g data. We looked at the log. When the app tries to read temperature by usi=
+ng the temperature UUID, somehow the bluetooth service we created received =
+the request to read the "device name"(device name UUID). So the "device nam=
+e" is returned to the app as the temperature. This looks like the same beha=
+vior as the bluetooth cache is not disabled. I looked at the "/var/lib/blue=
+tooth/[BT_MAC]/cache" folder. There is no "[Attributes]" section in the fil=
+es in the folder. That means the disabled cache seems working.
+> > > > > > > >
+> > > > > > > > So BlueZ is acting as the server, right? The Cache only
+> > > > > > > > applies to the client portion, there is no such thing as di=
+sabling the remote cache.
+> > > > > > > > I don't see any incoming Read By Group Request from the
+> > > > > > > > remote so it is very likely that it has cached the values,
+> > > > > > > > there is no Read By Type for the DB Hash either which is
+> > > > > > > > quite surprising to me since that is required for stacks
+> > > > > > > > supporting Robust Caching which I believe is the case of iO=
+S.
+> > > > > > > >
+> > > > > > > > Anyway, I would check that the following lines are being tr=
+iggered:
+> > > > > > > >
+> > > > > > > > When starting:
+> > > > > > > >
+> > > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/sr
+> > > > > > > > c/gatt-database.c#n3798
+> > > > > > > >
+> > > > > > > > On connect:
+> > > > > > > >
+> > > > > > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/sr
+> > > > > > > > c/gatt-database.c#n3741
+> > > > > > > >
+> > > > > > > > If those lines are not being triggered it is likely a
+> > > > > > > > client problem which for some reason had not subscribed to
+> > > > > > > > received service changes for some reason, if it doesn't
+> > > > > > > > subscribe to service changes then it shall not cache any
+> > > > > > > > attribute and attempt to rediscover on every connection.
+> > > > > > > >
+> > > > > > > > > The only way to fix this issue is to force exit the mobil=
+e app on the phone and "Forget This Device" in iOS or "Unpair" in Android.
+> > > > > > > > >
+> > > > > > > > > I looked at the btmon(see attached). For the working btmo=
+n log, there is "Attribute group list: XX entries" under "ACL Data TX". But=
+ there is no "Attribute group list: XX entries" under "ACL Data TX" in the =
+attached problematic btmon log.
+> > > > > > > > >
+> > > > > > > > > Questions:
+> > > > > > > > > 1. How is it possible that this still happens even if the=
+ bluetooth cache is disabled?
+> > > > > > > > > 2. Is this the problem on the Linux side which runs the G=
+ATT server or on the mobile side?
+> > > > > > > > > 3. Is there anything else we should look into?
+> > > > > > > > >
+> > > > > > > > > We're going to release our product soon. This is a critic=
+al issue for us. Please help if you have any suggestions.
+> > > > > > > > >
+> > > > > > > > > Thanks!
+> > > > > > > > > THIS MESSAGE, ANY ATTACHMENT(S), AND THE INFORMATION CONT=
+AINED HEREIN MAY BE PROPRIETARY TO LAIRD CONNECTIVITY, INC. AND/OR ANOTHER =
+PARTY, AND MAY FURTHER BE INTENDED TO BE KEPT CONFIDENTIAL. IF YOU ARE NOT =
+THE INTENDED RECIPIENT, PLEASE DELETE THE EMAIL AND ANY ATTACHMENTS, AND IM=
+MEDIATELY NOTIFY THE SENDER BY RETURN EMAIL. THIS MESSAGE AND ITS CONTENTS =
+ARE THE PROPERTY OF LAIRD CONNECTIVITY, INC. AND MAY NOT BE REPRODUCED OR U=
+SED WITHOUT THE EXPRESS WRITTEN CONSENT OF LAIRD CONNECTIVITY, INC.
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > --
+> > > > > > > > Luiz Augusto von Dentz
+> > > > >
+> > > > >
+> > > > >
+> > > > > --
+> > > > > Luiz Augusto von Dentz
+> > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
