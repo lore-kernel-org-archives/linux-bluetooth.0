@@ -7,69 +7,70 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1AB0CC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 22:17:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 455CBC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7D86613FD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Apr 2021 22:17:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BFB56023B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:02:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234268AbhDTWRx (ORCPT
+        id S234223AbhDUACk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Apr 2021 18:17:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42388 "EHLO
+        Tue, 20 Apr 2021 20:02:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36862 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233961AbhDTWRv (ORCPT
+        with ESMTP id S234482AbhDUACg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Apr 2021 18:17:51 -0400
-Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D3AEC06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 15:17:18 -0700 (PDT)
-Received: by mail-yb1-xb30.google.com with SMTP id v3so42517912ybi.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 15:17:18 -0700 (PDT)
+        Tue, 20 Apr 2021 20:02:36 -0400
+Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB4C0C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:02:04 -0700 (PDT)
+Received: by mail-yb1-xb32.google.com with SMTP id c195so45099392ybf.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:02:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=l/P2si4bYf2PFXY6JboE2R231xS79klUOPxwRu4oCHk=;
-        b=HgTbI48JmgssibahBDXFN4718B3pFNOpdNgkZHJWYGcRQa8LDY+iGtd5/prtBKtYdN
-         WM2Xin2XZlTYlIIFPW4FyORgpvocPbpCfgldSujWv/cr2AqirRre+bPpVHPU6Vv3JhxD
-         l0dBqpz8n0qONR05vt/YBj4OxMdhagsoNwlxEJ2ySHppasDJwvmMGY3VTX2yp0dvkoS6
-         5PG8k12xC4hlAs0so7qmphcFv3R+9MUropDzJz754m6nbJmh28cf/CvOZlzx3wRM9+YJ
-         s/R2z4475jAoDgOhgOWBiLRfOcSWyLjUD0hk5rFTuHd8Rs8MZpe/hTmdqgKBkX/t/CVe
-         7jzA==
+        bh=+Gqf2zkYhhm5xSgQZDj101wspWtOWddsUNQ9A0uJy5w=;
+        b=TGODgiIWQlVLWjyrlBpE+MPCTTEuNtLA1xlFVMYikL3UBO0xwiX7cDfj6FPRVZFOo2
+         18ZNItvCr5OQXGv6rB6NHszbuyjq4kO3i2J10KGUcSI8Ixtu4y6VRIe9YGAMaaEIViCX
+         KozX3iwu18Aj8QYjwMttSLr/7obZW+azsLOLT2yIQDI0lN9h0WusRs8Y4r6ok0FLOs+r
+         pYXAaUmvpu7Lgw9/NaxEvVvrfbx696nvWTBx86IGRx7cfrNwEeZY6EY5yhv2kuLJuGCH
+         a4dqD5deGm+ZdSM96wtiazeHceHtpuctmcfNkMUnGlcyuAZK9K2NTiW+5bv/3tNOI1fn
+         cEXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=l/P2si4bYf2PFXY6JboE2R231xS79klUOPxwRu4oCHk=;
-        b=mXBj3eKT+ngJwW9RURD14LbyHizsxy0F3lZC4K5F3jrxh/qNI4S3+WUWqz7cmkSkkG
-         /hp5bZY81W3XHHWoM5z8NODpAMirx0kUYv1jW+Bnstq2NN3z0KmKjdgCU7IQM6y7fF1B
-         4+vGKuq4AM+LiRlD1df2Iev8TCWpofI6lCjrxJMdEVy9VAUZ8JL2y+OZ/d/UTN3+kHSW
-         JoYy3I2+3V/v+E8ZuTp2x9rFtrU7c/AZ5bAu1sHFWjH7c+WLG+K/a7Ie/PugbUimyhjc
-         7PPlj1T5WHN1tLLUvXz+ytLwst6+/+TcRW5BWDQi0tDDWlkYoXLELeeUbu3VvtjTS11j
-         llvQ==
-X-Gm-Message-State: AOAM532eL9ApMsMY/fBjE8rGQKNnm4XpsVRJBTGEQ8/75apzQUGRgAwR
-        RqsXe0I1oUJ9icEzT1luAWaWtphC3QAWQDqca57PT5bw7GE=
-X-Google-Smtp-Source: ABdhPJwBoQGJZS4Mbo3Amo9NeDhM0Wn6Yy3/4RJgLUdNgr85YZbvXcRe6+WzvH+Ryqyh/D3vc1BBGs+/JhOqgOCl63Q=
-X-Received: by 2002:a05:6902:120a:: with SMTP id s10mr7366252ybu.91.1618957037327;
- Tue, 20 Apr 2021 15:17:17 -0700 (PDT)
+        bh=+Gqf2zkYhhm5xSgQZDj101wspWtOWddsUNQ9A0uJy5w=;
+        b=DGUVrygPr8fa/lN3qd6u9TCN30QmZbvjX0hdzMZ20JKSZ5EN9betFcZvYIpM5UYoMj
+         PMrF/HbFylv5PfoWSb10RimJQwJR94pZ+Bmi5m7YIpv7uyHvAT7bOi68GGJhGVQwuWp3
+         NegU8KYGzgF0R6hUrEE0P3/QhcQV2b74/MDknMk0/tD71OtKvfG5gPX6fDGA6zmKag5P
+         yQKCq2FwYRKHdfXZGunrmVhyor3oqDexL2EYcW31OT6X/f6oWCBeCkgULj+OZzTVpRJG
+         e/BQKoU6BxclqqrTcIZuVBWsI+MN0kPpACphabJww3YSHf88x90wvPLv7FOZQuxh/vBy
+         xTBw==
+X-Gm-Message-State: AOAM533Cr8BPyx/Ud2+QZzs0GWl3QPcX3FZhIigLZVY4ejyh6wNT1owb
+        peww3ERPJ8AXBbDvOQ6M4yZnfLoAzsDegn5bBwi8wotuEJ4=
+X-Google-Smtp-Source: ABdhPJweQZJYs9BuVxUdRujDISrnzItxKbm9fsOnX9hRhqMATwkYUCnL/iXJvV2zFDSLkioAn7rzN8EW5x3BIcd3bV8=
+X-Received: by 2002:a25:e74a:: with SMTP id e71mr29954210ybh.408.1618963323960;
+ Tue, 20 Apr 2021 17:02:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210419182149.712000-1-hj.tedd.an@gmail.com> <607dd135.1c69fb81.e26c5.62f4@mx.google.com>
-In-Reply-To: <607dd135.1c69fb81.e26c5.62f4@mx.google.com>
+References: <20210419163518.BlueZ.v1.1.Id327043128b54d359c7ad4bf44ec21179c7d3213@changeid>
+ <607e1a5c.1c69fb81.2a37f.8f69@mx.google.com>
+In-Reply-To: <607e1a5c.1c69fb81.2a37f.8f69@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 20 Apr 2021 15:17:06 -0700
-Message-ID: <CABBYNZ+OFW3CT19MMW7wCa2FiErP1a6iu_RMpk6LgST=8=qOHA@mail.gmail.com>
-Subject: Re: [BlueZ,v3] monitor: Add Intel read supported features command
+Date:   Tue, 20 Apr 2021 17:01:53 -0700
+Message-ID: <CABBYNZ+e6Bf_KQYENS9x7RpteHneuMvn1GO7Oc+R_v5eweKMuw@mail.gmail.com>
+Subject: Re: [BlueZ,v1] device: Reply to connect request if SDP search failed
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Miao,
 
-On Mon, Apr 19, 2021 at 3:15 PM <bluez.test.bot@gmail.com> wrote:
+On Mon, Apr 19, 2021 at 5:04 PM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -77,23 +78,23 @@ On Mon, Apr 19, 2021 at 3:15 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=469821
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=469903
 >
 > ---Test result---
 >
 > Test Summary:
-> CheckPatch                    PASS      0.40 seconds
-> GitLint                       PASS      0.11 seconds
-> Prep - Setup ELL              PASS      45.05 seconds
-> Build - Prep                  PASS      0.14 seconds
-> Build - Configure             PASS      7.67 seconds
-> Build - Make                  PASS      191.17 seconds
-> Make Check                    PASS      9.48 seconds
-> Make Dist                     PASS      11.11 seconds
-> Make Dist - Configure         PASS      5.18 seconds
-> Make Dist - Make              PASS      78.79 seconds
-> Build w/ext ELL - Configure   PASS      7.70 seconds
-> Build w/ext ELL - Make        PASS      178.80 seconds
+> CheckPatch                    PASS      0.32 seconds
+> GitLint                       PASS      0.10 seconds
+> Prep - Setup ELL              PASS      44.34 seconds
+> Build - Prep                  PASS      0.10 seconds
+> Build - Configure             PASS      7.74 seconds
+> Build - Make                  PASS      184.91 seconds
+> Make Check                    PASS      8.96 seconds
+> Make Dist                     PASS      11.44 seconds
+> Make Dist - Configure         PASS      4.77 seconds
+> Make Dist - Make              PASS      76.05 seconds
+> Build w/ext ELL - Configure   PASS      7.68 seconds
+> Build w/ext ELL - Make        PASS      176.90 seconds
 >
 > Details
 > ##############################
@@ -143,12 +144,6 @@ On Mon, Apr 19, 2021 at 3:15 PM <bluez.test.bot@gmail.com> wrote:
 > ##############################
 > Test: Build w/ext ELL - Make - PASS
 > Desc: Build BlueZ source with '--enable-external-ell' configuration
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
 
 Applied, thanks.
 
