@@ -2,351 +2,276 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE8B4C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46568C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:50:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 85707613AB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:07:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0BB9B6140D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:50:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233879AbhDUAHv (ORCPT
+        id S234276AbhDUAvP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Apr 2021 20:07:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38006 "EHLO
+        Tue, 20 Apr 2021 20:51:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233807AbhDUAHu (ORCPT
+        with ESMTP id S234309AbhDUAvP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Apr 2021 20:07:50 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEEBAC06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:07:17 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id w10so28034110pgh.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:07:17 -0700 (PDT)
+        Tue, 20 Apr 2021 20:51:15 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3267C06138B
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id 31so12606920pgn.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WUJEQZmIbzYIpNfgaOiKZszAjQ/uaNWppRm9k3vwwm8=;
-        b=qs2D+XePGcFyaY8hbKXD76j0bai0/tBWfr+guqRSWvrJMDu7V0QaV/MiRaML/b5GEG
-         8th8ncyyaVQL3tQ3DWaB+xGR3Ezkhy7nv1sHYNnuf7h06fiRCitpFq1/ZKyLrrCnoIFZ
-         s8xY8PCbOWHqvHCaJUL7zIjYKrL7XEFVhF4moWbfcJK7vcdJaznKWMnrAIs7DmPhCHZW
-         kdy7g3Ll6KYFr20T8GKhsqlgHQEg+oUBeTdAZUsKxycOgYaFNoVRRS3yC6yOkV4Ps49e
-         YLjOZso5tcIQNe6jA9aYLJSrgGrFVAkHT1ZSRzbp7nXnYSjVGNxBOm/aoF9uys7j1g88
-         NI8A==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=8YLOYTL9uFfTlsUBTt4KtFnsgrD3qMKDwpIsIQc1OzQ=;
+        b=GTHAWJyYH+TVJoASsZJVT+rFImVeTfbBdAU0ib1vxL3BQwDL7OWyZZRY+dVfY+CbpJ
+         teVIlUg3keh/0L70wBaEjFOe9F0jWuGp5A/2LL2L+QU1LNxy3sEJmhmPc3v7dSxnSngQ
+         I87A7TZRRHK9Zj4RcZGYcgJgbC3ctsHHRvmxI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=WUJEQZmIbzYIpNfgaOiKZszAjQ/uaNWppRm9k3vwwm8=;
-        b=OekOghWubVFHmxa8A526147mfsmHz6ZPxgkeKUga+G1OsPeptLfJMjwvMG+WUbe7Og
-         cUjh1i5UxlTEhchsufCnXmkByXZClo35aB7+GNyaRHEjyuclvvBVYRLaoEnxEx4/SftY
-         Q2Dd4GC16nmtlqCNQvOuzdzUxG4Y8ErFnCN1PKfZ9cXfXj43cLpDe80sF1/eILrXxW/V
-         OhRLiNTYRps5gYcm75qnscjbxrOP/80FXKOjfYP9HZEy5g0VBsVlo907vb8YJa1Z6sry
-         PcLQMIAUbAAFkPkE+xd5KCFSdt7Xob0TWB+PjIYnRWkCYubAQxXvTVTCFAvyYyjS2sI5
-         lfwg==
-X-Gm-Message-State: AOAM533eVH2VEONE4o1us8EtJxH6qPf9UA5uokon31s/UMTLwOoMFAM5
-        66oKmF4eK4wA+IUr8wegsXzdaR1PPvc=
-X-Google-Smtp-Source: ABdhPJx/5w86NP2ToIXzTI2z2O2J8+nci+6MH+rZ2go1Zt7Esx6o2Sl5JcUM4jy0mM2O4HSEraO6IA==
-X-Received: by 2002:a63:190b:: with SMTP id z11mr18893027pgl.314.1618963637080;
-        Tue, 20 Apr 2021 17:07:17 -0700 (PDT)
-Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:d830:2814:4d4c:dc67:d170])
-        by smtp.gmail.com with ESMTPSA id w6sm138888pfj.85.2021.04.20.17.07.16
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Apr 2021 17:07:16 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ v3] monitor: Fix the incorrect vendor name
-Date:   Tue, 20 Apr 2021 17:07:15 -0700
-Message-Id: <20210421000715.756127-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=8YLOYTL9uFfTlsUBTt4KtFnsgrD3qMKDwpIsIQc1OzQ=;
+        b=mAzFdi8RdYKk1vVUMzJtoVVJs2IZNtt219bSnEVw4Z3mJsRI0I7sOzcT17RcM+C4dG
+         k9MzMZxTjsjymVXJRmxthsK9mnHK/zbry6UeGvf2P0X9pcwHm3qpBB+XAFICGePX2QL1
+         K8PlszoB5Q8gek+rWy5kbzsVUvkhBYT30u+sLfbrFVHjKR9KC+Oz6u5/vB6BGRM5IbIR
+         ri+Uc9IfdhyEUTJwyS43C5SEcqiailEocoPeh11P10PBKS4rIpQvoBJLStZ43yh+RiHN
+         f7LdcgVmVYsmw5Sm2tc9l3rQD/JXJadlQWJhnd1hiL4CkWgbKkhsHCvgND+uodJTNFpZ
+         4q0w==
+X-Gm-Message-State: AOAM532akvYgMIW1JJbNxGzkdW0M/xRmZD5quj0LZxSiYBtiO1rwmYjn
+        zVDlg24ypjy0LoIXPpnSgIev9g==
+X-Google-Smtp-Source: ABdhPJyqsXFJPEW53dgWZWzIl1MKNJhSGg4Hv/Awq+xELaEHiZszta5Vzv92f/tFkQR8imMYCtKe3w==
+X-Received: by 2002:a63:1a47:: with SMTP id a7mr19505511pgm.437.1618966242338;
+        Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
+Received: from localhost ([2620:15c:202:201:b1f0:79e0:c1ca:fd1])
+        by smtp.gmail.com with UTF8SMTPSA id x38sm183812pfu.22.2021.04.20.17.50.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 20 Apr 2021 17:50:41 -0700 (PDT)
+Date:   Tue, 20 Apr 2021 17:50:40 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org
+Subject: Re: [PATCH v2 2/3] dt-bindings: net: bluetooth: Convert to DT schema
+Message-ID: <YH924M62b7PDd/r6@google.com>
+References: <1618936010-16579-1-git-send-email-gubbaven@codeaurora.org>
+ <1618936010-16579-3-git-send-email-gubbaven@codeaurora.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1618936010-16579-3-git-send-email-gubbaven@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+On Tue, Apr 20, 2021 at 09:56:49PM +0530, Venkata Lakshmi Narayana Gubba wrote:
 
-This patch fixes the vendor name is alwasy shown as "Microsoft" for the
-commands and Unknown name for vendor events.
+> Subject: dt-bindings: net: bluetooth: Convert to DT schema
 
-< HCI Command: Microsoft Secure Send (0x3f|0x0009) plen 249
-        Type: Data fragment (0x01)
-> HCI Event: Command Complete (0x0e) plen 4
-      Microsoft Secure Send (0x3f|0x0009) ncmd 31
-        Status: Success (0x00)
----
- monitor/msft.h   |   6 +++
- monitor/packet.c | 132 ++++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 114 insertions(+), 24 deletions(-)
+This doesn't convert the generic binding or all bindings to DT schema
+as the subject suggests, but the Qualcomm BT binding.
 
-diff --git a/monitor/msft.h b/monitor/msft.h
-index a268f4bc7..9072c6ef8 100644
---- a/monitor/msft.h
-+++ b/monitor/msft.h
-@@ -24,6 +24,12 @@
- 
- #include <stdint.h>
- 
-+struct msft_ext {
-+	uint16_t opcode;
-+	uint8_t  evt_prefix_len;
-+	uint8_t  evt_prefix[32];
-+} __attribute__ ((packed));
-+
- struct vendor_ocf;
- struct vendor_evt;
- 
-diff --git a/monitor/packet.c b/monitor/packet.c
-index d729a01cc..e43470e81 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -265,7 +265,7 @@ struct index_data {
- 	uint8_t  type;
- 	uint8_t  bdaddr[6];
- 	uint16_t manufacturer;
--	uint16_t msft_opcode;
-+	struct msft_ext msft_ext;
- 	size_t   frame;
- };
- 
-@@ -3939,7 +3939,9 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 			index_list[index].type = ni->type;
- 			memcpy(index_list[index].bdaddr, ni->bdaddr, 6);
- 			index_list[index].manufacturer = fallback_manufacturer;
--			index_list[index].msft_opcode = BT_HCI_CMD_NOP;
-+			index_list[index].msft_ext.opcode = BT_HCI_CMD_NOP;
-+			index_list[index].msft_ext.evt_prefix_len = 0;
-+			memset(index_list[index].msft_ext.evt_prefix, 0, 32);
- 		}
- 
- 		addr2str(ni->bdaddr, str);
-@@ -4006,9 +4008,12 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				/*
- 				 * Intel controllers that support the
- 				 * Microsoft vendor extension are using
--				 * 0xFC1E for VsMsftOpCode.
-+				 * 0xFC1E for VsMsftOpCode and 0x50 for event
-+				 * code.
- 				 */
--				index_list[index].msft_opcode = 0xFC1E;
-+				index_list[index].msft_ext.opcode = 0xFC1E;
-+				index_list[index].msft_ext.evt_prefix_len = 1;
-+				index_list[index].msft_ext.evt_prefix[0] = 0x50;
- 				break;
- 			case 93:
- 				/*
-@@ -4016,7 +4021,16 @@ void packet_monitor(struct timeval *tv, struct ucred *cred,
- 				 * Microsoft vendor extenions are using
- 				 * 0xFCF0 for VsMsftOpCode.
- 				 */
--				index_list[index].msft_opcode = 0xFCF0;
-+				index_list[index].msft_ext.opcode = 0xFCF0;
-+				index_list[index].msft_ext.evt_prefix_len = 8;
-+				index_list[index].msft_ext.evt_prefix[0] = 0x23;
-+				index_list[index].msft_ext.evt_prefix[1] = 0x79;
-+				index_list[index].msft_ext.evt_prefix[2] = 0x54;
-+				index_list[index].msft_ext.evt_prefix[3] = 0x33;
-+				index_list[index].msft_ext.evt_prefix[4] = 0x77;
-+				index_list[index].msft_ext.evt_prefix[5] = 0x88;
-+				index_list[index].msft_ext.evt_prefix[6] = 0x97;
-+				index_list[index].msft_ext.evt_prefix[7] = 0x68;
- 				break;
- 			}
- 		}
-@@ -9323,19 +9337,20 @@ static const char *get_supported_command(int bit)
- 	return NULL;
- }
- 
--static const char *current_vendor_str(void)
-+static const char *current_vendor_str(uint16_t ocf)
- {
- 	uint16_t manufacturer, msft_opcode;
- 
- 	if (index_current < MAX_INDEX) {
- 		manufacturer = index_list[index_current].manufacturer;
--		msft_opcode = index_list[index_current].msft_opcode;
-+		msft_opcode = index_list[index_current].msft_ext.opcode;
- 	} else {
- 		manufacturer = fallback_manufacturer;
- 		msft_opcode = BT_HCI_CMD_NOP;
- 	}
- 
--	if (msft_opcode != BT_HCI_CMD_NOP)
-+	if (msft_opcode != BT_HCI_CMD_NOP &&
-+				cmd_opcode_ocf(msft_opcode) == ocf)
- 		return "Microsoft";
- 
- 	switch (manufacturer) {
-@@ -9350,13 +9365,34 @@ static const char *current_vendor_str(void)
- 	return NULL;
- }
- 
-+static const char *current_vendor_evt_str(uint8_t evt)
-+{
-+	uint16_t manufacturer;
-+
-+	if (index_current < MAX_INDEX)
-+		manufacturer = index_list[index_current].manufacturer;
-+	else
-+		manufacturer = fallback_manufacturer;
-+
-+	switch (manufacturer) {
-+	case 2:
-+		return "Intel";
-+	case 15:
-+		return "Broadcom";
-+	case 93:
-+		return "Realtek";
-+	}
-+
-+	return NULL;
-+}
-+
- static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
- {
- 	uint16_t manufacturer, msft_opcode;
- 
- 	if (index_current < MAX_INDEX) {
- 		manufacturer = index_list[index_current].manufacturer;
--		msft_opcode = index_list[index_current].msft_opcode;
-+		msft_opcode = index_list[index_current].msft_ext.opcode;
- 	} else {
- 		manufacturer = fallback_manufacturer;
- 		msft_opcode = BT_HCI_CMD_NOP;
-@@ -9378,18 +9414,12 @@ static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
- 
- static const struct vendor_evt *current_vendor_evt(uint8_t evt)
- {
--	uint16_t manufacturer, msft_opcode;
-+	uint16_t manufacturer;
- 
--	if (index_current < MAX_INDEX) {
-+	if (index_current < MAX_INDEX)
- 		manufacturer = index_list[index_current].manufacturer;
--		msft_opcode = index_list[index_current].msft_opcode;
--	} else {
-+	else
- 		manufacturer = fallback_manufacturer;
--		msft_opcode = BT_HCI_CMD_NOP;
--	}
--
--	if (msft_opcode != BT_HCI_CMD_NOP)
--		return NULL;
- 
- 	switch (manufacturer) {
- 	case 2:
-@@ -9401,6 +9431,27 @@ static const struct vendor_evt *current_vendor_evt(uint8_t evt)
- 	return NULL;
- }
- 
-+static const struct vendor_evt *current_vendor_msft_evt(const void *data,
-+							uint8_t size)
-+{
-+	uint8_t *prefix, prefix_len;
-+
-+	if (index_current < MAX_INDEX) {
-+		prefix_len = index_list[index_current].msft_ext.evt_prefix_len;
-+		prefix = index_list[index_current].msft_ext.evt_prefix;
-+	} else
-+		return NULL;
-+
-+	/* MSFT extension events start with the MSFT event prefix which is
-+	 * defined by the vendor and followed by the MSFT event code.
-+	 */
-+	if (size > prefix_len && !memcmp(data, prefix, prefix_len)) {
-+		return msft_vendor_evt();
-+	}
-+
-+	return NULL;
-+}
-+
- static void inquiry_complete_evt(const void *data, uint8_t size)
- {
- 	const struct bt_hci_evt_inquiry_complete *evt = data;
-@@ -9573,7 +9624,7 @@ static void cmd_complete_evt(const void *data, uint8_t size)
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
-@@ -9665,7 +9716,7 @@ static void cmd_status_evt(const void *data, uint8_t size)
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
-@@ -11012,13 +11063,46 @@ static void le_meta_event_evt(const void *data, uint8_t size)
- 
- static void vendor_evt(const void *data, uint8_t size)
- {
--	uint8_t subevent = *((const uint8_t *) data);
-+	uint8_t subevent;
- 	struct subevent_data vendor_data;
- 	char vendor_str[150];
--	const struct vendor_evt *vnd = current_vendor_evt(subevent);
-+	const struct vendor_evt *vnd;
-+
-+	/* For MSFT Extension event only */
-+	vnd = current_vendor_msft_evt(data, size);
-+	if (vnd) {
-+		snprintf(vendor_str, sizeof(vendor_str),
-+					"Microsoft %s", vnd->str);
-+		print_indent(6, COLOR_HCI_EVENT, "", vendor_str, COLOR_OFF,
-+					" length: %u", size);
-+
-+		if (!vnd->evt_func) {
-+			packet_hexdump(data, size);
-+			return;
-+		}
-+
-+		if (vnd->evt_fixed) {
-+			if (size != vnd->evt_size) {
-+				print_text(COLOR_ERROR, "invalid packet size");
-+				packet_hexdump(data, size);
-+				return;
-+			}
-+		} else {
-+			if (size < vnd->evt_size) {
-+				print_text(COLOR_ERROR, "too short packet");
-+				packet_hexdump(data, size);
-+				return;
-+			}
-+		}
-+
-+		vnd->evt_func(data, size);
-+		return;
-+	}
- 
-+	subevent = *((const uint8_t *) data);
-+	vnd = current_vendor_evt(subevent);
- 	if (vnd) {
--		const char *str = current_vendor_str();
-+		const char *str = current_vendor_evt_str(subevent);
- 
- 		if (str) {
- 			snprintf(vendor_str, sizeof(vendor_str),
-@@ -11419,7 +11503,7 @@ void packet_hci_command(struct timeval *tv, struct ucred *cred, uint16_t index,
- 			const struct vendor_ocf *vnd = current_vendor_ocf(ocf);
- 
- 			if (vnd) {
--				const char *str = current_vendor_str();
-+				const char *str = current_vendor_str(ocf);
- 
- 				if (str) {
- 					snprintf(vendor_str, sizeof(vendor_str),
--- 
-2.25.1
+>
+> Converted Qualcomm Bluetooth binidings to DT schema.
+> 
+> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+> ---
+>  .../devicetree/bindings/net/qualcomm-bluetooth.txt | 69 -----------------
+>  .../bindings/net/qualcomm-bluetooth.yaml           | 87 ++++++++++++++++++++++
+>  2 files changed, 87 insertions(+), 69 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> deleted file mode 100644
+> index 709ca6d..0000000
+> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> +++ /dev/null
+> @@ -1,69 +0,0 @@
+> -Qualcomm Bluetooth Chips
+> ----------------------
+> -
+> -This documents the binding structure and common properties for serial
+> -attached Qualcomm devices.
+> -
+> -Serial attached Qualcomm devices shall be a child node of the host UART
+> -device the slave device is attached to.
+> -
+> -Required properties:
+> - - compatible: should contain one of the following:
+> -   * "qcom,qca6174-bt"
+> -   * "qcom,qca9377-bt"
+> -   * "qcom,wcn3990-bt"
+> -   * "qcom,wcn3991-bt"
+> -   * "qcom,wcn3998-bt"
+> -   * "qcom,qca6390-bt"
+> -
+> -Optional properties for compatible string qcom,qca6174-bt:
+> -
+> - - enable-gpios: gpio specifier used to enable chip
+> - - clocks: clock provided to the controller (SUSCLK_32KHZ)
+> - - firmware-name: specify the name of nvm firmware to load
+> -
+> -Optional properties for compatible string qcom,qca9377-bt:
+> -
+> - - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
+> -
+> -Required properties for compatible string qcom,wcn399x-bt:
+> -
+> - - vddio-supply: VDD_IO supply regulator handle.
+> - - vddxo-supply: VDD_XO supply regulator handle.
+> - - vddrf-supply: VDD_RF supply regulator handle.
+> - - vddch0-supply: VDD_CH0 supply regulator handle.
+> -
+> -Optional properties for compatible string qcom,wcn399x-bt:
+> -
+> - - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
+> - - firmware-name: specify the name of nvm firmware to load
+> - - clocks: clock provided to the controller
+> -
+> -Examples:
+> -
+> -serial@7570000 {
+> -	label = "BT-UART";
+> -	status = "okay";
+> -
+> -	bluetooth {
+> -		compatible = "qcom,qca6174-bt";
+> -
+> -		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+> -		clocks = <&divclk4>;
+> -		firmware-name = "nvm_00440302.bin";
+> -	};
+> -};
+> -
+> -serial@898000 {
+> -	bluetooth {
+> -		compatible = "qcom,wcn3990-bt";
+> -
+> -		vddio-supply = <&vreg_s4a_1p8>;
+> -		vddxo-supply = <&vreg_l7a_1p8>;
+> -		vddrf-supply = <&vreg_l17a_1p3>;
+> -		vddch0-supply = <&vreg_l25a_3p3>;
+> -		max-speed = <3200000>;
+> -		firmware-name = "crnv21.bin";
+> -		clocks = <&rpmhcc RPMH_RF_CLK2>;
+> -	};
+> -};
+> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> new file mode 100644
+> index 0000000..55cd995
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+> @@ -0,0 +1,87 @@
+> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/qualcomm-bluetooth.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Qualcomm Bluetooth Chips
+> +
+> +maintainers:
+> +  - Rob Herring <robh@kernel.org>
+> +  - Marcel Holtmann <marcel@holtmann.org>
+> +
+> +description:
+> +  This binding describes Qualcomm UART-attached bluetooth chips.
+> +
+> +properties:
+> +  compatible:
+> +    enum:
+> +      - qcom,qca6174-bt
+> +      - qcom,qca9377-bt
+> +      - qcom,wcn3990-bt
+> +      - qcom,wcn3991-bt
+> +      - qcom,wcn3998-bt
+> +      - qcom,qca6390-bt      
 
+delete trailing blanks
+
+> +
+> +  enable-gpios:
+> +    maxItems: 1
+> +    description: gpio specifier used to enable chip
+> +   
+
+delete blanks
+
+> +  clocks:
+> +    maxItems: 1
+> +    description: clock provided to the controller (SUSCLK_32KHZ)
+> +
+> +  vddio-supply:
+> +    description: VDD_IO supply regulator handle
+> +
+> +  vddxo-supply:
+> +    description: VDD_XO supply regulator handle
+> +
+> +  vddrf-supply:
+> +    description: VDD_RF supply regulator handle
+> +
+> +  vddch0-supply:
+> +    description: VDD_CH0 supply regulator handle
+> +
+> +  max-speed: 
+
+delete trailing blank
+
+> +    description: see Documentation/devicetree/bindings/serial/serial.yaml
+> +
+> +  firmware-name:
+> +    description: specify the name of nvm firmware to load
+> +
+> +  local-bd-address:
+> +    description: see Documentation/devicetree/bindings/net/bluetooth.txt
+> +
+> +
+> +required:
+> +  - compatible
+
+it seems you could make the supplies conditionally required based on the
+compatible string. See Documentation/devicetree/bindings/connector/usb-connector.yaml
+for an example
+
+> +
+> +additionalProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    uart {
+> +        label = "BT-UART";
+> +        status = "okay";
+> +
+> +        bluetooth {
+> +            compatible = "qcom,qca6174-bt";
+> +            enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
+> +            clocks = <&divclk4>;
+> +            firmware-name = "nvm_00440302.bin";
+> +        };
+> +    };
+> +  - |
+> +    uart {
+> +
+> +        bluetooth {
+> +            compatible = "qcom,wcn3990-bt";
+> +            vddio-supply = <&vreg_s4a_1p8>;
+> +            vddxo-supply = <&vreg_l7a_1p8>;
+> +            vddrf-supply = <&vreg_l17a_1p3>;
+> +            vddch0-supply = <&vreg_l25a_3p3>;
+> +            max-speed = <3200000>;
+> +            firmware-name = "crnv21.bin";		
+
+delete trailing blanks
