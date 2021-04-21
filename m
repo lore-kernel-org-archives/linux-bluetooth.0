@@ -2,276 +2,182 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46568C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:50:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36251C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 02:40:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0BB9B6140D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 00:50:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0657D61414
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Apr 2021 02:40:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234276AbhDUAvP (ORCPT
+        id S234626AbhDUCkj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Apr 2021 20:51:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47358 "EHLO
+        Tue, 20 Apr 2021 22:40:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42660 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234309AbhDUAvP (ORCPT
+        with ESMTP id S233874AbhDUCkg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Apr 2021 20:51:15 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3267C06138B
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id 31so12606920pgn.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
+        Tue, 20 Apr 2021 22:40:36 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 220E3C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 19:40:01 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id d6so12006367qtx.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Apr 2021 19:40:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8YLOYTL9uFfTlsUBTt4KtFnsgrD3qMKDwpIsIQc1OzQ=;
-        b=GTHAWJyYH+TVJoASsZJVT+rFImVeTfbBdAU0ib1vxL3BQwDL7OWyZZRY+dVfY+CbpJ
-         teVIlUg3keh/0L70wBaEjFOe9F0jWuGp5A/2LL2L+QU1LNxy3sEJmhmPc3v7dSxnSngQ
-         I87A7TZRRHK9Zj4RcZGYcgJgbC3ctsHHRvmxI=
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=joMKJmKEcMgtnwJZ1alTF7fDb5W7jyIEf+O8/oNZOt0=;
+        b=jIl3i8LGq7db3oaCcRb1EQg7WlnPZyJramX8ZcLHU75d1szOhlu71FhrrTN2aooWOT
+         WqR2Kdt74WbPHHj7Nz00n4UPAd4M04QqVB+46lYXcb9lg10XdeLXr7pbfNyCmlqsyv4M
+         X/+zGYD4PyfPnvwfX4lTxN6xprjLAVpUjK5G+R6l4piFjfvswTzuOYl6ap9uf+Lb9ka1
+         fvqEV+fv+UFiY5kb7sp9Mt2m+wK9nDJr1OpDYtxkYR0h/CZKptGsw69Qfjf6cWgIsCBN
+         3BYlrhiEgZdw0Upx3pRw+29f4FQ1eQk1U5UowaM7reY829Y0m6XsybxHIrtZ4ELHNMiL
+         aWuQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8YLOYTL9uFfTlsUBTt4KtFnsgrD3qMKDwpIsIQc1OzQ=;
-        b=mAzFdi8RdYKk1vVUMzJtoVVJs2IZNtt219bSnEVw4Z3mJsRI0I7sOzcT17RcM+C4dG
-         k9MzMZxTjsjymVXJRmxthsK9mnHK/zbry6UeGvf2P0X9pcwHm3qpBB+XAFICGePX2QL1
-         K8PlszoB5Q8gek+rWy5kbzsVUvkhBYT30u+sLfbrFVHjKR9KC+Oz6u5/vB6BGRM5IbIR
-         ri+Uc9IfdhyEUTJwyS43C5SEcqiailEocoPeh11P10PBKS4rIpQvoBJLStZ43yh+RiHN
-         f7LdcgVmVYsmw5Sm2tc9l3rQD/JXJadlQWJhnd1hiL4CkWgbKkhsHCvgND+uodJTNFpZ
-         4q0w==
-X-Gm-Message-State: AOAM532akvYgMIW1JJbNxGzkdW0M/xRmZD5quj0LZxSiYBtiO1rwmYjn
-        zVDlg24ypjy0LoIXPpnSgIev9g==
-X-Google-Smtp-Source: ABdhPJyqsXFJPEW53dgWZWzIl1MKNJhSGg4Hv/Awq+xELaEHiZszta5Vzv92f/tFkQR8imMYCtKe3w==
-X-Received: by 2002:a63:1a47:: with SMTP id a7mr19505511pgm.437.1618966242338;
-        Tue, 20 Apr 2021 17:50:42 -0700 (PDT)
-Received: from localhost ([2620:15c:202:201:b1f0:79e0:c1ca:fd1])
-        by smtp.gmail.com with UTF8SMTPSA id x38sm183812pfu.22.2021.04.20.17.50.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 20 Apr 2021 17:50:41 -0700 (PDT)
-Date:   Tue, 20 Apr 2021 17:50:40 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org
-Subject: Re: [PATCH v2 2/3] dt-bindings: net: bluetooth: Convert to DT schema
-Message-ID: <YH924M62b7PDd/r6@google.com>
-References: <1618936010-16579-1-git-send-email-gubbaven@codeaurora.org>
- <1618936010-16579-3-git-send-email-gubbaven@codeaurora.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=joMKJmKEcMgtnwJZ1alTF7fDb5W7jyIEf+O8/oNZOt0=;
+        b=rqXcdfX5Bw/z2Z3pPsX6AF4qhwXtJDBYOrRsxge1VvnTpSCvMHSR5d+j8C9XQl2x2M
+         OCJCvmJVR5QPqT/S3Xn3LMpcYOkeM/W9czBjQlYk+Yb/Zu/vUhZf4A2rSamR6z2OeoG9
+         4fubpRgpysr36J4iAzKqSV3+HN9tdB9Q11o/ASYtCwl94F4O8H/nMLrRTweLjWaLsyq5
+         jBtB7+1/a/i25xCJrlKBBMi/oK165aJPcutiis0ImJk2Gk+8eSwPfOKesPfVx5orTtiA
+         yLxzt6O0YRHiPkTcciNtrpr6CmI/eIazNJrgKyGiVtiBuy11kpPqVi7aZXuI4R8QX/a8
+         14eg==
+X-Gm-Message-State: AOAM531sxZFOkd7YVDK6R3beuHW3fuqFSeIs6omBT8SUVLH2JJQUMVx+
+        gYfsmFhHti0qFGwcIYzIciDTxNVPdKU9sg==
+X-Google-Smtp-Source: ABdhPJx+6Ggqkjxi4OmLWBpon7d26XWP2LHhK3fpBK5PporjCFMmT/6O8MdmHMY2VIm9ujl+1e8B4w==
+X-Received: by 2002:a05:622a:314:: with SMTP id q20mr19225150qtw.242.1618972800217;
+        Tue, 20 Apr 2021 19:40:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.185.88.124])
+        by smtp.gmail.com with ESMTPSA id l16sm926572qkg.91.2021.04.20.19.39.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Apr 2021 19:39:59 -0700 (PDT)
+Message-ID: <607f907f.1c69fb81.f409e.4e7b@mx.google.com>
+Date:   Tue, 20 Apr 2021 19:39:59 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3111956252447889593=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1618936010-16579-3-git-send-email-gubbaven@codeaurora.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,v3] monitor: Fix the incorrect vendor name
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210421000715.756127-1-hj.tedd.an@gmail.com>
+References: <20210421000715.756127-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Apr 20, 2021 at 09:56:49PM +0530, Venkata Lakshmi Narayana Gubba wrote:
+--===============3111956252447889593==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> Subject: dt-bindings: net: bluetooth: Convert to DT schema
+This is automated email and please do not reply to this email!
 
-This doesn't convert the generic binding or all bindings to DT schema
-as the subject suggests, but the Qualcomm BT binding.
+Dear submitter,
 
->
-> Converted Qualcomm Bluetooth binidings to DT schema.
-> 
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> ---
->  .../devicetree/bindings/net/qualcomm-bluetooth.txt | 69 -----------------
->  .../bindings/net/qualcomm-bluetooth.yaml           | 87 ++++++++++++++++++++++
->  2 files changed, 87 insertions(+), 69 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->  create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> deleted file mode 100644
-> index 709ca6d..0000000
-> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
-> +++ /dev/null
-> @@ -1,69 +0,0 @@
-> -Qualcomm Bluetooth Chips
-> ----------------------
-> -
-> -This documents the binding structure and common properties for serial
-> -attached Qualcomm devices.
-> -
-> -Serial attached Qualcomm devices shall be a child node of the host UART
-> -device the slave device is attached to.
-> -
-> -Required properties:
-> - - compatible: should contain one of the following:
-> -   * "qcom,qca6174-bt"
-> -   * "qcom,qca9377-bt"
-> -   * "qcom,wcn3990-bt"
-> -   * "qcom,wcn3991-bt"
-> -   * "qcom,wcn3998-bt"
-> -   * "qcom,qca6390-bt"
-> -
-> -Optional properties for compatible string qcom,qca6174-bt:
-> -
-> - - enable-gpios: gpio specifier used to enable chip
-> - - clocks: clock provided to the controller (SUSCLK_32KHZ)
-> - - firmware-name: specify the name of nvm firmware to load
-> -
-> -Optional properties for compatible string qcom,qca9377-bt:
-> -
-> - - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
-> -
-> -Required properties for compatible string qcom,wcn399x-bt:
-> -
-> - - vddio-supply: VDD_IO supply regulator handle.
-> - - vddxo-supply: VDD_XO supply regulator handle.
-> - - vddrf-supply: VDD_RF supply regulator handle.
-> - - vddch0-supply: VDD_CH0 supply regulator handle.
-> -
-> -Optional properties for compatible string qcom,wcn399x-bt:
-> -
-> - - max-speed: see Documentation/devicetree/bindings/serial/serial.yaml
-> - - firmware-name: specify the name of nvm firmware to load
-> - - clocks: clock provided to the controller
-> -
-> -Examples:
-> -
-> -serial@7570000 {
-> -	label = "BT-UART";
-> -	status = "okay";
-> -
-> -	bluetooth {
-> -		compatible = "qcom,qca6174-bt";
-> -
-> -		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> -		clocks = <&divclk4>;
-> -		firmware-name = "nvm_00440302.bin";
-> -	};
-> -};
-> -
-> -serial@898000 {
-> -	bluetooth {
-> -		compatible = "qcom,wcn3990-bt";
-> -
-> -		vddio-supply = <&vreg_s4a_1p8>;
-> -		vddxo-supply = <&vreg_l7a_1p8>;
-> -		vddrf-supply = <&vreg_l17a_1p3>;
-> -		vddch0-supply = <&vreg_l25a_3p3>;
-> -		max-speed = <3200000>;
-> -		firmware-name = "crnv21.bin";
-> -		clocks = <&rpmhcc RPMH_RF_CLK2>;
-> -	};
-> -};
-> diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> new file mode 100644
-> index 0000000..55cd995
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-> @@ -0,0 +1,87 @@
-> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/net/qualcomm-bluetooth.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: Qualcomm Bluetooth Chips
-> +
-> +maintainers:
-> +  - Rob Herring <robh@kernel.org>
-> +  - Marcel Holtmann <marcel@holtmann.org>
-> +
-> +description:
-> +  This binding describes Qualcomm UART-attached bluetooth chips.
-> +
-> +properties:
-> +  compatible:
-> +    enum:
-> +      - qcom,qca6174-bt
-> +      - qcom,qca9377-bt
-> +      - qcom,wcn3990-bt
-> +      - qcom,wcn3991-bt
-> +      - qcom,wcn3998-bt
-> +      - qcom,qca6390-bt      
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=470557
 
-delete trailing blanks
+---Test result---
 
-> +
-> +  enable-gpios:
-> +    maxItems: 1
-> +    description: gpio specifier used to enable chip
-> +   
+Test Summary:
+CheckPatch                    FAIL      0.44 seconds
+GitLint                       PASS      0.11 seconds
+Prep - Setup ELL              PASS      47.24 seconds
+Build - Prep                  PASS      0.14 seconds
+Build - Configure             PASS      8.17 seconds
+Build - Make                  PASS      204.14 seconds
+Make Check                    PASS      8.95 seconds
+Make Dist                     PASS      12.26 seconds
+Make Dist - Configure         PASS      4.99 seconds
+Make Dist - Make              PASS      84.00 seconds
+Build w/ext ELL - Configure   PASS      8.27 seconds
+Build w/ext ELL - Make        PASS      195.15 seconds
 
-delete blanks
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+monitor: Fix the incorrect vendor name
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#27: FILE: monitor/msft.h:31:
++} __attribute__ ((packed));
 
-> +  clocks:
-> +    maxItems: 1
-> +    description: clock provided to the controller (SUSCLK_32KHZ)
-> +
-> +  vddio-supply:
-> +    description: VDD_IO supply regulator handle
-> +
-> +  vddxo-supply:
-> +    description: VDD_XO supply regulator handle
-> +
-> +  vddrf-supply:
-> +    description: VDD_RF supply regulator handle
-> +
-> +  vddch0-supply:
-> +    description: VDD_CH0 supply regulator handle
-> +
-> +  max-speed: 
+WARNING:BRACES: braces {} are not necessary for single statement blocks
+#189: FILE: monitor/packet.c:9448:
++	if (size > prefix_len && !memcmp(data, prefix, prefix_len)) {
++		return msft_vendor_evt();
++	}
 
-delete trailing blank
+- total: 0 errors, 2 warnings, 240 lines checked
 
-> +    description: see Documentation/devicetree/bindings/serial/serial.yaml
-> +
-> +  firmware-name:
-> +    description: specify the name of nvm firmware to load
-> +
-> +  local-bd-address:
-> +    description: see Documentation/devicetree/bindings/net/bluetooth.txt
-> +
-> +
-> +required:
-> +  - compatible
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
 
-it seems you could make the supplies conditionally required based on the
-compatible string. See Documentation/devicetree/bindings/connector/usb-connector.yaml
-for an example
+"[PATCH] monitor: Fix the incorrect vendor name" has style problems, please review.
 
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    #include <dt-bindings/gpio/gpio.h>
-> +    uart {
-> +        label = "BT-UART";
-> +        status = "okay";
-> +
-> +        bluetooth {
-> +            compatible = "qcom,qca6174-bt";
-> +            enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
-> +            clocks = <&divclk4>;
-> +            firmware-name = "nvm_00440302.bin";
-> +        };
-> +    };
-> +  - |
-> +    uart {
-> +
-> +        bluetooth {
-> +            compatible = "qcom,wcn3990-bt";
-> +            vddio-supply = <&vreg_s4a_1p8>;
-> +            vddxo-supply = <&vreg_l7a_1p8>;
-> +            vddrf-supply = <&vreg_l17a_1p3>;
-> +            vddch0-supply = <&vreg_l25a_3p3>;
-> +            max-speed = <3200000>;
-> +            firmware-name = "crnv21.bin";		
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
 
-delete trailing blanks
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Dist - PASS
+Desc: Run 'make dist' and build the distribution tarball
+
+##############################
+Test: Make Dist - Configure - PASS
+Desc: Configure the source from distribution tarball
+
+##############################
+Test: Make Dist - Make - PASS
+Desc: Build the source from distribution tarball
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3111956252447889593==--
