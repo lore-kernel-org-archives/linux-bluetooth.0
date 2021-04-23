@@ -7,30 +7,30 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 67871C43462
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D159C43460
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 03:52:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42DED6146D
+	by mail.kernel.org (Postfix) with ESMTP id 09B0B61467
 	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 03:52:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240195AbhDWDx0 (ORCPT
+        id S240329AbhDWDxZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Apr 2021 23:53:26 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:41284 "EHLO
+        Thu, 22 Apr 2021 23:53:25 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:41282 "EHLO
         rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240259AbhDWDxY (ORCPT
+        with ESMTP id S231261AbhDWDxY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 22 Apr 2021 23:53:24 -0400
 Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 13N3qdBrB021907, This message is accepted by code: ctloc85258
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 13N3qdfiF021903, This message is accepted by code: ctloc85258
 Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 13N3qdBrB021907
+        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 13N3qdfiF021903
         (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
         Fri, 23 Apr 2021 11:52:39 +0800
 Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
  RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 23 Apr 2021 11:52:39 +0800
+ 15.1.2106.2; Fri, 23 Apr 2021 11:52:38 +0800
 Received: from localhost.localdomain (172.21.132.99) by
  RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -42,9 +42,9 @@ CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
         <apusaka@chromium.org>, <tientzu@chromium.org>,
         <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
         <kidman@realtek.com>
-Subject: [PATCH v3 2/2] Bluetooth: hci_h5: Add flag for keep power during suspend/resume
-Date:   Fri, 23 Apr 2021 11:52:29 +0800
-Message-ID: <20210423035229.27513-3-hildawu@realtek.com>
+Subject: [PATCH v3 1/2] Bluetooth: btrtl: Adjust the position of strcut definition
+Date:   Fri, 23 Apr 2021 11:52:28 +0800
+Message-ID: <20210423035229.27513-2-hildawu@realtek.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210423035229.27513-1-hildawu@realtek.com>
 References: <20210423035229.27513-1-hildawu@realtek.com>
@@ -70,7 +70,7 @@ X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
 X-KSE-AntiSpam-Info: LuaCore: 443 443 d64ad0ad6f66abd85f8fb55fe5d831fdcc4c44a0
 X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;realtek.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;realtek.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
 X-KSE-AntiSpam-Info: {Track_Chinese_Simplified, headers_charset}
 X-KSE-AntiSpam-Info: Rate: 10
 X-KSE-AntiSpam-Info: Status: not_detected
@@ -95,7 +95,7 @@ X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
 X-KSE-AntiSpam-Info: LuaCore: 443 443 d64ad0ad6f66abd85f8fb55fe5d831fdcc4c44a0
 X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
 X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;realtek.com:7.1.1
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;realtek.com:7.1.1;127.0.0.199:7.1.2
 X-KSE-AntiSpam-Info: Rate: 10
 X-KSE-AntiSpam-Info: Status: not_detected
 X-KSE-AntiSpam-Info: Method: none
@@ -110,115 +110,110 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: hildawu <hildawu@realtek.com>
 
-RTL8822C and RTL8852A devices support BT wakeup Host. Add a flag
-for these specific devices did not power off during suspend and resume.
-By this change, if the Host support that received BT device signal then
-it can wake Host up.
+Adjust the position of strcut definition for btrtl and hci_h5.
+The purpose is to avoid re-defining some chip features and let UART devices
+get relevant information too.
 
 Signed-off-by: hildawu <hildawu@realtek.com>
 ---
-Changed in v3:
-- Reworked to use UART flag, refer to Maintainer's suggestion.
-- Split into two patches for different purpose.
+ drivers/bluetooth/btrtl.c | 36 ------------------------------------
+ drivers/bluetooth/btrtl.h | 36 +++++++++++++++++++++++++++++++++++-
+ 2 files changed, 35 insertions(+), 37 deletions(-)
 
-Changes in v2:
-- Add the missing struct member
-- Modify title length
----
----
- drivers/bluetooth/hci_h5.c    | 34 ++++++++++++++++++++++++----------
- drivers/bluetooth/hci_ldisc.c |  3 ++-
- drivers/bluetooth/hci_uart.h  |  1 +
- 3 files changed, 27 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 27e96681d583..9cacc4cdc928 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -911,6 +911,15 @@ static int h5_btrtl_setup(struct h5 *h5)
- 	 */
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index e7fe5fb22753..94d1e7885aee 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -38,42 +38,6 @@
+ 	.hci_ver = (hciv), \
+ 	.hci_bus = (bus)
  
-+	switch (btrtl_dev->project_id) {
-+	case CHIP_ID_8822C:
-+	case CHIP_ID_8852A:
-+		set_bit(HCI_UART_WAKEUP_ENABLE, &h5->hu->hdev_flags);
-+		break;
-+	default:
-+		break;
-+	}
+-enum btrtl_chip_id {
+-	CHIP_ID_8723A,
+-	CHIP_ID_8723B,
+-	CHIP_ID_8821A,
+-	CHIP_ID_8761A,
+-	CHIP_ID_8822B = 8,
+-	CHIP_ID_8723D,
+-	CHIP_ID_8821C,
+-	CHIP_ID_8822C = 13,
+-	CHIP_ID_8761B,
+-	CHIP_ID_8852A = 18,
+-};
+-
+-struct id_table {
+-	__u16 match_flags;
+-	__u16 lmp_subver;
+-	__u16 hci_rev;
+-	__u8 hci_ver;
+-	__u8 hci_bus;
+-	bool config_needed;
+-	bool has_rom_version;
+-	char *fw_name;
+-	char *cfg_name;
+-};
+-
+-struct btrtl_device_info {
+-	const struct id_table *ic_info;
+-	u8 rom_version;
+-	u8 *fw_data;
+-	int fw_len;
+-	u8 *cfg_data;
+-	int cfg_len;
+-	bool drop_fw;
+-	int project_id;
+-};
+-
+ static const struct id_table ic_id_table[] = {
+ 	/* 8723A */
+ 	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
+diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+index 2a582682136d..08bda0597c0c 100644
+--- a/drivers/bluetooth/btrtl.h
++++ b/drivers/bluetooth/btrtl.h
+@@ -12,7 +12,41 @@
+ #define rtl_dev_info(dev, fmt, ...) bt_dev_info(dev, "RTL: " fmt, ##__VA_ARGS__)
+ #define rtl_dev_dbg(dev, fmt, ...) bt_dev_dbg(dev, "RTL: " fmt, ##__VA_ARGS__)
+ 
+-struct btrtl_device_info;
++enum btrtl_chip_id {
++	CHIP_ID_8723A,
++	CHIP_ID_8723B,
++	CHIP_ID_8821A,
++	CHIP_ID_8761A,
++	CHIP_ID_8822B = 8,
++	CHIP_ID_8723D,
++	CHIP_ID_8821C,
++	CHIP_ID_8822C = 13,
++	CHIP_ID_8761B,
++	CHIP_ID_8852A = 18,
++};
 +
- out_free:
- 	btrtl_free(btrtl_dev);
- 
-@@ -945,8 +954,11 @@ static void h5_btrtl_close(struct h5 *h5)
- static int h5_btrtl_suspend(struct h5 *h5)
- {
- 	serdev_device_set_flow_control(h5->hu->serdev, false);
--	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
--	gpiod_set_value_cansleep(h5->enable_gpio, 0);
++struct id_table {
++	__u16 match_flags;
++	__u16 lmp_subver;
++	__u16 hci_rev;
++	__u8 hci_ver;
++	__u8 hci_bus;
++	bool config_needed;
++	bool has_rom_version;
++	char *fw_name;
++	char *cfg_name;
++};
 +
-+	if (!test_bit(HCI_UART_WAKEUP_ENABLE, &h5->hu->hdev_flags)) {
-+		gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
-+		gpiod_set_value_cansleep(h5->enable_gpio, 0);
-+	}
- 	return 0;
- }
++struct btrtl_device_info {
++	const struct id_table *ic_info;
++	u8 rom_version;
++	u8 *fw_data;
++	int fw_len;
++	u8 *cfg_data;
++	int cfg_len;
++	bool drop_fw;
++	int project_id;
++};
  
-@@ -972,17 +984,19 @@ static void h5_btrtl_reprobe_worker(struct work_struct *work)
- 
- static int h5_btrtl_resume(struct h5 *h5)
- {
--	struct h5_btrtl_reprobe *reprobe;
-+	if (!test_bit(HCI_UART_WAKEUP_ENABLE, &h5->hu->hdev_flags)) {
-+		struct h5_btrtl_reprobe *reprobe;
- 
--	reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
--	if (!reprobe)
--		return -ENOMEM;
-+		reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
-+		if (!reprobe)
-+			return -ENOMEM;
- 
--	__module_get(THIS_MODULE);
-+		__module_get(THIS_MODULE);
- 
--	INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
--	reprobe->dev = get_device(&h5->hu->serdev->dev);
--	queue_work(system_long_wq, &reprobe->work);
-+		INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
-+		reprobe->dev = get_device(&h5->hu->serdev->dev);
-+		queue_work(system_long_wq, &reprobe->work);
-+	}
- 	return 0;
- }
- 
-diff --git a/drivers/bluetooth/hci_ldisc.c b/drivers/bluetooth/hci_ldisc.c
-index 637c5b8c2aa1..3a1038e9dc6a 100644
---- a/drivers/bluetooth/hci_ldisc.c
-+++ b/drivers/bluetooth/hci_ldisc.c
-@@ -719,7 +719,8 @@ static int hci_uart_set_flags(struct hci_uart *hu, unsigned long flags)
- 				    BIT(HCI_UART_CREATE_AMP) |
- 				    BIT(HCI_UART_INIT_PENDING) |
- 				    BIT(HCI_UART_EXT_CONFIG) |
--				    BIT(HCI_UART_VND_DETECT);
-+				    BIT(HCI_UART_VND_DETECT) |
-+				    BIT(HCI_UART_WAKEUP_ENABLE);
- 
- 	if (flags & ~valid_flags)
- 		return -EINVAL;
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 4e039d7a16f8..25f5e5c7544c 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -41,6 +41,7 @@
- #define HCI_UART_INIT_PENDING	3
- #define HCI_UART_EXT_CONFIG	4
- #define HCI_UART_VND_DETECT	5
-+#define HCI_UART_WAKEUP_ENABLE	6
- 
- struct hci_uart;
- struct serdev_device;
+ struct rtl_download_cmd {
+ 	__u8 index;
 -- 
 2.17.1
 
