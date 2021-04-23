@@ -7,222 +7,226 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 41F62C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 07:06:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4A45C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 07:58:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 199CF61452
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 07:06:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6C15E61422
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 07:58:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241020AbhDWHGv convert rfc822-to-8bit (ORCPT
+        id S229982AbhDWH6y convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Apr 2021 03:06:51 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36386 "EHLO
+        Fri, 23 Apr 2021 03:58:54 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:59564 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229456AbhDWHGt (ORCPT
+        with ESMTP id S229456AbhDWH6y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Apr 2021 03:06:49 -0400
+        Fri, 23 Apr 2021 03:58:54 -0400
 Received: from marcel-macbook.holtmann.net (p4fefc624.dip0.t-ipconnect.de [79.239.198.36])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BF39FCECFB;
-        Fri, 23 Apr 2021 09:13:58 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id DAF04CECFB;
+        Fri, 23 Apr 2021 10:06:03 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.60.0.2.21\))
-Subject: Re: [PATCH v3] Bluetooth: Add ncmd=0 recovery handling
+Subject: Re: [PATCH v3 1/3] Bluetooth: add support to enumerate codec
+ capabilities
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210422101657.v3.1.I14da3750a343d8d48921fffb7c6561337b6e6082@changeid>
-Date:   Fri, 23 Apr 2021 09:06:10 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
+In-Reply-To: <20210422141449.25155-1-kiran.k@intel.com>
+Date:   Fri, 23 Apr 2021 09:58:16 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C4B3A9F0-2D1D-4274-92AE-8616258E5947@holtmann.org>
-References: <20210422101657.v3.1.I14da3750a343d8d48921fffb7c6561337b6e6082@changeid>
-To:     Manish Mandlik <mmandlik@google.com>
+Message-Id: <96E58F60-51DE-4D47-B0BC-3D988D16C401@holtmann.org>
+References: <20210422141449.25155-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.60.0.2.21)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Kiran,
 
-> During command status or command complete event, the controller may set
-> ncmd=0 indicating that it is not accepting any more commands. In such a
-> case, host holds off sending any more commands to the controller. If the
-> controller doesn't recover from such condition, host will wait forever,
-> until the user decides that the Bluetooth is broken and may power cycles
-> the Bluetooth.
+> add support to enumerate local supported codec capabilities
 > 
-> This patch triggers the hardware error to reset the controller and
-> driver when it gets into such state as there is no other wat out.
+> < HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
+>        Codec: mSBC (0x05)
+>        Logical Transport Type: 0x00
+>        Direction: Input (Host to Controller) (0x00)
+>> HCI Event: Command Complete (0x0e) plen 12
+>      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
+>        Status: Success (0x00)
+>        Number of codec capabilities: 1
+>         Capabilities #0:
+>        00 00 11 15 02 33
 > 
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 > ---
+> * changes in v3
+>  move codec enumeration into a new init function
+> * changes in v2
+>  add skb length check before accessing data
 > 
-> Changes in v3:
-> - Restructure ncmd_timer scheduling in hci_event.c
-> - Cancel delayed work in hci_dev_do_close
-> - Do not inject hw error during HCI_INIT
-> - Update comment, add log message while injecting hw error
-> 
-> Changes in v2:
-> - Emit the hardware error when ncmd=0 occurs
-> 
-> include/net/bluetooth/hci.h      |  1 +
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_core.c         | 22 ++++++++++++++++++++++
-> net/bluetooth/hci_event.c        | 22 ++++++++++++++++++----
-> 4 files changed, 42 insertions(+), 4 deletions(-)
+> include/net/bluetooth/hci.h |  7 ++++
+> net/bluetooth/hci_core.c    | 16 ++++++---
+> net/bluetooth/hci_event.c   | 68 +++++++++++++++++++++++++++++++++++++
+> 3 files changed, 87 insertions(+), 4 deletions(-)
 > 
 > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index ea4ae551c426..c4b0650fb9ae 100644
+> index ea4ae551c426..e3f7771fe84f 100644
 > --- a/include/net/bluetooth/hci.h
 > +++ b/include/net/bluetooth/hci.h
-> @@ -339,6 +339,7 @@ enum {
-> #define HCI_PAIRING_TIMEOUT	msecs_to_jiffies(60000)	/* 60 seconds */
-> #define HCI_INIT_TIMEOUT	msecs_to_jiffies(10000)	/* 10 seconds */
-> #define HCI_CMD_TIMEOUT		msecs_to_jiffies(2000)	/* 2 seconds */
-> +#define HCI_NCMD_TIMEOUT	msecs_to_jiffies(4000)	/* 4 seconds */
-> #define HCI_ACL_TX_TIMEOUT	msecs_to_jiffies(45000)	/* 45 seconds */
-> #define HCI_AUTO_OFF_TIMEOUT	msecs_to_jiffies(2000)	/* 2 seconds */
-> #define HCI_POWER_OFF_TIMEOUT	msecs_to_jiffies(5000)	/* 5 seconds */
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index ebdd4afe30d2..f14692b39fd5 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -470,6 +470,7 @@ struct hci_dev {
-> 	struct delayed_work	service_cache;
+> @@ -1314,6 +1314,13 @@ struct hci_rp_read_local_pairing_opts {
+> 	__u8     max_key_size;
+> } __packed;
 > 
-> 	struct delayed_work	cmd_timer;
-> +	struct delayed_work	ncmd_timer;
-> 
-> 	struct work_struct	rx_work;
-> 	struct work_struct	cmd_work;
+> +#define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
+> +struct hci_op_read_local_codec_caps {
+> +	__u8	codec_id[5];
+> +	__u8	transport;
+> +	__u8	direction;
+> +} __packed;
+> +
+> #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
+> struct hci_rp_read_page_scan_activity {
+> 	__u8     status;
 > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index b0d9c36acc03..37789c5d0579 100644
+> index fd12f1652bdf..9419bbf55d90 100644
 > --- a/net/bluetooth/hci_core.c
 > +++ b/net/bluetooth/hci_core.c
-> @@ -1723,6 +1723,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> 	}
+> @@ -838,10 +838,6 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+> 	if (hdev->commands[22] & 0x04)
+> 		hci_set_event_mask_page_2(req);
 > 
-> 	cancel_delayed_work(&hdev->power_off);
-> +	cancel_delayed_work(&hdev->ncmd_timer);
-> 
-> 	hci_request_cancel_all(hdev);
-> 	hci_req_sync_lock(hdev);
-> @@ -2769,6 +2770,24 @@ static void hci_cmd_timeout(struct work_struct *work)
-> 	queue_work(hdev->workqueue, &hdev->cmd_work);
+> -	/* Read local codec list if the HCI command is supported */
+> -	if (hdev->commands[29] & 0x20)
+> -		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+> -
+
+that is not what I actually meant. The initial command to read the codec list can clearly stay in this init phase. Just the subsequent calls to read further details require an extra phase.
+
+> 	/* Read local pairing options if the HCI command is supported */
+> 	if (hdev->commands[41] & 0x08)
+> 		hci_req_add(req, HCI_OP_READ_LOCAL_PAIRING_OPTS, 0, NULL);
+> @@ -907,6 +903,15 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+> 	return 0;
 > }
 > 
-> +/* HCI ncmd timer function */
-> +static void hci_ncmd_timeout(struct work_struct *work)
+> +static int hci_init5_req(struct hci_request *req, unsigned long opt)
 > +{
-> +	struct hci_dev *hdev = container_of(work, struct hci_dev,
-> +					    ncmd_timer.work);
+> +	struct hci_dev *hdev = req->hdev;
 > +
-> +	bt_dev_err(hdev, "Controller not accepting commands anymore: ncmd = 0");
-> +
-> +	/* No hardware error event needs to be injected if the ncmd timer
-> +	 * triggers during HCI_INIT.
-> +	 */
+> +	/* Read local codec list if the HCI command is supported */
+> +	if (hdev->commands[29] & 0x20)
+> +		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
 
-while the patch looks good, I would be more strongly with my wording here.
+So here instead you go through your list of codec ids and read its capabilities.
 
-	/* During HCI_INIT phase no events can be injected if the ncmd timer
-	 * triggers since the procedure has its own timeout handling.
-	 */
-
-> +	if (test_bit(HCI_INIT, &hdev->flags))
-> +		return;
-> +
-> +	/* This is an irrecoverable state, inject hardware error event */
-> +	hci_reset_dev(hdev);
+> +	return 0;
 > +}
-> +
-> struct oob_data *hci_find_remote_oob_data(struct hci_dev *hdev,
-> 					  bdaddr_t *bdaddr, u8 bdaddr_type)
+> static int __hci_init(struct hci_dev *hdev)
 > {
-> @@ -3831,6 +3850,7 @@ struct hci_dev *hci_alloc_dev(void)
-> 	init_waitqueue_head(&hdev->suspend_wait_q);
+> 	int err;
+> @@ -937,6 +942,9 @@ static int __hci_init(struct hci_dev *hdev)
+> 	if (err < 0)
+> 		return err;
 > 
-> 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-> +	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
-> 
-> 	hci_request_setup(hdev);
-> 
-> @@ -4068,6 +4088,8 @@ int hci_reset_dev(struct hci_dev *hdev)
-> 	hci_skb_pkt_type(skb) = HCI_EVENT_PKT;
-> 	skb_put_data(skb, hw_err, 3);
-> 
-> +	bt_dev_err(hdev, "Injecting HCI hardware error event");
-> +
-> 	/* Send Hardware Error to upper stack */
-> 	return hci_recv_frame(hdev, skb);
-> }
+> +	err = __hci_req_sync(hdev, hci_init5_req, 0, HCI_INIT_TIMEOUT, NULL);
+> +	if (err < 0)
+> +		return err;
+> 	/* This function is only called when the controller is actually in
+> 	 * configured state. When the controller is marked as unconfigured,
+> 	 * this initialization procedure is not run.
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index cf2f4a0abdbd..8cd4bcf5dd00 100644
+> index 5e99968939ce..a4b905a76c1b 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -3635,8 +3635,15 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 	if (*opcode != HCI_OP_NOP)
-> 		cancel_delayed_work(&hdev->cmd_timer);
+> @@ -887,6 +887,70 @@ static void hci_cc_read_data_block_size(struct hci_dev *hdev,
+> 	       hdev->block_cnt, hdev->block_len);
+> }
 > 
-> -	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
-> -		atomic_set(&hdev->cmd_cnt, 1);
-> +	if (!test_bit(HCI_RESET, &hdev->flags)) {
-> +		if (ev->ncmd) {
-> +			cancel_delayed_work(&hdev->ncmd_timer);
-> +			atomic_set(&hdev->cmd_cnt, 1);
-> +		} else {
-> +			schedule_delayed_work(&hdev->ncmd_timer,
-> +					      HCI_NCMD_TIMEOUT);
-> +		}
+> +static void hci_cc_read_local_codecs(struct hci_dev *hdev,
+> +				     struct sk_buff *skb)
+> +{
+> +	__u8 num_codecs;
+> +	struct hci_op_read_local_codec_caps caps;
+> +
+> +	if (skb->len < sizeof(caps))
+> +		return;
+> +
+> +	bt_dev_dbg(hdev, "status 0x%2.2x", skb->data[0]);
+> +
+> +	if (skb->data[0])
+> +		return;
+> +
+> +	/* enumerate standard codecs */
+> +	skb_pull(skb, 1);
+> +
+> +	if (skb->len < 1)
+> +		return;
+> +
+> +	num_codecs = skb->data[0];
+> +
+> +	bt_dev_dbg(hdev, "Number of standard codecs: %u", num_codecs);
+> +
+> +	skb_pull(skb, 1);
+> +
+> +	if (skb->len < num_codecs)
+> +		return;
+> +
+> +	while (num_codecs--) {
+> +		caps.codec_id[0] = skb->data[0];
+> +		caps.transport = 0x00;
+> +		caps.direction = 0x00;
+> +
+> +		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +			     &caps);
+> +
+
+Here you just store the codec ids.
+
+> +		skb_pull(skb, 1);
 > +	}
-> 
-> 	hci_req_cmd_complete(hdev, *opcode, *status, req_complete,
-> 			     req_complete_skb);
-> @@ -3740,8 +3747,15 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 	if (*opcode != HCI_OP_NOP)
-> 		cancel_delayed_work(&hdev->cmd_timer);
-> 
-> -	if (ev->ncmd && !test_bit(HCI_RESET, &hdev->flags))
-> -		atomic_set(&hdev->cmd_cnt, 1);
-> +	if (!test_bit(HCI_RESET, &hdev->flags)) {
-> +		if (ev->ncmd) {
-> +			cancel_delayed_work(&hdev->ncmd_timer);
-> +			atomic_set(&hdev->cmd_cnt, 1);
-> +		} else {
-> +			schedule_delayed_work(&hdev->ncmd_timer,
-> +					      HCI_NCMD_TIMEOUT);
-> +		}
+> +
+> +	/* enumerate vendor specific codecs */
+> +	if (skb->len < 1)
+> +		return;
+> +
+> +	num_codecs = skb->data[0];
+> +	skb_pull(skb, 1);
+> +
+> +	bt_dev_dbg(hdev, "Number of vendor specific codecs: %u", num_codecs);
+> +
+> +	if (skb->len < (num_codecs * 4))
+> +		return;
+> +
+> +	while (num_codecs--) {
+> +		caps.codec_id[0] = 0xFF;
+> +		memcpy(&caps.codec_id[1], skb->data, 4);
+> +		caps.transport = 0x00;
+> +		caps.direction = 0x00;
+> +
+> +		hci_send_cmd(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS, sizeof(caps),
+> +			     &caps);
+> +		skb_pull(skb, 4);
 > +	}
+> +}
+> +
+> static void hci_cc_read_clock(struct hci_dev *hdev, struct sk_buff *skb)
+> {
+> 	struct hci_rp_read_clock *rp = (void *) skb->data;
+> @@ -3437,6 +3501,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+> 		hci_cc_read_data_block_size(hdev, skb);
+> 		break;
 > 
-
-Since the code is getting a bit more complex now, I would prefer that in a follow up patch we provide a common helper function for this.
-
-	static inline void handle_cmd_cnt_and_timer(struct hci_dev *hdev, bool is_nop)
-	{
-		if (!is_nop)
-			cancel_delayed_work(&hdev->cmd_timer);
-
-		if (!test_bit(HCI_RESET, ..) {
-			..
-		}
-	}
-
-And then you can just do:
-
-	handle_cmd_cnt_and_timer(hdev, *opcode == HCI_OP_NOP);
-
-Or something similar to this.
+> +	case HCI_OP_READ_LOCAL_CODECS:
+> +		hci_cc_read_local_codecs(hdev, skb);
+> +		break;
+> +
+> 	case HCI_OP_READ_FLOW_CONTROL_MODE:
+> 		hci_cc_read_flow_control_mode(hdev, skb);
+> 		break;
 
 Regards
 
