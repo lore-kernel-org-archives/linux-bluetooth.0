@@ -2,131 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+X-Spam-Status: No, score=-4.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB5BC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 15:17:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF148C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 17:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7944A61152
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 15:17:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9430561008
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 17:44:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231437AbhDWPSL (ORCPT
+        id S231400AbhDWRoy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Apr 2021 11:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231221AbhDWPSK (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Apr 2021 11:18:10 -0400
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20051C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 08:17:34 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id e7so39786128wrs.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 08:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qt5RIqRGGJrwy6PdF0DLOD9IeNtwiPFQ2QHql0XiKZo=;
-        b=WWLD+0WV7aarDUyyRg+YpNBksOUxyeyjNkX8JZZRANKWpQq5VXVKyVnHF7BPXgdTDF
-         NnblrvRyvZwiq8jj3YxGrfp/imJgYkAzkxA/fwUDuPFx3eNKuOJDsPU9xNvBqA6Fuktq
-         FBAIqKcF8xnIU3eJxkuhlxeWW6OCJkRoMYdTg4taIijlnhiOUDD3dUn4phV9tMDdToLI
-         o3A6zut3ceG1G4rXGnmlS7DJEGwA5ffOe28kGeRQmld0oeXYbPhXsI87hG9qZLxJgi38
-         x2wn+vr75+kfEB9Ruxj8eM7YhIORVCxtK1UUH9fsKest7ga1cW482XRPE6gPQTbf8d2f
-         +pbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qt5RIqRGGJrwy6PdF0DLOD9IeNtwiPFQ2QHql0XiKZo=;
-        b=QCS41qX06qgUZqQzKZ4TQbuUT3fNF21RGeZGmWORGczxbo1Yu75l4X+bX1bGJ8v1tL
-         IAbxT7uEIgg/msQCZwM4isp1olbihA0Zbe7jzJiE72rLXOhL7NVn5aY23gF93oCwkQU2
-         yUDtQBE6p8EX2aaVXBoE4KOVNfp+vHnQeeQ+sVNCPq03GQSbbbFGeH/AS2VnFV6wvCGy
-         WhcHvsZVhf379IDH2v31+gu5vLSdxZuGRW4k57Mv+zOPvQYLkoiBWOc4luxFuXKfRFCA
-         bnlynce0p1A352hBTKLb9Q4b2ksRx1Q1o8kajzOe24/eMVuuB/+K9+aoVIsMlNBYmEDh
-         hJLQ==
-X-Gm-Message-State: AOAM530UA2HGC7kLNdB0LhlOHrUoxMzhJntdsvCkwCt0fKaNQr2eccW1
-        MaCik4XzubZ+paeQSbTpL7EPIsQbf8CaOg==
-X-Google-Smtp-Source: ABdhPJyvRf34v7LNhJLKJ6uzzckWLS6JCYQ2x4FK/m4fVvATdcy/Vr8x8UiEtO26ygKIEIeJ/TpP5g==
-X-Received: by 2002:adf:a1db:: with SMTP id v27mr5396496wrv.181.1619191052884;
-        Fri, 23 Apr 2021 08:17:32 -0700 (PDT)
-Received: from localhost.localdomain (84.red-88-11-91.dynamicip.rima-tde.net. [88.11.91.84])
-        by smtp.googlemail.com with ESMTPSA id f6sm9074545wrt.19.2021.04.23.08.17.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Apr 2021 08:17:32 -0700 (PDT)
-From:   Ian Mackinnon <imackinnon@gmail.com>
+        Fri, 23 Apr 2021 13:44:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:38666 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229549AbhDWRoy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 23 Apr 2021 13:44:54 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 82B9F61425
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 17:44:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1619199857;
+        bh=iSskdoJnBa4aMMB81JwNTIfXpA8LiUOeHr2loyzu/Ks=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=ILuYnKTkSJdnmJG9qrnXAO6/oI6lCOW4W78Tlf4XSg5Ly4m+fVoCGzWlq35AuGkOC
+         +lUwOrhQ34hzyOK+uqHnRiLLCWfk8GPru4gvxi7fMHyfRh5zJWqIFy/Ffxx+ME7TUW
+         aAD4kNjb53uAsfYtItupTsF6oANrVNaoD2UyGOTC7580ZJ27M0kvWgcfgOQVeJJ/9c
+         +4U/ANgOT+yXXx0OfPMhhOLQNNxnmWZpCl53wqODXd0rUv1c4TqZJZ6Z4qTAwwlBBv
+         ff3zTbJwCoNRIjvB/FIuUk31ljVGjwjtzHjtlrFIsiIx23k2TnLVBxv7Q9stBPnzJD
+         gQ0o6USQxGHsw==
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Ian Mackinnon <imackinnon@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Load Broadcom firmware for Dell device 413c:8197
-Date:   Fri, 23 Apr 2021 17:17:16 +0200
-Message-Id: <20210423151716.39598-1-imackinnon@gmail.com>
-X-Mailer: git-send-email 2.25.1
+Subject: [Bug 203753] Bluetooth: hci0: advertising data len corrected
+Date:   Fri, 23 Apr 2021 17:44:17 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sheepdestroyer@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-203753-62941-OprmO5ljRX@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-203753-62941@https.bugzilla.kernel.org/>
+References: <bug-203753-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Remove the btusb_table entry for 413c:8197 so the device is handled
-by the later Dell vendor entry, which specifies patchram loading.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D203753
 
-T:  Bus=01 Lev=02 Prnt=02 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
-D:  Ver= 2.00 Cls=ff(vend.) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=413c ProdID=8197 Rev= 1.12
-S:  Manufacturer=Dell Computer Corp
-S:  Product=DW380 Bluetooth Module
-S:  SerialNumber=74E54354F609
-C:* #Ifs= 4 Cfg#= 1 Atr=e0 MxPwr=  0mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=ff(vend.) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=ff Driver=btusb
-E:  Ad=84(I) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS=  32 Ivl=0ms
-I:* If#= 3 Alt= 0 #EPs= 0 Cls=fe(app. ) Sub=01 Prot=01 Driver=(none)
+--- Comment #7 from sheepdestroyer (sheepdestroyer@gmail.com) ---
+fedora 33=20
+Kernel 5.11.16-200.fc33.x86_64
+bluez-5.58-1.fc33
 
-Signed-off-by: Ian Mackinnon <imackinnon@gmail.com>
----
- drivers/bluetooth/btusb.c | 3 ---
- 1 file changed, 3 deletions(-)
+Thinkpad X230 with integrated Broadcom Bluetooth :
+Device 010: ID 0a5c:21e6 Broadcom Corp. BCM20702 Bluetooth 4.0 [ThinkPad]
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5cbfbd948f6..2d24231f898 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -119,9 +119,6 @@ static const struct usb_device_id btusb_table[] = {
- 	/* Canyon CN-BTU1 with HID interfaces */
- 	{ USB_DEVICE(0x0c10, 0x0000) },
- 
--	/* Broadcom BCM20702A0 */
--	{ USB_DEVICE(0x413c, 0x8197) },
--
- 	/* Broadcom BCM20702B0 (Dynex/Insignia) */
- 	{ USB_DEVICE(0x19ff, 0x0239), .driver_info = BTUSB_BCM_PATCHRAM },
- 
--- 
-2.25.1
 
+still flooded by :
+Bluetooth: hci0: advertising data len corrected 20 -> 19=20
+Bluetooth: hci0: advertising data len corrected 20 -> 19=20
+
+bt_err_ratelimited: 2 callbacks suppressed=20=20=20=20=20=20=20=20=20=20=20=
+=20=20=20=20
+
+Bluetooth: hci0: advertising data len corrected 20 -> 19
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
