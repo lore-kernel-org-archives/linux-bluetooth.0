@@ -2,218 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D159C43460
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 03:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C50B5C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 06:39:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09B0B61467
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 03:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 876C061445
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 06:39:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240329AbhDWDxZ (ORCPT
+        id S230141AbhDWGj4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Apr 2021 23:53:25 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:41282 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231261AbhDWDxY (ORCPT
+        Fri, 23 Apr 2021 02:39:56 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:50840 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229519AbhDWGjz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Apr 2021 23:53:24 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 13N3qdfiF021903, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 13N3qdfiF021903
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Fri, 23 Apr 2021 11:52:39 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 23 Apr 2021 11:52:38 +0800
-Received: from localhost.localdomain (172.21.132.99) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Fri, 23 Apr 2021 11:52:37 +0800
-From:   <hildawu@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <apusaka@chromium.org>, <tientzu@chromium.org>,
-        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
-        <kidman@realtek.com>
-Subject: [PATCH v3 1/2] Bluetooth: btrtl: Adjust the position of strcut definition
-Date:   Fri, 23 Apr 2021 11:52:28 +0800
-Message-ID: <20210423035229.27513-2-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210423035229.27513-1-hildawu@realtek.com>
-References: <20210423035229.27513-1-hildawu@realtek.com>
+        Fri, 23 Apr 2021 02:39:55 -0400
+Received: by mail-il1-f199.google.com with SMTP id d2-20020a056e020c02b029013731419ee1so20733573ile.17
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Apr 2021 23:39:19 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=mz6YscuvZogBNVtCM3+B/kPlahbgXIU6kxtAJ38URss=;
+        b=qE2JMSSDhCUW9wuVHJJmPh1bIsq23q9nPYKjdkIPhSl6bGIrZtlGWDm3LpggEOcn4q
+         RYpTcOF7nlTDOT6G8UiMugDJsRe6pSIEcOpZQC/V5AfomE6qXhLaJ1NAllBPwt7I/GwI
+         SDMDRXNNiN2bi4XPsT1sqRFgWr95Ivj5rd6NcZxr+Jvu8ndA2vVOWVBbZS8r1JQO01h5
+         zoaB2qK+aBCvJINQnGZeWn555469IcWnVxKdIG0JXXGzUm4KokTCCM3RV2Hz9PA+KDv5
+         NNEn/7stkdOHlvxL/XwryEwtGH7PKGUfHfQGV+5PkBV4XHj2+gC9w37089PA8+daTgKG
+         jSIg==
+X-Gm-Message-State: AOAM5301iBx+SVykZs3c5vUHbtab2PJFIPb6Sh3O4vTn4JnJu4yat7b5
+        KnAsIQgPlYvtYYAC56L95m4F8yZLfjmvnjoOxlcjoqkOdMu2
+X-Google-Smtp-Source: ABdhPJx5rVdBAWR6yLoY6VS2F6GSO1mNHqq/d0GsQrzl6UBCH65Jgfp7PUakW2CmpeMeqZ/hWaLTDe13ZTnq27h8fMBEuNQ02WIa
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.99]
-X-ClientProxiedBy: RTEXMBS01.realtek.com.tw (172.21.6.94) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzQvMjMgpFekyCAwMToxMjowMA==?=
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 04/23/2021 03:40:47
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 10
-X-KSE-AntiSpam-Info: Lua profiles 163299 [Apr 22 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
-X-KSE-AntiSpam-Info: LuaCore: 443 443 d64ad0ad6f66abd85f8fb55fe5d831fdcc4c44a0
-X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;realtek.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: {Track_Chinese_Simplified, headers_charset}
-X-KSE-AntiSpam-Info: Rate: 10
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/23/2021 03:44:00
-X-KSE-ServerInfo: RTEXH36502.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 04/23/2021 03:40:47
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 10
-X-KSE-AntiSpam-Info: Lua profiles 163299 [Apr 22 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
-X-KSE-AntiSpam-Info: LuaCore: 443 443 d64ad0ad6f66abd85f8fb55fe5d831fdcc4c44a0
-X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;realtek.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: Rate: 10
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 04/23/2021 03:44:00
+X-Received: by 2002:a05:6e02:154d:: with SMTP id j13mr1694340ilu.46.1619159959603;
+ Thu, 22 Apr 2021 23:39:19 -0700 (PDT)
+Date:   Thu, 22 Apr 2021 23:39:19 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003a11a005c09e0e6e@google.com>
+Subject: [syzbot] general protection fault in qca_power_shutdown
+From:   syzbot <syzbot+adafc67b05ed63665d5e@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: hildawu <hildawu@realtek.com>
+Hello,
 
-Adjust the position of strcut definition for btrtl and hci_h5.
-The purpose is to avoid re-defining some chip features and let UART devices
-get relevant information too.
+syzbot found the following issue on:
 
-Signed-off-by: hildawu <hildawu@realtek.com>
+HEAD commit:    c98ff1d0 Merge tag 'scsi-fixes' of git://git.kernel.org/pu..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16d44341d00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=339c2ecce8fdd1d0
+dashboard link: https://syzkaller.appspot.com/bug?extid=adafc67b05ed63665d5e
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+adafc67b05ed63665d5e@syzkaller.appspotmail.com
+
+Bluetooth: hci7: Reading QCA version information failed (-110)
+Bluetooth: hci7: Retry BT power ON:0
+general protection fault, probably for non-canonical address 0xdffffc000000000f: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000078-0x000000000000007f]
+CPU: 1 PID: 6293 Comm: kworker/u5:5 Not tainted 5.12.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci7 hci_power_on
+RIP: 0010:dev_get_drvdata include/linux/device.h:666 [inline]
+RIP: 0010:serdev_device_get_drvdata include/linux/serdev.h:117 [inline]
+RIP: 0010:qca_soc_type drivers/bluetooth/hci_qca.c:240 [inline]
+RIP: 0010:qca_power_shutdown+0x77/0x3b0 drivers/bluetooth/hci_qca.c:1821
+Code: 4c 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 e8 02 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 75 08 49 8d 7e 78 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 ae 02 00 00 4d 85 f6 4d 8b 6e 78 41 bc 01 00 00
+RSP: 0018:ffffc9000193f978 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff888024c82000 RCX: 0000000000000000
+RDX: 000000000000000f RSI: ffffffff864835a6 RDI: 0000000000000078
+RBP: ffff88802818b800 R08: 0000000000000024 R09: 0000000000000000
+R10: ffffffff815bdabe R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff88802818b800 R14: 0000000000000000 R15: ffff88802818b808
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004e4a61 CR3: 000000007172f000 CR4: 00000000001526e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ qca_setup+0x912/0x2070 drivers/bluetooth/hci_qca.c:1740
+ hci_uart_setup+0x1b1/0x480 drivers/bluetooth/hci_ldisc.c:423
+ hci_dev_do_open+0x3e1/0x1a00 net/bluetooth/hci_core.c:1499
+ hci_power_on+0x133/0x650 net/bluetooth/hci_core.c:2247
+ process_one_work+0x98d/0x1600 kernel/workqueue.c:2275
+ worker_thread+0x64c/0x1120 kernel/workqueue.c:2421
+ kthread+0x3b1/0x4a0 kernel/kthread.c:292
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+Modules linked in:
+---[ end trace d4921a9b71de1581 ]---
+RIP: 0010:dev_get_drvdata include/linux/device.h:666 [inline]
+RIP: 0010:serdev_device_get_drvdata include/linux/serdev.h:117 [inline]
+RIP: 0010:qca_soc_type drivers/bluetooth/hci_qca.c:240 [inline]
+RIP: 0010:qca_power_shutdown+0x77/0x3b0 drivers/bluetooth/hci_qca.c:1821
+Code: 4c 89 fa 48 c1 ea 03 80 3c 02 00 0f 85 e8 02 00 00 48 b8 00 00 00 00 00 fc ff df 4c 8b 75 08 49 8d 7e 78 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 ae 02 00 00 4d 85 f6 4d 8b 6e 78 41 bc 01 00 00
+RSP: 0018:ffffc9000193f978 EFLAGS: 00010206
+RAX: dffffc0000000000 RBX: ffff888024c82000 RCX: 0000000000000000
+RDX: 000000000000000f RSI: ffffffff864835a6 RDI: 0000000000000078
+RBP: ffff88802818b800 R08: 0000000000000024 R09: 0000000000000000
+R10: ffffffff815bdabe R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff88802818b800 R14: 0000000000000000 R15: ffff88802818b808
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000004e4a61 CR3: 000000007172f000 CR4: 00000000001526e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+
+
 ---
- drivers/bluetooth/btrtl.c | 36 ------------------------------------
- drivers/bluetooth/btrtl.h | 36 +++++++++++++++++++++++++++++++++++-
- 2 files changed, 35 insertions(+), 37 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index e7fe5fb22753..94d1e7885aee 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -38,42 +38,6 @@
- 	.hci_ver = (hciv), \
- 	.hci_bus = (bus)
- 
--enum btrtl_chip_id {
--	CHIP_ID_8723A,
--	CHIP_ID_8723B,
--	CHIP_ID_8821A,
--	CHIP_ID_8761A,
--	CHIP_ID_8822B = 8,
--	CHIP_ID_8723D,
--	CHIP_ID_8821C,
--	CHIP_ID_8822C = 13,
--	CHIP_ID_8761B,
--	CHIP_ID_8852A = 18,
--};
--
--struct id_table {
--	__u16 match_flags;
--	__u16 lmp_subver;
--	__u16 hci_rev;
--	__u8 hci_ver;
--	__u8 hci_bus;
--	bool config_needed;
--	bool has_rom_version;
--	char *fw_name;
--	char *cfg_name;
--};
--
--struct btrtl_device_info {
--	const struct id_table *ic_info;
--	u8 rom_version;
--	u8 *fw_data;
--	int fw_len;
--	u8 *cfg_data;
--	int cfg_len;
--	bool drop_fw;
--	int project_id;
--};
--
- static const struct id_table ic_id_table[] = {
- 	/* 8723A */
- 	{ IC_INFO(RTL_ROM_LMP_8723A, 0xb, 0x6, HCI_USB),
-diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-index 2a582682136d..08bda0597c0c 100644
---- a/drivers/bluetooth/btrtl.h
-+++ b/drivers/bluetooth/btrtl.h
-@@ -12,7 +12,41 @@
- #define rtl_dev_info(dev, fmt, ...) bt_dev_info(dev, "RTL: " fmt, ##__VA_ARGS__)
- #define rtl_dev_dbg(dev, fmt, ...) bt_dev_dbg(dev, "RTL: " fmt, ##__VA_ARGS__)
- 
--struct btrtl_device_info;
-+enum btrtl_chip_id {
-+	CHIP_ID_8723A,
-+	CHIP_ID_8723B,
-+	CHIP_ID_8821A,
-+	CHIP_ID_8761A,
-+	CHIP_ID_8822B = 8,
-+	CHIP_ID_8723D,
-+	CHIP_ID_8821C,
-+	CHIP_ID_8822C = 13,
-+	CHIP_ID_8761B,
-+	CHIP_ID_8852A = 18,
-+};
-+
-+struct id_table {
-+	__u16 match_flags;
-+	__u16 lmp_subver;
-+	__u16 hci_rev;
-+	__u8 hci_ver;
-+	__u8 hci_bus;
-+	bool config_needed;
-+	bool has_rom_version;
-+	char *fw_name;
-+	char *cfg_name;
-+};
-+
-+struct btrtl_device_info {
-+	const struct id_table *ic_info;
-+	u8 rom_version;
-+	u8 *fw_data;
-+	int fw_len;
-+	u8 *cfg_data;
-+	int cfg_len;
-+	bool drop_fw;
-+	int project_id;
-+};
- 
- struct rtl_download_cmd {
- 	__u8 index;
--- 
-2.17.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
