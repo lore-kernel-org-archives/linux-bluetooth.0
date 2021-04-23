@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCE34C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 14:26:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB5BC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 15:17:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8488161406
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 14:26:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7944A61152
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Apr 2021 15:17:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231220AbhDWO05 (ORCPT
+        id S231437AbhDWPSL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Apr 2021 10:26:57 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41338 "EHLO
+        Fri, 23 Apr 2021 11:18:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52952 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229794AbhDWO04 (ORCPT
+        with ESMTP id S231221AbhDWPSK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Apr 2021 10:26:56 -0400
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83D7AC061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 07:26:17 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id p10-20020a1c544a0000b02901387e17700fso1342945wmi.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 07:26:17 -0700 (PDT)
+        Fri, 23 Apr 2021 11:18:10 -0400
+Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20051C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 08:17:34 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id e7so39786128wrs.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Apr 2021 08:17:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=qt5RIqRGGJrwy6PdF0DLOD9IeNtwiPFQ2QHql0XiKZo=;
-        b=myYf3tO9vH0cTJKeGvSfRVXBjDkrRsj8gTCOdfKiBita+YBJEJZ6OgPCoNE71NHp/7
-         YSgcHdO4kIVpuIvKRhUMCAaGGlMHgNaQ43x7MfM7DWmHxxtE3VJvkT6cuWLWidMnrPs5
-         mWhCP9YuAQPDGVKCYMPmmRhneW0TtEtlNfEVyOrCI4pUNAMUeyqROtR2hsC8lJKyeLk1
-         wLFag7RpVj5TwOq8gUItydrLPNrABgr8r7+rqW4PG9G15Mkw/Gx0RnviPGZog2h9IM5C
-         +Co5mEu0iPL+bLyFnCHjoq8a49QYu8lAgefM2pW/KraA7SHZJTtkWTf1dV+WuaRbiqJ7
-         e4eg==
+        b=WWLD+0WV7aarDUyyRg+YpNBksOUxyeyjNkX8JZZRANKWpQq5VXVKyVnHF7BPXgdTDF
+         NnblrvRyvZwiq8jj3YxGrfp/imJgYkAzkxA/fwUDuPFx3eNKuOJDsPU9xNvBqA6Fuktq
+         FBAIqKcF8xnIU3eJxkuhlxeWW6OCJkRoMYdTg4taIijlnhiOUDD3dUn4phV9tMDdToLI
+         o3A6zut3ceG1G4rXGnmlS7DJEGwA5ffOe28kGeRQmld0oeXYbPhXsI87hG9qZLxJgi38
+         x2wn+vr75+kfEB9Ruxj8eM7YhIORVCxtK1UUH9fsKest7ga1cW482XRPE6gPQTbf8d2f
+         +pbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=qt5RIqRGGJrwy6PdF0DLOD9IeNtwiPFQ2QHql0XiKZo=;
-        b=kZOorYJteiSzyOHbplyCWi8vD7JWaiQeEr8X1oi/wftCuZ54hLIWHI8YI9mzuvRmk+
-         nEuZFxgVmXzZo5eGFar+YEsoTddYf8CrVvDy0cu78wbteY2118N87hwJdNAifuRJ0Tg0
-         O6YTJ9yDfuyT+RTkbqUlwvbTkHyMAmcOSK6E6Wr57niH4qETCDItGSq6LcpeUVziJd2Q
-         IXriEkh8jxFqbQgXfCpLO1Qx2yPB+lRKH6XXoYK486sGw8G4a2d3R5BqxWsbvEHss7ME
-         qvUcGwdZD/z1jfAUKpHpH3nqcoessHd8Ip4W0Q9hVz/2TK/lhOwMbCyAnNdeuEeuB7+y
-         qebw==
-X-Gm-Message-State: AOAM530uKszhDVf4bTFd2GaPOx6pbBEEXrmzYSHt7T+h2ujLSTM2se+4
-        E6dWqVXRFu+znhgY3Ra2oHFviJ7ARMsgIw==
-X-Google-Smtp-Source: ABdhPJyzmP3SK0HBWPqHGQyM/q0+PmdHes6o1EUwmnsN2GKT0XBxdcxBvN7ZiMe//KyfHesyiJnVag==
-X-Received: by 2002:a05:600c:35d1:: with SMTP id r17mr4550935wmq.71.1619187976284;
-        Fri, 23 Apr 2021 07:26:16 -0700 (PDT)
+        b=QCS41qX06qgUZqQzKZ4TQbuUT3fNF21RGeZGmWORGczxbo1Yu75l4X+bX1bGJ8v1tL
+         IAbxT7uEIgg/msQCZwM4isp1olbihA0Zbe7jzJiE72rLXOhL7NVn5aY23gF93oCwkQU2
+         yUDtQBE6p8EX2aaVXBoE4KOVNfp+vHnQeeQ+sVNCPq03GQSbbbFGeH/AS2VnFV6wvCGy
+         WhcHvsZVhf379IDH2v31+gu5vLSdxZuGRW4k57Mv+zOPvQYLkoiBWOc4luxFuXKfRFCA
+         bnlynce0p1A352hBTKLb9Q4b2ksRx1Q1o8kajzOe24/eMVuuB/+K9+aoVIsMlNBYmEDh
+         hJLQ==
+X-Gm-Message-State: AOAM530UA2HGC7kLNdB0LhlOHrUoxMzhJntdsvCkwCt0fKaNQr2eccW1
+        MaCik4XzubZ+paeQSbTpL7EPIsQbf8CaOg==
+X-Google-Smtp-Source: ABdhPJyvRf34v7LNhJLKJ6uzzckWLS6JCYQ2x4FK/m4fVvATdcy/Vr8x8UiEtO26ygKIEIeJ/TpP5g==
+X-Received: by 2002:adf:a1db:: with SMTP id v27mr5396496wrv.181.1619191052884;
+        Fri, 23 Apr 2021 08:17:32 -0700 (PDT)
 Received: from localhost.localdomain (84.red-88-11-91.dynamicip.rima-tde.net. [88.11.91.84])
-        by smtp.googlemail.com with ESMTPSA id 18sm11060825wmo.47.2021.04.23.07.26.15
+        by smtp.googlemail.com with ESMTPSA id f6sm9074545wrt.19.2021.04.23.08.17.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Apr 2021 07:26:15 -0700 (PDT)
+        Fri, 23 Apr 2021 08:17:32 -0700 (PDT)
 From:   Ian Mackinnon <imackinnon@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Ian Mackinnon <imackinnon@gmail.com>
-Subject: [PATCH] Bluetooth: btusb: Load Broadcom firmware for Dell Bluetooth device 413c:8197.
-Date:   Fri, 23 Apr 2021 16:26:09 +0200
-Message-Id: <20210423142609.36712-1-imackinnon@gmail.com>
+Subject: [PATCH] Bluetooth: btusb: Load Broadcom firmware for Dell device 413c:8197
+Date:   Fri, 23 Apr 2021 17:17:16 +0200
+Message-Id: <20210423151716.39598-1-imackinnon@gmail.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
