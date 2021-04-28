@@ -2,198 +2,391 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 42A56C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Apr 2021 18:59:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 24DFFC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 06:22:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 22DA3613F1
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Apr 2021 18:59:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E8979613EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 06:22:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236394AbhD0TAS convert rfc822-to-8bit (ORCPT
+        id S234587AbhD1GXE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Apr 2021 15:00:18 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:55911 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235974AbhD0TAS (ORCPT
+        Wed, 28 Apr 2021 02:23:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37864 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229643AbhD1GXD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Apr 2021 15:00:18 -0400
-Received: from smtpclient.apple (p4fefc624.dip0.t-ipconnect.de [79.239.198.36])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 458BFCED05;
-        Tue, 27 Apr 2021 21:07:22 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
-Subject: Re: [PATCH v2 01/10] Bluetooth: HCI: Use skb_pull to parse BR/EDR
- events
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZ+ONgc-AfrSUfgvWQ1h=ue3+gM0HfYA0gDAwX61EtH=bQ@mail.gmail.com>
-Date:   Tue, 27 Apr 2021 20:59:33 +0200
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7B4EDE89-53D3-4F4C-A6BC-1842ED4352CD@holtmann.org>
-References: <20210419171257.3865181-1-luiz.dentz@gmail.com>
- <20210419171257.3865181-2-luiz.dentz@gmail.com>
- <25D86C94-89CE-44CC-BB9C-724486444C12@holtmann.org>
- <CABBYNZJSRN2AbLqOVEWJ1oJivn0nR59zZad5AG1LCYpghd6CmA@mail.gmail.com>
- <BB97D0B0-1006-47E0-BA9E-876A6833D5E0@holtmann.org>
- <CABBYNZKmsOGqtezqDzzEh=ti1Am-mGQcbGCrekEcr8JPx=TW0w@mail.gmail.com>
- <79A4150F-9DD2-4370-993F-495248D8D377@holtmann.org>
- <CABBYNZ+ONgc-AfrSUfgvWQ1h=ue3+gM0HfYA0gDAwX61EtH=bQ@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3654.80.0.2.43)
+        Wed, 28 Apr 2021 02:23:03 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF81BC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Apr 2021 23:22:17 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id o16so18616961plg.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Apr 2021 23:22:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vu4Z0KzeydnLpFhPoobK9nuBu5f6pJsJrN2DPTzUCeY=;
+        b=IGQ3dt80jDDDPY4cSzUlBUb8PAFHivPdjVwGpf83gFs7rD5MiFty9jvHO3KEU3bJno
+         cS+UAHBKqUNd3L9/aZCQ4+gb7Pmk3jjDEvD//aV3LX2bxZIuZBb+f8y4xfUzNwWZ7ZfN
+         FuJdnwsSm2EyRrwdelSbLya1I54EBMAfO4s7NtkBUxjNR4kJ/pA3RHpC6woeHQD+wQtN
+         69iAQiRtg5U6CnR9Nv4nCQt8qNTTrbg86fMEvMjT84rAZHehvkIsVOeWh7dqCNkiip0y
+         +6tMO6gIuSZKaYb7vMV1mekFBLbL+BOvZiXa5EK4h4QijkcFKo3uiaSzMGxwwXDdjPPN
+         xQPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=vu4Z0KzeydnLpFhPoobK9nuBu5f6pJsJrN2DPTzUCeY=;
+        b=U+S5XzEcgn+rA7DB7dkh5SM+0zg4+/j7kGOAUbVtaDmk6ZUA0/c+PZqgaIlZtR6IWW
+         hGK1DdXPwfGm+pYx1JGH2BaJQZlfGG8cfu1n9LbLYoOz/DuuLyMWXTV1082m8+TXFP4B
+         BWK9SrhvnDf7Qq/QAhr0EMsIRiGN8eReqqHYfBAjNpNN9LTQ9SLIDiu7SEP40VXnjvMF
+         BaCRiroKzVU/GYycPvk/cVzv7boKUrDAPYeAhy9AvlUxSUIQs8X/LVXJIRfXxcVOkb99
+         PPrf0ECva8d+FkL781vIwLGnHFVGzGyIJgzpjiDNtPnRaUP+RbHCC12OXzJJsqwljFhk
+         pvnw==
+X-Gm-Message-State: AOAM533PfxSvdhGJ2UF2VwGEgtbWex2VGkf6QwwwMTBjV6siMn4yBGVx
+        qsn5Dk1SdByUCcUBlYj2XzXq9RN/oI4=
+X-Google-Smtp-Source: ABdhPJzJonuwU+C7ic4uiSNpvG69whr3dEvVrNu2oEVjCpiog5bk5Y7PE/gb3yQkpq+8z5gsdT0ilA==
+X-Received: by 2002:a17:90a:fa8f:: with SMTP id cu15mr24514584pjb.216.1619590936954;
+        Tue, 27 Apr 2021 23:22:16 -0700 (PDT)
+Received: from han1-XPS-13-9350.hsd1.or.comcast.net ([2601:1c0:6a01:d830:6e5:bd32:3019:cc30])
+        by smtp.gmail.com with ESMTPSA id w140sm4226065pfc.176.2021.04.27.23.22.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Apr 2021 23:22:15 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ v2] monitor: Update manpage
+Date:   Tue, 27 Apr 2021 23:22:14 -0700
+Message-Id: <20210428062214.335567-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
->>>>>>> This uses skb_pull to check the BR/EDR events received have the minimum
->>>>>>> required length.
->>>>>>> 
->>>>>>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>>>>>> ---
->>>>>>> include/net/bluetooth/hci.h |   4 +
->>>>>>> net/bluetooth/hci_event.c   | 272 +++++++++++++++++++++++++++++-------
->>>>>>> 2 files changed, 229 insertions(+), 47 deletions(-)
->>>>>>> 
->>>>>>> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>>>>>> index ea4ae551c426..f1f505355e81 100644
->>>>>>> --- a/include/net/bluetooth/hci.h
->>>>>>> +++ b/include/net/bluetooth/hci.h
->>>>>>> @@ -1894,6 +1894,10 @@ struct hci_cp_le_reject_cis {
->>>>>>> } __packed;
->>>>>>> 
->>>>>>> /* ---- HCI Events ---- */
->>>>>>> +struct hci_ev_status {
->>>>>>> +     __u8    status;
->>>>>>> +} __packed;
->>>>>>> +
->>>>>>> #define HCI_EV_INQUIRY_COMPLETE               0x01
->>>>>>> 
->>>>>>> #define HCI_EV_INQUIRY_RESULT         0x02
->>>>>>> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
->>>>>>> index 5e99968939ce..077541fcba41 100644
->>>>>>> --- a/net/bluetooth/hci_event.c
->>>>>>> +++ b/net/bluetooth/hci_event.c
->>>>>>> @@ -42,6 +42,30 @@
->>>>>>> 
->>>>>>> /* Handle HCI Event packets */
->>>>>>> 
->>>>>>> +static void *hci_skb_pull(struct sk_buff *skb, size_t len)
->>>>>>> +{
->>>>>>> +     void *data = skb->data;
->>>>>>> +
->>>>>>> +     if (skb->len < len)
->>>>>>> +             return NULL;
->>>>>>> +
->>>>>>> +     skb_pull(skb, len);
->>>>>>> +
->>>>>>> +     return data;
->>>>>>> +}
->>>>>>> +
->>>>>>> +static void *hci_ev_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
->>>>>>> +                          u8 ev, size_t len)
->>>>>>> +{
->>>>>>> +     void *data;
->>>>>>> +
->>>>>>> +     data = hci_skb_pull(skb, len);
->>>>>>> +     if (!data)
->>>>>>> +             bt_dev_err(hdev, "Malformed Event: 0x%2.2x", ev);
->>>>>>> +
->>>>>>> +     return data;
->>>>>>> +}
->>>>>>> +
->>>>>> 
->>>>>> so if you do it in one function, this will look like this:
->>>>>> 
->>>>>>      static void *hci_ev_skb_pull(..)
->>>>>>      {
->>>>>>              void *data = skb->data;
->>>>>> 
->>>>>>              if (skb->len < len) {
->>>>>>                      bt_dev_err(hdev, “Malformed ..”);
->>>>>>                      return NULL;
->>>>>>              }
->>>>>> 
->>>>>>              skb_pull(skb, len);
->>>>>>              return data;
->>>>>>      }
->>>>>> 
->>>>>>      static void *hci_cc_skb_pull(..)
->>>>>>      {
->>>>>>              void *data = skb->data;
->>>>>> 
->>>>>>              if (skb->len < len) {
->>>>>>                      bt_dev_err(..);
->>>>>>                      return NULL;
->>>>>>              }
->>>>>> 
->>>>>>              skb_pull(..);
->>>>>>              return data;
->>>>>>      }
->>>>>> 
->>>>>> I realize that you want to optimize the code with hci_skb_pull, but I don’t see how that makes it simpler or cleaner. In the end you just have spaghetti code and don’t win anything in size reduction or complexity.
->>>>> 
->>>>> Right, I can either do that or perhaps bite the bullet and convert the
->>>>> whole hci_event.c to use a function table:
->>>>> 
->>>>> #define HCI_EVENT(_op, _len, _func)...
->>>>> 
->>>>> struct hci_event {
->>>>> __u8    op;
->>>>> __u16  len;
->>>>> func...
->>>>> } ev_table[] = {
->>>>> HCI_EVENT(...),
->>>>> }
->>>>> 
->>>>> But that would pack a lot more changes since we would need to convert
->>>>> the whole switch to a for loop or alternatively if we don't want do a
->>>>> lookup we could omit the op and access the table by index if we want
->>>>> to trade speed over code size, with that we can have just one call to
->>>>> the likes of hci_ev_skb_pull.
->>>> 
->>>> looping through a table is not ideal. There are too many events that you can receive and if we end up looping for every LE advertising report it would be rather silly. And of course a static table is possible since event numbers are assigned in order, but it also means some sort of overhead since we don’t parse each event.
->>>> 
->>>> In addition to that dilemma, you have the problem that not all events are fixed size. So you end up indicating that similar to how we do it in btmon which will increase the table size again. Maybe that is actually ok since two giant switch statements also take time and code size.
->>>> 
->>>> So our currently max event code is 0x57 for Authenticated Payload Timeout and the max LE event code is 0x3e for BIG Info Advertising Report. Meaning table one would have 87 entries and table would have two 63 entries. If we do min_len,max_len as uint8 then we have 2 octets and a function pointer. Maybe that is not too bad since that is all static const data.
->>> 
->>> Yep, even if we have to have NOP for those event we don't handle I
->>> don't think it is such a big deal and accessing by index should be
->>> comparable in terms of speed to a switch statement, that said we may
->>> still need to do some checks on the callbacks for those events that
->>> have variable size I was only intending to do minimal size checks but
->>> perhaps you are saying it might be better to have a bool/flag saying
->>> that the event has variable size which matters when we are checking
->>> the length to either use == or <.
->> 
->> I actually meant min_len + max_len.
->> 
->> So you have for example
->> 
->>        HCI_EVENT(..) that sets min_len = x, max_len = x.
->>        HCI_EVENT_VAR(..) that sets min_len = x and max_len = 253.
->> 
->> No need for extra flags then.
-> 
-> Ah got it, is there really a max_len for variable size though? Or you
-> mean to say that should be limited to event buffer size? That Im
-> afraid we only discover at runtime, anyway usually for variable size
-> we should be using flex_array_size but that requires accessing the
-> received skb so we can't really tell at build time and it will be
-> likely left for the callback to figure out it has received enough data
-> or not.
+This patch updates the manpage for btmon written in rst format.
+---
+ Makefile.am       |  26 ++++---
+ Makefile.tools    |   4 ++
+ configure.ac      |   4 ++
+ doc/btmon.txt     |  35 ----------
+ monitor/btmon.rst | 172 ++++++++++++++++++++++++++++++++++++++++++++++
+ 5 files changed, 197 insertions(+), 44 deletions(-)
+ delete mode 100644 doc/btmon.txt
+ create mode 100644 monitor/btmon.rst
 
-using max_len will make it flexible enough since in HCI event the max len is 253 as far as I recall. Or it was 255, but I don’t remember from the top of my head.
-
-It also really doesn’t matter since if you need to change something, you just change the #define HCI_EVENT_VAR and that is it. I prefer to not make it more complicated than needed. The flex_array_size is nice, but I don’t know how much use that is in a static const structure array.
-
-Regards
-
-Marcel
+diff --git a/Makefile.am b/Makefile.am
+index f98243f72..759110cbd 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -60,6 +60,11 @@ else
+ build_plugindir = $(plugindir)
+ endif
+ 
++if MANPAGES
++man_MANS =
++endif
++
++manual_pages = monitor/btmon.1
+ 
+ plugin_LTLIBRARIES =
+ 
+@@ -579,13 +584,7 @@ if LIBRARY
+ pkgconfig_DATA = lib/bluez.pc
+ endif
+ 
+-manual_pages = doc/btmon.1
+-
+-if MANPAGES
+-dist_noinst_MANS += $(manual_pages)
+-endif
+-
+-EXTRA_DIST += $(manual_pages:.1=.txt)
++EXTRA_DIST += $(manual_pages:.1=.rst)
+ 
+ DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
+ 						--enable-health \
+@@ -607,11 +606,20 @@ SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+ 		$(SED) -e 's,@pkglibexecdir\@,$(pkglibexecdir),g' \
+ 		< $< > $@
+ 
++if RUN_RST2MAN
++RST2MAN_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
++			$(RST2MAN) --strict --no-raw \
++			--no-generator --no-datestamp $< $@
++else
++RST2MAN_PROCESS = $(AM_V_GEN)test -f $@ || \
++		{ echo "Generated manual page $@ does not exist"; false; }
++endif
++
+ %.service: %.service.in Makefile
+ 	$(SED_PROCESS)
+ 
+-%.1: %.txt
+-	$(AM_V_GEN)a2x --doctype manpage --format manpage $(srcdir)/$<
++%.1: %.rst Makefile
++	$(RST2MAN_PROCESS)
+ 
+ src/builtin.h: src/genbuiltin $(builtin_sources)
+ 	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+diff --git a/Makefile.tools b/Makefile.tools
+index 57e858290..9b452aa74 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -49,6 +49,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+ 				monitor/tty.h
+ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-mainloop.la $(UDEV_LIBS) -ldl
++
++if MANPAGES
++man_MANS += monitor/btmon.1
++endif
+ endif
+ 
+ if LOGGER
+diff --git a/configure.ac b/configure.ac
+index dbd98c9ad..d7e4766e4 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -326,7 +326,11 @@ AM_CONDITIONAL(DATAFILES, test "${enable_datafiles}" != "no")
+ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+ 			[enable building of manual pages]),
+ 					[enable_manpages=${enableval}])
++if (test "${enable_manpages}" != "no"); then
++	AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
++fi
+ AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
++AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
+ 
+ AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing],
+ 			[enable testing tools]),
+diff --git a/doc/btmon.txt b/doc/btmon.txt
+deleted file mode 100644
+index 7a7fc537b..000000000
+--- a/doc/btmon.txt
++++ /dev/null
+@@ -1,35 +0,0 @@
+-BTMON(1)
+-========
+-:doctype: manpage
+-
+-
+-NAME
+-----
+-btmon - Bluetooth monitor
+-
+-
+-SYNOPSIS
+---------
+-*btmon* ['OPTIONS']
+-
+-
+-DESCRIPTION
+------------
+-The btmon(1) command provides access to the Bluetooth subsystem monitor
+-infrastructure for reading HCI traces.
+-
+-
+-AUTHOR
+-------
+-btmon was originally written by Marcel Holtmann.
+-
+-
+-RESOURCES
+----------
+-See <http://www.bluez.org/>
+-
+-
+-COPYING
+--------
+-Free use of this software is granted under ther terms of the GNU Lesser
+-General Public Licenses (LGPL).
+diff --git a/monitor/btmon.rst b/monitor/btmon.rst
+new file mode 100644
+index 000000000..29d275eb3
+--- /dev/null
++++ b/monitor/btmon.rst
+@@ -0,0 +1,172 @@
++=====
++btmon
++=====
++
++-----------------
++Bluetooth monitor
++-----------------
++
++:Authors: - Marcel Holtmann <marcel@holtmann.org>
++          - Tedd Ho-Jeong An <tedd.an@intel.com>
++:Copyright: Free use of this software is granted under ther terms of the GNU
++            Lesser General Public Licenses (LGPL).
++:Version: BlueZ
++:Date: April 2021
++:Manual section: 1
++:Manual group: Linux System Administration
++
++SYNOPSYS
++========
++
++**btmon** [*OPTIONS* ...]
++
++DESCRIPTION
++===========
++
++The  btmon(1) command  provides  access  to the Bluetooth subsystem monitor
++infrastructure for reading HCI traces.
++
++OPTIONS
++=======
++
++-r FILE, --read FILE        Read traces in btsnoop format from *FILE*.
++-w FILE, --write FILE       Save traces in btsnoop format to *FILE*.
++-a FILE, --analyze FILE     Analyze traces in btsnoop format from *FILE*.
++                            It displays the devices found in the *FILE* with
++                            its packets by type.
++-s SOCKET, --server SOCKET  Start monitor server socket.
++-p PRIORITY, --priority PRIORITY  Show only priority or lower for user log.
++
++.. list-table::
++   :header-rows: 1
++   :widths: auto
++   :stub-columns: 1
++
++   * - *PRIORITY*
++     - NAME
++
++   * - **3**
++     - Error
++
++   * - **4**
++     - Warning
++
++   * - **6**
++     - Information (Default)
++
++   * - **7**
++     - Debug. **debug** can be used.
++
++-i NUM, --index NUM         Show only specified controller. *hciNUM* is also
++                            acceptable. This is useful to capture the traces
++                            from the specific controller when the multiple
++                            controllers are presented.
++
++-d TTY, --tty TTY           Read data from *TTY*.
++
++-B SPEED, --rate SPEED      Set TTY speed. The default *SPEED* is 115300
++
++-V COMPID, --vendor COMPID  Set the default company identifier. The *COMPID* is
++                            a unique number assigned by the Bluetooth SIG to
++                            a member company and can be found/searched from the
++                            Bluetooth SIG webpage.
++
++                            For example, Intel is 2 and Realtek is 93.
++
++-M, --mgmt                  Open channel for mgmt events.
++
++-t, --time                  Show a time instead of time offset.
++
++-T, --date                  Show a time and date information instead of
++                            time offset.
++
++-S, --sco                   Dump SCO traffic in raw hex format.
++
++-A, --a2dp                  Dump A2DP stream traffic in a raw hex format.
++
++-E IP, --ellisys IP         Send Ellisys HCI Injection.
++
++-P, --no-pager              Disable pager usage while reading the log file.
++
++-J OPTIONS, --jlink OPTIONS     Read data from RTT.  Each options are comma(,)
++                                seprated without spaces.
++
++.. list-table::
++   :header-rows: 1
++   :widths: auto
++   :stub-columns: 1
++
++   * - *OPTIONS*
++     - Description
++
++   * - **DEVICE**
++     - Required. Set the target device.
++
++   * - **SERIALNO**
++     - (Optional) Set the USB serial number. Default is **0**.
++
++   * - **INTERFACE**
++     - (Optional) Target interface. Default is **swd**.
++
++   * - **SPEED**
++     - (Optional) Set target interface speed in kHz. Default is **1000**.
++
++-R OPTIONS, --rtt OPTIONS   RTT control block parameters. Each options are
++                            comma(,) seprated without spaces.
++
++.. list-table::
++   :header-rows: 1
++   :widths: auto
++   :stub-columns: 1
++
++   * - *OPTIONS*
++     - Description
++
++   * - **ADDRESS**
++     - (Optional) Address of RTT buffer. Default is **0x00**
++
++   * - **AREA**
++     - (Optional) Size of range to search in RTT buffer. Default is **0**
++
++   * - **NAME**
++     - (Optional) Buffer name. Default is **btmonitor**
++
++-C WIDTH, --columns WIDTH   Output width if not a terminal
++
++-c MODE, --color MODE       Set output color. The possible *MODE* values are:
++                            **auto|always|never**.
++
++                            Default value is **auto**
++
++-v, --version               Show version
++
++-h, --help                  Show help options
++
++EXAMPLES
++========
++
++Capture the traces from hci0 to hcidump.log file
++------------------------------------------------
++
++.. code-block:: bash
++
++   $ btmon -i hci0 -w hcidump.log
++
++Open the trace file
++-------------------
++
++.. code-block:: bash
++
++   $ btmon -r hcidump.log
++
++
++RESOURCES
++=========
++
++http://www.bluez.org
++
++REPORTING BUGS
++==============
++
++linux-bluetooth@vger.kernel.org
++
+-- 
+2.25.1
 
