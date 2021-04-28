@@ -2,115 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F83AC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 23:06:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C108C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 23:42:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D0D1C61090
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 23:06:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4DD661435
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 23:42:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230245AbhD1XHV (ORCPT
+        id S229718AbhD1XnW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Apr 2021 19:07:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35454 "EHLO
+        Wed, 28 Apr 2021 19:43:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229691AbhD1XHT (ORCPT
+        with ESMTP id S229488AbhD1XnV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Apr 2021 19:07:19 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01DE3C06138D
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Apr 2021 16:06:32 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id u20so33261670qku.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Apr 2021 16:06:32 -0700 (PDT)
+        Wed, 28 Apr 2021 19:43:21 -0400
+Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B05EC06138B
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Apr 2021 16:42:36 -0700 (PDT)
+Received: by mail-qt1-x834.google.com with SMTP id n22so8433425qtk.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Apr 2021 16:42:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Zh7OlMvW3DerlpqnUGmUulKmpWmcH2OBnD2WoZd3s2E=;
-        b=YmSZOiKx330MTi6OgPxfVQAMQcngQCx0VixjfYfa8oimpEQdKQgtVXk/+sdhYuWHBk
-         INJua3d8nJs4sB3DuURU4LOBXXJvRHtnO9z2pzNUOsZJqxJ/lu/MSd8Zk7zaJlk6X+3b
-         wV1t6QWmPYLQjSAqEZt/q6B+HAPDWWap6PV+FVd7Z7vMjm/zlLW6fC30urIy9Ixi1Zow
-         C+B1TJrtu6N0ov6PxdLuPTBDL8VD0zEtoFnb74RMkjl9oi1MKgNdiBJgV1HNSjGVv/Fl
-         L/AR4xnQA6V3mj7Yb0eu1tgO/5mcDwYATZi63am5SCwGLOOEX5cnBhXezwGWRTelTvHJ
-         begg==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=EMSWyo6O9mdVMq1x1lVRVT3hS7EOyyoDlIoF4AIL3kg=;
+        b=LKVKGX93Fr+R/HgCeY6MOCcKUs1ueDE2YrHdg2YBoYNSKqJ2H6c3CJFyf+Bz0CxWVQ
+         BUm00sxZfOMxKQtwJDr/BjOe9hGVEN+r9zGx//VuAqHtLf1YCmN7iJitXu32+2+/lcKN
+         aMhyhDcHSXXZyG3PGh+e679m+ami2FOX6Ro7ZU40NySMkBq8klSy2iojch8NI9LEULYn
+         sxdhOLLJpw5SPQz/plCTKWukAJyQkFzg2yGij1RiHlH+2JC65uryV8GguxtCK9KiA//j
+         VRJrXsgb99Z3g5AJoyaExm6M0qvUswh05egT0k1uv6PQCPSR1Re/or7MSwclinSFhhAV
+         lFsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Zh7OlMvW3DerlpqnUGmUulKmpWmcH2OBnD2WoZd3s2E=;
-        b=pAk6c7MgbcKwDBLeLr0wKBtvojra23g6rC7F8RLZamD/rjG8074ks6K29t+Lng6fMR
-         dESCt4mQKDvAGaY2ynkJOYFUPm9Ci1tYNCF7VcJ6XCw84w7A4Tqnl4LYyNXM3QHYLsnp
-         TEOs4nYUpmG90657ejgDQDckTYVn6ztOBON+fxNoue+8XgrlvMmhKgk7swPvNnko13Td
-         L7XhDAlbmOwh/JN8F7D+t+GXv7xz2+cmKrdApURO0u5yDn8XWLBCuuelYqEN0cQsQiFk
-         6vszvND47aCY/H7x6veEJ6ZeM5ozEOb0rjTuxvatwy0UgbnVVbiNIp/4EHHDx0LdY6Ck
-         st1g==
-X-Gm-Message-State: AOAM531EmhEzKLqFTwFlGDgIehl3IslZi418LIEZEb7JXhmBsO4Emjbw
-        BSc37f5PTtDRvwnIwly24XBdMqLFB5YgxWwACLp4I7XXZ0k=
-X-Google-Smtp-Source: ABdhPJyP5Rq2TRUvGNCzXQ1TVtatDBGYjPsbD4BIYz1E9VvNk25ly9hWjYmcb76DZ6leGHtwS5fr3IhvvwXH1Fuxrjw=
-X-Received: by 2002:a05:620a:70e:: with SMTP id 14mr31567987qkc.278.1619651190787;
- Wed, 28 Apr 2021 16:06:30 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=EMSWyo6O9mdVMq1x1lVRVT3hS7EOyyoDlIoF4AIL3kg=;
+        b=MjEVLJuwxxKjXRrgjEFMnbNf9HYAN6K5TSzMNHbthOiJWIol1dRELyTu8Fl8bgCKRV
+         jLWF8OI/cff5qNpRSd98Ti5LhKg9d5qjWhFnQun+lZVXFQkOszVwuYsc5UI7Xb999JVH
+         9XFfC7/riS4dn7aYFR07A7o5vYr04elW4ryHVUpAfjpovvHczRGxYhNSJsarakykz/Mu
+         CPIqQjCGW09jOrl6YTOVfGLUEPUiKtOzgF23G3RSC1diF6e7sLsMPSTTRQvRHpCPNSHe
+         20ISACSzHkimWiTwyNWeUaS5KpceX+SbXUrwWhSv+AXW47nya1z4akHZxW6D9MZpRH5m
+         MJww==
+X-Gm-Message-State: AOAM530P8VOuqRfo7ukneB/hnCUzv++KTWKkFPbC7Lr1niCu/l9eXz8V
+        2YjZh848SXqQqKGfey6mnMU/0agEE5qBQg==
+X-Google-Smtp-Source: ABdhPJxMPLqTkHFEFXNnmcPrEH1QaXjDy2fXu4JvTumXPoOguAr/gSjPgohavFB5/HeGtWOqlkS2uQ==
+X-Received: by 2002:ac8:5283:: with SMTP id s3mr19252980qtn.66.1619653355035;
+        Wed, 28 Apr 2021 16:42:35 -0700 (PDT)
+Received: from [172.17.0.2] ([40.75.120.110])
+        by smtp.gmail.com with ESMTPSA id a29sm1249185qtd.15.2021.04.28.16.42.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Apr 2021 16:42:34 -0700 (PDT)
+Message-ID: <6089f2ea.1c69fb81.44687.a8d3@mx.google.com>
+Date:   Wed, 28 Apr 2021 16:42:34 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3042689492206539138=="
 MIME-Version: 1.0
-References: <20210419165323.v1.1.I9f9e8bcc849d91c1bb588a5181317c3e2ad48461@changeid>
-In-Reply-To: <20210419165323.v1.1.I9f9e8bcc849d91c1bb588a5181317c3e2ad48461@changeid>
-From:   Yu Liu <yudiliu@google.com>
-Date:   Wed, 28 Apr 2021 16:05:54 -0700
-Message-ID: <CAHC-ybzmnE9ja1ianmLMyMvPq6Kkt1U8caiO+cGKtVc4cy1kLQ@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix the HCI to MGMT status conversion table
-To:     linux-bluetooth@vger.kernel.org,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ] Build: Add missing ELL headers and sources
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210428225650.372450-1-hj.tedd.an@gmail.com>
+References: <20210428225650.372450-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Ping for attention, thanks.
+--===============3042689492206539138==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=474765
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.31 seconds
+GitLint                       PASS      0.13 seconds
+Prep - Setup ELL              PASS      48.10 seconds
+Build - Prep                  PASS      0.13 seconds
+Build - Configure             PASS      8.39 seconds
+Build - Make                  PASS      207.27 seconds
+Make Check                    PASS      13.27 seconds
+Make Dist                     PASS      12.03 seconds
+Make Dist - Configure         PASS      5.18 seconds
+Make Dist - Make              PASS      84.09 seconds
+Build w/ext ELL - Configure   PASS      8.44 seconds
+Build w/ext ELL - Make        PASS      194.55 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Dist - PASS
+Desc: Run 'make dist' and build the distribution tarball
+
+##############################
+Test: Make Dist - Configure - PASS
+Desc: Configure the source from distribution tarball
+
+##############################
+Test: Make Dist - Make - PASS
+Desc: Build the source from distribution tarball
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
 
 
-On Mon, Apr 19, 2021 at 4:53 PM Yu Liu <yudiliu@google.com> wrote:
->
-> 0x2B, 0x31 and 0x33 are reserved for future use but were not present in
-> the HCI to MGMT conversion table, this caused the conversion to be
-> incorrect for the HCI status code greater than 0x2A.
->
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> Signed-off-by: Yu Liu <yudiliu@google.com>
-> ---
->
-> Changes in v1:
-> - Initial change
->
->  net/bluetooth/mgmt.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 40f75b8e1416..b44e19c69c44 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -252,12 +252,15 @@ static const u8 mgmt_status_table[] = {
->         MGMT_STATUS_TIMEOUT,            /* Instant Passed */
->         MGMT_STATUS_NOT_SUPPORTED,      /* Pairing Not Supported */
->         MGMT_STATUS_FAILED,             /* Transaction Collision */
-> +       MGMT_STATUS_FAILED,             /* Reserved for future use */
->         MGMT_STATUS_INVALID_PARAMS,     /* Unacceptable Parameter */
->         MGMT_STATUS_REJECTED,           /* QoS Rejected */
->         MGMT_STATUS_NOT_SUPPORTED,      /* Classification Not Supported */
->         MGMT_STATUS_REJECTED,           /* Insufficient Security */
->         MGMT_STATUS_INVALID_PARAMS,     /* Parameter Out Of Range */
-> +       MGMT_STATUS_FAILED,             /* Reserved for future use */
->         MGMT_STATUS_BUSY,               /* Role Switch Pending */
-> +       MGMT_STATUS_FAILED,             /* Reserved for future use */
->         MGMT_STATUS_FAILED,             /* Slot Violation */
->         MGMT_STATUS_FAILED,             /* Role Switch Failed */
->         MGMT_STATUS_INVALID_PARAMS,     /* EIR Too Large */
-> --
-> 2.31.1.368.gbe11c130af-goog
->
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============3042689492206539138==--
