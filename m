@@ -2,194 +2,180 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B567C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 06:48:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52888C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 13:54:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5572C611BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 06:48:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FBDD61441
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Apr 2021 13:54:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231600AbhD1GtB (ORCPT
+        id S231315AbhD1NzR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Apr 2021 02:49:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43610 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231578AbhD1GtA (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Apr 2021 02:49:00 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F922C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Apr 2021 23:48:16 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id z16so3128744pga.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Apr 2021 23:48:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Qf7jrWklRMPbQz/aiSl4WZ+FYvkwvBN4KEiwaVg4djo=;
-        b=TWT6V8Dpl6zAvWR39yN2ScMUP4cWy6N0J26C6V+/MI366GG3n3dbIDQhGK8fflMEIN
-         G0nVZ27XwTIB3dz08/DLzWfIxaJy6WeX+hktfViUSLGqgGrJ0OPnNyNPViTNlTuB/mgD
-         80Pp/GlyckdrzsytJV+dyZWniD4SP8gmQJM0bJfR5JsAZCa+k3BthUO3BaVLDH4tP0KX
-         w4YUoSp+OtRNcJcU2OUr//G+S3dCFnmpF839jygTDR6x9oNRY6MgkFBRTCq4iYNu/LrZ
-         6ziLAga8Jj3ZmQ+Rs08uwLHi3yyG7S7mFOy4O6RxVzQdZ1xkVKxgNXn472NF6xipqT5m
-         u4ng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Qf7jrWklRMPbQz/aiSl4WZ+FYvkwvBN4KEiwaVg4djo=;
-        b=cOJqxxjDhD9IzXf8bzVUAcGMbVkRt0bx3x2MGl4eGt7PVxno8cvFdM2YuJnKps4HuL
-         /DbnWGQpsvQaG0vdo28w0W/Rp5A3xXvuIqm4K3k6l53KTG+QwRzEI8iyxz8mNJ9NFOFy
-         c0yngstmAPlWJOwPGUtBmJ7e/5OSpTHd9/2D2Xah3vsSKFUAiqH68W6f6qJRAFfgkaHn
-         25Od5VYsop9CscM0r2J69IrV/AgIvWGGmDAQmiiEq34xs/1/drygMp6HUIOEJdb8rRd+
-         MX2t8wqqmTfUqItvDgd3yUjdCnTTlcv+KEdE3qaqBZ7VUW1VTNhjnicDkzN321+CPrF8
-         v1Bw==
-X-Gm-Message-State: AOAM530jBn1+YmRxnY+v3ur9C7xeOEKOBIxlKJu2nNg1wEgZ/eOq4L5t
-        gCMxdg3HmHRoLp6G+b9kRrIzMT7Py1c=
-X-Google-Smtp-Source: ABdhPJwyX+PGwWnfE1esBcp48iMa/V8Gphk79N5VB84ZRQFYw16S2ZDmlgZQ4qm6vwMb3bfXo94sbg==
-X-Received: by 2002:a62:2cb:0:b029:259:feaa:75e7 with SMTP id 194-20020a6202cb0000b0290259feaa75e7mr26310896pfc.24.1619592495374;
-        Tue, 27 Apr 2021 23:48:15 -0700 (PDT)
-Received: from [172.17.0.2] ([20.94.243.179])
-        by smtp.gmail.com with ESMTPSA id z29sm1466620pga.52.2021.04.27.23.48.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Apr 2021 23:48:14 -0700 (PDT)
-Message-ID: <6089052e.1c69fb81.f1c34.5801@mx.google.com>
-Date:   Tue, 27 Apr 2021 23:48:14 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1966273398624010554=="
+        Wed, 28 Apr 2021 09:55:17 -0400
+Received: from mga01.intel.com ([192.55.52.88]:27197 "EHLO mga01.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229965AbhD1NzQ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 28 Apr 2021 09:55:16 -0400
+IronPort-SDR: n1NxLFp2VFUtj7OioayxaS1XmGkp4Abe1+ezwxde8WhnEhe+v/OeAr5+ZQqXavVH3cYAAUURhf
+ SfvX+gp58EHg==
+X-IronPort-AV: E=McAfee;i="6200,9189,9968"; a="217462363"
+X-IronPort-AV: E=Sophos;i="5.82,258,1613462400"; 
+   d="scan'208";a="217462363"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Apr 2021 06:54:31 -0700
+IronPort-SDR: M0dB2HLBUHl28poulLOFQe5VCNJDwe5GuWnKGJb94GUG0wt3jreA2HsXhn29k19LPNAJS9rOg+
+ Q6UfQYxmN4tA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.82,258,1613462400"; 
+   d="scan'208";a="423548651"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmsmga008.fm.intel.com with ESMTP; 28 Apr 2021 06:54:31 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 28 Apr 2021 06:54:31 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Wed, 28 Apr 2021 06:54:30 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2
+ via Frontend Transport; Wed, 28 Apr 2021 06:54:30 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.103)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2106.2; Wed, 28 Apr 2021 06:54:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=lR5mfKpjcMDf11qDzTqjmXcJocrUAsawgEd2QMYSgyPlLGXFIn4fBXgyKmueKQ/+eaphBNrmId6VAwdibhK+XrdhB/+JIvKh4MA2UensOCIMw7Bud4YN45BSo28g9or7gnUzzqKORD6ZzY1sWW2BpY2Nl3Sox/VGvTENvp5go8D46GCa4aiI2hjFc1brGss8POh7CDN10OBzoV3Hw2QRk03w0yVTPUOptaRCiesxn8hVi/syiZCJ5tPBtrLFysE9r1XGZ0PlDfqJAqFnohXSYkSi2SFBj37TEGnfkj9Z6LMsehJ+umntjVKxuM8LzwpukOpYHNCP8QyHYSCtMEpZVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pf7nrhiWqpYSUP62k82KvsD0MeJxBOSFCXBzkqbR2Hw=;
+ b=DXe0YZFRy2rRbl1Pp8IFxRrBSWtFKPPu9/Qtf2YY7dFTSDErzYbTbrqZ/7euPC5TCK/woQGJA6ts3rEIEYnq0TjX1V3SmXkAL759pSSJhtvyS28hMoO/pN91LVVs1dJjvGB3uWVLJS62HVLXfHvet/qUpJNNCBBmh/aNuGgHRbSLD7FKyAndyQz1o/k9X24BcEApt80Xlmjy+4LSdHgzJhj0hBUd70vPT8CDQPKxpxrFxXeXeBYTR9gwZwR23gdDyb9dFa7nxq42L9J9NCNRIjA0DgiXU1Cnd+5bK9qUyXJBQlrlQHqFgvPNPrUM7gPc19LQLOKQRugwPn2TVmXUlQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
+ s=selector2-intel-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Pf7nrhiWqpYSUP62k82KvsD0MeJxBOSFCXBzkqbR2Hw=;
+ b=aq5rJHQpyn7Kf2F8cCmx4/GFlq9C4C4f6JT2P3w+KgVJcCuoUpI7ewzlOUYQISvndq0DIbgBNgPZFSqrxL9zUnaJaNgt7+6uo9VSssqIi9dbop0nLdk155hV4WBVRlzukC/p4DvufDJGQu9EkSu7IUVeLXcO68o9XNqjnUMzC7Y=
+Received: from DM8PR11MB5573.namprd11.prod.outlook.com (2603:10b6:8:3b::7) by
+ DM8PR11MB5623.namprd11.prod.outlook.com (2603:10b6:8:25::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4065.20; Wed, 28 Apr 2021 13:53:21 +0000
+Received: from DM8PR11MB5573.namprd11.prod.outlook.com
+ ([fe80::38f3:7a5:2cec:8ff7]) by DM8PR11MB5573.namprd11.prod.outlook.com
+ ([fe80::38f3:7a5:2cec:8ff7%5]) with mapi id 15.20.4065.027; Wed, 28 Apr 2021
+ 13:53:21 +0000
+From:   "K, Kiran" <kiran.k@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>
+Subject: RE: [PATCH v3 3/3] Bluetooth: cache local supported codec
+ capabilities
+Thread-Topic: [PATCH v3 3/3] Bluetooth: cache local supported codec
+ capabilities
+Thread-Index: AQHXN4FoiNVZDd1d6UizO+ZKZaI9carBv2wAgAg6EXA=
+Date:   Wed, 28 Apr 2021 13:53:20 +0000
+Message-ID: <DM8PR11MB55739D629FCFD9BD7174C51EF5409@DM8PR11MB5573.namprd11.prod.outlook.com>
+References: <20210422141449.25155-1-kiran.k@intel.com>
+ <20210422141449.25155-3-kiran.k@intel.com>
+ <349C0A6B-5E9C-4171-BFB5-C86AF4E8D698@holtmann.org>
+In-Reply-To: <349C0A6B-5E9C-4171-BFB5-C86AF4E8D698@holtmann.org>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+dlp-reaction: no-action
+dlp-version: 11.5.1.3
+dlp-product: dlpe-windows
+authentication-results: holtmann.org; dkim=none (message not signed)
+ header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
+x-originating-ip: [2405:201:d012:c839:adc4:2510:1d3c:4d99]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: 0bc63520-07ce-4789-092d-08d90a4cfbf4
+x-ms-traffictypediagnostic: DM8PR11MB5623:
+x-ms-exchange-transport-forked: True
+x-microsoft-antispam-prvs: <DM8PR11MB5623D4A5BE722AEB3029517BF5409@DM8PR11MB5623.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:10000;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: SGi8M/x/X6nnjLwByMnr/5nkX/klMN9Rqpagfpg0g9Q/1JK4jDXGDXEnnw8zPt3/kb563FvMEbC35/E1w+skTSwDsCY3uajU8C4j5aAZFXKRX2ksVKsEAMYeFDYNVxJlhdQiO/kZw8drzWQwJCzYghDnXKOnSAG12XfJVCnls3/cnnQl04wmsgncGFP3zgtRK33/iw4Mg7I2/NYl6XbEdm4+uGJt7DmU8oDevzoNO7Buy9m+4OZgYH/QxiiNqsw0H1imPY46jnmxeEWzrTOhxoVaSM4hEneAp8jX2IUGdJe38QDRa9JGfnqwpSAhRXNKyMKu63fHzCQ3xLAk0m+jNf17MnhFJXPOmcsHM42RBT+UV0lzquacfpLv/UVcviFc+CvTx/TjCqIpCvQTSk61tiSx2whFOLz+I5Cze6edFDN/HktQi/hVz6q+jJNocQauXo8ARXPzkMdI01K6ZVGgz6eRgzK2hdyqsWi/BoWqiO+AKweePSfGY29eeZiFPr7oUeQc3D3d2MB4krAvRgDJxyK7382w1VcrdHM/oLYK4ZFwQnXMbFBQFF+wnxFn8u06uZZfSLpXjifKb6SbA+tmTqAWdHazm4t0PfVzYv/+988=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(39850400004)(136003)(396003)(346002)(376002)(366004)(6506007)(6916009)(71200400001)(5660300002)(478600001)(186003)(83380400001)(64756008)(86362001)(8936002)(66556008)(76116006)(52536014)(7696005)(9686003)(66946007)(33656002)(8676002)(66476007)(4326008)(2906002)(66446008)(122000001)(38100700002)(55016002)(316002)(107886003)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata: =?utf-8?B?YWxicnA0UkpLTVZOVlNXbFQ3L2ptemp4bEpNdFVUbDFmQWtrOEtBYmpMK2N0?=
+ =?utf-8?B?QmlOeVFJTTBrb2JYNXNLVFI2U2FBbVZxSTRxUlRIRW9XQ25ZVEJiVG5HMU11?=
+ =?utf-8?B?RlpRUmpnSFUrSjk1c1dURUtQOExMQ2d3NlB1ZFkxY3gvTnd0eUEwRExQQmx3?=
+ =?utf-8?B?cWtGdDRvajJMMW1idVRQYVJWdW0vTm1yRnpJTjBnd0RQc2MxdnJrS09XNjJl?=
+ =?utf-8?B?M0FSa0tRbW9uZEpVcjQ2dWFqMzVXUnhlUW1VeHNnSWNmeFdJRy9neFRCMTB6?=
+ =?utf-8?B?VTl5VGJwbkwzOTdqSGpGdlZZZTA0NjQwOWUrUW1tOFdoK3d5SG1nRm1nZGZ0?=
+ =?utf-8?B?c2FpYm1RTzVMTVMxbFJvakxySXhoZE1OM2JudUlFZndxUnN5YlNUZHRYQW1Z?=
+ =?utf-8?B?ZXBQTURla0VBNVZDem1OUlpXVWdXVDRtMURoL3ZzVk94M0RlaGVJQThqZ0da?=
+ =?utf-8?B?dDlWaTM2aEs0aUZScTRNZ3ROMldyMitNbndqNWVUWFU2c2t3cWtwNEhzTk5V?=
+ =?utf-8?B?S3ZTNHBPQ1FwaklFN2Z6RklDYVEvcjYzQldhTGlrRXZPdFZadFUvYlBrZDBB?=
+ =?utf-8?B?R1hLazNGdVVjMldZelZMZ082TnBvclZGWnFWRmVVRzJwcElSMHlTclZ2U0tr?=
+ =?utf-8?B?TFBEbDJOZjlzSXluejVCbCtDZ1Ixb3pJc1NvcVRJalA4OURXWnh1cytyOGY2?=
+ =?utf-8?B?aU1jcDNRZnBJUlMrT1hwU0JVVnJNL0ZuTDZBTTdCRElhdkNVWFQ5L2RORmNk?=
+ =?utf-8?B?MjQvSlgwa0xOczE5UWhHdnBHOUk5WkNsQlViNThrc0JXYlBzOHNscWM1eXAx?=
+ =?utf-8?B?MnBncHg1MWpRL0x5MVA3MUtWTDhKYXRQMFh1Q0ozYjZ1ckYrOEIrYnBqZ2ly?=
+ =?utf-8?B?czNrQUszNGV6U0I4MFhKdm5uOFhkaCtxNklWRE9EZG81dUZBdE56d2hOVDRS?=
+ =?utf-8?B?bVFzdktIZy9oNzBneUdjRFFrcUQrSDl3ZFB2OTNyVGlJbitGcFNYTzdyOE1Y?=
+ =?utf-8?B?UXU1bHNsaXVpcmk4czJBTWtPa3ZtNGxVN1pEYXJvby9qWm44SkpuN3dwNzlJ?=
+ =?utf-8?B?VmtSbFIyamVrL1duWFBJUnZKVHp6K05BK3REc3VaZE5iVWQ4dE5kN1dlMFls?=
+ =?utf-8?B?VkhKdksrV3F1c0Y2cHE5QXlZUThOVEFaMldRWnUxZTRqWnpKbnBWVTh4QnIv?=
+ =?utf-8?B?bnNXOUYwRXhXRndZaDdRTk1RS1JJNmV0VUV3YWFKbVRYZURVVU4yYVBMYkVE?=
+ =?utf-8?B?eXlzMTJMWkxYRWFlVVVNRmpINi9yKzVRTkdSWlFiTGZQTWRXUm4yV05QcGFS?=
+ =?utf-8?B?VkVTa1l3ak9IZ1IyVW50bUxTQlFPaVBUTFI5VVV3ZFRsSWNLRnhvQ2RScVlG?=
+ =?utf-8?B?SGVkckFpdHRFMzFWWkFrWTRzZWpQVTdUZ2xxVXY4STFRRWRoQmszNFMza3JF?=
+ =?utf-8?B?U1lwekNPQ0k0TkJOZVpjVk4yYWdTS1ZDTGwySi9MRWZoZDBjcm52eVNEbk5F?=
+ =?utf-8?B?M2NmUVY2bWtoVzMrdnFzcFVFZy9SSVArbTBoYmFhMmV0Yi9mYThXZkp3M05E?=
+ =?utf-8?B?dEFzRXEycXZldDhFY3RMM2NVcEVIVUNpNWRZS05kOWM4MHI5Y2Zvc2lZTFd1?=
+ =?utf-8?B?KzFDRk5YdHNMNTJkZ1R3bHZnOW5WTlVSREIxUUVMM002TjF2WlhrOGZiTE5h?=
+ =?utf-8?B?Vzd6UXBRRTEyUHl4M2huc21MTXlscmVQV2Fzbi9JdU9KZW1VOE1wN3Z4MWpC?=
+ =?utf-8?B?L25XWDlxbkhBQmluRW9xN2w3cms2NE5qR2p1eUxrbUN6RTV1TXJ1aXFya0pI?=
+ =?utf-8?B?cDJ5Y0lrMVBhWWljbzFkUktNcU83T2E1emVMalZUNUsxaU10VUE1OUhBNk5h?=
+ =?utf-8?Q?i2C1HCvlENZG4?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ,v2] monitor: Update manpage
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210428062214.335567-1-hj.tedd.an@gmail.com>
-References: <20210428062214.335567-1-hj.tedd.an@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5573.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0bc63520-07ce-4789-092d-08d90a4cfbf4
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Apr 2021 13:53:20.8889
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: Hl+nPNojjOkEhEnp68mNEL/Cn4k1F4CsgX2qKq0pjAPyOeH3Q2HhI1HThLx9l94tKJCP6fdQ8D70RakTu0Y78g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5623
+X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1966273398624010554==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
-
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=474313
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.38 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      46.61 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.24 seconds
-Build - Make                  FAIL      197.06 seconds
-Make Check                    FAIL      0.65 seconds
-Make Dist                     PASS      12.74 seconds
-Make Dist - Configure         PASS      5.11 seconds
-Make Dist - Make              PASS      79.62 seconds
-Build w/ext ELL - Configure   PASS      8.24 seconds
-Build w/ext ELL - Make        FAIL      185.73 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-monitor: Update manpage
-WARNING:SPDX_LICENSE_TAG: Missing or malformed SPDX-License-Identifier tag in line 1
-#140: FILE: monitor/btmon.rst:1:
-+=====
-
-- total: 0 errors, 1 warnings, 240 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] monitor: Update manpage" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - FAIL
-Desc: Build the BlueZ source tree
-Output:
-monitor/btmon.rst:151: (WARNING/2) Cannot analyze code. Pygments package not found.
-Exiting due to level-2 (WARNING) system message.
-make[1]: *** [Makefile:11668: monitor/btmon.1] Error 1
-make: *** [Makefile:4069: all] Error 2
-
-
-##############################
-Test: Make Check - FAIL
-Desc: Run 'make check'
-Output:
-monitor/btmon.rst:151: (WARNING/2) Cannot analyze code. Pygments package not found.
-Exiting due to level-2 (WARNING) system message.
-make[1]: *** [Makefile:11668: monitor/btmon.1] Error 1
-make: *** [Makefile:10324: check] Error 2
-
-
-##############################
-Test: Make Dist - PASS
-Desc: Run 'make dist' and build the distribution tarball
-
-##############################
-Test: Make Dist - Configure - PASS
-Desc: Configure the source from distribution tarball
-
-##############################
-Test: Make Dist - Make - PASS
-Desc: Build the source from distribution tarball
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - FAIL
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-Output:
-monitor/btmon.rst:151: (WARNING/2) Cannot analyze code. Pygments package not found.
-Exiting due to level-2 (WARNING) system message.
-make[1]: *** [Makefile:11668: monitor/btmon.1] Error 1
-make: *** [Makefile:4069: all] Error 2
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1966273398624010554==--
+SGkgTWFyY2VsLA0KDQo+ID4gK2ludCBoY2lfY29kZWNfbGlzdF9hZGQoc3RydWN0IGxpc3RfaGVh
+ZCAqbGlzdCwgc3RydWN0DQo+IGhjaV9ycF9yZWFkX2xvY2FsX2NvZGVjX2NhcHMgKnJwLA0KPiA+
+ICsJCSAgICAgICBfX3UzMiBsZW4sDQo+ID4gKwkJICAgICAgIHN0cnVjdCBoY2lfb3BfcmVhZF9s
+b2NhbF9jb2RlY19jYXBzICpzZW50KTsNCj4gDQo+IEkgdGhpbmsgeW91IG5lZWQgdG8gcmVkbyB0
+aGUgd2hvbGUgcGF0Y2ggc2VyaWVzLCBzaW5jZSAxLzMgc2hvdWxkIGhhdmUNCj4gaGNpX2NvZGVj
+X2xpc3RfYWRkIGluIHRoYXQgaXQgYWRkcyB0aGUgY29kZWMgaWQgZnJvbSByZWFkaW5nIHRoZSBj
+b2RlYyBsaXN0Lg0KPiANCkFjaw0KDQo+IEFuZCB0aGVuIHJlYWRpbmcgdGhlIGNhcGFiaWxpdGll
+cyBqdXN0IHVwZGF0ZXMgdGhlIGNvZGVjLg0KPiANCldpdGggYXN5bmMgY2FsbHMgY29udmVydGVk
+IHRvIHN5bmMsICBjYW4gd2UgYWRkIGNvZGVjIGRldGFpbHMgdG8gdGhlIGxpc3Qgb24gcmVhZGlu
+ZyBjb2RlYyBjYXBzIGFzIHNhbWUgY29kZWMgY2FuIGJlIHN1cHBvcnRlZCBvbiBtdWx0aXBsZSB0
+cmFuc3BvcnQgdHlwZXMgPw0KDQo+IE91ciBwcm9ibGVtIGlzIHRoYXQgdGhlIHdob2xlIGluaXQg
+cGhhc2UgaXMgcmF0aGVyIGFzeW5jIHRoYW4gc3luYyBpbiBpdA0KPiBwcm9jZWR1cmUuIEFuZCB0
+aGUgcmVhc29uIGZvciB0aGF0IGlzIHB1cmVseSBoaXN0b3JpYyBmcm9tIHRoZSB0aW1lcyB3aGVu
+DQo+IExpbnVzIGhhZCBubyB3b3JrIHF1ZXVlcyBhbmQgd2UgaGFkIHRvIHByb2Nlc3MgZXZlcnl0
+aGluZyBpbiB0YXNrbGV0cyBvcg0KPiBzcGF3biBrdGhyZWFkcy4NCj4gDQo+IEZyYW5rbHkgaWYg
+d2UgbW92ZWQgdGhlIHdob2xlIGluaXQgcHJvY2VkdXJlIHRvIHVzZSBfX2hjaV9jbWRfc3luYyB3
+ZQ0KPiBjb3VsZCBmb2xkIHRoZSBjb21wbGV0ZSBpbml0ezEtNH0gcGhhc2VzIGludG8gb25lLiBB
+bmQgdGhlcmUgaXMgbm8gcmVhc29uIHdlDQo+IGRvbuKAmXQgZG8gdGhhdC4gSG93ZXZlciBvbmUg
+cHJvYmxlbSBhdCBhIHRpbWUuDQo+IA0KQWNrLiBJIHdpbGwgZGVmaW5lIGluaXQ1IGZvciByZWFk
+aW5nIGNvZGVjcyBhbmQgY29kZWMgY2FwcyAgdXNpbmcgX19oY2lfY21kX3N5bmMgIGNhbGxzLg0K
+DQo+IFJlZ2FyZHMNCj4gDQo+IE1hcmNlbA0KDQpUaGFua3MsDQpLaXJhbg0KDQo=
