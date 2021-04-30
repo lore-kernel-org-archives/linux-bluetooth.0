@@ -2,189 +2,403 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01924C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Apr 2021 20:20:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5575FC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Apr 2021 03:51:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0C29613F0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Apr 2021 20:20:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C7F7611CB
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Apr 2021 03:51:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234136AbhD2UVo (ORCPT
+        id S229726AbhD3DwQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Apr 2021 16:21:44 -0400
-Received: from mga12.intel.com ([192.55.52.136]:5624 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229674AbhD2UVn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Apr 2021 16:21:43 -0400
-IronPort-SDR: 457FKsHAEe4Neka8o2CVqkR0konurgdLWxUf/4IjOqvLOku9u+FAW8r+Z9oCdgcTC6Yd8CruSw
- kz+SI354OxMg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9969"; a="176591818"
-X-IronPort-AV: E=Sophos;i="5.82,260,1613462400"; 
-   d="scan'208";a="176591818"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Apr 2021 13:20:56 -0700
-IronPort-SDR: aH8SwzhqL0Cnu/eXW9EMKFc+VHtREz2YpejUhiFail+8wj+UVyyGsuy+0DGQfVEZ4ByvZysWiW
- SzWO0MUibT6Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,260,1613462400"; 
-   d="scan'208";a="527121090"
-Received: from lkp-server01.sh.intel.com (HELO a48ff7ddd223) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 29 Apr 2021 13:20:55 -0700
-Received: from kbuild by a48ff7ddd223 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1lcD9a-0007mi-GJ; Thu, 29 Apr 2021 20:20:54 +0000
-Date:   Fri, 30 Apr 2021 04:20:04 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 8faca89c34eb1af9dba5069bddd144e95d6b96d3
-Message-ID: <608b14f4.hJEy7J7NVghr1d11%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Thu, 29 Apr 2021 23:52:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47888 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229577AbhD3DwQ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 29 Apr 2021 23:52:16 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E98C3C06174A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Apr 2021 20:51:28 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id b131so5898672ybg.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Apr 2021 20:51:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Vmpr6p3YvbS0aLt+4y8R4KUObnOtryNiUR9DJEiMtBs=;
+        b=Fj+fun5Df6e+C+M4ml2Mw5fAiyIFPXhInheuOvFpiemKnMqm8m7sIhZNVBko3GPYze
+         rawwKkERuyW1KHOl5ofgBtln6nyJgZd34jbWoPOAauzcF/wleR/SZzyb1qltvU1dJSEh
+         nu0DcKCgW8enmBDj8+DIcqe52Q1lMVwCbOASww1GhYll4q6kRJHOBZy05mr01LLpNxMc
+         kw9AVXTtfrTVVB9QqGjwHxdljYLqEy80E1rIf0Op4CZU8k8JIt3MWlc6k5cEN+Fg4HUl
+         VQF79D/kbhvZ5o7x64kJOiRXkdFbhrhKTQe4VQXqJ16+wMzqFygXIePzhQmFHns2oW9K
+         kfUA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Vmpr6p3YvbS0aLt+4y8R4KUObnOtryNiUR9DJEiMtBs=;
+        b=eFQW43XCmaUrNaqEDRC0kFU12Bjknt5POj6LA+vvP88gfqanOrovdqgjbTJw5AilWa
+         MO1mCkWpO+VUL6YNt6nxKSZ+q3ht0pG43GVPRmFdU/CwPZL3fOq2H5/YYBrqLi+TJDb3
+         YfXidWUzAfqGrL5cqqt9DPJeubuiXC6af7hXVtknxa/sAD9RFKY2qayTKAKQKu57lOAG
+         xI6IdlHu4+YsnR6Bh0bCbqCqV3t+oo1MI7tgCrZxl6iLaAkyrJsMGieQ2/teQIB43R47
+         5BaS7bLJalZsJkViNdM14QMN2SScYxOktVpb2LEyMXWH8x0Zc9WOcEvnmtBKgjGUXi5Q
+         h65w==
+X-Gm-Message-State: AOAM531R16/OfwpgEJWLTUkT5cs4GeMTwJdiBWLrArEAuP0WgRWYllHO
+        mJ5jvWuRMGFRUb2kxOFA3Z/wBYrkQ1utWt20rCI=
+X-Google-Smtp-Source: ABdhPJzJu9ckAdCdpyBi7dVl9MtTwXA+z+ZRb1FjIpsa0lLEhW3ZHE64Iqomi0K5cGcZX1ZMnycFDeE9iQLym48wFGM=
+X-Received: by 2002:a25:c84:: with SMTP id 126mr4271875ybm.282.1619754687186;
+ Thu, 29 Apr 2021 20:51:27 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <20210428062214.335567-1-hj.tedd.an@gmail.com>
+In-Reply-To: <20210428062214.335567-1-hj.tedd.an@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 29 Apr 2021 20:51:15 -0700
+Message-ID: <CABBYNZJJHLZdhOFHrTHV7XN7++t4XKq3yHxS2wsi2bJ2AkRnVw@mail.gmail.com>
+Subject: Re: [BlueZ v2] monitor: Update manpage
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 8faca89c34eb1af9dba5069bddd144e95d6b96d3  Bluetooth: Fix the HCI to MGMT status conversion table
+Hi Tedd,
 
-elapsed time: 720m
+On Tue, Apr 27, 2021 at 11:24 PM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
+>
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+>
+> This patch updates the manpage for btmon written in rst format.
+> ---
+>  Makefile.am       |  26 ++++---
+>  Makefile.tools    |   4 ++
+>  configure.ac      |   4 ++
+>  doc/btmon.txt     |  35 ----------
+>  monitor/btmon.rst | 172 ++++++++++++++++++++++++++++++++++++++++++++++
 
-configs tested: 118
-configs skipped: 2
+I do wonder why you change the location from doc to monitor, I think
+we actually should keep all the documentation under doc and perhaps
+even have a dedicated make target for those since we would likely want
+to generate all the manpages from rst which may be time consuming so
+people not interested on it can just skip it.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+>  5 files changed, 197 insertions(+), 44 deletions(-)
+>  delete mode 100644 doc/btmon.txt
+>  create mode 100644 monitor/btmon.rst
+>
+> diff --git a/Makefile.am b/Makefile.am
+> index f98243f72..759110cbd 100644
+> --- a/Makefile.am
+> +++ b/Makefile.am
+> @@ -60,6 +60,11 @@ else
+>  build_plugindir = $(plugindir)
+>  endif
+>
+> +if MANPAGES
+> +man_MANS =
+> +endif
+> +
+> +manual_pages = monitor/btmon.1
+>
+>  plugin_LTLIBRARIES =
+>
+> @@ -579,13 +584,7 @@ if LIBRARY
+>  pkgconfig_DATA = lib/bluez.pc
+>  endif
+>
+> -manual_pages = doc/btmon.1
+> -
+> -if MANPAGES
+> -dist_noinst_MANS += $(manual_pages)
+> -endif
+> -
+> -EXTRA_DIST += $(manual_pages:.1=.txt)
+> +EXTRA_DIST += $(manual_pages:.1=.rst)
+>
+>  DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
+>                                                 --enable-health \
+> @@ -607,11 +606,20 @@ SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+>                 $(SED) -e 's,@pkglibexecdir\@,$(pkglibexecdir),g' \
+>                 < $< > $@
+>
+> +if RUN_RST2MAN
+> +RST2MAN_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
+> +                       $(RST2MAN) --strict --no-raw \
+> +                       --no-generator --no-datestamp $< $@
+> +else
+> +RST2MAN_PROCESS = $(AM_V_GEN)test -f $@ || \
+> +               { echo "Generated manual page $@ does not exist"; false; }
+> +endif
+> +
+>  %.service: %.service.in Makefile
+>         $(SED_PROCESS)
+>
+> -%.1: %.txt
+> -       $(AM_V_GEN)a2x --doctype manpage --format manpage $(srcdir)/$<
+> +%.1: %.rst Makefile
+> +       $(RST2MAN_PROCESS)
+>
+>  src/builtin.h: src/genbuiltin $(builtin_sources)
+>         $(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
+> diff --git a/Makefile.tools b/Makefile.tools
+> index 57e858290..9b452aa74 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -49,6 +49,10 @@ monitor_btmon_SOURCES = monitor/main.c monitor/bt.h \
+>                                 monitor/tty.h
+>  monitor_btmon_LDADD = lib/libbluetooth-internal.la \
+>                                 src/libshared-mainloop.la $(UDEV_LIBS) -ldl
+> +
+> +if MANPAGES
+> +man_MANS += monitor/btmon.1
+> +endif
+>  endif
+>
+>  if LOGGER
+> diff --git a/configure.ac b/configure.ac
+> index dbd98c9ad..d7e4766e4 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -326,7 +326,11 @@ AM_CONDITIONAL(DATAFILES, test "${enable_datafiles}" != "no")
+>  AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+>                         [enable building of manual pages]),
+>                                         [enable_manpages=${enableval}])
+> +if (test "${enable_manpages}" != "no"); then
+> +       AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
+> +fi
+>  AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
+> +AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
+>
+>  AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing],
+>                         [enable testing tools]),
+> diff --git a/doc/btmon.txt b/doc/btmon.txt
+> deleted file mode 100644
+> index 7a7fc537b..000000000
+> --- a/doc/btmon.txt
+> +++ /dev/null
+> @@ -1,35 +0,0 @@
+> -BTMON(1)
+> -========
+> -:doctype: manpage
+> -
+> -
+> -NAME
+> -----
+> -btmon - Bluetooth monitor
+> -
+> -
+> -SYNOPSIS
+> ---------
+> -*btmon* ['OPTIONS']
+> -
+> -
+> -DESCRIPTION
+> ------------
+> -The btmon(1) command provides access to the Bluetooth subsystem monitor
+> -infrastructure for reading HCI traces.
+> -
+> -
+> -AUTHOR
+> -------
+> -btmon was originally written by Marcel Holtmann.
+> -
+> -
+> -RESOURCES
+> ----------
+> -See <http://www.bluez.org/>
+> -
+> -
+> -COPYING
+> --------
+> -Free use of this software is granted under ther terms of the GNU Lesser
+> -General Public Licenses (LGPL).
+> diff --git a/monitor/btmon.rst b/monitor/btmon.rst
+> new file mode 100644
+> index 000000000..29d275eb3
+> --- /dev/null
+> +++ b/monitor/btmon.rst
+> @@ -0,0 +1,172 @@
+> +=====
+> +btmon
+> +=====
+> +
+> +-----------------
+> +Bluetooth monitor
+> +-----------------
+> +
+> +:Authors: - Marcel Holtmann <marcel@holtmann.org>
+> +          - Tedd Ho-Jeong An <tedd.an@intel.com>
+> +:Copyright: Free use of this software is granted under ther terms of the GNU
+> +            Lesser General Public Licenses (LGPL).
+> +:Version: BlueZ
+> +:Date: April 2021
+> +:Manual section: 1
+> +:Manual group: Linux System Administration
+> +
+> +SYNOPSYS
+> +========
+> +
+> +**btmon** [*OPTIONS* ...]
+> +
+> +DESCRIPTION
+> +===========
+> +
+> +The  btmon(1) command  provides  access  to the Bluetooth subsystem monitor
+> +infrastructure for reading HCI traces.
+> +
+> +OPTIONS
+> +=======
+> +
+> +-r FILE, --read FILE        Read traces in btsnoop format from *FILE*.
+> +-w FILE, --write FILE       Save traces in btsnoop format to *FILE*.
+> +-a FILE, --analyze FILE     Analyze traces in btsnoop format from *FILE*.
+> +                            It displays the devices found in the *FILE* with
+> +                            its packets by type.
+> +-s SOCKET, --server SOCKET  Start monitor server socket.
+> +-p PRIORITY, --priority PRIORITY  Show only priority or lower for user log.
+> +
+> +.. list-table::
+> +   :header-rows: 1
+> +   :widths: auto
+> +   :stub-columns: 1
+> +
+> +   * - *PRIORITY*
+> +     - NAME
+> +
+> +   * - **3**
+> +     - Error
+> +
+> +   * - **4**
+> +     - Warning
+> +
+> +   * - **6**
+> +     - Information (Default)
+> +
+> +   * - **7**
+> +     - Debug. **debug** can be used.
+> +
+> +-i NUM, --index NUM         Show only specified controller. *hciNUM* is also
+> +                            acceptable. This is useful to capture the traces
+> +                            from the specific controller when the multiple
+> +                            controllers are presented.
+> +
+> +-d TTY, --tty TTY           Read data from *TTY*.
+> +
+> +-B SPEED, --rate SPEED      Set TTY speed. The default *SPEED* is 115300
+> +
+> +-V COMPID, --vendor COMPID  Set the default company identifier. The *COMPID* is
+> +                            a unique number assigned by the Bluetooth SIG to
+> +                            a member company and can be found/searched from the
+> +                            Bluetooth SIG webpage.
+> +
+> +                            For example, Intel is 2 and Realtek is 93.
+> +
+> +-M, --mgmt                  Open channel for mgmt events.
+> +
+> +-t, --time                  Show a time instead of time offset.
+> +
+> +-T, --date                  Show a time and date information instead of
+> +                            time offset.
+> +
+> +-S, --sco                   Dump SCO traffic in raw hex format.
+> +
+> +-A, --a2dp                  Dump A2DP stream traffic in a raw hex format.
+> +
+> +-E IP, --ellisys IP         Send Ellisys HCI Injection.
+> +
+> +-P, --no-pager              Disable pager usage while reading the log file.
+> +
+> +-J OPTIONS, --jlink OPTIONS     Read data from RTT.  Each options are comma(,)
+> +                                seprated without spaces.
+> +
+> +.. list-table::
+> +   :header-rows: 1
+> +   :widths: auto
+> +   :stub-columns: 1
+> +
+> +   * - *OPTIONS*
+> +     - Description
+> +
+> +   * - **DEVICE**
+> +     - Required. Set the target device.
+> +
+> +   * - **SERIALNO**
+> +     - (Optional) Set the USB serial number. Default is **0**.
+> +
+> +   * - **INTERFACE**
+> +     - (Optional) Target interface. Default is **swd**.
+> +
+> +   * - **SPEED**
+> +     - (Optional) Set target interface speed in kHz. Default is **1000**.
+> +
+> +-R OPTIONS, --rtt OPTIONS   RTT control block parameters. Each options are
+> +                            comma(,) seprated without spaces.
+> +
+> +.. list-table::
+> +   :header-rows: 1
+> +   :widths: auto
+> +   :stub-columns: 1
+> +
+> +   * - *OPTIONS*
+> +     - Description
+> +
+> +   * - **ADDRESS**
+> +     - (Optional) Address of RTT buffer. Default is **0x00**
+> +
+> +   * - **AREA**
+> +     - (Optional) Size of range to search in RTT buffer. Default is **0**
+> +
+> +   * - **NAME**
+> +     - (Optional) Buffer name. Default is **btmonitor**
+> +
+> +-C WIDTH, --columns WIDTH   Output width if not a terminal
+> +
+> +-c MODE, --color MODE       Set output color. The possible *MODE* values are:
+> +                            **auto|always|never**.
+> +
+> +                            Default value is **auto**
+> +
+> +-v, --version               Show version
+> +
+> +-h, --help                  Show help options
+> +
+> +EXAMPLES
+> +========
+> +
+> +Capture the traces from hci0 to hcidump.log file
+> +------------------------------------------------
+> +
+> +.. code-block:: bash
+> +
+> +   $ btmon -i hci0 -w hcidump.log
+> +
+> +Open the trace file
+> +-------------------
+> +
+> +.. code-block:: bash
+> +
+> +   $ btmon -r hcidump.log
+> +
+> +
+> +RESOURCES
+> +=========
+> +
+> +http://www.bluez.org
+> +
+> +REPORTING BUGS
+> +==============
+> +
+> +linux-bluetooth@vger.kernel.org
+> +
+> --
+> 2.25.1
+>
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-x86_64                           allyesconfig
-riscv                            allmodconfig
-riscv                            allyesconfig
-arm                        clps711x_defconfig
-openrisc                  or1klitex_defconfig
-sh                   sh7770_generic_defconfig
-powerpc                        warp_defconfig
-sh                         ecovec24_defconfig
-powerpc                     kilauea_defconfig
-xtensa                         virt_defconfig
-arm                           corgi_defconfig
-nios2                            allyesconfig
-m68k                          sun3x_defconfig
-arm                          moxart_defconfig
-arm                     eseries_pxa_defconfig
-arm                       aspeed_g5_defconfig
-mips                       capcella_defconfig
-powerpc               mpc834x_itxgp_defconfig
-mips                           xway_defconfig
-powerpc                     sbc8548_defconfig
-arm                     am200epdkit_defconfig
-sh                           se7721_defconfig
-parisc                              defconfig
-powerpc                   lite5200b_defconfig
-powerpc                      ppc64e_defconfig
-arm                     davinci_all_defconfig
-xtensa                       common_defconfig
-m68k                        m5272c3_defconfig
-mips                      maltasmvp_defconfig
-powerpc                     tqm5200_defconfig
-x86_64                              defconfig
-powerpc                 mpc832x_rdb_defconfig
-powerpc                 linkstation_defconfig
-arm                        spear6xx_defconfig
-sh                          sdk7780_defconfig
-powerpc                      ppc40x_defconfig
-arm                        trizeps4_defconfig
-mips                         db1xxx_defconfig
-arm                             rpc_defconfig
-riscv                    nommu_virt_defconfig
-xtensa                  audio_kc705_defconfig
-xtensa                          iss_defconfig
-riscv                             allnoconfig
-s390                       zfcpdump_defconfig
-sh                          landisk_defconfig
-powerpc                 mpc8560_ads_defconfig
-mips                      bmips_stb_defconfig
-sparc64                             defconfig
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nds32                               defconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a004-20210429
-x86_64               randconfig-a002-20210429
-x86_64               randconfig-a005-20210429
-x86_64               randconfig-a006-20210429
-x86_64               randconfig-a001-20210429
-x86_64               randconfig-a003-20210429
-i386                 randconfig-a005-20210429
-i386                 randconfig-a002-20210429
-i386                 randconfig-a001-20210429
-i386                 randconfig-a006-20210429
-i386                 randconfig-a003-20210429
-i386                 randconfig-a004-20210429
-i386                 randconfig-a012-20210429
-i386                 randconfig-a014-20210429
-i386                 randconfig-a013-20210429
-i386                 randconfig-a011-20210429
-i386                 randconfig-a015-20210429
-i386                 randconfig-a016-20210429
-riscv                    nommu_k210_defconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-um                               allmodconfig
-um                                allnoconfig
-um                               allyesconfig
-um                                  defconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
 
-clang tested configs:
-x86_64               randconfig-a015-20210429
-x86_64               randconfig-a016-20210429
-x86_64               randconfig-a011-20210429
-x86_64               randconfig-a014-20210429
-x86_64               randconfig-a013-20210429
-x86_64               randconfig-a012-20210429
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+-- 
+Luiz Augusto von Dentz
