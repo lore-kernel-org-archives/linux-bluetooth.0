@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 211C9C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 May 2021 00:37:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B5B5FC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 May 2021 00:37:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EFAF26142A
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 May 2021 00:37:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8AD166142A
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  1 May 2021 00:37:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231197AbhEAAiN (ORCPT
+        id S231194AbhEAAiN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Fri, 30 Apr 2021 20:38:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39900 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230226AbhEAAiL (ORCPT
+        with ESMTP id S231244AbhEAAiN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Apr 2021 20:38:11 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4ACE6C06174A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Apr 2021 17:37:22 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id j7so41091042pgi.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Apr 2021 17:37:22 -0700 (PDT)
+        Fri, 30 Apr 2021 20:38:13 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F2AC06174A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Apr 2021 17:37:23 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id l10-20020a17090a850ab0290155b06f6267so2597837pjn.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Apr 2021 17:37:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=SJD/aHIRm27dT+kmAOuV3UfGlGvasL9/+X29i/Lf90k=;
-        b=A8sIayllgkmKH+Y0Jv1OaTrZ0KI+eEbD7Wp+bSJ2v3Noi+OiwsJ4wgH6Nzsqg27wRp
-         dr9t5JPBATpTatGkmkY4r9/VNF1gJa4GnC7wPkWBvxzuSscqsg13kUhtrQ5gGH2NwYdk
-         QgoP4PLAUlzTIQ6gGs+rrDTzIVJJG3yUjhggh/eFgKMNl5UlaZbK8kNkzhpoNjxJCyZV
-         CSff5e2QTCA4P5RidzIeK6neYW/ky/8EhnpHaWBlTxoWK6lqBioajbSZyTv5NRpkm/dq
-         vpffOkuUtA+Xf1cjVRNFO8hg/T5Mf8ZetOT/NgaEYRxn2InDNC8l2X1wShANSM8UFSdr
-         84eQ==
+        bh=xaAqXVJt3IJ9Op/EuI3fxPeDdV4te1AM/AzwiU4Fafc=;
+        b=l3uO2DIa1AUg+9Ge9nUuGCjkDSVharQ/SZXrWbkA8DUqa3XsayaHJwvl9/kd9GjlJc
+         rwUGrtbKJr1b/kjimBVGGaDmSuSmy6ZkgKsdlx245waUByDcUzwFuMXdHpcavi3II2Rj
+         otqgd7o9k1XeXiZquJIAxNiWCRgoq9QujABFFvk7OAskWE+K0KnT6dciFPCNUaS1jxrZ
+         3ZlqGOjb3aT0DnFoTDtTpNKRt11hHX9R7f92oSQa5+/NR5GfQAWxy3UeNf5g5g0E76WR
+         +KOFGfWj4aWVxGEjWZA5Yy5/m43YcG7ubg9B205Wqrqq2Y6JdiznYRH2Il8YUlDz5K1N
+         kEGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SJD/aHIRm27dT+kmAOuV3UfGlGvasL9/+X29i/Lf90k=;
-        b=kXt2GODy0hiQedrgdz0OWbQ0ElHJEJzWQ9xXmezGHJzG1ZfLyoyjzwyItE/wPHtPNz
-         XqxfGfa58tCufcOx+sgKLD+UKr8w5N9jPLazus67behsKqoFs7YPNepHxYuxWXo0N1zX
-         vzTIdBj1oR4wPv6UusHB0qLsHBraMcSq57C7SgGXgXgN4kiagtN6x6Jj3i85qiqiuwK3
-         Mdw7d64eBoFPXO1kKRtclo+/mvl2PZPCKdte3T1gTIG9GJefLxwZspK6jdxi7u7Bdol/
-         mNU3KOq5dHXnzbVp0rrRQE5QkFz5ZF8L6dcyVrt+jPs3PAyi+Zhex173jCNxM86yiAJB
-         GhEQ==
-X-Gm-Message-State: AOAM530CcKF6j+cRUgiOJrGqJDbstKGPh33NnuuD72m/Iy2ar+Wvyhtp
-        nr34kgaYSENwV1UHD+Tf+ybhgo9rDrPmDg==
-X-Google-Smtp-Source: ABdhPJw0Zegduicbl/LuIbrVStJbd2KV3xnsGy3WVx1W48bL6ZXnvglfZc3uVr2JIKXo7urbDFLqVA==
-X-Received: by 2002:aa7:9696:0:b029:259:efef:e1e0 with SMTP id f22-20020aa796960000b0290259efefe1e0mr7647153pfk.0.1619829441648;
-        Fri, 30 Apr 2021 17:37:21 -0700 (PDT)
+        bh=xaAqXVJt3IJ9Op/EuI3fxPeDdV4te1AM/AzwiU4Fafc=;
+        b=sFTLI1hglGXdblChGlafjhArdBNCrMS2wmO6Won2gv177mDAHWsDHGHx4GFQy77oVL
+         v0RQ3D7dsVxHzeYi6hnEcGqdrMsk2+3GYPSORKohYtV6wBm/yJGRkLsW9IYoQrdljpHa
+         pq7a8wuyo3gAvVM0L+3ku5TgIkeqrXzH/cDelyROpqMw/srFiUoeYB8VpZBkSaevCpOs
+         F39YCif/BCjpc7nYpJleYdC0FeWbWJbje3hEQ1IWLZUf/iPZZOU5feAnljvNcBYgAUP5
+         A/zm51vAJ0l0k+7kGd7Li1U6lxdEExjPRGtK/A2O13o3yXxPWsW2MxkUqqy5hwKqGW8q
+         D5IA==
+X-Gm-Message-State: AOAM532yQwF+LxV8iaMxU01y7/A0rXjQSGQV1MXR2ddg3muWdEg7ce6b
+        oNZdaYjr+H7e6CckqA3aBim/P/md/eeRwg==
+X-Google-Smtp-Source: ABdhPJzWV6SEeeFk3P80PCOkUo7vCut8jViio7rvnllOnTaij2WwxDRUOcoWbUYCi6skZOsXRBGsZQ==
+X-Received: by 2002:a17:90a:7063:: with SMTP id f90mr8875647pjk.95.1619829442740;
+        Fri, 30 Apr 2021 17:37:22 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h76sm2198410pfe.161.2021.04.30.17.37.20
+        by smtp.gmail.com with ESMTPSA id h76sm2198410pfe.161.2021.04.30.17.37.21
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Apr 2021 17:37:21 -0700 (PDT)
+        Fri, 30 Apr 2021 17:37:22 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] avrcp: Fix not checking if params_len match number of received bytes
-Date:   Fri, 30 Apr 2021 17:37:16 -0700
-Message-Id: <20210501003717.7553-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/3] monitor/avdtp: Fix decoding of reject type
+Date:   Fri, 30 Apr 2021 17:37:17 -0700
+Message-Id: <20210501003717.7553-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210501003717.7553-1-luiz.dentz@gmail.com>
 References: <20210501003717.7553-1-luiz.dentz@gmail.com>
@@ -75,32 +75,33 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes sure the number of bytes in the params_len matches the
-remaining bytes received so the code don't end up accessing invalid
-memory.
----
- profiles/audio/avrcp.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+Reject type was not being decoded, so this remove the early return and
+leave the callback to decode it:
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 05dd791de..c6a342ee3 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1914,6 +1914,14 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 		goto err_metadata;
+< ACL Data TX: Handle 42 flags 0x00 dlen 8
+      Channel: 64 len 4 [PSM 25 mode Basic (0x00)] {chan 1}
+      AVDTP: Set Configuration (0x03) Response Reject (0x03) type 0x00 label 2 nosp 0
+        Service Category: Reserved (0x00)
+        Error code: BAD_ACP_SEID (0x12)
+---
+ monitor/avdtp.c | 4 ----
+ 1 file changed, 4 deletions(-)
+
+diff --git a/monitor/avdtp.c b/monitor/avdtp.c
+index 9fe72d240..1393d1286 100644
+--- a/monitor/avdtp.c
++++ b/monitor/avdtp.c
+@@ -715,10 +715,6 @@ static bool avdtp_signalling_packet(struct avdtp_frame *avdtp_frame)
+ 		return true;
  	}
  
-+	operands += sizeof(*pdu);
-+	operand_count -= sizeof(*pdu);
-+
-+	if (pdu->params_len != operand_count) {
-+		DBG("AVRCP PDU parameters length don't match");
-+		pdu->params_len = operand_count;
-+	}
-+
- 	for (handler = session->control_handlers; handler->pdu_id; handler++) {
- 		if (handler->pdu_id == pdu->pdu_id)
- 			break;
+-	/* General Reject */
+-	if ((hdr & 0x03) == 0x03)
+-		return true;
+-
+ 	switch (sig_id) {
+ 	case AVDTP_DISCOVER:
+ 		return avdtp_discover(avdtp_frame);
 -- 
 2.30.2
 
