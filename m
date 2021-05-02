@@ -2,298 +2,201 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4749BC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 09:18:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D7DC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 09:18:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1673F613DC
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 09:18:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F9BE613AC
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 09:18:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229829AbhEBJS5 (ORCPT
+        id S229988AbhEBJS6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 May 2021 05:18:57 -0400
+        Sun, 2 May 2021 05:18:58 -0400
 Received: from mga07.intel.com ([134.134.136.100]:27341 "EHLO mga07.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229788AbhEBJS5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 May 2021 05:18:57 -0400
-IronPort-SDR: ekzZW/3PX5BsHEqLEMEVi/XwjO76Zq25h81ww5YMpOFEeVkGM39nNCnMc8IvRr0ck0ejDxCvry
- lWN68jGZZlAA==
-X-IronPort-AV: E=McAfee;i="6200,9189,9971"; a="261512652"
+        id S229788AbhEBJS6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 2 May 2021 05:18:58 -0400
+IronPort-SDR: 3f17psRiURiSUF1PzNZ3n7KLGp3F93wU/ltN6+fTtdHxVJOuWlCfFruorW2iWC7ItZeMfbcJd1
+ UgJPQ/65FLMQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9971"; a="261512653"
 X-IronPort-AV: E=Sophos;i="5.82,267,1613462400"; 
-   d="scan'208";a="261512652"
+   d="scan'208";a="261512653"
 Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2021 02:18:05 -0700
-IronPort-SDR: MXNxh9H2F9EE1QfCiYY5OyhwiCFdwz+nfRhNf7FguK1/aFr2YHrq4W+KOicehqcM5Eh138muCM
- Bb1Tg00qD51A==
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2021 02:18:06 -0700
+IronPort-SDR: 3XvAZbMycF19LjcAOOlwv2I25UZMXLZjeeS4/ERpBA50IhrK86RkDbHjId5SDnq0Tb9tsVvZ+z
+ 5JTXCS7PAKhQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,267,1613462400"; 
-   d="scan'208";a="461310277"
+   d="scan'208";a="461310292"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga002.fm.intel.com with ESMTP; 02 May 2021 02:18:03 -0700
+  by fmsmga002.fm.intel.com with ESMTP; 02 May 2021 02:18:05 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Kiran K <kiran.k@intel.com>,
         Chethan T N <chethan.tumkur.narayan@intel.com>,
         Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-Subject: [PATCH v5 1/2] Bluetooth: enumerate local supported codec and cache details
-Date:   Sun,  2 May 2021 14:52:06 +0530
-Message-Id: <20210502092207.12186-1-kiran.k@intel.com>
+Subject: [PATCH v5 2/2] Bluetooth: Add support for Read Local Supported Codecs V2
+Date:   Sun,  2 May 2021 14:52:07 +0530
+Message-Id: <20210502092207.12186-2-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210502092207.12186-1-kiran.k@intel.com>
+References: <20210502092207.12186-1-kiran.k@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Move reading of supported local codecs into a separate init function,
-query codecs capabilities and cache the data
+Use V2 version of read local supported command is controller
+supports
+
+snoop:
+> HCI Event: Command Complete (0x0e) plen 20
+      Read Local Supported Codecs V2 (0x04|0x000d) ncmd 1
+        Status: Success (0x00)
+        Number of supported codecs: 7
+          Codec: u-law log (0x00)
+          Logical Transport Type: 0x02
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: A-law log (0x01)
+          Logical Transport Type: 0x02
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: CVSD (0x02)
+          Logical Transport Type: 0x02
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: Transparent (0x03)
+          Logical Transport Type: 0x02
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: Linear PCM (0x04)
+          Logical Transport Type: 0x02
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: Reserved (0x08)
+          Logical Transport Type: 0x03
+            Codec supported over BR/EDR ACL
+            Codec supported over BR/EDR SCO and eSCO
+          Codec: mSBC (0x05)
+          Logical Transport Type: 0x03
+            Codec supported over BR/EDR ACL
+            Codec supported over BR/EDR SCO and eSCO
+        Number of vendor codecs: 0
+......
+< HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
+        Codec: mSBC (0x05)
+        Logical Transport Type: 0x00
+        Direction: Input (Host to Controller) (0x00)
+> HCI Event: Command Complete (0x0e) plen 12
+      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
+        Status: Success (0x00)
+        Number of codec capabilities: 1
+         Capabilities #0:
+        00 00 11 15 02 33
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
 * changes in v5:
-  - fix review comments
-  - move code used to read standard/vendor codecs caps into single function
-* changes in v4
-  - convert  reading of codecs and codecs caps calls from async to sync
-* changes in v3
-  move codec enumeration into a new init function
-* changes in v2
-  add skb length check before accessing data
+  fix review comments
 
- include/net/bluetooth/hci.h      |  38 +++++++
- include/net/bluetooth/hci_core.h |  16 +++
- net/bluetooth/hci_core.c         | 168 ++++++++++++++++++++++++++++++-
- 3 files changed, 218 insertions(+), 4 deletions(-)
+* changes in v4:
+  converts codec read capabilities calls from async to sync
+
+* changes in v3:
+  No changes
+
+* changes in v2:
+  add length check for event data before accessing
+
+ include/net/bluetooth/hci.h | 28 ++++++++++++++
+ net/bluetooth/hci_core.c    | 76 ++++++++++++++++++++++++++++++++++++-
+ 2 files changed, 103 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ea4ae551c426..c03afb77071d 100644
+index c03afb77071d..91bf48258f6f 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1306,6 +1306,26 @@ struct hci_rp_read_data_block_size {
- } __packed;
- 
- #define HCI_OP_READ_LOCAL_CODECS	0x100b
-+struct hci_standard_codecs {
-+	__u8	num;
-+	__u8	codec[];
-+} __packed;
-+
-+struct hci_vendor_codec {
-+	__le16	company_id;
-+	__le16	codec_id;
-+} __packed;
-+
-+struct hci_vendor_codecs {
-+	__u8	num;
-+	struct hci_vendor_codec codec[];
-+} __packed;
-+
-+struct hci_rp_read_local_supported_codecs {
-+	__u8	status;
-+	struct hci_standard_codecs std_codecs;
-+	struct hci_vendor_codecs vendor_codecs;
-+} __packed;
- 
- #define HCI_OP_READ_LOCAL_PAIRING_OPTS	0x100c
- struct hci_rp_read_local_pairing_opts {
-@@ -1314,6 +1334,24 @@ struct hci_rp_read_local_pairing_opts {
+@@ -1334,6 +1334,34 @@ struct hci_rp_read_local_pairing_opts {
  	__u8     max_key_size;
  } __packed;
  
-+#define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
-+struct hci_op_read_local_codec_caps {
-+	__u8	codec_id[5];
++#define HCI_OP_READ_LOCAL_CODECS_V2	0x100d
++struct hci_standard_codec_v2 {
++	__u8	codec_id;
 +	__u8	transport;
-+	__u8	direction;
 +} __packed;
 +
-+struct hci_codec_caps {
-+	__u8	len;
-+	__u8	caps[];
++struct hci_standard_codecs_v2 {
++	__u8	num;
++	struct hci_standard_codec_v2 codec[];
 +} __packed;
 +
-+struct hci_rp_read_local_codec_caps {
++struct hci_vendor_codec_v2 {
++	__le16	company_id;
++	__le16	vendor_id;
++	__u8	transport;
++} __packed;
++
++struct hci_vendor_codecs_v2 {
++	__u8	num;
++	struct hci_vendor_codec_v2 codec[];
++} __packed;
++
++struct hci_rp_read_local_supported_codecs_v2 {
 +	__u8	status;
-+	__u8	num_caps;
-+	struct hci_codec_caps caps[];
++	struct hci_standard_codecs_v2 std_codecs;
++	struct hci_vendor_codecs_v2 vendor_codecs;
 +} __packed;
 +
- #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
- struct hci_rp_read_page_scan_activity {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 8f5f390363f5..0afb1cc6b058 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -131,6 +131,14 @@ struct bdaddr_list {
- 	u8 bdaddr_type;
- };
- 
-+struct codec_list {
-+	struct list_head list;
-+	u8	transport;
-+	u8	codec_id[5];
-+	u8	num_caps;
-+	struct hci_codec_caps caps[];
-+};
-+
- struct bdaddr_list_with_irk {
- 	struct list_head list;
- 	bdaddr_t bdaddr;
-@@ -534,6 +542,7 @@ struct hci_dev {
- 	struct list_head	pend_le_conns;
- 	struct list_head	pend_le_reports;
- 	struct list_head	blocked_keys;
-+	struct list_head	local_codecs;
- 
- 	struct hci_dev_stats	stat;
- 
-@@ -1848,4 +1857,11 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
- #define SCO_AIRMODE_CVSD       0x0000
- #define SCO_AIRMODE_TRANSP     0x0003
- 
-+#define LOCAL_CODEC_ACL_MASK	BIT(0)
-+#define LOCAL_CODEC_SCO_MASK	BIT(1)
-+#define LOCAL_CODEC_CIS_MASK	BIT(2)
-+#define LOCAL_CODEC_BIS_MASK	BIT(3)
-+
-+#define TRANSPORT_TYPE_MAX	0x04
-+
- #endif /* __HCI_CORE_H */
+ #define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
+ struct hci_op_read_local_codec_caps {
+ 	__u8	codec_id[5];
 diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd12f1652bdf..93e20c0ab9f2 100644
+index 93e20c0ab9f2..04c55051247c 100644
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -838,10 +838,6 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
- 	if (hdev->commands[22] & 0x04)
- 		hci_set_event_mask_page_2(req);
- 
--	/* Read local codec list if the HCI command is supported */
--	if (hdev->commands[29] & 0x20)
--		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
--
- 	/* Read local pairing options if the HCI command is supported */
- 	if (hdev->commands[41] & 0x08)
- 		hci_req_add(req, HCI_OP_READ_LOCAL_PAIRING_OPTS, 0, NULL);
-@@ -907,6 +903,166 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
- 	return 0;
+@@ -1006,6 +1006,28 @@ void hci_codec_list_parse(struct hci_dev *hdev, __u8 num_codecs,
+ 	}
  }
  
-+static int hci_codec_list_add(struct list_head *list,
-+			      struct hci_rp_read_local_codec_caps *rp,
-+			      __u32 len,
-+			      struct hci_op_read_local_codec_caps *sent)
-+{
-+	struct codec_list *entry;
-+
-+	entry = kzalloc(sizeof(*entry) + len, GFP_KERNEL);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	memcpy(entry->codec_id, sent->codec_id, 5);
-+	entry->transport = sent->transport;
-+	entry->num_caps = rp->num_caps;
-+	if (rp->num_caps)
-+		memcpy(entry->caps, rp->caps, len);
-+	list_add(&entry->list, list);
-+
-+	return 0;
-+}
-+
-+static void hci_codec_list_clear(struct list_head *codec_list)
-+{
-+	struct codec_list *c, *n;
-+
-+	list_for_each_entry_safe(c, n, codec_list, list) {
-+		list_del(&c->list);
-+		kfree(c);
-+	}
-+}
-+
-+static void hci_read_codec_capabilities(struct hci_dev *hdev, void *codec_id,
-+					__u8 transport, bool is_vendor_codec)
-+{
-+	struct hci_op_read_local_codec_caps caps;
-+	__u8 i;
-+
-+	memset(&caps, 0, sizeof(caps));
-+
-+	if (is_vendor_codec) {
-+		caps.codec_id[0] = 0xFF;
-+		memcpy(&caps.codec_id[1], codec_id, 4);
-+	} else {
-+		memcpy(caps.codec_id, codec_id, 1);
-+	}
-+
-+	caps.direction = 0x00;
-+
-+	for (i = 0; i < TRANSPORT_TYPE_MAX; i++) {
-+		if (transport & BIT(i)) {
-+			struct hci_rp_read_local_codec_caps *rp;
-+			struct sk_buff *skb;
-+
-+			caps.transport = i;
-+			skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
-+					     sizeof(caps), &caps,
-+					     HCI_CMD_TIMEOUT);
-+			if (IS_ERR(skb)) {
-+				bt_dev_err(hdev, "Failed to read codec capabilities (%ld)",
-+					   PTR_ERR(skb));
-+				continue;
-+			}
-+
-+			if (skb->len < sizeof(*rp))
-+				goto error;
-+
-+			rp = (void *)skb->data;
-+
-+			if (rp->status)
-+				goto error;
-+
-+			hci_dev_lock(hdev);
-+			hci_codec_list_add(&hdev->local_codecs, rp, skb->len - 2,
-+					   &caps);
-+			hci_dev_unlock(hdev);
-+error:
-+			kfree_skb(skb);
-+		}
-+	}
-+}
-+
-+void hci_codec_list_parse(struct hci_dev *hdev, __u8 num_codecs,
-+			  void *codec_list, bool is_vendor_codec)
++static void hci_codec_list_parse_v2(struct hci_dev *hdev, __u8 num_codecs,
++				    void *codec_list, bool is_vendor_codec)
 +{
 +	__u8 i;
 +
 +	for (i = 0; i < num_codecs; i++) {
 +		if (!is_vendor_codec) {
-+			struct hci_standard_codecs *codecs = codec_list;
++			struct hci_standard_codecs_v2 *codecs = codec_list;
 +
 +			hci_read_codec_capabilities(hdev, &codecs->codec[i],
-+						    LOCAL_CODEC_ACL_MASK,
++						    codecs->codec[i].transport,
 +						    is_vendor_codec);
 +		} else {
-+			struct hci_vendor_codecs *codecs = codec_list;
++			struct hci_vendor_codecs_v2 *codecs = codec_list;
 +
 +			hci_read_codec_capabilities(hdev, &codecs->codec[i],
-+						    LOCAL_CODEC_ACL_MASK,
++						    codecs->codec[i].transport,
 +						    is_vendor_codec);
 +		}
 +	}
 +}
 +
-+static void hci_read_supported_codecs(struct hci_dev *hdev)
+ static void hci_read_supported_codecs(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -1056,10 +1078,62 @@ static void hci_read_supported_codecs(struct hci_dev *hdev)
+ 	kfree_skb(skb);
+ }
+ 
++static void hci_read_supported_codecs_v2(struct hci_dev *hdev)
 +{
 +	struct sk_buff *skb;
-+	struct hci_rp_read_local_supported_codecs *rp;
-+	struct hci_standard_codecs *std_codecs;
-+	struct hci_vendor_codecs *vendor_codecs;
++	struct hci_rp_read_local_supported_codecs_v2 *rp;
++	struct hci_standard_codecs_v2 *std_codecs;
++	struct hci_vendor_codecs_v2 *vendor_codecs;
 +
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
 +			     HCI_CMD_TIMEOUT);
 +
 +	if (IS_ERR(skb)) {
@@ -318,7 +221,7 @@ index fd12f1652bdf..93e20c0ab9f2 100644
 +	    + sizeof(std_codecs->num))
 +		goto error;
 +
-+	hci_codec_list_parse(hdev, std_codecs->num, std_codecs, false);
++	hci_codec_list_parse_v2(hdev, std_codecs->num, std_codecs, false);
 +
 +	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
 +		 + sizeof(std_codecs->num));
@@ -330,47 +233,22 @@ index fd12f1652bdf..93e20c0ab9f2 100644
 +	    + sizeof(vendor_codecs->num))
 +		goto error;
 +
-+	hci_codec_list_parse(hdev, vendor_codecs->num, vendor_codecs, true);
++	hci_codec_list_parse_v2(hdev, vendor_codecs->num, vendor_codecs, true);
 +
 +error:
 +	kfree_skb(skb);
 +}
 +
-+static void hci_init5_req(struct hci_dev *hdev)
-+{
-+	/* Read local codec list if the HCI command is supported */
-+	if (hdev->commands[29] & 0x20)
-+		hci_read_supported_codecs(hdev);
-+}
-+
- static int __hci_init(struct hci_dev *hdev)
+ static void hci_init5_req(struct hci_dev *hdev)
  {
- 	int err;
-@@ -937,6 +1093,8 @@ static int __hci_init(struct hci_dev *hdev)
- 	if (err < 0)
- 		return err;
+ 	/* Read local codec list if the HCI command is supported */
+-	if (hdev->commands[29] & 0x20)
++	if (hdev->commands[45] & 0x04)
++		hci_read_supported_codecs_v2(hdev);
++	else if (hdev->commands[29] & 0x20)
+ 		hci_read_supported_codecs(hdev);
+ }
  
-+	hci_init5_req(hdev);
-+
- 	/* This function is only called when the controller is actually in
- 	 * configured state. When the controller is marked as unconfigured,
- 	 * this initialization procedure is not run.
-@@ -1835,6 +1993,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 	memset(hdev->eir, 0, sizeof(hdev->eir));
- 	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
- 	bacpy(&hdev->random_addr, BDADDR_ANY);
-+	hci_codec_list_clear(&hdev->local_codecs);
- 
- 	hci_req_sync_unlock(hdev);
- 
-@@ -3818,6 +3977,7 @@ struct hci_dev *hci_alloc_dev(void)
- 	INIT_LIST_HEAD(&hdev->conn_hash.list);
- 	INIT_LIST_HEAD(&hdev->adv_instances);
- 	INIT_LIST_HEAD(&hdev->blocked_keys);
-+	INIT_LIST_HEAD(&hdev->local_codecs);
- 
- 	INIT_WORK(&hdev->rx_work, hci_rx_work);
- 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
 -- 
 2.17.1
 
