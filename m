@@ -2,256 +2,232 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33FADC43460
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 12:30:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B0DC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 May 2021 05:32:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0880E61362
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  2 May 2021 12:30:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89877611AE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  3 May 2021 05:32:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231130AbhEBMbe (ORCPT
+        id S229817AbhECFdq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 2 May 2021 08:31:34 -0400
-Received: from mga04.intel.com ([192.55.52.120]:30094 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230255AbhEBMbe (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 2 May 2021 08:31:34 -0400
-IronPort-SDR: uySOAWwx1WthjZbfHF7A4aEXjnYB5laz4eGPBiGItTzM5lTwQIXzKZepduHVM+PdQ2brAWTGOu
- 6GdNjlRDalrQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9972"; a="195509153"
-X-IronPort-AV: E=Sophos;i="5.82,267,1613462400"; 
-   d="scan'208";a="195509153"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 May 2021 05:30:42 -0700
-IronPort-SDR: ZBHlE1M0e0+72d8q62mTyokXpMwmZ19t13N60qeWUxAproM+T2CKcswdaWcxbmbibQyW3QIOBa
- jcIkgsGqFS+A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.82,267,1613462400"; 
-   d="scan'208";a="538367133"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga004.jf.intel.com with ESMTP; 02 May 2021 05:30:40 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Kiran K <kiran.k@intel.com>,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-Subject: [PATCH v6 2/2] Bluetooth: Add support for Read Local Supported Codecs V2
-Date:   Sun,  2 May 2021 18:04:42 +0530
-Message-Id: <20210502123442.19483-2-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210502123442.19483-1-kiran.k@intel.com>
-References: <20210502123442.19483-1-kiran.k@intel.com>
+        Mon, 3 May 2021 01:33:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44538 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229499AbhECFdo (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 3 May 2021 01:33:44 -0400
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F0AC06174A
+        for <linux-bluetooth@vger.kernel.org>; Sun,  2 May 2021 22:32:50 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id s25so5433575lji.0
+        for <linux-bluetooth@vger.kernel.org>; Sun, 02 May 2021 22:32:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7+x9X+bH9sVIQ7YhvysouTeiyyXRivn1vpvp9jCbJ/A=;
+        b=MlUPJ8cVgmBivf5rX8Cdn25uK5zo5i6ImJV9Xvcp1dTtH+2/zGlukHMVhK7Cp+i1Ly
+         jn/Sa5pWbXbVw4raldm7Pt0215esET2yMzV5Wf/h/m6NXP1UDpjP7R4wdm1kbiy2GtWi
+         w4Kkq1KwliNHOsLIXL0uxGzokOpHnsJdfR5c0r/7RvE6d0AENXCw3vgXi3GwIGteWvNG
+         FcjidFNOFxVOQ8RaFMEyFAo3kO0th4X2q7BPIrHeOthIUJB9aRW0SMOc7ZIgz0RPQpNT
+         KKWzwWJjUDaISDq2cYwE+z5o9tdePsLLc9cdV/2AZA7skfrCbp3SENw2oyWXIa9VSDFX
+         WcWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7+x9X+bH9sVIQ7YhvysouTeiyyXRivn1vpvp9jCbJ/A=;
+        b=IzAHnOTyXOKcFjDWQt/ka6b4p/sYi58tGMEtBl5M+xK7J6XmeFILhNDjfCLnlZk5k7
+         t78ssxDDZm/ORo0zH5/fD6/4CqYmN5ZyOiuIqFlKONuVhdDfNCZxMhIIWewuVSFpphCu
+         bHEbsXo981Jn9CRSoQtHE+wIkIBYyGE8bHUoJ5CAdeta/shIP5AhTpgOOK+ivmq8VVgp
+         uf1Sf6djLd790PC+Q4yPvExZUygYI7bWRttJzadVBPMtWG+cpxa0UI9EYK5v0lgi0O75
+         D87o9Yw0DvAIBpetrImitWAaxqdy9oelddCPmXAihDRHDuFgGg5D/ccKTV4O9dd1S8ew
+         rqTQ==
+X-Gm-Message-State: AOAM5314mcjcOFDHt3dMyFjtwJ/zf6PSo3l2toRQn/K2Am4ir4s1xzO+
+        RxHxmFFBCJiPirqb73TlDIFoGR7g0R9LbTluiM6WFQ==
+X-Google-Smtp-Source: ABdhPJx4yaGFvb9iHAdHysyvdFWzFQ1snaGsMOViAQAGAMCBJHwCSKUUuMB0yV4s0/wZFQdgBb/wlvsz2z0EXdDzRpw=
+X-Received: by 2002:a2e:8797:: with SMTP id n23mr12234159lji.347.1620019969150;
+ Sun, 02 May 2021 22:32:49 -0700 (PDT)
+MIME-Version: 1.0
+References: <20201009133147.1.Ie792480ac24829a48669e83c0045157eb3d46775@changeid>
+In-Reply-To: <20201009133147.1.Ie792480ac24829a48669e83c0045157eb3d46775@changeid>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Mon, 3 May 2021 13:32:38 +0800
+Message-ID: <CAJQfnxHcag62zp4_0R9=KomC7FJB=xaRbmfaHsTp8JrOgkV9Pg@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_h5: Add driver capabilities for RTL8822CS
+To:     Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        chromeos-bluetooth-upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     drinkcat@chromium.org, BlueZ <linux-bluetooth@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use V2 version of read local supported command is controller
-supports
+Hi maintainers,
 
-snoop:
-> HCI Event: Command Complete (0x0e) plen 20
-      Read Local Supported Codecs V2 (0x04|0x000d) ncmd 1
-        Status: Success (0x00)
-        Number of supported codecs: 7
-          Codec: u-law log (0x00)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: A-law log (0x01)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: CVSD (0x02)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Transparent (0x03)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Linear PCM (0x04)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Reserved (0x08)
-          Logical Transport Type: 0x03
-            Codec supported over BR/EDR ACL
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: mSBC (0x05)
-          Logical Transport Type: 0x03
-            Codec supported over BR/EDR ACL
-            Codec supported over BR/EDR SCO and eSCO
-        Number of vendor codecs: 0
-......
-< HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
-        Codec: mSBC (0x05)
-        Logical Transport Type: 0x00
-        Direction: Input (Host to Controller) (0x00)
-> HCI Event: Command Complete (0x0e) plen 12
-      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
-        Status: Success (0x00)
-        Number of codec capabilities: 1
-         Capabilities #0:
-        00 00 11 15 02 33
+Could you take another look at this patch?
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
----
-* changes in v6
-  no changes
+Thanks,
+Archie
 
-* changes in v5:
-  fix review comments
 
-* changes in v4:
-  converts codec read capabilities calls from async to sync
-
-* changes in v3:
-  No changes
-
-* changes in v2:
-  add length check for event data before accessing
-
- include/net/bluetooth/hci.h | 28 ++++++++++++++
- net/bluetooth/hci_core.c    | 76 ++++++++++++++++++++++++++++++++++++-
- 2 files changed, 103 insertions(+), 1 deletion(-)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index c03afb77071d..91bf48258f6f 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1334,6 +1334,34 @@ struct hci_rp_read_local_pairing_opts {
- 	__u8     max_key_size;
- } __packed;
- 
-+#define HCI_OP_READ_LOCAL_CODECS_V2	0x100d
-+struct hci_standard_codec_v2 {
-+	__u8	codec_id;
-+	__u8	transport;
-+} __packed;
-+
-+struct hci_standard_codecs_v2 {
-+	__u8	num;
-+	struct hci_standard_codec_v2 codec[];
-+} __packed;
-+
-+struct hci_vendor_codec_v2 {
-+	__le16	company_id;
-+	__le16	vendor_id;
-+	__u8	transport;
-+} __packed;
-+
-+struct hci_vendor_codecs_v2 {
-+	__u8	num;
-+	struct hci_vendor_codec_v2 codec[];
-+} __packed;
-+
-+struct hci_rp_read_local_supported_codecs_v2 {
-+	__u8	status;
-+	struct hci_standard_codecs_v2 std_codecs;
-+	struct hci_vendor_codecs_v2 vendor_codecs;
-+} __packed;
-+
- #define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
- struct hci_op_read_local_codec_caps {
- 	__u8	codec_id[5];
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index d0439f6b2d6a..7d663c91ba30 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1006,6 +1006,28 @@ static void hci_codec_list_parse(struct hci_dev *hdev, __u8 num_codecs,
- 	}
- }
- 
-+static void hci_codec_list_parse_v2(struct hci_dev *hdev, __u8 num_codecs,
-+				    void *codec_list, bool is_vendor_codec)
-+{
-+	__u8 i;
-+
-+	for (i = 0; i < num_codecs; i++) {
-+		if (!is_vendor_codec) {
-+			struct hci_standard_codecs_v2 *codecs = codec_list;
-+
-+			hci_read_codec_capabilities(hdev, &codecs->codec[i],
-+						    codecs->codec[i].transport,
-+						    is_vendor_codec);
-+		} else {
-+			struct hci_vendor_codecs_v2 *codecs = codec_list;
-+
-+			hci_read_codec_capabilities(hdev, &codecs->codec[i],
-+						    codecs->codec[i].transport,
-+						    is_vendor_codec);
-+		}
-+	}
-+}
-+
- static void hci_read_supported_codecs(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -1056,10 +1078,62 @@ static void hci_read_supported_codecs(struct hci_dev *hdev)
- 	kfree_skb(skb);
- }
- 
-+static void hci_read_supported_codecs_v2(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	struct hci_rp_read_local_supported_codecs_v2 *rp;
-+	struct hci_standard_codecs_v2 *std_codecs;
-+	struct hci_vendor_codecs_v2 *vendor_codecs;
-+
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
-+			     HCI_CMD_TIMEOUT);
-+
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
-+			   PTR_ERR(skb));
-+		return;
-+	}
-+
-+	if (skb->len < sizeof(*rp))
-+		goto error;
-+
-+	rp = (void *)skb->data;
-+
-+	if (rp->status)
-+		goto error;
-+
-+	skb_pull(skb, sizeof(rp->status));
-+
-+	std_codecs = (void *)skb->data;
-+
-+	if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
-+	    + sizeof(std_codecs->num))
-+		goto error;
-+
-+	hci_codec_list_parse_v2(hdev, std_codecs->num, std_codecs, false);
-+
-+	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
-+		 + sizeof(std_codecs->num));
-+
-+	vendor_codecs = (void *)skb->data;
-+
-+	if (skb->len <
-+	    flex_array_size(vendor_codecs, codec, vendor_codecs->num)
-+	    + sizeof(vendor_codecs->num))
-+		goto error;
-+
-+	hci_codec_list_parse_v2(hdev, vendor_codecs->num, vendor_codecs, true);
-+
-+error:
-+	kfree_skb(skb);
-+}
-+
- static void hci_init5_req(struct hci_dev *hdev)
- {
- 	/* Read local codec list if the HCI command is supported */
--	if (hdev->commands[29] & 0x20)
-+	if (hdev->commands[45] & 0x04)
-+		hci_read_supported_codecs_v2(hdev);
-+	else if (hdev->commands[29] & 0x20)
- 		hci_read_supported_codecs(hdev);
- }
- 
--- 
-2.17.1
-
+On Sat, 10 Oct 2020 at 04:32, Abhishek Pandit-Subedi
+<abhishekpandit@chromium.org> wrote:
+>
+> Certain controller capabilities must be exposed by the driver because it
+> can't be queried from HCI (wideband speech support, for example). Update
+> the match data structure to set the supported capabilities and set the
+> proper quirks on hdev after registering the device.
+>
+> Also update the 8822CS capabilities to show it supports wideband speech
+> and has valid le states (allows central peripheral role).
+>
+> Signed-off-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> ---
+>
+>  drivers/bluetooth/hci_h5.c | 53 +++++++++++++++++++++++++++++++-------
+>  1 file changed, 44 insertions(+), 9 deletions(-)
+>
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index a10d710fc3f13e..3833a2d276665f 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -97,6 +97,11 @@ struct h5 {
+>         struct gpio_desc *device_wake_gpio;
+>  };
+>
+> +enum h5_capabilities {
+> +       H5_CAP_WIDEBAND_SPEECH = BIT(0),
+> +       H5_CAP_VALID_LE_STATES = BIT(1),
+> +};
+> +
+>  struct h5_vnd {
+>         int (*setup)(struct h5 *h5);
+>         void (*open)(struct h5 *h5);
+> @@ -106,6 +111,11 @@ struct h5_vnd {
+>         const struct acpi_gpio_mapping *acpi_gpio_map;
+>  };
+>
+> +struct h5_device_data {
+> +       uint32_t capabilities;
+> +       struct h5_vnd *vnd;
+> +};
+> +
+>  static void h5_reset_rx(struct h5 *h5);
+>
+>  static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
+> @@ -791,7 +801,10 @@ static const struct hci_uart_proto h5p = {
+>  static int h5_serdev_probe(struct serdev_device *serdev)
+>  {
+>         struct device *dev = &serdev->dev;
+> +       struct hci_dev *hdev;
+>         struct h5 *h5;
+> +       const struct h5_device_data *data;
+> +       int err;
+>
+>         h5 = devm_kzalloc(dev, sizeof(*h5), GFP_KERNEL);
+>         if (!h5)
+> @@ -808,23 +821,21 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+>                 if (!match)
+>                         return -ENODEV;
+>
+> -               h5->vnd = (const struct h5_vnd *)match->driver_data;
+> +               data = (const struct h5_device_data *)match->driver_data;
+> +               h5->vnd = data->vnd;
+>                 h5->id  = (char *)match->id;
+>
+>                 if (h5->vnd->acpi_gpio_map)
+>                         devm_acpi_dev_add_driver_gpios(dev,
+>                                                        h5->vnd->acpi_gpio_map);
+>         } else {
+> -               const void *data;
+> -
+>                 data = of_device_get_match_data(dev);
+>                 if (!data)
+>                         return -ENODEV;
+>
+> -               h5->vnd = (const struct h5_vnd *)data;
+> +               h5->vnd = data->vnd;
+>         }
+>
+> -
+>         h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+>         if (IS_ERR(h5->enable_gpio))
+>                 return PTR_ERR(h5->enable_gpio);
+> @@ -834,7 +845,20 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+>         if (IS_ERR(h5->device_wake_gpio))
+>                 return PTR_ERR(h5->device_wake_gpio);
+>
+> -       return hci_uart_register_device(&h5->serdev_hu, &h5p);
+> +       err = hci_uart_register_device(&h5->serdev_hu, &h5p);
+> +       if (err)
+> +               return err;
+> +
+> +       hdev = h5->serdev_hu.hdev;
+> +
+> +       /* Set match specific quirks */
+> +       if (data->capabilities & H5_CAP_WIDEBAND_SPEECH)
+> +               set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+> +
+> +       if (data->capabilities & H5_CAP_VALID_LE_STATES)
+> +               set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+> +
+> +       return 0;
+>  }
+>
+>  static void h5_serdev_remove(struct serdev_device *serdev)
+> @@ -1000,12 +1024,21 @@ static struct h5_vnd rtl_vnd = {
+>         .resume         = h5_btrtl_resume,
+>         .acpi_gpio_map  = acpi_btrtl_gpios,
+>  };
+> +
+> +static const struct h5_device_data h5_data_rtl8822cs = {
+> +       .capabilities = H5_CAP_WIDEBAND_SPEECH | H5_CAP_VALID_LE_STATES,
+> +       .vnd = &rtl_vnd,
+> +};
+> +
+> +static const struct h5_device_data h5_data_rtl8723bs = {
+> +       .vnd = &rtl_vnd,
+> +};
+>  #endif
+>
+>  #ifdef CONFIG_ACPI
+>  static const struct acpi_device_id h5_acpi_match[] = {
+>  #ifdef CONFIG_BT_HCIUART_RTL
+> -       { "OBDA8723", (kernel_ulong_t)&rtl_vnd },
+> +       { "OBDA8723", (kernel_ulong_t)&h5_data_rtl8723bs},
+>  #endif
+>         { },
+>  };
+> @@ -1019,9 +1052,11 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
+>  static const struct of_device_id rtl_bluetooth_of_match[] = {
+>  #ifdef CONFIG_BT_HCIUART_RTL
+>         { .compatible = "realtek,rtl8822cs-bt",
+> -         .data = (const void *)&rtl_vnd },
+> +         .data = &h5_data_rtl8822cs,
+> +       },
+>         { .compatible = "realtek,rtl8723bs-bt",
+> -         .data = (const void *)&rtl_vnd },
+> +         .data = &h5_data_rtl8723bs,
+> +       },
+>  #endif
+>         { },
+>  };
+> --
+> 2.28.0.1011.ga647a8990f-goog
+>
+> --
+> You received this message because you are subscribed to the Google Groups "ChromeOS Bluetooth Upstreaming" group.
+> To unsubscribe from this group and stop receiving emails from it, send an email to chromeos-bluetooth-upstreaming+unsubscribe@chromium.org.
+> To post to this group, send email to chromeos-bluetooth-upstreaming@chromium.org.
+> To view this discussion on the web visit https://groups.google.com/a/chromium.org/d/msgid/chromeos-bluetooth-upstreaming/20201009133147.1.Ie792480ac24829a48669e83c0045157eb3d46775%40changeid.
