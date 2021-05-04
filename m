@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B0A6C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 09:50:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BD5FC43460
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 10:00:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E17A9610FC
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 09:50:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 71FF9601FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 10:00:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230150AbhEDJvh (ORCPT
+        id S230089AbhEDKBm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 May 2021 05:51:37 -0400
-Received: from mga14.intel.com ([192.55.52.115]:14685 "EHLO mga14.intel.com"
+        Tue, 4 May 2021 06:01:42 -0400
+Received: from mga18.intel.com ([134.134.136.126]:12059 "EHLO mga18.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230089AbhEDJvg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 4 May 2021 05:51:36 -0400
-IronPort-SDR: xRROuAbED/l+0FOZQydciOXSAkljZyh4lkTD/BiSW1OLNimVBTMaVd6CY7kWjO4SlPphsthxSj
- +uf43PQWTtAw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9973"; a="197557524"
+        id S230086AbhEDKBZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 4 May 2021 06:01:25 -0400
+IronPort-SDR: yatosVXEwteQCw6C2TP83zsnWOJHS+Hr1/iG7Q3W8pKCPclH2X5kNdJKq2kuqcQf9DXPJrwukp
+ UcmsveWgCNog==
+X-IronPort-AV: E=McAfee;i="6200,9189,9973"; a="185413021"
 X-IronPort-AV: E=Sophos;i="5.82,272,1613462400"; 
-   d="scan'208";a="197557524"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2021 02:50:42 -0700
-IronPort-SDR: rL4skt6U0SxG52HJP1MC+uW90TOX3BYKo33KE0Yvwm3k5r2oI1J3o32I/7AihWna700I0vrHAv
- A9/gO8FWFJjw==
+   d="scan'208";a="185413021"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 May 2021 02:59:44 -0700
+IronPort-SDR: hI5UAwaod2LEFcYfYIZ3ZKpqR3Le8ux0akP0+yksNaa+1NWxrAffyh/9J8QzQadDQEQCpUSASz
+ lTlzIMCgFHdg==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,272,1613462400"; 
-   d="scan'208";a="463088572"
+   d="scan'208";a="621473788"
 Received: from nsathish-latitude-7480.iind.intel.com ([10.224.186.105])
-  by fmsmga002.fm.intel.com with ESMTP; 04 May 2021 02:50:40 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 04 May 2021 02:59:42 -0700
 From:   Sathish Narasimman <sathish.narasimman@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     chethan.tumkur.narayan@intel.com, ravishankar.srivatsa@intel.com,
         Sathish Narasimman <sathish.narasimman@intel.com>
-Subject: [PATCH] btmgmt: Fix enable adding irk when turining privacy on.
-Date:   Tue,  4 May 2021 15:29:27 +0530
-Message-Id: <20210504095927.29393-1-sathish.narasimman@intel.com>
+Subject: [Bluez PATCH v1] btmgmt: Fix enable adding irk when turining privacy on.
+Date:   Tue,  4 May 2021 15:38:35 +0530
+Message-Id: <20210504100835.29468-1-sathish.narasimman@intel.com>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
