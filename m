@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85DEFC43460
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 05:02:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 034BCC43461
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 05:02:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A67B6139A
+	by mail.kernel.org (Postfix) with ESMTP id D237F611EE
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  4 May 2021 05:02:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhEDFDH (ORCPT
+        id S229824AbhEDFDI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 4 May 2021 01:03:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44430 "EHLO
+        Tue, 4 May 2021 01:03:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44420 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbhEDFDG (ORCPT
+        with ESMTP id S229813AbhEDFDG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 4 May 2021 01:03:06 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52E5BC061574
+Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFE6AC061761
         for <linux-bluetooth@vger.kernel.org>; Mon,  3 May 2021 22:02:11 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id t22so5698940pgu.0
+Received: by mail-pf1-x435.google.com with SMTP id h127so1481122pfe.9
         for <linux-bluetooth@vger.kernel.org>; Mon, 03 May 2021 22:02:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=lDzNN+8kFjAwC9cd7rrJcQ2maIfc7/D0ME3NRvAnLqQ=;
-        b=t8cMQsotHYE7H50YFU8iBmk0zNylRbroHFaEPHPQW2mQ5aBNmZxvsfl8OiN7PIkOBd
-         tM2D47oWp8kXAP6UAk1/QjAgCVvH++imJQ0N57Ukij7QjrX3hqWIk+EwKOC/dLix+zU8
-         RB4jWFW+47Yi2U62Ph0PTApN57Grih9uHQqKOlCEZKFVkgzbDtboaJbTrTSc1mfMYysU
-         inRRfG04szRgPQ2T8nf5+dRR5kmhwf5W/CXJKCVjMBBnDFMzXGjf1MvfZ8N0OJ4c4lDt
-         I8IV67H7OODCw7qFnU9dt7A/3nvKj8vzF79PwFJ3su/Wp/fn7Zylr1AM0TZeHETNN4og
-         dfIA==
+        bh=u25XIoVqobuwLiKTDjDkOMzO6oFDEJLZN1uFbvtpCII=;
+        b=eZDhIVhCZTnKHUZCkEL7js5P/pRCpN1TtCSH4K+MrRZ+jVAOE1TSJ/Wxr5KVSN93fI
+         JKMDLV0Q1HKz695bSVhq3vgtII/Oth8j+l9v9T8CB0gjnDnPIgq+HI5GYenZYXhDwBuE
+         8UQY7ZmzeF1O4CCMUDwz3vAdIUOaJaPd1klBzWWccUutsauKf+PxX0T97NwCqmrVE/4Z
+         IvATif8+f2Ta/OeR2CKO1VoXwXEQlv78ijxH64b0wuKcN5pnr9GL7FRFtOUQPeQj6yzV
+         pN83P7lM4kbWwg0XOuWf2uZmll8yxefXaop6SjEAWT6V43sq1JjW3P5Ew/r0Ltzkj1wd
+         prFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=lDzNN+8kFjAwC9cd7rrJcQ2maIfc7/D0ME3NRvAnLqQ=;
-        b=JuYjfsnwy9w2sTc0dOmXgdgT078ji++KcwUujJR3CkR+M5l7VaX3yJiOQT4J30n7al
-         zfILrcLnpoGNm/q5sx9fHS+PLwM4n+KKXRuhmBVVLUhYrZ2cdF67vZ0N7lSuBSoBuX9E
-         z6c3BPLJ0epMbPmH8Khx6R5nHokaEeQFGiim/ucYZk+UGrddAXaK10OV66tM/M0+mWO1
-         aqpmuQJvZehMNSAt+XEqCTXJwJux4wjtMQX1DXG3TUOKEKV3EGET1KPrIR5DlOLv4zKS
-         5QS8GEPLy8ssJP/U/3d4bkIISoAx8b52y9IjNis5MHKBcjwyly9HrDz4Tji/eE9dML00
-         3wZA==
-X-Gm-Message-State: AOAM530xQ90TZ+XuXHP/3zZfWBPUK1UkobS6H3+diDPp9qM4tDBdJptL
-        yFR5wYd1bipEpDrgk4nj6V77+mMqkFgFUg==
-X-Google-Smtp-Source: ABdhPJw8VJH+wMxPt8lX624YXRm1pS+PDUp0LOQHwZtK9kZJMbDgd+7yX9J69zL/QbkEYEKPk9S4yw==
-X-Received: by 2002:a63:7c42:: with SMTP id l2mr21448751pgn.98.1620104530478;
-        Mon, 03 May 2021 22:02:10 -0700 (PDT)
+        bh=u25XIoVqobuwLiKTDjDkOMzO6oFDEJLZN1uFbvtpCII=;
+        b=jYHbc1fEaN9ERf08KkRgeXJo3DhxHeMxoN4mVtKpyXf7F2NKttKBGDRO6xmV3hCorU
+         IP6Kzy6LZnM2ys1rmus/ltYGc3Z/jlcEVBZ70ygkflGDsRJv+zjY9pCViHIFbgH5qAEH
+         nAFnfYyNo6gZ1Tth+AJBUYKaE6aBREV1sz1zGw06Qw4WyWThsJkvFfOQTvTB5nZcW7+s
+         iINL0PGh6b4GjLAbgb6+RVVLwr1VmCP8UDoxdGImB6O+gb0gHKyLpHhd6nYGvcLh2eZy
+         qpgiBjTYPToJDy0wUwbEWG/1nSkuxVGG7KVIJ3TFheyaffaR3WHknG1KVG6qtEs0nBbs
+         3S5g==
+X-Gm-Message-State: AOAM5323dbUp5WsqZVT8bRgwla2iECNvgNkcD5U5LMC84bbTfv2bpQvu
+        6huKBow2g4Tf+Le20CRhX2c3kTdth5W0tw==
+X-Google-Smtp-Source: ABdhPJyeZ5nv/y5Q5ozewL7AT1xTlzj8d9FdlDqAXkZFqo/mKT+/qtMje25MsE4tKiGS/w1wEe6PTQ==
+X-Received: by 2002:a17:90b:1b03:: with SMTP id nu3mr2764620pjb.62.1620104531019;
+        Mon, 03 May 2021 22:02:11 -0700 (PDT)
 Received: from han1-mobl3.hsd1.or.comcast.net ([2601:1c0:6a01:d830::f7ee])
-        by smtp.gmail.com with ESMTPSA id m20sm1508385pjq.40.2021.05.03.22.02.09
+        by smtp.gmail.com with ESMTPSA id m20sm1508385pjq.40.2021.05.03.22.02.10
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 03 May 2021 22:02:10 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v3 2/4] monitor: Convert manpage to rst format
-Date:   Mon,  3 May 2021 22:02:05 -0700
-Message-Id: <20210504050207.841261-3-hj.tedd.an@gmail.com>
+Subject: [BlueZ PATCH v3 3/4] src: Convert manpage to rst format
+Date:   Mon,  3 May 2021 22:02:06 -0700
+Message-Id: <20210504050207.841261-4-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20210504050207.841261-1-hj.tedd.an@gmail.com>
 References: <20210504050207.841261-1-hj.tedd.an@gmail.com>
@@ -74,295 +74,199 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds support to convert reStructuredText formatted btmon
-manpage to manpage with rst2man tool.
+This patch converts the existing manpage for bluetoothd into
+reStructuredText format.
 ---
- Makefile.am       |  15 +++-
- Makefile.tools    |   4 +-
- configure.ac      |   4 ++
- doc/btmon.txt     |  35 ----------
- monitor/btmon.rst | 171 ++++++++++++++++++++++++++++++++++++++++++++++
- 5 files changed, 189 insertions(+), 40 deletions(-)
- delete mode 100644 doc/btmon.txt
- create mode 100644 monitor/btmon.rst
+ Makefile.am           |  5 ++-
+ configure.ac          |  2 +-
+ src/bluetoothd.8.in   | 63 --------------------------------
+ src/bluetoothd.rst.in | 84 +++++++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 89 insertions(+), 65 deletions(-)
+ delete mode 100644 src/bluetoothd.8.in
+ create mode 100644 src/bluetoothd.rst.in
 
 diff --git a/Makefile.am b/Makefile.am
-index cb0d5fc0a..4e9cae885 100644
+index 4e9cae885..52e0e9ed8 100644
 --- a/Makefile.am
 +++ b/Makefile.am
-@@ -594,7 +594,7 @@ if LIBRARY
- pkgconfig_DATA = lib/bluez.pc
+@@ -345,7 +345,7 @@ CLEANFILES += $(builtin_files) src/bluetooth.service
+ if MANPAGES
+ man_MANS += src/bluetoothd.8
  endif
+-EXTRA_DIST += src/bluetoothd.8
++manual_pages += src/bluetoothd.8
  
--EXTRA_DIST += $(manual_pages:.1=.txt)
-+EXTRA_DIST += $(manual_pages:.1=.rst)
+ EXTRA_DIST += src/genbuiltin src/bluetooth.conf \
+ 			src/main.conf profiles/network/network.conf \
+@@ -631,6 +631,9 @@ endif
+ %.1: %.rst Makefile
+ 	$(RST2MAN_PROCESS)
  
- DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
- 						--enable-health \
-@@ -616,11 +616,20 @@ SED_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
- 		$(SED) -e 's,@pkglibexecdir\@,$(pkglibexecdir),g' \
- 		< $< > $@
- 
-+if RUN_RST2MAN
-+RST2MAN_PROCESS = $(AM_V_GEN)$(MKDIR_P) $(dir $@) && \
-+			$(RST2MAN) --strict --no-raw \
-+			--no-generator --no-datestamp $< $@
-+else
-+RST2MAN_PROCESS = $(AM_V_GEN)test -f $@ || \
-+		{ echo "Generated manual page $@ does not exist"; false; }
-+endif
-+
- %.service: %.service.in Makefile
- 	$(SED_PROCESS)
- 
--%.1: %.txt
--	$(AM_V_GEN)a2x --doctype manpage --format manpage $(srcdir)/$<
-+%.1: %.rst Makefile
++%.8: %.rst Makefile
 +	$(RST2MAN_PROCESS)
- 
++
  src/builtin.h: src/genbuiltin $(builtin_sources)
  	$(AM_V_GEN)$(srcdir)/src/genbuiltin $(builtin_modules) > $@
-diff --git a/Makefile.tools b/Makefile.tools
-index 160272212..a39e3e334 100644
---- a/Makefile.tools
-+++ b/Makefile.tools
-@@ -51,10 +51,10 @@ monitor_btmon_LDADD = lib/libbluetooth-internal.la \
- 				src/libshared-mainloop.la $(UDEV_LIBS) -ldl
  
- if MANPAGES
--man_MANS += doc/btmon.1
-+man_MANS += monitor/btmon.1
- endif
- endif
--manual_pages += doc/btmon.1
-+manual_pages += monitor/btmon.1
- 
- if LOGGER
- pkglibexec_PROGRAMS += tools/btmon-logger
 diff --git a/configure.ac b/configure.ac
-index dbd98c9ad..d7e4766e4 100644
+index d7e4766e4..f445589b0 100644
 --- a/configure.ac
 +++ b/configure.ac
-@@ -326,7 +326,11 @@ AM_CONDITIONAL(DATAFILES, test "${enable_datafiles}" != "no")
- AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
- 			[enable building of manual pages]),
- 					[enable_manpages=${enableval}])
-+if (test "${enable_manpages}" != "no"); then
-+	AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
-+fi
- AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
-+AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
+@@ -412,4 +412,4 @@ fi
+ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
  
- AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing],
- 			[enable testing tools]),
-diff --git a/doc/btmon.txt b/doc/btmon.txt
+-AC_OUTPUT(Makefile src/bluetoothd.8 lib/bluez.pc)
++AC_OUTPUT(Makefile src/bluetoothd.rst lib/bluez.pc)
+diff --git a/src/bluetoothd.8.in b/src/bluetoothd.8.in
 deleted file mode 100644
-index 7a7fc537b..000000000
---- a/doc/btmon.txt
+index d61dcc5b3..000000000
+--- a/src/bluetoothd.8.in
 +++ /dev/null
-@@ -1,35 +0,0 @@
--BTMON(1)
--========
--:doctype: manpage
+@@ -1,63 +0,0 @@
+-.\"
+-.TH "BLUETOOTHD" "8" "March 2004" "Bluetooth daemon" "System management commands"
+-.SH "NAME"
+-bluetoothd \- Bluetooth daemon
 -
+-.SH "SYNOPSIS"
+-.B bluetoothd [--version] | [--help]
 -
--NAME
------
--btmon - Bluetooth monitor
+-.B bluetoothd [--nodetach] [--compat] [--experimental] [--debug=<files>] [--plugin=<plugins>] [--noplugin=<plugins>]
 -
+-.SH "DESCRIPTION"
+-This manual page documents briefly the
+-.B bluetoothd
+-daemon, which manages all the Bluetooth devices.
+-.B bluetoothd
+-can also provide a number of services via the D-Bus message bus
+-system.
+-.SH "OPTIONS"
+-.TP
+-.B -v, --version
+-Print bluetoothd version and exit.
+-.TP
+-.B -h, --help
+-Print bluetoothd options and exit.
+-.TP
+-.B -n, --nodetach
+-Enable logging in foreground. Directs log output to the controlling terminal \
+-in addition to syslog.
+-.TP
+-.B -f, --configfile
+-Specifies an explicit config file path instead of relying on the default path \
+-(@CONFIGDIR@/main.conf) for the config file.
+-.TP
+-.B -d, --debug=<file1>:<file2>:...
+-Sets how much information bluetoothd sends to the log destination (usually \
+-syslog's "daemon" facility). If the file options are omitted, then debugging \
+-information from all the source files are printed. If file options are \
+-present, then only debug prints from that source file are printed. The option \
+-can be a pattern containing "*" and "?" characters.
 -
--SYNOPSIS
----------
--*btmon* ['OPTIONS']
+-Example: --debug=src/adapter.c:src/agent.c
+-.TP
+-.B -p, --plugin=<plugin1>,<plugin2>,..
+-Load these plugins only. The option can be a pattern containing "*" and "?" \
+-characters.
+-.TP
+-.B -P, --noplugin=<plugin1>,<plugin2>,..
+-Never load these plugins. The option can be a pattern containing "*" and "?" \
+-characters.
+-.TP
+-.B -C, --compat
+-Provide deprecated command line interfaces.
+-.TP
+-.B -E, --experimental
+-Enable experimental interfaces. Those interfaces are not guaranteed to be
+-compatible or present in future releases.
+-.SH "FILES"
+-.TP
+-.I @CONFIGDIR@/main.conf
+-Location of the global configuration file.
 -
--
--DESCRIPTION
-------------
--The btmon(1) command provides access to the Bluetooth subsystem monitor
--infrastructure for reading HCI traces.
--
--
--AUTHOR
--------
--btmon was originally written by Marcel Holtmann.
--
--
--RESOURCES
-----------
--See <http://www.bluez.org/>
--
--
--COPYING
---------
--Free use of this software is granted under ther terms of the GNU Lesser
--General Public Licenses (LGPL).
-diff --git a/monitor/btmon.rst b/monitor/btmon.rst
+-.SH "AUTHOR"
+-This manual page was written by Marcel Holtmann, Philipp Matthias Hahn and Fredrik Noring.
+diff --git a/src/bluetoothd.rst.in b/src/bluetoothd.rst.in
 new file mode 100644
-index 000000000..c59fdde62
+index 000000000..6bce349ef
 --- /dev/null
-+++ b/monitor/btmon.rst
-@@ -0,0 +1,171 @@
-+=====
-+btmon
-+=====
++++ b/src/bluetoothd.rst.in
+@@ -0,0 +1,84 @@
++==========
++bluetoothd
++==========
 +
-+-----------------
-+Bluetooth monitor
-+-----------------
++----------------
++Bluetooth daemon
++----------------
 +
-+:Authors: - Marcel Holtmann <marcel@holtmann.org>
-+          - Tedd Ho-Jeong An <tedd.an@intel.com>
++:Authors: - Marcel Holtmann
++          - Philipp Matthias Hahn
++          - Fredrik Noring
++:Version: BlueZ
 +:Copyright: Free use of this software is granted under ther terms of the GNU
 +            Lesser General Public Licenses (LGPL).
-+:Version: BlueZ
-+:Date: April 2021
-+:Manual section: 1
-+:Manual group: Linux System Administration
++:Date: March, 2004
++:Manual section: 8
++:Manual group: System management commands
 +
-+SYNOPSYS
++SYNOPSIS
 +========
 +
-+**btmon** [*OPTIONS* ...]
++**bluetoothd** [--version] | [--help]
++
++**bluetoothd**  [--nodetach]  [--compat] [--experimental] [--debug=<*files*>]
++[--plugin=<*plugins*>] [--noplugin=<*plugins*>]
 +
 +DESCRIPTION
 +===========
 +
-+The  btmon(1) command  provides  access  to the Bluetooth subsystem monitor
-+infrastructure for reading HCI traces.
++This manual page documents briefly the **bluetoothd** daemon, which manages
++all the Bluetooth devices. **bluetoothd** can also provide a number of services
++via the D-Bus message bus system.
 +
 +OPTIONS
 +=======
 +
-+-r FILE, --read FILE        Read traces in btsnoop format from *FILE*.
-+-w FILE, --write FILE       Save traces in btsnoop format to *FILE*.
-+-a FILE, --analyze FILE     Analyze traces in btsnoop format from *FILE*.
-+                            It displays the devices found in the *FILE* with
-+                            its packets by type.
-+-s SOCKET, --server SOCKET  Start monitor server socket.
-+-p PRIORITY, --priority PRIORITY  Show only priority or lower for user log.
++-v, --version       Print bluetoothd version and exit.
 +
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
++-h, --help          Print bluetoothd options and exit.
 +
-+   * - *PRIORITY*
-+     - NAME
++-n, --nodetach      Enable logging in foreground. Directs log output to the
++                    controlling terminal in addition to syslog.
 +
-+   * - **3**
-+     - Error
++-f, --configfile    Specifies an explicit config file path instead of relying
++                    on the default path(*@CONFIGDIR@/main.conf*)
++                    for the config file.
 +
-+   * - **4**
-+     - Warning
++-d, --debug=<file1>:<file2>:...
++    Sets how much information bluetoothd sends to the log destination (usually
++    syslog's "daemon" facility). If the file options are omitted, then
++    debugging information from all the source files are printed. If file
++    options are present, then only debug prints from that source file are
++    printed. The option can be a pattern containing "*" and "?" characters.
 +
-+   * - **6**
-+     - Information (Default)
++    Example: --debug=src/adapter.c:src/agent.c
 +
-+   * - **7**
-+     - Debug. **debug** can be used.
++-p, --plugin=<plugin1>,<plugin2>,..
++    Load these plugins only. The option can be a pattern containing  "*" and
++    "?" characters.
 +
-+-i NUM, --index NUM         Show only specified controller. *hciNUM* is also
-+                            acceptable. This is useful to capture the traces
-+                            from the specific controller when the multiple
-+                            controllers are presented.
++-P, --noplugin=<plugin1>,<plugin2>,..
++    Never load these plugins. The option can be a pattern containing "*" and
++    "?"  characters.
 +
-+-d TTY, --tty TTY           Read data from *TTY*.
++-C, --compat        Provide deprecated command line interfaces.
 +
-+-B SPEED, --rate SPEED      Set TTY speed. The default *SPEED* is 115300
++-E, --experimental  Enable experimental interfaces. Those interfaces are not
++                    guaranteed to be compatible or present in future releases.
 +
-+-V COMPID, --vendor COMPID  Set the default company identifier. The *COMPID* is
-+                            a unique number assigned by the Bluetooth SIG to
-+                            a member company and can be found/searched from the
-+                            Bluetooth SIG webpage.
++FILES
++=====
 +
-+                            For example, Intel is 2 and Realtek is 93.
-+
-+-M, --mgmt                  Open channel for mgmt events.
-+
-+-t, --time                  Show a time instead of time offset.
-+
-+-T, --date                  Show a time and date information instead of
-+                            time offset.
-+
-+-S, --sco                   Dump SCO traffic in raw hex format.
-+
-+-A, --a2dp                  Dump A2DP stream traffic in a raw hex format.
-+
-+-E IP, --ellisys IP         Send Ellisys HCI Injection.
-+
-+-P, --no-pager              Disable pager usage while reading the log file.
-+
-+-J OPTIONS, --jlink OPTIONS     Read data from RTT.  Each options are comma(,)
-+                                seprated without spaces.
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+
-+   * - *OPTIONS*
-+     - Description
-+
-+   * - **DEVICE**
-+     - Required. Set the target device.
-+
-+   * - **SERIALNO**
-+     - (Optional) Set the USB serial number. Default is **0**.
-+
-+   * - **INTERFACE**
-+     - (Optional) Target interface. Default is **swd**.
-+
-+   * - **SPEED**
-+     - (Optional) Set target interface speed in kHz. Default is **1000**.
-+
-+-R OPTIONS, --rtt OPTIONS   RTT control block parameters. Each options are
-+                            comma(,) seprated without spaces.
-+
-+.. list-table::
-+   :header-rows: 1
-+   :widths: auto
-+   :stub-columns: 1
-+
-+   * - *OPTIONS*
-+     - Description
-+
-+   * - **ADDRESS**
-+     - (Optional) Address of RTT buffer. Default is **0x00**
-+
-+   * - **AREA**
-+     - (Optional) Size of range to search in RTT buffer. Default is **0**
-+
-+   * - **NAME**
-+     - (Optional) Buffer name. Default is **btmonitor**
-+
-+-C WIDTH, --columns WIDTH   Output width if not a terminal
-+
-+-c MODE, --color MODE       Set output color. The possible *MODE* values are:
-+                            **auto|always|never**.
-+
-+                            Default value is **auto**
-+
-+-v, --version               Show version
-+
-+-h, --help                  Show help options
-+
-+EXAMPLES
-+========
-+
-+Capture the traces from hci0 to hcidump.log file
-+------------------------------------------------
-+
-+.. code-block:: bash
-+
-+   $ btmon -i hci0 -w hcidump.log
-+
-+Open the trace file
-+-------------------
-+
-+.. code-block:: bash
-+
-+   $ btmon -r hcidump.log
-+
++*@CONFIGDIR@/main.conf*
++    Location of the global configuration file.
 +
 +RESOURCES
 +=========
