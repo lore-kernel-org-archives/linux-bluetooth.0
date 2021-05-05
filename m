@@ -7,44 +7,42 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F209EC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9824DC43600
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D6FDA61423
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B3F613C3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234448AbhEEQp3 (ORCPT
+        id S235483AbhEEQpc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 12:45:29 -0400
-Received: from mail.kernel.org ([198.145.29.99]:39198 "EHLO mail.kernel.org"
+        Wed, 5 May 2021 12:45:32 -0400
+Received: from mail.kernel.org ([198.145.29.99]:49346 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235511AbhEEQmG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 12:42:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 9063061627;
-        Wed,  5 May 2021 16:34:52 +0000 (UTC)
+        id S235307AbhEEQns (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 May 2021 12:43:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 625AE6191A;
+        Wed,  5 May 2021 16:35:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232493;
-        bh=1Tj8L1ZaYES/mLH5ILY14A6ccbafPhdoBV0lV+yee9w=;
+        s=k20201202; t=1620232508;
+        bh=8MqLuJRpRtNfNTz+zPiLQpJ1Jfnmn5DyqkueYbf3VKw=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Civs3S6ozlZwbd7eJ5q0tm4gUAJ/QtaPv/VSMWw7wfI5c3qXHBsK2gSAvRxSDWQ9y
-         PowPXPNJ8AyaSz1VVSFXL0WCbDeAyUY0//AN61CR+aCg/Y+J1AelFkrqnCpIafSSsG
-         MY0Ex53eRgeqTyraJgDq2RPOVj4Jo38GaI/S2epcuGDtcyIGfpPqiRB5xiYcjfmFBh
-         kakwZLR+ny+gMOo/vQtTdxxWAXX9lM60OJfhx0p8+i9sLFl5oBisKxYek7hyT4BLc8
-         tYgkY74pLPD1yrraYWUFYUzwu71lZ91+ZxVnZE1UJpFy38eS4/rITg7SmCJrrEkY2j
-         c2e3o3DUteQ7w==
+        b=fnszEe34mb8HCNinhtxXSwyMITuQOJtKWJVpXHGLcETbSgaHO+jgQoyD5zEweJUbm
+         m64hpv9OANgPJLxcTzuhoy9KLTWRw/owX4/HT2SvkNlrsP5Cj0BVWYdfeqtD4+yoXH
+         VXZkDPA5xsSnx2mlon4L4jycdFW7oKYaauCIFROSxncVpUeUiBxIj7Ie2yDBwjEj54
+         7eDpTALbG2HBZ4uMYJWDJOZTGnlRWfFV1f5kqbIJbzEjKr32cEuQN8SLeuHjJjf1rt
+         CztGHNTmWdl0mYgTzWiPSA0WV8g29TOihqFvjaCLXLzXzaGNAwxg0vFTv4OlE7K+hp
+         UApirn6AcjsBg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Archie Pusaka <apusaka@chromium.org>,
-        syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com,
-        Alain Michaud <alainm@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Guenter Roeck <groeck@chromium.org>,
+Cc:     "mark-yw.chen" <mark-yw.chen@mediatek.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 028/104] Bluetooth: check for zapped sk before connecting
-Date:   Wed,  5 May 2021 12:32:57 -0400
-Message-Id: <20210505163413.3461611-28-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.11 038/104] Bluetooth: btusb: Enable quirk boolean flag for Mediatek Chip.
+Date:   Wed,  5 May 2021 12:33:07 -0400
+Message-Id: <20210505163413.3461611-38-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
 References: <20210505163413.3461611-1-sashal@kernel.org>
@@ -56,67 +54,34 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+From: "mark-yw.chen" <mark-yw.chen@mediatek.com>
 
-[ Upstream commit 3af70b39fa2d415dc86c370e5b24ddb9fdacbd6f ]
+[ Upstream commit 27e554a4fcd84e499bf0a82122b8c4c3f1de38b6 ]
 
-There is a possibility of receiving a zapped sock on
-l2cap_sock_connect(). This could lead to interesting crashes, one
-such case is tearing down an already tore l2cap_sock as is happened
-with this call trace:
+Adding support LE scatternet and WBS for Mediatek Chip
 
-__dump_stack lib/dump_stack.c:15 [inline]
-dump_stack+0xc4/0x118 lib/dump_stack.c:56
-register_lock_class kernel/locking/lockdep.c:792 [inline]
-register_lock_class+0x239/0x6f6 kernel/locking/lockdep.c:742
-__lock_acquire+0x209/0x1e27 kernel/locking/lockdep.c:3105
-lock_acquire+0x29c/0x2fb kernel/locking/lockdep.c:3599
-__raw_spin_lock_bh include/linux/spinlock_api_smp.h:137 [inline]
-_raw_spin_lock_bh+0x38/0x47 kernel/locking/spinlock.c:175
-spin_lock_bh include/linux/spinlock.h:307 [inline]
-lock_sock_nested+0x44/0xfa net/core/sock.c:2518
-l2cap_sock_teardown_cb+0x88/0x2fb net/bluetooth/l2cap_sock.c:1345
-l2cap_chan_del+0xa3/0x383 net/bluetooth/l2cap_core.c:598
-l2cap_chan_close+0x537/0x5dd net/bluetooth/l2cap_core.c:756
-l2cap_chan_timeout+0x104/0x17e net/bluetooth/l2cap_core.c:429
-process_one_work+0x7e3/0xcb0 kernel/workqueue.c:2064
-worker_thread+0x5a5/0x773 kernel/workqueue.c:2196
-kthread+0x291/0x2a6 kernel/kthread.c:211
-ret_from_fork+0x4e/0x80 arch/x86/entry/entry_64.S:604
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reported-by: syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Guenter Roeck <groeck@chromium.org>
+Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/l2cap_sock.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/bluetooth/btusb.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index f1b1edd0b697..c99d65ef13b1 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -179,9 +179,17 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
- 	struct sockaddr_l2 la;
- 	int len, err = 0;
-+	bool zapped;
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index a4f834a50a98..3620981e8b1c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -397,7 +397,9 @@ static const struct usb_device_id blacklist_table[] = {
  
- 	BT_DBG("sk %p", sk);
+ 	/* MediaTek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
+-	  .driver_info = BTUSB_MEDIATEK },
++	  .driver_info = BTUSB_MEDIATEK |
++			 BTUSB_WIDEBAND_SPEECH |
++			 BTUSB_VALID_LE_STATES },
  
-+	lock_sock(sk);
-+	zapped = sock_flag(sk, SOCK_ZAPPED);
-+	release_sock(sk);
-+
-+	if (zapped)
-+		return -EINVAL;
-+
- 	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
- 	    addr->sa_family != AF_BLUETOOTH)
- 		return -EINVAL;
+ 	/* Additional MediaTek MT7615E Bluetooth devices */
+ 	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
 -- 
 2.30.2
 
