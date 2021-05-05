@@ -7,44 +7,43 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F72C43603
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E55ADC43470
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:43:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36EF06147E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:34:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9584361402
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:43:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234805AbhEEQfF (ORCPT
+        id S235367AbhEEQn5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 12:35:05 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54520 "EHLO mail.kernel.org"
+        Wed, 5 May 2021 12:43:57 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37174 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234495AbhEEQdf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 12:33:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3FB6D613CB;
-        Wed,  5 May 2021 16:32:26 +0000 (UTC)
+        id S235382AbhEEQlq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 May 2021 12:41:46 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 445D261463;
+        Wed,  5 May 2021 16:34:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232347;
-        bh=MXO7lywpyeZqi4VabcZBelWaWHOEX+WMMkhOrrfSQC8=;
+        s=k20201202; t=1620232478;
+        bh=AavGADOsZ2avaRn0K1KqrtaIz1J3axuxe+z8UCtXzOA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=CZJwtLXxq7uh3trGxljuDT8XPlTLPcfuagJ7PmO3gzufXR1RV0SGaovd0oe6eYmPQ
-         BVjCAurrP1tuvgeagk4GvQh4629OvXgElkYlsLerliL362UYlJfX+A7CNbfAxVup6k
-         2quixFy5YN1ghmjWMgSZnqJeGpNQDCLmFrxi6S5xkK1VAxQtPtIyEBaOSccijk3vg7
-         JKYcSPiH6fB3Rkl5A5uNM7rnKd3omyiOjTTDi0s4zzxmNd/WgiqhS0zXxE9KZd47Ek
-         r/cp1UfSnSHrSNLvzUCBcoz7j5ZPaeSai0fFfIuhWU/zobpM/DTeuKIx2jEsr/9xC3
-         9R7cinVfwiL5g==
+        b=R35jfxBecrp2T2D3uXJosmsj44xS+AHxxXhhh3UlkMXHk9U8zI3lYPzEAwe02ljau
+         roS+PgELePzeTgVrJieZU9a2eMqMPmrK2eNDE8YYysDJ7l4hTbm28aLyNDtwNYhf+j
+         3ObfRhAtu44dGvcQjJDY6qU4kBzccmwRhM7EybHA/ZNMXMLKgOn70G0T0lV1MzJKFK
+         lb4x6kayLZlwojCfrJYRP/58J1Nhh5Kszg8+kbLEhAHugRBaC0UqFJnX/u6/tHiUfY
+         iYuCqW3jqiBD9TmB4DnFQM3TKORPdJ5Skeri8BAuE8V1EGfn8leuFnRcE5z5aVC8eX
+         yP/qfRIHoxmKg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Daniel Winkler <danielwinkler@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
+Cc:     Ayush Garg <ayush.garg@samsung.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.12 045/116] Bluetooth: Do not set cur_adv_instance in adv param MGMT request
-Date:   Wed,  5 May 2021 12:30:13 -0400
-Message-Id: <20210505163125.3460440-45-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.11 017/104] Bluetooth: Fix incorrect status handling in LE PHY UPDATE event
+Date:   Wed,  5 May 2021 12:32:46 -0400
+Message-Id: <20210505163413.3461611-17-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210505163125.3460440-1-sashal@kernel.org>
-References: <20210505163125.3460440-1-sashal@kernel.org>
+In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
+References: <20210505163413.3461611-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -53,49 +52,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Daniel Winkler <danielwinkler@google.com>
+From: Ayush Garg <ayush.garg@samsung.com>
 
-[ Upstream commit b6f1b79deabd32f89adbf24ef7b30f82d029808a ]
+[ Upstream commit 87df8bcccd2cede62dfb97dc3d4ca1fe66cb4f83 ]
 
-We set hdev->cur_adv_instance in the adv param MGMT request to allow the
-callback to the hci param request to set the tx power to the correct
-instance. Now that the callbacks use the advertising handle from the hci
-request (as they should), this workaround is no longer necessary.
+Skip updation of tx and rx PHYs values, when PHY Update
+event's status is not successful.
 
-Furthermore, this change resolves a race condition that is more
-prevalent when using the extended advertising MGMT calls - if
-hdev->cur_adv_instance is set in the params request, then when the data
-request is called, we believe our new instance is already active. This
-treats it as an update and immediately schedules the instance with the
-controller, which has a potential race with the software rotation adv
-update. By not setting hdev->cur_adv_instance too early, the new
-instance is queued as it should be, to be used when the rotation comes
-around again.
-
-This change is tested on harrison peak to confirm that it resolves the
-race condition on registration, and that there is no regression in
-single- and multi-advertising automated tests.
-
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Daniel Winkler <danielwinkler@google.com>
+Signed-off-by: Ayush Garg <ayush.garg@samsung.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/mgmt.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/bluetooth/hci_event.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 74971b4bd457..939c6f77fecc 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7976,7 +7976,6 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 67668be3461e..b3872c7a64e1 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5911,7 +5911,7 @@ static void hci_le_phy_update_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
--	hdev->cur_adv_instance = cp->instance;
- 	/* Submit request for advertising params if ext adv available */
- 	if (ext_adv_capable(hdev)) {
- 		hci_req_init(&req, hdev);
+ 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
+ 
+-	if (!ev->status)
++	if (ev->status)
+ 		return;
+ 
+ 	hci_dev_lock(hdev);
 -- 
 2.30.2
 
