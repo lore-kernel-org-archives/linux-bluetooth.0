@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4ACAAC43460
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 17:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E1C5C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 17:02:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18CB761059
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 17:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E5FA3613EB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 17:02:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236459AbhEERC6 (ORCPT
+        id S236519AbhEERDC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 13:02:58 -0400
-Received: from mail.kernel.org ([198.145.29.99]:42904 "EHLO mail.kernel.org"
+        Wed, 5 May 2021 13:03:02 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44938 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236399AbhEEQ5C (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 12:57:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2EF5461584;
-        Wed,  5 May 2021 16:39:13 +0000 (UTC)
+        id S237102AbhEEQ5T (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 May 2021 12:57:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 71136619A2;
+        Wed,  5 May 2021 16:39:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232754;
-        bh=/b4fcH/ug+YTYHUPBnpnH5l5hxMCrb8TqmcbnRFcsx8=;
+        s=k20201202; t=1620232758;
+        bh=gpsENFJFQlAg8tfJQFpKGzd/hBl01D39MzOVUetkRYo=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=M2P8Zi2Aa3sKHDJfLE1ZMStyNv8+nG2XecTTAVAFv7zAagaXafg0yk89kwO4M22V/
-         RdicRIZd5zifkwFEmRh4e7lRQQkhKbMIZYzFcmqiUWG7n/tkI6o8DpNSnB2te+Z7aE
-         e/Nu6RWwj6JYhKwLMF7X8R5iY/LvtGsG5Ep1pAFQN32EGGAyCRz9e9cp/NX5N8t6C5
-         aIog0qH6DdLd7zOmAe4PcQ7mMzCL/BP1gfvDBfq6EPudhSb/E69lMxDt7loyiyyY0E
-         dPbvYs9/PxTMcoBQXcfM7EobsuG2yFcGz4BpTX+b2syK6Ul63/dHwqMlcSFgwxaXtG
-         JkrQuwTeiZPsA==
+        b=Hw5MSwR6aOaDvpB3Jg0MccwXdGBVpMNjCfKkl/SIJu3WVH6yAC7dEyYtguajkEHb5
+         K7/Zbra2VtTI3m1ihBbH9fPGC27xmqANTVOyr37qRd9UnURuOQcdjHtyn3pES5HEG9
+         U8iBJqiiwqY3IT+K89Wldl52lEdALfRtTgzSF4L/qkh/WijZt+QTv7pYcSLIOSAJes
+         BKcsk5chFaJUWrBW1Ntb59RS/UDle6WkvzqBYfMD2xFNUJ31YHPaMWSCRfa3YH29v0
+         OqzLuPFa1jBLFwVxKxUXkSG1A9lF5CLlF+VRS4LzHSCZ0HRg6b4rp+xDronelIuRk1
+         wTQ9F7z/sJ8qg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Archie Pusaka <apusaka@chromium.org>,
-        syzbot+98228e7407314d2d4ba2@syzkaller.appspotmail.com,
+        syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com,
         Alain Michaud <alainm@chromium.org>,
         Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Guenter Roeck <groeck@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 12/46] Bluetooth: verify AMP hci_chan before amp_destroy
-Date:   Wed,  5 May 2021 12:38:22 -0400
-Message-Id: <20210505163856.3463279-12-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.4 15/46] Bluetooth: check for zapped sk before connecting
+Date:   Wed,  5 May 2021 12:38:25 -0400
+Message-Id: <20210505163856.3463279-15-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210505163856.3463279-1-sashal@kernel.org>
 References: <20210505163856.3463279-1-sashal@kernel.org>
@@ -57,140 +58,65 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-[ Upstream commit 5c4c8c9544099bb9043a10a5318130a943e32fc3 ]
+[ Upstream commit 3af70b39fa2d415dc86c370e5b24ddb9fdacbd6f ]
 
-hci_chan can be created in 2 places: hci_loglink_complete_evt() if
-it is an AMP hci_chan, or l2cap_conn_add() otherwise. In theory,
-Only AMP hci_chan should be removed by a call to
-hci_disconn_loglink_complete_evt(). However, the controller might mess
-up, call that function, and destroy an hci_chan which is not initiated
-by hci_loglink_complete_evt().
+There is a possibility of receiving a zapped sock on
+l2cap_sock_connect(). This could lead to interesting crashes, one
+such case is tearing down an already tore l2cap_sock as is happened
+with this call trace:
 
-This patch adds a verification that the destroyed hci_chan must have
-been init'd by hci_loglink_complete_evt().
-
-Example crash call trace:
-Call Trace:
- __dump_stack lib/dump_stack.c:77 [inline]
- dump_stack+0xe3/0x144 lib/dump_stack.c:118
- print_address_description+0x67/0x22a mm/kasan/report.c:256
- kasan_report_error mm/kasan/report.c:354 [inline]
- kasan_report mm/kasan/report.c:412 [inline]
- kasan_report+0x251/0x28f mm/kasan/report.c:396
- hci_send_acl+0x3b/0x56e net/bluetooth/hci_core.c:4072
- l2cap_send_cmd+0x5af/0x5c2 net/bluetooth/l2cap_core.c:877
- l2cap_send_move_chan_cfm_icid+0x8e/0xb1 net/bluetooth/l2cap_core.c:4661
- l2cap_move_fail net/bluetooth/l2cap_core.c:5146 [inline]
- l2cap_move_channel_rsp net/bluetooth/l2cap_core.c:5185 [inline]
- l2cap_bredr_sig_cmd net/bluetooth/l2cap_core.c:5464 [inline]
- l2cap_sig_channel net/bluetooth/l2cap_core.c:5799 [inline]
- l2cap_recv_frame+0x1d12/0x51aa net/bluetooth/l2cap_core.c:7023
- l2cap_recv_acldata+0x2ea/0x693 net/bluetooth/l2cap_core.c:7596
- hci_acldata_packet net/bluetooth/hci_core.c:4606 [inline]
- hci_rx_work+0x2bd/0x45e net/bluetooth/hci_core.c:4796
- process_one_work+0x6f8/0xb50 kernel/workqueue.c:2175
- worker_thread+0x4fc/0x670 kernel/workqueue.c:2321
- kthread+0x2f0/0x304 kernel/kthread.c:253
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:415
-
-Allocated by task 38:
- set_track mm/kasan/kasan.c:460 [inline]
- kasan_kmalloc+0x8d/0x9a mm/kasan/kasan.c:553
- kmem_cache_alloc_trace+0x102/0x129 mm/slub.c:2787
- kmalloc include/linux/slab.h:515 [inline]
- kzalloc include/linux/slab.h:709 [inline]
- hci_chan_create+0x86/0x26d net/bluetooth/hci_conn.c:1674
- l2cap_conn_add.part.0+0x1c/0x814 net/bluetooth/l2cap_core.c:7062
- l2cap_conn_add net/bluetooth/l2cap_core.c:7059 [inline]
- l2cap_connect_cfm+0x134/0x852 net/bluetooth/l2cap_core.c:7381
- hci_connect_cfm+0x9d/0x122 include/net/bluetooth/hci_core.h:1404
- hci_remote_ext_features_evt net/bluetooth/hci_event.c:4161 [inline]
- hci_event_packet+0x463f/0x72fa net/bluetooth/hci_event.c:5981
- hci_rx_work+0x197/0x45e net/bluetooth/hci_core.c:4791
- process_one_work+0x6f8/0xb50 kernel/workqueue.c:2175
- worker_thread+0x4fc/0x670 kernel/workqueue.c:2321
- kthread+0x2f0/0x304 kernel/kthread.c:253
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:415
-
-Freed by task 1732:
- set_track mm/kasan/kasan.c:460 [inline]
- __kasan_slab_free mm/kasan/kasan.c:521 [inline]
- __kasan_slab_free+0x106/0x128 mm/kasan/kasan.c:493
- slab_free_hook mm/slub.c:1409 [inline]
- slab_free_freelist_hook+0xaa/0xf6 mm/slub.c:1436
- slab_free mm/slub.c:3009 [inline]
- kfree+0x182/0x21e mm/slub.c:3972
- hci_disconn_loglink_complete_evt net/bluetooth/hci_event.c:4891 [inline]
- hci_event_packet+0x6a1c/0x72fa net/bluetooth/hci_event.c:6050
- hci_rx_work+0x197/0x45e net/bluetooth/hci_core.c:4791
- process_one_work+0x6f8/0xb50 kernel/workqueue.c:2175
- worker_thread+0x4fc/0x670 kernel/workqueue.c:2321
- kthread+0x2f0/0x304 kernel/kthread.c:253
- ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:415
-
-The buggy address belongs to the object at ffff8881d7af9180
- which belongs to the cache kmalloc-128 of size 128
-The buggy address is located 24 bytes inside of
- 128-byte region [ffff8881d7af9180, ffff8881d7af9200)
-The buggy address belongs to the page:
-page:ffffea00075ebe40 count:1 mapcount:0 mapping:ffff8881da403200 index:0x0
-flags: 0x8000000000000200(slab)
-raw: 8000000000000200 dead000000000100 dead000000000200 ffff8881da403200
-raw: 0000000000000000 0000000080150015 00000001ffffffff 0000000000000000
-page dumped because: kasan: bad access detected
-
-Memory state around the buggy address:
- ffff8881d7af9080: fc fc fc fc fc fc fc fc fb fb fb fb fb fb fb fb
- ffff8881d7af9100: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
->ffff8881d7af9180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-                            ^
- ffff8881d7af9200: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
- ffff8881d7af9280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+__dump_stack lib/dump_stack.c:15 [inline]
+dump_stack+0xc4/0x118 lib/dump_stack.c:56
+register_lock_class kernel/locking/lockdep.c:792 [inline]
+register_lock_class+0x239/0x6f6 kernel/locking/lockdep.c:742
+__lock_acquire+0x209/0x1e27 kernel/locking/lockdep.c:3105
+lock_acquire+0x29c/0x2fb kernel/locking/lockdep.c:3599
+__raw_spin_lock_bh include/linux/spinlock_api_smp.h:137 [inline]
+_raw_spin_lock_bh+0x38/0x47 kernel/locking/spinlock.c:175
+spin_lock_bh include/linux/spinlock.h:307 [inline]
+lock_sock_nested+0x44/0xfa net/core/sock.c:2518
+l2cap_sock_teardown_cb+0x88/0x2fb net/bluetooth/l2cap_sock.c:1345
+l2cap_chan_del+0xa3/0x383 net/bluetooth/l2cap_core.c:598
+l2cap_chan_close+0x537/0x5dd net/bluetooth/l2cap_core.c:756
+l2cap_chan_timeout+0x104/0x17e net/bluetooth/l2cap_core.c:429
+process_one_work+0x7e3/0xcb0 kernel/workqueue.c:2064
+worker_thread+0x5a5/0x773 kernel/workqueue.c:2196
+kthread+0x291/0x2a6 kernel/kthread.c:211
+ret_from_fork+0x4e/0x80 arch/x86/entry/entry_64.S:604
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reported-by: syzbot+98228e7407314d2d4ba2@syzkaller.appspotmail.com
+Reported-by: syzbot+abfc0f5e668d4099af73@syzkaller.appspotmail.com
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Guenter Roeck <groeck@chromium.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- include/net/bluetooth/hci_core.h | 1 +
- net/bluetooth/hci_event.c        | 3 ++-
- 2 files changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/l2cap_sock.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 3cd232cf29c6..325e8efb5b36 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -540,6 +540,7 @@ struct hci_chan {
- 	struct sk_buff_head data_q;
- 	unsigned int	sent;
- 	__u8		state;
-+	bool		amp;
- };
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index 8648c5211ebe..e693fee08623 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -179,9 +179,17 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
+ 	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
+ 	struct sockaddr_l2 la;
+ 	int len, err = 0;
++	bool zapped;
  
- struct hci_conn_params {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 0a88645f103f..bd678ffdaef7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4840,6 +4840,7 @@ static void hci_loglink_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
+ 	BT_DBG("sk %p", sk);
  
- 	hchan->handle = le16_to_cpu(ev->handle);
-+	hchan->amp = true;
- 
- 	BT_DBG("hcon %p mgr %p hchan %p", hcon, hcon->amp_mgr, hchan);
- 
-@@ -4872,7 +4873,7 @@ static void hci_disconn_loglink_complete_evt(struct hci_dev *hdev,
- 	hci_dev_lock(hdev);
- 
- 	hchan = hci_chan_lookup_handle(hdev, le16_to_cpu(ev->handle));
--	if (!hchan)
-+	if (!hchan || !hchan->amp)
- 		goto unlock;
- 
- 	amp_destroy_logical_link(hchan, ev->reason);
++	lock_sock(sk);
++	zapped = sock_flag(sk, SOCK_ZAPPED);
++	release_sock(sk);
++
++	if (zapped)
++		return -EINVAL;
++
+ 	if (!addr || alen < offsetofend(struct sockaddr, sa_family) ||
+ 	    addr->sa_family != AF_BLUETOOTH)
+ 		return -EINVAL;
 -- 
 2.30.2
 
