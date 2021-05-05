@@ -7,41 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DFEAC4360C
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7C21C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3FD56613C3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C04846142C
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:44:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236048AbhEEQpd (ORCPT
+        id S236056AbhEEQpf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 12:45:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:49546 "EHLO mail.kernel.org"
+        Wed, 5 May 2021 12:45:35 -0400
+Received: from mail.kernel.org ([198.145.29.99]:39078 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235346AbhEEQny (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 12:43:54 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3483361878;
-        Wed,  5 May 2021 16:35:13 +0000 (UTC)
+        id S235487AbhEEQl7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 May 2021 12:41:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 607DC6186A;
+        Wed,  5 May 2021 16:34:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232514;
-        bh=whOO/qEGOEz7yoV6ZAmhRiWRqssU/z4LEZFhx831jh8=;
+        s=k20201202; t=1620232489;
+        bh=nlRjb1u7hSZ9ilo4vAun6ueLqcGnriYGmhd3kAeYos4=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=pVq4xfBYgDWzDprwSKXj+ZsSzYb9bol1pvsn7LB+ktJVjgNJwL7bUieWi4vKU8Bz9
-         HxlGtOREAJyQGca0pPxR7VfdgJWPqVdHe8Aq1oWqR7MT3wxoR7maxySO9FLN9ZRTXL
-         ng/Tw6sFNwJa/GRs7UDwF75tsRGl9GRLZ34O6LCDLLBqYIOuU41AAyxIF85Ynsntma
-         qz0G9CAgXgbO51f7sV2Djzo3yobKAUfu0Y/hj2a2c8vjNeTYkZBO0cACULXXhalvDJ
-         Y6R6nRP/sIWXI4IOe9jIrFmZRdmU6sQZeWE8Qb9b2QnPLtZeZ4uv7L/g/FO55WmJpq
-         ZNonoNZUzfNFA==
+        b=ZabK5x5EAiHoKxcM/YPU98UunKB5UFm9DK7izbl5o9fYsvAjB7ViYAYqO+Z8PNl4O
+         hU6vAJz4jrqwQcnP2asNZ/d7OzAH5B3pDyRpBt4O4A4vXH11O1FA1f+GL/I9txANMx
+         iomD+2KlK1MWO8sSsxNp/X2cnhjgHQgqNG+WcSG2uFk9GIvrn6xixnL1NFJVY2L+en
+         OKwJskXqyIMi5CAcTDY2h5FLKV2OstiWoj1CmxDRYJQb9zMdzQdKSroNoAzlEJGrsV
+         YoecCSxYFS4lEfwZLcHFZ9nrY8AujyA2OgUnFDF17JPGtq61CkMAzV11kx3JlYpOBp
+         k8Hy2BH5txD6w==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Daniel Winkler <danielwinkler@google.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
+Cc:     Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+        syzbot <syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.11 042/104] Bluetooth: Do not set cur_adv_instance in adv param MGMT request
-Date:   Wed,  5 May 2021 12:33:11 -0400
-Message-Id: <20210505163413.3461611-42-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.11 025/104] Bluetooth: initialize skb_queue_head at l2cap_chan_create()
+Date:   Wed,  5 May 2021 12:32:54 -0400
+Message-Id: <20210505163413.3461611-25-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210505163413.3461611-1-sashal@kernel.org>
 References: <20210505163413.3461611-1-sashal@kernel.org>
@@ -53,49 +53,41 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Daniel Winkler <danielwinkler@google.com>
+From: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 
-[ Upstream commit b6f1b79deabd32f89adbf24ef7b30f82d029808a ]
+[ Upstream commit be8597239379f0f53c9710dd6ab551bbf535bec6 ]
 
-We set hdev->cur_adv_instance in the adv param MGMT request to allow the
-callback to the hci param request to set the tx power to the correct
-instance. Now that the callbacks use the advertising handle from the hci
-request (as they should), this workaround is no longer necessary.
+syzbot is hitting "INFO: trying to register non-static key." message [1],
+for "struct l2cap_chan"->tx_q.lock spinlock is not yet initialized when
+l2cap_chan_del() is called due to e.g. timeout.
 
-Furthermore, this change resolves a race condition that is more
-prevalent when using the extended advertising MGMT calls - if
-hdev->cur_adv_instance is set in the params request, then when the data
-request is called, we believe our new instance is already active. This
-treats it as an update and immediately schedules the instance with the
-controller, which has a potential race with the software rotation adv
-update. By not setting hdev->cur_adv_instance too early, the new
-instance is queued as it should be, to be used when the rotation comes
-around again.
+Since "struct l2cap_chan"->lock mutex is initialized at l2cap_chan_create()
+immediately after "struct l2cap_chan" is allocated using kzalloc(), let's
+as well initialize "struct l2cap_chan"->{tx_q,srej_q}.lock spinlocks there.
 
-This change is tested on harrison peak to confirm that it resolves the
-race condition on registration, and that there is no regression in
-single- and multi-advertising automated tests.
+[1] https://syzkaller.appspot.com/bug?extid=fadfba6a911f6bf71842
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Daniel Winkler <danielwinkler@google.com>
+Reported-and-tested-by: syzbot <syzbot+fadfba6a911f6bf71842@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/mgmt.c | 1 -
- 1 file changed, 1 deletion(-)
+ net/bluetooth/l2cap_core.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index fa0f7a4a1d2f..01e143c2bbc0 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7768,7 +7768,6 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
- 		goto unlock;
- 	}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 46da4c1d0177..78776d0782c5 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -451,6 +451,8 @@ struct l2cap_chan *l2cap_chan_create(void)
+ 	if (!chan)
+ 		return NULL;
  
--	hdev->cur_adv_instance = cp->instance;
- 	/* Submit request for advertising params if ext adv available */
- 	if (ext_adv_capable(hdev)) {
- 		hci_req_init(&req, hdev);
++	skb_queue_head_init(&chan->tx_q);
++	skb_queue_head_init(&chan->srej_q);
+ 	mutex_init(&chan->lock);
+ 
+ 	/* Set default lock nesting level */
 -- 
 2.30.2
 
