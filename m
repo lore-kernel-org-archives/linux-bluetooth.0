@@ -7,42 +7,41 @@ X-Spam-Status: No, score=-19.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5788C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:33:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 59F72C43603
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:34:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B2F9761629
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:33:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36EF06147E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 16:34:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234445AbhEEQes (ORCPT
+        id S234805AbhEEQfF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 12:34:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:54092 "EHLO mail.kernel.org"
+        Wed, 5 May 2021 12:35:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54520 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234456AbhEEQdY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 12:33:24 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 91F4B6140E;
-        Wed,  5 May 2021 16:32:20 +0000 (UTC)
+        id S234495AbhEEQdf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 5 May 2021 12:33:35 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 3FB6D613CB;
+        Wed,  5 May 2021 16:32:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1620232341;
-        bh=M8zuBxLrA0vWx8Ky/9hlYUJL/Fo3+UCk3ey4IvlmNhI=;
+        s=k20201202; t=1620232347;
+        bh=MXO7lywpyeZqi4VabcZBelWaWHOEX+WMMkhOrrfSQC8=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=AxXY/5yI/115QO/sWqjQkDj8sNRrYNtL0KOSYzkoo41+I0fk/RitWGdK+yqOg5lj6
-         0iGgdQkCj23ugnv8bMLKLmwSMC+VaUn/SMhq9TieVJRCTfsZGzD7HhH6L94evmsRmm
-         fZuncp6yHqdS00P4msi/IKXgqsgE2jGYNv+rWhEyVxP63aCzDyUMn8HkoLNeTPSUNS
-         ZjpSApLOrSLZb/fuMGahob7Hes3SFv+MFf52v7r9Zcgs/e20xvI7W1RdhyBubuLY8u
-         QILJsvmRIGzMQD+pQDyy3eQCvig5wQhYz69dkC0vEDORaBeS4Ygf0ceW35jvrUmPP4
-         n1E/B/NQjq8vQ==
+        b=CZJwtLXxq7uh3trGxljuDT8XPlTLPcfuagJ7PmO3gzufXR1RV0SGaovd0oe6eYmPQ
+         BVjCAurrP1tuvgeagk4GvQh4629OvXgElkYlsLerliL362UYlJfX+A7CNbfAxVup6k
+         2quixFy5YN1ghmjWMgSZnqJeGpNQDCLmFrxi6S5xkK1VAxQtPtIyEBaOSccijk3vg7
+         JKYcSPiH6fB3Rkl5A5uNM7rnKd3omyiOjTTDi0s4zzxmNd/WgiqhS0zXxE9KZd47Ek
+         r/cp1UfSnSHrSNLvzUCBcoz7j5ZPaeSai0fFfIuhWU/zobpM/DTeuKIx2jEsr/9xC3
+         9R7cinVfwiL5g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "mark-yw.chen" <mark-yw.chen@mediatek.com>,
+Cc:     Daniel Winkler <danielwinkler@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.12 041/116] Bluetooth: btusb: Enable quirk boolean flag for Mediatek Chip.
-Date:   Wed,  5 May 2021 12:30:09 -0400
-Message-Id: <20210505163125.3460440-41-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.12 045/116] Bluetooth: Do not set cur_adv_instance in adv param MGMT request
+Date:   Wed,  5 May 2021 12:30:13 -0400
+Message-Id: <20210505163125.3460440-45-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210505163125.3460440-1-sashal@kernel.org>
 References: <20210505163125.3460440-1-sashal@kernel.org>
@@ -54,34 +53,49 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: "mark-yw.chen" <mark-yw.chen@mediatek.com>
+From: Daniel Winkler <danielwinkler@google.com>
 
-[ Upstream commit 27e554a4fcd84e499bf0a82122b8c4c3f1de38b6 ]
+[ Upstream commit b6f1b79deabd32f89adbf24ef7b30f82d029808a ]
 
-Adding support LE scatternet and WBS for Mediatek Chip
+We set hdev->cur_adv_instance in the adv param MGMT request to allow the
+callback to the hci param request to set the tx power to the correct
+instance. Now that the callbacks use the advertising handle from the hci
+request (as they should), this workaround is no longer necessary.
 
-Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+Furthermore, this change resolves a race condition that is more
+prevalent when using the extended advertising MGMT calls - if
+hdev->cur_adv_instance is set in the params request, then when the data
+request is called, we believe our new instance is already active. This
+treats it as an update and immediately schedules the instance with the
+controller, which has a potential race with the software rotation adv
+update. By not setting hdev->cur_adv_instance too early, the new
+instance is queued as it should be, to be used when the rotation comes
+around again.
+
+This change is tested on harrison peak to confirm that it resolves the
+race condition on registration, and that there is no regression in
+single- and multi-advertising automated tests.
+
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Daniel Winkler <danielwinkler@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ net/bluetooth/mgmt.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5cbfbd948f67..4a901508e48e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -399,7 +399,9 @@ static const struct usb_device_id blacklist_table[] = {
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 74971b4bd457..939c6f77fecc 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -7976,7 +7976,6 @@ static int add_ext_adv_params(struct sock *sk, struct hci_dev *hdev,
+ 		goto unlock;
+ 	}
  
- 	/* MediaTek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0e8d, 0xe0, 0x01, 0x01),
--	  .driver_info = BTUSB_MEDIATEK },
-+	  .driver_info = BTUSB_MEDIATEK |
-+			 BTUSB_WIDEBAND_SPEECH |
-+			 BTUSB_VALID_LE_STATES },
- 
- 	/* Additional MediaTek MT7615E Bluetooth devices */
- 	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
+-	hdev->cur_adv_instance = cp->instance;
+ 	/* Submit request for advertising params if ext adv available */
+ 	if (ext_adv_capable(hdev)) {
+ 		hci_req_init(&req, hdev);
 -- 
 2.30.2
 
