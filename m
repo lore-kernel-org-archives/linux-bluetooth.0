@@ -8,52 +8,52 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5C3BC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 18:44:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A81C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 18:44:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8867D613C4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 18:44:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E3926105A
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  5 May 2021 18:44:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234475AbhEESpE (ORCPT
+        id S234684AbhEESpF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 14:45:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38946 "EHLO
+        Wed, 5 May 2021 14:45:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38948 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbhEESpD (ORCPT
+        with ESMTP id S234557AbhEESpE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 14:45:03 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4226CC061574
+        Wed, 5 May 2021 14:45:04 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CEC51C061574
         for <linux-bluetooth@vger.kernel.org>; Wed,  5 May 2021 11:44:07 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id k19so2670871pfu.5
+Received: by mail-pf1-x434.google.com with SMTP id e15so2623585pfv.10
         for <linux-bluetooth@vger.kernel.org>; Wed, 05 May 2021 11:44:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=IldoP9ZdzuRpoaqQQEjWc1taE7gjMYerrGgSFZuozmA=;
-        b=q0kmTD1LVffNhwTF0+lQjLj8ZrZ16cg3b0LNECMuXs6Q0co7ChbTl+Y/A6V+RL2fn+
-         y+nLBF3Dt52QvCO9Oix5Y9jVTbsDhuaisCNvJQbkaG5v4+MDpZE6eM3cIzvhn1UnOlBE
-         qAlUQxfV+PGMjb9NoOyPwqcJB8cg2FSVW5gNe7UqN9Z4Xu8wY0/+mNy6PXnWySya1ZCe
-         O9i5MrOTqNMuMOtUO0tVxoQyiWGjxCw53p5YvydcCIK48Pso03bz9FTNjr3vHMgRiL7H
-         IIsLBv7kPCpCJXhVi2U7ZmARGmjOrvpxQrdQKbnwLBUVMsut8CIm44AXQF0EZHLYLVR9
-         spBA==
+        bh=CgBYmRk0gUh5MkdGk8tLwYIrT5PtzLUpvM3joEDIqLU=;
+        b=pea9aJPPsC8dZXx1FOvmCVYzoqpEi7TcoUUQkcjEVFkIRsKwET7gthuhB4yuJpfn2G
+         awMkZlHJFzqKqI5cbLUqTUAdOlAEobwKJZOcXgzNk27hHVhj6C7zQ+q9a/we2HF4+PEJ
+         vxaAvKJXFDjmU/Ph3nHK47mQMGMwXcqBS1q9YNFJqNC5raiB4G5AHpzsAvZvikoYDBbJ
+         00dOtUNMPahItiq7N7Todhj9TQKdPqbELjJLuL9Xtsq5/MrWNA5jNYFsVxuOw3jaPA/u
+         6LQC+RhBSYDinpcy0xkXwULoehx80jGXH9LF5cgysiqxHjv52+klq1ejqAV8GAynDMX7
+         edJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IldoP9ZdzuRpoaqQQEjWc1taE7gjMYerrGgSFZuozmA=;
-        b=QAuYgpwX8dDmA30Kv87ZIjmwbxAPX0IgFuFi3dUhU9KXqhWMY2TZkgr5VMh5vzp1jU
-         DaCLAyi52iii87xxelziSx+yBW+njALRu8fG1XQzwlSqz2dofLBzSakn6gdwWHzuK9zz
-         yVG5SgkE2ivi1RyEtjxtLXNhmgqktI+aOA6lrwCFbo3QMfgYOOMvMHijnONEd1f+GsV9
-         TBggdFd0T5pWlyp8ULHsaTA0BZHb41n9d4JnrTY6iX3H+pZP6pPyGnH2h51HiFzcQaZ7
-         Wby/iec9jfV3oBHvdb+B6XqHuskmHUuCJA8CFdq5U8+XEaaN4xuLgnsqz8MqIUXS2FFg
-         sZAA==
-X-Gm-Message-State: AOAM532YCi71IWH7tdhRQkCsulZtOTk8fMsuK5csgwZet3T9Yjg94gBu
-        GcEvk77P9HN1xSWTiNVD8kyaeAprD6n1TA==
-X-Google-Smtp-Source: ABdhPJxyTGRxo53AJOu4UgLPeWpcEVmS2/CEDAQ98Qnt0P8uGOVfYkk6dVgLD4SBFfOO8fbu5b8kHQ==
-X-Received: by 2002:a63:150c:: with SMTP id v12mr328523pgl.344.1620240246682;
-        Wed, 05 May 2021 11:44:06 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=CgBYmRk0gUh5MkdGk8tLwYIrT5PtzLUpvM3joEDIqLU=;
+        b=TAoMKhzuyqphCwkER1a2k6p/5QFqPEevMnuCtX/BhmEHvNtzhk2evH+vMBmjmUE0VZ
+         pL657axuX8oIeQQmKqRL+bPrkh8mFbVLcix+Y01HB3J3Nrz1J6IAzHRyLPsWgH/tLjUw
+         hHHS1ov6UR62UQj1CNNOGOzvv68x2y99SauHrWuhmq88QJzGztUl90wz3v/v9GYNzrhM
+         IqbfQ/EPQVFuaM9o9cRuZ0fYnlxg3DPck2IW1eyEUcU+s9jmr11hxWUyDMtI/ei2ZVzL
+         Gm1ftIs7Np9p4qM186GEQQGx/gKMrGY+2PRh2OKap5AMkvz27Rvs8CY8E7VzqosZGCsI
+         m9zw==
+X-Gm-Message-State: AOAM533EajrWvQXb9VwqHd3xYtsocRILyiuqTYWO8HPu+4USUxDtEgDi
+        48cwBgd/1d9+RI85yegp7JdPU+NzzdKiyw==
+X-Google-Smtp-Source: ABdhPJxtIpfVALzuIpAiNqiDUHptF6CfIAjiU6D6bxqMe6iG6dAoeB5kDkDjH4IjtWvcCrcHjZzPxw==
+X-Received: by 2002:a62:8c09:0:b029:28e:bca9:5985 with SMTP id m9-20020a628c090000b029028ebca95985mr246447pfd.10.1620240247247;
+        Wed, 05 May 2021 11:44:07 -0700 (PDT)
 Received: from han1-mobl3.hsd1.or.comcast.net ([2601:1c0:6a01:d830::f7ee])
         by smtp.gmail.com with ESMTPSA id z16sm7855584pjq.42.2021.05.05.11.44.06
         for <linux-bluetooth@vger.kernel.org>
@@ -61,10 +61,12 @@ Received: from han1-mobl3.hsd1.or.comcast.net ([2601:1c0:6a01:d830::f7ee])
         Wed, 05 May 2021 11:44:06 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH 1/2] gitignore: Add generated files to the ignore list
-Date:   Wed,  5 May 2021 11:44:04 -0700
-Message-Id: <20210505184405.1077111-1-hj.tedd.an@gmail.com>
+Subject: [BlueZ PATCH 2/2] build: Add generated manpages to distribute list
+Date:   Wed,  5 May 2021 11:44:05 -0700
+Message-Id: <20210505184405.1077111-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.26.3
+In-Reply-To: <20210505184405.1077111-1-hj.tedd.an@gmail.com>
+References: <20210505184405.1077111-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -73,86 +75,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds generated files like manpages and binaries to the
-ignore list so it won't show with 'git status'.
+This patch adds generated manpages to the distribution list.
 ---
- .gitignore | 16 ++++++++++++++--
- 1 file changed, 14 insertions(+), 2 deletions(-)
+ Makefile.am | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/.gitignore b/.gitignore
-index f4fb5db28..9c8393a81 100644
---- a/.gitignore
-+++ b/.gitignore
-@@ -47,23 +47,33 @@ tools/avinfo
- tools/bccmd
- tools/hwdb
- tools/ciptool
-+tools/ciptool.1
- tools/hciattach
-+tools/hciattach.1
- tools/hciconfig
-+tools/hciconfig.1
- tools/hcieventmask
- tools/hcisecfilter
- tools/hcitool
-+tools/hcitool.1
- tools/hcidump
-+tools/hcidump.1
- tools/hid2hci
-+tools/hid2hci.1
- tools/rfcomm
-+tools/rfcomm.1
- tools/l2ping
-+tools/l2ping.1
- tools/l2test
- tools/cltest
- tools/rctest
-+tools/rctest.1
- tools/scotest
- tools/amptest
- tools/oobtest
- tools/advtest
- tools/sdptool
-+tools/sdptool.1
- tools/avtest
- tools/bdaddr
- tools/bluemoon
-@@ -116,6 +126,7 @@ tools/rfcomm-tester
- tools/bnep-tester
- tools/userchan-tester
- tools/btattach
-+tools/btattach.1
- tools/btconfig
- tools/btmgmt
- tools/btsnoop
-@@ -125,15 +136,18 @@ tools/btmon-logger
- tools/bluetooth-logger.service
- peripheral/btsensor
- monitor/btmon
-+monitor/btmon.1
- emulator/btvirt
- emulator/b1ee
- emulator/hfp
- client/bluetoothctl
- tools/meshctl
- tools/mesh-cfgclient
-+tools/mesh-cfgtest
- mesh/bluetooth-meshd
+diff --git a/Makefile.am b/Makefile.am
+index 52e0e9ed8..42c1d0d9a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -594,7 +594,8 @@ if LIBRARY
+ pkgconfig_DATA = lib/bluez.pc
+ endif
  
- src/bluetoothd.8
-+src/bluetoothd.rst
- src/bluetooth.service
- mesh/bluetooth-mesh.service
+-EXTRA_DIST += $(manual_pages:.1=.rst)
++EXTRA_DIST += $(manual_pages) $(patsubst %.1,%.rst, \
++				$(patsubst %.8,%.rst,$(manual_pages)))
  
-@@ -157,8 +171,6 @@ unit/test-mesh-crypto
- unit/test-*.log
- unit/test-*.trs
- 
--doc/btmon.1
--
- android/system-emulator
- android/bluetoothd
- android/avdtptest
+ DISTCHECK_CONFIGURE_FLAGS = --disable-datafiles --enable-library \
+ 						--enable-health \
 -- 
 2.26.3
 
