@@ -2,113 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8539C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 03:43:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37DD0C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 04:04:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 94F3D611CB
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 03:43:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0CA3661207
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 04:04:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231233AbhEFDoH (ORCPT
+        id S230130AbhEFEE6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 5 May 2021 23:44:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44882 "EHLO
+        Thu, 6 May 2021 00:04:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49500 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230446AbhEFDoG (ORCPT
+        with ESMTP id S229564AbhEFEE6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 5 May 2021 23:44:06 -0400
-Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77291C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  5 May 2021 20:43:08 -0700 (PDT)
-Received: by mail-pj1-x1049.google.com with SMTP id u5-20020a17090a3fc5b029014e545d9a6eso2140230pjm.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 05 May 2021 20:43:08 -0700 (PDT)
+        Thu, 6 May 2021 00:04:58 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5310C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  5 May 2021 21:03:59 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id o27so3786783qkj.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 05 May 2021 21:03:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=v4sIB7CW7eNqeHRknNb8xK7/J/zKawxOJQD/udkqmgA=;
-        b=A6Slnis0Gy0YdgrM8+X6MAT/k2xhU/dKAIjiBzdgNRTVATHjEpOuSbB5Nd7hUAe/Qt
-         Lj49Jo2bNPf8oAsV14vpFNa1eg0Z6zZSvubUJE79qx/KKqiP96fEWtFNRVC93vYy1oJ0
-         vvnjhgTUV/mdBe4q/fPfukdRd9M0k5shwp5fwgh5Uhwz5p4HMYdKkA28n4qEXv3m4taX
-         j90gBUddIpGsxB8wwOGAxJvQlKYqfj5IDyONRvqZmz9EvTatBf2y9K5aZ0l7u07B6vK8
-         +k+LoVPaSNlaFWyV9WAqnmDLANxkonfPSUh5LcUdbl+sXaPLxDPNEVTVTQnDIxlnA9YP
-         slog==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=lseyQQX+hiFmG0SI4BDlBYVh2edQapduJ5YXkTqlXd4=;
+        b=BXrCuFooTtA/4VqjLX3fhmhrb9lz64zxQ7/hqtNjrB40NRv5pETf9Bz9bb1iNbRTJl
+         mMXDILvenKb45BlwlYTExHx1j+jhbPhp1AWAJcoi9f919Uu7hvqAMb5Ck41+vT3CMyfH
+         IlVkFGwiJXoYhuQy3ZDCxPotQY0ZpFdjqOK+6dRxafXkSu0WDA8Zt5SAHHM07TuyhTcQ
+         ER9afVOYJH2MWYQodgyR04RyglwjAmy5qh8lAFvZcXzJ6+vG3rzrbEEdhDnPRxWxdvWb
+         gGwdmHGfgpA3rbOVLXnbhDxEv3xODO3VxZKVtNP+X9hJybDLMOy3EOsqCVNmHhR7V7wR
+         JlKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=v4sIB7CW7eNqeHRknNb8xK7/J/zKawxOJQD/udkqmgA=;
-        b=ZNRFzTT0G2bkIhjoamq9b7u2VTujqjizG8D3HIDgrUqR2tj4PYkAu9G/jiC/SpqHFt
-         wO4o2Sk+b0R/HKvOK6XiI+eAuT5AFK1/BtWMDrWhTImSyyPOXtFRUEicnl4sB7Mo3pc3
-         isa7AKIi/JzBSlAXxV8WqzEyCzuW8gliLeJPEn1Kfz9Tf5yHnegzmgkljUm2PZ2A5cp1
-         U+LlZh/+gPQEOlHqwxXX9wVbRpPRfnFbIqFdsqeRLhILCU0VGaeAlVeOnQLjOvoY7ES6
-         sbbui3VA88mUumGcYEkZIs553tv5Uv/W+pCwoB3j4XLA2bxOug6FQgoYoejI6GL8EfgL
-         hzlQ==
-X-Gm-Message-State: AOAM5332ok34C1spUu8I76U5fp90CZo+ELn5cAGT/ACOCCARxjjOc7tq
-        K6q8NC5LtnsOI/r+F5gotiV3HIxbbP6Dh4JLGGsmMBxL/wSegV07kBkt4u9CCepDKHsvs6tLAFs
-        O1RA+iAN+k9S/CKKt4WICZgW2bWl0jR12Hyo0YGdrxDOL5yZlWaqvtD8Eat2Qwhh+AyZYzJt/dY
-        m5
-X-Google-Smtp-Source: ABdhPJzms5A+NrrhW5dZbyllBQn0Vaj1TAgSaiJuDYdo1oNQSHjH5B/TufxZZA+QjivTULLFb8gq6vAgJ6TC
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:f548:7c9e:65f1:7d8])
- (user=apusaka job=sendgmr) by 2002:a17:90a:174c:: with SMTP id
- 12mr1300474pjm.1.1620272586129; Wed, 05 May 2021 20:43:06 -0700 (PDT)
-Date:   Thu,  6 May 2021 11:42:55 +0800
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=lseyQQX+hiFmG0SI4BDlBYVh2edQapduJ5YXkTqlXd4=;
+        b=KcY5tBJ808CwbmNtpDBrLDHknPKTGt4sGb65sJmXduqe8ZH0GqyievylYJ5S29i6wQ
+         HBHrr+T5STTvr5fitVlr2SG4W5ID4KyM8sE00FawmTgDQwMFyMiiuvKRr93diNXCwAwS
+         Q0Cwgdyfn4YSgxOlaDb4jdBykerhB6K+OK+hvXs7pw+6YsFK+v3+iU7uE0Le8whlX6U1
+         Uao5ovJgYbwIJJYJvkhVqgdc6qb6qS8yorQIYQf+iyMYb1q3XQypXMFq8HPxa/owqJn8
+         lGOqa1ZWcEKpSE+RO8ZRpU8GPqjL+EvMcnBB13Htxu+d/p4R8cT4Zyne1NKoNBbKlf8a
+         swqA==
+X-Gm-Message-State: AOAM533pKw/SBizXFVWZF8ZCTmHfCgQOP2PrWjqjrvgNZRPfAoPKniqG
+        qOWOlU/neln0NRBYqlJTt92KI/ua+0ebag==
+X-Google-Smtp-Source: ABdhPJxBiy2q71xn3gB9WsICR64ACU+KDSOY/drRd4yy5UyMusPVq3NQwajymVf9zhWmnIC+Gq0BfQ==
+X-Received: by 2002:a37:7ec2:: with SMTP id z185mr2137909qkc.467.1620273838903;
+        Wed, 05 May 2021 21:03:58 -0700 (PDT)
+Received: from [172.17.0.2] ([13.72.71.105])
+        by smtp.gmail.com with ESMTPSA id c10sm1053296qtp.89.2021.05.05.21.03.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 May 2021 21:03:58 -0700 (PDT)
+Message-ID: <60936aae.1c69fb81.e4bce.68c2@mx.google.com>
+Date:   Wed, 05 May 2021 21:03:58 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6946218620628548635=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [Bluez,v3,1/2] PRE-UPSTREAM: unit/gobex: remove timer only when it's not removed yet
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20210506114234.Bluez.v3.1.I462ae10efbf980757258cabcce883b212259a793@changeid>
-Message-Id: <20210506114234.Bluez.v3.2.Ifd899edb45d3800750c6d04d6bde30a0115c007f@changeid>
-Mime-Version: 1.0
 References: <20210506114234.Bluez.v3.1.I462ae10efbf980757258cabcce883b212259a793@changeid>
-X-Mailer: git-send-email 2.31.1.527.g47e6f16901-goog
-Subject: [Bluez PATCH v3 2/2] PRE-UPSTREAM: Makefile.am: Hide test-gobex*
- behind OBEX flag
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============6946218620628548635==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-If obex is disabled in the config, running gobex test is unnecessary.
-This patch skips gobex tests if obex is disabled.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=477667
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.33 seconds
+GitLint                       PASS      0.24 seconds
+Prep - Setup ELL              PASS      40.93 seconds
+Build - Prep                  PASS      0.10 seconds
+Build - Configure             PASS      7.15 seconds
+Build - Make                  PASS      174.64 seconds
+Make Check                    PASS      8.56 seconds
+Make Dist                     PASS      11.62 seconds
+Make Dist - Configure         PASS      4.47 seconds
+Make Dist - Make              PASS      70.64 seconds
+Build w/ext ELL - Configure   PASS      7.16 seconds
+Build w/ext ELL - Make        PASS      164.49 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Dist - PASS
+Desc: Run 'make dist' and build the distribution tarball
+
+##############################
+Test: Make Dist - Configure - PASS
+Desc: Configure the source from distribution tarball
+
+##############################
+Test: Make Dist - Make - PASS
+Desc: Build the source from distribution tarball
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
-(no changes since v1)
 
- Makefile.am | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/Makefile.am b/Makefile.am
-index 2a222167f7..add80dde9e 100644
---- a/Makefile.am
-+++ b/Makefile.am
-@@ -492,6 +492,7 @@ unit_test_gdbus_client_SOURCES = unit/test-gdbus-client.c
- unit_test_gdbus_client_LDADD = gdbus/libgdbus-internal.la \
- 				src/libshared-glib.la $(GLIB_LIBS) $(DBUS_LIBS)
- 
-+if OBEX
- unit_tests += unit/test-gobex-header unit/test-gobex-packet unit/test-gobex \
- 			unit/test-gobex-transfer unit/test-gobex-apparam
- 
-@@ -514,6 +515,7 @@ unit_test_gobex_transfer_LDADD = $(GLIB_LIBS)
- unit_test_gobex_apparam_SOURCES = $(gobex_sources) unit/util.c unit/util.h \
- 						unit/test-gobex-apparam.c
- unit_test_gobex_apparam_LDADD = $(GLIB_LIBS)
-+endif
- 
- unit_tests += unit/test-lib
- 
--- 
-2.31.1.527.g47e6f16901-goog
-
+--===============6946218620628548635==--
