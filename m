@@ -7,82 +7,74 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAC71C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:23:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3AFF2C43460
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:26:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0631613C0
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:23:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06E3161289
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:26:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236264AbhEFRYr (ORCPT
+        id S236254AbhEFR1v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 May 2021 13:24:47 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:29361 "EHLO
+        Thu, 6 May 2021 13:27:51 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:15923 "EHLO
         so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236250AbhEFRYp (ORCPT
+        with ESMTP id S236224AbhEFR1v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 May 2021 13:24:45 -0400
+        Thu, 6 May 2021 13:27:51 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1620321826; h=Message-ID: References: In-Reply-To: Subject:
+ s=smtp; t=1620322013; h=Message-ID: References: In-Reply-To: Subject:
  Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=PkvnuSL03SDpw2bV221k6yrIiH+aU95lV8M60p0fhZU=;
- b=SdWpd/Re1NYnNeLTwnbI9XZChIhJrqJenTLxjfvH++H55hfI51i62rkd7Qh96gtR1P64JdxS
- TUo8lfmEyqWbv/95DHZpI4PjCicB9zfVqggRgFGUopgp+w5QoNt8xrzrxeBLIodYNsQqRQDp
- q9zyp8gT3uJLmF9nsfe1vvt+y1E=
+ MIME-Version: Sender; bh=P0OkbcD1NslTul+PF7Nxw/MNizW+0u/kMj7oLmG5KSA=;
+ b=hBXJCD3EHBBLN3qII4PBq6WoGBoTtcjctAoPdHneL1tlkoxSjdRqktoPPCOennSKtv5Y0UHN
+ h/1+yjgTUMJxQY7OklxmL1w+dWaHsCxBu74dshGQWmrKvpMx2KZZfzyLLqTQRjh8HOZKYBy+
+ 7vIKsw8bN5GSCECG6iefxZBGpI4=
 X-Mailgun-Sending-Ip: 198.61.254.9
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
- 6094260e853c0a2c468082ec (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 06 May 2021 17:23:26
+ smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
+ 609426dc8166b7eff752791b (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 06 May 2021 17:26:52
  GMT
 Sender: gubbaven=codeaurora.org@mg.codeaurora.org
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 8B216C43145; Thu,  6 May 2021 17:23:25 +0000 (UTC)
+        id A20B8C43147; Thu,  6 May 2021 17:26:51 +0000 (UTC)
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
         (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
         (No client certificate requested)
         (Authenticated sender: gubbaven)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 32BF1C4338A;
-        Thu,  6 May 2021 17:23:22 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 88F06C4338A;
+        Thu,  6 May 2021 17:26:50 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 06 May 2021 22:53:22 +0530
+Date:   Thu, 06 May 2021 22:56:50 +0530
 From:   gubbaven@codeaurora.org
-To:     Matthias Kaehlcke <mka@chromium.org>
+To:     Rob Herring <robh@kernel.org>
 Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org
+        devicetree@vger.kernel.org, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org
 Subject: Re: [PATCH v2 2/3] dt-bindings: net: bluetooth: Convert to DT schema
-In-Reply-To: <YH924M62b7PDd/r6@google.com>
+In-Reply-To: <20210421171009.GA1300559@robh.at.kernel.org>
 References: <1618936010-16579-1-git-send-email-gubbaven@codeaurora.org>
  <1618936010-16579-3-git-send-email-gubbaven@codeaurora.org>
- <YH924M62b7PDd/r6@google.com>
-Message-ID: <6eb5084aa89b7d2c26e41642b4fe56e1@codeaurora.org>
+ <20210421171009.GA1300559@robh.at.kernel.org>
+Message-ID: <b6aa923de63e287101d2d7d7babde00e@codeaurora.org>
 X-Sender: gubbaven@codeaurora.org
 User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matthias,
-On 2021-04-21 06:20, Matthias Kaehlcke wrote:
+Hi Rob Herring,
+
+On 2021-04-21 22:40, Rob Herring wrote:
 > On Tue, Apr 20, 2021 at 09:56:49PM +0530, Venkata Lakshmi Narayana 
 > Gubba wrote:
-> 
->> Subject: dt-bindings: net: bluetooth: Convert to DT schema
-> 
-> This doesn't convert the generic binding or all bindings to DT schema
-> as the subject suggests, but the Qualcomm BT binding.
-> 
-[Venkata]:
-I will update in next patchset.
->> 
 >> Converted Qualcomm Bluetooth binidings to DT schema.
 >> 
 >> Signed-off-by: Venkata Lakshmi Narayana Gubba 
@@ -97,87 +89,7 @@ I will update in next patchset.
 >> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
 >>  create mode 100644 
 >> Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->> 
->> diff --git 
->> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt 
->> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> deleted file mode 100644
->> index 709ca6d..0000000
->> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->> +++ /dev/null
->> @@ -1,69 +0,0 @@
->> -Qualcomm Bluetooth Chips
->> ----------------------
->> -
->> -This documents the binding structure and common properties for serial
->> -attached Qualcomm devices.
->> -
->> -Serial attached Qualcomm devices shall be a child node of the host 
->> UART
->> -device the slave device is attached to.
->> -
->> -Required properties:
->> - - compatible: should contain one of the following:
->> -   * "qcom,qca6174-bt"
->> -   * "qcom,qca9377-bt"
->> -   * "qcom,wcn3990-bt"
->> -   * "qcom,wcn3991-bt"
->> -   * "qcom,wcn3998-bt"
->> -   * "qcom,qca6390-bt"
->> -
->> -Optional properties for compatible string qcom,qca6174-bt:
->> -
->> - - enable-gpios: gpio specifier used to enable chip
->> - - clocks: clock provided to the controller (SUSCLK_32KHZ)
->> - - firmware-name: specify the name of nvm firmware to load
->> -
->> -Optional properties for compatible string qcom,qca9377-bt:
->> -
->> - - max-speed: see 
->> Documentation/devicetree/bindings/serial/serial.yaml
->> -
->> -Required properties for compatible string qcom,wcn399x-bt:
->> -
->> - - vddio-supply: VDD_IO supply regulator handle.
->> - - vddxo-supply: VDD_XO supply regulator handle.
->> - - vddrf-supply: VDD_RF supply regulator handle.
->> - - vddch0-supply: VDD_CH0 supply regulator handle.
->> -
->> -Optional properties for compatible string qcom,wcn399x-bt:
->> -
->> - - max-speed: see 
->> Documentation/devicetree/bindings/serial/serial.yaml
->> - - firmware-name: specify the name of nvm firmware to load
->> - - clocks: clock provided to the controller
->> -
->> -Examples:
->> -
->> -serial@7570000 {
->> -	label = "BT-UART";
->> -	status = "okay";
->> -
->> -	bluetooth {
->> -		compatible = "qcom,qca6174-bt";
->> -
->> -		enable-gpios = <&pm8994_gpios 19 GPIO_ACTIVE_HIGH>;
->> -		clocks = <&divclk4>;
->> -		firmware-name = "nvm_00440302.bin";
->> -	};
->> -};
->> -
->> -serial@898000 {
->> -	bluetooth {
->> -		compatible = "qcom,wcn3990-bt";
->> -
->> -		vddio-supply = <&vreg_s4a_1p8>;
->> -		vddxo-supply = <&vreg_l7a_1p8>;
->> -		vddrf-supply = <&vreg_l17a_1p3>;
->> -		vddch0-supply = <&vreg_l25a_3p3>;
->> -		max-speed = <3200000>;
->> -		firmware-name = "crnv21.bin";
->> -		clocks = <&rpmhcc RPMH_RF_CLK2>;
->> -	};
->> -};
+> 
 >> diff --git 
 >> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml 
 >> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
@@ -197,6 +109,11 @@ I will update in next patchset.
 >> +maintainers:
 >> +  - Rob Herring <robh@kernel.org>
 >> +  - Marcel Holtmann <marcel@holtmann.org>
+> 
+> This should be someone that knows and cares about this h/w. I don't.
+> 
+[Venkata]:
+I will remove your name in next patchset.
 >> +
 >> +description:
 >> +  This binding describes Qualcomm UART-attached bluetooth chips.
@@ -210,21 +127,11 @@ I will update in next patchset.
 >> +      - qcom,wcn3991-bt
 >> +      - qcom,wcn3998-bt
 >> +      - qcom,qca6390-bt
-> 
-> delete trailing blanks
-> 
-[Venkata]:
-I will update in next patchset.
 >> +
 >> +  enable-gpios:
 >> +    maxItems: 1
 >> +    description: gpio specifier used to enable chip
 >> +
-> 
-> delete blanks
-> 
-[Venkata]:
-I will update in next patchset.
 >> +  clocks:
 >> +    maxItems: 1
 >> +    description: clock provided to the controller (SUSCLK_32KHZ)
@@ -242,11 +149,6 @@ I will update in next patchset.
 >> +    description: VDD_CH0 supply regulator handle
 >> +
 >> +  max-speed:
-> 
-> delete trailing blank
-> 
-[Venkata]:
-I will update in next patchset.
 >> +    description: see 
 >> Documentation/devicetree/bindings/serial/serial.yaml
 >> +
@@ -260,15 +162,6 @@ I will update in next patchset.
 >> +
 >> +required:
 >> +  - compatible
-> 
-> it seems you could make the supplies conditionally required based on 
-> the
-> compatible string. See
-> Documentation/devicetree/bindings/connector/usb-connector.yaml
-> for an example
-> 
-[Venkata]:
-I will update in next patchset
 >> +
 >> +additionalProperties: false
 >> +
@@ -277,7 +170,18 @@ I will update in next patchset
 >> +    #include <dt-bindings/gpio/gpio.h>
 >> +    uart {
 >> +        label = "BT-UART";
+> 
+> Why do you need a label for in internal port where you've described the
+> connection?
+> 
+[Venkata]:
+I will remove in next patchset.
 >> +        status = "okay";
+> 
+> Don't show status in examples.
+> 
+[Venkata]:
+Sure, I will remove in next patchset.
 >> +
 >> +        bluetooth {
 >> +            compatible = "qcom,qca6174-bt";
@@ -297,10 +201,13 @@ I will update in next patchset
 >> +            vddch0-supply = <&vreg_l25a_3p3>;
 >> +            max-speed = <3200000>;
 >> +            firmware-name = "crnv21.bin";
-> 
-> delete trailing blanks
-[Venkata]:
-I will update in next patchset.
+>> +        };
+>> +    };
+>> --
+>> QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a 
+>> member
+>> of Code Aurora Forum, hosted by The Linux Foundation
+>> 
 
 Regards,
 Venkata.
