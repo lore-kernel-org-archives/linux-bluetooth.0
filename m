@@ -4,33 +4,33 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 371C7C43618
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:33:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B3C24C4361B
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:34:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07089610D2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:33:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8738A613CE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  6 May 2021 17:34:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236316AbhEFRe4 (ORCPT
+        id S236327AbhEFRe5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 May 2021 13:34:56 -0400
+        Thu, 6 May 2021 13:34:57 -0400
 Received: from alexa-out.qualcomm.com ([129.46.98.28]:43156 "EHLO
         alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236291AbhEFRex (ORCPT
+        with ESMTP id S236301AbhEFRey (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 May 2021 13:34:53 -0400
+        Thu, 6 May 2021 13:34:54 -0400
 Received: from ironmsg09-lv.qualcomm.com ([10.47.202.153])
-  by alexa-out.qualcomm.com with ESMTP; 06 May 2021 10:33:55 -0700
+  by alexa-out.qualcomm.com with ESMTP; 06 May 2021 10:33:56 -0700
 X-QCInternal: smtphost
 Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
   by ironmsg09-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 06 May 2021 10:33:54 -0700
 X-QCInternal: smtphost
 Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 06 May 2021 23:03:16 +0530
+  by ironmsg02-blr.qualcomm.com with ESMTP; 06 May 2021 23:03:15 +0530
 Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
-        id C878622008; Thu,  6 May 2021 23:03:14 +0530 (IST)
+        id 6E98321FBE; Thu,  6 May 2021 23:03:14 +0530 (IST)
 From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com,
         devicetree@vger.kernel.org
@@ -40,9 +40,9 @@ Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         rjliao@codeaurora.org, hbandi@codeaurora.org,
         abhishekpandit@chromium.org,
         Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Subject: [PATCH v3 5/5] dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn6750
-Date:   Thu,  6 May 2021 23:03:12 +0530
-Message-Id: <1620322392-27148-6-git-send-email-gubbaven@codeaurora.org>
+Subject: [PATCH v3 2/5] Bluetooth: btqca: Add support for firmware image with mbn type for WCN6750
+Date:   Thu,  6 May 2021 23:03:09 +0530
+Message-Id: <1620322392-27148-3-git-send-email-gubbaven@codeaurora.org>
 X-Mailer: git-send-email 2.7.4
 In-Reply-To: <1620322392-27148-1-git-send-email-gubbaven@codeaurora.org>
 References: <1620322392-27148-1-git-send-email-gubbaven@codeaurora.org>
@@ -50,119 +50,173 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch enables regulators and gpios for the Qualcomm Bluetooth wcn6750
-controller.
+1. Added support to download firmware image with mbn type for wcn6750
+   as it supports mbn type image.
+2. If mbn type image is not present then check for tlv type image.
+3. Added debug logs for mbn type image.
 
 Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
 ---
- .../bindings/net/qualcomm-bluetooth.yaml           | 71 ++++++++++++++++++++++
- 1 file changed, 71 insertions(+)
+ drivers/bluetooth/btqca.c | 69 +++++++++++++++++++++++++++++++++++------------
+ drivers/bluetooth/btqca.h |  3 ++-
+ 2 files changed, 54 insertions(+), 18 deletions(-)
 
-diff --git a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-index 3f3ec4d..0a90335 100644
---- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-+++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
-@@ -21,11 +21,17 @@ properties:
-       - qcom,wcn3991-bt
-       - qcom,wcn3998-bt
-       - qcom,qca6390-bt
-+      - qcom,wcn6750-bt
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index fce808c..320c555 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -182,7 +182,8 @@ int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ }
+ EXPORT_SYMBOL_GPL(qca_send_pre_shutdown_cmd);
  
-   enable-gpios:
-     maxItems: 1
-     description: gpio specifier used to enable chip
+-static void qca_tlv_check_data(struct qca_fw_config *config,
++static void qca_tlv_check_data(struct hci_dev *hdev,
++			       struct qca_fw_config *config,
+ 		const struct firmware *fw, enum qca_btsoc_type soc_type)
+ {
+ 	const u8 *data;
+@@ -194,19 +195,21 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 	struct tlv_type_nvm *tlv_nvm;
+ 	uint8_t nvm_baud_rate = config->user_baud_rate;
  
-+  swctrl-gpios:
-+    maxItems: 1
-+    description: gpio specifier is used to find status
-+                 of clock supply to SoC
-+
-   clocks:
-     maxItems: 1
-     description: clock provided to the controller (SUSCLK_32KHZ)
-@@ -42,6 +48,30 @@ properties:
-   vddch0-supply:
-     description: VDD_CH0 supply regulator handle
+-	tlv = (struct tlv_type_hdr *)fw->data;
+-
+-	type_len = le32_to_cpu(tlv->type_len);
+-	length = (type_len >> 8) & 0x00ffffff;
+-
+-	BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
+-	BT_DBG("Length\t\t : %d bytes", length);
+-
+ 	config->dnld_mode = QCA_SKIP_EVT_NONE;
+ 	config->dnld_type = QCA_SKIP_EVT_NONE;
  
-+  vddaon-supply:
-+    description: VDD_AON supply regulator handle
+ 	switch (config->type) {
++	case ELF_TYPE_PATCH:
++		config->dnld_mode = QCA_SKIP_EVT_VSE_CC;
++		config->dnld_type = QCA_SKIP_EVT_VSE_CC;
 +
-+  vddbtcxmx-supply:
-+    description: VDD_BT_CXMX supply regulator handle
-+
-+  vddrfacmn-supply:
-+    description: VDD_RFA_CMN supply regulator handle
-+
-+  vddrfa0p8-supply:
-+    description: VDD_RFA_0P8 suppply regulator handle
-+
-+  vddrfa1p7-supply:
-+    description: VDD_RFA_1P7 supply regulator handle
-+
-+  vddrfa1p2-supply:
-+    description: VDD_RFA_1P2 supply regulator handle
-+
-+  vddrfa2p2-supply:
-+    description: VDD_RFA_2P2 supply regulator handle
-+
-+  vddasd-supply:
-+    description: VDD_ASD supply regulator handle
-+
-   max-speed:
-     description: see Documentation/devicetree/bindings/serial/serial.yaml
++		bt_dev_dbg(hdev, "File Class        : 0x%x", fw->data[4]);
++		bt_dev_dbg(hdev, "Data Encoding     : 0x%x", fw->data[5]);
++		bt_dev_dbg(hdev, "File version      : 0x%x", fw->data[6]);
++		break;
+ 	case TLV_TYPE_PATCH:
++		tlv = (struct tlv_type_hdr *)fw->data;
++		type_len = le32_to_cpu(tlv->type_len);
+ 		tlv_patch = (struct tlv_type_patch *)tlv->data;
  
-@@ -84,6 +114,25 @@ allOf:
-         - vddrf-supply
-         - vddch0-supply
+ 		/* For Rome version 1.1 to 3.1, all segment commands
+@@ -218,6 +221,7 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 		config->dnld_mode = tlv_patch->download_mode;
+ 		config->dnld_type = config->dnld_mode;
  
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - qcom,wcn6750-bt
-+    then:
-+      required:
-+        - enable-gpios
-+        - swctrl-gpios
-+        - vddio-supply
-+        - vddaon-supply
-+        - vddbtcxmx-supply
-+        - vddrfacmn-supply
-+        - vddrfa0p8-supply
-+        - vddrfa1p7-supply
-+        - vddrfa1p2-supply
-+        - vddasd-supply
++		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
+ 		BT_DBG("Total Length           : %d bytes",
+ 		       le32_to_cpu(tlv_patch->total_size));
+ 		BT_DBG("Patch Data Length      : %d bytes",
+@@ -243,6 +247,14 @@ static void qca_tlv_check_data(struct qca_fw_config *config,
+ 		break;
+ 
+ 	case TLV_TYPE_NVM:
++		tlv = (struct tlv_type_hdr *)fw->data;
 +
- examples:
-   - |
-     #include <dt-bindings/gpio/gpio.h>
-@@ -109,3 +158,25 @@ examples:
-             firmware-name = "crnv21.bin";
-         };
-     };
-+  - |
-+    serial {
++		type_len = le32_to_cpu(tlv->type_len);
++		length = (type_len >> 8) & 0x00ffffff;
 +
-+        bluetooth {
-+            compatible = "qcom,wcn6750-bt";
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&bt_en_default>;
-+            enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-+            swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
-+            vddio-supply = <&vreg_l19b_1p8>;
-+            vddaon-supply = <&vreg_s7b_0p9>;
-+            vddbtcxmx-supply = <&vreg_s7b_0p9>;
-+            vddrfacmn-supply = <&vreg_s7b_0p9>;
-+            vddrfa0p8-supply = <&vreg_s7b_0p9>;
-+            vddrfa1p7-supply = <&vreg_s1b_1p8>;
-+            vddrfa1p2-supply = <&vreg_s8b_1p2>;
-+            vddrfa2p2-supply = <&vreg_s1c_2p2>;
-+            vddasd-supply = <&vreg_l11c_2p8>;
-+            max-speed = <3200000>;
-+            firmware-name = "msnv11.bin";
-+        };
-+    };
++		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
++		BT_DBG("Length\t\t : %d bytes", length);
++
+ 		idx = 0;
+ 		data = tlv->data;
+ 		while (idx < length) {
+@@ -387,7 +399,8 @@ static int qca_inject_cmd_complete_event(struct hci_dev *hdev)
+ 
+ static int qca_download_firmware(struct hci_dev *hdev,
+ 				 struct qca_fw_config *config,
+-				 enum qca_btsoc_type soc_type)
++				 enum qca_btsoc_type soc_type,
++				 u8 rom_ver)
+ {
+ 	const struct firmware *fw;
+ 	const u8 *segment;
+@@ -397,12 +410,30 @@ static int qca_download_firmware(struct hci_dev *hdev,
+ 
+ 	ret = request_firmware(&fw, config->fwname, &hdev->dev);
+ 	if (ret) {
+-		bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
+-			   config->fwname, ret);
+-		return ret;
++		/* For WCN6750, if mbn file is not present then check for
++		 * tlv file.
++		 */
++		if (soc_type == QCA_WCN6750 && config->type == ELF_TYPE_PATCH) {
++			bt_dev_dbg(hdev, "QCA Failed to request file: %s (%d)",
++				   config->fwname, ret);
++			config->type = TLV_TYPE_PATCH;
++			snprintf(config->fwname, sizeof(config->fwname),
++				 "qca/msbtfw%02x.tlv", rom_ver);
++			bt_dev_info(hdev, "QCA Downloading %s", config->fwname);
++			ret = request_firmware(&fw, config->fwname, &hdev->dev);
++			if (ret) {
++				bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
++					   config->fwname, ret);
++				return ret;
++			}
++		} else {
++			bt_dev_err(hdev, "QCA Failed to request file: %s (%d)",
++				   config->fwname, ret);
++			return ret;
++		}
+ 	}
+ 
+-	qca_tlv_check_data(config, fw, soc_type);
++	qca_tlv_check_data(hdev, config, fw, soc_type);
+ 
+ 	segment = fw->data;
+ 	remain = fw->size;
+@@ -520,14 +551,18 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	} else if (soc_type == QCA_WCN6750) {
+ 		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
+ 			    (soc_ver & 0x0000000f);
++		/* Choose mbn file by default.If mbn file is not found
++		 * then choose tlv file
++		 */
++		config.type = ELF_TYPE_PATCH;
+ 		snprintf(config.fwname, sizeof(config.fwname),
+-			 "qca/msbtfw%02x.tlv", rom_ver);
++			 "qca/msbtfw%02x.mbn", rom_ver);
+ 	} else {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/rampatch_%08x.bin", soc_ver);
+ 	}
+ 
+-	err = qca_download_firmware(hdev, &config, soc_type);
++	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "QCA Failed to download patch (%d)", err);
+ 		return err;
+@@ -560,7 +595,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/nvm_%08x.bin", soc_ver);
+ 
+-	err = qca_download_firmware(hdev, &config, soc_type);
++	err = qca_download_firmware(hdev, &config, soc_type, rom_ver);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+ 		return err;
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index dd82d2c..5a5e699 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -80,7 +80,8 @@ enum qca_tlv_dnld_mode {
+ 
+ enum qca_tlv_type {
+ 	TLV_TYPE_PATCH = 1,
+-	TLV_TYPE_NVM
++	TLV_TYPE_NVM,
++	ELF_TYPE_PATCH
+ };
+ 
+ struct qca_fw_config {
 -- 
 QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
 of Code Aurora Forum, hosted by The Linux Foundation
