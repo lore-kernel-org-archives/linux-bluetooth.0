@@ -2,42 +2,43 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D46BFC43460
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 05:56:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 096F0C43462
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 05:56:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE6886128B
+	by mail.kernel.org (Postfix) with ESMTP id D70ED613EA
 	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 05:56:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234372AbhEGF5k (ORCPT
+        id S234381AbhEGF5l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 7 May 2021 01:57:40 -0400
+        Fri, 7 May 2021 01:57:41 -0400
 Received: from mga12.intel.com ([192.55.52.136]:17174 "EHLO mga12.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234341AbhEGF5j (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S234361AbhEGF5j (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 7 May 2021 01:57:39 -0400
-IronPort-SDR: 7a9EIjZdhVbmXKCcQcNpBnUMBxQV9z8xQGgAp3tywDWxG32JTBhwMYLidFSLz75Piyhgs2F9ns
- NMwsRCoXLGJQ==
-X-IronPort-AV: E=McAfee;i="6200,9189,9976"; a="178220280"
+IronPort-SDR: nq4DOgmftvubLgLEPIFh77R5Lpw1uNF+lAI1ImRIZQy/ZCwH20+rmzkRc28eIDTm9tp41el7Gh
+ ZYMy0MhLeULQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,9976"; a="178220281"
 X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="178220280"
+   d="scan'208";a="178220281"
 Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 22:56:39 -0700
-IronPort-SDR: sG2h3T4/TLzYRWxiNXz1AuTQycLNHq6ehnb+Y8WLQ+HlqpNQEzhUY8l5Y4dlS4zPDrXub12UPb
- J0Uez68pCUTw==
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 22:56:40 -0700
+IronPort-SDR: Oa5IkF/Dl3GAHFbL0gTbkad3CpniWVmza1593JwkEhpb0MrcWEBJYgeW/JmWyN8A36030qao38
+ mSHktZaJE9lw==
 X-IronPort-AV: E=Sophos;i="5.82,279,1613462400"; 
-   d="scan'208";a="407314538"
+   d="scan'208";a="407314542"
 Received: from jinhuach-mobl1.ccr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.254.7.101])
-  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 22:56:39 -0700
+  by orsmga002-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 May 2021 22:56:40 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     luiz.dentz@gmail.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [RFC BlueZ v2 02/11] emulator/hciemu: Create ELL based version of hciemu
-Date:   Thu,  6 May 2021 22:56:20 -0700
-Message-Id: <20210507055629.338409-3-inga.stotland@intel.com>
+Subject: [RFC BlueZ v2 03/11] tools/gap-tester: Convert to use ELL library
+Date:   Thu,  6 May 2021 22:56:21 -0700
+Message-Id: <20210507055629.338409-4-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20210507055629.338409-1-inga.stotland@intel.com>
 References: <20210507055629.338409-1-inga.stotland@intel.com>
@@ -47,664 +48,211 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds a separate implementation of hciemu code, hciemu-ell.c,
-that uses ELL library primitives.
+This reworks the source code to use ELL primitives and removes
+dependencies on GLib.
 ---
- emulator/hciemu-ell.c | 645 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 645 insertions(+)
- create mode 100644 emulator/hciemu-ell.c
+ Makefile.tools     |   6 +--
+ tools/gap-tester.c | 107 +++++++++++++++++++++++++--------------------
+ 2 files changed, 62 insertions(+), 51 deletions(-)
 
-diff --git a/emulator/hciemu-ell.c b/emulator/hciemu-ell.c
-new file mode 100644
-index 000000000..0369c10a1
---- /dev/null
-+++ b/emulator/hciemu-ell.c
-@@ -0,0 +1,645 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2012-2014, 2021  Intel Corporation. All rights reserved.
-+ *
-+ *
-+ */
-+
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
-+
-+#define _GNU_SOURCE
-+#include <stdio.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <stdbool.h>
-+#include <errno.h>
-+#include <sys/socket.h>
-+
+diff --git a/Makefile.tools b/Makefile.tools
+index c836b5984..55674ca55 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -152,14 +152,12 @@ tools_smp_tester_LDADD = lib/libbluetooth-internal.la \
+ 				src/libshared-glib.la $(GLIB_LIBS)
+ 
+ tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
+-				emulator/hciemu.h emulator/hciemu.c \
++				emulator/hciemu.h emulator/hciemu-ell.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+ tools_gap_tester_LDADD =  lib/libbluetooth-internal.la \
+-				gdbus/libgdbus-internal.la \
+-				src/libshared-glib.la \
+-				$(GLIB_LIBS) $(DBUS_LIBS)
++				src/libshared-ell.la $(ell_ldadd)
+ 
+ tools_sco_tester_SOURCES = tools/sco-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
+diff --git a/tools/gap-tester.c b/tools/gap-tester.c
+index 942c37d27..c60cf9beb 100644
+--- a/tools/gap-tester.c
++++ b/tools/gap-tester.c
+@@ -12,102 +12,114 @@
+ #include <config.h>
+ #endif
+ 
+-#include "gdbus/gdbus.h"
 +#include <ell/ell.h>
-+
-+#include "lib/bluetooth.h"
-+#include "lib/hci.h"
-+
-+#include "monitor/bt.h"
-+#include "emulator/btdev.h"
-+#include "emulator/bthost.h"
-+#include "src/shared/util.h"
-+#include "src/shared/queue.h"
-+#include "emulator/hciemu.h"
-+
-+struct hciemu_client {
-+	struct bthost *host;
-+	struct btdev *dev;
-+	struct l_idle *start_idle;
-+	struct l_io *host_io;
-+	struct l_io *io;
-+};
-+
-+struct hciemu {
-+	int ref_count;
-+	enum btdev_type btdev_type;
-+	struct btdev *dev;
-+	struct l_queue *clients;
-+	struct l_io *io;
-+	struct l_queue *post_command_hooks;
-+	char bdaddr_str[18];
-+
-+	hciemu_debug_func_t debug_callback;
-+	hciemu_destroy_func_t debug_destroy;
-+	void *debug_data;
-+};
-+
-+struct hciemu_command_hook {
-+	hciemu_command_func_t function;
-+	void *user_data;
-+};
-+
-+static void destroy_command_hook(void *data)
-+{
-+	struct hciemu_command_hook *hook = data;
-+
-+	l_free(hook);
+ 
+-#include "src/shared/tester.h"
+ #include "emulator/hciemu.h"
++#include "src/shared/bttester.h"
+ 
+-static DBusConnection *dbus_conn = NULL;
+-static GDBusClient *dbus_client = NULL;
+-static GDBusProxy *adapter_proxy = NULL;
++static struct l_dbus *dbus_conn;
++struct l_dbus_client *dbus_client;
++struct l_dbus_proxy *adapter_proxy;
+ 
+-static struct hciemu *hciemu_stack = NULL;
++static struct hciemu *hciemu_stack;
++static struct l_tester *tester;
+ 
+-static void connect_handler(DBusConnection *connection, void *user_data)
++static void connect_handler(struct l_dbus *connection, void *user_data)
+ {
+-	tester_print("Connected to daemon");
++	bttester_print("Connected to daemon");
+ 
+ 	hciemu_stack = hciemu_new(HCIEMU_TYPE_BREDRLE);
+ }
+ 
+-static void disconnect_handler(DBusConnection *connection, void *user_data)
++static void destroy_client(void *data)
+ {
+-	tester_print("Disconnected from daemon");
++	l_dbus_client_destroy(dbus_client);
++	dbus_client = NULL;
 +}
-+
-+struct run_data {
-+	uint16_t opcode;
-+	const void *data;
-+	uint8_t len;
-+};
-+
-+static void run_command_hook(void *data, void *user_data)
+ 
+-	dbus_connection_unref(dbus_conn);
++static void destroy_conn(void *data)
 +{
-+	struct hciemu_command_hook *hook = data;
-+	struct run_data *run_data = user_data;
-+
-+	if (hook->function)
-+		hook->function(run_data->opcode, run_data->data,
-+					run_data->len, hook->user_data);
++	l_dbus_destroy(dbus_conn);
+ 	dbus_conn = NULL;
 +}
-+
-+static void master_command_callback(uint16_t opcode,
-+				const void *data, uint8_t len,
-+				btdev_callback callback, void *user_data)
+ 
+-	tester_teardown_complete();
++static void service_disconnect_handler(struct l_dbus *connection,
++							void *user_data)
 +{
-+	struct hciemu *hciemu = user_data;
-+	struct run_data run_data = { .opcode = opcode,
-+						.data = data, .len = len };
-+
-+	btdev_command_default(callback);
-+
-+	l_queue_foreach(hciemu->post_command_hooks, run_command_hook,
-+								&run_data);
++	bttester_print("Daemon disconnected");
+ }
+ 
+-static gboolean compare_string_property(GDBusProxy *proxy, const char *name,
+-							const char *value)
++static void client_destroy_handler(void *user_data)
+ {
+-	DBusMessageIter iter;
+-	const char *str;
++	bttester_print("Disconnected from daemon");
+ 
+-	if (g_dbus_proxy_get_property(proxy, name, &iter) == FALSE)
+-		return FALSE;
++	if (dbus_conn)
++		l_idle_oneshot(destroy_conn, NULL, NULL);
+ 
+-	if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_STRING)
+-		return FALSE;
++	l_tester_teardown_complete(tester);
 +}
-+
-+static void client_command_callback(uint16_t opcode,
-+				const void *data, uint8_t len,
-+				btdev_callback callback, void *user_data)
+ 
+-	dbus_message_iter_get_basic(&iter, &str);
++static bool compare_string_property(struct l_dbus_proxy *proxy,
++					const char *name, const char *value)
 +{
-+	btdev_command_default(callback);
-+}
++	const char *str;
 +
-+static void writev_callback(const struct iovec *iov, int iovlen,
-+								void *user_data)
-+{
-+	struct l_io *io = user_data;
-+	ssize_t written;
-+	int fd;
-+
-+	fd = l_io_get_fd(io);
-+
-+	written = writev(fd, iov, iovlen);
-+	if (written < 0)
-+		return;
-+}
-+
-+static bool receive_bthost(struct l_io *io, void *user_data)
-+{
-+	struct bthost *bthost = user_data;
-+	unsigned char buf[4096];
-+	ssize_t len;
-+	int fd;
-+
-+	fd = l_io_get_fd(io);
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len < 0)
++	if (!l_dbus_proxy_get_property(proxy, name, "s", &str))
 +		return false;
-+
-+	bthost_receive_h4(bthost, buf, len);
-+
-+	return true;
-+}
-+
-+static struct l_io *create_io_bthost(int fd, struct bthost *bthost)
-+{
-+	struct l_io *io;
-+
-+	io = l_io_new(fd);
-+
-+	l_io_set_close_on_destroy(io, true);
-+
-+	bthost_set_send_handler(bthost, writev_callback, io);
-+
-+	l_io_set_read_handler(io, receive_bthost, bthost, NULL);
-+
-+	return io;
-+}
-+
-+static bool receive_btdev(struct l_io *io, void *user_data)
-+{
-+	struct btdev *btdev = user_data;
-+	unsigned char buf[4096];
-+	ssize_t len;
-+	int fd;
-+
-+	fd = l_io_get_fd(io);
-+
-+	len = read(fd, buf, sizeof(buf));
-+	if (len < 0) {
-+		if (errno == EAGAIN || errno == EINTR)
-+			return true;
-+
-+		return false;
-+	}
-+
-+	if (len < 1)
-+		return false;
-+
-+	switch (buf[0]) {
-+	case BT_H4_CMD_PKT:
-+	case BT_H4_ACL_PKT:
-+	case BT_H4_SCO_PKT:
-+		btdev_receive_h4(btdev, buf, len);
-+		break;
-+	}
-+
-+	return true;
-+}
-+
-+static struct l_io *create_io_btdev(int fd, struct btdev *btdev)
-+{
-+	struct l_io *io;
-+
-+	io = l_io_new(fd);
-+
-+	l_io_set_close_on_destroy(io, true);
-+
-+	btdev_set_send_handler(btdev, writev_callback, io);
-+
-+	l_io_set_read_handler(io, receive_btdev, btdev, NULL);
-+
-+	return io;
-+}
-+
-+static bool create_vhci(struct hciemu *hciemu)
-+{
-+	struct btdev *btdev;
-+	uint8_t create_req[2];
-+	ssize_t written;
-+	int fd;
-+
-+	btdev = btdev_create(hciemu->btdev_type, 0x00);
-+	if (!btdev)
-+		return false;
-+
-+	btdev_set_command_handler(btdev, master_command_callback, hciemu);
-+
-+	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
-+	if (fd < 0) {
-+		perror("Opening /dev/vhci failed");
-+		btdev_destroy(btdev);
-+		return false;
-+	}
-+
-+	create_req[0] = HCI_VENDOR_PKT;
-+	create_req[1] = HCI_PRIMARY;
-+
-+	written = write(fd, create_req, sizeof(create_req));
-+	if (written < 0) {
-+		close(fd);
-+		btdev_destroy(btdev);
-+		return false;
-+	}
-+
-+	hciemu->dev = btdev;
-+
-+	hciemu->io = create_io_btdev(fd, btdev);
-+
-+	return true;
-+}
-+
-+struct hciemu_client *hciemu_get_client(struct hciemu *hciemu, int num)
-+{
-+	const struct l_queue_entry *entry;
-+
-+	if (!hciemu)
-+		return NULL;
-+
-+	for (entry = l_queue_get_entries(hciemu->clients); entry;
-+					entry = entry->next, num--) {
-+		if (!num)
-+			return entry->data;
-+	}
-+
-+	return NULL;
-+}
-+
-+struct bthost *hciemu_client_host(struct hciemu_client *client)
-+{
-+	if (!client)
-+		return NULL;
-+
-+	return client->host;
-+}
-+
-+struct bthost *hciemu_client_get_host(struct hciemu *hciemu)
-+{
-+	struct hciemu_client *client;
-+
-+	if (!hciemu)
-+		return NULL;
-+
-+	client = hciemu_get_client(hciemu, 0);
-+
-+	return hciemu_client_host(client);
-+}
-+
-+static void start_host(struct l_idle *idle, void *user_data)
-+{
-+	struct hciemu_client *client = user_data;
-+
-+	l_idle_remove(client->start_idle);
-+
-+	client->start_idle = NULL;
-+
-+	bthost_start(client->host);
-+}
-+
-+static void hciemu_client_destroy(void *data)
-+{
-+	struct hciemu_client *client = data;
-+
-+	if (client->start_idle)
-+		l_idle_remove(client->start_idle);
-+
-+	l_io_destroy(client->host_io);
-+	l_io_destroy(client->io);
-+
-+	bthost_destroy(client->host);
-+	btdev_destroy(client->dev);
-+
-+	l_free(client);
-+}
-+
-+static struct hciemu_client *hciemu_client_new(struct hciemu *hciemu,
-+							uint8_t id)
-+{
-+	struct hciemu_client *client;
-+	int sv[2];
-+
-+	client = l_new(struct hciemu_client, 1);
-+
-+	client->dev = btdev_create(hciemu->btdev_type, id++);
-+	if (!client->dev) {
-+		l_free(client);
-+		return NULL;
-+	}
-+
-+	client->host = bthost_create();
-+	if (!client->host) {
-+		btdev_destroy(client->dev);
-+		l_free(client);
-+		return NULL;
-+	}
-+
-+	btdev_set_command_handler(client->dev, client_command_callback, client);
-+
-+	if (socketpair(AF_UNIX, SOCK_SEQPACKET | SOCK_NONBLOCK | SOCK_CLOEXEC,
-+								0, sv) < 0) {
-+		bthost_destroy(client->host);
-+		btdev_destroy(client->dev);
-+		return NULL;
-+	}
-+
-+	client->io = create_io_btdev(sv[0], client->dev);
-+	client->host_io = create_io_bthost(sv[1], client->host);
-+	client->start_idle = l_idle_create(start_host, client, NULL);
-+
-+	return client;
-+}
-+
-+struct hciemu *hciemu_new_num(enum hciemu_type type, uint8_t num)
-+{
-+
-+	struct hciemu *hciemu;
-+	int i;
-+
-+	if (!num)
-+		return NULL;
-+
-+	hciemu = l_new(struct hciemu, 1);
-+
-+	switch (type) {
-+	case HCIEMU_TYPE_BREDRLE:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDRLE;
-+		break;
-+	case HCIEMU_TYPE_BREDR:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDR;
-+		break;
-+	case HCIEMU_TYPE_LE:
-+		hciemu->btdev_type = BTDEV_TYPE_LE;
-+		break;
-+	case HCIEMU_TYPE_LEGACY:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDR20;
-+		break;
-+	case HCIEMU_TYPE_BREDRLE50:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDRLE50;
-+		break;
-+	case HCIEMU_TYPE_BREDRLE52:
-+		hciemu->btdev_type = BTDEV_TYPE_BREDRLE52;
-+		break;
-+	default:
-+		return NULL;
-+	}
-+
-+	hciemu->post_command_hooks = l_queue_new();
-+	if (!hciemu->post_command_hooks) {
-+		l_free(hciemu);
-+		return NULL;
-+	}
-+
-+	if (!create_vhci(hciemu)) {
-+		l_queue_destroy(hciemu->post_command_hooks, NULL);
-+		l_free(hciemu);
-+		return NULL;
-+	}
-+
-+	hciemu->clients = l_queue_new();
-+
-+	for (i = 0; i < num; i++) {
-+		struct hciemu_client *client = hciemu_client_new(hciemu, i);
-+
-+		if (!client) {
-+			l_queue_destroy(hciemu->clients, hciemu_client_destroy);
-+			break;
-+		}
-+
-+		l_queue_push_tail(hciemu->clients, client);
-+	}
-+
-+	return hciemu_ref(hciemu);
-+}
-+
-+struct hciemu *hciemu_new(enum hciemu_type type)
-+{
-+	return hciemu_new_num(type, 1);
-+}
-+
-+struct hciemu *hciemu_ref(struct hciemu *hciemu)
-+{
-+	if (!hciemu)
-+		return NULL;
-+
-+	__sync_fetch_and_add(&hciemu->ref_count, 1);
-+
-+	return hciemu;
-+}
-+
-+void hciemu_unref(struct hciemu *hciemu)
-+{
-+	if (!hciemu)
-+		return;
-+
-+	if (__sync_sub_and_fetch(&hciemu->ref_count, 1))
-+		return;
-+
-+	l_queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
-+	l_queue_destroy(hciemu->clients, hciemu_client_destroy);
-+
-+	l_io_destroy(hciemu->io);
-+	btdev_destroy(hciemu->dev);
-+
-+	l_free(hciemu);
-+}
-+
-+static void bthost_debug(const char *str, void *user_data)
-+{
-+	struct hciemu *hciemu = user_data;
-+
-+	util_debug(hciemu->debug_callback, hciemu->debug_data,
-+					"bthost: %s", str);
-+}
-+
-+static void btdev_master_debug(const char *str, void *user_data)
-+{
-+	struct hciemu *hciemu = user_data;
-+
-+	util_debug(hciemu->debug_callback, hciemu->debug_data,
-+					"btdev: %s", str);
-+}
-+
-+static void btdev_client_debug(const char *str, void *user_data)
-+{
-+	struct hciemu *hciemu = user_data;
-+
-+	util_debug(hciemu->debug_callback, hciemu->debug_data,
-+					"btdev[bthost]: %s", str);
-+}
-+
-+static void hciemu_client_set_debug(void *data, void *user_data)
-+{
-+	struct hciemu_client *client = data;
-+	struct hciemu *hciemu = user_data;
-+
-+	btdev_set_debug(client->dev, btdev_client_debug, hciemu, NULL);
-+	bthost_set_debug(client->host, bthost_debug, hciemu, NULL);
-+}
-+
-+bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
-+			void *user_data, hciemu_destroy_func_t destroy)
-+{
-+	if (!hciemu)
-+		return false;
-+
-+	if (hciemu->debug_destroy)
-+		hciemu->debug_destroy(hciemu->debug_data);
-+
-+	hciemu->debug_callback = callback;
-+	hciemu->debug_destroy = destroy;
-+	hciemu->debug_data = user_data;
-+
-+	btdev_set_debug(hciemu->dev, btdev_master_debug, hciemu, NULL);
-+
-+	l_queue_foreach(hciemu->clients, hciemu_client_set_debug, hciemu);
-+
-+	return true;
-+}
-+
-+const char *hciemu_get_address(struct hciemu *hciemu)
-+{
-+	const uint8_t *addr;
-+
-+	if (!hciemu || !hciemu->dev)
-+		return NULL;
-+
-+	addr = btdev_get_bdaddr(hciemu->dev);
-+	sprintf(hciemu->bdaddr_str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
-+			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
-+	return hciemu->bdaddr_str;
-+}
-+
-+uint8_t *hciemu_get_features(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->dev)
-+		return NULL;
-+
-+	return btdev_get_features(hciemu->dev);
-+}
-+
-+const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->dev)
-+		return NULL;
-+
-+	return btdev_get_bdaddr(hciemu->dev);
-+}
-+
-+const uint8_t *hciemu_client_bdaddr(struct hciemu_client *client)
-+{
-+	if (!client)
-+		return NULL;
-+
-+	return btdev_get_bdaddr(client->dev);
-+}
-+
-+const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
-+{
-+	struct hciemu_client *client;
-+
-+	if (!hciemu)
-+		return NULL;
-+
-+	client = hciemu_get_client(hciemu, 0);
-+
-+	return hciemu_client_bdaddr(client);
-+}
-+
-+uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->dev)
-+		return 0;
-+
-+	return btdev_get_scan_enable(hciemu->dev);
-+}
-+
-+uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
-+{
-+	if (!hciemu || !hciemu->dev)
-+		return 0;
-+
-+	return btdev_get_le_scan_enable(hciemu->dev);
-+}
-+
-+void hciemu_set_master_le_states(struct hciemu *hciemu,
-+						const uint8_t *le_states)
-+{
-+	if (!hciemu || !hciemu->dev)
-+		return;
-+
-+	btdev_set_le_states(hciemu->dev, le_states);
-+}
-+
-+bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
-+			hciemu_command_func_t function, void *user_data)
-+{
-+	struct hciemu_command_hook *hook;
-+
-+	if (!hciemu)
-+		return false;
-+
-+	hook = l_new(struct hciemu_command_hook, 1);
-+
-+	hook->function = function;
-+	hook->user_data = user_data;
-+
-+	if (!l_queue_push_tail(hciemu->post_command_hooks, hook)) {
-+		l_free(hook);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu)
-+{
-+	if (!hciemu)
-+		return false;
-+
-+	l_queue_clear(hciemu->post_command_hooks, destroy_command_hook);
-+	return true;
-+}
-+
-+int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
-+				uint16_t opcode, hciemu_hook_func_t function,
-+				void *user_data)
-+{
-+	enum btdev_hook_type hook_type;
-+
-+	if (!hciemu)
-+		return -1;
-+
-+	switch (type) {
-+	case HCIEMU_HOOK_PRE_CMD:
-+		hook_type = BTDEV_HOOK_PRE_CMD;
-+		break;
-+	case HCIEMU_HOOK_POST_CMD:
-+		hook_type = BTDEV_HOOK_POST_CMD;
-+		break;
-+	case HCIEMU_HOOK_PRE_EVT:
-+		hook_type = BTDEV_HOOK_PRE_EVT;
-+		break;
-+	case HCIEMU_HOOK_POST_EVT:
-+		hook_type = BTDEV_HOOK_POST_EVT;
-+		break;
-+	default:
-+		return -1;
-+	}
-+
-+	return btdev_add_hook(hciemu->dev, hook_type, opcode, function,
-+								user_data);
-+}
-+
-+bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
-+								uint16_t opcode)
-+{
-+	enum btdev_hook_type hook_type;
-+
-+	if (!hciemu)
-+		return false;
-+
-+	switch (type) {
-+	case HCIEMU_HOOK_PRE_CMD:
-+		hook_type = BTDEV_HOOK_PRE_CMD;
-+		break;
-+	case HCIEMU_HOOK_POST_CMD:
-+		hook_type = BTDEV_HOOK_POST_CMD;
-+		break;
-+	case HCIEMU_HOOK_PRE_EVT:
-+		hook_type = BTDEV_HOOK_PRE_EVT;
-+		break;
-+	case HCIEMU_HOOK_POST_EVT:
-+		hook_type = BTDEV_HOOK_POST_EVT;
-+		break;
-+	default:
-+		return false;
-+	}
-+
-+	return btdev_del_hook(hciemu->dev, hook_type, opcode);
-+}
+ 
+-	return g_str_equal(str, value);
++	return !strcmp(str, value);
+ }
+ 
+-static void proxy_added(GDBusProxy *proxy, void *user_data)
++static void proxy_added(struct l_dbus_proxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+ 
+-	interface = g_dbus_proxy_get_interface(proxy);
++	interface = l_dbus_proxy_get_interface(proxy);
+ 
+-	if (g_str_equal(interface, "org.bluez.Adapter1") == TRUE) {
++	if (!strcmp(interface, "org.bluez.Adapter1")) {
+ 		if (compare_string_property(proxy, "Address",
+-				hciemu_get_address(hciemu_stack)) == TRUE) {
++				hciemu_get_address(hciemu_stack))) {
+ 			adapter_proxy = proxy;
+-			tester_print("Found adapter");
++			bttester_print("Found adapter");
+ 
+-			tester_setup_complete();
++			l_tester_setup_complete(tester);
+ 		}
+ 	}
+ }
+ 
+-static void proxy_removed(GDBusProxy *proxy, void *user_data)
++static void proxy_removed(struct l_dbus_proxy *proxy, void *user_data)
+ {
+ 	const char *interface;
+ 
+-	interface = g_dbus_proxy_get_interface(proxy);
++	interface = l_dbus_proxy_get_interface(proxy);
+ 
+-	if (g_str_equal(interface, "org.bluez.Adapter1") == TRUE) {
++	if (!strcmp(interface, "org.bluez.Adapter1")) {
+ 		if (adapter_proxy == proxy) {
+ 			adapter_proxy = NULL;
+-			tester_print("Adapter removed");
+-
+-			g_dbus_client_unref(dbus_client);
+-			dbus_client = NULL;
++			bttester_print("Adapter removed");
++			l_idle_oneshot(destroy_client, NULL, NULL);
+ 		}
+ 	}
+ }
+ 
+ static void test_setup(const void *test_data)
+ {
+-	dbus_conn = g_dbus_setup_private(DBUS_BUS_SYSTEM, NULL, NULL);
+-
+-	dbus_client = g_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++	dbus_conn = l_dbus_new_default(L_DBUS_SYSTEM_BUS);
+ 
+-	g_dbus_client_set_connect_watch(dbus_client, connect_handler, NULL);
+-	g_dbus_client_set_disconnect_watch(dbus_client,
+-						disconnect_handler, NULL);
++	dbus_client = l_dbus_client_new(dbus_conn, "org.bluez", "/org/bluez");
++	l_dbus_client_set_connect_handler(dbus_client, connect_handler, NULL,
++									NULL);
++	l_dbus_client_set_disconnect_handler(dbus_client,
++						service_disconnect_handler,
++						NULL, client_destroy_handler);
+ 
+-	g_dbus_client_set_proxy_handlers(dbus_client, proxy_added,
+-						proxy_removed, NULL, NULL);
++	l_dbus_client_set_proxy_handlers(dbus_client, proxy_added,
++					proxy_removed, NULL, NULL, NULL);
+ }
+ 
+ static void test_run(const void *test_data)
+ {
+-	tester_test_passed();
++	l_tester_test_passed(tester);
+ }
+ 
+ static void test_teardown(const void *test_data)
+@@ -118,9 +130,10 @@ static void test_teardown(const void *test_data)
+ 
+ int main(int argc, char *argv[])
+ {
+-	tester_init(&argc, &argv);
++	tester = bttester_init(&argc, &argv);
+ 
+-	tester_add("Adapter setup", NULL, test_setup, test_run, test_teardown);
++	l_tester_add(tester, "Adapter setup", NULL, test_setup, test_run,
++								test_teardown);
+ 
+-	return tester_run();
++	return bttester_run();
+ }
 -- 
 2.26.3
 
