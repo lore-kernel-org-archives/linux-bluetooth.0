@@ -2,78 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.0 required=3.0 tests=BAYES_00,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2087AC43461
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 01:19:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 876E9C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 01:30:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2FAD610F7
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 01:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FCBF610F7
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  7 May 2021 01:30:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233975AbhEGBUQ (ORCPT
+        id S233612AbhEGBbm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 6 May 2021 21:20:16 -0400
-Received: from mail-ot1-f45.google.com ([209.85.210.45]:44005 "EHLO
-        mail-ot1-f45.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233027AbhEGBUO (ORCPT
+        Thu, 6 May 2021 21:31:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53558 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231461AbhEGBbm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 6 May 2021 21:20:14 -0400
-Received: by mail-ot1-f45.google.com with SMTP id u19-20020a0568302493b02902d61b0d29adso5830700ots.10;
-        Thu, 06 May 2021 18:19:14 -0700 (PDT)
+        Thu, 6 May 2021 21:31:42 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06C45C061761
+        for <linux-bluetooth@vger.kernel.org>; Thu,  6 May 2021 18:30:41 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id n22so5567995qtk.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 06 May 2021 18:30:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=m/ynwBsOjNhNeecWqKJ+rHlfryMIlRAVBKL2dOLJL1Y=;
+        b=tOF0qPrqJCFenQ8iH697fHgleah+vKHFpBY81enLU/4PreD1PeMdzdhsgyilhAuHTP
+         OqjUFoaWCXFfCZO42GScWT8JsWbg5usIfm2lDu2MZfARaHdWe5+YqCeIpOamrJNL6JK4
+         DZ7ZfIPyKP0P2bwqM+MgF+6pl8sNp9MuqGYT7VXpoq0zdzxYQtcVAtewWshwTdfaHtLq
+         Z6VJ8UKj8ADj+ElGYNv6pKxGr8q+NIujxtMbcmjqGyZ3whurakdqIrnKvKAbR4pBLliP
+         6GDSsMg4ldwpuEIU4hkTst0y2KtWbQINEFFcnzO2GfPxN3DUD7wnfnjIY4X7ewIFFOQ2
+         xN1w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=iTRiEv/+c31w1knsIgiLTIV+1F0Vw0ef9aNvXKYG0/M=;
-        b=pkouxRVbkiG9cirC0aqotu3NAIOlNAoqaUscfy2FXBEwDnq8HOzoCFl429IoTxDA4e
-         oNk+oETH9N3Un+7Kw27TNWuMK5XBVBHfiE7bJ8XcMiogaNfQ7a4j+Uk+i6VUXJHVWUDN
-         4qkwEN2TS1T6dEWbAcbVrNe7HFbSA+BT4r+L825t5Vow2B4aAkPHDRa7w5FpAI0LEMfR
-         M6w/PO/fFgbB00lwQZft5OsPh9V4uo4O/BzgwuUeunfYLKYmJhKnQg47nvzkyn+Mgm8F
-         S3RsVlfSw9DrPt4UIZ/NogV0EReyu3n3xgYqyvPIGi98/0Srs4sA9tZ3VltssiJo5sGz
-         ttcg==
-X-Gm-Message-State: AOAM532oBnOE5K5/vK1MSz5DmlNREn/rG/NYmAFlYRrxcsbCLXgWHl3N
-        nTnP+gQ0ufA2gzDX+Tag3g==
-X-Google-Smtp-Source: ABdhPJwPMNVgkYoUMeIdVLdofJLqZe2HJ2aWT28cmU2/jeNKZAqSuKtsNJ/sYxzF5visBCFJ01x8lg==
-X-Received: by 2002:a9d:543:: with SMTP id 61mr2637297otw.287.1620350354494;
-        Thu, 06 May 2021 18:19:14 -0700 (PDT)
-Received: from robh.at.kernel.org (24-155-109-49.dyn.grandenetworks.net. [24.155.109.49])
-        by smtp.gmail.com with ESMTPSA id o6sm731687oih.44.2021.05.06.18.19.13
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=m/ynwBsOjNhNeecWqKJ+rHlfryMIlRAVBKL2dOLJL1Y=;
+        b=L5mYdpiREqnDP9J5K54KenPI1hEHdZ9PaeIWjEd9tQqCOM8SWO1PMPbufDy57JZl5p
+         Us1LnJ++kMetQrDAdbMrtrevFq/7u6eu864Iq7NB9aC5s1Nd2vX9pXRxcF8YzvFLfvxQ
+         3/ZqU/+iWxSdQ7uId5KbAQP01AjQa6x/qjNEYeLvzgy/AwjvfDNoVoh23cyYHrpiN9H6
+         UN1WaDSQs0OuMX/qsmgs8QBm5riKy7YGiK5bxZDmKOxyIccC/SVky6l1Yz1sA7GYV5Ly
+         hMLahclAYV+q858ISFR7mfIg59O1rHy5WuQMRDjIklvraG5jR18r5ZxZOwSngaCphbnZ
+         NzGw==
+X-Gm-Message-State: AOAM533V7ge07gdF49xB/hF1CB4600k/ULUVUYEATdXUD8n5/bNXz9n9
+        rDc+I6Xdldbk7lV1AMKgAy60VNrwdl7GHw==
+X-Google-Smtp-Source: ABdhPJw4EcwYerlPeiOugqB1h8nNC/LDLU3h2baH3Zar05B4OFMraFkjiBrgfto4BrGm6X9Dd2imgw==
+X-Received: by 2002:ac8:5649:: with SMTP id 9mr7224523qtt.148.1620351040130;
+        Thu, 06 May 2021 18:30:40 -0700 (PDT)
+Received: from [172.17.0.2] ([40.71.229.105])
+        by smtp.gmail.com with ESMTPSA id r186sm3623405qke.97.2021.05.06.18.30.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 May 2021 18:19:13 -0700 (PDT)
-Received: (nullmailer pid 1133400 invoked by uid 1000);
-        Fri, 07 May 2021 01:19:12 -0000
-Date:   Thu, 6 May 2021 20:19:12 -0500
-From:   Rob Herring <robh@kernel.org>
-To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-Cc:     rjliao@codeaurora.org, abhishekpandit@chromium.org,
-        hbandi@codeaurora.org, bgodavar@codeaurora.org,
-        devicetree@vger.kernel.org, johan.hedberg@gmail.com,
-        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        mka@chromium.org, hemantg@codeaurora.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org
-Subject: Re: [PATCH v3 5/5] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI chip wcn6750
-Message-ID: <20210507011912.GA1133328@robh.at.kernel.org>
-References: <1620322392-27148-1-git-send-email-gubbaven@codeaurora.org>
- <1620322392-27148-6-git-send-email-gubbaven@codeaurora.org>
+        Thu, 06 May 2021 18:30:39 -0700 (PDT)
+Message-ID: <6094983f.1c69fb81.c435d.7385@mx.google.com>
+Date:   Thu, 06 May 2021 18:30:39 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8985385030710743259=="
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1620322392-27148-6-git-send-email-gubbaven@codeaurora.org>
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ] monitor: Remove Pygments dependency from manpage
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210507005630.1231205-1-hj.tedd.an@gmail.com>
+References: <20210507005630.1231205-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 06 May 2021 23:03:12 +0530, Venkata Lakshmi Narayana Gubba wrote:
-> This patch enables regulators and gpios for the Qualcomm Bluetooth wcn6750
-> controller.
-> 
-> Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
-> ---
->  .../bindings/net/qualcomm-bluetooth.yaml           | 71 ++++++++++++++++++++++
->  1 file changed, 71 insertions(+)
-> 
+--===============8985385030710743259==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Reviewed-by: Rob Herring <robh@kernel.org>
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=478179
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.90 seconds
+GitLint                       PASS      0.12 seconds
+Prep - Setup ELL              PASS      47.68 seconds
+Build - Prep                  PASS      0.11 seconds
+Build - Configure             PASS      8.37 seconds
+Build - Make                  PASS      203.26 seconds
+Make Check                    PASS      9.58 seconds
+Make Dist                     PASS      12.87 seconds
+Make Dist - Configure         PASS      5.15 seconds
+Make Dist - Make              PASS      81.78 seconds
+Build w/ext ELL - Configure   PASS      8.41 seconds
+Build w/ext ELL - Make        PASS      190.81 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Dist - PASS
+Desc: Run 'make dist' and build the distribution tarball
+
+##############################
+Test: Make Dist - Configure - PASS
+Desc: Configure the source from distribution tarball
+
+##############################
+Test: Make Dist - Make - PASS
+Desc: Build the source from distribution tarball
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============8985385030710743259==--
