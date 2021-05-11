@@ -2,162 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1469C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 13:46:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83F82C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 17:58:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D76D6134F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 13:46:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46DFC61625
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 17:58:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231521AbhEKNrQ (ORCPT
+        id S231904AbhEKR7R (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 May 2021 09:47:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38812 "EHLO
+        Tue, 11 May 2021 13:59:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231426AbhEKNrQ (ORCPT
+        with ESMTP id S231439AbhEKR7N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 May 2021 09:47:16 -0400
-Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CD3FC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 06:46:10 -0700 (PDT)
-Received: by mail-qk1-x730.google.com with SMTP id a22so18146359qkl.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 06:46:10 -0700 (PDT)
+        Tue, 11 May 2021 13:59:13 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B6F0C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 10:58:06 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id i13so16768290pfu.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 10:58:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=5wJ/D0PSpYy5PeOXQkMhJb31ZtdORVo67NydgTJUnLc=;
-        b=MFSOklqNqc7pNTlaV2dw0sY/fAKnYVg/r0XPqrKHWpFoxpKlIEDlhoorJ2vI/QYUyh
-         A9qmD2WFcR5PoQcWQpCsiF1le/AmZUfBY8Nvi2grzlXIThIAEL+kKFIWUNFqLlxBs8hv
-         Z4AFiA0IeL/Y+jNVK7XBaWvM9YYZseWSZwrnpjMArAQRcXXAgYuFuTpkxs9I1eEyPOZU
-         I2L6upY4FnF5+tyIalfqwaKTOcAhCQfM9FHaKc0m2Jho66jPW+k1KPFM6zEyiofngj6P
-         szyj2Oq48q5M5JI1m0AxsUVyzAcpd1LUtkL9q9tFS3SG1bAjWBRH/QUPc+vm7DdxmUN0
-         TdNg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3qZDwzy2nMHUs6TgK3apG4VfEIUTtWnOQyxOVKFgvAo=;
+        b=OuuUJVimYP2FR8NLVWI5/h0Z/yqKk394+fLs1rUCSREUqmD9rVGlCMVzRlExdIyc6k
+         3FgCNDMYkyIh8rwFwMUu+UWfirrNErXUYpAuZvHofElNDW6Zj/KwH2K0+E7z4Kh+9VvI
+         9E2/y4YY2J256n3AD6QI9wCfBWS0AxZWv6XAPTj+TxjkWq80SynU806ELY3PValttUI6
+         zMsGixiV0apobOL49ksuz0hJ2WnGXmohAIPn6RsJkqUrZuWU0xV7g3gyuehXAun33af1
+         2bzz//4YmW7AWjszH/ToU+wxnw3LXajD/LWsFhV5Hhdry+Mt+5cHwN4fg1RROoMup7Q2
+         /nKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=5wJ/D0PSpYy5PeOXQkMhJb31ZtdORVo67NydgTJUnLc=;
-        b=qY94L20RA5HCUif6orwh2ZCR3fC3lySkyWqQppHlkX/rQpGpDcbwcIqC2OUevqg9Oo
-         C/66Fzd019Jw5OLKbX8eEuOfb1175B+GwZ1AjJYxt+qUdj5KtQ7HeHPoUux0SqiWk2C+
-         Y1pV+chSCz4N+VIpQaejggonWlQ3posvAIuDndjuY7Ru4+nX7h5RO8dbJYRGe4OJRkV4
-         2vPvhAqPZ4oF5+JECZwQIItAvCyF3FH1SMbGcT4fdElAj8YNUuxrQccl4mR2Itk2FS1R
-         X+DcxarZShiNJ/SiEAQIBCIBq6RCSvDHZtLzSYHGH+cSOtGDIQUDBaCN5EYgRXl+mH3Q
-         /j5g==
-X-Gm-Message-State: AOAM531WBOmhPOknj+pBUo/0tNjt8yUejUBwL494qa67XH6Z3wEO1iRh
-        nfSyabimXz64tDVtcM5KglkIARrzso368g==
-X-Google-Smtp-Source: ABdhPJx9M/8AJGMPO+xLKbroNmoJqZdGlv3U7a56oRoiieKgbnBhT0UlXzJyIkChkcCj9VLR0ABubg==
-X-Received: by 2002:a05:620a:2097:: with SMTP id e23mr28762902qka.98.1620740769039;
-        Tue, 11 May 2021 06:46:09 -0700 (PDT)
-Received: from [172.17.0.2] ([52.247.110.214])
-        by smtp.gmail.com with ESMTPSA id d10sm11135739qtq.55.2021.05.11.06.46.08
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3qZDwzy2nMHUs6TgK3apG4VfEIUTtWnOQyxOVKFgvAo=;
+        b=Y9Y43AS5Mx7lIFO9arWe5vvNcf4dkLN9wuitrlhs1/A+2NCxUxs5kdr/tZVl/CTOVZ
+         a9MbHuhqq9lmxubNWadHvxQnKr72oiWeWSW8uPy79KIH8pADkhgpa4vc+s5zIO+Tj9jt
+         wZg7o8AGOtyKaRTCGRIJb6Iyy4I2mMu9Y6HTfyRDGMaeI9taRi/wA4ni4U37Ked4QgX/
+         Biy0YfQtVIO2FWBFlZXP5dgHnucxsjjmfgf1SVv6AgvgkLDSnZvqm2LvlDSuPmCnLjfH
+         oJ01S+niifS2odNX7GgbXYKKtXTka4/Tv0GK9v0M2K0Jtx7JtOZ8oQ8MJiNIWjrziYi3
+         MJzA==
+X-Gm-Message-State: AOAM531Yy2Qg8ivqk+8OCF+VW1HWXTqdAMpp7DVSEGWjY1x/XNNUtMgC
+        SElp936TyafRBMfnTsiz93zHBJG644ThCA==
+X-Google-Smtp-Source: ABdhPJwma/7sG8ncKbmIDuvnGLdyi8iHUYEgpv9kXneTZeccdcUNVSqraJ7oHK/xoGiJ/WhSnogbsA==
+X-Received: by 2002:a63:982:: with SMTP id 124mr32075648pgj.37.1620755885100;
+        Tue, 11 May 2021 10:58:05 -0700 (PDT)
+Received: from han1-mobl3.hsd1.or.comcast.net ([2601:1c0:6a01:d830::512a])
+        by smtp.gmail.com with ESMTPSA id p36sm14093788pgm.74.2021.05.11.10.58.04
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 May 2021 06:46:08 -0700 (PDT)
-Message-ID: <609a8aa0.1c69fb81.f42f4.fe63@mx.google.com>
-Date:   Tue, 11 May 2021 06:46:08 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0203310872720174313=="
+        Tue, 11 May 2021 10:58:04 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] config: Show error if rst2man not found when manpages are enabled
+Date:   Tue, 11 May 2021 10:58:03 -0700
+Message-Id: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, thomas@t-8ch.de
-Subject: RE: [BlueZ] tools/mpris-proxy: Ship systemd unit file
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210511132213.150076-1-thomas@t-8ch.de>
-References: <20210511132213.150076-1-thomas@t-8ch.de>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0203310872720174313==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=480411
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.49 seconds
-GitLint                       FAIL      0.13 seconds
-Prep - Setup ELL              PASS      45.42 seconds
-Build - Prep                  PASS      0.14 seconds
-Build - Configure             PASS      8.03 seconds
-Build - Make                  PASS      197.02 seconds
-Make Check                    PASS      8.78 seconds
-Make Dist                     PASS      11.48 seconds
-Make Dist - Configure         PASS      4.92 seconds
-Make Dist - Make              PASS      79.31 seconds
-Build w/ext ELL - Configure   PASS      8.09 seconds
-Build w/ext ELL - Make        PASS      185.67 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-tools/mpris-proxy: Ship systemd unit file
-3: B6 Body message is missing
-
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Dist - PASS
-Desc: Run 'make dist' and build the distribution tarball
-
-##############################
-Test: Make Dist - Configure - PASS
-Desc: Configure the source from distribution tarball
-
-##############################
-Test: Make Dist - Make - PASS
-Desc: Build the source from distribution tarball
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+This patch adds a check if the conversion tool is installed when the
+manpages is enabled, and show error if it is not installed.
 ---
-Regards,
-Linux Bluetooth
+ configure.ac | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/configure.ac b/configure.ac
+index f445589b0..2b044f8e5 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -328,6 +328,9 @@ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+ 					[enable_manpages=${enableval}])
+ if (test "${enable_manpages}" != "no"); then
+ 	AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
++	if (test "${RST2MAN}" = "no" ); then
++		AC_MSG_ERROR([rst2man is required])
++	fi
+ fi
+ AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
+ AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
+-- 
+2.26.3
 
---===============0203310872720174313==--
