@@ -7,103 +7,118 @@ X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 126D8C43461
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:08:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A31C43460
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:24:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAB1161628
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:08:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 82F306190A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:24:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232113AbhEKSJY (ORCPT
+        id S231587AbhEKSZf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 May 2021 14:09:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
+        Tue, 11 May 2021 14:25:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232057AbhEKSJS (ORCPT
+        with ESMTP id S231329AbhEKSZf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 May 2021 14:09:18 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2519FC06138A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:08:11 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id h202so27461237ybg.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:08:11 -0700 (PDT)
+        Tue, 11 May 2021 14:25:35 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 727DFC06175F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:24:28 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id a11so11237225plh.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:24:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=cvuBK4aSTZYBYeCUeYPhHSIY916hSJ6uu/doeG4KOxI=;
-        b=qrJ384/FzjGFpidwkUqTV9xkcqgmMjQoYb2KSvgkggfTPnQMosGUNfGAqzW3h601Lx
-         cwIg3HLOyAFyFCV9iFCBCuoB02/qTGH0AAKK0gJ4tmasMsmANb1iWgNM62ByGW9UagvC
-         b1cdo+OmX3dlnCNzWgXYlnqudW8pmHBbL4282S/x9NLfotnuyQ1B7Zyxd+r4dcahOl78
-         36opCphLzj870TmlDLmRhtA6DSCqOm8TOrY0uSEyz+yWGVZ2klu4gtrg2wsl4h7deJJC
-         cldM3toK6MGKtodgN4ILi2kSacQMPlzr62E89U16RjLn6B33LT2FMXK+dKzR0PkeT/b1
-         CH0g==
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=ug7NELsxYhIYWU88vVsfghwegyuLJkBOzy+xlJ1ROyI=;
+        b=vQmVNjJKN7GSo7+M7Lf3fNXIq8kWojeHYh2AWnPGIkM5mMdsuPjvGrx8ioiTwGVueQ
+         cdYc1pt/UNuv09Wbp9PVFsd611PCF1ZFJbJz+OM4lNaAiOlCtE5e9hEJFfy75yEBRwlt
+         oiPm2HFXaWIv2zQGOvCFpLoYmJm+AJzEuvTGGAOmWEN6mDLgoqxmRkGvU72mnegzaeDG
+         VLcF224cGcx268GsFTHSNUzITWdgagQl7D3iyPHM1+9V1oOzJRbvYsMwyxz8PwMZ2Nq4
+         Xv0V0ZGhYPeEyZrA8OzQrDnSh1VCKc2jQINKSjD8eurmFGi5s40/GdhRKRC3lqShG+8a
+         npbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=cvuBK4aSTZYBYeCUeYPhHSIY916hSJ6uu/doeG4KOxI=;
-        b=otbC9wx/OEApriALq31VH48hYk6/h0d9Ly/Imv/2/hbd2mXyo4r86n9dXugbTNjHwr
-         yJU9QXWPdyfTET9fB5xdaQexPmC4umG4/R5nKNygdjCL5a4Dy23mhjoSBCXvBcZden5n
-         fdiW5MH78lOx0YYz6zsldY6M3+5hhUSnVUcm/hotLppViLSAvW+fvhCoGuPjLGWA2Yat
-         LRswE/iTWlPYlTbv7d2VX55pX82VsY4NCJ+gVaqeRh6dAqj/eED07L4tyvS0ZXuXdcjO
-         RX7omQ1cEB5bq5QMiM26YjPGttilFyS+VFNpiuEnVgn6zfnVWS1vxuKs6W5z93u5r6HW
-         6K5g==
-X-Gm-Message-State: AOAM531rtn4kuEMaSUaE5ToSFwJIsB4ZLc9Q4Qswux5SNdc4o6S6G5Ua
-        tq8NGyKYu57QdjW4ArzmTSzrrjN7WgcoB9WfxQY=
-X-Google-Smtp-Source: ABdhPJw3DpTOFL1//bdBevV5U/vF292kKtPJQszRjqjbjpMppn/1YH/P/BSf2rfXqmIiKuCIuLyBjOAjJXJSmJrzi78=
-X-Received: by 2002:a25:a466:: with SMTP id f93mr42739975ybi.264.1620756490409;
- Tue, 11 May 2021 11:08:10 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
-In-Reply-To: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 11 May 2021 11:07:59 -0700
-Message-ID: <CABBYNZKMHFVD7Z8oKOs3W-QusezCmjbZAeZn98NHVYz2YdfdEQ@mail.gmail.com>
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=ug7NELsxYhIYWU88vVsfghwegyuLJkBOzy+xlJ1ROyI=;
+        b=khyTz8d0PVeWSJ1QyrsFAiyREbgzTkWuqqF8JHxoeJ2pvz/YTqT49thwRyM2WmDDyC
+         VLibNkUSGH410Kl/QrPwvC2StQ2LxT2g2R0TEbWJQwKIQxEmEURPiTHCFZOFbgB7oO3L
+         /WVB06SO95AEsoI7mQsbNtHarP6Kd4ojttKzFzqIjh9ZtzPn+32/Sub92Sl7kcQawVPt
+         AcEnH4eszW/jefK3U+q9U5R3hIUFoYc6ENZAym+91oIfwnhGPi4iy1arfdYa4ztp9X/l
+         3QnIy87+4tLrLcZSN0dy15l2OYUO47oL4bmGhyiwkib4K60bQsC5Qyq+Lnsa3yM3ttM7
+         jTKw==
+X-Gm-Message-State: AOAM531o/0QeHoAbA6oKt1RTu1+d3Lp/35IMIh+iTQ8C2rjAEZdLN7yZ
+        U9NQNS4blvy8qIUD3jugJSY=
+X-Google-Smtp-Source: ABdhPJx3s5q0GZMPYt4tyHyVIIWKtJfl3/MecJblqW3staIA4R1ePUkZ1fbi+OtMrxt2rW3DmcKHgQ==
+X-Received: by 2002:a17:90a:540c:: with SMTP id z12mr6475280pjh.42.1620757468003;
+        Tue, 11 May 2021 11:24:28 -0700 (PDT)
+Received: from han1-mobl3 ([2601:1c0:6a01:d830::512a])
+        by smtp.gmail.com with ESMTPSA id t10sm2727709pju.18.2021.05.11.11.24.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 May 2021 11:24:27 -0700 (PDT)
+Message-ID: <b472ff1236cd1f0216af325ea4cd58dc7b562ae1.camel@gmail.com>
 Subject: Re: [BlueZ PATCH] config: Show error if rst2man not found when
  manpages are enabled
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 11 May 2021 11:24:26 -0700
+In-Reply-To: <CABBYNZKMHFVD7Z8oKOs3W-QusezCmjbZAeZn98NHVYz2YdfdEQ@mail.gmail.com>
+References: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
+         <CABBYNZKMHFVD7Z8oKOs3W-QusezCmjbZAeZn98NHVYz2YdfdEQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Luiz,
 
-On Tue, May 11, 2021 at 11:02 AM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
->
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->
-> This patch adds a check if the conversion tool is installed when the
-> manpages is enabled, and show error if it is not installed.
-> ---
->  configure.ac | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/configure.ac b/configure.ac
-> index f445589b0..2b044f8e5 100644
-> --- a/configure.ac
-> +++ b/configure.ac
-> @@ -328,6 +328,9 @@ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
->                                         [enable_manpages=${enableval}])
->  if (test "${enable_manpages}" != "no"); then
->         AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
-> +       if (test "${RST2MAN}" = "no" ); then
-> +               AC_MSG_ERROR([rst2man is required])
+On Tue, 2021-05-11 at 11:07 -0700, Luiz Augusto von Dentz wrote:
+> Hi Tedd,
+> 
+> On Tue, May 11, 2021 at 11:02 AM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
+> > From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> > 
+> > This patch adds a check if the conversion tool is installed when the
+> > manpages is enabled, and show error if it is not installed.
+> > ---
+> >  configure.ac | 3 +++
+> >  1 file changed, 3 insertions(+)
+> > 
+> > diff --git a/configure.ac b/configure.ac
+> > index f445589b0..2b044f8e5 100644
+> > --- a/configure.ac
+> > +++ b/configure.ac
+> > @@ -328,6 +328,9 @@ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+> >                                         [enable_manpages=${enableval}])
+> >  if (test "${enable_manpages}" != "no"); then
+> >         AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
+> > +       if (test "${RST2MAN}" = "no" ); then
+> > +               AC_MSG_ERROR([rst2man is required])
+> 
+> I guess we can mention that it is typically packaged with
+> python-docutils e.g: rstman is required: install python-docutils or
+> alternatively we check python-docutils with pkgconfig since it will be
+> a hard dependency anyway.
 
-I guess we can mention that it is typically packaged with
-python-docutils e.g: rstman is required: install python-docutils or
-alternatively we check python-docutils with pkgconfig since it will be
-a hard dependency anyway.
+Just to keep the consistency with other errors in configure.ac, I think it is better to say
+like it instead of mentioning the package name. 
+Also, there is a python3-docutils and python-docutils depending on the python version
+that user is using. So it may confuse the user, and the package name may different
+for other distros (I didn't check though...).
 
-> +       fi
->  fi
->  AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
->  AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
-> --
-> 2.26.3
->
+> 
+> > +       fi
+> >  fi
+> >  AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
+> >  AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
+> > --
+> > 2.26.3
+> > 
+> 
+> 
 
-
--- 
-Luiz Augusto von Dentz
