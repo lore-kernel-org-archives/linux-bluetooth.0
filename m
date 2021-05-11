@@ -2,116 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6EE1C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 126D8C43461
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:08:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B558E61625
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CAB1161628
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 18:08:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231996AbhEKSF4 (ORCPT
+        id S232113AbhEKSJY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 May 2021 14:05:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41534 "EHLO
+        Tue, 11 May 2021 14:09:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbhEKSF4 (ORCPT
+        with ESMTP id S232057AbhEKSJS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 May 2021 14:05:56 -0400
-Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 826BCC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:04:48 -0700 (PDT)
-Received: by mail-yb1-xb2a.google.com with SMTP id 15so27545204ybc.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:04:48 -0700 (PDT)
+        Tue, 11 May 2021 14:09:18 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2519FC06138A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:08:11 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id h202so27461237ybg.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 11:08:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=zdDJxG9IGj/xdsLMmHFEAKBlvZKxaTVxkJYJhr2qjI0=;
-        b=Z0KIryTf5PYZFuKEBdhQwWMoxZBKsU6p7apMJtSYlGxlNqO1L3TQcrYVyB1c8rHj/h
-         xCvtIPQaOgDztU23Z3XoAVLeqVXo5uMMRa/syd9pclv8Lp70U9ANAfNoaXlsEzEFFvMj
-         VGw9pc0PBBMU7UwjiiUI5B3hyJUwf+b5TdzttpeMT0USOERhWHSYujlVbaX+HutrR1vX
-         CfvVp/FF+61VxifdBiiH6/7yo3VdXW3rX+G+YVDFqR+zyvkBnardgENO7CsRgzCsbyoE
-         kkeptsjYRTXGU7vNVMashrSXnXyYHfpfnOGljD3s8gYsL/wPDySVikBaV+U0bAmYVdO3
-         IfVQ==
+        bh=cvuBK4aSTZYBYeCUeYPhHSIY916hSJ6uu/doeG4KOxI=;
+        b=qrJ384/FzjGFpidwkUqTV9xkcqgmMjQoYb2KSvgkggfTPnQMosGUNfGAqzW3h601Lx
+         cwIg3HLOyAFyFCV9iFCBCuoB02/qTGH0AAKK0gJ4tmasMsmANb1iWgNM62ByGW9UagvC
+         b1cdo+OmX3dlnCNzWgXYlnqudW8pmHBbL4282S/x9NLfotnuyQ1B7Zyxd+r4dcahOl78
+         36opCphLzj870TmlDLmRhtA6DSCqOm8TOrY0uSEyz+yWGVZ2klu4gtrg2wsl4h7deJJC
+         cldM3toK6MGKtodgN4ILi2kSacQMPlzr62E89U16RjLn6B33LT2FMXK+dKzR0PkeT/b1
+         CH0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=zdDJxG9IGj/xdsLMmHFEAKBlvZKxaTVxkJYJhr2qjI0=;
-        b=NNT7sX5+xqCEbQdBx5ZKqkOfermtKJ73EKt3rTdMIuiOuTs57MSy4QExPm2GhNARU1
-         yMeMOS9nmOpB6QyKbNvr/1H9wirBVXezBq9Zv3cRiy9SE+O6mB11yByoV5wNB1QjQ1sK
-         buv9A2et7S9xAAuWIBWXl2Kwgu7Iwr7MbSOSo+Yc82ULY2do8cMJKvZzOnvJuhiWLj7E
-         Xnh4AsKlJ3W/LgpWQuHEWuK/GVUU7QFE0z0/7vNpeYbCYgT9IZeAAqE0w/JoYwBChLrK
-         FKQgjMozEChDIwl1DsrqeR0dFZCEyDAkY2j/nIfhUqHRjZrOFbjnMA56xzxG+jYqpeaA
-         O4ow==
-X-Gm-Message-State: AOAM530v80MvkB3FeusWkXdtamBTihX+e2PGuZbbyZHTaggwMqMbldMt
-        7HbhZGVbHXiSyAJ6bHxAl6FzizOVdCUFSTdinNGzG6y9
-X-Google-Smtp-Source: ABdhPJy4HYghnQe98dMkBYQoTrazk42mR4ME9HWEjUPlbNKvegzIk955APpJ3rYGL3cyprwWu5uonpPVMJoS3SKuabo=
-X-Received: by 2002:a25:9a04:: with SMTP id x4mr26758873ybn.440.1620756287718;
- Tue, 11 May 2021 11:04:47 -0700 (PDT)
+        bh=cvuBK4aSTZYBYeCUeYPhHSIY916hSJ6uu/doeG4KOxI=;
+        b=otbC9wx/OEApriALq31VH48hYk6/h0d9Ly/Imv/2/hbd2mXyo4r86n9dXugbTNjHwr
+         yJU9QXWPdyfTET9fB5xdaQexPmC4umG4/R5nKNygdjCL5a4Dy23mhjoSBCXvBcZden5n
+         fdiW5MH78lOx0YYz6zsldY6M3+5hhUSnVUcm/hotLppViLSAvW+fvhCoGuPjLGWA2Yat
+         LRswE/iTWlPYlTbv7d2VX55pX82VsY4NCJ+gVaqeRh6dAqj/eED07L4tyvS0ZXuXdcjO
+         RX7omQ1cEB5bq5QMiM26YjPGttilFyS+VFNpiuEnVgn6zfnVWS1vxuKs6W5z93u5r6HW
+         6K5g==
+X-Gm-Message-State: AOAM531rtn4kuEMaSUaE5ToSFwJIsB4ZLc9Q4Qswux5SNdc4o6S6G5Ua
+        tq8NGyKYu57QdjW4ArzmTSzrrjN7WgcoB9WfxQY=
+X-Google-Smtp-Source: ABdhPJw3DpTOFL1//bdBevV5U/vF292kKtPJQszRjqjbjpMppn/1YH/P/BSf2rfXqmIiKuCIuLyBjOAjJXJSmJrzi78=
+X-Received: by 2002:a25:a466:: with SMTP id f93mr42739975ybi.264.1620756490409;
+ Tue, 11 May 2021 11:08:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210511152807.Bluez.v1.1.I6d2ab6907d9a84fa62ac8a39daef5bef7ff545d5@changeid>
-In-Reply-To: <20210511152807.Bluez.v1.1.I6d2ab6907d9a84fa62ac8a39daef5bef7ff545d5@changeid>
+References: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
+In-Reply-To: <20210511175803.1609438-1-hj.tedd.an@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 11 May 2021 11:04:36 -0700
-Message-ID: <CABBYNZ+JiqjRR0p6LSFr8MZ6i2pojDDjmh5X5n8MCRih06WEUQ@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1] monitor: Fix possible crash of rfcomm packet
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
+Date:   Tue, 11 May 2021 11:07:59 -0700
+Message-ID: <CABBYNZKMHFVD7Z8oKOs3W-QusezCmjbZAeZn98NHVYz2YdfdEQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH] config: Show error if rst2man not found when
+ manpages are enabled
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Tedd,
 
-On Tue, May 11, 2021 at 12:28 AM Howard Chung <howardchung@google.com> wrote:
+On Tue, May 11, 2021 at 11:02 AM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
 >
-> From: Yun-Hao Chung <howardchung@chromium.org>
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
 >
-> When RFCOMM_TEST_EA returns false, btmon assumes packet data has at
-> least 5 bytes long. If that assumption fails, btmon could crash when
-> trying to read the next byte.
-> This patch fix it by checking the remaining size before reading the last
-> byte.
->
-> Reviewed-by: apusaka@chromium.org
+> This patch adds a check if the conversion tool is installed when the
+> manpages is enabled, and show error if it is not installed.
 > ---
->
->  monitor/rfcomm.c | 3 +++
+>  configure.ac | 3 +++
 >  1 file changed, 3 insertions(+)
 >
-> diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
-> index 9b88a3440e31..76b1123bb23d 100644
-> --- a/monitor/rfcomm.c
-> +++ b/monitor/rfcomm.c
-> @@ -452,6 +452,9 @@ void rfcomm_packet(const struct l2cap_frame *frame)
->                 hdr.length = GET_LEN16(hdr.length);
->         }
->
-> +       if (l2cap_frame->size == 0)
-> +               goto fail;
-> +
+> diff --git a/configure.ac b/configure.ac
+> index f445589b0..2b044f8e5 100644
+> --- a/configure.ac
+> +++ b/configure.ac
+> @@ -328,6 +328,9 @@ AC_ARG_ENABLE(manpages, AC_HELP_STRING([--enable-manpages],
+>                                         [enable_manpages=${enableval}])
+>  if (test "${enable_manpages}" != "no"); then
+>         AC_CHECK_PROGS(RST2MAN, [rst2man rst2man.py], "no")
+> +       if (test "${RST2MAN}" = "no" ); then
+> +               AC_MSG_ERROR([rst2man is required])
 
-if (!l2cap_frame->size)
+I guess we can mention that it is typically packaged with
+python-docutils e.g: rstman is required: install python-docutils or
+alternatively we check python-docutils with pkgconfig since it will be
+a hard dependency anyway.
 
->         l2cap_frame_pull(&tmp_frame, l2cap_frame, l2cap_frame->size-1);
-
-Or perhaps we can make l2cap_frame_pull check if it can really pull
-the frame and return false if it doesn't just as get_*.
-
->         if (!l2cap_frame_get_u8(&tmp_frame, &hdr.fcs))
+> +       fi
+>  fi
+>  AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" = "yes")
+>  AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" = "yes" && test "${RST2MAN}" != "no")
 > --
-> 2.31.1.607.g51e8a6a459-goog
+> 2.26.3
 >
 
 
