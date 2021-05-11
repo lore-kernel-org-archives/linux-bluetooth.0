@@ -8,63 +8,63 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 424E0C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 07:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A158C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 07:28:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0C09C61925
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 07:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6545A6143B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 11 May 2021 07:28:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230361AbhEKHYu (ORCPT
+        id S230357AbhEKH3y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 May 2021 03:24:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37016 "EHLO
+        Tue, 11 May 2021 03:29:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38186 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229945AbhEKHYq (ORCPT
+        with ESMTP id S230343AbhEKH3y (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 May 2021 03:24:46 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAE28C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 00:23:40 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id o12-20020a5b050c0000b02904f4a117bd74so22882397ybp.17
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 00:23:40 -0700 (PDT)
+        Tue, 11 May 2021 03:29:54 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65951C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 00:28:48 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id n46-20020a056a000d6eb029028e9efbc4a7so12419965pfv.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 00:28:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=hq3OAqf8KWJqIcKPp9Wed0kiOfRYA7pD1gZRGA3gWHI=;
-        b=DLBm16lSmIhY4hP9HqpJrFRLr3pKA0lgoVYnuz71RIavrqZX6SN7E6KbB3F5Suaj70
-         BzORkXJfdjCjpUPliBFABjLznTd0Ea3gV5MJN/D5Qjd6E9BveK9cQmTKeLjr123UobLD
-         tWmtfP3r/MdRFrCCfXxSkR49BsxtkZAUh+fXsk3nQbnwVaCbZGwR/i1hfKewPA/4uE1q
-         YwgvQ75Yg7Dhu/Q9vrOp+qszFVehAOBhRDzRlCmkm1zglTiA2JusADp6v08gluYMzsk8
-         Z6VVWhQgMxdayxYWTOmflxV3RiwVl28hGQhLLBlj5mp2i/vMPFY0qoutrToEqM9WDC7n
-         L61w==
+        bh=0NuxBHGHxAT7PFBRKN8L1TkqBFdEqBHNKYTr/3kaxf8=;
+        b=qroSWun2ErszEsgxCp4O7qFrCH+qBjwTAM9e2Jl6GH0g4Wmq4P6wCRGV0eETDEL984
+         +eK1CnYCN0Hj8HSsfkHb6DtzOuriZepDfVB/KNmMLFMKn9rezjPlSxY8twRscIBQLjNE
+         qUqm9v6XDTrcqyOkwG2gaugqecgygWymAOjhtaq3g2ysQtNMEw0FQ2nVJGYEUTg+/Pig
+         8evtIwZh3yGfzOfg6UXO9lxkjl285vOQU2eaWH3TNO5+pMiwt5J68ul0lPiU1i+Do0eG
+         u+m58RyF73X5bYNjyL9Kozihcd6fy14UKb/nq7trf7W0u2XZtlVdREGRvzrNDyoAD7Tn
+         v8Tw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=hq3OAqf8KWJqIcKPp9Wed0kiOfRYA7pD1gZRGA3gWHI=;
-        b=uN+VdDjQOAtZoz4mCw20d8at4yPP8BaGYAEJryOx7H/37SmmhA6pePghcdEMQVHrjS
-         4ZHAcABznwSvWf0awaAdyzXJbiVDK85p0/Tljswpz7G5hVgwyerf0XbQicPkFuJAKKUS
-         eLmsCh35EiQEge5MrHnMqE21SCjx99ik+DarKB1eVTFJBZRUrURhZTeZn4th1/rMNkDd
-         XZTGgIzr2wfD7VhbZ43UlzPf5Jjps8zWPYnCXg3ch80MW/TSizB+E+/YtkabtnZn+2SR
-         XVhPXt1XYdI6LMOyUvAslirEKmN+VJZ8HZ56490ZdSRxTL5kTNvOh0ZcnBS8bhDl1YHG
-         iiBg==
-X-Gm-Message-State: AOAM531IH/GBP69IkeBJO1Xttz4tHaHpu+vFnNDjD2HaqCS0Zu5xmt7g
-        1JlYMbhUUqRHWXEsYNoaXkorrn+lSh8yt7u4SxxB9O15HrqPPffo+HjbrWolvEDd/RD95bYNEtd
-        rHTe3sRszUHhPSHOn2w/jnkUK8PNDB6qHYdvvg7A2nkqCarkhypn0oB+l8yzRw+MChDBM8t0nEg
-        /AncCE9YNASA0=
-X-Google-Smtp-Source: ABdhPJxlZl6yQZ/pP1gUbHXdHTRBVML0vJs9nYD/RcIE3HFkCgiv4uzdWnPQOCnnUo31GeiEtrWmkhN/4PwvXa5M1g==
+        bh=0NuxBHGHxAT7PFBRKN8L1TkqBFdEqBHNKYTr/3kaxf8=;
+        b=GhCWzJG5snn4zb7spaTbM+d9mNBBtWIuyKHD51/nsTn8ukeKYFUpPE5nYBnBgAYIoM
+         h9t/Pbe7WXWFYIgxEeWdg8ZzmTq68HRVW3msA9iMEzyPJQOOfobGtFQa7ezUGrIIscog
+         spBuDghJ5gk+bc4E3yVaQ1UwRWsmNbsAWQFJEQ0RY8cUma2uirmd7LT5x+gD7E4VBjrs
+         ddfr2k7F+nc2nE2xs1X17lsLxlkiB4eLYSg17r+0nkiJv0Y8wB9nWclXdLXvH5BrMA3Y
+         +yFxLX8KIMhXcoem0LF/q0U1tgrQC2FaNvxCMUdFKhzNFHJFzUuh85qV5VhJKZP3KYwd
+         +8Xw==
+X-Gm-Message-State: AOAM531x/74m4RuuTQXvBnHd9EwrXoBKDC1LidxFrozIUkjeR5wBmESL
+        4LLIE55xiIdxkDmMSTxVIj7GJ5gMDit2YOjaIwPgBbyi4E18kpwtu9Rf4axiSJoEbb/vfCBfXrt
+        Z1VZ3UNCAulkhyy4Ugh4gRH3HTzBwj7sA1lJ5zcz4Jr4+5roDdIiUt/AGPcPuMzEyjYca2t9ZPz
+        V3WOU9bdsZx08=
+X-Google-Smtp-Source: ABdhPJx4cuQxdXvSqJLYrH+lr0siY8udCaIfi/rjPPpz1tN0NeLdkUIgHM2XueEYkBj8k2JnRz3AJ7gMXBf1s8ataQ==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:cbc0:6ee0:8475:58e])
- (user=howardchung job=sendgmr) by 2002:a25:2e47:: with SMTP id
- b7mr37898510ybn.397.1620717819976; Tue, 11 May 2021 00:23:39 -0700 (PDT)
-Date:   Tue, 11 May 2021 15:23:33 +0800
-Message-Id: <20210511152320.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
+ (user=howardchung job=sendgmr) by 2002:a17:902:8505:b029:ec:b451:71cd with
+ SMTP id bj5-20020a1709028505b02900ecb45171cdmr28430448plb.23.1620718127754;
+ Tue, 11 May 2021 00:28:47 -0700 (PDT)
+Date:   Tue, 11 May 2021 15:28:42 +0800
+Message-Id: <20210511152807.Bluez.v1.1.I6d2ab6907d9a84fa62ac8a39daef5bef7ff545d5@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.31.1.607.g51e8a6a459-goog
-Subject: [Bluez PATCH v1] core: Add RSSI sampling period in system parameter
+Subject: [Bluez PATCH v1] monitor: Fix possible crash of rfcomm packet
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Yun-Hao Chung <howardchung@chromium.org>, apusaka@chromium.org,
-        mmandlik@chromium.org, mcchou@chromium.org
+        Yun-Hao Chung <howardchung@chromium.org>, apusaka@chromium.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -72,139 +72,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-Add an option in main.conf to configure the default RSSI sampling
-period for advertisement monitor.
+When RFCOMM_TEST_EA returns false, btmon assumes packet data has at
+least 5 bytes long. If that assumption fails, btmon could crash when
+trying to read the next byte.
+This patch fix it by checking the remaining size before reading the last
+byte.
 
 Reviewed-by: apusaka@chromium.org
-Reviewed-by: mmandlik@chromium.org
-Reviewed-by: mcchou@chromium.org
 ---
 
- src/adv_monitor.c |  4 ++--
- src/btd.h         |  6 ++++++
- src/main.c        | 20 ++++++++++++++++++++
- src/main.conf     |  6 ++++++
- 4 files changed, 34 insertions(+), 2 deletions(-)
+ monitor/rfcomm.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 9f04aaefbf22..17f1777eb1da 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -25,6 +25,7 @@
- #include "lib/mgmt.h"
- 
- #include "adapter.h"
-+#include "btd.h"
- #include "dbus-common.h"
- #include "device.h"
- #include "log.h"
-@@ -49,7 +50,6 @@
- #define ADV_MONITOR_DEFAULT_HIGH_TIMEOUT 10	/* second */
- #define ADV_MONITOR_UNSET_SAMPLING_PERIOD 256	/* 100 ms */
- #define ADV_MONITOR_MAX_SAMPLING_PERIOD	255	/* 100 ms */
--#define ADV_MONITOR_DEFAULT_SAMPLING_PERIOD 0	/* 100 ms */
- 
- struct btd_adv_monitor_manager {
- 	struct btd_adapter *adapter;
-@@ -831,7 +831,7 @@ static bool parse_rssi_and_timeout(struct adv_monitor *monitor,
- 		h_rssi_timeout = ADV_MONITOR_DEFAULT_HIGH_TIMEOUT;
- 
- 	if (sampling_period == ADV_MONITOR_UNSET_SAMPLING_PERIOD)
--		sampling_period = ADV_MONITOR_DEFAULT_SAMPLING_PERIOD;
-+		sampling_period = btd_opts.advmon.rssi_sampling_period;
- 
- 	if (h_rssi < ADV_MONITOR_MIN_RSSI || h_rssi > ADV_MONITOR_MAX_RSSI ||
- 		l_rssi < ADV_MONITOR_MIN_RSSI ||
-diff --git a/src/btd.h b/src/btd.h
-index a3247e4fd80a..1c9e9b2eff1f 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -89,6 +89,10 @@ struct btd_avdtp_opts {
- 	uint8_t  stream_mode;
- };
- 
-+struct btd_advmon_opts {
-+	uint8_t		rssi_sampling_period;
-+};
-+
- struct btd_opts {
- 	char		*name;
- 	uint32_t	class;
-@@ -122,6 +126,8 @@ struct btd_opts {
- 	uint8_t		key_size;
- 
- 	enum jw_repairing_t jw_repairing;
-+
-+	struct btd_advmon_opts	advmon;
- };
- 
- extern struct btd_opts btd_opts;
-diff --git a/src/main.c b/src/main.c
-index c32bda7d407d..617975d25cb1 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -145,6 +145,11 @@ static const char *avdtp_options[] = {
- 	NULL
- };
- 
-+static const char *advmon_options[] = {
-+	"RSSISamplingPeriod",
-+	NULL
-+};
-+
- static const struct group_table {
- 	const char *name;
- 	const char **options;
-@@ -155,6 +160,7 @@ static const struct group_table {
- 	{ "Policy",	policy_options },
- 	{ "GATT",	gatt_options },
- 	{ "AVDTP",	avdtp_options },
-+	{ "AdvMon",	advmon_options },
- 	{ }
- };
- 
-@@ -793,6 +799,18 @@ static void parse_config(GKeyFile *config)
- 		}
+diff --git a/monitor/rfcomm.c b/monitor/rfcomm.c
+index 9b88a3440e31..76b1123bb23d 100644
+--- a/monitor/rfcomm.c
++++ b/monitor/rfcomm.c
+@@ -452,6 +452,9 @@ void rfcomm_packet(const struct l2cap_frame *frame)
+ 		hdr.length = GET_LEN16(hdr.length);
  	}
  
-+	val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
-+									&err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		val = MIN(val, 0xFF);
-+		val = MAX(val, 0);
-+		DBG("RSSISamplingPeriod=%d", val);
-+		btd_opts.advmon.rssi_sampling_period = val;
-+	}
++	if (l2cap_frame->size == 0)
++		goto fail;
 +
- 	parse_br_config(config);
- 	parse_le_config(config);
- }
-@@ -832,6 +850,8 @@ static void init_defaults(void)
+ 	l2cap_frame_pull(&tmp_frame, l2cap_frame, l2cap_frame->size-1);
  
- 	btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
- 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
-+
-+	btd_opts.advmon.rssi_sampling_period = 0;
- }
- 
- static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
-diff --git a/src/main.conf b/src/main.conf
-index f47cab46dc10..9ad8895bd700 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -244,3 +244,9 @@
- # The value is in seconds.
- # Default: 2
- #ResumeDelay = 2
-+
-+[AdvMon]
-+# Default RSSI Sampling Period. This is used when a client registers an
-+# advertisement monitor and leaves the RSSISamplingPeriod unset.
-+# Default: 0
-+#RSSISamplingPeriod=0
+ 	if (!l2cap_frame_get_u8(&tmp_frame, &hdr.fcs))
 -- 
 2.31.1.607.g51e8a6a459-goog
 
