@@ -7,122 +7,81 @@ X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD4A6C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 22:40:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 227E8C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 22:40:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BE7CD611CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 22:40:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE2E2611CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 22:40:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237662AbhELWld (ORCPT
+        id S237920AbhELWlz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 12 May 2021 18:41:33 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:25288 "EHLO
+        Wed, 12 May 2021 18:41:55 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:41036 "EHLO
         us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S1392199AbhELVgw (ORCPT
+        by vger.kernel.org with ESMTP id S1392467AbhELVhr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 12 May 2021 17:36:52 -0400
+        Wed, 12 May 2021 17:37:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1620855343;
+        s=mimecast20190719; t=1620855399;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:mime-version:mime-version:content-type:content-type:
          content-transfer-encoding:content-transfer-encoding;
-        bh=ECiZex0mV5Oxaxt6S04kmD8mU2S1vLa1Q2/gouDDESI=;
-        b=jExmYDJiYjCAK5JWKk5+o+z2TuqMecET5MOd2GVYt4u3B3btdqhICmifa++p8ZoMvvCvaT
-        voD3jFmBxjNWOOh/k63Yb7iswxMj5GDZjE/Y/mSmgogV7lNOFyp0l4q62L5yHbR2sYg4xN
-        XYbf54Cfiune3umeEHPP/J0InAlF3tk=
+        bh=ZjFysPE72wEn02XDNwKNZXqJiKo5jA+rqapk3/wuO3M=;
+        b=duGiZcS1jSiE6iYGhdQzXGjGlDPHG9NVOXm63wyS/6kwPOnucsvxbJPY+0mbJa/bb0nnUV
+        SvoLNwo+WpDi11Set8IyeG9dyST5elJ1VjKVxjWYflpznP8dB1uWw8m2lb0eQ7V8Ovmk9I
+        AFDCyKQB5Kha7LeThGzUInpWAzN0zKo=
 Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
  [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-244-nHaG0abqMEePbTVuzjrcpQ-1; Wed, 12 May 2021 17:35:41 -0400
-X-MC-Unique: nHaG0abqMEePbTVuzjrcpQ-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.phx2.redhat.com [10.5.11.23])
+ us-mta-352-kBP6iXCWNvGspiPVhgejHw-1; Wed, 12 May 2021 17:36:35 -0400
+X-MC-Unique: kBP6iXCWNvGspiPVhgejHw-1
+Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.phx2.redhat.com [10.5.11.11])
         (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE042801817
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 21:35:40 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id B25A41020C37
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 21:36:34 +0000 (UTC)
 Received: from ivy-bridge (ovpn-112-130.rdu2.redhat.com [10.10.112.130])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 8739719D9F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 21:35:40 +0000 (UTC)
-Date:   Wed, 12 May 2021 17:36:07 -0400
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 5E68750AC6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 21:36:34 +0000 (UTC)
+Date:   Wed, 12 May 2021 17:37:01 -0400
 From:   Steve Grubb <sgrubb@redhat.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bluez PATCH 2/6] Fix leaks in obex
-Message-ID: <20210512173607.31b2b63d@ivy-bridge>
+Subject: [Bluez PATCH 3/6] Fix leaks in plugin
+Message-ID: <20210512173701.4bd04817@ivy-bridge>
 Organization: Red Hat
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Scanned-By: MIMEDefang 2.84 on 10.5.11.23
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.11
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
-In filesystem, g_file_get_contents allocates fresh memory. Use it
-instead of making a new copy of it. That saves having to free buf
-later.
-
-Destination was missed on an error path as is mld.
+g_file_get_contents allocates memory. It needs to be freed on any
+function exit.
 
 Signed-off-by: Steve Grubb <sgrubb@redhat.com>
 ---
- obexd/plugins/filesystem.c     | 2 +-
- obexd/plugins/ftp.c            | 8 ++++++--
- obexd/plugins/messages-dummy.c | 1 +
- 3 files changed, 8 insertions(+), 3 deletions(-)
+ plugins/hostname.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/obexd/plugins/filesystem.c b/obexd/plugins/filesystem.c
-index 09bff8ad0..44e3cf3d2 100644
---- a/obexd/plugins/filesystem.c
-+++ b/obexd/plugins/filesystem.c
-@@ -415,7 +415,7 @@ static void *capability_open(const char *name, int oflag, mode_t mode,
- 			goto fail;
- 		}
+diff --git a/plugins/hostname.c b/plugins/hostname.c
+index f7ab9e8bc..1a9513adb 100644
+--- a/plugins/hostname.c
++++ b/plugins/hostname.c
+@@ -213,11 +213,10 @@ static void read_dmi_fallback(void)
+ 		return;
  
--		object->buffer = g_string_new(buf);
-+		object->buffer = buf;
+ 	type = atoi(contents);
++	g_free(contents);
+ 	if (type < 0 || type > 0x1D)
+ 		return;
  
- 		if (size)
- 			*size = object->buffer->len;
-diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
-index 259bfcae2..4b04bab06 100644
---- a/obexd/plugins/ftp.c
-+++ b/obexd/plugins/ftp.c
-@@ -386,8 +386,10 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
- 	ret = verify_path(destdir);
- 	g_free(destdir);
- 
--	if (ret < 0)
-+	if (ret < 0) {
-+		g_free(destination);
- 		return ret;
-+	}
- 
- 	source = g_build_filename(ftp->folder, name, NULL);
- 
-@@ -424,8 +426,10 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
- 	ret = verify_path(destdir);
- 	g_free(destdir);
- 
--	if (ret < 0)
-+	if (ret < 0) {
-+		g_free(destination);
- 		return ret;
-+	}
- 
- 	source = g_build_filename(ftp->folder, name, NULL);
- 
-diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
-index 34199fa05..e37b52df6 100644
---- a/obexd/plugins/messages-dummy.c
-+++ b/obexd/plugins/messages-dummy.c
-@@ -488,6 +488,7 @@ int messages_get_messages_listing(void *session, const char *name,
- 			int err = -errno;
- 			DBG("fopen(): %d, %s", -err, strerror(-err));
- 			g_free(path);
-+			g_free(mld);
- 			return -EBADR;
- 		}
- 	}
+-	g_free(contents);
+-
+ 	/* from systemd hostname chassis list */
+ 	switch (type) {
+ 	case 0x3:
 -- 
 2.31.1
 
