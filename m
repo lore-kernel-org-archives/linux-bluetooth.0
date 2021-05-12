@@ -7,85 +7,102 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A24BFC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 00:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91876C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 01:40:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F6F361278
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 00:28:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 63B076192F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 12 May 2021 01:40:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229994AbhELA3a (ORCPT
+        id S229945AbhELBlW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 11 May 2021 20:29:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43584 "EHLO
+        Tue, 11 May 2021 21:41:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbhELA3a (ORCPT
+        with ESMTP id S230139AbhELBlO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 11 May 2021 20:29:30 -0400
-Received: from mail-io1-xd30.google.com (mail-io1-xd30.google.com [IPv6:2607:f8b0:4864:20::d30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EA4CC06174A
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 17:28:23 -0700 (PDT)
-Received: by mail-io1-xd30.google.com with SMTP id l21so20005366iob.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 17:28:23 -0700 (PDT)
+        Tue, 11 May 2021 21:41:14 -0400
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1777C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 18:36:15 -0700 (PDT)
+Received: by mail-vk1-xa2e.google.com with SMTP id j19so4455095vkj.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 11 May 2021 18:36:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:from:date:message-id:subject:to;
-        bh=Wc7KeWQzM7R2bzHUOFy/yjDt8VNG6x8f3+Mc6PwEFBw=;
-        b=emmLO5GF+aFAfhHoOjGwSWnN/ombwRm53u/qR2sDwFJGdJIGcWzrmTwu9D9euV5Vg4
-         aob5ANNpQZjKZ0IFT3YAm7igm/iolVRJTzVCyAElmct1/osMLS20B+tsqUGQRSWl8bNw
-         rxUE+OdlKd51yUgzetMP54gfjb6z04FBNqhd3r5cjeB+/l5yELokJoUgNc+4dipfnG2s
-         6QgDZ+42UfrLpGn9o8YySCBZ/wwPb9iHfDhR5LIF7Ktvt4UuJiL88+j92quk0gd2xF68
-         AHpMm/TK6oQ5h42sG9hfLZQfA1qTIRmGOUH9p5AAc+QiIVzbsNel1sA4bspiRnpT26Da
-         M56A==
+        bh=GpdyqVa3B+lxuTT8brBcevVG4wUtcG19Sl0+92ZTw8E=;
+        b=EbKlFpMXixN3PkW8eDkvOunk/HoqEpex4O2Lmeut3qK6PsTdYN22Y0sf14zOI4pN2V
+         TfTvZrqIcqPr6ye4O9+j7Gm3v1kjNv6WfJuV6aa02/YCBBSKQN39AQ1A1jjICxujdSmK
+         3JmlrmjV/DIJqqighTOYsIOhUq0jIANIRbK8V3D8MQizZrmmCgXEr3T++R43pVM3/Ona
+         ibgz+sXGAc71idUJQ99ir73Sgl5ZURHHj83K23mvB13+WGV0ilJ8of2qZHRd7dOhtQl9
+         b1lZLxzLQQ0/nxWeQ89PwFc3eJmLAK9p37x5q5Sj8seAQV7KbXpaCm/kpfhAWR8IuUuX
+         enrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=Wc7KeWQzM7R2bzHUOFy/yjDt8VNG6x8f3+Mc6PwEFBw=;
-        b=bEOpJVtslMqnwtSgWMaj+e/pq7buAhpa6IqkmgIj7ls53/Mo1JSM9a0a+vghguSg/x
-         Ke4Fd/rCPRUx2A0sspKcQYViFdtg0veyYWIrFXgcBhn4xd7ZB8rc6ULZkYyo9GMq2LaB
-         C/e/GzxhmTcZdonoVmmD+mbILArwxajrt4ZEh893xjQ40XzPjE6v4EqPMVVF+Sne5IhR
-         8nJ+8okbIEx2oikAkM45miVR81PKD4I6jM4edmu4bavGRTS2C19MMOgXjCAjP0v+a+FK
-         ucFMD6JmCbsyd8/mTtjPAWJY9nOhbzdaLNbbxNRNq1bZWq3rw1ekMhyqrFPR+qp0loaC
-         1i1A==
-X-Gm-Message-State: AOAM5325dvbukFcBfKx+lhKrdnWkbKpcQcL8pmeO8eEHm1NPtVqbHT80
-        H1uZ3zB/IJ2OZranXwos/s3qSTMFRPmqU3DbQPFNbHvu3CqD
-X-Google-Smtp-Source: ABdhPJxjsu8O70gj7EtjNbkndE04+oHO2QfAyTIANtSmHWWS6RQ45XGAEL92ppBrs2JjWODS9+40sCvQnqBa/SuV394=
-X-Received: by 2002:a5e:8c11:: with SMTP id n17mr15753843ioj.53.1620779302296;
- Tue, 11 May 2021 17:28:22 -0700 (PDT)
+        bh=GpdyqVa3B+lxuTT8brBcevVG4wUtcG19Sl0+92ZTw8E=;
+        b=WhYbpJsKBAFPz4RyXyI35hN0Kr9rA1iVcfz/Ox+fOPRMy8ET/F/rl6Wq3didLLrZ8h
+         xKTpTdgL6miD1WLBWsQyB7c/uTZy7g6VQ40MPAXJmYYwh+PSalucEbywBDHV65e2qkLb
+         qj2ANTv6uK8gBOQOoyBd68x7aw2T8XITL91fkfbRI991jKaAzn2iKNN6pfCJiPUsVkx1
+         5YCWa1xVEXFZCYUKZbdN0CvCWGlFaEz4ru91X4h6uFHuxaRFj4koGzxSJIR1KpUEIEdd
+         NM1RrvFsj27WNvOLH7NRzAqcCAnvSWMr/JFL0O2Xyx4mTOzN5fGCuaANS1zFYzbw0vv2
+         MVzw==
+X-Gm-Message-State: AOAM5339+1cHsUj7ooy7Im9oZauZjh07nTduiA8mT1GagJYPEqcGcDbc
+        2aWTdBLp/wuHsleey32d4p0GSjEUU/NVXKL8Z7CgYQk44Z8=
+X-Google-Smtp-Source: ABdhPJzag1amPQDlsEaSpqcb9pw/uffWurSOGRl0w27xgMMdY+WoSwuhLl/MguoOc6pKwRaq9cI/gvDryAt6mwWHdZA=
+X-Received: by 2002:a1f:9d90:: with SMTP id g138mr26081383vke.2.1620783374378;
+ Tue, 11 May 2021 18:36:14 -0700 (PDT)
 MIME-Version: 1.0
-From:   Kenny Bian <kennybian@gmail.com>
-Date:   Tue, 11 May 2021 17:28:11 -0700
-Message-ID: <CAC9s0NZaXLFvf8DbdSaQC4za-TkR2Dj+r5mp313kCUjEP0S1sA@mail.gmail.com>
-Subject: Build BlueZ 5.50: getting errors
+From:   Patrick Doyle <wpdster@gmail.com>
+Date:   Tue, 11 May 2021 21:35:48 -0400
+Message-ID: <CAF_dkJD9+0ZXRi6e+9Bsjwo7069zg9fHH4RhaYQf+w-LjNpRwg@mail.gmail.com>
+Subject: Help understanding BLE Advertising and Scan Response packets...
 To:     linux-bluetooth@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-We are using BlueZ 5.48 in embedded Ubuntu 18.04. We're trying to
-build BlueZ 5.50 for embedded Ubuntu 18.04 because we need the
-"Service Changed Indication" feature which was fixed in 5.50. The host
-system to build BlueZ is Ubuntu 18.04.
+I'm confused by how Bluez assigns data the to BLE and Scan Response
+packets.  In src/advertising.c, in the refresh_legacy_adv() function,
+I see the following:
 
-I downloaded the BlueZ 5.50. The CPU on the embedded device is
-"Freescale i.MX6 UltraLite". As we need to cross compile the BlueZ, I
-suppose we need to use the option "--host=arm-linux-gnueabihf". Is
-that the correct option for cross-compilation? Here is the configure
-command:
-./configure --host=arm-linux-gnueabihf --prefix=/usr
---mandir=/usr/share/man --sysconfdir=/etc --localstatedir=/var
 
-But there were errors when we ran the command above:
-checking for GLIB... no
-configure: error: GLib >= 2.28 is required
+adv_data = generate_adv_data(client, &flags, &adv_data_len);
+..
+scan_rsp = generate_scan_rsp(client, &flags, &scan_rsp_len);
 
-So I installed these packages:
-sudo apt-get install libglib2.0
-sudo apt-get install glib2.0
+Looking in generate_adv_data() and generate_scan_rsp(), I see that
+they both end with:
 
-But I still got the same errors even if the packages above were
-installed. It seems GLib is 2.27 for Ubuntu 18.04. If that is the
-case, how can I get GLib version 2.28 or above in order to get
-configure working?
+return bt_ad_generate(client->data, len);
 
-Thanks in Advance!
+So, then I look at bt_ad_generate() in src/shared/ad.c and I see code
+much like the following:
+
+serialize_service_uuids(ad->service_uuids, adv_data, &pos);
+serialize_solicit_uuids(ad->solicit_uuids, adv_data, &pos);
+serialize_manuf_data(ad->manufacturer_data, adv_data, &pos);
+serialize_service_data(ad->service_data, adv_data, &pos);
+serialize_name(ad->name, adv_data, &pos);
+serialize_appearance(ad->appearance, adv_data, &pos);
+serialize_data(ad->data, adv_data, &pos);
+
+return adv_data;
+
+From inspecting the code, it seems to me that Bluez stuffs the same
+data in both the advertising_data packet, and in the scan_repsonse
+packet.  This is especially confusing to me because, examining the
+packets on the air with a BLE sniffer, that is NOT what I see... but I
+can't figure why not.
+
+On a somewhat related note, I have constructed my D-Bus object with
+its org.bluez.LEAdvertisement1 interface to specify the data I want in
+my BLE peripheral advertising packet, and I overflowed the size of the
+advertising_data packet.  I would like to figure out how to indicate
+to Bluez that I would like the "service_data" portion of my
+advertisement to go into the scan_response packet instead of the
+advertising_data packet.  Any tips on how to do that?
+
+Thanks
+
+--wpd
