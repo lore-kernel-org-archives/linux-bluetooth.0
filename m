@@ -2,148 +2,153 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 26B1EC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 06:49:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B585C43460
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 08:09:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D9C6461405
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 06:49:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53C1F61355
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 08:09:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231425AbhEMGun (ORCPT
+        id S231485AbhEMILD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 02:50:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53740 "EHLO
+        Thu, 13 May 2021 04:11:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230063AbhEMGun (ORCPT
+        with ESMTP id S230318AbhEMILC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 02:50:43 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D21BCC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 23:49:33 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id q10so20479359qkc.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 12 May 2021 23:49:33 -0700 (PDT)
+        Thu, 13 May 2021 04:11:02 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DE17C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 01:09:53 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id p20so8830129ljj.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 01:09:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ky+L01TKZw2K0LFY2Zb7v0MA3SmNbj3bdFYRJQUZCSE=;
-        b=HKJ/jEcWftjK8Stlf9eBebjU2edWUry0Dh6TIeXAts4dlBMzgGNxylOgwA6UysS9lE
-         cihAlahqpup7bA3N7ai3rXcw283lRojd0So4JMVjGNl9J5jzYxzq8xPBBrBbMnr+7Dnf
-         CPJ/athaGiO5Q7p4Om3uwG2GJfv0pBvf8LRIfvIWQVWDl+xBSh4aqzwEd62AldHm1uMl
-         /g+hL080Jl4RMK2LJzCNa9yl5Wy8rIaXBK/6gQYbNwoP9RBA0aHPN4Erl9KNv6cnOsak
-         kqoX48Hy2djPokhhpej+y2SMbzMAg7lvVUtC/4ZXEYcuCsBy2iHhNmNZL4nM2my2j/S6
-         NhzQ==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:organization:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VKWTUzghWqG73Yb4bsxyH4lL4CY73jE061Smyy3iO4I=;
+        b=S8uw4xVC3wqxmVc+/BxuYOTb48CIlbujpoWzROCE1g60xEh9/4FU0DLYytrF6okOIY
+         sEb+zHFKkipag6wAclYAy/3H1RLUI0HusgMA3m19bjnRcPzzL/1a33rg5/Fpz4H3yxbJ
+         n4lDfGsYfjp4f4DGHr9tCSPX1CjuNJ110uFx89SPzK4qJygkl++B5ojqhZU0p/gTHX9d
+         nsp2VmW3HKOBs8A9zGyB9RZtw55RsDT8bQnRwBxOriX/wfsySLbVUwZ1aPFWFAQIV+ka
+         xkoBbNjL8ssw1JwTNgmQJYnBuYXNC9nuC0ETje/3Sl+LFsEsoBPXUn+vIERaZ1xzbtN8
+         Cb9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ky+L01TKZw2K0LFY2Zb7v0MA3SmNbj3bdFYRJQUZCSE=;
-        b=uMY+Zb9xcXBRtG4AgnFTENZwzZnNUbDKdZs9E6+2CFojKYp7Rws23XKJ2CUdzv+1GG
-         Ff8nxbal6hrawj/SOYujhgSDC0MbNNIFDUy7faewkCPBNyDKe7BY3tepqzWcHDLP9PVb
-         GtPGoVmdEo+oZ9QVF1epunBj2sTByv/v01qgYDrn0o3FQVaxMATi04TDFoxfTBNwYfWz
-         CT5NW/bYSfPtYEzlFfJkjdk0Nf8BQnJ/8rpU6Mb3lFz0J7S0n/oIJzQiL5GnSZr0lU0l
-         3iCa3GC03Q7mjSJ1aJCsUE5hLBOjLMT0JAIzctzu9gknQQnBKefh59DrFkVGo1cp/VJd
-         /Y+Q==
-X-Gm-Message-State: AOAM533AFxELgH5RABfc3SV1nrjybhVy3gSd+2scSk6RBZEPjp18Au1V
-        PbV9HhGbnVZ7+9wNetvOriZt4SDUYdbpCQ==
-X-Google-Smtp-Source: ABdhPJzdWlK3+z9MopaXq1UayrxXqVbIUhlVEzyCLxE6Ifxhuk7YvclftkA6zd31AMVDtgVfu/qVbA==
-X-Received: by 2002:a37:a604:: with SMTP id p4mr33014954qke.408.1620888572784;
-        Wed, 12 May 2021 23:49:32 -0700 (PDT)
-Received: from [172.17.0.2] ([20.69.252.229])
-        by smtp.gmail.com with ESMTPSA id t11sm1777075qkm.123.2021.05.12.23.49.32
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:organization
+         :in-reply-to:references:mime-version:content-transfer-encoding;
+        bh=VKWTUzghWqG73Yb4bsxyH4lL4CY73jE061Smyy3iO4I=;
+        b=OkizLIBszykUH9HS0UMtT+RulS4Fna2m4jSJA2IgROBpYdHhwAf24o3w/ffMdWZ4YA
+         HaLC83PUCAo4iPrTIR9x4UOR85Gtp9PsknBzychc3hR2AoNX6Wg0ePVUJZP5000f3dUk
+         K2iSHVUEnmluUarVv6yHIn3SRlWfYp+zQhr0hIK53aCauQSih8qdKJ6OJEe5rHNVWj8T
+         knapt/2xPr/V0kAVMMzhOQmVT7GH7lvRzRZWMWzDjHhfxh3gcUHb7hGSgJQxmuqSls9j
+         izeQ9GEXOQ1//5IuE3vtmgpVyctwTKwvH6SC2AR5yhxMVnP+NWK+AEfkKad59A39yqyi
+         Xtog==
+X-Gm-Message-State: AOAM532T6oqNwreBvr7MZEI84Aw+UeGhu4XFtgcAXMDfr8Y2zIbKX5px
+        QsMlcByReHFS9wDDd1RKcR0o1/YCjmP0cQ==
+X-Google-Smtp-Source: ABdhPJyeCg2RzxBXQp0AH4CyqOPe42FwmYIUF0RhVosdqTONIBF7a8OarEgdZzl2FdhrKmiiPHR1JQ==
+X-Received: by 2002:a2e:591:: with SMTP id 139mr25382859ljf.207.1620893391522;
+        Thu, 13 May 2021 01:09:51 -0700 (PDT)
+Received: from ix.localnet ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id f14sm353754ljm.55.2021.05.13.01.09.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 12 May 2021 23:49:32 -0700 (PDT)
-Message-ID: <609ccbfc.1c69fb81.7a1cc.c9bc@mx.google.com>
-Date:   Wed, 12 May 2021 23:49:32 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2231311713519181309=="
+        Thu, 13 May 2021 01:09:51 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     Kai Krakow <kai@kaishome.de>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        stable@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Remove spurious error message
+Date:   Thu, 13 May 2021 10:09:49 +0200
+Message-ID: <4321662.LvFx2qVVIh@ix>
+Organization: CODECOUP
+In-Reply-To: <CABBYNZKBW1wtTbkmcQbAybGm7zdcur16935yGNwid9oiGOxNFQ@mail.gmail.com>
+References: <20210512133407.52330-1-szymon.janc@codecoup.pl> <CAC2ZOYvax0WGO7wMzbPXQMGb2NDouAF6XRgd5TH+h-f6uWvhtg@mail.gmail.com> <CABBYNZKBW1wtTbkmcQbAybGm7zdcur16935yGNwid9oiGOxNFQ@mail.gmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: [BlueZ] mesh: Add missing "storage" option to help menu
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210513061516.114889-1-inga.stotland@intel.com>
-References: <20210513061516.114889-1-inga.stotland@intel.com>
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="us-ascii"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2231311713519181309==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Wednesday, 12 May 2021 20:13:19 CEST Luiz Augusto von Dentz wrote:
+> Hi Kai,
+> 
+> On Wed, May 12, 2021 at 11:06 AM Kai Krakow <kai@kaishome.de> wrote:
+> > Hi Szymon!
+> > 
+> > Am Mi., 12. Mai 2021 um 15:34 Uhr schrieb Szymon Janc 
+<szymon.janc@codecoup.pl>:
+> > > Even with rate limited reporting this is very spammy and since
+> > > it is remote device that is providing bogus data there is no
+> > > need to report this as error.
+> > 
+> > [...]
+> > 
+> > > [72464.546319] Bluetooth: hci0: advertising data len corrected
+> > > [72464.857318] Bluetooth: hci0: advertising data len corrected
+> > > [72465.163332] Bluetooth: hci0: advertising data len corrected
+> > > [72465.278331] Bluetooth: hci0: advertising data len corrected
+> > > [72465.432323] Bluetooth: hci0: advertising data len corrected
+> > > [72465.891334] Bluetooth: hci0: advertising data len corrected
+> > > [72466.045334] Bluetooth: hci0: advertising data len corrected
+> > > [72466.197321] Bluetooth: hci0: advertising data len corrected
+> > > [72466.340318] Bluetooth: hci0: advertising data len corrected
+> > > [72466.498335] Bluetooth: hci0: advertising data len corrected
+> > > [72469.803299] bt_err_ratelimited: 10 callbacks suppressed
+> > > 
+> > > Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+> > > Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=203753
+> > > Cc: stable@vger.kernel.org
+> > > ---
+> > > 
+> > >  net/bluetooth/hci_event.c | 2 --
+> > >  1 file changed, 2 deletions(-)
+> > > 
+> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > > index 5e99968939ce..abdc44dc0b2f 100644
+> > > --- a/net/bluetooth/hci_event.c
+> > > +++ b/net/bluetooth/hci_event.c
+> > > @@ -5476,8 +5476,6 @@ static void process_adv_report(struct hci_dev
+> > > *hdev, u8 type, bdaddr_t *bdaddr,> > 
+> > >         /* Adjust for actual length */
+> > >         if (len != real_len) {
+> > > 
+> > > -               bt_dev_err_ratelimited(hdev, "advertising data len
+> > > corrected %u -> %u", -                                      len,
+> > > real_len);
+> > > 
+> > >                 len = real_len;
+> > >         
+> > >         }
+> > 
+> > This renders the "if" quite useless since it now always ensures len =
+> > real_len and nothing else. At this point, the "if" can be removed, and
+> > len can be set unconditionally. Depending on the further context of
+> > the patch, destinction between real_len and len may not be needed at
+> > all and real_len could be renamed to len, ditching the unused original
+> > which is potentially bogus data anyways according to your commit
+> > description.
+> 
+> That was introduced to truncate the len, the patch just removes the
+> logging but it does keep this logic, if you want to understand the
+> reason for it just use git blame and look at the history.
 
-Dear submitter,
+Actually, with no log there is no need for this "if" and real_len could be 
+indeed avoided.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=481661
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.48 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      41.27 seconds
-Build - Prep                  PASS      0.12 seconds
-Build - Configure             PASS      7.08 seconds
-Build - Make                  PASS      174.12 seconds
-Make Check                    PASS      9.27 seconds
-Make Distcheck                PASS      207.89 seconds
-Build w/ext ELL - Configure   PASS      7.25 seconds
-Build w/ext ELL - Make        PASS      164.20 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
+But I'd change this is subsequent patch which would not be tagged as stable 
+candidate. Thoughts?
 
 
---===============2231311713519181309==--
+-- 
+pozdrawiam
+Szymon Janc
+
+
