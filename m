@@ -2,151 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B033C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 19:03:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 54083C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 20:26:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3CA3161264
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 19:03:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1FF6060725
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 20:26:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232049AbhEMTEz convert rfc822-to-8bit (ORCPT
+        id S232876AbhEMU2H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 15:04:55 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60896 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231993AbhEMTEy (ORCPT
+        Thu, 13 May 2021 16:28:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38578 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231140AbhEMU2G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 15:04:54 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 18D1BCED2E;
-        Thu, 13 May 2021 21:11:34 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
-Subject: Re: [PATCH] Bluetooth: hci_h5: Add RTL8822CS capabilities
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJQfnxE4PY09GpxGYLKy2kXnaCQaUmCakhCKnhqGnoK+9aSyyg@mail.gmail.com>
-Date:   Thu, 13 May 2021 21:03:41 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <DAE03499-573B-4A72-A2A9-2E139B78AB2E@holtmann.org>
-References: <20210513165327.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
- <7867EC1F-324A-4739-B5F7-DDEB3994EA7A@holtmann.org>
- <CAJQfnxE4PY09GpxGYLKy2kXnaCQaUmCakhCKnhqGnoK+9aSyyg@mail.gmail.com>
-To:     Archie Pusaka <apusaka@google.com>
-X-Mailer: Apple Mail (2.3654.80.0.2.43)
+        Thu, 13 May 2021 16:28:06 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7EAEC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 13:26:55 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id q144so3990428ybq.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 13:26:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=Qnxl9TVkkFUbHxonFK709IMbzSuvUJZ7KVYBleqyd/o=;
+        b=m5RgY7Z41W60jBsr7OuzdME4f2uJFgsUeZ14Xcf+yDGx04XkOUT4gR5gSR6sXwEGXo
+         MyvpSmfFRurkHwCweCwHftnUZJ33UDZu1MLUeDO1so7BQs7OPIHIQyyAFnMu+uFgUpsf
+         2t2Fg5AIoodQMxDL45p8tJ2BSzlc52F3MzVNkqtCipVYGj9ryFptVUkLEZ8rGCA8kWyM
+         QUYz9qgTkKlIuULyJV1IhsGFx3CZpZbCG1lT6tvH5qqZ8A8B4ODIsSm7YfKwuHlqgm6T
+         r9TYqdWj9EhZbWxn7zW9JV2/9QV9cyloGGC1cSJuQ/3wQTouDwcOdqNCwnITi+c/sFdY
+         4fYQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=Qnxl9TVkkFUbHxonFK709IMbzSuvUJZ7KVYBleqyd/o=;
+        b=HFImJwAjCNQHmGM2rtqFePLaZlxuCidQEvJScclFULxtDckEfkMTgH38YepgDhunsX
+         6XtEYC9Jbw9onwMcs2aZJgOzTLh06rNU63yW2h7HaXqnHwig6n9ggPztZMfQggXqtdpR
+         REi5gQIARB5Mv0ba4M7c8yd5PcbXG7Xqq/xUbNF/MdIepSDp7QepFuLbol+bRt3iRDAI
+         TmgdfC7TPhg5P1ImQiTEksH3qgyXnZBezHS8ZD1YEvA97Q3Ly2AaQOuDiHhHqvKpUnN7
+         oI4wRw4k3/VtHeTlzA3CRYwc6hEhC7HebdIo0imD1B66p5rKx2s/FJ9oOVQqjUGvAmWZ
+         ZBSA==
+X-Gm-Message-State: AOAM530KC6VskqMgCH8AZ6ap0PcJlD+8C3mxjiZ7RoryJAmGZE+dcHTz
+        S7h9wMhbkB29W0D9+WGtpiukwKhaHxA2UILSGzRRf2B1
+X-Google-Smtp-Source: ABdhPJxQyPPZQPh5E1XHjzNCzvMtq4IaSbwkqrpiq6eOBnkQVkZDL726h7dgcCyh0h59tcgB03C8OlPYA4BHVfjfFkQ=
+X-Received: by 2002:a25:a466:: with SMTP id f93mr59146552ybi.264.1620937614859;
+ Thu, 13 May 2021 13:26:54 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210513003428.2576827-1-luiz.dentz@gmail.com> <609c850a.1c69fb81.6aa5b.3d78@mx.google.com>
+In-Reply-To: <609c850a.1c69fb81.6aa5b.3d78@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 13 May 2021 13:26:44 -0700
+Message-ID: <CABBYNZ+r16wR1R9VZ2snLpY1F_rrnz8T53qtseo9UzSTB43tJQ@mail.gmail.com>
+Subject: Re: [BlueZ] client/advertising: Add support for setting min/max intervals
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi,
 
->>> RTL8822 chipset supports WBS, and this information is conveyed in
->>> btusb.c. However, the UART driver doesn't have this information just
->>> yet.
->>> 
->>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
->>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->>> ---
->>> 
->>> drivers/bluetooth/btrtl.c  | 26 ++++++++++++++++----------
->>> drivers/bluetooth/btrtl.h  |  2 ++
->>> drivers/bluetooth/hci_h5.c |  5 +----
->>> 3 files changed, 19 insertions(+), 14 deletions(-)
->>> 
->>> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
->>> index e7fe5fb22753..988a09860c6b 100644
->>> --- a/drivers/bluetooth/btrtl.c
->>> +++ b/drivers/bluetooth/btrtl.c
->>> @@ -719,17 +719,8 @@ int btrtl_download_firmware(struct hci_dev *hdev,
->>> }
->>> EXPORT_SYMBOL_GPL(btrtl_download_firmware);
->>> 
->>> -int btrtl_setup_realtek(struct hci_dev *hdev)
->>> +void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
->>> {
->>> -     struct btrtl_device_info *btrtl_dev;
->>> -     int ret;
->>> -
->>> -     btrtl_dev = btrtl_initialize(hdev, NULL);
->>> -     if (IS_ERR(btrtl_dev))
->>> -             return PTR_ERR(btrtl_dev);
->>> -
->>> -     ret = btrtl_download_firmware(hdev, btrtl_dev);
->>> -
->>>      /* Enable controller to do both LE scan and BR/EDR inquiry
->>>       * simultaneously.
->>>       */
->>> @@ -750,6 +741,21 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
->>>              rtl_dev_dbg(hdev, "WBS supported not enabled.");
->>>              break;
->>>      }
->>> +}
->>> +EXPORT_SYMBOL_GPL(btrtl_set_quirks);
->>> +
->>> +int btrtl_setup_realtek(struct hci_dev *hdev)
->>> +{
->>> +     struct btrtl_device_info *btrtl_dev;
->>> +     int ret;
->>> +
->>> +     btrtl_dev = btrtl_initialize(hdev, NULL);
->>> +     if (IS_ERR(btrtl_dev))
->>> +             return PTR_ERR(btrtl_dev);
->>> +
->>> +     ret = btrtl_download_firmware(hdev, btrtl_dev);
->>> +
->>> +     btrtl_set_quirks(hdev, btrtl_dev);
->>> 
->>>      btrtl_free(btrtl_dev);
->>>      return ret;
->>> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
->>> index 2a582682136d..260167f01b08 100644
->>> --- a/drivers/bluetooth/btrtl.h
->>> +++ b/drivers/bluetooth/btrtl.h
->>> @@ -54,6 +54,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
->>> void btrtl_free(struct btrtl_device_info *btrtl_dev);
->>> int btrtl_download_firmware(struct hci_dev *hdev,
->>>                          struct btrtl_device_info *btrtl_dev);
->>> +void btrtl_set_quirks(struct hci_dev *hdev,
->>> +                   struct btrtl_device_info *btrtl_dev);
->>> int btrtl_setup_realtek(struct hci_dev *hdev);
->>> int btrtl_shutdown_realtek(struct hci_dev *hdev);
->>> int btrtl_get_uart_settings(struct hci_dev *hdev,
->>> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
->>> index 27e96681d583..e0520639f4ba 100644
->>> --- a/drivers/bluetooth/hci_h5.c
->>> +++ b/drivers/bluetooth/hci_h5.c
->>> @@ -906,10 +906,7 @@ static int h5_btrtl_setup(struct h5 *h5)
->>>      /* Give the device some time before the hci-core sends it a reset */
->>>      usleep_range(10000, 20000);
->>> 
->>> -     /* Enable controller to do both LE scan and BR/EDR inquiry
->>> -      * simultaneously.
->>> -      */
->>> -     set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
->>> +     btrtl_set_quirks(h5->hu->hdev, btrtl_dev);
->> 
->> any reason why not just setting WBS quirk here?
-> 
-> Hmm, I think WBS is the feature of the chipset and not the transport.
-> Therefore isn't it better to just have it set in one place?
-> Setting the quirks here means we need to copy paste the settings from btrtl.c.
+On Wed, May 12, 2021 at 6:46 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=481575
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.87 seconds
+> GitLint                       PASS      0.15 seconds
+> Prep - Setup ELL              PASS      52.17 seconds
+> Build - Prep                  PASS      0.15 seconds
+> Build - Configure             PASS      8.90 seconds
+> Build - Make                  PASS      223.46 seconds
+> Make Check                    PASS      9.53 seconds
+> Make Distcheck                PASS      261.17 seconds
+> Build w/ext ELL - Configure   PASS      9.00 seconds
+> Build w/ext ELL - Make        PASS      210.86 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-but since you are already setting HCI_QUIRK_SIMULTANEOUS_DISCOVERY right now, I don’t see the difference.
+Pushed.
 
-Can we actually verify that we still need the WBS quirk. I think we fixed the broken errerrnous packet flag handling.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
