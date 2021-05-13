@@ -2,141 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40F85C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 10:18:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 101B7C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 12:22:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EDAF360BBB
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 10:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D1863613BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 12:22:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232643AbhEMKTf (ORCPT
+        id S233513AbhEMMXh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 06:19:35 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:40073 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232851AbhEMKT2 (ORCPT
+        Thu, 13 May 2021 08:23:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43304 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232992AbhEMMXg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 06:19:28 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 14DAI8dzC016490, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 14DAI8dzC016490
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 13 May 2021 18:18:08 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 13 May 2021 18:18:07 +0800
-Received: from localhost.localdomain (172.21.132.99) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 13 May 2021 18:18:06 +0800
-From:   <hildawu@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
-        <kidman@realtek.com>
-Subject: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
-Date:   Thu, 13 May 2021 18:18:06 +0800
-Message-ID: <20210513101806.5666-1-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 13 May 2021 08:23:36 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE551C061760
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 05:22:26 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id w15so33482200ljo.10
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 05:22:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+CvWp8C4jOtH4VG0WTPyYI86YzMBV1yC9j91Ev2r4/Y=;
+        b=I5lT/BA1ZifGnQZ2XKWcGG4/rdrp+hoPqcZN0X5t0EbtBvyJiEvjGQwL+Sk6XxKP/9
+         x1o3zRqjBBMvSyZwFoP2o/PlgXzH600APgiphoW/M9dofB/eLkpYvckMmo4P0noEaTBo
+         zeyvmw+mJiFYU6zq5y2heS7dOHj4HGxUmkHXq7uLySey6S8vHjXVpe0kX0+jvx0SPG88
+         rTDFr2qoUVO2zF9bNzslszgD7hRY2lH+Q58Qji406I80aYytXuQjMAm6NXLm1lQLMtLi
+         30X4MvoHMKW6RdRHOR86MFs0zZIaIKRVe2i3YMjt5KMcYGk+X9VOOSQ2VPwIEfn7dtRr
+         T+9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+CvWp8C4jOtH4VG0WTPyYI86YzMBV1yC9j91Ev2r4/Y=;
+        b=DvZGpTpvrZoA1kOeyObIyfD/9eZlOJi0olNj5rN+NuwwmpnFrCPd4xcyLYJG7c/df7
+         K6iaYTXNm5vAwZoz2U/w6yVIKEhy2Nd7o2gG7VXV/feVEf7oC7A6P0ZhNRsDwh541Nyn
+         VTNG5T5wwEVgXlMWRpExHahOD68JJsu0IvBQHZ46ZP+KDPIF0xjUQshMhxehIT+xAziG
+         7fehxDOtQWSj/pR/3DDp1PBZup3K76x85FHee9/35ugw3+OxaiW3lKtNZcobZXC1mdKw
+         0QquCaw0NzE8bu9QYLObtC7jKhqGC1mkM7tTDZedWtDnYHyuHau2soNzZ+hXYxDcnF22
+         24sw==
+X-Gm-Message-State: AOAM530ak/iE7V6Km9rO/ov9aBNQPkw9r7Vv+p9+wuON1SvEDtARmqE8
+        kVA3m6Du9/k9FP+Hp7lunbrYhi+pPgtBtw==
+X-Google-Smtp-Source: ABdhPJwtjAcDqUYX2MbiA8qkjLXRnDv1xbjhGBQCfUHpuooFIgnQsE4CJyvqJmwK92OhnN6L9rU1Cg==
+X-Received: by 2002:a2e:7807:: with SMTP id t7mr32138117ljc.393.1620908545000;
+        Thu, 13 May 2021 05:22:25 -0700 (PDT)
+Received: from ix.cc.local ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id 20sm415918ljj.101.2021.05.13.05.22.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 13 May 2021 05:22:24 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>, stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Remove spurious error message
+Date:   Thu, 13 May 2021 14:22:20 +0200
+Message-Id: <20210513122220.313465-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.99]
-X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzUvMTMgpFekyCAwNzo0MzowMA==?=
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/13/2021 09:53:57
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 10
-X-KSE-AntiSpam-Info: Lua profiles 163629 [May 13 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
-X-KSE-AntiSpam-Info: LuaCore: 445 445 d5f7ae5578b0f01c45f955a2a751ac25953290c9
-X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: realtek.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2
-X-KSE-AntiSpam-Info: {Track_Chinese_Simplified, headers_charset}
-X-KSE-AntiSpam-Info: Rate: 10
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 05/13/2021 09:56:00
-X-KSE-ServerInfo: RTEXH36502.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/13/2021 10:04:01
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 10
-X-KSE-AntiSpam-Info: Lua profiles 163631 [May 13 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
-X-KSE-AntiSpam-Info: LuaCore: 445 445 d5f7ae5578b0f01c45f955a2a751ac25953290c9
-X-KSE-AntiSpam-Info: {Prob_from_in_msgid}
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;realtek.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 10
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 05/13/2021 10:07:00
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: hildawu <hildawu@realtek.com>
+Even with rate limited reporting this is very spammy and since
+it is remote device that is providing bogus data there is no
+need to report this as error.
 
-Because mSBC frames do not need to be aligned to the SCO packet
-boundary. Using USB ALT 3 let HCI payload >= 60 bytes, let mSBC
-data satisfy 60 Bytes avoid payload unaligned situation and fixed
-some headset no voise issue.
+Since real_len variable was used only to allow conditional error
+message it is now also removed.
 
-USB Alt 3 supported also need HFP support transparent MTU in 72 Bytes.
+[72454.143336] bt_err_ratelimited: 10 callbacks suppressed
+[72454.143337] Bluetooth: hci0: advertising data len corrected
+[72454.296314] Bluetooth: hci0: advertising data len corrected
+[72454.892329] Bluetooth: hci0: advertising data len corrected
+[72455.051319] Bluetooth: hci0: advertising data len corrected
+[72455.357326] Bluetooth: hci0: advertising data len corrected
+[72455.663295] Bluetooth: hci0: advertising data len corrected
+[72455.787278] Bluetooth: hci0: advertising data len corrected
+[72455.942278] Bluetooth: hci0: advertising data len corrected
+[72456.094276] Bluetooth: hci0: advertising data len corrected
+[72456.249137] Bluetooth: hci0: advertising data len corrected
+[72459.416333] bt_err_ratelimited: 13 callbacks suppressed
+[72459.416334] Bluetooth: hci0: advertising data len corrected
+[72459.721334] Bluetooth: hci0: advertising data len corrected
+[72460.011317] Bluetooth: hci0: advertising data len corrected
+[72460.327171] Bluetooth: hci0: advertising data len corrected
+[72460.638294] Bluetooth: hci0: advertising data len corrected
+[72460.946350] Bluetooth: hci0: advertising data len corrected
+[72461.225320] Bluetooth: hci0: advertising data len corrected
+[72461.690322] Bluetooth: hci0: advertising data len corrected
+[72462.118318] Bluetooth: hci0: advertising data len corrected
+[72462.427319] Bluetooth: hci0: advertising data len corrected
+[72464.546319] bt_err_ratelimited: 7 callbacks suppressed
+[72464.546319] Bluetooth: hci0: advertising data len corrected
+[72464.857318] Bluetooth: hci0: advertising data len corrected
+[72465.163332] Bluetooth: hci0: advertising data len corrected
+[72465.278331] Bluetooth: hci0: advertising data len corrected
+[72465.432323] Bluetooth: hci0: advertising data len corrected
+[72465.891334] Bluetooth: hci0: advertising data len corrected
+[72466.045334] Bluetooth: hci0: advertising data len corrected
+[72466.197321] Bluetooth: hci0: advertising data len corrected
+[72466.340318] Bluetooth: hci0: advertising data len corrected
+[72466.498335] Bluetooth: hci0: advertising data len corrected
+[72469.803299] bt_err_ratelimited: 10 callbacks suppressed
 
-Signed-off-by: hildawu <hildawu@realtek.com>
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=203753
+Cc: stable@vger.kernel.org
 ---
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/bluetooth/hci_event.c | 10 ++--------
+ 1 file changed, 2 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 6f253378e893..872034e7a232 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1752,6 +1752,13 @@ static void btusb_work(struct work_struct *work)
- 			 * which work with WBS at all.
- 			 */
- 			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
-+			/* Because mSBC frames do not need to be aligned to the
-+			 * SCO packet boundary. If support the Alt 3, use the
-+			 * Alt 3 for HCI payload >= 60 Bytes let air packet
-+			 * data satisfy 60 bytes.
-+			 */
-+			if ((new_alts == 1) && (btusb_find_altsetting(data, 3)))
-+				new_alts = 3;
- 		}
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5e99968939ce..26846d338fa7 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5441,7 +5441,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	struct hci_conn *conn;
+ 	bool match;
+ 	u32 flags;
+-	u8 *ptr, real_len;
++	u8 *ptr;
  
- 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
+ 	switch (type) {
+ 	case LE_ADV_IND:
+@@ -5472,14 +5472,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 			break;
+ 	}
+ 
+-	real_len = ptr - data;
+-
+ 	/* Adjust for actual length */
+-	if (len != real_len) {
+-		bt_dev_err_ratelimited(hdev, "advertising data len corrected %u -> %u",
+-				       len, real_len);
+-		len = real_len;
+-	}
++	len = ptr - data;
+ 
+ 	/* If the direct address is present, then this report is from
+ 	 * a LE Direct Advertising Report event. In that case it is
 -- 
-2.17.1
+2.31.1
 
