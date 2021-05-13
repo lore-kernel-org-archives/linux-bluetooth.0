@@ -7,80 +7,134 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFB1C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:12:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2541C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:14:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 917FE6143B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:12:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E5C26143B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:14:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234012AbhEMPOD (ORCPT
+        id S234726AbhEMPP2 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 11:14:03 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39880 "EHLO
+        Thu, 13 May 2021 11:15:28 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41388 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbhEMPOD (ORCPT
+        with ESMTP id S234295AbhEMPPT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 11:14:03 -0400
+        Thu, 13 May 2021 11:15:19 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4883BCED28;
-        Thu, 13 May 2021 17:20:44 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 663CBCED28;
+        Thu, 13 May 2021 17:21:58 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
+Subject: Re: [PATCH] Bluetooth: hci_h5: Add RTL8822CS capabilities
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210513101806.5666-1-hildawu@realtek.com>
-Date:   Thu, 13 May 2021 17:12:51 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20210513165327.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
+Date:   Thu, 13 May 2021 17:14:05 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>, max.chou@realtek.com,
-        alex_lu@realsil.com.cn, kidman@realtek.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <846A7897-6645-4FA0-8B3A-C0AB01965365@holtmann.org>
-References: <20210513101806.5666-1-hildawu@realtek.com>
-To:     Hilda Wu <hildawu@realtek.com>
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7867EC1F-324A-4739-B5F7-DDEB3994EA7A@holtmann.org>
+References: <20210513165327.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
+To:     Archie Pusaka <apusaka@google.com>
 X-Mailer: Apple Mail (2.3654.80.0.2.43)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hilda,
+Hi Archie,
 
-> Because mSBC frames do not need to be aligned to the SCO packet
-> boundary. Using USB ALT 3 let HCI payload >= 60 bytes, let mSBC
-> data satisfy 60 Bytes avoid payload unaligned situation and fixed
-> some headset no voise issue.
+> RTL8822 chipset supports WBS, and this information is conveyed in
+> btusb.c. However, the UART driver doesn't have this information just
+> yet.
 > 
-> USB Alt 3 supported also need HFP support transparent MTU in 72 Bytes.
-> 
-> Signed-off-by: hildawu <hildawu@realtek.com>
-
-please use real name here.
-
+> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > ---
-> drivers/bluetooth/btusb.c | 7 +++++++
-> 1 file changed, 7 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 6f253378e893..872034e7a232 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1752,6 +1752,13 @@ static void btusb_work(struct work_struct *work)
-> 			 * which work with WBS at all.
-> 			 */
-> 			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
-> +			/* Because mSBC frames do not need to be aligned to the
-> +			 * SCO packet boundary. If support the Alt 3, use the
-> +			 * Alt 3 for HCI payload >= 60 Bytes let air packet
-> +			 * data satisfy 60 bytes.
-> +			 */
-> +			if ((new_alts == 1) && (btusb_find_altsetting(data, 3)))
-> +				new_alts = 3;
+> drivers/bluetooth/btrtl.c  | 26 ++++++++++++++++----------
+> drivers/bluetooth/btrtl.h  |  2 ++
+> drivers/bluetooth/hci_h5.c |  5 +----
+> 3 files changed, 19 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index e7fe5fb22753..988a09860c6b 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -719,17 +719,8 @@ int btrtl_download_firmware(struct hci_dev *hdev,
+> }
+> EXPORT_SYMBOL_GPL(btrtl_download_firmware);
+> 
+> -int btrtl_setup_realtek(struct hci_dev *hdev)
+> +void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+> {
+> -	struct btrtl_device_info *btrtl_dev;
+> -	int ret;
+> -
+> -	btrtl_dev = btrtl_initialize(hdev, NULL);
+> -	if (IS_ERR(btrtl_dev))
+> -		return PTR_ERR(btrtl_dev);
+> -
+> -	ret = btrtl_download_firmware(hdev, btrtl_dev);
+> -
+> 	/* Enable controller to do both LE scan and BR/EDR inquiry
+> 	 * simultaneously.
+> 	 */
+> @@ -750,6 +741,21 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
+> 		rtl_dev_dbg(hdev, "WBS supported not enabled.");
+> 		break;
+> 	}
+> +}
+> +EXPORT_SYMBOL_GPL(btrtl_set_quirks);
+> +
+> +int btrtl_setup_realtek(struct hci_dev *hdev)
+> +{
+> +	struct btrtl_device_info *btrtl_dev;
+> +	int ret;
+> +
+> +	btrtl_dev = btrtl_initialize(hdev, NULL);
+> +	if (IS_ERR(btrtl_dev))
+> +		return PTR_ERR(btrtl_dev);
+> +
+> +	ret = btrtl_download_firmware(hdev, btrtl_dev);
+> +
+> +	btrtl_set_quirks(hdev, btrtl_dev);
+> 
+> 	btrtl_free(btrtl_dev);
+> 	return ret;
+> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
+> index 2a582682136d..260167f01b08 100644
+> --- a/drivers/bluetooth/btrtl.h
+> +++ b/drivers/bluetooth/btrtl.h
+> @@ -54,6 +54,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+> void btrtl_free(struct btrtl_device_info *btrtl_dev);
+> int btrtl_download_firmware(struct hci_dev *hdev,
+> 			    struct btrtl_device_info *btrtl_dev);
+> +void btrtl_set_quirks(struct hci_dev *hdev,
+> +		      struct btrtl_device_info *btrtl_dev);
+> int btrtl_setup_realtek(struct hci_dev *hdev);
+> int btrtl_shutdown_realtek(struct hci_dev *hdev);
+> int btrtl_get_uart_settings(struct hci_dev *hdev,
+> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+> index 27e96681d583..e0520639f4ba 100644
+> --- a/drivers/bluetooth/hci_h5.c
+> +++ b/drivers/bluetooth/hci_h5.c
+> @@ -906,10 +906,7 @@ static int h5_btrtl_setup(struct h5 *h5)
+> 	/* Give the device some time before the hci-core sends it a reset */
+> 	usleep_range(10000, 20000);
+> 
+> -	/* Enable controller to do both LE scan and BR/EDR inquiry
+> -	 * simultaneously.
+> -	 */
+> -	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
+> +	btrtl_set_quirks(h5->hu->hdev, btrtl_dev);
 
-	if (new_alts == 1 && btusb_find_altsetting(..))
-		..
+any reason why not just setting WBS quirk here?
 
 Regards
 
