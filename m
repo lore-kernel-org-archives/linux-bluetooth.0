@@ -4,124 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6842FC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:11:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCFB1C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:12:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42B4A613C8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:11:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 917FE6143B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 15:12:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234389AbhEMPNE convert rfc822-to-8bit (ORCPT
+        id S234012AbhEMPOD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 11:13:04 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36066 "EHLO
+        Thu, 13 May 2021 11:14:03 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39880 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230401AbhEMPND (ORCPT
+        with ESMTP id S230401AbhEMPOD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 11:13:03 -0400
+        Thu, 13 May 2021 11:14:03 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id EE2A5CED28;
-        Thu, 13 May 2021 17:19:40 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4883BCED28;
+        Thu, 13 May 2021 17:20:44 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
-Subject: Re: [PATCH v2] Bluetooth: Remove spurious error message
+Subject: Re: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210513122220.313465-1-szymon.janc@codecoup.pl>
-Date:   Thu, 13 May 2021 17:11:48 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        stable@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B7FCFE61-A3A2-4E82-8FBD-8AB1D9277380@holtmann.org>
-References: <20210513122220.313465-1-szymon.janc@codecoup.pl>
-To:     Szymon Janc <szymon.janc@codecoup.pl>
+In-Reply-To: <20210513101806.5666-1-hildawu@realtek.com>
+Date:   Thu, 13 May 2021 17:12:51 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>, max.chou@realtek.com,
+        alex_lu@realsil.com.cn, kidman@realtek.com
+Content-Transfer-Encoding: 7bit
+Message-Id: <846A7897-6645-4FA0-8B3A-C0AB01965365@holtmann.org>
+References: <20210513101806.5666-1-hildawu@realtek.com>
+To:     Hilda Wu <hildawu@realtek.com>
 X-Mailer: Apple Mail (2.3654.80.0.2.43)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Szymon,
+Hi Hilda,
 
-> Even with rate limited reporting this is very spammy and since
-> it is remote device that is providing bogus data there is no
-> need to report this as error.
+> Because mSBC frames do not need to be aligned to the SCO packet
+> boundary. Using USB ALT 3 let HCI payload >= 60 bytes, let mSBC
+> data satisfy 60 Bytes avoid payload unaligned situation and fixed
+> some headset no voise issue.
 > 
-> Since real_len variable was used only to allow conditional error
-> message it is now also removed.
+> USB Alt 3 supported also need HFP support transparent MTU in 72 Bytes.
 > 
-> [72454.143336] bt_err_ratelimited: 10 callbacks suppressed
-> [72454.143337] Bluetooth: hci0: advertising data len corrected
-> [72454.296314] Bluetooth: hci0: advertising data len corrected
-> [72454.892329] Bluetooth: hci0: advertising data len corrected
-> [72455.051319] Bluetooth: hci0: advertising data len corrected
-> [72455.357326] Bluetooth: hci0: advertising data len corrected
-> [72455.663295] Bluetooth: hci0: advertising data len corrected
-> [72455.787278] Bluetooth: hci0: advertising data len corrected
-> [72455.942278] Bluetooth: hci0: advertising data len corrected
-> [72456.094276] Bluetooth: hci0: advertising data len corrected
-> [72456.249137] Bluetooth: hci0: advertising data len corrected
-> [72459.416333] bt_err_ratelimited: 13 callbacks suppressed
-> [72459.416334] Bluetooth: hci0: advertising data len corrected
-> [72459.721334] Bluetooth: hci0: advertising data len corrected
-> [72460.011317] Bluetooth: hci0: advertising data len corrected
-> [72460.327171] Bluetooth: hci0: advertising data len corrected
-> [72460.638294] Bluetooth: hci0: advertising data len corrected
-> [72460.946350] Bluetooth: hci0: advertising data len corrected
-> [72461.225320] Bluetooth: hci0: advertising data len corrected
-> [72461.690322] Bluetooth: hci0: advertising data len corrected
-> [72462.118318] Bluetooth: hci0: advertising data len corrected
-> [72462.427319] Bluetooth: hci0: advertising data len corrected
-> [72464.546319] bt_err_ratelimited: 7 callbacks suppressed
-> [72464.546319] Bluetooth: hci0: advertising data len corrected
-> [72464.857318] Bluetooth: hci0: advertising data len corrected
-> [72465.163332] Bluetooth: hci0: advertising data len corrected
-> [72465.278331] Bluetooth: hci0: advertising data len corrected
-> [72465.432323] Bluetooth: hci0: advertising data len corrected
-> [72465.891334] Bluetooth: hci0: advertising data len corrected
-> [72466.045334] Bluetooth: hci0: advertising data len corrected
-> [72466.197321] Bluetooth: hci0: advertising data len corrected
-> [72466.340318] Bluetooth: hci0: advertising data len corrected
-> [72466.498335] Bluetooth: hci0: advertising data len corrected
-> [72469.803299] bt_err_ratelimited: 10 callbacks suppressed
-> 
-> Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
-> Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=203753
-> Cc: stable@vger.kernel.org
+> Signed-off-by: hildawu <hildawu@realtek.com>
+
+please use real name here.
+
 > ---
-> net/bluetooth/hci_event.c | 10 ++--------
-> 1 file changed, 2 insertions(+), 8 deletions(-)
+> drivers/bluetooth/btusb.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 5e99968939ce..26846d338fa7 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -5441,7 +5441,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-> 	struct hci_conn *conn;
-> 	bool match;
-> 	u32 flags;
-> -	u8 *ptr, real_len;
-> +	u8 *ptr;
-> 
-> 	switch (type) {
-> 	case LE_ADV_IND:
-> @@ -5472,14 +5472,8 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
-> 			break;
-> 	}
-> 
-> -	real_len = ptr - data;
-> -
-> 	/* Adjust for actual length */
-> -	if (len != real_len) {
-> -		bt_dev_err_ratelimited(hdev, "advertising data len corrected %u -> %u",
-> -				       len, real_len);
-> -		len = real_len;
-> -	}
-> +	len = ptr - data;
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 6f253378e893..872034e7a232 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1752,6 +1752,13 @@ static void btusb_work(struct work_struct *work)
+> 			 * which work with WBS at all.
+> 			 */
+> 			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
+> +			/* Because mSBC frames do not need to be aligned to the
+> +			 * SCO packet boundary. If support the Alt 3, use the
+> +			 * Alt 3 for HCI payload >= 60 Bytes let air packet
+> +			 * data satisfy 60 bytes.
+> +			 */
+> +			if ((new_alts == 1) && (btusb_find_altsetting(data, 3)))
+> +				new_alts = 3;
 
-please put a comment above the statement that this handles the
-case of incorrect advertising data len.
+	if (new_alts == 1 && btusb_find_altsetting(..))
+		..
 
 Regards
 
