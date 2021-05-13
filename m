@@ -7,69 +7,69 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B9080C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 21:10:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BF9C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 21:11:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8149061438
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 21:10:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69002613C8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 21:11:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233291AbhEMVLa (ORCPT
+        id S233352AbhEMVMz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 17:11:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48380 "EHLO
+        Thu, 13 May 2021 17:12:55 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48714 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232569AbhEMVL3 (ORCPT
+        with ESMTP id S233353AbhEMVMz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 17:11:29 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9380EC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 14:10:19 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id e190so36334439ybb.10
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 14:10:19 -0700 (PDT)
+        Thu, 13 May 2021 17:12:55 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF65C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 14:11:44 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id v188so36389776ybe.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 14:11:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=IbJwb0cnUzDItfh0BjgkvPf6KtSW+K4NgHkS3/LLitw=;
-        b=QOEWx/lVFOnPYb2pUXnKMfOo+Q43YJ6n9riTMGTCgZvAlPL7vxrUeUmzn37SP1cC/Y
-         YN/h32pEt0EZ7kTuvNw1KT1kaMGDqm19mCwekf4uBIL2uTLoYGoXifrj8+RiDxYfJaiS
-         NKKAw3N7ja8TXzh34+Eg/kav1SmB1UKRo8wAPGlkbVJACyeAwiE4GNwqxLGYp4DJwzpN
-         8lN0I2PSjMpQbs7hb3TAUNlU1JUQWr08uMAqDBO+cTUVQc9HNUnK9VmBRQRcfBTb2/1T
-         ctkRZsX6R3w5Qa0yZou7e9U0JkUgwjsY96LPfq0JJMUcRxyBeZSmpqiePd77RJmm5fWv
-         777A==
+        bh=lO4Y9kTjPr7jW6LdiF2nTrRQVu3Rxx3XddF7pXSsxXU=;
+        b=n3Hy2fEtlzkBpxqMP6OhO5bFWO80FxLW2fy/9YOnpFaDzPgL1fIj9VllS6oiq/QdKg
+         I+jHJpBhdAI/vWoUpd973jRMxZQC2aw/O7qiMEClckL2Rp8WNNjrx6KxdfMRNY8yF7mk
+         oXFgd10/RAyHJlbKeLFJg0XEo3yj3V08WIeqd+wMlEBAQ6u7PJfHm/2nS3T/m6CeFvwh
+         ck4c5ZQvHJOeZeY9JPAvV8DTQ5USKR1q85nYCIsTSkYxzBjSVZWG4WpQChogiBAYWdCw
+         owLwDkGgsHVWrt8sUoZ+shXJ6db0T+fIewEFz2s30f/T18c0qHh60PrQ1DzaI+jVOY68
+         LDlQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=IbJwb0cnUzDItfh0BjgkvPf6KtSW+K4NgHkS3/LLitw=;
-        b=IZ7+lnJ3g+Vn5ALp87xpk39TMJFP29APlGw/kzDqIgO+1wea6eUpGZFX4hwiYH8UKp
-         8aAGx2zZsmHmQ0aexa2xEMvr8vNYEqhGv3uwkuMveS1677n+zMmt27X94ZYgnfHERg+D
-         UJZpJSSUDNXmAclCsrHDZHoYv6MPpq78ko5udV2LknGfPsow39lE/cvMEi9hw5ePny2m
-         wp6WxLSKlRzpyqfLFGXA25YFIctvh6bUQM7XZeD+eK2vXYhy6u4cZgqqOSOtEEDm6u63
-         UnGqtfspNA32EUJZerkIT9bMo/GNrMD98lSDAzEQbZ1BJNgxPgR4A/5/FJlB6v3h101a
-         ETQw==
-X-Gm-Message-State: AOAM532n7I9IqDqGzuVBaaycTN2EmVXnq1smjLEoe3VW0sq365yDXtjq
-        hVFgcirproqyAZSDLg6fJdlnUAFPxbgdrAdXT61KDNRF
-X-Google-Smtp-Source: ABdhPJwgjFMyn7vhAb8SL1EEHuzEkP+YSEmwxUBWQcbYBLpk/gsGBYpkbd7iFvzU/Vc94EsWsD65/ubgONA24BO152s=
-X-Received: by 2002:a5b:286:: with SMTP id x6mr61320982ybl.347.1620940218624;
- Thu, 13 May 2021 14:10:18 -0700 (PDT)
+        bh=lO4Y9kTjPr7jW6LdiF2nTrRQVu3Rxx3XddF7pXSsxXU=;
+        b=Vyb5Kkd867zHfRjZYdSGsobupV9LgU5JqjQ6G9idy9/uPA/jZkfw6HXlpu8ficcBnK
+         UQ6/xe2F2XkC+Oic2MOSvtFGoqfpZYj7UYz3oKOgabTvfjV7qlnQKk6d4yB+FIXOwE9E
+         qsdmR5UGVXzvJkhj7YbMJCb2Kn7B+9AE42YQWpiMDbBdDUKbEwAb24qYuaZJFRfZeI4A
+         kfgcYjNo4xdhkkN4yCim72BNF2wFdYxaS6RXO72bcWY1JtqAbcjmTORKZrj42LJJ846a
+         Wv1cPT7klzuy92MthkeQ4GA2l6VQvmgxUKYhBaJ/DmhhYcmtatJq6swU87IOfWQ5eodq
+         BZtg==
+X-Gm-Message-State: AOAM5311vkmqeEeHBVOaT/jCF7r8EBpNirk4UYQjbP1F8R2Ag3oBQjfo
+        tTu77RZ0LoZLWGBNRkjR8hgbul5pk1F1qZUuSgi8++o9
+X-Google-Smtp-Source: ABdhPJzzvaYl4knYDz7U6Ro1j+FDKNzUQYwkMseMph0Rw8GuO66dw105w+uUI6z/1IhcEY3+dkPToLg00SA/zq3HjVs=
+X-Received: by 2002:a25:ac94:: with SMTP id x20mr58399696ybi.432.1620940303498;
+ Thu, 13 May 2021 14:11:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210513003909.104379-1-inga.stotland@intel.com> <609c8431.1c69fb81.86c2a.adfc@mx.google.com>
-In-Reply-To: <609c8431.1c69fb81.86c2a.adfc@mx.google.com>
+References: <20210504111454.29697-1-sathish.narasimman@intel.com> <609131d4.1c69fb81.c3723.e825@mx.google.com>
+In-Reply-To: <609131d4.1c69fb81.c3723.e825@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 13 May 2021 14:10:07 -0700
-Message-ID: <CABBYNZL_9vSd_zgROn75hReVU529F4yS5wFiCfNxR838CHZ61g@mail.gmail.com>
-Subject: Re: [BlueZ] shared/shell: Print help info for individual commands
+Date:   Thu, 13 May 2021 14:11:32 -0700
+Message-ID: <CABBYNZJm1CbiM4ThmFaUu7GA9UkZJHMiHuZrFA6hsOz7amEANw@mail.gmail.com>
+Subject: Re: [Bluez,v2] btmgmt: Fix enable adding irk when turining privacy on
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "Stotland, Inga" <inga.stotland@intel.com>
+Cc:     Sathish Narasimman <sathish.narasimman@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Inga,
+Hi Sathish,
 
-On Wed, May 12, 2021 at 6:45 PM <bluez.test.bot@gmail.com> wrote:
+On Tue, May 4, 2021 at 4:48 AM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -77,21 +77,23 @@ On Wed, May 12, 2021 at 6:45 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=481581
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=476815
 >
 > ---Test result---
 >
 > Test Summary:
-> CheckPatch                    PASS      0.53 seconds
-> GitLint                       PASS      0.14 seconds
-> Prep - Setup ELL              PASS      40.14 seconds
-> Build - Prep                  PASS      0.10 seconds
-> Build - Configure             PASS      7.03 seconds
-> Build - Make                  PASS      167.38 seconds
-> Make Check                    PASS      8.21 seconds
-> Make Distcheck                PASS      190.10 seconds
-> Build w/ext ELL - Configure   PASS      6.57 seconds
-> Build w/ext ELL - Make        PASS      148.17 seconds
+> CheckPatch                    PASS      0.34 seconds
+> GitLint                       PASS      0.13 seconds
+> Prep - Setup ELL              PASS      48.83 seconds
+> Build - Prep                  PASS      0.11 seconds
+> Build - Configure             PASS      8.51 seconds
+> Build - Make                  PASS      208.97 seconds
+> Make Check                    PASS      9.35 seconds
+> Make Dist                     PASS      12.80 seconds
+> Make Dist - Configure         PASS      5.25 seconds
+> Make Dist - Make              PASS      84.21 seconds
+> Build w/ext ELL - Configure   PASS      8.62 seconds
+> Build w/ext ELL - Make        PASS      198.03 seconds
 >
 > Details
 > ##############################
@@ -123,8 +125,16 @@ On Wed, May 12, 2021 at 6:45 PM <bluez.test.bot@gmail.com> wrote:
 > Desc: Run 'make check'
 >
 > ##############################
-> Test: Make Distcheck - PASS
-> Desc: Run distcheck to check the distribution
+> Test: Make Dist - PASS
+> Desc: Run 'make dist' and build the distribution tarball
+>
+> ##############################
+> Test: Make Dist - Configure - PASS
+> Desc: Configure the source from distribution tarball
+>
+> ##############################
+> Test: Make Dist - Make - PASS
+> Desc: Build the source from distribution tarball
 >
 > ##############################
 > Test: Build w/ext ELL - Configure - PASS
