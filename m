@@ -2,82 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F0AC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 07:50:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B1AC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 07:50:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4429861446
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 07:50:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7726F61454
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 07:50:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233169AbhENHv3 (ORCPT
+        id S233295AbhENHwG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 May 2021 03:51:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47124 "EHLO
+        Fri, 14 May 2021 03:52:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47298 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230252AbhENHv2 (ORCPT
+        with ESMTP id S233278AbhENHwD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 May 2021 03:51:28 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F080C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 00:50:17 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id f29so15709785qka.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 00:50:17 -0700 (PDT)
+        Fri, 14 May 2021 03:52:03 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0ACDC06174A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 00:50:51 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id 1so21692931qtb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 00:50:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=FVH2zIUnP9sz5lTX5KnCsMJbYs82gorNQPSx9fXvjHk=;
-        b=jqKW66NFhksRG5U+2OA0I5FaMsDDdRWKyeELwYa6++jQX/WVTSntmgvZZrcD2cyeqa
-         OI8y+VjWtelGTnQSTFfLbTC895vm/hrGprO3TgNgpx7ayVGT0IQvHafwPEE/SyAlf4Qw
-         gaqrR0clbyT4QUSmnvsX5gGGAqMwk9GfqozE6P9lioNsiPVB4PuHZLRmfxdk5ZJw69VW
-         LHHJDKiL68COg0qsYokAj9Vn5bAoULmMKk1roEraqJY9ZJIVgNe8wksmfA2YNe5M/p0Z
-         Prv5JVze+mGu8igde8ze3fL9UiGdnhK9RThLKqyGKq4IiP1fdJMddpLygLpK+8k5Yvyc
-         44dg==
+        bh=kOfBJat+mqyQtxfMSdBFqXn3AB6r0NiX2/D+7z9FVyo=;
+        b=oBvVTruIns4DBa2mnrwIcWIU4SJx73VtUiBhpiZiiQ4AgdcUXLULLIJjdLp156rle+
+         hbbOl8MNj27y0QoSF1Sxomo69kVzLSL/Sn8XQDn9ubtKa/5+AML8FGLfW/8V90tU7YZh
+         HmvAJ+pCRWihBeTP8mSMCXhjLvgR/v/c9nMjDfspMVYG6TkRoM8EBz0hFJ14/zsHyqRv
+         Huyyff6Uq5YpEHTn+MOVWTugf14j65wzj96QL+NMlGTb3vufHVjTADePtQW55oPqg7H8
+         /YaTx+TDc++XoUxZOxnXzxjw2VNHP5VV0DZnLKPXpsQHPPdEsbTWrO8Fe9dl71d8KmL/
+         yOxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=FVH2zIUnP9sz5lTX5KnCsMJbYs82gorNQPSx9fXvjHk=;
-        b=Yju61oBqOECVpGmc9Hd5wLSnL/bjxFNT6xBbWUNy66VXHOZApfPvtaIDyH77ErKVDJ
-         opC0pb1PLaOc9jdVvRzj59jY0+06p8Nid2qsqBRPPC7njDsqFClfcCet2jCvDVz//u3R
-         ev3GQslHpv2wEvxMFNIcp6l53uwXEVGJ2L99fWyi/YZLfarfZ8f14J5j0E5AQy0CQHkM
-         /UN4v9WiE9SJikbyZcrMfchSrgFMdByNfnoXPRSfyqpam1rAwsS6mdKMr0vF1tlsPE5h
-         I4t78V0rPcQRq1pUpx8zGMH083V/X2lj6htNAILLVBuGo83MXBiGtBHMg9TWInocaOBg
-         p8tw==
-X-Gm-Message-State: AOAM532Lf6aCkTa9tFgF716P1n7uctWZmfIlj4Y9LP3ub3jDz2kc2OEV
-        EMEee9kbFG1+JwqkDV0RS6m91nTh1Jo51gV587zujA==
-X-Google-Smtp-Source: ABdhPJzUEzHXNsQw5zClRc6RrnFOutjEN6xkX6IPJ12OJocjAQ6uixJ27Y3w8crf+IGiWWrD6kdcuN/HiekmnBwP6iY=
-X-Received: by 2002:a37:4284:: with SMTP id p126mr23528523qka.501.1620978616514;
- Fri, 14 May 2021 00:50:16 -0700 (PDT)
+        bh=kOfBJat+mqyQtxfMSdBFqXn3AB6r0NiX2/D+7z9FVyo=;
+        b=FPo/ZxM6O4IbFBlm1GXNeHbvNA7xrURPcIZgTIsJC6iDpHD91U8S8wfJauVMp7KLht
+         DiWjlK9Zt8PUUYMO3rGjZCXB63ahdKWYF1mv36QQ20HQ/OUjzSfW2qZB+nrsdLCRGiNs
+         Xx6LHqWLMerrKzscG/ywbLXv8bfLhYEYlmOTEAjn5ATCDPlCtPRav4mengg2f2xOYROI
+         Tc5xPbzfC1WUVcylTcSPFHxUa5y0ELl/zDjVAwPaG2NliDSDrdB0EiR026rj/333f9eA
+         w7xTN/k900GbE/a7Po99hZ3yErQj6jg7OZmmnWUyXWknPtr4SXisgS4Mqh4ajWyiF2Dl
+         WDQw==
+X-Gm-Message-State: AOAM530l1OhjMkgfn8LHagxtEycOmYd4QBl+kzH7lLyORTvhJLDXbrI3
+        6q2gYCCGgs90+dTN2uXtLAzrbHDOQdaC+myabShdhw==
+X-Google-Smtp-Source: ABdhPJwO2h2BkNL/icMM2Oo2w/4OPTUpvyJcOesVWoDMUs+CyOXTk6AsniBs441KSzBS+qWlvmbJDR9FhZma/QKevLg=
+X-Received: by 2002:ac8:7c8a:: with SMTP id y10mr3974414qtv.337.1620978650818;
+ Fri, 14 May 2021 00:50:50 -0700 (PDT)
 MIME-Version: 1.0
-References: <0000000000001d48cd05abebd088@google.com> <000000000000987c8205c2446ac9@google.com>
-In-Reply-To: <000000000000987c8205c2446ac9@google.com>
+References: <000000000000aaa4a905ac646223@google.com> <000000000000fd05a005c2389844@google.com>
+In-Reply-To: <000000000000fd05a005c2389844@google.com>
 From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Fri, 14 May 2021 09:50:05 +0200
-Message-ID: <CACT4Y+ZFfu6a4z_fFHLupQQndH-1dn=z9s41MAmPK=QmCg+aCA@mail.gmail.com>
-Subject: Re: [syzbot] WARNING: ODEBUG bug in bt_host_release
-To:     syzbot <syzbot+0ce8a29c6c6469b16632@syzkaller.appspotmail.com>
-Cc:     David Miller <davem@davemloft.net>,
+Date:   Fri, 14 May 2021 09:50:39 +0200
+Message-ID: <CACT4Y+aAhVHiDyuiwxAh4KfHp3UnquQPGBJ52fa46Cm7LT_hdw@mail.gmail.com>
+Subject: Re: [syzbot] KASAN: use-after-free Read in __queue_work (3)
+To:     syzbot <syzbot+77e5e02c6c81136cdaff@syzkaller.appspotmail.com>
+Cc:     Markus Elfring <Markus.Elfring@web.de>,
+        Anant Thazhemadam <anant.thazhemadam@gmail.com>,
+        David Miller <davem@davemloft.net>,
         Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Hillf Danton <hdanton@sina.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Jakub Kicinski <kuba@kernel.org>, linma@zju.edu.cn,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>, luiz.dentz@gmail.com,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        syzscope@gmail.com
+        Marcel Holtmann <marcel@holtmann.org>, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, May 14, 2021 at 8:33 AM syzbot
-<syzbot+0ce8a29c6c6469b16632@syzkaller.appspotmail.com> wrote:
+On Thu, May 13, 2021 at 6:27 PM syzbot
+<syzbot+77e5e02c6c81136cdaff@syzkaller.appspotmail.com> wrote:
 >
 > syzbot suspects this issue was fixed by commit:
 >
@@ -87,18 +88,19 @@ On Fri, May 14, 2021 at 8:33 AM syzbot
 >
 >     bluetooth: eliminate the potential race condition when removing the HCI controller
 >
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15427145d00000
-> start commit:   f873db9a Merge tag 'io_uring-5.9-2020-08-21' of git://git...
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=127b3593d00000
+> start commit:   c0842fbc random32: move the pseudo-random 32-bit definitio..
 > git tree:       upstream
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=bb68b9e8a8cc842f
-> dashboard link: https://syzkaller.appspot.com/bug?extid=0ce8a29c6c6469b16632
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10310972900000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=cf567e8c7428377e
+> dashboard link: https://syzkaller.appspot.com/bug?extid=77e5e02c6c81136cdaff
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=140e36a4900000
 >
 > If the result looks correct, please mark the issue as fixed by replying with:
 >
 > #syz fix: bluetooth: eliminate the potential race condition when removing the HCI controller
 >
 > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
 
 Looks reasonable based on the commit and bisection log.
 Unfortunately I cannot easily send this as my email client will wrap
