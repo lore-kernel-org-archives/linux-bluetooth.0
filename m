@@ -2,148 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C1136C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 21:42:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 812B8C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 23:59:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3C6961440
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 21:42:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A23261408
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 23:59:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232971AbhENVnp (ORCPT
+        id S234461AbhEOAAM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 May 2021 17:43:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36704 "EHLO
+        Fri, 14 May 2021 20:00:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231741AbhENVnp (ORCPT
+        with ESMTP id S234457AbhEOAAL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 May 2021 17:43:45 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71534C06174A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 14:42:33 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id i5so300839pgm.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 14:42:33 -0700 (PDT)
+        Fri, 14 May 2021 20:00:11 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9044AC06174A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 16:58:58 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id pf4-20020a17090b1d84b029015ccffe0f2eso2443325pjb.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 16:58:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=4CVAXjgGAp4LIg7rNZjXXBek4kWxruMx13+pwItoSDM=;
-        b=Fze6Fe+uJknlKA4b/k5xbys0h9j2oiws9Zh1rD0ekH/d1YMkdt1LOh0rtiDNhpB/Tc
-         b49gHR/5++pfszLRDfdqd8/BEYoxUNCZtRO4x8Ycm9dPzvpWfboFfxPIKNGV/ZIAhWyE
-         fxyOVO0IyhM9xyoMZwrAXEdybtyrdKGIS37SYEl/Vbk/yisoU408W+dAH4BozBSfnNKd
-         bCUn14t3eWy4MdWO1vggMCwScBb6RIv7/LfhGY30D7znaFMrl7Gajwc1VbEIp+NmDPmB
-         108jZOtrNkE/iyEniG7TMqu3OHIfZw2oAdVuM6t3LWBr3NYMIcixQhFpUAbQRuHGe9EF
-         k4yw==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pOcHTUtC3MUClDwnYgf4UvVuP8PHsxg2YjAC+ZUhcd4=;
+        b=pYL/jb8KQ3wNuEdSkOx0rr027bGcPyvc5NSoYrckQ6n/07dQ+ws1k1IWORkjAK0556
+         8PmFlxLnk2TbdXKVY0xAFQ3ZbfeuTpG73yIy3D0iKPFKAeQ3Di2C9bmt9csymoajwJzJ
+         wVR+NzDzOqLe33COlOSHz09Z19V/MHPY2mT3aE377TDKvXBJQpA55eLeex0fCLxpaCPK
+         1bSoMorGAl3hBchP0nVM8hv6uBMGgswMs50aiMYh55DH12gNFEGG63DWBdmb/DO/XifL
+         4XprKU2eTz2YJltvPOIuBe5fN4iw8yuXZ0lCobyp02QUFnSSvIfd5ttuhNjCVXSnZNM8
+         Fy/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=4CVAXjgGAp4LIg7rNZjXXBek4kWxruMx13+pwItoSDM=;
-        b=uHQWMeXA9zSOnqh25F2ialbSpUeDQUD/VFEHs3zZA637dp0/i4xYMLjuzuAGAM/oFB
-         Y6YsSMjPn3C/rAwdhWatTRJ0PoPNtysRV10owvK5m+/nC5R4EdTBa5ibldsngxqvMlK+
-         29uuokk/eYjz+1LGCI0sqgfUEn3svc7JtFdTJyHBqeJ+u3cSO3ASZiKI+Im9o7+iX/Ax
-         6hldRBQqSlhrjx2pYAoiSJfT2noIG1aP9Sm2QTurEf0ov5S8uq+EE3rNmbzKV/obHiDR
-         No9iLMtOoHYdsXc22TUryLUh+Ih19ntwxX4pajhcajEO/tcQinOH9ZGov1GY9sL/mtI/
-         D6ow==
-X-Gm-Message-State: AOAM532LvxLAL/RYhsRvKiE5wgUu138lTTUBSbeF5OShXJfcRdrGNKoW
-        meAGNQ2gzCFvy0b9WvnDbqU/v67X7Mo=
-X-Google-Smtp-Source: ABdhPJyM1tsHs0YYhQCjQ3P4FA6jPehH6WxHU0ppY7A3agopDHeF4l+dXE0MnxdYI4uMFE1PfAuHAw==
-X-Received: by 2002:a63:515d:: with SMTP id r29mr49108296pgl.422.1621028552698;
-        Fri, 14 May 2021 14:42:32 -0700 (PDT)
-Received: from [172.17.0.2] ([52.250.122.209])
-        by smtp.gmail.com with ESMTPSA id r10sm1341868pjm.20.2021.05.14.14.42.31
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=pOcHTUtC3MUClDwnYgf4UvVuP8PHsxg2YjAC+ZUhcd4=;
+        b=ja0fpNkHljj5WMk+20ZI5wWvZ8GlsckQrLkP4MK8yaDMRWuoSkfabm8nch52rzoMGc
+         e3mMB6sOljXUHOvYoEepHLKdq+HYlvhoFkU8ZMghCv+b/eb4h8tEStOPTlvPeen16xiG
+         c2A+HyywuO16N4ZK+xGJ6koj+GrG8fJKqFQ5zuWprRNpNKizP2pA2qoJl5gwW5X/beG7
+         sdhGGxw2Sz2kdKeCKcGVv2lUbAR69kKHkYHNA7/3FJlU6vGakCJMruzb6tyEw/+F+g38
+         BimC+o/3Zi2WIT4t87WSOPL+Q3DyXRCqpbugyQcp/oqsTyTKFkfcmuBy5F48lGlUtpbV
+         RmtA==
+X-Gm-Message-State: AOAM530rNcIIAprVxe9ylN0T6zLmtDYgxD7nGTz+8ysgQc5Fi5Q7eMNj
+        cT4gtpktyJpP06TYe3PUgXxlV6NPSbU=
+X-Google-Smtp-Source: ABdhPJzYfjHNqkxzEpLwo1oqUau1YcO4O/RGZ5d4oJbllSUK3UKlXjzf7f8Ykg3lKNyygtbipTAaDg==
+X-Received: by 2002:a17:902:720c:b029:ee:f427:91e9 with SMTP id ba12-20020a170902720cb02900eef42791e9mr48607721plb.72.1621036737927;
+        Fri, 14 May 2021 16:58:57 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id x184sm5158089pgb.36.2021.05.14.16.58.57
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 14:42:31 -0700 (PDT)
-Message-ID: <609eeec7.1c69fb81.51f46.4576@mx.google.com>
-Date:   Fri, 14 May 2021 14:42:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1015906085014395841=="
+        Fri, 14 May 2021 16:58:57 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] client: Fix advertise broadcast
+Date:   Fri, 14 May 2021 16:58:54 -0700
+Message-Id: <20210514235854.143010-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] main.conf: Add option to enable experimental features
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210514211304.17237-1-luiz.dentz@gmail.com>
-References: <20210514211304.17237-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1015906085014395841==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=482739
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.93 seconds
-GitLint                       PASS      0.15 seconds
-Prep - Setup ELL              PASS      47.82 seconds
-Build - Prep                  PASS      0.15 seconds
-Build - Configure             PASS      8.16 seconds
-Build - Make                  PASS      209.60 seconds
-Make Check                    PASS      9.27 seconds
-Make Distcheck                PASS      242.89 seconds
-Build w/ext ELL - Configure   PASS      8.18 seconds
-Build w/ext ELL - Make        PASS      196.61 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+When advertising with type broadcast it cannot be discoverable as that
+would require setting flags which is not allowed by the spec.
 ---
-Regards,
-Linux Bluetooth
+ client/advertising.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/client/advertising.c b/client/advertising.c
+index 3bf12fe87..e40086c98 100644
+--- a/client/advertising.c
++++ b/client/advertising.c
+@@ -512,6 +512,9 @@ void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type)
+ 	g_free(ad.type);
+ 	ad.type = g_strdup(type);
+ 
++	if (!strcasecmp(ad.type, "Broadcast"))
++		ad.discoverable = false;
++
+ 	if (g_dbus_register_interface(conn, AD_PATH, AD_IFACE, ad_methods,
+ 					NULL, ad_props, NULL, NULL) == FALSE) {
+ 		bt_shell_printf("Failed to register advertising object\n");
+-- 
+2.30.2
 
---===============1015906085014395841==--
