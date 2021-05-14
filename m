@@ -2,107 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C993EC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 23:04:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1794EC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 02:32:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A88946143F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 13 May 2021 23:04:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE01C6143C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 02:32:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229693AbhEMXFi (ORCPT
+        id S230168AbhENCd1 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 13 May 2021 19:05:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45268 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229548AbhEMXFf (ORCPT
+        Thu, 13 May 2021 22:33:27 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:39019 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229459AbhENCd0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 13 May 2021 19:05:35 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E55EC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 16:04:25 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id v191so23012880pfc.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 13 May 2021 16:04:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=p16yRm3d4nfAphOhcY+FIH7RlIvQ9SGU1iJ2cb9RupY=;
-        b=Hjtgyk8AOkIml5W8Z7gOEZZmDgdJuBTdk+pW2ilXGCUmDfP9q+qanUQSA3O1ws99Aw
-         dtzUT8bACZSN9A11fZnKpv7MN7Zx3FtQyvXOSLlwhHPaCtC0/95T+YaEQH5OZd5POZAC
-         8NxYajSwSpU878egd0LrNxkJDIYQDv/FmgQynpsP+gRIzxEVOqnJf49T5oUhQx//5k/u
-         oWhHYTXtLuGHJcIrrGzQlkTIh7JMBNot6ENj/983EHaLiOehi6jxDJoQNkqFhyn779ht
-         zo+OODafZs8Qd84h/0R2RBEporkenXFuJqcNqof48HL9QlPlq0kK6INHkd2aI9VmwQh1
-         IGzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=p16yRm3d4nfAphOhcY+FIH7RlIvQ9SGU1iJ2cb9RupY=;
-        b=iE3AmDfeQmbi6de/2qEouMn5WBRKrZtLDNUdadE1zAyXFyA++Etjycv/HEElezZnuE
-         3w2tHwTDv0GV7vPKjgh6mf7btkdOugLO5Dmwfk8oCNBJNgKFRxhDC5PqEssDRhElU5UO
-         Cb1PVzelSWRA7Htq7h87SP5BaUjz9GMpOtwoaiDpe35b9zhL2bnmktb4JyAlZrA/+XZP
-         nBOAZTTSfYsXloWr0b5VQR81jYa50lEoFuIrq6Kzhu5dFbon5R67OE5eB6YQHOyJstK1
-         uf84A0txx+6ri8iWaxSl6fsqexsMflNyKYmK/dAihBjVaxIUvKiwsbvY/RDYFhD6n8dq
-         ZRzA==
-X-Gm-Message-State: AOAM530Pl4PTyENck6MMrjEvng97LFSNGwO2WENz2ZSRwrarDyEdlt3e
-        LGifKoBFvPEbpbfL35fspjcxRLe6wCY=
-X-Google-Smtp-Source: ABdhPJyKSz2+z5jVACkOWTBJOlHxTu9CpmZ3B9br+ShLc5W0I9ERSo0eUrZNvhKY3KiMMmJzJl1oEg==
-X-Received: by 2002:aa7:8e85:0:b029:28f:2620:957e with SMTP id a5-20020aa78e850000b029028f2620957emr43315872pfr.40.1620947063736;
-        Thu, 13 May 2021 16:04:23 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y30sm2741163pff.195.2021.05.13.16.04.23
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 13 May 2021 16:04:23 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btusb: Use firmware_request_nowarn
-Date:   Thu, 13 May 2021 16:04:22 -0700
-Message-Id: <20210513230422.2991704-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Thu, 13 May 2021 22:33:26 -0400
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 14E2W78g8028223, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 14E2W78g8028223
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Fri, 14 May 2021 10:32:07 +0800
+Received: from RTEXMBS02.realtek.com.tw (172.21.6.95) by
+ RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 14 May 2021 10:32:06 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXMBS02.realtek.com.tw (172.21.6.95) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Fri, 14 May 2021 10:31:45 +0800
+Received: from RTEXMBS04.realtek.com.tw ([fe80::1d8:ba7d:61ca:bd74]) by
+ RTEXMBS04.realtek.com.tw ([fe80::1d8:ba7d:61ca:bd74%5]) with mapi id
+ 15.01.2106.013; Fri, 14 May 2021 10:31:45 +0800
+From:   Hilda Wu <hildawu@realtek.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        Max Chou <max.chou@realtek.com>,
+        "alex_lu@realsil.com.cn" <alex_lu@realsil.com.cn>,
+        KidmanLee <kidman@realtek.com>
+Subject: RE: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
+Thread-Topic: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
+Thread-Index: AQHXR+FETZsNaKRViEWtURNUsICg4arg/wKAgAFAQAA=
+Date:   Fri, 14 May 2021 02:31:45 +0000
+Message-ID: <08bd26e7da6549898da05b5ec3bb8b44@realtek.com>
+References: <20210513101806.5666-1-hildawu@realtek.com>
+ <846A7897-6645-4FA0-8B3A-C0AB01965365@holtmann.org>
+In-Reply-To: <846A7897-6645-4FA0-8B3A-C0AB01965365@holtmann.org>
+Accept-Language: zh-TW, en-US
+Content-Language: zh-TW
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [172.21.132.158]
+x-kse-serverinfo: RTEXMBS02.realtek.com.tw, 9
+x-kse-antivirus-interceptor-info: scan successful
+x-kse-antivirus-info: =?us-ascii?Q?Clean,_bases:_2021/5/13_=3F=3F_08:28:00?=
+x-kse-attachment-filter-triggered-rules: Clean
+x-kse-attachment-filter-triggered-filters: Clean
+x-kse-bulkmessagesfiltering-scan-result: protection disabled
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 8BIT
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/14/2021 02:19:13
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 163648 [May 13 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
+X-KSE-AntiSpam-Info: LuaCore: 445 445 d5f7ae5578b0f01c45f955a2a751ac25953290c9
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/14/2021 02:21:00
+X-KSE-ServerInfo: RTEXH36502.realtek.com.tw, 9
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 05/14/2021 02:19:13
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 163648 [May 13 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: hildawu@realtek.com
+X-KSE-AntiSpam-Info: LuaCore: 445 445 d5f7ae5578b0f01c45f955a2a751ac25953290c9
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;realtek.com:7.1.1;127.0.0.199:7.1.2
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 05/14/2021 02:21:00
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Marcel,
 
-This replaces the use of request_firmware to firmware_request_nowarn
-when firmware is optional (firmware is already operational).
+Thank you!
+I will propose a patch v2.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/btusb.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Regards,
+Hilda
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7f10693eabc6..7db68f443569 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2601,7 +2601,7 @@ static int btusb_intel_download_firmware_newgen(struct hci_dev *hdev,
- 	}
- 
- 	btusb_setup_intel_newgen_get_fw_name(ver, fwname, sizeof(fwname), "sfi");
--	err = request_firmware(&fw, fwname, &hdev->dev);
-+	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
- 		if (!test_bit(BTUSB_BOOTLOADER, &data->flags)) {
- 			/* Firmware has already been loaded */
-@@ -2771,7 +2771,7 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
- 		return -EINVAL;
- 	}
- 
--	err = request_firmware(&fw, fwname, &hdev->dev);
-+	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
- 	if (err < 0) {
- 		if (!test_bit(BTUSB_BOOTLOADER, &data->flags)) {
- 			/* Firmware has already been loaded */
--- 
-2.30.2
+-----Original Message-----
+From: Marcel Holtmann <marcel@holtmann.org> 
+Sent: Thursday, May 13, 2021 11:13 PM
+To: Hilda Wu <hildawu@realtek.com>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>; Luiz Augusto von Dentz <luiz.dentz@gmail.com>; Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>; open list <linux-kernel@vger.kernel.org>; Max Chou <max.chou@realtek.com>; alex_lu@realsil.com.cn; KidmanLee <kidman@realtek.com>
+Subject: Re: [PATCH] Bluetooth: btusb: Add support USB ALT 3 for WBS
 
+Hi Hilda,
+
+> Because mSBC frames do not need to be aligned to the SCO packet 
+> boundary. Using USB ALT 3 let HCI payload >= 60 bytes, let mSBC data 
+> satisfy 60 Bytes avoid payload unaligned situation and fixed some 
+> headset no voise issue.
+> 
+> USB Alt 3 supported also need HFP support transparent MTU in 72 Bytes.
+> 
+> Signed-off-by: hildawu <hildawu@realtek.com>
+
+please use real name here.
+
+> ---
+> drivers/bluetooth/btusb.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c 
+> index 6f253378e893..872034e7a232 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1752,6 +1752,13 @@ static void btusb_work(struct work_struct *work)
+> 			 * which work with WBS at all.
+> 			 */
+> 			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
+> +			/* Because mSBC frames do not need to be aligned to the
+> +			 * SCO packet boundary. If support the Alt 3, use the
+> +			 * Alt 3 for HCI payload >= 60 Bytes let air packet
+> +			 * data satisfy 60 bytes.
+> +			 */
+> +			if ((new_alts == 1) && (btusb_find_altsetting(data, 3)))
+> +				new_alts = 3;
+
+	if (new_alts == 1 && btusb_find_altsetting(..))
+		..
+
+Regards
+
+Marcel
+
+------Please consider the environment before printing this e-mail.
