@@ -2,96 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 812B8C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 23:59:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E35CC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 May 2021 00:03:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A23261408
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 14 May 2021 23:59:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 764C261444
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 15 May 2021 00:03:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234461AbhEOAAM (ORCPT
+        id S234480AbhEOAEy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 14 May 2021 20:00:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38474 "EHLO
+        Fri, 14 May 2021 20:04:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234457AbhEOAAL (ORCPT
+        with ESMTP id S234463AbhEOAEx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 14 May 2021 20:00:11 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9044AC06174A
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 16:58:58 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id pf4-20020a17090b1d84b029015ccffe0f2eso2443325pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 16:58:58 -0700 (PDT)
+        Fri, 14 May 2021 20:04:53 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 574FCC06174A
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 17:03:40 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id i204so1163208yba.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 14 May 2021 17:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pOcHTUtC3MUClDwnYgf4UvVuP8PHsxg2YjAC+ZUhcd4=;
-        b=pYL/jb8KQ3wNuEdSkOx0rr027bGcPyvc5NSoYrckQ6n/07dQ+ws1k1IWORkjAK0556
-         8PmFlxLnk2TbdXKVY0xAFQ3ZbfeuTpG73yIy3D0iKPFKAeQ3Di2C9bmt9csymoajwJzJ
-         wVR+NzDzOqLe33COlOSHz09Z19V/MHPY2mT3aE377TDKvXBJQpA55eLeex0fCLxpaCPK
-         1bSoMorGAl3hBchP0nVM8hv6uBMGgswMs50aiMYh55DH12gNFEGG63DWBdmb/DO/XifL
-         4XprKU2eTz2YJltvPOIuBe5fN4iw8yuXZ0lCobyp02QUFnSSvIfd5ttuhNjCVXSnZNM8
-         Fy/Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=VxoIM040RmJhqg1xZIqFyFQIm7R+jXpieBkeBUVfrDk=;
+        b=mhnfj6LApbJcupXGolSSDM0Jy1x/4Zm7Lj8liBTktgdvVLmhQLgaKuhePQvwv9IdFX
+         ukenQysKWykD9KYs+16stIBQWoTpbSgHCsnn7E9LMqN99Czduvy6Syo4jpXMVK8/yjVc
+         XS6AYeCZN8kvXS2lkQQhoYz5om4Yo5iN9tz9Qi9UjX65qi9EhQPtq/sFtn+A6L0HUk37
+         HA4n/isV10lhDhoMazKPVcd6qm/Pwl8+Qcc2bcUy8dufivEXPHTHLJ9FZkHDJkSFMD0u
+         ZMxkoWXySWe9OlW7YTITPKgmmO53UR3DEU8M6y0nfHY1tFnioRpvA95rSUfpuF086rBU
+         F9uA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=pOcHTUtC3MUClDwnYgf4UvVuP8PHsxg2YjAC+ZUhcd4=;
-        b=ja0fpNkHljj5WMk+20ZI5wWvZ8GlsckQrLkP4MK8yaDMRWuoSkfabm8nch52rzoMGc
-         e3mMB6sOljXUHOvYoEepHLKdq+HYlvhoFkU8ZMghCv+b/eb4h8tEStOPTlvPeen16xiG
-         c2A+HyywuO16N4ZK+xGJ6koj+GrG8fJKqFQ5zuWprRNpNKizP2pA2qoJl5gwW5X/beG7
-         sdhGGxw2Sz2kdKeCKcGVv2lUbAR69kKHkYHNA7/3FJlU6vGakCJMruzb6tyEw/+F+g38
-         BimC+o/3Zi2WIT4t87WSOPL+Q3DyXRCqpbugyQcp/oqsTyTKFkfcmuBy5F48lGlUtpbV
-         RmtA==
-X-Gm-Message-State: AOAM530rNcIIAprVxe9ylN0T6zLmtDYgxD7nGTz+8ysgQc5Fi5Q7eMNj
-        cT4gtpktyJpP06TYe3PUgXxlV6NPSbU=
-X-Google-Smtp-Source: ABdhPJzYfjHNqkxzEpLwo1oqUau1YcO4O/RGZ5d4oJbllSUK3UKlXjzf7f8Ykg3lKNyygtbipTAaDg==
-X-Received: by 2002:a17:902:720c:b029:ee:f427:91e9 with SMTP id ba12-20020a170902720cb02900eef42791e9mr48607721plb.72.1621036737927;
-        Fri, 14 May 2021 16:58:57 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x184sm5158089pgb.36.2021.05.14.16.58.57
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 14 May 2021 16:58:57 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client: Fix advertise broadcast
-Date:   Fri, 14 May 2021 16:58:54 -0700
-Message-Id: <20210514235854.143010-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=VxoIM040RmJhqg1xZIqFyFQIm7R+jXpieBkeBUVfrDk=;
+        b=ruZw6getKiy8CbtoEfW+XaQG+Xz62T0JY0xGQkKYeef7PzZT9I9ldQm+WTnF81Rrou
+         FS/8Qj4NK+G5SM1uZzoUGI5tPjIsvMIzWNd+hSETzSoCZ9XLZFtcqptaLgOj5L6cZUib
+         mqqFN6ezArwrnokSqCsar96dIIFuShquBJ0Rq2QN7G6BIr3hKIsUhWAi/G70pxXj+MIy
+         6p3dlI9wqb7NP1PyqdU5ghK2HgLNcQL9EULPfuzYML3JN3Pa+Q4MRE10f1SBHoCbuTqn
+         2+Z2OSDhQO+yZ40f8Vo85BWbVzIsBQwjQjjRVvqYAP8/uegZuJ0yhp7Z5bEFj2mBBw0D
+         N2RQ==
+X-Gm-Message-State: AOAM533CXOCulJIbZowA5FOnKQGj9xHDaBl7G3DOyx+gwoqED+eli3lU
+        l10NUIrjUxj98Z7VCw1hQsbsxMm8mbyYy1hParbH3hv32kM=
+X-Google-Smtp-Source: ABdhPJyQbt4u4RA9Br7kmGr/OGHVyHowMLsWFUdrWQXwNp5TjAZJP4le1g4zpMnVaSrvW9egoX0J1yzg7AXlCKbz5bo=
+X-Received: by 2002:a25:9a04:: with SMTP id x4mr51179545ybn.440.1621037019467;
+ Fri, 14 May 2021 17:03:39 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210514095905.59358796@ivy-bridge>
+In-Reply-To: <20210514095905.59358796@ivy-bridge>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 14 May 2021 17:03:28 -0700
+Message-ID: <CABBYNZK7m=t2ExO5fZwfr0oosx8pUEQy4dOKT5HrpD_iLwqPPQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH 2/6 v2] Fix leaks in obex
+To:     Steve Grubb <sgrubb@redhat.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Steve,
 
-When advertising with type broadcast it cannot be discoverable as that
-would require setting flags which is not allowed by the spec.
----
- client/advertising.c | 3 +++
- 1 file changed, 3 insertions(+)
+On Fri, May 14, 2021 at 11:51 AM Steve Grubb <sgrubb@redhat.com> wrote:
+>
+>
+> In filesystem, g_file_get_contents allocates fresh memory to buf.
+> It needs to be freed after conversion to a GString object.
+>
+> Destination was missed on an error path as is mld.
+>
+> ---
+>  obexd/plugins/filesystem.c     | 2 +-
+>  obexd/plugins/ftp.c            | 8 ++++++--
+>  obexd/plugins/messages-dummy.c | 1 +
+>  3 files changed, 8 insertions(+), 3 deletions(-)
+>
+> diff --git a/obexd/plugins/filesystem.c b/obexd/plugins/filesystem.c
+> index 09bff8ad0..44e3cf3d2 100644
+> --- a/obexd/plugins/filesystem.c
+> +++ b/obexd/plugins/filesystem.c@@ -416,6 +416,7 @@ static void *capability_open(const char *name, int oflag, mode_t mode,
+>                 }
+>
+>                 object->buffer = g_string_new(buf);
+> +               g_free(buf);
+>
+>                 if (size)
+>                         *size = object->buffer->len;
+> diff --git a/obexd/plugins/ftp.c b/obexd/plugins/ftp.c
+> index 259bfcae2..4b04bab06 100644
+> --- a/obexd/plugins/ftp.c
+> +++ b/obexd/plugins/ftp.c
+> @@ -386,8 +386,10 @@ static int ftp_copy(struct ftp_session *ftp, const char *name,
+>         ret = verify_path(destdir);
+>         g_free(destdir);
+>
+> -       if (ret < 0)
+> +       if (ret < 0) {
+> +               g_free(destination);
+>                 return ret;
+> +       }
+>
+>         source = g_build_filename(ftp->folder, name, NULL);
+>
+> @@ -424,8 +426,10 @@ static int ftp_move(struct ftp_session *ftp, const char *name,
+>         ret = verify_path(destdir);
+>         g_free(destdir);
+>
+> -       if (ret < 0)
+> +       if (ret < 0) {
+> +               g_free(destination);
+>                 return ret;
+> +       }
+>
+>         source = g_build_filename(ftp->folder, name, NULL);
+>
+> diff --git a/obexd/plugins/messages-dummy.c b/obexd/plugins/messages-dummy.c
+> index 34199fa05..e37b52df6 100644
+> --- a/obexd/plugins/messages-dummy.c
+> +++ b/obexd/plugins/messages-dummy.c
+> @@ -488,6 +488,7 @@ int messages_get_messages_listing(void *session, const char *name,
+>                         int err = -errno;
+>                         DBG("fopen(): %d, %s", -err, strerror(-err));
+>                         g_free(path);
+> +                       g_free(mld);
+>                         return -EBADR;
+>                 }
+>         }
+> --
+> 2.31.1
 
-diff --git a/client/advertising.c b/client/advertising.c
-index 3bf12fe87..e40086c98 100644
---- a/client/advertising.c
-+++ b/client/advertising.c
-@@ -512,6 +512,9 @@ void ad_register(DBusConnection *conn, GDBusProxy *manager, const char *type)
- 	g_free(ad.type);
- 	ad.type = g_strdup(type);
- 
-+	if (!strcasecmp(ad.type, "Broadcast"))
-+		ad.discoverable = false;
-+
- 	if (g_dbus_register_interface(conn, AD_PATH, AD_IFACE, ad_methods,
- 					NULL, ad_props, NULL, NULL) == FALSE) {
- 		bt_shell_printf("Failed to register advertising object\n");
+You will need to resend this since apparently patchwork cannot
+identify this as the same set as the others:
+
+https://patchwork.kernel.org/project/bluetooth/list/?series=482521
+
+
 -- 
-2.30.2
-
+Luiz Augusto von Dentz
