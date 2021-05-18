@@ -2,141 +2,415 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13374C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 16:31:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 485C7C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 16:35:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DDA0C610E9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 16:31:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 21AD6611AD
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 16:35:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350650AbhERQcc (ORCPT
+        id S1350795AbhERQgm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 12:32:32 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:39667 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237653AbhERQcb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 May 2021 12:32:31 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1621355473; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=Og8vpZqeLAdSl93O6NbyuGWY01inTUHJlOZ8Qy7/qaA=;
- b=ofc3phqn1Tuxw50/2R+h7Gh4AKTinLJuI/smys3NJiLahgYGNIQyaSWsS6PO73wG1HJ7L7vI
- zlqBh+yL29uljNz/IyoiCrGGwE0SueVYtQBB9rs92cVhfsH0R6ovFS0CyvnXbj4EcWHzJ5or
- gHCMots15qKXrXnEDPM9ntQmFvk=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-west-2.postgun.com with SMTP id
- 60a3ebb91449805ea2688de1 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 18 May 2021 16:30:49
- GMT
-Sender: gubbaven=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id C29CAC43460; Tue, 18 May 2021 16:30:48 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: gubbaven)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9E564C4338A;
-        Tue, 18 May 2021 16:30:42 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 18 May 2021 22:00:42 +0530
-From:   gubbaven@codeaurora.org
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Rob Herring <robh@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        devicetree@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: Re: [PATCH v3 4/5] dt-bindings: net: bluetooth: Convert Qualcomm BT
- binding to DT schema
-In-Reply-To: <C6C73C77-669D-4552-AC0B-74BAA3FF583F@holtmann.org>
-References: <1620322392-27148-1-git-send-email-gubbaven@codeaurora.org>
- <1620322392-27148-5-git-send-email-gubbaven@codeaurora.org>
- <20210507011753.GB1126886@robh.at.kernel.org>
- <C81968AD-1C0B-4764-9631-FF227D026ED7@holtmann.org>
- <CAL_JsqKy-wyrG8hvg2yTBdB44BgPa11hcTPwKTD-WgVykvpLaw@mail.gmail.com>
- <C6C73C77-669D-4552-AC0B-74BAA3FF583F@holtmann.org>
-Message-ID: <8ba855ff3f1e285a87b651ed4b98a702@codeaurora.org>
-X-Sender: gubbaven@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        Tue, 18 May 2021 12:36:42 -0400
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:37559 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244037AbhERQgl (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 May 2021 12:36:41 -0400
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 18 May 2021 09:35:23 -0700
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 18 May 2021 09:35:21 -0700
+X-QCInternal: smtphost
+Received: from gubbaven-linux.qualcomm.com ([10.206.64.32])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 18 May 2021 22:04:49 +0530
+Received: by gubbaven-linux.qualcomm.com (Postfix, from userid 2365015)
+        id 5006C21300; Tue, 18 May 2021 22:04:48 +0530 (IST)
+From:   Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        devicetree@vger.kernel.org
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org,
+        Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+Subject: [PATCH v4 1/5] Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6750
+Date:   Tue, 18 May 2021 22:04:42 +0530
+Message-Id: <1621355686-29550-2-git-send-email-gubbaven@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
+In-Reply-To: <1621355686-29550-1-git-send-email-gubbaven@codeaurora.org>
+References: <1621355686-29550-1-git-send-email-gubbaven@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel and Rob,
+Added regulators,GPIOs and changes required to power on/off wcn6750.
+Added support for firmware download for wcn6750.
 
-On 2021-05-13 20:51, Marcel Holtmann wrote:
-> Hi Rob,
-> 
->>>>> Converted Qualcomm Bluetooth binidings to DT schema.
->>>>> 
->>>>> Signed-off-by: Venkata Lakshmi Narayana Gubba 
->>>>> <gubbaven@codeaurora.org>
->>>>> ---
->>>>> .../devicetree/bindings/net/qualcomm-bluetooth.txt |  69 
->>>>> -------------
->>>>> .../bindings/net/qualcomm-bluetooth.yaml           | 111 
->>>>> +++++++++++++++++++++
->>>>> 2 files changed, 111 insertions(+), 69 deletions(-)
->>>>> delete mode 100644 
->>>>> Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
->>>>> create mode 100644 
->>>>> Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->>>> 
->>>> 
->>>>> diff --git 
->>>>> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml 
->>>>> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->>>>> new file mode 100644
->>>>> index 0000000..3f3ec4d
->>>>> --- /dev/null
->>>>> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->>>>> @@ -0,0 +1,111 @@
->>>>> +# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
->>>>> +%YAML 1.2
->>>>> +---
->>>>> +$id: http://devicetree.org/schemas/net/qualcomm-bluetooth.yaml#
->>>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->>>>> +
->>>>> +title: Qualcomm Bluetooth Chips
->>>>> +
->>>>> +maintainers:
->>>>> +  - Marcel Holtmann <marcel@holtmann.org>
->>>> 
->>>> This should be someone who cares about Qcom BT.
->>> 
->>> yes, please, assign this to someone that knows the hardware.
->>> 
->>> Rob, can we leave this out for now if there is no dedicated person?
->> 
->> No, it's required. It can be me if it comes to that. However, if no
->> one can be bothered to step up, then we should just remove it perhaps.
->> QCom is a big company, I'm sure they can find some name.
-> 
-> I hope so as well since my name is clearly the wrong one there. I have
-> too little knowledge about that hardware and the platforms it is used
-> in.
-> 
-[Venkata]:
-I will update maintainers names in next patchset.
-> Regards
-> 
-> Marcel
+Changes done in detail:
+1. Added regulators and corresponding current values.
+2. Added sw_ctrl GPIO pin which is output from BT SoC and indicates
+   status of clock supply to BT SoC.
+3. Added inline function to check if the SoC type is wcn6750.
+4. Modified the function qca_wcn3990_init() to support wcn6750 and
+   renamed it to qca_regulator_init().
 
-Regards,
-Venkata.
+Signed-off-by: Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+---
+ drivers/bluetooth/btqca.c   |  13 ++++-
+ drivers/bluetooth/btqca.h   |  11 +++++
+ drivers/bluetooth/hci_qca.c | 114 ++++++++++++++++++++++++++++++++++++--------
+ 3 files changed, 115 insertions(+), 23 deletions(-)
+
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index bd71dfc..9574249 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -530,6 +530,11 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			    (soc_ver & 0x0000000f);
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htbtfw%02x.tlv", rom_ver);
++	} else if (soc_type == QCA_WCN6750) {
++		rom_ver = ((soc_ver & 0x00000f00) >> 0x04) |
++			    (soc_ver & 0x0000000f);
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/msbtfw%02x.tlv", rom_ver);
+ 	} else {
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/rampatch_%08x.bin", soc_ver);
+@@ -561,6 +566,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	else if (soc_type == QCA_QCA6390)
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/htnv%02x.bin", rom_ver);
++	else if (soc_type == QCA_WCN6750)
++		snprintf(config.fwname, sizeof(config.fwname),
++			 "qca/msnv%02x.bin", rom_ver);
+ 	else
+ 		snprintf(config.fwname, sizeof(config.fwname),
+ 			 "qca/nvm_%08x.bin", soc_ver);
+@@ -577,13 +585,14 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 			return err;
+ 	}
+ 
+-	/* WCN399x supports the Microsoft vendor extension with 0xFD70 as the
++	/* WCN399x and WCN6750 supports the Microsoft vendor extension with 0xFD70 as the
+ 	 * VsMsftOpCode.
+ 	 */
+ 	switch (soc_type) {
+ 	case QCA_WCN3990:
+ 	case QCA_WCN3991:
+ 	case QCA_WCN3998:
++	case QCA_WCN6750:
+ 		hci_set_msft_opcode(hdev, 0xFD70);
+ 		break;
+ 	default:
+@@ -597,7 +606,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 		return err;
+ 	}
+ 
+-	if (soc_type == QCA_WCN3991) {
++	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
+ 		/* get fw build info */
+ 		err = qca_read_fw_build_info(hdev);
+ 		if (err < 0)
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index b19add7..6ecd329 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -143,6 +143,7 @@ enum qca_btsoc_type {
+ 	QCA_WCN3998,
+ 	QCA_WCN3991,
+ 	QCA_QCA6390,
++	QCA_WCN6750,
+ };
+ 
+ #if IS_ENABLED(CONFIG_BT_QCA)
+@@ -160,6 +161,11 @@ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+ 	return soc_type == QCA_WCN3990 || soc_type == QCA_WCN3991 ||
+ 	       soc_type == QCA_WCN3998;
+ }
++static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
++{
++	return soc_type == QCA_WCN6750;
++}
++
+ #else
+ 
+ static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+@@ -192,6 +198,11 @@ static inline bool qca_is_wcn399x(enum qca_btsoc_type soc_type)
+ 	return false;
+ }
+ 
++static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
++{
++	return false;
++}
++
+ static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+ {
+ 	return -EOPNOTSUPP;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index dc6551d..53deea2 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -218,6 +218,7 @@ struct qca_power {
+ struct qca_serdev {
+ 	struct hci_uart	 serdev_hu;
+ 	struct gpio_desc *bt_en;
++	struct gpio_desc *sw_ctrl;
+ 	struct clk	 *susclk;
+ 	enum qca_btsoc_type btsoc_type;
+ 	struct qca_power *bt_power;
+@@ -604,7 +605,8 @@ static int qca_open(struct hci_uart *hu)
+ 	if (hu->serdev) {
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 
+-		if (qca_is_wcn399x(qcadev->btsoc_type))
++		if (qca_is_wcn399x(qcadev->btsoc_type) ||
++		    qca_is_wcn6750(qcadev->btsoc_type))
+ 			hu->init_speed = qcadev->init_speed;
+ 
+ 		if (qcadev->oper_speed)
+@@ -1308,7 +1310,8 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+ 		      msecs_to_jiffies(CMD_TRANS_TIMEOUT_MS));
+ 
+ 	/* Give the controller time to process the request */
+-	if (qca_is_wcn399x(qca_soc_type(hu)))
++	if (qca_is_wcn399x(qca_soc_type(hu)) ||
++	    qca_is_wcn6750(qca_soc_type(hu)))
+ 		usleep_range(1000, 10000);
+ 	else
+ 		msleep(300);
+@@ -1384,7 +1387,8 @@ static unsigned int qca_get_speed(struct hci_uart *hu,
+ 
+ static int qca_check_speeds(struct hci_uart *hu)
+ {
+-	if (qca_is_wcn399x(qca_soc_type(hu))) {
++	if (qca_is_wcn399x(qca_soc_type(hu)) ||
++	    qca_is_wcn6750(qca_soc_type(hu))) {
+ 		if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+ 		    !qca_get_speed(hu, QCA_OPER_SPEED))
+ 			return -EINVAL;
+@@ -1417,7 +1421,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		/* Disable flow control for wcn3990 to deassert RTS while
+ 		 * changing the baudrate of chip and host.
+ 		 */
+-		if (qca_is_wcn399x(soc_type))
++		if (qca_is_wcn399x(soc_type) ||
++		    qca_is_wcn6750(soc_type))
+ 			hci_uart_set_flow_control(hu, true);
+ 
+ 		if (soc_type == QCA_WCN3990) {
+@@ -1434,7 +1439,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+ 		host_set_baudrate(hu, speed);
+ 
+ error:
+-		if (qca_is_wcn399x(soc_type))
++		if (qca_is_wcn399x(soc_type) ||
++		    qca_is_wcn6750(soc_type))
+ 			hci_uart_set_flow_control(hu, false);
+ 
+ 		if (soc_type == QCA_WCN3990) {
+@@ -1585,10 +1591,12 @@ static bool qca_prevent_wake(struct hci_dev *hdev)
+ 	return !wakeup;
+ }
+ 
+-static int qca_wcn3990_init(struct hci_uart *hu)
++static int qca_regulator_init(struct hci_uart *hu)
+ {
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+ 	struct qca_serdev *qcadev;
+ 	int ret;
++	bool sw_ctrl_state;
+ 
+ 	/* Check for vregs status, may be hci down has turned
+ 	 * off the voltage regulator.
+@@ -1607,16 +1615,33 @@ static int qca_wcn3990_init(struct hci_uart *hu)
+ 		}
+ 	}
+ 
+-	/* Forcefully enable wcn3990 to enter in to boot mode. */
+-	host_set_baudrate(hu, 2400);
+-	ret = qca_send_power_pulse(hu, false);
+-	if (ret)
+-		return ret;
++	if (qca_is_wcn399x(soc_type)) {
++		/* Forcefully enable wcn399x to enter in to boot mode. */
++		host_set_baudrate(hu, 2400);
++		ret = qca_send_power_pulse(hu, false);
++		if (ret)
++			return ret;
++	}
++
++	/* For wcn6750 need to enable gpio bt_en */
++	if (qcadev->bt_en) {
++		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++		msleep(50);
++		gpiod_set_value_cansleep(qcadev->bt_en, 1);
++		msleep(50);
++		if (qcadev->sw_ctrl) {
++			sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
++			bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
++		}
++	}
+ 
+ 	qca_set_speed(hu, QCA_INIT_SPEED);
+-	ret = qca_send_power_pulse(hu, true);
+-	if (ret)
+-		return ret;
++
++	if (qca_is_wcn399x(soc_type)) {
++		ret = qca_send_power_pulse(hu, true);
++		if (ret)
++			return ret;
++	}
+ 
+ 	/* Now the device is in ready state to communicate with host.
+ 	 * To sync host with device we need to reopen port.
+@@ -1649,8 +1674,9 @@ static int qca_power_on(struct hci_dev *hdev)
+ 	if (!hu->serdev)
+ 		return 0;
+ 
+-	if (qca_is_wcn399x(soc_type)) {
+-		ret = qca_wcn3990_init(hu);
++	if (qca_is_wcn399x(soc_type) ||
++	    qca_is_wcn6750(soc_type)) {
++		ret = qca_regulator_init(hu);
+ 	} else {
+ 		qcadev = serdev_device_get_drvdata(hu->serdev);
+ 		if (qcadev->bt_en) {
+@@ -1689,7 +1715,8 @@ static int qca_setup(struct hci_uart *hu)
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 
+ 	bt_dev_info(hdev, "setting up %s",
+-		qca_is_wcn399x(soc_type) ? "wcn399x" : "ROME/QCA6390");
++		qca_is_wcn399x(soc_type) ? "wcn399x" :
++		(soc_type == QCA_WCN6750) ? "wcn6750" : "ROME/QCA6390");
+ 
+ 	qca->memdump_state = QCA_MEMDUMP_IDLE;
+ 
+@@ -1700,7 +1727,8 @@ static int qca_setup(struct hci_uart *hu)
+ 
+ 	clear_bit(QCA_SSR_TRIGGERED, &qca->flags);
+ 
+-	if (qca_is_wcn399x(soc_type)) {
++	if (qca_is_wcn399x(soc_type) ||
++	    qca_is_wcn6750(soc_type)) {
+ 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+ 
+ 		ret = qca_read_soc_version(hdev, &ver, soc_type);
+@@ -1720,7 +1748,8 @@ static int qca_setup(struct hci_uart *hu)
+ 		qca_baudrate = qca_get_baudrate_value(speed);
+ 	}
+ 
+-	if (!qca_is_wcn399x(soc_type)) {
++	if (!(qca_is_wcn399x(soc_type) ||
++	     qca_is_wcn6750(soc_type))) {
+ 		/* Get QCA version information */
+ 		ret = qca_read_soc_version(hdev, &ver, soc_type);
+ 		if (ret)
+@@ -1828,12 +1857,30 @@ static const struct qca_device_data qca_soc_data_qca6390 = {
+ 	.num_vregs = 0,
+ };
+ 
++static const struct qca_device_data qca_soc_data_wcn6750 = {
++	.soc_type = QCA_WCN6750,
++	.vregs = (struct qca_vreg []) {
++		{ "vddio", 5000 },
++		{ "vddaon", 26000 },
++		{ "vddbtcxmx", 126000 },
++		{ "vddrfacmn", 12500 },
++		{ "vddrfa0p8", 102000 },
++		{ "vddrfa1p7", 302000 },
++		{ "vddrfa1p2", 257000 },
++		{ "vddrfa2p2", 1700000 },
++		{ "vddasd", 200 },
++	},
++	.num_vregs = 9,
++	.capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
++};
++
+ static void qca_power_shutdown(struct hci_uart *hu)
+ {
+ 	struct qca_serdev *qcadev;
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned long flags;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	bool sw_ctrl_state;
+ 
+ 	/* From this point we go into power off state. But serial port is
+ 	 * still open, stop queueing the IBS data and flush all the buffered
+@@ -1856,6 +1903,14 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 		host_set_baudrate(hu, 2400);
+ 		qca_send_power_pulse(hu, false);
+ 		qca_regulator_disable(qcadev);
++	} else if (soc_type == QCA_WCN6750) {
++		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++		msleep(100);
++		qca_regulator_disable(qcadev);
++		if (qcadev->sw_ctrl) {
++			sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
++			bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
++		}
+ 	} else if (qcadev->bt_en) {
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	}
+@@ -1978,7 +2033,9 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 	if (!qcadev->oper_speed)
+ 		BT_DBG("UART will pick default operating speed");
+ 
+-	if (data && qca_is_wcn399x(data->soc_type)) {
++	if (data &&
++	    (qca_is_wcn399x(data->soc_type) ||
++	    qca_is_wcn6750(data->soc_type))) {
+ 		qcadev->btsoc_type = data->soc_type;
+ 		qcadev->bt_power = devm_kzalloc(&serdev->dev,
+ 						sizeof(struct qca_power),
+@@ -1996,6 +2053,18 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+ 
+ 		qcadev->bt_power->vregs_on = false;
+ 
++		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
++					       GPIOD_OUT_LOW);
++		if (!qcadev->bt_en && data->soc_type == QCA_WCN6750) {
++			dev_err(&serdev->dev, "failed to acquire BT_EN gpio\n");
++			power_ctrl_enabled = false;
++		}
++
++		qcadev->sw_ctrl = devm_gpiod_get_optional(&serdev->dev, "swctrl",
++					       GPIOD_IN);
++		if (!qcadev->sw_ctrl && data->soc_type == QCA_WCN6750)
++			dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
++
+ 		qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+ 		if (IS_ERR(qcadev->susclk)) {
+ 			dev_err(&serdev->dev, "failed to acquire clk\n");
+@@ -2068,7 +2137,9 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+ 	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+ 	struct qca_power *power = qcadev->bt_power;
+ 
+-	if (qca_is_wcn399x(qcadev->btsoc_type) && power->vregs_on)
++	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
++	     qca_is_wcn6750(qcadev->btsoc_type)) &&
++	     power->vregs_on)
+ 		qca_power_shutdown(&qcadev->serdev_hu);
+ 	else if (qcadev->susclk)
+ 		clk_disable_unprepare(qcadev->susclk);
+@@ -2244,6 +2315,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
+ 	{ .compatible = "qcom,wcn3990-bt", .data = &qca_soc_data_wcn3990},
+ 	{ .compatible = "qcom,wcn3991-bt", .data = &qca_soc_data_wcn3991},
+ 	{ .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
++	{ .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
+ 	{ /* sentinel */ }
+ };
+ MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
+of Code Aurora Forum, hosted by The Linux Foundation
+
