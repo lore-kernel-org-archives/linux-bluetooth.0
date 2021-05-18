@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5AF46C43462
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 10:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0010FC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 10:39:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 40ACC6124C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 10:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D74F8611CC
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 10:39:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242604AbhERKkS (ORCPT
+        id S1348576AbhERKkW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 06:40:18 -0400
-Received: from mga02.intel.com ([134.134.136.20]:23234 "EHLO mga02.intel.com"
+        Tue, 18 May 2021 06:40:22 -0400
+Received: from mga02.intel.com ([134.134.136.20]:23245 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1348568AbhERKkO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 May 2021 06:40:14 -0400
-IronPort-SDR: VxchUP+h7gdFDjaPGG7zMDqUYWbs8mqa1VOA2Jy86HcG8ngX+6RSJ3PssMWJ3SeonQIeAlXVEL
- Xq0iX88Bnvig==
-X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="187804825"
+        id S1348570AbhERKkR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 18 May 2021 06:40:17 -0400
+IronPort-SDR: rVk3adEx858blpj7Af5zMYqYTtai2UN2fSJpMPUmEX+LjKDiSQFsb85xN88DZ1wAZuau6s4b9P
+ l+/QTZDwpMpw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9987"; a="187804826"
 X-IronPort-AV: E=Sophos;i="5.82,309,1613462400"; 
-   d="scan'208";a="187804825"
+   d="scan'208";a="187804826"
 Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 03:38:56 -0700
-IronPort-SDR: PXZQPSDOGb56DXvIWxiuOU8yie54Iv4+2kED4+cTvB1/1dWs974d0fzknUJ6+Drnl47DxGdNCa
- UKBHI9wAYWkw==
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 18 May 2021 03:38:58 -0700
+IronPort-SDR: ttiaaHMj6T+53x3Tj5raqSLVaFTdB09CH8dqs2CsUnpoSDPMSQdS3H+eqn4Y6B37U01gRHvicv
+ Jv26mlVXfhSw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.82,309,1613462400"; 
-   d="scan'208";a="433017864"
+   d="scan'208";a="433017872"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga007.jf.intel.com with ESMTP; 18 May 2021 03:38:54 -0700
+  by orsmga007.jf.intel.com with ESMTP; 18 May 2021 03:38:56 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
         Kiran K <kiran.k@intel.com>
-Subject: [PATCH v8 6/9] Bluetooth: btintel: Add a callback function to configure data path
-Date:   Tue, 18 May 2021 16:12:29 +0530
-Message-Id: <20210518104232.5431-6-kiran.k@intel.com>
+Subject: [PATCH v8 7/9] Bluetooth: Add BT_CODEC option for setsockopt over SCO
+Date:   Tue, 18 May 2021 16:12:30 +0530
+Message-Id: <20210518104232.5431-7-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210518104232.5431-1-kiran.k@intel.com>
 References: <20210518104232.5431-1-kiran.k@intel.com>
@@ -48,159 +48,133 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In HFP offload usecase, Intel controllers require offload use
-case id (NBS or WBS) to be set before opening SCO connection. Define
-a new callback which gets called on setsockopt SCO socket. User space
-audio module is expected to set codec via setsockopt(sk, BT_CODEC, ....)
-before opening SCO connection.
+Add BT_CODEC option on setsockopt system call to allow user space
+audio modules to set codec. Driver also configures codec if non-HCI
+data is selected.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
+ include/net/bluetooth/bluetooth.h |  2 +
+ net/bluetooth/sco.c               | 63 +++++++++++++++++++++++++++++++
+ 2 files changed, 65 insertions(+)
 
-This callback gets called when audio module does setsockopt(sk, BT_CODEC,...)
-on SCO socket and data_path is 1 (non-HCI transport). For non-HCI transport,
-Intel controller expects presets to be set before opening SCO connection.
-Presets are pre-defined, 0 - NBS, 1 - WBS. Likewise additional presets will
-be defined for A2DP, LE Audio offload use cases.
-
- drivers/bluetooth/btintel.c      | 50 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h      |  8 +++++
- drivers/bluetooth/btusb.c        |  1 +
- include/net/bluetooth/hci.h      |  8 +++++
- include/net/bluetooth/hci_core.h |  2 ++
- 5 files changed, 69 insertions(+)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 8407e9736c62..8efb15504973 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -1308,6 +1308,56 @@ int btintel_get_data_path_id(struct hci_dev *hdev)
- }
- EXPORT_SYMBOL_GPL(btintel_get_data_path_id);
- 
-+int btintel_configure_data_path(struct hci_dev *hdev, __u8 type,
-+				struct bt_codec *codec)
-+{
-+	__u8 preset;
-+	struct hci_op_configure_data_path *cmd;
-+	__u8 buffer[255];
-+	struct sk_buff *skb;
-+
-+	if (type != SCO_LINK && type != ESCO_LINK)
-+		return -EINVAL;
-+
-+	switch (codec->id) {
-+	case 0x02:
-+		preset = 0x00;
-+	break;
-+	case 0x05:
-+		preset = 0x01;
-+	break;
-+	default:
-+		return -EINVAL;
-+	}
-+
-+	cmd = (void *)buffer;
-+	cmd->data_path_id = 0x01;
-+	cmd->len = 1;
-+	cmd->data[0] = preset;
-+
-+	cmd->direction = 0x00;
-+	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + 1,
-+			     cmd, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "configure input data path failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	cmd->direction = 0x01;
-+	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + 1,
-+			     cmd, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "configure output data path failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+	return 0;
-+}
-+EXPORT_SYMBOL_GPL(btintel_configure_data_path);
-+
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 6d4edfd16d44..f4af22ecdc0d 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -177,6 +177,8 @@ int btintel_set_debug_features(struct hci_dev *hdev,
- 			       const struct intel_debug_features *features);
- int btintel_read_offload_usecases(struct hci_dev *hdev);
- int btintel_get_data_path_id(struct hci_dev *hdev);
-+int btintel_configure_data_path(struct hci_dev *hdev, __u8 type,
-+				struct bt_codec *codec);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -318,4 +320,10 @@ static int btintel_get_data_path_id(struct hci_dev *hdev)
- {
- 	return -EOPNOTSUPP;
- }
-+
-+static int btintel_configure_data_path(struct hci_dev *hdev, __u8 type,
-+				       struct bt_codec *codec)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index f7b349db392a..220e7c85db10 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4632,6 +4632,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_bdaddr = btintel_set_bdaddr;
- 		hdev->cmd_timeout = btusb_intel_cmd_timeout;
- 		hdev->get_data_path_id = btintel_get_data_path_id;
-+		hdev->configure_data_path = btintel_configure_data_path;
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 9658600ae5de..bd666b114aea 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1257,6 +1257,14 @@ struct hci_rp_read_local_oob_ext_data {
- 	__u8     rand256[16];
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 1840756958ce..0e8802d09068 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -173,6 +173,8 @@ struct bt_codecs {
+ 	struct bt_codec	codecs[];
  } __packed;
  
-+#define HCI_CONFIGURE_DATA_PATH	0x0c83
-+struct hci_op_configure_data_path {
-+	__u8	direction;
-+	__u8	data_path_id;
-+	__u8	len;
-+	__u8	data[];
-+} __packed;
++#define CODING_FORMAT_CVSD	0x02
 +
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
- struct hci_rp_read_local_version {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 78d1ebab58f6..959585bafa8d 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -618,6 +618,8 @@ struct hci_dev {
- 	void (*cmd_timeout)(struct hci_dev *hdev);
- 	bool (*prevent_wake)(struct hci_dev *hdev);
- 	int (*get_data_path_id)(struct hci_dev *hdev);
-+	int (*configure_data_path)(struct hci_dev *hdev, __u8 type,
-+				   struct bt_codec *codec);
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index d66293d1cba4..d59f30fc4b9f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -67,6 +67,7 @@ struct sco_pinfo {
+ 	__u32		flags;
+ 	__u16		setting;
+ 	__u8		cmsg_mask;
++	struct bt_codec codec;
+ 	struct sco_conn	*conn;
  };
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+@@ -438,6 +439,7 @@ static void __sco_sock_close(struct sock *sk)
+ 		sock_set_flag(sk, SOCK_ZAPPED);
+ 		break;
+ 	}
++
+ }
+ 
+ /* Must be called on unlocked socket. */
+@@ -499,6 +501,10 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
+ 	sk->sk_state    = BT_OPEN;
+ 
+ 	sco_pi(sk)->setting = BT_VOICE_CVSD_16BIT;
++	sco_pi(sk)->codec.id = CODING_FORMAT_CVSD;
++	sco_pi(sk)->codec.cid = 0xffff;
++	sco_pi(sk)->codec.vid = 0xffff;
++	sco_pi(sk)->codec.data_path = 0x00;
+ 
+ 	timer_setup(&sk->sk_timer, sco_sock_timeout, 0);
+ 
+@@ -808,6 +814,9 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	int len, err = 0;
+ 	struct bt_voice voice;
++	struct bt_codecs *codecs;
++	struct hci_dev *hdev;
++	__u8 buffer[255];
+ 	u32 opt;
+ 
+ 	BT_DBG("sk %p", sk);
+@@ -870,6 +879,60 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			sco_pi(sk)->cmsg_mask &= SCO_CMSG_PKT_STATUS;
+ 		break;
+ 
++	case BT_CODEC:
++		if (sk->sk_state != BT_OPEN && sk->sk_state != BT_BOUND &&
++		    sk->sk_state != BT_CONNECT2) {
++			err = -EINVAL;
++			break;
++		}
++
++		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
++		if (!hdev) {
++			err = -EBADFD;
++			break;
++		}
++
++		if (!test_bit(HCI_QUIRK_HFP_OFFLOAD_CODECS_SUPPORTED, &hdev->quirks)) {
++			err = -EOPNOTSUPP;
++			break;
++		}
++
++		if (optlen < sizeof(struct bt_codecs) || optlen > 255) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (copy_from_sockptr(buffer, optval, optlen)) {
++			err = -EFAULT;
++			break;
++		}
++
++		codecs = (void *)buffer;
++
++		if (codecs->num_codecs > 1) {
++			err = -EINVAL;
++			break;
++		}
++
++		if (codecs->codecs[0].data_path) {
++			if (!hdev->configure_data_path) {
++				err = -EOPNOTSUPP;
++				break;
++			}
++			err = hdev->configure_data_path(hdev, SCO_LINK,
++							codecs->codecs);
++			if (err < 0)
++				break;
++
++			if (codecs->codecs[0].id == 0xff) {
++				sco_pi(sk)->codec.cid = codecs->codecs[0].cid;
++				sco_pi(sk)->codec.vid = codecs->codecs[0].vid;
++			}
++		}
++		sco_pi(sk)->codec.id = codecs->codecs[0].id;
++		sco_pi(sk)->codec.data_path = codecs->codecs[0].data_path;
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 2.17.1
 
