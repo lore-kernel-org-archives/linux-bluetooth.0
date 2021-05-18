@@ -2,101 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A7441C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22CDCC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 19:00:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83BCB61285
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 050A861285
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 19:00:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351610AbhERSlE (ORCPT
+        id S244207AbhERTBW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 14:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55868 "EHLO
+        Tue, 18 May 2021 15:01:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343747AbhERSlC (ORCPT
+        with ESMTP id S1351807AbhERTBO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 May 2021 14:41:02 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78D00C06175F
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:42 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id n8so379484plf.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:42 -0700 (PDT)
+        Tue, 18 May 2021 15:01:14 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46058C06175F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:59:48 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id t11so6044626pjm.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:59:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=sJMfQ7nQR3Pl+bsEnR4ULgp373XRVEfzHapTKV5IzLo=;
-        b=HpJioW51Ka8qDHrvTOtCMASmG+HPmw6LXUeez4jkU+8YLNqTv7kexDfZS1CB3n1+gA
-         XUeLuQ9ktpztecgbeBjJgKIu2mGAEi3fce3TTdBAEV8ubVbYJ0jUu+K9WGCb3arCvbwb
-         RerBHfy7clsgZvRdeNlcCqyrNP66+4v9Nkg/UqnsSDwOszrMv/gzs4czx/FSsfrZ6wRC
-         6wtK2ydOIZre4VYSlXLI8OFhmayTZWinMgi9gEJqxOaokEqBg1TYGdJmge736aiOaYdM
-         ejuzU6j/M6vQtiruw2nSteYLO5QSW9EfA92YsOaW4cGNhg2+raepragLslBE/6LwIzRs
-         k3XA==
+        h=from:to:cc:subject:date:message-id;
+        bh=sSW+RyQ8Xex5bb4BksaMTfUcNVjBzcIKNLpeNMKZk5I=;
+        b=FmFHMURZYcBaFjvK21PMWN2TS4tjNR3gv5fYg+Y/7A+fY49DBApbc4l45d8mb1+HvD
+         HfFK/xCGvGvS4XRUDK07V61tBrJzh+WIXEzTO7pqUpI0jdq4areWxAz7YX1rhzIn4bhd
+         4muZlWgnvHA46i3J88WoLXH5S5cneiiAZ8/Bd35WIUABXsbiet6+1yUZol8wYB20RDZp
+         6HvwV72FpxLdoIHSw7Tg4kVSfsyL5Mxt9J/k2BiG2udjMBbTx1+3SyKufsBZWmQi0qNz
+         CirMwpu5W/gLSbFg/aULcuydaDUMaJSMzqtBY0Gh4vFlRf4SL3OD44yeDlnj+Mpv57+p
+         tYOw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=sJMfQ7nQR3Pl+bsEnR4ULgp373XRVEfzHapTKV5IzLo=;
-        b=mK+jrDlXW2DCc5z7ZAtPyIISV4I0E2SqhUQhnze6pRI+jdGnsGgWSU5kMJ84+0tFlH
-         hh1Fs+46JbFwDm3Nvwaz2CQysFBxchPKXgS77Pg/P+O3imzjkqH8r7qaQC+XzjaHlgao
-         Hd6xTrgkHvPN5qRvMQxSzFO8hXV9ex0q8qtwprrFzyWuZ5quqntSQoNsoB6mklDx6r7x
-         K8C/7w3ZURpBfbCiGRQVF2NTlfbQxNr23XlT8tvx4nhxFA5wd/KnrZt/c+X1QiE0PnZg
-         l9IA/64Tqc2IYOXr8d/sW9Tw9Yoto6cRgussD4ZLuWfdbg2sYo4JLUO/sSBh5bSZ8tdt
-         lheA==
-X-Gm-Message-State: AOAM531ktDg9zanJgmTNQDDVaZqfjqVmqmYWD6JW1CutH0UAszHped8q
-        pyDlxqQ8RAy6TfS2mQIatWvNuD1XqYU=
-X-Google-Smtp-Source: ABdhPJybbPtHqLRnEAXOGf+kxkikUjQtp1HrdtJ/nQOdrW4LzyKpAR8+9qTVPyTdMkgCQuKKSuBhSw==
-X-Received: by 2002:a17:902:8211:b029:ef:64c8:5bb2 with SMTP id x17-20020a1709028211b02900ef64c85bb2mr6184844pln.64.1621363181694;
-        Tue, 18 May 2021 11:39:41 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id r22sm13157121pgr.1.2021.05.18.11.39.40
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=sSW+RyQ8Xex5bb4BksaMTfUcNVjBzcIKNLpeNMKZk5I=;
+        b=pAmQfrb2YVSFlic9IMyZIr1CXeBGE56AoNzM+6Yvtsofp4e7JocLm4+snablSncUd0
+         HRy5HZoPmvJ9P114+w5tEBm7Q6EmLedUBbTPERMLyIBxYopKK59QkFGw6zuxKJKIJnqi
+         /tEM7XW8hAuIbnjrAqkRgow6wLOk3uASX6yq/SMahsbpFzdJ51Bhp8cPYpo6KP1o2OTO
+         A/D3fLUTuylApiMLuFG5n6BS9O4dMEFwN9qwykWewxSntvt/MUGOQJitv+yE+cyGW3Uw
+         h+6K9h5x+SHD8C7DYQjNYYyhjLE0lr2FAfZZBXV3SgtVkEQYWpbnrFT+Y994yGlfcVPa
+         NUhA==
+X-Gm-Message-State: AOAM5329IAHSc7xR/Y4y+WL0RoF68Zcaa0thnICx5t/ja+6zpmcUDH5+
+        DVjUyidE+HreWkqIrvMJWlqijvFVZ0ZC4Dzm
+X-Google-Smtp-Source: ABdhPJxVcS6QNpnegrFtZrmMr54BgP9pF6CgzMLbt3X0dAvtDtoenRUdR1oqtIS6yHxc2hVxRn0E9A==
+X-Received: by 2002:a17:90b:703:: with SMTP id s3mr7180527pjz.69.1621364387426;
+        Tue, 18 May 2021 11:59:47 -0700 (PDT)
+Received: from u0b6eedb2c9435b.ant.amazon.com ([73.96.106.178])
+        by smtp.gmail.com with ESMTPSA id q18sm13111201pfj.131.2021.05.18.11.59.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 May 2021 11:39:41 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Tue, 18 May 2021 11:59:46 -0700 (PDT)
+From:   Daniel Lenski <dlenski@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/3] shared/util: Decode BlueZ experimental UUIDs
-Date:   Tue, 18 May 2021 11:39:36 -0700
-Message-Id: <20210518183937.786605-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210518183937.786605-1-luiz.dentz@gmail.com>
-References: <20210518183937.786605-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Daniel Lenski <dlenski@gmail.com>
+Subject: [PATCH] Bluetooth: Add a new QCA_ROME device (0cf3:e500)
+Date:   Tue, 18 May 2021 11:59:38 -0700
+Message-Id: <20210518185938.322908-1-dlenski@gmail.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This patch adds the 0cf3:e500 Bluetooth device (from a QCA9377 board) as a
+QCA_ROME device. It appears to be functionally identical to another device
+ID, also from a QCA9377 board, which was previously marked as QCA_ROME in
+commit 0a03f98b98c2 ("Bluetooth: Add a new 04ca:3015 QCA_ROME device").
 
-This adds BlueZ experimental UUIDs to uuid128_table so they are
-decoded by the likes of btmon.
+Without this patch, the WiFi side of the QCA9377 board is slow or unusable
+when the Bluetooth side is in use.
+
+See https://askubuntu.com/a/1137852 for another report of QCA_ROME fixing
+this issue for this device ID.
+
+/sys/kernel/debug/usb/devices:
+
+T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0cf3 ProdID=e500 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+
+Signed-off-by: Daniel Lenski <dlenski@gmail.com>
 ---
- src/shared/util.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 7fb1c01dc..8c216f936 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -1019,6 +1019,12 @@ static const struct {
- 	{ "6e400001-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART Service" },
- 	{ "6e400002-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART TX"	},
- 	{ "6e400003-b5a3-f393-e0a9-e50e24dcca9e", "Nordic UART RX"	},
-+	/* BlueZ Experimental Features */
-+	{ "d4992530-b9ec-469f-ab01-6c481c47da1c", "BlueZ Experimental Debug" },
-+	{ "671b10b5-42c0-4696-9227-eb28d1b049d6",
-+		"BlueZ Experimental Simultaneous Central and Peripheral" },
-+	{ "15c0a148-c273-11ea-b3de-0242ac130004",
-+		"BlueZ Experimental LL privacy" },
- 	{ }
- };
- 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5d603ef39..ba339e074 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -270,6 +270,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0cf3, 0xe360), .driver_info = BTUSB_QCA_ROME |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0cf3, 0xe500), .driver_info = BTUSB_QCA_ROME |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe092), .driver_info = BTUSB_QCA_ROME |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0489, 0xe09f), .driver_info = BTUSB_QCA_ROME |
 -- 
-2.30.2
+2.17.1
 
