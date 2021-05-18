@@ -2,123 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0981AC43460
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 14:13:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 821D7C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 14:54:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CBB3B611BF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 14:13:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F62A61074
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 14:54:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349882AbhEROOT (ORCPT
+        id S244245AbhERO4H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 10:14:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51332 "EHLO
+        Tue, 18 May 2021 10:56:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32978 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1349869AbhEROOQ (ORCPT
+        with ESMTP id S240593AbhERO4F (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 May 2021 10:14:16 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A51CC061573
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 07:12:58 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id a10so720987qtp.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 07:12:58 -0700 (PDT)
+        Tue, 18 May 2021 10:56:05 -0400
+Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 870C3C061756
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 07:54:46 -0700 (PDT)
+Received: by mail-lf1-x130.google.com with SMTP id m11so14607094lfg.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 07:54:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=reaganmcf.com; s=google;
-        h=to:cc:from:subject:message-id:date:user-agent:mime-version
-         :content-language:content-transfer-encoding;
-        bh=KxUrJHmK65TUPhstPO4qv9AyRaQQt5FUyzzptUDCDVs=;
-        b=dGS1CUsAyt5WH6CwLtWjRMx+wKJ5NJs4q+Eqi6Qld7mq+iKin2FTJsxRpSPr1MNvEq
-         SolYyWAcb3S57slXilTwmmP74oXfqe8LMjb2ncND/pkITgEpfCo+XKZrn9E6EIFdbD9S
-         PCsLP9Pb9CxwUURqh1OMvYxmJijWmUNrj7ww2xfqCbOwQZB4kgPX0UtocAN4jCXXUnmN
-         UdLS9MszOOUAShZjxObVL/hWDvJo2c/vpdAWBeZlUXbvsvdu8qfp1Uf6OLTJu5+wj4FF
-         d0cUbvwNe7eb7NMSdFGCMaGEc6DFhud7JkxHy+pwNSWXijTosm1ZgnQqKh8+qb0aKs8C
-         nCjg==
+        d=codecoup-pl.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ph0XmSSI/oRzmF3YyObORn/j1oThgDBs46q4R6Eam2Q=;
+        b=whVzvxWzqpoxJx5/4EO2U9yCUxvWlkvjD/7ZjF2E6y1Eqhj6CqxuZrDW4Z5kBG+sM7
+         rC1WYIxx/tT8iZhb0f4qVA9+tJtvof5YtdTcvEdfHHLRfbncStTgZtuCYHWih5m3xRon
+         1u3oD8r0o1kF+jaHST0oxgtZeool0x1790SnwMo3LKMWIV0mCulNyaNchCceu+ewSYel
+         HdzmeE713ouqPiZuAhzXazUr2txjMjFQGWggCt5EiDUpvwFqfK/BmKctlh1yvaosNIM1
+         L6Qg+jxTVJCJte56uhMpH+hJFZ30bu9FyBNm+LjrkRd1FX3we//gcOrhEYzCw/VVI35M
+         dyYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:to:cc:from:subject:message-id:date:user-agent
-         :mime-version:content-language:content-transfer-encoding;
-        bh=KxUrJHmK65TUPhstPO4qv9AyRaQQt5FUyzzptUDCDVs=;
-        b=RsUEHn+MD+KcYNfgX+Aqdw8XGrgNnnjoQovlf+scQpU+0FsTM149UB3bRluNju6lAz
-         dnOXECI0dAn6Jk+d2aDuyRJf8NNS+jbt7Nl9y4U3mv3LsEVCo1K131S09N8CAzlluIjw
-         yBOTjtJMMp+yhhoNzAIkySNPxKkzic25zRrRszSIxyljRHOvscQwxKsd99EGJKE5jJ/R
-         SsM4TJgN5cUfVwaZk9TNvLaemiG1Um6ItdS/nWUfO0g1BeYbWul/hITo0doWrC7NfhmM
-         KQUlGviLtLG024Gob5UzjSNZEywn7Mk/lF6skqQQsjlo7+XVYpMTWoe+nev73VF0dhsH
-         zvBg==
-X-Gm-Message-State: AOAM533vpxO7QuewF7IDQogp9Hil5BN4X6LCch0E5xCkigrx81GHSjD3
-        GNDJuRnAXeorEbfucAreQrtShn9XdVrI6oUgxYA=
-X-Google-Smtp-Source: ABdhPJzePXqU7JOLB9Nzju7YbIQtifKC7+rzO6bB+Y1JtNXzJZCiBSjjLLqvK7gGiF/JQs44hmwsMQ==
-X-Received: by 2002:a05:622a:289:: with SMTP id z9mr5012030qtw.325.1621347177389;
-        Tue, 18 May 2021 07:12:57 -0700 (PDT)
-Received: from [192.168.1.18] (c-73-112-152-161.hsd1.nj.comcast.net. [73.112.152.161])
-        by smtp.gmail.com with ESMTPSA id e19sm1343447qtr.45.2021.05.18.07.12.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 18 May 2021 07:12:57 -0700 (PDT)
-To:     marcel@holtmann.org
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-From:   Reagan McFarland <me@reaganmcf.com>
-Subject: [PATCH] Bluetooth: bfusb.c code style cleanup
-Message-ID: <c4755ff4-3bae-a5c8-a081-78cd2e0c52f5@reaganmcf.com>
-Date:   Tue, 18 May 2021 10:12:56 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.1
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Ph0XmSSI/oRzmF3YyObORn/j1oThgDBs46q4R6Eam2Q=;
+        b=TfVL8lkE26fSPed7wT6Sy3PecMYThAwTx60A+WOjTiFQMl8Y+CH21+2tdLTdUixnbI
+         5cFeRLhy0fHVN/jwAMrJCNR99MMRxVZVnusnSG0XLQiiumt15ew3aSi8n8zTw6CRUa76
+         446IBN7iAqzyRU3LEglt1wlRDBylDm7fkrlRUBhcSYcdwNTS96sj9raTd68l2uYVdk9C
+         CR3JR+mrethObPnlJNzdIfVCcuJ7EIUfGYQ5z67AGhMy0cSnPVdJQTpDnS1fW0Gz+HrO
+         92qat2dmPrxy9AtiGg8jHS/vAaXMUuK3gaDlY1wsOXmwJXG1cFcfpxtdlJWPSSsCWzvJ
+         TCag==
+X-Gm-Message-State: AOAM53048t+SmXVzEViDX7Z410PcBU2K40SzyXgwtFwXUnhvGDmJhHRJ
+        rcY7JPDp1bLTShNHyK3FWiTtgLJYanZhXg==
+X-Google-Smtp-Source: ABdhPJwUjxpd/FSFJK4FYOiEEZIfBBwmMyLdrObQJtG8kDexpKfVOv9Pr2eiQHXNXhUHRjmtf9jdDQ==
+X-Received: by 2002:a05:6512:3487:: with SMTP id v7mr4639735lfr.467.1621349684974;
+        Tue, 18 May 2021 07:54:44 -0700 (PDT)
+Received: from ix.cc.local ([95.143.243.62])
+        by smtp.gmail.com with ESMTPSA id b17sm1294499lfb.275.2021.05.18.07.54.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 18 May 2021 07:54:44 -0700 (PDT)
+From:   Szymon Janc <szymon.janc@codecoup.pl>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Szymon Janc <szymon.janc@codecoup.pl>, stable@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Remove spurious error message
+Date:   Tue, 18 May 2021 16:54:36 +0200
+Message-Id: <20210518145436.156997-1-szymon.janc@codecoup.pl>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Code styling / formatting changes made to drivers/bluetooth/bfusb.c to get rid of the warnings
-when running the checkpatch.pl script.
+Even with rate limited reporting this is very spammy and since
+it is remote device that is providing bogus data there is no
+need to report this as error.
 
-Signed-off-by: Reagan McFarland <me@reaganmcf.com>
+Since real_len variable was used only to allow conditional error
+message it is now also removed.
+
+[72454.143336] bt_err_ratelimited: 10 callbacks suppressed
+[72454.143337] Bluetooth: hci0: advertising data len corrected
+[72454.296314] Bluetooth: hci0: advertising data len corrected
+[72454.892329] Bluetooth: hci0: advertising data len corrected
+[72455.051319] Bluetooth: hci0: advertising data len corrected
+[72455.357326] Bluetooth: hci0: advertising data len corrected
+[72455.663295] Bluetooth: hci0: advertising data len corrected
+[72455.787278] Bluetooth: hci0: advertising data len corrected
+[72455.942278] Bluetooth: hci0: advertising data len corrected
+[72456.094276] Bluetooth: hci0: advertising data len corrected
+[72456.249137] Bluetooth: hci0: advertising data len corrected
+[72459.416333] bt_err_ratelimited: 13 callbacks suppressed
+[72459.416334] Bluetooth: hci0: advertising data len corrected
+[72459.721334] Bluetooth: hci0: advertising data len corrected
+[72460.011317] Bluetooth: hci0: advertising data len corrected
+[72460.327171] Bluetooth: hci0: advertising data len corrected
+[72460.638294] Bluetooth: hci0: advertising data len corrected
+[72460.946350] Bluetooth: hci0: advertising data len corrected
+[72461.225320] Bluetooth: hci0: advertising data len corrected
+[72461.690322] Bluetooth: hci0: advertising data len corrected
+[72462.118318] Bluetooth: hci0: advertising data len corrected
+[72462.427319] Bluetooth: hci0: advertising data len corrected
+[72464.546319] bt_err_ratelimited: 7 callbacks suppressed
+[72464.546319] Bluetooth: hci0: advertising data len corrected
+[72464.857318] Bluetooth: hci0: advertising data len corrected
+[72465.163332] Bluetooth: hci0: advertising data len corrected
+[72465.278331] Bluetooth: hci0: advertising data len corrected
+[72465.432323] Bluetooth: hci0: advertising data len corrected
+[72465.891334] Bluetooth: hci0: advertising data len corrected
+[72466.045334] Bluetooth: hci0: advertising data len corrected
+[72466.197321] Bluetooth: hci0: advertising data len corrected
+[72466.340318] Bluetooth: hci0: advertising data len corrected
+[72466.498335] Bluetooth: hci0: advertising data len corrected
+[72469.803299] bt_err_ratelimited: 10 callbacks suppressed
+
+Signed-off-by: Szymon Janc <szymon.janc@codecoup.pl>
+Fixes: https://bugzilla.kernel.org/show_bug.cgi?id=203753
+Cc: stable@vger.kernel.org
 ---
- drivers/bluetooth/bfusb.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
+ net/bluetooth/hci_event.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/bfusb.c b/drivers/bluetooth/bfusb.c
-index 5a321b4076aa..b4da848bdcf5 100644
---- a/drivers/bluetooth/bfusb.c
-+++ b/drivers/bluetooth/bfusb.c
-@@ -275,6 +275,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
-                case HCI_EVENT_PKT:
-                        if (len >= HCI_EVENT_HDR_SIZE) {
-                                struct hci_event_hdr *hdr = (struct hci_event_hdr *) buf;
-+
-                                pkt_len = HCI_EVENT_HDR_SIZE + hdr->plen;
-                        } else {
-                                bt_dev_err(data->hdev, "event block is too short");
-@@ -285,6 +286,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
-                case HCI_ACLDATA_PKT:
-                        if (len >= HCI_ACL_HDR_SIZE) {
-                                struct hci_acl_hdr *hdr = (struct hci_acl_hdr *) buf;
-+
-                                pkt_len = HCI_ACL_HDR_SIZE + __le16_to_cpu(hdr->dlen);
-                        } else {
-                                bt_dev_err(data->hdev, "data block is too short");
-@@ -295,6 +297,7 @@ static inline int bfusb_recv_block(struct bfusb_data *data, int hdr, unsigned ch
-                case HCI_SCODATA_PKT:
-                        if (len >= HCI_SCO_HDR_SIZE) {
-                                struct hci_sco_hdr *hdr = (struct hci_sco_hdr *) buf;
-+
-                                pkt_len = HCI_SCO_HDR_SIZE + hdr->dlen;
-                        } else {
-                                bt_dev_err(data->hdev, "audio block is too short");
-@@ -365,9 +368,8 @@ static void bfusb_rx_complete(struct urb *urb)
-                        buf   += 3;
-                }
-
--               if (count < len) {
-+               if (count < len)
-                        bt_dev_err(data->hdev, "block extends over URB buffer ranges");
--               }
-
-                if ((hdr & 0xe1) == 0xc1)
-                        bfusb_recv_block(data, hdr, buf, len);
---
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 5e99968939ce..f15d8b85571a 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5441,7 +5441,7 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 	struct hci_conn *conn;
+ 	bool match;
+ 	u32 flags;
+-	u8 *ptr, real_len;
++	u8 *ptr;
+ 
+ 	switch (type) {
+ 	case LE_ADV_IND:
+@@ -5472,14 +5472,10 @@ static void process_adv_report(struct hci_dev *hdev, u8 type, bdaddr_t *bdaddr,
+ 			break;
+ 	}
+ 
+-	real_len = ptr - data;
+-
+-	/* Adjust for actual length */
+-	if (len != real_len) {
+-		bt_dev_err_ratelimited(hdev, "advertising data len corrected %u -> %u",
+-				       len, real_len);
+-		len = real_len;
+-	}
++	/* Adjust for actual length. This handles the case when remote
++	 * device is advertising with incorrect data length.
++	 */
++	len = ptr - data;
+ 
+ 	/* If the direct address is present, then this report is from
+ 	 * a LE Direct Advertising Report event. In that case it is
+-- 
 2.31.1
+
