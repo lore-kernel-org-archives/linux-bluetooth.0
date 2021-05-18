@@ -2,68 +2,71 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-8.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4DE6AC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4807EC43460
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20A1E61244
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DAE56124C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 18:39:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1344691AbhERSlC (ORCPT
+        id S1345973AbhERSlD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 14:41:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55866 "EHLO
+        Tue, 18 May 2021 14:41:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1343747AbhERSlB (ORCPT
+        with ESMTP id S1344369AbhERSlB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 18 May 2021 14:41:01 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AED8C061573
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:42 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id 22so7683690pfv.11
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:42 -0700 (PDT)
+Received: from mail-pl1-x62a.google.com (mail-pl1-x62a.google.com [IPv6:2607:f8b0:4864:20::62a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBA1C061760
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:43 -0700 (PDT)
+Received: by mail-pl1-x62a.google.com with SMTP id s20so5593999plr.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 11:39:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Ot0DntzaYSgGQ31gvBNcBTx9/HZZ2Rd8zN+tqeN2Iog=;
-        b=vbPmK5cDMIp93aeZEvkUJ7Agd0tUGp8tb1CdglL7JOjGLJzcewLxRPIohquU0CF0lC
-         bny9ooRjQjqF9dL24dkULDQyerAW19QYG6SQboiZ4wt6nUSpI0MsfZXAUeZyNYbZ/4Eh
-         KCb64mGh0dRCLlEhs37/EHLZPW+AXFO9tGeKCAJwLKOBJaxy2hV+0WruzCjrAiqWW04G
-         m2g0IEqNJSyTDmt/ryaYHHo+9K9waGiUofurmKoCPn0rOCFxRdkjQ8qO5fuVY9ZVKbaf
-         5xHGu+1Vh+8PzpG0HshDOP2/pHd4HwZ1sgon1qBaz/faQq/zN/C61RzqwUIJt9tsDKiL
-         fNoQ==
+        bh=2XkMpWYGmA/c07E68wL6jGMt77CGRNTBe4b0pnu8Xrg=;
+        b=S7kI2lmna8bgL9OKTGauAfqdfdAkF/KSgV5bj+rB9XVETUzXz/DUNt1C/erRH8iq5M
+         URgRsA5dPqdBh7EsX6su1QjUw8gLdMzsrIxO4hL0myHhFxNPGV3ZSBnGs4gO/nSeZqwg
+         7t1rZ85pdfIYdBfAq0Et7bKGzWGO+PQ9TLrcgrP0Lu7kYv4bP5lRKb8Beh8QrI9DINDM
+         78DTtGDP3lwLbwaWJQjGjK0dyayA8ABFqXaPuqayCqZVjSahGFgcDUzBwI2l+lGicEji
+         g9WdFbWd4upbD30DMh1tFbNMwkdA4hg84gOfOi49lc9enKwDn3kg4EnuXeEkaxChogyy
+         ZG8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=Ot0DntzaYSgGQ31gvBNcBTx9/HZZ2Rd8zN+tqeN2Iog=;
-        b=p+Z8dFGuzUJLyeoPpibjyf6qLadUp4wNHFYRsv1bEMZc8z/AK2u7ReHMY7VFjwKU6j
-         FxIrw7vNkWU7Bbsh7fGs9pb2ShWPAgQZ9F1mC5X7Gsg2hPk3dhOCGTKqcaqgUFXuNTrg
-         OLrAmkIDhUwb6bwB/j1lbbZpoP6K9C7E8szBUaHazOZqIySE9gpEp9BAM1f8O+i4s59w
-         gMi+SMkGkP/mr62I/FiwF1NBIsL3MDsam73E/G2nhPUUpebS2ApC2R1LOZqi8xFDtEJO
-         +Wxvku7QBU0fMUNjX4dbohbwlIUMS+Yhm51JDPHsOF0x+gzkJMMIxdlmtoLzaP+P4kIo
-         D0TQ==
-X-Gm-Message-State: AOAM5330lr1tJjzKGxABaaQNK27plXQiMazQn614gzO+Y8z49jVnmN3G
-        8z1u6eeljhNMQUGvv5sJOnsx4WkX3Yg=
-X-Google-Smtp-Source: ABdhPJywqU0NOufHecBIAh6wI3JKTpxg+jP5qacci1JO0pZkCMLKChMJSj5G/dLzWGV7iNt8yTSRrQ==
-X-Received: by 2002:a62:ac1a:0:b029:2db:7c55:7f4 with SMTP id v26-20020a62ac1a0000b02902db7c5507f4mr6462000pfe.26.1621363180840;
-        Tue, 18 May 2021 11:39:40 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=2XkMpWYGmA/c07E68wL6jGMt77CGRNTBe4b0pnu8Xrg=;
+        b=J2yri6MwWQ7yGylP48Irc50EwgvmNZRNekIVdC/O6Y7j6R2QiFUU4QmjtY/8B4isBd
+         M7k7vrEbFQ42hkmTkW+GT7Brl0p/8npI3MNsKYAgSgLjzrajKE138VXk3D3zgeKLGPNR
+         ncnH3q0pdJda73/aVnYihHsLd9JRdGIGblzY21vtAQSJTUNCmZONmcgm1TA8QVO/PbTK
+         gJaRIt/NAPGslXv52/zlcM7MNZWEIHyXue5u9kcZ6kHGhCDbTIm5h4muTV2oj2XcZ3EF
+         noF8J9mn5YyMKs8D7sREHPK4HVbJJ7YxlU3wV04vA61CB9x6RANWrbEtXwWtlNpH5/6E
+         ul8Q==
+X-Gm-Message-State: AOAM5300jYMxwvgOaEuDU4ONVCsKouGymm5mP12ItdFt+vgjHoENIGcH
+        JXpV51ppUvh82RMzWrDb/4Qxg8s8aww=
+X-Google-Smtp-Source: ABdhPJwpatjuV1Vd+K9VRXOU9TKS9A+YsmRlSjvKxjHJ7yYNMPnT27QRoj2nRKUC3qQjEl/SEe5YyA==
+X-Received: by 2002:a17:902:854a:b029:ef:3f99:91a7 with SMTP id d10-20020a170902854ab02900ef3f9991a7mr6180139plo.74.1621363182501;
+        Tue, 18 May 2021 11:39:42 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id r22sm13157121pgr.1.2021.05.18.11.39.40
+        by smtp.gmail.com with ESMTPSA id r22sm13157121pgr.1.2021.05.18.11.39.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 May 2021 11:39:40 -0700 (PDT)
+        Tue, 18 May 2021 11:39:42 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/3] shared/util: Add bt_uuid128_to_str
-Date:   Tue, 18 May 2021 11:39:35 -0700
-Message-Id: <20210518183937.786605-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 3/3] btmon: Use bt_uuid128_to_str when printing UUIDs of 128 bits
+Date:   Tue, 18 May 2021 11:39:37 -0700
+Message-Id: <20210518183937.786605-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20210518183937.786605-1-luiz.dentz@gmail.com>
+References: <20210518183937.786605-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -72,47 +75,97 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_uuid128_to_str which can be used to convert UUID 128 bit
-binary format into string.
+This ensures that know UUIDs names are printed including those used by
+experimental features.
 ---
- src/shared/util.c | 12 ++++++++++++
- src/shared/util.h |  1 +
- 2 files changed, 13 insertions(+)
+ monitor/packet.c | 27 ++++++---------------------
+ 1 file changed, 6 insertions(+), 21 deletions(-)
 
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 9c2054211..7fb1c01dc 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -1042,6 +1042,18 @@ const char *bt_uuid32_to_str(uint32_t uuid)
- 	return "Unknown";
+diff --git a/monitor/packet.c b/monitor/packet.c
+index d729a01cc..82513a63c 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -3282,18 +3282,13 @@ static void print_uuid128_list(const char *label, const void *data,
+ {
+ 	uint8_t count = data_len / 16;
+ 	unsigned int i;
+-	char uuidstr[MAX_LEN_UUID_STR];
+ 
+ 	print_field("%s: %u entr%s", label, count, count == 1 ? "y" : "ies");
+ 
+ 	for (i = 0; i < count; i++) {
+ 		const uint8_t *uuid = data + (i * 16);
+ 
+-		sprintf(uuidstr, "%8.8x-%4.4x-%4.4x-%4.4x-%8.8x%4.4x",
+-				get_le32(&uuid[12]), get_le16(&uuid[10]),
+-				get_le16(&uuid[8]), get_le16(&uuid[6]),
+-				get_le32(&uuid[2]), get_le16(&uuid[0]));
+-		print_field("  %s (%s)", bt_uuidstr_to_str(uuidstr), uuidstr);
++		print_field("  %s", bt_uuid128_to_str(uuid));
+ 	}
  }
  
-+const char *bt_uuid128_to_str(const uint8_t uuid[16])
-+{
-+	char uuidstr[37];
-+
-+	sprintf(uuidstr, "%8.8x-%4.4x-%4.4x-%4.4x-%8.8x%4.4x",
-+				get_le32(&uuid[12]), get_le16(&uuid[10]),
-+				get_le16(&uuid[8]), get_le16(&uuid[6]),
-+				get_le32(&uuid[2]), get_le16(&uuid[0]));
-+
-+	return bt_uuidstr_to_str(uuidstr);
-+}
-+
- const char *bt_uuidstr_to_str(const char *uuid)
- {
- 	uint32_t val;
-diff --git a/src/shared/util.h b/src/shared/util.h
-index d6de55885..9920b7f76 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -107,6 +107,7 @@ void util_clear_uid(unsigned int *bitmap, uint8_t id);
+@@ -12006,16 +12001,6 @@ static void mgmt_print_name(const void *data)
+ 	print_field("Short name: %s", (char *) (data + 249));
+ }
  
- const char *bt_uuid16_to_str(uint16_t uuid);
- const char *bt_uuid32_to_str(uint32_t uuid);
-+const char *bt_uuid128_to_str(const uint8_t uuid[16]);
- const char *bt_uuidstr_to_str(const char *uuid);
- const char *bt_appear_to_str(uint16_t appearance);
+-static void mgmt_print_uuid(const void *data)
+-{
+-	const uint8_t *uuid = data;
+-
+-	print_field("UUID: %8.8x-%4.4x-%4.4x-%4.4x-%8.8x%4.4x",
+-				get_le32(&uuid[12]), get_le16(&uuid[10]),
+-				get_le16(&uuid[8]), get_le16(&uuid[6]),
+-				get_le32(&uuid[2]), get_le16(&uuid[0]));
+-}
+-
+ static void mgmt_print_io_capability(uint8_t capability)
+ {
+ 	const char *str;
+@@ -12261,7 +12246,7 @@ static void mgmt_print_exp_feature(const void *data)
+ 	uint32_t flags = get_le32(data + 16);
+ 	uint32_t mask;
+ 
+-	mgmt_print_uuid(data);
++	print_field("UUID: %s", bt_uuid128_to_str(data));
+ 	print_field("Flags: 0x%8.8x", flags);
+ 
+ 	mask = print_bitfield(2, flags, mgmt_exp_feature_flags_table);
+@@ -12457,7 +12442,7 @@ static void mgmt_add_uuid_cmd(const void *data, uint16_t size)
+ {
+ 	uint8_t service_class = get_u8(data + 16);
+ 
+-	mgmt_print_uuid(data);
++	print_field("UUID: %s", bt_uuid128_to_str(data));
+ 	print_field("Service class: 0x%2.2x", service_class);
+ }
+ 
+@@ -12468,7 +12453,7 @@ static void mgmt_add_uuid_rsp(const void *data, uint16_t size)
+ 
+ static void mgmt_remove_uuid_cmd(const void *data, uint16_t size)
+ {
+-	mgmt_print_uuid(data);
++	print_field("UUID: %s", bt_uuid128_to_str(data));
+ }
+ 
+ static void mgmt_remove_uuid_rsp(const void *data, uint16_t size)
+@@ -13092,7 +13077,7 @@ static void mgmt_start_service_discovery_cmd(const void *data, uint16_t size)
+ 	}
+ 
+ 	for (i = 0; i < num_uuids; i++)
+-		mgmt_print_uuid(data + 4 + (i * 16));
++		print_field("UUID: %s", bt_uuid128_to_str(data + 4 + (i * 16)));
+ }
+ 
+ static void mgmt_start_service_discovery_rsp(const void *data, uint16_t size)
+@@ -13352,7 +13337,7 @@ static void mgmt_set_exp_feature_cmd(const void *data, uint16_t size)
+ {
+ 	uint8_t enable = get_u8(data + 16);
+ 
+-	mgmt_print_uuid(data);
++	print_field("UUID: %s", bt_uuid128_to_str(data));
+ 	print_enable("Action", enable);
+ }
  
 -- 
 2.30.2
