@@ -2,100 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BB9AAC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 May 2021 23:11:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 071FDC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 02:16:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 927DA61263
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 17 May 2021 23:11:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D66A4613BB
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 18 May 2021 02:16:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236996AbhEQXMn (ORCPT
+        id S1346238AbhERCSK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 17 May 2021 19:12:43 -0400
-Received: from mail.kernel.org ([198.145.29.99]:52396 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234781AbhEQXMm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 17 May 2021 19:12:42 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 62EEF613BB
-        for <linux-bluetooth@vger.kernel.org>; Mon, 17 May 2021 23:11:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1621293085;
-        bh=u6Z0BSCT6Vf7asZUZ13DSAhkIHfdrKKeNHkzGGITh7g=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=aTukTAJJaRvzK+vU20+kkHacCck+KMDyt7fn2+gXPQ1+N1++TjC/76Y+QAgbAowTw
-         CZxX/fDaAFJ/DA5X2Pt8ghHBn9s391YlZ+MSfE13n7POYNKzz5CpC+xPS+Fld+Ahhy
-         z604yrycqu7tsLZvMeHy7N17gWYdYrNO2zvyM2tMcUdHpR5Ny1wSJOdds1rUycuUzf
-         2R+ki7aKHYM7SXY8bByjtfQfe47lP27LXIBQSJfxsWvPyVs8CCV6ka7jTc+GYzMIo1
-         9frOfVrZtvwzbVavO1hQwOp14ucC7fqPGr6C5x1AmCXePULgbuwUda+/sX6nyQW14T
-         Bnk1fnShC+1qw==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Mon, 17 May 2021 23:11:21 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-rIxOgWRAmF@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Mon, 17 May 2021 22:18:10 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:36451 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1346161AbhERCSJ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 17 May 2021 22:18:09 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1621304212; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=wXOZDBYYVOrLA+k0DLX8GUA/hjImHWC+dSZy1ah78MY=; b=gyaWrJSieHcd2tVl+sVjQraE7Mgi/s2il4l2ifOHy/uJthpeqdoTpvBWZT98mfUJddGWBXJO
+ B+kHpBZNIk6OjfvtYe8AsWOavwTTRLaCCtTuqxvywCmQQoCF9qzxQJTJmvc4nUiyKGB+UTCC
+ LZ6nVQVMDn+4t1yPHGCVD/7O1a4=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
+ 60a32393063320cd13185229 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 18 May 2021 02:16:51
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 873E8C43217; Tue, 18 May 2021 02:16:50 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2134EC433D3;
+        Tue, 18 May 2021 02:16:46 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 2134EC433D3
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v1] Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
+Date:   Tue, 18 May 2021 10:16:42 +0800
+Message-Id: <1621304202-5675-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+From: Tim Jiang <tjiang@codeaurora.org>
 
---- Comment #183 from Swyter (swyterzone@gmail.com) ---
-It ended up being included starting with Linux v5.9-rc1 in July last year, I
-think I originally tested it with a late v5.7 or v5.8 kernel. Then it regre=
-ssed
-shortly afterwards. =C2=AF\_(=E3=83=84)_/=C2=AF
+This is btsoc timing issue, host add 20ms delay as workaround.
 
-That's why I said a few months ago that trying to find what broke it is a g=
-ood
-start point. Solving it seems like a matter of finding the culprit by narro=
-wing
-down the range of changes between a known working point and now. Then it sh=
-ould
-be a matter of testing and sending a small patch that builds onto what's
-already there in less than ten lines, adding one or more missing quirks.
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-If I were to start working on another fix now I would also compare the pack=
-et
-flow between the Windows and Linux Bluetooth stacks and see what's up and w=
-hy
-it locks up after receiving very trivial stuff. Linux is probably doing
-something extra. :)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5245714..b0743db 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4064,6 +4064,7 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+ 
+ 	sent += size;
+ 	count -= size;
++	msleep(20);
+ 
+ 	while (count) {
+ 		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
-Comment #165 here and above (testing getting rid of the event filter thingi=
-e)
-seems also like a good candidate to expand the quirk list:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824#c165
-
-Food for thought.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
