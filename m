@@ -2,237 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59D57C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 00:53:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF72C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 01:38:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A7F560FE5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 00:53:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 074456135F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 01:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230037AbhESAyg (ORCPT
+        id S233332AbhESBje (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 18 May 2021 20:54:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54766 "EHLO
+        Tue, 18 May 2021 21:39:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36346 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231322AbhESAye (ORCPT
+        with ESMTP id S231689AbhESBjd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 18 May 2021 20:54:34 -0400
-Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFBA2C061761
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 17:53:15 -0700 (PDT)
-Received: by mail-pg1-x535.google.com with SMTP id f22so7287556pgb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 17:53:15 -0700 (PDT)
+        Tue, 18 May 2021 21:39:33 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F51C06175F
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 18:38:13 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id 1so9078362qtb.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 18 May 2021 18:38:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e+D7OqP4dwIQnUzDjlEDKWg26P099anF/7oRXAn963M=;
-        b=vEPQcPsPnzHXsesBp9ap+EtNNn9Ex9dHzWeqH5gptrIjgS6uoGEoPftg4qrrXVkBXg
-         POt/iP1rvoEjeATTvyKSLENH9D+RVdJxZwMLTGvM6AzG4eFjX/vYm11PrTj3QQDOnck6
-         XfkIwpe0k3l4uFOzSt/eroJC8AK3lAJOnJWlfGrxc6Z9UkSMbuuyNzx5kQq05/mb/4xI
-         rrcQ8muXMPy+yRtTN1hbgDMestUESwT/YY67iaidHpsdJWnLEZ2C6UjIyBNAcZEjUKRU
-         NPlDlIxwyshUEwrB3OddnFEcKVQQxr0cYSaaZe0R4yNvG6farSkDsIw7+PCZ3ntrJ1M4
-         d3XA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=JAZsrlrzwyew3m4HiGf55Bl/joSaqVKtV1ZTGMXaJgI=;
+        b=nzkefkpn5qoZ+Lgf80dloR1ZtgfNgM8wENBdvVp3kLITM6D4ceHUmW7iF2ZQ6BJTYH
+         HAwrZ5UDsm/LwCLju9QmOoSPBj3AU5BPXqiQ8YijVXeHkfpKTzVYH63WoVsJLEL1y5nA
+         uK+dBG8V2Jry4sxOembfNRdWuqtNua/PZwt3JrBoTKheKTg5xSrdA5JshaHABLmL8zz1
+         uM7AJhGO7hLzNICZO9qg64/nY1fZ+63dLQG8lapBTp13M4T4lpJ4mH8iUorX6j+qHuPm
+         bFQ2+ZMr02TImtWMRVn4+9sPRoXDWsTMN8swG2ISJKn+Bs67RBGjz4ZLBHaKVD7Y1gNb
+         xQSw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=e+D7OqP4dwIQnUzDjlEDKWg26P099anF/7oRXAn963M=;
-        b=PMqKalIphMG4eRKgDBTZ0Hfd64Io860ORJwbUoqAvJfx3G/NlvCWHyEjCHlG89tA+R
-         L9vS/lx60hgmc25Uwfkgm7PxjSVI6I7DYkKJ64tyBT0aReBlwHkujOQ40CP4lxsCWzIi
-         cyX8qrzqYiqMrQiWI0RUS8S+5s3huBKSJc2bYLtZ+0OCQFsXXFydiZjmEWhq++LX2Wk8
-         pD/tBKan5TxJXAce0wK5FJPw5twNLwSoNnxBT05qInWB0XLhQ7Fx3+1FfJmCHUE5NJgX
-         ym36DrDoNtasNlMWUOfE2qrPM8tsuiEEyXSdrezbm+yr3zfPMuyzB8v+HDevSxCSW0X2
-         rZYw==
-X-Gm-Message-State: AOAM533DoLxFEbbQzPHOXDTBlPZyDtS1xJ/VXgHkyd5smsuk3hKqmu5Z
-        op/uX+qCadadvCBs3C1CXzZ9qpEOpLI=
-X-Google-Smtp-Source: ABdhPJxcVFRP2+DlXVFm/jQxiCljRh0ZSNOeSUerp4jQAS0PFOMQ18uoONqZFkvM5ulPLcf6ObwXJg==
-X-Received: by 2002:a05:6a00:cd3:b029:27f:c296:4a5d with SMTP id b19-20020a056a000cd3b029027fc2964a5dmr7867255pfv.38.1621385594842;
-        Tue, 18 May 2021 17:53:14 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n20sm14057962pjq.45.2021.05.18.17.53.14
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=JAZsrlrzwyew3m4HiGf55Bl/joSaqVKtV1ZTGMXaJgI=;
+        b=lo+sbfAf4CqzBaFUs973F9fhyyHkmaOb+xXazpGJga2armPdeIDp9zwVm+xENtFtd5
+         pESrIE8qY+yMYH8Zc5dq90jYKLxpKoy+l/PjKUVN5QorMOCRHmpfYaO6OPYdT6VsPWOp
+         jtsNisKDJr/Q+ARe7lGa9OKx62oB8wh99aLtz9tASulHKyYifymyPunKg+h1QSPLnTC3
+         3XhikhbTGFf85nrtVAjm7jtHGg7faGIHp/8zs9WPxde6wf3zj9hYOSzP7ZXo4yXIi4h1
+         k9lr4iV0klXvJHi0z3xXuG5H0PZUFBfwB84CNI1dovOgobm3Tz3jrhiePwmp+SSs/01n
+         gOdQ==
+X-Gm-Message-State: AOAM533w9bVMItsnldyAoaONCSm4Si0xZwDp8nucfEtmZZ4xqBJuHk3i
+        2cUNVlA9gK6YrQw5H4sxjXXql+xjZ1U=
+X-Google-Smtp-Source: ABdhPJwfipuVpZa99SBIfmqkr+unBVfJH/kdPFHOCnU2RDlxVAc5yBLEAjcs74bTqJuba0SiJmJ5jQ==
+X-Received: by 2002:ac8:4092:: with SMTP id p18mr6553394qtl.388.1621388292723;
+        Tue, 18 May 2021 18:38:12 -0700 (PDT)
+Received: from [172.17.0.2] ([13.90.139.159])
+        by smtp.gmail.com with ESMTPSA id x27sm8428816qkj.133.2021.05.18.18.38.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 18 May 2021 17:53:14 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] core: Enable experimental MGMT when experimental is set
-Date:   Tue, 18 May 2021 17:53:13 -0700
-Message-Id: <20210519005313.867382-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.30.2
+        Tue, 18 May 2021 18:38:12 -0700 (PDT)
+Message-ID: <60a46c04.1c69fb81.54a63.6f83@mx.google.com>
+Date:   Tue, 18 May 2021 18:38:12 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3499008825671198274=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] core: Enable experimental MGMT when experimental is set
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210519005313.867382-1-luiz.dentz@gmail.com>
+References: <20210519005313.867382-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3499008825671198274==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This enables experimental MGMT features when experimental has been set.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=484631
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.45 seconds
+GitLint                       PASS      0.12 seconds
+Prep - Setup ELL              PASS      43.11 seconds
+Build - Prep                  PASS      0.12 seconds
+Build - Configure             PASS      7.59 seconds
+Build - Make                  PASS      189.85 seconds
+Make Check                    PASS      8.41 seconds
+Make Distcheck                PASS      229.02 seconds
+Build w/ext ELL - Configure   PASS      8.08 seconds
+Build w/ext ELL - Make        PASS      184.29 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
- src/adapter.c | 126 ++++++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 116 insertions(+), 10 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/adapter.c b/src/adapter.c
-index 2fa06b73c..30331a716 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -9216,6 +9216,106 @@ static bool set_blocked_keys(struct btd_adapter *adapter)
- 						adapter, NULL);
- }
- 
-+#define EXP_FEAT(_uuid, _func) \
-+{ \
-+	.uuid = _uuid, \
-+	.func = _func, \
-+}
-+
-+/* d4992530-b9ec-469f-ab01-6c481c47da1c */
-+static const uint8_t debug_uuid[16] = {
-+	0x1c, 0xda, 0x47, 0x1c, 0x48, 0x6c, 0x01, 0xab,
-+	0x9f, 0x46, 0xec, 0xb9, 0x30, 0x25, 0x99, 0xd4,
-+};
-+
-+/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
-+static const uint8_t le_simult_central_peripheral_uuid[16] = {
-+	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
-+	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
-+};
-+
-+/* 15c0a148-c273-11ea-b3de-0242ac130004 */
-+static const uint8_t rpa_resolution_uuid[16] = {
-+	0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
-+	0xea, 0x11, 0x73, 0xc2, 0x48, 0xa1, 0xc0, 0x15,
-+};
-+
-+static void set_exp_debug_complete(uint8_t status, uint16_t len,
-+					const void *param, void *user_data)
-+{
-+	if (status != 0)
-+		error("Set Experimental Debug failed with status 0x%02x (%s)",
-+						status, mgmt_errstr(status));
-+	else
-+		DBG("Experimental Debug successfully set");
-+}
-+
-+static void exp_debug_func(struct btd_adapter *adapter, uint32_t flags)
-+{
-+	struct mgmt_cp_set_exp_feature cp;
-+
-+	/* If already enabled don't attempt to set it again */
-+	if (flags & BIT(0))
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(cp.uuid, debug_uuid, 16);
-+	cp.action = 0x01;
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
-+			adapter->dev_id, sizeof(cp), &cp,
-+			set_exp_debug_complete, adapter, NULL) > 0)
-+		return;
-+
-+	btd_error(adapter->dev_id, "Failed to set exp debug");
-+}
-+
-+static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
-+							uint32_t flags)
-+{
-+	adapter->le_simult_roles_supported = flags & 0x01;
-+}
-+
-+static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
-+					const void *param, void *user_data)
-+{
-+	if (status != 0)
-+		error("Set RPA Resolution failed with status 0x%02x (%s)",
-+						status, mgmt_errstr(status));
-+	else
-+		DBG("RPA Resolution successfully set");
-+}
-+
-+static void rpa_resolution_func(struct btd_adapter *adapter, uint32_t flags)
-+{
-+	struct mgmt_cp_set_exp_feature cp;
-+
-+	/* If already enabled don't attempt to set it again */
-+	if (flags & BIT(0))
-+		return;
-+
-+	memset(&cp, 0, sizeof(cp));
-+	memcpy(cp.uuid, debug_uuid, 16);
-+	cp.action = 0x01;
-+
-+	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
-+			adapter->dev_id, sizeof(cp), &cp,
-+			set_rpa_resolution_complete, adapter, NULL) > 0)
-+		return;
-+
-+	btd_error(adapter->dev_id, "Failed to set RPA Resolution");
-+}
-+
-+static const struct exp_feat {
-+	const uint8_t *uuid;
-+	void (*func)(struct btd_adapter *adapter, uint32_t flags);
-+} exp_table[] = {
-+	EXP_FEAT(debug_uuid, exp_debug_func),
-+	EXP_FEAT(le_simult_central_peripheral_uuid,
-+		 le_simult_central_peripheral_func),
-+	EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
-+};
-+
- static void read_exp_features_complete(uint8_t status, uint16_t length,
- 					const void *param, void *user_data)
- {
-@@ -9239,19 +9339,24 @@ static void read_exp_features_complete(uint8_t status, uint16_t length,
- 	}
- 
- 	feature_count = le16_to_cpu(rp->feature_count);
-+
-+	if (length < sizeof(*rp) + (sizeof(*rp->features) * feature_count)) {
-+		btd_error(adapter->dev_id, "Response too small");
-+		return;
-+	}
-+
- 	for (i = 0; i < feature_count; ++i) {
-+		size_t j;
- 
--		/* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
--		static const uint8_t le_simult_central_peripheral[16] = {
--			0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
--			0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
--		};
-+		for (j = 0; j < ARRAY_SIZE(exp_table); j++) {
-+			const struct exp_feat *feat = &exp_table[j];
- 
--		if (memcmp(rp->features[i].uuid, le_simult_central_peripheral,
--				sizeof(le_simult_central_peripheral)) == 0) {
--			uint32_t flags = le32_to_cpu(rp->features[i].flags);
-+			if (memcmp(rp->features[i].uuid, feat->uuid,
-+					sizeof(rp->features[i].uuid)))
-+				continue;
- 
--			adapter->le_simult_roles_supported = flags & 0x01;
-+			if (feat->func)
-+				feat->func(adapter, rp->features[i].flags);
- 		}
- 	}
- }
-@@ -9375,7 +9480,8 @@ static void read_info_complete(uint8_t status, uint16_t length,
- 			(missing_settings & MGMT_SETTING_FAST_CONNECTABLE))
- 		set_mode(adapter, MGMT_OP_SET_FAST_CONNECTABLE, 0x01);
- 
--	if (btd_has_kernel_features(KERNEL_EXP_FEATURES))
-+	if (btd_opts.experimental &&
-+			btd_has_kernel_features(KERNEL_EXP_FEATURES))
- 		read_exp_features(adapter);
- 
- 	err = adapter_register(adapter);
--- 
-2.30.2
 
+--===============3499008825671198274==--
