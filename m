@@ -2,115 +2,192 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE16C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:19:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F392DC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:36:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BC29D6124C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:19:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D0C9560233
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:36:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbhESVUj (ORCPT
+        id S229718AbhESVhx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 17:20:39 -0400
-Received: from mga12.intel.com ([192.55.52.136]:43278 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229465AbhESVUh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 17:20:37 -0400
-IronPort-SDR: TASiqDj0fp8HaWeC8jBYDa2nhIRIg/r0vh5DOLvF+p6Xiqbm5gjpEKqFzrrwAnPXLRrT54B5oj
- vOtOqcRFneZw==
-X-IronPort-AV: E=McAfee;i="6200,9189,9989"; a="180682519"
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="180682519"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 14:19:15 -0700
-IronPort-SDR: 4NWBzmWhXBx2kWK1uLviTaboJSl8JQYZOdYmGvy5oN41Fv9mBtdxO57yrg+osHrkbUKFx0McxP
- 32RDKLW5r3kA==
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="612576429"
-Received: from akenaman-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.181.147])
-  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 14:19:15 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
+        Wed, 19 May 2021 17:37:53 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53818 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229455AbhESVhw (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 May 2021 17:37:52 -0400
+Received: from fedora.. (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 26CCBCECD5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 23:44:25 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mgmt-tester: Fix "Remove Ext Advertising" case
-Date:   Wed, 19 May 2021 14:19:07 -0700
-Message-Id: <20210519211907.157397-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.26.3
+Subject: [RFC PATCH 1/2] Bluetooth: Add helper for serialized HCI command execution
+Date:   Wed, 19 May 2021 23:36:27 +0200
+Message-Id: <20210519213628.44925-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the expected behavior of the following test case:
-"Remove Ext Advertising - Success 1", when the fail status
-was erroneously overwritten with success:
+The usage of __hci_cmd_sync() within the hdev->setup() callback allows for
+a nice and simple serialized execution of HCI commands. More importantly
+it allows for result processing before issueing the next command.
 
-<log snip>
-  New Advertising Removed event received
-  Test condition complete, 2 left
-  HCI Command 0x2039 length 6
-  Invalid parameter size for HCI command
-Remove Ext Advertising - Success 1 - test failed
-  HCI Command 0x203c length 1
-  HCI Command 0x2039 length 2
-  Test condition complete, 1 left
-  Remove Advertising (0x003f): Success (0x00)
-  Test condition complete, 0 left
-Remove Ext Advertising - Success 1 - test passed
+With the current usage of hci_req_run() it is possible to batch up
+commands and execute them, but it is impossible to react to their
+results or errors.
 
-The expected HCI command to disable extended advertisement for a
-non-zero number of sets should contain the specified number the
-advertising sets.
-In this particular test case, number of sets is set to 1 and,
-as a result, the expected HCI command should be:
-"00      | 01             | 01 00 00 00"
- disable | number of sets | set info
+This is an attempt to generalize the hdev->setup() handling and provide
+a simple way of running multiple HCI commands from a single function
+context.
 
-Also, to avoid false positives/negatives, skip exmination of HCI
-commands after the test conditions are met.
+There are multiple struct work that are decdicated to certain tasks
+already used right now. It is add a lot of bloat to hci_dev struct and
+extra handling code. So it might be possible to put all of these behind
+a common HCI command infrastructure and just execute the HCI commands
+from the same work context in a serialized fashion.
+
+For example updating the white list and resolving list can be done now
+without having to know the list size ahead of time. Also preparing for
+suspend or resume shouldn't require a state machine anymore. There are
+other tasks that should be simplified as well.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 ---
- tools/mgmt-tester.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ include/net/bluetooth/hci_core.h | 12 +++++++
+ net/bluetooth/hci_core.c         | 61 ++++++++++++++++++++++++++++++++
+ 2 files changed, 73 insertions(+)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index de35008ad..1b9dc0445 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -6671,7 +6671,7 @@ static void command_hci_callback(uint16_t opcode, const void *param,
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 43b08bebae74..473cc3fb314b 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -302,6 +302,13 @@ struct amp_assoc {
  
- 	tester_print("HCI Command 0x%04x length %u", opcode, length);
+ #define HCI_MAX_PAGES	3
  
--	if (opcode != test->expect_hci_command)
-+	if (opcode != test->expect_hci_command || data->unmet_conditions <= 0)
- 		return;
- 
- 	if (test->expect_hci_func)
-@@ -7720,6 +7720,10 @@ static const char set_ext_adv_disable_param[] = {
- 	0x00, 0x00,
- };
- 
-+static const char set_ext_adv_disable_param_1[] = {
-+	0x00, 0x01, 0x01, 0x00, 0x00, 0x00
++typedef void (*cmd_sync_work_func_t)(struct hci_dev *hdev);
++
++struct cmd_sync_work_entry {
++	struct list_head list;
++	cmd_sync_work_func_t func;
 +};
 +
- static const struct generic_data add_ext_advertising_timeout_expired = {
- 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
- 	.expect_alt_ev_param = advertising_instance1_param,
-@@ -7747,8 +7751,8 @@ static const struct generic_data remove_ext_advertising_success_1 = {
- 	.expect_alt_ev_param = advertising_instance1_param,
- 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
- 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE,
--	.expect_hci_param = set_ext_adv_disable_param,
--	.expect_hci_len = sizeof(set_ext_adv_disable_param),
-+	.expect_hci_param = set_ext_adv_disable_param_1,
-+	.expect_hci_len = sizeof(set_ext_adv_disable_param_1),
- };
+ struct hci_dev {
+ 	struct list_head list;
+ 	struct mutex	lock;
+@@ -463,6 +470,9 @@ struct hci_dev {
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
+ 	struct work_struct	error_reset;
++	struct work_struct	cmd_sync_work;
++	struct list_head	cmd_sync_work_list;
++	struct mutex		cmd_sync_work_lock;
  
- static const struct generic_data remove_ext_advertising_success_2 = {
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+@@ -1701,6 +1711,8 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			     const void *param, u32 timeout);
+ 
++void hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func);
++
+ u32 hci_conn_get_phy(struct hci_conn *conn);
+ 
+ /* ----- HCI Sockets ----- */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6eedf334f943..c37bd8ebfcf5 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2329,6 +2329,60 @@ static void hci_error_reset(struct work_struct *work)
+ 	hci_dev_do_open(hdev);
+ }
+ 
++static void hci_cmd_sync_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
++	struct cmd_sync_work_entry *entry;
++	cmd_sync_work_func_t func;
++
++	bt_dev_dbg(hdev, "");
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	entry = list_first_entry(&hdev->cmd_sync_work_list,
++				 struct cmd_sync_work_entry, list);
++	if (entry) {
++		list_del(&entry->list);
++		func = entry->func;
++		kfree(entry);
++	} else {
++		func = NULL;
++	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	if (func) {
++		hci_req_sync_lock(hdev);
++		func(hdev);
++		hci_req_sync_unlock(hdev);
++	}
++}
++
++void hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func)
++{
++	struct cmd_sync_work_entry *entry;
++
++	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return;
++
++	entry->func = func;
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
++}
++
++static void hci_cmd_sync_clear(struct hci_dev *hdev)
++{
++	struct cmd_sync_work_entry *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
++		list_del(&entry->list);
++		kfree(entry);
++	}
++}
++
+ void hci_uuids_clear(struct hci_dev *hdev)
+ {
+ 	struct bt_uuid *uuid, *tmp;
+@@ -3845,6 +3899,10 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
+ 
++	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
++	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
++	mutex_init(&hdev->cmd_sync_work_lock);
++
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
+@@ -4005,6 +4063,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
++	cancel_work_sync(&hdev->cmd_sync_work);
++	hci_cmd_sync_clear(hdev);
++
+ 	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
+ 		hci_suspend_clear_tasks(hdev);
+ 		unregister_pm_notifier(&hdev->suspend_notifier);
 -- 
-2.26.3
+2.31.1
 
