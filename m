@@ -2,148 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C398DC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 08:45:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1B738C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 14:20:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B24B611AD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 08:45:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F32C561244
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 14:20:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343683AbhESIq7 (ORCPT
+        id S1354059AbhESOVh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 04:46:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47276 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242897AbhESIq6 (ORCPT
+        Wed, 19 May 2021 10:21:37 -0400
+Received: from userp2130.oracle.com ([156.151.31.86]:48866 "EHLO
+        userp2130.oracle.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240320AbhESOVK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 04:46:58 -0400
-Received: from mail-qt1-x835.google.com (mail-qt1-x835.google.com [IPv6:2607:f8b0:4864:20::835])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A2EC06175F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 01:45:39 -0700 (PDT)
-Received: by mail-qt1-x835.google.com with SMTP id h21so9558060qtu.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 01:45:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=JZyArUmvvjAkT7sf4fpdepojeBgdiAZqNfO/E5JvYOY=;
-        b=BexQySZnzX2LImf2YDtAoppIGK9myCqs00DOpLFeOZJK4dIpdID8dr3+TrVxsibDIB
-         ADbMpqUQNT0pf1pXoYX/9ITQvTJz5bx3OUVy4NmXn6WIkwpCcLSp2w2OYNUvSpvsH3Fh
-         JGt5kJHRLATtS8TE2aXc2RLuTESRom5lHfDteygJl6DjhUsi6IgqoxepICMuHif+9s1H
-         tmR0pVrwEHV5+7rUSIov98a0oHMapfjDbAG29lG944W8KE6e291ViPUpWJquLC21+bNd
-         EttoJNm5wg46tDNNwpC6/4QBwCyiCshKqExe2ckvENZcKPhHqy5oXxYqR1ArIk84j7ZD
-         6kTg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=JZyArUmvvjAkT7sf4fpdepojeBgdiAZqNfO/E5JvYOY=;
-        b=mlX9lxXp8sTG1g9rseUZytS3Vub8V5D+2smo7LvCcVnz8/44EhZbRRYrQxPf6ATycv
-         mVk5VIYEBSo7OIWwZk1UC/OxJZ1tUVHEIQel9VYKtoQlxil5LZ34KzR4Gap3KNSAsXum
-         iQQvGBnxuGt/SmJHwOLiFZeRYlilY3h9gyCDXCFQDOlLgu5kGHmKshlsKngHVrvK3+oi
-         CpQfTDKr606dAgA5314nQbyrQu8t+SeNNyhKpERA6OCRLhXTIqreAZy/QJkciLgzSXWl
-         j4miaDth1IpYUr/o2UkNHsLfegcsLFJB7xYSSCMyywSVHVXC1fEcX3kmpQ9dmXKtj3Qr
-         jW2g==
-X-Gm-Message-State: AOAM531/hWdtYlqWWizlYVzH2HeQ/SbTukO8BSP4AYZ3H3FTNPSpPwQL
-        vNxJFrN3zzZ6rStNn0AaSsWeur0w9DUZqw==
-X-Google-Smtp-Source: ABdhPJxJUXMdmRy/AOQewpoy8IUpLnRgtKZTJAloU8AtGNrhrENgjTER894NesqevbbzFb5VAyftRw==
-X-Received: by 2002:ac8:5553:: with SMTP id o19mr10233965qtr.308.1621413938679;
-        Wed, 19 May 2021 01:45:38 -0700 (PDT)
-Received: from [172.17.0.2] ([13.68.29.33])
-        by smtp.gmail.com with ESMTPSA id x19sm320623qts.19.2021.05.19.01.45.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 01:45:38 -0700 (PDT)
-Message-ID: <60a4d032.1c69fb81.a6191.1a11@mx.google.com>
-Date:   Wed, 19 May 2021 01:45:38 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4157104024294595410=="
+        Wed, 19 May 2021 10:21:10 -0400
+Received: from pps.filterd (userp2130.oracle.com [127.0.0.1])
+        by userp2130.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14JEFEbI047562;
+        Wed, 19 May 2021 14:19:48 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type : in-reply-to;
+ s=corp-2020-01-29; bh=rYoKQ/yqCkVsQ9pvVzOFd9sWEWniiy34eTt7ihcghYs=;
+ b=Pg6efs+2MiVkVanYzqUkUk2rz/7YOehsm4kL8KJYKeeXcKUdFBmsN7B/uxfnfrl1QvbR
+ A3tgxSz2Oi6/em5OrLjpe8aod/vd4RMEeYeguU0yS4hQyx+QJA0OZ2iOpYz9kl2BoGwY
+ Se9lorg8oqMeZc+FeC/nwXXDgK3y0ShrqfB7ra4bwPpHQzUEUIEPJArHuI6sSkacha7o
+ qUi2yXEpV6DITC8xyUHFPjR0zUgxnP6MewVNU67UTxoioD5cmzFEIM4Tlyzh6mI+yxe5
+ YdQKG1SVgRj0aust3I22ij04Sd8Zjm2AYUf2kzQHelq0DAPV07PmlIMcRk1XOnLYPMh/ Yg== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by userp2130.oracle.com with ESMTP id 38j5qr9quq-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 14:19:48 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 14JEAO9j031306;
+        Wed, 19 May 2021 14:19:48 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by userp3030.oracle.com with ESMTP id 38megkh1k6-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 14:19:48 +0000
+Received: from userp3030.oracle.com (userp3030.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 14JEJmJJ053023;
+        Wed, 19 May 2021 14:19:48 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 38megkh1jv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 19 May 2021 14:19:47 +0000
+Received: from abhmp0007.oracle.com (abhmp0007.oracle.com [141.146.116.13])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 14JEJlJH004080;
+        Wed, 19 May 2021 14:19:47 GMT
+Received: from mwanda (/41.212.42.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Wed, 19 May 2021 07:19:46 -0700
+Date:   Wed, 19 May 2021 17:19:41 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     luiz.von.dentz@intel.com
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [bug report] Bluetooth: L2CAP: Add initial code for Enhanced Credit
+ Based Mode
+Message-ID: <YKUefcovrIVJg50u@mwanda>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez] lib/uuid: Fix string to uuid32 conversion
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210519162046.Bluez.1.Ic61b294b8337c492e9d4eab47d3c5709d8adacbf@changeid>
-References: <20210519162046.Bluez.1.Ic61b294b8337c492e9d4eab47d3c5709d8adacbf@changeid>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210518082855.GB32682@kadam>
+X-Proofpoint-GUID: gy8W_cX1yt19Zs-c12LkzdY3yt6Uwo5A
+X-Proofpoint-ORIG-GUID: gy8W_cX1yt19Zs-c12LkzdY3yt6Uwo5A
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=9988 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1011 impostorscore=0
+ mlxscore=0 lowpriorityscore=0 malwarescore=0 mlxlogscore=999
+ suspectscore=0 adultscore=0 priorityscore=1501 spamscore=0 phishscore=0
+ bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2104190000 definitions=main-2105190089
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4157104024294595410==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello Luiz Augusto von Dentz,
 
-This is automated email and please do not reply to this email!
+The patch 15f02b910562: "Bluetooth: L2CAP: Add initial code for
+Enhanced Credit Based Mode" from Mar 2, 2020, leads to the following
+static checker warning:
 
-Dear submitter,
+	net/bluetooth/l2cap_core.c:6265 l2cap_ecred_reconf_rsp()
+	warn: iterator 'chan->list.next' changed during iteration
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=484827
+net/bluetooth/l2cap_core.c
+  6247  static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+  6248                                           struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+  6249                                           u8 *data)
+  6250  {
+  6251          struct l2cap_chan *chan;
+  6252          struct l2cap_ecred_conn_rsp *rsp = (void *) data;
+  6253          u16 result;
+  6254  
+  6255          if (cmd_len < sizeof(*rsp))
+  6256                  return -EPROTO;
+  6257  
+  6258          result = __le16_to_cpu(rsp->result);
+  6259  
+  6260          BT_DBG("result 0x%4.4x", rsp->result);
+  6261  
+  6262          if (!result)
+  6263                  return 0;
+  6264  
+  6265          list_for_each_entry(chan, &conn->chan_l, list) {
+  6266                  if (chan->ident != cmd->ident)
+  6267                          continue;
+  6268  
+  6269                  l2cap_chan_del(chan, ECONNRESET);
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+This can call:
 
----Test result---
+		list_del(&chan->list);
 
-Test Summary:
-CheckPatch                    PASS      0.30 seconds
-GitLint                       PASS      0.11 seconds
-Prep - Setup ELL              PASS      41.04 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      7.18 seconds
-Build - Make                  PASS      176.76 seconds
-Make Check                    PASS      9.02 seconds
-Make Distcheck                PASS      210.36 seconds
-Build w/ext ELL - Configure   PASS      7.24 seconds
-Build w/ext ELL - Make        PASS      166.42 seconds
+which will lead to an oops in the next iteration.
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+  6270          }
+  6271  
+  6272          return 0;
+  6273  }
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4157104024294595410==--
+regards,
+dan carpenter
