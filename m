@@ -2,310 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.9 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69A4DC43470
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 19:09:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15058C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 19:43:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E1526135A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 19:09:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E635D6108C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 19:43:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231862AbhESTLD (ORCPT
+        id S232183AbhESTo1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 15:11:03 -0400
-Received: from mga06.intel.com ([134.134.136.31]:6662 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231922AbhESTLA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 15:11:00 -0400
-IronPort-SDR: /34KjFQleJtFssMp9+ocihzYasDtI4AwN9A/NSyKazDIUudAW6ZwBjs1+TbCoul9aaQCkhAAaq
- Zdj5JEcCVyAg==
-X-IronPort-AV: E=McAfee;i="6200,9189,9989"; a="262284403"
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="262284403"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 12:09:37 -0700
-IronPort-SDR: MSNpX5ZCEK2rDdaim0oDdQ1Q80XIQUWkoijhPUfTRBqvMAEL60rfQ9efwpeJTv/fy2d6IXZx85
- qw+/qFiFFeQA==
-X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
-   d="scan'208";a="439855273"
-Received: from bgi1-mobl2.amr.corp.intel.com ([10.212.229.7])
-  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 12:09:37 -0700
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     inga.stotland@intel.com, brian.gix@intel.com
-Subject: [PATCH BlueZ v3 5/6] mesh: Add single threading to prov-acp ob messaging
-Date:   Wed, 19 May 2021 12:09:24 -0700
-Message-Id: <20210519190925.1723012-6-brian.gix@intel.com>
-X-Mailer: git-send-email 2.25.4
-In-Reply-To: <20210519190925.1723012-1-brian.gix@intel.com>
-References: <20210519190925.1723012-1-brian.gix@intel.com>
+        Wed, 19 May 2021 15:44:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56574 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229531AbhESTo0 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 May 2021 15:44:26 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A71E8C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 12:43:06 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id a10so4253299qtp.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 12:43:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=a0l95yBFLdgMl/5jTNKS+KTtoXEx2ta3bvmgX9rjYCg=;
+        b=D54XBQMvmjTj/MH+KABcCZVuMQUmDoWrIG5NJNDHmmEn+IvnREb2W13HFBZNBIt9zF
+         JsWr7fGe28jhjnarlW3OI6frh7zOGzZfu4rP7cagEcRHR+AmbwJWrIqd0YopEIVOkPP1
+         2i0TJ+Y0SGfKafrk+SYSfS23flUn3ydPvXY3H66Rqy/mtOfVmKUX2I46DKrE+ZPSWTik
+         bSh+3IQfgziFu2Fe8chQvZdA4JRNxLWq/sVf+PAd1qKuBML4t6JBVZz9jXkWVDpJwHpg
+         yk7Bkrq5CWyu9g/jgmjcMO5aMK+wAJvRlsP6Tlepw0IaasIl8dVW/CUL5tM9z/pnxgZE
+         rWqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=a0l95yBFLdgMl/5jTNKS+KTtoXEx2ta3bvmgX9rjYCg=;
+        b=TnhAoZVQ0K/+4e0tDnyRTNF0zdkLGzn2H4S745XJheqccJ9fi9ekxMH+eLhT7n4Ykn
+         vbdDZNtXSo+kz2WjgX85pRDZecvvN1nhVPhqi4t0XqkDF/U2FWis35G65cikWWekruET
+         ut4c45gKDQoVZM7ONRCCS007mTf5UzZMGC4qMWb7d2ZdDjP2jS8AiEJtphjrnJSaGLaV
+         9hee+sCpxle/Y/rhjfoORXEmHlZurUcFCKGx+N089yxQ0KI2INIcwfqjHZ+tvBILutxT
+         oubuC6+gUfrN8iUEf/Q12boG8OofPylKogibP8XfBWDyf0QCBLAGOAXGvU/52A+/hpMh
+         S1Gw==
+X-Gm-Message-State: AOAM533cl8BeLx/CIwXhucNOjuMl/tUe3bk2Kxi135/G8wIXTI160BR+
+        PPBR41B3Y5EtaNS4+BLRThPvggRN3wmE3w==
+X-Google-Smtp-Source: ABdhPJwLwjMxaK723xIAAOfD5ULIyzK/h5KtnjtHeI3t9FVeEoPTygIURTO/Oq8zE9/dh9bevyGsFA==
+X-Received: by 2002:ac8:7e81:: with SMTP id w1mr1295090qtj.82.1621453385623;
+        Wed, 19 May 2021 12:43:05 -0700 (PDT)
+Received: from [172.17.0.2] ([13.68.108.236])
+        by smtp.gmail.com with ESMTPSA id a14sm296308qtp.74.2021.05.19.12.43.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 12:43:04 -0700 (PDT)
+Message-ID: <60a56a48.1c69fb81.b67ce.2b84@mx.google.com>
+Date:   Wed, 19 May 2021 12:43:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============4018317522887578237=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, brian.gix@intel.com
+Subject: RE: OOB Authentication improvements
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210519190925.1723012-2-brian.gix@intel.com>
+References: <20210519190925.1723012-2-brian.gix@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Certain IOP and stress testing scenarios can cause additional outbound
-messages to be attempted before the prior outbound message completes.
-This patch adds queuing if outbpund messages are attempted too quickly
-so that the additional message is not sent until the prior message is
-ACKed.
+--===============4018317522887578237==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=485263
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.29 seconds
+GitLint                       PASS      0.62 seconds
+Prep - Setup ELL              PASS      41.03 seconds
+Build - Prep                  PASS      0.10 seconds
+Build - Configure             PASS      7.17 seconds
+Build - Make                  PASS      173.70 seconds
+Make Check                    PASS      9.14 seconds
+Make Distcheck                PASS      204.37 seconds
+Build w/ext ELL - Configure   PASS      7.15 seconds
+Build w/ext ELL - Make        PASS      163.44 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
- mesh/prov-acceptor.c | 88 +++++++++++++++++++++++++++-----------------
- mesh/provision.h     |  1 +
- 2 files changed, 56 insertions(+), 33 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/prov-acceptor.c b/mesh/prov-acceptor.c
-index 0dbb84f50..f579a143b 100644
---- a/mesh/prov-acceptor.c
-+++ b/mesh/prov-acceptor.c
-@@ -42,26 +42,15 @@ static const uint16_t expected_pdu_size[] = {
- 
- #define BEACON_TYPE_UNPROVISIONED		0x00
- 
-+struct deferred_cmd {
-+	uint16_t len;
-+	uint8_t cmd[];
-+};
-+
- static const uint8_t pkt_filter = MESH_AD_TYPE_PROVISION;
- static const uint8_t bec_filter[] = {MESH_AD_TYPE_BEACON,
- 						BEACON_TYPE_UNPROVISIONED};
- 
--enum acp_state {
--	ACP_PROV_IDLE = 0,
--	ACP_PROV_CAPS_SENT,
--	ACP_PROV_CAPS_ACKED,
--	ACP_PROV_KEY_SENT,
--	ACP_PROV_KEY_ACKED,
--	ACP_PROV_INP_CMPLT_SENT,
--	ACP_PROV_INP_CMPLT_ACKED,
--	ACP_PROV_CONF_SENT,
--	ACP_PROV_CONF_ACKED,
--	ACP_PROV_RAND_SENT,
--	ACP_PROV_RAND_ACKED,
--	ACP_PROV_CMPLT_SENT,
--	ACP_PROV_FAIL_SENT,
--};
--
- #define MAT_REMOTE_PUBLIC	0x01
- #define MAT_LOCAL_PRIVATE	0x02
- #define MAT_RAND_AUTH		0x04
-@@ -70,12 +59,13 @@ enum acp_state {
- struct mesh_prov_acceptor {
- 	mesh_prov_acceptor_complete_func_t cmplt;
- 	prov_trans_tx_t trans_tx;
-+	struct l_queue *ob;
- 	void *agent;
- 	void *caller_data;
- 	void *trans_data;
- 	struct l_timeout *timeout;
- 	uint32_t to_secs;
--	enum acp_state	state;
-+	uint8_t out_opcode;
- 	uint8_t transport;
- 	uint8_t material;
- 	uint8_t expected;
-@@ -99,6 +89,7 @@ static void acceptor_free(void)
- 		return;
- 
- 	l_timeout_remove(prov->timeout);
-+	l_queue_destroy(prov->ob, l_free);
- 
- 	mesh_send_cancel(bec_filter, sizeof(bec_filter));
- 	mesh_send_cancel(&pkt_filter, sizeof(pkt_filter));
-@@ -126,6 +117,21 @@ static void acp_prov_close(void *user_data, uint8_t reason)
- 	acceptor_free();
- }
- 
-+static void prov_send(struct mesh_prov_acceptor *prov, void *cmd, uint16_t len)
-+{
-+	struct deferred_cmd *defer;
-+
-+	if (prov->out_opcode == PROV_NONE) {
-+		prov->out_opcode = *(uint8_t *) cmd;
-+		prov->trans_tx(prov->trans_data, cmd, len);
-+	} else {
-+		defer = l_malloc(len + sizeof(struct deferred_cmd));
-+		defer->len = len;
-+		memcpy(defer->cmd, cmd, len);
-+		l_queue_push_tail(prov->ob, defer);
-+	}
-+}
-+
- static void prov_to(struct l_timeout *timeout, void *user_data)
- {
- 	struct mesh_prov_acceptor *rx_prov = user_data;
-@@ -140,7 +146,7 @@ static void prov_to(struct l_timeout *timeout, void *user_data)
- 	if (prov->cmplt && prov->trans_tx) {
- 		prov->cmplt(prov->caller_data, PROV_ERR_TIMEOUT, NULL);
- 		prov->cmplt = NULL;
--		prov->trans_tx(prov->trans_data, fail_code, 2);
-+		prov_send(prov, fail_code, 2);
- 		prov->timeout = l_timeout_create(1, prov_to, prov, NULL);
- 		return;
- 	}
-@@ -258,7 +264,7 @@ static void number_cb(void *user_data, int err, uint32_t number)
- 	if (err) {
- 		msg.opcode = PROV_FAILED;
- 		msg.reason = PROV_ERR_UNEXPECTED_ERR;
--		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+		prov_send(prov, &msg, sizeof(msg));
- 		return;
- 	}
- 
-@@ -267,7 +273,7 @@ static void number_cb(void *user_data, int err, uint32_t number)
- 	l_put_be32(number, prov->rand_auth_workspace + 44);
- 	prov->material |= MAT_RAND_AUTH;
- 	msg.opcode = PROV_INP_CMPLT;
--	prov->trans_tx(prov->trans_data, &msg.opcode, 1);
-+	prov_send(prov, &msg.opcode, 1);
- }
- 
- static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
-@@ -281,7 +287,7 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
- 	if (err || !key || len != 16) {
- 		msg.opcode = PROV_FAILED;
- 		msg.reason = PROV_ERR_UNEXPECTED_ERR;
--		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+		prov_send(prov, &msg, sizeof(msg));
- 		return;
- 	}
- 
-@@ -292,7 +298,7 @@ static void static_cb(void *user_data, int err, uint8_t *key, uint32_t len)
- 
- 	if (prov->conf_inputs.start.auth_action == PROV_ACTION_IN_ALPHA) {
- 		msg.opcode = PROV_INP_CMPLT;
--		prov->trans_tx(prov->trans_data, &msg.opcode, 1);
-+		prov_send(prov, &msg.opcode, 1);
- 	}
- }
- 
-@@ -307,7 +313,7 @@ static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
- 	if (err || !key || len != 32) {
- 		msg.opcode = PROV_FAILED;
- 		msg.reason = PROV_ERR_UNEXPECTED_ERR;
--		prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+		prov_send(prov, &msg, sizeof(msg));
- 		return;
- 	}
- 
-@@ -326,7 +332,7 @@ static void priv_key_cb(void *user_data, int err, uint8_t *key, uint32_t len)
- 		if (!acp_credentials(prov)) {
- 			msg.opcode = PROV_FAILED;
- 			msg.reason = PROV_ERR_UNEXPECTED_ERR;
--			prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+			prov_send(prov, &msg, sizeof(msg));
- 		}
- 	}
- }
-@@ -339,9 +345,8 @@ static void send_caps(struct mesh_prov_acceptor *prov)
- 	memcpy(&msg.caps, &prov->conf_inputs.caps,
- 			sizeof(prov->conf_inputs.caps));
- 
--	prov->state = ACP_PROV_CAPS_SENT;
- 	prov->expected = PROV_START;
--	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+	prov_send(prov, &msg, sizeof(msg));
- }
- 
- static void send_pub_key(struct mesh_prov_acceptor *prov)
-@@ -350,7 +355,7 @@ static void send_pub_key(struct mesh_prov_acceptor *prov)
- 
- 	msg.opcode = PROV_PUB_KEY;
- 	memcpy(msg.pub_key, prov->conf_inputs.dev_pub_key, sizeof(msg.pub_key));
--	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+	prov_send(prov, &msg, sizeof(msg));
- }
- 
- static bool send_conf(struct mesh_prov_acceptor *prov)
-@@ -365,7 +370,7 @@ static bool send_conf(struct mesh_prov_acceptor *prov)
- 	if (!memcmp(msg.conf, prov->confirm, sizeof(msg.conf)))
- 		return false;
- 
--	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+	prov_send(prov, &msg, sizeof(msg));
- 	return true;
- }
- 
-@@ -375,7 +380,7 @@ static void send_rand(struct mesh_prov_acceptor *prov)
- 
- 	msg.opcode = PROV_RANDOM;
- 	memcpy(msg.rand, prov->rand_auth_workspace, sizeof(msg.rand));
--	prov->trans_tx(prov->trans_data, &msg, sizeof(msg));
-+	prov_send(prov, &msg, sizeof(msg));
- }
- 
- static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
-@@ -614,8 +619,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
- 
- 		if (result) {
- 			prov->rand_auth_workspace[0] = PROV_COMPLETE;
--			prov->trans_tx(prov->trans_data,
--					prov->rand_auth_workspace, 1);
-+			prov_send(prov, prov->rand_auth_workspace, 1);
- 			goto cleanup;
- 		} else {
- 			fail.reason = PROV_ERR_UNEXPECTED_ERR;
-@@ -638,7 +642,7 @@ static void acp_prov_rx(void *user_data, const uint8_t *data, uint16_t len)
- 
- failure:
- 	fail.opcode = PROV_FAILED;
--	prov->trans_tx(prov->trans_data, &fail, sizeof(fail));
-+	prov_send(prov, &fail, sizeof(fail));
- 	if (prov->cmplt)
- 		prov->cmplt(prov->caller_data, fail.reason, NULL);
- 	prov->cmplt = NULL;
-@@ -652,7 +656,23 @@ cleanup:
- 
- static void acp_prov_ack(void *user_data, uint8_t msg_num)
- {
--	/* TODO: Handle PB-ADV Ack */
-+	struct mesh_prov_acceptor *rx_prov = user_data;
-+	struct deferred_cmd *deferred;
-+
-+	if (rx_prov != prov)
-+		return;
-+
-+	if (prov->out_opcode == PROV_NONE)
-+		return;
-+
-+	prov->out_opcode = PROV_NONE;
-+
-+	deferred = l_queue_pop_head(prov->ob);
-+	if (!deferred)
-+		return;
-+
-+	prov_send(prov, deferred->cmd, deferred->len);
-+	l_free(deferred);
- }
- 
- 
-@@ -680,7 +700,9 @@ bool acceptor_start(uint8_t num_ele, uint8_t uuid[16],
- 	prov->to_secs = timeout;
- 	prov->agent = agent;
- 	prov->cmplt = complete_cb;
-+	prov->ob = l_queue_new();
- 	prov->previous = -1;
-+	prov->out_opcode = PROV_NONE;
- 	prov->caller_data = caller_data;
- 
- 	caps = mesh_agent_get_caps(agent);
-diff --git a/mesh/provision.h b/mesh/provision.h
-index 1a11b691b..1634c4d40 100644
---- a/mesh/provision.h
-+++ b/mesh/provision.h
-@@ -38,6 +38,7 @@ struct mesh_agent;
- #define PROV_DATA	0x07
- #define PROV_COMPLETE	0x08
- #define PROV_FAILED	0x09
-+#define PROV_NONE	0xFF
- 
- /* Spec defined Error Codes */
- #define PROV_ERR_SUCCESS		0x00
--- 
-2.25.4
 
+--===============4018317522887578237==--
