@@ -2,115 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5EBBC433B4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 20:47:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DAE16C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:19:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CAAAA611AE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 20:47:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BC29D6124C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:19:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229578AbhESUsn convert rfc822-to-8bit (ORCPT
+        id S229578AbhESVUj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 16:48:43 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:52579 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229379AbhESUsn (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 16:48:43 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 3791CCECD4;
-        Wed, 19 May 2021 22:55:15 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
-Subject: Re: [PATCH v1] Bluetooth: disable filter dup when scan for adv
- monitor
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210519102745.v1.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
-Date:   Wed, 19 May 2021 22:47:20 +0200
-Cc:     "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <73ED48AE-974A-476C-83AD-E6D09CDCBFC9@holtmann.org>
-References: <20210519102745.v1.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
-To:     Howard Chung <howardchung@google.com>
-X-Mailer: Apple Mail (2.3654.80.0.2.43)
+        Wed, 19 May 2021 17:20:39 -0400
+Received: from mga12.intel.com ([192.55.52.136]:43278 "EHLO mga12.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229465AbhESVUh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 May 2021 17:20:37 -0400
+IronPort-SDR: TASiqDj0fp8HaWeC8jBYDa2nhIRIg/r0vh5DOLvF+p6Xiqbm5gjpEKqFzrrwAnPXLRrT54B5oj
+ vOtOqcRFneZw==
+X-IronPort-AV: E=McAfee;i="6200,9189,9989"; a="180682519"
+X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
+   d="scan'208";a="180682519"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 14:19:15 -0700
+IronPort-SDR: 4NWBzmWhXBx2kWK1uLviTaboJSl8JQYZOdYmGvy5oN41Fv9mBtdxO57yrg+osHrkbUKFx0McxP
+ 32RDKLW5r3kA==
+X-IronPort-AV: E=Sophos;i="5.82,313,1613462400"; 
+   d="scan'208";a="612576429"
+Received: from akenaman-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.181.147])
+  by orsmga005-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 19 May 2021 14:19:15 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ] tools/mgmt-tester: Fix "Remove Ext Advertising" case
+Date:   Wed, 19 May 2021 14:19:07 -0700
+Message-Id: <20210519211907.157397-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.3
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+This fixes the expected behavior of the following test case:
+"Remove Ext Advertising - Success 1", when the fail status
+was erroneously overwritten with success:
 
-> Disable duplicates filter when scanning for advertisement monitor for
-> the following reasons. The scanning includes active scan and passive
-> scan.
-> 
-> For HW pattern filtering (ex. MSFT), some controllers ignore
-> RSSI_Sampling_Period when the duplicates filter is enabled.
-> 
-> For SW pattern filtering, when we're not doing interleaved scanning, it
-> is necessary to disable duplicates filter, otherwise hosts can only
-> receive one advertisement and it's impossible to know if a peer is still
-> in range.
+<log snip>
+  New Advertising Removed event received
+  Test condition complete, 2 left
+  HCI Command 0x2039 length 6
+  Invalid parameter size for HCI command
+Remove Ext Advertising - Success 1 - test failed
+  HCI Command 0x203c length 1
+  HCI Command 0x2039 length 2
+  Test condition complete, 1 left
+  Remove Advertising (0x003f): Success (0x00)
+  Test condition complete, 0 left
+Remove Ext Advertising - Success 1 - test passed
 
-can we be a bit more specific on which controller does what. I am not inclined to always disable duplicate filtering unless your controller doesn’t do what you want it to do.
+The expected HCI command to disable extended advertisement for a
+non-zero number of sets should contain the specified number the
+advertising sets.
+In this particular test case, number of sets is set to 1 and,
+as a result, the expected HCI command should be:
+"00      | 01             | 01 00 00 00"
+ disable | number of sets | set info
 
-I also disagree with the last statement. If the device moved out of range (or comes back for that matter) you should get a HCI_VS_MSFT_LE_Monitor_Device_Event event that tells you if a device is in range or not.
+Also, to avoid false positives/negatives, skip exmination of HCI
+commands after the test conditions are met.
+---
+ tools/mgmt-tester.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-Device leaving:
-
-> HCI Event: LE Meta Event (0x3e) plen 43
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-        Address type: Random (0x01)
-        Address: 01:9A:1F:C0:30:15 (Non-Resolvable)
-        Data length: 31
-        Flags: 0x1a
-          LE General Discoverable Mode
-          Simultaneous LE and BR/EDR (Controller)
-          Simultaneous LE and BR/EDR (Host)
-        16-bit Service UUIDs (complete): 1 entry
-          Apple, Inc. (0xfd6f)
-        Service Data (UUID 0xfd6f): f47698ff9243617d917ac521b5fcfd436afdb285
-        RSSI: -86 dBm (0xaa)
-> HCI Event: Vendor (0xff) plen 18
-        23 79 54 33 77 88 97 68 02 01 15 30 c0 1f 9a 01  #yT3w..h...0....
-        00 00                                            ..              
-
-Device coming back:
-
-> HCI Event: Vendor (0xff) plen 18
-        23 79 54 33 77 88 97 68 02 01 95 b9 0b 32 22 2a  #yT3w..h.....2"*
-        00 01                                            ..              
-> HCI Event: LE Meta Event (0x3e) plen 43
-      LE Advertising Report (0x02)
-        Num reports: 1
-        Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
-        Address type: Random (0x01)
-        Address: 2A:22:32:0B:B9:95 (Non-Resolvable)
-        Data length: 31
-        Flags: 0x1a
-          LE General Discoverable Mode
-          Simultaneous LE and BR/EDR (Controller)
-          Simultaneous LE and BR/EDR (Host)
-        16-bit Service UUIDs (complete): 1 entry
-          Apple, Inc. (0xfd6f)
-        Service Data (UUID 0xfd6f): 0b861791a0fb7adcf8b45f951f7d4b7c7fc8e3fd
-        RSSI: -27 dBm (0xe5)
-
-Regards
-
-Marcel
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index de35008ad..1b9dc0445 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -6671,7 +6671,7 @@ static void command_hci_callback(uint16_t opcode, const void *param,
+ 
+ 	tester_print("HCI Command 0x%04x length %u", opcode, length);
+ 
+-	if (opcode != test->expect_hci_command)
++	if (opcode != test->expect_hci_command || data->unmet_conditions <= 0)
+ 		return;
+ 
+ 	if (test->expect_hci_func)
+@@ -7720,6 +7720,10 @@ static const char set_ext_adv_disable_param[] = {
+ 	0x00, 0x00,
+ };
+ 
++static const char set_ext_adv_disable_param_1[] = {
++	0x00, 0x01, 0x01, 0x00, 0x00, 0x00
++};
++
+ static const struct generic_data add_ext_advertising_timeout_expired = {
+ 	.expect_alt_ev = MGMT_EV_ADVERTISING_REMOVED,
+ 	.expect_alt_ev_param = advertising_instance1_param,
+@@ -7747,8 +7751,8 @@ static const struct generic_data remove_ext_advertising_success_1 = {
+ 	.expect_alt_ev_param = advertising_instance1_param,
+ 	.expect_alt_ev_len = sizeof(advertising_instance1_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE,
+-	.expect_hci_param = set_ext_adv_disable_param,
+-	.expect_hci_len = sizeof(set_ext_adv_disable_param),
++	.expect_hci_param = set_ext_adv_disable_param_1,
++	.expect_hci_len = sizeof(set_ext_adv_disable_param_1),
+ };
+ 
+ static const struct generic_data remove_ext_advertising_success_2 = {
+-- 
+2.26.3
 
