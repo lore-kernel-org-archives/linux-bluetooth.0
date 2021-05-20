@@ -2,148 +2,215 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F5DEC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 04:53:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F06CC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 05:12:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 665F6611BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 04:53:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 01B5E611AD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 05:12:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229993AbhETEy4 (ORCPT
+        id S230339AbhETFNh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 May 2021 00:54:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38832 "EHLO
+        Thu, 20 May 2021 01:13:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229449AbhETEy4 (ORCPT
+        with ESMTP id S230317AbhETFNg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 May 2021 00:54:56 -0400
-Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF4DC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 21:53:35 -0700 (PDT)
-Received: by mail-qk1-x736.google.com with SMTP id i5so7786265qkf.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 21:53:35 -0700 (PDT)
+        Thu, 20 May 2021 01:13:36 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B7A4C061760
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 22:12:16 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id d15-20020a05620a136fb02902e9e93c69c8so11528937qkl.23
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 22:12:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=6d9/IQcz99NF8hs6v4m8wP4rDI0GKgj1cJW//YjciKg=;
-        b=o51MuX09Q9rlt7fUd+qkvYn2Yvo0fFP2L2we9fNNHVc1zT16u/RCdf9BNT4BGsifiC
-         Cwad90kB+Ie52eNWierAL+qkHeTIWOgqYirymH5N4T6FFoUZ3EtV6vDuR/bTNpFhYhrK
-         X+avHydAapYZpUxTTb+hCZHL7Ygrz26YKds7UVZ7EatWleHsN9Aza7kFEebUR0mMYX9q
-         /NCXy4OH83N1qYQZqyHYDBiZ8zraR2HTKQUF9xbP0Ec0S924OsS2Xr0AZ6zMvErJ+q6p
-         vbueHnxOl1su477+2X6uw0ohnLqo3I+wDWKy+q7qVwcI5eJ9MbQ4o6ydJ4TX8WhB5msk
-         381Q==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=nSHjW7bKWecnxQu3kZC8W2cm3ydg9WYf51lZYtMzgOg=;
+        b=vMOyzNDeFx1M0xVAhwjqx0war39y6moGq+UKVlCCcBk5bnt3xZzpzsr6K88mh/0wj7
+         wXEchgKN2iwi7xQ7tWHAjUHHwBXHbSrBl0vRuLN9r99Qmf2kxpE4tGpNUqyjXXwmdci4
+         njMzdWq4Raas3wxwNTR+tcNWS5Puh5/l1qTNJBcjOX/4whGr4cKAGnDS49Yz/VqLP4G0
+         NFr6ItR7Kgs9jSeNbML8IXxwDuYUSAyqLfk7kKLH3LuYbY01EOYQTOfBu4auVNvpItaF
+         mNMxKkB9qFxCvRF70tqHDX+6zt/gOXaBR3kodT9H3MulXbyH+IBRYEhp7NZOtRf5dILG
+         Kw3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=6d9/IQcz99NF8hs6v4m8wP4rDI0GKgj1cJW//YjciKg=;
-        b=IG70o5QRFfjy2Q8tUiP+Bm28lFARqdSwBu5sspKGaZQvZomQKe+u/F91UbGSASFfgB
-         Z1I1BJVli0nDE8abFQ1I3JAzrE125/K+ZkA/TihBUWtdM+fhxRKDsSXzmjYzl6Vpqrmu
-         KYurDmxUNhOgNefw43SLW+WqnZqgMeTSFLVC8U3mRM6ckOmFh+KycRVO6Gk9QnInk4H6
-         UiwQCwrzC2Y+RaN5xibzxSJPAT/rtuBEPluuLNmNLpIjHQDb0Bl2ZVZyB3c0zBu2zJuV
-         omF5xNgFL7OT4rJcr1d/PCxLXN3nEt0qdb7YIXl6ygl+XMR2xoKjm9tvnaRV5UzNSNgg
-         PFrQ==
-X-Gm-Message-State: AOAM532wrMX2iMXm/2p9Oepb6xjOf86dSGgyoU7U4D/yZNI/4SoyxwEn
-        4zbDARqsrrIx/dqblUfLNx/KjODasNkU0w==
-X-Google-Smtp-Source: ABdhPJz+lBr/ABbnCaMbzdwtNMmnWc+1rKGyvU9F1kLzR4UhbFNMT1ikthj5AiFI75XvxMazdm91nw==
-X-Received: by 2002:a05:620a:1036:: with SMTP id a22mr3173443qkk.186.1621486414369;
-        Wed, 19 May 2021 21:53:34 -0700 (PDT)
-Received: from [172.17.0.2] ([137.135.64.34])
-        by smtp.gmail.com with ESMTPSA id w189sm1359031qkb.39.2021.05.19.21.53.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 21:53:33 -0700 (PDT)
-Message-ID: <60a5eb4d.1c69fb81.28053.a5ff@mx.google.com>
-Date:   Wed, 19 May 2021 21:53:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6563406913898818364=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, eh5@sokka.cn
-Subject: RE: [BlueZ,v2] avrcp: Fix unregister AVRCP player
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210520041142.332534-1-eh5@sokka.cn>
-References: <20210520041142.332534-1-eh5@sokka.cn>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=nSHjW7bKWecnxQu3kZC8W2cm3ydg9WYf51lZYtMzgOg=;
+        b=d6Tvz5A170efmwqZSdcgGaHcBuNH7ZPitHnvl1/zTWXm+93S10/Jr5tquADUGwG07K
+         Gbz5QmzZRzs5ljiwkr+/55bhViJgi1Qu8W/EKc/qUg2z59P6DCTf2pMJX1mDP/PJ8WEE
+         lrvjDK3NZ54p4jzAmEwCpdtSlvalSzlNq7IJgVkcaFn+W0GxaT2hbIF9geV98zJIunRW
+         nm2+BWBYDR7Jnjv0sIBaxOPP6e9EIlM1bRgYRzlkTFH554ToQzotyB0N/YNDCcM3LBsJ
+         P3PvSSwy9IIfFRN+7+8+m4nvO3Sry6SAjwvEiXJUW0mobmAMvrL72VTeW957jM/woQ5Q
+         NFIA==
+X-Gm-Message-State: AOAM531AvOymu/oXVLUdKJPMO7vrClUU830eJ6L4j3Pzgl4MZzncd1lj
+        AO53lq6o/k6SF61FYUwxyaSnq5HkS1abHeqcgLN2ji9jFiobULWuHMlC26iFncwm3tcgDySHV8L
+        J8jHhHZ5Hs3MNhyzO5vJCbc+eutEqWo/ra3PQ55EfqDXQNf4l3qEgMeRbfQLCQrpmn1h60lD8qD
+        wAumekEfP5hkQ=
+X-Google-Smtp-Source: ABdhPJwQy5bIy4FKavqab+Kx8aF2GTMz69DN1UlXuxvD3QCWzHsTrIWRlA/EWOV/vDw4aNXYNhXNIErpZY5ypI2XpA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:5827:f259:c0e8:5b1d])
+ (user=howardchung job=sendgmr) by 2002:a0c:e34b:: with SMTP id
+ a11mr3693793qvm.24.1621487535094; Wed, 19 May 2021 22:12:15 -0700 (PDT)
+Date:   Thu, 20 May 2021 13:12:09 +0800
+Message-Id: <20210520131145.v2.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.31.1.751.gd2f1c929bd-goog
+Subject: [PATCH v2] Bluetooth: disable filter dup when scan for adv monitor
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6563406913898818364==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-This is automated email and please do not reply to this email!
+Disable duplicates filter when scanning for advertisement monitor for
+the following reasons. The scanning includes active scan and passive
+scan.
 
-Dear submitter,
+For HW pattern filtering (ex. MSFT), Realtek and Qualcomm controllers
+ignore RSSI_Sampling_Period when the duplicates filter is enabled.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=485461
+For SW pattern filtering, when we're not doing interleaved scanning, it
+is necessary to disable duplicates filter, otherwise hosts can only
+receive one advertisement and it's impossible to know if a peer is still
+in range.
 
----Test result---
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
 
-Test Summary:
-CheckPatch                    PASS      0.33 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      46.41 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.40 seconds
-Build - Make                  PASS      206.91 seconds
-Make Check                    PASS      9.50 seconds
-Make Distcheck                PASS      220.80 seconds
-Build w/ext ELL - Configure   PASS      7.70 seconds
-Build w/ext ELL - Make        PASS      172.24 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
+Signed-off-by: Yun-Hao Chung <howardchung@chromium.org>
 
 ---
-Regards,
-Linux Bluetooth
 
+Changes in v2:
+- include the vendor name in the comment and commit messages
 
---===============6563406913898818364==--
+ net/bluetooth/hci_request.c | 46 +++++++++++++++++++++++++++++++++----
+ 1 file changed, 41 insertions(+), 5 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index fa9125b782f85..3465862429fb5 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -932,7 +932,7 @@ static bool scan_use_rpa(struct hci_dev *hdev)
+ 
+ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
+ 			       u16 window, u8 own_addr_type, u8 filter_policy,
+-			       bool addr_resolv)
++			       bool filter_dup, bool addr_resolv)
+ {
+ 	struct hci_dev *hdev = req->hdev;
+ 
+@@ -997,7 +997,7 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
+ 
+ 		memset(&ext_enable_cp, 0, sizeof(ext_enable_cp));
+ 		ext_enable_cp.enable = LE_SCAN_ENABLE;
+-		ext_enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++		ext_enable_cp.filter_dup = filter_dup;
+ 
+ 		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
+ 			    sizeof(ext_enable_cp), &ext_enable_cp);
+@@ -1016,7 +1016,7 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
+ 
+ 		memset(&enable_cp, 0, sizeof(enable_cp));
+ 		enable_cp.enable = LE_SCAN_ENABLE;
+-		enable_cp.filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++		enable_cp.filter_dup = filter_dup;
+ 		hci_req_add(req, HCI_OP_LE_SET_SCAN_ENABLE, sizeof(enable_cp),
+ 			    &enable_cp);
+ 	}
+@@ -1053,6 +1053,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	u8 own_addr_type;
+ 	u8 filter_policy;
+ 	u16 window, interval;
++	/* Default is to enable duplicates filter */
++	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+ 	/* Background scanning should run with address resolution */
+ 	bool addr_resolv = true;
+ 
+@@ -1106,6 +1108,20 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 	} else if (hci_is_adv_monitoring(hdev)) {
+ 		window = hdev->le_scan_window_adv_monitor;
+ 		interval = hdev->le_scan_int_adv_monitor;
++
++		/* Disable duplicates filter when scanning for advertisement
++		 * monitor for the following reasons.
++		 *
++		 * For HW pattern filtering (ex. MSFT), Realtek and Qualcomm
++		 * controllers ignore RSSI_Sampling_Period when the duplicates
++		 * filter is enabled.
++		 *
++		 * For SW pattern filtering, when we're not doing interleaved
++		 * scanning, it is necessary to disable duplicates filter,
++		 * otherwise hosts can only receive one advertisement and it's
++		 * impossible to know if a peer is still in range.
++		 */
++		filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
+ 	} else {
+ 		window = hdev->le_scan_window;
+ 		interval = hdev->le_scan_interval;
+@@ -1113,7 +1129,8 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
+ 
+ 	bt_dev_dbg(hdev, "LE passive scan with whitelist = %d", filter_policy);
+ 	hci_req_start_scan(req, LE_SCAN_PASSIVE, interval, window,
+-			   own_addr_type, filter_policy, addr_resolv);
++			   own_addr_type, filter_policy, filter_dup,
++			   addr_resolv);
+ }
+ 
+ static bool adv_instance_is_scannable(struct hci_dev *hdev, u8 instance)
+@@ -3135,6 +3152,8 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	u8 own_addr_type;
+ 	/* White list is not used for discovery */
+ 	u8 filter_policy = 0x00;
++	/* Default is to enable duplicates filter */
++	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
+ 	/* Discovery doesn't require controller address resolution */
+ 	bool addr_resolv = false;
+ 	int err;
+@@ -3159,9 +3178,26 @@ static int active_scan(struct hci_request *req, unsigned long opt)
+ 	if (err < 0)
+ 		own_addr_type = ADDR_LE_DEV_PUBLIC;
+ 
++	if (hci_is_adv_monitoring(hdev)) {
++		/* Duplicate filter should be disabled when some advertisement
++		 * monitor is activated, otherwise AdvMon can only receive one
++		 * advertisement for one peer(*) during active scanning, and
++		 * might report loss to these peers.
++		 *
++		 * Note that different controllers have different meanings of
++		 * |duplicate|. Some of them consider packets with the same
++		 * address as duplicate, and others consider packets with the
++		 * same address and the same RSSI as duplicate. Although in the
++		 * latter case we don't need to disable duplicate filter, but
++		 * it is common to have active scanning for a short period of
++		 * time, the power impact should be neglectable.
++		 */
++		filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
++	}
++
+ 	hci_req_start_scan(req, LE_SCAN_ACTIVE, interval,
+ 			   hdev->le_scan_window_discovery, own_addr_type,
+-			   filter_policy, addr_resolv);
++			   filter_policy, filter_dup, addr_resolv);
+ 	return 0;
+ }
+ 
+-- 
+2.31.1.751.gd2f1c929bd-goog
+
