@@ -2,95 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F604C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 13:33:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A24D2C43470
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 15:10:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F37D60BD3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 13:33:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 860A461246
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 15:10:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237274AbhETNeF (ORCPT
+        id S243370AbhETPMG convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 May 2021 09:34:05 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:3629 "EHLO
-        szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235618AbhETNeF (ORCPT
+        Thu, 20 May 2021 11:12:06 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58146 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232020AbhETPMF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 May 2021 09:34:05 -0400
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4Fm9bP2NHQzmW7J;
-        Thu, 20 May 2021 21:30:25 +0800 (CST)
-Received: from dggema769-chm.china.huawei.com (10.1.198.211) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256) id
- 15.1.2176.2; Thu, 20 May 2021 21:32:42 +0800
-Received: from localhost (10.174.179.215) by dggema769-chm.china.huawei.com
- (10.1.198.211) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2176.2; Thu, 20
- May 2021 21:32:41 +0800
-From:   YueHaibing <yuehaibing@huawei.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-        <yuehaibing@huawei.com>
-CC:     <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH -next] Bluetooth: RFCOMM: Use DEVICE_ATTR_RO macro
-Date:   Thu, 20 May 2021 21:32:35 +0800
-Message-ID: <20210520133235.32244-1-yuehaibing@huawei.com>
-X-Mailer: git-send-email 2.10.2.windows.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.174.179.215]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- dggema769-chm.china.huawei.com (10.1.198.211)
-X-CFilter-Loop: Reflected
+        Thu, 20 May 2021 11:12:05 -0400
+Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 05B39CECEA;
+        Thu, 20 May 2021 17:18:33 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.80.0.2.43\))
+Subject: Re: [PATCH v4 0/5] Enable Bluetooth functionality for WCN6750
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <1621355686-29550-1-git-send-email-gubbaven@codeaurora.org>
+Date:   Thu, 20 May 2021 17:10:39 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        devicetree@vger.kernel.org, Matthias Kaehlcke <mka@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <DF3C6156-F44A-4954-B1EF-CB3051BCC0B6@holtmann.org>
+References: <1621355686-29550-1-git-send-email-gubbaven@codeaurora.org>
+To:     Venkata Lakshmi Narayana Gubba <gubbaven@codeaurora.org>
+X-Mailer: Apple Mail (2.3654.80.0.2.43)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use DEVICE_ATTR_RO helper instead of plain DEVICE_ATTR,
-which makes the code a bit shorter and easier to read.
+Hi Venkata,
 
-Signed-off-by: YueHaibing <yuehaibing@huawei.com>
----
- net/bluetooth/rfcomm/tty.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+> These patches enables Bluetooth functionalties for new Qualcomm
+> Bluetooth SoC wcn6750.
+> 
+> Venkata Lakshmi Narayana Gubba (5):
+>  Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6750
+>  Bluetooth: btqca: Add support for firmware image with mbn type for
+>    WCN6750
+>  Bluetooth: btqca: Moved extracting rom version info to common place
+>  dt-bindings: net: bluetooth: Convert Qualcomm BT binding to DT schema
+>  dt-bindings: net: bluetooth: Add device tree bindings for QTI chip
+>    wcn6750
+> 
+> .../devicetree/bindings/net/qualcomm-bluetooth.txt |  69 --------
+> .../bindings/net/qualcomm-bluetooth.yaml           | 183 +++++++++++++++++++++
+> drivers/bluetooth/btqca.c                          |  90 +++++++---
+> drivers/bluetooth/btqca.h                          |  14 +-
+> drivers/bluetooth/hci_qca.c                        | 114 ++++++++++---
+> 5 files changed, 354 insertions(+), 116 deletions(-)
+> delete mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
+> create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
 
-diff --git a/net/bluetooth/rfcomm/tty.c b/net/bluetooth/rfcomm/tty.c
-index c76dcc0f679b..4e095746e002 100644
---- a/net/bluetooth/rfcomm/tty.c
-+++ b/net/bluetooth/rfcomm/tty.c
-@@ -198,20 +198,22 @@ static void rfcomm_reparent_device(struct rfcomm_dev *dev)
- 	hci_dev_put(hdev);
- }
- 
--static ssize_t show_address(struct device *tty_dev, struct device_attribute *attr, char *buf)
-+static ssize_t address_show(struct device *tty_dev,
-+			    struct device_attribute *attr, char *buf)
- {
- 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
- 	return sprintf(buf, "%pMR\n", &dev->dst);
- }
- 
--static ssize_t show_channel(struct device *tty_dev, struct device_attribute *attr, char *buf)
-+static ssize_t channel_show(struct device *tty_dev,
-+			    struct device_attribute *attr, char *buf)
- {
- 	struct rfcomm_dev *dev = dev_get_drvdata(tty_dev);
- 	return sprintf(buf, "%d\n", dev->channel);
- }
- 
--static DEVICE_ATTR(address, 0444, show_address, NULL);
--static DEVICE_ATTR(channel, 0444, show_channel, NULL);
-+static DEVICE_ATTR_RO(address);
-+static DEVICE_ATTR_RO(channel);
- 
- static struct rfcomm_dev *__rfcomm_dev_add(struct rfcomm_dev_req *req,
- 					   struct rfcomm_dlc *dlc)
--- 
-2.17.1
+all 5 patches have been applied to bluetooth-next tree.
+
+Regards
+
+Marcel
 
