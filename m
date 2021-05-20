@@ -7,25 +7,25 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DB1CC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 11:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 033CCC433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 11:50:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 657036135C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 11:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9D4F611AD
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 11:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242146AbhETLvw (ORCPT
+        id S242244AbhETLwH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 May 2021 07:51:52 -0400
-Received: from szxga05-in.huawei.com ([45.249.212.191]:3604 "EHLO
-        szxga05-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243052AbhETLtA (ORCPT
+        Thu, 20 May 2021 07:52:07 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:3445 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241399AbhETLtA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 20 May 2021 07:49:00 -0400
-Received: from dggems706-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Fm7Dh1QDJzQp6W;
-        Thu, 20 May 2021 19:44:04 +0800 (CST)
+Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.58])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4Fm7FX21yszBv3f;
+        Thu, 20 May 2021 19:44:48 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems706-chm.china.huawei.com (10.3.19.183) with Microsoft SMTP Server
+ dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2176.2; Thu, 20 May 2021 19:47:35 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
@@ -37,9 +37,9 @@ To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
         <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
         <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 CC:     <linux-kernel@vger.kernel.org>, <yekai13@huawei.com>
-Subject: [PATCH 10/12] net/Bluetooth/msft - use the correct print format
-Date:   Thu, 20 May 2021 19:44:31 +0800
-Message-ID: <1621511073-47766-11-git-send-email-yekai13@huawei.com>
+Subject: [PATCH 12/12] net/Bluetooth/smp - use the correct print format
+Date:   Thu, 20 May 2021 19:44:33 +0800
+Message-ID: <1621511073-47766-13-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621511073-47766-1-git-send-email-yekai13@huawei.com>
 References: <1621511073-47766-1-git-send-email-yekai13@huawei.com>
@@ -59,22 +59,40 @@ instead of %d. Otherwise printk() might end up displaying negative numbers.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- net/bluetooth/msft.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/smp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index 47b104f..8d2310e 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -308,7 +308,7 @@ static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 2def906..56c59f8 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -859,7 +859,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 	memset(smp->tk, 0, sizeof(smp->tk));
+ 	clear_bit(SMP_FLAG_TK_VALID, &smp->flags);
  
- 	monitor = idr_find(&hdev->adv_monitors_idr, msft->pending_add_handle);
- 	if (!monitor) {
--		bt_dev_err(hdev, "msft add advmon: monitor %d is not found!",
-+		bt_dev_err(hdev, "msft add advmon: monitor %u is not found!",
- 			   msft->pending_add_handle);
- 		status = HCI_ERROR_UNSPECIFIED;
- 		goto unlock;
+-	bt_dev_dbg(hcon->hdev, "auth:%d lcl:%d rem:%d", auth, local_io,
++	bt_dev_dbg(hcon->hdev, "auth:%u lcl:%u rem:%u", auth, local_io,
+ 		   remote_io);
+ 
+ 	/* If neither side wants MITM, either "just" confirm an incoming
+@@ -925,7 +925,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 		get_random_bytes(&passkey, sizeof(passkey));
+ 		passkey %= 1000000;
+ 		put_unaligned_le32(passkey, smp->tk);
+-		bt_dev_dbg(hcon->hdev, "PassKey: %d", passkey);
++		bt_dev_dbg(hcon->hdev, "PassKey: %u", passkey);
+ 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
+ 	}
+ 
+@@ -1654,7 +1654,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ 	case MGMT_OP_USER_PASSKEY_REPLY:
+ 		value = le32_to_cpu(passkey);
+ 		memset(smp->tk, 0, sizeof(smp->tk));
+-		bt_dev_dbg(conn->hcon->hdev, "PassKey: %d", value);
++		bt_dev_dbg(conn->hcon->hdev, "PassKey: %u", value);
+ 		put_unaligned_le32(value, smp->tk);
+ 		fallthrough;
+ 	case MGMT_OP_USER_CONFIRM_REPLY:
 -- 
 2.8.1
 
