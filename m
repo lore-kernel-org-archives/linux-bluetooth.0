@@ -2,102 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAE8C433ED
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D571C433B4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:23:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E8A961163
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 580D261186
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:23:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229534AbhETDUo (ORCPT
+        id S230197AbhETDYm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 23:20:44 -0400
-Received: from mail.eh5.me ([45.76.212.85]:33400 "EHLO mail.eh5.me"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229505AbhETDUn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 23:20:43 -0400
-X-Greylist: delayed 326 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 May 2021 23:20:43 EDT
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4076834A3FBE;
-        Thu, 20 May 2021 11:13:53 +0800 (CST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sokka.cn; s=dkim;
-        t=1621480433; h=from:subject:date:message-id:to:cc:mime-version:
-         content-transfer-encoding; bh=N19l707bijlmauj5FzZ90bon9G3xhU7M+skeA8s21pY=;
-        b=g7ZvyEeO+lClnBRxOZq2VlOuKH8a7N0I4koA2hMba22ONKjgd7+ga8oxic8JjpgM24Ej1s
-        jJ7pRzMS6pFlzJ8stDZ5Cyrn1m8PDXM8MPNmnVzQFxmOGu5Gv1eTIs1VO+e9ApBUHO3vdW
-        t8YlgCQBVG8NpzkMZRddUdgJFnaXBhQ=
-From:   Huang-Huang Bao <eh5@sokka.cn>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Huang-Huang Bao <eh5@sokka.cn>
-Subject: [PATCH BlueZ] avrcp: Fix unregister AVRCP player
-Date:   Thu, 20 May 2021 11:13:34 +0800
-Message-Id: <20210520031334.304688-1-eh5@sokka.cn>
+        Wed, 19 May 2021 23:24:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47194 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229993AbhETDYl (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 May 2021 23:24:41 -0400
+Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA19C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:23:19 -0700 (PDT)
+Received: by mail-ej1-x62d.google.com with SMTP id lz27so22922553ejb.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:23:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=tCF2of9sQthHgOclT2S/qLqJUXtV4c3vy0KdbBzEbuc=;
+        b=m0XdNW513Upb+MvPpiula6KZLCIPjnVqUmo2Poj6eNwJ05smeaOtHYllYrAkMISWWG
+         h3Nm1EvA5xaRzYk/FU6IQmOADyTrx99ahbO1y6/pStz4o8EJmzPZJ32qUunVs5HjDfV9
+         b6GaEKbdDdRYwZvAGfOcHa9fyRbJZ8BXiSvbdoDqRMtzrwaKvaXzzLtzeJkn0G06lQVh
+         v8OrBUAPvx15yyTLrMxwxyOvTbgmTLUcXzliPLlGlE34dP5xCQ4Z19OH0JnhoX+iHGH9
+         iyEd5a7PmGop44sj2jSPtIN5z8RN8oNEmA2s/LVSUk31YahsE9Hu+kWp4cj3cep1LjI7
+         /20Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tCF2of9sQthHgOclT2S/qLqJUXtV4c3vy0KdbBzEbuc=;
+        b=hNu+WmSU2eqWg69j0q5sGZ2yU615Pf0M8QLxHI9EhcRXoI448P1ydiIeXA3KO4mlVc
+         n0XOhVpBu6Cok9SIlC9cbRKxP34bTXestqqF8gxdm0wl+Hs4si1xOLM86vQ2JCjnt5do
+         rx/sPucmwfUrIGlIJcG56x9m4I277v4tkSBU+VpLU/novL8qAGU0cQP9uXrAxkgSF/3m
+         phwME+KJA1pRQRRDaYo5DHpCBY0LySYsvWU5iZhEB0D6l9NO1qxBydzPNnp7GEOqCF3H
+         /II6YK2qIUYrYnpkvLsq9cDy0kwkKUixAZ5nAdl/ZlbjVrDtTOhUdgPzQ96JM9rr/1ad
+         Y77w==
+X-Gm-Message-State: AOAM532VEGNq10e6uBeATxZIuvzJi51hawkg+B8medDLJFUe6aen14rU
+        IbLG1oGtLrjPeGzutzLWYUnB3uDs6tgnMsz9uO9L6Q==
+X-Google-Smtp-Source: ABdhPJw/ed/k3szBOcbgIdWuEuWUOI0l73380mKIEyvkSM5Ss98uwAt20BkDyxKI+R91EfBgAlkyP7K9rTIukTZYaWY=
+X-Received: by 2002:a17:906:1496:: with SMTP id x22mr2463605ejc.419.1621480998180;
+ Wed, 19 May 2021 20:23:18 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Last-TLS-Session-Version: TLSv1.3
+References: <20210519102745.v1.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
+ <73ED48AE-974A-476C-83AD-E6D09CDCBFC9@holtmann.org>
+In-Reply-To: <73ED48AE-974A-476C-83AD-E6D09CDCBFC9@holtmann.org>
+From:   Yun-hao Chung <howardchung@google.com>
+Date:   Thu, 20 May 2021 11:23:07 +0800
+Message-ID: <CAPHZWUe0nqia2oHuxe6QQ_=Rt1LAx6rAQAP9QYdaNxSHG2Bu=A@mail.gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: disable filter dup when scan for adv monitor
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-'notify_addressed_player_changed()' expected to be called with
-'player->changed_id' set to what 'g_idle_add()' returns.
+Hi Marcel,
+Thanks for the comments.
 
-    player->changed_id = g_idle_add(notify_addressed_player_changed, player);
+On Thu, May 20, 2021 at 4:47 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Howard,
+>
+> > Disable duplicates filter when scanning for advertisement monitor for
+> > the following reasons. The scanning includes active scan and passive
+> > scan.
+> >
+> > For HW pattern filtering (ex. MSFT), some controllers ignore
+> > RSSI_Sampling_Period when the duplicates filter is enabled.
+> >
+> > For SW pattern filtering, when we're not doing interleaved scanning, it
+> > is necessary to disable duplicates filter, otherwise hosts can only
+> > receive one advertisement and it's impossible to know if a peer is stil=
+l
+> > in range.
+>
+> can we be a bit more specific on which controller does what. I am not inc=
+lined to always disable duplicate filtering unless your controller doesn=E2=
+=80=99t do what you want it to do.
 
-And 'avrcp_player_event()' relies on 'player->changed_id' to perform
-Addressed Player Changed notification. However,
-'avrcp_unregister_player()' calls 'notify_addressed_player_changed()'
-without adding it to the main loop and set 'player->changed_id'. To
-make 'notify_addressed_player_changed()' can be called without set
-'player->changed_id' flag. We add antoher flag
-'player->addressed_changing' to indicate addressed player changing.
+Will update the commit message and submit again.
 
-Fixes https://github.com/bluez/bluez/issues/142
----
- profiles/audio/avrcp.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+>
+> I also disagree with the last statement. If the device moved out of range=
+ (or comes back for that matter) you should get a HCI_VS_MSFT_LE_Monitor_De=
+vice_Event event that tells you if a device is in range or not.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 58d30b24d..039ac8924 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -239,6 +239,7 @@ struct avrcp_player {
- 	uint8_t *features;
- 	char *path;
- 	guint changed_id;
-+	bool addressed_changing;
- 
- 	struct pending_list_items *p;
- 	char *change_path;
-@@ -792,7 +793,7 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
- 
- 	DBG("id=%u", id);
- 
--	if (id != AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED && player->changed_id) {
-+	if (id != AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED && player->addressed_changing) {
- 		code = AVC_CTYPE_REJECTED;
- 		size = 1;
- 		pdu->params[0] = AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED;
-@@ -1794,6 +1795,8 @@ static gboolean notify_addressed_player_changed(gpointer user_data)
- 				};
- 	uint8_t i;
- 
-+	player->addressed_changing = true;
-+
- 	avrcp_player_event(player, AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED, NULL);
- 
- 	/*
-@@ -1804,6 +1807,7 @@ static gboolean notify_addressed_player_changed(gpointer user_data)
- 	for (i = 0; i < sizeof(events); i++)
- 		avrcp_player_event(player, events[i], NULL);
- 
-+	player->addressed_changing = false;
- 	player->changed_id = 0;
- 
- 	return FALSE;
--- 
-2.31.1
-
+The last statement is about software filtering, which is used when
+MSFT is not supported. Software filtering in the kernel is basically
+doing an LE passive scan. When the duplicate filter is enabled, some
+controllers consider packets with the same address but different RSSIs
+as duplicate thus not reporting to the host, which makes userspace not
+able to tell if a peer is in range or not.
+>
+> Device leaving:
+>
+> > HCI Event: LE Meta Event (0x3e) plen 43
+>       LE Advertising Report (0x02)
+>         Num reports: 1
+>         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+>         Address type: Random (0x01)
+>         Address: 01:9A:1F:C0:30:15 (Non-Resolvable)
+>         Data length: 31
+>         Flags: 0x1a
+>           LE General Discoverable Mode
+>           Simultaneous LE and BR/EDR (Controller)
+>           Simultaneous LE and BR/EDR (Host)
+>         16-bit Service UUIDs (complete): 1 entry
+>           Apple, Inc. (0xfd6f)
+>         Service Data (UUID 0xfd6f): f47698ff9243617d917ac521b5fcfd436afdb=
+285
+>         RSSI: -86 dBm (0xaa)
+> > HCI Event: Vendor (0xff) plen 18
+>         23 79 54 33 77 88 97 68 02 01 15 30 c0 1f 9a 01  #yT3w..h...0....
+>         00 00                                            ..
+>
+> Device coming back:
+>
+> > HCI Event: Vendor (0xff) plen 18
+>         23 79 54 33 77 88 97 68 02 01 95 b9 0b 32 22 2a  #yT3w..h.....2"*
+>         00 01                                            ..
+> > HCI Event: LE Meta Event (0x3e) plen 43
+>       LE Advertising Report (0x02)
+>         Num reports: 1
+>         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
+>         Address type: Random (0x01)
+>         Address: 2A:22:32:0B:B9:95 (Non-Resolvable)
+>         Data length: 31
+>         Flags: 0x1a
+>           LE General Discoverable Mode
+>           Simultaneous LE and BR/EDR (Controller)
+>           Simultaneous LE and BR/EDR (Host)
+>         16-bit Service UUIDs (complete): 1 entry
+>           Apple, Inc. (0xfd6f)
+>         Service Data (UUID 0xfd6f): 0b861791a0fb7adcf8b45f951f7d4b7c7fc8e=
+3fd
+>         RSSI: -27 dBm (0xe5)
+>
+> Regards
+>
+> Marcel
+>
