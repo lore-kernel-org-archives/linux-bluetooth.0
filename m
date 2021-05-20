@@ -2,148 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 90350C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:42:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BAE8C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:19:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60854611AD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 19 May 2021 21:42:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4E8A961163
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:19:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229632AbhESVns (ORCPT
+        id S229534AbhETDUo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 17:43:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229597AbhESVnq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 17:43:46 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61E65C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 14:42:26 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id 82so2894094qki.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 14:42:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=n3neOzmOrN1ZULuHTQG7xJ1o7NPqUPTAitOyR9v7Krg=;
-        b=qmNRJEnuP+eVP2lwF/jP34Y5zq/yfHGlPClLyxX+OONGqfJ8wla4raagXKuPAya4XR
-         aOU02ZTRrELcZKx6Tmz8/izKhjtv/HReFwXtauK51Bp0ZiXJ92MOq6JDSpkXVpmLM302
-         nUcYy1SSfH+8jVQ+Z+/6Xtca4sxyS4x+tt2kgXGrXPBfi66s4aQnBrsDtM+Aa2qUm56l
-         OHQiX+tB92hOgiWDOmQogJCso8+Fw1MmFMdOYfBzzgid/bgFnGFDyxbZOXVgQOfVAJE1
-         s/rF8TSQ1Ch4cQRN/l8U4CQI3qQtJdouSZ9pLsdrbYaY6+zIXQRI4eMo/zYOdubRVUQl
-         1Edw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=n3neOzmOrN1ZULuHTQG7xJ1o7NPqUPTAitOyR9v7Krg=;
-        b=eHrih4tOd93L+JU8ESI7gOAij4ieEN5Z64+dbB/tO0nYAxX8DEo7AmWC65+l4zYoIH
-         VHUxk4BLIUZe9BIeOlkglHswqiIoH8FcF3N5c8UEfEx1DoCevRyIjS2DAbCXmnGZRYBi
-         S6qdAhhhv+YiKFGlm5GdyzBvN6SDIRD3g6InvxYWdBA0k0iSWHPT0mj2yPh/M+SPpG6k
-         m1OOBWG+rLStXQaSmkhN86E2xuGcCdLDmGxLmL4Z5HXZFrpWTa2ieIrvI+dfpRfCbQ0z
-         lwZfe3WG7qPoBwvEBCcGHpKiB3NfuM7QqEwrfMUwj5ik7LRfyHk0XhrKeixtWDNjbVeM
-         VPBA==
-X-Gm-Message-State: AOAM531spKsL3kDtKLV0eKZ/gCJDVwrAHhN0cMNezGaRFv/rqbhgLpGW
-        DPKAoldv1iCEm2y9F6AJfYcn60d5ecnEyw==
-X-Google-Smtp-Source: ABdhPJyUfHtGsnbyDadmD9pj8RzjTZIK7cpbOGegxayn3g+iIp8P/ktQ+p4yxkzFQrd9/i0eqG1zqw==
-X-Received: by 2002:a05:620a:1265:: with SMTP id b5mr1710718qkl.208.1621460545430;
-        Wed, 19 May 2021 14:42:25 -0700 (PDT)
-Received: from [172.17.0.2] ([52.191.9.43])
-        by smtp.gmail.com with ESMTPSA id c14sm521170qtw.42.2021.05.19.14.42.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 19 May 2021 14:42:25 -0700 (PDT)
-Message-ID: <60a58641.1c69fb81.c548.4937@mx.google.com>
-Date:   Wed, 19 May 2021 14:42:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0290257079159555521=="
+        Wed, 19 May 2021 23:20:44 -0400
+Received: from mail.eh5.me ([45.76.212.85]:33400 "EHLO mail.eh5.me"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229505AbhETDUn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 19 May 2021 23:20:43 -0400
+X-Greylist: delayed 326 seconds by postgrey-1.27 at vger.kernel.org; Wed, 19 May 2021 23:20:43 EDT
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 4076834A3FBE;
+        Thu, 20 May 2021 11:13:53 +0800 (CST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sokka.cn; s=dkim;
+        t=1621480433; h=from:subject:date:message-id:to:cc:mime-version:
+         content-transfer-encoding; bh=N19l707bijlmauj5FzZ90bon9G3xhU7M+skeA8s21pY=;
+        b=g7ZvyEeO+lClnBRxOZq2VlOuKH8a7N0I4koA2hMba22ONKjgd7+ga8oxic8JjpgM24Ej1s
+        jJ7pRzMS6pFlzJ8stDZ5Cyrn1m8PDXM8MPNmnVzQFxmOGu5Gv1eTIs1VO+e9ApBUHO3vdW
+        t8YlgCQBVG8NpzkMZRddUdgJFnaXBhQ=
+From:   Huang-Huang Bao <eh5@sokka.cn>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Huang-Huang Bao <eh5@sokka.cn>
+Subject: [PATCH BlueZ] avrcp: Fix unregister AVRCP player
+Date:   Thu, 20 May 2021 11:13:34 +0800
+Message-Id: <20210520031334.304688-1-eh5@sokka.cn>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: [BlueZ] tools/mgmt-tester: Fix "Remove Ext Advertising" case
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210519211907.157397-1-inga.stotland@intel.com>
-References: <20210519211907.157397-1-inga.stotland@intel.com>
+Content-Transfer-Encoding: 8bit
+X-Last-TLS-Session-Version: TLSv1.3
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0290257079159555521==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+'notify_addressed_player_changed()' expected to be called with
+'player->changed_id' set to what 'g_idle_add()' returns.
 
-This is automated email and please do not reply to this email!
+    player->changed_id = g_idle_add(notify_addressed_player_changed, player);
 
-Dear submitter,
+And 'avrcp_player_event()' relies on 'player->changed_id' to perform
+Addressed Player Changed notification. However,
+'avrcp_unregister_player()' calls 'notify_addressed_player_changed()'
+without adding it to the main loop and set 'player->changed_id'. To
+make 'notify_addressed_player_changed()' can be called without set
+'player->changed_id' flag. We add antoher flag
+'player->addressed_changing' to indicate addressed player changing.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=485351
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.50 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      48.33 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.50 seconds
-Build - Make                  PASS      206.92 seconds
-Make Check                    PASS      9.88 seconds
-Make Distcheck                PASS      245.45 seconds
-Build w/ext ELL - Configure   PASS      8.68 seconds
-Build w/ext ELL - Make        PASS      194.87 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Fixes https://github.com/bluez/bluez/issues/142
 ---
-Regards,
-Linux Bluetooth
+ profiles/audio/avrcp.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
+diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+index 58d30b24d..039ac8924 100644
+--- a/profiles/audio/avrcp.c
++++ b/profiles/audio/avrcp.c
+@@ -239,6 +239,7 @@ struct avrcp_player {
+ 	uint8_t *features;
+ 	char *path;
+ 	guint changed_id;
++	bool addressed_changing;
+ 
+ 	struct pending_list_items *p;
+ 	char *change_path;
+@@ -792,7 +793,7 @@ void avrcp_player_event(struct avrcp_player *player, uint8_t id,
+ 
+ 	DBG("id=%u", id);
+ 
+-	if (id != AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED && player->changed_id) {
++	if (id != AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED && player->addressed_changing) {
+ 		code = AVC_CTYPE_REJECTED;
+ 		size = 1;
+ 		pdu->params[0] = AVRCP_STATUS_ADDRESSED_PLAYER_CHANGED;
+@@ -1794,6 +1795,8 @@ static gboolean notify_addressed_player_changed(gpointer user_data)
+ 				};
+ 	uint8_t i;
+ 
++	player->addressed_changing = true;
++
+ 	avrcp_player_event(player, AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED, NULL);
+ 
+ 	/*
+@@ -1804,6 +1807,7 @@ static gboolean notify_addressed_player_changed(gpointer user_data)
+ 	for (i = 0; i < sizeof(events); i++)
+ 		avrcp_player_event(player, events[i], NULL);
+ 
++	player->addressed_changing = false;
+ 	player->changed_id = 0;
+ 
+ 	return FALSE;
+-- 
+2.31.1
 
---===============0290257079159555521==--
