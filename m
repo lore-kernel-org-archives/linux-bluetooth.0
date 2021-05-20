@@ -2,166 +2,170 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7D571C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:23:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B9A6C433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:54:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 580D261186
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:23:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18A86611BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 03:54:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230197AbhETDYm (ORCPT
+        id S229955AbhETDza (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 19 May 2021 23:24:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47194 "EHLO
+        Wed, 19 May 2021 23:55:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53972 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229993AbhETDYl (ORCPT
+        with ESMTP id S229598AbhETDza (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 19 May 2021 23:24:41 -0400
-Received: from mail-ej1-x62d.google.com (mail-ej1-x62d.google.com [IPv6:2a00:1450:4864:20::62d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCA19C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:23:19 -0700 (PDT)
-Received: by mail-ej1-x62d.google.com with SMTP id lz27so22922553ejb.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:23:19 -0700 (PDT)
+        Wed, 19 May 2021 23:55:30 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6364C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:54:08 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id t20so11851370qtx.8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 19 May 2021 20:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=tCF2of9sQthHgOclT2S/qLqJUXtV4c3vy0KdbBzEbuc=;
-        b=m0XdNW513Upb+MvPpiula6KZLCIPjnVqUmo2Poj6eNwJ05smeaOtHYllYrAkMISWWG
-         h3Nm1EvA5xaRzYk/FU6IQmOADyTrx99ahbO1y6/pStz4o8EJmzPZJ32qUunVs5HjDfV9
-         b6GaEKbdDdRYwZvAGfOcHa9fyRbJZ8BXiSvbdoDqRMtzrwaKvaXzzLtzeJkn0G06lQVh
-         v8OrBUAPvx15yyTLrMxwxyOvTbgmTLUcXzliPLlGlE34dP5xCQ4Z19OH0JnhoX+iHGH9
-         iyEd5a7PmGop44sj2jSPtIN5z8RN8oNEmA2s/LVSUk31YahsE9Hu+kWp4cj3cep1LjI7
-         /20Q==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=tii1ipOGEVbhLtvBNdSeLpUxpszfgWDVoSk6oNEkxH0=;
+        b=ZBnccqt2tUP/8IUs+TQMjwn0GBH2d3Gi/YF7phXa7Xy6nT+T1dblnMX9h7xYi2Ug8J
+         A8rYsm73L0loihZJQLW2jFQq1FytqUoafUjk1RwazLHwcwDaSTljw0VMQnV6xFJ5NiBV
+         OdSF1y4uEHhyM+3KJzaLG2kQZ/myW+mqp8KeehRmvpp2IxdA2DAImPIjTRT3UD0kPV5n
+         47WKe28tE9v8U85evdFizOk6qsTDjNvzTimeexJ0mVrPQzi7KxwtfRjTaYwtZDnMRYCr
+         0PI06ac0tv+2xK9gjZalMa/aNVKzEQzcfwq7o/lf6xneyjA+Z7YW6gUiP1rTnr1a77P+
+         l5pw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=tCF2of9sQthHgOclT2S/qLqJUXtV4c3vy0KdbBzEbuc=;
-        b=hNu+WmSU2eqWg69j0q5sGZ2yU615Pf0M8QLxHI9EhcRXoI448P1ydiIeXA3KO4mlVc
-         n0XOhVpBu6Cok9SIlC9cbRKxP34bTXestqqF8gxdm0wl+Hs4si1xOLM86vQ2JCjnt5do
-         rx/sPucmwfUrIGlIJcG56x9m4I277v4tkSBU+VpLU/novL8qAGU0cQP9uXrAxkgSF/3m
-         phwME+KJA1pRQRRDaYo5DHpCBY0LySYsvWU5iZhEB0D6l9NO1qxBydzPNnp7GEOqCF3H
-         /II6YK2qIUYrYnpkvLsq9cDy0kwkKUixAZ5nAdl/ZlbjVrDtTOhUdgPzQ96JM9rr/1ad
-         Y77w==
-X-Gm-Message-State: AOAM532VEGNq10e6uBeATxZIuvzJi51hawkg+B8medDLJFUe6aen14rU
-        IbLG1oGtLrjPeGzutzLWYUnB3uDs6tgnMsz9uO9L6Q==
-X-Google-Smtp-Source: ABdhPJw/ed/k3szBOcbgIdWuEuWUOI0l73380mKIEyvkSM5Ss98uwAt20BkDyxKI+R91EfBgAlkyP7K9rTIukTZYaWY=
-X-Received: by 2002:a17:906:1496:: with SMTP id x22mr2463605ejc.419.1621480998180;
- Wed, 19 May 2021 20:23:18 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=tii1ipOGEVbhLtvBNdSeLpUxpszfgWDVoSk6oNEkxH0=;
+        b=E1eNUCFr9/btdK/KuoV4Q3eK2yie2rSRohr96FohgWPRvu9Si1ZI/tfjvLqvF8fjUP
+         VRytTxaPvLq41COP9OCczMnET5ROW4AaDP5X3aEoadAkPi0Ni9PvQT2TWBD9f7c4CT/N
+         ej67wmn2uwaHqfV7R3NRVhxXxAIjsejG6jx6nYNlqPLJu2k/nEuy8fpYuvDjfDTBDxFN
+         lpXUwBbdzSx4kGqxaUxzdzjA7XGW40wFiocThp04oWVWY3arYHSGD4YgxoUOTanjZSz8
+         6t+zHLZTlNE3lMHLKW+O8LccpTsTtzHQs35Pnhcw3AT7SmOj5N0fIOBkpEjCJAVCKLxt
+         Qajg==
+X-Gm-Message-State: AOAM531zYFuqUVblKYSqXKK4Pr4s+6sdKUASu2J4f57q+1GfHzLqDKbC
+        wBOFJuo4F6BmnCRzD9AfLsYujZdOSY0=
+X-Google-Smtp-Source: ABdhPJyk4TGhuOapPwxPeWScyBueVd+HqS8Fq0hVT9v0NFFcKNd4jwtrPJRJ+7rJcXGRl8Eb/sC0cw==
+X-Received: by 2002:ac8:c86:: with SMTP id n6mr3104978qti.100.1621482847893;
+        Wed, 19 May 2021 20:54:07 -0700 (PDT)
+Received: from [172.17.0.2] ([52.254.12.179])
+        by smtp.gmail.com with ESMTPSA id w7sm1052154qtn.91.2021.05.19.20.54.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 19 May 2021 20:54:07 -0700 (PDT)
+Message-ID: <60a5dd5f.1c69fb81.503d0.7d3c@mx.google.com>
+Date:   Wed, 19 May 2021 20:54:07 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2818650200191761160=="
 MIME-Version: 1.0
-References: <20210519102745.v1.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
- <73ED48AE-974A-476C-83AD-E6D09CDCBFC9@holtmann.org>
-In-Reply-To: <73ED48AE-974A-476C-83AD-E6D09CDCBFC9@holtmann.org>
-From:   Yun-hao Chung <howardchung@google.com>
-Date:   Thu, 20 May 2021 11:23:07 +0800
-Message-ID: <CAPHZWUe0nqia2oHuxe6QQ_=Rt1LAx6rAQAP9QYdaNxSHG2Bu=A@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: disable filter dup when scan for adv monitor
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, eh5@sokka.cn
+Subject: RE: [BlueZ] avrcp: Fix unregister AVRCP player
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210520031334.304688-1-eh5@sokka.cn>
+References: <20210520031334.304688-1-eh5@sokka.cn>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
-Thanks for the comments.
+--===============2818650200191761160==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Thu, May 20, 2021 at 4:47 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Howard,
->
-> > Disable duplicates filter when scanning for advertisement monitor for
-> > the following reasons. The scanning includes active scan and passive
-> > scan.
-> >
-> > For HW pattern filtering (ex. MSFT), some controllers ignore
-> > RSSI_Sampling_Period when the duplicates filter is enabled.
-> >
-> > For SW pattern filtering, when we're not doing interleaved scanning, it
-> > is necessary to disable duplicates filter, otherwise hosts can only
-> > receive one advertisement and it's impossible to know if a peer is stil=
-l
-> > in range.
->
-> can we be a bit more specific on which controller does what. I am not inc=
-lined to always disable duplicate filtering unless your controller doesn=E2=
-=80=99t do what you want it to do.
+This is automated email and please do not reply to this email!
 
-Will update the commit message and submit again.
+Dear submitter,
 
->
-> I also disagree with the last statement. If the device moved out of range=
- (or comes back for that matter) you should get a HCI_VS_MSFT_LE_Monitor_De=
-vice_Event event that tells you if a device is in range or not.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=485435
 
-The last statement is about software filtering, which is used when
-MSFT is not supported. Software filtering in the kernel is basically
-doing an LE passive scan. When the duplicate filter is enabled, some
-controllers consider packets with the same address but different RSSIs
-as duplicate thus not reporting to the host, which makes userspace not
-able to tell if a peer is in range or not.
->
-> Device leaving:
->
-> > HCI Event: LE Meta Event (0x3e) plen 43
->       LE Advertising Report (0x02)
->         Num reports: 1
->         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
->         Address type: Random (0x01)
->         Address: 01:9A:1F:C0:30:15 (Non-Resolvable)
->         Data length: 31
->         Flags: 0x1a
->           LE General Discoverable Mode
->           Simultaneous LE and BR/EDR (Controller)
->           Simultaneous LE and BR/EDR (Host)
->         16-bit Service UUIDs (complete): 1 entry
->           Apple, Inc. (0xfd6f)
->         Service Data (UUID 0xfd6f): f47698ff9243617d917ac521b5fcfd436afdb=
-285
->         RSSI: -86 dBm (0xaa)
-> > HCI Event: Vendor (0xff) plen 18
->         23 79 54 33 77 88 97 68 02 01 15 30 c0 1f 9a 01  #yT3w..h...0....
->         00 00                                            ..
->
-> Device coming back:
->
-> > HCI Event: Vendor (0xff) plen 18
->         23 79 54 33 77 88 97 68 02 01 95 b9 0b 32 22 2a  #yT3w..h.....2"*
->         00 01                                            ..
-> > HCI Event: LE Meta Event (0x3e) plen 43
->       LE Advertising Report (0x02)
->         Num reports: 1
->         Event type: Non connectable undirected - ADV_NONCONN_IND (0x03)
->         Address type: Random (0x01)
->         Address: 2A:22:32:0B:B9:95 (Non-Resolvable)
->         Data length: 31
->         Flags: 0x1a
->           LE General Discoverable Mode
->           Simultaneous LE and BR/EDR (Controller)
->           Simultaneous LE and BR/EDR (Host)
->         16-bit Service UUIDs (complete): 1 entry
->           Apple, Inc. (0xfd6f)
->         Service Data (UUID 0xfd6f): 0b861791a0fb7adcf8b45f951f7d4b7c7fc8e=
-3fd
->         RSSI: -27 dBm (0xe5)
->
-> Regards
->
-> Marcel
->
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.32 seconds
+GitLint                       PASS      0.11 seconds
+Prep - Setup ELL              PASS      40.94 seconds
+Build - Prep                  PASS      0.11 seconds
+Build - Configure             PASS      7.27 seconds
+Build - Make                  PASS      176.69 seconds
+Make Check                    PASS      9.45 seconds
+Make Distcheck                PASS      210.25 seconds
+Build w/ext ELL - Configure   PASS      7.30 seconds
+Build w/ext ELL - Make        PASS      166.44 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+avrcp: Fix unregister AVRCP player
+WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+#9: 
+    player->changed_id = g_idle_add(notify_addressed_player_changed, player);
+
+WARNING:LONG_LINE: line length of 87 exceeds 80 columns
+#38: FILE: profiles/audio/avrcp.c:796:
++	if (id != AVRCP_EVENT_ADDRESSED_PLAYER_CHANGED && player->addressed_changing) {
+
+- total: 0 errors, 2 warnings, 30 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] avrcp: Fix unregister AVRCP player" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2818650200191761160==--
