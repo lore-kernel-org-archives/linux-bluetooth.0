@@ -2,211 +2,651 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF94C43460
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 16:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C47EC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 16:42:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 540CA61163
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 16:03:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 38B7061019
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 20 May 2021 16:42:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231601AbhETQEW (ORCPT
+        id S234389AbhETQnj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 20 May 2021 12:04:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48910 "EHLO
+        Thu, 20 May 2021 12:43:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57886 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233567AbhETQDs (ORCPT
+        with ESMTP id S234282AbhETQni (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 20 May 2021 12:03:48 -0400
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3080C061763
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 May 2021 09:02:24 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id e11so20358854ljn.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 20 May 2021 09:02:24 -0700 (PDT)
+        Thu, 20 May 2021 12:43:38 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC12C06175F
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 May 2021 09:42:17 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id s20so9407277plr.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 20 May 2021 09:42:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=jDrgqcc3k7nepG1SkpwVsguwmrI+16TCzS7szWNRwyI=;
-        b=Rrj3D5YUkkGbPMibj9/9rE1x6uQ47qTK7WTL5scybaU0hAZPAwaJaNhk259OCTkiCH
-         x/KSZI5jBjMJJmL0ji1qNkYgALh+dXMAUAV7pJEcQ8Y58dXQKEkK7pbRWTCLyEgjFCHs
-         zCNdF1wPhwDs+PRN5hJQzIK+dGGKw9RfLWpXQN3qpVq+muifr5MwsbzvW+Sjs6sOFbYy
-         2DVuAQ2w/U/pEN3TddcBcl9AqJmvIZzuPzoiYLU5sbGuFa5se7bHNmRcABYjMWE2VLdl
-         0bKhb2QxmFwo0XNDNIieS+Dtm5FIWbZghnX486m+VyWxL1/+RGEIxng85upaJw5oj60a
-         FTJA==
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=ITIaTPgZ96ZqF9av4Nattk6ZvI4mHAMDllt4A8CB3/g=;
+        b=nVfnVWECrLxOCfD6Zv3Ply7W2/ea3Mr5grYSkFN2Qdq7aTK0IxvZyIJxMEzmfT4jA9
+         7DDQobWfI5TBIQL2/H9yzK8hP0Ti7fX6ce+kWzV3kkIF4d6GVZujnjb30bQzNn3Dqxqc
+         ZMQBSC3hzgnouMf/NutsYlVbXTv9mUj1LYWHyvY9/hY4DEShLNglt8cYxe6gOrNuCgfn
+         mMuX472180v4xUwCveS87WRjKCZJtRZSToDYvSn9Fk/1jCJqRBpRF2gAsi5cyv8Dcr+R
+         J/IpT5lGh757Lybag1pYF6/fJP1L1AGVvDcZTlnrKEIBz0WoWBKeL4kpuCVpIYz+CxfT
+         vXCQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=jDrgqcc3k7nepG1SkpwVsguwmrI+16TCzS7szWNRwyI=;
-        b=KxPGj/IHix5Uy+PdMtFRD7746yIDlYdOoxDAdO1WhmMqlzAVRKQ5eALzlaUtyG9h++
-         0udhAYTaLECaPj587LP+zGQyJiH54Ripeapz14wIsO6mJTPnnjdMjFcwtTZCLOljmmX2
-         eVw9U4rOtJ0UBj6eHOUZpxz9QI/Ii3SWxQNZS6lUZYXoAB7v0/dPSAhHPPEltGjp4J0z
-         HTJ+WWjL+uUIjP0DoTeM957cCChoo9xenDZ7n6HVU6/ELmbIoTk3hBtZErNQZzTAfGpk
-         Pb/W9JgQ5wUS4Tnb+btJ1+mTJppD7l/ZiYni9JIUFpT1658ArYe4x8McZXDFDNb1im76
-         R2bA==
-X-Gm-Message-State: AOAM530idIW2pOuUkkiVruFDuyehYCHn312cvNsf0FO7Yw1donEEeww2
-        u4pyPEx+cr9g6S32rGsvnQOlcbdqRjbQlPFnwt2LVA==
-X-Google-Smtp-Source: ABdhPJxLawValRrk4pcVqZuVlbRnn1ovqu8k+VbbKQZdR4STNbqcDAWfWoOdSQRUXfcCpXDAoa5v7YQOobHUSvKFTkA=
-X-Received: by 2002:a2e:3305:: with SMTP id d5mr3677101ljc.102.1621526541760;
- Thu, 20 May 2021 09:02:21 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=ITIaTPgZ96ZqF9av4Nattk6ZvI4mHAMDllt4A8CB3/g=;
+        b=RD9+gf+JkUiJxPziqo8E1WM2Gk8SxshOWJ5oPYCUHnx1PRJEQYdOn67ZUIeFISQveC
+         omudUHVeyd6IDsDgTN8J+c6/3nWUnZPlh7h6jFFpt+cDPtEXgY1gmoi3dBrzvPUmE/mA
+         BU8ZCXKDVEVPYmEdcYBLe3+8Vnq/hh7OetryDUwITJJ6jTdvMf0pcZbPVsB1r70c/HOa
+         lw2sxQ2e9+uEI//MthSGaB7lz5IIn0gBf6AJRPJFSN4UjxMBB7IkD1kd6sqpm9Uze9x7
+         AH5tQPuHTxrs4bQM5eUV0CYpRAKB4vnR8Vh2bTPACUojlulh0ApOh5zNaIdRNgqsj73Z
+         wZ6A==
+X-Gm-Message-State: AOAM532I2M/1GMKF3EaM/y0ikqOpYZnzTi1SOg1Ei1vTUm58NIKl4JJ3
+        VXvsK23zUqi/SblIkZMsYQbCCNhB5qk=
+X-Google-Smtp-Source: ABdhPJyK0KCfYYxgzeVBJgrKxTegy09isgvowa+y9RyYQDv6YeE1or74sWRgeap8Vdg4ij6KKXUobg==
+X-Received: by 2002:a17:902:aa02:b029:f0:cc19:faae with SMTP id be2-20020a170902aa02b02900f0cc19faaemr6844690plb.57.1621528936261;
+        Thu, 20 May 2021 09:42:16 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id z5sm2254834pfa.172.2021.05.20.09.42.15
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 20 May 2021 09:42:15 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: hci_sync: Make use of hci_cmd_sync_queue
+Date:   Thu, 20 May 2021 09:42:13 -0700
+Message-Id: <20210520164213.1381518-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210520164213.1381518-1-luiz.dentz@gmail.com>
+References: <20210520164213.1381518-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-References: <20210513165327.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
- <7867EC1F-324A-4739-B5F7-DDEB3994EA7A@holtmann.org> <CAJQfnxE4PY09GpxGYLKy2kXnaCQaUmCakhCKnhqGnoK+9aSyyg@mail.gmail.com>
- <DAE03499-573B-4A72-A2A9-2E139B78AB2E@holtmann.org> <CAJQfnxHg50mKGVpQoH-dobphAzpFwyc2gQMzVkLZeNUW0Yyh3Q@mail.gmail.com>
- <CAJQfnxG1ba=imd_BiOXpuT8WF8HeWPcs5y4kdKx+fV6LEL9SyA@mail.gmail.com> <3DB375AF-3BC3-43F3-A1F5-1E3CBF17318D@holtmann.org>
-In-Reply-To: <3DB375AF-3BC3-43F3-A1F5-1E3CBF17318D@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 21 May 2021 00:02:09 +0800
-Message-ID: <CAJQfnxE+qiPor8xUd8zuJH45LmbrHb8YwcvjrnhkG0LovP1vyw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_h5: Add RTL8822CS capabilities
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, 20 May 2021 at 23:18, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Archie,
->
-> >>>>>> RTL8822 chipset supports WBS, and this information is conveyed in
-> >>>>>> btusb.c. However, the UART driver doesn't have this information ju=
-st
-> >>>>>> yet.
-> >>>>>>
-> >>>>>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> >>>>>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> >>>>>> ---
-> >>>>>>
-> >>>>>> drivers/bluetooth/btrtl.c  | 26 ++++++++++++++++----------
-> >>>>>> drivers/bluetooth/btrtl.h  |  2 ++
-> >>>>>> drivers/bluetooth/hci_h5.c |  5 +----
-> >>>>>> 3 files changed, 19 insertions(+), 14 deletions(-)
-> >>>>>>
-> >>>>>> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-> >>>>>> index e7fe5fb22753..988a09860c6b 100644
-> >>>>>> --- a/drivers/bluetooth/btrtl.c
-> >>>>>> +++ b/drivers/bluetooth/btrtl.c
-> >>>>>> @@ -719,17 +719,8 @@ int btrtl_download_firmware(struct hci_dev *h=
-dev,
-> >>>>>> }
-> >>>>>> EXPORT_SYMBOL_GPL(btrtl_download_firmware);
-> >>>>>>
-> >>>>>> -int btrtl_setup_realtek(struct hci_dev *hdev)
-> >>>>>> +void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_i=
-nfo *btrtl_dev)
-> >>>>>> {
-> >>>>>> -     struct btrtl_device_info *btrtl_dev;
-> >>>>>> -     int ret;
-> >>>>>> -
-> >>>>>> -     btrtl_dev =3D btrtl_initialize(hdev, NULL);
-> >>>>>> -     if (IS_ERR(btrtl_dev))
-> >>>>>> -             return PTR_ERR(btrtl_dev);
-> >>>>>> -
-> >>>>>> -     ret =3D btrtl_download_firmware(hdev, btrtl_dev);
-> >>>>>> -
-> >>>>>>     /* Enable controller to do both LE scan and BR/EDR inquiry
-> >>>>>>      * simultaneously.
-> >>>>>>      */
-> >>>>>> @@ -750,6 +741,21 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
-> >>>>>>             rtl_dev_dbg(hdev, "WBS supported not enabled.");
-> >>>>>>             break;
-> >>>>>>     }
-> >>>>>> +}
-> >>>>>> +EXPORT_SYMBOL_GPL(btrtl_set_quirks);
-> >>>>>> +
-> >>>>>> +int btrtl_setup_realtek(struct hci_dev *hdev)
-> >>>>>> +{
-> >>>>>> +     struct btrtl_device_info *btrtl_dev;
-> >>>>>> +     int ret;
-> >>>>>> +
-> >>>>>> +     btrtl_dev =3D btrtl_initialize(hdev, NULL);
-> >>>>>> +     if (IS_ERR(btrtl_dev))
-> >>>>>> +             return PTR_ERR(btrtl_dev);
-> >>>>>> +
-> >>>>>> +     ret =3D btrtl_download_firmware(hdev, btrtl_dev);
-> >>>>>> +
-> >>>>>> +     btrtl_set_quirks(hdev, btrtl_dev);
-> >>>>>>
-> >>>>>>     btrtl_free(btrtl_dev);
-> >>>>>>     return ret;
-> >>>>>> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
-> >>>>>> index 2a582682136d..260167f01b08 100644
-> >>>>>> --- a/drivers/bluetooth/btrtl.h
-> >>>>>> +++ b/drivers/bluetooth/btrtl.h
-> >>>>>> @@ -54,6 +54,8 @@ struct btrtl_device_info *btrtl_initialize(struc=
-t hci_dev *hdev,
-> >>>>>> void btrtl_free(struct btrtl_device_info *btrtl_dev);
-> >>>>>> int btrtl_download_firmware(struct hci_dev *hdev,
-> >>>>>>                         struct btrtl_device_info *btrtl_dev);
-> >>>>>> +void btrtl_set_quirks(struct hci_dev *hdev,
-> >>>>>> +                   struct btrtl_device_info *btrtl_dev);
-> >>>>>> int btrtl_setup_realtek(struct hci_dev *hdev);
-> >>>>>> int btrtl_shutdown_realtek(struct hci_dev *hdev);
-> >>>>>> int btrtl_get_uart_settings(struct hci_dev *hdev,
-> >>>>>> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5=
-.c
-> >>>>>> index 27e96681d583..e0520639f4ba 100644
-> >>>>>> --- a/drivers/bluetooth/hci_h5.c
-> >>>>>> +++ b/drivers/bluetooth/hci_h5.c
-> >>>>>> @@ -906,10 +906,7 @@ static int h5_btrtl_setup(struct h5 *h5)
-> >>>>>>     /* Give the device some time before the hci-core sends it a re=
-set */
-> >>>>>>     usleep_range(10000, 20000);
-> >>>>>>
-> >>>>>> -     /* Enable controller to do both LE scan and BR/EDR inquiry
-> >>>>>> -      * simultaneously.
-> >>>>>> -      */
-> >>>>>> -     set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->qui=
-rks);
-> >>>>>> +     btrtl_set_quirks(h5->hu->hdev, btrtl_dev);
-> >>>>>
-> >>>>> any reason why not just setting WBS quirk here?
-> >>>>
-> >>>> Hmm, I think WBS is the feature of the chipset and not the transport=
-.
-> >>>> Therefore isn't it better to just have it set in one place?
-> >>>> Setting the quirks here means we need to copy paste the settings fro=
-m btrtl.c.
-> >>>
-> >>> but since you are already setting HCI_QUIRK_SIMULTANEOUS_DISCOVERY ri=
-ght now, I don=E2=80=99t see the difference.
-> >>
-> >> Sorry, I don't get what you mean.
-> >> With this patch I also moved HCI_QUIRK_SIMULTANEOUS_DISCOVERY into
-> >> btrtl.c, so it's together with the WBS quirk.
-> >>
-> >>> Can we actually verify that we still need the WBS quirk. I think we f=
-ixed the broken errerrnous packet flag handling.
-> >>
-> >> To be honest, I am not aware about the story of the broken erroneous
-> >> packet flag.
-> >> Last time I checked I still needed the quirk to have RTL8822 on UART
-> >> properly run WBS, but that was months ago...
-> >> Let me verify whether this quirk is still needed.
-> >
-> > It looks like we still need the WBS quirk because otherwise the host
-> > wouldn't know whether the controller supports WBS or not. It's used in
-> > get_supported_settings() in mgmt.c.
->
-> and why not set it unconditionally for all Realtek chips?
+This make use of hci_cmd_sync_queue for the following MGMT commands:
 
-Not all Realtek chips supports WBS, therefore
-HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED is only set on some of them.
+Set Device Class
+Set Device ID
+Add UUID
+Remove UUID
 
-Thanks
-Archie
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   2 +
+ net/bluetooth/Makefile           |   2 +-
+ net/bluetooth/hci_request.c      |  18 +++
+ net/bluetooth/hci_sync.c         | 241 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_sync.h         |   9 ++
+ net/bluetooth/mgmt.c             | 123 ++++++++--------
+ 6 files changed, 328 insertions(+), 67 deletions(-)
+ create mode 100644 net/bluetooth/hci_sync.c
+ create mode 100644 net/bluetooth/hci_sync.h
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index aecbdf99c216..2494c547a622 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1699,6 +1699,8 @@ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			       const void *param, u32 timeout);
+ struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 				  const void *param, u8 event, u32 timeout);
++int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
++			  const void *param, u32 timeout);
+ int __hci_cmd_send(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		   const void *param);
+ 
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index cc0995301f93..ab46b2b4f3cb 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+-	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o
++	ecdh_helper.o hci_request.o hci_sync.o mgmt_util.o mgmt_config.o
+ 
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
+ bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index fa9125b782f8..f390ac33ced9 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -189,6 +189,24 @@ struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync);
+ 
++int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
++			  const void *param, u32 timeout)
++{
++	struct sk_buff *skb;
++	uint8_t status;
++
++	skb = __hci_cmd_sync(hdev, opcode, plen, param, timeout);
++	if (IS_ERR(skb))
++		return PTR_ERR(skb);
++
++	status = skb->data[0];
++
++	kfree_skb(skb);
++
++	return status;
++}
++EXPORT_SYMBOL(__hci_cmd_sync_status);
++
+ /* Execute request and wait for completion. */
+ int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
+ 						     unsigned long opt),
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+new file mode 100644
+index 000000000000..5b73fcf09c18
+--- /dev/null
++++ b/net/bluetooth/hci_sync.c
+@@ -0,0 +1,241 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * BlueZ - Bluetooth protocol stack for Linux
++ *
++ * Copyright (C) 2021 Intel Corporation
++ */
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++
++#include "hci_request.h"
++#include "hci_sync.h"
++
++#define PNP_INFO_SVCLASS_ID		0x1200
++
++static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++{
++	u8 *ptr = data, *uuids_start = NULL;
++	struct bt_uuid *uuid;
++
++	if (len < 4)
++		return ptr;
++
++	list_for_each_entry(uuid, &hdev->uuids, list) {
++		u16 uuid16;
++
++		if (uuid->size != 16)
++			continue;
++
++		uuid16 = get_unaligned_le16(&uuid->uuid[12]);
++		if (uuid16 < 0x1100)
++			continue;
++
++		if (uuid16 == PNP_INFO_SVCLASS_ID)
++			continue;
++
++		if (!uuids_start) {
++			uuids_start = ptr;
++			uuids_start[0] = 1;
++			uuids_start[1] = EIR_UUID16_ALL;
++			ptr += 2;
++		}
++
++		/* Stop if not enough space to put next UUID */
++		if ((ptr - data) + sizeof(u16) > len) {
++			uuids_start[1] = EIR_UUID16_SOME;
++			break;
++		}
++
++		*ptr++ = (uuid16 & 0x00ff);
++		*ptr++ = (uuid16 & 0xff00) >> 8;
++		uuids_start[0] += sizeof(uuid16);
++	}
++
++	return ptr;
++}
++
++static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++{
++	u8 *ptr = data, *uuids_start = NULL;
++	struct bt_uuid *uuid;
++
++	if (len < 6)
++		return ptr;
++
++	list_for_each_entry(uuid, &hdev->uuids, list) {
++		if (uuid->size != 32)
++			continue;
++
++		if (!uuids_start) {
++			uuids_start = ptr;
++			uuids_start[0] = 1;
++			uuids_start[1] = EIR_UUID32_ALL;
++			ptr += 2;
++		}
++
++		/* Stop if not enough space to put next UUID */
++		if ((ptr - data) + sizeof(u32) > len) {
++			uuids_start[1] = EIR_UUID32_SOME;
++			break;
++		}
++
++		memcpy(ptr, &uuid->uuid[12], sizeof(u32));
++		ptr += sizeof(u32);
++		uuids_start[0] += sizeof(u32);
++	}
++
++	return ptr;
++}
++
++static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++{
++	u8 *ptr = data, *uuids_start = NULL;
++	struct bt_uuid *uuid;
++
++	if (len < 18)
++		return ptr;
++
++	list_for_each_entry(uuid, &hdev->uuids, list) {
++		if (uuid->size != 128)
++			continue;
++
++		if (!uuids_start) {
++			uuids_start = ptr;
++			uuids_start[0] = 1;
++			uuids_start[1] = EIR_UUID128_ALL;
++			ptr += 2;
++		}
++
++		/* Stop if not enough space to put next UUID */
++		if ((ptr - data) + 16 > len) {
++			uuids_start[1] = EIR_UUID128_SOME;
++			break;
++		}
++
++		memcpy(ptr, uuid->uuid, 16);
++		ptr += 16;
++		uuids_start[0] += 16;
++	}
++
++	return ptr;
++}
++
++static void create_eir(struct hci_dev *hdev, u8 *data)
++{
++	u8 *ptr = data;
++	size_t name_len;
++
++	name_len = strlen(hdev->dev_name);
++
++	if (name_len > 0) {
++		/* EIR Data type */
++		if (name_len > 48) {
++			name_len = 48;
++			ptr[1] = EIR_NAME_SHORT;
++		} else
++			ptr[1] = EIR_NAME_COMPLETE;
++
++		/* EIR Data length */
++		ptr[0] = name_len + 1;
++
++		memcpy(ptr + 2, hdev->dev_name, name_len);
++
++		ptr += (name_len + 2);
++	}
++
++	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID) {
++		ptr[0] = 2;
++		ptr[1] = EIR_TX_POWER;
++		ptr[2] = (u8) hdev->inq_tx_power;
++
++		ptr += 3;
++	}
++
++	if (hdev->devid_source > 0) {
++		ptr[0] = 9;
++		ptr[1] = EIR_DEVICE_ID;
++
++		put_unaligned_le16(hdev->devid_source, ptr + 2);
++		put_unaligned_le16(hdev->devid_vendor, ptr + 4);
++		put_unaligned_le16(hdev->devid_product, ptr + 6);
++		put_unaligned_le16(hdev->devid_version, ptr + 8);
++
++		ptr += 10;
++	}
++
++	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++}
++
++int __hci_update_eir_sync(struct hci_dev *hdev)
++{
++	struct hci_cp_write_eir cp;
++
++	bt_dev_dbg(hdev, "");
++
++	if (!hdev_is_powered(hdev))
++		return 0;
++
++	if (!lmp_ext_inq_capable(hdev))
++		return 0;
++
++	if (!hci_dev_test_flag(hdev, HCI_SSP_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	create_eir(hdev, cp.data);
++
++	if (memcmp(cp.data, hdev->eir, sizeof(cp.data)) == 0)
++		return 0;
++
++	memcpy(hdev->eir, cp.data, sizeof(cp.data));
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp,
++				     HCI_CMD_TIMEOUT);
++}
++
++static u8 get_service_classes(struct hci_dev *hdev)
++{
++	struct bt_uuid *uuid;
++	u8 val = 0;
++
++	list_for_each_entry(uuid, &hdev->uuids, list)
++		val |= uuid->svc_hint;
++
++	return val;
++}
++
++int __hci_update_class_sync(struct hci_dev *hdev)
++{
++	u8 cod[3];
++
++	bt_dev_dbg(hdev, "");
++
++	if (!hdev_is_powered(hdev))
++		return 0;
++
++	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	cod[0] = hdev->minor_class;
++	cod[1] = hdev->major_class;
++	cod[2] = get_service_classes(hdev);
++
++	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
++		cod[1] |= 0x20;
++
++	if (memcmp(cod, hdev->dev_class, 3) == 0)
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_CLASS_OF_DEV,
++				     sizeof(cod), cod, HCI_CMD_TIMEOUT);
++}
+diff --git a/net/bluetooth/hci_sync.h b/net/bluetooth/hci_sync.h
+new file mode 100644
+index 000000000000..735ff4b46e86
+--- /dev/null
++++ b/net/bluetooth/hci_sync.h
+@@ -0,0 +1,9 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++/*
++ * BlueZ - Bluetooth protocol stack for Linux
++ *
++ * Copyright (C) 2021 Intel Corporation
++ */
++
++int __hci_update_eir_sync(struct hci_dev *hdev);
++int __hci_update_class_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b44e19c69c44..96759c166678 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -34,6 +34,7 @@
+ #include <net/bluetooth/mgmt.h>
+ 
+ #include "hci_request.h"
++#include "hci_sync.h"
+ #include "smp.h"
+ #include "mgmt_util.h"
+ #include "mgmt_config.h"
+@@ -950,25 +951,21 @@ bool mgmt_get_connectable(struct hci_dev *hdev)
+ 	return hci_dev_test_flag(hdev, HCI_CONNECTABLE);
+ }
+ 
++static void __service_cache_sync(struct hci_dev *hdev, void *data)
++{
++	__hci_update_eir_sync(hdev);
++	__hci_update_class_sync(hdev);
++}
++
+ static void service_cache_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    service_cache.work);
+-	struct hci_request req;
+ 
+ 	if (!hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE))
+ 		return;
+ 
+-	hci_req_init(&req, hdev);
+-
+-	hci_dev_lock(hdev);
+-
+-	__hci_req_update_eir(&req);
+-	__hci_req_update_class(&req);
+-
+-	hci_dev_unlock(hdev);
+-
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, __service_cache_sync, NULL);
+ }
+ 
+ static void rpa_expired(struct work_struct *work)
+@@ -2093,8 +2090,17 @@ static void mgmt_class_complete(struct hci_dev *hdev, u16 mgmt_op, u8 status)
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static void add_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void __add_uuid_sync(struct hci_dev *hdev, void *data)
+ {
++	uint8_t status;
++
++	status = __hci_update_class_sync(hdev);
++	if (status)
++		goto done;
++
++	status = __hci_update_eir_sync(hdev);
++
++done:
+ 	bt_dev_dbg(hdev, "status 0x%02x", status);
+ 
+ 	mgmt_class_complete(hdev, MGMT_OP_ADD_UUID, status);
+@@ -2104,7 +2110,6 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_uuid *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	struct bt_uuid *uuid;
+ 	int err;
+ 
+@@ -2130,20 +2135,9 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	list_add_tail(&uuid->list, &hdev->uuids);
+ 
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, add_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto failed;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_UUID, 0,
+-					hdev->dev_class, 3);
++	err = hci_cmd_sync_queue(hdev, __add_uuid_sync, NULL);
++	if (err < 0)
+ 		goto failed;
+-	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_UUID, hdev, data, len);
+ 	if (!cmd) {
+@@ -2172,8 +2166,17 @@ static bool enable_service_cache(struct hci_dev *hdev)
+ 	return false;
+ }
+ 
+-static void remove_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void __remove_uuid_sync(struct hci_dev *hdev, void *data)
+ {
++	uint8_t status;
++
++	status = __hci_update_class_sync(hdev);
++	if (status)
++		goto done;
++
++	status = __hci_update_eir_sync(hdev);
++
++done:
+ 	bt_dev_dbg(hdev, "status 0x%02x", status);
+ 
+ 	mgmt_class_complete(hdev, MGMT_OP_REMOVE_UUID, status);
+@@ -2186,7 +2189,6 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_pending_cmd *cmd;
+ 	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+-	struct hci_request req;
+ 	int err, found;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2230,20 +2232,9 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ update_class:
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, remove_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_UUID, 0,
+-					hdev->dev_class, 3);
++	err = hci_cmd_sync_queue(hdev, __remove_uuid_sync, NULL);
++	if (err < 0)
+ 		goto unlock;
+-	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
+ 	if (!cmd) {
+@@ -2258,8 +2249,24 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
+-static void set_class_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void __set_class_sync(struct hci_dev *hdev, void *data)
+ {
++	uint8_t status = 0;
++
++	hci_dev_lock(hdev);
++
++	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
++		hci_dev_unlock(hdev);
++		cancel_delayed_work_sync(&hdev->service_cache);
++		hci_dev_lock(hdev);
++		status = __hci_update_eir_sync(hdev);
++	}
++
++	hci_dev_unlock(hdev);
++
++	if (!status)
++		status = __hci_update_class_sync(hdev);
++
+ 	bt_dev_dbg(hdev, "status 0x%02x", status);
+ 
+ 	mgmt_class_complete(hdev, MGMT_OP_SET_DEV_CLASS, status);
+@@ -2270,7 +2277,6 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_set_dev_class *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2302,26 +2308,9 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
+-
+-	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
+-		hci_dev_unlock(hdev);
+-		cancel_delayed_work_sync(&hdev->service_cache);
+-		hci_dev_lock(hdev);
+-		__hci_req_update_eir(&req);
+-	}
+-
+-	__hci_req_update_class(&req);
+-
+-	err = hci_req_run(&req, set_class_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEV_CLASS, 0,
+-					hdev->dev_class, 3);
++	err = hci_cmd_sync_queue(hdev, __set_class_sync, NULL);
++	if (err < 0)
+ 		goto unlock;
+-	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
+ 	if (!cmd) {
+@@ -5263,11 +5252,15 @@ static int unblock_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static void __set_device_id_sync(struct hci_dev *hdev, void *data)
++{
++	__hci_update_eir_sync(hdev);
++}
++
+ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_device_id *cp = data;
+-	struct hci_request req;
+ 	int err;
+ 	__u16 source;
+ 
+@@ -5289,9 +5282,7 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_ID, 0,
+ 				NULL, 0);
+ 
+-	hci_req_init(&req, hdev);
+-	__hci_req_update_eir(&req);
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, __set_device_id_sync, NULL);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+-- 
+2.31.1
+
