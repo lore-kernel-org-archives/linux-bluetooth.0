@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 269A9C43460
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:02:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FFAC433ED
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05621613B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:02:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5EC3A613BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231475AbhEUGEU (ORCPT
+        id S231373AbhEUGEW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 May 2021 02:04:20 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4709 "EHLO
+        Fri, 21 May 2021 02:04:22 -0400
+Received: from szxga04-in.huawei.com ([45.249.212.190]:4710 "EHLO
         szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231451AbhEUGET (ORCPT
+        with ESMTP id S231452AbhEUGET (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 21 May 2021 02:04:19 -0400
-Received: from dggems705-chm.china.huawei.com (unknown [172.30.72.58])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FmbYJ19CNz16QgH;
-        Fri, 21 May 2021 14:00:04 +0800 (CST)
+Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
+        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FmbYH4Bcrz16Qfy;
+        Fri, 21 May 2021 14:00:03 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems705-chm.china.huawei.com (10.3.19.182) with Microsoft SMTP Server
+ dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
  15.1.2176.2; Fri, 21 May 2021 14:02:51 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
  (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 21 May
- 2021 14:02:51 +0800
+ 2021 14:02:50 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
         <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
         <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 CC:     <linux-kernel@vger.kernel.org>, <yekai13@huawei.com>
-Subject: [PATCH v2 06/12] net/Bluetooth/a2mp - use the correct print format
-Date:   Fri, 21 May 2021 13:59:42 +0800
-Message-ID: <1621576788-48092-7-git-send-email-yekai13@huawei.com>
+Subject: [PATCH v2 03/12] net/Bluetooth/hidp - use the correct print format
+Date:   Fri, 21 May 2021 13:59:39 +0800
+Message-ID: <1621576788-48092-4-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
 References: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
@@ -59,121 +59,40 @@ instead of %d. Otherwise printk() might end up displaying negative numbers.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- net/bluetooth/a2mp.c | 24 ++++++++++++------------
- 1 file changed, 12 insertions(+), 12 deletions(-)
+ net/bluetooth/hidp/core.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/a2mp.c b/net/bluetooth/a2mp.c
-index 463bad5..1fcc482 100644
---- a/net/bluetooth/a2mp.c
-+++ b/net/bluetooth/a2mp.c
-@@ -120,7 +120,7 @@ static int a2mp_command_rej(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*rej))
- 		return -EINVAL;
- 
--	BT_DBG("ident %d reason %d", hdr->ident, le16_to_cpu(rej->reason));
-+	BT_DBG("ident %u reason %d", hdr->ident, le16_to_cpu(rej->reason));
- 
- 	skb_pull(skb, sizeof(*rej));
- 
-@@ -219,7 +219,7 @@ static int a2mp_discover_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	cl = (void *) skb->data;
- 	while (len >= sizeof(*cl)) {
--		BT_DBG("Remote AMP id %d type %d status %d", cl->id, cl->type,
-+		BT_DBG("Remote AMP id %u type %u status %u", cl->id, cl->type,
- 		       cl->status);
- 
- 		if (cl->id != AMP_ID_BREDR && cl->type != AMP_TYPE_BREDR) {
-@@ -273,7 +273,7 @@ static int a2mp_change_notify(struct amp_mgr *mgr, struct sk_buff *skb,
- 	struct a2mp_cl *cl = (void *) skb->data;
- 
- 	while (skb->len >= sizeof(*cl)) {
--		BT_DBG("Controller id %d type %d status %d", cl->id, cl->type,
-+		BT_DBG("Controller id %u type %u status %u", cl->id, cl->type,
- 		       cl->status);
- 		cl = skb_pull(skb, sizeof(*cl));
- 	}
-@@ -302,7 +302,7 @@ static int a2mp_getinfo_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
- 
--	BT_DBG("id %d", req->id);
-+	BT_DBG("id %u", req->id);
- 
- 	hdev = hci_dev_get(req->id);
- 	if (!hdev || hdev->dev_type != HCI_AMP) {
-@@ -344,7 +344,7 @@ static int a2mp_getinfo_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*rsp))
- 		return -EINVAL;
- 
--	BT_DBG("id %d status 0x%2.2x", rsp->id, rsp->status);
-+	BT_DBG("id %u status 0x%2.2x", rsp->id, rsp->status);
- 
- 	if (rsp->status)
- 		return -EINVAL;
-@@ -373,7 +373,7 @@ static int a2mp_getampassoc_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
- 
--	BT_DBG("id %d", req->id);
-+	BT_DBG("id %u", req->id);
- 
- 	/* Make sure that other request is not processed */
- 	tmp = amp_mgr_lookup_by_state(READ_LOC_AMP_ASSOC);
-@@ -423,7 +423,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 
- 	assoc_len = len - sizeof(*rsp);
- 
--	BT_DBG("id %d status 0x%2.2x assoc len %zu", rsp->id, rsp->status,
-+	BT_DBG("id %u status 0x%2.2x assoc len %zu", rsp->id, rsp->status,
- 	       assoc_len);
- 
- 	if (rsp->status)
-@@ -457,7 +457,7 @@ static int a2mp_getampassoc_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (!hcon)
- 		goto done;
- 
--	BT_DBG("Created hcon %p: loc:%d -> rem:%d", hcon, hdev->id, rsp->id);
-+	BT_DBG("Created hcon %p: loc:%u -> rem:%u", hcon, hdev->id, rsp->id);
- 
- 	mgr->bredr_chan->remote_amp_id = rsp->id;
- 
-@@ -481,7 +481,7 @@ static int a2mp_createphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
- 
--	BT_DBG("local_id %d, remote_id %d", req->local_id, req->remote_id);
-+	BT_DBG("local_id %u, remote_id %u", req->local_id, req->remote_id);
- 
- 	memset(&rsp, 0, sizeof(rsp));
- 
-@@ -562,7 +562,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- 	if (le16_to_cpu(hdr->len) < sizeof(*req))
- 		return -EINVAL;
- 
--	BT_DBG("local_id %d remote_id %d", req->local_id, req->remote_id);
-+	BT_DBG("local_id %u remote_id %u", req->local_id, req->remote_id);
- 
- 	memset(&rsp, 0, sizeof(rsp));
- 
-@@ -599,7 +599,7 @@ static int a2mp_discphyslink_req(struct amp_mgr *mgr, struct sk_buff *skb,
- static inline int a2mp_cmd_rsp(struct amp_mgr *mgr, struct sk_buff *skb,
- 			       struct a2mp_cmd *hdr)
+diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
+index 0db48c8..1dc8dee 100644
+--- a/net/bluetooth/hidp/core.c
++++ b/net/bluetooth/hidp/core.c
+@@ -508,7 +508,7 @@ static int hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
+ 				unsigned char param)
  {
--	BT_DBG("ident %d code 0x%2.2x", hdr->ident, hdr->code);
-+	BT_DBG("ident %u code 0x%2.2x", hdr->ident, hdr->code);
+ 	int done_with_skb = 1;
+-	BT_DBG("session %p skb %p len %d param 0x%02x", session, skb, skb->len, param);
++	BT_DBG("session %p skb %p len %u param 0x%02x", session, skb, skb->len, param);
  
- 	skb_pull(skb, le16_to_cpu(hdr->len));
- 	return 0;
-@@ -620,7 +620,7 @@ static int a2mp_chan_recv_cb(struct l2cap_chan *chan, struct sk_buff *skb)
- 		hdr = (void *) skb->data;
- 		len = le16_to_cpu(hdr->len);
+ 	switch (param) {
+ 	case HIDP_DATA_RTYPE_INPUT:
+@@ -553,7 +553,7 @@ static void hidp_recv_ctrl_frame(struct hidp_session *session,
+ 	unsigned char hdr, type, param;
+ 	int free_skb = 1;
  
--		BT_DBG("code 0x%2.2x id %d len %u", hdr->code, hdr->ident, len);
-+		BT_DBG("code 0x%2.2x id %u len %u", hdr->code, hdr->ident, len);
+-	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
++	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
  
- 		skb_pull(skb, sizeof(*hdr));
+ 	hdr = skb->data[0];
+ 	skb_pull(skb, 1);
+@@ -589,7 +589,7 @@ static void hidp_recv_intr_frame(struct hidp_session *session,
+ {
+ 	unsigned char hdr;
  
+-	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
++	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+ 
+ 	hdr = skb->data[0];
+ 	skb_pull(skb, 1);
 -- 
 2.8.1
 
