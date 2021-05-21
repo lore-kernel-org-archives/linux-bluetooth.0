@@ -7,27 +7,27 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71FFAC433ED
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A360C43461
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EC3A613BE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 673D2613B6
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231373AbhEUGEW (ORCPT
+        id S231757AbhEUGEY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 May 2021 02:04:22 -0400
-Received: from szxga04-in.huawei.com ([45.249.212.190]:4710 "EHLO
-        szxga04-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231452AbhEUGET (ORCPT
+        Fri, 21 May 2021 02:04:24 -0400
+Received: from szxga07-in.huawei.com ([45.249.212.35]:3456 "EHLO
+        szxga07-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231201AbhEUGEU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 21 May 2021 02:04:19 -0400
-Received: from dggems702-chm.china.huawei.com (unknown [172.30.72.59])
-        by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4FmbYH4Bcrz16Qfy;
-        Fri, 21 May 2021 14:00:03 +0800 (CST)
+        Fri, 21 May 2021 02:04:20 -0400
+Received: from dggems704-chm.china.huawei.com (unknown [172.30.72.60])
+        by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4FmbYG4qM5zBvRW;
+        Fri, 21 May 2021 14:00:02 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
- dggems702-chm.china.huawei.com (10.3.19.179) with Microsoft SMTP Server
+ dggems704-chm.china.huawei.com (10.3.19.181) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 21 May 2021 14:02:51 +0800
+ 15.1.2176.2; Fri, 21 May 2021 14:02:50 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
  (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 21 May
@@ -37,9 +37,9 @@ To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
         <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
         <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 CC:     <linux-kernel@vger.kernel.org>, <yekai13@huawei.com>
-Subject: [PATCH v2 03/12] net/Bluetooth/hidp - use the correct print format
-Date:   Fri, 21 May 2021 13:59:39 +0800
-Message-ID: <1621576788-48092-4-git-send-email-yekai13@huawei.com>
+Subject: [PATCH v2 01/12] net/Bluetooth/bnep - use the correct print format
+Date:   Fri, 21 May 2021 13:59:37 +0800
+Message-ID: <1621576788-48092-2-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
 References: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
@@ -59,40 +59,42 @@ instead of %d. Otherwise printk() might end up displaying negative numbers.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- net/bluetooth/hidp/core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/bnep/core.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/hidp/core.c b/net/bluetooth/hidp/core.c
-index 0db48c8..1dc8dee 100644
---- a/net/bluetooth/hidp/core.c
-+++ b/net/bluetooth/hidp/core.c
-@@ -508,7 +508,7 @@ static int hidp_process_data(struct hidp_session *session, struct sk_buff *skb,
- 				unsigned char param)
- {
- 	int done_with_skb = 1;
--	BT_DBG("session %p skb %p len %d param 0x%02x", session, skb, skb->len, param);
-+	BT_DBG("session %p skb %p len %u param 0x%02x", session, skb, skb->len, param);
+diff --git a/net/bluetooth/bnep/core.c b/net/bluetooth/bnep/core.c
+index 43c2841..72f47b3 100644
+--- a/net/bluetooth/bnep/core.c
++++ b/net/bluetooth/bnep/core.c
+@@ -126,8 +126,8 @@ static int bnep_ctrl_set_netfilter(struct bnep_session *s, __be16 *data, int len
+ 			f[i].start = get_unaligned_be16(data++);
+ 			f[i].end   = get_unaligned_be16(data++);
  
- 	switch (param) {
- 	case HIDP_DATA_RTYPE_INPUT:
-@@ -553,7 +553,7 @@ static void hidp_recv_ctrl_frame(struct hidp_session *session,
- 	unsigned char hdr, type, param;
- 	int free_skb = 1;
+-			BT_DBG("proto filter start %d end %d",
+-				f[i].start, f[i].end);
++			BT_DBG("proto filter start %u end %u",
++			       f[i].start, f[i].end);
+ 		}
  
--	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
-+	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+ 		if (i < BNEP_MAX_PROTO_FILTERS)
+@@ -266,7 +266,7 @@ static int bnep_rx_extension(struct bnep_session *s, struct sk_buff *skb)
+ 			break;
+ 		}
  
- 	hdr = skb->data[0];
- 	skb_pull(skb, 1);
-@@ -589,7 +589,7 @@ static void hidp_recv_intr_frame(struct hidp_session *session,
- {
- 	unsigned char hdr;
+-		BT_DBG("type 0x%x len %d", h->type, h->len);
++		BT_DBG("type 0x%x len %u", h->type, h->len);
  
--	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
-+	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
+ 		switch (h->type & BNEP_TYPE_MASK) {
+ 		case BNEP_EXT_CONTROL:
+@@ -424,7 +424,7 @@ static int bnep_tx_frame(struct bnep_session *s, struct sk_buff *skb)
+ 	int len = 0, il = 0;
+ 	u8 type = 0;
  
- 	hdr = skb->data[0];
- 	skb_pull(skb, 1);
+-	BT_DBG("skb %p dev %p type %d", skb, skb->dev, skb->pkt_type);
++	BT_DBG("skb %p dev %p type %u", skb, skb->dev, skb->pkt_type);
+ 
+ 	if (!skb->dev) {
+ 		/* Control frame sent by us */
 -- 
 2.8.1
 
