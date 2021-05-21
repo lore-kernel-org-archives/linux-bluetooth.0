@@ -7,39 +7,39 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 972F9C433B4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05CA0C43462
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8335B61057
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E26E661057
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 21 May 2021 06:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237057AbhEUGEe (ORCPT
+        id S237500AbhEUGEf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 21 May 2021 02:04:34 -0400
-Received: from szxga06-in.huawei.com ([45.249.212.32]:3640 "EHLO
+        Fri, 21 May 2021 02:04:35 -0400
+Received: from szxga06-in.huawei.com ([45.249.212.32]:3643 "EHLO
         szxga06-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231334AbhEUGEW (ORCPT
+        with ESMTP id S231476AbhEUGEW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 21 May 2021 02:04:22 -0400
-Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.58])
-        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FmbYs4YvjzmXn5;
-        Fri, 21 May 2021 14:00:33 +0800 (CST)
+Received: from dggems701-chm.china.huawei.com (unknown [172.30.72.59])
+        by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4FmbYy1vBGzmXqW;
+        Fri, 21 May 2021 14:00:38 +0800 (CST)
 Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
  dggems701-chm.china.huawei.com (10.3.19.178) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2176.2; Fri, 21 May 2021 14:02:50 +0800
+ 15.1.2176.2; Fri, 21 May 2021 14:02:53 +0800
 Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
  (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Fri, 21 May
- 2021 14:02:50 +0800
+ 2021 14:02:52 +0800
 From:   Kai Ye <yekai13@huawei.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
         <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
         <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
 CC:     <linux-kernel@vger.kernel.org>, <yekai13@huawei.com>
-Subject: [PATCH v2 02/12] net/Bluetooth/cmtp - use the correct print format
-Date:   Fri, 21 May 2021 13:59:38 +0800
-Message-ID: <1621576788-48092-3-git-send-email-yekai13@huawei.com>
+Subject: [PATCH v2 12/12] net/Bluetooth/smp - use the correct print format
+Date:   Fri, 21 May 2021 13:59:48 +0800
+Message-ID: <1621576788-48092-13-git-send-email-yekai13@huawei.com>
 X-Mailer: git-send-email 2.8.1
 In-Reply-To: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
 References: <1621576788-48092-1-git-send-email-yekai13@huawei.com>
@@ -59,105 +59,40 @@ instead of %d. Otherwise printk() might end up displaying negative numbers.
 
 Signed-off-by: Kai Ye <yekai13@huawei.com>
 ---
- net/bluetooth/cmtp/capi.c | 22 +++++++++++-----------
- 1 file changed, 11 insertions(+), 11 deletions(-)
+ net/bluetooth/smp.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/bluetooth/cmtp/capi.c b/net/bluetooth/cmtp/capi.c
-index eb415560..f3bedc3 100644
---- a/net/bluetooth/cmtp/capi.c
-+++ b/net/bluetooth/cmtp/capi.c
-@@ -74,7 +74,7 @@ static struct cmtp_application *cmtp_application_add(struct cmtp_session *sessio
- {
- 	struct cmtp_application *app = kzalloc(sizeof(*app), GFP_KERNEL);
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 2def906..56c59f8 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -859,7 +859,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 	memset(smp->tk, 0, sizeof(smp->tk));
+ 	clear_bit(SMP_FLAG_TK_VALID, &smp->flags);
  
--	BT_DBG("session %p application %p appl %d", session, app, appl);
-+	BT_DBG("session %p application %p appl %u", session, app, appl);
+-	bt_dev_dbg(hcon->hdev, "auth:%d lcl:%d rem:%d", auth, local_io,
++	bt_dev_dbg(hcon->hdev, "auth:%u lcl:%u rem:%u", auth, local_io,
+ 		   remote_io);
  
- 	if (!app)
- 		return NULL;
-@@ -135,7 +135,7 @@ static void cmtp_send_capimsg(struct cmtp_session *session, struct sk_buff *skb)
- {
- 	struct cmtp_scb *scb = (void *) skb->cb;
- 
--	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
-+	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
- 
- 	scb->id = -1;
- 	scb->data = (CAPIMSG_COMMAND(skb->data) == CAPI_DATA_B3);
-@@ -152,7 +152,7 @@ static void cmtp_send_interopmsg(struct cmtp_session *session,
- 	struct sk_buff *skb;
- 	unsigned char *s;
- 
--	BT_DBG("session %p subcmd 0x%02x appl %d msgnum %d", session, subcmd, appl, msgnum);
-+	BT_DBG("session %p subcmd 0x%02x appl %u msgnum %u", session, subcmd, appl, msgnum);
- 
- 	skb = alloc_skb(CAPI_MSG_BASELEN + 6 + len, GFP_ATOMIC);
- 	if (!skb) {
-@@ -188,7 +188,7 @@ static void cmtp_recv_interopmsg(struct cmtp_session *session, struct sk_buff *s
- 	__u16 appl, msgnum, func, info;
- 	__u32 controller;
- 
--	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
-+	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
- 
- 	switch (CAPIMSG_SUBCOMMAND(skb->data)) {
- 	case CAPI_CONF:
-@@ -321,7 +321,7 @@ void cmtp_recv_capimsg(struct cmtp_session *session, struct sk_buff *skb)
- 	__u16 appl;
- 	__u32 contr;
- 
--	BT_DBG("session %p skb %p len %d", session, skb, skb->len);
-+	BT_DBG("session %p skb %p len %u", session, skb, skb->len);
- 
- 	if (skb->len < CAPI_MSG_BASELEN)
- 		return;
-@@ -344,7 +344,7 @@ void cmtp_recv_capimsg(struct cmtp_session *session, struct sk_buff *skb)
- 		appl = application->appl;
- 		CAPIMSG_SETAPPID(skb->data, appl);
- 	} else {
--		BT_ERR("Can't find application with id %d", appl);
-+		BT_ERR("Can't find application with id %u", appl);
- 		kfree_skb(skb);
- 		return;
- 	}
-@@ -385,8 +385,8 @@ static void cmtp_register_appl(struct capi_ctr *ctrl, __u16 appl, capi_register_
- 	unsigned char buf[8];
- 	int err = 0, nconn, want = rp->level3cnt;
- 
--	BT_DBG("ctrl %p appl %d level3cnt %d datablkcnt %d datablklen %d",
--		ctrl, appl, rp->level3cnt, rp->datablkcnt, rp->datablklen);
-+	BT_DBG("ctrl %p appl %u level3cnt %u datablkcnt %u datablklen %u",
-+	       ctrl, appl, rp->level3cnt, rp->datablkcnt, rp->datablklen);
- 
- 	application = cmtp_application_add(session, appl);
- 	if (!application) {
-@@ -450,7 +450,7 @@ static void cmtp_release_appl(struct capi_ctr *ctrl, __u16 appl)
- 	struct cmtp_session *session = ctrl->driverdata;
- 	struct cmtp_application *application;
- 
--	BT_DBG("ctrl %p appl %d", ctrl, appl);
-+	BT_DBG("ctrl %p appl %u", ctrl, appl);
- 
- 	application = cmtp_application_get(session, CMTP_APPLID, appl);
- 	if (!application) {
-@@ -483,7 +483,7 @@ static u16 cmtp_send_message(struct capi_ctr *ctrl, struct sk_buff *skb)
- 
- 	application = cmtp_application_get(session, CMTP_APPLID, appl);
- 	if ((!application) || (application->state != BT_CONNECTED)) {
--		BT_ERR("Can't find application with id %d", appl);
-+		BT_ERR("Can't find application with id %u", appl);
- 		return CAPI_ILLAPPNR;
+ 	/* If neither side wants MITM, either "just" confirm an incoming
+@@ -925,7 +925,7 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 		get_random_bytes(&passkey, sizeof(passkey));
+ 		passkey %= 1000000;
+ 		put_unaligned_le32(passkey, smp->tk);
+-		bt_dev_dbg(hcon->hdev, "PassKey: %d", passkey);
++		bt_dev_dbg(hcon->hdev, "PassKey: %u", passkey);
+ 		set_bit(SMP_FLAG_TK_VALID, &smp->flags);
  	}
  
-@@ -515,7 +515,7 @@ static int cmtp_proc_show(struct seq_file *m, void *v)
- 	seq_printf(m, "ctrl %d\n", session->num);
- 
- 	list_for_each_entry(app, &session->applications, list) {
--		seq_printf(m, "appl %d -> %d\n", app->appl, app->mapping);
-+		seq_printf(m, "appl %u -> %u\n", app->appl, app->mapping);
- 	}
- 
- 	return 0;
+@@ -1654,7 +1654,7 @@ int smp_user_confirm_reply(struct hci_conn *hcon, u16 mgmt_op, __le32 passkey)
+ 	case MGMT_OP_USER_PASSKEY_REPLY:
+ 		value = le32_to_cpu(passkey);
+ 		memset(smp->tk, 0, sizeof(smp->tk));
+-		bt_dev_dbg(conn->hcon->hdev, "PassKey: %d", value);
++		bt_dev_dbg(conn->hcon->hdev, "PassKey: %u", value);
+ 		put_unaligned_le32(value, smp->tk);
+ 		fallthrough;
+ 	case MGMT_OP_USER_CONFIRM_REPLY:
 -- 
 2.8.1
 
