@@ -2,209 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39389C47080
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 02:43:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA78C47083
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 03:00:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FEE561168
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 02:43:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3840D61155
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 03:00:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232221AbhEXCpM (ORCPT
+        id S232108AbhEXDCV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 May 2021 22:45:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43766 "EHLO
+        Sun, 23 May 2021 23:02:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232212AbhEXCpM (ORCPT
+        with ESMTP id S231833AbhEXDCV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 May 2021 22:45:12 -0400
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C88B3C061574
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 19:43:43 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id x13-20020a65414d0000b029021b7c343d32so1485383pgp.19
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 19:43:43 -0700 (PDT)
+        Sun, 23 May 2021 23:02:21 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1ECCC061574
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 20:00:52 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id q25so1613284pfn.1
+        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 20:00:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=1FzVE3PAeI49l0j73y3tYJ0lzNJx+HJPjdIbesY8aKY=;
-        b=vaxA+oID7XBF3NyoW/wK+yynhI50dH4vVr0ka/IY4J5gxD15pkUWW2TbQGnYK6Ny1f
-         lRgQmL6ob2fSMFytag0o5evH8IZYu052vi1Ic9LdI1te+NqguLQt9QAKSclxPoxTkA9F
-         ZKuPi3eXzHwE/Sd0quK87kAEy/ND9QWbdtV6OF2ng/WEeoU3IbmxI6Diwuu/2caHUOZv
-         kKNMYGvp8lTzZiyL0nHtxJekGeACaJFAL0q+iocINfy6o2qTKnwkrpQHktTNYZthysfZ
-         NOweTR3lB8EO1h2WA0KU7XHynN+aecWTnav4C2R694XMk0YWd5jXk8rBdJvSw8oDnwWV
-         dqLw==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=N1XFefcXrQjgQulBbFpIdLb2CsgD4jtqJek3Q/5qfJw=;
+        b=A/ZfOtsY4Z9knZ+TzVZO2tKMbvo3NHWAlWdLNenmaGgs+hDDx3cfkIBR2O3gYYVjw2
+         n/CGKX3WyI4DFTGUaZc93XthT2cLSGBXwqcdnj8PiK/DKKIU/8C30KhCE9yQbUJS5XK8
+         4off/vNeMydn7YfFrQwmP6pwqBkfaGpInuCZO90SoZZ05wWM4zW2MXO8Wvd9xysKmu1s
+         veEsL+khzkO9Cv0ph/xADMthKwyba7I/06KKVAJqVJtM6Q9bDNR2fpWGb9WlPSKAAEND
+         NZKnfDaYpE+V0nL3Q+bApWYMquo7SKK5lIAqnj12CgS5lKGfAm0NL0xBEP8pad/p7GqF
+         NLGA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=1FzVE3PAeI49l0j73y3tYJ0lzNJx+HJPjdIbesY8aKY=;
-        b=NBolcoPQvmtHT/e0lfn3G+Rj+pqTKpU8tqkeqkQtLmS1slO2H2BO2pSMtsEI7H9kKT
-         mOY33PVhav4OyCduxUgRmwq+n0BwOBN1lmDT2XVWNKkcCRU/G9ThItmFSOqq8OnPbl49
-         HJRVbbi02Y1xie4EICUV8qmMiRFXyqBBfhMdqytX3ZW1NONllgqJh8iCGfdO3rY/3E1V
-         AklnTgvoe5gzjY/P3uTiPxNAJZeFdQwzEhl+qSXj2Htk4znI7v9QxlsqBzH2sB54w6z8
-         SaeYHPrrtRkjOrSIG2BPK/lanKlV/vuyCRMKfUPe1cQhnct60FtPxo2drAPZSUIQI9mO
-         QHxQ==
-X-Gm-Message-State: AOAM5330s+Vo9xx2M7/VFrYDpmr+kUBaSb+gErs65NfkSasUwXkE6eLj
-        IoBk1t8K7n4qBcAck1ETybyzvpK+fTKrHAMg2JN5TFy04/ZznOjswOkXkqecFP7VklE6lqmCtmH
-        G70+7FyO2XdL/RBTeNBMx/KuX8FL6XXeckXACdpTq1GguBtm8pUIF9q2YJurY4dh+R4dZhzlu3D
-        PT4vHsgyWDXK8=
-X-Google-Smtp-Source: ABdhPJzO5hMcLFRCSZhJEviatcGkbz7ozzgDqe2yccaT/cdHpGXh+iRHAQJPl+AQKlRl1Im3/j8J+SSNbbs2swU9PQ==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:405a:37d1:d35f:13c9])
- (user=howardchung job=sendgmr) by 2002:a17:90a:f518:: with SMTP id
- cs24mr22805794pjb.182.1621824223046; Sun, 23 May 2021 19:43:43 -0700 (PDT)
-Date:   Mon, 24 May 2021 10:43:37 +0800
-Message-Id: <20210524104329.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [Bluez PATCH v1] core: Add RSSI sampling period in system parameter
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Yun-Hao Chung <howardchung@chromium.org>, apusaka@chromium.org,
-        mmandlik@chromium.org, mcchou@chromium.org
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=N1XFefcXrQjgQulBbFpIdLb2CsgD4jtqJek3Q/5qfJw=;
+        b=SIoj2bLOTF8l/VUdKZYkCBeI9Twzq2J7bfYmAH/qHGSDin5CT+fy3kSsADJGXtKfAd
+         g2Nvp503XyxjHz14bPfEANlBak+1t/ejH1Nb0Ojmq7PKixCV9WXN8WkK7d1f9OBN0Cky
+         1WOvnbrBI/IMh0mR74kCY5HHsRjUFIXEjuUuL9qqvmice4ANIjGtICjjter77KZoMeeg
+         BLQX6N1fdrT62oxvz8lx+o2W6B/828g2mRwR6EJqEC2ljPV1Z0V7cR8rHIyPW4PiULDP
+         xa7zQMr2/LMLGx1EHRkGrorVGoyXeAFXn9bpdWpC+42GK1QmetCaRR8ReAneWO2eri2d
+         CSCw==
+X-Gm-Message-State: AOAM531JAc/VfnHjYLMjpzkH/OyxjdQC4P1AyD9CtlFf1+uA4bA7kTQ6
+        dQ4REjtZQs40mbDnjoKuUNOYmt3pXPs=
+X-Google-Smtp-Source: ABdhPJxfcf1hI+dMhKk6ujW+L2N5I1p75+rS5XmeS8RcZm1G7eVEkAVt3x/bpge4AwOZzX2LKCNOvQ==
+X-Received: by 2002:a63:7e13:: with SMTP id z19mr11177576pgc.184.1621825252160;
+        Sun, 23 May 2021 20:00:52 -0700 (PDT)
+Received: from [172.17.0.2] ([20.69.120.190])
+        by smtp.gmail.com with ESMTPSA id l64sm10441398pgd.20.2021.05.23.20.00.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 23 May 2021 20:00:51 -0700 (PDT)
+Message-ID: <60ab16e3.1c69fb81.2ef14.32a5@mx.google.com>
+Date:   Sun, 23 May 2021 20:00:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2162241458457966003=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: [Bluez,v1] core: Add RSSI sampling period in system parameter
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210524104329.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
+References: <20210524104329.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yun-Hao Chung <howardchung@chromium.org>
+--===============2162241458457966003==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Add an option in main.conf to configure the default RSSI sampling
-period for advertisement monitor.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: apusaka@chromium.org
-Reviewed-by: mmandlik@chromium.org
-Reviewed-by: mcchou@chromium.org
----
+Dear submitter,
 
- src/adv_monitor.c |  4 ++--
- src/btd.h         |  6 ++++++
- src/main.c        | 20 ++++++++++++++++++++
- src/main.conf     |  6 ++++++
- 4 files changed, 34 insertions(+), 2 deletions(-)
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=487211
 
-diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index 9f04aaefbf22..17f1777eb1da 100644
---- a/src/adv_monitor.c
-+++ b/src/adv_monitor.c
-@@ -25,6 +25,7 @@
- #include "lib/mgmt.h"
- 
- #include "adapter.h"
-+#include "btd.h"
- #include "dbus-common.h"
- #include "device.h"
- #include "log.h"
-@@ -49,7 +50,6 @@
- #define ADV_MONITOR_DEFAULT_HIGH_TIMEOUT 10	/* second */
- #define ADV_MONITOR_UNSET_SAMPLING_PERIOD 256	/* 100 ms */
- #define ADV_MONITOR_MAX_SAMPLING_PERIOD	255	/* 100 ms */
--#define ADV_MONITOR_DEFAULT_SAMPLING_PERIOD 0	/* 100 ms */
- 
- struct btd_adv_monitor_manager {
- 	struct btd_adapter *adapter;
-@@ -831,7 +831,7 @@ static bool parse_rssi_and_timeout(struct adv_monitor *monitor,
- 		h_rssi_timeout = ADV_MONITOR_DEFAULT_HIGH_TIMEOUT;
- 
- 	if (sampling_period == ADV_MONITOR_UNSET_SAMPLING_PERIOD)
--		sampling_period = ADV_MONITOR_DEFAULT_SAMPLING_PERIOD;
-+		sampling_period = btd_opts.advmon.rssi_sampling_period;
- 
- 	if (h_rssi < ADV_MONITOR_MIN_RSSI || h_rssi > ADV_MONITOR_MAX_RSSI ||
- 		l_rssi < ADV_MONITOR_MIN_RSSI ||
-diff --git a/src/btd.h b/src/btd.h
-index 6af54a99a02b..d7288354698a 100644
---- a/src/btd.h
-+++ b/src/btd.h
-@@ -89,6 +89,10 @@ struct btd_avdtp_opts {
- 	uint8_t  stream_mode;
- };
- 
-+struct btd_advmon_opts {
-+	uint8_t		rssi_sampling_period;
-+};
-+
- struct btd_opts {
- 	char		*name;
- 	uint32_t	class;
-@@ -123,6 +127,8 @@ struct btd_opts {
- 	uint8_t		key_size;
- 
- 	enum jw_repairing_t jw_repairing;
-+
-+	struct btd_advmon_opts	advmon;
- };
- 
- extern struct btd_opts btd_opts;
-diff --git a/src/main.c b/src/main.c
-index 57db9c134854..516509e3f076 100644
---- a/src/main.c
-+++ b/src/main.c
-@@ -145,6 +145,11 @@ static const char *avdtp_options[] = {
- 	NULL
- };
- 
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      0.38 seconds
+GitLint                       PASS      0.11 seconds
+Prep - Setup ELL              PASS      44.60 seconds
+Build - Prep                  PASS      0.10 seconds
+Build - Configure             PASS      7.98 seconds
+Build - Make                  PASS      191.14 seconds
+Make Check                    PASS      9.02 seconds
+Make Distcheck                PASS      238.86 seconds
+Build w/ext ELL - Configure   PASS      8.53 seconds
+Build w/ext ELL - Make        PASS      190.53 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+core: Add RSSI sampling period in system parameter
+WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
+#74: FILE: src/main.c:148:
 +static const char *advmon_options[] = {
-+	"RSSISamplingPeriod",
-+	NULL
-+};
-+
- static const struct group_table {
- 	const char *name;
- 	const char **options;
-@@ -155,6 +160,7 @@ static const struct group_table {
- 	{ "Policy",	policy_options },
- 	{ "GATT",	gatt_options },
- 	{ "AVDTP",	avdtp_options },
-+	{ "AdvMon",	advmon_options },
- 	{ }
- };
- 
-@@ -802,6 +808,18 @@ static void parse_config(GKeyFile *config)
- 		g_free(str);
- 	}
- 
-+	val = g_key_file_get_integer(config, "AdvMon", "RSSISamplingPeriod",
-+									&err);
-+	if (err) {
-+		DBG("%s", err->message);
-+		g_clear_error(&err);
-+	} else {
-+		val = MIN(val, 0xFF);
-+		val = MAX(val, 0);
-+		DBG("RSSISamplingPeriod=%d", val);
-+		btd_opts.advmon.rssi_sampling_period = val;
-+	}
-+
- 	parse_br_config(config);
- 	parse_le_config(config);
- }
-@@ -842,6 +860,8 @@ static void init_defaults(void)
- 
- 	btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
- 	btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
-+
-+	btd_opts.advmon.rssi_sampling_period = 0;
- }
- 
- static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
-diff --git a/src/main.conf b/src/main.conf
-index bf8a86080a24..198899541459 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -248,3 +248,9 @@
- # The value is in seconds.
- # Default: 2
- #ResumeDelay = 2
-+
-+[AdvMon]
-+# Default RSSI Sampling Period. This is used when a client registers an
-+# advertisement monitor and leaves the RSSISamplingPeriod unset.
-+# Default: 0
-+#RSSISamplingPeriod=0
--- 
-2.31.1.818.g46aad6cb9e-goog
 
+- total: 0 errors, 1 warnings, 93 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] core: Add RSSI sampling period in system parameter" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============2162241458457966003==--
