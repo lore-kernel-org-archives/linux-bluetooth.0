@@ -2,166 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EA78C47083
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 03:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 698C4C04FF3
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 07:59:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3840D61155
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 03:00:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42139610CB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 07:59:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232108AbhEXDCV (ORCPT
+        id S232306AbhEXIBV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 23 May 2021 23:02:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47588 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231833AbhEXDCV (ORCPT
+        Mon, 24 May 2021 04:01:21 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:43892 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232266AbhEXIBV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 23 May 2021 23:02:21 -0400
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1ECCC061574
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 20:00:52 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id q25so1613284pfn.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 23 May 2021 20:00:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=N1XFefcXrQjgQulBbFpIdLb2CsgD4jtqJek3Q/5qfJw=;
-        b=A/ZfOtsY4Z9knZ+TzVZO2tKMbvo3NHWAlWdLNenmaGgs+hDDx3cfkIBR2O3gYYVjw2
-         n/CGKX3WyI4DFTGUaZc93XthT2cLSGBXwqcdnj8PiK/DKKIU/8C30KhCE9yQbUJS5XK8
-         4off/vNeMydn7YfFrQwmP6pwqBkfaGpInuCZO90SoZZ05wWM4zW2MXO8Wvd9xysKmu1s
-         veEsL+khzkO9Cv0ph/xADMthKwyba7I/06KKVAJqVJtM6Q9bDNR2fpWGb9WlPSKAAEND
-         NZKnfDaYpE+V0nL3Q+bApWYMquo7SKK5lIAqnj12CgS5lKGfAm0NL0xBEP8pad/p7GqF
-         NLGA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=N1XFefcXrQjgQulBbFpIdLb2CsgD4jtqJek3Q/5qfJw=;
-        b=SIoj2bLOTF8l/VUdKZYkCBeI9Twzq2J7bfYmAH/qHGSDin5CT+fy3kSsADJGXtKfAd
-         g2Nvp503XyxjHz14bPfEANlBak+1t/ejH1Nb0Ojmq7PKixCV9WXN8WkK7d1f9OBN0Cky
-         1WOvnbrBI/IMh0mR74kCY5HHsRjUFIXEjuUuL9qqvmice4ANIjGtICjjter77KZoMeeg
-         BLQX6N1fdrT62oxvz8lx+o2W6B/828g2mRwR6EJqEC2ljPV1Z0V7cR8rHIyPW4PiULDP
-         xa7zQMr2/LMLGx1EHRkGrorVGoyXeAFXn9bpdWpC+42GK1QmetCaRR8ReAneWO2eri2d
-         CSCw==
-X-Gm-Message-State: AOAM531JAc/VfnHjYLMjpzkH/OyxjdQC4P1AyD9CtlFf1+uA4bA7kTQ6
-        dQ4REjtZQs40mbDnjoKuUNOYmt3pXPs=
-X-Google-Smtp-Source: ABdhPJxfcf1hI+dMhKk6ujW+L2N5I1p75+rS5XmeS8RcZm1G7eVEkAVt3x/bpge4AwOZzX2LKCNOvQ==
-X-Received: by 2002:a63:7e13:: with SMTP id z19mr11177576pgc.184.1621825252160;
-        Sun, 23 May 2021 20:00:52 -0700 (PDT)
-Received: from [172.17.0.2] ([20.69.120.190])
-        by smtp.gmail.com with ESMTPSA id l64sm10441398pgd.20.2021.05.23.20.00.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 23 May 2021 20:00:51 -0700 (PDT)
-Message-ID: <60ab16e3.1c69fb81.2ef14.32a5@mx.google.com>
-Date:   Sun, 23 May 2021 20:00:51 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2162241458457966003=="
+        Mon, 24 May 2021 04:01:21 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1621843193; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=uogsG3A+h5LeNQ0cQUSHg5KaZ9zWz24HgreBoVB53Yo=;
+ b=CjmVdMzxpK7t+fBmsEen0+9lVqYwp+T9j2vYsXjUfPiyA56IGJ5L8FtuaVbHLdAojwJBV9GF
+ YC8Ur89KaA8N3GooRRq4196mCofw4693xS2o94t5sjImz/yUs4ocFslOo/l4xITvscWPt54q
+ ErqkQoex9EsYW4cHzqDJFURapg0=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 60ab5ce467d156359afbd471 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 24 May 2021 07:59:32
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 5F87BC43460; Mon, 24 May 2021 07:59:32 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id AE98EC433F1;
+        Mon, 24 May 2021 07:59:31 +0000 (UTC)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v1] core: Add RSSI sampling period in system parameter
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210524104329.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
-References: <20210524104329.Bluez.v1.1.I3f63cfa802b3602a4ddd7604acc8e886f223912f@changeid>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 24 May 2021 15:59:31 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org
+Subject: Re: [PATCH v1] Bluetooth: btusb: use default nvm if boardID is 0 for
+ wcn6855.
+In-Reply-To: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
+References: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
+Message-ID: <404766ae900a70b0ae2d28e702508e21@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2162241458457966003==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+marcel:
+   could you help mainline this change ?
 
-This is automated email and please do not reply to this email!
+regards.
+tjiang
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=487211
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.38 seconds
-GitLint                       PASS      0.11 seconds
-Prep - Setup ELL              PASS      44.60 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      7.98 seconds
-Build - Make                  PASS      191.14 seconds
-Make Check                    PASS      9.02 seconds
-Make Distcheck                PASS      238.86 seconds
-Build w/ext ELL - Configure   PASS      8.53 seconds
-Build w/ext ELL - Make        PASS      190.53 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-core: Add RSSI sampling period in system parameter
-WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-#74: FILE: src/main.c:148:
-+static const char *advmon_options[] = {
-
-- total: 0 errors, 1 warnings, 93 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] core: Add RSSI sampling period in system parameter" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2162241458457966003==--
+On 2021-04-21 17:16, Zijun Hu wrote:
+> From: Tim Jiang <tjiang@codeaurora.org>
+> 
+> if boardID is 0, will use the default nvm file without surfix.
+> 
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> ---
+>  drivers/bluetooth/btusb.c | 11 ++++++++---
+>  1 file changed, 8 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 6f25337..61afea9 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -4138,9 +4138,14 @@ static int btusb_setup_qca_load_nvm(struct 
+> hci_dev *hdev,
+>  	int err;
+> 
+>  	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -			 le32_to_cpu(ver->rom_version),
+> -			 le16_to_cpu(ver->board_id));
+> +		if (le16_to_cpu(ver->board_id) == 0x0) { //if boardid equal 0, use
+> default nvm.
+> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> +				 le32_to_cpu(ver->rom_version));
+> +		} else {
+> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> +				le32_to_cpu(ver->rom_version),
+> +				le16_to_cpu(ver->board_id));
+> +		}
+>  	} else {
+>  		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+>  			 le32_to_cpu(ver->rom_version));
