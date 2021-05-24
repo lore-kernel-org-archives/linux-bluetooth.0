@@ -2,109 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 698C4C04FF3
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 07:59:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 40883C2B9F8
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 11:30:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 42139610CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 07:59:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 23A16611CE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 24 May 2021 11:30:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232306AbhEXIBV (ORCPT
+        id S232547AbhEXLb7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 24 May 2021 04:01:21 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:43892 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232266AbhEXIBV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 24 May 2021 04:01:21 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1621843193; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=uogsG3A+h5LeNQ0cQUSHg5KaZ9zWz24HgreBoVB53Yo=;
- b=CjmVdMzxpK7t+fBmsEen0+9lVqYwp+T9j2vYsXjUfPiyA56IGJ5L8FtuaVbHLdAojwJBV9GF
- YC8Ur89KaA8N3GooRRq4196mCofw4693xS2o94t5sjImz/yUs4ocFslOo/l4xITvscWPt54q
- ErqkQoex9EsYW4cHzqDJFURapg0=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
- 60ab5ce467d156359afbd471 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 24 May 2021 07:59:32
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 5F87BC43460; Mon, 24 May 2021 07:59:32 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id AE98EC433F1;
-        Mon, 24 May 2021 07:59:31 +0000 (UTC)
+        Mon, 24 May 2021 07:31:59 -0400
+Received: from mail.kernel.org ([198.145.29.99]:40464 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232110AbhEXLb7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 24 May 2021 07:31:59 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 43A1E611CD
+        for <linux-bluetooth@vger.kernel.org>; Mon, 24 May 2021 11:30:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1621855831;
+        bh=52YOwVjZVzxWYgHUgVxKMy0PxkPV2Lap8Rn2zd/kFHY=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=h2o1BEr6PnyR6HZi3gGde0qHJ9d+ittGNw0daLemGYafkxCa/nEO5zFZusJE0RioD
+         SI7oNqlsz3GlTHCbWbEJu7UMaCqzp2nZ+nkHatjePLVUte6w2nW5ShFXvg1HmJKu/P
+         6tUKsw9/nswWftVM8pV9/SnfpwhXKfLx8+oXCafaPZBrDjIhf/Y8QmIQ5P4IxWMSWM
+         EHWzesUxHC1BF2qw+6Qc0fwYMzjApmZOvj+o1GDPQy064pQ40WhF147D79zq8pVCoZ
+         ukNYIXpMY9AXle/anV/abZJWmoo2IxqHp7V3JkhUXZo3+uAjys9VWAdBIXGji1DMIq
+         cCgTbvt4uZekQ==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 204629] Bluetooth headset auto connected but failed to
+ recognize as audio device
+Date:   Mon, 24 May 2021 11:30:30 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: juha-pekka.savolainen@unikie.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-204629-62941-mlifp1evbP@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-204629-62941@https.bugzilla.kernel.org/>
+References: <bug-204629-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 24 May 2021 15:59:31 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org
-Subject: Re: [PATCH v1] Bluetooth: btusb: use default nvm if boardID is 0 for
- wcn6855.
-In-Reply-To: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
-References: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
-Message-ID: <404766ae900a70b0ae2d28e702508e21@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-marcel:
-   could you help mainline this change ?
+https://bugzilla.kernel.org/show_bug.cgi?id=3D204629
 
-regards.
-tjiang
+Juha-Pekka Savolainen (juha-pekka.savolainen@unikie.com) changed:
 
-On 2021-04-21 17:16, Zijun Hu wrote:
-> From: Tim Jiang <tjiang@codeaurora.org>
-> 
-> if boardID is 0, will use the default nvm file without surfix.
-> 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
-> ---
->  drivers/bluetooth/btusb.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 6f25337..61afea9 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4138,9 +4138,14 @@ static int btusb_setup_qca_load_nvm(struct 
-> hci_dev *hdev,
->  	int err;
-> 
->  	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -			 le32_to_cpu(ver->rom_version),
-> -			 le16_to_cpu(ver->board_id));
-> +		if (le16_to_cpu(ver->board_id) == 0x0) { //if boardid equal 0, use
-> default nvm.
-> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> +				 le32_to_cpu(ver->rom_version));
-> +		} else {
-> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> +				le32_to_cpu(ver->rom_version),
-> +				le16_to_cpu(ver->board_id));
-> +		}
->  	} else {
->  		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
->  			 le32_to_cpu(ver->rom_version));
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |juha-pekka.savolainen@uniki
+                   |                            |e.com
+
+--- Comment #2 from Juha-Pekka Savolainen (juha-pekka.savolainen@unikie.com=
+) ---
+Can you provide relevant commit(s) in master branch? I'm facing similar loo=
+king
+issue but can not upgrade the BlueZ. I could however try by patching the
+current version if pointed to correct commit(s).
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
