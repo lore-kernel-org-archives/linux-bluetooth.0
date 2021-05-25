@@ -2,102 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-11.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD8EC4707F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 12:39:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6025AC2B9F8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 14:21:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B32EC6141C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 12:39:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43563613FA
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 14:21:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232651AbhEYMkg (ORCPT
+        id S233850AbhEYOXV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 May 2021 08:40:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40224 "EHLO mail.kernel.org"
+        Tue, 25 May 2021 10:23:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42932 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232627AbhEYMkf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 May 2021 08:40:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 89B276140E;
-        Tue, 25 May 2021 12:39:05 +0000 (UTC)
+        id S233663AbhEYOXU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 25 May 2021 10:23:20 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 20D53613E1;
+        Tue, 25 May 2021 14:21:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1621946346;
-        bh=/vZdsDJghPOhaskyihnVquOx0gtCUPIcL1HHuW88hFw=;
-        h=From:To:Cc:Subject:Date:From;
-        b=gNLVIVutCdom27ITDvkbnAvDdHFCcWeovKJxvbAx8OuZ50fbUPimBfRsfZU39D/18
-         IARkHgE25Kuvh+Q3irzMlVJaAfJURHqC7yYIMHQz6yVVg1R0bEksfBJqzlxUYV0v/B
-         B2AiyTddBVSVzTIH2N1pF0ijGpZ0wBVyLHXtiflk=
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linma <linma@zju.edu.cn>, "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Hao Xiong <mart1n@zju.edu.cn>,
-        stable <stable@vger.kernel.org>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Subject: [PATCH v2] Bluetooth: fix the erroneous flush_work() order
-Date:   Tue, 25 May 2021 14:39:02 +0200
-Message-Id: <20210525123902.189012-1-gregkh@linuxfoundation.org>
-X-Mailer: git-send-email 2.31.1
+        s=korg; t=1621952510;
+        bh=z3lzzp3wg+6gXiNJKwEp7FgqyJAXq0aFNK9P0DVeFoI=;
+        h=Date:From:To:Subject:References:In-Reply-To:From;
+        b=VQgWT6qL5kmaNsCnu0FpO+/Ar2IAcGmADZdCaLmZYg9Y8edqzNluIuXF1SplgShux
+         bh90ydGA76VHlasW5F9AtBmatw3D7HO+ngRT9AFQTq/P4yl4Jg80BuZwZ2vHyiW1+G
+         Acjln6cZHEaCq9dANWZZ5ZCjc4N7d/9cyn85dZ0g=
+Date:   Tue, 25 May 2021 16:21:48 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Re: [v2] Bluetooth: fix the erroneous flush_work() order
+Message-ID: <YK0H/AyoPWZwNZbu@kroah.com>
+References: <20210525123902.189012-1-gregkh@linuxfoundation.org>
+ <60acfd67.1c69fb81.ff72c.cc6c@mx.google.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <60acfd67.1c69fb81.ff72c.cc6c@mx.google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: linma <linma@zju.edu.cn>
+On Tue, May 25, 2021 at 06:36:39AM -0700, bluez.test.bot@gmail.com wrote:
+> This is automated email and please do not reply to this email!
+> 
+> Dear submitter,
+> 
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=488173
+> 
+> ---Test result---
+> 
+> Test Summary:
+> CheckPatch                    FAIL      0.77 seconds
+> GitLint                       PASS      0.12 seconds
+> BuildKernel                   PASS      529.82 seconds
+> TestRunner: Setup             PASS      311.54 seconds
+> TestRunner: l2cap-tester      PASS      2.46 seconds
+> TestRunner: bnep-tester       PASS      1.76 seconds
+> TestRunner: mgmt-tester       PASS      26.34 seconds
+> TestRunner: rfcomm-tester     PASS      1.97 seconds
+> TestRunner: sco-tester        PASS      1.94 seconds
+> TestRunner: smp-tester        PASS      2.03 seconds
+> TestRunner: userchan-tester   PASS      1.92 seconds
+> 
+> Details
+> ##############################
+> Test: CheckPatch - FAIL - 0.77 seconds
+> Run checkpatch.pl script with rule in .checkpatch.conf
+> Bluetooth: fix the erroneous flush_work() order
+> WARNING: Invalid email format for stable: 'stable <stable@vger.kernel.org>', prefer 'stable@vger.kernel.org'
+> #26: 
+> Cc: stable <stable@vger.kernel.org>
+> 
+> WARNING: From:/Signed-off-by: email name mismatch: 'From: linma <linma@zju.edu.cn>' != 'Signed-off-by: Lin Ma <linma@zju.edu.cn>'
+> 
+> total: 0 errors, 2 warnings, 0 checks, 14 lines checked
+> 
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+> 
+> "[PATCH] Bluetooth: fix the erroneous flush_work() order" has style problems, please review.
+> 
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+> 
+> 
 
-In the cleanup routine for failed initialization of HCI device,
-the flush_work(&hdev->rx_work) need to be finished before the
-flush_work(&hdev->cmd_work). Otherwise, the hci_rx_work() can
-possibly invoke new cmd_work and cause a bug, like double free,
-in late processings.
+Do these matter enough for me to do a v3?
 
-This was assigned CVE-2021-3564.
+The first one is crazy, the second one, well, I can understand...
 
-This patch reorder the flush_work() to fix this bug.
+thanks,
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
-Signed-off-by: Hao Xiong <mart1n@zju.edu.cn>
-Cc: stable <stable@vger.kernel.org>
-Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
----
- net/bluetooth/hci_core.c | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
-
-v2: use "network comment style" for block comment.
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index fd12f1652bdf..7d71d104fdfd 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1610,8 +1610,13 @@ static int hci_dev_do_open(struct hci_dev *hdev)
- 	} else {
- 		/* Init failed, cleanup */
- 		flush_work(&hdev->tx_work);
--		flush_work(&hdev->cmd_work);
-+
-+		/* Since hci_rx_work() is possible to awake new cmd_work
-+		 * it should be flushed first to avoid unexpected call of
-+		 * hci_cmd_work()
-+		 */
- 		flush_work(&hdev->rx_work);
-+		flush_work(&hdev->cmd_work);
- 
- 		skb_queue_purge(&hdev->cmd_q);
- 		skb_queue_purge(&hdev->rx_q);
--- 
-2.31.1
-
+greg k-h
