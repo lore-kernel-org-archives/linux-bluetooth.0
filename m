@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9717AC2B9F8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 10:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 824A6C2B9F8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 10:31:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5621B6142D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 10:31:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A56BF6142B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 10:31:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232063AbhEYKcb (ORCPT
+        id S232192AbhEYKcs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 May 2021 06:32:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49430 "EHLO
+        Tue, 25 May 2021 06:32:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231926AbhEYKcI (ORCPT
+        with ESMTP id S232027AbhEYKcK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 May 2021 06:32:08 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FAC1C06134C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 03:30:08 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id l19-20020a0ce0930000b02901efdf1c21ecso27218849qvk.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 03:30:08 -0700 (PDT)
+        Tue, 25 May 2021 06:32:10 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9D2BC061357
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 03:30:12 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id i8-20020a25b2080000b0290523c9c81ba5so6605319ybj.20
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 03:30:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=JQK1EHK4aOakeCprBWj7aKMHOh08lvflh7jGMcWacII=;
-        b=dJgZMfAMc/NW7C1vk8k5bgZAfmX4Ja/MgezxZhsFsc2vGRBBtuwdh5YRMaYbxBb5Ze
-         ohNxUIOK3XGyg3xDonu05+hbskjIrB7ww+0dG2aUnFB2NhAsMlohmxFR/8ZI6MVlIQQJ
-         OSrPiszHyZ0mOIqrbdxZuv9SSNooosasWOIJCdVEHKJk6VV7YTSqUzMEYfsIzbzfwCfY
-         AegO3cSNEWH7jCjS/7Yg8Yi/GwNd4ib/Mg7Miht2mmed54yD0FrtBStoYRsRvseUjcIp
-         HlLuTYlhKkv2V7LnfiJ6ib/kh1bLxxRgflid3ruqklnQPxC+jlFNadBDWzVXuCFMn5QE
-         wM3A==
+        bh=fyjIrLzYntEHHLrRAIzBQQt2AEsBdUtB3IMjcBPkQ9g=;
+        b=wVCX+TVKyjcdWoHrgXmlUhvQjo0GsS23RxJFN3W7YopCvFYw+sNNupJhJUTJ4ywtmm
+         +A5hfK8rWRR/tr6bN9P4Z6HXEPV4VwkiSSswqR5hCN2NvWq929j35Qo4IaQuOK6/j7sG
+         aifd280V1o6FMYsAVx9Wo8WxjNHb9JTjszEBnBaXTY9IOsJcPoOwJvdr6sFLyeQQzC+y
+         jLQ51zJFG22G+hfmf6PWIAphcxiGP4yazuadFOp0brNlcPycsjq1VfkUuS3x3gN2aUJw
+         rm5Ul7aCruDj0bnPM9bshN+sKnBDS/ZBkfXyxacxiFveoVK+ZI1rPX9BAfNUBxjUp71s
+         Xtlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JQK1EHK4aOakeCprBWj7aKMHOh08lvflh7jGMcWacII=;
-        b=pwMBdP8hkYESz+RtUowDvQ7ERPfdZU5JsGiSL3YsMixClz8eQEPEdmUWYvNzhtyuCa
-         EBLW668NN1THU7OTP3CsvNL9e5djAWjTuXjgpRLj+ugZQtErFAOh2a5sXbJlyqtwySyM
-         +vgS40ax01nKKwrw66R+gK0iGMDOpY/vzPOjcumXfvhdHTDeXn0uQM2d/6VWelOFPjAk
-         rxowIQWZgrLf/+kwnZkpdDFzvrf1H7YZ0GToyAUveN+JCbk+D0xbJoO4G3/SHd1md3xp
-         aZKto2lYZBYgHm/Bqm4LGmrvy+8x/994YFLdG71CkmknMGBLXfEebDiKsWb5sPutlx6X
-         gz1A==
-X-Gm-Message-State: AOAM531cPv+eU6lm+Yn3GDwxkAJRrgE1q98xVFtJYRv3n7Oo96Lc5DFH
-        tpXkdwC8ie3R94skjPgCpnMp5lDjF1jKHchQEBfkFgLQRrGOhe9in9hm0UoVp6PseBotbpCS9iB
-        F0GEZRDwAMz5mxhwuI9T6XpPmyIFFjA6XdEhMICOaICRRlfIq4FAZMSPu5UqfIqtokRRTEgPI7S
-        2G
-X-Google-Smtp-Source: ABdhPJwNpUGygtLBgz6MEnsU96mYHVIJWIP0Wk1azb58WqTF+GZ5rpkpB/PFe3h+lfupzWd76OYB13UFw8A7
+        bh=fyjIrLzYntEHHLrRAIzBQQt2AEsBdUtB3IMjcBPkQ9g=;
+        b=jdEtKXHOLNbsoaXsC67Ry4I/rASZmCj7Z0+tXgHN2qHGEvgi6khH5n+lMK2TbKw2aQ
+         ZWFdi/TraDO/3Z323hpoc1sFEhYYDElGB7Ah2HMavW3aq/xMj/4jkvfUn1IxM/BpelhB
+         J2nXX0GEfir+3dDgwYA0LJZiJ3KNitx3qfzNeB22oiYTHNtgQNk+V//DAwDHifExUXeb
+         OxzfR/tTK7vB28s8jjQGqppasPwalnEDD6TlCUvbEX2OWgKBvQqGp3xtvDn/jOJozagX
+         6RJyuB/cGOUu9NTpjryrv7qnwhn52ChXby9o0gY3QqNdM1H4GjudaUx8ax+0xb6M/3uF
+         AYdw==
+X-Gm-Message-State: AOAM532aU/kAinPTDYci9xLU3z2YEmR4Xapz27/W7IF+fxZW+wOjnzjs
+        A6cqCTPFCQ4xOa81+5TrtBcPO8tlqS0hmgUw6JbC7I1FBUrgt37rOEwmKueIoIdGuRxO8K8jz8Z
+        zgToHqQ2FlZ3cQQkzVcA9AClNbFgL0XnpxkE5UlVwhb1s/JNTDGBcSsKPMTGqThM00hAjDi1/hK
+        Vl
+X-Google-Smtp-Source: ABdhPJw6OPs/uVtSZcBHz2FT9mMKID2FZjmYHAS3+H7DjT1NQh+6pBz5N57c06RrZ5Z9R23LI2a6wH+Ktal4
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:8806:6b98:8ae6:8824])
- (user=apusaka job=sendgmr) by 2002:ad4:4c45:: with SMTP id
- cs5mr36050943qvb.6.1621938607208; Tue, 25 May 2021 03:30:07 -0700 (PDT)
-Date:   Tue, 25 May 2021 18:29:33 +0800
+ (user=apusaka job=sendgmr) by 2002:a25:cb01:: with SMTP id
+ b1mr1683727ybg.236.1621938611056; Tue, 25 May 2021 03:30:11 -0700 (PDT)
+Date:   Tue, 25 May 2021 18:29:34 +0800
 In-Reply-To: <20210525102941.3958649-1-apusaka@google.com>
-Message-Id: <20210525182900.4.I12d95340363056b05f656880e3dad40322eab39f@changeid>
+Message-Id: <20210525182900.5.I8353f22ae68a7e5ed9aaa44a692dec6d11bcb43a@changeid>
 Mime-Version: 1.0
 References: <20210525102941.3958649-1-apusaka@google.com>
 X-Mailer: git-send-email 2.31.1.818.g46aad6cb9e-goog
-Subject: [PATCH 04/12] Bluetooth: use inclusive language in HCI LE features
+Subject: [PATCH 05/12] Bluetooth: use inclusive language in L2CAP
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
@@ -89,80 +89,45 @@ Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 
 ---
 
- include/net/bluetooth/hci.h |  6 +++---
- net/bluetooth/hci_event.c   | 14 +++++++-------
- 2 files changed, 10 insertions(+), 10 deletions(-)
+ include/net/bluetooth/l2cap.h | 2 +-
+ net/bluetooth/l2cap_sock.c    | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index a7cf5a2d87c5..441125f6b616 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -489,7 +489,7 @@ enum {
- /* LE features */
- #define HCI_LE_ENCRYPTION		0x01
- #define HCI_LE_CONN_PARAM_REQ_PROC	0x02
--#define HCI_LE_SLAVE_FEATURES		0x08
-+#define HCI_LE_PERIPHERAL_FEATURES	0x08
- #define HCI_LE_PING			0x10
- #define HCI_LE_DATA_LEN_EXT		0x20
- #define HCI_LE_LL_PRIVACY		0x40
-@@ -498,8 +498,8 @@ enum {
- #define HCI_LE_PHY_CODED		0x08
- #define HCI_LE_EXT_ADV			0x10
- #define HCI_LE_CHAN_SEL_ALG2		0x40
--#define HCI_LE_CIS_MASTER		0x10
--#define HCI_LE_CIS_SLAVE		0x20
-+#define HCI_LE_CIS_CENTRAL		0x10
-+#define HCI_LE_CIS_PERIPHERAL		0x20
+diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
+index 3c4f550e5a8b..1f5ed6b163af 100644
+--- a/include/net/bluetooth/l2cap.h
++++ b/include/net/bluetooth/l2cap.h
+@@ -89,7 +89,7 @@ struct l2cap_conninfo {
+ };
  
- /* Connection modes */
- #define HCI_CM_ACTIVE	0x0000
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index e5f3840abd1a..a809e90326d7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5243,17 +5243,17 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	hci_debugfs_create_conn(conn);
- 	hci_conn_add_sysfs(conn);
+ #define L2CAP_LM	0x03
+-#define L2CAP_LM_MASTER		0x0001
++#define L2CAP_LM_CENTRAL	0x0001
+ #define L2CAP_LM_AUTH		0x0002
+ #define L2CAP_LM_ENCRYPT	0x0004
+ #define L2CAP_LM_TRUSTED	0x0008
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index c99d65ef13b1..9080d001a03a 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -503,7 +503,7 @@ static int l2cap_sock_getsockopt_old(struct socket *sock, int optname,
+ 		}
  
--	/* The remote features procedure is defined for master
-+	/* The remote features procedure is defined for central
- 	 * role only. So only in case of an initiated connection
- 	 * request the remote features.
- 	 *
--	 * If the local controller supports slave-initiated features
--	 * exchange, then requesting the remote features in slave
-+	 * If the local controller supports peripheral-initiated features
-+	 * exchange, then requesting the remote features in peripheral
- 	 * role is possible. Otherwise just transition into the
- 	 * connected state without requesting the remote features.
- 	 */
- 	if (conn->out ||
--	    (hdev->le_features[0] & HCI_LE_SLAVE_FEATURES)) {
-+	    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES)) {
- 		struct hci_cp_le_read_remote_features cp;
+ 		if (test_bit(FLAG_ROLE_SWITCH, &chan->flags))
+-			opt |= L2CAP_LM_MASTER;
++			opt |= L2CAP_LM_CENTRAL;
  
- 		cp.handle = __cpu_to_le16(conn->handle);
-@@ -5774,7 +5774,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev,
- 		if (conn->state == BT_CONFIG) {
- 			__u8 status;
+ 		if (test_bit(FLAG_FORCE_RELIABLE, &chan->flags))
+ 			opt |= L2CAP_LM_RELIABLE;
+@@ -807,7 +807,7 @@ static int l2cap_sock_setsockopt_old(struct socket *sock, int optname,
+ 		if (opt & L2CAP_LM_SECURE)
+ 			chan->sec_level = BT_SECURITY_HIGH;
  
--			/* If the local controller supports slave-initiated
-+			/* If the local controller supports peripheral-initiated
- 			 * features exchange, but the remote controller does
- 			 * not, then it is possible that the error code 0x1a
- 			 * for unsupported remote feature gets returned.
-@@ -5783,8 +5783,8 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev,
- 			 * transition into connected state and mark it as
- 			 * successful.
- 			 */
--			if ((hdev->le_features[0] & HCI_LE_SLAVE_FEATURES) &&
--			    !conn->out && ev->status == 0x1a)
-+			if (!conn->out && ev->status == 0x1a &&
-+			    (hdev->le_features[0] & HCI_LE_PERIPHERAL_FEATURES))
- 				status = 0x00;
- 			else
- 				status = ev->status;
+-		if (opt & L2CAP_LM_MASTER)
++		if (opt & L2CAP_LM_CENTRAL)
+ 			set_bit(FLAG_ROLE_SWITCH, &chan->flags);
+ 		else
+ 			clear_bit(FLAG_ROLE_SWITCH, &chan->flags);
 -- 
 2.31.1.818.g46aad6cb9e-goog
 
