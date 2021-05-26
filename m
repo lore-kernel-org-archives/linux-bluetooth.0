@@ -2,110 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_RED autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5A63C47089
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:50:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A505C47088
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 17:36:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8953C613E1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:50:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DA936101B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 17:36:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235415AbhEZPvd (ORCPT
+        id S234439AbhEZRiD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 May 2021 11:51:33 -0400
-Received: from mail.kernel.org ([198.145.29.99]:36496 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235370AbhEZPvU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 May 2021 11:51:20 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id BF93161184;
-        Wed, 26 May 2021 15:49:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1622044178;
-        bh=uyJM6RmL4VFOIpdrgSUrinaAJ058EDjZ1XMhpJ0RipY=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=dUE8zMqAXEPdRvMBVtCaDDomtwIkS8UIos2Vn2ggDOzI/gUAhah5INMyy7aya8QqM
-         HCbdOp6JRcQKBvw1x4BnScLAESoZEsHBW5n3VBfgBneBehi14KtfrEBo1clXAhCt7C
-         CpvUh1hf2Lz1Xfu2tKbSZwg0+L96lQxa14FY+up8=
-Date:   Wed, 26 May 2021 17:49:35 +0200
-From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linma <linma@zju.edu.cn>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, Hao Xiong <mart1n@zju.edu.cn>,
-        stable <stable@vger.kernel.org>
-Subject: Re: [PATCH] Bluetooth: fix the erroneous flush_work() order
-Message-ID: <YK5uD/z8oQqyle3w@kroah.com>
-References: <20210525114215.141988-1-gregkh@linuxfoundation.org>
- <87CD8C35-C7D2-4CF7-B9F9-266B3498DB94@holtmann.org>
+        Wed, 26 May 2021 13:38:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48010 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231461AbhEZRiB (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 26 May 2021 13:38:01 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F84DC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 May 2021 10:36:30 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id g24so1200113pji.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 26 May 2021 10:36:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=W0xL/wAmB2zPBX9ms3ONNX4hzcZBWDkgv2/924oUi3c=;
+        b=jAZlH3uT8PuIp/2oEVFg3EqLrlZNGEfE6INcfmp1PWE9GSZNvdJMcxyKaKMbfFwceC
+         /vqD1J6C/b0c1FlKc+1KFVtdmg6HiF/1XEnq3wZgcK6XqXdF0ynY5E0KCdABAPDdQvua
+         BuozTNakWslEdX1Of3LbPQwPy0LeaOzmiKF4SDJKZldELzphCXkl85+IHBNPDq0zvO/0
+         udh09rdNMhBwsPULc5SAs/ejYwmV51Hyv4ksS2EnC9Qw5h6N88nOb1ZUoySqZ5tbROrO
+         KgOFopmrzQDWrCdAy8L3abvA1Em6ACVhq0cZbKp3VERPqt3dpqNxmL1eolLyH2Nki97g
+         NPew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=W0xL/wAmB2zPBX9ms3ONNX4hzcZBWDkgv2/924oUi3c=;
+        b=YQek4xxRdfYO99x5UuvOK7eaoHieEv/848sSVdSp0k/5QcHhsrqOrDRpx3XxG8b4kK
+         y0DusW4cLRa4XsUWlgmDL7MDopnKOWC+ZcgtouXyN51c88EC2WmibOGt6TY66tMrahE7
+         r9QwdEyX2xGcRdkS37QuV2BnB2pJ9lBwaRUr1A7+E5o3LxcWcBdAevV+fkdXotUdTx97
+         5w7/RLezYLsYG171mqgTwO6VQBoCfmDb20MChpTCaS39WvD1FLIB3m576Oc/BYfGo+Wq
+         lQdQ+IGe3Yl+kMpc9bOr6ZyC6E3slmxWRCkT68hcDTM8V7vw6Mncl32BQBK0lsjxjbjk
+         jr8A==
+X-Gm-Message-State: AOAM532Ia4ciEBfQICsWVIa6brN6vInwzCUxF3uhWdKWywfGl3WoFOUL
+        JfaoLAzhRvim9Lk2lrlAeYsO+9sNsnTO0A==
+X-Google-Smtp-Source: ABdhPJzm2aH+alspi2S11MPhv4svtpgjzJ9sHLIFEJBQYN7cHKIKujR2QPw1570f+eTg9LisYd4TjQ==
+X-Received: by 2002:a17:90a:5406:: with SMTP id z6mr35932161pjh.130.1622050587651;
+        Wed, 26 May 2021 10:36:27 -0700 (PDT)
+Received: from han1-mobl3.intel.com ([2601:1c0:6a01:d830::e853])
+        by smtp.gmail.com with ESMTPSA id z5sm16187894pfa.172.2021.05.26.10.36.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 26 May 2021 10:36:26 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [PATCH V2] Bluetooth: mgmt: Fix the command returns garbage parameter value
+Date:   Wed, 26 May 2021 10:36:22 -0700
+Message-Id: <20210526173622.444397-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87CD8C35-C7D2-4CF7-B9F9-266B3498DB94@holtmann.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, May 26, 2021 at 05:05:50PM +0200, Marcel Holtmann wrote:
-> Hi Greg,
-> 
-> > From: linma <linma@zju.edu.cn>
-> 
-> this needs a real name, but I could fix that on git am as well.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-"Lin Ma"
+When the Get Device Flags command fails, it returns the error status
+with the parameters filled with the garbage values. Although the
+parameters are not used, it is better to fill with zero than the random
+values.
 
-> > In the cleanup routine for failed initialization of HCI device,
-> > the flush_work(&hdev->rx_work) need to be finished before the
-> > flush_work(&hdev->cmd_work). Otherwise, the hci_rx_work() can
-> > possibly invoke new cmd_work and cause a bug, like double free,
-> > in late processings.
-> > 
-> > This was assigned CVE-2021-3564.
-> > 
-> > This patch reorder the flush_work() to fix this bug.
-> > 
-> > Cc: Marcel Holtmann <marcel@holtmann.org>
-> > Cc: Johan Hedberg <johan.hedberg@gmail.com>
-> > Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> > Cc: "David S. Miller" <davem@davemloft.net>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: linux-bluetooth@vger.kernel.org
-> > Cc: netdev@vger.kernel.org
-> > Cc: linux-kernel@vger.kernel.org
-> > Signed-off-by: Lin Ma <linma@zju.edu.cn>
-> > Signed-off-by: Hao Xiong <mart1n@zju.edu.cn>
-> > Cc: stable <stable@vger.kernel.org>
-> > Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> > ---
-> > net/bluetooth/hci_core.c | 7 ++++++-
-> > 1 file changed, 6 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index fd12f1652bdf..88aa32f44e68 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -1610,8 +1610,13 @@ static int hci_dev_do_open(struct hci_dev *hdev)
-> > 	} else {
-> > 		/* Init failed, cleanup */
-> > 		flush_work(&hdev->tx_work);
-> > -		flush_work(&hdev->cmd_work);
-> > +		/*
-> > +		 * Since hci_rx_work() is possible to awake new cmd_work
-> > +		 * it should be flushed first to avoid unexpected call of
-> > +		 * hci_cmd_work()
-> > +		 */
-> 
-> So everything in net/ uses the comment coding style enforced with --strict.
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ net/bluetooth/mgmt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-See v2 please.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index b44e19c69c44..91d36c3bf23e 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4061,6 +4061,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+ 
+ 	hci_dev_lock(hdev);
+ 
++	memset(&rp, 0, sizeof(rp));
++
+ 	if (cp->addr.type == BDADDR_BREDR) {
+ 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
+ 							      &cp->addr.bdaddr,
+-- 
+2.26.3
 
-thanks,
-
-greg k-h
