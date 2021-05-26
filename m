@@ -2,53 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_RED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8497C47082
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:02:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D4DBC47082
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:05:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88804613CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:02:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45937613CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:05:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235179AbhEZPDg (ORCPT
+        id S235212AbhEZPH1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 May 2021 11:03:36 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33281 "EHLO
+        Wed, 26 May 2021 11:07:27 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:41321 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235007AbhEZPDf (ORCPT
+        with ESMTP id S233472AbhEZPH0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 May 2021 11:03:35 -0400
+        Wed, 26 May 2021 11:07:26 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2CFD9CED1E;
-        Wed, 26 May 2021 17:09:58 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 57059CED1B;
+        Wed, 26 May 2021 17:13:46 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH] Bluetooth: Fix get device flags command returns garbage
- parameter
+Subject: Re: [PATCH] Bluetooth: fix the erroneous flush_work() order
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210526002816.413660-1-hj.tedd.an@gmail.com>
-Date:   Wed, 26 May 2021 17:02:02 +0200
-Cc:     linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
+In-Reply-To: <20210525114215.141988-1-gregkh@linuxfoundation.org>
+Date:   Wed, 26 May 2021 17:05:50 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linma <linma@zju.edu.cn>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Hao Xiong <mart1n@zju.edu.cn>,
+        stable <stable@vger.kernel.org>
 Content-Transfer-Encoding: 7bit
-Message-Id: <34D9C8B2-2B39-4AFD-83F3-F99726EA6292@holtmann.org>
-References: <20210526002816.413660-1-hj.tedd.an@gmail.com>
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Message-Id: <87CD8C35-C7D2-4CF7-B9F9-266B3498DB94@holtmann.org>
+References: <20210525114215.141988-1-gregkh@linuxfoundation.org>
+To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Greg,
 
-> This patch memset the response parameter so it doesn't return the garbage
-> value when the Get Device Flags command fails.
+> From: linma <linma@zju.edu.cn>
+
+this needs a real name, but I could fix that on git am as well.
+
 > 
+> In the cleanup routine for failed initialization of HCI device,
+> the flush_work(&hdev->rx_work) need to be finished before the
+> flush_work(&hdev->cmd_work). Otherwise, the hci_rx_work() can
+> possibly invoke new cmd_work and cause a bug, like double free,
+> in late processings.
+> 
+> This was assigned CVE-2021-3564.
+> 
+> This patch reorder the flush_work() to fix this bug.
+> 
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: linux-kernel@vger.kernel.org
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> Signed-off-by: Hao Xiong <mart1n@zju.edu.cn>
+> Cc: stable <stable@vger.kernel.org>
+> Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> ---
+> net/bluetooth/hci_core.c | 7 ++++++-
+> 1 file changed, 6 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index fd12f1652bdf..88aa32f44e68 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1610,8 +1610,13 @@ static int hci_dev_do_open(struct hci_dev *hdev)
+> 	} else {
+> 		/* Init failed, cleanup */
+> 		flush_work(&hdev->tx_work);
+> -		flush_work(&hdev->cmd_work);
+> +		/*
+> +		 * Since hci_rx_work() is possible to awake new cmd_work
+> +		 * it should be flushed first to avoid unexpected call of
+> +		 * hci_cmd_work()
+> +		 */
 
-please add a Fixes: tag here.
+So everything in net/ uses the comment coding style enforced with --strict.
 
 Regards
 
