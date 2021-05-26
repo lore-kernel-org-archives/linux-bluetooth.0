@@ -4,75 +4,81 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C34DBC47088
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:15:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E74AC47082
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:17:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A44CF613CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:15:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ED8C86101E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:17:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235433AbhEZPQ7 convert rfc822-to-8bit (ORCPT
+        id S235239AbhEZPTY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 May 2021 11:16:59 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58760 "EHLO
+        Wed, 26 May 2021 11:19:24 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:57501 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233431AbhEZPQx (ORCPT
+        with ESMTP id S235128AbhEZPTX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 May 2021 11:16:53 -0400
+        Wed, 26 May 2021 11:19:23 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9C28FCED1D;
-        Wed, 26 May 2021 17:23:14 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7CC7BCED1D;
+        Wed, 26 May 2021 17:25:45 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v2] Bluetooth: btusb: fix bt fiwmare downloading failure
- issue for qca btsoc.
+Subject: Re: [PATCH v2] Bluetooth: disable filter dup when scan for adv
+ monitor
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1622008265-18727-1-git-send-email-zijuhu@codeaurora.org>
-Date:   Wed, 26 May 2021 17:15:18 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20210520131145.v2.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
+Date:   Wed, 26 May 2021 17:17:49 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Manish Mandlik <mmandlik@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, tjiang@codeaurora.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <3E1910BA-9116-438F-91F9-AD3C3622668B@holtmann.org>
-References: <1622008265-18727-1-git-send-email-zijuhu@codeaurora.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <AE7453FB-1E39-422A-91FB-C136343B2991@holtmann.org>
+References: <20210520131145.v2.1.I69e82377dd94ad7cba0cde75bcac2dce62fbc542@changeid>
+To:     Howard Chung <howardchung@google.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Howard,
 
-> This is btsoc timing issue, after host start to downloading bt firmware,
-> ep2 need time to switch from function acl to function dfu, so host add
-> 20ms delay as workaround.
+> Disable duplicates filter when scanning for advertisement monitor for
+> the following reasons. The scanning includes active scan and passive
+> scan.
 > 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> For HW pattern filtering (ex. MSFT), Realtek and Qualcomm controllers
+> ignore RSSI_Sampling_Period when the duplicates filter is enabled.
+> 
+> For SW pattern filtering, when we're not doing interleaved scanning, it
+> is necessary to disable duplicates filter, otherwise hosts can only
+> receive one advertisement and it's impossible to know if a peer is still
+> in range.
+> 
+> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> Reviewed-by: Manish Mandlik <mmandlik@chromium.org>
+> 
+> Signed-off-by: Yun-Hao Chung <howardchung@chromium.org>
+> 
 > ---
-> drivers/bluetooth/btusb.c | 1 +
-> 1 file changed, 1 insertion(+)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 5245714..b0743db 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4064,6 +4064,7 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+> Changes in v2:
+> - include the vendor name in the comment and commit messages
 > 
-> 	sent += size;
-> 	count -= size;
+> net/bluetooth/hci_request.c | 46 +++++++++++++++++++++++++++++++++----
+> 1 file changed, 41 insertions(+), 5 deletions(-)
 
-you need a comment here explain why this is needed.
-
-> +	msleep(20);
-> 
-> 	while (count) {
-> 		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
+patch has been applied to bluetooth-next tree.
 
 Regards
 
