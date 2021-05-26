@@ -2,124 +2,303 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4711BC47086
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 20:07:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C115C47087
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 00:20:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2244C61358
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 25 May 2021 20:07:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4791613D6
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 00:20:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232183AbhEYUIk (ORCPT
+        id S232307AbhEZAV6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 25 May 2021 16:08:40 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39468 "EHLO
+        Tue, 25 May 2021 20:21:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229595AbhEYUIj (ORCPT
+        with ESMTP id S229595AbhEZAV5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 25 May 2021 16:08:39 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0636C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 13:07:08 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id f9so44786938ybo.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 13:07:08 -0700 (PDT)
+        Tue, 25 May 2021 20:21:57 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D2EAC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 17:20:26 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id ne24-20020a17090b3758b029015f2dafecb0so12968706pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 25 May 2021 17:20:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fVN656SSKNaQlxJCj0G7QK1Aj/Hjf4bAj4VCZn+ACWM=;
-        b=XaUZlgyJi9+KAGJx2n+PfjhDvrCAofIYSWaXfQH0MUDZkjiSpiRVhTVAZkX1vwkKgW
-         smb4mfdz2CSXlWX8NkgAOpkk+IdI/Ta9Yv0+oxoHqh2PFxjoPrCGCrYp4qJL6IQWs9Y8
-         eshsL6rHzH/8YgLmTiE2Bodf/5geBK5eBY4xjiN/WQ8khfQ2JRd78rap9Nu8PB6M/8us
-         C7DQ5udVjizg0SJAL2GSjsOCybmIN3Nv01qgGUmgHY4uuXDQF9AL5Whny0y9jkRCXUZL
-         8oDuOXB0joNKAURxMECybglNfU0+7tOr2uBs5PGny5tOV6yYlMOGZHgkPQlofKkP6OJS
-         KE/g==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=S5qSqx3TwuZ8VsmUQSyplqhBBlTtHbqLkNIGiOXodxw=;
+        b=D6JtIY3HzFs1Ylz7k7P5V0Y6pFaLQmooMjp1YgNl2t84SRhv0mgB66yD9FmevIuYBb
+         YJhzUiLvE2RKVsWYIVLDrLRhIrEvIJxbXcbFvhfQ3ThBJO/FRrHzcQsUoqmQUdYRwE1Q
+         V37ztJbpL5gSh9yYTQu/Ubb6tiUhxUQRmnqyb5zIEXl97VvqzmR6bFHDBU9+RjlnN5Nc
+         viDcGv98hLBcJOTZpxTxTzky62++YZvptijH/52AOGagkhso1o0jcnfV/bBFEJ6IPLMk
+         4EnNF+OWT4FCKOg/SHjKnufrsZX2GBxpLck02CjDEkECOy7NpHKtYnt4jzRrkvWxwVzx
+         uK9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fVN656SSKNaQlxJCj0G7QK1Aj/Hjf4bAj4VCZn+ACWM=;
-        b=UQ9N3Mu0pHaf+LlcXl48Tyg8JqQrTomNg618+05X40ECzk4C1a2StW/9e74nhg0NtW
-         DupMDKMKVxs9m229wrVQMUVHhNoWUk15L3F3FtTWG3AjD/9yvGWQ7MMBelSPhSwJEqeO
-         ar/cjRxfjLjjGxRZXQwxICPzraTQUH40mx2A4jeeaEJOnkgCr1EBs+gIGBBzyAAwhVHE
-         baoRH6N1JDDpta3dHQXPLRvnIeDLTRKSYAySwpZ02s4pIc1JFidbm/N1FPF+MdyfSwpq
-         916M5DHOErEi66OAkYjdpG/tEQiLoRMX/DmhhGYQMNAYFzR5rxPriRjsOG6tfES+2pTF
-         w1qA==
-X-Gm-Message-State: AOAM530nf5RIpnhTfCC9E3nehNMO3vqeHqjdC1KKTNtZojQ7APqCiopu
-        YjNr+qqdZc4Sh94sZ3/eAaCS6ibHakBhYfSeTM0=
-X-Google-Smtp-Source: ABdhPJz0mqscHOBKVyGogaMyeXuAaPjHH2KA4JC8EnTYT7VoPzXANLWbxUrToyOdVt4ozbOxfpmxE8WbybUkjqK56zM=
-X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr47784858ybu.282.1621973227975;
- Tue, 25 May 2021 13:07:07 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=S5qSqx3TwuZ8VsmUQSyplqhBBlTtHbqLkNIGiOXodxw=;
+        b=q8D/1nRknD8NoGFvZ3AfbKZQj2/kcjff7P2LdgMtt31+ypWnouhFwF1T/TW/V+t5MK
+         1Hnse49c98UA93ybt84yCAYUHbBOm4WdHdFnH3kuAfINww9y39kW55AoswigZqf2I50Q
+         3MVtelFDq+1ix25EcAH6EPOwTeFGTVg8LjAq3KmcbPHE01TedXi4O7YMM40+zJRLkmkh
+         4yZAu23xMbN3mg5PKICeWt2tYyzg+mPJvN66uK7fJBoTcM7W2c8rOZ90kmw7jnYekn10
+         ZatFqwGG8/qheZHNFPUq2uZBl+7klr6WZC+7xIukA8QGrmRbZ1+7jGvwyazTIbAjQdzD
+         2msA==
+X-Gm-Message-State: AOAM532uz0DOHqGNWQTEu30s/RRFLE7KSyPMsVPv39w+0p+KTI8WStZk
+        MTB3x+1dWCtzJZ9lU+NE1sjNQeADOesADQ==
+X-Google-Smtp-Source: ABdhPJxP5vU4iAKhgk5lDWvhtonOdNLJe6tuY9LU4dgZAzWyAdazrpTcIzIEtf9dKFm/Xey9sRyZYA==
+X-Received: by 2002:a17:90b:3615:: with SMTP id ml21mr34038280pjb.194.1621988425364;
+        Tue, 25 May 2021 17:20:25 -0700 (PDT)
+Received: from han1-mobl3.hsd1.or.comcast.net ([2601:1c0:6a01:d830::e853])
+        by smtp.gmail.com with ESMTPSA id t19sm14305726pfq.116.2021.05.25.17.20.24
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 25 May 2021 17:20:24 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH 1/4] tools/btmgmt: Add device flags commands
+Date:   Tue, 25 May 2021 17:20:21 -0700
+Message-Id: <20210526002024.412237-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-References: <81eddb07-f346-c12a-345b-d929fd2edb10@googlemail.com>
- <DM8PR11MB5573280FAB275DCEE789D389F5259@DM8PR11MB5573.namprd11.prod.outlook.com>
- <52914cbc-4004-8389-fa7b-6b42cf8f85e1@googlemail.com> <CABBYNZKtApu7Q4kU+msfLco-ihDrx5kWiugDRT0ic3_Tb1YSGg@mail.gmail.com>
- <d97da5b6-a337-3550-ace3-e6789fd9165f@googlemail.com>
-In-Reply-To: <d97da5b6-a337-3550-ace3-e6789fd9165f@googlemail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 25 May 2021 13:06:57 -0700
-Message-ID: <CABBYNZLYsM_LgKU8r0BRGp3hAk8m2OQWxnwtGz8VwidGCHRB-A@mail.gmail.com>
-Subject: Re: BT Intel: Regression loading firmware in linux-5.13-rc3
-To:     Chris Clayton <chris2553@googlemail.com>
-Cc:     "K, Kiran" <kiran.k@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "Von Dentz, Luiz" <luiz.von.dentz@intel.com>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Tue, May 25, 2021 at 12:22 PM Chris Clayton <chris2553@googlemail.com> wrote:
->
-> Thanks Luiz.
->
-> On 25/05/2021 19:10, Luiz Augusto von Dentz wrote:
-> > Hi Chris,
-> >
-> > On Tue, May 25, 2021 at 8:08 AM Chris Clayton <chris2553@googlemail.com> wrote:
-> >>
-> >> Thanks for your reply, Kiran.
-> >>
-> >> Does the phrase "next release" mean linux-5.13-rc4 or the next release of linux-firmware?  I just want to know what to
-> >> look out for.
-> >>
-> >> Thanks
-> >>
-> >> Chris
-> >>
-> >>
-> >> On 25/05/2021 11:14, K, Kiran wrote:
-> >>> Hi Chris,
-> >>>
-> >>> This is a known issue related to firmware and is expected to be fixed in next release.
-> >>>
-> >>> Thanks,
-> >>> Kiran
-> >>>
-> >>>
-> <snip>
-> >
-> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/drivers/bluetooth/btusb.c?id=183dce5a7fd3040ced6a220b0aa536c926f10cd9
-> >
-> > That said we shall probably merge it to 5.13 before it is released.
-> > I think you should, otherwise, without patching, 5.13.0 will be broken for many bluetooth users.
->
-> I've applied your patch your patch to Linus' latest and greatest (by hand - it doesn't apply cleanly to the current 5.13
-> tree). The error messages are no longer produced and bluetooth is working fine, so...
->
-> Tested-by: Chris Clayton <chris2553@googlemail.com>
+This patch adds commands for get/set device flags mgmt ops.
 
-Shall I have another pull request, or do we need to send this directly
-to Linus somehow?
+Usage:
 
+get-flags [-t type] <address>
+	-t type    Address Type
+		   0 BR/EDR
+		   1 LE Public
+		   2 LE Random
+
+set-flags [-f flags] [-t type] <address>
+	-t type    Address Type
+		   0 BR/EDR
+		   1 LE Public
+		   2 LE Random
+	-f flags   Device flag.
+		   1 Remote Wake Enable
+---
+ tools/btmgmt.c | 174 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 174 insertions(+)
+
+diff --git a/tools/btmgmt.c b/tools/btmgmt.c
+index bf3b460d0..a6ac026dc 100644
+--- a/tools/btmgmt.c
++++ b/tools/btmgmt.c
+@@ -1000,6 +1000,24 @@ static void advertising_removed(uint16_t index, uint16_t len,
+ 	print("hci%u advertising_removed: instance %u", index, ev->instance);
+ }
+ 
++static void flags_changed(uint16_t index, uint16_t len, const void *param,
++							void *user_data)
++{
++	const struct mgmt_ev_device_flags_changed *ev = param;
++	char addr[18];
++
++	if (len < sizeof(*ev)) {
++		error("Too small (%u bytes) %s event", len, __func__);
++		return;
++	}
++
++	ba2str(&ev->addr.bdaddr, addr);
++	print("hci%u device_flags_changed: %s (%s)", index, addr,
++							typestr(ev->addr.type));
++	print("     supp: 0x%08x  curr: 0x%08x",
++					ev->supported_flags, ev->current_flags);
++}
++
+ static void advmon_added(uint16_t index, uint16_t len, const void *param,
+ 							void *user_data)
+ {
+@@ -2110,6 +2128,156 @@ static void cmd_auto_power(int argc, char **argv)
+ 	}
+ }
+ 
++static void get_flags_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	const struct mgmt_rp_get_device_flags *rp = param;
++
++	if (status != 0) {
++		error("Get device flags failed with status 0x%02x (%s)",
++						status, mgmt_errstr(status));
++		bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	print("Supported Flags: 0x%08x", rp->supported_flags);
++	print("Current Flags:   0x%08x", rp->current_flags);
++	bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static struct option get_flags_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "type",	1, 0, 't' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_get_flags(int argc, char **argv)
++{
++	struct mgmt_cp_get_device_flags cp;
++	uint8_t type = BDADDR_BREDR;
++	char addr[18];
++	int opt;
++	uint16_t index;
++
++	while ((opt = getopt_long(argc, argv, "+t:h", get_flags_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++			bt_shell_usage();
++			optind = 0;
++			return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++		default:
++			bt_shell_usage();
++			optind = 0;
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		bt_shell_usage();
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++
++	ba2str(&cp.addr.bdaddr, addr);
++	print("Get device flag of %s (%s)", addr, typestr(cp.addr.type));
++
++	if (mgmt_send(mgmt, MGMT_OP_GET_DEVICE_FLAGS, index, sizeof(cp), &cp,
++					get_flags_rsp, NULL, NULL) == 0) {
++		error("Unable to send Get Device Flags command");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++}
++
++static void set_flags_rsp(uint8_t status, uint16_t len, const void *param,
++							void *user_data)
++{
++	if (status != 0) {
++		error("Set device flags failed with status 0x%02x (%s)",
++						status, mgmt_errstr(status));
++		bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++	bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
++static struct option set_flags_options[] = {
++	{ "help",	0, 0, 'h' },
++	{ "type",	1, 0, 't' },
++	{ "flags",	1, 0, 'f' },
++	{ 0, 0, 0, 0 }
++};
++
++static void cmd_set_flags(int argc, char **argv)
++{
++	struct mgmt_cp_set_device_flags cp;
++	uint8_t type = BDADDR_BREDR;
++	uint32_t flags = 0;
++	char addr[18];
++	int opt;
++	uint16_t index;
++
++	while ((opt = getopt_long(argc, argv, "+f:t:h", set_flags_options,
++								NULL)) != -1) {
++		switch (opt) {
++		case 'f':
++			flags = strtol(optarg, NULL, 0);
++			break;
++		case 't':
++			type = strtol(optarg, NULL, 0);
++			break;
++		case 'h':
++			bt_shell_usage();
++			optind = 0;
++			return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++		default:
++			bt_shell_usage();
++			optind = 0;
++			return bt_shell_noninteractive_quit(EXIT_FAILURE);
++		}
++	}
++
++	argc -= optind;
++	argv += optind;
++	optind = 0;
++
++	if (argc < 1) {
++		bt_shell_usage();
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++	index = mgmt_index;
++	if (index == MGMT_INDEX_NONE)
++		index = 0;
++
++	memset(&cp, 0, sizeof(cp));
++	str2ba(argv[0], &cp.addr.bdaddr);
++	cp.addr.type = type;
++	cp.current_flags = flags;
++
++	ba2str(&cp.addr.bdaddr, addr);
++	print("Set device flag of %s (%s)", addr, typestr(cp.addr.type));
++
++	if (mgmt_send(mgmt, MGMT_OP_SET_DEVICE_FLAGS, index, sizeof(cp), &cp,
++					set_flags_rsp, NULL, NULL) == 0) {
++		error("Unable to send Set Device Flags command");
++		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	}
++
++}
++
+ /* Wrapper to get the index and opcode to the response callback */
+ struct command_data {
+ 	uint16_t id;
+@@ -5197,6 +5365,8 @@ static void register_mgmt_callbacks(struct mgmt *mgmt, uint16_t index)
+ 						advertising_added, NULL, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_ADVERTISING_REMOVED, index,
+ 					advertising_removed, NULL, NULL);
++	mgmt_register(mgmt, MGMT_EV_DEVICE_FLAGS_CHANGED, index,
++					flags_changed, NULL, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_ADDED, index, advmon_added,
+ 								NULL, NULL);
+ 	mgmt_register(mgmt, MGMT_EV_ADV_MONITOR_REMOVED, index, advmon_removed,
+@@ -5381,6 +5551,10 @@ static const struct bt_shell_menu main_menu = {
+ 		cmd_read_sysconfig,	"Read System Configuration"	},
+ 	{ "set-sysconfig",	"<-v|-h> [options...]",
+ 		cmd_set_sysconfig,	"Set System Configuration"	},
++	{ "get-flags",		"[-t type] <address>",
++		cmd_get_flags,		"Get device flags"		},
++	{ "set-flags",		"[-f flags] [-t type] <address>",
++		cmd_set_flags,		"Set device flags"		},
+ 	{} },
+ };
+ 
 -- 
-Luiz Augusto von Dentz
+2.26.3
+
