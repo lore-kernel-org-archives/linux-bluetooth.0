@@ -4,80 +4,83 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09966C47082
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:13:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D44D2C47082
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:14:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4EA16101E
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:12:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B5C7D6139A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:14:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235378AbhEZPO3 convert rfc822-to-8bit (ORCPT
+        id S235242AbhEZPPh convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 May 2021 11:14:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:35182 "EHLO
+        Wed, 26 May 2021 11:15:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56267 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235339AbhEZPO0 (ORCPT
+        with ESMTP id S235348AbhEZPPf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 May 2021 11:14:26 -0400
+        Wed, 26 May 2021 11:15:35 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B4038CED1D;
-        Wed, 26 May 2021 17:20:47 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id ACDBFCED1D;
+        Wed, 26 May 2021 17:21:57 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH 05/12] Bluetooth: use inclusive language in L2CAP
+Subject: Re: [PATCH v1] Bluetooth: btusb: use default nvm if boardID is 0 for
+ wcn6855.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210525182900.5.I8353f22ae68a7e5ed9aaa44a692dec6d11bcb43a@changeid>
-Date:   Wed, 26 May 2021 17:12:51 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Wed, 26 May 2021 17:14:01 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, tjiang@codeaurora.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <234F83C9-7D24-41A5-A6B4-7B9F515323C0@holtmann.org>
-References: <20210525102941.3958649-1-apusaka@google.com>
- <20210525182900.5.I8353f22ae68a7e5ed9aaa44a692dec6d11bcb43a@changeid>
-To:     Archie Pusaka <apusaka@google.com>
+Message-Id: <0200EB0E-F931-43F1-B1CB-E19127BE9A70@holtmann.org>
+References: <1618996576-7743-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Zijun,
 
-> Use "central" and "peripheral".
+> if boardID is 0, will use the default nvm file without surfix.
 > 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> 
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 > ---
+> drivers/bluetooth/btusb.c | 11 ++++++++---
+> 1 file changed, 8 insertions(+), 3 deletions(-)
 > 
-> include/net/bluetooth/l2cap.h | 2 +-
-> net/bluetooth/l2cap_sock.c    | 4 ++--
-> 2 files changed, 3 insertions(+), 3 deletions(-)
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 6f25337..61afea9 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -4138,9 +4138,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+> 	int err;
 > 
-> diff --git a/include/net/bluetooth/l2cap.h b/include/net/bluetooth/l2cap.h
-> index 3c4f550e5a8b..1f5ed6b163af 100644
-> --- a/include/net/bluetooth/l2cap.h
-> +++ b/include/net/bluetooth/l2cap.h
-> @@ -89,7 +89,7 @@ struct l2cap_conninfo {
-> };
-> 
-> #define L2CAP_LM	0x03
-> -#define L2CAP_LM_MASTER		0x0001
-> +#define L2CAP_LM_CENTRAL	0x0001
-> #define L2CAP_LM_AUTH		0x0002
-> #define L2CAP_LM_ENCRYPT	0x0004
-> #define L2CAP_LM_TRUSTED	0x0008
+> 	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -			 le32_to_cpu(ver->rom_version),
+> -			 le16_to_cpu(ver->board_id));
+> +		if (le16_to_cpu(ver->board_id) == 0x0) { //if boardid equal 0, use default nvm.
 
-same as with the RFCOMM change, this is something I am not prepared to do right now since it touches API.
+this comment style is not acceptable.
+
+> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> +				 le32_to_cpu(ver->rom_version));
+> +		} else {
+> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> +				le32_to_cpu(ver->rom_version),
+> +				le16_to_cpu(ver->board_id));
+> +		}
+> 	} else {
+> 		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> 			 le32_to_cpu(ver->rom_version));
 
 Regards
 
