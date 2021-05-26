@@ -3,177 +3,91 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 59144C47088
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 14:59:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CFF4CC47088
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:01:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E237613BC
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 14:59:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0E39613CA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 26 May 2021 15:01:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235178AbhEZPBE convert rfc822-to-8bit (ORCPT
+        id S234923AbhEZPCg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 26 May 2021 11:01:04 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47950 "EHLO
+        Wed, 26 May 2021 11:02:36 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53311 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235188AbhEZPBC (ORCPT
+        with ESMTP id S235234AbhEZPCf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 26 May 2021 11:01:02 -0400
+        Wed, 26 May 2021 11:02:35 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 38623CED1B;
-        Wed, 26 May 2021 17:07:24 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 030E9CED1B;
+        Wed, 26 May 2021 17:08:57 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH] Bluetooth: hci_h5: Add RTL8822CS capabilities
+Subject: Re: BT Intel: Regression loading firmware in linux-5.13-rc3
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAJQfnxErqfZ-+NgT2xeeOADChJxs2hkwkn-qePtJTRcU53BmGw@mail.gmail.com>
-Date:   Wed, 26 May 2021 16:59:28 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>
+In-Reply-To: <CABBYNZLYsM_LgKU8r0BRGp3hAk8m2OQWxnwtGz8VwidGCHRB-A@mail.gmail.com>
+Date:   Wed, 26 May 2021 17:01:02 +0200
+Cc:     Chris Clayton <chris2553@googlemail.com>,
+        "K, Kiran" <kiran.k@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <14DD0026-DE65-4EAA-B5EF-F98C3407BA1A@holtmann.org>
-References: <20210513165327.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
- <7867EC1F-324A-4739-B5F7-DDEB3994EA7A@holtmann.org>
- <CAJQfnxE4PY09GpxGYLKy2kXnaCQaUmCakhCKnhqGnoK+9aSyyg@mail.gmail.com>
- <DAE03499-573B-4A72-A2A9-2E139B78AB2E@holtmann.org>
- <CAJQfnxHg50mKGVpQoH-dobphAzpFwyc2gQMzVkLZeNUW0Yyh3Q@mail.gmail.com>
- <CAJQfnxG1ba=imd_BiOXpuT8WF8HeWPcs5y4kdKx+fV6LEL9SyA@mail.gmail.com>
- <3DB375AF-3BC3-43F3-A1F5-1E3CBF17318D@holtmann.org>
- <CAJQfnxE+qiPor8xUd8zuJH45LmbrHb8YwcvjrnhkG0LovP1vyw@mail.gmail.com>
- <CAJQfnxErqfZ-+NgT2xeeOADChJxs2hkwkn-qePtJTRcU53BmGw@mail.gmail.com>
-To:     Archie Pusaka <apusaka@google.com>
+Message-Id: <F70C22C4-8E2D-4C98-8AF9-0C12A06BFC85@holtmann.org>
+References: <81eddb07-f346-c12a-345b-d929fd2edb10@googlemail.com>
+ <DM8PR11MB5573280FAB275DCEE789D389F5259@DM8PR11MB5573.namprd11.prod.outlook.com>
+ <52914cbc-4004-8389-fa7b-6b42cf8f85e1@googlemail.com>
+ <CABBYNZKtApu7Q4kU+msfLco-ihDrx5kWiugDRT0ic3_Tb1YSGg@mail.gmail.com>
+ <d97da5b6-a337-3550-ace3-e6789fd9165f@googlemail.com>
+ <CABBYNZLYsM_LgKU8r0BRGp3hAk8m2OQWxnwtGz8VwidGCHRB-A@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Luiz,
 
->>>>>>>>> RTL8822 chipset supports WBS, and this information is conveyed in
->>>>>>>>> btusb.c. However, the UART driver doesn't have this information just
->>>>>>>>> yet.
->>>>>>>>> 
->>>>>>>>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
->>>>>>>>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
->>>>>>>>> ---
->>>>>>>>> 
->>>>>>>>> drivers/bluetooth/btrtl.c  | 26 ++++++++++++++++----------
->>>>>>>>> drivers/bluetooth/btrtl.h  |  2 ++
->>>>>>>>> drivers/bluetooth/hci_h5.c |  5 +----
->>>>>>>>> 3 files changed, 19 insertions(+), 14 deletions(-)
->>>>>>>>> 
->>>>>>>>> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
->>>>>>>>> index e7fe5fb22753..988a09860c6b 100644
->>>>>>>>> --- a/drivers/bluetooth/btrtl.c
->>>>>>>>> +++ b/drivers/bluetooth/btrtl.c
->>>>>>>>> @@ -719,17 +719,8 @@ int btrtl_download_firmware(struct hci_dev *hdev,
->>>>>>>>> }
->>>>>>>>> EXPORT_SYMBOL_GPL(btrtl_download_firmware);
->>>>>>>>> 
->>>>>>>>> -int btrtl_setup_realtek(struct hci_dev *hdev)
->>>>>>>>> +void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
->>>>>>>>> {
->>>>>>>>> -     struct btrtl_device_info *btrtl_dev;
->>>>>>>>> -     int ret;
->>>>>>>>> -
->>>>>>>>> -     btrtl_dev = btrtl_initialize(hdev, NULL);
->>>>>>>>> -     if (IS_ERR(btrtl_dev))
->>>>>>>>> -             return PTR_ERR(btrtl_dev);
->>>>>>>>> -
->>>>>>>>> -     ret = btrtl_download_firmware(hdev, btrtl_dev);
->>>>>>>>> -
->>>>>>>>>    /* Enable controller to do both LE scan and BR/EDR inquiry
->>>>>>>>>     * simultaneously.
->>>>>>>>>     */
->>>>>>>>> @@ -750,6 +741,21 @@ int btrtl_setup_realtek(struct hci_dev *hdev)
->>>>>>>>>            rtl_dev_dbg(hdev, "WBS supported not enabled.");
->>>>>>>>>            break;
->>>>>>>>>    }
->>>>>>>>> +}
->>>>>>>>> +EXPORT_SYMBOL_GPL(btrtl_set_quirks);
->>>>>>>>> +
->>>>>>>>> +int btrtl_setup_realtek(struct hci_dev *hdev)
->>>>>>>>> +{
->>>>>>>>> +     struct btrtl_device_info *btrtl_dev;
->>>>>>>>> +     int ret;
->>>>>>>>> +
->>>>>>>>> +     btrtl_dev = btrtl_initialize(hdev, NULL);
->>>>>>>>> +     if (IS_ERR(btrtl_dev))
->>>>>>>>> +             return PTR_ERR(btrtl_dev);
->>>>>>>>> +
->>>>>>>>> +     ret = btrtl_download_firmware(hdev, btrtl_dev);
->>>>>>>>> +
->>>>>>>>> +     btrtl_set_quirks(hdev, btrtl_dev);
->>>>>>>>> 
->>>>>>>>>    btrtl_free(btrtl_dev);
->>>>>>>>>    return ret;
->>>>>>>>> diff --git a/drivers/bluetooth/btrtl.h b/drivers/bluetooth/btrtl.h
->>>>>>>>> index 2a582682136d..260167f01b08 100644
->>>>>>>>> --- a/drivers/bluetooth/btrtl.h
->>>>>>>>> +++ b/drivers/bluetooth/btrtl.h
->>>>>>>>> @@ -54,6 +54,8 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
->>>>>>>>> void btrtl_free(struct btrtl_device_info *btrtl_dev);
->>>>>>>>> int btrtl_download_firmware(struct hci_dev *hdev,
->>>>>>>>>                        struct btrtl_device_info *btrtl_dev);
->>>>>>>>> +void btrtl_set_quirks(struct hci_dev *hdev,
->>>>>>>>> +                   struct btrtl_device_info *btrtl_dev);
->>>>>>>>> int btrtl_setup_realtek(struct hci_dev *hdev);
->>>>>>>>> int btrtl_shutdown_realtek(struct hci_dev *hdev);
->>>>>>>>> int btrtl_get_uart_settings(struct hci_dev *hdev,
->>>>>>>>> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
->>>>>>>>> index 27e96681d583..e0520639f4ba 100644
->>>>>>>>> --- a/drivers/bluetooth/hci_h5.c
->>>>>>>>> +++ b/drivers/bluetooth/hci_h5.c
->>>>>>>>> @@ -906,10 +906,7 @@ static int h5_btrtl_setup(struct h5 *h5)
->>>>>>>>>    /* Give the device some time before the hci-core sends it a reset */
->>>>>>>>>    usleep_range(10000, 20000);
->>>>>>>>> 
->>>>>>>>> -     /* Enable controller to do both LE scan and BR/EDR inquiry
->>>>>>>>> -      * simultaneously.
->>>>>>>>> -      */
->>>>>>>>> -     set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &h5->hu->hdev->quirks);
->>>>>>>>> +     btrtl_set_quirks(h5->hu->hdev, btrtl_dev);
->>>>>>>> 
->>>>>>>> any reason why not just setting WBS quirk here?
->>>>>>> 
->>>>>>> Hmm, I think WBS is the feature of the chipset and not the transport.
->>>>>>> Therefore isn't it better to just have it set in one place?
->>>>>>> Setting the quirks here means we need to copy paste the settings from btrtl.c.
->>>>>> 
->>>>>> but since you are already setting HCI_QUIRK_SIMULTANEOUS_DISCOVERY right now, I don’t see the difference.
->>>>> 
->>>>> Sorry, I don't get what you mean.
->>>>> With this patch I also moved HCI_QUIRK_SIMULTANEOUS_DISCOVERY into
->>>>> btrtl.c, so it's together with the WBS quirk.
->>>>> 
->>>>>> Can we actually verify that we still need the WBS quirk. I think we fixed the broken errerrnous packet flag handling.
->>>>> 
->>>>> To be honest, I am not aware about the story of the broken erroneous
->>>>> packet flag.
->>>>> Last time I checked I still needed the quirk to have RTL8822 on UART
->>>>> properly run WBS, but that was months ago...
->>>>> Let me verify whether this quirk is still needed.
+>>>> Thanks for your reply, Kiran.
 >>>> 
->>>> It looks like we still need the WBS quirk because otherwise the host
->>>> wouldn't know whether the controller supports WBS or not. It's used in
->>>> get_supported_settings() in mgmt.c.
+>>>> Does the phrase "next release" mean linux-5.13-rc4 or the next release of linux-firmware?  I just want to know what to
+>>>> look out for.
+>>>> 
+>>>> Thanks
+>>>> 
+>>>> Chris
+>>>> 
+>>>> 
+>>>> On 25/05/2021 11:14, K, Kiran wrote:
+>>>>> Hi Chris,
+>>>>> 
+>>>>> This is a known issue related to firmware and is expected to be fixed in next release.
+>>>>> 
+>>>>> Thanks,
+>>>>> Kiran
+>>>>> 
+>>>>> 
+>> <snip>
 >>> 
->>> and why not set it unconditionally for all Realtek chips?
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/drivers/bluetooth/btusb.c?id=183dce5a7fd3040ced6a220b0aa536c926f10cd9
+>>> 
+>>> That said we shall probably merge it to 5.13 before it is released.
+>>> I think you should, otherwise, without patching, 5.13.0 will be broken for many bluetooth users.
 >> 
->> Not all Realtek chips supports WBS, therefore
->> HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED is only set on some of them.
+>> I've applied your patch your patch to Linus' latest and greatest (by hand - it doesn't apply cleanly to the current 5.13
+>> tree). The error messages are no longer produced and bluetooth is working fine, so...
+>> 
+>> Tested-by: Chris Clayton <chris2553@googlemail.com>
 > 
-> Are there any other concerns you might have?
+> Shall I have another pull request, or do we need to send this directly
+> to Linus somehow?
 
-can we do the quirk setting in btrtl_setup_realtek() instead of creating another exported function.
+if this is not urgent, we can put it into bluetooth.git tree and ask net.git to pull it. However if we already have this in net-next, it gets a bit trickier.
 
 Regards
 
