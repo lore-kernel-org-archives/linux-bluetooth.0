@@ -2,147 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 691FAC47091
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 11:57:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CFEDC47092
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 16:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 38E6C610C7
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 11:57:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F2C3A611EE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 16:35:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229599AbhE3L6n (ORCPT
+        id S229714AbhE3QhS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 May 2021 07:58:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32898 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229550AbhE3L6m (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 May 2021 07:58:42 -0400
-Received: from mout-p-101.mailbox.org (mout-p-101.mailbox.org [IPv6:2001:67c:2050::465:101])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D328C061574
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 May 2021 04:57:04 -0700 (PDT)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:105:465:1:1:0])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4FtH3125KHzQjXk
-        for <linux-bluetooth@vger.kernel.org>; Sun, 30 May 2021 13:57:01 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-Received: from smtp1.mailbox.org ([80.241.60.240])
-        by spamfilter05.heinlein-hosting.de (spamfilter05.heinlein-hosting.de [80.241.56.123]) (amavisd-new, port 10030)
-        with ESMTP id 4Ft9p7C_RFXV for <linux-bluetooth@vger.kernel.org>;
-        Sun, 30 May 2021 13:56:57 +0200 (CEST)
-Message-ID: <0feae4a19f7afbecbcb233d169cf04d42d7bb3c6.camel@mailbox.org>
-Subject: Audio playback over bluetooth stutters during scan
-From:   Christian Stadelmann <dev@genodeftest.de>
-To:     linux-bluetooth@vger.kernel.org
-Date:   Sun, 30 May 2021 13:56:57 +0200
-Content-Type: multipart/mixed; boundary="=-geCdgYwykuAjzbS13X+/"
+        Sun, 30 May 2021 12:37:18 -0400
+Received: from foss.arm.com ([217.140.110.172]:40524 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229599AbhE3QhR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 30 May 2021 12:37:17 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09A966D;
+        Sun, 30 May 2021 09:35:39 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B93253F73D;
+        Sun, 30 May 2021 09:35:36 -0700 (PDT)
+Date:   Sun, 30 May 2021 17:34:54 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     Ondrej Jirman <megous@megous.com>, Chen-Yu Tsai <wens@csie.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linux-serial@vger.kernel.org,
+        Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-sunxi@lists.linux.dev
+Cc:     Josh Triplett <josh@joshtriplett.org>, tuxd3v@sapo.pt
+Subject: sunxi: Bluetooth broken since 5.6-rc1
+Message-ID: <20210530173454.5ab1dcf5@slackpad.fritz.box>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-X-MBO-SPAM-Probability: 
-X-Rspamd-Score: -3.09 / 15.00 / 15.00
-X-Rspamd-Queue-Id: 0F2CA189A
-X-Rspamd-UID: 020bef
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi,
 
---=-geCdgYwykuAjzbS13X+/
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
+as recently discovered via IRC discussions, Bluetooth (via UART)
+seems to be broken on many (if not all) Allwinner devices using recent
+mainline kernels. On *some* occasions it might work, but more often
+than not the hci_bcm driver just times out:
+....
+[    5.046126] Bluetooth: HIDP socket layer initialized
+...
+[    7.809425] Bluetooth: hci0: command 0x0c03 tx timeout
+[   15.969286] Bluetooth: hci0: BCM: Reset failed (-110)
 
-Dear bluez developers,
+After some guessing, trying, and bisecting I pinned the problem down to:
+commit dc56ecb81a0aa46a7e127e916df5c8fdb8364f0b
+Author: Josh Triplett <josh@joshtriplett.org>
+Date:   Fri Jan 10 18:25:13 2020 -0800
 
-whenever I start bluetooth scanning on my PC, any audio playback over
-bluetooth stutters.
+    serial: 8250: Support disabling mdelay-filled probes of 16550A variants
 
-Example #1 with GUI tools:
-https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/409
+This seemingly innocent commit shaved off some milliseconds during the
+8250 probe, which apparently lets the Bluetooth device trip.
 
-Example #2 with bluetoothctl:
-1. Connect a bluetooth speaker or headphone to the PC
-2. start audio playback (e.g. using totem)
-3. run `bluetoothctl scan on`
+An obvious easy hack-fix is to just define
+CONFIG_SERIAL_8250_16550A_VARIANTS, which brings the delays back and
+seems to avoid the problem for me.
+Another hack which seems to mitigate the problem is to avoid switching
+the baudrate to something faster than 115200.
 
-What happens:
-As long as bluetooth scan is runnig, audio playback stutters. Once I
-kill `bluetoothctl scan on` or close gnome's control center, audio
-playback is back to normal.
+I observed this on a BananaPi-M64 (Allwinner A64 SoC with AP6212 WiFi/BT
+chip), but others reported the same issue on a NanoPi Air (Allwinner H3
+with 6212), but also other SoCs and devices (at least one AP6210).
 
-Would it be possible to modify the scanning behaviour in a way that it
-does not make audio playback stutter? 
+Obviously those workarounds are not real solutions, and I was
+wondering if anybody has an idea how to properly fix this?
+What puzzles me is that the delay is happening during the *UART*
+probe, so before we even start dealing with the Bluetooth device.
 
+I see that hci_bcm.c has some history with adding delays, also with
+RTS/CTS lines, so does anyone have an idea what's going on here,
+exactly, and how to properly fix this problem?
 
-Software versions (Fedora 34):
-bluez 5.58 (5.58-2.fc34.x86_64)
-kernel 5.12.7 (5.12.7-300.fc34.x86_64)
-
-PS: I've attached the output of `$ bluetoothctl info` and `$
-bluetoothctl show` but I doubt it is relevant for this issue.
-
--- 
-Kind Regards
-Chris
-
-
---=-geCdgYwykuAjzbS13X+/
-Content-Disposition: attachment; filename="bluetoothctl_info.txt"
-Content-Type: text/plain; name="bluetoothctl_info.txt"; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-RGV2aWNlIDk0OkRCOjU2OltyZWRhY3RlZF0gKHB1YmxpYykKCU5hbWU6IFdILTEwMDBYTTMKCUFs
-aWFzOiBXSC0xMDAwWE0zCglDbGFzczogMHgwMDI0MDQwNAoJSWNvbjogYXVkaW8tY2FyZAoJUGFp
-cmVkOiB5ZXMKCVRydXN0ZWQ6IHllcwoJQmxvY2tlZDogbm8KCUNvbm5lY3RlZDogeWVzCglMZWdh
-Y3lQYWlyaW5nOiBubwoJVVVJRDogVmVuZG9yIHNwZWNpZmljICAgICAgICAgICAoMDAwMDAwMDAt
-ZGVjYS1mYWRlLWRlY2EtZGVhZmRlY2FjYWZmKQoJVVVJRDogSGVhZHNldCAgICAgICAgICAgICAg
-ICAgICAoMDAwMDExMDgtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogQXVkaW8g
-U2luayAgICAgICAgICAgICAgICAoMDAwMDExMGItMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZi
-KQoJVVVJRDogQS9WIFJlbW90ZSBDb250cm9sIFRhcmdldCAoMDAwMDExMGMtMDAwMC0xMDAwLTgw
-MDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogQS9WIFJlbW90ZSBDb250cm9sICAgICAgICAoMDAwMDEx
-MGUtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogSGFuZHNmcmVlICAgICAgICAg
-ICAgICAgICAoMDAwMDExMWUtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogUG5Q
-IEluZm9ybWF0aW9uICAgICAgICAgICAoMDAwMDEyMDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIz
-NGZiKQoJVVVJRDogVmVuZG9yIHNwZWNpZmljICAgICAgICAgICAoN2IyNjViMGUtMjIzMi00ZDQ1
-LWJlZjQtYmI4YWU2MmY4MTNkKQoJVVVJRDogVmVuZG9yIHNwZWNpZmljICAgICAgICAgICAoODFj
-MmU3MmEtMDU5MS00NDNlLWExZmYtMDVmOTg4NTkzMzUxKQoJVVVJRDogVmVuZG9yIHNwZWNpZmlj
-ICAgICAgICAgICAoOTMxYzdlOGEtNTQwZi00Njg2LWI3OTgtZThkZjBhMmFkOWY3KQoJVVVJRDog
-VmVuZG9yIHNwZWNpZmljICAgICAgICAgICAoOTZjYzIwM2UtNTA2OC00NmFkLWIzMmQtZTMxNmY1
-ZTA2OWJhKQoJVVVJRDogVmVuZG9yIHNwZWNpZmljICAgICAgICAgICAoYjliMjEzY2UtZWVhYi00
-OWU0LThmZDktYWE0NzhlZDFiMjZiKQoJVVVJRDogVmVuZG9yIHNwZWNpZmljICAgICAgICAgICAo
-ZjhkMWZiZTQtNzk2Ni00MzM0LTgwMjQtZmY5NmM5MzMwZTE1KQoJTW9kYWxpYXM6IHVzYjp2MDU0
-Q3AwQ0QzZDA0NTIK
-
-
---=-geCdgYwykuAjzbS13X+/
-Content-Disposition: attachment; filename="bluetoothctl_show.txt"
-Content-Type: text/plain; name="bluetoothctl_show.txt"; charset="UTF-8"
-Content-Transfer-Encoding: base64
-
-Q29udHJvbGxlciAwMDpEQjpERjpbcmVkYWN0ZWRdIChwdWJsaWMpCglOYW1lOiBbcmVkYWN0ZWRd
-CglBbGlhczogW3JlZGFjdGVkXQoJQ2xhc3M6IDB4MDA3YzAxMGMKCVBvd2VyZWQ6IHllcwoJRGlz
-Y292ZXJhYmxlOiB5ZXMKCURpc2NvdmVyYWJsZVRpbWVvdXQ6IDB4MDAwMDAwMDAKCVBhaXJhYmxl
-OiBubwoJVVVJRDogQS9WIFJlbW90ZSBDb250cm9sICAgICAgICAoMDAwMDExMGUtMDAwMC0xMDAw
-LTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogQXVkaW8gU291cmNlICAgICAgICAgICAgICAoMDAw
-MDExMGEtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogUG5QIEluZm9ybWF0aW9u
-ICAgICAgICAgICAoMDAwMDEyMDAtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDog
-QXVkaW8gU2luayAgICAgICAgICAgICAgICAoMDAwMDExMGItMDAwMC0xMDAwLTgwMDAtMDA4MDVm
-OWIzNGZiKQoJVVVJRDogSGVhZHNldCAgICAgICAgICAgICAgICAgICAoMDAwMDExMDgtMDAwMC0x
-MDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogTWVzc2FnZSBOb3RpZmljYXRpb24gU2UuLiAo
-MDAwMDExMzMtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogQS9WIFJlbW90ZSBD
-b250cm9sIFRhcmdldCAoMDAwMDExMGMtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJ
-RDogSGFuZHNmcmVlIEF1ZGlvIEdhdGV3YXkgICAoMDAwMDExMWYtMDAwMC0xMDAwLTgwMDAtMDA4
-MDVmOWIzNGZiKQoJVVVJRDogTWVzc2FnZSBBY2Nlc3MgU2VydmVyICAgICAoMDAwMDExMzItMDAw
-MC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogT0JFWCBGaWxlIFRyYW5zZmVyICAgICAg
-ICAoMDAwMDExMDYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJVVVJRDogUGhvbmVib29r
-IEFjY2VzcyBTZXJ2ZXIgICAoMDAwMDExMmYtMDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJ
-VVVJRDogSXJNQyBTeW5jICAgICAgICAgICAgICAgICAoMDAwMDExMDQtMDAwMC0xMDAwLTgwMDAt
-MDA4MDVmOWIzNGZiKQoJVVVJRDogT0JFWCBPYmplY3QgUHVzaCAgICAgICAgICAoMDAwMDExMDUt
-MDAwMC0xMDAwLTgwMDAtMDA4MDVmOWIzNGZiKQoJTW9kYWxpYXM6IHVzYjp2MUQ2QnAwMjQ2ZDA1
-M0EKCURpc2NvdmVyaW5nOiBubwo=
-
-
---=-geCdgYwykuAjzbS13X+/--
-
+Many thanks,
+Andre
