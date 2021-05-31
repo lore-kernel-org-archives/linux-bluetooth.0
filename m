@@ -2,95 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CFEDC47092
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 16:35:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAB0BC47093
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 00:27:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2C3A611EE
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 30 May 2021 16:35:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9989361222
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 00:27:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229714AbhE3QhS (ORCPT
+        id S229901AbhEaA2o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 30 May 2021 12:37:18 -0400
-Received: from foss.arm.com ([217.140.110.172]:40524 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229599AbhE3QhR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 30 May 2021 12:37:17 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 09A966D;
-        Sun, 30 May 2021 09:35:39 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B93253F73D;
-        Sun, 30 May 2021 09:35:36 -0700 (PDT)
-Date:   Sun, 30 May 2021 17:34:54 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     Ondrej Jirman <megous@megous.com>, Chen-Yu Tsai <wens@csie.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linux-serial@vger.kernel.org,
-        Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-sunxi@lists.linux.dev
-Cc:     Josh Triplett <josh@joshtriplett.org>, tuxd3v@sapo.pt
-Subject: sunxi: Bluetooth broken since 5.6-rc1
-Message-ID: <20210530173454.5ab1dcf5@slackpad.fritz.box>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        Sun, 30 May 2021 20:28:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54552 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229887AbhEaA2n (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 30 May 2021 20:28:43 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6029CC061574
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 May 2021 17:27:04 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id y2so14148422ybq.13
+        for <linux-bluetooth@vger.kernel.org>; Sun, 30 May 2021 17:27:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=OPk2gLXkdWLBqSGf/Fd4TOtAuxbtCfYrlERdK5WWZeg=;
+        b=gzSfYhfYmX1DSQPr5nVGy85BCG8bQv5QkiG+z8QGhJY2Jz0JQIzJH/y+a4s3nM5+h2
+         4uPaRTd9uQbNv2zHfzDrRg8f/c5tNIo4Dwjv71tsqGlL2NcPlxqHuOKCVNbgfxl3uYxE
+         HbyBfA8m0M6dbMdtOZwMlovGOQltMbM4odqkNhTSjN9aedsT0Nf0XjHENbkWZJoAOjsW
+         oFJqy0Y2fHKG8oEaORQ93N5HDDrmTdlV6yYTMKpoVCxoV/m9UgfAdWyzCbJg/5kVQsno
+         NROgErcBcD9+56bDDlsdqaFYvsBqFo/gMdfcwHHBn1+Vf8+lKcvXeEOkmpy+Ij9H1eUk
+         VFMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=OPk2gLXkdWLBqSGf/Fd4TOtAuxbtCfYrlERdK5WWZeg=;
+        b=i8ms6+8OT6TvbFeBxYhJTKdtP6nhrjE01IZJPkw0UO1SkQMGMG3rh0MiW74cttKCq7
+         Rt0+NE5odocEkIzJ4XlcfrIjIMW+B1crHuzMnn6t7r+UEsRLXl0V82FeEadbLG27eAJs
+         nFAV1358D9OqNFhtuET+2UgklWxvLGVCB2uKWZrSGtVkmwApF1THL5YIyDCsXEmE3tkz
+         lAjhf34EHanOwxI7qdJtLFP/acJX5wOxyeoc/hrrg+SFXgMVxTkpN3Fnd7qg5hlzna+T
+         T09Ajkj4uin+rhsRQv3hHBXGNIwtzSKn8RAFvHN4oiTrxu5ToJtAjvT9XIgMtgiqOytv
+         I/5Q==
+X-Gm-Message-State: AOAM533S+ZIAPbcwmWO6/iKpw4W/61/XyHT2QlOb2U7Sq8SxAihPHVpX
+        Mr31+49dPsiMwOO0bK9/Y34GFyBZuMpP4uXI9sfQ7nEj
+X-Google-Smtp-Source: ABdhPJxt3Jo5TeRTExB95UdCsoUMF+DG7bq0KCmIgZFa0fDNqV6IrsnshSBD06nCaK6Sc8uJ2OBarDIOZHBMU1Y5Sfw=
+X-Received: by 2002:a25:2388:: with SMTP id j130mr27640284ybj.222.1622420823452;
+ Sun, 30 May 2021 17:27:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <0feae4a19f7afbecbcb233d169cf04d42d7bb3c6.camel@mailbox.org>
+In-Reply-To: <0feae4a19f7afbecbcb233d169cf04d42d7bb3c6.camel@mailbox.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Sun, 30 May 2021 17:26:50 -0700
+Message-ID: <CABBYNZ+iy41jKJt5B066wi0HBTDnZsg2Tda+1RdJAZBrqGEofA@mail.gmail.com>
+Subject: Re: Audio playback over bluetooth stutters during scan
+To:     Christian Stadelmann <dev@genodeftest.de>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Chris,
 
-as recently discovered via IRC discussions, Bluetooth (via UART)
-seems to be broken on many (if not all) Allwinner devices using recent
-mainline kernels. On *some* occasions it might work, but more often
-than not the hci_bcm driver just times out:
-....
-[    5.046126] Bluetooth: HIDP socket layer initialized
-...
-[    7.809425] Bluetooth: hci0: command 0x0c03 tx timeout
-[   15.969286] Bluetooth: hci0: BCM: Reset failed (-110)
+On Sun, May 30, 2021 at 4:58 AM Christian Stadelmann <dev@genodeftest.de> wrote:
+>
+> Dear bluez developers,
+>
+> whenever I start bluetooth scanning on my PC, any audio playback over
+> bluetooth stutters.
+>
+> Example #1 with GUI tools:
+> https://gitlab.gnome.org/GNOME/gnome-control-center/-/issues/409
+>
+> Example #2 with bluetoothctl:
+> 1. Connect a bluetooth speaker or headphone to the PC
+> 2. start audio playback (e.g. using totem)
+> 3. run `bluetoothctl scan on`
+>
+> What happens:
+> As long as bluetooth scan is runnig, audio playback stutters. Once I
+> kill `bluetoothctl scan on` or close gnome's control center, audio
+> playback is back to normal.
+>
+> Would it be possible to modify the scanning behaviour in a way that it
+> does not make audio playback stutter?
 
-After some guessing, trying, and bisecting I pinned the problem down to:
-commit dc56ecb81a0aa46a7e127e916df5c8fdb8364f0b
-Author: Josh Triplett <josh@joshtriplett.org>
-Date:   Fri Jan 10 18:25:13 2020 -0800
+I'm afraid this may be controller specific, afaik our parameters for
+scanning are not that aggressive that would force the controller to
+throttle but perhaps some controllers would attempt to prioritize the
+inquiry requests over an ACL connection, so we probably need to
+investigate if there is some way to get work around this problem even
+if that means we discovery will be slower. Btw, are you testing this
+in a crowded environment?
 
-    serial: 8250: Support disabling mdelay-filled probes of 16550A variants
+>
+> Software versions (Fedora 34):
+> bluez 5.58 (5.58-2.fc34.x86_64)
+> kernel 5.12.7 (5.12.7-300.fc34.x86_64)
+>
+> PS: I've attached the output of `$ bluetoothctl info` and `$
+> bluetoothctl show` but I doubt it is relevant for this issue.
+>
+> --
+> Kind Regards
+> Chris
+>
 
-This seemingly innocent commit shaved off some milliseconds during the
-8250 probe, which apparently lets the Bluetooth device trip.
 
-An obvious easy hack-fix is to just define
-CONFIG_SERIAL_8250_16550A_VARIANTS, which brings the delays back and
-seems to avoid the problem for me.
-Another hack which seems to mitigate the problem is to avoid switching
-the baudrate to something faster than 115200.
-
-I observed this on a BananaPi-M64 (Allwinner A64 SoC with AP6212 WiFi/BT
-chip), but others reported the same issue on a NanoPi Air (Allwinner H3
-with 6212), but also other SoCs and devices (at least one AP6210).
-
-Obviously those workarounds are not real solutions, and I was
-wondering if anybody has an idea how to properly fix this?
-What puzzles me is that the delay is happening during the *UART*
-probe, so before we even start dealing with the Bluetooth device.
-
-I see that hci_bcm.c has some history with adding delays, also with
-RTS/CTS lines, so does anyone have an idea what's going on here,
-exactly, and how to properly fix this problem?
-
-Many thanks,
-Andre
+-- 
+Luiz Augusto von Dentz
