@@ -2,120 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 639FAC47082
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 07:19:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16186C4708F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3AB4E61186
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 07:19:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E7C10610A0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230228AbhEaHVA (ORCPT
+        id S230388AbhEaIj6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 May 2021 03:21:00 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:54119 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230143AbhEaHU4 (ORCPT
+        Mon, 31 May 2021 04:39:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49718 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230250AbhEaIj4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 May 2021 03:20:56 -0400
-Received: by mail-io1-f69.google.com with SMTP id u15-20020a6b490f0000b0290447d9583f14so6668535iob.20
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 00:19:17 -0700 (PDT)
+        Mon, 31 May 2021 04:39:56 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3476DC061760
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:17 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id 6-20020a05621420a6b0290214b9d4b6c3so8467857qvd.11
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=tjbMdWg4PO8/eooobp10b8z1ZpbzFZFdpuK8M8h0fLo=;
+        b=tDvDLZe5WhMR+9XN/fr/hQFwABYjIvNU2JvatJfqPzN09JN5eP5aMIpPZaEeJZUxZY
+         iLgzoLZyhlaX1/9fSyOy/Y/IGjWO7AKtEUHMU8Ws5NDka2dncaU9hI20X/nOxaDWnXKV
+         sKMKz51/ZuKer9sdM44wJWpTx7JBx6/Cm0GHRTSUY4VDDtQQ4GY5azSu4nZ16QZI4r5a
+         YDifmvyjaBsxo93NaVvDnLcd+wlVfR/Wm/5wyb7bW6YCERNi9x5xVkpecboEJqnJSzzc
+         u8ugRJNiUCcDoMn2h/zDs57lrS8JkgZhTQzGud5zBjzcJ44xPj5OcjR068vsXi8KToE3
+         cPjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=ArOpMdbFDDmKZECmacnd2/wE83IcJjiqARCZQPnaa3A=;
-        b=qffMCySN2bHgcFzdurdDsVHqEbjXevkzZDV/cWD+pQDRCddBVS7KVMeuOGLEa3gjWI
-         zkDbLPR8jCYf9LPCkpUY92v5PQckNMkVtA3LB01eODsPL5MTa1y4+Ag+mzZfoEcLX5mF
-         gQ9YtIz2p2hWPzKJlfc/Yvrk4IgjqcI1ANCAvAD72n3Uc62VbiX7f9pPLcvOVi75SL6S
-         GBndj4BSjuP84MzrUCZOhj//Nl6U5z0r4n7FFY+KxqXCwbsYZiDwINm5doOGN3q5JGGO
-         dLuOJ5bGUAoocnwPN9V6r9v7ITgN7iX4nDJFNVPenL1MZp25XMYIzdeB4864vYXRLBBz
-         c+XQ==
-X-Gm-Message-State: AOAM531B2CQymk/dVqspdAJajHOBihZclh+ioW5G2ki4twr8bQcHw3Q1
-        YCEjKUlClhrXUzqTjnzI8UPHfXxkl01VgYW9HugWY9AjHzzS
-X-Google-Smtp-Source: ABdhPJzEztdJ0o/G3hEuPu3fGtsj6Vswr0Ea06NfZCEV1dhAjKIhKjuRFPOkORDHPIMrp2/d/6pxBrq3IQ63xtm26c+MvOs0S4fg
-MIME-Version: 1.0
-X-Received: by 2002:a05:6602:29cf:: with SMTP id z15mr16147286ioq.176.1622445557367;
- Mon, 31 May 2021 00:19:17 -0700 (PDT)
-Date:   Mon, 31 May 2021 00:19:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001d4a3005c39b0b40@google.com>
-Subject: [syzbot] general protection fault in l2cap_chan_timeout (2)
-From:   syzbot <syzbot+008cdbf7a9044c2c2f99@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=tjbMdWg4PO8/eooobp10b8z1ZpbzFZFdpuK8M8h0fLo=;
+        b=DDD+YHIYBkFueSN5hYGJ7uNvxAsWspfifFW+BlniHtrQwdhTZdt6R0GPp6/mLKu/kK
+         XqLUR+T7Kt03pWTzw+rGW0VF+yizv0OTxSVLKRfTdw8oSEqM+HR+KR/cTjWC1p4KtZqx
+         7l2+5mSu6A57h6GCQOB0NsADZSalaiD30M5/LgbpMZGR8CMvtSe3Nh2f2mdt2r9zx0wi
+         9w6LFk8SUxFiCg+rxjpQJ/0PkvsPBTRKBfP/OKyvC/Ky8GOcxo7WIR2LYyEZsdGQwHGY
+         nObdMekk25Fa1Lqi4pPGEMegckMQTYYvzf4tarNdK5zLjR8+fviOR0aAc44UkBupy753
+         yyWQ==
+X-Gm-Message-State: AOAM532XDEZOMzDhUEk5cXVOraK1hyxCprVtED3Q4H8Rc3rPh+hygNHf
+        pwRV53osm7t703NnQGYSx/k/nej7eqFBB5v+7zmtytecvBsh40ShyEFoniElDp4S7Kr7QBFRu2K
+        KGBLBPhoJYK0dx1QLHp7DxOnVp9wTbHjdqTB26aGSzjpHwfhcGuDQ+7wwAb/JseldLVa3ps07L6
+        gp
+X-Google-Smtp-Source: ABdhPJyZcRoSDWVH/ygFRbiMzdMkaOGR+gYo0Zl1J7DcUhFoU2h2bta9jDlzmoiu76s2GQUJ+4RIKL/jyly9
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:a6d1:a727:b17d:154e])
+ (user=apusaka job=sendgmr) by 2002:a05:6214:246a:: with SMTP id
+ im10mr15568895qvb.2.1622450296211; Mon, 31 May 2021 01:38:16 -0700 (PDT)
+Date:   Mon, 31 May 2021 16:37:19 +0800
+Message-Id: <20210531083726.1949001-1-apusaka@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc0.204.g9fa02ecfa5-goog
+Subject: [PATCH v2 0/8] Bluetooth: use inclusive language
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "=?UTF-8?q?Ole=20Bj=C3=B8rn=20Midtb=C3=B8?=" <omidtbo@cisco.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Archie Pusaka <apusaka@chromium.org>
 
-syzbot found the following issue on:
+Hi linux-bluetooth maintainers,
 
-HEAD commit:    ad9f25d3 Merge tag 'netfs-lib-fixes-20200525' of git://git..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=173d383dd00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=266cda122a0b56c
-dashboard link: https://syzkaller.appspot.com/bug?extid=008cdbf7a9044c2c2f99
+This series contains inclusive language patches, to promote usage of
+central, peripheral, reject list, and accept list. I tried to divide
+the change to several smaller patches to ease downstreamers to make
+gradual change.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+There are still some occurences in debugfs in which the
+original less inclusive terms is still left as-is since it is a
+file name, and I afraid replacing them will cause instability to
+other systems depending on that file name.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+008cdbf7a9044c2c2f99@syzkaller.appspotmail.com
+Changes in v2:
+* Add details in commit message
+* SMP: Use initiator/responder instead of central/peripheral
+* reject/accept list: Was actually two patches, squashed together
+* Drop patches in L2CAP, RFCOMM, and debugfs
 
-general protection fault, probably for non-canonical address 0xdffffc000000005a: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x00000000000002d0-0x00000000000002d7]
-CPU: 0 PID: 8 Comm: kworker/0:2 Not tainted 5.13.0-rc3-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events l2cap_chan_timeout
-RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:941 [inline]
-RIP: 0010:__mutex_lock+0xf6/0x10c0 kernel/locking/mutex.c:1104
-Code: d0 7c 08 84 d2 0f 85 cc 0c 00 00 8b 15 e3 55 5f 07 85 d2 75 29 48 8d 7d 60 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 db 0e 00 00 48 3b 6d 60 0f 85 5a 0a 00 00 bf 01
-RSP: 0018:ffffc90000cd7b78 EFLAGS: 00010216
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-RDX: 000000000000005a RSI: 0000000000000000 RDI: 00000000000002d0
-RBP: 0000000000000270 R08: ffffffff880a40d9 R09: 0000000000000000
-R10: ffffffff814b4be0 R11: 0000000000000000 R12: 0000000000000000
-R13: dffffc0000000000 R14: ffff888072e47020 R15: ffff8880b9c34a40
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fcac15f1d58 CR3: 00000000628fa000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
-Call Trace:
- l2cap_chan_timeout+0x69/0x2f0 net/bluetooth/l2cap_core.c:422
- process_one_work+0x98d/0x1600 kernel/workqueue.c:2276
- worker_thread+0x64c/0x1120 kernel/workqueue.c:2422
- kthread+0x3b1/0x4a0 kernel/kthread.c:313
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
-Modules linked in:
----[ end trace d3dc393d48928266 ]---
-RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:941 [inline]
-RIP: 0010:__mutex_lock+0xf6/0x10c0 kernel/locking/mutex.c:1104
-Code: d0 7c 08 84 d2 0f 85 cc 0c 00 00 8b 15 e3 55 5f 07 85 d2 75 29 48 8d 7d 60 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 db 0e 00 00 48 3b 6d 60 0f 85 5a 0a 00 00 bf 01
-RSP: 0018:ffffc90000cd7b78 EFLAGS: 00010216
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
-RDX: 000000000000005a RSI: 0000000000000000 RDI: 00000000000002d0
-RBP: 0000000000000270 R08: ffffffff880a40d9 R09: 0000000000000000
-R10: ffffffff814b4be0 R11: 0000000000000000 R12: 0000000000000000
-R13: dffffc0000000000 R14: ffff888072e47020 R15: ffff8880b9c34a40
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000001b33621000 CR3: 00000000628fa000 CR4: 0000000000350ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+Archie Pusaka (8):
+  Bluetooth: use inclusive language in HCI role
+  Bluetooth: use inclusive language in hci_core.h
+  Bluetooth: use inclusive language to describe CPB
+  Bluetooth: use inclusive language in HCI LE features
+  Bluetooth: use inclusive language when tracking connections
+  Bluetooth: use inclusive language in SMP
+  Bluetooth: use inclusive language when filtering devices
+  Bluetooth: use inclusive language in comments
 
+ include/net/bluetooth/hci.h      |  98 +++++++++++++-------------
+ include/net/bluetooth/hci_core.h |  22 +++---
+ include/net/bluetooth/mgmt.h     |   2 +-
+ net/bluetooth/amp.c              |   2 +-
+ net/bluetooth/hci_conn.c         |  32 ++++-----
+ net/bluetooth/hci_core.c         |  46 ++++++-------
+ net/bluetooth/hci_debugfs.c      |   8 +--
+ net/bluetooth/hci_event.c        | 114 +++++++++++++++----------------
+ net/bluetooth/hci_request.c      | 106 ++++++++++++++--------------
+ net/bluetooth/hci_sock.c         |  12 ++--
+ net/bluetooth/hidp/core.c        |   2 +-
+ net/bluetooth/l2cap_core.c       |  16 ++---
+ net/bluetooth/mgmt.c             |  36 +++++-----
+ net/bluetooth/smp.c              |  86 +++++++++++------------
+ net/bluetooth/smp.h              |   6 +-
+ 15 files changed, 297 insertions(+), 291 deletions(-)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+-- 
+2.32.0.rc0.204.g9fa02ecfa5-goog
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
