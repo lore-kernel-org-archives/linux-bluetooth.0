@@ -8,124 +8,105 @@ X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE9EC47082
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:44:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AD51C4708F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:56:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A1A3361248
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:44:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60965611CA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:56:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230408AbhEaIqS (ORCPT
+        id S229640AbhEaI5s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 May 2021 04:46:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
+        Mon, 31 May 2021 04:57:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230104AbhEaIqR (ORCPT
+        with ESMTP id S229768AbhEaI5q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 May 2021 04:46:17 -0400
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12A5C06174A
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:44:37 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id a4so7274864ljq.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:44:37 -0700 (PDT)
+        Mon, 31 May 2021 04:57:46 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64737C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:56:05 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id v3so2396302ljc.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:56:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qSiHm2x0VYis9oHGnKO3wH7svcL5++yEAOjW2BWiBYU=;
-        b=lUxQ/k0n1JapZZYTm69WFnp1eyRdyBv9rIpg5Qh78uGFcJwW9zj0JcGANNe5jNTAFG
-         ozbtZ19Nc+BI3pdHuSh+/AHWTjfLNx+jpgL2KiYFpm5juWP8Q+fXbywiRAarGYsAFa66
-         n5Lmmdf6u0AfEvUhf/zjjSwkd4PUgWkBeSrNEGIKth9VCi0zGtBuhxe4oAhERKzc18wf
-         IIi4BH9yYkES5wS/298ydjGJp8UFleI9hGUBoL9WweIR1jYeZDqGgHYcl/D6UNXQyOR8
-         MNiFxe6hNyYGtsi2S9uF7/N7aDogN7+HMo7wS1+aCdcMz53ZnOoS5VHUytvp03Gppzzc
-         XM2Q==
+         :cc:content-transfer-encoding;
+        bh=tvHEbWi99MRQiSqQ0dpvehrTJbqzi24F4Mtjzu6mR6k=;
+        b=a7D7xLP0kqqaj7oc5DObkDtPDhXJpwZUNNLM9BtSwtpaxPjJwUoggJVIrnr/Kr+Cus
+         kZGRz4NzY5KGjSZ/7+5AlTUkwtflDAXuEghqGrYoCBOfV273X/wW51JGsJB7gWG+Xfv0
+         e67m3gDGECjFaGkHI7VldKx6Yr94OSsy/1FNcqHNuqXGBY/T3dCj0EHTFC1MxfXcxBlZ
+         kRuLEZ5BkcsPGDBhz0v4cMbetvdR1As9BoFWPEeB3aFhuytQc0oJg79XzAPmnvBBQmBT
+         Lx/BLwlJW50gUMeYkSORenF8+jOTNL5z4WB6C7AZ3rNVDbETpKVpfUBX3jbJDOl0iUmL
+         +r3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qSiHm2x0VYis9oHGnKO3wH7svcL5++yEAOjW2BWiBYU=;
-        b=Pqo4BDjZ+mpsUD2JZ2Pkv3CPnMTf/XeBJ5vh7lpTCeFy65RdiwuhvsTejt/wM9aC0s
-         K2/6NJjhZpXk6RN17D5Jz2rch3yC+ynBRiho5/rHuXk/zW11VlNK1ctaoVdBPnR6IHLd
-         yIwRGoh+lud0NuQfH47sCdYB2Wb5XfATIhkL3OPMq0DrZ1paEIp3l/3ME1czS7xYR7N3
-         4vFEhdnGyT0zsuN4WzObMGr+RjWT9mIh+D3aUEmXuibJaUI/ZDKwaWsnhkx69OpffL0N
-         nhJ5CrgHNJ618hhJbJQPzBske5L6fvHvC5T0lxjyTRY0EXk0rOVmViLrP110KgPakjb+
-         GU7Q==
-X-Gm-Message-State: AOAM533QieFTEbt5vyErA7iBcA2gULMlByZJWEj4owIMRX1TZfEDNPWj
-        6zHsjX4t4oyhVW9WMxHhfzVY+Lpqo49+MsAoCALozA==
-X-Google-Smtp-Source: ABdhPJx9Ta1DFU72yZxzmXeXZOHH/mxW2HUJNM4rOxP7dcdz3+l3k6YcFpfBLmsFpnqUgnCpq0TZ4Q5SQiQ1fLRuA1Q=
-X-Received: by 2002:a2e:154a:: with SMTP id 10mr15435817ljv.133.1622450676013;
- Mon, 31 May 2021 01:44:36 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=tvHEbWi99MRQiSqQ0dpvehrTJbqzi24F4Mtjzu6mR6k=;
+        b=jKC9K9oebfSVIQsHELRkM0yAbyFWVA+kDndXPSXvCulucN/SoxOV5o+BqBMrBjfPu6
+         krCVpSztVK6NqHFfu7hnUCn/KfBmjmDPzxLcvhNO0AduSIJJm0Uj5DnC4C/7XG81Ba93
+         s7ojkr6IKeOBjzwD1U/dtwlYql3nBXRxmkN5Kx1bDhee76o3vpfFNamJWXRqN1eQLDRF
+         hMhfVTNAByFNsmZfhjZZCHcVdmxtqlLUKjOyF05C/e9dyCiSoUv1M9RKEYa5gFHPt/kE
+         M4FyFutWzHvO6y88jEKfhriDt7odBIT0a/yuCrjY0E3j2uh1tNt9Vq0FO/GXXkETYYCL
+         uWlQ==
+X-Gm-Message-State: AOAM532LRoUoO2p5dz7bRr5Msh3BZKhQfde78RmSusESMRx6B7yep2Ot
+        Y0AGlhlsS9rdlVPlGdLxK2zA4tXN5s1WsyleIDAknA==
+X-Google-Smtp-Source: ABdhPJymrCKvD50qJ0q7P/Q6YwoGiM1DNxzs/HyvQ3iD7hb5n3syYdNfNejRL5rBR2aNGii9kvLC7ZjTwZuJiTt1nek=
+X-Received: by 2002:a2e:9a14:: with SMTP id o20mr16205587lji.309.1622451363555;
+ Mon, 31 May 2021 01:56:03 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210525102941.3958649-1-apusaka@google.com> <20210525182900.6.Id35872ce1572f18e0792e6f4d70721132e97a480@changeid>
- <42C641C9-2EAC-4A47-9FF7-8A079DF278E0@holtmann.org>
-In-Reply-To: <42C641C9-2EAC-4A47-9FF7-8A079DF278E0@holtmann.org>
+References: <20210527151951.v2.1.I4d214bb82746fb2ed94eb1c2100dda0f63cf9a25@changeid>
+ <E1D8B7BD-2F62-4491-8289-BE925AB2B4D2@holtmann.org>
+In-Reply-To: <E1D8B7BD-2F62-4491-8289-BE925AB2B4D2@holtmann.org>
 From:   Archie Pusaka <apusaka@google.com>
-Date:   Mon, 31 May 2021 16:44:25 +0800
-Message-ID: <CAJQfnxHf1FEe-TWgSj7rJ=h4+_=LXm0QPXHoJUn3tpWnm6mvtw@mail.gmail.com>
-Subject: Re: [PATCH 06/12] Bluetooth: use inclusive language in RFCOMM
+Date:   Mon, 31 May 2021 16:55:52 +0800
+Message-ID: <CAJQfnxFARoQkaP_NYVhtOZZr=hUimOjMUTYaF6ptU5QMHGYhhw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: hci_h5: Add RTL8822CS capabilities
 To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Gustavo A. R. Silva" <gustavoars@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
-Thanks for the reply. I have sent v2 which omits this patch. Please take a look.
-
-I am not familiar with the libbluetooth API. Could you tell me more about it?
-Beside this and the L2CAP change, are there any other terms
-replacement which can't be accepted due to the libbluetooth API?
-
-Cheers,
-Archie
-
-
-On Wed, 26 May 2021 at 23:07, Marcel Holtmann <marcel@holtmann.org> wrote:
+On Thu, 27 May 2021 at 23:22, Marcel Holtmann <marcel@holtmann.org> wrote:
 >
 > Hi Archie,
 >
-> > Use "central" and "peripheral".
+> > RTL8822 chipset supports WBS, and this information is conveyed in
+> > btusb.c. However, the UART driver doesn't have this information just
+> > yet.
 > >
 > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
 > >
 > > ---
 > >
-> > include/net/bluetooth/rfcomm.h | 2 +-
-> > net/bluetooth/rfcomm/sock.c    | 4 ++--
-> > 2 files changed, 3 insertions(+), 3 deletions(-)
+> > Changes in v2:
+> > * Add declaration for the case when CONFIG_BT_RTL is not enabled
 > >
-> > diff --git a/include/net/bluetooth/rfcomm.h b/include/net/bluetooth/rfcomm.h
-> > index 99d26879b02a..6472ec0053b9 100644
-> > --- a/include/net/bluetooth/rfcomm.h
-> > +++ b/include/net/bluetooth/rfcomm.h
-> > @@ -290,7 +290,7 @@ struct rfcomm_conninfo {
-> > };
-> >
-> > #define RFCOMM_LM     0x03
-> > -#define RFCOMM_LM_MASTER     0x0001
-> > +#define RFCOMM_LM_CENTRAL    0x0001
-> > #define RFCOMM_LM_AUTH                0x0002
-> > #define RFCOMM_LM_ENCRYPT     0x0004
-> > #define RFCOMM_LM_TRUSTED     0x0008
+> > drivers/bluetooth/btrtl.c  | 26 ++++++++++++++++----------
+> > drivers/bluetooth/btrtl.h  |  7 +++++++
+> > drivers/bluetooth/hci_h5.c |  5 +----
+> > 3 files changed, 24 insertions(+), 14 deletions(-)
 >
-> I am not planning to accept this change any time soon since this is also in the libbluetooth API.
+> patch has been applied to bluetooth-next tree ..
 >
-> Regards
->
-> Marcel
->
+> .. however I am not super happy with this. I think it is time that we cle=
+an this stuff up. The vendor support for Realtek is getting messy and I don=
+=E2=80=99t like that.
+
+Thanks for your concern. I will initiate internal discussion to
+hopefully shape things up.
+
+Cheers,
+Archie
