@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8471FC47095
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AFF0C4708F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6331B610A0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4889D61186
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 08:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230496AbhEaIkX (ORCPT
+        id S230475AbhEaIk0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 May 2021 04:40:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49800 "EHLO
+        Mon, 31 May 2021 04:40:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230429AbhEaIkM (ORCPT
+        with ESMTP id S230453AbhEaIkS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 May 2021 04:40:12 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5C2E7C061763
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:33 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id e203-20020a2569d40000b029052f27a0b9b3so12913092ybc.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:33 -0700 (PDT)
+        Mon, 31 May 2021 04:40:18 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E43BC0613ED
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:38 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id z93-20020a0ca5e60000b02901ec19d8ff47so8507589qvz.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 31 May 2021 01:38:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=oha3Req4PO5smWr+P0a1rzrVDS+Kl6LxFKPaoAFG81g=;
-        b=Q+3E5glDrcwJ4gwXL2WKwdVztQqd2VwmSyAq4lUAEDUwQsYKH0cVUY7PLSVTw3jdXO
-         uQ7cpb75AX27stPJLi34hjuB9+PJ1NN46vwYcnxiM/uZuBfw1alW+Ojr0UQ0Tyz9rkpi
-         7ahkPgdMInf4iAvBt9NlzcCbdgNG1hMiGY/aynXyBxOl18vWV77J9xkwB23zLMyKmUsf
-         +DiMt4kE+DIDU6njzOmETqZqzmNb+7jh9FhRpUeaKrYpdAX4S0LTOUmkp8lTMu5x1NRb
-         DOi2N16VbZd2doOhhxhpreFJow8W1K25i1r6uXOSqxViqNI6NFB414hdlXtN1K3uTRzl
-         spnw==
+        bh=9r21AyqsmQHvyUtyxiaJxCTMlJZ7EnY4HZMY3OoMpaQ=;
+        b=lpFGNDUwdGfJOWYtCwF2MSQWgmwjA0H5Kh6EezPDF9zzT6dKfskh/M2QrAoWC+UUrB
+         PHatFOaZBKW3kRWRtiJtk3AcQFA7GhmAButXV4ChGAex2z4EsH8tC1MsjSGbq34XKNTc
+         j4vLvaC0eQcUJLLfHfpBLzEJYqITzwKWmu2wta/nZPyAaXOj3BKbOrBvttks6v7/rJwp
+         3eG9yPNQaY5oE5aGuT6/kWuvFUKCaRL5P0e5lHAy+lf3KhNuvqiOX7ySRhMb1LayyzV6
+         lq8O4AV5KNzNm2XZk/qSSHriWiD0nXuOLr7ulTITp1/0ayRICVWhqs82dy0j7GYiYbUi
+         uxUw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=oha3Req4PO5smWr+P0a1rzrVDS+Kl6LxFKPaoAFG81g=;
-        b=SZUk/BmOfK3XcUjfLfCam7B6HbbUOUep74/Pzbgi+mLJ/+rytSGgiGB/eBeeFsNYYw
-         4PRMnJfiFSv/f99upjbiDj/gcpE0jropQSDstnB951ZmRnlZbJrWlxuspNYC56SZZx/x
-         Z8/zwi8nFMPqrv5KrzgdHGt0qo/yQIBj55RcdbuTgV+tT+GZ4Rmhk6123mxjwUZCg4l4
-         DI0FpDnW3QuIuuTv9JcbX0Lqoweyk2KTg1cpwb0R3pqOFDWYyYRpnNqVWX1Nt1eCVAqz
-         OVtqFeY7mCaUXbRbo3iv5GFqTU+sY1wXuqiod4G9MVQnmNeKYYCRwTQLpICySV3vFIr1
-         Qqhg==
-X-Gm-Message-State: AOAM5309JQxAn5gX7bcXCDw6eIPOz8cgI9M00zs2FvR3yNVuW7QS06YT
-        /+v5aKpuGSt6l7FP2wSnXJ58YCz0z7WX4Is6kfyCnSDTFWqDR14K0rl40BXYRpGVIKB69lfKh3g
-        duHy+vQ/cEcdTKac9m6hO+pftsAe7ffwHnbKg6mY+02yu4tTTTiRWpYc0ANNoo7t8J3pWP/fxeM
-        J4
-X-Google-Smtp-Source: ABdhPJxZSLMhNj2/1XeLU1eRo0bYIz3Xc/neRmJaXqRXQM4HhbA2x46IKSIKI94yWQ8BFyI1ZxHyNWH6Q3u4
+        bh=9r21AyqsmQHvyUtyxiaJxCTMlJZ7EnY4HZMY3OoMpaQ=;
+        b=gG/o2OBMDWEsPGalXH5wBcsPWFsCmWsepi6XOic+wuQ1XzE5UmNmwYidzngLOozQT/
+         kuf89x6/UwOXqb09uTA53xZr1HYfcVkHdppfa4gowgIcIEczvfxtybFJ7keBlEuARftF
+         zukXD8M4W049nkSOgKtY3F4Nv3cYzES94KZkyod3ApneFLYYxZZFJfm0hDosJDxCQbSI
+         OdFTaUvg9TiQuBRwfSaP9acp2Pnb4xooRl2vDMZXfXIGBkwdErX00+dZkzrJoEBGSGYX
+         xxPBDzQGfEjk8TBVfDmRZjkrSIKes/30Zm8KXs6xAZyd37KkTmTWnVrLbW7U0kUBps6s
+         Sh/Q==
+X-Gm-Message-State: AOAM5324Q2CL1q2fL5qKEGnvcdfgPlthYMXYaXoh384uLjo3WeR6MUxD
+        cG0ca9+PhxKsvQDfDwnwrXcg06bXM8kv4afLwqS9GMnF1A3a6CDBZcVbGv+d0PQYYIJkTCuhpCO
+        NhvzQ5C6HPh4820oa/HE2K4vgNNEVjW8/AfJfZkEMq9l8CZrjKGpISfO7xPehiwiaOM9emR30of
+        am
+X-Google-Smtp-Source: ABdhPJz4dzWcW79/HylOZxkLtC618BQpt9/mn7BND/etToBSCd+vBUb5i7UlBAtGxtGF9BzDoiyK+5bQd0Ww
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:a6d1:a727:b17d:154e])
- (user=apusaka job=sendgmr) by 2002:a25:af04:: with SMTP id
- a4mr30452339ybh.131.1622450312500; Mon, 31 May 2021 01:38:32 -0700 (PDT)
-Date:   Mon, 31 May 2021 16:37:21 +0800
+ (user=apusaka job=sendgmr) by 2002:ad4:5be5:: with SMTP id
+ k5mr15792611qvc.55.1622450317259; Mon, 31 May 2021 01:38:37 -0700 (PDT)
+Date:   Mon, 31 May 2021 16:37:22 +0800
 In-Reply-To: <20210531083726.1949001-1-apusaka@google.com>
-Message-Id: <20210531163500.v2.2.I0564cdade0879f3f2b192ae73d01a0135baf8050@changeid>
+Message-Id: <20210531163500.v2.3.Icd1fee7b40dcfec866286803065a3d19dd9ca7ed@changeid>
 Mime-Version: 1.0
 References: <20210531083726.1949001-1-apusaka@google.com>
 X-Mailer: git-send-email 2.32.0.rc0.204.g9fa02ecfa5-goog
-Subject: [PATCH v2 2/8] Bluetooth: use inclusive language in hci_core.h
+Subject: [PATCH v2 3/8] Bluetooth: use inclusive language to describe CPB
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
@@ -86,11 +86,10 @@ This patch replaces some non-inclusive terms based on the appropriate
 language mapping table compiled by the Bluetooth SIG:
 https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 
-Specifically, these terms are replaced:
+Specifically, these terms are replaced when describing the
+connectionless peripheral broadcast feature:
 master -> central
 slave  -> peripheral
-
-These attributes are not used elsewhere in the code.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
@@ -100,85 +99,146 @@ Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Changes in v2:
 * Add details in commit message
 
- include/net/bluetooth/hci.h | 44 ++++++++++++++++++-------------------
- 1 file changed, 22 insertions(+), 22 deletions(-)
+ include/net/bluetooth/hci.h      | 26 +++++++++++++-------------
+ include/net/bluetooth/hci_core.h |  4 ++--
+ net/bluetooth/hci_conn.c         |  2 +-
+ net/bluetooth/hci_core.c         | 16 ++++++++--------
+ 4 files changed, 24 insertions(+), 24 deletions(-)
 
 diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 18742f4471ff..c3efef266d6d 100644
+index c3efef266d6d..a7cf5a2d87c5 100644
 --- a/include/net/bluetooth/hci.h
 +++ b/include/net/bluetooth/hci.h
-@@ -1839,23 +1839,23 @@ struct hci_rp_le_read_iso_tx_sync {
- #define HCI_OP_LE_SET_CIG_PARAMS		0x2062
- struct hci_cis_params {
- 	__u8    cis_id;
--	__le16  m_sdu;
--	__le16  s_sdu;
--	__u8    m_phy;
--	__u8    s_phy;
--	__u8    m_rtn;
--	__u8    s_rtn;
-+	__le16  c_sdu;
-+	__le16  p_pdu;
-+	__u8    c_phy;
-+	__u8    p_phy;
-+	__u8    c_rtn;
-+	__u8    p_rtn;
+@@ -36,7 +36,7 @@
+ 
+ #define HCI_MAX_AMP_ASSOC_SIZE	672
+ 
+-#define HCI_MAX_CSB_DATA_SIZE	252
++#define HCI_MAX_CPB_DATA_SIZE	252
+ 
+ /* HCI dev events */
+ #define HCI_DEV_REG			1
+@@ -472,10 +472,10 @@ enum {
+ #define LMP_EXTFEATURES	0x80
+ 
+ /* Extended LMP features */
+-#define LMP_CSB_MASTER	0x01
+-#define LMP_CSB_SLAVE	0x02
+-#define LMP_SYNC_TRAIN	0x04
+-#define LMP_SYNC_SCAN	0x08
++#define LMP_CPB_CENTRAL		0x01
++#define LMP_CPB_PERIPHERAL	0x02
++#define LMP_SYNC_TRAIN		0x04
++#define LMP_SYNC_SCAN		0x08
+ 
+ #define LMP_SC		0x01
+ #define LMP_PING	0x02
+@@ -877,17 +877,17 @@ struct hci_rp_logical_link_cancel {
+ 	__u8     flow_spec_id;
  } __packed;
  
- struct hci_cp_le_set_cig_params {
- 	__u8    cig_id;
--	__u8    m_interval[3];
--	__u8    s_interval[3];
--	__u8    sca;
-+	__u8    c_interval[3];
-+	__u8    p_interval[3];
-+	__u8    wc_sca;
- 	__u8    packing;
- 	__u8    framing;
--	__le16  m_latency;
--	__le16  s_latency;
-+	__le16  c_latency;
-+	__le16  p_latency;
- 	__u8    num_cis;
- 	struct hci_cis_params cis[];
+-#define HCI_OP_SET_CSB			0x0441
+-struct hci_cp_set_csb {
++#define HCI_OP_SET_CPB			0x0441
++struct hci_cp_set_cpb {
+ 	__u8	enable;
+ 	__u8	lt_addr;
+ 	__u8	lpo_allowed;
+ 	__le16	packet_type;
+ 	__le16	interval_min;
+ 	__le16	interval_max;
+-	__le16	csb_sv_tout;
++	__le16	cpb_sv_tout;
  } __packed;
-@@ -2260,7 +2260,7 @@ struct hci_ev_sync_train_complete {
+-struct hci_rp_set_csb {
++struct hci_rp_set_cpb {
  	__u8	status;
+ 	__u8	lt_addr;
+ 	__le16	interval;
+@@ -1184,14 +1184,14 @@ struct hci_rp_delete_reserved_lt_addr {
+ 	__u8	lt_addr;
  } __packed;
  
--#define HCI_EV_SLAVE_PAGE_RESP_TIMEOUT	0x54
-+#define HCI_EV_PERIPHERAL_PAGE_RESP_TIMEOUT	0x54
- 
- #define HCI_EV_LE_CONN_COMPLETE		0x01
- struct hci_ev_le_conn_complete {
-@@ -2418,17 +2418,17 @@ struct hci_evt_le_cis_established {
- 	__le16 handle;
- 	__u8  cig_sync_delay[3];
- 	__u8  cis_sync_delay[3];
--	__u8  m_latency[3];
--	__u8  s_latency[3];
--	__u8  m_phy;
--	__u8  s_phy;
-+	__u8  c_latency[3];
-+	__u8  p_latency[3];
-+	__u8  c_phy;
-+	__u8  p_phy;
- 	__u8  nse;
--	__u8  m_bn;
--	__u8  s_bn;
--	__u8  m_ft;
--	__u8  s_ft;
--	__le16 m_mtu;
--	__le16 s_mtu;
-+	__u8  c_bn;
-+	__u8  p_bn;
-+	__u8  c_ft;
-+	__u8  p_ft;
-+	__le16 c_mtu;
-+	__le16 p_mtu;
- 	__le16 interval;
+-#define HCI_OP_SET_CSB_DATA		0x0c76
+-struct hci_cp_set_csb_data {
++#define HCI_OP_SET_CPB_DATA		0x0c76
++struct hci_cp_set_cpb_data {
+ 	__u8	lt_addr;
+ 	__u8	fragment;
+ 	__u8	data_length;
+-	__u8	data[HCI_MAX_CSB_DATA_SIZE];
++	__u8	data[HCI_MAX_CPB_DATA_SIZE];
  } __packed;
+-struct hci_rp_set_csb_data {
++struct hci_rp_set_cpb_data {
+ 	__u8	status;
+ 	__u8	lt_addr;
+ } __packed;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 368e16fdf441..929768f6ed93 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1394,8 +1394,8 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ #define lmp_edr_5slot_capable(dev) ((dev)->features[0][5] & LMP_EDR_5SLOT)
  
+ /* ----- Extended LMP capabilities ----- */
+-#define lmp_csb_master_capable(dev) ((dev)->features[2][0] & LMP_CSB_MASTER)
+-#define lmp_csb_slave_capable(dev)  ((dev)->features[2][0] & LMP_CSB_SLAVE)
++#define lmp_cpb_central_capable(dev) ((dev)->features[2][0] & LMP_CPB_CENTRAL)
++#define lmp_cpb_peripheral_capable(dev) ((dev)->features[2][0] & LMP_CPB_PERIPHERAL)
+ #define lmp_sync_train_capable(dev) ((dev)->features[2][0] & LMP_SYNC_TRAIN)
+ #define lmp_sync_scan_capable(dev)  ((dev)->features[2][0] & LMP_SYNC_SCAN)
+ #define lmp_sc_capable(dev)         ((dev)->features[2][1] & LMP_SC)
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 703470b6b924..7b8784d4da96 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1842,7 +1842,7 @@ u32 hci_conn_get_phy(struct hci_conn *conn)
+ 
+ 	/* BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 2, Part B page 471:
+ 	 * Table 6.2: Packets defined for synchronous, asynchronous, and
+-	 * CSB logical transport types.
++	 * CPB logical transport types.
+ 	 */
+ 	switch (conn->type) {
+ 	case SCO_LINK:
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 4ac6022f7085..b9ebad0f8fb9 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -545,24 +545,24 @@ static void hci_set_event_mask_page_2(struct hci_request *req)
+ 	u8 events[8] = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
+ 	bool changed = false;
+ 
+-	/* If Connectionless Slave Broadcast master role is supported
++	/* If Connectionless Peripheral Broadcast central role is supported
+ 	 * enable all necessary events for it.
+ 	 */
+-	if (lmp_csb_master_capable(hdev)) {
++	if (lmp_cpb_central_capable(hdev)) {
+ 		events[1] |= 0x40;	/* Triggered Clock Capture */
+ 		events[1] |= 0x80;	/* Synchronization Train Complete */
+-		events[2] |= 0x10;	/* Slave Page Response Timeout */
+-		events[2] |= 0x20;	/* CSB Channel Map Change */
++		events[2] |= 0x10;	/* Peripheral Page Response Timeout */
++		events[2] |= 0x20;	/* CPB Channel Map Change */
+ 		changed = true;
+ 	}
+ 
+-	/* If Connectionless Slave Broadcast slave role is supported
++	/* If Connectionless Peripheral Broadcast peripheral role is supported
+ 	 * enable all necessary events for it.
+ 	 */
+-	if (lmp_csb_slave_capable(hdev)) {
++	if (lmp_cpb_peripheral_capable(hdev)) {
+ 		events[2] |= 0x01;	/* Synchronization Train Received */
+-		events[2] |= 0x02;	/* CSB Receive */
+-		events[2] |= 0x04;	/* CSB Timeout */
++		events[2] |= 0x02;	/* CPB Receive */
++		events[2] |= 0x04;	/* CPB Timeout */
+ 		events[2] |= 0x08;	/* Truncated Page Complete */
+ 		changed = true;
+ 	}
 -- 
 2.32.0.rc0.204.g9fa02ecfa5-goog
 
