@@ -2,109 +2,201 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.0 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 05643C47083
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 16:04:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3FE16C47080
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 02:11:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DC13261370
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 31 May 2021 16:04:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D0A361027
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 02:11:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233453AbhEaQGT (ORCPT
+        id S232503AbhFACNB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 31 May 2021 12:06:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36156 "EHLO
+        Mon, 31 May 2021 22:13:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234386AbhEaQEX (ORCPT
+        with ESMTP id S232320AbhFACNB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 31 May 2021 12:04:23 -0400
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96589C061351;
-        Mon, 31 May 2021 07:41:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-        MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-        Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-        Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-        List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-         bh=euB7BL2XuW3HoSpXnWIwx0mLzMjhawHcBqDGg751C3g=; b=tDWS4hOZfgY456Ivm/TAoCqAi
-        kwzSbsxZzymv6NNi44bQffd7ZVRueqJlNBszDtH/qddj46tkhS/3Fuw+g8KWvQi6JsUHe4dq/Kwc+
-        9YJrjaDlUyrlg1ENb0GZqTSnR8QXlZ0aakBYMTkeDqJ5SEqj+IrsOnUF/DdY9lHOzkLkGzV08kV7a
-        8h+GklEje69BI1jShscsHfdMkfebBoWOLNr7s3SllPMQAkFQqMilwb2dvauJcsy4MlG5Vm17JS1l8
-        mSG6Dfl1lID8lL4zgtQt1eM+fdGEbG6Pqm1pUw4u+Qct3o4zWw7vkf0cqlmthZbmhe2cSV0uXZ+WL
-        B5HbFDzdA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:44520)
-        by pandora.armlinux.org.uk with esmtpsa (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-        (Exim 4.92)
-        (envelope-from <linux@armlinux.org.uk>)
-        id 1lnj6r-0002p9-Al; Mon, 31 May 2021 15:41:41 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.92)
-        (envelope-from <linux@shell.armlinux.org.uk>)
-        id 1lnj6m-0007d2-9u; Mon, 31 May 2021 15:41:36 +0100
-Date:   Mon, 31 May 2021 15:41:36 +0100
-From:   "Russell King (Oracle)" <linux@armlinux.org.uk>
-To:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc:     Andre Przywara <andre.przywara@arm.com>,
-        Ondrej Jirman <megous@megous.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Jernej =?utf-8?Q?=C5=A0krabec?= <jernej.skrabec@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linux-serial@vger.kernel.org,
-        Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
+        Mon, 31 May 2021 22:13:01 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D34DC061574;
+        Mon, 31 May 2021 19:11:20 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id s107so15144671ybi.3;
+        Mon, 31 May 2021 19:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=eQx9xctYuJ3o/fL+k58wM3001vnaqhkuZk05QT6MtrM=;
+        b=bOJNbvJHOEK87SsKfxONaqabouGNB8DfGTIM6H+S5tRhGPp2SnpMwu3UbCuFty1Crs
+         D84mLcWCvKznvO1/eakwBFflnVW6+cleUwnxLmTYWu6lpYuvjXZ+8QYV0dHwshO7YMKL
+         Phq8Y3XGmwORv7NxAqRyE0TJPNTFb/5FuPGnE/8ZN3HrLeHkqPTVtbWC8fKlHsL7JcuW
+         c8eYFOD+NeRTDPyCNNVf9oiVBOueWXMIdQWjO0ublxgFpvqM4igYSAryP4aQtFDxcD/z
+         NtCywQQEhtIhbih5kTxb1HtwZVfnnFiePkA5zIQkJ1OdqM7KPo8HSMKZl2nK8eLcD7eY
+         kqwg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=eQx9xctYuJ3o/fL+k58wM3001vnaqhkuZk05QT6MtrM=;
+        b=nMCX+HVDXTTxU62MR2Q463CEhswLjSqLZppDsy48gNH9iytOSTr7o9ZxdMQnUnvNBN
+         79fmR25mSFfwx3eVBj0nhjMAWMObi6kesOUh1IN/zN3GjB60Tsyxv8vRMh2F7J6vmGUA
+         YT9r7yHd8fXdpcv1/WDYxQC32uWU5keGvwIccV5bc0zwFNdFKqMSNn3vnbH9sgGY8Kgv
+         zvGdI7ON5tMBN9k2iZNAUHt5Zmx3mw5mednWx4KRivNjZNc59qHEBwkXV2jj1p5ehUvf
+         tiqoqAsb5ypCCQ3K0PwnIFR2ORHJBIJ8gx4TJPvrwrH5rvtKsYwkwzl/NABNQjWKkeKE
+         vp6g==
+X-Gm-Message-State: AOAM5331jjDmYhnDZGoPp6ur7OHe9w1iKXrFrpRAlhde76w/YAcbabXb
+        2e3rw3eV1XOkMqGpbB4L1WFI6oglHkOidd8gsO0=
+X-Google-Smtp-Source: ABdhPJwPq/rJ/r7/ossVC6pWzDcwciHJV+txmedd+BBMtu+wGkeLp+cxgaI7u2+R1Xuh29L5U8abqjLu8oXhpjMzji4=
+X-Received: by 2002:a25:a466:: with SMTP id f93mr33940228ybi.264.1622513479484;
+ Mon, 31 May 2021 19:11:19 -0700 (PDT)
+MIME-Version: 1.0
+References: <0000000000001d4a3005c39b0b40@google.com> <20210531090414.2558-1-hdanton@sina.com>
+In-Reply-To: <20210531090414.2558-1-hdanton@sina.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 31 May 2021 19:11:08 -0700
+Message-ID: <CABBYNZLwdYRMeXFpLqHiyU2Xi3Q1gjygjF_DoMAZR4rp1E+vQA@mail.gmail.com>
+Subject: Re: [syzbot] general protection fault in l2cap_chan_timeout (2)
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     syzbot <syzbot+008cdbf7a9044c2c2f99@syzkaller.appspotmail.com>,
+        David Miller <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-sunxi@lists.linux.dev,
-        Josh Triplett <josh@joshtriplett.org>, tuxd3v@sapo.pt
-Subject: Re: sunxi: Bluetooth broken since 5.6-rc1
-Message-ID: <20210531144136.GS30436@shell.armlinux.org.uk>
-References: <20210530173454.5ab1dcf5@slackpad.fritz.box>
- <YLTi8iYdLiKNeaLC@kroah.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YLTi8iYdLiKNeaLC@kroah.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, May 31, 2021 at 03:21:54PM +0200, Greg Kroah-Hartman wrote:
-> On Sun, May 30, 2021 at 05:34:54PM +0100, Andre Przywara wrote:
-> > An obvious easy hack-fix is to just define
-> > CONFIG_SERIAL_8250_16550A_VARIANTS, which brings the delays back and
-> > seems to avoid the problem for me.
-> > Another hack which seems to mitigate the problem is to avoid switching
-> > the baudrate to something faster than 115200.
-> > 
-> > I observed this on a BananaPi-M64 (Allwinner A64 SoC with AP6212 WiFi/BT
-> > chip), but others reported the same issue on a NanoPi Air (Allwinner H3
-> > with 6212), but also other SoCs and devices (at least one AP6210).
-> > 
-> > Obviously those workarounds are not real solutions, and I was
-> > wondering if anybody has an idea how to properly fix this?
-> > What puzzles me is that the delay is happening during the *UART*
-> > probe, so before we even start dealing with the Bluetooth device.
-> 
-> What type of bluetooth device is this, and what does it have to do with
-> the serial port?  Is the SoC device using the same IP blocks for both?
+Hi,
 
-Many bluetooth "devices" (I mean the interface from the local machine
-to the BT world, not as in remote devices) are connected through a
-standard UART. Pictorially, it's:
+On Mon, May 31, 2021 at 2:04 AM Hillf Danton <hdanton@sina.com> wrote:
+>
+> On Mon, 31 May 2021 00:19:17 -0700
+> > Hello,
+> >
+> > syzbot found the following issue on:
+> >
+> > HEAD commit:    ad9f25d3 Merge tag 'netfs-lib-fixes-20200525' of git://git..
+> > git tree:       upstream
+> > console output: https://syzkaller.appspot.com/x/log.txt?x=173d383dd00000
+> > kernel config:  https://syzkaller.appspot.com/x/.config?x=266cda122a0b56c
+> > dashboard link: https://syzkaller.appspot.com/bug?extid=008cdbf7a9044c2c2f99
+> >
+> > Unfortunately, I don't have any reproducer for this issue yet.
+> >
+> > IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> > Reported-by: syzbot+008cdbf7a9044c2c2f99@syzkaller.appspotmail.com
+> >
+> > general protection fault, probably for non-canonical address 0xdffffc000000005a: 0000 [#1] PREEMPT SMP KASAN
+> > KASAN: null-ptr-deref in range [0x00000000000002d0-0x00000000000002d7]
+> > CPU: 0 PID: 8 Comm: kworker/0:2 Not tainted 5.13.0-rc3-syzkaller #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+> > Workqueue: events l2cap_chan_timeout
+> > RIP: 0010:__mutex_lock_common kernel/locking/mutex.c:941 [inline]
+> > RIP: 0010:__mutex_lock+0xf6/0x10c0 kernel/locking/mutex.c:1104
+> > Code: d0 7c 08 84 d2 0f 85 cc 0c 00 00 8b 15 e3 55 5f 07 85 d2 75 29 48 8d 7d 60 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 db 0e 00 00 48 3b 6d 60 0f 85 5a 0a 00 00 bf 01
+> > RSP: 0018:ffffc90000cd7b78 EFLAGS: 00010216
+> > RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000001
+> > RDX: 000000000000005a RSI: 0000000000000000 RDI: 00000000000002d0
+> > RBP: 0000000000000270 R08: ffffffff880a40d9 R09: 0000000000000000
+> > R10: ffffffff814b4be0 R11: 0000000000000000 R12: 0000000000000000
+> > R13: dffffc0000000000 R14: ffff888072e47020 R15: ffff8880b9c34a40
+> > FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > CR2: 00007fcac15f1d58 CR3: 00000000628fa000 CR4: 0000000000350ef0
+> > DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> > DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+> > Call Trace:
+> >  l2cap_chan_timeout+0x69/0x2f0 net/bluetooth/l2cap_core.c:422
+> >  process_one_work+0x98d/0x1600 kernel/workqueue.c:2276
+> >  worker_thread+0x64c/0x1120 kernel/workqueue.c:2422
+> >  kthread+0x3b1/0x4a0 kernel/kthread.c:313
+> >  ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:294
+>
+> To fix the uaf reported, 1) releases connection through rcu 2) detects race
+> under rcu lock in the delayed work callback.
+>
+> Note it is only for idea and thoughts are welcome if it makes sense to you.
+>
+> +++ x/net/bluetooth/l2cap_core.c
+> @@ -414,12 +414,25 @@ static void l2cap_chan_timeout(struct wo
+>  {
+>         struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
+>                                                chan_timer.work);
+> -       struct l2cap_conn *conn = chan->conn;
+> +       struct l2cap_conn *conn;
+>         int reason;
+>
+> +       rcu_read_lock();
+> +       conn = chan->conn;
+> +       if (conn && !kref_get_unless_zero(&conn->ref))
+> +               conn = NULL;
+> +       rcu_read_unlock();
+> +
+> +       if (!conn)
+> +               goto put;
+> +
+>         BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+>
+>         mutex_lock(&conn->chan_lock);
+> +
+> +       if (!chan->conn)
+> +               goto put;
+> +
+>         /* __set_chan_timer() calls l2cap_chan_hold(chan) while scheduling
+>          * this work. No need to call l2cap_chan_hold(chan) here again.
+>          */
+> @@ -438,9 +451,13 @@ static void l2cap_chan_timeout(struct wo
+>         chan->ops->close(chan);
+>
+>         l2cap_chan_unlock(chan);
+> +put:
+>         l2cap_chan_put(chan);
+>
+> +       if (!conn)
+> +               return;
+>         mutex_unlock(&conn->chan_lock);
+> +       l2cap_conn_put(conn);
+>  }
+>
+>  struct l2cap_chan *l2cap_chan_create(void)
+> @@ -1915,12 +1932,19 @@ static void l2cap_conn_del(struct hci_co
+>         l2cap_conn_put(conn);
+>  }
+>
+> +static void l2cap_conn_rcu_fn(struct rcu_head *r)
+> +{
+> +       struct l2cap_conn *conn = container_of(r, struct l2cap_conn, rcu);
+> +
+> +       kfree(conn);
+> +}
+> +
+>  static void l2cap_conn_free(struct kref *ref)
+>  {
+>         struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
+>
+>         hci_conn_put(conn->hcon);
+> -       kfree(conn);
 
-  CPU <---> UART <---> BT chip <---> Bluetooth RF world
+Shouldn't we actually cancel the timeout work if the connection is
+freed here? At least I don't see a valid reason to have a l2cap_chan
+without l2cap_conn.
 
-The reporter seems to be saying is that a change to the UART driver now
-means that the bluetooth chip wired to that UART no longer functions due
-to slightly different initialisation timings of the host UART.
+> +       call_rcu(&conn->rcu, l2cap_conn_rcu_fn);
+>  }
+>
+>  struct l2cap_conn *l2cap_conn_get(struct l2cap_conn *conn)
+
+
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 40Mbps down 10Mbps up. Decent connectivity at last!
+Luiz Augusto von Dentz
