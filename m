@@ -2,101 +2,246 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 27A12C4708F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 19:04:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66401C47080
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 20:19:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 04B446135D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 19:04:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3DBBA613D6
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 20:19:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234574AbhFATGS (ORCPT
+        id S234758AbhFAUVJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Jun 2021 15:06:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60884 "EHLO
+        Tue, 1 Jun 2021 16:21:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49254 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233397AbhFATGR (ORCPT
+        with ESMTP id S234513AbhFAUVI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Jun 2021 15:06:17 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD77BC061574;
-        Tue,  1 Jun 2021 12:04:34 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id j1so396889oie.6;
-        Tue, 01 Jun 2021 12:04:34 -0700 (PDT)
+        Tue, 1 Jun 2021 16:21:08 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BE8C06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jun 2021 13:19:26 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id v12so7489995plo.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jun 2021 13:19:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=yMAgZF7duW/UBs3zqaxQqh55RXQkmEY7w7zfn2JeuWM=;
-        b=lTibGVqmD3fk35o3Ypk641kCHOffLCFHfN0t+Zv+nijjWr08dbhMm3FC6+5IvAxBkZ
-         PSruYhjMrAXrdkvovRY+SED6Rt2lTUWV8P3oZ+CYSw+2XNN1JJgnNjgmm/qJrtXX7Fap
-         qYp/RulJ6M1l7OvhMs7320PA3JMXdx604bSoo5XTUw3ZLWd9bU1L+9aZLQ6E/PF62h37
-         CoglFdHwJG2zuwpZWg4eKDPP5OMgvZW1Jhpuv4ooAzU1WOrbKrwCr8U2yQJ6jRNtzlVX
-         jHbFKUYtS+l0W/M9hJrkWZLpAnwBAsAtGKJ9UpOco7ECYGPJxhvWX3c/MPDehAJ6oN3n
-         dPTQ==
+        bh=9YUjnJ2PTkELptkYWCmxO47K33gXfXzwP4BqGN3mI4Y=;
+        b=BTpgZwgHBK2v2a2Q4+Pl9EaJ1n9R1MfxOINRamz4GUW4lgmsVHAfEJGcgXZLloL55Y
+         utUaxLzhZqPeFR9V2ic+8NPMrTMgcmfDV04e2QntMAfibNLsCU5Hrp1wIy9gdNACFeQb
+         dtsuuF1q56sx0xQQDPqc40yb19p8pq++iWAu19x95lLvtigR3GBlWh3jPGz6SrSc32Ql
+         G9JaXkglnmDgyTlLwrYEM5RjGAmj2te4YeEDxadv+87Ylp2uG3/3V6Zqz8cqlFJWEzK8
+         n6l/jHIllIZf6aDQGHSsQRce1D6zH5/eCKF0ctNiVHDjGt3ddXOYyk4JHwxBxKg8SQ1j
+         +Cbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=yMAgZF7duW/UBs3zqaxQqh55RXQkmEY7w7zfn2JeuWM=;
-        b=Mnr0s958pKyKHj2t2DoNCQMCM6qdex2q4w2KRmvM9cdH34SMfL1tjcMMzUSBmNw9Zt
-         V+8deB0gurjilW2y+ZnJhWEQQXx6GeKMYPfI+uE0hwOxS2x7AbNy2r2USV1tkRgany6q
-         lF53C+r1Z6I0W6vt9e7sZnVtuTEkQEsQZjJIiX3zp2nltritK5etAbZBeGcd+H9buERw
-         NBlkuNpx65IgZMJRPg88avXm7CRO+LEYrThcTTuAOAgvxGIUci/I17YBLUV6DU8YkmuA
-         N7kq614OKw9bjf2mT07exRNT52aCsDiqpiP5c1NKjTVRJvVOnv8dTTld/9udYCF8zTm/
-         hndA==
-X-Gm-Message-State: AOAM530PtdBBVxZh6iV1Bbjrxp0neEnT0qAqdzmkejErOE9HDX5RoFEN
-        t8QxumwUAtKnnabSDS1GEUw=
-X-Google-Smtp-Source: ABdhPJz8TdhKPwFGlIVD78DZ3rP2frRr8ZBgAQzwC9PrHKF3iMVuCmI5zI5H+fZfekGGAnmweQCFqQ==
-X-Received: by 2002:aca:1317:: with SMTP id e23mr997976oii.94.1622574274224;
-        Tue, 01 Jun 2021 12:04:34 -0700 (PDT)
-Received: from localhost.localdomain (cpe-24-31-245-230.kc.res.rr.com. [24.31.245.230])
-        by smtp.gmail.com with ESMTPSA id l20sm3515720oop.3.2021.06.01.12.04.33
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=9YUjnJ2PTkELptkYWCmxO47K33gXfXzwP4BqGN3mI4Y=;
+        b=EMW9Xow4y/ddhO4+k65ZRQpCQ1hv2r+gp+cvJrHaiCwx/Pd3/DJWPyGh5K0QX7vmap
+         wx5RIVPd/xmHxLf7ZSv2VUOCKMpEXEbO7yUIzbpDKFLIs8U6L1Sy/RW9r8N20zo5Uspt
+         dV5CK89gjxf2tdaPashCND+6lJqClVEYqiQIm8ih6Ebk9ibZ1D5gqHN0Lc3nZrStvSBq
+         WkH8FWwHS6/K2oDeRRFtrJoy0SDfyAKZTqwBfL1P1LvD1F2QK4ohT1ft55gnrxOqvdi4
+         rG9YgqdYvOfYYN8uTqBVS/UJG7Ir03Orr4fs5iEyoA6A9Xz7wg7rHWIubHk12HrPfDpP
+         QDQg==
+X-Gm-Message-State: AOAM533UjMdhql9n6Ztw8BkcaEZTZiVgXuw84Ekpn6BegHoRDQM6OW55
+        YehYV4f5SKHoPVM7wD3icxPP3+0N+ZM=
+X-Google-Smtp-Source: ABdhPJysTjx9s6WRW7OIBogKZl8n8CEQ+tLNeaNtM6En6/DBpnRfysx2MbBY8o+KzfuW90XDoHjOBQ==
+X-Received: by 2002:a17:902:bd0b:b029:ef:8970:281c with SMTP id p11-20020a170902bd0bb02900ef8970281cmr27301602pls.35.1622578766137;
+        Tue, 01 Jun 2021 13:19:26 -0700 (PDT)
+Received: from han1-mobl3.intel.com ([2601:1c0:6a01:d830::512a])
+        by smtp.gmail.com with ESMTPSA id y129sm13399262pfy.123.2021.06.01.13.19.25
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 12:04:33 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-From:   Larry Finger <Larry.Finger@lwfinger.net>
-To:     Linus Torvalds <torvalds@linux-foundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-kernel@vger.kernel.org,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: Add a new USB ID for RTL8822CE
-Date:   Tue,  1 Jun 2021 14:04:18 -0500
-Message-Id: <20210601190418.25628-1-Larry.Finger@lwfinger.net>
-X-Mailer: git-send-email 2.31.1
+        Tue, 01 Jun 2021 13:19:25 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH 2/3] tools/mgmt-tester: Add tests for experimental feature command
+Date:   Tue,  1 Jun 2021 13:19:22 -0700
+Message-Id: <20210601201923.899950-2-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.26.3
+In-Reply-To: <20210601201923.899950-1-hj.tedd.an@gmail.com>
+References: <20210601201923.899950-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Some models of the RTL8822ce utilize a different USB ID. Add this
-new one to the Bluetooth driver.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+This patch adds test cases for Read/Set Experimenal Feature commands.
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+ tools/mgmt-tester.c | 139 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 138 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 5d603ef39bad..7a8e1d240f15 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -388,6 +388,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Realtek 8822CE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0bda, 0xc822), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 4550d6e9c..0d7c6b9e1 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -6837,7 +6837,7 @@ static void command_generic_callback(uint8_t status, uint16_t length,
+ 			expect_param = test->expect_func(&expect_len);
  
- 	/* Realtek 8852AE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xc852), .driver_info = BTUSB_REALTEK |
+ 		if (length != expect_len) {
+-			tester_warn("Invalid cmd response parameter size");
++			tester_warn("Invalid cmd response parameter size: %d", length);
+ 			tester_test_failed();
+ 			return;
+ 		}
+@@ -9124,6 +9124,100 @@ static const struct generic_data set_dev_flags_fail_3 = {
+ 	.expect_len = sizeof(set_dev_flags_rsp_param_fail_3),
+ };
+ 
++static const uint8_t read_exp_feat_param_success[] = {
++	0x02, 0x00,				/* Feature Count */
++	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,	/* UUID - Simultaneous */
++	0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,	/* Central Peripheral */
++	0xb5, 0x10, 0x1b, 0x67,
++	0x00, 0x00, 0x00, 0x00,			/* Flags */
++	0x04, 0x00, 0x13, 0xac, 0x42, 0x02,	/* UUID - LL Privacy */
++	0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
++	0x48, 0xa1, 0xc0, 0x15,
++	0x02, 0x00, 0x00, 0x00,			/* Flags */
++};
++
++static const struct generic_data read_exp_feat_success = {
++	.send_opcode = MGMT_OP_READ_EXP_FEATURES_INFO,
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = read_exp_feat_param_success,
++	.expect_len = sizeof(read_exp_feat_param_success),
++};
++
++static uint16_t settings_powered_le_privacy[] = { MGMT_OP_SET_LE,
++						MGMT_OP_SET_PRIVACY,
++						MGMT_OP_SET_POWERED, 0 };
++
++static const uint8_t set_exp_feat_param_ll_privacy[] = {
++	0x04, 0x00, 0x13, 0xac, 0x42, 0x02,	/* UUID - LL Privacy */
++	0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
++	0x48, 0xa1, 0xc0, 0x15,
++	0x01,					/* Action - enable */
++};
++
++static const uint8_t set_exp_feat_rsp_param_ll_privacy[] = {
++	0x04, 0x00, 0x13, 0xac, 0x42, 0x02,	/* UUID - LL Privacy */
++	0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
++	0x48, 0xa1, 0xc0, 0x15,
++	0x03, 0x00, 0x00, 0x00,			/* Action - enable */
++};
++
++static const struct generic_data set_exp_feat_enable_ll_privacy = {
++	.send_opcode = MGMT_OP_SET_EXP_FEATURE,
++	.send_param = set_exp_feat_param_ll_privacy,
++	.send_len = sizeof(set_exp_feat_param_ll_privacy),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = set_exp_feat_rsp_param_ll_privacy,
++	.expect_len = sizeof(set_exp_feat_rsp_param_ll_privacy),
++};
++
++static const uint8_t set_exp_feat_param_disable[17] = { 0x00 };
++static const uint8_t set_exp_feat_rsp_param_disable[20] = { 0x00 };
++
++static const struct generic_data set_exp_feat_disable = {
++	.send_opcode = MGMT_OP_SET_EXP_FEATURE,
++	.send_param = set_exp_feat_param_disable,
++	.send_len = sizeof(set_exp_feat_param_disable),
++	.expect_status = MGMT_STATUS_SUCCESS,
++	.expect_param = set_exp_feat_rsp_param_disable,
++	.expect_len = sizeof(set_exp_feat_rsp_param_disable),
++};
++
++static const struct generic_data set_exp_feat_rejected = {
++	.setup_settings = settings_powered_le_privacy,
++	.send_opcode = MGMT_OP_SET_EXP_FEATURE,
++	.send_param = set_exp_feat_param_ll_privacy,
++	.send_len = sizeof(set_exp_feat_param_ll_privacy),
++	.expect_status = MGMT_STATUS_REJECTED,
++};
++
++static const uint8_t set_exp_feat_param_invalid[] = {
++	0x04, 0x00, 0x13, 0xac, 0x42, 0x02,	/* UUID - LL Privacy */
++	0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
++	0x48, 0xa1, 0xc0, 0x15,
++	0xff,					/* Action - invalid */
++};
++
++static const struct generic_data set_exp_feat_invalid = {
++	.send_opcode = MGMT_OP_SET_EXP_FEATURE,
++	.send_param = set_exp_feat_param_invalid,
++	.send_len = sizeof(set_exp_feat_param_invalid),
++	.expect_status = MGMT_STATUS_INVALID_PARAMS,
++};
++
++static const uint8_t set_exp_feat_param_unknown[] = {
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,	/* UUID - Unknown */
++	0xff, 0xff, 0xff, 0xff, 0xff, 0xff,
++	0xff, 0xff, 0xff, 0xff,
++	0x01,					/* Action - enable */
++};
++
++static const struct generic_data set_exp_feat_unknown = {
++	.send_opcode = MGMT_OP_SET_EXP_FEATURE,
++	.send_param = set_exp_feat_param_unknown,
++	.send_len = sizeof(set_exp_feat_param_unknown),
++	.expect_status = MGMT_STATUS_NOT_SUPPORTED,
++};
++
+ static bool power_off(uint16_t index)
+ {
+ 	int sk, err;
+@@ -11192,5 +11286,48 @@ int main(int argc, char *argv[])
+ 				setup_get_dev_flags,
+ 				test_command_generic);
+ 
++	/* MGMT_OP_READ_EXP_FEATURE
++	 * Read Experimental features - success
++	 */
++	test_bredrle50("Read Exp Feature - Success",
++				&read_exp_feat_success,
++				NULL, test_command_generic);
++	/* MGMT_OP_SET_EXP_FEATURE
++	 * Enable LL Privacy
++	 */
++	test_bredrle50("Set Exp Feature - Enable LL Privacy",
++				&set_exp_feat_enable_ll_privacy,
++				NULL, test_command_generic);
++
++	/* MGMT_OP_SET_EXP_FEATURE
++	 * Disable all features by sending zero UUID
++	 */
++	test_bredrle50("Set Exp Feature - Disable all",
++				&set_exp_feat_disable,
++				NULL, test_command_generic);
++
++	/* MGMT_OP_SET_EXP_FEATURE
++	 * Rejected - If the power is on, the command should be rejected
++	 */
++	test_bredrle50("Set Exp Feature - Rejected",
++				&set_exp_feat_rejected,
++				NULL, test_command_generic);
++
++	/* MGMT_OP_SET_EXP_FEATURE
++	 * Invalid parameter
++	 */
++	test_bredrle50("Set Exp Feature - Invalid params",
++				&set_exp_feat_invalid,
++				NULL, test_command_generic);
++
++
++	/* MGMT_OP_SET_EXP_FEATURE
++	 * Not Supported UUID
++	 */
++	test_bredrle50("Set Exp Feature - Unknown feature",
++				&set_exp_feat_unknown,
++				NULL, test_command_generic);
++
++
+ 	return tester_run();
+ }
 -- 
-2.31.1
+2.26.3
 
