@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E793C47092
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 22:03:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E1BC47093
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 22:03:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 50DA660C40
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 22:03:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 45F3660C40
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 22:03:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234882AbhFAWFh (ORCPT
+        id S234898AbhFAWFj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Jun 2021 18:05:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44044 "EHLO
+        Tue, 1 Jun 2021 18:05:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44056 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234671AbhFAWFg (ORCPT
+        with ESMTP id S234818AbhFAWFj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Jun 2021 18:05:36 -0400
-Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDB63C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jun 2021 15:03:54 -0700 (PDT)
-Received: by mail-pf1-x42b.google.com with SMTP id g6so610648pfq.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jun 2021 15:03:54 -0700 (PDT)
+        Tue, 1 Jun 2021 18:05:39 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3DD6AC06174A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jun 2021 15:03:57 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id v14so515411pgi.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jun 2021 15:03:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=B9bWQDNODQbfdstGNxmo0gbpw0WdJcK0cmUVE1EtB/A=;
-        b=rtnEkTENNxFsTW3X3POGCGtCb+Wxi0UHY9Hs9wLx1T59bABI6AXe24ZvNg24gTkHGa
-         J5Y4otJdy5+nFQ9c0opmTTAfv1FLpSg4/ZV8v7bzT7uhG4MS7RdsKNtxrWzzECOlHvBV
-         477cPFOxi4gafvtkdPvbT6tpgJwqlO7m/Yi0Qc0dr0GUnYib/WbCMJQPKrao29oprpeE
-         LKfZ5l5mE6QeIfH5pY/xCfTmq6dOOyO6MyyeacjKA+2skUcbQEfxrvHh4fiJokal3Qrl
-         b+02PavYfPUE6qchWMBWJPL7UeWU8dgEjLHlReCU8Ft/vv8Q5NMhX04MaqqyrwRmaz3W
-         Uu9g==
+        bh=V/AtrhP+AKHpU9UpGm4fo/bOWE/vIaHBuJEPLuBJCLM=;
+        b=NMvGeMUuXdxyOExF89bKA/zw4f1wuW8LPQurQhQOT5D5/BKq+ybTu1zkjIvf5jCDNA
+         +Izmhhc1n10wrFNX1iKx//a6jUoVxzY8RJ3De8ygdm/Z9NiBdW+6I6ZHXUg9oNy+4p8m
+         1fWLtuD+JA5QFR4U1uZAmJRaE9gAOLhp1Bht9Qpf/5/Px7l34sXJs5SsQrQrGv8a0lzy
+         dvFyOevvxtHeFfEIEWjQ6l+e+C5xzmsH7Xz9uhLqwzwR4fimKOOCE/ZeHfKtEV9Rwu1E
+         e+ZQ08DZN1RnoFDen/8pPl10mdYPSc2wtfX1YqApUXotDsjbewB1WbqK5ApOCbFpAE0o
+         6Tgw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=B9bWQDNODQbfdstGNxmo0gbpw0WdJcK0cmUVE1EtB/A=;
-        b=PsPn9dbhL76epQekavcpx7+jMK3BV/va0t+Kiqj5ewmw8Izwy6BWRKxRHWPm1P0YKm
-         OJ09qFQ8P4G8P6xGQAlJjFSM0cSTPHf7SD7K9XHz8dSDBnLd9IVnbA/Ww+XJ2Pd0wkvv
-         OvyFZ6ejGmj/bAwWxTkRZpXPvgb/ohzog9xUdgsgL8TYFgDCwHe0Ed+SzZ8T/oZTqrPw
-         7G/fSHxfLyD/nMSDEQCdWnSsy/3ULF4MXTrbmwVZgNxmuX/bD3MAthbqJGdldlmoEVq7
-         H4n5tgHR1pPS1kj2kvejGPbHclerTWHMcSckGcIBwRzppuPrJ9mFAKzzESI36lCMoFnY
-         Mwjg==
-X-Gm-Message-State: AOAM530orwCM/TBwW+jUCgN9oM7S4HLSZlijL9UeL9AK0ohkihvap+4L
-        unPibYJDMf0//Bxm36Z26XVwoeePNsw=
-X-Google-Smtp-Source: ABdhPJwyrAxeBGi5ZaiUDBDFvIfS6RTuYVb2EFLLlFEZgdPyGQR5+p7xQCoM8NYWu3/MGG5CxP0DAg==
-X-Received: by 2002:a05:6a00:acb:b029:2dc:db73:d44c with SMTP id c11-20020a056a000acbb02902dcdb73d44cmr24439147pfl.28.1622585033791;
-        Tue, 01 Jun 2021 15:03:53 -0700 (PDT)
+        bh=V/AtrhP+AKHpU9UpGm4fo/bOWE/vIaHBuJEPLuBJCLM=;
+        b=RYdNw61c97PsGTiQ67uRnMJBz+AtpRjIblKYAJGRlZPaWKSU1HUCBO4pg92Aj+RZSy
+         3gc2XEqLyi/WMlRbs6sz5eVNoDpLdxfNBmSCxT/5pIXlbVdbmoPUK+Z/b63ywYtmH6ZF
+         jVuwE4kTfIKNyVojcZMal9OwjoqnphgUppMVTg9W+H8XgQEvgp3x/kOP/HvI68W5OxQk
+         GKMhi8vjojg/ciHVLfLZn9mA/Te2eObn0/ExgpS7zQiTyaXxRXqViPm5KR9vuz3xXnd4
+         y9kkTov4eB+pDGB7HavaiIdtcCScJiMIQonVgF26t70wBcYpj22Hp4VZmX8sefOJPLan
+         8kOA==
+X-Gm-Message-State: AOAM530jVnAXQrZ2RpyY3YcQ64MohBkLaRSLC4zcWeKKG3vEOns794D2
+        6vfcdVRtFt93sEnbQqkR6Mv8ZMGQ21k=
+X-Google-Smtp-Source: ABdhPJznPVs6fiz5Vl33k4XRa1MAqXgXUc6k57usA/L/A2lgVktMif3SSWr5mDkaHId5Azn5U8Vb+g==
+X-Received: by 2002:a62:8c0d:0:b029:2e9:e1f4:c433 with SMTP id m13-20020a628c0d0000b02902e9e1f4c433mr9128754pfd.24.1622585036212;
+        Tue, 01 Jun 2021 15:03:56 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f9sm13573780pfc.42.2021.06.01.15.03.53
+        by smtp.gmail.com with ESMTPSA id f9sm13573780pfc.42.2021.06.01.15.03.55
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 15:03:53 -0700 (PDT)
+        Tue, 01 Jun 2021 15:03:55 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v1 2/5] Bluetooth: eir: Move EIR/Adv Data functions to its own file
-Date:   Tue,  1 Jun 2021 15:03:46 -0700
-Message-Id: <20210601220349.375619-2-luiz.dentz@gmail.com>
+Subject: [PATCH v1 5/5] Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
+Date:   Tue,  1 Jun 2021 15:03:49 -0700
+Message-Id: <20210601220349.375619-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210601220349.375619-1-luiz.dentz@gmail.com>
 References: <20210601220349.375619-1-luiz.dentz@gmail.com>
@@ -75,1179 +75,748 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This moves functions manipulating EIR/Adv Data to its own file so it
-can be reused by other files.
+This make use of hci_cmd_sync_queue for the following MGMT commands:
+
+    Add Device
+    Remove Device
+
+Tested with:
+
+mgmt-tester -s "Add Device"
+
+Test Summary
+------------
+Add Device - Invalid Params 1                        Passed       0.016 seconds
+Add Device - Invalid Params 2                        Passed       0.013 seconds
+Add Device - Invalid Params 3                        Passed       0.015 seconds
+Add Device - Invalid Params 4                        Passed       0.013 seconds
+Add Device - Success 1                               Passed       0.015 seconds
+Add Device - Success 2                               Passed       0.014 seconds
+Add Device - Success 3                               Passed       0.015 seconds
+Add Device - Success 4                               Passed       0.018 seconds
+Add Device - Success 5                               Passed       0.017 seconds
+Add Device - Success 6 - Add to whitelist            Passed       0.019 seconds
+Add Device - Success 7 - Add to resolv list          Passed       0.021 seconds
+Add Device - Success 8 - Enable resolv list          Passed       0.021 seconds
+Total: 12, Passed: 12 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.209 seconds
+
+mgmt-tester -s "Remove Device"
+
+Test Summary
+------------
+Remove Device - Invalid Params 1                     Passed       0.017 seconds
+Remove Device - Invalid Params 2                     Passed       0.013 seconds
+Remove Device - Invalid Params 3                     Passed       0.014 seconds
+Remove Device - Success 1                            Passed       0.017 seconds
+Remove Device - Success 2                            Passed       0.017 seconds
+Remove Device - Success 3                            Passed       1.034 seconds
+Remove Device - Success 4                            Passed       1.036 seconds
+Remove Device - Success 5                            Passed       1.021 seconds
+Remove Device - Success 6 - All Devices              Passed       1.023 seconds
+Remove Device - Success 7 - Remove from whitelist    Passed       0.026 seconds
+Remove Device - Success 8 - Remove from resolv list  Passed       0.023 seconds
+Total: 11, Passed: 11 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 4.26 seconds
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  39 +--
- net/bluetooth/Makefile           |   2 +-
- net/bluetooth/eir.c              | 334 +++++++++++++++++++++++++
- net/bluetooth/eir.h              |  72 ++++++
- net/bluetooth/hci_core.c         |  54 ++++
- net/bluetooth/hci_event.c        |   1 +
- net/bluetooth/hci_request.c      | 416 ++-----------------------------
- net/bluetooth/hci_request.h      |  23 --
- net/bluetooth/mgmt.c             |   3 +-
- 9 files changed, 481 insertions(+), 463 deletions(-)
- create mode 100644 net/bluetooth/eir.c
- create mode 100644 net/bluetooth/eir.h
+ net/bluetooth/hci_sync.c | 606 ++++++++++++++++++++++++++++++++++++++-
+ net/bluetooth/hci_sync.h |   2 +
+ net/bluetooth/mgmt.c     |  19 +-
+ 3 files changed, 622 insertions(+), 5 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index de95c47aaf77..28f70dca80c9 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1360,6 +1360,8 @@ int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
- 			 u16 scan_rsp_len, u8 *scan_rsp_data);
- int hci_remove_adv_instance(struct hci_dev *hdev, u8 instance);
- void hci_adv_instances_set_rpa_expired(struct hci_dev *hdev, bool rpa_expired);
-+u32 hci_adv_instance_flags(struct hci_dev *hdev, u8 instance);
-+bool hci_adv_instance_is_scannable(struct hci_dev *hdev, u8 instance);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 671f71413847..9b31823ad1f0 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -85,7 +85,10 @@ u8 __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 	uint8_t status;
  
- void hci_adv_monitors_clear(struct hci_dev *hdev);
- void hci_free_adv_monitor(struct hci_dev *hdev, struct adv_monitor *monitor);
-@@ -1605,43 +1607,6 @@ static inline void hci_role_switch_cfm(struct hci_conn *conn, __u8 status,
- 	mutex_unlock(&hci_cb_list_lock);
+ 	skb = __hci_cmd_sync(hdev, opcode, plen, param, timeout);
+-	if (IS_ERR(skb)) {
++	if (IS_ERR_OR_NULL(skb)) {
++		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
++			   PTR_ERR(skb));
++
+ 		switch (PTR_ERR(skb)) {
+ 		case -ETIMEDOUT:
+ 			return HCI_ERROR_CONNECTION_TIMEOUT;
+@@ -912,3 +915,604 @@ int hci_disable_advertising_sync(struct hci_dev *hdev)
+ 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_ENABLE,
+ 				     sizeof(enable), &enable, HCI_CMD_TIMEOUT);
  }
- 
--static inline void *eir_get_data(u8 *eir, size_t eir_len, u8 type,
--				 size_t *data_len)
--{
--	size_t parsed = 0;
--
--	if (eir_len < 2)
--		return NULL;
--
--	while (parsed < eir_len - 1) {
--		u8 field_len = eir[0];
--
--		if (field_len == 0)
--			break;
--
--		parsed += field_len + 1;
--
--		if (parsed > eir_len)
--			break;
--
--		if (eir[1] != type) {
--			eir += field_len + 1;
--			continue;
--		}
--
--		/* Zero length data */
--		if (field_len == 1)
--			return NULL;
--
--		if (data_len)
--			*data_len = field_len - 1;
--
--		return &eir[2];
--	}
--
--	return NULL;
--}
--
- static inline bool hci_bdaddr_is_rpa(bdaddr_t *bdaddr, u8 addr_type)
- {
- 	if (addr_type != ADDR_LE_DEV_RANDOM)
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index cc0995301f93..0276e7d5d7ad 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
- 
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
--	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o
-+	ecdh_helper.o eir.o hci_request.o mgmt_util.o mgmt_config.o
- 
- bluetooth-$(CONFIG_BT_BREDR) += sco.o
- bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
-diff --git a/net/bluetooth/eir.c b/net/bluetooth/eir.c
-new file mode 100644
-index 000000000000..da1e536c5c27
---- /dev/null
-+++ b/net/bluetooth/eir.c
-@@ -0,0 +1,334 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2021 Intel Corporation
++
++static int hci_le_set_ext_scan_enable_sync(struct hci_dev *hdev, u8 val,
++					   u8 filter_dup)
++{
++	struct hci_cp_le_set_ext_scan_enable cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = val;
++	cp.filter_dup = filter_dup;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_ENABLE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
++				       u8 filter_dup)
++{
++	struct hci_cp_le_set_scan_enable cp;
++
++	if (use_ext_scan(hdev))
++		return hci_le_set_ext_scan_enable_sync(hdev, val, filter_dup);
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = val;
++	cp.filter_dup = filter_dup;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_SCAN_ENABLE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_le_set_addr_resolution_enable_sync(struct hci_dev *hdev, u8 val)
++{
++	if (!use_ll_privacy(hdev) ||
++	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE,
++				     sizeof(val), &val, HCI_CMD_TIMEOUT);
++}
++
++int hci_scan_disable_sync(struct hci_dev *hdev, bool rpa_le_conn)
++{
++	int err;
++
++	/* If controller is not scanning we are done. */
++	if (!hci_dev_test_flag(hdev, HCI_LE_SCAN))
++		return 0;
++
++	if (hdev->scanning_paused) {
++		bt_dev_dbg(hdev, "Scanning is paused for suspend");
++		return 0;
++	}
++
++	if (hdev->suspended)
++		set_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
++
++	err = hci_le_set_scan_enable_sync(hdev, LE_SCAN_DISABLE, 0x00);
++	if (err) {
++		bt_dev_err(hdev, "Unable to disable scanning: %d", err);
++		return err;
++	}
++
++	if (rpa_le_conn) {
++		err = hci_le_set_addr_resolution_enable_sync(hdev, 0x00);
++		if (err)
++			bt_dev_err(hdev, "Unable to disable LL privacy: %d",
++				   err);
++	}
++
++	return err;
++}
++
++static bool scan_use_rpa(struct hci_dev *hdev)
++{
++	return hci_dev_test_flag(hdev, HCI_PRIVACY);
++}
++
++static void hci_start_interleave_scan(struct hci_dev *hdev)
++{
++	hdev->interleave_scan_state = INTERLEAVE_SCAN_NO_FILTER;
++	queue_delayed_work(hdev->req_workqueue,
++			   &hdev->interleave_scan, 0);
++}
++
++static bool is_interleave_scanning(struct hci_dev *hdev)
++{
++	return hdev->interleave_scan_state != INTERLEAVE_SCAN_NONE;
++}
++
++static void cancel_interleave_scan(struct hci_dev *hdev)
++{
++	bt_dev_dbg(hdev, "cancelling interleave scan");
++
++	cancel_delayed_work_sync(&hdev->interleave_scan);
++
++	hdev->interleave_scan_state = INTERLEAVE_SCAN_NONE;
++}
++
++/* Return true if interleave_scan wasn't started until exiting this function,
++ * otherwise, return false
 + */
-+
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/mgmt.h>
-+
-+#include "eir.h"
-+
-+#define PNP_INFO_SVCLASS_ID		0x1200
-+
-+u8 eir_append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
++static bool hci_update_interleaved_scan_sync(struct hci_dev *hdev)
 +{
-+	size_t short_len;
-+	size_t complete_len;
-+
-+	/* no space left for name (+ NULL + type + len) */
-+	if ((HCI_MAX_AD_LENGTH - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
-+		return ad_len;
-+
-+	/* use complete name if present and fits */
-+	complete_len = strlen(hdev->dev_name);
-+	if (complete_len && complete_len <= HCI_MAX_SHORT_NAME_LENGTH)
-+		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
-+				       hdev->dev_name, complete_len + 1);
-+
-+	/* use short name if present */
-+	short_len = strlen(hdev->short_name);
-+	if (short_len)
-+		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
-+				       hdev->short_name, short_len + 1);
-+
-+	/* use shortened full name if present, we already know that name
-+	 * is longer then HCI_MAX_SHORT_NAME_LENGTH
++	/* Do interleaved scan only if all of the following are true:
++	 * - There is at least one ADV monitor
++	 * - At least one pending LE connection or one device to be scanned for
++	 * - Monitor offloading is not supported
++	 * If so, we should alternate between allowlist scan and one without
++	 * any filters to save power.
 +	 */
-+	if (complete_len) {
-+		u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
++	bool use_interleaving = hci_is_adv_monitoring(hdev) &&
++				!(list_empty(&hdev->pend_le_conns) &&
++				  list_empty(&hdev->pend_le_reports)) &&
++				hci_get_adv_monitor_offload_ext(hdev) ==
++				    HCI_ADV_MONITOR_EXT_NONE;
++	bool is_interleaving = is_interleave_scanning(hdev);
 +
-+		memcpy(name, hdev->dev_name, HCI_MAX_SHORT_NAME_LENGTH);
-+		name[HCI_MAX_SHORT_NAME_LENGTH] = '\0';
-+
-+		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT, name,
-+				       sizeof(name));
++	if (use_interleaving && !is_interleaving) {
++		hci_start_interleave_scan(hdev);
++		bt_dev_dbg(hdev, "starting interleave scan");
++		return true;
 +	}
 +
-+	return ad_len;
++	if (!use_interleaving && is_interleaving)
++		cancel_interleave_scan(hdev);
++
++	return false;
 +}
 +
-+u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
++/* Removes connection to resolve list if needed.*/
++static int hci_le_del_resolve_list_sync(struct hci_dev *hdev,
++					bdaddr_t *bdaddr, u8 bdaddr_type)
 +{
-+	return eir_append_le16(ptr, ad_len, EIR_APPEARANCE, hdev->appearance);
++	struct hci_cp_le_del_from_resolv_list cp;
++	struct smp_irk *irk;
++
++	if (!use_ll_privacy(hdev) ||
++	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return 0;
++
++	irk = hci_find_irk_by_addr(hdev, bdaddr, bdaddr_type);
++	if (!irk)
++		return 0;
++
++	cp.bdaddr_type = bdaddr_type;
++	bacpy(&cp.bdaddr, bdaddr);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_DEL_FROM_RESOLV_LIST,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 +}
 +
-+static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++static int hci_le_del_allow_list_sync(struct hci_dev *hdev,
++				      bdaddr_t *bdaddr, u8 bdaddr_type)
 +{
-+	u8 *ptr = data, *uuids_start = NULL;
-+	struct bt_uuid *uuid;
++	struct hci_cp_le_del_from_white_list cp;
++	int err;
 +
-+	if (len < 4)
-+		return ptr;
++	cp.bdaddr_type = bdaddr_type;
++	bacpy(&cp.bdaddr, bdaddr);
 +
-+	list_for_each_entry(uuid, &hdev->uuids, list) {
-+		u16 uuid16;
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_DEL_FROM_WHITE_LIST,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	if (err) {
++		bt_dev_err(hdev, "Unable to remove from allow list: %d", err);
++		return err;
++	}
 +
-+		if (uuid->size != 16)
++	bt_dev_dbg(hdev, "Remove %pMR (0x%x) from allow list", &cp.bdaddr,
++		   cp.bdaddr_type);
++
++	return hci_le_del_resolve_list_sync(hdev, &cp.bdaddr, cp.bdaddr_type);
++}
++
++/* Adds connection to resolve list if needed.*/
++static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
++					struct hci_conn_params *params)
++{
++	struct hci_cp_le_add_to_resolv_list cp;
++	struct smp_irk *irk;
++
++	if (!use_ll_privacy(hdev) ||
++	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		return 0;
++
++	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
++	if (!irk)
++		return 0;
++
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++	memcpy(cp.peer_irk, irk->val, 16);
++
++	if (hci_dev_test_flag(hdev, HCI_PRIVACY))
++		memcpy(cp.local_irk, hdev->irk, 16);
++	else
++		memset(cp.local_irk, 0, 16);
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_ADD_TO_RESOLV_LIST,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++/* Adds connection to allow list if needed.*/
++static int hci_le_add_allow_list_sync(struct hci_dev *hdev,
++				      struct hci_conn_params *params,
++				      u8 *num_entries, bool allow_rpa)
++{
++	struct hci_cp_le_add_to_white_list cp;
++	int err;
++
++	/* Already in white list */
++	if (hci_bdaddr_list_lookup(&hdev->le_white_list, &params->addr,
++				   params->addr_type))
++		return 0;
++
++	/* Select filter policy to accept all advertising */
++	if (*num_entries >= hdev->le_white_list_size)
++		return -ENOSPC;
++
++	/* White list can not be used with RPAs */
++	if (!allow_rpa &&
++	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
++	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
++		return -EINVAL;
++	}
++
++	/* During suspend, only wakeable devices can be in whitelist */
++	if (hdev->suspended && !hci_conn_test_flag(HCI_CONN_FLAG_REMOTE_WAKEUP,
++						   params->current_flags))
++		return 0;
++
++	*num_entries += 1;
++	cp.bdaddr_type = params->addr_type;
++	bacpy(&cp.bdaddr, &params->addr);
++
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_ADD_TO_WHITE_LIST,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	if (err) {
++		bt_dev_err(hdev, "Unable to add to allow list: %d", err);
++		return err;
++	}
++
++	bt_dev_dbg(hdev, "Add %pMR (0x%x) to allow list", &cp.bdaddr,
++		   cp.bdaddr_type);
++
++	return hci_le_add_resolve_list_sync(hdev, params);
++}
++
++static u8 hci_update_white_list_sync(struct hci_dev *hdev)
++{
++	struct hci_conn_params *params;
++	struct bdaddr_list *b, *t;
++	u8 num_entries = 0;
++	bool pend_conn, pend_report;
++	/* We allow whitelisting even with RPAs in suspend. In the worst case,
++	 * we won't be able to wake from devices that use the privacy1.2
++	 * features. Additionally, once we support privacy1.2 and IRK
++	 * offloading, we can update this to also check for those conditions.
++	 */
++	bool allow_rpa = hdev->suspended;
++
++	if (use_ll_privacy(hdev) &&
++	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
++		allow_rpa = true;
++
++	/* Go through the current white list programmed into the
++	 * controller one by one and check if that address is still
++	 * in the list of pending connections or list of devices to
++	 * report. If not present in either list, then remove it from
++	 * the controller.
++	 */
++	list_for_each_entry_safe(b, t, &hdev->le_white_list, list) {
++		pend_conn = hci_pend_le_action_lookup(&hdev->pend_le_conns,
++						      &b->bdaddr,
++						      b->bdaddr_type);
++		pend_report = hci_pend_le_action_lookup(&hdev->pend_le_reports,
++							&b->bdaddr,
++							b->bdaddr_type);
++
++		/* If the device is not likely to connect or report,
++		 * remove it from the whitelist.
++		 */
++		if (!pend_conn && !pend_report) {
++			hci_le_del_allow_list_sync(hdev, &b->bdaddr,
++						   b->bdaddr_type);
 +			continue;
-+
-+		uuid16 = get_unaligned_le16(&uuid->uuid[12]);
-+		if (uuid16 < 0x1100)
-+			continue;
-+
-+		if (uuid16 == PNP_INFO_SVCLASS_ID)
-+			continue;
-+
-+		if (!uuids_start) {
-+			uuids_start = ptr;
-+			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID16_ALL;
-+			ptr += 2;
 +		}
 +
-+		/* Stop if not enough space to put next UUID */
-+		if ((ptr - data) + sizeof(u16) > len) {
-+			uuids_start[1] = EIR_UUID16_SOME;
-+			break;
++		/* White list can not be used with RPAs */
++		if (!allow_rpa &&
++		    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
++		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
++			return 0x00;
 +		}
 +
-+		*ptr++ = (uuid16 & 0x00ff);
-+		*ptr++ = (uuid16 & 0xff00) >> 8;
-+		uuids_start[0] += sizeof(uuid16);
++		num_entries++;
 +	}
 +
-+	return ptr;
++	/* Since all no longer valid white list entries have been
++	 * removed, walk through the list of pending connections
++	 * and ensure that any new device gets programmed into
++	 * the controller.
++	 *
++	 * If the list of the devices is larger than the list of
++	 * available white list entries in the controller, then
++	 * just abort and return filer policy value to not use the
++	 * white list.
++	 */
++	list_for_each_entry(params, &hdev->pend_le_conns, action) {
++		if (hci_le_add_allow_list_sync(hdev, params, &num_entries,
++					       allow_rpa))
++			return 0x00;
++	}
++
++	/* After adding all new pending connections, walk through
++	 * the list of pending reports and also add these to the
++	 * white list if there is still space. Abort if space runs out.
++	 */
++	list_for_each_entry(params, &hdev->pend_le_reports, action) {
++		if (hci_le_add_allow_list_sync(hdev, params, &num_entries,
++					       allow_rpa))
++			return 0x00;
++	}
++
++	/* Use the allowlist unless the following conditions are all true:
++	 * - We are not currently suspending
++	 * - There are 1 or more ADV monitors registered and it's not offloaded
++	 * - Interleaved scanning is not currently using the allowlist
++	 */
++	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
++	    hci_get_adv_monitor_offload_ext(hdev) == HCI_ADV_MONITOR_EXT_NONE &&
++	    hdev->interleave_scan_state != INTERLEAVE_SCAN_ALLOWLIST)
++		return 0x00;
++
++	/* Select filter policy to use white list */
++	return 0x01;
 +}
 +
-+static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++/* Returns true if an le connection is in the scanning state */
++static inline bool hci_is_le_conn_scanning(struct hci_dev *hdev)
 +{
-+	u8 *ptr = data, *uuids_start = NULL;
-+	struct bt_uuid *uuid;
++	struct hci_conn_hash *h = &hdev->conn_hash;
++	struct hci_conn  *c;
 +
-+	if (len < 6)
-+		return ptr;
++	rcu_read_lock();
 +
-+	list_for_each_entry(uuid, &hdev->uuids, list) {
-+		if (uuid->size != 32)
-+			continue;
-+
-+		if (!uuids_start) {
-+			uuids_start = ptr;
-+			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID32_ALL;
-+			ptr += 2;
++	list_for_each_entry_rcu(c, &h->list, list) {
++		if (c->type == LE_LINK && c->state == BT_CONNECT &&
++		    test_bit(HCI_CONN_SCANNING, &c->flags)) {
++			rcu_read_unlock();
++			return true;
 +		}
-+
-+		/* Stop if not enough space to put next UUID */
-+		if ((ptr - data) + sizeof(u32) > len) {
-+			uuids_start[1] = EIR_UUID32_SOME;
-+			break;
-+		}
-+
-+		memcpy(ptr, &uuid->uuid[12], sizeof(u32));
-+		ptr += sizeof(u32);
-+		uuids_start[0] += sizeof(u32);
 +	}
 +
-+	return ptr;
++	rcu_read_unlock();
++
++	return false;
 +}
 +
-+static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
++static int hci_le_set_ext_scan_param_sync(struct hci_dev *hdev, u8 type,
++					  u16 interval, u16 window,
++					  u8 own_addr_type, u8 filter_policy)
 +{
-+	u8 *ptr = data, *uuids_start = NULL;
-+	struct bt_uuid *uuid;
++	struct hci_cp_le_set_ext_scan_params *cp;
++	struct hci_cp_le_scan_phy_params *phy;
++	u8 data[sizeof(*cp) + sizeof(*phy) * 2];
++	u8 num_phy = 0;
 +
-+	if (len < 18)
-+		return ptr;
++	cp = (void *)data;
++	phy = (void *)cp->data;
 +
-+	list_for_each_entry(uuid, &hdev->uuids, list) {
-+		if (uuid->size != 128)
-+			continue;
++	memset(data, 0, sizeof(data));
 +
-+		if (!uuids_start) {
-+			uuids_start = ptr;
-+			uuids_start[0] = 1;
-+			uuids_start[1] = EIR_UUID128_ALL;
-+			ptr += 2;
-+		}
++	cp->own_addr_type = own_addr_type;
++	cp->filter_policy = filter_policy;
 +
-+		/* Stop if not enough space to put next UUID */
-+		if ((ptr - data) + 16 > len) {
-+			uuids_start[1] = EIR_UUID128_SOME;
-+			break;
-+		}
++	if (scan_1m(hdev) || scan_2m(hdev)) {
++		cp->scanning_phys |= LE_SCAN_PHY_1M;
 +
-+		memcpy(ptr, uuid->uuid, 16);
-+		ptr += 16;
-+		uuids_start[0] += 16;
++		phy->type = type;
++		phy->interval = cpu_to_le16(interval);
++		phy->window = cpu_to_le16(window);
++
++		num_phy++;
++		phy++;
 +	}
 +
-+	return ptr;
++	if (scan_coded(hdev)) {
++		cp->scanning_phys |= LE_SCAN_PHY_CODED;
++
++		phy->type = type;
++		phy->interval = cpu_to_le16(interval);
++		phy->window = cpu_to_le16(window);
++
++		num_phy++;
++		phy++;
++	}
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_SCAN_PARAMS,
++				     sizeof(*cp) + sizeof(*phy) * num_phy,
++				     data, HCI_CMD_TIMEOUT);
 +}
 +
-+void eir_create(struct hci_dev *hdev, u8 *data)
++static int hci_le_set_scan_param_sync(struct hci_dev *hdev, u8 type,
++				       u16 interval, u16 window,
++				       u8 own_addr_type, u8 filter_policy)
 +{
-+	u8 *ptr = data;
-+	size_t name_len;
++	struct hci_cp_le_set_scan_param cp;
 +
-+	name_len = strlen(hdev->dev_name);
++	if (use_ext_scan(hdev))
++		return hci_le_set_ext_scan_param_sync(hdev, type, interval,
++						      window, own_addr_type,
++						      filter_policy);
 +
-+	if (name_len > 0) {
-+		/* EIR Data type */
-+		if (name_len > 48) {
-+			name_len = 48;
-+			ptr[1] = EIR_NAME_SHORT;
-+		} else
-+			ptr[1] = EIR_NAME_COMPLETE;
++	memset(&cp, 0, sizeof(cp));
++	cp.type = type;
++	cp.interval = cpu_to_le16(interval);
++	cp.window = cpu_to_le16(window);
++	cp.own_address_type = own_addr_type;
++	cp.filter_policy = filter_policy;
 +
-+		/* EIR Data length */
-+		ptr[0] = name_len + 1;
-+
-+		memcpy(ptr + 2, hdev->dev_name, name_len);
-+
-+		ptr += (name_len + 2);
-+	}
-+
-+	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID) {
-+		ptr[0] = 2;
-+		ptr[1] = EIR_TX_POWER;
-+		ptr[2] = (u8) hdev->inq_tx_power;
-+
-+		ptr += 3;
-+	}
-+
-+	if (hdev->devid_source > 0) {
-+		ptr[0] = 9;
-+		ptr[1] = EIR_DEVICE_ID;
-+
-+		put_unaligned_le16(hdev->devid_source, ptr + 2);
-+		put_unaligned_le16(hdev->devid_vendor, ptr + 4);
-+		put_unaligned_le16(hdev->devid_product, ptr + 6);
-+		put_unaligned_le16(hdev->devid_version, ptr + 8);
-+
-+		ptr += 10;
-+	}
-+
-+	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-+	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
-+	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_SCAN_PARAM,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 +}
 +
-+u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
++static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
++			       u16 window, u8 own_addr_type, u8 filter_policy,
++			       bool addr_resolv)
 +{
-+	struct adv_info *adv = NULL;
-+	u8 ad_len = 0, flags = 0;
-+	u32 instance_flags;
++	int err;
 +
-+	/* Return 0 when the current instance identifier is invalid. */
-+	if (instance) {
-+		adv = hci_find_adv_instance(hdev, instance);
-+		if (!adv)
++	if (hdev->scanning_paused) {
++		bt_dev_dbg(hdev, "Scanning is paused for suspend");
++		return 0;
++	}
++
++	if (addr_resolv) {
++		err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
++		if (err)
++			return err;
++	}
++
++	err = hci_le_set_scan_param_sync(hdev, type, interval, window,
++					 own_addr_type, filter_policy);
++	if (err)
++		return err;
++
++	return hci_le_set_scan_enable_sync(hdev, LE_SCAN_ENABLE,
++					   LE_SCAN_FILTER_DUP_ENABLE);
++}
++
++/* Ensure to call hci_scan_disable_sync first to disable the controller based
++ * address resolution to be able to reconfigure resolving list.
++ */
++int hci_passive_scan_sync(struct hci_dev *hdev)
++{
++	u8 own_addr_type;
++	u8 filter_policy;
++	u16 window, interval;
++	/* Background scanning should run with address resolution */
++	bool addr_resolv = true;
++
++	if (hdev->scanning_paused) {
++		bt_dev_dbg(hdev, "Scanning is paused for suspend");
++		return 0;
++	}
++
++	/* Set require_privacy to false since no SCAN_REQ are send
++	 * during passive scanning. Not using an non-resolvable address
++	 * here is important so that peer devices using direct
++	 * advertising with our address will be correctly reported
++	 * by the controller.
++	 */
++	if (hci_update_random_address_sync(hdev, false, scan_use_rpa(hdev),
++					   &own_addr_type))
++		return 0;
++
++	if (hdev->enable_advmon_interleave_scan &&
++	    hci_update_interleaved_scan_sync(hdev))
++		return 0;
++
++	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
++	/* Adding or removing entries from the white list must
++	 * happen before enabling scanning. The controller does
++	 * not allow white list modification while scanning.
++	 */
++	filter_policy = hci_update_white_list_sync(hdev);
++
++	/* When the controller is using random resolvable addresses and
++	 * with that having LE privacy enabled, then controllers with
++	 * Extended Scanner Filter Policies support can now enable support
++	 * for handling directed advertising.
++	 *
++	 * So instead of using filter polices 0x00 (no whitelist)
++	 * and 0x01 (whitelist enabled) use the new filter policies
++	 * 0x02 (no whitelist) and 0x03 (whitelist enabled).
++	 */
++	if (hci_dev_test_flag(hdev, HCI_PRIVACY) &&
++	    (hdev->le_features[0] & HCI_LE_EXT_SCAN_POLICY))
++		filter_policy |= 0x02;
++
++	if (hdev->suspended) {
++		window = hdev->le_scan_window_suspend;
++		interval = hdev->le_scan_int_suspend;
++
++		set_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
++	} else if (hci_is_le_conn_scanning(hdev)) {
++		window = hdev->le_scan_window_connect;
++		interval = hdev->le_scan_int_connect;
++	} else if (hci_is_adv_monitoring(hdev)) {
++		window = hdev->le_scan_window_adv_monitor;
++		interval = hdev->le_scan_int_adv_monitor;
++	} else {
++		window = hdev->le_scan_window;
++		interval = hdev->le_scan_interval;
++	}
++
++	bt_dev_dbg(hdev, "LE passive scan with whitelist = %d", filter_policy);
++
++	return hci_start_scan_sync(hdev, LE_SCAN_PASSIVE, interval, window,
++				   own_addr_type, filter_policy, addr_resolv);
++}
++
++/* This function controls the background scanning based on hdev->pend_le_conns
++ * list. If there are pending LE connection we start the background scanning,
++ * otherwise we stop it.
++ */
++int hci_update_background_scan_sync(struct hci_dev *hdev)
++{
++	int err;
++
++	if (!test_bit(HCI_UP, &hdev->flags) ||
++	    test_bit(HCI_INIT, &hdev->flags) ||
++	    hci_dev_test_flag(hdev, HCI_SETUP) ||
++	    hci_dev_test_flag(hdev, HCI_CONFIG) ||
++	    hci_dev_test_flag(hdev, HCI_AUTO_OFF) ||
++	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
++	/* No point in doing scanning if LE support hasn't been enabled */
++	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED))
++		return 0;
++
++	/* If discovery is active don't interfere with it */
++	if (hdev->discovery.state != DISCOVERY_STOPPED)
++		return 0;
++
++	/* Reset RSSI and UUID filters when starting background scanning
++	 * since these filters are meant for service discovery only.
++	 *
++	 * The Start Discovery and Start Service Discovery operations
++	 * ensure to set proper values for RSSI threshold and UUID
++	 * filter list. So it is safe to just reset them here.
++	 */
++	hci_discovery_filter_clear(hdev);
++
++	bt_dev_dbg(hdev, "ADV monitoring is %s",
++		   hci_is_adv_monitoring(hdev) ? "on" : "off");
++
++	if (list_empty(&hdev->pend_le_conns) &&
++	    list_empty(&hdev->pend_le_reports) &&
++	    !hci_is_adv_monitoring(hdev)) {
++		/* If there is no pending LE connections or devices
++		 * to be scanned for or no ADV monitors, we should stop the
++		 * background scanning.
++		 */
++
++		bt_dev_dbg(hdev, "stopping background scanning");
++
++		err = hci_scan_disable_sync(hdev, false);
++		if (err)
++			bt_dev_err(hdev, "stop background scanning failed: %d",
++				   err);
++	} else {
++		/* If there is at least one pending LE connection, we should
++		 * keep the background scan running.
++		 */
++
++		/* If controller is connecting, we should not start scanning
++		 * since some controllers are not able to scan and connect at
++		 * the same time.
++		 */
++		if (hci_lookup_le_connect(hdev))
 +			return 0;
-+	}
 +
-+	instance_flags = hci_adv_instance_flags(hdev, instance);
-+
-+	/* If instance already has the flags set skip adding it once
-+	 * again.
-+	 */
-+	if (adv && eir_get_data(adv->adv_data, adv->adv_data_len, EIR_FLAGS,
-+				NULL))
-+		goto skip_flags;
-+
-+	/* The Add Advertising command allows userspace to set both the general
-+	 * and limited discoverable flags.
-+	 */
-+	if (instance_flags & MGMT_ADV_FLAG_DISCOV)
-+		flags |= LE_AD_GENERAL;
-+
-+	if (instance_flags & MGMT_ADV_FLAG_LIMITED_DISCOV)
-+		flags |= LE_AD_LIMITED;
-+
-+	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
-+		flags |= LE_AD_NO_BREDR;
-+
-+	if (flags || (instance_flags & MGMT_ADV_FLAG_MANAGED_FLAGS)) {
-+		/* If a discovery flag wasn't provided, simply use the global
-+		 * settings.
-+		 */
-+		if (!flags)
-+			flags |= mgmt_get_adv_discov_flags(hdev);
-+
-+		/* If flags would still be empty, then there is no need to
-+		 * include the "Flags" AD field".
-+		 */
-+		if (flags) {
-+			ptr[0] = 0x02;
-+			ptr[1] = EIR_FLAGS;
-+			ptr[2] = flags;
-+
-+			ad_len += 3;
-+			ptr += 3;
-+		}
-+	}
-+
-+skip_flags:
-+	if (adv) {
-+		memcpy(ptr, adv->adv_data, adv->adv_data_len);
-+		ad_len += adv->adv_data_len;
-+		ptr += adv->adv_data_len;
-+	}
-+
-+	if (instance_flags & MGMT_ADV_FLAG_TX_POWER) {
-+		s8 adv_tx_power;
-+
-+		if (ext_adv_capable(hdev)) {
-+			if (adv)
-+				adv_tx_power = adv->tx_power;
-+			else
-+				adv_tx_power = hdev->adv_tx_power;
-+		} else {
-+			adv_tx_power = hdev->adv_tx_power;
++		err = hci_scan_disable_sync(hdev, false);
++		if (err) {
++			bt_dev_err(hdev, "stop background scanning failed: %d",
++				   err);
++			return err;
 +		}
 +
-+		/* Provide Tx Power only if we can provide a valid value for it */
-+		if (adv_tx_power != HCI_TX_POWER_INVALID) {
-+			ptr[0] = 0x02;
-+			ptr[1] = EIR_TX_POWER;
-+			ptr[2] = (u8)adv_tx_power;
++		bt_dev_dbg(hdev, "start background scanning");
 +
-+			ad_len += 3;
-+			ptr += 3;
-+		}
++		err = hci_passive_scan_sync(hdev);
++		if (err)
++			bt_dev_err(hdev, "start background scanning failed: %d",
++				   err);
 +	}
 +
-+	return ad_len;
++	return err;
 +}
+diff --git a/net/bluetooth/hci_sync.h b/net/bluetooth/hci_sync.h
+index 5e4392a93607..5ef02b1cb8c1 100644
+--- a/net/bluetooth/hci_sync.h
++++ b/net/bluetooth/hci_sync.h
+@@ -29,3 +29,5 @@ int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance);
+ void hci_clear_adv_instance_sync(struct hci_dev *hdev, struct sock *sk,
+ 				 u8 instance, bool force);
+ int hci_disable_advertising_sync(struct hci_dev *hdev);
 +
-+static u8 create_default_scan_rsp(struct hci_dev *hdev, u8 *ptr)
-+{
-+	u8 scan_rsp_len = 0;
-+
-+	if (hdev->appearance)
-+		scan_rsp_len = eir_append_appearance(hdev, ptr, scan_rsp_len);
-+
-+	return eir_append_local_name(hdev, ptr, scan_rsp_len);
-+}
-+
-+u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr)
-+{
-+	struct adv_info *adv;
-+	u8 scan_rsp_len = 0;
-+
-+	if (!instance)
-+		return create_default_scan_rsp(hdev, ptr);
-+
-+	adv = hci_find_adv_instance(hdev, instance);
-+	if (!adv)
-+		return 0;
-+
-+	if ((adv->flags & MGMT_ADV_FLAG_APPEARANCE) && hdev->appearance)
-+		scan_rsp_len = eir_append_appearance(hdev, ptr, scan_rsp_len);
-+
-+	memcpy(&ptr[scan_rsp_len], adv->scan_rsp_data, adv->scan_rsp_len);
-+
-+	scan_rsp_len += adv->scan_rsp_len;
-+
-+	if (adv->flags & MGMT_ADV_FLAG_LOCAL_NAME)
-+		scan_rsp_len = eir_append_local_name(hdev, ptr, scan_rsp_len);
-+
-+	return scan_rsp_len;
-+}
-diff --git a/net/bluetooth/eir.h b/net/bluetooth/eir.h
-new file mode 100644
-index 000000000000..724662f8f8b1
---- /dev/null
-+++ b/net/bluetooth/eir.h
-@@ -0,0 +1,72 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2021 Intel Corporation
-+ */
-+
-+void eir_create(struct hci_dev *hdev, u8 *data);
-+
-+u8 eir_create_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr);
-+u8 eir_create_scan_rsp(struct hci_dev *hdev, u8 instance, u8 *ptr);
-+
-+u8 eir_append_local_name(struct hci_dev *hdev, u8 *eir, u8 ad_len);
-+u8 eir_append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
-+
-+static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type,
-+				  u8 *data, u8 data_len)
-+{
-+	eir[eir_len++] = sizeof(type) + data_len;
-+	eir[eir_len++] = type;
-+	memcpy(&eir[eir_len], data, data_len);
-+	eir_len += data_len;
-+
-+	return eir_len;
-+}
-+
-+static inline u16 eir_append_le16(u8 *eir, u16 eir_len, u8 type, u16 data)
-+{
-+	eir[eir_len++] = sizeof(type) + sizeof(data);
-+	eir[eir_len++] = type;
-+	put_unaligned_le16(data, &eir[eir_len]);
-+	eir_len += sizeof(data);
-+
-+	return eir_len;
-+}
-+
-+static inline void *eir_get_data(u8 *eir, size_t eir_len, u8 type,
-+				 size_t *data_len)
-+{
-+	size_t parsed = 0;
-+
-+	if (eir_len < 2)
-+		return NULL;
-+
-+	while (parsed < eir_len - 1) {
-+		u8 field_len = eir[0];
-+
-+		if (field_len == 0)
-+			break;
-+
-+		parsed += field_len + 1;
-+
-+		if (parsed > eir_len)
-+			break;
-+
-+		if (eir[1] != type) {
-+			eir += field_len + 1;
-+			continue;
-+		}
-+
-+		/* Zero length data */
-+		if (field_len == 1)
-+			return NULL;
-+
-+		if (data_len)
-+			*data_len = field_len - 1;
-+
-+		return &eir[2];
-+	}
-+
-+	return NULL;
-+}
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index ba407976066b..bb10087f77cb 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3143,6 +3143,60 @@ int hci_set_adv_instance_data(struct hci_dev *hdev, u8 instance,
- 	return 0;
- }
- 
-+/* This function requires the caller holds hdev->lock */
-+u32 hci_adv_instance_flags(struct hci_dev *hdev, u8 instance)
-+{
-+	u32 flags;
-+	struct adv_info *adv;
-+
-+	if (instance == 0x00) {
-+		/* Instance 0 always manages the "Tx Power" and "Flags"
-+		 * fields
-+		 */
-+		flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
-+
-+		/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting
-+		 * corresponds to the "connectable" instance flag.
-+		 */
-+		if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
-+			flags |= MGMT_ADV_FLAG_CONNECTABLE;
-+
-+		if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
-+			flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
-+		else if (hci_dev_test_flag(hdev, HCI_DISCOVERABLE))
-+			flags |= MGMT_ADV_FLAG_DISCOV;
-+
-+		return flags;
-+	}
-+
-+	adv = hci_find_adv_instance(hdev, instance);
-+
-+	/* Return 0 when we got an invalid instance identifier. */
-+	if (!adv)
-+		return 0;
-+
-+	return adv->flags;
-+}
-+
-+bool hci_adv_instance_is_scannable(struct hci_dev *hdev, u8 instance)
-+{
-+	struct adv_info *adv;
-+
-+	/* Instance 0x00 always set local name */
-+	if (instance == 0x00)
-+		return true;
-+
-+	adv = hci_find_adv_instance(hdev, instance);
-+	if (!adv)
-+		return false;
-+
-+	if (adv->flags & MGMT_ADV_FLAG_APPEARANCE ||
-+	    adv->flags & MGMT_ADV_FLAG_LOCAL_NAME)
-+		return true;
-+
-+	return adv->scan_rsp_len ? true : false;
-+}
-+
- /* This function requires the caller holds hdev->lock */
- void hci_adv_monitors_clear(struct hci_dev *hdev)
- {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index cde6a43cc61d..3106ee9d2c04 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -36,6 +36,7 @@
- #include "amp.h"
- #include "smp.h"
- #include "msft.h"
-+#include "eir.h"
- 
- #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
- 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 3465862429fb..7e86637a9933 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -30,6 +30,7 @@
- #include "smp.h"
- #include "hci_request.h"
- #include "msft.h"
-+#include "eir.h"
- 
- #define HCI_REQ_DONE	  0
- #define HCI_REQ_PEND	  1
-@@ -521,164 +522,6 @@ void __hci_req_update_name(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_WRITE_LOCAL_NAME, sizeof(cp), &cp);
- }
- 
--#define PNP_INFO_SVCLASS_ID		0x1200
--
--static u8 *create_uuid16_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
--{
--	u8 *ptr = data, *uuids_start = NULL;
--	struct bt_uuid *uuid;
--
--	if (len < 4)
--		return ptr;
--
--	list_for_each_entry(uuid, &hdev->uuids, list) {
--		u16 uuid16;
--
--		if (uuid->size != 16)
--			continue;
--
--		uuid16 = get_unaligned_le16(&uuid->uuid[12]);
--		if (uuid16 < 0x1100)
--			continue;
--
--		if (uuid16 == PNP_INFO_SVCLASS_ID)
--			continue;
--
--		if (!uuids_start) {
--			uuids_start = ptr;
--			uuids_start[0] = 1;
--			uuids_start[1] = EIR_UUID16_ALL;
--			ptr += 2;
--		}
--
--		/* Stop if not enough space to put next UUID */
--		if ((ptr - data) + sizeof(u16) > len) {
--			uuids_start[1] = EIR_UUID16_SOME;
--			break;
--		}
--
--		*ptr++ = (uuid16 & 0x00ff);
--		*ptr++ = (uuid16 & 0xff00) >> 8;
--		uuids_start[0] += sizeof(uuid16);
--	}
--
--	return ptr;
--}
--
--static u8 *create_uuid32_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
--{
--	u8 *ptr = data, *uuids_start = NULL;
--	struct bt_uuid *uuid;
--
--	if (len < 6)
--		return ptr;
--
--	list_for_each_entry(uuid, &hdev->uuids, list) {
--		if (uuid->size != 32)
--			continue;
--
--		if (!uuids_start) {
--			uuids_start = ptr;
--			uuids_start[0] = 1;
--			uuids_start[1] = EIR_UUID32_ALL;
--			ptr += 2;
--		}
--
--		/* Stop if not enough space to put next UUID */
--		if ((ptr - data) + sizeof(u32) > len) {
--			uuids_start[1] = EIR_UUID32_SOME;
--			break;
--		}
--
--		memcpy(ptr, &uuid->uuid[12], sizeof(u32));
--		ptr += sizeof(u32);
--		uuids_start[0] += sizeof(u32);
--	}
--
--	return ptr;
--}
--
--static u8 *create_uuid128_list(struct hci_dev *hdev, u8 *data, ptrdiff_t len)
--{
--	u8 *ptr = data, *uuids_start = NULL;
--	struct bt_uuid *uuid;
--
--	if (len < 18)
--		return ptr;
--
--	list_for_each_entry(uuid, &hdev->uuids, list) {
--		if (uuid->size != 128)
--			continue;
--
--		if (!uuids_start) {
--			uuids_start = ptr;
--			uuids_start[0] = 1;
--			uuids_start[1] = EIR_UUID128_ALL;
--			ptr += 2;
--		}
--
--		/* Stop if not enough space to put next UUID */
--		if ((ptr - data) + 16 > len) {
--			uuids_start[1] = EIR_UUID128_SOME;
--			break;
--		}
--
--		memcpy(ptr, uuid->uuid, 16);
--		ptr += 16;
--		uuids_start[0] += 16;
--	}
--
--	return ptr;
--}
--
--static void create_eir(struct hci_dev *hdev, u8 *data)
--{
--	u8 *ptr = data;
--	size_t name_len;
--
--	name_len = strlen(hdev->dev_name);
--
--	if (name_len > 0) {
--		/* EIR Data type */
--		if (name_len > 48) {
--			name_len = 48;
--			ptr[1] = EIR_NAME_SHORT;
--		} else
--			ptr[1] = EIR_NAME_COMPLETE;
--
--		/* EIR Data length */
--		ptr[0] = name_len + 1;
--
--		memcpy(ptr + 2, hdev->dev_name, name_len);
--
--		ptr += (name_len + 2);
--	}
--
--	if (hdev->inq_tx_power != HCI_TX_POWER_INVALID) {
--		ptr[0] = 2;
--		ptr[1] = EIR_TX_POWER;
--		ptr[2] = (u8) hdev->inq_tx_power;
--
--		ptr += 3;
--	}
--
--	if (hdev->devid_source > 0) {
--		ptr[0] = 9;
--		ptr[1] = EIR_DEVICE_ID;
--
--		put_unaligned_le16(hdev->devid_source, ptr + 2);
--		put_unaligned_le16(hdev->devid_vendor, ptr + 4);
--		put_unaligned_le16(hdev->devid_product, ptr + 6);
--		put_unaligned_le16(hdev->devid_version, ptr + 8);
--
--		ptr += 10;
--	}
--
--	ptr = create_uuid16_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
--	ptr = create_uuid32_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
--	ptr = create_uuid128_list(hdev, ptr, HCI_MAX_EIR_LENGTH - (ptr - data));
--}
--
- void __hci_req_update_eir(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -698,7 +541,7 @@ void __hci_req_update_eir(struct hci_request *req)
- 
- 	memset(&cp, 0, sizeof(cp));
- 
--	create_eir(hdev, cp.data);
-+	eir_create(hdev, cp.data);
- 
- 	if (memcmp(cp.data, hdev->eir, sizeof(cp.data)) == 0)
- 		return;
-@@ -1133,25 +976,6 @@ void hci_req_add_le_passive_scan(struct hci_request *req)
- 			   addr_resolv);
- }
- 
--static bool adv_instance_is_scannable(struct hci_dev *hdev, u8 instance)
--{
--	struct adv_info *adv_instance;
--
--	/* Instance 0x00 always set local name */
--	if (instance == 0x00)
--		return true;
--
--	adv_instance = hci_find_adv_instance(hdev, instance);
--	if (!adv_instance)
--		return false;
--
--	if (adv_instance->flags & MGMT_ADV_FLAG_APPEARANCE ||
--	    adv_instance->flags & MGMT_ADV_FLAG_LOCAL_NAME)
--		return true;
--
--	return adv_instance->scan_rsp_len ? true : false;
--}
--
- static void hci_req_clear_event_filter(struct hci_request *req)
- {
- 	struct hci_cp_set_event_filter f;
-@@ -1441,7 +1265,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next)
- 
- static bool adv_cur_instance_is_scannable(struct hci_dev *hdev)
- {
--	return adv_instance_is_scannable(hdev, hdev->cur_adv_instance);
-+	return hci_adv_instance_is_scannable(hdev, hdev->cur_adv_instance);
- }
- 
- void __hci_req_disable_advertising(struct hci_request *req)
-@@ -1456,40 +1280,6 @@ void __hci_req_disable_advertising(struct hci_request *req)
- 	}
- }
- 
--static u32 get_adv_instance_flags(struct hci_dev *hdev, u8 instance)
--{
--	u32 flags;
--	struct adv_info *adv_instance;
--
--	if (instance == 0x00) {
--		/* Instance 0 always manages the "Tx Power" and "Flags"
--		 * fields
--		 */
--		flags = MGMT_ADV_FLAG_TX_POWER | MGMT_ADV_FLAG_MANAGED_FLAGS;
--
--		/* For instance 0, the HCI_ADVERTISING_CONNECTABLE setting
--		 * corresponds to the "connectable" instance flag.
--		 */
--		if (hci_dev_test_flag(hdev, HCI_ADVERTISING_CONNECTABLE))
--			flags |= MGMT_ADV_FLAG_CONNECTABLE;
--
--		if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
--			flags |= MGMT_ADV_FLAG_LIMITED_DISCOV;
--		else if (hci_dev_test_flag(hdev, HCI_DISCOVERABLE))
--			flags |= MGMT_ADV_FLAG_DISCOV;
--
--		return flags;
--	}
--
--	adv_instance = hci_find_adv_instance(hdev, instance);
--
--	/* Return 0 when we got an invalid instance identifier. */
--	if (!adv_instance)
--		return 0;
--
--	return adv_instance->flags;
--}
--
- static bool adv_use_rpa(struct hci_dev *hdev, uint32_t flags)
- {
- 	/* If privacy is not enabled don't use RPA */
-@@ -1553,15 +1343,15 @@ static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
- void __hci_req_enable_advertising(struct hci_request *req)
- {
- 	struct hci_dev *hdev = req->hdev;
--	struct adv_info *adv_instance;
-+	struct adv_info *adv;
- 	struct hci_cp_le_set_adv_param cp;
- 	u8 own_addr_type, enable = 0x01;
- 	bool connectable;
- 	u16 adv_min_interval, adv_max_interval;
- 	u32 flags;
- 
--	flags = get_adv_instance_flags(hdev, hdev->cur_adv_instance);
--	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
-+	flags = hci_adv_instance_flags(hdev, hdev->cur_adv_instance);
-+	adv = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
- 
- 	/* If the "connectable" instance flag was not set, then choose between
- 	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
-@@ -1593,9 +1383,9 @@ void __hci_req_enable_advertising(struct hci_request *req)
- 
- 	memset(&cp, 0, sizeof(cp));
- 
--	if (adv_instance) {
--		adv_min_interval = adv_instance->min_interval;
--		adv_max_interval = adv_instance->max_interval;
-+	if (adv) {
-+		adv_min_interval = adv->min_interval;
-+		adv_max_interval = adv->max_interval;
- 	} else {
- 		adv_min_interval = hdev->le_adv_min_interval;
- 		adv_max_interval = hdev->le_adv_max_interval;
-@@ -1626,85 +1416,6 @@ void __hci_req_enable_advertising(struct hci_request *req)
- 	hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable), &enable);
- }
- 
--u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
--{
--	size_t short_len;
--	size_t complete_len;
--
--	/* no space left for name (+ NULL + type + len) */
--	if ((HCI_MAX_AD_LENGTH - ad_len) < HCI_MAX_SHORT_NAME_LENGTH + 3)
--		return ad_len;
--
--	/* use complete name if present and fits */
--	complete_len = strlen(hdev->dev_name);
--	if (complete_len && complete_len <= HCI_MAX_SHORT_NAME_LENGTH)
--		return eir_append_data(ptr, ad_len, EIR_NAME_COMPLETE,
--				       hdev->dev_name, complete_len + 1);
--
--	/* use short name if present */
--	short_len = strlen(hdev->short_name);
--	if (short_len)
--		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT,
--				       hdev->short_name, short_len + 1);
--
--	/* use shortened full name if present, we already know that name
--	 * is longer then HCI_MAX_SHORT_NAME_LENGTH
--	 */
--	if (complete_len) {
--		u8 name[HCI_MAX_SHORT_NAME_LENGTH + 1];
--
--		memcpy(name, hdev->dev_name, HCI_MAX_SHORT_NAME_LENGTH);
--		name[HCI_MAX_SHORT_NAME_LENGTH] = '\0';
--
--		return eir_append_data(ptr, ad_len, EIR_NAME_SHORT, name,
--				       sizeof(name));
--	}
--
--	return ad_len;
--}
--
--static u8 append_appearance(struct hci_dev *hdev, u8 *ptr, u8 ad_len)
--{
--	return eir_append_le16(ptr, ad_len, EIR_APPEARANCE, hdev->appearance);
--}
--
--static u8 create_default_scan_rsp_data(struct hci_dev *hdev, u8 *ptr)
--{
--	u8 scan_rsp_len = 0;
--
--	if (hdev->appearance)
--		scan_rsp_len = append_appearance(hdev, ptr, scan_rsp_len);
--
--	return append_local_name(hdev, ptr, scan_rsp_len);
--}
--
--static u8 create_instance_scan_rsp_data(struct hci_dev *hdev, u8 instance,
--					u8 *ptr)
--{
--	struct adv_info *adv_instance;
--	u32 instance_flags;
--	u8 scan_rsp_len = 0;
--
--	adv_instance = hci_find_adv_instance(hdev, instance);
--	if (!adv_instance)
--		return 0;
--
--	instance_flags = adv_instance->flags;
--
--	if ((instance_flags & MGMT_ADV_FLAG_APPEARANCE) && hdev->appearance)
--		scan_rsp_len = append_appearance(hdev, ptr, scan_rsp_len);
--
--	memcpy(&ptr[scan_rsp_len], adv_instance->scan_rsp_data,
--	       adv_instance->scan_rsp_len);
--
--	scan_rsp_len += adv_instance->scan_rsp_len;
--
--	if (instance_flags & MGMT_ADV_FLAG_LOCAL_NAME)
--		scan_rsp_len = append_local_name(hdev, ptr, scan_rsp_len);
--
--	return scan_rsp_len;
--}
--
- void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -1718,11 +1429,7 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
- 
- 		memset(&cp, 0, sizeof(cp));
- 
--		if (instance)
--			len = create_instance_scan_rsp_data(hdev, instance,
--							    cp.data);
--		else
--			len = create_default_scan_rsp_data(hdev, cp.data);
-+		len = eir_create_scan_rsp(hdev, instance, cp.data);
- 
- 		if (hdev->scan_rsp_data_len == len &&
- 		    !memcmp(cp.data, hdev->scan_rsp_data, len))
-@@ -1743,11 +1450,7 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
- 
- 		memset(&cp, 0, sizeof(cp));
- 
--		if (instance)
--			len = create_instance_scan_rsp_data(hdev, instance,
--							    cp.data);
--		else
--			len = create_default_scan_rsp_data(hdev, cp.data);
-+		len = eir_create_scan_rsp(hdev, instance, cp.data);
- 
- 		if (hdev->scan_rsp_data_len == len &&
- 		    !memcmp(cp.data, hdev->scan_rsp_data, len))
-@@ -1762,95 +1465,6 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
- 	}
- }
- 
--static u8 create_instance_adv_data(struct hci_dev *hdev, u8 instance, u8 *ptr)
--{
--	struct adv_info *adv_instance = NULL;
--	u8 ad_len = 0, flags = 0;
--	u32 instance_flags;
--
--	/* Return 0 when the current instance identifier is invalid. */
--	if (instance) {
--		adv_instance = hci_find_adv_instance(hdev, instance);
--		if (!adv_instance)
--			return 0;
--	}
--
--	instance_flags = get_adv_instance_flags(hdev, instance);
--
--	/* If instance already has the flags set skip adding it once
--	 * again.
--	 */
--	if (adv_instance && eir_get_data(adv_instance->adv_data,
--					 adv_instance->adv_data_len, EIR_FLAGS,
--					 NULL))
--		goto skip_flags;
--
--	/* The Add Advertising command allows userspace to set both the general
--	 * and limited discoverable flags.
--	 */
--	if (instance_flags & MGMT_ADV_FLAG_DISCOV)
--		flags |= LE_AD_GENERAL;
--
--	if (instance_flags & MGMT_ADV_FLAG_LIMITED_DISCOV)
--		flags |= LE_AD_LIMITED;
--
--	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
--		flags |= LE_AD_NO_BREDR;
--
--	if (flags || (instance_flags & MGMT_ADV_FLAG_MANAGED_FLAGS)) {
--		/* If a discovery flag wasn't provided, simply use the global
--		 * settings.
--		 */
--		if (!flags)
--			flags |= mgmt_get_adv_discov_flags(hdev);
--
--		/* If flags would still be empty, then there is no need to
--		 * include the "Flags" AD field".
--		 */
--		if (flags) {
--			ptr[0] = 0x02;
--			ptr[1] = EIR_FLAGS;
--			ptr[2] = flags;
--
--			ad_len += 3;
--			ptr += 3;
--		}
--	}
--
--skip_flags:
--	if (adv_instance) {
--		memcpy(ptr, adv_instance->adv_data,
--		       adv_instance->adv_data_len);
--		ad_len += adv_instance->adv_data_len;
--		ptr += adv_instance->adv_data_len;
--	}
--
--	if (instance_flags & MGMT_ADV_FLAG_TX_POWER) {
--		s8 adv_tx_power;
--
--		if (ext_adv_capable(hdev)) {
--			if (adv_instance)
--				adv_tx_power = adv_instance->tx_power;
--			else
--				adv_tx_power = hdev->adv_tx_power;
--		} else {
--			adv_tx_power = hdev->adv_tx_power;
--		}
--
--		/* Provide Tx Power only if we can provide a valid value for it */
--		if (adv_tx_power != HCI_TX_POWER_INVALID) {
--			ptr[0] = 0x02;
--			ptr[1] = EIR_TX_POWER;
--			ptr[2] = (u8)adv_tx_power;
--
--			ad_len += 3;
--			ptr += 3;
--		}
--	}
--
--	return ad_len;
--}
--
- void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
- {
- 	struct hci_dev *hdev = req->hdev;
-@@ -1864,7 +1478,7 @@ void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
- 
- 		memset(&cp, 0, sizeof(cp));
- 
--		len = create_instance_adv_data(hdev, instance, cp.data);
-+		len = eir_create_adv_data(hdev, instance, cp.data);
- 
- 		/* There's nothing to do if the data hasn't changed */
- 		if (hdev->adv_data_len == len &&
-@@ -1885,7 +1499,7 @@ void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
- 
- 		memset(&cp, 0, sizeof(cp));
- 
--		len = create_instance_adv_data(hdev, instance, cp.data);
-+		len = eir_create_adv_data(hdev, instance, cp.data);
- 
- 		/* There's nothing to do if the data hasn't changed */
- 		if (hdev->adv_data_len == len &&
-@@ -2164,7 +1778,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 		adv_instance = NULL;
- 	}
- 
--	flags = get_adv_instance_flags(hdev, instance);
-+	flags = hci_adv_instance_flags(hdev, instance);
- 
- 	/* If the "connectable" instance flag was not set, then choose between
- 	 * ADV_IND and ADV_NONCONN_IND based on the global connectable setting.
-@@ -2204,7 +1818,7 @@ int __hci_req_setup_ext_adv_instance(struct hci_request *req, u8 instance)
- 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_CONN_IND);
- 		else
- 			cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_IND);
--	} else if (adv_instance_is_scannable(hdev, instance) ||
-+	} else if (hci_adv_instance_is_scannable(hdev, instance) ||
- 		   (flags & MGMT_ADV_PARAM_SCAN_RSP)) {
- 		if (secondary_adv)
- 			cp.evt_properties = cpu_to_le16(LE_EXT_ADV_SCAN_IND);
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 39ee8a18087a..4824be833169 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -122,26 +122,3 @@ static inline void hci_update_background_scan(struct hci_dev *hdev)
- 
- void hci_request_setup(struct hci_dev *hdev);
- void hci_request_cancel_all(struct hci_dev *hdev);
--
--u8 append_local_name(struct hci_dev *hdev, u8 *ptr, u8 ad_len);
--
--static inline u16 eir_append_data(u8 *eir, u16 eir_len, u8 type,
--				  u8 *data, u8 data_len)
--{
--	eir[eir_len++] = sizeof(type) + data_len;
--	eir[eir_len++] = type;
--	memcpy(&eir[eir_len], data, data_len);
--	eir_len += data_len;
--
--	return eir_len;
--}
--
--static inline u16 eir_append_le16(u8 *eir, u16 eir_len, u8 type, u16 data)
--{
--	eir[eir_len++] = sizeof(type) + sizeof(data);
--	eir[eir_len++] = type;
--	put_unaligned_le16(data, &eir[eir_len]);
--	eir_len += sizeof(data);
--
--	return eir_len;
--}
++int hci_update_background_scan_sync(struct hci_dev *hdev);
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 91d36c3bf23e..a376e3adda55 100644
+index 9d61f9fa8343..ea770386c686 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -38,6 +38,7 @@
- #include "mgmt_util.h"
- #include "mgmt_config.h"
- #include "msft.h"
-+#include "eir.h"
- 
- #define MGMT_VERSION	1
- #define MGMT_REVISION	20
-@@ -7526,7 +7527,7 @@ static u8 calculate_name_len(struct hci_dev *hdev)
- {
- 	u8 buf[HCI_MAX_SHORT_NAME_LENGTH + 3];
- 
--	return append_local_name(hdev, buf, 0);
-+	return eir_append_local_name(hdev, buf, 0);
+@@ -6700,6 +6700,11 @@ static void device_added(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_DEVICE_ADDED, hdev, &ev, sizeof(ev), sk);
  }
  
- static u8 tlv_data_max_len(struct hci_dev *hdev, u32 adv_flags,
++static int add_device_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_update_background_scan_sync(hdev);
++}
++
+ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 		      void *data, u16 len)
+ {
+@@ -6782,7 +6787,9 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
+ 			current_flags = params->current_flags;
+ 	}
+ 
+-	hci_update_background_scan(hdev);
++	err = hci_cmd_sync_queue(hdev, add_device_sync, NULL, NULL);
++	if (err < 0)
++		goto unlock;
+ 
+ added:
+ 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
+@@ -6809,6 +6816,11 @@ static void device_removed(struct sock *sk, struct hci_dev *hdev,
+ 	mgmt_event(MGMT_EV_DEVICE_REMOVED, hdev, &ev, sizeof(ev), sk);
+ }
+ 
++static int remove_device_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_update_background_scan_sync(hdev);
++}
++
+ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 			 void *data, u16 len)
+ {
+@@ -6888,7 +6900,6 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 		list_del(&params->action);
+ 		list_del(&params->list);
+ 		kfree(params);
+-		hci_update_background_scan(hdev);
+ 
+ 		device_removed(sk, hdev, &cp->addr.bdaddr, cp->addr.type);
+ 	} else {
+@@ -6925,10 +6936,10 @@ static int remove_device(struct sock *sk, struct hci_dev *hdev,
+ 		}
+ 
+ 		bt_dev_dbg(hdev, "All LE connection parameters were removed");
+-
+-		hci_update_background_scan(hdev);
+ 	}
+ 
++	hci_cmd_sync_queue(hdev, remove_device_sync, NULL, NULL);
++
+ complete:
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_DEVICE,
+ 				MGMT_STATUS_SUCCESS, &cp->addr,
 -- 
 2.31.1
 
