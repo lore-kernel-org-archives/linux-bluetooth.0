@@ -7,71 +7,71 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8197C4708F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 21:11:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DECC8C4708F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 21:11:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B524D613AE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 21:11:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C22D5613B4
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  1 Jun 2021 21:11:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234747AbhFAVND (ORCPT
+        id S234785AbhFAVNH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 1 Jun 2021 17:13:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60782 "EHLO
+        Tue, 1 Jun 2021 17:13:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234513AbhFAVND (ORCPT
+        with ESMTP id S234782AbhFAVNG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 1 Jun 2021 17:13:03 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61A34C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jun 2021 14:11:21 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id u30so270189qke.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jun 2021 14:11:21 -0700 (PDT)
+        Tue, 1 Jun 2021 17:13:06 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0DEDC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue,  1 Jun 2021 14:11:23 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id a7so193613qvf.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 01 Jun 2021 14:11:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=TfWVe0OrdPg0wBiMFnwL7mJUNGJrTuN+BG9OV0hrFx8=;
-        b=rcHaOLHQDWMlf/lF5duB5bvE+w0Z0GmggaS2Blvqy01fTZoBUGc3ojiARzkaIbJJ2O
-         wfyEWlCNe06R/o4LYxM+QRgwNQyu8gFdmtW0r1naST5QOrVN2zm8KMN/qko3eVulX9ju
-         Kb5CPMREoudz8hrSmVSYaJUT4ZPNTduVU+Xoeft/29O3t6tZP+Sq54TL/ac3R0NR4QAJ
-         lSTnYW+uxOs5SD43Ncm0fkDcpXAbe3Qq14GiJpuxM+iUu1t7yNhm727FsGZNcKBKtcga
-         QPvoxipbuKOJmc+Ln1OBQt7d64/EW+NaLiks7bGhm4vRzkZCSdOvvw8QUrw6e6NPiLRZ
-         EOTQ==
+        bh=rg7b/AHy3tNrpv0jD8GaEUbPvXYZQ+E372+Na9WTkNI=;
+        b=mjeJHsPwNfY2Hmf6hwyCWpegDFGOCjGdPjL3G2Jhw+JJOuUsy29e4VQOrbnlcFm6sT
+         Qb5wE1J2Zu9dzlkKSI/8fxXUjBkauNmjgAwZr9stTl87zBp5HEQv6xyrfvt8vNLMJ0q9
+         xhPYwEwsXPh4EiNHc/iQVyThBBZW3guv21mznCHS5VtRMafLlYNwP73UZDqyRm79Bnha
+         0cgpnfe4HYuB9KWkf8p6Nm8iMLmo5kciC7fcIA1Vb963gEo/kz+8Qo0OIANO8Y/3Pmul
+         mLMoNV4ZeuGKVLXBAQQ768m6HpAmDiVDH1LVU8pE99bsDd6yOKIYMj95E06bLRaAlAQq
+         7w/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=TfWVe0OrdPg0wBiMFnwL7mJUNGJrTuN+BG9OV0hrFx8=;
-        b=CLZenP0ceVPJ/U/UTeLXH4QO/eJe0SXSHDZMy52nTGIePnDZV9DotCeft66CihSjOu
-         iN0YfYzxesi6SF9hu7Xi9cu4E5M1QktNJnipjGv3lo4I5AX0zoatzvZRNeSuGvAmtX4N
-         ea158767OHSC64YB5RVuhjTDVg+7w2JGr9lOjlisyPYD9tEEvLcf6v00TboPQCGfg08r
-         WksmCF9CLZ0z5VPKS192mqFgdiyLc6sChjGXzWD9hGWrUiS643IawGcko6XqcDCHAjaG
-         6LsIMzgSdo3ysAbEGqw4wFcShiAjrhEIWhDudFCnvsQZkuOeIFcMnIJ9anmI+KogVFb7
-         stEg==
-X-Gm-Message-State: AOAM533i2hY3F8NsodotUrnHUNdQsDJmii2IOllGpkvcQelnmranKZJ7
-        +jswzgl1tFPvIfj8KldEcylPQvthvgnVVg==
-X-Google-Smtp-Source: ABdhPJxN+yrunPlJxD5IPTF3pNYaxN6dzs5Mm9eMueKpYwtC5Y/sGhwDt1jOzJ+G+BON8ujZYMzxOQ==
-X-Received: by 2002:ae9:d60f:: with SMTP id r15mr24644141qkk.20.1622581880326;
-        Tue, 01 Jun 2021 14:11:20 -0700 (PDT)
-Received: from [172.17.0.2] ([52.251.113.181])
-        by smtp.gmail.com with ESMTPSA id d16sm10757015qtw.23.2021.06.01.14.11.19
+        bh=rg7b/AHy3tNrpv0jD8GaEUbPvXYZQ+E372+Na9WTkNI=;
+        b=AHTxy/95zIdXDjuePOwuNeDw6tLoPDCeTnEKBQL++w4HmYwEm8k/P58FvbpisoQnMh
+         vwDBZqZji8WKgIhWmzCSBg2yxYZjzaoITMHWC1xpNuQ2kgrl12XI+nTbqnt44V/VNR1W
+         O+McayyPI1qzG9Natnjwy1FLQ9qI/l7U2lAwM62j3QBt8o1TgfxmmCWHLOMJGcPhlYh6
+         rK3BT/y76lvsC0MDjudLc6mBIA1D0jlezHWx5YiPTATg1+ZKakeEtynTR1v89WMvdn9V
+         locphq/hs+PoEQ8I6hBisYIJxPUuSqgtai8sx81EJyJcC+AaAcA7cGRgfpqRr2BUT8Aq
+         Dz8Q==
+X-Gm-Message-State: AOAM531X5kfhV6OA3ydVLODVzGyC8/Ap9rfn9uRmEN6kh5tsMfwS6+33
+        6kSHGQEfnzvh2mQKL9H378QMR/CLI7H4tg==
+X-Google-Smtp-Source: ABdhPJxOWSzYJIyYCTSEhbQ6lurS3iOlqtp59WvgHXMpkPiyai5BDWscMEWWH+AH7sBWrw6ordytLA==
+X-Received: by 2002:a0c:e601:: with SMTP id z1mr24956388qvm.62.1622581882798;
+        Tue, 01 Jun 2021 14:11:22 -0700 (PDT)
+Received: from [172.17.0.2] ([40.71.60.54])
+        by smtp.gmail.com with ESMTPSA id o26sm6989545qtt.11.2021.06.01.14.11.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 01 Jun 2021 14:11:19 -0700 (PDT)
-Message-ID: <60b6a277.1c69fb81.9560f.bce0@mx.google.com>
-Date:   Tue, 01 Jun 2021 14:11:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8211481811869830953=="
+        Tue, 01 Jun 2021 14:11:22 -0700 (PDT)
+Message-ID: <60b6a27a.1c69fb81.bf667.fcf2@mx.google.com>
+Date:   Tue, 01 Jun 2021 14:11:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============0012848605818867662=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
 To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ,1/3] emulator/btdev: Enable LE Privacy feature
+Subject: RE: [BlueZ,V2,1/3] emulator/btdev: Enable LE Privacy feature
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210601201923.899950-1-hj.tedd.an@gmail.com>
-References: <20210601201923.899950-1-hj.tedd.an@gmail.com>
+In-Reply-To: <20210601204918.903327-1-hj.tedd.an@gmail.com>
+References: <20210601204918.903327-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8211481811869830953==
+--===============0012848605818867662==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -82,80 +82,26 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=492055
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=492061
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    FAIL      1.00 seconds
+CheckPatch                    PASS      1.23 seconds
 GitLint                       PASS      0.32 seconds
-Prep - Setup ELL              PASS      41.00 seconds
+Prep - Setup ELL              PASS      41.15 seconds
 Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      7.22 seconds
-Build - Make                  PASS      176.73 seconds
-Make Check                    PASS      9.25 seconds
-Make Distcheck                PASS      208.95 seconds
-Build w/ext ELL - Configure   PASS      7.20 seconds
-Build w/ext ELL - Make        PASS      165.59 seconds
+Build - Configure             PASS      7.20 seconds
+Build - Make                  PASS      176.25 seconds
+Make Check                    PASS      8.86 seconds
+Make Distcheck                PASS      208.06 seconds
+Build w/ext ELL - Configure   PASS      7.32 seconds
+Build w/ext ELL - Make        PASS      166.59 seconds
 
 Details
 ##############################
-Test: CheckPatch - FAIL
+Test: CheckPatch - PASS
 Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-tools/mgmt-tester: Add tests for experimental feature command
-WARNING:LONG_LINE: line length of 87 exceeds 80 columns
-#17: FILE: tools/mgmt-tester.c:6840:
-+			tester_warn("Invalid cmd response parameter size: %d", length);
-
-- total: 0 errors, 1 warnings, 156 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] tools/mgmt-tester: Add tests for experimental feature command" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-tools/mgmt-tester: Add tests for whitelist and resolving list
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#163: FILE: tools/mgmt-tester.c:6988:
-+		tester_warn("Invalid parameter size for HCI command (%d)", length);
-
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#172: FILE: tools/mgmt-tester.c:7021:
-+		tester_warn("Invalid parameter size for HCI command (%d)", length);
-
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#240: FILE: tools/mgmt-tester.c:9396:
-+	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE , data->mgmt_index,
- 	                                              ^
-
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#298: FILE: tools/mgmt-tester.c:9454:
-+	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE , data->mgmt_index,
- 	                                              ^
-
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#358: FILE: tools/mgmt-tester.c:9514:
-+	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE , data->mgmt_index,
- 	                                              ^
-
-- total: 3 errors, 2 warnings, 420 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] tools/mgmt-tester: Add tests for whitelist and resolving list" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
 
 ##############################
 Test: GitLint - PASS
@@ -200,4 +146,4 @@ Regards,
 Linux Bluetooth
 
 
---===============8211481811869830953==--
+--===============0012848605818867662==--
