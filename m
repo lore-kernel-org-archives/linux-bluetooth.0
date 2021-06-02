@@ -2,91 +2,256 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD8C1C47083
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 21:18:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5834C47083
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 22:54:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BF2D2613E7
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 21:18:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BBF2C613E6
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 22:54:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229657AbhFBVTq convert rfc822-to-8bit (ORCPT
+        id S229744AbhFBWzw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jun 2021 17:19:46 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41913 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbhFBVTq (ORCPT
+        Wed, 2 Jun 2021 18:55:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38148 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229626AbhFBWzw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jun 2021 17:19:46 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D926ECED0C;
-        Wed,  2 Jun 2021 23:25:58 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCHv2 2/2] Bluetooth: btusb: Add 0x0b05:0x190e Realtek 8761BU
- (ASUS BT500) device
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210602210702.26038-1-joakim.tjernlund@infinera.com>
-Date:   Wed, 2 Jun 2021 23:18:00 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        stable@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6019220E-9A35-4A80-B29A-446E1D74FDDE@holtmann.org>
-References: <20210602210702.26038-1-joakim.tjernlund@infinera.com>
-To:     Joakim Tjernlund <joakim.tjernlund@infinera.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Wed, 2 Jun 2021 18:55:52 -0400
+Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E276BC06174A
+        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jun 2021 15:54:08 -0700 (PDT)
+Received: by mail-pg1-x532.google.com with SMTP id t8so3530321pgb.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jun 2021 15:54:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JivnPwUdgtiMEUtJMjXPlP8jDXsxA2fny+NDGNihgHw=;
+        b=BxTUUHMYhJYQ4dYrzEuHrOZZd36x1rNCo3Ze2HfVK7OVU514qjCwmeI3lI/mDHbQis
+         X9pydEXLRVkq4eoir0wm9nkH9iVc0Fd5iUnsGE1AIr4030dvRKRMVFEKtDUThVHURjDo
+         Jn2Cbj4hwegMN5V+b0H5BZuw0OakL2vavbTBaU/BsR1i/ArnAl/rX1kD3gD51Sfb0gOt
+         R80iA5bL8QaKfXJnQzKh8ltO/oC0XBZ6+N7GxGBomGfO8cGRhwd4GMIZzsQROxMYWm7V
+         Hh407fjPNFZql8AyglA2Ugsu6HDm7KDqy1EyN0L42h091K+oK6udCN3K4MHnJET7pk+I
+         6w3Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=JivnPwUdgtiMEUtJMjXPlP8jDXsxA2fny+NDGNihgHw=;
+        b=FukXjCNFqST1yR8VBMTTNwreVHdYO3nP+qHUZbI3q1NqS9Jf5S4sGJGnXrwuSeGjSs
+         NZ9Iyx5LTbFt86pkvYhe2UZHgH0xUo2zexzNxDiMn0hOuxrcsjqfTNNoIliBHpAL2dlc
+         wzXoKmQRuCm7A13uDHHTNrBbev67sqg8GR5tVwn+bRj9w47JndggDOkiu7EKeqRIgzOG
+         Zclt2WQiedOAogllF+wUCBeY23YGHio3C+5NRgbOCefmttQWb7VHwH4Fu7qK119SbK0Q
+         euDKi1qk9hbcdfCdYauNOovzfgSDHv58AF4EE7qIwIfGtrhL0Te7eEl+ajyiFHHh+0iY
+         Ieuw==
+X-Gm-Message-State: AOAM530UFkFHzCMjgAyAYJ+krkfCD3DC6X8zPIQqbWq2eKnKdmBYO1Gz
+        w4mhNZDyW27C4jiwHnXUumijodHYlfk=
+X-Google-Smtp-Source: ABdhPJwh841mpTS0RGwCbVzDikGn3qjol+tObySzyUTOXpAJiDVN7+/5yZZCvH0ZWWUjJ3zHHEPAiQ==
+X-Received: by 2002:a63:5b21:: with SMTP id p33mr18389828pgb.402.1622674448148;
+        Wed, 02 Jun 2021 15:54:08 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s3sm678578pgs.62.2021.06.02.15.54.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 02 Jun 2021 15:54:07 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/5] Bluetooth: Add helper for serialized HCI command execution
+Date:   Wed,  2 Jun 2021 15:54:00 -0700
+Message-Id: <20210602225404.744891-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joakim,
+From: Marcel Holtmann <marcel@holtmann.org>
 
-> T:  Bus=01 Lev=01 Prnt=01 Port=08 Cnt=04 Dev#= 18 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0b05 ProdID=190e Rev= 2.00
-> S:  Manufacturer=Realtek
-> S:  Product=ASUS USB-BT500
-> S:  SerialNumber=xxxxxxxx
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> Signed-off-by: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
-> Cc: stable@vger.kernel.org
-> ---
-> 
-> v2 - fix SPACE
-> drivers/bluetooth/btusb.c | 4 ++++
-> 1 file changed, 4 insertions(+)
+The usage of __hci_cmd_sync() within the hdev->setup() callback allows for
+a nice and simple serialized execution of HCI commands. More importantly
+it allows for result processing before issueing the next command.
 
-now it doesn’t apply to bluetooth-next anymore.
+With the current usage of hci_req_run() it is possible to batch up
+commands and execute them, but it is impossible to react to their
+results or errors.
 
-And please take CC: stable off this since I am pretty sure it depends on the 1/2 change for the firmware as well.
+This is an attempt to generalize the hdev->setup() handling and provide
+a simple way of running multiple HCI commands from a single function
+context.
 
-Regards
+There are multiple struct work that are decdicated to certain tasks
+already used right now. It is add a lot of bloat to hci_dev struct and
+extra handling code. So it might be possible to put all of these behind
+a common HCI command infrastructure and just execute the HCI commands
+from the same work context in a serialized fashion.
 
-Marcel
+For example updating the white list and resolving list can be done now
+without having to know the list size ahead of time. Also preparing for
+suspend or resume shouldn't require a state machine anymore. There are
+other tasks that should be simplified as well.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 17 +++++++
+ net/bluetooth/hci_core.c         | 82 ++++++++++++++++++++++++++++++++
+ 2 files changed, 99 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 43b08bebae74..de95c47aaf77 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -302,6 +302,17 @@ struct amp_assoc {
+ 
+ #define HCI_MAX_PAGES	3
+ 
++typedef int (*cmd_sync_work_func_t)(struct hci_dev *hdev, void *data);
++typedef void (*cmd_sync_work_destroy_t)(struct hci_dev *hdev, void *data,
++					int err);
++
++struct cmd_sync_work_entry {
++	struct list_head list;
++	cmd_sync_work_func_t func;
++	void *data;
++	cmd_sync_work_destroy_t destroy;
++};
++
+ struct hci_dev {
+ 	struct list_head list;
+ 	struct mutex	lock;
+@@ -463,6 +474,9 @@ struct hci_dev {
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
+ 	struct work_struct	error_reset;
++	struct work_struct	cmd_sync_work;
++	struct list_head	cmd_sync_work_list;
++	struct mutex		cmd_sync_work_lock;
+ 
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+@@ -1701,6 +1715,9 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			     const void *param, u32 timeout);
+ 
++int hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func,
++		       void *data, cmd_sync_work_destroy_t destroy);
++
+ u32 hci_conn_get_phy(struct hci_conn *conn);
+ 
+ /* ----- HCI Sockets ----- */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 6eedf334f943..ba407976066b 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2329,6 +2329,81 @@ static void hci_error_reset(struct work_struct *work)
+ 	hci_dev_do_open(hdev);
+ }
+ 
++static void hci_cmd_sync_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
++	struct cmd_sync_work_entry *entry;
++	cmd_sync_work_func_t func;
++	cmd_sync_work_destroy_t destroy;
++	void *data;
++
++	bt_dev_dbg(hdev, "");
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	entry = list_first_entry(&hdev->cmd_sync_work_list,
++				 struct cmd_sync_work_entry, list);
++	if (entry) {
++		list_del(&entry->list);
++		func = entry->func;
++		data = entry->data;
++		destroy = entry->destroy;
++		kfree(entry);
++	} else {
++		func = NULL;
++		data = NULL;
++		destroy = NULL;
++	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	if (func) {
++		int err;
++
++		hci_req_sync_lock(hdev);
++
++		err = func(hdev, data);
++
++		if (destroy)
++			destroy(hdev, data, err);
++
++		hci_req_sync_unlock(hdev);
++	}
++}
++
++int hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func,
++		       void *data, cmd_sync_work_destroy_t destroy)
++{
++	struct cmd_sync_work_entry *entry;
++
++	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	entry->func = func;
++	entry->data = data;
++	entry->destroy = destroy;
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
++
++	return 0;
++}
++
++static void hci_cmd_sync_clear(struct hci_dev *hdev)
++{
++	struct cmd_sync_work_entry *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
++		if (entry->destroy)
++			entry->destroy(hdev, entry->data, -ECANCELED);
++
++		list_del(&entry->list);
++		kfree(entry);
++	}
++}
++
+ void hci_uuids_clear(struct hci_dev *hdev)
+ {
+ 	struct bt_uuid *uuid, *tmp;
+@@ -3845,6 +3920,10 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
+ 
++	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
++	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
++	mutex_init(&hdev->cmd_sync_work_lock);
++
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
+ 
+ 	skb_queue_head_init(&hdev->rx_q);
+@@ -4005,6 +4084,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 
+ 	cancel_work_sync(&hdev->power_on);
+ 
++	cancel_work_sync(&hdev->cmd_sync_work);
++	hci_cmd_sync_clear(hdev);
++
+ 	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
+ 		hci_suspend_clear_tasks(hdev);
+ 		unregister_pm_notifier(&hdev->suspend_notifier);
+-- 
+2.31.1
 
