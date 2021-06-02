@@ -7,81 +7,93 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF604C4708F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 19:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 964B4C47099
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 19:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 933D8610E5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 19:52:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 73A9161242
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 19:55:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbhFBTyB convert rfc822-to-8bit (ORCPT
+        id S229959AbhFBT5H convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jun 2021 15:54:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48557 "EHLO
+        Wed, 2 Jun 2021 15:57:07 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44320 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229491AbhFBTyA (ORCPT
+        with ESMTP id S229607AbhFBT5G (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jun 2021 15:54:00 -0400
+        Wed, 2 Jun 2021 15:57:06 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 00641CED09;
-        Wed,  2 Jun 2021 22:00:13 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0D41FCED09;
+        Wed,  2 Jun 2021 22:03:19 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v2] Bluetooth: MGTM: Fix slab-out-of-bounds in
- tlv_data_is_valid
+Subject: Re: [PATCH v2 1/8] Bluetooth: use inclusive language in HCI role
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210528184502.171731-1-luiz.dentz@gmail.com>
-Date:   Wed, 2 Jun 2021 21:52:16 +0200
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210531163500.v2.1.I55a28f07420d96b60332def9a579d27f4a4cf4cb@changeid>
+Date:   Wed, 2 Jun 2021 21:55:20 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <10093E2D-8238-448E-8E90-5B2851B85BCB@holtmann.org>
-References: <20210528184502.171731-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <AF991D82-2984-450B-A522-54F8F4E850F8@holtmann.org>
+References: <20210531083726.1949001-1-apusaka@google.com>
+ <20210531163500.v2.1.I55a28f07420d96b60332def9a579d27f4a4cf4cb@changeid>
+To:     Archie Pusaka <apusaka@google.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Archie,
 
-> This fixes parsing of LTV entries when the length is 0.
+> This patch replaces some non-inclusive terms based on the appropriate
+> language mapping table compiled by the Bluetooth SIG:
+> https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 > 
-> Found with:
+> Specifically, these terms are replaced:
+> master -> central
+> slave  -> peripheral
 > 
-> tools/mgmt-tester -s "Add Advertising - Success (ScRsp only)"
+> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 > 
-> Add Advertising - Success (ScRsp only) - run
->  Sending Add Advertising (0x003e)
->  Test condition added, total 1
-> [   11.004577] ==================================================================
-> [   11.005292] BUG: KASAN: slab-out-of-bounds in tlv_data_is_valid+0x87/0xe0
-> [   11.005984] Read of size 1 at addr ffff888002c695b0 by task mgmt-tester/87
-> [   11.006711]
-> [   11.007176]
-> [   11.007429] Allocated by task 87:
-> [   11.008151]
-> [   11.008438] The buggy address belongs to the object at ffff888002c69580
-> [   11.008438]  which belongs to the cache kmalloc-64 of size 64
-> [   11.010526] The buggy address is located 48 bytes inside of
-> [   11.010526]  64-byte region [ffff888002c69580, ffff888002c695c0)
-> [   11.012423] The buggy address belongs to the page:
-> [   11.013291]
-> [   11.013544] Memory state around the buggy address:
-> [   11.014359]  ffff888002c69480: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-> [   11.015453]  ffff888002c69500: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-> [   11.016232] >ffff888002c69580: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
-> [   11.017010]                                      ^
-> [   11.017547]  ffff888002c69600: 00 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc
-> [   11.018296]  ffff888002c69680: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
-> [   11.019116] ==================================================================
-> 
-> Fixes: 2bb36870e8cb2 ("Bluetooth: Unify advertising instance flags check")
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> net/bluetooth/mgmt.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> 
+> Changes in v2:
+> * Add details in commit message
+> 
+> include/net/bluetooth/hci.h      |  6 +++---
+> include/net/bluetooth/hci_core.h |  4 ++--
+> net/bluetooth/amp.c              |  2 +-
+> net/bluetooth/hci_conn.c         | 30 +++++++++++++++---------------
+> net/bluetooth/hci_core.c         |  6 +++---
+> net/bluetooth/hci_event.c        | 20 ++++++++++----------
+> net/bluetooth/l2cap_core.c       | 12 ++++++------
+> net/bluetooth/smp.c              | 20 ++++++++++----------
+> 8 files changed, 50 insertions(+), 50 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index c4b0650fb9ae..18742f4471ff 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -515,7 +515,7 @@ enum {
+> 
+> /* Link modes */
+> #define HCI_LM_ACCEPT	0x8000
+> -#define HCI_LM_MASTER	0x0001
+> +#define HCI_LM_CENTRAL	0x0001
+> #define HCI_LM_AUTH	0x0002
+> #define HCI_LM_ENCRYPT	0x0004
+> #define HCI_LM_TRUSTED	0x0008
 
-patch has been applied to bluetooth-next tree.
+this is my fault since I overlooked this one. This is also API. Lets skip this for now.
 
 Regards
 
