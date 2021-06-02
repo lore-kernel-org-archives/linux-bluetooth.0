@@ -7,53 +7,57 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0EA73C4708F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 20:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B07B9C4708F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 20:10:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6504613D7
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 20:07:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 81768613EB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 20:10:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229541AbhFBUIs (ORCPT
+        id S229604AbhFBULw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jun 2021 16:08:48 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:57512 "EHLO
+        Wed, 2 Jun 2021 16:11:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36268 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229467AbhFBUIs (ORCPT
+        with ESMTP id S229467AbhFBULv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jun 2021 16:08:48 -0400
+        Wed, 2 Jun 2021 16:11:51 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 54465CED09;
-        Wed,  2 Jun 2021 22:15:01 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1C48FCED0B;
+        Wed,  2 Jun 2021 22:18:04 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH -next] Bluetooth: btmtkuart: using
- pm_runtime_resume_and_get instead of pm_runtime_get_sync
+Subject: Re: [PATCH v2] Bluetooth: btusb: use default nvm if boardID is 0 for
+ wcn6855.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210531142450.30779-1-zhangqilong3@huawei.com>
-Date:   Wed, 2 Jun 2021 22:07:03 +0200
-Cc:     Sean Wang <sean.wang@mediatek.com>, matthias.bgg@gmail.com,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <1622541445-17115-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Wed, 2 Jun 2021 22:10:05 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rocky Liao <rjliao@codeaurora.org>, tjiang@codeaurora.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <F0355112-A984-4DB7-8164-1B261745AB2C@holtmann.org>
-References: <20210531142450.30779-1-zhangqilong3@huawei.com>
-To:     Zhang Qilong <zhangqilong3@huawei.com>
+Message-Id: <5EAA7972-F58F-4C50-B390-5A833555B967@holtmann.org>
+References: <1622541445-17115-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zhang,
+Hi Zijun,
 
-> Using pm_runtime_resume_and_get is more appropriate
-> for simplifing code
+> if boardID is 0, will use the default nvm file without surfix.
 > 
-> Signed-off-by: Zhang Qilong <zhangqilong3@huawei.com>
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 > ---
-> drivers/bluetooth/btmtkuart.c | 6 ++----
-> 1 file changed, 2 insertions(+), 4 deletions(-)
+> drivers/bluetooth/btusb.c | 12 +++++++++---
+> 1 file changed, 9 insertions(+), 3 deletions(-)
 
 patch has been applied to bluetooth-next tree.
 
