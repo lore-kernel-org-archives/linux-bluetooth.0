@@ -2,74 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-21.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAA80C47096
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 18:36:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E768C47096
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 19:20:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDEFE613F1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 18:36:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3320A61408
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 19:20:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhFCSi1 (ORCPT
+        id S229704AbhFCTWS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jun 2021 14:38:27 -0400
-Received: from mail.kernel.org ([198.145.29.99]:51896 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229576AbhFCSi1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jun 2021 14:38:27 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 2197B613D7;
-        Thu,  3 Jun 2021 18:36:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1622745402;
-        bh=FwhSCnFU0UJW2nRbWaqzvrhP+56z8E67kW2nPD73Yz0=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=PCSfGVR5MIP2734dt3tsc1wkIpv2avXJCGZ7wQkCN/71MeuQSzy/scHwUgS5DRlhe
-         bQbqrfnM3K/bv3Ohh+kgKdHnYWVIZ+i+Q0bWAAH4myZ0Ha+ExXYzmF3bHUKQKT/m1v
-         /gVyZhATL/V+i694vAdzjvfHnwR/jys1fXM3sSYY=
-Date:   Thu, 3 Jun 2021 20:36:40 +0200
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     SyzScope <syzscope@gmail.com>
-Cc:     syzbot <syzbot+305a91e025a73e4fd6ce@syzkaller.appspotmail.com>,
-        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: KASAN: use-after-free Read in hci_chan_del
-Message-ID: <YLkhOFPU5mb5vspm@kroah.com>
-References: <000000000000adea7f05abeb19cf@google.com>
- <2fb47714-551c-f44b-efe2-c6708749d03f@gmail.com>
- <c40de1fa-c152-4c94-041a-7e014085c66e@gmail.com>
+        Thu, 3 Jun 2021 15:22:18 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42018 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229675AbhFCTWQ (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 3 Jun 2021 15:22:16 -0400
+Received: from fedora.. (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 57FE3CED24
+        for <linux-bluetooth@vger.kernel.org>; Thu,  3 Jun 2021 21:28:27 +0200 (CEST)
+From:   Marcel Holtmann <marcel@holtmann.org>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5.13-rc4] Bluetooth: Fix VIRTIO_ID_BT assigned number
+Date:   Thu,  3 Jun 2021 21:20:26 +0200
+Message-Id: <20210603192026.185625-1-marcel@holtmann.org>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <c40de1fa-c152-4c94-041a-7e014085c66e@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jun 03, 2021 at 11:30:08AM -0700, SyzScope wrote:
-> Hi developers,
-> 
-> Besides the control flow hijacking primitive we sent before, we managed to
-> discover an additional double free primitive in this bug, making this bug
-> even more dangerous.
-> 
-> We created a web page with detailed descriptions: https://sites.google.com/view/syzscope/kasan-use-after-free-read-in-hci_chan_del
-> 
-> We understand that creating a patch can be time-consuming and there is
-> probably a long list of bugs pending fixes. We hope that our security
-> analysis can enable an informed decision on which bugs to fix first
-> (prioritization).
-> 
-> Since the bug has been on syzbot for over ten months (first found on
-> 08-03-2020 and still can be triggered on 05-08-2021), it is best to have the
-> bug fixed early enough to avoid it being weaponized.
+It turned out that the VIRTIO_ID_* are not assigned in the virtio_ids.h
+file in the upstream kernel. Picking the next free one was wrong and
+there is a process that has been followed now.
 
-Wonderful, please help out by sending a fix for this.
+See https://github.com/oasis-tcs/virtio-spec/issues/108 for details.
 
-thanks,
+Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ include/uapi/linux/virtio_ids.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-greg k-h
+diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
+index f0c35ce8628c..4fe842c3a3a9 100644
+--- a/include/uapi/linux/virtio_ids.h
++++ b/include/uapi/linux/virtio_ids.h
+@@ -54,7 +54,7 @@
+ #define VIRTIO_ID_SOUND			25 /* virtio sound */
+ #define VIRTIO_ID_FS			26 /* virtio filesystem */
+ #define VIRTIO_ID_PMEM			27 /* virtio pmem */
+-#define VIRTIO_ID_BT			28 /* virtio bluetooth */
+ #define VIRTIO_ID_MAC80211_HWSIM	29 /* virtio mac80211-hwsim */
++#define VIRTIO_ID_BT			40 /* virtio bluetooth */
+ 
+ #endif /* _LINUX_VIRTIO_IDS_H */
+-- 
+2.31.1
+
