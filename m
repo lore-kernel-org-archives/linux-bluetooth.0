@@ -2,86 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADA81C4708F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 03:20:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88FA1C47096
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 07:44:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7E426613E9
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 03:20:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D467613F1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 07:44:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229611AbhFCDVw (ORCPT
+        id S229775AbhFCHqB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jun 2021 23:21:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38998 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229541AbhFCDVv (ORCPT
+        Thu, 3 Jun 2021 03:46:01 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:2973 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229567AbhFCHqA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jun 2021 23:21:51 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D93BC06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jun 2021 20:20:04 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id i4so6859672ybe.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jun 2021 20:20:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qtJBBfd5RP7iP2oPG4uMPhDWXo0c0Rcr1wHYucdT8uE=;
-        b=NOUhxWdeVO0vZqValuRKPuUxoJeKrB/wSjNMxMQ63MOQogB8rHREd7E2rY6is1S4+H
-         OzMjpqwehtqAYWu06C/0nMiFQmfMB7hihCjaQsPXdtMiq6WZZCbbG+IDXnssnJS5KQOh
-         sjbG/8YEsk4P5ov/8CVdpUx5r0r0X3AZj377pDUvZubkUl59+21lQYiaLbDHbl+6ZhsD
-         Kh9DwUdWuynobe0SAR8c6QT8YGvYLKm/mLkmuy8RDgK/EVNJcjwaZ7qNcfEIaGLj6D+A
-         G4zmn2UxjMDAKguJqaHlhRUiH5zRiXlf1IKWBxxYQ+2KVZte11Agrv+UkcbJPbmrxi8k
-         7jmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qtJBBfd5RP7iP2oPG4uMPhDWXo0c0Rcr1wHYucdT8uE=;
-        b=FC/WhC7fFYqu/QFRS4/fZp7Ds4z7a+ESOmMrnNcleIum3aYkCiXoudPi6qMha7PItB
-         tqBQ0sa5QwCqDmK1HQ5enoCLh92sIB6hT4hRGIqYDl2IZDEzazO4CD5sSMTZ4bQ/4cqA
-         8xofS/vwQXrplA51gETOTNWyb+nE9OC4b8T92j7MHFT459pnSK/ZwBv6/KQ4MJxVIBnL
-         t99rFwBqMPb0c09fmBggt0pVN11PMzeCGbhrTPqQBQPTcXMNPpJLiDPXu2yc+pQ90/nl
-         V4EsyhWdcJVuJnGroQQDLeMQCYig0b8osDHuHwLpy2VK8Maoawzt1FjJudYFh0o7H0I8
-         t9JA==
-X-Gm-Message-State: AOAM531JTnpWjQu3J9zK8g5fR6li4YfMmfwiwag/+OZmMJie5PkLfmsF
-        Fd/vU4RAgxfPLPJOk7QqyL/qKeQ9fD/TZLAg9E4=
-X-Google-Smtp-Source: ABdhPJyY3VkEGEgsGxMDplKW3GB9Tiw0xN/DXfapVV5wIs9uflMcG0LXp3Ye6rENH/KlxJ+OhgLQFmvWc6RKJ9+mfUE=
-X-Received: by 2002:a25:3406:: with SMTP id b6mr51682164yba.318.1622690403942;
- Wed, 02 Jun 2021 20:20:03 -0700 (PDT)
+        Thu, 3 Jun 2021 03:46:00 -0400
+Received: from dggemv704-chm.china.huawei.com (unknown [172.30.72.53])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4FwdB35MFqz6tt4;
+        Thu,  3 Jun 2021 15:41:15 +0800 (CST)
+Received: from dggpeml500012.china.huawei.com (7.185.36.15) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 3 Jun 2021 15:44:14 +0800
+Received: from huawei.com (10.67.165.24) by dggpeml500012.china.huawei.com
+ (7.185.36.15) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Thu, 3 Jun 2021
+ 15:44:14 +0800
+From:   Kai Ye <yekai13@huawei.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, <linux-bluetooth@vger.kernel.org>
+CC:     <linux-kernel@vger.kernel.org>, <yekai13@huawei.com>
+Subject: [PATCH v3 05/12] Bluetooth: 6lowpan: Use the correct print format
+Date:   Thu, 3 Jun 2021 15:40:58 +0800
+Message-ID: <1622706065-45409-6-git-send-email-yekai13@huawei.com>
+X-Mailer: git-send-email 2.8.1
+In-Reply-To: <1622706065-45409-1-git-send-email-yekai13@huawei.com>
+References: <1622706065-45409-1-git-send-email-yekai13@huawei.com>
 MIME-Version: 1.0
-References: <CAJjojJvVPwssDxY-GcQcw0TXMzhEX4RgiNeGWowKo6mKTw13=g@mail.gmail.com>
- <CABBYNZJm+ScxVjVBcxRpUuu+9J8sgyEmrnFaVpVii0FCg3EMxw@mail.gmail.com>
-In-Reply-To: <CABBYNZJm+ScxVjVBcxRpUuu+9J8sgyEmrnFaVpVii0FCg3EMxw@mail.gmail.com>
-From:   Lin Horse <kylin.formalin@gmail.com>
-Date:   Thu, 3 Jun 2021 11:19:52 +0800
-Message-ID: <CAJjojJvtSVqw2BcWoDULEF3AqLJN6pguuJUN65PxAL70-rbATg@mail.gmail.com>
-Subject: Re: BUG: KASAN: use-after-free in l2cap_send_cmd from l2cap_chan_timeout
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-Originating-IP: [10.67.165.24]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500012.china.huawei.com (7.185.36.15)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-> Try with the following patch:
-> https://patchwork.kernel.org/project/bluetooth/patch/20210602232348.766496-1-luiz.dentz@gmail.com/
+According to Documentation/core-api/printk-formats.rst,
+Use the correct print format. Printing an unsigned int value should use %u
+instead of %d. Otherwise printk() might end up displaying negative numbers.
 
-Yeah, I send this email because I have seen this wonderful patch.
-However, the crash site is not exactly the same as this UAF is about
-the hdev object while the discussed patch is about the l2cap_conn
-object.
-I will try to reproduce this one to test if it can work.
+Signed-off-by: Kai Ye <yekai13@huawei.com>
+---
+ net/bluetooth/6lowpan.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-> If that doesn't work we may need to use cancel_delayed_work_sync but
-> I'm not sure if that is safe to use since that blocks the context.
+diff --git a/net/bluetooth/6lowpan.c b/net/bluetooth/6lowpan.c
+index cff4944..8de7876 100644
+--- a/net/bluetooth/6lowpan.c
++++ b/net/bluetooth/6lowpan.c
+@@ -195,7 +195,7 @@ static inline struct lowpan_peer *peer_lookup_dst(struct lowpan_btle_dev *dev,
+ 	rcu_read_lock();
+ 
+ 	list_for_each_entry_rcu(peer, &dev->peers, list) {
+-		BT_DBG("dst addr %pMR dst type %d ip %pI6c",
++		BT_DBG("dst addr %pMR dst type %u ip %pI6c",
+ 		       &peer->chan->dst, peer->chan->dst_type,
+ 		       &peer->peer_addr);
+ 
+@@ -507,7 +507,7 @@ static int send_mcast_pkt(struct sk_buff *skb, struct net_device *netdev)
+ 
+ 			local_skb = skb_clone(skb, GFP_ATOMIC);
+ 
+-			BT_DBG("xmit %s to %pMR type %d IP %pI6c chan %p",
++			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name,
+ 			       &pentry->chan->dst, pentry->chan->dst_type,
+ 			       &pentry->peer_addr, pentry->chan);
+@@ -550,7 +550,7 @@ static netdev_tx_t bt_xmit(struct sk_buff *skb, struct net_device *netdev)
+ 
+ 	if (err) {
+ 		if (lowpan_cb(skb)->chan) {
+-			BT_DBG("xmit %s to %pMR type %d IP %pI6c chan %p",
++			BT_DBG("xmit %s to %pMR type %u IP %pI6c chan %p",
+ 			       netdev->name, &addr, addr_type,
+ 			       &lowpan_cb(skb)->addr, lowpan_cb(skb)->chan);
+ 			err = send_pkt(lowpan_cb(skb)->chan, skb, netdev);
+@@ -819,7 +819,7 @@ static void chan_close_cb(struct l2cap_chan *chan)
+ 
+ 			BT_DBG("dev %p removing %speer %p", dev,
+ 			       last ? "last " : "1 ", peer);
+-			BT_DBG("chan %p orig refcnt %d", chan,
++			BT_DBG("chan %p orig refcnt %u", chan,
+ 			       kref_read(&chan->kref));
+ 
+ 			l2cap_chan_put(chan);
+@@ -943,7 +943,7 @@ static int bt_6lowpan_disconnect(struct l2cap_conn *conn, u8 dst_type)
+ {
+ 	struct lowpan_peer *peer;
+ 
+-	BT_DBG("conn %p dst type %d", conn, dst_type);
++	BT_DBG("conn %p dst type %u", conn, dst_type);
+ 
+ 	peer = lookup_peer(conn);
+ 	if (!peer)
+@@ -975,7 +975,7 @@ static struct l2cap_chan *bt_6lowpan_listen(void)
+ 
+ 	atomic_set(&chan->nesting, L2CAP_NESTING_PARENT);
+ 
+-	BT_DBG("chan %p src type %d", chan, chan->src_type);
++	BT_DBG("chan %p src type %u", chan, chan->src_type);
+ 
+ 	err = l2cap_add_psm(chan, addr, cpu_to_le16(L2CAP_PSM_IPSP));
+ 	if (err) {
+@@ -1016,7 +1016,7 @@ static int get_l2cap_conn(char *buf, bdaddr_t *addr, u8 *addr_type,
+ 
+ 	*conn = (struct l2cap_conn *)hcon->l2cap_data;
+ 
+-	BT_DBG("conn %p dst %pMR type %d", *conn, &hcon->dst, hcon->dst_type);
++	BT_DBG("conn %p dst %pMR type %u", *conn, &hcon->dst, hcon->dst_type);
+ 
+ 	return 0;
+ }
+@@ -1158,7 +1158,7 @@ static ssize_t lowpan_control_write(struct file *fp,
+ 				return -EALREADY;
+ 			}
+ 
+-			BT_DBG("conn %p dst %pMR type %d user %d", conn,
++			BT_DBG("conn %p dst %pMR type %d user %u", conn,
+ 			       &conn->hcon->dst, conn->hcon->dst_type,
+ 			       addr_type);
+ 		}
+-- 
+2.8.1
 
-Agree :)
-
-Thanks
-Lin Ma
