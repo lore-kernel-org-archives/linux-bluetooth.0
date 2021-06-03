@@ -2,118 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DD246C47083
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 23:23:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 863AEC4708F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 00:04:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C5A6C613DC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  2 Jun 2021 23:23:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C5E960E0C
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 00:04:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbhFBXZl (ORCPT
+        id S229611AbhFCAGM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 2 Jun 2021 19:25:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44582 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229810AbhFBXZk (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 2 Jun 2021 19:25:40 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 368A0C06174A
-        for <linux-bluetooth@vger.kernel.org>; Wed,  2 Jun 2021 16:23:57 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id v14so3601725pgi.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 02 Jun 2021 16:23:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3d3ivt1fYy7wYAy9VVau3f04+YK0DuDoNcN0/4A2FUE=;
-        b=UdAluVuyagP99/ZWawjZTWUKDmBjNRmnVYav+Kx0nG5UiNy4V6DHEAC8ntqCCkmuFf
-         gsCi9BqiZFS8al3aVRAjVo2VFnf8pIrZjizeesZSzTCSUalNzK8iC+h1nXtkGVFqIIMP
-         +cpfDA32gwWTz1vNOOmj4BfMcxj9PYb9P9TQHu9prlWauCPDSDW/C9WFIFtmOeD2ORYo
-         1y9AvfwJ315hCkAxEBKJFn3TP46EoPhdkuHn7pcSZWwqSyiIc2XOl+br3a72VqJlVw0J
-         nBqIXalZdi0AGK0gRObqueTU0jEPjq3elg1yuKbohYsT3o3HODMD3x4CunyXeBDoNwvd
-         uChg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=3d3ivt1fYy7wYAy9VVau3f04+YK0DuDoNcN0/4A2FUE=;
-        b=fdJ9bCOtKdcb8HEbHdxYPe15bj6PfP/Z0+jyHO4bLbRUJvyuHmeChKf5972PAIjvNa
-         ajOEFvEYCO+GJLcoZM5orkef1R0UqnL7Nk6GdcawUbFJ+pPYV0+l2V8Vqv9/Ag8qE6D0
-         YPqT0uWlEto0UwU3cA9zCZLBfIFdbta4+Qb4tLdEY7oiH49V2NxoE0zUw5coRp3lBjgp
-         wRwkYxSi/LGXKdHwCEKE3/GBnP/XprTXeeOE9CfDF1ZvEOQ+d9SxQJYEEUMKkWYHaF6G
-         FilEh4acMXya0Gtat6+LiT2pqWNpYpQcbVHKemWpOhRAOatxxX2Bzt83SyansCzGUITE
-         YDfA==
-X-Gm-Message-State: AOAM531HaGPkwNU7IrMT/fEPYBBnDX/VCphhvK3kUGY+7HPO7Sl4doQl
-        fTjMIKuphyN3YHPuSHE3DkUxXnGLiGo=
-X-Google-Smtp-Source: ABdhPJxQwhaINPqsUyF0RLn+wNVjRWiRw+J2k2qrOA01HEplZ8DekihCm5mhS3OYnaeDIYaIaCUZvQ==
-X-Received: by 2002:aa7:9a97:0:b029:2e9:e1fb:2f0d with SMTP id w23-20020aa79a970000b02902e9e1fb2f0dmr14680901pfi.45.1622676236466;
-        Wed, 02 Jun 2021 16:23:56 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p11sm409093pjo.19.2021.06.02.16.23.55
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 02 Jun 2021 16:23:56 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Wed, 2 Jun 2021 20:06:12 -0400
+Received: from mga09.intel.com ([134.134.136.24]:50742 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229541AbhFCAGL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 2 Jun 2021 20:06:11 -0400
+IronPort-SDR: ePayiVbc+qnbr0DtkDts9Th8k6f185Da0XP4Oe6xDBi1qMknNHrtv+XwKulgKH47HzVohFDfF8
+ zOw+0NsKvPsQ==
+X-IronPort-AV: E=McAfee;i="6200,9189,10003"; a="203920483"
+X-IronPort-AV: E=Sophos;i="5.83,244,1616482800"; 
+   d="scan'208";a="203920483"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2021 17:04:27 -0700
+IronPort-SDR: yPFhDkBr8ewiakuM7PgT6g4dRkLA8HcmCehbxIrCKKSuLbojVj3l+ao2lNdTmDVQEewvk+Xwom
+ SJv60VsZBPtQ==
+X-IronPort-AV: E=Sophos;i="5.83,244,1616482800"; 
+   d="scan'208";a="483240058"
+Received: from rsurapan-mobl2.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.209.86.49])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jun 2021 17:04:26 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC] Bluetooth: L2CAP: Fix general protection fault in l2cap_chan_timeout
-Date:   Wed,  2 Jun 2021 16:23:48 -0700
-Message-Id: <20210602232348.766496-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+Cc:     luiz.dentz@gmail.com, tedd.an@linux.intel.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 2/2] tools/mgmt-tester: Add setup condition to resolve list
+Date:   Wed,  2 Jun 2021 17:04:16 -0700
+Message-Id: <20210603000416.171392-2-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.3
+In-Reply-To: <20210603000416.171392-1-inga.stotland@intel.com>
+References: <20210603000416.171392-1-inga.stotland@intel.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+This adds expected setup HCI command condition to
+"Start Discovery - Disable Resolve List" case.
 
-Even though l2cap_chan_del calls __clear_chan_timer that uses
-cancel_delayed_work which doesn't prevent the work to run as it could be
-already pending.
-
-So instead this check if chan->conn has been set to NULL, which indicates
-that l2cap_conn_del might have run, and proceed to release its reference
-since the channel has already been cleanup.
-
-Reported-by: syzbot+008cdbf7a9044c2c2f99@syzkaller.appspotmail.com
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Check that on setup HCI command Set LE Resolve Enable is complete
+with "enable" parameter set to 1.
 ---
- net/bluetooth/l2cap_core.c | 12 +++++++++++-
- 1 file changed, 11 insertions(+), 1 deletion(-)
+ tools/mgmt-tester.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9ebb85df4db4..4408e07a00d1 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -414,11 +414,21 @@ static void l2cap_chan_timeout(struct work_struct *work)
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 657b7aaa0..d659d7eb0 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2076,6 +2076,9 @@ static const struct generic_data start_discovery_ll_privacy_disable_resolv = {
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+ 	.expect_param = start_discovery_le_param,
+ 	.expect_len = sizeof(start_discovery_le_param),
++	.setup_expect_hci_command = BT_HCI_CMD_LE_SET_RESOLV_ENABLE,
++	.setup_expect_hci_param = set_resolv_on_param,
++	.setup_expect_hci_len = sizeof(set_resolv_on_param),
+ 	.expect_hci_command = BT_HCI_CMD_LE_SET_RESOLV_ENABLE,
+ 	.expect_hci_param = set_resolv_off_param,
+ 	.expect_hci_len = sizeof(set_resolv_off_param),
+@@ -9442,6 +9445,7 @@ static void setup_add_device_callback(uint8_t status, uint16_t length,
+ static void setup_ll_privacy_device(const void *test_data)
  {
- 	struct l2cap_chan *chan = container_of(work, struct l2cap_chan,
- 					       chan_timer.work);
--	struct l2cap_conn *conn = chan->conn;
-+	struct l2cap_conn *conn;
- 	int reason;
+ 	struct test_data *data = tester_get_data();
++	const struct generic_data *test = data->test_data;
+ 	unsigned char param[] = { 0x01 };
+ 	const uint8_t *ext_feat_param;
+ 	size_t ext_feat_len;
+@@ -9453,6 +9457,12 @@ static void setup_ll_privacy_device(const void *test_data)
+ 			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
+ 			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
  
- 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
- 
-+	conn = chan->conn;
-+	if (!conn) {
-+		/* Channel is no longer attached to a connection so
-+		 * l2cap_conn_del might have run, just release reference
-+		 * acquired via __set_chan_timer.
-+		 */
-+		l2cap_chan_put(chan);
-+		return;
-+	}
++	tester_print("Setup expected HCI command 0x%04x",
++					 test->setup_expect_hci_command);
++	hciemu_add_master_post_command_hook(data->hciemu,
++					command_setup_hci_callback, data);
++	test_add_setup_condition(data);
 +
- 	mutex_lock(&conn->chan_lock);
- 	/* __set_chan_timer() calls l2cap_chan_hold(chan) while scheduling
- 	 * this work. No need to call l2cap_chan_hold(chan) here again.
+ 	tester_print("Enabling LL Privacy feature");
+ 
+ 	ext_feat_param = set_exp_feat_param_ll_privacy;
 -- 
-2.31.1
+2.26.3
 
