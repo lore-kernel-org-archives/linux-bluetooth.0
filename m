@@ -2,102 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE autolearn=ham
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A748DC47096
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 20:04:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01C99C47082
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 20:12:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8010361008
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 20:04:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE572610A2
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 20:12:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229661AbhFCUG0 (ORCPT
+        id S230131AbhFCUNt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jun 2021 16:06:26 -0400
-Received: from mail-yb1-f171.google.com ([209.85.219.171]:42766 "EHLO
-        mail-yb1-f171.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229617AbhFCUGZ (ORCPT
+        Thu, 3 Jun 2021 16:13:49 -0400
+Received: from mail-pg1-f169.google.com ([209.85.215.169]:42980 "EHLO
+        mail-pg1-f169.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229620AbhFCUNr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jun 2021 16:06:25 -0400
-Received: by mail-yb1-f171.google.com with SMTP id x6so10488945ybl.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jun 2021 13:04:40 -0700 (PDT)
+        Thu, 3 Jun 2021 16:13:47 -0400
+Received: by mail-pg1-f169.google.com with SMTP id t8so5984766pgb.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 03 Jun 2021 13:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yGAu4RK1+bPr/qDz/fldKm03YL7PhSciYtK65EU2YWY=;
-        b=ab4j7/sz5br46xOBQLeYdiclXky1JXTCpUYhSLwu31dfgR4kuCmeHtBYwDZagXBY3l
-         NxOsoDiQMCvxzUG5ZCclYZKVg95zmsdLcAepuomcwxvIG0g9L8tNdgZlJg/7BwImmML+
-         ETGRS9HNalKrm03bWfz2bxj5wnPXJ2z6V9UqwacwG6W0lr54mnjqmmou/wnXUzltBGOc
-         pY97rnz2SXzw0LUp4rVImle0wCSQCzuOBd+9PR7AFsDpjqF/P5GMxe4rppP5drCRQuIp
-         IniFhJI2uYpiKARIRxtJ8qTtQ1tmQkvCQKSUPhkv9t6pFXU/4COJ3gNGzefFvTCcRWGP
-         4xYg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zyR2oaW1I6ukUnJq/oDMqQPxK1dvJ0wMFZLdjqrTI2Q=;
+        b=g4rb3SzFdi1L6MUVTRTBd8u2YyrAjgU8PPQenP6IH5FAZ8ws/kTlEn6LhJCie6r5HJ
+         eiKI4+Qc76Wq8uzCY1zAKIIObfrR12TQQWKSayAw3nK5Uc2Eac4IMJ+ucTqltErLCcfp
+         WL7YbhSqmqPUz7Z2i3QADK7nnWPxx4HTlI1qrCjpgto5ZQk6i3F2vJrIiBpsgRjAwB+2
+         DgWHhWfQKB+sBTavPinCn5j2S6+FELH71XBVQiIe/nW5fEhBaVFT2ATWnl6QmyeSKYst
+         OJALrwnmVqkeOq8pUQ5r004jca8emegtyf7hsc1deHnYOcQbsq3/Ycka8rqc8VhGxSU2
+         shRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yGAu4RK1+bPr/qDz/fldKm03YL7PhSciYtK65EU2YWY=;
-        b=n+p22P1x4rnWLy3ZM6gJZezrVYO26K9iVN3Y/d/f723BjdOOHCj6j1L/Uw0+Zbdg1l
-         iZqVNpyANveYTNorMeT0yCBQN6H575gYHiHibWz+4AB2cv8lQ+0qkIot8TchCmrVy1jY
-         yA87REcHPBYHozXqzBKJsre1jf0CA1l0jeKiMVRaz+xGhn5BKXO5/+j4RgZKWHWpti9p
-         YMbNobkhp52bMUSoZNDwur8FRUEHh02NbIWaxdQxhmvzov6D5rOZ8xMYZ1z/0O9Em+Lv
-         xO8UNkQpIG0k/zYxvlfS+SrA1vXf9uV0Wl3hZfx8tAHXAETlkxE9plrOjZO1o9VWLGey
-         bgCw==
-X-Gm-Message-State: AOAM530f43ID/WiZXtbtw7Tzw+TA7IJ+dd5rWTg1eGwZBleogF8VhO46
-        izJFQt5IW6ASdBgOGZjC9GRDIhF+yngRCo2w8QCHfT8O
-X-Google-Smtp-Source: ABdhPJwWXQESQc73irZB3Wr3W2PDfmYsZTBOu2x2hRiblxBDwGnQCaQmNGfsLeFxHOALPRTNvF1atx//UXDFjRg5RTc=
-X-Received: by 2002:a25:9a04:: with SMTP id x4mr295257ybn.440.1622750620237;
- Thu, 03 Jun 2021 13:03:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210603192026.185625-1-marcel@holtmann.org>
-In-Reply-To: <20210603192026.185625-1-marcel@holtmann.org>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=zyR2oaW1I6ukUnJq/oDMqQPxK1dvJ0wMFZLdjqrTI2Q=;
+        b=mxK+7j9LArOYLCr1F0y8Z54cAslu6SJu96eY+2yUHJofbn2ak4d9wC26sjwU7Xo1lW
+         BV2u9k1LRHU9YCuhK+ZE1LRTLMdgW71HqXG5T19MTCyLF+FraudiTTq3JQtkiLXORX4V
+         /7j1gh0wkMApEj1ViFG5uuK6/ysLYtz7Ztw0NfvZHKSbGesdbzX2LDpGj3ZPCatYkfar
+         IDdtyeqoDcVdEOxTMF4US9+Q0ojibBoaavYWiVaZd/L3Q48KIjkx7cmh/9LoR4euTAPu
+         ygQ709E4dN9qlKxtsLGiX+wOTKT53dsEM4FVeiswMTkcX4iFvst1I6Z7s3gKYf5q4Y3m
+         hNBw==
+X-Gm-Message-State: AOAM530ckHIOFXY13XMbGatQrRc14/WNk+HB3aOFpCFTtu4uhdeHG3Uf
+        /ved8azATIQvDyokvaLZfwB0JB1Ei+c=
+X-Google-Smtp-Source: ABdhPJxZAJrvjFR8eiOan42cHCiZht3RLxLKHp76AE8YEZSX4mYx8Lkog334LrrFozFT+n73hODmMA==
+X-Received: by 2002:a65:458b:: with SMTP id o11mr1167749pgq.51.1622751047739;
+        Thu, 03 Jun 2021 13:10:47 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id i10sm3033910pfk.74.2021.06.03.13.10.46
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 03 Jun 2021 13:10:46 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 3 Jun 2021 13:03:29 -0700
-Message-ID: <CABBYNZ+YTevbqingXfJ=sTX=G10pGjRwRi+8TEnHa1RSETHAZg@mail.gmail.com>
-Subject: Re: [PATCH 5.13-rc4] Bluetooth: Fix VIRTIO_ID_BT assigned number
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 5.13-rc4] Bluetooth: btusb: Fix failing to init controllers with operation firmware
+Date:   Thu,  3 Jun 2021 13:10:45 -0700
+Message-Id: <20210603201045.964496-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jun 3, 2021 at 12:22 PM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> It turned out that the VIRTIO_ID_* are not assigned in the virtio_ids.h
-> file in the upstream kernel. Picking the next free one was wrong and
-> there is a process that has been followed now.
->
-> See https://github.com/oasis-tcs/virtio-spec/issues/108 for details.
->
-> Fixes: afd2daa26c7a ("Bluetooth: Add support for virtio transport driver")
-> Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-> ---
->  include/uapi/linux/virtio_ids.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/include/uapi/linux/virtio_ids.h b/include/uapi/linux/virtio_ids.h
-> index f0c35ce8628c..4fe842c3a3a9 100644
-> --- a/include/uapi/linux/virtio_ids.h
-> +++ b/include/uapi/linux/virtio_ids.h
-> @@ -54,7 +54,7 @@
->  #define VIRTIO_ID_SOUND                        25 /* virtio sound */
->  #define VIRTIO_ID_FS                   26 /* virtio filesystem */
->  #define VIRTIO_ID_PMEM                 27 /* virtio pmem */
-> -#define VIRTIO_ID_BT                   28 /* virtio bluetooth */
->  #define VIRTIO_ID_MAC80211_HWSIM       29 /* virtio mac80211-hwsim */
-> +#define VIRTIO_ID_BT                   40 /* virtio bluetooth */
->
->  #endif /* _LINUX_VIRTIO_IDS_H */
-> --
-> 2.31.1
+Some firmware when operation don't may have broken versions leading to
+error like the following:
 
-Applied to bluetooth.git, thanks.
+[    6.176482] Bluetooth: hci0: Firmware revision 0.0 build 121 week 7 2021
+[    6.177906] bluetooth hci0: Direct firmware load for intel/ibt-20-0-0.sfi failed with error -2
+[    6.177910] Bluetooth: hci0: Failed to load Intel firmware file intel/ibt-20-0-0.sfi (-2)
 
+Since we load the firmware file just to check if its version had changed
+comparing to the one already loaded we can just skip since the firmware
+is already operation.
+
+Fixes: ac0565462e330 ("Bluetooth: btintel: Check firmware version before
+download")
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ drivers/bluetooth/btusb.c | 23 +++++++++++++++++++++--
+ 1 file changed, 21 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 5d603ef39bad..b88c63fbf7fb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2527,10 +2527,17 @@ static int btusb_intel_download_firmware_newgen(struct hci_dev *hdev,
+ 	}
+ 
+ 	btusb_setup_intel_newgen_get_fw_name(ver, fwname, sizeof(fwname), "sfi");
+-	err = request_firmware(&fw, fwname, &hdev->dev);
++	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
++		if (!test_bit(BTUSB_BOOTLOADER, &data->flags)) {
++			/* Firmware has already been loaded */
++			set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++			return 0;
++		}
++
+ 		bt_dev_err(hdev, "Failed to load Intel firmware file %s (%d)",
+ 			   fwname, err);
++
+ 		return err;
+ 	}
+ 
+@@ -2680,12 +2687,24 @@ static int btusb_intel_download_firmware(struct hci_dev *hdev,
+ 	err = btusb_setup_intel_new_get_fw_name(ver, params, fwname,
+ 						sizeof(fwname), "sfi");
+ 	if (err < 0) {
++		if (!test_bit(BTUSB_BOOTLOADER, &data->flags)) {
++			/* Firmware has already been loaded */
++			set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++			return 0;
++		}
++
+ 		bt_dev_err(hdev, "Unsupported Intel firmware naming");
+ 		return -EINVAL;
+ 	}
+ 
+-	err = request_firmware(&fw, fwname, &hdev->dev);
++	err = firmware_request_nowarn(&fw, fwname, &hdev->dev);
+ 	if (err < 0) {
++		if (!test_bit(BTUSB_BOOTLOADER, &data->flags)) {
++			/* Firmware has already been loaded */
++			set_bit(BTUSB_FIRMWARE_LOADED, &data->flags);
++			return 0;
++		}
++
+ 		bt_dev_err(hdev, "Failed to load Intel firmware file %s (%d)",
+ 			   fwname, err);
+ 		return err;
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
