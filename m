@@ -2,429 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A51A7C47096
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:39:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7378FC47082
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:45:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B519613F1
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:39:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55190613F1
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:45:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231228AbhFCOle convert rfc822-to-8bit (ORCPT
+        id S231228AbhFCOrQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jun 2021 10:41:34 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:33889 "EHLO
+        Thu, 3 Jun 2021 10:47:16 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:40604 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231213AbhFCOle (ORCPT
+        with ESMTP id S229744AbhFCOrP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jun 2021 10:41:34 -0400
+        Thu, 3 Jun 2021 10:47:15 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1E599CED1F;
-        Thu,  3 Jun 2021 16:47:46 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 22BCECED1F;
+        Thu,  3 Jun 2021 16:53:27 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v8 8/9] Bluetooth: Add support for
- HCI_Enhanced_Setup_Synchronous_Connection command
+Subject: Re: SC bit in SMP Security Request (BLE)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210518104232.5431-8-kiran.k@intel.com>
-Date:   Thu, 3 Jun 2021 16:39:47 +0200
-Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
-        chethan.tumkur.narayan@intel.com
+In-Reply-To: <CAO1O6seA_k_Fsm=VJvx30kui2tNeJd8tN-a=uXNQnPk9xy6jZQ@mail.gmail.com>
+Date:   Thu, 3 Jun 2021 16:45:28 +0200
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <0141E444-5FE4-416D-BE10-DEE305EA0826@holtmann.org>
-References: <20210518104232.5431-1-kiran.k@intel.com>
- <20210518104232.5431-8-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
+Message-Id: <479AD5B3-D4E3-4401-A981-27708267FB32@holtmann.org>
+References: <CAO1O6seA_k_Fsm=VJvx30kui2tNeJd8tN-a=uXNQnPk9xy6jZQ@mail.gmail.com>
+To:     Emil Lenngren <emil.lenngren@gmail.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+Hi Emil,
 
-> < HCI Command: Enhanced Setup Synchronous Connection (0x01|0x003d) plen 59
->        Handle: 256
->        Transmit bandwidth: 8000
->        Receive bandwidth: 8000
->        Max latency: 13
->        Packet type: 0x0380
->          3-EV3 may not be used
->          2-EV5 may not be used
->          3-EV5 may not be used
->        Retransmission effort: Optimize for link quality (0x02)
->> HCI Event: Command Status (0x0f) plen 4
->      Enhanced Setup Synchronous Connection (0x01|0x003d) ncmd 1
->        Status: Success (0x00)
->> HCI Event: Synchronous Connect Complete (0x2c) plen 17
->        Status: Success (0x00)
->        Handle: 257
->        Address: CC:98:8B:92:04:FD (SONY Visual Products Inc.)
->        Link type: eSCO (0x02)
->        Transmission interval: 0x0c
->        Retransmission window: 0x06
->        RX packet length: 60
->        TX packet length: 60
->        Air mode: Transparent (0x03)
+> I'm looking into how to a BLE slave should ask the master to initiate
+> encryption, if an LTK exists, but the master has not yet started
+> encryption on its own.
 > 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> ---
+> Per the spec, the SMP "Security Request" packet should be sent. What
+> I'm wondering about is how the "sc" bit in that packet should be set.
+> I think the spec isn't clear here.
 > 
-> Need implementation HCI_Enhanced_Setup_Synchronous_Command as it allows
-> setting of non-HCI data path
+> Assume the local device supports SC but the LTK stored was not created
+> using SC, should we set the "sc" bit to 1 or 0?
 > 
-> include/net/bluetooth/bluetooth.h |   1 +
-> include/net/bluetooth/hci.h       |  34 ++++++++++
-> include/net/bluetooth/hci_core.h  |   7 +-
-> net/bluetooth/hci_conn.c          | 104 +++++++++++++++++++++++++++++-
-> net/bluetooth/hci_event.c         |  48 +++++++++++++-
-> net/bluetooth/sco.c               |  11 +++-
-> 6 files changed, 198 insertions(+), 7 deletions(-)
+> In SMP specification, section 2.4.6 "Security Request":
 > 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 0e8802d09068..4e58d275c72c 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -174,6 +174,7 @@ struct bt_codecs {
-> } __packed;
+> "After receiving a Security Request, the master shall first check whether it has
+> the required security information to enable encryption; see Section 2.4.4.2. If
+> this information is missing or does not meet the security properties requested
+> by the slave, then the master shall initiate the pairing procedure."
 > 
-> #define CODING_FORMAT_CVSD	0x02
-> +#define CODING_FORMAT_TRANS	0x03
+> What I'm wondering is if this "sc" bit is considered part of the
+> "security properties requested" or not. It is part of the
+> "authentication requirements" field which is a bit field that
+> "indicates the requested security properties", but according to the
+> SMP specification, section 3.6.7 "Security Request":
 > 
-> __printf(1, 2)
-> void bt_info(const char *fmt, ...);
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index bd666b114aea..af168f3c1f2e 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -878,6 +878,40 @@ struct hci_cp_logical_link_cancel {
-> 	__u8     flow_spec_id;
-> } __packed;
+> "The SC field is a 1 bit flag. If LE Secure Connections pairing is supported by
+> the device, then the SC field shall be set to 1, otherwise it shall be
+> set to 0. If
+> both devices support LE Secure Connections pairing, then LE Secure
+> Connections pairing shall be used, otherwise LE Legacy pairing shall be
+> used."
 > 
-> +#define HCI_OP_ENHANCED_SETUP_SYNC_CONN		0x043D
-> +struct hci_coding_format {
-> +	__u8	id;
-> +	__le16	cid;
-> +	__le16	vid;
-> +} __packed;
-> +
-> +struct hci_cp_enhanced_setup_sync_conn {
-> +	__le16   handle;
-> +	__le32   tx_bandwidth;
-> +	__le32   rx_bandwidth;
-> +	struct	 hci_coding_format tx_coding_format;
-> +	struct	 hci_coding_format rx_coding_format;
-> +	__le16	 tx_codec_frame_size;
-> +	__le16	 rx_codec_frame_size;
-> +	__le32	 in_bandwidth;
-> +	__le32	 out_bandwidth;
-> +	struct	 hci_coding_format in_coding_format;
-> +	struct	 hci_coding_format out_coding_format;
-> +	__le16   in_coded_data_size;
-> +	__le16	 out_coded_data_size;
-> +	__u8	 in_pcm_data_format;
-> +	__u8	 out_pcm_data_format;
-> +	__u8	 in_pcm_sample_payload_msb_pos;
-> +	__u8	 out_pcm_sample_payload_msb_pos;
-> +	__u8	 in_data_path;
-> +	__u8	 out_data_path;
-> +	__u8	 in_trasnport_unit_size;
-> +	__u8	 out_trasnport_unit_size;
-> +	__le16   max_latency;
-> +	__le16   pkt_type;
-> +	__u8     retrans_effort;
-> +} __packed;
-> +
-> struct hci_rp_logical_link_cancel {
-> 	__u8     status;
-> 	__u8     phy_handle;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 959585bafa8d..760d21a2134e 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -712,6 +712,7 @@ struct hci_conn {
-> 	struct amp_mgr	*amp_mgr;
+> In my opinion, that indicates that the "sc" bit should not be treated
+> as part of the "security properties requested" but rather simply
+> indicates if SC are supported or not, since the spec does not allow us
+> to set it to 0 if we support SC as I see it, for example in the case
+> we have a LTK generated using the legacy way and want to use that key.
+> Another possible interpretation would be that it's part of "security
+> properties requested" but it's impossible to ask for a non-SC level if
+> we support SC, i.e. basically the slave cannot request the master to
+> start encryption with the legacy-generated LTK we already have.
 > 
-> 	struct hci_conn	*link;
-> +	struct bt_codec codec;
+> Consider the case when the remote device doesn't support SC (but is at
+> least Core 4.2-compliant and hence understands the protocol) and
+> interprets the spec in the way that the "sc" bit is part of the
+> "security properties requested", but we (slave) set the "sc" bit to 1
+> since we support SC. Then this would trigger a re-pairing all the time
+> the slave wants to start encryption using the LTK we already have.
 > 
-> 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
-> 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
-> @@ -1094,6 +1095,7 @@ static inline struct hci_conn *hci_lookup_le_connect(struct hci_dev *hdev)
+> Note that a firmware update (at either device) could enable support
+> for SC, if it wasn't supported before. We don't want a re-pairing
+> being forced just because of a firmware update, right?
 > 
-> int hci_disconnect(struct hci_conn *conn, __u8 reason);
-> bool hci_setup_sync(struct hci_conn *conn, __u16 handle);
-> +bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle);
-> void hci_sco_setup(struct hci_conn *conn, __u8 status);
+> When I read the BlueZ implementation at
+> https://github.com/bluez/bluetooth-next/blob/9d31d2338950293ec19d9b095fbaa9030899dcb4/net/bluetooth/smp.c#L2308,
+> it seems the BlueZ developers' interpretation is that the "sc" bit is
+> part of the "security properties requested".
 > 
-> struct hci_conn *hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> @@ -1118,7 +1120,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
-> 				 u8 sec_level, u8 auth_type,
-> 				 enum conn_reasons conn_reason);
-> struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> -				 __u16 setting);
-> +				 __u16 setting, struct bt_codec *codec);
-> int hci_conn_check_link_mode(struct hci_conn *conn);
-> int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
-> int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-> @@ -1439,6 +1441,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-> /* Use LL Privacy based address resolution if supported */
-> #define use_ll_privacy(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
+> At the same time, at
+> https://github.com/bluez/bluetooth-next/blob/9d31d2338950293ec19d9b095fbaa9030899dcb4/net/bluetooth/smp.c#L2398
+> we have that the "sc" bit is set according to if SC is supported or
+> not (not depending on the requested security level), when sending a
+> Security Request.
 > 
-> +/* Use enhanced synchronous connection if command is supported */
-> +#define use_enhanced_sco_conn(dev) ((dev)->commands[29] & 0x08)
-> +
-> /* Use ext scanning if set ext scan param and ext scan enable is supported */
-> #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
-> 			   ((dev)->commands[37] & 0x40))
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 88ec08978ff4..e2435b5abeca 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -307,6 +307,96 @@ static bool find_next_esco_param(struct hci_conn *conn,
-> 	return conn->attempt <= size;
-> }
+> So it seems the BlueZ developers use the interpretation where it it
+> both indicates if SC is supported, but at the same time also is part
+> of the "security properties requested".
 > 
-> +bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle)
-> +{
-> +	struct hci_dev *hdev = conn->hdev;
-> +	struct hci_cp_enhanced_setup_sync_conn cp;
-> +	const struct sco_param *param;
-> +
-> +	BT_DBG("hcon %p", conn);
-> +
-> +	conn->state = BT_CONNECT;
-> +	conn->out = true;
-> +
-> +	conn->attempt++;
-> +
-> +	memset(&cp, 0x00, sizeof(cp));
-> +
-> +	cp.handle   = cpu_to_le16(handle);
-> +
-> +	cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
-> +	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
-> +
-> +	switch (conn->codec.id) {
-> +	case CODING_FORMAT_CVSD:
-> +		if (lmp_esco_capable(conn->link)) {
-> +			if (conn->attempt > ARRAY_SIZE(esco_param_cvsd))
-> +				return false;
-> +			param = &esco_param_cvsd[conn->attempt - 1];
-> +		} else {
-> +			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-> +				return false;
-> +			param = &sco_param_cvsd[conn->attempt - 1];
-> +		}
-> +		cp.tx_coding_format.id = 2;
-> +		cp.rx_coding_format.id = 2;
-> +		cp.tx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.rx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.in_bandwidth = __cpu_to_le32(16000);
-> +		cp.out_bandwidth = __cpu_to_le32(16000);
-> +		cp.in_coding_format.id = 4;
-> +		cp.out_coding_format.id = 4;
-> +		cp.in_coded_data_size = __cpu_to_le16(16);
-> +		cp.out_coded_data_size = __cpu_to_le16(16);
-> +		cp.in_pcm_data_format = 2;
-> +		cp.out_pcm_data_format = 2;
-> +		cp.in_pcm_sample_payload_msb_pos = 0;
-> +		cp.out_pcm_sample_payload_msb_pos = 0;
-> +		cp.in_data_path = conn->codec.data_path;
-> +		cp.out_data_path = conn->codec.data_path;
-> +		cp.in_trasnport_unit_size = 16;
-> +		cp.out_trasnport_unit_size = 16;
-> +		break;
-> +
-> +	case CODING_FORMAT_TRANS:
-> +		if (conn->attempt > ARRAY_SIZE(esco_param_msbc))
-> +			return false;
-> +
-> +		param = &esco_param_msbc[conn->attempt - 1];
-> +		cp.tx_coding_format.id = 0x03;
-> +		cp.rx_coding_format.id = 0x03;
-> +		cp.tx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.rx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.in_bandwidth = __cpu_to_le32(0x1f40);
-> +		cp.out_bandwidth = __cpu_to_le32(0x1f40);
-> +		cp.in_coding_format.id = 0x03;
-> +		cp.out_coding_format.id = 0x03;
-> +		cp.in_coded_data_size = __cpu_to_le16(16);
-> +		cp.out_coded_data_size = __cpu_to_le16(16);
-> +		cp.in_pcm_data_format = 2;
-> +		cp.out_pcm_data_format = 2;
-> +		cp.in_pcm_sample_payload_msb_pos = 0;
-> +		cp.out_pcm_sample_payload_msb_pos = 0;
-> +		cp.in_data_path = conn->codec.data_path;
-> +		cp.out_data_path = conn->codec.data_path;
-> +		cp.in_trasnport_unit_size = 1;
-> +		cp.out_trasnport_unit_size = 1;
-> +		break;
-> +
-> +	default:
-> +		return false;
-> +	}
-> +
-> +	cp.retrans_effort = param->retrans_effort;
-> +	cp.pkt_type = __cpu_to_le16(param->pkt_type);
-> +	cp.max_latency = __cpu_to_le16(param->max_latency);
-> +
-> +	if (hci_send_cmd(hdev, HCI_OP_ENHANCED_SETUP_SYNC_CONN, sizeof(cp), &cp) < 0)
-> +		return false;
-> +
-> +	return true;
-> +}
-> +
-> bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
-> {
-> 	struct hci_dev *hdev = conn->hdev;
-> @@ -424,8 +514,12 @@ void hci_sco_setup(struct hci_conn *conn, __u8 status)
-> 	BT_DBG("hcon %p", conn);
+> I'm also a bit skeptical to build_pairing_cmd. Should the authReq more
+> or less just be copied from the Security Request to the Pairing
+> Request? Why not just always request for the highest security possible
+> in the Pairing Request? If the slave wants lower security it can say
+> so in the pairing response. Otherwise we could get in a situation
+> where we previously have an LTK without mitm security, and we send a
+> security request with mitm=0 in order to use this, but the master
+> device has removed the bond, and hence sends a pairing request with
+> mitm=0 instead of mitm=1, even though mitm would be preferred, if
+> possible.
 > 
-> 	if (!status) {
-> -		if (lmp_esco_capable(conn->hdev))
-> -			hci_setup_sync(sco, conn->handle);
-> +		if (lmp_esco_capable(conn->hdev)) {
-> +			if (use_enhanced_sco_conn(conn->hdev))
-> +				hci_enhanced_setup_sync(sco, conn->handle);
-> +			else
-> +				hci_setup_sync(sco, conn->handle);
-> +		}
-> 		else
-> 			hci_add_sco(sco, conn->handle);
+> So my question is simply, if I want to enable encryption to provide
+> integrity and confidentiality (GAP 10.6 Encryption Procedure) at a
+> peripheral, using the key I already have, or if the master deleted the
+> key create a new bond with the best possible security properties, what
+> should I set the "sc" and "mitm" bits to in the Security Request that
+> I send, in case the local device supports both SC and MITM, but the
+> LTK that is stored wasn't generated using SC and/or MITM?
+> 
+> Let me know if my concerns make sense or if I have totally missed
+> something in the specification or so.
 
-you have coding style mistake here.
-
-
-> 	} else {
-> @@ -1319,7 +1413,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
-> }
-> 
-> struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> -				 __u16 setting)
-> +				 __u16 setting, struct bt_codec *codec)
-> {
-> 	struct hci_conn *acl;
-> 	struct hci_conn *sco;
-> @@ -1344,6 +1438,10 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
-> 	hci_conn_hold(sco);
-> 
-> 	sco->setting = setting;
-> +	sco->codec.id = codec->id;
-> +	sco->codec.cid = codec->cid;
-> +	sco->codec.vid = codec->vid;
-> +	sco->codec.data_path = codec->data_path;
-> 
-> 	if (acl->state == BT_CONNECTED &&
-> 	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 4241ae310fcb..94c64e2c11e4 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -2236,6 +2236,41 @@ static void hci_cs_setup_sync_conn(struct hci_dev *hdev, __u8 status)
-> 	hci_dev_unlock(hdev);
-> }
-> 
-> +static void hci_cs_enhanced_setup_sync_conn(struct hci_dev *hdev, __u8 status)
-> +{
-> +	struct hci_cp_enhanced_setup_sync_conn *cp;
-> +	struct hci_conn *acl, *sco;
-> +	__u16 handle;
-> +
-> +	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-> +
-> +	if (!status)
-> +		return;
-> +
-> +	cp = hci_sent_cmd_data(hdev, HCI_OP_ENHANCED_SETUP_SYNC_CONN);
-> +	if (!cp)
-> +		return;
-> +
-> +	handle = __le16_to_cpu(cp->handle);
-> +
-> +	BT_DBG("%s handle 0x%4.4x", hdev->name, handle);
-
-Please start using bt_dev_dbg.
-
-> +
-> +	hci_dev_lock(hdev);
-> +
-> +	acl = hci_conn_hash_lookup_handle(hdev, handle);
-> +	if (acl) {
-> +		sco = acl->link;
-> +		if (sco) {
-> +			sco->state = BT_CLOSED;
-> +
-> +			hci_connect_cfm(sco, status);
-> +			hci_conn_del(sco);
-> +		}
-> +	}
-> +
-> +	hci_dev_unlock(hdev);
-> +}
-> +
-> static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
-> {
-> 	struct hci_cp_sniff_mode *cp;
-> @@ -3715,6 +3750,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cs_setup_sync_conn(hdev, ev->status);
-> 		break;
-> 
-> +	case HCI_OP_ENHANCED_SETUP_SYNC_CONN:
-> +		hci_cs_enhanced_setup_sync_conn(hdev, ev->status);
-> +		break;
-> +
-> 	case HCI_OP_SNIFF_MODE:
-> 		hci_cs_sniff_mode(hdev, ev->status);
-> 		break;
-> @@ -4401,8 +4440,13 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
-> 		if (conn->out) {
-> 			conn->pkt_type = (hdev->esco_type & SCO_ESCO_MASK) |
-> 					(hdev->esco_type & EDR_ESCO_MASK);
-> -			if (hci_setup_sync(conn, conn->link->handle))
-> -				goto unlock;
-> +			if (use_enhanced_sco_conn(hdev)) {
-> +				if (hci_enhanced_setup_sync(conn, conn->link->handle))
-> +					goto unlock;
-> +			} else {
-> +				if (hci_setup_sync(conn, conn->link->handle))
-> +					goto unlock;
-> +			}
-> 		}
-> 		fallthrough;
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index d59f30fc4b9f..19d8ee11eed5 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -240,7 +240,7 @@ static int sco_connect(struct sock *sk)
-> 	}
-> 
-> 	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
-> -			       sco_pi(sk)->setting);
-> +			       sco_pi(sk)->setting, &sco_pi(sk)->codec);
-> 	if (IS_ERR(hcon)) {
-> 		err = PTR_ERR(hcon);
-> 		goto done;
-> @@ -865,6 +865,15 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
-> 		}
-> 
-> 		sco_pi(sk)->setting = voice.setting;
-> +		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
-> +				     BDADDR_BREDR);
-> +		if (!hdev) {
-> +			err = -EBADFD;
-> +			break;
-> +		}
-> +		if (use_enhanced_sco_conn(hdev) &&
-> +		    voice.setting == BT_VOICE_TRANSPARENT)
-> +			sco_pi(sk)->codec.id = CODING_FORMAT_TRANS;
-> 		break;
+I have read this email a few times now and I am still confused on what you are asking. Can you show us a btmon trace of what is going on and how this works right now.
 
 Regards
 
