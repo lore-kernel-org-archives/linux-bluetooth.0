@@ -2,100 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C104BC47082
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:21:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC47AC47082
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:23:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A37CC6100B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:21:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9395C613F3
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  3 Jun 2021 14:23:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231424AbhFCOXa convert rfc822-to-8bit (ORCPT
+        id S231678AbhFCOZX convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jun 2021 10:23:30 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50503 "EHLO
+        Thu, 3 Jun 2021 10:25:23 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:50399 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230044AbhFCOXa (ORCPT
+        with ESMTP id S230044AbhFCOZX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jun 2021 10:23:30 -0400
+        Thu, 3 Jun 2021 10:25:23 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 795B4CED1F;
-        Thu,  3 Jun 2021 16:29:41 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4C1A6CED1F;
+        Thu,  3 Jun 2021 16:31:35 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v3 00/12] Bluetooth: correct the use of print format
+Subject: Re: [PATCH v8 1/9] Bluetooth: enumerate local supported codec and
+ cache details
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1622706065-45409-1-git-send-email-yekai13@huawei.com>
-Date:   Thu, 3 Jun 2021 16:21:43 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
+In-Reply-To: <20210518104232.5431-1-kiran.k@intel.com>
+Date:   Thu, 3 Jun 2021 16:23:37 +0200
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <BD2539CA-5475-4FD3-AB79-B4D5FA764AD9@holtmann.org>
-References: <1622706065-45409-1-git-send-email-yekai13@huawei.com>
-To:     Kai Ye <yekai13@huawei.com>
+Message-Id: <23D52481-5703-48EC-93DC-1674C0B3CBB8@holtmann.org>
+References: <20210518104232.5431-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai,
+Hi Kiran,
 
-> According to Documentation/core-api/printk-formats.rst,
-> Use the correct print format. 
-> 1. Printing an unsigned int value should use %u instead of %d.
-> 2. Printing an unsigned long value should use %lu instead of %ld.
-> Otherwise printk() might end up displaying negative numbers.
+> Move reading of supported local codecs into a separate init function,
+> query codecs capabilities and cache the data
 > 
-> changes v1 -> v2:
-> 	fix some style problems
-> changes v2 -> v3
-> 	fix some commit message style
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+> Reported-by: kernel test robot <lkp@intel.com>
+> ---
+> * changes in v8:
+>  - add comments
+>  - split __u8 codec_id[5] into {__u8 id; __le16 cid, vid }
+>  - address review comment related codec caps structure
 > 
-> Kai Ye (12):
->  Bluetooth: bnep: Use the correct print format
->  Bluetooth: cmtp: Use the correct print format
->  Bluetooth: hidp: Use the correct print format
->  Bluetooth: rfcomm: Use the correct print format
->  Bluetooth: 6lowpan: Use the correct print format
->  Bluetooth: a2mp: Use the correct print format
->  Bluetooth: amp: Use the correct print format
->  Bluetooth: hci: Use the correct print format
->  Bluetooth: mgmt: Use the correct print format
->  Bluetooth: msft: Use the correct print format
->  Bluetooth: sco: Use the correct print format
->  Bluetooth: smp: Use the correct print format
+> * changes in v7:
+>  - keep codec enumeration call in hci_init instead of having a separate
+>    function
+>  - Remove unused bitmasks defined for LE transports
 > 
-> net/bluetooth/6lowpan.c     | 16 +++++------
-> net/bluetooth/a2mp.c        | 24 ++++++++--------
-> net/bluetooth/amp.c         |  6 ++--
-> net/bluetooth/bnep/core.c   |  8 +++---
-> net/bluetooth/cmtp/capi.c   | 22 +++++++--------
-> net/bluetooth/hci_conn.c    |  8 +++---
-> net/bluetooth/hci_core.c    | 48 ++++++++++++++++----------------
-> net/bluetooth/hci_event.c   | 24 ++++++++--------
-> net/bluetooth/hci_request.c |  8 +++---
-> net/bluetooth/hci_sock.c    |  6 ++--
-> net/bluetooth/hci_sysfs.c   |  2 +-
-> net/bluetooth/hidp/core.c   |  6 ++--
-> net/bluetooth/mgmt.c        | 16 +++++------
-> net/bluetooth/mgmt_config.c |  4 +--
-> net/bluetooth/msft.c        |  2 +-
-> net/bluetooth/rfcomm/core.c | 68 ++++++++++++++++++++++-----------------------
-> net/bluetooth/rfcomm/sock.c |  8 +++---
-> net/bluetooth/rfcomm/tty.c  | 10 +++----
-> net/bluetooth/sco.c         |  8 +++---
-> net/bluetooth/smp.c         |  6 ++--
-> 20 files changed, 150 insertions(+), 150 deletions(-)
+> * changes  in v6:
+>  - fix compiler warning reported for ARCH=arc
+> 
+> * changes in v5:
+>  - fix review comments
+>  - move code used to read standard/vendor codecs caps into single function
+> 
+> * changes in v4:
+>  - convert  reading of codecs and codecs caps calls from async to sync
+> 
+> * changes in v3
+>  move codec enumeration into a new init function
+> 
+> * changes in v2
+>  add skb length check before accessing data
+> 
+> include/net/bluetooth/hci.h      |  41 +++++++
+> include/net/bluetooth/hci_core.h |  17 +++
+> net/bluetooth/hci_core.c         | 199 ++++++++++++++++++++++++++++++-
+> 3 files changed, 253 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> index c4b0650fb9ae..6cb9340a2d51 100644
+> --- a/include/net/bluetooth/hci.h
+> +++ b/include/net/bluetooth/hci.h
+> @@ -1307,6 +1307,28 @@ struct hci_rp_read_data_block_size {
+> } __packed;
+> 
+> #define HCI_OP_READ_LOCAL_CODECS	0x100b
+> +struct hci_std_codecs {
+> +	__u8	num;
+> +	__u8	codec[];
+> +} __packed;
+> +
+> +struct hci_ven_codec {
+> +	/* company id */
+> +	__le16	cid;
+> +	/* vendor codec id */
+> +	__le16	vid;
+> +} __packed;
 
-I applied all patches except 04/12 and 08/12 since they no longer apply cleanly against bluetooth-next tree.
+I am pretty sure that I said to use vnd and not ven. The shortcut ven for vendor is not something we used at all.
 
 Regards
 
