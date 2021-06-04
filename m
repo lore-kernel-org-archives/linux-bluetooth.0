@@ -2,128 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 430B4C4743C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:11:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B4920C4743D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:13:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 287AB61405
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:11:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99FDE613F9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:13:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230306AbhFDRMw (ORCPT
+        id S230111AbhFDRPT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jun 2021 13:12:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55162 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230291AbhFDRMw (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:12:52 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7897C061766;
-        Fri,  4 Jun 2021 10:11:05 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d16so7878949pfn.12;
-        Fri, 04 Jun 2021 10:11:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=A8tbCM6Wzc7qo6yZiGdsvIizSfEsRxnGz4O8sqiJL1E=;
-        b=U2sHcJfDvHRybYlqmBWoVOc2kUbloM0Fj22U0ID75V71unSVKnOkV1n7gWwKHuiR3i
-         KDyk7b54zI9xQ8FjwgiXk9atJErIuQQb6FKVB7Eb77BJ2+9gBFUHDXHlACorNGyHLRf8
-         eJ/qvlujsTM3Uio1PVUQNnHYeP9UOLvPTw82KOcd0zidGop7+os19OrEanYTQy7BRwpG
-         m6kQTnOA361m57UZWBsjyNK9T52/5xjGf+Ktw+J/0gh4Z8ncdFaqju0wA9wU++A9YNtx
-         h3lH0Oy8rn4NImDq2O7iaOehec7WogPd20Uievoc1/odZFlPOMlHOx0nZNPN3jmsDLYG
-         ZKDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=A8tbCM6Wzc7qo6yZiGdsvIizSfEsRxnGz4O8sqiJL1E=;
-        b=MMfBRrnVhu87/rzWMV5re0aikDmKWjzSPhoiiRfwCsxE00kvM7Z2M1EAgUsF8c2/jJ
-         i8e+aOEZZX9nfL6JoObBC9Lc8u8TKGeEboFG848wcVYbfheJp8ATS94awbHoX/41Ea/U
-         8zWHokKLhAJvZK84EtPJQM2gQhzJEm50+Dz8KhO8Ssr5mPE0myEheqFq6LD7dWydy+Wd
-         Gr2k8AMW5pUwvP1+hlId2JxGSZUSjPwFJwJMoyYWB/IhV7veR81vdhDYwGqJey0Prlrd
-         o2DL4pfQJxt6S0oEgRvsJjQfmiR36WdUh7qUjAaNUuEX5IAyYb8Q9mq0nhv5xclcnb7r
-         dSdw==
-X-Gm-Message-State: AOAM533tDaIRsL7qSYwu+5uKpOepmq3a3r6HWYbltMR3ydzp1MM3sa+b
-        hIccAt8nyqUW1u0Ksg1Yy6FOhyABtudzDw==
-X-Google-Smtp-Source: ABdhPJxr7r4TPZT2RlU+7Vw9eF/0wjpRiGfvOF4ixcZJKCfj9q7r3PmbqxkPki6kZloqHf03ymw0Vw==
-X-Received: by 2002:aa7:8888:0:b029:2ec:763f:4bcc with SMTP id z8-20020aa788880000b02902ec763f4bccmr5473095pfe.35.1622826665260;
-        Fri, 04 Jun 2021 10:11:05 -0700 (PDT)
-Received: from [192.168.1.41] (096-040-190-174.res.spectrum.com. [96.40.190.174])
-        by smtp.gmail.com with ESMTPSA id x15sm2279010pfd.121.2021.06.04.10.11.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 04 Jun 2021 10:11:04 -0700 (PDT)
-Subject: Re: KASAN: use-after-free Read in hci_chan_del
-To:     Greg KH <gregkh@linuxfoundation.org>
-Cc:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-References: <000000000000adea7f05abeb19cf@google.com>
- <c2004663-e54a-7fbc-ee19-b2749549e2dd@gmail.com> <YLn24sFxJqGDNBii@kroah.com>
-From:   SyzScope <syzscope@gmail.com>
-Message-ID: <0f489a64-f080-2f89-6e4a-d066aeaea519@gmail.com>
-Date:   Fri, 4 Jun 2021 10:11:03 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Fri, 4 Jun 2021 13:15:19 -0400
+Received: from foss.arm.com ([217.140.110.172]:43982 "EHLO foss.arm.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229878AbhFDRPT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 4 Jun 2021 13:15:19 -0400
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9278B1063;
+        Fri,  4 Jun 2021 10:13:32 -0700 (PDT)
+Received: from slackpad.fritz.box (unknown [172.31.20.19])
+        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 387D03F73D;
+        Fri,  4 Jun 2021 10:13:30 -0700 (PDT)
+Date:   Fri, 4 Jun 2021 18:13:22 +0100
+From:   Andre Przywara <andre.przywara@arm.com>
+To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Ondrej Jirman <megous@megous.com>,
+        Chen-Yu Tsai <wens@csie.org>,
+        Maxime Ripard <mripard@kernel.org>,
+        Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>,
+        Jiri Slaby <jirislaby@kernel.org>,
+        linux-serial@vger.kernel.org,
+        Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-sunxi@lists.linux.dev,
+        Josh Triplett <josh@joshtriplett.org>, tuxd3v@sapo.pt,
+        Rob Herring <robh@kernel.org>
+Subject: Re: sunxi: Bluetooth broken since 5.6-rc1
+Message-ID: <20210604181322.52a26de8@slackpad.fritz.box>
+In-Reply-To: <20210531144136.GS30436@shell.armlinux.org.uk>
+References: <20210530173454.5ab1dcf5@slackpad.fritz.box>
+        <YLTi8iYdLiKNeaLC@kroah.com>
+        <20210531144136.GS30436@shell.armlinux.org.uk>
+Organization: Arm Ltd.
+X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
 MIME-Version: 1.0
-In-Reply-To: <YLn24sFxJqGDNBii@kroah.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+On Mon, 31 May 2021 15:41:36 +0100
+"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+
 Hi Greg,
 
-> Who is working on and doing this "reseach project"?
-We are a group of researchers from University of California, Riverside 
-(we introduced ourselves in an earlier email to security@kernel.org if 
-you recall).  Please allow us to articulate the goal of our research. 
-We'd be happy to hear your feedback and suggestions.
+> On Mon, May 31, 2021 at 03:21:54PM +0200, Greg Kroah-Hartman wrote:
+> > On Sun, May 30, 2021 at 05:34:54PM +0100, Andre Przywara wrote:  
+> > > An obvious easy hack-fix is to just define
+> > > CONFIG_SERIAL_8250_16550A_VARIANTS, which brings the delays back and
+> > > seems to avoid the problem for me.
+> > > Another hack which seems to mitigate the problem is to avoid switching
+> > > the baudrate to something faster than 115200.
+> > > 
+> > > I observed this on a BananaPi-M64 (Allwinner A64 SoC with AP6212 WiFi/BT
+> > > chip), but others reported the same issue on a NanoPi Air (Allwinner H3
+> > > with 6212), but also other SoCs and devices (at least one AP6210).
+> > > 
+> > > Obviously those workarounds are not real solutions, and I was
+> > > wondering if anybody has an idea how to properly fix this?
+> > > What puzzles me is that the delay is happening during the *UART*
+> > > probe, so before we even start dealing with the Bluetooth device.  
+> > 
+> > What type of bluetooth device is this, and what does it have to do with
+> > the serial port?  Is the SoC device using the same IP blocks for both?  
+> 
+> Many bluetooth "devices" (I mean the interface from the local machine
+> to the BT world, not as in remote devices) are connected through a
+> standard UART. Pictorially, it's:
+> 
+>   CPU <---> UART <---> BT chip <---> Bluetooth RF world
+> 
+> The reporter seems to be saying is that a change to the UART driver now
+> means that the bluetooth chip wired to that UART no longer functions due
+> to slightly different initialisation timings of the host UART.
 
-> And what is it
-> doing to actually fix the issues that syzbot finds?  Seems like that
-> would be a better solution instead of just trying to send emails saying,
-> in short "why isn't this reported issue fixed yet?"
- From our limited understanding, we know a key problem with syzbot bugs 
-is that there are too many of them - more than what can be handled by 
-developers and maintainers. Therefore, it seems some form of 
-prioritization on bug fixing would be helpful. The goal of the SyzScope 
-project is to *automatically* analyze the security impact of syzbot 
-bugs, which helps with prioritizing bug fixes. In other words, when a 
-syzbot bug is reported, we aim to attach a corresponding security impact 
-"signal" to help developers make an informed decision on which ones to 
-fix first.
+Yes, exactly, thanks Russell for clarifying this.
+How this works (when it does) is that the UART driver probes, then we
+look at the children of the UART devicetree node, to probe for those, by
+virtue of the serdev bus.
 
-Currently,  SyzScope is a standalone prototype system that we plan to 
-open source. We hope to keep developing it to make it more and more 
-useful and have it eventually integrated into syzbot (we are in talks 
-with Dmitry).
+My question was about if this rings a bell with someone, because I have
+a hard time piecing together how a delay in the *UART probe* could
+affect devices depending on it. And how to fix this ...
 
-We are happy to talk more offline (perhaps even in a zoom meeting if you 
-would like). Thanks in advance for any feedback and suggestions you may 
-have.
+Cheers,
+Andre
 
-
-On 6/4/2021 2:48 AM, Greg KH wrote:
-> On Tue, May 04, 2021 at 02:50:03PM -0700, ETenal wrote:
->> Hi,
->>
->> This is SyzScope, a research project that aims to reveal high-risk
->> primitives from a seemingly low-risk bug (UAF/OOB read, WARNING, BUG, etc.).
-> Who is working on and doing this "reseach project"?  And what is it
-> doing to actually fix the issues that syzbot finds?  Seems like that
-> would be a better solution instead of just trying to send emails saying,
-> in short "why isn't this reported issue fixed yet?"
->
-> thanks,
->
-> greg k-h
->
