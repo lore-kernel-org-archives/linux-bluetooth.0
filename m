@@ -2,88 +2,63 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73176C47083
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 09:09:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A13BCC07E94
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 09:48:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B82B61418
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 09:09:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A44B61405
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 09:48:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230075AbhFDJLc (ORCPT
+        id S230015AbhFDJuH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jun 2021 05:11:32 -0400
-Received: from mslow1.mail.gandi.net ([217.70.178.240]:37209 "EHLO
-        mslow1.mail.gandi.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbhFDJLc (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jun 2021 05:11:32 -0400
-Received: from relay9-d.mail.gandi.net (unknown [217.70.183.199])
-        by mslow1.mail.gandi.net (Postfix) with ESMTP id C8F9AC74FD;
-        Fri,  4 Jun 2021 09:09:44 +0000 (UTC)
-Received: (Authenticated sender: hadess@hadess.net)
-        by relay9-d.mail.gandi.net (Postfix) with ESMTPSA id 14349FF804;
-        Fri,  4 Jun 2021 09:09:19 +0000 (UTC)
-Message-ID: <1fc00ee63fcb2be29148e33be1f013a154caf287.camel@hadess.net>
-Subject: Re: [PATCH v3 1/3] Bluetooth: use inclusive language in HCI role
- comments
-From:   Bastien Nocera <hadess@hadess.net>
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        LKML <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Date:   Fri, 04 Jun 2021 11:09:19 +0200
-In-Reply-To: <CAJQfnxHtgsCTS5GCTj-p4iqaR=jZVPho1ELgFQ6-UngZcBECig@mail.gmail.com>
-References: <20210604162616.v3.1.I444f42473f263fed77f2586eb4b01d6752df0de4@changeid>
-         <fc36d07a8f148a45c61225fefdd440313ee723d0.camel@hadess.net>
-         <CAJQfnxHtgsCTS5GCTj-p4iqaR=jZVPho1ELgFQ6-UngZcBECig@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.1 (3.40.1-1.fc34) 
+        Fri, 4 Jun 2021 05:50:07 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43738 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229930AbhFDJuH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 4 Jun 2021 05:50:07 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id AE6326023E;
+        Fri,  4 Jun 2021 09:48:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1622800101;
+        bh=K/Vyl1hSa3J6uLFGe/60MlgbY2CmEQ5E1ho03Zn5iZU=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=UP7J6m5qQDDBxUTV35zuTvUbNtiT02kANk8rWwRVpBO4Os5PQw7I1j7sXrK5a9B5M
+         B3sL3x74ADZwlASjKwXBfzV801R3p3VNDCZjWMR6vbSUN4gmkO6Irx9hFWN7sUsk8O
+         MCACtfSU+mIllQGxbP+8OZ5tVSVIpJpUBz7scXLc=
+Date:   Fri, 4 Jun 2021 11:48:18 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     ETenal <etenalcxz@gmail.com>
+Cc:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: KASAN: use-after-free Read in hci_chan_del
+Message-ID: <YLn24sFxJqGDNBii@kroah.com>
+References: <000000000000adea7f05abeb19cf@google.com>
+ <c2004663-e54a-7fbc-ee19-b2749549e2dd@gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <c2004663-e54a-7fbc-ee19-b2749549e2dd@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 2021-06-04 at 16:56 +0800, Archie Pusaka wrote:
-> Hi Bastien,
+On Tue, May 04, 2021 at 02:50:03PM -0700, ETenal wrote:
+> Hi,
 > 
-> Thanks! That was a great input.
-> I'm not sure though, do we have a standard, proper way to deprecate
-> macros?
-> Or does a simple /* deprecated */ comment works for now?
+> This is SyzScope, a research project that aims to reveal high-risk
+> primitives from a seemingly low-risk bug (UAF/OOB read, WARNING, BUG, etc.).
 
-I think we might need to add #ifdef around those instead unfortunately,
-something like "#ifndef BLUETOOTH_NO_DEPRECATED_CONSTANTS" around the
-old names.
+Who is working on and doing this "reseach project"?  And what is it
+doing to actually fix the issues that syzbot finds?  Seems like that
+would be a better solution instead of just trying to send emails saying,
+in short "why isn't this reported issue fixed yet?"
 
-> 
-> Cheers,
-> Archie
-> 
-> 
-> On Fri, 4 Jun 2021 at 16:39, Bastien Nocera <hadess@hadess.net>
-> wrote:
-> > 
-> > On Fri, 2021-06-04 at 16:26 +0800, Archie Pusaka wrote:
-> > > 
-> > > The #define preprocessor terms are unchanged for now to not
-> > > disturb
-> > > dependent APIs.
-> > 
-> > Could we add new defines, and deprecate the old ones? Something
-> > akin
-> > to that would help migrate the constants, over time:
-> > https://gitlab.gnome.org/GNOME/glib/blob/master/glib/gmacros.h#L686-716
-> > 
+thanks,
 
-
+greg k-h
