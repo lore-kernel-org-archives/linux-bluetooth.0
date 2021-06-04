@@ -2,256 +2,198 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CFC5C47096
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 02:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31246C07E94
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64DB06140B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 02:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B5A56141D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229769AbhFDCa2 (ORCPT
+        id S230041AbhFDI3U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 3 Jun 2021 22:30:28 -0400
-Received: from mga12.intel.com ([192.55.52.136]:18196 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229576AbhFDCa1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 3 Jun 2021 22:30:27 -0400
-IronPort-SDR: 7iqgzcYa/mkLQkS6g/eHX6gtRpkB+gt+8ctbx5jyG87H3TSUqqUqhGRBhZXJg2MlKPUgOWmI4o
- HPGUxo/v8Cbw==
-X-IronPort-AV: E=McAfee;i="6200,9189,10004"; a="183890280"
-X-IronPort-AV: E=Sophos;i="5.83,246,1616482800"; 
-   d="scan'208";a="183890280"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jun 2021 19:28:39 -0700
-IronPort-SDR: 8Tkyly0ENbdgptwi67PBMCos4ZGhjjnpG97vuuPJakpJPfum3Q6tWTAOFjJdu0PQMQym4Yhtnz
- 7LWGraPS6AWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,246,1616482800"; 
-   d="scan'208";a="483724613"
-Received: from lkp-server02.sh.intel.com (HELO 1ec8406c5392) ([10.239.97.151])
-  by fmsmga002.fm.intel.com with ESMTP; 03 Jun 2021 19:28:37 -0700
-Received: from kbuild by 1ec8406c5392 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1lozZd-0006ak-7O; Fri, 04 Jun 2021 02:28:37 +0000
-Date:   Fri, 04 Jun 2021 10:28:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- e62473c516b6bf2a9adb2bb37bdab1ae0f4a0511
-Message-ID: <60b98fc7.fOmoUJlr6krXIMzq%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Fri, 4 Jun 2021 04:29:20 -0400
+Received: from mail-qt1-f201.google.com ([209.85.160.201]:40950 "EHLO
+        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229996AbhFDI3T (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 4 Jun 2021 04:29:19 -0400
+Received: by mail-qt1-f201.google.com with SMTP id a12-20020ac8108c0000b029023c90fba3dcso4744328qtj.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jun 2021 01:27:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=rkwFW1rTtpipvPo2i45vrrpv7tHxndFtqZdOdDuII3A=;
+        b=TqrRKVn7by4f57Ty0NBYM9ZQi0Yel60OrNYMMrjdSVWyfN/pZriGeyU44PbO89UH+P
+         KcXpb6FIgJGL4eZm6mJ2RjgoXhiQCswQJfQwdDai4ATO9xluo0Rry/txCJsBUnpF+h4y
+         NPHqWomi88TH4sHmoUCSGUoPfgt2GJgFv7fYazgcXz4lL+ApLzKomWX6tKnyQ1D/8vG7
+         LTYS8oIpLAl5ZA0AYkSW6gCY8u26jL9khDnOPV6B/ZamX9UXq0PpyOw/bVlVYCHlJfl/
+         pG/Bbo+7XPbMbjumsX6r9K6hc4QSAobk1RJviQ2TkGIJ0rUs8OtvzupajxV4OdlfiUOM
+         DPeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=rkwFW1rTtpipvPo2i45vrrpv7tHxndFtqZdOdDuII3A=;
+        b=QRHzjqhJZ9DIAO4xoMV3YfA+YscvISX1y6U4AVQzpQ82rhMsBnHiuUcyMaVmmRV8ud
+         Aszgk3L8b8YZ4gPBxkbaZrVQkV2KLBulJE69LbLyOec9+fVVaUd9N1kqyw+/sWSl44Dc
+         bBAgk8dpezEg5kLFmMBFzX5sqXVp2NJv6a4Sl3RufdTg0W9Zuxnqhnw/oO60msg9KJa6
+         AW/g8T6jTMed/uBorfs399MViLODeSN9phc8OVx8cuDIIe4n19rulslmTf3RSInD7xZY
+         zH4LsOGgYRzYK1LIYb1uE1iEZXjP7ZtWhIzCWxzIsqp+CMRcB31EmBgq70VlM8wJmRog
+         9K8g==
+X-Gm-Message-State: AOAM533+Lh+lNDLJGoZ4MV6fIX1w+PdTzXEDoZc1bnpN4NclzMvtax/+
+        51fsqW5YdXg61Doec/fS4BX00PNS46OcHjeFrBhrI7BlYMS9PhFM5UzihhRB61HFi9q/PvqYST6
+        ZbGQ2iCTua6SfjJjt5qec1T8L5+20+E9MD2vDwJO2kM76HPGbS/JHn+yzWka0Bv4TNV5nS93VlM
+        Rw
+X-Google-Smtp-Source: ABdhPJy79J6o/QLMeaKcj/RXYOyZshshwOG8QXnezqwQnLqPs+Ls7Rbq+Jrw45UofuZH6InyGCdACZ3fMjbT
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:c6ff:1ed3:74cf:2ae3])
+ (user=apusaka job=sendgmr) by 2002:a0c:d80f:: with SMTP id
+ h15mr3586315qvj.17.1622795193532; Fri, 04 Jun 2021 01:26:33 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 16:26:25 +0800
+Message-Id: <20210604162616.v3.1.I444f42473f263fed77f2586eb4b01d6752df0de4@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
+Subject: [PATCH v3 1/3] Bluetooth: use inclusive language in HCI role comments
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: e62473c516b6bf2a9adb2bb37bdab1ae0f4a0511  Bluetooth: smp: Use the correct print format
+From: Archie Pusaka <apusaka@chromium.org>
 
-elapsed time: 721m
+This patch replaces some non-inclusive terms based on the appropriate
+language mapping table compiled by the Bluetooth SIG:
+https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 
-configs tested: 185
-configs skipped: 2
+Specifically, these terms are replaced:
+master -> initiator (for smp) or central (everything else)
+slave  -> responder (for smp) or peripheral (everything else)
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+The #define preprocessor terms are unchanged for now to not disturb
+dependent APIs.
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-arm                         socfpga_defconfig
-arm                            qcom_defconfig
-sh                          sdk7786_defconfig
-mips                       rbtx49xx_defconfig
-mips                        vocore2_defconfig
-mips                           ip27_defconfig
-powerpc                      pasemi_defconfig
-m68k                       m5249evb_defconfig
-arm                         lpc32xx_defconfig
-nios2                            alldefconfig
-arm                      tct_hammer_defconfig
-powerpc                      cm5200_defconfig
-mips                       capcella_defconfig
-ia64                      gensparse_defconfig
-sh                            hp6xx_defconfig
-sh                         ap325rxa_defconfig
-powerpc                 xes_mpc85xx_defconfig
-sh                         apsh4a3a_defconfig
-arc                         haps_hs_defconfig
-arm                         mv78xx0_defconfig
-sh                         ecovec24_defconfig
-arc                                 defconfig
-powerpc                    amigaone_defconfig
-arc                 nsimosci_hs_smp_defconfig
-sh                   sh7770_generic_defconfig
-m68k                       m5275evb_defconfig
-powerpc                 mpc836x_mds_defconfig
-m68k                        m5407c3_defconfig
-m68k                        mvme16x_defconfig
-arc                    vdk_hs38_smp_defconfig
-powerpc                      katmai_defconfig
-mips                         mpc30x_defconfig
-powerpc                      acadia_defconfig
-powerpc64                        alldefconfig
-arm                          collie_defconfig
-arc                     nsimosci_hs_defconfig
-m68k                             alldefconfig
-arm                         lpc18xx_defconfig
-arc                      axs103_smp_defconfig
-sh                        dreamcast_defconfig
-arm                         s3c6400_defconfig
-sparc                       sparc32_defconfig
-powerpc                     tqm8540_defconfig
-mips                           rs90_defconfig
-m68k                         amcore_defconfig
-arm                        cerfcube_defconfig
-powerpc                 canyonlands_defconfig
-powerpc                 mpc832x_rdb_defconfig
-powerpc                        warp_defconfig
-arm                        neponset_defconfig
-nios2                         3c120_defconfig
-powerpc                      pcm030_defconfig
-powerpc                   lite5200b_defconfig
-arm                           u8500_defconfig
-um                                  defconfig
-nds32                             allnoconfig
-powerpc                      walnut_defconfig
-mips                      pic32mzda_defconfig
-mips                           jazz_defconfig
-mips                malta_qemu_32r6_defconfig
-powerpc                      tqm8xx_defconfig
-sh                          urquell_defconfig
-arm                  colibri_pxa270_defconfig
-um                            kunit_defconfig
-mips                       bmips_be_defconfig
-powerpc                     mpc83xx_defconfig
-mips                  decstation_64_defconfig
-xtensa                    xip_kc705_defconfig
-powerpc                 mpc8560_ads_defconfig
-arm                           sunxi_defconfig
-mips                           mtx1_defconfig
-sh                           se7712_defconfig
-powerpc                     rainier_defconfig
-arm                         orion5x_defconfig
-powerpc                     mpc5200_defconfig
-powerpc                 mpc834x_itx_defconfig
-arm                           stm32_defconfig
-powerpc                 mpc85xx_cds_defconfig
-mips                  cavium_octeon_defconfig
-powerpc                  storcenter_defconfig
-arm                         palmz72_defconfig
-mips                          rb532_defconfig
-powerpc                    sam440ep_defconfig
-arm                         s5pv210_defconfig
-sh                          lboxre2_defconfig
-mips                         tb0219_defconfig
-mips                     loongson2k_defconfig
-arc                              alldefconfig
-mips                      pistachio_defconfig
-sh                        sh7757lcr_defconfig
-arm                      pxa255-idp_defconfig
-arm                           spitz_defconfig
-arm                        vexpress_defconfig
-arm                           viper_defconfig
-sh                   rts7751r2dplus_defconfig
-arm                          simpad_defconfig
-riscv                            allyesconfig
-arm                          exynos_defconfig
-arm                           tegra_defconfig
-sh                  sh7785lcr_32bit_defconfig
-powerpc                      bamboo_defconfig
-powerpc                       ppc64_defconfig
-arc                        nsimosci_defconfig
-ia64                                defconfig
-x86_64                              defconfig
-powerpc                     skiroot_defconfig
-mips                 decstation_r4k_defconfig
-powerpc                         ps3_defconfig
-sh                           se7206_defconfig
-powerpc                    gamecube_defconfig
-mips                      maltasmvp_defconfig
-m68k                        stmark2_defconfig
-x86_64                            allnoconfig
-ia64                             allmodconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-i386                 randconfig-a003-20210603
-i386                 randconfig-a006-20210603
-i386                 randconfig-a004-20210603
-i386                 randconfig-a001-20210603
-i386                 randconfig-a002-20210603
-i386                 randconfig-a005-20210603
-x86_64               randconfig-a015-20210603
-x86_64               randconfig-a011-20210603
-x86_64               randconfig-a012-20210603
-x86_64               randconfig-a014-20210603
-x86_64               randconfig-a016-20210603
-x86_64               randconfig-a013-20210603
-i386                 randconfig-a015-20210603
-i386                 randconfig-a013-20210603
-i386                 randconfig-a011-20210603
-i386                 randconfig-a016-20210603
-i386                 randconfig-a014-20210603
-i386                 randconfig-a012-20210603
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
-
-clang tested configs:
-x86_64               randconfig-b001-20210603
-x86_64               randconfig-a002-20210603
-x86_64               randconfig-a004-20210603
-x86_64               randconfig-a003-20210603
-x86_64               randconfig-a006-20210603
-x86_64               randconfig-a005-20210603
-x86_64               randconfig-a001-20210603
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+
+Changes in v3:
+* Remove the #define terms from change
+
+ net/bluetooth/hci_conn.c   | 8 ++++----
+ net/bluetooth/hci_event.c  | 6 +++---
+ net/bluetooth/l2cap_core.c | 2 +-
+ net/bluetooth/smp.c        | 6 +++---
+ 4 files changed, 11 insertions(+), 11 deletions(-)
+
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index ea0f9cdaa6b1..2b5059a56cda 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -257,7 +257,7 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
+ {
+ 	BT_DBG("hcon %p", conn);
+ 
+-	/* When we are master of an established connection and it enters
++	/* When we are central of an established connection and it enters
+ 	 * the disconnect timeout, then go ahead and try to read the
+ 	 * current clock offset.  Processing of the result is done
+ 	 * within the event handling and hci_clock_offset_evt function.
+@@ -1109,9 +1109,9 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 
+ 	hci_req_init(&req, hdev);
+ 
+-	/* Disable advertising if we're active. For master role
++	/* Disable advertising if we're active. For central role
+ 	 * connections most controllers will refuse to connect if
+-	 * advertising is enabled, and for slave role connections we
++	 * advertising is enabled, and for peripheral role connections we
+ 	 * anyway have to disable it in order to start directed
+ 	 * advertising. Any registered advertisements will be
+ 	 * re-enabled after the connection attempt is finished.
+@@ -1119,7 +1119,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+ 		__hci_req_pause_adv_instances(&req);
+ 
+-	/* If requested to connect as slave use directed advertising */
++	/* If requested to connect as peripheral use directed advertising */
+ 	if (conn->role == HCI_ROLE_SLAVE) {
+ 		/* If we're active scanning most controllers are unable
+ 		 * to initiate advertising. Simply reject the attempt.
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 43c324c46c0b..da013d485f14 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2795,9 +2795,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		bacpy(&cp.bdaddr, &ev->bdaddr);
+ 
+ 		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
+-			cp.role = 0x00; /* Become master */
++			cp.role = 0x00; /* Become central */
+ 		else
+-			cp.role = 0x01; /* Remain slave */
++			cp.role = 0x01; /* Remain peripheral */
+ 
+ 		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
+ 	} else if (!(flags & HCI_PROTO_DEFER)) {
+@@ -5131,7 +5131,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
+ 		conn->dst_type = bdaddr_type;
+ 
+ 		/* If we didn't have a hci_conn object previously
+-		 * but we're in master role this must be something
++		 * but we're in central role this must be something
+ 		 * initiated using a white list. Since white list based
+ 		 * connections are not "first class citizens" we don't
+ 		 * have full tracking of them. Therefore, we go ahead
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 9ebb85df4db4..b76c5d00b082 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -1691,7 +1691,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
+ 	if (hcon->out)
+ 		smp_conn_security(hcon, hcon->pending_sec_level);
+ 
+-	/* For LE slave connections, make sure the connection interval
++	/* For LE peripheral connections, make sure the connection interval
+ 	 * is in the range of the minimum and maximum interval that has
+ 	 * been configured for this connection. If not, then trigger
+ 	 * the connection update procedure.
+diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
+index 6777f5313838..53f984d11bc1 100644
+--- a/net/bluetooth/smp.c
++++ b/net/bluetooth/smp.c
+@@ -909,8 +909,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
+ 			hcon->pending_sec_level = BT_SECURITY_HIGH;
+ 	}
+ 
+-	/* If both devices have Keyoard-Display I/O, the master
+-	 * Confirms and the slave Enters the passkey.
++	/* If both devices have Keyboard-Display I/O, the initiator
++	 * Confirms and the responder Enters the passkey.
+ 	 */
+ 	if (smp->method == OVERLAP) {
+ 		if (hcon->role == HCI_ROLE_MASTER)
+@@ -3083,7 +3083,7 @@ static void bredr_pairing(struct l2cap_chan *chan)
+ 	if (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
+ 		return;
+ 
+-	/* Only master may initiate SMP over BR/EDR */
++	/* Only initiator may initiate SMP over BR/EDR */
+ 	if (hcon->role != HCI_ROLE_MASTER)
+ 		return;
+ 
+-- 
+2.32.0.rc1.229.g3e70b5a671-goog
+
