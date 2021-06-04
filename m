@@ -8,60 +8,65 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31246C07E94
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA7E4C07E94
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B5A56141D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A4DA61414
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 08:27:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230041AbhFDI3U (ORCPT
+        id S230270AbhFDI32 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jun 2021 04:29:20 -0400
-Received: from mail-qt1-f201.google.com ([209.85.160.201]:40950 "EHLO
-        mail-qt1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229996AbhFDI3T (ORCPT
+        Fri, 4 Jun 2021 04:29:28 -0400
+Received: from mail-yb1-f202.google.com ([209.85.219.202]:42582 "EHLO
+        mail-yb1-f202.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229996AbhFDI31 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jun 2021 04:29:19 -0400
-Received: by mail-qt1-f201.google.com with SMTP id a12-20020ac8108c0000b029023c90fba3dcso4744328qtj.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jun 2021 01:27:33 -0700 (PDT)
+        Fri, 4 Jun 2021 04:29:27 -0400
+Received: by mail-yb1-f202.google.com with SMTP id 22-20020a250d160000b0290532b914c9f4so10631710ybn.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jun 2021 01:27:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=rkwFW1rTtpipvPo2i45vrrpv7tHxndFtqZdOdDuII3A=;
-        b=TqrRKVn7by4f57Ty0NBYM9ZQi0Yel60OrNYMMrjdSVWyfN/pZriGeyU44PbO89UH+P
-         KcXpb6FIgJGL4eZm6mJ2RjgoXhiQCswQJfQwdDai4ATO9xluo0Rry/txCJsBUnpF+h4y
-         NPHqWomi88TH4sHmoUCSGUoPfgt2GJgFv7fYazgcXz4lL+ApLzKomWX6tKnyQ1D/8vG7
-         LTYS8oIpLAl5ZA0AYkSW6gCY8u26jL9khDnOPV6B/ZamX9UXq0PpyOw/bVlVYCHlJfl/
-         pG/Bbo+7XPbMbjumsX6r9K6hc4QSAobk1RJviQ2TkGIJ0rUs8OtvzupajxV4OdlfiUOM
-         DPeQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=+AyhPjQAPW++p5K3nJ03WOoCDBfn/0eNV9Q9A7qWaqw=;
+        b=b7GtoEq98rIjsqgXlDNOWMrCe5aDE2gemhqDuDRVfKbICCzjeNUg5BKLC7B1Q7Qwp+
+         w5ohxdM+zHtWGR2boYr3j9b+KHrSH62g/rGgpg5FjQXL53cYiDEiMeA3g/Brib1nwOZ6
+         CPcHVMmw7uDynDA27Rq4UQnqyQS0v/enq+5B3k33nKMQfb0yPsfZ2U0r648ApIuklfpM
+         d/odMHgWIwkQ5kQu3HYOAbRArgKKvTex0+VAIyVLqLEMkjU5U4bEIF/oAnzI/oVGFwSr
+         0VwHcCCCkeFBnJEzi4GSNY9iOhC7wTuUs3zy08lrpHWQop5uIbgx5XYYRVth3gp64p5U
+         pC8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=rkwFW1rTtpipvPo2i45vrrpv7tHxndFtqZdOdDuII3A=;
-        b=QRHzjqhJZ9DIAO4xoMV3YfA+YscvISX1y6U4AVQzpQ82rhMsBnHiuUcyMaVmmRV8ud
-         Aszgk3L8b8YZ4gPBxkbaZrVQkV2KLBulJE69LbLyOec9+fVVaUd9N1kqyw+/sWSl44Dc
-         bBAgk8dpezEg5kLFmMBFzX5sqXVp2NJv6a4Sl3RufdTg0W9Zuxnqhnw/oO60msg9KJa6
-         AW/g8T6jTMed/uBorfs399MViLODeSN9phc8OVx8cuDIIe4n19rulslmTf3RSInD7xZY
-         zH4LsOGgYRzYK1LIYb1uE1iEZXjP7ZtWhIzCWxzIsqp+CMRcB31EmBgq70VlM8wJmRog
-         9K8g==
-X-Gm-Message-State: AOAM533+Lh+lNDLJGoZ4MV6fIX1w+PdTzXEDoZc1bnpN4NclzMvtax/+
-        51fsqW5YdXg61Doec/fS4BX00PNS46OcHjeFrBhrI7BlYMS9PhFM5UzihhRB61HFi9q/PvqYST6
-        ZbGQ2iCTua6SfjJjt5qec1T8L5+20+E9MD2vDwJO2kM76HPGbS/JHn+yzWka0Bv4TNV5nS93VlM
-        Rw
-X-Google-Smtp-Source: ABdhPJy79J6o/QLMeaKcj/RXYOyZshshwOG8QXnezqwQnLqPs+Ls7Rbq+Jrw45UofuZH6InyGCdACZ3fMjbT
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=+AyhPjQAPW++p5K3nJ03WOoCDBfn/0eNV9Q9A7qWaqw=;
+        b=E0rWA5JoLCc2n7FVmzI9RhcPWM7BmkpUiwe7gV+iAbVaYk7yCTlHUc4RDkdB78qyX+
+         POib2FeK91LEe0eBZkujyh0DGcdqsct5Vmtr34Pd3xs/vVeoCNSPEeDFF87WIvxDHYxv
+         EVzOn87qRCLujODQCyrhtXfpBB5HxkW3oCE9x6BABoIOuPdmfZe5yAResnXiznnCAJ3P
+         Bkd8vAoXbmj+/e76qRmeUWVZGzIIz+E6PWW3/dD1p+fR2i/3/PlzKnuIKgmHke4TtCa+
+         Uh9kVRFD8odBIYQejdoAmLHHKltk6LmI+Z3pVOLC75psUMUjCsPQ05Awi+JFeU7GLDke
+         wCoA==
+X-Gm-Message-State: AOAM533L8iBHjwQAEVVBWNW/12mA066ARHIHzo2yyfUqDnLlX7m8rVBC
+        gc+HLLMJFCfvGE8/rmkLZZAGLmAdo/KFmY/2YApWyvRuU8ij+0xthypXmUmlnJbJdv3UplVqcTk
+        YEJKm7vvs9UKluXVKCj31xemiBmc1AnwtuJHQs560rqXnEQUf27wsHRxuQ5GwZBKfn1NGBW2Q6W
+        VP
+X-Google-Smtp-Source: ABdhPJxQUzOTMWH90q4/iupjoGoNEQgxTDc/V+R7TgCPjXrBYMGDO2l3RzihTA3ngt5CUfaLCxBwZTE8MO6o
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:b:c6ff:1ed3:74cf:2ae3])
- (user=apusaka job=sendgmr) by 2002:a0c:d80f:: with SMTP id
- h15mr3586315qvj.17.1622795193532; Fri, 04 Jun 2021 01:26:33 -0700 (PDT)
-Date:   Fri,  4 Jun 2021 16:26:25 +0800
-Message-Id: <20210604162616.v3.1.I444f42473f263fed77f2586eb4b01d6752df0de4@changeid>
+ (user=apusaka job=sendgmr) by 2002:a25:b8c5:: with SMTP id
+ g5mr3784584ybm.57.1622795201615; Fri, 04 Jun 2021 01:26:41 -0700 (PDT)
+Date:   Fri,  4 Jun 2021 16:26:26 +0800
+In-Reply-To: <20210604162616.v3.1.I444f42473f263fed77f2586eb4b01d6752df0de4@changeid>
+Message-Id: <20210604162616.v3.2.I4401b43eaf53e45e02ccaadef43cdcd3396173be@changeid>
 Mime-Version: 1.0
+References: <20210604162616.v3.1.I444f42473f263fed77f2586eb4b01d6752df0de4@changeid>
 X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [PATCH v3 1/3] Bluetooth: use inclusive language in HCI role comments
+Subject: [PATCH v3 2/3] Bluetooth: use inclusive language when tracking connections
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
 Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
@@ -79,121 +84,113 @@ language mapping table compiled by the Bluetooth SIG:
 https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 
 Specifically, these terms are replaced:
-master -> initiator (for smp) or central (everything else)
-slave  -> responder (for smp) or peripheral (everything else)
-
-The #define preprocessor terms are unchanged for now to not disturb
-dependent APIs.
+master -> central
+slave  -> peripheral
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 
 ---
 
 Changes in v3:
-* Remove the #define terms from change
+* Resolve conflict
 
- net/bluetooth/hci_conn.c   | 8 ++++----
- net/bluetooth/hci_event.c  | 6 +++---
- net/bluetooth/l2cap_core.c | 2 +-
- net/bluetooth/smp.c        | 6 +++---
- 4 files changed, 11 insertions(+), 11 deletions(-)
+Changes in v2:
+* Add details in commit message
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index ea0f9cdaa6b1..2b5059a56cda 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -257,7 +257,7 @@ int hci_disconnect(struct hci_conn *conn, __u8 reason)
- {
- 	BT_DBG("hcon %p", conn);
+ include/net/bluetooth/hci_core.h |  6 +++---
+ net/bluetooth/hci_event.c        |  4 ++--
+ net/bluetooth/hci_request.c      | 17 +++++++++--------
+ 3 files changed, 14 insertions(+), 13 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index c9ec06997e1c..fe5f3a9d9924 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -122,7 +122,7 @@ struct hci_conn_hash {
+ 	unsigned int     amp_num;
+ 	unsigned int     sco_num;
+ 	unsigned int     le_num;
+-	unsigned int     le_num_slave;
++	unsigned int     le_num_peripheral;
+ };
  
--	/* When we are master of an established connection and it enters
-+	/* When we are central of an established connection and it enters
- 	 * the disconnect timeout, then go ahead and try to read the
- 	 * current clock offset.  Processing of the result is done
- 	 * within the event handling and hci_clock_offset_evt function.
-@@ -1109,9 +1109,9 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 
- 	hci_req_init(&req, hdev);
- 
--	/* Disable advertising if we're active. For master role
-+	/* Disable advertising if we're active. For central role
- 	 * connections most controllers will refuse to connect if
--	 * advertising is enabled, and for slave role connections we
-+	 * advertising is enabled, and for peripheral role connections we
- 	 * anyway have to disable it in order to start directed
- 	 * advertising. Any registered advertisements will be
- 	 * re-enabled after the connection attempt is finished.
-@@ -1119,7 +1119,7 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
- 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
- 		__hci_req_pause_adv_instances(&req);
- 
--	/* If requested to connect as slave use directed advertising */
-+	/* If requested to connect as peripheral use directed advertising */
- 	if (conn->role == HCI_ROLE_SLAVE) {
- 		/* If we're active scanning most controllers are unable
- 		 * to initiate advertising. Simply reject the attempt.
+ struct bdaddr_list {
+@@ -894,7 +894,7 @@ static inline void hci_conn_hash_add(struct hci_dev *hdev, struct hci_conn *c)
+ 	case LE_LINK:
+ 		h->le_num++;
+ 		if (c->role == HCI_ROLE_SLAVE)
+-			h->le_num_slave++;
++			h->le_num_peripheral++;
+ 		break;
+ 	case SCO_LINK:
+ 	case ESCO_LINK:
+@@ -920,7 +920,7 @@ static inline void hci_conn_hash_del(struct hci_dev *hdev, struct hci_conn *c)
+ 	case LE_LINK:
+ 		h->le_num--;
+ 		if (c->role == HCI_ROLE_SLAVE)
+-			h->le_num_slave--;
++			h->le_num_peripheral--;
+ 		break;
+ 	case SCO_LINK:
+ 	case ESCO_LINK:
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 43c324c46c0b..da013d485f14 100644
+index da013d485f14..e479dc44e572 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -2795,9 +2795,9 @@ static void hci_conn_request_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		bacpy(&cp.bdaddr, &ev->bdaddr);
+@@ -5384,9 +5384,9 @@ static struct hci_conn *check_pending_le_conn(struct hci_dev *hdev,
+ 		return NULL;
  
- 		if (lmp_rswitch_capable(hdev) && (mask & HCI_LM_MASTER))
--			cp.role = 0x00; /* Become master */
-+			cp.role = 0x00; /* Become central */
- 		else
--			cp.role = 0x01; /* Remain slave */
-+			cp.role = 0x01; /* Remain peripheral */
+ 	/* Most controller will fail if we try to create new connections
+-	 * while we have an existing one in slave role.
++	 * while we have an existing one in peripheral role.
+ 	 */
+-	if (hdev->conn_hash.le_num_slave > 0 &&
++	if (hdev->conn_hash.le_num_peripheral > 0 &&
+ 	    (!test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) ||
+ 	     !(hdev->le_states[3] & 0x10)))
+ 		return NULL;
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 3465862429fb..a5d55175176e 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1519,13 +1519,14 @@ static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
+ 	if (hci_conn_num(hdev, LE_LINK) == 0)
+ 		return true;
  
- 		hci_send_cmd(hdev, HCI_OP_ACCEPT_CONN_REQ, sizeof(cp), &cp);
- 	} else if (!(flags & HCI_PROTO_DEFER)) {
-@@ -5131,7 +5131,7 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 		conn->dst_type = bdaddr_type;
+-	/* Check le_states if there is any connection in slave role. */
+-	if (hdev->conn_hash.le_num_slave > 0) {
+-		/* Slave connection state and non connectable mode bit 20. */
++	/* Check le_states if there is any connection in peripheral role. */
++	if (hdev->conn_hash.le_num_peripheral > 0) {
++		/* Peripheral connection state and non connectable mode bit 20.
++		 */
+ 		if (!connectable && !(hdev->le_states[2] & 0x10))
+ 			return false;
  
- 		/* If we didn't have a hci_conn object previously
--		 * but we're in master role this must be something
-+		 * but we're in central role this must be something
- 		 * initiated using a white list. Since white list based
- 		 * connections are not "first class citizens" we don't
- 		 * have full tracking of them. Therefore, we go ahead
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 9ebb85df4db4..b76c5d00b082 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -1691,7 +1691,7 @@ static void l2cap_le_conn_ready(struct l2cap_conn *conn)
- 	if (hcon->out)
- 		smp_conn_security(hcon, hcon->pending_sec_level);
- 
--	/* For LE slave connections, make sure the connection interval
-+	/* For LE peripheral connections, make sure the connection interval
- 	 * is in the range of the minimum and maximum interval that has
- 	 * been configured for this connection. If not, then trigger
- 	 * the connection update procedure.
-diff --git a/net/bluetooth/smp.c b/net/bluetooth/smp.c
-index 6777f5313838..53f984d11bc1 100644
---- a/net/bluetooth/smp.c
-+++ b/net/bluetooth/smp.c
-@@ -909,8 +909,8 @@ static int tk_request(struct l2cap_conn *conn, u8 remote_oob, u8 auth,
- 			hcon->pending_sec_level = BT_SECURITY_HIGH;
+-		/* Slave connection state and connectable mode bit 38
++		/* Peripheral connection state and connectable mode bit 38
+ 		 * and scannable bit 21.
+ 		 */
+ 		if (connectable && (!(hdev->le_states[4] & 0x40) ||
+@@ -1533,13 +1534,13 @@ static bool is_advertising_allowed(struct hci_dev *hdev, bool connectable)
+ 			return false;
  	}
  
--	/* If both devices have Keyoard-Display I/O, the master
--	 * Confirms and the slave Enters the passkey.
-+	/* If both devices have Keyboard-Display I/O, the initiator
-+	 * Confirms and the responder Enters the passkey.
- 	 */
- 	if (smp->method == OVERLAP) {
- 		if (hcon->role == HCI_ROLE_MASTER)
-@@ -3083,7 +3083,7 @@ static void bredr_pairing(struct l2cap_chan *chan)
- 	if (!test_bit(HCI_CONN_ENCRYPT, &hcon->flags))
- 		return;
+-	/* Check le_states if there is any connection in master role. */
+-	if (hci_conn_num(hdev, LE_LINK) != hdev->conn_hash.le_num_slave) {
+-		/* Master connection state and non connectable mode bit 18. */
++	/* Check le_states if there is any connection in central role. */
++	if (hci_conn_num(hdev, LE_LINK) != hdev->conn_hash.le_num_peripheral) {
++		/* Central connection state and non connectable mode bit 18. */
+ 		if (!connectable && !(hdev->le_states[2] & 0x02))
+ 			return false;
  
--	/* Only master may initiate SMP over BR/EDR */
-+	/* Only initiator may initiate SMP over BR/EDR */
- 	if (hcon->role != HCI_ROLE_MASTER)
- 		return;
- 
+-		/* Master connection state and connectable mode bit 35 and
++		/* Central connection state and connectable mode bit 35 and
+ 		 * scannable 19.
+ 		 */
+ 		if (connectable && (!(hdev->le_states[4] & 0x08) ||
 -- 
 2.32.0.rc1.229.g3e70b5a671-goog
 
