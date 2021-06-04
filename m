@@ -2,106 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_SANE_2 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4920C4743D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:13:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6A6C4743C
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:59:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 99FDE613F9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:13:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 005FD61402
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  4 Jun 2021 17:59:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230111AbhFDRPT (ORCPT
+        id S230255AbhFDSBX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jun 2021 13:15:19 -0400
-Received: from foss.arm.com ([217.140.110.172]:43982 "EHLO foss.arm.com"
+        Fri, 4 Jun 2021 14:01:23 -0400
+Received: from mga04.intel.com ([192.55.52.120]:26404 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229878AbhFDRPT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jun 2021 13:15:19 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9278B1063;
-        Fri,  4 Jun 2021 10:13:32 -0700 (PDT)
-Received: from slackpad.fritz.box (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 387D03F73D;
-        Fri,  4 Jun 2021 10:13:30 -0700 (PDT)
-Date:   Fri, 4 Jun 2021 18:13:22 +0100
-From:   Andre Przywara <andre.przywara@arm.com>
-To:     "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Ondrej Jirman <megous@megous.com>,
-        Chen-Yu Tsai <wens@csie.org>,
-        Maxime Ripard <mripard@kernel.org>,
-        Jernej =?UTF-8?B?xaBrcmFiZWM=?= <jernej.skrabec@gmail.com>,
-        Jiri Slaby <jirislaby@kernel.org>,
-        linux-serial@vger.kernel.org,
-        Linux ARM Mailing List <linux-arm-kernel@lists.infradead.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-sunxi@lists.linux.dev,
-        Josh Triplett <josh@joshtriplett.org>, tuxd3v@sapo.pt,
-        Rob Herring <robh@kernel.org>
-Subject: Re: sunxi: Bluetooth broken since 5.6-rc1
-Message-ID: <20210604181322.52a26de8@slackpad.fritz.box>
-In-Reply-To: <20210531144136.GS30436@shell.armlinux.org.uk>
-References: <20210530173454.5ab1dcf5@slackpad.fritz.box>
-        <YLTi8iYdLiKNeaLC@kroah.com>
-        <20210531144136.GS30436@shell.armlinux.org.uk>
-Organization: Arm Ltd.
-X-Mailer: Claws Mail 3.17.1 (GTK+ 2.24.31; x86_64-slackware-linux-gnu)
+        id S229810AbhFDSBX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 4 Jun 2021 14:01:23 -0400
+IronPort-SDR: GFQb5GoifLJKwh58PlWNmQRa3CzoafnPr4nM3rBwUfC43HT7fVwV8OXclwO+VAikvRUI9VaorP
+ sZHo/Svrt68Q==
+X-IronPort-AV: E=McAfee;i="6200,9189,10005"; a="202482061"
+X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
+   d="scan'208";a="202482061"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 10:59:20 -0700
+IronPort-SDR: Qc5xrIB+TaOODrzXHuMI9qy/NoTtd7vlsA0jPT4pixx5PsYost8WdZ8qAnGFVgmMtn/mbII6mj
+ xMIwt9WsAuCw==
+X-IronPort-AV: E=Sophos;i="5.83,248,1616482800"; 
+   d="scan'208";a="401033661"
+Received: from beomtaek-mobl2.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.156.80])
+  by orsmga003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jun 2021 10:59:20 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     luiz.dentz@gmail.com, tedd.an@intel.com,
+        Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ v2] tools/mgmt-tester: Fix expected HCI command accounting
+Date:   Fri,  4 Jun 2021 10:59:13 -0700
+Message-Id: <20210604175913.256979-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 31 May 2021 15:41:36 +0100
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+This fixes test condition count in the expected HCI command
+callback.
 
-Hi Greg,
+When the expected HCI opcode is detected, mark the condition
+as done. Any subsequent HCI commands are ignored.
 
-> On Mon, May 31, 2021 at 03:21:54PM +0200, Greg Kroah-Hartman wrote:
-> > On Sun, May 30, 2021 at 05:34:54PM +0100, Andre Przywara wrote:  
-> > > An obvious easy hack-fix is to just define
-> > > CONFIG_SERIAL_8250_16550A_VARIANTS, which brings the delays back and
-> > > seems to avoid the problem for me.
-> > > Another hack which seems to mitigate the problem is to avoid switching
-> > > the baudrate to something faster than 115200.
-> > > 
-> > > I observed this on a BananaPi-M64 (Allwinner A64 SoC with AP6212 WiFi/BT
-> > > chip), but others reported the same issue on a NanoPi Air (Allwinner H3
-> > > with 6212), but also other SoCs and devices (at least one AP6210).
-> > > 
-> > > Obviously those workarounds are not real solutions, and I was
-> > > wondering if anybody has an idea how to properly fix this?
-> > > What puzzles me is that the delay is happening during the *UART*
-> > > probe, so before we even start dealing with the Bluetooth device.  
-> > 
-> > What type of bluetooth device is this, and what does it have to do with
-> > the serial port?  Is the SoC device using the same IP blocks for both?  
-> 
-> Many bluetooth "devices" (I mean the interface from the local machine
-> to the BT world, not as in remote devices) are connected through a
-> standard UART. Pictorially, it's:
-> 
->   CPU <---> UART <---> BT chip <---> Bluetooth RF world
-> 
-> The reporter seems to be saying is that a change to the UART driver now
-> means that the bluetooth chip wired to that UART no longer functions due
-> to slightly different initialisation timings of the host UART.
+Without this fix, in couple of test cases where the expected HCI
+command is detected more than once, the test may be erroneously
+reported as a failure or prematurely declared as a success before
+waiting on an expected MGMT event condition.
 
-Yes, exactly, thanks Russell for clarifying this.
-How this works (when it does) is that the UART driver probes, then we
-look at the children of the UART devicetree node, to probe for those, by
-virtue of the serdev bus.
+The test cases where this behavior is fixed:
+Remove Ext Advertising - Success 1
+Remove Ext Advertising - Success 2
+---
+ tools/mgmt-tester.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-My question was about if this rings a bell with someone, because I have
-a hard time piecing together how a delay in the *UART probe* could
-affect devices depending on it. And how to fix this ...
-
-Cheers,
-Andre
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index c5073fe2b..6109883ad 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -52,6 +52,7 @@ struct test_data {
+ 	uint16_t mgmt_index;
+ 	struct hciemu *hciemu;
+ 	enum hciemu_type hciemu_type;
++	bool expect_hci_command_done;
+ 	int unmet_conditions;
+ 	int unmet_setup_conditions;
+ 	int sk;
+@@ -7021,9 +7022,11 @@ static void command_hci_callback(uint16_t opcode, const void *param,
+ 
+ 	tester_print("HCI Command 0x%04x length %u", opcode, length);
+ 
+-	if (opcode != test->expect_hci_command || data->unmet_conditions <= 0)
++	if (opcode != test->expect_hci_command || data->expect_hci_command_done)
+ 		return;
+ 
++	data->expect_hci_command_done = true;
++
+ 	if (test->expect_hci_func)
+ 		expect_hci_param = test->expect_hci_func(&expect_hci_len);
+ 
+-- 
+2.26.3
 
