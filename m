@@ -2,118 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6DFDC4743C
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Jun 2021 00:02:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17D12C4743D
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Jun 2021 00:31:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF5426121D
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Jun 2021 00:02:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0A8360E0B
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  5 Jun 2021 00:31:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229873AbhFEAEG (ORCPT
+        id S230169AbhFEAdl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 4 Jun 2021 20:04:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60762 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229847AbhFEAEF (ORCPT
+        Fri, 4 Jun 2021 20:33:41 -0400
+Received: from mail-yb1-f180.google.com ([209.85.219.180]:36816 "EHLO
+        mail-yb1-f180.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229853AbhFEAdk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 4 Jun 2021 20:04:05 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D43FC061766
-        for <linux-bluetooth@vger.kernel.org>; Fri,  4 Jun 2021 17:02:04 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id d5-20020a17090ab305b02901675357c371so7991839pjr.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jun 2021 17:02:04 -0700 (PDT)
+        Fri, 4 Jun 2021 20:33:40 -0400
+Received: by mail-yb1-f180.google.com with SMTP id s107so16106197ybi.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 04 Jun 2021 17:31:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=E/XhIDy736F/MgXA+fkXd9PPWaYekCXW/pnskPaBXHs=;
-        b=vZOgNURsu66Ps8ly5BPkCO8uhfnR1C+Sl2RmEL8riDRuWOTMHSo63PgC3SWLzOcTd9
-         0rfELwV4obrHGXOdnqEbXomf73SbImQyD1yYpF6vsmpxmffKPH35tdFDcp+81u13zcQ6
-         DMXMIRYfC/hTHYNUbKWqkLbROt1/008ixteeF7JzgbsHOGuUIkZMbjSl9JjvteCl541L
-         j1aY2DPeQ6isgflQh2UvM6c+/qx26BdJ7XY5gsxalJ/2lqcMMPjBgYMjk2yRYSpCOPwY
-         Z68TVcBULGeoqX44oxsju7HXcw6gEnyfMs0v84hxm5egMSe1YFhSA/P0LOk4EkTTdDo7
-         l90Q==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=WSMV+sMomjroZF0377wvSmU+pcLLvt39YLDOpyFW3Ac=;
+        b=TXH0cX+y0stI012pk6ScmrMzc57a0ZMv4pcSzmm/E8bKQ3HShiOW5qQ7q4X2DZdwyo
+         nsJg+UURMlD9VAmtYYjdnX+7pKFVqamAiuitZpCN0AW/kNooWkxd4WjP5vNxPXltGkth
+         av0347xYZQpGvleeRkxxFsTzV2x1Maa/9+G1hyBVMD283xgtvUQ1b5I5uU1GKHBIis5P
+         eIMjsKmu02i4oFfvRHoGNDJYBZordS/GNJMT7VIunVtwXfYAaYZgqB+4aYGKxm+HX5EV
+         uRWWhOWYVmFQJbYTF1cHyCcw6iEz9JyI6cGJ3DwSaTlXWN5PX5KMampDQU9Vpwxt/f+4
+         C2qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=E/XhIDy736F/MgXA+fkXd9PPWaYekCXW/pnskPaBXHs=;
-        b=NXuCgk5Z0X5bD/+Cyst603t2MszRrgNDM6dbFOl6mgE0E6hCuQe0a+zjlffmCB5Oan
-         P+KP9QCvyXtmFaRWx6JyErC8CgEMlgMvuarUdn9ySLtnCB1ALg15VsJF6pHwTNPW/J3f
-         2i26SYUPI3uWGFsrYogzVcDhqf8hsMP3UKGgYVmlf2yD/ZNdTENpQOlUduQ0/OY3zFQ6
-         t0GNnWnZlVq3MDLfmylT1/HYVeBKOCQ2301uwCFSYp1SB3LLoZNTGSRwv7ONr9e8Qtyt
-         txPQr0o4jh65kK93E3QG7I0WHaL28wQAR64opk9GZZEH3VnmV+R1qsuzIechaOzev/wi
-         58Zw==
-X-Gm-Message-State: AOAM533KnhxG9RUarrLs8e8vQOXIw6shffe6mxE+Hbvki4VVobP7WNyq
-        ztI2RT7IeC9R2WvudSgmoLCLmA+c9Us=
-X-Google-Smtp-Source: ABdhPJz59c5OsIa9h2o7/x0mFCY73HDxhjScjZG7ZTJKSW8AbmsR9bef9tbcUKtGIfpWW6JnoUt5xw==
-X-Received: by 2002:a17:902:8ec9:b029:ef:5a88:e7cf with SMTP id x9-20020a1709028ec9b02900ef5a88e7cfmr6769929plo.48.1622851323719;
-        Fri, 04 Jun 2021 17:02:03 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g22sm2481163pfv.123.2021.06.04.17.02.03
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 04 Jun 2021 17:02:03 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH V2] shared/mgmt: Fix not processing request queue
-Date:   Fri,  4 Jun 2021 17:02:00 -0700
-Message-Id: <20210605000200.1938853-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=WSMV+sMomjroZF0377wvSmU+pcLLvt39YLDOpyFW3Ac=;
+        b=dxp+BXHGv3oFIBWd97U7AQaj9wzOOaTbUgnDyStu7Bi7AdKW97H2Jf9wzWa6Ez58qi
+         R4PAG7bSe+kpKuvn9+bO9gitjw33Yn5426UH+7ucFisyLylMKb5F8+IjvwcdP3D2WIJe
+         gNBMOwVKoARbmsOsQX5H20Yqt5aTnwUOzMFWEJs8stEjoVKr5vuPwFGZdTE46hbYIS1e
+         ZHyrx5nJ9U3M4GTIvQIca+PIZMyw9iAexlMIUDoJ6bskGdhaH8suc7L0NZKEjhvQEqpq
+         ePfmsYvWJuroHvaKx8NBeXnfssW6zcPIQr+SVc/0OxyEUC73VZZ2N0/KA3zL11/lOHpB
+         lRKQ==
+X-Gm-Message-State: AOAM5336VEQekvYtEkhkRiZG+iHggOc58vajdeIPWd/5m9WvuYgKhgJ1
+        o9ziXXZ8jsEG+ygYfla46zTkHgxDO0H60pdTU4c=
+X-Google-Smtp-Source: ABdhPJxYPCwslcWrroa8X6y8EKjFR1xHGUg1MI3KMCypu5xIjOVZlzjsa/OpxMKDINS75TO6FpVIWWJrJhQbftr142g=
+X-Received: by 2002:a25:4048:: with SMTP id n69mr9032893yba.91.1622853040390;
+ Fri, 04 Jun 2021 17:30:40 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210604175913.256979-1-inga.stotland@intel.com> <5d31aebb39bc10584a71df894908e16104980985.camel@intel.com>
+In-Reply-To: <5d31aebb39bc10584a71df894908e16104980985.camel@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 4 Jun 2021 17:30:29 -0700
+Message-ID: <CABBYNZKYfzpqXUJB02-zSfsPjrD81MwcDuUYRjEeYqU_WD--_A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ v2] tools/mgmt-tester: Fix expected HCI command accounting
+To:     "An, Tedd" <tedd.an@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Stotland, Inga" <inga.stotland@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Inga,
 
-If the kernel returns an invalid opcode like below the request won't
-be processed making it unusable:
+On Fri, Jun 4, 2021 at 12:30 PM An, Tedd <tedd.an@intel.com> wrote:
+>
+> Hi Inga,
+>
+> On Fri, 2021-06-04 at 10:59 -0700, Inga Stotland wrote:
+> > This fixes test condition count in the expected HCI command
+> > callback.
+> >
+> > When the expected HCI opcode is detected, mark the condition
+> > as done. Any subsequent HCI commands are ignored.
+> >
+> > Without this fix, in couple of test cases where the expected HCI
+> > command is detected more than once, the test may be erroneously
+> > reported as a failure or prematurely declared as a success before
+> > waiting on an expected MGMT event condition.
+> >
+> > The test cases where this behavior is fixed:
+> > Remove Ext Advertising - Success 1
+> > Remove Ext Advertising - Success 2
+>
+> Reviewed-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+>
+> > ---
+> >  tools/mgmt-tester.c | 5 ++++-
+> >  1 file changed, 4 insertions(+), 1 deletion(-)
+> >
+> > diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+> > index c5073fe2b..6109883ad 100644
+> > --- a/tools/mgmt-tester.c
+> > +++ b/tools/mgmt-tester.c
+> > @@ -52,6 +52,7 @@ struct test_data {
+> >       uint16_t mgmt_index;
+> >       struct hciemu *hciemu;
+> >       enum hciemu_type hciemu_type;
+> > +     bool expect_hci_command_done;
+> >       int unmet_conditions;
+> >       int unmet_setup_conditions;
+> >       int sk;
+> > @@ -7021,9 +7022,11 @@ static void command_hci_callback(uint16_t opcode, const void *param,
+> >
+> >       tester_print("HCI Command 0x%04x length %u", opcode, length);
+> >
+> > -     if (opcode != test->expect_hci_command || data->unmet_conditions <= 0)
+> > +     if (opcode != test->expect_hci_command || data->expect_hci_command_done)
+> >               return;
+> >
+> > +     data->expect_hci_command_done = true;
+> > +
+> >       if (test->expect_hci_func)
+> >               expect_hci_param = test->expect_hci_func(&expect_hci_len);
+> >
+>
+> Regards,
+> Tedd
 
-@ MGMT Command: Read Advertising Features (0x003d) plen 0
-{0x0001} [hci0] 14:25:11.096370
-@ MGMT Event: Command Status (0x0002) plen 3
-{0x0001} [hci0] 14:25:11.096373
-      Set Advertising (0x0029)
-              Status: Not Supported (0x0c)
+Applied, thanks.
 
-In order to fix this attempts to remove the first request pending on the
-given index:
-
-= bluetoothd: src/advertising.c:read_adv_features_callback() Failed to
-read advertising features: Not Supported (0x0c)
----
- src/shared/mgmt.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
-
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index 3e9b9ee26..b869fa6ef 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -248,6 +248,17 @@ static void request_complete(struct mgmt *mgmt, uint8_t status,
- 
- 	request = queue_remove_if(mgmt->pending_list,
- 					match_request_opcode_index, &match);
-+	if (!request) {
-+		util_debug(mgmt->debug_callback, mgmt->debug_data,
-+				"Unable to find request for opcode 0x%04x",
-+				opcode);
-+
-+		/* Attempt to remove with no opcode */
-+		request = queue_remove_if(mgmt->pending_list,
-+						match_request_index,
-+						UINT_TO_PTR(index));
-+	}
-+
- 	if (request) {
- 		if (request->callback)
- 			request->callback(status, length, param,
 -- 
-2.31.1
-
+Luiz Augusto von Dentz
