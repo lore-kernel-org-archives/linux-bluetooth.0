@@ -2,146 +2,239 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=unavailable autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E4FDC47082
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 10:29:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8874CC47082
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 10:31:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8372E6108E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 10:29:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BB48611AD
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 10:31:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230198AbhFGKbS (ORCPT
+        id S230241AbhFGKdd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jun 2021 06:31:18 -0400
-Received: from mail-qv1-f52.google.com ([209.85.219.52]:34406 "EHLO
-        mail-qv1-f52.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230173AbhFGKbR (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jun 2021 06:31:17 -0400
-Received: by mail-qv1-f52.google.com with SMTP id hf3so2630844qvb.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jun 2021 03:29:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=ZfkBsIz55tc2TjLqFxmc/bAmxwRHg1Mbcf6YmSgMAxk=;
-        b=mCku7nEhc36iPXmaV5ZpqwDlklutay5KPg6iqsqZxq2CokVccbmE+mUuengvI2Dpsi
-         dl1Y91MQ2JtefEGi0EW1mF2TxcfO8A0MFI9Le4owGdL9ocR4It1icWtO/uXO00MUnK4x
-         seD41HcQJyxmQVtjryLCfyOGuwvne6gmjvUH16F7f8DjeudkrlCYS9NGryxxJXsfeWjj
-         Qs258WegfSalZ30nctr0kz07eIS7+fgayFMx3uZoQQFemq7xk7WUvxpufggYWlJkhWkC
-         +qY2ArocvPnjf8rD4IfpXe8vES+5M+eZnJz8p4zQ4rA+wihc3zbxaFvWyrl3czt9UP0Z
-         z+QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=ZfkBsIz55tc2TjLqFxmc/bAmxwRHg1Mbcf6YmSgMAxk=;
-        b=oljlWZcxGbCdxUe9cy0AScpHvQvCKDxcfODwAf0b5EGcFrjOFnGtXbRgfM/2OUAX1t
-         zVQvo1Aw1HgaiWYlMJCwlGilF6O87tkv90DlVMPsi2iUSVZVCg0fFBX+O2jAiiwE669q
-         CDRJ2LKPJ5f6WJZ2XaEyuQfz9zob+OzlTNu2PBn6fvB7UlJIK4WlhvytzJjLjg5ZQB61
-         O3UFsfKFWVUSCMuEi9B5U3yCiRpllue0P1zijesdWwnMogB9pJ/JzKVr4kxrX6QPS8yz
-         ScT2OJQYy0maJxrdy2rUrRy42Bhn/fHJlZB/77aVoL7HOBtTjrgOiNkUHTjtEmkUxfiS
-         WpOw==
-X-Gm-Message-State: AOAM530gOrG94PrvPa98/vn18ju+t0vjoFSMcA2EDUqV8cPqjS89GxR7
-        NeXsqddknJ673GsAOOgQbYPG775LF74QlcRV/OUwwQ==
-X-Google-Smtp-Source: ABdhPJyrBYoegPp/hlN/HNK4Ga/7kDespCvl6zt6t9y4843+ugPo0yOhcUJ/bNsMmCY/lhd7y9Zjdv/FNvqe+GRQTvE=
-X-Received: by 2002:a0c:d610:: with SMTP id c16mr17480702qvj.13.1623061705667;
- Mon, 07 Jun 2021 03:28:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <000000000000adea7f05abeb19cf@google.com> <2fb47714-551c-f44b-efe2-c6708749d03f@gmail.com>
- <YL3zGGMRwmD7fNK+@zx2c4.com>
-In-Reply-To: <YL3zGGMRwmD7fNK+@zx2c4.com>
-From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Mon, 7 Jun 2021 12:28:14 +0200
-Message-ID: <CACT4Y+bcxROH6+xCpf4fn0dUggEqhrngkmo8-7vrdaJULYhD-w@mail.gmail.com>
+        Mon, 7 Jun 2021 06:33:33 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55740 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230127AbhFGKdc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Jun 2021 06:33:32 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 4C5CE6105A;
+        Mon,  7 Jun 2021 10:31:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623061901;
+        bh=QDWSZEpNc4xQ1VqsobtEpkvi3gCs9U7824XDo8S/V0s=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=eXIR3lMLCBk7NJht1nSrHju2Frq/LgW/B8BpcT02rUIUPWPdsrv5it5e9cUHhmtUx
+         qaqzswAdLGb7OHW3atgH0QGH15ZiARmTErCFdxXyRbPoT5Ues9L8chwdMQX6u+KHAc
+         zVNOo+8HPjFWzmRdET6Fu0Nx+NCAWQih+nq32M+Y=
+Date:   Mon, 7 Jun 2021 12:31:39 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Leon Romanovsky <leon@kernel.org>, SyzScope <syzscope@gmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Subject: Re: KASAN: use-after-free Read in hci_chan_del
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     SyzScope <syzscope@gmail.com>,
-        syzbot <syzbot+305a91e025a73e4fd6ce@syzkaller.appspotmail.com>,
-        David Miller <davem@davemloft.net>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        netdev <netdev@vger.kernel.org>,
-        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
-        Kernel Hardening <kernel-hardening@lists.openwall.com>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <YL31i98CpOO/AjKY@kroah.com>
+References: <000000000000adea7f05abeb19cf@google.com>
+ <c2004663-e54a-7fbc-ee19-b2749549e2dd@gmail.com>
+ <YLn24sFxJqGDNBii@kroah.com>
+ <0f489a64-f080-2f89-6e4a-d066aeaea519@gmail.com>
+ <YLsrLz7otkQAkIN7@kroah.com>
+ <20210606085004.12212-1-hdanton@sina.com>
+ <20210607074828.3259-1-hdanton@sina.com>
+ <20210607100201.3345-1-hdanton@sina.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210607100201.3345-1-hdanton@sina.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jun 7, 2021 at 12:21 PM Jason A. Donenfeld <Jason@zx2c4.com> wrote:
->
-> Hi SyzScope,
->
-> On Fri, May 28, 2021 at 02:12:01PM -0700, SyzScope wrote:
->
-> > The bug was reported by syzbot first in Aug 2020. Since it remains
-> > unpatched to this date, we have conducted some analysis to determine its
-> > security impact and root causes, which hopefully can help with the
-> > patching decisions.
-> > Specifically, we find that even though it is labeled as "UAF read" by
-> > syzbot, it can in fact lead to double free and control flow hijacking as
-> > well. Here is our analysis below (on this kernel version:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/log/?id=af5043c89a8ef6b6949a245fff355a552eaed240)
+On Mon, Jun 07, 2021 at 06:02:01PM +0800, Hillf Danton wrote:
+> On Mon, 7 Jun 2021 09:55:31 +0200 Greg KH wrote:
+> >On Mon, Jun 07, 2021 at 03:48:28PM +0800, Hillf Danton wrote:
+> >> On Sun, 6 Jun 2021 11:54:22 +0200 Greg KH wrote:
+> >> >On Sun, Jun 06, 2021 at 04:50:04PM +0800, Hillf Danton wrote:
+> >> >> 
+> >> >> To fix the uaf reported, add reference count to hci channel to track users.
+> >> >> Then only channels with zero users will be released.
+> >> >> 
+> >> >> It is now only for thoughts.
+> >> >> 
+> >> >> +++ x/include/net/bluetooth/hci_core.h
+> >> >> @@ -704,6 +704,7 @@ struct hci_chan {
+> >> >>  	struct sk_buff_head data_q;
+> >> >>  	unsigned int	sent;
+> >> >>  	__u8		state;
+> >> >> +	atomic_t ref;
+> >> >
+> >> >Please no, never use "raw" atomic variables.  Especially for something
+> >> >like this, use a kref.
+> >> 
+> >> Fair, thanks for taking a look at it.
+> >> 
+> >> Spin with care for the race the added ref fails to cut.
 > >
-> > ----------------------------- Root cause analysis:
-> > --------------------------
-> > The use-after-free bug happened because the object has two different
-> > references. But when it was freed, only one reference was removed,
-> > allowing the other reference to be used incorrectly.
-> > [...]
->
-> Thank you very much for your detailed analysis. I think this is very
-> valuable work, and I appreciate you doing it. I wanted to jump in to
-> this thread here so as not to discourage you, following Greg's hasty
-> dismissal. The bad arguments made I've seen have been something like:
->
-> - Who cares about the impact? Bugs are bugs and these should be fixed
->   regardless. Severity ratings are a waste of time.
-> - Spend your time writing patches, not writing tools to discover
->   security issues.
-> - This doesn't help my interns.
-> - "research project" scare quotes.
->
-> I think this entire set of argumentation is entirely bogus, and I really
-> hope it doesn't dissuade you from continuing to conduct useful research
-> on the kernel.
->
-> Specifically, it sounds like your tool is scanning through syzbot
-> reports, loading them into a symbolic execution engine, and seeing what
-> other primitives you can finesse out of the bugs, all in an automated
-> way. So, in the end, a developer gets a report that, rather than just
-> saying "4 byte out of bounds read into all zeroed memory so not a big
-> deal anyway even if it should be fixed," the developer gets a report
-> that says, "4 byte out of bounds read, or a UaF if approached in this
-> other way." Knowing that seems like very useful information, not just
-> for prioritization, but also for the urgency at which patches might be
-> deployed. For example, that's a meaningful distinction were that kind of
-> bug found in core networking stack or in wifi or ethernet drivers. I
-> also think it's great that you're pushing forward the field of automated
-> vulnerability discovery and exploit writing. Over time, hopefully that
-> leads to crushing all sorts of classes of bugs. It's also impressive
-> that you're able to do so much with kernel code in a symbolic execution
-> environment; this sounds a few steps beyond Angr ;-)...
->
-> My one suggestion would be that your email alerts / follow-ups to syzbot
-> reports, if automated, contain a bit more "dumbed-down" information
-> about what's happening. Not all kernel developers speak security, and as
-> you've seen, in some places it might be an uphill battle to have your
-> contributions taken seriously. On the other hand, it sounds like you
-> might already be working with Dmitry to integrate this into the
-> syzkaller infrastructure itself, somehow? If so, that'd be great.
+> >I do not understand what you mean here.
+> >
+> >> To ease review the full syzreport is also attached.
+> >> 
+> >> To fix uaf, add user track to hci channel and we will only release channel if
+> >> its user hits zero. And a dryrun mechanism is also added to take care of the
+> >> race user track fails to cut.
+> >> 
+> >> 	CPU0			CPU1
+> >> 	----			----
+> >> 	hci_chan_del		l2cap_conn_del
+> >> 				chan->user = 0;
+> >> 
+> >> 	if (chan->user != 0)
+> >> 		return;
+> >> 	synchronize_rcu();
+> >> 	kfree(chan);
+> >> 
+> >> 				hci_chan_del();
+> >> 
+> >> It is now only for thoughts.
+> >> 
+> >> +++ x/include/net/bluetooth/hci_core.h
+> >> @@ -704,6 +704,10 @@ struct hci_chan {
+> >>  	struct sk_buff_head data_q;
+> >>  	unsigned int	sent;
+> >>  	__u8		state;
+> >> +	__u8		user;
+> >
+> >No.
+> >
+> >> +	__u8		release;
+> >
+> >No please no.
+> >
+> >> +
+> >> +#define HCHAN_RELEASE_DRYRUN 1
+> >>  };
+> >>  
+> >>  struct hci_conn_params {
+> >> +++ x/net/bluetooth/l2cap_core.c
+> >> @@ -1903,6 +1903,12 @@ static void l2cap_conn_del(struct hci_co
+> >>  
+> >>  	mutex_unlock(&conn->chan_lock);
+> >>  
+> >> +	/* see comment in hci_chan_del() */
+> >> +	conn->hchan->release = HCHAN_RELEASE_DRYRUN;
+> >> +	smp_wmb();
+> >> +	conn->hchan->user--;
+> >
+> >And the reason you are open-coding a kref is why???
+> >
+> >Please again no.
+> >
+> >> +	hci_chan_del(conn->hchan);
+> >> +	conn->hchan->release = 0;
+> >>  	hci_chan_del(conn->hchan);
+> >>  
+> >>  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> >> @@ -7716,6 +7722,8 @@ static struct l2cap_conn *l2cap_conn_add
+> >>  	kref_init(&conn->ref);
+> >>  	hcon->l2cap_data = conn;
+> >>  	conn->hcon = hci_conn_get(hcon);
+> >> +	/* dec in l2cap_conn_del() */
+> >> +	hchan->user++;
+> >
+> >{sigh}
+> >
+> >No, there is a reason we wrote kref many _decades_ ago.  Please use it,
+> >your original attempt with an atomic was just fine, just use the proper
+> >data structures the kernel provides you as this is obviously a reference
+> >counted object.
+> 
+> I see your concern. I thought this is a simpler user track than kref and
+> open coded a couple of lines. I see it is incorrect. Sorry for that.
+> 
+> After taking another look at the added user track, I realised that it serves
+> no more than a one-off state word that prevents channel from being released.
+> Then the race behind the uaf can be fixed by adding a state on top of the
+> dryrun introduced even without tracking users.
+> 
+> The state machine works as the following,
+> 1) it is initialised to be backoff that means channel cannot be released
+>    at the moment.
+> 2) it is changed to be dryrun on releasing to cut the race that survived
+>    backoff.
+> 3) it is finally set to zero for release after cutting the chance for race.
 
-We discussed this with authors, but no integration work is happening
-right now yet.
-Yes, it would be useful for syzbot to do this assessment automatically
-for all bugs and, say, tag bugs on the dashboard (less noisy then
-sending separate emails). If/when syzbot sends, say, monthly
-per-subsystem summary, that priority info could also be included
-there.
+Adding another state on top of this feels rough, does it really solve
+the race here?  Normally a reference count should be enough to properly
+tear things down when needed, rolling back from a "can I try this now"
+state still seems racy without the needed lock somewhere.
+
+
+> 
+> 
+> +++ x/include/net/bluetooth/hci_core.h
+> @@ -704,6 +704,10 @@ struct hci_chan {
+>  	struct sk_buff_head data_q;
+>  	unsigned int	sent;
+>  	__u8		state;
+> +	__u8		release;
+> +
+> +#define HCHAN_RELEASE_DRYRUN  1
+> +#define HCHAN_RELEASE_BACKOFF 2
+>  };
+>  
+>  struct hci_conn_params {
+> +++ x/net/bluetooth/l2cap_core.c
+> @@ -1903,6 +1903,10 @@ static void l2cap_conn_del(struct hci_co
+>  
+>  	mutex_unlock(&conn->chan_lock);
+>  
+> +	/* see comment in hci_chan_del() */
+> +	conn->hchan->release = HCHAN_RELEASE_DRYRUN;
+> +	hci_chan_del(conn->hchan);
+> +	conn->hchan->release = 0;
+>  	hci_chan_del(conn->hchan);
+>  
+>  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> @@ -7716,6 +7720,8 @@ static struct l2cap_conn *l2cap_conn_add
+>  	kref_init(&conn->ref);
+>  	hcon->l2cap_data = conn;
+>  	conn->hcon = hci_conn_get(hcon);
+> +	/* release is changed in l2cap_conn_del() */
+> +	hchan->release = HCHAN_RELEASE_BACKOFF;
+>  	conn->hchan = hchan;
+>  
+>  	BT_DBG("hcon %p conn %p hchan %p", hcon, conn, hchan);
+> +++ x/net/bluetooth/hci_conn.c
+> @@ -1769,12 +1769,26 @@ void hci_chan_del(struct hci_chan *chan)
+>  	struct hci_conn *conn = chan->conn;
+>  	struct hci_dev *hdev = conn->hdev;
+>  
+> +	if (chan->release == HCHAN_RELEASE_BACKOFF)
+> +		return;
+> +
+>  	BT_DBG("%s hcon %p chan %p", hdev->name, conn, chan);
+>  
+> -	list_del_rcu(&chan->list);
+> +	if (!list_empty(&chan->list))
+> +		list_del_rcu(&chan->list);
+>  
+>  	synchronize_rcu();
+>  
+> +	if (chan->release == HCHAN_RELEASE_DRYRUN) {
+> +		/*
+> +		 * after list_del chan is only visible to the owner of dryrun,
+> +		 * which is needed to cut the race that survived backoff,
+> +		 * and simply return to owner. 
+
+checkpatch will ding you for this not being the proper format for
+networking, it hit me last week as well :)
+
+thanks,
+
+greg k-h
