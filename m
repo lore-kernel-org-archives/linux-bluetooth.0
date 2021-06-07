@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E9CC47082
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 18:41:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC55CC47094
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 18:42:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FD806023D
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 18:41:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C242F61139
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 18:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230316AbhFGSnl (ORCPT
+        id S230420AbhFGSor (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jun 2021 14:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230239AbhFGSnl (ORCPT
+        Mon, 7 Jun 2021 14:44:47 -0400
+Received: from mail-pj1-f48.google.com ([209.85.216.48]:54847 "EHLO
+        mail-pj1-f48.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230378AbhFGSor (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jun 2021 14:43:41 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7C4C061766
-        for <linux-bluetooth@vger.kernel.org>; Mon,  7 Jun 2021 11:41:43 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id y11so6374500pgp.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jun 2021 11:41:43 -0700 (PDT)
+        Mon, 7 Jun 2021 14:44:47 -0400
+Received: by mail-pj1-f48.google.com with SMTP id g24so10411024pji.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 07 Jun 2021 11:42:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=7IgO3P6uxtms8q0bieG/FxoM5uXnSbqtGxF7Q5v3/AY=;
-        b=qnoZFUs7Lww9XBa+nDvQWkN633G0vfLxQ0JknlVoZcWcYeKK41Ywkd+t/IlhvNTPz3
-         jkmXofkodnoywPkRVdLR7tuLP0c55Qy1G4JhTMGlbi9B6ZLeGG++OOWjqoo2gpzSCNJF
-         nrQ3DfYpPy9vo7qEKatnzFzkpb5JLjTi4ycIW602xJzsX8afyDj4YT/ggGBEkif4DqKL
-         1SSD4HEYeZcZL+HKP6P4KsnEx8MKAPK0vpfd2qmSEjU9EcN3uu3WZf+D6Xc+dsm2OB9p
-         WMVLBVWJ16n9ChcpD5Rk17cKHNVkBMjS/9vf3e5MCbUZGReN1xuPOscqdRXMNcXXNmy5
-         8Fcw==
+        bh=YCOhDTGAO3dSYHWp1brg94HHn7mstrbL0puqB4KiTKo=;
+        b=RhEPhO5pivo/hhkiMUs9vDT2RVi2Agcj0N7B6snMeNjij5g59v9trXpj/bJ+s48fgT
+         RDiH/opdG2XEK3PDa4IH4YS9gJUR0uMxgFCTzDZ2LJWjS+7XAVtPs7bW9UwB0j0Fu4x4
+         bSdUSJOLozONBoXa1aokjsinKt7FHtQs/roUV1lnc5F/oNfSg9c/4YrF0iDWccUbFXjv
+         GrAcr7DBhxc4njPGaGXH1Lf7mdo3Ki2qOSdbS/VeNIs2ss8cbhUy+DUw1zplc8ryzVHq
+         3sw027WtIca0BWtquvlrF1JCht6OIJ7f9xaH736Au575e50j5zsDNSnJOvhkafLbQyh0
+         1n0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=7IgO3P6uxtms8q0bieG/FxoM5uXnSbqtGxF7Q5v3/AY=;
-        b=LCInMPrcm4CQl3lTdcnSBiYlarKXZoAco9TYOQ+gMV3+W15fBdImgF/rl7vg2HWF8Z
-         XFqWUQcz9oWGGkvm5x2rZCo8bOHFIG23l5axprwy44DpIWZ4M2m0oLfk+YztwPlm1IqJ
-         UjPgTTUrLQr4Eg9l4KLQB7SY743mpzKG7Xfm+M/tWGDHV+73Oej1qPGOVs7n4aE+dv11
-         7+JJk33XdGv0aQuz8o3Ox613Ul+PJeGLf60yd0usq0/S3RybgoMsaV4y4YlXlgPsjN4w
-         rhc5MV75tFYuBSTtGLqGN8Fqm/CaDtTEx6OR8gjJh3a163jCXgj6wRqmCY1YpJftS08I
-         u+0w==
-X-Gm-Message-State: AOAM531ZCTMYius+DEsnkcmfM4e4CgB2WwYmA9YhWboFQZat04Jwm2tS
-        176sRIU9t4Of/9u9H7QS7tlTBasNtJo=
-X-Google-Smtp-Source: ABdhPJwAuWeOcFUHGhsX+qFcI2OepuZuCNc4KisdLbHJJjjK0fz/W1wtPGutuBdJgVbxtze3G4sXdw==
-X-Received: by 2002:aa7:96e3:0:b029:2ec:e8a1:3d66 with SMTP id i3-20020aa796e30000b02902ece8a13d66mr11670123pfq.79.1623091302423;
-        Mon, 07 Jun 2021 11:41:42 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=YCOhDTGAO3dSYHWp1brg94HHn7mstrbL0puqB4KiTKo=;
+        b=djHMEeiJt2+AEfiG/ht4wfgrDhoSrfOdbKXInV+H3hz7TIkHDbjQZWr8H8IHMICnWJ
+         sBbTwDyCS6GYRyEvmIZxeqvXsrLjUQKNAR7lb5sbA0chW8NoI5DsxocnJmtDyKe7W34/
+         h4KtJRywc1RefgfIYxOaABqtSDmE8iRr+F2rfqFkrEubof2XMmKb3m94JGfjE/BAi+Gw
+         oLrhaS9ubkO77VTQJSNkq+EY1T1OOFqxCQOCDJR/t6cOy9tUty8KsvbuSbXZQZi2nv09
+         CC0MKTmB4dn9nCOq1oEXg2AnngAOHwN3G4l93tCewzj0l1aibuswnlsFhVG49kabB1AE
+         RRYw==
+X-Gm-Message-State: AOAM532Tx9eJbZUrhAb4m58QyoinnDRZ8C6HSHryZcfqM8ATOWQG01WD
+        15zbt4HW9ZZDMbdUB/n1Gqf5KF8pI1w=
+X-Google-Smtp-Source: ABdhPJxJkDmSFmRwNqgSkpWURl/a+PqZrD8YQnqCpU6EKLhYoEnNZyjMpwXo+amB9gGjHYTospZQzA==
+X-Received: by 2002:a17:90b:803:: with SMTP id bk3mr522959pjb.224.1623091303128;
+        Mon, 07 Jun 2021 11:41:43 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id u13sm9435241pga.64.2021.06.07.11.41.41
+        by smtp.gmail.com with ESMTPSA id u13sm9435241pga.64.2021.06.07.11.41.42
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Mon, 07 Jun 2021 11:41:42 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] btdev: Check advertising/scanning states when changing White List
-Date:   Mon,  7 Jun 2021 11:41:32 -0700
-Message-Id: <20210607184134.2664349-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/2] btdev: Check advertising/scanning states when changing Resolving List
+Date:   Mon,  7 Jun 2021 11:41:33 -0700
+Message-Id: <20210607184134.2664349-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210607184134.2664349-1-luiz.dentz@gmail.com>
+References: <20210607184134.2664349-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
@@ -73,163 +72,88 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-White List cannot be changed when advertising/scanning:
+Resolving List cannot be changed when advertising/scanning:
 
-• any advertising filter policy uses the White List and advertising is
-enabled,
-• the scanning filter policy uses the White List and scanning is
-enabled, or
-• the initiator filter policy uses the White List and an
-HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
-command is outstanding.
+• Advertising (other than periodic advertising) is enabled,
+• Scanning is enabled, or
+• an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection, or
+HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
 ---
- emulator/btdev.c | 68 ++++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 68 insertions(+)
+ emulator/btdev.c | 40 ++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index ad5bb8d92..bfee0ed7b 100644
+index bfee0ed7b..eba9f57f9 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -150,11 +150,13 @@ struct btdev {
- 	uint8_t  le_adv_own_addr;
- 	uint8_t  le_adv_direct_addr_type;
- 	uint8_t  le_adv_direct_addr[6];
-+	uint8_t  le_adv_filter_policy;
- 	uint8_t  le_scan_data[31];
- 	uint8_t  le_scan_data_len;
- 	uint8_t  le_scan_enable;
- 	uint8_t  le_scan_type;
- 	uint8_t  le_scan_own_addr_type;
-+	uint8_t  le_scan_filter_policy;
- 	uint8_t  le_filter_dup;
- 	uint8_t  le_adv_enable;
- 	uint8_t  le_periodic_adv_enable;
-@@ -3002,6 +3004,7 @@ static int cmd_set_adv_params(struct btdev *dev, const void *data, uint8_t len)
- 	dev->le_adv_own_addr = cmd->own_addr_type;
- 	dev->le_adv_direct_addr_type = cmd->direct_addr_type;
- 	memcpy(dev->le_adv_direct_addr, cmd->direct_addr, 6);
-+	dev->le_adv_filter_policy = cmd->filter_policy;
- 
- 	status = BT_HCI_ERR_SUCCESS;
- 
-@@ -3223,6 +3226,7 @@ static int cmd_set_scan_params(struct btdev *dev, const void *data, uint8_t len)
- 	status = BT_HCI_ERR_SUCCESS;
- 	dev->le_scan_type = cmd->type;
- 	dev->le_scan_own_addr_type = cmd->own_addr_type;
-+	dev->le_scan_filter_policy = cmd->filter_policy;
- 
- done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS, &status,
-@@ -3396,10 +3400,45 @@ static int cmd_read_wl_size(struct btdev *dev, const void *data, uint8_t len)
- 	return 0;
- }
- 
-+static bool wl_can_change(struct btdev *dev)
-+{
-+	 /* filter policy uses the White List and advertising is enable. */
-+	if (dev->le_adv_enable && dev->le_adv_filter_policy)
-+		return false;
-+
-+	/* scanning filter policy uses the White List and scanning is enabled */
-+	if (dev->le_scan_enable) {
-+		switch (dev->le_scan_filter_policy) {
-+		case 0x00:
-+			return true;
-+		case 0x01:
-+			return false;
-+		case 0x02:
-+			return true;
-+		case 0x03:
-+			return false;
-+		}
-+	}
-+
-+	return true;
-+}
-+
- static int cmd_wl_clear(struct btdev *dev, const void *data, uint8_t len)
- {
- 	uint8_t status;
- 
-+	/* This command shall not be used when:
-+	 * • any advertising filter policy uses the White List and advertising
-+	 * is enabled,
-+	 * • the scanning filter policy uses the White List and scanning is
-+	 * enabled, or
-+	 * • the initiator filter policy uses the White List and an
-+	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
-+	 * command is outstanding.
-+	 */
-+	if (!wl_can_change(dev))
-+		return -EPERM;
-+
- 	wl_clear(dev);
- 
- 	status = BT_HCI_ERR_SUCCESS;
-@@ -3425,6 +3464,18 @@ static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
+@@ -3566,6 +3566,16 @@ static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
  	bool exists = false;
  	int i, pos = -1;
  
-+	/* This command shall not be used when:
-+	 * • any advertising filter policy uses the White List and advertising
-+	 * is enabled,
-+	 * • the scanning filter policy uses the White List and scanning is
-+	 * enabled, or
-+	 * • the initiator filter policy uses the White List and an
-+	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
-+	 * command is outstanding.
++	/* This command shall not be used when address resolution is enabled in
++	 * the Controller and:
++	 * • Advertising (other than periodic advertising) is enabled,
++	 * • Scanning is enabled, or
++	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
++	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
 +	 */
-+	if (!wl_can_change(dev))
++	if (dev->le_adv_enable || dev->le_scan_enable)
 +		return -EPERM;
 +
  	/* Valid range for address type is 0x00 to 0x01 */
  	if (cmd->addr_type > 0x01)
  		return -EINVAL;
-@@ -3464,6 +3515,18 @@ static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
+@@ -3607,6 +3617,16 @@ static int cmd_remove_rl(struct btdev *dev, const void *data, uint8_t len)
+ 	uint8_t status;
  	int i;
- 	char addr[18];
  
-+	/* This command shall not be used when:
-+	 * • any advertising filter policy uses the White List and advertising
-+	 * is enabled,
-+	 * • the scanning filter policy uses the White List and scanning is
-+	 * enabled, or
-+	 * • the initiator filter policy uses the White List and an
-+	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
-+	 * command is outstanding.
++	/* This command shall not be used when address resolution is enabled in
++	 * the Controller and:
++	 * • Advertising (other than periodic advertising) is enabled,
++	 * • Scanning is enabled, or
++	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
++	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
 +	 */
-+	if (!wl_can_change(dev))
++	if (dev->le_adv_enable || dev->le_scan_enable)
 +		return -EPERM;
 +
  	/* Valid range for address type is 0x00 to 0x01 */
  	if (cmd->addr_type > 0x01)
  		return -EINVAL;
-@@ -4120,6 +4183,7 @@ static int cmd_set_ext_adv_params(struct btdev *dev, const void *data,
- 	dev->le_adv_own_addr = cmd->own_addr_type;
- 	dev->le_adv_direct_addr_type = cmd->peer_addr_type;
- 	memcpy(dev->le_adv_direct_addr, cmd->peer_addr, 6);
-+	dev->le_adv_filter_policy = cmd->filter_policy;
+@@ -3634,6 +3654,16 @@ static int cmd_clear_rl(struct btdev *dev, const void *data, uint8_t len)
+ {
+ 	uint8_t status;
  
- 	rsp.status = BT_HCI_ERR_SUCCESS;
- 	rsp.tx_power = 0;
-@@ -4380,6 +4444,7 @@ static int cmd_set_ext_scan_params(struct btdev *dev, const void *data,
- 		 */
- 		dev->le_scan_type = scan->type;
- 		dev->le_scan_own_addr_type = cmd->own_addr_type;
-+		dev->le_scan_filter_policy = cmd->filter_policy;
- 	}
++	/* This command shall not be used when address resolution is enabled in
++	 * the Controller and:
++	 * • Advertising (other than periodic advertising) is enabled,
++	 * • Scanning is enabled, or
++	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
++	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
++	 */
++	if (dev->le_adv_enable || dev->le_scan_enable)
++		return -EPERM;
++
+ 	rl_clear(dev);
  
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_SCAN_PARAMS, &status,
-@@ -5761,6 +5826,9 @@ static const struct btdev_cmd *default_cmd(struct btdev *btdev, uint16_t opcode,
- 		case -EINVAL:
- 			status = BT_HCI_ERR_INVALID_PARAMETERS;
- 			goto failed;
-+		case -EPERM:
-+			status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+			goto failed;
- 		default:
- 			status = BT_HCI_ERR_UNSPECIFIED_ERROR;
- 			goto failed;
+ 	status = BT_HCI_ERR_SUCCESS;
+@@ -3699,6 +3729,16 @@ static int cmd_set_rl_enable(struct btdev *dev, const void *data, uint8_t len)
+ 	const struct bt_hci_cmd_le_set_resolv_enable *cmd = data;
+ 	uint8_t status;
+ 
++	/* This command shall not be used when address resolution is enabled in
++	 * the Controller and:
++	 * • Advertising (other than periodic advertising) is enabled,
++	 * • Scanning is enabled, or
++	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
++	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
++	 */
++	if (dev->le_adv_enable || dev->le_scan_enable)
++		return -EPERM;
++
+ 	/* Valid range for address resolution enable is 0x00 to 0x01 */
+ 	if (cmd->enable > 0x01)
+ 		return -EINVAL;
 -- 
 2.31.1
 
