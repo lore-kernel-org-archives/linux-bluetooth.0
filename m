@@ -2,70 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE3FFC4743D
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 01:58:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05104C47082
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 07:55:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B206E611AB
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 01:58:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF5AC611AB
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 07:55:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230187AbhFGCAZ (ORCPT
+        id S230169AbhFGH50 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 6 Jun 2021 22:00:25 -0400
-Received: from mail-qv1-f51.google.com ([209.85.219.51]:34627 "EHLO
-        mail-qv1-f51.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230145AbhFGCAX (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 6 Jun 2021 22:00:23 -0400
-Received: by mail-qv1-f51.google.com with SMTP id hf3so2188704qvb.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 06 Jun 2021 18:58:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=TZ3fbnw0dHyN2xr2hVf1US2R/f4ZBnSgB3Om3hO5kzM=;
-        b=XBSVSwWXpPtjEUtBqXEq8hXfwj5G71J5kVoBs+BOMjKhcuNxDhAdpK8ACgpYXWFQZ4
-         jHPUMBWOSewYIgKEmGQMmawRj1P6BFvvW+giKp+S+j3Rz+H4TLtbE5XbzqgqOr+fVAoA
-         8mjzf+/iGHjafbvj0aHpJ1s2rMucz1gy5nCCM0yLhJgH3S/a5vbzoAZOpV6zvEdn0L91
-         LkEHw29dRGFt1mujet0usF3wUjBqY/O6AQVScklCtHxliiIZDhBtPvHRjTFLZYVPbroL
-         WLYNBBk2g2flDrC1gB7wGga1xKQAShwAat2zxVKxZRNM16Ho/g6iNx7c4McIxsel+8SR
-         ++1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=TZ3fbnw0dHyN2xr2hVf1US2R/f4ZBnSgB3Om3hO5kzM=;
-        b=lOQeV2j/D6dMtvNGFqP2Qxr6xCkgQeLjS/MpiRlNfItnw4nTTwx1h4zYTR28F5SIQC
-         5Su0aGaX3j3xC0Xn2wK+lcYw9Isk8sdLuXOkn03Fdg53VdHopmfal8prqBzEzU6K1vE4
-         gAK41OQqQzynCS3gStpdOg6vsX3tf57usOpA+S8werIEBUziZGEvRhBLeH8g3wgm+Nm9
-         pJiZ33TfO1ocsYlgDiMLwOQS+XhSpQ8mV+al34CnWH2VQkJWpf6cwyj+tqTEWJqw5YUv
-         WIMjNV2THVwp1QWxVdYIFqtsoKNjy4Jbu83S6TBvRfWbgSpsAw24QNJy9I4TdEs+jAXD
-         4pMQ==
-X-Gm-Message-State: AOAM530MVbshDBCmosYgu/EAOb8wiPtUz7KcTxQzQUyN73hpO3Lp82ZS
-        StjAgqHCSj9No7Qaxa1OpaoZgtjtGkMIy8xXwYZyAoy99OUj+Q==
-X-Google-Smtp-Source: ABdhPJyiOFVmY95j7NmpR5NqQftb7fu6ZoJeGHZtf533T9c8dA+ZN31vhxEz288RIVdUcEKA6blKaF7e1rX0QzZshtc=
-X-Received: by 2002:a05:6214:848:: with SMTP id dg8mr15907615qvb.2.1623031036499;
- Sun, 06 Jun 2021 18:57:16 -0700 (PDT)
+        Mon, 7 Jun 2021 03:57:26 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55566 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229436AbhFGH5Z (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Jun 2021 03:57:25 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E8E2E60238;
+        Mon,  7 Jun 2021 07:55:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623052534;
+        bh=qlaXBBljfuNy9WKbCWLsVZBe2CUbxsFeGMx1HeZlRao=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=r0TrbnG7uOmzox7WYNlVPtv2R0PIW2dzfzFoCoabl0Z/vTQV1kgLsyHchCLxNLcQI
+         4baEnybEh4BAZGia/iNRJL6FTBI6PRj415vAikhogurOMkyqAWafpp0HcGQN3zFxYJ
+         C7gcq62LUzHRziw7Qd7xiJPtbmaNoLi8xVGHOjPQ=
+Date:   Mon, 7 Jun 2021 09:55:31 +0200
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     Leon Romanovsky <leon@kernel.org>, SyzScope <syzscope@gmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Subject: Re: KASAN: use-after-free Read in hci_chan_del
+Message-ID: <YL3Q848EVIdkUrF4@kroah.com>
+References: <000000000000adea7f05abeb19cf@google.com>
+ <c2004663-e54a-7fbc-ee19-b2749549e2dd@gmail.com>
+ <YLn24sFxJqGDNBii@kroah.com>
+ <0f489a64-f080-2f89-6e4a-d066aeaea519@gmail.com>
+ <YLsrLz7otkQAkIN7@kroah.com>
+ <20210606085004.12212-1-hdanton@sina.com>
+ <20210607074828.3259-1-hdanton@sina.com>
 MIME-Version: 1.0
-From:   "jonsmirl@gmail.com" <jonsmirl@gmail.com>
-Date:   Sun, 6 Jun 2021 21:57:05 -0400
-Message-ID: <CAKON4OyOnKBOECYBSqDDQ+iX-UxH6Q3t=CXcm62CMuH2nmpRfw@mail.gmail.com>
-Subject: Bluetooth 6lowpan and kernel lockdown
-To:     BlueZ development <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210607074828.3259-1-hdanton@sina.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-6lowpan_enable and 6lowpan_control parameters are exposed via debugfs.
-Since Ubuntu has turned on kernel lockdown by default I can't access
-debugfs anymore.  If I want to turn on 6lowpan_enable in Ubuntu my
-only solution is to turn off secure boot. I've done that and it works,
-but could these parameters be reworked so as to not require turning
-off secure boot in order to enable bluetooth 6lowpan?
+On Mon, Jun 07, 2021 at 03:48:28PM +0800, Hillf Danton wrote:
+> On Sun, 6 Jun 2021 11:54:22 +0200 Greg KH wrote:
+> >On Sun, Jun 06, 2021 at 04:50:04PM +0800, Hillf Danton wrote:
+> >> 
+> >> To fix the uaf reported, add reference count to hci channel to track users.
+> >> Then only channels with zero users will be released.
+> >> 
+> >> It is now only for thoughts.
+> >> 
+> >> +++ x/include/net/bluetooth/hci_core.h
+> >> @@ -704,6 +704,7 @@ struct hci_chan {
+> >>  	struct sk_buff_head data_q;
+> >>  	unsigned int	sent;
+> >>  	__u8		state;
+> >> +	atomic_t ref;
+> >
+> >Please no, never use "raw" atomic variables.  Especially for something
+> >like this, use a kref.
+> 
+> Fair, thanks for taking a look at it.
+> 
+> Spin with care for the race the added ref fails to cut.
 
--- 
-Jon Smirl
-jonsmirl@gmail.com
+I do not understand what you mean here.
+
+> To ease review the full syzreport is also attached.
+> 
+> To fix uaf, add user track to hci channel and we will only release channel if
+> its user hits zero. And a dryrun mechanism is also added to take care of the
+> race user track fails to cut.
+> 
+> 	CPU0			CPU1
+> 	----			----
+> 	hci_chan_del		l2cap_conn_del
+> 				chan->user = 0;
+> 
+> 	if (chan->user != 0)
+> 		return;
+> 	synchronize_rcu();
+> 	kfree(chan);
+> 
+> 				hci_chan_del();
+> 
+> It is now only for thoughts.
+> 
+> +++ x/include/net/bluetooth/hci_core.h
+> @@ -704,6 +704,10 @@ struct hci_chan {
+>  	struct sk_buff_head data_q;
+>  	unsigned int	sent;
+>  	__u8		state;
+> +	__u8		user;
+
+No.
+
+> +	__u8		release;
+
+No please no.
+
+> +
+> +#define HCHAN_RELEASE_DRYRUN 1
+>  };
+>  
+>  struct hci_conn_params {
+> +++ x/net/bluetooth/l2cap_core.c
+> @@ -1903,6 +1903,12 @@ static void l2cap_conn_del(struct hci_co
+>  
+>  	mutex_unlock(&conn->chan_lock);
+>  
+> +	/* see comment in hci_chan_del() */
+> +	conn->hchan->release = HCHAN_RELEASE_DRYRUN;
+> +	smp_wmb();
+> +	conn->hchan->user--;
+
+And the reason you are open-coding a kref is why???
+
+Please again no.
+
+> +	hci_chan_del(conn->hchan);
+> +	conn->hchan->release = 0;
+>  	hci_chan_del(conn->hchan);
+>  
+>  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+> @@ -7716,6 +7722,8 @@ static struct l2cap_conn *l2cap_conn_add
+>  	kref_init(&conn->ref);
+>  	hcon->l2cap_data = conn;
+>  	conn->hcon = hci_conn_get(hcon);
+> +	/* dec in l2cap_conn_del() */
+> +	hchan->user++;
+
+{sigh}
+
+No, there is a reason we wrote kref many _decades_ ago.  Please use it,
+your original attempt with an atomic was just fine, just use the proper
+data structures the kernel provides you as this is obviously a reference
+counted object.
+
+thanks,
+
+greg k-h
