@@ -7,42 +7,42 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F300C47095
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:26:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1911C47095
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:26:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A65A613BE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:26:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9048A613BE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:26:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232369AbhFGQ20 (ORCPT
+        id S233625AbhFGQ21 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jun 2021 12:28:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:32772 "EHLO mail.kernel.org"
+        Mon, 7 Jun 2021 12:28:27 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60478 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232192AbhFGQXG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jun 2021 12:23:06 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6005761933;
-        Mon,  7 Jun 2021 16:15:28 +0000 (UTC)
+        id S233764AbhFGQY2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Jun 2021 12:24:28 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id CF37F61949;
+        Mon,  7 Jun 2021 16:15:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623082529;
-        bh=yj8ftTlOiTAwjfjuv4XnTbRRyDBDAiG+Pt5Uz2JaO/c=;
+        s=k20201202; t=1623082555;
+        bh=QJbYxkmjGTiKMFT/ADimCcoSFQEo3WxH3FOOmcIHplA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uiepu2vV7fbfIpTU7EQS95H15mLbeXphWjV3R6qRxZgmOlqslsPTtLEhGYxH2JQQA
-         LFeE11jXZzQbN86HS4wiRPx4HWmMCOuektBF8tXfNvEfepY6TmGDo6Qg6T4D4Tg8Db
-         LzKioKZQMxBHlZj4Fw5bDg04AkmCvgR7VU9BrAUb+84he+Uwic+U/VmmVjiUXSqbSl
-         zb/xwyLPr19rC4jNi8Q7CkSbbyCHWSfQAbt80b/Bcz82oPGif5VAt/JqxBEEkW8fCR
-         kg4AN0o2NfAaJbLCxiY/JjV/eTa+Va/HBDM6oztk2h3tmA/DZsQBHhVOmPBDMdaaqW
-         TOQo2fd21Ou/A==
+        b=JBFyyEBgTHc0lRU6TBiOi+WTmdIdKJfzW2mRts+u8cf0eVYB5ptglhGo1SGHYm6ET
+         anM7B82bG7Gm6pPvTlrfd+AysV2O7lkVTZJx+lV4+S6UaE6sHtjMNsXxo5b7s1l/Vt
+         f4+GSmVfBVQ3YDYY4/MmUv+36prnUFi8D2Q5MJykq445YEWduyBgQ0nwPqFhCD76M5
+         1Idvdnt+X7Y5a4Mw3q2vGWCL5qQGM+SDDZz7aB2qzPOWjczCvfFOqqw2hXZaWivwO8
+         MelZI+0Qyp04xa76uAv67U1sDGOC+5ulV+xsJcl6G3DCGrRR49IyXth3rGAUV90bxS
+         NoHx202WR95Zg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Lin Ma <linma@zju.edu.cn>, Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.14 08/18] Bluetooth: use correct lock to prevent UAF of hdev object
-Date:   Mon,  7 Jun 2021 12:15:06 -0400
-Message-Id: <20210607161517.3584577-8-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.9 08/15] Bluetooth: use correct lock to prevent UAF of hdev object
+Date:   Mon,  7 Jun 2021 12:15:36 -0400
+Message-Id: <20210607161543.3584778-8-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210607161517.3584577-1-sashal@kernel.org>
-References: <20210607161517.3584577-1-sashal@kernel.org>
+In-Reply-To: <20210607161543.3584778-1-sashal@kernel.org>
+References: <20210607161543.3584778-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -70,7 +70,7 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 93093d7c3824..120064e9cb2b 100644
+index 44b3146c6117..35f5585188de 100644
 --- a/net/bluetooth/hci_sock.c
 +++ b/net/bluetooth/hci_sock.c
 @@ -750,7 +750,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
