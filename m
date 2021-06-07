@@ -7,39 +7,40 @@ X-Spam-Status: No, score=-19.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01041C47082
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:15:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 098CDC47082
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:15:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D712161953
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:15:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA26461950
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  7 Jun 2021 16:15:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232637AbhFGQRb (ORCPT
+        id S231998AbhFGQRm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 7 Jun 2021 12:17:31 -0400
-Received: from mail.kernel.org ([198.145.29.99]:48406 "EHLO mail.kernel.org"
+        Mon, 7 Jun 2021 12:17:42 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48832 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231949AbhFGQQL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 7 Jun 2021 12:16:11 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id CF8DA61452;
-        Mon,  7 Jun 2021 16:13:43 +0000 (UTC)
+        id S231994AbhFGQQM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 7 Jun 2021 12:16:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id E853E61467;
+        Mon,  7 Jun 2021 16:13:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1623082424;
-        bh=EfJUgZAXEQ4e3/YoC+7oj97TJtaGz+HewvLUCRFRV0E=;
+        s=k20201202; t=1623082429;
+        bh=UqhJ3SIEBL8LVZzYQuYX/Sxg3qd2Hxfplf+mP7Pmmsk=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=RwNcnHAPG0m0kCbZ7AX/4HEcqIEiY8nj4QLLj8sKq7hSgyrsS4i5+ZbU1dDnoG5TC
-         GApskweTDmruIKnnkkXGeOBe6gUYtL9jKD9+/Ox60PWEkt/KGafcyaAkwGozxkTbqp
-         Or97Tr6BXJMtr6ghaon8yUgwEiKNmD8V3DbHI64d/jZTX2cQ3sOJ9fagvfNYyJJAfh
-         wxLhQwmo5sKbYPgbHG774vXoOJ5kSNsLoUqDm1NfxQFDBu06I772myjrjfxI/GVl6a
-         prBTn0luqz2pN+8T1lfAUEM8OvCr4bP3V/5z8TFScgsREN2x+cNZP7yv4wiasya9TX
-         wo0Gi9PowjQ8w==
+        b=sDMrnFsP3yQCIjJl1z+usPOgsk6G7xXxobROEabu3sdPrCyUWBwNAna3SRVOrdY/k
+         XArp1iHVDm/DzVXjsZXIY1cNf1a2JA/6WlGzMC6vDvZIC5zOG7VQJd1PJn3Yur7pZl
+         bovTf9VszeVvLb7A2ZvAMh8V2ln4FEsTnS5v/Tw8lMkOeWwxpzCwVmFHt0fwdtgdMA
+         pLM8ydDf7GdIznJ10ErzV0dyCoqaydNHJdubGG3Kh1Aa/vzU1/mFPvf6xZTg5pq2jp
+         5Qtyy7hDeRqMfMof4HD1z1Ue1lNrajRwx7+dSpBLUDvrDYR3di8KxDyejThLkeFcHo
+         aP1TpikQ8EHcg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Lin Ma <linma@zju.edu.cn>, Marcel Holtmann <marcel@holtmann.org>,
+Cc:     Larry Finger <Larry.Finger@lwfinger.net>,
+        Linus Torvalds <torvalds@linux-foundation.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 20/39] Bluetooth: use correct lock to prevent UAF of hdev object
-Date:   Mon,  7 Jun 2021 12:12:59 -0400
-Message-Id: <20210607161318.3583636-20-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.10 24/39] Bluetooth: Add a new USB ID for RTL8822CE
+Date:   Mon,  7 Jun 2021 12:13:03 -0400
+Message-Id: <20210607161318.3583636-24-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210607161318.3583636-1-sashal@kernel.org>
 References: <20210607161318.3583636-1-sashal@kernel.org>
@@ -51,46 +52,33 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Lin Ma <linma@zju.edu.cn>
+From: Larry Finger <Larry.Finger@lwfinger.net>
 
-[ Upstream commit e305509e678b3a4af2b3cfd410f409f7cdaabb52 ]
+[ Upstream commit 4d96d3b0efee6416ef0d61b76aaac6f4a2e15b12 ]
 
-The hci_sock_dev_event() function will cleanup the hdev object for
-sockets even if this object may still be in used within the
-hci_sock_bound_ioctl() function, result in UAF vulnerability.
+Some models of the RTL8822ce utilize a different USB ID. Add this
+new one to the Bluetooth driver.
 
-This patch replace the BH context lock to serialize these affairs
-and prevent the race condition.
-
-Signed-off-by: Lin Ma <linma@zju.edu.cn>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_sock.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index 251b9128f530..eed0dd066e12 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -762,7 +762,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
- 		/* Detach sockets from device */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, &hci_sk_list.head) {
--			bh_lock_sock_nested(sk);
-+			lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
- 				hci_pi(sk)->hdev = NULL;
- 				sk->sk_err = EPIPE;
-@@ -771,7 +771,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 175cb1c0d569..b1f0b13cc8bc 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -385,6 +385,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* Realtek 8822CE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0xb00c), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0xc822), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
  
- 				hci_dev_put(hdev);
- 			}
--			bh_unlock_sock(sk);
-+			release_sock(sk);
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
+ 	/* Realtek Bluetooth devices */
+ 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
 -- 
 2.30.2
 
