@@ -2,117 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21D9CC47082
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:55:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1DE41C49361
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 19:00:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1F6061351
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:55:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EFA866108D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 19:00:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236354AbhFHS5L (ORCPT
+        id S235890AbhFHTCV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 14:57:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32818 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236684AbhFHSzB (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 14:55:01 -0400
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0BFC061787;
-        Tue,  8 Jun 2021 11:50:26 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id b13so31667257ybk.4;
-        Tue, 08 Jun 2021 11:50:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=7M9VFsKxrdlHw7/FHmSJbgO0028h75HscQCU07Ex82A=;
-        b=r8sOulUb+7Oo4UIhwZeOlhEmOVKFUnbKJdPHPpvItasm9l1e/OuimK82WismH5johH
-         eFH6ziz3Eic9iwreIahg0F34U6Cq5pGhPBvXtP7/lVk+ex3XTG34z4oG2j4Os/vPzhHG
-         p5bpBobMFS2yi+POFP7nWQy9q9DeS0itQmgEDqWv4r7QiobKh7nZUu7PaHl+nbOn5fj+
-         tK4JNVrtMPyAB5/TgPrzY0qpS2tObfgjWiG/ClAQoLkE5mOHSk3NCtjqhJOjOoSgGfI4
-         P+2Ks/3iD1L2MKPTRAE+tXUGD3fxoNYCt2oZ0EpBJtjbGOyMu5eK2l45GOT4hY/Zzls/
-         XOiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=7M9VFsKxrdlHw7/FHmSJbgO0028h75HscQCU07Ex82A=;
-        b=b90Z5c6GDD8nk8FzOE8py0JJ0PphuWhgHyV8RwRi04KZpYK02tD9RVMrthitc0Vs5+
-         FQMnHcwRpRa8YhvZr6yjYGVCpCCKwMXsUuGl5eRzTJUwVd1x3WGFNfpjFk7DZcSkvKty
-         qkXAwd8N69i6v2Zx+K5qZ2hr8bAZkRgvYQqq8FYsvfY1laCxmrRhkkG7jX/clj/hUtD4
-         Iqmc/4SLQN0KTazmq5NS1z9xzgDxlfS8PE+WkxvfejxRofroYSYStSYdl35Jr1ybyw20
-         I3HFSQbWjnyoD1s4JUhMtWX3dhJvUYKEqi8cMEgP0JIvBKIV6sRUOiSJFWFqG0lzC32F
-         /cOg==
-X-Gm-Message-State: AOAM530LmyBHH6GTpddZeiFfhl87/uTP9Ct2f0Cgkf6XpJxWWnsf/Z1K
-        Dxs2aHR4o+z521zTw8K1AnUa64K5yGoAKfno5J5264uU
-X-Google-Smtp-Source: ABdhPJz3xMma3vSOQfDOk0uVSq7V1AQYYr07TtsGqokzUkZW8FU1/kPpaxcikO29kCtIOjTZ1gDrgUc7jNIWu0ECDIc=
-X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr35693284ybu.282.1623178224957;
- Tue, 08 Jun 2021 11:50:24 -0700 (PDT)
+        Tue, 8 Jun 2021 15:02:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34780 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236769AbhFHS7e (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Jun 2021 14:59:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C996461442;
+        Tue,  8 Jun 2021 18:43:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1623177803;
+        bh=8inqZlLFAoPV/eTd2CWwAlxCN2FGHO0YFkuEPuXML6U=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+        b=DqCdiyjacsLE7CgDp3soQpHfTMs9mdGYShr3O8dLuIbvczCGq+61aMf+4emQkQU6h
+         QbdqJ01iPqye6eMK+KBKgZRn6Edp719xnpweDCgLgA/hBW1xDHz+2xjAnnp6X8LRqw
+         QYmlu3/q22ow/GVev7L9jvukadhTJaBVNKNa0w6I=
+From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To:     linux-kernel@vger.kernel.org
+Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        stable@vger.kernel.org, Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        Lin Ma <linma@zju.edu.cn>, Hao Xiong <mart1n@zju.edu.cn>
+Subject: [PATCH 5.10 078/137] Bluetooth: fix the erroneous flush_work() order
+Date:   Tue,  8 Jun 2021 20:26:58 +0200
+Message-Id: <20210608175944.992647333@linuxfoundation.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <20210608175942.377073879@linuxfoundation.org>
+References: <20210608175942.377073879@linuxfoundation.org>
+User-Agent: quilt/0.66
 MIME-Version: 1.0
-References: <20210603215249.1048521-1-luiz.dentz@gmail.com>
-In-Reply-To: <20210603215249.1048521-1-luiz.dentz@gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Jun 2021 11:50:14 -0700
-Message-ID: <CABBYNZJqBbq0pMRt9w7XLLw0MnxmavokT2t6_PqwGVf4YfdnNA@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2021-06-03
-To:     David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi David, Jakub,
+From: Lin Ma <linma@zju.edu.cn>
 
-On Thu, Jun 3, 2021 at 2:52 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> The following changes since commit 62f3415db237b8d2aa9a804ff84ce2efa87df179:
->
->   net: phy: Document phydev::dev_flags bits allocation (2021-05-26 13:15:55 -0700)
->
-> are available in the Git repository at:
->
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2021-06-03
->
-> for you to fetch changes up to 1f14a620f30b01234f8b61df396f513e2ec4887f:
->
->   Bluetooth: btusb: Fix failing to init controllers with operation firmware (2021-06-03 14:02:17 -0700)
->
-> ----------------------------------------------------------------
-> bluetooth pull request for net:
->
->  - Fixes UAF and CVE-2021-3564
->  - Fix VIRTIO_ID_BT to use an unassigned ID
->  - Fix firmware loading on some Intel Controllers
->
-> ----------------------------------------------------------------
-> Lin Ma (2):
->       Bluetooth: fix the erroneous flush_work() order
->       Bluetooth: use correct lock to prevent UAF of hdev object
->
-> Luiz Augusto von Dentz (1):
->       Bluetooth: btusb: Fix failing to init controllers with operation firmware
->
-> Marcel Holtmann (1):
->       Bluetooth: Fix VIRTIO_ID_BT assigned number
->
->  drivers/bluetooth/btusb.c       | 23 +++++++++++++++++++++--
->  include/uapi/linux/virtio_ids.h |  2 +-
->  net/bluetooth/hci_core.c        |  7 ++++++-
->  net/bluetooth/hci_sock.c        |  4 ++--
->  4 files changed, 30 insertions(+), 6 deletions(-)
+commit 6a137caec23aeb9e036cdfd8a46dd8a366460e5d upstream.
 
-We are hoping we could merge these before the release.
+In the cleanup routine for failed initialization of HCI device,
+the flush_work(&hdev->rx_work) need to be finished before the
+flush_work(&hdev->cmd_work). Otherwise, the hci_rx_work() can
+possibly invoke new cmd_work and cause a bug, like double free,
+in late processings.
+
+This was assigned CVE-2021-3564.
+
+This patch reorder the flush_work() to fix this bug.
+
+Cc: Marcel Holtmann <marcel@holtmann.org>
+Cc: Johan Hedberg <johan.hedberg@gmail.com>
+Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+Signed-off-by: Hao Xiong <mart1n@zju.edu.cn>
+Cc: stable <stable@vger.kernel.org>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+---
+ net/bluetooth/hci_core.c |    7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
+
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1602,8 +1602,13 @@ setup_failed:
+ 	} else {
+ 		/* Init failed, cleanup */
+ 		flush_work(&hdev->tx_work);
+-		flush_work(&hdev->cmd_work);
++
++		/* Since hci_rx_work() is possible to awake new cmd_work
++		 * it should be flushed first to avoid unexpected call of
++		 * hci_cmd_work()
++		 */
+ 		flush_work(&hdev->rx_work);
++		flush_work(&hdev->cmd_work);
+ 
+ 		skb_queue_purge(&hdev->cmd_q);
+ 		skb_queue_purge(&hdev->rx_q);
 
 
--- 
-Luiz Augusto von Dentz
