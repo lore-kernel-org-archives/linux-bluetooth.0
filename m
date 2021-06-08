@@ -2,72 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69413C47082
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:46:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3938C47082
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:53:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 55E1761287
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:46:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BCBF46124B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:53:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231343AbhFHIsB (ORCPT
+        id S230369AbhFHIzl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 04:48:01 -0400
-Received: from new3-smtp.messagingengine.com ([66.111.4.229]:43025 "EHLO
-        new3-smtp.messagingengine.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231337AbhFHIsA (ORCPT
+        Tue, 8 Jun 2021 04:55:41 -0400
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:17778 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229507AbhFHIzk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 04:48:00 -0400
-Received: from compute1.internal (compute1.nyi.internal [10.202.2.41])
-        by mailnew.nyi.internal (Postfix) with ESMTP id 79FBF5804C1;
-        Tue,  8 Jun 2021 04:46:07 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute1.internal (MEProxy); Tue, 08 Jun 2021 04:46:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kroah.com; h=
-        date:from:to:cc:subject:message-id:references:mime-version
-        :content-type:content-transfer-encoding:in-reply-to; s=fm1; bh=O
-        cJGuks2BsIJ9Z1Uvy/YBynhz/rsZ2UduAezquC86NI=; b=Av6caqxi5rTeJuJHw
-        NWZllbrLTXvWa6MpjlijpjX11gb55Q9azwW9YidOA7pOaoaBZSbY9Er5dQF3lAwH
-        XRCYFjQQkWNjX09zfqB2bbyTZ2mYtyx2iNJu1VVlM/KfyAN6Tnjugvlkl6cKwKrF
-        v5Q4Stz39wCAJcxFC3HftStWE/BMDI9JOUeza2CR4jQFVcJlT+N3QezxzhJe2yIB
-        S3QXGkKjZ7jcy1uCy+7X53oQC0v2UeKU+K61lSBBZrBzNm4bUcg9wC8QCa5ErgDI
-        2c+8ZfMRSyHtP9PSb0qUczFUy5Fqcr7m9/I999kyu60xVMk94hj+0wYvV7Y1Yvfl
-        dSSWA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-        messagingengine.com; h=cc:content-transfer-encoding:content-type
-        :date:from:in-reply-to:message-id:mime-version:references
-        :subject:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-        :x-sasl-enc; s=fm3; bh=OcJGuks2BsIJ9Z1Uvy/YBynhz/rsZ2UduAezquC86
-        NI=; b=LQ3VVl0vrlrnC1fH8a6CIwcGKSaKfX0uKUPPrFAxMAoczlzylddAm1zFD
-        rYqKAwYGUWA/3OAg2hMIW9NFlRfDq7MZTwuuEqBL226S/F/OSkbV31O/L3ZudGdN
-        xIv+0nG+5SjqmHYHjrZXqM6E72EZ8DcfQig6lt4AVp+Yan/a2FE3fusNCm0/TnYE
-        rEUdURyDrdJdZzWXpPKA7bHeyZoilks79sJa8CquafC8YfJHuVXf0ibgmvQLTr1i
-        XC3auMTnQ6ebbQDZd0RxdXliO92ysTZJ3e/teU8uNtYzNWOtwuCxWbJvchXXkuG/
-        bESeHmPi1hLl9C76I1WnQkySvf12Q==
-X-ME-Sender: <xms:TS6_YIUQMV85vYceE_lEfts11O3sw_pzt-ANcNmNvDlGmb4-zWcgpQ>
-    <xme:TS6_YMmiTXVRcc3dMiyofq3ut_wU-7FvwJ7wa7jYb8bZoSlbYoLjrMtumMsY2oU2Z
-    lmyh9f1u44CKw>
-X-ME-Received: <xmr:TS6_YMY9-whsuVEzWq1Bp1BSfff-rqAZsKkvlLrs-jk_6INBXZz8KoY_ZE7TZO3TWk_spwo0adZE16jkQr7Ag6vv3SjhsTPA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeduledrfedtledgtdehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepfffhvffukfhfgggtugfgjgesthekredttddtudenucfhrhhomhepifhrvghg
-    ucfmjfcuoehgrhgvgheskhhrohgrhhdrtghomheqnecuggftrfgrthhtvghrnhepvedtie
-    elueetgeeggfeufefhvefgtdetgfetgfdtvdegjeehieduvddtkeffheffnecuvehluhhs
-    thgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepghhrvghgsehkrhhorg
-    hhrdgtohhm
-X-ME-Proxy: <xmx:TS6_YHWd5HfNLAvh7lnUeqIL8D5jGoHawtStOpDi8ll8GN3zLPjDag>
-    <xmx:TS6_YCnt7Uu46jz_WR3dWUz52tJNSV5gJXuTALwt-yUAhUW-zsoxqg>
-    <xmx:TS6_YMdsE8gWbnV1WaLsXIEZv-twskMgkpCqAI_AQWZy05m4peZpYw>
-    <xmx:Ty6_YEXRGZbV09VfuUGJhNrBV6JF7eva0271Y_yYabrH33rJJ0R8ng>
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 8 Jun 2021 04:46:05 -0400 (EDT)
-Date:   Tue, 8 Jun 2021 10:46:04 +0200
-From:   Greg KH <greg@kroah.com>
-To:     SyzScope <syzscope@gmail.com>
-Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
+        Tue, 8 Jun 2021 04:55:40 -0400
+Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1588lt9Q000998;
+        Tue, 8 Jun 2021 08:53:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : mime-version : content-type :
+ in-reply-to; s=corp-2020-01-29;
+ bh=uXsfBS09h5r8atqX2PNh5Ig45l4lwTr4pwZjL/r3r08=;
+ b=rIHqGiszTwgFXYU/29HrTXFSuOgR9+nwuryBFW68Xibj9DLPsIar+VXv/BI9MdswqoYW
+ 2qR4lyled93+VhADteVmUs9HeKBOAQyMh8qnNO8Fr5XK8r1U1S4AZ0uFyUc4sgJY9EIf
+ +XrbhyeczsMbcIjlnA9yYyf/LrrpIKgiANecaz/VPhzenvG0jKqlG1h1YvJYHJEEt7RH
+ mscM9rM8T6aLdp334Non989aCGXV6XRsWAl6PMNBuuz3mBtdfATRf1MNq5iz+iZ0jnLw
+ MwQZc+pA5q0zFWnC/kVAdl3hiEU70Or7jAUNXolAmXEZy+puOr+cvoJseSgdfyJFalN6 Vw== 
+Received: from oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3916ehrkkr-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jun 2021 08:53:27 +0000
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
+        by pps.podrdrct (8.16.0.36/8.16.0.36) with SMTP id 1588pMAu194740;
+        Tue, 8 Jun 2021 08:53:27 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by aserp3030.oracle.com with ESMTP id 38yyaaqvpv-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jun 2021 08:53:27 +0000
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 1588rQWJ003308;
+        Tue, 8 Jun 2021 08:53:26 GMT
+Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
+        by aserp3030.oracle.com with ESMTP id 38yyaaqvpd-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Tue, 08 Jun 2021 08:53:26 +0000
+Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
+        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 1588rJqi003329;
+        Tue, 8 Jun 2021 08:53:22 GMT
+Received: from kadam (/41.212.42.34)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Tue, 08 Jun 2021 08:53:18 +0000
+Date:   Tue, 8 Jun 2021 11:53:10 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc:     SyzScope <syzscope@gmail.com>,
         syzbot <syzbot+305a91e025a73e4fd6ce@syzkaller.appspotmail.com>,
         davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
@@ -75,51 +68,26 @@ Cc:     "Jason A. Donenfeld" <Jason@zx2c4.com>,
         syzkaller-bugs@googlegroups.com,
         kernel-hardening@lists.openwall.com
 Subject: Re: KASAN: use-after-free Read in hci_chan_del
-Message-ID: <YL8uTH9Ey3U38yPr@kroah.com>
+Message-ID: <20210608085310.GA1955@kadam>
 References: <000000000000adea7f05abeb19cf@google.com>
  <2fb47714-551c-f44b-efe2-c6708749d03f@gmail.com>
  <YL3zGGMRwmD7fNK+@zx2c4.com>
- <YL4BAKHPZqH6iPdP@kroah.com>
- <dd3094fa-9cb8-91c2-7631-a69c34eac387@gmail.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <dd3094fa-9cb8-91c2-7631-a69c34eac387@gmail.com>
+In-Reply-To: <YL3zGGMRwmD7fNK+@zx2c4.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-Proofpoint-GUID: 9xkxAKvdty5E81yk4zbMACfpHhdkZeVE
+X-Proofpoint-ORIG-GUID: 9xkxAKvdty5E81yk4zbMACfpHhdkZeVE
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, Jun 07, 2021 at 11:26:26AM -0700, SyzScope wrote:
-> Hi all,
-> We are really thankful for all the suggestions and concerns. We are
-> definitely interested in continuing this line of research.
-> 
-> Just to clarify:  SyzScope is an ongoing research project that is currently
-> under submission, which has an anonymity requirement.
+This SyzScope stuff could be good in theory and it could be something
+useful with more work.  But in real life terms do you know anyone who
+looked at "use-after-free Read in hci_chan_del" and thought, "Oh that
+sounds totally harmless."
 
-As documented, we can not accept anonymous contributions to the kernel,
-so perhaps just wait until your paper is accepted?  However, we take
-patches from researchers all the time under their real names while their
-papers are being reviewed, so this "requirement" seems odd to me, who is
-requiring this?
+regards,
+dan carpenter
 
-> Therefore we chose to
-> use a gmail address initially in the public channel. Since Greg asked, we
-> did reveal our university affiliation and email address, as well as
-> cross-referenced a private email (again using university address) to
-> security@kernel.org.
-
-security@kernel.org is for fixing bugs reported to them that are not
-public, it is not for any sort of "notification of affiliation".  See
-the documentation for the details about what this alias is to be used
-for please.
-
-> We are sorry for the chaos of using several different
-> email addresses. In the future, we will try to use our university address
-> directly (we checked with other researchers and it seems to be okay).
-
-That would be best, as obviously, and again, as documented, we can not
-accept anonymous contributions to the kernel.
-
-greg k-h
