@@ -2,92 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNPARSEABLE_RELAY,USER_AGENT_SANE_1
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3938C47082
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:53:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046F7C4743E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 09:50:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCBF46124B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 08:53:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1E5F61008
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 09:50:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230369AbhFHIzl (ORCPT
+        id S230448AbhFHJwH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 04:55:41 -0400
-Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:17778 "EHLO
-        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229507AbhFHIzk (ORCPT
+        Tue, 8 Jun 2021 05:52:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53968 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230222AbhFHJwE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 04:55:40 -0400
-Received: from pps.filterd (m0246630.ppops.net [127.0.0.1])
-        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 1588lt9Q000998;
-        Tue, 8 Jun 2021 08:53:28 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : mime-version : content-type :
- in-reply-to; s=corp-2020-01-29;
- bh=uXsfBS09h5r8atqX2PNh5Ig45l4lwTr4pwZjL/r3r08=;
- b=rIHqGiszTwgFXYU/29HrTXFSuOgR9+nwuryBFW68Xibj9DLPsIar+VXv/BI9MdswqoYW
- 2qR4lyled93+VhADteVmUs9HeKBOAQyMh8qnNO8Fr5XK8r1U1S4AZ0uFyUc4sgJY9EIf
- +XrbhyeczsMbcIjlnA9yYyf/LrrpIKgiANecaz/VPhzenvG0jKqlG1h1YvJYHJEEt7RH
- mscM9rM8T6aLdp334Non989aCGXV6XRsWAl6PMNBuuz3mBtdfATRf1MNq5iz+iZ0jnLw
- MwQZc+pA5q0zFWnC/kVAdl3hiEU70Or7jAUNXolAmXEZy+puOr+cvoJseSgdfyJFalN6 Vw== 
-Received: from oracle.com (aserp3030.oracle.com [141.146.126.71])
-        by mx0b-00069f02.pphosted.com with ESMTP id 3916ehrkkr-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Jun 2021 08:53:27 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.podrdrct (8.16.0.36/8.16.0.36) with SMTP id 1588pMAu194740;
-        Tue, 8 Jun 2021 08:53:27 GMT
-Received: from pps.reinject (localhost [127.0.0.1])
-        by aserp3030.oracle.com with ESMTP id 38yyaaqvpv-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Jun 2021 08:53:27 +0000
-Received: from aserp3030.oracle.com (aserp3030.oracle.com [127.0.0.1])
-        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 1588rQWJ003308;
-        Tue, 8 Jun 2021 08:53:26 GMT
-Received: from aserv0121.oracle.com (aserv0121.oracle.com [141.146.126.235])
-        by aserp3030.oracle.com with ESMTP id 38yyaaqvpd-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Tue, 08 Jun 2021 08:53:26 +0000
-Received: from abhmp0004.oracle.com (abhmp0004.oracle.com [141.146.116.10])
-        by aserv0121.oracle.com (8.14.4/8.13.8) with ESMTP id 1588rJqi003329;
-        Tue, 8 Jun 2021 08:53:22 GMT
-Received: from kadam (/41.212.42.34)
-        by default (Oracle Beehive Gateway v4.0)
-        with ESMTP ; Tue, 08 Jun 2021 08:53:18 +0000
-Date:   Tue, 8 Jun 2021 11:53:10 +0300
-From:   Dan Carpenter <dan.carpenter@oracle.com>
-To:     "Jason A. Donenfeld" <Jason@zx2c4.com>
-Cc:     SyzScope <syzscope@gmail.com>,
-        syzbot <syzbot+305a91e025a73e4fd6ce@syzkaller.appspotmail.com>,
-        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com,
-        kernel-hardening@lists.openwall.com
-Subject: Re: KASAN: use-after-free Read in hci_chan_del
-Message-ID: <20210608085310.GA1955@kadam>
-References: <000000000000adea7f05abeb19cf@google.com>
- <2fb47714-551c-f44b-efe2-c6708749d03f@gmail.com>
- <YL3zGGMRwmD7fNK+@zx2c4.com>
+        Tue, 8 Jun 2021 05:52:04 -0400
+X-Greylist: delayed 39788 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 08 Jun 2021 02:50:09 PDT
+Received: from relay02.th.seeweb.it (relay02.th.seeweb.it [IPv6:2001:4b7a:2000:18::163])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A42C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jun 2021 02:50:09 -0700 (PDT)
+Received: from [10.0.20.3] (94-209-165-62.cable.dynamic.v4.ziggo.nl [94.209.165.62])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id E17791F539;
+        Tue,  8 Jun 2021 11:50:06 +0200 (CEST)
+Subject: Re: [PATCH BlueZ] Queue SetAbsoluteVolume if there is an in-progress
+ one.
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+References: <CABBYNZKcr74zYzPMcLo5+-49Fv02Kxoyf11bNPSuSGWThz-eqQ@mail.gmail.com>
+ <9d386692-4c1c-b262-bca2-cec3568dc579@somainline.org>
+ <CABBYNZLXRK9TN_TKdj5T7oP3D_HaeQiBsaCaRtE7nAK9hYuh-w@mail.gmail.com>
+From:   Marijn Suijten <marijn.suijten@somainline.org>
+Message-ID: <f3e18adc-b1ad-2ab5-164e-43a1ae20f708@somainline.org>
+Date:   Tue, 8 Jun 2021 11:50:06 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YL3zGGMRwmD7fNK+@zx2c4.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
-X-Proofpoint-GUID: 9xkxAKvdty5E81yk4zbMACfpHhdkZeVE
-X-Proofpoint-ORIG-GUID: 9xkxAKvdty5E81yk4zbMACfpHhdkZeVE
+In-Reply-To: <CABBYNZLXRK9TN_TKdj5T7oP3D_HaeQiBsaCaRtE7nAK9hYuh-w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This SyzScope stuff could be good in theory and it could be something
-useful with more work.  But in real life terms do you know anyone who
-looked at "use-after-free Read in hci_chan_del" and thought, "Oh that
-sounds totally harmless."
+Hi Luiz,
 
-regards,
-dan carpenter
+On 6/8/21 1:47 AM, Luiz Augusto von Dentz wrote:
+> Hi Marijn,
+> 
+[..]
+>> We've been running into a similar issue with PulseAudio.  There is no
+>> way to track a Set call for the Volume property back to the
+>> property-change notification, running into both jitter on quick
+>> successive volume changes and the inability to reflect peer hardware
+>> volume in case the peer rounds the requested volume to a coarser scale.
+>>    This rounded value is supposedly returned from SetAbsoluteVolume
+>> according to AVRCP spec 1.6.2, section 6.13.2:
+>>
+>>      The volume level which has actually been set on the TG is returned in
+>>      the response.
+>>
+>> I would have proposed a new DBUS function SetAbsoluteVolume that accepts
+>> volume as sole argument, blocks until the peer replies, and returns the
+>> actual volume as per its namesake AVRCP command.  This should address
+>> both issues.
+>>
+>> Note that it is also impossible to distinguish Volume property changes
+>> from an action invoked on the peer (ie. the user pressing physical
+>> buttons or using a volume slider on headphones) or the result of an
+>> earlier Set(Volume) call as these to my knowledge all happen async, may
+>> be intertwined, may involve rounding (on the peer) to make the resulting
+>> number different, etc.
+> 
+> Yep, the volume may actually be rounded like you said, so Im not
+> really sure how we can queue because we will not be able to verify the
+> volume has been set properly, we could do a blocking call even in case
+> of setting as a property we only need to delay the call to
+> g_dbus_pending_property_success until we actually receive a response,
+> that said there maybe some impact on the user experience since if you
+> have the volume implemented with something like a slider it will not
+> move smoothly anymore, but I guess that is better than have it
+> flipping back and forth, well except that can still happens because
+> the volume can be changed on the device in the meantime but I guess
+> the client wont see those changes until the method returns if it is
+> blocking waiting for the reply, which means it will only see that the
+> value flipped to something else later when the signals are dispatched.
 
+
+The main use-case is software volume compensation for devices with 
+limited granularity, for which we need to know exactly what is replied 
+to AVRCP's SetAbsoluteVolume call.  Delaying 
+g_dbus_pending_property_success will only block the call longer but 
+won't exactly let us know the resulting value.  We can immediately Get 
+the new property after (or try and relate the change notification to 
+it), but there's nothing preventing a change on the device intervening. 
+  In that case we should discard requested volume (on the host) and 
+software compensation, and take/display device volume as-is.
+This seems unfortunate as the AVRCP spec provides exactly the 
+consistency we're looking for here.
+
+As for user experience it seems acceptable to make such a call block 
+until the peer replies, if only for a much more predictable API.  It is 
+then up to the caller (ie. PulseAudio) to deal with that by 
+disabling/blocking the slider, or scheduling the most recent volume 
+update to be sent as soon as a reply is received (the DBus call returns).
+
+> 
+> If you feel like that is acceptable I'm happy to review any patches in
+> that direction.
+> 
+
+[..]
+
+> --
+> Luiz Augusto von Dentz
+- Marijn
