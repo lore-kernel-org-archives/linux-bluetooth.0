@@ -2,167 +2,235 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 69ADFC4743D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:40:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8EEE0C48BE0
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:48:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E3B061351
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A6AA61960
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:48:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235256AbhFHSmP (ORCPT
+        id S234990AbhFHSus (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 14:42:15 -0400
-Received: from mail-ed1-f54.google.com ([209.85.208.54]:45992 "EHLO
-        mail-ed1-f54.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234823AbhFHSkQ (ORCPT
+        Tue, 8 Jun 2021 14:50:48 -0400
+Received: from mail-pl1-f172.google.com ([209.85.214.172]:40569 "EHLO
+        mail-pl1-f172.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235064AbhFHSrx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 14:40:16 -0400
-Received: by mail-ed1-f54.google.com with SMTP id r7so11302271edv.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 11:38:23 -0700 (PDT)
+        Tue, 8 Jun 2021 14:47:53 -0400
+Received: by mail-pl1-f172.google.com with SMTP id e7so11163016plj.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 11:46:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yFrqDfOhU1VfDLPa8wupGqarobe8mpttWBLBK534Bok=;
-        b=mdTJpfvthnISkFqANjNlRBRPy0s7RIYGCGGWdWMqClTgc6q4t+azH1gA3UK2mfc8a0
-         j7ocxs/7hXcvFGgj9pyOrOegQ9bHlIWZOfYaUqOg4qoNQXoAC2cAgfF7W4v7Gr9r3yZX
-         b/HNGyoqys8Aqou8FYaxvts0CMkKlu19YhTs8=
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uvWOXTPueyrs2x/uQSk4+Xdap4QKR6xTeGr+M5KaG7w=;
+        b=twnLortWHD42UWc0DyosXcmnrndkDzgUvMIw+UsZrn1dfnDy2MAFmEK0jkxTsKklME
+         ShbjXQlD1qaMmtAzCgfLU+hRIpdG4B5puHVH5BU1eP0x/gsYzRKKC+RFBg9y1F3olNVH
+         zwtwenAcH6Ftkj+R5C8IaDKQAd7Iz9Pijy117pFj/S77nhaQudqBhdmYhScwa9LuR4Jk
+         hpTlpHgOrmyi+hL0ddEwlwfaYP6MpnOgSWR2fdM9X5kTq8+liKPv3lXA/PHvpPuJf3gL
+         CpPBuMa9uZe7KR0zz4sCppynBL0ViD0ZOoXXu5UZliFHUvFYdLnnswvBBBHUCmZdq6zk
+         CKew==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yFrqDfOhU1VfDLPa8wupGqarobe8mpttWBLBK534Bok=;
-        b=JKoAYB4N8xErekDtWwG3v3q+orIcBnSB6Br95BqwN4+RLnzGXqQ9c+mGT9Zyuuk/8b
-         zoTsHmC0wtRr0vlnSJF0184kN/7lGIq+Rvk23wQx/94ePoaAYEHxYKGRmhQRuhR1YMtN
-         33Uo0l1jwy7rcU0Ox6Iqm7xdTc3T1a4BeKiZFXopIfMMh0xvUlLECyiKCQuWLQ7pL00G
-         vkjwH0d6T31WLSx709HAk7+zx0a0ta0SzUGuljve5hf0MM+6DAmQaaBlD54f3pv3XIfq
-         d7XoUexufPT2dChrCxuwbxDXZgwQcZTZBAeF0a1kEItbREGzD1W6SvHdRZmMlAaW4pjy
-         G1vg==
-X-Gm-Message-State: AOAM531iiGcjWYKYzVZb76GX7Ajv/6HroMuwozP1KEEQWqy9yX2rAP4T
-        TFRxryBmt+XCUcA3Yhl8DzEYcZVyU5iGK7EN
-X-Google-Smtp-Source: ABdhPJyITiWIFXt5jI3N7ev05mAZ/h+DgWqJL25Ui6DA6poVwsaGARkIqwYO21ZknkMrJjsmgvkjYw==
-X-Received: by 2002:a05:6402:31eb:: with SMTP id dy11mr14632321edb.165.1623177442634;
-        Tue, 08 Jun 2021 11:37:22 -0700 (PDT)
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
-        by smtp.gmail.com with ESMTPSA id w17sm207423edd.44.2021.06.08.11.37.22
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=uvWOXTPueyrs2x/uQSk4+Xdap4QKR6xTeGr+M5KaG7w=;
+        b=Ds0DAP55Txf/3vjtWvki4S2xd3+rbL9x3GnVYF/WNqTnpJ7c0YxMK8Qs8oFes/NOQx
+         FBRNBtioEO/t4wOQ3z2R03P+XhXz4MSaJ5Zj901fqeCbsaII/11SlUYwYKLJneUnLtXR
+         QSweNj0NmWVE5HREwOPFRkXaBcre0ECWXQltuE1Yr3pSNV8jJMun95D7OdnJP6P3GOr4
+         zL/Vrx+rJbrHtMGJZMA5tdzpn8RrYlQ8TvVObAOXDi7Dj2hTXg6QHpUhfncjz5057FkG
+         u/p2CT3g2cFUQPEFVGZqytU1L3scA8gUQ9NXJFXLY5oVkQfOZz1ipE8O6LqPFQtm0llV
+         P82Q==
+X-Gm-Message-State: AOAM533RY5kFgfD7uXtvCbkFcszDD4gEq662DKjBHNmZU1pe9uOhevJd
+        VeR1dBKNb1+1DluxYvLH5IG8PDfTIWQ=
+X-Google-Smtp-Source: ABdhPJzPew3dhFbjBQDEXcW1F6Eipf4SBO1RcUeopLOJNB5VuKAqsQ+rGxAw9lVtZXwRNJquCpcBmQ==
+X-Received: by 2002:a17:90a:7345:: with SMTP id j5mr6238431pjs.64.1623177899311;
+        Tue, 08 Jun 2021 11:44:59 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id f13sm11480571pfa.207.2021.06.08.11.44.58
         for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 08 Jun 2021 11:37:22 -0700 (PDT)
-Received: by mail-wr1-f54.google.com with SMTP id r9so5953782wrz.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 11:37:22 -0700 (PDT)
-X-Received: by 2002:a5d:4408:: with SMTP id z8mr24506030wrq.336.1623177441699;
- Tue, 08 Jun 2021 11:37:21 -0700 (PDT)
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 08 Jun 2021 11:44:59 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: HCI: Fix Set Extended (Scan Response) Data
+Date:   Tue,  8 Jun 2021 11:44:57 -0700
+Message-Id: <20210608184457.3069064-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-References: <CABBYNZKcr74zYzPMcLo5+-49Fv02Kxoyf11bNPSuSGWThz-eqQ@mail.gmail.com>
- <9d386692-4c1c-b262-bca2-cec3568dc579@somainline.org> <CABBYNZLXRK9TN_TKdj5T7oP3D_HaeQiBsaCaRtE7nAK9hYuh-w@mail.gmail.com>
- <f3e18adc-b1ad-2ab5-164e-43a1ae20f708@somainline.org>
-In-Reply-To: <f3e18adc-b1ad-2ab5-164e-43a1ae20f708@somainline.org>
-From:   Sonny Sasaka <sonnysasaka@chromium.org>
-Date:   Tue, 8 Jun 2021 11:37:10 -0700
-X-Gmail-Original-Message-ID: <CAO271mkpy5W0KB60X5G1mwp92bB+K2Ru3ODP8K2APCkjfkX70w@mail.gmail.com>
-Message-ID: <CAO271mkpy5W0KB60X5G1mwp92bB+K2Ru3ODP8K2APCkjfkX70w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] Queue SetAbsoluteVolume if there is an in-progress one.
-To:     Marijn Suijten <marijn.suijten@somainline.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marijn,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thanks for your inputs. Having a separate SetAbsoluteVolume API that
-blocks (until the peer acknowledges the change) is certainly more
-featureful than this patch's approach, since the media player can
-decide what to do with pending SetAbsoluteVolume calls and have the
-flexibility to handle the situation. However, there is also a value in
-the shorter term approach that this patch without any changes in the
-media player part and has been tested to solve the janky slider issue
-in Chrome OS. I believe that this would also solve PulseAudio's
-similar janky slider issue for the short term.
+These command do have variable length and the length can go up to 251,
+so this changes the struct to not use a fixed size and then when
+creating the PDU only the actual length of the data send to the
+controller.
 
-If Marijn and Luiz are okay with the shorter term approach first, I
-will continue updating this patch according to Luiz's comments, but
-otherwise I will abandon this patch in favor of the separate
-SetAbsoluteVolume API that Marijn will provide.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci.h      |  6 ++--
+ include/net/bluetooth/hci_core.h |  8 ++---
+ net/bluetooth/hci_request.c      | 51 ++++++++++++++++++--------------
+ 3 files changed, 37 insertions(+), 28 deletions(-)
 
-On Tue, Jun 8, 2021 at 2:50 AM Marijn Suijten
-<marijn.suijten@somainline.org> wrote:
->
-> Hi Luiz,
->
-> On 6/8/21 1:47 AM, Luiz Augusto von Dentz wrote:
-> > Hi Marijn,
-> >
-> [..]
-> >> We've been running into a similar issue with PulseAudio.  There is no
-> >> way to track a Set call for the Volume property back to the
-> >> property-change notification, running into both jitter on quick
-> >> successive volume changes and the inability to reflect peer hardware
-> >> volume in case the peer rounds the requested volume to a coarser scale.
-> >>    This rounded value is supposedly returned from SetAbsoluteVolume
-> >> according to AVRCP spec 1.6.2, section 6.13.2:
-> >>
-> >>      The volume level which has actually been set on the TG is returned in
-> >>      the response.
-> >>
-> >> I would have proposed a new DBUS function SetAbsoluteVolume that accepts
-> >> volume as sole argument, blocks until the peer replies, and returns the
-> >> actual volume as per its namesake AVRCP command.  This should address
-> >> both issues.
-> >>
-> >> Note that it is also impossible to distinguish Volume property changes
-> >> from an action invoked on the peer (ie. the user pressing physical
-> >> buttons or using a volume slider on headphones) or the result of an
-> >> earlier Set(Volume) call as these to my knowledge all happen async, may
-> >> be intertwined, may involve rounding (on the peer) to make the resulting
-> >> number different, etc.
-> >
-> > Yep, the volume may actually be rounded like you said, so Im not
-> > really sure how we can queue because we will not be able to verify the
-> > volume has been set properly, we could do a blocking call even in case
-> > of setting as a property we only need to delay the call to
-> > g_dbus_pending_property_success until we actually receive a response,
-> > that said there maybe some impact on the user experience since if you
-> > have the volume implemented with something like a slider it will not
-> > move smoothly anymore, but I guess that is better than have it
-> > flipping back and forth, well except that can still happens because
-> > the volume can be changed on the device in the meantime but I guess
-> > the client wont see those changes until the method returns if it is
-> > blocking waiting for the reply, which means it will only see that the
-> > value flipped to something else later when the signals are dispatched.
->
->
-> The main use-case is software volume compensation for devices with
-> limited granularity, for which we need to know exactly what is replied
-> to AVRCP's SetAbsoluteVolume call.  Delaying
-> g_dbus_pending_property_success will only block the call longer but
-> won't exactly let us know the resulting value.  We can immediately Get
-> the new property after (or try and relate the change notification to
-> it), but there's nothing preventing a change on the device intervening.
->   In that case we should discard requested volume (on the host) and
-> software compensation, and take/display device volume as-is.
-> This seems unfortunate as the AVRCP spec provides exactly the
-> consistency we're looking for here.
->
-> As for user experience it seems acceptable to make such a call block
-> until the peer replies, if only for a much more predictable API.  It is
-> then up to the caller (ie. PulseAudio) to deal with that by
-> disabling/blocking the slider, or scheduling the most recent volume
-> update to be sent as soon as a reply is received (the DBus call returns).
->
-> >
-> > If you feel like that is acceptable I'm happy to review any patches in
-> > that direction.
-> >
->
-> [..]
->
-> > --
-> > Luiz Augusto von Dentz
-> - Marijn
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 479adbde6db4..cfd4e40594d1 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1775,13 +1775,15 @@ struct hci_cp_ext_adv_set {
+ 	__u8  max_events;
+ } __packed;
+ 
++#define HCI_MAX_EXT_AD_LENGTH	251
++
+ #define HCI_OP_LE_SET_EXT_ADV_DATA		0x2037
+ struct hci_cp_le_set_ext_adv_data {
+ 	__u8  handle;
+ 	__u8  operation;
+ 	__u8  frag_pref;
+ 	__u8  length;
+-	__u8  data[HCI_MAX_AD_LENGTH];
++	__u8  data[];
+ } __packed;
+ 
+ #define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
+@@ -1790,7 +1792,7 @@ struct hci_cp_le_set_ext_scan_rsp_data {
+ 	__u8  operation;
+ 	__u8  frag_pref;
+ 	__u8  length;
+-	__u8  data[HCI_MAX_AD_LENGTH];
++	__u8  data[];
+ } __packed;
+ 
+ #define LE_SET_ADV_DATA_OP_COMPLETE	0x03
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 212f46806ce7..a53e94459ecd 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -228,9 +228,9 @@ struct adv_info {
+ 	__u16	remaining_time;
+ 	__u16	duration;
+ 	__u16	adv_data_len;
+-	__u8	adv_data[HCI_MAX_AD_LENGTH];
++	__u8	adv_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__u16	scan_rsp_len;
+-	__u8	scan_rsp_data[HCI_MAX_AD_LENGTH];
++	__u8	scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__s8	tx_power;
+ 	__u32   min_interval;
+ 	__u32   max_interval;
+@@ -551,9 +551,9 @@ struct hci_dev {
+ 	DECLARE_BITMAP(dev_flags, __HCI_NUM_FLAGS);
+ 
+ 	__s8			adv_tx_power;
+-	__u8			adv_data[HCI_MAX_AD_LENGTH];
++	__u8			adv_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__u8			adv_data_len;
+-	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
++	__u8			scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
+ 	__u8			scan_rsp_data_len;
+ 
+ 	struct list_head	adv_instances;
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index f7a9d97f3e84..1d14adc023e9 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1716,30 +1716,33 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
+ 		return;
+ 
+ 	if (ext_adv_capable(hdev)) {
+-		struct hci_cp_le_set_ext_scan_rsp_data cp;
++		struct {
++			struct hci_cp_le_set_ext_scan_rsp_data cp;
++			u8 data[HCI_MAX_EXT_AD_LENGTH];
++		} pdu;
+ 
+-		memset(&cp, 0, sizeof(cp));
++		memset(&pdu, 0, sizeof(pdu));
+ 
+ 		if (instance)
+ 			len = create_instance_scan_rsp_data(hdev, instance,
+-							    cp.data);
++							    pdu.data);
+ 		else
+-			len = create_default_scan_rsp_data(hdev, cp.data);
++			len = create_default_scan_rsp_data(hdev, pdu.data);
+ 
+ 		if (hdev->scan_rsp_data_len == len &&
+-		    !memcmp(cp.data, hdev->scan_rsp_data, len))
++		    !memcmp(pdu.data, hdev->scan_rsp_data, len))
+ 			return;
+ 
+-		memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
++		memcpy(hdev->scan_rsp_data, pdu.data, len);
+ 		hdev->scan_rsp_data_len = len;
+ 
+-		cp.handle = instance;
+-		cp.length = len;
+-		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+-		cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
++		pdu.cp.handle = instance;
++		pdu.cp.length = len;
++		pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++		pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+-		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA, sizeof(cp),
+-			    &cp);
++		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA,
++			    sizeof(pdu.cp) + len, &pdu.cp);
+ 	} else {
+ 		struct hci_cp_le_set_scan_rsp_data cp;
+ 
+@@ -1862,26 +1865,30 @@ void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
+ 		return;
+ 
+ 	if (ext_adv_capable(hdev)) {
+-		struct hci_cp_le_set_ext_adv_data cp;
++		struct {
++			struct hci_cp_le_set_ext_adv_data cp;
++			u8 data[HCI_MAX_EXT_AD_LENGTH];
++		} pdu;
+ 
+-		memset(&cp, 0, sizeof(cp));
++		memset(&pdu, 0, sizeof(pdu));
+ 
+-		len = create_instance_adv_data(hdev, instance, cp.data);
++		len = create_instance_adv_data(hdev, instance, pdu.data);
+ 
+ 		/* There's nothing to do if the data hasn't changed */
+ 		if (hdev->adv_data_len == len &&
+-		    memcmp(cp.data, hdev->adv_data, len) == 0)
++		    memcmp(pdu.data, hdev->adv_data, len) == 0)
+ 			return;
+ 
+-		memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
++		memcpy(hdev->adv_data, pdu.data, len);
+ 		hdev->adv_data_len = len;
+ 
+-		cp.length = len;
+-		cp.handle = instance;
+-		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
+-		cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
++		pdu.cp.length = len;
++		pdu.cp.handle = instance;
++		pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
++		pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 
+-		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_DATA, sizeof(cp), &cp);
++		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_DATA,
++			    sizeof(pdu.cp) + len, &pdu.cp);
+ 	} else {
+ 		struct hci_cp_le_set_adv_data cp;
+ 
+-- 
+2.31.1
+
