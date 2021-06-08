@@ -8,28 +8,28 @@ X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9629BC4743D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:29:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C8D6C4743E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:31:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81144613CA
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:29:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 380646136D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:31:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234167AbhFHSbm (ORCPT
+        id S234611AbhFHSdb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 14:31:42 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56008 "EHLO mail.kernel.org"
+        Tue, 8 Jun 2021 14:33:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57560 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234164AbhFHSbS (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 14:31:18 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id AF6BA613AC;
-        Tue,  8 Jun 2021 18:29:11 +0000 (UTC)
+        id S234124AbhFHSce (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Jun 2021 14:32:34 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D70DC613CD;
+        Tue,  8 Jun 2021 18:30:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623176952;
-        bh=/1mCeOgaUwamvf5jGFid4iJx7VUU0RlW3DOilkc3oGY=;
+        s=korg; t=1623177025;
+        bh=jl8Z6ZgrA67B1nrcFs3fiCeBUftXiBdarqG5ygOvl9Q=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=fPeX+qDMkP4X0J2CdfSBeAamGUK7kJaPCeDc/EQCufi2wwQMdzoJb+0CL8ESSBBbe
-         cXliuweT/QkkYSbMdnuqSnyc/U06v02kA40dG0foWOh05lvOBJYO/NKFdWN1m0vtn4
-         HUWqqNzhWmEirz2722frBz9vu9Fh/jTCaeIlvFDs=
+        b=pI/22bxZRt7qPlSGGd3+J+ZP0NDcqMYF7cx3B+0VLCqEvuNhSWkzY9LJBH43MmMwf
+         Ydr5Rt2Fg0aLOfKqblgMektOf3KynEv8j7my2dCN1KLo70xWVTZBnCBNBitQ73RLQB
+         T1p3GLb9GYca3pNF3dudTxtoBZMwfJ7HnhBVRD9Y=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -40,12 +40,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         Lin Ma <linma@zju.edu.cn>, Hao Xiong <mart1n@zju.edu.cn>
-Subject: [PATCH 4.4 09/23] Bluetooth: fix the erroneous flush_work() order
-Date:   Tue,  8 Jun 2021 20:27:01 +0200
-Message-Id: <20210608175926.842991911@linuxfoundation.org>
+Subject: [PATCH 4.9 13/29] Bluetooth: fix the erroneous flush_work() order
+Date:   Tue,  8 Jun 2021 20:27:07 +0200
+Message-Id: <20210608175928.248830114@linuxfoundation.org>
 X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210608175926.524658689@linuxfoundation.org>
-References: <20210608175926.524658689@linuxfoundation.org>
+In-Reply-To: <20210608175927.821075974@linuxfoundation.org>
+References: <20210608175927.821075974@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -87,7 +87,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1555,8 +1555,13 @@ static int hci_dev_do_open(struct hci_de
+@@ -1422,8 +1422,13 @@ static int hci_dev_do_open(struct hci_de
  	} else {
  		/* Init failed, cleanup */
  		flush_work(&hdev->tx_work);
