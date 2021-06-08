@@ -2,97 +2,209 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+X-Spam-Status: No, score=-4.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84082C47082
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 17:41:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5B5E0C47082
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 17:42:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E2B26128E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 17:41:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EE566135D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 17:42:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233800AbhFHRnM (ORCPT
+        id S233700AbhFHRob (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 13:43:12 -0400
-Received: from mail-yb1-f201.google.com ([209.85.219.201]:53118 "EHLO
-        mail-yb1-f201.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233156AbhFHRnM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 13:43:12 -0400
-Received: by mail-yb1-f201.google.com with SMTP id a17-20020a5b09110000b0290547160c87c9so7647955ybq.19
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 10:41:02 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=yN9GR9yn0BfU6/EEd8zjvhTrSdkHYvbwqIDx2oegE6M=;
-        b=lUKVI2qSP+0mXSfM0vF4+/X/1ZcFEcNyZRvgUexZxFn4DeSpOeA3maKp3/PVblMk1D
-         Gt0Z/SQaRYszCeb3NKqHNDW0bn6/gT2aoYAHYEtgsg5N6fX/HOP1KnPwUZTk33DtPN2v
-         mzJMnUs8ccvLO6zImuSG7VTgKLqf36ekCZk4l/WzqITTNBzPOgzS3JK8KSMTZbkYtvjG
-         d6QAX1cI7DOYsfejly1f8a99mOK9ymU9JjZgi3ybgRxXiRVaTEt3fIQeQqCLAjURSVhI
-         aPO+rIyv27cBGdiXnbSthJlfUnBv3w3P7zG91yRQXzMJ05TK9HIQjVT6eVHtP0plOG0E
-         msdw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=yN9GR9yn0BfU6/EEd8zjvhTrSdkHYvbwqIDx2oegE6M=;
-        b=BXTHoYi7eBMORzNCL4qbKLX7CJeI6KFSHhVL8l9DY1Jr7a251/PPlLnUozx9drHll3
-         b32HelzVffOfzH7ODaQCfHwtrCjxNJEAwT07sMvAeXFb4MEFbaJ3LXBh1uuKhLouaV+r
-         BIyaFHUChCBC0qvWYS4AiKyeDvj4Q7Dj9QB9Sw92Cj8A0M5hrOS0AIchtz2ohlz4sJm2
-         J+hZw5UpZzlM9QfqQUStTr/9UzSTtbxoR93uj+0Aj2CLWBZWQg01mvi8I8qA8aNfMH6a
-         wogzuEqBzuW6fKAZFjEJdpYV9bhBXPWHlM/aRjF59i81+gNj9vGpjG06f1eT1HOjBob1
-         uhkQ==
-X-Gm-Message-State: AOAM533BhrajFiIcFjYjS+xY68d3k5rNUgUusuGQF2/8bYCzrFr82Mpv
-        esgqI+bcL144lrfsC74bhRcl0xPTjMMRvupsxNcfHtuUpNkrWjd4YD+i+CaVRca/E9PCvf8pNa2
-        cWk+OfgtPT5YIbwFhJXfr3j4c4BxCvsDNcKa94XFTpj0bOjmHjGVgw/sEoRcxKrpA4lF1uSgnOR
-        6xSj21zYlsLSs=
-X-Google-Smtp-Source: ABdhPJwaYn8Kt0V/szqHTy6YllqdCPcVkJvLyAz3FakPBT1MPahvJtMnxHAqF4UjTF9FKsZQoL8XHLKtjgApP6Apgw==
-X-Received: from michaelfsun.mtv.corp.google.com ([2620:15c:202:201:46ba:c169:c41a:2166])
- (user=michaelfsun job=sendgmr) by 2002:a25:389:: with SMTP id
- 131mr33526913ybd.306.1623174002354; Tue, 08 Jun 2021 10:40:02 -0700 (PDT)
-Date:   Tue,  8 Jun 2021 10:39:50 -0700
-Message-Id: <20210608103940.BlueZ.v1.1.Ifed45e2dfac25b2627fcaabc66cd29f6894ba07b@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.rc1.229.g3e70b5a671-goog
-Subject: [BlueZ PATCH v1] avrcp: fix byte order of PDU parameter length compare
-From:   Michael Sun <michaelfsun@google.com>
+        Tue, 8 Jun 2021 13:44:31 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37100 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233094AbhFHRob (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Jun 2021 13:44:31 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 4C66C6135A
+        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jun 2021 17:42:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1623174158;
+        bh=xDxtUkpFqYuu4SqqQmVbFzYapz1lY8+fHkEEM1giqVk=;
+        h=From:To:Subject:Date:From;
+        b=WE4z+5MP2IoOB7V2LsY0ZiDvs3wJJysKyfxTLEgRiNrtwwhxtxC6oBRZbtffxMpPO
+         19T4mdHVPDwh4esCnNBSoROJRNpLayVn8mpOYycCNyRpuPbJbM1rGjkpm0h6U22e33
+         +Yi4R4MVbeb0HkXMnkq7cMrU8RA9EHMDMW8diVklxAK2A57hRli0OfD039FH4aeECb
+         3MgGAYQb7aXVXxhtUqAOtV/ixFDeseo/Br3WgIB1bNU9W7XtBvt6LR4w0Nank+V10B
+         GMe0Nzss2bAUqn1E/ZwGCCVewuN39lp7UMBWpQtYpooqN69dyDrpu5SwSrGOKf9dYE
+         6Wabfrdqx0VxQ==
+From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Michael Sun <michaelfsun@google.com>,
-        Alain Michaud <alainm@chromium.org>
+Subject: [Bug 213369] New: Bluetooth Will Not Enable Intel AX200
+Date:   Tue, 08 Jun 2021 17:42:38 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: hankins.bruce@outlook.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-213369-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fix the issue that directly uses params_len, from received PDU data,
-for arithmetic calculation and comparison.
+https://bugzilla.kernel.org/show_bug.cgi?id=3D213369
 
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-Signed-off-by: Michael Sun <michaelfsun@google.com>
----
+            Bug ID: 213369
+           Summary: Bluetooth Will Not Enable Intel AX200
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.11.22-180
+          Hardware: x86-64
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: hankins.bruce@outlook.com
+        Regression: No
 
- profiles/audio/avrcp.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+So a new issue that started recently, I enable my Bluetooth, but when I go =
+into
+settings it shows it's not enabled and when I click add device from the tra=
+y it
+says "Your Bluetooth adapter is not pairable". Not sure what's going on. I'=
+ve
+tried manually installing the driver, but no luck. Running on Solus 4.2 KDE
+Plasma DE, stable repos, fully updated. Bluetooth/WiFi adapter is an Intel
+AX200. Here is the output of commands I've tried so far. Manually installing
+BlueZ 5.55-30 fixes the issue. Have tried installing BlueZ 5.56 with bluez-=
+qt
+and bluedevil rebuilt against the new BlueZ version and still have the same
+issue.
 
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index ccf34b220..2265f87ab 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -1923,9 +1923,9 @@ static size_t handle_vendordep_pdu(struct avctp *conn, uint8_t transaction,
- 	operands += sizeof(*pdu);
- 	operand_count -= sizeof(*pdu);
- 
--	if (pdu->params_len != operand_count) {
-+	if (pdu->params_len != htons(operand_count)) {
- 		DBG("AVRCP PDU parameters length don't match");
--		pdu->params_len = operand_count;
-+		pdu->params_len = htons(operand_count);
- 	}
- 
- 	for (handler = session->control_handlers; handler->pdu_id; handler++) {
--- 
-2.32.0.rc1.229.g3e70b5a671-goog
 
+`bruce@s145-15api ~ $ modprobe btusb
+bruce@s145-15api ~ $ sudo systemctl enable bluetooth.service
+Password:
+bruce@s145-15api ~ $ sudo systemctl start bluetooth.service
+bruce@s145-15api ~ $ systemctl is-enabled bluetooth
+enabled
+bruce@s145-15api ~ $ systemctl status bluetooth.service
+=E2=97=8F bluetooth.service - Bluetooth service
+Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled; vendor
+preset: enabled)
+Active: active (running) since Sun 2021-06-06 11:18:38 EDT; 6min ago
+Docs: man:bluetoothd(8)
+Main PID: 698 (bluetoothd)
+Status: "Running"
+Tasks: 1 (limit: 11730)
+Memory: 1.9M
+CPU: 30ms
+CGroup: /system.slice/bluetooth.service
+=E2=94=94=E2=94=80698 /usr/lib64/bluez/bluetooth/bluetoothd
+
+Warning: some journal files were not opened due to insufficient permissions.
+bruce@s145-15api ~ $ sudo systemctl status bluetooth.service
+=E2=97=8F bluetooth.service - Bluetooth service
+Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled; vendor
+preset: enabled)
+Active: active (running) since Sun 2021-06-06 11:18:38 EDT; 6min ago
+Docs: man:bluetoothd(8)
+Main PID: 698 (bluetoothd)
+Status: "Running"
+Tasks: 1 (limit: 11730)
+Memory: 1.9M
+CPU: 30ms
+CGroup: /system.slice/bluetooth.service
+=E2=94=94=E2=94=80698 /usr/lib64/bluez/bluetooth/bluetoothd
+Jun 06 11:18:38 s145-15api systemd[1]: Starting Bluetooth service...
+Jun 06 11:18:38 s145-15api bluetoothd[698]: Bluetooth daemon 5.58
+Jun 06 11:18:38 s145-15api systemd[1]: Started Bluetooth service.
+Jun 06 11:18:38 s145-15api bluetoothd[698]: Starting SDP server
+Jun 06 11:18:38 s145-15api bluetoothd[698]: Bluetooth management interface =
+1.19
+initialized
+Jun 06 11:18:38 s145-15api bluetoothd[698]: Failed to set mode: Blocked thr=
+ough
+rfkill (0x12)
+Jun 06 11:18:46 s145-15api bluetoothd[698]: Endpoint registered: sender=3D:=
+1.39
+path=3D/MediaEndpoint/A2DPSink/>
+Jun 06 11:18:46 s145-15api bluetoothd[698]: Endpoint registered: sender=3D:=
+1.39
+path=3D/MediaEndpoint/A2DPSourc>
+bruce@s145-15api ~ $ rfkill
+ID TYPE DEVICE SOFT HARD
+0 wlan ideapad_wlan unblocked unblocked
+1 bluetooth ideapad_bluetooth unblocked unblocked
+2 bluetooth hci0 unblocked unblocked
+3 wlan phy0 unblocked unblocked
+bruce@s145-15api ~ $ blutoothctl
+bash: blutoothctl: command not found
+bruce@s145-15api ~ $ bluetoothctl
+Agent registered
+[bluetooth]# show
+Controller A4:B1:C1:36:53:11 (public)
+Name: s145-15api
+Alias: s145-15api
+Class: 0x00000000
+Powered: no
+Discoverable: no
+DiscoverableTimeout: 0x000000b4
+Pairable: yes
+UUID: Message Notification Se.. (00001133-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control (0000110e-0000-1000-8000-00805f9b34fb)
+UUID: OBEX Object Push (00001105-0000-1000-8000-00805f9b34fb)
+UUID: Message Access Server (00001132-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information (00001200-0000-1000-8000-00805f9b34fb)
+UUID: IrMC Sync (00001104-0000-1000-8000-00805f9b34fb)
+UUID: Vendor specific (00005005-0000-1000-8000-0002ee000001)
+UUID: Headset (00001108-0000-1000-8000-00805f9b34fb)
+UUID: Headset AG (00001112-0000-1000-8000-00805f9b34fb)
+UUID: A/V Remote Control Target (0000110c-0000-1000-8000-00805f9b34fb)
+UUID: Generic Attribute Profile (00001801-0000-1000-8000-00805f9b34fb)
+UUID: Phonebook Access Server (0000112f-0000-1000-8000-00805f9b34fb)
+UUID: Audio Sink (0000110b-0000-1000-8000-00805f9b34fb)
+UUID: Device Information (0000180a-0000-1000-8000-00805f9b34fb)
+UUID: Generic Access Profile (00001800-0000-1000-8000-00805f9b34fb)
+UUID: Audio Source (0000110a-0000-1000-8000-00805f9b34fb)
+UUID: OBEX File Transfer (00001106-0000-1000-8000-00805f9b34fb)
+Modalias: usb:v1D6Bp0246d053A
+Discovering: no
+Roles: central
+Roles: peripheral
+Advertising Features:
+ActiveInstances: 0x00 (0)
+SupportedInstances: 0x06 (6)
+SupportedIncludes: tx-power
+SupportedIncludes: appearance
+SupportedIncludes: local-name
+SupportedSecondaryChannels: 1M
+SupportedSecondaryChannels: 2M
+SupportedSecondaryChannels: Coded
+[bluetooth]# agent KeyboardOnly
+Agent is already registered
+[bluetooth]# default-agent
+Default agent request successful
+[bluetooth]# power on
+Failed to set power on: org.bluez.Error.Busy
+[bluetooth]# scan on
+Failed to start discovery: org.bluez.Error.NotReady`
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
