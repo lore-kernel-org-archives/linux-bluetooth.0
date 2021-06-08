@@ -2,34 +2,33 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.9 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9585C4743D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:33:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18219C4743F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:38:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3F79613AE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:33:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6D0E61416
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 18:38:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234855AbhFHSf0 (ORCPT
+        id S233896AbhFHSkF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 14:35:26 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56768 "EHLO mail.kernel.org"
+        Tue, 8 Jun 2021 14:40:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:57858 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234649AbhFHSdr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 14:33:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6A407613AE;
-        Tue,  8 Jun 2021 18:31:35 +0000 (UTC)
+        id S234845AbhFHShX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 8 Jun 2021 14:37:23 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id DC90F613C1;
+        Tue,  8 Jun 2021 18:33:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1623177095;
-        bh=OyIcUR2R8BanA9DlHP9/ePstJ4qAecFtfjXxNMb7Gz4=;
+        s=korg; t=1623177188;
+        bh=sL2pptJEnZeH91qiZVlt+pEhndZC2kDozsMnCX5V3jQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vk1h6wddbpayADBeeLecja2C8jPpYjhtFZRGivG6ItwnFyQUnWoJOykmvqGLPpEU7
-         B1KQHvcFXnek1T2PFbfgew2uM6lRZpEO7jMA7o3JkZ5x2TQ4/lfzA1Hc+PanydCg0z
-         ZEBn+uf0L/vhPq9ku+7TSKsbpX0dBs6CuJJfFPtk=
+        b=E+bccCDQECM5zjn+X0M3gLkID7lmc3EgRu204j2EZuBm68z47iyj+OcAzQ8K+mx9r
+         b1y5Y38qnNgeYyw9m+zBcfF38o9C0IEu91xNSoPjlni5vcJhRMSUM8JEqFPifxqKKq
+         kORuPx66ZqrFkjr/yE5nIwq8R15kALALYMv7FUY0=
 From:   Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 To:     linux-kernel@vger.kernel.org
 Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
@@ -40,12 +39,12 @@ Cc:     Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
         Jakub Kicinski <kuba@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
         Lin Ma <linma@zju.edu.cn>, Hao Xiong <mart1n@zju.edu.cn>
-Subject: [PATCH 4.14 13/47] Bluetooth: fix the erroneous flush_work() order
-Date:   Tue,  8 Jun 2021 20:26:56 +0200
-Message-Id: <20210608175930.918559811@linuxfoundation.org>
+Subject: [PATCH 4.19 19/58] Bluetooth: fix the erroneous flush_work() order
+Date:   Tue,  8 Jun 2021 20:27:00 +0200
+Message-Id: <20210608175932.916571245@linuxfoundation.org>
 X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20210608175930.477274100@linuxfoundation.org>
-References: <20210608175930.477274100@linuxfoundation.org>
+In-Reply-To: <20210608175932.263480586@linuxfoundation.org>
+References: <20210608175932.263480586@linuxfoundation.org>
 User-Agent: quilt/0.66
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
@@ -87,7 +86,7 @@ Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 
 --- a/net/bluetooth/hci_core.c
 +++ b/net/bluetooth/hci_core.c
-@@ -1458,8 +1458,13 @@ static int hci_dev_do_open(struct hci_de
+@@ -1498,8 +1498,13 @@ static int hci_dev_do_open(struct hci_de
  	} else {
  		/* Init failed, cleanup */
  		flush_work(&hdev->tx_work);
