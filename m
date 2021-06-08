@@ -2,186 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5E22C47082
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 19:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57C6FC47082
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 20:17:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE4E46024A
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 19:57:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A0EE610F8
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  8 Jun 2021 20:17:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234754AbhFHT7b (ORCPT
+        id S235010AbhFHUTD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 8 Jun 2021 15:59:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47924 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233695AbhFHT7b (ORCPT
+        Tue, 8 Jun 2021 16:19:03 -0400
+Received: from mail-il1-f198.google.com ([209.85.166.198]:46898 "EHLO
+        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234849AbhFHUS6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 8 Jun 2021 15:59:31 -0400
-Received: from mail-yb1-xb32.google.com (mail-yb1-xb32.google.com [IPv6:2607:f8b0:4864:20::b32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07C71C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue,  8 Jun 2021 12:57:22 -0700 (PDT)
-Received: by mail-yb1-xb32.google.com with SMTP id q21so31910415ybg.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 12:57:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bNFhaATKL9cFgTS2eiccK4GiRji7Y9SK+W6sRYw5bJ0=;
-        b=ooxf93GA4dcFUh31zlbCY3pHD3qk3Wkq8uKsFJzC5FIpi081RvIZvpmP3OicUM1VQx
-         2WL/YzP9aucNtXmf2ViXrZocsP1qu6kWisp3zRK+Pq5LMWHvPbWdJqoai9AtDByRkn1z
-         s4tNFvVUAeo2HwsScl8PG5dIFzxYS4HFNIl3Z7lvHfbXgwVRNcPb07qtGGfw3GPWbxBZ
-         +Yfl3tCJozwVQ/bjgD6kWk4YDIU3o3yf4oTkLi7KbILbBPqWWuR7YFGXOK1q2dnbnCcH
-         4ckOQIOog1gexSjWYZt3J6GaS5gSMHhqM3g6YFPB27EO/TtXd1L4jwPRTCNUPytfrfOf
-         qLVw==
+        Tue, 8 Jun 2021 16:18:58 -0400
+Received: by mail-il1-f198.google.com with SMTP id y6-20020a92d0c60000b02901e82edc2af9so9126366ila.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 13:17:05 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bNFhaATKL9cFgTS2eiccK4GiRji7Y9SK+W6sRYw5bJ0=;
-        b=AGKJ1ZAJYfOgSynVKS916RZ5jjKMAr1JEpL+Ds90VfAjqrjYSMH2D2SgaTByBT/coi
-         UmKb6by3y09Kn16fFSerikn/7bX+cn+MbNRAg56aAvk4bnQOx6qmOsDbSyActu+ZB/DI
-         uczYr4gucRJWb3Xg0ZifGbEb1OnN86FkkESTcUkjF+x1HrcLCX0u4+hL5REBVYFJJpun
-         KyhWj51TOeu6Crt238fa2yorqdxVryOTBHnGnfRFF8c54f1hv+ijrxpkf5Bb+le3Tlph
-         +TcIHH9y+YPpFEch0++NZ064WMy0e9tiCmH5WkiJLOgfyxfT8+pjUvi4az3eyqxaYJ/J
-         UKRA==
-X-Gm-Message-State: AOAM532AjJj4l276/qbHbHgYpNmqn+O4cwg9AXpBQCbihBVneh+Dcmod
-        4RgOuobzmgItrLA1GosMsM+DQ33uZoNMWjVGJqQqKm9O
-X-Google-Smtp-Source: ABdhPJyVMYTFf9V5f2/kVWPnvS/L0ULCTswcDJYDHBoCu/lBP9IEF36tlj1epBpYSB45PVrq1Uu0ORG6Sp1Yb83eZJE=
-X-Received: by 2002:a25:6612:: with SMTP id a18mr34125027ybc.347.1623182241106;
- Tue, 08 Jun 2021 12:57:21 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=ezcyOkSc0C4ne5wy7XpBhvdu2J9JnoNW6BAbB6EkXRc=;
+        b=UM8ZhfMGocS0j7EQCzGBt0gw3eWHIiRJAop5aMyACeyd3PTrliTLc/F0KuOnC7olT0
+         nV667kwuwBpub6gjjV3YRcsHTRWRgv0tvtNNSp0fa/PS0T49huRQX++BpBxSIH3UI/F1
+         ViZq+nRcKgUAt0EAFbn+MPL4iYOsIsTnr2AZXRghsyiSlSnu8VM7vfE7wsp82LN0aIAX
+         Kah1kJjj9u/zTiucVpRRZJRpcgIYZxrlNcQDbAxh7h5eV1EdS9Bz1XcTXxoXzYY+9qMt
+         JhkFTFB73s+9Agn2eVpq4vta16njTIUo7Qvhr/sEc8j3rvz4pwxNwoW3EY4fb21Gem6I
+         9SEA==
+X-Gm-Message-State: AOAM533blGt6sc9D5Po5fghBlJDtUw0lmDIfefdzWIkZzp/UvGgg7vHg
+        2EZwZcPND9ETrI3Dwl0A7VC7vSHuSQoxLc82E0YLqopAIphs
+X-Google-Smtp-Source: ABdhPJxlFMepmJqj21LizbIi4meiP0zBRDHteG4KDW9m2NIZ7zZsorrU0kycxV5pId0oKOs6apRSk7sZWFPXjDKQYU6iZDZS5LBV
 MIME-Version: 1.0
-References: <20210608184457.3069064-1-luiz.dentz@gmail.com> <60bfc808.1c69fb81.1d1c6.838b@mx.google.com>
-In-Reply-To: <60bfc808.1c69fb81.1d1c6.838b@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 8 Jun 2021 12:57:10 -0700
-Message-ID: <CABBYNZ+yuNRGU4m68GRGd0exodb-0hwkLaYQ8gCE+NPi4bq0Fw@mail.gmail.com>
-Subject: Re: Bluetooth: HCI: Fix Set Extended (Scan Response) Data
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "An, Tedd" <tedd.an@intel.com>
+X-Received: by 2002:a92:d1c3:: with SMTP id u3mr22045702ilg.190.1623183425148;
+ Tue, 08 Jun 2021 13:17:05 -0700 (PDT)
+Date:   Tue, 08 Jun 2021 13:17:05 -0700
+In-Reply-To: <000000000000f6d80505abb42b60@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000761c0e05c446d750@google.com>
+Subject: Re: [syzbot] WARNING in cancel_delayed_work
+From:   syzbot <syzbot+35e70efb794757d7e175@syzkaller.appspotmail.com>
+To:     coreteam@netfilter.org, davem@davemloft.net, dsahern@kernel.org,
+        fw@strlen.de, johan.hedberg@gmail.com, johannes.berg@intel.com,
+        johannes@sipsolutions.net, kadlec@netfilter.org, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-wireless@vger.kernel.org, luciano.coelho@intel.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, pablo@netfilter.org,
+        syzkaller-bugs@googlegroups.com, yoshfuji@linux-ipv6.org
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+syzbot suspects this issue was fixed by commit:
 
-On Tue, Jun 8, 2021 at 12:42 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=496525
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.03 seconds
-> GitLint                       PASS      0.10 seconds
-> BuildKernel                   PASS      512.94 seconds
-> TestRunner: Setup             PASS      336.29 seconds
-> TestRunner: l2cap-tester      PASS      2.59 seconds
-> TestRunner: bnep-tester       PASS      1.87 seconds
-> TestRunner: mgmt-tester       FAIL      29.48 seconds
-> TestRunner: rfcomm-tester     PASS      2.03 seconds
-> TestRunner: sco-tester        PASS      1.99 seconds
-> TestRunner: smp-tester        PASS      2.06 seconds
-> TestRunner: userchan-tester   PASS      1.88 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - PASS - 1.03 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
->
->
-> ##############################
-> Test: GitLint - PASS - 0.10 seconds
-> Run gitlint with rule in .gitlint
->
->
-> ##############################
-> Test: BuildKernel - PASS - 512.94 seconds
-> Build Kernel with minimal configuration supports Bluetooth
->
->
-> ##############################
-> Test: TestRunner: Setup - PASS - 336.29 seconds
-> Setup environment for running Test Runner
->
->
-> ##############################
-> Test: TestRunner: l2cap-tester - PASS - 2.59 seconds
-> Run test-runner with l2cap-tester
-> Total: 40, Passed: 40 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: bnep-tester - PASS - 1.87 seconds
-> Run test-runner with bnep-tester
-> Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: mgmt-tester - FAIL - 29.48 seconds
-> Run test-runner with mgmt-tester
-> Total: 446, Passed: 415 (93.0%), Failed: 18, Not Run: 13
->
-> Failed Test Cases
-> Add Ext Advertising - Success 1 (Powered, Add Adv Inst) Failed       0.015 seconds
-> Add Ext Advertising - Success 2 (!Powered, Add Adv Inst) Failed       0.021 seconds
-> Add Ext Advertising - Success 5 (Set Adv off override) Failed       0.024 seconds
-> Add Ext Advertising - Success 6 (Scan Rsp Dta, Adv ok) Failed       0.019 seconds
-> Add Ext Advertising - Success 7 (Scan Rsp Dta, Scan ok)  Failed       0.016 seconds
-> Add Ext Advertising - Success 9 (General Discov Flag) Failed       0.020 seconds
-> Add Ext Advertising - Success 10 (Limited Discov Flag) Failed       0.017 seconds
-> Add Ext Advertising - Success 11 (Managed Flags)     Failed       0.023 seconds
-> Add Ext Advertising - Success 12 (TX Power Flag)     Failed       0.017 seconds
-> Add Ext Advertising - Success 20 (Add Adv override)  Failed       0.018 seconds
-> Add Ext Advertising - Success (Name is null)         Failed       0.015 seconds
-> Add Ext Advertising - Success (Complete name)        Failed       0.024 seconds
-> Add Ext Advertising - Success (Shortened name)       Failed       0.024 seconds
-> Add Ext Advertising - Success (Short name)           Failed       0.018 seconds
-> Add Ext Advertising - Success (Name + data)          Failed       0.023 seconds
-> Add Ext Advertising - Success (Name+data+appear)     Failed       0.025 seconds
-> Ext Adv MGMT - AD Data (5.0) Success                 Failed       0.022 seconds
-> Ext Adv MGMT - AD Scan Response (5.0) Success        Failed       0.020 seconds
+commit 43016d02cf6e46edfc4696452251d34bba0c0435
+Author: Florian Westphal <fw@strlen.de>
+Date:   Mon May 3 11:51:15 2021 +0000
 
-We will probably need to fix these once the patch is merged, it looks
-like they are always expecting 31 bytes of data but the extended
-version this is variable size.
+    netfilter: arptables: use pernet ops struct during unregister
 
->
-> ##############################
-> Test: TestRunner: rfcomm-tester - PASS - 2.03 seconds
-> Run test-runner with rfcomm-tester
-> Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: sco-tester - PASS - 1.99 seconds
-> Run test-runner with sco-tester
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: smp-tester - PASS - 2.06 seconds
-> Run test-runner with smp-tester
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: userchan-tester - PASS - 1.88 seconds
-> Run test-runner with userchan-tester
-> Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
->
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=140478ffd00000
+start commit:   c3d8f220 Merge tag 'kbuild-fixes-v5.9' of git://git.kernel..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=bb68b9e8a8cc842f
+dashboard link: https://syzkaller.appspot.com/bug?extid=35e70efb794757d7e175
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14f6602e900000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1203cc61900000
 
+If the result looks correct, please mark the issue as fixed by replying with:
 
--- 
-Luiz Augusto von Dentz
+#syz fix: netfilter: arptables: use pernet ops struct during unregister
+
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
