@@ -7,335 +7,142 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0958CC48BCF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 19:12:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2D6AFC48BCD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 19:17:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD21C613E3
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 19:12:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DEF4613E3
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 19:17:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229507AbhFITOC convert rfc822-to-8bit (ORCPT
+        id S229507AbhFITTw convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jun 2021 15:14:02 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42191 "EHLO
+        Wed, 9 Jun 2021 15:19:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42502 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229472AbhFITOB (ORCPT
+        with ESMTP id S229472AbhFITTv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jun 2021 15:14:01 -0400
+        Wed, 9 Jun 2021 15:19:51 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2485ECECD6;
-        Wed,  9 Jun 2021 21:20:04 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 19970CECD6;
+        Wed,  9 Jun 2021 21:25:52 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v1] Bluetooth: btintel: Support Digital(N) + RF(N-1)
- combination
+Subject: Re: [PATCH 1/2] Bluetooth: btusb: Record debug log for Mediatek Chip.
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210609114029.1656-1-kiran.k@intel.com>
-Date:   Wed, 9 Jun 2021 21:12:04 +0200
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        ravishankar.srivatsa@intel.com
+In-Reply-To: <20210609190734.30088-1-mark-yw.chen@mediatek.com>
+Date:   Wed, 9 Jun 2021 21:17:52 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, chris.lu@mediatek.com,
+        will-cy.lee@mediatek.com, Sean Wang <sean.wang@mediatek.com>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        open list <linux-kernel@vger.kernel.org>,
+        michaelfsun@google.com, shawnku@google.com, jemele@google.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <E6C00EEB-8D02-4EF1-87FD-75E58023BA67@holtmann.org>
-References: <20210609114029.1656-1-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
+Message-Id: <35B0FA64-903D-4747-8D39-4FA48D30A680@holtmann.org>
+References: <20210609190734.30088-1-mark-yw.chen@mediatek.com>
+To:     mark-yw.chen@mediatek.com
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+Hi Mark,
 
-> New generation Intel controllers(N) need to support RF from (N-1)
-> generation. Since PID comes from OTP present in RF module,
-> *setup* function gets mapped to BTUSB_INTEL_NEW instead of
-> BTUSB_INTEL_NEWGEN. This patch checks generation of CNVi in
-> *setup* of BTUSB_INTEL_NEW and maps callbacks to BTUSB_INTEL_NEWGEN
-> if new generation controller is found and attempts *setup* of
-> BTUSB_INTEL_NEWGEN.
+> 1. Add btusb_recv_bulk_mtk to receive debug log.
+> 2. Send the debug log via hci_recv_diag channel.
+> 3. The upper layerd use hci_channel_minitor to receive
+>   these packets.
 > 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
 > ---
-> drivers/bluetooth/btintel.c | 119 ++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btintel.h |  10 +++
-> drivers/bluetooth/btusb.c   |  45 +++++++++++++-
-> net/bluetooth/hci_core.c    |   5 +-
-> 4 files changed, 177 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btusb.c | 67 +++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 67 insertions(+)
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index e44b6993cf91..1d9ecc481f14 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -483,6 +483,85 @@ int btintel_version_info_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
-> }
-> EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
-> 
-> +void btintel_parse_version_tlv(struct hci_dev *hdev, struct sk_buff *skb,
-> +			       struct intel_version_tlv *version)
-> +{
-> +	/* Consume Command Complete Status field */
-> +	skb_pull(skb, sizeof(__u8));
-> +
-> +	/* Event parameters contatin multiple TLVs. Read each of them
-> +	 * and only keep the required data. Also, it use existing legacy
-> +	 * version field like hw_platform, hw_variant, and fw_variant
-> +	 * to keep the existing setup flow
-> +	 */
-> +	while (skb->len) {
-> +		struct intel_tlv *tlv;
-> +
-> +		tlv = (struct intel_tlv *)skb->data;
-> +		switch (tlv->type) {
-> +		case INTEL_TLV_CNVI_TOP:
-> +			version->cnvi_top = get_unaligned_le32(tlv->val);
-> +			break;
-
-I think we already had this issue that you need to check that enough data is actually in the SKB.
-
-> +		case INTEL_TLV_CNVR_TOP:
-> +			version->cnvr_top = get_unaligned_le32(tlv->val);
-> +			break;
-> +		case INTEL_TLV_CNVI_BT:
-> +			version->cnvi_bt = get_unaligned_le32(tlv->val);
-> +			break;
-> +		case INTEL_TLV_CNVR_BT:
-> +			version->cnvr_bt = get_unaligned_le32(tlv->val);
-> +			break;
-> +		case INTEL_TLV_DEV_REV_ID:
-> +			version->dev_rev_id = get_unaligned_le16(tlv->val);
-> +			break;
-> +		case INTEL_TLV_IMAGE_TYPE:
-> +			version->img_type = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_TIME_STAMP:
-> +			version->timestamp = get_unaligned_le16(tlv->val);
-> +			break;
-> +		case INTEL_TLV_BUILD_TYPE:
-> +			version->build_type = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_BUILD_NUM:
-> +			version->build_num = get_unaligned_le32(tlv->val);
-> +			break;
-> +		case INTEL_TLV_SECURE_BOOT:
-> +			version->secure_boot = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_OTP_LOCK:
-> +			version->otp_lock = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_API_LOCK:
-> +			version->api_lock = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_DEBUG_LOCK:
-> +			version->debug_lock = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_MIN_FW:
-> +			version->min_fw_build_nn = tlv->val[0];
-> +			version->min_fw_build_cw = tlv->val[1];
-> +			version->min_fw_build_yy = tlv->val[2];
-> +			break;
-> +		case INTEL_TLV_LIMITED_CCE:
-> +			version->limited_cce = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_SBE_TYPE:
-> +			version->sbe_type = tlv->val[0];
-> +			break;
-> +		case INTEL_TLV_OTP_BDADDR:
-> +			memcpy(&version->otp_bd_addr, tlv->val, tlv->len);
-> +			break;
-> +		default:
-> +			/* Ignore rest of information */
-> +			break;
-> +		}
-> +		/* consume the current tlv and move to next*/
-> +		skb_pull(skb, tlv->len + sizeof(*tlv));
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_parse_version_tlv);
-> +
-> int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
-> {
-> 	struct sk_buff *skb;
-> @@ -595,6 +674,46 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
-> }
-> EXPORT_SYMBOL_GPL(btintel_read_version_tlv);
-> 
-> +int btintel_generic_read_version(struct hci_dev *hdev,
-> +				 struct intel_version_tlv *ver_tlv,
-> +				 struct intel_version *ver, bool *is_tlv)
-> +{
-> +	struct sk_buff *skb;
-> +	const u8 param[1] = { 0xFF };
-> +
-> +	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +
-> +	if (skb->data[0]) {
-> +		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
-> +			   skb->data[0]);
-> +		kfree_skb(skb);
-> +		return -EIO;
-> +	}
-> +
-> +	if (skb->len < sizeof(struct intel_version))
-> +		return -EILSEQ;
-> +
-> +	if (skb->len == sizeof(struct intel_version) &&
-> +	    skb->data[1] == 0x37)
-> +		*is_tlv = false;
-> +	else
-> +		*is_tlv = true;
-> +
-> +	if (*is_tlv)
-> +		btintel_parse_version_tlv(hdev, skb, ver_tlv);
-> +	else
-> +		memcpy(ver, skb->data, sizeof(*ver));
-> +
-> +	kfree_skb(skb);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_generic_read_version);
-> +
-
-I have the feeling that we are falling back to a patch that I already rejected.
-
-> /* ------- REGMAP IBT SUPPORT ------- */
-> 
-> #define IBT_REG_MODE_8BIT  0x00
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index d184064a5e7c..366cb746f9c4 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -175,6 +175,10 @@ int btintel_read_debug_features(struct hci_dev *hdev,
-> 				struct intel_debug_features *features);
-> int btintel_set_debug_features(struct hci_dev *hdev,
-> 			       const struct intel_debug_features *features);
-> +int btintel_generic_read_version(struct hci_dev *hdev,
-> +				 struct intel_version_tlv *ver_tlv,
-> +				 struct intel_version *ver,
-> +				 bool *is_tlv);
-> #else
-> 
-> static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-> @@ -307,4 +311,10 @@ static inline int btintel_set_debug_features(struct hci_dev *hdev,
-> 	return -EOPNOTSUPP;
-> }
-> 
-> +static int btintel_generic_read_version(struct hci_dev *hdev,
-> +					struct intel_version_tlv *ver_tlv,
-> +					struct intel_version *ver, bool *is_tlv)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> #endif
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index a9855a2dd561..15d91aae52cc 100644
+> index b015dcecfb13..2a55ae0a5f8c 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -583,6 +583,9 @@ struct btusb_data {
-> 	unsigned cmd_timeout_cnt;
-> };
-> 
-> +static int btusb_setup_intel_newgen(struct hci_dev *hdev);
-> +static int btusb_shutdown_intel_new(struct hci_dev *hdev);
-> +
-> static void btusb_intel_cmd_timeout(struct hci_dev *hdev)
-> {
-> 	struct btusb_data *data = hci_get_drvdata(hdev);
-> @@ -2842,6 +2845,18 @@ static int btusb_intel_boot(struct hci_dev *hdev, u32 boot_addr)
-> 	return err;
+> @@ -3851,6 +3851,72 @@ static int btusb_mtk_shutdown(struct hci_dev *hdev)
+> 	return 0;
 > }
 > 
-> +static bool btintel_is_newgen_controller(struct hci_dev *hdev, u32 cnvi)
+> +static int btusb_recv_bulk_mtk(struct btusb_data *data, void *buffer, int count)
 > +{
-> +	switch (cnvi & 0xFFF) {
-> +	case 0x400: /* Slr */
-> +	case 0x401: /* Slr-F */
-> +	case 0x410: /* TyP */
-> +	case 0x810: /* Mgr */
-> +		return true;
+> +	struct sk_buff *skb;
+> +	unsigned long flags;
+> +	int err = 0;
+> +
+> +	spin_lock_irqsave(&data->rxlock, flags);
+> +	skb = data->acl_skb;
+> +
+> +	while (count) {
+> +		int len;
+> +
+> +		if (!skb) {
+> +			skb = bt_skb_alloc(HCI_MAX_FRAME_SIZE, GFP_ATOMIC);
+> +			if (!skb) {
+> +				err = -ENOMEM;
+> +				break;
+> +			}
+> +
+> +			hci_skb_pkt_type(skb) = HCI_ACLDATA_PKT;
+> +			hci_skb_expect(skb) = HCI_ACL_HDR_SIZE;
+> +		}
+> +
+> +		len = min_t(uint, hci_skb_expect(skb), count);
+> +		skb_put_data(skb, buffer, len);
+> +
+> +		count -= len;
+> +		buffer += len;
+> +		hci_skb_expect(skb) -= len;
+> +
+> +		if (skb->len == HCI_ACL_HDR_SIZE) {
+> +			__le16 dlen = hci_acl_hdr(skb)->dlen;
+> +
+> +			/* Complete ACL header */
+> +			hci_skb_expect(skb) = __le16_to_cpu(dlen);
+> +
+> +			if (skb_tailroom(skb) < hci_skb_expect(skb)) {
+> +				kfree_skb(skb);
+> +				skb = NULL;
+> +
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+> +		}
+> +
+> +		if (!hci_skb_expect(skb)) {
+> +			/* Complete frame */
+> +			if (skb->data[0] == 0x6f && skb->data[1] == 0xfc) {
+> +				usb_disable_autosuspend(data->udev);
+> +				hci_recv_diag(data->hdev, skb);
+> +			} else if ((skb->data[0] == 0xfe || skb->data[0] == 0xff) &&
+> +				   skb->data[1] == 0x05) {
+> +				hci_recv_diag(data->hdev, skb);
+> +			} else {
+> +				hci_recv_frame(data->hdev, skb);
+> +			}
+> +			skb = NULL;
+> +		}
 > +	}
-> +	return false;
+> +
+> +	data->acl_skb = skb;
+> +	spin_unlock_irqrestore(&data->rxlock, flags);
+> +
+> +	return err;
 > +}
 > +
-> static int btusb_setup_intel_new(struct hci_dev *hdev)
-> {
-> 	struct btusb_data *data = hci_get_drvdata(hdev);
-> @@ -2851,6 +2866,8 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
-> 	char ddcname[64];
-> 	int err;
-> 	struct intel_debug_features features;
-> +	struct intel_version_tlv ver_tlv;
-> +	bool is_tlv;
+> MODULE_FIRMWARE(FIRMWARE_MT7663);
+> MODULE_FIRMWARE(FIRMWARE_MT7668);
 > 
-> 	BT_DBG("%s", hdev->name);
-> 
-> @@ -2864,12 +2881,38 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
-> 	 * is in bootloader mode or if it already has operational firmware
-> 	 * loaded.
-> 	 */
-> -	err = btintel_read_version(hdev, &ver);
-> +	err = btintel_generic_read_version(hdev, &ver_tlv, &ver, &is_tlv);
-> 	if (err) {
-> 		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
-> 		btintel_reset_to_bootloader(hdev);
-> 		return err;
-> 	}
-> +	if (is_tlv) {
-> +		/* We got TLV data. Check for new generation CNVi. If present,
-> +		 * then map the callbacks to BTUSB_INTEL_NEWGEN and attempt
-> +		 * setup function again
-> +		 */
-> +		if (btintel_is_newgen_controller(hdev, ver_tlv.cnvi_top)) {
-> +			hdev->send = btusb_send_frame_intel;
-> +			hdev->setup = btusb_setup_intel_newgen;
+> @@ -4669,6 +4735,7 @@ static int btusb_probe(struct usb_interface *intf,
+> 		hdev->setup = btusb_mtk_setup;
+> 		hdev->shutdown = btusb_mtk_shutdown;
+> 		hdev->manufacturer = 70;
+> +		data->recv_bulk = btusb_recv_bulk_mtk;
+> 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
 
-So this is a clear no, your are not changing hdev->setup within hdev->setup.
-
-> +			hdev->shutdown = btusb_shutdown_intel_new;
-> +			hdev->hw_error = btintel_hw_error;
-> +			hdev->set_diag = btintel_set_diag;
-> +			hdev->set_bdaddr = btintel_set_bdaddr;
-> +			hdev->cmd_timeout = btusb_intel_cmd_timeout;
-> +			return -EAGAIN;
-> +		}
-> +
-> +		/* we need to read legacy version here to minimize the changes
-> +		 * and keep the esixiting flow
-> +		 */
-> +		err = btintel_read_version(hdev, &ver);
-> +		if (err) {
-> +			bt_dev_err(hdev, "Intel Read version failed (%d)", err);
-> +			btintel_reset_to_bootloader(hdev);
-> +			return err;
-> +		}
-> +	}
-> 
-> 	err = btintel_version_info(hdev, &ver);
-> 	if (err)
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 1eb7ffd0dd29..8e407bad0e31 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1496,8 +1496,11 @@ static int hci_dev_do_open(struct hci_dev *hdev)
-> 
-> 		hci_sock_dev_event(hdev, HCI_DEV_SETUP);
-> 
-> -		if (hdev->setup)
-> +		if (hdev->setup) {
-> 			ret = hdev->setup(hdev);
-> +			if (ret && ret == -EAGAIN)
-> +				ret = hdev->setup(hdev);
-> +		}
-
-NO. Please stop hacking here. I think you need to take a whiteboard and draw how our controllers are initialized.
+NO. The recv_bulk was meant for cases when bulk was faster and needed to redirected as interrupt/event data. Doing a complete copy of btusb_recv_bulk is not acceptable. You need to introduce data->recv_acl.
 
 Regards
 
