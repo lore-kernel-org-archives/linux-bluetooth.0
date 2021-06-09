@@ -6,46 +6,46 @@ X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
 	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EC4C48BCD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CA868C48BCF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E0E36136D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B460B6136D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234534AbhFIOV6 (ORCPT
+        id S234688AbhFIOWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jun 2021 10:21:58 -0400
-Received: from flippie-beckerswealth-sa.xyz ([62.173.147.2]:36570 "EHLO
-        host.flippie-beckerswealth-sa.xyz" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235561AbhFIOV5 (ORCPT
+        Wed, 9 Jun 2021 10:22:39 -0400
+Received: from flippie-beckerswealthsa.xyz ([62.173.138.170]:50044 "EHLO
+        host.flippie-beckerswealthsa.xyz" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235098AbhFIOWg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jun 2021 10:21:57 -0400
-X-Greylist: delayed 6199 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:21:57 EDT
-Received: from flippie-beckerswealth-sa.xyz (ec2-3-131-99-163.us-east-2.compute.amazonaws.com [3.131.99.163])
-        by host.flippie-beckerswealth-sa.xyz (Postfix) with ESMTPA id F194230AE509
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jun 2021 15:10:26 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz F194230AE509
+        Wed, 9 Jun 2021 10:22:36 -0400
+X-Greylist: delayed 7062 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:22:35 EDT
+Received: from flippie-beckerswealthsa.xyz (ec2-18-118-29-154.us-east-2.compute.amazonaws.com [18.118.29.154])
+        by host.flippie-beckerswealthsa.xyz (Postfix) with ESMTPA id 1F5BB3115ACF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jun 2021 15:09:31 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealthsa.xyz 1F5BB3115ACF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240627;
+        d=flippie-beckerswealthsa.xyz; s=default; t=1623240572;
         bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
         h=Reply-To:From:To:Subject:Date:From;
-        b=Qs2lth5DKpg/Bc9k7Xwfwyn06lbGtjY2Z9SoWYYU3UuUHDsACc1YFnTJH7OsjfOZy
-         Y+3akg3h0CjmxQsmP3Sg9kcmIgeyIHrDJ2/9S/HhhLuOAA32kKb3XIW5pfZP2JVfAF
-         OdXooMDdHZn8eJDFqTw7YFaiIfQHzd4WtpQbhXiM=
-DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz F194230AE509
+        b=qUHMH+hFrvakYt6Vzp5NFeE9pbcJUUxglTkzlqtG2l69zblBu458GqSoBXn2z7IZw
+         2WHzCUyfj/0j25bx88EVhqGalzFiZ26VGqXINhgmnNIM+4PgZgR1VidlKe3gpTI3D1
+         igPgnBQjUbUkPufvpb8FgADxyU7yDm1zNNse8Yu0=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealthsa.xyz 1F5BB3115ACF
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240627;
+        d=flippie-beckerswealthsa.xyz; s=default; t=1623240572;
         bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
         h=Reply-To:From:To:Subject:Date:From;
-        b=Qs2lth5DKpg/Bc9k7Xwfwyn06lbGtjY2Z9SoWYYU3UuUHDsACc1YFnTJH7OsjfOZy
-         Y+3akg3h0CjmxQsmP3Sg9kcmIgeyIHrDJ2/9S/HhhLuOAA32kKb3XIW5pfZP2JVfAF
-         OdXooMDdHZn8eJDFqTw7YFaiIfQHzd4WtpQbhXiM=
+        b=qUHMH+hFrvakYt6Vzp5NFeE9pbcJUUxglTkzlqtG2l69zblBu458GqSoBXn2z7IZw
+         2WHzCUyfj/0j25bx88EVhqGalzFiZ26VGqXINhgmnNIM+4PgZgR1VidlKe3gpTI3D1
+         igPgnBQjUbUkPufvpb8FgADxyU7yDm1zNNse8Yu0=
 Reply-To: jmasuku40@flippiebeckerwealthservices.com
-From:   Jotham Masuku <jmasuku40@flippie-beckerswealth-sa.xyz>
+From:   Jotham Masuku <jmasuku40@flippie-beckerswealthsa.xyz>
 To:     linux-bluetooth@vger.kernel.org
-Subject: Proposal
-Date:   09 Jun 2021 12:10:26 +0000
-Message-ID: <20210609121026.225278F0335DD5EF@flippie-beckerswealth-sa.xyz>
+Subject: Projects
+Date:   09 Jun 2021 12:09:31 +0000
+Message-ID: <20210609120931.7753F5C0085443F3@flippie-beckerswealthsa.xyz>
 Mime-Version: 1.0
 Content-Type: text/plain;
         charset="utf-8"
