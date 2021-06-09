@@ -1,75 +1,79 @@
 Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Level: *
+X-Spam-Status: No, score=1.0 required=3.0 tests=BAYES_50,DKIMWL_BL,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A70E0C48BDF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 12:21:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EC4C48BCD
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 89BA761351
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 12:21:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E0E36136D
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 14:20:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239834AbhFIMWz (ORCPT
+        id S234534AbhFIOV6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jun 2021 08:22:55 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:39191 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239763AbhFIMWo (ORCPT
+        Wed, 9 Jun 2021 10:21:58 -0400
+Received: from flippie-beckerswealth-sa.xyz ([62.173.147.2]:36570 "EHLO
+        host.flippie-beckerswealth-sa.xyz" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235561AbhFIOV5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jun 2021 08:22:44 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id EE21BCECCD;
-        Wed,  9 Jun 2021 14:28:47 +0200 (CEST)
+        Wed, 9 Jun 2021 10:21:57 -0400
+X-Greylist: delayed 6199 seconds by postgrey-1.27 at vger.kernel.org; Wed, 09 Jun 2021 10:21:57 EDT
+Received: from flippie-beckerswealth-sa.xyz (ec2-3-131-99-163.us-east-2.compute.amazonaws.com [3.131.99.163])
+        by host.flippie-beckerswealth-sa.xyz (Postfix) with ESMTPA id F194230AE509
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jun 2021 15:10:26 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz F194230AE509
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240627;
+        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=Qs2lth5DKpg/Bc9k7Xwfwyn06lbGtjY2Z9SoWYYU3UuUHDsACc1YFnTJH7OsjfOZy
+         Y+3akg3h0CjmxQsmP3Sg9kcmIgeyIHrDJ2/9S/HhhLuOAA32kKb3XIW5pfZP2JVfAF
+         OdXooMDdHZn8eJDFqTw7YFaiIfQHzd4WtpQbhXiM=
+DKIM-Filter: OpenDKIM Filter v2.11.0 host.flippie-beckerswealth-sa.xyz F194230AE509
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=flippie-beckerswealth-sa.xyz; s=default; t=1623240627;
+        bh=h0ivQLrZuUWuyEKz/TWb+FP9AASpHhVqOsJtRcwKQV4=;
+        h=Reply-To:From:To:Subject:Date:From;
+        b=Qs2lth5DKpg/Bc9k7Xwfwyn06lbGtjY2Z9SoWYYU3UuUHDsACc1YFnTJH7OsjfOZy
+         Y+3akg3h0CjmxQsmP3Sg9kcmIgeyIHrDJ2/9S/HhhLuOAA32kKb3XIW5pfZP2JVfAF
+         OdXooMDdHZn8eJDFqTw7YFaiIfQHzd4WtpQbhXiM=
+Reply-To: jmasuku40@flippiebeckerwealthservices.com
+From:   Jotham Masuku <jmasuku40@flippie-beckerswealth-sa.xyz>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Proposal
+Date:   09 Jun 2021 12:10:26 +0000
+Message-ID: <20210609121026.225278F0335DD5EF@flippie-beckerswealth-sa.xyz>
+Mime-Version: 1.0
 Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH] NULL check value returned by alloc_skb
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210609091149.12557-1-find.dhiraj@gmail.com>
-Date:   Wed, 9 Jun 2021 14:20:48 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <55C683FF-DC9D-4D38-8BFF-D97685462E1C@holtmann.org>
-References: <20210609091149.12557-1-find.dhiraj@gmail.com>
-To:     Dhiraj Shah <find.dhiraj@gmail.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dhiraj,
+Hello there,
 
-> Return error ENOMEM if alloc_skb() failed.
-> 
-> Signed-off-by: Dhiraj Shah <find.dhiraj@gmail.com>
-> ---
-> drivers/bluetooth/virtio_bt.c | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
-> index c804db7e90f8..5f82574236c0 100644
-> --- a/drivers/bluetooth/virtio_bt.c
-> +++ b/drivers/bluetooth/virtio_bt.c
-> @@ -34,6 +34,8 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt)
-> 	int err;
-> 
-> 	skb = alloc_skb(1000, GFP_KERNEL);
-> +	if (!skb)
-> +		return -ENOMEM;
-> 	sg_init_one(sg, skb->data, 1000);
-> 
-> 	err = virtqueue_add_inbuf(vq, sg, 1, skb, GFP_KERNEL);
+I hope this message finds you in good spirits especially during=20
+this challenging time of coronavirus pandemic. I hope you and=20
+your family are well and keeping safe. Anyway, I am Jotham=20
+Masuku, a broker working with Flippiebecker Wealth. I got your=20
+contact (along with few other contacts) through an online=20
+business directory and I thought I should contact you to see if=20
+you are interested in this opportunity. I am contacting you=20
+because one of my high profile clients is interested in investing=20
+abroad and has asked me to look for individuals and companies=20
+with interesting business ideas and projects that he can invest=20
+in. He wants to invest a substantial amount of asset abroad.
 
-a similar patch is already upstream in bluetooth-next.
+Please kindly respond back to this email if you are interested in=20
+this opportunity. Once I receive your response, I will give you=20
+more details and we can plan a strategy that will be beneficial=20
+to all parties.
 
-Regards
+Best regards
 
-Marcel
-
+J Masuku
+Flippiebecker Wealth
