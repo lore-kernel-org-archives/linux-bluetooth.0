@@ -8,236 +8,250 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0A5FC48BCF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 22:20:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDB15C48BCF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 22:21:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7901961184
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 22:20:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4DE0613E7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 22:21:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229845AbhFIWWs (ORCPT
+        id S229626AbhFIWXf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jun 2021 18:22:48 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58478 "EHLO
+        Wed, 9 Jun 2021 18:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58662 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229542AbhFIWWs (ORCPT
+        with ESMTP id S229542AbhFIWXe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jun 2021 18:22:48 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D1CC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jun 2021 15:20:39 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id h12so16894858pfe.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jun 2021 15:20:39 -0700 (PDT)
+        Wed, 9 Jun 2021 18:23:34 -0400
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDC09C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  9 Jun 2021 15:21:28 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id u18so19714658pfk.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 09 Jun 2021 15:21:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=XejPS2SxgaSma7UYPFxMSGQDLe3SrSlRCe8g7Osky3I=;
-        b=TlGAGC0h5hkvE5CdZFNiteGBKw8g0aR+bHvRX/SPGme2uJbB69qy2UM4MIYHGYqnqO
-         lmV+Y07vZCOfCqx8PcnL74JXYwilhDyWWRHByu2+nA7mGJFdvePZawTGRTkno6kCdEKY
-         530Y1LM1uRy/MUVSGIBNwdk7zpzFN2EAPWmHdxKKA9Kj+oZhQCDSc/eiacfnmLdZVgmh
-         9hnEubHH43OofoyUJvMxvGuFWPtwFUGSsv3iJzugt5zysRpTILfuX59F7n8VxbkisLTP
-         3DwZsyI4XRNdEYiYZKNLEp8I2a/f7cqrZU22naUGzijW8vHenK9F+fZJoZ3E2N0LMj3O
-         SwQA==
+        bh=29CZpLoK6nPZvYor9his0scdmxoyTQJ8HNnJMA8OXho=;
+        b=OqZgib0FzQmMWP4Up8sXNNSsfUE9zyakTcar6kQ8n6GwHlkz8Ownz2bLBEMIEMHKey
+         vkOXymKTJzchlTMPf4sKNLR0YEmUkzhWNu4aI1F5MolBb9EZNOIYtqpSdxmmK1ww8ASP
+         4dVhDkXsI3cn9qrrogOzjQIZgxUjMv4q+kL13f/IfgbzqQRcItRzj6KQntST496KiNPg
+         j6c+V+ocMaPV8PgCpmXi4YB+vU7zIr0WbQu1KMseGleqPYmCIVHox9BskdQfgr79rshc
+         Ne7ESjJHwa6EHFkWiGxgzDgXlhKlHzF5hqqQUOWJntNNR+c5Ih0FgyB4pm6D0fN9RAol
+         XBWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=XejPS2SxgaSma7UYPFxMSGQDLe3SrSlRCe8g7Osky3I=;
-        b=goOCBbfD0LqrOFZ6gRcG+4+kQ+khMCJ2d/c7vxge3Od0LdIRG1QL03ERgepkzIZWF9
-         7SasErfcn5GdviILAPoGgGspeS47yklE4erk4FNAISEBsDcH6Bfbz6dPMMeFh55gkcn2
-         ZzFSKZrl2N3jVVfVOYB2dG/40zfSHNNByaVdpOZ1eph+Wgi6BVUkLPYzo4aAq5bAVO+8
-         z7sKUA/Ab6E1qPv7qzVblJLe7f9RIeeSpszLf8xB3h3WD03ZFskzT4jb+4dXOAoyBVU6
-         Al/YXczJB98Hu3bb6TAxXMXFaUDuPlGi2wQ+KOcb+mRG0mDgqooU+QbJHKqERmOjufYW
-         FCOw==
-X-Gm-Message-State: AOAM533/cwNNLf9G1v05qQUYwwFOMRrjcJHrgYCihsTD22fLgXtS+dGq
-        bpp+5AwunZ9qrl2EaKNla3S0FZ7IirE=
-X-Google-Smtp-Source: ABdhPJxnS233DHXEVgO9HKfm5iG6Kq45elPk9eFR8S1ya93Wjsk/DQ8CwZLWD+qAft4nPsaLIJWxPQ==
-X-Received: by 2002:a63:1041:: with SMTP id 1mr1831346pgq.258.1623277238744;
-        Wed, 09 Jun 2021 15:20:38 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=29CZpLoK6nPZvYor9his0scdmxoyTQJ8HNnJMA8OXho=;
+        b=P5olkBJt+FAteWS/3OcbeWevSRfVswp0Y1mnYkqLs6Zr4B7R0pxPTzlmUl29NsRah/
+         l44S4eATsb7bXYlbp0/OH1Z3kMnYaF9FlntmudF2iKT/i08/wsWkDq2g7FlLSRZF3Ld3
+         WXt3jDyIeH0HVhrKrMn3aOykrSj7tmCmreFptOmfIqhpGQw8HY5m0qfo2mLcrrDEc8tw
+         UduOwLmgdAKTyycKyQW9yRr/+U0UOXVCunYZO6EOfXHtqZlZ6C1I+s7PUfxIyiatevYN
+         BQCA7iyzna2ceb09XHwXInu6KZQgdDGfSv71AwX4kR/JGu2EutJUZVGjEaII+rmXLVZB
+         FmkQ==
+X-Gm-Message-State: AOAM533alDPdc09eO5Ie9wL4iJNErj0KtMoJVUszQUJo2IGl/uhCo9v4
+        nsdfOahxSFGEqrvpmhNVWagsTwbEMJQ=
+X-Google-Smtp-Source: ABdhPJw0CrO5BCg4K2B+ZF5tksyaf9R+5RtzQgbl3D+4flzTvuuaqpeI2L71H5KhobfK/1d1h5zIjA==
+X-Received: by 2002:a62:5545:0:b029:2e9:d88c:15c1 with SMTP id j66-20020a6255450000b02902e9d88c15c1mr1870528pfb.75.1623277286883;
+        Wed, 09 Jun 2021 15:21:26 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n9sm460352pfu.121.2021.06.09.15.20.38
+        by smtp.gmail.com with ESMTPSA id i16sm546233pji.30.2021.06.09.15.21.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 09 Jun 2021 15:20:38 -0700 (PDT)
+        Wed, 09 Jun 2021 15:21:26 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] Bluetooth: HCI: Fix Set Extended (Scan Response) Data
-Date:   Wed,  9 Jun 2021 15:20:30 -0700
-Message-Id: <20210609222035.297833-2-luiz.dentz@gmail.com>
+Subject: [PATCH v3 1/6] Bluetooth: Add helper for serialized HCI command execution
+Date:   Wed,  9 Jun 2021 15:21:19 -0700
+Message-Id: <20210609222124.298336-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210609222035.297833-1-luiz.dentz@gmail.com>
-References: <20210609222035.297833-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Marcel Holtmann <marcel@holtmann.org>
 
-These command do have variable length and the length can go up to 251,
-so this changes the struct to not use a fixed size and then when
-creating the PDU only the actual length of the data send to the
-controller.
+The usage of __hci_cmd_sync() within the hdev->setup() callback allows for
+a nice and simple serialized execution of HCI commands. More importantly
+it allows for result processing before issueing the next command.
 
-Fixes: a0fb3726ba551 ("Bluetooth: Use Set ext adv/scan rsp data if
-controller supports")
+With the current usage of hci_req_run() it is possible to batch up
+commands and execute them, but it is impossible to react to their
+results or errors.
+
+This is an attempt to generalize the hdev->setup() handling and provide
+a simple way of running multiple HCI commands from a single function
+context.
+
+There are multiple struct work that are decdicated to certain tasks
+already used right now. It is add a lot of bloat to hci_dev struct and
+extra handling code. So it might be possible to put all of these behind
+a common HCI command infrastructure and just execute the HCI commands
+from the same work context in a serialized fashion.
+
+For example updating the white list and resolving list can be done now
+without having to know the list size ahead of time. Also preparing for
+suspend or resume shouldn't require a state machine anymore. There are
+other tasks that should be simplified as well.
+
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci.h      |  6 ++--
- include/net/bluetooth/hci_core.h |  8 ++---
- net/bluetooth/hci_request.c      | 51 ++++++++++++++++++--------------
- 3 files changed, 37 insertions(+), 28 deletions(-)
+ include/net/bluetooth/hci_core.h | 17 +++++++
+ net/bluetooth/hci_core.c         | 82 ++++++++++++++++++++++++++++++++
+ 2 files changed, 99 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 479adbde6db4..cfd4e40594d1 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1775,13 +1775,15 @@ struct hci_cp_ext_adv_set {
- 	__u8  max_events;
- } __packed;
- 
-+#define HCI_MAX_EXT_AD_LENGTH	251
-+
- #define HCI_OP_LE_SET_EXT_ADV_DATA		0x2037
- struct hci_cp_le_set_ext_adv_data {
- 	__u8  handle;
- 	__u8  operation;
- 	__u8  frag_pref;
- 	__u8  length;
--	__u8  data[HCI_MAX_AD_LENGTH];
-+	__u8  data[];
- } __packed;
- 
- #define HCI_OP_LE_SET_EXT_SCAN_RSP_DATA		0x2038
-@@ -1790,7 +1792,7 @@ struct hci_cp_le_set_ext_scan_rsp_data {
- 	__u8  operation;
- 	__u8  frag_pref;
- 	__u8  length;
--	__u8  data[HCI_MAX_AD_LENGTH];
-+	__u8  data[];
- } __packed;
- 
- #define LE_SET_ADV_DATA_OP_COMPLETE	0x03
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 212f46806ce7..a53e94459ecd 100644
+index a53e94459ecd..7b8dac2131e7 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -228,9 +228,9 @@ struct adv_info {
- 	__u16	remaining_time;
- 	__u16	duration;
- 	__u16	adv_data_len;
--	__u8	adv_data[HCI_MAX_AD_LENGTH];
-+	__u8	adv_data[HCI_MAX_EXT_AD_LENGTH];
- 	__u16	scan_rsp_len;
--	__u8	scan_rsp_data[HCI_MAX_AD_LENGTH];
-+	__u8	scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
- 	__s8	tx_power;
- 	__u32   min_interval;
- 	__u32   max_interval;
-@@ -551,9 +551,9 @@ struct hci_dev {
- 	DECLARE_BITMAP(dev_flags, __HCI_NUM_FLAGS);
+@@ -302,6 +302,17 @@ struct amp_assoc {
  
- 	__s8			adv_tx_power;
--	__u8			adv_data[HCI_MAX_AD_LENGTH];
-+	__u8			adv_data[HCI_MAX_EXT_AD_LENGTH];
- 	__u8			adv_data_len;
--	__u8			scan_rsp_data[HCI_MAX_AD_LENGTH];
-+	__u8			scan_rsp_data[HCI_MAX_EXT_AD_LENGTH];
- 	__u8			scan_rsp_data_len;
+ #define HCI_MAX_PAGES	3
  
- 	struct list_head	adv_instances;
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index f7a9d97f3e84..1d14adc023e9 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -1716,30 +1716,33 @@ void __hci_req_update_scan_rsp_data(struct hci_request *req, u8 instance)
- 		return;
++typedef int (*cmd_sync_work_func_t)(struct hci_dev *hdev, void *data);
++typedef void (*cmd_sync_work_destroy_t)(struct hci_dev *hdev, void *data,
++					int err);
++
++struct cmd_sync_work_entry {
++	struct list_head list;
++	cmd_sync_work_func_t func;
++	void *data;
++	cmd_sync_work_destroy_t destroy;
++};
++
+ struct hci_dev {
+ 	struct list_head list;
+ 	struct mutex	lock;
+@@ -463,6 +474,9 @@ struct hci_dev {
+ 	struct work_struct	power_on;
+ 	struct delayed_work	power_off;
+ 	struct work_struct	error_reset;
++	struct work_struct	cmd_sync_work;
++	struct list_head	cmd_sync_work_list;
++	struct mutex		cmd_sync_work_lock;
  
- 	if (ext_adv_capable(hdev)) {
--		struct hci_cp_le_set_ext_scan_rsp_data cp;
-+		struct {
-+			struct hci_cp_le_set_ext_scan_rsp_data cp;
-+			u8 data[HCI_MAX_EXT_AD_LENGTH];
-+		} pdu;
+ 	__u16			discov_timeout;
+ 	struct delayed_work	discov_off;
+@@ -1701,6 +1715,9 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
+ struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 			     const void *param, u32 timeout);
  
--		memset(&cp, 0, sizeof(cp));
-+		memset(&pdu, 0, sizeof(pdu));
++int hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func,
++		       void *data, cmd_sync_work_destroy_t destroy);
++
+ u32 hci_conn_get_phy(struct hci_conn *conn);
  
- 		if (instance)
- 			len = create_instance_scan_rsp_data(hdev, instance,
--							    cp.data);
-+							    pdu.data);
- 		else
--			len = create_default_scan_rsp_data(hdev, cp.data);
-+			len = create_default_scan_rsp_data(hdev, pdu.data);
+ /* ----- HCI Sockets ----- */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 1eb7ffd0dd29..8100a3a1ae13 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2329,6 +2329,81 @@ static void hci_error_reset(struct work_struct *work)
+ 	hci_dev_do_open(hdev);
+ }
  
- 		if (hdev->scan_rsp_data_len == len &&
--		    !memcmp(cp.data, hdev->scan_rsp_data, len))
-+		    !memcmp(pdu.data, hdev->scan_rsp_data, len))
- 			return;
++static void hci_cmd_sync_work(struct work_struct *work)
++{
++	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
++	struct cmd_sync_work_entry *entry;
++	cmd_sync_work_func_t func;
++	cmd_sync_work_destroy_t destroy;
++	void *data;
++
++	bt_dev_dbg(hdev, "");
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	entry = list_first_entry(&hdev->cmd_sync_work_list,
++				 struct cmd_sync_work_entry, list);
++	if (entry) {
++		list_del(&entry->list);
++		func = entry->func;
++		data = entry->data;
++		destroy = entry->destroy;
++		kfree(entry);
++	} else {
++		func = NULL;
++		data = NULL;
++		destroy = NULL;
++	}
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	if (func) {
++		int err;
++
++		hci_req_sync_lock(hdev);
++
++		err = func(hdev, data);
++
++		if (destroy)
++			destroy(hdev, data, err);
++
++		hci_req_sync_unlock(hdev);
++	}
++}
++
++int hci_cmd_sync_queue(struct hci_dev *hdev, cmd_sync_work_func_t func,
++		       void *data, cmd_sync_work_destroy_t destroy)
++{
++	struct cmd_sync_work_entry *entry;
++
++	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	entry->func = func;
++	entry->data = data;
++	entry->destroy = destroy;
++
++	mutex_lock(&hdev->cmd_sync_work_lock);
++	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
++	mutex_unlock(&hdev->cmd_sync_work_lock);
++
++	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
++
++	return 0;
++}
++
++static void hci_cmd_sync_clear(struct hci_dev *hdev)
++{
++	struct cmd_sync_work_entry *entry, *tmp;
++
++	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
++		if (entry->destroy)
++			entry->destroy(hdev, entry->data, -ECANCELED);
++
++		list_del(&entry->list);
++		kfree(entry);
++	}
++}
++
+ void hci_uuids_clear(struct hci_dev *hdev)
+ {
+ 	struct bt_uuid *uuid, *tmp;
+@@ -3845,6 +3920,10 @@ struct hci_dev *hci_alloc_dev(void)
+ 	INIT_WORK(&hdev->error_reset, hci_error_reset);
+ 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
  
--		memcpy(hdev->scan_rsp_data, cp.data, sizeof(cp.data));
-+		memcpy(hdev->scan_rsp_data, pdu.data, len);
- 		hdev->scan_rsp_data_len = len;
++	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
++	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
++	mutex_init(&hdev->cmd_sync_work_lock);
++
+ 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
  
--		cp.handle = instance;
--		cp.length = len;
--		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
--		cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
-+		pdu.cp.handle = instance;
-+		pdu.cp.length = len;
-+		pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
-+		pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
+ 	skb_queue_head_init(&hdev->rx_q);
+@@ -4005,6 +4084,9 @@ void hci_unregister_dev(struct hci_dev *hdev)
  
--		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA, sizeof(cp),
--			    &cp);
-+		hci_req_add(req, HCI_OP_LE_SET_EXT_SCAN_RSP_DATA,
-+			    sizeof(pdu.cp) + len, &pdu.cp);
- 	} else {
- 		struct hci_cp_le_set_scan_rsp_data cp;
+ 	cancel_work_sync(&hdev->power_on);
  
-@@ -1862,26 +1865,30 @@ void __hci_req_update_adv_data(struct hci_request *req, u8 instance)
- 		return;
- 
- 	if (ext_adv_capable(hdev)) {
--		struct hci_cp_le_set_ext_adv_data cp;
-+		struct {
-+			struct hci_cp_le_set_ext_adv_data cp;
-+			u8 data[HCI_MAX_EXT_AD_LENGTH];
-+		} pdu;
- 
--		memset(&cp, 0, sizeof(cp));
-+		memset(&pdu, 0, sizeof(pdu));
- 
--		len = create_instance_adv_data(hdev, instance, cp.data);
-+		len = create_instance_adv_data(hdev, instance, pdu.data);
- 
- 		/* There's nothing to do if the data hasn't changed */
- 		if (hdev->adv_data_len == len &&
--		    memcmp(cp.data, hdev->adv_data, len) == 0)
-+		    memcmp(pdu.data, hdev->adv_data, len) == 0)
- 			return;
- 
--		memcpy(hdev->adv_data, cp.data, sizeof(cp.data));
-+		memcpy(hdev->adv_data, pdu.data, len);
- 		hdev->adv_data_len = len;
- 
--		cp.length = len;
--		cp.handle = instance;
--		cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
--		cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
-+		pdu.cp.length = len;
-+		pdu.cp.handle = instance;
-+		pdu.cp.operation = LE_SET_ADV_DATA_OP_COMPLETE;
-+		pdu.cp.frag_pref = LE_SET_ADV_DATA_NO_FRAG;
- 
--		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_DATA, sizeof(cp), &cp);
-+		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_DATA,
-+			    sizeof(pdu.cp) + len, &pdu.cp);
- 	} else {
- 		struct hci_cp_le_set_adv_data cp;
- 
++	cancel_work_sync(&hdev->cmd_sync_work);
++	hci_cmd_sync_clear(hdev);
++
+ 	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
+ 		hci_suspend_clear_tasks(hdev);
+ 		unregister_pm_notifier(&hdev->suspend_notifier);
 -- 
 2.31.1
 
