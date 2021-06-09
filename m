@@ -7,68 +7,68 @@ X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
 	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A9CEC47095
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 04:06:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFBDBC47095
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 04:07:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32EF961178
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 04:06:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8A78260240
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  9 Jun 2021 04:07:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229914AbhFIEIk (ORCPT
+        id S229943AbhFIEJF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 9 Jun 2021 00:08:40 -0400
-Received: from mail-qt1-f174.google.com ([209.85.160.174]:41504 "EHLO
-        mail-qt1-f174.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbhFIEIe (ORCPT
+        Wed, 9 Jun 2021 00:09:05 -0400
+Received: from mail-qv1-f42.google.com ([209.85.219.42]:38622 "EHLO
+        mail-qv1-f42.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229910AbhFIEJD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 9 Jun 2021 00:08:34 -0400
-Received: by mail-qt1-f174.google.com with SMTP id o20so1629076qtr.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 21:06:25 -0700 (PDT)
+        Wed, 9 Jun 2021 00:09:03 -0400
+Received: by mail-qv1-f42.google.com with SMTP id t6so6260662qvp.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 08 Jun 2021 21:06:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
          :references;
-        bh=8ta2qBey43qymkEZk4++K7I0MNCdl5cmmUUr8C7httM=;
-        b=ghA/bit33tzxG9PIR6M/tQggzWP70YpJqNsJ0zG3V/C8UGQWzrgtfAbpdmYGuWVnCy
-         4d+uRVR21dTKAWCFnNDHbb9BqXNJEeaKs+w707GyT+4Vw/awVTS1JOfLRCNNm1Ql18Im
-         UxteJWRpintLqYHHza3H1hBzh6l7lf4t5YwEPWX+OOIm+NSZTe4BCYT0zzb7nlsMPJzX
-         grTBkh8PbjsyLGijdyglbNW7RQqvY7GjxYRjrwdgZN9B59xVCyjJCxDb3MMJxfftJ0ZO
-         ztKQKEvOcpMtVNfmZ4H/nahBCM9Ssgh+IQQLgj0YRmhRSqMBKWWtlU2x/RYwnMVBpJiF
-         z3Fg==
+        bh=B+0sgDreYoGM0eroihsHtyFrSeOyYiG804/oyu8XvmY=;
+        b=DdeueMLCZrD+lZ4pkhatGWC9fC074JbZiorxwNcHqXL5Zm5jMhaHnBhaRtPWdLtO6X
+         ZB9Ydidy2+aRVVUUTHx+CqXxIGuefrNsq7pgj+zNqLsj0+dMrFb88d8QEHet3Wl74stc
+         gatPdNOYUW83pT79Z8aumEoNOv4G52dSEbIIpXM/vxbYEwUdHy8H3tnwhWhXup46IPNP
+         LUe8wcOT5xEtVdzO9a0QUWR9rAqhPDh7ytxd0Vy57wXMKdUtEBr9vBCeoFo9ZdnuKlRa
+         RtRq0CVddqfK0HRi8kiVwuP9bsu9umuNMZxpB6tiHu2uLDqZL60qR96WoA6E4PqmFjgt
+         6F5g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:message-id:date:mime-version:from:to:subject
          :reply-to:in-reply-to:references;
-        bh=8ta2qBey43qymkEZk4++K7I0MNCdl5cmmUUr8C7httM=;
-        b=d9aOOepV6Mx+xklki04dBibih1YE1W+uwZiP4k7dJ7P3q3tvJ/PkPxCOIu5xyfp883
-         haLROZSWP1sb+GKzCQHDJhwMAP26I6I26f/0/aHHDizZgn2SXW/HBL1E0tKf5wfGIdIU
-         Ko7rDHNx36NEWt+1OMvqnq3X+MKbbZvNvb/ARjKfuGg9A4M5v77MIZ6jUDP07A4jsbB8
-         NHMZ/2URebGYJivTYgCOsR75H1Co0YQfyzdT31WHTrE81ND2DICuHfeugZBNvNzeny3i
-         yrJbZEigOPlZeq0R9izmvMshJky3e0iFw30S6NwE6cJxOx1Fgj8s3eLEySRGVTrA6x5o
-         bgvA==
-X-Gm-Message-State: AOAM531vZB+KdVZ+gEjJjMnlSxJ/D8bBPS5IUHdfENVGe8DCg6BlLi43
-        zG88SDmH4myiQBGdUOyFHolrmk6AmaUppQ==
-X-Google-Smtp-Source: ABdhPJzWrDhkyIv1YD9mnvZWzCje9lDyWn8GDpQpFEGSfK5GckDm+Pw6ji7P7cxlIwoFXrHfW5vO7g==
-X-Received: by 2002:a05:622a:15c9:: with SMTP id d9mr24357854qty.103.1623211524471;
-        Tue, 08 Jun 2021 21:05:24 -0700 (PDT)
-Received: from [172.17.0.2] ([52.225.234.170])
-        by smtp.gmail.com with ESMTPSA id h6sm3215985qta.65.2021.06.08.21.05.24
+        bh=B+0sgDreYoGM0eroihsHtyFrSeOyYiG804/oyu8XvmY=;
+        b=HFviFUri45qA6JBz+/u7WGH4qQ+vR4oL7ExIZzwDAicIXdhF0FCJKO/pDSYQLywV0h
+         WV/8igdVPbVWgGHaAtp+h7QvU0KgTV1e1tffy9ptHTXbMyhnbeyVjf9bHVO2F8Ykc6xi
+         v0mZJazGSXgrmK11Kn5WdYDpCEj71ulTHR8Vf+MxvNSEKM+IQTxcXrNSoKcVWj6QL3X8
+         lrtIWbwtW9YVHa4ojcpn6lZjGyxaLMqRVsMtWLnQRkqxSz2j9sAQgswv6Pur7zg0txWG
+         KVQUMwDXJTYSBligFTdElSvBWUZKgWGNqykm/D4N1l8hRW6HrZY+8bsaoEsTq7eQiNcd
+         gakA==
+X-Gm-Message-State: AOAM530CtGVbGEEnK4BIDjaMjbA1Kp/+9iVk5zYX+SYeJckKXgvNE9kj
+        qJzV6yCJef9LkWjUVXZjCa7Po37HeT2H9A==
+X-Google-Smtp-Source: ABdhPJyKNJXIBU0FAyHb4jAO0RdOceK0SfA2uDH95N3o5bQD1E2MAYuBzvDviGiEgZ6rDfWSTTOthw==
+X-Received: by 2002:a0c:ba0c:: with SMTP id w12mr3556308qvf.41.1623211539146;
+        Tue, 08 Jun 2021 21:05:39 -0700 (PDT)
+Received: from [172.17.0.2] ([52.167.113.248])
+        by smtp.gmail.com with ESMTPSA id x28sm12481813qtm.71.2021.06.08.21.05.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 08 Jun 2021 21:05:24 -0700 (PDT)
-Message-ID: <60c03e04.1c69fb81.d6c5d.766d@mx.google.com>
-Date:   Tue, 08 Jun 2021 21:05:24 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0110546453714479736=="
+        Tue, 08 Jun 2021 21:05:38 -0700 (PDT)
+Message-ID: <60c03e12.1c69fb81.54894.51f3@mx.google.com>
+Date:   Tue, 08 Jun 2021 21:05:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5960186605624350915=="
 MIME-Version: 1.0
 From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] btdev: Check advertising/scanning states when changing White List
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: Convert tester tools to use ELL
 Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210607184134.2664349-1-luiz.dentz@gmail.com>
-References: <20210607184134.2664349-1-luiz.dentz@gmail.com>
+In-Reply-To: <20210606063719.339794-2-inga.stotland@intel.com>
+References: <20210606063719.339794-2-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0110546453714479736==
+--===============5960186605624350915==
 Content-Type: text/plain; charset="us-ascii"
 MIME-Version: 1.0
 Content-Transfer-Encoding: 7bit
@@ -79,26 +79,56 @@ Dear submitter,
 
 Thank you for submitting the patches to the linux bluetooth mailing list.
 This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=495601
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=494845
 
 ---Test result---
 
 Test Summary:
-CheckPatch                    PASS      0.53 seconds
-GitLint                       PASS      0.20 seconds
-Prep - Setup ELL              PASS      40.30 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      7.00 seconds
-Build - Make                  PASS      173.43 seconds
-Make Check                    PASS      8.70 seconds
-Make Distcheck                PASS      204.32 seconds
-Build w/ext ELL - Configure   PASS      7.18 seconds
-Build w/ext ELL - Make        PASS      163.31 seconds
+CheckPatch                    FAIL      5.15 seconds
+GitLint                       PASS      1.19 seconds
+Prep - Setup ELL              PASS      43.38 seconds
+Build - Prep                  PASS      0.12 seconds
+Build - Configure             PASS      7.34 seconds
+Build - Make                  PASS      177.48 seconds
+Make Check                    PASS      8.32 seconds
+Make Distcheck                PASS      207.15 seconds
+Build w/ext ELL - Configure   PASS      7.31 seconds
+Build w/ext ELL - Make        PASS      165.37 seconds
 
 Details
 ##############################
-Test: CheckPatch - PASS
+Test: CheckPatch - FAIL
 Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+shared/bttester: tester framework wrapper to use ELL
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
+#330: FILE: src/shared/bttester.h:16:
++#define __packed __attribute__((packed))
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __printf(1, 2) over __attribute__((format(printf, 1, 2)))
+#340: FILE: src/shared/bttester.h:26:
++				__attribute__((format(printf, 1, 2)));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __printf(1, 2) over __attribute__((format(printf, 1, 2)))
+#342: FILE: src/shared/bttester.h:28:
++				__attribute__((format(printf, 1, 2)));
+
+WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __printf(1, 2) over __attribute__((format(printf, 1, 2)))
+#344: FILE: src/shared/bttester.h:30:
++				__attribute__((format(printf, 1, 2)));
+
+- total: 0 errors, 4 warnings, 321 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] shared/bttester: tester framework wrapper to use ELL" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
 
 ##############################
 Test: GitLint - PASS
@@ -143,4 +173,4 @@ Regards,
 Linux Bluetooth
 
 
---===============0110546453714479736==--
+--===============5960186605624350915==--
