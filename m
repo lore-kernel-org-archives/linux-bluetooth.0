@@ -2,170 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 339C2C48BE0
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 08:42:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EBB23C48BD1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 12:29:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1C73F60C40
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 08:42:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5CFA613D3
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 12:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231193AbhFKIoV (ORCPT
+        id S231180AbhFKMb0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 11 Jun 2021 04:44:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33312 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229584AbhFKIoV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 11 Jun 2021 04:44:21 -0400
-Received: from mail-qk1-x72e.google.com (mail-qk1-x72e.google.com [IPv6:2607:f8b0:4864:20::72e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72898C0617AF
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jun 2021 01:42:07 -0700 (PDT)
-Received: by mail-qk1-x72e.google.com with SMTP id j62so16385105qke.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 11 Jun 2021 01:42:07 -0700 (PDT)
+        Fri, 11 Jun 2021 08:31:26 -0400
+Received: from mail-eopbgr80134.outbound.protection.outlook.com ([40.107.8.134]:14464
+        "EHLO EUR04-VI1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230188AbhFKMbZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 11 Jun 2021 08:31:25 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kCKPHwsTgAFwX4jMd3cL0d96VUz+1q42Zx4vJPyvR+HtZgmPiaNzf6uwiapflgK8V2EOp3I4htlE6dAbGT7OrIPT4Gb5lDnrGUj538ocGqoFPWtF+iYOx7DGYYsdkqONRMwYAuWsQ283ZkSZCwOlR8wnsRjn0tNHgfPs10aAQgYtqhgaiEMmVVtSoP9LcZA9c3i6BTGSCnXJrxb1oQsaklLEHkw/ERl40OEh+LpJFzPmMuipSiIJsDfRmks7nyXjGZma4GbbG0iZJapaHOfRPA9m4+JuTb0njHveq+foESjW8k89MDTFRL+qlpKUuUk3YbdUMz3CfeJEDzIWQkhY3A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KIInolZECEth8eIBwckvf6bldey1ZNM171ZCiLHnZco=;
+ b=n4DaIA3Eg10r2G5SvEvDbYpiWCu52YWrSFpxgr0NshsDfqL/2VwaMoHJE31UZF7l7NblPLsSeDr8z51U4pApPZEcbgdfuLX42gqIFnKz8/FnOqmHHL/72dxug3cP/jqvhWMXEIqN1eNGWFA+bVbYcky1ezzHLy5w+JLobpQUrN12U8+hq3hRwkDThey1RkzdF6fGTOeYrxdZ4tO13eV0eOBzSOs3tZExCxh9oMmuN/RllteaE9WkrJaRYZawZwdoeeWwlgKKh3p1pS1EBjHqLWpDo1IP4ix/2TlAYtM4RTNcdrJCwwmYXW8d/Gi3BZ9XyjavynjvzeGM5kG5tQmEkA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=surban.net; dmarc=pass action=none header.from=surban.net;
+ dkim=pass header.d=surban.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=zS9dLFOrInQEtUAsIwWOrWbG2bDhRiYC18ieXt1t7AI=;
-        b=MEzqUuM28HfnT6q83cz7NKMZt2CrMZIOamScBZTxgX2ElzZGWzhejDzBB97PsPFUQ7
-         W/j/49ZMK1I5n6dMTyo4gvKpWkVLCYKsVIs1d4gyv2igoRDMkY+QNZwP2w5YNMt1u6wM
-         6BX6EeBM3Vb02H1x984/RFuSzos0d20gDY6PH4dexiY8CLAeQAPBC4/wlxmtCHF6/Mn/
-         jycqy6eaOZLmSy1JkdY1/73p9j0kYL0Tyd7AgiWwOv8fAwO87umryqU/Elkhv02w/JsT
-         4VtyAr+13tPobS5wXTMO6LUvcxokzJQss1hp36g3rOXzarQ0ceGcjk2pRDWR+FyA3fgz
-         4X0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=zS9dLFOrInQEtUAsIwWOrWbG2bDhRiYC18ieXt1t7AI=;
-        b=hQ4+IvRd23O+md1Zc6nqoJkABn4PV8nb5p5ahTrdTawKvXEGKa9lhE2EqrILSOx8/Z
-         m/kTRRJZfdt8VpR/3a/8rqt7vNC1TDK05x2r0AAbn3oHuiCMFA9vV04t+rX5T1PTO/Ip
-         64ufFR3Dm7IdeZl8X8PHCIw/5qAJWaJk2Z5JidVNoeBkiaageaeVcSXXAhg9cDX3pHL/
-         SaiArBr/92vpy5cfSvofh8yMVz26qpq9fMHTwL8E5maAMCrOQhz6fQXyoPpEORpm3AR7
-         Dm7O4mq6iByTYuc5gcJzBRSG6YJ+Kj+C+VxqztOD7yj2yQUEBUSXkXzDiDALuTsEXzPk
-         zRQg==
-X-Gm-Message-State: AOAM5331zKqVI2ZJ/BJv+RSVkJY2x0onoSRP2t8w7TN7U20xwTF3jk2a
-        TT/Qp7bCf3qNQ4Npwrt9Rs44POSEUdOPcw==
-X-Google-Smtp-Source: ABdhPJxxVQCOyyk4fbWHmao7AOGj9st4sgpP12PXW+fhiwfMsEXpXn4A+xt/Xebm1jLlyXom7MqbLg==
-X-Received: by 2002:a37:310:: with SMTP id 16mr2623138qkd.437.1623400926433;
-        Fri, 11 Jun 2021 01:42:06 -0700 (PDT)
-Received: from [172.17.0.2] ([104.209.155.82])
-        by smtp.gmail.com with ESMTPSA id z3sm4002022qkj.40.2021.06.11.01.42.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 11 Jun 2021 01:42:06 -0700 (PDT)
-Message-ID: <60c321de.1c69fb81.635b0.db01@mx.google.com>
-Date:   Fri, 11 Jun 2021 01:42:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2141040615552163025=="
+ d=surbannet.onmicrosoft.com; s=selector2-surbannet-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=KIInolZECEth8eIBwckvf6bldey1ZNM171ZCiLHnZco=;
+ b=KD50XjEQhBMVH+rHPRiCXLlgceT06EuicdKHOalMu7T9RVon7w8GJi3EAO2gc+v/N5Jhe1yITlp7tFlqTJn9+bnCuLV0XDzPGwFuZGl58oTFMLkOf6ow6nhPlsiPHwKGhuJFiTADCQjuTLNGIVgV0CI3lg7i4v9CztBgSkJz3fM=
+Authentication-Results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=surban.net;
+Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:30c::17)
+ by AM9P189MB1651.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:30b::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Fri, 11 Jun
+ 2021 12:29:24 +0000
+Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+ ([fe80::d9c0:8560:388:4ebf]) by AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+ ([fe80::d9c0:8560:388:4ebf%7]) with mapi id 15.20.4219.021; Fri, 11 Jun 2021
+ 12:29:24 +0000
+From:   Sebastian Urban <surban@surban.net>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Sebastian Urban <surban@surban.net>
+Subject: [PATCH BlueZ] gatt-server: Flush notify multiple buffer when full and fix overflow
+Date:   Fri, 11 Jun 2021 14:29:15 +0200
+Message-Id: <20210611122915.21068-1-surban@surban.net>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [24.134.128.129]
+X-ClientProxiedBy: ZRAP278CA0009.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:10::19) To AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:30c::17)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, surban@surban.net
-Subject: RE: [BlueZ] gatt-server: Flush notify multiple buffer when full and fix overflow
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210611081932.4279-1-surban@surban.net>
-References: <20210611081932.4279-1-surban@surban.net>
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from dino.localdomain (24.134.128.129) by ZRAP278CA0009.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:10::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Fri, 11 Jun 2021 12:29:23 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 1d1a6d28-fa6a-4034-2ffb-08d92cd48bbb
+X-MS-TrafficTypeDiagnostic: AM9P189MB1651:
+X-MS-Exchange-Transport-Forked: True
+X-Microsoft-Antispam-PRVS: <AM9P189MB16510BCD73A5317DF13BF436AB349@AM9P189MB1651.EURP189.PROD.OUTLOOK.COM>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: UlRrtTvOk+OjY+BwwzFTHuMvM1SXXsHu4CLH0wGQ7DzcAlemyzqhb8hOmoh4gkJATeHkETkk8b22kOmPG4xNWSxraEyMxq6bak+d2OcvGyqn2hRL7vgny+tuEoTaFhg7DwhOZR0zF0gjXaZ3caeikRnjnKY+avwiU4aRu6feD+W2tkMqlXsEvTXTe3jPPIv+CocD5pZVpHLRh0jLrm2otSKCKbbkeVruw8Kc54aRVPhV1T/Nj1CqshaN1zkCeBgVatzNzFMxhhY2k0LlJIKr519JNxBDahCBpR6uQPsvAikWtKPc/2JkL0HtNFj/DapWfXyvlrLjf3Ah0vq/sQc+R2ZcDc/y+mq8SvvxSDAgtsiFywOLDR3i6JBXZrZ/IfEosjsxwn9YOYvpi/DOqCnBirJVI7aZNTOS9/mmpRljRDr+phygAfYjf9ikOAT1Ir3e79768Mo4X90V42GCsZeWmNNvO6cDzjQ3IQMjw/EH38rADmqb6LXv/vOC+4b2PO19/ipdqTNsiFjspxWeZcHl/JHa3yIJZE3mBL9i5y9W5H1BpLxKtxJD0Vyg+1TejbJJruVJ66l/1cXWOfU9U5khbKcYcvATDJD/fxr1tvRICqsnkSs5dfQwQvztv3pLBnT4VN8MV3WaJKANZXd/jUOuhSOQ2VBJb9/ZPiZ2ogYUIkA=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9P189MB1730.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(366004)(396003)(376002)(136003)(39830400003)(346002)(6486002)(26005)(8936002)(38350700002)(2906002)(52116002)(6506007)(6512007)(1076003)(956004)(38100700002)(186003)(66476007)(66556008)(66946007)(16526019)(4326008)(6916009)(86362001)(83380400001)(36756003)(316002)(6666004)(2616005)(107886003)(8676002)(5660300002)(478600001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?eRfwCgA9n2jvEHk1saUvreVoY1YT1S7S8INwp7NitA5qJZW2VumHqyg/ex0b?=
+ =?us-ascii?Q?IJdIwv9HHKGz+tUZJ7EqkNRPdiNW2crzYYUpGS/ECq7+FsIs51+UFHF1VHP9?=
+ =?us-ascii?Q?IomtC09ZSG1p6FMgcXzRC/G9ta4fQN6hxW9MGMWVhhkpXy9Ihl9/jsqwtUNo?=
+ =?us-ascii?Q?7EMazy7yQXljqRrMOeSbCAi+pZEWNkKwSAzBHgMz5JoUCrpKnJuVVLw9kyc7?=
+ =?us-ascii?Q?SUu7emEXJ74Zt3soHCdqniUYN7UuoATbJ7j5etrIXjsxzbq2kbtyIyP9N3cI?=
+ =?us-ascii?Q?11aFO/0iN1a3v/L7Ou2MmbRHczt1Ktu+ugg6QiatPfghjJHWwei2PsxN/KaM?=
+ =?us-ascii?Q?ydYHehBeHQVwpWbisM/mfQjLpg/mgxuD8g4Mb3xwMV0w8lArufaMrj6piVkc?=
+ =?us-ascii?Q?qbk303JkOe6oIGUtKJTQAff3ze/JlIJSrzJHm4DvOMnYm8Q5yzmui4n/yK/L?=
+ =?us-ascii?Q?Gi4mHbibJNtMG6bQjgcITFHRDRJPp3Uwjs0Rx1dTj1CSDp9Zdhl0SyhOzFbY?=
+ =?us-ascii?Q?WzxmM3lqKA/9jf4dr0DkgEcdQGPgOaanQpDNreTVjj+LJXk8UpZ6CBvKGhYl?=
+ =?us-ascii?Q?jbqrMvAK6cG4PperaGFKbLxrYRtkuXLcyXzFsVudCsgd40qbf5bJ6v0Q5DIp?=
+ =?us-ascii?Q?8JmVNBLLzt9XRsC3Vn8jG7C/GQpm7VLa8gsQ1LeUjqErd4H+Z3NnrR6qEee7?=
+ =?us-ascii?Q?4+5KNb5uAun5ChDDOPVvLWpCEKeX/bvgf744kj29K8l5T28aig08hleRV+KB?=
+ =?us-ascii?Q?g6X3lMNjckx2JQQaQb0gSeO2P1J3cetHHVTD52iVdy6k/up8ukUFUiOs5Uki?=
+ =?us-ascii?Q?jW0mAgosdcA0GbcSJezBHvQtj4+qAaZ97KK/0nZ3GVt9YUNRW76kGSVb/8eN?=
+ =?us-ascii?Q?5VDwMw6o+yuS/EnMUUpdCbzBznZQvRMs8NGEMG1ZvIw+Mct7Hm0f5z08ectk?=
+ =?us-ascii?Q?Gxb4keigsTXQ2XQ/cwa8JK0RN27wO77na3U9a83p8OOzIwGibSRyi1w6GB/k?=
+ =?us-ascii?Q?k2whA9SnXXFJG6BXVk6T1wPmEio3GloUe8/QblNnEQqC2aSJMpBq3gFKCqE5?=
+ =?us-ascii?Q?xbfDy8KXKT/twPZw8IXjSLsbnGX+MBgE2SJ0dFuFhIGg/hGZ+MNGwXu2MMEU?=
+ =?us-ascii?Q?ChdpYBs196GgDIafoHY62eiqyLr6q/WOaOJPFyUyTH10lkHVIxcRSx8VD9Jq?=
+ =?us-ascii?Q?d8WXsg8adB9NTAgdi7wnNCaM41ZwlDOMNS1464MlhQdey69yT4Vbc5y3517g?=
+ =?us-ascii?Q?LfwFjcSbAJvibSktifYVpIpknxD3G7FiQu18sZYV6VxLsEvc9ScaVs93jjxa?=
+ =?us-ascii?Q?3EcMSt2Qy4q6qIYI1EquV1vY?=
+X-OriginatorOrg: surban.net
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d1a6d28-fa6a-4034-2ffb-08d92cd48bbb
+X-MS-Exchange-CrossTenant-AuthSource: AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 11 Jun 2021 12:29:24.0845
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: a27af4ff-c4b3-4dec-be8d-845345d2ab67
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: PBI7Wou82zhLz0ShDHGd1EHtKarLK2fLQ9inkXulwbK/3Bl7qaIxcH3jeb9dyGcpJ6ftR3ZtvFtuc+DjJPShzg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9P189MB1651
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2141040615552163025==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This fixes the calculation of available buffer space in
+bt_gatt_server_send_notification and sends pending notifications
+immediately when there is no more room to add a notification.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=498667
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.31 seconds
-GitLint                       PASS      0.11 seconds
-Prep - Setup ELL              PASS      44.15 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      7.14 seconds
-Build - Make                  PASS      189.01 seconds
-Make Check                    PASS      9.48 seconds
-Make Distcheck                PASS      207.31 seconds
-Build w/ext ELL - Configure   PASS      6.78 seconds
-Build w/ext ELL - Make        PASS      157.09 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-gatt-server: Flush notify multiple buffer when full and fix overflow
-WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
-#28: FILE: src/shared/gatt-server.c:1706:
-+		/* Flush buffered data, if this request hits buffer size limit */
-
-WARNING:LONG_LINE: line length of 88 exceeds 80 columns
-#29: FILE: src/shared/gatt-server.c:1707:
-+		if (data && data->offset > 0 && data->len - data->offset < 4 + length) {
-
-- total: 0 errors, 2 warnings, 38 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] gatt-server: Flush notify multiple buffer when full and fix" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Previously there was a buffer overflow caused by incorrect calculation
+of available buffer space: data->offset can equal data->len
+from a previous call to this function, leading
+(data->len - data->offset) to underflow after data->offset += 2.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/gatt-server.c | 23 +++++++++++++++++++----
+ 1 file changed, 19 insertions(+), 4 deletions(-)
 
+diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
+index 970c35f94..d53efe782 100644
+--- a/src/shared/gatt-server.c
++++ b/src/shared/gatt-server.c
+@@ -1700,20 +1700,35 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
+ 	if (!server || (length && !value))
+ 		return false;
+ 
+-	if (multiple)
++	if (multiple) {
+ 		data = server->nfy_mult;
+ 
++		/* flush buffered data if this request hits buffer size limit */
++		if (data && data->offset > 0 &&
++				data->len - data->offset < 4 + length) {
++			if (server->nfy_mult->id)
++				timeout_remove(server->nfy_mult->id);
++			notify_multiple(server);
++			data = NULL;
++		}
++	}
++
+ 	if (!data) {
+ 		data = new0(struct nfy_mult_data, 1);
+ 		data->len = bt_att_get_mtu(server->att) - 1;
+ 		data->pdu = malloc(data->len);
+ 	}
+ 
++	if (multiple) {
++		if (data->len - data->offset < 4 + length)
++			return false;
++	} else {
++		if (data->len - data->offset < 2 + length)
++			return false;
++	}
++
+ 	put_le16(handle, data->pdu + data->offset);
+ 	data->offset += 2;
+-
+-	length = MIN(data->len - data->offset, length);
+-
+ 	if (multiple) {
+ 		put_le16(length, data->pdu + data->offset);
+ 		data->offset += 2;
+-- 
+2.25.1
 
---===============2141040615552163025==--
