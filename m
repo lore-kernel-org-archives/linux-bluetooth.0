@@ -7,63 +7,60 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 760C7C48BDF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 02:07:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DEC20C48BD1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 02:08:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B89E6124C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 02:07:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AE7D961376
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 11 Jun 2021 02:08:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230212AbhFKCJT (ORCPT
+        id S230299AbhFKCKo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 10 Jun 2021 22:09:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58976 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230168AbhFKCJT (ORCPT
+        Thu, 10 Jun 2021 22:10:44 -0400
+Received: from mail-pl1-f179.google.com ([209.85.214.179]:41558 "EHLO
+        mail-pl1-f179.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230168AbhFKCKn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 10 Jun 2021 22:09:19 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3093FC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jun 2021 19:07:11 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id m13-20020a17090b068db02901656cc93a75so4905393pjz.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jun 2021 19:07:11 -0700 (PDT)
+        Thu, 10 Jun 2021 22:10:43 -0400
+Received: by mail-pl1-f179.google.com with SMTP id e1so2028837plh.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 10 Jun 2021 19:08:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=N3W+ptAt8pudYPms9bhH6xWeReFXen6e/6oFzS927c0=;
-        b=hRLBnvzFXzfd1CXnW/l84VexjeKL1Sooi/NGT3LEFkZOAlkPbNzhMs+WmI9OSZ9qqt
-         Ecl8QGe5tnNs3nA+pWmkWRL+xAmG5zCak7APb08VAz93fh+dbp+IziR8ALjHUzT6pZ8F
-         WkU76N7UAIy/4nq/Cq51k0C/h85987JCITLDTRpWYW0FJHJti2IckcUzaqoVfT/4UZpW
-         01J8kgKoOnsyX+Vp5EHGOFQDoC1xF5YMr/kcSjcYQemSgygFNauIm1MDWQ5HiNS/ZP5t
-         Y8gzQB1UefikyTaKstdyMCUJmo9HhM1ZnPPdx9wz+noOtDWomAKFwkt9NS6FPKXq/Q9x
-         dRZQ==
+        b=RG4bQDOWFZ8Tnd/hLtS9Vcu+8IVafGQnMYvKaa4z7JE9xYtS/OAp40gD2CxmI1ROgi
+         d/IMJQQGtOHB+ClLu5JVoH+h5lM2/+CBXATUPe/nWP/AAgOfNQhMddnwDmqpQ3sGAEKK
+         V5ulOWE+wqAIz6VTlSaPRVcvgEt+7/tG3aguuE16b0BZeqpkmnGGjU4sNyS+qdTT+N7q
+         foDgxsD6wQeJwy9Ct0e+kDPCjvCFEp5iX9Nsdhtg5gIR3HjADRCqgqlb6q4CPV1kr8IK
+         hXXMajmIHm6S9BWTuoI0kOUoP7eFlylD79m0FWgoGpmvremP9eeu8vb91XpHEMJpcOXM
+         6cdw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=N3W+ptAt8pudYPms9bhH6xWeReFXen6e/6oFzS927c0=;
-        b=uAjLMUzCNtL3aVyDErXJi2/j8HQe8eUZ1aNiZc3YhfE2d2LvB2h3L4f9q1fX/bACU/
-         K+qsn+uqtwXMpMY9u88eJQuNRLb/t6TqyMX+G01xmpRpJTPzlH53fBqzIp20RW1t8NBY
-         xR/JJLXZPzyX/UJld7rmUjTqyKmSsirXrLsOLS4yVfJD5uTlV6RHdb587RctpSDcJ6dZ
-         6nJQ8pay67vvBxXcpq67pRe+xv+wCThZFpRvLmvegVgjE49siYxaa+JFeafr+4F13Gaz
-         wQZ+ziRSchEekOsdjHL6NtJDkb2AMyzRBIrg9q8zyIOr6LVr+/erVnmJhBepwDtNLo3E
-         WWBw==
-X-Gm-Message-State: AOAM531hIkvzsMHoyjbeglXts+RPhWLQ2Q3O2M3BTPjzmcz1bRQtH/SM
-        tf5XMMM7DwJw9v2BjF6gLaGvlZk55Ik=
-X-Google-Smtp-Source: ABdhPJw5qbLdhecOTXI6TXIafSsTneWxgp+s++o89j5RDzLyWdneiAMk+eCXhG7yhSNMC+1COBnU3g==
-X-Received: by 2002:a17:902:d284:b029:106:64e4:6bed with SMTP id t4-20020a170902d284b029010664e46bedmr1635633plc.73.1623377230426;
-        Thu, 10 Jun 2021 19:07:10 -0700 (PDT)
+        b=qkPkt+/44QydDI3AU3GofCwe+VDw/g5D6iUHFyNR+gG+taIT6qHwrv6XMHd1Il8wE+
+         GFUaEQLbzzM3zJtijkorKEN8EWQfIu+IDdRLWiGZUDQGA4UyuLgvDDiWc0DbA0f6HGVP
+         Z20IeIgwhW0yw/qXz0noWgyXYJwEYFj/ve2ZhjMtRd5Zw2Iy9vlg42FPTETwt9wultIc
+         XkOorMF4xBvNP+qKRXUEobmgPqOCHY5DfLkPitvtU08/Jk/vxnh4QJypuLEo2VT8xs7p
+         uMfH9uBiSyJ9hBhpDCDrmhIk1vFeEj+f8fER0/5uFo/MgOIXvqV+VWQsjgY+dZaNXL9d
+         Nliw==
+X-Gm-Message-State: AOAM5319IvaX7CROSxLFNz6aLVc1x8AHYfr7G1zKld55/Gekukdw1eT+
+        gXLqm8JWygqWpqK8NUbMV3smru9P2WA=
+X-Google-Smtp-Source: ABdhPJwNN5n7JmdD+gLRQG94OMz0iv8+2CStL570OK6jDVsdjmOwAu3iNwDnq4yMk5ZHzcnQ7zJ9lg==
+X-Received: by 2002:a17:902:8b8a:b029:108:7849:dae0 with SMTP id ay10-20020a1709028b8ab02901087849dae0mr1626226plb.36.1623377250587;
+        Thu, 10 Jun 2021 19:07:30 -0700 (PDT)
 Received: from mimieux.endlessm-sf.com ([2604:4080:13bd:8000::36d])
-        by smtp.gmail.com with ESMTPSA id br14sm8674050pjb.41.2021.06.10.19.07.09
+        by smtp.gmail.com with ESMTPSA id m134sm3608060pfd.148.2021.06.10.19.07.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 10 Jun 2021 19:07:09 -0700 (PDT)
+        Thu, 10 Jun 2021 19:07:30 -0700 (PDT)
 From:   "=?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?=" <jprvita@gmail.com>
 X-Google-Original-From: =?UTF-8?q?Jo=C3=A3o=20Paulo=20Rechi=20Vita?= <jprvita@endlessos.org>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     jprvita@endlessos.org, jprvita@gmail.com
+Cc:     jprvita@endlessos.org, jprvita@gmail.com, linux@endlessos.org
 Subject: [PATCH BlueZ] profile: Fail RegisterProfile if UUID already exists
-Date:   Thu, 10 Jun 2021 19:06:49 -0700
-Message-Id: <20210611020649.15179-1-jprvita@endlessos.org>
+Date:   Thu, 10 Jun 2021 19:07:28 -0700
+Message-Id: <20210611020728.15233-1-jprvita@endlessos.org>
 X-Mailer: git-send-email 2.20.1
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
