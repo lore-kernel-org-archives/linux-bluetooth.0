@@ -7,203 +7,204 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 34E9DC48BE5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jun 2021 09:32:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 300BBC48BE5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jun 2021 09:56:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3E67611CB
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jun 2021 09:32:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 04B67611CC
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 12 Jun 2021 09:56:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230095AbhFLJes (ORCPT
+        id S230470AbhFLJ6L (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 12 Jun 2021 05:34:48 -0400
-Received: from mail-am6eur05on2128.outbound.protection.outlook.com ([40.107.22.128]:36353
-        "EHLO EUR05-AM6-obe.outbound.protection.outlook.com"
+        Sat, 12 Jun 2021 05:58:11 -0400
+Received: from mail-eopbgr140125.outbound.protection.outlook.com ([40.107.14.125]:22163
+        "EHLO EUR01-VE1-obe.outbound.protection.outlook.com"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229819AbhFLJes (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 12 Jun 2021 05:34:48 -0400
+        id S229584AbhFLJ6L (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 12 Jun 2021 05:58:11 -0400
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Q172mvWjiV183jI8+PKy+ftPQygah1i6LtE/cgpqyNErLhNETnsgViIDejofxDFa5lTZOgnhmsvAkEjywt/EyKi4ZtNbg1sZ4pvlLWIjvlYAXBv2YQbTxBjV3NqAiCsFZXjryBZ9/Y2C8kvoZu3A8Amh1maFAQhUBsEgZV+N7WKoJSzJvBjxUSc08w5YoswUtWru8QD5lexYKYfEykoC0rhnywOETUTcJcLSJN0z9FTZYzCJEtdrxX93ts2e2TB6qrLF4KEIVf4wwsHiuvaOBvFQXHUL5L5MlbCcYpg6+PPgtY7jZiU2lCGjXGZnGU/VpW8mKCHxoZ1IXPj+G2Dl9A==
+ b=Eb4jcKieX4gD9vHkUkqs0uEqR/BcW681V9b5cefTNXOheeAJJ68ulNrD0wK6dUhS4aYAEbmI3PZ+xUPo4u4+C46cJfGDKzK1CDBzaN/aiNiaPmCvO/p6kTh/EFpBS5e/G5F4+LnjXiVIWU0HrsHYcVfcFtEssktom3CXZJ4/anLO0Kdxm2ye63KCox0UPi1LPWchzrXtUoLxJTxxoi6lIfb3McjdjW9NZ8HYCf7t6TH3qYBEQz5bVsGgeYSfYMP/OoJqCriorl1N/AA8qHGePaW5HfuROI1KHRl2JR5t4wzyJiv3JcXVMbJPfnoVoaa6p9qjJqMlWKRLbkzVHkCEJA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lSscg/fKNXAQ6a1ZHzEmZFq0tw1CIyLnoBPvwSZJltE=;
- b=fV0T3HCpih7kGfuO63HiG/lZMwX2t3SBiIxZtIapSZvAcRLXpp3TbRzOCNZtbYQNepeWteE9NG2IYEjI1aUFv7mtwHhP10rDxpIWmVAkBtQ0qSa8Oa/lSZQQmf/9fx2eCqiIYEHVvMM5KFZSGlLVLcBoKIxw1KmwFfuM2/ThgiYkI+d2xWqiI023OsDhoh/Yr+mBkyWj//yQrm2T0oNK+MKS+ybgf/07tmcC3QqcL4yUnG6oArvH8YUTptIp+QIJGrEI+Y0N5l1yfExajP3DO+MBLaXT9c7gtvwh4bCWTYhFkqZVxd6RW+uuFmKhKnF69keW1lGwZ190LHJr1QCfxA==
+ bh=EhwzRUQaMq8SVFkQsEzZq5wsh1qUIUTXtzrKXhBprM8=;
+ b=F3RsVQbJqQRAcK/ZzevEzuFVzCgCN/gppC+rDwoAgS/WWaE+ihPQ2lCJmwaqzRSmpZlzg68B7MRbb0TVQwEOY9mL2w+ju2g5fp0vOsNQvjq8nplOXYpo4xijfA158P/JArljIfG6GnJEACviJuXlUYvgV9fywWCqIGU9BuPA6Ry3J2SNmKjtjTTKdiVMR/xMRDOUKKhHPnjy/EN5JDbRvKJ7N5NjtHUpEgFkH9T83VzI33GbNlBqLmB3DXM75gudGK0c708CADCeZegey+K0BWUYOwPhTBX9DPOjvHXpU2BcrNxJXLE523UlVGJfGNSrZnm/gNFDCElmG/U20TbXjw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=surban.net; dmarc=pass action=none header.from=surban.net;
  dkim=pass header.d=surban.net; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=surbannet.onmicrosoft.com; s=selector2-surbannet-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=lSscg/fKNXAQ6a1ZHzEmZFq0tw1CIyLnoBPvwSZJltE=;
- b=lhOKzexNhn/lNlYZz70CGxL3FLiw/1OWok2FcycSUnnwB/BsGpahokcBiF5NihVt3nWqt4IlTxoOPxm9JYbOkNEdcCxOFkyzICPjoMpTV9li9jHVI7MCW/C005NvAlWaXIYa/12twqBYGCdNMBc0fnxBwiiQoxFIKrfYkjKglYY=
+ bh=EhwzRUQaMq8SVFkQsEzZq5wsh1qUIUTXtzrKXhBprM8=;
+ b=ctQzbW/7guIHLGBIG9DujhOu9nnQ5687h8liZBUO1ejZfBQL81CiGw7H9QT1823gwNCuSAzUOX7VFKJ9VfunTw9An0vNoFrXQ3Un+aNMokBic5oCGySkHMWWOaGg7HtQuGpe/1sYKtrz29dsewgICQw55mjRFCj3X3ZzSSnpPK4=
 Authentication-Results: vger.kernel.org; dkim=none (message not signed)
  header.d=none;vger.kernel.org; dmarc=none action=none header.from=surban.net;
 Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:30c::17)
- by AM0P189MB0610.EURP189.PROD.OUTLOOK.COM (2603:10a6:208:191::9) with
+ by AM9P189MB1601.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:300::12) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.22; Sat, 12 Jun
- 2021 09:32:46 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21; Sat, 12 Jun
+ 2021 09:56:09 +0000
 Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
  ([fe80::d9c0:8560:388:4ebf]) by AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
  ([fe80::d9c0:8560:388:4ebf%7]) with mapi id 15.20.4219.024; Sat, 12 Jun 2021
- 09:32:46 +0000
+ 09:56:09 +0000
 From:   Sebastian Urban <surban@surban.net>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Sebastian Urban <surban@surban.net>
-Subject: [PATCH BlueZ] gatt-server: Flush notify multiple buffer when full and fix overflow
-Date:   Sat, 12 Jun 2021 11:32:36 +0200
-Message-Id: <20210612093236.5293-1-surban@surban.net>
+Subject: [PATCH BlueZ] gatt-database: No multiple calls to AcquireWrite
+Date:   Sat, 12 Jun 2021 11:56:01 +0200
+Message-Id: <20210612095601.7654-1-surban@surban.net>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <CABBYNZJBbiBvw+r1XLxE5=uXVv3cXe8EpCd3YOF7ZQVmDGxyBg@mail.gmail.com>
-References: <CABBYNZJBbiBvw+r1XLxE5=uXVv3cXe8EpCd3YOF7ZQVmDGxyBg@mail.gmail.com>
+In-Reply-To: <CABBYNZ+Z-Z8e2XPpRxfdWoP2AP5QeMVFqhk7Go+2HMD7xpdc4g@mail.gmail.com>
+References: <CABBYNZ+Z-Z8e2XPpRxfdWoP2AP5QeMVFqhk7Go+2HMD7xpdc4g@mail.gmail.com>
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-Originating-IP: [24.134.128.129]
-X-ClientProxiedBy: ZRAP278CA0011.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:10::21) To AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+X-ClientProxiedBy: ZR0P278CA0055.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:21::6) To AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
  (2603:10a6:20b:30c::17)
 MIME-Version: 1.0
 X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from dino.localdomain (24.134.128.129) by ZRAP278CA0011.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:10::21) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.21 via Frontend Transport; Sat, 12 Jun 2021 09:32:45 +0000
+Received: from dino.localdomain (24.134.128.129) by ZR0P278CA0055.CHEP278.PROD.OUTLOOK.COM (2603:10a6:910:21::6) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.20 via Frontend Transport; Sat, 12 Jun 2021 09:56:08 +0000
 X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 1a93bfbe-b4e6-4bbc-16de-08d92d850936
-X-MS-TrafficTypeDiagnostic: AM0P189MB0610:
+X-MS-Office365-Filtering-Correlation-Id: c7e6a7ea-b34f-4fb1-c2e9-08d92d884d75
+X-MS-TrafficTypeDiagnostic: AM9P189MB1601:
 X-MS-Exchange-Transport-Forked: True
-X-Microsoft-Antispam-PRVS: <AM0P189MB061067BB7871AF9F9BB33B23AB339@AM0P189MB0610.EURP189.PROD.OUTLOOK.COM>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6430;
+X-Microsoft-Antispam-PRVS: <AM9P189MB160191E4ABEA2647A72A539AAB339@AM9P189MB1601.EURP189.PROD.OUTLOOK.COM>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
 X-MS-Exchange-SenderADCheck: 1
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: qALX8B7JvEfvdUgvN5hVhJh3iff7CgPQpSyn7C+KNUwnLcdeqHL3zuKRH0HorxDLujvQLj6BcI2wsppmEHJ3zEuhSOFRAuMN+mxZVH7C08Ib6abGOJST3T4wvFGkjQEF+fL9hTU40qcw+uPtxEEDgmxoUrs9mmeC58wbvNRJ411FHcEUet0vLNjLQQd8VCosqHAC84yLI4/JVpZZn8OlQUrjAmkwcw9N6wLRD0i997mjhobBWFESk0EwckdUmAUjNERTfY/47SQWR196mqL37XSt04AbKPsUU247tX9JQuuqRmKkIS/ifUDCiT92qmkwK954tTf2QdbKjEs6Ipy7zRSZg0L8mkbbkvFXv2yedLoWvgg32f/lOuY7CZ6utOXSXh9sDUksHvpePTkT7zxOAPX4FQHOE5v+Xs0jqmM37vpekthLXvV3ohwqhEq1AYmLdCvB2G9gwFsZ44El7AEQctVvyXif8TP5KhdWqqjbYHRECGQda7bVI50OnL0GL3o42xOzCKIYz6B4DMDbq/e3L/6XQ50UishXJZYgr34KNI3GTwrBoqMl6J84NV0d8H12PubaS22Vf1sGwHBSZe+Guq6CECbKaNoDd9htcFBLK7ww6uDgBd1yLOgsrQWB1nRByfwStkiVQyWNjhepH/gT1w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9P189MB1730.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(346002)(366004)(136003)(396003)(376002)(39830400003)(52116002)(478600001)(6506007)(107886003)(6916009)(6486002)(2906002)(4326008)(316002)(36756003)(66556008)(83380400001)(66476007)(5660300002)(66946007)(6512007)(956004)(6666004)(86362001)(1076003)(8936002)(38350700002)(38100700002)(2616005)(26005)(16526019)(8676002)(186003);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info: wAO4DUheR0KxXYrzGPSO2MavQIA0iYB9RcTXZd7Id7o93gD9IvF7tEk9ZRm8ARbIdZxF6DPtVGFMnp2uh2NHfkVo0BA5e+MOUasT6/mzb6G0ASsTCQ6sw3+X/C+1QpiSXW5kbgI52UXqyUgm91DmqiiZat7Oi311mJgh/29q6Ux/zJ3O8CvLOUB3UlrYP2NoIZKFuHNQdC22odrQ1yruuQO3MXJ4SuLruacXZ3Bxlti4OPhxj+tlzSzDLHMtQhX8Iz2iLtRDErGb6Nc0pRZPtwszY8T70CAAdaE4qFeRAEeazYGm2s0OpeXmt4sQML8Ead780bW0IgiUxZRq7swwNSHpmFA8tn6JLjqCyZJ5PETNfOsKLvtJxgQjzQmPS65lDch4V64Fa0Uc7yn1tj8cdrADPrf7A5562/YymEWIyKzPB4ub4SetMIYB6BOKFI//Abd4qYn0Hq3NVt3uBUSaePw4abXr+p29iludVvIfg78Bd/RcZhjmnMPoS1E5J2Kxr3tGoD8nb8aQUoiN49/06shpOS3Zk4bQj80e2m3DoZqWkob09MRhBlY/5sSUeqaGbzbAr24IMHKMaJLyC74tpT1ixjk/Z7qvIb7BHWhacLzwTiRRTfa/x49GkjqeF/G0jZ93iIZk4GxeGT6+nX2lxrimmoDelImQRhy/Q7P4fL2Bt4mcM5TxSdkoOfpvZZ0h
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9P189MB1730.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(366004)(346002)(376002)(39830400003)(136003)(396003)(6486002)(6666004)(66476007)(66556008)(186003)(6506007)(4326008)(5660300002)(38350700002)(38100700002)(2616005)(956004)(52116002)(16526019)(6512007)(8676002)(83380400001)(8936002)(86362001)(6916009)(26005)(2906002)(107886003)(36756003)(1076003)(478600001)(66946007)(316002)(130980200001);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?oWg92jW387kMl144Dxg+CljLoxpHmBq5k8jB6zxOWfVPVHgNhFppfvmRMcuS?=
- =?us-ascii?Q?N5itECh+0SRxqn6TACty7L6Wg+08wwf++tQBPyQTD5XpCNIyzIpefaUtVNUq?=
- =?us-ascii?Q?r6su4qM0mLG3Tl077ncibTpcI0xP8kMUuVNDn7SNJUTEYnhOAC7MwgJ2Y9JE?=
- =?us-ascii?Q?9F1Tft+o9zh/M52mVPW7cyUxuF53Sh0O07VjwTslFcVtqxRzEPFNOcz4DbpN?=
- =?us-ascii?Q?xI8yhaHbYk4eZIkQXHIxLKRtkHXxHDTUDAAz0PrfeNt0A26MZwoIO3iOr6qn?=
- =?us-ascii?Q?GjeNINCsRHihT3FZtTZdvMM4nbe8bRZG/hdd0GrWLXUJ3puqZg66azhsRYEJ?=
- =?us-ascii?Q?PVU1+l+96zYitPeAAlkB/8E5z2m/8Rqiuaz4502T6lCruzkh3iZHTdHivT3z?=
- =?us-ascii?Q?3t/KF78lp1iOppIDj8k64v9fv8QeE1MD78K8YpsX5aFsRfna6lalIL7WOD1w?=
- =?us-ascii?Q?dquhp0bU3d8RwIww2AcWtDOZAbbOG+qyj9y/M2cjDRggrdRLidId4puFuKFw?=
- =?us-ascii?Q?7CHJoUPJPT+wWPCNcRL3x9R+idl3m9x4leKbuFuDmSHbEUdywJil22yZ9Ec6?=
- =?us-ascii?Q?0kVsU9dCX0AQIfa8A/xiztCjllCJs05XMHAYX96wHcrqd6K4l/ztjDzTdeOT?=
- =?us-ascii?Q?lkSY3b15ul7pCPkQ45/Bg7uHdiphGNB8BnAcdc9wSV8IRcvSFiqmRp8WeP+L?=
- =?us-ascii?Q?QtzbcD2xDoJ6LsJJjfOYPaV1tgPdVgnl8BTzM3zCXr83LBHV8mP17jWrRr5J?=
- =?us-ascii?Q?NbTa5ni8lHXCr2xBiVWHByjGELTyk6ucF1bc2S22U7XtzZpaN3YRNDG8Sv3Z?=
- =?us-ascii?Q?OTqYS8XgxFHwmrNF+JZQsSJCC0MDJObne1sa12NWca0Iia7I3CtiwFf1vQQ/?=
- =?us-ascii?Q?OezDJezOugfRMVhWOISbpGOagSzOenSw3itUih6WjA/M+pc+P3zxRbGI/0ID?=
- =?us-ascii?Q?Fde+WF4LYkuY0csXrIn82lryGLxB+/bZxcdMwLehFysZD/zCJ4AVvqMo3qzd?=
- =?us-ascii?Q?NJfCnNDN646koUyA94Ry+EDF/lr79t0RDYU6T0I+XzPgBdmajilCgE5Stgk+?=
- =?us-ascii?Q?igsSA2r35L9VTAFR6Q4wP0OPDgDOqZkxKssIB3UrnaO8cSjBAuyCiJg0zoiB?=
- =?us-ascii?Q?sdYf6GxXDO2sufAkuYBQzrMjt1swhBdWgV6feCdGDuAnNPgavIVBbXmBjAIY?=
- =?us-ascii?Q?GRLLHVti961UWfhUmDDRnM1HlD2ba4QzYZZo3vhbhmH5ttV+Yap+qtbywvaw?=
- =?us-ascii?Q?Hs7RMjPpTDJbFjFOnNMJwov3XoFwycJUA+jJOY/dByDmMsmJov7metzbk9HB?=
- =?us-ascii?Q?Gd1bJeCV4qyoTp1JuKWrgMd+?=
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?aYSsaZhyBJG49zlVkmND7yzR0WJtQ3PUXBA+6hl2N8ulceMtBp6/NVu1dEFy?=
+ =?us-ascii?Q?ARAsx04D++6/aD9uzcmYrJu3MHtwpVrKhZuobr2vY/yJRrWFJYokUgAg2ugd?=
+ =?us-ascii?Q?W18QArUBmungIN5hR0eN2dCpfwr1prrYFmK94Kh0OMvr7MufbLJSpxyY+wHb?=
+ =?us-ascii?Q?lxpMYREcaFOHXe3oZ8PlMAweYDUjcjsPrGmflSkfe9ZmaCtSJXYWw1k9acth?=
+ =?us-ascii?Q?Hz2FlZezJuBL5QWcXdqmGYOPNOqefjfZ77oAj3La6w6InfoK+mlII+Ys0xmy?=
+ =?us-ascii?Q?b162LnIJiND8qvR2Nxl7/WgFZ9gXC8ZU4sAro82L8W+AI1RWTO7f920nDVKe?=
+ =?us-ascii?Q?B6AjipB1lKfjst4/tiCDOE0Li6q0RXwmiM+MDXxD/RPfLhwX7cxLtpl9ozGG?=
+ =?us-ascii?Q?Q1n99fflkLXEkfMTw3hd1zo1kv0njMzRQjgHCU/Ub043HnJm53TW48GF7oiK?=
+ =?us-ascii?Q?zNbDSuHx1DNG5WvC+dTHYs5asAQ6ayrsLYNv63ufOgZkb3190qZ/axxVLmWo?=
+ =?us-ascii?Q?Nwykq1eGy2APLZok6jgzLCIclYKcsrp0HkjAgVG7Ecmsj/OGIKxhYNA5xyrI?=
+ =?us-ascii?Q?jbK8XFnj/XOksZg78i9sMRegXt4uxkNA3GHr0p2ak32XRJ/4LcLHC0mQeC18?=
+ =?us-ascii?Q?ZJmkpOD3qcToGhKrggZukFf/HjW6hRYwR10ycHVgyteEGPDUfRJBkaHpNJea?=
+ =?us-ascii?Q?9xogOCidmw64ValRJsRAyzR3MHDPp39xTcxsJgK0kcb+/SHpBTfQka3rR68J?=
+ =?us-ascii?Q?sdK1Krx2Da90xAAjqOY1jYq5CSUkMcVHOsZRdy0vS/gL3BXVFP1/d9nzJoTT?=
+ =?us-ascii?Q?1S6fx6knm/xEPF49SO1dDkGc6KbPmCsC6jmd+y+wSqeK8l5TYYiAr9xm18HL?=
+ =?us-ascii?Q?NBt6+LqptzI1v1UqT0wdLLR66rYZ7at7u4tsSCiQ/8fUl+aik4jE1ui/SaZI?=
+ =?us-ascii?Q?rVzhUoohLO4SNIIEqY+t2RFHnLjPvYxAO65bJDoih4sABOTRchuSSAqMwVlW?=
+ =?us-ascii?Q?5xC6K3WSQVhI+BYqlI8Vi3lM/9eka2cC6cJT2NFHoDO6+fsrvsumjwgKsjph?=
+ =?us-ascii?Q?h0EqqggIqLn75p6uVHelp7USOX+ip9BAmfaRyhsrydS7CYlGGgfUhBwUduQz?=
+ =?us-ascii?Q?VCOwScDDCrOBIxCafihqYMRjbzkw/5K/ZuKOelNbjbe7Uzp52RR3XetD1vPK?=
+ =?us-ascii?Q?Xh1Is+m/T82ELSOf4ulVxs/On0H6I+ck7u7vDLlujLU5o2Mx45kVLTCkqsCA?=
+ =?us-ascii?Q?D2Zn30oZoVdxogaDKEgoHOwVBdUMGtx+8qzyH3jBmSFax0kOpGAZAalNiTOd?=
+ =?us-ascii?Q?CfL6zsYk66JQjoDpIBVemhUY?=
 X-OriginatorOrg: surban.net
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a93bfbe-b4e6-4bbc-16de-08d92d850936
+X-MS-Exchange-CrossTenant-Network-Message-Id: c7e6a7ea-b34f-4fb1-c2e9-08d92d884d75
 X-MS-Exchange-CrossTenant-AuthSource: AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2021 09:32:46.3044
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 12 Jun 2021 09:56:08.9454
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: a27af4ff-c4b3-4dec-be8d-845345d2ab67
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: GnCyuDWh77tFqdycGSHlj/i+9CY0yK073xgTSV1il1zyZK3UdVz3BklC7bzQ1AdLu+5SUxXTFXvLXYAzBzmEUA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM0P189MB0610
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1u2nej4krKDVknM2M77kXKmJLWBFMFNSMTQ4vMN5TKGCYVcXN21duXtECFwsUq4EwT8EUcEUGdMiT8ml2YtU6A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9P189MB1601
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This fixes the calculation of available buffer space in
-bt_gatt_server_send_notification and sends pending notifications
-immediately when there is no more room to add a notification.
+This checks if an outstanding call to AcquireWrite is already in
+progress. If so, the write request is placed into the queue, but
+AcquireWrite is not called again. When a response to AcquireWrite is
+received, acquire_write_reply sends all queued writes over the acquired
+socket.
 
-Previously there was a buffer overflow caused by incorrect calculation
-of available buffer space: data->offset can equal data->len
-from a previous call to this function, leading
-(data->len - data->offset) to underflow after data->offset += 2.
+Making multiple simultaneous calls to AcquireWrite makes no sense,
+as this would open multiple socket pairs and only the last returned
+socket would be used for further writes.
 ---
- src/shared/gatt-server.c | 43 +++++++++++++++++++++++++++++++++-------
- 1 file changed, 36 insertions(+), 7 deletions(-)
+ src/gatt-database.c | 41 +++++++++++++++++++++++++++++++++--------
+ 1 file changed, 33 insertions(+), 8 deletions(-)
 
-diff --git a/src/shared/gatt-server.c b/src/shared/gatt-server.c
-index 970c35f94..5dbe9d66c 100644
---- a/src/shared/gatt-server.c
-+++ b/src/shared/gatt-server.c
-@@ -1690,6 +1690,17 @@ static bool notify_multiple(void *user_data)
- 	return false;
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index be6dfb265..8cf60c597 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -2378,6 +2378,26 @@ static struct pending_op *send_write(struct btd_device *device,
+ 	return NULL;
  }
  
-+bool notify_append_le16(struct nfy_mult_data *data, uint16_t value)
++static void flush_pending_write(void *data, void *user_data)
 +{
-+	if (data->offset + sizeof(value) > data->len)
-+		return false;
++	GDBusProxy *proxy = user_data;
++	struct pending_op *op = data;
 +
-+	put_le16(value, data->pdu + data->offset);
-+	data->offset += sizeof(value);
++	if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
++					write_reply_cb,
++					op, pending_op_free) == TRUE)
++		return;
 +
-+	return true;
++	pending_op_free(op);
 +}
 +
- bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
- 					uint16_t handle, const uint8_t *value,
- 					uint16_t length, bool multiple)
-@@ -1700,23 +1711,35 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
- 	if (!server || (length && !value))
- 		return false;
++static void flush_pending_writes(GDBusProxy *proxy,
++					struct queue *owner_queue)
++{
++	queue_foreach(owner_queue, flush_pending_write, proxy);
++	queue_remove_all(owner_queue, NULL, NULL, NULL);
++}
++
+ static bool sock_hup(struct io *io, void *user_data)
+ {
+ 	struct external_chrc *chrc = user_data;
+@@ -2488,18 +2508,19 @@ static void acquire_write_reply(DBusMessage *message, void *user_data)
  
--	if (multiple)
-+	if (multiple) {
- 		data = server->nfy_mult;
+ 	chrc->write_io = sock_io_new(fd, chrc);
  
-+		/* flush buffered data if this request hits buffer size limit */
-+		if (data && data->offset > 0 &&
-+				data->len - data->offset < 4 + length) {
-+			if (server->nfy_mult->id)
-+				timeout_remove(server->nfy_mult->id);
-+			notify_multiple(server);
-+			/* data has been freed by notify_multiple */
-+			data = NULL;
-+		}
+-	if (sock_io_send(chrc->write_io, op->data.iov_base,
+-				op->data.iov_len) < 0)
+-		goto retry;
++	while ((op = queue_peek_head(chrc->pending_writes)) != NULL) {
++		if (sock_io_send(chrc->write_io, op->data.iov_base,
++					op->data.iov_len) < 0)
++			goto retry;
+ 
+-	gatt_db_attribute_write_result(op->attrib, op->id, 0);
++		gatt_db_attribute_write_result(op->attrib, op->id, 0);
++		pending_op_free(op);
 +	}
-+
- 	if (!data) {
- 		data = new0(struct nfy_mult_data, 1);
- 		data->len = bt_att_get_mtu(server->att) - 1;
- 		data->pdu = malloc(data->len);
- 	}
  
--	put_le16(handle, data->pdu + data->offset);
--	data->offset += 2;
--
--	length = MIN(data->len - data->offset, length);
-+	if (!notify_append_le16(data, handle))
-+		goto error;
+ 	return;
  
- 	if (multiple) {
--		put_le16(length, data->pdu + data->offset);
--		data->offset += 2;
-+		length = MIN(data->len - data->offset - 2, length);
-+		if (!notify_append_le16(data, length))
-+			goto error;
-+	} else {
-+		length = MIN(data->len - data->offset, length);
- 	}
- 
- 	memcpy(data->pdu + data->offset, value, length);
-@@ -1740,6 +1763,12 @@ bool bt_gatt_server_send_notification(struct bt_gatt_server *server,
- 	free(data);
- 
- 	return result;
-+
-+error:
-+	if (data)
-+		free(data);
-+
-+	return false;
+ retry:
+-	send_write(op->device, op->attrib, chrc->proxy, NULL, op->id,
+-				op->data.iov_base, op->data.iov_len, 0,
+-				op->link_type, false, false);
++	flush_pending_writes(chrc->proxy, chrc->pending_writes);
  }
  
- struct ind_data {
+ static void acquire_write_setup(DBusMessageIter *iter, void *user_data)
+@@ -2527,14 +2548,18 @@ static struct pending_op *acquire_write(struct external_chrc *chrc,
+ 					uint8_t link_type)
+ {
+ 	struct pending_op *op;
++	bool acquiring = !queue_isempty(chrc->pending_writes);
+ 
+ 	op = pending_write_new(device, chrc->pending_writes, attrib, id, value,
+ 				len, 0, link_type, false, false);
+ 
++	if (acquiring)
++		return op;
++
+ 	if (g_dbus_proxy_method_call(chrc->proxy, "AcquireWrite",
+ 					acquire_write_setup,
+ 					acquire_write_reply,
+-					op, pending_op_free))
++					op, NULL))
+ 		return op;
+ 
+ 	pending_op_free(op);
 -- 
 2.25.1
 
