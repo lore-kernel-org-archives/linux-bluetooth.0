@@ -2,165 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49696C2B9F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jun 2021 17:28:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BB0C2B9F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jun 2021 17:46:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23B3F6023E
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jun 2021 17:28:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D19C460E09
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 14 Jun 2021 17:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235569AbhFNRax (ORCPT
+        id S233918AbhFNRsq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 14 Jun 2021 13:30:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39568 "EHLO
+        Mon, 14 Jun 2021 13:48:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43502 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235553AbhFNRaw (ORCPT
+        with ESMTP id S233178AbhFNRsp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 14 Jun 2021 13:30:52 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8203EC061767
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jun 2021 10:28:34 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id m9so16567681ybo.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jun 2021 10:28:34 -0700 (PDT)
+        Mon, 14 Jun 2021 13:48:45 -0400
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 28DAFC061767
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jun 2021 10:46:28 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id e22so9228805pgv.10
+        for <linux-bluetooth@vger.kernel.org>; Mon, 14 Jun 2021 10:46:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=mAQKd8DmVmuefsPKPOvnnlECnXA2MB5bd8cxixwlwNE=;
-        b=AuHtaMbDlYjn88067oztJ9KFk0/xGRS4cgofRwPPkpSQ5kQASvqk2or8/BN7iV+OVj
-         3AnSGUfN6DAJ7O1Vu20kniwQNb3KabvoCwufQwyWSqmp7C9w0aHk+7pYeiCTs5VAw4al
-         5xX9nLnDq4gbnveigx8zqueHE0rZA+om4tIfiLob8HZkXUVeqsDUI9TJbo/ZtrKOf4oq
-         eKEXkTFbqGEJWAnXMUbTCkOn+pgRtmt5uJm0JqRIvtUak5FYa7ro7mx5dX/tTWIJyzTL
-         6FXLEchHSpQEgSsxIONtDL9lxBKS96mZOokfyhFduXmLKT4R8Y4rHw8sIevdtyEVMr0+
-         K9yQ==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9H3B2LUKSQy09vfpNt+jBkq8nGOjtNWx26sB189hDNU=;
+        b=YwS6+8nAp8tvcIhG3G/KnOh06VeXBQ772znRc+ZZMgn66MiYQe0EpoX090caKqxhyh
+         C2NMjcendX1UuuZRlcac6EWRUkPq1C8FGsZjA48fbm/3v5MXQf/gP8lJ6HoCUjDNGF20
+         3vL8232CheQk65BpxbJ2p9xWTS9H1f0/GwN12eUyCgaiIab/4SIVYPtWhQ26t4eYkeaf
+         qJ1PazVmfdmdQXfP8RrhKcvtUoDWAreHztwOs3G4nLH5lGeY8ilL67qy3RNX9HEalT31
+         knxQQngffJCte+1T6rgWqZLFDBkXvVwlSLhpQRDfevlZ4od4ZpKIODOfvpQH9elOf09J
+         lixw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=mAQKd8DmVmuefsPKPOvnnlECnXA2MB5bd8cxixwlwNE=;
-        b=AkTahjoIXun0Rpg1abaOxGCG/u1CazIerfN8L+HDBPcP5z6x7SDeov4hJXZ+6SSoK1
-         K6bTC68Z9EinukFTZmXWuPJOgjdm4ZrG/Pa3ONRokSOl2uQqRBuz1AsIaQZ5uuDKR8FG
-         vMoul1hW+cULMf+3UGVGmyBEdh8+EDfle9psaXATZnv7NIYBZ6RgxfGWY8MAe0nMyMrV
-         yu8VTr3A0km2z08O5WXICKHmf4QPeI2W1X1dDKqP9RYEKzeT08Qwkq7yx4At3GzshuXn
-         obtihEYYttV5uMSd/0DVY6QFk0ugsvQrdkDHEbzE5YnEXWMASj8bDawErItu8pmmIVRx
-         xuCw==
-X-Gm-Message-State: AOAM532Cflf8oMQhBJx8p7jZz+QN4vsB9zBlT+GtVEW4KJz+rMQ7EbbW
-        NDsTW3l6corTH484BwpsRH3pC2Dnnjk2M9qQXeyfGsZHEy0=
-X-Google-Smtp-Source: ABdhPJzFeQ0I2sUE4lJpjJ38gZalz5b40eyjVvcW6LHA+7xZKZEP/J5QvnWmhacEOYBTSgEqxURXjOHqlHC+Z183upA=
-X-Received: by 2002:a25:c60a:: with SMTP id k10mr23544560ybf.264.1623691713660;
- Mon, 14 Jun 2021 10:28:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAFJ_xbpkmBv4O8EPN0DRNYEzBEFcm1dj+ae765626nd+PPbo3Q@mail.gmail.com>
-In-Reply-To: <CAFJ_xbpkmBv4O8EPN0DRNYEzBEFcm1dj+ae765626nd+PPbo3Q@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=9H3B2LUKSQy09vfpNt+jBkq8nGOjtNWx26sB189hDNU=;
+        b=GqI02INXKSCa4w4+TeiNOuPVxDCkArW8cuJw978gAna6pjhZINgp0Fogiw0ifrMLTb
+         VrOjKehH1VXd1sr5RVesPhobP6Ui9eDyfe0kI9T22WVc3Kf0TDmW3HtszkzWoY5A7+gI
+         doIgsCKKo5G19wofF8yvflFuUktUJvTNy3ylM6Wh4eibZ4Eq9+rjm1nV2ZnZAeSzyPde
+         9vItH1cu14wSOJQdDvGFioQK/tt8GKvwkXQHSkTt4WGe1fL7Jjqhzk7evP7OfXklHRsk
+         NOrFYlALeiCTnDkNTMP0oyT8mHJaldGxB1kqDG7oy2IYr78F/xfydGlfC2MvbUh/m0uQ
+         wn3A==
+X-Gm-Message-State: AOAM530BR9nuV70sD1VgI5hS/U+dYgvM5KEnu21fJVQrQck+kSGRL9nE
+        avAomNnUQQqrlhoG7gn30FnAkyQBgSy7yA==
+X-Google-Smtp-Source: ABdhPJwEQDtXjdeUX/Tl1+4Ut7hosMYWHHjJiHIkJ9n/Q5y8HZonBFdvJ1J/1DvWfKMyPBY/fewCuw==
+X-Received: by 2002:aa7:8b0d:0:b029:2e9:857e:c1d1 with SMTP id f13-20020aa78b0d0000b02902e9857ec1d1mr194625pfd.33.1623692786978;
+        Mon, 14 Jun 2021 10:46:26 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id c21sm13055479pfi.44.2021.06.14.10.46.26
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 14 Jun 2021 10:46:26 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 14 Jun 2021 10:28:22 -0700
-Message-ID: <CABBYNZL-qvNyeATZcaK2v3jia66o4Rn_0fsPfZg1euOJqo8-ug@mail.gmail.com>
-Subject: Re: PROBLEM: Crash after Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
-To:     Lukasz Majczak <lma@semihalf.com>, "An, Tedd" <tedd.an@intel.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>, upstream@semihalf.com,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Alex Levin <levinale@google.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] mgmt-tester: Enable Kernel Debug Experimental Feature
+Date:   Mon, 14 Jun 2021 10:46:25 -0700
+Message-Id: <20210614174625.1259675-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Lukasz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Mon, Jun 14, 2021 at 6:32 AM Lukasz Majczak <lma@semihalf.com> wrote:
->
-> Hi,
->
-> I was testing v5.13-rc5 and I have noticed it sometimes crashes giving
-> the following logs:
->
-> [   13.886255] Bluetooth: rfcomm_init() RFCOMM ver 1.11
-> [   14.654758] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> [   14.662562] #PF: supervisor read access in kernel mode
-> [   14.668319] #PF: error_code(0x0000) - not-present page
-> [   14.674080] PGD 0 P4D 0
-> [   14.676923] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [   14.681802] CPU: 0 PID: 2647 Comm: kworker/u17:2 Tainted: G     U
->          5.13.0-rc5 #2
-> [   14.691052] Hardware name: Google Delbin/Delbin, BIOS
-> Google_Delbin.13672.156.3 05/14/2021
-> [   14.700289] Workqueue: hci0 hci_rx_work [bluetooth]
-> [   14.705776] RIP: 0010:smp_new_conn_cb+0xd/0xb0 [bluetooth]
-> [   14.711920] Code: 47 c5 6b c0 48 89 d9 31 c0 e8 aa 31 00 00 48 8b
-> 3b be 13 00 00 00 5b 5d e9 8d b4 fc ff 55 48 89 e5 41 56 53 49 89 fe
-> 48 8b 07 <48> 8b 00 48 8b 90 c0 05 00 00 48 83 c2 48 48 c7 c7 53 c58
-> [   14.732905] RSP: 0018:ffffba9fc2a5bc88 EFLAGS: 00010246
-> [   14.738755] RAX: 0000000000000000 RBX: 0000000000000002 RCX: ffff9f373f23ad00
-> [   14.746748] RDX: 0000000000000000 RSI: ffffffff88df7c90 RDI: ffff9f3760e51c00
-> [   14.754718] RBP: ffffba9fc2a5bc98 R08: 0000000000000000 R09: fefefefefefefeff
-> [   14.762678] R10: 0000000000000018 R11: ffffffffc06a93d3 R12: ffff9f37344fe000
-> [   14.770657] R13: ffff9f3760e51f28 R14: ffff9f3760e51c00 R15: ffff9f3757aab540
-> [   14.778625] FS:  0000000000000000(0000) GS:ffff9f3878000000(0000)
-> knlGS:0000000000000000
-> [   14.787672] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   14.794099] CR2: 0000000000000000 CR3: 000000012e6dc003 CR4: 0000000000770ef0
-> [   14.802070] PKRU: 55555554
-> [   14.805087] Call Trace:
-> [   14.807815]  l2cap_connect_cfm+0x15b/0x3b1 [bluetooth]
-> [   14.813574]  hci_le_meta_evt+0x8c2/0xb76 [bluetooth]
-> [   14.819136]  ? newidle_balance+0x200/0x36f
-> [   14.823724]  hci_event_packet+0x6f1/0x844 [bluetooth]
-> [   14.829383]  hci_rx_work+0x121/0x338 [bluetooth]
-> [   14.834557]  process_one_work+0x1b9/0x368
-> [   14.839038]  worker_thread+0x213/0x372
-> [   14.843222]  ? _raw_spin_unlock_irqrestore+0x12/0x2c
-> [   14.848782]  kthread+0x150/0x15f
-> [   14.852384]  ? pr_cont_work+0x58/0x58
-> [   14.856477]  ? kthread_blkcg+0x31/0x31
-> [   14.860663]  ret_from_fork+0x1f/0x30
-> [   14.864655] Modules linked in: rfcomm cmac algif_hash
-> algif_skcipher af_alg vhost_vsock vhost vhost_iotlb
-> vmw_vsock_virtio_transport_common vsock uinput mei_hdcp xt_cgroup
-> btusb cdc_ether usbnet btrtl s1
-> [   14.864691]  iwlwifi cfg80211 joydev
-> [   14.968673] gsmi: Log Shutdown Reason 0x03
-> [   14.973278] CR2: 0000000000000000
-> [   14.976991] ---[ end trace 9e1b3a2966a93e69 ]---
-> [   14.984499] RIP: 0010:smp_new_conn_cb+0xd/0xb0 [bluetooth]
-> [   14.990648] Code: 47 c5 6b c0 48 89 d9 31 c0 e8 aa 31 00 00 48 8b
-> 3b be 13 00 00 00 5b 5d e9 8d b4 fc ff 55 48 89 e5 41 56 53 49 89 fe
-> 48 8b 07 <48> 8b 00 48 8b 90 c0 05 00 00 48 83 c2 48 48 c7 c7 53 c58
-> [   15.011645] RSP: 0018:ffffba9fc2a5bc88 EFLAGS: 00010246
-> [   15.017481] RAX: 0000000000000000 RBX: 0000000000000002 RCX: ffff9f373f23ad00
-> [   15.025449] RDX: 0000000000000000 RSI: ffffffff88df7c90 RDI: ffff9f3760e51c00
-> [   15.033418] RBP: ffffba9fc2a5bc98 R08: 0000000000000000 R09: fefefefefefefeff
-> [   15.041387] R10: 0000000000000018 R11: ffffffffc06a93d3 R12: ffff9f37344fe000
-> [   15.049361] R13: ffff9f3760e51f28 R14: ffff9f3760e51c00 R15: ffff9f3757aab540
-> [   15.057336] FS:  0000000000000000(0000) GS:ffff9f3878000000(0000)
-> knlGS:0000000000000000
-> [   15.066380] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [   15.072797] CR2: 0000000000000000 CR3: 000000012e6dc003 CR4: 0000000000770ef0
-> [   15.080768] PKRU: 55555554
-> [   15.083775] Kernel panic - not syncing: Fatal exception
-> [   15.089661] Kernel Offset: 0x6a00000 from 0xffffffff81000000
-> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [   15.102110] gsmi: Log Shutdown Reason 0x02
-> [   15.108941] ACPI MEMORY or I/O RESET_REG.
->
-> After short debug it pointed to the commit:
->
-> commit 2e1614f7d61e407f1a8e7935a2903a6fa3cb0b11
-> Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> Date:   Mon Mar 15 14:39:29 2021 -0700
->
->     Bluetooth: SMP: Convert BT_ERR/BT_DBG to bt_dev_err/bt_dev_dbg
->
-> In my case it looks like "conn" appears to be NULL,
-> at the following call (function: smp_new_conn_cb, net/bluetooth/smp.c)
-> bt_dev_dbg(pchan->conn->hcon->hdev, "created chan %p", chan);
+This attempts to enable Kernel Debug Experimental Feature if debug is
+enabled.
+---
+ tools/mgmt-tester.c | 27 +++++++++++++++++++++++++++
+ 1 file changed, 27 insertions(+)
 
-Just sent a patch for it, looks like our CI doesn't enable debug logs
-so we were not able to test it properly.
-
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 52cd19a36..fe39506f6 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -308,6 +308,32 @@ struct generic_data {
+ 	uint8_t adv_data_len;
+ };
+ 
++static const uint8_t set_exp_feat_param_debug[] = {
++	0x1c, 0xda, 0x47, 0x1c, 0x48, 0x6c, 0x01, 0xab, /* UUID - Debug */
++	0x9f, 0x46, 0xec, 0xb9, 0x30, 0x25, 0x99, 0xd4,
++	0x01,						/* Action - enable */
++};
++
++static void debug_exp_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_print("Debug feature could not be enabled");
++		return;
++	}
++
++	tester_print("Debug feature is enabled");
++}
++
++static void debup_exp_feature(struct test_data *data)
++{
++	tester_print("Enabling Debug feature");
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, MGMT_INDEX_NONE,
++		sizeof(set_exp_feat_param_debug), set_exp_feat_param_debug,
++		debug_exp_callback, NULL, NULL);
++}
++
+ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+@@ -365,6 +391,7 @@ static void test_pre_setup(const void *test_data)
+ 	if (tester_use_debug()) {
+ 		mgmt_set_debug(data->mgmt, print_debug, "mgmt: ", NULL);
+ 		mgmt_set_debug(data->mgmt_alt, print_debug, "mgmt-alt: ", NULL);
++		debup_exp_feature(data);
+ 	}
+ 
+ 	mgmt_send(data->mgmt, MGMT_OP_READ_VERSION, MGMT_INDEX_NONE, 0, NULL,
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
