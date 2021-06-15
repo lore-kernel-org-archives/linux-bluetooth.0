@@ -2,122 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AFEC48BDF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:43:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD030C48BE5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:56:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AADF361166
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:43:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B933B61185
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:56:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229951AbhFOTpx convert rfc822-to-8bit (ORCPT
+        id S229965AbhFOT63 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Jun 2021 15:45:53 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:46747 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229749AbhFOTpw (ORCPT
+        Tue, 15 Jun 2021 15:58:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57726 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229898AbhFOT62 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Jun 2021 15:45:52 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 4E684CECFB;
-        Tue, 15 Jun 2021 21:51:47 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v9 10/10] Bluetooth: Add support for msbc coding format
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210608122455.19583-10-kiran.k@intel.com>
-Date:   Tue, 15 Jun 2021 21:43:45 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AA50351C-7DF2-4732-8493-A57616918B11@holtmann.org>
-References: <20210608122455.19583-1-kiran.k@intel.com>
- <20210608122455.19583-10-kiran.k@intel.com>
-To:     Kiran K <kiran.k@intel.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Tue, 15 Jun 2021 15:58:28 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE611C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jun 2021 12:56:23 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id k22-20020a17090aef16b0290163512accedso2380351pjz.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 15 Jun 2021 12:56:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=R5V1AcxVMp5U7ECDcNGGyhB2ScLr26o7sk4k3xn71AM=;
+        b=Wgr6whVBYYzP2VZRr2ZZKqMscsMKI0TxX8NR9wE12OZxs8mj2pJcwSZgCGCDMwAgdl
+         tUCNiR65yFNpcsEnL6ZfJdaBV5uS68HEIKYVDJhGRodnd/oR6PUOv+m3PRAFwczBM7Zc
+         CA+T9HSci3ZodhRIX2BufUEGoi5uof6bLEBA6FlksV7cad8J67RnwT75LGTWvPlKURse
+         RumVRZI1DEwIGHpIoGfdBn7o+UU5CnnuzKMwhT65WXxYcazXXM1FM91xqx7b0QamyrHm
+         QRSVs4FtAABybr/DKLUVfEFTacPv2J2sg6PTQDENL/ta+UL11//sCRwr/jSCtG0HWEfe
+         eZbA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=R5V1AcxVMp5U7ECDcNGGyhB2ScLr26o7sk4k3xn71AM=;
+        b=Deeiq3z0eX0CF0dIZGKjXoS1UmgGQz/fZ+UAKmZ6mY5Sl98IoIF0VN48WZYCOp8gV7
+         nRsqIOrpKsyT+9ABEXyeZbauUVRpFLR6UrTrE9Pi/x+H5l0LMq2PVeYUh35CfNqsg67j
+         SbXIbqJ3lJrHiMnL0YxJp0R4qp8lDQGMIwL6UOvPwq/X7WVVa8oYFUN678D5qiUtLPuf
+         1Mafj5GP7zuNjeUseuY4chTPPPXi6h9quVprEC8HovdwxTxEKWrOtZUQthuqLMjpfgzj
+         JaWfjxZY93QwIfX7pwzEZpWExccQvrRAP6sxYL65RoDp8CFQNjaXSa13Q3FRuo8YfyDq
+         1QjA==
+X-Gm-Message-State: AOAM532sZ36DDH8SawdhxYtHH4WU5iQ2x6jAIHq3INyRgWHFydUWrdzu
+        O2lNGUtSuRcB19ppjIf8Y70OYTj7BeI=
+X-Google-Smtp-Source: ABdhPJwXbqSWWABEAjv3Ps2CvUsUygcBT948L2ViAACpdvUWRLj9Jr/S7d2Fxn4KPuxBdOSNcZAiLQ==
+X-Received: by 2002:a17:902:aa8d:b029:11a:9225:3ea with SMTP id d13-20020a170902aa8db029011a922503eamr5696050plr.49.1623786983197;
+        Tue, 15 Jun 2021 12:56:23 -0700 (PDT)
+Received: from [172.17.0.2] ([52.151.5.42])
+        by smtp.gmail.com with ESMTPSA id s4sm15863127pjn.31.2021.06.15.12.56.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 15 Jun 2021 12:56:22 -0700 (PDT)
+Message-ID: <60c905e6.1c69fb81.56b62.dbc0@mx.google.com>
+Date:   Tue, 15 Jun 2021 12:56:22 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5961368103315651923=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [RFC,BlueZ,1/2] emulator/btdev: Update the white list and resolving list size
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210615193007.1854488-1-hj.tedd.an@gmail.com>
+References: <20210615193007.1854488-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+--===============5961368103315651923==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-> In Enhanced_Setup_Synchronous_Command, add support for msbc
-> coding format
-> 
-> Signed-off-by: Kiran K <kiran.k@intel.com>
-> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> ---
-> include/net/bluetooth/bluetooth.h |  1 +
-> net/bluetooth/hci_conn.c          | 27 ++++++++++++++++++++++++++-
-> 2 files changed, 27 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index af2809121571..056699224da7 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -175,6 +175,7 @@ struct bt_codecs {
-> 
-> #define CODING_FORMAT_CVSD		0x02
-> #define CODING_FORMAT_TRANSPARENT	0x03
-> +#define CODING_FORMAT_MSBC		0x05
-> 
-> __printf(1, 2)
-> void bt_info(const char *fmt, ...);
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 9569b21adb88..73c134459361 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -328,6 +328,32 @@ bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle)
-> 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
-> 
-> 	switch (conn->codec.id) {
-> +	case CODING_FORMAT_MSBC:
-> +		if (!find_next_esco_param(conn, esco_param_msbc,
-> +					  ARRAY_SIZE(esco_param_msbc)))
-> +			return false;
-> +
-> +		param = &esco_param_msbc[conn->attempt - 1];
-> +		cp.tx_coding_format.id = 0x05;
-> +		cp.rx_coding_format.id = 0x05;
-> +		cp.tx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.rx_codec_frame_size = __cpu_to_le16(60);
-> +		cp.in_bandwidth = __cpu_to_le32(32000);
-> +		cp.out_bandwidth = __cpu_to_le32(32000);
-> +		cp.in_coding_format.id = 0x04;
-> +		cp.out_coding_format.id = 0x04;
-> +		cp.in_coded_data_size = __cpu_to_le16(16);
-> +		cp.out_coded_data_size = __cpu_to_le16(16);
-> +		cp.in_pcm_data_format = 2;
-> +		cp.out_pcm_data_format = 2;
-> +		cp.in_pcm_sample_payload_msb_pos = 0;
-> +		cp.out_pcm_sample_payload_msb_pos = 0;
-> +		cp.in_data_path = conn->codec.data_path;
-> +		cp.out_data_path = conn->codec.data_path;
-> +		cp.in_trasnport_unit_size = 1;
-> +		cp.out_trasnport_unit_size = 1;
+This is automated email and please do not reply to this email!
 
-so s/trasnport/transport/
+Dear submitter,
 
-Please spellcheck your structs.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=500953
 
-> +		break;
-> +
-> 	case CODING_FORMAT_TRANSPARENT:
-> 		if (!find_next_esco_param(conn, esco_param_msbc,
-> 					  ARRAY_SIZE(esco_param_msbc)))
-> @@ -383,7 +409,6 @@ bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle)
-> 		cp.in_trasnport_unit_size = 16;
-> 		cp.out_trasnport_unit_size = 16;
-> 		break;
-> -
+---Test result---
 
-We can not have these random hunks in patches. You need to review your final set before sending it out.
+Test Summary:
+CheckPatch                    FAIL      1.32 seconds
+GitLint                       PASS      0.25 seconds
+Prep - Setup ELL              PASS      50.71 seconds
+Build - Prep                  PASS      0.15 seconds
+Build - Configure             PASS      8.83 seconds
+Build - Make                  PASS      215.87 seconds
+Make Check                    PASS      9.17 seconds
+Make Distcheck                PASS      258.54 seconds
+Build w/ext ELL - Configure   PASS      8.91 seconds
+Build w/ext ELL - Make        PASS      202.65 seconds
 
-Regards
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+tools/mgmt-tester: Add LL Privacy test cases
+WARNING:LEADING_SPACE: please, no spaces at the start of a line
+#136: FILE: tools/mgmt-tester.c:4267:
++ static const uint8_t le_add_to_white_list_param[] = {$
 
-Marcel
+- total: 0 errors, 1 warnings, 995 lines checked
 
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] tools/mgmt-tester: Add LL Privacy test cases" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============5961368103315651923==--
