@@ -7,36 +7,35 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 988DAC48BE5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:39:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D1AFEC48BDF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:43:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7646461350
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:39:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AADF361166
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 19:43:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230052AbhFOTlp convert rfc822-to-8bit (ORCPT
+        id S229951AbhFOTpx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Jun 2021 15:41:45 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48293 "EHLO
+        Tue, 15 Jun 2021 15:45:53 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:46747 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229898AbhFOTlp (ORCPT
+        with ESMTP id S229749AbhFOTpw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Jun 2021 15:41:45 -0400
+        Tue, 15 Jun 2021 15:45:52 -0400
 Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 38F8DCECFB;
-        Tue, 15 Jun 2021 21:47:40 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 4E684CECFB;
+        Tue, 15 Jun 2021 21:51:47 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v9 07/10] Bluetooth: btintel: define callback to set data
- path
+Subject: Re: [PATCH v9 10/10] Bluetooth: Add support for msbc coding format
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210608122455.19583-7-kiran.k@intel.com>
-Date:   Tue, 15 Jun 2021 21:39:39 +0200
+In-Reply-To: <20210608122455.19583-10-kiran.k@intel.com>
+Date:   Tue, 15 Jun 2021 21:43:45 +0200
 Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <4C624839-10D3-4114-9037-4FB9E93E1EB6@holtmann.org>
+Message-Id: <AA50351C-7DF2-4732-8493-A57616918B11@holtmann.org>
 References: <20210608122455.19583-1-kiran.k@intel.com>
- <20210608122455.19583-7-kiran.k@intel.com>
+ <20210608122455.19583-10-kiran.k@intel.com>
 To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
@@ -45,138 +44,78 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Kiran,
 
-> Adds callback function which is called to set the data path
-> for HFP offload case before opening SCO connection
+> In Enhanced_Setup_Synchronous_Command, add support for msbc
+> coding format
 > 
 > Signed-off-by: Kiran K <kiran.k@intel.com>
 > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 > ---
-> drivers/bluetooth/btintel.c | 50 +++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btintel.h |  8 ++++++
-> drivers/bluetooth/btusb.c   |  4 ++-
-> include/net/bluetooth/hci.h |  8 ++++++
-> 4 files changed, 69 insertions(+), 1 deletion(-)
+> include/net/bluetooth/bluetooth.h |  1 +
+> net/bluetooth/hci_conn.c          | 27 ++++++++++++++++++++++++++-
+> 2 files changed, 27 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 95c6a1bef35e..3eba5c587ef6 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -1308,6 +1308,56 @@ int btintel_read_offload_usecases(struct hci_dev *hdev,
-> }
-> EXPORT_SYMBOL_GPL(btintel_read_offload_usecases);
+> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+> index af2809121571..056699224da7 100644
+> --- a/include/net/bluetooth/bluetooth.h
+> +++ b/include/net/bluetooth/bluetooth.h
+> @@ -175,6 +175,7 @@ struct bt_codecs {
 > 
-> +int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
-> +			  struct bt_codec *codec)
-> +{
-> +	__u8 preset;
-> +	struct hci_op_configure_data_path *cmd;
-> +	__u8 buffer[255];
-> +	struct sk_buff *skb;
-> +
-> +	if (type != SCO_LINK && type != ESCO_LINK)
-> +		return -EINVAL;
-> +
-> +	switch (codec->id) {
-> +	case 0x02:
-> +		preset = 0x00;
-> +	break;
-> +	case 0x05:
-> +		preset = 0x01;
-> +	break;
-> +	default:
-> +		return -EINVAL;
-> +	}
-> +
-> +	cmd = (void *)buffer;
-> +	cmd->data_path_id = 0x01;
-> +	cmd->len = 1;
-> +	cmd->data[0] = preset;
-> +
-> +	cmd->direction = 0x00;
-> +	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + 1,
-> +			     cmd, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "configure input data path failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +	kfree_skb(skb);
-> +
-> +	cmd->direction = 0x01;
-> +	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + 1,
-> +			     cmd, HCI_INIT_TIMEOUT);
-> +	if (IS_ERR(skb)) {
-> +		bt_dev_err(hdev, "configure output data path failed (%ld)",
-> +			   PTR_ERR(skb));
-> +		return PTR_ERR(skb);
-> +	}
-> +	kfree_skb(skb);
-> +	return 0;
-> +}
-> +EXPORT_SYMBOL_GPL(btintel_set_data_path);
-> +
-> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
-> MODULE_VERSION(VERSION);
-> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-> index 9bcc489680db..9806970c9871 100644
-> --- a/drivers/bluetooth/btintel.h
-> +++ b/drivers/bluetooth/btintel.h
-> @@ -183,6 +183,8 @@ int btintel_set_debug_features(struct hci_dev *hdev,
-> int btintel_read_offload_usecases(struct hci_dev *hdev,
-> 				  struct intel_offload_usecases *usecases);
-> int btintel_get_data_path(struct hci_dev *hdev);
-> +int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
-> +			  struct bt_codec *codec);
-> #else
+> #define CODING_FORMAT_CVSD		0x02
+> #define CODING_FORMAT_TRANSPARENT	0x03
+> +#define CODING_FORMAT_MSBC		0x05
 > 
-> static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-> @@ -325,4 +327,10 @@ static int btintel_get_data_path(struct hci_dev *hdev)
-> {
-> 	return -EOPNOTSUPP;
-> }
+> __printf(1, 2)
+> void bt_info(const char *fmt, ...);
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 9569b21adb88..73c134459361 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -328,6 +328,32 @@ bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle)
+> 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
+> 
+> 	switch (conn->codec.id) {
+> +	case CODING_FORMAT_MSBC:
+> +		if (!find_next_esco_param(conn, esco_param_msbc,
+> +					  ARRAY_SIZE(esco_param_msbc)))
+> +			return false;
 > +
-> +static int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
-> +				 struct bt_codec *codec)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> #endif
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 1e51beec5776..afafa44752a1 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3012,8 +3012,10 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
-> 	err = btintel_read_offload_usecases(hdev, &usecases);
-> 	if (!err) {
-> 		/* set get_data_path callback if offload is supported */
-> -		if (usecases.preset[0] & 0x03)
-> +		if (usecases.preset[0] & 0x03) {
-> 			hdev->get_data_path = btintel_get_data_path;
-> +			hdev->set_data_path = btintel_set_data_path;
-> +		}
-> 	}
+> +		param = &esco_param_msbc[conn->attempt - 1];
+> +		cp.tx_coding_format.id = 0x05;
+> +		cp.rx_coding_format.id = 0x05;
+> +		cp.tx_codec_frame_size = __cpu_to_le16(60);
+> +		cp.rx_codec_frame_size = __cpu_to_le16(60);
+> +		cp.in_bandwidth = __cpu_to_le32(32000);
+> +		cp.out_bandwidth = __cpu_to_le32(32000);
+> +		cp.in_coding_format.id = 0x04;
+> +		cp.out_coding_format.id = 0x04;
+> +		cp.in_coded_data_size = __cpu_to_le16(16);
+> +		cp.out_coded_data_size = __cpu_to_le16(16);
+> +		cp.in_pcm_data_format = 2;
+> +		cp.out_pcm_data_format = 2;
+> +		cp.in_pcm_sample_payload_msb_pos = 0;
+> +		cp.out_pcm_sample_payload_msb_pos = 0;
+> +		cp.in_data_path = conn->codec.data_path;
+> +		cp.out_data_path = conn->codec.data_path;
+> +		cp.in_trasnport_unit_size = 1;
+> +		cp.out_trasnport_unit_size = 1;
 
-> 	/* Read the Intel version information after loading the FW  */
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 31a5ac8918fc..42963188dcea 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1250,6 +1250,14 @@ struct hci_rp_read_local_oob_ext_data {
-> 	__u8     rand256[16];
-> } __packed;
-> 
-> +#define HCI_CONFIGURE_DATA_PATH	0x0c83
-> +struct hci_op_configure_data_path {
-> +	__u8	direction;
-> +	__u8	data_path_id;
-> +	__u8	len;
-> +	__u8	data[];
-> +} __packed;
-> +
+so s/trasnport/transport/
 
-if this is a standard HCI command, why is this done as hdev->set_data_path? This makes no sense too me.
+Please spellcheck your structs.
+
+> +		break;
+> +
+> 	case CODING_FORMAT_TRANSPARENT:
+> 		if (!find_next_esco_param(conn, esco_param_msbc,
+> 					  ARRAY_SIZE(esco_param_msbc)))
+> @@ -383,7 +409,6 @@ bool hci_enhanced_setup_sync(struct hci_conn *conn, __u16 handle)
+> 		cp.in_trasnport_unit_size = 16;
+> 		cp.out_trasnport_unit_size = 16;
+> 		break;
+> -
+
+We can not have these random hunks in patches. You need to review your final set before sending it out.
 
 Regards
 
