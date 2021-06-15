@@ -2,78 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FROM_LOCAL_DIGITS,FROM_LOCAL_HEX,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2621C48BDF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 11:25:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B49DC48BE5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 13:44:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9F3E6143D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 11:25:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E517761477
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 15 Jun 2021 13:44:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230120AbhFOL1D (ORCPT
+        id S231704AbhFONqg convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 15 Jun 2021 07:27:03 -0400
-Received: from m12-16.163.com ([220.181.12.16]:58699 "EHLO m12-16.163.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229939AbhFOL07 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 15 Jun 2021 07:26:59 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-        s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=B6k7i
-        nvKCT/Pz/OK8O9wGyXAn8lzcUGY7sIqYwEMwyw=; b=WY1pMQvx9gAjEo7kEXQFF
-        SrFBFF718IQhhQBFfWXEszuJwXmxO+AMrMdW6Ii8PWlC5nlEQyKpRqJ4YiHIQLlm
-        hVcyRjjqG03RqjExeD2vd3Xq/Ao8Vqp+YenUbb2IoI+G2kCpXOQQSY58sEfcRkOH
-        HLPumxYGhw63tn95zvj7/E=
-Received: from ubuntu.localdomain (unknown [112.37.241.255])
-        by smtp12 (Coremail) with SMTP id EMCowAA3ZkH9jchg_4XgxQ--.64545S2;
-        Tue, 15 Jun 2021 19:24:46 +0800 (CST)
-From:   13145886936@163.com
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, gushengxian <gushengxian@yulong.com>
-Subject: [PATCH] Bluetooth: Fix a spelling mistake
-Date:   Tue, 15 Jun 2021 19:24:43 +0800
-Message-Id: <20210615112443.13956-1-13145886936@163.com>
-X-Mailer: git-send-email 2.25.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID: EMCowAA3ZkH9jchg_4XgxQ--.64545S2
-X-Coremail-Antispam: 1Uf129KBjvdXoWrtFWxZryUWFW3AFy3WF1fCrg_yoWfCrbE9r
-        navanagr4UJryIy3WayFs7X347Kw1ruF1kJwsxWryjg34DGwsrG3s7Xrs5KF17Ww47Cr9x
-        Ars8J3Z5ur1IyjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IUnZjjDUUUUU==
-X-Originating-IP: [112.37.241.255]
-X-CM-SenderInfo: 5zrdx5xxdq6xppld0qqrwthudrp/1tbiXB6yg1Xlz+G0xQAAsc
+        Tue, 15 Jun 2021 09:46:36 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56593 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231140AbhFONqD (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 15 Jun 2021 09:46:03 -0400
+Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
+        by mail.holtmann.org (Postfix) with ESMTPSA id D9D5DCECF4;
+        Tue, 15 Jun 2021 15:51:55 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [PATCH] Bluetooth: Fix a spelling mistake
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210615112443.13956-1-13145886936@163.com>
+Date:   Tue, 15 Jun 2021 15:43:54 +0200
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        gushengxian <gushengxian@yulong.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <12122F14-688A-41B0-ABA7-90CC893005E8@holtmann.org>
+References: <20210615112443.13956-1-13145886936@163.com>
+To:     13145886936@163.com
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: gushengxian <gushengxian@yulong.com>
+Hi,
 
-Fix a spelling mistake.
+> Fix a spelling mistake.
+> 
+> Signed-off-by: gushengxian <gushengxian@yulong.com>
+> ---
+> net/bluetooth/hci_conn.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+> index 2b5059a56cda..e91ac6945ec3 100644
+> --- a/net/bluetooth/hci_conn.c
+> +++ b/net/bluetooth/hci_conn.c
+> @@ -760,7 +760,7 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+> 	/* If the status indicates successful cancellation of
+> 	 * the attempt (i.e. Unknown Connection Id) there's no point of
+> 	 * notifying failure since we'll go back to keep trying to
+> -	 * connect. The only exception is explicit connect requests
+> +	 * connect. The only exception is explicit connection requests
+> 	 * where a timeout + cancel does indicate an actual failure.
 
-Signed-off-by: gushengxian <gushengxian@yulong.com>
----
- net/bluetooth/hci_conn.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I am not even convinced this is a spelling mistake since according to the specification they are connect requests. Anyhow, I no considering patches without proper real name attached to it and send from a total vague email address.
 
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2b5059a56cda..e91ac6945ec3 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -760,7 +760,7 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
- 	/* If the status indicates successful cancellation of
- 	 * the attempt (i.e. Unknown Connection Id) there's no point of
- 	 * notifying failure since we'll go back to keep trying to
--	 * connect. The only exception is explicit connect requests
-+	 * connect. The only exception is explicit connection requests
- 	 * where a timeout + cancel does indicate an actual failure.
- 	 */
- 	if (status != HCI_ERROR_UNKNOWN_CONN_ID ||
--- 
-2.25.1
+Regards
 
+Marcel
 
