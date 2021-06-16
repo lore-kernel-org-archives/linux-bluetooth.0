@@ -2,191 +2,200 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	PDS_BAD_THREAD_QP_64,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4F32C48BE6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jun 2021 05:18:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 103DBC48BE8
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jun 2021 11:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5718961375
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jun 2021 05:18:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3ABB610A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 16 Jun 2021 11:22:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231176AbhFPFUh convert rfc822-to-8bit (ORCPT
+        id S230225AbhFPLYu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 16 Jun 2021 01:20:37 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:55491 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230336AbhFPFUd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 16 Jun 2021 01:20:33 -0400
-Received: from smtpclient.apple (p4fefc9d6.dip0.t-ipconnect.de [79.239.201.214])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 22EB2CED07;
-        Wed, 16 Jun 2021 07:26:28 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v9 07/10] Bluetooth: btintel: define callback to set data
- path
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <DM8PR11MB5573451838727540A14200D4F50F9@DM8PR11MB5573.namprd11.prod.outlook.com>
-Date:   Wed, 16 Jun 2021 07:18:26 +0200
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4D9B420C-BD66-4E74-81EB-F0090D575115@holtmann.org>
-References: <20210608122455.19583-1-kiran.k@intel.com>
- <20210608122455.19583-7-kiran.k@intel.com>
- <4C624839-10D3-4114-9037-4FB9E93E1EB6@holtmann.org>
- <DM8PR11MB5573451838727540A14200D4F50F9@DM8PR11MB5573.namprd11.prod.outlook.com>
-To:     "K, Kiran" <kiran.k@intel.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Wed, 16 Jun 2021 07:24:50 -0400
+Received: from mail-db8eur05on2099.outbound.protection.outlook.com ([40.107.20.99]:41440
+        "EHLO EUR05-DB8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229546AbhFPLYu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 16 Jun 2021 07:24:50 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Z3A4I+N/thnoK+SqQHzAWg1aEMnRLi6Ydu92xRWy5QbJ8ANrC4jEIcMnndvBwGfKwzkhx1ndKcvOxNorLjR/2qqOubmsCP1uKFIHJl/1wWVzUINSU3/VvwoHoMjRZxFXqvQeJFdeSfoYnX6mfVW3v+/JnwowP/uRF7VgBaK3o+FgUAiUMMZYegUJD48PouWU7t0dnR/FR+C0b3JN5jyGYAEvDiUCb4gIdijip+3UWi0J8ywdNt/A2AebvFlV2znJI0rL5Yy7Ttg+rT8JVvuUHvcBlXT0+KTIyKOzesN0sDk4UPCNcHOgYnQT2lruRy21XIM6dBX+oJ2+hrDTQ5s7XA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FAKIfsxyv/MSvSHQ0ihc5x5PaEPZzQe9MVi0UDiLolw=;
+ b=VPQtXket17+1MPb8cjxvKjR4gn+3dMzo8RHK+MEcVxrp7S0hD2rMqb/8W1KMP3ZVWA9MF/3ZDPDbR4ixBZJJPvRsWkNAsC+oRP04nbBV7XKsi6reba+21cgnSNle9XnnzbWVfNsh9dInYiv9u0kJfK/R7vhNSsHFrxceoiv7xwh6DI/sn1S+Fho59UMeYYMrcF3D2jU8APSVwueD6GWalMffqMay9toCKUs3o0/1uKeU7N+XeuvPHNarbkLy2veYhBYafVvHiCFLK6PLODYv/jWdXouv7lZYkZPJ8BzKp0anlsPinb8S2oiJOwXIiD5f6xY/TGuc4GVY5aJS+pEkfw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=surban.net; dmarc=pass action=none header.from=surban.net;
+ dkim=pass header.d=surban.net; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=surbannet.onmicrosoft.com; s=selector2-surbannet-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FAKIfsxyv/MSvSHQ0ihc5x5PaEPZzQe9MVi0UDiLolw=;
+ b=R2WjscJfdC5Ykh0eMNcxSGPwLe25zAgWk9DqUMSO3ao9yTgEsQclOnPtpLKhRjVRpNUvn8vd/sG88slZVsso+kWj6lvCxbIohan913+xlnkV9nSMthwkaWnS9GDxyQTR8LMr3/pBYMxvTc/2q9f4w9efsShN8ZR3Y3yTrxPz5tA=
+Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:30c::17)
+ by AM8P189MB1185.EURP189.PROD.OUTLOOK.COM (2603:10a6:20b:237::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4219.22; Wed, 16 Jun
+ 2021 11:22:42 +0000
+Received: from AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+ ([fe80::d9c0:8560:388:4ebf]) by AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+ ([fe80::d9c0:8560:388:4ebf%9]) with mapi id 15.20.4242.018; Wed, 16 Jun 2021
+ 11:22:42 +0000
+From:   Sebastian Urban <surban@surban.net>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Subject: RE: [BlueZ] gatt-client: Check length of notify multiple op
+Thread-Topic: [BlueZ] gatt-client: Check length of notify multiple op
+Thread-Index: AQHXXsDDtvdahQizY0iOmJt0Vv2EA6sWhh+w
+Date:   Wed, 16 Jun 2021 11:22:41 +0000
+Message-ID: <AM9P189MB17301A7C6ADE3457B06BA26DAB0F9@AM9P189MB1730.EURP189.PROD.OUTLOOK.COM>
+References: <20210611123021.21211-1-surban@surban.net>
+ <60c35cbf.1c69fb81.4ee39.fc1c@mx.google.com>
+In-Reply-To: <60c35cbf.1c69fb81.4ee39.fc1c@mx.google.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: vger.kernel.org; dkim=none (message not signed)
+ header.d=none;vger.kernel.org; dmarc=none action=none header.from=surban.net;
+x-originating-ip: [2a02:8106:216:3a01:45d3:a51f:f94e:2cee]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: e4a527c7-8234-418e-3bee-08d930b90e9d
+x-ms-traffictypediagnostic: AM8P189MB1185:
+x-microsoft-antispam-prvs: <AM8P189MB1185C292DCE5FC7688FE266FAB0F9@AM8P189MB1185.EURP189.PROD.OUTLOOK.COM>
+x-ms-oob-tlc-oobclassifiers: OLM:9508;
+x-ms-exchange-senderadcheck: 1
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 24F2NGNMwilXTVHK4pxcYlPjUS4zZqcapmIrlNI1HGXLWGNk+IAJmeZcja75U8by288Q/siCySzBENV5awBW9FGP1anr100GVWCIpM95dBZNH8ISA1aq4KfjjQFPxhJ6Mt66crgYaQWVDgaxnVoSfpRxW96zoYEt81Y2//SFiKojz5l+AR+JHy9vWI8q6V+6hfh7bKQC2jZKW1SUFz1KLs4LwGCtPaPlY+Ob5OEGi0jadzoMiSXb+8CTjna0WOBi1rq8bmRgCA/5BRFz/YKx5Uh5GZ8nkTjlVUEdLjL4hmuvpXky+EZEhMjq3DVyCP8EDKTuiqtNeWO6wDYFmwptf078GeMnfPAIGdPKv+OFPmgUfD45Hwa3cE0LxAmzgJ22KCtV0m11lMOn9EHuglHrCBLq82mU8S3/WTr7fxMTOZM6VN1uRXO5cv/obfKKLbudkUKT04jDWgiL/XRZVIk8AzRFx8nVuwVcCarnxfjaO3XsdC5CweN/Ywa67dU3Qn99VdixpFnPCygWrsBTntadGFHh0YAlWnz249J8Wrt+CJfmib8CK8oYjSO7OiudE7pHAVHLQyP/A2TLA9oR9n1mPvfWJy9wzG3v4Hpja3GUaMm2P6XSlI0YXSpbLaOXNDcTHWJzWXpIQGNrVX+SwDsp4EbaQKJJCIz05YL/k0N9ZSubrXCNYZY5oYW5l4NqTQt4f88ciY9RaadPMd6v3hXmLg==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9P189MB1730.EURP189.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(136003)(396003)(39830400003)(376002)(366004)(346002)(122000001)(53546011)(38100700002)(83380400001)(7696005)(8936002)(6506007)(86362001)(52536014)(6916009)(478600001)(5660300002)(55016002)(64756008)(33656002)(66556008)(316002)(66946007)(71200400001)(76116006)(2906002)(186003)(8676002)(66446008)(66476007)(9686003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?lAqzvGodhH3huvDXLLLQA25+O+wDxcee0yzm+6dIWo4Np9cIryHxsUXjvleC?=
+ =?us-ascii?Q?M/vN7wtNEnq0PyxQGVDDCc2OOsJ7EWiSNRcd/uYvoRg/HdCYFeld/DitfyJh?=
+ =?us-ascii?Q?wZ5+uqextB9DpZDWOsG4Eor7f5JCNnbcudAuUx3JmSc1eiK783OvBMc69jL7?=
+ =?us-ascii?Q?mChx6hKj+MP7bXzYRetGkk20SIsi5yyKV0i9jisoyMK2RQLwUWzEdpMU8yZE?=
+ =?us-ascii?Q?X5nZHFm6aAC8bYYrSKt7xFWZwQOL4vXwOKAtVALuMbHLQIreBfolceyvRWRp?=
+ =?us-ascii?Q?h8Pbg8G7o7wqqiv5RhOIuTTV+M+o853NFr7pq5p9dNGPS8MIqvCuNvrZpPgi?=
+ =?us-ascii?Q?sXO+TuXNotpvBsFC2vaZ6Kqmxg8XwNobvaBHtld0FinaAFPl5ma3UcinAvjG?=
+ =?us-ascii?Q?ISTx+LgjGRNFNlmRXeiPypR321JxSPpW1fUuBI6Nj7DkTLJa/b/Vatfn7ory?=
+ =?us-ascii?Q?qNPJcJeBQOfxrEORJz9gPs6kmgpDtdjOgkxJWPKFCz83SOsoSn8BwINmGD2W?=
+ =?us-ascii?Q?wec3JsfXnVela6oIQWjT7C0pc1TiBMJ/jGLDH+wCI2KIOQp/fqcsKxnqABO8?=
+ =?us-ascii?Q?gZcaBE9vEH/MQ1gOxfIvkF1gccKIw4jqrRh55sQeRtjRsSLEgNpr3O6PVLin?=
+ =?us-ascii?Q?lpH8t8qXc5toMM3Dj2sqZV/SRinrVllVH+a/sGBKk15uOGuKlRe6TV0FAw0H?=
+ =?us-ascii?Q?vVOAeY050Wy+vFsNLOhHjvuEVQ+N/azrQfzJUEWgefXxiHD6pladrXE+dpbj?=
+ =?us-ascii?Q?nYI7Fowv8EeQoemDgIkF7vdaSjVV1APNEuUvyLAcyElh3Z10S4RFZBqGhz6Q?=
+ =?us-ascii?Q?fdoVvoGht7B0jmr9WjZkEoErDougSQ96GJQqnQtDbcmj2XJ4xHVOwufve2F+?=
+ =?us-ascii?Q?LDTH1LXggnShrpq+dKF/f6IcyOqTWHsI8DB99h+cLY3DX8YusJipc79n2Phj?=
+ =?us-ascii?Q?1HzEEqPClISKUyrcIHqYDJuaA7Zm/GqDID9tcGLkm7QGYBMVeSCVxfPRqBuz?=
+ =?us-ascii?Q?UIB2TsaABb7WcS19Sy/mHj4H7ECLeK4CGdwdBGattMfwAJsdXG1StAQeong0?=
+ =?us-ascii?Q?2oTz7GyWTftOwPpYHHubQxn9ndAEiXG6N/I1kJ1mNzcvckQmGjEF1gOq7L44?=
+ =?us-ascii?Q?Uj1mthPqssyKb0/GjK9tY+oFpZEKrRaLkbgntQ7fM4LJtqNoMsAV2Z2VZJFS?=
+ =?us-ascii?Q?vemLwWGyiJ0gbUtF9EMlNAuK6XXX4h4Mhi/Wl0W03uO8QKi1A30OTkULfl/U?=
+ =?us-ascii?Q?1FgA6JNeSt5ikwC7PzRZ/I09cbl0sZc+yCDUkezIHXG5bPATZj+A8Gioydyo?=
+ =?us-ascii?Q?WQoWVNatLhclPA726A9uUOIYrKObLxIiaZnAcApZswKAs3dlsmjc08vGbqri?=
+ =?us-ascii?Q?SEU6MIc=3D?=
+x-ms-exchange-transport-forked: True
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: surban.net
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: AM9P189MB1730.EURP189.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-Network-Message-Id: e4a527c7-8234-418e-3bee-08d930b90e9d
+X-MS-Exchange-CrossTenant-originalarrivaltime: 16 Jun 2021 11:22:42.0002
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: a27af4ff-c4b3-4dec-be8d-845345d2ab67
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: O225K5Ny3rJqIsFUX++sULIKomSKQRgZiSM/+mcu59E7cva9g22MqzKXiZ7JUC5rVlSj2gbqs1QZoFGLmZ0sFg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM8P189MB1185
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+Hi Luiz,
 
->>> Adds callback function which is called to set the data path for HFP
->>> offload case before opening SCO connection
->>> 
->>> Signed-off-by: Kiran K <kiran.k@intel.com>
->>> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
->>> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
->>> ---
->>> drivers/bluetooth/btintel.c | 50
->> +++++++++++++++++++++++++++++++++++++
->>> drivers/bluetooth/btintel.h |  8 ++++++
->>> drivers/bluetooth/btusb.c   |  4 ++-
->>> include/net/bluetooth/hci.h |  8 ++++++
->>> 4 files changed, 69 insertions(+), 1 deletion(-)
->>> 
->>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
->>> index 95c6a1bef35e..3eba5c587ef6 100644
->>> --- a/drivers/bluetooth/btintel.c
->>> +++ b/drivers/bluetooth/btintel.c
->>> @@ -1308,6 +1308,56 @@ int btintel_read_offload_usecases(struct
->>> hci_dev *hdev, } EXPORT_SYMBOL_GPL(btintel_read_offload_usecases);
->>> 
->>> +int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
->>> +			  struct bt_codec *codec)
->>> +{
->>> +	__u8 preset;
->>> +	struct hci_op_configure_data_path *cmd;
->>> +	__u8 buffer[255];
->>> +	struct sk_buff *skb;
->>> +
->>> +	if (type != SCO_LINK && type != ESCO_LINK)
->>> +		return -EINVAL;
->>> +
->>> +	switch (codec->id) {
->>> +	case 0x02:
->>> +		preset = 0x00;
->>> +	break;
->>> +	case 0x05:
->>> +		preset = 0x01;
->>> +	break;
->>> +	default:
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	cmd = (void *)buffer;
->>> +	cmd->data_path_id = 0x01;
->>> +	cmd->len = 1;
->>> +	cmd->data[0] = preset;
->>> +
->>> +	cmd->direction = 0x00;
->>> +	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH,
->> sizeof(*cmd) + 1,
->>> +			     cmd, HCI_INIT_TIMEOUT);
->>> +	if (IS_ERR(skb)) {
->>> +		bt_dev_err(hdev, "configure input data path failed (%ld)",
->>> +			   PTR_ERR(skb));
->>> +		return PTR_ERR(skb);
->>> +	}
->>> +	kfree_skb(skb);
->>> +
->>> +	cmd->direction = 0x01;
->>> +	skb = __hci_cmd_sync(hdev, HCI_CONFIGURE_DATA_PATH,
->> sizeof(*cmd) + 1,
->>> +			     cmd, HCI_INIT_TIMEOUT);
->>> +	if (IS_ERR(skb)) {
->>> +		bt_dev_err(hdev, "configure output data path failed (%ld)",
->>> +			   PTR_ERR(skb));
->>> +		return PTR_ERR(skb);
->>> +	}
->>> +	kfree_skb(skb);
->>> +	return 0;
->>> +}
->>> +EXPORT_SYMBOL_GPL(btintel_set_data_path);
->>> +
->>> MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
->>> MODULE_DESCRIPTION("Bluetooth support for Intel devices ver "
->>> VERSION); MODULE_VERSION(VERSION); diff --git
->>> a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index
->>> 9bcc489680db..9806970c9871 100644
->>> --- a/drivers/bluetooth/btintel.h
->>> +++ b/drivers/bluetooth/btintel.h
->>> @@ -183,6 +183,8 @@ int btintel_set_debug_features(struct hci_dev
->>> *hdev, int btintel_read_offload_usecases(struct hci_dev *hdev,
->>> 				  struct intel_offload_usecases *usecases); int
->>> btintel_get_data_path(struct hci_dev *hdev);
->>> +int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
->>> +			  struct bt_codec *codec);
->>> #else
->>> 
->>> static inline int btintel_check_bdaddr(struct hci_dev *hdev) @@ -325,4
->>> +327,10 @@ static int btintel_get_data_path(struct hci_dev *hdev) {
->>> 	return -EOPNOTSUPP;
->>> }
->>> +
->>> +static int btintel_set_data_path(struct hci_dev *hdev, __u8 type,
->>> +				 struct bt_codec *codec)
->>> +{
->>> +	return -EOPNOTSUPP;
->>> +}
->>> #endif
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index 1e51beec5776..afafa44752a1 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -3012,8 +3012,10 @@ static int btusb_setup_intel_newgen(struct
->> hci_dev *hdev)
->>> 	err = btintel_read_offload_usecases(hdev, &usecases);
->>> 	if (!err) {
->>> 		/* set get_data_path callback if offload is supported */
->>> -		if (usecases.preset[0] & 0x03)
->>> +		if (usecases.preset[0] & 0x03) {
->>> 			hdev->get_data_path = btintel_get_data_path;
->>> +			hdev->set_data_path = btintel_set_data_path;
->>> +		}
->>> 	}
->> 
->>> 	/* Read the Intel version information after loading the FW  */ diff
->>> --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
->>> index 31a5ac8918fc..42963188dcea 100644
->>> --- a/include/net/bluetooth/hci.h
->>> +++ b/include/net/bluetooth/hci.h
->>> @@ -1250,6 +1250,14 @@ struct hci_rp_read_local_oob_ext_data {
->>> 	__u8     rand256[16];
->>> } __packed;
->>> 
->>> +#define HCI_CONFIGURE_DATA_PATH	0x0c83
->>> +struct hci_op_configure_data_path {
->>> +	__u8	direction;
->>> +	__u8	data_path_id;
->>> +	__u8	len;
->>> +	__u8	data[];
->>> +} __packed;
->>> +
->> 
->> if this is a standard HCI command, why is this done as hdev->set_data_path?
->> This makes no sense too me.
-> Intel uses  HCI_CONFIGURE_DATA_PATH to command to set the preset ID (NBS, WBS, ...). Here len and data[] are vendor specific. I should have prefixed these fields with vnd_. I will address this in next patchset.
+thanks for applying my other two patches.
 
-if the command is defined by the Bluetooth SIG, it is handle in the core. However if it needs vendor specific input that we need a callback for just that data.
+Has this one been missed or are there still changes required?
 
-Regards
+Sebastian
 
-Marcel
+> -----Original Message-----
+> From: bluez.test.bot@gmail.com <bluez.test.bot@gmail.com>
+> Sent: Friday, June 11, 2021 2:53 PM
+> To: linux-bluetooth@vger.kernel.org; Sebastian Urban <surban@surban.net>
+> Subject: RE: [BlueZ] gatt-client: Check length of notify multiple op
+>=20
+> This is automated email and please do not reply to this email!
+>=20
+> Dear submitter,
+>=20
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D498=
+859
+>=20
+> ---Test result---
+>=20
+> Test Summary:
+> CheckPatch                    PASS      0.62 seconds
+> GitLint                       PASS      0.14 seconds
+> Prep - Setup ELL              PASS      47.26 seconds
+> Build - Prep                  PASS      0.14 seconds
+> Build - Configure             PASS      8.36 seconds
+> Build - Make                  PASS      207.71 seconds
+> Make Check                    PASS      9.15 seconds
+> Make Distcheck                PASS      243.46 seconds
+> Build w/ext ELL - Configure   PASS      8.38 seconds
+> Build w/ext ELL - Make        PASS      195.76 seconds
+>=20
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>=20
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>=20
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>=20
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>=20
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>=20
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>=20
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>=20
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>=20
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>=20
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>=20
+>=20
+>=20
+> ---
+> Regards,
+> Linux Bluetooth
 
