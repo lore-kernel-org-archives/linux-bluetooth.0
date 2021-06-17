@@ -2,86 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B28DC2B9F4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jun 2021 13:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3DAD0C2B9F4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jun 2021 19:18:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6C95361185
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jun 2021 13:56:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CB9A613E1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 17 Jun 2021 19:18:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232817AbhFQN66 (ORCPT
+        id S232840AbhFQTUj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 17 Jun 2021 09:58:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56940 "EHLO
+        Thu, 17 Jun 2021 15:20:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44580 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230411AbhFQN65 (ORCPT
+        with ESMTP id S230484AbhFQTUh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 17 Jun 2021 09:58:57 -0400
-Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B50FBC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jun 2021 06:56:49 -0700 (PDT)
-Received: by mail-yb1-xb29.google.com with SMTP id c14so8372259ybk.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 17 Jun 2021 06:56:49 -0700 (PDT)
+        Thu, 17 Jun 2021 15:20:37 -0400
+Received: from mail-wm1-x332.google.com (mail-wm1-x332.google.com [IPv6:2a00:1450:4864:20::332])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1381C061574;
+        Thu, 17 Jun 2021 12:18:27 -0700 (PDT)
+Received: by mail-wm1-x332.google.com with SMTP id u5-20020a7bc0450000b02901480e40338bso5388286wmc.1;
+        Thu, 17 Jun 2021 12:18:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rMLOVBAQJl3F1mUyqdQMmm91i0oizXXZmct2m4tTtx0=;
-        b=sp5yfkP+3aHYOU02mBFl5OClvzbavynHAz7pVhUPX8jhzoZFzOOmWikIGUu0FUHJSq
-         cs2SmSpKMxmUvy20ZBe1pMxyKJnk/Qxu+0uK3s/YWBg/dEMNKeDsJIvYqsU4XlJLiXOC
-         Yt+vL1rzhdB2iJwIzwP5bCh85indXfze7bTLj6hzLEqUGq58Focl8+yJKxv/0EtzfPDW
-         jHeNIz3QtvTiYfWSlbUvD8rMVDwIKIs52bIKZd14sCp0CFfaweIAQ5libOAZLVNGXwNr
-         FW7X+MnP/Q9n0KQEFifRiEp5OOrSMjOqx20wxuTiHbMCJYgMoyxD/iRc3IIwQ0J7bbVP
-         Q8wA==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=G25iPlaj2HGTX4/c5/P02HpluiLJKUaToUtVn3p2XEU=;
+        b=oAmGXcFGyeOAMdXRXsgNwuJK8YrgMHMqNbf/jUmBfo09nMs4tNOfpzEwrFBQTuDEoB
+         2OzbF89eiKcCQFluqpTZxdF3MmLRxkP5tT9jr0JxSLb8jJJnzK/mrjzZGn5gPOf9Q3l5
+         ypeuuUO/xtF36cJ+0tEFgFZQjw6kpYcfIEaspKDuZjo4HUsvK8tKt8Dk3xJryAo40moS
+         sspmM+Q7d93o9rfmRBnA0BCM6NpsM9nofBLk5ompjot9iDYctYKXe9OYMpsDZO/7aJVn
+         RK184oyaH/a7qwsN/5Y9JRy7BXgpAdrPpTsuAABTpSEAyCUA1Iru7C3wieFEEGiLhoz6
+         lcNg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rMLOVBAQJl3F1mUyqdQMmm91i0oizXXZmct2m4tTtx0=;
-        b=CaiZgMjYxkFGOAnJnvvYVfFeus6iOW2eEWzsfW6BXO4CPzj1Mf5O4vy8U1lixZ/GGH
-         oa5WVSYI7A5DzgRlQbPs+FQ5TXpewoWScx6CZ5J6j7sOZDKrd9Q0aazFviwX9i4GNx9W
-         vipqhuTwSLyY7DiOoE9KGmuKm2rzN1vim/3AsowvxTi3EfWJf1k6n9cKX/7RAaDC2glN
-         NZkixekFXjVoGej8Qb/q1QsKkmzbgFNzaLMvAJWzL448LFk2kpPjybu/NtXiWiVZgKJ2
-         WMotKhpi/i9tWJ4sFpy0zx8Kmk3+QEnbrBfkUYwDSebl04SQ9Xm/IR5vetylYO7KyR0U
-         GSFw==
-X-Gm-Message-State: AOAM530IRECNMdH4YyxvVRPuMnk4bnQOvprePItxxYfFs4hwHYz69Rrf
-        kqTxPW74MRNVzfedBep2xaafpMscFN1frzrfX7osC+hbiy0G+A==
-X-Google-Smtp-Source: ABdhPJykjG+6cm1xm6nNHw/0JEp+DEme90io/n0hv1CJvZPH7he1FxM8hbJqWJJ7uXbcl7vVdRICRXZdzsm6JHJrR54=
-X-Received: by 2002:a25:d3c9:: with SMTP id e192mr7156478ybf.20.1623938209002;
- Thu, 17 Jun 2021 06:56:49 -0700 (PDT)
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=G25iPlaj2HGTX4/c5/P02HpluiLJKUaToUtVn3p2XEU=;
+        b=gbi4+TKxPkESInvfEQaW+25Inh/+qwKiKCbpriwtdZ4R3JUFbVgGImseYnni8JAT48
+         fSSXF7F86/IU27kQhq99EFc52cdse9Z57QIl/84RWf8Bpyjs7tn/JwIQzuZXrzicnLKj
+         e6txQKXOw+kqT52wAurLIcSPgnPuvj4c9wJtH8PYfbdAQ4oDq6626JbJIrVxXsf4lJPl
+         lXuiSnvDZPv/7C7Wh+IqNW+GYpFt0LDXv5Ly8b3cO0ZizcZuv/6aQ+3YO1qK0qVLJMuw
+         FzlIdJ7CdqFnz7lIc6c3Ywe8jxUaiSdnbX4ltOEoybOavlojhiVEyb55/1BFbLyrPJl3
+         erPw==
+X-Gm-Message-State: AOAM533fYVPR0vSUDdKYQXJ1AgRJ7lXcktmH2eg5JcOVjDwrZ+2fMHe7
+        PoqTwPnPKBr7HMDZ/6lMu9g=
+X-Google-Smtp-Source: ABdhPJxD+RhPQTQ8UkShaehTZ5CaMDskeoT8/i9aZqxMLyXGYQXYXEoCFr7uSbC5Mg7664IMHGb18w==
+X-Received: by 2002:a7b:cb03:: with SMTP id u3mr7174032wmj.119.1623957506595;
+        Thu, 17 Jun 2021 12:18:26 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159425-cmbg20-2-0-cust403.5-4.cable.virginm.net. [86.7.189.148])
+        by smtp.gmail.com with ESMTPSA id s5sm6779320wrn.38.2021.06.17.12.18.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 17 Jun 2021 12:18:25 -0700 (PDT)
+Subject: Re: [PATCH] Bluetooth: fix a grammar mistake
+To:     13145886936@163.com, davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, gushengxian <gushengxian@yulong.com>
+References: <20210616082524.10754-1-13145886936@163.com>
+From:   Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <0e895cfb-21f0-70da-540b-72d6b5d06d8b@gmail.com>
+Date:   Thu, 17 Jun 2021 20:18:24 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.5.0
 MIME-Version: 1.0
-References: <CA+rLJxX4=oLbSO-4RML7+WM6iwxTc50BDbOgNM2CcAsW4NK0Mg@mail.gmail.com>
-In-Reply-To: <CA+rLJxX4=oLbSO-4RML7+WM6iwxTc50BDbOgNM2CcAsW4NK0Mg@mail.gmail.com>
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Thu, 17 Jun 2021 14:56:38 +0100
-Message-ID: <CAAu3APZkSWXCB1GiRwbcEXVKOHwsqj5cYGARPRaQYETD5-uUPw@mail.gmail.com>
-Subject: Re: iOS Central with BlueZ Peripheral disconnect due to insufficient auth
-To:     Matt Hazley <lists@matthazley.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <20210616082524.10754-1-13145886936@163.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Matt,
+On 16/06/2021 09:25, 13145886936@163.com wrote:
+> From: gushengxian <gushengxian@yulong.com>
+> 
+> Fix a grammar mistake.
+> 
+> Signed-off-by: gushengxian <gushengxian@yulong.com>
+> ---
+>  net/bluetooth/hci_event.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 98ec486743ba..a33838a72f19 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -5780,7 +5780,7 @@ static void hci_le_remote_feat_complete_evt(struct hci_dev *hdev,
+>  			 * for unsupported remote feature gets returned.
+>  			 *
+>  			 * In this specific case, allow the connection to
+> -			 * transition into connected state and mark it as
+> +			 * transit into connected state and mark it as
 
-On Thu, 17 Jun 2021 at 09:43, Matt Hazley <lists@matthazley.com> wrote:
-> Does anyone know of a workaround that avoids a recompilation of BlueZ?
+Nack.  The original phrasing is correct; "transition" is the proper
+ technical term for a change of state in a state machine.
 
-You can start the Bluetooth daemon with the "-P" flag to remove the
-Battery plugin.
-
-Depending on your system, that means modifying the following file:
-
-/lib/systemd/system/bluetooth.service
-
-To read:
-
-ExecStart=/usr/lib/bluetooth/bluetoothd -P battery
-
-Cheers,
-Barry
+-ed
