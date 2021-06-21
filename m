@@ -2,173 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FD2AC4743C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jun 2021 18:25:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 634B3C4743C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jun 2021 22:31:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33A3A61042
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jun 2021 18:25:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37EF060FE9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 21 Jun 2021 22:31:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231390AbhFUS1Y (ORCPT
+        id S232087AbhFUWeC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 21 Jun 2021 14:27:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56010 "EHLO
+        Mon, 21 Jun 2021 18:34:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55160 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231194AbhFUS1X (ORCPT
+        with ESMTP id S231488AbhFUWeB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 21 Jun 2021 14:27:23 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D1FBC061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jun 2021 11:25:09 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id j184so32950578qkd.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jun 2021 11:25:09 -0700 (PDT)
+        Mon, 21 Jun 2021 18:34:01 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 585D0C061760
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jun 2021 15:31:46 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id q23so16931694ljh.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 21 Jun 2021 15:31:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5f/ax12MXeFVFbZu7aGsJGdBqm+HWHBYKwh4bMxbF/A=;
-        b=njciv8m3W2EN2xYwD65LZXqUA5MTqT6sWEIT/y+fCgJVxQaeGwyY38mEvdjW2nwW90
-         CjTA2NK+KxKlCoNyA4ovEfCK9o0oPoe02ZdtTqys7OfB3SdILL944J6lThZPj213xgMJ
-         VKYNYiSe0y30x7D0eNPVQusCKadYDlT8k8kTh5IFNphnSZKlFAfx5gsvHrTQQ89SEln3
-         QrkHcZ3Nah8FVsqj3wMhcKuI9OthfQWulUwrePE9q0kuvlljZ8rNnAeSU41KYHISxi5y
-         sc0/XvwWVeEHT6sDUQtbL+fjDkKZ/mU94XWP7SPO70AmIvRD5aFyXquoHr14PN4Nftcj
-         1FlA==
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qTXp9V2gmS/6O+YjuJWBHqGlLGOormIxmTXNND1OMs8=;
+        b=lai/1I7l4KC6OZXLITF8pOdxQsjd6lU25zB/FRzAon/Xz7Au42HePwMQ550WfPuc7p
+         R7pq17A87GvzCXfVQQRRnjfAgC5kz71kcb6rblgOxQCJRROIZRRJ4l8VbwqwhavOOcW4
+         cTx7T9k7VhUehbcrQZgbAJmuzcrcnmyFs8NbM5aVe/ycCouGwyeltnuWrcsKao79aZIT
+         gOut8cr5CK1MuImXyopuS8k4brXmHU1DbOWvmUqukzRGgiVq/VWT7HPjO6+Fl+Gcp1rs
+         6SapLXi94VG2/A7VnZw7ZiSdVF4aRA8nOjpTofWQqCVTMe0qfvlu1VsKEkHqpIHb9uJI
+         lIKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5f/ax12MXeFVFbZu7aGsJGdBqm+HWHBYKwh4bMxbF/A=;
-        b=UDtphfCIW2/Wf39z395QgueMFOqrXnvCbQEvzCkOa2QdGnz+xzHsY1gHxqzWXPB9FA
-         dMzi8CSIscfQC58mk1DYGfBdd8/I+tPa+JjuVQzg9KcgikxC/75lfKkqfKjRP0aIVFk8
-         nPyRocVs1iivcpllh3B29HPGgLTj2qEZV37G+rAOb7JlYiB3VrKRM2xMfQsLyrIH6CgU
-         3xCuozgsiv1yIXzjKJYqBCJ1//skoQS2ZKSh/TEdZQV1aOmQwLQGscQPjSR7oGExy7sI
-         3mppm0RDvh0vSAc/2Q/jeXEVi/zbXmMzFMWeoU7N1Xj1VE6eSkQ4VqZ8l5ROP5BOgM7T
-         7p6g==
-X-Gm-Message-State: AOAM531LrE/it9r7HjIAn76P3NWcLuhlwRmECgPDWkUxqVPtk0YaQCff
-        2o8/lUQUIZthWbGxiKLskBDv3OKzc3yviroVh+E=
-X-Google-Smtp-Source: ABdhPJx++Wq+cAH4dYuBvSePa2StZ5lQ+K+Sj1NqT4c5F9gRehHoYdB2jdIrgXw7ALmmT+3dBRkgG81WxQsDqdGys3U=
-X-Received: by 2002:a05:6902:102d:: with SMTP id x13mr36190249ybt.408.1624299908357;
- Mon, 21 Jun 2021 11:25:08 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210621182149.BlueZ.v2.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
- <20210621182149.BlueZ.v2.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
-In-Reply-To: <20210621182149.BlueZ.v2.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 21 Jun 2021 11:24:57 -0700
-Message-ID: <CABBYNZL3sWvzC9je7_MnuxftJyo9iUOshsXHBtaNAKgAar7XHA@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v2 3/3] adapter: set quality report feature
-To:     Joseph Hwang <josephsih@chromium.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qTXp9V2gmS/6O+YjuJWBHqGlLGOormIxmTXNND1OMs8=;
+        b=EsRli+P7W2fM6iSQtnHStlfTIdcOnhCxOE95Cmm0hvBZ4tPvVvvmSn3cXzZA+v+ztN
+         uDW0hjrIjFqn+K+PFGImlUTYta4C0+IMO89wisqmdosF101n7IgWpVrhXb/WPgCcVCeo
+         TX8x/4wHxLw4vTUdSH5yREnIEJwsh+wrYhNRkDGi3cyOt2mz6ATzHPgTt/KLhvu3kWaW
+         0VRlYtIiShCTgIPNEaWonA4jNp0LUPxXEH1bO4ZMv+j5vPqg4m/0oyE00YH8ZRKrlA0Q
+         aN6oG41Okfh7kOfJyMaursRXgtRNoq/3a1U14ccXo0Hn1HUwPyMrEavTDDdER6TLq9I8
+         1Pxw==
+X-Gm-Message-State: AOAM5330gCMqOqiBVL0lboxZynHLaA7LDHs38ZtxKBI0hU0qw26/6Z9x
+        UFzWrMSumkZ+LSz+oUMHOPjdCA==
+X-Google-Smtp-Source: ABdhPJx3Tm/JKfsPSaneIPp8NE+W6ZjNQe1NNfBaZHoOmMkmpX1TaXMONK6O/nQYB3zOFTKwsTpwhg==
+X-Received: by 2002:a2e:7103:: with SMTP id m3mr386188ljc.300.1624314704471;
+        Mon, 21 Jun 2021 15:31:44 -0700 (PDT)
+Received: from eriador.lan ([37.153.55.125])
+        by smtp.gmail.com with ESMTPSA id b10sm2516025ljf.72.2021.06.21.15.31.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 21 Jun 2021 15:31:44 -0700 (PDT)
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+To:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
-        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-        Joseph Hwang <josephsih@google.com>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-arm-msm@vger.kernel.org,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 0/7] Add support for Qualcomm QCA639x chips family
+Date:   Tue, 22 Jun 2021 01:31:34 +0300
+Message-Id: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
+X-Mailer: git-send-email 2.30.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Joseph,
+Qualcomm QCA639x is a family of WiFi + Bluetooth chips, with BT part
+being controlled through the UART and WiFi being present on PCIe
+bus. Both blocks use common power management unit wich should be turned
+on before either of devices can be probed. Add common 'qcom-qca6390'
+driver providing regulator to be used by both BT and PCIe parts.
 
-On Mon, Jun 21, 2021 at 3:23 AM Joseph Hwang <josephsih@chromium.org> wrote:
->
-> This patch adds the function to enable/disable the quality report
-> experimental feature in the controller through MGMT_OP_SET_EXP_FEATURE.
->
-> A user space process can enable/disable the quality report feature
-> by sending a property changed signal to the bluetoothd. The bluetoothd
-> can set up the signal handlers to handle the signal in a file under
-> plugins/ to call this function.
->
-> Note that the bluetoothd calls the experimental feature only when
-> the quality_report_supported flag is true.
->
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
->
-> (no changes since v1)
->
->  src/adapter.c | 36 ++++++++++++++++++++++++++++++++++++
->  src/adapter.h |  2 ++
->  2 files changed, 38 insertions(+)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index e2873de46..829d9806b 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -9332,6 +9332,42 @@ static const struct exp_feat {
->         EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
->  };
->
-> +/* A user space process can enable/disable the quality report feature
-> + * by sending a property changed signal to the bluetoothd. The bluetoothd
-> + * can set up the signal handlers in a file under plugins/ to call
-> + * this function.
-> + */
-> +void btd_adapter_update_kernel_quality_report(uint8_t action)
-> +{
-> +       struct mgmt_cp_set_exp_feature cp;
-> +       struct btd_adapter *adapter;
-> +
-> +       adapter = btd_adapter_get_default();
-> +       if (!adapter) {
-> +               info("No default adapter. Skip enabling quality report.");
-> +               return;
-> +       }
-> +
-> +       if (!adapter->quality_report_supported) {
-> +               info("quality report feature not supported.");
-> +               return;
-> +       }
-> +
-> +       memset(&cp, 0, sizeof(cp));
-> +       memcpy(cp.uuid, quality_report_uuid, 16);
-> +
-> +       cp.action = action;
-> +       if (cp.action > 1) {
-> +               error("Unexpected quality report action %u", cp.action);
-> +               return;
-> +       }
-> +
-> +       mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE, adapter->dev_id,
-> +                       sizeof(cp), &cp, NULL, NULL, NULL);
-> +       info("update kernel quality report default adapter %d enable %d",
-> +               adapter->dev_id, cp.action);
-> +}
-> +
->  static void read_exp_features_complete(uint8_t status, uint16_t length,
->                                         const void *param, void *user_data)
->  {
-> diff --git a/src/adapter.h b/src/adapter.h
-> index 60b5e3bcc..001f784e4 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -240,3 +240,5 @@ enum kernel_features {
->  };
->
->  bool btd_has_kernel_features(uint32_t feature);
-> +
-> +void btd_adapter_update_kernel_quality_report(uint8_t action);
+Changes since v2:
+ - Rebase on top of linux-next to get wcn6750 changes.
+ - Switch from misc device providing power domains into regulator code.
+ - Use vddpe-3v3-supply as expected by pcie-qcom driver.
+ - Use enable_gpio functionality in hci_qca driver.
 
-It doesn't seem this is being used anywhere, in the patch description
-it mentions a plugin is handling this via a signal but we could
-actually make the core do that directly, in fact having a plugin
-handling posix signals might be a bad idea. If this is something we
-don't need to change at runtime I would expect it to be configurable
-over main.conf, or are there legitimate reasons to not have the
-controller generating these events all the time?
+Changes since v1:
+ - Stopped using wildcard in the dts binding, stick to qcom,qca6390.
+ - Stopped using pcie0_phy for qca639x power domain.
+ - Describe root PCIe bridge in the dts and bind power domain to the
+   bridge.
+ - Add pci quirk to power up power domains connected to this bridge.
 
-> --
-> 2.32.0.288.g62a8d224e6-goog
->
+----------------------------------------------------------------
+Dmitry Baryshkov (7):
+      dt-bindings: regulator: qcom,qca6390: add binding for QCA6390 device
+      regulator: qca6390: add support for QCA639x powerup sequence
+      Bluetooth: hci_qca: provide default device data
+      Bluetooth: hci_qca: merge qca_power into qca_serdev
+      Bluetooth: hci_qca: merge wcn & non-wcn code paths
+      Bluetooth: hci_qca: add power sequencer support to qca6390
+      arm64: dts: qcom: qrb5165-rb5: add QCA6391 WiFi+BT SoC
+
+ .../bindings/regulator/qcom,qca6390.yaml           |  70 +++++++
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts           |  56 +++++
+ drivers/bluetooth/hci_qca.c                        | 225 ++++++++++-----------
+ drivers/regulator/Kconfig                          |  13 ++
+ drivers/regulator/Makefile                         |   1 +
+ drivers/regulator/qcom-qca639x.c                   | 157 ++++++++++++++
+ 6 files changed, 401 insertions(+), 121 deletions(-)
+ create mode 100644 Documentation/devicetree/bindings/regulator/qcom,qca6390.yaml
+ create mode 100644 drivers/regulator/qcom-qca639x.c
 
 
--- 
-Luiz Augusto von Dentz
+
