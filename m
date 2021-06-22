@@ -2,107 +2,242 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A506C49EA2
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jun 2021 17:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF79DC2B9F4
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jun 2021 18:12:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 259FE61353
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jun 2021 17:08:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C13AC61002
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 22 Jun 2021 18:12:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231656AbhFVRLD (ORCPT
+        id S232412AbhFVSOV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 22 Jun 2021 13:11:03 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37420 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230076AbhFVRLC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 22 Jun 2021 13:11:02 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6DA5A61360;
-        Tue, 22 Jun 2021 17:08:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1624381726;
-        bh=c8HGlAjch/gVhdi7JaBrw2jhwA9rmnpGC/Hcq+DPDdg=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=MqQktpEn56WA/G+vQRSUUQhb6eXMNQ9sMzwGcpbdNN67bMefV2mvku6nYqVArMaI4
-         2+zzqnRaWG/+lLqsZ+xaPje1lzJCrsy7EltBUyNgLfY5/+Rk8mtTGz52OvFCloayvr
-         sBTKGBR01iTgmPvp2J/2DLEkuv3LYWqD6P70XiLKWM6xJvON7h4Xf6SKdVlIFEVVDb
-         GMWWls/1dTTLCMEIMgxpGZ8BCyx5neqQdkhMBv27xf67+dqTVUZK2BFrQn4uOuUPKQ
-         G6sUSkEy46GqC5Pw3EJSgVc+cFBxRf4H7K3TmKs98AroQlrx/udari8FpOwucysh0x
-         8PJoVkziDTFOg==
-Date:   Tue, 22 Jun 2021 18:08:22 +0100
-From:   Mark Brown <broonie@kernel.org>
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "open list:DRM DRIVER FOR MSM ADRENO GPU" 
-        <linux-arm-msm@vger.kernel.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        "open list:OPEN FIRMWARE AND FLATTENED DEVICE TREE BINDINGS" 
-        <devicetree@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 2/7] regulator: qca6390: add support for QCA639x
- powerup sequence
-Message-ID: <20210622170822.GI4574@sirena.org.uk>
-References: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
- <20210621223141.1638189-3-dmitry.baryshkov@linaro.org>
- <20210622112843.GB4574@sirena.org.uk>
- <CAA8EJpoTdg3O6dzpTaNS5fJRbtb1Fndv0mEuO+e4b6XCmuvzhQ@mail.gmail.com>
- <20210622143812.GE4574@sirena.org.uk>
- <CAA8EJpoeYUOPLKca5oJNKdyOvOmoLX6FvsTbdmC7W9mLsyyVmw@mail.gmail.com>
+        Tue, 22 Jun 2021 14:14:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40822 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230146AbhFVSOU (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 22 Jun 2021 14:14:20 -0400
+Received: from mail-qk1-x732.google.com (mail-qk1-x732.google.com [IPv6:2607:f8b0:4864:20::732])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536D7C061574;
+        Tue, 22 Jun 2021 11:12:04 -0700 (PDT)
+Received: by mail-qk1-x732.google.com with SMTP id w21so28070908qkb.9;
+        Tue, 22 Jun 2021 11:12:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=D7xOfxClAE0XGbOXekOrajTdpVZp4p1VXYkVa1t3B64=;
+        b=vZ8sG9fDOsM73zD+H1ta/7t2hoE5UOWkVM8FXifxb76+smhhV/36Zwm5jDGM5rzStP
+         OoyG78WUSNA/+c+lrt/YNOn9H/iXbitZtXXXStqJ6ffPKti0g9/eSBvGO5OoruQwulyh
+         ftXF/K/vOjIw21rWOnudOOUPmaWP3rXdFsR072QmN1r8MFz91P6CjXpWBX+lnaJ7adZF
+         Opxmwr1WrQ26AMlSJSAbMNePY05Ouc/wgawzRzSupyMkRPXGlpcBgg12T2ZyyuL7/ADY
+         VL4L/9UFUyBRaPbU4ISKYAHNgpFo0u2SFtOvMUzUC/psPfA+1J+JOto330x54jtwFFzd
+         1eLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=D7xOfxClAE0XGbOXekOrajTdpVZp4p1VXYkVa1t3B64=;
+        b=JipaqeG+/nVQAjOEyXc2TQDx7sWK8K4eF+ztW1iLT6U2LYFxuovgvOolRELkXY2d+7
+         ifkz/Vi8X4GPu7zSWAOAqB+5tzSdjf4AmcdsBL9M5jtE2EwQxTUEOefv4VqixXdYWb9z
+         u+bWV+33yU88HBJHpEnzSklN1HXpe4g2BCVXU3BK7B8X9G5H2I4nKqcovf+8kDYRguhB
+         E1kSyMxCsgxfxYGUKthcm5gTtHycKHZkl3dzyockOhSdDSXdhrpHrpMpolDERDVceeWC
+         d81dGnZtS0V4MJ5RHBZfCyIJThGzpTJLXccb7n8P7CsZlS+7n/gy1UrRlXoK/6xXC0eR
+         MK2A==
+X-Gm-Message-State: AOAM531SmE1GI80m3QWPV+4RWXqvao3nFNTCnaOfYgL+RQlwsfo3/wEn
+        xYn0eNIUNnP1N4snCCKcO9ZZclEtskek9MNskqE=
+X-Google-Smtp-Source: ABdhPJw6DWrinBU9wBqF4Rm5zM5rAH8tIO23mJDWKIVMzO8ceQibpWy9TWuSPFepNxdeOmB9sDV58EiCKT/+iq7foj4=
+X-Received: by 2002:a05:6902:102d:: with SMTP id x13mr6842725ybt.408.1624385523386;
+ Tue, 22 Jun 2021 11:12:03 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-        protocol="application/pgp-signature"; boundary="k9xkV0rc9XGsukaG"
-Content-Disposition: inline
-In-Reply-To: <CAA8EJpoeYUOPLKca5oJNKdyOvOmoLX6FvsTbdmC7W9mLsyyVmw@mail.gmail.com>
-X-Cookie: fortune: not found
-User-Agent: Mutt/1.10.1 (2018-07-13)
+References: <CAJjojJvCv2aMWt_cjSC2eBNBDGwV2ottSApgmHdJmup6-+_k4w@mail.gmail.com>
+ <YKc6SloWBg5maJpU@kroah.com> <CAJjojJtvYeK4N7E8MZkF8YBbp-mvjzoeJgjb=6zQB6h-5tRkNg@mail.gmail.com>
+ <20210521090256.GA24442@kadam> <CAJjojJu6ZaAZOs1K=OsvA0=+ZNVATdT3YgbsqSzTYeFJFCgqzQ@mail.gmail.com>
+ <20210521150454.GD24442@kadam> <20210622103232.GL1901@kadam>
+In-Reply-To: <20210622103232.GL1901@kadam>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 22 Jun 2021 11:11:52 -0700
+Message-ID: <CABBYNZK0yHjKM1BtjLV=AVvXDoitnkh4TzYS76c89Xft8i9q0Q@mail.gmail.com>
+Subject: Re: OOB Read in hci_cc_read_local_name() cause information leak
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+Cc:     Lin Horse <kylin.formalin@gmail.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Greg KH <greg@kroah.com>, security@kernel.org,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Dan,
 
---k9xkV0rc9XGsukaG
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+On Tue, Jun 22, 2021 at 3:34 AM Dan Carpenter <dan.carpenter@oracle.com> wrote:
+>
+> Hi Luiz,
+>
+> I was looking through old bug reports that Lin Horse had reported and
+> was wondering when your patchset would be applied?
+>
+> https://lore.kernel.org/linux-bluetooth/20210419171257.3865181-1-luiz.dentz@gmail.com/
 
-On Tue, Jun 22, 2021 at 07:46:08PM +0300, Dmitry Baryshkov wrote:
-> On Tue, 22 Jun 2021 at 17:38, Mark Brown <broonie@kernel.org> wrote:
+This is on hold until I finish with the LL Privacy set, but yes we do
+intend to introduce such checks in the future, I just need to address
+some of Marcel's comments.
 
-> > Well, perhaps it should do one of those things then?
+> I really like the hci_skb_pull() function and I think that it should be
+> made into a top level function which all drivers can use.  It's like
+> skb_pull() but it returns the old skb->data instead of skb->data + len.
+> The skb_pull() still updates skb->data and skb->len.
+>
+> static void *skb_pull_data(struct sk_buff *skb, size_t len)
+> {
+>         void *data = skb->data;
+>
+>         if (skb->len < len)
+>                 return NULL;
+>
+>         skb_pull(skb, len);
+>
+>         return data;
+> }
 
-> I don't think so. BT part is just a serdev sitting on top of UART,
-> WiFi is PCIe device (for qca6390). So using MFD API (which primarily
-> targets platform devices) does not seem logical and feasible.
+Indeed that would be very convenient, I guess that should be added to
+skbuff.h perhaps as with a inline variant as skb_pull, but that is
+probably up for the net folks to decide.
 
-That really does sound like a MFD - AIUI it's a single chip with
-multiple interfaces that needs some glue logic to hold it together.  It
-doesn't fit well with the current framework that MFD offers but it's
-definitely the same sort of one chip in multiple Linux frameworks sort
-of thing.  The only other thing I can think might fit is handling it
-like a plug in module for a development board (eg, RPi hats) but we've
-not been doing so great at getting them supported upstream.
+> There is a lot of code that does "struct foo *p = (void *)skb->data;"
+> and that's hard to audit and error prone.  Changing it to:
+>
+>         p = skb_pull_data(skb, sizeof(*p));
+>         if (!p)
+>                 return;
+>
+> seems more clear and safe.
 
---k9xkV0rc9XGsukaG
-Content-Type: application/pgp-signature; name="signature.asc"
++1
 
------BEGIN PGP SIGNATURE-----
+Feel free to propose a patch introducing skb_pull_data, I would be
+happy to change my set to use it once I got back to it.
 
-iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmDSGQUACgkQJNaLcl1U
-h9BJwQf/S9os6LnqYb2q1/RMKcv1FwE6Jze9TX0xNc3AXqXxIIxK4VAQ4mhBf1ne
-7j63Gq/t3jtZ1lqGlXj0Tso7CjQgH/UxdqmhzBYRRwDmMKrL6Vr5ON3JvHjjjQoF
-N7k2CARqOEAAVMjLkhMWhTblaRuhfLjAe68vR0ZXTttY2ES8n2+Csa5AbEHvOxdl
-lHJsSz2C2ZR7nsl0KhmO17w0H3KcHxupzCbh6IqJllXZBy985FDCl8UllCYFL8hC
-nqSfXuTXfUNrWnaAlwWAIss69Et/PqtbuGFAUsP6U+OCRSMsQJ2QBAFQavwkHEip
-ooGQW6CJaf3Es4RU8JmTEMWiRhiaEw==
-=staA
------END PGP SIGNATURE-----
+> regards,
+> dan carpenter
+>
+> > net/bluetooth/hci_event.c:119 hci_cc_role_discovery() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:138 hci_cc_read_link_policy() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:157 hci_cc_write_link_policy() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:182 hci_cc_read_def_link_policy() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:246 hci_cc_read_stored_link_key() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:264 hci_cc_delete_stored_link_key() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:300 hci_cc_read_local_name() assignment assumes 'skb->len' is '249' bytes
+> > net/bluetooth/hci_event.c:423 hci_cc_read_class_of_dev() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:460 hci_cc_read_voice_setting() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:513 hci_cc_read_num_supported_iac() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:589 hci_cc_read_local_version() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:609 hci_cc_read_local_commands() assignment assumes 'skb->len' is '65' bytes
+> > net/bluetooth/hci_event.c:624 hci_cc_read_auth_payload_timeout() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:644 hci_cc_write_auth_payload_timeout() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:669 hci_cc_read_local_features() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:719 hci_cc_read_local_ext_features() assignment assumes 'skb->len' is '11' bytes
+> > net/bluetooth/hci_event.c:736 hci_cc_read_flow_control_mode() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:748 hci_cc_read_buffer_size() assignment assumes 'skb->len' is '8' bytes
+> > net/bluetooth/hci_event.c:774 hci_cc_read_bd_addr() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:791 hci_cc_read_local_pairing_opts() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:808 hci_cc_read_page_scan_activity() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:843 hci_cc_read_page_scan_type() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:873 hci_cc_read_data_block_size() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:892 hci_cc_read_clock() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:928 hci_cc_read_local_amp_info() assignment assumes 'skb->len' is '31' bytes
+> > net/bluetooth/hci_event.c:950 hci_cc_read_inq_rsp_tx_power() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:963 hci_cc_read_def_err_data_reporting() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:993 hci_cc_pin_code_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1021 hci_cc_pin_code_neg_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1037 hci_cc_le_read_buffer_size() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:1055 hci_cc_le_read_local_features() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:1068 hci_cc_le_read_adv_tx_power() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:1080 hci_cc_user_confirm_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1096 hci_cc_user_confirm_neg_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1111 hci_cc_user_passkey_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1127 hci_cc_user_passkey_neg_reply() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:1143 hci_cc_read_local_oob_data() assignment assumes 'skb->len' is '33' bytes
+> > net/bluetooth/hci_event.c:1151 hci_cc_read_local_oob_ext_data() assignment assumes 'skb->len' is '65' bytes
+> > net/bluetooth/hci_event.c:1230 hci_cc_le_read_transmit_power() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:1484 hci_cc_le_read_num_adv_sets() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:1498 hci_cc_le_read_white_list_size() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:1562 hci_cc_le_read_supported_states() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:1575 hci_cc_le_read_def_data_len() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:1660 hci_cc_le_read_resolv_list_size() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:1697 hci_cc_le_read_max_data_len() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:1765 hci_cc_set_ext_adv_param() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:1796 hci_cc_read_rssi() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:1816 hci_cc_read_tx_power() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:2607 hci_conn_complete_evt() assignment assumes 'skb->len' is '11' bytes
+> > net/bluetooth/hci_event.c:2731 hci_conn_request_evt() assignment assumes 'skb->len' is '10' bytes
+> > net/bluetooth/hci_event.c:2842 hci_disconn_complete_evt() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:2934 hci_auth_complete_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:3004 hci_remote_name_evt() assignment assumes 'skb->len' is '255' bytes
+> > net/bluetooth/hci_event.c:3087 hci_encrypt_change_evt() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:3202 hci_change_link_key_complete_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:3225 hci_remote_features_evt() assignment assumes 'skb->len' is '11' bytes
+> > net/bluetooth/hci_event.c:3293 hci_cmd_complete_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:3670 hci_cmd_status_evt() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:3776 hci_hardware_error_evt() assignment assumes 'skb->len' is '1' bytes
+> > net/bluetooth/hci_event.c:3785 hci_role_change_evt() assignment assumes 'skb->len' is '8' bytes
+> > net/bluetooth/hci_event.c:3807 hci_num_comp_pkts_evt() assignment assumes 'skb->len' is '1' bytes
+> > net/bluetooth/hci_event.c:3895 hci_num_comp_blocks_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:3946 hci_mode_change_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:3974 hci_pin_code_request_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:4044 hci_link_key_request_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:4104 hci_link_key_notify_evt() assignment assumes 'skb->len' is '23' bytes
+> > net/bluetooth/hci_event.c:4164 hci_clock_offset_evt() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:4187 hci_pkt_type_change_evt() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:4203 hci_pscan_rep_mode_evt() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:4293 hci_remote_ext_features_evt() assignment assumes 'skb->len' is '13' bytes
+> > net/bluetooth/hci_event.c:4357 hci_sync_conn_complete_evt() assignment assumes 'skb->len' is '17' bytes
+> > net/bluetooth/hci_event.c:4505 hci_key_refresh_complete_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:4614 hci_io_capa_request_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:4683 hci_io_capa_reply_evt() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:4704 hci_user_confirm_request_evt() assignment assumes 'skb->len' is '10' bytes
+> > net/bluetooth/hci_event.c:4789 hci_user_passkey_request_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:4800 hci_user_passkey_notify_evt() assignment assumes 'skb->len' is '10' bytes
+> > net/bluetooth/hci_event.c:4820 hci_keypress_notify_evt() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:4859 hci_simple_pair_complete_evt() assignment assumes 'skb->len' is '7' bytes
+> > net/bluetooth/hci_event.c:4890 hci_remote_host_features_evt() assignment assumes 'skb->len' is '14' bytes
+> > net/bluetooth/hci_event.c:4912 hci_remote_oob_data_request_evt() assignment assumes 'skb->len' is '6' bytes
+> > net/bluetooth/hci_event.c:4966 hci_chan_selected_evt() assignment assumes 'skb->len' is '1' bytes
+> > net/bluetooth/hci_event.c:4983 hci_phy_link_complete_evt() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:5023 hci_loglink_complete_evt() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:5063 hci_disconn_loglink_complete_evt() assignment assumes 'skb->len' is '4' bytes
+> > net/bluetooth/hci_event.c:5087 hci_disconn_phylink_complete_evt() assignment assumes 'skb->len' is '3' bytes
+> > net/bluetooth/hci_event.c:5271 hci_le_conn_complete_evt() assignment assumes 'skb->len' is '18' bytes
+> > net/bluetooth/hci_event.c:5285 hci_le_enh_conn_complete_evt() assignment assumes 'skb->len' is '30' bytes
+> > net/bluetooth/hci_event.c:5303 hci_le_ext_adv_term_evt() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:5332 hci_le_conn_update_complete_evt() assignment assumes 'skb->len' is '9' bytes
+> > net/bluetooth/hci_event.c:5749 hci_le_remote_feat_complete_evt() assignment assumes 'skb->len' is '11' bytes
+> > net/bluetooth/hci_event.c:5790 hci_le_ltk_request_evt() assignment assumes 'skb->len' is '12' bytes
+> > net/bluetooth/hci_event.c:5867 hci_le_remote_conn_param_req_evt() assignment assumes 'skb->len' is '10' bytes
+> > net/bluetooth/hci_event.c:5944 hci_le_phy_update_evt() assignment assumes 'skb->len' is '5' bytes
+> > net/bluetooth/hci_event.c:5967 hci_le_meta_evt() assignment assumes 'skb->len' is '1' bytes
+> > net/bluetooth/hci_event.c:6079 hci_store_wake_reason() assignment assumes 'skb->len' is '11' bytes
+> > net/bluetooth/hci_event.c:6080 hci_store_wake_reason() assignment assumes 'skb->len' is '10' bytes
+> > net/bluetooth/hci_event.c:6106 hci_store_wake_reason() assignment assumes 'skb->len' is '1' bytes
+> > net/bluetooth/hci_event.c:6144 hci_event_packet() assignment assumes 'skb->len' is '2' bytes
+> > net/bluetooth/hci_event.c:6157 hci_event_packet() assignment assumes 'hdev->sent_cmd->len' is '3' bytes
+> >
+> > Also these warnings are probably worth looking into:
+> >
+> > net/bluetooth/hci_event.c:3823 hci_num_comp_pkts_evt() warn: uncapped user loop: 'ev->num_hndl'
+> > net/bluetooth/hci_event.c:3912 hci_num_comp_blocks_evt() warn: uncapped user loop: 'ev->num_hndl'
+> > net/bluetooth/hci_event.c:5656 hci_le_adv_report_evt() warn: uncapped user loop: 'num_reports--'
+> > net/bluetooth/hci_event.c:5726 hci_le_ext_adv_report_evt() warn: uncapped user loop: 'num_reports--'
 
---k9xkV0rc9XGsukaG--
+
+
+-- 
+Luiz Augusto von Dentz
