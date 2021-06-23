@@ -2,118 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5897DC49EA5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jun 2021 22:35:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 451CDC48BC2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jun 2021 22:45:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3ED4D60698
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jun 2021 22:35:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 086836100A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 23 Jun 2021 22:45:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229755AbhFWWiD (ORCPT
+        id S229844AbhFWWsG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 23 Jun 2021 18:38:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56260 "EHLO
+        Wed, 23 Jun 2021 18:48:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229688AbhFWWiD (ORCPT
+        with ESMTP id S229726AbhFWWsF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 23 Jun 2021 18:38:03 -0400
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF81C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jun 2021 15:35:45 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id bm25so9576853qkb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jun 2021 15:35:45 -0700 (PDT)
+        Wed, 23 Jun 2021 18:48:05 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9A9C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jun 2021 15:45:46 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id 22-20020a17090a0c16b0290164a5354ad0so4702255pjs.2
+        for <linux-bluetooth@vger.kernel.org>; Wed, 23 Jun 2021 15:45:46 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yAYl+/1usO+36xFxopY4DIvTrqgPU1U0/I4g5j0JsS4=;
-        b=CCqIwiMsZswlTCyGNagFpf57FAvrW7Kv5j4CuxKggBXSg717sCmZ8DMThVbINzUhgh
-         ouTSwDWUXWtaLmoAzTL8mDpLGfGXv+QAyaU6SOjhx4zzRUnNClB8tscpa/NrTd0+gebr
-         nRvevO9bbkaa2f0vjyk6+AIv6ZJBU1ilJPo6Uc6ytUD+FlLVNBNNiEAFZJOg03R34Nzi
-         CtR7R0kGLfRquHzwY11+MkqRYRYbOa6IVENJAlhRTTZGxEzUGO5Iz2GmSevqoJfculFi
-         N4ACIJR6BgGystYJmOCVhmbbKrezS4EsBUFmyPk174gmadcp47083Q5mdZF7qAzjm6Kx
-         Wq0g==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SI7DNZLiE6FeiIIyxWw8tFnQ7FL+fZxSWhi94AaHhQ4=;
+        b=OUOb/eoOeMdE1DTE6CDdeKMqAH1nuocaHLqQ6PKdWq/xHovsc2vYz0O2OA31z93CJT
+         b1Ky6Yk8rzoUOrub0DXCa1nbKyGXh4Jp2C2ibejbCAmGzwGmRzGBqSh+I+JdI5hwmvKx
+         lWSfUGIbizDN3yYVcbfdOyEq03QGuv6cfz0KM5EbNOMFiUSiQCLfr+HtP57epphPFGWj
+         XWk2ua9CCaZTu63JV8ueGR68+8tls2R3hjOuKjcfJkaPHfo1bgPiYoy/COnELuYiSxon
+         7a4p78VHr0B+GcW8J7kqij5nMYwQVHjZqVuKy0tP6Uqn1hQ81jlwtKyxq92C0ovg+h4O
+         rzaw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yAYl+/1usO+36xFxopY4DIvTrqgPU1U0/I4g5j0JsS4=;
-        b=gVb46uk9osve1xNr49eWQnD3QcxT/Ia2uQG+v8rkuB0HeE1xSzcSmPvkqyp4YkeXIv
-         2GCOR8Pm1HkW7Kgx8wWXx+UEuY2PMmBfaBo1T8FvN+gWXz/YnnoeCq9O5F6iiOF7PMiV
-         B6mdO/jfvSDj/0cmci/Byfxv0ged8e+64jUBbanRuo3JppHUdVGVJ2wgQ+ffvaYowu2L
-         gN30JJFXTUOGL24IAiQMK4Zwudxz7h9+nYVnePmQINKu5DlluFJvqCVdIYNoAL2Jusvy
-         1D2tS6tKBmnyEI8ghVRCmxWebngKFk7CG82oNuKBto3CNDfTmdCkJ1KryLAz6xYIdHDp
-         7KJg==
-X-Gm-Message-State: AOAM530uoP00L/FGPTMJ2mqSXzCfg6xoKGPRdB2GaU+P/JhoqCC2+HyT
-        W6evXmx/c4UjqXk6rUxcJdle9IU+wS7hKBObzrk=
-X-Google-Smtp-Source: ABdhPJwOXnseXmmdZFk3orPw3y2QwDDudxaJM/euvTJ+iNZz99ZZQOlfsvsm35GwdT+JClUNgtGE9t4YwwSXVAofmqs=
-X-Received: by 2002:a25:acdf:: with SMTP id x31mr539339ybd.222.1624487744301;
- Wed, 23 Jun 2021 15:35:44 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210503131210.90066-1-benjamin@sipsolutions.net>
- <fe5e3c7519a52aa59e33939c64e9aa4b7c5e30c3.camel@hadess.net> <e2e0ef088416fdc37d240c2b7b3e348d8179db86.camel@hadess.net>
-In-Reply-To: <e2e0ef088416fdc37d240c2b7b3e348d8179db86.camel@hadess.net>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=SI7DNZLiE6FeiIIyxWw8tFnQ7FL+fZxSWhi94AaHhQ4=;
+        b=sVAFJPfay/ik7uyhIWaNfHVY2wCI4+STRiQlCSJwcy7bPz2lay1cTGED9V6HL0EHwR
+         BwLALUSrBKxjsR4ZgaKEz/9OGPtjPkAIWfaq+m31V1kh4z1uJZjKyy5w/8OwjSKt3Qxw
+         7Iu0vfHbZ6jIK/AbZ6HDVPhvCpKIzTx9BPLxlgAsjvjoAWPEH4Hu+BIl+0tAmU3MW0oo
+         umEehPuu+dlVlE5rNaiHtv3578+DLxfKYQ3f+AdkIG0gMPZH2VFQvSzMPLB157RtT0/N
+         gxWqppImhrF3xpcYCO2v/BzB0jhu5bVnYHlhXSy6RODARYunYLDP32LO2wKl+J4KmDL1
+         7P6g==
+X-Gm-Message-State: AOAM533OxPYERKT4kDJGFuUtDK4XshmMkNHvI7NgZ6+Ls7Qlvf+duM96
+        9i9xgrChKmXZvd4qwkCWdQy/qPnilGx6UQ==
+X-Google-Smtp-Source: ABdhPJzZTZ4ZyZhaU47CL1qw/OIswM0nZ2RmhcH7LIaoxaEt+BwjRiMt1CmHAuaVurbgODw3ka5wBQ==
+X-Received: by 2002:a17:90a:558c:: with SMTP id c12mr11670009pji.166.1624488345425;
+        Wed, 23 Jun 2021 15:45:45 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id c12sm744454pfo.177.2021.06.23.15.45.44
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 23 Jun 2021 15:45:45 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 23 Jun 2021 15:35:33 -0700
-Message-ID: <CABBYNZ+Sx0XZB=kp+GhEXZrOBr2g52N-JEp4Rbc3e_jTz6-cYA@mail.gmail.com>
-Subject: Re: [PATCH] rfkill: Fix reading from rfkill socket
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     Benjamin Berg <benjamin@sipsolutions.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Benjamin Berg <bberg@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] media: Fix UnregisterApplication
+Date:   Wed, 23 Jun 2021 15:45:39 -0700
+Message-Id: <20210623224539.3738085-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Jun 10, 2021 at 5:53 AM Bastien Nocera <hadess@hadess.net> wrote:
->
-> On Thu, 2021-06-10 at 14:45 +0200, Bastien Nocera wrote:
-> > On Mon, 2021-05-03 at 15:12 +0200, Benjamin Berg wrote:
-> > > From: Benjamin Berg <bberg@redhat.com>
-> > >
-> > > The kernel will always send exactly one event, but the size of the
-> > > passed struct will depend on the length of the submitted read() and
-> > > the
-> > > kernel version. i.e. the interface can be extended and we need to
-> > > expect
-> > > for a read to be longer than expected if we ask for it.
-> > >
-> > > Fix this by only requesting the needed length and explicitly check
-> > > the
-> > > length against the V1 version of the structure to make the code a bit
-> > > more future proof in case the internal copy of the struct is updated
-> > > to
-> > > contain new fields.
-> >
-> > This fixes a bug in GNOME where to enable Bluetooth, we removed a soft
-> > rfkill block on the Bluetooth interface.
-> >
-> > Without this, the bluetooth rfkill gets unblocked, but bluetoothd
-> > doesn't see it as unblocked so never powers it on, causing the UI to
-> > appear broken, as we expect Bluetooth devices to be either blocked
-> > through rfkill, or powered on.
-> >
-> > The equivalent gnome-settings-daemon fix (which deals with rfkill) was
-> > reviewed by Hans de Goede:
-> > https://gitlab.gnome.org/GNOME/gnome-settings-daemon/-/merge_requests/234
-> >
-> > Benjamin, it might be worth resending this with a better commit message
-> > explaining exactly what it fixes and referencing the gnome-bluetooth
-> > bug:
-> > https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/issues/38
->
-> >
-> It's also been pushed to Fedora rawhide and Fedora 34:
-> https://bodhi.fedoraproject.org/updates/FEDORA-2021-2cd83da751
+UnregisterApplication is not doing anything since the apps queue is
+never initialized which results in not finding any application when
+unregistering.
 
-I missed this one for some reason, it has been applied now.
+Fixes: https://github.com/bluez/bluez/issues/126
+---
+ profiles/audio/media.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
+diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+index c84bbe22d..267722542 100644
+--- a/profiles/audio/media.c
++++ b/profiles/audio/media.c
+@@ -2384,6 +2384,8 @@ static void path_free(void *data)
+ {
+ 	struct media_adapter *adapter = data;
+ 
++	queue_destroy(adapter->apps, app_free);
++
+ 	while (adapter->endpoints)
+ 		release_endpoint(adapter->endpoints->data);
+ 
+@@ -2402,6 +2404,7 @@ int media_register(struct btd_adapter *btd_adapter)
+ 
+ 	adapter = g_new0(struct media_adapter, 1);
+ 	adapter->btd_adapter = btd_adapter_ref(btd_adapter);
++	adapter->apps = queue_new();
+ 
+ 	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+ 					adapter_get_path(btd_adapter),
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
