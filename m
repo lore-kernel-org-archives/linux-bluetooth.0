@@ -2,148 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.9 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNPARSEABLE_RELAY autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A4C54C49EA5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jun 2021 22:36:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC875C49EA7
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jun 2021 15:00:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CEE561164
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 24 Jun 2021 22:36:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9234661864
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 25 Jun 2021 15:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232650AbhFXWin (ORCPT
+        id S231701AbhFYPCx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 24 Jun 2021 18:38:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42246 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229671AbhFXWim (ORCPT
+        Fri, 25 Jun 2021 11:02:53 -0400
+Received: from mx0a-00069f02.pphosted.com ([205.220.165.32]:17078 "EHLO
+        mx0a-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229653AbhFYPCw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 24 Jun 2021 18:38:42 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E6FC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jun 2021 15:36:20 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id a2so5935629pgi.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 24 Jun 2021 15:36:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Yrfs/rwcYEKFQR+gQyrCZCL/M7N/pwH4o4ysiBKUK5o=;
-        b=KEdHexWgzD/CXVhQ/W8kvg2XIio0Q1854np0remBGzKlzpKmESCFt96Jn3Sw3PNlcl
-         8yuXtBAnY8VmcRCXxT8R0xezsUwBVlQY+La+82q8dHLX8PiPna4GvdHr8QS8wQhmd5UY
-         s4t5WbvXTHDZ4Xq8hAWUHbklZdfAGYsDp8ljt/TQ9SoYZtmmqyCm9U8SuVdIwEOcqlfE
-         vUlDoKfU3kypAZjgMrQdrnqKT0lPpZdU7DRTuJFXjw8xILcmYE5SVwUO8O7oY51/EoVz
-         A3HCddFip6WdbKnGhn9vLxOJ7N7Bj6yt27TMcuZGV72qAU2F3fhLmaQH2rvp2RuVACcL
-         EZ3g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Yrfs/rwcYEKFQR+gQyrCZCL/M7N/pwH4o4ysiBKUK5o=;
-        b=U2pAIChFMlqvsfZ7DviQ211fDnX2iVSTFHzG1HTsGrvL15nBGdadlXPuvWU92YFQ7S
-         m2Fl3tUjkkwzmv10FzGF6tAOdDCjIEvj2/podIZckdf12vBg5XZzYEbN/9VU0GwY+BCG
-         /pFvfnNvvVG8sBql1j6CLq7UDiydhYzuKDAfD7+qBMSYS/4RjmjM9tSdbI4yy+tB8gp1
-         nBN9P7Z7+pHRCU8IWWCqb6pqTeMn00JRz61HTojt+f1G505YcAqH/WJ3KeNfQh4FxBvj
-         B/Xkzj+vt9eBtBWClWP3M5/uyF9j/oxMLGTF7T9KsB1PhVNzoUdM1M0BbxIw5QxKreDO
-         B9mw==
-X-Gm-Message-State: AOAM531lDO1zBExVsCsfu0+HVGIQejNXH9kHRd3ff936//4o/grGwamp
-        z2UCknokyASclv1RTzkXBPQpeoii5U0=
-X-Google-Smtp-Source: ABdhPJyefeRkWibzLG5U6ygoUiWXS4EYdmJt1avz6V4f46xK9BlY49fMpnGhn4W2hSyfB90GatQ1/Q==
-X-Received: by 2002:aa7:8681:0:b029:304:3432:ba2a with SMTP id d1-20020aa786810000b02903043432ba2amr7352369pfo.40.1624574179869;
-        Thu, 24 Jun 2021 15:36:19 -0700 (PDT)
-Received: from [172.17.0.2] ([20.94.207.217])
-        by smtp.gmail.com with ESMTPSA id x5sm3703662pff.37.2021.06.24.15.36.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 24 Jun 2021 15:36:19 -0700 (PDT)
-Message-ID: <60d508e3.1c69fb81.879fc.b632@mx.google.com>
-Date:   Thu, 24 Jun 2021 15:36:19 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8014642022621290984=="
+        Fri, 25 Jun 2021 11:02:52 -0400
+Received: from pps.filterd (m0246627.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 15PEunDr028653;
+        Fri, 25 Jun 2021 15:00:24 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : mime-version : content-type; s=corp-2020-01-29;
+ bh=R3UUkLIxm/AmMV3IJTJTXNwAbhgOyICacczkE14XPLg=;
+ b=stvEjRtLt+e+OfddZWLc6TaLgoZdQu13bEAoknNrYDcobYqzTXk3URcUcosIRttQsbrA
+ /EnYZ0UXH+pQJTIjW5+cZgeP4r1oB6CkAqtgn0RqulOFIaG1sdbcN3/L5QU27WGawDyH
+ oJBfFgNPzs5ynHswCgGBl9AHuigQe0udS6UU07aF40MbrXnanh44/atHnyayf7SJtwaY
+ AgT0yiwEAmW+wqfoc4AsvDK4hHp+rSmny4Pec1kh5oNb3WKLl2vAViDgy15bL5Fc9ZRE
+ LrOZZyDnhh4Z26ismo1JXv3wrtKv32BSWNsiLC58J1aMfpSGKeBSBm1LjEZvkpYJjnUA ug== 
+Received: from userp3030.oracle.com (userp3030.oracle.com [156.151.31.80])
+        by mx0b-00069f02.pphosted.com with ESMTP id 39d27esjkj-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Jun 2021 15:00:24 +0000
+Received: from pps.filterd (userp3030.oracle.com [127.0.0.1])
+        by userp3030.oracle.com (8.16.0.42/8.16.0.42) with SMTP id 15PEtNo6019143;
+        Fri, 25 Jun 2021 15:00:22 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+        by userp3030.oracle.com with ESMTP id 39d23y7d84-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Jun 2021 15:00:22 +0000
+Received: from userp3030.oracle.com (userp3030.oracle.com [127.0.0.1])
+        by pps.reinject (8.16.0.36/8.16.0.36) with SMTP id 15PEwP8o031787;
+        Fri, 25 Jun 2021 15:00:22 GMT
+Received: from aserv0122.oracle.com (aserv0122.oracle.com [141.146.126.236])
+        by userp3030.oracle.com with ESMTP id 39d23y7d5v-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Fri, 25 Jun 2021 15:00:22 +0000
+Received: from abhmp0018.oracle.com (abhmp0018.oracle.com [141.146.116.24])
+        by aserv0122.oracle.com (8.14.4/8.14.4) with ESMTP id 15PF0Gjh027858;
+        Fri, 25 Jun 2021 15:00:16 GMT
+Received: from mwanda (/102.222.70.252)
+        by default (Oracle Beehive Gateway v4.0)
+        with ESMTP ; Fri, 25 Jun 2021 08:00:16 -0700
+Date:   Fri, 25 Jun 2021 18:00:09 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        =?iso-8859-1?Q?Fr=E9d=E9ric?= Dalleau 
+        <frederic.dalleau@linux.intel.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+        linux-bluetooth@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: [PATCH] Bluetooth: sco: prevent information leak in
+ sco_conn_defer_accept()
+Message-ID: <YNXveZZwzS3crmHH@mwanda>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] adapter: Fix toggling of experimental features
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210624220844.3920039-1-luiz.dentz@gmail.com>
-References: <20210624220844.3920039-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mailer: git-send-email haha only kidding
+X-Proofpoint-GUID: e15vRjHMF6J31MkXcwjM9L_eBo_jMSUG
+X-Proofpoint-ORIG-GUID: e15vRjHMF6J31MkXcwjM9L_eBo_jMSUG
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8014642022621290984==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Smatch complains that some of these struct members are not initialized
+leading to a stack information disclosure:
 
-This is automated email and please do not reply to this email!
+    net/bluetooth/sco.c:778 sco_conn_defer_accept() warn:
+    check that 'cp.retrans_effort' doesn't leak information
 
-Dear submitter,
+This seems like a valid warning.  I've added a default case to fix
+this issue.  It's sort of unusual to have case SCO_AIRMODE_CVSD,
+followed by a default case but I think it's nicely readable.  :)
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=506771
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.41 seconds
-GitLint                       PASS      0.11 seconds
-Prep - Setup ELL              PASS      43.31 seconds
-Build - Prep                  PASS      0.14 seconds
-Build - Configure             PASS      7.61 seconds
-Build - Make                  PASS      188.57 seconds
-Make Check                    PASS      8.56 seconds
-Make Distcheck                PASS      222.79 seconds
-Build w/ext ELL - Configure   PASS      7.66 seconds
-Build w/ext ELL - Make        PASS      177.18 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Fixes: 2f69a82acf6f ("Bluetooth: Use voice setting in deferred SCO connection request")
+Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/sco.c | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index d9a4e88dacbb..e2ee00fea64b 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -770,6 +770,7 @@ static void sco_conn_defer_accept(struct hci_conn *conn, u16 setting)
+ 			cp.retrans_effort = 0x02;
+ 			break;
+ 		case SCO_AIRMODE_CVSD:
++		default:
+ 			cp.max_latency = cpu_to_le16(0xffff);
+ 			cp.retrans_effort = 0xff;
+ 			break;
+-- 
+2.30.2
 
---===============8014642022621290984==--
