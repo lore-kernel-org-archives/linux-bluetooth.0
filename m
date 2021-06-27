@@ -2,186 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15666C49EA5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jun 2021 18:57:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDFDC48BC2
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Jun 2021 13:12:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4D4061C40
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 26 Jun 2021 18:57:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 29484619C5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 27 Jun 2021 13:12:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230151AbhFZS61 (ORCPT
+        id S230236AbhF0NOn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 26 Jun 2021 14:58:27 -0400
-Received: from mga01.intel.com ([192.55.52.88]:24096 "EHLO mga01.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230107AbhFZS61 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 26 Jun 2021 14:58:27 -0400
-IronPort-SDR: 2+Mn6qz6j6ghkh8rcodAo0DCE8wvwgASq4IhGtWph6STIdvZ2dbSz+f6CCAVIKQGdAaQjLFsS+
- mfGSKUpo7Wag==
-X-IronPort-AV: E=McAfee;i="6200,9189,10027"; a="229409290"
-X-IronPort-AV: E=Sophos;i="5.83,302,1616482800"; 
-   d="scan'208";a="229409290"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2021 11:56:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.83,302,1616482800"; 
-   d="scan'208";a="455793882"
-Received: from lkp-server01.sh.intel.com (HELO 4aae0cb4f5b5) ([10.239.97.150])
-  by fmsmga008.fm.intel.com with ESMTP; 26 Jun 2021 11:56:03 -0700
-Received: from kbuild by 4aae0cb4f5b5 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1lxDTG-0007qj-S1; Sat, 26 Jun 2021 18:56:02 +0000
-Date:   Sun, 27 Jun 2021 02:55:28 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 1f0536139cb8e8175ca034e12706b86f77f9061e
-Message-ID: <60d77820.n75F8mnwLUL/9aZK%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+        Sun, 27 Jun 2021 09:14:43 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:57553 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229817AbhF0NOm (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 27 Jun 2021 09:14:42 -0400
+Received: from fsav115.sakura.ne.jp (fsav115.sakura.ne.jp [27.133.134.242])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 15RDBh50091179;
+        Sun, 27 Jun 2021 22:11:43 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav115.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp);
+ Sun, 27 Jun 2021 22:11:43 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav115.sakura.ne.jp)
+Received: from localhost.localdomain (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 15RDBcTs091155
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+        Sun, 27 Jun 2021 22:11:43 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Lin Ma <linma@zju.edu.cn>,
+        netdev@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] Bluetooth: call lock_sock() outside of spinlock section
+Date:   Sun, 27 Jun 2021 22:11:34 +0900
+Message-Id: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
+X-Mailer: git-send-email 2.18.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 1f0536139cb8e8175ca034e12706b86f77f9061e  Bluetooth: hci_uart: Remove redundant assignment to fw_ptr
+syzbot is hitting might_sleep() warning at hci_sock_dev_event() due to
+calling lock_sock() with rw spinlock held [1]. Defer calling lock_sock()
+via sock_hold().
 
-elapsed time: 725m
-
-configs tested: 117
-configs skipped: 2
-
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-powerpc                         ps3_defconfig
-powerpc                      mgcoge_defconfig
-sh                        sh7785lcr_defconfig
-sh                           se7721_defconfig
-sh                        edosk7705_defconfig
-m68k                        mvme16x_defconfig
-riscv                            allyesconfig
-arm                           omap1_defconfig
-arm                         axm55xx_defconfig
-powerpc                 mpc834x_itx_defconfig
-ia64                                defconfig
-sh                             espt_defconfig
-microblaze                      mmu_defconfig
-arm                          pxa3xx_defconfig
-arm                          moxart_defconfig
-arm                           u8500_defconfig
-arm                         palmz72_defconfig
-powerpc                 mpc834x_mds_defconfig
-arm                         s3c6400_defconfig
-mips                      pic32mzda_defconfig
-arc                            hsdk_defconfig
-powerpc                mpc7448_hpc2_defconfig
-powerpc                     tqm8560_defconfig
-arc                     nsimosci_hs_defconfig
-powerpc                     pq2fads_defconfig
-arm                         vf610m4_defconfig
-m68k                            mac_defconfig
-ia64                            zx1_defconfig
-arm                        trizeps4_defconfig
-powerpc                    socrates_defconfig
-powerpc                          g5_defconfig
-powerpc                        fsp2_defconfig
-sparc64                             defconfig
-sparc                       sparc32_defconfig
-sh                          rsk7201_defconfig
-arm                             pxa_defconfig
-m68k                         amcore_defconfig
-sh                           sh2007_defconfig
-arm                           viper_defconfig
-x86_64                            allnoconfig
-ia64                             allmodconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a002-20210625
-x86_64               randconfig-a001-20210625
-x86_64               randconfig-a005-20210625
-x86_64               randconfig-a003-20210625
-x86_64               randconfig-a004-20210625
-x86_64               randconfig-a006-20210625
-i386                 randconfig-a002-20210625
-i386                 randconfig-a001-20210625
-i386                 randconfig-a003-20210625
-i386                 randconfig-a006-20210625
-i386                 randconfig-a005-20210625
-i386                 randconfig-a004-20210625
-x86_64               randconfig-a012-20210622
-x86_64               randconfig-a016-20210622
-x86_64               randconfig-a015-20210622
-x86_64               randconfig-a014-20210622
-x86_64               randconfig-a013-20210622
-x86_64               randconfig-a011-20210622
-i386                 randconfig-a011-20210625
-i386                 randconfig-a014-20210625
-i386                 randconfig-a013-20210625
-i386                 randconfig-a015-20210625
-i386                 randconfig-a012-20210625
-i386                 randconfig-a016-20210625
-riscv                    nommu_k210_defconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-um                            kunit_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                      rhel-8.3-kbuiltin
-x86_64                                  kexec
-
-clang tested configs:
-x86_64               randconfig-b001-20210622
-x86_64               randconfig-b001-20210625
-
+Link: https://syzkaller.appspot.com/bug?extid=a5df189917e79d5e59c9 [1]
+Reported-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Tested-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
+Fixes: e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF of hdev object")
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ net/bluetooth/hci_sock.c | 24 ++++++++++++++++++++++--
+ 1 file changed, 22 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index eed0dd066e12..64e54ab0892f 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -759,19 +759,39 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 	if (event == HCI_DEV_UNREG) {
+ 		struct sock *sk;
+ 
++restart:
+ 		/* Detach sockets from device */
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, &hci_sk_list.head) {
++			/* hci_sk_list.lock is preventing hci_sock_release()
++			 * from calling bt_sock_unlink().
++			 */
++			if (hci_pi(sk)->hdev != hdev || sk_unhashed(sk))
++				continue;
++			/* Take a ref because we can't call lock_sock() with
++			 * hci_sk_list.lock held.
++			 */
++			sock_hold(sk);
++			read_unlock(&hci_sk_list.lock);
+ 			lock_sock(sk);
+-			if (hci_pi(sk)->hdev == hdev) {
++			/* Since hci_sock_release() might have already called
++			 * bt_sock_unlink() while waiting for lock_sock(),
++			 * use sk_hashed(sk) for checking that bt_sock_unlink()
++			 * is not yet called.
++			 */
++			if (sk_hashed(sk) && hci_pi(sk)->hdev == hdev) {
+ 				hci_pi(sk)->hdev = NULL;
+ 				sk->sk_err = EPIPE;
+ 				sk->sk_state = BT_OPEN;
+ 				sk->sk_state_change(sk);
+-
+ 				hci_dev_put(hdev);
+ 			}
+ 			release_sock(sk);
++			sock_put(sk);
++			/* Restarting is safe, for hci_pi(sk)->hdev is now NULL
++			 * if condition met and will "continue;" otherwise.
++			 */
++			goto restart;
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
+ 	}
+-- 
+2.18.4
+
