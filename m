@@ -2,148 +2,201 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8040BC49EA7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 04:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71229C49EAB
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 07:50:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5C98561C2F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 04:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5856A61AC0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 07:50:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbhF1EFz (ORCPT
+        id S232359AbhF1Hwm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 00:05:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37830 "EHLO
+        Mon, 28 Jun 2021 03:52:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229802AbhF1EFy (ORCPT
+        with ESMTP id S232351AbhF1Hwi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 00:05:54 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5490C061766
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Jun 2021 21:02:01 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id y29so24615631qky.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 27 Jun 2021 21:02:01 -0700 (PDT)
+        Mon, 28 Jun 2021 03:52:38 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9657CC061574;
+        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id c8so13424189pfp.5;
+        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=JRD2UMa8feOMRx3hhzF2mlskp3Kik/kxZufkZpqt2vc=;
-        b=NNfnjKaJcTlNQahIjnNEq6e1WGk+1LYA34NYOjt7cFxTASF+f5qZVMLbbmb+5HkSz/
-         M3k1MeQb06KQSTfBaHQiCvgg8+4Olk3B84afSYYnScUmyxI22MTm/eaaOemwlGOpBSiQ
-         CL8CtkF3L1eW+eOmNFPmLUAMj5M4J+61WIlSd9MpMV51nY/+tHEtVnBrIVcLMgVcuD4O
-         L3rV/HvMbM+AnRy3wADP7TGt625S9kG9NC8A3u6E1iPirc5GuHaRds139GDXLE6GyEVw
-         gJVjzyBAKl6Lel5NSSeDHPRYypUJ+RiaxG41zs7q5xWwfnLQr4gtqQfFhRZL+6FUP/zH
-         N45g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=a9SnhaSC0KGtJA4jbcNzI1RmFExj/PoChJSbMbViqHo=;
+        b=SlBZfW/vVWkuCoPhugNlcjB4fJuggEiyWrFbzXOSBp0G7zrKUI/R531RyHgcoG8efT
+         xMZRK6yAyqGWqh6LYzljI4DeFQA6oX0HXvbVZiflZqrioI0gcIFrYOmwvNwC+87d4SbO
+         NJBa4WTI/IOXtT7RPXxYE5OfokS/CmNnGGm8fCay/OWPwkl7L3GQ27x0aeMElR28679S
+         jmhnHhLXd6cdg+2kzk9jbWHc4Djt1aagDnGCpDyux6srGhw/DsjbElHyZkCzY1B+UOMK
+         prjZCWbYlh6BlTl6D0YBgmoYDCpNn/zSsUvf9ifiRhd2nQzDTtjAjpJRJVd6DAU21lzH
+         QC1g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=JRD2UMa8feOMRx3hhzF2mlskp3Kik/kxZufkZpqt2vc=;
-        b=ChIJO3NMJzfxJEiig6Gt7R3uaEzucJvV1BnXCZRx+dDVmew2xnIy46gS/qcRtR1ky1
-         wYATTASe4b7hb4v8SEzL1ok/HF8AmdLZKbpAjO1azx2utLrHU0+xNskC43jBXntJv4nY
-         IQPIkkF9NlycZWqUKB7j5LQScjk4ALRCyLTbf0M1cpPbDoYEzK3cvBwyWBoxKyp4pdzN
-         V1YDyevh4nlOjAX6PfRT4J6BiHCW8eXYhC7qIZRLNfozhhQXUE54uksDu2aJ1CDrre/s
-         Qj+cT5wjuceNGWJRS1EmNrTqHsYaIS8g3l21aoOpHJjiW16EMGW73l9Dqbqhu8boPxJI
-         ja5w==
-X-Gm-Message-State: AOAM532DJ/IYP7Xik9r1affMFEXqhRH5iLfKqCc38e+FEkbs9b+MH8yy
-        1xOofQ7dZ5fwsRb1FjWaQBQQiitrubI=
-X-Google-Smtp-Source: ABdhPJyVyv1r7ve/4DO+cQb3D7mLdwCk7hZSAL2dtdNxrFMkMzsn6MxWPyuFx70HoIyHxOL4pcgkpg==
-X-Received: by 2002:a37:c40c:: with SMTP id d12mr17918825qki.392.1624852920601;
-        Sun, 27 Jun 2021 21:02:00 -0700 (PDT)
-Received: from [172.17.0.2] ([20.98.224.243])
-        by smtp.gmail.com with ESMTPSA id p64sm3422534qka.114.2021.06.27.21.02.00
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=a9SnhaSC0KGtJA4jbcNzI1RmFExj/PoChJSbMbViqHo=;
+        b=pIsiLEP/7dSkozWCBaxSz2VxR1szpukwInDRZSPLfce8XC/IqDup4dYuI7SC8LNfPF
+         E0Z7CmgQgRTF9v6n4zH6Ri8kssH6xdyAYSxzFJJYOYQU6BVU9zgMqxNW43A1Mhk/Y6A5
+         DT36NFZdsNfVUbaYWWxW/7XP6ZU2LESS5rf60KKuPx3EYA1CetGepAvjt88+bNyDqELV
+         jOeZFZrvQeFwL8wSUOdywYVBytxefM4iVSZ14Ae8vAuPAoWER/6+l0kp8qdbmHrV2xAD
+         /BxzQmGFKixJHIPwFmpXjgfZbIPunT24keVPKj97h/H1efxVubPfF8OFvETaC/8T3qru
+         mUWQ==
+X-Gm-Message-State: AOAM531P96fqLelzBjNX3xzat4OgecncH1w0s1IRKhO3Xx4gya1HkEHT
+        /aZ9YBcsSk6ulnFRA+Ze92Q=
+X-Google-Smtp-Source: ABdhPJzmLptl5YBBhs4A80NLCSgl3oM4vlhA0HLGNblaK7RuNiVK3F/VD3Cb07Y/TvBgBZzt9AUuaw==
+X-Received: by 2002:a65:6555:: with SMTP id a21mr5312004pgw.53.1624866613181;
+        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
+Received: from localhost.localdomain ([118.200.190.93])
+        by smtp.gmail.com with ESMTPSA id c24sm14519028pgj.11.2021.06.28.00.50.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 27 Jun 2021 21:02:00 -0700 (PDT)
-Message-ID: <60d949b8.1c69fb81.7de68.0d09@mx.google.com>
-Date:   Sun, 27 Jun 2021 21:02:00 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8264779283083004144=="
+        Mon, 28 Jun 2021 00:50:12 -0700 (PDT)
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
+        gregkh@linuxfoundation.org,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
+Subject: [PATCH] Bluetooth: fix inconsistent lock state in sco
+Date:   Mon, 28 Jun 2021 15:48:34 +0800
+Message-Id: <20210628074834.161640-1-desmondcheongzx@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v2] src/adv_monitor: Remove checking in device lost timeout
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210628113535.Bluez.v2.1.I5dc587c2fe4bf2e49927513cd711d353510c12fc@changeid>
-References: <20210628113535.Bluez.v2.1.I5dc587c2fe4bf2e49927513cd711d353510c12fc@changeid>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8264779283083004144==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Syzbot reported an inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock
+usage in sco_conn_del and sco_sock_timeout that could lead to
+deadlocks:
+https://syzkaller.appspot.com/bug?id=9089d89de0502e120f234ca0fc8a703f7368b31e
 
-This is automated email and please do not reply to this email!
+This inconsistent lock state can also happen between sco_conn_ready
+and sco_sock_timeout.
 
-Dear submitter,
+The issue is that these three functions take a spin lock on the
+socket, but sco_sock_timeout is called from an IRQ context. Since
+bh_lock_sock calls spin_lock but does not disable softirqs, this could
+lead to deadlocks:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=507773
+       CPU0
+       ----
+  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+  <Interrupt>
+    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
 
----Test result---
+ *** DEADLOCK ***
 
-Test Summary:
-CheckPatch                    PASS      0.69 seconds
-GitLint                       PASS      0.14 seconds
-Prep - Setup ELL              PASS      47.87 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.22 seconds
-Build - Make                  PASS      204.47 seconds
-Make Check                    PASS      9.06 seconds
-Make Distcheck                PASS      241.25 seconds
-Build w/ext ELL - Configure   PASS      8.28 seconds
-Build w/ext ELL - Make        PASS      192.03 seconds
+We fix this by replacing bh_lock_sock with spin_lock_bh in
+sco_conn_del and sco_conn_ready.
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Additionally, to avoid regressions, we pull the clean-up code out from
+sco_chan_del and use it directly in sco_conn_del. This is necessary
+because sco_chan_del makes a call to sco_conn_lock which takes an
+SOFTIRQ-unsafe lock. This means that calling sco_chan_del while
+holding the socket lock would result in a SOFTIRQ-safe ->
+SOFTIRQ-unsafe lock hierarchy between slock-AF_BLUETOOTH-BTPROTO_SCO
+and &conn->lock#2. This could lead to a deadlock as well:
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
+        CPU0                    CPU1
+        ----                    ----
+   lock(&conn->lock#2);
+                                local_irq_disable();
+                                lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+                                lock(&conn->lock#2);
+   <Interrupt>
+     lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
 
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
+  *** DEADLOCK ***
 
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
+Pulling out the code from sco_chan_del allows us to avoid this lock
+dependency by holding the two locks for only their required critical
+sections.
 
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Reported-and-tested-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
+Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/sco.c | 28 ++++++++++++++++++++--------
+ 1 file changed, 20 insertions(+), 8 deletions(-)
 
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 3bd41563f118..d05629d7cc55 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -173,10 +173,22 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+ 
+ 	if (sk) {
+ 		sock_hold(sk);
+-		bh_lock_sock(sk);
++
++		spin_lock_bh(&sk->sk_lock.slock);
+ 		sco_sock_clear_timer(sk);
+-		sco_chan_del(sk, err);
+-		bh_unlock_sock(sk);
++		sco_pi(sk)->conn = NULL;
++		if (conn->hcon)
++			hci_conn_drop(conn->hcon);
++		sk->sk_state = BT_CLOSED;
++		sk->sk_err   = err;
++		sk->sk_state_change(sk);
++		sock_set_flag(sk, SOCK_ZAPPED);
++		spin_unlock_bh(&sk->sk_lock.slock);
++
++		sco_conn_lock(conn);
++		conn->sk = NULL;
++		sco_conn_unlock(conn);
++
+ 		sco_sock_kill(sk);
+ 		sock_put(sk);
+ 	}
+@@ -1084,10 +1096,10 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 
+ 	if (sk) {
+ 		sco_sock_clear_timer(sk);
+-		bh_lock_sock(sk);
++		spin_lock_bh(&sk->sk_lock.slock);
+ 		sk->sk_state = BT_CONNECTED;
+ 		sk->sk_state_change(sk);
+-		bh_unlock_sock(sk);
++		spin_unlock_bh(&sk->sk_lock.slock);
+ 	} else {
+ 		sco_conn_lock(conn);
+ 
+@@ -1102,12 +1114,12 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 			return;
+ 		}
+ 
+-		bh_lock_sock(parent);
++		spin_lock_bh(&parent->sk_lock.slock);
+ 
+ 		sk = sco_sock_alloc(sock_net(parent), NULL,
+ 				    BTPROTO_SCO, GFP_ATOMIC, 0);
+ 		if (!sk) {
+-			bh_unlock_sock(parent);
++			spin_unlock_bh(&parent->sk_lock.slock);
+ 			sco_conn_unlock(conn);
+ 			return;
+ 		}
+@@ -1128,7 +1140,7 @@ static void sco_conn_ready(struct sco_conn *conn)
+ 		/* Wake up parent */
+ 		parent->sk_data_ready(parent);
+ 
+-		bh_unlock_sock(parent);
++		spin_unlock_bh(&parent->sk_lock.slock);
+ 
+ 		sco_conn_unlock(conn);
+ 	}
+-- 
+2.25.1
 
---===============8264779283083004144==--
