@@ -2,254 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,INCLUDES_PULL_REQUEST,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80E24C2B9F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:15:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 246ABC11F64
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:33:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6454061C43
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:15:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F233661C65
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:33:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233791AbhF1RSX (ORCPT
+        id S233430AbhF1Rfj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 13:18:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
+        Mon, 28 Jun 2021 13:35:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232457AbhF1RSW (ORCPT
+        with ESMTP id S232498AbhF1Rfi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 13:18:22 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B9CBC061574;
-        Mon, 28 Jun 2021 10:15:56 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id s137so7065087pfc.4;
-        Mon, 28 Jun 2021 10:15:56 -0700 (PDT)
+        Mon, 28 Jun 2021 13:35:38 -0400
+Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4094AC061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:33:11 -0700 (PDT)
+Received: by mail-yb1-xb31.google.com with SMTP id i4so19799582ybe.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:33:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5jCtC/EjTSl+56yWCJS4Wg9H7Wt739bW+3WIEc2Lniw=;
-        b=BScQVeca7jPeNYveuJIhaPZAmqOGOQn99TvagA2kvuNm7hCPnwzDx+Yv5Mkv/tBG81
-         tPB0RJP6pkH3CA1DmNREc4zVAJ4W4LaHTq2djDy7Fb/diy6+q1jH24R0VkkW+wZFp2Vk
-         XMdNFZOw4uZozJ4NUag8hiG19fKk0/pBw/jme6iWJ4rv06q1dAfT/rhZLL8A25RhjGwC
-         zwbFq9ZVfYFfp6y0hNfpz4MMLBLynS6eVPj5Rp4cSxpvWNp+28cYxcc1SfUkefqTWZgQ
-         ztaqlKgvXwNU4Lo1VGp513pyp2goDOtXAh8CEgLPph3vC08q2EdZjTGFOwWk8nL7Lvtl
-         hwsg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=GM9jsAlrYg2SRXzVRGphJEsMstnF14zXR2P0IoS3Uks=;
+        b=p3ym1tBTILjcSZnia9PTd6/WGxLoqoJl6mMZD/Lpr6/tavfzVfgPuG2xh8MStopgdr
+         pOi2GGBx3sVZkXbXFw1WhS1uC0HXZBmyghLVCV6QLIm/VEd4orQYqeTMfAUK7PN1VTYK
+         v0Zni7hqR+fQHywe9ev0jEQF+IGiwTWmFWxGEEfoPxGWJXUzveSaVAqDICGDD0VrPvq8
+         ZavRAuwN9/Z7o3TFHHAyPMNwha7ngF/HCFUIA5JMqJyccU5l4mIFLDOvPn7UgHyyEHbo
+         S/lUNHNKgNIdoy4w5KRa2SdwbXLJ4BsuvFC+hoi2PdDT7IdPhW9khzUPRdeP2VnacCG9
+         Zsiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=5jCtC/EjTSl+56yWCJS4Wg9H7Wt739bW+3WIEc2Lniw=;
-        b=CB/jJka542YXj6ByOQdBfNT2UTiodWo2jTBNvzn1Ru3DCvrue6ISyQosJZ6CGyLrcQ
-         TjvKCllP58Xf1H/iz6o4dildg/x+hCVByrfex5HJtMPOzmnhaKOnVwJbEKiOvUDJsyt8
-         aFfRe1dz7bCKP91lfEmYJXSJSwXnCz9e+coB3oGCu2/p5asJ/zNc7HVLfktHzZLnTuAn
-         75341o3y8gAJuVeJHrt+DX3l+S8DriUXau+Xz6dbctm6fOC1UAgxRBx29Q7uXeCD+bBG
-         qBi1QuWJ5pegJXOS3lgczXDzYsRmgdffTADyBgy4Q873M5+uXapoNH+rd2IdDDqIrJ8+
-         pPeg==
-X-Gm-Message-State: AOAM532r3OVQaQbEulI6ytSiwdr8DWmK8S1XYrVz+xF0vW+kWg72pDjC
-        PdQlDUvU83walWYR3iblodU=
-X-Google-Smtp-Source: ABdhPJyR1zXY/2/WMkoUYkanHCbbJb0INcn2SWEvKX3tFPJNNI3kj4LcVEoI2Vi2HZ3z6W8s3STk1w==
-X-Received: by 2002:aa7:8605:0:b029:30a:30f:af5e with SMTP id p5-20020aa786050000b029030a030faf5emr15681828pfn.19.1624900555619;
-        Mon, 28 Jun 2021 10:15:55 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p45sm15605651pfw.19.2021.06.28.10.15.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jun 2021 10:15:55 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth-next 2021-06-28
-Date:   Mon, 28 Jun 2021 10:15:52 -0700
-Message-Id: <20210628171552.313547-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=GM9jsAlrYg2SRXzVRGphJEsMstnF14zXR2P0IoS3Uks=;
+        b=tjaahFDODUJE30iUK5KBUnEnwZ4BxTeJNPCvHX//UJBjAf/bNKSTx56/HtVsQEaL/L
+         txtjyzKJhxUQrkblzXCBHwznVvDanvqPRznbXatu7o7zEJIXbEJR4XV4aa/8HW648sxh
+         9FDMHpiny4ATHXlN1mh4xb7OCxsTKbT4xvYTK9PDYvDv+i8MmMwYkPvmFoFE537wp9cM
+         TnaxiUf77MGkJpqo1ftXMLcxrD0fL/Ke0nD4B4CDf8U2C2LxdbAESUGeSnHEix8juf0T
+         EBeptmXHkJkRj8PGzXgFKqhqaMV7hpKzlf9gL5rzooggJKdMLA1uD9cYBkht/Ku1/WsB
+         Dndg==
+X-Gm-Message-State: AOAM530tclBbwhIp3IYK0R/rF1QhalgFPbcMMq/n31T5YKCBy5t46Nk2
+        QjytJ2wyewHBVIAvvwqw98gnQFi/najnalkNFn6+Vv3bZV0=
+X-Google-Smtp-Source: ABdhPJxHwc5Kh5d6T8znMpfflqEIa+fp4R+FTLREYE/vGY/w1v2/GUneqFTq8T7boo4CaeiHPNWxrRPoXIByYLjgXtI=
+X-Received: by 2002:a25:be02:: with SMTP id h2mr33507037ybk.91.1624901590426;
+ Mon, 28 Jun 2021 10:33:10 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210623184355.3685859-1-luiz.dentz@gmail.com> <363a48e3df83590ad4f53383830ca447c71939d7.camel@hadess.net>
+In-Reply-To: <363a48e3df83590ad4f53383830ca447c71939d7.camel@hadess.net>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 28 Jun 2021 10:32:59 -0700
+Message-ID: <CABBYNZKaWn_6FEX8YOmDX5bDo6pe5yERDs1X+=76yH4X3sH0hw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] doc/agent-api: Add AuthenticationFailed method
+To:     Bastien Nocera <hadess@hadess.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit ff8744b5eb116fdf9b80a6ff774393afac7325bd:
+Hi Bastien,
 
-  Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue (2021-06-25 11:59:11 -0700)
+On Mon, Jun 28, 2021 at 7:59 AM Bastien Nocera <hadess@hadess.net> wrote:
+>
+> On Wed, 2021-06-23 at 11:43 -0700, Luiz Augusto von Dentz wrote:
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > This introduces AuthenticationFailed method which is used to indicate
+> > when there was an authentication failure with a remote device which is
+> > recommended by the core spec:
+> >
+> > BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1314:
+> >  '5.2.2.3 Simple Pairing after authentication failure
+> >  When the link key is stored, subsequent connections to the same device
+> >  will use authentication but this may fail if the remote device has
+> >  deleted the link key. Table 5.2 defines what shall be done depending
+> >  on the type of the link key and whether bonding was performed or not.'
+> >
+> > So following Table 5.2 recommendation the AuthenticationFailed method
+> > would be called when authentication fails with a bonded device.
+> > ---
+> >  doc/agent-api.txt | 5 +++++
+> >  1 file changed, 5 insertions(+)
+> >
+> > diff --git a/doc/agent-api.txt b/doc/agent-api.txt
+> > index 0d9347cab..91d752b0a 100644
+> > --- a/doc/agent-api.txt
+> > +++ b/doc/agent-api.txt
+> > @@ -183,3 +183,8 @@ Methods             void Release()
+> >
+> >                         This method gets called to indicate that the
+> > agent
+> >                         request failed before a reply was returned.
+> > +
+> > +               void AuthenticationFailed(object device, byte status)
+> > +
+> > +                       This method indicates that there was an
+> > authentication
+> > +                       failure with a remote device.
+>
+> Is there a way that we could have some persistent storage for when the
+> last authentication error happened?
+>
+> This would allow showing a /!\ icon in the device list even though we
+> don't have an agent running in the session, just when the settings are
+> open, in GNOME.
 
-are available in the Git repository at:
+I guess you are suggesting introducing a property to the device object
+e.g. AuthenticationStatus or something like that, that way one can
+figure out if the device needs repairing or not. Alternatively we
+could just remove the device, after a few attempts, if there is no
+agent of the agent don't implement the new method.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-06-28
+> This would also allow the settings to get this information in the first
+> place, otherwise we'd need to have some side-channel to funnel that
+> information from the "desktop-wide" agent to the settings agent.
+>
+> I've made the upstream bug[1] public now, can you reference it in the
+> commit message?
 
-for you to fetch changes up to 1f0536139cb8e8175ca034e12706b86f77f9061e:
+Sure.
 
-  Bluetooth: hci_uart: Remove redundant assignment to fw_ptr (2021-06-26 07:52:41 +0200)
+> Cheers
+>
+> [1]: https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/issues/91
+>
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
 
- - Add support for QCA_ROME device (0cf3:e500) and RTL8822CE
- - Update management interface revision to 21
- - Use of incluse language
- - Proper handling of HCI_LE_Advertising_Set_Terminated event
- - Recovery handing of HCI ncmd=0
- - Various memory fixes
-
-----------------------------------------------------------------
-Archie Pusaka (9):
-      Bluetooth: hci_h5: Add RTL8822CS capabilities
-      Bluetooth: use inclusive language in hci_core.h
-      Bluetooth: use inclusive language to describe CPB
-      Bluetooth: use inclusive language in HCI LE features
-      Bluetooth: use inclusive language in SMP
-      Bluetooth: use inclusive language in comments
-      Bluetooth: use inclusive language in HCI role comments
-      Bluetooth: use inclusive language when tracking connections
-      Bluetooth: use inclusive language when filtering devices
-
-Colin Ian King (2):
-      Bluetooth: virtio_bt: add missing null pointer check on alloc_skb call return
-      Bluetooth: btmrvl: remove redundant continue statement
-
-Connor Abbott (1):
-      Bluetooth: btqca: Don't modify firmware contents in-place
-
-Daniel Lenski (1):
-      Bluetooth: btusb: Add a new QCA_ROME device (0cf3:e500)
-
-Hilda Wu (1):
-      Bluetooth: btusb: Add support USB ALT 3 for WBS
-
-Jiapeng Chong (1):
-      Bluetooth: 6lowpan: remove unused function
-
-Joakim Tjernlund (2):
-      Bluetooth: btusb: Add 0x0b05:0x190e Realtek 8761BU (ASUS BT500) device.
-      Bluetooth: btrtl: rename USB fw for RTL8761
-
-Kai Ye (11):
-      Bluetooth: 6lowpan: delete unneeded variable initialization
-      Bluetooth: bnep: Use the correct print format
-      Bluetooth: cmtp: Use the correct print format
-      Bluetooth: hidp: Use the correct print format
-      Bluetooth: 6lowpan: Use the correct print format
-      Bluetooth: a2mp: Use the correct print format
-      Bluetooth: amp: Use the correct print format
-      Bluetooth: mgmt: Use the correct print format
-      Bluetooth: msft: Use the correct print format
-      Bluetooth: sco: Use the correct print format
-      Bluetooth: smp: Use the correct print format
-
-Kai-Heng Feng (1):
-      Bluetooth: Shutdown controller after workqueues are flushed or cancelled
-
-Kiran K (1):
-      Bluetooth: Fix alt settings for incoming SCO with transparent coding format
-
-Luiz Augusto von Dentz (5):
-      Bluetooth: L2CAP: Fix invalid access if ECRED Reconfigure fails
-      Bluetooth: L2CAP: Fix invalid access on ECRED Connection response
-      Bluetooth: mgmt: Fix slab-out-of-bounds in tlv_data_is_valid
-      Bluetooth: Fix Set Extended (Scan Response) Data
-      Bluetooth: Fix handling of HCI_LE_Advertising_Set_Terminated event
-
-Manish Mandlik (1):
-      Bluetooth: Add ncmd=0 recovery handling
-
-Marcel Holtmann (1):
-      Bluetooth: Increment management interface revision
-
-Mikhail Rudenko (1):
-      Bluetooth: btbcm: Add entry for BCM43430B0 UART Bluetooth
-
-Muhammad Usama Anjum (1):
-      Bluetooth: btusb: fix memory leak
-
-Nigel Christian (1):
-      Bluetooth: hci_uart: Remove redundant assignment to fw_ptr
-
-Pavel Skripkin (1):
-      Bluetooth: hci_qca: fix potential GPF
-
-Qiheng Lin (1):
-      Bluetooth: use flexible-array member instead of zero-length array
-
-Sathish Narasimman (1):
-      Bluetooth: Translate additional address type during le_conn_comp
-
-Szymon Janc (1):
-      Bluetooth: Remove spurious error message
-
-Tedd Ho-Jeong An (1):
-      Bluetooth: mgmt: Fix the command returns garbage parameter value
-
-Thadeu Lima de Souza Cascardo (1):
-      Bluetooth: cmtp: fix file refcount when cmtp_attach_device fails
-
-Tim Jiang (2):
-      Bluetooth: btusb: use default nvm if boardID is 0 for wcn6855.
-      Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
-
-Venkata Lakshmi Narayana Gubba (5):
-      Bluetooth: hci_qca: Add support for QTI Bluetooth chip wcn6750
-      Bluetooth: btqca: Add support for firmware image with mbn type for WCN6750
-      Bluetooth: btqca: Moved extracting rom version info to common place
-      dt-bindings: net: bluetooth: Convert Qualcomm BT binding to DT schema
-      dt-bindings: net: bluetooth: Add device tree bindings for QTI chip wcn6750
-
-Yu Liu (2):
-      Bluetooth: Return whether a connection is outbound
-      Bluetooth: Fix the HCI to MGMT status conversion table
-
-YueHaibing (1):
-      Bluetooth: RFCOMM: Use DEVICE_ATTR_RO macro
-
-Yun-Hao Chung (1):
-      Bluetooth: disable filter dup when scan for adv monitor
-
-Zhang Qilong (1):
-      Bluetooth: btmtkuart: using pm_runtime_resume_and_get instead of pm_runtime_get_sync
-
-mark-yw.chen (2):
-      Bluetooth: btusb: Fixed too many in-token issue for Mediatek Chip.
-      Bluetooth: btusb: Add support for Lite-On Mediatek Chip
-
- .../devicetree/bindings/net/qualcomm-bluetooth.txt |  69 -------
- .../bindings/net/qualcomm-bluetooth.yaml           | 183 +++++++++++++++++++
- drivers/bluetooth/btbcm.c                          |   1 +
- drivers/bluetooth/btmrvl_sdio.c                    |   4 +-
- drivers/bluetooth/btmtkuart.c                      |   6 +-
- drivers/bluetooth/btqca.c                          | 113 +++++++++---
- drivers/bluetooth/btqca.h                          |  14 +-
- drivers/bluetooth/btrtl.c                          |  35 ++--
- drivers/bluetooth/btrtl.h                          |   7 +
- drivers/bluetooth/btusb.c                          |  45 ++++-
- drivers/bluetooth/hci_ag6xx.c                      |   1 -
- drivers/bluetooth/hci_h5.c                         |   5 +-
- drivers/bluetooth/hci_qca.c                        | 118 +++++++++---
- drivers/bluetooth/virtio_bt.c                      |   3 +
- include/net/bluetooth/hci.h                        |  99 +++++-----
- include/net/bluetooth/hci_core.h                   |  29 +--
- include/net/bluetooth/mgmt.h                       |   3 +-
- net/bluetooth/6lowpan.c                            |  54 +-----
- net/bluetooth/a2mp.c                               |  24 +--
- net/bluetooth/amp.c                                |   6 +-
- net/bluetooth/bnep/core.c                          |   8 +-
- net/bluetooth/cmtp/capi.c                          |  22 +--
- net/bluetooth/cmtp/core.c                          |   5 +
- net/bluetooth/hci_conn.c                           |  10 +-
- net/bluetooth/hci_core.c                           |  78 +++++---
- net/bluetooth/hci_debugfs.c                        |   8 +-
- net/bluetooth/hci_event.c                          | 187 +++++++++++--------
- net/bluetooth/hci_request.c                        | 203 +++++++++++++--------
- net/bluetooth/hci_sock.c                           |  12 +-
- net/bluetooth/hidp/core.c                          |   8 +-
- net/bluetooth/l2cap_core.c                         |  16 +-
- net/bluetooth/mgmt.c                               |  58 +++---
- net/bluetooth/mgmt_config.c                        |   4 +-
- net/bluetooth/msft.c                               |   8 +-
- net/bluetooth/rfcomm/tty.c                         |  10 +-
- net/bluetooth/sco.c                                |   8 +-
- net/bluetooth/smp.c                                |  78 ++++----
- net/bluetooth/smp.h                                |   6 +-
- 38 files changed, 967 insertions(+), 581 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.txt
- create mode 100644 Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
+-- 
+Luiz Augusto von Dentz
