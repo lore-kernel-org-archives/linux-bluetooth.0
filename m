@@ -2,133 +2,140 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC178C2B9F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:33:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ECDE7C49361
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 10:00:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7E496141F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:33:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5F40611B0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 10:00:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232346AbhF1Ifz (ORCPT
+        id S232582AbhF1KCu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 04:35:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41272 "EHLO
+        Mon, 28 Jun 2021 06:02:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60518 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231698AbhF1Ify (ORCPT
+        with ESMTP id S232559AbhF1KCt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 04:35:54 -0400
-Received: from mail-qt1-x830.google.com (mail-qt1-x830.google.com [IPv6:2607:f8b0:4864:20::830])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B34FBC061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:33:28 -0700 (PDT)
-Received: by mail-qt1-x830.google.com with SMTP id f13so6852870qtb.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:33:28 -0700 (PDT)
+        Mon, 28 Jun 2021 06:02:49 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C78B6C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 03:00:24 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id g6-20020a17090adac6b029015d1a9a6f1aso10370258pjx.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 03:00:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=IK51j2ZZQrCLBe99YOJPT6h32otlJOpnXYAnNOhUWJc=;
-        b=UdKBaEr+wqoOfeh2hCHdTlHWz6gXf+FSk6KHyWNknSAcB/9H71vEI/zjEDkn3UTaW9
-         S/8wZzlPC21RKagA8yOzTKqWE+g/ekBHwUP8nccmPXzeFLwNx/xHqXA7TMn8v1qNlJ5Z
-         yDf4+a7T6mtIOouciIatErcR5FIOgfddR6JPB5fRHrWCNb1DeSD83VW9c8YNI91kFBdc
-         O3aVNbuK4nKzT4GD++e0JxrKvw0o0NhfVphqxHRmdT5L8IAbi5dq/CUCO8/v/QzfJeoY
-         PjQfOiIdXF8jd6hS7gZZCTyVyj9Y3wI1yv9LV2OpHV+qHAwIcQEKT0tPGqJyPehHgdh/
-         wPWw==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=sVlFgFCxaWRw37gYpSX+JcptxmlyyJYMOHEGZTzQPAM=;
+        b=gnW2C6zGgwudemJGN7z5cIXe1Xeu7NcUnAdq4iv6XqwNNAJoF0aUYXkfyeGS+DdBtC
+         INORydznhcsy/25G0t1nj4MV+fcs7sHTgmmAdILlD7mwqvzsC2/TnqF7peM2vhPqSl9u
+         OBrO3E4ao2WodbbjXJMuUP33RTWpOWIEFMCMI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=IK51j2ZZQrCLBe99YOJPT6h32otlJOpnXYAnNOhUWJc=;
-        b=UjFsHlubTaWk8IAXAjzKRlmlXNZCH3ClfZDOhDrkTnj8UzCoNy5wIekZ7OubKQ6A5+
-         tcs2oUEGw0/44Zzj/p9C4jJxa5aemP/GGyiTHDPl0Yupw7R66SBT71QIVsERRyb1nVnE
-         FA6GxrQbdZ1uUtA4zVx8PJ3XZ2yGf6Z21AlaZIjYBEjeXSkHHDtlrjLoEE7MYP1Q01Bc
-         7EiC3LMU+QedfzXKt49r24wCrRF1hmUqW6YLKhHzoaU0DdNGjm3jvdgb40FsU0B8ouG3
-         60ogidwyExA3sdT9tPoR/jiqGOX+khwgs+bridZmQCvDae9RHJf52lBR0Q8h3PuFAePV
-         TzCA==
-X-Gm-Message-State: AOAM532tkm0cYp1Ov5p2ZRchNb2RT5HZROKO2uZSfrmSbvHrGoGDWvZ4
-        fb+Jfyn5diK/frMKQ4ig22MrTM6ly4yECA==
-X-Google-Smtp-Source: ABdhPJzFAwIJLL7vjqUbOAK7lwZB+JDA5+ZmSsmOUKHT2YzBKjCvjCD29LyOAOJkDsTpHJqy7bs/Zg==
-X-Received: by 2002:ac8:5dd1:: with SMTP id e17mr20911537qtx.252.1624869207555;
-        Mon, 28 Jun 2021 01:33:27 -0700 (PDT)
-Received: from [172.17.0.2] ([52.242.78.206])
-        by smtp.gmail.com with ESMTPSA id 198sm10404176qkn.29.2021.06.28.01.33.27
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=sVlFgFCxaWRw37gYpSX+JcptxmlyyJYMOHEGZTzQPAM=;
+        b=h8CJA5cWUoIpvZ5jj+DH42+Ur+OgKyynFa09tZyr+kR2pOoB8lz9p8wXccXM3aZi6P
+         4yypjbeZtBXCX4Q/OOggsXp/T7yeHRjLxP5gVrn158bLuBSZ+5CzDCCvyBotKMS1SA8P
+         +uBACWLiBgu4K6iIy56TrmmVlUULJsd0OU/G+46UHYHf+OH+fbAJxPKPZUtl7tjJ+t0R
+         jNfkmikEVuYIa7PFuVpHzBgv7Gbwlr9T5SLReoGmIQIntNjbau8xB0mM446a2SNTtJ2f
+         zeeEzUFUWsHHXcgF8XAVQURcEOrczZnYl//sxmyigviMwprKYoHrZ6KV5Z87soiU1ZtO
+         Uueg==
+X-Gm-Message-State: AOAM530d8KPW8YCzNhYi7Kd+SVzFgR+0drKoVlWOwmqkPyoK/QAZzCl3
+        XSILv07kQnVlC8Uyr7BDJ5mjmul99qBs5A==
+X-Google-Smtp-Source: ABdhPJyl7o2ajMmX6tKSzwEiSbcT2fEG8P9UQhxCGKUx/G/BBgsjQ2ofNAG9KBRhDa/DqBKTxCXbVw==
+X-Received: by 2002:a17:90a:3844:: with SMTP id l4mr4938280pjf.137.1624874424116;
+        Mon, 28 Jun 2021 03:00:24 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:d73e:91da:d7c7:57a])
+        by smtp.gmail.com with ESMTPSA id y80sm14003834pfb.204.2021.06.28.03.00.22
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jun 2021 01:33:27 -0700 (PDT)
-Message-ID: <60d98957.1c69fb81.d8c53.cd37@mx.google.com>
-Date:   Mon, 28 Jun 2021 01:33:27 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6594575804401014271=="
+        Mon, 28 Jun 2021 03:00:23 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Subject: [BlueZ PATCH v4 2/3] adapter: read quality report feature
+Date:   Mon, 28 Jun 2021 18:00:15 +0800
+Message-Id: <20210628175942.BlueZ.v4.2.I7d16f055bc51ac86915c114c671743f49a1fc226@changeid>
+X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
+In-Reply-To: <20210628175942.BlueZ.v4.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
+References: <20210628175942.BlueZ.v4.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, josephsih@chromium.org
-Subject: RE: [BlueZ,v3,1/3] monitor: add new Intel extended telemetry events
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210628162107.BlueZ.v3.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
-References: <20210628162107.BlueZ.v3.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6594575804401014271==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+This patch adds a new UUID for the quality report experimental
+feature. When reading the experimental features, it checks if
+the new feature is supported by the controller and stores the
+value in the quality_report_supported flag of the adapter.
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NTA3ODQ1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgMS4zNCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAwLjM0IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDQxLjk3IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuMTAgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgNy4y
-OSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNi45NiBz
-ZWNvbmRzCk1ha2UgQ2hlY2sgICAgICAgICAgICAgICAgICAgIEZBSUwgICAgICA1LjA0IHNlY29u
-ZHMKTWFrZSBEaXN0Y2hlY2sgICAgICAgICAgICAgICAgUEFTUyAgICAgIDIxNS4zNiBzZWNvbmRz
-CkJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAgIFBBU1MgICAgICA3LjMyIHNlY29uZHMKQnVp
-bGQgdy9leHQgRUxMIC0gTWFrZSAgICAgICAgRkFJTCAgICAgIDE2LjgyIHNlY29uZHMKCkRldGFp
-bHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBQQVNT
-CkRlc2M6IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdCB3aXRoIHJ1bGUgaW4gLmNoZWNrcGF0Y2gu
-Y29uZgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEdpdExpbnQgLSBQQVNT
-CkRlc2M6IFJ1biBnaXRsaW50IHdpdGggcnVsZSBpbiAuZ2l0bGludAoKIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjClRlc3Q6IFByZXAgLSBTZXR1cCBFTEwgLSBQQVNTCkRlc2M6IENsb25l
-LCBidWlsZCwgYW5kIGluc3RhbGwgRUxMCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMK
-VGVzdDogQnVpbGQgLSBQcmVwIC0gUEFTUwpEZXNjOiBQcmVwYXJlIGVudmlyb25tZW50IGZvciBi
-dWlsZAoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0gQ29uZmln
-dXJlIC0gUEFTUwpEZXNjOiBDb25maWd1cmUgdGhlIEJsdWVaIHNvdXJjZSB0cmVlCgojIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgLSBNYWtlIC0gRkFJTApEZXNjOiBC
-dWlsZCB0aGUgQmx1ZVogc291cmNlIHRyZWUKT3V0cHV0Ogptb25pdG9yL3BhY2tldC5jOiBJbiBm
-dW5jdGlvbiDigJhjdXJyZW50X3ZlbmRvcl9ldnTigJk6Cm1vbml0b3IvcGFja2V0LmM6OTM3OToy
-NzogZXJyb3I6IHVudXNlZCB2YXJpYWJsZSDigJh2bmTigJkgWy1XZXJyb3I9dW51c2VkLXZhcmlh
-YmxlXQogOTM3OSB8ICBjb25zdCBzdHJ1Y3QgdmVuZG9yX2V2dCAqdm5kOwogICAgICB8ICAgICAg
-ICAgICAgICAgICAgICAgICAgICAgXn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQg
-YXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6NjkzOTogbW9uaXRvci9wYWNrZXQub10g
-RXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjQxMzQ6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBNYWtlIENoZWNrIC0gRkFJTApEZXNjOiBSdW4g
-J21ha2UgY2hlY2snCk91dHB1dDoKbW9uaXRvci9wYWNrZXQuYzogSW4gZnVuY3Rpb24g4oCYY3Vy
-cmVudF92ZW5kb3JfZXZ04oCZOgptb25pdG9yL3BhY2tldC5jOjkzNzk6Mjc6IGVycm9yOiB1bnVz
-ZWQgdmFyaWFibGUg4oCYdm5k4oCZIFstV2Vycm9yPXVudXNlZC12YXJpYWJsZV0KIDkzNzkgfCAg
-Y29uc3Qgc3RydWN0IHZlbmRvcl9ldnQgKnZuZDsKICAgICAgfCAgICAgICAgICAgICAgICAgICAg
-ICAgICAgIF5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtl
-WzFdOiAqKiogW01ha2VmaWxlOjY5Mzk6IG1vbml0b3IvcGFja2V0Lm9dIEVycm9yIDEKbWFrZTog
-KioqIFtNYWtlZmlsZToxMDQwNjogY2hlY2tdIEVycm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMKVGVzdDogTWFrZSBEaXN0Y2hlY2sgLSBQQVNTCkRlc2M6IFJ1biBkaXN0Y2hl
-Y2sgdG8gY2hlY2sgdGhlIGRpc3RyaWJ1dGlvbgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjClRlc3Q6IEJ1aWxkIHcvZXh0IEVMTCAtIENvbmZpZ3VyZSAtIFBBU1MKRGVzYzogQ29uZmln
-dXJlIEJsdWVaIHNvdXJjZSB3aXRoICctLWVuYWJsZS1leHRlcm5hbC1lbGwnIGNvbmZpZ3VyYXRp
-b24KCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCB3L2V4dCBFTEwg
-LSBNYWtlIC0gRkFJTApEZXNjOiBCdWlsZCBCbHVlWiBzb3VyY2Ugd2l0aCAnLS1lbmFibGUtZXh0
-ZXJuYWwtZWxsJyBjb25maWd1cmF0aW9uCk91dHB1dDoKbW9uaXRvci9wYWNrZXQuYzogSW4gZnVu
-Y3Rpb24g4oCYY3VycmVudF92ZW5kb3JfZXZ04oCZOgptb25pdG9yL3BhY2tldC5jOjkzNzk6Mjc6
-IGVycm9yOiB1bnVzZWQgdmFyaWFibGUg4oCYdm5k4oCZIFstV2Vycm9yPXVudXNlZC12YXJpYWJs
-ZV0KIDkzNzkgfCAgY29uc3Qgc3RydWN0IHZlbmRvcl9ldnQgKnZuZDsKICAgICAgfCAgICAgICAg
-ICAgICAgICAgICAgICAgICAgIF5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVkIGFz
-IGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjY5Mzk6IG1vbml0b3IvcGFja2V0Lm9dIEVy
-cm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MTM0OiBhbGxdIEVycm9yIDIKCgoKCi0tLQpSZWdh
-cmRzLApMaW51eCBCbHVldG9vdGgKCg==
+The quality_report_supported flag could be used by the bluetoothd
+to determine if the quality report feature can be enabled.
 
---===============6594575804401014271==--
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
+
+(no changes since v1)
+
+ src/adapter.c | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 98fc78f1e..e2873de46 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -284,6 +284,7 @@ struct btd_adapter {
+ 	bool is_default;		/* true if adapter is default one */
+ 
+ 	bool le_simult_roles_supported;
++	bool quality_report_supported;
+ };
+ 
+ typedef enum {
+@@ -9234,6 +9235,12 @@ static const uint8_t le_simult_central_peripheral_uuid[16] = {
+ 	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
+ };
+ 
++/* 330859bc-7506-492d-9370-9a6f0614037f */
++static const uint8_t quality_report_uuid[16] = {
++	0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
++	0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
++};
++
+ /* 15c0a148-c273-11ea-b3de-0242ac130004 */
+ static const uint8_t rpa_resolution_uuid[16] = {
+ 	0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
+@@ -9276,6 +9283,14 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
+ 	adapter->le_simult_roles_supported = flags & 0x01;
+ }
+ 
++static void quality_report_func(struct btd_adapter *adapter, uint32_t flags)
++{
++	adapter->quality_report_supported = le32_to_cpu(flags) & 0x01;
++
++	btd_info(adapter->dev_id, "quality_report_supported %d",
++			adapter->quality_report_supported);
++}
++
+ static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
+ 					const void *param, void *user_data)
+ {
+@@ -9313,6 +9328,7 @@ static const struct exp_feat {
+ 	EXP_FEAT(debug_uuid, exp_debug_func),
+ 	EXP_FEAT(le_simult_central_peripheral_uuid,
+ 		 le_simult_central_peripheral_func),
++	EXP_FEAT(quality_report_uuid, quality_report_func),
+ 	EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
+ };
+ 
+-- 
+2.32.0.93.g670b81a890-goog
+
