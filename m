@@ -2,138 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 246ABC11F64
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:33:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8F703C11F64
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:35:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F233661C65
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:33:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7071761C67
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 17:35:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233430AbhF1Rfj (ORCPT
+        id S234120AbhF1Rhe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 13:35:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49498 "EHLO
+        Mon, 28 Jun 2021 13:37:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49940 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232498AbhF1Rfi (ORCPT
+        with ESMTP id S232266AbhF1Rhe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 13:35:38 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4094AC061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:33:11 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id i4so19799582ybe.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:33:11 -0700 (PDT)
+        Mon, 28 Jun 2021 13:37:34 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7128C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:35:06 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id s129so19804336ybf.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 10:35:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=GM9jsAlrYg2SRXzVRGphJEsMstnF14zXR2P0IoS3Uks=;
-        b=p3ym1tBTILjcSZnia9PTd6/WGxLoqoJl6mMZD/Lpr6/tavfzVfgPuG2xh8MStopgdr
-         pOi2GGBx3sVZkXbXFw1WhS1uC0HXZBmyghLVCV6QLIm/VEd4orQYqeTMfAUK7PN1VTYK
-         v0Zni7hqR+fQHywe9ev0jEQF+IGiwTWmFWxGEEfoPxGWJXUzveSaVAqDICGDD0VrPvq8
-         ZavRAuwN9/Z7o3TFHHAyPMNwha7ngF/HCFUIA5JMqJyccU5l4mIFLDOvPn7UgHyyEHbo
-         S/lUNHNKgNIdoy4w5KRa2SdwbXLJ4BsuvFC+hoi2PdDT7IdPhW9khzUPRdeP2VnacCG9
-         Zsiw==
+        bh=740a8kCzPIT3mewVULe7dcCE48/gc7fgeTG4RKOGsbo=;
+        b=kEzd5YvPpVKwdQM4hLFZ+nf5ywrIoVD8IH3D//xEfrBzcI3K34AZ2PGP6n4ziwDmZk
+         djLx1zYfBZQ/HRPha8TvYaaidJYOFdtTH6P2fkYPsJ64UxB2jeQhapFqf0zliX0z1DHt
+         EvmmbEERZNhJw0NAHIbHUHSUJbS52T+UQI6ELHuiCs3sSvIA2f50Mt3Fj6Lt6yEsIStv
+         9gfSAx1bm6XuOsPXNWw+Hhj3t6YAYhJvtJ4oi9ez+Yihepdht5S7ybszf/G1kWrOzzqV
+         ProdLUn3AME55ZZmwKVbVp4rFPDNdiOhD9B04fIrG2V7PtheIRLKZNGK320g5gH64RQW
+         1FsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=GM9jsAlrYg2SRXzVRGphJEsMstnF14zXR2P0IoS3Uks=;
-        b=tjaahFDODUJE30iUK5KBUnEnwZ4BxTeJNPCvHX//UJBjAf/bNKSTx56/HtVsQEaL/L
-         txtjyzKJhxUQrkblzXCBHwznVvDanvqPRznbXatu7o7zEJIXbEJR4XV4aa/8HW648sxh
-         9FDMHpiny4ATHXlN1mh4xb7OCxsTKbT4xvYTK9PDYvDv+i8MmMwYkPvmFoFE537wp9cM
-         TnaxiUf77MGkJpqo1ftXMLcxrD0fL/Ke0nD4B4CDf8U2C2LxdbAESUGeSnHEix8juf0T
-         EBeptmXHkJkRj8PGzXgFKqhqaMV7hpKzlf9gL5rzooggJKdMLA1uD9cYBkht/Ku1/WsB
-         Dndg==
-X-Gm-Message-State: AOAM530tclBbwhIp3IYK0R/rF1QhalgFPbcMMq/n31T5YKCBy5t46Nk2
-        QjytJ2wyewHBVIAvvwqw98gnQFi/najnalkNFn6+Vv3bZV0=
-X-Google-Smtp-Source: ABdhPJxHwc5Kh5d6T8znMpfflqEIa+fp4R+FTLREYE/vGY/w1v2/GUneqFTq8T7boo4CaeiHPNWxrRPoXIByYLjgXtI=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr33507037ybk.91.1624901590426;
- Mon, 28 Jun 2021 10:33:10 -0700 (PDT)
+        bh=740a8kCzPIT3mewVULe7dcCE48/gc7fgeTG4RKOGsbo=;
+        b=g8+ez1wRyFI5h5Vg0SmKGOm2augl5HCMaFZ+xx94Vvh248SHTzF3InHMrvdNH4FDHt
+         ynOl23qXORWdNxLq9EtjqrQfAGrjLPZoUWtH8J6hIsRywpUQfCadVPXi12Ort0sNEVG3
+         9Y/mWI5GKSJJTxxdPRo4IChN8d+tiTKW0LeAeM6qEqmYBPuheAtrmPPZe3sUFUyVfvNl
+         qPUh+us4Lpj4urws2VKuYrMbbAZzIuDCZ+BylxKy5IeUINR7aBFh0PvQRTFcxWR3f5jF
+         yI8UVfNxrdJ8IGzxg12RXKV7zwH5FhP+1Wa3Ofy2ahvN972QecRcCPBxOLKErsnd7L/k
+         F15Q==
+X-Gm-Message-State: AOAM533RJ4m1sZcqcv2hJ5ZBbwKUAz4/5CvtlfAHzzuD5wQoY/3N590m
+        KGc6fYNcDxJJnoT3NSDKxSLYb2VLnzwPFN+7krs=
+X-Google-Smtp-Source: ABdhPJysFZpTf+ZMD7KpCFvw/Xs0Yd84EED8lckyUmYSmn2Vch1U3oxUInETLcNURf1osNAa+s/QHJJkJxqlbLtRwNs=
+X-Received: by 2002:a25:be02:: with SMTP id h2mr33518859ybk.91.1624901706042;
+ Mon, 28 Jun 2021 10:35:06 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210623184355.3685859-1-luiz.dentz@gmail.com> <363a48e3df83590ad4f53383830ca447c71939d7.camel@hadess.net>
-In-Reply-To: <363a48e3df83590ad4f53383830ca447c71939d7.camel@hadess.net>
+References: <20201228142224.Bluez.v1.1.I89c3c683e3dec6439f3b0d2c00da86a2107019af@changeid>
+ <CAPHZWUcgjK+NSTj_GozH8jv5AHOfEOxu7mM95VgCq0Zr02Dyhg@mail.gmail.com>
+In-Reply-To: <CAPHZWUcgjK+NSTj_GozH8jv5AHOfEOxu7mM95VgCq0Zr02Dyhg@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 28 Jun 2021 10:32:59 -0700
-Message-ID: <CABBYNZKaWn_6FEX8YOmDX5bDo6pe5yERDs1X+=76yH4X3sH0hw@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] doc/agent-api: Add AuthenticationFailed method
-To:     Bastien Nocera <hadess@hadess.net>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Mon, 28 Jun 2021 10:34:55 -0700
+Message-ID: <CABBYNZLcE7oKUPQCJhDqV1iwjD7mH_NcuOunUXoMCRnQWeepRg@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1] shared/gatt-client: Fix GATT client attribute
+ read with offset
+To:     Yun-hao Chung <howardchung@google.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bastien,
+Hi Howard,
 
-On Mon, Jun 28, 2021 at 7:59 AM Bastien Nocera <hadess@hadess.net> wrote:
+On Mon, Jun 28, 2021 at 4:57 AM Yun-hao Chung <howardchung@google.com> wrote:
 >
-> On Wed, 2021-06-23 at 11:43 -0700, Luiz Augusto von Dentz wrote:
-> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> >
-> > This introduces AuthenticationFailed method which is used to indicate
-> > when there was an authentication failure with a remote device which is
-> > recommended by the core spec:
-> >
-> > BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 3, Part C page 1314:
-> >  '5.2.2.3 Simple Pairing after authentication failure
-> >  When the link key is stored, subsequent connections to the same device
-> >  will use authentication but this may fail if the remote device has
-> >  deleted the link key. Table 5.2 defines what shall be done depending
-> >  on the type of the link key and whether bonding was performed or not.'
-> >
-> > So following Table 5.2 recommendation the AuthenticationFailed method
-> > would be called when authentication fails with a bonded device.
-> > ---
-> >  doc/agent-api.txt | 5 +++++
-> >  1 file changed, 5 insertions(+)
-> >
-> > diff --git a/doc/agent-api.txt b/doc/agent-api.txt
-> > index 0d9347cab..91d752b0a 100644
-> > --- a/doc/agent-api.txt
-> > +++ b/doc/agent-api.txt
-> > @@ -183,3 +183,8 @@ Methods             void Release()
-> >
-> >                         This method gets called to indicate that the
-> > agent
-> >                         request failed before a reply was returned.
-> > +
-> > +               void AuthenticationFailed(object device, byte status)
-> > +
-> > +                       This method indicates that there was an
-> > authentication
-> > +                       failure with a remote device.
+> Hi,
 >
-> Is there a way that we could have some persistent storage for when the
-> last authentication error happened?
+> Can we get a reply on this patch?
 >
-> This would allow showing a /!\ icon in the device list even though we
-> don't have an agent running in the session, just when the settings are
-> open, in GNOME.
+> Thanks,
+> Howard
+>
+> On Mon, Dec 28, 2020 at 2:22 PM Howard Chung <howardchung@google.com> wrote:
+>>
+>> bluez always replies the whole value despite a user specify the offset.
+>> This patch fixes the issue.
+>>
+>> Reviewed-by: sonnysasaka@chromium.org
+>> ---
+>>
+>>  src/gatt-client.c | 6 ++++--
+>>  1 file changed, 4 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/src/gatt-client.c b/src/gatt-client.c
+>> index 0cf5324ffa46..bec6e1ec049e 100644
+>> --- a/src/gatt-client.c
+>> +++ b/src/gatt-client.c
+>> @@ -368,7 +368,8 @@ static void desc_read_cb(bool success, uint8_t att_ecode,
+>>         }
+>>
+>>         /* Read the stored data from db */
+>> -       if (!gatt_db_attribute_read(desc->attr, 0, 0, NULL, read_op_cb, op)) {
+>> +       if (!gatt_db_attribute_read(desc->attr, op->offset, 0, NULL, read_op_cb,
+>> +                                                                       op)) {
+>>                 error("Failed to read database");
+>>                 att_ecode = BT_ATT_ERROR_UNLIKELY;
+>>                 goto fail;
+>> @@ -906,7 +907,8 @@ static void chrc_read_cb(bool success, uint8_t att_ecode, const uint8_t *value,
+>>         }
+>>
+>>         /* Read the stored data from db */
+>> -       if (!gatt_db_attribute_read(chrc->attr, 0, 0, NULL, read_op_cb, op)) {
+>> +       if (!gatt_db_attribute_read(chrc->attr, op->offset, 0, NULL, read_op_cb,
+>> +                                                                       op)) {
+>>                 error("Failed to read database");
+>>                 att_ecode = BT_ATT_ERROR_UNLIKELY;
+>>                 goto fail;
+>> --
+>> 2.29.2.729.g45daf8777d-goog
 
-I guess you are suggesting introducing a property to the device object
-e.g. AuthenticationStatus or something like that, that way one can
-figure out if the device needs repairing or not. Alternatively we
-could just remove the device, after a few attempts, if there is no
-agent of the agent don't implement the new method.
-
-> This would also allow the settings to get this information in the first
-> place, otherwise we'd need to have some side-channel to funnel that
-> information from the "desktop-wide" agent to the settings agent.
->
-> I've made the upstream bug[1] public now, can you reference it in the
-> commit message?
-
-Sure.
-
-> Cheers
->
-> [1]: https://gitlab.gnome.org/GNOME/gnome-bluetooth/-/issues/91
->
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
