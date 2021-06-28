@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFD60C2B9F4
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:22:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3FDFC2B9F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:22:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AF70061C31
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:22:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C141861C2F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:22:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232152AbhF1IYa (ORCPT
+        id S232376AbhF1IYd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 04:24:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38730 "EHLO
+        Mon, 28 Jun 2021 04:24:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38738 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231506AbhF1IY3 (ORCPT
+        with ESMTP id S232346AbhF1IYb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 04:24:29 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2FE9C061766
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:22:04 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id b5so957982plg.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:22:04 -0700 (PDT)
+        Mon, 28 Jun 2021 04:24:31 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6B50C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:22:06 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id ce18-20020a17090aff12b0290170a3e3eb07so258067pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:22:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=sVlFgFCxaWRw37gYpSX+JcptxmlyyJYMOHEGZTzQPAM=;
-        b=mhA74HqZVcZliRrJVQSIuaINHbDFLklRNtR8gx5hsVhx25KGaUoc2WKcrnsUsduTtk
-         Rnzj1xw6x64XLpQMe8TulVSUbJkkrSI13Tw+YFEs7Kz7tmdwpOZpuTsRArb0ORNDtsIN
-         ylbwPrus3yCmARPr+vlzETfanv3sgFDVnQ3bM=
+        bh=+Pol7EU6cLeB9bzs3xLMxd7uFMdBT25dp4ht2BBEEjg=;
+        b=CePD/aQ44iKLoZD6Sgr4f6wOk5sdH3IVihHU9FfUg7WfBXZeG8IEseazRTXzC+aQTf
+         gCjl6BAZAGNLRcN330eba2/GZgb9L2Xvl9evl1fD//S3/5z6kfSWeXeR6f7H/UrRSDPJ
+         WjY9WQGKGidxvf7hxbd2KzXrYXr6W4ACL8c4o=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=sVlFgFCxaWRw37gYpSX+JcptxmlyyJYMOHEGZTzQPAM=;
-        b=cvawIUJKuqlCbwAE74JDMey57NOYXVV83w/fiN2Mz0RHgRNV8HY8IDLEvUINWuxB6q
-         n8U/Z59UwbJQjZVEY31SIYH1tSoRV9WmA4PDVmffGm9ojOgmW/sH47lQpGIJVbpvjekI
-         asGf+6JjPE3yUWlGv+eNO8y05rQd6GqqKsl87x8S3YS0WZTDri6HtHFVb09yl3+pve6Y
-         XdKTt5PuaB4DvbLpexbyk/v3UzumU8x5WPE6zavTy41r8h0IYdkKkZkPLuweBZwYr1Hz
-         liuSqCHTmKQ2jYlKUfBr3Ux6vsrdOKX8l5FeTwcbByaKfAdJ/eKpcuWgi+pREWPyKVLA
-         hi7Q==
-X-Gm-Message-State: AOAM531cev50ikaI4iU3+IYyWRp776L+NcZjUwlDEOIBnOy5gbn1kCCa
-        PnoYnMVmzDVbRpzw/cPzlRixxAwu706DVQ==
-X-Google-Smtp-Source: ABdhPJw6hZrnIagzf7NFoTxW2g8oIZpUSTpIrw/vkxc5LWiSngui6oZsh9aU4OLcopJ75N8DKi7MxA==
-X-Received: by 2002:a17:903:18d:b029:128:d71a:4773 with SMTP id z13-20020a170903018db0290128d71a4773mr4776543plg.76.1624868524198;
-        Mon, 28 Jun 2021 01:22:04 -0700 (PDT)
+        bh=+Pol7EU6cLeB9bzs3xLMxd7uFMdBT25dp4ht2BBEEjg=;
+        b=MxpjEdFb/6zIfMyJ8RZN7cKoRTI4RYoqD9lJR/4vXBU4jqt3WloVmjeOsrDS5W5iiF
+         oxuJw/nLqcpflS4rjr1h47yujdqsW4TH0DAQGQ5fI+1mS6FAzayiboD7ogUvXvJ003TX
+         bkw2nNVy5/LztDu3WxCbHzc25LMVC8RySRZYBcDnqLYIUTir3Y4JL3Cy70i5pTAlykro
+         PSjF5Sgrg/I5JtjH2POiPozPuB7Kw7dZJGl+sn9LKtOalb7GNPnx0as5YIMhw5nVj8bM
+         ZwUkM9O6WTy3sD1igRyukkJAzifkuqSzdvwGoPWXRDv5bfVMDOzwH4HO8AzD1O5EQmzS
+         XLUA==
+X-Gm-Message-State: AOAM531cJPOnTrpJLnq7EzVTzRrk3ms3LN/pjaojhxfGAcu+2oCz2Yk/
+        DnUmoAeVzIDSuGIDqsyM9TXba0UdlOh5eQ==
+X-Google-Smtp-Source: ABdhPJwQm9vlruG4PCeRq1YdAbLNaMAVBw0CukbbMmaM5OWYKi2AnmbXqYkySdde7jNtALlO4xVnMg==
+X-Received: by 2002:a17:902:be0d:b029:f9:c913:821f with SMTP id r13-20020a170902be0db02900f9c913821fmr21785788pls.2.1624868526177;
+        Mon, 28 Jun 2021 01:22:06 -0700 (PDT)
 Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:d73e:91da:d7c7:57a])
-        by smtp.gmail.com with ESMTPSA id b22sm5381125pfp.20.2021.06.28.01.22.02
+        by smtp.gmail.com with ESMTPSA id b22sm5381125pfp.20.2021.06.28.01.22.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jun 2021 01:22:03 -0700 (PDT)
+        Mon, 28 Jun 2021 01:22:05 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
         Joseph Hwang <josephsih@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v3 2/3] adapter: read quality report feature
-Date:   Mon, 28 Jun 2021 16:21:49 +0800
-Message-Id: <20210628162107.BlueZ.v3.2.I7d16f055bc51ac86915c114c671743f49a1fc226@changeid>
+Subject: [BlueZ PATCH v3 3/3] adapter: set quality report feature
+Date:   Mon, 28 Jun 2021 16:21:50 +0800
+Message-Id: <20210628162107.BlueZ.v3.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 In-Reply-To: <20210628162107.BlueZ.v3.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
 References: <20210628162107.BlueZ.v3.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
@@ -72,70 +72,83 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds a new UUID for the quality report experimental
-feature. When reading the experimental features, it checks if
-the new feature is supported by the controller and stores the
-value in the quality_report_supported flag of the adapter.
+This patch adds the function to enable/disable the quality report
+experimental feature in the controller through MGMT_OP_SET_EXP_FEATURE.
 
-The quality_report_supported flag could be used by the bluetoothd
-to determine if the quality report feature can be enabled.
+A user space process can enable/disable the quality report feature
+by sending a property changed signal to the bluetoothd. The bluetoothd
+can set up the signal handlers to handle the signal in a file under
+plugins/ to call this function.
+
+Note that the bluetoothd calls the experimental feature only when
+the quality_report_supported flag is true.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 (no changes since v1)
 
- src/adapter.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ src/adapter.c | 36 ++++++++++++++++++++++++++++++++++++
+ src/adapter.h |  2 ++
+ 2 files changed, 38 insertions(+)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index 98fc78f1e..e2873de46 100644
+index e2873de46..829d9806b 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -284,6 +284,7 @@ struct btd_adapter {
- 	bool is_default;		/* true if adapter is default one */
- 
- 	bool le_simult_roles_supported;
-+	bool quality_report_supported;
- };
- 
- typedef enum {
-@@ -9234,6 +9235,12 @@ static const uint8_t le_simult_central_peripheral_uuid[16] = {
- 	0x96, 0x46, 0xc0, 0x42, 0xb5, 0x10, 0x1b, 0x67,
- };
- 
-+/* 330859bc-7506-492d-9370-9a6f0614037f */
-+static const uint8_t quality_report_uuid[16] = {
-+	0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a, 0x70, 0x93,
-+	0x2d, 0x49, 0x06, 0x75, 0xbc, 0x59, 0x08, 0x33,
-+};
-+
- /* 15c0a148-c273-11ea-b3de-0242ac130004 */
- static const uint8_t rpa_resolution_uuid[16] = {
- 	0x04, 0x00, 0x13, 0xac, 0x42, 0x02, 0xde, 0xb3,
-@@ -9276,6 +9283,14 @@ static void le_simult_central_peripheral_func(struct btd_adapter *adapter,
- 	adapter->le_simult_roles_supported = flags & 0x01;
- }
- 
-+static void quality_report_func(struct btd_adapter *adapter, uint32_t flags)
-+{
-+	adapter->quality_report_supported = le32_to_cpu(flags) & 0x01;
-+
-+	btd_info(adapter->dev_id, "quality_report_supported %d",
-+			adapter->quality_report_supported);
-+}
-+
- static void set_rpa_resolution_complete(uint8_t status, uint16_t len,
- 					const void *param, void *user_data)
- {
-@@ -9313,6 +9328,7 @@ static const struct exp_feat {
- 	EXP_FEAT(debug_uuid, exp_debug_func),
- 	EXP_FEAT(le_simult_central_peripheral_uuid,
- 		 le_simult_central_peripheral_func),
-+	EXP_FEAT(quality_report_uuid, quality_report_func),
+@@ -9332,6 +9332,42 @@ static const struct exp_feat {
  	EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
  };
  
++/* A user space process can enable/disable the quality report feature
++ * by sending a property changed signal to the bluetoothd. The bluetoothd
++ * can set up the signal handlers in a file under plugins/ to call
++ * this function.
++ */
++void btd_adapter_update_kernel_quality_report(uint8_t action)
++{
++	struct mgmt_cp_set_exp_feature cp;
++	struct btd_adapter *adapter;
++
++	adapter = btd_adapter_get_default();
++	if (!adapter) {
++		info("No default adapter. Skip enabling quality report.");
++		return;
++	}
++
++	if (!adapter->quality_report_supported) {
++		info("quality report feature not supported.");
++		return;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++	memcpy(cp.uuid, quality_report_uuid, 16);
++
++	cp.action = action;
++	if (cp.action > 1) {
++		error("Unexpected quality report action %u", cp.action);
++		return;
++	}
++
++	mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE, adapter->dev_id,
++			sizeof(cp), &cp, NULL, NULL, NULL);
++	info("update kernel quality report default adapter %d enable %d",
++		adapter->dev_id, cp.action);
++}
++
+ static void read_exp_features_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+diff --git a/src/adapter.h b/src/adapter.h
+index 60b5e3bcc..001f784e4 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -240,3 +240,5 @@ enum kernel_features {
+ };
+ 
+ bool btd_has_kernel_features(uint32_t feature);
++
++void btd_adapter_update_kernel_quality_report(uint8_t action);
 -- 
 2.32.0.93.g670b81a890-goog
 
