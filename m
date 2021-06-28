@@ -2,201 +2,212 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71229C49EAB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 07:50:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44E7AC2B9F4
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:07:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5856A61AC0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 07:50:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31C62619A9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 28 Jun 2021 08:07:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232359AbhF1Hwm (ORCPT
+        id S232222AbhF1IKM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 28 Jun 2021 03:52:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59852 "EHLO
+        Mon, 28 Jun 2021 04:10:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35556 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232351AbhF1Hwi (ORCPT
+        with ESMTP id S231845AbhF1IKL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 28 Jun 2021 03:52:38 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9657CC061574;
-        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id c8so13424189pfp.5;
-        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
+        Mon, 28 Jun 2021 04:10:11 -0400
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3EE0C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:07:45 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id c20so6628254uar.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 28 Jun 2021 01:07:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=a9SnhaSC0KGtJA4jbcNzI1RmFExj/PoChJSbMbViqHo=;
-        b=SlBZfW/vVWkuCoPhugNlcjB4fJuggEiyWrFbzXOSBp0G7zrKUI/R531RyHgcoG8efT
-         xMZRK6yAyqGWqh6LYzljI4DeFQA6oX0HXvbVZiflZqrioI0gcIFrYOmwvNwC+87d4SbO
-         NJBa4WTI/IOXtT7RPXxYE5OfokS/CmNnGGm8fCay/OWPwkl7L3GQ27x0aeMElR28679S
-         jmhnHhLXd6cdg+2kzk9jbWHc4Djt1aagDnGCpDyux6srGhw/DsjbElHyZkCzY1B+UOMK
-         prjZCWbYlh6BlTl6D0YBgmoYDCpNn/zSsUvf9ifiRhd2nQzDTtjAjpJRJVd6DAU21lzH
-         QC1g==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=+vOEcp0yzFS62fPpzEQDP1h946F/gt+Z8CXA4RgKtoE=;
+        b=k+SQdtULoHyIlpN1daemobUVKceuxep6kMwFD8gvR/dPYjx1xKN6/1Do8xbyofv4HG
+         /ltCEPoebLv5WhI7EIkQjQo29Pe2GOsGq7RgKRkH7mGEtYRPn9C7SOeQrwUlFextBTdh
+         VK5ME1jIyPZU34O847ObOb65HuEqsX35pu5vPPckQfl4ckjEWItqQJHwpVej6Pt+NAfC
+         1upAkeg6FhS45YM1uPnmm7jV13/osDdYx1ta05b69uP+/k029ywr+MG1sFV9rAnshJX3
+         H2uwqL6Mqw7rjabKrZBlpMbtrBPa0ouXt703Oc9U7MjAzcfhXOZjC4s3AqFkayQjrY19
+         EViw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=a9SnhaSC0KGtJA4jbcNzI1RmFExj/PoChJSbMbViqHo=;
-        b=pIsiLEP/7dSkozWCBaxSz2VxR1szpukwInDRZSPLfce8XC/IqDup4dYuI7SC8LNfPF
-         E0Z7CmgQgRTF9v6n4zH6Ri8kssH6xdyAYSxzFJJYOYQU6BVU9zgMqxNW43A1Mhk/Y6A5
-         DT36NFZdsNfVUbaYWWxW/7XP6ZU2LESS5rf60KKuPx3EYA1CetGepAvjt88+bNyDqELV
-         jOeZFZrvQeFwL8wSUOdywYVBytxefM4iVSZ14Ae8vAuPAoWER/6+l0kp8qdbmHrV2xAD
-         /BxzQmGFKixJHIPwFmpXjgfZbIPunT24keVPKj97h/H1efxVubPfF8OFvETaC/8T3qru
-         mUWQ==
-X-Gm-Message-State: AOAM531P96fqLelzBjNX3xzat4OgecncH1w0s1IRKhO3Xx4gya1HkEHT
-        /aZ9YBcsSk6ulnFRA+Ze92Q=
-X-Google-Smtp-Source: ABdhPJzmLptl5YBBhs4A80NLCSgl3oM4vlhA0HLGNblaK7RuNiVK3F/VD3Cb07Y/TvBgBZzt9AUuaw==
-X-Received: by 2002:a65:6555:: with SMTP id a21mr5312004pgw.53.1624866613181;
-        Mon, 28 Jun 2021 00:50:13 -0700 (PDT)
-Received: from localhost.localdomain ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id c24sm14519028pgj.11.2021.06.28.00.50.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Jun 2021 00:50:12 -0700 (PDT)
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, kuba@kernel.org
-Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-        gregkh@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: fix inconsistent lock state in sco
-Date:   Mon, 28 Jun 2021 15:48:34 +0800
-Message-Id: <20210628074834.161640-1-desmondcheongzx@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=+vOEcp0yzFS62fPpzEQDP1h946F/gt+Z8CXA4RgKtoE=;
+        b=bO6DTcWSFNyZUqMnQERpQCxr9hCLji4isysQTKfiTVvY1IHV6V1p5P7lryPJjTb5TT
+         KqbkT5wkSolkKajHWjfZpXlrWhRQyoQQklu3scSkW1fhbiqG7rzvupZQxw6X8G2bxefN
+         aVeFVQ0UsDKuHLeO9Hj99TJ23cGmDHe9mcBANbBwKz3wfXWueiEdWwRFWORI5HJ3/q+v
+         1PzXG6hB4ogFYPyISSfNI9rNk3eVRjUmEGWxKBIjHho175K5fK4NW9obEjMuZc0ffhfo
+         RXThpK+w2eLnRLyQVbJpFdvMYfpfKkfVUSEMq9deTTfHhqtrbE6A66sBbL+kdkQcbgb0
+         Ga0A==
+X-Gm-Message-State: AOAM53163m12WP07gwtNGv3fzxIActWotp07Ba5cvGYt8G1TCWFBW0LK
+        CQev8+ac669t3AowSx6jCdCJfNe3wPIlsKdKSSGl5g==
+X-Google-Smtp-Source: ABdhPJzLRMpQoOBj/sIjZ2pILL/50YA2opkidZfHEJD3h0R+YEI9quCmlFMfQ+JNJoYIFnLDSyj9KAAD6P3UOX5D9tc=
+X-Received: by 2002:ab0:2690:: with SMTP id t16mr19332675uao.9.1624867664519;
+ Mon, 28 Jun 2021 01:07:44 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210621182149.BlueZ.v2.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
+ <20210621182149.BlueZ.v2.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
+ <CABBYNZL3sWvzC9je7_MnuxftJyo9iUOshsXHBtaNAKgAar7XHA@mail.gmail.com>
+In-Reply-To: <CABBYNZL3sWvzC9je7_MnuxftJyo9iUOshsXHBtaNAKgAar7XHA@mail.gmail.com>
+From:   Joseph Hwang <josephsih@google.com>
+Date:   Mon, 28 Jun 2021 16:07:33 +0800
+Message-ID: <CAHFy41_xStESoyY6-3+Tb64biBNuPhwPw5OyuJs1rKnouZ=dmg@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v2 3/3] adapter: set quality report feature
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot reported an inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock
-usage in sco_conn_del and sco_sock_timeout that could lead to
-deadlocks:
-https://syzkaller.appspot.com/bug?id=9089d89de0502e120f234ca0fc8a703f7368b31e
+Please read the replies in the lines below.
 
-This inconsistent lock state can also happen between sco_conn_ready
-and sco_sock_timeout.
+Thanks!
 
-The issue is that these three functions take a spin lock on the
-socket, but sco_sock_timeout is called from an IRQ context. Since
-bh_lock_sock calls spin_lock but does not disable softirqs, this could
-lead to deadlocks:
+On Tue, Jun 22, 2021 at 2:25 AM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Joseph,
+>
+> On Mon, Jun 21, 2021 at 3:23 AM Joseph Hwang <josephsih@chromium.org> wrote:
+> >
+> > This patch adds the function to enable/disable the quality report
+> > experimental feature in the controller through MGMT_OP_SET_EXP_FEATURE.
+> >
+> > A user space process can enable/disable the quality report feature
+> > by sending a property changed signal to the bluetoothd. The bluetoothd
+> > can set up the signal handlers to handle the signal in a file under
+> > plugins/ to call this function.
+> >
+> > Note that the bluetoothd calls the experimental feature only when
+> > the quality_report_supported flag is true.
+> >
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > ---
+> >
+> > (no changes since v1)
+> >
+> >  src/adapter.c | 36 ++++++++++++++++++++++++++++++++++++
+> >  src/adapter.h |  2 ++
+> >  2 files changed, 38 insertions(+)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index e2873de46..829d9806b 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -9332,6 +9332,42 @@ static const struct exp_feat {
+> >         EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
+> >  };
+> >
+> > +/* A user space process can enable/disable the quality report feature
+> > + * by sending a property changed signal to the bluetoothd. The bluetoothd
+> > + * can set up the signal handlers in a file under plugins/ to call
+> > + * this function.
+> > + */
+> > +void btd_adapter_update_kernel_quality_report(uint8_t action)
+> > +{
+> > +       struct mgmt_cp_set_exp_feature cp;
+> > +       struct btd_adapter *adapter;
+> > +
+> > +       adapter = btd_adapter_get_default();
+> > +       if (!adapter) {
+> > +               info("No default adapter. Skip enabling quality report.");
+> > +               return;
+> > +       }
+> > +
+> > +       if (!adapter->quality_report_supported) {
+> > +               info("quality report feature not supported.");
+> > +               return;
+> > +       }
+> > +
+> > +       memset(&cp, 0, sizeof(cp));
+> > +       memcpy(cp.uuid, quality_report_uuid, 16);
+> > +
+> > +       cp.action = action;
+> > +       if (cp.action > 1) {
+> > +               error("Unexpected quality report action %u", cp.action);
+> > +               return;
+> > +       }
+> > +
+> > +       mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE, adapter->dev_id,
+> > +                       sizeof(cp), &cp, NULL, NULL, NULL);
+> > +       info("update kernel quality report default adapter %d enable %d",
+> > +               adapter->dev_id, cp.action);
+> > +}
+> > +
+> >  static void read_exp_features_complete(uint8_t status, uint16_t length,
+> >                                         const void *param, void *user_data)
+> >  {
+> > diff --git a/src/adapter.h b/src/adapter.h
+> > index 60b5e3bcc..001f784e4 100644
+> > --- a/src/adapter.h
+> > +++ b/src/adapter.h
+> > @@ -240,3 +240,5 @@ enum kernel_features {
+> >  };
+> >
+> >  bool btd_has_kernel_features(uint32_t feature);
+> > +
+> > +void btd_adapter_update_kernel_quality_report(uint8_t action);
+>
+> It doesn't seem this is being used anywhere, in the patch description
 
-       CPU0
-       ----
-  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
-  <Interrupt>
-    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+  It is not used elsewhere except in plugins/chromium.c. The function
+is placed here so that
+other user processes in the Linux community can use it very easily.
+Please refer to how it is invoked
+in chrome os
 
- *** DEADLOCK ***
+https://source.chromium.org/chromiumos/chromiumos/codesearch/+/main:src/third_party/bluez/current/plugins/chromium.c;l=748?q=btd_adapter_update_kernel_quality_report&ss=chromiumos
 
-We fix this by replacing bh_lock_sock with spin_lock_bh in
-sco_conn_del and sco_conn_ready.
+  This quality report experimental feature
+(CONFIG_BT_FEATURE_QUALITY_REPORT) follows what was implemented for
+the debug log experimental feature (CONFIG_BT_FEATURE_DEBUG).
 
-Additionally, to avoid regressions, we pull the clean-up code out from
-sco_chan_del and use it directly in sco_conn_del. This is necessary
-because sco_chan_del makes a call to sco_conn_lock which takes an
-SOFTIRQ-unsafe lock. This means that calling sco_chan_del while
-holding the socket lock would result in a SOFTIRQ-safe ->
-SOFTIRQ-unsafe lock hierarchy between slock-AF_BLUETOOTH-BTPROTO_SCO
-and &conn->lock#2. This could lead to a deadlock as well:
+> it mentions a plugin is handling this via a signal but we could
+> actually make the core do that directly, in fact having a plugin
+> handling posix signals might be a bad idea. If this is something we
+> don't need to change at runtime I would expect it to be configurable
 
-        CPU0                    CPU1
-        ----                    ----
-   lock(&conn->lock#2);
-                                local_irq_disable();
-                                lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
-                                lock(&conn->lock#2);
-   <Interrupt>
-     lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+In chrome os, this quality report experimental feature, just like the
+other debug log experimental feature, is required to change at run
+time. Both experimental features are enabled/disabled at run time with
+the same mechanism -- a user space process sends the dbus signals to
+enable/disable the features.
 
-  *** DEADLOCK ***
+> over main.conf, or are there legitimate reasons to not have the
+> controller generating these events all the time?
 
-Pulling out the code from sco_chan_del allows us to avoid this lock
-dependency by holding the two locks for only their required critical
-sections.
+Another reason not to generate the events all the time is to avoid the
+overhead on the BT controller and the stack if the feature is not
+required.
 
-Reported-and-tested-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
-Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
----
- net/bluetooth/sco.c | 28 ++++++++++++++++++++--------
- 1 file changed, 20 insertions(+), 8 deletions(-)
+>
+> > --
+> > 2.32.0.288.g62a8d224e6-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 3bd41563f118..d05629d7cc55 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -173,10 +173,22 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 
- 	if (sk) {
- 		sock_hold(sk);
--		bh_lock_sock(sk);
-+
-+		spin_lock_bh(&sk->sk_lock.slock);
- 		sco_sock_clear_timer(sk);
--		sco_chan_del(sk, err);
--		bh_unlock_sock(sk);
-+		sco_pi(sk)->conn = NULL;
-+		if (conn->hcon)
-+			hci_conn_drop(conn->hcon);
-+		sk->sk_state = BT_CLOSED;
-+		sk->sk_err   = err;
-+		sk->sk_state_change(sk);
-+		sock_set_flag(sk, SOCK_ZAPPED);
-+		spin_unlock_bh(&sk->sk_lock.slock);
-+
-+		sco_conn_lock(conn);
-+		conn->sk = NULL;
-+		sco_conn_unlock(conn);
-+
- 		sco_sock_kill(sk);
- 		sock_put(sk);
- 	}
-@@ -1084,10 +1096,10 @@ static void sco_conn_ready(struct sco_conn *conn)
- 
- 	if (sk) {
- 		sco_sock_clear_timer(sk);
--		bh_lock_sock(sk);
-+		spin_lock_bh(&sk->sk_lock.slock);
- 		sk->sk_state = BT_CONNECTED;
- 		sk->sk_state_change(sk);
--		bh_unlock_sock(sk);
-+		spin_unlock_bh(&sk->sk_lock.slock);
- 	} else {
- 		sco_conn_lock(conn);
- 
-@@ -1102,12 +1114,12 @@ static void sco_conn_ready(struct sco_conn *conn)
- 			return;
- 		}
- 
--		bh_lock_sock(parent);
-+		spin_lock_bh(&parent->sk_lock.slock);
- 
- 		sk = sco_sock_alloc(sock_net(parent), NULL,
- 				    BTPROTO_SCO, GFP_ATOMIC, 0);
- 		if (!sk) {
--			bh_unlock_sock(parent);
-+			spin_unlock_bh(&parent->sk_lock.slock);
- 			sco_conn_unlock(conn);
- 			return;
- 		}
-@@ -1128,7 +1140,7 @@ static void sco_conn_ready(struct sco_conn *conn)
- 		/* Wake up parent */
- 		parent->sk_data_ready(parent);
- 
--		bh_unlock_sock(parent);
-+		spin_unlock_bh(&parent->sk_lock.slock);
- 
- 		sco_conn_unlock(conn);
- 	}
+
+
 -- 
-2.25.1
 
+Joseph Shyh-In Hwang
+Email: josephsih@google.com
