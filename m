@@ -2,181 +2,177 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E31DC11F69
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jun 2021 19:59:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB9DAC11F67
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jun 2021 20:25:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1F63561D9A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jun 2021 19:59:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8D5861DA6
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 29 Jun 2021 20:25:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235427AbhF2UBo (ORCPT
+        id S235233AbhF2U1o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 29 Jun 2021 16:01:44 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:38592 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S235320AbhF2UBl (ORCPT
+        Tue, 29 Jun 2021 16:27:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40860 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233801AbhF2U1m (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 29 Jun 2021 16:01:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1624996753;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding;
-        bh=ouVxo/zxae5gXThrRHBXzTZ4nIgnfA0w9RjelCry6lU=;
-        b=H/Ig2l337J6Wm3EU/jYghHgAUTyWNgsSpfRvIJmH6U8QsUcSRAftP11VZ0KUg/xTUFQGl/
-        hqATuPUsSWoUiO7llzE7EcN0dZu4HQT5GKOqOZy1HsY6bEqrtajElTNmZDs66SaKV10YUB
-        R4+MlrpzyAAUMh9B1toJehtWgUh2N8E=
-Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
- [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
- us-mta-412-ON8sJmYcM92gPSeStXuqCg-1; Tue, 29 Jun 2021 15:59:12 -0400
-X-MC-Unique: ON8sJmYcM92gPSeStXuqCg-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id CE3FE362FA;
-        Tue, 29 Jun 2021 19:59:10 +0000 (UTC)
-Received: from x1.localdomain.com (ovpn-112-29.ams2.redhat.com [10.36.112.29])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id CF9E05DA2D;
-        Tue, 29 Jun 2021 19:59:08 +0000 (UTC)
-From:   Hans de Goede <hdegoede@redhat.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Hans de Goede <hdegoede@redhat.com>,
-        linux-bluetooth@vger.kernel.org,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Vasily Khoruzhick <anarsoul@gmail.com>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Subject: [PATCH v3] Bluetooth: hci_h5: Disable the hci_suspend_notifier for btrtl devices
-Date:   Tue, 29 Jun 2021 21:59:07 +0200
-Message-Id: <20210629195907.64769-1-hdegoede@redhat.com>
+        Tue, 29 Jun 2021 16:27:42 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C099C061760
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jun 2021 13:25:14 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id i18so935615yba.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 29 Jun 2021 13:25:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=L7AbbAbaZz43i7sv1H4l16IhYXIFrDz8xbRFAkERY/A=;
+        b=spLWIwqDSeifKc6USDHRU34VlHGXuHvYJxgARFWFD2Td+AnfH84GTsAmz1s+LzZAU3
+         /Uk3lkoIrkRXi3bdbIfJCCJOwRT/9QKZIO2voiDuCaJhgg/kjDQ/n4tdFmgLav43qixg
+         i8N1AJkcHvxoNLMfwnfyMxIPvUuMXQzfKrOrzs+3qUaypYaG4+gv6lDFmsTWAxNzXSvf
+         ZOxwHhjDGDEObeqeUvkuKE93CzEO0AgPa13vmDISBX29O3MAvrQQhdRCbB8hwPFYIi56
+         bn/X7vb4Ye4QbvqRMHXYIjPyMLBUCcvjNjA/aUqlvjAAUxxWmWh1MVtmtV+4DlsKRcqU
+         80IQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=L7AbbAbaZz43i7sv1H4l16IhYXIFrDz8xbRFAkERY/A=;
+        b=seRw2vQzBmh2f6mCttlaYdF4jvCSRijPu9N65QzAT8N4ar3YBustQe75Ay2H46pKVV
+         6cQaJ/isYWIvsB2r/MfgreAkPkXbMuuDiJCXaFaQB/2jg4GWEl+eRVOSuoW/Y3CYHRaH
+         al2liUmloqogwJSrYWGKuwZOl79EmaGQ57IO3wikTnIdNgK06Rd14c3edtq+0QeVZW7T
+         EAploOd8F/Gs9jfbj87lDz0b/R2+HZY04PVqbBjCUI0FytthDPvbJJ7jHkK8wE2/yTzd
+         ejKlZJK+11GyR73aOfbtK1g1ganvLlpMmvpul0NjwmrIpvvlgEPPzoMTUK3fZKqQ0Idq
+         G21w==
+X-Gm-Message-State: AOAM533IDY7JnT/tQ+qMgz6R8IaLwlQQzmenUN74dbqYoPJ3fsVzM0mn
+        JsrBcsDfNGDfJZYDRjjVHrz/PfhR4LsMS+9B1JI=
+X-Google-Smtp-Source: ABdhPJyygs/L2j7H/gkL0CQ9fj0e4quATA9/jWxETFXfl0giQGmXt3rJxVToGSs63f/sGvDDe1F+q8+zHv1UVcRRJ5Q=
+X-Received: by 2002:a25:b216:: with SMTP id i22mr12554629ybj.264.1624998312675;
+ Tue, 29 Jun 2021 13:25:12 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
+References: <20210629154652.BlueZ.v5.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
+ <20210629154652.BlueZ.v5.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
+In-Reply-To: <20210629154652.BlueZ.v5.3.I5b72c623fb8b002a5e1f000149b362af3c01ab98@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 29 Jun 2021 13:25:01 -0700
+Message-ID: <CABBYNZJH3Lih+yNdxdre_5zXp4CuNAzek73cTVub0h0rno3YCA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v5 3/3] adapter: set quality report feature
+To:     Joseph Hwang <josephsih@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The hci_suspend_notifier which was introduced last year, is causing
-problems for uart attached btrtl devices. These devices may loose their
-firmware and their baudrate setting over a suspend/resume.
+Hi Joseph,
 
-Since we don't even know the baudrate after a suspend/resume recovering
-from this is tricky. The driver solves this by treating these devices
-the same as USB BT HCIs which drop of the bus during suspend.
+On Tue, Jun 29, 2021 at 12:47 AM Joseph Hwang <josephsih@chromium.org> wrote:
+>
+> This patch adds the function to enable/disable the quality report
+> experimental feature in the controller through MGMT_OP_SET_EXP_FEATURE.
+>
+> A user space process can enable/disable the quality report feature
+> by sending a property changed signal to the bluetoothd. The bluetoothd
+> can set up the signal handlers to handle the signal in a file under
+> plugins/ to call this function.
+>
+> Note that the bluetoothd calls the experimental feature only when
+> the quality_report_supported flag is true.
+>
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+>
+> (no changes since v1)
+>
+>  src/adapter.c | 36 ++++++++++++++++++++++++++++++++++++
+>  src/adapter.h |  2 ++
+>  2 files changed, 38 insertions(+)
+>
+> diff --git a/src/adapter.c b/src/adapter.c
+> index e2873de46..829d9806b 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -9332,6 +9332,42 @@ static const struct exp_feat {
+>         EXP_FEAT(rpa_resolution_uuid, rpa_resolution_func),
+>  };
+>
+> +/* A user space process can enable/disable the quality report feature
+> + * by sending a property changed signal to the bluetoothd. The bluetoothd
+> + * can set up the signal handlers in a file under plugins/ to call
+> + * this function.
+> + */
+> +void btd_adapter_update_kernel_quality_report(uint8_t action)
+> +{
+> +       struct mgmt_cp_set_exp_feature cp;
+> +       struct btd_adapter *adapter;
+> +
+> +       adapter = btd_adapter_get_default();
+> +       if (!adapter) {
+> +               info("No default adapter. Skip enabling quality report.");
+> +               return;
+> +       }
+> +
+> +       if (!adapter->quality_report_supported) {
+> +               info("quality report feature not supported.");
+> +               return;
+> +       }
+> +
+> +       memset(&cp, 0, sizeof(cp));
+> +       memcpy(cp.uuid, quality_report_uuid, 16);
+> +
+> +       cp.action = action;
+> +       if (cp.action > 1) {
+> +               error("Unexpected quality report action %u", cp.action);
+> +               return;
+> +       }
+> +
+> +       mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE, adapter->dev_id,
+> +                       sizeof(cp), &cp, NULL, NULL, NULL);
+> +       info("update kernel quality report default adapter %d enable %d",
+> +               adapter->dev_id, cp.action);
+> +}
+> +
+>  static void read_exp_features_complete(uint8_t status, uint16_t length,
+>                                         const void *param, void *user_data)
+>  {
+> diff --git a/src/adapter.h b/src/adapter.h
+> index 60b5e3bcc..001f784e4 100644
+> --- a/src/adapter.h
+> +++ b/src/adapter.h
+> @@ -240,3 +240,5 @@ enum kernel_features {
+>  };
+>
+>  bool btd_has_kernel_features(uint32_t feature);
+> +
+> +void btd_adapter_update_kernel_quality_report(uint8_t action);
 
-Specifically the driver:
-1. Simply unconditionally turns the device fully off during
-   system-suspend to save maximum power.
-2. Calls device_reprobe() from a workqueue to fully re-init the device
-   from scratch on system-resume (unregistering the old HCI and
-   registering a new HCI).
+I rather not have these function exposed if there is no upstream code
+using it because this may appear on the likes of static analyzer as
+something that is never used, also the current policy is that all
+experimental features are to be enabled with -E or if experimental is
+set on main.conf, also note that experimental features do persist so I
+think in the long run we might want to have an interface in the core
+to expose the controls of each experimental feature separately, with
+that we could replace the current policy of -E to enable all
+experimental features to actually enable the interface and then
+persist the features that upper layer would like to have enabled in
+the storage.
 
-This means that these devices do not benefit from the suspend / resume
-handling work done by the hci_suspend_notifier. At best this unnecessarily
-adds some time to the suspend/resume time.
+> --
+> 2.32.0.93.g670b81a890-goog
+>
 
-But in practice this is actually causing problems:
 
-1. These btrtl devices seem to not like the HCI_OP_WRITE_SCAN_ENABLE(
-SCAN_DISABLED) request being send to them when entering the
-BT_SUSPEND_CONFIGURE_WAKE state. The same request send on
-BT_SUSPEND_DISCONNECT works fine, but the second one send (unnecessarily?)
-from the BT_SUSPEND_CONFIGURE_WAKE transition causes the device to hang:
-
-[  573.497754] PM: suspend entry (s2idle)
-[  573.554615] Filesystems sync: 0.056 seconds
-[  575.837753] Bluetooth: hci0: Timed out waiting for suspend events
-[  575.837801] Bluetooth: hci0: Suspend timeout bit: 4
-[  575.837925] Bluetooth: hci0: Suspend notifier action (3) failed: -110
-
-2. The PM_POST_SUSPEND / BT_RUNNING transition races with the
-driver-unbinding done by the device_reprobe() work.
-If the hci_suspend_notifier wins the race it is talking to a dead
-device leading to the following errors being logged:
-
-[  598.686060] Bluetooth: hci0: Timed out waiting for suspend events
-[  598.686124] Bluetooth: hci0: Suspend timeout bit: 5
-[  598.686237] Bluetooth: hci0: Suspend notifier action (4) failed: -110
-
-In both cases things still work, but the suspend-notifier is causing
-these ugly errors getting logged and ut increase both the suspend- and
-the resume-time by 2 seconds.
-
-This commit avoids these problems by disabling the hci_suspend_notifier.
-
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: Vasily Khoruzhick <anarsoul@gmail.com>
-Cc: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Signed-off-by: Hans de Goede <hdegoede@redhat.com>
----
-Changes in v3:
-- Use hu->flags instead of hu->hdev_flags to store the
-  HCI_UART_NO_SUSPEND_NOTIFIER flag
-
-Changes in v2:
-- Use the new HCI_QUIRK_NO_SUSPEND_NOTIFIER quirk, instead of directly
-  unregistering the notifier from hci_h5.c
----
- drivers/bluetooth/hci_h5.c     | 7 +++++++
- drivers/bluetooth/hci_serdev.c | 3 +++
- drivers/bluetooth/hci_uart.h   | 7 ++++---
- 3 files changed, 14 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 27e96681d583..c283504ec3b3 100644
---- a/drivers/bluetooth/hci_h5.c
-+++ b/drivers/bluetooth/hci_h5.c
-@@ -919,6 +919,13 @@ static int h5_btrtl_setup(struct h5 *h5)
- 
- static void h5_btrtl_open(struct h5 *h5)
- {
-+	/*
-+	 * Since h5_btrtl_resume() does a device_reprobe() the suspend handling
-+	 * done by the hci_suspend_notifier is not necessary; it actually causes
-+	 * delays and a bunch of errors to get logged, so disable it.
-+	 */
-+	set_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &h5->hu->flags);
-+
- 	/* Devices always start with these fixed parameters */
- 	serdev_device_set_flow_control(h5->hu->serdev, false);
- 	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
-diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
-index 9e03402ef1b3..3b00d82d36cf 100644
---- a/drivers/bluetooth/hci_serdev.c
-+++ b/drivers/bluetooth/hci_serdev.c
-@@ -343,6 +343,9 @@ int hci_uart_register_device(struct hci_uart *hu,
- 	hdev->setup = hci_uart_setup;
- 	SET_HCIDEV_DEV(hdev, &hu->serdev->dev);
- 
-+	if (test_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &hu->flags))
-+		set_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks);
-+
- 	if (test_bit(HCI_UART_RAW_DEVICE, &hu->hdev_flags))
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
- 
-diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
-index 4e039d7a16f8..fb4a2d0d8cc8 100644
---- a/drivers/bluetooth/hci_uart.h
-+++ b/drivers/bluetooth/hci_uart.h
-@@ -86,9 +86,10 @@ struct hci_uart {
- };
- 
- /* HCI_UART proto flag bits */
--#define HCI_UART_PROTO_SET	0
--#define HCI_UART_REGISTERED	1
--#define HCI_UART_PROTO_READY	2
-+#define HCI_UART_PROTO_SET		0
-+#define HCI_UART_REGISTERED		1
-+#define HCI_UART_PROTO_READY		2
-+#define HCI_UART_NO_SUSPEND_NOTIFIER	3
- 
- /* TX states  */
- #define HCI_UART_SENDING	1
 -- 
-2.31.1
-
+Luiz Augusto von Dentz
