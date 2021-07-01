@@ -2,96 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E10C11F67
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:06:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C65C11F67
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:29:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B198361411
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:06:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69ABD61410
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:29:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234158AbhGAVJW (ORCPT
+        id S233910AbhGAVbh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jul 2021 17:09:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37520 "EHLO
+        Thu, 1 Jul 2021 17:31:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42416 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233893AbhGAVJW (ORCPT
+        with ESMTP id S230328AbhGAVbh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jul 2021 17:09:22 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C378C061762;
-        Thu,  1 Jul 2021 14:06:50 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id v10so5164069qto.1;
-        Thu, 01 Jul 2021 14:06:50 -0700 (PDT)
+        Thu, 1 Jul 2021 17:31:37 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49EA7C061762
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jul 2021 14:29:05 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id o139so13116210ybg.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Jul 2021 14:29:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=JdZfhD8zS8Li7V1IWr5im/Ov0yGZJzdw3SFKa8tmvaA=;
-        b=coFXzdn8+GFRVvzHgAyl5ya90JjlYSnS84Ena2i664mPYGWza2mLyEi8CqvbBO8QoK
-         AMKqkrmx7AB/snglYTmG5VrGh4KFMVa7MmrarR+R6xWquwmAObVhKQrwP0YBpq0OWeXZ
-         ffUGNPzJd2Q0pR2qmS8V2U7qHuxJPArIgljtleqjf3PwLu85WorQ4hrTVQoQLOCZ2fwb
-         zk4mMVfXrcghfDxud6b6JG16Psnajj/rrjufSzS+N1gtQT6TfXL6qfak/ryp5/D0kWmv
-         FB23x9kxBbkg4Gmi16pIJJ5sNRXbfXSlqkeMVKEeD9YZLh0MnFAwgshvw+7RY6IdV8Mt
-         1wFw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=P3Ax5KiANODXeQnoi1N71FszccMTTaw457fOL3jT5rQ=;
+        b=Yu/MffwZh6m96npORDDwFKW66aEHqyDh4mg9nih2kbHrtc4A7G7bGgsU3CJVXNvynH
+         ndbIn4ImBbH+UGs7sYA1DR31yZx7uhl8WoFJshd2vF0idYV6ked3h2ZSN1ChwfoMj9Ho
+         kOyR91CsSV+bz/+uEdQh5U6EtB1vIUcugCubiYTE8TIq+AJEs3l6of5ALMvxSqTFWAd8
+         dHITQ6pT/SqW7Emye+/k0W5EV48AQRP1SK2zDn3cZV1/6PFyIaxKDX1+ZeHnzbJrbQW1
+         o7oiGWsqZhZFceXU50M+RzPDuTcYne/rfKhIS1X5TXD6j6XAFJGxE54uzQmvPEBdTA5z
+         xU6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=JdZfhD8zS8Li7V1IWr5im/Ov0yGZJzdw3SFKa8tmvaA=;
-        b=kT8STan2hJsl6HR8nrfeAEga18F/Vu0YCEVNjFphBdsH+q1AruUne+FzsMJ4tNJ1Q2
-         s1ZNZRWIRU+pGaGh+U0ITUAVOquKTuQ8jfJFzuC5YqwLyNGiU3aXMEHIDM5NOAUBbg1C
-         81eYs0BWD9FZ3FcvktNxFL8GE5nuPvtz/lLiWyhaps+g60l9UGHCCfGIU4lhmiUASC0t
-         FZOOw4cjq3JAVYxSLn8w8QrwTF4e6EuB4QPnLeuVLxpMGj1vAfPrwB8vAM172oD2LUee
-         vnl4U0TzdOwKbr8MWRQXR0hX6YxW33b9xephDnhsOySIi3oDNxv6rYJQGHIR2BvRBGOB
-         5JJQ==
-X-Gm-Message-State: AOAM532Wo3nfxKuSyJ9N2IWVAv057evM5MaSWjh1J5EnjKn6TKhnu0Tn
-        9Dmo0Bc3m/JYAwU/aW+PFg==
-X-Google-Smtp-Source: ABdhPJzJZm7Wwvj9JL2Rw3TI6kf2fUOVVJh1b0RQieFYgctpFerkJ6QWAsaYSREJxI0H7Uuwi4ovZg==
-X-Received: by 2002:a05:622a:453:: with SMTP id o19mr1903676qtx.122.1625173609396;
-        Thu, 01 Jul 2021 14:06:49 -0700 (PDT)
-Received: from PWN (104-9-124-193.lightspeed.sntcca.sbcglobal.net. [104.9.124.193])
-        by smtp.gmail.com with ESMTPSA id t62sm431440qkc.26.2021.07.01.14.06.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 01 Jul 2021 14:06:49 -0700 (PDT)
-Date:   Thu, 1 Jul 2021 17:06:45 -0400
-From:   Peilin Ye <yepeilin.cs@gmail.com>
-To:     Alexander Larkin <avlarkin82@gmail.com>
-Cc:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        linux-kernel@vger.kernel.org, linux@armlinux.org.uk,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Subject: Re: maybe similar bug exists for HCI_EV_INQUIRY_RESULT* like
- [Linux-kernel-mentees] [PATCH v2] net/bluetooth: slab-out-of-bounds read in
- hci_extended_inquiry_result_evt()
-Message-ID: <20210701210645.GA14471@PWN>
-References: <20200709130224.214204-1-yepeilin.cs@gmail.com>
- <20210701153936.2954886-1-avlarkin82@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=P3Ax5KiANODXeQnoi1N71FszccMTTaw457fOL3jT5rQ=;
+        b=VBvWigCFDV6mQJ29A0mj93/Q56qd9XXr+81bIIb6ADKKV3+X46LtJH36swFViT5lmu
+         5WpHOyBnlQGs5pwdOwZNVvPfLEykTVnrOvbMcB53kxcOab8PVJJ+DvhpsVaxK8AJTUOg
+         0iKAtQVEqi3R7QMoG9W7YmqbDZuq1u3ocxYcOUbVrxRSrNeBAbhvnBXtyXq3hkfAhRC5
+         k8xzYN9tUGokR4RTDiOzEj8qZqFAD1uveOmGdv/aekNO6MeTEwICExDHCEkRnvSeHvlw
+         oaHxCQagyoZgtQrWJmNH5okT2IUTECfaV9Bo6SAud++Gwyp534VcwnnbTbQUeWRGSnqC
+         XwOw==
+X-Gm-Message-State: AOAM531Q9sRiOl1Ef3+4CIf0LbLKhkgNmIlU0xFGERCon4NxcaR5Ogmq
+        MrxnEJ61k1e7GrFKghPftgPPMsqauwhX7iFlSr8=
+X-Google-Smtp-Source: ABdhPJy4lknegznkNhrVi7O4HwIJauAsP03KOHOHu0+sFELLmwCEDX6IGtANPYuVPp7wZvo9brZMvHYt2G1Ljo4jPYA=
+X-Received: by 2002:a25:8205:: with SMTP id q5mr2399909ybk.440.1625174944198;
+ Thu, 01 Jul 2021 14:29:04 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210701153936.2954886-1-avlarkin82@gmail.com>
+References: <20210626063010.152987-1-hj.tedd.an@gmail.com> <20210626063010.152987-2-hj.tedd.an@gmail.com>
+In-Reply-To: <20210626063010.152987-2-hj.tedd.an@gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 1 Jul 2021 14:28:53 -0700
+Message-ID: <CABBYNZLqprh1nZmz9Pjk4bW1+V0nZaUaOJvVzxw_Z8hgLwMUyw@mail.gmail.com>
+Subject: Re: [RFC BlueZ PATCH v4 2/3] emulator/btdev: clean up the queue
+ before closing the test
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Jul 01, 2021 at 06:39:36PM +0300, Alexander Larkin wrote:
-> For the net/bluetooth/hci_event.c , maybe similar bug could be inside
-> hci_inquiry_result_with_rssi_evt() that is HCI_EV_INQUIRY_RESULT_WITH_RSSI
-> and inside hci_inquiry_result_evt() that is HCI_EV_INQUIRY_RESULT. 
+Hi Tedd,
 
-Hi Alexander,
+On Fri, Jun 25, 2021 at 11:31 PM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
+>
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+>
+> This patch clean up the queue for connection before closing the test to
+> prevent the potential memory leak.
+>
+> ==50== 32 bytes in 1 blocks are definitely lost in loss record 18 of 32
+> ==50==    at 0x483A809: malloc (vg_replace_malloc.c:307)
+> ==50==    by 0x14A37E: btd_malloc (util.c:33)
+> ==50==    by 0x149D9D: queue_new (queue.c:47)
+> ==50==    by 0x13B3C0: btdev_create (btdev.c:6042)
+> ==50==    by 0x13178E: create_vhci (hciemu.c:229)
+> ==50==    by 0x13178E: hciemu_new_num (hciemu.c:403)
+> ==50==    by 0x130E2C: read_index_list_callback (mgmt-tester.c:357)
+> ==50==    by 0x14AD91: request_complete (mgmt.c:264)
+> ==50==    by 0x14BD34: can_read_data (mgmt.c:356)
+> ==50==    by 0x14E794: watch_callback (io-glib.c:157)
+> ==50==    by 0x48B578E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ==50==    by 0x48B5B17: ??? (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ==50==    by 0x48B5E32: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ==50==
+> ==50== 32 bytes in 1 blocks are definitely lost in loss record 19 of 32
+> ==50==    at 0x483A809: malloc (vg_replace_malloc.c:307)
+> ==50==    by 0x14A37E: btd_malloc (util.c:33)
+> ==50==    by 0x149D9D: queue_new (queue.c:47)
+> ==50==    by 0x13B3C0: btdev_create (btdev.c:6042)
+> ==50==    by 0x1318F7: hciemu_client_new (hciemu.c:332)
+> ==50==    by 0x1318F7: hciemu_new_num (hciemu.c:412)
+> ==50==    by 0x130E2C: read_index_list_callback (mgmt-tester.c:357)
+> ==50==    by 0x14AD91: request_complete (mgmt.c:264)
+> ==50==    by 0x14BD34: can_read_data (mgmt.c:356)
+> ==50==    by 0x14E794: watch_callback (io-glib.c:157)
+> ==50==    by 0x48B578E: g_main_context_dispatch (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ==50==    by 0x48B5B17: ??? (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ==50==    by 0x48B5E32: g_main_loop_run (in /usr/lib64/libglib-2.0.so.0.6400.6)
+> ---
+>  emulator/btdev.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>
+> diff --git a/emulator/btdev.c b/emulator/btdev.c
+> index 202fc7996..75cca7549 100644
+> --- a/emulator/btdev.c
+> +++ b/emulator/btdev.c
+> @@ -624,8 +624,10 @@ static void conn_unlink(struct btdev_conn *conn1, struct btdev_conn *conn2)
+>         conn2->link = NULL;
+>  }
+>
+> -static void conn_remove(struct btdev_conn *conn)
+> +static void conn_remove(void *data)
+>  {
+> +       struct btdev_conn *conn = data;
+> +
+>         if (conn->link) {
+>                 struct btdev_conn *link = conn->link;
+>
+> @@ -6056,6 +6058,7 @@ void btdev_destroy(struct btdev *btdev)
+>         bt_crypto_unref(btdev->crypto);
+>         del_btdev(btdev);
+>
+> +       queue_destroy(btdev->conns, conn_remove);
+>         queue_destroy(btdev->le_ext_adv, le_ext_adv_free);
+>
+>         free(btdev);
+> --
+> 2.26.3
 
-Thanks for looking into this, I believe they were handled in commit
-629b49c848ee ("Bluetooth: Prevent out-of-bounds read in
-hci_inquiry_result_with_rssi_evt()") and commit 75bbd2ea50ba ("Bluetooth:
-Prevent out-of-bounds read in hci_inquiry_result_evt()").
+Ive pushed this one.
 
-Thanks,
-Peilin Ye
 
+-- 
+Luiz Augusto von Dentz
