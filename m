@@ -7,137 +7,165 @@ X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED3EC11F67
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:44:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB9F4C11F67
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 22:50:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7FF061410
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 21:44:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F44A61410
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  1 Jul 2021 22:50:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234011AbhGAVql (ORCPT
+        id S234005AbhGAWxQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 1 Jul 2021 17:46:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45766 "EHLO
+        Thu, 1 Jul 2021 18:53:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60294 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229934AbhGAVql (ORCPT
+        with ESMTP id S232807AbhGAWxQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 1 Jul 2021 17:46:41 -0400
+        Thu, 1 Jul 2021 18:53:16 -0400
 Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 62FFFC061762
-        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jul 2021 14:44:09 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id g19so13159684ybe.11
-        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Jul 2021 14:44:09 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83949C061762
+        for <linux-bluetooth@vger.kernel.org>; Thu,  1 Jul 2021 15:50:44 -0700 (PDT)
+Received: by mail-yb1-xb2c.google.com with SMTP id m9so13439362ybo.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 01 Jul 2021 15:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=urRC5WkmIZ5OA6xMcYQBYED0UF2XOszVMkXOm4qFtEY=;
-        b=jtoObubATZCPxJCkocbw6x02z89Bd2q1I/6UgYHYpF3/c3rNZZ50KBb4jKueWDm6PV
-         hNebDCB8Jhy2O+7XtsK3iHUyJbJdLQv4uqxGeFKyofPMn0EMCW35w08tgYarxOmtih2D
-         rjfhwxFvgP3qjNEZGJmihBU7DH7TuRxr0NMM7jk7KHAhhE6azN+/54kJvCAdsD/ca4Z5
-         80BjKnTRiPIyg6KkVVOaeyu2HaQle2PxyMeErAY0H6KiHzISlPOfhIWjyE7vc1zNvCeO
-         FAgDrJnvv3M071OsBO6BqMg2LQdMqGOEAI+Lmhe8Z2EhLBGZtiWR8F6oj9fIBjE/0aKb
-         OISg==
+         :cc:content-transfer-encoding;
+        bh=9VFyQcYYvFG3wwO4gx9lxF3Zs7HMjQdIXDTXQZ6iPTA=;
+        b=l9MQv5MnUaXCNTmt7CtSijc/DcsO7LHsX1l/Wi0PQ4noBmwDerDP5EGrGRhyoHbAP5
+         AqMKRWPCDWR367Rut3kyXSuj44atwSW0FPDP/+fvyPlzRaBfWfbEg0OMOkGqmBgGOhBy
+         zfRHrVbBUJ34BJ7tB6esPsVzIUMpSCksY2gOQIUfbxFGcq1sQi65sKXB+jp9zoqSo7YS
+         cSG426tf2P0dSECDSllMVeUrYTjNksmtst0G1NFjgf6kPvKsFe0zWVGFbgqfqZnp5V25
+         1YDuNy2W09sHg9KNbgf9kK+410C4wTH08UM2XwMVzrqNMPzfSCKRfboC4OV0PvMHerBK
+         hB4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=urRC5WkmIZ5OA6xMcYQBYED0UF2XOszVMkXOm4qFtEY=;
-        b=mg8fxhLcKQ+pjeg074GvYxPVPNs4A49CjVvISXTTnvN9+BzcZ5N/MLQn/d1doiG2ke
-         joQjqFjc8oMl3rAmSBQRtiQW3weNN663SUrNwdb7UkkZec/XZH/GXMQ3ubtO5o17kp3E
-         TkNNUg21xN8DagZ4VEvzeGFbiVGW6i63XQFtWpkpsIP5L7vplNr0ErDN9WMrlu8vQ6Wp
-         032h9G9PAaC3+6XgZrMN5rATSGCQTmPJ3UpKMJamwujYs3myUmnZ2SkmC/kP3lP+gY9n
-         duqRo9NAvH0m2cs+HG5mMF5VMFQE6TlSvgWRf2wC/bDXxBJpP2AfMeaTvyu9ZBsqRXHs
-         piqw==
-X-Gm-Message-State: AOAM531D9vjCLpxmklANjIa8qb3OiwJvUVxUOdbHf3m4PEUckNOL1NRp
-        l68x/6xw4zMP+KLpgRSRWeFNUQ9EcQt6ApkhJNU=
-X-Google-Smtp-Source: ABdhPJwTO2QzFcvMqfMT8BiFen3Ucn8lkCm33UevWtswZQvE0T17MpxolfrX3+xpcobLWLBqqFoTYJ7kZ0HXeeYZINg=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr2694958ybk.91.1625175848584;
- Thu, 01 Jul 2021 14:44:08 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=9VFyQcYYvFG3wwO4gx9lxF3Zs7HMjQdIXDTXQZ6iPTA=;
+        b=HhWx3PPqutDy6SHQESWZrjVniCfKUc/WguuoT7tsmGHxaSRJU7APvghwnNAeT7cNEU
+         7yodcgycGjqgIDJI3SF83p1dyMT4tffmH7LTX6u5LXGQ4limo4b9RTTsT7EkJ702/lEw
+         OWq7xNCMvB3Av/3ADqPVfekfdkie+7NjDrII8CCgOmxOOA8GRHg/hz34A+YlBzCNc5mV
+         D6uo8KyUk+JAjpqbJ+tJdd4i3awBUFM7m0PrvmMO9ppmJTR2nFgbD9fEsgKTKk+qPyDy
+         /LnUF9iKJjttD+CNFt5UEkya3hFgN+KnFsVzK5vMaPIClIf+PuonLLcjACi4McBUcxA/
+         IYsQ==
+X-Gm-Message-State: AOAM530QlkBFbr3JlHPJxTlgovD7GFqlUEkRnUbyLmBD+KAwI86CRize
+        RXq5Qr1g5J9+EoYkWMMYNnWvQwo6CHq4Xf9kez4=
+X-Google-Smtp-Source: ABdhPJybJGYurA1d+/1q4/X5XHyYfbRx4SKcuzobCUVFwGq9M3Ffi+y+kAJr2BLbMKVduso5YkL7tbfnuRCSIU8WnZo=
+X-Received: by 2002:a25:7647:: with SMTP id r68mr2838440ybc.432.1625179843693;
+ Thu, 01 Jul 2021 15:50:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210626063010.152987-1-hj.tedd.an@gmail.com>
-In-Reply-To: <20210626063010.152987-1-hj.tedd.an@gmail.com>
+References: <20210611020728.15233-1-jprvita@endlessos.org> <CA+A7VXVO6cyVCRnEHvPC1jW_+rQ582AA6c9n68xiGg5t0NwnHQ@mail.gmail.com>
+In-Reply-To: <CA+A7VXVO6cyVCRnEHvPC1jW_+rQ582AA6c9n68xiGg5t0NwnHQ@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 1 Jul 2021 14:43:57 -0700
-Message-ID: <CABBYNZ+c+ic8gBRd6-wTK7z8yXsmJnf2X49OBkRNO97_1_4kFQ@mail.gmail.com>
-Subject: Re: [RFC BlueZ PATCH v4 1/3] emulator/btdev: Update the white list
- and resolving list size
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 1 Jul 2021 15:50:32 -0700
+Message-ID: <CABBYNZLJP7FgKgxbKbvuBJejTKeeXvsTDgWTL3n2=HE4fRoTOw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] profile: Fail RegisterProfile if UUID already exists
+To:     =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        =?UTF-8?Q?Jo=C3=A3o_Paulo_Rechi_Vita?= <jprvita@endlessos.org>,
+        linux@endlessos.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Jo=C3=A3o,
 
-On Fri, Jun 25, 2021 at 11:31 PM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
+On Tue, Jun 29, 2021 at 4:52 PM Jo=C3=A3o Paulo Rechi Vita <jprvita@gmail.c=
+om> wrote:
 >
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> On Thu, Jun 10, 2021 at 7:07 PM Jo=C3=A3o Paulo Rechi Vita <jprvita@gmail=
+.com> wrote:
+> >
+> > From: Jo=C3=A3o Paulo Rechi Vita <jprvita@gmail.com>
+> >
+> > If a process tries to register a profile implementation that is already
+> > registered, RegisterProfile should fail.
+> >
+> > This should help address issues when two instances of PulseAudio are
+> > running at the same time, and the second instance tries to register an
+> > audio profile implementation that has already been registered by the
+> > first instance. Two situations where this may happen is when more than
+> > one user is logged in, or during the transition between the GDM session
+> > and the user session, when PulseAudio gets started on the new session
+> > before the old session has been fully terminated.
+> >
+> > https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/issues/303
+> > https://gitlab.gnome.org/GNOME/gdm/-/issues/486
 >
-> This patch updates the white list and resolving list size to small
-> number.
-> Also, it update the size of white list and resolving list to 1 more than
-> actual size when it is read via HCI read size commands. This is used to
-> simulate the case when the list is out of space.
+> Any feedback on these changes?  I have
+> https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/593
+> on the PulseAudio side, and we have been shipping these changes on
+> Endless OS to address the case where PulseAudio gets started on the
+> user session before PulseAudio on the GDM session has finished.
 >
-> Note that the read list size may not represent the current actual list
-> size depends on the device vendor.
-> ---
->  emulator/btdev.c | 18 ++++++++++++++----
->  1 file changed, 14 insertions(+), 4 deletions(-)
+> Thanks,
 >
-> diff --git a/emulator/btdev.c b/emulator/btdev.c
-> index 90457a5aa..202fc7996 100644
-> --- a/emulator/btdev.c
-> +++ b/emulator/btdev.c
-> @@ -33,8 +33,8 @@
->  #include "monitor/bt.h"
->  #include "btdev.h"
+> Jo=C3=A3o Paulo.
 >
-> -#define WL_SIZE                        16
-> -#define RL_SIZE                        16
-> +#define WL_SIZE                        3
-> +#define RL_SIZE                        3
->  #define CIS_SIZE               3
->
->  #define has_bredr(btdev)       (!((btdev)->features[4] & 0x20))
-> @@ -3402,7 +3402,12 @@ static int cmd_read_wl_size(struct btdev *dev, const void *data, uint8_t len)
->         struct bt_hci_rsp_le_read_white_list_size rsp;
->
->         rsp.status = BT_HCI_ERR_SUCCESS;
-> -       rsp.size = WL_SIZE;
-> +       /* The size is not fixed and the actual list size can be different from
-> +        * the returned size here.
-> +        * In order to test such cases, return more than allocated size, and
-> +        * HCI Add device cmd will return the Memory Capacity Exceeded(0x07)
-> +        */
-> +       rsp.size = WL_SIZE + 1;
->         cmd_complete(dev, BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE, &rsp,
->                                                 sizeof(rsp));
->
-> @@ -3687,7 +3692,12 @@ static int cmd_read_rl_size(struct btdev *dev, const void *data, uint8_t len)
->         struct bt_hci_rsp_le_read_resolv_list_size rsp;
->
->         rsp.status = BT_HCI_ERR_SUCCESS;
-> -       rsp.size = RL_SIZE;
-> +       /* The size is not fixed and the actual list size can be different from
-> +        * the returned size here.
-> +        * In order to test such cases, return more than allocated size, and
-> +        * HCI Add device cmd will return the Memory Capacity Exceeded(0x07)
-> +        */
-> +       rsp.size = RL_SIZE + 1;
->
->         cmd_complete(dev, BT_HCI_CMD_LE_READ_RESOLV_LIST_SIZE,
->                                                         &rsp, sizeof(rsp));
-> --
-> 2.26.3
+> > ---
+> >  src/profile.c | 30 ++++++++++++++++++++++++++++++
+> >  1 file changed, 30 insertions(+)
+> >
+> > diff --git a/src/profile.c b/src/profile.c
+> > index 5e460b639..60d17b6ae 100644
+> > --- a/src/profile.c
+> > +++ b/src/profile.c
+> > @@ -749,6 +749,30 @@ void btd_profile_foreach(void (*func)(struct btd_p=
+rofile *p, void *data),
+> >         }
+> >  }
+> >
+> > +static struct btd_profile *btd_profile_find_uuid(const char *uuid)
+> > +{
+> > +       GSList *l, *next;
+> > +
+> > +       for (l =3D profiles; l !=3D NULL; l =3D next) {
+> > +               struct btd_profile *p =3D l->data;
+> > +
+> > +               if (!g_strcmp0(p->local_uuid, uuid))
+> > +                       return p;
+> > +               next =3D g_slist_next(l);
+> > +       }
+> > +
+> > +       for (l =3D ext_profiles; l !=3D NULL; l =3D next) {
+> > +               struct ext_profile *ext =3D l->data;
+> > +               struct btd_profile *p =3D &ext->p;
+> > +
+> > +               if (!g_strcmp0(p->local_uuid, uuid))
+> > +                       return p;
+> > +               next =3D g_slist_next(l);
+> > +       }
+> > +
+> > +       return NULL;
+> > +}
+> > +
+> >  int btd_profile_register(struct btd_profile *profile)
+> >  {
+> >         profiles =3D g_slist_append(profiles, profile);
+> > @@ -2441,6 +2465,12 @@ static DBusMessage *register_profile(DBusConnect=
+ion *conn,
+> >         dbus_message_iter_get_basic(&args, &uuid);
+> >         dbus_message_iter_next(&args);
+> >
+> > +       if (btd_profile_find_uuid(uuid)) {
+> > +               warn("%s tried to register %s which is already register=
+ed",
+> > +                                                               sender,=
+ uuid);
+> > +               return btd_error_not_permitted(msg, "UUID already regis=
+tered");
+> > +       }
+> > +
+> >         if (dbus_message_iter_get_arg_type(&args) !=3D DBUS_TYPE_ARRAY)
+> >                 return btd_error_invalid_args(msg);
+> >
+> > --
+> > 2.20.1
+> >
 
+Applied, thanks.
 
-This one I think we need to rework somehow, the idea is that we have
-this lists set dynamically in order to test the HCI error so Id have
-some function limit the amount of instances that can be used instead
-of reporting a wrong number like this.
-
-
--- 
+--=20
 Luiz Augusto von Dentz
