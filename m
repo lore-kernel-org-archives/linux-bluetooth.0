@@ -2,148 +2,98 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 031D2C11F68
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jul 2021 15:44:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75455C07E95
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Jul 2021 14:55:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D07C1613CB
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  2 Jul 2021 15:44:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48FF4613AA
+	for <linux-bluetooth@archiver.kernel.org>; Sun,  4 Jul 2021 14:55:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231987AbhGBPqw (ORCPT
+        id S229570AbhGDO6K (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 2 Jul 2021 11:46:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58452 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231804AbhGBPqw (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 2 Jul 2021 11:46:52 -0400
-Received: from mail-qv1-xf30.google.com (mail-qv1-xf30.google.com [IPv6:2607:f8b0:4864:20::f30])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D0EC061762
-        for <linux-bluetooth@vger.kernel.org>; Fri,  2 Jul 2021 08:44:18 -0700 (PDT)
-Received: by mail-qv1-xf30.google.com with SMTP id w5so4833721qvu.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 02 Jul 2021 08:44:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=YaasqdqDbWojsdk/X2AE2NvqYqTBAxfNKfmJ9W5xjEY=;
-        b=QPjvAJ29gAY2E1Uf1fE2gIGTMssJCFSjjAoEjO78//qI+ndnk2CZc5MSeGvR7yuC2Z
-         kqFzwzzH7D0g+TRiIXZ+1uGoN18p/3Mmjs4X8Qe1eSNMLi2rY0CwRfM8nmiwTkW04DcU
-         MWKb2DVWRc7fGOPSBrGsRm8CZhDM6/kqFXHklHXzBMxoXzg9OIXyBwGVytP3xOmlkJ8O
-         ieDpM9d6aJJuoGsccfqa/DEgzp7lIh1we6jGQ1i4EsLVzRTjK48C07/SQdRHX05RRzAS
-         pF7vRpm6Ts1mZI/9DJNexNDmFsGbAyRl3CHSChDG2gBxtX9yRKFje8lDFl2ufgMb0JeH
-         eezg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=YaasqdqDbWojsdk/X2AE2NvqYqTBAxfNKfmJ9W5xjEY=;
-        b=HAVS2Z9JAb9TXchYOQcfZ8o0V63vvEtMZGcFyG2YCYq8CGNEYnFlS1+bYZDXALESOZ
-         qh7VGmofaWyoObnd9NWvaN53s8EBYN+yJqezLbMJbjqxJztjZa67RtNtDYQwahtHdLeI
-         LfYM8Bbil94/8cJ4cxPyKWmBCUK9kLyzE2uPt8mbQ52+zPCawxDbCWSEsWhedFxWmpYm
-         689smqrgQPHGrNs9rmB3aPjPs85nxInNrxDjTmeUGAASOnGN5UMX/rJvCNV8ky7rBmlL
-         A3yGsj1EZCIs/9aMuMSjdcM2HrWgx+ZTkyw0KwLPwUwffwJOM8uMx0WKC1iEYg+0SXp9
-         4xCw==
-X-Gm-Message-State: AOAM532fN/OG3TLtHa4C5JbEu8m8X6cR1I/lqefvEXwSB8hf3DXE/h82
-        1m2Zp2JJPY3F0neooc+TaDYTOWVLCU0g3A==
-X-Google-Smtp-Source: ABdhPJxaBQ0znKde49/SE+HoY2rDEytkMPIYfCNXJX7dqiUsp2KeqyMaf2GwgXWuY40bmjtTEOx3NA==
-X-Received: by 2002:a0c:f78a:: with SMTP id s10mr28379qvn.61.1625240657821;
-        Fri, 02 Jul 2021 08:44:17 -0700 (PDT)
-Received: from [172.17.0.2] ([20.41.13.141])
-        by smtp.gmail.com with ESMTPSA id s77sm516746qke.85.2021.07.02.08.44.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 02 Jul 2021 08:44:17 -0700 (PDT)
-Message-ID: <60df3451.1c69fb81.90838.36c8@mx.google.com>
-Date:   Fri, 02 Jul 2021 08:44:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3995512284351686540=="
+        Sun, 4 Jul 2021 10:58:10 -0400
+Received: from mout.gmx.net ([212.227.17.21]:38079 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229547AbhGDO6J (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 4 Jul 2021 10:58:09 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1625410532;
+        bh=sOGXehM1tLZ6085q2bAyEipEHuIDLW99g0jEdsG2oko=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=KByv1+fLFfkFlb/oT6T5CHrnN+tCaib55Oip7pjBiS394gK9fxKEblAvsaNAo6XrS
+         VR7IDbpBTjTEYs49QSRVGmYmKMFMFVHcWRjbe7/6PkAS6kAKMk1gQGW+AG6p5wzQ9D
+         K+OTa5UX39he49OKgdXXmkWFukwporJYORJItJkY=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([83.52.228.41]) by mail.gmx.net
+ (mrgmx104 [212.227.17.174]) with ESMTPSA (Nemesis) id
+ 1MA7GM-1lu1ub38bi-00Bg2d; Sun, 04 Jul 2021 16:55:31 +0200
+From:   John Wood <john.wood@gmx.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     John Wood <john.wood@gmx.com>, stable@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] bluetooth/virtio_bt: Fix dereference null return value
+Date:   Sun,  4 Jul 2021 16:55:04 +0200
+Message-Id: <20210704145504.24756-1-john.wood@gmx.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, frederik.carlier@quamotion.mobi
-Subject: RE: `SimAccessTest1.CardStatus`: Mark status as `uint`
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <AM8PR05MB8292DD484EF2EE569F04BF2DEA1F9@AM8PR05MB8292.eurprd05.prod.outlook.com>
-References: <AM8PR05MB8292DD484EF2EE569F04BF2DEA1F9@AM8PR05MB8292.eurprd05.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:+Bb+LJ6hEp5FkU0Ty6vgHXhvNSVHjKFxNZ32v7cj48ZledK+47z
+ ho59QPdZI4SqrO/qg8OiC4qCNeY6xQcGffORnIcTsaoXcwvNcIFTFJiDDZUOSV1Vkcan5x4
+ gZ69pgPe/cTDcozlflyNgNz5VKbI4xcGAUJ0ffD/yzsXMKHcZN6ryVTRVUpBTZWW3+ThsTc
+ tCEqv9VwwU/iArj71yrFg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:jfEjBhVmTbc=:XXFC+AsCMXRZqok/1arJ8E
+ DH6R4NbF35KNeTSY7cjwA8USqJ2bltknRJzJKT95OKrqqq1EY67GjK3+LUlXw4wKVsx7g1UhK
+ VBGldQvs9vkEVftIvAO1MSXbIjyFU8+bqfA5t1uMnGqqiAubK/f2UyFb6Dnkmys1nQXT/81S5
+ uXb1TdPmyitBN22LhQjDMFD7WwuF7h0Ev1qCpqV7hxS03K4MvgD1ldJA/PvjhbQkK781xMezt
+ fF4IGlUt2MKSYlejSwnf9GDnMNVhsXk2n6F+g5ZBVyBJYm6ojQ11QhWNi80/yRGhmTcHyu7gR
+ 3tTN7QkJK0IbvpFFeVBmzeSznkSSCcgnsdeuhDiIrtQP/ZXJR0PgmcD8AbSOqcHte0i0/NxHT
+ YiW5nGpyJr0uEc9W3kdxs+QemKeCncWj9F70AkL657VBYZcvAlaMlAKwybsxE1a1qLg/fz1L1
+ O0Wl8QzdwCLFa56AA8mSAzdIxdSoImWO3Za6QjPnPIL3Qv0zbZi9njQ8T3JNCiQ9tSbboFeWD
+ jvx6D+MOZYvmlx2C0Y6CXk+wU+9WmaQAtDKfckkf4BBYz4cZM5Lkdx4ExE0I8KpLJBKYeHOlR
+ Rc9OCbTXyE2Fcxh1zvyKWeOzS3RGerwXQ0l3kTEvE0TzeVMavc4Ipb2gIFo6q8xd8gDCJp9OQ
+ 77sHhrO1iaIx9K6bKfLoedJK7bsUvgQSiu8ZUZkRpAeIC57lFU0tCIr0GM98utB6r1maPAvBh
+ j+DHJQzDKMZ+91gnFNQ/Xal64XGeDxpOTQLC4oRA/wOos8jOVNgE6NGi21AedC+seiAhzA7SQ
+ HnN9f1OCtldrzghREwmBf4ngGbYfDnoimYsgPWKbgBWOQp+KVMLJhP4ffBeQ+aQBlnusHB5dR
+ bMsjP16UtqKz7K4hI17A0QRIA8xvtjB2H1SoynKJhoo3UW1vt+IN9TdoTADwJ9eyP+qTdk9i+
+ In/G0g4cGr3qrKA6Qyuz5crNaM0Ao3aJ+v7DeqMZ0kletTkFftEzSqBg1jVEN4OUlajikucD4
+ TRN1u4jwtuHEWyR670Sl6YfJUIG5OUQF93tECcYR4VG/uskgD4aamh4elvVNmq1C3n4EDsEeN
+ fLA9ZX7+2YwTibzavE12RmRQgBcldDtQzC/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3995512284351686540==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+The alloc_skb function returns NULL on error. So, test this case and
+avoid a NULL dereference (skb->data).
 
-This is automated email and please do not reply to this email!
+Addresses-Coverity-ID: 1484718 ("Dereference null return value")
+Fixes: afd2daa26c7ab ("Bluetooth: Add support for virtio transport driver"=
+)
+Signed-off-by: John Wood <john.wood@gmx.com>
+=2D--
+ drivers/bluetooth/virtio_bt.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Dear submitter,
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index c804db7e90f8..5f82574236c0 100644
+=2D-- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -34,6 +34,8 @@ static int virtbt_add_inbuf(struct virtio_bluetooth *vbt=
+)
+ 	int err;
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=510177
+ 	skb =3D alloc_skb(1000, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
+ 	sg_init_one(sg, skb->data, 1000);
 
----Test result---
+ 	err =3D virtqueue_add_inbuf(vq, sg, 1, skb, GFP_KERNEL);
+=2D-
+2.25.1
 
-Test Summary:
-CheckPatch                    PASS      0.34 seconds
-GitLint                       PASS      0.14 seconds
-Prep - Setup ELL              PASS      52.51 seconds
-Build - Prep                  PASS      0.16 seconds
-Build - Configure             PASS      9.36 seconds
-Build - Make                  PASS      231.65 seconds
-Make Check                    PASS      9.36 seconds
-Make Distcheck                PASS      277.56 seconds
-Build w/ext ELL - Configure   PASS      9.14 seconds
-Build w/ext ELL - Make        PASS      221.35 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3995512284351686540==--
