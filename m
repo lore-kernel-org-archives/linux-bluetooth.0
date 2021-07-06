@@ -7,42 +7,40 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_NONE,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74FC2C11F70
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A345C07E9E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4EDB361EC1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36B6A61EC7
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234669AbhGFL2U (ORCPT
+        id S233375AbhGFL2V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 07:28:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55302 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 07:28:21 -0400
+Received: from mail.kernel.org ([198.145.29.99]:54930 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233770AbhGFLWk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S233780AbhGFLWk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 6 Jul 2021 07:22:40 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 741C761C96;
-        Tue,  6 Jul 2021 11:17:57 +0000 (UTC)
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D67AC61CE7;
+        Tue,  6 Jul 2021 11:17:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570278;
-        bh=i+v0LyqW/GMJfqirG5xhb6SPG5Y0ig7AwKIuaVGnbvY=;
+        s=k20201202; t=1625570280;
+        bh=4XE57rboEos+g49ocWKsyKPo6QxLC7zp0tlpBlAbidU=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=S3ad2FVb2T1+vi+Sv5ULRyjnygx0I9cxYx+j3fS8qMvRztqsYm0XwHxrpFCPE6lPK
-         Iw1wYqCUrxG7DUPf7/iMu4NbcP6bGoidMOnab814AYkEKpIMYT5JunsJ5PN/QQ9ccM
-         Wn4OaaEjPNvCQ4oVd6shGdfsVZLeWeiagX+w5HZxnTefMdBabZX98UndMe7NHpF9tc
-         AzxuebEHLocMumCN4yM/vd/aNETg8fgWNaz38UHY3zLassu2a/JY3iVaIgMunATm7q
-         ppgcSb065TAb2V7GQ/75RS/b9t3XrFLHSpIlDQQAtLXTe65tRx8zdy389FetDIg2hY
-         9gg3lfOHsaTEg==
+        b=njrCgESoQF3UnH7nRjQwqnamFXkFMzvRU4Zlrv/NjKnZ8nz7U5UkqgnJpvSZhSwLW
+         g8REk6BkJswdu7wczOgniZbntGwdOGVU19TMrgJ+pYdw8qU+5HbxvS5GIaHAN8/GP7
+         UsLDvF7CurATtHCdm/4Uwxauf1gHyxx3yoQ7Nsy1yNV+6xR4liqGnHhM2OUvSd1MiF
+         M7wnWwHzVm7zxUump5yIuIKrI+u2p8U70dJZyJUBDBuLXzoK5xGlhtgBjaK97ZTLIW
+         3CSjpFGWMbOyzeF4QusXbx0WB6AEy6iwEUUP1cjVCnYyHuwN1V9P5EbZOhxym/tBbK
+         IVYD5LMCib0Dw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     "mark-yw.chen" <mark-yw.chen@mediatek.com>,
+Cc:     Yu Liu <yudiliu@google.com>, Miao-chen Chou <mcchou@chromium.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org
-Subject: [PATCH AUTOSEL 5.13 170/189] Bluetooth: btusb: Fixed too many in-token issue for Mediatek Chip.
-Date:   Tue,  6 Jul 2021 07:13:50 -0400
-Message-Id: <20210706111409.2058071-170-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 172/189] Bluetooth: Fix the HCI to MGMT status conversion table
+Date:   Tue,  6 Jul 2021 07:13:52 -0400
+Message-Id: <20210706111409.2058071-172-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210706111409.2058071-1-sashal@kernel.org>
 References: <20210706111409.2058071-1-sashal@kernel.org>
@@ -54,48 +52,42 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: "mark-yw.chen" <mark-yw.chen@mediatek.com>
+From: Yu Liu <yudiliu@google.com>
 
-[ Upstream commit 8454ed9ff9647e31e061fb5eb2e39ce79bc5e960 ]
+[ Upstream commit 4ef36a52b0e47c80bbfd69c0cce61c7ae9f541ed ]
 
-This patch reduce in-token during download patch procedure.
-Don't submit urb for polling event before sending hci command.
+0x2B, 0x31 and 0x33 are reserved for future use but were not present in
+the HCI to MGMT conversion table, this caused the conversion to be
+incorrect for the HCI status code greater than 0x2A.
 
-Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Yu Liu <yudiliu@google.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ net/bluetooth/mgmt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7f6ba2c975ed..99fd88f7653d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3312,11 +3312,6 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	struct btmtk_wmt_hdr *hdr;
- 	int err;
- 
--	/* Submit control IN URB on demand to process the WMT event */
--	err = btusb_mtk_submit_wmt_recv_urb(hdev);
--	if (err < 0)
--		return err;
--
- 	/* Send the WMT command and wait until the WMT event returns */
- 	hlen = sizeof(*hdr) + wmt_params->dlen;
- 	if (hlen > 255)
-@@ -3342,6 +3337,11 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
- 		goto err_free_wc;
- 	}
- 
-+	/* Submit control IN URB on demand to process the WMT event */
-+	err = btusb_mtk_submit_wmt_recv_urb(hdev);
-+	if (err < 0)
-+		return err;
-+
- 	/* The vendor specific WMT commands are all answered by a vendor
- 	 * specific event and will have the Command Status or Command
- 	 * Complete as with usual HCI command flow control.
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f9be7f9084d6..425502f1d380 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -252,12 +252,15 @@ static const u8 mgmt_status_table[] = {
+ 	MGMT_STATUS_TIMEOUT,		/* Instant Passed */
+ 	MGMT_STATUS_NOT_SUPPORTED,	/* Pairing Not Supported */
+ 	MGMT_STATUS_FAILED,		/* Transaction Collision */
++	MGMT_STATUS_FAILED,		/* Reserved for future use */
+ 	MGMT_STATUS_INVALID_PARAMS,	/* Unacceptable Parameter */
+ 	MGMT_STATUS_REJECTED,		/* QoS Rejected */
+ 	MGMT_STATUS_NOT_SUPPORTED,	/* Classification Not Supported */
+ 	MGMT_STATUS_REJECTED,		/* Insufficient Security */
+ 	MGMT_STATUS_INVALID_PARAMS,	/* Parameter Out Of Range */
++	MGMT_STATUS_FAILED,		/* Reserved for future use */
+ 	MGMT_STATUS_BUSY,		/* Role Switch Pending */
++	MGMT_STATUS_FAILED,		/* Reserved for future use */
+ 	MGMT_STATUS_FAILED,		/* Slot Violation */
+ 	MGMT_STATUS_FAILED,		/* Role Switch Failed */
+ 	MGMT_STATUS_INVALID_PARAMS,	/* EIR Too Large */
 -- 
 2.30.2
 
