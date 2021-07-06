@@ -7,40 +7,40 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BE9EC11F81
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77643C11F86
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9325861D2D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B54761EE1
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234719AbhGFL2c (ORCPT
+        id S233745AbhGFL2e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 07:28:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55802 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 07:28:34 -0400
+Received: from mail.kernel.org ([198.145.29.99]:56584 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233934AbhGFLXI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:23:08 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 1ECB561D01;
-        Tue,  6 Jul 2021 11:18:09 +0000 (UTC)
+        id S234093AbhGFLXo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:23:44 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 6DFF361D04;
+        Tue,  6 Jul 2021 11:18:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570289;
-        bh=m3dohVFWiNvNrxgZb3MiEuDyl8NHehKbXvCYfxO7etI=;
+        s=k20201202; t=1625570292;
+        bh=9CZYZH1IJIqZRfQ/cPp5d9YX2cUsPDo8NZVgJPiZQHA=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=GHh77UVJ4uUECyp5T+lSyZAzx2cXToXNEvt7fInk+hk4JW8QWxAfYuGr7XnJqewbV
-         TiBsy3D82zxC5nBwKrl67IFVlU0JNMbnDXQlcNmv1R5qpDI+RhN/v0Gv1o6+48bhxe
-         JxKtanm6/j/FB68orKX5YtUGgaChK3WeEoh40K91D2WCkip1W6EVUgum5tUuIMXYGQ
-         OxVIGTSax9MztyJC5gwcc/WdeVLl4irrs8Hvi/spu5Y3+BDVSlhucDcoPn2lEFct5N
-         XX4n4MfwRuByslPWEi/y9LljLqlEcvwRWQJ5deMVVF8Kvytla9Gehe4hf10zamdDte
-         HKTNHrFU2WcJw==
+        b=TZoxlgTlRJdGPxDuwRUtp4huAAbF8SRWq/ITUiR8VeJDGYdHmQvEVqPCwCcOP1/h2
+         XObDL1GMqcU0MoaCVR6gNZumAiAQkSQytTaDYDb2f+7dggTg6cLR9NpH2TWJ8IR8BR
+         eSDV7Eb0NSLP8Nz+ovO5AlzFPGznV5eFkHs+n+STV+5tO15rlP1b3LnAXK84lUTNzY
+         gPUQrG+E26IpL9DbOlxfoFKkP3KHtwlXfYQYC7lzItu4/npmWwQwnrMdvUiieLhgT9
+         5x8Oh7zMEBrE+cOyhun74nEVsjYfw8dXnY+UoeAC6knr5ddOI/HKXqhG3F0Cn/oQ/B
+         hFO/5VpeYRMjw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>,
+Cc:     Tim Jiang <tjiang@codeaurora.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 179/189] Bluetooth: mgmt: Fix the command returns garbage parameter value
-Date:   Tue,  6 Jul 2021 07:13:59 -0400
-Message-Id: <20210706111409.2058071-179-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 181/189] Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
+Date:   Tue,  6 Jul 2021 07:14:01 -0400
+Message-Id: <20210706111409.2058071-181-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210706111409.2058071-1-sashal@kernel.org>
 References: <20210706111409.2058071-1-sashal@kernel.org>
@@ -52,35 +52,37 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+From: Tim Jiang <tjiang@codeaurora.org>
 
-[ Upstream commit 02ce2c2c24024aade65a8d91d6a596651eaf2d0a ]
+[ Upstream commit 4f00bfb372674d586c4a261bfc595cbce101fbb6 ]
 
-When the Get Device Flags command fails, it returns the error status
-with the parameters filled with the garbage values. Although the
-parameters are not used, it is better to fill with zero than the random
-values.
+This is btsoc timing issue, after host start to downloading bt firmware,
+ep2 need time to switch from function acl to function dfu, so host add
+20ms delay as workaround.
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/mgmt.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btusb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 425502f1d380..d0c8b8a41914 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4061,6 +4061,8 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1cec9b2353c6..6d23308119d1 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4071,6 +4071,11 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+ 	sent += size;
+ 	count -= size;
  
- 	hci_dev_lock(hdev);
- 
-+	memset(&rp, 0, sizeof(rp));
++	/* ep2 need time to switch from function acl to function dfu,
++	 * so we add 20ms delay here.
++	 */
++	msleep(20);
 +
- 	if (cp->addr.type == BDADDR_BREDR) {
- 		br_params = hci_bdaddr_list_lookup_with_flags(&hdev->whitelist,
- 							      &cp->addr.bdaddr,
+ 	while (count) {
+ 		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
+ 
 -- 
 2.30.2
 
