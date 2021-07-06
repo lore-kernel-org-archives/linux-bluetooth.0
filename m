@@ -2,92 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
+	DKIM_SIGNED,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F391AC11FF3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD627C11F66
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D111B62111
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9330620DB
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240239AbhGFMFR (ORCPT
+        id S240617AbhGFMFX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 08:05:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47624 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 08:05:23 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33316 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238098AbhGFLiv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:38:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 5617161F99;
-        Tue,  6 Jul 2021 11:30:05 +0000 (UTC)
+        id S237525AbhGFL63 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:58:29 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id B6F8861179;
+        Tue,  6 Jul 2021 11:55:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625571006;
-        bh=GezdSB+vhv6+73BBnXMo04oga3ezmusXwbjqm0pi+vw=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=miXf9f+bocDPTixIzZs9yxNKxqwiBuVH9yHgbYCXWuP1DKO30BEJ7CRhLw/A6Zivt
-         GIilx2PJOobw1xwOrtM3wDkvqUjKeJA2Irsa83RWyE6xTy3XMJFwQpzDfSz3sbUPpe
-         xUIFJcyvOC7G+eh0lQzGo5eCQL/8fO0i1H0gv0NBTGZOruHEZUZsQXl4hZioR7W113
-         nYqD9tPnhwnlp8jzAZVLqsHQtCfZlf/CYe3QRYJDlMg4AnoYx0xrnnAFG4iOKBpEYh
-         mQ0OOpHJyJzw7hc/4KK9JZUKL1lBGg29oWyB6h0DZwhtvdlvVPIgk3aIAWbtqNXdMT
-         eS9CiSYzmrDDw==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Yu Liu <yudiliu@google.com>, Miao-chen Chou <mcchou@chromium.org>,
+        s=k20201202; t=1625572549;
+        bh=JXmBsXYXG9KG7U5AjlAUHgTa15XndAwh6xpRx35ssAo=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=JbOfwmVF4OkhS5vWEeG1/y6EzbbSwmaGz+O2PUgdxW8i2J5XsnE7M6+ypvPxZiLBM
+         3klouA+VESkfgGkHYyVBVx5HAXAMNeDdkwIVUlkmZB4SfoyyvNJwuuVLQZl1sl9nsf
+         0qQ7VeJLZSks0CiTqNdrnJgOXjaWxCHUW29odk/ZYWRSc+mczvm80gi1qDhbm2bNPq
+         XWfnvdeAJB7ZdvMhgvuqLB+U0egmAIOso0LHfx4nboab6JTrLN15TfrTVD7LgBqzzZ
+         nemt4h8ofc9CIUk76G2oifZwmbZ+SizUH2SPthodth6U5RWSM+ykcrqZnKpIuDWzz+
+         uyTdLgzFUAD1w==
+Date:   Tue, 6 Jul 2021 12:55:17 +0100
+From:   Mark Brown <broonie@kernel.org>
+To:     Ulf Hansson <ulf.hansson@linaro.org>
+Cc:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
+        Peter Chen <peter.chen@nxp.com>,
+        Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Rob Herring <robh+dt@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 28/31] Bluetooth: Fix the HCI to MGMT status conversion table
-Date:   Tue,  6 Jul 2021 07:29:28 -0400
-Message-Id: <20210706112931.2066397-28-sashal@kernel.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210706112931.2066397-1-sashal@kernel.org>
-References: <20210706112931.2066397-1-sashal@kernel.org>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        DTML <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH v3 2/7] regulator: qca6390: add support for QCA639x
+ powerup sequence
+Message-ID: <20210706115517.GB4529@sirena.org.uk>
+References: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
+ <20210621223141.1638189-3-dmitry.baryshkov@linaro.org>
+ <CAPDyKFo6dmjw0TnaK7=35dq5Si_6YYpeeSa=gU++1od7WkQZ7A@mail.gmail.com>
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+        protocol="application/pgp-signature"; boundary="24zk1gE8NUlDmwG9"
+Content-Disposition: inline
+In-Reply-To: <CAPDyKFo6dmjw0TnaK7=35dq5Si_6YYpeeSa=gU++1od7WkQZ7A@mail.gmail.com>
+X-Cookie: Some restrictions may apply.
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yu Liu <yudiliu@google.com>
 
-[ Upstream commit 4ef36a52b0e47c80bbfd69c0cce61c7ae9f541ed ]
+--24zk1gE8NUlDmwG9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-0x2B, 0x31 and 0x33 are reserved for future use but were not present in
-the HCI to MGMT conversion table, this caused the conversion to be
-incorrect for the HCI status code greater than 0x2A.
+On Tue, Jul 06, 2021 at 09:54:03AM +0200, Ulf Hansson wrote:
+> On Tue, 22 Jun 2021 at 00:32, Dmitry Baryshkov
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Yu Liu <yudiliu@google.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- net/bluetooth/mgmt.c | 3 +++
- 1 file changed, 3 insertions(+)
+> > Qualcomm QCA6390/1 is a family of WiFi + Bluetooth SoCs, with BT part
+> > being controlled through the UART and WiFi being present on PCIe
+> > bus. Both blocks share common power sources. Add device driver handling
+> > power sequencing of QCA6390/1.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ee761fb09559..4a95c89d8506 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -212,12 +212,15 @@ static u8 mgmt_status_table[] = {
- 	MGMT_STATUS_TIMEOUT,		/* Instant Passed */
- 	MGMT_STATUS_NOT_SUPPORTED,	/* Pairing Not Supported */
- 	MGMT_STATUS_FAILED,		/* Transaction Collision */
-+	MGMT_STATUS_FAILED,		/* Reserved for future use */
- 	MGMT_STATUS_INVALID_PARAMS,	/* Unacceptable Parameter */
- 	MGMT_STATUS_REJECTED,		/* QoS Rejected */
- 	MGMT_STATUS_NOT_SUPPORTED,	/* Classification Not Supported */
- 	MGMT_STATUS_REJECTED,		/* Insufficient Security */
- 	MGMT_STATUS_INVALID_PARAMS,	/* Parameter Out Of Range */
-+	MGMT_STATUS_FAILED,		/* Reserved for future use */
- 	MGMT_STATUS_BUSY,		/* Role Switch Pending */
-+	MGMT_STATUS_FAILED,		/* Reserved for future use */
- 	MGMT_STATUS_FAILED,		/* Slot Violation */
- 	MGMT_STATUS_FAILED,		/* Role Switch Failed */
- 	MGMT_STATUS_INVALID_PARAMS,	/* EIR Too Large */
--- 
-2.30.2
+> Power sequencing of discoverable buses have been discussed several
+> times before at LKML. The last attempt [1] I am aware of, was in 2017
+> from Peter Chen. I don't think there is a common solution, yet.
 
+This feels a bit different to the power sequencing problem - it's not
+exposing the individual inputs to the device but rather is a block that
+manages everything but needs a bit of a kick to get things going (I'd
+guess that with ACPI it'd be triggered via AML).  It's in the same space
+but it's not quite the same issue I think, something that can handle
+control of the individual resources might still struggle with this.
+
+--24zk1gE8NUlDmwG9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmDkRKQACgkQJNaLcl1U
+h9A9oAf/QENRZjXRFVPDjWc5SZZ1jRLz0JmogYRWNMICgbOtz1VBdXoNW/Lww3pt
+dke5UKjZ+XQkNR3aavlJL+PatLcw5KcLLIM7q6seqDtyV3oesMqPe4eHpf7E8niH
+RlrkwxoSHb3r7/tYFr2TNDxL1ZuQKEOT1Bn1tcNP4krJ4sa2M4sYmM7XV4VdFlkE
+/ymTDt9FrU/lQZHkT414lAI615+uJqFaRn17h6TnrC0MhELJ/BoLo62tBWaO0gtv
+sey70r+PcIRzS6p/iA8i+HHNTfR5EiVnBF3tVidPeOwt8Haj8TfhdDGbvzeAuaDc
+sia1bg8tC8v+IFLkdkwWFG7TzvN8ZQ==
+=L8x2
+-----END PGP SIGNATURE-----
+
+--24zk1gE8NUlDmwG9--
