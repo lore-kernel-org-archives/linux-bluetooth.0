@@ -7,43 +7,45 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58BE8C07E9B
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A704BC11F69
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:48:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3842D619C4
+	by mail.kernel.org (Postfix) with ESMTP id 8AB9361F94
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:48:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238788AbhGFLtR (ORCPT
+        id S239088AbhGFLtZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 07:49:17 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47572 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 07:49:25 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47596 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236923AbhGFLfr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:35:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 749D261C52;
-        Tue,  6 Jul 2021 11:24:43 +0000 (UTC)
+        id S237253AbhGFLgD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:36:03 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 700F861ED3;
+        Tue,  6 Jul 2021 11:26:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570684;
-        bh=VtYaThCNyltNmuOVNOdhyM/G03hpxwBF3WfsEHgyDtM=;
+        s=k20201202; t=1625570788;
+        bh=YKDKaRGl7fO7ELmzr9hBkOFhBeqnWCkO4x0aW4zfCPE=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=vNklP6VPnsmMqcJVDgAd0qJmXuKbPmqEaa/A9P6TF4j2yYJ5NyYji6YFnVk9xjoS2
-         OBKKI1QWcOCOaa9rJu2LububxWEW2ubE+QAUkA/ELDYbt/xOugNZ4AGsUlsYl/k+pL
-         faY7G+gJ4PxYYzpuR/atd2KT5rZtz+7OvX3TjQc7lQG/vJ7SMEnizalS3PRFe9+I/1
-         H0RpVBEF4RO7ClIyXYJDpPA/mXYTrhr5HaeYzhpqyI/+Ny1X3UfihrxG7dqR1984ng
-         38WDaRkuZkltkOvgbLPnR5dJ23MUuSLROLvuAnEGB/bS+ERHNbwGWnbEGZ3VJwZi6r
-         9roRGR9PyKYGA==
+        b=LV5S6k/nPF7tUbmUa1I+tjokFUrBsh9V/vgIDhZ/o/hF5Iw35csRC6Y4HUanRDH7L
+         M9Dr9DXL/f5S+gGjO3LcwUPdDTBEFnSXYdayJODuFzFa2qfcGUgUtj3A4tM8S+YhZS
+         tJIRebgctlR+T0AyrHxhxVDjNsMhtt3labW8nAoVCMR9vYINSDQxNBhz0a7voolQRi
+         9EwAyqU9/3V/4+ksZd9Lh9oX0NsgNxCoMpK/1PORj5JIp7EUw+oRsgn/s2SYzhMO1m
+         VHGxCke2/N/0EHKj3vZnOHOS60wnscEXpXOw47pHcRM/2DgQh/IQ3mHLiiWxbtWVc4
+         1JvdOpLfy9iFQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
+Cc:     "mark-yw.chen" <mark-yw.chen@mediatek.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 124/137] Bluetooth: Shutdown controller after workqueues are flushed or cancelled
-Date:   Tue,  6 Jul 2021 07:21:50 -0400
-Message-Id: <20210706112203.2062605-124-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.4 67/74] Bluetooth: btusb: Fixed too many in-token issue for Mediatek Chip.
+Date:   Tue,  6 Jul 2021 07:24:55 -0400
+Message-Id: <20210706112502.2064236-67-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210706112203.2062605-1-sashal@kernel.org>
-References: <20210706112203.2062605-1-sashal@kernel.org>
+In-Reply-To: <20210706112502.2064236-1-sashal@kernel.org>
+References: <20210706112502.2064236-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,113 +54,48 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Kai-Heng Feng <kai.heng.feng@canonical.com>
+From: "mark-yw.chen" <mark-yw.chen@mediatek.com>
 
-[ Upstream commit 0ea9fd001a14ebc294f112b0361a4e601551d508 ]
+[ Upstream commit 8454ed9ff9647e31e061fb5eb2e39ce79bc5e960 ]
 
-Rfkill block and unblock Intel USB Bluetooth [8087:0026] may make it
-stops working:
-[  509.691509] Bluetooth: hci0: HCI reset during shutdown failed
-[  514.897584] Bluetooth: hci0: MSFT filter_enable is already on
-[  530.044751] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
-[  545.660350] usb 3-10: device descriptor read/64, error -110
-[  561.283530] usb 3-10: device descriptor read/64, error -110
-[  561.519682] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
-[  566.686650] Bluetooth: hci0: unexpected event for opcode 0x0500
-[  568.752452] Bluetooth: hci0: urb 0000000096cd309b failed to resubmit (113)
-[  578.797955] Bluetooth: hci0: Failed to read MSFT supported features (-110)
-[  586.286565] Bluetooth: hci0: urb 00000000c522f633 failed to resubmit (113)
-[  596.215302] Bluetooth: hci0: Failed to read MSFT supported features (-110)
+This patch reduce in-token during download patch procedure.
+Don't submit urb for polling event before sending hci command.
 
-Or kernel panics because other workqueues already freed skb:
-[ 2048.663763] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[ 2048.663775] #PF: supervisor read access in kernel mode
-[ 2048.663779] #PF: error_code(0x0000) - not-present page
-[ 2048.663782] PGD 0 P4D 0
-[ 2048.663787] Oops: 0000 [#1] SMP NOPTI
-[ 2048.663793] CPU: 3 PID: 4491 Comm: rfkill Tainted: G        W         5.13.0-rc1-next-20210510+ #20
-[ 2048.663799] Hardware name: HP HP EliteBook 850 G8 Notebook PC/8846, BIOS T76 Ver. 01.01.04 12/02/2020
-[ 2048.663801] RIP: 0010:__skb_ext_put+0x6/0x50
-[ 2048.663814] Code: 8b 1b 48 85 db 75 db 5b 41 5c 5d c3 be 01 00 00 00 e8 de 13 c0 ff eb e7 be 02 00 00 00 e8 d2 13 c0 ff eb db 0f 1f 44 00 00 55 <8b> 07 48 89 e5 83 f8 01 74 14 b8 ff ff ff ff f0 0f c1
-07 83 f8 01
-[ 2048.663819] RSP: 0018:ffffc1d105b6fd80 EFLAGS: 00010286
-[ 2048.663824] RAX: 0000000000000000 RBX: ffff9d9ac5649000 RCX: 0000000000000000
-[ 2048.663827] RDX: ffffffffc0d1daf6 RSI: 0000000000000206 RDI: 0000000000000000
-[ 2048.663830] RBP: ffffc1d105b6fd98 R08: 0000000000000001 R09: ffff9d9ace8ceac0
-[ 2048.663834] R10: ffff9d9ace8ceac0 R11: 0000000000000001 R12: ffff9d9ac5649000
-[ 2048.663838] R13: 0000000000000000 R14: 00007ffe0354d650 R15: 0000000000000000
-[ 2048.663843] FS:  00007fe02ab19740(0000) GS:ffff9d9e5f8c0000(0000) knlGS:0000000000000000
-[ 2048.663849] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 2048.663853] CR2: 0000000000000000 CR3: 0000000111a52004 CR4: 0000000000770ee0
-[ 2048.663856] PKRU: 55555554
-[ 2048.663859] Call Trace:
-[ 2048.663865]  ? skb_release_head_state+0x5e/0x80
-[ 2048.663873]  kfree_skb+0x2f/0xb0
-[ 2048.663881]  btusb_shutdown_intel_new+0x36/0x60 [btusb]
-[ 2048.663905]  hci_dev_do_close+0x48c/0x5e0 [bluetooth]
-[ 2048.663954]  ? __cond_resched+0x1a/0x50
-[ 2048.663962]  hci_rfkill_set_block+0x56/0xa0 [bluetooth]
-[ 2048.664007]  rfkill_set_block+0x98/0x170
-[ 2048.664016]  rfkill_fop_write+0x136/0x1e0
-[ 2048.664022]  vfs_write+0xc7/0x260
-[ 2048.664030]  ksys_write+0xb1/0xe0
-[ 2048.664035]  ? exit_to_user_mode_prepare+0x37/0x1c0
-[ 2048.664042]  __x64_sys_write+0x1a/0x20
-[ 2048.664048]  do_syscall_64+0x40/0xb0
-[ 2048.664055]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[ 2048.664060] RIP: 0033:0x7fe02ac23c27
-[ 2048.664066] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-[ 2048.664070] RSP: 002b:00007ffe0354d638 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-[ 2048.664075] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fe02ac23c27
-[ 2048.664078] RDX: 0000000000000008 RSI: 00007ffe0354d650 RDI: 0000000000000003
-[ 2048.664081] RBP: 0000000000000000 R08: 0000559b05998440 R09: 0000559b05998440
-[ 2048.664084] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
-[ 2048.664086] R13: 0000000000000000 R14: ffffffff00000000 R15: 00000000ffffffff
-
-So move the shutdown callback to a place where workqueues are either
-flushed or cancelled to resolve the issue.
-
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/hci_core.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ drivers/bluetooth/btusb.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 86ebfc6ae698..0854f1b35683 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1713,14 +1713,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b467fd05c5e8..27ff7a6e2fc9 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2700,11 +2700,6 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 	struct btmtk_wmt_hdr *hdr;
+ 	int err;
  
- 	BT_DBG("%s %p", hdev->name, hdev);
- 
--	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
--	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--	    test_bit(HCI_UP, &hdev->flags)) {
--		/* Execute vendor specific shutdown routine */
--		if (hdev->shutdown)
--			hdev->shutdown(hdev);
--	}
+-	/* Submit control IN URB on demand to process the WMT event */
+-	err = btusb_mtk_submit_wmt_recv_urb(hdev);
+-	if (err < 0)
+-		return err;
 -
- 	cancel_delayed_work(&hdev->power_off);
- 
- 	hci_request_cancel_all(hdev);
-@@ -1796,6 +1788,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 		clear_bit(HCI_INIT, &hdev->flags);
+ 	/* Send the WMT command and wait until the WMT event returns */
+ 	hlen = sizeof(*hdr) + wmt_params->dlen;
+ 	if (hlen > 255)
+@@ -2726,6 +2721,11 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 		return err;
  	}
  
-+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+	    test_bit(HCI_UP, &hdev->flags)) {
-+		/* Execute vendor specific shutdown routine */
-+		if (hdev->shutdown)
-+			hdev->shutdown(hdev);
-+	}
++	/* Submit control IN URB on demand to process the WMT event */
++	err = btusb_mtk_submit_wmt_recv_urb(hdev);
++	if (err < 0)
++		return err;
 +
- 	/* flush cmd  work */
- 	flush_work(&hdev->cmd_work);
- 
+ 	/* The vendor specific WMT commands are all answered by a vendor
+ 	 * specific event and will have the Command Status or Command
+ 	 * Complete as with usual HCI command flow control.
 -- 
 2.30.2
 
