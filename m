@@ -7,43 +7,43 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 321B8C11FFC
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B703FC11F6C
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1EF86620DD
+	by mail.kernel.org (Postfix) with ESMTP id 9FDF5620DB
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 12:02:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240628AbhGFMFY (ORCPT
+        id S238289AbhGFMF3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 08:05:24 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47556 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 08:05:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47600 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235260AbhGFLgd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:36:33 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 342E561F29;
-        Tue,  6 Jul 2021 11:29:29 +0000 (UTC)
+        id S236951AbhGFLfs (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:35:48 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id F09CE61C5C;
+        Tue,  6 Jul 2021 11:24:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570969;
-        bh=grkEjosmlW7zlW8HPokuK+9bc9XrMK0ts/pfTBaXc38=;
+        s=k20201202; t=1625570691;
+        bh=weH4CNkH3qClIGicJA8ZV2exCFsK3zq5d/yVwQmLTII=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=UyDgi2PEEG1dCGLX+LB3uTnYJKUN7qSc/BsowVgcd3OxoTa1wcIpZoi5CmJ+az1in
-         wSlGvdZJ9xsNm3A/KXZbc+pp7zuE/CkGYj30PRCH3waKXfLWusbL/8ao8lsiOWW4Bg
-         3ePsUzXjoaFJ4XAO5c80h3+dodherlmEYjoORVb4X0tH7nOtaiBuKP5yk6HRjFiVXs
-         0tKrJR1mHlFbHgVGu8GhpcQX2y80t4rvscMOshTiDC1Jdyro5W8paHRYjEut+o1iMp
-         oJv6r6hOt6AJQf0Z1SqIVCaEWV5Qn9kJAgZGdbs7XeJyp+CHZ7lztqskcRZTS+IF25
-         FCEYTk7s1rwIg==
+        b=lfGbyRz4qEcLJFYLyQVKvS/M8QaNj8YRj/MHvGGDSezmg/+tSnZ1cDRLtSF9ZHtYD
+         MLOUxfkxIIgiK77OH0IFoMVJeSeSr8DaGKDC1+SpLjG+swOXUPIe6RJh/zUOgWFBSO
+         k0ZitEqJu640sh96pdqmBD/6Q+xAP7CoBFRyUbVwTyTmxd3zl52l/VJdd+/Y7IWaOW
+         +79zqTQH7vaIGtZSwA6xoEyna0LErkSGc0pG1SoSFwBjbC7cPSvTjAPavIfxL0rQZY
+         hgTazPSzAmCh9IK0SSJBry9BEUI5apqCp4r1Buj6nO3ssd2QTLRCPKsln5uET1KvNM
+         +nkNuaeeFSh9Q==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Tim Jiang <tjiang@codeaurora.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 34/35] Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
-Date:   Tue,  6 Jul 2021 07:28:46 -0400
-Message-Id: <20210706112848.2066036-34-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 5.10 130/137] Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
+Date:   Tue,  6 Jul 2021 07:21:56 -0400
+Message-Id: <20210706112203.2062605-130-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210706112848.2066036-1-sashal@kernel.org>
-References: <20210706112848.2066036-1-sashal@kernel.org>
+In-Reply-To: <20210706112203.2062605-1-sashal@kernel.org>
+References: <20210706112203.2062605-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -68,10 +68,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 5 insertions(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 4e3b24a0511f..30c09b9ddbf0 100644
+index b3c63e06838d..afd2b1f12d49 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -2508,6 +2508,11 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
+@@ -3558,6 +3558,11 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
  	sent += size;
  	count -= size;
  
