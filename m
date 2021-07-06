@@ -7,43 +7,45 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 77643C11F86
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E2C9C07E9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:31:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B54761EE1
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D23461C66
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:31:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233745AbhGFL2e (ORCPT
+        id S235024AbhGFLdy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 07:28:34 -0400
-Received: from mail.kernel.org ([198.145.29.99]:56584 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 07:33:54 -0400
+Received: from mail.kernel.org ([198.145.29.99]:42502 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234093AbhGFLXo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:23:44 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 6DFF361D04;
-        Tue,  6 Jul 2021 11:18:11 +0000 (UTC)
+        id S235694AbhGFLaT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:30:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A680961DD9;
+        Tue,  6 Jul 2021 11:21:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570292;
-        bh=9CZYZH1IJIqZRfQ/cPp5d9YX2cUsPDo8NZVgJPiZQHA=;
+        s=k20201202; t=1625570498;
+        bh=q/xI32GUZnF5MRSeaC0V+7RxRVKueJxbI8lVxADhDSM=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=TZoxlgTlRJdGPxDuwRUtp4huAAbF8SRWq/ITUiR8VeJDGYdHmQvEVqPCwCcOP1/h2
-         XObDL1GMqcU0MoaCVR6gNZumAiAQkSQytTaDYDb2f+7dggTg6cLR9NpH2TWJ8IR8BR
-         eSDV7Eb0NSLP8Nz+ovO5AlzFPGznV5eFkHs+n+STV+5tO15rlP1b3LnAXK84lUTNzY
-         gPUQrG+E26IpL9DbOlxfoFKkP3KHtwlXfYQYC7lzItu4/npmWwQwnrMdvUiieLhgT9
-         5x8Oh7zMEBrE+cOyhun74nEVsjYfw8dXnY+UoeAC6knr5ddOI/HKXqhG3F0Cn/oQ/B
-         hFO/5VpeYRMjw==
+        b=c6R6Wine1+E+mnUFoLkb84qOdnEuMX9Ih+VfOa+HiMwVwWibfxOCfw3cnao4GmquZ
+         0hafPc1pKOuxdhzkAVkQYzGMMlz9iLf1BaneItxOzzoSAy7oIykZLNm/o6TaomX/SX
+         Wbx0dFq3yr7UlBPXkzvniJDhKmzXdqmz+Prf8N1LYM2hZBkxK408DgHuSlz80q+hgq
+         t1daAyLoonuAEkJWHYnE4+v75lXUXxBonTpp141lHxrkF12eCEotY2QG7bk81fwKJl
+         EGfdt8Fq9vtaiO+WQj1OSbQTupa+Psq5EVsd9j1Q9Zg1F+7Mm9cjg4oIthfOfWc4Tk
+         VhGLcDkHYTidw==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Tim Jiang <tjiang@codeaurora.org>,
+Cc:     "mark-yw.chen" <mark-yw.chen@mediatek.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 181/189] Bluetooth: btusb: fix bt fiwmare downloading failure issue for qca btsoc.
-Date:   Tue,  6 Jul 2021 07:14:01 -0400
-Message-Id: <20210706111409.2058071-181-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org,
+        linux-mediatek@lists.infradead.org
+Subject: [PATCH AUTOSEL 5.12 142/160] Bluetooth: btusb: Fixed too many in-token issue for Mediatek Chip.
+Date:   Tue,  6 Jul 2021 07:18:08 -0400
+Message-Id: <20210706111827.2060499-142-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210706111409.2058071-1-sashal@kernel.org>
-References: <20210706111409.2058071-1-sashal@kernel.org>
+In-Reply-To: <20210706111827.2060499-1-sashal@kernel.org>
+References: <20210706111827.2060499-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -52,37 +54,48 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tim Jiang <tjiang@codeaurora.org>
+From: "mark-yw.chen" <mark-yw.chen@mediatek.com>
 
-[ Upstream commit 4f00bfb372674d586c4a261bfc595cbce101fbb6 ]
+[ Upstream commit 8454ed9ff9647e31e061fb5eb2e39ce79bc5e960 ]
 
-This is btsoc timing issue, after host start to downloading bt firmware,
-ep2 need time to switch from function acl to function dfu, so host add
-20ms delay as workaround.
+This patch reduce in-token during download patch procedure.
+Don't submit urb for polling event before sending hci command.
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ drivers/bluetooth/btusb.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1cec9b2353c6..6d23308119d1 100644
+index ddc7b86725cd..b3ba5a9dc5fc 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -4071,6 +4071,11 @@ static int btusb_setup_qca_download_fw(struct hci_dev *hdev,
- 	sent += size;
- 	count -= size;
+@@ -3377,11 +3377,6 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 	struct btmtk_wmt_hdr *hdr;
+ 	int err;
  
-+	/* ep2 need time to switch from function acl to function dfu,
-+	 * so we add 20ms delay here.
-+	 */
-+	msleep(20);
+-	/* Submit control IN URB on demand to process the WMT event */
+-	err = btusb_mtk_submit_wmt_recv_urb(hdev);
+-	if (err < 0)
+-		return err;
+-
+ 	/* Send the WMT command and wait until the WMT event returns */
+ 	hlen = sizeof(*hdr) + wmt_params->dlen;
+ 	if (hlen > 255)
+@@ -3407,6 +3402,11 @@ static int btusb_mtk_hci_wmt_sync(struct hci_dev *hdev,
+ 		goto err_free_wc;
+ 	}
+ 
++	/* Submit control IN URB on demand to process the WMT event */
++	err = btusb_mtk_submit_wmt_recv_urb(hdev);
++	if (err < 0)
++		return err;
 +
- 	while (count) {
- 		size = min_t(size_t, count, QCA_DFU_PACKET_LEN);
- 
+ 	/* The vendor specific WMT commands are all answered by a vendor
+ 	 * specific event and will have the Command Status or Command
+ 	 * Complete as with usual HCI command flow control.
 -- 
 2.30.2
 
