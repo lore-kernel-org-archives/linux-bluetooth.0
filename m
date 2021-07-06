@@ -7,40 +7,41 @@ X-Spam-Status: No, score=-20.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13C60C07E9E
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97893C11F7E
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE93161D4B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8258261D3E
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  6 Jul 2021 11:25:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234697AbhGFL2a (ORCPT
+        id S234690AbhGFL23 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 6 Jul 2021 07:28:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:55764 "EHLO mail.kernel.org"
+        Tue, 6 Jul 2021 07:28:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:55702 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233911AbhGFLXH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 6 Jul 2021 07:23:07 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id DBC9161CF5;
-        Tue,  6 Jul 2021 11:18:07 +0000 (UTC)
+        id S233900AbhGFLXG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 6 Jul 2021 07:23:06 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 424BD61CE9;
+        Tue,  6 Jul 2021 11:18:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1625570288;
-        bh=eKX49emukDMwE44pP/xuqP89fE1fH4GYou94kjiKakc=;
+        s=k20201202; t=1625570286;
+        bh=Ia9rktBdiHb6EMa1fSBNeBeKeuUl/zIf8i7KRp0qjnQ=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=I+BnkE0R+N0eQKZAfv446Qyttf9ONnp+ZoCfVVsNK7ii5XJpEDf4ZZ6b2rA5fiaPA
-         lTdYPk9BOHEU/D3OIlR6jCqFb+g4C0CsN2MeHS5v7aSdWGpgOBneHuRGohg2WmMYiB
-         lChgugUOb9vEXr+tfoueXxBd/WnQIBTE5K1m5i/l+MF11+Ewnhc2jKIYmMT74DUwJG
-         /4Sg9j2bWj//nLM9roDt2jtGqNU8xZVXroAu3dz6cMKOAtSv7EnjgoSEQvm9sC5gFo
-         Ne/ZaJXmq2Xnr/AM01Oz1GFwC8OM+22MRg/wpqMQKyV/AwrdzoQDcjSKQSHu6YzzO1
-         EElfSFZ/xPBCw==
+        b=aNcfdBIOXI/UixgN8tSHDRLFnIiQchoeG637Y1UgsuKWFxMCrexQmiNuFgGDeOFCD
+         1IPN0vm9rUj++W7S5LEE3bpAXna++ifM5EhQd8kAJbzVXURbUlW3E5n5EE5vFz6oAO
+         1Y+jvUieGGoRQHR0XxSvMvS3koihCLB9hfQuvdrhCUpV8Cz1tVlhOFug7fSt/FHHNz
+         ccRM2JfkdW1L1KGaPzdFj0seU5g3OQbz4BVoQ4eYda/21V/vxt9mdz3xqqWJyKIBa3
+         W3Oa8DAWJ8duDL9J4YSdoMak/lDdnVfwxQ9+vzCVdLemN4qLoykEYmSzOOoIh6qNU3
+         pxBSv7ZfJRC6g==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Hilda Wu <hildawu@realtek.com>,
+Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Dan Carpenter <dan.carpenter@oracle.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.13 178/189] Bluetooth: btusb: Add support USB ALT 3 for WBS
-Date:   Tue,  6 Jul 2021 07:13:58 -0400
-Message-Id: <20210706111409.2058071-178-sashal@kernel.org>
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.13 176/189] Bluetooth: L2CAP: Fix invalid access if ECRED Reconfigure fails
+Date:   Tue,  6 Jul 2021 07:13:56 -0400
+Message-Id: <20210706111409.2058071-176-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20210706111409.2058071-1-sashal@kernel.org>
 References: <20210706111409.2058071-1-sashal@kernel.org>
@@ -52,42 +53,43 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hilda Wu <hildawu@realtek.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-[ Upstream commit e848dbd364aca44c9d23c04bef964fab79e2b34f ]
+[ Upstream commit 1fa20d7d4aad02206e84b74915819fbe9f81dab3 ]
 
-Because mSBC frames do not need to be aligned to the SCO packet
-boundary. Using USB ALT 3 let HCI payload >= 60 bytes, let mSBC
-data satisfy 60 Bytes avoid payload unaligned situation and fixed
-some headset no voise issue.
+The use of l2cap_chan_del is not safe under a loop using
+list_for_each_entry.
 
-USB Alt 3 supported also need HFP support transparent MTU in 72 Bytes.
-
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/bluetooth/btusb.c | 7 +++++++
- 1 file changed, 7 insertions(+)
+ net/bluetooth/l2cap_core.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 90872099d9c3..4c18a85a1070 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -1751,6 +1751,13 @@ static void btusb_work(struct work_struct *work)
- 			 * which work with WBS at all.
- 			 */
- 			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
-+			/* Because mSBC frames do not need to be aligned to the
-+			 * SCO packet boundary. If support the Alt 3, use the
-+			 * Alt 3 for HCI payload >= 60 Bytes let air packet
-+			 * data satisfy 60 bytes.
-+			 */
-+			if (new_alts == 1 && btusb_find_altsetting(data, 3))
-+				new_alts = 3;
- 		}
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index b6a88b8256c7..9b6e57204f51 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -6248,7 +6248,7 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+ 					 struct l2cap_cmd_hdr *cmd, u16 cmd_len,
+ 					 u8 *data)
+ {
+-	struct l2cap_chan *chan;
++	struct l2cap_chan *chan, *tmp;
+ 	struct l2cap_ecred_conn_rsp *rsp = (void *) data;
+ 	u16 result;
  
- 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
+@@ -6262,7 +6262,7 @@ static inline int l2cap_ecred_reconf_rsp(struct l2cap_conn *conn,
+ 	if (!result)
+ 		return 0;
+ 
+-	list_for_each_entry(chan, &conn->chan_l, list) {
++	list_for_each_entry_safe(chan, tmp, &conn->chan_l, list) {
+ 		if (chan->ident != cmd->ident)
+ 			continue;
+ 
 -- 
 2.30.2
 
