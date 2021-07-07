@@ -2,76 +2,169 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_20,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	FREEMAIL_REPLYTO_END_DIGIT,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C115C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 11:26:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7B20C07E95
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 18:21:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5D4C161CB9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 11:26:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9478461CC8
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 18:21:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231423AbhGGL3Z (ORCPT
+        id S230521AbhGGSXs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Jul 2021 07:29:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56000 "EHLO
+        Wed, 7 Jul 2021 14:23:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36306 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231397AbhGGL3Z (ORCPT
+        with ESMTP id S231362AbhGGSXr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Jul 2021 07:29:25 -0400
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D7E7C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 04:26:44 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id az11so1395184vsb.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 04:26:44 -0700 (PDT)
+        Wed, 7 Jul 2021 14:23:47 -0400
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AA08C061574;
+        Wed,  7 Jul 2021 11:21:06 -0700 (PDT)
+Received: by mail-yb1-xb34.google.com with SMTP id p22so4593728yba.7;
+        Wed, 07 Jul 2021 11:21:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:reply-to:from:date:message-id:subject:to;
-        bh=uKTx0Hu6QFtGSSwpkRnFIPAMoek4UpWiH5jpyf2f4UA=;
-        b=EiSzCNPMXlUVTQqSbcqmNUkwbAiaIzNfKx88POpk0PKYXHXnHkO86X0wKzoVZPY+Qr
-         WhxH2fsleX/n/0AZQoTH9vsNNMC8sG0AqPipVcriFGp4uUNSTHQ3mZHmQIqxeAD0t4HJ
-         JV/jKYUgWsdPO2pKzy2CfXiSfLMrBfqwfQoimKBJ2fMWG5vykZ5rAnrpZFE/USgCJAwh
-         KqyRf3E85BozZ5dhOO0efgOd1wTKUjb1cbUNcITEU8+EMh3Qj606v4nScsC8po0Wla1h
-         zB+9jmGdWcQ3UEGKn1z9N0xZpWVc92hvf6aqOSh/bLvRnvJ+hEKe2t3V3/2XGcI1NO5n
-         b8lg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=0UsMR6dgbLAQ7a3v8mrVQ2c0/k46Bj91GFDCBaSCAW8=;
+        b=BmamxN7I7rJaC329iBWVyQyIczteQMFU3PqfDweMvffVAgXQB0hIfegSQCYp7/EDcu
+         33Cy2hxSqR8BclpCp8CPoIwbV7Rl0TPR5dAa7kqUSRX421oz2WA84zQ6+ypSa8oM5vwC
+         Ll8vAYRtiult7QIWRee0+w3XM1BJtokcCpIu1UQxq18542mZDQF7oP5WsyYLsSUS0RkL
+         dsuc/C00mCmqKHdcQmv8OaM3fHCMa5ZxjndYIYnoJUUDa5SzRYxeG6V8dI/xChHmeYlI
+         1cft7sLsyYNfr1Nnf5OUJyJPCCEEYJ6/SAhwpE0gUMqTxBrk9S4bNk32keLs9hQ7PCdv
+         ZVwA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:reply-to:from:date:message-id
-         :subject:to;
-        bh=uKTx0Hu6QFtGSSwpkRnFIPAMoek4UpWiH5jpyf2f4UA=;
-        b=fEtRT5H8/kumEF6XFm/VPDQt4sQwbjprj6FA/rTxJMxOxpERP92k7xM9igxYm04X6b
-         rrCajqIIJuaQJbq1/93NEMop1mHyE5ZFlVpcybrGDQQs11xNfFFmuHa9QdniN3Aj3YYd
-         hbMzgQBk2fcC1RKeqUmRhGcv88EB8HmoSfKVvZ/M+rtCU8i6ciFtCdkLg3ASij+mMWpL
-         1MCM6IUDHkHpbP8+2+uXXxkPmTv+02fbdVEA9jeO/mxPiLDZ3s75Mp/Oz8xhjDwOegzI
-         lFJeffavsux6OaOWad5DiWJ/nscJsFKPDYxi99JuOmVEq229MwKXbq67JBVT2L7UrGCO
-         L1qA==
-X-Gm-Message-State: AOAM530ujV5a3x6safLKqZGfJpP3vxfoECV20OGQ+I5S//20e2ek3hW0
-        gkANkHIiZBFGYFm7HagC5+vKKlbAnBaD/nkfO+cG/8IADAk8hw==
-X-Google-Smtp-Source: ABdhPJy6FCFgylkGFSySPyP+n9DTT6GiifoxJ5MnmB/jXW8N7Id/m7Nxde26TM9Axkmqfyro16O/h5WnZeRq6T6mAsg=
-X-Received: by 2002:a05:6102:206:: with SMTP id z6mr19767061vsp.3.1625657203250;
- Wed, 07 Jul 2021 04:26:43 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=0UsMR6dgbLAQ7a3v8mrVQ2c0/k46Bj91GFDCBaSCAW8=;
+        b=SXARANUREwZ58+bmOXr0RMrj9Emrd2M9jw5iRXCBEZ46LE1hUkIXQmssuK/lXBQNel
+         YuB2PqTCvsIbPbgets81NxamSlbuXUj/dR2O6GGzJ6VTTjEi5vzHn/O2IT19TL3sBszk
+         Uxk5OTzRfzjEhRm1Oo1v3JprbOilGM/Je+1Gq0E/jn9nj9rqEP+Ceeu7tR/ZhDPvFfqP
+         k4LgsnyrTrVj4+3FVEp/Yufcu5hruBQA2echUIUDzKrdarHZyUTrOnC3LL54T7LD0Bet
+         Nqq++87fK1W8Il3h2AqKHptkkJZzcQKChamraJjp3dp4n4ZYNWnwaZC2AOeq8kwosH5I
+         XU7w==
+X-Gm-Message-State: AOAM531vGAsKX8yRDAf5i53hZ0kdc/ktGeqqk0UcUfi5erl1fq+Cm7C4
+        Q2ONwPunVdsz3KWBLP6Eko66XHVHGTWa7wUBCRY=
+X-Google-Smtp-Source: ABdhPJxG8Um+aWqqNQ0d5o811N/Wy+woMR8wf8ICYG23RYwDvaAnPXg4AO1H0FQyV88Ez1SVlYXpyB348CcJv7N0ZiI=
+X-Received: by 2002:a25:be02:: with SMTP id h2mr34971749ybk.91.1625682065253;
+ Wed, 07 Jul 2021 11:21:05 -0700 (PDT)
 MIME-Version: 1.0
-Reply-To: sameerfeb05@gmail.com
-From:   "sameerfeb05@gmail.com" <sameerfeb05@gmail.com>
-Date:   Wed, 7 Jul 2021 16:56:27 +0530
-Message-ID: <CAJ9BmNjk6+3osDj0ac1H+eUnMP8fbEnY9mNsb=USXnxBGfVR4Q@mail.gmail.com>
-Subject: Bluetooth 5.0 support
-To:     linux-bluetooth@vger.kernel.org
+References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp> <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
+In-Reply-To: <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 7 Jul 2021 11:20:54 -0700
+Message-ID: <CABBYNZ+Vpzy2+u=xYR-7Kxx5M6pAQFQ8TJHYV1-Jr-FvqZ8=OQ@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: call lock_sock() outside of spinlock section
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Lin Ma <linma@zju.edu.cn>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear All,
+Hi Tetsuo,
 
-In below link Bluetooth Core version supported is 4.2
-http://www.bluez.org/profiles/
-https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/doc/supported-features.txt
+On Wed, Jul 7, 2021 at 2:43 AM Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+>
+> syzbot is hitting might_sleep() warning at hci_sock_dev_event() due to
+> calling lock_sock() with rw spinlock held [1]. Defer calling lock_sock()
+> via sock_hold().
+>
+> Link: https://syzkaller.appspot.com/bug?extid=a5df189917e79d5e59c9 [1]
+> Reported-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
+> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+> Tested-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
+> Fixes: e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF of hdev object")
+> ---
+> Changes in v2:
+>   Take hci_sk_list.lock for write in case bt_sock_unlink() is called after
+>   sk_hashed(sk) test, and defer hci_dev_put(hdev) till schedulable context.
+>
+>  net/bluetooth/hci_sock.c | 32 +++++++++++++++++++++++++++++---
+>  1 file changed, 29 insertions(+), 3 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+> index b04a5a02ecf3..d8e1ac1ae10d 100644
+> --- a/net/bluetooth/hci_sock.c
+> +++ b/net/bluetooth/hci_sock.c
+> @@ -758,20 +758,46 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+>
+>         if (event == HCI_DEV_UNREG) {
+>                 struct sock *sk;
+> +               bool put_dev;
+>
+> +restart:
+> +               put_dev = false;
+>                 /* Detach sockets from device */
+>                 read_lock(&hci_sk_list.lock);
+>                 sk_for_each(sk, &hci_sk_list.head) {
+> +                       /* hci_sk_list.lock is preventing hci_sock_release()
+> +                        * from calling bt_sock_unlink().
+> +                        */
+> +                       if (hci_pi(sk)->hdev != hdev || sk_unhashed(sk))
+> +                               continue;
+> +                       /* Take a ref because we can't call lock_sock() with
+> +                        * hci_sk_list.lock held.
+> +                        */
+> +                       sock_hold(sk);
+> +                       read_unlock(&hci_sk_list.lock);
+>                         lock_sock(sk);
+> -                       if (hci_pi(sk)->hdev == hdev) {
+> +                       /* Since hci_sock_release() might have already called
+> +                        * bt_sock_unlink() while waiting for lock_sock(),
+> +                        * use sk_hashed(sk) for checking that bt_sock_unlink()
+> +                        * is not yet called.
+> +                        */
+> +                       write_lock(&hci_sk_list.lock);
+> +                       if (sk_hashed(sk) && hci_pi(sk)->hdev == hdev) {
+>                                 hci_pi(sk)->hdev = NULL;
+>                                 sk->sk_err = EPIPE;
+>                                 sk->sk_state = BT_OPEN;
+>                                 sk->sk_state_change(sk);
+> -
+> -                               hci_dev_put(hdev);
+> +                               put_dev = true;
+>                         }
+> +                       write_unlock(&hci_sk_list.lock);
+>                         release_sock(sk);
+> +                       sock_put(sk);
+> +                       if (put_dev)
+> +                               hci_dev_put(hdev);
+> +                       /* Restarting is safe, for hci_pi(sk)->hdev != hdev if
+> +                        * condition met and sk_unhashed(sk) == true otherwise.
+> +                        */
+> +                       goto restart;
 
-Any plan to upgrade BlueZ to support Bluetooth 5.0 and above ?
+This sounds a little too complicated, afaik backward goto is not even
+consider a good practice either, since it appears we don't unlink the
+sockets here we could perhaps don't release the reference to hdev
+either and leave hci_sock_release to deal with it and then perhaps we
+can take away the backward goto, actually why are you restarting to
+begin with? It is also weird that this only manifests in the Bluetooth
+HCI sockets or other subsystems don't use such locking mechanism
+anymore?
 
-Thanks and regards
-Sameer
+
+>                 }
+>                 read_unlock(&hci_sk_list.lock);
+>         }
+> --
+> 2.18.4
+>
+>
+
+
+-- 
+Luiz Augusto von Dentz
