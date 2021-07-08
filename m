@@ -2,68 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-24.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-27.0 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F4E6C07E96
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:24:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30170C07E96
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:24:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2752161C59
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:24:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18A8461C59
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:24:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229901AbhGHG0p (ORCPT
+        id S229966AbhGHG0s (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Jul 2021 02:26:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53756 "EHLO
+        Thu, 8 Jul 2021 02:26:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53776 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229872AbhGHG0p (ORCPT
+        with ESMTP id S229863AbhGHG0s (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Jul 2021 02:26:45 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07DC2C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 23:24:04 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id eo5-20020ad459450000b02902d60d0f0744so387057qvb.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 23:24:03 -0700 (PDT)
+        Thu, 8 Jul 2021 02:26:48 -0400
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 700DCC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 23:24:07 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id o11-20020a62f90b0000b02902db3045f898so3132729pfh.23
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 23:24:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=TJCDUU+XB3aEdDYTTNZHmC5Pd9cnwtGzJfl+G0OsRkk=;
-        b=oH38xudHwDoFduby2q7apvV+9KLZxTLhTIKbNSXv2mgzDsS+FyysqOjloIqhOM4YAd
-         JqBfDVhRavczML0nujtpTtQpwnpqV57m9qxpO7tN8uTzed1U0Rlgb94msKpXktQb7Atd
-         fbgZL8sTzZz2c9wOZKGwdcNoEurejMvfIXD5enDmUIF2Lww1BroKo3wne6BaqhufeVk/
-         wnMJRwgEudpkXwZGT3C1TldkUg+Sewp1TDL18mN6fcRQNsO0MHizubatOBRXECkOzFsm
-         mbZnHU1qTkh0fQoZlMmC82OaYvNkN9YiR6U6kIfk+14Uc/Pvoc8lXr1AVYc26NE6mtXz
-         3ebw==
+        bh=VyXHTtvy32iIeRBIdw6ZHes2fzV1g/gDjPGzdkXsXsY=;
+        b=oczNY2z89CYZ76FNlU5tn/jpfXqsZZ4rAGpq6uxthuJFOFNf4BRG/qTttDoNJTG6A6
+         6i1wsZXilibxuzTUoevMyqz0WUFLhdujPPFJNV+85AJR+mqjaYfKxpY/JGGSOzcsae24
+         3WYTcAfj058+xGEXJL92XX9ftHWqAAqZArDowxxptfYoSQkTg7VzZkXe6LgM7P2tVqgU
+         6rJEEspe2eO6JyzWUtLCT47uqelRzdLaM4iFeswmdDNuZyypvD2qUorKAIG5ymnLP6ca
+         MoATUx+eum+MMqZfmrMgdostv7bJJ8M3uvYbn7PCqyRXPmK+oZgHx+5Jhl7BIzAli5ay
+         AUEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=TJCDUU+XB3aEdDYTTNZHmC5Pd9cnwtGzJfl+G0OsRkk=;
-        b=K+UTEIqFjKOG+SZFmyWNLZ2DDEZwgUBwhJBCNT/GBAX6wPlKYXQuU9Tt27QvbpaxQx
-         0OKnjvr0lVZoYWGAW3fFXciUIS0Rdd1RM88YgG007OHFuROeA1qH4uyy0ZljJ506Tj+o
-         ulQGVdlPQ43s4gkPRJTTI0wJZsmj8xM/Prtbu3+QeYpzpIL8sMAzK7O7iHrO9QK4jKF4
-         n4kGHffQSpyMI5wIiDvKu2tsN88rthomKsL8hDmtS27dNgwTdoTdod+qOOJK/ZftJsqZ
-         rs5NTQDdtHQW6DIuFR9go9HoY8iscfbzzvqXQY990C6yrUGr7bNJSkYujxvaz0DXaL1y
-         LBQw==
-X-Gm-Message-State: AOAM530ZcwuzitKDqLXmUC2OAA85A54R9NSP7vhc7tpfa/b5oOOxs8jv
-        Ml2cFB6rXRgV7waxfuxFxwbS3i3Dbdg6Ot6Wwn/iuLRBBeu4/cSd8fVIKJUpEKoOFSurROB1uAL
-        NBBsDg/HLB+6mSFwBCzlwXphdKKT4SFEzqPAXU6cJ7pUQfiZcQTVwNZRjzf8JufOKCVBF3TJIdt
-        RPy0ZxY495o0s=
-X-Google-Smtp-Source: ABdhPJyk4LY8QX0NwWBlmTHQxoOU46RfDX9Jr/V2azCqJPcw8ta7+G6l9uPXlansLmQmivNexh6ggbV4s5hRrI4hDA==
+        bh=VyXHTtvy32iIeRBIdw6ZHes2fzV1g/gDjPGzdkXsXsY=;
+        b=cf48z+KqHyGEYnJV1gut1MSnNldxYje/Ds/se+fwWxYybJtt6BbPBPsZGtFl9vJEWF
+         0yQOi8HX6h9yAT7jhj9z8YsGi92K7g+rJq0Y3YQmpg2OsX4cYToKIvRmEvcum+TlFgrb
+         fk6leAplBZ+qkO5W9Cv3gkka3vlq0m1QYLOTWeC/KUBS+JY93+gluRO4vJkz/kE/MSuV
+         +GxRTrIIIVZIDuJvdvRAIOIS6WffrGmv1t4ID42vSe0u293fkEswFqIzsFJ1Qd32mjlD
+         8ZTV1LDGJOoNWO0dyfIr0EoID4WQH5EGrb/BjQvW6dpoaMAn8qZxd7Cl2EPAVKyL6qnF
+         UTGw==
+X-Gm-Message-State: AOAM530sT8qGqobTPcQsDe2l90wxMZzfGgdUQDBv2UGUp/Mh+SHvF1y8
+        eCxf6MF39ZqxsX5M6GuMomaUm9tKhM4LgSk916dWJOK0MkOJTNQsTUBOzYcWIcGd1QdhPJvRd7i
+        uj+q0CcQQaEqOk23JkzV3dbIGagB30Pxd5lnrwEr2/Lg7vMEIVaeuS0iOBQZJEmRSI00O3dshyq
+        YB/1sSauVS/KI=
+X-Google-Smtp-Source: ABdhPJzyHLAoPUWeakqN2PnzBSWtuqDIOoFn4j6/uibxDq5T/DoXCi37FNY+7RcVKrCWQ64NOyHFRpwPW30Z3yE0wA==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:de70:7033:67f7:8d0b])
- (user=howardchung job=sendgmr) by 2002:a0c:c249:: with SMTP id
- w9mr28296697qvh.32.1625725443110; Wed, 07 Jul 2021 23:24:03 -0700 (PDT)
-Date:   Thu,  8 Jul 2021 14:23:11 +0800
+ (user=howardchung job=sendgmr) by 2002:a62:bd14:0:b029:2de:8bf7:2df8 with
+ SMTP id a20-20020a62bd140000b02902de8bf72df8mr29365345pff.60.1625725446900;
+ Wed, 07 Jul 2021 23:24:06 -0700 (PDT)
+Date:   Thu,  8 Jul 2021 14:23:12 +0800
 In-Reply-To: <20210708062314.245754-1-howardchung@google.com>
-Message-Id: <20210708142059.Bluez.v1.11.I517e5199ac8019b770c7ee8c92a294ec1c752748@changeid>
+Message-Id: <20210708142059.Bluez.v1.12.I570c860f59c8ed66ddb31aa54584ee08080aa10c@changeid>
 Mime-Version: 1.0
 References: <20210708062314.245754-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [Bluez PATCH v1 11/14] plugins/admin_policy: add device state callback
+Subject: [Bluez PATCH v1 12/14] plugins/admin_policy: add AffectedByPolicy property
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>,
@@ -75,155 +76,169 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-This registers a device state callback function. It will be used to
-implement "AffectedByPolicy" property which indicates if there is any
-service in a device that is being blocked by admin policy.
+This adds property to indicate if a device has any service that is being
+blocked by admin policy.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 The following test steps were performed:
-1. start discovery using UI
-2. verify device_data were added by checking system log
-3. stop discovery
-4. verify device_data were removed after a few seconds by checking
-system log
+1. Set ServiceAllowList to []
+2. Verify AffectedByPolicy of K830 is False
+3. Set ServiceAllowList to
+   ["1800","1801","180A","180F","1812",
+    "00010000-0000-1000-8000-011f2000046d"
+4. Verify AffectedByPolicy of K830 is False
+5. Set ServiceAllowList to ["1800","1801","180A","180F","1812"]
+6. Verify AffectedByPolicy of K830 is True
 
- plugins/admin_policy.c | 87 ++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 87 insertions(+)
+ plugins/admin_policy.c | 78 ++++++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 76 insertions(+), 2 deletions(-)
 
 diff --git a/plugins/admin_policy.c b/plugins/admin_policy.c
-index c5ad31f761d9..852e79aaa07a 100644
+index 852e79aaa07a..be4ba096a8b9 100644
 --- a/plugins/admin_policy.c
 +++ b/plugins/admin_policy.c
-@@ -20,6 +20,7 @@
+@@ -44,6 +44,7 @@ static struct btd_admin_policy {
+ struct device_data {
+ 	struct btd_device *device;
+ 	char *path;
++	bool affected;
+ };
  
- #include "src/adapter.h"
- #include "src/dbus-common.h"
-+#include "src/device.h"
- #include "src/error.h"
- #include "src/log.h"
- #include "src/plugin.h"
-@@ -30,6 +31,8 @@
- #define ADMIN_POLICY_STATUS_INTERFACE	"org.bluez.AdminPolicyStatus1"
+ static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
+@@ -137,6 +138,27 @@ static bool service_allowlist_set(struct btd_admin_policy *admin_policy,
+ 	return true;
+ }
  
- static DBusConnection *dbus_conn;
-+static struct queue *devices; /* List of struct device_data objects */
-+static unsigned int device_cb_id;
++static void update_device_affected(void *data, void *user_data)
++{
++	struct device_data *dev_data = data;
++	bool affected;
++
++	if (!dev_data) {
++		error("Unexpected NULL device_data when updating device");
++		return;
++	}
++
++	affected = btd_device_all_services_allowed(dev_data->device);
++
++	if (affected == dev_data->affected)
++		return;
++
++	dev_data->affected = affected;
++
++	g_dbus_emit_property_changed(dbus_conn, dev_data->path,
++			ADMIN_POLICY_STATUS_INTERFACE, "AffectedByPolicy");
++}
++
+ static DBusMessage *set_service_allowlist(DBusConnection *conn,
+ 					DBusMessage *msg, void *user_data)
+ {
+@@ -164,6 +186,8 @@ static DBusMessage *set_service_allowlist(DBusConnection *conn,
+ 				adapter_get_path(policy_data->adapter),
+ 				ADMIN_POLICY_SET_INTERFACE, "ServiceAllowList");
  
- /* |policy_data| has the same life cycle as btd_adapter */
- static struct btd_admin_policy {
-@@ -38,6 +41,11 @@ static struct btd_admin_policy {
- 	struct queue *service_allowlist;
- } *policy_data = NULL;
++	queue_foreach(devices, update_device_affected, NULL);
++
+ 	return dbus_message_new_method_return(msg);
+ }
  
-+struct device_data {
-+	struct btd_device *device;
-+	char *path;
+@@ -266,6 +290,29 @@ static bool device_data_match(const void *a, const void *b)
+ 	return data->device == dev;
+ }
+ 
++static gboolean property_get_affected_by_policy(
++					const GDBusPropertyTable *property,
++					DBusMessageIter *iter, void *user_data)
++{
++	struct device_data *data = user_data;
++	dbus_bool_t affected;
++
++	if (!data) {
++		error("Unexpected error: device_data is NULL");
++		return FALSE;
++	}
++
++	dbus_message_iter_append_basic(iter, DBUS_TYPE_BOOLEAN,
++							&data->affected);
++
++	return TRUE;
++}
++
++static const GDBusPropertyTable admin_policy_device_properties[] = {
++	{ "AffectedByPolicy", "b", property_get_affected_by_policy },
++	{ }
 +};
 +
- static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
+ static void free_device_data(struct device_data *data)
  {
- 	struct btd_admin_policy *admin_policy = NULL;
-@@ -245,6 +253,79 @@ static int admin_policy_adapter_probe(struct btd_adapter *adapter)
- 	return 0;
+ 	g_free(data->path);
+@@ -299,11 +346,33 @@ static void add_device_data(struct btd_device *device)
+ 
+ 	data->device = device;
+ 	data->path = g_strdup(device_get_path(device));
++	data->affected = btd_device_all_services_allowed(data->device);
++
++	if (!g_dbus_register_interface(dbus_conn, data->path,
++					ADMIN_POLICY_STATUS_INTERFACE,
++					NULL, NULL,
++					admin_policy_device_properties,
++					data, remove_device_data)) {
++		btd_error(btd_adapter_get_index(adapter),
++			"Admin Policy Status interface init failed on path %s",
++						device_get_path(device));
++		free_device_data(data);
++		return;
++	}
++
+ 	queue_push_tail(devices, data);
+ 
+ 	DBG("device_data for %s added", data->path);
  }
  
-+static bool device_data_match(const void *a, const void *b)
++static void unregister_device_data(void *data, void *user_data)
 +{
-+	const struct device_data *data = a;
-+	const struct btd_device *dev = b;
++	struct device_data *dev_data = data;
 +
-+	if (!data) {
-+		error("Unexpected NULL device_data");
-+		return false;
-+	}
-+
-+	return data->device == dev;
++	g_dbus_unregister_interface(dbus_conn, dev_data->path,
++						ADMIN_POLICY_STATUS_INTERFACE);
 +}
 +
-+static void free_device_data(struct device_data *data)
-+{
-+	g_free(data->path);
-+	g_free(data);
-+}
-+
-+static void remove_device_data(void *data)
-+{
-+	struct device_data *device_data = data;
-+
-+	DBG("device_data for %s removing", device_data->path);
-+
-+	queue_remove(devices, device_data);
-+	free_device_data(device_data);
-+}
-+
-+static void add_device_data(struct btd_device *device)
-+{
-+	struct btd_adapter *adapter = device_get_adapter(device);
-+	struct device_data *data;
-+
-+	if (queue_find(devices, device_data_match, device))
-+		return;
-+
-+	data = g_new0(struct device_data, 1);
-+	if (!data) {
-+		btd_error(btd_adapter_get_index(adapter),
-+				"Failed to allocate memory for device_data");
-+		return;
-+	}
-+
-+	data->device = device;
-+	data->path = g_strdup(device_get_path(device));
-+	queue_push_tail(devices, data);
-+
-+	DBG("device_data for %s added", data->path);
-+}
-+
-+static void admin_policy_device_state_cb(struct btd_device *device,
-+					enum btd_device_state_t new_state,
-+					void *user_data)
-+{
-+	struct device_data *data = NULL;
-+
-+	switch (new_state) {
-+	case BTD_DEVICE_STATE_INITIALIZING:
-+		warn("Unexpected new state %d", new_state);
-+		return;
-+	case BTD_DEVICE_STATE_AVAILABLE:
-+		add_device_data(device);
-+		break;
-+	case BTD_DEVICE_STATE_REMOVING:
-+		data = queue_find(devices, device_data_match, device);
-+
-+		if (data)
-+			remove_device_data(data);
-+		break;
-+	}
-+}
-+
- static struct btd_adapter_driver admin_policy_driver = {
- 	.name	= "admin_policy",
- 	.probe	= admin_policy_adapter_probe,
-@@ -256,6 +337,10 @@ static int admin_policy_init(void)
- 	DBG("");
+ static void admin_policy_device_state_cb(struct btd_device *device,
+ 					enum btd_device_state_t new_state,
+ 					void *user_data)
+@@ -321,7 +390,7 @@ static void admin_policy_device_state_cb(struct btd_device *device,
+ 		data = queue_find(devices, device_data_match, device);
  
+ 		if (data)
+-			remove_device_data(data);
++			unregister_device_data(data, NULL);
+ 		break;
+ 	}
+ }
+@@ -339,6 +408,9 @@ static int admin_policy_init(void)
  	dbus_conn = btd_get_dbus_connection();
-+	devices = queue_new();
-+
+ 	devices = queue_new();
+ 
 +	device_cb_id = btd_device_add_state_cb(admin_policy_device_state_cb,
 +									NULL);
++
+ 	device_cb_id = btd_device_add_state_cb(admin_policy_device_state_cb,
+ 									NULL);
  
- 	return btd_register_adapter_driver(&admin_policy_driver);
- }
-@@ -265,6 +350,8 @@ static void admin_policy_exit(void)
+@@ -350,9 +422,11 @@ static void admin_policy_exit(void)
  	DBG("");
  
  	btd_unregister_adapter_driver(&admin_policy_driver);
-+	queue_destroy(devices, free_device_data);
-+	btd_device_remove_state_cb(device_cb_id);
+-	queue_destroy(devices, free_device_data);
++	queue_foreach(devices, unregister_device_data, NULL);
++	queue_destroy(devices, g_free);
+ 	btd_device_remove_state_cb(device_cb_id);
  
++	btd_device_remove_state_cb(device_cb_id);
  	if (policy_data)
  		admin_policy_free(policy_data);
+ }
 -- 
 2.32.0.93.g670b81a890-goog
 
