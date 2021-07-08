@@ -8,148 +8,169 @@ X-Spam-Status: No, score=-27.0 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A394C07E99
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:23:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5C4DCC07E96
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:23:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D9F2619A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:23:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E15B61C59
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 06:23:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229780AbhGHG0K (ORCPT
+        id S229821AbhGHG0N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Jul 2021 02:26:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53574 "EHLO
+        Thu, 8 Jul 2021 02:26:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53588 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229608AbhGHG0K (ORCPT
+        with ESMTP id S229608AbhGHG0M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Jul 2021 02:26:10 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A8D9C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 23:23:28 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id a6-20020a37b1060000b02903b488f9d348so3196250qkf.20
-        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 23:23:28 -0700 (PDT)
+        Thu, 8 Jul 2021 02:26:12 -0400
+Received: from mail-pl1-x64a.google.com (mail-pl1-x64a.google.com [IPv6:2607:f8b0:4864:20::64a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D57C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 23:23:31 -0700 (PDT)
+Received: by mail-pl1-x64a.google.com with SMTP id x15-20020a170902e04fb02900f5295925dbso1536565plx.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 23:23:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=4YlKuUBAVCzUya4qwzfjFYw41CES3ee8lmcRt7kpXbI=;
-        b=YjpgoJ++8h/jrhemV9NdBxNEswKo0ShewItkHTOHerfRpB4zqK5pZmUaa1m/j4vVY9
-         +CnakWFM4MsxevmVOZDL4PUl7ugBS02g3KtIBml08PsU8Dvlf+amAN2JyPDQCq1mHVzG
-         g3aJtF7CzYsn0dzHqmu9PWpnK0et60TJb2EZPZJo0PzdgfaLv9SDXTxJB1ozxJ/cdcMd
-         PR+PdP7CU5sMK3RnUPbmFfUfFrH40kaBmKEv+4D0VUrdOQ9ViWr0Ck1R4nn0Ww4KdeF/
-         DoBlCOZOMcfQFfZPh/aQ8JhDRpE0DHt4R2hdYCewGrddsrA9Uk9XKF8WQnZV0S8knWrK
-         aqFA==
+        bh=XQqRS0lanOdd0QqGLCcCybEElU8zxVKVl7sin01pi1s=;
+        b=K7mZbhVjktcjxMZsvZ+ipOzarx/4gbsXUHzqq6dtzYXq//9J4gINY04Kg9BmR3mC5e
+         be7vbt4tajHu66ZDDvD9lYtezvD3ZeCTBBFKaHuA9K+o/CpTH8IcrnC90RjGaBgc1QAO
+         pM7fmwk7py7x5/EWUPKToLPSnRtyOO9BZV9MlEmsvAQ9EKvsZs8vs8pheGa4Xh/gkrxK
+         d5oOblr2rzv6hrrhwBftgOXJ2/EnPzQ+qcVD8RXiuLJutOg0tZlvlQfXecuqkoqf5CRm
+         qRpB7UELCpXWWeqD+RKFyKkHXeBchniLj6CF9nY26uFULIGQX8iL6QpynGPaqyTL3L0z
+         yaiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=4YlKuUBAVCzUya4qwzfjFYw41CES3ee8lmcRt7kpXbI=;
-        b=Doh7CNYtRJBbZrBl0a+H3RGBf0ayEZrqf/qtKsbqAXslu35bVSu5zZ8NXZ22glfNu/
-         6sln9z/gidHrAKQgqSEIlSG271FlDh5QpAo9DZtLAyfXB6XMwXoS5kJMN49XAWLvER2M
-         VCgAx3Z+4vaIcj8M4Qa/lqkspU7+RBcq88KUNkxt5HB5lzNOj4NGzbowjOnzFb1X/Rmy
-         G65EcNdul+iiuMmn+dJBAQGKaPiCk12khJ5JkINYnzr+4poUZygTJTFpZzTZz94wrT+5
-         efWNj+DkQIonvvJt20fl3y8H8qLDt86TbDh3hve1kMJtrYoUkwgoldHMugAQPFKhWfVi
-         4Tmg==
-X-Gm-Message-State: AOAM5301EPoomY4XH0ZenY8Rz3mczPYgiOuiOD4NSvcBOgZxnPA8ny8Y
-        ZxgHdFdGLWbYVGn3+3km7dUeTrUbn2I1oB1DfqLJlj6F07yd4SGfVTFYOra81xe0yuhG7nMUoVt
-        C3OXBRbDY4eWOeNYOLdXmrFL64NrURaejEZwLxN8lw7DZ6pg6IRZZYIHIKWVblNX2bAGlHLp1QF
-        p8HZyUDS8pNW4=
-X-Google-Smtp-Source: ABdhPJzm8od7VacDhYINIXkVLRvPU+xAmRsb1Fo2MqJTqgrUoifTaJPxtV+cyQ4TNCuZ9VB8s8AqfY35PEEImWeFSA==
+        bh=XQqRS0lanOdd0QqGLCcCybEElU8zxVKVl7sin01pi1s=;
+        b=OIvzXSMfkMvASaA3I1mU9KyLOHdArnU4oZSCPFVOswSeEP8iJTIGd/Met4yoXPg8lH
+         44RAVu1EMx/X5odNv7ZJC6T+eEoSjx7DCUysXoLzuGiV/lf+z+aOEYjZnXYbN0WKiF4c
+         lmzT0E5eTTqq5Eo3HEQyvx6q43eHyj9jUZik4Cc1u+BiCBHO8fU7b0WEuHnJj3iCfOMI
+         FyarvaN/WOmObFnDQ72k3pX3v9598OEP1sDvBwNiHeLHL0eFKXrO2x3b9I4nH91jtQbw
+         miVaMroQAyb4vRXAA2w7/Gv+shd4E9jk++f7znG531kUusZ2HG0Hnyr0UZl7oH/AZ5MP
+         UqVg==
+X-Gm-Message-State: AOAM532L1XBJnLVvOdx5vJQBdI85Ge8Z1yYinY5E5GWdx02fF63Ir7yj
+        gYTKh6j2dS75D2I5CvNP7eBiOSnVnwNQZCvGffSWxh5w96G3PJMTDXHlwQ3yzPO9g4HASewfU+K
+        2cPrihX0bt1xxJoUzXlPBuk0RjJFPW5i6ELitlZgJF1lgGAQAQOZzJEpmmSQbR06Yp+7w3xThqv
+        uLehhLkPMe+HA=
+X-Google-Smtp-Source: ABdhPJxFluaBXKGF/ZuAnnWNBLavirHqbdd1Qt4alFOqlUiFA1wQTaAOkgUS01CudWsCJaB7dCOCfUBSfLo4rhehEg==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:de70:7033:67f7:8d0b])
- (user=howardchung job=sendgmr) by 2002:a05:6214:15d0:: with SMTP id
- p16mr28088061qvz.21.1625725407489; Wed, 07 Jul 2021 23:23:27 -0700 (PDT)
-Date:   Thu,  8 Jul 2021 14:23:01 +0800
+ (user=howardchung job=sendgmr) by 2002:a05:6a00:2293:b029:309:e87c:1f4a with
+ SMTP id f19-20020a056a002293b0290309e87c1f4amr28753920pfe.36.1625725411084;
+ Wed, 07 Jul 2021 23:23:31 -0700 (PDT)
+Date:   Thu,  8 Jul 2021 14:23:02 +0800
 In-Reply-To: <20210708062314.245754-1-howardchung@google.com>
-Message-Id: <20210708142059.Bluez.v1.1.I69278fab3bf86adb578c5cba0a39e5bcf7f9581e@changeid>
+Message-Id: <20210708142059.Bluez.v1.2.Ifd6e18068b54a0c9c8f8422ff502e46167d8b348@changeid>
 Mime-Version: 1.0
 References: <20210708062314.245754-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [Bluez PATCH v1 01/14] lib: add hash functions for bt_uuid_t
+Subject: [Bluez PATCH v1 02/14] unit: add uuid unit tests
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     Howard Chung <howardchung@google.com>,
+Cc:     Yun-Hao Chung <howardchung@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This adds function GHashFunc and GEqualFunc for bt_uuid_t.
-With these functions, we can add uuids into a GHashTable with bt_uuid_t
-format.
+From: Yun-Hao Chung <howardchung@chromium.org>
+
+This adds uuid tests of bt_uuid_hash and bt_uuid_equal to
+unit/test-uuid.c
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
- lib/uuid.c | 27 +++++++++++++++++++++++++++
- lib/uuid.h |  3 +++
- 2 files changed, 30 insertions(+)
+ unit/test-uuid.c | 48 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 48 insertions(+)
 
-diff --git a/lib/uuid.c b/lib/uuid.c
-index 3d97dc8359c7..a09f5c428b87 100644
---- a/lib/uuid.c
-+++ b/lib/uuid.c
-@@ -16,6 +16,7 @@
- #include <string.h>
- #include <stdlib.h>
- #include <errno.h>
-+#include <glib.h>
- 
- #include "lib/bluetooth.h"
- #include "uuid.h"
-@@ -120,6 +121,32 @@ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2)
- 	return bt_uuid128_cmp(&u1, &u2);
+diff --git a/unit/test-uuid.c b/unit/test-uuid.c
+index 0889630cfb34..ac613c5c2951 100644
+--- a/unit/test-uuid.c
++++ b/unit/test-uuid.c
+@@ -169,6 +169,34 @@ static void test_cmp(gconstpointer data)
+ 	tester_test_passed();
  }
  
-+guint bt_uuid_hash(gconstpointer key)
++static void test_hash(gconstpointer data)
 +{
-+	const bt_uuid_t *uuid = key;
-+	bt_uuid_t uuid_128;
-+	uint64_t *val;
++	const struct uuid_test_data *test_data = data;
++	bt_uuid_t uuid1, uuid2;
++	guint uuid_h1, uuid_h2;
 +
-+	if (!uuid)
-+		return 0;
++	g_assert(bt_string_to_uuid(&uuid1, test_data->str) == 0);
++	g_assert(bt_string_to_uuid(&uuid2, test_data->str128) == 0);
 +
-+	bt_uuid_to_uuid128(uuid, &uuid_128);
-+	val = (uint64_t *)&uuid_128.value.u128;
++	uuid_h1 = bt_uuid_hash(&uuid1);
++	uuid_h2 = bt_uuid_hash(&uuid2);
 +
-+	return g_int64_hash(val) ^ g_int64_hash(val+1);
++	g_assert(uuid_h1 == uuid_h2);
++	tester_test_passed();
 +}
 +
-+gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2)
++static void test_equal(gconstpointer data)
 +{
-+	const bt_uuid_t *uuid1 = v1;
-+	const bt_uuid_t *uuid2 = v2;
++	const struct uuid_test_data *test_data = data;
++	bt_uuid_t uuid1, uuid2;
 +
-+	if (!uuid1 || !uuid2)
-+		return !uuid1 && !uuid2;
++	g_assert(bt_string_to_uuid(&uuid1, test_data->str) == 0);
++	g_assert(bt_string_to_uuid(&uuid2, test_data->str128) == 0);
 +
-+	return bt_uuid_cmp(uuid1, uuid2) == 0;
++	g_assert(bt_uuid_equal(&uuid1, &uuid2) == 1);
++	tester_test_passed();
 +}
 +
- /*
-  * convert the UUID to string, copying a maximum of n characters.
-  */
-diff --git a/lib/uuid.h b/lib/uuid.h
-index 1a4029b68730..e47ccccb9fd2 100644
---- a/lib/uuid.h
-+++ b/lib/uuid.h
-@@ -17,6 +17,7 @@ extern "C" {
- #endif
+ static const struct uuid_test_data compress[] = {
+ 	{
+ 		.str = "00001234-0000-1000-8000-00805f9b34fb",
+@@ -226,26 +254,46 @@ int main(int argc, char *argv[])
+ 	tester_add("/uuid/base", &uuid_base, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/base/str", &uuid_base, NULL, test_str, NULL);
+ 	tester_add("/uuid/base/cmp", &uuid_base, NULL, test_cmp, NULL);
++	tester_add("/uuid/base/hash", &uuid_base, NULL, test_hash, NULL);
++	tester_add("/uuid/base/equal", &uuid_base, NULL, test_equal, NULL);
  
- #include <stdint.h>
-+#include <glib.h>
+ 	tester_add("/uuid/sixteen1", &uuid_sixteen1, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/sixteen1/str", &uuid_sixteen1, NULL, test_str, NULL);
+ 	tester_add("/uuid/sixteen1/cmp", &uuid_sixteen1, NULL, test_cmp, NULL);
++	tester_add("/uuid/sixteen1/hash", &uuid_sixteen1, NULL, test_hash,
++									NULL);
++	tester_add("/uuid/sixteen1/equal", &uuid_sixteen1, NULL, test_equal,
++									NULL);
  
- #define GENERIC_AUDIO_UUID	"00001203-0000-1000-8000-00805f9b34fb"
+ 	tester_add("/uuid/sixteen2", &uuid_sixteen2, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/sixteen2/str", &uuid_sixteen2, NULL, test_str, NULL);
+ 	tester_add("/uuid/sixteen2/cmp", &uuid_sixteen2, NULL, test_cmp, NULL);
++	tester_add("/uuid/sixteen2/hash", &uuid_sixteen2, NULL, test_hash,
++									NULL);
++	tester_add("/uuid/sixteen2/equal", &uuid_sixteen2, NULL, test_equal,
++									NULL);
  
-@@ -167,6 +168,8 @@ int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
+ 	tester_add("/uuid/thirtytwo1", &uuid_32_1, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/thirtytwo1/str", &uuid_32_1, NULL, test_str, NULL);
+ 	tester_add("/uuid/thirtytwo1/cmp", &uuid_32_1, NULL, test_cmp, NULL);
++	tester_add("/uuid/thirtytwo1/hash", &uuid_32_1, NULL, test_hash, NULL);
++	tester_add("/uuid/thirtytwo1/equal", &uuid_32_1, NULL, test_equal,
++									NULL);
  
- int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
- void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
-+guint bt_uuid_hash(gconstpointer key);
-+gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2);
+ 	tester_add("/uuid/thirtytwo2", &uuid_32_2, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/thritytwo2/str", &uuid_32_2, NULL, test_str, NULL);
+ 	tester_add("/uuid/thirtytwo2/cmp", &uuid_32_2, NULL, test_cmp, NULL);
++	tester_add("/uuid/thirtytwo2/hash", &uuid_32_2, NULL, test_hash, NULL);
++	tester_add("/uuid/thirtytwo2/equal", &uuid_32_2, NULL, test_equal,
++									NULL);
  
- #define MAX_LEN_UUID_STR 37
+ 	tester_add("/uuid/onetwentyeight", &uuid_128, NULL, test_uuid, NULL);
+ 	tester_add("/uuid/onetwentyeight/str", &uuid_128, NULL, test_str, NULL);
+ 	tester_add("/uuid/onetwentyeight/cmp", &uuid_128, NULL, test_cmp, NULL);
++	tester_add("/uuid/onetwentyeight/hash", &uuid_128, NULL, test_hash,
++									NULL);
++	tester_add("/uuid/onetwentyeight/equal", &uuid_128, NULL, test_equal,
++									NULL);
  
+ 	for (i = 0; malformed[i]; i++) {
+ 		char *testpath;
 -- 
 2.32.0.93.g670b81a890-goog
 
