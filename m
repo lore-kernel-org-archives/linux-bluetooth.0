@@ -2,130 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.6 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44499C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 01:00:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5696AC07E95
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 02:36:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1DC0061C4E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 01:00:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D69961CD0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 02:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230170AbhGHBDd (ORCPT
+        id S230303AbhGHCim (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Jul 2021 21:03:33 -0400
-Received: from mail.zju.edu.cn ([61.164.42.155]:43612 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230029AbhGHBDc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Jul 2021 21:03:32 -0400
-Received: by ajax-webmail-mail-app2 (Coremail) ; Thu, 8 Jul 2021 09:00:41
- +0800 (GMT+08:00)
-X-Originating-IP: [10.162.82.120]
-Date:   Thu, 8 Jul 2021 09:00:41 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   LinMa <linma@zju.edu.cn>
-To:     "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: Re: [PATCH v2] Bluetooth: call lock_sock() outside of spinlock
- section
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
-In-Reply-To: <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
-References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
- <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
- <CABBYNZ+Vpzy2+u=xYR-7Kxx5M6pAQFQ8TJHYV1-Jr-FvqZ8=OQ@mail.gmail.com>
- <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        Wed, 7 Jul 2021 22:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60946 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230195AbhGHCil (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 7 Jul 2021 22:38:41 -0400
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6260FC061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  7 Jul 2021 19:35:59 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id ga42so6771371ejc.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 07 Jul 2021 19:35:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=VBNdO3Om1Rvqk+3UaOnwFXvamJIQMipSJ24QHi91MpQ=;
+        b=og7XbAX5owVTZGDXe9o0w1zVPdxXmJ5E90GNMPFIJglWlaXWLKydHjDXwz/RwtD5PM
+         +AXOMcrrIV97TniUIIkpyYywGbZCpQ1noYN+/8iBBlDgfM33SupmCMxDJsr/E2JxU8L+
+         8HM+ld9upb9GCHBlKL7BLhEPE9JWSuoImB4SO7nFwoBrwIaEzBCHbDGfQWn+jXrRf95i
+         3ZclloRXSwAsCwR2uahyQawNUH7mdPjaozwM0I3W+rRSok52sU7VbFA0xVll+E3MIcqY
+         uFKp1C0IJWOlcqoL4Am5s4oi7synQFODj95qPqgyQX7Dyh2bGq9BiGGNNtS49UFMBH93
+         d33Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to;
+        bh=VBNdO3Om1Rvqk+3UaOnwFXvamJIQMipSJ24QHi91MpQ=;
+        b=frQcIDMg8Hz7WOdh6nb/TTFZx1Iu2yFzsLo1YmJR4SLioaqr+B+dnlO+qAos/vjV+H
+         UFK7gpitVPmYxxzxX6ClCozUp+iXW50eOFOatlYTCGya02OgSBk9TSdBnhmxfxFk0CWF
+         i2FfzSlQFeiUmYfsUfXgkq9DOtrXQEQ1XJfy4svv1oTRmgVDP5yaLONiqhA04W2lEpge
+         Fbl+arwfZflD5PLM8R5VTy8o86ubBoxnLyaTIvw8b1iod7+fqoTvNZKPb576uWyi2kut
+         H9d29afo3lmmVS8Kx7UGMSgW2dklfWkS9ChQ750UALxZ2lSA3hAX2Uck4q0oHUKw1RBj
+         /lGQ==
+X-Gm-Message-State: AOAM5307B2MUBA85q+BQAYxmImuXFb6++Bzql3kB865fZFx5jGV9UutG
+        gEvdqDobGLspb7uYeQ53fFaTIRIHs/flrqWOJA4IT2s4T5t0yg==
+X-Google-Smtp-Source: ABdhPJxlYD8m+88lc7bsUTWnYu43WJLmiAL6hnKZZFWc53eYAquZ/YpiACUNUQjkOQkv0gpxDBbfu9GWtemHpPU6uw8=
+X-Received: by 2002:a17:906:71c1:: with SMTP id i1mr21810221ejk.549.1625711757365;
+ Wed, 07 Jul 2021 19:35:57 -0700 (PDT)
 MIME-Version: 1.0
-Message-ID: <5c823fa2.353ff.17a83a190e2.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: en_US
-X-CM-TRANSID: by_KCgA3WBQ5TuZg6qBJAQ--.23666W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIAElNG3DbcsQABsA
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+References: <20210628113535.Bluez.v2.1.I5dc587c2fe4bf2e49927513cd711d353510c12fc@changeid>
+ <60d949b8.1c69fb81.7de68.0d09@mx.google.com>
+In-Reply-To: <60d949b8.1c69fb81.7de68.0d09@mx.google.com>
+From:   Yun-hao Chung <howardchung@google.com>
+Date:   Thu, 8 Jul 2021 10:35:46 +0800
+Message-ID: <CAPHZWUcpvuR+V43VEjVvB0qXT_eyTEdXJskPtJxBn=AbvZ+_YA@mail.gmail.com>
+Subject: Re: [Bluez,v2] src/adv_monitor: Remove checking in device lost timeout
+To:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-PiAKPiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jIGIvbmV0L2JsdWV0b290
-aC9oY2lfc29jay5jCj4gaW5kZXggYjA0YTVhMDJlY2YzLi4wNTI1ODgzZjQ2MzkgMTAwNjQ0Cj4g
-LS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gKysrIGIvbmV0L2JsdWV0b290aC9oY2lf
-c29jay5jCj4gQEAgLTc1OSwxOSArNzU5LDE0IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2ZW50KHN0
-cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCj4gIAlpZiAoZXZlbnQgPT0gSENJX0RFVl9V
-TlJFRykgewo+ICAJCXN0cnVjdCBzb2NrICpzazsKPiAgCj4gLQkJLyogRGV0YWNoIHNvY2tldHMg
-ZnJvbSBkZXZpY2UgKi8KPiArCQkvKiBDaGFuZ2Ugc29ja2V0IHN0YXRlIGFuZCBub3RpZnkgKi8K
-PiAgCQlyZWFkX2xvY2soJmhjaV9za19saXN0LmxvY2spOwo+ICAJCXNrX2Zvcl9lYWNoKHNrLCAm
-aGNpX3NrX2xpc3QuaGVhZCkgewo+IC0JCQlsb2NrX3NvY2soc2spOwo+ICAJCQlpZiAoaGNpX3Bp
-KHNrKS0+aGRldiA9PSBoZGV2KSB7Cj4gLQkJCQloY2lfcGkoc2spLT5oZGV2ID0gTlVMTDsKPiAg
-CQkJCXNrLT5za19lcnIgPSBFUElQRTsKPiAgCQkJCXNrLT5za19zdGF0ZSA9IEJUX09QRU47Cj4g
-IAkJCQlzay0+c2tfc3RhdGVfY2hhbmdlKHNrKTsKPiAtCj4gLQkJCQloY2lfZGV2X3B1dChoZGV2
-KTsKPiAgCQkJfQo+IC0JCQlyZWxlYXNlX3NvY2soc2spOwo+ICAJCX0KPiAgCQlyZWFkX3VubG9j
-aygmaGNpX3NrX2xpc3QubG9jayk7Cj4gIAl9Cj4gCj4gPyBJIGNhbid0IGp1ZGdlIGJlY2F1c2Ug
-SSBkb24ndCBrbm93IGhvdyB0aGlzIHdvcmtzLiBJIHdvcnJ5IHRoYXQKPiB3aXRob3V0IGxvY2tf
-c29jaygpL3JlbGVhc2Vfc29jaygpLCB0aGlzIHJhY2VzIHdpdGggZS5nLiBoY2lfc29ja19iaW5k
-KCkuCj4gCj4gV2UgY291bGQgdGFrZSBhd2F5IHRoZSBiYWNrd2FyZCBnb3RvIGlmIHdlIGNhbiBk
-byBzb21ldGhpbmcgbGlrZSBiZWxvdy4KPiAKPiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9o
-Y2lfc29jay5jIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gaW5kZXggYjA0YTVhMDJlY2Yz
-Li4xY2EwMzc2OWJhZGYgMTAwNjQ0Cj4gLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4g
-KysrIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gQEAgLTQzLDYgKzQzLDggQEAgc3RhdGlj
-IERFRklORV9JREEoc29ja19jb29raWVfaWRhKTsKPiAgCj4gIHN0YXRpYyBhdG9taWNfdCBtb25p
-dG9yX3Byb21pc2MgPSBBVE9NSUNfSU5JVCgwKTsKPiAgCj4gK3N0YXRpYyBERUZJTkVfTVVURVgo
-c29ja19saXN0X2xvY2spOwo+ICsKPiAgLyogLS0tLS0gSENJIHNvY2tldCBpbnRlcmZhY2UgLS0t
-LS0gKi8KPiAgCj4gIC8qIFNvY2tldCBpbmZvICovCj4gQEAgLTc2MCw3ICs3NjIsNyBAQCB2b2lk
-IGhjaV9zb2NrX2Rldl9ldmVudChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgaW50IGV2ZW50KQo+ICAJ
-CXN0cnVjdCBzb2NrICpzazsKPiAgCj4gIAkJLyogRGV0YWNoIHNvY2tldHMgZnJvbSBkZXZpY2Ug
-Ki8KPiAtCQlyZWFkX2xvY2soJmhjaV9za19saXN0LmxvY2spOwo+ICsJCW11dGV4X2xvY2soJnNv
-Y2tfbGlzdF9sb2NrKTsKPiAgCQlza19mb3JfZWFjaChzaywgJmhjaV9za19saXN0LmhlYWQpIHsK
-PiAgCQkJbG9ja19zb2NrKHNrKTsKPiAgCQkJaWYgKGhjaV9waShzayktPmhkZXYgPT0gaGRldikg
-ewo+IEBAIC03NzMsNyArNzc1LDcgQEAgdm9pZCBoY2lfc29ja19kZXZfZXZlbnQoc3RydWN0IGhj
-aV9kZXYgKmhkZXYsIGludCBldmVudCkKPiAgCQkJfQo+ICAJCQlyZWxlYXNlX3NvY2soc2spOwo+
-ICAJCX0KPiAtCQlyZWFkX3VubG9jaygmaGNpX3NrX2xpc3QubG9jayk7Cj4gKwkJbXV0ZXhfdW5s
-b2NrKCZzb2NrX2xpc3RfbG9jayk7Cj4gIAl9Cj4gIH0KPiAgCj4gQEAgLTgzOCw2ICs4NDAsNyBA
-QCBzdGF0aWMgaW50IGhjaV9zb2NrX3JlbGVhc2Uoc3RydWN0IHNvY2tldCAqc29jaykKPiAgCWlm
-ICghc2spCj4gIAkJcmV0dXJuIDA7Cj4gIAo+ICsJbXV0ZXhfbG9jaygmc29ja19saXN0X2xvY2sp
-Owo+ICAJbG9ja19zb2NrKHNrKTsKPiAgCj4gIAlzd2l0Y2ggKGhjaV9waShzayktPmNoYW5uZWwp
-IHsKPiBAQCAtODYwLDYgKzg2Myw3IEBAIHN0YXRpYyBpbnQgaGNpX3NvY2tfcmVsZWFzZShzdHJ1
-Y3Qgc29ja2V0ICpzb2NrKQo+ICAJfQo+ICAKPiAgCWJ0X3NvY2tfdW5saW5rKCZoY2lfc2tfbGlz
-dCwgc2spOwo+ICsJbXV0ZXhfdW5sb2NrKCZzb2NrX2xpc3RfbG9jayk7Cj4gIAo+ICAJaGRldiA9
-IGhjaV9waShzayktPmhkZXY7Cj4gIAlpZiAoaGRldikgewo+IEBAIC0yMDQ5LDcgKzIwNTMsOSBA
-QCBzdGF0aWMgaW50IGhjaV9zb2NrX2NyZWF0ZShzdHJ1Y3QgbmV0ICpuZXQsIHN0cnVjdCBzb2Nr
-ZXQgKnNvY2ssIGludCBwcm90b2NvbCwKPiAgCXNvY2stPnN0YXRlID0gU1NfVU5DT05ORUNURUQ7
-Cj4gIAlzay0+c2tfc3RhdGUgPSBCVF9PUEVOOwo+ICAKPiArCW11dGV4X2xvY2soJnNvY2tfbGlz
-dF9sb2NrKTsKPiAgCWJ0X3NvY2tfbGluaygmaGNpX3NrX2xpc3QsIHNrKTsKPiArCW11dGV4X3Vu
-bG9jaygmc29ja19saXN0X2xvY2spOwo+ICAJcmV0dXJuIDA7Cj4gIH0KPiAgCj4gCj4gPiAgICAg
-ICAgICAgICBJdCBpcyBhbHNvIHdlaXJkIHRoYXQgdGhpcyBvbmx5IG1hbmlmZXN0cyBpbiB0aGUg
-Qmx1ZXRvb3RoCj4gPiBIQ0kgc29ja2V0cyBvciBvdGhlciBzdWJzeXN0ZW1zIGRvbid0IHVzZSBz
-dWNoIGxvY2tpbmcgbWVjaGFuaXNtCj4gPiBhbnltb3JlPwo+IAoKSGVsbG8gVGV0c3VvLAoKWWVh
-aCwgdGhhdCdzIGEgZ3JlYXQgcGF0Y2ggaW5kZWVkLiBBZGQgb25lIGV4dHJhIG11dGV4IGxvY2sg
-Zm9yIGhhbmRsaW5nIHRoaXMuCkluIGZhY3QsIEkgaGF2ZSB0cmllZCB0byByZXBsYWNlIGFsbCB0
-aGUgaGNpX3NrX2xpc3QubG9jayBmcm9tIHJ3bG9ja190IHRvIG11dGV4dC4KCj4gaHR0cHM6Ly9w
-YXRjaHdvcmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9wYXRjaC9DQUpqb2pKc2o5cHpG
-NGoyTVZ2c00taENwdnlSN09rWm4yMzJ5dDNNZE9Hbkx4T2lSUmdAbWFpbC5nbWFpbC5jb20vCj4g
-SG93ZXZlciwgZnJvbSB0aGUgbG9jayBwcmluY2lwbGUgaW4gdGhlIExpbnV4IGtlcm5lbCwgdGhp
-cyBsb2NrCj4gcmVwbGFjZW1lbnQgaXMgbm90IGFwcHJvcHJpYXRlLiBJIHRha2UgYSBsb3Qgb2Yg
-dGltZSB0byB0cnkgd2l0aCBvdGhlcgo+IGxvY2sgY29tYmluYXRpb25zIGZvciB0aGlzIGNhc2Ug
-YnV0IGZhaWxlZC4gRm9yIGV4YW1wbGUsIEkgdHJpZWQgdG8KPiByZXBsYWNlIHRoZSByd2xvY2tf
-dCBpbiB0aGUgaGNpX3NrX2xpc3Qgd2l0aCBhIHNsZWVwLWFibGUgbXV0ZXggbG9jay4KCkJlY2F1
-c2UgSSBoYXZlIHNlZW0gb3RoZXIgcGFydCBvZiBjb2RlIGluIGtlcm5lbCB1c2VzIHRoaXMgY29t
-YmluYXRpb246IG11dGV4X3QgKyBsb2NrX3NvY2suIEl0IHNob3VsZG4ndCB0cmlnZ2VyIGFueSBs
-b2NraW5nIGVycm9ycy4gKFdpbGwgdGVzdCBpdCkKCj4gQWxzbywgdGhpcyByZWdyZXNzaW9uIGlz
-IGN1cnJlbnRseSA3dGggdG9wCj4gY3Jhc2hlcnMgZm9yIHN5emJvdCwgYW5kIEknZCBsaWtlIHRv
-IGFwcGx5IHRoaXMgcGF0Y2ggYXMgc29vbiBhcyBwb3NzaWJsZS4KPiAKClhELCBZZWFoLiBCZWNh
-dXNlIHRoZSBidWcgY3Jhc2ggcG9pbnQgaXMgbG9jYXRlZCBhdCBmdW5jdGlvbiBoY2lfc29ja19k
-ZXZfZXZlbnQoKS4gV2hlbmV2ZXIgc3l6a2FsbGVyIGZ1enplcyBCbHVldG9vdGggc3RhY2sgYW5k
-IHRoZSBleGVjdXRvciBleGl0cywgdGhlIGNyYXNoIGhhcHBlbnMuCgo+IEkgdGhpbmsgdGhhdCB0
-aGlzIHBhdGNoIGNhbiBzZXJ2ZSBhcyBhIHJlc3BvbnNlIHRvIExpbidzIGNvbW1lbnQKCj4gPiBJ
-biBzaG9ydCwgSSBoYXZlIG5vIGlkZWEgaWYgdGhlcmUgaXMgYW55IGxvY2sgcmVwbGFjaW5nIHNv
-bHV0aW9uIGZvcgo+ID4gdGhpcyBidWcuIEkgbmVlZCBoZWxwIGFuZCBzdWdnZXN0aW9ucyBiZWNh
-dXNlIHRoZSBsb2NrIG1lY2hhbmlzbSBpcwo+ID4ganVzdCBzbyBkaWZmaWN1bHQuCgpUaGFua3Mg
-Zm9yIHRoYXQsIGl0J3MgcXVpdGUgYXBwcmVjaWF0aW5nLgoKUmVnYXJkcwpMaW4gTWEK
+Gentle ping.
+
+On Mon, Jun 28, 2021 at 12:02 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=507773
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.69 seconds
+> GitLint                       PASS      0.14 seconds
+> Prep - Setup ELL              PASS      47.87 seconds
+> Build - Prep                  PASS      0.11 seconds
+> Build - Configure             PASS      8.22 seconds
+> Build - Make                  PASS      204.47 seconds
+> Make Check                    PASS      9.06 seconds
+> Make Distcheck                PASS      241.25 seconds
+> Build w/ext ELL - Configure   PASS      8.28 seconds
+> Build w/ext ELL - Make        PASS      192.03 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
+>
