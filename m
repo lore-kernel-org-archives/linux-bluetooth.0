@@ -2,252 +2,130 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 966DFC07E95
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 23:33:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44499C07E95
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 01:00:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7487B61CC4
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  7 Jul 2021 23:33:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DC0061C4E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 01:00:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230481AbhGGXgh (ORCPT
+        id S230170AbhGHBDd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 7 Jul 2021 19:36:37 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:59711 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229986AbhGGXgg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 7 Jul 2021 19:36:36 -0400
-Received: from fsav314.sakura.ne.jp (fsav314.sakura.ne.jp [153.120.85.145])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 167NXad9056266;
-        Thu, 8 Jul 2021 08:33:36 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav314.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp);
- Thu, 08 Jul 2021 08:33:36 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav314.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 167NXZAR056260
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Thu, 8 Jul 2021 08:33:36 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH v2] Bluetooth: call lock_sock() outside of spinlock
- section
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+        Wed, 7 Jul 2021 21:03:33 -0400
+Received: from mail.zju.edu.cn ([61.164.42.155]:43612 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230029AbhGHBDc (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 7 Jul 2021 21:03:32 -0400
+Received: by ajax-webmail-mail-app2 (Coremail) ; Thu, 8 Jul 2021 09:00:41
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.162.82.120]
+Date:   Thu, 8 Jul 2021 09:00:41 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   LinMa <linma@zju.edu.cn>
+To:     "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Lin Ma <linma@zju.edu.cn>,
+        "Jakub Kicinski" <kuba@kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: Re: [PATCH v2] Bluetooth: call lock_sock() outside of spinlock
+ section
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
+In-Reply-To: <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
 References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
  <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
  <CABBYNZ+Vpzy2+u=xYR-7Kxx5M6pAQFQ8TJHYV1-Jr-FvqZ8=OQ@mail.gmail.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
-Date:   Thu, 8 Jul 2021 08:33:32 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+ <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+Vpzy2+u=xYR-7Kxx5M6pAQFQ8TJHYV1-Jr-FvqZ8=OQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-ID: <5c823fa2.353ff.17a83a190e2.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID: by_KCgA3WBQ5TuZg6qBJAQ--.23666W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwIAElNG3DbcsQABsA
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW3Jw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2021/07/08 3:20, Luiz Augusto von Dentz wrote:
->> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
->> index b04a5a02ecf3..d8e1ac1ae10d 100644
->> --- a/net/bluetooth/hci_sock.c
->> +++ b/net/bluetooth/hci_sock.c
->> @@ -758,20 +758,46 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
->>
->>         if (event == HCI_DEV_UNREG) {
->>                 struct sock *sk;
->> +               bool put_dev;
->>
->> +restart:
->> +               put_dev = false;
->>                 /* Detach sockets from device */
->>                 read_lock(&hci_sk_list.lock);
->>                 sk_for_each(sk, &hci_sk_list.head) {
->> +                       /* hci_sk_list.lock is preventing hci_sock_release()
->> +                        * from calling bt_sock_unlink().
->> +                        */
->> +                       if (hci_pi(sk)->hdev != hdev || sk_unhashed(sk))
->> +                               continue;
->> +                       /* Take a ref because we can't call lock_sock() with
->> +                        * hci_sk_list.lock held.
->> +                        */
->> +                       sock_hold(sk);
->> +                       read_unlock(&hci_sk_list.lock);
->>                         lock_sock(sk);
->> -                       if (hci_pi(sk)->hdev == hdev) {
->> +                       /* Since hci_sock_release() might have already called
->> +                        * bt_sock_unlink() while waiting for lock_sock(),
->> +                        * use sk_hashed(sk) for checking that bt_sock_unlink()
->> +                        * is not yet called.
->> +                        */
->> +                       write_lock(&hci_sk_list.lock);
->> +                       if (sk_hashed(sk) && hci_pi(sk)->hdev == hdev) {
->>                                 hci_pi(sk)->hdev = NULL;
->>                                 sk->sk_err = EPIPE;
->>                                 sk->sk_state = BT_OPEN;
->>                                 sk->sk_state_change(sk);
->> -
->> -                               hci_dev_put(hdev);
->> +                               put_dev = true;
->>                         }
->> +                       write_unlock(&hci_sk_list.lock);
->>                         release_sock(sk);
->> +                       sock_put(sk);
->> +                       if (put_dev)
->> +                               hci_dev_put(hdev);
->> +                       /* Restarting is safe, for hci_pi(sk)->hdev != hdev if
->> +                        * condition met and sk_unhashed(sk) == true otherwise.
->> +                        */
->> +                       goto restart;
-> 
-> This sounds a little too complicated, afaik backward goto is not even
-> consider a good practice either, since it appears we don't unlink the
-> sockets here
-
-Because hci_sock_release() might be concurrently called while
-hci_sock_dev_event() from hci_unregister_dev() from vhci_release() is running.
-
-While hci_sock_dev_event() itself does not unlink the sockets from hci_sk_list.head,
-bt_sock_unlink() from hci_sock_release() unlinks a socket from hci_sk_list.head.
-
-Therefore, as long as there is possibility that hci_sk_list is modified by other thread
-when current thread is traversing this list, we need to be prepared for such race.
-
->              we could perhaps don't release the reference to hdev
-> either and leave hci_sock_release to deal with it and then perhaps we
-> can take away the backward goto, actually why are you restarting to
-> begin with?
-
-Do you mean something like
-
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b04a5a02ecf3..0525883f4639 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -759,19 +759,14 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
- 	if (event == HCI_DEV_UNREG) {
- 		struct sock *sk;
- 
--		/* Detach sockets from device */
-+		/* Change socket state and notify */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, &hci_sk_list.head) {
--			lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
--				hci_pi(sk)->hdev = NULL;
- 				sk->sk_err = EPIPE;
- 				sk->sk_state = BT_OPEN;
- 				sk->sk_state_change(sk);
--
--				hci_dev_put(hdev);
- 			}
--			release_sock(sk);
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
-
-? I can't judge because I don't know how this works. I worry that
-without lock_sock()/release_sock(), this races with e.g. hci_sock_bind().
-
-We could take away the backward goto if we can do something like below.
-
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b04a5a02ecf3..1ca03769badf 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -43,6 +43,8 @@ static DEFINE_IDA(sock_cookie_ida);
- 
- static atomic_t monitor_promisc = ATOMIC_INIT(0);
- 
-+static DEFINE_MUTEX(sock_list_lock);
-+
- /* ----- HCI socket interface ----- */
- 
- /* Socket info */
-@@ -760,7 +762,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
- 		struct sock *sk;
- 
- 		/* Detach sockets from device */
--		read_lock(&hci_sk_list.lock);
-+		mutex_lock(&sock_list_lock);
- 		sk_for_each(sk, &hci_sk_list.head) {
- 			lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
-@@ -773,7 +775,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
- 			}
- 			release_sock(sk);
- 		}
--		read_unlock(&hci_sk_list.lock);
-+		mutex_unlock(&sock_list_lock);
- 	}
- }
- 
-@@ -838,6 +840,7 @@ static int hci_sock_release(struct socket *sock)
- 	if (!sk)
- 		return 0;
- 
-+	mutex_lock(&sock_list_lock);
- 	lock_sock(sk);
- 
- 	switch (hci_pi(sk)->channel) {
-@@ -860,6 +863,7 @@ static int hci_sock_release(struct socket *sock)
- 	}
- 
- 	bt_sock_unlink(&hci_sk_list, sk);
-+	mutex_unlock(&sock_list_lock);
- 
- 	hdev = hci_pi(sk)->hdev;
- 	if (hdev) {
-@@ -2049,7 +2053,9 @@ static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
- 	sock->state = SS_UNCONNECTED;
- 	sk->sk_state = BT_OPEN;
- 
-+	mutex_lock(&sock_list_lock);
- 	bt_sock_link(&hci_sk_list, sk);
-+	mutex_unlock(&sock_list_lock);
- 	return 0;
- }
- 
-
->             It is also weird that this only manifests in the Bluetooth
-> HCI sockets or other subsystems don't use such locking mechanism
-> anymore?
-
-If other subsystems have similar problem, that should be handled by different
-patches. This patch fixes a regression introduced when fixing CVE-2021-3573,
-and I think that Linux distributors are waiting for this regression to be fixed
-so that they can backport commit e305509e678b3a4a ("Bluetooth: use correct lock
-to prevent UAF of hdev object"). Also, this regression is currently 7th top
-crashers for syzbot, and I'd like to apply this patch as soon as possible.
-
-I think that this patch can serve as a response to Lin's comment
-
-  > In short, I have no idea if there is any lock replacing solution for
-  > this bug. I need help and suggestions because the lock mechanism is
-  > just so difficult.
-
-at https://patchwork.kernel.org/project/bluetooth/patch/CAJjojJsj9pzF4j2MVvsM-hCpvyR7OkZn232yt3MdOGnLxOiRRg@mail.gmail.com
-without changing behavior.
-
-> 
-> 
->>                 }
->>                 read_unlock(&hci_sk_list.lock);
->>         }
->> --
->> 2.18.4
-
+PiAKPiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jIGIvbmV0L2JsdWV0b290
+aC9oY2lfc29jay5jCj4gaW5kZXggYjA0YTVhMDJlY2YzLi4wNTI1ODgzZjQ2MzkgMTAwNjQ0Cj4g
+LS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gKysrIGIvbmV0L2JsdWV0b290aC9oY2lf
+c29jay5jCj4gQEAgLTc1OSwxOSArNzU5LDE0IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2ZW50KHN0
+cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCj4gIAlpZiAoZXZlbnQgPT0gSENJX0RFVl9V
+TlJFRykgewo+ICAJCXN0cnVjdCBzb2NrICpzazsKPiAgCj4gLQkJLyogRGV0YWNoIHNvY2tldHMg
+ZnJvbSBkZXZpY2UgKi8KPiArCQkvKiBDaGFuZ2Ugc29ja2V0IHN0YXRlIGFuZCBub3RpZnkgKi8K
+PiAgCQlyZWFkX2xvY2soJmhjaV9za19saXN0LmxvY2spOwo+ICAJCXNrX2Zvcl9lYWNoKHNrLCAm
+aGNpX3NrX2xpc3QuaGVhZCkgewo+IC0JCQlsb2NrX3NvY2soc2spOwo+ICAJCQlpZiAoaGNpX3Bp
+KHNrKS0+aGRldiA9PSBoZGV2KSB7Cj4gLQkJCQloY2lfcGkoc2spLT5oZGV2ID0gTlVMTDsKPiAg
+CQkJCXNrLT5za19lcnIgPSBFUElQRTsKPiAgCQkJCXNrLT5za19zdGF0ZSA9IEJUX09QRU47Cj4g
+IAkJCQlzay0+c2tfc3RhdGVfY2hhbmdlKHNrKTsKPiAtCj4gLQkJCQloY2lfZGV2X3B1dChoZGV2
+KTsKPiAgCQkJfQo+IC0JCQlyZWxlYXNlX3NvY2soc2spOwo+ICAJCX0KPiAgCQlyZWFkX3VubG9j
+aygmaGNpX3NrX2xpc3QubG9jayk7Cj4gIAl9Cj4gCj4gPyBJIGNhbid0IGp1ZGdlIGJlY2F1c2Ug
+SSBkb24ndCBrbm93IGhvdyB0aGlzIHdvcmtzLiBJIHdvcnJ5IHRoYXQKPiB3aXRob3V0IGxvY2tf
+c29jaygpL3JlbGVhc2Vfc29jaygpLCB0aGlzIHJhY2VzIHdpdGggZS5nLiBoY2lfc29ja19iaW5k
+KCkuCj4gCj4gV2UgY291bGQgdGFrZSBhd2F5IHRoZSBiYWNrd2FyZCBnb3RvIGlmIHdlIGNhbiBk
+byBzb21ldGhpbmcgbGlrZSBiZWxvdy4KPiAKPiBkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9o
+Y2lfc29jay5jIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gaW5kZXggYjA0YTVhMDJlY2Yz
+Li4xY2EwMzc2OWJhZGYgMTAwNjQ0Cj4gLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4g
+KysrIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4gQEAgLTQzLDYgKzQzLDggQEAgc3RhdGlj
+IERFRklORV9JREEoc29ja19jb29raWVfaWRhKTsKPiAgCj4gIHN0YXRpYyBhdG9taWNfdCBtb25p
+dG9yX3Byb21pc2MgPSBBVE9NSUNfSU5JVCgwKTsKPiAgCj4gK3N0YXRpYyBERUZJTkVfTVVURVgo
+c29ja19saXN0X2xvY2spOwo+ICsKPiAgLyogLS0tLS0gSENJIHNvY2tldCBpbnRlcmZhY2UgLS0t
+LS0gKi8KPiAgCj4gIC8qIFNvY2tldCBpbmZvICovCj4gQEAgLTc2MCw3ICs3NjIsNyBAQCB2b2lk
+IGhjaV9zb2NrX2Rldl9ldmVudChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgaW50IGV2ZW50KQo+ICAJ
+CXN0cnVjdCBzb2NrICpzazsKPiAgCj4gIAkJLyogRGV0YWNoIHNvY2tldHMgZnJvbSBkZXZpY2Ug
+Ki8KPiAtCQlyZWFkX2xvY2soJmhjaV9za19saXN0LmxvY2spOwo+ICsJCW11dGV4X2xvY2soJnNv
+Y2tfbGlzdF9sb2NrKTsKPiAgCQlza19mb3JfZWFjaChzaywgJmhjaV9za19saXN0LmhlYWQpIHsK
+PiAgCQkJbG9ja19zb2NrKHNrKTsKPiAgCQkJaWYgKGhjaV9waShzayktPmhkZXYgPT0gaGRldikg
+ewo+IEBAIC03NzMsNyArNzc1LDcgQEAgdm9pZCBoY2lfc29ja19kZXZfZXZlbnQoc3RydWN0IGhj
+aV9kZXYgKmhkZXYsIGludCBldmVudCkKPiAgCQkJfQo+ICAJCQlyZWxlYXNlX3NvY2soc2spOwo+
+ICAJCX0KPiAtCQlyZWFkX3VubG9jaygmaGNpX3NrX2xpc3QubG9jayk7Cj4gKwkJbXV0ZXhfdW5s
+b2NrKCZzb2NrX2xpc3RfbG9jayk7Cj4gIAl9Cj4gIH0KPiAgCj4gQEAgLTgzOCw2ICs4NDAsNyBA
+QCBzdGF0aWMgaW50IGhjaV9zb2NrX3JlbGVhc2Uoc3RydWN0IHNvY2tldCAqc29jaykKPiAgCWlm
+ICghc2spCj4gIAkJcmV0dXJuIDA7Cj4gIAo+ICsJbXV0ZXhfbG9jaygmc29ja19saXN0X2xvY2sp
+Owo+ICAJbG9ja19zb2NrKHNrKTsKPiAgCj4gIAlzd2l0Y2ggKGhjaV9waShzayktPmNoYW5uZWwp
+IHsKPiBAQCAtODYwLDYgKzg2Myw3IEBAIHN0YXRpYyBpbnQgaGNpX3NvY2tfcmVsZWFzZShzdHJ1
+Y3Qgc29ja2V0ICpzb2NrKQo+ICAJfQo+ICAKPiAgCWJ0X3NvY2tfdW5saW5rKCZoY2lfc2tfbGlz
+dCwgc2spOwo+ICsJbXV0ZXhfdW5sb2NrKCZzb2NrX2xpc3RfbG9jayk7Cj4gIAo+ICAJaGRldiA9
+IGhjaV9waShzayktPmhkZXY7Cj4gIAlpZiAoaGRldikgewo+IEBAIC0yMDQ5LDcgKzIwNTMsOSBA
+QCBzdGF0aWMgaW50IGhjaV9zb2NrX2NyZWF0ZShzdHJ1Y3QgbmV0ICpuZXQsIHN0cnVjdCBzb2Nr
+ZXQgKnNvY2ssIGludCBwcm90b2NvbCwKPiAgCXNvY2stPnN0YXRlID0gU1NfVU5DT05ORUNURUQ7
+Cj4gIAlzay0+c2tfc3RhdGUgPSBCVF9PUEVOOwo+ICAKPiArCW11dGV4X2xvY2soJnNvY2tfbGlz
+dF9sb2NrKTsKPiAgCWJ0X3NvY2tfbGluaygmaGNpX3NrX2xpc3QsIHNrKTsKPiArCW11dGV4X3Vu
+bG9jaygmc29ja19saXN0X2xvY2spOwo+ICAJcmV0dXJuIDA7Cj4gIH0KPiAgCj4gCj4gPiAgICAg
+ICAgICAgICBJdCBpcyBhbHNvIHdlaXJkIHRoYXQgdGhpcyBvbmx5IG1hbmlmZXN0cyBpbiB0aGUg
+Qmx1ZXRvb3RoCj4gPiBIQ0kgc29ja2V0cyBvciBvdGhlciBzdWJzeXN0ZW1zIGRvbid0IHVzZSBz
+dWNoIGxvY2tpbmcgbWVjaGFuaXNtCj4gPiBhbnltb3JlPwo+IAoKSGVsbG8gVGV0c3VvLAoKWWVh
+aCwgdGhhdCdzIGEgZ3JlYXQgcGF0Y2ggaW5kZWVkLiBBZGQgb25lIGV4dHJhIG11dGV4IGxvY2sg
+Zm9yIGhhbmRsaW5nIHRoaXMuCkluIGZhY3QsIEkgaGF2ZSB0cmllZCB0byByZXBsYWNlIGFsbCB0
+aGUgaGNpX3NrX2xpc3QubG9jayBmcm9tIHJ3bG9ja190IHRvIG11dGV4dC4KCj4gaHR0cHM6Ly9w
+YXRjaHdvcmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9wYXRjaC9DQUpqb2pKc2o5cHpG
+NGoyTVZ2c00taENwdnlSN09rWm4yMzJ5dDNNZE9Hbkx4T2lSUmdAbWFpbC5nbWFpbC5jb20vCj4g
+SG93ZXZlciwgZnJvbSB0aGUgbG9jayBwcmluY2lwbGUgaW4gdGhlIExpbnV4IGtlcm5lbCwgdGhp
+cyBsb2NrCj4gcmVwbGFjZW1lbnQgaXMgbm90IGFwcHJvcHJpYXRlLiBJIHRha2UgYSBsb3Qgb2Yg
+dGltZSB0byB0cnkgd2l0aCBvdGhlcgo+IGxvY2sgY29tYmluYXRpb25zIGZvciB0aGlzIGNhc2Ug
+YnV0IGZhaWxlZC4gRm9yIGV4YW1wbGUsIEkgdHJpZWQgdG8KPiByZXBsYWNlIHRoZSByd2xvY2tf
+dCBpbiB0aGUgaGNpX3NrX2xpc3Qgd2l0aCBhIHNsZWVwLWFibGUgbXV0ZXggbG9jay4KCkJlY2F1
+c2UgSSBoYXZlIHNlZW0gb3RoZXIgcGFydCBvZiBjb2RlIGluIGtlcm5lbCB1c2VzIHRoaXMgY29t
+YmluYXRpb246IG11dGV4X3QgKyBsb2NrX3NvY2suIEl0IHNob3VsZG4ndCB0cmlnZ2VyIGFueSBs
+b2NraW5nIGVycm9ycy4gKFdpbGwgdGVzdCBpdCkKCj4gQWxzbywgdGhpcyByZWdyZXNzaW9uIGlz
+IGN1cnJlbnRseSA3dGggdG9wCj4gY3Jhc2hlcnMgZm9yIHN5emJvdCwgYW5kIEknZCBsaWtlIHRv
+IGFwcGx5IHRoaXMgcGF0Y2ggYXMgc29vbiBhcyBwb3NzaWJsZS4KPiAKClhELCBZZWFoLiBCZWNh
+dXNlIHRoZSBidWcgY3Jhc2ggcG9pbnQgaXMgbG9jYXRlZCBhdCBmdW5jdGlvbiBoY2lfc29ja19k
+ZXZfZXZlbnQoKS4gV2hlbmV2ZXIgc3l6a2FsbGVyIGZ1enplcyBCbHVldG9vdGggc3RhY2sgYW5k
+IHRoZSBleGVjdXRvciBleGl0cywgdGhlIGNyYXNoIGhhcHBlbnMuCgo+IEkgdGhpbmsgdGhhdCB0
+aGlzIHBhdGNoIGNhbiBzZXJ2ZSBhcyBhIHJlc3BvbnNlIHRvIExpbidzIGNvbW1lbnQKCj4gPiBJ
+biBzaG9ydCwgSSBoYXZlIG5vIGlkZWEgaWYgdGhlcmUgaXMgYW55IGxvY2sgcmVwbGFjaW5nIHNv
+bHV0aW9uIGZvcgo+ID4gdGhpcyBidWcuIEkgbmVlZCBoZWxwIGFuZCBzdWdnZXN0aW9ucyBiZWNh
+dXNlIHRoZSBsb2NrIG1lY2hhbmlzbSBpcwo+ID4ganVzdCBzbyBkaWZmaWN1bHQuCgpUaGFua3Mg
+Zm9yIHRoYXQsIGl0J3MgcXVpdGUgYXBwcmVjaWF0aW5nLgoKUmVnYXJkcwpMaW4gTWEK
