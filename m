@@ -2,179 +2,380 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0DCC07E99
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:46:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4910C07E99
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:50:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0974461376
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:46:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4129613B2
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:50:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231942AbhGINtd (ORCPT
+        id S232088AbhGINxf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Jul 2021 09:49:33 -0400
-Received: from mx0a-0064b401.pphosted.com ([205.220.166.238]:6034 "EHLO
-        mx0a-0064b401.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231756AbhGINtc (ORCPT
+        Fri, 9 Jul 2021 09:53:35 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:63320 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231454AbhGINxe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Jul 2021 09:49:32 -0400
-Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
-        by mx0a-0064b401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 169Dhj8q008136;
-        Fri, 9 Jul 2021 06:46:42 -0700
-Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2174.outbound.protection.outlook.com [104.47.58.174])
-        by mx0a-0064b401.pphosted.com with ESMTP id 39pjap86nb-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Fri, 09 Jul 2021 06:46:41 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=FY+kvYQEwyCe+ZVZ8fnw1CewetKskjvpK1d03jIEy/mMLKPcEfrYZ0z+qo75JkW1dP2ZUegMvu8HosAwILyB8l0VpmnVm3WkAVf3hzit0JY+Djwyd7Xg0uaZ8NOzlj1xI/j0s6RPrtz6yuFgLF2jbx6smjPbbDd82eQWcP5Rk1QY4O/HGUZ2lRJuSYJt6dWNN6DsweEwad+LdiuQqQQ84TCmzJqbI+Oa5KUh8z3VOs6HxfnGQXrB4JAWxu60pD9llf8f7thkwuAOxEZ1R2XI2UPOVZxIw21uCffkdJBtLLp9iXJDyebBLLre2cQctK59LshAh/m7FuP+XsHnxXFlpw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=INXqbuVqq3BnNaRF1G9xc8iKhr30LxLpFA9KyR84m9k=;
- b=T70zznxEho0x1jRaAVHALsUTdoN9Ap7UR7yWPuA1C/PpAOH8XndIGCvZlb4Wy+E9rKC3jvor3gmi5JSNKgSDTjFq5+Djwf5X6unMGnVAM1yc1FggvGZidBEb2tunlGqOVvc1RYSoOdDSxd0YI5F7zSf6R94DALPSJdC5FKm2u6ouKMqQv+7YYDbUyhcugwX3vQ4+trV+iDySxzI00JujNHMzdXuV0bXQuFf87dWRdaePQQWg2/j6EdeuRiP5y96wzg0A7jr8/ezlU50mTA6NtjPVw+C3tsG8cgjl+880qbezkYtyzK9rceZ47NZAnH2hipWaSOMpz654wZYFfT8qsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=windriver.com; dmarc=pass action=none
- header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=windriversystems.onmicrosoft.com;
- s=selector2-windriversystems-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=INXqbuVqq3BnNaRF1G9xc8iKhr30LxLpFA9KyR84m9k=;
- b=jrkKidKgT9EQMhhMDrZ1PHK0irUlhtXCBLFLmFrkM29T4oBEZG4+ax6c/GjFDxRe4CNpIAIDKY/+JcEaLksaQ2fvJ5dKgP/LID1U4zL0je/ErpJCDaiOxmhNOThJSRLWgc4wXEWY/d9qcdYnYt39gc+5uZmiRrQ+IUJRrufplXc=
-Authentication-Results: gmail.com; dkim=none (message not signed)
- header.d=none;gmail.com; dmarc=none action=none header.from=windriver.com;
-Received: from DM6PR11MB2587.namprd11.prod.outlook.com (2603:10b6:5:c3::16) by
- DM6PR11MB4057.namprd11.prod.outlook.com (2603:10b6:5:19d::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4308.19; Fri, 9 Jul 2021 13:46:38 +0000
-Received: from DM6PR11MB2587.namprd11.prod.outlook.com
- ([fe80::7071:ef90:3130:cc76]) by DM6PR11MB2587.namprd11.prod.outlook.com
- ([fe80::7071:ef90:3130:cc76%6]) with mapi id 15.20.4287.030; Fri, 9 Jul 2021
- 13:46:38 +0000
-From:   Jun Miao <jun.miao@windriver.com>
-To:     matthias.bgg@gmail.com
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org
-Subject: [PATCH] Bluetooth: btusb: Fix a unspported condition to set available debug features
-Date:   Fri,  9 Jul 2021 21:46:25 +0800
-Message-Id: <20210709134625.1235015-1-jun.miao@windriver.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: HK2PR0401CA0018.apcprd04.prod.outlook.com
- (2603:1096:202:2::28) To DM6PR11MB2587.namprd11.prod.outlook.com
- (2603:10b6:5:c3::16)
+        Fri, 9 Jul 2021 09:53:34 -0400
+Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 169DoUpb063867;
+        Fri, 9 Jul 2021 22:50:30 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
+ Fri, 09 Jul 2021 22:50:30 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 169DoThx063863
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 9 Jul 2021 22:50:30 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH v2] Bluetooth: call lock_sock() outside of spinlock
+ section
+To:     LinMa <linma@zju.edu.cn>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
+ <CABBYNZ+Vpzy2+u=xYR-7Kxx5M6pAQFQ8TJHYV1-Jr-FvqZ8=OQ@mail.gmail.com>
+ <79694c01-b69e-a039-6860-d7e612fbc008@i-love.sakura.ne.jp>
+ <5c823fa2.353ff.17a83a190e2.Coremail.linma@zju.edu.cn>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <05535d35-30d6-28b6-067e-272d01679d24@i-love.sakura.ne.jp>
+Date:   Fri, 9 Jul 2021 22:50:28 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-Received: from pek-lpggp7.wrs.com (60.247.85.82) by HK2PR0401CA0018.apcprd04.prod.outlook.com (2603:1096:202:2::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 13:46:36 +0000
-X-MS-PublicTrafficType: Email
-X-MS-Office365-Filtering-Correlation-Id: 123803e8-c0b8-46df-ebad-08d942dff9d7
-X-MS-TrafficTypeDiagnostic: DM6PR11MB4057:
-X-Microsoft-Antispam-PRVS: <DM6PR11MB4057CCADF7DF3B2936C016D78E189@DM6PR11MB4057.namprd11.prod.outlook.com>
-X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
-X-MS-Exchange-SenderADCheck: 1
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: bzIpkF/6XDHMxJy4ja/jBh2lcA0TD6m7HnAeHIzT1ZnAftg/F2AqD01qn1YpLEqfkBHJdxeUsijHMNo/r1g6tvK+r7Mm8rsBWg/zOvfbFlQ/xt4k4J9RLtdEP8mmmfvdhpwD1K+5vmFX0zvhuJDBG6Sk712pwK9XThuhgFQzfedRUys5CvT2VXFZXML/AQaV/Vd6tFLfkQg0IeqT8a+VIE91ZxXuGOwHs4jZjgAcYUTxe6UBNsUU2f4GZ2TNQTUJKBp4J8VsjukowObnBoSs8g9TUcr0bqyTLX3+2B6JyjDpNGpdnAGd+l9IocGlWcegf3wajRV49oYogFrOgVUea3Rf9lTnE5kgNA9PcMwKmTYjq3pCdNiye7ReCl+2io/WKxqFDDckr2DwrPB4bxCJAtcTMgh2g98xNeli9g1fLT2MiGpEjRCRWhLYSVMqtxjy3ISSe0tRPb+8YDRpRJTy3AXbkUY4vZe3rixxvue0OgNWDEOYbQEEwF/8Lli2JuoTpBGXOnqOShSjHYJx9GiGMWMlvTD7qng4wMCn39TnsKuYJwoiR9w4mqqWZrkZ8EJOyz+mqe89PaXqE4R6RERDTveJPOkI96EVmcxV0dxGaSk6yVHJmQl6feqM5S3skkxNYiZxHiXzoTELJYiXvordSl0dO/Niv654x/kOcLcR/Ek5I6H4ygg58XXi8lt1i3JnZLx8smnI2B/KVllvUUhYwQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB2587.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(396003)(376002)(346002)(366004)(136003)(6916009)(1076003)(4326008)(52116002)(5660300002)(36756003)(186003)(956004)(83380400001)(2616005)(66946007)(2906002)(6512007)(26005)(86362001)(8936002)(6486002)(38100700002)(38350700002)(478600001)(8676002)(66476007)(66556008)(44832011)(6666004)(6506007)(316002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zCDXltOKTGMTgp1ctFUnGigI+YZbHFRQ6EWMRVOTbOJby51kUPxlObaGpMsG?=
- =?us-ascii?Q?ssFqHVtbziUeIvbslO21prEwwDWAYpPVArOMX28CrNWi+FrqBNHAnutJ1GZd?=
- =?us-ascii?Q?Goqh5t5P44oun1TiKKgdkRUkeorVSixZ+pkwQz5jqrFxwAiuqJgAmuMt312H?=
- =?us-ascii?Q?cWgKaIhFUYC+bCSAAtRkq4FPV//6lFc6p88mMihbcEl9Grk42DxvNELuzNnU?=
- =?us-ascii?Q?FysukqsAcTkwqvXwy6z4MmJnPT5xad4Toms2BnOS0OMhoyjBUMW6ccP46PqU?=
- =?us-ascii?Q?2QkGR0EvJHK2fQWLsioDnK/Ja/mung0nzSzzr5Q2pGxdwXrE+iwe/lCAxtyz?=
- =?us-ascii?Q?xoU6+dm8gRI2OV5iCfXS8Kjc06KkPpVc97LmxWJdELS97WsoXAtpOcc+dlyJ?=
- =?us-ascii?Q?2WYRLUO6X8qhFodZFZ4h4X9sV3x3huVYRQiCN5wRcFdiU+PcWOwRpi2nUAwY?=
- =?us-ascii?Q?6vCSkkSwl1jQjfr2lxt/+lFTYogAO7ulAjEiPaOXJtSVjBYhOYdt8aqI2q6q?=
- =?us-ascii?Q?qfTtx4FXX50wnwOlzhwvPq43MJEJBAGOA9CvvgqYi2MTLLusv1hFUYz+NGIj?=
- =?us-ascii?Q?+VvYor1EZsUtNirBpg927cGQo6ae3TpHo968ienZyqajuXet3n2ysRlB0jbs?=
- =?us-ascii?Q?50dleC9bbJboYPfwC9LObgwBneGXwqxtf0zHlnWPgbljeW+s0tYdOn/9XJpL?=
- =?us-ascii?Q?kAbcbtZara/Q8dF4TSMD2GMO9ubXRIKFxLkShx4JYlvt+6HAQzyydyNt3IEI?=
- =?us-ascii?Q?iJ6p/Kz+2LDWa3tUxg1vjQ5Af2cPEBNc892gWcChNjQ2Fhu3drsf6we0XILN?=
- =?us-ascii?Q?WtNZ/vBmgO8/j4uxRUfrudlX3Z11VbDDpBKi+w+5mtLm8I7F1jW33lHT9pdg?=
- =?us-ascii?Q?pdOZiLifVLuwVU5EWGHSDKR03CSaFby50chDAcmvqJDPoteRPrVMOrJ7oA+D?=
- =?us-ascii?Q?h4IMzSD5ZmUmFeUN5S2Y4B6zrdE08FPoiFwp0W947fMIsCGtQiVtakm8PNKQ?=
- =?us-ascii?Q?Zf/igdkJkIpYOuIyxJzjDBhX6iLBN5LX66+A02FUzoVoHGV8UAqzEyWkvL2F?=
- =?us-ascii?Q?FgrSlQc1jVflUl8x0owmO1iueJJ7K4o9hKNV3RwKDBpJ50iS8GAzoPL3re+O?=
- =?us-ascii?Q?XBGhJhgCe9LKNr9YD3VEz9EXEpjqAQ+S08fIBVgaA/gnPAfTBzvbc4e2XDhq?=
- =?us-ascii?Q?KndXHaY/dRmslpKHEGw+WqgBcqpAGlDtTCthkDzwpVlxznvBgduDrJcXIpPE?=
- =?us-ascii?Q?47exDZHB0YtvoylvJzLEiavgI95P3gMWTv+AbpaCY8+wtTKPu6lu9DiTmx9B?=
- =?us-ascii?Q?5HQC9OMlAFdnIHYg0GbqhfQZ?=
-X-OriginatorOrg: windriver.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 123803e8-c0b8-46df-ebad-08d942dff9d7
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB2587.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 13:46:38.7992
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0z+BuCuDCQpc1I92awfwnU5Bs5wJzQNMwFuv53mIT2kBfXCg7Ls1blChUGTwwiQn+vKsuUlgq15czEilLK4TQw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4057
-X-Proofpoint-GUID: s5jBkAWvZ93slwDRw1gzNXaenGRuY_4B
-X-Proofpoint-ORIG-GUID: s5jBkAWvZ93slwDRw1gzNXaenGRuY_4B
-X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
- definitions=2021-07-09_06:2021-07-09,2021-07-09 signatures=0
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
- priorityscore=1501 suspectscore=0 impostorscore=0 bulkscore=0
- lowpriorityscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
- malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2104190000 definitions=main-2107090068
+In-Reply-To: <5c823fa2.353ff.17a83a190e2.Coremail.linma@zju.edu.cn>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When reading the support debug features failed, there are not available
-features init. Continue to set the debug features is illogical, we should
-skip btintel_set_debug_features(), even if check it by "if (!features)".
+It seems that history of this locking problem is a trial and error.
 
-Fixes: c453b10c2b28 ("Bluetooth: btusb: Configure Intel debug feature based on
-available support")
-Signed-off-by: Jun Miao <jun.miao@windriver.com>
----
- drivers/bluetooth/btusb.c | 18 ++++++++++--------
- 1 file changed, 10 insertions(+), 8 deletions(-)
+Commit b40df5743ee8aed8 ("[PATCH] bluetooth: fix socket locking in
+hci_sock_dev_event()") in 2.6.21-rc4 changed bh_lock_sock() to lock_sock()
+as an attempt to fix lockdep warning.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 7f6ba2c975ed..a3c027d17745 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2889,10 +2889,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
- 	/* Read the Intel supported features and if new exception formats
- 	 * supported, need to load the additional DDC config to enable.
- 	 */
--	btintel_read_debug_features(hdev, &features);
--
--	/* Set DDC mask for available debug features */
--	btintel_set_debug_features(hdev, &features);
-+	err = btintel_read_debug_features(hdev, &features);
-+	if (!err) {
-+		/* Set DDC mask for available debug features */
-+		btintel_set_debug_features(hdev, &features);
-+	}
+Then, commit 4ce61d1c7a8ef4c1 ("[BLUETOOTH]: Fix locking in
+hci_sock_dev_event().") in 2.6.22-rc2 changed lock_sock() to
+local_bh_disable() + bh_lock_sock_nested() as an attempt to fix
+sleep in atomic context warning.
+
+Then, commit 4b5dd696f81b210c ("Bluetooth: Remove local_bh_disable() from
+hci_sock.c") in 3.3-rc1 removed local_bh_disable().
+
+Then, commit e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF
+of hdev object") in 5.13-rc5 again changed bh_lock_sock_nested() to
+lock_sock() as an attempt to fix CVE-2021-3573.
+
+But unfortunately it is too difficult to convert rw spinlock into mutex;
+we need to live with current rw spinlock.
+
+And we have three choices that can live with current rw spinlock.
+Patches for these choices are show bottom. All tested by syzbot.
+
+(1) Introduce a global mutex dedicated for hci_sock_dev_event(), and block
+    bt_sock_unlink() and concurrent hci_sock_dev_event() callers.
+
+    This is simplest if it is guaranteed that total delay for lock_sock()
+    on all sockets is short enough.
+
+    But it is not clear how long lock_sock() might block, for e.g.
+    hci_sock_bound_ioctl() which is called inside lock_sock() section is
+    doing copy_from_user()/copy_to_user() which may result in blocking
+    other lock_sock() waiters for many seconds. I think that POC.zip is
+    demonstrating that this delay is controllable via userfaultfd.
+
+    Of course, the robust fix will be not to call
+    copy_from_user()/copy_to_user() inside lock_sock() section. But such
+    big change is not suitable for a fix for commit e305509e678b3a4a
+    ("Bluetooth: use correct lock to prevent UAF of hdev object").
+
+(2) Introduce a global mutex for hci_sock_dev_event(), but don't block
+    bt_sock_unlink() nor concurrent hci_sock_dev_event() callers (i.e.
+    use this mutex like a spinlock).
+
+    Since it will be safe to resume sk_for_each() as long as currently
+    accessing socket remains on that list, we can track which socket is
+    currently accessed, and let bt_sock_unlink() wait if that socket is
+    currently accessed.
+
+    It is possible that total delay becomes long enough for khungtaskd to
+    complain. Commit 8d0caedb75968304 ("can: bcm/raw/isotp: use per module
+    netdevice notifier") is an example for avoiding khungtaskd warning
+    using this choice. Compared to that commit, this choice for
+    hci_sock_dev_event() case will need to also touch "struct hci_pinfo"
+    because we need to track concurrent hci_sock_dev_event() callers.
+
+(3) Don't introduce a global mutex for hci_sock_dev_event(), and don't
+    block bt_sock_unlink() nor concurrent hci_sock_dev_event() callers.
+
+    Since it will be safe to resume sk_for_each() as long as currently
+    accessing socket remains on that list, take a refcount on currently
+    accessing socket and check if currently accessing socket is still
+    on the list. This choice needs to touch only hci_sock_dev_event().
+
+Which choice do we want to go?
+
+Patch for choice (1):
+
+----------------------------------------
+ net/bluetooth/hci_sock.c |   17 ++++++++++++++---
+ 1 file changed, 14 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b04a5a02ecf3..c860ec4ea7b8 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -150,6 +150,8 @@ static struct bt_sock_list hci_sk_list = {
+ 	.lock = __RW_LOCK_UNLOCKED(hci_sk_list.lock)
+ };
  
- 	/* Read the Intel version information after loading the FW  */
- 	err = btintel_read_version(hdev, &ver);
-@@ -2985,10 +2986,11 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
- 	/* Read the Intel supported features and if new exception formats
- 	 * supported, need to load the additional DDC config to enable.
- 	 */
--	btintel_read_debug_features(hdev, &features);
--
--	/* Set DDC mask for available debug features */
--	btintel_set_debug_features(hdev, &features);
-+	err = btintel_read_debug_features(hdev, &features);
-+	if (!err) {
-+		/* Set DDC mask for available debug features */
-+		btintel_set_debug_features(hdev, &features);
-+	}
++static DEFINE_MUTEX(hci_sk_list_lock);
++
+ static bool is_filtered_packet(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct hci_filter *flt;
+@@ -758,10 +760,13 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
  
- 	/* Read the Intel version information after loading the FW  */
- 	err = btintel_read_version_tlv(hdev, &version);
--- 
-2.25.1
+ 	if (event == HCI_DEV_UNREG) {
+ 		struct sock *sk;
++		int put_count = 0;
+ 
+ 		/* Detach sockets from device */
++		mutex_lock(&hci_sk_list_lock);
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, &hci_sk_list.head) {
++			read_unlock(&hci_sk_list.lock);
+ 			lock_sock(sk);
+ 			if (hci_pi(sk)->hdev == hdev) {
+ 				hci_pi(sk)->hdev = NULL;
+@@ -769,11 +774,15 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 				sk->sk_state = BT_OPEN;
+ 				sk->sk_state_change(sk);
+ 
+-				hci_dev_put(hdev);
++				put_count++;
+ 			}
+ 			release_sock(sk);
++			read_lock(&hci_sk_list.lock);
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
++		mutex_unlock(&hci_sk_list_lock);
++		while (put_count--)
++			hci_dev_put(hdev);
+ 	}
+ }
+ 
+@@ -838,6 +847,10 @@ static int hci_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	mutex_lock(&hci_sk_list_lock);
++	bt_sock_unlink(&hci_sk_list, sk);
++	mutex_unlock(&hci_sk_list_lock);
++
+ 	lock_sock(sk);
+ 
+ 	switch (hci_pi(sk)->channel) {
+@@ -859,8 +872,6 @@ static int hci_sock_release(struct socket *sock)
+ 		break;
+ 	}
+ 
+-	bt_sock_unlink(&hci_sk_list, sk);
+-
+ 	hdev = hci_pi(sk)->hdev;
+ 	if (hdev) {
+ 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
+----------------------------------------
+
+Patch for choice (2):
+
+----------------------------------------
+ net/bluetooth/hci_sock.c |   39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b04a5a02ecf3..3e65fcc8c9af 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -43,6 +43,8 @@ static DEFINE_IDA(sock_cookie_ida);
+ 
+ static atomic_t monitor_promisc = ATOMIC_INIT(0);
+ 
++static DEFINE_MUTEX(dev_event_lock);
++
+ /* ----- HCI socket interface ----- */
+ 
+ /* Socket info */
+@@ -57,6 +59,7 @@ struct hci_pinfo {
+ 	unsigned long     flags;
+ 	__u32             cookie;
+ 	char              comm[TASK_COMM_LEN];
++	unsigned int      event_in_progress;
+ };
+ 
+ void hci_sock_set_flag(struct sock *sk, int nr)
+@@ -758,10 +761,15 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 
+ 	if (event == HCI_DEV_UNREG) {
+ 		struct sock *sk;
++		int put_count = 0;
+ 
+ 		/* Detach sockets from device */
++		mutex_lock(&dev_event_lock);
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, &hci_sk_list.head) {
++			read_unlock(&hci_sk_list.lock);
++			hci_pi(sk)->event_in_progress++;
++			mutex_unlock(&dev_event_lock);
+ 			lock_sock(sk);
+ 			if (hci_pi(sk)->hdev == hdev) {
+ 				hci_pi(sk)->hdev = NULL;
+@@ -769,11 +777,17 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 				sk->sk_state = BT_OPEN;
+ 				sk->sk_state_change(sk);
+ 
+-				hci_dev_put(hdev);
++				put_count++;
+ 			}
+ 			release_sock(sk);
++			mutex_lock(&dev_event_lock);
++			hci_pi(sk)->event_in_progress--;
++			read_lock(&hci_sk_list.lock);
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
++		mutex_unlock(&dev_event_lock);
++		while (put_count--)
++			hci_dev_put(hdev);
+ 	}
+ }
+ 
+@@ -838,6 +852,26 @@ static int hci_sock_release(struct socket *sock)
+ 	if (!sk)
+ 		return 0;
+ 
++	/*
++	 * Wait for sk_for_each() in hci_sock_dev_event() to stop accessing
++	 * this sk before unlinking. Need to unlink before lock_sock(), for
++	 * hci_sock_dev_event() calls lock_sock() after incrementing
++	 * event_in_progress counter.
++	 */
++	while (1) {
++		bool unlinked = true;
++
++		mutex_lock(&dev_event_lock);
++		if (!hci_pi(sk)->event_in_progress)
++			bt_sock_unlink(&hci_sk_list, sk);
++		else
++			unlinked = false;
++		mutex_unlock(&dev_event_lock);
++		if (unlinked)
++			break;
++		schedule_timeout_uninterruptible(1);
++	}
++
+ 	lock_sock(sk);
+ 
+ 	switch (hci_pi(sk)->channel) {
+@@ -859,8 +893,6 @@ static int hci_sock_release(struct socket *sock)
+ 		break;
+ 	}
+ 
+-	bt_sock_unlink(&hci_sk_list, sk);
+-
+ 	hdev = hci_pi(sk)->hdev;
+ 	if (hdev) {
+ 		if (hci_pi(sk)->channel == HCI_CHANNEL_USER) {
+@@ -2049,6 +2081,7 @@ static int hci_sock_create(struct net *net, struct socket *sock, int protocol,
+ 	sock->state = SS_UNCONNECTED;
+ 	sk->sk_state = BT_OPEN;
+ 
++	hci_pi(sk)->event_in_progress = 0;
+ 	bt_sock_link(&hci_sk_list, sk);
+ 	return 0;
+ }
+----------------------------------------
+
+Patch for choice (3):
+
+----------------------------------------
+ net/bluetooth/hci_sock.c |   35 +++++++++++++++++++++++++++++++++--
+ 1 file changed, 33 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b04a5a02ecf3..38146cf37378 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -758,22 +758,53 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 
+ 	if (event == HCI_DEV_UNREG) {
+ 		struct sock *sk;
++		int put_count = 0;
+ 
+ 		/* Detach sockets from device */
++restart:
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, &hci_sk_list.head) {
++			/* This sock_hold(sk) is safe, for bt_sock_unlink(sk)
++			 * is not called yet.
++			 */
++			sock_hold(sk);
++			read_unlock(&hci_sk_list.lock);
+ 			lock_sock(sk);
+-			if (hci_pi(sk)->hdev == hdev) {
++			write_lock(&hci_sk_list.lock);
++			/* Check that bt_sock_unlink(sk) is not called yet. */
++			if (sk_hashed(sk) && hci_pi(sk)->hdev == hdev) {
+ 				hci_pi(sk)->hdev = NULL;
+ 				sk->sk_err = EPIPE;
+ 				sk->sk_state = BT_OPEN;
+ 				sk->sk_state_change(sk);
+ 
+-				hci_dev_put(hdev);
++				put_count++;
+ 			}
++			write_unlock(&hci_sk_list.lock);
+ 			release_sock(sk);
++			read_lock(&hci_sk_list.lock);
++			/* If bt_sock_unlink(sk) is not called yet, we can
++			 * continue iteration. We can use __sock_put(sk) here
++			 * because hci_sock_release() will call sock_put(sk)
++			 * after bt_sock_unlink(sk).
++			 */
++			if (sk_hashed(sk)) {
++				__sock_put(sk);
++				continue;
++			}
++			/* Otherwise, we need to restart iteration, for the
++			 * next socket pointed by sk->next might be already
++			 * gone. We can't use __sock_put(sk) here because
++			 * hci_sock_release() might have already called
++			 * sock_put(sk) after bt_sock_unlink(sk).
++			 */
++			read_unlock(&hci_sk_list.lock);
++			sock_put(sk);
++			goto restart;
+ 		}
+ 		read_unlock(&hci_sk_list.lock);
++		while (put_count--)
++			hci_dev_put(hdev);
+ 	}
+ }
+ 
+----------------------------------------
 
