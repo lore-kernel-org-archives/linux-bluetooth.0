@@ -2,118 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 831E6C07E96
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 13:19:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 218C6C07E99
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 05:21:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65B9561467
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  8 Jul 2021 13:19:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0512561442
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 05:21:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231454AbhGHNWT (ORCPT
+        id S229863AbhGIFYA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 8 Jul 2021 09:22:19 -0400
-Received: from 185-125-188-181.canonical.com ([185.125.188.181]:35814 "EHLO
-        smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-FAIL)
-        by vger.kernel.org with ESMTP id S230254AbhGHNWS (ORCPT
+        Fri, 9 Jul 2021 01:24:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49098 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229583AbhGIFX7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 8 Jul 2021 09:22:18 -0400
-X-Greylist: delayed 405 seconds by postgrey-1.27 at vger.kernel.org; Thu, 08 Jul 2021 09:22:18 EDT
-Received: from localhost.localdomain (unknown [222.129.38.167])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id D60C6406A1;
-        Thu,  8 Jul 2021 13:12:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1625749964;
-        bh=MYnwACSxZXw/tdO1IBJgMWsYb1BW8Qy1Y1TrAbpbPB8=;
-        h=From:To:Subject:Date:Message-Id:MIME-Version;
-        b=Ll2yKm9Dl5NTxPqEkScpTM4EK9BoVccFojqhE8bYZAarGJejr/yW5Dtd7AuAFn00U
-         BWGGlgpiocEFU3lus60dC2tw+71jTsb8crLZ/pbOMMxJA1Zp9f1sa4S2RHvUtXPgd9
-         gP1+0sDd+M2vV0njNs/N+sCfddV9HXuuMwc5Ex7GGUAJamt8pTs7kRpAxOf79xS7sw
-         QlB6C0XfvcPm30aMTWFoiuG36JZzXXSMKoPB8lBvZfXEKdwZ2YQmMDW+7dBTazGVJs
-         NZEJ5nwZtcw7JABvW/1Ke1TSOUm4Ydr7tuKlUvRpz5Qa7d0XwDzZGxkS2K8XBCmwpw
-         TfzQbRuvbX9NQ==
-From:   Aaron Ma <aaron.ma@canonical.com>
-To:     aaron.ma@canonical.com, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org
-Subject: [PATCH] Bluetooth: btusb: Add support for Foxconn Mediatek Chip
-Date:   Thu,  8 Jul 2021 21:12:14 +0800
-Message-Id: <20210708131214.695458-1-aaron.ma@canonical.com>
-X-Mailer: git-send-email 2.32.0
+        Fri, 9 Jul 2021 01:23:59 -0400
+Received: from mail-yb1-xb29.google.com (mail-yb1-xb29.google.com [IPv6:2607:f8b0:4864:20::b29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEEF8C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jul 2021 22:21:15 -0700 (PDT)
+Received: by mail-yb1-xb29.google.com with SMTP id o139so12719044ybg.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jul 2021 22:21:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=7glaz09LYK1wgJStu1fhPymyoFrPcqtPcZcOpaCWbGE=;
+        b=lSQLveN6qOBiYywViZLOtei7SSgIciQqrbVMcJWZK9uYXBfSYcwj5ivEmMqXohVc05
+         X2q+6Z+b/Bd5zDo3sT5toZ9kaMZEjPS3QOCEbUf5PQq7NSISUETS1pkxayC/13jSyVNS
+         /inLuvulmcPiTO9ozcztiFTMxzKK+Luj75HHLz9pzuoEYmMr9UXlxNK4m/d41KA7bT7I
+         J4XPaNtZC8KTDUvTJwBn3XAvkmUa6E2GABcT9p7f9+f7SK9hHUNurT9MVKtDMhYqdUos
+         8j2OPJZqLZGfCL3VZkZIOTPa7Lx4JoidKB4MtvNw0o4g9ZfFASURPMFxV0zBpq0A15EH
+         bxjA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=7glaz09LYK1wgJStu1fhPymyoFrPcqtPcZcOpaCWbGE=;
+        b=jC1FV1AY8WcLL7ZQTAYbW+Bol010mtaL27qQg25Vz+0+GFl/RLPs/Xom9MAK/ulNnf
+         bTXqP425wRreN9yW6O3VVtOFYb8jnsoaOH2Ee2SB+pACHZDUKn8FExtmhiGJOs3BFT1K
+         ZbN3iDFgDRbC5I1TGqI4nghbIiANyPH2n/hhGO+V+p/QxD7It/N9+AofN+xZ6F3JDHha
+         OVb0DYHy62xmvimFf8mV+1HootdI+X2ps/yCLmPcoNt9K/kS4wEv0aMZpA3W6aWo0hxD
+         nscBlOhi4gsGmodR5e5RoFDwnGP0weaLX3DIFRsJ8vYKgJ7phBSWd2vcsv7Dqav+F/Th
+         g6mA==
+X-Gm-Message-State: AOAM531Ou71uHand2WFWbrqEkThAakvksS/Mpj5oKeVu0y/Q4Nk/VfgA
+        IGQk4EF+z/B5Xpai5o+w2ZQrLUICsqQOZ5QH47I=
+X-Google-Smtp-Source: ABdhPJwbRduPDHCE480o0O8emYt6e7Sw5/PJ+Av88QE1s/0MrEl/2vzCJgnpHAV8XPNPEj9kOjYf4unOWSoskxZqvuk=
+X-Received: by 2002:a25:b741:: with SMTP id e1mr45646724ybm.347.1625808075135;
+ Thu, 08 Jul 2021 22:21:15 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210708062314.245754-1-howardchung@google.com> <20210708142059.Bluez.v1.1.I69278fab3bf86adb578c5cba0a39e5bcf7f9581e@changeid>
+In-Reply-To: <20210708142059.Bluez.v1.1.I69278fab3bf86adb578c5cba0a39e5bcf7f9581e@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 8 Jul 2021 22:21:04 -0700
+Message-ID: <CABBYNZKjc+2ur81SR2_jTiba6SgxNQh9piXqhmfKro511=QN8Q@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1 01/14] lib: add hash functions for bt_uuid_t
+To:     Howard Chung <howardchung@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for another Foxconn / Hon Hai device with MT7921 chip.
+Hi Howard,
 
-T:  Bus=05 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0cd Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+On Wed, Jul 7, 2021 at 11:23 PM Howard Chung <howardchung@google.com> wrote:
+>
+> This adds function GHashFunc and GEqualFunc for bt_uuid_t.
+> With these functions, we can add uuids into a GHashTable with bt_uuid_t
+> format.
 
-Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
----
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
+We will likely move away from GLib dependency so I wouldn't want to
+introduce a dependency to it specially as part of libbluetooth.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a9855a2dd561..240463d0e367 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -414,6 +414,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x04ca, 0x3802), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0cd), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
- 
- 	/* Additional Realtek 8723AE Bluetooth devices */
- 	{ USB_DEVICE(0x0930, 0x021d), .driver_info = BTUSB_REALTEK },
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+>
+>  lib/uuid.c | 27 +++++++++++++++++++++++++++
+>  lib/uuid.h |  3 +++
+>  2 files changed, 30 insertions(+)
+>
+> diff --git a/lib/uuid.c b/lib/uuid.c
+> index 3d97dc8359c7..a09f5c428b87 100644
+> --- a/lib/uuid.c
+> +++ b/lib/uuid.c
+> @@ -16,6 +16,7 @@
+>  #include <string.h>
+>  #include <stdlib.h>
+>  #include <errno.h>
+> +#include <glib.h>
+>
+>  #include "lib/bluetooth.h"
+>  #include "uuid.h"
+> @@ -120,6 +121,32 @@ int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2)
+>         return bt_uuid128_cmp(&u1, &u2);
+>  }
+>
+> +guint bt_uuid_hash(gconstpointer key)
+> +{
+> +       const bt_uuid_t *uuid = key;
+> +       bt_uuid_t uuid_128;
+> +       uint64_t *val;
+> +
+> +       if (!uuid)
+> +               return 0;
+> +
+> +       bt_uuid_to_uuid128(uuid, &uuid_128);
+> +       val = (uint64_t *)&uuid_128.value.u128;
+> +
+> +       return g_int64_hash(val) ^ g_int64_hash(val+1);
+> +}
+> +
+> +gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2)
+> +{
+> +       const bt_uuid_t *uuid1 = v1;
+> +       const bt_uuid_t *uuid2 = v2;
+> +
+> +       if (!uuid1 || !uuid2)
+> +               return !uuid1 && !uuid2;
+> +
+> +       return bt_uuid_cmp(uuid1, uuid2) == 0;
+> +}
+> +
+>  /*
+>   * convert the UUID to string, copying a maximum of n characters.
+>   */
+> diff --git a/lib/uuid.h b/lib/uuid.h
+> index 1a4029b68730..e47ccccb9fd2 100644
+> --- a/lib/uuid.h
+> +++ b/lib/uuid.h
+> @@ -17,6 +17,7 @@ extern "C" {
+>  #endif
+>
+>  #include <stdint.h>
+> +#include <glib.h>
+>
+>  #define GENERIC_AUDIO_UUID     "00001203-0000-1000-8000-00805f9b34fb"
+>
+> @@ -167,6 +168,8 @@ int bt_uuid128_create(bt_uuid_t *btuuid, uint128_t value);
+>
+>  int bt_uuid_cmp(const bt_uuid_t *uuid1, const bt_uuid_t *uuid2);
+>  void bt_uuid_to_uuid128(const bt_uuid_t *src, bt_uuid_t *dst);
+> +guint bt_uuid_hash(gconstpointer key);
+> +gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2);
+>
+>  #define MAX_LEN_UUID_STR 37
+>
+> --
+> 2.32.0.93.g670b81a890-goog
+>
+
+
 -- 
-2.32.0
-
+Luiz Augusto von Dentz
