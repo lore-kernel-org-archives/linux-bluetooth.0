@@ -2,314 +2,179 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MSGID_FROM_MTA_HEADER,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23505C07E99
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 06:01:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B0DCC07E99
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:46:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0460161441
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 06:01:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0974461376
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  9 Jul 2021 13:46:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229979AbhGIGEY (ORCPT
+        id S231942AbhGINtd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 9 Jul 2021 02:04:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57908 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229624AbhGIGEY (ORCPT
+        Fri, 9 Jul 2021 09:49:33 -0400
+Received: from mx0a-0064b401.pphosted.com ([205.220.166.238]:6034 "EHLO
+        mx0a-0064b401.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231756AbhGINtc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 9 Jul 2021 02:04:24 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DA57C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  8 Jul 2021 23:01:40 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id o139so12852319ybg.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 08 Jul 2021 23:01:40 -0700 (PDT)
+        Fri, 9 Jul 2021 09:49:32 -0400
+Received: from pps.filterd (m0250809.ppops.net [127.0.0.1])
+        by mx0a-0064b401.pphosted.com (8.16.0.43/8.16.0.43) with SMTP id 169Dhj8q008136;
+        Fri, 9 Jul 2021 06:46:42 -0700
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2174.outbound.protection.outlook.com [104.47.58.174])
+        by mx0a-0064b401.pphosted.com with ESMTP id 39pjap86nb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Fri, 09 Jul 2021 06:46:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=FY+kvYQEwyCe+ZVZ8fnw1CewetKskjvpK1d03jIEy/mMLKPcEfrYZ0z+qo75JkW1dP2ZUegMvu8HosAwILyB8l0VpmnVm3WkAVf3hzit0JY+Djwyd7Xg0uaZ8NOzlj1xI/j0s6RPrtz6yuFgLF2jbx6smjPbbDd82eQWcP5Rk1QY4O/HGUZ2lRJuSYJt6dWNN6DsweEwad+LdiuQqQQ84TCmzJqbI+Oa5KUh8z3VOs6HxfnGQXrB4JAWxu60pD9llf8f7thkwuAOxEZ1R2XI2UPOVZxIw21uCffkdJBtLLp9iXJDyebBLLre2cQctK59LshAh/m7FuP+XsHnxXFlpw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=INXqbuVqq3BnNaRF1G9xc8iKhr30LxLpFA9KyR84m9k=;
+ b=T70zznxEho0x1jRaAVHALsUTdoN9Ap7UR7yWPuA1C/PpAOH8XndIGCvZlb4Wy+E9rKC3jvor3gmi5JSNKgSDTjFq5+Djwf5X6unMGnVAM1yc1FggvGZidBEb2tunlGqOVvc1RYSoOdDSxd0YI5F7zSf6R94DALPSJdC5FKm2u6ouKMqQv+7YYDbUyhcugwX3vQ4+trV+iDySxzI00JujNHMzdXuV0bXQuFf87dWRdaePQQWg2/j6EdeuRiP5y96wzg0A7jr8/ezlU50mTA6NtjPVw+C3tsG8cgjl+880qbezkYtyzK9rceZ47NZAnH2hipWaSOMpz654wZYFfT8qsQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=windriver.com; dmarc=pass action=none
+ header.from=windriver.com; dkim=pass header.d=windriver.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=rOoKhypFTF2dgCMfLROhRuFad5TEIPPSaPB/nJcvoCE=;
-        b=Nkc2j9rOUsZD+THnqR2Ylpza7iAmG4Y1+0loHdB+nrRIvek8HKa6xAQpfcXd6lKUTF
-         CWla+9h+G9zWOIdCHXCwlGI9AWdu12RXFX54AqG/t4EAQEkWOszqKnvGrwzala2HgPKz
-         CxfkZN3+/k52CKAk4ofOrXJTMjc75eLu8hy7c6cchkYa8iQPY9Ued1p8N7a/Sb806z8D
-         ECGjU8KrhDgB2BmLIHCWT/z6+Udxcrlr+nrb/uVXMQ51fuMgYrLgEAjPdCvmAk0vPWLA
-         0rbU54KHboHBVPCkfUKaIJSvSC/TaJ6+XfKkZc6oWSEA4SmfTCnlwubRCClK4Co3qVR3
-         HnNw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=rOoKhypFTF2dgCMfLROhRuFad5TEIPPSaPB/nJcvoCE=;
-        b=sphevF+ONyq0PAnM7tKH2dNwXJtCG1qDa0zX8bxHLym8QCD/kveb+dxKxsYKRcbaJm
-         S29fBOzMIq3pXGqLHWLqTVC4nSKW7L01fHCvg2KEthsUCUra38f/jIBUgqTfqx4WnXB3
-         1nsEqmIdDXZ6nL3giCqptNnTe9FpvDxJ8+IXMZCV/8jk6aZzJ1ifqSlLsI5tAy1eUbUL
-         gogtK1zENpBPDaS4Y742NfGB4AgyqVG8GJb/eacrzTaPMEl+0Ug6dM8Gi+K86RBZMHeF
-         iitf95Xh88SZX+GuLy9DqjeypfBZpYgptusBasDkQObJu+vw4WT79kvjp8hRHItF07ld
-         8p6Q==
-X-Gm-Message-State: AOAM530T+w0RVkHbr5vlp9IrDviSxR7tPnafzaRXEAjiE2cN86ZOzz3I
-        ifrSjpmbIJe1S7X+NZrDl5oO2da27sOVfndfG9g=
-X-Google-Smtp-Source: ABdhPJwENBLCP8U+t223AjTfz9MyDGA+/BYo+KHKEFmcC69Xj3USt88snqdkflDyVYDoKM28iWwsKyMhH6m6mNr2/8s=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr46211943ybk.91.1625810499585;
- Thu, 08 Jul 2021 23:01:39 -0700 (PDT)
+ d=windriversystems.onmicrosoft.com;
+ s=selector2-windriversystems-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=INXqbuVqq3BnNaRF1G9xc8iKhr30LxLpFA9KyR84m9k=;
+ b=jrkKidKgT9EQMhhMDrZ1PHK0irUlhtXCBLFLmFrkM29T4oBEZG4+ax6c/GjFDxRe4CNpIAIDKY/+JcEaLksaQ2fvJ5dKgP/LID1U4zL0je/ErpJCDaiOxmhNOThJSRLWgc4wXEWY/d9qcdYnYt39gc+5uZmiRrQ+IUJRrufplXc=
+Authentication-Results: gmail.com; dkim=none (message not signed)
+ header.d=none;gmail.com; dmarc=none action=none header.from=windriver.com;
+Received: from DM6PR11MB2587.namprd11.prod.outlook.com (2603:10b6:5:c3::16) by
+ DM6PR11MB4057.namprd11.prod.outlook.com (2603:10b6:5:19d::20) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.4308.19; Fri, 9 Jul 2021 13:46:38 +0000
+Received: from DM6PR11MB2587.namprd11.prod.outlook.com
+ ([fe80::7071:ef90:3130:cc76]) by DM6PR11MB2587.namprd11.prod.outlook.com
+ ([fe80::7071:ef90:3130:cc76%6]) with mapi id 15.20.4287.030; Fri, 9 Jul 2021
+ 13:46:38 +0000
+From:   Jun Miao <jun.miao@windriver.com>
+To:     matthias.bgg@gmail.com
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        linux-arm-kernel@lists.infradead.org
+Subject: [PATCH] Bluetooth: btusb: Fix a unspported condition to set available debug features
+Date:   Fri,  9 Jul 2021 21:46:25 +0800
+Message-Id: <20210709134625.1235015-1-jun.miao@windriver.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: HK2PR0401CA0018.apcprd04.prod.outlook.com
+ (2603:1096:202:2::28) To DM6PR11MB2587.namprd11.prod.outlook.com
+ (2603:10b6:5:c3::16)
 MIME-Version: 1.0
-References: <20210708062314.245754-1-howardchung@google.com> <20210708142059.Bluez.v1.9.Ifbb69dd6e371da3a914049a94615064479b9024b@changeid>
-In-Reply-To: <20210708142059.Bluez.v1.9.Ifbb69dd6e371da3a914049a94615064479b9024b@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 8 Jul 2021 23:01:28 -0700
-Message-ID: <CABBYNZ+w+FT3W3_2XDbhqsT99j3G4AdWQGKF=SbYcU57YyxpRw@mail.gmail.com>
-Subject: Re: [Bluez PATCH v1 09/14] plugins/admin_policy: add ServiceAllowList method
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+Received: from pek-lpggp7.wrs.com (60.247.85.82) by HK2PR0401CA0018.apcprd04.prod.outlook.com (2603:1096:202:2::28) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4308.20 via Frontend Transport; Fri, 9 Jul 2021 13:46:36 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: 123803e8-c0b8-46df-ebad-08d942dff9d7
+X-MS-TrafficTypeDiagnostic: DM6PR11MB4057:
+X-Microsoft-Antispam-PRVS: <DM6PR11MB4057CCADF7DF3B2936C016D78E189@DM6PR11MB4057.namprd11.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:6790;
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: bzIpkF/6XDHMxJy4ja/jBh2lcA0TD6m7HnAeHIzT1ZnAftg/F2AqD01qn1YpLEqfkBHJdxeUsijHMNo/r1g6tvK+r7Mm8rsBWg/zOvfbFlQ/xt4k4J9RLtdEP8mmmfvdhpwD1K+5vmFX0zvhuJDBG6Sk712pwK9XThuhgFQzfedRUys5CvT2VXFZXML/AQaV/Vd6tFLfkQg0IeqT8a+VIE91ZxXuGOwHs4jZjgAcYUTxe6UBNsUU2f4GZ2TNQTUJKBp4J8VsjukowObnBoSs8g9TUcr0bqyTLX3+2B6JyjDpNGpdnAGd+l9IocGlWcegf3wajRV49oYogFrOgVUea3Rf9lTnE5kgNA9PcMwKmTYjq3pCdNiye7ReCl+2io/WKxqFDDckr2DwrPB4bxCJAtcTMgh2g98xNeli9g1fLT2MiGpEjRCRWhLYSVMqtxjy3ISSe0tRPb+8YDRpRJTy3AXbkUY4vZe3rixxvue0OgNWDEOYbQEEwF/8Lli2JuoTpBGXOnqOShSjHYJx9GiGMWMlvTD7qng4wMCn39TnsKuYJwoiR9w4mqqWZrkZ8EJOyz+mqe89PaXqE4R6RERDTveJPOkI96EVmcxV0dxGaSk6yVHJmQl6feqM5S3skkxNYiZxHiXzoTELJYiXvordSl0dO/Niv654x/kOcLcR/Ek5I6H4ygg58XXi8lt1i3JnZLx8smnI2B/KVllvUUhYwQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB2587.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(39850400004)(396003)(376002)(346002)(366004)(136003)(6916009)(1076003)(4326008)(52116002)(5660300002)(36756003)(186003)(956004)(83380400001)(2616005)(66946007)(2906002)(6512007)(26005)(86362001)(8936002)(6486002)(38100700002)(38350700002)(478600001)(8676002)(66476007)(66556008)(44832011)(6666004)(6506007)(316002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?zCDXltOKTGMTgp1ctFUnGigI+YZbHFRQ6EWMRVOTbOJby51kUPxlObaGpMsG?=
+ =?us-ascii?Q?ssFqHVtbziUeIvbslO21prEwwDWAYpPVArOMX28CrNWi+FrqBNHAnutJ1GZd?=
+ =?us-ascii?Q?Goqh5t5P44oun1TiKKgdkRUkeorVSixZ+pkwQz5jqrFxwAiuqJgAmuMt312H?=
+ =?us-ascii?Q?cWgKaIhFUYC+bCSAAtRkq4FPV//6lFc6p88mMihbcEl9Grk42DxvNELuzNnU?=
+ =?us-ascii?Q?FysukqsAcTkwqvXwy6z4MmJnPT5xad4Toms2BnOS0OMhoyjBUMW6ccP46PqU?=
+ =?us-ascii?Q?2QkGR0EvJHK2fQWLsioDnK/Ja/mung0nzSzzr5Q2pGxdwXrE+iwe/lCAxtyz?=
+ =?us-ascii?Q?xoU6+dm8gRI2OV5iCfXS8Kjc06KkPpVc97LmxWJdELS97WsoXAtpOcc+dlyJ?=
+ =?us-ascii?Q?2WYRLUO6X8qhFodZFZ4h4X9sV3x3huVYRQiCN5wRcFdiU+PcWOwRpi2nUAwY?=
+ =?us-ascii?Q?6vCSkkSwl1jQjfr2lxt/+lFTYogAO7ulAjEiPaOXJtSVjBYhOYdt8aqI2q6q?=
+ =?us-ascii?Q?qfTtx4FXX50wnwOlzhwvPq43MJEJBAGOA9CvvgqYi2MTLLusv1hFUYz+NGIj?=
+ =?us-ascii?Q?+VvYor1EZsUtNirBpg927cGQo6ae3TpHo968ienZyqajuXet3n2ysRlB0jbs?=
+ =?us-ascii?Q?50dleC9bbJboYPfwC9LObgwBneGXwqxtf0zHlnWPgbljeW+s0tYdOn/9XJpL?=
+ =?us-ascii?Q?kAbcbtZara/Q8dF4TSMD2GMO9ubXRIKFxLkShx4JYlvt+6HAQzyydyNt3IEI?=
+ =?us-ascii?Q?iJ6p/Kz+2LDWa3tUxg1vjQ5Af2cPEBNc892gWcChNjQ2Fhu3drsf6we0XILN?=
+ =?us-ascii?Q?WtNZ/vBmgO8/j4uxRUfrudlX3Z11VbDDpBKi+w+5mtLm8I7F1jW33lHT9pdg?=
+ =?us-ascii?Q?pdOZiLifVLuwVU5EWGHSDKR03CSaFby50chDAcmvqJDPoteRPrVMOrJ7oA+D?=
+ =?us-ascii?Q?h4IMzSD5ZmUmFeUN5S2Y4B6zrdE08FPoiFwp0W947fMIsCGtQiVtakm8PNKQ?=
+ =?us-ascii?Q?Zf/igdkJkIpYOuIyxJzjDBhX6iLBN5LX66+A02FUzoVoHGV8UAqzEyWkvL2F?=
+ =?us-ascii?Q?FgrSlQc1jVflUl8x0owmO1iueJJ7K4o9hKNV3RwKDBpJ50iS8GAzoPL3re+O?=
+ =?us-ascii?Q?XBGhJhgCe9LKNr9YD3VEz9EXEpjqAQ+S08fIBVgaA/gnPAfTBzvbc4e2XDhq?=
+ =?us-ascii?Q?KndXHaY/dRmslpKHEGw+WqgBcqpAGlDtTCthkDzwpVlxznvBgduDrJcXIpPE?=
+ =?us-ascii?Q?47exDZHB0YtvoylvJzLEiavgI95P3gMWTv+AbpaCY8+wtTKPu6lu9DiTmx9B?=
+ =?us-ascii?Q?5HQC9OMlAFdnIHYg0GbqhfQZ?=
+X-OriginatorOrg: windriver.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 123803e8-c0b8-46df-ebad-08d942dff9d7
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB2587.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2021 13:46:38.7992
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ddb2873-a1ad-4a18-ae4e-4644631433be
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 0z+BuCuDCQpc1I92awfwnU5Bs5wJzQNMwFuv53mIT2kBfXCg7Ls1blChUGTwwiQn+vKsuUlgq15czEilLK4TQw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4057
+X-Proofpoint-GUID: s5jBkAWvZ93slwDRw1gzNXaenGRuY_4B
+X-Proofpoint-ORIG-GUID: s5jBkAWvZ93slwDRw1gzNXaenGRuY_4B
+X-Proofpoint-Virus-Version: vendor=fsecure engine=2.50.10434:6.0.391,18.0.790
+ definitions=2021-07-09_06:2021-07-09,2021-07-09 signatures=0
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011
+ priorityscore=1501 suspectscore=0 impostorscore=0 bulkscore=0
+ lowpriorityscore=0 spamscore=0 mlxscore=0 mlxlogscore=999 adultscore=0
+ malwarescore=0 phishscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2104190000 definitions=main-2107090068
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+When reading the support debug features failed, there are not available
+features init. Continue to set the debug features is illogical, we should
+skip btintel_set_debug_features(), even if check it by "if (!features)".
 
-On Wed, Jul 7, 2021 at 11:23 PM Howard Chung <howardchung@google.com> wrote:
->
-> From: Yun-Hao Chung <howardchung@chromium.org>
->
-> This adds code to register interface org.bluez.AdminPolicySet1.
-> The interface will provide methods to limit users to operate certain
-> functions of bluez, such as allow/disallow user to taggle adapter power,
-> or only allow users to connect services in the specified list, etc.
->
-> This patch also implements ServiceAllowlist in
-> org.bluez.AdminPolicySet1.
->
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
-> The following test steps were performed:
-> 1. Set ServiceAllowList to
->    ["0x1108","0x110A","0x110B","0x110C","0x110D","0x110E",
->    "0x110F","0x1112","0x111E","0x111F","0x1203"]
->    ( users are only allowed to connect headset )
-> 2. Turn on paired WF1000XM3, and listen music on Youtube.
-> 3. Turn on paired K830 (LE device), press any key on keyboard.
-> 4. Turn on paired Samsung Bluetooth Keyboard EE-BT550 (BREDR device),
->    press any key on keyboard.
-> 5. Set ServiceAllowList to
->    ["1124","180A","180F","1812"]
->    ( users are only allowed to connect HID devices )
-> 6. Turn on paired WF1000XM3, and listen music on Youtube.
-> 7. Turn on paired K830 (LE device), press any key on keyboard.
-> 8. Turn on paired Samsung Bluetooth Keyboard EE-BT550 (BREDR device),
->    press any key on keyboard.
-> 9. Set ServiceAllowList to []
->    ( users are only allowed to connect any device. )
-> 10. Turn on paired WF1000XM3, and listen music on Youtube.
-> 11. Turn on paired K830 (LE device), press any key on keyboard.
-> 12. Turn on paired Samsung Bluetooth Keyboard EE-BT550 (BREDR device),
->    press any key on keyboard.
->
-> Expected results:
-> Step 2,7,8,9,10,11 should success, and step 3,4,6 should fail.
+Fixes: c453b10c2b28 ("Bluetooth: btusb: Configure Intel debug feature based on
+available support")
+Signed-off-by: Jun Miao <jun.miao@windriver.com>
+---
+ drivers/bluetooth/btusb.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-All this explanation is great but it would really help if you have
-added support for bluetoothctl to control this, we also need to
-document these interfaces in case someone else wants to use them (e.g:
-other clients like bluetoothctl). For the bluetoothctl we could
-perhaps an admin menu registered whenever the interfaces are available
-and then a command allow [list/none/any] so the user can query when no
-parameter is given or set a list of UUIDs. Btw, how is this supposed
-to work with vendor UUIDs? I guess that would need to support UUID 128
-bit format in order to support that.
-
->
->  plugins/admin_policy.c | 123 ++++++++++++++++++++++++++++++++++++++++-
->  1 file changed, 122 insertions(+), 1 deletion(-)
->
-> diff --git a/plugins/admin_policy.c b/plugins/admin_policy.c
-> index 2ece871564e6..242b8d5dacb0 100644
-> --- a/plugins/admin_policy.c
-> +++ b/plugins/admin_policy.c
-> @@ -12,19 +12,29 @@
->  #include <config.h>
->  #endif
->
-> +#include <dbus/dbus.h>
-> +#include <gdbus/gdbus.h>
-> +
->  #include "lib/bluetooth.h"
-> +#include "lib/uuid.h"
->
->  #include "src/adapter.h"
-> +#include "src/dbus-common.h"
->  #include "src/error.h"
->  #include "src/log.h"
->  #include "src/plugin.h"
->
->  #include "src/shared/queue.h"
->
-> +#define ADMIN_POLICY_SET_INTERFACE     "org.bluez.AdminPolicySet1"
-> +
-> +static DBusConnection *dbus_conn;
-> +
->  /* |policy_data| has the same life cycle as btd_adapter */
->  static struct btd_admin_policy {
->         struct btd_adapter *adapter;
->         uint16_t adapter_id;
-> +       struct queue *service_allowlist;
->  } *policy_data = NULL;
->
->  static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
-> @@ -40,17 +50,116 @@ static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
->
->         admin_policy->adapter = adapter;
->         admin_policy->adapter_id = btd_adapter_get_index(adapter);
-> +       admin_policy->service_allowlist = NULL;
->
->         return admin_policy;
->  }
->
-> +static void free_service_allowlist(struct queue *q)
-> +{
-> +       queue_destroy(q, g_free);
-> +}
-> +
->  static void admin_policy_free(void *data)
->  {
->         struct btd_admin_policy *admin_policy = data;
->
-> +       free_service_allowlist(admin_policy->service_allowlist);
->         g_free(admin_policy);
->  }
->
-> +static struct queue *parse_allow_service_list(struct btd_adapter *adapter,
-> +                                                       DBusMessage *msg)
-> +{
-> +       DBusMessageIter iter, arr_iter;
-> +       struct queue *uuid_list = NULL;
-> +
-> +       dbus_message_iter_init(msg, &iter);
-> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY)
-> +               return NULL;
-> +
-> +       uuid_list = queue_new();
-> +       dbus_message_iter_recurse(&iter, &arr_iter);
-> +       do {
-> +               const int type = dbus_message_iter_get_arg_type(&arr_iter);
-> +               char *uuid_param;
-> +               bt_uuid_t *uuid;
-> +
-> +               if (type == DBUS_TYPE_INVALID)
-> +                       break;
-> +
-> +               if (type != DBUS_TYPE_STRING)
-> +                       goto failed;
-> +
-> +               dbus_message_iter_get_basic(&arr_iter, &uuid_param);
-> +
-> +               uuid = g_try_malloc(sizeof(*uuid));
-> +               if (!uuid)
-> +                       goto failed;
-> +
-> +               if (bt_string_to_uuid(uuid, uuid_param)) {
-> +                       g_free(uuid);
-> +                       goto failed;
-> +               }
-> +
-> +               queue_push_head(uuid_list, uuid);
-> +
-> +               dbus_message_iter_next(&arr_iter);
-> +       } while (true);
-> +
-> +       return uuid_list;
-> +
-> +failed:
-> +       queue_destroy(uuid_list, g_free);
-> +       return NULL;
-> +}
-> +
-> +static bool service_allowlist_set(struct btd_admin_policy *admin_policy,
-> +                                                       struct queue *uuid_list)
-> +{
-> +       struct btd_adapter *adapter = admin_policy->adapter;
-> +
-> +       if (!btd_adapter_set_allowed_uuids(adapter, uuid_list))
-> +               return false;
-> +
-> +       free_service_allowlist(admin_policy->service_allowlist);
-> +       admin_policy->service_allowlist = uuid_list;
-> +
-> +       return true;
-> +}
-> +
-> +static DBusMessage *set_service_allowlist(DBusConnection *conn,
-> +                                       DBusMessage *msg, void *user_data)
-> +{
-> +       struct btd_admin_policy *admin_policy = user_data;
-> +       struct btd_adapter *adapter = admin_policy->adapter;
-> +       struct queue *uuid_list = NULL;
-> +       const char *sender = dbus_message_get_sender(msg);
-> +
-> +       DBG("sender %s", sender);
-> +
-> +       /* Parse parameters */
-> +       uuid_list = parse_allow_service_list(adapter, msg);
-> +       if (!uuid_list) {
-> +               btd_error(admin_policy->adapter_id,
-> +                               "Failed on parsing allowed service list");
-> +               return btd_error_invalid_args(msg);
-> +       }
-> +
-> +       if (!service_allowlist_set(admin_policy, uuid_list)) {
-> +               free_service_allowlist(uuid_list);
-> +               return btd_error_failed(msg, "service_allowlist_set failed");
-> +       }
-> +
-> +       return dbus_message_new_method_return(msg);
-> +}
-> +
-> +static const GDBusMethodTable admin_policy_adapter_methods[] = {
-> +       { GDBUS_METHOD("SetServiceAllowList", GDBUS_ARGS({ "UUIDs", "as" }),
-> +                                               NULL, set_service_allowlist) },
-> +       { }
-> +};
-> +
->  static int admin_policy_adapter_probe(struct btd_adapter *adapter)
->  {
->         if (policy_data) {
-> @@ -64,8 +173,18 @@ static int admin_policy_adapter_probe(struct btd_adapter *adapter)
->         if (!policy_data)
->                 return -ENOMEM;
->
-> -       btd_info(policy_data->adapter_id, "Admin Policy has been enabled");
-> +       if (!g_dbus_register_interface(dbus_conn, adapter_get_path(adapter),
-> +                                       ADMIN_POLICY_SET_INTERFACE,
-> +                                       admin_policy_adapter_methods, NULL,
-> +                                       NULL, policy_data, admin_policy_free)) {
-> +               btd_error(policy_data->adapter_id,
-> +                       "Admin Policy Set interface init failed on path %s",
-> +                                               adapter_get_path(adapter));
-> +               return -EINVAL;
-> +       }
->
-> +       btd_info(policy_data->adapter_id,
-> +                               "Admin Policy Set interface registered");
->         return 0;
->  }
->
-> @@ -79,6 +198,8 @@ static int admin_policy_init(void)
->  {
->         DBG("");
->
-> +       dbus_conn = btd_get_dbus_connection();
-> +
->         return btd_register_adapter_driver(&admin_policy_driver);
->  }
->
-> --
-> 2.32.0.93.g670b81a890-goog
->
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 7f6ba2c975ed..a3c027d17745 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2889,10 +2889,11 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+ 	/* Read the Intel supported features and if new exception formats
+ 	 * supported, need to load the additional DDC config to enable.
+ 	 */
+-	btintel_read_debug_features(hdev, &features);
+-
+-	/* Set DDC mask for available debug features */
+-	btintel_set_debug_features(hdev, &features);
++	err = btintel_read_debug_features(hdev, &features);
++	if (!err) {
++		/* Set DDC mask for available debug features */
++		btintel_set_debug_features(hdev, &features);
++	}
+ 
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version(hdev, &ver);
+@@ -2985,10 +2986,11 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+ 	/* Read the Intel supported features and if new exception formats
+ 	 * supported, need to load the additional DDC config to enable.
+ 	 */
+-	btintel_read_debug_features(hdev, &features);
+-
+-	/* Set DDC mask for available debug features */
+-	btintel_set_debug_features(hdev, &features);
++	err = btintel_read_debug_features(hdev, &features);
++	if (!err) {
++		/* Set DDC mask for available debug features */
++		btintel_set_debug_features(hdev, &features);
++	}
+ 
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version_tlv(hdev, &version);
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
