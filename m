@@ -2,166 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0F37C11F7C
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Jul 2021 07:42:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F07CBC11F90
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Jul 2021 08:29:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0A4E61921
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Jul 2021 07:42:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D27BC60FE7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 12 Jul 2021 08:29:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345929AbhGLHpd (ORCPT
+        id S1353812AbhGLIcK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 12 Jul 2021 03:45:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43248 "EHLO
+        Mon, 12 Jul 2021 04:32:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348593AbhGLHlH (ORCPT
+        with ESMTP id S1358378AbhGLIZx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 12 Jul 2021 03:41:07 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DAC3C022593;
-        Mon, 12 Jul 2021 00:32:52 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id z12so13273584qtj.3;
-        Mon, 12 Jul 2021 00:32:52 -0700 (PDT)
+        Mon, 12 Jul 2021 04:25:53 -0400
+Received: from mail-ed1-x52b.google.com (mail-ed1-x52b.google.com [IPv6:2a00:1450:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0B8FC09CE7A
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jul 2021 01:17:08 -0700 (PDT)
+Received: by mail-ed1-x52b.google.com with SMTP id h8so13437342eds.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 12 Jul 2021 01:17:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=7516QFKCbONFu1K4UM0Mfb3rZBvmchK7pEHlv8tiP/s=;
-        b=mszEFKbKWeSyvVifSeriXR9rZ/pP1xKlJ1f9aqWHLsS9QilBHOzMbxSVcxTYO/ORTX
-         fKW3ZRa2hH9EoQETxAARImaA5+BbHDOQcsTyfTd8PiOZyCi4oo17USOvj1Dhu/ECKj4C
-         7JokpZHgNdsGD5h3SkvSfmsAZ94tNbr1DYbNcCLc+PHMkllsCaRrEa5A3BcMUs1HfziK
-         64rckuHCtvBWsAZfMhIiT8cA61vvdAI+81JcE6hRnYqzEJmERECBFI8sb+kYvNF30WW8
-         l+Sxfj7224hfw66/kMH9fhkjt34rtKmufNox/qCDdf/KQ2x1fK4Fmpz5ud6EOHKOFlG1
-         Md6Q==
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=wxHpiYfDuncik6i5FwRpbNUnKMGIA/9+EY+s+sQQfMA=;
+        b=CGypMf/PuT/GG5nredzePwHjCCdYQd2+769x+EJWPBa+/JiSMa++TYKlpZdoyyUENA
+         ZdAUeg8+rzYQZHSUkJM17exv38C/ToG2CU9mTk+cBatA8U+h/Wn79tFyqc7SY5w7aJnA
+         kwP9j4YgCmZSbNeRmg1NMol0xrKJuwnBHU34uSsOU6rQrmrnkOuLp3KpNRSQf6+5D3lW
+         v8Mufq/KV49cf9Iy9lUGJmeqzBYDv9x0AjeO2IMaW/djCEMm39BA4B8PXUnpa+aD3Qyj
+         F1DEfDSpF/9X53L65Od4InQ5lByJdPHkuv80Kq28vI6i9ZN+YklvnDZJgxgCjcvkBiMk
+         Igtg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7516QFKCbONFu1K4UM0Mfb3rZBvmchK7pEHlv8tiP/s=;
-        b=kcOL52n0GASLnG4YJt33cpVho87MhbiM0CEWg4ESrYXIcC0JH4is+pKShXI0R5iztd
-         jurNpxU/H9mY3sewpQ2o+WQ4DAac1xUhj0k5LsYvgO+59NzPs2yWULM0ZTGk/u1FcAnL
-         bISjYag7hOE6yFyInuxHNYhdMZ7gqbQl3+MUXTG+GkrVBn47nxtU6jrFjRsuQi/Bfy3i
-         dp5Y0LboLmptmsQU4VbNfh80LL8CwanFm7T4Za6RCpoGMhteSYKg/cPGBrM1YScb0b3m
-         mZEzFpDrTMr0AvJeKaxvqF/Q8xPcik0Pa8CR8TzrlqW+PKRIOgckA+/cgGpWih4eWAi0
-         6Qlg==
-X-Gm-Message-State: AOAM532j6ZD4TN53aRpTRS6M3hCECvrlnMRmZfTag1gaIkTU9F78X33G
-        yHk2Sm6QQgsrmIil59BGKI3Fi1ZTvcN9RA==
-X-Google-Smtp-Source: ABdhPJztwwA6gBbpAgnr9bsX/jzhs+KGYK2+qzRHsVjmFIVLg5t6C11wlA9R8SRUWkhQNIzXIiaSgQ==
-X-Received: by 2002:ac8:74b:: with SMTP id k11mr19647039qth.19.1626075171270;
-        Mon, 12 Jul 2021 00:32:51 -0700 (PDT)
-Received: from localhost.localdomain ([194.110.112.30])
-        by smtp.gmail.com with ESMTPSA id o18sm1654750qko.63.2021.07.12.00.32.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 12 Jul 2021 00:32:50 -0700 (PDT)
-From:   Forest Crossman <cyrozap@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        matthias.bgg@gmail.com
-Cc:     Forest Crossman <cyrozap@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: btusb: Add support for LG LGSBWAC92/TWCM-K505D
-Date:   Mon, 12 Jul 2021 02:32:20 -0500
-Message-Id: <20210712073220.200414-1-cyrozap@gmail.com>
-X-Mailer: git-send-email 2.32.0
-In-Reply-To: <20201021030521.1121268-1-cyrozap@gmail.com>
-References: <20201021030521.1121268-1-cyrozap@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=wxHpiYfDuncik6i5FwRpbNUnKMGIA/9+EY+s+sQQfMA=;
+        b=iYpEWL5vWMSWsx5/dDkVRsKTuJJy4/sqhJ1gJcWkLSJGe037oiO4R27GXKzIROXSKW
+         dZl9gGqXtrilMmq6Tm6wbQ/M/ZgQN/E7cArkUgMISQr+0NKXfSgyKXH9bXlwoNQ7lZ1B
+         p8CJ8RERwi8GDsRpLYFRCrQ/FWOj/JJy9ozBoZeWbnBRcbr/Kma5MFwziuG4igJh8u8H
+         TgYzKnge/4Zj4+7+em7BZ5bCtC0CVXM9B2Rn5FeHfjbSzUFvNH5s1fvF/X2s3MoaeQjs
+         MeCqlYuzdgjkXrKSCwERtSGLkZbgFiLUQ4RCypo5/NawvSzOnUFsjAVVTCCilMQZ41FW
+         L6mA==
+X-Gm-Message-State: AOAM530ESdtAvaAoXS7NaP4aVf6BdVZWNyqOzAU9Ce2wKEKcg21yUuvH
+        oaXbpwyP0rBOEcossP09yDqSdhsO3TVRLeuv5ajfvg==
+X-Google-Smtp-Source: ABdhPJyRoWzqPHKS7BjtIKnElyqlBBkIXBFVCGub63ybxrL2pVVsCG9hHvjuRToxcmMSSQdFsgQvIDKlxmBy/EGAdaU=
+X-Received: by 2002:aa7:dd0d:: with SMTP id i13mr50853521edv.97.1626077826901;
+ Mon, 12 Jul 2021 01:17:06 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210708062314.245754-1-howardchung@google.com>
+ <20210708142059.Bluez.v1.6.I123189fa93aad2c2d1be645d38dbc494aa15563c@changeid>
+ <CABBYNZ+_hYCZX=QMbrYALK6QwVnxcT4-XM-aaFvNHxC06fR2vQ@mail.gmail.com>
+In-Reply-To: <CABBYNZ+_hYCZX=QMbrYALK6QwVnxcT4-XM-aaFvNHxC06fR2vQ@mail.gmail.com>
+From:   Yun-hao Chung <howardchung@google.com>
+Date:   Mon, 12 Jul 2021 16:16:55 +0800
+Message-ID: <CAPHZWUfQSECsHDB4AB2OfhTeRra9JoiwK_gqxysD1nrqtknyyw@mail.gmail.com>
+Subject: Re: [Bluez PATCH v1 06/14] audio: Remove Media1 interface when a2dp
+ source disallowed
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The LG LGSBWAC92/TWCM-K505D/EAT64454801/EAT64454802 (it goes by many
-names) is a combo WiFi/Bluetooth module that's used in several models of
-LG TVs. It uses the MediaTek MT7668AUN, which is already supported in
-btusb, but this device has a non-MediaTek VID:PID pair so to get it to
-work we just need to add it to the list of devices to probe.
+I agree this is a trick for CrOS and probably not suitable for
+upstreaming. If we want to allow/disallow profiles without
+reprobing/removing them, here is what we need to do:
+For each profile in profiles/, reject the connection if its UUID is
+not allowed. Note that checking the UUID in btd_request_authorization
+is not enough since some profiles like profiles/health/mcap.c don't
+call btd_request_authorization.
+The same check will need to be added in src/profiles.c as well so that
+we can also manage external profiles.
+Does that make sense?
 
-Device from /sys/kernel/debug/usb/devices:
-
-T:  Bus=09 Lev=02 Prnt=02 Port=00 Cnt=01 Dev#=  6 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=043e ProdID=3109 Rev= 1.00
-S:  Manufacturer=MediaTek Inc.
-S:  Product=Wireless_Device
-S:  SerialNumber=000000000
-C:* #Ifs= 3 Cfg#= 1 Atr=a0 MxPwr=100mA
-A:  FirstIf#= 0 IfCount= 2 Cls=e0(wlcon) Sub=01 Prot=01
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:* If#= 2 Alt= 0 #EPs= 8 Cls=ff(vend.) Sub=ff Prot=ff Driver=(none)
-E:  Ad=84(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=08(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=09(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-Signed-off-by: Forest Crossman <cyrozap@gmail.com>
----
-
-Changes from v2:
- - Specify device with USB_DEVICE again, to match the other "Additional
-   MediaTek Bluetooth devices".
- - Add BTUSB_WIDEBAND_SPEECH and BTUSB_VALID_LE_STATES flags to the
-   driver_info, since this device would otherwise have them applied were
-   it not for the non-MediaTek vendor ID.
-
-Changes from v1:
- - Added /sys/kernel/debug/usb/devices info.
- - Specify device with USB_DEVICE_AND_INTERFACE_INFO instead of just
-   USB_DEVICE.
-
----
- drivers/bluetooth/btusb.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index a9855a2dd561..d644e704a460 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -410,6 +410,11 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Additional MediaTek MT7615E Bluetooth devices */
- 	{ USB_DEVICE(0x13d3, 0x3560), .driver_info = BTUSB_MEDIATEK},
- 
-+	/* Additional MediaTek MT7668 Bluetooth devices */
-+	{ USB_DEVICE(0x043e, 0x3109), .driver_info = BTUSB_MEDIATEK |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
-+
- 	/* Additional MediaTek MT7921 Bluetooth devices */
- 	{ USB_DEVICE(0x04ca, 0x3802), .driver_info = BTUSB_MEDIATEK |
- 						     BTUSB_WIDEBAND_SPEECH |
--- 
-2.20.1
-
+On Fri, Jul 9, 2021 at 1:49 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Howard,
+>
+> On Wed, Jul 7, 2021 at 11:23 PM Howard Chung <howardchung@google.com> wrote:
+> >
+> > When A2DP source profile is removed from adapter, a2dp_server and
+> > everything inside the object will be removed, which also releases all
+> > MediaEndpoints and MediaPlayer. When A2DP source profile is re-added,
+> > although a2dp_server will be created, clients are not able to know they
+> > can register their endpoints and player by then.
+> >
+> > This patch handles this case by unregistering Media1 interface
+> > when we remove a2dp_server, and register it back when a2dp_source is
+> > allowed.
+>
+> This sounds more like a bug fix for a regression introduced by the
+> very set, so Id recommend fixup the original patch that introduced the
+> problem, also Im afraid there could other instances like this perhaps
+> it would have been better to propagate the allow/block to the profiles
+> that way they don't have to be reprobed, I also have my doubts clients
+> would react properly to Media1 disappearing and appearing again so Id
+> leave it up if there is any endpoint/player registered to avoid having
+> them to re-register.
+>
+> >
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > ---
+> > perform following steps
+> > 1. SetServiceAllowList to empty list
+> > 2. pair with an LE headset, then turn off the headset
+> > 3. SetServiceAllowList to "0x1234"
+> > 4. SetServiceAllowList to empty list
+> > 5. turn on the headset and check if it is reconnected.
+> >
+> >  profiles/audio/a2dp.c  | 2 ++
+> >  profiles/audio/avrcp.c | 3 +++
+> >  2 files changed, 5 insertions(+)
+> >
+> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > index d31ed845cbe7..26d4f365207e 100644
+> > --- a/profiles/audio/a2dp.c
+> > +++ b/profiles/audio/a2dp.c
+> > @@ -3275,6 +3275,7 @@ static int a2dp_source_server_probe(struct btd_profile *p,
+> >  {
+> >         struct a2dp_server *server;
+> >
+> > +       media_register(adapter);
+> >         DBG("path %s", adapter_get_path(adapter));
+> >
+> >         server = find_server(servers, adapter);
+> > @@ -3315,6 +3316,7 @@ static void a2dp_source_server_remove(struct btd_profile *p,
+> >                 return;
+> >
+> >         a2dp_server_unregister(server);
+> > +       media_unregister(adapter);
+> >  }
+> >
+> >  static int a2dp_sink_server_probe(struct btd_profile *p,
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index ccf34b2207a9..997a5be9a0f4 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -4751,6 +4751,8 @@ static void avrcp_controller_server_remove(struct btd_profile *p,
+> >
+> >         if (server->tg_record_id == 0)
+> >                 avrcp_server_unregister(server);
+> > +
+> > +       media_unregister(adapter);
+> >  }
+> >
+> >  static int avrcp_controller_server_probe(struct btd_profile *p,
+> > @@ -4761,6 +4763,7 @@ static int avrcp_controller_server_probe(struct btd_profile *p,
+> >
+> >         DBG("path %s", adapter_get_path(adapter));
+> >
+> > +       media_register(adapter);
+> >         server = find_server(servers, adapter);
+> >         if (server != NULL)
+> >                 goto done;
+> > --
+> > 2.32.0.93.g670b81a890-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
