@@ -2,203 +2,646 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-15.6 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2416C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 09:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21A40C07E95
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 10:10:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D85BA61158
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 09:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 046366120A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 10:10:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235473AbhGMJ6Y (ORCPT
+        id S235266AbhGMKNi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jul 2021 05:58:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38084 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235149AbhGMJ6Y (ORCPT
+        Tue, 13 Jul 2021 06:13:38 -0400
+Received: from mail-pl1-f175.google.com ([209.85.214.175]:33289 "EHLO
+        mail-pl1-f175.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235152AbhGMKNg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jul 2021 05:58:24 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA2ADC0613DD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 02:55:34 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id c22-20020a0ca9d60000b02902e60d75210eso5811942qvb.19
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 02:55:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=l5F4BKwyaBy83y62AZjTc/qt2ROTKel2LO04fCzL2X8=;
-        b=uCSMQr9c+ZuhjfjkTnGdWJmMYECAsI5Sdsh3UXNBtGThTUBkfDe1BvMLLUr2CnL0+A
-         33rkV6h5mQwD2vJVmYwBxdTAz/odcmYhV7v4KU5454GvJXL3OAY9MNS4dkB02orlronf
-         OLtwD+RiUNgWckzCjAIgW+2IdEJ0deY6nHxkjwSxWi+qIAo9xYmGK1P/M5HWkuNnpZwW
-         ZzquhNC8t1MvNiwzUWNDhWElZGzyNBd1FKXbOtWFMS6ZZo/dJrnhRTEBCJujjoZxDUDa
-         OWaM4yVsST+F8qdwABro4zWaVV6gDNSihG3Amvqvw3ubQCjVItL2iOG8SSd41tnP9tSs
-         QQug==
+        Tue, 13 Jul 2021 06:13:36 -0400
+Received: by mail-pl1-f175.google.com with SMTP id d1so5631449plg.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 03:10:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=l5F4BKwyaBy83y62AZjTc/qt2ROTKel2LO04fCzL2X8=;
-        b=leASSkZ8/hGfwgDh0VuUFTPuTlGhDhDN+0CNzQEcPziGrAmkwkeJcLreHrnwfaJHzM
-         3uN1rBQrKyuFg7qQnSKqHbkpXHkefjyUCeT8UxC3s45uiP5fx4NKD5D3uv4pQqdD6ISB
-         xBpvHjvJfWasYN8rN1Ve6Yxp+4lgEjBYZwA5p54Ak2YN2oP+tkzbt6N9PvV3OTTyqEiT
-         pGIVRzbMHKKGhkVUAcDnO+uK8v1Nqs+qfzMfVut6my2kaW1fYixO/oY12r9piuHwUre1
-         cZQm+i2D9MiKOuwA2VvngugnXHwR4iZP5NVAmgjVix6ak3FhS9dR21WqWRTYzhsHIiVI
-         FVbw==
-X-Gm-Message-State: AOAM530sqQF+bT66ncUs6b6q3htHaFP+RuNwvvlhz3H7seH4yrSBwWdd
-        k+/mV8+VNPRFsIifTDDr0JN+y/Ogc1toLNH7RLbjfQsaBTwUy1cZ4/zy3bLXDkTKGORPiXfCT95
-        TRSLE1Y0rjdXCSbk/R+vPWhuFmhrzaXqMQ8+zaRobguJf3bxwj93X1MRpxaofX7G6u9gXwuBmuW
-        8gPGo5kvNYjfY=
-X-Google-Smtp-Source: ABdhPJyUCJSKbgv2q11Hcuw/UQSCsVMBpYwcfOH77kuJbfT7NE5rfPrDvuEngKzQT4TidlFZVVC1VPm9kKNpCVv/wA==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:5ef5:2854:f7cf:6571])
- (user=howardchung job=sendgmr) by 2002:ad4:5386:: with SMTP id
- i6mr3851969qvv.2.1626170133914; Tue, 13 Jul 2021 02:55:33 -0700 (PDT)
-Date:   Tue, 13 Jul 2021 17:55:30 +0800
-Message-Id: <20210713175519.Bluez.v3.1.Id7aa1152377161d17b442bf258773d9b6c624ca3@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [Bluez PATCH v3] a2dp: Fix crash in channel_free while waiting cmd resp
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     Yun-Hao Chung <howardchung@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=Q7YicNbx+tyBG/ga00Y9dBUdEerqH1IHM14LE8Jh88w=;
+        b=mvGmxTV/cjI5uU7gO1jzbb2vBR/8zBzBd/iPAecb6hoZZqpRN0LJrnCGUs6Vua7pyn
+         nBdnDnwfs8bO6nw3JWJqrp+gKW/wHok7XjKb9eT9Mw6NjgIR6tSJA1GHBqb6Q6Z7IA/M
+         5lW8RT8t5JeSuBba1JR4Kv27fj0nG3igpDpShULGnoYg4d2MjI4qTBOtSgvf+5RZ8c4B
+         XnoMqiZKaLvZ2ESmGscgmP34SveeWPUwZCHW/033w8O6xJUL2m/ZcvdEvKUV6e/P2VjM
+         TO/Ec9ZBXlgxidY4PEy7Sccvu+L0h5SS0/lfnncjFXxmenPwjLi136UjXrPDeQWXFHWB
+         4vcQ==
+X-Gm-Message-State: AOAM530KJl3FJ2DkdRt8V+rinwLhQwRpPvmAxS04jgplNSp0mEEt1BP6
+        l0LfclwP/RNCseoBk9AHb54eHLm8PSlrbQ==
+X-Google-Smtp-Source: ABdhPJzkwh9U6iXt+KxjNjWYj/7dkimM0HSYMuxLYlEHF1R0QEHE+1wTbraa1e4HMAKmNy0ifCsx/g==
+X-Received: by 2002:a17:903:89:b029:12a:ee95:42df with SMTP id o9-20020a1709030089b029012aee9542dfmr2967356pld.77.1626171045491;
+        Tue, 13 Jul 2021 03:10:45 -0700 (PDT)
+Received: from [10.101.46.79] (61-220-137-37.HINET-IP.hinet.net. [61.220.137.37])
+        by smtp.gmail.com with ESMTPSA id h17sm427762pfh.192.2021.07.13.03.10.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 13 Jul 2021 03:10:44 -0700 (PDT)
+Subject: Re: [PATCH v2] Bluetooth: btintel: Support Digital(N) + RF(N-1)
+ combination
+To:     Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
+References: <20210713032755.19351-1-kiran.k@intel.com>
+From:   You-Sheng Yang <vicamo.yang@canonical.com>
+Message-ID: <131b761e-be71-e161-1aee-187beaa15b07@canonical.com>
+Date:   Tue, 13 Jul 2021 18:10:42 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
+MIME-Version: 1.0
+In-Reply-To: <20210713032755.19351-1-kiran.k@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yun-Hao Chung <howardchung@chromium.org>
+Hi,
 
-When channel_free is called and we are waiting for a command response
-from the peer, bluez NULL the setup->session but would not free its
-setup_cb. Since setup_cb holds a ref of setup, the setup wouldn't be
-freed and if service_removed is called after channel_free, a2dp_cancel
-tries to abort the ongoing avdtp commands, which accesses the
-setup->session and triggers a crash.
+This works for me with Intel 9462 installed on an ADL platform.
 
-This change finalizes all avdtp commands before assigning setup->session
-to NULL in channel_free.
+Tested-by: You-Sheng Yang <vicamo.yang@canonical.com>
 
-Crash stack trace:
-0x000059f01943e688	(bluetoothd -avdtp.c:3690)
-avdtp_abort
-0x000059f01943928a	(bluetoothd -a2dp.c:3069)
-a2dp_cancel
-0x000059f0194377fa	(bluetoothd -sink.c:324)
-sink_unregister
-0x000059f01948715a	(bluetoothd -service.c:177)
-service_remove
-0x000059f01948d77c	(bluetoothd -device.c:5346)
-device_remove
-0x000059f019476d14	(bluetoothd -adapter.c:7202)
-adapter_remove
-0x000059f019476c3e	(bluetoothd -adapter.c:10827)
-adapter_cleanup
-0x000059f01949d8d7	(bluetoothd -main.c:1114)		main
-0x0000787b36185d74	(libc.so.6 -libc-start.c:308)
-__libc_start_main
-0x000059f019433e39	(bluetoothd + 0x00026e39)		_start
-0x00007fff2d2c0127
-
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
----
-There are two other options to fix this crash.
-1. add a NULL check in a2dp_cancel before calling avdtp_abort.
-2. call setup_cb_free to every setup_cb in setup->cb in channel_free.
-
-Since each setup_cb needs setup->session, I think there is no need to
-keep the setup_cb after assigning setup->session to NULL. So the first
-option is not ideal. If the second option is adopted, there would be
-some time that sink/source->connect_id/disconnect_id is not zero, but
-there is no corresponding setup_cb.
-
-Test steps:
-Reproduce the crash with the following steps. Verify the crash is
-no longer observed after this change.
-1. ignore AVDTP_SET_CONFIGURATION resp by modifying avdtp.c
-2. turn on a paired headset
-3. check the bluetooth.log, while bluez is waiting for
-   AVDTP_SET_CONFIGURATION resp, stop bluetoothd immediately.
-   This will trigger:
-   session_cb (I/O error) -> connection_lost
-   -> avdtp_set_state (AVDTP_SESSION_STATE_DISCONNECTED)
-   -> avdtp_state_cb -> channel_remove -> channel_free
-   then:
-   adapter_cleanup -> adapter_remove -> device_remove -> service_remove
-   -> a2dp_sink_remove -> sink_unregister -> sink_free -> a2dp_cancel
-4. check if bluetoothd crash
-The above steps can trigger the crash 100%.
-
-Changes in v3:
-- Remove the duplicated finalize_all
-
-Changes in v2:
-- Implement helper function finalize_all
-- add setup_ref before finalize_all, in case the setup is freed during
-  finalize
-
- profiles/audio/a2dp.c | 37 ++++++++++++++++++++++++++++++++++++-
- 1 file changed, 36 insertions(+), 1 deletion(-)
-
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index d31ed845cbe7..39d5e3ef736c 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -404,6 +404,38 @@ static void finalize_discover(struct a2dp_setup *s)
- 	}
- }
- 
-+static void finalize_all(struct a2dp_setup *s)
-+{
-+	GSList *l;
-+	struct avdtp_stream *stream = s->err ? NULL : s->stream;
-+
-+	for (l = s->cb; l != NULL; ) {
-+		struct a2dp_setup_cb *cb = l->data;
-+
-+		l = l->next;
-+
-+		if (cb->discover_cb) {
-+			cb->discover_cb(s->session, s->seps,
-+					error_to_errno(s->err), cb->user_data);
-+		} else if (cb->select_cb) {
-+			cb->select_cb(s->session, s->seps, s->caps,
-+					error_to_errno(s->err), cb->user_data);
-+		} else if (cb->suspend_cb) {
-+			cb->suspend_cb(s->session,
-+					error_to_errno(s->err), cb->user_data);
-+		} else if (cb->resume_cb) {
-+			cb->resume_cb(s->session,
-+					error_to_errno(s->err), cb->user_data);
-+		} else if (cb->config_cb) {
-+			cb->config_cb(s->session, s->seps, stream,
-+					error_to_errno(s->err), cb->user_data);
-+		} else
-+			warn("setup_cb doesn't have any callback function");
-+
-+		setup_cb_free(cb);
-+	}
-+}
-+
- static struct a2dp_setup *find_setup_by_session(struct avdtp *session)
- {
- 	GSList *l;
-@@ -1540,9 +1572,12 @@ static void channel_free(void *data)
- 	setup = find_setup_by_session(chan->session);
- 	if (setup) {
- 		setup->chan = NULL;
-+		setup_ref(setup);
-+		/* Finalize pending commands before we NULL setup->session */
-+		finalize_setup_errno(setup, -ENOTCONN, finalize_all, NULL);
- 		avdtp_unref(setup->session);
- 		setup->session = NULL;
--		finalize_setup_errno(setup, -ENOTCONN, NULL);
-+		setup_unref(setup);
- 	}
- 
- 	g_free(chan);
--- 
-2.32.0.93.g670b81a890-goog
-
+On 7/13/21 11:27 AM, Kiran K wrote:
+> New generation Intel controllers(N) need to support RF from (N-1)
+> generation. Since PID comes from OTP present in RF module,
+> *setup* function gets mapped to BTUSB_INTEL_NEW instead of
+> BTUSB_INTEL_NEWGEN. This patch converges INTEL_NEW and INTEL_NEWGEN
+> mappings and defines a new generic *setup* function. All the
+> required information to load the correct driver is read from controller
+> in generic *setup* and branchs out appropriately.
+> 
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+> ---
+> changes in v2:
+>  * For compatibility b/w CNVi and CNVr, instead of overriding the callbacks
+>    find out the required information at run time and branch out appropriately
+>  * review comments
+> 
+>  drivers/bluetooth/btintel.c | 149 ++++++++++++++++++++++++++++++------
+>  drivers/bluetooth/btintel.h |  10 +++
+>  drivers/bluetooth/btusb.c   | 149 +++++++++++++++++++-----------------
+>  3 files changed, 215 insertions(+), 93 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index e44b6993cf91..b1a4e02c0680 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -58,8 +58,10 @@ int btintel_check_bdaddr(struct hci_dev *hdev)
+>  	 * address 00:03:19:9E:8B:00 can be found. These controllers are
+>  	 * fully operational, but have the danger of duplicate addresses
+>  	 * and that in turn can cause problems with Bluetooth operation.
+> +	 * Also mark controllers having zero bdaddress
+>  	 */
+> -	if (!bacmp(&bda->bdaddr, BDADDR_INTEL)) {
+> +	if (!bacmp(&bda->bdaddr, BDADDR_INTEL) ||
+> +	    !bacmp(&bda->bdaddr, BDADDR_ANY)) {
+>  		bt_dev_err(hdev, "Found Intel default device address (%pMR)",
+>  			   &bda->bdaddr);
+>  		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> @@ -483,30 +485,15 @@ int btintel_version_info_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+>  }
+>  EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
+>  
+> -int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
+> +static int btintel_parse_version_tlv(struct hci_dev *hdev, struct sk_buff *skb,
+> +				     struct intel_version_tlv *version)
+>  {
+> -	struct sk_buff *skb;
+> -	const u8 param[1] = { 0xFF };
+> -
+> -	if (!version)
+> -		return -EINVAL;
+> -
+> -	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
+> -	if (IS_ERR(skb)) {
+> -		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+> -			   PTR_ERR(skb));
+> -		return PTR_ERR(skb);
+> -	}
+> +	int err = 0;
+>  
+> -	if (skb->data[0]) {
+> -		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
+> -			   skb->data[0]);
+> -		kfree_skb(skb);
+> -		return -EIO;
+> -	}
+> +	memset(version, 0x00, sizeof(*version));
+>  
+>  	/* Consume Command Complete Status field */
+> -	skb_pull(skb, 1);
+> +	skb_pull(skb, sizeof(__u8));
+>  
+>  	/* Event parameters contatin multiple TLVs. Read each of them
+>  	 * and only keep the required data. Also, it use existing legacy
+> @@ -516,27 +503,62 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+>  	while (skb->len) {
+>  		struct intel_tlv *tlv;
+>  
+> +		if (skb->len < sizeof(*tlv)) {
+> +			err = -EILSEQ;
+> +			break;
+> +		}
+> +
+>  		tlv = (struct intel_tlv *)skb->data;
+> +
+> +		if (skb->len < (sizeof(*tlv) + tlv->len)) {
+> +			err = -EILSEQ;
+> +			break;
+> +		}
+> +
+>  		switch (tlv->type) {
+>  		case INTEL_TLV_CNVI_TOP:
+> +			if (tlv->len != sizeof(__le32)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->cnvi_top = get_unaligned_le32(tlv->val);
+>  			break;
+>  		case INTEL_TLV_CNVR_TOP:
+> +			if (tlv->len != sizeof(__le32)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->cnvr_top = get_unaligned_le32(tlv->val);
+>  			break;
+>  		case INTEL_TLV_CNVI_BT:
+> +			if (tlv->len != sizeof(__le32)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->cnvi_bt = get_unaligned_le32(tlv->val);
+>  			break;
+>  		case INTEL_TLV_CNVR_BT:
+> +			if (tlv->len != sizeof(__le32)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->cnvr_bt = get_unaligned_le32(tlv->val);
+>  			break;
+>  		case INTEL_TLV_DEV_REV_ID:
+> +			if (tlv->len != sizeof(__le16)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->dev_rev_id = get_unaligned_le16(tlv->val);
+>  			break;
+>  		case INTEL_TLV_IMAGE_TYPE:
+>  			version->img_type = tlv->val[0];
+>  			break;
+>  		case INTEL_TLV_TIME_STAMP:
+> +			if (tlv->len != sizeof(__le16)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			/* If image type is Operational firmware (0x03), then
+>  			 * running FW Calendar Week and Year information can
+>  			 * be extracted from Timestamp information
+> @@ -549,6 +571,10 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+>  			version->build_type = tlv->val[0];
+>  			break;
+>  		case INTEL_TLV_BUILD_NUM:
+> +			if (tlv->len != sizeof(__le32)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			/* If image type is Operational firmware (0x03), then
+>  			 * running FW build number can be extracted from the
+>  			 * Build information
+> @@ -569,6 +595,10 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+>  			version->debug_lock = tlv->val[0];
+>  			break;
+>  		case INTEL_TLV_MIN_FW:
+> +			if (tlv->len != 3) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			version->min_fw_build_nn = tlv->val[0];
+>  			version->min_fw_build_cw = tlv->val[1];
+>  			version->min_fw_build_yy = tlv->val[2];
+> @@ -580,21 +610,96 @@ int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
+>  			version->sbe_type = tlv->val[0];
+>  			break;
+>  		case INTEL_TLV_OTP_BDADDR:
+> +			if (tlv->len != sizeof(version->otp_bd_addr)) {
+> +				err = -EILSEQ;
+> +				break;
+> +			}
+>  			memcpy(&version->otp_bd_addr, tlv->val, tlv->len);
+>  			break;
+>  		default:
+>  			/* Ignore rest of information */
+>  			break;
+>  		}
+> +
+> +		if (err)
+> +			break;
+> +
+>  		/* consume the current tlv and move to next*/
+>  		skb_pull(skb, tlv->len + sizeof(*tlv));
+>  	}
+> +	return err;
+> +}
+> +
+> +int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
+> +{
+> +	int err;
+> +	struct sk_buff *skb;
+> +	const u8 param[1] = { 0xFF };
+> +
+> +	if (!version)
+> +		return -EINVAL;
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+> +			   PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	if (skb->data[0]) {
+> +		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
+> +			   skb->data[0]);
+> +		kfree_skb(skb);
+> +		return -EIO;
+> +	}
+> +
+> +	err = btintel_parse_version_tlv(hdev, skb, version);
+>  
+>  	kfree_skb(skb);
+> -	return 0;
+> +
+> +	return err;
+>  }
+>  EXPORT_SYMBOL_GPL(btintel_read_version_tlv);
+>  
+> +int btintel_generic_read_version(struct hci_dev *hdev,
+> +				 struct intel_version_tlv *ver_tlv,
+> +				 struct intel_version *ver, bool *is_tlv)
+> +{
+> +	int err = 0;
+> +	struct sk_buff *skb;
+> +	const u8 param[1] = { 0xFF };
+> +
+> +	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "Reading Intel version information failed (%ld)",
+> +			   PTR_ERR(skb));
+> +		return PTR_ERR(skb);
+> +	}
+> +
+> +	if (skb->data[0]) {
+> +		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
+> +			   skb->data[0]);
+> +		kfree_skb(skb);
+> +		return -EIO;
+> +	}
+> +
+> +	if (skb->len < sizeof(struct intel_version))
+> +		return -EILSEQ;
+> +
+> +	if (skb->len == sizeof(struct intel_version) &&
+> +	    skb->data[1] == 0x37) {
+> +		*is_tlv = false;
+> +		memcpy(ver, skb->data, sizeof(*ver));
+> +	} else {
+> +		*is_tlv = true;
+> +		err = btintel_parse_version_tlv(hdev, skb, ver_tlv);
+> +	}
+> +
+> +	kfree_skb(skb);
+> +	return err;
+> +}
+> +EXPORT_SYMBOL_GPL(btintel_generic_read_version);
+> +
+>  /* ------- REGMAP IBT SUPPORT ------- */
+>  
+>  #define IBT_REG_MODE_8BIT  0x00
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index d184064a5e7c..366cb746f9c4 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -175,6 +175,10 @@ int btintel_read_debug_features(struct hci_dev *hdev,
+>  				struct intel_debug_features *features);
+>  int btintel_set_debug_features(struct hci_dev *hdev,
+>  			       const struct intel_debug_features *features);
+> +int btintel_generic_read_version(struct hci_dev *hdev,
+> +				 struct intel_version_tlv *ver_tlv,
+> +				 struct intel_version *ver,
+> +				 bool *is_tlv);
+>  #else
+>  
+>  static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+> @@ -307,4 +311,10 @@ static inline int btintel_set_debug_features(struct hci_dev *hdev,
+>  	return -EOPNOTSUPP;
+>  }
+>  
+> +static int btintel_generic_read_version(struct hci_dev *hdev,
+> +					struct intel_version_tlv *ver_tlv,
+> +					struct intel_version *ver, bool *is_tlv)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+>  #endif
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index a9855a2dd561..6c5050bdcfcc 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -60,7 +60,6 @@ static struct usb_driver btusb_driver;
+>  #define BTUSB_WIDEBAND_SPEECH	0x400000
+>  #define BTUSB_VALID_LE_STATES   0x800000
+>  #define BTUSB_QCA_WCN6855	0x1000000
+> -#define BTUSB_INTEL_NEWGEN	0x2000000
+>  
+>  static const struct usb_device_id btusb_table[] = {
+>  	/* Generic Bluetooth USB device */
+> @@ -368,9 +367,9 @@ static const struct usb_device_id blacklist_table[] = {
+>  						     BTUSB_WIDEBAND_SPEECH },
+>  	{ USB_DEVICE(0x8087, 0x0029), .driver_info = BTUSB_INTEL_NEW |
+>  						     BTUSB_WIDEBAND_SPEECH },
+> -	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEWGEN |
+> +	{ USB_DEVICE(0x8087, 0x0032), .driver_info = BTUSB_INTEL_NEW |
+>  						     BTUSB_WIDEBAND_SPEECH},
+> -	{ USB_DEVICE(0x8087, 0x0033), .driver_info = BTUSB_INTEL_NEWGEN |
+> +	{ USB_DEVICE(0x8087, 0x0033), .driver_info = BTUSB_INTEL_NEW |
+>  						     BTUSB_WIDEBAND_SPEECH},
+>  	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+>  	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+> @@ -2521,8 +2520,8 @@ static int btusb_intel_download_firmware_newgen(struct hci_dev *hdev,
+>  		return -EINVAL;
+>  
+>  	/* The firmware variant determines if the device is in bootloader
+> -	 * mode or is running operational firmware. The value 0x03 identifies
+> -	 * the bootloader and the value 0x23 identifies the operational
+> +	 * mode or is running operational firmware. The value 0x23 identifies
+> +	 * the bootloader and the value 0x03 identifies the operational
+>  	 * firmware.
+>  	 *
+>  	 * When the operational firmware is already present, then only
+> @@ -2536,14 +2535,14 @@ static int btusb_intel_download_firmware_newgen(struct hci_dev *hdev,
+>  	if (ver->img_type == 0x03) {
+>  		clear_bit(BTUSB_BOOTLOADER, &data->flags);
+>  		btintel_check_bdaddr(hdev);
+> -	}
+> -
+> -	/* If the OTP has no valid Bluetooth device address, then there will
+> -	 * also be no valid address for the operational firmware.
+> -	 */
+> -	if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+> -		bt_dev_info(hdev, "No device address configured");
+> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +	} else {
+> +		/* In Boot mode, bd address is part of tlv data. Check for
+> +		 * valid bd address
+> +		 */
+> +		if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+> +			bt_dev_info(hdev, "No device address configured");
+> +			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +		}
+>  	}
+>  
+>  	btusb_setup_intel_newgen_get_fw_name(ver, fwname, sizeof(fwname), "sfi");
+> @@ -2842,10 +2841,9 @@ static int btusb_intel_boot(struct hci_dev *hdev, u32 boot_addr)
+>  	return err;
+>  }
+>  
+> -static int btusb_setup_intel_new(struct hci_dev *hdev)
+> +static int btusb_setup_intel_new(struct hci_dev *hdev, struct intel_version *ver)
+>  {
+>  	struct btusb_data *data = hci_get_drvdata(hdev);
+> -	struct intel_version ver;
+>  	struct intel_boot_params params;
+>  	u32 boot_param;
+>  	char ddcname[64];
+> @@ -2860,27 +2858,16 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  	 */
+>  	boot_param = 0x00000000;
+>  
+> -	/* Read the Intel version information to determine if the device
+> -	 * is in bootloader mode or if it already has operational firmware
+> -	 * loaded.
+> -	 */
+> -	err = btintel_read_version(hdev, &ver);
+> -	if (err) {
+> -		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+> -		btintel_reset_to_bootloader(hdev);
+> -		return err;
+> -	}
+> -
+> -	err = btintel_version_info(hdev, &ver);
+> +	err = btintel_version_info(hdev, ver);
+>  	if (err)
+>  		return err;
+>  
+> -	err = btusb_intel_download_firmware(hdev, &ver, &params, &boot_param);
+> +	err = btusb_intel_download_firmware(hdev, ver, &params, &boot_param);
+>  	if (err)
+>  		return err;
+>  
+>  	/* controller is already having an operational firmware */
+> -	if (ver.fw_variant == 0x23)
+> +	if (ver->fw_variant == 0x23)
+>  		goto finish;
+>  
+>  	err = btusb_intel_boot(hdev, boot_param);
+> @@ -2889,7 +2876,7 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  
+>  	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+>  
+> -	err = btusb_setup_intel_new_get_fw_name(&ver, &params, ddcname,
+> +	err = btusb_setup_intel_new_get_fw_name(ver, &params, ddcname,
+>  						sizeof(ddcname), "ddc");
+>  
+>  	if (err < 0) {
+> @@ -2913,17 +2900,17 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  	btintel_set_debug_features(hdev, &features);
+>  
+>  	/* Read the Intel version information after loading the FW  */
+> -	err = btintel_read_version(hdev, &ver);
+> +	err = btintel_read_version(hdev, ver);
+>  	if (err)
+>  		return err;
+>  
+> -	btintel_version_info(hdev, &ver);
+> +	btintel_version_info(hdev, ver);
+>  
+>  finish:
+>  	/* All Intel controllers that support the Microsoft vendor
+>  	 * extension are using 0xFC1E for VsMsftOpCode.
+>  	 */
+> -	switch (ver.hw_variant) {
+> +	switch (ver->hw_variant) {
+>  	case 0x11:	/* JfP */
+>  	case 0x12:	/* ThP */
+>  	case 0x13:	/* HrP */
+> @@ -2944,14 +2931,13 @@ static int btusb_setup_intel_new(struct hci_dev *hdev)
+>  	return 0;
+>  }
+>  
+> -static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+> +static int btusb_setup_intel_newgen(struct hci_dev *hdev, struct intel_version_tlv *version)
+>  {
+>  	struct btusb_data *data = hci_get_drvdata(hdev);
+>  	u32 boot_param;
+>  	char ddcname[64];
+>  	int err;
+>  	struct intel_debug_features features;
+> -	struct intel_version_tlv version;
+>  
+>  	bt_dev_dbg(hdev, "");
+>  
+> @@ -2961,27 +2947,16 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+>  	 */
+>  	boot_param = 0x00000000;
+>  
+> -	/* Read the Intel version information to determine if the device
+> -	 * is in bootloader mode or if it already has operational firmware
+> -	 * loaded.
+> -	 */
+> -	err = btintel_read_version_tlv(hdev, &version);
+> -	if (err) {
+> -		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+> -		btintel_reset_to_bootloader(hdev);
+> -		return err;
+> -	}
+> -
+> -	err = btintel_version_info_tlv(hdev, &version);
+> +	err = btintel_version_info_tlv(hdev, version);
+>  	if (err)
+>  		return err;
+>  
+> -	err = btusb_intel_download_firmware_newgen(hdev, &version, &boot_param);
+> +	err = btusb_intel_download_firmware_newgen(hdev, version, &boot_param);
+>  	if (err)
+>  		return err;
+>  
+>  	/* check if controller is already having an operational firmware */
+> -	if (version.img_type == 0x03)
+> +	if (version->img_type == 0x03)
+>  		goto finish;
+>  
+>  	err = btusb_intel_boot(hdev, boot_param);
+> @@ -2990,7 +2965,7 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+>  
+>  	clear_bit(BTUSB_BOOTLOADER, &data->flags);
+>  
+> -	btusb_setup_intel_newgen_get_fw_name(&version, ddcname, sizeof(ddcname),
+> +	btusb_setup_intel_newgen_get_fw_name(version, ddcname, sizeof(ddcname),
+>  					     "ddc");
+>  	/* Once the device is running in operational mode, it needs to
+>  	 * apply the device configuration (DDC) parameters.
+> @@ -3009,11 +2984,11 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+>  	btintel_set_debug_features(hdev, &features);
+>  
+>  	/* Read the Intel version information after loading the FW  */
+> -	err = btintel_read_version_tlv(hdev, &version);
+> +	err = btintel_read_version_tlv(hdev, version);
+>  	if (err)
+>  		return err;
+>  
+> -	btintel_version_info_tlv(hdev, &version);
+> +	btintel_version_info_tlv(hdev, version);
+>  
+>  finish:
+>  	/* Set the event mask for Intel specific vendor events. This enables
+> @@ -3027,6 +3002,56 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+>  
+>  	return 0;
+>  }
+> +
+> +static bool btintel_is_newgen_controller(struct hci_dev *hdev, u32 cnvi)
+> +{
+> +	bt_dev_dbg(hdev, "CNVi - %x", cnvi & 0xFFF);
+> +
+> +	switch (cnvi & 0xFFF) {
+> +	case 0x400: /* Slr */
+> +	case 0x401: /* Slr-F */
+> +	case 0x410: /* TyP */
+> +		return true;
+> +	}
+> +	return false;
+> +}
+> +
+> +static int btusb_setup_intel_generic(struct hci_dev *hdev)
+> +{
+> +	struct intel_version_tlv ver_tlv;
+> +	struct intel_version ver;
+> +	bool is_tlv;
+> +	int err;
+> +
+> +	err = btintel_generic_read_version(hdev, &ver_tlv, &ver, &is_tlv);
+> +	if (err) {
+> +		bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+> +		btintel_reset_to_bootloader(hdev);
+> +		goto done;
+> +	}
+> +
+> +	if (!is_tlv) {
+> +		err = btusb_setup_intel_new(hdev, &ver);
+> +	} else {
+> +		/* In OP mode Quasar/Pulsar ram products returns TLV data.
+> +		 * Find out CNVi and then  branch out appropriately
+> +		 */
+> +		if (btintel_is_newgen_controller(hdev, ver_tlv.cnvi_top)) {
+> +			err = btusb_setup_intel_newgen(hdev, &ver_tlv);
+> +		} else {
+> +			err = btintel_read_version(hdev, &ver);
+> +			if (err) {
+> +				bt_dev_err(hdev, "Intel Read version failed (%d)", err);
+> +				goto done;
+> +			}
+> +			err = btusb_setup_intel_new(hdev, &ver);
+> +		}
+> +	}
+> +done:
+> +
+> +	return err;
+> +}
+> +
+>  static int btusb_shutdown_intel(struct hci_dev *hdev)
+>  {
+>  	struct sk_buff *skb;
+> @@ -4649,21 +4674,7 @@ static int btusb_probe(struct usb_interface *intf,
+>  	if (id->driver_info & BTUSB_INTEL_NEW) {
+>  		hdev->manufacturer = 2;
+>  		hdev->send = btusb_send_frame_intel;
+> -		hdev->setup = btusb_setup_intel_new;
+> -		hdev->shutdown = btusb_shutdown_intel_new;
+> -		hdev->hw_error = btintel_hw_error;
+> -		hdev->set_diag = btintel_set_diag;
+> -		hdev->set_bdaddr = btintel_set_bdaddr;
+> -		hdev->cmd_timeout = btusb_intel_cmd_timeout;
+> -		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+> -		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+> -		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> -	}
+> -
+> -	if (id->driver_info & BTUSB_INTEL_NEWGEN) {
+> -		hdev->manufacturer = 2;
+> -		hdev->send = btusb_send_frame_intel;
+> -		hdev->setup = btusb_setup_intel_newgen;
+> +		hdev->setup = btusb_setup_intel_generic;
+>  		hdev->shutdown = btusb_shutdown_intel_new;
+>  		hdev->hw_error = btintel_hw_error;
+>  		hdev->set_diag = btintel_set_diag;
+> @@ -4672,10 +4683,6 @@ static int btusb_probe(struct usb_interface *intf,
+>  		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
+>  		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>  		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+> -
+> -		data->recv_event = btusb_recv_event_intel;
+> -		data->recv_bulk = btusb_recv_bulk_intel;
+> -		set_bit(BTUSB_BOOTLOADER, &data->flags);
+>  	}
+>  
+>  	if (id->driver_info & BTUSB_MARVELL)
+> 
