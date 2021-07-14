@@ -2,148 +2,173 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ADC7C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 20:34:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1286FC07E95
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 00:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 657536128E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 13 Jul 2021 20:34:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E71FA61370
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 00:22:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234947AbhGMUhd (ORCPT
+        id S237047AbhGNAZR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jul 2021 16:37:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43402 "EHLO
+        Tue, 13 Jul 2021 20:25:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38252 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234290AbhGMUhd (ORCPT
+        with ESMTP id S237022AbhGNAZR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jul 2021 16:37:33 -0400
-Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C42C0613DD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 13:34:43 -0700 (PDT)
-Received: by mail-qk1-x734.google.com with SMTP id m3so9204775qkm.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 13:34:42 -0700 (PDT)
+        Tue, 13 Jul 2021 20:25:17 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BCAEC0613DD
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 17:22:27 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id p9so178817pjl.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 17:22:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=c+42oEGWyA7d7j94XGkWBSI/MJNZPxcMjSiULWJmIRU=;
-        b=J3V5deNju9glnY5Z1nAWFFM3Pr8XG91qC1f5/ZqaLFSHANe5zFk4+ZtBtmLRxAVDJp
-         Lhbh+wWhmu1ikvczWxZsE6NasdEH/cJgiqzb6YQnh2RrY92LrZH2XJvGj2TcZgOHeXL1
-         briz0eDbPToh77/MmQEYFKcAnd6MNNt+wGXGBC7/dAEG0N6h1ZOOH+8yROLWGlCmUMH8
-         zQCG6mOorne8w62MiCEFBMJTHNOWPd9d7aux9JcwhS5bb32dCo7qIo5dfNlO3ayaDxWF
-         G8D/N8STb9qddr5vhnHS/2Gd3TSvhoMyMOA185zOwjZRmFg3xDq0xlSnCbp/tUi0qpc9
-         yf0w==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NXbJfurgKICWNVQFX642RsimOUp1jbBIxlMZi53/Dow=;
+        b=ajypaVSJuF2HuJVoSwN5C31vCHiRxT45MdAXl0Y45/WyQ3cF4T1Q3TtkJ1/U726X44
+         7y+8g/BvGrbpBTm0jIzKwrW1+Uns8oSkyas0+4J4I4x8J1WAa4dSacOd0hj8VjO2nxK+
+         hdPe1+S4a2bwcEihxacrlGdxQJ+uq/9XYbCjJqX82i4oPjIgkFugqEwrNZyfsLBog4+G
+         WHDPWjgvEMp4RZBEeqAIv22Rf2hgzHCfAzkwOSyH4L3fWc59nYcHl11Ojnlo9aYS85x/
+         2LJd3N0OPuORIs14umZHBU/90s8w/1LIQ50Nki1gW+Z99efk8bzUmyXQsCnHF2J8Knwg
+         b5Qw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=c+42oEGWyA7d7j94XGkWBSI/MJNZPxcMjSiULWJmIRU=;
-        b=AWopSxTO2Y3c4cozrVcXbWmDGETkdoZwe6YRfgO6NBNzp+31NrENRuLfGL+HrrPExW
-         vSVjC94KTqOeeF4pgZbxsLvb0tjJQhq/Z0LXWqWXCaUUdorAB2QhxKojKmWZtl7uDXpa
-         mqaJGHA/8BmLTP+Dah1U3UGH0L9YVBQwcmNCpQ0cLTBPpkBqfvNrRy2aw6Il8nLheZ+/
-         l4lrX9NdF0jWz6hrp/uVl5WGeVu38SQaPj4DdwsXpSuLTYfby3zoWDu3z1hJQXFfwpn2
-         cxM4m8t6bgetK0AxAcw7ywU3C+sQS7A9Q7rPdUEVyJI0u283FF5GA9xCoGtiIo5po0tQ
-         kFvg==
-X-Gm-Message-State: AOAM532NL7HbFVfVcg0ryjKj383gDaS9Ue8E/lFlGAZSgnP4WjUWl44O
-        MmgWNyv7g6FZtyjYMNFadJI+2/w6VUhI3Q==
-X-Google-Smtp-Source: ABdhPJxDtiVX6zmq5lP739A5GR5sOqZakaAfECSdTywAw6mw+RcKpb22WZxXKL/fg1iXraLfQj4CDQ==
-X-Received: by 2002:a05:620a:d5d:: with SMTP id o29mr6198967qkl.157.1626208481582;
-        Tue, 13 Jul 2021 13:34:41 -0700 (PDT)
-Received: from [172.17.0.2] ([20.44.104.5])
-        by smtp.gmail.com with ESMTPSA id o13sm7382911qti.84.2021.07.13.13.34.40
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NXbJfurgKICWNVQFX642RsimOUp1jbBIxlMZi53/Dow=;
+        b=Hr3uLYq3JorxlF+wwiPchWCdV+U+tIOjRM8njMIygHUQasqxCZGnT7DM8UPJtzKfuG
+         4vz4GaR4stZiuza5NBi6CseMJSeekl13kb803TLirgC8jaGazzQQ2jHS/L66Xr33u8tO
+         BzQ4c4u7RjHCnU6Uo7ee4+tMo6O6Jj6761p6+lvXzxSsbenvA0n8NqLLBqslnoVnvYah
+         u59wYkwjch8yPQ4RDjE/y6xMuh8xbMwf6VQj9Yl9jaMVtIehmOsS4M67AoRWa8UDqtuN
+         fvvBEBLZSTXrn7IcVoW+IrIVxqAFvWsmghNpVh1wzfmxTkkxcMLuaSW6QMP+fQXeYLmF
+         LWVA==
+X-Gm-Message-State: AOAM530gynOt/m1W06ilvja2qISHNE6SRmTqif7UOM2VHK9YFgzSuxsI
+        rvIrHwgdgRqRlY2YnEHFc8uV2MfT9V3NwA==
+X-Google-Smtp-Source: ABdhPJwJBG4NbLQV1FdK4Qdr1E1YJc64GQyOx8BgAYlNUqByJmmyuetbdYU5LTpQyrOfUbIU2oMyKA==
+X-Received: by 2002:a17:90a:9205:: with SMTP id m5mr898713pjo.172.1626222146235;
+        Tue, 13 Jul 2021 17:22:26 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s15sm307818pfw.207.2021.07.13.17.22.25
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 13:34:40 -0700 (PDT)
-Message-ID: <60edf8e0.1c69fb81.8a415.e3ac@mx.google.com>
-Date:   Tue, 13 Jul 2021 13:34:40 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7096005259069755916=="
+        Tue, 13 Jul 2021 17:22:25 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] btdev: Add proper checks for own_addr_type for extended advertising
+Date:   Tue, 13 Jul 2021 17:22:24 -0700
+Message-Id: <20210714002224.2632842-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ] doc: Add kernel config to use SHA512
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210713202147.116261-1-hj.tedd.an@gmail.com>
-References: <20210713202147.116261-1-hj.tedd.an@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7096005259069755916==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
+own_addr_type 0x01 and 0x03 shall check that a random address has
+properly been set and in case of 0x03 the resolving list actually
+contains the irk of the identity address:
 
-Dear submitter,
+BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 4, Part E
+page 2596
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=514999
+  'If the advertising set's Own_Address_Type parameter is set to 0x01
+  and the random address for the advertising set has not been
+  initialized, the Controller shall return the error code Invalid HCI
+  Command Parameters (0x12).'
 
----Test result---
+BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 4, Part E
+page 2597
 
-Test Summary:
-CheckPatch                    PASS      0.28 seconds
-GitLint                       PASS      0.11 seconds
-Prep - Setup ELL              PASS      39.64 seconds
-Build - Prep                  PASS      0.09 seconds
-Build - Configure             PASS      6.94 seconds
-Build - Make                  PASS      172.20 seconds
-Make Check                    PASS      8.70 seconds
-Make Distcheck                PASS      202.76 seconds
-Build w/ext ELL - Configure   PASS      7.09 seconds
-Build w/ext ELL - Make        PASS      162.67 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+  'If the advertising set's Own_Address_Type parameter is set to 0x03,
+  the controller's resolving list did not contain a matching entry, and
+  the random address for the advertising set has not been initialized,
+  the Controller shall return the error code Invalid HCI Command
+  Parameters (0x12).'
 ---
-Regards,
-Linux Bluetooth
+v2: Fix checks for Own_Address_Type when is to 0x03 since it can work with
+both resolving list _and_ when a random address is set.
 
+ emulator/btdev.c | 44 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 44 insertions(+)
 
---===============7096005259069755916==--
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 1567713d2..b6142f176 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -4538,6 +4538,20 @@ static bool ext_adv_timeout(void *user_data)
+ 	return false;
+ }
+ 
++static struct btdev_rl *rl_find(struct btdev *dev, uint8_t type, uint8_t *addr)
++{
++	unsigned int i;
++
++	for (i = 0; i < ARRAY_SIZE(dev->le_rl); i++) {
++		struct btdev_rl *rl = &dev->le_rl[i];
++
++		if (RL_ADDR_EQUAL(rl, type, addr))
++			return rl;
++	}
++
++	return NULL;
++}
++
+ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
+ 							uint8_t len)
+ {
+@@ -4561,6 +4575,7 @@ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
+ 	for (i = 0; i < cmd->num_of_sets; i++) {
+ 		const struct bt_hci_cmd_ext_adv_set *eas;
+ 		struct le_ext_adv *ext_adv;
++		bool random_addr;
+ 
+ 		eas = data + sizeof(*cmd) + (sizeof(*eas) * i);
+ 
+@@ -4576,6 +4591,35 @@ static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
+ 			goto exit_complete;
+ 		}
+ 
++		random_addr = bacmp((bdaddr_t *)ext_adv->random_addr,
++							BDADDR_ANY);
++
++		/* If the advertising set's Own_Address_Type parameter
++		 * is set to 0x01 and the random address for
++		 * the advertising set has not been initialized, the
++		 * Controller shall return the error code Invalid HCI
++		 * Command Parameters (0x12).
++		 */
++		if (ext_adv->own_addr_type == 0x01 && !random_addr) {
++			status = BT_HCI_ERR_INVALID_PARAMETERS;
++			goto exit_complete;
++		}
++
++		/* If the advertising set's Own_Address_Type parameter is set
++		 * to 0x03, the controller's resolving list did not contain a
++		 * matching entry, and the random address for the advertising
++		 * set has not been initialized, the Controller shall return the
++		 * error code Invalid HCI Command Parameters (0x12).
++		 */
++		if (ext_adv->own_addr_type == 0x03 && !random_addr) {
++			if (!dev->le_rl_enable ||
++					!rl_find(dev, ext_adv->direct_addr_type,
++					ext_adv->direct_addr)) {
++				status = BT_HCI_ERR_INVALID_PARAMETERS;
++				goto exit_complete;
++			}
++		}
++
+ 		ext_adv->enable = cmd->enable;
+ 
+ 		if (!cmd->enable)
+-- 
+2.31.1
+
