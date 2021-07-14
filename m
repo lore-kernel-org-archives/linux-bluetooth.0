@@ -2,148 +2,191 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E05CC07E95
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 01:20:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1327CC07E95
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 03:20:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7578B61370
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 01:20:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF28E60720
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 03:20:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237236AbhGNBXQ (ORCPT
+        id S237737AbhGNDXg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 13 Jul 2021 21:23:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51180 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237225AbhGNBXQ (ORCPT
+        Tue, 13 Jul 2021 23:23:36 -0400
+Received: from szxga08-in.huawei.com ([45.249.212.255]:11274 "EHLO
+        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237694AbhGNDXg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 13 Jul 2021 21:23:16 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4568EC0613DD
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 18:20:25 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id d1so732172qto.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 13 Jul 2021 18:20:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ge1p3HVCH3PSO/w2i3tA0W+RUpiv0mAo1K68jzbXb9o=;
-        b=d0DymIj1WKJWqFgt0deMRLsszQUjqeyLWFMzbWTbRtFjUqYfOCJtQ/qmRn6wcsr+mQ
-         qeY+mb7IPrfXmVEgM+dvtGIbFGqJMBFeYvpHeTEQu1Pp4szMOwhlkUkiAkKSjiBKfq3z
-         KLhq3UckrfyHtMzITZeWh9CvN3Ya3NdJ6zsLb2vs5RYK+XR/EM+nGMRYH+79uvr5/RIP
-         HIg/F6uPUKn6W8zy/YamW6TXAHKGSaJp3uT8Vld1Ya1OeyA13ruFQ7xCu7D87I17GHvo
-         VEy0oa5jtqqThkSpdQBjuBZIaZTUQfjKJw+32NTDE2lBMTPOUvqJSGx0eyd4nir9JQ0R
-         EsgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ge1p3HVCH3PSO/w2i3tA0W+RUpiv0mAo1K68jzbXb9o=;
-        b=sPMfpizYcGvcAmksNNY+JdPKjwdMFgXUSVvIjU/fAmRPcucuAaLTcEqJs3SvEv9dCe
-         v7JmOiJLqFjP8AVzbrpx8KeCN32WN0E9vKMi2KRLnWQKzr76EzYQthioUFMbYf4f5oTg
-         F/N/oZ4B8qHc8toQHeRmku8vLFuggKkUyBpwPJ3N+bPaBJChqp5sHdJqU29GiYYdSxhx
-         3za57ihOSWEvQ0WtioAZQ0/1cL8pE9Eaf67d4pqs93ZayD6C9xJYtgUNv//Gtu8f/z5X
-         vtKDVeYUORje2iqrGvCN3ljIIgm+MORJrPAyf3ConF0u9JOn6R1l44hkh2ug5pwL8fRf
-         QKLQ==
-X-Gm-Message-State: AOAM531i/k/J19BQKpSzCEM5qmQHM6lOquFpTwz6nlSvMQDhEKoKrt+I
-        Iz95LZSIDO0b8GVtFtXFOoSEqh+Vms5gcw==
-X-Google-Smtp-Source: ABdhPJySf6UWaZv4qNb6bek0GHgwMsL0njkDD/BhRGOVnePXoMpoYezgJf0gBK0m8XrqxDlrfRaSAA==
-X-Received: by 2002:ac8:108a:: with SMTP id a10mr6985702qtj.14.1626225624241;
-        Tue, 13 Jul 2021 18:20:24 -0700 (PDT)
-Received: from [172.17.0.2] ([52.232.200.192])
-        by smtp.gmail.com with ESMTPSA id l5sm318352qkb.62.2021.07.13.18.20.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 13 Jul 2021 18:20:23 -0700 (PDT)
-Message-ID: <60ee3bd7.1c69fb81.73f05.1fd1@mx.google.com>
-Date:   Tue, 13 Jul 2021 18:20:23 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1336005744872030770=="
+        Tue, 13 Jul 2021 23:23:36 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4GPjL15snkz1CJfb;
+        Wed, 14 Jul 2021 11:15:05 +0800 (CST)
+Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Wed, 14 Jul 2021 11:20:39 +0800
+Received: from huawei.com (10.175.124.27) by dggpemm500015.china.huawei.com
+ (7.185.36.181) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2176.2; Wed, 14 Jul
+ 2021 11:20:38 +0800
+From:   Wang ShaoBo <bobo.shaobowang@huawei.com>
+CC:     <cj.chengjian@huawei.com>, <weiyongjun1@huawei.com>,
+        <yuehaibing@huawei.com>, <huawei.libin@huawei.com>,
+        <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
+        <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: fix use-after-free error in lock_sock_nested()
+Date:   Wed, 14 Jul 2021 11:17:33 +0800
+Message-ID: <20210714031733.1395549-1-bobo.shaobowang@huawei.com>
+X-Mailer: git-send-email 2.27.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v2] btdev: Add proper checks for own_addr_type for extended advertising
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210714002224.2632842-1-luiz.dentz@gmail.com>
-References: <20210714002224.2632842-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.124.27]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemm500015.china.huawei.com (7.185.36.181)
+X-CFilter-Loop: Reflected
+To:     unlisted-recipients:; (no To-header on input)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1336005744872030770==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+use-after-free error in lock_sock_nested() is reported:
 
-This is automated email and please do not reply to this email!
+[  179.140137][ T3731] =====================================================
+[  179.142675][ T3731] BUG: KMSAN: use-after-free in lock_sock_nested+0x280/0x2c0
+[  179.145494][ T3731] CPU: 4 PID: 3731 Comm: kworker/4:2 Not tainted 5.12.0-rc6+ #54
+[  179.148432][ T3731] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+[  179.151806][ T3731] Workqueue: events l2cap_chan_timeout
+[  179.152730][ T3731] Call Trace:
+[  179.153301][ T3731]  dump_stack+0x24c/0x2e0
+[  179.154063][ T3731]  kmsan_report+0xfb/0x1e0
+[  179.154855][ T3731]  __msan_warning+0x5c/0xa0
+[  179.155579][ T3731]  lock_sock_nested+0x280/0x2c0
+[  179.156436][ T3731]  ? kmsan_get_metadata+0x116/0x180
+[  179.157257][ T3731]  l2cap_sock_teardown_cb+0xb8/0x890
+[  179.158154][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+[  179.159141][ T3731]  ? kmsan_get_metadata+0x116/0x180
+[  179.159994][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+[  179.160959][ T3731]  ? l2cap_sock_recv_cb+0x420/0x420
+[  179.161834][ T3731]  l2cap_chan_del+0x3e1/0x1d50
+[  179.162608][ T3731]  ? kmsan_get_metadata+0x116/0x180
+[  179.163435][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+[  179.164406][ T3731]  l2cap_chan_close+0xeea/0x1050
+[  179.165189][ T3731]  ? kmsan_internal_unpoison_shadow+0x42/0x70
+[  179.166180][ T3731]  l2cap_chan_timeout+0x1da/0x590
+[  179.167066][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+[  179.168023][ T3731]  ? l2cap_chan_create+0x560/0x560
+[  179.168818][ T3731]  process_one_work+0x121d/0x1ff0
+[  179.169598][ T3731]  worker_thread+0x121b/0x2370
+[  179.170346][ T3731]  kthread+0x4ef/0x610
+[  179.171010][ T3731]  ? process_one_work+0x1ff0/0x1ff0
+[  179.171828][ T3731]  ? kthread_blkcg+0x110/0x110
+[  179.172587][ T3731]  ret_from_fork+0x1f/0x30
+[  179.173348][ T3731]
+[  179.173752][ T3731] Uninit was created at:
+[  179.174409][ T3731]  kmsan_internal_poison_shadow+0x5c/0xf0
+[  179.175373][ T3731]  kmsan_slab_free+0x76/0xc0
+[  179.176060][ T3731]  kfree+0x3a5/0x1180
+[  179.176664][ T3731]  __sk_destruct+0x8af/0xb80
+[  179.177375][ T3731]  __sk_free+0x812/0x8c0
+[  179.178032][ T3731]  sk_free+0x97/0x130
+[  179.178686][ T3731]  l2cap_sock_release+0x3d5/0x4d0
+[  179.179457][ T3731]  sock_close+0x150/0x450
+[  179.180117][ T3731]  __fput+0x6bd/0xf00
+[  179.180787][ T3731]  ____fput+0x37/0x40
+[  179.181481][ T3731]  task_work_run+0x140/0x280
+[  179.182219][ T3731]  do_exit+0xe51/0x3e60
+[  179.182930][ T3731]  do_group_exit+0x20e/0x450
+[  179.183656][ T3731]  get_signal+0x2dfb/0x38f0
+[  179.184344][ T3731]  arch_do_signal_or_restart+0xaa/0xe10
+[  179.185266][ T3731]  exit_to_user_mode_prepare+0x2d2/0x560
+[  179.186136][ T3731]  syscall_exit_to_user_mode+0x35/0x60
+[  179.186984][ T3731]  do_syscall_64+0xc5/0x140
+[  179.187681][ T3731]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  179.188604][ T3731] =====================================================
 
-Dear submitter,
+In our case, there are two Thread A and B:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=515075
+Context: Thread A:              Context: Thread B:
 
----Test result---
+l2cap_chan_timeout()            __se_sys_shutdown()
+  l2cap_chan_close()              l2cap_sock_shutdown()
+    l2cap_chan_del()                l2cap_chan_close()
+      l2cap_sock_teardown_cb()        l2cap_sock_teardown_cb()
 
-Test Summary:
-CheckPatch                    PASS      0.28 seconds
-GitLint                       PASS      0.10 seconds
-Prep - Setup ELL              PASS      39.84 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      6.93 seconds
-Build - Make                  PASS      171.76 seconds
-Make Check                    PASS      8.57 seconds
-Make Distcheck                PASS      203.18 seconds
-Build w/ext ELL - Configure   PASS      6.96 seconds
-Build w/ext ELL - Make        PASS      161.92 seconds
+Once l2cap_sock_teardown_cb() excuted, this sock will be marked as SOCK_ZAPPED,
+and can be treated as killable in l2cap_sock_kill() if sock_orphan() has
+excuted, at this time we close sock through sock_close() which end to call
+l2cap_sock_kill() like Thread C:
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Context: Thread C:
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
+sock_close()
+  l2cap_sock_release()
+    sock_orphan()
+    l2cap_sock_kill()  #free sock if refcnt is 1
 
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
+If C completed, Once A or B reaches l2cap_sock_teardown_cb() again,
+use-after-free happened.
 
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
+We should set chan->data to NULL if sock is freed, for telling teardown
+operation is not allowed in l2cap_sock_teardown_cb(), and also we should
+avoid killing an already killed socket in l2cap_sock_close_cb().
 
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/l2cap_sock.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
 
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index c99d65ef13b1..ddc6a692b237 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1215,14 +1215,18 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+  */
+ static void l2cap_sock_kill(struct sock *sk)
+ {
++	struct l2cap_chan *chan;
++
+ 	if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+ 		return;
+ 
+ 	BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+ 
+ 	/* Kill poor orphan */
+-
+-	l2cap_chan_put(l2cap_pi(sk)->chan);
++	chan = l2cap_pi(sk)->chan;
++	l2cap_chan_put(chan);
++	if (refcount_read(&sk->sk_refcnt) == 1)
++		chan->data = NULL;
+ 	sock_set_flag(sk, SOCK_DEAD);
+ 	sock_put(sk);
+ }
+@@ -1508,6 +1512,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan *chan)
+ {
+ 	struct sock *sk = chan->data;
+ 
++	if (!sk)
++		return;
++
+ 	l2cap_sock_kill(sk);
+ }
+ 
+@@ -1516,6 +1523,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+ 	struct sock *sk = chan->data;
+ 	struct sock *parent;
+ 
++	if (!sk)
++		return;
++
+ 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+ 
+ 	/* This callback can be called both for server (BT_LISTEN)
+-- 
+2.27.0
 
---===============1336005744872030770==--
