@@ -8,58 +8,63 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 40A45C07E9C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5768FC07E9C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 23500613B9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 41F2C613B2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238139AbhGNHQj (ORCPT
+        id S238267AbhGNHQo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 03:16:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45508 "EHLO
+        Wed, 14 Jul 2021 03:16:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238208AbhGNHQi (ORCPT
+        with ESMTP id S238264AbhGNHQo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 03:16:38 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732A6C06175F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:46 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id a4-20020a25f5040000b029054df41d5cceso1436394ybe.18
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:46 -0700 (PDT)
+        Wed, 14 Jul 2021 03:16:44 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A99C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:52 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id 100-20020aed206d0000b029024ea3acef5bso1361041qta.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=KFBkxoUD/o9yz/RhAxI9E4kJa7uKniUZjvzDQA7KYYU=;
-        b=t7wtKX75VmH4wKkWF0q6RWqb06RptYVYNLaMFxEhrC/Vh4PHV07j8rtYDcGu6MMeZU
-         jk4qVVM0eXc/fnTa5wt2NKnEhOH2zzGGwr6jmPSWoLGToBDQynQxadRyU+xL23CETgIr
-         hM1pu1epk/R3iRcZJupsH2dcamXuHr4nHnSU8MoxSMrkpkHa9wSDF2cAwKVCbhrJk4zn
-         IXhfupNyMO0ZbpHpxYoH3TQ9Ya5FBNdZtwE/46pNyITVpLTlFFaxaYjy1zl6FxR6GYz7
-         aD9jfwLO/+1aE/ItSWaxeK9bOT9iwRtAcrBds6VzLXCh6QE9EDTbmZ1ylhjG/sHuIsX7
-         bvRA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=XTdrZ0dJFn1DaDa3LqHGHs3jtPZhxu1jdfiB7BtKgFo=;
+        b=o7gIoRrnyXaH5I79tSNE/yWeSaLTBnVkThvhwXgKspB0bcJbBqSf7lmAqvuzVZHlK5
+         GLv4babRtNAlx+IBFYehVNkprisSBvFPg27fuKeFqWiuHg/S0uyWcQVnFcv6rqSZ3VY8
+         XyzGP1li9RxJwYX+X6aGYnnJRr/NthmMAFvPjdbyukGCIY78UP61luOLBbtxALhGW5Ob
+         6Dpw3yRc/YL4zSfqedHQ3b74fwy8C+u1Gjqys4AhsE9SXJ51qDrVJBeWHn4iRvQXEMx8
+         A5J8XxZkSkhFSxYumsZvuS2u4lNEwbSH6lql0Ma0jCHYAJiXZTS4U2K3DINovGizcOPJ
+         Bl+w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=KFBkxoUD/o9yz/RhAxI9E4kJa7uKniUZjvzDQA7KYYU=;
-        b=XD+jBy1rHf4h2KTn4UOuYf/8b4szR7B3ZF7T3KNuMx6FK4UGn01RCI4EQGph09r1F2
-         v00rWpu2siqbRe0xySL/0zmfc/K8yv/pjzayQu3HoJhI3XvL9d1mH8V42oQjKWEI1Lkk
-         bHA1uILOGxagEb+XFyIehA+o63TGXzRdQQSmrK/2+iCrxPe6rQSrKZRFm1yfJkYXY/pH
-         wk+pkYkLrTOebs8ymNQysTLdjsqTckLG8d0vhdoJeVkxtMSy2PESWucVsT2LKN4VDi0p
-         OopRvnl9Bg/cqLRxaKkhYb+SqfzctMoXJmT09yf/2F4le2Zq5Z0rg8411eqovLPZdNJj
-         EexA==
-X-Gm-Message-State: AOAM532xEmEVLYBydgvXp1nn4SGHxRyWnUm9cU/3BcsVTTPsTxRTnafp
-        dUwJOA1ELRLsF1LdcrM07Kjnt7nCkQoRXL5ZbbJ0UVQkW8mvK4s+ttRqtswFbs5oPKJFwjRKRfa
-        SKpLDphPczpkMT7RqE18J7T1YleiRdsCGEjd0yEcc1SN3Cz4NHxdMclsdfddkX0L3BLKl2nAs9x
-        q6
-X-Google-Smtp-Source: ABdhPJxz1iphW0s/Q7YNoQROAdpOxnpVY07NTD1R0PR3fTbbt5D5k+jQDCGoVPhQav/tKETNK0izq7JFYWdU
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=XTdrZ0dJFn1DaDa3LqHGHs3jtPZhxu1jdfiB7BtKgFo=;
+        b=fdM12Y3BNKq617nAiZ+S/KX3Bx6Do2NLAV7dPr2qBLC3zJOokqChrouaPCsESqLBYs
+         ENd3y78qW7M2dXs1OwAXp759b/PzbGe0k7eOVLstOvKCOjQw2henRvIiBXEMIoeVguZF
+         ZJS4NmES60uarP9GxQeS5NYtT6goeYrMtcKJBWw1MVhlzyPmv6dqzc7n9zh0IGyORgH4
+         fq4ubXSudxVsIyy4cQuX81yepWBC2iCH/yzK+qjzYtcrhKdRfbC4xnWrOBp5zL+n8C92
+         Koc9RTqY9LO6YlhhTwgUiADbzPA+6hdSMVhI3/RQfAC+HN2s26mWsqv6qBtmgX0UN+GC
+         kh8A==
+X-Gm-Message-State: AOAM531Lf1nEzmsXKEgQtLJLLVMU+UV55tqOh4FlZH0xoC4/G7amIHZW
+        eLuBvyU4JjigLWczbZRLfC0TxgtHJRT3NQzI3HSbzrv7VqNI5tIiD1AQFsJZP8lZA+aMscd0YS3
+        I/Dfid123aF6dIPwoxxJSC5syyxfhFcFKrBtTHU9r6uRvUOznuxnJXx3l9693SEoFOuG4/e3a2q
+        KI
+X-Google-Smtp-Source: ABdhPJy8p7BkWUFja6u2+iuoz5FX+Add8fSQBRbgL/BXdoPiti4032Scw6UwbWF2CwpEaJWyZ07HJyMAkJr+
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:ecf5:ef03:eb15:e989])
- (user=apusaka job=sendgmr) by 2002:a25:ac04:: with SMTP id
- w4mr11729125ybi.431.1626246825570; Wed, 14 Jul 2021 00:13:45 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 15:13:38 +0800
-Message-Id: <20210714151332.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
+ (user=apusaka job=sendgmr) by 2002:a05:6214:e6e:: with SMTP id
+ jz14mr9102781qvb.55.1626246831175; Wed, 14 Jul 2021 00:13:51 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 15:13:39 +0800
+In-Reply-To: <20210714151332.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
+Message-Id: <20210714151332.2.I404c6df9cdab270223c13e867396f440dd4b499d@changeid>
 Mime-Version: 1.0
+References: <20210714151332.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH 1/3] Bluetooth: hci_h5: add WAKEUP_DISABLE flag
+Subject: [PATCH 2/3] Bluetooth: hci_h5: btrtl: Maintain flow control if wakeup
+ is enabled
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
@@ -77,13 +82,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Some RTL chips resets the FW on suspend, so wakeup is disabled on
-those chips. This patch introduces this WAKEUP_DISABLE flag so that
-chips that doesn't reset FW on suspend can leave the flag unset and
-is allowed to wake the host.
-
-This patch also left RTL8822 WAKEUP_DISABLE flag unset, therefore
-allowing it to wake the host, and preventing reprobing on resume.
+For chips that doesn't reset on suspend, we need to provide the correct
+value of flow_control when it resumes. Therefore, store the flow
+control value when reading from the config file to be reused upon
+suspend.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
@@ -91,202 +93,43 @@ Reviewed-by: Hilda Wu <hildawu@realtek.com>
 
 ---
 
- drivers/bluetooth/hci_h5.c | 86 +++++++++++++++++++++++++++-----------
- 1 file changed, 62 insertions(+), 24 deletions(-)
+ drivers/bluetooth/hci_h5.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 7b985c7cd26d..947246569434 100644
+index 947246569434..67fcf192d5c5 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -51,8 +51,9 @@
- 
- /* H5 state flags */
- enum {
--	H5_RX_ESC,	/* SLIP escape mode */
--	H5_TX_ACK_REQ,	/* Pending ack to send */
-+	H5_RX_ESC,		/* SLIP escape mode */
-+	H5_TX_ACK_REQ,		/* Pending ack to send */
-+	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
+@@ -54,6 +54,7 @@ enum {
+ 	H5_RX_ESC,		/* SLIP escape mode */
+ 	H5_TX_ACK_REQ,		/* Pending ack to send */
+ 	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
++	H5_HW_FLOW_CONTROL,	/* Use HW flow control */
  };
  
  struct h5 {
-@@ -97,6 +98,10 @@ struct h5 {
- 	struct gpio_desc *device_wake_gpio;
- };
+@@ -923,6 +924,9 @@ static int h5_btrtl_setup(struct h5 *h5)
+ 	serdev_device_set_baudrate(h5->hu->serdev, controller_baudrate);
+ 	serdev_device_set_flow_control(h5->hu->serdev, flow_control);
  
-+enum h5_driver_info {
-+	H5_INFO_WAKEUP_DISABLE = BIT(0),
-+};
++	if (flow_control)
++		set_bit(H5_HW_FLOW_CONTROL, &h5->flags);
 +
- struct h5_vnd {
- 	int (*setup)(struct h5 *h5);
- 	void (*open)(struct h5 *h5);
-@@ -106,6 +111,11 @@ struct h5_vnd {
- 	const struct acpi_gpio_mapping *acpi_gpio_map;
- };
- 
-+struct h5_device_data {
-+	uint32_t driver_info;
-+	struct h5_vnd *vnd;
-+};
-+
- static void h5_reset_rx(struct h5 *h5);
- 
- static void h5_link_control(struct hci_uart *hu, const void *data, size_t len)
-@@ -791,6 +801,9 @@ static int h5_serdev_probe(struct serdev_device *serdev)
- {
- 	struct device *dev = &serdev->dev;
- 	struct h5 *h5;
-+	struct hci_dev *hdev;
-+	const struct h5_device_data *data;
-+	int err;
- 
- 	h5 = devm_kzalloc(dev, sizeof(*h5), GFP_KERNEL);
- 	if (!h5)
-@@ -807,20 +820,19 @@ static int h5_serdev_probe(struct serdev_device *serdev)
- 		if (!match)
- 			return -ENODEV;
- 
--		h5->vnd = (const struct h5_vnd *)match->driver_data;
-+		data = (const struct h5_device_data *)match->driver_data;
-+		h5->vnd = data->vnd;
- 		h5->id  = (char *)match->id;
- 
- 		if (h5->vnd->acpi_gpio_map)
- 			devm_acpi_dev_add_driver_gpios(dev,
- 						       h5->vnd->acpi_gpio_map);
+ 	err = btrtl_download_firmware(h5->hu->hdev, btrtl_dev);
+ 	/* Give the device some time before the hci-core sends it a reset */
+ 	usleep_range(10000, 20000);
+@@ -1015,7 +1019,11 @@ static int h5_btrtl_resume(struct h5 *h5)
+ 		queue_work(system_long_wq, &reprobe->work);
  	} else {
--		const void *data;
--
- 		data = of_device_get_match_data(dev);
- 		if (!data)
- 			return -ENODEV;
- 
--		h5->vnd = (const struct h5_vnd *)data;
-+		h5->vnd = data->vnd;
+ 		gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
++
++		if (test_bit(H5_HW_FLOW_CONTROL, &h5->flags))
++			serdev_device_set_flow_control(h5->hu->serdev, true);
  	}
- 
- 
-@@ -833,7 +845,16 @@ static int h5_serdev_probe(struct serdev_device *serdev)
- 	if (IS_ERR(h5->device_wake_gpio))
- 		return PTR_ERR(h5->device_wake_gpio);
- 
--	return hci_uart_register_device(&h5->serdev_hu, &h5p);
-+	err = hci_uart_register_device(&h5->serdev_hu, &h5p);
-+	if (err)
-+		return err;
-+
-+	hdev = h5->serdev_hu.hdev;
-+
-+	if (data->driver_info & H5_INFO_WAKEUP_DISABLE)
-+		set_bit(H5_WAKEUP_DISABLE, &h5->flags);
-+
-+	return 0;
- }
- 
- static void h5_serdev_remove(struct serdev_device *serdev)
-@@ -921,7 +942,8 @@ static void h5_btrtl_open(struct h5 *h5)
- 	 * done by the hci_suspend_notifier is not necessary; it actually causes
- 	 * delays and a bunch of errors to get logged, so disable it.
- 	 */
--	set_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &h5->hu->flags);
-+	if (test_bit(H5_WAKEUP_DISABLE, &h5->flags))
-+		set_bit(HCI_UART_NO_SUSPEND_NOTIFIER, &h5->hu->flags);
- 
- 	/* Devices always start with these fixed parameters */
- 	serdev_device_set_flow_control(h5->hu->serdev, false);
-@@ -942,15 +964,18 @@ static void h5_btrtl_close(struct h5 *h5)
- 
- /* Suspend/resume support. On many devices the RTL BT device loses power during
-  * suspend/resume, causing it to lose its firmware and all state. So we simply
-- * turn it off on suspend and reprobe on resume.  This mirrors how RTL devices
-- * are handled in the USB driver, where the USB_QUIRK_RESET_RESUME is used which
-+ * turn it off on suspend and reprobe on resume. This mirrors how RTL devices
-+ * are handled in the USB driver, where the BTUSB_WAKEUP_DISABLE is used which
-  * also causes a reprobe on resume.
-  */
- static int h5_btrtl_suspend(struct h5 *h5)
- {
- 	serdev_device_set_flow_control(h5->hu->serdev, false);
- 	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
--	gpiod_set_value_cansleep(h5->enable_gpio, 0);
-+
-+	if (test_bit(H5_WAKEUP_DISABLE, &h5->flags))
-+		gpiod_set_value_cansleep(h5->enable_gpio, 0);
 +
  	return 0;
  }
  
-@@ -976,17 +1001,21 @@ static void h5_btrtl_reprobe_worker(struct work_struct *work)
- 
- static int h5_btrtl_resume(struct h5 *h5)
- {
--	struct h5_btrtl_reprobe *reprobe;
-+	if (test_bit(H5_WAKEUP_DISABLE, &h5->flags)) {
-+		struct h5_btrtl_reprobe *reprobe;
- 
--	reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
--	if (!reprobe)
--		return -ENOMEM;
-+		reprobe = kzalloc(sizeof(*reprobe), GFP_KERNEL);
-+		if (!reprobe)
-+			return -ENOMEM;
- 
--	__module_get(THIS_MODULE);
-+		__module_get(THIS_MODULE);
- 
--	INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
--	reprobe->dev = get_device(&h5->hu->serdev->dev);
--	queue_work(system_long_wq, &reprobe->work);
-+		INIT_WORK(&reprobe->work, h5_btrtl_reprobe_worker);
-+		reprobe->dev = get_device(&h5->hu->serdev->dev);
-+		queue_work(system_long_wq, &reprobe->work);
-+	} else {
-+		gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
-+	}
- 	return 0;
- }
- 
-@@ -1008,13 +1037,22 @@ static struct h5_vnd rtl_vnd = {
- 	.resume		= h5_btrtl_resume,
- 	.acpi_gpio_map	= acpi_btrtl_gpios,
- };
-+
-+static const struct h5_device_data h5_data_rtl8822cs = {
-+	.vnd = &rtl_vnd,
-+};
-+
-+static const struct h5_device_data h5_data_rtl8723bs = {
-+	.driver_info = H5_INFO_WAKEUP_DISABLE,
-+	.vnd = &rtl_vnd,
-+};
- #endif
- 
- #ifdef CONFIG_ACPI
- static const struct acpi_device_id h5_acpi_match[] = {
- #ifdef CONFIG_BT_HCIUART_RTL
--	{ "OBDA0623", (kernel_ulong_t)&rtl_vnd },
--	{ "OBDA8723", (kernel_ulong_t)&rtl_vnd },
-+	{ "OBDA0623", (kernel_ulong_t)&h5_data_rtl8723bs },
-+	{ "OBDA8723", (kernel_ulong_t)&h5_data_rtl8723bs },
- #endif
- 	{ },
- };
-@@ -1028,11 +1066,11 @@ static const struct dev_pm_ops h5_serdev_pm_ops = {
- static const struct of_device_id rtl_bluetooth_of_match[] = {
- #ifdef CONFIG_BT_HCIUART_RTL
- 	{ .compatible = "realtek,rtl8822cs-bt",
--	  .data = (const void *)&rtl_vnd },
-+	  .data = (const void *)&h5_data_rtl8822cs },
- 	{ .compatible = "realtek,rtl8723bs-bt",
--	  .data = (const void *)&rtl_vnd },
-+	  .data = (const void *)&h5_data_rtl8723bs },
- 	{ .compatible = "realtek,rtl8723ds-bt",
--	  .data = (const void *)&rtl_vnd },
-+	  .data = (const void *)&h5_data_rtl8723bs },
- #endif
- 	{ },
- };
 -- 
 2.32.0.93.g670b81a890-goog
 
