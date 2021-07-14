@@ -2,167 +2,245 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8016AC12002
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 19:20:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C03DCC12002
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 20:34:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 60E22613C8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 19:20:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7B196128C
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 20:34:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240080AbhGNTXU (ORCPT
+        id S232517AbhGNUhN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 15:23:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43762 "EHLO
+        Wed, 14 Jul 2021 16:37:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33732 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230129AbhGNTXT (ORCPT
+        with ESMTP id S229650AbhGNUhN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 15:23:19 -0400
-Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0340C06175F;
-        Wed, 14 Jul 2021 12:20:26 -0700 (PDT)
-Received: by mail-yb1-xb34.google.com with SMTP id r135so5054271ybc.0;
-        Wed, 14 Jul 2021 12:20:26 -0700 (PDT)
+        Wed, 14 Jul 2021 16:37:13 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8029C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 13:34:21 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id w15so3688074pgk.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 13:34:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=jjSz1JmEJaotKApoc0SCfbkh4lIXQPiTHol15ysgTs0=;
-        b=d1q07o+6HBG7oYjBg23TbFv555t1qmOmcDJkUv2Xzf6htne/ItLhesZHIqSii3TLg+
-         W+5zQRQzaMkIdnP/NdXzUmfd5qK+u8Q7DXzT6QKsPBjPGDPCrdvmHJK6OYKpWYuwJrSP
-         I/oL4ZaBGSxetWqzlZXIktVa6xf+anEAIPgdN8EkDyVXA8sOuba7ZZ1y6NrttJDqURRL
-         YqtIaDUzRjcIWvJI/WCcaqLrEQaGmSkniX+xw11U0P+TdOPKFrtDia+uR9Qtw4hzw5Wi
-         V2XIIQv0JuN/prYd8nHhGZACuQ21tGgfY54ITUAkII01DMMFcx4gcx90aJ5P6n3WblPb
-         l73Q==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OIWyv9gkzNxETN61C4OO5dpt2kQmYd7A0gHg3DDUNWc=;
+        b=FtAnFFngCSOiITDo/n/ALbfSuLlr/lzxH03DhRbfKG89s6Jz3KjL8MmCsQ6dNP8hRq
+         XWld1Ey30xS8IVHYOD6UQVsFS3dkp995Xbp6O2i1ShV2XwTPmb08pQIiSI7WwXzA+Q5A
+         S5PuIHposXniRjboHfOH7zaQs6VBDLC+IEyf1tNerbgCFpV6sDMahn0MRD1Db/x9pcio
+         yLTet0fosbdJUeVOcO04P0leJp8gmiXyOXT1TyeJWq0gC4VnyscmvMkfqJmj5h64jqta
+         mzQpvw6ZqZPrF9f68hgQXHfbv4Gy8WkkMWBj9CStlI3jBIayXmcda2nkDY6/DHxqUTRp
+         1NdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=jjSz1JmEJaotKApoc0SCfbkh4lIXQPiTHol15ysgTs0=;
-        b=LmLI3APJt5muIzAN4gEKhW6EikeGUN0/tV4y62/zBb2UKhk7SL66sB+qVDQnpbBKHS
-         QiYtgUtOuVvlDFKb39Hnk5TV9ovcjhps+jZR/ikeKVVBBihZjV9tAPnU1Tnx0tykTkKr
-         /SpTeWY2PHF63J/7/3HA4GNR4R5N8kb4GUIoP/AyWtXjATh2B1NG5CXXXWSef3ocYya2
-         z7PlpTDa1VkrZRP45YxH/FlJ6D/KLdBhYnsOJ7z3/Bk+rrszCi3GJakqeZ7A8YJnkQUj
-         7kljhwmqywTFukteoNLBnHN1NTLgc8VklE2y6GRGMqQwM7rxouGaViTjwHbzlC8gJjlo
-         UlaA==
-X-Gm-Message-State: AOAM533aorhDESxD6xyHkZpBpX+iBjuMLK2HGORh0VrV6WKj2vIdwgET
-        ih/firMQFYkB5uA18gAB5Ab7vefKBGBqAaIFNZt+SUcoX7wbYQ==
-X-Google-Smtp-Source: ABdhPJyQvZrocf7QPQ2nhuK6uKl8uEmK6X6piIdPdvESIA9xatNnXIpJFGQguAwvs4HOL0wYvl2FDn2IssPgxXa79ZQ=
-X-Received: by 2002:a25:8205:: with SMTP id q5mr15052420ybk.440.1626290425963;
- Wed, 14 Jul 2021 12:20:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
- <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp> <48d66166-4d39-4fe2-3392-7e0c84b9bdb3@i-love.sakura.ne.jp>
-In-Reply-To: <48d66166-4d39-4fe2-3392-7e0c84b9bdb3@i-love.sakura.ne.jp>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=OIWyv9gkzNxETN61C4OO5dpt2kQmYd7A0gHg3DDUNWc=;
+        b=lzQ7SizX0p3f1ZNriLb8YfSFYMyb1lxJwOXfxrKbFb3787i9r9ycJmhGNdBXt4x4Sz
+         yAKWddtNlA2Pi/yGCDrd3L+c0kF9JO/6/S+ZFp6HKw7VcoGLJ1qygXMt0YkOjfIOF2Os
+         +SZ7fp+X2hzRpUsdaNN+rWASy/Vi5pVSABmikBvOTxdZfi9w0lqKq18gFDLXV6OAkJI4
+         ucor4W814TipolYYfIpSz1lzsmzXEVbphEtLl7E3YsdUcc2GwW43VCoAl6CDpSts5EUc
+         fm4yzsNI30uK8mRB3apx/fYMgCTLMitEo5Nm5Spqp/Ptv0sRHlfE09pPuVu5pujRfkeF
+         jK5g==
+X-Gm-Message-State: AOAM530ouizK2WI49n3p4lUrgghXI+4fy2sjEtLWPAJkjdU4XZrH6Rj3
+        i4qAl1518awbcgS2rtr3u3PhC4+s2Rg7mQ==
+X-Google-Smtp-Source: ABdhPJxcRIw5RqRR9fpoNgbHdBnuShw2Mc29uDtIXQVw244IYcjJiB0CRrVQQZCGrJR5oROyTyOvvA==
+X-Received: by 2002:aa7:808b:0:b029:2ef:cdd4:8297 with SMTP id v11-20020aa7808b0000b02902efcdd48297mr11894594pff.27.1626294860993;
+        Wed, 14 Jul 2021 13:34:20 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u33sm3864060pfg.3.2021.07.14.13.34.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 14 Jul 2021 13:34:20 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Jul 2021 12:20:15 -0700
-Message-ID: <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
-Subject: Re: [PATCH v3] Bluetooth: call lock_sock() outside of spinlock section
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Lin Ma <linma@zju.edu.cn>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Fix not generating RPA when required
+Date:   Wed, 14 Jul 2021 13:34:17 -0700
+Message-Id: <20210714203417.2914359-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tetsuo,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Jul 13, 2021 at 4:28 AM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> syzbot is hitting might_sleep() warning at hci_sock_dev_event() due to
-> calling lock_sock() with rw spinlock held [1]. Among three possible
-> approaches [2], this patch chose holding a refcount via sock_hold() and
-> revalidating the element via sk_hashed().
->
-> Link: https://syzkaller.appspot.com/bug?extid=a5df189917e79d5e59c9 [1]
-> Link: https://lkml.kernel.org/r/05535d35-30d6-28b6-067e-272d01679d24@i-love.sakura.ne.jp [2]
-> Reported-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> Tested-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
-> Fixes: e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF of hdev object")
-> ---
-> Changes in v3:
->   Don't use unlocked hci_pi(sk)->hdev != hdev test, for it is racy.
->   No need to defer hci_dev_put(hdev), for it can't be the last reference.
->
-> Changes in v2:
->   Take hci_sk_list.lock for write in case bt_sock_unlink() is called after
->   sk_hashed(sk) test, and defer hci_dev_put(hdev) till schedulable context.
+Code was checking if random_addr and hdev->rpa match without first
+checking if the RPA has not been set (BDADDR_ANY), furthermore it was
+clearing HCI_RPA_EXPIRED before the command completes and the RPA is
+actually programmed which in case of failure would leave the expired
+RPA still set.
 
-How about we revert back to use bh_lock_sock_nested but use
-local_bh_disable like the following patch:
+Since advertising instance have a similar problem the clearing of
+HCI_RPA_EXPIRED has been moved to hci_event.c after checking the random
+address is in fact the hdev->rap and then proceed to set the expire
+timeout.
 
-https://patchwork.kernel.org/project/bluetooth/patch/20210713162838.693266-1-desmondcheongzx@gmail.com/
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |  4 ++++
+ net/bluetooth/hci_event.c        | 28 ++++++++++++++++++++++++----
+ net/bluetooth/hci_request.c      | 26 +++-----------------------
+ 3 files changed, 31 insertions(+), 27 deletions(-)
 
->  net/bluetooth/hci_sock.c | 30 +++++++++++++++++++++++++++++-
->  1 file changed, 29 insertions(+), 1 deletion(-)
->
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index b04a5a02ecf3..786a06a232fd 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -760,10 +760,18 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
->                 struct sock *sk;
->
->                 /* Detach sockets from device */
-> +restart:
->                 read_lock(&hci_sk_list.lock);
->                 sk_for_each(sk, &hci_sk_list.head) {
-> +                       /* This sock_hold(sk) is safe, for bt_sock_unlink(sk)
-> +                        * is not called yet.
-> +                        */
-> +                       sock_hold(sk);
-> +                       read_unlock(&hci_sk_list.lock);
->                         lock_sock(sk);
-> -                       if (hci_pi(sk)->hdev == hdev) {
-> +                       write_lock(&hci_sk_list.lock);
-> +                       /* Check that bt_sock_unlink(sk) is not called yet. */
-> +                       if (sk_hashed(sk) && hci_pi(sk)->hdev == hdev) {
->                                 hci_pi(sk)->hdev = NULL;
->                                 sk->sk_err = EPIPE;
->                                 sk->sk_state = BT_OPEN;
-> @@ -771,7 +779,27 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
->
->                                 hci_dev_put(hdev);
->                         }
-> +                       write_unlock(&hci_sk_list.lock);
->                         release_sock(sk);
-> +                       read_lock(&hci_sk_list.lock);
-> +                       /* If bt_sock_unlink(sk) is not called yet, we can
-> +                        * continue iteration. We can use __sock_put(sk) here
-> +                        * because hci_sock_release() will call sock_put(sk)
-> +                        * after bt_sock_unlink(sk).
-> +                        */
-> +                       if (sk_hashed(sk)) {
-> +                               __sock_put(sk);
-> +                               continue;
-> +                       }
-> +                       /* Otherwise, we need to restart iteration, for the
-> +                        * next socket pointed by sk->next might be already
-> +                        * gone. We can't use __sock_put(sk) here because
-> +                        * hci_sock_release() might have already called
-> +                        * sock_put(sk) after bt_sock_unlink(sk).
-> +                        */
-> +                       read_unlock(&hci_sk_list.lock);
-> +                       sock_put(sk);
-> +                       goto restart;
->                 }
->                 read_unlock(&hci_sk_list.lock);
->         }
-> --
-> 2.18.4
->
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d916729674a0..d1b3c0d5649a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1412,6 +1412,10 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+ 				!hci_dev_test_flag(dev, HCI_AUTO_OFF))
+ #define bredr_sc_enabled(dev)  (lmp_sc_capable(dev) && \
+ 				hci_dev_test_flag(dev, HCI_SC_ENABLED))
++#define rpa_valid(dev)         (bacmp(&dev->rpa, BDADDR_ANY) && \
++				!hci_dev_test_flag(dev, HCI_RPA_EXPIRED))
++#define adv_rpa_valid(adv)     (bacmp(&adv->random_addr, BDADDR_ANY) && \
++				!adv->rpa_expired)
+ 
+ #define scan_1m(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_1M) || \
+ 		      ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_1M))
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d7e85049d49d..81f8e9193b90 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -40,6 +40,8 @@
+ #define ZERO_KEY "\x00\x00\x00\x00\x00\x00\x00\x00" \
+ 		 "\x00\x00\x00\x00\x00\x00\x00\x00"
+ 
++#define secs_to_jiffies(_secs) msecs_to_jiffies((_secs) * 1000)
++
+ /* Handle HCI Event packets */
+ 
+ static void hci_cc_inquiry_cancel(struct hci_dev *hdev, struct sk_buff *skb,
+@@ -1171,6 +1173,12 @@ static void hci_cc_le_set_random_addr(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	bacpy(&hdev->random_addr, sent);
+ 
++	if (!bacmp(&hdev->rpa, sent)) {
++		hci_dev_clear_flag(hdev, HCI_RPA_EXPIRED);
++		queue_delayed_work(hdev->workqueue, &hdev->rpa_expired,
++				   secs_to_jiffies(hdev->rpa_timeout));
++	}
++
+ 	hci_dev_unlock(hdev);
+ }
+ 
+@@ -1201,7 +1209,7 @@ static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
+ {
+ 	__u8 status = *((__u8 *) skb->data);
+ 	struct hci_cp_le_set_adv_set_rand_addr *cp;
+-	struct adv_info *adv_instance;
++	struct adv_info *adv;
+ 
+ 	if (status)
+ 		return;
+@@ -1215,10 +1223,22 @@ static void hci_cc_le_set_adv_set_random_addr(struct hci_dev *hdev,
+ 	if (!cp->handle) {
+ 		/* Store in hdev for instance 0 (Set adv and Directed advs) */
+ 		bacpy(&hdev->random_addr, &cp->bdaddr);
++		if (!bacmp(&hdev->rpa, &cp->bdaddr)) {
++			hci_dev_clear_flag(hdev, HCI_RPA_EXPIRED);
++			queue_delayed_work(hdev->workqueue, &hdev->rpa_expired,
++					   secs_to_jiffies(hdev->rpa_timeout));
++		}
+ 	} else {
+-		adv_instance = hci_find_adv_instance(hdev, cp->handle);
+-		if (adv_instance)
+-			bacpy(&adv_instance->random_addr, &cp->bdaddr);
++		adv = hci_find_adv_instance(hdev, cp->handle);
++		if (adv) {
++			bacpy(&adv->random_addr, &cp->bdaddr);
++			if (!bacmp(&hdev->rpa, &cp->bdaddr)) {
++				adv->rpa_expired = false;
++				queue_delayed_work(hdev->workqueue,
++						   &adv->rpa_expired_cb,
++						   secs_to_jiffies(hdev->rpa_timeout));
++			}
++		}
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 1d14adc023e9..eea2c3f5f118 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -2072,8 +2072,6 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 	 * current RPA has expired then generate a new one.
+ 	 */
+ 	if (use_rpa) {
+-		int to;
+-
+ 		/* If Controller supports LL Privacy use own address type is
+ 		 * 0x03
+ 		 */
+@@ -2084,14 +2082,10 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 			*own_addr_type = ADDR_LE_DEV_RANDOM;
+ 
+ 		if (adv_instance) {
+-			if (!adv_instance->rpa_expired &&
+-			    !bacmp(&adv_instance->random_addr, &hdev->rpa))
++			if (adv_rpa_valid(adv_instance))
+ 				return 0;
+-
+-			adv_instance->rpa_expired = false;
+ 		} else {
+-			if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
+-			    !bacmp(&hdev->random_addr, &hdev->rpa))
++			if (rpa_valid(hdev))
+ 				return 0;
+ 		}
+ 
+@@ -2103,14 +2097,6 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
+ 
+ 		bacpy(rand_addr, &hdev->rpa);
+ 
+-		to = msecs_to_jiffies(hdev->rpa_timeout * 1000);
+-		if (adv_instance)
+-			queue_delayed_work(hdev->workqueue,
+-					   &adv_instance->rpa_expired_cb, to);
+-		else
+-			queue_delayed_work(hdev->workqueue,
+-					   &hdev->rpa_expired, to);
+-
+ 		return 0;
+ 	}
+ 
+@@ -2547,8 +2533,6 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 	 * the current RPA in use, then generate a new one.
+ 	 */
+ 	if (use_rpa) {
+-		int to;
+-
+ 		/* If Controller supports LL Privacy use own address type is
+ 		 * 0x03
+ 		 */
+@@ -2558,8 +2542,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 		else
+ 			*own_addr_type = ADDR_LE_DEV_RANDOM;
+ 
+-		if (!hci_dev_test_and_clear_flag(hdev, HCI_RPA_EXPIRED) &&
+-		    !bacmp(&hdev->random_addr, &hdev->rpa))
++		if (rpa_valid(hdev))
+ 			return 0;
+ 
+ 		err = smp_generate_rpa(hdev, hdev->irk, &hdev->rpa);
+@@ -2570,9 +2553,6 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
+ 
+ 		set_random_addr(req, &hdev->rpa);
+ 
+-		to = msecs_to_jiffies(hdev->rpa_timeout * 1000);
+-		queue_delayed_work(hdev->workqueue, &hdev->rpa_expired, to);
+-
+ 		return 0;
+ 	}
+ 
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
