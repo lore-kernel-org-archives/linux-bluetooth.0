@@ -2,147 +2,253 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8A09C07E9A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 17:23:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABABBC07E9A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 17:25:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCCC5613C5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 17:23:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7FD1E613C0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 17:25:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229685AbhGNR0h (ORCPT
+        id S238965AbhGNR2V (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 13:26:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45034 "EHLO
+        Wed, 14 Jul 2021 13:28:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45512 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229559AbhGNR0h (ORCPT
+        with ESMTP id S237956AbhGNR2U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 13:26:37 -0400
-Received: from mail-oi1-x236.google.com (mail-oi1-x236.google.com [IPv6:2607:f8b0:4864:20::236])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF3F2C061760
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 10:23:45 -0700 (PDT)
-Received: by mail-oi1-x236.google.com with SMTP id u11so3144813oiv.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 10:23:45 -0700 (PDT)
+        Wed, 14 Jul 2021 13:28:20 -0400
+Received: from mail-ot1-x335.google.com (mail-ot1-x335.google.com [IPv6:2607:f8b0:4864:20::335])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2563FC061760
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 10:25:29 -0700 (PDT)
+Received: by mail-ot1-x335.google.com with SMTP id i12-20020a05683033ecb02903346fa0f74dso3257497otu.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 10:25:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=date:from:to:cc:subject:message-id:references:mime-version
          :content-disposition:in-reply-to;
-        bh=xQZN3icDsBkvO9cDDwLhgogPceNHTrTo1SCrhA6YUsI=;
-        b=zay8GJlYMMCpW9N+3AwgKok2LmG/Fcup6oo9MKk+B6g3v8LF0bJocGP01P9Y0yNQ8S
-         qxQQYHaX+dIZjK6/fvxuozcpC8G1nWY+Pruy/FoN/ofrFlFo3t6HnkMJwPcOF6a0lG1n
-         fhCAUX9m7FIkv4ZmCkZwS1MsQOEPyMTWOSutcSHq9er35C3PzgNGBvcD3H9fcl3JjmlE
-         WNOJAVT55UZV1pBIsaW6ig5FVKGhe2N1sogoQWmLLsvV77JwH7kd1mFUvqA/hP3q7z23
-         dsMvqaqYJDvK4x1qZPoKvO6G+cfYRW7Tp0lt1EayHinr+zk8QaZY7DCCMV6sv8dy3AOZ
-         SXZg==
+        bh=4Kumx3nS5y9nz9rWe/sEdbMMcdp5ffd/gZuxBQbNya4=;
+        b=IYaHXcWbRW58qcNEf1nShgqUxB13n2Xl2hBMhmSAeknojrMiTnIh/2w4JC4WBEpmz3
+         SjsdAEJcE6QHDole4Fe40mfdpoQe7eTNuRHMvrbu5DY4npCrSRtmnEGzwk0kXkCXLwqj
+         VqEYbOkVuh5L0askie7wCgU6nQz3cBemjnAAOgjOejBCCFamATFLSzf7i4AQl7DnQJVP
+         BngZkmi/1fck4UB01js5oqRrhRLFw7+YHWPRWaRMAjehCeUjQmVelorxsV8o3FEoUtvz
+         8UostLjfjTNF/+gHVkAP/xzWPeAScK9lPVT1L4pZ/ebzY1x+KYYtJp71a8k1+K+l680o
+         9wbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:from:to:cc:subject:message-id:references
          :mime-version:content-disposition:in-reply-to;
-        bh=xQZN3icDsBkvO9cDDwLhgogPceNHTrTo1SCrhA6YUsI=;
-        b=lh1szYSq19xEjNE03s5EL2JulcbYmo7sjATkcrQpGLzgw5/Zm3fqyLGQSJgnTruydO
-         jLF7C+TNXs5M4sg72l7ZoXu6T6/Bj/CbQrfSJDDlX49rh3vebaBeVtWMgZlbN4n7EBza
-         YdOZUFQUcQ9ux+UFndXlXahNtHf7kWN2dz/l9w9t20Siys8mWNBNYVkTuuzWsjHZGITO
-         b9+YZk9lN8cTrWSeW/hqGYnN6lfp4ezDHp7GFxshmJBNhrHe+5n5ao4lVJzsFWnKWadW
-         CMpEI3UYCyZI87U9i0Fj6zKxvJJ+QkUNzjdloa6mDClY1MD1/q+fdznL1Jb3IJaod6xR
-         hQtA==
-X-Gm-Message-State: AOAM532JVI2wgeX6ATaWAREXShHznCPtNB/zPZvRQjhWuhCqT6mbq2MQ
-        zr7iczbr/XnTmpdY55DVr6+Z1A==
-X-Google-Smtp-Source: ABdhPJwM0np9CfM0k4rj4WeO6SuzIyzCjbFRY9p44kNiFnz2AL6mmIc1PvRhoUdlc97FFDvMcoHxSA==
-X-Received: by 2002:aca:ef84:: with SMTP id n126mr8158730oih.59.1626283425029;
-        Wed, 14 Jul 2021 10:23:45 -0700 (PDT)
+        bh=4Kumx3nS5y9nz9rWe/sEdbMMcdp5ffd/gZuxBQbNya4=;
+        b=DTqNTvcbrXaSs337h67AEKyNX8IKmBGyK0RpzzJ8OJPvDfVte4fvwhpaYnn568jEZz
+         yZVJwi3+NNLuaSlUZrAVOnRshPAhDy1EqdGY/jsCVPHE1YbCk8DDScCYpI2VZ7sZat9x
+         oHdAjNliwpRrKbZe2Wdu/qTbAzmzlDxcq1jSQNqQRYARn4LNhb24EZXDLVkQtEbPvZUx
+         4LJJzzYh/AEdFebe1YIDeDpbGJjinpYfbRE7vSfSXo3QxFgtOzObB34fqHlpVQS7B2qK
+         jlbx1iJn1iDFDQbhVv7/slfUsM1YtD//XoZ9idAjHt5LDmd/MEcH84X6HvLcvvvZx9/N
+         sWVg==
+X-Gm-Message-State: AOAM532uUUuC/GkEBbpKlrKHDBDv8XBXh3bpFR/1wAtATzuUG8mQZfZw
+        J8A0f1R7xCeJeiFKYruusfY5NA==
+X-Google-Smtp-Source: ABdhPJxJhQltkVBXqegdnO9IaV/+FtL3Hn5ISoeGdm1cXIRjDt1pi4WI2yOMSRkOnK2cup+024ClQg==
+X-Received: by 2002:a9d:4916:: with SMTP id e22mr9268121otf.112.1626283528429;
+        Wed, 14 Jul 2021 10:25:28 -0700 (PDT)
 Received: from yoga (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id y6sm620261oiy.18.2021.07.14.10.23.43
+        by smtp.gmail.com with ESMTPSA id p9sm553538otl.64.2021.07.14.10.25.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 10:23:44 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 12:23:41 -0500
+        Wed, 14 Jul 2021 10:25:27 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 12:25:25 -0500
 From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Ulf Hansson <ulf.hansson@linaro.org>
-Cc:     Mark Brown <broonie@kernel.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
+To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>, Rob Herring <robh+dt@kernel.org>,
         Liam Girdwood <lgirdwood@gmail.com>,
+        Mark Brown <broonie@kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        linux-arm-msm@vger.kernel.org,
         Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        DTML <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org
-Subject: Re: [PATCH v3 2/7] regulator: qca6390: add support for QCA639x
- powerup sequence
-Message-ID: <YO8dnRE9pq5T64PD@yoga>
+Subject: Re: [PATCH v3 4/7] Bluetooth: hci_qca: merge qca_power into
+ qca_serdev
+Message-ID: <YO8eBZfLd0vnTy/x@yoga>
 References: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
- <20210621223141.1638189-3-dmitry.baryshkov@linaro.org>
- <CAPDyKFo6dmjw0TnaK7=35dq5Si_6YYpeeSa=gU++1od7WkQZ7A@mail.gmail.com>
- <20210706115517.GB4529@sirena.org.uk>
- <CAPDyKFr=8spZBD+bTe3SjS=nATL-ByFu_epnT2Z4chSuQNke2w@mail.gmail.com>
+ <20210621223141.1638189-5-dmitry.baryshkov@linaro.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAPDyKFr=8spZBD+bTe3SjS=nATL-ByFu_epnT2Z4chSuQNke2w@mail.gmail.com>
+In-Reply-To: <20210621223141.1638189-5-dmitry.baryshkov@linaro.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu 08 Jul 05:09 CDT 2021, Ulf Hansson wrote:
+On Mon 21 Jun 17:31 CDT 2021, Dmitry Baryshkov wrote:
 
-> - Peter (the email was bouncing)
-> 
-> On Tue, 6 Jul 2021 at 13:55, Mark Brown <broonie@kernel.org> wrote:
-> >
-> > On Tue, Jul 06, 2021 at 09:54:03AM +0200, Ulf Hansson wrote:
-> > > On Tue, 22 Jun 2021 at 00:32, Dmitry Baryshkov
-> >
-> > > > Qualcomm QCA6390/1 is a family of WiFi + Bluetooth SoCs, with BT part
-> > > > being controlled through the UART and WiFi being present on PCIe
-> > > > bus. Both blocks share common power sources. Add device driver handling
-> > > > power sequencing of QCA6390/1.
-> >
-> > > Power sequencing of discoverable buses have been discussed several
-> > > times before at LKML. The last attempt [1] I am aware of, was in 2017
-> > > from Peter Chen. I don't think there is a common solution, yet.
-> >
-> > This feels a bit different to the power sequencing problem - it's not
-> > exposing the individual inputs to the device but rather is a block that
-> > manages everything but needs a bit of a kick to get things going (I'd
-> > guess that with ACPI it'd be triggered via AML).  It's in the same space
-> > but it's not quite the same issue I think, something that can handle
-> > control of the individual resources might still struggle with this.
-> 
-> Well, to me it looks very similar to those resouses we could manage
-> with the mmc pwrseq, for SDIO. It's also typically the same kind of
-> combo-chips that moved from supporting SDIO to PCIe, for improved
-> performance I guess. More importantly, the same constraint to
-> pre-power on the device is needed to allow it to be discovered/probed.
-> 
-> Therefore, I think it would be worth having a common solution for
-> this, rather than a solution per subsystem or even worse, per device.
+> There is no need to allocate separate structure for handling regulators
+> used by QCA chips, we gain nothing from it. Move all used data fields
+> directly to struct qca_serdev.
 > 
 
-Representing the chip and its power needs, separate from the busses does
-seem reasonable. It's pretty much what Dmitry suggested originally, but
-his attempts to use either power-domain or regulator references to
-ensure ordering has been objected.
-
-
-Beyond this, there is a similar case (that you and I have talked about
-earlier) in supporting the SDX55 PCIe modem found in some devices.
-Where in addition to ensuring that the power rails are configured, a
-couple of gpios needs to be controlled and there's an incoming gpio line
-indicating that the firmware of the device has locked up and the power
-needs to be toggled and the device re-enumerated.
-
-> Unfortunately, it looks like Peter's email is bouncing so we can't get
-> an update from him.
-> 
-
-And for this second part, where we need some additional logic it seems
-to go beyond what the power sequence discussions has touched upon so
-far.
+Reviewed-by: Bjorn Andersson <bjorn.andersson@linaro.org>
 
 Regards,
 Bjorn
+
+> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> ---
+>  drivers/bluetooth/hci_qca.c | 58 ++++++++++++++-----------------------
+>  1 file changed, 22 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> index 3704dbadba1d..9cc8a9153d76 100644
+> --- a/drivers/bluetooth/hci_qca.c
+> +++ b/drivers/bluetooth/hci_qca.c
+> @@ -208,20 +208,15 @@ struct qca_device_data {
+>  /*
+>   * Platform data for the QCA Bluetooth power driver.
+>   */
+> -struct qca_power {
+> -	struct device *dev;
+> -	struct regulator_bulk_data *vreg_bulk;
+> -	int num_vregs;
+> -	bool vregs_on;
+> -};
+> -
+>  struct qca_serdev {
+>  	struct hci_uart	 serdev_hu;
+>  	struct gpio_desc *bt_en;
+>  	struct gpio_desc *sw_ctrl;
+>  	struct clk	 *susclk;
+>  	enum qca_btsoc_type btsoc_type;
+> -	struct qca_power *bt_power;
+> +	struct regulator_bulk_data *vreg_bulk;
+> +	int num_vregs;
+> +	bool vregs_on;
+>  	u32 init_speed;
+>  	u32 oper_speed;
+>  	const char *firmware_name;
+> @@ -1602,7 +1597,7 @@ static int qca_regulator_init(struct hci_uart *hu)
+>  	 * off the voltage regulator.
+>  	 */
+>  	qcadev = serdev_device_get_drvdata(hu->serdev);
+> -	if (!qcadev->bt_power->vregs_on) {
+> +	if (!qcadev->vregs_on) {
+>  		serdev_device_close(hu->serdev);
+>  		ret = qca_regulator_enable(qcadev);
+>  		if (ret)
+> @@ -1945,20 +1940,19 @@ static int qca_power_off(struct hci_dev *hdev)
+>  
+>  static int qca_regulator_enable(struct qca_serdev *qcadev)
+>  {
+> -	struct qca_power *power = qcadev->bt_power;
+>  	int ret;
+>  
+>  	/* Already enabled */
+> -	if (power->vregs_on)
+> +	if (qcadev->vregs_on)
+>  		return 0;
+>  
+> -	BT_DBG("enabling %d regulators)", power->num_vregs);
+> +	BT_DBG("enabling %d regulators)", qcadev->num_vregs);
+>  
+> -	ret = regulator_bulk_enable(power->num_vregs, power->vreg_bulk);
+> +	ret = regulator_bulk_enable(qcadev->num_vregs, qcadev->vreg_bulk);
+>  	if (ret)
+>  		return ret;
+>  
+> -	power->vregs_on = true;
+> +	qcadev->vregs_on = true;
+>  
+>  	ret = clk_prepare_enable(qcadev->susclk);
+>  	if (ret)
+> @@ -1969,38 +1963,37 @@ static int qca_regulator_enable(struct qca_serdev *qcadev)
+>  
+>  static void qca_regulator_disable(struct qca_serdev *qcadev)
+>  {
+> -	struct qca_power *power;
+> -
+>  	if (!qcadev)
+>  		return;
+>  
+> -	power = qcadev->bt_power;
+> -
+>  	/* Already disabled? */
+> -	if (!power->vregs_on)
+> +	if (!qcadev->vregs_on)
+>  		return;
+>  
+> -	regulator_bulk_disable(power->num_vregs, power->vreg_bulk);
+> -	power->vregs_on = false;
+> +	regulator_bulk_disable(qcadev->num_vregs, qcadev->vreg_bulk);
+> +	qcadev->vregs_on = false;
+>  
+>  	clk_disable_unprepare(qcadev->susclk);
+>  }
+>  
+> -static int qca_init_regulators(struct qca_power *qca,
+> -				const struct qca_vreg *vregs, size_t num_vregs)
+> +static int qca_init_regulators(struct device *dev, struct qca_serdev *qca,
+> +			       const struct qca_vreg *vregs, size_t num_vregs)
+>  {
+>  	struct regulator_bulk_data *bulk;
+>  	int ret;
+>  	int i;
+>  
+> -	bulk = devm_kcalloc(qca->dev, num_vregs, sizeof(*bulk), GFP_KERNEL);
+> +	if (!num_vregs)
+> +		return 0;
+> +
+> +	bulk = devm_kcalloc(dev, num_vregs, sizeof(*bulk), GFP_KERNEL);
+>  	if (!bulk)
+>  		return -ENOMEM;
+>  
+>  	for (i = 0; i < num_vregs; i++)
+>  		bulk[i].supply = vregs[i].name;
+>  
+> -	ret = devm_regulator_bulk_get(qca->dev, num_vregs, bulk);
+> +	ret = devm_regulator_bulk_get(dev, num_vregs, bulk);
+>  	if (ret < 0)
+>  		return ret;
+>  
+> @@ -2044,21 +2037,15 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  	if ((qca_is_wcn399x(data->soc_type) ||
+>  	     qca_is_wcn6750(data->soc_type))) {
+>  		qcadev->btsoc_type = data->soc_type;
+> -		qcadev->bt_power = devm_kzalloc(&serdev->dev,
+> -						sizeof(struct qca_power),
+> -						GFP_KERNEL);
+> -		if (!qcadev->bt_power)
+> -			return -ENOMEM;
+> -
+> -		qcadev->bt_power->dev = &serdev->dev;
+> -		err = qca_init_regulators(qcadev->bt_power, data->vregs,
+> +
+> +		err = qca_init_regulators(&serdev->dev, qcadev, data->vregs,
+>  					  data->num_vregs);
+>  		if (err) {
+>  			BT_ERR("Failed to init regulators:%d", err);
+>  			return err;
+>  		}
+>  
+> -		qcadev->bt_power->vregs_on = false;
+> +		qcadev->vregs_on = false;
+>  
+>  		qcadev->bt_en = devm_gpiod_get_optional(&serdev->dev, "enable",
+>  					       GPIOD_OUT_LOW);
+> @@ -2139,11 +2126,10 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>  static void qca_serdev_remove(struct serdev_device *serdev)
+>  {
+>  	struct qca_serdev *qcadev = serdev_device_get_drvdata(serdev);
+> -	struct qca_power *power = qcadev->bt_power;
+>  
+>  	if ((qca_is_wcn399x(qcadev->btsoc_type) ||
+>  	     qca_is_wcn6750(qcadev->btsoc_type)) &&
+> -	     power->vregs_on)
+> +	     qcadev->vregs_on)
+>  		qca_power_shutdown(&qcadev->serdev_hu);
+>  	else if (qcadev->susclk)
+>  		clk_disable_unprepare(qcadev->susclk);
+> -- 
+> 2.30.2
+> 
