@@ -2,69 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-23.5 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5768FC07E9C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB524C07E9A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 41F2C613B2
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 86CC9613B2
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 07:13:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238267AbhGNHQo (ORCPT
+        id S238244AbhGNHQs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 03:16:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45534 "EHLO
+        Wed, 14 Jul 2021 03:16:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45562 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238264AbhGNHQo (ORCPT
+        with ESMTP id S238264AbhGNHQs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 03:16:44 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27A99C06175F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:52 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id 100-20020aed206d0000b029024ea3acef5bso1361041qta.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:52 -0700 (PDT)
+        Wed, 14 Jul 2021 03:16:48 -0400
+Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 674AFC06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:57 -0700 (PDT)
+Received: by mail-pg1-x549.google.com with SMTP id a6-20020a63e4060000b02902272a0052cdso865944pgi.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 00:13:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=XTdrZ0dJFn1DaDa3LqHGHs3jtPZhxu1jdfiB7BtKgFo=;
-        b=o7gIoRrnyXaH5I79tSNE/yWeSaLTBnVkThvhwXgKspB0bcJbBqSf7lmAqvuzVZHlK5
-         GLv4babRtNAlx+IBFYehVNkprisSBvFPg27fuKeFqWiuHg/S0uyWcQVnFcv6rqSZ3VY8
-         XyzGP1li9RxJwYX+X6aGYnnJRr/NthmMAFvPjdbyukGCIY78UP61luOLBbtxALhGW5Ob
-         6Dpw3yRc/YL4zSfqedHQ3b74fwy8C+u1Gjqys4AhsE9SXJ51qDrVJBeWHn4iRvQXEMx8
-         A5J8XxZkSkhFSxYumsZvuS2u4lNEwbSH6lql0Ma0jCHYAJiXZTS4U2K3DINovGizcOPJ
-         Bl+w==
+        bh=4VkQ1Iiul9IdyOdh2D5ZbpYEPyiXApvR1eCAJNvVrsM=;
+        b=dxNkLIPensbh7CpTTLhNxTKlMxa+tVRgW2IpfGuC2M0ke9N83F29aMXYvdgT++ZeKf
+         lPupsD+yhcXH83PTMl4NaZTdABK6AVCx2vXKVL0+2ZgfKsHQZiwYXLwx7Oik0k6QEj8T
+         QV8hDr8qAXLW0XQRgBl2/G606qPuLXe8B6cjBtpo1DzEu2RmMxFgJ3UsvMwTFd7gutlv
+         0lalDf1wwfId21Pqcka2HuExBj6t0RpqFNRSLn9cVikoPQrhdID8PPPXgFKpggfGwOK4
+         TQ4xQ1Zzdu4jpj4SfHkybrYW51juhWWRtgm4R7k5dW1zghvnKg0GDMrbN3D8EWMsWgsr
+         6jJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=XTdrZ0dJFn1DaDa3LqHGHs3jtPZhxu1jdfiB7BtKgFo=;
-        b=fdM12Y3BNKq617nAiZ+S/KX3Bx6Do2NLAV7dPr2qBLC3zJOokqChrouaPCsESqLBYs
-         ENd3y78qW7M2dXs1OwAXp759b/PzbGe0k7eOVLstOvKCOjQw2henRvIiBXEMIoeVguZF
-         ZJS4NmES60uarP9GxQeS5NYtT6goeYrMtcKJBWw1MVhlzyPmv6dqzc7n9zh0IGyORgH4
-         fq4ubXSudxVsIyy4cQuX81yepWBC2iCH/yzK+qjzYtcrhKdRfbC4xnWrOBp5zL+n8C92
-         Koc9RTqY9LO6YlhhTwgUiADbzPA+6hdSMVhI3/RQfAC+HN2s26mWsqv6qBtmgX0UN+GC
-         kh8A==
-X-Gm-Message-State: AOAM531Lf1nEzmsXKEgQtLJLLVMU+UV55tqOh4FlZH0xoC4/G7amIHZW
-        eLuBvyU4JjigLWczbZRLfC0TxgtHJRT3NQzI3HSbzrv7VqNI5tIiD1AQFsJZP8lZA+aMscd0YS3
-        I/Dfid123aF6dIPwoxxJSC5syyxfhFcFKrBtTHU9r6uRvUOznuxnJXx3l9693SEoFOuG4/e3a2q
-        KI
-X-Google-Smtp-Source: ABdhPJy8p7BkWUFja6u2+iuoz5FX+Add8fSQBRbgL/BXdoPiti4032Scw6UwbWF2CwpEaJWyZ07HJyMAkJr+
+        bh=4VkQ1Iiul9IdyOdh2D5ZbpYEPyiXApvR1eCAJNvVrsM=;
+        b=lVfn44uc+2C/QL4fQSvjGTM6W0fESCJAOaAkuqB25mYUAewT1adsPBIXlaw26lU8hX
+         z7lRu1gQeyMwkEaJcGkiveVhv6nbZ3mrkqt99jMlVlSmdZ03HNiPFa+Ewbrxwr1ytDYQ
+         7dfkgAlgJtNsYV9v5bU3ZhUD/GTktGwkbJMdoet/ov3sbdj2kDCk8ZQNRbjLCon1Zuq/
+         HY3BtwopoZreu9wsWg1e1uL9Ph6w3xw5/mvvOsCdzJ61LJ6Ev0+Q2cXxyqCZrQ/McGJ2
+         yCXSFzkrdff5EXhBtW1YVPqg+mDnoRHqnJi9QrHXUDa0h7VKUyPtRRdhEW52pk/LKCFR
+         oH5w==
+X-Gm-Message-State: AOAM532ciwJxk2M8oLPp7GrgRl73pfjNBHlOGIlmX+pqOoVP/k1spu3u
+        M6Npfr6MymuyQs7MNV2e3tssRfXXcln58IoOhS7HRsLR/Fs3CbGNij1bJfbMclD1vi+zpT4JpEY
+        im4jIV8r42lA4N+c4G2xLjw4AsPfI5Jlihwv2l8mVSjWnXuT4oa2GVeJCpsMwX6pW6iGu9rHyib
+        Tu
+X-Google-Smtp-Source: ABdhPJx4joST/q+l0Tth0jRspoxkgMhbzuHImZ6dAlxfN1Ug6/UIMqXCbd5quC1pkIjexHXeIAe2JqP0C20E
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:ecf5:ef03:eb15:e989])
- (user=apusaka job=sendgmr) by 2002:a05:6214:e6e:: with SMTP id
- jz14mr9102781qvb.55.1626246831175; Wed, 14 Jul 2021 00:13:51 -0700 (PDT)
-Date:   Wed, 14 Jul 2021 15:13:39 +0800
+ (user=apusaka job=sendgmr) by 2002:a17:90a:a393:: with SMTP id
+ x19mr289600pjp.1.1626246836513; Wed, 14 Jul 2021 00:13:56 -0700 (PDT)
+Date:   Wed, 14 Jul 2021 15:13:40 +0800
 In-Reply-To: <20210714151332.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
-Message-Id: <20210714151332.2.I404c6df9cdab270223c13e867396f440dd4b499d@changeid>
+Message-Id: <20210714151332.3.I4b323d2adf1dca62777c41de344a7d2f79b7f908@changeid>
 Mime-Version: 1.0
 References: <20210714151332.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
-Subject: [PATCH 2/3] Bluetooth: hci_h5: btrtl: Maintain flow control if wakeup
- is enabled
+Subject: [PATCH 3/3] Bluetooth: hci_h5: Add runtime suspend
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>
@@ -82,10 +81,8 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-For chips that doesn't reset on suspend, we need to provide the correct
-value of flow_control when it resumes. Therefore, store the flow
-control value when reading from the config file to be reused upon
-suspend.
+This patch allows the controller to suspend after a short period of
+inactivity.
 
 Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
@@ -93,43 +90,82 @@ Reviewed-by: Hilda Wu <hildawu@realtek.com>
 
 ---
 
- drivers/bluetooth/hci_h5.c | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ drivers/bluetooth/hci_h5.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
 diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-index 947246569434..67fcf192d5c5 100644
+index 67fcf192d5c5..41039cadd6f8 100644
 --- a/drivers/bluetooth/hci_h5.c
 +++ b/drivers/bluetooth/hci_h5.c
-@@ -54,6 +54,7 @@ enum {
- 	H5_RX_ESC,		/* SLIP escape mode */
- 	H5_TX_ACK_REQ,		/* Pending ack to send */
- 	H5_WAKEUP_DISABLE,	/* Device cannot wake host */
-+	H5_HW_FLOW_CONTROL,	/* Use HW flow control */
- };
+@@ -11,6 +11,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+ #include <linux/mod_devicetable.h>
++#include <linux/pm_runtime.h>
+ #include <linux/of_device.h>
+ #include <linux/serdev.h>
+ #include <linux/skbuff.h>
+@@ -21,6 +22,8 @@
+ #include "btrtl.h"
+ #include "hci_uart.h"
  
- struct h5 {
-@@ -923,6 +924,9 @@ static int h5_btrtl_setup(struct h5 *h5)
- 	serdev_device_set_baudrate(h5->hu->serdev, controller_baudrate);
- 	serdev_device_set_flow_control(h5->hu->serdev, flow_control);
++#define SUSPEND_TIMEOUT_MS	6000
++
+ #define HCI_3WIRE_ACK_PKT	0
+ #define HCI_3WIRE_LINK_PKT	15
  
-+	if (flow_control)
-+		set_bit(H5_HW_FLOW_CONTROL, &h5->flags);
-+
- 	err = btrtl_download_firmware(h5->hu->hdev, btrtl_dev);
- 	/* Give the device some time before the hci-core sends it a reset */
- 	usleep_range(10000, 20000);
-@@ -1015,7 +1019,11 @@ static int h5_btrtl_resume(struct h5 *h5)
- 		queue_work(system_long_wq, &reprobe->work);
- 	} else {
- 		gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
-+
-+		if (test_bit(H5_HW_FLOW_CONTROL, &h5->flags))
-+			serdev_device_set_flow_control(h5->hu->serdev, true);
+@@ -584,6 +587,10 @@ static int h5_recv(struct hci_uart *hu, const void *data, int count)
+ 		count -= processed;
  	}
+ 
++	pm_runtime_get(&hu->serdev->dev);
++	pm_runtime_mark_last_busy(&hu->serdev->dev);
++	pm_runtime_put_autosuspend(&hu->serdev->dev);
 +
  	return 0;
  }
  
+@@ -620,6 +627,10 @@ static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+ 		break;
+ 	}
+ 
++	pm_runtime_get_sync(&hu->serdev->dev);
++	pm_runtime_mark_last_busy(&hu->serdev->dev);
++	pm_runtime_put_autosuspend(&hu->serdev->dev);
++
+ 	return 0;
+ }
+ 
+@@ -954,6 +965,12 @@ static void h5_btrtl_open(struct h5 *h5)
+ 	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
+ 	serdev_device_set_baudrate(h5->hu->serdev, 115200);
+ 
++	pm_runtime_set_active(&h5->hu->serdev->dev);
++	pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
++	pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
++					 SUSPEND_TIMEOUT_MS);
++	pm_runtime_enable(&h5->hu->serdev->dev);
++
+ 	/* The controller needs up to 500ms to wakeup */
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 1);
+ 	gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
+@@ -962,6 +979,8 @@ static void h5_btrtl_open(struct h5 *h5)
+ 
+ static void h5_btrtl_close(struct h5 *h5)
+ {
++	pm_runtime_disable(&h5->hu->serdev->dev);
++
+ 	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
+ }
+@@ -1069,6 +1088,7 @@ MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
+ 
+ static const struct dev_pm_ops h5_serdev_pm_ops = {
+ 	SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
++	SET_RUNTIME_PM_OPS(h5_serdev_suspend, h5_serdev_resume, NULL)
+ };
+ 
+ static const struct of_device_id rtl_bluetooth_of_match[] = {
 -- 
 2.32.0.93.g670b81a890-goog
 
