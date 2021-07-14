@@ -2,746 +2,787 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7AAF3C12002
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 22:06:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 41356C12002
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 22:22:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5E058613A9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 22:06:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2D575613D0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 22:22:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236460AbhGNWJp (ORCPT
+        id S236898AbhGNWYy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 18:09:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55962 "EHLO
+        Wed, 14 Jul 2021 18:24:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59406 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229750AbhGNWJo (ORCPT
+        with ESMTP id S235314AbhGNWYy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 18:09:44 -0400
-Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2642C06175F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 15:06:52 -0700 (PDT)
-Received: by mail-yb1-xb2f.google.com with SMTP id o139so5669467ybg.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 15:06:52 -0700 (PDT)
+        Wed, 14 Jul 2021 18:24:54 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E579C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 15:22:01 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id r135so5825081ybc.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 15:22:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=8O2pLSDKciccqS2aitFp5idRscWLeYM/gQYwT8HGu08=;
-        b=FS8D3L536K/s84AMngF0IY7r3Ga9VKSpBilljrp7K82qZAfZcIRLezaTVEUCjho/gy
-         oRP2qLlkj0biirmrPEC4rykk5TqBtRdUKT4oP63cTfHDhlNtqXwxOJEi/YeFw2QI0Wo+
-         7CtmVYkFu2azirh2gW2WaPWKzf2lWYYISR/NmsqYNn2HTW38de7cdJlf62S8E7ds1uvr
-         BXWqOqYU2OQ1roCwZ6r5u5hWjtCuA1HizusddM1aHhNm17K3IjmaIv69So95CRLa1ay8
-         nAnpvTb73vCfYEz6VxXp6kw8sigOghY2jR+/q3KgnpMSbGm62ezXFLYB5k69qWSTjORY
-         digA==
+         :cc;
+        bh=ubH4QXynH60wV8+GThzA2EwahTi6KaZw8WS4RxDuZR0=;
+        b=P8BtaSvXl6BktKhOFBEi+MXzAMG+Y+VyBi8M9g9LnrFBRVEI5Hb3Jo7RYw2aoASIiv
+         XrDeOY4xiWER8D9kBvGDD4+S9GtZkAGHsKTCXNfVsYsGpAG997WhqAMJTl0R59o6q/B8
+         nzJQP6ZDQaGieXXw2MMEEzB26eTwrNJx0z6KzkKZ2F9pn4GdLjtVILi702cndehKhwXn
+         Zzx03FQmIZL7aWURWZCYbQeX+HORHZ305gYZCWI5ViPb7pkksMXD9chGEWxvnIdXtIDS
+         pY1/RlE6/BBHz8q2UXst+yKEGKhK/FU19I1I4jKdF/pPkFDrLVeiTAnn5MYsjqpxeHSd
+         5DbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8O2pLSDKciccqS2aitFp5idRscWLeYM/gQYwT8HGu08=;
-        b=Lsf0w4Iwy1ILYGjryNFXSpAKYPUrPbOR22C4tkbsEgTXHCTrdz9JxguUqSOIIQD5+1
-         fctlkOm4FAHM8hruPzgAV1TuA7VvBZDTq8Ptw75hOf53IifLBXN+VWKGaHsCEWp0svmS
-         0nW+SBxf9Fynk0FRqlS2Ph+Ha+WkfjJNEwTXZW3cDWxgotSFDqOdpsrUGtylMuWuiP9Y
-         JdeeBxaO/XV+OxhIR3/J0lmhulfM1KwtgBAq4J+CD14k+N6+Jnzd/INv6gVROn+erf48
-         zoK8oFtMNYTu08C3fxj0sVU7PMt+Rf2Bc6dWePE9FU/jhjEMY4Ii+xHV1R0fezOwbYs1
-         myCA==
-X-Gm-Message-State: AOAM531Bo+BfwQw6wKdYKFcaiDrLWZoSZTcpuydsbU0OzSOgdM9Hm0zj
-        kamvWklLE53cIuHLPtQf5/E6+ZpwXGuSPmE5kxc=
-X-Google-Smtp-Source: ABdhPJwxR8EgfYEjUq1L/xp0RVQy9rPW6gkBiyiWmlD3sfLf63AAqK1OhfG4PJv0sIfTP9CTzBeprmzSjK/c57guAWE=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr204678ybk.91.1626300411965;
- Wed, 14 Jul 2021 15:06:51 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=ubH4QXynH60wV8+GThzA2EwahTi6KaZw8WS4RxDuZR0=;
+        b=OV75dZ+ZiDViGNfiMTYZyBUMq6GkXIp5A+nBOPiXUF/I9sbkV4Uf90qNxPvtGz4jEt
+         BEXQFvwwZjpI1osWSpSJu7PlW4N0qauWpTeneAHm6Fy78l++yCV5jJweRgFZJJiKSLP6
+         Zkx5EMp44iLu2Nxpqf3L5JLgU7ICEF8rdQSnJarjiH/6kxrgay/xxUWUiBmvHYYwBhjM
+         Ilo/soHAiLMz+iKdgLWjY7lyAYUTS5W5CMwkudiAHXayoAFT6nm47mtzXPZj9OanBmZz
+         aYAnxopD4aANGeH3+EzFAGLb1fnbmMpkfI5uv/dq3spDp4g5WaBEJ/eIMhZdujUgMV6q
+         Sv1Q==
+X-Gm-Message-State: AOAM533Cfn2WM0v2RStHppCu89tg3UYXlqxR9jG2IGEiAUNl67mTwH0W
+        tmbK5odmXwDgOVfUWk1JAEwqMaKRrbzXFdRBcNQ=
+X-Google-Smtp-Source: ABdhPJyE8p2/uhnEeEjy0lRqLDYI008FpesVWCuPHywHtdyFPj55Usd8IPrjdOBBc/dOIk1pMB4tlArlFwZfu+7Y1n8=
+X-Received: by 2002:a25:8205:: with SMTP id q5mr284002ybk.440.1626301320469;
+ Wed, 14 Jul 2021 15:22:00 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210626052152.2543526-1-mcchou@chromium.org> <20210625222111.BlueZ.v2.1.If79c3f0720cc893be1770c6853fe2fbe626f2caa@changeid>
- <086ED9D7-96E6-46AB-88B6-F2E71ACD1B15@holtmann.org> <CABmPvSHyt0LfMRJeaWzEMUZZNGnnNnZTnw_0iU4CyxQMd8jy1w@mail.gmail.com>
-In-Reply-To: <CABmPvSHyt0LfMRJeaWzEMUZZNGnnNnZTnw_0iU4CyxQMd8jy1w@mail.gmail.com>
+References: <20210629154652.BlueZ.v5.1.I832f2d744fe2cff0d9749e24c9ec27071fa0b4ed@changeid>
+ <CAHFy41_eMG+YdkD7O6DhJ4xX_8uxHdh1huy4Wg-Nu7tr3tVFcA@mail.gmail.com>
+In-Reply-To: <CAHFy41_eMG+YdkD7O6DhJ4xX_8uxHdh1huy4Wg-Nu7tr3tVFcA@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 14 Jul 2021 15:06:41 -0700
-Message-ID: <CABBYNZJgK_vo2QyvA7Sy+8Hd3uUh59Dz6gBQYLjVL6y6tvSo8A@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v2 1/3] error: BR/EDR and LE connection failure reasons
-To:     Miao-chen Chou <mcchou@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Bluetooth Kernel Mailing List 
-        <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Howard Chung <howardchung@google.com>
+Date:   Wed, 14 Jul 2021 15:21:49 -0700
+Message-ID: <CABBYNZJ5YHCSiE+-oLHgS0OV2GVxKgQi1c+QxRaJxxbL3+k3hA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v5 1/3] monitor: add new Intel extended telemetry events
+To:     Joseph Hwang <josephsih@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Miao,
+Hi Joseph,
 
-On Wed, Jul 14, 2021 at 2:13 PM Miao-chen Chou <mcchou@chromium.org> wrote:
+On Mon, Jul 12, 2021 at 7:08 PM Joseph Hwang <josephsih@google.com> wrote:
 >
-> On Fri, Jun 25, 2021 at 10:39 PM Marcel Holtmann <marcel@holtmann.org> wr=
-ote:
-> >
-> > Hi Miao-chen,
-> >
-> > > The source of Connect() failures can be divided into the following
-> > > three.
-> > > - bluetoothd's device interface state transition and profile state
-> > >  transition
-> > > - Kernel's L2CAP layer state transition
-> > > - Potential HCI error codes returned by the remote device
-> > >
-> > > This also added error-code.txt to describe these error codes.
-> > >
-> > > Reviewed-by: Alain Michaud <alainm@chromium.org>
-> > > Reviewed-by: Howard Chung <howardchung@google.com>
-> > > ---
-> > >
-> > > Changes in v2:
-> > > - Add error-code.txt
-> > > - Remove BtdError from return string
-> > >
-> > > doc/error-code.txt | 266 ++++++++++++++++++++++++++++++++++++++++++++=
-+
-> > > src/error.c        | 111 +++++++++++++++++++
-> > > src/error.h        |  52 +++++++++
-> > > 3 files changed, 429 insertions(+)
-> > > create mode 100644 doc/error-code.txt
-> >
-> > please split documentation and code changes into separate patches.
-> >
-> >
-> > >
-> > > diff --git a/doc/error-code.txt b/doc/error-code.txt
-> > > new file mode 100644
-> > > index 000000000..e91324855
-> > > --- /dev/null
-> > > +++ b/doc/error-code.txt
-> > > @@ -0,0 +1,266 @@
-> > > +D-Bus Method Return Error Codes
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +
-> > > +The motivation of having detailed error codes is to provide context-=
-based
-> > > +failure reasons along with D-Bus method return so that D-Bus clients=
- can
-> > > +build metrics and optimize their application based on these failure =
-reasons.
-> > > +For instance, a client can build retry mechanism for a connection fa=
-ilure or
-> > > +improve the bottleneck of use scenario based on actionable metrics.
-> > > +
-> > > +These error codes are context-based but not necessarily tied to inte=
-rface or
-> > > +method calls. For instance, if a pairing request failed due to conne=
-ction
-> > > +failure, connection error would be attached to the method return of =
-Pair().
-> > > +
-> > > +BR/EDR connection already connected
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0001
-> > > +     errno:  EALREADY, EISCONN
-> >
-> > I would rather see connnection-already-connected instead of 0x0001 in t=
-he D-Bus error message.
-> Having a code attached instead of a string description makes it easier
-> for a D-Bus client to interpret and map to corresponding handlers IMO.
-> For instead, a client can simplily use the code in a switch case to
-> perform retry or error reporting.
+> Hi Luiz:
+>
+>   A gentle ping for a re-review on the new changes per your previous comments.
 
-Well you first need to decode it since the error message is still a
-string, but I would have to agree that doing things like strcmp for
-the error message might be more error prone than extracting the error
-code since the former is more likely to change, the weird thing is
-that D-Bus seems to allow passing more than just a error message
-(https://dbus.freedesktop.org/doc/dbus-specification.html):
+Ive left comments to patch 2/3 and 3/3 that still haven't been addressed:
 
- 'Errors
+2/3: We need to new UUID to be added to util.c like the rest of
+experimental UUIDs:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/shared/util.c#n1023
 
- Messages of type ERROR are most commonly replies to a METHOD_CALL,
-but may be returned in reply to any kind of message. The message bus
-for example will return an ERROR in reply to a signal emission if the
-bus does not have enough memory to send the signal.
+3/3: Instead of having a function that doesn't seem to be used
+anywhere it would probably be easier to enable whenever
+btd_opts.experimental is enable e.g.:
+https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/adapter.c#n9293
 
- An ERROR may have any arguments, but if the first argument is a
-STRING, it must be an error message. The error message may be logged
-or shown to the user in some way.'
+> Thanks and best regards,
+> Joseph
+>
+>
+> On Tue, Jun 29, 2021 at 3:47 PM Joseph Hwang <josephsih@chromium.org> wrote:
+> >
+> > This patch adds new Intel extended telemetry events for both ACL and
+> > SCO/eSCO audio link quality reports.
+> >
+> > For SCO/eSCO audio link quality report, it shows something like
+> > > HCI Event: Vendor (0xff) plen 190  #120 [hci0] 2021-05-31 20:27:50.257
+> >         Vendor Prefix (0x8780)
+> >       Intel Extended Telemetry (0x87)
+> >         Extended Telemetry (0x80): SubOpcode (0x03)
+> >         Extended event type (0x01): Audio Link Quality Report Type(0x05)
+> >         SCO/eSCO connection handle (0x6a): 0x0101
+> >         Packets from host (0x6b): 399
+> >         Tx packets (0x6c): 403
+> >         Rx payload lost (0x6d): 3
+> >         Tx payload lost (0x6e): 0
+> >         Rx No SYNC errors (0x6f): 3 2 3 3 0
+> >         Rx HEC errors (0x70): 0 0 0 0 0
+> >         Rx CRC errors (0x71): 2 0 0 0 0
+> >         Rx NAK errors (0x72): 6 0 0 0 0
+> >         Failed Tx due to Wifi coex (0x73): 6 0 0 0 0
+> >         Failed Rx due to Wifi coex (0x74): 0 0 0 0 0
+> >         Late samples inserted based on CDC (0x75): 0
+> >         Samples dropped (0x76): 0
+> >         Mute samples sent at initial connection (0x77): 0
+> >         PLC injection data (0x78): 0
+> >
+> > For ACL audio link quality report, it shows something like
+> > > HCI Event: Vendor (0xff) plen 142  #120 [hci0] 2021-05-31 20:27:50.261
+> >         Vendor Prefix (0x8780)
+> >       Intel Extended Telemetry (0x87)
+> >         Extended Telemetry (0x80): SubOpcode (0x03)
+> >         Extended event type (0x01): Audio Link Quality Report Type(0x05)
+> >         ACL connection handle (0x4a): 0x0100
+> >         Rx HEC errors (0x4b): 0
+> >         Rx CRC errors (0x4c): 0
+> >         Packets from host (0x4d): 100
+> >         Tx packets (0x4e): 101
+> >         Tx packets 0 retries (0x4f): 89
+> >         Tx packets 1 retries (0x50): 11
+> >         Tx packets 2 retries (0x51): 1
+> >         Tx packets 3 retries (0x52): 0
+> >         Tx packets 4 retries and more (0x53): 0
+> >         Tx DH1 packets (0x54): 0
+> >         Tx DH3 packets (0x55): 0
+> >         Tx DH5 packets (0x56): 0
+> >         Tx 2DH1 packets (0x57): 0
+> >         Tx 2DH3 packets (0x58): 0
+> >         Tx 2DH5 packets (0x59): 0
+> >         Tx 3DH1 packets (0x5a): 6
+> >         Tx 3DH3 packets (0x5b): 0
+> >         Tx 3DH5 packets (0x5c): 94
+> >         Rx packets (0x5d): 272
+> >         ACL link throughput (KBps) (0x5e): 343815
+> >         ACL max packet latency (ms) (0x5f): 20625
+> >         ACL avg packet latency (ms) (0x60): 12
+> >
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > ---
+> >
+> > Changes in v5:
+> > - Fix two Make errors.
+> > - Please also review Series-changes 3.
+> >
+> > Changes in v4:
+> > - Fix a Make error.
+> > - Please also review Series-changes 3.
+> >
+> > Changes in v3:
+> > - Define the packed struct intel_ext_evt for the extended telemetry
+> >   event.
+> > - Define the packed struct intel_tlv for the telemetry subevent.
+> > - Define a new function intel_vendor_prefix_evt() to handle the new
+> >   vendor event type with a vendor prefix
+> >       0xff <length> <vendor_prefix> <subopcode> <data>
+> >   while intel_vendor_evt() handles the original vendor event type
+> >       0xff <length> <subopcode> <data>
+> > - Add the vendor_prefix_evt_table table so that more subopcodes can be
+> >   added for the events with a vendor prefix.
+> > - Move the event data buffer check after processing the current tlv.
+> > - Fix typos.
+> >
+> > Changes in v2:
+> > - Perform size checks for tlv subevents.
+> > - Fix the Make errors about qualifiers.
+> >
+> >  monitor/intel.c  | 492 ++++++++++++++++++++++++++++++++++++++++++++++-
+> >  monitor/intel.h  |   2 +-
+> >  monitor/packet.c |  18 +-
+> >  3 files changed, 503 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/monitor/intel.c b/monitor/intel.c
+> > index d2aefa6a8..7591df4ee 100644
+> > --- a/monitor/intel.c
+> > +++ b/monitor/intel.c
+> > @@ -30,6 +30,7 @@
+> >
+> >  #define COLOR_UNKNOWN_EVENT_MASK       COLOR_WHITE_BG
+> >  #define COLOR_UNKNOWN_SCAN_STATUS      COLOR_WHITE_BG
+> > +#define COLOR_UNKNOWN_EXT_EVENT                COLOR_WHITE_BG
+> >
+> >  static void print_status(uint8_t status)
+> >  {
+> > @@ -992,14 +993,501 @@ static const struct vendor_evt vendor_evt_table[] = {
+> >         { }
+> >  };
+> >
+> > -const struct vendor_evt *intel_vendor_evt(uint8_t evt)
+> > +/*
+> > + * An Intel telemetry subevent is of the TLV format.
+> > + * - Type: takes 1 byte. This is the subevent_id.
+> > + * - Length: takes 1 byte.
+> > + * - Value: takes |Length| bytes.
+> > + */
+> > +struct intel_tlv {
+> > +       uint8_t subevent_id;
+> > +       uint8_t length;
+> > +       uint8_t value[];
+> > +};
+> > +
+> > +#define TLV_SIZE(tlv) (*((const uint8_t *) tlv + 1) + 2 * sizeof(uint8_t))
+> > +#define NEXT_TLV(tlv) (const struct intel_tlv *) \
+> > +                                       ((const uint8_t *) tlv + TLV_SIZE(tlv))
+> > +
+> > +static void ext_evt_type(const struct intel_tlv *tlv)
+> > +{
+> > +       uint8_t evt_type = get_u8(tlv->value);
+> > +       const char *str;
+> > +
+> > +       switch (evt_type) {
+> > +       case 0x00:
+> > +               str = "System Exception";
+> > +               break;
+> > +       case 0x01:
+> > +               str = "Fatal Exception";
+> > +               break;
+> > +       case 0x02:
+> > +               str = "Debug Exception";
+> > +               break;
+> > +       case 0x03:
+> > +               str = "Connection Event for BR/EDR Link Type";
+> > +               break;
+> > +       case 0x04:
+> > +               str = "Disconnection Event";
+> > +               break;
+> > +       case 0x05:
+> > +               str = "Audio Link Quality Report Type";
+> > +               break;
+> > +       case 0x06:
+> > +               str = "Stats for BR/EDR Link Type";
+> > +               break;
+> > +       default:
+> > +               print_text(COLOR_UNKNOWN_EXT_EVENT,
+> > +                       "Unknown extended telemetry event type (0x%2.2x)",
+> > +                       evt_type);
+> > +               packet_hexdump((const void *) tlv,
+> > +                                       tlv->length + 2 * sizeof(uint8_t));
+> > +               return;
+> > +       }
+> > +
+> > +       print_field("Extended event type (0x%2.2x): %s (0x%2.2x)",
+> > +                       tlv->subevent_id, str, evt_type);
+> > +}
+> > +
+> > +static void ext_acl_evt_conn_handle(const struct intel_tlv *tlv)
+> > +{
+> > +       uint16_t conn_handle = get_le16(tlv->value);
+> > +
+> > +       print_field("ACL connection handle (0x%2.2x): 0x%4.4x",
+> > +                       tlv->subevent_id, conn_handle);
+> > +}
+> > +
+> > +static void ext_acl_evt_hec_errors(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Rx HEC errors (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_crc_errors(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Rx CRC errors (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_num_pkt_from_host(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Packets from host (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_num_tx_pkt_to_air(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Tx packets (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_num_tx_pkt_retry(const struct intel_tlv *tlv)
+> > +{
+> > +       char *subevent_str;
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       switch (tlv->subevent_id) {
+> > +       case 0x4f:
+> > +               subevent_str = "Tx packets 0 retries";
+> > +               break;
+> > +       case 0x50:
+> > +               subevent_str = "Tx packets 1 retries";
+> > +               break;
+> > +       case 0x51:
+> > +               subevent_str = "Tx packets 2 retries";
+> > +               break;
+> > +       case 0x52:
+> > +               subevent_str = "Tx packets 3 retries";
+> > +               break;
+> > +       case 0x53:
+> > +               subevent_str = "Tx packets 4 retries and more";
+> > +               break;
+> > +       default:
+> > +               subevent_str = "Unknown";
+> > +               break;
+> > +       }
+> > +
+> > +       print_field("%s (0x%2.2x): %d", subevent_str, tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_num_tx_pkt_type(const struct intel_tlv *tlv)
+> > +{
+> > +       char *packet_type_str;
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       switch (tlv->subevent_id) {
+> > +       case 0x54:
+> > +               packet_type_str = "DH1";
+> > +               break;
+> > +       case 0x55:
+> > +               packet_type_str = "DH3";
+> > +               break;
+> > +       case 0x56:
+> > +               packet_type_str = "DH5";
+> > +               break;
+> > +       case 0x57:
+> > +               packet_type_str = "2DH1";
+> > +               break;
+> > +       case 0x58:
+> > +               packet_type_str = "2DH3";
+> > +               break;
+> > +       case 0x59:
+> > +               packet_type_str = "2DH5";
+> > +               break;
+> > +       case 0x5a:
+> > +               packet_type_str = "3DH1";
+> > +               break;
+> > +       case 0x5b:
+> > +               packet_type_str = "3DH3";
+> > +               break;
+> > +       case 0x5c:
+> > +               packet_type_str = "3DH5";
+> > +               break;
+> > +       default:
+> > +               packet_type_str = "Unknown";
+> > +               break;
+> > +       }
+> > +
+> > +       print_field("Tx %s packets (0x%2.2x): %d",
+> > +                       packet_type_str, tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_num_rx_pkt_from_air(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Rx packets (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_link_throughput(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("ACL link throughput (KBps) (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_max_packet_latency(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("ACL max packet latency (ms) (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_acl_evt_avg_packet_latency(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("ACL avg packet latency (ms) (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_conn_handle(const struct intel_tlv *tlv)
+> > +{
+> > +       uint16_t conn_handle = get_le16(tlv->value);
+> > +
+> > +       print_field("SCO/eSCO connection handle (0x%2.2x): 0x%4.4x",
+> > +                       tlv->subevent_id, conn_handle);
+> > +}
+> > +
+> > +static void ext_sco_evt_num_rx_pkt_from_air(const struct intel_tlv *tlv)
+> >  {
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Packets from host (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_num_tx_pkt_to_air(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Tx packets (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_num_rx_payloads_lost(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Rx payload lost (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_num_tx_payloads_lost(const struct intel_tlv *tlv)
+> > +{
+> > +
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Tx payload lost (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void slots_errors(const struct intel_tlv *tlv, const char *type_str)
+> > +{
+> > +       /* The subevent has 5 slots where each slot is of the uint32_t type. */
+> > +       uint32_t num[5];
+> > +       const uint8_t *data = tlv->value;
+> > +       int i;
+> > +
+> > +       if (tlv->length != 5 * sizeof(uint32_t)) {
+> > +               print_text(COLOR_UNKNOWN_EXT_EVENT,
+> > +                               "  Invalid subevent length (%d)", tlv->length);
+> > +               return;
+> > +       }
+> > +
+> > +       for (i = 0; i < 5; i++) {
+> > +               num[i] = get_le32(data);
+> > +               data += sizeof(uint32_t);
+> > +       }
+> > +
+> > +       print_field("%s (0x%2.2x): %d %d %d %d %d", type_str, tlv->subevent_id,
+> > +                       num[0], num[1], num[2], num[3], num[4]);
+> > +}
+> > +
+> > +static void ext_sco_evt_num_no_sync_errors(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Rx No SYNC errors");
+> > +}
+> > +
+> > +static void ext_sco_evt_num_hec_errors(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Rx HEC errors");
+> > +}
+> > +
+> > +static void ext_sco_evt_num_crc_errors(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Rx CRC errors");
+> > +}
+> > +
+> > +static void ext_sco_evt_num_naks(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Rx NAK errors");
+> > +}
+> > +
+> > +static void ext_sco_evt_num_failed_tx_by_wifi(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Failed Tx due to Wifi coex");
+> > +}
+> > +
+> > +static void ext_sco_evt_num_failed_rx_by_wifi(const struct intel_tlv *tlv)
+> > +{
+> > +       slots_errors(tlv, "Failed Rx due to Wifi coex");
+> > +}
+> > +
+> > +static void ext_sco_evt_samples_inserted(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Late samples inserted based on CDC (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_samples_dropped(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Samples dropped (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_mute_samples(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("Mute samples sent at initial connection (0x%2.2x): %d",
+> > +                       tlv->subevent_id, num);
+> > +}
+> > +
+> > +static void ext_sco_evt_plc_injection_data(const struct intel_tlv *tlv)
+> > +{
+> > +       uint32_t num = get_le32(tlv->value);
+> > +
+> > +       print_field("PLC injection data (0x%2.2x): %d", tlv->subevent_id, num);
+> > +}
+> > +
+> > +static const struct intel_ext_subevent {
+> > +       uint8_t subevent_id;
+> > +       uint8_t length;
+> > +       void (*func)(const struct intel_tlv *tlv);
+> > +} intel_ext_subevent_table[] = {
+> > +       { 0x01, 1, ext_evt_type },
+> > +
+> > +       /* ACL audio link quality subevents */
+> > +       { 0x4a, 2, ext_acl_evt_conn_handle },
+> > +       { 0x4b, 4, ext_acl_evt_hec_errors },
+> > +       { 0x4c, 4, ext_acl_evt_crc_errors },
+> > +       { 0x4d, 4, ext_acl_evt_num_pkt_from_host },
+> > +       { 0x4e, 4, ext_acl_evt_num_tx_pkt_to_air },
+> > +       { 0x4f, 4, ext_acl_evt_num_tx_pkt_retry },
+> > +       { 0x50, 4, ext_acl_evt_num_tx_pkt_retry },
+> > +       { 0x51, 4, ext_acl_evt_num_tx_pkt_retry },
+> > +       { 0x52, 4, ext_acl_evt_num_tx_pkt_retry },
+> > +       { 0x53, 4, ext_acl_evt_num_tx_pkt_retry },
+> > +       { 0x54, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x55, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x56, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x57, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x58, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x59, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x5a, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x5b, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x5c, 4, ext_acl_evt_num_tx_pkt_type },
+> > +       { 0x5d, 4, ext_acl_evt_num_rx_pkt_from_air },
+> > +       { 0x5e, 4, ext_acl_evt_link_throughput },
+> > +       { 0x5f, 4, ext_acl_evt_max_packet_latency },
+> > +       { 0x60, 4, ext_acl_evt_avg_packet_latency },
+> > +
+> > +       /* SCO/eSCO audio link quality subevents */
+> > +       { 0x6a, 2, ext_sco_evt_conn_handle },
+> > +       { 0x6b, 4, ext_sco_evt_num_rx_pkt_from_air },
+> > +       { 0x6c, 4, ext_sco_evt_num_tx_pkt_to_air },
+> > +       { 0x6d, 4, ext_sco_evt_num_rx_payloads_lost },
+> > +       { 0x6e, 4, ext_sco_evt_num_tx_payloads_lost },
+> > +       { 0x6f, 20, ext_sco_evt_num_no_sync_errors },
+> > +       { 0x70, 20, ext_sco_evt_num_hec_errors },
+> > +       { 0x71, 20, ext_sco_evt_num_crc_errors },
+> > +       { 0x72, 20, ext_sco_evt_num_naks },
+> > +       { 0x73, 20, ext_sco_evt_num_failed_tx_by_wifi },
+> > +       { 0x74, 20, ext_sco_evt_num_failed_rx_by_wifi },
+> > +       { 0x75, 4, ext_sco_evt_samples_inserted },
+> > +       { 0x76, 4, ext_sco_evt_samples_dropped },
+> > +       { 0x77, 4, ext_sco_evt_mute_samples },
+> > +       { 0x78, 4, ext_sco_evt_plc_injection_data },
+> > +
+> > +       /* end */
+> > +       { 0x0, 0}
+> > +};
+> > +
+> > +static const struct intel_tlv *process_ext_subevent(const struct intel_tlv *tlv,
+> > +                                       const struct intel_tlv *last_tlv)
+> > +{
+> > +       const struct intel_tlv *next_tlv = NEXT_TLV(tlv);
+> > +       const struct intel_ext_subevent *subevent = NULL;
+> >         int i;
+> >
+> > +       for (i = 0; intel_ext_subevent_table[i].length > 0; i++) {
+> > +               if (intel_ext_subevent_table[i].subevent_id ==
+> > +                                                       tlv->subevent_id) {
+> > +                       subevent = &intel_ext_subevent_table[i];
+> > +                       break;
+> > +               }
+> > +       }
+> > +
+> > +       if (!subevent) {
+> > +               print_text(COLOR_UNKNOWN_EXT_EVENT,
+> > +                               "Unknown extended subevent 0x%2.2x",
+> > +                               tlv->subevent_id);
+> > +               return NULL;
+> > +       }
+> > +
+> > +       if (tlv->length != subevent->length) {
+> > +               print_text(COLOR_ERROR, "Invalid length %d of subevent 0x%2.2x",
+> > +                               tlv->length, tlv->subevent_id);
+> > +               return NULL;
+> > +       }
+> > +
+> > +       if (next_tlv > last_tlv) {
+> > +               print_text(COLOR_ERROR, "Subevent exceeds the buffer size.");
+> > +               return NULL;
+> > +       }
+> > +
+> > +       subevent->func(tlv);
+> > +
+> > +       return next_tlv;
+> > +}
+> > +
+> > +static void intel_vendor_ext_evt(const void *data, uint8_t size)
+> > +{
+> > +       /* The data pointer points to a number of tlv.*/
+> > +       const struct intel_tlv *tlv = data;
+> > +       const struct intel_tlv *last_tlv = data + size;
+> > +
+> > +       /* Process every tlv subevent until reaching last_tlv.
+> > +        * The decoding process terminates normally when tlv == last_tlv.
+> > +        */
+> > +       while (tlv && tlv < last_tlv)
+> > +               tlv = process_ext_subevent(tlv, last_tlv);
+> > +
+> > +       /* If an error occurs in decoding the subevents, hexdump the packet. */
+> > +       if (!tlv)
+> > +               packet_hexdump(data, size);
+> > +}
+> > +
+> > +/* Vendor extended events with a vendor prefix. */
+> > +static const struct vendor_evt vendor_prefix_evt_table[] = {
+> > +       { 0x03, "Extended Telemetry", intel_vendor_ext_evt },
+> > +       { }
+> > +};
+> > +
+> > +const uint8_t intel_vendor_prefix[] = {0x87, 0x80};
+> > +#define INTEL_VENDOR_PREFIX_SIZE sizeof(intel_vendor_prefix)
+> > +
+> > +/*
+> > + * The vendor event with Intel vendor prefix.
+> > + * Its format looks like
+> > + *   0xff <length> <vendor_prefix> <subopcode> <data>
+> > + *   where Intel's <vendor_prefix> is 0x8780.
+> > + *
+> > + *   When <subopcode> == 0x03, it is a telemetry event; and
+> > + *   <data> is a number of tlv data.
+> > + */
+> > +struct vendor_prefix_evt {
+> > +       uint8_t prefix_data[INTEL_VENDOR_PREFIX_SIZE];
+> > +       uint8_t subopcode;
+> > +};
+> > +
+> > +static const struct vendor_evt *intel_vendor_prefix_evt(const void *data,
+> > +                                                       int *consumed_size)
+> > +{
+> > +       unsigned int i;
+> > +       const struct vendor_prefix_evt *vnd = data;
+> > +       char prefix_string[INTEL_VENDOR_PREFIX_SIZE * 2 + 1] = { 0 };
+> > +
+> > +       /* Check if the vendor prefix matches. */
+> > +       for (i = 0; i < INTEL_VENDOR_PREFIX_SIZE; i++) {
+> > +               if (vnd->prefix_data[i] != intel_vendor_prefix[i])
+> > +                       return NULL;
+> > +               sprintf(prefix_string + i * 2, "%02x", vnd->prefix_data[i]);
+> > +       }
+> > +       print_field("Vendor Prefix (0x%s)", prefix_string);
+> > +
+> > +       /*
+> > +        * Handle the vendor event with a vendor prefix.
+> > +        *   0xff <length> <vendor_prefix> <subopcode> <data>
+> > +        * This loop checks whether the <subopcode> exists in the
+> > +        * vendor_prefix_evt_table.
+> > +        */
+> > +       for (i = 0; vendor_prefix_evt_table[i].str; i++) {
+> > +               if (vendor_prefix_evt_table[i].evt == vnd->subopcode) {
+> > +                       *consumed_size = sizeof(struct vendor_prefix_evt);
+> > +                       return &vendor_prefix_evt_table[i];
+> > +               }
+> > +       }
+> > +
+> > +       return NULL;
+> > +}
+> > +
+> > +const struct vendor_evt *intel_vendor_evt(const void *data, int *consumed_size)
+> > +{
+> > +       uint8_t evt = *((const uint8_t *) data);
+> > +       int i;
+> > +
+> > +       /*
+> > +        * Handle the vendor event without a vendor prefix.
+> > +        *   0xff <length> <evt> <data>
+> > +        * This loop checks whether the <evt> exists in the vendor_evt_table.
+> > +        */
+> >         for (i = 0; vendor_evt_table[i].str; i++) {
+> >                 if (vendor_evt_table[i].evt == evt)
+> >                         return &vendor_evt_table[i];
+> >         }
+> >
+> > -       return NULL;
+> > +       /*
+> > +        * It is not a regular event. Check whether it is a vendor extended
+> > +        * event that comes with a vendor prefix followed by a subopcode.
+> > +        */
+> > +       return intel_vendor_prefix_evt(data, consumed_size);
+> >  }
+> > diff --git a/monitor/intel.h b/monitor/intel.h
+> > index bf00ad491..bfb04540c 100644
+> > --- a/monitor/intel.h
+> > +++ b/monitor/intel.h
+> > @@ -15,4 +15,4 @@ struct vendor_ocf;
+> >  struct vendor_evt;
+> >
+> >  const struct vendor_ocf *intel_vendor_ocf(uint16_t ocf);
+> > -const struct vendor_evt *intel_vendor_evt(uint8_t evt);
+> > +const struct vendor_evt *intel_vendor_evt(const void *data, int *consumed_size);
+> > diff --git a/monitor/packet.c b/monitor/packet.c
+> > index 82513a63c..4a371f508 100644
+> > --- a/monitor/packet.c
+> > +++ b/monitor/packet.c
+> > @@ -9371,9 +9371,14 @@ static const struct vendor_ocf *current_vendor_ocf(uint16_t ocf)
+> >         return NULL;
+> >  }
+> >
+> > -static const struct vendor_evt *current_vendor_evt(uint8_t evt)
+> > +static const struct vendor_evt *current_vendor_evt(const void *data,
+> > +                                                       int *consumed_size)
+> >  {
+> >         uint16_t manufacturer, msft_opcode;
+> > +       uint8_t evt = *((const uint8_t *) data);
+> > +
+> > +       /* A regular vendor event consumes 1 byte. */
+> > +       *consumed_size = 1;
+> >
+> >         if (index_current < MAX_INDEX) {
+> >                 manufacturer = index_list[index_current].manufacturer;
+> > @@ -9388,7 +9393,7 @@ static const struct vendor_evt *current_vendor_evt(uint8_t evt)
+> >
+> >         switch (manufacturer) {
+> >         case 2:
+> > -               return intel_vendor_evt(evt);
+> > +               return intel_vendor_evt(data, consumed_size);
+> >         case 15:
+> >                 return broadcom_vendor_evt(evt);
+> >         }
+> > @@ -11007,10 +11012,10 @@ static void le_meta_event_evt(const void *data, uint8_t size)
+> >
+> >  static void vendor_evt(const void *data, uint8_t size)
+> >  {
+> > -       uint8_t subevent = *((const uint8_t *) data);
+> >         struct subevent_data vendor_data;
+> >         char vendor_str[150];
+> > -       const struct vendor_evt *vnd = current_vendor_evt(subevent);
+> > +       int consumed_size;
+> > +       const struct vendor_evt *vnd = current_vendor_evt(data, &consumed_size);
+> >
+> >         if (vnd) {
+> >                 const char *str = current_vendor_str();
+> > @@ -11021,12 +11026,13 @@ static void vendor_evt(const void *data, uint8_t size)
+> >                         vendor_data.str = vendor_str;
+> >                 } else
+> >                         vendor_data.str = vnd->str;
+> > -               vendor_data.subevent = subevent;
+> > +               vendor_data.subevent = vnd->evt;
+> >                 vendor_data.func = vnd->evt_func;
+> >                 vendor_data.size = vnd->evt_size;
+> >                 vendor_data.fixed = vnd->evt_fixed;
+> >
+> > -               print_subevent(&vendor_data, data + 1, size - 1);
+> > +               print_subevent(&vendor_data, data + consumed_size,
+> > +                                                       size - consumed_size);
+> >         } else {
+> >                 uint16_t manufacturer;
+> >
+> > --
+> > 2.32.0.93.g670b81a890-goog
+> >
+>
+>
+> --
+>
+> Joseph Shyh-In Hwang
+> Email: josephsih@google.com
 
-But it looks like libdbus does expect only a string:
-
-https://dbus.freedesktop.org/doc/api/html/group__DBusMessage.html#ga2ab8969=
-65aec97fb21293affeed36232
-
-Well perhaps it needs to constructed manually with the use of
-dbus_message_new_method_return if you want to pass parameters other
-than error_name and error_message so we could include a third one e.g.
-error_code.
-
-> >
-> > > +
-> > > +Either the profile is already connected or ACL connection is in plac=
-e.
-> > > +
-> > > +BR/EDR connection page timeout
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0002
-> > > +     errno:  EHOSTDOWN
-> > > +
-> > > +Failed due to page timeout.
-> > > +
-> > > +BR/EDR connection profile unavailable
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0003
-> > > +     errno:  ENOPROTOOPT
-> > > +
-> > > +Failed to find connectable services or the target service.
-> > > +
-> > > +BR/EDR connection SDP search
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0004
-> > > +     errno:  none
-> > > +
-> > > +Failed to complete the SDP search.
-> > > +
-> > > +BR/EDR connection create socket
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0005
-> > > +     errno:  EIO
-> > > +
-> > > +Failed to create or connect to BT IO socket. This can also indicate =
-hardware
-> > > +failure in the controller.
-> > > +
-> > > +BR/EDR connection invalid arguments
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0006
-> > > +     errno:  EHOSTUNREACH
-> > > +
-> > > +Failed due to invalid arguments.
-> > > +
-> > > +BR/EDR connection not powered
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0007
-> > > +     errno:  EHOSTUNREACH
-> > > +
-> > > +Failed due to adapter not powered.
-> > > +
-> > > +BR/EDR connection not supported
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0008
-> > > +     errno:  EOPNOTSUPP, EPROTONOSUPPORT
-> > > +
-> > > +Failed due to unsupported state transition of L2CAP channel or other=
- features
-> > > +either by the local host or the remote.
-> > > +
-> > > +BR/EDR connection bad socket
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0009
-> > > +     errno:  EBADFD
-> > > +
-> > > +Failed due to the socket is in bad state.
-> > > +
-> > > +BR/EDR connection memory allocation
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x000A
-> > > +     errno:  EBADFD
-> > > +
-> > > +Failed to allocate memory in either host stack or controller.
-> >
-> > If this happens, then the code is wrong. Should be an ENOMEM.
-> My mistake, this should be ENOMEM. Corrected in v3.
-> >
-> > > +
-> > > +BR/EDR connection busy
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x000B
-> > > +     errno:  EBUSY
-> > > +
-> > > +Failed due to other ongoing operations, such as pairing, busy L2CAP =
-channel or
-> > > +the operation disallowed by the controller.
-> > > +
-> > > +BR/EDR connection concurrent connection limit
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x000C
-> > > +     errno:  EMLINK
-> > > +
-> > > +Failed due to reaching the concurrent connection limit to a device.
-> > > +
-> > > +BR/EDR connection timeout
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > > +     code:   0x000D
-> > > +     errno:  ETIMEDOUT
-> > > +
-> > > +Failed due to connection timeout
-> > > +
-> > > +BR/EDR connection refused
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > > +     code:   0x000E
-> > > +     errno:  ECONNREFUSED
-> > > +
-> > > +Refused by the remote device due to limited resource, security reaso=
-n or
-> > > +unacceptable address type.
-> > > +
-> > > +BR/EDR connection aborted by remote
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x000F
-> > > +     errno:  ECONNRESET
-> > > +
-> > > +Terminated by the remote device due to limited resource or power off=
-.
-> > > +
-> > > +BR/EDR connection aborted by local
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0010
-> > > +     errno:  ECONNABORTED
-> > > +
-> > > +Aborted by the local host.
-> > > +
-> > > +BR/EDR connection protocol error
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0011
-> > > +     errno:  EPROTO
-> > > +
-> > > +Failed due to LMP protocol error.
-> > > +
-> > > +BR/EDR connection canceled
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D
-> > > +     code:   0x0012
-> > > +     errno:  none
-> > > +
-> > > +Failed due to cancellation caused by adapter drop, unexpected device=
- drop, or
-> > > +incoming disconnection request before connection request is complete=
-d.
-> > > +
-> > > +BR/EDR connection unknown error
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0013
-> > > +     errno:  ENOSYS
-> > > +
-> > > +Failed due to unknown reason.
-> > > +
-> > > +LE connection invalid arguments
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0101
-> > > +     errno:  EINVAL
-> > > +
-> > > +Failed due to invalid arguments.
-> > > +
-> > > +LE connection not powered
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D
-> > > +     code:   0x0102
-> > > +     errno:  EHOSTUNREACH
-> > > +
-> > > +Failed due to adapter not powered.
-> > > +
-> > > +LE connection not supported
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > +     code:   0x0103
-> > > +     errno:  EOPNOTSUPP, EPROTONOSUPPORT
-> > > +
-> > > +Failed due to unsupported state transition of L2CAP channel or other=
- features
-> > > +(e.g. LE features) either by the local host or the remote.
-> > > +
-> > > +LE connection already connected
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0104
-> > > +     errno: EALREADY, EISCONN
-> > > +
-> > > +Either the BT IO is already connected or LE link connection in place=
-.
-> > > +
-> > > +LE connection bad socket
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D
-> > > +     code:   0x0105
-> > > +     errno: EBADFD
-> > > +
-> > > +Failed due to the socket is in bad state.
-> > > +
-> > > +LE connection memory allocation
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0106
-> > > +     errno: ENOMEM
-> > > +
-> > > +Failed to allocate memory in either host stack or controller.
-> > > +
-> > > +LE connection busy
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0107
-> > > +     errno:  EBUSY
-> > > +
-> > > +Failed due to other ongoing operations, such as pairing, connecting,=
- busy
-> > > +L2CAP channel or the operation disallowed by the controller.
-> > > +
-> > > +LE connection refused
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x0108
-> > > +     errno:  ECONNREFUSED
-> > > +
-> > > +Failed due to that LE is not enabled or the attempt is refused by th=
-e remote
-> > > +device due to limited resource, security reason or unacceptable addr=
-ess type.
-> > > +
-> > > +LE connection create socket
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > +     code:   0x0109
-> > > +     errno:  EIO
-> > > +
-> > > +Failed to create or connect to BT IO socket. This can also indicate =
-hardware
-> > > +failure in the controller.
-> > > +
-> > > +LE connection timeout
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x010A
-> > > +     errno:  ETIMEDOUT
-> > > +
-> > > +Failed due to connection timeout
-> > > +
-> > > +LE connection concurrent connection limit
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x010B
-> > > +     errno:  EMLINK
-> > > +
-> > > +Failed due to reaching the synchronous connection limit to a device.
-> > > +
-> > > +LE connection abort by remote
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x010C
-> > > +     errno:  ECONNRESET
-> > > +
-> > > +Aborted by the remote device due to limited resource or power off.
-> > > +
-> > > +LE connection abort by local
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x010D
-> > > +     errno:  ECONNABORTED
-> > > +
-> > > +Aborted by the local host.
-> > > +
-> > > +LE connection link layer protocol error
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > > +     code:   0x010E
-> > > +     errno:  EPROTO
-> > > +
-> > > +Failed due to link layer protocol error.
-> > > +
-> > > +LE connection GATT browsing
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > +     code:   0x010F
-> > > +     errno:  none
-> > > +
-> > > +Failed to complete the GATT browsing.
-> > > +
-> > > +LE connection unknown error
-> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > > +     code:   0x0110
-> > > +     errno:  ENOSYS
-> > > +
-> > > + Failed due to unknown reason.
-> > > diff --git a/src/error.c b/src/error.c
-> > > index 89517075e..73602c4bf 100644
-> > > --- a/src/error.c
-> > > +++ b/src/error.c
-> > > @@ -27,6 +27,7 @@
-> > > #include <config.h>
-> > > #endif
-> > >
-> > > +#include <stdio.h>
-> > > #include "gdbus/gdbus.h"
-> > >
-> > > #include "error.h"
-> > > @@ -43,6 +44,12 @@ DBusMessage *btd_error_invalid_args_str(DBusMessag=
-e *msg, const char *str)
-> > >                                       "%s", str);
-> > > }
-> > >
-> > > +DBusMessage *btd_error_invalid_args_err(DBusMessage *msg, uint16_t e=
-rr)
-> > > +{
-> > > +     return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArgume=
-nts",
-> > > +                                     "0x%04X", err);
-> > > +}
-> > > +
-> > > DBusMessage *btd_error_busy(DBusMessage *msg)
-> > > {
-> > >       return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
-> > > @@ -79,12 +86,24 @@ DBusMessage *btd_error_in_progress(DBusMessage *m=
-sg)
-> > >                                       "In Progress");
-> > > }
-> > >
-> > > +DBusMessage *btd_error_in_progress_err(DBusMessage *msg, uint16_t er=
-r)
-> > > +{
-> > > +     return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress", =
-"0x%04X",
-> > > +                                     err);
-> > > +}
-> > > +
-> > > DBusMessage *btd_error_not_available(DBusMessage *msg)
-> > > {
-> > >       return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable"=
-,
-> > >                                       "Operation currently not availa=
-ble");
-> > > }
-> > >
-> > > +DBusMessage *btd_error_not_available_err(DBusMessage *msg, uint16_t =
-err)
-> > > +{
-> > > +     return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable"=
-,
-> > > +                                     "0x%04X", err);
-> > > +}
-> > > +
-> > > DBusMessage *btd_error_does_not_exist(DBusMessage *msg)
-> > > {
-> > >       return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist"=
-,
-> > > @@ -121,8 +140,100 @@ DBusMessage *btd_error_not_ready(DBusMessage *m=
-sg)
-> > >                                       "Resource Not Ready");
-> > > }
-> > >
-> > > +DBusMessage *btd_error_not_ready_err(DBusMessage *msg, uint16_t err)
-> > > +{
-> > > +     return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady", "0=
-x%04X",
-> > > +                                     err);
-> > > +}
-> > > +
-> > > DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
-> > > {
-> > >       return g_dbus_create_error(msg, ERROR_INTERFACE
-> > >                                       ".Failed", "%s", str);
-> > > }
-> > > +
-> > > +DBusMessage *btd_error_failed_err(DBusMessage *msg, uint16_t err)
-> > > +{
-> > > +     return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed", "0x%=
-04X",
-> > > +                                     err);
-> > > +}
-> > > +
-> > > +uint16_t btd_error_bredr_conn_from_errno(int errno_code)
-> > > +{
-> > > +     switch (-errno_code) {
-> > > +     case EALREADY:
-> > > +     case EISCONN: // Fall through
-> >
-> > Don=E2=80=99t do this Fall through. It is actually not a fall through p=
-er se. This is just a statement with two case labels. That is perfectly nor=
-mal and no compiler should complain. And frankly no C-programmer should be =
-confused if this was intentional or not.
-> Corrected in v3.
-> >
-> > > +             return BTD_ERR_BREDR_CONN_ALREADY_CONNECTED;
-> > > +     case EHOSTDOWN:
-> > > +             return BTD_ERR_BREDR_CONN_PAGE_TIMEOUT;
-> > > +     case ENOPROTOOPT:
-> > > +             return BTD_ERR_BREDR_CONN_PROFILE_UNAVAILABLE;
-> > > +     case EIO:
-> > > +             return BTD_ERR_BREDR_CONN_CREATE_SOCKET;
-> > > +     case EINVAL:
-> > > +             return BTD_ERR_BREDR_CONN_INVALID_ARGUMENTS;
-> > > +     case EHOSTUNREACH:
-> > > +             return BTD_ERR_BREDR_CONN_ADAPTER_NOT_POWERED;
-> > > +     case EOPNOTSUPP:
-> > > +     case EPROTONOSUPPORT: // Fall through
-> > > +             return BTD_ERR_BREDR_CONN_NOT_SUPPORTED;
-> > > +     case EBADFD:
-> > > +             return BTD_ERR_BREDR_CONN_BAD_SOCKET;
-> > > +     case ENOMEM:
-> > > +             return BTD_ERR_BREDR_CONN_MEMORY_ALLOC;
-> > > +     case EBUSY:
-> > > +             return BTD_ERR_BREDR_CONN_BUSY;
-> > > +     case EMLINK:
-> > > +             return BTD_ERR_BREDR_CONN_CNCR_CONNECT_LIMIT;
-> > > +     case ETIMEDOUT:
-> > > +             return BTD_ERR_BREDR_CONN_TIMEOUT;
-> > > +     case ECONNREFUSED:
-> > > +             return BTD_ERR_BREDR_CONN_REFUSED;
-> > > +     case ECONNRESET:
-> > > +             return BTD_ERR_BREDR_CONN_ABORT_BY_REMOTE;
-> > > +     case ECONNABORTED:
-> > > +             return BTD_ERR_BREDR_CONN_ABORT_BY_LOCAL;
-> > > +     case EPROTO:
-> > > +             return BTD_ERR_BREDR_CONN_PROTO_ERROR;
-> > > +     default:
-> > > +             return BTD_ERR_BREDR_CONN_UNKNOWN;
-> > > +     }
-> > > +}
-> > > +
-> > > +uint16_t btd_error_le_conn_from_errno(int errno_code)
-> > > +{
-> > > +     switch (-errno_code) {
-> > > +     case EINVAL:
-> > > +             return BTD_ERR_LE_CONN_INVALID_ARGUMENTS;
-> > > +     case EHOSTUNREACH:
-> > > +             return BTD_ERR_LE_CONN_ADAPTER_NOT_POWERED;
-> > > +     case EOPNOTSUPP:
-> > > +     case EPROTONOSUPPORT: // Fall through
-> > > +             return BTD_ERR_LE_CONN_NOT_SUPPORTED;
-> > > +     case EALREADY:
-> > > +     case EISCONN: // Fall through
-> > > +             return BTD_ERR_LE_CONN_ALREADY_CONNECTED;
-> > > +     case EBADFD:
-> > > +             return BTD_ERR_LE_CONN_BAD_SOCKET;
-> > > +     case ENOMEM:
-> > > +             return BTD_ERR_LE_CONN_MEMORY_ALLOC;
-> > > +     case EBUSY:
-> > > +             return BTD_ERR_LE_CONN_BUSY;
-> > > +     case ECONNREFUSED:
-> > > +             return BTD_ERR_LE_CONN_REFUSED;
-> > > +     case EIO:
-> > > +             return BTD_ERR_LE_CONN_CREATE_SOCKET;
-> > > +     case ETIMEDOUT:
-> > > +             return BTD_ERR_LE_CONN_TIMEOUT;
-> > > +     case EMLINK:
-> > > +             return BTD_ERR_LE_CONN_SYNC_CONNECT_LIMIT;
-> > > +     case ECONNRESET:
-> > > +             return BTD_ERR_LE_CONN_ABORT_BY_REMOTE;
-> > > +     case ECONNABORTED:
-> > > +             return BTD_ERR_LE_CONN_ABORT_BY_LOCAL;
-> > > +     case EPROTO:
-> > > +             return BTD_ERR_LE_CONN_PROTO_ERROR;
-> > > +     default:
-> > > +             return BTD_ERR_LE_CONN_UNKNOWN;
-> > > +     }
-> > > +}
-> > > diff --git a/src/error.h b/src/error.h
-> > > index 7c8cad066..74d433aca 100644
-> > > --- a/src/error.h
-> > > +++ b/src/error.h
-> > > @@ -24,22 +24,74 @@
-> > >  */
-> > >
-> > > #include <dbus/dbus.h>
-> > > +#include <stdint.h>
-> > >
-> > > #define ERROR_INTERFACE "org.bluez.Error"
-> > >
-> > > +/* BR/EDR connection failure reasons
-> > > + * BT_ERR_* should be used as one of the parameters to btd_error_*_e=
-rr().
-> > > + */
-> > > +#define BTD_ERR_BREDR_CONN_ALREADY_CONNECTED 0x0001
-> > > +#define BTD_ERR_BREDR_CONN_PAGE_TIMEOUT              0x0002
-> > > +#define BTD_ERR_BREDR_CONN_PROFILE_UNAVAILABLE       0x0003
-> > > +#define BTD_ERR_BREDR_CONN_SDP_SEARCH                0x0004
-> > > +#define BTD_ERR_BREDR_CONN_CREATE_SOCKET     0x0005
-> > > +#define BTD_ERR_BREDR_CONN_INVALID_ARGUMENTS 0x0006
-> > > +#define BTD_ERR_BREDR_CONN_ADAPTER_NOT_POWERED       0x0007
-> > > +#define BTD_ERR_BREDR_CONN_NOT_SUPPORTED     0x0008
-> > > +#define BTD_ERR_BREDR_CONN_BAD_SOCKET                0x0009
-> > > +#define BTD_ERR_BREDR_CONN_MEMORY_ALLOC              0x000A
-> > > +#define BTD_ERR_BREDR_CONN_BUSY                      0x000B
-> > > +#define BTD_ERR_BREDR_CONN_CNCR_CONNECT_LIMIT        0x000C
-> > > +#define BTD_ERR_BREDR_CONN_TIMEOUT           0x000D
-> > > +#define BTD_ERR_BREDR_CONN_REFUSED           0x000E
-> > > +#define BTD_ERR_BREDR_CONN_ABORT_BY_REMOTE   0x000F
-> > > +#define BTD_ERR_BREDR_CONN_ABORT_BY_LOCAL    0x0010
-> > > +#define BTD_ERR_BREDR_CONN_PROTO_ERROR               0x0011
-> > > +#define BTD_ERR_BREDR_CONN_CANCELED          0x0012
-> > > +#define BTD_ERR_BREDR_CONN_UNKNOWN           0x0013
-> > > +
-> > > +/* LE connection failure reasons
-> > > + * BT_ERR_* should be used as one of the parameters to btd_error_*_e=
-rr().
-> > > + */
-> > > +#define BTD_ERR_LE_CONN_INVALID_ARGUMENTS    0x0101
-> > > +#define BTD_ERR_LE_CONN_ADAPTER_NOT_POWERED  0x0102
-> > > +#define BTD_ERR_LE_CONN_NOT_SUPPORTED                0x0103
-> > > +#define BTD_ERR_LE_CONN_ALREADY_CONNECTED    0x0104
-> > > +#define BTD_ERR_LE_CONN_BAD_SOCKET           0x0105
-> > > +#define BTD_ERR_LE_CONN_MEMORY_ALLOC         0x0106
-> > > +#define BTD_ERR_LE_CONN_BUSY                 0x0107
-> > > +#define BTD_ERR_LE_CONN_REFUSED                      0x0108
-> > > +#define BTD_ERR_LE_CONN_CREATE_SOCKET                0x0109
-> > > +#define BTD_ERR_LE_CONN_TIMEOUT                      0x010A
-> > > +#define BTD_ERR_LE_CONN_SYNC_CONNECT_LIMIT   0x010B
-> > > +#define BTD_ERR_LE_CONN_ABORT_BY_REMOTE              0x010C
-> > > +#define BTD_ERR_LE_CONN_ABORT_BY_LOCAL               0x010D
-> > > +#define BTD_ERR_LE_CONN_PROTO_ERROR          0x010E
-> > > +#define BTD_ERR_LE_CONN_GATT_BROWSE          0x010F
-> > > +#define BTD_ERR_LE_CONN_UNKNOWN                      0x0110
-> > > +
-> >
-> > What is the intention to split BR/EDR and LE here. You do know up-front=
- what connection type you are. Trying to figure out from the error code wha=
-t connection you have been trying to establish is plain wrong.
-> In fact the up-front connection type is not necessarily known. In the
-> case of dual-mode devices, such as Bose QC35, a D-Bus client can issue
-> Connect(), and it depends on the timing of connection request (adv
-> usually arrive first compared to inquiry result), it can be either
-> BR/EDR or LE link being established. Another aspect of this is the
-> metrics collection, where knowing transport can be handy. For
-> instance, we can associate the certain error to particular use cases
-> at application layer, and that can help targeting the bottleneck to
-> tackle.
-> >
-> > The description is that you want to know exactly where the connection f=
-ailed. And I think that can be established independent from the transport.
-> Indeed the intention is to know where it failed exactly. However, as
-> mentioned above, transport information is also an important piece of
-> information to know.
-> >
-> > In addition, I don=E2=80=99t like the 0x00?? vs 0x01?? reservation of a=
-ny number. That always goes bad at some point in the future.
-> As replied above, having a code attached instead of a string
-> description makes it easier for a D-Bus client to interpret and map to
-> corresponding handlers, but I am happy to explore other options as
-> well.
-> >
-> > Regards
-> >
-> > Marcel
-> >
-> Thanks,
-> Miao
 
 
-
---=20
+-- 
 Luiz Augusto von Dentz
