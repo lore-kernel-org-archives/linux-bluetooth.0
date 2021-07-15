@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2B011C12002
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 01:11:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA701C47E4B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 01:12:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02827613CC
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 01:11:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4D9861005
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 01:12:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230496AbhGOBOl (ORCPT
+        id S231324AbhGOBPB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 21:14:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40766 "EHLO
+        Wed, 14 Jul 2021 21:15:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40834 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbhGOBOl (ORCPT
+        with ESMTP id S231374AbhGOBO5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 21:14:41 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59378C06175F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 18:11:48 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id cu14so2754124pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 18:11:48 -0700 (PDT)
+        Wed, 14 Jul 2021 21:14:57 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A43BC06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 18:12:05 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id me13-20020a17090b17cdb0290173bac8b9c9so5011104pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 18:12:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=yEDW9GgxcjnKM5DbyQ4gCDEWGpAfaZad24mH40e9GQ8=;
-        b=DFgmUbaDtpkvebz5Tes9m7oQG3f/JOGCpOZ5SOrrTkAKR0QE3tCNoMYfITzL8JicPm
-         VJXuTYuBY0r8r+0RkoodIvlF657Eq7k949bvuBC2zHzkOKqBH8AURdjdnR6ceGv5m67t
-         9Lej4Q24x67Nz46IW2APo8Kuc+Z4dFeS+T77w=
+        bh=IhrSu4wh8n4znVOwGnNvlUkfc0zLP1DS+0LDkx5VFDw=;
+        b=J8BLPkR0X6erW673XeQK0gOwGhUrvf8P3FwTeiDErmcNrJaqMBdwKkx3hSDanDnp9Y
+         Jy0bNJvH68NuBXFTWyuh9lrfyCZOceNd64tZZYcIIc76JCURNlItZ3nUJrLOxAPvFqw3
+         mFuZMD/LtA86P4U2cnEnW5HVzSUswdJ9xZVhM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=yEDW9GgxcjnKM5DbyQ4gCDEWGpAfaZad24mH40e9GQ8=;
-        b=UpAEZ9J+6vI4pX2UMF0njgFi9pwUzpW5E0p+a1uomLlnBl5GE8M4KlSDKexM/mtmaT
-         5+R6fmec5iYBYWHFZritqF23U3LJvLhsYEgmvjts8IffGyAlXflNP8DhpxvJ+zxDA1Eq
-         JZxxz1LtdLIYEYPas0xXrU17AFTlhuBJ+X6DwraBFdsww7ulcrhvDDJps4leSqoCrGl5
-         jbponb35Ceznid5a0MbLKLozE19DgP8YYByFbzTTMA4fweSjBmi0qAahpAFjtLX6SX/e
-         mjdTzXBdmFSeNnaP2S4goLh/6hSdYSZnlnQfbpVhwSsEJGHovQWnUBbpjUzGWmMuIYMY
-         V04Q==
-X-Gm-Message-State: AOAM533zIWN+H4YdNiULeO+2FXX1jhI7NeQXByoHqY7MpU0Ma4/Ra7WV
-        Ahr3L6lOcvfdwI/yEDW39Y4Ve/XvLHnCpQ==
-X-Google-Smtp-Source: ABdhPJwbOTfKLzNPzKT4I08ICuCmqm7U4w4shyfBjnv2kGpbCWoo0rznSZ+D9VURprNKs8qrH0ryOA==
-X-Received: by 2002:a17:902:7d83:b029:11d:75c2:79a6 with SMTP id a3-20020a1709027d83b029011d75c279a6mr703374plm.62.1626311507597;
-        Wed, 14 Jul 2021 18:11:47 -0700 (PDT)
+        bh=IhrSu4wh8n4znVOwGnNvlUkfc0zLP1DS+0LDkx5VFDw=;
+        b=kyAbQAEGz//qzFd8jskmC/UJBZmKokcq7WTYP77sPGXwkiuDO1MqR7ud+417vufhpz
+         2bfq89HNeki0T3PhdQCzRWCQn74gGso0S0IKqUFDy5two3pNzRicVO3VOPligNF1Zcmq
+         rfp82kPzivWXsDihNvF1Fw0GKbfBBKPT7Hwjvg/hOlwUoXy/ZTdsFRMrWyd8u79aZ7wX
+         DbWMPXSO0t+Tp9ECWSMwDQRgy8o1zBM/oXiTb52Hw34BjKYh6Syqu7z6B5Q8vZuLY4MK
+         PvUppxGSLhXDLUkQrmSsDHjHEk7LqRfJhQhxL+0CQRkUNGcqAa5DT9x7R2H8wruP3tk4
+         2QLA==
+X-Gm-Message-State: AOAM533QoA5KtoBtEO9xdTo8WFjH1rGJFrG6E6MZiz9hTujMJtalD/oN
+        b06ZcjPXbkXB/6KV1DvyHDZX55UIMuQfmA==
+X-Google-Smtp-Source: ABdhPJz2H1aII74cHYUrvjBWuWX/nxaXz7tpbgEVqrO3DK1GsB2AK8QTKMCmRD89LwXJWTJU/pAULw==
+X-Received: by 2002:a17:90a:6482:: with SMTP id h2mr6255457pjj.24.1626311524579;
+        Wed, 14 Jul 2021 18:12:04 -0700 (PDT)
 Received: from localhost ([2620:15c:202:201:20b7:5dcc:d530:a8df])
-        by smtp.gmail.com with UTF8SMTPSA id e16sm4680341pgl.54.2021.07.14.18.11.46
+        by smtp.gmail.com with UTF8SMTPSA id t11sm4653972pgm.36.2021.07.14.18.12.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 18:11:47 -0700 (PDT)
+        Wed, 14 Jul 2021 18:12:04 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
@@ -61,9 +61,9 @@ Cc:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Alain Michaud <alainm@chromium.org>,
         Howard Chung <howardchung@google.com>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v3 3/4] device: Include BtdError code in Connect() return
-Date:   Wed, 14 Jul 2021 18:09:54 -0700
-Message-Id: <20210714180917.BlueZ.v3.3.Idd761b9b9f4620480db8889e7885a17952c2c13a@changeid>
+Subject: [BlueZ PATCH v3 4/4] client: Print error code for connect methods
+Date:   Wed, 14 Jul 2021 18:09:56 -0700
+Message-Id: <20210714180917.BlueZ.v3.4.I226fdcdd12b13e4875c8cd03b42fc52283920cc4@changeid>
 X-Mailer: git-send-email 2.32.0.93.g670b81a890-goog
 In-Reply-To: <20210715010951.963176-1-mcchou@chromium.org>
 References: <20210715010951.963176-1-mcchou@chromium.org>
@@ -73,148 +73,37 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This replaces generic strerror message with context specific BtdError
-code to better indicate the detailed failure reason so that the D-Bus
-clients can optimize their application to work better with BlueZ, e.g.
-introducing retry mechanism or building metrics.
+The following steps were performed.
+- Issuing repeated commands to connect the same BLE device.
+- Verifying the print in bluetoothctl console
 
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Howard Chung <howardchung@google.com>
 ---
 
-(no changes since v1)
+Changes in v3:
+- Correct error-codes.txt.
 
- src/device.c | 52 ++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 34 insertions(+), 18 deletions(-)
+Changes in v2:
+- Add documentation for error codes
 
-diff --git a/src/device.c b/src/device.c
-index df440ce09..c9dc616a2 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -1607,8 +1607,8 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
+ client/main.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/client/main.c b/client/main.c
+index da877b546..488a24bf6 100644
+--- a/client/main.c
++++ b/client/main.c
+@@ -1949,7 +1949,8 @@ static void connect_reply(DBusMessage *message, void *user_data)
+ 	dbus_error_init(&error);
+ 
+ 	if (dbus_set_error_from_message(&error, message) == TRUE) {
+-		bt_shell_printf("Failed to connect: %s\n", error.name);
++		bt_shell_printf("Failed to connect: %s %s\n", error.name,
++				error.message);
+ 		dbus_error_free(&error);
+ 		return bt_shell_noninteractive_quit(EXIT_FAILURE);
  	}
- 
- 	if (device->connect) {
--		DBusMessage *reply = btd_error_failed(device->connect,
--								"Cancelled");
-+		DBusMessage *reply = btd_error_failed_err(device->connect,
-+						BTD_ERR_BREDR_CONN_CANCELED);
- 		g_dbus_send_message(dbus_conn, reply);
- 		dbus_message_unref(device->connect);
- 		device->connect = NULL;
-@@ -1802,7 +1802,8 @@ done:
- 		}
- 
- 		g_dbus_send_message(dbus_conn,
--				btd_error_failed(dev->connect, strerror(-err)));
-+			btd_error_failed_err(dev->connect,
-+					btd_error_bredr_conn_from_errno(err)));
- 	} else {
- 		/* Start passive SDP discovery to update known services */
- 		if (dev->bredr && !dev->svc_refreshed && dev->refresh_discovery)
-@@ -2003,10 +2004,12 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 						dbus_message_get_sender(msg));
- 
- 	if (dev->pending || dev->connect || dev->browse)
--		return btd_error_in_progress(msg);
-+		return btd_error_in_progress_err(msg, BTD_ERR_BREDR_CONN_BUSY);
- 
--	if (!btd_adapter_get_powered(dev->adapter))
--		return btd_error_not_ready(msg);
-+	if (!btd_adapter_get_powered(dev->adapter)) {
-+		return btd_error_not_ready_err(msg,
-+					BTD_ERR_BREDR_CONN_ADAPTER_NOT_POWERED);
-+	}
- 
- 	btd_device_set_temporary(dev, false);
- 
-@@ -2019,10 +2022,12 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 			if (dbus_message_is_method_call(msg, DEVICE_INTERFACE,
- 							"Connect") &&
- 				find_service_with_state(dev->services,
--						BTD_SERVICE_STATE_CONNECTED))
-+						BTD_SERVICE_STATE_CONNECTED)) {
- 				return dbus_message_new_method_return(msg);
--			else
--				return btd_error_not_available(msg);
-+			} else {
-+				return btd_error_not_available_err(msg,
-+					BTD_ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
-+			}
- 		}
- 
- 		goto resolve_services;
-@@ -2032,7 +2037,8 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
- 	if (err < 0) {
- 		if (err == -EALREADY)
- 			return dbus_message_new_method_return(msg);
--		return btd_error_failed(msg, strerror(-err));
-+		return btd_error_failed_err(msg,
-+					btd_error_bredr_conn_from_errno(err));
- 	}
- 
- 	dev->connect = dbus_message_ref(msg);
-@@ -2046,8 +2052,11 @@ resolve_services:
- 		err = device_browse_sdp(dev, msg);
- 	else
- 		err = device_browse_gatt(dev, msg);
--	if (err < 0)
--		return btd_error_failed(msg, strerror(-err));
-+	if (err < 0) {
-+		return btd_error_failed_err(msg, bdaddr_type == BDADDR_BREDR ?
-+			BTD_ERR_BREDR_CONN_SDP_SEARCH :
-+			BTD_ERR_LE_CONN_GATT_BROWSE);
-+	}
- 
- 	return NULL;
- }
-@@ -2157,8 +2166,10 @@ static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *msg,
- 	DBusMessage *reply;
- 
- 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
--							DBUS_TYPE_INVALID))
--		return btd_error_invalid_args(msg);
-+							DBUS_TYPE_INVALID)) {
-+		return btd_error_invalid_args_err(msg,
-+					BTD_ERR_BREDR_CONN_INVALID_ARGUMENTS);
-+	}
- 
- 	uuid = bt_name2string(pattern);
- 	reply = connect_profiles(dev, BDADDR_BREDR, msg, uuid);
-@@ -2541,7 +2552,11 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
- 			if (err == 0)
- 				goto done;
- 		}
--		reply = btd_error_failed(req->msg, strerror(-err));
-+		reply = (bdaddr_type == BDADDR_BREDR ?
-+				btd_error_failed_err(req->msg,
-+					btd_error_bredr_conn_from_errno(err)) :
-+				btd_error_failed_err(req->msg,
-+					btd_error_le_conn_from_errno(err)));
- 		goto done;
- 	}
- 
-@@ -3027,7 +3042,8 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
- 	 */
- 	if (device->connect) {
- 		DBG("connection removed while Connect() is waiting reply");
--		reply = btd_error_failed(device->connect, "Disconnected early");
-+		reply = btd_error_failed_err(device->connect,
-+						BTD_ERR_BREDR_CONN_CANCELED);
- 		g_dbus_send_message(dbus_conn, reply);
- 		dbus_message_unref(device->connect);
- 		device->connect = NULL;
-@@ -5413,8 +5429,8 @@ done:
- 
- 	if (device->connect) {
- 		if (err < 0)
--			reply = btd_error_failed(device->connect,
--							strerror(-err));
-+			reply = btd_error_failed_err(device->connect,
-+					btd_error_le_conn_from_errno(err));
- 		else
- 			reply = dbus_message_new_method_return(device->connect);
- 
 -- 
 2.32.0.93.g670b81a890-goog
 
