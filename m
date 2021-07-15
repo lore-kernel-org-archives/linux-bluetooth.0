@@ -2,339 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.3 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D3AEC12002
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 02:21:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FF2C12002
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 03:04:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 038B1613D0
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 02:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DA9761103
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 03:04:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231854AbhGOCYm (ORCPT
+        id S232545AbhGODG4 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 22:24:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56138 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231156AbhGOCYl (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 22:24:41 -0400
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00122C06175F;
-        Wed, 14 Jul 2021 19:21:48 -0700 (PDT)
-Received: by mail-pg1-x532.google.com with SMTP id y17so4437468pgf.12;
-        Wed, 14 Jul 2021 19:21:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Xk+bzsUUhRfnteb4np5wfFEQnczuTEkubtOo+6KG5f4=;
-        b=uYskKqEKC8XeGxw/m7v84jSQx3EE7S8LAGhN8uMoRZB3tprwcfikayRiOO7r98jTO2
-         FB3YSj9kJjb/IjQ4W2Ukd97zdzhUfVZ0AZjITvfMcSupgUmhcT/kdUd91wQjMIB0lIYq
-         U2zm8XnDRIk/e8X8WV1xVA14z+JftfxgoS/hSHCHySVK++6Or82EmORMnS4ETtiGK8C6
-         Ee8gWQO7HSfP+o1ydoi5pFZS+LBqQEnDb9+a5P24TbfEC4jW+aCGR5+ZvGBraoKdDl4U
-         PVo3n6tjoSsSM1krrraIj4WQuSQUmUWlfbML3yDR7QVmXmSLfxKzCqvtEmA7kWxRNOVv
-         ER2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Xk+bzsUUhRfnteb4np5wfFEQnczuTEkubtOo+6KG5f4=;
-        b=VEDi5yqLxJbKheCdAzESS8VUCEJWnuZGWtFqluwUI6zIkUH/iiw6IQYiBV9JClCcej
-         I0ciCRYAnsg+At7XlVcXy3Wky6bFXYr5DdLcN3CQS9sYzzbGiFhIubH0XhHnjHJO8VMB
-         ff7w6MjAoM4A3QcIstr+HDYVGVcFxnU6bVNH5tgIjyLWJVZOxfx3xlScZAAqX6I5nLRX
-         eFy9dSl2gFM+ltY3I0PSuG9uZ1gnt8x+QmAJSaddkB1IaX783U7Q/qwksMQUcPU+r28R
-         Ad8QSZAWpVvS4pIWXh4T/hup9nAZuktSNVyC2KC76C+aYqyGQj4ASjBFUF8Y+6zsIGAy
-         0yEQ==
-X-Gm-Message-State: AOAM5326RSnJdiYxnv7Bie3bruarZKB+CkAXKYlSoapXhlgAsnnu1SZR
-        kxQWLlCiTemJ0LnPbM1E2QA=
-X-Google-Smtp-Source: ABdhPJwVicxeM6sLiW5I62juancSEsjb5cqhbqovYu8hHGmPkcGQDMQtm2t7s5tZ15wmKmjv7YeIrg==
-X-Received: by 2002:a63:4a43:: with SMTP id j3mr1424942pgl.367.1626315708299;
-        Wed, 14 Jul 2021 19:21:48 -0700 (PDT)
-Received: from [192.168.1.237] ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id 20sm4288470pfi.170.2021.07.14.19.21.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 14 Jul 2021 19:21:47 -0700 (PDT)
-Subject: Re: [PATCH v2] Bluetooth: fix inconsistent lock state in sco
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, stefan@datenfreihafen.org,
+        Wed, 14 Jul 2021 23:06:56 -0400
+Received: from spam.zju.edu.cn ([61.164.42.155]:45160 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230433AbhGODGz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 14 Jul 2021 23:06:55 -0400
+Received: by ajax-webmail-mail-app4 (Coremail) ; Thu, 15 Jul 2021 11:03:53
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.162.82.120]
+Date:   Thu, 15 Jul 2021 11:03:53 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   LinMa <linma@zju.edu.cn>
+To:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
+Cc:     "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
-References: <20210713162838.693266-1-desmondcheongzx@gmail.com>
- <CABBYNZLBfH+0=yhgcAK4XzizUKqpmAxjyxGpBACiFZpPsr0CEQ@mail.gmail.com>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <a4e8c316-69d5-0a6f-5480-bfe077d9d032@gmail.com>
-Date:   Thu, 15 Jul 2021 10:21:42 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        "David S. Miller" <davem@davemloft.net>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: Re: [PATCH v3] Bluetooth: call lock_sock() outside of spinlock
+ section
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
+In-Reply-To: <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
+References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
+ <48d66166-4d39-4fe2-3392-7e0c84b9bdb3@i-love.sakura.ne.jp>
+ <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-In-Reply-To: <CABBYNZLBfH+0=yhgcAK4XzizUKqpmAxjyxGpBACiFZpPsr0CEQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Message-ID: <674e6b1c.4780d.17aa81ee04c.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID: cS_KCgAXSXSZpe9gkNjsAA--.32411W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUHElNG3DfRWwABsm
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 15/7/21 3:12 am, Luiz Augusto von Dentz wrote:
-> Hi Desmond,
-> 
-> On Tue, Jul 13, 2021 at 9:29 AM Desmond Cheong Zhi Xi
-> <desmondcheongzx@gmail.com> wrote:
->>
->> Syzbot reported an inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock
->> usage in sco_conn_del and sco_sock_timeout that could lead to
->> deadlocks.
->>
->> This inconsistent lock state can also happen in sco_conn_ready,
->> rfcomm_connect_ind, and bt_accept_enqueue.
->>
->> The issue is that these functions take a spin lock on the socket with
->> interrupts enabled, but sco_sock_timeout takes the lock in an IRQ
->> context. This could lead to deadlocks:
->>
->>         CPU0
->>         ----
->>    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>    <Interrupt>
->>      lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>
->>   *** DEADLOCK ***
->>
->> We fix this by ensuring that local bh is disabled before calling
->> bh_lock_sock.
->>
->> After doing this, we additionally need to protect sco_conn_lock by
->> disabling local bh.
->>
->> This is necessary because sco_conn_del makes a call to sco_chan_del
->> while holding on to the sock lock, and sco_chan_del itself makes a
->> call to sco_conn_lock. If sco_conn_lock is held elsewhere with
->> interrupts enabled, there could still be a
->> slock-AF_BLUETOOTH-BTPROTO_SCO --> &conn->lock#2 lock inversion as
->> follows:
->>
->>          CPU0                    CPU1
->>          ----                    ----
->>     lock(&conn->lock#2);
->>                                  local_irq_disable();
->>                                  lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>                                  lock(&conn->lock#2);
->>     <Interrupt>
->>       lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>
->>    *** DEADLOCK ***
->>
->> As sco_conn_del now disables local bh before calling sco_chan_del,
->> instead of disabling local bh for the calls to sco_conn_lock in
->> sco_chan_del, we instead wrap other calls to sco_chan_del with
->> local_bh_disable/enable.
->>
->> Reported-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
->> Tested-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
->> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
->> ---
->>
->> Hi,
->>
->> The previous version of this patch was a bit of a mess, so I made the
->> following changes.
->>
->> v1 -> v2:
->> - Instead of pulling out the clean-up code out from sco_chan_del and
->> using it directly in sco_conn_del, disable local irqs for relevant
->> sections.
->> - Disable local irqs more thoroughly for instances of
->> bh_lock_sock/bh_lock_sock_nested in the bluetooth subsystem.
->> Specifically, the calls in af_bluetooth.c and rfcomm/sock.c are now made
->> with local irqs disabled as well.
->>
->> Best wishes,
->> Desmond
->>
->>   net/bluetooth/rfcomm/sock.c |  2 ++
->>   net/bluetooth/sco.c         | 26 +++++++++++++++++++++++++-
->>   2 files changed, 27 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
->> index ae6f80730561..d8734abb2df4 100644
->> --- a/net/bluetooth/rfcomm/sock.c
->> +++ b/net/bluetooth/rfcomm/sock.c
->> @@ -974,6 +974,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
->>          if (!parent)
->>                  return 0;
->>
->> +       local_bh_disable();
->>          bh_lock_sock(parent);
->>
->>          /* Check for backlog size */
->> @@ -1002,6 +1003,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
->>
->>   done:
->>          bh_unlock_sock(parent);
->> +       local_bh_enable();
-> 
-> Looks like you are touching RFCOMM as well, perhaps you should have it
-> split, also how about other sockets like L2CAP and HCI are they
-> affected? There seems to be a lot of problem with the likes of
-> bh_lock_sock I wonder if going with local_bh_disable is overall a
-> better way to handle.
-> 
-
-Thanks for the feedback, Luiz. I'll separate the SCO and RFCOMM code 
-changes.
-
-I believe other sockets should be fine. From what I see, they use 
-lock_sock, which acquires the spin lock via spin_lock_bh under the hood. 
-So only code that uses bh_lock_sock/bh_lock_sock_nested are affected.
-
-Also I'm not sure what you meant by going with local_bh_disable? I'm 
-probably missing context about Bluetooth protocols, but I think the spin 
-locks still have their place to protect concurrent accesses and to make 
-it clear about what's being protected.
-
->>          if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
->>                  parent->sk_state_change(parent);
->> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
->> index 3bd41563f118..2548b8f81473 100644
->> --- a/net/bluetooth/sco.c
->> +++ b/net/bluetooth/sco.c
->> @@ -167,16 +167,22 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
->>          BT_DBG("hcon %p conn %p, err %d", hcon, conn, err);
->>
->>          /* Kill socket */
->> +       local_bh_disable();
->>          sco_conn_lock(conn);
->>          sk = conn->sk;
->>          sco_conn_unlock(conn);
->> +       local_bh_enable();
->>
->>          if (sk) {
->>                  sock_hold(sk);
->> +
->> +               local_bh_disable();
->>                  bh_lock_sock(sk);
->>                  sco_sock_clear_timer(sk);
->>                  sco_chan_del(sk, err);
->>                  bh_unlock_sock(sk);
->> +               local_bh_enable();
->> +
->>                  sco_sock_kill(sk);
->>                  sock_put(sk);
->>          }
->> @@ -202,6 +208,7 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
->>   {
->>          int err = 0;
->>
->> +       local_bh_disable();
->>          sco_conn_lock(conn);
->>          if (conn->sk)
->>                  err = -EBUSY;
->> @@ -209,6 +216,7 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
->>                  __sco_chan_add(conn, sk, parent);
->>
->>          sco_conn_unlock(conn);
->> +       local_bh_enable();
->>          return err;
->>   }
->>
->> @@ -303,9 +311,11 @@ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
->>   {
->>          struct sock *sk;
->>
->> +       local_bh_disable();
->>          sco_conn_lock(conn);
->>          sk = conn->sk;
->>          sco_conn_unlock(conn);
->> +       local_bh_enable();
->>
->>          if (!sk)
->>                  goto drop;
->> @@ -420,18 +430,25 @@ static void __sco_sock_close(struct sock *sk)
->>                  if (sco_pi(sk)->conn->hcon) {
->>                          sk->sk_state = BT_DISCONN;
->>                          sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
->> +                       local_bh_disable();
->>                          sco_conn_lock(sco_pi(sk)->conn);
->>                          hci_conn_drop(sco_pi(sk)->conn->hcon);
->>                          sco_pi(sk)->conn->hcon = NULL;
->>                          sco_conn_unlock(sco_pi(sk)->conn);
->> -               } else
->> +                       local_bh_enable();
->> +               } else {
->> +                       local_bh_disable();
->>                          sco_chan_del(sk, ECONNRESET);
->> +                       local_bh_enable();
->> +               }
->>                  break;
->>
->>          case BT_CONNECT2:
->>          case BT_CONNECT:
->>          case BT_DISCONN:
->> +               local_bh_disable();
->>                  sco_chan_del(sk, ECONNRESET);
->> +               local_bh_enable();
->>                  break;
->>
->>          default:
->> @@ -1084,21 +1101,26 @@ static void sco_conn_ready(struct sco_conn *conn)
->>
->>          if (sk) {
->>                  sco_sock_clear_timer(sk);
->> +               local_bh_disable();
->>                  bh_lock_sock(sk);
->>                  sk->sk_state = BT_CONNECTED;
->>                  sk->sk_state_change(sk);
->>                  bh_unlock_sock(sk);
->> +               local_bh_enable();
->>          } else {
->> +               local_bh_disable();
->>                  sco_conn_lock(conn);
->>
->>                  if (!conn->hcon) {
->>                          sco_conn_unlock(conn);
->> +                       local_bh_enable();
->>                          return;
->>                  }
->>
->>                  parent = sco_get_sock_listen(&conn->hcon->src);
->>                  if (!parent) {
->>                          sco_conn_unlock(conn);
->> +                       local_bh_enable();
->>                          return;
->>                  }
->>
->> @@ -1109,6 +1131,7 @@ static void sco_conn_ready(struct sco_conn *conn)
->>                  if (!sk) {
->>                          bh_unlock_sock(parent);
->>                          sco_conn_unlock(conn);
->> +                       local_bh_enable();
->>                          return;
->>                  }
->>
->> @@ -1131,6 +1154,7 @@ static void sco_conn_ready(struct sco_conn *conn)
->>                  bh_unlock_sock(parent);
->>
->>                  sco_conn_unlock(conn);
->> +               local_bh_enable();
->>          }
->>   }
->>
->> --
->> 2.25.1
->>
-> 
-> 
-
+SGkgdGhlcmUsCgpJJ20ganVzdCBleGhpbGFyYXRlZCB0byBzZWUgdGhlcmUgaGF2ZSBiZWVuIHNv
+bWUgbmV3IGlkZWFzIHRvIGZpeCB0aGlzLgoKPiAKPiBIb3cgYWJvdXQgd2UgcmV2ZXJ0IGJhY2sg
+dG8gdXNlIGJoX2xvY2tfc29ja19uZXN0ZWQgYnV0IHVzZQo+IGxvY2FsX2JoX2Rpc2FibGUgbGlr
+ZSB0aGUgZm9sbG93aW5nIHBhdGNoOgo+IAo+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcv
+cHJvamVjdC9ibHVldG9vdGgvcGF0Y2gvMjAyMTA3MTMxNjI4MzguNjkzMjY2LTEtZGVzbW9uZGNo
+ZW9uZ3p4QGdtYWlsLmNvbS8KPiAKCkkgaGF2ZSBjaGVja2VkIHRoYXQgcGF0Y2ggYW5kIGxlYXJu
+IGFib3V0IHNvbWUgYGxvY2FsX2JoX2Rpc2FibGUvZW5hYmxlYCB1c2FnZS4KVG8gdGhlIGJlc3Qg
+b2YgbXkga25vd2xlZGdlLCB0aGUgbG9jYWxfYmhfZGlzYWJsZSgpIGZ1bmN0aW9uIGNhbiBiZSB1
+c2VkIHRvIGRpc2FibGUgdGhlIHByb2Nlc3Npbmcgb2YgYm90dG9tIGhhbHZlcyAoc29mdGlycXMp
+LgpPciBpbiBhbm90aGVyIHdvcmQsIGlmIHByb2Nlc3MgY29udGV4dCBmdW5jdGlvbiwgaGNpX3Nv
+Y2tfc2VuZG1zZygpIGZvciBleGFtcGxlLCBjYW4gbWFzayB0aGUgQkggKGhjaV9kZXZfZG9fY2xv
+c2UoKT8pLiBJdCBkb2Vzbid0IG5lZWQgdG8gd29ycnkgYWJvdXQgdGhlIFVBRi4KCkhvd2V2ZXIs
+IGFmdGVyIGRvaW5nIHNvbWUgZXhwZXJpbWVudHMsIEkgZmFpbGVkIDooCkZvciBpbnN0YW5jZSwg
+SSB0cnkgdG8gZG8gZm9sbG93aW5nIHBhdGNoOgoKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29j
+ay5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX3NvY2suYwpAQCAtMTcyMCw2ICsxNzIwLDcgQEAg
+c3RhdGljIGludCBoY2lfc29ja19zZW5kbXNnKHN0cnVjdCBzb2NrZXQgKnNvY2ssIHN0cnVjdCBt
+c2doZHIgKm1zZywKICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwoKICAgICAgICBsb2Nr
+X3NvY2soc2spOworICAgICAgIGxvY2FsX2JoX2Rpc2FibGUoKTsKCiAgICAgICAgc3dpdGNoICho
+Y2lfcGkoc2spLT5jaGFubmVsKSB7CiAgICAgICAgY2FzZSBIQ0lfQ0hBTk5FTF9SQVc6CkBAIC0x
+ODMyLDcgKzE4MzMsOSBAQCBzdGF0aWMgaW50IGhjaV9zb2NrX3NlbmRtc2coc3RydWN0IHNvY2tl
+dCAqc29jaywgc3RydWN0IG1zZ2hkciAqbXNnLAogICAgICAgIGVyciA9IGxlbjsKCiBkb25lOgor
+ICAgICAgIGxvY2FsX2JoX2VuYWJsZSgpOwogICAgICAgIHJlbGVhc2Vfc29jayhzayk7CisKICAg
+ICAgICByZXR1cm4gZXJyOwoKQnV0IHRoZSBQT0MgY29kZSBzaG93cyBlcnJvciBtZXNzYWdlIGxp
+a2UgYmVsb3c6CgpbICAgMTguMTY5MTU1XSBCVUc6IHNsZWVwaW5nIGZ1bmN0aW9uIGNhbGxlZCBm
+cm9tIGludmFsaWQgY29udGV4dCBhdCBpbmNsdWRlL2xpbnV4L3NjaGVkL21tLmg6MTk3ClsgICAx
+OC4xNzAxODFdIGluX2F0b21pYygpOiAxLCBpcnFzX2Rpc2FibGVkKCk6IDAsIG5vbl9ibG9jazog
+MCwgcGlkOiAxMjAsIG5hbWU6IGV4cApbICAgMTguMTcwOTg3XSAxIGxvY2sgaGVsZCBieSBleHAv
+MTIwOgpbICAgMTguMTcxMzg0XSAgIzA6IGZmZmY4ODgwMTFkZDUxMjAgKHNrX2xvY2stQUZfQkxV
+RVRPT1RILUJUUFJPVE9fSENJKXsrLisufS17MDowfSwgYXQ6IGhjaV9zb2NrX3NlbmRtc2crMHgx
+MWUvMHgyNmMwClsgICAxOC4xNzIzMDBdIENQVTogMCBQSUQ6IDEyMCBDb21tOiBleHAgTm90IHRh
+aW50ZWQgNS4xMS4xMSsgIzQ0ClsgICAxOC4xNzI5MjFdIEhhcmR3YXJlIG5hbWU6IFFFTVUgU3Rh
+bmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9TIDEuMTAuMi0xdWJ1bnR1MSAwNC8w
+MS8yMDE0Ci4uLgoKVGhlIHBhdGNoIHByb3ZpZGVkIGJ5IERlc21vbmQgYWRkcyB0aGUgbG9jYWxf
+YmhfZGlzYWJsZSgpIGJlZm9yZSB0aGUgYmhfbG9ja19zb2NrKCkgc28gSSBhbHNvIHRyeSB0aGF0
+IGluIAoKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCisrKyBiL25ldC9ibHVldG9vdGgv
+aGNpX3NvY2suYwpAQCAtNzYyLDYgKzc2Miw3IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2ZW50KHN0
+cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCiAgICAgICAgICAgICAgICAvKiBEZXRhY2gg
+c29ja2V0cyBmcm9tIGRldmljZSAqLwogICAgICAgICAgICAgICAgcmVhZF9sb2NrKCZoY2lfc2tf
+bGlzdC5sb2NrKTsKICAgICAgICAgICAgICAgIHNrX2Zvcl9lYWNoKHNrLCAmaGNpX3NrX2xpc3Qu
+aGVhZCkgeworICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9iaF9kaXNhYmxlKCk7CiAgICAg
+ICAgICAgICAgICAgICAgICAgIGJoX2xvY2tfc29ja19uZXN0ZWQoc2spOwogICAgICAgICAgICAg
+ICAgICAgICAgICBpZiAoaGNpX3BpKHNrKS0+aGRldiA9PSBoZGV2KSB7CiAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICAgaGNpX3BpKHNrKS0+aGRldiA9IE5VTEw7CkBAIC03NzIsNiArNzcz
+LDcgQEAgdm9pZCBoY2lfc29ja19kZXZfZXZlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIGludCBl
+dmVudCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoY2lfZGV2X3B1dChoZGV2KTsK
+ICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICBiaF91bmxv
+Y2tfc29jayhzayk7CisgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsX2JoX2VuYWJsZSgpOwog
+ICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgcmVhZF91bmxvY2soJmhjaV9za19saXN0
+LmxvY2spOwogICAgICAgIH0KCkJ1dCB0aGlzIGlzIG5vdCB1c2VmdWwsIHRoZSBVQUYgc3RpbGwg
+b2NjdXJzCgpbICAgMTMuODYyMTE3XSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
+PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KWyAgIDEzLjg2MzA2NF0gQlVHOiBLQVNB
+TjogdXNlLWFmdGVyLWZyZWUgaW4gX19sb2NrX2FjcXVpcmUrMHhlNS8weDJjYTAKWyAgIDEzLjg2
+Mzg1Ml0gUmVhZCBvZiBzaXplIDggYXQgYWRkciBmZmZmODg4MDExZDlhZWIwIGJ5IHRhc2sgZXhw
+LzExOQpbICAgMTMuODY0NjIwXQpbICAgMTMuODY0ODE4XSBDUFU6IDAgUElEOiAxMTkgQ29tbTog
+ZXhwIE5vdCB0YWludGVkIDUuMTEuMTErICM0NQpbICAgMTMuODY1NTQzXSBIYXJkd2FyZSBuYW1l
+OiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyAxLjEwLjItMXVi
+dW50dTEgMDQvMDEvMjAxNApbICAgMTMuODY2NjM0XSBDYWxsIFRyYWNlOgpbICAgMTMuODY2OTQ3
+XSAgZHVtcF9zdGFjaysweDE4My8weDIyZQpbICAgMTMuODY3Mzg5XSAgPyBzaG93X3JlZ3NfcHJp
+bnRfaW5mbysweDEyLzB4MTIKWyAgIDEzLjg2NzkyN10gID8gbG9nX2J1Zl92bWNvcmVpbmZvX3Nl
+dHVwKzB4NDVkLzB4NDVkClsgICAxMy44Njg1MDNdICA/IF9yYXdfc3Bpbl9sb2NrX2lycXNhdmUr
+MHhiZC8weDEwMApbICAgMTMuODY5MjQ0XSAgcHJpbnRfYWRkcmVzc19kZXNjcmlwdGlvbisweDdi
+LzB4M2EwClsgICAxMy44Njk4MjhdICBfX2thc2FuX3JlcG9ydCsweDE0ZS8weDIwMApbICAgMTMu
+ODcwMjg4XSAgPyBfX2xvY2tfYWNxdWlyZSsweGU1LzB4MmNhMApbICAgMTMuODcwNzY4XSAga2Fz
+YW5fcmVwb3J0KzB4NDcvMHg2MApbICAgMTMuODcxMTg5XSAgX19sb2NrX2FjcXVpcmUrMHhlNS8w
+eDJjYTAKWyAgIDEzLjg3MTY0N10gID8gbG9ja19hY3F1aXJlKzB4MTY4LzB4NmEwClsgICAxMy44
+NzIxMDddICA/IHRyYWNlX2xvY2tfcmVsZWFzZSsweDVjLzB4MTIwClsgICAxMy44NzI2MTVdICA/
+IGRvX3VzZXJfYWRkcl9mYXVsdCsweDljMi8weGRiMApbICAgMTMuODczMTM1XSAgPyB0cmFjZV9s
+b2NrX2FjcXVpcmUrMHgxNTAvMHgxNTAKWyAgIDEzLjg3MzY2MV0gID8gcmN1X3JlYWRfbG9ja19z
+Y2hlZF9oZWxkKzB4ODcvMHgxMTAKWyAgIDEzLjg3NDIzMl0gID8gcGVyZl90cmFjZV9yY3VfYmFy
+cmllcisweDM2MC8weDM2MApbICAgMTMuODc0NzkwXSAgPyBhdmNfaGFzX3Blcm1fbm9hdWRpdCsw
+eDQ0Mi8weDRjMApbICAgMTMuODc1MzMyXSAgbG9ja19hY3F1aXJlKzB4MTY4LzB4NmEwClsgICAx
+My44NzU3NzJdICA/IHNrYl9xdWV1ZV90YWlsKzB4MzIvMHgxMjAKWyAgIDEzLjg3NjI0MF0gID8g
+ZG9fa2Vybl9hZGRyX2ZhdWx0KzB4MjMwLzB4MjMwClsgICAxMy44NzY3NTZdICA/IHJlYWRfbG9j
+a19pc19yZWN1cnNpdmUrMHgxMC8weDEwClsgICAxMy44NzczMDBdICA/IGV4Y19wYWdlX2ZhdWx0
+KzB4ZjMvMHgxYjAKWyAgIDEzLjg3Nzc3MF0gID8gY3JlZF9oYXNfY2FwYWJpbGl0eSsweDE5MS8w
+eDNmMApbICAgMTMuODc4MjkwXSAgPyBjcmVkX2hhc19jYXBhYmlsaXR5KzB4MmExLzB4M2YwClsg
+ICAxMy44Nzg4MTZdICA/IHJjdV9sb2NrX3JlbGVhc2UrMHgyMC8weDIwClsgICAxMy44NzkyOTVd
+ICBfcmF3X3NwaW5fbG9ja19pcnFzYXZlKzB4YjEvMHgxMDAKWyAgIDEzLjg3OTgyMV0gID8gc2ti
+X3F1ZXVlX3RhaWwrMHgzMi8weDEyMApbICAgMTMuODgwMjg3XSAgPyBfcmF3X3NwaW5fbG9jaysw
+eDQwLzB4NDAKWyAgIDEzLjg4MDc0NV0gIHNrYl9xdWV1ZV90YWlsKzB4MzIvMHgxMjAKWyAgIDEz
+Ljg4MTE5NF0gIGhjaV9zb2NrX3NlbmRtc2crMHgxNTQ1LzB4MjZiMAoKRnJvbSBteSBwb2ludCBv
+ZiB2aWV3LCBhZGRpbmcgdGhlIGxvY2FsX2JoX2Rpc2FibGUoKSBjYW5ub3QgcHJldmVudCBjdXJy
+ZW50IGhjaV9zb2NrX2Rldl9ldmVudCgpIHRvIHNldCBhbmQgZGVjcmVhc2UgdGhlIHJlZi1jb3Vu
+dC4gSXQncyBub3QgcXVpdGUgc2ltaWxhciB3aXRoIHRoZSBjYXNlcyB0aGF0IERlc21vbmQgZGlz
+Y3Vzc2VkLgooT3IgbWF5YmUganVzdCBJIGRvbid0IGtub3cgaG93IHRvIHVzZSB0aGlzKS4KCkkg
+cmVjZW50bHkgdHJpZWQgdG8gZmluZCBzb21lIHNpbWlsYXIgY2FzZXMgKGFuZCBJIGRpZCwgcmVw
+b3J0ZWQgdG8gc2VjdXJpdHkgYWxyZWFkeSBidXQgZ2V0IG5vIHJlcGx5KSBhbmQgZmlndXJlIG91
+dCBob3cgb3RoZXJzIGFyZSBmaXhlZC4KU29tZSBndWlkZWxpbmUgdGVsbHMgbWUgdGhhdCAoaHR0
+cDovL2Jvb2tzLmdpZ2F0dXgubmwvbWlycm9yL2tlcm5lbGRldmVsb3BtZW50LzA2NzIzMjcyMDEv
+Y2gwN2xldjFzZWM2Lmh0bWwpCgoiSWYgcHJvY2VzcyBjb250ZXh0IGNvZGUgYW5kIGEgYm90dG9t
+IGhhbGYgc2hhcmUgZGF0YSwgeW91IG5lZWQgdG8gZGlzYWJsZSBib3R0b20taGFsZiBwcm9jZXNz
+aW5nIGFuZCBvYnRhaW4gYSBsb2NrIGJlZm9yZSBhY2Nlc3NpbmcgdGhlIGRhdGEuIERvaW5nIGJv
+dGggZW5zdXJlcyBsb2NhbCBhbmQgU01QIHByb3RlY3Rpb24gYW5kIHByZXZlbnRzIGEgZGVhZGxv
+Y2suIgoKQXNzdW1pbmcgaGNpX3NvY2tfc2VuZG1zZygpL2hjaV9zb2NrX2JvdW5kX2lvY3RsKCkg
+YXJlIHRoZSBwcm9jZXNzIGNvbnRleHRzIHdoaWxlIHRoZSBoY2lfc29ja19kZXZfZXZlbnQoKSwg
+bm90IHN1cmUsIGlzIHRoZSBCSCBjb250ZXh0LiBUaGUgZmFjdCBpcyB0aGF0IHRoZSBoY2lfc29j
+a19kZXZfZXZlbnQoKSBzaG91bGQgd2FpdCBmb3IgdGhlIHByb2Nlc3MgY29udGV4dHMuIEhlbmNl
+LCBJIHRoaW5rIFRldHN1byBpcyBvbiB0aGUgcmlnaHQgd2F5LgoKUmVnYXJkcwpMb2NrLU5vb2Ig
+TGluTWEKCgoK
