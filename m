@@ -2,276 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CD933C12002
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 23:58:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9A817C12002
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 00:35:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEC9461396
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 14 Jul 2021 23:58:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 732A0613C2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 00:35:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237074AbhGOAB2 (ORCPT
+        id S230155AbhGOAiZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 20:01:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52898 "EHLO
+        Wed, 14 Jul 2021 20:38:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32804 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229535AbhGOAB1 (ORCPT
+        with ESMTP id S229928AbhGOAiY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 20:01:27 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5A4C061762
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 16:58:34 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id q10so3451099pfj.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 16:58:34 -0700 (PDT)
+        Wed, 14 Jul 2021 20:38:24 -0400
+Received: from mail-pf1-x429.google.com (mail-pf1-x429.google.com [IPv6:2607:f8b0:4864:20::429])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCD55C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 17:35:31 -0700 (PDT)
+Received: by mail-pf1-x429.google.com with SMTP id j199so3524037pfd.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 14 Jul 2021 17:35:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=PbiiiM8zip/W7X26lU1NxZPBKk6n2vAUfcryPqy6b+M=;
-        b=RhzoM+QMXBtR0IH9A7mkTuRY5vol2HXJjZRpvlXbsSme0m8mZkaxBLzE0Oowdo9TMP
-         kvJOsJlWC7QIyL5XbmVv0PCYFlu5fv/2Ocsg37JJgchd99HiU8mTSnmUeUapDsDNaSiq
-         yzZSRTZShX0fJXg9ju5kzeMBYi9r0zDPTyTlhuRwePOClecaBtHQqAeCVyaULMK3XFcT
-         K6Owcw73gPM85vVJwU96ao7w4aypd8JHVsK2hSQ6JEOMdxfhfL/VI1P1urz2XOmqDW2S
-         S1EA0jYzCPlpKjlecdgBbK08XAUi5qe0n+lVwjJES5xm81yEq1V6RIv/j+zIiRTVE9RJ
-         Yx0A==
+        bh=maz5Id7GN+kd9MSFFSJeDZW5ZeqTYNSfGoJr7u2cTOs=;
+        b=R6Y9j/0kFkbRi+sduMF4dUKWCfL8WYv6usVfywtERedqCc+Cq+pGVziOxL2MWH6qYp
+         /WhuwLoN4a4IRjOezgrsdcYB/1i6iUeRev6Bf3SLvOCiTZcLAKfQVSN5p44lUn9vlADE
+         XzEfb7tZ1z0pGPyNnAeVCVN5Q+7Xa4y0Lry/M=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=PbiiiM8zip/W7X26lU1NxZPBKk6n2vAUfcryPqy6b+M=;
-        b=CWcQ7bAiiDHPSL1Cj8Fl/bfd14BCRFUrcc4gIJqGWr+Anh0Twkzy6OLrUhcb/s8YF9
-         95IggxyF3acd+5ncJ7cqEt7fYZ+EwvH1nbNlKeeK9BTsHJoFcyD1CYGpX17Hd2RCSAom
-         phHhzRI0CSsZ2uJ5pMRffc9CaAkWVzTBCDgjqOo5tpooCfM5o6Ic/tQs7wHrBfJi5jyw
-         vQYjromL+3zzm24IF2QnebHHTD3/KoL/bdzDTzUfV+rqlXyIfBE9azNSmH87x0WU9/gw
-         7uOKrUJ7X6Atbi3nL/Cf7UcDsoppwXb4B6LKOT/n/bUnLYvtGNKqdUbdlZExI4cEAdqV
-         LoiA==
-X-Gm-Message-State: AOAM532vyBiGb5uVC7ZIUAE3fBCTckTzRKN5UOn/o0hjMlBOTlmPRSx+
-        vTK/bi7aPPop38nn35RrIwRpcKwyso6Aw/cg
-X-Google-Smtp-Source: ABdhPJxvkji2tzOwIi2Kg29vDnEe9CqxtIngfNl8PFGB+fcAFU/GpSrSODmFGnMimJDoAGwOfzZd6A==
-X-Received: by 2002:a65:6a4c:: with SMTP id o12mr636538pgu.108.1626307114036;
-        Wed, 14 Jul 2021 16:58:34 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x30sm4008580pfh.126.2021.07.14.16.58.33
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 14 Jul 2021 16:58:33 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        bh=maz5Id7GN+kd9MSFFSJeDZW5ZeqTYNSfGoJr7u2cTOs=;
+        b=iUmGu7cAWq7pJCiqRlzp2DMmHf0ZYHY5QHMbEmRucUqp387EeutirazPiqzNWkO4mE
+         a3TpPHjmeeCbGJz9GE6cSEv6EMCNtatA4p2+Di7Rdd2r1TZdNxKNQube7gCNzdS1MmFS
+         gx2ANjVNFKB/McHzzHw5y/tMsYPsdZJaRn5mc1yPD5jazcadE1xD8xQRzwBi9bIglo2N
+         qASctYTRS9wsnkfUWvEsAhyIEbhvxe1TAzR0cLslY0IFgnZhlZZIRc6g0SshAMuLAKqS
+         mrUguQW4DIJu0f6i1eh5QsQcgZJk7FGK8hxkemLLSKbJOwFippflok9Ehpcbc/U8JYs3
+         cIZg==
+X-Gm-Message-State: AOAM5331FuoaXVkNT1iZIzXULIq8n7+vQuJru0WbXj3P9IyfYXvR3PMq
+        1gaw+C4zbvjqC5bzVCmIywlf82f9HRjJBw==
+X-Google-Smtp-Source: ABdhPJwAZ6GhXsVUseFUuZThxNUg5OUv7P/ZRrqS5pVG8r4ZG2dZFrl13MUuLp5xVm44VR9w6ZDUSA==
+X-Received: by 2002:a63:3d0:: with SMTP id 199mr751809pgd.159.1626309330851;
+        Wed, 14 Jul 2021 17:35:30 -0700 (PDT)
+Received: from sonnysasaka-chrome.mtv.corp.google.com ([2620:15c:202:201:93fa:43e6:d832:c6a5])
+        by smtp.gmail.com with ESMTPSA id j129sm4164909pfb.132.2021.07.14.17.35.29
+        (version=TLS1_2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 14 Jul 2021 17:35:30 -0700 (PDT)
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2] btdev: Add proper checks for own_addr_type for LE (extended) scan
-Date:   Wed, 14 Jul 2021 16:58:32 -0700
-Message-Id: <20210714235832.2992619-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+Cc:     Sonny Sasaka <sonnysasaka@chromium.org>
+Subject: [PATCH BlueZ] monitor: Print EIR of Extended Advertisement Report
+Date:   Wed, 14 Jul 2021 17:35:21 -0700
+Message-Id: <20210715003521.2222-1-sonnysasaka@chromium.org>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+It's useful to be able to see Extended Adv's EIR flags just like the
+legacy Adv.
 
-own_addr_type 0x01 and 0x03 shall check that a random address has
-properly been set:
-
-BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 4, Part E
-page 2496:
-
-  'If LE_Scan_Enable is set to 0x01, the scanning parameters'
-  Own_Address_Type parameter is set to 0x01 or 0x03, and the random
-  ddress for the device has not been initialized, the Controller shall
-  return the error code Invalid HCI Command Parameters (0x12).'
-
-BLUETOOTH CORE SPECIFICATION Version 5.2 | Vol 4, Part E
-page 2614:
-
-  'If Enable is set to 0x01, the scanning parameters' Own_Address_Type
-  parameter is set to 0x01 or 0x03, and the random address for the
-  device has not been initialized, the Controller shall return the
-  error code Invalid HCI Command Parameters (0x12).'
+Change-Id: I4805e589837733e7ecf9d33218e4135e8f822a7c
 ---
- emulator/btdev.c | 101 ++++++++++++++++++++++++++++++++++++-----------
- src/main.conf    |   4 +-
- 2 files changed, 81 insertions(+), 24 deletions(-)
+ monitor/packet.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index abd0263d1..e4612ec9e 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -3220,10 +3220,28 @@ static void le_set_adv_enable_complete(struct btdev *btdev)
+diff --git a/monitor/packet.c b/monitor/packet.c
+index fbde71101..51c0bacae 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -10602,6 +10602,7 @@ static void le_ext_adv_report_evt(const void *data, uint8_t size)
+ 		print_field("  Data length: 0x%2.2x", report->data_len);
+ 		data += sizeof(struct bt_hci_le_ext_adv_report);
+ 		packet_hexdump(data, report->data_len);
++		print_eir(data, report->data_len, true);
+ 		data += report->data_len;
  	}
  }
- 
-+#define RL_ADDR_EQUAL(_rl, _type, _addr) \
-+	(_rl->type == _type && !bacmp(&_rl->addr, (bdaddr_t *)_addr))
-+
-+static struct btdev_rl *rl_find(struct btdev *dev, uint8_t type, uint8_t *addr)
-+{
-+	unsigned int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(dev->le_rl); i++) {
-+		struct btdev_rl *rl = &dev->le_rl[i];
-+
-+		if (RL_ADDR_EQUAL(rl, type, addr))
-+			return rl;
-+	}
-+
-+	return NULL;
-+}
-+
- static int cmd_set_adv_enable(struct btdev *dev, const void *data, uint8_t len)
- {
- 	const struct bt_hci_cmd_le_set_ext_adv_enable *cmd = data;
- 	uint8_t status;
-+	bool random_addr;
- 
- 	if (dev->le_adv_enable == cmd->enable) {
- 		status = BT_HCI_ERR_COMMAND_DISALLOWED;
-@@ -3233,6 +3251,36 @@ static int cmd_set_adv_enable(struct btdev *dev, const void *data, uint8_t len)
- 	dev->le_adv_enable = cmd->enable;
- 	status = BT_HCI_ERR_SUCCESS;
- 
-+	if (!cmd->enable)
-+		goto done;
-+
-+	random_addr = bacmp((bdaddr_t *)dev->random_addr, BDADDR_ANY);
-+
-+	/* If Advertising_Enable is set to 0x01, the advertising parameters'
-+	 * Own_Address_Type parameter is set to 0x01, and the random address for
-+	 * the device has not been initialized, the Controller shall return the
-+	 * error code Invalid HCI Command Parameters (0x12).
-+	 */
-+	if (dev->le_adv_own_addr == 0x01 && !random_addr) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
-+	/* If Advertising_Enable is set to 0x01, the advertising parameters'
-+	 * Own_Address_Type parameter is set to 0x03, the controller's resolving
-+	 * list did not contain a matching entry, and the random address for the
-+	 * device has not been initialized, the Controller shall return the
-+	 * error code Invalid HCI Command Parameters (0x12).
-+	 */
-+	if (dev->le_adv_own_addr == 0x03 && !random_addr) {
-+		if (!dev->le_rl_enable ||
-+				!rl_find(dev, dev->le_adv_direct_addr_type,
-+					dev->le_adv_direct_addr)) {
-+			status = BT_HCI_ERR_INVALID_PARAMETERS;
-+			goto done;
-+		}
-+	}
-+
- done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_ADV_ENABLE, &status,
- 						sizeof(status));
-@@ -3275,6 +3323,18 @@ static int cmd_set_scan_enable(struct btdev *dev, const void *data, uint8_t len)
- 		goto done;
- 	}
- 
-+	/* If LE_Scan_Enable is set to 0x01, the scanning parameters'
-+	 * Own_Address_Type parameter is set to 0x01 or 0x03, and the random
-+	 * address for the device has not been initialized, the Controller shall
-+	 * return the error code Invalid HCI Command Parameters (0x12).
-+	 */
-+	if ((dev->le_scan_own_addr_type == 0x01 ||
-+			dev->le_scan_own_addr_type == 0x03) &&
-+			!bacmp((bdaddr_t *)dev->random_addr, BDADDR_ANY)) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
-+
- 	dev->le_scan_enable = cmd->enable;
- 	dev->le_filter_dup = cmd->filter_dup;
- 	status = BT_HCI_ERR_SUCCESS;
-@@ -3586,9 +3646,6 @@ static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
- 	return 0;
- }
- 
--#define RL_ADDR_EQUAL(_rl, _type, _addr) \
--	(_rl->type == _type && !bacmp(&_rl->addr, (bdaddr_t *)_addr))
--
- static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
- {
- 	const struct bt_hci_cmd_le_add_to_resolv_list *cmd = data;
-@@ -4538,20 +4595,6 @@ static bool ext_adv_timeout(void *user_data)
- 	return false;
- }
- 
--static struct btdev_rl *rl_find(struct btdev *dev, uint8_t type, uint8_t *addr)
--{
--	unsigned int i;
--
--	for (i = 0; i < ARRAY_SIZE(dev->le_rl); i++) {
--		struct btdev_rl *rl = &dev->le_rl[i];
--
--		if (RL_ADDR_EQUAL(rl, type, addr))
--			return rl;
--	}
--
--	return NULL;
--}
--
- static int cmd_set_ext_adv_enable(struct btdev *dev, const void *data,
- 							uint8_t len)
- {
-@@ -4819,14 +4862,28 @@ static int cmd_set_ext_scan_enable(struct btdev *dev, const void *data,
- 	const struct bt_hci_cmd_le_set_ext_scan_enable *cmd = data;
- 	uint8_t status;
- 
--	if (dev->le_scan_enable == cmd->enable)
-+	if (dev->le_scan_enable == cmd->enable) {
- 		status = BT_HCI_ERR_COMMAND_DISALLOWED;
--	else {
--		dev->le_scan_enable = cmd->enable;
--		dev->le_filter_dup = cmd->filter_dup;
--		status = BT_HCI_ERR_SUCCESS;
-+		goto done;
-+	}
-+
-+	/* If Enable is set to 0x01, the scanning parameters' Own_Address_Type
-+	 * parameter is set to 0x01 or 0x03, and the random address for the
-+	 * device has not been initialized, the Controller shall return the
-+	 * error code Invalid HCI Command Parameters (0x12).
-+	 */
-+	if ((dev->le_scan_own_addr_type == 0x01 ||
-+			dev->le_scan_own_addr_type == 0x03) &&
-+			!bacmp((bdaddr_t *)dev->random_addr, BDADDR_ANY)) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
- 	}
- 
-+	dev->le_scan_enable = cmd->enable;
-+	dev->le_filter_dup = cmd->filter_dup;
-+	status = BT_HCI_ERR_SUCCESS;
-+
-+done:
- 	cmd_complete(dev, BT_HCI_CMD_LE_SET_EXT_SCAN_ENABLE, &status,
- 							sizeof(status));
- 
-diff --git a/src/main.conf b/src/main.conf
-index 198899541..791b0f909 100644
---- a/src/main.conf
-+++ b/src/main.conf
-@@ -70,7 +70,7 @@
- # Possible values: "off", "device", "network"
- # "network" option not supported currently
- # Defaults to "off"
--# Privacy = off
-+Privacy = device
- 
- # Specify the policy to the JUST-WORKS repairing initiated by peer
- # Possible values: "never", "confirm", "always"
-@@ -88,7 +88,7 @@
- 
- # Enables experimental features and interfaces.
- # Defaults to false.
--#Experimental = false
-+Experimental = true
- 
- [BR]
- # The following values are used to load default adapter parameters for BR/EDR.
 -- 
-2.31.1
+2.31.0
 
