@@ -2,157 +2,232 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 72FF2C12002
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 03:04:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C7680C07E96
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 04:57:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DA9761103
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 03:04:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A60996128B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 15 Jul 2021 04:57:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232545AbhGODG4 (ORCPT
+        id S235229AbhGOFAt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 14 Jul 2021 23:06:56 -0400
-Received: from spam.zju.edu.cn ([61.164.42.155]:45160 "EHLO zju.edu.cn"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S230433AbhGODGz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 14 Jul 2021 23:06:55 -0400
-Received: by ajax-webmail-mail-app4 (Coremail) ; Thu, 15 Jul 2021 11:03:53
- +0800 (GMT+08:00)
-X-Originating-IP: [10.162.82.120]
-Date:   Thu, 15 Jul 2021 11:03:53 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From:   LinMa <linma@zju.edu.cn>
-To:     "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>
-Cc:     "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>,
-        "Marcel Holtmann" <marcel@holtmann.org>,
-        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        Thu, 15 Jul 2021 01:00:49 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:7010 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229675AbhGOFAs (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 15 Jul 2021 01:00:48 -0400
+Received: from dggemv711-chm.china.huawei.com (unknown [172.30.72.56])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4GQMRd44MDzXtG2;
+        Thu, 15 Jul 2021 12:52:13 +0800 (CST)
+Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 12:57:52 +0800
+Received: from [10.174.179.224] (10.174.179.224) by
+ dggpemm500015.china.huawei.com (7.185.36.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Thu, 15 Jul 2021 12:57:51 +0800
+Subject: Re: [PATCH] Bluetooth: fix use-after-free error in lock_sock_nested()
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+CC:     <cj.chengjian@huawei.com>, Wei Yongjun <weiyongjun1@huawei.com>,
+        <yuehaibing@huawei.com>, <huawei.libin@huawei.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: Re: [PATCH v3] Bluetooth: call lock_sock() outside of spinlock
- section
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
- Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
-In-Reply-To: <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
-References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
- <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
- <48d66166-4d39-4fe2-3392-7e0c84b9bdb3@i-love.sakura.ne.jp>
- <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>
+References: <20210714031733.1395549-1-bobo.shaobowang@huawei.com>
+ <CABBYNZL37yLgj1LP7r=rbEcsPXCPy1y55ar816eZXka2W=7-Aw@mail.gmail.com>
+From:   "Wangshaobo (bobo)" <bobo.shaobowang@huawei.com>
+Message-ID: <a1c4ddcb-afbd-c0e4-2003-90590b10ea84@huawei.com>
+Date:   Thu, 15 Jul 2021 12:57:51 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
 MIME-Version: 1.0
-Message-ID: <674e6b1c.4780d.17aa81ee04c.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: en_US
-X-CM-TRANSID: cS_KCgAXSXSZpe9gkNjsAA--.32411W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwUHElNG3DfRWwABsm
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
-        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-        daVFxhVjvjDU=
+In-Reply-To: <CABBYNZL37yLgj1LP7r=rbEcsPXCPy1y55ar816eZXka2W=7-Aw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.224]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500015.china.huawei.com (7.185.36.181)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgdGhlcmUsCgpJJ20ganVzdCBleGhpbGFyYXRlZCB0byBzZWUgdGhlcmUgaGF2ZSBiZWVuIHNv
-bWUgbmV3IGlkZWFzIHRvIGZpeCB0aGlzLgoKPiAKPiBIb3cgYWJvdXQgd2UgcmV2ZXJ0IGJhY2sg
-dG8gdXNlIGJoX2xvY2tfc29ja19uZXN0ZWQgYnV0IHVzZQo+IGxvY2FsX2JoX2Rpc2FibGUgbGlr
-ZSB0aGUgZm9sbG93aW5nIHBhdGNoOgo+IAo+IGh0dHBzOi8vcGF0Y2h3b3JrLmtlcm5lbC5vcmcv
-cHJvamVjdC9ibHVldG9vdGgvcGF0Y2gvMjAyMTA3MTMxNjI4MzguNjkzMjY2LTEtZGVzbW9uZGNo
-ZW9uZ3p4QGdtYWlsLmNvbS8KPiAKCkkgaGF2ZSBjaGVja2VkIHRoYXQgcGF0Y2ggYW5kIGxlYXJu
-IGFib3V0IHNvbWUgYGxvY2FsX2JoX2Rpc2FibGUvZW5hYmxlYCB1c2FnZS4KVG8gdGhlIGJlc3Qg
-b2YgbXkga25vd2xlZGdlLCB0aGUgbG9jYWxfYmhfZGlzYWJsZSgpIGZ1bmN0aW9uIGNhbiBiZSB1
-c2VkIHRvIGRpc2FibGUgdGhlIHByb2Nlc3Npbmcgb2YgYm90dG9tIGhhbHZlcyAoc29mdGlycXMp
-LgpPciBpbiBhbm90aGVyIHdvcmQsIGlmIHByb2Nlc3MgY29udGV4dCBmdW5jdGlvbiwgaGNpX3Nv
-Y2tfc2VuZG1zZygpIGZvciBleGFtcGxlLCBjYW4gbWFzayB0aGUgQkggKGhjaV9kZXZfZG9fY2xv
-c2UoKT8pLiBJdCBkb2Vzbid0IG5lZWQgdG8gd29ycnkgYWJvdXQgdGhlIFVBRi4KCkhvd2V2ZXIs
-IGFmdGVyIGRvaW5nIHNvbWUgZXhwZXJpbWVudHMsIEkgZmFpbGVkIDooCkZvciBpbnN0YW5jZSwg
-SSB0cnkgdG8gZG8gZm9sbG93aW5nIHBhdGNoOgoKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29j
-ay5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNpX3NvY2suYwpAQCAtMTcyMCw2ICsxNzIwLDcgQEAg
-c3RhdGljIGludCBoY2lfc29ja19zZW5kbXNnKHN0cnVjdCBzb2NrZXQgKnNvY2ssIHN0cnVjdCBt
-c2doZHIgKm1zZywKICAgICAgICAgICAgICAgIHJldHVybiAtRUlOVkFMOwoKICAgICAgICBsb2Nr
-X3NvY2soc2spOworICAgICAgIGxvY2FsX2JoX2Rpc2FibGUoKTsKCiAgICAgICAgc3dpdGNoICho
-Y2lfcGkoc2spLT5jaGFubmVsKSB7CiAgICAgICAgY2FzZSBIQ0lfQ0hBTk5FTF9SQVc6CkBAIC0x
-ODMyLDcgKzE4MzMsOSBAQCBzdGF0aWMgaW50IGhjaV9zb2NrX3NlbmRtc2coc3RydWN0IHNvY2tl
-dCAqc29jaywgc3RydWN0IG1zZ2hkciAqbXNnLAogICAgICAgIGVyciA9IGxlbjsKCiBkb25lOgor
-ICAgICAgIGxvY2FsX2JoX2VuYWJsZSgpOwogICAgICAgIHJlbGVhc2Vfc29jayhzayk7CisKICAg
-ICAgICByZXR1cm4gZXJyOwoKQnV0IHRoZSBQT0MgY29kZSBzaG93cyBlcnJvciBtZXNzYWdlIGxp
-a2UgYmVsb3c6CgpbICAgMTguMTY5MTU1XSBCVUc6IHNsZWVwaW5nIGZ1bmN0aW9uIGNhbGxlZCBm
-cm9tIGludmFsaWQgY29udGV4dCBhdCBpbmNsdWRlL2xpbnV4L3NjaGVkL21tLmg6MTk3ClsgICAx
-OC4xNzAxODFdIGluX2F0b21pYygpOiAxLCBpcnFzX2Rpc2FibGVkKCk6IDAsIG5vbl9ibG9jazog
-MCwgcGlkOiAxMjAsIG5hbWU6IGV4cApbICAgMTguMTcwOTg3XSAxIGxvY2sgaGVsZCBieSBleHAv
-MTIwOgpbICAgMTguMTcxMzg0XSAgIzA6IGZmZmY4ODgwMTFkZDUxMjAgKHNrX2xvY2stQUZfQkxV
-RVRPT1RILUJUUFJPVE9fSENJKXsrLisufS17MDowfSwgYXQ6IGhjaV9zb2NrX3NlbmRtc2crMHgx
-MWUvMHgyNmMwClsgICAxOC4xNzIzMDBdIENQVTogMCBQSUQ6IDEyMCBDb21tOiBleHAgTm90IHRh
-aW50ZWQgNS4xMS4xMSsgIzQ0ClsgICAxOC4xNzI5MjFdIEhhcmR3YXJlIG5hbWU6IFFFTVUgU3Rh
-bmRhcmQgUEMgKGk0NDBGWCArIFBJSVgsIDE5OTYpLCBCSU9TIDEuMTAuMi0xdWJ1bnR1MSAwNC8w
-MS8yMDE0Ci4uLgoKVGhlIHBhdGNoIHByb3ZpZGVkIGJ5IERlc21vbmQgYWRkcyB0aGUgbG9jYWxf
-YmhfZGlzYWJsZSgpIGJlZm9yZSB0aGUgYmhfbG9ja19zb2NrKCkgc28gSSBhbHNvIHRyeSB0aGF0
-IGluIAoKLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCisrKyBiL25ldC9ibHVldG9vdGgv
-aGNpX3NvY2suYwpAQCAtNzYyLDYgKzc2Miw3IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2ZW50KHN0
-cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCiAgICAgICAgICAgICAgICAvKiBEZXRhY2gg
-c29ja2V0cyBmcm9tIGRldmljZSAqLwogICAgICAgICAgICAgICAgcmVhZF9sb2NrKCZoY2lfc2tf
-bGlzdC5sb2NrKTsKICAgICAgICAgICAgICAgIHNrX2Zvcl9lYWNoKHNrLCAmaGNpX3NrX2xpc3Qu
-aGVhZCkgeworICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9iaF9kaXNhYmxlKCk7CiAgICAg
-ICAgICAgICAgICAgICAgICAgIGJoX2xvY2tfc29ja19uZXN0ZWQoc2spOwogICAgICAgICAgICAg
-ICAgICAgICAgICBpZiAoaGNpX3BpKHNrKS0+aGRldiA9PSBoZGV2KSB7CiAgICAgICAgICAgICAg
-ICAgICAgICAgICAgICAgICAgaGNpX3BpKHNrKS0+aGRldiA9IE5VTEw7CkBAIC03NzIsNiArNzcz
-LDcgQEAgdm9pZCBoY2lfc29ja19kZXZfZXZlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIGludCBl
-dmVudCkKICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICBoY2lfZGV2X3B1dChoZGV2KTsK
-ICAgICAgICAgICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgICAgICAgICBiaF91bmxv
-Y2tfc29jayhzayk7CisgICAgICAgICAgICAgICAgICAgICAgIGxvY2FsX2JoX2VuYWJsZSgpOwog
-ICAgICAgICAgICAgICAgfQogICAgICAgICAgICAgICAgcmVhZF91bmxvY2soJmhjaV9za19saXN0
-LmxvY2spOwogICAgICAgIH0KCkJ1dCB0aGlzIGlzIG5vdCB1c2VmdWwsIHRoZSBVQUYgc3RpbGwg
-b2NjdXJzCgpbICAgMTMuODYyMTE3XSA9PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KWyAgIDEzLjg2MzA2NF0gQlVHOiBLQVNB
-TjogdXNlLWFmdGVyLWZyZWUgaW4gX19sb2NrX2FjcXVpcmUrMHhlNS8weDJjYTAKWyAgIDEzLjg2
-Mzg1Ml0gUmVhZCBvZiBzaXplIDggYXQgYWRkciBmZmZmODg4MDExZDlhZWIwIGJ5IHRhc2sgZXhw
-LzExOQpbICAgMTMuODY0NjIwXQpbICAgMTMuODY0ODE4XSBDUFU6IDAgUElEOiAxMTkgQ29tbTog
-ZXhwIE5vdCB0YWludGVkIDUuMTEuMTErICM0NQpbICAgMTMuODY1NTQzXSBIYXJkd2FyZSBuYW1l
-OiBRRU1VIFN0YW5kYXJkIFBDIChpNDQwRlggKyBQSUlYLCAxOTk2KSwgQklPUyAxLjEwLjItMXVi
-dW50dTEgMDQvMDEvMjAxNApbICAgMTMuODY2NjM0XSBDYWxsIFRyYWNlOgpbICAgMTMuODY2OTQ3
-XSAgZHVtcF9zdGFjaysweDE4My8weDIyZQpbICAgMTMuODY3Mzg5XSAgPyBzaG93X3JlZ3NfcHJp
-bnRfaW5mbysweDEyLzB4MTIKWyAgIDEzLjg2NzkyN10gID8gbG9nX2J1Zl92bWNvcmVpbmZvX3Nl
-dHVwKzB4NDVkLzB4NDVkClsgICAxMy44Njg1MDNdICA/IF9yYXdfc3Bpbl9sb2NrX2lycXNhdmUr
-MHhiZC8weDEwMApbICAgMTMuODY5MjQ0XSAgcHJpbnRfYWRkcmVzc19kZXNjcmlwdGlvbisweDdi
-LzB4M2EwClsgICAxMy44Njk4MjhdICBfX2thc2FuX3JlcG9ydCsweDE0ZS8weDIwMApbICAgMTMu
-ODcwMjg4XSAgPyBfX2xvY2tfYWNxdWlyZSsweGU1LzB4MmNhMApbICAgMTMuODcwNzY4XSAga2Fz
-YW5fcmVwb3J0KzB4NDcvMHg2MApbICAgMTMuODcxMTg5XSAgX19sb2NrX2FjcXVpcmUrMHhlNS8w
-eDJjYTAKWyAgIDEzLjg3MTY0N10gID8gbG9ja19hY3F1aXJlKzB4MTY4LzB4NmEwClsgICAxMy44
-NzIxMDddICA/IHRyYWNlX2xvY2tfcmVsZWFzZSsweDVjLzB4MTIwClsgICAxMy44NzI2MTVdICA/
-IGRvX3VzZXJfYWRkcl9mYXVsdCsweDljMi8weGRiMApbICAgMTMuODczMTM1XSAgPyB0cmFjZV9s
-b2NrX2FjcXVpcmUrMHgxNTAvMHgxNTAKWyAgIDEzLjg3MzY2MV0gID8gcmN1X3JlYWRfbG9ja19z
-Y2hlZF9oZWxkKzB4ODcvMHgxMTAKWyAgIDEzLjg3NDIzMl0gID8gcGVyZl90cmFjZV9yY3VfYmFy
-cmllcisweDM2MC8weDM2MApbICAgMTMuODc0NzkwXSAgPyBhdmNfaGFzX3Blcm1fbm9hdWRpdCsw
-eDQ0Mi8weDRjMApbICAgMTMuODc1MzMyXSAgbG9ja19hY3F1aXJlKzB4MTY4LzB4NmEwClsgICAx
-My44NzU3NzJdICA/IHNrYl9xdWV1ZV90YWlsKzB4MzIvMHgxMjAKWyAgIDEzLjg3NjI0MF0gID8g
-ZG9fa2Vybl9hZGRyX2ZhdWx0KzB4MjMwLzB4MjMwClsgICAxMy44NzY3NTZdICA/IHJlYWRfbG9j
-a19pc19yZWN1cnNpdmUrMHgxMC8weDEwClsgICAxMy44NzczMDBdICA/IGV4Y19wYWdlX2ZhdWx0
-KzB4ZjMvMHgxYjAKWyAgIDEzLjg3Nzc3MF0gID8gY3JlZF9oYXNfY2FwYWJpbGl0eSsweDE5MS8w
-eDNmMApbICAgMTMuODc4MjkwXSAgPyBjcmVkX2hhc19jYXBhYmlsaXR5KzB4MmExLzB4M2YwClsg
-ICAxMy44Nzg4MTZdICA/IHJjdV9sb2NrX3JlbGVhc2UrMHgyMC8weDIwClsgICAxMy44NzkyOTVd
-ICBfcmF3X3NwaW5fbG9ja19pcnFzYXZlKzB4YjEvMHgxMDAKWyAgIDEzLjg3OTgyMV0gID8gc2ti
-X3F1ZXVlX3RhaWwrMHgzMi8weDEyMApbICAgMTMuODgwMjg3XSAgPyBfcmF3X3NwaW5fbG9jaysw
-eDQwLzB4NDAKWyAgIDEzLjg4MDc0NV0gIHNrYl9xdWV1ZV90YWlsKzB4MzIvMHgxMjAKWyAgIDEz
-Ljg4MTE5NF0gIGhjaV9zb2NrX3NlbmRtc2crMHgxNTQ1LzB4MjZiMAoKRnJvbSBteSBwb2ludCBv
-ZiB2aWV3LCBhZGRpbmcgdGhlIGxvY2FsX2JoX2Rpc2FibGUoKSBjYW5ub3QgcHJldmVudCBjdXJy
-ZW50IGhjaV9zb2NrX2Rldl9ldmVudCgpIHRvIHNldCBhbmQgZGVjcmVhc2UgdGhlIHJlZi1jb3Vu
-dC4gSXQncyBub3QgcXVpdGUgc2ltaWxhciB3aXRoIHRoZSBjYXNlcyB0aGF0IERlc21vbmQgZGlz
-Y3Vzc2VkLgooT3IgbWF5YmUganVzdCBJIGRvbid0IGtub3cgaG93IHRvIHVzZSB0aGlzKS4KCkkg
-cmVjZW50bHkgdHJpZWQgdG8gZmluZCBzb21lIHNpbWlsYXIgY2FzZXMgKGFuZCBJIGRpZCwgcmVw
-b3J0ZWQgdG8gc2VjdXJpdHkgYWxyZWFkeSBidXQgZ2V0IG5vIHJlcGx5KSBhbmQgZmlndXJlIG91
-dCBob3cgb3RoZXJzIGFyZSBmaXhlZC4KU29tZSBndWlkZWxpbmUgdGVsbHMgbWUgdGhhdCAoaHR0
-cDovL2Jvb2tzLmdpZ2F0dXgubmwvbWlycm9yL2tlcm5lbGRldmVsb3BtZW50LzA2NzIzMjcyMDEv
-Y2gwN2xldjFzZWM2Lmh0bWwpCgoiSWYgcHJvY2VzcyBjb250ZXh0IGNvZGUgYW5kIGEgYm90dG9t
-IGhhbGYgc2hhcmUgZGF0YSwgeW91IG5lZWQgdG8gZGlzYWJsZSBib3R0b20taGFsZiBwcm9jZXNz
-aW5nIGFuZCBvYnRhaW4gYSBsb2NrIGJlZm9yZSBhY2Nlc3NpbmcgdGhlIGRhdGEuIERvaW5nIGJv
-dGggZW5zdXJlcyBsb2NhbCBhbmQgU01QIHByb3RlY3Rpb24gYW5kIHByZXZlbnRzIGEgZGVhZGxv
-Y2suIgoKQXNzdW1pbmcgaGNpX3NvY2tfc2VuZG1zZygpL2hjaV9zb2NrX2JvdW5kX2lvY3RsKCkg
-YXJlIHRoZSBwcm9jZXNzIGNvbnRleHRzIHdoaWxlIHRoZSBoY2lfc29ja19kZXZfZXZlbnQoKSwg
-bm90IHN1cmUsIGlzIHRoZSBCSCBjb250ZXh0LiBUaGUgZmFjdCBpcyB0aGF0IHRoZSBoY2lfc29j
-a19kZXZfZXZlbnQoKSBzaG91bGQgd2FpdCBmb3IgdGhlIHByb2Nlc3MgY29udGV4dHMuIEhlbmNl
-LCBJIHRoaW5rIFRldHN1byBpcyBvbiB0aGUgcmlnaHQgd2F5LgoKUmVnYXJkcwpMb2NrLU5vb2Ig
-TGluTWEKCgoK
+
+在 2021/7/15 5:50, Luiz Augusto von Dentz 写道:
+> Hi,
+>
+> On Tue, Jul 13, 2021 at 8:20 PM Wang ShaoBo <bobo.shaobowang@huawei.com> wrote:
+>> use-after-free error in lock_sock_nested() is reported:
+>>
+>> [  179.140137][ T3731] =====================================================
+>> [  179.142675][ T3731] BUG: KMSAN: use-after-free in lock_sock_nested+0x280/0x2c0
+>> [  179.145494][ T3731] CPU: 4 PID: 3731 Comm: kworker/4:2 Not tainted 5.12.0-rc6+ #54
+>> [  179.148432][ T3731] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+>> [  179.151806][ T3731] Workqueue: events l2cap_chan_timeout
+>> [  179.152730][ T3731] Call Trace:
+>> [  179.153301][ T3731]  dump_stack+0x24c/0x2e0
+>> [  179.154063][ T3731]  kmsan_report+0xfb/0x1e0
+>> [  179.154855][ T3731]  __msan_warning+0x5c/0xa0
+>> [  179.155579][ T3731]  lock_sock_nested+0x280/0x2c0
+>> [  179.156436][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.157257][ T3731]  l2cap_sock_teardown_cb+0xb8/0x890
+>> [  179.158154][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+>> [  179.159141][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.159994][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+>> [  179.160959][ T3731]  ? l2cap_sock_recv_cb+0x420/0x420
+>> [  179.161834][ T3731]  l2cap_chan_del+0x3e1/0x1d50
+>> [  179.162608][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.163435][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+>> [  179.164406][ T3731]  l2cap_chan_close+0xeea/0x1050
+>> [  179.165189][ T3731]  ? kmsan_internal_unpoison_shadow+0x42/0x70
+>> [  179.166180][ T3731]  l2cap_chan_timeout+0x1da/0x590
+>> [  179.167066][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+>> [  179.168023][ T3731]  ? l2cap_chan_create+0x560/0x560
+>> [  179.168818][ T3731]  process_one_work+0x121d/0x1ff0
+>> [  179.169598][ T3731]  worker_thread+0x121b/0x2370
+>> [  179.170346][ T3731]  kthread+0x4ef/0x610
+>> [  179.171010][ T3731]  ? process_one_work+0x1ff0/0x1ff0
+>> [  179.171828][ T3731]  ? kthread_blkcg+0x110/0x110
+>> [  179.172587][ T3731]  ret_from_fork+0x1f/0x30
+>> [  179.173348][ T3731]
+>> [  179.173752][ T3731] Uninit was created at:
+>> [  179.174409][ T3731]  kmsan_internal_poison_shadow+0x5c/0xf0
+>> [  179.175373][ T3731]  kmsan_slab_free+0x76/0xc0
+>> [  179.176060][ T3731]  kfree+0x3a5/0x1180
+>> [  179.176664][ T3731]  __sk_destruct+0x8af/0xb80
+>> [  179.177375][ T3731]  __sk_free+0x812/0x8c0
+>> [  179.178032][ T3731]  sk_free+0x97/0x130
+>> [  179.178686][ T3731]  l2cap_sock_release+0x3d5/0x4d0
+>> [  179.179457][ T3731]  sock_close+0x150/0x450
+>> [  179.180117][ T3731]  __fput+0x6bd/0xf00
+>> [  179.180787][ T3731]  ____fput+0x37/0x40
+>> [  179.181481][ T3731]  task_work_run+0x140/0x280
+>> [  179.182219][ T3731]  do_exit+0xe51/0x3e60
+>> [  179.182930][ T3731]  do_group_exit+0x20e/0x450
+>> [  179.183656][ T3731]  get_signal+0x2dfb/0x38f0
+>> [  179.184344][ T3731]  arch_do_signal_or_restart+0xaa/0xe10
+>> [  179.185266][ T3731]  exit_to_user_mode_prepare+0x2d2/0x560
+>> [  179.186136][ T3731]  syscall_exit_to_user_mode+0x35/0x60
+>> [  179.186984][ T3731]  do_syscall_64+0xc5/0x140
+>> [  179.187681][ T3731]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> [  179.188604][ T3731] =====================================================
+>>
+>> In our case, there are two Thread A and B:
+>>
+>> Context: Thread A:              Context: Thread B:
+>>
+>> l2cap_chan_timeout()            __se_sys_shutdown()
+>>    l2cap_chan_close()              l2cap_sock_shutdown()
+>>      l2cap_chan_del()                l2cap_chan_close()
+>>        l2cap_sock_teardown_cb()        l2cap_sock_teardown_cb()
+>>
+>> Once l2cap_sock_teardown_cb() excuted, this sock will be marked as SOCK_ZAPPED,
+>> and can be treated as killable in l2cap_sock_kill() if sock_orphan() has
+>> excuted, at this time we close sock through sock_close() which end to call
+>> l2cap_sock_kill() like Thread C:
+>>
+>> Context: Thread C:
+>>
+>> sock_close()
+>>    l2cap_sock_release()
+>>      sock_orphan()
+>>      l2cap_sock_kill()  #free sock if refcnt is 1
+>>
+>> If C completed, Once A or B reaches l2cap_sock_teardown_cb() again,
+>> use-after-free happened.
+>>
+>> We should set chan->data to NULL if sock is freed, for telling teardown
+>> operation is not allowed in l2cap_sock_teardown_cb(), and also we should
+>> avoid killing an already killed socket in l2cap_sock_close_cb().
+>>
+>> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+>> ---
+>>   net/bluetooth/l2cap_sock.c | 14 ++++++++++++--
+>>   1 file changed, 12 insertions(+), 2 deletions(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index c99d65ef13b1..ddc6a692b237 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -1215,14 +1215,18 @@ static int l2cap_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+>>    */
+>>   static void l2cap_sock_kill(struct sock *sk)
+>>   {
+>> +       struct l2cap_chan *chan;
+>> +
+>>          if (!sock_flag(sk, SOCK_ZAPPED) || sk->sk_socket)
+>>                  return;
+>>
+>>          BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
+>>
+>>          /* Kill poor orphan */
+>> -
+>> -       l2cap_chan_put(l2cap_pi(sk)->chan);
+>> +       chan = l2cap_pi(sk)->chan;
+>> +       l2cap_chan_put(chan);
+
+There is a problem here, the above sentence `l2cap_chan_put(chan)` 
+should put after
+
+following sentence.
+
+>> +       if (refcount_read(&sk->sk_refcnt) == 1)
+>> +               chan->data = NULL;
+> Instead of checking if it is the last reference here, wouldn't it be
+> better to reset the chan->data to NULL on l2cap_sock_destruct?
+
+Hi,
+
+In my case it looks OK, this is the diff:
+
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index f1b1edd0b697..32ef3328ab49 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1500,6 +1500,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan 
+*chan)
+  {
+         struct sock *sk = chan->data;
+
++       if (!sk)
++               return;
++
+         l2cap_sock_kill(sk);
+  }
+
+@@ -1508,6 +1511,9 @@ static void l2cap_sock_teardown_cb(struct 
+l2cap_chan *chan, int err)
+         struct sock *sk = chan->data;
+         struct sock *parent;
+
++       if (!sk)
++               return;
++
+         BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+
+         /* This callback can be called both for server (BT_LISTEN)
+@@ -1700,6 +1706,7 @@ static void l2cap_sock_destruct(struct sock *sk)
+         BT_DBG("sk %p", sk);
+
+         if (l2cap_pi(sk)->chan)
++              l2cap_pi(sk)->chan->data = NULL;
+                  l2cap_chan_put(l2cap_pi(sk)->chan);
+
+But if it has potential risk if l2cap_sock_destruct() can not be excuted 
+in time ?
+
+sk_free():
+
+         if (refcount_dec_and_test(&sk->sk_wmem_alloc)) //is possible 
+this condition false ?
+
+               __sk_free(sk)   -> ... l2cap_sock_destruct()
+
