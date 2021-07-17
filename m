@@ -2,121 +2,230 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93196C636CA
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Jul 2021 13:35:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 75ACFC636C9
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Jul 2021 15:41:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7228E6115B
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Jul 2021 13:35:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 456B66115C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 17 Jul 2021 15:41:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233125AbhGQNiI (ORCPT
+        id S235023AbhGQPo3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 17 Jul 2021 09:38:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229746AbhGQNiH (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 17 Jul 2021 09:38:07 -0400
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC60C06175F
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jul 2021 06:35:10 -0700 (PDT)
-Received: by mail-ua1-x92e.google.com with SMTP id n61so4778702uan.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jul 2021 06:35:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=prMbdjZsxOgJbK6uUoKMbaLY4SrWw8gmg6+Jlty6xBY=;
-        b=GO4jrEsNa4mBOxumLQ7ESBVxz427YiDmZDUOuX/1sx9BclFjQw0SeRYRSeQoG96PIW
-         +xl+WmG6ZoHAfCA2dxd8Bh/yfaSZGnZ/swzFNx2Zrr2OX5AHM6DjlDprZaThJA8NwRbY
-         WqJSCkLPbLZeB9okQ5zKEzV2VpP9VuPDilMBnBXHyra/Oy0x3WJQoL0lvaUiHMD4oEbD
-         LER0L7hO1wnP0pcNhxol1tjN0D64olfWfxaJiz3ZIeFAe+O4cWkxdpPnKRk5DrasQnky
-         Zg3TEhKLdIDlxHzAJGAQmv7ZghWzQ+dObkCNge8HzJ1MbPmxehOpQ2PV6BLUaxPzAHyt
-         l4Bw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=prMbdjZsxOgJbK6uUoKMbaLY4SrWw8gmg6+Jlty6xBY=;
-        b=VpDyjpDG8mFyNYNXpiSewVpleTnaHhi68BIV91dXfyZI17NcN2vN8zAb7TB1/ZFnZt
-         hu6SX35BsHLDSlqpxx8Su3rE4mhiXVPfj9WCAvLF2RiAegIE+jg+WyULK1IY55EIoRud
-         2A+SRODfrrkG2wukgDrB590QHzuRE/XTG4K8Kpm2ihC5Pzcttu9RuJr5iHZzdDjU/X2d
-         paZZtjqpgey6Ts6rku9r/mzn2pgRlPTu0WthvzeTjaX26BX5xbigkCg2rS008QCaLr9F
-         hkKUp1MqmXO4Bmm8v/9gaPkIveZZ0VYlvzETRIGnIfJtOXfFNArJf5kOpjkWJgRH9sqY
-         9Q8Q==
-X-Gm-Message-State: AOAM53299pHJjFnX04UD+Jl4yw0BDAI4BkR9TIuLcRjiD9zIm2mDkalN
-        4wsY4K73qS7L8kPgCerkEsQ93OmGHHAvxc5PE8TJMA==
-X-Google-Smtp-Source: ABdhPJwsRKiCBzAwhhdvQYIouAsViI06GDp+fGSjLxy3u7z669i3QV2p0ex+LvNCfG5qt49+jnmlgGKBhVTJzvqFeHY=
-X-Received: by 2002:ab0:7c67:: with SMTP id h7mr18894262uax.61.1626528909223;
- Sat, 17 Jul 2021 06:35:09 -0700 (PDT)
+        Sat, 17 Jul 2021 11:44:29 -0400
+Received: from spam.zju.edu.cn ([61.164.42.155]:30096 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S234751AbhGQPo2 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 17 Jul 2021 11:44:28 -0400
+Received: by ajax-webmail-mail-app3 (Coremail) ; Sat, 17 Jul 2021 23:41:22
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.162.82.120]
+Date:   Sat, 17 Jul 2021 23:41:22 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   LinMa <linma@zju.edu.cn>
+To:     "Tetsuo Handa" <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     "Desmond Cheong Zhi Xi" <desmondcheongzx@gmail.com>,
+        "Luiz Augusto von Dentz" <luiz.dentz@gmail.com>,
+        "Johan Hedberg" <johan.hedberg@gmail.com>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        "Jakub Kicinski" <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Yet Another Patch for CVE-2021-3573
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
+In-Reply-To: <4bd89382.4d087.17aafed62b1.Coremail.3160105373@zju.edu.cn>
+References: <20210627131134.5434-1-penguin-kernel@I-love.SAKURA.ne.jp>
+ <9deece33-5d7f-9dcb-9aaa-94c60d28fc9a@i-love.sakura.ne.jp>
+ <48d66166-4d39-4fe2-3392-7e0c84b9bdb3@i-love.sakura.ne.jp>
+ <CABBYNZJKWktRo1pCMdafAZ22sE2ZbZeMuFOO+tHUxOtEtTDTeA@mail.gmail.com>
+ <674e6b1c.4780d.17aa81ee04c.Coremail.linma@zju.edu.cn>
+ <2b0e515c-6381-bffe-7742-05148e1e2dcb@gmail.com>
+ <4b955786-d233-8d3f-4445-2422c1daf754@gmail.com>
+ <e07c5bbf-115c-6ffa-8492-7b749b9d286b@i-love.sakura.ne.jp>
+ <4bd89382.4d087.17aafed62b1.Coremail.3160105373@zju.edu.cn>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
 MIME-Version: 1.0
-References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
-In-Reply-To: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
-From:   Joseph Hwang <josephsih@google.com>
-Date:   Sat, 17 Jul 2021 21:34:57 +0800
-Message-ID: <CAHFy41_-EYBNnKyLPof40r6jhtBW=mSHjOX6O=+hzLCbf7_ELQ@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: btusb: check SCO MTU before enabling USB ALT 3
- for WBS
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Hilda Wu <hildawu@realtek.com>
-Content-Type: text/plain; charset="UTF-8"
+Message-ID: <6559740a.4e8a5.17ab521166d.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID: cC_KCgA3+Gwi+vJgsiCNAQ--.47325W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQJElNG3DgSwQAAs+
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-It looks reasonable to check sco_mtu. My suggestion is to use
-hci_packet_size_usb_alt[3] instead of the magic number 72.
+SGkgZXZlcnlvbmUsCgpBZnRlciByZWFkaW5nIGxhcmdlIGxpbmVzIG9mIGNvZGUgaW4gdGhlIG5l
+dCBkaXJlY3Rvcnkgb2YgdGhlIGtlcm5lbCwgSSBoYXZlIHRoZSBmb2xsb3dpbmcgdGhpbmtpbmdz
+IGFuZCBtYXkgbmVlZCB5b3VyIGd1eXMnIHN1Z2dlc3Rpb25zLgoKPj4gPj4gU2F3IHRoaXMgYW5k
+IHRob3VnaHQgSSdkIG9mZmVyIG15IHR3byBjZW50cy4KPj4gPj4gQlVHOiBzbGVlcGluZyBmdW5j
+dGlvbiBjYWxsZWQgZnJvbSBpbnZhbGlkIGNvbnRleHQKPj4gPj4gVGhpcyBpcyB0aGUgb3JpZ2lu
+YWwgcHJvYmxlbSB0aGF0IFRldHN1bydzIHBhdGNoIHdhcyB0cnlpbmcgdG8gZml4Lgo+PiAKPj4g
+WWVzLgo+PiAKPj4gPj4gVW5kZXIgdGhlIGhvb2Qgb2YgbG9ja19zb2NrLCB3ZSBjYWxsIGxvY2tf
+c29ja19uZXN0ZWQgd2hpY2ggbWlnaHQgc2xlZXAKPj4gPj4gYmVjYXVzZSBvZiB0aGUgbXV0ZXhf
+YWNxdWlyZS4KPj4gCj4+IEJvdGggbG9ja19zb2NrKCkgYW5kIGxvY2tfc29ja19uZXN0ZWQoKSBt
+aWdodCBzbGVlcC4KPj4gCj4+ID4+IEJ1dCB3ZSBzaG91bGRuJ3Qgc2xlZXAgd2hpbGUgaG9sZGlu
+ZyB0aGUgcncgc3BpbmxvY2suCj4+IAo+PiBSaWdodC4gSW4gYXRvbWljIGNvbnRleHQgKGUuZy4g
+aW5zaWRlIGludGVycnVwdCBoYW5kbGVyLCBzY2hlZHVsYWJsZSBjb250ZXh0Cj4+IHdpdGggaW50
+ZXJydXB0cyBvciBwcmVlbXB0aW9uIGRpc2FibGVkLCBzY2hlZHVsYWJsZSBjb250ZXh0IGluc2lk
+ZSBSQ1UgcmVhZAo+PiBjcml0aWNhbCBzZWN0aW9uLCBzY2hlZHVsYWJsZSBjb250ZXh0IGluc2lk
+ZSBhIHNwaW5sb2NrIHNlY3Rpb24pLCB3ZSBtdXN0IG5vdAo+PiBjYWxsIGZ1bmN0aW9ucyAoZS5n
+LiB3YWl0aW5nIGZvciBhIG11dGV4LCB3YWl0aW5nIGZvciBhIHNlbWFwaG9yZSwgd2FpdGluZyBm
+b3IKPj4gYSBwYWdlIGZhdWx0KSB3aGljaCBhcmUgbm90IGF0b21pYy4KPj4gCj4+ID4+IFNvIHdl
+IGVpdGhlciBoYXZlIHRvIGFjcXVpcmUgYSBzcGlubG9jayBpbnN0ZWFkIG9mIGEgbXV0ZXggYXMg
+d2FzIGRvbmUgYmVmb3JlLAo+PiAKPj4gUmVnYXJkaW5nIGhjaV9zb2NrX2Rldl9ldmVudChIQ0lf
+REVWX1VOUkVHKSBjYXNlLCB3ZSBjYW4ndCB1c2UgYSBzcGlubG9jay4KPj4gCj4+IExpa2UgTGlu
+TWEgZXhwbGFpbmVkLCBsb2NrX3NvY2soKSBoYXMgdG8gYmUgdXNlZCBpbiBvcmRlciB0byBzZXJp
+YWxpemUgZnVuY3Rpb25zCj4+IChlLmcuIGhjaV9zb2NrX3NlbmRtc2coKSkgd2hpY2ggYWNjZXNz
+IGhjaV9waShzayktPmhkZXYgYmV0d2VlbiBsb2NrX3NvY2soc2spIGFuZAo+PiByZWxlYXNlX3Nv
+Y2soc2spLiBBbmQgbGlrZSBJIGV4cGxhaW5lZCwgd2UgY2FuJ3QgZGVmZXIgcmVzZXR0aW5nIGhj
+aV9waShzayktPmhkZXYKPj4gdG8gTlVMTCwgZm9yIGhjaV9zb2NrX2Rldl9ldmVudChIQ0lfREVW
+X1VOUkVHKSBpcyByZXNwb25zaWJsZSBmb3IgcmVzZXR0aW5nCj4+IGhjaV9waShzayktPmhkZXYg
+dG8gTlVMTCBiZWNhdXNlIHRoZSBjYWxsZXIgb2YgaGNpX3NvY2tfZGV2X2V2ZW50KEhDSV9ERVZf
+VU5SRUcpCj4+IGltbWVkaWF0ZWx5IGRlc3Ryb3lzIHJlc291cmNlcyBhc3NvY2lhdGVkIHdpdGgg
+dGhpcyBoZGV2Lgo+PiAKClRoaXMgaXMgdGhlIGNyaXRpY2FsIHBhcnQgb2YgdGhlIEJVRyBoZXJl
+LiBBcyB5b3UgY2FuIHJlYWQgc29tZSBzaW1pbGFyIGNvZGUsIGZvciBleGFtcGxlLCBjb2RlIGF0
+IC9uZXQvaXVjdi9hZl9pdWN2LmMuCgpUaGUgaXVjdl9zb2NrX2JpbmQoKSBmdW5jdGlvbiB3aWxs
+IGJpbmQgdGhlIGRldmljZTogCgpzdGF0aWMgaW50IGl1Y3Zfc29ja19iaW5kKHN0cnVjdCBzb2Nr
+ZXQgKnNvY2ssIHN0cnVjdCBzb2NrYWRkciAqYWRkciwKCQkJICBpbnQgYWRkcl9sZW4pCnsKLi4u
+CiAgaXVjdi0+aHNfZGV2ID0gZGV2OwoKQW5kIHRoaXMgZmllbGQgd2lsbCBiZSBhc3NpZ25lZCBh
+cyBOVUxMIG9ubHkgd2hlbiB0aGUgc29ja2V0IGlzIGNsb3NlZC4KCnN0YXRpYyB2b2lkIGl1Y3Zf
+c29ja19jbG9zZShzdHJ1Y3Qgc29jayAqc2spCnsKLi4uCiAgaWYgKGl1Y3YtPmhzX2Rldikgewog
+ICAgZGV2X3B1dChpdWN2LT5oc19kZXYpOwogICAgaXVjdi0+aHNfZGV2ID0gTlVMTDsKICAgIHNr
+LT5za19ib3VuZF9kZXZfaWYgPSAwOwogIH0KCkV2ZW4gaW4gdGhlIGFmaXVjdl9uZXRkZXZfZXZl
+bnQoKSBmdW5jdGlvbiwgdGhlcmUgaXMgbm9uIGJ1c2luZXNzIHdpdGggaXVjdi0+aHNfZGV2LgoK
+U28gd2h5IHRoZSBoY2lfc29ja19kZXZfZXZlbnQoSENJX0RFVl9VTlJFRykgbmVlZCB0byBzZXQg
+dGhlIE5VTEwgcG9pbnRlciBhbmQgdGhlbiBkZWNyZWFzZSB0aGUgcmVmLWNvdW50PyAKQXMgVGV0
+c3VvIHNhaWQsIGJlY2F1c2UgdGhlIGhjaV91bnJlZ2lzdGVyX2RldigpIGZ1bmN0aW9uLCB3aGlj
+aCBpcyB0aGUgY2FsbGVyIG9mIGhjaV9zb2NrX2Rldl9ldmVudCgpIHdpbGwKcmVjbGFpbSB0aGUg
+cmVzb3VyY2Ugb2YgdGhlIGhkZXYgb2JqZWN0LiBJdCB3aWxsIGRlc3Ryb3kgdGhlIHdvcmtxdWV1
+ZSBhbmQgYWxzbyBjbGVhbiB1cCB0aGUgc3lzZnMuCgpJZiB3ZSBhY2hpZXZlIG91ciBwYXRjaGVz
+IGxpa2UgdGhlIGl1Y3Ygc3RhY2ssIG9yIHNvbWUgb3RoZXIgcmVmLWNvdW50IGlkZWEgKGh0dHBz
+Oi8vbGttbC5vcmcvbGttbC8yMDIxLzYvMjIvMTM0NykgCndpdGhvdXQgY2FyZSwgdGhlIGJhZCB0
+aGluZyB3aWxsIGhhcHBlbi4gQmVjYXVzZSB0aGVyZSBpcyBub3RoaW5nIHVzZWZ1bCBpbiB0aGUg
+aGRldiBvYmplY3QsIGFueSBjaGFuZ2VzIHRvIGl0IG1ha2Ugbm8gc2Vuc2UuCgpCdXQgd2FpdCwg
+dGhlIHdyaXRlIG9yIGRlcmVmZXJlbmNlIGZvciB0aGlzIG9iamVjdCBjYW4gYmUgaWxsZWdhbCwg
+YnV0IHRoZXJlIHNob3VsZCBiZSBzb21lIGxlZ2FsIGFjdGlvbnMsIGxpa2UgcmVhZGluZyBmbGFn
+cz8KCkhlbmNlLCB3ZSBjYW4gc3RpbGwgZGVsYXkgdGhlIHJlbGVhc2Ugb2YgdGhlIGhkZXYgb2Jq
+ZWN0IHRvIGhjaV9zb2NrX3JlbGVhc2UgKGxpa2Ugb3RoZXIgbmV0IGNvZGUgZG9lcykuIApXZSBq
+dXN0IG5lZWQgdG8gdGFrZSBjYXJlIG9mIHRoZSBjaGVja2luZyBwYXJ0LgoKT25lIHF1aWNrIHBh
+dGNoIGlzIHNob3duIGJlbG93LCBteSBQT0MgZGlkbid0IHRyaWdnZXIgYW55IHdhcm5pbmcgYnV0
+IG1vcmUgY2hlY2tzIGFyZSBuZWVkZWQuCgpkaWZmIC0tZ2l0IGEvbmV0L2JsdWV0b290aC9oY2lf
+c29jay5jIGIvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCmluZGV4IDI1MWI5MTI4Zi4uZGI2NjVm
+NzhhIDEwMDY0NAotLS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9zb2NrLmMKKysrIGIvbmV0L2JsdWV0
+b290aC9oY2lfc29jay5jCkBAIC03NjQsMTIgKzc2NCw5IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2
+ZW50KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCiAJCXNrX2Zvcl9lYWNoKHNrLCAm
+aGNpX3NrX2xpc3QuaGVhZCkgewogCQkJYmhfbG9ja19zb2NrX25lc3RlZChzayk7CiAJCQlpZiAo
+aGNpX3BpKHNrKS0+aGRldiA9PSBoZGV2KSB7Ci0JCQkJaGNpX3BpKHNrKS0+aGRldiA9IE5VTEw7
+CiAJCQkJc2stPnNrX2VyciA9IEVQSVBFOwogCQkJCXNrLT5za19zdGF0ZSA9IEJUX09QRU47CiAJ
+CQkJc2stPnNrX3N0YXRlX2NoYW5nZShzayk7Ci0KLQkJCQloY2lfZGV2X3B1dChoZGV2KTsKIAkJ
+CX0KIAkJCWJoX3VubG9ja19zb2NrKHNrKTsKIAkJfQpAQCAtODgwLDYgKzg3Nyw3IEBAIHN0YXRp
+YyBpbnQgaGNpX3NvY2tfcmVsZWFzZShzdHJ1Y3Qgc29ja2V0ICpzb2NrKQoKIAkJYXRvbWljX2Rl
+YygmaGRldi0+cHJvbWlzYyk7CiAJCWhjaV9kZXZfcHV0KGhkZXYpOworCQloY2lfcGkoc2spLT5o
+ZGV2ID0gTlVMTDsKIAl9CgogCXNvY2tfb3JwaGFuKHNrKTsKQEAgLTE3MjcsMTAgKzE3MjUsMTAg
+QEAgc3RhdGljIGludCBoY2lfc29ja19zZW5kbXNnKHN0cnVjdCBzb2NrZXQgKnNvY2ssIHN0cnVj
+dCBtc2doZHIgKm1zZywKIAkJYnJlYWs7CiAJY2FzZSBIQ0lfQ0hBTk5FTF9NT05JVE9SOgogCQll
+cnIgPSAtRU9QTk9UU1VQUDsKLQkJZ290byBkb25lOworCQlnb3RvIGRvbmVmYXN0OwogCWNhc2Ug
+SENJX0NIQU5ORUxfTE9HR0lORzoKIAkJZXJyID0gaGNpX2xvZ2dpbmdfZnJhbWUoc2ssIG1zZywg
+bGVuKTsKLQkJZ290byBkb25lOworCQlnb3RvIGRvbmVmYXN0OwogCWRlZmF1bHQ6CiAJCW11dGV4
+X2xvY2soJm1nbXRfY2hhbl9saXN0X2xvY2spOwogCQljaGFuID0gX19oY2lfbWdtdF9jaGFuX2Zp
+bmQoaGNpX3BpKHNrKS0+Y2hhbm5lbCk7CkBAIC0xNzQwLDE1ICsxNzM4LDE2IEBAIHN0YXRpYyBp
+bnQgaGNpX3NvY2tfc2VuZG1zZyhzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBzdHJ1Y3QgbXNnaGRyICpt
+c2csCiAJCQllcnIgPSAtRUlOVkFMOwoKIAkJbXV0ZXhfdW5sb2NrKCZtZ210X2NoYW5fbGlzdF9s
+b2NrKTsKLQkJZ290byBkb25lOworCQlnb3RvIGRvbmVmYXN0OwogCX0KCiAJaGRldiA9IGhjaV9w
+aShzayktPmhkZXY7CiAJaWYgKCFoZGV2KSB7CiAJCWVyciA9IC1FQkFERkQ7Ci0JCWdvdG8gZG9u
+ZTsKKwkJZ290byBkb25lZmFzdDsKIAl9CgorCWhjaV9kZXZfbG9jayhoZGV2KTsKIAlpZiAoIXRl
+c3RfYml0KEhDSV9VUCwgJmhkZXYtPmZsYWdzKSkgewogCQllcnIgPSAtRU5FVERPV047CiAJCWdv
+dG8gZG9uZTsKQEAgLTE4MzIsNiArMTgzMSw4IEBAIHN0YXRpYyBpbnQgaGNpX3NvY2tfc2VuZG1z
+ZyhzdHJ1Y3Qgc29ja2V0ICpzb2NrLCBzdHJ1Y3QgbXNnaGRyICptc2csCiAJZXJyID0gbGVuOwoK
+IGRvbmU6CisJaGNpX2Rldl91bmxvY2soaGRldik7Citkb25lZmFzdDoKIAlyZWxlYXNlX3NvY2so
+c2spOwogCXJldHVybiBlcnI7CgoKSW4gc2hvcnQsIHRoaXMgcGF0Y2ggZGVsYXlzIHRoZSBoY2lf
+ZGV2X3B1dCgpIHRvIGhjaV9zb2NrX3JlbGVhc2UoKSBhbmQga2VlcHMgdGhlIG9sZCBiaF9sb2Nr
+X3NvY2tfbmVzdGVkKCkuCgpPbmNlIHdlIGRpZCB0aGF0LCB0aGUgVUFGIGluIGhjaV9zb2NrX2Jv
+dW5kX2lvY3RsKCkgYXJlIGZpeGVkLiAoIFRoZSBmb3VyIGRpZmZlcmVudCBjb21tYW5kcyBpbiBo
+Y2lfc29ja19ib3VuZF9pb2N0bCB3aWxsIGp1c3QKdHJhdmVyc2UgYSBlbXB0eSBsaW5rZWQgbGlz
+dCApCgpGb3IgYW5vdGhlciBVQUYgcG9pbnQ6IGhjaV9zb2NrX3NlbmRtc2coKSwgdGhpcyBwYXRj
+aCB1c2VzIGhjaV9kZXZfbG9jaygpIHRvIG1ha2Ugc3VyZSB0aGUgZmxhZ3MgYW5kIHJlc291cmNl
+IGluIGhkZXYgd2lsbCBub3QgYmUKcmVsZWFzZWQgdGlsbCB0aGUgc2VuZG1zZyBpcyBmaW5pc2hl
+ZC4gKERpc2xpa2UgdGhlIGhjaV9zb2NrX2NyZWF0ZSgpLCB0aGUgaGNpX3NvY2tfc2VuZG1zZygp
+IGNhbiBzbGVlcCBzbyB0aGUgbXV0ZXggbG9jayBpcyBwb3NzaWJsZSkKCk9mIGNvdXJzZSwgbW9y
+ZSBhdWRpdGluZyBpcyBuZWVkZWQgYnV0IEkganVzdCB3YW50IHRvIHNoYXJlIHRoaXMgdG8geW91
+LiBBbnkgc3VnZ2VzdGlvbnMgYW5kIGRpc2N1c3Npb25zIHdpbGwgYmUgbXVjaCBhcHByZWNpYXRl
+ZC4KCgo+PiA+PiBvciB3ZSBuZWVkIHRvIG1vdmUgbG9ja19zb2NrIG91dCBvZiB0aGUgcncgc3Bp
+bmxvY2sgY3JpdGljYWwgc2VjdGlvbiBhcyBUZXRzdW8gcHJvcG9zZXMuCj4+IAo+PiBFeGFjdGx5
+LiBTaW5jZSB0aGlzIGlzIGEgcmVncmVzc2lvbiBpbnRyb2R1Y2VkIHdoZW4gZml4aW5nIENWRS0y
+MDIxLTM1NzMsIExpbnV4Cj4+IGRpc3RyaWJ1dG9ycyBhcmUgd2FpdGluZyBmb3IgdGhpcyBwYXRj
+aCBzbyB0aGF0IHRoZXkgY2FuIGFwcGx5IHRoZSBmaXggZm9yIENWRS0yMDIxLTM1NzMuCj4+IFRo
+aXMgcGF0Y2ggc2hvdWxkIGJlIHNlbnQgdG8gbGludXguZ2l0IGFuZCBzdGFibGVzIGFzIHNvb24g
+YXMgcG9zc2libGUuIEJ1dCBkdWUgdG8gbGl0dGxlCj4+IGF0dGVudGlvbiBvbiB0aGlzIHBhdGNo
+LCBJJ20gYWxyZWFkeSB0ZXN0aW5nIHRoaXMgcGF0Y2ggaW4gbGludXgtbmV4dC5naXQgdmlhIG15
+IHRyZWUuCj4+IEknbGwgZHJvcCB3aGVuIEJsdWV0b290aCBtYWludGFpbmVycyBwaWNrIHRoaXMg
+cGF0Y2ggdXAgZm9yIGxpbnV4LTUuMTQtcmNYLiAoT3Igc2hvdWxkIEkKPj4gZGlyZWN0bHkgc2Vu
+ZCB0byBMaW51cz8pCj4+IAo+PiA+Pgo+PiA+IAo+PiA+IE15IGJhZCwgd2FzIHRoaW5raW5nIG1v
+cmUgYWJvdXQgdGhlIHByb2JsZW0gYW5kIG5vdGljZWQgeW91ciBwb2Mgd2FzIGZvciBoY2lfc29j
+a19zZW5kbXNnLAo+PiA+IG5vdCBoY2lfc29ja19kZXZfZXZlbnQuCj4+IAo+PiBJIGRpZG4ndCBj
+YXRjaCB0aGlzIHBhcnQuIEFyZSB5b3UgdGFsa2luZyBhYm91dCBhIGRpZmZlcmVudCBwb2M/Cj4+
+IEFzIGZhciBhcyBJJ20gYXdhcmUsIGV4cC5jIGluIFBPQy56aXAgd2FzIGZvciBoY2lfc29ja19i
+b3VuZF9pb2N0bChIQ0lVTkJMT0NLQUREUikuCj4+IAo+PiBoY2lfc29ja19ib3VuZF9pb2N0bChI
+Q0lVTkJMT0NLQUREUikgKHdoaWNoIGlzIGNhbGxlZCBiZXR3ZWVuIGxvY2tfc29jaygpIGFuZCBy
+ZWxlYXNlX3NvY2soKSkKPj4gY2FsbHMgY29weV9mcm9tX3VzZXIoKSB3aGljaCBtaWdodCBjYXVz
+ZSBwYWdlIGZhdWx0LCBhbmQgdXNlcmZhdWx0ZmQgbWVjaGFuaXNtIGFsbG93cyBhbiBhdHRhY2tl
+cgo+PiB0byBzbG93ZG93biBwYWdlIGZhdWx0IGhhbmRsaW5nIGVub3VnaCB0byBoY2lfc29ja19k
+ZXZfZXZlbnQoSENJX0RFVl9VTlJFRykgdG8gcmV0dXJuIHdpdGhvdXQKPj4gd2FpdGluZyBmb3Ig
+aGNpX3NvY2tfYm91bmRfaW9jdGwoSENJVU5CTE9DS0FERFIpIHRvIGNhbGwgcmVsZWFzZV9zb2Nr
+KCkuIFRoaXMgcmFjZSB3aW5kb3cKPj4gcmVzdWx0cyBpbiBVQUYgKGRvZXNuJ3QgaXQsIExpbk1h
+PykuCj4+IAo+PiA+IEluIHRoaXMgY2FzZSwgaXQncyBub3QgY2xlYXIgdG8gbWUgd2h5IHRoZSBh
+dG9taWMgY29udGV4dCBpcyBiZWluZyB2aW9sYXRlZC4KPj4gCj4+IEluIGF0b21pYyBjb250ZXh0
+IChpbiBoY2lfc29ja19kZXZfZXZlbnQoSENJX0RFVl9VTlJFRykgY2FzZSwgYmV0d2Vlbgo+PiBy
+ZWFkX2xvY2soJmhjaV9za19saXN0LmxvY2spIGFuZCByZWFkX3VubG9jaygmaGNpX3NrX2xpc3Qu
+bG9jaykpLCB3ZSBtdXN0IG5vdCBjYWxsCj4+IGxvY2tfc29jayhzaykgd2hpY2ggbWlnaHQgd2Fp
+dCBmb3IgaGNpX3NvY2tfYm91bmRfaW9jdGwoSENJVU5CTE9DS0FERFIpIHRvIGNhbGwgcmVsZWFz
+ZV9zb2NrKCkuCj4+IAo+PiA+IAo+PiA+IFNvcnJ5IGZvciB0aGUgbm9pc2UuCj4+ID4gCj4+ID4+
+Pgo+PiA+Pj4gVGhlIHBhdGNoIHByb3ZpZGVkIGJ5IERlc21vbmQgYWRkcyB0aGUgbG9jYWxfYmhf
+ZGlzYWJsZSgpIGJlZm9yZSB0aGUgYmhfbG9ja19zb2NrKCkgc28gSSBhbHNvIHRyeSB0aGF0IGlu
+Cj4+ID4+Pgo+PiA+Pj4gLS0tIGEvbmV0L2JsdWV0b290aC9oY2lfc29jay5jCj4+ID4+PiArKysg
+Yi9uZXQvYmx1ZXRvb3RoL2hjaV9zb2NrLmMKPj4gPj4+IEBAIC03NjIsNiArNzYyLDcgQEAgdm9p
+ZCBoY2lfc29ja19kZXZfZXZlbnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIGludCBldmVudCkKPj4g
+Pj4+ICAgICAgICAgICAgICAgICAgLyogRGV0YWNoIHNvY2tldHMgZnJvbSBkZXZpY2UgKi8KPj4g
+Pj4+ICAgICAgICAgICAgICAgICAgcmVhZF9sb2NrKCZoY2lfc2tfbGlzdC5sb2NrKTsKPj4gPj4+
+ICAgICAgICAgICAgICAgICAgc2tfZm9yX2VhY2goc2ssICZoY2lfc2tfbGlzdC5oZWFkKSB7Cj4+
+ID4+PiArICAgICAgICAgICAgICAgICAgICAgICBsb2NhbF9iaF9kaXNhYmxlKCk7Cj4+ID4+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgYmhfbG9ja19zb2NrX25lc3RlZChzayk7Cj4+ID4+PiAg
+ICAgICAgICAgICAgICAgICAgICAgICAgaWYgKGhjaV9waShzayktPmhkZXYgPT0gaGRldikgewo+
+PiA+Pj4gICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgaGNpX3BpKHNrKS0+aGRldiA9
+IE5VTEw7Cj4+ID4+PiBAQCAtNzcyLDYgKzc3Myw3IEBAIHZvaWQgaGNpX3NvY2tfZGV2X2V2ZW50
+KHN0cnVjdCBoY2lfZGV2ICpoZGV2LCBpbnQgZXZlbnQpCj4+ID4+PiAgICAgICAgICAgICAgICAg
+ICAgICAgICAgICAgICAgICBoY2lfZGV2X3B1dChoZGV2KTsKPj4gPj4+ICAgICAgICAgICAgICAg
+ICAgICAgICAgICB9Cj4+ID4+PiAgICAgICAgICAgICAgICAgICAgICAgICAgYmhfdW5sb2NrX3Nv
+Y2soc2spOwo+PiA+Pj4gKyAgICAgICAgICAgICAgICAgICAgICAgbG9jYWxfYmhfZW5hYmxlKCk7
+Cj4+ID4+PiAgICAgICAgICAgICAgICAgIH0KPj4gPj4+ICAgICAgICAgICAgICAgICAgcmVhZF91
+bmxvY2soJmhjaV9za19saXN0LmxvY2spOwo+PiA+Pj4gICAgICAgICAgfQo+PiA+Pj4KPj4gPj4+
+IEJ1dCB0aGlzIGlzIG5vdCB1c2VmdWwsIHRoZSBVQUYgc3RpbGwgb2NjdXJzCj4+ID4+Pgo+PiA+
+Pgo+PiA+PiBJIG1pZ2h0IGJlIHZlcnkgbWlzdGFrZW4gb24gdGhpcywgYnV0IEkgYmVsaWV2ZSB0
+aGUgVUFGIHN0aWxsIGhhcHBlbnMgYmVjYXVzZQo+PiA+PiB5b3UgY2FuJ3QgcmVhbGx5IG1peCBi
+aF9sb2NrX3NvY2sqIGFuZCBsb2NrX3NvY2sqIHRvIHByb3RlY3QgdGhlIHNhbWUgdGhpbmdzLgo+
+PiAKPj4gUmlnaHQuIGh0dHBzOi8vd3d3Lmtlcm5lbC5vcmcvZG9jL2h0bWwvdjUuMTMva2VybmVs
+LWhhY2tpbmcvbG9ja2luZy5odG1sCj4+IAo+PiA+PiBUaGUgZm9ybWVyIGhvbGRzIHRoZSBzcGlu
+bG9jayAmc2stPnNrX2xvY2suc2xvY2sgYW5kIHN5bmNocm9uaXplcyBiZXR3ZWVuCj4+ID4+IHVz
+ZXIgY29udGV4dHMgYW5kIGJvdHRvbSBoYWx2ZXMsCj4+IAo+PiBzZXJpYWxpemVzIGFjY2VzcyB0
+byByZXNvdXJjZXMgd2hpY2ggbWlnaHQgYmUgYWNjZXNzZWQgZnJvbSBhdG9taWMgKGkuZS4gbm9u
+LXNjaGVkdWxhYmxlKSBjb250ZXh0cwo+PiAKPj4gPj4gd2hpbGUgdGhlIGxhdHRlciBob2xkcyBh
+IG11dGV4IG9uICZzay0+c2tfbG9jay5kZXBfbWFwIHRvIHN5bmNocm9uaXplIGJldHdlZW4KPj4g
+Pj4gbXVsdGlwbGUgdXNlcnMuCj4+IAo+PiBzZXJpYWxpemVzIGFjY2VzcyB0byByZXNvdXJjZXMg
+d2hpY2ggYXJlIGFjY2Vzc2VkIGZyb20gb25seSBzY2hlZHVsYWJsZSAoaS5lLiBub24tYXRvbWlj
+KSBjb250ZXh0cwo+PiAKPj4gPj4KPj4gPj4gT25lIG9wdGlvbiBJIGNhbiB0aGluayBvZiB3b3Vs
+ZCBiZSB0byBzd2l0Y2ggaW5zdGFuY2VzIG9mIGxvY2tfc29jayB0byBiaF9sb2NrX3NvY2tfbmVz
+dGVkCj4+ID4+IGZvciB1c2VycyB0aGF0IG1pZ2h0IHJhY2UgKHN1Y2ggYXMgaGNpX3NvY2tfc2Vu
+ZG1zZywgaGNpX3NvY2tfYm91bmRfaW9jdGwsIGFuZCBvdGhlcnMgYXMKPj4gPj4gbmVlZGVkKS4g
+QnV0IEknbSBub3Qgc3VyZSBpZiB0aGF0J3MgcXVpdGUgd2hhdCB3ZSB3YW50LCBwbHVzIHdlIHdv
+dWxkIG5lZWQgdG8gZW5zdXJlIHRoYXQKPj4gPj4gc2xlZXBpbmcgZnVuY3Rpb25zIGFyZW4ndCBj
+YWxsZWQgYmV0d2VlbiB0aGUgYmhfbG9jay91bmxvY2suCj4+IAo+PiBXZSBjYW4ndCBkbyBpdCBm
+b3IgaGNpX3NvY2tfZGV2X2V2ZW50KEhDSV9ERVZfVU5SRUcpLgoKUmVnYXJkcyAKCkxpbiBNYQ==
 
-Thanks,
-Joseph
-
-
-On Sat, Jul 17, 2021 at 1:58 AM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Some USB BT adapters don't satisfy the MTU requirement mentioned in
-> commit e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
-> and have ALT 3 setting that produces no/garbled audio. Check that the MTU
-> condition is satisfied, and fall back to ALT 1 if not.
->
-> Tested with USB adapters (mtu<72, produce sound only with ALT1)
-> BCM20702A1 0b05:17cb, CSR8510A10 0a12:0001, and (mtu>=72, ALT3)
-> RTL8761BU 0bda:8771, Intel AX200 8087:0029 (after disabling ALT6).
->
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> ---
->  drivers/bluetooth/btusb.c | 6 ++++--
->  1 file changed, 4 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index a9855a2dd561..3ee66e415c4d 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1763,9 +1763,11 @@ static void btusb_work(struct work_struct *work)
->                         /* Because mSBC frames do not need to be aligned to the
->                          * SCO packet boundary. If support the Alt 3, use the
->                          * Alt 3 for HCI payload >= 60 Bytes let air packet
-> -                        * data satisfy 60 bytes.
-> +                        * data satisfy 60 bytes. USB Alt 3 support also needs
-> +                        * HFP transparent MTU >= 72 Bytes.
->                          */
-> -                       if (new_alts == 1 && btusb_find_altsetting(data, 3))
-> +                       if (new_alts == 1 && hdev->sco_mtu >= 72 &&
-> +                           btusb_find_altsetting(data, 3))
->                                 new_alts = 3;
->                 }
->
-> --
-> 2.31.1
->
->
-
-
--- 
-
-Joseph Shyh-In Hwang
-Email: josephsih@google.com
