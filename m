@@ -2,106 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65528C636C8
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 06:51:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7320C636CA
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 10:47:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 391CC61166
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 06:51:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D55D611AB
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 10:47:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229799AbhGRGyu (ORCPT
+        id S232745AbhGRKuw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Jul 2021 02:54:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36496 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229480AbhGRGyt (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Jul 2021 02:54:49 -0400
-Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31436C061762
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jul 2021 23:51:51 -0700 (PDT)
-Received: by mail-yb1-xb33.google.com with SMTP id g19so22197763ybe.11
-        for <linux-bluetooth@vger.kernel.org>; Sat, 17 Jul 2021 23:51:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fkeS3d9zkV5UugREVkpK+fBURGhl+uNRLB6rfN3cNw4=;
-        b=mUbuBmNSUllRTJfIDaFuOYo31S3GR32n9AMR8Epk1iVYPQQ6iEE+dti3Q4TWzKCOhx
-         XbubTWKcVB2JCY9MSEWolqivFNRUwSWkwD5b2iDBIpTU1lePQjl9sOyARbQwgGV/w/iL
-         /UjbWy77+2bWlPYeDrZi4+lLjqLyVdyjO1n3QX88ldAi3ouut02sQB1d8CmdJm+4bGL3
-         61lbAk3nrWr2G1cHRcTcj5nA5BxdKBNvNQyCTItjgXvbWFw2a5CaPPQ/pGZ5QBy0f4Tg
-         TCe3GzGnAgVCHG65uxlc93vHdn1yjXWxp5qWI4IgxD3bZ97CVBHDP+GqiPW940DVwBP/
-         VIiQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fkeS3d9zkV5UugREVkpK+fBURGhl+uNRLB6rfN3cNw4=;
-        b=hxe7JnQYFIHghKWo4sSY3VDK+ZhisqFSD11sSWJjleZ5DuKnE8563dihbUIoG+NsZ+
-         ZehKucX4Qz8b6coGzDps+Dgsc1fLDlslFABg3Elyj5blOUbk47+bijC83nzutqJa6xpl
-         f9f5lz7YKcXhgtZ1ivk+oTHDRwEhUg03Wd2lhtHjHd7tS9zDMIocdbwdxPNr9coCL7mS
-         s6vqrklr+ervHRlfZIhYsqsW/ovUDH4OVpzPi+Z3FL+5Kd8p4iBSBRdUJ/1k4vvqVpLE
-         zKRK/sSjlPHPUB2itkq9eGIBPIJE7Vd9g5VnoHsZhmCA3GtcYGmNUBfjC2wHSqXabBn4
-         4vIg==
-X-Gm-Message-State: AOAM5333TA8V0ffufrR1SzZqTBoQpo0PsWJKw5PQtBrIY7CjoLObuhmX
-        o/N7lzngrWo/Ip2Kzmq5sqWnXoS6VwgAYxE48xuTxwXO5Dg=
-X-Google-Smtp-Source: ABdhPJzsxu5TvSAH7UnxJJ6PUkImAD+i6+YMuUfeDolPooOkNyZaqssm/kvpAIKyk2z7U8VzbWQ/wPbzU1hJ81z/Azs=
-X-Received: by 2002:a25:7647:: with SMTP id r68mr23185462ybc.432.1626591110115;
- Sat, 17 Jul 2021 23:51:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210717000731.3836303-1-luiz.dentz@gmail.com>
- <7a0405c7-63ba-3e5c-7b22-503d7b326a11@i-love.sakura.ne.jp>
- <CABBYNZLdYXHxD47xO+TX6U=MK1RtvuAAHLYvS1vTsuk4nFQfrg@mail.gmail.com> <166a8c6d-9928-4edf-8082-111e555f5808@i-love.sakura.ne.jp>
-In-Reply-To: <166a8c6d-9928-4edf-8082-111e555f5808@i-love.sakura.ne.jp>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sat, 17 Jul 2021 23:51:39 -0700
-Message-ID: <CABBYNZJpeRmkB6zGUVDJYTLEFvds8z_ag++vC-mT8faig31O+w@mail.gmail.com>
-Subject: Re: [RFC] Bluetooth: hci_sock: Fix calling lock_sock when handling HCI_DEV_UNREG
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        LinMa <linma@zju.edu.cn>
+        Sun, 18 Jul 2021 06:50:52 -0400
+Received: from mail.kernel.org ([198.145.29.99]:60694 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231836AbhGRKuw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 18 Jul 2021 06:50:52 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id B4A7C611AD
+        for <linux-bluetooth@vger.kernel.org>; Sun, 18 Jul 2021 10:47:54 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626605274;
+        bh=idT6U5GhH2+fPFQ6Ujz1XwjS7jyWy2U6jmstS8cfv+Q=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=XdyDzjXGHwp25QCCStWIyWaNs9BB5bKpTDxxebbMHDqF3j9QG9KhIguAD+6Hkd/5H
+         f37QBAOOkQG/E0/IKrJv2yS1LOl7t1YBtO57bzdznwWr64gnb256u1WNqS2jvJTWHl
+         dsGxtlXSojG3Hc73wmv8WbkcBqUXhpqpYG0A8uGQ4bUs2fIkLRFCfSXYZWxwgElOdR
+         DH4VLzIzB+FAr8TfBmaMSrXOpkQD9vFOJXYHl5kBGFyi8sio5E1QyZEG3KUFg9HSjS
+         OgVbRTCjRKZmZ/uCq3hbeaP8KJL873ycqad2O0p3k0AYEZzosMk169EaApTRT4Nydf
+         Yv6ivk7EEs+jg==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 86931] hid-generic 0005:099A:0500.0001: unknown main item tag
+ 0x0
+Date:   Sun, 18 Jul 2021 10:47:54 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: someuniquename@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-86931-62941-s5LKjCDiQJ@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-86931-62941@https.bugzilla.kernel.org/>
+References: <bug-86931-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tetsuo,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D86931
 
-On Sat, Jul 17, 2021 at 11:22 PM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> On 2021/07/18 14:16, Luiz Augusto von Dentz wrote:
-> > Anyway after all these discussion Im even
-> > more convinced that the real problem lies in hci_dev_get/hold, after
-> > all references are usually used to prevent the objects to be freed but
-> > in this case it doesn't and no locking will gonna fix that.
->
-> If hci_dev_hold() calls atomic_long_add_unless(&file->f_count, 1, 0) under RCU,
-> vhci_release(file) would not be called until all sockets using that hdev drops
-> the reference, and hci_sock_dev_event(hdev, HCI_DEV_UNREG) no longer needs to
-> traverse sockets on hci_sk_list.head list. This requires adding "struct file *" to
-> "struct hci_dev". My patch keeps changes be confined to only hci_sock_dev_event().
+Roman Evstifeev (someuniquename@gmail.com) changed:
 
-Being confined doesn't mean that it simple, your changes are doing a
-loop locking, and I also didn't touch hci_dev_hold because it would
-affect all drivers but if there is a way to do it by all means we
-should do it, but notice that we do need a way to cleanup if the
-device is unregistered so I don't think holding the file directly
-would be a good idea since it prevents release but it would also
-prevent cleanup, in other words if the process which open the vhci
-terminates or close, all bluetooth sockets should receive a proper
-error so we cannot really change this behavior. From the brief look at
-it I think we should remove the function hci_dev_free and leave
-hci_dev_unregister to cleanup everything, but I'm afraid there could
-be extra references that are not being cleanup properly and finding
-out where could take a lot more time, well even with your suggestion
-that could be a problem since we also would need to inspect every time
-we hold a reference in the same manner.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |someuniquename@gmail.com
 
--- 
-Luiz Augusto von Dentz
+--- Comment #9 from Roman Evstifeev (someuniquename@gmail.com) ---
+The bug is still here in 5.12.13 with asaus m-rbb93 logitech b370 mouse. Af=
+ter
+some time (unpredictable, can be few hours or few minutes) mouse pointer st=
+ops
+responding, though mouse appears conneceted in the bluetoothctl.
+
+> bluetoothctl=20
+Agent registered
+[Bluetooth Travel Mouse]# info
+Device 00:07:61:68:D2:9E (public)
+        Name: Bluetooth Travel Mouse
+        Alias: Bluetooth Travel Mouse
+        Class: 0x00002580
+        Icon: input-mouse
+        Paired: yes
+        Trusted: yes
+        Blocked: no
+        Connected: yes
+        WakeAllowed: yes
+        LegacyPairing: no
+        UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34=
+fb)
+        UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34=
+fb)
+        Modalias: usb:v046DpB002d4809
+
+journalctl and dmesg is silent when the mouse stops responding. Is there any
+other way to debug this?
+
+When mouse is first connected, dmesg has the message mentioned as the topic=
+ of
+this bug:
+[185307.429898] hid-generic 0005:046D:B002.002C: input,hidraw1: BLUETOOTH H=
+ID
+v48.09 Mouse [Bluetooth Travel Mouse] on dc:e9:94:7e:5f:86
+[187430.340610] hid-generic 0005:046D:B002.002D: unknown main item tag 0x0
+[187430.340668] input: Bluetooth Travel Mouse as
+/devices/pci0000:00/0000:00:08.1/0000:05:00.4/usb3/3-3/3-3:1.0/bluetooth/hc=
+i0/hci0:1/0005:046D:B002.002D/input/input104
+
+ (In reply to jbMacAZ from comment #5)
+> The issue was fixed for the Asus T100 (baytrail) 2-in-1 family.  See this
+> commit.
+> https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux-stable-rc.gi=
+t/
+> commit/?id=3Dc4c285da1ee18582ace366f07e56e355c20ebc49 which is in kernel =
+4.15.=20
+
+Is there a way to enable this system-wide without patching a kernel, for a
+quick test?
+
+I tried to add btusb.enable_autosuspend=3Dn kernel paremeter:
+
+# cat /proc/cmdline=20
+BOOT_IMAGE=3D/boot/vmlinuz-5.12.13-1-default
+root=3DUUID=3Dece1a448-6944-4f34-a61c-1742fde2ac3c splash=3Dsilent psi=3D1
+nvidia-drm.modeset=3D1 btusb.enable_autosuspend=3Dn quiet mitigations=3Dauto
+
+# systool -v -m btusb=20=20=20=20=20=20=20=20=20=20=20=20
+Module =3D "btusb"
+
+  Attributes:
+    coresize            =3D "69632"
+    initsize            =3D "0"
+    initstate           =3D "live"
+    refcnt              =3D "0"
+    srcversion          =3D "8EADE2557C147180496F74C"
+    taint               =3D ""
+    uevent              =3D <store method only>
+    version             =3D "0.8"
+
+  Parameters:
+    disable_scofix      =3D "N"
+    enable_autosuspend  =3D "N"
+    force_scofix        =3D "N"
+    reset               =3D "Y"
+
+But this does not resolve the bug
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
