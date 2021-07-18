@@ -2,372 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 670D5C636CA
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 14:56:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6F2BFC636CD
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 15:37:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 30A29610A5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 14:56:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31BDC61183
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 18 Jul 2021 15:37:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233953AbhGRO7M (ORCPT
+        id S233951AbhGRPjo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 18 Jul 2021 10:59:12 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56148 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233950AbhGRO7L (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 18 Jul 2021 10:59:11 -0400
-Received: from fsav114.sakura.ne.jp (fsav114.sakura.ne.jp [27.133.134.241])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 16IEu5BD018424;
-        Sun, 18 Jul 2021 23:56:05 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav114.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp);
- Sun, 18 Jul 2021 23:56:05 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav114.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 16IEu5CG018416
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Sun, 18 Jul 2021 23:56:05 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [RFC] Bluetooth: hci_sock: Fix calling lock_sock when handling
- HCI_DEV_UNREG
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, LinMa <linma@zju.edu.cn>
-References: <7a0405c7-63ba-3e5c-7b22-503d7b326a11@i-love.sakura.ne.jp>
-Message-ID: <f1e8061b-c5af-3ea1-2203-daa4e2b40459@i-love.sakura.ne.jp>
-Date:   Sun, 18 Jul 2021 23:56:05 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Sun, 18 Jul 2021 11:39:44 -0400
+Received: from mout.gmx.net ([212.227.15.19]:51383 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233869AbhGRPjn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 18 Jul 2021 11:39:43 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1626622602;
+        bh=BgmVAD6kQePhUvQNif1bc8lY91CsAoONyYzXjsFONis=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=Gt7yH71jOitZgFlDaeBbpkSPi1vS8fapl3iLlNLWetohQnCsLrDaN0CI6aFwVZBoA
+         73dyMYkS+MoLIoCb4DrylVUw/GkA0psmGdcNuQfmqr9umBlPQN0w5YVLv7QwMZLv/I
+         vHZKWgVG7pfku/rgBc++jYyeQTzsWV5q7VODul4Q=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from localhost.localdomain ([83.52.228.41]) by mail.gmx.net
+ (mrgmx005 [212.227.17.184]) with ESMTPSA (Nemesis) id
+ 1Mof5H-1lLOuR2fwP-00p3CF; Sun, 18 Jul 2021 17:36:42 +0200
+From:   Len Baker <len.baker@gmx.com>
+To:     Kees Cook <keescook@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Len Baker <len.baker@gmx.com>, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: [PATCH] drivers/bluetooth: Remove all strcpy() uses
+Date:   Sun, 18 Jul 2021 17:36:26 +0200
+Message-Id: <20210718153626.18382-1-len.baker@gmx.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-In-Reply-To: <7a0405c7-63ba-3e5c-7b22-503d7b326a11@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:pnlRtIpPSD8E8+0dK8xsXGYaM6qJq363xXDdVrNqbI/2gQ+DNM/
+ R3/kIeJ2sr+jnUSftacP5xgOlparNV6mXNLnPWRGBxzYuHpGh9n6PpLn8+BETRLbOB++xF7
+ gY8Fonr+BBkdR06JNXLhbvxXassiKLAgRQaMmzJ7+bn1traPAzNR+HyQM0gMLzSheyU2rMs
+ YpErU+yeG+ptbrFNTsSZg==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:tyTsSvmv35o=:WVSUZkX3DlAOfVYr2CJKM5
+ 0qWeKBKVjW/UYrTlWpM+d4UPuRo4UxZ4ho5StsWBCjW7nz++0/UCJfdaQsuzG3/3HE5Uyo0vV
+ UDJMip3E7tIz3pimGSWu8k6Qd/7qTotowAyV154F3SDwcH4JJSU60UT4ikHH9QEBiuuY+wcnw
+ NKgqiEsQWafhUxntF+SG/GkMIBmGuoY3K83U4oKvyjdL7gF3LjI7TanLaMQLrjMGvsn+KpEpx
+ dUqN5uOzvs1nrmrHzeYc07JlFFfIcg5071+NSk3R0G7unWiwCp2kcLZhUxmQVIwQIvVnGBjfK
+ P6xYt4FWyGh2yqx8fvhSOYwdHEx+vpmWTeyveq06v6F9MV6M9Aj+wyuCrdtHWdroMfJ7GoAPH
+ JKoHR4krXK2cSrQYY9VNhfXOZhW1HpiNQgIm+PyaHJhtKFnB4Ew4k+Q6xDKjWbsHHsgtZct5Y
+ 50CGrMY3MZevcAZg9E/NhfuZcRfbZ9OZNWZxVjdgWZL39K0AhWrwRLV13W00gevQmjl/BQiDs
+ Ie5IAcCKqeqJ9dY8H0OUtbMXzeFN1gw82nL5g+6OG1DxdUxRdgN3GBK0S2iUfwQBISrDIcvLI
+ xYCnWOA0HiRf5KmUHXn8cFNPw9ey01e9cIH000BgGjF2G636xyFZunLod9R0rpamjH+7h3SbV
+ FJ8r76V+tMS+jpoZMAgpS3VGuusaYmer128u2ydLZY9CZF1gVlPps3bFA57s9ZL6CKZCMz193
+ GMgXiaUUQX6UdGmzGMkdQtoEAbDwLlDMkV/EwzG7tZ1l8blD1hab8+hnU+6S0fKj4cKVY7ron
+ VcFaUI2DQdB7Ol47CSe88jHkDsR8cJrNWKpZKwNX0VXwlWpXxuxBuxGpnZwBp/swfO6A8sbnZ
+ d/8ZRAtPOZooL83tJAtXDceqFKObK9X0NRMmMpMmLVQptDd9u95gApHk26Kr7raa+WjicZi1h
+ XLfYKRPAN82U5OhEqpn4DuMvAGX1qMk2S/mMcPAwujvccP0zYhKstuYhzjncPuMHWEbttzbfD
+ jiMdfFxxhQ6SHGG+NbnfVuC/Fe7bH7HN0fPTf1UJgz1MmPpTlAFTH2v6k0lDUCbNgeHB97j6F
+ R0mveSze4IMd9NgFLNcAKTT6kUYUetG48rO
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Apart from my "[PATCH v3] Bluetooth: call lock_sock() outside of spinlock section",
-I propose below change in order to make sure that hci_sock_bound_ioctl() will not
-be blocked with sock lock held due to userfaultfd mechanism. This is a portion of
-improvement I commented
+strcpy() performs no bounds checking on the destination buffer. This
+could result in linear overflows beyond the end of the buffer, leading
+to all kinds of misbehaviors. The safe replacement is strscpy() but in
+this case it is better to use the scnprintf to simplify the arithmetic.
 
-  After lock_sock() became free from delay caused by pagefault handling
+This is a previous step in the path to remove the strcpy() function
+entirely from the kernel.
 
-at https://lore.kernel.org/linux-bluetooth/9771b40f-b544-a2a7-04e1-eddb38a4aae7@i-love.sakura.ne.jp/ .
- include/net/bluetooth/hci_core.h |    3 
- net/bluetooth/hci_conn.c         |   50 -----------
- net/bluetooth/hci_sock.c         |  163 ++++++++++++++++++++++++---------------
- 3 files changed, 106 insertions(+), 110 deletions(-)
+Signed-off-by: Len Baker <len.baker@gmx.com>
+=2D--
+ drivers/bluetooth/btmrvl_sdio.c | 27 +++++++++++++--------------
+ 1 file changed, 13 insertions(+), 14 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a53e94459ecd..d9e55682b908 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1261,8 +1261,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg);
- int hci_get_dev_list(void __user *arg);
- int hci_get_dev_info(void __user *arg);
- int hci_get_conn_list(void __user *arg);
--int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
--int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
-+u32 get_link_mode(struct hci_conn *conn);
- int hci_inquiry(void __user *arg);
- 
- struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2b5059a56cda..41af11fadb74 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -1626,7 +1626,7 @@ void hci_conn_check_pending(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- }
- 
--static u32 get_link_mode(struct hci_conn *conn)
-+u32 get_link_mode(struct hci_conn *conn)
- {
- 	u32 link_mode = 0;
- 
-@@ -1701,54 +1701,6 @@ int hci_get_conn_list(void __user *arg)
- 	return err ? -EFAULT : 0;
- }
- 
--int hci_get_conn_info(struct hci_dev *hdev, void __user *arg)
--{
--	struct hci_conn_info_req req;
--	struct hci_conn_info ci;
--	struct hci_conn *conn;
--	char __user *ptr = arg + sizeof(req);
+diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrvl_sd=
+io.c
+index cddd350beba3..d6674b367e05 100644
+=2D-- a/drivers/bluetooth/btmrvl_sdio.c
++++ b/drivers/bluetooth/btmrvl_sdio.c
+@@ -1350,6 +1350,7 @@ static void btmrvl_sdio_coredump(struct device *dev)
+ 	u8 *dbg_ptr, *end_ptr, *fw_dump_data, *fw_dump_ptr;
+ 	u8 dump_num =3D 0, idx, i, read_reg, doneflag =3D 0;
+ 	u32 memory_size, fw_dump_len =3D 0;
++	int size =3D 0;
+
+ 	card =3D sdio_get_drvdata(func);
+ 	priv =3D card->priv;
+@@ -1493,20 +1494,18 @@ static void btmrvl_sdio_coredump(struct device *de=
+v)
+ 		struct memory_type_mapping *entry =3D &mem_type_mapping_tbl[idx];
+
+ 		if (entry->mem_ptr) {
+-			strcpy(fw_dump_ptr, "=3D=3D=3D=3D=3D=3D=3D=3DStart dump ");
+-			fw_dump_ptr +=3D strlen("=3D=3D=3D=3D=3D=3D=3D=3DStart dump ");
 -
--	if (copy_from_user(&req, arg, sizeof(req)))
--		return -EFAULT;
+-			strcpy(fw_dump_ptr, entry->mem_name);
+-			fw_dump_ptr +=3D strlen(entry->mem_name);
 -
--	hci_dev_lock(hdev);
--	conn = hci_conn_hash_lookup_ba(hdev, req.type, &req.bdaddr);
--	if (conn) {
--		bacpy(&ci.bdaddr, &conn->dst);
--		ci.handle = conn->handle;
--		ci.type  = conn->type;
--		ci.out   = conn->out;
--		ci.state = conn->state;
--		ci.link_mode = get_link_mode(conn);
--	}
--	hci_dev_unlock(hdev);
+-			strcpy(fw_dump_ptr, "=3D=3D=3D=3D=3D=3D=3D=3D\n");
+-			fw_dump_ptr +=3D strlen("=3D=3D=3D=3D=3D=3D=3D=3D\n");
 -
--	if (!conn)
--		return -ENOENT;
+-			memcpy(fw_dump_ptr, entry->mem_ptr, entry->mem_size);
+-			fw_dump_ptr +=3D entry->mem_size;
 -
--	return copy_to_user(ptr, &ci, sizeof(ci)) ? -EFAULT : 0;
--}
--
--int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
--{
--	struct hci_auth_info_req req;
--	struct hci_conn *conn;
--
--	if (copy_from_user(&req, arg, sizeof(req)))
--		return -EFAULT;
--
--	hci_dev_lock(hdev);
--	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req.bdaddr);
--	if (conn)
--		req.type = conn->auth_type;
--	hci_dev_unlock(hdev);
--
--	if (!conn)
--		return -ENOENT;
--
--	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
--}
--
- struct hci_chan *hci_chan_create(struct hci_conn *conn)
- {
- 	struct hci_dev *hdev = conn->hdev;
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b04a5a02ecf3..2b166a269712 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -892,82 +892,134 @@ static int hci_sock_release(struct socket *sock)
- 	return 0;
- }
- 
--static int hci_sock_reject_list_add(struct hci_dev *hdev, void __user *arg)
-+static int hci_sock_reject_list_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
--	bdaddr_t bdaddr;
--	int err;
--
--	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
--		return -EFAULT;
--
--	hci_dev_lock(hdev);
--
--	err = hci_bdaddr_list_add(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
--
--	hci_dev_unlock(hdev);
--
--	return err;
-+	return hci_bdaddr_list_add(&hdev->reject_list, bdaddr, BDADDR_BREDR);
- }
- 
--static int hci_sock_reject_list_del(struct hci_dev *hdev, void __user *arg)
-+static int hci_sock_reject_list_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
- {
--	bdaddr_t bdaddr;
--	int err;
--
--	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
--		return -EFAULT;
--
--	hci_dev_lock(hdev);
-+	return hci_bdaddr_list_del(&hdev->reject_list, bdaddr, BDADDR_BREDR);
-+}
- 
--	err = hci_bdaddr_list_del(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
-+static int hci_get_conn_info(struct hci_dev *hdev, struct hci_conn_info_req *req,
-+			     struct hci_conn_info *ci)
-+{
-+	struct hci_conn *conn;
+-			strcpy(fw_dump_ptr, "\n=3D=3D=3D=3D=3D=3D=3D=3DEnd dump=3D=3D=3D=3D=3D=
+=3D=3D=3D\n");
+-			fw_dump_ptr +=3D strlen("\n=3D=3D=3D=3D=3D=3D=3D=3DEnd dump=3D=3D=3D=
+=3D=3D=3D=3D=3D\n");
++			size +=3D scnprintf(fw_dump_ptr + size,
++					  sizeof(fw_dump_ptr) - size,
++					  "=3D=3D=3D=3D=3D=3D=3D=3DStart dump %s=3D=3D=3D=3D=3D=3D=3D=3D\n",
++					  entry->mem_name);
 +
-+	conn = hci_conn_hash_lookup_ba(hdev, req->type, &req->bdaddr);
-+	if (!conn)
-+		return -ENOENT;
-+	bacpy(&ci->bdaddr, &conn->dst);
-+	ci->handle = conn->handle;
-+	ci->type  = conn->type;
-+	ci->out   = conn->out;
-+	ci->state = conn->state;
-+	ci->link_mode = get_link_mode(conn);
-+	return 0;
-+}
- 
--	hci_dev_unlock(hdev);
-+static int hci_get_auth_info(struct hci_dev *hdev, struct hci_auth_info_req *req)
-+{
-+	struct hci_conn *conn;
- 
--	return err;
-+	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req->bdaddr);
-+	if (!conn)
-+		return -ENOENT;
-+	req->type = conn->auth_type;
-+	return 0;
- }
- 
- /* Ioctls that require bound socket */
--static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
--				unsigned long arg)
-+static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
- {
--	struct hci_dev *hdev = hci_pi(sk)->hdev;
-+	struct hci_dev *hdev;
-+	union {
-+		bdaddr_t bdaddr;
-+		struct hci_conn_info_req conn_req;
-+		struct hci_auth_info_req auth_req;
-+	} u;
-+	struct hci_conn_info ci;
-+	int err;
- 
--	if (!hdev)
--		return -EBADFD;
-+	if (cmd == HCIBLOCKADDR || cmd == HCIUNBLOCKADDR) {
-+		if (copy_from_user(&u.bdaddr, arg, sizeof(u.bdaddr)))
-+			return -EFAULT;
-+	} else if (cmd == HCIGETCONNINFO) {
-+		if (copy_from_user(&u.conn_req, arg, sizeof(u.conn_req)))
-+			return -EFAULT;
-+	} else if (cmd == HCIGETAUTHINFO) {
-+		if (copy_from_user(&u.auth_req, arg, sizeof(u.auth_req)))
-+			return -EFAULT;
-+	}
- 
--	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
--		return -EBUSY;
-+	lock_sock(sk);
- 
--	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
--		return -EOPNOTSUPP;
-+	hdev = hci_pi(sk)->hdev;
-+	if (!hdev) {
-+		err = -EBADFD;
-+		goto out;
-+	}
- 
--	if (hdev->dev_type != HCI_PRIMARY)
--		return -EOPNOTSUPP;
-+	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		err = -EBUSY;
-+		goto out;
-+	}
++			memcpy(fw_dump_ptr + size, entry->mem_ptr,
++			       entry->mem_size);
++			size +=3D entry->mem_size;
 +
-+	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
-+		err = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
-+	if (hdev->dev_type != HCI_PRIMARY) {
-+		err = -EOPNOTSUPP;
-+		goto out;
-+	}
- 
-+	hci_dev_lock(hdev);
- 	switch (cmd) {
- 	case HCISETRAW:
- 		if (!capable(CAP_NET_ADMIN))
--			return -EPERM;
--		return -EOPNOTSUPP;
--
-+			err = -EPERM;
-+		else
-+			err = -EOPNOTSUPP;
-+		break;
- 	case HCIGETCONNINFO:
--		return hci_get_conn_info(hdev, (void __user *)arg);
--
-+		err = hci_get_conn_info(hdev, &u.conn_req, &ci);
-+		break;
- 	case HCIGETAUTHINFO:
--		return hci_get_auth_info(hdev, (void __user *)arg);
--
-+		err = hci_get_auth_info(hdev, &u.auth_req);
-+		break;
- 	case HCIBLOCKADDR:
- 		if (!capable(CAP_NET_ADMIN))
--			return -EPERM;
--		return hci_sock_reject_list_add(hdev, (void __user *)arg);
--
-+			err = -EPERM;
-+		else
-+			err = hci_sock_reject_list_add(hdev, &u.bdaddr);
-+		break;
- 	case HCIUNBLOCKADDR:
- 		if (!capable(CAP_NET_ADMIN))
--			return -EPERM;
--		return hci_sock_reject_list_del(hdev, (void __user *)arg);
-+			err = -EPERM;
-+		else
-+			err = hci_sock_reject_list_del(hdev, &u.bdaddr);
-+		break;
-+	default:
-+		err = -ENOIOCTLCMD;
- 	}
-+	hci_dev_unlock(hdev);
-+
-+ out:
-+	release_sock(sk);
- 
--	return -ENOIOCTLCMD;
-+	if (!err) {
-+		if (cmd == HCIGETCONNINFO) {
-+			if (copy_to_user(arg + sizeof(u.conn_req), &ci, sizeof(ci)))
-+				err = -EFAULT;
-+		} else if (cmd == HCIGETAUTHINFO) {
-+			if (copy_to_user(arg, &u.auth_req, sizeof(u.auth_req)))
-+				err = -EFAULT;
-+		}
-+	}
-+	return err;
- }
- 
- static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
-@@ -975,15 +1027,14 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- {
- 	void __user *argp = (void __user *)arg;
- 	struct sock *sk = sock->sk;
--	int err;
- 
- 	BT_DBG("cmd %x arg %lx", cmd, arg);
- 
- 	lock_sock(sk);
- 
- 	if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
--		err = -EBADFD;
--		goto done;
-+		release_sock(sk);
-+		return -EBADFD;
- 	}
- 
- 	/* When calling an ioctl on an unbound raw socket, then ensure
-@@ -1055,13 +1106,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
- 		return hci_inquiry(argp);
- 	}
- 
--	lock_sock(sk);
--
--	err = hci_sock_bound_ioctl(sk, cmd, arg);
--
--done:
--	release_sock(sk);
--	return err;
-+	return hci_sock_bound_ioctl(sk, cmd, (void __user *)arg);
- }
- 
- #ifdef CONFIG_COMPAT
++			size +=3D scnprintf(fw_dump_ptr + size,
++					  sizeof(fw_dump_ptr) - size,
++					  "\n=3D=3D=3D=3D=3D=3D=3D=3DEnd dump=3D=3D=3D=3D=3D=3D=3D=3D\n");
+
+ 			vfree(mem_type_mapping_tbl[idx].mem_ptr);
+ 			mem_type_mapping_tbl[idx].mem_ptr =3D NULL;
+=2D-
+2.25.1
 
