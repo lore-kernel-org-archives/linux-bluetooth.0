@@ -2,609 +2,269 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFE61C636CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jul 2021 07:58:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92F47C636C9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jul 2021 09:04:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A51C26024A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jul 2021 07:58:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C01B611EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 19 Jul 2021 09:04:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234937AbhGSIBO convert rfc822-to-8bit (ORCPT
+        id S235783AbhGSIXX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Jul 2021 04:01:14 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44818 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235150AbhGSIBL (ORCPT
+        Mon, 19 Jul 2021 04:23:23 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:11445 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235528AbhGSIXW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Jul 2021 04:01:11 -0400
-Received: from smtpclient.apple (p5b3d2eb8.dip0.t-ipconnect.de [91.61.46.184])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5A369CECF8;
-        Mon, 19 Jul 2021 09:57:47 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [BlueZ PATCH v2 1/3] error: BR/EDR and LE connection failure
- reasons
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABmPvSHyt0LfMRJeaWzEMUZZNGnnNnZTnw_0iU4CyxQMd8jy1w@mail.gmail.com>
-Date:   Mon, 19 Jul 2021 09:57:46 +0200
-Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Alain Michaud <alainm@chromium.org>,
-        Howard Chung <howardchung@google.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AF4F82B4-E735-4629-A01E-F8FB512652D8@holtmann.org>
-References: <20210626052152.2543526-1-mcchou@chromium.org>
- <20210625222111.BlueZ.v2.1.If79c3f0720cc893be1770c6853fe2fbe626f2caa@changeid>
- <086ED9D7-96E6-46AB-88B6-F2E71ACD1B15@holtmann.org>
- <CABmPvSHyt0LfMRJeaWzEMUZZNGnnNnZTnw_0iU4CyxQMd8jy1w@mail.gmail.com>
-To:     Miao-chen Chou <mcchou@chromium.org>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Mon, 19 Jul 2021 04:23:22 -0400
+Received: from dggemv703-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4GSwmQ4RRgzcg1t;
+        Mon, 19 Jul 2021 17:00:38 +0800 (CST)
+Received: from dggpemm500015.china.huawei.com (7.185.36.181) by
+ dggemv703-chm.china.huawei.com (10.3.19.46) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Mon, 19 Jul 2021 17:03:54 +0800
+Received: from [10.174.179.224] (10.174.179.224) by
+ dggpemm500015.china.huawei.com (7.185.36.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.2; Mon, 19 Jul 2021 17:03:54 +0800
+Subject: Re: [PATCH v2] Bluetooth: fix use-after-free error in
+ lock_sock_nested()
+To:     Hillf Danton <hdanton@sina.com>
+CC:     <cj.chengjian@huawei.com>, <weiyongjun1@huawei.com>,
+        <yuehaibing@huawei.com>, <huawei.libin@huawei.com>,
+        <marcel@holtmann.org>, <luiz.dentz@gmail.com>,
+        <johan.hedberg@gmail.com>, <linux-bluetooth@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        syzbot <syzbot+664818c59309176d03ee@syzkaller.appspotmail.com>,
+        syzbot <syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com>
+References: <20210719024937.9542-1-bobo.shaobowang@huawei.com>
+ <20210719074829.2554-1-hdanton@sina.com>
+From:   "Wangshaobo (bobo)" <bobo.shaobowang@huawei.com>
+Message-ID: <97b64908-45d3-f074-bd9c-0bb04624bad1@huawei.com>
+Date:   Mon, 19 Jul 2021 17:03:53 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:68.0) Gecko/20100101
+ Thunderbird/68.1.0
+MIME-Version: 1.0
+In-Reply-To: <20210719074829.2554-1-hdanton@sina.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.174.179.224]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpemm500015.china.huawei.com (7.185.36.181)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Miao-chen,
 
->>> The source of Connect() failures can be divided into the following
->>> three.
->>> - bluetoothd's device interface state transition and profile state
->>> transition
->>> - Kernel's L2CAP layer state transition
->>> - Potential HCI error codes returned by the remote device
->>> 
->>> This also added error-code.txt to describe these error codes.
->>> 
->>> Reviewed-by: Alain Michaud <alainm@chromium.org>
->>> Reviewed-by: Howard Chung <howardchung@google.com>
->>> ---
->>> 
->>> Changes in v2:
->>> - Add error-code.txt
->>> - Remove BtdError from return string
->>> 
->>> doc/error-code.txt | 266 +++++++++++++++++++++++++++++++++++++++++++++
->>> src/error.c        | 111 +++++++++++++++++++
->>> src/error.h        |  52 +++++++++
->>> 3 files changed, 429 insertions(+)
->>> create mode 100644 doc/error-code.txt
->> 
->> please split documentation and code changes into separate patches.
->> 
->> 
->>> 
->>> diff --git a/doc/error-code.txt b/doc/error-code.txt
->>> new file mode 100644
->>> index 000000000..e91324855
->>> --- /dev/null
->>> +++ b/doc/error-code.txt
->>> @@ -0,0 +1,266 @@
->>> +D-Bus Method Return Error Codes
->>> +===============================
->>> +
->>> +The motivation of having detailed error codes is to provide context-based
->>> +failure reasons along with D-Bus method return so that D-Bus clients can
->>> +build metrics and optimize their application based on these failure reasons.
->>> +For instance, a client can build retry mechanism for a connection failure or
->>> +improve the bottleneck of use scenario based on actionable metrics.
->>> +
->>> +These error codes are context-based but not necessarily tied to interface or
->>> +method calls. For instance, if a pairing request failed due to connection
->>> +failure, connection error would be attached to the method return of Pair().
->>> +
->>> +BR/EDR connection already connected
->>> +===================================
->>> +     code:   0x0001
->>> +     errno:  EALREADY, EISCONN
->> 
->> I would rather see connnection-already-connected instead of 0x0001 in the D-Bus error message.
-> Having a code attached instead of a string description makes it easier
-> for a D-Bus client to interpret and map to corresponding handlers IMO.
-> For instead, a client can simplily use the code in a switch case to
-> perform retry or error reporting.
+在 2021/7/19 15:48, Hillf Danton 写道:
+> On Mon, 19 Jul 2021 10:49:37 +0800 Wang ShaoBo wrote:
+>> use-after-free error in lock_sock_nested is reported:
+> There are similar reports from syzbot.
+>
+> [1] https://lore.kernel.org/netdev/000000000000f335f205b5649c70@google.com/
+> [2] https://lore.kernel.org/netdev/000000000000c4fd0405b6cc8e53@google.com/
+>
+>> [  179.140137][ T3731] =====================================================
+>> [  179.142675][ T3731] BUG: KMSAN: use-after-free in lock_sock_nested+0x280/0x2c0
+>> [  179.145494][ T3731] CPU: 4 PID: 3731 Comm: kworker/4:2 Not tainted 5.12.0-rc6+ #54
+>> [  179.148432][ T3731] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+>> [  179.151806][ T3731] Workqueue: events l2cap_chan_timeout
+>> [  179.152730][ T3731] Call Trace:
+>> [  179.153301][ T3731]  dump_stack+0x24c/0x2e0
+>> [  179.154063][ T3731]  kmsan_report+0xfb/0x1e0
+>> [  179.154855][ T3731]  __msan_warning+0x5c/0xa0
+>> [  179.155579][ T3731]  lock_sock_nested+0x280/0x2c0
+>> [  179.156436][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.157257][ T3731]  l2cap_sock_teardown_cb+0xb8/0x890
+>> [  179.158154][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+>> [  179.159141][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.159994][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+>> [  179.160959][ T3731]  ? l2cap_sock_recv_cb+0x420/0x420
+>> [  179.161834][ T3731]  l2cap_chan_del+0x3e1/0x1d50
+>> [  179.162608][ T3731]  ? kmsan_get_metadata+0x116/0x180
+>> [  179.163435][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
+>> [  179.164406][ T3731]  l2cap_chan_close+0xeea/0x1050
+>> [  179.165189][ T3731]  ? kmsan_internal_unpoison_shadow+0x42/0x70
+>> [  179.166180][ T3731]  l2cap_chan_timeout+0x1da/0x590
+>> [  179.167066][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
+>> [  179.168023][ T3731]  ? l2cap_chan_create+0x560/0x560
+>> [  179.168818][ T3731]  process_one_work+0x121d/0x1ff0
+>> [  179.169598][ T3731]  worker_thread+0x121b/0x2370
+>> [  179.170346][ T3731]  kthread+0x4ef/0x610
+>> [  179.171010][ T3731]  ? process_one_work+0x1ff0/0x1ff0
+>> [  179.171828][ T3731]  ? kthread_blkcg+0x110/0x110
+>> [  179.172587][ T3731]  ret_from_fork+0x1f/0x30
+>> [  179.173348][ T3731]
+>> [  179.173752][ T3731] Uninit was created at:
+>> [  179.174409][ T3731]  kmsan_internal_poison_shadow+0x5c/0xf0
+>> [  179.175373][ T3731]  kmsan_slab_free+0x76/0xc0
+>> [  179.176060][ T3731]  kfree+0x3a5/0x1180
+>> [  179.176664][ T3731]  __sk_destruct+0x8af/0xb80
+>> [  179.177375][ T3731]  __sk_free+0x812/0x8c0
+>> [  179.178032][ T3731]  sk_free+0x97/0x130
+>> [  179.178686][ T3731]  l2cap_sock_release+0x3d5/0x4d0
+>> [  179.179457][ T3731]  sock_close+0x150/0x450
+>> [  179.180117][ T3731]  __fput+0x6bd/0xf00
+>> [  179.180787][ T3731]  ____fput+0x37/0x40
+>> [  179.181481][ T3731]  task_work_run+0x140/0x280
+>> [  179.182219][ T3731]  do_exit+0xe51/0x3e60
+>> [  179.182930][ T3731]  do_group_exit+0x20e/0x450
+>> [  179.183656][ T3731]  get_signal+0x2dfb/0x38f0
+>> [  179.184344][ T3731]  arch_do_signal_or_restart+0xaa/0xe10
+>> [  179.185266][ T3731]  exit_to_user_mode_prepare+0x2d2/0x560
+>> [  179.186136][ T3731]  syscall_exit_to_user_mode+0x35/0x60
+>> [  179.186984][ T3731]  do_syscall_64+0xc5/0x140
+>> [  179.187681][ T3731]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> [  179.188604][ T3731] =====================================================
+>>
+>> In our case, there are two Thread A and B:
+>>
+>> Context: Thread A:              Context: Thread B:
+>>
+>> l2cap_chan_timeout()            __se_sys_shutdown()
+>>   l2cap_chan_close()              l2cap_sock_shutdown()
+>>     l2cap_chan_del()                l2cap_chan_close()
+>>       l2cap_sock_teardown_cb()        l2cap_sock_teardown_cb()
+>>
+>> Once l2cap_sock_teardown_cb() excuted, this sock will be marked as SOCK_ZAPPED,
+>> and can be treated as killable in l2cap_sock_kill() if sock_orphan() has
+>> excuted, at this time we close sock through sock_close() which end to call
+>> l2cap_sock_kill() like Thread C:
+>>
+>> Context: Thread C:
+>>
+>> sock_close()
+>>   l2cap_sock_release()
+>>     sock_orphan()
+>>     l2cap_sock_kill()  #free sock if refcnt is 1
+>>
+>> If C completed, Once A or B reaches l2cap_sock_teardown_cb() again,
+>> use-after-free happened.
+>>
+>> We should set chan->data to NULL if sock is destructed, for telling teardown
+>> operation is not allowed in l2cap_sock_teardown_cb(), and also we should
+> Alternatively ensure it is safe to invoke the teardown cb by holding extra
+> grab to sock, see diff below,
+>
+>> avoid killing an already killed socket in l2cap_sock_close_cb().
+> with an eye on double kill.
+>
+>> Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
+>> ---
+>> v2:
+>>   put chan->data = NULL in l2cap_socl_destruct(), this refers to
+>>   Luiz Augusto von Dentz <luiz.dentz@gmail.com>'s proposal.
+>> ---
+>> net/bluetooth/l2cap_sock.c | 10 +++++++++-
+>> 1 file changed, 9 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+>> index c99d65ef13b1..160c016a5dfb 100644
+>> --- a/net/bluetooth/l2cap_sock.c
+>> +++ b/net/bluetooth/l2cap_sock.c
+>> @@ -1508,6 +1508,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan *chan)
+>> {
+>> 	struct sock *sk = chan->data;
+>>
+>> +	if (!sk)
+>> +		return;
+>> +
+>> 	l2cap_sock_kill(sk);
+>> }
+>>
+>> @@ -1516,6 +1519,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+>> 	struct sock *sk = chan->data;
+>> 	struct sock *parent;
+>>
+>> +	if (!sk)
+>> +		return;
+>> +
+>> 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
+>>
+>> 	/* This callback can be called both for server (BT_LISTEN)
+>> @@ -1707,8 +1713,10 @@ static void l2cap_sock_destruct(struct sock *sk)
+>> {
+>> 	BT_DBG("sk %p", sk);
+>>
+>> -	if (l2cap_pi(sk)->chan)
+>> +	if (l2cap_pi(sk)->chan) {
+>> +		l2cap_pi(sk)->chan->data = NULL;
+>> 		l2cap_chan_put(l2cap_pi(sk)->chan);
+>> +	}
+>>
+>> 	if (l2cap_pi(sk)->rx_busy_skb) {
+>> 		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
+>> -- 
+>> 2.27.0
+>
+> Hold sock until it is killed to make l2cap callbacks safe.
+> Now only for thoughts.
+>
+> +++ x/net/bluetooth/l2cap_sock.c
+> @@ -1509,6 +1509,8 @@ static void l2cap_sock_close_cb(struct l
+>   	struct sock *sk = chan->data;
+>   
+>   	l2cap_sock_kill(sk);
+> +	/* put the extra hold in l2cap_sock_init() */
+> +	sock_put(sk);
+>   }
+>   
+>   static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+> @@ -1794,6 +1796,8 @@ static void l2cap_sock_init(struct sock
+>   	/* Default config options */
+>   	chan->flush_to = L2CAP_DEFAULT_FLUSH_TO;
+>   
+> +	/* will be put in l2cap_sock_close_cb() */
+> +	sock_hold(sk);
+>   	chan->data = sk;
+>   	chan->ops = &l2cap_chan_ops;
+>   }
+> .
 
-this argument has been made since forever. However D-Bus is heavily string based and we also have our API heavily string and descriptive. So I rather keep it that way.
+Dear Danton，
 
->> 
->>> +
->>> +Either the profile is already connected or ACL connection is in place.
->>> +
->>> +BR/EDR connection page timeout
->>> +==============================
->>> +     code:   0x0002
->>> +     errno:  EHOSTDOWN
->>> +
->>> +Failed due to page timeout.
->>> +
->>> +BR/EDR connection profile unavailable
->>> +=====================================
->>> +     code:   0x0003
->>> +     errno:  ENOPROTOOPT
->>> +
->>> +Failed to find connectable services or the target service.
->>> +
->>> +BR/EDR connection SDP search
->>> +============================
->>> +     code:   0x0004
->>> +     errno:  none
->>> +
->>> +Failed to complete the SDP search.
->>> +
->>> +BR/EDR connection create socket
->>> +===============================
->>> +     code:   0x0005
->>> +     errno:  EIO
->>> +
->>> +Failed to create or connect to BT IO socket. This can also indicate hardware
->>> +failure in the controller.
->>> +
->>> +BR/EDR connection invalid arguments
->>> +===================================
->>> +     code:   0x0006
->>> +     errno:  EHOSTUNREACH
->>> +
->>> +Failed due to invalid arguments.
->>> +
->>> +BR/EDR connection not powered
->>> +=============================
->>> +     code:   0x0007
->>> +     errno:  EHOSTUNREACH
->>> +
->>> +Failed due to adapter not powered.
->>> +
->>> +BR/EDR connection not supported
->>> +===============================
->>> +     code:   0x0008
->>> +     errno:  EOPNOTSUPP, EPROTONOSUPPORT
->>> +
->>> +Failed due to unsupported state transition of L2CAP channel or other features
->>> +either by the local host or the remote.
->>> +
->>> +BR/EDR connection bad socket
->>> +============================
->>> +     code:   0x0009
->>> +     errno:  EBADFD
->>> +
->>> +Failed due to the socket is in bad state.
->>> +
->>> +BR/EDR connection memory allocation
->>> +===================================
->>> +     code:   0x000A
->>> +     errno:  EBADFD
->>> +
->>> +Failed to allocate memory in either host stack or controller.
->> 
->> If this happens, then the code is wrong. Should be an ENOMEM.
-> My mistake, this should be ENOMEM. Corrected in v3.
->> 
->>> +
->>> +BR/EDR connection busy
->>> +======================
->>> +     code:   0x000B
->>> +     errno:  EBUSY
->>> +
->>> +Failed due to other ongoing operations, such as pairing, busy L2CAP channel or
->>> +the operation disallowed by the controller.
->>> +
->>> +BR/EDR connection concurrent connection limit
->>> +=============================================
->>> +     code:   0x000C
->>> +     errno:  EMLINK
->>> +
->>> +Failed due to reaching the concurrent connection limit to a device.
->>> +
->>> +BR/EDR connection timeout
->>> +=========================
->>> +     code:   0x000D
->>> +     errno:  ETIMEDOUT
->>> +
->>> +Failed due to connection timeout
->>> +
->>> +BR/EDR connection refused
->>> +=========================
->>> +     code:   0x000E
->>> +     errno:  ECONNREFUSED
->>> +
->>> +Refused by the remote device due to limited resource, security reason or
->>> +unacceptable address type.
->>> +
->>> +BR/EDR connection aborted by remote
->>> +===================================
->>> +     code:   0x000F
->>> +     errno:  ECONNRESET
->>> +
->>> +Terminated by the remote device due to limited resource or power off.
->>> +
->>> +BR/EDR connection aborted by local
->>> +==================================
->>> +     code:   0x0010
->>> +     errno:  ECONNABORTED
->>> +
->>> +Aborted by the local host.
->>> +
->>> +BR/EDR connection protocol error
->>> +================================
->>> +     code:   0x0011
->>> +     errno:  EPROTO
->>> +
->>> +Failed due to LMP protocol error.
->>> +
->>> +BR/EDR connection canceled
->>> +==========================
->>> +     code:   0x0012
->>> +     errno:  none
->>> +
->>> +Failed due to cancellation caused by adapter drop, unexpected device drop, or
->>> +incoming disconnection request before connection request is completed.
->>> +
->>> +BR/EDR connection unknown error
->>> +===============================
->>> +     code:   0x0013
->>> +     errno:  ENOSYS
->>> +
->>> +Failed due to unknown reason.
->>> +
->>> +LE connection invalid arguments
->>> +===============================
->>> +     code:   0x0101
->>> +     errno:  EINVAL
->>> +
->>> +Failed due to invalid arguments.
->>> +
->>> +LE connection not powered
->>> +=========================
->>> +     code:   0x0102
->>> +     errno:  EHOSTUNREACH
->>> +
->>> +Failed due to adapter not powered.
->>> +
->>> +LE connection not supported
->>> +===========================
->>> +     code:   0x0103
->>> +     errno:  EOPNOTSUPP, EPROTONOSUPPORT
->>> +
->>> +Failed due to unsupported state transition of L2CAP channel or other features
->>> +(e.g. LE features) either by the local host or the remote.
->>> +
->>> +LE connection already connected
->>> +===============================
->>> +     code:   0x0104
->>> +     errno: EALREADY, EISCONN
->>> +
->>> +Either the BT IO is already connected or LE link connection in place.
->>> +
->>> +LE connection bad socket
->>> +========================
->>> +     code:   0x0105
->>> +     errno: EBADFD
->>> +
->>> +Failed due to the socket is in bad state.
->>> +
->>> +LE connection memory allocation
->>> +===============================
->>> +     code:   0x0106
->>> +     errno: ENOMEM
->>> +
->>> +Failed to allocate memory in either host stack or controller.
->>> +
->>> +LE connection busy
->>> +==================
->>> +     code:   0x0107
->>> +     errno:  EBUSY
->>> +
->>> +Failed due to other ongoing operations, such as pairing, connecting, busy
->>> +L2CAP channel or the operation disallowed by the controller.
->>> +
->>> +LE connection refused
->>> +=====================
->>> +     code:   0x0108
->>> +     errno:  ECONNREFUSED
->>> +
->>> +Failed due to that LE is not enabled or the attempt is refused by the remote
->>> +device due to limited resource, security reason or unacceptable address type.
->>> +
->>> +LE connection create socket
->>> +===========================
->>> +     code:   0x0109
->>> +     errno:  EIO
->>> +
->>> +Failed to create or connect to BT IO socket. This can also indicate hardware
->>> +failure in the controller.
->>> +
->>> +LE connection timeout
->>> +=====================
->>> +     code:   0x010A
->>> +     errno:  ETIMEDOUT
->>> +
->>> +Failed due to connection timeout
->>> +
->>> +LE connection concurrent connection limit
->>> +=========================================
->>> +     code:   0x010B
->>> +     errno:  EMLINK
->>> +
->>> +Failed due to reaching the synchronous connection limit to a device.
->>> +
->>> +LE connection abort by remote
->>> +=============================
->>> +     code:   0x010C
->>> +     errno:  ECONNRESET
->>> +
->>> +Aborted by the remote device due to limited resource or power off.
->>> +
->>> +LE connection abort by local
->>> +============================
->>> +     code:   0x010D
->>> +     errno:  ECONNABORTED
->>> +
->>> +Aborted by the local host.
->>> +
->>> +LE connection link layer protocol error
->>> +=======================================
->>> +     code:   0x010E
->>> +     errno:  EPROTO
->>> +
->>> +Failed due to link layer protocol error.
->>> +
->>> +LE connection GATT browsing
->>> +===========================
->>> +     code:   0x010F
->>> +     errno:  none
->>> +
->>> +Failed to complete the GATT browsing.
->>> +
->>> +LE connection unknown error
->>> +===========================
->>> +     code:   0x0110
->>> +     errno:  ENOSYS
->>> +
->>> + Failed due to unknown reason.
->>> diff --git a/src/error.c b/src/error.c
->>> index 89517075e..73602c4bf 100644
->>> --- a/src/error.c
->>> +++ b/src/error.c
->>> @@ -27,6 +27,7 @@
->>> #include <config.h>
->>> #endif
->>> 
->>> +#include <stdio.h>
->>> #include "gdbus/gdbus.h"
->>> 
->>> #include "error.h"
->>> @@ -43,6 +44,12 @@ DBusMessage *btd_error_invalid_args_str(DBusMessage *msg, const char *str)
->>>                                      "%s", str);
->>> }
->>> 
->>> +DBusMessage *btd_error_invalid_args_err(DBusMessage *msg, uint16_t err)
->>> +{
->>> +     return g_dbus_create_error(msg, ERROR_INTERFACE ".InvalidArguments",
->>> +                                     "0x%04X", err);
->>> +}
->>> +
->>> DBusMessage *btd_error_busy(DBusMessage *msg)
->>> {
->>>      return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
->>> @@ -79,12 +86,24 @@ DBusMessage *btd_error_in_progress(DBusMessage *msg)
->>>                                      "In Progress");
->>> }
->>> 
->>> +DBusMessage *btd_error_in_progress_err(DBusMessage *msg, uint16_t err)
->>> +{
->>> +     return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress", "0x%04X",
->>> +                                     err);
->>> +}
->>> +
->>> DBusMessage *btd_error_not_available(DBusMessage *msg)
->>> {
->>>      return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
->>>                                      "Operation currently not available");
->>> }
->>> 
->>> +DBusMessage *btd_error_not_available_err(DBusMessage *msg, uint16_t err)
->>> +{
->>> +     return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
->>> +                                     "0x%04X", err);
->>> +}
->>> +
->>> DBusMessage *btd_error_does_not_exist(DBusMessage *msg)
->>> {
->>>      return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
->>> @@ -121,8 +140,100 @@ DBusMessage *btd_error_not_ready(DBusMessage *msg)
->>>                                      "Resource Not Ready");
->>> }
->>> 
->>> +DBusMessage *btd_error_not_ready_err(DBusMessage *msg, uint16_t err)
->>> +{
->>> +     return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady", "0x%04X",
->>> +                                     err);
->>> +}
->>> +
->>> DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
->>> {
->>>      return g_dbus_create_error(msg, ERROR_INTERFACE
->>>                                      ".Failed", "%s", str);
->>> }
->>> +
->>> +DBusMessage *btd_error_failed_err(DBusMessage *msg, uint16_t err)
->>> +{
->>> +     return g_dbus_create_error(msg, ERROR_INTERFACE ".Failed", "0x%04X",
->>> +                                     err);
->>> +}
->>> +
->>> +uint16_t btd_error_bredr_conn_from_errno(int errno_code)
->>> +{
->>> +     switch (-errno_code) {
->>> +     case EALREADY:
->>> +     case EISCONN: // Fall through
->> 
->> Don’t do this Fall through. It is actually not a fall through per se. This is just a statement with two case labels. That is perfectly normal and no compiler should complain. And frankly no C-programmer should be confused if this was intentional or not.
-> Corrected in v3.
->> 
->>> +             return BTD_ERR_BREDR_CONN_ALREADY_CONNECTED;
->>> +     case EHOSTDOWN:
->>> +             return BTD_ERR_BREDR_CONN_PAGE_TIMEOUT;
->>> +     case ENOPROTOOPT:
->>> +             return BTD_ERR_BREDR_CONN_PROFILE_UNAVAILABLE;
->>> +     case EIO:
->>> +             return BTD_ERR_BREDR_CONN_CREATE_SOCKET;
->>> +     case EINVAL:
->>> +             return BTD_ERR_BREDR_CONN_INVALID_ARGUMENTS;
->>> +     case EHOSTUNREACH:
->>> +             return BTD_ERR_BREDR_CONN_ADAPTER_NOT_POWERED;
->>> +     case EOPNOTSUPP:
->>> +     case EPROTONOSUPPORT: // Fall through
->>> +             return BTD_ERR_BREDR_CONN_NOT_SUPPORTED;
->>> +     case EBADFD:
->>> +             return BTD_ERR_BREDR_CONN_BAD_SOCKET;
->>> +     case ENOMEM:
->>> +             return BTD_ERR_BREDR_CONN_MEMORY_ALLOC;
->>> +     case EBUSY:
->>> +             return BTD_ERR_BREDR_CONN_BUSY;
->>> +     case EMLINK:
->>> +             return BTD_ERR_BREDR_CONN_CNCR_CONNECT_LIMIT;
->>> +     case ETIMEDOUT:
->>> +             return BTD_ERR_BREDR_CONN_TIMEOUT;
->>> +     case ECONNREFUSED:
->>> +             return BTD_ERR_BREDR_CONN_REFUSED;
->>> +     case ECONNRESET:
->>> +             return BTD_ERR_BREDR_CONN_ABORT_BY_REMOTE;
->>> +     case ECONNABORTED:
->>> +             return BTD_ERR_BREDR_CONN_ABORT_BY_LOCAL;
->>> +     case EPROTO:
->>> +             return BTD_ERR_BREDR_CONN_PROTO_ERROR;
->>> +     default:
->>> +             return BTD_ERR_BREDR_CONN_UNKNOWN;
->>> +     }
->>> +}
->>> +
->>> +uint16_t btd_error_le_conn_from_errno(int errno_code)
->>> +{
->>> +     switch (-errno_code) {
->>> +     case EINVAL:
->>> +             return BTD_ERR_LE_CONN_INVALID_ARGUMENTS;
->>> +     case EHOSTUNREACH:
->>> +             return BTD_ERR_LE_CONN_ADAPTER_NOT_POWERED;
->>> +     case EOPNOTSUPP:
->>> +     case EPROTONOSUPPORT: // Fall through
->>> +             return BTD_ERR_LE_CONN_NOT_SUPPORTED;
->>> +     case EALREADY:
->>> +     case EISCONN: // Fall through
->>> +             return BTD_ERR_LE_CONN_ALREADY_CONNECTED;
->>> +     case EBADFD:
->>> +             return BTD_ERR_LE_CONN_BAD_SOCKET;
->>> +     case ENOMEM:
->>> +             return BTD_ERR_LE_CONN_MEMORY_ALLOC;
->>> +     case EBUSY:
->>> +             return BTD_ERR_LE_CONN_BUSY;
->>> +     case ECONNREFUSED:
->>> +             return BTD_ERR_LE_CONN_REFUSED;
->>> +     case EIO:
->>> +             return BTD_ERR_LE_CONN_CREATE_SOCKET;
->>> +     case ETIMEDOUT:
->>> +             return BTD_ERR_LE_CONN_TIMEOUT;
->>> +     case EMLINK:
->>> +             return BTD_ERR_LE_CONN_SYNC_CONNECT_LIMIT;
->>> +     case ECONNRESET:
->>> +             return BTD_ERR_LE_CONN_ABORT_BY_REMOTE;
->>> +     case ECONNABORTED:
->>> +             return BTD_ERR_LE_CONN_ABORT_BY_LOCAL;
->>> +     case EPROTO:
->>> +             return BTD_ERR_LE_CONN_PROTO_ERROR;
->>> +     default:
->>> +             return BTD_ERR_LE_CONN_UNKNOWN;
->>> +     }
->>> +}
->>> diff --git a/src/error.h b/src/error.h
->>> index 7c8cad066..74d433aca 100644
->>> --- a/src/error.h
->>> +++ b/src/error.h
->>> @@ -24,22 +24,74 @@
->>> */
->>> 
->>> #include <dbus/dbus.h>
->>> +#include <stdint.h>
->>> 
->>> #define ERROR_INTERFACE "org.bluez.Error"
->>> 
->>> +/* BR/EDR connection failure reasons
->>> + * BT_ERR_* should be used as one of the parameters to btd_error_*_err().
->>> + */
->>> +#define BTD_ERR_BREDR_CONN_ALREADY_CONNECTED 0x0001
->>> +#define BTD_ERR_BREDR_CONN_PAGE_TIMEOUT              0x0002
->>> +#define BTD_ERR_BREDR_CONN_PROFILE_UNAVAILABLE       0x0003
->>> +#define BTD_ERR_BREDR_CONN_SDP_SEARCH                0x0004
->>> +#define BTD_ERR_BREDR_CONN_CREATE_SOCKET     0x0005
->>> +#define BTD_ERR_BREDR_CONN_INVALID_ARGUMENTS 0x0006
->>> +#define BTD_ERR_BREDR_CONN_ADAPTER_NOT_POWERED       0x0007
->>> +#define BTD_ERR_BREDR_CONN_NOT_SUPPORTED     0x0008
->>> +#define BTD_ERR_BREDR_CONN_BAD_SOCKET                0x0009
->>> +#define BTD_ERR_BREDR_CONN_MEMORY_ALLOC              0x000A
->>> +#define BTD_ERR_BREDR_CONN_BUSY                      0x000B
->>> +#define BTD_ERR_BREDR_CONN_CNCR_CONNECT_LIMIT        0x000C
->>> +#define BTD_ERR_BREDR_CONN_TIMEOUT           0x000D
->>> +#define BTD_ERR_BREDR_CONN_REFUSED           0x000E
->>> +#define BTD_ERR_BREDR_CONN_ABORT_BY_REMOTE   0x000F
->>> +#define BTD_ERR_BREDR_CONN_ABORT_BY_LOCAL    0x0010
->>> +#define BTD_ERR_BREDR_CONN_PROTO_ERROR               0x0011
->>> +#define BTD_ERR_BREDR_CONN_CANCELED          0x0012
->>> +#define BTD_ERR_BREDR_CONN_UNKNOWN           0x0013
->>> +
->>> +/* LE connection failure reasons
->>> + * BT_ERR_* should be used as one of the parameters to btd_error_*_err().
->>> + */
->>> +#define BTD_ERR_LE_CONN_INVALID_ARGUMENTS    0x0101
->>> +#define BTD_ERR_LE_CONN_ADAPTER_NOT_POWERED  0x0102
->>> +#define BTD_ERR_LE_CONN_NOT_SUPPORTED                0x0103
->>> +#define BTD_ERR_LE_CONN_ALREADY_CONNECTED    0x0104
->>> +#define BTD_ERR_LE_CONN_BAD_SOCKET           0x0105
->>> +#define BTD_ERR_LE_CONN_MEMORY_ALLOC         0x0106
->>> +#define BTD_ERR_LE_CONN_BUSY                 0x0107
->>> +#define BTD_ERR_LE_CONN_REFUSED                      0x0108
->>> +#define BTD_ERR_LE_CONN_CREATE_SOCKET                0x0109
->>> +#define BTD_ERR_LE_CONN_TIMEOUT                      0x010A
->>> +#define BTD_ERR_LE_CONN_SYNC_CONNECT_LIMIT   0x010B
->>> +#define BTD_ERR_LE_CONN_ABORT_BY_REMOTE              0x010C
->>> +#define BTD_ERR_LE_CONN_ABORT_BY_LOCAL               0x010D
->>> +#define BTD_ERR_LE_CONN_PROTO_ERROR          0x010E
->>> +#define BTD_ERR_LE_CONN_GATT_BROWSE          0x010F
->>> +#define BTD_ERR_LE_CONN_UNKNOWN                      0x0110
->>> +
->> 
->> What is the intention to split BR/EDR and LE here. You do know up-front what connection type you are. Trying to figure out from the error code what connection you have been trying to establish is plain wrong.
-> In fact the up-front connection type is not necessarily known. In the
-> case of dual-mode devices, such as Bose QC35, a D-Bus client can issue
-> Connect(), and it depends on the timing of connection request (adv
-> usually arrive first compared to inquiry result), it can be either
-> BR/EDR or LE link being established. Another aspect of this is the
-> metrics collection, where knowing transport can be handy. For
-> instance, we can associate the certain error to particular use cases
-> at application layer, and that can help targeting the bottleneck to
-> tackle.
+I have tried this before, this will trigger error "underflow of refcount 
+of chan" as following:
 
-Then we need to find a different way to convey the transport chosen. Doing this by error message is a bad idea.
+[  118.708179][ T3086] ------------[ cut here ]------------
+[  118.710172][ T3086] refcount_t: underflow; use-after-free.
+[  118.713391][ T3086] WARNING: CPU: 4 PID: 3086 at lib/refcount.c:28 
+refcount_warn_saturate+0x30a/0x3c0
+[  118.716774][ T3086] Modules linked in:
+[  118.718279][ T3086] CPU: 4 PID: 3086 Comm: kworker/4:2 Not tainted 
+5.12.0-rc6+ #84
+[  118.721005][ T3086] Hardware name: QEMU Standard PC (i440FX + PIIX, 
+1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
+[  118.722846][ T3086] Workqueue: events l2cap_chan_timeout
+[  118.723786][ T3086] RIP: 0010:refcount_warn_saturate+0x30a/0x3c0
+...
+[  118.737912][ T3086] CR2: 0000000020000040 CR3: 0000000011029000 CR4: 
+00000000000006e0
+[  118.739187][ T3086] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 
+0000000000000000
+[  118.740451][ T3086] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 
+0000000000000400
+[  118.741720][ T3086] Call Trace:
+[  118.742262][ T3086]  l2cap_sock_close_cb+0x165/0x170
+[  118.743124][ T3086]  ? l2cap_sock_teardown_cb+0x560/0x560
 
->> 
->> The description is that you want to know exactly where the connection failed. And I think that can be established independent from the transport.
-> Indeed the intention is to know where it failed exactly. However, as
-> mentioned above, transport information is also an important piece of
-> information to know.
+Actually, if adding sock_hold(sk) in l2cap_sock_init(), 
+l2cap_sock_kill() will continue to excute untill it found
 
-We need to find a different way to inform about which transport failed (or better which was chosen in the first place).
+now chan's refcount is 0, this is because sock was not freed in last 
+round execution of l2cap_sock_kill().
 
->> 
->> In addition, I don’t like the 0x00?? vs 0x01?? reservation of any number. That always goes bad at some point in the future.
-> As replied above, having a code attached instead of a string
-> description makes it easier for a D-Bus client to interpret and map to
-> corresponding handlers, but I am happy to explore other options as
-> well.
 
-You are creating namespaces within a 16-bit integer. That is never a good idea. It always goes wrong at some point in the future and then we are stuck with an API.
+this method also makes l2cap_sock_init()'s logic more difficult to 
+understand,   we have set refcount
 
-Regards
+of sock to 1 when allocating it, why do we need hold it again ?
 
-Marcel
+-- Wang ShaoBo
 
