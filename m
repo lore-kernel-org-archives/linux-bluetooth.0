@@ -2,193 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-15.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4BE5C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 04:24:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EB24C07E9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 09:32:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABF9D6101B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 04:24:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A8661209
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 09:32:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232228AbhGTDoG (ORCPT
+        id S235277AbhGTIvh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 19 Jul 2021 23:44:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229831AbhGTDoE (ORCPT
+        Tue, 20 Jul 2021 04:51:37 -0400
+Received: from fgw22-4.mail.saunalahti.fi ([62.142.5.109]:39581 "EHLO
+        fgw22-4.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S234987AbhGTIv0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 19 Jul 2021 23:44:04 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01CF4C061574;
-        Mon, 19 Jul 2021 21:24:41 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id x192so31022913ybe.6;
-        Mon, 19 Jul 2021 21:24:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=gPhUF/uHHJlKK8me05sAmbzC0LuWJeGm9afwshlZzGw=;
-        b=av6fx2TPOwB8VB0mVPMtKJVSv8DePQYE/mhdoQc65FqEeI2My/RWvp62AQrY/Q5A8i
-         3zBUIUTN9ceuIri/eIwvuVCZzcx1F6+WzIcIfrORFrPAhzJDipjTUqX+Idda2akkUXvF
-         zRo+HjwyRsrKc4nn9jjeSe3Qfyi/oeAnstbwDeNzUtFh9zfEOZlFnAN5b1MgehmExNMd
-         Lmw3Oa6sFL3W+5aa06/Vo9sfScZWlxtwh7L3gjdJ9MsCUXUGJogmx6Alff7lrVVHWAIq
-         IS9nNNDuzjWhtI2A9guG0h2rB2RfmXTt9gG64uMih8TN2bKob8DayvZD/Bo15JbacGKY
-         Zvug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=gPhUF/uHHJlKK8me05sAmbzC0LuWJeGm9afwshlZzGw=;
-        b=Jt2fWbRHtn/HDFvOzzOaogumaMopGGWYe2biRam7RVfbC/dxFe9XMDVeMDPaiQGAcC
-         hgS8Elf+VZj963Vr2Gxkfa06UWq7oUbd8qM89NUfZM9WNtohvwJlTkCa6mMyrOs2sq6H
-         PJNcoygl0boGbaAHy9f0A8k18wkiqip+FcwVcRZzPsUyY82n4sCam4cWs8VM4NQJhWfs
-         dT7R5w8yDNvy3uhTeTt6nv1jSMDlfWDdNkaW2m6TIaEB3QuDo1MGW+PhB9qy+dnByrWA
-         dv+VwOvZAds3QM6yH62MrEhbAKHroemIBZEZREjw8OYlqaAfV5/+jVfLGMyb92HLD4uD
-         lzZA==
-X-Gm-Message-State: AOAM530F2t5VS7seJw3A2C1XuPpnP0hjdZB274FRrGaaVrLrKveHQoPI
-        GeipJw7dAgM8UpSyj7hTW2XZ7JmTTV/KbT9Od9I=
-X-Google-Smtp-Source: ABdhPJzlQhNsdeS+eWb9SZXda2twu5XzghBhOY0bySFPt9bhIOsBAq5XdVjXHon3yXqSL8YU1dTX9Rd73o3kWBYbl4c=
-X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr37297091ybu.282.1626755081153;
- Mon, 19 Jul 2021 21:24:41 -0700 (PDT)
+        Tue, 20 Jul 2021 04:51:26 -0400
+X-Greylist: delayed 967 seconds by postgrey-1.27 at vger.kernel.org; Tue, 20 Jul 2021 04:51:25 EDT
+Received: from ydin.reaktio.net (reaktio.net [85.76.255.15])
+        by fgw22.mail.saunalahti.fi (Halon) with ESMTP
+        id 15521c28-e93b-11eb-88cb-005056bdf889;
+        Tue, 20 Jul 2021 12:15:53 +0300 (EEST)
+Received: by ydin.reaktio.net (Postfix, from userid 1001)
+        id 6C6CF20089; Tue, 20 Jul 2021 12:15:53 +0300 (EEST)
+Date:   Tue, 20 Jul 2021 12:15:53 +0300
+From:   Pasi =?iso-8859-1?Q?K=E4rkk=E4inen?= <pasik@iki.fi>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hilda Wu <hildawu@realtek.com>
+Subject: Re: [PATCH] Bluetooth: btusb: check SCO MTU before enabling USB ALT
+ 3 for WBS
+Message-ID: <20210720091553.GI10625@reaktio.net>
+References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
 MIME-Version: 1.0
-References: <20210719024937.9542-1-bobo.shaobowang@huawei.com>
- <20210719074829.2554-1-hdanton@sina.com> <97b64908-45d3-f074-bd9c-0bb04624bad1@huawei.com>
- <20210720021619.621-1-hdanton@sina.com>
-In-Reply-To: <20210720021619.621-1-hdanton@sina.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 19 Jul 2021 21:24:30 -0700
-Message-ID: <CABBYNZLfFs86Hiej6C2EMVutf4ygyamifBJrXdQK97JpTLBqKg@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: fix use-after-free error in lock_sock_nested()
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     "Wangshaobo (bobo)" <bobo.shaobowang@huawei.com>,
-        cj.chengjian@huawei.com, Wei Yongjun <weiyongjun1@huawei.com>,
-        yuehaibing@huawei.com, huawei.libin@huawei.com,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzbot <syzbot+664818c59309176d03ee@syzkaller.appspotmail.com>,
-        syzbot <syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hillf,
+Hi Pauli,
 
-On Mon, Jul 19, 2021 at 7:16 PM Hillf Danton <hdanton@sina.com> wrote:
+On Fri, Jul 16, 2021 at 08:58:17PM +0300, Pauli Virtanen wrote:
+> Some USB BT adapters don't satisfy the MTU requirement mentioned in
+> commit e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
+> and have ALT 3 setting that produces no/garbled audio. Check that the MTU
+> condition is satisfied, and fall back to ALT 1 if not.
+> 
+> Tested with USB adapters (mtu<72, produce sound only with ALT1)
+> BCM20702A1 0b05:17cb, CSR8510A10 0a12:0001, and (mtu>=72, ALT3)
+> RTL8761BU 0bda:8771, Intel AX200 8087:0029 (after disabling ALT6).
+> 
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
 >
-> On Mon, 19 Jul 2021 17:03:53 +0800 Wang ShaoBo wrote:
-> >
-> >I have tried this before, this will trigger error "underflow of refcount
-> >of chan" as following:
-> >
-> >[  118.708179][ T3086] ------------[ cut here ]------------
-> >[  118.710172][ T3086] refcount_t: underflow; use-after-free.
-> >[  118.713391][ T3086] WARNING: CPU: 4 PID: 3086 at lib/refcount.c:28
-> >refcount_warn_saturate+0x30a/0x3c0
-> >[  118.716774][ T3086] Modules linked in:
-> >[  118.718279][ T3086] CPU: 4 PID: 3086 Comm: kworker/4:2 Not tainted
-> >5.12.0-rc6+ #84
-> >[  118.721005][ T3086] Hardware name: QEMU Standard PC (i440FX + PIIX,
-> >1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-> >[  118.722846][ T3086] Workqueue: events l2cap_chan_timeout
-> >[  118.723786][ T3086] RIP: 0010:refcount_warn_saturate+0x30a/0x3c0
-> >...
-> >[  118.737912][ T3086] CR2: 0000000020000040 CR3: 0000000011029000 CR4:
-> >00000000000006e0
-> >[  118.739187][ T3086] DR0: 0000000000000000 DR1: 0000000000000000 DR2:
-> >0000000000000000
-> >[  118.740451][ T3086] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7:
-> >0000000000000400
-> >[  118.741720][ T3086] Call Trace:
-> >[  118.742262][ T3086]  l2cap_sock_close_cb+0x165/0x170
-> >[  118.743124][ T3086]  ? l2cap_sock_teardown_cb+0x560/0x560
-> >
-> >Actually, if adding sock_hold(sk) in l2cap_sock_init(),
-> >l2cap_sock_kill() will continue to excute untill it found
-> >
-> >now chan's refcount is 0, this is because sock was not freed in last
-> >round execution of l2cap_sock_kill().
->
-> Well double kill cannot be walked around without adding more - add the
-> destroy callback to make the chan->data recorded sock survive kill. It
-> will be released when chan is destroyed to cut the race in reguards to
-> accessing sock by making chan->data stable throughout chan's lifespan.
->
->
-> +++ x/net/bluetooth/l2cap_core.c
-> @@ -485,7 +485,10 @@ static void l2cap_chan_destroy(struct kr
->         list_del(&chan->global_l);
->         write_unlock(&chan_list_lock);
->
-> -       kfree(chan);
-> +       if (chan->ops && chan->ops->destroy)
-> +               chan->ops->destroy(chan);
-> +       else
-> +               kfree(chan);
 
-While Im fine adding a destroy callback the kfree shall be still in
-l2cap_chan_destroy:
-
-if (chan->ops && chan->ops->destroy)
-  /* Destroy chan->data */
-  chan->ops->destroy(chan->data);
-
-kfree(chan);
-
->  }
->
->  void l2cap_chan_hold(struct l2cap_chan *c)
-> +++ x/net/bluetooth/l2cap_sock.c
-> @@ -1220,11 +1220,13 @@ static void l2cap_sock_kill(struct sock
->
->         BT_DBG("sk %p state %s", sk, state_to_string(sk->sk_state));
->
-> +       /* double kill means noop */
-> +       if (sock_flag(sk, SOCK_DEAD))
-> +               return;
->         /* Kill poor orphan */
->
->         l2cap_chan_put(l2cap_pi(sk)->chan);
->         sock_set_flag(sk, SOCK_DEAD);
-> -       sock_put(sk);
->  }
->
->  static int __l2cap_wait_ack(struct sock *sk, struct l2cap_chan *chan)
-> @@ -1504,6 +1506,14 @@ done:
->         return err;
->  }
->
-> +static void l2cap_sock_destroy_cb(struct l2cap_chan *chan)
-> +{
-> +       struct sock *sk = chan->data;
-> +
-> +       sock_put(sk);
-> +       kfree(chan);
-> +}
-> +
->  static void l2cap_sock_close_cb(struct l2cap_chan *chan)
->  {
->         struct sock *sk = chan->data;
-> @@ -1690,6 +1700,7 @@ static const struct l2cap_ops l2cap_chan
->         .new_connection         = l2cap_sock_new_connection_cb,
->         .recv                   = l2cap_sock_recv_cb,
->         .close                  = l2cap_sock_close_cb,
-> +       .destroy                = l2cap_sock_destroy_cb,
-
-If you do the changes above you can probably have sock_put directly
-set as .destroy.
-
->         .teardown               = l2cap_sock_teardown_cb,
->         .state_change           = l2cap_sock_state_change_cb,
->         .ready                  = l2cap_sock_ready_cb,
+Maybe add a Fixes: tag ?
 
 
+Thanks,
 
--- 
-Luiz Augusto von Dentz
+-- Pasi
+
+>  drivers/bluetooth/btusb.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index a9855a2dd561..3ee66e415c4d 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -1763,9 +1763,11 @@ static void btusb_work(struct work_struct *work)
+>  			/* Because mSBC frames do not need to be aligned to the
+>  			 * SCO packet boundary. If support the Alt 3, use the
+>  			 * Alt 3 for HCI payload >= 60 Bytes let air packet
+> -			 * data satisfy 60 bytes.
+> +			 * data satisfy 60 bytes. USB Alt 3 support also needs
+> +			 * HFP transparent MTU >= 72 Bytes.
+>  			 */
+> -			if (new_alts == 1 && btusb_find_altsetting(data, 3))
+> +			if (new_alts == 1 && hdev->sco_mtu >= 72 &&
+> +			    btusb_find_altsetting(data, 3))
+>  				new_alts = 3;
+>  		}
+>  
+> -- 
+> 2.31.1
+> 
+> 
