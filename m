@@ -2,113 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 30B6BC07E95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 11:52:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB23C07E9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 12:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 13E346113C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 11:52:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 427F561019
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 12:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237024AbhGTLLc (ORCPT
+        id S230091AbhGTMJd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jul 2021 07:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35126 "EHLO
+        Tue, 20 Jul 2021 08:09:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48210 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237340AbhGTLLE (ORCPT
+        with ESMTP id S232186AbhGTMJN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jul 2021 07:11:04 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DD78C061762
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 04:51:42 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id q10-20020a056902150ab02905592911c932so30137743ybu.15
-        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 04:51:42 -0700 (PDT)
+        Tue, 20 Jul 2021 08:09:13 -0400
+Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 067D8C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 05:49:51 -0700 (PDT)
+Received: by mail-qv1-xf32.google.com with SMTP id i4so10021545qvq.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 05:49:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=NM/Gq6o1W+zLvEmjAneDTgb5xEyVBdslvhpbgIMsBHM=;
-        b=IhN9rRZohQwAYAtkrUmARIx2FgvxUkhPNgNK3uogThD/bEAoNouJ8c+Uui3I9JKxqH
-         s3R044IM6e3qEmunY9ClB7gfwaGsEZ5zCQlHAWB6ArIG6M4Uxxs7XKzx/9cHwCsu788H
-         CVTw0/ZUl0pTVyXpVtj9c9+1le39358Met3Z5KXLDOlQhOOehKX7Rx4vTR7xu+rtzlsu
-         yVl9x4i914mXJ/hFvfxIw0jt+wwyad14Ptp6oDgdvLJCDQGEENVcf/x1pHYnlmR9eAln
-         xSkoXOC/MoXLdS7t+QgCgeFaOJnAegkYg3SS7gxGqkohVU370+UOc+Oya0dV8KzVmaC+
-         TVrQ==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=U2jLSebloTD7sKordRjLKs0e0eaB3VAttfjv5Z2dEfo=;
+        b=frpGun+54+e+xwoi0qwxSt5OW5pEtCbfKInSGBbWuF/ZuhhK44+bvTu8YprT7glpCe
+         vFmi+wL9HDlBVetm38gHyfVYwgUWsLOI/XhEdGrfL8o++mC+RLJrNWGA0Ol5rk+DPLJk
+         pivdzTh3rCnjjaJuYuNxDntSc2iO+kdJJDT5q+VBr9S3pCMNyxpo5IvCG2+lTdx5S8hC
+         ygZtsHNglM7gR4h4oibZqn5tSlYw3iIz34gO8SgvJoCc3jKdVmDg6mlJgr8Di6UiGNiD
+         w8jAaAThn/yRC6Rj0/jN+1Jt7XMOmyb8Xyb/BS25OwBdBpt73K/HLB3np74XntKWJrlT
+         E49w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=NM/Gq6o1W+zLvEmjAneDTgb5xEyVBdslvhpbgIMsBHM=;
-        b=sqPTzyWDPZT2g9hXh09Wvv6GMK29J0Ql7UpbuCSu3UdmarN+l3T0NdZXDUCJ0fNfj6
-         EDjdPp5ElXTmzYJZ+y0CbF5sjCtiCgRkcJWGn2KmZLssKpoyY0bRdMZSMqUcJlybgGab
-         AfwjCIOdN/0oyCSVznso/uGXd/N22DP+WSo2iVV1smqP3BKHlejKBhHpgkxBQyi2WoaM
-         Al7L9wEVyR9fGThYDNdxgzc14H1Qu0JupEWzFAxmC/8ALN2JmLe+3pqj8Xrau5d20jDA
-         Ax80mUIcw4N7qLy9SemQNmIoVuu8bjf3EYK/WwWkyxQOCUyZH0TP6v5C9wCc3xocXaTT
-         ZjdA==
-X-Gm-Message-State: AOAM530ekZUAGVYS5rxvsLMn1ebozRHGR868WiYkiW5boKF1Joc/C5TY
-        doU06L+FKgMNmGwnK6FaHHxaRDMMTZl2/JlsTKDfJOnq6BdCbKxP0jPGDcf60nfgQxBabZDthZ2
-        +g5LF5KAopscEeJPEiEQtMj335Mk4LQgYTq50XkTnnA21rLoyx7/FqPfmD1g7wy1dxN9SdckDaO
-        4fsSe4gFEKU7Y=
-X-Google-Smtp-Source: ABdhPJxcZTSzOD+4hMiFvclWsGOcq3GL2NSRIxdWUlhS5PbxmjMvZ0URZ/BCcDm4HafUUiYfHXV/d3CgHXUV0qllrA==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:fefc:42bc:f2d9:7140])
- (user=howardchung job=sendgmr) by 2002:a25:ba0f:: with SMTP id
- t15mr36588174ybg.15.1626781901756; Tue, 20 Jul 2021 04:51:41 -0700 (PDT)
-Date:   Tue, 20 Jul 2021 19:51:37 +0800
-Message-Id: <20210720195130.Bluez.v1.1.Ib24a67a8a849f311d5213f83eaac3cfbc54b7b58@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.32.0.402.g57bb445576-goog
-Subject: [Bluez PATCH v1] core: fix a possible crash when removing devices
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     Yun-Hao Chung <howardchung@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=U2jLSebloTD7sKordRjLKs0e0eaB3VAttfjv5Z2dEfo=;
+        b=cznQOyr8uXYJY5e+KBjgjo+ymY98ytQw1vUy805fchotvDcJfh4HQ4HGZxZVNOfHQH
+         h76hFRwCoO4oII7uk2Bmt/5PS3rZfWh91vbc2SQoRMggcu70QucgReOeMgQnaKmHQVG0
+         dxlLU13cTcntcJHZGVzZcoPcjSPfQJH0TVOFlyw8tiYFxLpgU5+lR63BAw5U0RTjCSC7
+         K9qTgWCuK5wYcooxXT+3yYKqUiCeOo/PYfdbNYhLwcaLm2EnefTkhbDOTIstJncSOQ2W
+         M4Pg4qbuCkI/cjg99JojIxTFcLtAug2twiaVQHTnQ72YYFBsZrdFYks6pRmY+abLTMQo
+         ZXBw==
+X-Gm-Message-State: AOAM533a/Vm3LyTlQV0ydK12HGiZ6Ij5eCJL6bFlGlInshXo3lEghgx9
+        xE9KZIYnE7qQEej2nlaZzmz0NrRM7X+oKA==
+X-Google-Smtp-Source: ABdhPJwIL2dYj1ujgx3cpbAqydlZb/IUq8Emrf6tsDIncreNrg/mzl3j3VQpUqqnpxPep8liTYllpw==
+X-Received: by 2002:ad4:4ae5:: with SMTP id cp5mr29924531qvb.38.1626785390115;
+        Tue, 20 Jul 2021 05:49:50 -0700 (PDT)
+Received: from [172.17.0.2] ([137.116.36.227])
+        by smtp.gmail.com with ESMTPSA id x14sm2388752qts.13.2021.07.20.05.49.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jul 2021 05:49:49 -0700 (PDT)
+Message-ID: <60f6c66d.1c69fb81.66662.df3b@mx.google.com>
+Date:   Tue, 20 Jul 2021 05:49:49 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============3937084863221787125=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: [Bluez,v1] core: fix a possible crash when removing devices
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210720195130.Bluez.v1.1.Ib24a67a8a849f311d5213f83eaac3cfbc54b7b58@changeid>
+References: <20210720195130.Bluez.v1.1.Ib24a67a8a849f311d5213f83eaac3cfbc54b7b58@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yun-Hao Chung <howardchung@chromium.org>
+--===============3937084863221787125==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-In probe_service, if the service already exists in device->services, it
-returns the service. This might cause dev_probe and device_probe_profile
-to add a duplicate service into device->services. When removing the
-device, a double-free error might occur.
+This is automated email and please do not reply to this email!
 
-This patch changes the logic of probe_service so that the same service
-will not be added to a device.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=518263
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.37 seconds
+GitLint                       PASS      0.10 seconds
+Prep - Setup ELL              PASS      38.35 seconds
+Build - Prep                  PASS      0.08 seconds
+Build - Configure             PASS      6.70 seconds
+Build - Make                  PASS      168.29 seconds
+Make Check                    PASS      8.36 seconds
+Make Distcheck                PASS      195.34 seconds
+Build w/ext ELL - Configure   PASS      6.65 seconds
+Build w/ext ELL - Make        PASS      157.00 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
 
 ---
-Hi maintainers,
+Regards,
+Linux Bluetooth
 
-This was originally found by removing/reprobing profiles in admin_policy
-plugin. Since we are going to adopt the other way to block incoming
-connection, this patch is no longer causing any issue, but I think it
-is still nice to have to prevent potential crashes.
 
-Thanks,
-Howard
-
- src/device.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/src/device.c b/src/device.c
-index faf07ba22270..b29aa195d19b 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4624,8 +4624,11 @@ static struct btd_service *probe_service(struct btd_device *device,
- 		return NULL;
- 
- 	l = find_service_with_profile(device->services, profile);
-+	/* If the service already exists, return NULL so that it won't be added
-+	 * to the device->services.
-+	 */
- 	if (l)
--		return l->data;
-+		return NULL;
- 
- 	service = service_create(device, profile);
- 
--- 
-2.32.0.402.g57bb445576-goog
-
+--===============3937084863221787125==--
