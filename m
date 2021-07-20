@@ -7,91 +7,141 @@ X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC232C07E9B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 16:06:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6CBA7C07E9B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 17:40:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9127C6100C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 16:06:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55C5561003
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 17:40:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238187AbhGTP0M (ORCPT
+        id S230037AbhGTQ7u (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jul 2021 11:26:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60642 "EHLO
+        Tue, 20 Jul 2021 12:59:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57898 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241378AbhGTPKw (ORCPT
+        with ESMTP id S232292AbhGTQ7n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jul 2021 11:10:52 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B91B5C0617AB;
-        Tue, 20 Jul 2021 08:47:07 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id b13so33362989ybk.4;
-        Tue, 20 Jul 2021 08:47:07 -0700 (PDT)
+        Tue, 20 Jul 2021 12:59:43 -0400
+Received: from mail-yb1-xb2a.google.com (mail-yb1-xb2a.google.com [IPv6:2607:f8b0:4864:20::b2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 327BFC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 10:40:21 -0700 (PDT)
+Received: by mail-yb1-xb2a.google.com with SMTP id k184so33780529ybf.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 20 Jul 2021 10:40:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=tn5GQG1impN/UmGoIUcAsteqIcWCQ+O6KpXk/KRYhHI=;
-        b=lNe/NW7lWDfERaztukADH3t7mRVDXv2pDELtmVvc07xZv0ICbm05BMThqPQSSUv9E/
-         ttK+/Sh+Ik06l3uIOR3N+963yTIAC4Jr540RdewFXARtj3ZPH3mx83ZF0PfmxpUIzAEO
-         f+K3h1ST0eiURDX0/B7REINx2adZcqjmEPH8MhKvj2qKm4+Qce7TFcpNo9+G1b10vLD7
-         ZgjNONkjZ12ykLi2WnADh5sjwt0frPhPXO3szciv99P9o7NJScVrPwzzfoeRUrAVJle0
-         rFTz0GvanUoQ/TiEUbktBBCFOmLWKHwuPYWHNfKSiQw4hC3zzF6BeqXmHXUvP7NryZDJ
-         BA5A==
+        bh=alfYTnKnJV7hbE/HGGDxCyGgS0hp4r3nD1l6L1hWsHc=;
+        b=WG/2sKXoUm8yOwBucLBuV2mJLvNJLQ3B7uqEWku/nxTj6RT1XOVl4NKpmi/2V0tzD0
+         CpubQqyRbzJahDQxJjpREPXN0Y7xlNJaB4mmRp4bp1QWEbQC39U4DdU8qQANDj6d2roI
+         7wbPuUvcAzzzQqe829u/tsGmXfHXHEzWHCawHB/UgCXRSMYWYYAq94m6zPX5PdaOR+W1
+         /CXifRV5ViLpy4BbOJJqeGGOIT5Bh2hpQShV+AUj7D6t6pUwcVQq3YZc8aHPjGocWCmr
+         HKtmn/w2UeIWCv+3srSNckNr3MbeyZZPOsFR+g/YLJVTLE7ZYWayjyN/OFTovbR1zFMU
+         X/0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=tn5GQG1impN/UmGoIUcAsteqIcWCQ+O6KpXk/KRYhHI=;
-        b=cxB1m470RYO4WcLZ2xTfZtuPt+5f1MXPfo8AaZShdc3j5F9eSV0noX+lE8J+ITSWMl
-         y331qmKNoKSDnPR/NY8aPHgwXrDgniFqwEU7iyvH+C4f5hvMktZFrU8gw9rVrTv6pq6V
-         MOPu7KLQLlv3lR2EEXaLDCLaxab10FS7iegmxLQ4hetdCYb6caICCOTo0LYLonQ5+qlJ
-         01j9xTKnRNGakuOJb5UTnFy5ngn9cZTcSDhWiCXMDcJAs1QoRb4XhUMFrRgUCvbOxZQs
-         9YsGjnIdAK9ax0X5CdN+UJDA14YAJ+2CEsJLKSxox+bTq3Gyusa8A3X/1aP9+9yJcJxE
-         DBDQ==
-X-Gm-Message-State: AOAM533QTvDTyu/qPdXGCLlsAPaBSnKV2MR3hgLU5mPQGYWcXJCVSRsH
-        x9MD16iXQVEiDFHOTIy1S9IzxHM2OU33vwoy5Tk=
-X-Google-Smtp-Source: ABdhPJwH+vPpHV3/iIL524Q2gUMiQvMFEi+ZeqvPtEb3SDgb0PiJRlrOt6Cqrtwu2GlZu4x42p3ivQ1b4BnSYyVDafM=
-X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr40586981ybu.282.1626796027029;
- Tue, 20 Jul 2021 08:47:07 -0700 (PDT)
+        bh=alfYTnKnJV7hbE/HGGDxCyGgS0hp4r3nD1l6L1hWsHc=;
+        b=RxYcDhgn4bvT4OPKs9lN4KnQDgx9H+n+PggM2YkTL8rkSY4FOu1XJjdMheW14CenGn
+         wz0tLAuJ6oYRM7TwmHC2QTQ6toUIhkQ9qDdzRU1z0jkwCR+onck45Pw/G+CdxLENnurE
+         epCdixuxVC4GJHeunWsU9jQycA7YVFojY3/qbliddvd3/mEUih1HJ+vnPgfBKMit/5Cz
+         cNpzq1VpA6zcmW9m5iJV6AAtvUjw/ltn7PZmQNMa5kmD8Vnw7zM8XkB9AYFnsRy0uVdM
+         cg7mIlFy1P6/DyOvIp2sGAG3mQRi0XBocgiZb2L66rAiSuNOSkm5QD+/o+GtG0rNxtJ/
+         zr9w==
+X-Gm-Message-State: AOAM533zbpOcCb+9g6ZDK9ohg1z7znd0faIPpyP6dsAF7RhQ4WqdJyx7
+        5V8x3sJUlqNPE8IdKB5cRXRoIHEj+xZVI3e1mMYRvSRg
+X-Google-Smtp-Source: ABdhPJy/gJYbLhvafG0AIc+myAAyFYB1bASt5Yvpp6pD5rr8vDcsHN0TbpWi70pjk9n30lal388nZ1TX8moLcuq/Ua8=
+X-Received: by 2002:a25:be02:: with SMTP id h2mr41341477ybk.91.1626802820281;
+ Tue, 20 Jul 2021 10:40:20 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210719024937.9542-1-bobo.shaobowang@huawei.com>
- <20210719074829.2554-1-hdanton@sina.com> <97b64908-45d3-f074-bd9c-0bb04624bad1@huawei.com>
- <20210720021619.621-1-hdanton@sina.com> <CABBYNZLfFs86Hiej6C2EMVutf4ygyamifBJrXdQK97JpTLBqKg@mail.gmail.com>
- <20210720062100.819-1-hdanton@sina.com>
-In-Reply-To: <20210720062100.819-1-hdanton@sina.com>
+References: <20210720195130.Bluez.v1.1.Ib24a67a8a849f311d5213f83eaac3cfbc54b7b58@changeid>
+ <60f6c66d.1c69fb81.66662.df3b@mx.google.com>
+In-Reply-To: <60f6c66d.1c69fb81.66662.df3b@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 20 Jul 2021 08:46:55 -0700
-Message-ID: <CABBYNZKaNM=koHZ1X=D1_jD9NvEdYN4Be5mH5hAghHG2tkgCHA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: fix use-after-free error in lock_sock_nested()
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     "Wangshaobo (bobo)" <bobo.shaobowang@huawei.com>,
-        cj.chengjian@huawei.com, Wei Yongjun <weiyongjun1@huawei.com>,
-        yuehaibing@huawei.com, huawei.libin@huawei.com,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        syzbot <syzbot+664818c59309176d03ee@syzkaller.appspotmail.com>,
-        syzbot <syzbot+9a0875bc1b2ca466b484@syzkaller.appspotmail.com>
+Date:   Tue, 20 Jul 2021 10:40:09 -0700
+Message-ID: <CABBYNZJrm7ZwXNxguu6+TQiK44KNgUP7cK8FWQp4GqP6+u8cMw@mail.gmail.com>
+Subject: Re: [Bluez,v1] core: fix a possible crash when removing devices
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yun-hao Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hillf,
+Hi,
 
-On Mon, Jul 19, 2021 at 11:21 PM Hillf Danton <hdanton@sina.com> wrote:
+On Tue, Jul 20, 2021 at 5:52 AM <bluez.test.bot@gmail.com> wrote:
 >
-> On Mon, 19 Jul 2021 21:24:30 -0700 Luiz Augusto von Dentz wrote:
-> >
-> >While Im fine adding a destroy callback the kfree shall be still in
-> >l2cap_chan_destroy:
+> This is automated email and please do not reply to this email!
 >
-> Then feel free to send a tiny patchset to linux-bluetooth@vger.
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=518263
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.37 seconds
+> GitLint                       PASS      0.10 seconds
+> Prep - Setup ELL              PASS      38.35 seconds
+> Build - Prep                  PASS      0.08 seconds
+> Build - Configure             PASS      6.70 seconds
+> Build - Make                  PASS      168.29 seconds
+> Make Check                    PASS      8.36 seconds
+> Make Distcheck                PASS      195.34 seconds
+> Build w/ext ELL - Configure   PASS      6.65 seconds
+> Build w/ext ELL - Make        PASS      157.00 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-What do you mean, we haven't applied your changes yet.
-
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
