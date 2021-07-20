@@ -2,771 +2,390 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A719C07E95
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 15:12:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 394A6C636CE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 15:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4B9A6610A0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 15:12:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0AF8B61244
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 20 Jul 2021 15:12:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239937AbhGTO2b (ORCPT
+        id S240252AbhGTO3Z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 20 Jul 2021 10:28:31 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56020 "EHLO
+        Tue, 20 Jul 2021 10:29:25 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:64091 "EHLO
         www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240992AbhGTOKx (ORCPT
+        with ESMTP id S232212AbhGTOVd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 20 Jul 2021 10:10:53 -0400
-Received: from fsav311.sakura.ne.jp (fsav311.sakura.ne.jp [153.120.85.142])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 16KEoOCk055304;
-        Tue, 20 Jul 2021 23:50:24 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+        Tue, 20 Jul 2021 10:21:33 -0400
+Received: from fsav117.sakura.ne.jp (fsav117.sakura.ne.jp [27.133.134.244])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 16KF25Fe063944;
+        Wed, 21 Jul 2021 00:02:05 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
 Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav311.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp);
- Tue, 20 Jul 2021 23:50:24 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav311.sakura.ne.jp)
-Received: from localhost.localdomain (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+ by fsav117.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp);
+ Wed, 21 Jul 2021 00:02:05 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
         (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 16KEoJYh055284
-        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 20 Jul 2021 23:50:24 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 16KF24b0063940
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 21 Jul 2021 00:02:04 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: [PATCH v2] Bluetooth: reorganize ioctls from hci_sock_bound_ioctl()
 To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, LinMa <linma@zju.edu.cn>,
-        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH] Bluetooth: introduce hci_dev_lock_killable()
-Date:   Tue, 20 Jul 2021 23:50:09 +0900
-Message-Id: <20210720145009.5201-1-penguin-kernel@I-love.SAKURA.ne.jp>
-X-Mailer: git-send-email 2.18.4
+Cc:     linux-bluetooth@vger.kernel.org, LinMa <linma@zju.edu.cn>
+References: <20210720104905.6870-1-penguin-kernel@I-love.SAKURA.ne.jp>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <39b677ce-dcbf-6393-6279-88ed3a9e570e@i-love.sakura.ne.jp>
+Date:   Wed, 21 Jul 2021 00:02:01 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <20210720104905.6870-1-penguin-kernel@I-love.SAKURA.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Since being able to immediately react to SIGKILL is good,
-introduce killable version of hci_dev_lock().
-
-Since there are 270+ hci_dev_lock() callers, this patch updates only
-hci_debugfs.c part where blindly aborting operation would be acceptable.
-
-Although hci_dev_lock_killable() is currently an alias of
-mutex_lock_killable() which returns either 0 or -EINTR, this patch
-explicitly receives return value of hci_dev_lock_killable() using a
-local variable in order to make it possible to add race detection into
-hci_dev_lock_killable(), and e.g. return 0 without doing anything when
-a race was detected.
+Since userfaultfd mechanism allows sleeping with kernel lock held,
+avoiding page fault with kernel lock held where possible will make
+the module more robust. This patch just brings copy_{from,to}_user()
+calls to out of hdev lock and sock lock.
 
 Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
 ---
- include/net/bluetooth/hci_core.h |   1 +
- net/bluetooth/hci_debugfs.c      | 221 ++++++++++++++++++++++++-------
- 2 files changed, 171 insertions(+), 51 deletions(-)
+Changes in v2:
+  Rename get_link_mode() to hci_get_link_mode() to avoid
+  symbol name collision.
+
+ include/net/bluetooth/hci_core.h |   3 +-
+ net/bluetooth/hci_conn.c         |  52 +---------
+ net/bluetooth/hci_sock.c         | 165 ++++++++++++++++++++-----------
+ 3 files changed, 109 insertions(+), 111 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index d9e55682b908..f8d0e57407e7 100644
+index a53e94459ecd..654677f59887 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -1208,6 +1208,7 @@ static inline struct hci_dev *hci_dev_hold(struct hci_dev *d)
+@@ -1261,8 +1261,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg);
+ int hci_get_dev_list(void __user *arg);
+ int hci_get_dev_info(void __user *arg);
+ int hci_get_conn_list(void __user *arg);
+-int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
+-int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
++u32 hci_get_link_mode(struct hci_conn *conn);
+ int hci_inquiry(void __user *arg);
+ 
+ struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 2b5059a56cda..ea2b538537aa 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -1626,7 +1626,7 @@ void hci_conn_check_pending(struct hci_dev *hdev)
+ 	hci_dev_unlock(hdev);
  }
  
- #define hci_dev_lock(d)		mutex_lock(&d->lock)
-+#define hci_dev_lock_killable(d) mutex_lock_killable(&d->lock)
- #define hci_dev_unlock(d)	mutex_unlock(&d->lock)
- 
- #define to_hci_dev(d) container_of(d, struct hci_dev, dev)
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 841393389f7b..6a5801d90126 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -77,8 +77,10 @@ static const struct file_operations __name ## _fops = {			      \
- static int __name ## _show(struct seq_file *f, void *ptr)		      \
- {									      \
- 	struct hci_dev *hdev = f->private;				      \
-+	const int err = hci_dev_lock_killable(hdev);			      \
- 									      \
--	hci_dev_lock(hdev);						      \
-+	if (err)							      \
-+		return err;						      \
- 	seq_printf(f, "%s\n", hdev->__field ? : "");			      \
- 	hci_dev_unlock(hdev);						      \
- 									      \
-@@ -91,8 +93,10 @@ static int features_show(struct seq_file *f, void *ptr)
+-static u32 get_link_mode(struct hci_conn *conn)
++u32 hci_get_link_mode(struct hci_conn *conn)
  {
- 	struct hci_dev *hdev = f->private;
- 	u8 p;
-+	const int err = hci_dev_lock_killable(hdev);
+ 	u32 link_mode = 0;
  
+@@ -1683,7 +1683,7 @@ int hci_get_conn_list(void __user *arg)
+ 		(ci + n)->type  = c->type;
+ 		(ci + n)->out   = c->out;
+ 		(ci + n)->state = c->state;
+-		(ci + n)->link_mode = get_link_mode(c);
++		(ci + n)->link_mode = hci_get_link_mode(c);
+ 		if (++n >= req.conn_num)
+ 			break;
+ 	}
+@@ -1701,54 +1701,6 @@ int hci_get_conn_list(void __user *arg)
+ 	return err ? -EFAULT : 0;
+ }
+ 
+-int hci_get_conn_info(struct hci_dev *hdev, void __user *arg)
+-{
+-	struct hci_conn_info_req req;
+-	struct hci_conn_info ci;
+-	struct hci_conn *conn;
+-	char __user *ptr = arg + sizeof(req);
+-
+-	if (copy_from_user(&req, arg, sizeof(req)))
+-		return -EFAULT;
+-
 -	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	for (p = 0; p < HCI_MAX_PAGES && p <= hdev->max_page; p++)
- 		seq_printf(f, "%2u: %8ph\n", p, hdev->features[p]);
- 	if (lmp_le_capable(hdev))
-@@ -107,8 +111,10 @@ DEFINE_SHOW_ATTRIBUTE(features);
- static int device_id_show(struct seq_file *f, void *ptr)
+-	conn = hci_conn_hash_lookup_ba(hdev, req.type, &req.bdaddr);
+-	if (conn) {
+-		bacpy(&ci.bdaddr, &conn->dst);
+-		ci.handle = conn->handle;
+-		ci.type  = conn->type;
+-		ci.out   = conn->out;
+-		ci.state = conn->state;
+-		ci.link_mode = get_link_mode(conn);
+-	}
+-	hci_dev_unlock(hdev);
+-
+-	if (!conn)
+-		return -ENOENT;
+-
+-	return copy_to_user(ptr, &ci, sizeof(ci)) ? -EFAULT : 0;
+-}
+-
+-int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
+-{
+-	struct hci_auth_info_req req;
+-	struct hci_conn *conn;
+-
+-	if (copy_from_user(&req, arg, sizeof(req)))
+-		return -EFAULT;
+-
+-	hci_dev_lock(hdev);
+-	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req.bdaddr);
+-	if (conn)
+-		req.type = conn->auth_type;
+-	hci_dev_unlock(hdev);
+-
+-	if (!conn)
+-		return -ENOENT;
+-
+-	return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
+-}
+-
+ struct hci_chan *hci_chan_create(struct hci_conn *conn)
  {
- 	struct hci_dev *hdev = f->private;
-+	const int err = hci_dev_lock_killable(hdev);
+ 	struct hci_dev *hdev = conn->hdev;
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b04a5a02ecf3..ef7fc3e9d471 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -892,82 +892,136 @@ static int hci_sock_release(struct socket *sock)
+ 	return 0;
+ }
  
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	seq_printf(f, "%4.4x:%4.4x:%4.4x:%4.4x\n", hdev->devid_source,
- 		  hdev->devid_vendor, hdev->devid_product, hdev->devid_version);
- 	hci_dev_unlock(hdev);
-@@ -123,8 +129,10 @@ static int device_list_show(struct seq_file *f, void *ptr)
- 	struct hci_dev *hdev = f->private;
- 	struct hci_conn_params *p;
- 	struct bdaddr_list *b;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(b, &hdev->accept_list, list)
- 		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
- 	list_for_each_entry(p, &hdev->le_conn_params, list) {
-@@ -142,8 +150,10 @@ static int blacklist_show(struct seq_file *f, void *p)
+-static int hci_sock_reject_list_add(struct hci_dev *hdev, void __user *arg)
++static int hci_sock_reject_list_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
  {
- 	struct hci_dev *hdev = f->private;
- 	struct bdaddr_list *b;
-+	const int err = hci_dev_lock_killable(hdev);
- 
+-	bdaddr_t bdaddr;
+-	int err;
+-
+-	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+-		return -EFAULT;
+-
 -	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(b, &hdev->reject_list, list)
- 		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
- 	hci_dev_unlock(hdev);
-@@ -172,8 +182,10 @@ static int uuids_show(struct seq_file *f, void *p)
+-
+-	err = hci_bdaddr_list_add(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
+-
+-	hci_dev_unlock(hdev);
+-
+-	return err;
++	return hci_bdaddr_list_add(&hdev->reject_list, bdaddr, BDADDR_BREDR);
+ }
+ 
+-static int hci_sock_reject_list_del(struct hci_dev *hdev, void __user *arg)
++static int hci_sock_reject_list_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
  {
- 	struct hci_dev *hdev = f->private;
- 	struct bt_uuid *uuid;
-+	const int err = hci_dev_lock_killable(hdev);
- 
+-	bdaddr_t bdaddr;
+-	int err;
+-
+-	if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
+-		return -EFAULT;
+-
 -	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(uuid, &hdev->uuids, list) {
- 		u8 i, val[16];
++	return hci_bdaddr_list_del(&hdev->reject_list, bdaddr, BDADDR_BREDR);
++}
  
-@@ -197,8 +209,10 @@ static int remote_oob_show(struct seq_file *f, void *ptr)
+-	err = hci_bdaddr_list_del(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
++static int hci_get_conn_info(struct hci_dev *hdev, struct hci_conn_info_req *req,
++			     struct hci_conn_info *ci)
++{
++	struct hci_conn *conn;
++
++	conn = hci_conn_hash_lookup_ba(hdev, req->type, &req->bdaddr);
++	if (!conn)
++		return -ENOENT;
++	bacpy(&ci->bdaddr, &conn->dst);
++	ci->handle = conn->handle;
++	ci->type  = conn->type;
++	ci->out   = conn->out;
++	ci->state = conn->state;
++	ci->link_mode = hci_get_link_mode(conn);
++	return 0;
++}
+ 
+-	hci_dev_unlock(hdev);
++static int hci_get_auth_info(struct hci_dev *hdev, struct hci_auth_info_req *req)
++{
++	struct hci_conn *conn;
+ 
+-	return err;
++	conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req->bdaddr);
++	if (!conn)
++		return -ENOENT;
++	req->type = conn->auth_type;
++	return 0;
+ }
+ 
+ /* Ioctls that require bound socket */
+-static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+-				unsigned long arg)
++static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
  {
- 	struct hci_dev *hdev = f->private;
- 	struct oob_data *data;
-+	const int err = hci_dev_lock_killable(hdev);
+-	struct hci_dev *hdev = hci_pi(sk)->hdev;
++	struct hci_dev *hdev;
++	union {
++		bdaddr_t bdaddr;
++		struct hci_conn_info_req conn_req;
++		struct hci_auth_info_req auth_req;
++	} u;
++	struct hci_conn_info ci;
++	int err = 0;
  
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(data, &hdev->remote_oob_data, list) {
- 		seq_printf(f, "%pMR (type %u) %u %*phN %*phN %*phN %*phN\n",
- 			   &data->bdaddr, data->bdaddr_type, data->present,
-@@ -215,11 +229,14 @@ DEFINE_SHOW_ATTRIBUTE(remote_oob);
- static int conn_info_min_age_set(void *data, u64 val)
+-	if (!hdev)
+-		return -EBADFD;
++	if (cmd == HCIBLOCKADDR || cmd == HCIUNBLOCKADDR) {
++		if (copy_from_user(&u.bdaddr, arg, sizeof(u.bdaddr)))
++			err = -EFAULT;
++	} else if (cmd == HCIGETCONNINFO) {
++		if (copy_from_user(&u.conn_req, arg, sizeof(u.conn_req)))
++			err = -EFAULT;
++	} else if (cmd == HCIGETAUTHINFO) {
++		if (copy_from_user(&u.auth_req, arg, sizeof(u.auth_req)))
++			err = -EFAULT;
++	}
+ 
+-	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
+-		return -EBUSY;
++	lock_sock(sk);
+ 
+-	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
+-		return -EOPNOTSUPP;
++	hdev = hci_pi(sk)->hdev;
++	if (!hdev) {
++		err = -EBADFD;
++		goto out;
++	}
+ 
+-	if (hdev->dev_type != HCI_PRIMARY)
+-		return -EOPNOTSUPP;
++	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
++		err = -EBUSY;
++		goto out;
++	}
+ 
++	if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++
++	if (hdev->dev_type != HCI_PRIMARY) {
++		err = -EOPNOTSUPP;
++		goto out;
++	}
++
++	hci_dev_lock(hdev);
+ 	switch (cmd) {
+ 	case HCISETRAW:
+ 		if (!capable(CAP_NET_ADMIN))
+-			return -EPERM;
+-		return -EOPNOTSUPP;
+-
++			err = -EPERM;
++		else
++			err = -EOPNOTSUPP;
++		break;
+ 	case HCIGETCONNINFO:
+-		return hci_get_conn_info(hdev, (void __user *)arg);
+-
++		if (!err)
++			err = hci_get_conn_info(hdev, &u.conn_req, &ci);
++		break;
+ 	case HCIGETAUTHINFO:
+-		return hci_get_auth_info(hdev, (void __user *)arg);
+-
++		if (!err)
++			err = hci_get_auth_info(hdev, &u.auth_req);
++		break;
+ 	case HCIBLOCKADDR:
+ 		if (!capable(CAP_NET_ADMIN))
+-			return -EPERM;
+-		return hci_sock_reject_list_add(hdev, (void __user *)arg);
+-
++			err = -EPERM;
++		else if (!err)
++			err = hci_sock_reject_list_add(hdev, &u.bdaddr);
++		break;
+ 	case HCIUNBLOCKADDR:
+ 		if (!capable(CAP_NET_ADMIN))
+-			return -EPERM;
+-		return hci_sock_reject_list_del(hdev, (void __user *)arg);
++			err = -EPERM;
++		else if (!err)
++			err = hci_sock_reject_list_del(hdev, &u.bdaddr);
++		break;
++	default:
++		err = -ENOIOCTLCMD;
+ 	}
++	hci_dev_unlock(hdev);
++
++ out:
++	release_sock(sk);
+ 
+-	return -ENOIOCTLCMD;
++	if (!err) {
++		if (cmd == HCIGETCONNINFO) {
++			if (copy_to_user(arg + sizeof(u.conn_req), &ci, sizeof(ci)))
++				err = -EFAULT;
++		} else if (cmd == HCIGETAUTHINFO) {
++			if (copy_to_user(arg, &u.auth_req, sizeof(u.auth_req)))
++				err = -EFAULT;
++		}
++	}
++	return err;
+ }
+ 
+ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+@@ -975,15 +1029,14 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
  {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val == 0 || val > hdev->conn_info_max_age)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->conn_info_min_age = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -229,8 +246,10 @@ static int conn_info_min_age_set(void *data, u64 val)
- static int conn_info_min_age_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->conn_info_min_age;
- 	hci_dev_unlock(hdev);
- 
-@@ -243,11 +262,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_info_min_age_fops, conn_info_min_age_get,
- static int conn_info_max_age_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val == 0 || val < hdev->conn_info_min_age)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->conn_info_max_age = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -257,8 +279,10 @@ static int conn_info_max_age_set(void *data, u64 val)
- static int conn_info_max_age_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->conn_info_max_age;
- 	hci_dev_unlock(hdev);
- 
-@@ -357,8 +381,10 @@ static int inquiry_cache_show(struct seq_file *f, void *p)
- 	struct hci_dev *hdev = f->private;
- 	struct discovery_state *cache = &hdev->discovery;
- 	struct inquiry_entry *e;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 
- 	list_for_each_entry(e, &cache->all, all) {
- 		struct inquiry_data *data = &e->data;
-@@ -397,8 +423,10 @@ DEFINE_SHOW_ATTRIBUTE(link_keys);
- static int dev_class_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	seq_printf(f, "0x%.2x%.2x%.2x\n", hdev->dev_class[2],
- 		   hdev->dev_class[1], hdev->dev_class[0]);
- 	hci_dev_unlock(hdev);
-@@ -411,8 +439,10 @@ DEFINE_SHOW_ATTRIBUTE(dev_class);
- static int voice_setting_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->voice_setting;
- 	hci_dev_unlock(hdev);
- 
-@@ -443,8 +473,10 @@ static const struct file_operations ssp_debug_mode_fops = {
- static int auto_accept_delay_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	hdev->auto_accept_delay = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -454,11 +486,14 @@ static int auto_accept_delay_set(void *data, u64 val)
- static int min_encrypt_key_size_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 1 || val > 16)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->min_enc_key_size = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -468,8 +503,10 @@ static int min_encrypt_key_size_set(void *data, u64 val)
- static int min_encrypt_key_size_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->min_enc_key_size;
- 	hci_dev_unlock(hdev);
- 
-@@ -483,8 +520,10 @@ DEFINE_DEBUGFS_ATTRIBUTE(min_encrypt_key_size_fops,
- static int auto_accept_delay_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->auto_accept_delay;
- 	hci_dev_unlock(hdev);
- 
-@@ -536,11 +575,14 @@ static const struct file_operations force_bredr_smp_fops = {
- static int idle_timeout_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val != 0 && (val < 500 || val > 3600000))
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->idle_timeout = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -550,8 +592,10 @@ static int idle_timeout_set(void *data, u64 val)
- static int idle_timeout_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->idle_timeout;
- 	hci_dev_unlock(hdev);
- 
-@@ -564,11 +608,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(idle_timeout_fops, idle_timeout_get,
- static int sniff_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val == 0 || val % 2 || val > hdev->sniff_max_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->sniff_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -578,8 +625,10 @@ static int sniff_min_interval_set(void *data, u64 val)
- static int sniff_min_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->sniff_min_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -592,11 +641,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(sniff_min_interval_fops, sniff_min_interval_get,
- static int sniff_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val == 0 || val % 2 || val < hdev->sniff_min_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->sniff_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -606,8 +658,10 @@ static int sniff_max_interval_set(void *data, u64 val)
- static int sniff_max_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->sniff_max_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -663,8 +717,10 @@ static int identity_show(struct seq_file *f, void *p)
- 	struct hci_dev *hdev = f->private;
- 	bdaddr_t addr;
- 	u8 addr_type;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 
- 	hci_copy_identity_address(hdev, &addr, &addr_type);
- 
-@@ -681,6 +737,7 @@ DEFINE_SHOW_ATTRIBUTE(identity);
- static int rpa_timeout_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	/* Require the RPA timeout to be at least 30 seconds and at most
- 	 * 24 hours.
-@@ -688,7 +745,9 @@ static int rpa_timeout_set(void *data, u64 val)
- 	if (val < 30 || val > (60 * 60 * 24))
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->rpa_timeout = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -698,8 +757,10 @@ static int rpa_timeout_set(void *data, u64 val)
- static int rpa_timeout_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->rpa_timeout;
- 	hci_dev_unlock(hdev);
- 
-@@ -712,8 +773,10 @@ DEFINE_DEBUGFS_ATTRIBUTE(rpa_timeout_fops, rpa_timeout_get,
- static int random_address_show(struct seq_file *f, void *p)
- {
- 	struct hci_dev *hdev = f->private;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	seq_printf(f, "%pMR\n", &hdev->random_addr);
- 	hci_dev_unlock(hdev);
- 
-@@ -725,8 +788,10 @@ DEFINE_SHOW_ATTRIBUTE(random_address);
- static int static_address_show(struct seq_file *f, void *p)
- {
- 	struct hci_dev *hdev = f->private;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	seq_printf(f, "%pMR\n", &hdev->static_addr);
- 	hci_dev_unlock(hdev);
- 
-@@ -782,8 +847,10 @@ static int white_list_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
- 	struct bdaddr_list *b;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(b, &hdev->le_accept_list, list)
- 		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
- 	hci_dev_unlock(hdev);
-@@ -797,8 +864,10 @@ static int resolv_list_show(struct seq_file *f, void *ptr)
- {
- 	struct hci_dev *hdev = f->private;
- 	struct bdaddr_list *b;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	list_for_each_entry(b, &hdev->le_resolv_list, list)
- 		seq_printf(f, "%pMR (type %u)\n", &b->bdaddr, b->bdaddr_type);
- 	hci_dev_unlock(hdev);
-@@ -847,11 +916,14 @@ DEFINE_SHOW_ATTRIBUTE(long_term_keys);
- static int conn_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x0006 || val > 0x0c80 || val > hdev->le_conn_max_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_conn_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -861,8 +933,10 @@ static int conn_min_interval_set(void *data, u64 val)
- static int conn_min_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_conn_min_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -875,11 +949,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_min_interval_fops, conn_min_interval_get,
- static int conn_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x0006 || val > 0x0c80 || val < hdev->le_conn_min_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_conn_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -889,8 +966,10 @@ static int conn_max_interval_set(void *data, u64 val)
- static int conn_max_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_conn_max_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -903,11 +982,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_max_interval_fops, conn_max_interval_get,
- static int conn_latency_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val > 0x01f3)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_conn_latency = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -917,8 +999,10 @@ static int conn_latency_set(void *data, u64 val)
- static int conn_latency_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_conn_latency;
- 	hci_dev_unlock(hdev);
- 
-@@ -931,11 +1015,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(conn_latency_fops, conn_latency_get,
- static int supervision_timeout_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x000a || val > 0x0c80)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_supv_timeout = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -945,8 +1032,10 @@ static int supervision_timeout_set(void *data, u64 val)
- static int supervision_timeout_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_supv_timeout;
- 	hci_dev_unlock(hdev);
- 
-@@ -959,11 +1048,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(supervision_timeout_fops, supervision_timeout_get,
- static int adv_channel_map_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x01 || val > 0x07)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_adv_channel_map = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -973,8 +1065,10 @@ static int adv_channel_map_set(void *data, u64 val)
- static int adv_channel_map_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_adv_channel_map;
- 	hci_dev_unlock(hdev);
- 
-@@ -987,11 +1081,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_channel_map_fops, adv_channel_map_get,
- static int adv_min_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x0020 || val > 0x4000 || val > hdev->le_adv_max_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_adv_min_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1001,8 +1098,10 @@ static int adv_min_interval_set(void *data, u64 val)
- static int adv_min_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_adv_min_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -1015,11 +1114,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_min_interval_fops, adv_min_interval_get,
- static int adv_max_interval_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x0020 || val > 0x4000 || val < hdev->le_adv_min_interval)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_adv_max_interval = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1029,8 +1131,10 @@ static int adv_max_interval_set(void *data, u64 val)
- static int adv_max_interval_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_adv_max_interval;
- 	hci_dev_unlock(hdev);
- 
-@@ -1043,11 +1147,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(adv_max_interval_fops, adv_max_interval_get,
- static int min_key_size_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val > hdev->le_max_key_size || val < SMP_MIN_ENC_KEY_SIZE)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_min_key_size = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1057,8 +1164,10 @@ static int min_key_size_set(void *data, u64 val)
- static int min_key_size_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_min_key_size;
- 	hci_dev_unlock(hdev);
- 
-@@ -1071,11 +1180,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(min_key_size_fops, min_key_size_get,
- static int max_key_size_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val > SMP_MAX_ENC_KEY_SIZE || val < hdev->le_min_key_size)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->le_max_key_size = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1085,8 +1197,10 @@ static int max_key_size_set(void *data, u64 val)
- static int max_key_size_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->le_max_key_size;
- 	hci_dev_unlock(hdev);
- 
-@@ -1099,11 +1213,14 @@ DEFINE_DEBUGFS_ATTRIBUTE(max_key_size_fops, max_key_size_get,
- static int auth_payload_timeout_set(void *data, u64 val)
- {
- 	struct hci_dev *hdev = data;
-+	int err;
- 
- 	if (val < 0x0001 || val > 0xffff)
- 		return -EINVAL;
- 
--	hci_dev_lock(hdev);
-+	err = hci_dev_lock_killable(hdev);
-+	if (err)
-+		return err;
- 	hdev->auth_payload_timeout = val;
- 	hci_dev_unlock(hdev);
- 
-@@ -1113,8 +1230,10 @@ static int auth_payload_timeout_set(void *data, u64 val)
- static int auth_payload_timeout_get(void *data, u64 *val)
- {
- 	struct hci_dev *hdev = data;
-+	const int err = hci_dev_lock_killable(hdev);
- 
--	hci_dev_lock(hdev);
-+	if (err)
-+		return err;
- 	*val = hdev->auth_payload_timeout;
- 	hci_dev_unlock(hdev);
- 
+ 	void __user *argp = (void __user *)arg;
+ 	struct sock *sk = sock->sk;
+-	int err;
+ 
+ 	BT_DBG("cmd %x arg %lx", cmd, arg);
+ 
+ 	lock_sock(sk);
+ 
+ 	if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
+-		err = -EBADFD;
+-		goto done;
++		release_sock(sk);
++		return -EBADFD;
+ 	}
+ 
+ 	/* When calling an ioctl on an unbound raw socket, then ensure
+@@ -1055,13 +1108,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+ 		return hci_inquiry(argp);
+ 	}
+ 
+-	lock_sock(sk);
+-
+-	err = hci_sock_bound_ioctl(sk, cmd, arg);
+-
+-done:
+-	release_sock(sk);
+-	return err;
++	return hci_sock_bound_ioctl(sk, cmd, (void __user *)arg);
+ }
+ 
+ #ifdef CONFIG_COMPAT
 -- 
 2.18.4
+
 
