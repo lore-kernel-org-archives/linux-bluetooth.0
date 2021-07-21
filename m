@@ -3,111 +3,134 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1BB3DC07E9B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 11:31:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 797B9C636C9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 15:40:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7A8160FD7
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 11:31:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 58D6061221
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 15:40:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238653AbhGUKsx (ORCPT
+        id S239962AbhGUO77 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jul 2021 06:48:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54994 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238551AbhGUJgx (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jul 2021 05:36:53 -0400
-Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 392B8C0613E3;
-        Wed, 21 Jul 2021 03:17:29 -0700 (PDT)
-Received: by mail-pg1-x536.google.com with SMTP id j73so1441000pge.1;
-        Wed, 21 Jul 2021 03:17:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GmFXEsAxbG8KZfMM+UsqBDrbJkHUFiGmqFsibv1XO4g=;
-        b=Fx32sue3mQepTLN9Ttrt6nLPas35qhyRkAnEpea2Mouer4p+Cp6rthrsL0RXkc9o1M
-         s4xuwkH74RNoERSESufIhVW5eNQj38mMmrHQXEDWSVGjLfLVy2TSkuvNab0maOwEyAmH
-         vhtKcsVhXIv3VHE2dy7Bxv3e2XjJSjApiub4YZQWmmJ3hpaLjd4pxLNhfMeBjBfkFE6G
-         wcs16zGFHsiqGI2ZwZeZ7hjkkP8Xgozod55VlGfbMi6U4GR0+/ul1sFKsHzpeZ/Mw/kQ
-         1RbnVd1EOtTJRIQcbHlan6TIBFQKtiHCYvWczkApNzkSqtUKeY9mFElQvgqpoxLK/XyU
-         8Mzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GmFXEsAxbG8KZfMM+UsqBDrbJkHUFiGmqFsibv1XO4g=;
-        b=llkvxkCmvQAILRG42cjdegu0GrLXO4MGeMtASaEHZM4Enxvi2ZOiHCoYpmk/VPbd5J
-         +FFivlWTMry8WjXRdABo9fy3QEEWVOgZgoBggq+XboymfeFf3lsD7z7kGOwCE0TGFoDg
-         ZwJM6em0t5yxx5qMAmrYUnUQnqJYwz70kjepwxS0qkY2SlPw+MHQ2SVF1dtUygKO/lOD
-         VWbmy0bNnlCOCiw9llYMkfMPNbVogeisrFxp2aSwZM1YBqxVlrKfK7Csw2uoDBdLzdaD
-         f3dOY2k8EJJwqOiSTephpZDWBGtMUNyY2awwVPAJ3lhye6pRRGFrieZ43MbfcvYyijiu
-         tjPQ==
-X-Gm-Message-State: AOAM531JwknIZkSX/Akn6w40zZLRvclfTWXsZfTlsxSDLSogUKVcit/1
-        IHh9L0Y7Qg9WcrlZXLfPyHtubP8nmoqEVIFRMEQ=
-X-Google-Smtp-Source: ABdhPJxabd+8ymM2NRg2/JRi5E0kd2wtw9dI2cxAd5OZTNoNwxYd09wBP09f+o8F+RdDtGAnclFeIQ==
-X-Received: by 2002:a62:160a:0:b029:328:56b9:b1ee with SMTP id 10-20020a62160a0000b029032856b9b1eemr36090473pfw.52.1626862648751;
-        Wed, 21 Jul 2021 03:17:28 -0700 (PDT)
-Received: from localhost.localdomain ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id p33sm26481068pfw.40.2021.07.21.03.17.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 03:17:28 -0700 (PDT)
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, kuba@kernel.org
-Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
-        gregkh@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-Subject: [PATCH] Bluetooth: skip invalid hci_sync_conn_complete_evt
-Date:   Wed, 21 Jul 2021 18:17:10 +0800
-Message-Id: <20210721101710.82974-1-desmondcheongzx@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Wed, 21 Jul 2021 10:59:59 -0400
+Received: from meesny.iki.fi ([195.140.195.201]:34222 "EHLO meesny.iki.fi"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S239922AbhGUO76 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 21 Jul 2021 10:59:58 -0400
+Received: from [192.168.1.195] (91-152-122-41.elisa-laajakaista.fi [91.152.122.41])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav@iki.fi)
+        by meesny.iki.fi (Postfix) with ESMTPSA id F3D10200C0;
+        Wed, 21 Jul 2021 18:40:29 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=meesny;
+        t=1626882030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BDs0jgCsvkGgpLEtAiAdZHaBtwOuxFbMU8eWvONBzbI=;
+        b=amRFucxKAkPyzJ5T62eymWGG4wURVFjDT6v4A9/a8PVM3upjYf4IdOy0Dbdttj0DD+b+pJ
+        cRw29c7X0iq1LvdscclveHtzwfuV2DMdgmSPdj/8FUsZmRoE0I7BA0n8kzx5qZj2ekIE6T
+        NC7L40HTBuaiuc6mxIGC+dDKGYt4Ga4=
+Message-ID: <f0a3fae602bb54313d078563d971827c88315b43.camel@iki.fi>
+Subject: Re: [PATCH] Bluetooth: btusb: check SCO MTU before enabling USB ALT
+ 3 for WBS
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Joseph Hwang <josephsih@google.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hilda Wu <hildawu@realtek.com>
+Date:   Wed, 21 Jul 2021 18:40:29 +0300
+In-Reply-To: <CAHFy41_-EYBNnKyLPof40r6jhtBW=mSHjOX6O=+hzLCbf7_ELQ@mail.gmail.com>
+References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
+         <CAHFy41_-EYBNnKyLPof40r6jhtBW=mSHjOX6O=+hzLCbf7_ELQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.3 (3.40.3-1.fc34) 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=meesny; t=1626882030;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=BDs0jgCsvkGgpLEtAiAdZHaBtwOuxFbMU8eWvONBzbI=;
+        b=TUy+ec8f0U9cCx1OS0njytayPjaGNlT/VzTi80KZkMtOUaIugBMQ2V8AsPXipU8VPqMREJ
+        AtEsVc5oc+2JOFt3glg7fM3uNppFwPS+O1XrWQzVxM/4cquxqorE9OaEbaKfj+LN8LR2AO
+        mgL27u4Drf5xGHkfk7ZMHhqTmlYQoVI=
+ARC-Seal: i=1; s=meesny; d=iki.fi; t=1626882030; a=rsa-sha256; cv=none;
+        b=k09AeowBoJHDyQKU+BsEBenqHUV+VdCD/qfAgcwdr81DQRcXL6NuDqnH+fOdZOuE3B8wjQ
+        Ns7iLXudLB1WS9MF7d/eNztwrNm8Cvm/CyYrc33SP0HihhTCEoTddjMTdBBNSgBUk1c0Wz
+        pdO6ZksaJ+gjaoRMq7B6hy625fv+vB8=
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav@iki.fi smtp.mailfrom=pav@iki.fi
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Syzbot reported a corrupted list in kobject_add_internal [1]. This
-happens when multiple HCI_EV_SYNC_CONN_COMPLETE event packets with
-status 0 are sent for the same HCI connection. This causes us to
-register the device more than once which corrupts the kset list.
+Hi,
 
-To fix this, in hci_sync_conn_complete_evt, we check whether we're
-trying to process the same HCI_EV_SYNC_CONN_COMPLETE event multiple
-times for one connection. If that's the case, the event is invalid, so
-we skip further processing and exit.
+la, 2021-07-17 kello 21:34 +0800, Joseph Hwang kirjoitti:
+> It looks reasonable to check sco_mtu. My suggestion is to use
+> hci_packet_size_usb_alt[3] instead of the magic number 72.
 
-Link: https://syzkaller.appspot.com/bug?extid=66264bf2fd0476be7e6c [1]
-Reported-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-Tested-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
----
- net/bluetooth/hci_event.c | 2 ++
- 1 file changed, 2 insertions(+)
+Thanks for looking at it. IIUC, hci_packet_size_usb_alt only appears in
+previous discussions on this list, which did not seem to reach a
+conclusion if this should be computed from wMaxPacketSize. I can do
+less magical v2 and add the table.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 016b2999f219..091a92338492 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4373,6 +4373,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 
- 	switch (ev->status) {
- 	case 0x00:
-+		if (conn->state == BT_CONNECTED)
-+			goto unlock;  /* Already connected, event not valid */
- 		conn->handle = __le16_to_cpu(ev->handle);
- 		conn->state  = BT_CONNECTED;
- 		conn->type   = ev->link_type;
--- 
-2.25.1
+Different solution would be to make the altsetting choice
+manufacturer/device specific flag, as I'm not sure on what hardware
+e848dbd364ac was tested on, so maybe it is intended Realtek specific.
+
+Best,
+Pauli
+
+
+> On Sat, Jul 17, 2021 at 1:58 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Some USB BT adapters don't satisfy the MTU requirement mentioned in
+> > commit e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
+> > and have ALT 3 setting that produces no/garbled audio. Check that the MTU
+> > condition is satisfied, and fall back to ALT 1 if not.
+> > 
+> > Tested with USB adapters (mtu<72, produce sound only with ALT1)
+> > BCM20702A1 0b05:17cb, CSR8510A10 0a12:0001, and (mtu>=72, ALT3)
+> > RTL8761BU 0bda:8771, Intel AX200 8087:0029 (after disabling ALT6).
+> > 
+> > Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> > ---
+> >  drivers/bluetooth/btusb.c | 6 ++++--
+> >  1 file changed, 4 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index a9855a2dd561..3ee66e415c4d 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -1763,9 +1763,11 @@ static void btusb_work(struct work_struct *work)
+> >                         /* Because mSBC frames do not need to be aligned to the
+> >                          * SCO packet boundary. If support the Alt 3, use the
+> >                          * Alt 3 for HCI payload >= 60 Bytes let air packet
+> > -                        * data satisfy 60 bytes.
+> > +                        * data satisfy 60 bytes. USB Alt 3 support also needs
+> > +                        * HFP transparent MTU >= 72 Bytes.
+> >                          */
+> > -                       if (new_alts == 1 && btusb_find_altsetting(data, 3))
+> > +                       if (new_alts == 1 && hdev->sco_mtu >= 72 &&
+> > +                           btusb_find_altsetting(data, 3))
+> >                                 new_alts = 3;
+> >                 }
+> > 
+> > --
+> > 2.31.1
+> > 
+> > 
+> 
+> 
+
 
