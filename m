@@ -2,412 +2,247 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.0 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4A37C12002
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 18:18:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1909FC636C9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 18:26:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B920D6120C
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 18:18:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F29B661221
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 18:26:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236998AbhGURhb (ORCPT
+        id S237642AbhGURps (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jul 2021 13:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52772 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231434AbhGURh3 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 21 Jul 2021 13:37:29 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6544BC061575
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jul 2021 11:18:04 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id i18so4457868yba.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jul 2021 11:18:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=TGqZrz0YEABNs0LpSkP9pTVxlbJFBT9c0tb0DVX5a2w=;
-        b=SyjBP/9WlS2KE/P/Asuu8ZrQbXhMLcErlNORul3tsUJQV5L3UMaI6HAYLlhkPqqOJX
-         SpMnyfXOlpFV758hcIHjhDLUIka7xjd3hbWP1bLKrC6QIjISKMwpIErxEx2TzD+P3T9z
-         9FpuFy9Eu5AbjotAiwrdKEdZ2WTUMzwHAWLEkZ8pckkUf2G4EDoepUftsMbf+B5e4WsN
-         QhRX5H7t72u2qiBuwqin+vICPP0b/EECM3y8VkEKaDXrO0J48jkFoEAppzyLL//FDKtU
-         kksO55hfxv2Mn3AKBM8RoC1bRyNVL9Kk7RdsWRoBL+bsGPNFvzUJKk83rTapL/QVwHl9
-         F1aA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=TGqZrz0YEABNs0LpSkP9pTVxlbJFBT9c0tb0DVX5a2w=;
-        b=GaIRnnMAOd0inL/V7M+OTH5OpbLPckPV5WrBhFp9y2NuAVMO68Ed044BmBNdOQ3ToA
-         IHtTxdccc2okxSDRXTiOnns6YWpAmq7Zdt9EMZNcKXz/tvHife39fv/uxZhwj+aryaD/
-         RNP1OlZ3qKamAAPix2rsQgNKdIp8864jBc1MQWV9JnuwzStH0so9NwntPKZX5bhdMTvJ
-         JLNLRDjm3lkdlD2RG3Xpx69EewsTDGSk2kigwnae3/QOUGSjJ1Uif+1D8htrQSher8e5
-         J1C4348/lzO9ZI1b1LCe5PnGqmBAp3b0+3fCzyRy59SokwEruyUr6xpuYeZVLjhUKmiv
-         7IHQ==
-X-Gm-Message-State: AOAM532+hdRyoe2iXYt5XuLYVfKIzuLA2XEujSXqE4e2rb9iHPhUFELC
-        SXqyHo9KTvfWc9SNTqacQ+WmlE17p9lM4P414io=
-X-Google-Smtp-Source: ABdhPJzRlmr4fHmLuAWfkUi/2/dt3qSgmaYhtKjp7Pyvat+NhEiy2aNkAprOIf15BzZkaPsRVX2MVOKQBSBObJ+vh0A=
-X-Received: by 2002:a25:b741:: with SMTP id e1mr48076895ybm.347.1626891483395;
- Wed, 21 Jul 2021 11:18:03 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210720104905.6870-1-penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20210720104905.6870-1-penguin-kernel@I-love.SAKURA.ne.jp>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 21 Jul 2021 11:17:52 -0700
-Message-ID: <CABBYNZLt=fJTtdj9qvC22GkF_uYFe59D2bS3u61K14=Gq43Qbw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: reorganize ioctls from hci_sock_bound_ioctl()
-To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Wed, 21 Jul 2021 13:45:48 -0400
+Received: from mail.kernel.org ([198.145.29.99]:34458 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235826AbhGURpr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 21 Jul 2021 13:45:47 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id C4D3F61222;
+        Wed, 21 Jul 2021 18:26:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1626891984;
+        bh=jkc6omrR2hOV0Md2ueLa6a5u2LaKn/ysa9NV7K55nyI=;
+        h=Date:From:To:cc:Subject:In-Reply-To:References:From;
+        b=UKZqTckGSywksr+buTJ+HyKoeBGkMbSFGr4E9NFmjFFQDrM8YbC0n9Ft6BUUBKwvp
+         UUhborSDC3cFqq+OmULJkl66FoRyPFjhruH90Ob++dwJUUjDYczG0UvMJai1IgYRAO
+         qertKc+qHF9TODKojtQAdMgg7zq5S+J6blkP/Z+ZGuWb+mpNtyvgazRAX6BOtgNz83
+         9VV5yDAlvRqNarkvY8eF+uyTrW55vlYb04jCT9TdBAjvf77O4Bu6z4MeMljDU25gee
+         laSU5iBV076VyDYmpDxofxkGT1lyXq06gLUyKOWZi/LiUTweuecDKjBOCwOApMhIa2
+         P7mcAPozmLugQ==
+Date:   Wed, 21 Jul 2021 20:26:20 +0200 (CEST)
+From:   Jiri Kosina <jikos@kernel.org>
+To:     Lin Ma <linma@zju.edu.cn>, Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        LinMa <linma@zju.edu.cn>
-Content-Type: text/plain; charset="UTF-8"
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Two issues caused by commit e305509e678b3 ("Bluetooth: use
+ correct lock to prevent UAF of hdev object")
+In-Reply-To: <nycvar.YFH.7.76.2107131924280.8253@cbobk.fhfr.pm>
+Message-ID: <nycvar.YFH.7.76.2107212026050.8253@cbobk.fhfr.pm>
+References: <nycvar.YFH.7.76.2107131924280.8253@cbobk.fhfr.pm>
+User-Agent: Alpine 2.21 (LSU 202 2017-01-01)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tetsuo,
+On Tue, 13 Jul 2021, Jiri Kosina wrote:
 
-On Tue, Jul 20, 2021 at 3:49 AM Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> Since userfaultfd mechanism allows sleeping with kernel lock held,
-> avoiding page fault with kernel lock held where possible will make
-> the module more robust. This patch just brings copy_{from,to}_user()
-> calls to out of hdev lock and sock lock.
->
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> ---
->  include/net/bluetooth/hci_core.h |   3 +-
->  net/bluetooth/hci_conn.c         |  50 +---------
->  net/bluetooth/hci_sock.c         | 165 ++++++++++++++++++++-----------
->  3 files changed, 108 insertions(+), 110 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index a53e94459ecd..d9e55682b908 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -1261,8 +1261,7 @@ int hci_dev_cmd(unsigned int cmd, void __user *arg);
->  int hci_get_dev_list(void __user *arg);
->  int hci_get_dev_info(void __user *arg);
->  int hci_get_conn_list(void __user *arg);
-> -int hci_get_conn_info(struct hci_dev *hdev, void __user *arg);
-> -int hci_get_auth_info(struct hci_dev *hdev, void __user *arg);
-> +u32 get_link_mode(struct hci_conn *conn);
->  int hci_inquiry(void __user *arg);
->
->  struct bdaddr_list *hci_bdaddr_list_lookup(struct list_head *list,
-> diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-> index 2b5059a56cda..41af11fadb74 100644
-> --- a/net/bluetooth/hci_conn.c
-> +++ b/net/bluetooth/hci_conn.c
-> @@ -1626,7 +1626,7 @@ void hci_conn_check_pending(struct hci_dev *hdev)
->         hci_dev_unlock(hdev);
->  }
->
-> -static u32 get_link_mode(struct hci_conn *conn)
-> +u32 get_link_mode(struct hci_conn *conn)
->  {
->         u32 link_mode = 0;
->
-> @@ -1701,54 +1701,6 @@ int hci_get_conn_list(void __user *arg)
->         return err ? -EFAULT : 0;
->  }
->
-> -int hci_get_conn_info(struct hci_dev *hdev, void __user *arg)
-> -{
-> -       struct hci_conn_info_req req;
-> -       struct hci_conn_info ci;
-> -       struct hci_conn *conn;
-> -       char __user *ptr = arg + sizeof(req);
-> -
-> -       if (copy_from_user(&req, arg, sizeof(req)))
-> -               return -EFAULT;
-> -
-> -       hci_dev_lock(hdev);
-> -       conn = hci_conn_hash_lookup_ba(hdev, req.type, &req.bdaddr);
-> -       if (conn) {
-> -               bacpy(&ci.bdaddr, &conn->dst);
-> -               ci.handle = conn->handle;
-> -               ci.type  = conn->type;
-> -               ci.out   = conn->out;
-> -               ci.state = conn->state;
-> -               ci.link_mode = get_link_mode(conn);
-> -       }
-> -       hci_dev_unlock(hdev);
-> -
-> -       if (!conn)
-> -               return -ENOENT;
-> -
-> -       return copy_to_user(ptr, &ci, sizeof(ci)) ? -EFAULT : 0;
-> -}
-> -
-> -int hci_get_auth_info(struct hci_dev *hdev, void __user *arg)
-> -{
-> -       struct hci_auth_info_req req;
-> -       struct hci_conn *conn;
-> -
-> -       if (copy_from_user(&req, arg, sizeof(req)))
-> -               return -EFAULT;
-> -
-> -       hci_dev_lock(hdev);
-> -       conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req.bdaddr);
-> -       if (conn)
-> -               req.type = conn->auth_type;
-> -       hci_dev_unlock(hdev);
-> -
-> -       if (!conn)
-> -               return -ENOENT;
-> -
-> -       return copy_to_user(arg, &req, sizeof(req)) ? -EFAULT : 0;
-> -}
-> -
->  struct hci_chan *hci_chan_create(struct hci_conn *conn)
->  {
->         struct hci_dev *hdev = conn->hdev;
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index b04a5a02ecf3..ff78b79ee09d 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -892,82 +892,136 @@ static int hci_sock_release(struct socket *sock)
->         return 0;
->  }
->
-> -static int hci_sock_reject_list_add(struct hci_dev *hdev, void __user *arg)
-> +static int hci_sock_reject_list_add(struct hci_dev *hdev, bdaddr_t *bdaddr)
->  {
-> -       bdaddr_t bdaddr;
-> -       int err;
-> -
-> -       if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
-> -               return -EFAULT;
-> -
-> -       hci_dev_lock(hdev);
-> -
-> -       err = hci_bdaddr_list_add(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
-> -
-> -       hci_dev_unlock(hdev);
-> -
-> -       return err;
-> +       return hci_bdaddr_list_add(&hdev->reject_list, bdaddr, BDADDR_BREDR);
->  }
->
-> -static int hci_sock_reject_list_del(struct hci_dev *hdev, void __user *arg)
-> +static int hci_sock_reject_list_del(struct hci_dev *hdev, bdaddr_t *bdaddr)
->  {
-> -       bdaddr_t bdaddr;
-> -       int err;
-> -
-> -       if (copy_from_user(&bdaddr, arg, sizeof(bdaddr)))
-> -               return -EFAULT;
-> -
-> -       hci_dev_lock(hdev);
-> +       return hci_bdaddr_list_del(&hdev->reject_list, bdaddr, BDADDR_BREDR);
-> +}
->
-> -       err = hci_bdaddr_list_del(&hdev->reject_list, &bdaddr, BDADDR_BREDR);
-> +static int hci_get_conn_info(struct hci_dev *hdev, struct hci_conn_info_req *req,
-> +                            struct hci_conn_info *ci)
-> +{
-> +       struct hci_conn *conn;
-> +
-> +       conn = hci_conn_hash_lookup_ba(hdev, req->type, &req->bdaddr);
-> +       if (!conn)
-> +               return -ENOENT;
-> +       bacpy(&ci->bdaddr, &conn->dst);
-> +       ci->handle = conn->handle;
-> +       ci->type  = conn->type;
-> +       ci->out   = conn->out;
-> +       ci->state = conn->state;
-> +       ci->link_mode = get_link_mode(conn);
-> +       return 0;
-> +}
->
-> -       hci_dev_unlock(hdev);
-> +static int hci_get_auth_info(struct hci_dev *hdev, struct hci_auth_info_req *req)
-> +{
-> +       struct hci_conn *conn;
->
-> -       return err;
-> +       conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK, &req->bdaddr);
-> +       if (!conn)
-> +               return -ENOENT;
-> +       req->type = conn->auth_type;
-> +       return 0;
->  }
->
->  /* Ioctls that require bound socket */
-> -static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
-> -                               unsigned long arg)
-> +static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd, void __user *arg)
->  {
-> -       struct hci_dev *hdev = hci_pi(sk)->hdev;
-> +       struct hci_dev *hdev;
-> +       union {
-> +               bdaddr_t bdaddr;
-> +               struct hci_conn_info_req conn_req;
-> +               struct hci_auth_info_req auth_req;
-> +       } u;
-> +       struct hci_conn_info ci;
-> +       int err = 0;
->
-> -       if (!hdev)
-> -               return -EBADFD;
-> +       if (cmd == HCIBLOCKADDR || cmd == HCIUNBLOCKADDR) {
-> +               if (copy_from_user(&u.bdaddr, arg, sizeof(u.bdaddr)))
-> +                       err = -EFAULT;
-> +       } else if (cmd == HCIGETCONNINFO) {
-> +               if (copy_from_user(&u.conn_req, arg, sizeof(u.conn_req)))
-> +                       err = -EFAULT;
-> +       } else if (cmd == HCIGETAUTHINFO) {
-> +               if (copy_from_user(&u.auth_req, arg, sizeof(u.auth_req)))
-> +                       err = -EFAULT;
-> +       }
->
-> -       if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
-> -               return -EBUSY;
-> +       lock_sock(sk);
->
-> -       if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED))
-> -               return -EOPNOTSUPP;
-> +       hdev = hci_pi(sk)->hdev;
-> +       if (!hdev) {
-> +               err = -EBADFD;
-> +               goto out;
-> +       }
->
-> -       if (hdev->dev_type != HCI_PRIMARY)
-> -               return -EOPNOTSUPP;
-> +       if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-> +               err = -EBUSY;
-> +               goto out;
-> +       }
->
-> +       if (hci_dev_test_flag(hdev, HCI_UNCONFIGURED)) {
-> +               err = -EOPNOTSUPP;
-> +               goto out;
-> +       }
-> +
-> +       if (hdev->dev_type != HCI_PRIMARY) {
-> +               err = -EOPNOTSUPP;
-> +               goto out;
-> +       }
-> +
-> +       hci_dev_lock(hdev);
+> Hi,
+> 
+> commit e305509e678b3 ("Bluetooth: use correct lock to prevent UAF of hdev 
+> object") has two issues, and I believe it should be reverted for 5.14 
+> final. Could you please elaborate what is the exact UAF scenario the patch 
+> is fixing? It's rather hard to deduce from the very short changelog, but 
+> it's pretty obvious that it creates at least two issues.
 
-I think it would have been cleaner if we have dedicated functions for
-each command like I did in my patch:
+Marcel, Johan, Luiz, any thoughts on this please? Thanks.
 
-https://patchwork.kernel.org/project/bluetooth/patch/20210717000731.3836303-1-luiz.dentz@gmail.com/
-
-That way it is simpler to protect the likes of
-copy_from_user/copy_to_user, etc, even if we have to some checks
-duplicated on each function we can have a helper function to checks
-the flags, etc.
-
->         switch (cmd) {
->         case HCISETRAW:
->                 if (!capable(CAP_NET_ADMIN))
-> -                       return -EPERM;
-> -               return -EOPNOTSUPP;
-> -
-> +                       err = -EPERM;
-> +               else
-> +                       err = -EOPNOTSUPP;
-> +               break;
->         case HCIGETCONNINFO:
-> -               return hci_get_conn_info(hdev, (void __user *)arg);
-> -
-> +               if (!err)
-> +                       err = hci_get_conn_info(hdev, &u.conn_req, &ci);
-> +               break;
->         case HCIGETAUTHINFO:
-> -               return hci_get_auth_info(hdev, (void __user *)arg);
-> -
-> +               if (!err)
-> +                       err = hci_get_auth_info(hdev, &u.auth_req);
-> +               break;
->         case HCIBLOCKADDR:
->                 if (!capable(CAP_NET_ADMIN))
-> -                       return -EPERM;
-> -               return hci_sock_reject_list_add(hdev, (void __user *)arg);
-> -
-> +                       err = -EPERM;
-> +               else if (!err)
-> +                       err = hci_sock_reject_list_add(hdev, &u.bdaddr);
-> +               break;
->         case HCIUNBLOCKADDR:
->                 if (!capable(CAP_NET_ADMIN))
-> -                       return -EPERM;
-> -               return hci_sock_reject_list_del(hdev, (void __user *)arg);
-> +                       err = -EPERM;
-> +               else if (!err)
-> +                       err = hci_sock_reject_list_del(hdev, &u.bdaddr);
-> +               break;
-> +       default:
-> +               err = -ENOIOCTLCMD;
->         }
-> +       hci_dev_unlock(hdev);
-> +
-> + out:
-> +       release_sock(sk);
->
-> -       return -ENOIOCTLCMD;
-> +       if (!err) {
-> +               if (cmd == HCIGETCONNINFO) {
-> +                       if (copy_to_user(arg + sizeof(u.conn_req), &ci, sizeof(ci)))
-> +                               err = -EFAULT;
-> +               } else if (cmd == HCIGETAUTHINFO) {
-> +                       if (copy_to_user(arg, &u.auth_req, sizeof(u.auth_req)))
-> +                               err = -EFAULT;
-> +               }
-> +       }
-> +       return err;
->  }
->
->  static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
-> @@ -975,15 +1029,14 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
->  {
->         void __user *argp = (void __user *)arg;
->         struct sock *sk = sock->sk;
-> -       int err;
->
->         BT_DBG("cmd %x arg %lx", cmd, arg);
->
->         lock_sock(sk);
->
->         if (hci_pi(sk)->channel != HCI_CHANNEL_RAW) {
-> -               err = -EBADFD;
-> -               goto done;
-> +               release_sock(sk);
-> +               return -EBADFD;
->         }
->
->         /* When calling an ioctl on an unbound raw socket, then ensure
-> @@ -1055,13 +1108,7 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
->                 return hci_inquiry(argp);
->         }
->
-> -       lock_sock(sk);
-> -
-> -       err = hci_sock_bound_ioctl(sk, cmd, arg);
-> -
-> -done:
-> -       release_sock(sk);
-> -       return err;
-> +       return hci_sock_bound_ioctl(sk, cmd, (void __user *)arg);
->  }
->
->  #ifdef CONFIG_COMPAT
-> --
-> 2.18.4
->
-
+> 
+> 
+> 
+> (1) it introduces a possibility of deadlock between hci_sock_dev_event() 
+>    and hci_sock_sendmsg().
+> 
+> Namely:
+> 
+> - hci_sock_sendmsg(HCI_CHANNEL_LOGGING) acquires lock_sock(sk) and then 
+>   calls into hci_logging_frame() -> hci_send_to_channel() which in turn 
+>   acquires hci_sk_list.lock
+> 
+> - after the mentioned commit, hci_sock_dev_event() first acquires 
+>   hci_sk_list.lock before doing lock_sock(sk) on each of the sockets it
+>   iterates through, creating the reverse dependency
+> 
+> 
+> Please find the full lockdep report below for reference.
+> 
+> (2) it causes sleeping function to be called from atomic context, because 
+>    it's not allowed to sleep after acquiring read_lock(), which is exactly 
+>    what this patch does (lock_sock() is sleepable). Report below as well.
+> 
+> 
+> 
+> 
+> 
+> 
+>  BUG: sleeping function called from invalid context at net/core/sock.c:3100
+>  in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 448, name: kworker/0:5
+>  6 locks held by kworker/0:5/448:
+>   #0: ffff89e947fb4338 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_one_work+0x1c2/0x5e0
+>   #1: ffffadef40973e78 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_one_work+0x1c2/0x5e0
+>   #2: ffff89e946998a20 (&dev->mutex){....}-{3:3}, at: hub_event+0x6a/0xd50 [usbcore]
+>   #3: ffff89e950828a20 (&dev->mutex){....}-{3:3}, at: usb_disconnect+0x54/0x270 [usbcore]
+>   #4: ffff89e9504e71a8 (&dev->mutex){....}-{3:3}, at: device_release_driver_internal+0x1a/0x1d0
+>   #5: ffffffffc117a3c0 (hci_sk_list.lock){++++}-{2:2}, at: hci_sock_dev_event+0x12b/0x1e0 [bluetooth]
+>  CPU: 0 PID: 448 Comm: kworker/0:5 Not tainted 5.14.0-rc1-00003-g7fef2edf7cc7 #15
+>  Hardware name: LENOVO 20K5S22R00/20K5S22R00, BIOS R0IET38W (1.16 ) 05/31/2017
+>  Workqueue: usb_hub_wq hub_event [usbcore]
+>  Call Trace:
+>   dump_stack_lvl+0x56/0x6c
+>   ___might_sleep+0x1b6/0x210
+>   lock_sock_nested+0x29/0xa0
+>   hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>   hci_unregister_dev+0xd2/0x350 [bluetooth]
+>   btusb_disconnect+0x63/0x150 [btusb]
+>   usb_unbind_interface+0x79/0x260 [usbcore]
+>   device_release_driver_internal+0xf7/0x1d0
+>   bus_remove_device+0xef/0x160
+>   device_del+0x1ac/0x430
+>   ? usb_remove_ep_devs+0x1b/0x30 [usbcore]
+>   usb_disable_device+0x8d/0x1a0 [usbcore]
+>   usb_disconnect+0xc1/0x270 [usbcore]
+>   ? hub_event+0x4b0/0xd50 [usbcore]
+>   hub_port_connect+0x82/0xa20 [usbcore]
+>   ? __mutex_unlock_slowpath+0x43/0x2b0
+>   hub_event+0x4c4/0xd50 [usbcore]
+>   ? lock_is_held_type+0xb4/0x120
+>   process_one_work+0x244/0x5e0
+>   worker_thread+0x3c/0x390
+>   ? process_one_work+0x5e0/0x5e0
+>   kthread+0x133/0x160
+>   ? set_kthread_struct+0x40/0x40
+>   ret_from_fork+0x22/0x30
+> 
+>  ======================================================
+>  WARNING: possible circular locking dependency detected
+>  5.14.0-rc1-00003-g7fef2edf7cc7 #15 Tainted: G        W        
+>  ------------------------------------------------------
+>  kworker/0:5/448 is trying to acquire lock:
+>  ffff89e950647920 (sk_lock-AF_BLUETOOTH-BTPROTO_HCI){+.+.}-{0:0}, at: hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>  
+>  but task is already holding lock:
+>  ffffffffc117a3c0 (hci_sk_list.lock){++++}-{2:2}, at: hci_sock_dev_event+0x12b/0x1e0 [bluetooth]
+>  
+>  which lock already depends on the new lock.
+> 
+>  
+>  the existing dependency chain (in reverse order) is:
+>  
+>  -> #1 (hci_sk_list.lock){++++}-{2:2}:
+>         _raw_read_lock+0x38/0x70
+>  systemd-sysv-generator[1254]: stat() failed on /etc/init.d/jexec, ignoring: No such file or directory
+>         hci_send_to_channel+0x22/0x50 [bluetooth]
+>         hci_sock_sendmsg+0xa2b/0xa40 [bluetooth]
+>         sock_sendmsg+0x5b/0x60
+>         ____sys_sendmsg+0x1ed/0x250
+>  systemd-sysv-generator[1254]: SysV service '/etc/init.d/tpfand' lacks a native systemd unit file. Automatically generating a unit file for compatibility. Please update package to include a native systemd unit file, in order to make it more safe and robust.
+>         ___sys_sendmsg+0x88/0xd0
+>         __sys_sendmsg+0x5e/0xa0
+>         do_syscall_64+0x3a/0xb0
+>  systemd-sysv-generator[1254]: SysV service '/etc/init.d/boot.local' lacks a native systemd unit file. Automatically generating a unit file for compatibility. Please update package to include a native systemd unit file, in order to make it more safe and robust.
+>         entry_SYSCALL_64_after_hwframe+0x44/0xae
+>  
+>  -> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_HCI){+.+.}-{0:0}:
+>         __lock_acquire+0x124a/0x1680
+>         lock_acquire+0x278/0x300
+>         lock_sock_nested+0x72/0xa0
+>         hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>         hci_unregister_dev+0xd2/0x350 [bluetooth]
+>         btusb_disconnect+0x63/0x150 [btusb]
+>         usb_unbind_interface+0x79/0x260 [usbcore]
+>         device_release_driver_internal+0xf7/0x1d0
+>         bus_remove_device+0xef/0x160
+>         device_del+0x1ac/0x430
+>         usb_disable_device+0x8d/0x1a0 [usbcore]
+>         usb_disconnect+0xc1/0x270 [usbcore]
+>         hub_port_connect+0x82/0xa20 [usbcore]
+>         hub_event+0x4c4/0xd50 [usbcore]
+>         process_one_work+0x244/0x5e0
+>         worker_thread+0x3c/0x390
+>         kthread+0x133/0x160
+>         ret_from_fork+0x22/0x30
+>  
+>  other info that might help us debug this:
+> 
+>   Possible unsafe locking scenario:
+> 
+>         CPU0                    CPU1
+>         ----                    ----
+>    lock(hci_sk_list.lock);
+>                                 lock(sk_lock-AF_BLUETOOTH-BTPROTO_HCI);
+>                                 lock(hci_sk_list.lock);
+>    lock(sk_lock-AF_BLUETOOTH-BTPROTO_HCI);
+>  
+>   *** DEADLOCK ***
+> 
+>  6 locks held by kworker/0:5/448:
+>   #0: ffff89e947fb4338 ((wq_completion)usb_hub_wq){+.+.}-{0:0}, at: process_one_work+0x1c2/0x5e0
+>   #1: ffffadef40973e78 ((work_completion)(&hub->events)){+.+.}-{0:0}, at: process_one_work+0x1c2/0x5e0
+>   #2: ffff89e946998a20 (&dev->mutex){....}-{3:3}, at: hub_event+0x6a/0xd50 [usbcore]
+>   #3: ffff89e950828a20 (&dev->mutex){....}-{3:3}, at: usb_disconnect+0x54/0x270 [usbcore]
+>   #4: ffff89e9504e71a8 (&dev->mutex){....}-{3:3}, at: device_release_driver_internal+0x1a/0x1d0
+>   #5: ffffffffc117a3c0 (hci_sk_list.lock){++++}-{2:2}, at: hci_sock_dev_event+0x12b/0x1e0 [bluetooth]
+>  
+>  stack backtrace:
+>  CPU: 0 PID: 448 Comm: kworker/0:5 Tainted: G        W         5.14.0-rc1-00003-g7fef2edf7cc7 #15
+>  Hardware name: LENOVO 20K5S22R00/20K5S22R00, BIOS R0IET38W (1.16 ) 05/31/2017
+>  Workqueue: usb_hub_wq hub_event [usbcore]
+>  Call Trace:
+>   dump_stack_lvl+0x56/0x6c
+>   check_noncircular+0x105/0x120
+>   ? stack_trace_save+0x4b/0x70
+>   ? save_trace+0x3d/0x340
+>   ? __lock_acquire+0x124a/0x1680
+>   __lock_acquire+0x124a/0x1680
+>   lock_acquire+0x278/0x300
+>   ? hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>   ? lock_release+0x15a/0x2a0
+>   lock_sock_nested+0x72/0xa0
+>   ? hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>   hci_sock_dev_event+0x156/0x1e0 [bluetooth]
+>   hci_unregister_dev+0xd2/0x350 [bluetooth]
+>   btusb_disconnect+0x63/0x150 [btusb]
+>   usb_unbind_interface+0x79/0x260 [usbcore]
+>   device_release_driver_internal+0xf7/0x1d0
+>   bus_remove_device+0xef/0x160
+>   device_del+0x1ac/0x430
+>   ? usb_remove_ep_devs+0x1b/0x30 [usbcore]
+>   usb_disable_device+0x8d/0x1a0 [usbcore]
+>   usb_disconnect+0xc1/0x270 [usbcore]
+>   ? hub_event+0x4b0/0xd50 [usbcore]
+>   hub_port_connect+0x82/0xa20 [usbcore]
+>   ? __mutex_unlock_slowpath+0x43/0x2b0
+>   hub_event+0x4c4/0xd50 [usbcore]
+>   ? lock_is_held_type+0xb4/0x120
+>   process_one_work+0x244/0x5e0
+>   worker_thread+0x3c/0x390
+>   ? process_one_work+0x5e0/0x5e0
+>   kthread+0x133/0x160
+>   ? set_kthread_struct+0x40/0x40
+>   ret_from_fork+0x22/0x30
+> 
+> 
+> 
+> -- 
+> Jiri Kosina
+> SUSE Labs
+> 
 
 -- 
-Luiz Augusto von Dentz
+Jiri Kosina
+SUSE Labs
+
