@@ -2,61 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A55CCC12002
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA7B6C6377A
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 09:59:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8CB4660FDA
+	by mail.kernel.org (Postfix) with ESMTP id D1C1761249
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 21 Jul 2021 09:59:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237722AbhGUJIz (ORCPT
+        id S236340AbhGUJQe (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 21 Jul 2021 05:08:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46380 "EHLO
+        Wed, 21 Jul 2021 05:16:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237804AbhGUI6i (ORCPT
+        with ESMTP id S237675AbhGUI6i (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 21 Jul 2021 04:58:38 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94263C061762;
-        Wed, 21 Jul 2021 02:38:59 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id b12so1799870pfv.6;
-        Wed, 21 Jul 2021 02:38:59 -0700 (PDT)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2FDC061574;
+        Wed, 21 Jul 2021 02:39:13 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id o201so1822482pfd.1;
+        Wed, 21 Jul 2021 02:39:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=i9lkhl5CGNwVkPr4Gc/fkK8jj+kqc00wstH/fPwiQoY=;
-        b=hH2Z4OaAClP5KljSyPIFjkVHl1LF2NfPBN/bNCaI0eAGcpgtt2DbKCB6S0XKzS8s42
-         /oZP5LmeyfDv8Caqje9WS3sgtklqdfYTMkuPq32Ew7XqxVFvcgD6wHm6XhrzeVZAAcGi
-         11iJy/iIb7wcGE2RZq119eDp6TtBD95RcgfOTzPAtySSptZsmEUPvV/ajbVmASxQl0M5
-         IIcQ1C+hiqd4WWu2yzvmMR9eegWTfQYD4GtMndBT9/7Pgs3EXpTe5r/0ZDZbxaTT91RU
-         +XGIRLzmOWCyW9RWanuS27vUqIG9V3OSN9FOmfKOI+Qb+1KvQAq6BlbxPKoahWNsz/5p
-         Hm0Q==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=PjuFR6HuAqzaOBzOINC7ROg0fkvdUGdT6kDWetuSLNA=;
+        b=SSCMiLxpMlxDqbev6KyNKRINcMP3ATB1bD6BU81Vvu2ZLhmmYWvvW7tLTpTRsZwiok
+         X/zYaEqz1uBEy4/emehHUpmEcxqHijdIe8NcOQW0Z6Zs7uDseVws5e11QoXA27pSP9Um
+         QApdrIp4/agvt8Kapy9jJd0pSsQFh83oL+uBU02Y7gfv2KWuG398YZ7CpCO/TxfBrrhL
+         bR6qKXCIc5MiM3fOWgCmmi88NuFSUv46ylmwA7Ozn8qBpzvK9FJ/u1zFsuS+HXJeGGGr
+         mu5mj32xp/g019exxf4psjgpRD3lq8noTrPiyVCMZbhdF7nDJPIrIOWiZFgZlCnAsO1B
+         BPZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=i9lkhl5CGNwVkPr4Gc/fkK8jj+kqc00wstH/fPwiQoY=;
-        b=WXqEYHd0WsFppra77BpGt4qkSsBAdZrL3S9tpq89BL+MAUkk0GpgVkI+mVaWM/rZmX
-         bSfBsHBoceqAayDZqmgnP8I+MdQEZEbH1KnHqxnfxaewwTl6XuXiqlLFDRPov6C0bKw3
-         sWeBC/yz1haZ6tDNrv64/ZbKGk8ztoofG8MAprz+4ACWqbm/7MCuDXdL4cqajpcNW/na
-         ooCntlkMlBev0fqgjKK9u5XsfQMz96Ct/0jNLTAo1gqaIPEf/eeMfzIMLT06oskhKYB+
-         WO+hmEUwDEiBjF/0HSM6Cn89iXgoTViPRoNpsVRCcaTIuXHGKTZoOb/ZcbZV4eUolf9Q
-         YWEA==
-X-Gm-Message-State: AOAM5322UfYg40TSDIvdNVSWUo0c2jHnqnse8jcRL4TeOIB4SuuiBv4R
-        F/yTq9/7L2HY9NYOoooDxGM=
-X-Google-Smtp-Source: ABdhPJwe9X9dZuLm3t9+BFn8++RhOcSNWNEc70KRQR5FCUJmoeexUawaYQaytntIsbib8D73D3c9Cw==
-X-Received: by 2002:a63:3dcb:: with SMTP id k194mr34987757pga.202.1626860339124;
-        Wed, 21 Jul 2021 02:38:59 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=PjuFR6HuAqzaOBzOINC7ROg0fkvdUGdT6kDWetuSLNA=;
+        b=DY1jtTyM6JcojqYKo0k7cP+YhwedjIxFGM8kIgYL5HmFuQfE977rkVG0sxA1oC/81S
+         OHw3VQALOYATL+pXIxRm9WDjbSG6fL7f6JKKthgZqbC3L1KGNOv3sCTD2wVxnVaoTZCK
+         8pyVdXGIly/YovOkdIcF0B0z73Y12SGipGwdZI37m6AjQeJVtutLG1th6lfR3hsm47vW
+         pU4AF/1TFDHQPLzwi1gFELiX7JBYzgSvOzf4SBNNrL+fhR32MczxMaApK/jdQEVt5dma
+         X1eZEdZGLIwCEbGpm53rSftpjqGlJNxdK3m/5QFwIoxsX35Dvj0YR5snRLsuLHA+LbFa
+         qDSQ==
+X-Gm-Message-State: AOAM531X9CspJC1m3G1biwbnv8s7PYdOjVizqj5xIFUQF5G3y0sjqI6r
+        InbNbmMd6PFd8t3rR31Ngu4=
+X-Google-Smtp-Source: ABdhPJyLWYQsZQ+eLcP51gJqr+yNhWz6CITIUAHfjWRVt8BqikE1aEmB7DhdUoi1JBVeW317BZfy/A==
+X-Received: by 2002:a63:e643:: with SMTP id p3mr34526522pgj.213.1626860353146;
+        Wed, 21 Jul 2021 02:39:13 -0700 (PDT)
 Received: from localhost.localdomain ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id j129sm27311956pfb.132.2021.07.21.02.38.55
+        by smtp.gmail.com with ESMTPSA id j129sm27311956pfb.132.2021.07.21.02.39.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 02:38:58 -0700 (PDT)
+        Wed, 21 Jul 2021 02:39:12 -0700 (PDT)
 From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         davem@davemloft.net, kuba@kernel.org, matthieu.baerts@tessares.net,
@@ -66,50 +67,57 @@ Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
         linux-kernel@vger.kernel.org, skhan@linuxfoundation.org,
         gregkh@linuxfoundation.org,
         linux-kernel-mentees@lists.linuxfoundation.org
-Subject: [PATCH v3 0/2] Bluetooth: fix inconsistent lock states
-Date:   Wed, 21 Jul 2021 17:38:30 +0800
-Message-Id: <20210721093832.78081-1-desmondcheongzx@gmail.com>
+Subject: [PATCH v3 2/2] Bluetooth: fix inconsistent lock state in rfcomm_connect_ind
+Date:   Wed, 21 Jul 2021 17:38:32 +0800
+Message-Id: <20210721093832.78081-3-desmondcheongzx@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210721093832.78081-1-desmondcheongzx@gmail.com>
+References: <20210721093832.78081-1-desmondcheongzx@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Commit fad003b6c8e3d ("Bluetooth: Fix inconsistent lock state with
+RFCOMM") fixed a lockdep warning due to sk->sk_lock.slock being
+acquired without disabling softirq while the lock is also used in
+softirq context. This was done by disabling interrupts before calling
+bh_lock_sock in rfcomm_sk_state_change.
 
-This series addresses inconsistent lock states first identified by
-Syzbot here:
-https://syzkaller.appspot.com/bug?extid=2f6d7c28bb4bf7e82060
+Later, this was changed in commit e6da0edc24ee ("Bluetooth: Acquire
+sk_lock.slock without disabling interrupts") to disable softirqs
+only.
 
-v2 -> v3:
-- Split SCO and RFCOMM code changes, as suggested by Luiz Augusto von
-Dentz.
-- Simplify local bh disabling in SCO by using local_bh_disable/enable
-inside sco_chan_del. The rationale is inside the commit message, but in
-summary I initially wanted to avoid nesting local_bh_disable until I
-learned that local_bh_disable/enable pairs are reentrant.
+However, there is another instance of sk->sk_lock.slock being acquired
+without disabling softirq in rfcomm_connect_ind. This patch fixes this
+by disabling local bh before the call to bh_lock_sock.
 
-v1 -> v2:
-- Instead of pulling out the clean-up code out from sco_chan_del and
-using it directly in sco_conn_del, disable local softirqs for relevant
-sections.
-- Disable local softirqs more thoroughly for instances of
-bh_lock_sock/bh_lock_sock_nested in the bluetooth subsystem.
-Specifically, the calls in af_bluetooth.c and rfcomm/sock.c are now made
-with local softirqs disabled as well.
+Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+---
+ net/bluetooth/rfcomm/sock.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Best wishes,
-Desmond
-
-Desmond Cheong Zhi Xi (2):
-  Bluetooth: fix inconsistent lock state in SCO
-  Bluetooth: fix inconsistent lock state in rfcomm_connect_ind
-
- net/bluetooth/rfcomm/sock.c |  2 ++
- net/bluetooth/sco.c         | 21 +++++++++++++++++++++
- 2 files changed, 23 insertions(+)
-
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index ae6f80730561..d8734abb2df4 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -974,6 +974,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 	if (!parent)
+ 		return 0;
+ 
++	local_bh_disable();
+ 	bh_lock_sock(parent);
+ 
+ 	/* Check for backlog size */
+@@ -1002,6 +1003,7 @@ int rfcomm_connect_ind(struct rfcomm_session *s, u8 channel, struct rfcomm_dlc *
+ 
+ done:
+ 	bh_unlock_sock(parent);
++	local_bh_enable();
+ 
+ 	if (test_bit(BT_SK_DEFER_SETUP, &bt_sk(parent)->flags))
+ 		parent->sk_state_change(parent);
 -- 
 2.25.1
 
