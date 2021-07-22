@@ -2,265 +2,142 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 28DA5C63798
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:45:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0CEFC6377D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 07:07:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0786B61285
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:45:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A962761106
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 07:07:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231334AbhGVGEu (ORCPT
+        id S230467AbhGVG0q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 02:04:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52284 "EHLO
+        Thu, 22 Jul 2021 02:26:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231250AbhGVGEt (ORCPT
+        with ESMTP id S230466AbhGVG0p (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 02:04:49 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7B2CC061575
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jul 2021 23:45:23 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id a10so2141035qvj.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 21 Jul 2021 23:45:23 -0700 (PDT)
+        Thu, 22 Jul 2021 02:26:45 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48FA6C061575
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 00:07:20 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id x192so6870697ybe.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 00:07:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=n77gpZdiQx2XoJxztEWy6+tMhTq5Fkas8RaOJhWCSKI=;
-        b=KUq7ZstHal5P8z1N0mA8td533geUYkfLQEkIAhrl8fGskTu7yue2AbzrIUkzkSKOKx
-         iE7WUctMG+zAY+JAIJ5qAqI7cLetaDtaM37wv4nhKTtqlnO33Zimt4+bA2qxccWnsqiQ
-         Q1ggwzjMS53J6qXc3vn5yjWp21z8JKuB0S3h2Cs6quTyFj9HzFphX1B6XTvZ55omX3jf
-         M+XY9uKRCw7KjzVLZ2GphRZfTbpxPs1ZskWgFiVK6f5mmWQohRawzajj5zECroIr8+in
-         Q9FnbzjqyiwZndvlj0dkn5P6A6IGVq9qaYDqCTg3rrtO3VxywFHcy6ktH1ykOjnEJYc+
-         kC2w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=pCweIOqGQEXbjO8x0ZSXEFX8aT2lPgRjfL8xR9OP/zM=;
+        b=OesLZ/jM16d2HdKZM/IvVi05RoBazT+WBGTIas39n0l9vI8r5GRnN2cTJ8thjw3jMi
+         JN1kd5Ambw3e3pMhEAUwDA10Zv7YAa0cEsPgb2+KizyapZgLos5OOayYkjC7tOdXkKk8
+         oTyKrzySjRnoNWLvodokw+wNaYChSDycfPJa3n3StheA8ZCVMeY7I/ZaJ2ylDlLYRuA1
+         X/lfDO3Rd3vhc92zcoCcGWlMCPinHdOO0zQrIIMzSG/qLTCPdfX6Ztc4LPnAzqDJPwTq
+         SqxJZ6mLiROU8aA/vOC588JfoqexDBFYmAUpn15P5cJGCClTKGCgVOWi1UyBmk+Q/fGL
+         Y+yg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=n77gpZdiQx2XoJxztEWy6+tMhTq5Fkas8RaOJhWCSKI=;
-        b=kECSUxyW4dnLLHLtJiw924mBXSHoO1VPFviWxby0WWu27UkJTdiEUrguGWeeJB9ibO
-         VOw4DRkvSVcJun0xTjp7taQz+fxkKu7QssRlK56neignZBfyxBaOYjFGzyzMcbNQJSTG
-         RTRlGOwBjxiej+3y4bF3oUq1ARjJ1P11tU/l12fbCMyFa9i/LNkO8pCZH7SNxzuuOQFN
-         +TCVKyeQSd9C323Eu6gJuiXUw6/OSzWKXhEt2aDFH5HI+Hp3UAHCG0QEusrHQBELBws6
-         Aw9R0/+g6chzcvkmNXM2t7p2PtP/zVQjV8q5oYh+xM2pWP0H3fQxk6iBLVT6aDeGVpCj
-         18ng==
-X-Gm-Message-State: AOAM532USMASQqYEv3pk7iOBBn+KmlSI2uSc2CaEkhZL9i/hccIzxDIe
-        zzKSnX8nZYiqkStEN5L3MPC7QIebhnfxTg==
-X-Google-Smtp-Source: ABdhPJxXl0RL9BJjHZwFBw4CWFE8pqhTCTLusBT58ijgaoi9N3338Xn+z8HI0jJ0Mw2zeNvu//uKWg==
-X-Received: by 2002:a05:6214:13c8:: with SMTP id cg8mr40269347qvb.23.1626936322689;
-        Wed, 21 Jul 2021 23:45:22 -0700 (PDT)
-Received: from [172.17.0.2] ([20.97.224.126])
-        by smtp.gmail.com with ESMTPSA id y20sm12304450qkm.5.2021.07.21.23.45.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jul 2021 23:45:22 -0700 (PDT)
-Message-ID: <60f91402.1c69fb81.db8d2.c061@mx.google.com>
-Date:   Wed, 21 Jul 2021 23:45:22 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1367524387232263948=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=pCweIOqGQEXbjO8x0ZSXEFX8aT2lPgRjfL8xR9OP/zM=;
+        b=EC4b4lJHUTG7emWbE5SfavrZkXwJ2rZkQJ9VPyRGNJl0yqbGhTzDlYnIX6JUetndX8
+         iTIHFP06e689mOj0zOKe01hpmiK+e58igbhURAT9uuPq49MgsDNtetIwmhU7vrKpJhvl
+         2BQddIbDRcJWJvOJWt/eCtRr5tc0CD2kOJa+WZukh/H7b2e94/FH6T+aHP+a/zKdjm/N
+         fFqzwk/dIfupK4a6x7zFBZO7sIUjRsxUfqFrRKLlr+TMI61Io+UqtY2l3UblPIh1iWcs
+         1vbBLQp+YZBikn5KimkBD676I8a3IAXMbMBaJPeL/0oTiznno2K7B8eO17jmVRMHvtJX
+         3inQ==
+X-Gm-Message-State: AOAM5312HEVSB9sVF9djP2No9irDx0LQK8+mT7QsTdYhRuMnZZTPeNS3
+        6Pj1PMv/RUPnoo8Lj8ITpyQldbRZgz51//OwPPeybGVF+5D6Mw==
+X-Google-Smtp-Source: ABdhPJzpF08C6copgidiUj5olROjSBP+2Li3zgAS47C7eHDb8gi7ec7zrMckBxtgmGE3cAHBdPNV3bmgP3SMd5U/Ync=
+X-Received: by 2002:a25:6985:: with SMTP id e127mr53348866ybc.212.1626937639443;
+ Thu, 22 Jul 2021 00:07:19 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, ayush.garg@samsung.com
-Subject: RE: Support for Adapter's Default PHY Configuration
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210722052640.5863-2-ayush.garg@samsung.com>
-References: <20210722052640.5863-2-ayush.garg@samsung.com>
+References: <20210722021952.18260-1-wangyouwan@uniontech.com>
+In-Reply-To: <20210722021952.18260-1-wangyouwan@uniontech.com>
+From:   Barry Byford <31baz66@gmail.com>
+Date:   Thu, 22 Jul 2021 08:07:08 +0100
+Message-ID: <CAAu3APbE1jQSC_zPzXDYQcuMJqoKQ3cbApQt5sJ6M_6ZDWQ4Jg@mail.gmail.com>
+Subject: =?UTF-8?Q?Re=3A_=5BPATCH=5D_bluez=3Afix_btmon_tools_=E2=80=9CAllow_slave=E2=80=9D_?=
+        =?UTF-8?Q?to_=22Master_Or_Slave=22_=23431_=5Bhci0=5D_99=2E922927?=
+To:     wangyouwan <wangyouwan@uniontech.com>
+Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1367524387232263948==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Thu, 22 Jul 2021 at 03:23, wangyouwan <wangyouwan@uniontech.com> wrote:
+>
+>     I want to explain it as=E3=80=80=E2=80=9CMaster Or Slave=E2=80=9D, be=
+cause this is explained in the Core_v5.2
+>
 
-This is automated email and please do not reply to this email!
+There is now Core V5.3 which has been updated to use inclusive
+language as outlined by Archie in his post:
 
-Dear submitter,
+https://marc.info/?l=3Dlinux-bluetooth&m=3D162195325125419&w=3D2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=519479
+I think the terms should be Central or Peripheral. Here is the same
+extract from the spec in v5.3
 
----Test result---
+8.6.5 Role switch
+There are several occasions when a role switch is used:
+=E2=80=A2 A role switch is necessary in order to make a paging device a Per=
+ipheral
+when joining an existing piconet, since by definition the paging device is
+initially Central of a piconet involving the pager (Central) and the paged
+(Peripheral) device.
+=E2=80=A2 A role switch is necessary in order for a Peripheral in an existi=
+ng piconet to
+set up a new piconet with itself as Central and the original piconet Centra=
+l as
+Peripheral. If the original piconet had more than one Peripheral, then this
+implies a double role for the original piconet Central; it becomes a Periph=
+eral
+in the new piconet while still maintaining the original piconet as Central.
 
-Test Summary:
-CheckPatch                    FAIL      1.86 seconds
-GitLint                       FAIL      0.84 seconds
-Prep - Setup ELL              PASS      47.00 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      8.33 seconds
-Build - Make                  PASS      203.42 seconds
-Make Check                    PASS      9.65 seconds
-Make Distcheck                PASS      241.66 seconds
-Build w/ext ELL - Configure   PASS      8.32 seconds
-Build w/ext ELL - Make        PASS      191.62 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-adapter: Add support for get/set phy configuration property
-WARNING:LONG_LINE_STRING: line length of 82 exceeds 80 columns
-#103: FILE: src/adapter.c:3323:
-+		g_dbus_pending_property_error(data->id, ERROR_INTERFACE ".Failed",
-
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#145: FILE: src/adapter.c:3365:
-+	unconfigure_phys = adapter->supported_phys & ~(adapter->configurable_phys);
-
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#171: FILE: src/adapter.c:3391:
-+	DBG("sending set phy configuration command for index %u", adapter->dev_id);
-
-WARNING:LONG_LINE_STRING: line length of 82 exceeds 80 columns
-#181: FILE: src/adapter.c:3401:
-+	btd_error(adapter->dev_id, "Failed to set PHY configuration for index %u",
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#189: FILE: src/adapter.c:3409:
-+					const GDBusPropertyTable *property,
- 					                         ^
-
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#205: FILE: src/adapter.c:3425:
-+				const GDBusPropertyTable *property,
- 				                         ^
-
-- total: 2 errors, 4 warnings, 312 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] adapter: Add support for get/set phy configuration property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-adapter: Add support for the get supported phy property
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#20: FILE: src/adapter.c:3409:
-+					const GDBusPropertyTable *property,
- 					                         ^
-
-- total: 1 errors, 0 warnings, 30 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] adapter: Add support for the get supported phy property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-adapter: Add support for PHY Configuration Changed event
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#52: FILE: src/adapter.c:9944:
-+						phy_configuration_changed_callback,
-
-- total: 0 errors, 1 warnings, 39 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] adapter: Add support for PHY Configuration Changed event" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-client: Add support for get/set PHY configuration in bluetoothctl
-WARNING:LONG_LINE_STRING: line length of 87 exceeds 80 columns
-#65: FILE: client/main.c:2046:
-+					"SupportedPhyConfiguration", "Supported phys");
-
-WARNING:LONG_LINE: line length of 83 exceeds 80 columns
-#86: FILE: client/main.c:2067:
-+					"PhyConfiguration", DBUS_TYPE_STRING, phys,
-
-WARNING:LONG_LINE_STRING: line length of 88 exceeds 80 columns
-#87: FILE: client/main.c:2068:
-+					phys_len, generic_callback, "PHY Configuration",
-
-- total: 0 errors, 3 warnings, 57 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] client: Add support for get/set PHY configuration in" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-client: Add support for get/set PHY configuration in bluetoothctl
-18: B3 Line contains hard tab characters (\t): "	Supported phys: BR1M1SLOT"
-19: B3 Line contains hard tab characters (\t): "	Supported phys: BR1M3SLOT"
-20: B3 Line contains hard tab characters (\t): "	Supported phys: BR1M5SLOT"
-21: B3 Line contains hard tab characters (\t): "	Supported phys: EDR2M1SLOT"
-22: B3 Line contains hard tab characters (\t): "	Supported phys: EDR2M3SLOT"
-23: B3 Line contains hard tab characters (\t): "	Supported phys: EDR2M5SLOT"
-24: B3 Line contains hard tab characters (\t): "	Supported phys: EDR3M1SLOT"
-25: B3 Line contains hard tab characters (\t): "	Supported phys: EDR3M3SLOT"
-26: B3 Line contains hard tab characters (\t): "	Supported phys: EDR3M5SLOT"
-27: B3 Line contains hard tab characters (\t): "	Supported phys: LE1MTX"
-28: B3 Line contains hard tab characters (\t): "	Supported phys: LE1MRX"
-29: B3 Line contains hard tab characters (\t): "	Selected phys: BR1M1SLOT"
-30: B3 Line contains hard tab characters (\t): "	Selected phys: LE1MTX"
-31: B3 Line contains hard tab characters (\t): "	Selected phys: LE1MRX"
-
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1367524387232263948==--
+>     8.6.5 Role switch
+>     There are several occasions when a role switch is used:
+>     =E2=80=A2 A role switch is necessary in order to make a paging device=
+ a slave when
+>     joining an existing piconet, since by definition the paging device is=
+ initially
+>     master of a piconet involving the pager (master) and the paged (slave=
+)
+>     device.
+>     =E2=80=A2 A role switch is necessary in order for a slave in an exist=
+ing piconet to set up
+>     a new piconet with itself as master and the original piconet master a=
+s slave.
+>     If the original piconet had more than one slave, then this implies a =
+double
+>     role for the original piconet master; it becomes a slave
+>
+> Signed-off-by: wangyouwan <wangyouwan@uniontech.com>
+> ---
+>  monitor/packet.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/monitor/packet.c b/monitor/packet.c
+> index 52d22ab21..b73615509 100644
+> --- a/monitor/packet.c
+> +++ b/monitor/packet.c
+> @@ -4143,7 +4143,7 @@ static void create_conn_cmd(const void *data, uint8=
+_t size)
+>                 str =3D "Stay master";
+>                 break;
+>         case 0x01:
+> -               str =3D "Allow slave";
+> +               str =3D "Master Or Slave";
+>                 break;
+>         default:
+>                 str =3D "Reserved";
+> --
+> 2.20.1
+>
+>
+>
