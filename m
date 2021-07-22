@@ -7,76 +7,80 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6672AC63793
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:32:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A16CC63793
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:36:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BA646101E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:32:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F34AE6128D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:36:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232231AbhGVNvm convert rfc822-to-8bit (ORCPT
+        id S232265AbhGVNzx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 09:51:42 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49782 "EHLO
+        Thu, 22 Jul 2021 09:55:53 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:36025 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230306AbhGVNvk (ORCPT
+        with ESMTP id S230343AbhGVNzv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 09:51:40 -0400
+        Thu, 22 Jul 2021 09:55:51 -0400
 Received: from smtpclient.apple (p5b3d2eb8.dip0.t-ipconnect.de [91.61.46.184])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 536BECECDD;
-        Thu, 22 Jul 2021 16:32:14 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A46E1CECDD;
+        Thu, 22 Jul 2021 16:36:24 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v2 1/3] Bluetooth: hci_h5: add WAKEUP_DISABLE flag
+Subject: Re: [PATCH] bluetooth: btrsi: use non-kernel-doc comment for
+ copyright
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210715225146.v2.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
-Date:   Thu, 22 Jul 2021 16:32:13 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Hilda Wu <hildawu@realtek.com>,
+In-Reply-To: <20210721020334.3129-1-rdunlap@infradead.org>
+Date:   Thu, 22 Jul 2021 16:36:24 +0200
+Cc:     open list <linux-kernel@vger.kernel.org>,
+        kernel test robot <lkp@intel.com>,
+        Aditya Srivastava <yashsri421@gmail.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Prameela Rani Garnepudi <prameela.j04cs@gmail.com>,
+        Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>,
+        Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>,
+        Kalle Valo <kvalo@codeaurora.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <57AE120A-78AE-4990-8D7F-BA8D8077B610@holtmann.org>
-References: <20210715225146.v2.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
-To:     Archie Pusaka <apusaka@google.com>
+Message-Id: <BC3E0AE2-F6E7-43BE-8CEE-882722E0609F@holtmann.org>
+References: <20210721020334.3129-1-rdunlap@infradead.org>
+To:     Randy Dunlap <rdunlap@infradead.org>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Hi Randy,
 
-> Some RTL chips resets the FW on suspend, so wakeup is disabled on
-> those chips. This patch introduces this WAKEUP_DISABLE flag so that
-> chips that doesn't reset FW on suspend can leave the flag unset and
-> is allowed to wake the host.
+> kernel-doc complains about a non-kernel-doc comment that uses "/**"
+> to begin the comment, so change it to just "/*".
 > 
-> This patch also left RTL8822 WAKEUP_DISABLE flag unset, therefore
-> allowing it to wake the host, and preventing reprobing on resume.
+> drivers/bluetooth/btrsi.c:2: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
+>    * Copyright (c) 2017 Redpine Signals Inc.
 > 
-> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> Reviewed-by: Hilda Wu <hildawu@realtek.com>
-> 
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Cc: Aditya Srivastava <yashsri421@gmail.com>
+> Cc: Marcel Holtmann <marcel@holtmann.org>
+> Cc: Johan Hedberg <johan.hedberg@gmail.com>
+> Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> Cc: linux-bluetooth@vger.kernel.org
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Cc: Prameela Rani Garnepudi <prameela.j04cs@gmail.com>
+> Cc: Sanjay Kumar Konduri <sanjay.konduri@redpinesignals.com>
+> Cc: Siva Rebbagondla <siva.rebbagondla@redpinesignals.com>
+> Cc: Kalle Valo <kvalo@codeaurora.org>
 > ---
-> 
-> Changes in v2:
-> * Remove unnecessary variable
-> 
-> drivers/bluetooth/hci_h5.c | 83 +++++++++++++++++++++++++++-----------
-> 1 file changed, 59 insertions(+), 24 deletions(-)
+> drivers/bluetooth/btrsi.c |    2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 
-so the set does not apply cleanly to bluetooth-next
-
-Applying: Bluetooth: hci_h5: Add runtime suspend
-error: patch failed: drivers/bluetooth/hci_h5.c:11
-error: drivers/bluetooth/hci_h5.c: patch does not apply
-
-And I am really close to not accepting any patches for hci_h5.c anymore. This thing turns into crazy hacking and nobody is taking my hint to redo this as clean H:5 3-Wire serdev standalone driver.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
