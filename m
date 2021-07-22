@@ -7,201 +7,139 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C0C5BC6377D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A1AC63793
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A624C61283
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 676BD6127C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230365AbhGVFUT (ORCPT
+        id S230376AbhGVFUU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 01:20:19 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:49426 "EHLO
-        mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230187AbhGVFUS (ORCPT
+        Thu, 22 Jul 2021 01:20:20 -0400
+Received: from mailout3.samsung.com ([203.254.224.33]:41591 "EHLO
+        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230343AbhGVFUU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:20:18 -0400
+        Thu, 22 Jul 2021 01:20:20 -0400
 Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210722060053epoutp01cea9b5e15ddac7cf04aa5073b1c2dc23~UB4m3AULM1956619566epoutp01F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 06:00:53 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210722060053epoutp01cea9b5e15ddac7cf04aa5073b1c2dc23~UB4m3AULM1956619566epoutp01F
+        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210722060054epoutp03ff929ccb8b5bbf768136c69b6257430c~UB4oA60cf0824508245epoutp03B
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 06:00:54 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210722060054epoutp03ff929ccb8b5bbf768136c69b6257430c~UB4oA60cf0824508245epoutp03B
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1626933653;
-        bh=+bXCDXMPBYaySU8ZeO2ssuv752TOfXMu8pPFE7teVSg=;
+        s=mail20170921; t=1626933654;
+        bh=VhAUX2KaLhcD0nEsXOQiKQD6baHytHOBPwc2nY0Hr9o=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=ZW6qmZz/hrIY7PkidUQFnUUPx60wKey+txTyYTInDkcEXbUP5/PhDkd9Q5RxXS8ET
-         2m5X8sHeeT6F4oEn96+rbSauR1RUfnruPKmq5tNNnM9j7yjmyR4uMiBsYeTQa4Ro57
-         QJnEZUSX0CJa9RVoT9gnhhfPTcI3doi7oFw50miw=
-Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
+        b=Wm4HjPXOh2qmpZz3KoQG6mA6tdeFKbiZrxEDiNdQLmcj1m918MLmDCN0ixlskeo2l
+         mMeLONooD480bSV3xTRNdcV4XDETiJB2qg3TtKVXbIiULanEVg8bzylJvxhczfg/lI
+         dHD7+QZSzyGuj/ptkleMx9lvDrZGVMU7k6s6tDVQ=
+Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
         epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20210722060048epcas5p1e782dfef9f2df6439e509b1508d32f3c~UB4iY0efb2845628456epcas5p1T;
-        Thu, 22 Jul 2021 06:00:48 +0000 (GMT)
+        20210722060050epcas5p190ce885f3ed971de687fde4dc3ce24c6~UB4jxa9aa2840328403epcas5p1a;
+        Thu, 22 Jul 2021 06:00:50 +0000 (GMT)
 Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        63.13.55882.F8909F06; Thu, 22 Jul 2021 15:00:47 +0900 (KST)
-Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p1.samsung.com (KnoxPortal) with ESMTPA id
-        20210722055011epcas5p15299bfe8f8b8dd58e1354364071608e3~UBvRPlD9b1427914279epcas5p1A;
-        Thu, 22 Jul 2021 05:50:11 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
-        epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210722055011epsmtrp2d6032a963bdec05754de1312b722d9b8~UBvRPF0gE1175011750epsmtrp26;
-        Thu, 22 Jul 2021 05:50:11 +0000 (GMT)
-X-AuditID: b6c32a49-f65ff7000001da4a-c3-60f9098fea23
+        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        57.0B.09595.F8909F06; Thu, 22 Jul 2021 15:00:48 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
+        20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785~UBvPGCgsX1311413114epcas5p2g;
+        Thu, 22 Jul 2021 05:50:09 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
+        epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+        20210722055009epsmtrp136c979ae9ef2327e87a48a66370ac37f~UBvPFQRT03119631196epsmtrp1e;
+        Thu, 22 Jul 2021 05:50:09 +0000 (GMT)
+X-AuditID: b6c32a4a-eebff7000000257b-8b-60f9098fd051
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        72.14.08394.31709F06; Thu, 22 Jul 2021 14:50:11 +0900 (KST)
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        08.6B.08289.11709F06; Thu, 22 Jul 2021 14:50:09 +0900 (KST)
 Received: from ayush.garg-20-10-15 (unknown [107.109.98.149]) by
         epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210722055010epsmtip1a7fe1e5b4d68aa21b5c4301eccf2831c~UBvQLqhZT1275612756epsmtip1C;
-        Thu, 22 Jul 2021 05:50:10 +0000 (GMT)
+        20210722055008epsmtip16e6be481b399800959be0f4b7b4eb380~UBvOWkjlC1099710997epsmtip1d;
+        Thu, 22 Jul 2021 05:50:08 +0000 (GMT)
 From:   Ayush Garg <ayush.garg@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     anupam.r@samsung.com, nitin.j@samsung.com
-Subject: [PATCH BlueZ 3/8] btio: Add BT_IO_PHY option to set le phy options
-Date:   Thu, 22 Jul 2021 11:19:46 +0530
-Message-Id: <20210722054951.8291-4-ayush.garg@samsung.com>
+Subject: [PATCH BlueZ 1/8] doc/device-api: Add Phy property
+Date:   Thu, 22 Jul 2021 11:19:44 +0530
+Message-Id: <20210722054951.8291-2-ayush.garg@samsung.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210722054951.8291-1-ayush.garg@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrIIsWRmVeSWpSXmKPExsWy7bCmhm4/588Eg1uT5CzurLa2mHOtj9li
-        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MqYci+p4LdExZyb/9gbGF8IdzFyckgI
-        mEjMWDOdpYuRi0NIYDejxI2dHxghnE+MEmdut7BDON8YJXb9esgG09J+8QBUYi+jxPkJe1jg
-        WnrXbmUFqWIT0JR4/fELE4gtIqAs8WzfYTCbWUBX4sz7dUCTODiEBbwlVvaBhVkEVCVunnnE
-        DmLzClhJ/Fj5lgVimbzE6g0HmEFsTgFriQOPboItlhCYzC5xds5+dpA5EgIuEvsWB0HUC0u8
-        Or6FHcKWkvj8bi8bRH0zo8SOzRuhmnsYJR786IZ6x17iXNMzVpBBzEBHr9+lDxGWlZh6ah3U
-        zXwSvb+fMEHEeSV2zIOxVSQ2rOqEW/bx2EJmCNtDon/eHSZIoPQxSjR232WcwCg3C2HFAkbG
-        VYySqQXFuempxaYFhnmp5XrFibnFpXnpesn5uZsYwbGs5bmD8e6DD3qHGJk4GA8xSnAwK4nw
-        qhR9TRDiTUmsrEotyo8vKs1JLT7EKM3BoiTOyx4PlBJITyxJzU5NLUgtgskycXBKNTBFh7Pv
-        5vjZffr+tDmaZY/U7SJv+3euEOR8tG81982+ShOXzI49R2ratgg5dNsK8U75Ol++5tgW3esa
-        Kew7l38+ZrVGnaHDdPfDeiO3kKz41LdugXGRj3XzZsiffLUpaDFz9925N2SevDsUFTsrvtVL
-        1M1fRPbkftHiv+dL04/Gf8+3CH3x7szGdL+z5lfrF8lb5B/dc3X1y+lviurcj9zVN1dd4nX7
-        5xY2Nqmd8xeruioziOtubj+Qx5H2xfHY/NrOyYf5JOPr/rQXN2285bu660XV/peJHlxfVkj+
-        ad8/tWVBoYAAE8vuetf7a/tmLb0/38z0YrL/Fb4LfL7fc7Z+K8j/mjbL4sbUe4nc3TeVWIoz
-        Eg21mIuKEwHdVB0kVAMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrAJMWRmVeSWpSXmKPExsWy7bCSnK4w+88Eg/MvFS3urLa2mHOtj9li
-        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MqYci+p4LdExZyb/9gbGF8IdzFyckgI
-        mEi0XzzA3sXIxSEksJtRYt6Bl8xdjBxACSmJx8t0IGqEJVb+ew5V84FR4vqCu2wgCTYBTYnX
-        H78wgdgiAsoSz/YdBrOZBfQlnl64zggyR1jAW2JlH1iYRUBV4uaZR+wgNq+AlcSPlW9ZIObL
-        S6zecIAZxOYUsJY48OgmWI0QUM2911uYJzDyLWBkWMUomVpQnJueW2xYYJiXWq5XnJhbXJqX
-        rpecn7uJERwoWpo7GLev+qB3iJGJg/EQowQHs5IIr0rR1wQh3pTEyqrUovz4otKc1OJDjNIc
-        LErivBe6TsYLCaQnlqRmp6YWpBbBZJk4OKUamFofbBCTXbJGYpODtg2nqsg3o6Pzf/lkzp/U
-        sf/4/E08Mc+93t55srwxru7N7kN6HS7HpL1n+k5dJC6iECcSVP72luuu66lz/vn6Tb7+MdJV
-        9tP8OmHNBffKXk5PEPr1LKl2RwdP7w136cdTrcwWrj7vwOGxfK2/Zt2jI3qBae8vcjTb7pFf
-        s7aUT+/nNqV/1zV+OSwU2KGUsWtD2xV+/QeLZgexir2Ta7x+92hJHOfq3VZRO19X/ClU+8NR
-        2Ka5Len3j8avCYcNFZa5cS3NSdWsvNF6oqvp4c5MQ2ttnl27O5fLZexQ3dZwT4Bv84bT3hP2
-        PHTcUcsR2rhWf8N6e6VXrfdOPeYMMJ4lXv1zdpMSS3FGoqEWc1FxIgA0wTy1gwIAAA==
-X-CMS-MailID: 20210722055011epcas5p15299bfe8f8b8dd58e1354364071608e3
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMIsWRmVeSWpSXmKPExsWy7bCmhu4Ezp8JBu3TmSzurLa2mHOtj9li
+        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MrovrmereAwR8X6A4eYGxi3sXUxcnJI
+        CJhI3Fv+kL2LkYtDSGA3o8SJFTfZIJxPjBI7191jhnA+M0r0/G5kh2l5MfkYM4gtJLCLUeL1
+        ekO4jiWd/WAJNgFNidcfvzCB2CICyhLP9h0Gs5kFdCXOvF8HtltYwFpi/qc9YDaLgKrEiunL
+        WUBsXgEriZ3XTzJCLJOXWL3hANhMTqD6A49ugt0qITCdXWL/mZVQRS4S7zatZ4GwhSVeHd8C
+        damUxMv+NqiGZkaJHZs3Qjk9jBIPfnRDg8Be4lzTM9YuRg6g8zQl1u/ShwjLSkw9tQ7qaj6J
+        3t9PmCDivBI75sHYKhIbVnXCLft4bCEzhO0h0XHrEjQg+xglFu3bxzyBUW4WwooFjIyrGCVT
+        C4pz01OLTQuM8lLL9YoTc4tL89L1kvNzNzGC41nLawfjwwcf9A4xMnEwHmKU4GBWEuFVKfqa
+        IMSbklhZlVqUH19UmpNafIhRmoNFSZyXPR4oJZCeWJKanZpakFoEk2Xi4JRqYNrZmcivvWGl
+        GWOrzqFfF9i+sH2rF8k16wlv4ojyuHcqMt/8hqWM6jtPvqAPGm8+PtUsn3fg6hYjsb6dPnOm
+        8Vn6zcvefGy3tMrGJRLregR4jebZTHSQ948VD/z/bhXPi0OOGzfNcdltzRUTyHTytU9t0+eE
+        wvM/L9x2bz3WIPBC3bLqm8vftb1ONtG/VDwVzvFsvOPbNFF66cRKmW/lKTIT5CTbr0w58TAw
+        MMHmXHh+2v1fyyPuVsjPdb1g4Pi4zMVug8CBx1yZLy7YT8naIpD48RijsJa0d+79JXWX7Se8
+        +nfms8nksCLXD8ltqewbmDKV2x/p3Z/QYTYj24bPo20zx+kj/FNFXpR8NfrrpsRSnJFoqMVc
+        VJwIAMVwWORWAwAA
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEJMWRmVeSWpSXmKPExsWy7bCSnK4g+88Eg2XXRC3urLa2mHOtj9li
+        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MrovrmereAwR8X6A4eYGxi3sXUxcnJI
+        CJhIvJh8jLmLkYtDSGAHo8TZPxOZuhg5gBJSEo+X6UDUCEus/PecHaLmA6PE9PsPWUASbAKa
+        Eq8/fmECsUUElCWe7TsMZjML6Es8vXCdEcQWFrCWmP9pD9gyFgFViRXTl4P18gpYSey8fpIR
+        YoG8xOoNB5hBbE6g+gOPbrKD2EJANfdeb2GewMi3gJFhFaNkakFxbnpusWGBUV5quV5xYm5x
+        aV66XnJ+7iZGcLBoae1g3LPqg94hRiYOxkOMEhzMSiK8KkVfE4R4UxIrq1KL8uOLSnNSiw8x
+        SnOwKInzXug6GS8kkJ5YkpqdmlqQWgSTZeLglGpgOv4nOe3f5ddhbO3qs+d78r1kWLT23YwN
+        GVHHL/37WDxv989U5guBdz+fmjnb7qVR7Fb/twcOpK+6E/TI+muAfqrZnumaP58eYf7NselB
+        wWuP5/0OoWf+19g2iPoISps1WTj/S86QqDycueqzrLGyNP+/DzvW8vAEFN7K1Lfkn87v8W2n
+        TktJ3P9E3xr9XQ3lr19u2HDnzJ8psVJ5lsrenIoxF5PXhRr8j9r96ZWsp/BGNw1VhWk8zhZV
+        b2NXbP3/6fv7SyHvFk6b8idq8mIDv8TSNf8W/8jcf7uO17BgpuCRm0Uv+dcLxfTuM5x1NXrp
+        17y1nx2u6Ai2ikxjWP04YYq/Qt6/q7W7fv6rXPflZpQSS3FGoqEWc1FxIgBcm/0ehQIAAA==
+X-CMS-MailID: 20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20210722055011epcas5p15299bfe8f8b8dd58e1354364071608e3
+X-CMS-RootMailID: 20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785
 References: <20210722054951.8291-1-ayush.garg@samsung.com>
-        <CGME20210722055011epcas5p15299bfe8f8b8dd58e1354364071608e3@epcas5p1.samsung.com>
+        <CGME20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785@epcas5p2.samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds support for the BT_IO_PHY socket
-option through BtIO. This can be used to set preference
-for LE TX & RX PHYs for a particular connection.
+This will allow to set the LE PHY preferences for
+a connected device.
 
 Reviewed-by: Anupam Roy <anupam.r@samsung.com>
 ---
- btio/btio.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
+ doc/device-api.txt | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
 
-diff --git a/btio/btio.c b/btio/btio.c
-index 1f1c374bc..6805ac438 100644
---- a/btio/btio.c
-+++ b/btio/btio.c
-@@ -66,6 +66,7 @@ struct set_opts {
- 	int flushable;
- 	uint32_t priority;
- 	uint16_t voice;
-+	uint32_t phy;
- };
- 
- struct connect {
-@@ -569,6 +570,14 @@ static int set_priority(int sock, uint32_t prio)
- 	return 0;
- }
- 
-+static int l2cap_set_le_phy(int sock, uint32_t phy)
-+{
-+	if (setsockopt(sock, SOL_BLUETOOTH, BT_PHY, &phy, sizeof(phy)) < 0)
-+		return -errno;
+diff --git a/doc/device-api.txt b/doc/device-api.txt
+index 4e824d2de..d0e108f74 100644
+--- a/doc/device-api.txt
++++ b/doc/device-api.txt
+@@ -272,3 +272,25 @@ Properties	string Address [readonly]
+ 			Example:
+ 				<Transport Discovery> <Organization Flags...>
+ 				0x26                   0x01         0x01...
 +
-+	return 0;
-+}
++		array{string} Phy [readwrite, optional]
 +
- static gboolean get_key_size(int sock, int *size, GError **err)
- {
- 	struct bt_security sec;
-@@ -657,7 +666,7 @@ static gboolean set_le_mode(int sock, uint8_t mode, GError **err)
- static gboolean l2cap_set(int sock, uint8_t src_type, int sec_level,
- 				uint16_t imtu, uint16_t omtu, uint8_t mode,
- 				int master, int flushable, uint32_t priority,
--				GError **err)
-+				uint32_t phy, GError **err)
- {
- 	if (imtu || omtu || mode) {
- 		gboolean ret = FALSE;
-@@ -694,6 +703,11 @@ static gboolean l2cap_set(int sock, uint8_t src_type, int sec_level,
- 	if (sec_level && !set_sec_level(sock, BT_IO_L2CAP, sec_level, err))
- 		return FALSE;
- 
-+	if (phy > 0 && l2cap_set_le_phy(sock, phy) < 0) {
-+		ERROR_FAILED(err, "l2cap_set_le_phy", errno);
-+		return FALSE;
-+	}
++			PHY Preferences for a connected device.
 +
- 	return TRUE;
- }
- 
-@@ -834,6 +848,7 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
- 	opts->priority = 0;
- 	opts->src_type = BDADDR_BREDR;
- 	opts->dst_type = BDADDR_BREDR;
-+	opts->phy = 0;
- 
- 	while (opt != BT_IO_OPT_INVALID) {
- 		switch (opt) {
-@@ -904,13 +919,15 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
- 		case BT_IO_OPT_VOICE:
- 			opts->voice = va_arg(args, int);
- 			break;
-+		case BT_IO_OPT_PHY:
-+			opts->phy = va_arg(args, int);
-+			break;
- 		case BT_IO_OPT_INVALID:
- 		case BT_IO_OPT_KEY_SIZE:
- 		case BT_IO_OPT_SOURCE_CHANNEL:
- 		case BT_IO_OPT_DEST_CHANNEL:
- 		case BT_IO_OPT_HANDLE:
- 		case BT_IO_OPT_CLASS:
--		case BT_IO_OPT_PHY:
- 		default:
- 			g_set_error(err, BT_IO_ERROR, EINVAL,
- 					"Unknown option %d", opt);
-@@ -1579,7 +1596,7 @@ gboolean bt_io_set(GIOChannel *io, GError **err, BtIOOption opt1, ...)
- 	case BT_IO_L2CAP:
- 		return l2cap_set(sock, opts.src_type, opts.sec_level, opts.imtu,
- 					opts.omtu, opts.mode, opts.master,
--					opts.flushable, opts.priority, err);
-+					opts.flushable, opts.priority, opts.phy, err);
- 	case BT_IO_RFCOMM:
- 		return rfcomm_set(sock, opts.sec_level, opts.master, err);
- 	case BT_IO_SCO:
-@@ -1629,7 +1646,7 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
- 		if (!l2cap_set(sock, opts->src_type, opts->sec_level,
- 				opts->imtu, opts->omtu, opts->mode,
- 				opts->master, opts->flushable, opts->priority,
--				err))
-+				opts->phy, err))
- 			goto failed;
- 		break;
- 	case BT_IO_RFCOMM:
++			Note: The controller might not be able to make the
++			change because of reasons like peer not supporting
++			the requested PHY or it couldnot schedule due to
++			other activites.
++
++			This is only available for LE capable controllers.
++			It will return Not Supported Otherwise.
++
++			Possible values:
++				"LE1MTX"
++				"LE1MRX"
++				"LE2MTX"
++				"LE2MRX"
++				"LECODEDTX"
++				"LECODEDRX"
++				"LECODEDS2"
++				"LECODEDS8"
 -- 
 2.17.1
 
