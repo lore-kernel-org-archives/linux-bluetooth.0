@@ -7,139 +7,144 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 80A1AC63793
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1AD4C6377D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 676BD6127C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89AD461279
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 06:00:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230376AbhGVFUU (ORCPT
+        id S230397AbhGVFUX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 01:20:20 -0400
-Received: from mailout3.samsung.com ([203.254.224.33]:41591 "EHLO
-        mailout3.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbhGVFUU (ORCPT
+        Thu, 22 Jul 2021 01:20:23 -0400
+Received: from mailout2.samsung.com ([203.254.224.25]:19484 "EHLO
+        mailout2.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230343AbhGVFUW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:20:20 -0400
-Received: from epcas5p1.samsung.com (unknown [182.195.41.39])
-        by mailout3.samsung.com (KnoxPortal) with ESMTP id 20210722060054epoutp03ff929ccb8b5bbf768136c69b6257430c~UB4oA60cf0824508245epoutp03B
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 06:00:54 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout3.samsung.com 20210722060054epoutp03ff929ccb8b5bbf768136c69b6257430c~UB4oA60cf0824508245epoutp03B
+        Thu, 22 Jul 2021 01:20:22 -0400
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+        by mailout2.samsung.com (KnoxPortal) with ESMTP id 20210722060057epoutp02a421aaf98fad0ef58c912b083e5fddae~UB4qZcEF01764317643epoutp02I
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 06:00:57 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.samsung.com 20210722060057epoutp02a421aaf98fad0ef58c912b083e5fddae~UB4qZcEF01764317643epoutp02I
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1626933654;
-        bh=VhAUX2KaLhcD0nEsXOQiKQD6baHytHOBPwc2nY0Hr9o=;
+        s=mail20170921; t=1626933657;
+        bh=pAi250CDFGbNfpdLR4WHLR17XIUus+005tpHnZhisVc=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=Wm4HjPXOh2qmpZz3KoQG6mA6tdeFKbiZrxEDiNdQLmcj1m918MLmDCN0ixlskeo2l
-         mMeLONooD480bSV3xTRNdcV4XDETiJB2qg3TtKVXbIiULanEVg8bzylJvxhczfg/lI
-         dHD7+QZSzyGuj/ptkleMx9lvDrZGVMU7k6s6tDVQ=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
+        b=qsUcVVb3BemxLb0rLwoPVtGvBJSPXeZ47NIi/ZDcjRr+wFrIqjHiU5D56nqvwSOwD
+         mnDciYjGAHLE/+YlPC3pedLgnngeiT9ktuVpTgz5PQGiCyXd2kSSKJC4L4Mev8XuCQ
+         LUWLA/i4jyEvGIfbmZQmnk62AVzAx0SnLVDChWgM=
+Received: from epsmges5p1new.samsung.com (unknown [182.195.42.73]) by
         epcas5p1.samsung.com (KnoxPortal) with ESMTP id
-        20210722060050epcas5p190ce885f3ed971de687fde4dc3ce24c6~UB4jxa9aa2840328403epcas5p1a;
-        Thu, 22 Jul 2021 06:00:50 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        57.0B.09595.F8909F06; Thu, 22 Jul 2021 15:00:48 +0900 (KST)
+        20210722060047epcas5p1aed4914c7362aebdc596b7b67e934f02~UB4hcv_T72576525765epcas5p1V;
+        Thu, 22 Jul 2021 06:00:47 +0000 (GMT)
+Received: from epcas5p4.samsung.com ( [182.195.41.42]) by
+        epsmges5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        0F.03.55882.D8909F06; Thu, 22 Jul 2021 15:00:45 +0900 (KST)
 Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
-        epcas5p2.samsung.com (KnoxPortal) with ESMTPA id
-        20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785~UBvPGCgsX1311413114epcas5p2g;
-        Thu, 22 Jul 2021 05:50:09 +0000 (GMT)
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210722055010epcas5p45a16ff704c37d108a9df0d6c0a1942a8~UBvQAq-iO2535725357epcas5p4G;
+        Thu, 22 Jul 2021 05:50:10 +0000 (GMT)
 Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
         epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
-        20210722055009epsmtrp136c979ae9ef2327e87a48a66370ac37f~UBvPFQRT03119631196epsmtrp1e;
-        Thu, 22 Jul 2021 05:50:09 +0000 (GMT)
-X-AuditID: b6c32a4a-eebff7000000257b-8b-60f9098fd051
+        20210722055010epsmtrp1ce7e23b831485f35ef28327a459700e3~UBvP-taDv3087030870epsmtrp1X;
+        Thu, 22 Jul 2021 05:50:10 +0000 (GMT)
+X-AuditID: b6c32a49-f65ff7000001da4a-b7-60f9098ddf3e
 Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
         epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
-        08.6B.08289.11709F06; Thu, 22 Jul 2021 14:50:09 +0900 (KST)
+        09.6B.08289.21709F06; Thu, 22 Jul 2021 14:50:10 +0900 (KST)
 Received: from ayush.garg-20-10-15 (unknown [107.109.98.149]) by
         epsmtip1.samsung.com (KnoxPortal) with ESMTPA id
-        20210722055008epsmtip16e6be481b399800959be0f4b7b4eb380~UBvOWkjlC1099710997epsmtip1d;
-        Thu, 22 Jul 2021 05:50:08 +0000 (GMT)
+        20210722055009epsmtip1524cc0293ebfce1a1f9d8d23e70f0772~UBvPQey2n1099710997epsmtip1e;
+        Thu, 22 Jul 2021 05:50:09 +0000 (GMT)
 From:   Ayush Garg <ayush.garg@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     anupam.r@samsung.com, nitin.j@samsung.com
-Subject: [PATCH BlueZ 1/8] doc/device-api: Add Phy property
-Date:   Thu, 22 Jul 2021 11:19:44 +0530
-Message-Id: <20210722054951.8291-2-ayush.garg@samsung.com>
+Subject: [PATCH BlueZ 2/8] doc/mgmt-api: Add support for LE PHY Update
+ Complete event
+Date:   Thu, 22 Jul 2021 11:19:45 +0530
+Message-Id: <20210722054951.8291-3-ayush.garg@samsung.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210722054951.8291-1-ayush.garg@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMIsWRmVeSWpSXmKPExsWy7bCmhu4Ezp8JBu3TmSzurLa2mHOtj9li
-        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MrovrmereAwR8X6A4eYGxi3sXUxcnJI
-        CJhI3Fv+kL2LkYtDSGA3o8SJFTfZIJxPjBI7191jhnA+M0r0/G5kh2l5MfkYM4gtJLCLUeL1
-        ekO4jiWd/WAJNgFNidcfvzCB2CICyhLP9h0Gs5kFdCXOvF8HtltYwFpi/qc9YDaLgKrEiunL
-        WUBsXgEriZ3XTzJCLJOXWL3hANhMTqD6A49ugt0qITCdXWL/mZVQRS4S7zatZ4GwhSVeHd8C
-        damUxMv+NqiGZkaJHZs3Qjk9jBIPfnRDg8Be4lzTM9YuRg6g8zQl1u/ShwjLSkw9tQ7qaj6J
-        3t9PmCDivBI75sHYKhIbVnXCLft4bCEzhO0h0XHrEjQg+xglFu3bxzyBUW4WwooFjIyrGCVT
-        C4pz01OLTQuM8lLL9YoTc4tL89L1kvNzNzGC41nLawfjwwcf9A4xMnEwHmKU4GBWEuFVKfqa
-        IMSbklhZlVqUH19UmpNafIhRmoNFSZyXPR4oJZCeWJKanZpakFoEk2Xi4JRqYNrZmcivvWGl
-        GWOrzqFfF9i+sH2rF8k16wlv4ojyuHcqMt/8hqWM6jtPvqAPGm8+PtUsn3fg6hYjsb6dPnOm
-        8Vn6zcvefGy3tMrGJRLregR4jebZTHSQ948VD/z/bhXPi0OOGzfNcdltzRUTyHTytU9t0+eE
-        wvM/L9x2bz3WIPBC3bLqm8vftb1ONtG/VDwVzvFsvOPbNFF66cRKmW/lKTIT5CTbr0w58TAw
-        MMHmXHh+2v1fyyPuVsjPdb1g4Pi4zMVug8CBx1yZLy7YT8naIpD48RijsJa0d+79JXWX7Se8
-        +nfms8nksCLXD8ltqewbmDKV2x/p3Z/QYTYj24bPo20zx+kj/FNFXpR8NfrrpsRSnJFoqMVc
-        VJwIAMVwWORWAwAA
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEJMWRmVeSWpSXmKPExsWy7bCSnK4g+88Eg2XXRC3urLa2mHOtj9li
-        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4MrovrmereAwR8X6A4eYGxi3sXUxcnJI
-        CJhIvJh8jLmLkYtDSGAHo8TZPxOZuhg5gBJSEo+X6UDUCEus/PecHaLmA6PE9PsPWUASbAKa
-        Eq8/fmECsUUElCWe7TsMZjML6Es8vXCdEcQWFrCWmP9pD9gyFgFViRXTl4P18gpYSey8fpIR
-        YoG8xOoNB5hBbE6g+gOPbrKD2EJANfdeb2GewMi3gJFhFaNkakFxbnpusWGBUV5quV5xYm5x
-        aV66XnJ+7iZGcLBoae1g3LPqg94hRiYOxkOMEhzMSiK8KkVfE4R4UxIrq1KL8uOLSnNSiw8x
-        SnOwKInzXug6GS8kkJ5YkpqdmlqQWgSTZeLglGpgOv4nOe3f5ddhbO3qs+d78r1kWLT23YwN
-        GVHHL/37WDxv989U5guBdz+fmjnb7qVR7Fb/twcOpK+6E/TI+muAfqrZnumaP58eYf7NselB
-        wWuP5/0OoWf+19g2iPoISps1WTj/S86QqDycueqzrLGyNP+/DzvW8vAEFN7K1Lfkn87v8W2n
-        TktJ3P9E3xr9XQ3lr19u2HDnzJ8psVJ5lsrenIoxF5PXhRr8j9r96ZWsp/BGNw1VhWk8zhZV
-        b2NXbP3/6fv7SyHvFk6b8idq8mIDv8TSNf8W/8jcf7uO17BgpuCRm0Uv+dcLxfTuM5x1NXrp
-        17y1nx2u6Ai2ikxjWP04YYq/Qt6/q7W7fv6rXPflZpQSS3FGoqEWc1FxIgBcm/0ehQIAAA==
-X-CMS-MailID: 20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrEIsWRmVeSWpSXmKPExsWy7bCmlm4v588Eg427WCzurLa2mHOtj9li
+        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4Mp4f3QDY8Eczor9nTfYGhjnsncxcnJI
+        CJhIHJg6l6WLkYtDSGA3o8SRjgvsEM4nRomNDy5BZT4zSpz48JENpuVWy0eoql2MEs2f3rPB
+        tXy8/ZsVpIpNQFPi9ccvTCC2iICyxLN9h8FsZgFdiTPv14FNEhYIl7j+cwKQzcHBIqAqMXFe
+        GkiYV8BK4k/DKiaIZfISqzccYAaxOQWsJQ48ugm2WEJgMrvElhPTGUF6JQRcJB79hvpHWOLV
+        8S1QtpTEy/42qPpmRokdmzdCOT2MEg9+dEO9Yy9xrukZK8ggZqCj1+/ShwjLSkw9tQ7qZj6J
+        3t9PoA7ildgxD8ZWkdiwqhNu2cdjC5khbA+J1v1ToYHSxyhx8sYG5gmMcrMQVixgZFzFKJla
+        UJybnlpsWmCYl1quV5yYW1yal66XnJ+7iREczVqeOxjvPvigd4iRiYPxEKMEB7OSCK9K0dcE
+        Id6UxMqq1KL8+KLSnNTiQ4zSHCxK4rzs8UApgfTEktTs1NSC1CKYLBMHp1QDk1vc3oP3nvwp
+        KNZleS0/Z5XkUbuPkx5KJzwT83O0npm8aua7qd9juxxj9zxZefbcVc8n8WKRR4WZLukXnL64
+        8d0UueKrFSXO56foSbMePdEndXrbwsk8rmJX9z29pLt5UlriozWJ1c5vLkdMyy1W2LBf7qxQ
+        VcRfu4ldB626LV04N+mI+EVrBKXlvJjTvXrTzHXXFEP/+xotu75XOUrzRspVBlv1wCcxyzTu
+        3VRyjTtxw+nT/X0/21tDd6YyPVpykqPp99uN/BkPjlu8fZYdwuuwwlOthXeG5xvpiRJMf86l
+        zf/oVLPqusMRYZFtETO/ycyyPR/r6Jd2oTHgsseRl0GT7m5x/tIXe/Ze4G7Gog1KLMUZiYZa
+        zEXFiQBpl59QVQMAAA==
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIJMWRmVeSWpSXmKPExsWy7bCSnK4Q+88Eg93HRSzurLa2mHOtj9li
+        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4Mp4f3QDY8Eczor9nTfYGhjnsncxcnJI
+        CJhI3Gr5CGRzcQgJ7GCU2PnkI3MXIwdQQkri8TIdiBphiZX/nkPVfGCUOH9nGhtIgk1AU+L1
+        xy9MILaIgLLEs32HwWxmAX2JpxeuM4LYwgKhEp9nPGQCmckioCoxcV4aSJhXwEriT8MqJoj5
+        8hKrNxxgBrE5BawlDjy6CXabEFDNvddbmCcw8i1gZFjFKJlaUJybnltsWGCUl1quV5yYW1ya
+        l66XnJ+7iREcKlpaOxj3rPqgd4iRiYPxEKMEB7OSCK9K0dcEId6UxMqq1KL8+KLSnNTiQ4zS
+        HCxK4rwXuk7GCwmkJ5akZqemFqQWwWSZODilGpi8CzUVf1dfj9I79VaP4YiP+iL1JLe3s3c8
+        jv527M7S0MyZVefvSlTVRpvLmmRe0ZmZb5K+bGJMbsID5a3X9u88oPGTq74tzn91WMNPIeez
+        pdPXRE/mibvz53y1qvbJ1JoJfWvuSi/h3y8gt3R1gmbpTvEfK2oPMWXLLTuzSaG34l94XvWF
+        qWl7nap+zTuuoSUexZkpK/mUc41C6SuXpcd25N6wM7zSfzQqIMX8WDPv64w1S69m7+kSLdhR
+        G2Ry/UfaUeG9Tzdw2Cx5sP/n5+/fXhz4J7I+fMeSef0OJy5O2XAg6H2Q9s/Hvx/KHSzUfKUv
+        l3Pr78NnIh7bcye5ii069K5+t4OpuvjbjxLlBp1eSizFGYmGWsxFxYkABIjs1oQCAAA=
+X-CMS-MailID: 20210722055010epcas5p45a16ff704c37d108a9df0d6c0a1942a8
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785
+X-CMS-RootMailID: 20210722055010epcas5p45a16ff704c37d108a9df0d6c0a1942a8
 References: <20210722054951.8291-1-ayush.garg@samsung.com>
-        <CGME20210722055009epcas5p25e4997aa7e53cb2a6e3780fdb7301785@epcas5p2.samsung.com>
+        <CGME20210722055010epcas5p45a16ff704c37d108a9df0d6c0a1942a8@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This will allow to set the LE PHY preferences for
-a connected device.
-
 Reviewed-by: Anupam Roy <anupam.r@samsung.com>
 ---
- doc/device-api.txt | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+ doc/mgmt-api.txt | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/doc/device-api.txt b/doc/device-api.txt
-index 4e824d2de..d0e108f74 100644
---- a/doc/device-api.txt
-+++ b/doc/device-api.txt
-@@ -272,3 +272,25 @@ Properties	string Address [readonly]
- 			Example:
- 				<Transport Discovery> <Organization Flags...>
- 				0x26                   0x01         0x01...
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 5355fedb0..f7379fcd9 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -4910,3 +4910,32 @@ Controller Resume Event
+ 	Address_Type. Otherwise, Address and Address_Type will both be zero.
+ 
+ 	This event will be sent to all management sockets.
 +
-+		array{string} Phy [readwrite, optional]
 +
-+			PHY Preferences for a connected device.
++LE PHY Update Complete Event
++===============================
 +
-+			Note: The controller might not be able to make the
-+			change because of reasons like peer not supporting
-+			the requested PHY or it couldnot schedule due to
-+			other activites.
++	Event Code:		0x002f
++	Controller Index:	<controller id>
++	Event Parameters:	Address (6 Octets)
++				Address_Type (1 Octet)
++				Status (1 Octet)
++				PHYs (4 Octets)
 +
-+			This is only available for LE capable controllers.
-+			It will return Not Supported Otherwise.
++	This event indicates that LE PHYs have been changed for this
++	connected device.
 +
-+			Possible values:
-+				"LE1MTX"
-+				"LE1MRX"
-+				"LE2MTX"
-+				"LE2MRX"
-+				"LECODEDTX"
-+				"LECODEDRX"
-+				"LECODEDS2"
-+				"LECODEDS8"
++	The PHYs parameters are a bitmask with currently the
++	following available bits:
++
++		9	LE 1M TX
++		10	LE 1M RX
++		11	LE 2M TX
++		12	LE 2M RX
++		13	LE Coded TX
++		14	LE Coded RX
++
++	This event will be used in case of autonomous PHY update made
++	by the controller or HCI_LE_SET_PHY command succeeded.
++
++	This event will be sent to all management sockets.
 -- 
 2.17.1
 
