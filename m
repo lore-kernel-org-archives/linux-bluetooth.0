@@ -2,94 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9631C63793
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:39:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BC79DC6377D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:42:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BECB561278
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:39:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 944FA6100C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 14:42:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232290AbhGVN6j convert rfc822-to-8bit (ORCPT
+        id S232359AbhGVOBm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 09:58:39 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47706 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230343AbhGVN6j (ORCPT
+        Thu, 22 Jul 2021 10:01:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230343AbhGVOBm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 09:58:39 -0400
-Received: from smtpclient.apple (p5b3d2eb8.dip0.t-ipconnect.de [91.61.46.184])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E3DF1CECDF;
-        Thu, 22 Jul 2021 16:39:12 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH] Bluetooth: skip invalid hci_sync_conn_complete_evt
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210721101710.82974-1-desmondcheongzx@gmail.com>
-Date:   Thu, 22 Jul 2021 16:39:12 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org, gregkh@linuxfoundation.org,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <A47B24AE-C807-4ADA-B0F7-8283ACC83BF7@holtmann.org>
-References: <20210721101710.82974-1-desmondcheongzx@gmail.com>
-To:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Thu, 22 Jul 2021 10:01:42 -0400
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAD0C061575
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 07:42:16 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id x24so3927624ljm.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 07:42:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kempniu.pl; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:content-transfer-encoding:in-reply-to;
+        bh=lnZ6Y0OTHt96qItLs6yg95ugZMUGh5/BVyNiweYbsvE=;
+        b=QZcUfiedvMOhjhYMEOzpHNPY6txRK8E0f3kcF6O+CkxRWhebVg6LanJ31J9bnMCTdY
+         qF2ynSs8iOTxQM8KJIVq1oPfhP3ALLx+mgu7gsKPYLbto8GTzbpRrQgzCv+v+1hxbRKa
+         DVFhCuVO39DVvikTPgMi2NVpNQ0B/1uDewaAk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=lnZ6Y0OTHt96qItLs6yg95ugZMUGh5/BVyNiweYbsvE=;
+        b=t+Jr93m4VLz1cihm/GV5NVhrrBO/AKDAFZDfaJ984QrCeZ4wQ57HL12HqdJSxPQH2t
+         EDvvj48yDtjRG1y20QHRlDewMRa9meMFWj+mSh0FLrqymfd61SFA6EDnDum6oMa5dn8p
+         YDbQq9fJE5suIsgwdKPO/W2/HmDviJ/FNKCx/Y15grORxSz1cRytHmuviNujSmTyNfWx
+         Wsdrrj7GIot5WMDG1M+J27d2hp3kOJNhhcoAJLBN/IRXah+GuSmfS38OpId/WdAw72Uj
+         /Xu01u+oOMNaNHAGc6vBAIBSNMbf+N82Ys7q25H3rkDVb7A9wTJUpXJkxJe/+p65ZMky
+         94xw==
+X-Gm-Message-State: AOAM5317mwSuKt/BEpXMJOcs65m/51yV486fD0LOwvGAmgvr350fzkWL
+        RhUt5bQ2FH4IxIvp8sZy1n3625yGWZrqPuPJdEp3dA==
+X-Google-Smtp-Source: ABdhPJwQyiasNG78Zd437qTFw3hLIozTK1rUo27LtcrqlOcLyxLP1W6HnGG7eO3uPC9K/JDhEtgwKQ==
+X-Received: by 2002:a2e:b162:: with SMTP id a2mr241756ljm.290.1626964934666;
+        Thu, 22 Jul 2021 07:42:14 -0700 (PDT)
+Received: from larwa.hq.kempniu.pl ([2001:470:64df:111::e02])
+        by smtp.gmail.com with ESMTPSA id f12sm1994395lfu.67.2021.07.22.07.42.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jul 2021 07:42:14 -0700 (PDT)
+Date:   Thu, 22 Jul 2021 16:42:12 +0200
+From:   =?utf-8?B?TWljaGHFgiBLxJlwaWXFhA==?= <kernel@kempniu.pl>
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Subject: Re: [PATCH] Bluetooth: btusb: check SCO MTU before enabling USB ALT
+ 3 for WBS
+Message-ID: <YPmDxETlABDcAXXF@larwa.hq.kempniu.pl>
+References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
+ <YPly1RR8V33T3odj@larwa.hq.kempniu.pl>
+ <f32df70b9aaccfbb471a6305c5b4884ae14dede3.camel@iki.fi>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <f32df70b9aaccfbb471a6305c5b4884ae14dede3.camel@iki.fi>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Desmond,
+Pauli,
 
-> Syzbot reported a corrupted list in kobject_add_internal [1]. This
-> happens when multiple HCI_EV_SYNC_CONN_COMPLETE event packets with
-> status 0 are sent for the same HCI connection. This causes us to
-> register the device more than once which corrupts the kset list.
+> Thanks for testing! What userspace software did you use? Pulseaudio at
+> least I think had assumption that mtu <= 60, which breaks here
+> (Pipewire works, don't know about bluez-alsa). If otherwise, maybe it
+> then needs also the manufacturer flag.
 
-and that is actually forbidden by the spec. So we need to complain loudly that such a device is misbehaving.
+I am using Pipewire 0.3.32.
 
-> To fix this, in hci_sync_conn_complete_evt, we check whether we're
-> trying to process the same HCI_EV_SYNC_CONN_COMPLETE event multiple
-> times for one connection. If that's the case, the event is invalid, so
-> we skip further processing and exit.
-> 
-> Link: https://syzkaller.appspot.com/bug?extid=66264bf2fd0476be7e6c [1]
-> Reported-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-> Tested-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
-> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-> ---
-> net/bluetooth/hci_event.c | 2 ++
-> 1 file changed, 2 insertions(+)
-> 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index 016b2999f219..091a92338492 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -4373,6 +4373,8 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
-> 
-> 	switch (ev->status) {
-> 	case 0x00:
-> +		if (conn->state == BT_CONNECTED)
-> +			goto unlock;  /* Already connected, event not valid */
+When I wrote "this adapter (...) reports an SCO MTU of 96 bytes" in my
+previous message, I meant that this was the value present in
+hdev->sco_mtu around the problematic code location.  If this was the
+wrong thing to take a look at, please let me know.
 
-The comment has go above and be a lot more details since this is not expected behavior from valid hardware and we should add a bt_dev_err as well.
-
-> 		conn->handle = __le16_to_cpu(ev->handle);
-> 		conn->state  = BT_CONNECTED;
-> 		conn->type   = ev->link_type;
-
-Regards
-
-Marcel
-
+-- 
+Best regards,
+Michał Kępień
