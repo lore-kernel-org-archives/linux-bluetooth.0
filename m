@@ -7,207 +7,197 @@ X-Spam-Status: No, score=-20.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 995EEC63793
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 05:59:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AAC8EC6377D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 05:59:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EEC26120C
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 05:59:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 934F660FE7
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 22 Jul 2021 05:59:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230153AbhGVFTH (ORCPT
+        id S230330AbhGVFTN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 22 Jul 2021 01:19:07 -0400
-Received: from mailout1.samsung.com ([203.254.224.24]:48038 "EHLO
+        Thu, 22 Jul 2021 01:19:13 -0400
+Received: from mailout1.samsung.com ([203.254.224.24]:48114 "EHLO
         mailout1.samsung.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230137AbhGVFTG (ORCPT
+        with ESMTP id S230283AbhGVFTK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 22 Jul 2021 01:19:06 -0400
-Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
-        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210722055941epoutp01e09889a6a81be821ebc976f67474c463~UB3joKRr41867818678epoutp011
-        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 05:59:41 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210722055941epoutp01e09889a6a81be821ebc976f67474c463~UB3joKRr41867818678epoutp011
+        Thu, 22 Jul 2021 01:19:10 -0400
+Received: from epcas5p4.samsung.com (unknown [182.195.41.42])
+        by mailout1.samsung.com (KnoxPortal) with ESMTP id 20210722055945epoutp01b00239ee135cc4af52ffc545d7e0f947~UB3nh4-BL1720917209epoutp01O
+        for <linux-bluetooth@vger.kernel.org>; Thu, 22 Jul 2021 05:59:45 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout1.samsung.com 20210722055945epoutp01b00239ee135cc4af52ffc545d7e0f947~UB3nh4-BL1720917209epoutp01O
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-        s=mail20170921; t=1626933581;
-        bh=EUChzWKcOMrlauR7u+IEDeWBTjjDHcEGJ3f050q2Uec=;
+        s=mail20170921; t=1626933585;
+        bh=yvLhXLJo1gC7HS333Qbuv5u1JDJYWuVzLFpYxe56V20=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=QRb9t1l1TJfpxNT6d4jPMO3QMpVWsJUhPpI8+iQzb7MDGJMurZk2jHWiCZQ/0bZW8
-         Laq6xZkzJbhg9kavDEwuOikeECp7U1ac/EwNZ7LWLtO4esU5qJ3UXJ7CkCl4VeICtH
-         BKn0qPmsWwau/n+gFK+Y77D5n3gx8XVc9waXv/6I=
-Received: from epsmges5p2new.samsung.com (unknown [182.195.42.74]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTP id
-        20210722055940epcas5p381c52bf95fdff4d4a527cd150ad8b150~UB3jSubBH0717107171epcas5p3E;
-        Thu, 22 Jul 2021 05:59:40 +0000 (GMT)
-Received: from epcas5p2.samsung.com ( [182.195.41.40]) by
-        epsmges5p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        CD.6A.09595.C4909F06; Thu, 22 Jul 2021 14:59:40 +0900 (KST)
+        b=mZllkImtjMLq+H0gzLJr9bDIfTzDZMxwg4DUUYTStDi3hHSpVnVPtOWbAiXNES7fP
+         uiTg+UE8UFZFIraYVStJKRkDA4EyPsdFMIHHEqUd1s5mUEkqL3zwNA772TR3EGJ4A3
+         t4HmxMNU3mZVfJumwqGk0/Ij6l8CuxaxA2Uw1Muo=
+Received: from epsmges5p3new.samsung.com (unknown [182.195.42.75]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTP id
+        20210722055944epcas5p40b71697b2264707675b2ddb5c57585b7~UB3m_q-6m1890418904epcas5p4d;
+        Thu, 22 Jul 2021 05:59:44 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+        epsmges5p3new.samsung.com (Symantec Messaging Gateway) with SMTP id
+        78.DA.11627.05909F06; Thu, 22 Jul 2021 14:59:44 +0900 (KST)
 Received: from epsmtrp2.samsung.com (unknown [182.195.40.14]) by
-        epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
-        20210722052743epcas5p34af6f55c11db2e8909c2730fae7e1cac~UBbpl7Orb1662316623epcas5p33;
-        Thu, 22 Jul 2021 05:27:43 +0000 (GMT)
-Received: from epsmgms1p1new.samsung.com (unknown [182.195.42.41]) by
+        epcas5p4.samsung.com (KnoxPortal) with ESMTPA id
+        20210722052744epcas5p46996d48d12500c39b4b63dfcecd30d37~UBbqkvSTs2470224702epcas5p46;
+        Thu, 22 Jul 2021 05:27:44 +0000 (GMT)
+Received: from epsmgms1p2.samsung.com (unknown [182.195.42.42]) by
         epsmtrp2.samsung.com (KnoxPortal) with ESMTP id
-        20210722052743epsmtrp2c71eef4f0532502dc569bb90005b1be6~UBbplNlk70094500945epsmtrp2F;
-        Thu, 22 Jul 2021 05:27:43 +0000 (GMT)
-X-AuditID: b6c32a4a-eebff7000000257b-40-60f9094cd075
+        20210722052744epsmtrp2ea4a84d369d2fd698dcbba2fde7cb175~UBbqj1DrS0094500945epsmtrp2I;
+        Thu, 22 Jul 2021 05:27:44 +0000 (GMT)
+X-AuditID: b6c32a4b-acdff70000022d6b-e0-60f90950e30c
 Received: from epsmtip2.samsung.com ( [182.195.34.31]) by
-        epsmgms1p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
-        F0.91.08394.EC109F06; Thu, 22 Jul 2021 14:27:42 +0900 (KST)
+        epsmgms1p2.samsung.com (Symantec Messaging Gateway) with SMTP id
+        46.F8.08289.FC109F06; Thu, 22 Jul 2021 14:27:43 +0900 (KST)
 Received: from ayush.garg-20-10-15 (unknown [107.109.98.149]) by
         epsmtip2.samsung.com (KnoxPortal) with ESMTPA id
-        20210722052742epsmtip2238d96986118fbf5fb0810618db16aee~UBbo2sDSM0837808378epsmtip2W;
-        Thu, 22 Jul 2021 05:27:42 +0000 (GMT)
+        20210722052743epsmtip2ea20deabdf9a767dfa56b4d092af9aaa~UBbpwbzwe0848408484epsmtip2N;
+        Thu, 22 Jul 2021 05:27:43 +0000 (GMT)
 From:   Ayush Garg <ayush.garg@samsung.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     anupam.r@samsung.com, nitin.j@samsung.com
-Subject: [PATCH BlueZ 6/7] client: Add support for get/set PHY configuration
- in bluetoothctl
-Date:   Thu, 22 Jul 2021 10:56:39 +0530
-Message-Id: <20210722052640.5863-7-ayush.garg@samsung.com>
+Subject: [PATCH BlueZ 7/7] adapter: Save PHY Configuration in storage and
+ read it at init
+Date:   Thu, 22 Jul 2021 10:56:40 +0530
+Message-Id: <20210722052640.5863-8-ayush.garg@samsung.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210722052640.5863-1-ayush.garg@samsung.com>
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrMIsWRmVeSWpSXmKPExsWy7bCmhq4P588Egx/PFC3urLa2mHOtj9li
-        27p2Zgdmj74tqxg9Pm+SC2CK4rJJSc3JLEst0rdL4Mro2JxSME+morVpKXsD42vxLkZODgkB
-        E4nur51sXYxcHEICuxkldm9+yQjhfGKU+PNmO1TmG6PEs8YZzDAt387cZYJI7GWUmP5wEStc
-        y6U/RxhBqtgENCVef/zCBGKLCChLPNt3GMxmFtCVOPN+HRuILSwQJ9E2fzOYzSKgKtH5bDU7
-        iM0rYCXx++UOqG3yEqs3HACzOQWsJWb0vmEGWSYh0M8usejEdnaIIheJx4tmsUHYwhKvjm+B
-        iktJfH63lw2ioZlRYsfmjewQTg+jxIMf3VAd9hLnmp4B/cABdJ6mxPpd+hBhWYmpp9ZBXc0n
-        0fv7CRNEnFdixzwYW0Viw6pOuGUfjy2EutpDYsWJx+yQYOljlFg+fyLzBEa5WQgrFjAyrmKU
-        TC0ozk1PLTYtMMpLLdcrTswtLs1L10vOz93ECI5nLa8djA8ffNA7xMjEwXiIUYKDWUmEV6Xo
-        a4IQb0piZVVqUX58UWlOavEhRmkOFiVxXvZ4oJRAemJJanZqakFqEUyWiYNTqoFJc/ovxoB9
-        VqfsG9NKIlekJ38rc4558ehgX3XoPNfjh56K+u/ePdvCaJPu2rbUlLDdRzlnGH8XKkv13LYi
-        6pbhpdeNIv8qsmT3nvp7RE6n+aygWL1z3+zwQNWGCXMD+R5UtZn+TuPYd3+d4vb5G7VmcN84
-        uu5FsP7KD7N93i0rfqnFn8XRmn2XxUbkit3cyRk6lqKp3P19E65NtPV5V5pb/1a568LsbY7r
-        JMPPcjB80WbYednS6snhnWVPlPPcv7ZNiJZ59/hLzifmgMSeU+trDnos/2qqf6d319IG2dnq
-        3FkFAqqm74sZjnGFaga8Obe9rl90HxMvg1f8apcj/1RsuJ7yfFhkK29XZRjRP1+JpTgj0VCL
-        uag4EQDuGO81VgMAAA==
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrIJMWRmVeSWpSXmKPExsWy7bCSvO45xp8JBt9mmlvcWW1tMedaH7PF
-        tnXtzA7MHn1bVjF6fN4kF8AUxWWTkpqTWZZapG+XwJXRsTmlYJ5MRWvTUvYGxtfiXYycHBIC
-        JhLfztxl6mLk4hAS2M0o0XHwMJDDAZSQkni8TAeiRlhi5b/n7BA1Hxgljp5YwgiSYBPQlHj9
-        8QsTiC0ioCzxbN9hMJtZQF/i6YXrYDXCAjESUx89BouzCKhKdD5bzQ5i8wpYSfx+uYMZYoG8
-        xOoNB8BsTgFriRm9b8BsIaCapV/2sk1g5FvAyLCKUTK1oDg3PbfYsMAwL7Vcrzgxt7g0L10v
-        OT93EyM4VLQ0dzBuX/VB7xAjEwfjIUYJDmYlEV6Voq8JQrwpiZVVqUX58UWlOanFhxilOViU
-        xHkvdJ2MFxJITyxJzU5NLUgtgskycXBKNTBdMP7RUcb6bPFkr02ia6ZHzj24qK61dOabeYV3
-        NIumLT11vWnf/Pm7Dim7rdeyZj7t8fD9QtV5i2ZuqZvs6/DV0ny25q8L/u+mfNiWnz71Hvee
-        l9O4jjVd91d2awiTPn4t7toL5vlFP49InNu8yzzlYb/76vcTtoT7mS+s3pwe3GBQuyzHwYfp
-        EnMFS7hllihzm0li9YfSK93uC4676/Cmy2vF113vLVI6kMMpLRkukSLxOoehOidd8GvMjnnn
-        Xrtel40qiDv3XnDdp199AvdvxcW6XJ58WvaNd9hjeZfmh4+fPf7y2brKW+bPhPTOfc+E911Z
-        eGOJXUDuL9El19Pn7S8IYJpivKH8kYl4ra+QEktxRqKhFnNRcSIA5BPu4YQCAAA=
-X-CMS-MailID: 20210722052743epcas5p34af6f55c11db2e8909c2730fae7e1cac
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFjrCIsWRmVeSWpSXmKPExsWy7bCmpm4A588Eg+Pd4hZ3VltbzLnWx2yx
+        bV07swOzR9+WVYwenzfJBTBFcdmkpOZklqUW6dslcGU8uDGLpaBXsuLR7jksDYyfRLoYOTkk
+        BEwkPpz8wNzFyMUhJLCbUeJT6y82COcTo8TuWdcYIZzPjBJTd2xjh2lZerkBqmoXo8S8E2eY
+        4Vp+XZ0OVsUmoCnx+uMXJhBbREBZ4tm+w2A2s4CuxJn369hAbGGBaIm70z6xgtgsAqoSp7qn
+        g8V5Bawk7vdsgdomL7F6wwFmEJtTwFpiRu8bsGUSApPZJXau2ccKUeQicX/lX2YIW1ji1XGY
+        ZimJz+/2skE0NDNK7Ni8kR3C6WGUePCjmw2iyl7iXNMzoEkcQOdpSqzfpQ8RlpWYemod1NV8
+        Er2/nzBBxHkldsyDsVUkNqzqhFv28dhCqCM8JBqvbmSBBEsfo8S2v3uYJzDKzUJYsYCRcRWj
+        ZGpBcW56arFpgXFearlecWJucWleul5yfu4mRnBEa3nvYHz04IPeIUYmDsZDjBIczEoivCpF
+        XxOEeFMSK6tSi/Lji0pzUosPMUpzsCiJ87LHA6UE0hNLUrNTUwtSi2CyTBycUg1MrJMlTrlO
+        r+JrVd7Tnd0Wyc4WdXfhxpt/Cj5fDZ0lp83atez9BtH1DiLeF549O5JWcfR00f+9zt9ebl5+
+        Rf/bscz8sgsHuEI7p2i+E/pY8mC1447y4kwGR/U1/cIORl9FOeZr3n0uI2770zqkjXl1ULRy
+        y3QVi4YnywV2Gm4sCow78/d0a5f31gvHD5w1LZZlv69ccSg1vuNp18cZ/up7lj1j+ch2W0VM
+        xPIWm+FzUZEJDvYnF9xJff7/6IGz1+PPfe7qkHEOO3rUX15b7dlNg576qkc79nHKdjsZSCTv
+        8/80b+qPUxqKeX8ji94wqJayX7c6/yLxe4Jlxz/nGV/ZAldd6jz4ucA/Nfzf5Ef3lViKMxIN
+        tZiLihMBcr7O5FcDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrEJMWRmVeSWpSXmKPExsWy7bCSvO55xp8JBieemlvcWW1tMedaH7PF
+        tnXtzA7MHn1bVjF6fN4kF8AUxWWTkpqTWZZapG+XwJXx4MYsloJeyYpHu+ewNDB+Euli5OSQ
+        EDCRWHq5ga2LkYtDSGAHo8TzXdeAHA6ghJTE42U6EDXCEiv/PWeHqPnAKLH41X5mkASbgKbE
+        649fmEBsEQFliWf7DoPZzAL6Ek8vXGcEsYUFIiVmznoFVs8ioCpxqns6G4jNK2Alcb9nCzvE
+        AnmJ1RsOgNVwClhLzOh9A2YLAdUs/bKXbQIj3wJGhlWMkqkFxbnpucWGBUZ5qeV6xYm5xaV5
+        6XrJ+bmbGMHBoqW1g3HPqg96hxiZOBgPMUpwMCuJ8KoUfU0Q4k1JrKxKLcqPLyrNSS0+xCjN
+        waIkznuh62S8kEB6YklqdmpqQWoRTJaJg1OqganI++kRQ5mlPowh6yao7klgV/Q7FPJw5aLJ
+        M9T75fae8tV97nNV9O29vg9e2ncFpt+77pZ+5XeT45cd/Gr7je+wLrdzyLv2Y0FfkR2PcpM8
+        55EjL8x+Kt194Cgft+vqx//qT240z94fGGIpwfxpUeHdmnt3ar/5ljjUN1y6x8KfueSeYnbh
+        rsRfCa5r5Kf6/axbnLrl64ONIjd4frC6FibbGHaJnLf+M/H6+0e9AnFXHvF929lcGdso5DXl
+        aol22u6sLRPWvd4X1vKgiTfq+aE7bkpz+yVf3OraVP9TMGz1dC6fszf/uy7zeDJZa/vCWOcf
+        KpLPK3fG5/989+vo9s4kY2lf6w+FXWlGx3yWxCorsRRnJBpqMRcVJwIASwF8soUCAAA=
+X-CMS-MailID: 20210722052744epcas5p46996d48d12500c39b4b63dfcecd30d37
 X-Msg-Generator: CA
 Content-Type: text/plain; charset="utf-8"
 X-Sendblock-Type: REQ_APPROVE
 CMS-TYPE: 105P
-X-CMS-RootMailID: 20210722052743epcas5p34af6f55c11db2e8909c2730fae7e1cac
+X-CMS-RootMailID: 20210722052744epcas5p46996d48d12500c39b4b63dfcecd30d37
 References: <20210722052640.5863-1-ayush.garg@samsung.com>
-        <CGME20210722052743epcas5p34af6f55c11db2e8909c2730fae7e1cac@epcas5p3.samsung.com>
+        <CGME20210722052744epcas5p46996d48d12500c39b4b63dfcecd30d37@epcas5p4.samsung.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Verification logs based on BT 5.0 controller
-==============================================
-[bluetooth] default-phy LE1MTX LE2MTX LE1MRX LE2MRX LECODEDTX LECODEDRX
-[bluetooth]
-Changing PHY Configuration succeeded
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LE1MTX
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LE1MRX
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LE2MTX
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LE2MRX
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LECODEDTX
-Controller D6:C9:16:E8:6A:D9 PhyConfiguration: LECODEDRX
-
-Verification logs based on BT 4.0 controller
-=============================================
-[bluetooth]# default-phy
-	Supported phys: BR1M1SLOT
-	Supported phys: BR1M3SLOT
-	Supported phys: BR1M5SLOT
-	Supported phys: EDR2M1SLOT
-	Supported phys: EDR2M3SLOT
-	Supported phys: EDR2M5SLOT
-	Supported phys: EDR3M1SLOT
-	Supported phys: EDR3M3SLOT
-	Supported phys: EDR3M5SLOT
-	Supported phys: LE1MTX
-	Supported phys: LE1MRX
-	Selected phys: BR1M1SLOT
-	Selected phys: LE1MTX
-	Selected phys: LE1MRX
-[bluetooth]# default-phy BR1M1SLOT LE1MTX LE1MRX BR1M3SLOT
-Changing PHY Configuration succeeded
-[CHG] Controller 00:1A:7D:DA:71:14 PhyConfiguration: BR1M1SLOT
-[CHG] Controller 00:1A:7D:DA:71:14 PhyConfiguration: BR1M3SLOT
-[CHG] Controller 00:1A:7D:DA:71:14 PhyConfiguration: LE1MTX
-[CHG] Controller 00:1A:7D:DA:71:14 PhyConfiguration: LE1MRX
+This change will save the current selected PHY configuration
+in the storage when PHY Configuration Changed Event is
+received. It will also load and set the stored PHY configuration
+when controller initialized. Thus it enables the user to continue
+with the last selected PHYs on controller restart.
 
 Reviewed-by: Anupam Roy <anupam.r@samsung.com>
 ---
- client/main.c | 39 +++++++++++++++++++++++++++++++++++++++
- 1 file changed, 39 insertions(+)
+ src/adapter.c | 30 +++++++++++++++++++++++++++++-
+ 1 file changed, 29 insertions(+), 1 deletion(-)
 
-diff --git a/client/main.c b/client/main.c
-index c1a62edb7..ab925769b 100644
---- a/client/main.c
-+++ b/client/main.c
-@@ -934,6 +934,8 @@ static void cmd_show(int argc, char *argv[])
- 	print_property(adapter->proxy, "Modalias");
- 	print_property(adapter->proxy, "Discovering");
- 	print_property(adapter->proxy, "Roles");
-+	print_property(adapter->proxy, "SupportedPhyConfiguration");
-+	print_property(adapter->proxy, "PhyConfiguration");
+diff --git a/src/adapter.c b/src/adapter.c
+index 84dd2e5bd..3861ade8a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -288,7 +288,8 @@ struct btd_adapter {
  
- 	if (adapter->ad_proxy) {
- 		bt_shell_printf("Advertising Features:\n");
-@@ -2038,6 +2040,37 @@ static void cmd_disconn(int argc, char *argv[])
- 						proxy_address(proxy));
- }
- 
-+static void get_phy_configuration(void)
-+{
-+	print_property_with_label(default_ctrl->proxy,
-+					"SupportedPhyConfiguration", "Supported phys");
-+
-+	print_property_with_label(default_ctrl->proxy, "PhyConfiguration",
-+					"Selected phys");
-+}
-+
-+static void cmd_phy_configuration(int argc, char *argv[])
-+{
-+	char **phys = NULL;
-+	size_t phys_len = 0;
-+
-+	if (check_default_ctrl() == FALSE)
-+		return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+
-+	if (argc < 2 || !strlen(argv[1]))
-+		return get_phy_configuration();
-+
-+	phys = g_strdupv(&argv[1]);
-+	phys_len = g_strv_length(phys);
-+
-+	g_dbus_proxy_set_property_array(default_ctrl->proxy,
-+					"PhyConfiguration", DBUS_TYPE_STRING, phys,
-+					phys_len, generic_callback, "PHY Configuration",
-+					NULL);
-+
-+	g_strfreev(phys);
-+}
-+
- static void cmd_list_attributes(int argc, char *argv[])
- {
- 	GDBusProxy *proxy;
-@@ -3033,6 +3066,12 @@ static const struct bt_shell_menu main_menu = {
- 							dev_generator },
- 	{ "disconnect",   "[dev]",    cmd_disconn, "Disconnect device",
- 							dev_generator },
-+	{ "default-phy",	"[LE1MTX] [LE1MRX] [LE2MTX] [LE2MRX] "
-+				"[LECODEDTX] [LECODEDRX] "
-+				"[BR1M1SLOT] [BR1M3SLOT] [BR1M5SLOT] "
-+				"[EDR2M1SLOT] [EDR2M3SLOT] [EDR2M5SLOT] "
-+				"[EDR3M1SLOT] [EDR3M3SLOT] [EDR3M5SLOT]",
-+		cmd_phy_configuration,		"Get/Set PHY Configuration" },
- 	{ } },
+ 	uint32_t supported_phys;
+ 	uint32_t configurable_phys;
+-	uint32_t selected_phys;
++	uint32_t selected_phys;		/* Current selected PHYs */
++	uint32_t stored_phys;		/* Stored last selected PHYs */
+ 	uint32_t pending_phys;
  };
  
+@@ -508,6 +509,10 @@ static void store_adapter_info(struct btd_adapter *adapter)
+ 		g_key_file_set_string(key_file, "General", "Alias",
+ 							adapter->stored_alias);
+ 
++	if (adapter->stored_phys)
++		g_key_file_set_integer(key_file, "General", "PhyConfiguration",
++					adapter->stored_phys);
++
+ 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/settings",
+ 					btd_adapter_get_storage_dir(adapter));
+ 
+@@ -3329,10 +3334,13 @@ static void set_default_phy_complete(uint8_t status, uint16_t length,
+ 	btd_info(adapter->dev_id, "PHY configuration successfully set");
+ 
+ 	adapter->selected_phys = adapter->pending_phys;
++	adapter->stored_phys = adapter->pending_phys;
+ 	adapter->pending_phys = 0;
+ 
+ 	g_dbus_pending_property_success(data->id);
+ 
++	store_adapter_info(adapter);
++
+ 	g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "PhyConfiguration");
+ }
+@@ -6548,6 +6556,15 @@ static void load_config(struct btd_adapter *adapter)
+ 		gerr = NULL;
+ 	}
+ 
++	/* Get PHY Configuration */
++	adapter->stored_phys = g_key_file_get_integer(key_file,
++				"General", "PhyConfiguration", &gerr);
++	if (gerr) {
++		adapter->stored_phys = 0;
++		g_error_free(gerr);
++		gerr = NULL;
++	}
++
+ 	g_key_file_free(key_file);
+ }
+ 
+@@ -9670,6 +9687,13 @@ static void read_phy_configuration_resp(uint8_t status, uint16_t length,
+ 	DBG("Supported phys: [0x%x]", adapter->supported_phys);
+ 	DBG("Configurable phys: [0x%x]", adapter->configurable_phys);
+ 	DBG("Selected phys: [0x%x]", adapter->selected_phys);
++
++	/*
++	 * Set the default PHYs to the last selected PHYs on which the
++	 * controller was operating before shutting down.
++	 */
++	if (adapter->supported_settings & MGMT_SETTING_PHY_CONFIGURATION)
++		set_default_phy(adapter, adapter->stored_phys, -1);
+ }
+ 
+ static void read_phy_configuration(struct btd_adapter *adapter)
+@@ -9696,10 +9720,14 @@ static void phy_configuration_changed_callback(uint16_t index,
+ 	}
+ 
+ 	adapter->selected_phys = get_le32(&ev->selected_phys);
++	adapter->stored_phys = adapter->selected_phys;
++
+ 	info("PHYs changed, New PHYs [0x%x]", adapter->selected_phys);
+ 
+ 	adapter->pending_phys = 0;
+ 
++	store_adapter_info(adapter);
++
+ 	g_dbus_emit_property_changed(dbus_conn, adapter->path,
+ 					ADAPTER_INTERFACE, "PhyConfiguration");
+ }
 -- 
 2.17.1
 
