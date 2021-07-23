@@ -2,142 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0507EC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 12:19:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D8BAAC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 13:21:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFE3560720
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 12:19:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BFEF860E9C
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 13:21:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234806AbhGWLih convert rfc822-to-8bit (ORCPT
+        id S233273AbhGWMk7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jul 2021 07:38:37 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:38078 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234601AbhGWLih (ORCPT
+        Fri, 23 Jul 2021 08:40:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47876 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235118AbhGWMkD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jul 2021 07:38:37 -0400
-Received: from smtpclient.apple (p5b3d2eb8.dip0.t-ipconnect.de [91.61.46.184])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 88606CECE3;
-        Fri, 23 Jul 2021 14:19:09 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v2] Bluetooth: btusb: check conditions before enabling USB
- ALT 3 for WBS
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <b86543908684cc6cd9afaf4de10fac7af1a49665.camel@iki.fi>
-Date:   Fri, 23 Jul 2021 14:19:09 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Joseph Hwang <josephsih@google.com>,
-        Hilda Wu <hildawu@realtek.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        =?utf-8?B?TWljaGHFgiBLxJlwaWXFhA==?= <kernel@kempniu.pl>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <872F0B33-594E-4BD7-8B75-EA96DE8DBA8F@holtmann.org>
-References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
- <b86543908684cc6cd9afaf4de10fac7af1a49665.camel@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Fri, 23 Jul 2021 08:40:03 -0400
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0438C061575
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jul 2021 06:20:35 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id q2so1671734ljq.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jul 2021 06:20:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XnDsomaFlcNC3McINgc0uDEVcOJXYzs3EaeY8FFuK24=;
+        b=kXLMXTvgXfOtGs8oaJZzqNdxx5jl21FkoltmDFBSOhhRoupK7zGR7w41t2wmi0RSs9
+         DyNNgqO75lhQGDzfLrogGFFgfd8hpRMgdwERXsTm99ZAn/I2NyYdqkYMYKxPzHmwlnaX
+         Pj/JOQbQO/+Lsj1WkGcd7p7bn1BH9VmTtQjmbBba1+mN1ZnNgbVzEDsD2+3Piswq6gAI
+         u4653HEomQQzedpuKQcAUz25JpMionw2UxQpytwuFi01zOYq8QDI5ieqm16cF0ZomNsu
+         7l/v4HzvOb51yJgLo3oa0dEdmLcMI/w95Ah/LodV5uwcq+gcFlJbl9tq+hsYg3FAp6XB
+         Bpcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XnDsomaFlcNC3McINgc0uDEVcOJXYzs3EaeY8FFuK24=;
+        b=Cl+Ih/HBVZMdINTH0X3VKKrxjhNqhno1+K2Z73kYLusxZ66GR1d4Jp3duxJ4fHXRgB
+         GcPWTd1c3sCuSGhAMKYQVeRgqRF8BlxcAofCF5ePWvuhfqjU2/VcM3jex38xPZ8z/iBy
+         L4DWz+MYCMGbQn2EU+jqcSxhMbxGdd7s9jwObNjEBjHlb1spc0Gu1PCJoio1gYwhec1Y
+         5za7SThbtWKoVrgJzesrh+TnYykfw7rzfpNBL/6lgTQf16dA35GPEMtrk7s0p/MC0u/l
+         INt7LETjoJSz8UyNEsGwRnHPhMz6WT84ZXlmf6NEIxkg1xRuvg/7jp7plI3DPVBTi1It
+         mbpw==
+X-Gm-Message-State: AOAM531oY8vmeqdlJ6YvG7d8pIBs3u2tthCjj83hdq7KzZ5bszLFZDNj
+        CUOTF+LkTi4yCLR9HiIFqxurdOD+1WmOMJ9SlWXLZA==
+X-Google-Smtp-Source: ABdhPJxtWN/FTEneqMUXm3CzgzmgYj3lSZ1kX6drdvFLGK8aLZnsSpkcntD5k6Jif10f64RUp3hmUzXRXrO/zCopgys=
+X-Received: by 2002:a05:651c:1108:: with SMTP id d8mr3404689ljo.127.1627046433930;
+ Fri, 23 Jul 2021 06:20:33 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210626052152.2543526-1-mcchou@chromium.org> <CALWDO_V6y0sCVOGJjCfn7eqQ3RAc4NHqsFbXxRmGvnzGxU26ZQ@mail.gmail.com>
+ <5350EBBD-7F81-448E-B96A-A1C09F8EC676@holtmann.org> <2206189.ElGaqSPkdT@ix>
+In-Reply-To: <2206189.ElGaqSPkdT@ix>
+From:   Alain Michaud <alainmichaud@google.com>
+Date:   Fri, 23 Jul 2021 09:20:17 -0400
+Message-ID: <CALWDO_UPexnNmFSf8i8ONkEfQknLqacgw8k4MQs9pejWnD99jQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v2 1/3] error: BR/EDR and LE connection failure reasons
+To:     Szymon Janc <szymon.janc@codecoup.pl>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Bluetooth Kernel Mailing List 
+        <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>,
+        Howard Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+On Fri, Jul 23, 2021 at 4:20 AM Szymon Janc <szymon.janc@codecoup.pl> wrote:
+>
+> Hi,
+>
+> On Friday, 23 July 2021 09:38:40 CEST Marcel Holtmann wrote:
+>
+> > >>>>> What is the intention to split BR/EDR and LE here. You do know
+> > >>>>> up-front what connection type you are. Trying to figure out from the
+> > >>>>> error code what connection you have been trying to establish is plain
+> > >>>>> wrong.>>>>
+> > >>>> In fact the up-front connection type is not necessarily known. In the
+> > >>>> case of dual-mode devices, such as Bose QC35, a D-Bus client can issue
+> > >>>> Connect(), and it depends on the timing of connection request (adv
+> > >>>> usually arrive first compared to inquiry result), it can be either
+> > >>>> BR/EDR or LE link being established. Another aspect of this is the
+> > >>>> metrics collection, where knowing transport can be handy. For
+> > >>>> instance, we can associate the certain error to particular use cases
+> > >>>> at application layer, and that can help targeting the bottleneck to
+> > >>>> tackle.
+> > >>>
+> > >>> Then we need to find a different way to convey the transport chosen.
+> > >>> Doing this by error message is a bad idea.>>>
+> > >>>>> The description is that you want to know exactly where the connection
+> > >>>>> failed. And I think that can be established independent from the
+> > >>>>> transport.>>>>
+> > >>>> Indeed the intention is to know where it failed exactly. However, as
+> > >>>> mentioned above, transport information is also an important piece of
+> > >>>> information to know.
+> > >>>
+> > >>> We need to find a different way to inform about which transport failed
+> > >>> (or better which was chosen in the first place).>
+> > > I would love to hear your thoughts on an alternative.  Many of the
+> > > Apis are transport agnostic (Connect/Pair may end up connecting to
+> > > either available transports for dual mode devices), but yet the error
+> > > that results from them are not.  Errors from one transport doesn't
+> > > make sense for one and vice versa.  A platform wanting to leverage
+> > > telemetry and metrics to drive ecosystem improvements would ultimately
+> > > need to know the difference even if the applications may not need to
+> > > care.
+> >
+> > and we might have made a mistake in the API design and should have given the
+> > caller more control. We need to review the API design and see if things
+> > have to change. Just glueing things on at the end makes me suspicious.
+>
+> Some (5, wow!) years back I've loosely proposed split for org.bluez.Device API
+> that was meant to handle some of the dual mode devices issues we've been
+> seeing [1] [2].
+>
+> We never got time to fully implement it (mostly due to hacking around device.c
+> instead of properly splitting internal implementation into device_le.c and
+> device_bredr.c) but got some very initial PoC running.
+>
+> With new interfaces old Device1 could be simply super-set of two for legacy
+> applications purposes.
+>
+> Maybe such approach is worth re-considering?
+>
+>
+> [1] https://marc.info/?l=linux-bluetooth&m=145710680912268&w=2
+> [2] https://marc.info/?l=linux-bluetooth&m=145973293118003&w=2
+Definitely worth reconsidering.  We've recently introduced a ConnectLE
+Api as a stop gap measure for something very similar.  I'd love to see
+the equivalent of a ConnectClassic / ConnectLE distinction.
 
-> Some USB BT adapters don't satisfy the MTU requirement mentioned in
-> commit e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
-> and have ALT 3 setting that produces no/garbled audio. Some adapters
-> with larger MTU were also reported to have problems with ALT 3.
-> 
-> Add a flag and check it and MTU before selecting ALT 3, falling back to
-> ALT 1. Enable the flag for Realtek, restoring the previous behavior for
-> non-Realtek devices.
-> 
-> Tested with USB adapters (mtu<72, no/garbled sound with ALT3, ALT1
-> works) BCM20702A1 0b05:17cb, CSR8510A10 0a12:0001, and (mtu>=72, ALT3
-> works) RTL8761BU 0bda:8771, Intel AX200 8087:0029 (after disabling
-> ALT6). Also got reports for (mtu>=72, ALT 3 reported to produce bad
-> audio) Intel 8087:0a2b.
-> 
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> Fixes: e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
+However, I still believe the "Generic" Connect serves its purpose as
+you alluded to above.  Even if it could be built using layers, I still
+believe there is value from a telemetry POV to understand the errors
+from the field better and there, the distinction between the specific
+transport matter.  Just like today, I suspect many applications will
+continue to use the generic "Connect" as to not replicate the logic it
+ultimately implements for dealing with dual mode devices, yet
+results/metrics would be important.
 
-before I will apply this, I need Tested-by or Ack-by people that confirm that this fixes their issues now.
+The team strives to improve interoperability at a large scale in the
+ecosystem, I believe these data point distinctions are a critical
+enabler to get better insights into the specific errors customers are
+seeing.  A counter proposal that would be acceptable to you, achieves
+the objectives and that the team can implement would be a nice next
+step.
 
-> ---
-> 
-> Changes in v2:
-> - Explain magic number 72 in a comment; didn't add the table for them,
->  because it's not used elsewhere and we need just one number from it.
-> - Add flag for ALT3 support, restoring the behavior
->  for non-Realtek devices the same as before e848dbd364ac, due to
->  the problems reported on an Intel adapter. Don't have the device
->  myself.
-> 
-> drivers/bluetooth/btusb.c | 22 ++++++++++++++--------
-> 1 file changed, 14 insertions(+), 8 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 6d23308119d1..5cec719f6cba 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -516,6 +516,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
-> #define BTUSB_HW_RESET_ACTIVE	12
-> #define BTUSB_TX_WAIT_VND_EVT	13
-> #define BTUSB_WAKEUP_DISABLE	14
-> +#define BTUSB_ALT3_OK_FOR_WBS	15
-
-Rename this to BTUSB_USE_ALT3_FOR_WBS.
-
-> 
-> struct btusb_data {
-> 	struct hci_dev       *hdev;
-> @@ -1748,16 +1749,20 @@ static void btusb_work(struct work_struct *work)
-> 			/* Bluetooth USB spec recommends alt 6 (63 bytes), but
-> 			 * many adapters do not support it.  Alt 1 appears to
-> 			 * work for all adapters that do not have alt 6, and
-> -			 * which work with WBS at all.
-> +			 * which work with WBS at all.  Some devices prefer
-> +			 * alt 3 (HCI payload >= 60 Bytes let air packet
-> +			 * data satisfy 60 bytes), requiring
-> +			 * MTU >= 3 (packets) * 25 (size) - 3 (headers) = 72
-> +			 * see also Core spec 5, vol 4, B 2.1.1 & Table 2.1.
-> 			 */
-> -			new_alts = btusb_find_altsetting(data, 6) ? 6 : 1;
-> -			/* Because mSBC frames do not need to be aligned to the
-> -			 * SCO packet boundary. If support the Alt 3, use the
-> -			 * Alt 3 for HCI payload >= 60 Bytes let air packet
-> -			 * data satisfy 60 bytes.
-> -			 */
-> -			if (new_alts == 1 && btusb_find_altsetting(data, 3))
-> +			if (btusb_find_altsetting(data, 6))
-> +				new_alts = 6;
-> +			else if (test_bit(BTUSB_ALT3_OK_FOR_WBS, &data->flags) &&
-> +				 hdev->sco_mtu >= 72 &&
-> +				 btusb_find_altsetting(data, 3))
-
-This is whitespace damaged.
-
-> 				new_alts = 3;
-> +			else
-> +				new_alts = 1;
-> 		}
-> 
-> 		if (btusb_switch_alt_setting(hdev, new_alts) < 0)
-> @@ -4733,6 +4738,7 @@ static int btusb_probe(struct usb_interface *intf,
-> 		 * (DEVICE_REMOTE_WAKEUP)
-> 		 */
-> 		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-> +		set_bit(BTUSB_ALT3_OK_FOR_WBS, &data->flags);
-> 	}
-
-Regards
-
-Marcel
-
+Thanks!
+Alain
+>
+>
+> --
+> pozdrawiam
+> Szymon Janc
+>
+>
