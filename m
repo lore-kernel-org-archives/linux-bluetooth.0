@@ -2,981 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FE61C4320E
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 13:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9368EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 14:32:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E765060EB4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 13:58:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A5AC60EB1
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 23 Jul 2021 14:32:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235336AbhGWNSZ (ORCPT
+        id S235284AbhGWNv5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jul 2021 09:18:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56588 "EHLO
+        Fri, 23 Jul 2021 09:51:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35846 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235302AbhGWNSY (ORCPT
+        with ESMTP id S233665AbhGWNv4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jul 2021 09:18:24 -0400
-Received: from mout-p-201.mailbox.org (mout-p-201.mailbox.org [IPv6:2001:67c:2050::465:201])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43B7CC061575
-        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jul 2021 06:58:58 -0700 (PDT)
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-201.mailbox.org (Postfix) with ESMTPS id 4GWWBm5Yg2zQkFR;
-        Fri, 23 Jul 2021 15:58:56 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dylanvanassche.be;
-        s=MBO0001; t=1627048734;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=P1dZFKDe3ERf4PCfbDBy/+WBP8mvVFI6Ey7cIpjvGf0=;
-        b=zel36RxLnrADnH7k4zD3VJvt5xx1mcck+YZ3msYsAI3QWQUMn0BIN/IbJPbpogjLORLASA
-        RqKWb4PhDsGgoK11HG5+RbzrZcQ2UoDXCRT5aHFIbwGIxVWcH4DyspGhqLL5rEqX6evGkP
-        8mtjzI3fxDuky2JqnJ4xQKVyy/ym0/7NFNOfQZYg+1cKx3Ip/D9TkNinf82OoKw7XzHlMK
-        J1bsSFano/oeiEYaNZS7TKVb6EvS3auvG/41fzDPOGVXxZhkoULzpBGuqeGxqDYbosWbci
-        SZNpUH19xWI6QKtqutv8BaDgibbQENFmfq71yd0Oc5W1Gb+qXxPa1VExCKoZTg==
-Received: from smtp1.mailbox.org ([80.241.60.240])
-        by gerste.heinlein-support.de (gerste.heinlein-support.de [91.198.250.173]) (amavisd-new, port 10030)
-        with ESMTP id VqWhj0Xxy0ku; Fri, 23 Jul 2021 15:58:51 +0200 (CEST)
-From:   Dylan Van Assche <me@dylanvanassche.be>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Dylan Van Assche <me@dylanvanassche.be>
-Subject: [PATCH BlueZ 1/4] obexd: phonebook-ebook: modernize
-Date:   Fri, 23 Jul 2021 15:58:21 +0200
-Message-Id: <20210723135824.8032-2-me@dylanvanassche.be>
-In-Reply-To: <20210723135824.8032-1-me@dylanvanassche.be>
-References: <20210723135824.8032-1-me@dylanvanassche.be>
+        Fri, 23 Jul 2021 09:51:56 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B7A7C061575
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jul 2021 07:32:30 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id x3so1528592qkl.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 23 Jul 2021 07:32:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=+tWp1No06cfIZ716aVrqwQ6dOB/pfn8Q+DdUtmqaDi0=;
+        b=QWKhJbRI5FuVDstialQ9Sqw8edy80V9Fwor2i1effgRSRa1cnuxalGC72p06FwrYg/
+         0aoLKpl0SMh5SnzP6buGXohhhWPIwwPQVPcACKATctC9Lq9mbfkq1UojzfNnp8pyk5XN
+         4BuR1kIAWStuDmIEJEBD7JPtY9PTZCOjfOshvApae1TLEBz2Lhid7zCB38LqM2XA7rTW
+         5/gL46qAhlE3PD+Pljjf1afR5lkTyhfSEo2UT/GagVHZbGuU/dwcw+nKwVOSucrnsRK+
+         BtRGLuV6hCF/r/xnrdHXqPwCNVvPUGW8Fi7My2nkzqJ/Gg8jJw6D33M1aUicWLn3cA4T
+         6fVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=+tWp1No06cfIZ716aVrqwQ6dOB/pfn8Q+DdUtmqaDi0=;
+        b=tnKLUq9CuAqY+kp7auZHC8ud7WxIxNtGeGcBV9fPXwOT3qqr2G5aTw4jyu0+AOJlGT
+         XXuQpaW/6qAjQqjJN/Tx6k66mUai1OfpBwsFo7jdFd8IuogUSK8KzMI4H625gqCD8B2V
+         tlxVhsq1tH0pkQGNLElc4MS5fJ5HEbRas11spuyR6wLyeYviNK95q1uJZwP7P9V89/rR
+         OR8/Cn64AzUFISFzMN/A3vH7Bf0s9Vgw8HDxmknEK0+T7a0J1QWggBurMFzkuTmvpew9
+         0chejd93Pxc6jDTq3PY1HZEPwiwrHvRZKq6DAUMgQ3EVJG0e2sb8ckQA1XBRqQv5qNo1
+         wasg==
+X-Gm-Message-State: AOAM5331fR7D4Y7q6hoiyqP+0F2J7sYz9IQMj6KdguAZbRtXFQXLxtvZ
+        R07aALZU1HybwDn6v0oVbjCVC6k9lrmLTg==
+X-Google-Smtp-Source: ABdhPJwDn+0Ocun33D3/Er/2JBo+LFT3/jEP+YbZYEHFQYXdNJYREjQ/pnIdUZa9JIARqfOHXADz+Q==
+X-Received: by 2002:a37:4652:: with SMTP id t79mr4816189qka.93.1627050749326;
+        Fri, 23 Jul 2021 07:32:29 -0700 (PDT)
+Received: from [172.17.0.2] ([52.177.71.48])
+        by smtp.gmail.com with ESMTPSA id t30sm14098109qkm.11.2021.07.23.07.32.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jul 2021 07:32:28 -0700 (PDT)
+Message-ID: <60fad2fc.1c69fb81.4c2fc.785c@mx.google.com>
+Date:   Fri, 23 Jul 2021 07:32:28 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2675257332697632981=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 8C4BF1898
-X-Rspamd-UID: eaca67
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, me@dylanvanassche.be
+Subject: RE: obexd: phonebook-ebook: modernize
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210723135824.8032-2-me@dylanvanassche.be>
+References: <20210723135824.8032-2-me@dylanvanassche.be>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Modernize PBAP phonebook-ebook plugin for newer libebook version
-of the Evolution Data Server.
+--===============2675257332697632981==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-The ebook plugin was introduced during GSoC 2011 [1] and allows
-BlueZ to share contacts stored in the Evolution Data Server to
-connected clients such as car multimedia systems.
-With the rise of Mobile Linux thanks to the PinePhone and Librem 5,
-this plugin was modernized to compile with newer libebook versions
-because the API was changed [2].
+This is automated email and please do not reply to this email!
 
-[1] http://www.bluez.org/gsoc-eds-backend-of-phonebook-access-profilepbap/
-[2] https://wiki.gnome.org/Apps/Evolution/ESourceMigrationGuide
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=520361
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.25 seconds
+GitLint                       PASS      0.38 seconds
+Prep - Setup ELL              PASS      36.63 seconds
+Build - Prep                  PASS      0.11 seconds
+Build - Configure             PASS      6.37 seconds
+Build - Make                  PASS      159.94 seconds
+Make Check                    PASS      9.12 seconds
+Make Distcheck                PASS      195.35 seconds
+Build w/ext ELL - Configure   PASS      6.54 seconds
+Build w/ext ELL - Make        PASS      150.40 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
- obexd/plugins/phonebook-ebook.c | 668 +++++++++++++++-----------------
- 1 file changed, 320 insertions(+), 348 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/obexd/plugins/phonebook-ebook.c b/obexd/plugins/phonebook-ebook.c
-index 30be9d921..29ec9d213 100644
---- a/obexd/plugins/phonebook-ebook.c
-+++ b/obexd/plugins/phonebook-ebook.c
-@@ -3,8 +3,9 @@
-  *
-  *  OBEX Server
-  *
-- *  Copyright (C) 2009-2010  Intel Corporation
-- *  Copyright (C) 2007-2010  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2009-2021  Intel Corporation
-+ *  Copyright (C) 2007-2021  Marcel Holtmann <marcel@holtmann.org>
-+ *  Copyright (C) 2021       Dylan Van Assche <me@dylanvanassche.be>
-  *
-  *
-  */
-@@ -13,35 +14,44 @@
- #include <config.h>
- #endif
- 
--#include <string.h>
-+#define _GNU_SOURCE
-+#include <dirent.h>
- #include <errno.h>
--
-+#include <stdio.h>
-+#include <stdint.h>
-+#include <string.h>
- #include <glib.h>
--#include <libebook/e-book.h>
--
--#include "lib/bluetooth.h"
-+#include <stdlib.h>
-+#include <sys/types.h>
-+#include <sys/stat.h>
-+#include <fcntl.h>
-+#include <unistd.h>
-+#include <libebook/libebook.h>
-+#include <libedataserver/libedataserver.h>
- 
- #include "obexd/src/log.h"
--#include "obexd/src/obex.h"
--#include "obexd/src/service.h"
- #include "phonebook.h"
- 
--#define QUERY_FN "(contains \"family_name\" \"%s\")"
--#define QUERY_NAME "(contains \"given_name\" \"%s\")"
--#define QUERY_PHONE "(contains \"phone\" \"%s\")"
-+#define CONNECTION_TIMEOUT 30  // seconds
-+#define PB_FORMAT_VCARD21	0
-+#define PB_FORMAT_VCARD30	1
-+#define PB_FORMAT_NONE		2
-+
-+ESourceRegistry *registry;
-+ESource *address_book;
-+EBookClient *book_client;
- 
- struct query_context {
- 	const struct apparam_field *params;
- 	phonebook_cb contacts_cb;
- 	phonebook_entry_cb entry_cb;
- 	phonebook_cache_ready_cb ready_cb;
--	EBookQuery *query;
-+	gchar *query;
- 	unsigned int count;
- 	GString *buf;
--	char *id;
-+	char *uid;
- 	unsigned queued_calls;
- 	void *user_data;
--	GSList *ebooks;
- 	gboolean canceled;
- };
- 
-@@ -76,39 +86,30 @@ static char *attribute_mask[] = {
- 		"SORT-STRING",
- /* 28 */	"X-IRMC-CALL-DATETIME",
- 		NULL
--
- };
- 
--static void close_ebooks(GSList *ebooks)
--{
--	g_slist_free_full(ebooks, g_object_unref);
--}
--
- static void free_query_context(struct query_context *data)
- {
--	g_free(data->id);
-+	g_free(data->uid);
- 
- 	if (data->buf != NULL)
- 		g_string_free(data->buf, TRUE);
- 
- 	if (data->query != NULL)
--		e_book_query_unref(data->query);
--
--	close_ebooks(data->ebooks);
-+		g_free(data->query);
- 
- 	g_free(data);
- }
- 
- static char *evcard_to_string(EVCard *evcard, unsigned int format,
--							uint64_t filter)
-+							       uint64_t filter)
- {
- 	EVCard *evcard2;
- 	GList *l;
- 	char *vcard;
- 
- 	if (!filter)
--		return e_vcard_to_string(evcard, EVC_FORMAT_VCARD_30);
--		/* XXX There is no support for VCARD 2.1 at this time */
-+		return e_vcard_to_string(evcard, format);
- 
- 	/*
- 	 * Mandatory attributes for vCard 2.1 are VERSION ,N and TEL.
-@@ -135,7 +136,7 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
- 				continue;
- 
- 			e_vcard_add_attribute(evcard2,
--					e_vcard_attribute_copy(attrib));
-+					       e_vcard_attribute_copy(attrib));
- 		}
- 	}
- 
-@@ -145,25 +146,149 @@ static char *evcard_to_string(EVCard *evcard, unsigned int format,
- 	return vcard;
- }
- 
--static void ebookpull_cb(EBook *book, const GError *gerr, GList *contacts,
--							void *user_data)
-+char *phonebook_set_folder(const char *current_folder, const char *new_folder,
-+						       uint8_t flags, int *err)
-+{
-+	gboolean root, child;
-+	char *fullname = NULL, *tmp1, *tmp2, *base;
-+	int ret = 0, len;
-+
-+	root = (g_strcmp0("/", current_folder) == 0);
-+	child = (new_folder && strlen(new_folder) != 0);
-+
-+	/* Evolution back-end will support /telecom/pb folder only */
-+	switch (flags) {
-+	case 0x02:
-+		/* Go back to root */
-+		if (!child) {
-+			fullname = g_strdup("/");
-+			goto done;
-+		}
-+
-+		/* Go down 1 level */
-+		fullname = g_build_filename(current_folder, new_folder, NULL);
-+		if (strcmp(PB_TELECOM_FOLDER, fullname) != 0 &&
-+				   strcmp(PB_CONTACTS_FOLDER, fullname) != 0) {
-+			g_free(fullname);
-+			fullname = NULL;
-+			ret = -ENOENT;
-+		}
-+
-+		break;
-+	case 0x03:
-+		/* Go up 1 level */
-+		if (root) {
-+			/* Already root */
-+			ret = -EBADR;
-+			goto done;
-+		}
-+
-+		/*
-+		 * Removing one level of the current folder. Current folder
-+		 * contains AT LEAST one level since it is not at root folder.
-+		 * Use glib utility functions to handle invalid chars in the
-+		 * folder path properly.
-+		 */
-+		tmp1 = g_path_get_basename(current_folder);
-+		tmp2 = g_strrstr(current_folder, tmp1);
-+		len = tmp2 - (current_folder + 1);
-+
-+		g_free(tmp1);
-+
-+		if (len == 0)
-+			base = g_strdup("/");
-+		else
-+			base = g_strndup(current_folder, len);
-+
-+		/* Return one level only */
-+		if (!child) {
-+			fullname = base;
-+			goto done;
-+		}
-+
-+		fullname = g_build_filename(base, new_folder, NULL);
-+		if (strcmp(fullname, PB_TELECOM_FOLDER) != 0 &&
-+				   strcmp(fullname, PB_CONTACTS_FOLDER) != 0) {
-+			g_free(fullname);
-+			fullname = NULL;
-+			ret = -ENOENT;
-+		}
-+
-+		g_free(base);
-+
-+		break;
-+	default:
-+		ret = -EBADR;
-+		break;
-+	}
-+
-+done:
-+	if (err)
-+		*err = ret;
-+
-+	return fullname;
-+}
-+
-+void phonebook_req_finalize(void *request)
-+{
-+	/* Free resources after pull request */
-+	struct query_context *data = request;
-+
-+	if (data->queued_calls == 0)
-+		free_query_context(data);
-+	else
-+		data->canceled = TRUE;
-+}
-+
-+void *phonebook_pull(const char *name, const struct apparam_field *params,
-+				    phonebook_cb cb, void *user_data, int *err)
-+{
-+	struct query_context *data;
-+	EBookQuery *query;
-+
-+	/* Request should be for '/telecom/pb.vcf', reject others */
-+	if (g_strcmp0(PB_CONTACTS, name) != 0) {
-+		if (err)
-+			*err = -ENOENT;
-+		return NULL;
-+	}
-+
-+	data = g_new0(struct query_context, 1);
-+	data->contacts_cb = cb;
-+	data->params = params;
-+	data->user_data = user_data;
-+	data->buf = g_string_new("");
-+	query = e_book_query_any_field_contains("");  // all contacts
-+	data->query = e_book_query_to_string(query);
-+	e_book_query_unref(query);
-+
-+	return data;
-+}
-+
-+static void phonebook_pull_read_ready(GObject *source_object,
-+				      GAsyncResult *result, gpointer user_data)
- {
- 	struct query_context *data = user_data;
--	GList *l;
-+	GSList *l = NULL;
-+	GSList *contacts = NULL;
-+	GError *gerr = NULL;
- 	unsigned int count, maxcount;
- 
-+	/* Finish async call to retrieve contacts */
- 	data->queued_calls--;
- 
- 	if (data->canceled)
- 		goto canceled;
- 
-+	e_book_client_get_contacts_finish(E_BOOK_CLIENT(source_object),
-+						     result, &contacts, &gerr);
-+
- 	if (gerr != NULL) {
--		error("E-Book query failed: %s", gerr->message);
-+		error("Failed to retrieve contacts, invalid query");
-+		g_error_free(gerr);
- 		goto done;
- 	}
- 
--	DBG("");
--
- 	/*
- 	 * When MaxListCount is zero, PCE wants to know the number of used
- 	 * indexes in the phonebook of interest. All other parameters that
-@@ -171,42 +296,48 @@ static void ebookpull_cb(EBook *book, const GError *gerr, GList *contacts,
- 	 */
- 	maxcount = data->params->maxlistcount;
- 	if (maxcount == 0) {
--		data->count += g_list_length(contacts);
-+		data->count += g_slist_length(contacts);
- 		goto done;
- 	}
- 
--	l = g_list_nth(contacts, data->params->liststartoffset);
--
--	for (count = 0; l && count + data->count < maxcount; l = g_list_next(l),
--								count++) {
-+	/*
-+	 * Convert each contact to a vCard and append the card to
-+	 * the buffer string.
-+	 */
-+	l = g_slist_nth(contacts, data->params->liststartoffset);
-+	for (count = 0; l && count + data->count < maxcount;
-+						l = g_slist_next(l), count++) {
- 		EContact *contact = E_CONTACT(l->data);
- 		EVCard *evcard = E_VCARD(contact);
- 		char *vcard;
- 
--		vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_30,
--						data->params->filter);
-+		if (data->params->format == PB_FORMAT_VCARD30)
-+			vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_30,
-+							 data->params->filter);
-+		else if (data->params->format == PB_FORMAT_VCARD21)
-+			vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_21,
-+							 data->params->filter);
-+		else
-+			error("unknown format: %d", data->params->format);
- 
- 		data->buf = g_string_append(data->buf, vcard);
- 		data->buf = g_string_append(data->buf, "\r\n");
- 		g_free(vcard);
- 	}
- 
--	DBG("collected %d vcards", count);
-+	DBG("collected %d contacts", count);
- 
- 	data->count += count;
--
--	g_list_free_full(contacts, g_object_unref);
-+	g_slist_free_full(contacts, (GDestroyNotify) g_object_unref);
- 
- done:
- 	if (data->queued_calls == 0) {
- 		GString *buf = data->buf;
- 		data->buf = NULL;
- 
--		data->contacts_cb(buf->str, buf->len, data->count,
--						0, TRUE, data->user_data);
--
-+		data->contacts_cb(buf->str, buf->len, data->count, 0, TRUE,
-+							      data->user_data);
- 		g_string_free(buf, TRUE);
--
- 	}
- 
- 	return;
-@@ -216,9 +347,31 @@ canceled:
- 		free_query_context(data);
- }
- 
--static void ebook_entry_cb(EBook *book, const GError *gerr,
--				EContact *contact, void *user_data)
-+int phonebook_pull_read(void *request)
- {
-+	struct query_context *data = request;
-+	GError *gerr = NULL;
-+
-+	if (!data) {
-+		error("Request data is empty");
-+		return -ENOENT;
-+	}
-+
-+	DBG("retrieving all contacts");
-+
-+	/* Fetch async contacts from default address book */
-+	e_book_client_get_contacts(book_client, data->query, NULL,
-+			(GAsyncReadyCallback) phonebook_pull_read_ready, data);
-+	data->queued_calls++;
-+
-+	return 0;
-+}
-+
-+static void phonebook_get_entry_ready(GObject *source_object,
-+				      GAsyncResult *result, gpointer user_data)
-+{
-+	GError *gerr = NULL;
-+	EContact *contact = NULL;
- 	struct query_context *data = user_data;
- 	EVCard *evcard;
- 	char *vcard;
-@@ -226,20 +379,27 @@ static void ebook_entry_cb(EBook *book, const GError *gerr,
- 
- 	data->queued_calls--;
- 
-+	e_book_client_get_contact_finish(E_BOOK_CLIENT(source_object), result,
-+							      &contact, &gerr);
- 	if (data->canceled)
- 		goto done;
- 
- 	if (gerr != NULL) {
--		error("E-Book query failed: %s", gerr->message);
-+		error("Getting contact failed: %s", gerr->message);
-+		g_error_free(gerr);
- 		goto done;
- 	}
- 
--	DBG("");
--
- 	evcard = E_VCARD(contact);
- 
--	vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_30,
--					data->params->filter);
-+	if (data->params->format == PB_FORMAT_VCARD30)
-+		vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_30,
-+							 data->params->filter);
-+	else if (data->params->format == PB_FORMAT_VCARD21)
-+		vcard = evcard_to_string(evcard, EVC_FORMAT_VCARD_21,
-+							 data->params->filter);
-+	else
-+		error("Unknown vCard format: %d", data->params->format);
- 
- 	len = vcard ? strlen(vcard) : 0;
- 
-@@ -247,18 +407,45 @@ static void ebook_entry_cb(EBook *book, const GError *gerr,
- 	data->contacts_cb(vcard, len, 1, 0, TRUE, data->user_data);
- 
- 	g_free(vcard);
--	g_object_unref(contact);
- 
--	return;
-+	DBG("retrieving entry successful");
- 
- done:
- 	if (data->queued_calls == 0) {
- 		if (data->count == 0)
- 			data->contacts_cb(NULL, 0, 1, 0, TRUE,
--						data->user_data);
-+					  data->user_data);
- 		else if (data->canceled)
- 			free_query_context(data);
- 	}
-+
-+	g_object_unref(contact);
-+}
-+
-+void *phonebook_get_entry(const char *folder, const char *id,
-+			   const struct apparam_field *params, phonebook_cb cb,
-+						     void *user_data, int *err)
-+{
-+	struct query_context *data;
-+	GSList *l;
-+
-+	DBG("retrieving entry: %s", id);
-+
-+	data = g_new0(struct query_context, 1);
-+	data->contacts_cb = cb;
-+	data->params = params;
-+	data->user_data = user_data;
-+	data->uid = g_strdup(id);
-+
-+	/* Fetch async contacts from default address book */
-+	e_book_client_get_contact(book_client, data->uid, NULL,
-+			(GAsyncReadyCallback) phonebook_get_entry_ready, data);
-+	data->queued_calls++;
-+
-+	if (err)
-+		*err = (data->queued_calls == 0 ? -ENOENT : 0);
-+
-+	return data;
- }
- 
- static char *evcard_name_attribute_to_string(EVCard *evcard)
-@@ -291,25 +478,28 @@ static char *evcard_name_attribute_to_string(EVCard *evcard)
- 	return g_string_free(name, FALSE);
- }
- 
--static void cache_cb(EBook *book, const GError *gerr, GList *contacts,
--							void *user_data)
-+static void phonebook_create_cache_ready(GObject *source_object,
-+				      GAsyncResult *result, gpointer user_data)
- {
- 	struct query_context *data = user_data;
--	GList *l;
-+	GSList *l = NULL;
-+	GSList *contacts = NULL;
-+	GError *gerr = NULL;
- 
- 	data->queued_calls--;
- 
- 	if (data->canceled)
- 		goto canceled;
- 
-+	e_book_client_get_contacts_finish(E_BOOK_CLIENT(source_object),
-+						     result, &contacts, &gerr);
-+
- 	if (gerr != NULL) {
--		error("E-Book operation failed: %s", gerr->message);
-+		error("Getting contacts failed: %s", gerr->message);
- 		goto done;
- 	}
- 
--	DBG("");
--
--	for (l = contacts; l; l = g_list_next(l)) {
-+	for (l = contacts; l; l = g_slist_next(l)) {
- 		EContact *contact = E_CONTACT(l->data);
- 		EVCard *evcard = E_VCARD(contact);
- 		EVCardAttribute *attrib;
-@@ -341,7 +531,9 @@ static void cache_cb(EBook *book, const GError *gerr, GList *contacts,
- 		g_free(tel);
- 	}
- 
--	g_list_free_full(contacts, g_object_unref);
-+	DBG("caching successful");
-+
-+	g_slist_free_full(contacts, (GDestroyNotify) g_object_unref);
- 
- done:
- 	if (data->queued_calls == 0)
-@@ -354,275 +546,16 @@ canceled:
- 		free_query_context(data);
- }
- 
--static GSList *traverse_sources(GSList *ebooks, GSList *sources,
--							char **default_src) {
--	GError *gerr = NULL;
--
--	for (; sources != NULL; sources = g_slist_next(sources)) {
--		char *uri;
--		ESource *source = E_SOURCE(sources->data);
--		EBook *ebook = e_book_new(source, &gerr);
--
--		if (ebook == NULL) {
--			error("Can't create user's address book: %s",
--								gerr->message);
--			g_clear_error(&gerr);
--			continue;
--		}
--
--		uri = e_source_get_uri(source);
--		if (g_strcmp0(*default_src, uri) == 0) {
--			g_free(uri);
--			continue;
--		}
--		g_free(uri);
--
--		if (e_book_open(ebook, FALSE, &gerr) == FALSE) {
--			error("Can't open e-book address book: %s",
--							gerr->message);
--			g_object_unref(ebook);
--			g_clear_error(&gerr);
--			continue;
--		}
--
--		if (*default_src == NULL)
--			*default_src = e_source_get_uri(source);
--
--		DBG("%s address book opened", e_source_peek_name(source));
--
--		ebooks = g_slist_append(ebooks, ebook);
--	}
--
--	return ebooks;
--}
--
--int phonebook_init(void)
--{
--	g_type_init();
--
--	return 0;
--}
--
--static GSList *open_ebooks(void)
--{
--	GError *gerr = NULL;
--	ESourceList *src_list;
--	GSList *list;
--	char *default_src = NULL;
--	GSList *ebooks = NULL;
--
--	if (e_book_get_addressbooks(&src_list, &gerr) == FALSE) {
--		error("Can't list user's address books: %s", gerr->message);
--		g_error_free(gerr);
--		return NULL;
--	}
--
--	list = e_source_list_peek_groups(src_list);
--	while (list != NULL) {
--		ESourceGroup *group = E_SOURCE_GROUP(list->data);
--		GSList *sources = e_source_group_peek_sources(group);
--
--		ebooks = traverse_sources(ebooks, sources, &default_src);
--
--		list = list->next;
--	}
--
--	g_free(default_src);
--	g_object_unref(src_list);
--
--	return ebooks;
--}
--
--void phonebook_exit(void)
--{
--}
--
--char *phonebook_set_folder(const char *current_folder,
--		const char *new_folder, uint8_t flags, int *err)
--{
--	gboolean root, child;
--	char *fullname = NULL, *tmp1, *tmp2, *base;
--	int ret = 0, len;
--
--	root = (g_strcmp0("/", current_folder) == 0);
--	child = (new_folder && strlen(new_folder) != 0);
--
--	/* Evolution back-end will support /telecom/pb folder only */
--
--	switch (flags) {
--	case 0x02:
--		/* Go back to root */
--		if (!child) {
--			fullname = g_strdup("/");
--			goto done;
--		}
--
--		/* Go down 1 level */
--		fullname = g_build_filename(current_folder, new_folder, NULL);
--		if (strcmp(PB_TELECOM_FOLDER, fullname) != 0 &&
--				strcmp(PB_CONTACTS_FOLDER, fullname) != 0) {
--			g_free(fullname);
--			fullname = NULL;
--			ret = -ENOENT;
--		}
--
--		break;
--	case 0x03:
--		/* Go up 1 level */
--		if (root) {
--			/* Already root */
--			ret = -EBADR;
--			goto done;
--		}
--
--		/*
--		 * Removing one level of the current folder. Current folder
--		 * contains AT LEAST one level since it is not at root folder.
--		 * Use glib utility functions to handle invalid chars in the
--		 * folder path properly.
--		 */
--		tmp1 = g_path_get_basename(current_folder);
--		tmp2 = g_strrstr(current_folder, tmp1);
--		len = tmp2 - (current_folder + 1);
--
--		g_free(tmp1);
--
--		if (len == 0)
--			base = g_strdup("/");
--		else
--			base = g_strndup(current_folder, len);
--
--		/* Return one level only */
--		if (!child) {
--			fullname = base;
--			goto done;
--		}
--
--		fullname = g_build_filename(base, new_folder, NULL);
--		if (strcmp(fullname, PB_TELECOM_FOLDER) != 0 &&
--				strcmp(fullname, PB_CONTACTS_FOLDER) != 0) {
--			g_free(fullname);
--			fullname = NULL;
--			ret = -ENOENT;
--		}
--
--		g_free(base);
--
--		break;
--	default:
--		ret = -EBADR;
--		break;
--	}
--
--done:
--	if (err)
--		*err = ret;
--
--	return fullname;
--}
--
--void phonebook_req_finalize(void *request)
--{
--	struct query_context *data = request;
--
--	if (data->queued_calls == 0)
--		free_query_context(data);
--	else
--		data->canceled = TRUE;
--}
--
--void *phonebook_pull(const char *name, const struct apparam_field *params,
--				phonebook_cb cb, void *user_data, int *err)
--{
--	struct query_context *data;
--
--	if (g_strcmp0(PB_CONTACTS, name) != 0) {
--		if (err)
--			*err = -ENOENT;
--
--		return NULL;
--	}
--
--	data = g_new0(struct query_context, 1);
--	data->contacts_cb = cb;
--	data->params = params;
--	data->user_data = user_data;
--	data->buf = g_string_new("");
--	data->query = e_book_query_any_field_contains("");
--	data->ebooks = open_ebooks();
--
--	if (err)
--		*err = data->ebooks == NULL ? -EIO : 0;
--
--	return data;
--}
--
--int phonebook_pull_read(void *request)
--{
--	struct query_context *data = request;
--	GSList *l;
--
--	if (!data)
--		return -ENOENT;
--
--	for (l = data->ebooks; l != NULL; l = g_slist_next(l)) {
--		EBook *ebook = l->data;
--
--		if (e_book_is_opened(ebook) == FALSE)
--			continue;
--
--		if (e_book_get_contacts_async(ebook, data->query,
--						ebookpull_cb, data) == TRUE)
--			data->queued_calls++;
--	}
--
--	if (data->queued_calls == 0)
--		return -ENOENT;
--
--	return 0;
--}
--
--void *phonebook_get_entry(const char *folder, const char *id,
--				const struct apparam_field *params,
--				phonebook_cb cb, void *user_data, int *err)
--{
--	struct query_context *data;
--	GSList *l;
--
--	data = g_new0(struct query_context, 1);
--	data->contacts_cb = cb;
--	data->params = params;
--	data->user_data = user_data;
--	data->id = g_strdup(id);
--	data->ebooks = open_ebooks();
--
--	for (l = data->ebooks; l != NULL; l = g_slist_next(l)) {
--		EBook *ebook = l->data;
--
--		if (e_book_is_opened(ebook) == FALSE)
--			continue;
--
--		if (e_book_get_contact_async(ebook, data->id,
--						ebook_entry_cb, data) == TRUE)
--			data->queued_calls++;
--	}
--
--	if (err)
--		*err = (data->queued_calls == 0 ? -ENOENT : 0);
--
--	return data;
--}
--
- void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
--		phonebook_cache_ready_cb ready_cb, void *user_data, int *err)
-+		  phonebook_cache_ready_cb ready_cb, void *user_data, int *err)
- {
-+	/* Build a cache of contacts */
- 	struct query_context *data;
- 	EBookQuery *query;
--	GSList *l;
- 	EContact *me;
-+	EBookClient *me_client;
- 	EVCard *evcard;
- 	GError *gerr = NULL;
--	EBook *eb;
- 	EVCardAttribute *attrib;
- 	char *uid, *tel, *cname;
- 
-@@ -633,23 +566,25 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 		return NULL;
- 	}
- 
--	DBG("");
--
--	query = e_book_query_any_field_contains("");
-+	DBG("creating cache");
- 
- 	data = g_new0(struct query_context, 1);
- 	data->entry_cb = entry_cb;
- 	data->ready_cb = ready_cb;
- 	data->user_data = user_data;
--	data->query = query;
--	data->ebooks = open_ebooks();
-+	query = e_book_query_any_field_contains("");  // all contacts
-+	data->query = e_book_query_to_string(query);
-+	e_book_query_unref(query);
- 
--	/* Add 0.vcf */
--	if (e_book_get_self(&me, &eb, &gerr) == FALSE) {
-+	/* Myself as contact should always be 0.vcf if found in address book */
-+	if (!e_book_client_get_self(registry, &me, &me_client, &gerr)) {
-+		DBG("owner is not in address book: %s", gerr->message);
- 		g_error_free(gerr);
- 		goto next;
- 	}
- 
-+	DBG("caching address book owner");
-+
- 	evcard = E_VCARD(me);
- 
- 	cname = evcard_name_attribute_to_string(evcard);
-@@ -668,28 +603,65 @@ void *phonebook_create_cache(const char *name, phonebook_entry_cb entry_cb,
- 		tel = g_strdup("");
- 
- 	data->entry_cb(uid, 0, cname, NULL, tel, data->user_data);
--
- 	data->count++;
- 
- 	g_free(cname);
- 	g_free(uid);
- 	g_free(tel);
--	g_object_unref(eb);
- 
- next:
--	for (l = data->ebooks; l != NULL; l = g_slist_next(l)) {
--		EBook *ebook = l->data;
--
--		if (e_book_is_opened(ebook) == FALSE)
--			continue;
--
--		if (e_book_get_contacts_async(ebook, query,
--						cache_cb, data) == TRUE)
--			data->queued_calls++;
--	}
-+	/* Fetch async contacts from default address book */
-+	DBG("caching contacts");
-+	e_book_client_get_contacts(book_client, data->query, NULL,
-+		     (GAsyncReadyCallback) phonebook_create_cache_ready, data);
-+	data->queued_calls++;
- 
- 	if (err)
- 		*err = (data->queued_calls == 0 ? -ENOENT : 0);
- 
- 	return data;
- }
-+
-+int phonebook_init(void)
-+{
-+	EClient *client;
-+	GError *gerr = NULL;
-+
-+	/* Acquire ESource Registry */
-+	registry = e_source_registry_new_sync(NULL, &gerr);
-+	if (gerr != NULL) {
-+		error("Unable to acquire registery: %s\n", gerr->message);
-+		g_error_free(gerr);
-+		return -1;
-+	}
-+
-+	/* Get ref to default address book */
-+	address_book = e_source_registry_ref_default_address_book(registry);
-+	if (address_book == NULL) {
-+		error("Unable to get reference to default address book");
-+		return -2;
-+	}
-+
-+	/* Allocate e-book client for address book */
-+	gerr = NULL;
-+	client = e_book_client_connect_sync(address_book, CONNECTION_TIMEOUT,
-+								  NULL, &gerr);
-+	if (gerr != NULL || client == NULL) {
-+		error("Cannot connect ebook client to EDS: %s",
-+					gerr != NULL ? gerr->message : "NULL");
-+		g_error_free(gerr);
-+		return -3;
-+	}
-+	book_client = E_BOOK_CLIENT(client);
-+
-+	DBG("created address book client");
-+
-+	return 0;
-+}
-+
-+void phonebook_exit(void)
-+{
-+	g_object_unref(book_client);
-+	g_object_unref(address_book);
-+	g_object_unref(registry);
-+}
--- 
-2.32.0
 
+--===============2675257332697632981==--
