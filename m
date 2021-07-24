@@ -2,183 +2,139 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21B04C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 03:16:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8D94C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 07:30:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EE4C760F02
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 03:16:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A213860EB1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 07:30:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233849AbhGXCgI (ORCPT
+        id S234422AbhGXGtq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 23 Jul 2021 22:36:08 -0400
-Received: from mga09.intel.com ([134.134.136.24]:30091 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233628AbhGXCgI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 23 Jul 2021 22:36:08 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10054"; a="211989574"
-X-IronPort-AV: E=Sophos;i="5.84,265,1620716400"; 
-   d="scan'208";a="211989574"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jul 2021 20:16:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,265,1620716400"; 
-   d="scan'208";a="497501393"
-Received: from lkp-server01.sh.intel.com (HELO d053b881505b) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 23 Jul 2021 20:16:39 -0700
-Received: from kbuild by d053b881505b with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1m789W-0002ky-JV; Sat, 24 Jul 2021 03:16:38 +0000
-Date:   Sat, 24 Jul 2021 11:16:12 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- d9dd833cf6d29695682ec7e7924c0d0992b906bc
-Message-ID: <60fb85fc.qpBDux/r4Ih9qTNX%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sat, 24 Jul 2021 02:49:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37004 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234385AbhGXGtj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 24 Jul 2021 02:49:39 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27AC1C06175F
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Jul 2021 00:30:10 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id k1so5610953plt.12
+        for <linux-bluetooth@vger.kernel.org>; Sat, 24 Jul 2021 00:30:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J1CpBl5mY0p2RfQRLB4s0Fjznb7qXVJN+FiwMEwnizY=;
+        b=jIkEtVzzLltAT3IM5BemqW7btKcFIxz9qkTd4FOItwBJh5fCO9JRE+/didYQmrMgm2
+         EuHP43hSvbl9lvBNR4bNvu54tTUHsEY0WTlcFA9s2+fwUDnYqRAbNs3/IFIUPu8/yfPS
+         lyMvGs80rNBL/lkhCYqbDJi6d7SVQurBjImtitbvD58mosEtvasbtxQ9gJ/dymoSxcni
+         NrmXlyV2uTh7RyY9qscrSy9MNh9tSy7+b8kp/lEOgx/uKHlAdVLgfE1znKVy+VM9WcFl
+         /tYvFhj/OIJmY1KeeE4UFJW4bVw+nU2d8OfB81ZPlvUyC+WLj1PxZhKBqIXSOzAO8QdZ
+         Dw5g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=J1CpBl5mY0p2RfQRLB4s0Fjznb7qXVJN+FiwMEwnizY=;
+        b=g1wT76Q2ANz20AeawnraS9TvqtPoMBUfGx1bDgXZbVuKoUv7QvOhNu/NJAW/nMGtaw
+         an10/Cv3dOZCkAohJ82FHDGAgKPyisuLNfW3vsYAtG92VkL5AI1KHdbaSK7QV/RPBe02
+         4Cb1BUPrk4nisiSwQsnQRQtUcYzJPWd9yAqVg9h9R0PLwy9jkQsKluHTqA8X+zHNkNFP
+         WD8qIQnyi7M4j2smKE9714m/3LrRbLfPBrLqNllJ8MB22qr06gSrUUNU2E9gbOUSXNH1
+         +7LO9FEI7BbthPJonz8PSFiqCrdW/ymTU8VGZ21q5ff4YIgQ23mWJkt33c+cCHBkU4s3
+         ZCAQ==
+X-Gm-Message-State: AOAM533ithTHWpiWi1Lt3vxkXC2HPVajHRRGbpRba24PKq/5xOUjt1Uk
+        lUE4Tvwzf/WGQVqu2XCxMYsUx9IhiLE=
+X-Google-Smtp-Source: ABdhPJyMEGpvZAalq59pEh1tyS+gc2CVyG4l5mccpWVrdeAm1MoTqYn14B1GQELGGDa6oWT54pCb4Q==
+X-Received: by 2002:a17:90a:6be1:: with SMTP id w88mr7921583pjj.121.1627111809395;
+        Sat, 24 Jul 2021 00:30:09 -0700 (PDT)
+Received: from localhost.localdomain ([2601:1c0:6a01:d830::1291])
+        by smtp.gmail.com with ESMTPSA id u24sm38510919pfm.141.2021.07.24.00.30.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 24 Jul 2021 00:30:08 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [RFC PATCH v3 0/9] Bluetooth: btintel: Refactoring setup routines
+Date:   Sat, 24 Jul 2021 00:29:56 -0700
+Message-Id: <20210724073005.714003-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.26.3
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: d9dd833cf6d29695682ec7e7924c0d0992b906bc  Bluetooth: hci_h5: Add runtime suspend
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-elapsed time: 894m
+This patch set refactors the multiple setup routines for various Intel devices
+to a combined single entry. Here are the highlight of the changes:
 
-configs tested: 116
-configs skipped: 3
+1. Updated hci_alloc_dev() to allocate the hdev object with an extra buffer
+   for the private data. btintel introduces the btintel_data struct and
+   store it to the private data in hdev object.
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+2. Added a single entry for setup and shutdown and uses the
+   HCI_Intel_Read_Version command to identify the device, instead of
+   relying on the USB VID and PID.
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20210723
-arc                     haps_hs_smp_defconfig
-powerpc                    klondike_defconfig
-arm                         vf610m4_defconfig
-mips                       rbtx49xx_defconfig
-sh                        dreamcast_defconfig
-m68k                          sun3x_defconfig
-arm                          collie_defconfig
-powerpc                      makalu_defconfig
-sh                           se7750_defconfig
-arm                          moxart_defconfig
-powerpc               mpc834x_itxgp_defconfig
-sparc64                             defconfig
-arc                        nsim_700_defconfig
-powerpc                     ppa8548_defconfig
-h8300                            allyesconfig
-arm                          gemini_defconfig
-microblaze                          defconfig
-openrisc                  or1klitex_defconfig
-sh                          r7785rp_defconfig
-h8300                            alldefconfig
-powerpc                 mpc85xx_cds_defconfig
-sh                           se7705_defconfig
-arm                          badge4_defconfig
-powerpc                     kmeter1_defconfig
-sh                     sh7710voipgw_defconfig
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-x86_64                            allnoconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-i386                 randconfig-a005-20210723
-i386                 randconfig-a003-20210723
-i386                 randconfig-a004-20210723
-i386                 randconfig-a002-20210723
-i386                 randconfig-a001-20210723
-i386                 randconfig-a006-20210723
-i386                 randconfig-a005-20210722
-i386                 randconfig-a003-20210722
-i386                 randconfig-a004-20210722
-i386                 randconfig-a002-20210722
-i386                 randconfig-a001-20210722
-i386                 randconfig-a006-20210722
-x86_64               randconfig-a011-20210723
-x86_64               randconfig-a016-20210723
-x86_64               randconfig-a013-20210723
-x86_64               randconfig-a014-20210723
-x86_64               randconfig-a012-20210723
-x86_64               randconfig-a015-20210723
-i386                 randconfig-a016-20210724
-i386                 randconfig-a013-20210724
-i386                 randconfig-a012-20210724
-i386                 randconfig-a014-20210724
-i386                 randconfig-a011-20210724
-i386                 randconfig-a015-20210724
-i386                 randconfig-a016-20210723
-i386                 randconfig-a013-20210723
-i386                 randconfig-a012-20210723
-i386                 randconfig-a011-20210723
-i386                 randconfig-a014-20210723
-i386                 randconfig-a015-20210723
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                                  kexec
+   Also, it uses the new format of HCI_Intel_Read_Version command for
+   legacy ROM and legacy bootloader devices. Luckly legacy devices
+   support the new format.
 
-clang tested configs:
-x86_64               randconfig-c001-20210723
-x86_64               randconfig-c001-20210724
-x86_64               randconfig-b001-20210723
-x86_64               randconfig-a003-20210723
-x86_64               randconfig-a006-20210723
-x86_64               randconfig-a001-20210723
-x86_64               randconfig-a005-20210723
-x86_64               randconfig-a004-20210723
-x86_64               randconfig-a002-20210723
+3. Keep the state of bootloader in btintel object. The bootloader state
+   is agnostic to the transport type, so btintel uses the btintel_data
+   to keep track of the state in the private data section in hdev.
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+4. After identifying the setup type for the device, it uses the
+   correspond setup routines based on the setup type, and the setup
+   routines were moved from btusb to btintel.
+   However, actual work for the setup routines were not changed or very
+   minimal.
+
+5. Since many functions were moved from btusb to btintel, clean up the
+   exported functions and make them static if possible.
+
+Tedd Ho-Jeong An (9):
+  Bluetooth: Add support hdev to allocate private data
+  Bluetooth: btintel: Add combined setup and shutdown functions
+  Bluetooth: btintel: Refactoring setup routine for legacy ROM sku
+  Bluetooth: btintel: Add btintel data struct
+  Bluetooth: btintel: Fix the first HCI command not work with ROM
+    device.
+  Bluetooth: btintel: Add combined set_diag functions
+  Bluetooth: btintel: Refactoring setup routine for legacy bootloader
+  Bluetooth: btintel: Refactoring setup routine for TLV based booloader
+  Bluetooth: btintel: Clean the exported function to static
+
+ drivers/bluetooth/bfusb.c        |    2 +-
+ drivers/bluetooth/bluecard_cs.c  |    2 +-
+ drivers/bluetooth/bpa10x.c       |    2 +-
+ drivers/bluetooth/bt3c_cs.c      |    2 +-
+ drivers/bluetooth/btintel.c      | 1184 ++++++++++++++++++++++++++++--
+ drivers/bluetooth/btintel.h      |   82 +--
+ drivers/bluetooth/btmrvl_main.c  |    2 +-
+ drivers/bluetooth/btmtksdio.c    |    2 +-
+ drivers/bluetooth/btmtkuart.c    |    2 +-
+ drivers/bluetooth/btqcomsmd.c    |    2 +-
+ drivers/bluetooth/btrsi.c        |    2 +-
+ drivers/bluetooth/btsdio.c       |    2 +-
+ drivers/bluetooth/btusb.c        | 1098 ++-------------------------
+ drivers/bluetooth/dtl1_cs.c      |    2 +-
+ drivers/bluetooth/hci_ldisc.c    |    2 +-
+ drivers/bluetooth/hci_serdev.c   |    2 +-
+ drivers/bluetooth/hci_vhci.c     |    2 +-
+ drivers/bluetooth/virtio_bt.c    |    2 +-
+ include/net/bluetooth/hci_core.h |    7 +-
+ net/bluetooth/hci_core.c         |   11 +-
+ 20 files changed, 1225 insertions(+), 1187 deletions(-)
+
+-- 
+2.26.3
+
