@@ -2,124 +2,281 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF1E4C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 12:22:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F5E8C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 14:04:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8EF960E98
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 12:22:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 426046069E
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 24 Jul 2021 14:04:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234266AbhGXLmF (ORCPT
+        id S233591AbhGXNXq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 24 Jul 2021 07:42:05 -0400
-Received: from mout.gmx.net ([212.227.15.19]:53465 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234250AbhGXLly (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 24 Jul 2021 07:41:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1627129344;
-        bh=93pczZ/TrPgKDCMWQvii3munN+eykEYdV1vWI5tNV6E=;
-        h=X-UI-Sender-Class:Date:From:To:Cc:Subject:References:In-Reply-To;
-        b=DV7utWnuj6pUqJRfpUqPq9GGrIHQPjiUqaMsNNAgD/mrN2dL3b2lUtrzf0REXdNwD
-         YKEUQKTxn6kMdoVRatta6uCoaTQxrwlFQJ5calEmFjZEXYZ82syHOJuYsQ/lvWossP
-         QIZfubWwX5bxUSIGK0nza2lESABkBm/8D1/cyh9Q=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from titan ([83.52.228.41]) by mail.gmx.net (mrgmx004
- [212.227.17.184]) with ESMTPSA (Nemesis) id 1MC34h-1lvTt43vp7-00CPhb; Sat, 24
- Jul 2021 14:22:24 +0200
-Date:   Sat, 24 Jul 2021 14:22:21 +0200
-From:   Len Baker <len.baker@gmx.com>
-To:     Adam Sampson <ats@offog.org>
-Cc:     Len Baker <len.baker@gmx.com>, Kees Cook <keescook@chromium.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Sat, 24 Jul 2021 09:23:46 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:56836 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229713AbhGXNXo (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 24 Jul 2021 09:23:44 -0400
+Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 16OE3p8p052500;
+        Sat, 24 Jul 2021 23:03:51 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
+ Sat, 24 Jul 2021 23:03:51 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
+Received: from localhost.localdomain (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 16OE3iAa052479
+        (version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+        Sat, 24 Jul 2021 23:03:51 +0900 (JST)
+        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
+From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+To:     Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-hardening@vger.kernel.org
-Subject: Re: [PATCH] drivers/bluetooth: Remove all strcpy() uses
-Message-ID: <20210724112139.GC4709@titan>
-References: <20210718153626.18382-1-len.baker@gmx.com>
- <y2awnpnfvnc.fsf@offog.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <y2awnpnfvnc.fsf@offog.org>
-X-Provags-ID: V03:K1:ydVGEqIMa6taHulJ5X8IxGd16Qcx4W/RSiaUkXIKSJ1yWPZ1s/+
- scbvgai6zJXARlLtQEymAiNlZ90BsVDxkmWllgbA/tesQqEU9dkwS0gi9XGDLyS4iR5MWbM
- v1KyoH6YX5HB4iDSpJIp2WShcnYWyXnS1fN9lVg5cugfpqyQLRueu4mGTQTeHAjMqmMD/SC
- V6AVOMfGPrtjUl5FK5i4g==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:JK6Vv9Z4NjE=:PnZZZ7PGYLk7TF+E1Er85G
- Ve146W1MrrTbC/32ZYq0plgoMZds10cV+ZkR4JoSJQfrdBC4Xv+nC2l0G4eTkdza7B/ZiNtjq
- sdTjDwXIuYgP3qly0VMsjh5ixbSxQjCyTMaEXYGP/0kh62Y35Jr3LoHAhjHTQqHhfpLqXQx1u
- M9UWpAWcGoTAODVttWdwogf6lawSeekabHO91ImcPpMIqh/pTdnctLCTXXxWOZh3cnYTHXWOQ
- B2FClPO2CfdxwIAWfbkXjPm4o+V2osCc/oq2KBkcmGOl6zq1d0V3+OOKk/Lrno8mobe5efAZT
- 1Y8ASbaSdx2j1GW0wBAO/yAv0L0LBLiPQyiUfe18F26x+7j4h0bku5apLl8+DEO7KQjlpfKzT
- o66rXLsV9KlU5+t2zo46orH3Fws4h1oQ+v49bGS9PzJA9OlJwxpGfdJNq5Z85PjAW4fSBKhTv
- rS0ExHbXv6MtRT0pwdrjE+BFEiarMyTnKd45MyBAkDaE39IQAbumdw888os/6nbzZQde8ijA2
- Jxk73Y1wTP3yLrlmBaN9kEYzeBShlLpB7qqxx5LRLAG4/k2xvz2H4ABJ10L4yhNpdVbR79Si2
- 2IfqdlZfvIEI8f/wioTV2EGWnFDKzpnPVUGzBxGda6Zj5f8gMn8ke9d9FYpwCGKmM+1KTnGdy
- n0m0ZzPah0QvY/AaVQeFFkcFkV7BRGwvBsJtNP12tQ5gb15KOvsBXmSQwfWMe6yxcgEHUnYRH
- iTdrhKfzLfNjp7oXZdl+vnOB02owfDVibQDswA+EfCPRNbwLHTsJoXkPCcGMWUtR0vpQa+4CH
- 2j52wLiefWzKYt/OxooayxrGYMoto4oVaKKUSFp/RPiHUQN9Tb1A0J3vMDnbn32XE1hPMtPjl
- MlYb4DQg8qgNnjHMBnfCeok2YYWihpUX1Lyp+E9PsoojGeRaDyw+6gipWXH0N7VFVb2lwhch9
- fj4+7e+nVh6UT39l764P8bRG2VXA+1SfOZuFdM6GGghnYEPCfDy4Q0QPAXaCiMITRqJXbxgaN
- t/tlpuduFxK0zz30d1FDexhyLgzjW4T+l6tuEcQsgLR4apiUj0JlxHxg6y3G9BnLnMcEDJWn6
- /KxB67SI1KV5Y9P3dvYCREL1xxDUWjvC4WJ
-Content-Transfer-Encoding: quoted-printable
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH] Bluetooth: use helper function for monitor's open/close notifications
+Date:   Sat, 24 Jul 2021 23:03:31 +0900
+Message-Id: <20210724140331.3465-1-penguin-kernel@I-love.SAKURA.ne.jp>
+X-Mailer: git-send-email 2.18.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+hci_sock.c has many
+hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, HCI_SOCK_TRUSTED, NULL);
+calls. Use helper functions and replace skb with sk.
 
-On Sun, Jul 18, 2021 at 05:12:55PM +0100, Adam Sampson wrote:
-> Len Baker <len.baker@gmx.com> writes:
->
-> > strcpy() performs no bounds checking on the destination buffer. This
-> > could result in linear overflows beyond the end of the buffer, leading
-> > to all kinds of misbehaviors. The safe replacement is strscpy() but in
-> > this case it is better to use the scnprintf to simplify the arithmetic=
-.
-> >
-> > This is a previous step in the path to remove the strcpy() function
-> > entirely from the kernel.
-> >
-> > Signed-off-by: Len Baker <len.baker@gmx.com>
-> > ---
-> >  drivers/bluetooth/btmrvl_sdio.c | 27 +++++++++++++--------------
-> >  1 file changed, 13 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btmrvl_sdio.c b/drivers/bluetooth/btmrv=
-l_sdio.c
-> > index cddd350beba3..d6674b367e05 100644
-> > --- a/drivers/bluetooth/btmrvl_sdio.c
-> > +++ b/drivers/bluetooth/btmrvl_sdio.c
-> > @@ -1350,6 +1350,7 @@ static void btmrvl_sdio_coredump(struct device *=
-dev)
-> >  	u8 *dbg_ptr, *end_ptr, *fw_dump_data, *fw_dump_ptr;
-> [...]
-> > +			size +=3D scnprintf(fw_dump_ptr + size,
-> > +					  sizeof(fw_dump_ptr) - size,
-> [...]
-> > +			size +=3D scnprintf(fw_dump_ptr + size,
-> > +					  sizeof(fw_dump_ptr) - size,
->
-> sizeof(fw_dump_ptr) there looks wrong -- you want the size of the buffer
-> it points to (fw_dump_len + 1)?
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+---
+ net/bluetooth/hci_sock.c | 96 ++++++++++++++++------------------------
+ 1 file changed, 37 insertions(+), 59 deletions(-)
 
-Apologies. I will work on it and I will send a new version for review.
-Thanks for the feedback.
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 786a06a232fd..fc2336855dab 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -295,6 +295,11 @@ void hci_send_to_channel(unsigned short channel, struct sk_buff *skb,
+ 	read_unlock(&hci_sk_list.lock);
+ }
+ 
++static void __hci_send_to_monitor(struct sk_buff *skb)
++{
++	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, HCI_SOCK_TRUSTED, NULL);
++}
++
+ /* Send frame to monitor socket */
+ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+@@ -350,8 +355,7 @@ void hci_send_to_monitor(struct hci_dev *hdev, struct sk_buff *skb)
+ 	hdr->index = cpu_to_le16(hdev->id);
+ 	hdr->len = cpu_to_le16(skb->len);
+ 
+-	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb_copy,
+-			    HCI_SOCK_TRUSTED, NULL);
++	__hci_send_to_monitor(skb_copy);
+ 	kfree_skb(skb_copy);
+ }
+ 
+@@ -545,6 +549,16 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
+ 	return skb;
+ }
+ 
++static void hci_monitor_ctrl_open(struct sock *sk)
++{
++	struct sk_buff *skb = create_monitor_ctrl_open(sk);
++
++	if (skb) {
++		__hci_send_to_monitor(skb);
++		kfree_skb(skb);
++	}
++}
++
+ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+ {
+ 	struct hci_mon_hdr *hdr;
+@@ -583,6 +597,16 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+ 	return skb;
+ }
+ 
++static void hci_monitor_ctrl_close(struct sock *sk)
++{
++	struct sk_buff *skb = create_monitor_ctrl_close(sk);
++
++	if (skb) {
++		__hci_send_to_monitor(skb);
++		kfree_skb(skb);
++	}
++}
++
+ static struct sk_buff *create_monitor_ctrl_command(struct sock *sk, u16 index,
+ 						   u16 opcode, u16 len,
+ 						   const void *buf)
+@@ -741,8 +765,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 		/* Send event to monitor */
+ 		skb = create_monitor_event(hdev, event);
+ 		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
++			__hci_send_to_monitor(skb);
+ 			kfree_skb(skb);
+ 		}
+ 	}
+@@ -859,7 +882,6 @@ static int hci_sock_release(struct socket *sock)
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct hci_dev *hdev;
+-	struct sk_buff *skb;
+ 
+ 	BT_DBG("sock %p sk %p", sock, sk);
+ 
+@@ -876,12 +898,7 @@ static int hci_sock_release(struct socket *sock)
+ 	case HCI_CHANNEL_USER:
+ 	case HCI_CHANNEL_CONTROL:
+ 		/* Send event to monitor */
+-		skb = create_monitor_ctrl_close(sk);
+-		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
+-			kfree_skb(skb);
+-		}
++		hci_monitor_ctrl_close(sk);
+ 
+ 		hci_sock_free_cookie(sk);
+ 		break;
+@@ -1021,18 +1038,11 @@ static int hci_sock_ioctl(struct socket *sock, unsigned int cmd,
+ 	 * of a given socket.
+ 	 */
+ 	if (hci_sock_gen_cookie(sk)) {
+-		struct sk_buff *skb;
+-
+ 		if (capable(CAP_NET_ADMIN))
+ 			hci_sock_set_flag(sk, HCI_SOCK_TRUSTED);
+ 
+ 		/* Send event to monitor */
+-		skb = create_monitor_ctrl_open(sk);
+-		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
+-			kfree_skb(skb);
+-		}
++		hci_monitor_ctrl_open(sk);
+ 	}
+ 
+ 	release_sock(sk);
+@@ -1114,7 +1124,6 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 	struct sockaddr_hci haddr;
+ 	struct sock *sk = sock->sk;
+ 	struct hci_dev *hdev = NULL;
+-	struct sk_buff *skb;
+ 	int len, err = 0;
+ 
+ 	BT_DBG("sock %p sk %p", sock, sk);
+@@ -1162,12 +1171,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			 * notification. Send a close notification first to
+ 			 * allow the state transition to bounded.
+ 			 */
+-			skb = create_monitor_ctrl_close(sk);
+-			if (skb) {
+-				hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-						    HCI_SOCK_TRUSTED, NULL);
+-				kfree_skb(skb);
+-			}
++			hci_monitor_ctrl_close(sk);
+ 		}
+ 
+ 		if (capable(CAP_NET_ADMIN))
+@@ -1176,12 +1180,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		hci_pi(sk)->hdev = hdev;
+ 
+ 		/* Send event to monitor */
+-		skb = create_monitor_ctrl_open(sk);
+-		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
+-			kfree_skb(skb);
+-		}
++		hci_monitor_ctrl_open(sk);
+ 		break;
+ 
+ 	case HCI_CHANNEL_USER:
+@@ -1251,12 +1250,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 			 * a user channel socket. For a clean transition, send
+ 			 * the close notification first.
+ 			 */
+-			skb = create_monitor_ctrl_close(sk);
+-			if (skb) {
+-				hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-						    HCI_SOCK_TRUSTED, NULL);
+-				kfree_skb(skb);
+-			}
++			hci_monitor_ctrl_close(sk);
+ 		}
+ 
+ 		/* The user channel is restricted to CAP_NET_ADMIN
+@@ -1267,12 +1261,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 		hci_pi(sk)->hdev = hdev;
+ 
+ 		/* Send event to monitor */
+-		skb = create_monitor_ctrl_open(sk);
+-		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
+-			kfree_skb(skb);
+-		}
++		hci_monitor_ctrl_open(sk);
+ 
+ 		atomic_inc(&hdev->promisc);
+ 		break;
+@@ -1359,21 +1348,11 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 				 * allow for a clean transition, send the
+ 				 * close notification first.
+ 				 */
+-				skb = create_monitor_ctrl_close(sk);
+-				if (skb) {
+-					hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-							    HCI_SOCK_TRUSTED, NULL);
+-					kfree_skb(skb);
+-				}
++				hci_monitor_ctrl_close(sk);
+ 			}
+ 
+ 			/* Send event to monitor */
+-			skb = create_monitor_ctrl_open(sk);
+-			if (skb) {
+-				hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-						    HCI_SOCK_TRUSTED, NULL);
+-				kfree_skb(skb);
+-			}
++			hci_monitor_ctrl_open(sk);
+ 
+ 			hci_sock_set_flag(sk, HCI_MGMT_INDEX_EVENTS);
+ 			hci_sock_set_flag(sk, HCI_MGMT_UNCONF_INDEX_EVENTS);
+@@ -1559,8 +1538,7 @@ static int hci_mgmt_cmd(struct hci_mgmt_chan *chan, struct sock *sk,
+ 		skb = create_monitor_ctrl_command(sk, index, opcode, len,
+ 						  buf + sizeof(*hdr));
+ 		if (skb) {
+-			hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
+-					    HCI_SOCK_TRUSTED, NULL);
++			__hci_send_to_monitor(skb);
+ 			kfree_skb(skb);
+ 		}
+ 	}
+@@ -1715,7 +1693,7 @@ static int hci_logging_frame(struct sock *sk, struct msghdr *msg, int len)
+ 
+ 	hdr->opcode = cpu_to_le16(HCI_MON_USER_LOGGING);
+ 
+-	hci_send_to_channel(HCI_CHANNEL_MONITOR, skb, HCI_SOCK_TRUSTED, NULL);
++	__hci_send_to_monitor(skb);
+ 	err = len;
+ 
+ 	if (hdev)
+-- 
+2.18.4
 
->
-> Thanks,
->
-> --
-> Adam Sampson <ats@offog.org>                         <http://offog.org/>
-
-Regards,
-Len
