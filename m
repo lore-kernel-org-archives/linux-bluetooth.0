@@ -2,165 +2,159 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C914C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Jul 2021 13:00:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2A007C4320E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jul 2021 04:02:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0278060E77
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 25 Jul 2021 13:00:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B1BB60E78
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 26 Jul 2021 04:02:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230193AbhGYMU0 (ORCPT
+        id S231805AbhGZDVq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 25 Jul 2021 08:20:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55746 "EHLO
+        Sun, 25 Jul 2021 23:21:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55924 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230029AbhGYMUZ (ORCPT
+        with ESMTP id S231371AbhGZDVo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 25 Jul 2021 08:20:25 -0400
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4D29C061757
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Jul 2021 06:00:54 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id hs23so11223879ejc.13
-        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Jul 2021 06:00:54 -0700 (PDT)
+        Sun, 25 Jul 2021 23:21:44 -0400
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A28EC061765
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Jul 2021 21:02:13 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id e2so9399104wrq.6
+        for <linux-bluetooth@vger.kernel.org>; Sun, 25 Jul 2021 21:02:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=binghamton.edu; s=google;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=nAK5MB9sPYqjlh5rpF65jiMMnujrBD48MVs/hKZOpxs=;
-        b=SpKJxZr5Yofz5zOjE2m54wD4A/1F/gMripq+WP24V/nwrAYoRDmWdsoxgBGMuv0fnV
-         B5UJvKWS7nx4oCkM02QY3rbNnynAyOfa0Kx3cEPjfgw+E9kiNxM9/ykeQAJ6J7Rbuczz
-         3FccJSCgQxFodxYMaX5W8z03twIKYuyvrkbUM=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=OAGvUT/kXC9dCKrJ4XapF6slBWwOhbYOVHaafdEp/tM=;
+        b=v8JDrOVUtls1FoQTqc5CyiVAhbR19hifbzmcSfXSY24Icy+D9698bnVhJhDfHkxjNi
+         LfRpjpBYpGWkPp7C9T9kH69jAPAQmo0c2FI34+uX4zmEmdKWzhnJaw/IweVbo3dgfYuY
+         JmsNCdkyE7oI9BKSpOOjTb+AG6yrYaZPI1bMvU9i5x1jfs6RotFuwzXm/dxbDAW91vGA
+         9E70nZRb4TSoTh3T0VB4ZEDydE9Wu5CO+sdbAidSYrtwSVPsNz6tktLs7T7/wD/SW9GU
+         JRL/ZzyKepS2seIe7kkSWoPkvov053pL3s5LRNrpKkhx8gf+wqv8KRbXesxuKvBfL9aJ
+         00kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=nAK5MB9sPYqjlh5rpF65jiMMnujrBD48MVs/hKZOpxs=;
-        b=K8mR1jCZDc5ug6/rh3Caxy7yyp3vlk6n0xhcJWLalhwqbUFrgxkEKH1vsI34mjEXXg
-         o7N3JviNimEDsuCllF8V/nZMAFXkapEDw+arqS7+ltyyR76bK/klMpBwM4Kji7biDr6y
-         3vz7EMj7qtUAx1CkV4jjAFKEJch5/vPvsULsaILCtRv+3Mct9FdQTodEFwonUxeTrl9o
-         /IVHpaccZI+u7X7XcLzDcqAF3CC/ZCfowyTvUKerTwKh/s6LC4nb9MDAfBnvbIr3CiAt
-         rBCzrCQbG4tvMCjSU25WhbvHZ0XtmsYm6y+2vjlhLS4NIQKylV7BLCLXm8Lv8x3EWR9v
-         mgGQ==
-X-Gm-Message-State: AOAM532v73APFcwglBGn2VC1ZU8tTI9Sq07jSKMjg9tKqP54HWoPGOoZ
-        n764rYJzPECRa+JC0VGvzb2DIgNaL9qKheAN5b1DTaiuPmJ21Q==
-X-Google-Smtp-Source: ABdhPJx0fmlCU6+CsYeSWVr+dc2ScFidCBwlt9/+GwFxsf/0i/uohCYP6OBR9npBaFRYCXV/Ci75dGYGk1ISuL0/Gaw=
-X-Received: by 2002:a17:906:7fd3:: with SMTP id r19mr3485080ejs.314.1627218052996;
- Sun, 25 Jul 2021 06:00:52 -0700 (PDT)
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=OAGvUT/kXC9dCKrJ4XapF6slBWwOhbYOVHaafdEp/tM=;
+        b=Nn8QF++LmCgWWkr1w/zl8LC/H8omsy0bXL9aRLBMm5qctjBTImzTYC6KP/MEFl+QLf
+         7Ze4uTaZqzS4sidx/z4en3GtAwERKR4cEMiKLybOaoifggI9duK29ahHwYDJvBIbIrmA
+         p6C3A4M9huIf38bBGGBJu0eRSJ0wamF4S5/jTCKiv/emgs4gL/unNVZHIAsQ2o/pYfEg
+         TZEQpVzZQTZi9tqut/5Blxu7hpEVsFDjls59qbY80i6gWVogMwh9lrADvlnNylugjUcQ
+         XX/x8JqWceFuZ04ysf/YCcMyVWlJBtVmWNkXEXmWLBvAMRItgXF8rgfEUAG4mAc0L2ZB
+         YtNA==
+X-Gm-Message-State: AOAM532WtfIKKblXZSOa2jkfd8TJ4vIRPcAJz3y0YoPSk17UFzg/CCiR
+        mcEWutLAI9INbASc3FXt7zjtJ3QCSwjoj5uU49AgEA==
+X-Google-Smtp-Source: ABdhPJw585+OF8XW1vFb2TNPoadvCSK7Bd8Kiiz38Ij6LI7300i0MvGlTkFPqXcpU1JbUgbu9sw23VkptVhzXERcccs=
+X-Received: by 2002:adf:e5c4:: with SMTP id a4mr3985900wrn.262.1627272131775;
+ Sun, 25 Jul 2021 21:02:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   Zhan Shu <zshu1@binghamton.edu>
-Date:   Sun, 25 Jul 2021 09:00:40 -0400
-Message-ID: <CALdsPdb7x1mmt2YjkWE-0+kAJ+37uJ2A=-NbSp0C9CSK-o4rfA@mail.gmail.com>
-Subject: BlueTooth bug freeze target linux kernel system
-To:     linux-bluetooth@vger.kernel.org
+References: <20210715225146.v2.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
+ <57AE120A-78AE-4990-8D7F-BA8D8077B610@holtmann.org> <CAJQfnxFzj9m43wntnb2gvXkJS6B5+aQGsu7v6hc4H4ktAopk7g@mail.gmail.com>
+ <A2D33DB0-40DD-4F14-BFB9-9FB34DB003A8@holtmann.org>
+In-Reply-To: <A2D33DB0-40DD-4F14-BFB9-9FB34DB003A8@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Mon, 26 Jul 2021 12:02:00 +0800
+Message-ID: <CAJQfnxFikFjkGn6_+n=ycH4byzTMWY51C=+VJOycg_ZXmg=qqA@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Bluetooth: hci_h5: add WAKEUP_DISABLE flag
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Hilda Wu <hildawu@realtek.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-  We are working on fuzzing testing the target protocol security.
-While fuzzing the BlueTooth L2CAP signal request we found that the
-target system will freeze and the process 'bluetoothd' CPU usage
-becomes fully used. No other process can run anymore. This bug can not
-be reproduced by the same set of command sequences. So we can not
-locate the problem in the code. But to reproduce the error we can do
-the loop:
-1. build a normal L2CAP socket connection.
-2. send set of command to reach the specific state
-'02:06:04:00:01:00:40:00','04:07:13:00:40:00:00:00:01:03:f5:03:04:09:8e:00:00:00:00:00:00:00:00','04:07:13:00:40:00:00:00:01:02:9d:03:04:09:ef:00:00:00:00:00:00:00:00'
-3. Randomly fills the value into the options field of the CONFIG
-request. And send the CONFIG request to the target.
-4. Shut down the HCI connection directly.
-5. go to step1 and do everything again.
-This is not the only way to crash the target but fuzzing on other
-states may take a longer time to crash the target. We send each
-command every 0.7 seconds, and usually, the target will crash in half
-an hour.
-We tested this bug on 4.14, 4.15, and 5.43 three different kernels of
-Linux. They all have the same problem.
-We post the dmsg before it crash here:
-[174611.980681] Modules linked in: rfcomm cmac xt_CHECKSUM
-iptable_mangle ipt_MASQUERADE nf_nat_masquerade_ipv4 iptable_nat
-nf_nat_ipv4 nf_nat nf_conntrack_ipv4 nf_defrag_ipv4 xt_conntrack
-nf_conntrack libcrc32c ipt_REJECT nf_reject_ipv4 xt_tcpudp bridge stp
-llc pci_stub vboxpci(OE) vboxnetadp(OE) vboxnetflt(OE) vboxdrv(OE)
-ebtable_filter ebtables ip6table_filter ip6_tables iptable_filter
-devlink ccm bnep intel_rapl uvcvideo x86_pkg_temp_thermal
-intel_powerclamp videobuf2_vmalloc videobuf2_memops videobuf2_v4l2
-videobuf2_core coretemp videodev crct10dif_pclmul crc32_pclmul
-snd_hda_codec_hdmi snd_hda_codec_realtek snd_hda_codec_generic media
-ghash_clmulni_intel snd_hda_intel snd_hda_codec rtsx_usb_ms memstick
-snd_hda_core pcbc arc4 btusb snd_hwdep btrtl btbcm btintel aesni_intel
-snd_pcm iwlmvm bluetooth
-[174611.980707]  ecdh_generic aes_x86_64 mac80211 snd_seq_midi
-snd_seq_midi_event dell_laptop dell_smm_hwmon crypto_simd glue_helper
-snd_rawmidi iwlwifi cfg80211 snd_seq snd_seq_device cryptd
-intel_cstate intel_rapl_perf joydev dell_wmi sparse_keymap input_leds
-snd_timer serio_raw snd mei_me shpchp dell_smbios dcdbas
-dell_wmi_descriptor wmi_bmof mei dell_rbtn soundcore lpc_ich acpi_pad
-mac_hid kvm_intel binfmt_misc kvm irqbypass sch_fq_codel parport_pc
-ppdev lp parport ip_tables x_tables autofs4 rtsx_usb_sdmmc rtsx_usb
-i915 i2c_algo_bit drm_kms_helper syscopyarea sysfillrect sysimgblt
-ahci psmouse libahci fb_sys_fops r8169 drm mii wmi video i2c_hid hid
-[174611.980735] CPU: 0 PID: 916 Comm: bluetoothd Tainted: G        W
-OE    4.15.0-72-generic #81-Ubuntu
-[174611.980736] Hardware name: Dell Inc. Inspiron 5558/0V7MX2, BIOS
-A02 03/09/2015
-[174611.980743] RIP: 0010:bt_sock_poll+0x17a/0x1d0 [bluetooth]
-[174611.980744] RSP: 0018:ffffb6ea41293a88 EFLAGS: 00010246
-[174611.980746] RAX: fffffffffffffd38 RBX: ffff8c0c53bf0000 RCX:
-0000000000000000
-[174611.980747] RDX: 0000000000000000 RSI: ffff8c0c21941800 RDI:
-0000000000000000
-[174611.980748] RBP: ffffb6ea41293aa0 R08: ffff8c0c4b771d00 R09:
-0000000000000466
-[174611.980749] R10: 0000000000000000 R11: 00017c4f569e4e50 R12:
-ffffb6ea41293c30
-[174611.980749] R13: ffff8c0c4b771d00 R14: 0000000000000000 R15:
-ffff8c0c4b771d00
-[174611.980751] FS:  00007fafd6a797c0(0000) GS:ffff8c0c5f400000(0000)
-knlGS:0000000000000000
-[174611.980752] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[174611.980753] CR2: 0000000000000000 CR3: 0000000190dac004 CR4:
-00000000003606f0
-[174611.980754] Call Trace:
-[174611.980758]  sock_poll+0x74/0x90
-[174611.980761]  do_sys_poll+0x26f/0x580
-[174611.980764]  ? __wake_up_sync_key+0x1e/0x30
-[174611.980766]  ? sock_def_readable+0x40/0x70
-[174611.980768]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980769]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980771]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980772]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980774]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980775]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980777]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980778]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980779]  ? compat_poll_select_copy_remaining+0x130/0x130
-[174611.980781]  SyS_poll+0x30/0x130
-[174611.980782]  ? SyS_poll+0x30/0x130
-[174611.980785]  do_syscall_64+0x73/0x130
-[174611.980787]  entry_SYSCALL_64_after_hwframe+0x3d/0xa2
-[174611.980789] RIP: 0033:0x7fafd5c27bc4
-[174611.980789] RSP: 002b:00007ffe26f7aac8 EFLAGS: 00000246 ORIG_RAX:
-0000000000000007
-[174611.980791] RAX: ffffffffffffffda RBX: 000056363ed5bc90 RCX:
-00007fafd5c27bc4
-[174611.980792] RDX: 00000000ffffffff RSI: 000000000000001b RDI:
-000056363ed77000
-[174611.980793] RBP: 000000000000001b R08: 000000000000001b R09:
-000056363ed78f10
-[174611.980794] R10: 000056363ed5c8e0 R11: 0000000000000246 R12:
-000056363ed77000
-[174611.980794] R13: 00000000ffffffff R14: 00007fafd65b8f70 R15:
-000000000000001b
-[174611.980796] Code: 80 fa 01 75 11 eb 5e 0f b6 48 12 48 89 c6 48 89
-d0 80 f9 01 74 4f 48 8b 93 e0 02 00 00 83 e2 01 74 09 0f b6 56 12 80
-fa 06 74 3a <48> 8b b8 c8 02 00 00 48 39 c3 48 8d 97 38 fd ff ff 75 c9
-5b 31
-[174611.980822] RIP: bt_sock_poll+0x17a/0x1d0 [bluetooth] RSP: ffffb6ea41293a88
-[174611.980823] CR2: 0000000000000000
-Hope someone can figure it out.
+Hi Marcel,
+
+On Fri, 23 Jul 2021 at 20:17, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Archie,
+>
+> >>> Some RTL chips resets the FW on suspend, so wakeup is disabled on
+> >>> those chips. This patch introduces this WAKEUP_DISABLE flag so that
+> >>> chips that doesn't reset FW on suspend can leave the flag unset and
+> >>> is allowed to wake the host.
+> >>>
+> >>> This patch also left RTL8822 WAKEUP_DISABLE flag unset, therefore
+> >>> allowing it to wake the host, and preventing reprobing on resume.
+> >>>
+> >>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> >>> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> >>> Reviewed-by: Hilda Wu <hildawu@realtek.com>
+> >>>
+> >>> ---
+> >>>
+> >>> Changes in v2:
+> >>> * Remove unnecessary variable
+> >>>
+> >>> drivers/bluetooth/hci_h5.c | 83 +++++++++++++++++++++++++++----------=
+-
+> >>> 1 file changed, 59 insertions(+), 24 deletions(-)
+> >>
+> >> so the set does not apply cleanly to bluetooth-next
+> >>
+> >> Applying: Bluetooth: hci_h5: Add runtime suspend
+> >> error: patch failed: drivers/bluetooth/hci_h5.c:11
+> >> error: drivers/bluetooth/hci_h5.c: patch does not apply
+> >
+> > Hmm, it applies cleanly for me. Not sure what's going on.
+> > Anyway I rebased and made a little change as v3, please take a look!
+>
+> the v3 applied cleanly.
+>
+> >>
+> >>
+> >> And I am really close to not accepting any patches for hci_h5.c anymor=
+e. This thing turns into crazy hacking and nobody is taking my hint to redo=
+ this as clean H:5 3-Wire serdev standalone driver.
+> >
+> > Pardon my unfamiliarity, but could you share more about your vision of
+> > a clean h5 driver? Should the RTL component be moved out to btrtl?
+> > Do we have something as a reference?
+>
+> so a while back I send a bt3wire.c sample driver around. That would be a =
+good starting point.
+>
+> Anyhow, the problem is that hci_uart.ko is inherent a line discipline dri=
+ver from 2.4.x kernel days and it has been stacked and hacked on top of it.=
+ It has become a burden, especially in the light that you can have clean se=
+rdev based drivers now (like btmtkuart.c).
+>
+> And yes, it would be following the 3-Wire H:5 spec and then deal with ven=
+dor specific details like btusb.c for example. And my hope would be that es=
+pecially in the Realtek and Broadcom (RPi3 etc.) cases this can move into v=
+endor specific blocks and shared between USB and UART transports.
+>
+> I also send around a btuart.c sample driver that is solely serdev based a=
+nd should replace all the cases where we have H:4 as transport.
+>
+
+Thanks for the pointers!
+
+The files you mentioned are rather hard to find, so below I paste the
+URL where I found them in case anyone else is also interested.
+
+[RFC v2] Bluetooth: Add new serdev based driver for UART attached controlle=
+rs
+https://www.spinics.net/lists/linux-bluetooth/msg74918.html
+
+[RFC] Bluetooth: Add new serdev based driver for 3-Wire attached controller=
+s
+https://www.spinics.net/lists/linux-bluetooth/msg74839.html
 
 Thanks,
-Zhan
+Archie
