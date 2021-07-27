@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F57FC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jul 2021 23:51:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A333C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jul 2021 23:51:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E6A8760FC0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jul 2021 23:51:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 68BB960F93
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 27 Jul 2021 23:51:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232963AbhG0Xvo (ORCPT
+        id S233132AbhG0Xvp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 27 Jul 2021 19:51:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37194 "EHLO
+        Tue, 27 Jul 2021 19:51:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232883AbhG0Xvn (ORCPT
+        with ESMTP id S232983AbhG0Xvo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 27 Jul 2021 19:51:43 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51747C061760
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jul 2021 16:51:42 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id n10so481353plf.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jul 2021 16:51:42 -0700 (PDT)
+        Tue, 27 Jul 2021 19:51:44 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A544C061757
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jul 2021 16:51:43 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id b6so2383414pji.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 27 Jul 2021 16:51:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=ujv8xZH/VDjMO2Ul6piiScZ73Az6pJDrbgCUWoOkWrU=;
-        b=mrb8bflPohHwodSl0tJjpW5Vt6H7ySlQqPfy8GpoIJW5iRxc+bjJDVCkkHkcyQJLlD
-         YuPHL2APipq5jmD5Qu9RTzCL1kEXznna3eDWjoCpnsFDu0RATcV9/DJYT6brsyv3r3RS
-         dT/K1Dw8RgR2mo/2xLvUdsgO1F0Ow5wDBAdx0BSP09tnw0l9B3qV3seXtw+OengeZMm3
-         X0e7/d+gWgOqB13iAg0A9ezgBIYZIMawLrmQLVO8i9Y+xKOq5uJoHhfTp2edHpxa687J
-         0y+vlVf4XkAW6/6NlI02OOdW4XyR9VJFo82MPk1TVU66yYNBqKNjMVt1htKDjpAxJ+w2
-         ghOQ==
+        bh=uybIKVPM4hp9SywafLYCli1GHjZzX15ud3br2iWGeUU=;
+        b=H87g7gerkRMb824X13goNJ95X97gh92MvaYYiVt7GvKiTarlh6U6DeeeCY4Hf7ozvi
+         4KedmNoLI8Z0HrCNR5XNGZxZXjUTQAH0HOy368w8zEgXwsHH5WRW8xDlzMAhl2zSYN6N
+         l9HhmJvLnNsPH2NJculFVaNQFSj5jhqfC0wv+n/7iLODmXI6wiI2G32efZpWXXMqgDQf
+         oHxNnzhFr4uVhluwKiCZ7w48ZhXboWllD+wXk04s3ERqXbEgGAfjVVEMIut0gZH67cLz
+         ylt7sfqsau98Jxbw+60xwWaxyMW3tHGKPWftRI/Xa1rcqUsa2QAVv22bU1z+vwIfDokZ
+         qa7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ujv8xZH/VDjMO2Ul6piiScZ73Az6pJDrbgCUWoOkWrU=;
-        b=O4cVDc+TFgpQNemrjA6mkVx091Pd+lPg8ibzy/vAqeyyJZxcpI7qA05o823qSvuf3s
-         kiuQQRcDU+0GH2iKOzdF6hTdGPG6PdcoXch8QLU8X1Ils704irw8bh9gITXpeaHTEH96
-         iXQd3WLUi427QtxXMFrCUCCeGwA9ZM7gD4HP71/TmXTuASUOr3VBo33IkwOISkoNewIa
-         YBtXF5j2F+Y7H0NMuiwBInzZzETvhkYp9Ij7Bt2qhSfxwPNmw8uVfm6Db9YVnwbYb9EZ
-         qCW3YlH/eV7lw8mlzm6NmFcyiDR5pm0Fu0IQe+6FbvSTFa8aX0/ScrLQwIFvueFW0MV5
-         WFsg==
-X-Gm-Message-State: AOAM532xMycLLNE9+CD36Pp1QflW6NzzWwNjBviE6qD7a54/p/cxVYUv
-        dhMc320PMHBkdBafJEglxvqwdb3qEYs=
-X-Google-Smtp-Source: ABdhPJyiCOHiqIWuD/ctL80aodPjv7Ak14P+l84wywpNaD4pd/0NCaQK+vE+mgN2cGIJfaE28Yz68w==
-X-Received: by 2002:a17:902:8e88:b029:11e:b703:83f1 with SMTP id bg8-20020a1709028e88b029011eb70383f1mr20435389plb.79.1627429901598;
-        Tue, 27 Jul 2021 16:51:41 -0700 (PDT)
+        bh=uybIKVPM4hp9SywafLYCli1GHjZzX15ud3br2iWGeUU=;
+        b=Wq0mYstBTni/pO3JlwGORvR6AYk5pqSFLcoCEOjni3RtRjlC3eJDfThoPdteJyCjFw
+         CfSYjewZd7zBk8sVdCoryRQCCRQoT1dJWm8D88as/f1aZH0schRHRfY2qX9egqS6swK/
+         NHCAkr+y6jSPLVdvaejN4zdn+LQbuz6225m9rp0mZdVwxbY+Tu1tZtN8kQsGx/FHooJ1
+         OGHjXJ+yYpThsSDDKfR/bIUjtgvTQD9mOb2vygDZ1TLCDsHPwO/YBBUGUiYzR+8eAQEp
+         b9owS6Tk3s/WxtPErJ95M5+o6JOLAPAJhV7AMiOG1Wr2N1Qi7WWpXQ/X5oXJiv0nFHPF
+         XebQ==
+X-Gm-Message-State: AOAM532T3BEo2xPmU/FwHX5ZXSyp7+ppIQIHZgQuPGev0+sfvgL3vRtt
+        2AQhIuv4uXeZTIQ5V1ME2aPxpnJV7jw=
+X-Google-Smtp-Source: ABdhPJz/IApKKAXYV1p0M/DJZRkdTvbBcH9wptfn69axHrO/LjuTqYUJA5YreaM9BcZ2g/cWUBHg+A==
+X-Received: by 2002:a05:6a00:882:b029:354:a616:7fbb with SMTP id q2-20020a056a000882b0290354a6167fbbmr25209422pfj.2.1627429902258;
+        Tue, 27 Jul 2021 16:51:42 -0700 (PDT)
 Received: from localhost.localdomain ([2601:1c0:6a01:d830::7cb2])
-        by smtp.gmail.com with ESMTPSA id y9sm1545332pfq.199.2021.07.27.16.51.40
+        by smtp.gmail.com with ESMTPSA id y9sm1545332pfq.199.2021.07.27.16.51.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 27 Jul 2021 16:51:41 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [RFC PATCH v4 02/11] Bluetooth: btintel: Add combined setup and shutdown functions
-Date:   Tue, 27 Jul 2021 16:51:18 -0700
-Message-Id: <20210727235127.173149-3-hj.tedd.an@gmail.com>
+Subject: [RFC PATCH v4 03/11] Bluetooth: btintel: Refactoring setup routine for legacy ROM sku
+Date:   Tue, 27 Jul 2021 16:51:19 -0700
+Message-Id: <20210727235127.173149-4-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.26.3
 In-Reply-To: <20210727235127.173149-1-hj.tedd.an@gmail.com>
 References: <20210727235127.173149-1-hj.tedd.an@gmail.com>
@@ -75,287 +75,724 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-There are multiple setup and shutdown functions for Intel device and the
-setup function to use is depends on the USB PID/VID, which makes
-difficult to maintain the code and increases the code size.
-
-This patch adds combined setup and shutdown functions to provide a
-single entry point for all Intel devices and choose the setup functions
-based on the information read with HCI_Intel_Read_Version command.
-
-Starting from TyP device, for HCI_Intel_Read_Version command, the
-command parameter and response are changed even though OCF remains
-same. Luckly the legacy devices still can handle the command without
-error even if it has a extra parameter, so it uses the new command
-format to support both legacy and new (tlv based) format.
+This patch refactors the setup routines for legacy ROM product into
+combined setup, and move the related functions from btusb to btintel.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- drivers/bluetooth/btintel.c | 196 ++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  12 +++
- 2 files changed, 208 insertions(+)
+ drivers/bluetooth/btintel.c | 287 +++++++++++++++++++++++++++-
+ drivers/bluetooth/btusb.c   | 362 +-----------------------------------
+ 2 files changed, 294 insertions(+), 355 deletions(-)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index e44b6993cf91..a23304435814 100644
+index a23304435814..cfc097694b53 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -236,6 +236,8 @@ int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
- 	 * compatibility options when newer hardware variants come along.
- 	 */
- 	switch (ver->hw_variant) {
-+	case 0x07:	/* WP - Legacy ROM */
-+	case 0x08:	/* StP - Legacy ROM */
- 	case 0x0b:      /* SfP */
- 	case 0x0c:      /* WsP */
- 	case 0x11:      /* JfP */
-@@ -250,9 +252,15 @@ int btintel_version_info(struct hci_dev *hdev, struct intel_version *ver)
- 	}
- 
- 	switch (ver->fw_variant) {
-+	case 0x01:
-+		variant = "Legacy ROM 2.5";
-+		break;
- 	case 0x06:
- 		variant = "Bootloader";
- 		break;
-+	case 0x22:
-+		variant = "Legacy ROM 2.x";
-+		break;
- 	case 0x23:
- 		variant = "Firmware";
- 		break;
-@@ -483,6 +491,98 @@ int btintel_version_info_tlv(struct hci_dev *hdev, struct intel_version_tlv *ver
- }
- EXPORT_SYMBOL_GPL(btintel_version_info_tlv);
- 
-+static int btintel_parse_version_tlv(struct hci_dev *hdev,
-+				     struct intel_version_tlv *version,
-+				     struct sk_buff *skb)
-+{
-+	/* Consume Command Complete Status field */
-+	skb_pull(skb, 1);
-+
-+	/* Event parameters contatin multiple TLVs. Read each of them
-+	 * and only keep the required data. Also, it use existing legacy
-+	 * version field like hw_platform, hw_variant, and fw_variant
-+	 * to keep the existing setup flow
-+	 */
-+	while (skb->len) {
-+		struct intel_tlv *tlv;
-+
-+		tlv = (struct intel_tlv *)skb->data;
-+		switch (tlv->type) {
-+		case INTEL_TLV_CNVI_TOP:
-+			version->cnvi_top = get_unaligned_le32(tlv->val);
-+			break;
-+		case INTEL_TLV_CNVR_TOP:
-+			version->cnvr_top = get_unaligned_le32(tlv->val);
-+			break;
-+		case INTEL_TLV_CNVI_BT:
-+			version->cnvi_bt = get_unaligned_le32(tlv->val);
-+			break;
-+		case INTEL_TLV_CNVR_BT:
-+			version->cnvr_bt = get_unaligned_le32(tlv->val);
-+			break;
-+		case INTEL_TLV_DEV_REV_ID:
-+			version->dev_rev_id = get_unaligned_le16(tlv->val);
-+			break;
-+		case INTEL_TLV_IMAGE_TYPE:
-+			version->img_type = tlv->val[0];
-+			break;
-+		case INTEL_TLV_TIME_STAMP:
-+			/* If image type is Operational firmware (0x03), then
-+			 * running FW Calendar Week and Year information can
-+			 * be extracted from Timestamp information
-+			 */
-+			version->min_fw_build_cw = tlv->val[0];
-+			version->min_fw_build_yy = tlv->val[1];
-+			version->timestamp = get_unaligned_le16(tlv->val);
-+			break;
-+		case INTEL_TLV_BUILD_TYPE:
-+			version->build_type = tlv->val[0];
-+			break;
-+		case INTEL_TLV_BUILD_NUM:
-+			/* If image type is Operational firmware (0x03), then
-+			 * running FW build number can be extracted from the
-+			 * Build information
-+			 */
-+			version->min_fw_build_nn = tlv->val[0];
-+			version->build_num = get_unaligned_le32(tlv->val);
-+			break;
-+		case INTEL_TLV_SECURE_BOOT:
-+			version->secure_boot = tlv->val[0];
-+			break;
-+		case INTEL_TLV_OTP_LOCK:
-+			version->otp_lock = tlv->val[0];
-+			break;
-+		case INTEL_TLV_API_LOCK:
-+			version->api_lock = tlv->val[0];
-+			break;
-+		case INTEL_TLV_DEBUG_LOCK:
-+			version->debug_lock = tlv->val[0];
-+			break;
-+		case INTEL_TLV_MIN_FW:
-+			version->min_fw_build_nn = tlv->val[0];
-+			version->min_fw_build_cw = tlv->val[1];
-+			version->min_fw_build_yy = tlv->val[2];
-+			break;
-+		case INTEL_TLV_LIMITED_CCE:
-+			version->limited_cce = tlv->val[0];
-+			break;
-+		case INTEL_TLV_SBE_TYPE:
-+			version->sbe_type = tlv->val[0];
-+			break;
-+		case INTEL_TLV_OTP_BDADDR:
-+			memcpy(&version->otp_bd_addr, tlv->val, tlv->len);
-+			break;
-+		default:
-+			/* Ignore rest of information */
-+			break;
-+		}
-+		/* consume the current tlv and move to next*/
-+		skb_pull(skb, tlv->len + sizeof(*tlv));
-+	}
-+
-+	return 0;
-+}
-+
- int btintel_read_version_tlv(struct hci_dev *hdev, struct intel_version_tlv *version)
- {
- 	struct sk_buff *skb;
-@@ -1272,6 +1372,102 @@ int btintel_set_debug_features(struct hci_dev *hdev,
+@@ -1372,6 +1372,291 @@ int btintel_set_debug_features(struct hci_dev *hdev,
  }
  EXPORT_SYMBOL_GPL(btintel_set_debug_features);
  
-+int btintel_setup_combined(struct hci_dev *hdev)
++static const struct firmware *btintel_legacy_rom_get_fw(struct hci_dev *hdev,
++					       struct intel_version *ver)
 +{
-+	const u8 param[1] = { 0xFF };
-+	struct intel_version ver;
-+	struct intel_version_tlv ver_tlv;
-+	struct sk_buff *skb;
-+	int err;
++	const struct firmware *fw;
++	char fwname[64];
++	int ret;
 +
-+	BT_DBG("%s", hdev->name);
++	snprintf(fwname, sizeof(fwname),
++		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
++		 ver->hw_platform, ver->hw_variant, ver->hw_revision,
++		 ver->fw_variant,  ver->fw_revision, ver->fw_build_num,
++		 ver->fw_build_ww, ver->fw_build_yy);
 +
-+	/* Starting from TyP device, the command parameter and response are
-+	 * changed even though the OCF for HCI_Intel_Read_Version command
-+	 * remains same. The legacy devices can handle even if the
-+	 * command has a parameter and returns a correct version information.
-+	 * So, it uses new format to support both legacy and new format.
-+	 */
-+	skb = __hci_cmd_sync(hdev, 0xfc05, 1, param, HCI_CMD_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading Intel version command failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	/* Check the status */
-+	if (skb->data[0]) {
-+		bt_dev_err(hdev, "Intel Read Version command failed (%02x)",
-+			   skb->data[0]);
-+		kfree_skb(skb);
-+		return -EIO;
-+	}
-+
-+	/* For Legacy device, check the HW platform value and size */
-+	if (skb->data[1] == 0x37 && skb->len == sizeof(ver)) {
-+		bt_dev_dbg(hdev, "Read the legacy Intel version information");
-+
-+		memcpy(&ver, skb->data, sizeof(ver));
-+
-+		/* Display version information */
-+		btintel_version_info(hdev, &ver);
-+
-+		/* Identify the device type based on the read version */
-+		switch (ver.hw_variant) {
-+		case 0x07:	/* WP */
-+		case 0x08:	/* StP */
-+			/* Legacy ROM product */
-+			/* TODO: call setup routine for legacy rom product */
-+			break;
-+		case 0x0b:      /* SfP */
-+		case 0x0c:      /* WsP */
-+		case 0x11:      /* JfP */
-+		case 0x12:      /* ThP */
-+		case 0x13:      /* HrP */
-+		case 0x14:      /* CcP */
-+			/* TODO: call setup routine for bootloader product */
-+			break;
-+		default:
-+			bt_dev_err(hdev, "Unsupported Intel hw variant (%u)",
-+				   ver.hw_variant);
-+			return -EINVAL;
++	ret = request_firmware(&fw, fwname, &hdev->dev);
++	if (ret < 0) {
++		if (ret == -EINVAL) {
++			bt_dev_err(hdev, "Intel firmware file request failed (%d)",
++				   ret);
++			return NULL;
 +		}
 +
-+		return err;
++		bt_dev_err(hdev, "failed to open Intel firmware file: %s (%d)",
++			   fwname, ret);
++
++		/* If the correct firmware patch file is not found, use the
++		 * default firmware patch file instead
++		 */
++		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.bseq",
++			 ver->hw_platform, ver->hw_variant);
++		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
++			bt_dev_err(hdev, "failed to open default fw file: %s",
++				   fwname);
++			return NULL;
++		}
 +	}
 +
-+	/* For TLV type device, parse the tlv data */
-+	btintel_parse_version_tlv(hdev, &ver_tlv, skb);
++	bt_dev_info(hdev, "Intel Bluetooth firmware file: %s", fwname);
 +
-+	/* Display version information of TLV type */
-+	btintel_version_info_tlv(hdev, &ver_tlv);
-+
-+	/* TODO: Need to filter the device for new generation */
-+	/* TODO: call setup routine for tlv based bootloader product */
-+
-+	return err;
++	return fw;
 +}
-+EXPORT_SYMBOL_GPL(btintel_setup_combined);
 +
-+int btintel_shutdown_combined(struct hci_dev *hdev)
++static int btintel_legacy_rom_patching(struct hci_dev *hdev,
++				      const struct firmware *fw,
++				      const u8 **fw_ptr, int *disable_patch)
 +{
 +	struct sk_buff *skb;
++	struct hci_command_hdr *cmd;
++	const u8 *cmd_param;
++	struct hci_event_hdr *evt = NULL;
++	const u8 *evt_param = NULL;
++	int remain = fw->size - (*fw_ptr - fw->data);
 +
-+	/* Send HCI Reset to the controller to stop any BT activity which
-+	 * were triggered. This will help to save power and maintain the
-+	 * sync b/w Host and controller
++	/* The first byte indicates the types of the patch command or event.
++	 * 0x01 means HCI command and 0x02 is HCI event. If the first bytes
++	 * in the current firmware buffer doesn't start with 0x01 or
++	 * the size of remain buffer is smaller than HCI command header,
++	 * the firmware file is corrupted and it should stop the patching
++	 * process.
 +	 */
-+	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
++	if (remain > HCI_COMMAND_HDR_SIZE && *fw_ptr[0] != 0x01) {
++		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd read");
++		return -EINVAL;
++	}
++	(*fw_ptr)++;
++	remain--;
++
++	cmd = (struct hci_command_hdr *)(*fw_ptr);
++	*fw_ptr += sizeof(*cmd);
++	remain -= sizeof(*cmd);
++
++	/* Ensure that the remain firmware data is long enough than the length
++	 * of command parameter. If not, the firmware file is corrupted.
++	 */
++	if (remain < cmd->plen) {
++		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd len");
++		return -EFAULT;
++	}
++
++	/* If there is a command that loads a patch in the firmware
++	 * file, then enable the patch upon success, otherwise just
++	 * disable the manufacturer mode, for example patch activation
++	 * is not required when the default firmware patch file is used
++	 * because there are no patch data to load.
++	 */
++	if (*disable_patch && le16_to_cpu(cmd->opcode) == 0xfc8e)
++		*disable_patch = 0;
++
++	cmd_param = *fw_ptr;
++	*fw_ptr += cmd->plen;
++	remain -= cmd->plen;
++
++	/* This reads the expected events when the above command is sent to the
++	 * device. Some vendor commands expects more than one events, for
++	 * example command status event followed by vendor specific event.
++	 * For this case, it only keeps the last expected event. so the command
++	 * can be sent with __hci_cmd_sync_ev() which returns the sk_buff of
++	 * last expected event.
++	 */
++	while (remain > HCI_EVENT_HDR_SIZE && *fw_ptr[0] == 0x02) {
++		(*fw_ptr)++;
++		remain--;
++
++		evt = (struct hci_event_hdr *)(*fw_ptr);
++		*fw_ptr += sizeof(*evt);
++		remain -= sizeof(*evt);
++
++		if (remain < evt->plen) {
++			bt_dev_err(hdev, "Intel fw corrupted: invalid evt len");
++			return -EFAULT;
++		}
++
++		evt_param = *fw_ptr;
++		*fw_ptr += evt->plen;
++		remain -= evt->plen;
++	}
++
++	/* Every HCI commands in the firmware file has its correspond event.
++	 * If event is not found or remain is smaller than zero, the firmware
++	 * file is corrupted.
++	 */
++	if (!evt || !evt_param || remain < 0) {
++		bt_dev_err(hdev, "Intel fw corrupted: invalid evt read");
++		return -EFAULT;
++	}
++
++	skb = __hci_cmd_sync_ev(hdev, le16_to_cpu(cmd->opcode), cmd->plen,
++				cmd_param, evt->evt, HCI_INIT_TIMEOUT);
 +	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "HCI reset during shutdown failed");
++		bt_dev_err(hdev, "sending Intel patch command (0x%4.4x) failed (%ld)",
++			   cmd->opcode, PTR_ERR(skb));
 +		return PTR_ERR(skb);
++	}
++
++	/* It ensures that the returned event matches the event data read from
++	 * the firmware file. At fist, it checks the length and then
++	 * the contents of the event.
++	 */
++	if (skb->len != evt->plen) {
++		bt_dev_err(hdev, "mismatch event length (opcode 0x%4.4x)",
++			   le16_to_cpu(cmd->opcode));
++		kfree_skb(skb);
++		return -EFAULT;
++	}
++
++	if (memcmp(skb->data, evt_param, evt->plen)) {
++		bt_dev_err(hdev, "mismatch event parameter (opcode 0x%4.4x)",
++			   le16_to_cpu(cmd->opcode));
++		kfree_skb(skb);
++		return -EFAULT;
 +	}
 +	kfree_skb(skb);
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(btintel_shutdown_combined);
 +
- MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
- MODULE_DESCRIPTION("Bluetooth support for Intel devices ver " VERSION);
- MODULE_VERSION(VERSION);
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index d184064a5e7c..68ffa84fa87a 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -165,6 +165,8 @@ int btintel_read_boot_params(struct hci_dev *hdev,
- 			     struct intel_boot_params *params);
- int btintel_download_firmware(struct hci_dev *dev, struct intel_version *ver,
- 			      const struct firmware *fw, u32 *boot_param);
-+int btintel_setup_combined(struct hci_dev *hdev);
-+int btintel_shutdown_combined(struct hci_dev *hdev);
- int btintel_download_firmware_newgen(struct hci_dev *hdev,
- 				     struct intel_version_tlv *ver,
- 				     const struct firmware *fw,
-@@ -283,6 +285,16 @@ static inline int btintel_download_firmware(struct hci_dev *dev,
- 	return -EOPNOTSUPP;
++static int btintel_legacy_rom_setup(struct hci_dev *hdev,
++				    struct intel_version *ver)
++{
++	const struct firmware *fw;
++	const u8 *fw_ptr;
++	int disable_patch, err;
++	struct intel_version new_ver;
++
++	BT_DBG("%s", hdev->name);
++
++	/* fw_patch_num indicates the version of patch the device currently
++	 * have. If there is no patch data in the device, it is always 0x00.
++	 * So, if it is other than 0x00, no need to patch the device again.
++	 */
++	if (ver->fw_patch_num) {
++		bt_dev_info(hdev,
++			    "Intel device is already patched. patch num: %02x",
++			    ver->fw_patch_num);
++		goto complete;
++	}
++
++	/* Opens the firmware patch file based on the firmware version read
++	 * from the controller. If it fails to open the matching firmware
++	 * patch file, it tries to open the default firmware patch file.
++	 * If no patch file is found, allow the device to operate without
++	 * a patch.
++	 */
++	fw = btintel_legacy_rom_get_fw(hdev, ver);
++	if (!fw)
++		goto complete;
++	fw_ptr = fw->data;
++
++	/* Enable the manufacturer mode of the controller.
++	 * Only while this mode is enabled, the driver can download the
++	 * firmware patch data and configuration parameters.
++	 */
++	err = btintel_enter_mfg(hdev);
++	if (err) {
++		release_firmware(fw);
++		return err;
++	}
++
++	disable_patch = 1;
++
++	/* The firmware data file consists of list of Intel specific HCI
++	 * commands and its expected events. The first byte indicates the
++	 * type of the message, either HCI command or HCI event.
++	 *
++	 * It reads the command and its expected event from the firmware file,
++	 * and send to the controller. Once __hci_cmd_sync_ev() returns,
++	 * the returned event is compared with the event read from the firmware
++	 * file and it will continue until all the messages are downloaded to
++	 * the controller.
++	 *
++	 * Once the firmware patching is completed successfully,
++	 * the manufacturer mode is disabled with reset and activating the
++	 * downloaded patch.
++	 *
++	 * If the firmware patching fails, the manufacturer mode is
++	 * disabled with reset and deactivating the patch.
++	 *
++	 * If the default patch file is used, no reset is done when disabling
++	 * the manufacturer.
++	 */
++	while (fw->size > fw_ptr - fw->data) {
++		int ret;
++
++		ret = btintel_legacy_rom_patching(hdev, fw, &fw_ptr,
++						 &disable_patch);
++		if (ret < 0)
++			goto exit_mfg_deactivate;
++	}
++
++	release_firmware(fw);
++
++	if (disable_patch)
++		goto exit_mfg_disable;
++
++	/* Patching completed successfully and disable the manufacturer mode
++	 * with reset and activate the downloaded firmware patches.
++	 */
++	err = btintel_exit_mfg(hdev, true, true);
++	if (err)
++		return err;
++
++	/* Need build number for downloaded fw patches in
++	 * every power-on boot
++	 */
++	err = btintel_read_version(hdev, &new_ver);
++	if (err)
++		return err;
++
++	bt_dev_info(hdev, "Intel BT fw patch 0x%02x completed & activated",
++		    new_ver.fw_patch_num);
++
++	goto complete;
++
++exit_mfg_disable:
++	/* Disable the manufacturer mode without reset */
++	err = btintel_exit_mfg(hdev, false, false);
++	if (err)
++		return err;
++
++	bt_dev_info(hdev, "Intel firmware patch completed");
++
++	goto complete;
++
++exit_mfg_deactivate:
++	release_firmware(fw);
++
++	/* Patching failed. Disable the manufacturer mode with reset and
++	 * deactivate the downloaded firmware patches.
++	 */
++	err = btintel_exit_mfg(hdev, true, false);
++	if (err)
++		return err;
++
++	bt_dev_info(hdev, "Intel firmware patch completed and deactivated");
++
++complete:
++	/* Set the event mask for Intel specific vendor events. This enables
++	 * a few extra events that are useful during general operation.
++	 */
++	btintel_set_event_mask_mfg(hdev, false);
++
++	btintel_check_bdaddr(hdev);
++
++	return 0;
++}
++
+ int btintel_setup_combined(struct hci_dev *hdev)
+ {
+ 	const u8 param[1] = { 0xFF };
+@@ -1417,7 +1702,7 @@ int btintel_setup_combined(struct hci_dev *hdev)
+ 		case 0x07:	/* WP */
+ 		case 0x08:	/* StP */
+ 			/* Legacy ROM product */
+-			/* TODO: call setup routine for legacy rom product */
++			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+ 		case 0x0c:      /* WsP */
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index baf0934657d8..3382d75b1969 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -61,6 +61,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_VALID_LE_STATES   0x800000
+ #define BTUSB_QCA_WCN6855	0x1000000
+ #define BTUSB_INTEL_NEWGEN	0x2000000
++#define BTUSB_INTEL_COMBINED	0x4000000
+ 
+ static const struct usb_device_id btusb_table[] = {
+ 	/* Generic Bluetooth USB device */
+@@ -375,11 +376,11 @@ static const struct usb_device_id blacklist_table[] = {
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+-	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL },
+-	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL },
++	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED },
++	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH },
+-	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL |
++	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+ 						     BTUSB_WIDEBAND_SPEECH |
+@@ -1962,319 +1963,6 @@ static int btusb_setup_csr(struct hci_dev *hdev)
+ 	return 0;
  }
  
-+static inline int btintel_setup_combined(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
-+static inline int btintel_shutdown_combined(struct hci_dev *hdev)
-+{
-+	return -EOPNOTSUPP;
-+}
-+
- static inline int btintel_download_firmware_newgen(struct hci_dev *hdev,
- 						   const struct firmware *fw,
- 						   u32 *boot_param,
+-static const struct firmware *btusb_setup_intel_get_fw(struct hci_dev *hdev,
+-						       struct intel_version *ver)
+-{
+-	const struct firmware *fw;
+-	char fwname[64];
+-	int ret;
+-
+-	snprintf(fwname, sizeof(fwname),
+-		 "intel/ibt-hw-%x.%x.%x-fw-%x.%x.%x.%x.%x.bseq",
+-		 ver->hw_platform, ver->hw_variant, ver->hw_revision,
+-		 ver->fw_variant,  ver->fw_revision, ver->fw_build_num,
+-		 ver->fw_build_ww, ver->fw_build_yy);
+-
+-	ret = request_firmware(&fw, fwname, &hdev->dev);
+-	if (ret < 0) {
+-		if (ret == -EINVAL) {
+-			bt_dev_err(hdev, "Intel firmware file request failed (%d)",
+-				   ret);
+-			return NULL;
+-		}
+-
+-		bt_dev_err(hdev, "failed to open Intel firmware file: %s (%d)",
+-			   fwname, ret);
+-
+-		/* If the correct firmware patch file is not found, use the
+-		 * default firmware patch file instead
+-		 */
+-		snprintf(fwname, sizeof(fwname), "intel/ibt-hw-%x.%x.bseq",
+-			 ver->hw_platform, ver->hw_variant);
+-		if (request_firmware(&fw, fwname, &hdev->dev) < 0) {
+-			bt_dev_err(hdev, "failed to open default fw file: %s",
+-				   fwname);
+-			return NULL;
+-		}
+-	}
+-
+-	bt_dev_info(hdev, "Intel Bluetooth firmware file: %s", fwname);
+-
+-	return fw;
+-}
+-
+-static int btusb_setup_intel_patching(struct hci_dev *hdev,
+-				      const struct firmware *fw,
+-				      const u8 **fw_ptr, int *disable_patch)
+-{
+-	struct sk_buff *skb;
+-	struct hci_command_hdr *cmd;
+-	const u8 *cmd_param;
+-	struct hci_event_hdr *evt = NULL;
+-	const u8 *evt_param = NULL;
+-	int remain = fw->size - (*fw_ptr - fw->data);
+-
+-	/* The first byte indicates the types of the patch command or event.
+-	 * 0x01 means HCI command and 0x02 is HCI event. If the first bytes
+-	 * in the current firmware buffer doesn't start with 0x01 or
+-	 * the size of remain buffer is smaller than HCI command header,
+-	 * the firmware file is corrupted and it should stop the patching
+-	 * process.
+-	 */
+-	if (remain > HCI_COMMAND_HDR_SIZE && *fw_ptr[0] != 0x01) {
+-		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd read");
+-		return -EINVAL;
+-	}
+-	(*fw_ptr)++;
+-	remain--;
+-
+-	cmd = (struct hci_command_hdr *)(*fw_ptr);
+-	*fw_ptr += sizeof(*cmd);
+-	remain -= sizeof(*cmd);
+-
+-	/* Ensure that the remain firmware data is long enough than the length
+-	 * of command parameter. If not, the firmware file is corrupted.
+-	 */
+-	if (remain < cmd->plen) {
+-		bt_dev_err(hdev, "Intel fw corrupted: invalid cmd len");
+-		return -EFAULT;
+-	}
+-
+-	/* If there is a command that loads a patch in the firmware
+-	 * file, then enable the patch upon success, otherwise just
+-	 * disable the manufacturer mode, for example patch activation
+-	 * is not required when the default firmware patch file is used
+-	 * because there are no patch data to load.
+-	 */
+-	if (*disable_patch && le16_to_cpu(cmd->opcode) == 0xfc8e)
+-		*disable_patch = 0;
+-
+-	cmd_param = *fw_ptr;
+-	*fw_ptr += cmd->plen;
+-	remain -= cmd->plen;
+-
+-	/* This reads the expected events when the above command is sent to the
+-	 * device. Some vendor commands expects more than one events, for
+-	 * example command status event followed by vendor specific event.
+-	 * For this case, it only keeps the last expected event. so the command
+-	 * can be sent with __hci_cmd_sync_ev() which returns the sk_buff of
+-	 * last expected event.
+-	 */
+-	while (remain > HCI_EVENT_HDR_SIZE && *fw_ptr[0] == 0x02) {
+-		(*fw_ptr)++;
+-		remain--;
+-
+-		evt = (struct hci_event_hdr *)(*fw_ptr);
+-		*fw_ptr += sizeof(*evt);
+-		remain -= sizeof(*evt);
+-
+-		if (remain < evt->plen) {
+-			bt_dev_err(hdev, "Intel fw corrupted: invalid evt len");
+-			return -EFAULT;
+-		}
+-
+-		evt_param = *fw_ptr;
+-		*fw_ptr += evt->plen;
+-		remain -= evt->plen;
+-	}
+-
+-	/* Every HCI commands in the firmware file has its correspond event.
+-	 * If event is not found or remain is smaller than zero, the firmware
+-	 * file is corrupted.
+-	 */
+-	if (!evt || !evt_param || remain < 0) {
+-		bt_dev_err(hdev, "Intel fw corrupted: invalid evt read");
+-		return -EFAULT;
+-	}
+-
+-	skb = __hci_cmd_sync_ev(hdev, le16_to_cpu(cmd->opcode), cmd->plen,
+-				cmd_param, evt->evt, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		bt_dev_err(hdev, "sending Intel patch command (0x%4.4x) failed (%ld)",
+-			   cmd->opcode, PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-
+-	/* It ensures that the returned event matches the event data read from
+-	 * the firmware file. At fist, it checks the length and then
+-	 * the contents of the event.
+-	 */
+-	if (skb->len != evt->plen) {
+-		bt_dev_err(hdev, "mismatch event length (opcode 0x%4.4x)",
+-			   le16_to_cpu(cmd->opcode));
+-		kfree_skb(skb);
+-		return -EFAULT;
+-	}
+-
+-	if (memcmp(skb->data, evt_param, evt->plen)) {
+-		bt_dev_err(hdev, "mismatch event parameter (opcode 0x%4.4x)",
+-			   le16_to_cpu(cmd->opcode));
+-		kfree_skb(skb);
+-		return -EFAULT;
+-	}
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+-
+-static int btusb_setup_intel(struct hci_dev *hdev)
+-{
+-	struct sk_buff *skb;
+-	const struct firmware *fw;
+-	const u8 *fw_ptr;
+-	int disable_patch, err;
+-	struct intel_version ver;
+-
+-	BT_DBG("%s", hdev->name);
+-
+-	/* The controller has a bug with the first HCI command sent to it
+-	 * returning number of completed commands as zero. This would stall the
+-	 * command processing in the Bluetooth core.
+-	 *
+-	 * As a workaround, send HCI Reset command first which will reset the
+-	 * number of completed commands and allow normal command processing
+-	 * from now on.
+-	 */
+-	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		bt_dev_err(hdev, "sending initial HCI reset command failed (%ld)",
+-			   PTR_ERR(skb));
+-		return PTR_ERR(skb);
+-	}
+-	kfree_skb(skb);
+-
+-	/* Read Intel specific controller version first to allow selection of
+-	 * which firmware file to load.
+-	 *
+-	 * The returned information are hardware variant and revision plus
+-	 * firmware variant, revision and build number.
+-	 */
+-	err = btintel_read_version(hdev, &ver);
+-	if (err)
+-		return err;
+-
+-	bt_dev_info(hdev, "read Intel version: %02x%02x%02x%02x%02x%02x%02x%02x%02x",
+-		    ver.hw_platform, ver.hw_variant, ver.hw_revision,
+-		    ver.fw_variant,  ver.fw_revision, ver.fw_build_num,
+-		    ver.fw_build_ww, ver.fw_build_yy, ver.fw_patch_num);
+-
+-	/* fw_patch_num indicates the version of patch the device currently
+-	 * have. If there is no patch data in the device, it is always 0x00.
+-	 * So, if it is other than 0x00, no need to patch the device again.
+-	 */
+-	if (ver.fw_patch_num) {
+-		bt_dev_info(hdev, "Intel device is already patched. "
+-			    "patch num: %02x", ver.fw_patch_num);
+-		goto complete;
+-	}
+-
+-	/* Opens the firmware patch file based on the firmware version read
+-	 * from the controller. If it fails to open the matching firmware
+-	 * patch file, it tries to open the default firmware patch file.
+-	 * If no patch file is found, allow the device to operate without
+-	 * a patch.
+-	 */
+-	fw = btusb_setup_intel_get_fw(hdev, &ver);
+-	if (!fw)
+-		goto complete;
+-	fw_ptr = fw->data;
+-
+-	/* Enable the manufacturer mode of the controller.
+-	 * Only while this mode is enabled, the driver can download the
+-	 * firmware patch data and configuration parameters.
+-	 */
+-	err = btintel_enter_mfg(hdev);
+-	if (err) {
+-		release_firmware(fw);
+-		return err;
+-	}
+-
+-	disable_patch = 1;
+-
+-	/* The firmware data file consists of list of Intel specific HCI
+-	 * commands and its expected events. The first byte indicates the
+-	 * type of the message, either HCI command or HCI event.
+-	 *
+-	 * It reads the command and its expected event from the firmware file,
+-	 * and send to the controller. Once __hci_cmd_sync_ev() returns,
+-	 * the returned event is compared with the event read from the firmware
+-	 * file and it will continue until all the messages are downloaded to
+-	 * the controller.
+-	 *
+-	 * Once the firmware patching is completed successfully,
+-	 * the manufacturer mode is disabled with reset and activating the
+-	 * downloaded patch.
+-	 *
+-	 * If the firmware patching fails, the manufacturer mode is
+-	 * disabled with reset and deactivating the patch.
+-	 *
+-	 * If the default patch file is used, no reset is done when disabling
+-	 * the manufacturer.
+-	 */
+-	while (fw->size > fw_ptr - fw->data) {
+-		int ret;
+-
+-		ret = btusb_setup_intel_patching(hdev, fw, &fw_ptr,
+-						 &disable_patch);
+-		if (ret < 0)
+-			goto exit_mfg_deactivate;
+-	}
+-
+-	release_firmware(fw);
+-
+-	if (disable_patch)
+-		goto exit_mfg_disable;
+-
+-	/* Patching completed successfully and disable the manufacturer mode
+-	 * with reset and activate the downloaded firmware patches.
+-	 */
+-	err = btintel_exit_mfg(hdev, true, true);
+-	if (err)
+-		return err;
+-
+-	/* Need build number for downloaded fw patches in
+-	 * every power-on boot
+-	 */
+-       err = btintel_read_version(hdev, &ver);
+-       if (err)
+-               return err;
+-       bt_dev_info(hdev, "Intel BT fw patch 0x%02x completed & activated",
+-		   ver.fw_patch_num);
+-
+-	goto complete;
+-
+-exit_mfg_disable:
+-	/* Disable the manufacturer mode without reset */
+-	err = btintel_exit_mfg(hdev, false, false);
+-	if (err)
+-		return err;
+-
+-	bt_dev_info(hdev, "Intel firmware patch completed");
+-
+-	goto complete;
+-
+-exit_mfg_deactivate:
+-	release_firmware(fw);
+-
+-	/* Patching failed. Disable the manufacturer mode with reset and
+-	 * deactivate the downloaded firmware patches.
+-	 */
+-	err = btintel_exit_mfg(hdev, true, false);
+-	if (err)
+-		return err;
+-
+-	bt_dev_info(hdev, "Intel firmware patch completed and deactivated");
+-
+-complete:
+-	/* Set the event mask for Intel specific vendor events. This enables
+-	 * a few extra events that are useful during general operation.
+-	 */
+-	btintel_set_event_mask_mfg(hdev, false);
+-
+-	btintel_check_bdaddr(hdev);
+-	return 0;
+-}
+-
+ static int inject_cmd_complete(struct hci_dev *hdev, __u16 opcode)
+ {
+ 	struct sk_buff *skb;
+@@ -3042,41 +2730,6 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
+ 
+ 	return 0;
+ }
+-static int btusb_shutdown_intel(struct hci_dev *hdev)
+-{
+-	struct sk_buff *skb;
+-	long ret;
+-
+-	/* In the shutdown sequence where Bluetooth is turned off followed
+-	 * by WiFi being turned off, turning WiFi back on causes issue with
+-	 * the RF calibration.
+-	 *
+-	 * To ensure that any RF activity has been stopped, issue HCI Reset
+-	 * command to clear all ongoing activity including advertising,
+-	 * scanning etc.
+-	 */
+-	skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		ret = PTR_ERR(skb);
+-		bt_dev_err(hdev, "HCI reset during shutdown failed");
+-		return ret;
+-	}
+-	kfree_skb(skb);
+-
+-	/* Some platforms have an issue with BT LED when the interface is
+-	 * down or BT radio is turned off, which takes 5 seconds to BT LED
+-	 * goes off. This command turns off the BT LED immediately.
+-	 */
+-	skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
+-	if (IS_ERR(skb)) {
+-		ret = PTR_ERR(skb);
+-		bt_dev_err(hdev, "turning off Intel device LED failed");
+-		return ret;
+-	}
+-	kfree_skb(skb);
+-
+-	return 0;
+-}
+ 
+ static int btusb_shutdown_intel_new(struct hci_dev *hdev)
+ {
+@@ -4649,10 +4302,11 @@ static int btusb_probe(struct usb_interface *intf,
+ 		data->diag = usb_ifnum_to_if(data->udev, ifnum_base + 2);
+ 	}
+ 
+-	if (id->driver_info & BTUSB_INTEL) {
++	/* Combined Intel Device setup to support multiple setup routine */
++	if (id->driver_info & BTUSB_INTEL_COMBINED) {
+ 		hdev->manufacturer = 2;
+-		hdev->setup = btusb_setup_intel;
+-		hdev->shutdown = btusb_shutdown_intel;
++		hdev->setup = btintel_setup_combined;
++		hdev->shutdown = btintel_shutdown_combined;
+ 		hdev->set_diag = btintel_set_diag_mfg;
+ 		hdev->set_bdaddr = btintel_set_bdaddr;
+ 		hdev->cmd_timeout = btusb_intel_cmd_timeout;
 -- 
 2.26.3
 
