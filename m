@@ -2,196 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71037C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 15:25:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 03C17C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 17:38:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E3AA60BD3
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 15:25:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DA9B16103E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 17:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237216AbhG1PZj (ORCPT
+        id S229635AbhG1Riu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Jul 2021 11:25:39 -0400
-Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:45662
-        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S237148AbhG1PZg (ORCPT
+        Wed, 28 Jul 2021 13:38:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55328 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229574AbhG1Riu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Jul 2021 11:25:36 -0400
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPS id 9A9463FE73
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 15:25:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1627485933;
-        bh=TJTik6Us22RjEvwCSSfTHiH2CoUTbJZ4NSn7tc12tHc=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=ByVMSjEO0NNUp5WQLfU3wxK5uuK2yWkYUxqTERGzHSdosfTNhfz/hKiCTdExWFPsY
-         TNDR69XyvVb8bcGV0AFJByLSWIb+LqjoET5K0Z6tDJmYM8bUtJ54jSR19R7cMAPQYQ
-         /gnSBWF8grjW27HeaUl4/vYKTrm0TJWNCM+x4DubPuvTSHdxcbXSKY8i6wJ40PVnAe
-         T1V5bPV0wakv5B3s6VMqR/d4u+g+QKsKO90m07/AxZOpRkFohgWwzzC7eStQk5kyMO
-         e4NBluTLzhXUDHW1RLxXrc3+iv+lzTazltpvRByBE4/8WR+Vf03sGaaH8x9lKsOhcm
-         Gza+14JFmG7JQ==
-Received: by mail-ed1-f72.google.com with SMTP id j22-20020a50ed160000b02903ab03a06e86so1416499eds.14
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 08:25:33 -0700 (PDT)
+        Wed, 28 Jul 2021 13:38:50 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 866BDC061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 10:38:47 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id k65so5202226yba.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 10:38:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=/CBfBiMnq8n1CGum1MHdnOJooBrmDLh8W//4KGkz/KM=;
+        b=qyv0N2Nph6U9JwRyotqlZtaHWtfPxtPTicl+GerTuUNBFzphH8mLxHJCvPb9MwDVPe
+         MU/WHRuyDnkigHbYwBf9oHFShVpzwAe8SWypD+vHVmbojWe7doMzD+qRChnbsmosdkMC
+         X6AztFuN+Nvicecx2UFAS59jhFzqCJsiGZZ7Lm9GviZN+GpGj2qbIjGHgChmZpP4C3Df
+         rvWCS5ANkbX+d5kfpFgA9KCkJ6ln7h7I4LrL3FUHYa1SO5TFhGrOcFHrwzD4QutI1Lp5
+         dnRU2WsCyIc2PdC77ddM/Q+C5Gum7Kl8BXQjfBhFjd9cQft6sq2KbfGmsh0ZkdzXp0so
+         wzeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=TJTik6Us22RjEvwCSSfTHiH2CoUTbJZ4NSn7tc12tHc=;
-        b=F32uuqO8u2CM5Onnq320cKjeSVbxXXjcb9IPKBcpyTSmmpAtz9ofOfq10+wkFTDh++
-         9Uqo3DaWtdHRAcqRRIB5c0W/Smwb7mB5totDMUFXFq2Lo5QpfbYx5OjOPoNoTHswN5Rf
-         CrsJB/OFns2VQo3tPx0iPlibstWo8BGh0MXmmwj5rAr9F2WOrrH5CkQ3xFGZRE6dMAoA
-         kItIzvRea5DFSDMBKzONprV/B6RwMcjo/8owv/IVSJLXiGLHiR5sbikhR+aOCLzKdPtK
-         ws5ZprrEUnmcVyFPy39j9fCnNn5EbfHDvYlaN7ZX/xB4MaSuammPU2IbXYZOlVPPV+/K
-         LDJQ==
-X-Gm-Message-State: AOAM530ppZ9i31ylacdexQNBCx+W/6n2a8cz78yZmFFepE8hWD0AK8Yk
-        zsuk8z5/XLxUuo2haYuCKC0Yduj4W9L4ru4Tw5N9UQvBiTjM6xJn6SS8PgvBhiq6aYxk9ibqJUe
-        vrfLbtrTC9KnMr3GWEh1A++Ud1/tZ/lI8APGFDJ+WQDs4E8WQoU1EpycPayarvQ==
-X-Received: by 2002:a17:907:724b:: with SMTP id ds11mr64050ejc.192.1627485933183;
-        Wed, 28 Jul 2021 08:25:33 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwhC1o2i0v5V/SColTfA+WcYZQst0PkxOCwBTDcf5GB/YVtOahXKmHaSUZi1F+VNiGWENr2ioZokzsv1PCnJek=
-X-Received: by 2002:a17:907:724b:: with SMTP id ds11mr64019ejc.192.1627485932802;
- Wed, 28 Jul 2021 08:25:32 -0700 (PDT)
+        bh=/CBfBiMnq8n1CGum1MHdnOJooBrmDLh8W//4KGkz/KM=;
+        b=nPrDqQ0aSxnJB3MHdYyRTDsUNfB6zTcFFGjtZfZYyQK60Ek7eVU0MkYlVCfb/HCa0S
+         XWFBuLqoPhZNYpr803D8dhytau1bVAuMSkXyiFZy63W7vGXEcoOaXA+wEzEXgIamJZNK
+         4QvabSC0sTb67StzojWaXAWacVxEKANohL74MS1nDz8mNfHA9nK0KwARLOYIJvdI7VKz
+         LsHx3WjfB9whUxCCQNdKBjAUo2OQW//xsutIn4ObXLyWqkOmD98sdtY7Xom/cM2ezFRe
+         bfkAnK/N1V45OJzYaFqOW/SDQ4lrZeFnEf1DF+59WDmnn10t9+CPK1YgpbtfFa0Y9uAP
+         6ypw==
+X-Gm-Message-State: AOAM533GZgcdy6EdlD9+gBI+DPdauKpgLVC45E46JU56U6624AZvjlLH
+        uqGQyPh8cNsnlQ1uNWvHurrk36ACbZVtK5dRGhPSnmX/4So=
+X-Google-Smtp-Source: ABdhPJzFFKgrkARa0zibjLE52KqcPyGOo8WXT5XCDdexIPj7R3Clc90TO3LH2n5VA4W88+t5CJZ1ePRr8BRVCYvnsAo=
+X-Received: by 2002:a25:b741:: with SMTP id e1mr1075369ybm.347.1627493926603;
+ Wed, 28 Jul 2021 10:38:46 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
- <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org> <8735ryk0o7.fsf@baylibre.com>
-In-Reply-To: <8735ryk0o7.fsf@baylibre.com>
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date:   Wed, 28 Jul 2021 23:25:19 +0800
-Message-ID: <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
- flushed or cancelled
-To:     Mattijs Korpershoek <mkorpershoek@baylibre.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Fabien Parent <fparent@baylibre.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
+References: <20210728212259.Bluez.v2.1.I20397b8350f98567b8d52b895442c768250a6ab3@changeid>
+ <61015f06.1c69fb81.1f3ca.029a@mx.google.com>
+In-Reply-To: <61015f06.1c69fb81.1f3ca.029a@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 28 Jul 2021 10:38:35 -0700
+Message-ID: <CABBYNZL0R_1XENCaUkn-+vQp6sSh-8A+5Afx7otmhHVzzQv9Bw@mail.gmail.com>
+Subject: Re: [Bluez,v2] gatt-db: fix service in range check
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yun-hao Chung <howardchung@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Jul 28, 2021 at 9:50 PM Mattijs Korpershoek
-<mkorpershoek@baylibre.com> wrote:
->
-> Hi Kai-Heng, Marcel,
->
-> Marcel Holtmann <marcel@holtmann.org> writes:
->
-> > Hi Kai-Heng,
-> >
-> >> Rfkill block and unblock Intel USB Bluetooth [8087:0026] may make it
-> >> stops working:
-> >> [  509.691509] Bluetooth: hci0: HCI reset during shutdown failed
-> >> [  514.897584] Bluetooth: hci0: MSFT filter_enable is already on
-> >> [  530.044751] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
-> >> [  545.660350] usb 3-10: device descriptor read/64, error -110
-> >> [  561.283530] usb 3-10: device descriptor read/64, error -110
-> >> [  561.519682] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
-> >> [  566.686650] Bluetooth: hci0: unexpected event for opcode 0x0500
-> >> [  568.752452] Bluetooth: hci0: urb 0000000096cd309b failed to resubmit (113)
-> >> [  578.797955] Bluetooth: hci0: Failed to read MSFT supported features (-110)
-> >> [  586.286565] Bluetooth: hci0: urb 00000000c522f633 failed to resubmit (113)
-> >> [  596.215302] Bluetooth: hci0: Failed to read MSFT supported features (-110)
-> >>
-> >> Or kernel panics because other workqueues already freed skb:
-> >> [ 2048.663763] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> >> [ 2048.663775] #PF: supervisor read access in kernel mode
-> >> [ 2048.663779] #PF: error_code(0x0000) - not-present page
-> >> [ 2048.663782] PGD 0 P4D 0
-> >> [ 2048.663787] Oops: 0000 [#1] SMP NOPTI
-> >> [ 2048.663793] CPU: 3 PID: 4491 Comm: rfkill Tainted: G        W         5.13.0-rc1-next-20210510+ #20
-> >> [ 2048.663799] Hardware name: HP HP EliteBook 850 G8 Notebook PC/8846, BIOS T76 Ver. 01.01.04 12/02/2020
-> >> [ 2048.663801] RIP: 0010:__skb_ext_put+0x6/0x50
-> >> [ 2048.663814] Code: 8b 1b 48 85 db 75 db 5b 41 5c 5d c3 be 01 00 00 00 e8 de 13 c0 ff eb e7 be 02 00 00 00 e8 d2 13 c0 ff eb db 0f 1f 44 00 00 55 <8b> 07 48 89 e5 83 f8 01 74 14 b8 ff ff ff ff f0 0f c1
-> >> 07 83 f8 01
-> >> [ 2048.663819] RSP: 0018:ffffc1d105b6fd80 EFLAGS: 00010286
-> >> [ 2048.663824] RAX: 0000000000000000 RBX: ffff9d9ac5649000 RCX: 0000000000000000
-> >> [ 2048.663827] RDX: ffffffffc0d1daf6 RSI: 0000000000000206 RDI: 0000000000000000
-> >> [ 2048.663830] RBP: ffffc1d105b6fd98 R08: 0000000000000001 R09: ffff9d9ace8ceac0
-> >> [ 2048.663834] R10: ffff9d9ace8ceac0 R11: 0000000000000001 R12: ffff9d9ac5649000
-> >> [ 2048.663838] R13: 0000000000000000 R14: 00007ffe0354d650 R15: 0000000000000000
-> >> [ 2048.663843] FS:  00007fe02ab19740(0000) GS:ffff9d9e5f8c0000(0000) knlGS:0000000000000000
-> >> [ 2048.663849] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >> [ 2048.663853] CR2: 0000000000000000 CR3: 0000000111a52004 CR4: 0000000000770ee0
-> >> [ 2048.663856] PKRU: 55555554
-> >> [ 2048.663859] Call Trace:
-> >> [ 2048.663865]  ? skb_release_head_state+0x5e/0x80
-> >> [ 2048.663873]  kfree_skb+0x2f/0xb0
-> >> [ 2048.663881]  btusb_shutdown_intel_new+0x36/0x60 [btusb]
-> >> [ 2048.663905]  hci_dev_do_close+0x48c/0x5e0 [bluetooth]
-> >> [ 2048.663954]  ? __cond_resched+0x1a/0x50
-> >> [ 2048.663962]  hci_rfkill_set_block+0x56/0xa0 [bluetooth]
-> >> [ 2048.664007]  rfkill_set_block+0x98/0x170
-> >> [ 2048.664016]  rfkill_fop_write+0x136/0x1e0
-> >> [ 2048.664022]  vfs_write+0xc7/0x260
-> >> [ 2048.664030]  ksys_write+0xb1/0xe0
-> >> [ 2048.664035]  ? exit_to_user_mode_prepare+0x37/0x1c0
-> >> [ 2048.664042]  __x64_sys_write+0x1a/0x20
-> >> [ 2048.664048]  do_syscall_64+0x40/0xb0
-> >> [ 2048.664055]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> >> [ 2048.664060] RIP: 0033:0x7fe02ac23c27
-> >> [ 2048.664066] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
-> >> [ 2048.664070] RSP: 002b:00007ffe0354d638 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-> >> [ 2048.664075] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fe02ac23c27
-> >> [ 2048.664078] RDX: 0000000000000008 RSI: 00007ffe0354d650 RDI: 0000000000000003
-> >> [ 2048.664081] RBP: 0000000000000000 R08: 0000559b05998440 R09: 0000559b05998440
-> >> [ 2048.664084] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
-> >> [ 2048.664086] R13: 0000000000000000 R14: ffffffff00000000 R15: 00000000ffffffff
-> >>
-> >> So move the shutdown callback to a place where workqueues are either
-> >> flushed or cancelled to resolve the issue.
-> >>
-> >> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
-> >> ---
-> >> v2:
-> >> - Rebased on bluetooth-next.
-> >>
-> >> net/bluetooth/hci_core.c | 16 ++++++++--------
-> >> 1 file changed, 8 insertions(+), 8 deletions(-)
-> >
-> > patch has been applied to bluetooth-next tree.
->
-> This patch seems to introduce a regression in the btmtksdio driver.
-> With this patch applied, I can't enable the hci0 interface anymore on mt8183-pumpkin:
->
-> i500-pumpkin login: root
-> root@i500-pumpkin:~# uname -a
-> Linux i500-pumpkin 5.14.0-rc3 #94 SMP PREEMPT Wed Jul 28 11:58:20 CEST 2021 aarch64 aarch64 aarch64 GNU/Linux
-> root@i500-pumpkin:~# hciconfig hci0 up
-> Can't init device hci0: Connection timed out (110)
-> root@i500-pumpkin:~# hciconfig hci0 down
-> root@i500-pumpkin:~# hciconfig hci0 up
-> Can't init device hci0: Input/output error (5)
->
-> Reverting it fixes the above issue.
-> Any suggestion on how to fix this without touching hci_core ?
-> Maybe the btmtksdio driver needs some rework. As I'm not familiar with the code, I would appreciate any tips.
+Hi Howard,
 
-Can you please attach dmesg?  Also, full ftrace log on btmtksdio can
-also be helpful.
+On Wed, Jul 28, 2021 at 6:45 AM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=522683
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.29 seconds
+> GitLint                       PASS      0.11 seconds
+> Prep - Setup ELL              PASS      40.81 seconds
+> Build - Prep                  PASS      0.09 seconds
+> Build - Configure             PASS      7.35 seconds
+> Build - Make                  PASS      176.55 seconds
+> Make Check                    FAIL      8.72 seconds
+> Make Distcheck                FAIL      190.86 seconds
 
-Kai-Heng
+These will need to be fixed, I suspect removing the check completely
+is wrong since the condition svc_start < foreach_data->start is not
+tested.
 
+> Build w/ext ELL - Configure   PASS      7.24 seconds
+> Build w/ext ELL - Make        PASS      165.61 seconds
 >
-> Thanks,
-> Mattijs Korpershoek
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - FAIL
+> Desc: Run 'make check'
+> Output:
+> ./test-driver: line 107: 28579 Aborted                 (core dumped) "$@" > $log_file 2>&1
+> make[3]: *** [Makefile:9910: test-suite.log] Error 1
+> make[2]: *** [Makefile:10018: check-TESTS] Error 2
+> make[1]: *** [Makefile:10412: check-am] Error 2
+> make: *** [Makefile:10414: check] Error 2
 >
 >
-> >
-> > Regards
-> >
-> > Marcel
+> ##############################
+> Test: Make Distcheck - FAIL
+> Desc: Run distcheck to check the distribution
+> Output:
+> ../../test-driver: line 107: 47458 Aborted                 (core dumped) "$@" > $log_file 2>&1
+> make[4]: *** [Makefile:9910: test-suite.log] Error 1
+> make[3]: *** [Makefile:10018: check-TESTS] Error 2
+> make[2]: *** [Makefile:10412: check-am] Error 2
+> make[1]: *** [Makefile:10414: check] Error 2
+> make: *** [Makefile:10335: distcheck] Error 1
+>
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
+>
+
+
+-- 
+Luiz Augusto von Dentz
