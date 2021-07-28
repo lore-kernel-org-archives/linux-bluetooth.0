@@ -2,284 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.9 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB2AC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 17:42:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F2970C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 20:48:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D4AA6023F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 17:42:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CBD006023D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 28 Jul 2021 20:48:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbhG1Rmn (ORCPT
+        id S231674AbhG1UsF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 28 Jul 2021 13:42:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56208 "EHLO
+        Wed, 28 Jul 2021 16:48:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41824 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbhG1Rmn (ORCPT
+        with ESMTP id S231585AbhG1UsF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 28 Jul 2021 13:42:43 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67671C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 10:42:41 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id q15so5319506ybu.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 10:42:41 -0700 (PDT)
+        Wed, 28 Jul 2021 16:48:05 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E3EFC061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 13:48:02 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so6078253pjd.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 28 Jul 2021 13:48:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=p9dlaND77uvFHoUmaYmEjFo4SvBRJHP5Z6FPoMeFkiA=;
-        b=Kjtfw9MWwulV9eM2COF6K96DIA3JMNKLL1GSWVZlz/mzgy65BUoSWbaOsFP3nqBCFj
-         J56YmLMKl6/sHyo+qz6TUTU29XMCoUNHTPbgSmEcNX9HBHgLMFrfDVsX0QUZG1lYPwIa
-         ULvCPS/s79qfvpi9716ZM6URPOnWTHE2mxaLRadWajoVWn+oQ4Sy9HrsOXPH2x/SWEHb
-         7ShXx2ILPcqMsJNR5oHS/3WMLCABiv8sI+TrrLyvtYxEe/tNm13c52/8NkGp8MydFMY0
-         07JPxRH3UYqmVg2/xJ56Lm4Kxi4ksu7m/ukyCEgvcK85c4jAW4GnGK21xrVXPBCqH6LG
-         WhfA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=skKSfOcmM8SlX/jWeC/JEFpjH0uXzUrXQVzuHFTmAx4=;
+        b=Fg4YApfxqKnxc0DhH6YXsYTlU5mFLkW+lsRSKQDiAMeYb8eYHcMD+yOE0zy0l+tDzO
+         TfpN+cbhdckezUtG0zgClw8/b90uyytwxzPzDbx5hyo/K8RZWutQ0jQablhUIMuzhlXH
+         4BfAe4buQAxdRG7r8lC4nUx0U+QERq28gDwLp4U65dkUdjXbVBDqbM0o7gG/rMrQUiHL
+         EAp2wicR3OR6ZRQDZ20BrmaqC/fCUwPfFBGhQIrJv8/VbYnbXq6X8TOWlXZvPVLzTZMB
+         Eb+daQCgtZXim97ng2Cq/s+0wHbFkI5BDm/xcVF15L89pNjLq/mYvREWY6x/E0umEILB
+         EkCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=p9dlaND77uvFHoUmaYmEjFo4SvBRJHP5Z6FPoMeFkiA=;
-        b=EpGykooPqAxLFCRHea2SIM6t1eaS0rUPyun5nUYQh7TIlvTKF+sWUyR+brysypxMpS
-         7x5/E0AIBLR166OgZ3vp3qnrcGlr68DjwkHL3d0Ar9FBPqvktsAswcGcRf4nR5fscxV1
-         /9QdvB7M2T3PV/dpaBcTa0LI4oDtOR/sYKRYF+tWwEZkQgpZzDsKMFH1BN0nkzLfjf94
-         F+cJ3OnafObVun0CI/8zk+kAvsCGlCKDZ1Zn5IkWRTCox+fB0o1c3ktWrs8i2qNT3OWW
-         HOf4taTVvlEFpvmkNpd1IALh7VMznbh7CEvNZYPeVznQ3AZMe5zG33elBTle7dNqxiVw
-         Emrg==
-X-Gm-Message-State: AOAM5309SD+43U/qeOghwVHtNu0S0Aug69GUUruEyLi7ktgB4eSGP+/q
-        NWlSuzZmlKkvGoAJyAKXV5x9H8lpGOL8ZWHE+7k=
-X-Google-Smtp-Source: ABdhPJwVVft7EU2K1vu/LunCye8kI/PgjRimUD6lBd/Xa/oGd5KvfwJXE6tQ2BHzfHG7hAnUtzRaLnkX9KhOW0CQb0c=
-X-Received: by 2002:a25:9b03:: with SMTP id y3mr1053428ybn.264.1627494160530;
- Wed, 28 Jul 2021 10:42:40 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210728131529.3310558-1-howardchung@google.com> <20210728211405.Bluez.v3.7.I29607be7ac91b0a494ab51713ba14f583eb858ed@changeid>
-In-Reply-To: <20210728211405.Bluez.v3.7.I29607be7ac91b0a494ab51713ba14f583eb858ed@changeid>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=skKSfOcmM8SlX/jWeC/JEFpjH0uXzUrXQVzuHFTmAx4=;
+        b=hIJ59KpFY04BQIF+ZV2HJRKvSZxGD2hQEYnxgtYb51KT51FwQCWd0BsuHoQnWlHmQ2
+         g3fVmf9rBE/TVOZxumv7JMepBkgdSj8jPOBhK/Vr0fXST2QXIpKTQU2hbJ3I0VurbiaL
+         X+oLEzdFidal+jVVnKx79UPg4VNTJk43SAJyTHygjpmcSni6JA7xZDXFokUhj14KCmXT
+         ClG0hpfaZZfpwMNCzoi8qXT/ZyVDAPfWlkkn534cqdGCxWT5b3hsuz1tL/M9YE/HUDjS
+         QIaVl6V0UPRGc56wKPCGrCHzlxlybLEov5bVQbHqfOzmzjx5SmuvRhtQslLbUskXD4RG
+         dFdg==
+X-Gm-Message-State: AOAM5314znacB7kBr68wphGVl3aiEAPDXYJsPm01NcRv7xssFoY5ews7
+        fu6yrKJ0FKQ6vogqSgpS3l+XhD/a/7g=
+X-Google-Smtp-Source: ABdhPJwm0Q8JZh4YQU2RiWcKJePG4Afi2RNxT5lALjVogAH2pY33WIt44RwVA+CfGCcpiEFWnp7EOg==
+X-Received: by 2002:aa7:9a07:0:b029:329:46d2:c6e4 with SMTP id w7-20020aa79a070000b029032946d2c6e4mr1635643pfj.81.1627505281717;
+        Wed, 28 Jul 2021 13:48:01 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id s195sm933276pfs.119.2021.07.28.13.48.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jul 2021 13:48:01 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 28 Jul 2021 10:42:29 -0700
-Message-ID: <CABBYNZLfv3FiB0nM6nEh=fnfa0+oqaWSGgjJqoZxeL9aLoAXsA@mail.gmail.com>
-Subject: Re: [Bluez PATCH v3 07/13] plugins/admin_policy: add admin_policy
- adapter driver
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] gatt: Add support for Central Address Resolution characteristic
+Date:   Wed, 28 Jul 2021 13:48:00 -0700
+Message-Id: <20210728204800.2205665-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Jul 28, 2021 at 6:16 AM Howard Chung <howardchung@google.com> wrote:
->
-> From: Yun-Hao Chung <howardchung@chromium.org>
->
-> This adds code to register admin_policy driver to adapter when
-> admin_policy plugin is enabled.
->
-> The following test steps were performed:
-> 1. restart bluetoothd
-> 2. check if "Admin Policy is enabled" in system log
->
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> ---
->
-> (no changes since v1)
->
->  plugins/admin.c        | 67 ++++++++++++++++++++++++++++++++++++++++++
->  plugins/admin_policy.c | 67 ++++++++++++++++++++++++++++++++++++++++++
+This adds Central Address Resolution characteristic so peripherals can
+use directed advertising using RPA as initiator address.
+---
+ lib/uuid.h          |  1 +
+ src/gatt-database.c | 33 +++++++++++++++++++++++++--------
+ 2 files changed, 26 insertions(+), 8 deletions(-)
 
-Looks like the old file still being added, besides you should update
-your patch description as well since you still mentioning it as
-admin_policy in quite a few of them.
-
->  2 files changed, 134 insertions(+)
->
-> diff --git a/plugins/admin.c b/plugins/admin.c
-> index 42866bcf7..923e08cb8 100644
-> --- a/plugins/admin.c
-> +++ b/plugins/admin.c
-> @@ -12,17 +12,84 @@
->  #include <config.h>
->  #endif
->
-> +#include "lib/bluetooth.h"
-> +
-> +#include "src/adapter.h"
-> +#include "src/error.h"
->  #include "src/log.h"
->  #include "src/plugin.h"
->
-> +#include "src/shared/queue.h"
-> +
-> +/* |policy_data| has the same life cycle as btd_adapter */
-> +static struct btd_admin_policy {
-> +       struct btd_adapter *adapter;
-> +       uint16_t adapter_id;
-> +} *policy_data = NULL;
-> +
-> +static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
-> +{
-> +       struct btd_admin_policy *admin_policy = NULL;
-> +
-> +       admin_policy = g_try_malloc(sizeof(*admin_policy));
-> +       if (!admin_policy) {
-> +               btd_error(btd_adapter_get_index(adapter),
-> +                               "Failed to allocate memory for admin_policy");
-> +               return NULL;
-> +       }
-> +
-> +       admin_policy->adapter = adapter;
-> +       admin_policy->adapter_id = btd_adapter_get_index(adapter);
-> +
-> +       return admin_policy;
-> +}
-> +
-> +static void admin_policy_free(void *data)
-> +{
-> +       struct btd_admin_policy *admin_policy = data;
-> +
-> +       g_free(admin_policy);
-> +}
-> +
-> +static int admin_policy_adapter_probe(struct btd_adapter *adapter)
-> +{
-> +       if (policy_data) {
-> +               btd_warn(policy_data->adapter_id,
-> +                                               "Policy data already exists");
-> +               admin_policy_free(policy_data);
-> +               policy_data = NULL;
-> +       }
-> +
-> +       policy_data = admin_policy_new(adapter);
-> +       if (!policy_data)
-> +               return -ENOMEM;
-> +
-> +       btd_info(policy_data->adapter_id, "Admin Policy has been enabled");
-> +
-> +       return 0;
-> +}
-> +
-> +static struct btd_adapter_driver admin_policy_driver = {
-> +       .name   = "admin_policy",
-> +       .probe  = admin_policy_adapter_probe,
-> +       .resume = NULL,
-> +};
-> +
->  static int admin_init(void)
->  {
->         DBG("");
-> +
-> +       return btd_register_adapter_driver(&admin_policy_driver);
->  }
->
->  static void admin_exit(void)
->  {
->         DBG("");
-> +
-> +       btd_unregister_adapter_driver(&admin_policy_driver);
-> +
-> +       if (policy_data)
-> +               admin_policy_free(policy_data);
->  }
->
->  BLUETOOTH_PLUGIN_DEFINE(admin, VERSION,
-> diff --git a/plugins/admin_policy.c b/plugins/admin_policy.c
-> index dd8d89736..2ece87156 100644
-> --- a/plugins/admin_policy.c
-> +++ b/plugins/admin_policy.c
-> @@ -12,17 +12,84 @@
->  #include <config.h>
->  #endif
->
-> +#include "lib/bluetooth.h"
-> +
-> +#include "src/adapter.h"
-> +#include "src/error.h"
->  #include "src/log.h"
->  #include "src/plugin.h"
->
-> +#include "src/shared/queue.h"
-> +
-> +/* |policy_data| has the same life cycle as btd_adapter */
-> +static struct btd_admin_policy {
-> +       struct btd_adapter *adapter;
-> +       uint16_t adapter_id;
-> +} *policy_data = NULL;
-> +
-> +static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
-> +{
-> +       struct btd_admin_policy *admin_policy = NULL;
-> +
-> +       admin_policy = g_try_malloc(sizeof(*admin_policy));
-> +       if (!admin_policy) {
-> +               btd_error(btd_adapter_get_index(adapter),
-> +                               "Failed to allocate memory for admin_policy");
-> +               return NULL;
-> +       }
-> +
-> +       admin_policy->adapter = adapter;
-> +       admin_policy->adapter_id = btd_adapter_get_index(adapter);
-> +
-> +       return admin_policy;
-> +}
-> +
-> +static void admin_policy_free(void *data)
-> +{
-> +       struct btd_admin_policy *admin_policy = data;
-> +
-> +       g_free(admin_policy);
-> +}
-> +
-> +static int admin_policy_adapter_probe(struct btd_adapter *adapter)
-> +{
-> +       if (policy_data) {
-> +               btd_warn(policy_data->adapter_id,
-> +                                               "Policy data already exists");
-> +               admin_policy_free(policy_data);
-> +               policy_data = NULL;
-> +       }
-> +
-> +       policy_data = admin_policy_new(adapter);
-> +       if (!policy_data)
-> +               return -ENOMEM;
-> +
-> +       btd_info(policy_data->adapter_id, "Admin Policy has been enabled");
-> +
-> +       return 0;
-> +}
-> +
-> +static struct btd_adapter_driver admin_policy_driver = {
-> +       .name   = "admin_policy",
-> +       .probe  = admin_policy_adapter_probe,
-> +       .resume = NULL,
-> +};
-> +
->  static int admin_policy_init(void)
->  {
->         DBG("");
-> +
-> +       return btd_register_adapter_driver(&admin_policy_driver);
->  }
->
->  static void admin_policy_exit(void)
->  {
->         DBG("");
-> +
-> +       btd_unregister_adapter_driver(&admin_policy_driver);
-> +
-> +       if (policy_data)
-> +               admin_policy_free(policy_data);
->  }
->
->  BLUETOOTH_PLUGIN_DEFINE(admin_policy, VERSION,
-> --
-> 2.32.0.432.gabb21c7263-goog
->
-
-
+diff --git a/lib/uuid.h b/lib/uuid.h
+index 1a4029b68..6236752a1 100644
+--- a/lib/uuid.h
++++ b/lib/uuid.h
+@@ -116,6 +116,7 @@ extern "C" {
+ #define GATT_CHARAC_SOFTWARE_REVISION_STRING		0x2A28
+ #define GATT_CHARAC_MANUFACTURER_NAME_STRING		0x2A29
+ #define GATT_CHARAC_PNP_ID				0x2A50
++#define GATT_CHARAC_CAR					0x2AA6
+ 
+ /* GATT Characteristic Descriptors */
+ #define GATT_CHARAC_EXT_PROPER_UUID			0x2900
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 8cf60c597..99c95f2d6 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -699,6 +699,18 @@ static void gap_appearance_read_cb(struct gatt_db_attribute *attrib,
+ 	gatt_db_attribute_read_result(attrib, id, error, value, len);
+ }
+ 
++static void gap_car_read_cb(struct gatt_db_attribute *attrib,
++					unsigned int id, uint16_t offset,
++					uint8_t opcode, struct bt_att *att,
++					void *user_data)
++{
++	uint8_t value = 0x01;
++
++	DBG("GAP Central Address Resolution read request\n");
++
++	gatt_db_attribute_read_result(attrib, id, 0, &value, sizeof(value));
++}
++
+ static sdp_record_t *record_new(uuid_t *uuid, uint16_t start, uint16_t end)
+ {
+ 	sdp_list_t *svclass_id, *apseq, *proto[2], *root, *aproto;
+@@ -820,7 +832,7 @@ static void populate_gap_service(struct btd_gatt_database *database)
+ 
+ 	/* Add the GAP service */
+ 	bt_uuid16_create(&uuid, UUID_GAP);
+-	service = gatt_db_add_service(database->db, &uuid, true, 5);
++	service = gatt_db_add_service(database->db, &uuid, true, 7);
+ 
+ 	/*
+ 	 * Device Name characteristic.
+@@ -842,6 +854,17 @@ static void populate_gap_service(struct btd_gatt_database *database)
+ 							NULL, database);
+ 	gatt_db_attribute_set_fixed_length(attrib, 2);
+ 
++	/*
++	 * Central Address Resolution characteristic.
++	 */
++	bt_uuid16_create(&uuid, GATT_CHARAC_CAR);
++	attrib = gatt_db_service_add_characteristic(service, &uuid,
++							BT_ATT_PERM_READ,
++							BT_GATT_CHRC_PROP_READ,
++							gap_car_read_cb,
++							NULL, database);
++	gatt_db_attribute_set_fixed_length(attrib, 1);
++
+ 	gatt_db_service_set_active(service, true);
+ 
+ 	database_add_record(database, service);
+@@ -3853,13 +3876,7 @@ void btd_gatt_database_restore_svc_chng_ccc(struct btd_gatt_database *database)
+ 	 */
+ 	btd_adapter_for_each_device(database->adapter, restore_state, database);
+ 
+-	/* This needs to be updated (probably to 0x0001) if we ever change
+-	 * core services
+-	 *
+-	 * TODO we could also store this info (along with CCC value) and be able
+-	 * to send 0x0001-0xffff only once per device.
+-	 */
+-	put_le16(0x000a, value);
++	put_le16(0x0001, value);
+ 	put_le16(0xffff, value + 2);
+ 
+ 	send_notification_to_devices(database, handle, value, sizeof(value),
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
