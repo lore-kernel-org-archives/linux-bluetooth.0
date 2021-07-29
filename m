@@ -2,318 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 575B8C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 04:28:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 67425C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2FDC361042
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 04:28:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EF5461059
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233731AbhG2E2o (ORCPT
+        id S234986AbhG2I5D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 00:28:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60160 "EHLO
+        Thu, 29 Jul 2021 04:57:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37358 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233664AbhG2E2n (ORCPT
+        with ESMTP id S234886AbhG2I5C (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 00:28:43 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB1C1C061757;
-        Wed, 28 Jul 2021 21:28:40 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id j1so8416425pjv.3;
-        Wed, 28 Jul 2021 21:28:40 -0700 (PDT)
+        Thu, 29 Jul 2021 04:57:02 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3F8DC061757
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:56:58 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id w26-20020a05620a129ab02903b9eeb8b45dso3420981qki.8
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:56:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=tW4DIBxR80i4BJo02U0SxUluh+ki4NFjLgvAshr0xxA=;
-        b=l4ZOGC66Ljc1csQjbpoEwnSp1sFzgtXS3Q7rjGMrE40E69jSYsY7nVqM3kyc8M3haz
-         wLso0RS7wRUStsSKxFjafxATDFQzY72LNDfunK21zfA3FTts1ObmZJr87CuF1j6rrmap
-         4iL+U875tmUarppfdGaYq+IHqyvAoxuvzheMyG/mYWxGZzJUz66ge3ZsyNVH48ElmJXW
-         +ABYYA4taxaa2yswqwlAB/HajNt/7SHEMoX3BRLHjmrmFx+URDHVTlJul57IbnFZCIIG
-         eL2o58qpM0xUCYKns13y75YW2uig+XgY3Q44W/DjhpUyNOc3lN5SmsnF5TqDux2oPiwN
-         bM1g==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=L7MblLuSrbsDGknoKMFU48tI/k3+p9nDFuXCQMLTjTI=;
+        b=rYXSiq2EkZOOw6ARZzpT/N8pRWzodPMsraVi/YHroI3O9xwGloBY6HMmS+EvhcnLDq
+         xdEHnZRnXTtfWkTRQgZak7kP306zIput7Ti1mhSN9f3VJP0H3MX1pVV12DOL3hxN8hmB
+         LoDcl7K1vkdywTZmbRJpRfqlSL1qjkrti7FLfSd70DW+sUNqx4H7IN4XGRuR9ybL5tzU
+         07SrCAgyVQzFI1nQyfw/GwPQSBSCjv7SfqWpwtcPFYWvK7pCT/OBSQ/6OqG4Odbo2WXO
+         Ti7/zgt2tzeCdesMQRi7G9n6lBcuyLtoa6jqB9m0Wkd2HHqUPfgZ+aoEKWaxEnXdSBoe
+         hf5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=tW4DIBxR80i4BJo02U0SxUluh+ki4NFjLgvAshr0xxA=;
-        b=sdxU1w5Nz1ehp63o8ifWqRqdYAJjM8RRNxpZD/26baJlHHrX7MKqTjW1dt5km+Lvrp
-         wwqWIr3222/QP87+YCXTn3DevKbRpjP/fxF2GVvsPSCUQn73wFAv7BihHnyAxOq28mK+
-         4IpdAgT2340dcEp12bjmjkTwcI/ZMYQ1vHwwOpxI6MTe1ipjKQEBMf8FdiuZKUDRx2Q0
-         kSxPwTqcEk/6y5utsKtjRIQcdGRjdfXq1KUK43mMjpG2c+r/y76hd0U7ew6xbQtSORYT
-         pb+h9N9QKjx2jwFCV9m7u6nZqNifbngLDmd0e0JFKK0lrZbsI08BgH12a2CJEn2gli0K
-         Y3ow==
-X-Gm-Message-State: AOAM531kZAe2LbO1pa9q4RCPYHh6h8wKQ/0OZCfTDitYM0jbf5tbOIpX
-        fIeOD3XWNLS2FeqK3WsZVwI=
-X-Google-Smtp-Source: ABdhPJzJrK4273rjTXGt/mNhlac2/bk86XjPDCdBLZ7pWU6F2N22Wczrf2f17PGXudgdoSB7e7iQmg==
-X-Received: by 2002:a17:903:2c2:b029:101:9c88:d928 with SMTP id s2-20020a17090302c2b02901019c88d928mr2848193plk.62.1627532920344;
-        Wed, 28 Jul 2021 21:28:40 -0700 (PDT)
-Received: from [192.168.1.237] ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id b6sm7813162pjl.17.2021.07.28.21.28.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jul 2021 21:28:39 -0700 (PDT)
-Subject: Re: [PATCH v4] Bluetooth: schedule SCO timeouts with delayed_work
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
-References: <20210728071721.411669-1-desmondcheongzx@gmail.com>
- <CABBYNZ+_mYB=r3B-f0Pu214ZmKVAM2EmpSFYQksTDbdm61Q4Bw@mail.gmail.com>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <6c152b1f-fe15-6ea3-cb96-1d87f0f7dea7@gmail.com>
-Date:   Thu, 29 Jul 2021 12:28:34 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZ+_mYB=r3B-f0Pu214ZmKVAM2EmpSFYQksTDbdm61Q4Bw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=L7MblLuSrbsDGknoKMFU48tI/k3+p9nDFuXCQMLTjTI=;
+        b=RX4IA/vt6ybbAxX0zTKIG5mkrSnDs8IJxXVQvIvTauE0RxZAhJzehf+mTr/30gsdgo
+         tFj1ry7duBR6Ubd6Kxpdw25qNdx8Fw6qU0mPHuLpyZfvpATBDNZ2w3EsRviMJiJq7swg
+         m6M2YRuHeG8o634sqfypDUnxnxxwzQIK8o5kXZ9FusIdx+w4+vxoTBs127RUPcDITa7I
+         /jby/+vgYDJxe2IGQwsaeF7pmDo3fOoioiYlKkAINTrsDk0PjIaz+ZThgJyLGIiTcJX4
+         8o9WJjvDOitpBG0KlWmoVIMD+FpO8qEZbM8Kdosa1GDp/9DbH3HaXe3xwz4rrJU6IGWe
+         Fy+g==
+X-Gm-Message-State: AOAM533Pk2oa+8BTjF9r5Emg7vZYP6rDbXOxyx+zfHlbGft/jXqnkJPx
+        p0+7ybp1vjEdiRFZfXRbVItcA8aNM2Psu06KFDW3zPmLqOSN+0uxdCvThP3uE6xGNqCyMJE0ozb
+        9HMhz6xVTR04Q551AjbsRv+agjnImrHYkssrxkdfWJo4krlb01047C7tefYeICd4DsgLV5MYzMa
+        xF2xNmBNg2mB8=
+X-Google-Smtp-Source: ABdhPJyyo7KwNT+n/13JdLVFpxNHJtZ4XiQD9tB6/6UvtZOcmpF29cBpB1Sso8MyoX49WoQwIjpXBd1Qq4dcEvqKNQ==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ff72:1420:4502:fdaf])
+ (user=howardchung job=sendgmr) by 2002:ad4:538c:: with SMTP id
+ i12mr3926250qvv.51.1627549018014; Thu, 29 Jul 2021 01:56:58 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 16:56:38 +0800
+Message-Id: <20210729085651.3600926-1-howardchung@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [Bluez PATCH v5 00/13] Admin policy series
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Yun-Hao Chung <howardchung@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-On 29/7/21 7:07 am, Luiz Augusto von Dentz wrote:
-> Hi Desmond,
-> 
-> On Wed, Jul 28, 2021 at 12:17 AM Desmond Cheong Zhi Xi
-> <desmondcheongzx@gmail.com> wrote:
->>
->> struct sock.sk_timer should be used as a sock cleanup timer. However,
->> SCO uses it to implement sock timeouts.
->>
->> This causes issues because struct sock.sk_timer's callback is run in
->> an IRQ context, and the timer callback function sco_sock_timeout takes
->> a spin lock on the socket. However, other functions such as
->> sco_conn_del, sco_conn_ready, rfcomm_connect_ind, and
->> bt_accept_enqueue also take the spin lock with interrupts enabled.
->>
->> This inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock usage could
->> lead to deadlocks as reported by Syzbot [1]:
->>         CPU0
->>         ----
->>    lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>    <Interrupt>
->>      lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>
->> To fix this, we use delayed work to implement SCO sock timouts
->> instead. This allows us to avoid taking the spin lock on the socket in
->> an IRQ context, and corrects the misuse of struct sock.sk_timer.
->>
->> Link: https://syzkaller.appspot.com/bug?id=9089d89de0502e120f234ca0fc8a703f7368b31e [1]
->> Reported-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
->> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
->> ---
->>
->> Hi,
->>
->> As suggested, this patch addresses the inconsistent lock state while
->> avoiding having to deal with local_bh_disable.
->>
->> Now that sco_sock_timeout is no longer run in IRQ context, it might
->> be the case that bh_lock_sock is no longer needed to sync between
->> SOFTIRQ and user contexts, so we can switch to lock_sock.
->>
->> I'm not too certain about this, or if there's any benefit to using
->> lock_sock instead, so I've left that out of this patch.
->>
->> v3 -> v4:
->> - Switch to using delayed_work to schedule SCO sock timeouts instead
->> of using local_bh_disable. As suggested by Luiz Augusto von Dentz.
->>
->> v2 -> v3:
->> - Split SCO and RFCOMM code changes, as suggested by Luiz Augusto von
->> Dentz.
->> - Simplify local bh disabling in SCO by using local_bh_disable/enable
->> inside sco_chan_del since local_bh_disable/enable pairs are reentrant.
->>
->> v1 -> v2:
->> - Instead of pulling out the clean-up code out from sco_chan_del and
->> using it directly in sco_conn_del, disable local softirqs for relevant
->> sections.
->> - Disable local softirqs more thoroughly for instances of
->> bh_lock_sock/bh_lock_sock_nested in the bluetooth subsystem.
->> Specifically, the calls in af_bluetooth.c and rfcomm/sock.c are now made
->> with local softirqs disabled as well.
->>
->> Best wishes,
->> Desmond
->>
->>   net/bluetooth/sco.c | 39 ++++++++++++++++++++++++---------------
->>   1 file changed, 24 insertions(+), 15 deletions(-)
->>
->> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
->> index 3bd41563f118..b6dd16153d38 100644
->> --- a/net/bluetooth/sco.c
->> +++ b/net/bluetooth/sco.c
->> @@ -48,6 +48,8 @@ struct sco_conn {
->>          spinlock_t      lock;
->>          struct sock     *sk;
->>
->> +       struct delayed_work     sk_timer;
->> +
->>          unsigned int    mtu;
->>   };
->>
->> @@ -74,9 +76,11 @@ struct sco_pinfo {
->>   #define SCO_CONN_TIMEOUT       (HZ * 40)
->>   #define SCO_DISCONN_TIMEOUT    (HZ * 2)
->>
->> -static void sco_sock_timeout(struct timer_list *t)
->> +static void sco_sock_timeout(struct work_struct *work)
->>   {
->> -       struct sock *sk = from_timer(sk, t, sk_timer);
->> +       struct sco_conn *conn = container_of(work, struct sco_conn,
->> +                                            sk_timer.work);
->> +       struct sock *sk = conn->sk;
->>
->>          BT_DBG("sock %p state %d", sk, sk->sk_state);
->>
->> @@ -89,16 +93,18 @@ static void sco_sock_timeout(struct timer_list *t)
->>          sock_put(sk);
->>   }
->>
->> -static void sco_sock_set_timer(struct sock *sk, long timeout)
->> +static void sco_sock_set_timer(struct sock *sk, struct delayed_work *work,
->> +                              long timeout)
->>   {
->>          BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
->> -       sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
->> +       cancel_delayed_work(work);
->> +       schedule_delayed_work(work, timeout);
-> 
-> I guess if you want to really guarantee cancel takes effect you must
-> call cancel_delayed_work_sync
-> 
 
-Got it, thanks for catching that.
+Hi manintainers,
 
->>   }
->>
->> -static void sco_sock_clear_timer(struct sock *sk)
->> +static void sco_sock_clear_timer(struct sock *sk, struct delayed_work *work)
->>   {
->>          BT_DBG("sock %p state %d", sk, sk->sk_state);
->> -       sk_stop_timer(sk, &sk->sk_timer);
->> +       cancel_delayed_work(work);
->>   }
->>
->>   /* ---- SCO connections ---- */
->> @@ -174,7 +180,7 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
->>          if (sk) {
->>                  sock_hold(sk);
->>                  bh_lock_sock(sk);
->> -               sco_sock_clear_timer(sk);
->> +               sco_sock_clear_timer(sk, &conn->sk_timer);
->>                  sco_chan_del(sk, err);
->>                  bh_unlock_sock(sk);
->>                  sco_sock_kill(sk);
->> @@ -193,6 +199,8 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
->>          sco_pi(sk)->conn = conn;
->>          conn->sk = sk;
->>
->> +       INIT_DELAYED_WORK(&conn->sk_timer, sco_sock_timeout);
->> +
->>          if (parent)
->>                  bt_accept_enqueue(parent, sk, true);
->>   }
->> @@ -260,11 +268,11 @@ static int sco_connect(struct sock *sk)
->>                  goto done;
->>
->>          if (hcon->state == BT_CONNECTED) {
->> -               sco_sock_clear_timer(sk);
->> +               sco_sock_clear_timer(sk, &conn->sk_timer);
->>                  sk->sk_state = BT_CONNECTED;
->>          } else {
->>                  sk->sk_state = BT_CONNECT;
->> -               sco_sock_set_timer(sk, sk->sk_sndtimeo);
->> +               sco_sock_set_timer(sk, &conn->sk_timer, sk->sk_sndtimeo);
->>          }
->>
->>   done:
->> @@ -419,7 +427,8 @@ static void __sco_sock_close(struct sock *sk)
->>          case BT_CONFIG:
->>                  if (sco_pi(sk)->conn->hcon) {
->>                          sk->sk_state = BT_DISCONN;
->> -                       sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
->> +                       sco_sock_set_timer(sk, &sco_pi(sk)->conn->sk_timer,
->> +                                          SCO_DISCONN_TIMEOUT);
->>                          sco_conn_lock(sco_pi(sk)->conn);
->>                          hci_conn_drop(sco_pi(sk)->conn->hcon);
->>                          sco_pi(sk)->conn->hcon = NULL;
->> @@ -443,7 +452,8 @@ static void __sco_sock_close(struct sock *sk)
->>   /* Must be called on unlocked socket. */
->>   static void sco_sock_close(struct sock *sk)
->>   {
->> -       sco_sock_clear_timer(sk);
->> +       if (sco_pi(sk)->conn)
->> +               sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
->>          lock_sock(sk);
->>          __sco_sock_close(sk);
->>          release_sock(sk);
->> @@ -500,8 +510,6 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
->>
->>          sco_pi(sk)->setting = BT_VOICE_CVSD_16BIT;
->>
->> -       timer_setup(&sk->sk_timer, sco_sock_timeout, 0);
->> -
->>          bt_sock_link(&sco_sk_list, sk);
->>          return sk;
->>   }
->> @@ -1036,7 +1044,8 @@ static int sco_sock_shutdown(struct socket *sock, int how)
->>
->>          if (!sk->sk_shutdown) {
->>                  sk->sk_shutdown = SHUTDOWN_MASK;
->> -               sco_sock_clear_timer(sk);
->> +               if (sco_pi(sk)->conn)
->> +                       sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
-> 
-> It probably makes it simpler if we can have the check for
-> sco_pi(sk)->conn inside sco_sock_{clear,set}_timer, that way we don't
-> need to keep checking like in the code above.
-> 
+This series is to
+1. Implement a few methods in core so that a plugin can have control of
+   allowing / disallowing certain service connections.
+2. Implement the AdminPolicy plugin. The plugin provides interfaces
+   AdminPolicySet and AdminPolicyStatus. For each policy, users should
+   set the value thorugh AdminPolicySet and query the current setting
+   through AdminPolicyStatus. We separeted these two interfaces so that
+   developers can assign different groups of users to these interfaces.
+   Currently the only policy is ServiceAllowList, which make bluez only
+   allow a list of service by specified their UUIDs, but the plugin is
+   also expected to provide more controls over other bluez behaviors.
+Since the second part is a plugin, it might not be necessary to land in
+upstream tree.
 
-Makes sense, I'll make the change.
+Thanks.
 
-Re: testing, this patch passes some local tests I set up to trigger the 
-lockdep warning, but I'll run the updated patch through Syzbot again to 
-double-check.
+Changes in v5:
+- Fix compiler errors in plugins/admin.c
 
-Best wishes,
-Desmond
+Changes in v4:
+- Update commit message (admin_policy -> admin)
+- remove old plugins/admin_policy.c
 
->>                  __sco_sock_close(sk);
->>
->>                  if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
->> @@ -1083,7 +1092,7 @@ static void sco_conn_ready(struct sco_conn *conn)
->>          BT_DBG("conn %p", conn);
->>
->>          if (sk) {
->> -               sco_sock_clear_timer(sk);
->> +               sco_sock_clear_timer(sk, &conn->sk_timer);
->>                  bh_lock_sock(sk);
->>                  sk->sk_state = BT_CONNECTED;
->>                  sk->sk_state_change(sk);
->> --
->> 2.25.1
->>
-> 
-> 
+Changes in v3:
+- Rename plugins/admin_policy.c -> plugins/admin.c
+- Use device_added callback in btd_adapter_driver instead of listen for
+  dbus
+- Add authorization method in profiles/health/mcap.c and block incoming
+  connections in adapter authorization function.
+
+Changes in v2:
+- Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
+- Modify the criteria to say a device is `Affected` from any-of-uuid
+  to any-of-auto-connect-profile.
+- Remove the code to remove/reprobe disallowed/allowed profiles,
+  instead, check if the service is allowed in bt_io_accept connect_cb.
+- Fix a typo in emit_property_change in
+  plugin/admin_policy.c:set_service_allowlist
+- Instead of using device_state_cb, utilize D-BUS client to watch device
+  added/removed.
+- Add a document in doc/
+
+Yun-Hao Chung (13):
+  core: add is_allowed property in btd_service
+  core: add adapter and device allowed_uuid functions
+  mcap: add adapter authorization
+  core: block not allowed UUID connect in auth
+  core: add device_added and device_removed to adapter driver
+  plugins: new plugin
+  plugins/admin: add admin_policy adapter driver
+  plugins/admin: add ServiceAllowList method
+  plugins/admin: add ServiceAllowList property
+  plugins/admin: add device callbacks
+  plugins/admin: add AffectedByPolicy property
+  plugins/admin: persist policy settings
+  doc: add description of admin policy
+
+ Makefile.plugins         |   5 +
+ android/health.c         |   2 +-
+ bootstrap-configure      |   1 +
+ configure.ac             |   4 +
+ doc/admin-policy-api.txt |  65 +++++
+ plugins/admin.c          | 592 +++++++++++++++++++++++++++++++++++++++
+ profiles/health/hdp.c    |   1 +
+ profiles/health/mcap.c   |  39 ++-
+ profiles/health/mcap.h   |   7 +
+ src/adapter.c            | 154 +++++++++-
+ src/adapter.h            |  12 +
+ src/device.c             |  64 ++++-
+ src/device.h             |   2 +
+ src/profile.c            |  11 +
+ src/service.c            |  39 +++
+ src/service.h            |   2 +
+ tools/mcaptest.c         |   2 +-
+ 17 files changed, 992 insertions(+), 10 deletions(-)
+ create mode 100644 doc/admin-policy-api.txt
+ create mode 100644 plugins/admin.c
+
+-- 
+2.32.0.554.ge1b32706d8-goog
 
