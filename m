@@ -8,62 +8,63 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 479E4C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81D54C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2982260F02
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6BA2A60ED4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237047AbhG2M2Z (ORCPT
+        id S236848AbhG2M2a (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 08:28:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59842 "EHLO
+        Thu, 29 Jul 2021 08:28:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59872 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237089AbhG2M2Y (ORCPT
+        with ESMTP id S236927AbhG2M2a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 08:28:24 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2005C0613C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:20 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id j9-20020a2581490000b02905897d81c63fso1014738ybm.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:20 -0700 (PDT)
+        Thu, 29 Jul 2021 08:28:30 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1719EC061765
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:26 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id q9-20020a05620a0c89b02903ba3e0f08d7so3751538qki.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=L6lNNaSX6qQORZqT2VoBUMM9LUS7LaDIzlSN+vZ3p6I=;
-        b=GMCnMOCRaAO7Za/aFmII2fUUSdrjgf6nkctSrs0AV0SllUrTuFvhahUbqIyc+W9Nz4
-         7ZRfxK+xIPb4SEgERTEevHRfi0lfgycgW/kp2/3LElPo0kEHNU2BFFsAsPKT7mNHVxVN
-         OEBtGbi5GAdPCGWRRgcnXwrKyguqvH0bA4IafZfc3hBU+8rrZomEoHeBLOVbB0a9amn+
-         O1D6BRUyZhyyNqzQ+hK/piHJeZK5LqQvWyuBAll2EYWqKJrhFvzqEp+7ZRmvvauVGUB5
-         xalWOaSpMNbrW/Z7obmDGzty1HanDTB5MYKXh4M2EaFCl3ie+WshIdPPU0ieEmF/vt6g
-         oNkw==
+        bh=Q/e+0IQlyiwFsKtb7qCWpUP84WxAop8SbAryiByocQw=;
+        b=Upam9157F1DAgkqV8tGfg9Xrmuz195NlzDyf4OBWTRyHQG6o6Pz3VkRjfRc9gnOeBG
+         4xKSAZ+Zn0V+kbvu2aq2AfUuuSzEl8jATmi1lo6irK1AoUix9vTaaDkp5UY3jUFN5lnn
+         H17xR5uvqoqkH+K/N6iqRvgGvoxnrGLvy1TsJI9vhM3t3GWgiFm1+Y+bu9lu9ofHp4m0
+         vZ2nTpOwG8qeDdqIeiKfjQ6gxbzeki0A82hjYt1MsMdkzYipX/c1uPj8gwYM7Bmkz8kg
+         GVNRsF2+FTJPA95AvJ9v4VA9mgAtwV8o0vcp9l5eY/kT+RG1dCO9yfJJsjFGNW5cYr79
+         bW9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=L6lNNaSX6qQORZqT2VoBUMM9LUS7LaDIzlSN+vZ3p6I=;
-        b=osK93m97Lu9jYZ6ovc8mi+jWp8mb6GAGladOd534TsKOfpqEbSKTAlW9XSU9bFxZGX
-         1VYYvM/ubnkPTWd8A8oTx+eombIlR2Jt0XQGRorKtBXgqmq+YQhtF7XAa6PG1K7fsp5i
-         RFCq+ODfzJxG5M4ReH5WMHCx6U3Ya3jGYW7r1nFTfGFmICJLOxgqqeE5cX6KbkUJJblC
-         6CC55wknkt6z2R8j2hi/enBGILF8HgdbYftjoq7tvdGTeM00sNjK2tqFMA3hjJQeiA7v
-         62KHwfQsHAGEqxxOoYE/PN0ZaTbG8efnIfwXJswMvoxDgUJZ+rUZgy0GVQQvudH7Cv6r
-         v5CA==
-X-Gm-Message-State: AOAM5332F8lan7Wv5Of3fJD+Fbxq2mBqVnSNePzo++VvVvwmI3u0GW2q
-        VTAMolMZpevCgZu9+ewsE11B3G2gNXwAERpDqNFcT/pFANKzB5G7gkL1uLizQ5G2pY4pXxQyktX
-        lU8B1OlnvSwuJdxbW0mevsPIur1UBT7kpBdpVjUc4X64ezMY4/U+Mk7kjalHnsqnHrBcyOvOb2s
-        5rytKGcTMQDmM=
-X-Google-Smtp-Source: ABdhPJx6OQbn7Qt8uMKvsNgIQvZYnd3zKkJR2utbw3ynber2PB2qmhKbum9LCFMho3B5YekZLzMaNX2L6hFjvqO5Ew==
+        bh=Q/e+0IQlyiwFsKtb7qCWpUP84WxAop8SbAryiByocQw=;
+        b=uWs2Dp8cb8kRoKYkZwJNgYp/5+ac1PmjF8DP8ZfESBCsmphRlhRFylMSCL49nasAeV
+         gxfgI+5vTZLcRv1nPoaRZYCB9+X/SEhnm7rnwriNQaeMRw7KtmF095rEy/FVr7w57wLy
+         jd6QAtowOLvK+2W821L7F33mft7b4L6ZcTq60HH6qChjn5Ne/4EvHgOFbyL0qpfgGBs/
+         7Y8RLI3VhmKTNtz9xvR38IeGGmNFR7YSLiao5++59h2dQZWpKT0tNC8sePh2KE9p9V8V
+         Iz6v8dnKrDLVED3YDDbTxz1+IKv8+lEhfyC32VSC8Mj2ejEf2Q0Iawcrtf9g+5e8q90H
+         5/rw==
+X-Gm-Message-State: AOAM533Fo7WceHYL6VXHBcWAxoM2txZrZXwDwyqZIgQt8WxoeNxnelpH
+        B+xt6mM4cswZ3fho5NWYBMcNHqlOzyHdmSQCeHdl12gjLon0hor1qidlpGpaT5aDm+yGxhg6XXh
+        bWUFdTRw8a34JNEl4Q6e2onFRWFwKZyvbcfMeiv+fJ+1lrJF7li7BPxNmZuZKiOQQHDjtkVNKjw
+        ltZ1hddzenmoI=
+X-Google-Smtp-Source: ABdhPJziXipuKqPs0lrRHXIMgjBm+Bc2CGdgxt2w+kLjBUH/q+lVX/lLDYKqDLQVJtUNJ2z4ixYRv0m/PfVPB4yJgQ==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ff72:1420:4502:fdaf])
- (user=howardchung job=sendgmr) by 2002:a25:ac64:: with SMTP id
- r36mr6282842ybd.369.1627561700132; Thu, 29 Jul 2021 05:28:20 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 20:27:42 +0800
+ (user=howardchung job=sendgmr) by 2002:a05:6214:2482:: with SMTP id
+ gi2mr5116344qvb.51.1627561705100; Thu, 29 Jul 2021 05:28:25 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 20:27:43 +0800
 In-Reply-To: <20210729122751.3728885-1-howardchung@google.com>
-Message-Id: <20210729202648.Bluez.v6.4.Ia4dc489979e4bf7ffa3421199b1b9fd8d7f00bbc@changeid>
+Message-Id: <20210729202648.Bluez.v6.5.Iee308dd18bfdfd3dae9e343e78b3942ee462314f@changeid>
 Mime-Version: 1.0
 References: <20210729122751.3728885-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v6 04/13] core: block not allowed UUID connect in auth
+Subject: [Bluez PATCH v6 05/13] core: add device_added and device_removed to
+ adapter driver
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>
@@ -74,79 +75,144 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-This ensures any incoming profile connection will be blocked if its UUID
-is not allowed by the following assumption:
-
-1. Each system profile asks adapter authorization when seeing a incoming
-   connection.
-2. Each external profile checks if its UUID is allowed by adapter when
-   seeing a incoming connection.
+This adds device_added and device_removed to btd_adapter_driver so that
+a driver can get notification when device is added or removed.
 ---
-The following test steps were performed after enabling admin plugin:
-1. Set ServiceAllowList to ["1234"].
-2. Turn on a paired classic keyboard. Verify it can not be connected.
-3. Set ServiceAllowList to
-   ["1800","1801","180A","180F","1812"]
-4. Turn off and turn on the keyboard. Verift it can be connected.
 
 (no changes since v1)
 
- src/adapter.c |  5 +++++
- src/profile.c | 11 +++++++++++
- 2 files changed, 16 insertions(+)
+ src/adapter.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++-----
+ src/adapter.h |  4 ++++
+ 2 files changed, 58 insertions(+), 5 deletions(-)
 
 diff --git a/src/adapter.c b/src/adapter.c
-index c7fe27d19a5d..6c8096147bdd 100644
+index 6c8096147bdd..5c556b569ca7 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -7118,6 +7118,11 @@ static gboolean process_auth_queue(gpointer user_data)
- 		if (auth->svc_id > 0)
- 			return FALSE;
+@@ -1218,6 +1218,9 @@ void adapter_service_remove(struct btd_adapter *adapter, uint32_t handle)
+ 	remove_record_from_server(rec->handle);
+ }
  
-+		if (!btd_adapter_is_uuid_allowed(adapter, auth->uuid)) {
-+			auth->cb(&err, auth->user_data);
-+			goto next;
-+		}
++static void adapter_add_device(struct btd_adapter *adapter,
++						struct btd_device *device);
 +
- 		if (device_is_trusted(device) == TRUE) {
- 			auth->cb(NULL, auth->user_data);
- 			goto next;
-diff --git a/src/profile.c b/src/profile.c
-index 60d17b6ae657..e1bebf1ee19c 100644
---- a/src/profile.c
-+++ b/src/profile.c
-@@ -1249,6 +1249,11 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
+ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
+ 						const bdaddr_t *bdaddr,
+ 						uint8_t bdaddr_type)
+@@ -1228,8 +1231,7 @@ static struct btd_device *adapter_create_device(struct btd_adapter *adapter,
+ 	if (!device)
+ 		return NULL;
  
- 	DBG("incoming connect from %s", addr);
+-	adapter->devices = g_slist_append(adapter->devices, device);
+-
++	adapter_add_device(adapter, device);
+ 	return device;
+ }
  
-+	if (!btd_adapter_is_uuid_allowed(adapter_find(&src), uuid)) {
-+		info("UUID %s is not allowed. Igoring the connection", uuid);
-+		return;
+@@ -1256,6 +1258,9 @@ static void service_auth_cancel(struct service_auth *auth)
+ 	g_free(auth);
+ }
+ 
++static void adapter_remove_device(struct btd_adapter *adapter,
++						struct btd_device *device);
++
+ void btd_adapter_remove_device(struct btd_adapter *adapter,
+ 				struct btd_device *dev)
+ {
+@@ -1263,7 +1268,7 @@ void btd_adapter_remove_device(struct btd_adapter *adapter,
+ 
+ 	adapter->connect_list = g_slist_remove(adapter->connect_list, dev);
+ 
+-	adapter->devices = g_slist_remove(adapter->devices, dev);
++	adapter_remove_device(adapter, dev);
+ 	btd_adv_monitor_device_remove(adapter->adv_monitor_manager, dev);
+ 
+ 	adapter->discovery_found = g_slist_remove(adapter->discovery_found,
+@@ -4665,7 +4670,7 @@ static void load_devices(struct btd_adapter *adapter)
+ 			goto free;
+ 
+ 		btd_device_set_temporary(device, false);
+-		adapter->devices = g_slist_append(adapter->devices, device);
++		adapter_add_device(adapter, device);
+ 
+ 		/* TODO: register services from pre-loaded list of primaries */
+ 
+@@ -4827,6 +4832,48 @@ void adapter_remove_profile(struct btd_adapter *adapter, gpointer p)
+ 		profile->adapter_remove(profile, adapter);
+ }
+ 
++static void device_added_drivers(struct btd_adapter *adapter,
++						struct btd_device *device)
++{
++	struct btd_adapter_driver *driver;
++	GSList *l;
++
++	for (l = adapter_drivers; l; l = l->next) {
++		driver = l->data;
++
++		if (driver->device_added)
++			driver->device_added(adapter, device);
 +	}
++}
 +
- 	conn = create_conn(server, io, &src, &dst);
- 	if (conn == NULL)
- 		return;
-@@ -1272,6 +1277,7 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
- 	struct ext_profile *ext = server->ext;
- 	GError *gerr = NULL;
- 	struct ext_io *conn;
-+	const char *uuid = ext->service ? ext->service : ext->uuid;
- 	bdaddr_t src, dst;
- 
- 	bt_io_get(io, &gerr,
-@@ -1285,6 +1291,11 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
- 		return;
- 	}
- 
-+	if (!btd_adapter_is_uuid_allowed(adapter_find(&src), uuid)) {
-+		info("UUID %s is not allowed. Igoring the connection", uuid);
-+		return;
++static void device_removed_drivers(struct btd_adapter *adapter,
++						struct btd_device *device)
++{
++	struct btd_adapter_driver *driver;
++	GSList *l;
++
++	for (l = adapter_drivers; l; l = l->next) {
++		driver = l->data;
++
++		if (driver->device_removed)
++			driver->device_removed(adapter, device);
 +	}
++}
 +
- 	conn = create_conn(server, io, &src, &dst);
- 	if (conn == NULL)
- 		return;
++static void adapter_add_device(struct btd_adapter *adapter,
++						struct btd_device *device)
++{
++	adapter->devices = g_slist_append(adapter->devices, device);
++	device_added_drivers(adapter, device);
++}
++
++static void adapter_remove_device(struct btd_adapter *adapter,
++						struct btd_device *device)
++{
++	adapter->devices = g_slist_remove(adapter->devices, device);
++	device_removed_drivers(adapter, device);
++}
++
+ static void adapter_add_connection(struct btd_adapter *adapter,
+ 						struct btd_device *device,
+ 						uint8_t bdaddr_type)
+@@ -6445,8 +6492,10 @@ static void adapter_remove(struct btd_adapter *adapter)
+ 	g_slist_free(adapter->connect_list);
+ 	adapter->connect_list = NULL;
+ 
+-	for (l = adapter->devices; l; l = l->next)
++	for (l = adapter->devices; l; l = l->next) {
++		device_removed_drivers(adapter, l->data);
+ 		device_remove(l->data, FALSE);
++	}
+ 
+ 	g_slist_free(adapter->devices);
+ 	adapter->devices = NULL;
+diff --git a/src/adapter.h b/src/adapter.h
+index 7cac51451249..a2567330ddc9 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -111,6 +111,10 @@ struct btd_adapter_driver {
+ 	int (*probe) (struct btd_adapter *adapter);
+ 	void (*remove) (struct btd_adapter *adapter);
+ 	void (*resume) (struct btd_adapter *adapter);
++	void (*device_added) (struct btd_adapter *adapter,
++						struct btd_device *device);
++	void (*device_removed) (struct btd_adapter *adapter,
++						struct btd_device *device);
+ };
+ 
+ typedef void (*service_auth_cb) (DBusError *derr, void *user_data);
 -- 
 2.32.0.554.ge1b32706d8-goog
 
