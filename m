@@ -2,260 +2,363 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A0BD5C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:59:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E09C4320E
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 14:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C62D60F23
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:59:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 720056103A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 14:10:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237336AbhG2M7l (ORCPT
+        id S239036AbhG2OKE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 08:59:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39072 "EHLO
+        Thu, 29 Jul 2021 10:10:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237275AbhG2M7l (ORCPT
+        with ESMTP id S239148AbhG2OI1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 08:59:41 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08A2C06179E
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:50:18 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id 190so5749262qkk.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:50:18 -0700 (PDT)
+        Thu, 29 Jul 2021 10:08:27 -0400
+Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C615C08EAF0;
+        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
+Received: by mail-pl1-x634.google.com with SMTP id k1so7060250plt.12;
+        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=F801OWEyxMvQ2C809akKcJMuAF43bKcR4HVX6iuSUt4=;
-        b=dbpbRIcZ5QTgNtN+Ti0JWQOw7eOicuY30x6hxQJ73oea+Gy5C2ROpc7gPrkZbcdwz0
-         e8X40F6PTaHRrhHkeH3ToNuJgNBecVsgs0ftC1pDZ0H9UaxM9gNSiG2yWKCqmY8rtgRU
-         /fUvqnA5Ti8iMeyhMHFoSfTY7kiNKPTfYkVUlpQFknlgfNPts6QAx4yV6C/scYselKN3
-         5ouTbbVxenLxyNZjXLghE/Yb3L1mZN+ChX//T+A82/8QfmE4tt5RdU4Eo6XtWXH/2fCg
-         KpUwKTl84PG9KaqTKRoymobWACvriBg9ddR6yaY8cyvUucbqb31bxhN4/eY3qt58SALv
-         eQMg==
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=sC0RxXaBHF8bVVFQScILDosn557UeHIRNJqc1N05wY0=;
+        b=s8cBYF+OaNkTtZszeh88AESli5UFUYhuH9jgv8uhgSSv37d/02MjOKKv5HdRn6zCGT
+         MKk9cgj+ANjYjh3E4RalKiWJjbKKuwSPJuFtTvdVcY6pq2K7xQ8F3TgTNZ4HXccOTIG4
+         /nq1fB/c1OJS+AdexjqfB7Rat1i6xut++TZRWE34XiEgV6taWwn2SzveP9GDK1EAMrna
+         AUlkoEt/hMSfpED4DpgIdPJo/cCB+TQiP1Fdp5OH4YPlCUo7DxHhp3rjnecMlp6+tp8h
+         rgbtl6Y8ENLOmEBtxb7+ubfkz2RpbBrkei0IVyELVNAv5jemUVzxa6anZCrBGrrmuOya
+         dBcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=F801OWEyxMvQ2C809akKcJMuAF43bKcR4HVX6iuSUt4=;
-        b=Wy9VHP9hTsKgi0cRDyrus3VBNjOLW3OdjZ3UgNEMRV4fbUvyhy/su5WqQXnVBTgkdz
-         XshD5ckZidhpdoOx9q7vO4YMboFjnIGP6HKgq8vq/76vKks+rNxz6g/fBCQSDiDjqFi6
-         gfIBOQTDJSDEQe1YyT+VGsPqxJ/uoBm3uOZXwINqohznSnlP5pchipIOTXEyRdSf+pkS
-         o7RJV7ERf/N0EudlTfP1A/WiF6l244CrHyExke0h8EPrVv/cn4yb7Am4csVmXGkghvqT
-         tEfh9z+krnrhuZxDZVE5Rk2rgPwF3u7ni7tZC29QWCTy+Ad4CNpD+T/jPUrjR94ShoWz
-         9RNw==
-X-Gm-Message-State: AOAM5306tDxsZimYsPMT8udAtESO5EqrnTb5CL2vfrDmQB1iXWzPR6Yu
-        sAFCwL+eF0QbH3yc1nHI/7q65ZpNFGxheg==
-X-Google-Smtp-Source: ABdhPJz6wKq+77ebQyTMeuOau6KMVbBraxQpIgJo8C19ZVDOLFhRRk+MV0IszPtfml1mwJjEFBEa+A==
-X-Received: by 2002:a37:4042:: with SMTP id n63mr4930248qka.425.1627563017726;
-        Thu, 29 Jul 2021 05:50:17 -0700 (PDT)
-Received: from [172.17.0.2] ([20.98.209.34])
-        by smtp.gmail.com with ESMTPSA id t10sm1170981qti.94.2021.07.29.05.50.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jul 2021 05:50:17 -0700 (PDT)
-Message-ID: <6102a409.1c69fb81.8c1c3.7ed8@mx.google.com>
-Date:   Thu, 29 Jul 2021 05:50:17 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6328443348875944057=="
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=sC0RxXaBHF8bVVFQScILDosn557UeHIRNJqc1N05wY0=;
+        b=BiayIssB65m5UOy1nxTqUoxP3crNqC9C/bvLXz3f481PxahM1YqRMgVr9h7BsTIWiz
+         4Ww2C6B6/tK8dfx0JRJ/pAOF7v1woYfMvT28E+i8H+wT2JtuJWR1sTTy7E8QiQNcmYkR
+         5HqGRPmSXRyXf8+4cS5w427MUUh3PP8VFzpAwpjd33JM+jBClajPBTcpNEkbKppId0Ot
+         AEpTR4y4TFR2HON/EeQxHvW7PqQ2s/Gfbk2SeblpjHJTneQemC79+H3dYx7LXxu4+pGE
+         fa3VSxMHGJ45YRGtT1Z6d4Gv5m5kX5xYHV1U1wkWOvcabLz5MwQmYO+TRBtekPt+9YqC
+         ugTA==
+X-Gm-Message-State: AOAM53137OUvvLtiQqyLSvPtjoG10QWP2t2nAryiL1Fm96PobSUd1s5D
+        IS0XwLcwTqEBB4g9aKcV04M=
+X-Google-Smtp-Source: ABdhPJzB/FbzO+7bV94OfSl/6NiWIooTKaeoOoi0TVD8u1h5RkyvCzkMOGJCxC31R783LE+0iFwgOA==
+X-Received: by 2002:a65:5a83:: with SMTP id c3mr2226286pgt.321.1627567332086;
+        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
+Received: from [192.168.1.237] ([118.200.190.93])
+        by smtp.gmail.com with ESMTPSA id w11sm3501921pjr.44.2021.07.29.07.02.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jul 2021 07:02:11 -0700 (PDT)
+Subject: Re: [PATCH v4] Bluetooth: schedule SCO timeouts with delayed_work
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        skhan@linuxfoundation.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
+References: <20210728071721.411669-1-desmondcheongzx@gmail.com>
+ <565F72A4-F9B6-430F-A35D-8EAC7545C141@holtmann.org>
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+Message-ID: <3d665eac-2262-a618-2729-850de317c8ea@gmail.com>
+Date:   Thu, 29 Jul 2021 22:02:06 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: Admin policy series
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210729202648.Bluez.v6.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
-References: <20210729202648.Bluez.v6.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+In-Reply-To: <565F72A4-F9B6-430F-A35D-8EAC7545C141@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6328443348875944057==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Marcel,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NTIzMzY5CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgMy42OCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAxLjM3IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDQwLjk2IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuMTAgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgNy4x
-NSBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNDMuMDIg
-c2Vjb25kcwpNYWtlIENoZWNrICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMC44OSBzZWNv
-bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyMTEuMjMgc2Vjb25k
-cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgNy4yMyBzZWNvbmRzCkJ1
-aWxkIHcvZXh0IEVMTCAtIE1ha2UgICAgICAgIEZBSUwgICAgICAxMzIuNDQgc2Vjb25kcwoKRGV0
-YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIEZB
-SUwKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0IHdpdGggcnVsZSBpbiAuY2hlY2twYXRj
-aC5jb25mCk91dHB1dDoKbWNhcDogYWRkIGFkYXB0ZXIgYXV0aG9yaXphdGlvbgpXQVJOSU5HOk5F
-V19UWVBFREVGUzogZG8gbm90IGFkZCBuZXcgdHlwZWRlZnMKIzE1MjogRklMRTogcHJvZmlsZXMv
-aGVhbHRoL21jYXAuaDoyNTM6Cit0eXBlZGVmIGd1aW50ICgqIG1jYXBfYXV0aG9yaXplX2NiKSAo
-Y29uc3QgYmRhZGRyX3QgKnNyYywgY29uc3QgYmRhZGRyX3QgKmRzdCwKCldBUk5JTkc6TE9OR19M
-SU5FX0NPTU1FTlQ6IGxpbmUgbGVuZ3RoIG9mIDkzIGV4Y2VlZHMgODAgY29sdW1ucwojMTYzOiBG
-SUxFOiBwcm9maWxlcy9oZWFsdGgvbWNhcC5oOjI3OToKKwltY2FwX2F1dGhvcml6ZV9jYglhdXRo
-b3JpemVfY2I7CQkvKiBNZXRob2QgdG8gcmVxdWVzdCBhdXRob3JpemF0aW9uICovCgotIHRvdGFs
-OiAwIGVycm9ycywgMiB3YXJuaW5ncywgMTQxIGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21l
-IG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAg
-IG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9y
-IC0tZml4LWlucGxhY2UuCgoiW1BBVENIXSBtY2FwOiBhZGQgYWRhcHRlciBhdXRob3JpemF0aW9u
-IiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3Nh
-Z2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVf
-UEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0Vf
-VEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVy
-cm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhl
-IG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKY29yZTogYWRkIGRl
-dmljZV9hZGRlZCBhbmQgZGV2aWNlX3JlbW92ZWQgdG8gYWRhcHRlciBkcml2ZXIKV0FSTklORzpT
-UEFDSU5HOiBVbm5lY2Vzc2FyeSBzcGFjZSBiZWZvcmUgZnVuY3Rpb24gcG9pbnRlciBhcmd1bWVu
-dHMKIzEzMDogRklMRTogc3JjL2FkYXB0ZXIuaDoxMTQ6CisJdm9pZCAoKmRldmljZV9hZGRlZCkg
-KHN0cnVjdCBidGRfYWRhcHRlciAqYWRhcHRlciwKCldBUk5JTkc6U1BBQ0lORzogVW5uZWNlc3Nh
-cnkgc3BhY2UgYmVmb3JlIGZ1bmN0aW9uIHBvaW50ZXIgYXJndW1lbnRzCiMxMzI6IEZJTEU6IHNy
-Yy9hZGFwdGVyLmg6MTE2OgorCXZvaWQgKCpkZXZpY2VfcmVtb3ZlZCkgKHN0cnVjdCBidGRfYWRh
-cHRlciAqYWRhcHRlciwKCi0gdG90YWw6IDAgZXJyb3JzLCAyIHdhcm5pbmdzLCAxMTIgbGluZXMg
-Y2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0
-Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGlj
-YWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCiJbUEFUQ0hdIGNvcmU6IGFk
-ZCBkZXZpY2VfYWRkZWQgYW5kIGRldmljZV9yZW1vdmVkIHRvIGFkYXB0ZXIgZHJpdmVyIiBoYXMg
-c3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlw
-ZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9D
-SEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQ
-TElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBh
-cmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50
-YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKcGx1Z2lucy9hZG1pbjogYWRk
-IFNlcnZpY2VBbGxvd0xpc3QgcHJvcGVydHkKRVJST1I6U1BBQ0lORzogbmVlZCBjb25zaXN0ZW50
-IHNwYWNpbmcgYXJvdW5kICcqJyAoY3R4Old4VikKIzYzOiBGSUxFOiBwbHVnaW5zL2FkbWluLmM6
-MTg2OgorCQkJCQljb25zdCBHREJ1c1Byb3BlcnR5VGFibGUgKnByb3BlcnR5LAogCQkJCQkgICAg
-ICAgICAgICAgICAgICAgICAgICAgXgoKLSB0b3RhbDogMSBlcnJvcnMsIDAgd2FybmluZ3MsIDgy
-IGxpbmVzIGNoZWNrZWQKCk5PVEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBj
-aGVja3BhdGNoIG1heSBiZSBhYmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRo
-ZSB0eXBpY2FsIHN0eWxlIHVzaW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgoiW1BBVENIXSBw
-bHVnaW5zL2FkbWluOiBhZGQgU2VydmljZUFsbG93TGlzdCBwcm9wZXJ0eSIgaGFzIHN0eWxlIHBy
-b2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3JlZCBtZXNzYWdlIHR5cGVzOiBDT01N
-SVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVDVCBGSUxFX1BBVEhfQ0hBTkdFUyBN
-SVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9MSUNFTlNFX1RBRyBTUExJVF9TVFJJ
-TkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9mIHRoZSBlcnJvcnMgYXJlIGZhbHNl
-IHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVtIHRvIHRoZSBtYWludGFpbmVyLCBz
-ZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCnBsdWdpbnMvYWRtaW46IGFkZCBBZmZlY3Rl
-ZEJ5UG9saWN5IHByb3BlcnR5CkVSUk9SOlNQQUNJTkc6IG5lZWQgY29uc2lzdGVudCBzcGFjaW5n
-IGFyb3VuZCAnKicgKGN0eDpXeFYpCiM2NTogRklMRTogcGx1Z2lucy9hZG1pbi5jOjI1NDoKKwkJ
-CQkJY29uc3QgR0RCdXNQcm9wZXJ0eVRhYmxlICpwcm9wZXJ0eSwKIAkJCQkJICAgICAgICAgICAg
-ICAgICAgICAgICAgIF4KCi0gdG90YWw6IDEgZXJyb3JzLCAwIHdhcm5pbmdzLCAxMjAgbGluZXMg
-Y2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2YgdGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0
-Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVjaGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGlj
-YWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1maXgtaW5wbGFjZS4KCiJbUEFUQ0hdIHBsdWdpbnMv
-YWRtaW46IGFkZCBBZmZlY3RlZEJ5UG9saWN5IHByb3BlcnR5IiBoYXMgc3R5bGUgcHJvYmxlbXMs
-IHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1lc3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNT
-QUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJTEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdf
-U0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VOU0VfVEFHIFNQTElUX1NUUklORyBTU0NB
-TkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhlIGVycm9ycyBhcmUgZmFsc2UgcG9zaXRp
-dmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8gdGhlIG1haW50YWluZXIsIHNlZSBDSEVD
-S1BBVENIIGluIE1BSU5UQUlORVJTLgoKcGx1Z2lucy9hZG1pbjogcGVyc2lzdCBwb2xpY3kgc2V0
-dGluZ3MKV0FSTklORzpMSU5FX1NQQUNJTkc6IE1pc3NpbmcgYSBibGFuayBsaW5lIGFmdGVyIGRl
-Y2xhcmF0aW9ucwojMTY0OiBGSUxFOiBwbHVnaW5zL2FkbWluLmM6MzQwOgorCXN0cnVjdCBxdWV1
-ZSAqdXVpZF9saXN0ID0gTlVMTDsKKwlnY2hhciAqKnV1aWRzID0gTlVMTDsKCi0gdG90YWw6IDAg
-ZXJyb3JzLCAxIHdhcm5pbmdzLCAyMTYgbGluZXMgY2hlY2tlZAoKTk9URTogRm9yIHNvbWUgb2Yg
-dGhlIHJlcG9ydGVkIGRlZmVjdHMsIGNoZWNrcGF0Y2ggbWF5IGJlIGFibGUgdG8KICAgICAgbWVj
-aGFuaWNhbGx5IGNvbnZlcnQgdG8gdGhlIHR5cGljYWwgc3R5bGUgdXNpbmcgLS1maXggb3IgLS1m
-aXgtaW5wbGFjZS4KCiJbUEFUQ0hdIHBsdWdpbnMvYWRtaW46IHBlcnNpc3QgcG9saWN5IHNldHRp
-bmdzIiBoYXMgc3R5bGUgcHJvYmxlbXMsIHBsZWFzZSByZXZpZXcuCgpOT1RFOiBJZ25vcmVkIG1l
-c3NhZ2UgdHlwZXM6IENPTU1JVF9NRVNTQUdFIENPTVBMRVhfTUFDUk8gQ09OU1RfU1RSVUNUIEZJ
-TEVfUEFUSF9DSEFOR0VTIE1JU1NJTkdfU0lHTl9PRkYgUFJFRkVSX1BBQ0tFRCBTUERYX0xJQ0VO
-U0VfVEFHIFNQTElUX1NUUklORyBTU0NBTkZfVE9fS1NUUlRPCgpOT1RFOiBJZiBhbnkgb2YgdGhl
-IGVycm9ycyBhcmUgZmFsc2UgcG9zaXRpdmVzLCBwbGVhc2UgcmVwb3J0CiAgICAgIHRoZW0gdG8g
-dGhlIG1haW50YWluZXIsIHNlZSBDSEVDS1BBVENIIGluIE1BSU5UQUlORVJTLgoKCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBHaXRMaW50IC0gUEFTUwpEZXNjOiBSdW4gZ2l0
-bGludCB3aXRoIHJ1bGUgaW4gLmdpdGxpbnQKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IwpUZXN0OiBQcmVwIC0gU2V0dXAgRUxMIC0gUEFTUwpEZXNjOiBDbG9uZSwgYnVpbGQsIGFuZCBp
-bnN0YWxsIEVMTAoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0g
-UHJlcCAtIFBBU1MKRGVzYzogUHJlcGFyZSBlbnZpcm9ubWVudCBmb3IgYnVpbGQKCiMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIENvbmZpZ3VyZSAtIFBBU1MKRGVz
-YzogQ29uZmlndXJlIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQoKIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAtIEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVa
-IHNvdXJjZSB0cmVlCk91dHB1dDoKcHJvZmlsZXMvaGVhbHRoL2hkcC5jOiBJbiBmdW5jdGlvbiDi
-gJh1cGRhdGVfYWRhcHRlcuKAmToKcHJvZmlsZXMvaGVhbHRoL2hkcC5jOjEzNTA6NTogZXJyb3I6
-IHBhc3NpbmcgYXJndW1lbnQgMTAgb2Yg4oCYbWNhcF9jcmVhdGVfaW5zdGFuY2XigJkgZnJvbSBp
-bmNvbXBhdGlibGUgcG9pbnRlciB0eXBlIFstV2Vycm9yPWluY29tcGF0aWJsZS1wb2ludGVyLXR5
-cGVzXQogMTM1MCB8ICAgICBidGRfcmVxdWVzdF9hdXRob3JpemF0aW9uLAogICAgICB8ICAgICBe
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+CiAgICAgIHwgICAgIHwKICAgICAgfCAgICAgZ3VpbnQg
-KCopKGNvbnN0IGJkYWRkcl90ICosIGNvbnN0IGJkYWRkcl90ICosIGNvbnN0IGNoYXIgKiwgdm9p
-ZCAoKikoREJ1c0Vycm9yICosIHZvaWQgKiksIHZvaWQgKikge2FrYSB1bnNpZ25lZCBpbnQgKCop
-KGNvbnN0IHN0cnVjdCA8YW5vbnltb3VzPiAqLCBjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwg
-Y29uc3QgY2hhciAqLCB2b2lkICgqKShzdHJ1Y3QgREJ1c0Vycm9yICosIHZvaWQgKiksIHZvaWQg
-Kil9CkluIGZpbGUgaW5jbHVkZWQgZnJvbSBwcm9maWxlcy9oZWFsdGgvaGRwLmM6NDA6CnByb2Zp
-bGVzL2hlYWx0aC9tY2FwLmg6NDA1OjIzOiBub3RlOiBleHBlY3RlZCDigJhtY2FwX2F1dGhvcml6
-ZV9jYuKAmSB7YWthIOKAmHVuc2lnbmVkIGludCAoKikoY29uc3Qgc3RydWN0IDxhbm9ueW1vdXM+
-ICosIGNvbnN0IHN0cnVjdCA8YW5vbnltb3VzPiAqLCBjb25zdCBjaGFyICosIHZvaWQgKCopKHZv
-aWQgKiwgdm9pZCAqKSwgdm9pZCAqKeKAmX0gYnV0IGFyZ3VtZW50IGlzIG9mIHR5cGUg4oCYZ3Vp
-bnQgKCopKGNvbnN0IGJkYWRkcl90ICosIGNvbnN0IGJkYWRkcl90ICosIGNvbnN0IGNoYXIgKiwg
-dm9pZCAoKikoREJ1c0Vycm9yICosIHZvaWQgKiksIHZvaWQgKinigJkge2FrYSDigJh1bnNpZ25l
-ZCBpbnQgKCopKGNvbnN0IHN0cnVjdCA8YW5vbnltb3VzPiAqLCBjb25zdCBzdHJ1Y3QgPGFub255
-bW91cz4gKiwgY29uc3QgY2hhciAqLCB2b2lkICgqKShzdHJ1Y3QgREJ1c0Vycm9yICosIHZvaWQg
-KiksIHZvaWQgKinigJl9CiAgNDA1IHwgc3RydWN0IG1jYXBfaW5zdGFuY2UgKm1jYXBfY3JlYXRl
-X2luc3RhbmNlKGNvbnN0IGJkYWRkcl90ICpzcmMsCiAgICAgIHwgICAgICAgICAgICAgICAgICAg
-ICAgIF5+fn5+fn5+fn5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQg
-YXMgZXJyb3JzCm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODg5NzogcHJvZmlsZXMvaGVhbHRoL2Js
-dWV0b290aGQtaGRwLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MTQ3OiBhbGxdIEVy
-cm9yIDIKCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZSBDaGVjayAt
-IEZBSUwKRGVzYzogUnVuICdtYWtlIGNoZWNrJwpPdXRwdXQ6CnByb2ZpbGVzL2hlYWx0aC9oZHAu
-YzogSW4gZnVuY3Rpb24g4oCYdXBkYXRlX2FkYXB0ZXLigJk6CnByb2ZpbGVzL2hlYWx0aC9oZHAu
-YzoxMzUwOjU6IGVycm9yOiBwYXNzaW5nIGFyZ3VtZW50IDEwIG9mIOKAmG1jYXBfY3JlYXRlX2lu
-c3RhbmNl4oCZIGZyb20gaW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBh
-dGlibGUtcG9pbnRlci10eXBlc10KIDEzNTAgfCAgICAgYnRkX3JlcXVlc3RfYXV0aG9yaXphdGlv
-biwKICAgICAgfCAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICB8ICAgICB8CiAg
-ICAgIHwgICAgIGd1aW50ICgqKShjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBiZGFkZHJfdCAqLCBj
-b25zdCBjaGFyICosIHZvaWQgKCopKERCdXNFcnJvciAqLCB2b2lkICopLCB2b2lkICopIHtha2Eg
-dW5zaWduZWQgaW50ICgqKShjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29uc3Qgc3RydWN0
-IDxhbm9ueW1vdXM+ICosIGNvbnN0IGNoYXIgKiwgdm9pZCAoKikoc3RydWN0IERCdXNFcnJvciAq
-LCB2b2lkICopLCB2b2lkICopfQpJbiBmaWxlIGluY2x1ZGVkIGZyb20gcHJvZmlsZXMvaGVhbHRo
-L2hkcC5jOjQwOgpwcm9maWxlcy9oZWFsdGgvbWNhcC5oOjQwNToyMzogbm90ZTogZXhwZWN0ZWQg
-4oCYbWNhcF9hdXRob3JpemVfY2LigJkge2FrYSDigJh1bnNpZ25lZCBpbnQgKCopKGNvbnN0IHN0
-cnVjdCA8YW5vbnltb3VzPiAqLCBjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29uc3QgY2hh
-ciAqLCB2b2lkICgqKSh2b2lkICosIHZvaWQgKiksIHZvaWQgKinigJl9IGJ1dCBhcmd1bWVudCBp
-cyBvZiB0eXBlIOKAmGd1aW50ICgqKShjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBiZGFkZHJfdCAq
-LCBjb25zdCBjaGFyICosIHZvaWQgKCopKERCdXNFcnJvciAqLCB2b2lkICopLCB2b2lkICop4oCZ
-IHtha2Eg4oCYdW5zaWduZWQgaW50ICgqKShjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29u
-c3Qgc3RydWN0IDxhbm9ueW1vdXM+ICosIGNvbnN0IGNoYXIgKiwgdm9pZCAoKikoc3RydWN0IERC
-dXNFcnJvciAqLCB2b2lkICopLCB2b2lkICop4oCZfQogIDQwNSB8IHN0cnVjdCBtY2FwX2luc3Rh
-bmNlICptY2FwX2NyZWF0ZV9pbnN0YW5jZShjb25zdCBiZGFkZHJfdCAqc3JjLAogICAgICB8ICAg
-ICAgICAgICAgICAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5n
-cyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg4OTc6IHBy
-b2ZpbGVzL2hlYWx0aC9ibHVldG9vdGhkLWhkcC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZp
-bGU6MTA0MzY6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-ClRlc3Q6IE1ha2UgRGlzdGNoZWNrIC0gUEFTUwpEZXNjOiBSdW4gZGlzdGNoZWNrIHRvIGNoZWNr
-IHRoZSBkaXN0cmlidXRpb24KCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBC
-dWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgLSBQQVNTCkRlc2M6IENvbmZpZ3VyZSBCbHVlWiBz
-b3VyY2Ugd2l0aCAnLS1lbmFibGUtZXh0ZXJuYWwtZWxsJyBjb25maWd1cmF0aW9uCgojIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgdy9leHQgRUxMIC0gTWFrZSAtIEZB
-SUwKRGVzYzogQnVpbGQgQmx1ZVogc291cmNlIHdpdGggJy0tZW5hYmxlLWV4dGVybmFsLWVsbCcg
-Y29uZmlndXJhdGlvbgpPdXRwdXQ6CnByb2ZpbGVzL2hlYWx0aC9oZHAuYzogSW4gZnVuY3Rpb24g
-4oCYdXBkYXRlX2FkYXB0ZXLigJk6CnByb2ZpbGVzL2hlYWx0aC9oZHAuYzoxMzUwOjU6IGVycm9y
-OiBwYXNzaW5nIGFyZ3VtZW50IDEwIG9mIOKAmG1jYXBfY3JlYXRlX2luc3RhbmNl4oCZIGZyb20g
-aW5jb21wYXRpYmxlIHBvaW50ZXIgdHlwZSBbLVdlcnJvcj1pbmNvbXBhdGlibGUtcG9pbnRlci10
-eXBlc10KIDEzNTAgfCAgICAgYnRkX3JlcXVlc3RfYXV0aG9yaXphdGlvbiwKICAgICAgfCAgICAg
-Xn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgogICAgICB8ICAgICB8CiAgICAgIHwgICAgIGd1aW50
-ICgqKShjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBjaGFyICosIHZv
-aWQgKCopKERCdXNFcnJvciAqLCB2b2lkICopLCB2b2lkICopIHtha2EgdW5zaWduZWQgaW50ICgq
-KShjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29uc3Qgc3RydWN0IDxhbm9ueW1vdXM+ICos
-IGNvbnN0IGNoYXIgKiwgdm9pZCAoKikoc3RydWN0IERCdXNFcnJvciAqLCB2b2lkICopLCB2b2lk
-ICopfQpJbiBmaWxlIGluY2x1ZGVkIGZyb20gcHJvZmlsZXMvaGVhbHRoL2hkcC5jOjQwOgpwcm9m
-aWxlcy9oZWFsdGgvbWNhcC5oOjQwNToyMzogbm90ZTogZXhwZWN0ZWQg4oCYbWNhcF9hdXRob3Jp
-emVfY2LigJkge2FrYSDigJh1bnNpZ25lZCBpbnQgKCopKGNvbnN0IHN0cnVjdCA8YW5vbnltb3Vz
-PiAqLCBjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29uc3QgY2hhciAqLCB2b2lkICgqKSh2
-b2lkICosIHZvaWQgKiksIHZvaWQgKinigJl9IGJ1dCBhcmd1bWVudCBpcyBvZiB0eXBlIOKAmGd1
-aW50ICgqKShjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBiZGFkZHJfdCAqLCBjb25zdCBjaGFyICos
-IHZvaWQgKCopKERCdXNFcnJvciAqLCB2b2lkICopLCB2b2lkICop4oCZIHtha2Eg4oCYdW5zaWdu
-ZWQgaW50ICgqKShjb25zdCBzdHJ1Y3QgPGFub255bW91cz4gKiwgY29uc3Qgc3RydWN0IDxhbm9u
-eW1vdXM+ICosIGNvbnN0IGNoYXIgKiwgdm9pZCAoKikoc3RydWN0IERCdXNFcnJvciAqLCB2b2lk
-ICopLCB2b2lkICop4oCZfQogIDQwNSB8IHN0cnVjdCBtY2FwX2luc3RhbmNlICptY2FwX2NyZWF0
-ZV9pbnN0YW5jZShjb25zdCBiZGFkZHJfdCAqc3JjLAogICAgICB8ICAgICAgICAgICAgICAgICAg
-ICAgICBefn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJuaW5ncyBiZWluZyB0cmVhdGVk
-IGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg4OTc6IHByb2ZpbGVzL2hlYWx0aC9i
-bHVldG9vdGhkLWhkcC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDE0NzogYWxsXSBF
-cnJvciAyCgoKCgotLS0KUmVnYXJkcywKTGludXggQmx1ZXRvb3RoCgo=
+On 29/7/21 7:30 pm, Marcel Holtmann wrote:
+> Hi Desmond,
+> 
+>> struct sock.sk_timer should be used as a sock cleanup timer. However,
+>> SCO uses it to implement sock timeouts.
+>>
+>> This causes issues because struct sock.sk_timer's callback is run in
+>> an IRQ context, and the timer callback function sco_sock_timeout takes
+>> a spin lock on the socket. However, other functions such as
+>> sco_conn_del, sco_conn_ready, rfcomm_connect_ind, and
+>> bt_accept_enqueue also take the spin lock with interrupts enabled.
+>>
+>> This inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock usage could
+>> lead to deadlocks as reported by Syzbot [1]:
+>>        CPU0
+>>        ----
+>>   lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+>>   <Interrupt>
+>>     lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
+>>
+>> To fix this, we use delayed work to implement SCO sock timouts
+>> instead. This allows us to avoid taking the spin lock on the socket in
+>> an IRQ context, and corrects the misuse of struct sock.sk_timer.
+>>
+>> Link: https://syzkaller.appspot.com/bug?id=9089d89de0502e120f234ca0fc8a703f7368b31e [1]
+>> Reported-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
+>> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+>> ---
+>>
+>> Hi,
+>>
+>> As suggested, this patch addresses the inconsistent lock state while
+>> avoiding having to deal with local_bh_disable.
+>>
+>> Now that sco_sock_timeout is no longer run in IRQ context, it might
+>> be the case that bh_lock_sock is no longer needed to sync between
+>> SOFTIRQ and user contexts, so we can switch to lock_sock.
+>>
+>> I'm not too certain about this, or if there's any benefit to using
+>> lock_sock instead, so I've left that out of this patch.
+> 
+> I don’t see a reason why we can’t switch to lock_sock, but lets do that in a separate patch in case I missed something it is easier to revert.
+> 
 
---===============6328443348875944057==--
+Sounds good to me.
+
+After further investigation, I believe the switch to lock_sock is needed 
+to prevent calls to sco_sock_set_timer while we're trying to remove a 
+connection or socket.
+
+Right now _set_timer is called under lock_sock, whereas _clear_timer is 
+sometimes called under lock_sock, sometimes under bh_lock_sock, and 
+sometimes under no lock. It seems to me that there's potential races 
+here. For example:
+
+         CPU0                    CPU1
+         ----                    ----
+    lock_sock();
+                                 bh_lock_sock();
+                                 sco_sock_clear_timer();
+    sco_sock_set_timer();
+                                 sco_chan_del();
+
+So calls to _clear_timer and _set_timer need to be consolidated under 
+lock_sock.
+
+But before that there's a circular lock dependency that's currently 
+hidden. When changing bh_lock_sock to lock_sock in sco.c, we get a chain 
+of sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> &hdev->lock --> hci_cb_list_lock
+
+Assuming that the proper lock hierarchy (from outer to inner) should be 
+&hdev->lock --> hci_cb_list_lock --> sk_lock-AF_BLUETOOTH-BTPROTO_SCO,
+then the inversion happens in sco_sock_connect where we call lock_sock 
+before hci_dev_lock.
+
+So probably this fix needs to happen in a series like so:
+- schedule SCO timeouts with delayed_work (which removes the SOFTIRQ)
+- break the circular dependency (which enables the switch to lock_sock)
+- switch to lock_sock while moving calls to _clear_timer under the lock
+
+Thoughts?
+
+>>
+>> v3 -> v4:
+>> - Switch to using delayed_work to schedule SCO sock timeouts instead
+>> of using local_bh_disable. As suggested by Luiz Augusto von Dentz.
+>>
+>> v2 -> v3:
+>> - Split SCO and RFCOMM code changes, as suggested by Luiz Augusto von
+>> Dentz.
+>> - Simplify local bh disabling in SCO by using local_bh_disable/enable
+>> inside sco_chan_del since local_bh_disable/enable pairs are reentrant.
+>>
+>> v1 -> v2:
+>> - Instead of pulling out the clean-up code out from sco_chan_del and
+>> using it directly in sco_conn_del, disable local softirqs for relevant
+>> sections.
+>> - Disable local softirqs more thoroughly for instances of
+>> bh_lock_sock/bh_lock_sock_nested in the bluetooth subsystem.
+>> Specifically, the calls in af_bluetooth.c and rfcomm/sock.c are now made
+>> with local softirqs disabled as well.
+>>
+>> Best wishes,
+>> Desmond
+>>
+>> net/bluetooth/sco.c | 39 ++++++++++++++++++++++++---------------
+>> 1 file changed, 24 insertions(+), 15 deletions(-)
+>>
+>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>> index 3bd41563f118..b6dd16153d38 100644
+>> --- a/net/bluetooth/sco.c
+>> +++ b/net/bluetooth/sco.c
+>> @@ -48,6 +48,8 @@ struct sco_conn {
+>> 	spinlock_t	lock;
+>> 	struct sock	*sk;
+>>
+>> +	struct delayed_work	sk_timer;
+>> +
+> 
+> I don’t like the sk_timer name. That is confusing. Maybe better use timeout_work or to_work. The sk_* are really more struct sock fields (hence the sk->sk_xyz naming schema).
+> 
+
+Thanks for the feedback. timeout_work sounds good to me, I'll make the 
+update.
+
+>> 	unsigned int    mtu;
+>> };
+>>
+>> @@ -74,9 +76,11 @@ struct sco_pinfo {
+>> #define SCO_CONN_TIMEOUT	(HZ * 40)
+>> #define SCO_DISCONN_TIMEOUT	(HZ * 2)
+>>
+>> -static void sco_sock_timeout(struct timer_list *t)
+>> +static void sco_sock_timeout(struct work_struct *work)
+>> {
+>> -	struct sock *sk = from_timer(sk, t, sk_timer);
+>> +	struct sco_conn *conn = container_of(work, struct sco_conn,
+>> +					     sk_timer.work);
+>> +	struct sock *sk = conn->sk;
+>>
+>> 	BT_DBG("sock %p state %d", sk, sk->sk_state);
+>>
+>> @@ -89,16 +93,18 @@ static void sco_sock_timeout(struct timer_list *t)
+>> 	sock_put(sk);
+>> }
+>>
+>> -static void sco_sock_set_timer(struct sock *sk, long timeout)
+>> +static void sco_sock_set_timer(struct sock *sk, struct delayed_work *work,
+>> +			       long timeout)
+>> {
+> 
+> I don’t get the extra variable here. Can we not just pass in struct hci_conn.
+> 
+> 
+
+Right, the extra variable isn't needed.
+
+I think either struct hci_conn or struct sock should go in there. But as 
+Luiz suggested in another email, perhaps struct sock would be a better 
+candidate.
+
+This is because sometimes we need to check whether sock has been added 
+to a connection before calling sco_sock_clear_timer, e.g. in 
+sco_sock_shutdown or sco_sock_close. So might as well consolidate all 
+the checks and dereferences into sco_sock_{set/clear}_timer.
+
+>> 	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
+>> -	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
+>> +	cancel_delayed_work(work);
+>> +	schedule_delayed_work(work, timeout);
+>> }
+>>
+>> -static void sco_sock_clear_timer(struct sock *sk)
+>> +static void sco_sock_clear_timer(struct sock *sk, struct delayed_work *work)
+>> {
+>> 	BT_DBG("sock %p state %d", sk, sk->sk_state);
+>> -	sk_stop_timer(sk, &sk->sk_timer);
+>> +	cancel_delayed_work(work);
+> 
+> Same as above, we pass in struct sock just for the debug message.
+> 
+>> }
+>>
+>> /* ---- SCO connections ---- */
+>> @@ -174,7 +180,7 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+>> 	if (sk) {
+>> 		sock_hold(sk);
+>> 		bh_lock_sock(sk);
+>> -		sco_sock_clear_timer(sk);
+>> +		sco_sock_clear_timer(sk, &conn->sk_timer);
+>> 		sco_chan_del(sk, err);
+>> 		bh_unlock_sock(sk);
+>> 		sco_sock_kill(sk);
+>> @@ -193,6 +199,8 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
+>> 	sco_pi(sk)->conn = conn;
+>> 	conn->sk = sk;
+>>
+>> +	INIT_DELAYED_WORK(&conn->sk_timer, sco_sock_timeout);
+>> +
+>> 	if (parent)
+>> 		bt_accept_enqueue(parent, sk, true);
+>> }
+>> @@ -260,11 +268,11 @@ static int sco_connect(struct sock *sk)
+>> 		goto done;
+>>
+>> 	if (hcon->state == BT_CONNECTED) {
+>> -		sco_sock_clear_timer(sk);
+>> +		sco_sock_clear_timer(sk, &conn->sk_timer);
+>> 		sk->sk_state = BT_CONNECTED;
+>> 	} else {
+>> 		sk->sk_state = BT_CONNECT;
+>> -		sco_sock_set_timer(sk, sk->sk_sndtimeo);
+>> +		sco_sock_set_timer(sk, &conn->sk_timer, sk->sk_sndtimeo);
+>> 	}
+>>
+>> done:
+>> @@ -419,7 +427,8 @@ static void __sco_sock_close(struct sock *sk)
+>> 	case BT_CONFIG:
+>> 		if (sco_pi(sk)->conn->hcon) {
+>> 			sk->sk_state = BT_DISCONN;
+>> -			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+>> +			sco_sock_set_timer(sk, &sco_pi(sk)->conn->sk_timer,
+>> +					   SCO_DISCONN_TIMEOUT);
+>> 			sco_conn_lock(sco_pi(sk)->conn);
+>> 			hci_conn_drop(sco_pi(sk)->conn->hcon);
+>> 			sco_pi(sk)->conn->hcon = NULL;
+>> @@ -443,7 +452,8 @@ static void __sco_sock_close(struct sock *sk)
+>> /* Must be called on unlocked socket. */
+>> static void sco_sock_close(struct sock *sk)
+>> {
+>> -	sco_sock_clear_timer(sk);
+>> +	if (sco_pi(sk)->conn)
+>> +		sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
+>> 	lock_sock(sk);
+>> 	__sco_sock_close(sk);
+>> 	release_sock(sk);
+>> @@ -500,8 +510,6 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
+>>
+>> 	sco_pi(sk)->setting = BT_VOICE_CVSD_16BIT;
+>>
+>> -	timer_setup(&sk->sk_timer, sco_sock_timeout, 0);
+>> -
+>> 	bt_sock_link(&sco_sk_list, sk);
+>> 	return sk;
+>> }
+>> @@ -1036,7 +1044,8 @@ static int sco_sock_shutdown(struct socket *sock, int how)
+>>
+>> 	if (!sk->sk_shutdown) {
+>> 		sk->sk_shutdown = SHUTDOWN_MASK;
+>> -		sco_sock_clear_timer(sk);
+>> +		if (sco_pi(sk)->conn)
+>> +			sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
+>> 		__sco_sock_close(sk);
+>>
+>> 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
+>> @@ -1083,7 +1092,7 @@ static void sco_conn_ready(struct sco_conn *conn)
+>> 	BT_DBG("conn %p", conn);
+>>
+>> 	if (sk) {
+>> -		sco_sock_clear_timer(sk);
+>> +		sco_sock_clear_timer(sk, &conn->sk_timer);
+>> 		bh_lock_sock(sk);
+>> 		sk->sk_state = BT_CONNECTED;
+>> 		sk->sk_state_change(sk);
+> 
+> Other than these minor cleanups, this looks great.
+> 
+> Regards
+> 
+> Marcel
+> 
+
