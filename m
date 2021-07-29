@@ -5,66 +5,64 @@ X-Spam-Level:
 X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F2E58C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 16:43:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C73EC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D347360F22
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 16:43:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6B73160F21
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 17:11:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229995AbhG2Qn3 (ORCPT
+        id S231475AbhG2RLH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 12:43:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38268 "EHLO
+        Thu, 29 Jul 2021 13:11:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45234 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229812AbhG2Qn2 (ORCPT
+        with ESMTP id S229771AbhG2RLH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 12:43:28 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D6DDC0613C1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 09:43:25 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id y125-20020a2532830000b029058328f1b02eso6995329yby.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 09:43:25 -0700 (PDT)
+        Thu, 29 Jul 2021 13:11:07 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79E0C0613C1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 10:11:03 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id o2-20020a05620a1102b02903b9ade0af31so3726346qkk.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 10:11:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:message-id:mime-version:subject:from:to:cc;
-        bh=+vXJXnWw4i/uZjkWX5JtWCOlsWNzjAsTCHJJYSUJPqg=;
-        b=DeXGHwZ26J/RmPqe0tvmGC10hTSpp6xifoGBlog/q3hsEyb6x7Aue+LUMEk5Q33fIj
-         d56RbbxHoMmyF2vKZ5LiBtVD6fceN9t1dTf7PglIOLZERUg/kQcZ9cWNz5ONZB/KItVc
-         gNy5N1kgv1vxgfU/BmFGuszHkW7dDnOG94NX/oVezluQmQm6UXRmG8Qv1GKjw+PlJVQk
-         uzWbeeYQ1aPK/snNzAvndpWlhAjrXvpBlG0kN48w3ZnnYInNH1lDUn6Bx2bnkjd611HR
-         ngjlyFL1P/cYF163wu5ai+SB6xVzRXg5YT/GH26xMLaq4CLDUlfYh3Mk/bAfUTxJ0Dfx
-         lTCw==
+        bh=7QYjLUUqEA7QJtp6uP4L96pWeYbMtWuBy88IlWBrbUs=;
+        b=GitGuPFN7VBWLpKFt0v1/hktZg429tIvceF80bLzkFbR32YQ/YcMnH8Teqgja1oso6
+         s3KMBnYF5rqp5okurqP0N+mxGdLdhhMxBzlOwpA0LR5Cm2aYe9C+a948MWYoM+lCv/0c
+         9sA2Y3uP+udORQmrkpo86lU33HFiU7fybTIg+W03UgB4mbI4b5TE3MkZspuwWxT/szgK
+         kFFluWoT7Ma3m+ZhKwVpPOZkVoS56RUlobsfiIIzYP1k/V7b4d8mBKyFIQhTeo7rkYt5
+         GjKJbKVWfYio+Qhk6KYtgIDJlKBikxy3KTL5hQvaudIaxEK/I5avhFbREGxPpmt9oX2n
+         nJ3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=+vXJXnWw4i/uZjkWX5JtWCOlsWNzjAsTCHJJYSUJPqg=;
-        b=T6Yt02wg1pj/7OwHpY1tgGKSEYQWUG4mzLPxjNWJneP7WudL9Pl4wavDH2TmargHxy
-         57Svi05kC9rSFBJ5AO1Um7NRM8uk/bH43WX9i5F+r8RxrA32Lckd49R73G2B4g3D8QmN
-         OXs78l72oV3EmA4ipu1s2KDFPM+tdOnyOi9uScJ82TD6uwAIt8K/g4kEhRwUVul8xVWd
-         yagn3lay8s1dTmEy7UPskpw8CkbYZG4YDvAwZPuHd27JymWUb0LSsCbrT2kDfDPizUfe
-         ipF3sU1giC9qhyc6XcLiSJHUACKzijQ+9yPUEiD1dcjCreDJO6ksJ1HY6ylARQSkrz2e
-         jhEQ==
-X-Gm-Message-State: AOAM533WL7KU4eRbo7N8NJqy3E/2eXwTHSA/S+Osh0tNIbCVap5RU+yz
-        FiVoVGHmE2v7wy+a8bLYYg19YWDzXLMCtPW1YSGP36rZFo81TXcq+J0e3gNP6mX21L1yLZnMVB1
-        BbD1RACm9niF8mWuWAjZGg0wOq6eVLnUDJNeD1ubP7vGHROE6bkvGALgaFsqV61ZNtbf6eJgTlI
-        zwoQYwKpwyl1k=
-X-Google-Smtp-Source: ABdhPJwVXBQAWZwfhc/BekQ1qtupMFZFls7enotw/WCy2nXFNP8xBlx4nkU04KIBWiQ0qwvcHW/q34tI22ot2MdnZQ==
+        bh=7QYjLUUqEA7QJtp6uP4L96pWeYbMtWuBy88IlWBrbUs=;
+        b=dXA3sl6eWnuT7uQPuh0xFtmFvm34YCSZB0WtTjCmnuDOwBxZxGhXX9aNgCLzk6Ojzv
+         vyMg6JsNQkWQT+3oeAyMkAbKJw/kx3ix7FDiDVmncxM1yEAhLjQ+ZFHenuNmrp8aix8t
+         Vkmb+k5x/C3g44r/6Z8GUvRlZ1PivPOHoQ2qA/bbOYvEQe06Uwu2rscHagnmHpFOpzWf
+         9ZHm3a0fZ5WDNBlzajHG6hnBRvFSpPWwyvDjydsBnuR1+lBubEyfl0uNCN9tcNA7q3aE
+         6sojP0kQLbwPiWDXLkhTKrp/T7MYB1O+bESaKm2HuUzu+a2Y6fcVab0qUANGn1fSaXDp
+         4Fpg==
+X-Gm-Message-State: AOAM5302rBLGNODrtrFJp0gvx34RbxeQVPup0tlenLRmluxRdDgV5zVh
+        GKBXraKN/3EzagSIGj0s7zxb//sRVxsfK7cA1hNLKECuup4zf3LP7yeEyf1skqDN768gxqTcET7
+        itQrJZi/88hR1VhOFKmPg8JhtreYFiHciF+BfIqpsetFzkDdFxjb6Mn6sZsm3rQfpuJVnws5AZ/
+        4fLlYZ6gnzUC0=
+X-Google-Smtp-Source: ABdhPJy36b6GeGbxRVtXuY9CMyJWfNPDbOYW8W1+t+m0QitXepHvJiP1Q389FHGvtpmShE09ePMHXwqChVjxL+2CkA==
 X-Received: from michaelfsun.mtv.corp.google.com ([2620:15c:202:201:9678:c075:a4e7:f144])
- (user=michaelfsun job=sendgmr) by 2002:a25:b3c9:: with SMTP id
- x9mr7360564ybf.514.1627577004790; Thu, 29 Jul 2021 09:43:24 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 09:43:21 -0700
-Message-Id: <20210729094319.1.Ib7a90fea41e56da34bab6811c2ecf6b255a14f51@changeid>
+ (user=michaelfsun job=sendgmr) by 2002:a05:6214:1909:: with SMTP id
+ er9mr6387577qvb.26.1627578662750; Thu, 29 Jul 2021 10:11:02 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 10:10:59 -0700
+Message-Id: <20210729101036.1.I20af1cbaba1aed4ea5978c97339df5e035f08625@changeid>
 Mime-Version: 1.0
 X-Mailer: git-send-email 2.32.0.432.gabb21c7263-goog
-Subject: [PATCH] Bluetooth: btusb: Enable MSFT extension for Intel next
- generation controllers
+Subject: [PATCH] Bluetooth: btusb: Enable MSFT extension for WCN6855 controller
 From:   Michael Sun <michaelfsun@google.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
         Michael Sun <michaelfsun@google.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -75,43 +73,29 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
+The Qualcomm WCN6855 Bluetooth controller supports the Microsoft vendor
+extension, enable them by setting VsMsftOpCode to 0xFD70.
 
-The Intel TyphoonPeak, GarfieldPeak Bluetooth controllers
-support the Microsoft vendor extension and they are using
-0xFC1E for VsMsftOpCode.
+Verified on a WCN6855 device through bluetoothctl show
 
-Verified on a GarfieldPeak device through bluetoothctl show
-
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Signed-off-by: Michael Sun <michaelfsun@google.com>
 ---
 
- drivers/bluetooth/btusb.c | 11 +++++++++++
- 1 file changed, 11 insertions(+)
+ drivers/bluetooth/btusb.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 1876a960b3dc..23cf6e98173b 100644
+index 1876a960b3dc..d9376380fcc2 100644
 --- a/drivers/bluetooth/btusb.c
 +++ b/drivers/bluetooth/btusb.c
-@@ -3031,6 +3031,17 @@ static int btusb_setup_intel_newgen(struct hci_dev *hdev)
- 	btintel_version_info_tlv(hdev, &version);
+@@ -4735,6 +4735,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->set_bdaddr = btusb_set_bdaddr_wcn6855;
+ 		hdev->cmd_timeout = btusb_qca_cmd_timeout;
+ 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
++		hci_set_msft_opcode(hdev, 0xFD70);
+ 	}
  
- finish:
-+	/* All Intel new genration controllers support the Microsoft vendor
-+	 * extension are using 0xFC1E for VsMsftOpCode.
-+	 */
-+	switch (INTEL_HW_VARIANT(version.cnvi_bt)) {
-+	case 0x17:
-+	case 0x18:
-+	case 0x19:
-+		hci_set_msft_opcode(hdev, 0xFC1E);
-+		break;
-+	}
-+
- 	/* Set the event mask for Intel specific vendor events. This enables
- 	 * a few extra events that are useful during general operation. It
- 	 * does not enable any debugging related events.
+ 	if (id->driver_info & BTUSB_AMP) {
 -- 
 2.32.0.432.gabb21c7263-goog
 
