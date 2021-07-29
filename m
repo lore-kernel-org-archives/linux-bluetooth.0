@@ -2,363 +2,195 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 85E09C4320E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 14:10:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1091AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 15:39:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 720056103A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 14:10:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EDB0D60F01
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 15:39:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239036AbhG2OKE (ORCPT
+        id S237915AbhG2PjS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 10:10:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55462 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239148AbhG2OI1 (ORCPT
+        Thu, 29 Jul 2021 11:39:18 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:58889 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237913AbhG2PjR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 10:08:27 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C615C08EAF0;
-        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id k1so7060250plt.12;
-        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=sC0RxXaBHF8bVVFQScILDosn557UeHIRNJqc1N05wY0=;
-        b=s8cBYF+OaNkTtZszeh88AESli5UFUYhuH9jgv8uhgSSv37d/02MjOKKv5HdRn6zCGT
-         MKk9cgj+ANjYjh3E4RalKiWJjbKKuwSPJuFtTvdVcY6pq2K7xQ8F3TgTNZ4HXccOTIG4
-         /nq1fB/c1OJS+AdexjqfB7Rat1i6xut++TZRWE34XiEgV6taWwn2SzveP9GDK1EAMrna
-         AUlkoEt/hMSfpED4DpgIdPJo/cCB+TQiP1Fdp5OH4YPlCUo7DxHhp3rjnecMlp6+tp8h
-         rgbtl6Y8ENLOmEBtxb7+ubfkz2RpbBrkei0IVyELVNAv5jemUVzxa6anZCrBGrrmuOya
-         dBcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=sC0RxXaBHF8bVVFQScILDosn557UeHIRNJqc1N05wY0=;
-        b=BiayIssB65m5UOy1nxTqUoxP3crNqC9C/bvLXz3f481PxahM1YqRMgVr9h7BsTIWiz
-         4Ww2C6B6/tK8dfx0JRJ/pAOF7v1woYfMvT28E+i8H+wT2JtuJWR1sTTy7E8QiQNcmYkR
-         5HqGRPmSXRyXf8+4cS5w427MUUh3PP8VFzpAwpjd33JM+jBClajPBTcpNEkbKppId0Ot
-         AEpTR4y4TFR2HON/EeQxHvW7PqQ2s/Gfbk2SeblpjHJTneQemC79+H3dYx7LXxu4+pGE
-         fa3VSxMHGJ45YRGtT1Z6d4Gv5m5kX5xYHV1U1wkWOvcabLz5MwQmYO+TRBtekPt+9YqC
-         ugTA==
-X-Gm-Message-State: AOAM53137OUvvLtiQqyLSvPtjoG10QWP2t2nAryiL1Fm96PobSUd1s5D
-        IS0XwLcwTqEBB4g9aKcV04M=
-X-Google-Smtp-Source: ABdhPJzB/FbzO+7bV94OfSl/6NiWIooTKaeoOoi0TVD8u1h5RkyvCzkMOGJCxC31R783LE+0iFwgOA==
-X-Received: by 2002:a65:5a83:: with SMTP id c3mr2226286pgt.321.1627567332086;
-        Thu, 29 Jul 2021 07:02:12 -0700 (PDT)
-Received: from [192.168.1.237] ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id w11sm3501921pjr.44.2021.07.29.07.02.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jul 2021 07:02:11 -0700 (PDT)
-Subject: Re: [PATCH v4] Bluetooth: schedule SCO timeouts with delayed_work
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        Thu, 29 Jul 2021 11:39:17 -0400
+Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A9FA3CED19;
+        Thu, 29 Jul 2021 17:39:12 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: memory leak in h4_recv_buf
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210729120706.GU1931@kadam>
+Date:   Thu, 29 Jul 2021 17:39:12 +0200
+Cc:     Phi Nguyen <phind.uet@gmail.com>,
+        syzkaller-bugs <syzkaller-bugs@googlegroups.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org,
-        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
-References: <20210728071721.411669-1-desmondcheongzx@gmail.com>
- <565F72A4-F9B6-430F-A35D-8EAC7545C141@holtmann.org>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <3d665eac-2262-a618-2729-850de317c8ea@gmail.com>
-Date:   Thu, 29 Jul 2021 22:02:06 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
-MIME-Version: 1.0
-In-Reply-To: <565F72A4-F9B6-430F-A35D-8EAC7545C141@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <AF823758-2063-4E9C-8EF8-9F22107FFB71@holtmann.org>
+References: <0000000000006b1779058c0cbdda@google.com>
+ <d71a274f-fdeb-4da1-898e-06f6944e04dan@googlegroups.com>
+ <a125c3e6-7723-185a-3c47-219c201c6785@gmail.com>
+ <E59B3DB2-3D96-459B-9902-C9E729407ED2@holtmann.org>
+ <20210729120706.GU1931@kadam>
+To:     Dan Carpenter <dan.carpenter@oracle.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Dan,
 
-On 29/7/21 7:30 pm, Marcel Holtmann wrote:
-> Hi Desmond,
+>>>>   syzbot found the following crash on:
+>>>>   HEAD commit: abf02e29 Merge tag 'pm-5.2-rc6' of
+>>>>   git://git.kernel.org/pu <http://git.kernel.org/pu>..
+>>>>   git tree: upstream
+>>>>   console output:
+>>>>   https://syzkaller.appspot.com/x/log.txt?x=1054e6b2a00000
+>>>>   <https://syzkaller.appspot.com/x/log.txt?x=1054e6b2a00000>
+>>>>   kernel config:
+>>>>   https://syzkaller.appspot.com/x/.config?x=56f1da14935c3cce
+>>>>   <https://syzkaller.appspot.com/x/.config?x=56f1da14935c3cce>
+>>>>   dashboard link:
+>>>>   https://syzkaller.appspot.com/bug?extid=97388eb9d31b997fe1d0
+>>>>   <https://syzkaller.appspot.com/bug?extid=97388eb9d31b997fe1d0>
+>>>>   compiler: gcc (GCC) 9.0.0 20181231 (experimental)
+>>>>   syz repro:
+>>>>   https://syzkaller.appspot.com/x/repro.syz?x=1073d8aaa00000
+>>>>   <https://syzkaller.appspot.com/x/repro.syz?x=1073d8aaa00000>
+>>>>   C reproducer:
+>>>>   https://syzkaller.appspot.com/x/repro.c?x=17b36fbea00000
+>>>>   <https://syzkaller.appspot.com/x/repro.c?x=17b36fbea00000>
+>>>>   IMPORTANT: if you fix the bug, please add the following tag to the
+>>>>   commit:
+>>>>   Reported-by: syzbot+97388e...@syzkaller.appspotmail.com
+>>>>   program
+>>>>   BUG: memory leak
+>>>>   unreferenced object 0xffff88810991fa00 (size 224):
+>>>>   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
+>>>>   hex dump (first 32 bytes):
+>>>>   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+>>>>   00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 ................
+>>>>   backtrace:
+>>>>   [<00000000da42c09f>] kmemleak_alloc_recursive
+>>>>   include/linux/kmemleak.h:43 [inline]
+>>>>   [<00000000da42c09f>] slab_post_alloc_hook mm/slab.h:439 [inline]
+>>>>   [<00000000da42c09f>] slab_alloc_node mm/slab.c:3269 [inline]
+>>>>   [<00000000da42c09f>] kmem_cache_alloc_node+0x153/0x2a0 mm/slab.c:3579
+>>>>   [<00000000f6fbcf84>] __alloc_skb+0x6e/0x210 net/core/skbuff.c:194
+>>>>   [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
+>>>>   [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339
+>>>>   [inline]
+>>>>   [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450
+>>>>   drivers/bluetooth/hci_h4.c:182
+>>>>   [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
+>>>>   [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200
+>>>>   drivers/bluetooth/hci_ldisc.c:592
+>>>>   [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
+>>>>   [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
+>>>>   [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
+>>>>   [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
+>>>>   [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
+>>>>   [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
+>>>>   [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+>>>>   [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+>>>>   [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
+>>>>   [<00000000c62091e3>] do_syscall_64+0x76/0x1a0
+>>>>   arch/x86/entry/common.c:301
+>>>>   [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>>>>   BUG: memory leak
+>>>>   unreferenced object 0xffff8881204f4400 (size 1024):
+>>>>   comm "syz-executor739", pid 7080, jiffies 4294949854 (age 18.640s)
+>>>>   hex dump (first 32 bytes):
+>>>>   6c 69 62 75 64 65 76 00 fe ed ca fe 28 00 00 00 libudev.....(...
+>>>>   28 00 00 00 a0 00 00 00 52 ca da 77 00 00 00 00 (.......R..w....
+>>>>   backtrace:
+>>>>   [<0000000034504843>] kmemleak_alloc_recursive
+>>>>   include/linux/kmemleak.h:43 [inline]
+>>>>   [<0000000034504843>] slab_post_alloc_hook mm/slab.h:439 [inline]
+>>>>   [<0000000034504843>] slab_alloc_node mm/slab.c:3269 [inline]
+>>>>   [<0000000034504843>] kmem_cache_alloc_node_trace+0x15b/0x2a0
+>>>>   mm/slab.c:3597
+>>>>   [<0000000056d30eb5>] __do_kmalloc_node mm/slab.c:3619 [inline]
+>>>>   [<0000000056d30eb5>] __kmalloc_node_track_caller+0x38/0x50
+>>>>   mm/slab.c:3634
+>>>>   [<00000000df40176c>] __kmalloc_reserve.isra.0+0x40/0xb0
+>>>>   net/core/skbuff.c:138
+>>>>   [<0000000035340e64>] __alloc_skb+0xa0/0x210 net/core/skbuff.c:206
+>>>>   [<00000000ea93fc4c>] alloc_skb include/linux/skbuff.h:1054 [inline]
+>>>>   [<00000000ea93fc4c>] bt_skb_alloc include/net/bluetooth/bluetooth.h:339
+>>>>   [inline]
+>>>>   [<00000000ea93fc4c>] h4_recv_buf+0x26d/0x450
+>>>>   drivers/bluetooth/hci_h4.c:182
+>>>>   [<00000000e0312475>] h4_recv+0x51/0xb0 drivers/bluetooth/hci_h4.c:116
+>>>>   [<00000000ebf11fab>] hci_uart_tty_receive+0xba/0x200
+>>>>   drivers/bluetooth/hci_ldisc.c:592
+>>>>   [<0000000095e1216e>] tiocsti drivers/tty/tty_io.c:2195 [inline]
+>>>>   [<0000000095e1216e>] tty_ioctl+0x81c/0xa30 drivers/tty/tty_io.c:2571
+>>>>   [<000000009fa523f0>] vfs_ioctl fs/ioctl.c:46 [inline]
+>>>>   [<000000009fa523f0>] file_ioctl fs/ioctl.c:509 [inline]
+>>>>   [<000000009fa523f0>] do_vfs_ioctl+0x62a/0x810 fs/ioctl.c:696
+>>>>   [<000000000cebb5d9>] ksys_ioctl+0x86/0xb0 fs/ioctl.c:713
+>>>>   [<000000001630008a>] __do_sys_ioctl fs/ioctl.c:720 [inline]
+>>>>   [<000000001630008a>] __se_sys_ioctl fs/ioctl.c:718 [inline]
+>>>>   [<000000001630008a>] __x64_sys_ioctl+0x1e/0x30 fs/ioctl.c:718
+>>>>   [<00000000c62091e3>] do_syscall_64+0x76/0x1a0
+>>>>   arch/x86/entry/common.c:301
+>>>>   [<000000005c213625>] entry_SYSCALL_64_after_hwframe+0x44/0xa9
+>>>>   ---
+>>>>   This bug is generated by a bot. It may contain errors.
+>>>>   See https://goo.gl/tpsmEJ <https://goo.gl/tpsmEJ> for more
+>>>>   information about syzbot.
+>>>>   syzbot engineers can be reached at syzk...@googlegroups.com.
+>>>>   syzbot will keep track of this bug report. See:
+>>>>   https://goo.gl/tpsmEJ#status <https://goo.gl/tpsmEJ#status> for how
+>>>>   to communicate with syzbot.
+>>>>   syzbot can test patches for this bug, for details see:
+>>>>   https://goo.gl/tpsmEJ#testing-patches
+>>>>   <https://goo.gl/tpsmEJ#testing-patches>
+>>>> -- 
+>>>> You received this message because you are subscribed to the Google Groups "syzkaller-bugs" group.
+>>>> To unsubscribe from this group and stop receiving emails from it, send an email to syzkaller-bugs+unsubscribe@googlegroups.com <mailto:syzkaller-bugs+unsubscribe@googlegroups.com>.
+>>>> To view this discussion on the web visit https://groups.google.com/d/msgid/syzkaller-bugs/d71a274f-fdeb-4da1-898e-06f6944e04dan%40googlegroups.com <https://groups.google.com/d/msgid/syzkaller-bugs/d71a274f-fdeb-4da1-898e-06f6944e04dan%40googlegroups.com?utm_medium=email&utm_source=footer>.
+>>> 
+>>> The reason of this memory leak is tty_ldisc_receive_buf() and tiocsti()
+>>> can access the h4->rx_skb concurrently by calling
+>>> hci_uart_tty_receive(), so the rx_skb be overwritten without
+>>> deallocating. There used to be an spin_lock in hci_uart_tty_receive(),
+>>> but it was removed by commit 7649ffaff1cfe(Bluetooth: Remove useless
+>>> rx_lock spinlock).
+>> 
+>> I don’t have that commit in my Linus’ tree. Where is it?
+>> 
 > 
->> struct sock.sk_timer should be used as a sock cleanup timer. However,
->> SCO uses it to implement sock timeouts.
->>
->> This causes issues because struct sock.sk_timer's callback is run in
->> an IRQ context, and the timer callback function sco_sock_timeout takes
->> a spin lock on the socket. However, other functions such as
->> sco_conn_del, sco_conn_ready, rfcomm_connect_ind, and
->> bt_accept_enqueue also take the spin lock with interrupts enabled.
->>
->> This inconsistent {SOFTIRQ-ON-W} -> {IN-SOFTIRQ-W} lock usage could
->> lead to deadlocks as reported by Syzbot [1]:
->>        CPU0
->>        ----
->>   lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>   <Interrupt>
->>     lock(slock-AF_BLUETOOTH-BTPROTO_SCO);
->>
->> To fix this, we use delayed work to implement SCO sock timouts
->> instead. This allows us to avoid taking the spin lock on the socket in
->> an IRQ context, and corrects the misuse of struct sock.sk_timer.
->>
->> Link: https://syzkaller.appspot.com/bug?id=9089d89de0502e120f234ca0fc8a703f7368b31e [1]
->> Reported-by: syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
->> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
->> ---
->>
->> Hi,
->>
->> As suggested, this patch addresses the inconsistent lock state while
->> avoiding having to deal with local_bh_disable.
->>
->> Now that sco_sock_timeout is no longer run in IRQ context, it might
->> be the case that bh_lock_sock is no longer needed to sync between
->> SOFTIRQ and user contexts, so we can switch to lock_sock.
->>
->> I'm not too certain about this, or if there's any benefit to using
->> lock_sock instead, so I've left that out of this patch.
+> There is a typo in the git hash.  It should be: 7649faff1cfe4 ("Bluetooth:
+> Remove useless rx_lock spinlock").
 > 
-> I don’t see a reason why we can’t switch to lock_sock, but lets do that in a separate patch in case I missed something it is easier to revert.
+>>> The commit message claims that hci_uart_tty_receive() was only called by
+>>> flush_to_ldisc(), but it seems incorrect.
+>> 
+>> That seems to be a larger problem in the TTY layer if its contract with its users have changed.
 > 
-
-Sounds good to me.
-
-After further investigation, I believe the switch to lock_sock is needed 
-to prevent calls to sco_sock_set_timer while we're trying to remove a 
-connection or socket.
-
-Right now _set_timer is called under lock_sock, whereas _clear_timer is 
-sometimes called under lock_sock, sometimes under bh_lock_sock, and 
-sometimes under no lock. It seems to me that there's potential races 
-here. For example:
-
-         CPU0                    CPU1
-         ----                    ----
-    lock_sock();
-                                 bh_lock_sock();
-                                 sco_sock_clear_timer();
-    sco_sock_set_timer();
-                                 sco_chan_del();
-
-So calls to _clear_timer and _set_timer need to be consolidated under 
-lock_sock.
-
-But before that there's a circular lock dependency that's currently 
-hidden. When changing bh_lock_sock to lock_sock in sco.c, we get a chain 
-of sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> &hdev->lock --> hci_cb_list_lock
-
-Assuming that the proper lock hierarchy (from outer to inner) should be 
-&hdev->lock --> hci_cb_list_lock --> sk_lock-AF_BLUETOOTH-BTPROTO_SCO,
-then the inversion happens in sco_sock_connect where we call lock_sock 
-before hci_dev_lock.
-
-So probably this fix needs to happen in a series like so:
-- schedule SCO timeouts with delayed_work (which removes the SOFTIRQ)
-- break the circular dependency (which enables the switch to lock_sock)
-- switch to lock_sock while moving calls to _clear_timer under the lock
-
-Thoughts?
-
->>
->> v3 -> v4:
->> - Switch to using delayed_work to schedule SCO sock timeouts instead
->> of using local_bh_disable. As suggested by Luiz Augusto von Dentz.
->>
->> v2 -> v3:
->> - Split SCO and RFCOMM code changes, as suggested by Luiz Augusto von
->> Dentz.
->> - Simplify local bh disabling in SCO by using local_bh_disable/enable
->> inside sco_chan_del since local_bh_disable/enable pairs are reentrant.
->>
->> v1 -> v2:
->> - Instead of pulling out the clean-up code out from sco_chan_del and
->> using it directly in sco_conn_del, disable local softirqs for relevant
->> sections.
->> - Disable local softirqs more thoroughly for instances of
->> bh_lock_sock/bh_lock_sock_nested in the bluetooth subsystem.
->> Specifically, the calls in af_bluetooth.c and rfcomm/sock.c are now made
->> with local softirqs disabled as well.
->>
->> Best wishes,
->> Desmond
->>
->> net/bluetooth/sco.c | 39 ++++++++++++++++++++++++---------------
->> 1 file changed, 24 insertions(+), 15 deletions(-)
->>
->> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
->> index 3bd41563f118..b6dd16153d38 100644
->> --- a/net/bluetooth/sco.c
->> +++ b/net/bluetooth/sco.c
->> @@ -48,6 +48,8 @@ struct sco_conn {
->> 	spinlock_t	lock;
->> 	struct sock	*sk;
->>
->> +	struct delayed_work	sk_timer;
->> +
+> The tiocsti() function has an ancient comment which suggests that the
+> documentation has always been wrong.
 > 
-> I don’t like the sk_timer name. That is confusing. Maybe better use timeout_work or to_work. The sk_* are really more struct sock fields (hence the sk->sk_xyz naming schema).
-> 
+> *      FIXME: may race normal receive processing
 
-Thanks for the feedback. timeout_work sounds good to me, I'll make the 
-update.
+so what are we suppose to do now? Fix this in TTY layer or try to revert this patch?
 
->> 	unsigned int    mtu;
->> };
->>
->> @@ -74,9 +76,11 @@ struct sco_pinfo {
->> #define SCO_CONN_TIMEOUT	(HZ * 40)
->> #define SCO_DISCONN_TIMEOUT	(HZ * 2)
->>
->> -static void sco_sock_timeout(struct timer_list *t)
->> +static void sco_sock_timeout(struct work_struct *work)
->> {
->> -	struct sock *sk = from_timer(sk, t, sk_timer);
->> +	struct sco_conn *conn = container_of(work, struct sco_conn,
->> +					     sk_timer.work);
->> +	struct sock *sk = conn->sk;
->>
->> 	BT_DBG("sock %p state %d", sk, sk->sk_state);
->>
->> @@ -89,16 +93,18 @@ static void sco_sock_timeout(struct timer_list *t)
->> 	sock_put(sk);
->> }
->>
->> -static void sco_sock_set_timer(struct sock *sk, long timeout)
->> +static void sco_sock_set_timer(struct sock *sk, struct delayed_work *work,
->> +			       long timeout)
->> {
-> 
-> I don’t get the extra variable here. Can we not just pass in struct hci_conn.
-> 
-> 
+And does it have to be spinlock or can we use a mutex? My knowledge of the TTY internal are limited and thus, I have no idea what we need to do here. However h4_recv_buf needs to be protected against concurrently calls.
 
-Right, the extra variable isn't needed.
+Regards
 
-I think either struct hci_conn or struct sock should go in there. But as 
-Luiz suggested in another email, perhaps struct sock would be a better 
-candidate.
-
-This is because sometimes we need to check whether sock has been added 
-to a connection before calling sco_sock_clear_timer, e.g. in 
-sco_sock_shutdown or sco_sock_close. So might as well consolidate all 
-the checks and dereferences into sco_sock_{set/clear}_timer.
-
->> 	BT_DBG("sock %p state %d timeout %ld", sk, sk->sk_state, timeout);
->> -	sk_reset_timer(sk, &sk->sk_timer, jiffies + timeout);
->> +	cancel_delayed_work(work);
->> +	schedule_delayed_work(work, timeout);
->> }
->>
->> -static void sco_sock_clear_timer(struct sock *sk)
->> +static void sco_sock_clear_timer(struct sock *sk, struct delayed_work *work)
->> {
->> 	BT_DBG("sock %p state %d", sk, sk->sk_state);
->> -	sk_stop_timer(sk, &sk->sk_timer);
->> +	cancel_delayed_work(work);
-> 
-> Same as above, we pass in struct sock just for the debug message.
-> 
->> }
->>
->> /* ---- SCO connections ---- */
->> @@ -174,7 +180,7 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
->> 	if (sk) {
->> 		sock_hold(sk);
->> 		bh_lock_sock(sk);
->> -		sco_sock_clear_timer(sk);
->> +		sco_sock_clear_timer(sk, &conn->sk_timer);
->> 		sco_chan_del(sk, err);
->> 		bh_unlock_sock(sk);
->> 		sco_sock_kill(sk);
->> @@ -193,6 +199,8 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
->> 	sco_pi(sk)->conn = conn;
->> 	conn->sk = sk;
->>
->> +	INIT_DELAYED_WORK(&conn->sk_timer, sco_sock_timeout);
->> +
->> 	if (parent)
->> 		bt_accept_enqueue(parent, sk, true);
->> }
->> @@ -260,11 +268,11 @@ static int sco_connect(struct sock *sk)
->> 		goto done;
->>
->> 	if (hcon->state == BT_CONNECTED) {
->> -		sco_sock_clear_timer(sk);
->> +		sco_sock_clear_timer(sk, &conn->sk_timer);
->> 		sk->sk_state = BT_CONNECTED;
->> 	} else {
->> 		sk->sk_state = BT_CONNECT;
->> -		sco_sock_set_timer(sk, sk->sk_sndtimeo);
->> +		sco_sock_set_timer(sk, &conn->sk_timer, sk->sk_sndtimeo);
->> 	}
->>
->> done:
->> @@ -419,7 +427,8 @@ static void __sco_sock_close(struct sock *sk)
->> 	case BT_CONFIG:
->> 		if (sco_pi(sk)->conn->hcon) {
->> 			sk->sk_state = BT_DISCONN;
->> -			sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
->> +			sco_sock_set_timer(sk, &sco_pi(sk)->conn->sk_timer,
->> +					   SCO_DISCONN_TIMEOUT);
->> 			sco_conn_lock(sco_pi(sk)->conn);
->> 			hci_conn_drop(sco_pi(sk)->conn->hcon);
->> 			sco_pi(sk)->conn->hcon = NULL;
->> @@ -443,7 +452,8 @@ static void __sco_sock_close(struct sock *sk)
->> /* Must be called on unlocked socket. */
->> static void sco_sock_close(struct sock *sk)
->> {
->> -	sco_sock_clear_timer(sk);
->> +	if (sco_pi(sk)->conn)
->> +		sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
->> 	lock_sock(sk);
->> 	__sco_sock_close(sk);
->> 	release_sock(sk);
->> @@ -500,8 +510,6 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
->>
->> 	sco_pi(sk)->setting = BT_VOICE_CVSD_16BIT;
->>
->> -	timer_setup(&sk->sk_timer, sco_sock_timeout, 0);
->> -
->> 	bt_sock_link(&sco_sk_list, sk);
->> 	return sk;
->> }
->> @@ -1036,7 +1044,8 @@ static int sco_sock_shutdown(struct socket *sock, int how)
->>
->> 	if (!sk->sk_shutdown) {
->> 		sk->sk_shutdown = SHUTDOWN_MASK;
->> -		sco_sock_clear_timer(sk);
->> +		if (sco_pi(sk)->conn)
->> +			sco_sock_clear_timer(sk, &sco_pi(sk)->conn->sk_timer);
->> 		__sco_sock_close(sk);
->>
->> 		if (sock_flag(sk, SOCK_LINGER) && sk->sk_lingertime &&
->> @@ -1083,7 +1092,7 @@ static void sco_conn_ready(struct sco_conn *conn)
->> 	BT_DBG("conn %p", conn);
->>
->> 	if (sk) {
->> -		sco_sock_clear_timer(sk);
->> +		sco_sock_clear_timer(sk, &conn->sk_timer);
->> 		bh_lock_sock(sk);
->> 		sk->sk_state = BT_CONNECTED;
->> 		sk->sk_state_change(sk);
-> 
-> Other than these minor cleanups, this looks great.
-> 
-> Regards
-> 
-> Marcel
-> 
+Marcel
 
