@@ -2,74 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1474CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 19:53:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 42571C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 19:55:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA82B60EFF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 19:53:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24F1C60EFF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 19:55:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230527AbhG2TxZ convert rfc822-to-8bit (ORCPT
+        id S229896AbhG2Tzu convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 15:53:25 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54829 "EHLO
+        Thu, 29 Jul 2021 15:55:50 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60213 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229645AbhG2TxY (ORCPT
+        with ESMTP id S229645AbhG2Tzu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 15:53:24 -0400
+        Thu, 29 Jul 2021 15:55:50 -0400
 Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 994FFCED1E;
-        Thu, 29 Jul 2021 21:53:19 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id F04BFCED1E;
+        Thu, 29 Jul 2021 21:55:45 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v3 2/2] Bluetooth: fix inconsistent lock state in
- rfcomm_connect_ind
+Subject: Re: [PATCH] Bluetooth: btusb: Make the CSR clone chip force-suspend
+ workaround more generic
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210721093832.78081-3-desmondcheongzx@gmail.com>
-Date:   Thu, 29 Jul 2021 21:53:19 +0200
+In-Reply-To: <906e95ce-b0e5-239e-f544-f34d8424c8da@gmail.com>
+Date:   Thu, 29 Jul 2021 21:55:45 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        linux-kernel@vger.kernel.org, Hans de Goede <hdegoede@redhat.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <06E57598-5723-459D-9CE3-4DD8D3145D86@holtmann.org>
-References: <20210721093832.78081-1-desmondcheongzx@gmail.com>
- <20210721093832.78081-3-desmondcheongzx@gmail.com>
-To:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+Message-Id: <D11408EE-8541-4930-A438-6338F342EFB1@holtmann.org>
+References: <906e95ce-b0e5-239e-f544-f34d8424c8da@gmail.com>
+To:     Ismael Ferreras Morezuelas <swyterzone@gmail.com>
 X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Desmond,
+Hi Ismael,
 
-> Commit fad003b6c8e3d ("Bluetooth: Fix inconsistent lock state with
-> RFCOMM") fixed a lockdep warning due to sk->sk_lock.slock being
-> acquired without disabling softirq while the lock is also used in
-> softirq context. This was done by disabling interrupts before calling
-> bh_lock_sock in rfcomm_sk_state_change.
+> Turns out Hans de Goede completed the work I started last year trying to
+> improve Chinese-clone detection of CSR controller chips. Quirk after quirk
+> these Bluetooth dongles are more usable now.
 > 
-> Later, this was changed in commit e6da0edc24ee ("Bluetooth: Acquire
-> sk_lock.slock without disabling interrupts") to disable softirqs
-> only.
+> Even after a few BlueZ regressions; these clones are so fickle that some
+> days they stop working altogether. Except on Windows, they work fine.
 > 
-> However, there is another instance of sk->sk_lock.slock being acquired
-> without disabling softirq in rfcomm_connect_ind. This patch fixes this
-> by disabling local bh before the call to bh_lock_sock.
+> 
+> But this force-suspend initialization quirk seems to mostly do the trick,
+> after a lot of testing Bluetooth now seems to work *all* the time.
+> 
+> The only problem is that the solution ended up being masked under a very
+> stringent check; when there are probably hundreds of fake dongle
+> models out there that benefit from a good reset. Make it so.
+> 
+> 
+> Fixes: 81cac64ba258a ("Bluetooth: Deal with USB devices that are faking CSR vendor")
+> Fixes: cde1a8a992875 ("Bluetooth: btusb: Fix and detect most of the Chinese Bluetooth controllers")
+> Fixes: d74e0ae7e0303 ("Bluetooth: btusb: Fix detection of some fake CSR controllers with a bcdDevice val of 0x0134")
+> Fixes: 0671c0662383e ("Bluetooth: btusb: Add workaround for remote-wakeup issues with Barrot 8041a02 fake CSR controllers")
+> 
+> Cc: stable@vger.kernel.org
+> Cc: Hans de Goede <hdegoede@redhat.com>
+> Tested-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+> Signed-off-by: Ismael Ferreras Morezuelas <swyterzone@gmail.com>
+> ---
+> 
+> I've changed the warning line to make it easy to grep and detect if this updated
+> workaround is part of the driver. Should make it much more obvious to users in
+> case their dongle doesn't work for other reasons. There's a clear then-now.
+> 
+> Easy to narrow other future issues down. Let me know what you think.
+> 
+> drivers/bluetooth/btusb.c | 61 +++++++++++++++++++++------------------
+> 1 file changed, 33 insertions(+), 28 deletions(-)
 
-back in the days, the packet processing was done in a tasklet, but these days it is done in a workqueue. So shouldn’t this be just converted into a lock_sock(). Am I missing something?
+patch has been applied to bluetooth-next tree.
 
 Regards
 
