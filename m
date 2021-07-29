@@ -2,172 +2,247 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 88C28C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 21:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ED9AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 21:59:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7111960F00
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 21:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 099AF60F48
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 21:59:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233664AbhG2VVb (ORCPT
+        id S233599AbhG2V7x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 17:21:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49030 "EHLO
+        Thu, 29 Jul 2021 17:59:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57858 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230392AbhG2VVa (ORCPT
+        with ESMTP id S229873AbhG2V7w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 17:21:30 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E4DFC061765
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 14:21:26 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id s48so12428197ybi.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 14:21:26 -0700 (PDT)
+        Thu, 29 Jul 2021 17:59:52 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AC14C061765
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 14:59:49 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id k4-20020a17090a5144b02901731c776526so17734226pjm.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 14:59:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Zryx1k2fzQy92ggF+WJFlIrjnUjcfDHIatFx+mkIvbo=;
-        b=OCYfv/0kNkMIUqnqOsE8iToBccD9nBxy+bzANN+cg4/ll5mzfmuZ9dZLOE7cMlHD6S
-         ZZk7i8c2uotuuFw/VOjR4H+mvWz1UbiMCIERS4oUB/8e7godiRRwwigTV9uCtL4ZeC/f
-         7/fZ1h5KAC+blJ08o9T2eW73XdKcxUnL/P/CWPVt9q+LKIQYF2C2XeDsX8SDRogooMSM
-         3BBPozqS1nF1QVeWpnwOFTH4M4cY49U3LUapqPU0mzsOLTj3qlaze2cOE3VwJ7vhRol6
-         Dv71rK/TgoTPJtTbFFXM/sHHq+iwW6BFLBkbdlPE00JfbJV0DzVhndK7kPTYPs00uIV6
-         7cAg==
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=7WKi8wjMk9wI3r5Yi0tqC7Qwefzwqp1JP3u+OSI15Q4=;
+        b=I61ZR43XzvZ8Fw/hALlAQvqE8KWea3hRNgNyb0EpbHiW2it6VNK/AZujnouW1jzM0k
+         mUKTHKf9YeIxvCMqwqEMh9iKAIhhuRXjL1/7Kn4zCdGHY2j1GrADKh5KZ8//oo/BoT2A
+         TA9ppSsQpnoSVyHQ5C6lm7YsPU0uYodu5CvF9S+FbtMhOkwWMLWOMEXBEguXjjmr8Vlr
+         OLMoimsABqOlNBTnJ5FPRYSVMBHx36jMkvJJgbwv4EkV9ONju++dNzesAhuJ/uRVV8Db
+         ZpwoqOGQ85Iz4YsIdjhZfs0sh9tCLeolTZN7YiTpk3/1/YqApKN2ryrfl2GpP8bEM7/D
+         3c+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Zryx1k2fzQy92ggF+WJFlIrjnUjcfDHIatFx+mkIvbo=;
-        b=GfT8ksoWNcAoTxXds5JcCribCvQKV9mOZOESgBUxe3XqnBk030Zk1RX1Usr/ZqROAU
-         qabvKHlhTk+CghML4VguN8GNNAbwBll34wSlNijtHM28g0TSvO9DBrm3XFLNI+ta4ivS
-         rPNoR0uiVZ5PYNBeuuu/4nqVvIa2EAkUKvmHdbDmhAEOix91fTUDkSbGkHf+3WLyJi84
-         k9uo7ylshyDGmIN8eorZFZxfT0sA0DEh3tSUz4XdV+K0r2bESyvhH599sVdXjS3EhI2g
-         R7rrMUIkQu2RmtJ8Ts3M25G7sHsqQQV+8JU9DlJgpkaWf36SapYbl5n4EmWpe3tNES43
-         hxOg==
-X-Gm-Message-State: AOAM5313HxS/Cg+IWHtNG/y2niNxYdRk8AzL2Dqi18UZ/AfPrXMFb/Vf
-        AbQWzEzpBmKR/xM/6rILnstbpxrg+eb5jMOrYwU=
-X-Google-Smtp-Source: ABdhPJzftwdFgNtT71Sgq947fvyUNbFc8I067gcJJ0y1PZczqZfsQM4p45o4UllJri5o3R6NyCSp1aKUXLk8HKGRz24=
-X-Received: by 2002:a25:d183:: with SMTP id i125mr9972579ybg.408.1627593685585;
- Thu, 29 Jul 2021 14:21:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210715003521.2222-1-sonnysasaka@chromium.org>
- <60ef8eb2.1c69fb81.6fb78.9241@mx.google.com> <CAO271m=0yH_9oBMGeHSCWAQFpZPiLxx+ejCZyBpbFuKYhAky6A@mail.gmail.com>
-In-Reply-To: <CAO271m=0yH_9oBMGeHSCWAQFpZPiLxx+ejCZyBpbFuKYhAky6A@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 29 Jul 2021 14:21:14 -0700
-Message-ID: <CABBYNZKDsU1ZPkJs2ZAjkYunnaanVtxkcpt+Rh0djdOv_V_UEw@mail.gmail.com>
-Subject: Re: [BlueZ] monitor: Print EIR of Extended Advertisement Report
-To:     Sonny Sasaka <sonnysasaka@chromium.org>
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=7WKi8wjMk9wI3r5Yi0tqC7Qwefzwqp1JP3u+OSI15Q4=;
+        b=HfKqLwHWL5Foi4YeKlgrnYwE1htAXlUcxEDaUsoOnYZtSuvyZjwQWbjmppL31NnaGR
+         ynCjjwxyZef/9FlUWQ23GZjX249VLx4irxjVkNC5/wFgK+X/KHiEpdjRhueDDusvg3K5
+         hUav9Sj5ltFTC2PniiEjMNnQwk7g0WXTNprwokZ1agbyfoCuwGJCY+STvLOzrP0JgJGJ
+         eUZvGiTABhY8ay/2lpJ+QUzPZ5ma0wp0y0Lmt4a+baHQb/XoA20N4XAaOoiPa/zM88tj
+         Pj+zI3lRf/137wR/vry5GPI3kkahmseRa8jNjNae/z4r1DQjDLtgkTjNpoVYylbsAy8f
+         i80A==
+X-Gm-Message-State: AOAM53136Goa5oSkDE1rck48DVrN44FLZ5a2QoBStns3s0PswfiBnnFG
+        RWFzcOVEm597CmYo2hMOdlPsfUEIr8U=
+X-Google-Smtp-Source: ABdhPJxEBUqyR+v5eC13q0CkEOC0yBbndwLEs4SgCWNLRdEkM/+OAw98kQgpW461tHpELDz4fbOUFg==
+X-Received: by 2002:a65:420d:: with SMTP id c13mr5627449pgq.123.1627595988767;
+        Thu, 29 Jul 2021 14:59:48 -0700 (PDT)
+Received: from pkalappa-MOBL1.amr.corp.intel.com ([134.134.139.81])
+        by smtp.gmail.com with ESMTPSA id b3sm4806220pfi.179.2021.07.29.14.59.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jul 2021 14:59:47 -0700 (PDT)
+Message-ID: <05fd097e82b5c50ceaba584f36b6f8855792fc69.camel@gmail.com>
+Subject: Re: [PATCH v5 05/11] Bluetooth: btintel: Fix the first HCI command
+ not work with ROM device
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Date:   Thu, 29 Jul 2021 14:59:46 -0700
+In-Reply-To: <02BA95EC-D6F9-40DA-BAC3-6C935A8DB0C4@holtmann.org>
+References: <20210729183600.281586-1-hj.tedd.an@gmail.com>
+         <20210729183600.281586-6-hj.tedd.an@gmail.com>
+         <02BA95EC-D6F9-40DA-BAC3-6C935A8DB0C4@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sonny,
+Hi Marcel,
 
-On Thu, Jul 29, 2021 at 10:53 AM Sonny Sasaka <sonnysasaka@chromium.org> wrote:
->
-> Dear Maintainers,
->
-> Friendly ping to review this simple patch. Thanks!
->
->
-> On Wed, Jul 14, 2021 at 6:26 PM <bluez.test.bot@gmail.com> wrote:
-> >
-> > This is automated email and please do not reply to this email!
-> >
-> > Dear submitter,
-> >
-> > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > This is a CI test results with your patch series:
-> > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=515781
-> >
-> > ---Test result---
-> >
-> > Test Summary:
-> > CheckPatch                    FAIL      0.24 seconds
-> > GitLint                       PASS      0.11 seconds
-> > Prep - Setup ELL              PASS      39.40 seconds
-> > Build - Prep                  PASS      0.09 seconds
-> > Build - Configure             PASS      7.11 seconds
-> > Build - Make                  PASS      170.91 seconds
-> > Make Check                    PASS      8.82 seconds
-> > Make Distcheck                PASS      204.00 seconds
-> > Build w/ext ELL - Configure   PASS      6.98 seconds
-> > Build w/ext ELL - Make        PASS      161.16 seconds
-> >
-> > Details
-> > ##############################
-> > Test: CheckPatch - FAIL
-> > Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> > Output:
-> > monitor: Print EIR of Extended Advertisement Report
-> > ERROR:GERRIT_CHANGE_ID: Remove Gerrit Change-Id's before submitting upstream
-> > #9:
-> > Change-Id: I4805e589837733e7ecf9d33218e4135e8f822a7c
-> >
-> > - total: 1 errors, 0 warnings, 7 lines checked
-> >
-> > NOTE: For some of the reported defects, checkpatch may be able to
-> >       mechanically convert to the typical style using --fix or --fix-inplace.
-> >
-> > "[PATCH] monitor: Print EIR of Extended Advertisement Report" has style problems, please review.
-> >
-> > NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-> >
-> > NOTE: If any of the errors are false positives, please report
-> >       them to the maintainer, see CHECKPATCH in MAINTAINERS.
-> >
-> >
-> > ##############################
-> > Test: GitLint - PASS
-> > Desc: Run gitlint with rule in .gitlint
-> >
-> > ##############################
-> > Test: Prep - Setup ELL - PASS
-> > Desc: Clone, build, and install ELL
-> >
-> > ##############################
-> > Test: Build - Prep - PASS
-> > Desc: Prepare environment for build
-> >
-> > ##############################
-> > Test: Build - Configure - PASS
-> > Desc: Configure the BlueZ source tree
-> >
-> > ##############################
-> > Test: Build - Make - PASS
-> > Desc: Build the BlueZ source tree
-> >
-> > ##############################
-> > Test: Make Check - PASS
-> > Desc: Run 'make check'
-> >
-> > ##############################
-> > Test: Make Distcheck - PASS
-> > Desc: Run distcheck to check the distribution
-> >
-> > ##############################
-> > Test: Build w/ext ELL - Configure - PASS
-> > Desc: Configure BlueZ source with '--enable-external-ell' configuration
-> >
-> > ##############################
-> > Test: Build w/ext ELL - Make - PASS
-> > Desc: Build BlueZ source with '--enable-external-ell' configuration
-> >
-> >
-> >
+On Thu, 2021-07-29 at 21:35 +0200, Marcel Holtmann wrote:
+> Hi Tedd,
+> 
+> > The some legacy ROM controllers have a bug with the first HCI command
+> > sent to it returning number of completed commands as zero, which would
+> > stall the command processing in the Bluetooth core.
+> > 
+> > As a workaround, send HCI Rest command first which will reset the
+> > controller to fix the issue.
+> > 
+> > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > > ---
-> > Regards,
-> > Linux Bluetooth
-> >
+> > drivers/bluetooth/btintel.c | 21 +++++++++++++++++++++
+> > drivers/bluetooth/btintel.h |  1 +
+> > drivers/bluetooth/btusb.c   | 16 ++++++++++++++--
+> > 3 files changed, 36 insertions(+), 2 deletions(-)
+> > 
+> > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> > index bf0ad05b80fe..65ecf2ae9a10 100644
+> > --- a/drivers/bluetooth/btintel.c
+> > +++ b/drivers/bluetooth/btintel.c
+> > @@ -1659,6 +1659,7 @@ static int btintel_legacy_rom_setup(struct hci_dev *hdev,
+> > 
+> > int btintel_setup_combined(struct hci_dev *hdev)
+> > {
+> > +	struct btintel_data *intel = hci_get_priv(hdev);
+> > 	const u8 param[1] = { 0xFF };
+> > 	struct intel_version ver;
+> > 	struct intel_version_tlv ver_tlv;
+> > @@ -1667,6 +1668,26 @@ int btintel_setup_combined(struct hci_dev *hdev)
+> > 
+> > 	BT_DBG("%s", hdev->name);
+> > 
+> > +	/* The some controllers have a bug with the first HCI command sent to it
+> > +	 * returning number of completed commands as zero. This would stall the
+> > +	 * command processing in the Bluetooth core.
+> > +	 *
+> > +	 * As a workaround, send HCI Reset command first which will reset the
+> > +	 * number of completed commands and allow normal command processing
+> > +	 * from now on.
+> > +	 */
+> > +	if (test_bit(INTEL_BROKEN_READ_VERSION, &intel->flags)) {
+> > +		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
+> > +				     HCI_INIT_TIMEOUT);
+> > +		if (IS_ERR(skb)) {
+> > +			bt_dev_err(hdev,
+> > +				   "sending initial HCI reset failed (%ld)",
+> > +				   PTR_ERR(skb));
+> > +			return PTR_ERR(skb);
+> > +		}
+> > +		kfree_skb(skb);
+> > +	}
+> > +
+> > 	/* Starting from TyP device, the command parameter and response are
+> > 	 * changed even though the OCF for HCI_Intel_Read_Version command
+> > 	 * remains same. The legacy devices can handle even if the
+> > diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> > index df7aa30142b4..29b678364a79 100644
+> > --- a/drivers/bluetooth/btintel.h
+> > +++ b/drivers/bluetooth/btintel.h
+> > @@ -143,6 +143,7 @@ struct intel_debug_features {
+> > #define INTEL_FIRMWARE_LOADED		2
+> > #define INTEL_FIRMWARE_FAILED		3
+> > #define INTEL_BOOTING			4
+> > +#define INTEL_BROKEN_READ_VERSION	5
+> > 
+> > struct btintel_data {
+> > 	unsigned long flags;
+> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > index 8c54ab03ee63..a64473c525eb 100644
+> > --- a/drivers/bluetooth/btusb.c
+> > +++ b/drivers/bluetooth/btusb.c
+> > @@ -62,6 +62,7 @@ static struct usb_driver btusb_driver;
+> > #define BTUSB_QCA_WCN6855	0x1000000
+> > #define BTUSB_INTEL_NEWGEN	0x2000000
+> > #define BTUSB_INTEL_COMBINED	0x4000000
+> > +#define BTUSB_INTEL_BROKEN_READ_VERSION 0x8000000
+> > 
+> > static const struct usb_device_id btusb_table[] = {
+> > 	/* Generic Bluetooth USB device */
+> > @@ -376,11 +377,14 @@ static const struct usb_device_id blacklist_table[] = {
+> > 						     BTUSB_WIDEBAND_SPEECH |
+> > 						     BTUSB_VALID_LE_STATES },
+> > 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+> > -	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED },
+> > -	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
+> > +	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
+> > +						     BTUSB_INTEL_BROKEN_READ_VERSION },
+> > +	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
+> > +						     BTUSB_INTEL_BROKEN_READ_VERSION },
+> > 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW |
+> > 						     BTUSB_WIDEBAND_SPEECH },
+> > 	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
+> > +						     BTUSB_INTEL_BROKEN_READ_VERSION |
+> > 						     BTUSB_WIDEBAND_SPEECH },
+> > 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_NEW |
+> > 						     BTUSB_WIDEBAND_SPEECH |
+> 
+> can you check that all 3 have this problem? Don’t we ever produced a ROM where this is fixed?
 
-Pushed, thanks.
+It looks like the early version of ROM (WP2) causes the problem. StP and SdP don't have the problem.
+I will update accordingly.
 
--- 
-Luiz Augusto von Dentz
+WP2 - I only had mini-PCIe form factor card and it is broken.
+< HCI Command: Intel Read Version (0x3f|0x0005) plen 1                        #1 [hci0] 9.212217
+        Requested Type:
+          All Supported Types(0xff)
+> HCI Event: Command Complete (0x0e) plen 13                                      #2 [hci0] 9.213338
+      Intel Read Version (0x3f|0x0005) ncmd 0
+        Status: Success (0x00)
+        Hardware platform: 0x37
+        Hardware variant: 0x07
+        Hardware revision: 1.0
+        Firmware variant: 0x01
+        Firmware revision: 8.0
+        Firmware build: 2-3.2013
+        Firmware patch: 0
+
+StP - OK. 
+< HCI Command: Intel Read Version (0x3f|0x0005) plen 1                      #3 [hci0] 108.053455
+        Requested Type:
+          All Supported Types(0xff)
+> HCI Event: Command Complete (0x0e) plen 13                                    #4 [hci0] 108.054034
+      Intel Read Version (0x3f|0x0005) ncmd 1
+        Status: Success (0x00)
+        Hardware platform: 0x37
+        Hardware variant: 0x08
+        Hardware revision: 1.0
+        Firmware variant: 0x01
+        Firmware revision: 1.0
+        Firmware build: 3-17.2014
+        Firmware patch: 0
+
+SdP - OK.
+< HCI Command: Intel Read Version (0x3f|0x0005) plen 1                    #400 [hci0] 173.911992
+        Requested Type:
+          All Supported Types(0xff)
+> HCI Event: Command Complete (0x0e) plen 13                                  #401 [hci0] 173.912576
+      Intel Read Version (0x3f|0x0005) ncmd 1
+        Status: Success (0x00)
+        Hardware platform: 0x37
+        Hardware variant: 0x08
+        Hardware revision: 1.0
+        Firmware variant: 0x22
+        Firmware revision: 5.0
+        Firmware build: 25-20.2015
+        Firmware patch: 0
+
+
+> 
+> > @@ -4221,6 +4225,11 @@ static int btusb_probe(struct usb_interface *intf,
+> > 
+> > 	priv_size = 0;
+> > 
+> > +	if (id->driver_info & BTUSB_INTEL_COMBINED) {
+> > +		/* Allocate extra space for Intel device */
+> > +		priv_size += sizeof(struct btintel_data);
+> > +	}
+> > +
+> 
+> This needs to be in the previous patch.
+> 
+> Regards
+> 
+> Marcel
+> 
+
