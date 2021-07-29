@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4289AC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D78ADC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2A95A60ED4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEAB360ED4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 12:28:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236927AbhG2M2f (ORCPT
+        id S237103AbhG2M2j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 08:28:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59894 "EHLO
+        Thu, 29 Jul 2021 08:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236976AbhG2M2e (ORCPT
+        with ESMTP id S236942AbhG2M2i (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 08:28:34 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA16EC061765
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:30 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id u22-20020ae9c0160000b02903b488f9d348so3702377qkk.20
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:30 -0700 (PDT)
+        Thu, 29 Jul 2021 08:28:38 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7FBFC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:35 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id s14-20020ac8528e0000b029025f76cabdfcso2656154qtn.15
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 05:28:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=mDdEFCjpHD/uWglCa7g2e7wWzLT0QoSSZnVpKWZCPo4=;
-        b=AyXyOWfBN7ZM6tBAQpok+eKjmCT++RGqnUTSOzcKp5APcOjqxsoiZVp9QDlW4O6/ne
-         2WderqJU2PEEra8xg9gpYCfg58OWldSofqLqh7rOUsnji7HZ6B3T5f3G4OWB8MwTy+Pk
-         Im5c3/hV69W9/e2IGIda89KsX3rMUJrVwroK40y3hcxNqnHFb0YZJ/rgF9lrJAQN+ftq
-         XvMSrN+N9GJQFu7quBHy+HUWThgAjrgteonZuvO1Y2LSgNVhBlLaLZ7/cyfSoX+dDf2R
-         o4Y5e8Kms+3zxkd6kVlk2es1KgQTjUh2wtfHuuA4UjNU3F8uJlSW3K5bZROeqngqIvRf
-         Jlqg==
+        bh=ov+ljL+WLImh2UNgqiJukm2dfT5futa1Kc0R7vlTCyc=;
+        b=hcZMh79E9OWIm2eWx6osQS+1cV33cHE4TVbSaBPVx01aT5uNQV8QY5gX+wOzB4yp+D
+         z/S3TN1mWToaNoTDydTga7ys7OHZ+exnhLRcR4Tzmnag8gEziaL5DCJw0m+73o6S140Q
+         w/XOmm4tZTLzBKRN7Nu4tgauIgJgBqqYUDhpaafmO3Y2FX5CFDmcnOEMHw67KN3a410n
+         34etZ0FcmVfNmKOnqacM8D+0llMrUAO3WfnhNArYhiOslrAPsZvHnIjhE3/jDgd9JUJW
+         9IeZY5gnAZ1arp4HCNtXHdMsemgrB4T6bWpJMX+Ebhu2pb6ZUaypGbs0L/GdNxTwbbWM
+         /4Fw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=mDdEFCjpHD/uWglCa7g2e7wWzLT0QoSSZnVpKWZCPo4=;
-        b=h1Vg8Ymvp54dAt1XipTSMtUgKi8KREJ6wTzkEQwcW032A3XWo631vULKm3H1WpDgN5
-         okBdgbFsaNYPB/CSq/jEmYGAw7J6FIE00teTPuiZ7shnBxBMTuUUzXVQgoAQYkKX137g
-         Ispuio29YHDCFLvtMfrBmYwYw4UwswtMG3IBu60SCPCIAXSRCUCOHSlMsgK1CdbgrN35
-         xl7JgTK6dCfomAMwfbh+muZTmRHdQtlDCRmBXBRInht0thek4y16xzAVmWERzInZ2y0S
-         XE7j0diIFqROIKdTIm1nb98prqmYwp0Ppt7d4C3AhAgcVTuQo4kX4CUOnB6zgFqtM0+R
-         t0Hw==
-X-Gm-Message-State: AOAM531btjeIsaDVcVhtlHJUAu24jFgjv5uGcZxsJJ6KruE5PA4fo2CK
-        2JNDeG5qmIfS0niUt57FTb1dFP0jB9nsf0vvqTaEB5i3dZsuCaN7jHnsK6OVrCd5BPI0tXcHA8Q
-        +oS28EH7h7WJTr3xM33EpZ4iYEDuXH+gafgjofGrluoqPcjPLSJ1RHlkMFx81IUfWS+N09+oQnK
-        ddfRZqU0cAROk=
-X-Google-Smtp-Source: ABdhPJzpoGwaknHTjMZC7T9pwoZVi/YqD3mOEQ56jfwe60QQD5fNaEDLNOjJ9RjiHkVHx+LrDBKNi/0e80uRkdqnRw==
+        bh=ov+ljL+WLImh2UNgqiJukm2dfT5futa1Kc0R7vlTCyc=;
+        b=FD5Oeqo6WFpqoj3er4tamHbt7CTDakYvm+zLTrUDZ3RF+ZILnNv488VxH/mamgC3GX
+         JK9vzOvz+Z5SWYzaP9/jDJzHUJ5/jk/78dHX8lQ7hUYKlti7MjTylHFkFbZij7Bqj+fh
+         uyyJ/Wcx6Wga0TuzHWGfbJuAsQBFl4BG2rmp4P2dtOfcrv5L8jJd2gzQe56alEn/NEEm
+         MgXzN5JhgjPYIV75ReLDOqf4zA6aHfrC+PTooI94BbDdzP2shTOPvsuXUa8NEM4kyF+z
+         neQr6lQfRE9UoJXO3QtOZjOOWbiF9BKwcJlObldMdpnMF0ZlgAhaQdLyXfhopIrGyDfN
+         u7LQ==
+X-Gm-Message-State: AOAM530nW9SMZMTWfHueQFq35pv0C18ucZIvHU4rCyWcUlYm/cUa8gbt
+        PzWh37fRc8ulebsHdkseVSqe7LiHMHUnm2IBN5hBHZfR0fUdKUqbBP3IBEE4QcyUUwzZgol84LC
+        7aHR/wvS8nOmswStzBEt4qIjYDwEB8A9NHuzPXCsy2pP9eqw8zmIHhDRWwDd46EErX9a3sN5Ct+
+        3WjmJNlFe6eHk=
+X-Google-Smtp-Source: ABdhPJwkT1l4Z1Da3ILDyu2tDRlHhJHN2CSXRZexJ1eOCbW8W/amLd7mBJpyKDLDgKJjBcvtIkk6jlzPp8BLrdkqOg==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ff72:1420:4502:fdaf])
- (user=howardchung job=sendgmr) by 2002:a0c:fbd1:: with SMTP id
- n17mr5013725qvp.19.1627561710030; Thu, 29 Jul 2021 05:28:30 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 20:27:44 +0800
+ (user=howardchung job=sendgmr) by 2002:a05:6214:b87:: with SMTP id
+ fe7mr985589qvb.39.1627561714943; Thu, 29 Jul 2021 05:28:34 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 20:27:45 +0800
 In-Reply-To: <20210729122751.3728885-1-howardchung@google.com>
-Message-Id: <20210729202648.Bluez.v6.6.Id0842634d98a21fbdfa5cc72c76a462a98bf6f40@changeid>
+Message-Id: <20210729202648.Bluez.v6.7.I29607be7ac91b0a494ab51713ba14f583eb858ed@changeid>
 Mime-Version: 1.0
 References: <20210729122751.3728885-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v6 06/13] plugins: new plugin
+Subject: [Bluez PATCH v6 07/13] plugins/admin: add admin_policy adapter driver
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>,
@@ -75,97 +75,110 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-This adds an initial code for a new plugin admin.
+This adds code to register admin_policy driver to adapter when
+admin plugin is enabled.
+
+The following test steps were performed:
+1. restart bluetoothd
+2. check if "Admin Policy is enabled" in system log
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 (no changes since v1)
 
- Makefile.plugins    |  5 +++++
- bootstrap-configure |  1 +
- configure.ac        |  4 ++++
- plugins/admin.c     | 30 ++++++++++++++++++++++++++++++
- 4 files changed, 40 insertions(+)
- create mode 100644 plugins/admin.c
+ plugins/admin.c | 67 +++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 67 insertions(+)
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index 4e6a72b0bdf6..69fb01001cc6 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -11,6 +11,11 @@ builtin_sources += plugins/autopair.c
- builtin_modules += policy
- builtin_sources += plugins/policy.c
- 
-+if ADMIN
-+builtin_modules += admin
-+builtin_sources += plugins/admin.c
-+endif
-+
- if NFC
- builtin_modules += neard
- builtin_sources += plugins/neard.c
-diff --git a/bootstrap-configure b/bootstrap-configure
-index 0efd83abc2c4..a34be832068e 100755
---- a/bootstrap-configure
-+++ b/bootstrap-configure
-@@ -30,4 +30,5 @@ fi
- 		--enable-pie \
- 		--enable-cups \
- 		--enable-library \
-+		--enable-admin \
- 		--disable-datafiles $*
-diff --git a/configure.ac b/configure.ac
-index a5afaea6cfcd..0744860b89fb 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -364,6 +364,10 @@ AC_ARG_ENABLE(logger, AC_HELP_STRING([--enable-logger],
- 		[enable HCI logger service]), [enable_logger=${enableval}])
- AM_CONDITIONAL(LOGGER, test "${enable_logger}" = "yes")
- 
-+AC_ARG_ENABLE(admin, AC_HELP_STRING([--enable-admin],
-+		[enable admin policy plugin]), [enable_admin=${enableval}])
-+AM_CONDITIONAL(ADMIN, test "${enable_admin}" = "yes")
-+
- if (test "${prefix}" = "NONE"); then
- 	dnl no prefix and no localstatedir, so default to /var
- 	if (test "$localstatedir" = '${prefix}/var'); then
 diff --git a/plugins/admin.c b/plugins/admin.c
-new file mode 100644
-index 000000000000..42866bcf7be2
---- /dev/null
+index 42866bcf7be2..923e08cb836b 100644
+--- a/plugins/admin.c
 +++ b/plugins/admin.c
-@@ -0,0 +1,30 @@
-+// SPDX-License-Identifier: LGPL-2.1-or-later
-+/*
-+ *
-+ *  BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ *  Copyright (C) 2021 Google LLC
-+ *
-+ *
-+ */
+@@ -12,17 +12,84 @@
+ #include <config.h>
+ #endif
+ 
++#include "lib/bluetooth.h"
 +
-+#ifdef HAVE_CONFIG_H
-+#include <config.h>
-+#endif
++#include "src/adapter.h"
++#include "src/error.h"
+ #include "src/log.h"
+ #include "src/plugin.h"
+ 
++#include "src/shared/queue.h"
 +
-+#include "src/log.h"
-+#include "src/plugin.h"
++/* |policy_data| has the same life cycle as btd_adapter */
++static struct btd_admin_policy {
++	struct btd_adapter *adapter;
++	uint16_t adapter_id;
++} *policy_data = NULL;
 +
-+static int admin_init(void)
++static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
 +{
-+	DBG("");
++	struct btd_admin_policy *admin_policy = NULL;
++
++	admin_policy = g_try_malloc(sizeof(*admin_policy));
++	if (!admin_policy) {
++		btd_error(btd_adapter_get_index(adapter),
++				"Failed to allocate memory for admin_policy");
++		return NULL;
++	}
++
++	admin_policy->adapter = adapter;
++	admin_policy->adapter_id = btd_adapter_get_index(adapter);
++
++	return admin_policy;
 +}
 +
-+static void admin_exit(void)
++static void admin_policy_free(void *data)
 +{
-+	DBG("");
++	struct btd_admin_policy *admin_policy = data;
++
++	g_free(admin_policy);
 +}
 +
-+BLUETOOTH_PLUGIN_DEFINE(admin, VERSION,
-+			BLUETOOTH_PLUGIN_PRIORITY_DEFAULT,
-+			admin_init, admin_exit)
++static int admin_policy_adapter_probe(struct btd_adapter *adapter)
++{
++	if (policy_data) {
++		btd_warn(policy_data->adapter_id,
++						"Policy data already exists");
++		admin_policy_free(policy_data);
++		policy_data = NULL;
++	}
++
++	policy_data = admin_policy_new(adapter);
++	if (!policy_data)
++		return -ENOMEM;
++
++	btd_info(policy_data->adapter_id, "Admin Policy has been enabled");
++
++	return 0;
++}
++
++static struct btd_adapter_driver admin_policy_driver = {
++	.name	= "admin_policy",
++	.probe	= admin_policy_adapter_probe,
++	.resume = NULL,
++};
++
+ static int admin_init(void)
+ {
+ 	DBG("");
++
++	return btd_register_adapter_driver(&admin_policy_driver);
+ }
+ 
+ static void admin_exit(void)
+ {
+ 	DBG("");
++
++	btd_unregister_adapter_driver(&admin_policy_driver);
++
++	if (policy_data)
++		admin_policy_free(policy_data);
+ }
+ 
+ BLUETOOTH_PLUGIN_DEFINE(admin, VERSION,
 -- 
 2.32.0.554.ge1b32706d8-goog
 
