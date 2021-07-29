@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A636C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB5BC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F4F260F23
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5C0EA61074
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 29 Jul 2021 08:57:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234996AbhG2I5I (ORCPT
+        id S235319AbhG2I5M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 29 Jul 2021 04:57:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37376 "EHLO
+        Thu, 29 Jul 2021 04:57:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37396 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234886AbhG2I5H (ORCPT
+        with ESMTP id S234886AbhG2I5L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 29 Jul 2021 04:57:07 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E73BC061757
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:57:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id c63-20020a25e5420000b0290580b26e708aso6077199ybh.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:57:04 -0700 (PDT)
+        Thu, 29 Jul 2021 04:57:11 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA933C061757
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:57:08 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id x12-20020a05620a14acb02903b8f9d28c19so3356947qkj.23
+        for <linux-bluetooth@vger.kernel.org>; Thu, 29 Jul 2021 01:57:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=4I2iMbWQ21aFNoMQLxQWDUhc1iIIJegWRipWIi9tO9k=;
-        b=Lb3vWrY0yGOlJegcgogBkMQ2S7wwRxTEVa05+wFMuBM4F9d+F8Up1RVK6bjdJLtaG4
-         niRpZUNucUt2key+18LFhLJyJe20Luv6Anvdrqbq1yZ6uBgMXafyUY7mHdI4VSJGm6Xb
-         q3VQzt0KyZGEHwUU3ET8aMOtwInHjrjrwgJRO7/6Fv2IdMWcA469skZf5H7LKq7+h93f
-         iPpwGtgvjTNNMar6yskDXA5qgYt44uoAiQzYpmnSiER9WyHHwxrGXaLphhmQ/ksolpQn
-         0NuvX1zK+mAAvFERcdu6piRDK5nDrB7+NGwSZ+sX/9E41bwfuRDhhW37Shy10pXOPCtC
-         08LQ==
+        bh=lcgnPP5ww4lJRDXdTTx6Q4PYdYcLCGwV1/+vXOgA96w=;
+        b=ix3d58KqOhMm19KW3TZ4/Y4h9T70xgIRXAdJbtUORaLNoo10cAVYEZdEQtd9A3LXLz
+         UoDVKbk8Eo/HlsepzHpXIX8QA7HyYeksYAI7Lt1gMuSeD9IA2nrUVrqWyHvShmIpMcuY
+         rL78PBaaJ0Nlajc78XYR99QdgXy/IS6foWq6FlDRD2XTA51BgNH3oGmd2R/1OcqCdVPV
+         3kWV+C9pwSc79Bs+WDg0uFlCahsmn3/+BOpW+pvdneLB65JP7x7AGyQbeLXb00ji4NXe
+         ZFJayEOXG7ZXO5BsnCSG/NTy/VaVoi2wOLLVpmG4kVEb+Mu9W/hv0FDcuranwlq8Q50f
+         S3kg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=4I2iMbWQ21aFNoMQLxQWDUhc1iIIJegWRipWIi9tO9k=;
-        b=C3LFJnfgAEqJ56vdNeEnkop69AOkbw6zy4yP31pu7nzo5zE3I1c7IgPtrPM+SFY54o
-         cdse1m95LsVm3O2lifPfFPlFVYS0oEFriMRNhqYg8Zpjn4OAioNgjQnKGyR+4MckUFY1
-         6KLC28Z9/BK4+d9mtlrY7G1adf/iS7FARgiDwRDeiijnz8n9zCvWsxqT8a6Re7oF0P15
-         bimcjmZNl7lx+SOmmVh2rrhKK9/iJD28Q6OyzNc7QERqyGuqmzs3XWJJtG+xkH3ysWX7
-         IhakMWV/yju8WzAnrUjiMED94drpQmeJyi2zwnrRqyZLol/gphJ/c2eUzvr9NtpyqE8g
-         0eaw==
-X-Gm-Message-State: AOAM532owWnJF8l4M7I8hSrYDz9EzCDTFGxC1wooQgA5KA0AYo/eqtAQ
-        /Cl0lO2b7E7ugoJhYp+hP6TE7roRVhckNjlixP3yya20ruY6X432M2vU/SdO0TcxaHj//7TsbCg
-        xe09xuAKsptekVaWkQtcoOoRqsHoZEeSClgaglc2u669UdWaCCKiSfDQmLAi+FDgMJTzFR/HM+4
-        gxdxRuSwmHGcY=
-X-Google-Smtp-Source: ABdhPJwwgj4PJSj0k2me3KO6nFy9k2E8EYl2e0X+D/G/GtYzCiSlmCNzd7iHMB3BBD1qrGMDOQLnnQWiTZ/p8alnHA==
+        bh=lcgnPP5ww4lJRDXdTTx6Q4PYdYcLCGwV1/+vXOgA96w=;
+        b=CLYpUU84pWiYF9/D6J7l9yiYBBih5UqiR+qDN10WyKyrCopjTOM8ZY7+eIFrAr77MF
+         YRpl/CXcEXwxX6em9c4kYn4O+E6YPN4Cnn0upYnBYWPu1heUeRJxhMghaklLc2V1Hl1E
+         A7hD6Q5ecjIow5pvp6nQlFAXT/ETSMuGx4VWJgpPV2HD+Nuv7lYAQi7XopNHuvlCPPO3
+         ukTFF6WnZmGDfCrbU4OTTPPlCPKabQxjlbzpvrYXD9wr+WoUcG9L//a+tOz/cL8Tn2VO
+         oaVte/LpP1WvLM6MBc2Fl50krNeqTii+NLqi+6upwFjljsAHFRG5vDKt6+mwdCn5q/RE
+         nIfA==
+X-Gm-Message-State: AOAM5306zWMWbWwsGn6w7iGPkZ0Vp+vXQfzDNNXga769PjY5G0lmcd2O
+        0Va3yLZAOKq854Q2sSWovnFBMPXESTo3RC72N1GtXRWzBhcOwoj1q5FBdwLfRZR9z4+zApy8GRl
+        +nAknLvD8ksCsrLr1lX/toa+hDkNCnhz13zTrGretrl4A3I+od+tRJV3vmGGr9s/itZX4iKNnZk
+        oicGWyUP3ykmk=
+X-Google-Smtp-Source: ABdhPJyWydZvEbE9HAPCgxpMeGMHXq6SlXflwlw69xlKOr/qdDlazgebiSBtbw5otn/hBLOH9gR+MaIriZBGjiWwlg==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ff72:1420:4502:fdaf])
- (user=howardchung job=sendgmr) by 2002:a25:d0d4:: with SMTP id
- h203mr5467424ybg.0.1627549023467; Thu, 29 Jul 2021 01:57:03 -0700 (PDT)
-Date:   Thu, 29 Jul 2021 16:56:39 +0800
+ (user=howardchung job=sendgmr) by 2002:a0c:d644:: with SMTP id
+ e4mr4177747qvj.45.1627549027948; Thu, 29 Jul 2021 01:57:07 -0700 (PDT)
+Date:   Thu, 29 Jul 2021 16:56:40 +0800
 In-Reply-To: <20210729085651.3600926-1-howardchung@google.com>
-Message-Id: <20210729165211.Bluez.v5.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+Message-Id: <20210729165211.Bluez.v5.2.Ibc0b5f02cb249f9aca9efe45e2dadc5e50b7d89e@changeid>
 Mime-Version: 1.0
 References: <20210729085651.3600926-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v5 01/13] core: add is_allowed property in btd_service
+Subject: [Bluez PATCH v5 02/13] core: add adapter and device allowed_uuid functions
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>,
@@ -75,134 +75,275 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-This adds is_allowed property in btd_service. When is_allowed is set to
-false, calling btd_service_connect and service_accept will fail and the
-existing service connection gets disconnected.
+This implements functions in src/adapter.c and src/device.c for
+plugins setting a list of allowed services.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
-Changes in v5:
-- Fix compiler errors in plugins/admin.c
+(no changes since v1)
 
-Changes in v4:
-- Update commit message (admin_policy -> admin)
-- remove old plugins/admin_policy.c
+ src/adapter.c | 90 +++++++++++++++++++++++++++++++++++++++++++++++++++
+ src/adapter.h |  8 +++++
+ src/device.c  | 64 +++++++++++++++++++++++++++++++++++-
+ src/device.h  |  2 ++
+ 4 files changed, 163 insertions(+), 1 deletion(-)
 
-Changes in v3:
-- Rename plugins/admin_policy.c -> plugins/admin.c
-- Use device_added callback in btd_adapter_driver instead of listen for
-  dbus
-- Add authorization method in profiles/health/mcap.c and block incoming
-  connections in adapter authorization function.
-
-Changes in v2:
-- Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
-- Modify the criteria to say a device is `Affected` from any-of-uuid
-  to any-of-auto-connect-profile.
-- Remove the code to remove/reprobe disallowed/allowed profiles,
-  instead, check if the service is allowed in bt_io_accept connect_cb.
-- Fix a typo in emit_property_change in
-  plugin/admin_policy.c:set_service_allowlist
-- Instead of using device_state_cb, utilize D-BUS client to watch device
-  added/removed.
-- Add a document in doc/
-
- src/service.c | 39 +++++++++++++++++++++++++++++++++++++++
- src/service.h |  2 ++
- 2 files changed, 41 insertions(+)
-
-diff --git a/src/service.c b/src/service.c
-index 21a52762e637..929d6c136b6d 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -41,6 +41,7 @@ struct btd_service {
- 	void			*user_data;
- 	btd_service_state_t	state;
- 	int			err;
-+	bool			is_allowed;
+diff --git a/src/adapter.c b/src/adapter.c
+index 663b778e4a5d..c7fe27d19a5d 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -260,6 +260,8 @@ struct btd_adapter {
+ 
+ 	struct btd_battery_provider_manager *battery_provider_manager;
+ 
++	GHashTable *allowed_uuid_set;	/* Set of allowed service UUIDs */
++
+ 	gboolean initialized;
+ 
+ 	GSList *pin_callbacks;
+@@ -3489,6 +3491,93 @@ static DBusMessage *connect_device(DBusConnection *conn,
+ 	return NULL;
+ }
+ 
++static void update_device_allowed_services(void *data, void *user_data)
++{
++	struct btd_device *device = data;
++
++	btd_device_update_allowed_services(device);
++}
++
++static void add_uuid_to_uuid_set(void *data, void *user_data)
++{
++	bt_uuid_t *uuid = data;
++	GHashTable *uuid_set = user_data;
++
++	if (!uuid) {
++		error("Found NULL in UUID allowed list");
++		return;
++	}
++
++	g_hash_table_add(uuid_set, uuid);
++}
++
++static guint bt_uuid_hash(gconstpointer key)
++{
++	const bt_uuid_t *uuid = key;
++	bt_uuid_t uuid_128;
++	uint64_t *val;
++
++	if (!uuid)
++		return 0;
++
++	bt_uuid_to_uuid128(uuid, &uuid_128);
++	val = (uint64_t *)&uuid_128.value.u128;
++
++	return g_int64_hash(val) ^ g_int64_hash(val+1);
++}
++
++static gboolean bt_uuid_equal(gconstpointer v1, gconstpointer v2)
++{
++	const bt_uuid_t *uuid1 = v1;
++	const bt_uuid_t *uuid2 = v2;
++
++	if (!uuid1 || !uuid2)
++		return !uuid1 && !uuid2;
++
++	return bt_uuid_cmp(uuid1, uuid2) == 0;
++}
++
++bool btd_adapter_set_allowed_uuids(struct btd_adapter *adapter,
++							struct queue *uuids)
++{
++	if (!adapter)
++		return false;
++
++	if (adapter->allowed_uuid_set)
++		g_hash_table_destroy(adapter->allowed_uuid_set);
++
++	adapter->allowed_uuid_set = g_hash_table_new(bt_uuid_hash,
++								bt_uuid_equal);
++	if (!adapter->allowed_uuid_set) {
++		btd_error(adapter->dev_id,
++					"Failed to allocate allowed_uuid_set");
++		return false;
++	}
++
++	queue_foreach(uuids, add_uuid_to_uuid_set, adapter->allowed_uuid_set);
++	g_slist_foreach(adapter->devices, update_device_allowed_services, NULL);
++
++	return true;
++}
++
++bool btd_adapter_is_uuid_allowed(struct btd_adapter *adapter,
++							const char *uuid_str)
++{
++	bt_uuid_t uuid;
++
++	if (!adapter || !adapter->allowed_uuid_set)
++		return true;
++
++	if (bt_string_to_uuid(&uuid, uuid_str)) {
++		btd_error(adapter->dev_id,
++				"Failed to parse UUID string '%s'", uuid_str);
++		return false;
++	}
++
++	return !g_hash_table_size(adapter->allowed_uuid_set) ||
++		g_hash_table_contains(adapter->allowed_uuid_set, &uuid);
++}
++
+ static const GDBusMethodTable adapter_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("StartDiscovery", NULL, NULL, start_discovery) },
+ 	{ GDBUS_METHOD("SetDiscoveryFilter",
+@@ -5404,6 +5493,7 @@ static void adapter_free(gpointer user_data)
+ 	g_free(adapter->stored_alias);
+ 	g_free(adapter->current_alias);
+ 	free(adapter->modalias);
++	g_hash_table_destroy(adapter->allowed_uuid_set);
+ 	g_free(adapter);
+ }
+ 
+diff --git a/src/adapter.h b/src/adapter.h
+index 60b5e3bcca34..7cac51451249 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -25,6 +25,7 @@
+ 
+ struct btd_adapter;
+ struct btd_device;
++struct queue;
+ 
+ struct btd_adapter *btd_adapter_get_default(void);
+ bool btd_adapter_is_default(struct btd_adapter *adapter);
+@@ -97,6 +98,8 @@ void adapter_service_remove(struct btd_adapter *adapter, uint32_t handle);
+ 
+ struct agent *adapter_get_agent(struct btd_adapter *adapter);
+ 
++bool btd_adapter_uuid_is_allowed(struct btd_adapter *adapter, const char *uuid);
++
+ struct btd_adapter *btd_adapter_ref(struct btd_adapter *adapter);
+ void btd_adapter_unref(struct btd_adapter *adapter);
+ 
+@@ -240,3 +243,8 @@ enum kernel_features {
  };
  
- struct service_state_callback {
-@@ -133,6 +134,7 @@ struct btd_service *service_create(struct btd_device *device,
- 	service->device = device; /* Weak ref */
- 	service->profile = profile;
- 	service->state = BTD_SERVICE_STATE_UNAVAILABLE;
-+	service->is_allowed = true;
- 
- 	return service;
+ bool btd_has_kernel_features(uint32_t feature);
++
++bool btd_adapter_set_allowed_uuids(struct btd_adapter *adapter,
++							struct queue *uuids);
++bool btd_adapter_is_uuid_allowed(struct btd_adapter *adapter,
++							const char *uuid_str);
+diff --git a/src/device.c b/src/device.c
+index b29aa195d19b..c4a4497da01f 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1929,6 +1929,56 @@ static int service_prio_cmp(gconstpointer a, gconstpointer b)
+ 	return p2->priority - p1->priority;
  }
-@@ -186,6 +188,18 @@ int service_accept(struct btd_service *service)
- 	if (!service->profile->accept)
- 		return -ENOSYS;
  
-+	if (!service->is_allowed) {
-+		info("service %s is not allowed",
-+						service->profile->remote_uuid);
-+		return -ECONNABORTED;
++bool btd_device_all_services_allowed(struct btd_device *dev)
++{
++	GSList *l;
++	struct btd_adapter *adapter = dev->adapter;
++	struct btd_service *service;
++	struct btd_profile *profile;
++
++	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
++		service = l->data;
++		profile = btd_service_get_profile(service);
++
++		if (!profile || !profile->auto_connect)
++			continue;
++
++		if (!btd_adapter_is_uuid_allowed(adapter, profile->remote_uuid))
++			return false;
 +	}
 +
-+	if (!service->is_allowed) {
-+		info("service %s is not allowed",
-+						service->profile->remote_uuid);
-+		return -ECONNABORTED;
++	return true;
++}
++
++void btd_device_update_allowed_services(struct btd_device *dev)
++{
++	struct btd_adapter *adapter = dev->adapter;
++	struct btd_service *service;
++	struct btd_profile *profile;
++	GSList *l;
++	bool is_allowed;
++	char addr[18];
++
++	/* If service discovery is ongoing, let the service discovery complete
++	 * callback call this function.
++	 */
++	if (dev->browse) {
++		ba2str(&dev->bdaddr, addr);
++		DBG("service discovery of %s is ongoing. Skip updating allowed "
++							"services", addr);
++		return;
 +	}
 +
- 	err = service->profile->accept(service);
- 	if (!err)
- 		goto done;
-@@ -245,6 +259,12 @@ int btd_service_connect(struct btd_service *service)
- 		return -EBUSY;
++	for (l = dev->services; l != NULL; l = g_slist_next(l)) {
++		service = l->data;
++		profile = btd_service_get_profile(service);
++
++		is_allowed = btd_adapter_is_uuid_allowed(adapter,
++							profile->remote_uuid);
++		btd_service_set_allowed(service, is_allowed);
++	}
++}
++
+ static GSList *create_pending_list(struct btd_device *dev, const char *uuid)
+ {
+ 	struct btd_service *service;
+@@ -1937,9 +1987,14 @@ static GSList *create_pending_list(struct btd_device *dev, const char *uuid)
+ 
+ 	if (uuid) {
+ 		service = find_connectable_service(dev, uuid);
+-		if (service)
++
++		if (!service)
++			return dev->pending;
++
++		if (btd_service_is_allowed(service))
+ 			return g_slist_prepend(dev->pending, service);
+ 
++		info("service %s is blocked", uuid);
+ 		return dev->pending;
  	}
  
-+	if (!service->is_allowed) {
-+		info("service %s is not allowed",
-+						service->profile->remote_uuid);
-+		return -ECONNABORTED;
-+	}
+@@ -1950,6 +2005,11 @@ static GSList *create_pending_list(struct btd_device *dev, const char *uuid)
+ 		if (!p->auto_connect)
+ 			continue;
+ 
++		if (!btd_service_is_allowed(service)) {
++			info("service %s is blocked", p->remote_uuid);
++			continue;
++		}
 +
- 	err = profile->connect(service);
- 	if (err == 0) {
- 		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
-@@ -361,6 +381,25 @@ bool btd_service_remove_state_cb(unsigned int id)
- 	return false;
+ 		if (g_slist_find(dev->pending, service))
+ 			continue;
+ 
+@@ -2633,6 +2693,8 @@ static void device_svc_resolved(struct btd_device *dev, uint8_t browse_type,
+ 							dev->svc_callbacks);
+ 		g_free(cb);
+ 	}
++
++	btd_device_update_allowed_services(dev);
  }
  
-+void btd_service_set_allowed(struct btd_service *service, bool allowed)
-+{
-+	if (allowed == service->is_allowed)
-+		return;
-+
-+	service->is_allowed = allowed;
-+
-+	if (!allowed && (service->state == BTD_SERVICE_STATE_CONNECTING ||
-+			service->state == BTD_SERVICE_STATE_CONNECTED)) {
-+		btd_service_disconnect(service);
-+		return;
-+	}
-+}
-+
-+bool btd_service_is_allowed(struct btd_service *service)
-+{
-+	return service->is_allowed;
-+}
-+
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
- 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-diff --git a/src/service.h b/src/service.h
-index 88530cc17d53..5a2a02447b24 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -51,6 +51,8 @@ int btd_service_get_error(const struct btd_service *service);
- unsigned int btd_service_add_state_cb(btd_service_state_cb cb,
- 							void *user_data);
- bool btd_service_remove_state_cb(unsigned int id);
-+void btd_service_set_allowed(struct btd_service *service, bool allowed);
-+bool btd_service_is_allowed(struct btd_service *service);
+ static struct bonding_req *bonding_request_new(DBusMessage *msg,
+diff --git a/src/device.h b/src/device.h
+index 4ae9abe0dbb4..5f615cb4b6b2 100644
+--- a/src/device.h
++++ b/src/device.h
+@@ -175,5 +175,7 @@ uint32_t btd_device_get_current_flags(struct btd_device *dev);
+ void btd_device_flags_changed(struct btd_device *dev, uint32_t supported_flags,
+ 			      uint32_t current_flags);
  
- /* Functions used by profile implementation */
- void btd_service_connecting_complete(struct btd_service *service, int err);
++bool btd_device_all_services_allowed(struct btd_device *dev);
++void btd_device_update_allowed_services(struct btd_device *dev);
+ void btd_device_init(void);
+ void btd_device_cleanup(void);
 -- 
 2.32.0.554.ge1b32706d8-goog
 
