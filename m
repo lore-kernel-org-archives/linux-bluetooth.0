@@ -2,125 +2,206 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2476DC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 09:06:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89EA4C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 11:40:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07AEE60F6B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 09:06:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7254061042
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 11:40:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238126AbhG3JG3 (ORCPT
+        id S238623AbhG3Lkm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jul 2021 05:06:29 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43646 "EHLO
+        Fri, 30 Jul 2021 07:40:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54240 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230335AbhG3JGU (ORCPT
+        with ESMTP id S230157AbhG3Lkl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jul 2021 05:06:20 -0400
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F0EBC061765;
-        Fri, 30 Jul 2021 02:06:15 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id k1so10297032plt.12;
-        Fri, 30 Jul 2021 02:06:15 -0700 (PDT)
+        Fri, 30 Jul 2021 07:40:41 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8670C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jul 2021 04:40:36 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id l4-20020a05600c1d04b02902506f89ad2dso7575508wms.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 30 Jul 2021 04:40:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=Mw1aFNNIOpDd6NtZ8F40EUdFGaW5gJZPJaFX36P2GH4=;
-        b=PDhCB3WiEMgvoVoN6RSvr91JVfbkdxrwkvEDMIF9wzT17E0CzubrymEuVPOlE3NOXN
-         /8YACLQCPhk56eQzxEZ8WPwnoCBJCMN7Za/s2Qc+zun84neby2kck5aOfEATqEsFOjv4
-         bY6gn+7RP2/VJCJ3b/Is1HGQMZz43jUOsLtcr0Rf67qfHpm5xmzm5jruRJriT9QIjK2r
-         hr0r31VDMsfbop9DWXSF9lSkxTL5tf8EjGiufZDdbKnWkYA0ezlGEXuYiJD9EQy9iUtX
-         n2ATYssATUEy0lzTmo0MTGdFs9u9+Nmsi9AvJGXN+HERe7iaUBpvt46rKMY25YasxSnf
-         duKg==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=eZH6ID6JN6iX0H3pPHAq1xYGdgcDUQKy1n9bHToJ928=;
+        b=HWUF9Y4NgzTcYZZLnJUPsF1QvXF8YbymIcp4lFLeCle6cVTtT6h+IsA94OKZZixU+J
+         6g2f+h8gUBYPlAPF/kaaou5vto+6Z2iMdRBzFCUBC8mqNlt88QwZbegyzxQFVSuNzbOW
+         bwdiM6q1m/5AZD5+XVkGuuv7foFvR0c+KaGqMo7UGJNxt89XBf9NaUA/OJycq9IurAOr
+         +YT+i5gekHV7uTqP4msfkiVGvTm3E4es7FOcmvExBJP4NPgSCHJE2hkm/kSgSNEYE7TP
+         uX8595kc4G3fKpb86ocVrqK52Opzq6Pdza5P/T7R+VQcqBQgCD9QEFtdLt5Cw5LTqkPX
+         Sg5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=Mw1aFNNIOpDd6NtZ8F40EUdFGaW5gJZPJaFX36P2GH4=;
-        b=qAINuhKqvQbY4tZX8reobiv5P3N4jaXnY3NMtJZ6q32X7JlD7DOvUoTqzheqYrP2ti
-         Ee7I3WcgD6txGfvEzK/3pu324+JZfdK8XlWm6qkeq/R0IWPTDMgJjn0HTXx7dsi5Nz3Z
-         k3enIczScHh7O7O3HLw/Grgw04s/q4CHW1fIjg5O29t5veYUP7C0imuvR2LDjJAL9GGf
-         4k6Ps0XSaA82xzv4j8AoVRCjcwHj5qLB9sx/DcwTXttZjTCBMHHAmU6dhy0PFRQbPPFR
-         oqSzSfamFVXBfeG0UHLjOn8h1c0yRZDzofZlSVCNAesAV5UyT3DqDJkbllzgt5SGM6po
-         B84w==
-X-Gm-Message-State: AOAM5330Ldd1g2pQDncaBt9n7JGcZPGgj6VWjShvtYNQyCHIuB1OhXNQ
-        g4MkuTTxlbCmihlTapF4ns//b2nb9Q0isoenJ2E=
-X-Google-Smtp-Source: ABdhPJwMP6iBF4QEFfQd4ZEwB71ogfa04DRHUob13iYfVP9XXnAjEIO+neixEejSZo4OBjngk8pIMA==
-X-Received: by 2002:a17:903:49:b029:12b:1c88:101b with SMTP id l9-20020a1709030049b029012b1c88101bmr1771853pla.30.1627635974881;
-        Fri, 30 Jul 2021 02:06:14 -0700 (PDT)
-Received: from [192.168.1.237] ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id a16sm1570122pfo.66.2021.07.30.02.06.10
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jul 2021 02:06:14 -0700 (PDT)
-Subject: Re: [PATCH v3 2/2] Bluetooth: fix inconsistent lock state in
- rfcomm_connect_ind
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=eZH6ID6JN6iX0H3pPHAq1xYGdgcDUQKy1n9bHToJ928=;
+        b=c2FgOd3MTci0YWwKt3YCdTqWPJjtjZl0kJndInI9RbUfbUpgWsx2OCsgKtTJcbtas2
+         jk0n/G2OVsQhSr/TLOkkU8au6mlpxsZaeFd+FAPzZCnt9u4Ml+PD+aN0RXN1H11i4Oao
+         ik9+ZmcheP/0PesFCxF0m+cuEvDIUxclXCyza8Jp4PNQf52glmqIY0q/VIEXi+hc3awc
+         dpQVn1DQ/ZbcejgYpxjS0zOTFg0gdMNU0V4pgOC005T8VCuXmM1rt92ioqs52pJGVYqi
+         WASPoP8vksmj59M4pHX+os6J5oyxGtgUC9DLWb4mQStvomnRnz5IfwY4uCsO4jm5Yh9s
+         bluQ==
+X-Gm-Message-State: AOAM531JII+ZOQ1JPyi/TLo6+egzJfBDMEyJug1ZkthDkhpPWalfftqC
+        oIW74ai2o5HcBsq0CQsEJU7YEQ==
+X-Google-Smtp-Source: ABdhPJwprO6/RUuUoMkZkjV7JSEVyItBgBNITiCGe0AkHiuRssPPVkhgdLfgu9hP75Ut7M4rIJrO5g==
+X-Received: by 2002:a05:600c:3593:: with SMTP id p19mr2357910wmq.33.1627645235158;
+        Fri, 30 Jul 2021 04:40:35 -0700 (PDT)
+Received: from localhost ([2a01:cb19:826e:8e00:6536:8a22:58a3:a175])
+        by smtp.gmail.com with ESMTPSA id 9sm1431619wmf.34.2021.07.30.04.40.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jul 2021 04:40:34 -0700 (PDT)
+From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Matthieu Baerts <matthieu.baerts@tessares.net>,
-        Stefan Schmidt <stefan@datenfreihafen.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Fabien Parent <fparent@baylibre.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        skhan@linuxfoundation.org,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        linux-kernel-mentees@lists.linuxfoundation.org
-References: <20210721093832.78081-1-desmondcheongzx@gmail.com>
- <20210721093832.78081-3-desmondcheongzx@gmail.com>
- <06E57598-5723-459D-9CE3-4DD8D3145D86@holtmann.org>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <40f38642-faa9-8c63-4306-6477e272cfbe@gmail.com>
-Date:   Fri, 30 Jul 2021 17:06:09 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
+ flushed or cancelled
+In-Reply-To: <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
+References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
+ <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org>
+ <8735ryk0o7.fsf@baylibre.com>
+ <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
+Date:   Fri, 30 Jul 2021 13:40:33 +0200
+Message-ID: <87y29o58su.fsf@baylibre.com>
 MIME-Version: 1.0
-In-Reply-To: <06E57598-5723-459D-9CE3-4DD8D3145D86@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Kai-Heng,
 
-On 30/7/21 3:53 am, Marcel Holtmann wrote:
-> Hi Desmond,
-> 
->> Commit fad003b6c8e3d ("Bluetooth: Fix inconsistent lock state with
->> RFCOMM") fixed a lockdep warning due to sk->sk_lock.slock being
->> acquired without disabling softirq while the lock is also used in
->> softirq context. This was done by disabling interrupts before calling
->> bh_lock_sock in rfcomm_sk_state_change.
+Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
+
+> On Wed, Jul 28, 2021 at 9:50 PM Mattijs Korpershoek
+> <mkorpershoek@baylibre.com> wrote:
 >>
->> Later, this was changed in commit e6da0edc24ee ("Bluetooth: Acquire
->> sk_lock.slock without disabling interrupts") to disable softirqs
->> only.
+>> Hi Kai-Heng, Marcel,
 >>
->> However, there is another instance of sk->sk_lock.slock being acquired
->> without disabling softirq in rfcomm_connect_ind. This patch fixes this
->> by disabling local bh before the call to bh_lock_sock.
-> 
-> back in the days, the packet processing was done in a tasklet, but these days it is done in a workqueue. So shouldn’t this be just converted into a lock_sock(). Am I missing something?
-> 
+>> Marcel Holtmann <marcel@holtmann.org> writes:
+>>
+>> > Hi Kai-Heng,
+>> >
+>> >> Rfkill block and unblock Intel USB Bluetooth [8087:0026] may make it
+>> >> stops working:
+>> >> [  509.691509] Bluetooth: hci0: HCI reset during shutdown failed
+>> >> [  514.897584] Bluetooth: hci0: MSFT filter_enable is already on
+>> >> [  530.044751] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
+>> >> [  545.660350] usb 3-10: device descriptor read/64, error -110
+>> >> [  561.283530] usb 3-10: device descriptor read/64, error -110
+>> >> [  561.519682] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
+>> >> [  566.686650] Bluetooth: hci0: unexpected event for opcode 0x0500
+>> >> [  568.752452] Bluetooth: hci0: urb 0000000096cd309b failed to resubmit (113)
+>> >> [  578.797955] Bluetooth: hci0: Failed to read MSFT supported features (-110)
+>> >> [  586.286565] Bluetooth: hci0: urb 00000000c522f633 failed to resubmit (113)
+>> >> [  596.215302] Bluetooth: hci0: Failed to read MSFT supported features (-110)
+>> >>
+>> >> Or kernel panics because other workqueues already freed skb:
+>> >> [ 2048.663763] BUG: kernel NULL pointer dereference, address: 0000000000000000
+>> >> [ 2048.663775] #PF: supervisor read access in kernel mode
+>> >> [ 2048.663779] #PF: error_code(0x0000) - not-present page
+>> >> [ 2048.663782] PGD 0 P4D 0
+>> >> [ 2048.663787] Oops: 0000 [#1] SMP NOPTI
+>> >> [ 2048.663793] CPU: 3 PID: 4491 Comm: rfkill Tainted: G        W         5.13.0-rc1-next-20210510+ #20
+>> >> [ 2048.663799] Hardware name: HP HP EliteBook 850 G8 Notebook PC/8846, BIOS T76 Ver. 01.01.04 12/02/2020
+>> >> [ 2048.663801] RIP: 0010:__skb_ext_put+0x6/0x50
+>> >> [ 2048.663814] Code: 8b 1b 48 85 db 75 db 5b 41 5c 5d c3 be 01 00 00 00 e8 de 13 c0 ff eb e7 be 02 00 00 00 e8 d2 13 c0 ff eb db 0f 1f 44 00 00 55 <8b> 07 48 89 e5 83 f8 01 74 14 b8 ff ff ff ff f0 0f c1
+>> >> 07 83 f8 01
+>> >> [ 2048.663819] RSP: 0018:ffffc1d105b6fd80 EFLAGS: 00010286
+>> >> [ 2048.663824] RAX: 0000000000000000 RBX: ffff9d9ac5649000 RCX: 0000000000000000
+>> >> [ 2048.663827] RDX: ffffffffc0d1daf6 RSI: 0000000000000206 RDI: 0000000000000000
+>> >> [ 2048.663830] RBP: ffffc1d105b6fd98 R08: 0000000000000001 R09: ffff9d9ace8ceac0
+>> >> [ 2048.663834] R10: ffff9d9ace8ceac0 R11: 0000000000000001 R12: ffff9d9ac5649000
+>> >> [ 2048.663838] R13: 0000000000000000 R14: 00007ffe0354d650 R15: 0000000000000000
+>> >> [ 2048.663843] FS:  00007fe02ab19740(0000) GS:ffff9d9e5f8c0000(0000) knlGS:0000000000000000
+>> >> [ 2048.663849] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>> >> [ 2048.663853] CR2: 0000000000000000 CR3: 0000000111a52004 CR4: 0000000000770ee0
+>> >> [ 2048.663856] PKRU: 55555554
+>> >> [ 2048.663859] Call Trace:
+>> >> [ 2048.663865]  ? skb_release_head_state+0x5e/0x80
+>> >> [ 2048.663873]  kfree_skb+0x2f/0xb0
+>> >> [ 2048.663881]  btusb_shutdown_intel_new+0x36/0x60 [btusb]
+>> >> [ 2048.663905]  hci_dev_do_close+0x48c/0x5e0 [bluetooth]
+>> >> [ 2048.663954]  ? __cond_resched+0x1a/0x50
+>> >> [ 2048.663962]  hci_rfkill_set_block+0x56/0xa0 [bluetooth]
+>> >> [ 2048.664007]  rfkill_set_block+0x98/0x170
+>> >> [ 2048.664016]  rfkill_fop_write+0x136/0x1e0
+>> >> [ 2048.664022]  vfs_write+0xc7/0x260
+>> >> [ 2048.664030]  ksys_write+0xb1/0xe0
+>> >> [ 2048.664035]  ? exit_to_user_mode_prepare+0x37/0x1c0
+>> >> [ 2048.664042]  __x64_sys_write+0x1a/0x20
+>> >> [ 2048.664048]  do_syscall_64+0x40/0xb0
+>> >> [ 2048.664055]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+>> >> [ 2048.664060] RIP: 0033:0x7fe02ac23c27
+>> >> [ 2048.664066] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+>> >> [ 2048.664070] RSP: 002b:00007ffe0354d638 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+>> >> [ 2048.664075] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fe02ac23c27
+>> >> [ 2048.664078] RDX: 0000000000000008 RSI: 00007ffe0354d650 RDI: 0000000000000003
+>> >> [ 2048.664081] RBP: 0000000000000000 R08: 0000559b05998440 R09: 0000559b05998440
+>> >> [ 2048.664084] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
+>> >> [ 2048.664086] R13: 0000000000000000 R14: ffffffff00000000 R15: 00000000ffffffff
+>> >>
+>> >> So move the shutdown callback to a place where workqueues are either
+>> >> flushed or cancelled to resolve the issue.
+>> >>
+>> >> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>> >> ---
+>> >> v2:
+>> >> - Rebased on bluetooth-next.
+>> >>
+>> >> net/bluetooth/hci_core.c | 16 ++++++++--------
+>> >> 1 file changed, 8 insertions(+), 8 deletions(-)
+>> >
+>> > patch has been applied to bluetooth-next tree.
+>>
+>> This patch seems to introduce a regression in the btmtksdio driver.
+>> With this patch applied, I can't enable the hci0 interface anymore on mt8183-pumpkin:
+>>
+>> i500-pumpkin login: root
+>> root@i500-pumpkin:~# uname -a
+>> Linux i500-pumpkin 5.14.0-rc3 #94 SMP PREEMPT Wed Jul 28 11:58:20 CEST 2021 aarch64 aarch64 aarch64 GNU/Linux
+>> root@i500-pumpkin:~# hciconfig hci0 up
+>> Can't init device hci0: Connection timed out (110)
+>> root@i500-pumpkin:~# hciconfig hci0 down
+>> root@i500-pumpkin:~# hciconfig hci0 up
+>> Can't init device hci0: Input/output error (5)
+>>
+>> Reverting it fixes the above issue.
+>> Any suggestion on how to fix this without touching hci_core ?
+>> Maybe the btmtksdio driver needs some rework. As I'm not familiar with the code, I would appreciate any tips.
+>
+> Can you please attach dmesg?  Also, full ftrace log on btmtksdio can
+> also be helpful.
+Thank you for your help. Sorry I did not post the logs previously.
 
-Thanks for the info. I think you're right, I just didn't understand very 
-much when I wrote this patch.
+dmesg: https://pastebin.com/tpWDNyQr
+ftrace on btmtksdio: https://pastebin.com/jmhvmwUw
 
-If I'm understanding correctly, it seems that both the bh_lock_sock in 
-rfcomm_connect_ind, and spin_lock_bh in rfcomm_sk_state_change need to 
-be changed to lock_sock, otherwise they don't provide any 
-synchronization with other functions in RFCOMM that use lock_sock.
-
-If that sounds correct I can prepare the patch for that.
-
-Best wishes,
-Desmond
+Mattijs
+>
+> Kai-Heng
+>
+>>
+>> Thanks,
+>> Mattijs Korpershoek
+>>
+>>
+>> >
+>> > Regards
+>> >
+>> > Marcel
