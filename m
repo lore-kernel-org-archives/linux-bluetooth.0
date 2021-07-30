@@ -2,97 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BCB94C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 12:35:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 21088C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 13:40:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 965D960F12
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 12:35:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 081AB61040
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 30 Jul 2021 13:40:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238663AbhG3MfJ (ORCPT
+        id S239125AbhG3Nkz convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 30 Jul 2021 08:35:09 -0400
-Received: from fgw21-4.mail.saunalahti.fi ([62.142.5.108]:37635 "EHLO
-        fgw21-4.mail.saunalahti.fi" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230429AbhG3MfI (ORCPT
+        Fri, 30 Jul 2021 09:40:55 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35614 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231247AbhG3Nke (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 30 Jul 2021 08:35:08 -0400
-Received: from ydin.reaktio.net (reaktio.net [85.76.255.15])
-        by fgw21.mail.saunalahti.fi (Halon) with ESMTP
-        id 8ee2df34-f132-11eb-ae1c-005056bdd08f;
-        Fri, 30 Jul 2021 15:35:02 +0300 (EEST)
-Received: by ydin.reaktio.net (Postfix, from userid 1001)
-        id 38F2520089; Fri, 30 Jul 2021 15:35:01 +0300 (EEST)
-Date:   Fri, 30 Jul 2021 15:35:01 +0300
-From:   Pasi =?iso-8859-1?Q?K=E4rkk=E4inen?= <pasik@iki.fi>
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, kernel@kempniu.pl,
-        linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com,
-        hildawu@realtek.com, josephsih@google.com
-Subject: Re: [PATCH v3] Bluetooth: btusb: check conditions before enabling
- USB ALT 3 for WBS
-Message-ID: <20210730123501.GA16261@reaktio.net>
-References: <d43dffdc43a40782ec6d5d6c24b1638005992a8f.camel@iki.fi>
- <20210726180206.49703-1-pav@iki.fi>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20210726180206.49703-1-pav@iki.fi>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+        Fri, 30 Jul 2021 09:40:34 -0400
+Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 754BFCED30;
+        Fri, 30 Jul 2021 15:40:20 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [PATCH v3 2/2] Bluetooth: fix inconsistent lock state in
+ rfcomm_connect_ind
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <40f38642-faa9-8c63-4306-6477e272cfbe@gmail.com>
+Date:   Fri, 30 Jul 2021 15:40:19 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Matthieu Baerts <matthieu.baerts@tessares.net>,
+        Stefan Schmidt <stefan@datenfreihafen.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        skhan@linuxfoundation.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <B35BD760-E00E-43ED-85A1-775197FB3ED1@holtmann.org>
+References: <20210721093832.78081-1-desmondcheongzx@gmail.com>
+ <20210721093832.78081-3-desmondcheongzx@gmail.com>
+ <06E57598-5723-459D-9CE3-4DD8D3145D86@holtmann.org>
+ <40f38642-faa9-8c63-4306-6477e272cfbe@gmail.com>
+To:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Desmond,
 
-On Mon, Jul 26, 2021 at 09:02:06PM +0300, Pauli Virtanen wrote:
-> Some USB BT adapters don't satisfy the MTU requirement mentioned in
-> commit e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
-> and have ALT 3 setting that produces no/garbled audio. Some adapters
-> with larger MTU were also reported to have problems with ALT 3.
+>>> Commit fad003b6c8e3d ("Bluetooth: Fix inconsistent lock state with
+>>> RFCOMM") fixed a lockdep warning due to sk->sk_lock.slock being
+>>> acquired without disabling softirq while the lock is also used in
+>>> softirq context. This was done by disabling interrupts before calling
+>>> bh_lock_sock in rfcomm_sk_state_change.
+>>> 
+>>> Later, this was changed in commit e6da0edc24ee ("Bluetooth: Acquire
+>>> sk_lock.slock without disabling interrupts") to disable softirqs
+>>> only.
+>>> 
+>>> However, there is another instance of sk->sk_lock.slock being acquired
+>>> without disabling softirq in rfcomm_connect_ind. This patch fixes this
+>>> by disabling local bh before the call to bh_lock_sock.
+>> back in the days, the packet processing was done in a tasklet, but these days it is done in a workqueue. So shouldn’t this be just converted into a lock_sock(). Am I missing something?
 > 
-> Add a flag and check it and MTU before selecting ALT 3, falling back to
-> ALT 1. Enable the flag for Realtek, restoring the previous behavior for
-> non-Realtek devices.
+> Thanks for the info. I think you're right, I just didn't understand very much when I wrote this patch.
 > 
-> Tested with USB adapters (mtu<72, no/garbled sound with ALT3, ALT1
-> works) BCM20702A1 0b05:17cb, CSR8510A10 0a12:0001, and (mtu>=72, ALT3
-> works) RTL8761BU 0bda:8771, Intel AX200 8087:0029 (after disabling
-> ALT6). Also got reports for (mtu>=72, ALT 3 reported to produce bad
-> audio) Intel 8087:0a2b.
+> If I'm understanding correctly, it seems that both the bh_lock_sock in rfcomm_connect_ind, and spin_lock_bh in rfcomm_sk_state_change need to be changed to lock_sock, otherwise they don't provide any synchronization with other functions in RFCOMM that use lock_sock.
 > 
-> Signed-off-by: Pauli Virtanen <pav@iki.fi>
-> Fixes: e848dbd364ac ("Bluetooth: btusb: Add support USB ALT 3 for WBS")
-> Tested-by: Michał Kępień <kernel@kempniu.pl>
-> ---
->
+> If that sounds correct I can prepare the patch for that.
 
-This probably also should have CC stable@kernel.org, as users have
-started reporting this bug as distros have started shipping kernels with
-the faulty patch in it.. so it'd be nice to have the fix backported to
-stable kernel trees.
+please do so and re-run the tests. Thanks.
 
+Regards
 
-Thanks,
+Marcel
 
--- Pasi
-
-> 
-> Changes in v3:
-> - Rename flag to BTUSB_USE_ALT3_FOR_WBS.
-> - No spaces in indent.
-> - Added Tested-by: Michał Kępień
-> 
-> Changes in v2:
-> - Explain magic number 72 in a comment; didn't add the table for them,
->   because it's not used elsewhere and we need just one number from it.
-> - Add flag for ALT3 support, restoring the behavior
->   for non-Realtek devices the same as before e848dbd364ac, due to
->   the problems reported on an Intel adapter. Don't have the device
->   myself.
-> 
