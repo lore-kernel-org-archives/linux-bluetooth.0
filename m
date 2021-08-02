@@ -2,367 +2,168 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6EF7BC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 15:19:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2A1EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 17:37:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5669060FF2
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 15:19:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B664960F9E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 17:37:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234754AbhHBPT6 (ORCPT
+        id S229640AbhHBRhP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Aug 2021 11:19:58 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:50761 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234233AbhHBPT5 (ORCPT
+        Mon, 2 Aug 2021 13:37:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40138 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229551AbhHBRhO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Aug 2021 11:19:57 -0400
-Received: from fsav116.sakura.ne.jp (fsav116.sakura.ne.jp [27.133.134.243])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 172FJd3D036395;
-        Tue, 3 Aug 2021 00:19:39 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav116.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp);
- Tue, 03 Aug 2021 00:19:39 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav116.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 172FJdAp036391
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Tue, 3 Aug 2021 00:19:39 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, LinMa <linma@zju.edu.cn>,
-        Linus Torvalds <torvalds@linux-foundation.org>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH v3] Bluetooth: defer cleanup of resources in
- hci_unregister_dev()
-Message-ID: <290fe7c7-c14f-8685-af09-419faa0e4d1f@i-love.sakura.ne.jp>
-Date:   Tue, 3 Aug 2021 00:19:35 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.12.0
+        Mon, 2 Aug 2021 13:37:14 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71A9DC06175F
+        for <linux-bluetooth@vger.kernel.org>; Mon,  2 Aug 2021 10:37:04 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id p38so20171150lfa.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Aug 2021 10:37:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linux-foundation.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=Eqj/jbZUe4stLkK8cTohIBe/BZXBIqwPs+QNhcq+Uec=;
+        b=LENOxdMDGSQ8ezLeubiwsFnhp0UmAoj7lbtwnE324EOPT1HnvQsMT9HLyRWCvWlNTf
+         7nXLNE01gbSGv0K8iX2MF5FHzlwx8GhQneKWfenVmtTRCuAdpgO7AELLBzksrRKNiOsX
+         z0OWp7rbjQzQXKXEW9i8T2YOcWNsRUW9zP7VE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=Eqj/jbZUe4stLkK8cTohIBe/BZXBIqwPs+QNhcq+Uec=;
+        b=oJynQvJ9TajAAZeG9WJf+XTB0wfy5fHEqQdVjrlq/bFj1Qyo3jbXTNqxlkD15bPtw2
+         4j1Mjy8RbtrFZlM1Pqxajm1ifz/gre4otpJAe2dZKaDdWUzaUT68zxEDW+/mEWJAmMIY
+         aNqQ5qXRe8FX8zOiLxTo83V7YaAV/0hEsWvXc46MT2wxAU7WQY/K6YV7OZedBH7++wUV
+         I5xnzscafKV9l+o6uO1Tyd0QLsfudLLhjz0y60P69qOVH2TnmfkHkuKQz+VumR9/Droe
+         zspNHl0L50q2qRb2Wq0bMhVCyKi3qPcWJsyFCTNEVcXfBZDT76Ze1wuyHXTuCBYjJddk
+         Z0XQ==
+X-Gm-Message-State: AOAM531gk9vX5uy0O155noYWL5pZM/wFVHvuz/DbIPtbIAo+REVtneRF
+        yrIXVCjJFOlKr0wJk62+1SyJIbWcfWeKjFd0
+X-Google-Smtp-Source: ABdhPJzPHjf8CsdJWgKlwpT71GHFgP4eLuR29ppz1POHb2GWofMCgyz1zzlALCKnbBiswaNj0+Azbg==
+X-Received: by 2002:a05:6512:3c9a:: with SMTP id h26mr13366210lfv.300.1627925822667;
+        Mon, 02 Aug 2021 10:37:02 -0700 (PDT)
+Received: from mail-lf1-f52.google.com (mail-lf1-f52.google.com. [209.85.167.52])
+        by smtp.gmail.com with ESMTPSA id d4sm778370lfg.178.2021.08.02.10.37.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 02 Aug 2021 10:37:01 -0700 (PDT)
+Received: by mail-lf1-f52.google.com with SMTP id m13so35070217lfg.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 02 Aug 2021 10:37:01 -0700 (PDT)
+X-Received: by 2002:ac2:569a:: with SMTP id 26mr9231678lfr.41.1627925821490;
+ Mon, 02 Aug 2021 10:37:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+References: <290fe7c7-c14f-8685-af09-419faa0e4d1f@i-love.sakura.ne.jp>
+In-Reply-To: <290fe7c7-c14f-8685-af09-419faa0e4d1f@i-love.sakura.ne.jp>
+From:   Linus Torvalds <torvalds@linux-foundation.org>
+Date:   Mon, 2 Aug 2021 10:36:45 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgRzabeP3CLZmFWO5EXrqWSvSL8uKwbSYRWw2xT9RVBrQ@mail.gmail.com>
+Message-ID: <CAHk-=wgRzabeP3CLZmFWO5EXrqWSvSL8uKwbSYRWw2xT9RVBrQ@mail.gmail.com>
+Subject: Re: [PATCH v3] Bluetooth: defer cleanup of resources in hci_unregister_dev()
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LinMa <linma@zju.edu.cn>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot is hitting might_sleep() warning at hci_sock_dev_event()
-due to calling lock_sock() with rw spinlock held [1].
+On Mon, Aug 2, 2021 at 8:19 AM Tetsuo Handa
+<penguin-kernel@i-love.sakura.ne.jp> wrote:
+>
+> @@ -200,7 +211,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+>         sk_for_each(sk, &hci_sk_list.head) {
+>                 struct sk_buff *nskb;
+>
+> -               if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev)
+> +               if (sk->sk_state != BT_BOUND || hci_hdev_from_sock(sk) != hdev)
+>                         continue;
+>
+>                 /* Don't send frame to the socket it came from */
 
-It seems that history of this locking problem is a trial and error.
+I'm not convinced this is a good idea.
 
-Commit b40df5743ee8aed8 ("[PATCH] bluetooth: fix socket locking in
-hci_sock_dev_event()") in 2.6.21-rc4 changed bh_lock_sock() to lock_sock()
-as an attempt to fix lockdep warning.
+Here we use hci_hdev_from_sock() outside the socket lock, so now that
+HCI_UNREGISTER test is not very logical.
 
-Then, commit 4ce61d1c7a8ef4c1 ("[BLUETOOTH]: Fix locking in
-hci_sock_dev_event().") in 2.6.22-rc2 changed lock_sock() to
-local_bh_disable() + bh_lock_sock_nested() as an attempt to fix
-sleep in atomic context warning.
+And it's positively stupid to start with a hdev, then walk the socket
+list to look up another hdev, and then check "was it the original
+hdev, but not unregistered"?
 
-Then, commit 4b5dd696f81b210c ("Bluetooth: Remove local_bh_disable() from
-hci_sock.c") in 3.3-rc1 removed local_bh_disable().
+In other words - if you care about HCI_UNREGISTER state, it should be
+*above* the whole loop. Not inside of it.
 
-Then, commit e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF
-of hdev object") in 5.13-rc5 again changed bh_lock_sock_nested() to
-lock_sock() as an attempt to fix CVE-2021-3573.
+So I think this test should remain just that
 
-This difficulty comes from current implementation that
-hci_sock_dev_event(HCI_DEV_UNREG) is responsible for dropping all
-references from sockets because hci_unregister_dev() immediately reclaims
-resources as soon as returning from hci_sock_dev_event(HCI_DEV_UNREG).
-But the history suggests that hci_sock_dev_event(HCI_DEV_UNREG) was not
-doing what it should do.
+     hci_pi(sk)->hdev != hdev
 
-Therefore, instead of trying to detach sockets from device, let's accept
-not detaching sockets from device at hci_sock_dev_event(HCI_DEV_UNREG),
-by moving actual cleanup of resources from hci_unregister_dev() to
-hci_cleanup_dev() which is called by bt_host_release() when all references
-to this unregistered device (which is a kobject) are gone.
+and if HCI_UNREGISTER is relevant - and I don't think it is - it
+should have been done earlier.
 
-Since hci_sock_dev_event(HCI_DEV_UNREG) no longer resets hci_pi(sk)->hdev,
-we need to check whether this device was unregistered and return an error
-based on HCI_UNREGISTER flag.
+> @@ -536,8 +548,9 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
+>
+>         hdr = skb_push(skb, HCI_MON_HDR_SIZE);
+>         hdr->opcode = cpu_to_le16(HCI_MON_CTRL_OPEN);
+> -       if (hci_pi(sk)->hdev)
+> -               hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
+> +       hdev = hci_hdev_from_sock(sk);
+> +       if (!IS_ERR(hdev))
+> +               hdr->index = cpu_to_le16(hdev->id);
 
-Link: https://syzkaller.appspot.com/bug?extid=a5df189917e79d5e59c9 [1]
-Reported-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
-Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Tested-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
-Fixes: e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF of hdev object")
----
-v3: Unexport hci_unregister_dev because only bt_host_release calls it
-    and both hci_core.o and hci_sysfs.o are combined into bluetooth.o.
+Same deal. The 'id' is valid even if it's unregistered.
 
-    Rename hci_release_dev to hci_cleanup_dev and call it only when
-    HCI_UNREGISTER was set, for syzbot
-    <syzbot+47c6d0efbb7fe2f7a5b8@syzkaller.appspotmail.com> is reporting
-    that bt_host_release might be called without hci_register_dev and
-    hci_unregister_dev.
+So either it should have generated an error earlier, or we just shouldn't care.
 
-    Return -EPIPE instead of 0 if HCI_UNREGISTER was set, in order to
-    make sure that userspace finds that the device was unregistred.
+The fact that the old code used to do HCI_DEV_NONE seems to be more
+about the fact that the ID no longer existed.  I think that if you
+want to monitor a socket with a stale hdev, that's likely pointless
+but valid.
 
-v2: Add hci_release_dev and make bt_host_release call it instead of making
-    bt_host_release public.
+So I think this should just keep using the hdev->id, even for a
+HCI_UNREGISTER case.
 
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_core.c         | 16 ++++----
- net/bluetooth/hci_sock.c         | 67 +++++++++++++++++++++-----------
- net/bluetooth/hci_sysfs.c        |  3 ++
- 4 files changed, 56 insertions(+), 31 deletions(-)
+That said, the *normal* case seems to be from the socket ioctl code,
+so it's either explicitly not yet registered, or it just got
+registered with a hdev, so I don't think it even matters. It looks
+like the only case that HCI_UNREGISTER case would happen is likely the
+magical replay case.
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a53e94459ecd..db4312e44d47 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1230,6 +1230,7 @@ struct hci_dev *hci_alloc_dev(void);
- void hci_free_dev(struct hci_dev *hdev);
- int hci_register_dev(struct hci_dev *hdev);
- void hci_unregister_dev(struct hci_dev *hdev);
-+void hci_cleanup_dev(struct hci_dev *hdev);
- int hci_suspend_dev(struct hci_dev *hdev);
- int hci_resume_dev(struct hci_dev *hdev);
- int hci_reset_dev(struct hci_dev *hdev);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2560ed2f144d..e1a545c8a69f 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3996,14 +3996,10 @@ EXPORT_SYMBOL(hci_register_dev);
- /* Unregister HCI device */
- void hci_unregister_dev(struct hci_dev *hdev)
- {
--	int id;
--
- 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
- 
- 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
- 
--	id = hdev->id;
--
- 	write_lock(&hci_dev_list_lock);
- 	list_del(&hdev->list);
- 	write_unlock(&hci_dev_list_lock);
-@@ -4038,7 +4034,14 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	}
- 
- 	device_del(&hdev->dev);
-+	/* Actual cleanup is deferred until hci_cleanup_dev(). */
-+	hci_dev_put(hdev);
-+}
-+EXPORT_SYMBOL(hci_unregister_dev);
- 
-+/* Cleanup HCI device */
-+void hci_cleanup_dev(struct hci_dev *hdev)
-+{
- 	debugfs_remove_recursive(hdev->debugfs);
- 	kfree_const(hdev->hw_info);
- 	kfree_const(hdev->fw_info);
-@@ -4063,11 +4066,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 	hci_blocked_keys_clear(hdev);
- 	hci_dev_unlock(hdev);
- 
--	hci_dev_put(hdev);
--
--	ida_simple_remove(&hci_index_ida, id);
-+	ida_simple_remove(&hci_index_ida, hdev->id);
- }
--EXPORT_SYMBOL(hci_unregister_dev);
- 
- /* Suspend HCI device */
- int hci_suspend_dev(struct hci_dev *hdev)
-diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-index b04a5a02ecf3..39c03a8b762f 100644
---- a/net/bluetooth/hci_sock.c
-+++ b/net/bluetooth/hci_sock.c
-@@ -59,6 +59,17 @@ struct hci_pinfo {
- 	char              comm[TASK_COMM_LEN];
- };
- 
-+static struct hci_dev *hci_hdev_from_sock(struct sock *sk)
-+{
-+	struct hci_dev *hdev = hci_pi(sk)->hdev;
-+
-+	if (!hdev)
-+		return ERR_PTR(-EBADFD);
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
-+		return ERR_PTR(-EPIPE);
-+	return hdev;
-+}
-+
- void hci_sock_set_flag(struct sock *sk, int nr)
- {
- 	set_bit(nr, &hci_pi(sk)->flags);
-@@ -200,7 +211,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
- 	sk_for_each(sk, &hci_sk_list.head) {
- 		struct sk_buff *nskb;
- 
--		if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev)
-+		if (sk->sk_state != BT_BOUND || hci_hdev_from_sock(sk) != hdev)
- 			continue;
- 
- 		/* Don't send frame to the socket it came from */
-@@ -494,6 +505,7 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- 	u16 format;
- 	u8 ver[3];
- 	u32 flags;
-+	struct hci_dev *hdev;
- 
- 	/* No message needed when cookie is not present */
- 	if (!hci_pi(sk)->cookie)
-@@ -536,8 +548,9 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
- 
- 	hdr = skb_push(skb, HCI_MON_HDR_SIZE);
- 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_OPEN);
--	if (hci_pi(sk)->hdev)
--		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
-+	hdev = hci_hdev_from_sock(sk);
-+	if (!IS_ERR(hdev))
-+		hdr->index = cpu_to_le16(hdev->id);
- 	else
- 		hdr->index = cpu_to_le16(HCI_DEV_NONE);
- 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
-@@ -549,6 +562,7 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
- {
- 	struct hci_mon_hdr *hdr;
- 	struct sk_buff *skb;
-+	struct hci_dev *hdev;
- 
- 	/* No message needed when cookie is not present */
- 	if (!hci_pi(sk)->cookie)
-@@ -574,8 +588,9 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
- 
- 	hdr = skb_push(skb, HCI_MON_HDR_SIZE);
- 	hdr->opcode = cpu_to_le16(HCI_MON_CTRL_CLOSE);
--	if (hci_pi(sk)->hdev)
--		hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
-+	hdev = hci_hdev_from_sock(sk);
-+	if (!IS_ERR(hdev))
-+		hdr->index = cpu_to_le16(hdev->id);
- 	else
- 		hdr->index = cpu_to_le16(HCI_DEV_NONE);
- 	hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
-@@ -759,19 +774,13 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
- 	if (event == HCI_DEV_UNREG) {
- 		struct sock *sk;
- 
--		/* Detach sockets from device */
-+		/* Wake up sockets using this dead device */
- 		read_lock(&hci_sk_list.lock);
- 		sk_for_each(sk, &hci_sk_list.head) {
--			lock_sock(sk);
- 			if (hci_pi(sk)->hdev == hdev) {
--				hci_pi(sk)->hdev = NULL;
- 				sk->sk_err = EPIPE;
--				sk->sk_state = BT_OPEN;
- 				sk->sk_state_change(sk);
--
--				hci_dev_put(hdev);
- 			}
--			release_sock(sk);
- 		}
- 		read_unlock(&hci_sk_list.lock);
- 	}
-@@ -930,10 +939,10 @@ static int hci_sock_reject_list_del(struct hci_dev *hdev, void __user *arg)
- static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
- 				unsigned long arg)
- {
--	struct hci_dev *hdev = hci_pi(sk)->hdev;
-+	struct hci_dev *hdev = hci_hdev_from_sock(sk);
- 
--	if (!hdev)
--		return -EBADFD;
-+	if (IS_ERR(hdev))
-+		return PTR_ERR(hdev);
- 
- 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
- 		return -EBUSY;
-@@ -1103,6 +1112,18 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 
- 	lock_sock(sk);
- 
-+	/* Allow detaching from dead device and attaching to alive device, if
-+	 * the caller wants to re-bind (instead of close) this socket in
-+	 * response to hci_sock_dev_event(HCI_DEV_UNREG) notification.
-+	 */
-+	hdev = hci_pi(sk)->hdev;
-+	if (hdev && hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
-+		hci_pi(sk)->hdev = NULL;
-+		sk->sk_state = BT_OPEN;
-+		hci_dev_put(hdev);
-+		hdev = NULL;
-+	}
-+
- 	if (sk->sk_state == BT_BOUND) {
- 		err = -EALREADY;
- 		goto done;
-@@ -1110,7 +1131,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 
- 	switch (haddr.hci_channel) {
- 	case HCI_CHANNEL_RAW:
--		if (hci_pi(sk)->hdev) {
-+		if (hdev) {
- 			err = -EALREADY;
- 			goto done;
- 		}
-@@ -1157,7 +1178,7 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
- 		break;
- 
- 	case HCI_CHANNEL_USER:
--		if (hci_pi(sk)->hdev) {
-+		if (hdev) {
- 			err = -EALREADY;
- 			goto done;
- 		}
-@@ -1379,9 +1400,9 @@ static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
- 
- 	lock_sock(sk);
- 
--	hdev = hci_pi(sk)->hdev;
--	if (!hdev) {
--		err = -EBADFD;
-+	hdev = hci_hdev_from_sock(sk);
-+	if (IS_ERR(hdev)) {
-+		err = PTR_ERR(hdev);
- 		goto done;
- 	}
- 
-@@ -1743,9 +1764,9 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		goto done;
- 	}
- 
--	hdev = hci_pi(sk)->hdev;
--	if (!hdev) {
--		err = -EBADFD;
-+	hdev = hci_hdev_from_sock(sk);
-+	if (IS_ERR(hdev)) {
-+		err = PTR_ERR(hdev);
- 		goto done;
- 	}
- 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 9874844a95a9..b69d88b88d2e 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -83,6 +83,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
- static void bt_host_release(struct device *dev)
- {
- 	struct hci_dev *hdev = to_hci_dev(dev);
-+
-+	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
-+		hci_cleanup_dev(hdev);
- 	kfree(hdev);
- 	module_put(THIS_MODULE);
- }
--- 
-2.18.4
+Which - again - I think would actually prefer the now still existing
+hdev channel id.
 
+
+> @@ -574,8 +588,9 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+>
+>         hdr = skb_push(skb, HCI_MON_HDR_SIZE);
+>         hdr->opcode = cpu_to_le16(HCI_MON_CTRL_CLOSE);
+> -       if (hci_pi(sk)->hdev)
+> -               hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
+> +       hdev = hci_hdev_from_sock(sk);
+> +       if (!IS_ERR(hdev))
+> +               hdr->index = cpu_to_le16(hdev->id);
+>         else
+>                 hdr->index = cpu_to_le16(HCI_DEV_NONE);
+>         hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+
+I think the monitor_ctrl close case is exactly the same case as the
+open case above.
+
+But the others look good to me.
+
+So I *think* that the cases you actually want to catch are just the
+ioctl/recvmsg/sendmsg ones. Not the special "monitor the hdev" ones.
+
+That said, if you have some test-case that argues differently, then
+hard data is obviously more valid than my blathering above.
+
+                 Linus
