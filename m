@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BAA0C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:13:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C41CC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:13:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 394C660EE8
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:13:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 19BBF610A2
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:13:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232093AbhHBGNS (ORCPT
+        id S232127AbhHBGNV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Aug 2021 02:13:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40344 "EHLO
+        Mon, 2 Aug 2021 02:13:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40360 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229792AbhHBGNQ (ORCPT
+        with ESMTP id S232069AbhHBGNU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Aug 2021 02:13:16 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D34BDC06175F
-        for <linux-bluetooth@vger.kernel.org>; Sun,  1 Aug 2021 23:13:07 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id x12-20020a05620a14acb02903b8f9d28c19so12177399qkj.23
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Aug 2021 23:13:07 -0700 (PDT)
+        Mon, 2 Aug 2021 02:13:20 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30B6C06175F
+        for <linux-bluetooth@vger.kernel.org>; Sun,  1 Aug 2021 23:13:11 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id v71-20020a252f4a0000b029055b51419c7dso17971281ybv.23
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Aug 2021 23:13:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=F7VJqV3BeiJu665vbWvjgil8eUCIQvMKzwljw5TIy8g=;
-        b=uGc82zsXPPEEKkj+VR67JZA6I3HM8MGm5bjV+ebmcIMTypGWrLqZdXWB6u97RqFki2
-         7+X1UFWriyRMZaQLbdZdQ161HyvrqcjM5T01n1xj6USfuSYceyaJR7FrxewzcyE3RZSt
-         IzIHvXqAAq30QAzE6z0ERFKwuQlLf5F6DZ3KocMfhyZ0OGQODa+i8LhtHg0zZGEc1lfg
-         ecBj3I+yNgpTi4E9vLabMLcvKaVxoFnjEmncZRL4I18zu9DH9+MQEaYilSZmBXqT7MQq
-         hUe4V4NndavjwRSg7JTnU4sa0Y+S+B/1L83c7eh1FHENZbr4CP+1jxlNEWB1R7uO4U3x
-         gfUw==
+        bh=L6lNNaSX6qQORZqT2VoBUMM9LUS7LaDIzlSN+vZ3p6I=;
+        b=ddkLMzzNl3oi3sd5UJx1c7+EXItedK9/+8CUUNGsnphjIWU7+Nhitaxv+FfulDUD3X
+         qFOem8iviLclDogPvc5Tk1UKO4COECPtcj1yri2IDOoUSbgVjMcGYhdN4bCBZ9sfM/g1
+         d6hPLw77jqxDYAVRVgn8MRn9fuetwIoMZ5G4jWht5IsSA164qQUn4hwvQejyQfpSyy7s
+         3Om5Wy8JfrUPAQ4GEZqrRpNtqs79+RFPMQBpDHvKj6r1vYel68zoRFPEf7oUF4jwjtii
+         zcVV3u6w3FoimzUn9HkBM18bKQBZMZNw/oOCgM5L+9JVfgJJMeg7Vn5/GAkYcJ6xvr49
+         ztaA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=F7VJqV3BeiJu665vbWvjgil8eUCIQvMKzwljw5TIy8g=;
-        b=dmu5UBPLJK6a8gAeOdqcom1KO639YlFjw6UZLJcOnXvRo/l+JWlLIuBRDwnGtnitI1
-         X60ty4oO0ca+c20/qa+z96IhXRPG7GotdOqRbXhnWkF8/u8YaFVKN8AfarftWDeJjJIX
-         SX5vKxJDqWYH15QmXbTBehJfK0Cv7y9XIWFc43wr8glL9J8uSqtqO+cOVZ8jBbDbL4os
-         9TaX9H3SnYbmrt9+YQJCPPBZk/b4NhD8Sw8A2y6yqs+uF8xf6ozFzXkvXYZP/f+weSyd
-         KrFDiIPVkspE7shm5+n/6bLHo+oq8c/bWqjZoPImdr83rSAk9QQ6JTTQF1Rpe/FGVIQ6
-         QgEg==
-X-Gm-Message-State: AOAM530s72W83c9EyqY9/STF3p68462SjTG9rPqpeUnU7fyFW8b95pRp
-        Xx/ilMzA1VZbTi3oaT1vJGLaPPTZ/5jEAoGhopPe10Boa+tfWSf5TM1UzUut0FKpUW7hS/qC6Hs
-        yY8713Z2QTcl2rpNhrhSQv9EXrfOz399frVne+MtcWy7TfZCx0uEWpVsxcDFb9RDw7g/r1XdXK4
-        eCL0s8rsiU+tg=
-X-Google-Smtp-Source: ABdhPJz6jgYvnSoDg7/F7pKd553uERJ6+YKwWF8iW+wV545uanLlpN43rTq3VisCzWxRvfXO5o5f0xZOqp7OKMJXpQ==
+        bh=L6lNNaSX6qQORZqT2VoBUMM9LUS7LaDIzlSN+vZ3p6I=;
+        b=hwMNKlwk20aAAQwTl74JY5/b526IfzOi3BOgEeHNV82Z3nfXvsqvWhZ1s0N9EuHNZN
+         f0mpi1V74uyBon/kks8/0eWNU0DUnvIfXkXTuOT2DYyR8yXpvuQ1NqvfXKHs6ZgvRpG3
+         zSALWY8nwInYN6gJS3sOs/OKNQ6w2MXArXauMYKjaCXSMtngrehfEb93RagdM0MO3wzP
+         voIYEuRTLrrAT5XuY3/8zXuWoaxPhwtratL2/RQryE+I6wC0hh5x9yOppcg3zxKWABo3
+         1nahumzWq/kxjypHianUUh6Lyo0kTCe4duxcHSnT/UIN3EJ+P9q9dVeyTu3rEGVF1z+a
+         InRQ==
+X-Gm-Message-State: AOAM5326R6nubrY6X1/PzYNRIWBJpav4STFkYOv22VO+N0M9JEm+gVKJ
+        zEaj6Qsn4ugWyXM03N6HUCg68mwm7/crK6QGLM1Az6MTV5hRJmMZccwYiaTD30SoigIITmpkM2b
+        3aO7oYf/akTIJNk56SgifpDXshtppwdgd1658Vb8wqZVLqbP1cd6opX4GBNIYk78NMsDQf9ImKV
+        6AfSs5RcpTWZM=
+X-Google-Smtp-Source: ABdhPJzEi2reB2QkvRgXPspCDMxn06vRFSQNnLuHJbCRdmzu1xM34ZD7AntW2N9QgHsdrGYLBOWUxDXBd6OFTj6f1g==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:9f82:5515:89:f2cb])
- (user=howardchung job=sendgmr) by 2002:a05:6214:dce:: with SMTP id
- 14mr9060709qvt.34.1627884786950; Sun, 01 Aug 2021 23:13:06 -0700 (PDT)
-Date:   Mon,  2 Aug 2021 14:12:40 +0800
+ (user=howardchung job=sendgmr) by 2002:a25:af81:: with SMTP id
+ g1mr18498936ybh.172.1627884790844; Sun, 01 Aug 2021 23:13:10 -0700 (PDT)
+Date:   Mon,  2 Aug 2021 14:12:41 +0800
 In-Reply-To: <20210802061250.170975-1-howardchung@google.com>
-Message-Id: <20210802141140.Bluez.v7.3.If0cf6e1feb9e9cc8106793bcaea60202852d7095@changeid>
+Message-Id: <20210802141140.Bluez.v7.4.Ia4dc489979e4bf7ffa3421199b1b9fd8d7f00bbc@changeid>
 Mime-Version: 1.0
 References: <20210802061250.170975-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v7 03/13] mcap: add adapter authorization
+Subject: [Bluez PATCH v7 04/13] core: block not allowed UUID connect in auth
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>
@@ -74,206 +74,79 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-Currently mcap is the only profile that doesn't request adatper
-authorization. This patch adds a argument when creating the mcap
-instance to set authorize method. The reason why we don't use
-btd_request_authorization directly like all other profiles is because
-tools/mcaptest includes the profile/health/mcap.h. If we add dependency
-to adapter.h in mcap.h, it will make mcaptest depend on adapter and be
-not able to build independently.
+This ensures any incoming profile connection will be blocked if its UUID
+is not allowed by the following assumption:
+
+1. Each system profile asks adapter authorization when seeing a incoming
+   connection.
+2. Each external profile checks if its UUID is allowed by adapter when
+   seeing a incoming connection.
 ---
+The following test steps were performed after enabling admin plugin:
+1. Set ServiceAllowList to ["1234"].
+2. Turn on a paired classic keyboard. Verify it can not be connected.
+3. Set ServiceAllowList to
+   ["1800","1801","180A","180F","1812"]
+4. Turn off and turn on the keyboard. Verift it can be connected.
 
 (no changes since v1)
 
- android/health.c       |  2 +-
- profiles/health/hdp.c  |  1 +
- profiles/health/mcap.c | 38 ++++++++++++++++++++++++++++++++++++--
- profiles/health/mcap.h |  9 +++++++++
- tools/mcaptest.c       |  2 +-
- 5 files changed, 48 insertions(+), 4 deletions(-)
+ src/adapter.c |  5 +++++
+ src/profile.c | 11 +++++++++++
+ 2 files changed, 16 insertions(+)
 
-diff --git a/android/health.c b/android/health.c
-index 9a29964b1be2..de50db98e988 100644
---- a/android/health.c
-+++ b/android/health.c
-@@ -2008,7 +2008,7 @@ bool bt_health_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
- 					mcl_connected, mcl_reconnected,
- 					mcl_disconnected, mcl_uncached,
- 					NULL, /* CSP is not used right now */
--					NULL, &err);
-+					NULL, NULL, &err);
- 	if (!mcap) {
- 		error("health: MCAP instance creation failed %s", err->message);
- 		g_error_free(err);
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index 6bc41946fef3..efa8955efaea 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -1347,6 +1347,7 @@ static gboolean update_adapter(struct hdp_adapter *hdp_adapter)
- 				mcl_connected, mcl_reconnected,
- 				mcl_disconnected, mcl_uncached,
- 				NULL, /* CSP is not used by now */
-+				btd_request_authorization,
- 				hdp_adapter, &err);
- 	if (hdp_adapter->mi == NULL) {
- 		error("Error creating the MCAP instance: %s", err->message);
-diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
-index be13af37a0b8..a7eaba51693a 100644
---- a/profiles/health/mcap.c
-+++ b/profiles/health/mcap.c
-@@ -14,6 +14,7 @@
- #endif
+diff --git a/src/adapter.c b/src/adapter.c
+index c7fe27d19a5d..6c8096147bdd 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -7118,6 +7118,11 @@ static gboolean process_auth_queue(gpointer user_data)
+ 		if (auth->svc_id > 0)
+ 			return FALSE;
  
- #define _GNU_SOURCE
-+#include <dbus/dbus.h>
- #include <netinet/in.h>
- #include <stdlib.h>
- #include <errno.h>
-@@ -23,6 +24,7 @@
- #include <glib.h>
- 
- #include "lib/bluetooth.h"
-+#include "lib/uuid.h"
- #include "bluetooth/l2cap.h"
- #include "btio/btio.h"
- #include "src/log.h"
-@@ -1980,7 +1982,6 @@ static void set_mcl_conf(GIOChannel *chan, struct mcap_mcl *mcl)
- 	mcl->state = MCL_CONNECTED;
- 	mcl->role = MCL_ACCEPTOR;
- 	mcl->req = MCL_AVAILABLE;
--	mcl->cc = g_io_channel_ref(chan);
- 	mcl->ctrl |= MCAP_CTRL_STD_OP;
- 
- 	mcap_sync_init(mcl);
-@@ -2005,19 +2006,38 @@ static void set_mcl_conf(GIOChannel *chan, struct mcap_mcl *mcl)
- 		mcl->mi->mcl_connected_cb(mcl, mcl->mi->user_data);
- }
- 
-+static void auth_callback(DBusError *derr, void *user_data)
-+{
-+	struct mcap_mcl *mcl = user_data;
++		if (!btd_adapter_is_uuid_allowed(adapter, auth->uuid)) {
++			auth->cb(&err, auth->user_data);
++			goto next;
++		}
 +
-+	if (derr) {
-+		error("Access denied: %s", derr->message);
-+		goto reject;
+ 		if (device_is_trusted(device) == TRUE) {
+ 			auth->cb(NULL, auth->user_data);
+ 			goto next;
+diff --git a/src/profile.c b/src/profile.c
+index 60d17b6ae657..e1bebf1ee19c 100644
+--- a/src/profile.c
++++ b/src/profile.c
+@@ -1249,6 +1249,11 @@ static void ext_confirm(GIOChannel *io, gpointer user_data)
+ 
+ 	DBG("incoming connect from %s", addr);
+ 
++	if (!btd_adapter_is_uuid_allowed(adapter_find(&src), uuid)) {
++		info("UUID %s is not allowed. Igoring the connection", uuid);
++		return;
 +	}
 +
-+	set_mcl_conf(mcl->cc, mcl);
-+	return;
-+
-+reject:
-+	g_io_channel_shutdown(mcl->cc, TRUE, NULL);
-+	g_io_channel_unref(mcl->cc);
-+}
-+
- static void connect_mcl_event_cb(GIOChannel *chan, GError *gerr,
- 							gpointer user_data)
- {
- 	struct mcap_instance *mi = user_data;
- 	struct mcap_mcl *mcl;
--	bdaddr_t dst;
-+	bdaddr_t src, dst;
- 	char address[18], srcstr[18];
- 	GError *err = NULL;
-+	guint ret;
- 
- 	if (gerr)
+ 	conn = create_conn(server, io, &src, &dst);
+ 	if (conn == NULL)
  		return;
+@@ -1272,6 +1277,7 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
+ 	struct ext_profile *ext = server->ext;
+ 	GError *gerr = NULL;
+ 	struct ext_io *conn;
++	const char *uuid = ext->service ? ext->service : ext->uuid;
+ 	bdaddr_t src, dst;
  
- 	bt_io_get(chan, &err,
-+			BT_IO_OPT_SOURCE_BDADDR, &src,
- 			BT_IO_OPT_DEST_BDADDR, &dst,
- 			BT_IO_OPT_DEST, address,
- 			BT_IO_OPT_INVALID);
-@@ -2044,6 +2064,18 @@ static void connect_mcl_event_cb(GIOChannel *chan, GError *gerr,
- 		mcl->next_mdl = (rand() % MCAP_MDLID_FINAL) + 1;
+ 	bt_io_get(io, &gerr,
+@@ -1285,6 +1291,11 @@ static void ext_direct_connect(GIOChannel *io, GError *err, gpointer user_data)
+ 		return;
  	}
  
-+	mcl->cc = g_io_channel_ref(chan);
-+	if (mi->authorize_cb) {
-+		ret = mi->authorize_cb(&src, &dst, HDP_UUID, auth_callback,
-+									mcl);
-+		if (ret != 0)
-+			return;
-+
-+		error("HDP: authorization for device %s failed", address);
-+		g_io_channel_unref(mcl->cc);
-+		goto drop;
++	if (!btd_adapter_is_uuid_allowed(adapter_find(&src), uuid)) {
++		info("UUID %s is not allowed. Igoring the connection", uuid);
++		return;
 +	}
 +
- 	set_mcl_conf(chan, mcl);
- 
- 	return;
-@@ -2060,6 +2092,7 @@ struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
- 					mcap_mcl_event_cb mcl_disconnected,
- 					mcap_mcl_event_cb mcl_uncached,
- 					mcap_info_ind_event_cb mcl_sync_info_ind,
-+					mcap_authorize_cb authorize_cb,
- 					gpointer user_data,
- 					GError **gerr)
- {
-@@ -2089,6 +2122,7 @@ struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
- 	mi->mcl_disconnected_cb = mcl_disconnected;
- 	mi->mcl_uncached_cb = mcl_uncached;
- 	mi->mcl_sync_infoind_cb = mcl_sync_info_ind;
-+	mi->authorize_cb = authorize_cb;
- 	mi->user_data = user_data;
- 	mi->csp_enabled = FALSE;
- 
-diff --git a/profiles/health/mcap.h b/profiles/health/mcap.h
-index 5a94c8b63bea..48b7d7846c57 100644
---- a/profiles/health/mcap.h
-+++ b/profiles/health/mcap.h
-@@ -9,6 +9,8 @@
-  *
-  */
- 
-+#include <dbus/dbus.h>
-+
- #define MCAP_VERSION	0x0100	/* current version 01.00 */
- 
- /* bytes to get MCAP Supported Procedures */
-@@ -249,6 +251,11 @@ typedef void (* mcap_sync_set_cb) (struct mcap_mcl *mcl,
- 					GError *err,
- 					gpointer data);
- 
-+typedef void mcap_auth_cb(DBusError *derr, void *user_data);
-+typedef guint (* mcap_authorize_cb) (const bdaddr_t *src, const bdaddr_t *dst,
-+					const char *uuid, mcap_auth_cb cb,
-+					void *user_data);
-+
- struct mcap_mdl_cb {
- 	mcap_mdl_event_cb		mdl_connected;	/* Remote device has created a MDL */
- 	mcap_mdl_event_cb		mdl_closed;	/* Remote device has closed a MDL */
-@@ -271,6 +278,7 @@ struct mcap_instance {
- 	mcap_mcl_event_cb	mcl_disconnected_cb;	/* MCL disconnected */
- 	mcap_mcl_event_cb	mcl_uncached_cb;	/* MCL has been removed from MCAP cache */
- 	mcap_info_ind_event_cb	mcl_sync_infoind_cb;	/* (CSP Master) Received info indication */
-+	mcap_authorize_cb	authorize_cb;		/* Method to request authorization */
- 	gpointer		user_data;		/* Data to be provided in callbacks */
- 	int			ref;			/* Reference counter */
- 
-@@ -404,6 +412,7 @@ struct mcap_instance *mcap_create_instance(const bdaddr_t *src,
- 					mcap_mcl_event_cb mcl_disconnected,
- 					mcap_mcl_event_cb mcl_uncached,
- 					mcap_info_ind_event_cb mcl_sync_info_ind,
-+					mcap_authorize_cb authorize_cb,
- 					gpointer user_data,
- 					GError **gerr);
- void mcap_release_instance(struct mcap_instance *mi);
-diff --git a/tools/mcaptest.c b/tools/mcaptest.c
-index dcef0b908ac8..63ee22149a40 100644
---- a/tools/mcaptest.c
-+++ b/tools/mcaptest.c
-@@ -434,7 +434,7 @@ int main(int argc, char *argv[])
- 					mcl_connected, mcl_reconnected,
- 					mcl_disconnected, mcl_uncached,
- 					NULL, /* CSP is not used right now */
--					NULL, &err);
-+					NULL, NULL, &err);
- 
- 	if (!mcap) {
- 		printf("MCAP instance creation failed %s\n", err->message);
+ 	conn = create_conn(server, io, &src, &dst);
+ 	if (conn == NULL)
+ 		return;
 -- 
 2.32.0.554.ge1b32706d8-goog
 
