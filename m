@@ -2,165 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 17CAFC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 04:07:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EACBFC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:12:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAA6261050
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 04:07:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFF7160EE8
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  2 Aug 2021 06:12:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbhHBEH1 (ORCPT
+        id S231958AbhHBGNF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 2 Aug 2021 00:07:27 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:48932 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229500AbhHBEH1 (ORCPT
+        Mon, 2 Aug 2021 02:13:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40280 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229792AbhHBGNF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 2 Aug 2021 00:07:27 -0400
-Received: by mail-il1-f197.google.com with SMTP id p6-20020a056e021446b0290205af2e2342so7703647ilo.15
-        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Aug 2021 21:07:18 -0700 (PDT)
+        Mon, 2 Aug 2021 02:13:05 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A62DC06175F
+        for <linux-bluetooth@vger.kernel.org>; Sun,  1 Aug 2021 23:12:56 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id w26-20020a05620a129ab02903b9eeb8b45dso8103469qki.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 01 Aug 2021 23:12:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=iZF+42747nTECmbQEpmwvPedWXQvvIZLebZREQolKd8=;
+        b=RL1j9U2rF1GX9FKLq9Ffrw/6hA5vleXf4t2k/q5LQZzQZCg5xHPW/xIJFs3jp5wFJm
+         yv1jNMi8STK8Kzc3CqPHc/Gpv2w+GCzYvKmQ/N6GKcc3sT8k6cuR+Q5f65l5f2EcTo0s
+         qYrLoCjpJfp8ZHzeZXwswJe3li7UnHm6XcX2HLLOmfEg85+8HOeBOYURKWM2Hhg5f96E
+         HqG3Cm+GtkAItYBYorm0nli5KochRe4a7WsGmJJ4iw4lADDDZuu1P2icAWta6l1OX+LR
+         mr5xhwH6rD3Q+p1sv56G+yLYvGJ8c9CndfiUBgwV02b+8bU5+8hrgyP3qfh8eDvQT2kq
+         YCTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=9Wk7WJ2AalfetOwN+B2EmORMek+8iV47E0Dl7NfLfdE=;
-        b=pNeNp0Di4ZHZ5DDVRxK7zqymcTVo6kUMMB5bPc8zy4F7xyiCcoAZySV8zTztyIG1Y8
-         r6we7T7wDHlGRsWkOk0xIix828P2md5Qgat4ji9ShuNlG8JCDFbMoeZpWGnvMhfN+A9h
-         zrsopY17ilIpy8ukqXAQMLuJH5/5PNjAKIYB1cx0LY5AxTU4pkL3a4SsvXlkhK/BeQll
-         pMek+fIV8Hi9YhmUFyfctqhc0WHMASVBgX30vpm1SjQh5TTj2RrwvZGs4EkREEOhVEfw
-         mcIAJluYzs694VNPwhCT6CKT77BcKYMurqlXUMfob62E2Vk3XVY1hVp3h4X5Amin7y66
-         dxmw==
-X-Gm-Message-State: AOAM530zurfOYiVwmMbBrC5PfSfr89SGOOJGD8GCFAE1/iAbsWhTTTdf
-        v11tu9kUJz63XSVV4gf+wxFBb6Lu8ZB4VvPYmM+FJj63kj5t
-X-Google-Smtp-Source: ABdhPJxYKgvtJeSsOJsK3ivfttNjcCGN7qbfp5MXh+tl/+q9dLKCM9D7cpnrWBxCnwg7WtHfvFpmmkUn5lcFTjq9wJvq5y8eImxC
-MIME-Version: 1.0
-X-Received: by 2002:a5e:9918:: with SMTP id t24mr516718ioj.24.1627877238118;
- Sun, 01 Aug 2021 21:07:18 -0700 (PDT)
-Date:   Sun, 01 Aug 2021 21:07:18 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000084201105c88bb48a@google.com>
-Subject: [syzbot] general protection fault in hci_release_dev
-From:   syzbot <syzbot+47c6d0efbb7fe2f7a5b8@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, luiz.von.dentz@intel.com,
-        marcel@holtmann.org, netdev@vger.kernel.org,
-        penguin-kernel@I-love.SAKURA.ne.jp,
-        penguin-kernel@i-love.sakura.ne.jp, syzkaller-bugs@googlegroups.com
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=iZF+42747nTECmbQEpmwvPedWXQvvIZLebZREQolKd8=;
+        b=dokgCugWgiRZsFgx1Q0ZsVc1nT7J5ncW/kfBlEtuLIG/w13QzunBNRKDeTccMlHKYN
+         xtBWRyi+VkzFl42QzxWX3n4RdYuLbB91UBeyhRGSGY6XOZVp2200i3iG1IMnpfDuXp83
+         ZV69YJqVHYbHcwuCdIvn+HPDx7LT5sKTu1KHPWDSbFqyeddEJPhdHTwOcZo7vWEI82Q/
+         22ZZ573yW1xvrc6SleD7YMJvE9Y4AOg/Lb2+82Kkz2Wkf/M0oxdutQWtZmTHN4+ZH2Ln
+         q+9Qs1wLsuaXIHzXgvxr0M4UrzqmmvUD9hTXnToZxzz9bAg87ioaVBvRjFBps9VXE9XP
+         Vrpw==
+X-Gm-Message-State: AOAM53370dg2pH3JfN2QAoKRIaG0G66RA3pK7EPPDRuRFJ7nQxtVrShc
+        MBpv234Pyey8ubUEDw2/59Pt6/aCbAUrLiwQOA2nvPm34g0wqYXQmtiANqQ9zpNwIVoFrtNIdKM
+        S0mXYHYO85mjKPM2T2kvuENK3xOd0KlPojufrUM+v1BlhfJGwusCVBsY+uoSsXkTDiZPISddCRu
+        gCzZiTUbL+p/M=
+X-Google-Smtp-Source: ABdhPJxUq/LZgY94Cvbg5tdySA2KUKKNyZGJ6Wsie0Wm9jHam7X4CSGhu0ibeqzb7hiO/etXbI84Oo6eLwNx8oZxRA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:9f82:5515:89:f2cb])
+ (user=howardchung job=sendgmr) by 2002:a05:6214:d1:: with SMTP id
+ f17mr15008533qvs.12.1627884775474; Sun, 01 Aug 2021 23:12:55 -0700 (PDT)
+Date:   Mon,  2 Aug 2021 14:12:37 +0800
+Message-Id: <20210802061250.170975-1-howardchung@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [Bluez PATCH v7 00/13] Admin policy series
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Yun-Hao Chung <howardchung@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
-
-syzbot found the following issue on:
-
-HEAD commit:    5a4cee98ea75 Add linux-next specific files for 20210728
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=146e451e300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=143f7094479da395
-dashboard link: https://syzkaller.appspot.com/bug?extid=47c6d0efbb7fe2f7a5b8
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=118c3162300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10500872300000
-
-The issue was bisected to:
-
-commit 73333364afebb5e45807139bc79e6a6574c1874b
-Author: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Date:   Mon Jul 26 21:12:04 2021 +0000
-
-    Bluetooth: defer cleanup of resources in hci_unregister_dev()
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=169b6346300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=159b6346300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=119b6346300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+47c6d0efbb7fe2f7a5b8@syzkaller.appspotmail.com
-Fixes: 73333364afeb ("Bluetooth: defer cleanup of resources in hci_unregister_dev()")
-
-general protection fault, probably for non-canonical address 0xdffffc0000000023: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000118-0x000000000000011f]
-CPU: 1 PID: 8467 Comm: syz-executor744 Not tainted 5.14.0-rc3-next-20210728-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:workqueue_sysfs_unregister kernel/workqueue.c:5732 [inline]
-RIP: 0010:destroy_workqueue+0x2e/0x800 kernel/workqueue.c:4386
-Code: 49 89 fe 41 55 41 54 55 53 48 83 ec 08 e8 aa 5c 29 00 49 8d be 18 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 2e 07 00 00 49 8b 9e 18 01 00 00 48 85 db 74 19
-RSP: 0018:ffffc90009577a98 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: dffffc0000000000 RCX: 0000000000000000
-RDX: 0000000000000023 RSI: ffffffff814c5bc6 RDI: 0000000000000118
-RBP: ffff8880131ad340 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff81a39748 R11: 0000000000000000 R12: ffff8880131ac000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000480da8 CR3: 000000000b68e000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- hci_release_dev+0x125/0xb70 net/bluetooth/hci_core.c:4048
- bt_host_release+0x15/0x20 net/bluetooth/hci_sysfs.c:86
- device_release+0x9f/0x240 drivers/base/core.c:2193
- kobject_cleanup lib/kobject.c:705 [inline]
- kobject_release lib/kobject.c:736 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x1c8/0x540 lib/kobject.c:753
- put_device+0x1b/0x30 drivers/base/core.c:3463
- hci_uart_tty_close+0x1e4/0x2a0 drivers/bluetooth/hci_ldisc.c:546
- tty_ldisc_close+0x110/0x190 drivers/tty/tty_ldisc.c:474
- tty_ldisc_kill+0x94/0x150 drivers/tty/tty_ldisc.c:629
- tty_ldisc_release+0xe3/0x2a0 drivers/tty/tty_ldisc.c:803
- tty_release_struct+0x20/0xe0 drivers/tty/tty_io.c:1706
- tty_release+0xc70/0x1200 drivers/tty/tty_io.c:1878
- __fput+0x288/0x920 fs/file_table.c:280
- task_work_run+0xdd/0x1a0 kernel/task_work.c:164
- exit_task_work include/linux/task_work.h:32 [inline]
- do_exit+0xbd4/0x2a60 kernel/exit.c:825
- do_group_exit+0x125/0x310 kernel/exit.c:922
- __do_sys_exit_group kernel/exit.c:933 [inline]
- __se_sys_exit_group kernel/exit.c:931 [inline]
- __x64_sys_exit_group+0x3a/0x50 kernel/exit.c:931
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x43da49
-Code: Unable to access opcode bytes at RIP 0x43da1f.
-RSP: 002b:00007ffc6bba0fb8 EFLAGS: 00000246 ORIG_RAX: 00000000000000e7
-RAX: ffffffffffffffda RBX: 00000000004ae230 RCX: 000000000043da49
-RDX: 000000000000003c RSI: 00000000000000e7 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffffffffffc0 R09: 0000000000400488
-R10: 0000000000000000 R11: 0000000000000246 R12: 00000000004ae230
-R13: 0000000000000001 R14: 0000000000000000 R15: 0000000000000001
-Modules linked in:
----[ end trace 516dd52cdf23e662 ]---
-RIP: 0010:workqueue_sysfs_unregister kernel/workqueue.c:5732 [inline]
-RIP: 0010:destroy_workqueue+0x2e/0x800 kernel/workqueue.c:4386
-Code: 49 89 fe 41 55 41 54 55 53 48 83 ec 08 e8 aa 5c 29 00 49 8d be 18 01 00 00 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 2e 07 00 00 49 8b 9e 18 01 00 00 48 85 db 74 19
-RSP: 0018:ffffc90009577a98 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: dffffc0000000000 RCX: 0000000000000000
-RDX: 0000000000000023 RSI: ffffffff814c5bc6 RDI: 0000000000000118
-RBP: ffff8880131ad340 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff81a39748 R11: 0000000000000000 R12: ffff8880131ac000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000480da8 CR3: 000000000b68e000 CR4: 00000000001506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+From: Yun-Hao Chung <howardchung@chromium.org>
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Hi manintainers,
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+This series is to
+1. Implement a few methods in core so that a plugin can have control of
+   allowing / disallowing certain service connections.
+2. Implement the AdminPolicy plugin. The plugin provides interfaces
+   AdminPolicySet and AdminPolicyStatus. For each policy, users should
+   set the value thorugh AdminPolicySet and query the current setting
+   through AdminPolicyStatus. We separeted these two interfaces so that
+   developers can assign different groups of users to these interfaces.
+   Currently the only policy is ServiceAllowList, which make bluez only
+   allow a list of service by specified their UUIDs, but the plugin is
+   also expected to provide more controls over other bluez behaviors.
+Since the second part is a plugin, it might not be necessary to land in
+upstream tree.
+
+Thanks.
+
+Changes in v7:
+- Fix compiler errors in profiles/hdp.c
+
+Changes in v6:
+- include <errno.h> instead of <error.h> in plugins/admin.c
+
+Changes in v5:
+- Fix compiler errors in plugins/admin.c
+
+Changes in v4:
+- Update commit message (admin_policy -> admin)
+- remove old plugins/admin_policy.c
+
+Changes in v3:
+- Rename plugins/admin_policy.c -> plugins/admin.c
+- Use device_added callback in btd_adapter_driver instead of listen for
+  dbus
+- Add authorization method in profiles/health/mcap.c and block incoming
+  connections in adapter authorization function.
+
+Changes in v2:
+- Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
+- Modify the criteria to say a device is `Affected` from any-of-uuid
+  to any-of-auto-connect-profile.
+- Remove the code to remove/reprobe disallowed/allowed profiles,
+  instead, check if the service is allowed in bt_io_accept connect_cb.
+- Fix a typo in emit_property_change in
+  plugin/admin_policy.c:set_service_allowlist
+- Instead of using device_state_cb, utilize D-BUS client to watch device
+  added/removed.
+- Add a document in doc/
+
+Yun-Hao Chung (13):
+  core: add is_allowed property in btd_service
+  core: add adapter and device allowed_uuid functions
+  mcap: add adapter authorization
+  core: block not allowed UUID connect in auth
+  core: add device_added and device_removed to adapter driver
+  plugins: new plugin
+  plugins/admin: add admin_policy adapter driver
+  plugins/admin: add ServiceAllowList method
+  plugins/admin: add ServiceAllowList property
+  plugins/admin: add device callbacks
+  plugins/admin: add AffectedByPolicy property
+  plugins/admin: persist policy settings
+  doc: add description of admin policy
+
+ Makefile.plugins         |   5 +
+ android/health.c         |   2 +-
+ bootstrap-configure      |   1 +
+ configure.ac             |   4 +
+ doc/admin-policy-api.txt |  65 +++++
+ plugins/admin.c          | 592 +++++++++++++++++++++++++++++++++++++++
+ profiles/health/hdp.c    |   1 +
+ profiles/health/mcap.c   |  38 ++-
+ profiles/health/mcap.h   |   9 +
+ src/adapter.c            | 154 +++++++++-
+ src/adapter.h            |  12 +
+ src/device.c             |  64 ++++-
+ src/device.h             |   2 +
+ src/profile.c            |  11 +
+ src/service.c            |  39 +++
+ src/service.h            |   2 +
+ tools/mcaptest.c         |   2 +-
+ 17 files changed, 993 insertions(+), 10 deletions(-)
+ create mode 100644 doc/admin-policy-api.txt
+ create mode 100644 plugins/admin.c
+
+-- 
+2.32.0.554.ge1b32706d8-goog
+
