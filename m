@@ -2,73 +2,66 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8CFC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 10068C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9254160EE9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E70EF60C3F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235616AbhHCLnn (ORCPT
+        id S235615AbhHCLnk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Aug 2021 07:43:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
+        Tue, 3 Aug 2021 07:43:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235560AbhHCLnm (ORCPT
+        with ESMTP id S234171AbhHCLnj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Aug 2021 07:43:42 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0677C061757
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 04:43:30 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d10-20020a170902e14ab029012ccda38630so862617pla.15
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 04:43:30 -0700 (PDT)
+        Tue, 3 Aug 2021 07:43:39 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 25A24C061757
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 04:43:27 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id a6-20020a25ae060000b0290551bbd99700so22643816ybj.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 04:43:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=jJr8Pj0oZi3uk1UfApDjJ/uA6UIySU3eGXKkrZPI+TI=;
-        b=uY3eSxva/IshEHaeLnV67BRybKCeU4uXYg5AytfXon/vo9mPal1ALKBvzz1oO6xbEx
-         DdK6LlA9XSU+1uYHVI1WOLtsx1l7T8X5X9Y3Jlr2FYGPQSO5rbcDRRiuIS+rCtRotoNl
-         H4YoqMrzxq3e5ggHT+aCQMnVmhrdciFXvxf5NN4oFzWioaj5HdIvyVumYvLx3Rt6Rkmx
-         tndv28Lap/7hG6AlrTlNed0w4VI0XCg7t8rQ/NBaFl208eGTeRcjiWET5fg8PWNPvf5D
-         Tf2ZhHvgB44xuq/3ihiznXEa5eHpaO22OGjH7RyoMSYYuMvZRwjCYlmotk39BBXoLc04
-         1huA==
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=dnzKJiMv0Udzq9gGlj67AB4Clpgus0ypSbnBf8N7YG8=;
+        b=bcWj2THFpBmlv3V0g1yjkFeJUyH5MQPtzJYrcrCmDmY5Sw6xtZmCLMkG9bZDjRQjXb
+         0GK/ybt4DMGVq4ZPxoqcRy3DbIQVWJ/wgNBuAD1CU8mpLdM4VfzxMGWqjqpAmcOXJb59
+         id4hToPwq71muyFhOIYeOoQJAhH8a6YgyH9jL3hcWze1XkzBvIiSp+o21T3qqabCl5XN
+         2IjVABmlLVKnfzLW1+jM7wIyTuquzshPv3infr1KY4hzB5c23R0Gmvx7W+rTpVaAy8V+
+         MUjUw6uQgXOp3pgcvnzO00DYP1Z0rda2jFZ10wtRXTCsRNTiA81kCZsf3jKWitOWBUbE
+         gOlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=jJr8Pj0oZi3uk1UfApDjJ/uA6UIySU3eGXKkrZPI+TI=;
-        b=hp73+MemdQ4EXQOj3hvY+r8TBrMHROo2JiEoILH6Wx2+B9AaYOWNXhczsB2kcS3LWN
-         aZMtzqPiTL1BghJPKBkINQc/KxggJMCXwM36PACLEsf/Y9NrjPYYGTwQU/Iqpuq2h52D
-         DWM6dQjEDTMkFGc9LKoEnfySwLRibcA7XRNenwuglIlZIyFGEBl5eAjwarAIPDGTYoMn
-         QtlE/xnBlXrk0HjOwhFfvzXvCSGYgk9MiESKGX3RIx2CFi0iL+CburMlBtIEXtqEaaB6
-         EWgrENjrKRm4/sVmeC+kv3gQnQRKKcsGGvkECapmWOUYrMS42+/4G9DTO5USCIpk6kh6
-         8nMg==
-X-Gm-Message-State: AOAM532VB4+R2fPPcGgBLt2lGSUSi4iioqZnGkU5lZ6UGLOVucDqxfUE
-        9bZzBBUBXAvmBstQWvZ8LsvYxzICQBzvF9RWjAHzcO71pXb+R8Fm/14UUUuZitcbClan5uyFaNS
-        i4HyvtoIjPK3js1Qr6Ujt3NsSgbdd8H/OHxtohgfS/zwlkDDeqeip2ByU1yBJKMioNvl9Hqz1en
-        XjSl3n5PcD8HI=
-X-Google-Smtp-Source: ABdhPJwD9TqM8D8ycgJQZDG7+vRcmM1AkeJdN+uhfhh1/4UR3Xixr6/gEBpjwMg+HyweZ9Xl3bUgRtElF0heW1kjaA==
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=dnzKJiMv0Udzq9gGlj67AB4Clpgus0ypSbnBf8N7YG8=;
+        b=q8/a6ao2r9pkf9SDkRKVv/841+1sQ89Pra9rn7h3TXpbJd6CK3HdeFwQbomxCPvST0
+         OjsN1jQ6axQWegc7KRMr2UTRLQHhm9UQjsLYUIToKpbE5Y7VN8DwYaapVXlj4JM73/yJ
+         A0OIlKiXyed0rfFjxZ+HGVhsrVGpA+G/AAwSMgvTOoB2LLl7oE/ZaxTEKRY4zsID5w0x
+         lZN39+AWq3hAG1lqa4jzNTE72GS4Keib+btbOXs4qpTLIo/ulVLKWS9G/AeXCXEe3PG1
+         /MyLSTnsrsL9X1G1W2gHCgsc5hsXdKsDYOoJgs79dE7uxCK+6lp/AUc1/30XCm09klwq
+         xHlg==
+X-Gm-Message-State: AOAM530hIiyA2iykjo3DLVx1DqzjJ/X5muIKWiqwdQNMmFmxBdAak3uN
+        +/JoAsOhs85nm8JQIWUZCI2kw0ObCv5JYEet2IQSWOyrwlqXjYT/UHdg7SoYoA9zKiARBLhiMVR
+        U6O3VUgRR81bheJsWTd0i0DpjsLb7GcvQGblLRTnTz9MU82qi9KxOZYiUrzxiCMhf/O2MdBeW9M
+        Nc4whcIZzM+sE=
+X-Google-Smtp-Source: ABdhPJzZ3DFu/517puK2AYHhqyjDduqDL8XON9NQSvMJMs1/JhP+U4JHU8xnlUCJIWqZV1lwM1m+NoUAzVnS1ezD4g==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ef55:8161:c77b:7a8d])
- (user=howardchung job=sendgmr) by 2002:aa7:93b1:0:b029:3c0:a7b7:3db0 with
- SMTP id x17-20020aa793b10000b02903c0a7b73db0mr7306717pff.40.1627991010165;
- Tue, 03 Aug 2021 04:43:30 -0700 (PDT)
-Date:   Tue,  3 Aug 2021 19:43:05 +0800
-In-Reply-To: <20210803114317.801840-1-howardchung@google.com>
-Message-Id: <20210803194127.Bluez.v9.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+ (user=howardchung job=sendgmr) by 2002:a25:186:: with SMTP id
+ 128mr27432012ybb.434.1627991006327; Tue, 03 Aug 2021 04:43:26 -0700 (PDT)
+Date:   Tue,  3 Aug 2021 19:43:04 +0800
+Message-Id: <20210803114317.801840-1-howardchung@google.com>
 Mime-Version: 1.0
-References: <20210803114317.801840-1-howardchung@google.com>
 X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v9 01/13] core: add is_allowed property in btd_service
+Subject: [Bluez PATCH v9 00/13] Admin policy series
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     Yun-Hao Chung <howardchung@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
+Cc:     Yun-Hao Chung <howardchung@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -76,12 +69,24 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-This adds is_allowed property in btd_service. When is_allowed is set to
-false, calling btd_service_connect and service_accept will fail and the
-existing service connection gets disconnected.
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
----
+Hi manintainers,
+
+This series is to
+1. Implement a few methods in core so that a plugin can have control of
+   allowing / disallowing certain service connections.
+2. Implement the AdminPolicy plugin. The plugin provides interfaces
+   AdminPolicySet and AdminPolicyStatus. For each policy, users should
+   set the value thorugh AdminPolicySet and query the current setting
+   through AdminPolicyStatus. We separeted these two interfaces so that
+   developers can assign different groups of users to these interfaces.
+   Currently the only policy is ServiceAllowList, which make bluez only
+   allow a list of service by specified their UUIDs, but the plugin is
+   also expected to provide more controls over other bluez behaviors.
+Since the second part is a plugin, it might not be necessary to land in
+upstream tree.
+
+Thanks.
 
 Changes in v9:
 - Fix gitlint error in patch 'core: add device callbacks to adapter
@@ -122,95 +127,38 @@ Changes in v2:
   added/removed.
 - Add a document in doc/
 
- src/service.c | 33 +++++++++++++++++++++++++++++++++
- src/service.h |  2 ++
- 2 files changed, 35 insertions(+)
+Yun-Hao Chung (13):
+  core: add is_allowed property in btd_service
+  core: add device callbacks to adapter driver
+  core: add adapter and device allowed_uuid functions
+  core: block not allowed UUID connect in auth
+  plugins: new plugin
+  plugins/admin: add admin_policy adapter driver
+  plugins/admin: add ServiceAllowList method
+  plugins/admin: add ServiceAllowList property
+  plugins/admin: add device callbacks
+  plugins/admin: add AffectedByPolicy property
+  plugins/admin: persist policy settings
+  doc: add description of admin policy
+  doc: add admin policy file storage description
 
-diff --git a/src/service.c b/src/service.c
-index 21a52762e637..84fbb208a7e9 100644
---- a/src/service.c
-+++ b/src/service.c
-@@ -41,6 +41,7 @@ struct btd_service {
- 	void			*user_data;
- 	btd_service_state_t	state;
- 	int			err;
-+	bool			is_allowed;
- };
- 
- struct service_state_callback {
-@@ -133,6 +134,7 @@ struct btd_service *service_create(struct btd_device *device,
- 	service->device = device; /* Weak ref */
- 	service->profile = profile;
- 	service->state = BTD_SERVICE_STATE_UNAVAILABLE;
-+	service->is_allowed = true;
- 
- 	return service;
- }
-@@ -186,6 +188,12 @@ int service_accept(struct btd_service *service)
- 	if (!service->profile->accept)
- 		return -ENOSYS;
- 
-+	if (!service->is_allowed) {
-+		info("service %s is not allowed",
-+						service->profile->remote_uuid);
-+		return -ECONNABORTED;
-+	}
-+
- 	err = service->profile->accept(service);
- 	if (!err)
- 		goto done;
-@@ -245,6 +253,12 @@ int btd_service_connect(struct btd_service *service)
- 		return -EBUSY;
- 	}
- 
-+	if (!service->is_allowed) {
-+		info("service %s is not allowed",
-+						service->profile->remote_uuid);
-+		return -ECONNABORTED;
-+	}
-+
- 	err = profile->connect(service);
- 	if (err == 0) {
- 		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
-@@ -361,6 +375,25 @@ bool btd_service_remove_state_cb(unsigned int id)
- 	return false;
- }
- 
-+void btd_service_set_allowed(struct btd_service *service, bool allowed)
-+{
-+	if (allowed == service->is_allowed)
-+		return;
-+
-+	service->is_allowed = allowed;
-+
-+	if (!allowed && (service->state == BTD_SERVICE_STATE_CONNECTING ||
-+			service->state == BTD_SERVICE_STATE_CONNECTED)) {
-+		btd_service_disconnect(service);
-+		return;
-+	}
-+}
-+
-+bool btd_service_is_allowed(struct btd_service *service)
-+{
-+	return service->is_allowed;
-+}
-+
- void btd_service_connecting_complete(struct btd_service *service, int err)
- {
- 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
-diff --git a/src/service.h b/src/service.h
-index 88530cc17d53..5a2a02447b24 100644
---- a/src/service.h
-+++ b/src/service.h
-@@ -51,6 +51,8 @@ int btd_service_get_error(const struct btd_service *service);
- unsigned int btd_service_add_state_cb(btd_service_state_cb cb,
- 							void *user_data);
- bool btd_service_remove_state_cb(unsigned int id);
-+void btd_service_set_allowed(struct btd_service *service, bool allowed);
-+bool btd_service_is_allowed(struct btd_service *service);
- 
- /* Functions used by profile implementation */
- void btd_service_connecting_complete(struct btd_service *service, int err);
+ Makefile.plugins         |   5 +
+ bootstrap-configure      |   1 +
+ configure.ac             |   4 +
+ doc/admin-policy-api.txt |  65 +++++
+ doc/settings-storage.txt |  20 ++
+ plugins/admin.c          | 590 +++++++++++++++++++++++++++++++++++++++
+ src/adapter.c            | 169 ++++++++++-
+ src/adapter.h            |  22 +-
+ src/device.c             |  65 ++++-
+ src/device.h             |   2 +
+ src/profile.c            |  11 +
+ src/service.c            |  33 +++
+ src/service.h            |   2 +
+ 13 files changed, 980 insertions(+), 9 deletions(-)
+ create mode 100644 doc/admin-policy-api.txt
+ create mode 100644 plugins/admin.c
+
 -- 
 2.32.0.554.ge1b32706d8-goog
 
