@@ -2,264 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 402C2C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 21:41:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B2EBC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 22:36:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 217FA60F70
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 21:41:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33DA061037
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 22:36:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229684AbhHCVlu (ORCPT
+        id S233705AbhHCWgw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Aug 2021 17:41:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52092 "EHLO
+        Tue, 3 Aug 2021 18:36:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36602 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbhHCVls (ORCPT
+        with ESMTP id S233675AbhHCWgp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Aug 2021 17:41:48 -0400
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D4047C061757
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 14:41:35 -0700 (PDT)
-Received: by mail-pj1-x102c.google.com with SMTP id mt6so78950pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 14:41:35 -0700 (PDT)
+        Tue, 3 Aug 2021 18:36:45 -0400
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305CEC06175F
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 15:36:33 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id b1-20020a17090a8001b029017700de3903so4003672pjn.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 15:36:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=n2p2ZxWozg0AA5Cqu6tRxilhTcFJhADwJ/T2ig+aIx0=;
-        b=simc63DmqMrDV3Z3kP9959l2TB/flxvz29XJhEiQcWtJE6sBwjM0dS7TzzTi9DzfZE
-         KmjlJ2Bd1OXxUooLF0HBJ8jJOXQbk065WEPlEaQfnQlsfC3FRoNLgK5E7GxaMkm9DkKq
-         R9VzQc2DhqA90vNHjlB8h4L63pcmBhzerV75CS4XMmLLQLOND2AHyPGXf9oZZjK4/3Fi
-         GvU0ce1QLhHwFe0CoAxi8htCbjKDnMBXJIA9lyEwPuyyBOAvurqF/PLDNOnBGrpKwVhZ
-         qSzccinqEZFMFM6fiiNF7zQLRMz1gG8CCp36WNwD0kLNuD8Sj9Gyw+HbuYB79oqj+IwP
-         6nbw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=rdN2JhIjOOQhRcYxKp5fxHXQUXSo2MwDmsRhS4RRhM0=;
+        b=pCNb06U83uxKxeEujcPwuZ5N+l3js+hIj4kZdZFMEGIvhoy70aqS3QVEy1mpXe+Q1a
+         OUUhCs6/gCJ3FJkyvyhxeK0+guJa4ehBEztzT7jC5ttuwMFSO4fUpkFwbEiTJs2Evbb0
+         OH3he9ejcwqGnSG6ph8oWzGFhJ2ZrGgs22cIXm0nkXQFPO64I4fczon8IXDDvHVo61hf
+         uZH2RO1YVqATDBDz60wXTdWvoLrdmna6qyHAc6oUNsqtQLZYvoYIyffr26vlRYE1zqqe
+         LosatybsRLdUcX/0LS9BRG3erdADADnOVg954sE4N2EeLg8PviAEzZxKQ0LXIJIEBctw
+         pN2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=n2p2ZxWozg0AA5Cqu6tRxilhTcFJhADwJ/T2ig+aIx0=;
-        b=NZegSFYb7gRDAj9Gr46fxM+ooMtu/G0kdtv2gcR84Qy/pOWQ+yR0SJsdxc2/sj5Qzk
-         0mJvdiqRz93u4Ol4htk3DjOCcfi9y764qPk8/uNzQ7lZ7grhSgyZL2QfuONWzHfCqkcl
-         IRdJLga7buzDbhmd1yzGurr1TrNfse7qymP7lBXz2WRvHCyslfzQwH6TqylwqxqHzjlO
-         b7lZGMbSWSvz4TKiW1y9CgFvfLMKu/y0ZBtGZKaEXiGhQ1giF7cz9w6bPyEGJs9m/DVx
-         0ZzO4K/XIQ1bTIW66VX7NLf2Gr5M782x72+Y3RS4+SjICp0wBd5Q2JM7c+fhMrkwh21z
-         mnDg==
-X-Gm-Message-State: AOAM531ZMcTPxrN5ffUBuhg4A3i7LnOEuLJkM8BPGNOInPIfhSEBLP8H
-        dMMzSAnSvfSXB9sqduUGANvkGToWKD0=
-X-Google-Smtp-Source: ABdhPJztDqujtj1ww/dszhq0SvMzErCmaqbf6lguec5IOqE4TwNrWjlTeRMz7iaYy4134Zai/rrysA==
-X-Received: by 2002:a17:90a:d190:: with SMTP id fu16mr6479083pjb.157.1628026895036;
-        Tue, 03 Aug 2021 14:41:35 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y64sm57281pgy.32.2021.08.03.14.41.34
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=rdN2JhIjOOQhRcYxKp5fxHXQUXSo2MwDmsRhS4RRhM0=;
+        b=mfjnUMH9iXxxOC1EfD7g3lBX7nLjYzFTA4wm5uOL0/zSZFzgLQJl6S0gYDiws3ACVz
+         /SbYi8dpyk/0WLfSov45YGIrSri5SD3wf5VmzQc17veCQL8DIhOlpkQZ1ETIBI5S9793
+         wrtXebZ8zqs0/ifVQy0sFF+Seatq2mkjfu4GLgdRVz/W4cD8gpDhZSpa1hD4VWmUNd1d
+         Sk+upUOBquTA1bsLIQ3gZsGtw0YRzuKjWCkW5cnqxEWtKcdoLQJ3CclqW9RmZcLn4bL+
+         pE1sOBTL/uU4tLdpBwO21AnuTREDXIdxjeDhJrh83a97zlb+2yUdGG6qubl1sb1Cxqnm
+         o2vg==
+X-Gm-Message-State: AOAM533+GjUYMXOV7zs3T6HRTBlcfyCW+DHNWTpoGJQcYd4VzPGeeYoq
+        cPU3PNZQ74vWIGiW0dyzrplJ0H5waJs=
+X-Google-Smtp-Source: ABdhPJwvZ0OAo7jm2Ph19AA5TqHwMEmh0wcpELJ18dc64xl/K44ZZsuwwUhHUzyO6iA+gylCPqZ2Tw==
+X-Received: by 2002:aa7:8f05:0:b029:3b4:ff54:9a10 with SMTP id x5-20020aa78f050000b02903b4ff549a10mr18486033pfr.29.1628030192384;
+        Tue, 03 Aug 2021 15:36:32 -0700 (PDT)
+Received: from [172.17.0.2] ([52.183.119.12])
+        by smtp.gmail.com with ESMTPSA id s39sm227887pfg.131.2021.08.03.15.36.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 14:41:34 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC] a2dp: Invalidate cache if SetConfiguration fails
-Date:   Tue,  3 Aug 2021 14:41:33 -0700
-Message-Id: <20210803214133.87090-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 03 Aug 2021 15:36:31 -0700 (PDT)
+Message-ID: <6109c4ef.1c69fb81.9a8c4.143e@mx.google.com>
+Date:   Tue, 03 Aug 2021 15:36:31 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7005974465940057564=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [RFC] a2dp: Invalidate cache if SetConfiguration fails
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210803214133.87090-1-luiz.dentz@gmail.com>
+References: <20210803214133.87090-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============7005974465940057564==
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: base64
 
-If SetConfiguration fails with Unsupported Configuration it might
-indicate that either the capabilities stored are incorrect or the seid
-may have changed, so this attempt to invalidate the remote seps loaded
-from cache when that happens so the next time there is an attempt to
-discover this will force Get(All)Capabilities to be called and cause
-the cache to be updated.
----
- profiles/audio/a2dp.c  | 56 ++++++++++++++++++++++++++++++++----------
- profiles/audio/avdtp.c | 11 +++++++++
- profiles/audio/avdtp.h |  2 ++
- 3 files changed, 56 insertions(+), 13 deletions(-)
+VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
+bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
+aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
+dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
+cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NTI1OTA1CgotLS1U
+ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
+ICBQQVNTICAgICAgMC41MyBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
+U1MgICAgICAwLjEzIHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
+ICAgIDUwLjc3IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
+IDAuMTQgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC43
+NiBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxNjguODMg
+c2Vjb25kcwpNYWtlIENoZWNrICAgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMS40OSBzZWNv
+bmRzCk1ha2UgRGlzdGNoZWNrICAgICAgICAgICAgICAgIFBBU1MgICAgICAyNTguODUgc2Vjb25k
+cwpCdWlsZCB3L2V4dCBFTEwgLSBDb25maWd1cmUgICBQQVNTICAgICAgOC43MyBzZWNvbmRzCkJ1
+aWxkIHcvZXh0IEVMTCAtIE1ha2UgICAgICAgIEZBSUwgICAgICAxNTMuNjggc2Vjb25kcwoKRGV0
+YWlscwojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQ2hlY2tQYXRjaCAtIFBB
+U1MKRGVzYzogUnVuIGNoZWNrcGF0Y2gucGwgc2NyaXB0IHdpdGggcnVsZSBpbiAuY2hlY2twYXRj
+aC5jb25mCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogR2l0TGludCAtIFBB
+U1MKRGVzYzogUnVuIGdpdGxpbnQgd2l0aCBydWxlIGluIC5naXRsaW50CgojIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogUHJlcCAtIFNldHVwIEVMTCAtIFBBU1MKRGVzYzogQ2xv
+bmUsIGJ1aWxkLCBhbmQgaW5zdGFsbCBFTEwKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
+IwpUZXN0OiBCdWlsZCAtIFByZXAgLSBQQVNTCkRlc2M6IFByZXBhcmUgZW52aXJvbm1lbnQgZm9y
+IGJ1aWxkCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgLSBDb25m
+aWd1cmUgLSBQQVNTCkRlc2M6IENvbmZpZ3VyZSB0aGUgQmx1ZVogc291cmNlIHRyZWUKCiMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0OiBCdWlsZCAtIE1ha2UgLSBGQUlMCkRlc2M6
+IEJ1aWxkIHRoZSBCbHVlWiBzb3VyY2UgdHJlZQpPdXRwdXQ6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRw
+LmM6IEluIGZ1bmN0aW9uIOKAmGF2ZHRwX3VucmVnaXN0ZXJfcmVtb3RlX3NlcOKAmToKcHJvZmls
+ZXMvYXVkaW8vYXZkdHAuYzozMzc2OjE6IGVycm9yOiBjb250cm9sIHJlYWNoZXMgZW5kIG9mIG5v
+bi12b2lkIGZ1bmN0aW9uIFstV2Vycm9yPXJldHVybi10eXBlXQogMzM3NiB8IH0KICAgICAgfCBe
+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBb
+TWFrZWZpbGU6ODU1MzogcHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1hdmR0cC5vXSBFcnJvciAx
+Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDE0MjogYWxsXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgLSBGQUlMCkRlc2M6IFJ1biAnbWFrZSBj
+aGVjaycKT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhhdmR0
+cF91bnJlZ2lzdGVyX3JlbW90ZV9zZXDigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MzM3Njox
+OiBlcnJvcjogY29udHJvbCByZWFjaGVzIGVuZCBvZiBub24tdm9pZCBmdW5jdGlvbiBbLVdlcnJv
+cj1yZXR1cm4tdHlwZV0KIDMzNzYgfCB9CiAgICAgIHwgXgpjYzE6IGFsbCB3YXJuaW5ncyBiZWlu
+ZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg1NTM6IHByb2ZpbGVz
+L2F1ZGlvL2JsdWV0b290aGQtYXZkdHAub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxlOjEw
+NDE0OiBjaGVja10gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIwpUZXN0
+OiBNYWtlIERpc3RjaGVjayAtIFBBU1MKRGVzYzogUnVuIGRpc3RjaGVjayB0byBjaGVjayB0aGUg
+ZGlzdHJpYnV0aW9uCgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQg
+dy9leHQgRUxMIC0gQ29uZmlndXJlIC0gUEFTUwpEZXNjOiBDb25maWd1cmUgQmx1ZVogc291cmNl
+IHdpdGggJy0tZW5hYmxlLWV4dGVybmFsLWVsbCcgY29uZmlndXJhdGlvbgoKIyMjIyMjIyMjIyMj
+IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIHcvZXh0IEVMTCAtIE1ha2UgLSBGQUlMCkRl
+c2M6IEJ1aWxkIEJsdWVaIHNvdXJjZSB3aXRoICctLWVuYWJsZS1leHRlcm5hbC1lbGwnIGNvbmZp
+Z3VyYXRpb24KT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhh
+dmR0cF91bnJlZ2lzdGVyX3JlbW90ZV9zZXDigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MzM3
+NjoxOiBlcnJvcjogY29udHJvbCByZWFjaGVzIGVuZCBvZiBub24tdm9pZCBmdW5jdGlvbiBbLVdl
+cnJvcj1yZXR1cm4tdHlwZV0KIDMzNzYgfCB9CiAgICAgIHwgXgpjYzE6IGFsbCB3YXJuaW5ncyBi
+ZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjg1NTM6IHByb2Zp
+bGVzL2F1ZGlvL2JsdWV0b290aGQtYXZkdHAub10gRXJyb3IgMQptYWtlOiAqKiogW01ha2VmaWxl
+OjQxNDI6IGFsbF0gRXJyb3IgMgoKCgoKLS0tClJlZ2FyZHMsCkxpbnV4IEJsdWV0b290aAoK
 
-diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-index 86bc02994..68af9da1a 100644
---- a/profiles/audio/a2dp.c
-+++ b/profiles/audio/a2dp.c
-@@ -127,6 +127,7 @@ struct a2dp_remote_sep {
- 	struct a2dp_channel *chan;
- 	char *path;
- 	struct avdtp_remote_sep *sep;
-+	bool from_cache;
- };
- 
- struct a2dp_last_used {
-@@ -773,6 +774,32 @@ done:
- 	setup_unref(setup);
- }
- 
-+static bool match_remote_sep(const void *data, const void *user_data)
-+{
-+	const struct a2dp_remote_sep *sep = data;
-+	const struct avdtp_remote_sep *rsep = user_data;
-+
-+	return sep->sep == rsep;
-+}
-+
-+static void invalidate_remote_cache(struct a2dp_setup *setup,
-+						struct avdtp_error *err)
-+{
-+	struct a2dp_remote_sep *rsep;
-+
-+	if (err->category != AVDTP_ERRNO ||
-+			err->err.error_code != AVDTP_UNSUPPORTED_CONFIGURATION)
-+		return;
-+
-+	/* Attempt to unregister Remove SEP if configuration
-+	 * fails with Unsupported Configuration and it was
-+	 * loaded from cache.
-+	 */
-+	rsep = queue_find(setup->chan->seps, match_remote_sep, setup->rsep);
-+	if (rsep && rsep->from_cache)
-+		avdtp_unregister_remote_sep(setup->session, rsep->sep);
-+}
-+
- static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 				struct avdtp_stream *stream,
- 				struct avdtp_error *err, void *user_data)
-@@ -794,10 +821,12 @@ static void setconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 		if (setup) {
- 			setup_ref(setup);
- 			setup->err = err;
-+			invalidate_remote_cache(setup, err);
- 			finalize_config(setup);
- 			setup->err = NULL;
- 			setup_unref(setup);
- 		}
-+
- 		return;
- 	}
- 
-@@ -874,14 +903,6 @@ static void getconf_cfm(struct avdtp *session, struct avdtp_local_sep *sep,
- 		DBG("Source %p: Set_Configuration_Cfm", sep);
- }
- 
--static bool match_remote_sep(const void *data, const void *user_data)
--{
--	const struct a2dp_remote_sep *sep = data;
--	const struct avdtp_remote_sep *rsep = user_data;
--
--	return sep->sep == rsep;
--}
--
- static void store_last_used(struct a2dp_channel *chan, uint8_t lseid,
- 							uint8_t rseid)
- {
-@@ -1941,7 +1962,7 @@ static void remote_sep_destroy(void *user_data)
- 		remove_remote_sep(sep);
- }
- 
--static void register_remote_sep(void *data, void *user_data)
-+static struct a2dp_remote_sep *register_remote_sep(void *data, void *user_data)
- {
- 	struct avdtp_remote_sep *rsep = data;
- 	struct a2dp_channel *chan = user_data;
-@@ -1949,7 +1970,7 @@ static void register_remote_sep(void *data, void *user_data)
- 
- 	sep = queue_find(chan->seps, match_remote_sep, rsep);
- 	if (sep)
--		return;
-+		return sep;
- 
- 	sep = new0(struct a2dp_remote_sep, 1);
- 	sep->chan = chan;
-@@ -1972,7 +1993,7 @@ static void register_remote_sep(void *data, void *user_data)
- 		error("Could not register remote sep %s", sep->path);
- 		free(sep->path);
- 		free(sep);
--		return;
-+		return NULL;
- 	}
- 
- 	DBG("Found remote SEP: %s", sep->path);
-@@ -1981,6 +2002,8 @@ static void register_remote_sep(void *data, void *user_data)
- 
- done:
- 	queue_push_tail(chan->seps, sep);
-+
-+	return sep;
- }
- 
- static bool match_seid(const void *data, const void *user_data)
-@@ -2080,7 +2103,9 @@ static void load_remote_sep(struct a2dp_channel *chan, GKeyFile *key_file,
- 			continue;
- 		}
- 
--		register_remote_sep(rsep, chan);
-+		sep = register_remote_sep(rsep, chan);
-+		if (sep)
-+			sep->from_cache = true;
- 	}
- 
- 	value = g_key_file_get_string(key_file, "Endpoints", "LastUsed", NULL);
-@@ -2778,6 +2803,11 @@ static void store_remote_seps(struct a2dp_channel *chan)
- 	g_key_file_free(key_file);
- }
- 
-+static void foreach_register_remote_sep(void *data, void *user_data)
-+{
-+	register_remote_sep(data, user_data);
-+}
-+
- static void discover_cb(struct avdtp *session, GSList *seps,
- 				struct avdtp_error *err, void *user_data)
- {
-@@ -2791,7 +2821,7 @@ static void discover_cb(struct avdtp *session, GSList *seps,
- 		setup->err = err;
- 
- 	if (!err) {
--		g_slist_foreach(seps, register_remote_sep, setup->chan);
-+		g_slist_foreach(seps, foreach_register_remote_sep, setup->chan);
- 
- 		/* Only store version has been initialized as features like
- 		 * Delay Reporting may not be queried if the version in
-diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 5d13104c1..38043d757 100644
---- a/profiles/audio/avdtp.c
-+++ b/profiles/audio/avdtp.c
-@@ -3364,6 +3364,17 @@ struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
- 	return sep;
- }
- 
-+int avdtp_unregister_remote_sep(struct avdtp *session,
-+						struct avdtp_remote_sep *rsep)
-+{
-+	if (!session || !rsep)
-+		return -EINVAL;
-+
-+	session->seps = g_slist_remove(session->seps, rsep);
-+
-+	sep_free(rsep);
-+}
-+
- void avdtp_remote_sep_set_destroy(struct avdtp_remote_sep *sep, void *user_data,
- 					avdtp_remote_sep_destroy_t destroy)
- {
-diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-index b29d0621a..b02534cd5 100644
---- a/profiles/audio/avdtp.h
-+++ b/profiles/audio/avdtp.h
-@@ -215,6 +215,8 @@ struct avdtp_remote_sep *avdtp_register_remote_sep(struct avdtp *session,
- 							uint8_t type,
- 							GSList *caps,
- 							bool delay_reporting);
-+int avdtp_unregister_remote_sep(struct avdtp *session,
-+						struct avdtp_remote_sep *rsep);
- 
- typedef void (*avdtp_remote_sep_destroy_t)(void *user_data);
- 
--- 
-2.31.1
-
+--===============7005974465940057564==--
