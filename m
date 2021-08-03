@@ -2,209 +2,215 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CE8C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:42:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC8CFC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7FF960F58
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:42:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9254160EE9
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 11:43:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234356AbhHCImx (ORCPT
+        id S235616AbhHCLnn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Aug 2021 04:42:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56658 "EHLO
+        Tue, 3 Aug 2021 07:43:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234412AbhHCImx (ORCPT
+        with ESMTP id S235560AbhHCLnm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Aug 2021 04:42:53 -0400
-Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8EDDC06175F
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 01:42:42 -0700 (PDT)
-Received: by mail-qk1-x729.google.com with SMTP id z24so19167288qkz.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 01:42:42 -0700 (PDT)
+        Tue, 3 Aug 2021 07:43:42 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0677C061757
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 04:43:30 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d10-20020a170902e14ab029012ccda38630so862617pla.15
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 04:43:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=acfCnHOPQA6HAQ3Nr29t3pXYywRMcfHQQp7kPxml568=;
-        b=gWeTtCgv/I0KdaVBn4xVoCvVAnp5+Ul/uwy5OgBv/pUCdggyiZ+4QIsiOuL4exmY/0
-         soxFTypiVtCrCW/hAQIjKgPc75avu/KjwdgGxIDRTh5wNHpCbUzn7DEt3dw/hIhuoHNB
-         WCj4leAphrOf+DUITlx5bMO5dyNSoSFvG35sFmSKswDsmO1tCKLiJqa6imGqhoztE2BD
-         +BYHqZzZdSaxpNMWEv7GoJ7ZUVGN0ZS3y8mQ8+on5Teg3I/GzDlqc94NNcDUM3eLXp8s
-         ekalu4PDkK8wr6y74g8QrDaewoREcHm4fPq9G4sSOBIThivhZEHfMnyCrESWR7D6LFOa
-         30Nw==
+        d=google.com; s=20161025;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=jJr8Pj0oZi3uk1UfApDjJ/uA6UIySU3eGXKkrZPI+TI=;
+        b=uY3eSxva/IshEHaeLnV67BRybKCeU4uXYg5AytfXon/vo9mPal1ALKBvzz1oO6xbEx
+         DdK6LlA9XSU+1uYHVI1WOLtsx1l7T8X5X9Y3Jlr2FYGPQSO5rbcDRRiuIS+rCtRotoNl
+         H4YoqMrzxq3e5ggHT+aCQMnVmhrdciFXvxf5NN4oFzWioaj5HdIvyVumYvLx3Rt6Rkmx
+         tndv28Lap/7hG6AlrTlNed0w4VI0XCg7t8rQ/NBaFl208eGTeRcjiWET5fg8PWNPvf5D
+         Tf2ZhHvgB44xuq/3ihiznXEa5eHpaO22OGjH7RyoMSYYuMvZRwjCYlmotk39BBXoLc04
+         1huA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=acfCnHOPQA6HAQ3Nr29t3pXYywRMcfHQQp7kPxml568=;
-        b=QGgfsl8Z4zk54cMGIVjhCEdgW7qOpK8uFbCQybPEwJAfrNe3o52Pa4lhH20Lklp24k
-         1OuBMJK3ovtEjC65fMo6tGGwNv3+MzCb8tzpDUN0+LvFLYX3EbEFWH6TPEHM9hUG5EzI
-         a/H+bFEOFCq8DFSbLblkgLzE60LCCYcFRPCiJr3Ja0hmvGJU2RT34RSu8nKDWjHzG0u+
-         DFmxS0+SufgxnV6oZ5xj0gf/0oXFyxJy1gTBYXZQkX7+bQTwHYP0L0BONRoggYnUQ297
-         T3af2BatHA8n+Ucqape9rjBuKf5/ifyM8jr0wdWEdi7+0GnCUHReDw2A/wkMqjSLbE8a
-         GgYw==
-X-Gm-Message-State: AOAM5324uYEvsTMiZuF7BIs+6G54z9AJ+hRWblvL29I1HDs6LhBB5MBk
-        pLx8Y0ig2lz6h2ng8cOnxuvgSEf4ylXKHg==
-X-Google-Smtp-Source: ABdhPJyBBjYL6ZX+Jzu6czfBVxv8Im1xR4GIyZRwpLtgZVsz2EIOiu8nCvO0ogulyKPxlpmZ/9LmKA==
-X-Received: by 2002:a37:ccb:: with SMTP id 194mr19877711qkm.369.1627980161689;
-        Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
-Received: from [172.17.0.2] ([52.242.81.63])
-        by smtp.gmail.com with ESMTPSA id 18sm7684157qkv.118.2021.08.03.01.42.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
-Message-ID: <61090181.1c69fb81.44f92.d1a0@mx.google.com>
-Date:   Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5875222100720029800=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: Admin policy series
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210803161319.Bluez.v8.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
-References: <20210803161319.Bluez.v8.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=jJr8Pj0oZi3uk1UfApDjJ/uA6UIySU3eGXKkrZPI+TI=;
+        b=hp73+MemdQ4EXQOj3hvY+r8TBrMHROo2JiEoILH6Wx2+B9AaYOWNXhczsB2kcS3LWN
+         aZMtzqPiTL1BghJPKBkINQc/KxggJMCXwM36PACLEsf/Y9NrjPYYGTwQU/Iqpuq2h52D
+         DWM6dQjEDTMkFGc9LKoEnfySwLRibcA7XRNenwuglIlZIyFGEBl5eAjwarAIPDGTYoMn
+         QtlE/xnBlXrk0HjOwhFfvzXvCSGYgk9MiESKGX3RIx2CFi0iL+CburMlBtIEXtqEaaB6
+         EWgrENjrKRm4/sVmeC+kv3gQnQRKKcsGGvkECapmWOUYrMS42+/4G9DTO5USCIpk6kh6
+         8nMg==
+X-Gm-Message-State: AOAM532VB4+R2fPPcGgBLt2lGSUSi4iioqZnGkU5lZ6UGLOVucDqxfUE
+        9bZzBBUBXAvmBstQWvZ8LsvYxzICQBzvF9RWjAHzcO71pXb+R8Fm/14UUUuZitcbClan5uyFaNS
+        i4HyvtoIjPK3js1Qr6Ujt3NsSgbdd8H/OHxtohgfS/zwlkDDeqeip2ByU1yBJKMioNvl9Hqz1en
+        XjSl3n5PcD8HI=
+X-Google-Smtp-Source: ABdhPJwD9TqM8D8ycgJQZDG7+vRcmM1AkeJdN+uhfhh1/4UR3Xixr6/gEBpjwMg+HyweZ9Xl3bUgRtElF0heW1kjaA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ef55:8161:c77b:7a8d])
+ (user=howardchung job=sendgmr) by 2002:aa7:93b1:0:b029:3c0:a7b7:3db0 with
+ SMTP id x17-20020aa793b10000b02903c0a7b73db0mr7306717pff.40.1627991010165;
+ Tue, 03 Aug 2021 04:43:30 -0700 (PDT)
+Date:   Tue,  3 Aug 2021 19:43:05 +0800
+In-Reply-To: <20210803114317.801840-1-howardchung@google.com>
+Message-Id: <20210803194127.Bluez.v9.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+Mime-Version: 1.0
+References: <20210803114317.801840-1-howardchung@google.com>
+X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
+Subject: [Bluez PATCH v9 01/13] core: add is_allowed property in btd_service
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Yun-Hao Chung <howardchung@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5875222100720029800==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-This is automated email and please do not reply to this email!
+This adds is_allowed property in btd_service. When is_allowed is set to
+false, calling btd_service_connect and service_accept will fail and the
+existing service connection gets disconnected.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=525459
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      3.11 seconds
-GitLint                       FAIL      1.28 seconds
-Prep - Setup ELL              PASS      38.33 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      6.68 seconds
-Build - Make                  PASS      163.49 seconds
-Make Check                    PASS      8.11 seconds
-Make Distcheck                PASS      201.69 seconds
-Build w/ext ELL - Configure   PASS      6.74 seconds
-Build w/ext ELL - Make        PASS      153.94 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-plugins/admin: add ServiceAllowList property
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#63: FILE: plugins/admin.c:186:
-+					const GDBusPropertyTable *property,
- 					                         ^
-
-- total: 1 errors, 0 warnings, 82 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] plugins/admin: add ServiceAllowList property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-plugins/admin: add AffectedByPolicy property
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#65: FILE: plugins/admin.c:254:
-+					const GDBusPropertyTable *property,
- 					                         ^
-
-- total: 1 errors, 0 warnings, 120 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] plugins/admin: add AffectedByPolicy property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-plugins/admin: persist policy settings
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#135: FILE: plugins/admin.c:260:
-+	struct queue *uuid_list = NULL;
-+	gchar **uuids = NULL;
-
-- total: 0 errors, 1 warnings, 208 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] plugins/admin: persist policy settings" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-core: add device callbacks to adapter driver
-5: B3 Line contains hard tab characters (\t): "device_added:	 called when a device is added to the adapter"
-6: B3 Line contains hard tab characters (\t): "device_removed:	 called when a device is removed from the adapter"
-8: B3 Line contains hard tab characters (\t): "				 resolved."
-
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+Changes in v9:
+- Fix gitlint error in patch 'core: add device callbacks to adapter
+  driver'
 
---===============5875222100720029800==--
+Changes in v8:
+- Remove changes in profiles/health/
+
+Changes in v7:
+- Fix compiler errors in profiles/hdp.c
+
+Changes in v6:
+- include <errno.h> instead of <error.h> in plugins/admin.c
+
+Changes in v5:
+- Fix compiler errors in plugins/admin.c
+
+Changes in v4:
+- Update commit message (admin_policy -> admin)
+- remove old plugins/admin_policy.c
+
+Changes in v3:
+- Rename plugins/admin_policy.c -> plugins/admin.c
+- Use device_added callback in btd_adapter_driver instead of listen for
+  dbus
+- Add authorization method in profiles/health/mcap.c and block incoming
+  connections in adapter authorization function.
+
+Changes in v2:
+- Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
+- Modify the criteria to say a device is `Affected` from any-of-uuid
+  to any-of-auto-connect-profile.
+- Remove the code to remove/reprobe disallowed/allowed profiles,
+  instead, check if the service is allowed in bt_io_accept connect_cb.
+- Fix a typo in emit_property_change in
+  plugin/admin_policy.c:set_service_allowlist
+- Instead of using device_state_cb, utilize D-BUS client to watch device
+  added/removed.
+- Add a document in doc/
+
+ src/service.c | 33 +++++++++++++++++++++++++++++++++
+ src/service.h |  2 ++
+ 2 files changed, 35 insertions(+)
+
+diff --git a/src/service.c b/src/service.c
+index 21a52762e637..84fbb208a7e9 100644
+--- a/src/service.c
++++ b/src/service.c
+@@ -41,6 +41,7 @@ struct btd_service {
+ 	void			*user_data;
+ 	btd_service_state_t	state;
+ 	int			err;
++	bool			is_allowed;
+ };
+ 
+ struct service_state_callback {
+@@ -133,6 +134,7 @@ struct btd_service *service_create(struct btd_device *device,
+ 	service->device = device; /* Weak ref */
+ 	service->profile = profile;
+ 	service->state = BTD_SERVICE_STATE_UNAVAILABLE;
++	service->is_allowed = true;
+ 
+ 	return service;
+ }
+@@ -186,6 +188,12 @@ int service_accept(struct btd_service *service)
+ 	if (!service->profile->accept)
+ 		return -ENOSYS;
+ 
++	if (!service->is_allowed) {
++		info("service %s is not allowed",
++						service->profile->remote_uuid);
++		return -ECONNABORTED;
++	}
++
+ 	err = service->profile->accept(service);
+ 	if (!err)
+ 		goto done;
+@@ -245,6 +253,12 @@ int btd_service_connect(struct btd_service *service)
+ 		return -EBUSY;
+ 	}
+ 
++	if (!service->is_allowed) {
++		info("service %s is not allowed",
++						service->profile->remote_uuid);
++		return -ECONNABORTED;
++	}
++
+ 	err = profile->connect(service);
+ 	if (err == 0) {
+ 		change_state(service, BTD_SERVICE_STATE_CONNECTING, 0);
+@@ -361,6 +375,25 @@ bool btd_service_remove_state_cb(unsigned int id)
+ 	return false;
+ }
+ 
++void btd_service_set_allowed(struct btd_service *service, bool allowed)
++{
++	if (allowed == service->is_allowed)
++		return;
++
++	service->is_allowed = allowed;
++
++	if (!allowed && (service->state == BTD_SERVICE_STATE_CONNECTING ||
++			service->state == BTD_SERVICE_STATE_CONNECTED)) {
++		btd_service_disconnect(service);
++		return;
++	}
++}
++
++bool btd_service_is_allowed(struct btd_service *service)
++{
++	return service->is_allowed;
++}
++
+ void btd_service_connecting_complete(struct btd_service *service, int err)
+ {
+ 	if (service->state != BTD_SERVICE_STATE_DISCONNECTED &&
+diff --git a/src/service.h b/src/service.h
+index 88530cc17d53..5a2a02447b24 100644
+--- a/src/service.h
++++ b/src/service.h
+@@ -51,6 +51,8 @@ int btd_service_get_error(const struct btd_service *service);
+ unsigned int btd_service_add_state_cb(btd_service_state_cb cb,
+ 							void *user_data);
+ bool btd_service_remove_state_cb(unsigned int id);
++void btd_service_set_allowed(struct btd_service *service, bool allowed);
++bool btd_service_is_allowed(struct btd_service *service);
+ 
+ /* Functions used by profile implementation */
+ void btd_service_connecting_complete(struct btd_service *service, int err);
+-- 
+2.32.0.554.ge1b32706d8-goog
+
