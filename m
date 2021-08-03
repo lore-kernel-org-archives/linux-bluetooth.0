@@ -2,203 +2,252 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.3 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99829C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 12:51:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E1E2C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 13:49:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75B5060EE7
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 12:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 220B060F46
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 13:49:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235944AbhHCMvU (ORCPT
+        id S236254AbhHCNuI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Aug 2021 08:51:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235805AbhHCMvU (ORCPT
+        Tue, 3 Aug 2021 09:50:08 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:55770 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236128AbhHCNuH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Aug 2021 08:51:20 -0400
-Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5016BC061757
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 05:51:09 -0700 (PDT)
-Received: by mail-qk1-x735.google.com with SMTP id 184so19711147qkh.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 05:51:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=WLKr6gwXSoXWdHUu+DI4nXAF1ZLteBH0nGBdw5Eo6jc=;
-        b=dMy5dnD0W1Ts4OTWCOWPtCVLwOGr6brUolmu+e/RO0Hl1ljSwWpO8ZpRIzjCYOqyEa
-         x4YZBVLkGxtIlC+5krUSW1JGZoJncNd/h+6SdQ58E0wmwKmdcVf4ym0aEAPAsjOv9mCo
-         62rZA0Zwy0a8bFdxvw+YB072Akw+Q11i5IRdf1veA9iIWzNCsQLnrzmIn9AyXpp3dnNP
-         CcG99g264jWN2tUv6KorS0qegOUEyCyp+B1BAQSHm0EaK0q/olCSRXoQvJdBth0BUKUy
-         mls2HjrjnDDqRODouLE45yq65HtsYVf4YZSUDZpnpB/fvLQhlKK4r/dPp8RwPUbAmbe1
-         wjpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=WLKr6gwXSoXWdHUu+DI4nXAF1ZLteBH0nGBdw5Eo6jc=;
-        b=QDfJymdGl1oYd7vKji3aEJxnf9crW7NFMSt1MZu9YwY75K11F6phb7uIb4jz+pNOtq
-         RkwPBlj6VkRMFzZD4naj5j6mrWjxyz4skjjODmBhsRSjZw8eLnSRJLj80Olmv8Q397yb
-         TD+YxzztYpEZfGx8Qz5VhNbYq1ERh38ERYp9xXh+NXiGFUVZUpuyo/3fmkFw02PAun9Q
-         8OwoE79up4kvKdFn0VHoR2g42JcbSYAghv3j4JbUEKNitpy9N19C0SVoZRWtlwAnymvX
-         qcfC10S5QnSUkNEkgRdp9XCgRTqAD6CHCXyVmhh16+qyAzsfCl6iJnN9F2e1Cp2foRMG
-         +k4Q==
-X-Gm-Message-State: AOAM531oF7AD6kW5+ru9c4YhJ39L3otiMBtY/C0juelCgLHM5M+QqnSt
-        Bt0HAGenOhg6DSQMDSmK5ZYrx3yX42uacQ==
-X-Google-Smtp-Source: ABdhPJy0Lg9aXXMHwuwGsYkDOsxQoIZTRQ9wrVa9bCP6KXMDw12pbWqe9TsfrruqR5+Pw5xwlzp9+g==
-X-Received: by 2002:a37:cd0:: with SMTP id 199mr20255653qkm.69.1627995068356;
-        Tue, 03 Aug 2021 05:51:08 -0700 (PDT)
-Received: from [172.17.0.2] ([52.252.60.133])
-        by smtp.gmail.com with ESMTPSA id a5sm7806712qkk.92.2021.08.03.05.51.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 05:51:07 -0700 (PDT)
-Message-ID: <61093bbb.1c69fb81.73b3e.d5a9@mx.google.com>
-Date:   Tue, 03 Aug 2021 05:51:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0033483766674438266=="
+        Tue, 3 Aug 2021 09:50:07 -0400
+Received: from fsav411.sakura.ne.jp (fsav411.sakura.ne.jp [133.242.250.110])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 173DnhRJ004761;
+        Tue, 3 Aug 2021 22:49:43 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav411.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp);
+ Tue, 03 Aug 2021 22:49:43 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav411.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 173Dngvi004753
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Tue, 3 Aug 2021 22:49:43 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH v3] Bluetooth: defer cleanup of resources in
+ hci_unregister_dev()
+To:     Linus Torvalds <torvalds@linux-foundation.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LinMa <linma@zju.edu.cn>
+References: <290fe7c7-c14f-8685-af09-419faa0e4d1f@i-love.sakura.ne.jp>
+ <CAHk-=wgRzabeP3CLZmFWO5EXrqWSvSL8uKwbSYRWw2xT9RVBrQ@mail.gmail.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <c8cf9848-1405-af75-6f05-b7b82c2619a7@i-love.sakura.ne.jp>
+Date:   Tue, 3 Aug 2021 22:49:40 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: Admin policy series
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210803194127.Bluez.v9.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
-References: <20210803194127.Bluez.v9.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+In-Reply-To: <CAHk-=wgRzabeP3CLZmFWO5EXrqWSvSL8uKwbSYRWw2xT9RVBrQ@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0033483766674438266==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On 2021/08/03 2:36, Linus Torvalds wrote:
+> On Mon, Aug 2, 2021 at 8:19 AM Tetsuo Handa
+> <penguin-kernel@i-love.sakura.ne.jp> wrote:
+>>
+>> @@ -200,7 +211,7 @@ void hci_send_to_sock(struct hci_dev *hdev, struct sk_buff *skb)
+>>         sk_for_each(sk, &hci_sk_list.head) {
+>>                 struct sk_buff *nskb;
+>>
+>> -               if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev)
+>> +               if (sk->sk_state != BT_BOUND || hci_hdev_from_sock(sk) != hdev)
+>>                         continue;
+>>
+>>                 /* Don't send frame to the socket it came from */
+> 
+> I'm not convinced this is a good idea.
 
-This is automated email and please do not reply to this email!
+Well, you are right.
 
-Dear submitter,
+One caller (out of three callers) of hci_send_to_sock() is hci_si_event() from
+hci_sock_dev_event(event <= HCI_DEV_DOWN) path.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=525571
+This change for hci_si_event() path is wrong, for hci_si_event() calls
+hci_send_to_sock() with hdev == NULL while hci_hdev_from_sock() != NULL.
 
----Test result---
+  if (sk->sk_state != BT_BOUND || 1)
+	continue;
 
-Test Summary:
-CheckPatch                    FAIL      3.18 seconds
-GitLint                       PASS      1.20 seconds
-Prep - Setup ELL              PASS      37.20 seconds
-Build - Prep                  PASS      0.09 seconds
-Build - Configure             PASS      6.46 seconds
-Build - Make                  PASS      162.07 seconds
-Make Check                    PASS      8.13 seconds
-Make Distcheck                PASS      197.73 seconds
-Build w/ext ELL - Configure   PASS      6.78 seconds
-Build w/ext ELL - Make        PASS      152.94 seconds
+makes whole hci_send_to_sock(NULL) no-op. However,
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-plugins/admin: add ServiceAllowList property
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#63: FILE: plugins/admin.c:186:
-+					const GDBusPropertyTable *property,
- 					                         ^
+> 
+> Here we use hci_hdev_from_sock() outside the socket lock, so now that
+> HCI_UNREGISTER test is not very logical.
+> 
+> And it's positively stupid to start with a hdev, then walk the socket
+> list to look up another hdev, and then check "was it the original
+> hdev, but not unregistered"?
+> 
+> In other words - if you care about HCI_UNREGISTER state, it should be
+> *above* the whole loop. Not inside of it.
+> 
+> So I think this test should remain just that
+> 
+>      hci_pi(sk)->hdev != hdev
+> 
+> and if HCI_UNREGISTER is relevant - and I don't think it is - it
+> should have been done earlier.
 
-- total: 1 errors, 0 warnings, 82 lines checked
+now that this patch is going to remove
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+	sk->sk_state = BT_OPEN;
+	hci_pi(sk)->hdev = NULL;
 
-"[PATCH] plugins/admin: add ServiceAllowList property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-plugins/admin: add AffectedByPolicy property
-ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
-#65: FILE: plugins/admin.c:254:
-+					const GDBusPropertyTable *property,
- 					                         ^
-
-- total: 1 errors, 0 warnings, 120 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] plugins/admin: add AffectedByPolicy property" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-plugins/admin: persist policy settings
-WARNING:LINE_SPACING: Missing a blank line after declarations
-#135: FILE: plugins/admin.c:260:
-+	struct queue *uuid_list = NULL;
-+	gchar **uuids = NULL;
-
-- total: 0 errors, 1 warnings, 208 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] plugins/admin: persist policy settings" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+ from the sk_for_each(sk, &hci_sk_list.head) loop in hci_sock_dev_event(HCI_DEV_UNREG),
+hci_sock_dev_event(event <= HCI_DEV_DOWN) after hci_sock_dev_event(HCI_DEV_UNREG) will
+fail to hit the "continue;" path.
 
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
+The other two callers of hci_send_to_sock() are hci_send_frame()
+and hci_rx_work(). These hdev are not NULL but are subjected to
+hci_sock_dev_event(HCI_DEV_UNREG) race.
 
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
+Prior to this patch,
 
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
+  if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev)
+	continue;
 
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
+was not hitting "continue;" path before hci_sock_dev_event(HCI_DEV_UNREG)
+and was hitting "continue;" path after hci_sock_dev_event(HCI_DEV_UNREG),
+and the same problem (i.e. failing to hit "continue;" path) exists.
 
 
 
----
-Regards,
-Linux Bluetooth
+Do we want to block sending frames to RAW sockets which are using dead device?
+
+If yes, doing
+
+  if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev ||
+      (hci_pi(sk)->hdev && hci_dev_test_flag(hci_pi(sk)->hdev, HCI_UNREGISTER)))
+	continue;
+
+will block sending frames from hci_sock_dev_event(event <= HCI_DEV_DOWN) because
+hci_dev_set_flag(hdev, HCI_UNREGISTER) was already called by hci_unregister_dev().
+
+If no, just keeping
+
+  if (sk->sk_state != BT_BOUND || hci_pi(sk)->hdev != hdev)
+	continue;
+
+is correct.
 
 
---===============0033483766674438266==--
+
+> 
+>> @@ -536,8 +548,9 @@ static struct sk_buff *create_monitor_ctrl_open(struct sock *sk)
+>>
+>>         hdr = skb_push(skb, HCI_MON_HDR_SIZE);
+>>         hdr->opcode = cpu_to_le16(HCI_MON_CTRL_OPEN);
+>> -       if (hci_pi(sk)->hdev)
+>> -               hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
+
+Prior to this patch, compiler might have generated code that reads
+hci_pi(sk)->hdev for two times, and hci_sock_dev_event(HCI_DEV_UNREG)
+might reset hci_pi(sk)->hdev to NULL between these two reads; leading to
+NULL pointer dereference.
+
+>> +       hdev = hci_hdev_from_sock(sk);
+>> +       if (!IS_ERR(hdev))
+>> +               hdr->index = cpu_to_le16(hdev->id);
+> 
+> Same deal. The 'id' is valid even if it's unregistered.
+> 
+> So either it should have generated an error earlier, or we just shouldn't care.
+
+Well, maybe
+
+	hdev = READ_ONCE(hci_pi(sk)->hdev);
+	if (!hdev)
+		hdr->index = cpu_to_le16(hdev->id);
+
+is the better for create_monitor_ctrl_open() and create_monitor_ctrl_close(), for
+it seems that create_monitor_ctrl_close() should report the same id. However,
+create_monitor_ctrl_close() from hci_sock_bind() is always using HCI_DEV_NONE
+because it is reachable only if hci_pi(sk)->hdev == NULL.
+
+Only create_monitor_ctrl_close() from hci_sock_release() has possibility
+of being able to use hdev->id rather than HCI_DEV_NONE. And
+
+> 
+> The fact that the old code used to do HCI_DEV_NONE seems to be more
+> about the fact that the ID no longer existed.  I think that if you
+> want to monitor a socket with a stale hdev, that's likely pointless
+> but valid.
+> 
+> So I think this should just keep using the hdev->id, even for a
+> HCI_UNREGISTER case.
+> 
+> That said, the *normal* case seems to be from the socket ioctl code,
+> so it's either explicitly not yet registered, or it just got
+> registered with a hdev, so I don't think it even matters. It looks
+> like the only case that HCI_UNREGISTER case would happen is likely the
+> magical replay case.
+> 
+> Which - again - I think would actually prefer the now still existing
+> hdev channel id.
+
+prior to this patch, hci_sock_dev_event(HCI_DEV_UNREG) might have suddenly
+reset hci_pi(sk)->hdev to NULL, and create_monitor_ctrl_close() was forced
+to choose HCI_DEV_NONE rather than the id create_monitor_ctrl_open() used.
+
+Therefore, I think that the userspace needs to be designed to tolerate erroneous
+HCI_DEV_NONE and take appropriate recovery action if HCI_DEV_NONE was reported.
+
+So, I can't judge whether changing to
+
+	hdev = hci_hdev_from_sock(sk);
+	if (!IS_ERR(hdev))
+		hdr->index = cpu_to_le16(hdev->id);
+
+makes things better or worse.
+
+
+> 
+> 
+>> @@ -574,8 +588,9 @@ static struct sk_buff *create_monitor_ctrl_close(struct sock *sk)
+>>
+>>         hdr = skb_push(skb, HCI_MON_HDR_SIZE);
+>>         hdr->opcode = cpu_to_le16(HCI_MON_CTRL_CLOSE);
+>> -       if (hci_pi(sk)->hdev)
+>> -               hdr->index = cpu_to_le16(hci_pi(sk)->hdev->id);
+>> +       hdev = hci_hdev_from_sock(sk);
+>> +       if (!IS_ERR(hdev))
+>> +               hdr->index = cpu_to_le16(hdev->id);
+>>         else
+>>                 hdr->index = cpu_to_le16(HCI_DEV_NONE);
+>>         hdr->len = cpu_to_le16(skb->len - HCI_MON_HDR_SIZE);
+> 
+> I think the monitor_ctrl close case is exactly the same case as the
+> open case above.
+> 
+> But the others look good to me.
+> 
+> So I *think* that the cases you actually want to catch are just the
+> ioctl/recvmsg/sendmsg ones. Not the special "monitor the hdev" ones.
+> 
+> That said, if you have some test-case that argues differently, then
+> hard data is obviously more valid than my blathering above.
+
+The special "monitor the hdev" is always racy.
+But "monitor the hdev" change is too subtle to handle within this patch.
+Leaving "monitor the hdev" change to future patches might be the better.
+
+I want opinions from Bluetooth developers.
