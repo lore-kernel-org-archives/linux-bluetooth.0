@@ -2,132 +2,209 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01BABC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:23:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 06CE8C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:42:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF85060EFF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:23:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7FF960F58
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  3 Aug 2021 08:42:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234423AbhHCIYC (ORCPT
+        id S234356AbhHCImx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 3 Aug 2021 04:24:02 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52124 "EHLO
+        Tue, 3 Aug 2021 04:42:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56658 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234469AbhHCIYC (ORCPT
+        with ESMTP id S234412AbhHCImx (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 3 Aug 2021 04:24:02 -0400
-Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 747E1C06175F
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 01:23:51 -0700 (PDT)
-Received: by mail-qk1-x74a.google.com with SMTP id t191-20020a37aac80000b02903b9402486c5so16118560qke.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 01:23:51 -0700 (PDT)
+        Tue, 3 Aug 2021 04:42:53 -0400
+Received: from mail-qk1-x729.google.com (mail-qk1-x729.google.com [IPv6:2607:f8b0:4864:20::729])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8EDDC06175F
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 01:42:42 -0700 (PDT)
+Received: by mail-qk1-x729.google.com with SMTP id z24so19167288qkz.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 01:42:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=IspAzGAMuGHmQUhDBsbcIwOoqtAeGv0Fzajl8rOsFOg=;
-        b=GdQMmOAxF0J6ek9RjsAE9MDaki+x9Z3zUrcK0Di+obQRHKN5TPsPVz+Mi0hAAJjFuU
-         U9rW5ZF2/4DUwzdmchPKqQ/MDgfBcNeNBdB02OIwpwaI5+R/r9YLq8JcE6IvpVVJROEP
-         ThWaF/TsYxB2FlEf5NYEGKWnf4VJA1A7TLZkRx8OswMwk8mJv8DSACorafHuVjLk4Tn+
-         O//oEKIM/SSshpj0MJCP45eY0V+ZEcQFNiL2oCgquvIAhEILePXlSAVSHmF9e6Uq2pog
-         pvs+lkd28gDxH9xErMz0i9TdtTRtouqb4EkR8If0p8byfLs0jT3P5Cmv0iLvFWoDgsZP
-         DV2A==
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=acfCnHOPQA6HAQ3Nr29t3pXYywRMcfHQQp7kPxml568=;
+        b=gWeTtCgv/I0KdaVBn4xVoCvVAnp5+Ul/uwy5OgBv/pUCdggyiZ+4QIsiOuL4exmY/0
+         soxFTypiVtCrCW/hAQIjKgPc75avu/KjwdgGxIDRTh5wNHpCbUzn7DEt3dw/hIhuoHNB
+         WCj4leAphrOf+DUITlx5bMO5dyNSoSFvG35sFmSKswDsmO1tCKLiJqa6imGqhoztE2BD
+         +BYHqZzZdSaxpNMWEv7GoJ7ZUVGN0ZS3y8mQ8+on5Teg3I/GzDlqc94NNcDUM3eLXp8s
+         ekalu4PDkK8wr6y74g8QrDaewoREcHm4fPq9G4sSOBIThivhZEHfMnyCrESWR7D6LFOa
+         30Nw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=IspAzGAMuGHmQUhDBsbcIwOoqtAeGv0Fzajl8rOsFOg=;
-        b=jZ5Bku/oj6blc0yJLRiZZCFTNF0lp3JJ9FNkjf/dNobn+btZ8yJt9U5rCrr7tmuOSd
-         pvPEyJLJozNSPIcOGkvDVejNXVoJua6XqgtayCuOjg7aIr8gknLaADTatmMV6QOlPyfx
-         OJQjuFP6XrfuxScYva+0L3AdAlfYS6jJZgmUZH14qaZZX7wjcRe9wYkTyhDYstzRI4nn
-         qDBaLx1a/3x6XFJJciW4monnoOqRwoQo8r23XuStnTWZ86L4ZSBmWRY+TEB/yM8bR1YN
-         gcOtO6sOZCxYU6tZ8mwFHlHW9XSQS4PoX/GFUSAbjGYiAkvbFB54B58GPouGknMe/+83
-         tJFA==
-X-Gm-Message-State: AOAM531Vn8Q4NoE+R3O6ohP84FEyxh1jZzPdiFvsbCp8yCqFlhGYe/vf
-        VpY/xzku6GhJIrhVPECtUFHPVUwjItD7dzSqtl7qSmQRIwIr72gzel3diGnWha9pQFhj3NAL2Jf
-        tCWP3643jXXky51KqGqftJvYhGk+L4B9o7qHXZ1QzpZbsZTtoRNg92rj7Jdi4o21Rft65cv/Jf+
-        TAiHSdd20bRw4=
-X-Google-Smtp-Source: ABdhPJx/2/B4d6cDTLcuDoyk6mTRBT6RdWkLUWnAG/MMTw53Qn/8U2tGCgdDv04/6qVVuQwBkYUkUqkY3w0REyUvEA==
-X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:ef55:8161:c77b:7a8d])
- (user=howardchung job=sendgmr) by 2002:a05:6214:1d0a:: with SMTP id
- e10mr5607028qvd.15.1627979030541; Tue, 03 Aug 2021 01:23:50 -0700 (PDT)
-Date:   Tue,  3 Aug 2021 16:22:37 +0800
-In-Reply-To: <20210803082237.723766-1-howardchung@google.com>
-Message-Id: <20210803161319.Bluez.v8.13.Ide727bc4654c80ce67a268b624a6c5a0f79a11e1@changeid>
-Mime-Version: 1.0
-References: <20210803082237.723766-1-howardchung@google.com>
-X-Mailer: git-send-email 2.32.0.554.ge1b32706d8-goog
-Subject: [Bluez PATCH v8 13/13] doc: add admin policy file storage description
-From:   Howard Chung <howardchung@google.com>
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Cc:     Yun-Hao Chung <howardchung@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=acfCnHOPQA6HAQ3Nr29t3pXYywRMcfHQQp7kPxml568=;
+        b=QGgfsl8Z4zk54cMGIVjhCEdgW7qOpK8uFbCQybPEwJAfrNe3o52Pa4lhH20Lklp24k
+         1OuBMJK3ovtEjC65fMo6tGGwNv3+MzCb8tzpDUN0+LvFLYX3EbEFWH6TPEHM9hUG5EzI
+         a/H+bFEOFCq8DFSbLblkgLzE60LCCYcFRPCiJr3Ja0hmvGJU2RT34RSu8nKDWjHzG0u+
+         DFmxS0+SufgxnV6oZ5xj0gf/0oXFyxJy1gTBYXZQkX7+bQTwHYP0L0BONRoggYnUQ297
+         T3af2BatHA8n+Ucqape9rjBuKf5/ifyM8jr0wdWEdi7+0GnCUHReDw2A/wkMqjSLbE8a
+         GgYw==
+X-Gm-Message-State: AOAM5324uYEvsTMiZuF7BIs+6G54z9AJ+hRWblvL29I1HDs6LhBB5MBk
+        pLx8Y0ig2lz6h2ng8cOnxuvgSEf4ylXKHg==
+X-Google-Smtp-Source: ABdhPJyBBjYL6ZX+Jzu6czfBVxv8Im1xR4GIyZRwpLtgZVsz2EIOiu8nCvO0ogulyKPxlpmZ/9LmKA==
+X-Received: by 2002:a37:ccb:: with SMTP id 194mr19877711qkm.369.1627980161689;
+        Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
+Received: from [172.17.0.2] ([52.242.81.63])
+        by smtp.gmail.com with ESMTPSA id 18sm7684157qkv.118.2021.08.03.01.42.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
+Message-ID: <61090181.1c69fb81.44f92.d1a0@mx.google.com>
+Date:   Tue, 03 Aug 2021 01:42:41 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5875222100720029800=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
+Subject: RE: Admin policy series
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210803161319.Bluez.v8.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
+References: <20210803161319.Bluez.v8.1.Ic71b1ed97538a06d02425ba502690bdab1c5d836@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Yun-Hao Chung <howardchung@chromium.org>
+--===============5875222100720029800==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds storage description of admin policy file in
-doc/settings-storage.txt
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=525459
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      3.11 seconds
+GitLint                       FAIL      1.28 seconds
+Prep - Setup ELL              PASS      38.33 seconds
+Build - Prep                  PASS      0.10 seconds
+Build - Configure             PASS      6.68 seconds
+Build - Make                  PASS      163.49 seconds
+Make Check                    PASS      8.11 seconds
+Make Distcheck                PASS      201.69 seconds
+Build w/ext ELL - Configure   PASS      6.74 seconds
+Build w/ext ELL - Make        PASS      153.94 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+plugins/admin: add ServiceAllowList property
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#63: FILE: plugins/admin.c:186:
++					const GDBusPropertyTable *property,
+ 					                         ^
+
+- total: 1 errors, 0 warnings, 82 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] plugins/admin: add ServiceAllowList property" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+plugins/admin: add AffectedByPolicy property
+ERROR:SPACING: need consistent spacing around '*' (ctx:WxV)
+#65: FILE: plugins/admin.c:254:
++					const GDBusPropertyTable *property,
+ 					                         ^
+
+- total: 1 errors, 0 warnings, 120 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] plugins/admin: add AffectedByPolicy property" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+plugins/admin: persist policy settings
+WARNING:LINE_SPACING: Missing a blank line after declarations
+#135: FILE: plugins/admin.c:260:
++	struct queue *uuid_list = NULL;
++	gchar **uuids = NULL;
+
+- total: 0 errors, 1 warnings, 208 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+"[PATCH] plugins/admin: persist policy settings" has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+core: add device callbacks to adapter driver
+5: B3 Line contains hard tab characters (\t): "device_added:	 called when a device is added to the adapter"
+6: B3 Line contains hard tab characters (\t): "device_removed:	 called when a device is removed from the adapter"
+8: B3 Line contains hard tab characters (\t): "				 resolved."
+
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
 
 ---
+Regards,
+Linux Bluetooth
 
-(no changes since v1)
 
- doc/settings-storage.txt | 20 ++++++++++++++++++++
- 1 file changed, 20 insertions(+)
-
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index d21150f09ecb..1d96cd66d94f 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -36,6 +36,7 @@ root, named based on the address, which contains:
- 
-  - a settings file for the local adapter
-  - an attributes file containing attributes of supported LE services
-+ - an admin policy file containing current values of admin policies
-  - a cache directory containing:
-     - one file per device, named by remote device address, which contains
-     device name
-@@ -50,6 +51,7 @@ So the directory structure is:
-     /var/lib/bluetooth/<adapter address>/
-         ./settings
-         ./attributes
-+	./admin_policy_settings
-         ./cache/
-             ./<remote device address>
-             ./<remote device address>
-@@ -140,6 +142,24 @@ Sample:
-   Value=4578616D706C6520446576696365
- 
- 
-+Admin Policy file format
-+======================
-+
-+The admin policy file stores the current value of each admin policy.
-+
-+[General] group contains:
-+
-+  ServiceAllowlist	List of		List of service UUID allowed by
-+			strings		adapter in 128-bits format, separated
-+					by ','. Default is empty.
-+
-+Sample:
-+  [General]
-+  ServiceAllowlist=
-+
-+
-+
-+
- CCC file format
- ======================
- 
--- 
-2.32.0.554.ge1b32706d8-goog
-
+--===============5875222100720029800==--
