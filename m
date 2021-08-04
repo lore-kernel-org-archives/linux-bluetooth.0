@@ -2,115 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87DC9C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 15:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 05DE2C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 15:09:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EFB460F0F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 15:01:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DC7D461002
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 15:09:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238794AbhHDPCI convert rfc822-to-8bit (ORCPT
+        id S238654AbhHDPKG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 11:02:08 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:36817 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238862AbhHDPAw (ORCPT
+        Wed, 4 Aug 2021 11:10:06 -0400
+Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:34162
+        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S237114AbhHDPKF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 11:00:52 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D8023CECD5;
-        Wed,  4 Aug 2021 17:00:38 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [PATCH v6 00/12] Bluetooth: btintel: Refactoring setup routines
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210804044032.59729-1-hj.tedd.an@gmail.com>
-Date:   Wed, 4 Aug 2021 17:00:38 +0200
-Cc:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <E4C1739A-8F01-4771-9A86-EF2F48110798@holtmann.org>
-References: <20210804044032.59729-1-hj.tedd.an@gmail.com>
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Wed, 4 Aug 2021 11:10:05 -0400
+Received: from localhost (1.general.cking.uk.vpn [10.172.193.212])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 57B383F04E;
+        Wed,  4 Aug 2021 15:09:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1628089791;
+        bh=jOI1MaghgNGcJtSRSTB8GoNttvxl2jIpyug9Cz3oOHk=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type;
+        b=OW2kjVqQSto9Eac4j2zLDVIwwEpXPBKYDJSMWMQnZsOuUGaBNVLmswCLD+TtIBPRv
+         Blq5wbKCOfQxL3C/hNcXCRs/6Xc41PCoihgbypXZorXxpoNrxzXxi48LEGcAfa6V5w
+         Qs7+jFds+9sp3HTrJODcrYqvcjo56xAd1e+AJzmRWpajhi7O0A+FWRVDZ0QSlcnNcD
+         EOPQbbvUXMSo0zNCOQNT6p03383iNgkfl+yohdzEgP4kX7dSyhtNOrBlHh7pcahCbP
+         sMPhNzKrkjpHjCnEGvw8GWjWBTZtoGlz2pkSKxB78QTkTMZh2bI3NqpwfZGT79U0MM
+         NH0v38Ywy3DFQ==
+From:   Colin King <colin.king@canonical.com>
+To:     Karsten Keil <isdn@linux-pingi.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Andrei Emeltchenko <andrei.emeltchenko@intel.com>,
+        Gustavo Padovan <gustavo.padovan@collabora.co.uk>,
+        netdev@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Cc:     kernel-janitors@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: increase BTNAMSIZ to 21 chars to fix potential buffer overflow
+Date:   Wed,  4 Aug 2021 16:09:51 +0100
+Message-Id: <20210804150951.116814-1-colin.king@canonical.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+From: Colin Ian King <colin.king@canonical.com>
 
-> This patch set refactors the multiple setup routines for various Intel devices
-> to a combined single entry. Here are the highlight of the changes:
-> 
-> 1. Updated hci_alloc_dev() to allocate the hdev object with an extra buffer
->   for the private data. btintel introduces the btintel_data struct and
->   store it to the private data in hdev object.
-> 
-> 2. Added a single entry for setup and shutdown and uses the
->   HCI_Intel_Read_Version command to identify the device, instead of
->   relying on the USB VID and PID. The new HCI_Intel_Read_Version command
->   is used for both legacy ROM, legacy Bootloader and TLV based bootloader.
-> 
->   Also, btintel_configure_setup() is added to setup the most of hdev
->   callbacks, unless it is a transport specific functions.
-> 
->   After identifying the device, it calls the corresponding setup routines.
->   These routines were copied from btusb to btintel and changes are none or
->   very minimal.
-> 
-> 3. Keep the state of bootloader in btintel object. The bootloader state
->   is agnostic to the transport type, so btintel uses the btintel_data
->   to keep track of the state in the private data section in hdev.
-> 
->   Also, added macros to set/clear/test flags to simplify the code.
-> 
-> 5. Cleaned up the exported functions and make it static as much as possible
->   if not necessary.
-> 
-> 6. From the JfP/ThP, the operational firmware support the new TLV based
->   HCI_Intel_Read_Version command, which confues the usage during the
->   setup routine. So, the check for firmware variant of those legacy
->   bootloader sku is added to use the legacy bootloader setup call.
-> 
-> 7. All of HCI quirks for Intel devices are moved in the setup routines.
->   There are several HCI quirks for Intel devices and some of them are
->   for all Intel devices and some of them are for a specific devices.
-> 
->   The flag for HCI quirks are removed from the .driver_info, and applying
->   HCI quirks are done in combined setup routine depends on the hw_variant.
-> 
-> 8. Combined the setting the MSFT extension support in the combined setup
->   routine now depends on the hw_variant.
-> 
-> Tedd Ho-Jeong An (12):
->  Bluetooth: Add support hdev to allocate private data
->  Bluetooth: btintel: Add combined setup and shutdown functions
->  Bluetooth: btintel: Refactoring setup routine for legacy ROM sku
->  Bluetooth: btintel: Add btintel data struct
->  Bluetooth: btintel: Fix the first HCI command not work with ROM device
->  Bluetooth: btintel: Fix the LED is not turning off immediately
->  Bluetooth: btintel: Add combined set_diag functions
->  Bluetooth: btintel: Refactoring setup routine for bootloader devices
->  Bluetooth: btintel: Move hci quirks to setup routine
->  Bluetooth: btintel: Clean the exported function to static
->  Bluetooth: btintel: Fix the legacy bootloader returns tlv based
->    version
->  Bluetooth: btintel: Combine setting MSFT extension
-> 
-> drivers/bluetooth/btintel.c      | 1307 ++++++++++++++++++++++++++++--
-> drivers/bluetooth/btintel.h      |  119 ++-
-> drivers/bluetooth/btusb.c        | 1128 +-------------------------
-> include/net/bluetooth/hci_core.h |   13 +-
-> net/bluetooth/hci_core.c         |   13 +-
-> 5 files changed, 1358 insertions(+), 1222 deletions(-)
+An earlier commit replaced using batostr to using %pMR sprintf for the
+construction of session->name. Static analysis detected that this new
+method can use a total of 21 characters (including the trailing '\0')
+so we need to increase the BTNAMSIZ from 18 to 21 to fix potential
+buffer overflows.
 
-I have no further comments, but the patch set needs to be rebased against latest bluetooth-next tree.
+Addresses-Coverity: ("Out-of-bounds write")
+Fixes: fcb73338ed53 ("Bluetooth: Use %pMR in sprintf/seq_printf instead of batostr")
+Signed-off-by: Colin Ian King <colin.king@canonical.com>
+---
+ net/bluetooth/cmtp/cmtp.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Regards
-
-Marcel
+diff --git a/net/bluetooth/cmtp/cmtp.h b/net/bluetooth/cmtp/cmtp.h
+index c32638dddbf9..f6b9dc4e408f 100644
+--- a/net/bluetooth/cmtp/cmtp.h
++++ b/net/bluetooth/cmtp/cmtp.h
+@@ -26,7 +26,7 @@
+ #include <linux/types.h>
+ #include <net/bluetooth/bluetooth.h>
+ 
+-#define BTNAMSIZ 18
++#define BTNAMSIZ 21
+ 
+ /* CMTP ioctl defines */
+ #define CMTPCONNADD	_IOW('C', 200, int)
+-- 
+2.31.1
 
