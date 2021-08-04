@@ -2,172 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC63C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:07:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 32AACC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 23:15:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1894D61073
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:07:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 06244610A0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 23:15:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235087AbhHDWHR (ORCPT
+        id S235528AbhHDXPN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 18:07:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235066AbhHDWF3 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 18:05:29 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8DA9C061799
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 15:05:15 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id k65so5908299yba.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 15:05:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=xvdAuZMwvx4/bGaUn0WGVJBHpvTUpDRyXvINUKXbHnM=;
-        b=gGPLcGDcEFqZ/M3c4vfYEgMSnk/8w8qCTOfQPRvqwTPgjZ518gcf9X3WyPu2PUybXp
-         V3Rvp5tRNEz0EhoIiQhP1+/CYT3P3yAPKKbZXaa8qh1ZruCs56UlHfhTeNkYVUzJSaUn
-         CJjvrxuJ//csd3BXjIJRolf8O44A0hCGjfTTbnTejlngrQ9rzCYCH1K06fj7VR6IEZQJ
-         QjuQaqJOpTp51uZ2uwJwLmEYUY+WCojZyViHgKC12b2SVj/zL3cQTqa44HstBuUC2TUO
-         Zfb3R3zTm9dwtMd4oo37gcwa/O28tCtNgN5JR/GY7u5DwPMZH9dHKEpDDusVT7JZQmqi
-         Uk8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=xvdAuZMwvx4/bGaUn0WGVJBHpvTUpDRyXvINUKXbHnM=;
-        b=iaJB/S1Q0WsxQSIsSfqeyzsVIaWhprLFYnBXpfS6L/nST6Fraqy77XC0SITMXVLq/W
-         aokbObL8Hs8RqicYuRxSPq9FZUScmdAPIsMLmKPPwCIrN+sMcElSbVT5qXvzcdWFZ9sL
-         9meSc/h/J9i+c9+Hp4UAfLZVdvvHKSEv1thMPpux8xwaV9i727oFC9GW3wV5bW29Z8en
-         XOZt43VyW/7t8pPoGWph4eGKgqqt2A8KDlfzzfLQ2RzVCtNWw6I1OcRu05s4UVK7Pb83
-         yDXvtMprAJWqzaR8TVDEAJZWTVUtlHGKI4DYMYXnHBeLkO1w7uZkOZTIqL8yKDXod3Ug
-         zYcw==
-X-Gm-Message-State: AOAM532Mz/Bky6mCZG1UcX/xpyDWyrbF3v+NXlp/oNMicT/UXTE/3UN1
-        20NN0ka60BLlMDfG6u/XDXjnIARe+SB2oJ5etG4=
-X-Google-Smtp-Source: ABdhPJziYB6rprlB5jMAN272UBoExmdb9hhB1K3o/b9bqFefA2tyIrZBJG5tJnCoeYdFat3m3Ag5EOWr7ctknuqgSMM=
-X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr2112504ybu.282.1628114714832;
- Wed, 04 Aug 2021 15:05:14 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210803114317.801840-1-howardchung@google.com>
-In-Reply-To: <20210803114317.801840-1-howardchung@google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 4 Aug 2021 15:05:03 -0700
-Message-ID: <CABBYNZL9eY0ux92AMLZosUXa1p9t8d62WqLoTnrkxNg4Vq=3Ew@mail.gmail.com>
-Subject: Re: [Bluez PATCH v9 00/13] Admin policy series
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Yun-Hao Chung <howardchung@chromium.org>
+        Wed, 4 Aug 2021 19:15:13 -0400
+Received: from mga14.intel.com ([192.55.52.115]:10020 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230514AbhHDXPN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Aug 2021 19:15:13 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10066"; a="213760940"
+X-IronPort-AV: E=Sophos;i="5.84,295,1620716400"; 
+   d="scan'208";a="213760940"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2021 16:14:59 -0700
+X-IronPort-AV: E=Sophos;i="5.84,295,1620716400"; 
+   d="scan'208";a="668379256"
+Received: from ltd-ie-desk03.amr.corp.intel.com ([10.212.230.170])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Aug 2021 16:14:58 -0700
+Message-ID: <4e9d536cb6a7cffb829f105183f2bb5bceb4122c.camel@linux.intel.com>
+Subject: Re: [PATCH v5 1/2] Bluetooth: btusb: Record debug log for Mediatek
+ Chip.
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        "\"Mark-YW Chen" =?UTF-8?Q?=28=E9=99=B3=E6=8F=9A=E6=96=87=29=22?= 
+        <Mark-YW.Chen@mediatek.com>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, chris.lu@mediatek.com,
+        will-cy.lee@mediatek.com, Sean Wang <sean.wang@mediatek.com>,
+        BlueZ <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org,
+        open list <linux-kernel@vger.kernel.org>,
+        Michael Sun <michaelfsun@google.com>, shawnku@google.com,
+        jemele@google.com, apusaka@google.com, mcchou@chromium.org
+Date:   Wed, 04 Aug 2021 16:14:57 -0700
+In-Reply-To: <8988B918-95FD-42DE-95FA-3BAC4A144165@holtmann.org>
+References: <20210804090316.12080-1-mark-yw.chen@mediatek.com>
+         <8988B918-95FD-42DE-95FA-3BAC4A144165@holtmann.org>
+Organization: Intel Corporation
 Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Mark,
 
-On Tue, Aug 3, 2021 at 4:43 AM Howard Chung <howardchung@google.com> wrote:
->
-> From: Yun-Hao Chung <howardchung@chromium.org>
->
->
-> Hi manintainers,
->
-> This series is to
-> 1. Implement a few methods in core so that a plugin can have control of
->    allowing / disallowing certain service connections.
-> 2. Implement the AdminPolicy plugin. The plugin provides interfaces
->    AdminPolicySet and AdminPolicyStatus. For each policy, users should
->    set the value thorugh AdminPolicySet and query the current setting
->    through AdminPolicyStatus. We separeted these two interfaces so that
->    developers can assign different groups of users to these interfaces.
->    Currently the only policy is ServiceAllowList, which make bluez only
->    allow a list of service by specified their UUIDs, but the plugin is
->    also expected to provide more controls over other bluez behaviors.
-> Since the second part is a plugin, it might not be necessary to land in
-> upstream tree.
->
-> Thanks.
->
-> Changes in v9:
-> - Fix gitlint error in patch 'core: add device callbacks to adapter
->   driver'
->
-> Changes in v8:
-> - Remove changes in profiles/health/
->
-> Changes in v7:
-> - Fix compiler errors in profiles/hdp.c
->
-> Changes in v6:
-> - include <errno.h> instead of <error.h> in plugins/admin.c
->
-> Changes in v5:
-> - Fix compiler errors in plugins/admin.c
->
-> Changes in v4:
-> - Update commit message (admin_policy -> admin)
-> - remove old plugins/admin_policy.c
->
-> Changes in v3:
-> - Rename plugins/admin_policy.c -> plugins/admin.c
-> - Use device_added callback in btd_adapter_driver instead of listen for
->   dbus
-> - Add authorization method in profiles/health/mcap.c and block incoming
->   connections in adapter authorization function.
->
-> Changes in v2:
-> - Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
-> - Modify the criteria to say a device is `Affected` from any-of-uuid
->   to any-of-auto-connect-profile.
-> - Remove the code to remove/reprobe disallowed/allowed profiles,
->   instead, check if the service is allowed in bt_io_accept connect_cb.
-> - Fix a typo in emit_property_change in
->   plugin/admin_policy.c:set_service_allowlist
-> - Instead of using device_state_cb, utilize D-BUS client to watch device
->   added/removed.
-> - Add a document in doc/
->
-> Yun-Hao Chung (13):
->   core: add is_allowed property in btd_service
->   core: add device callbacks to adapter driver
->   core: add adapter and device allowed_uuid functions
->   core: block not allowed UUID connect in auth
->   plugins: new plugin
->   plugins/admin: add admin_policy adapter driver
->   plugins/admin: add ServiceAllowList method
->   plugins/admin: add ServiceAllowList property
->   plugins/admin: add device callbacks
->   plugins/admin: add AffectedByPolicy property
->   plugins/admin: persist policy settings
->   doc: add description of admin policy
->   doc: add admin policy file storage description
->
->  Makefile.plugins         |   5 +
->  bootstrap-configure      |   1 +
->  configure.ac             |   4 +
->  doc/admin-policy-api.txt |  65 +++++
->  doc/settings-storage.txt |  20 ++
->  plugins/admin.c          | 590 +++++++++++++++++++++++++++++++++++++++
->  src/adapter.c            | 169 ++++++++++-
->  src/adapter.h            |  22 +-
->  src/device.c             |  65 ++++-
->  src/device.h             |   2 +
->  src/profile.c            |  11 +
->  src/service.c            |  33 +++
->  src/service.h            |   2 +
->  13 files changed, 980 insertions(+), 9 deletions(-)
->  create mode 100644 doc/admin-policy-api.txt
->  create mode 100644 plugins/admin.c
->
-> --
-> 2.32.0.554.ge1b32706d8-goog
+I cannot find the original patch email and CI report, however this patch throws this warning.
 
-Applied, thanks.
+drivers/bluetooth/btusb.c: In function ‘btusb_recv_acl_mtk’:
+drivers/bluetooth/btusb.c:4033:3: warning: this statement may fall through [-Wimplicit-fallthrough=]
+ 4033 |   usb_disable_autosuspend(data->udev);
+      |   ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/bluetooth/btusb.c:4034:2: note: here
+ 4034 |  case 0x05ff:  /* Firmware debug logging 1 */
+      |  ^~~~
 
--- 
-Luiz Augusto von Dentz
+
+Regards,
+Tedd
+
+
+On Wed, 2021-08-04 at 16:48 +0200, Marcel Holtmann wrote:
+> Hi Mark,
+> 
+> > Mediatek Bluetooth controller sends the FW log and FW dump via EP2.
+> > This patch creates an MTK specified callback(btusb_recv_acl_mtk) to
+> > replace the original one (hci_recv_frame) when an MTK controller is
+> > detected. The new callback will separate the firmware dump traffics
+> > from the ACL data to have them process separately.
+> > 
+> > 1. Add a new field (recv_acl) to the btusb_data struct to store
+> > vendor-specific ACL callback handler.
+> > 2. Add the MTK-specific ACL callback handler (btusb_recv_acl_mtk) to
+> > process ACL data, debug log, and firmware dump.
+> > 3. The debug log traces LMP/LL events and connection quality reports.
+> > 4. The upper layer can use hci_channel_monitor to receive these
+> > packets.
+> > 
+> > Example btmon: firmware debug log.
+> > 1. Enable firmware debug log.
+> > < HCI Command: Vendor (0x3f|0x005d) plen 4
+> >        00 00 02 02                                      ....
+> > > HCI Event: Command Complete (0x0e) plen 8
+> >      Vendor (0x3f|0x005d) ncmd 1
+> >        Status: Success (0x00)
+> >        00 00 02 02                                      ....
+> > 2. Diagnostic packet from controller
+> > = Vendor Diagnostic (len 500)
+> >          ff 05 f0 01 fd ff 02 0e 08 01 5d fc 00 00 00 02
+> >          02 aa aa aa cb e3 f0 15 b0 0c 5f 01 00 d1 0f 33
+> >          01 7f 00 08 57 61 0c 00 00 00 00 00 23 37 17 00
+> >          fd ff 00 00 29 60 ff ff b1 56 e8 00 57 40 0a 40
+> >          39 95 f2 00 47 40 43 00 fc f0 16 00 57 61 0c 00
+> >          00 00 00 00 23 37 17 00 fd ff 00 00 29 60 ff ff
+> >          65 95 f2 00 57 40 0a 40 ec d3 fc 00 47 40 3b 00
+> >          2c f1 17 00 57 61 0c 00 00 00 00 00 23 37 17 00
+> >          fd ff 00 00 29 60 ff ff 19 d4 fc 00 57 40 76 1c
+> >          b2 61 01 01 47 40 b3 04 0b 63 18 00 fe ff 02 01
+> >          04 05 33 8b 9e 08 00 aa aa aa aa aa 27 38 01 02
+> >          01 00 00 00 02 e0 10 00 20 00 20 00 2a 08 40 00
+> >          20 00 20 08 2a 08 02 00 40 00 00 01 2e 08 40 00
+> >          01 67 b0 c2 2e 08 3e 07 ff ff ff ff 40 08 01 00
+> >          02 00 00 00 34 08 a3 00 00 00 00 00 34 08 a3 00
+> >          00 00 00 00 35 08 45 01 00 00 00 00 2e 08 40 00
+> >          01 67 b0 c2 30 35 01 02 00 00 00 00 2c 31 01 00
+> >          02 00 00 40 2d 19 03 00 00 40 00 00 fd ff 02 0f
+> >          04 00 01 01 04 aa aa aa aa aa aa aa 57 61 0c 00
+> >          00 00 00 00 23 46 32 00 01 00 00 00 2f 35 00 02
+> >          00 00 00 00 29 35 ff 02 00 22 00 00 2d 31 a6 02
+> >          02 00 00 00 31 6c 40 00 14 63 18 1b 31 6c 40 00
+> >          14 63 18 23 51 08 53 00 12 63 18 00 2c 35 12 01
+> >          fe 00 00 00 2b 35 fe 02 02 00 00 00 2f 31 21 00
+> >          00 00 02 00 75 61 01 00 4c 1b 93 00 79 61 01 00
+> >          00 00 00 00 12 e3 63 18 20 31 86 01 74 61 68 03
+> >          00 00 04 00 a1 73 ff 00 b9 01 00 00 a1 73 04 00
+> >          00 00 00 00 a1 73 00 00 00 00 00 00 a1 73 00 00
+> >          02 00 00 00 31 6c 40 00 16 63 18 0c 31 6c 40 00
+> >          16 63 18 1c 77 61 40 00 48 33 40 00 14 e3 63 18
+> >          40 31 86 01 00 d1 02 c5 07 23 a1 34 73 61 37 02
+> >          02 00 00 a1
+> > 
+> > Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+> > Reviewed-by: Michael Sun <michaelfsun@google.com>
+> > Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+> > ---
+> > drivers/bluetooth/btusb.c | 25 ++++++++++++++++++++++++-
+> > 1 file changed, 24 insertions(+), 1 deletion(-)
+> 
+> patch has been applied to bluetooth-next tree.
+> 
+> Regards
+> 
+> Marcel
+> 
+
