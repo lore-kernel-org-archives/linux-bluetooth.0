@@ -2,143 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EE16C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BC63C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:07:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26E0961073
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1894D61073
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 22:07:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234975AbhHDWDp (ORCPT
+        id S235087AbhHDWHR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 18:03:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45842 "EHLO
+        Wed, 4 Aug 2021 18:07:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46426 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231500AbhHDWDn (ORCPT
+        with ESMTP id S235066AbhHDWF3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 18:03:43 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7ACA1C0613D5
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 15:02:43 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id j77so5986818ybj.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 15:02:43 -0700 (PDT)
+        Wed, 4 Aug 2021 18:05:29 -0400
+Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8DA9C061799
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 15:05:15 -0700 (PDT)
+Received: by mail-yb1-xb2b.google.com with SMTP id k65so5908299yba.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 15:05:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Uk44ztAe48lqNdLBDktAqfGNRmjNHGTeQX0gFybUgTQ=;
-        b=deMIzFe7Hg3pavQlvPLPUn/0RDMVBFSWpN4VKEyqxaKQ+UfYAm0TjAVhqWJDfQuTSf
-         o3pv5j0tppw3fiAoMSqmCA9I0X5uScIZ82uIfo9QMpZGuSn/hvMnJlWZKcgziNExg7GF
-         AIaO4YfioDkfHW5Vb8Te8X+yz1xsqM7J1Frc26Q1VwDBhQHIGV9TRmZ4e7tXXQGHeWGi
-         ILagp4Qmo9gXhwpbogOaUhu5tE6X6fAZ4lskkaniiKfr1ffFR+UXSLSb+QeALzXtgld0
-         BKu/cYoviZnw4Lxo1S2NZf0iP2szfqsbzhO/M4TecclD/Dw36jOQtArWU5tVtgh2cCH0
-         U4pw==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=xvdAuZMwvx4/bGaUn0WGVJBHpvTUpDRyXvINUKXbHnM=;
+        b=gGPLcGDcEFqZ/M3c4vfYEgMSnk/8w8qCTOfQPRvqwTPgjZ518gcf9X3WyPu2PUybXp
+         V3Rvp5tRNEz0EhoIiQhP1+/CYT3P3yAPKKbZXaa8qh1ZruCs56UlHfhTeNkYVUzJSaUn
+         CJjvrxuJ//csd3BXjIJRolf8O44A0hCGjfTTbnTejlngrQ9rzCYCH1K06fj7VR6IEZQJ
+         QjuQaqJOpTp51uZ2uwJwLmEYUY+WCojZyViHgKC12b2SVj/zL3cQTqa44HstBuUC2TUO
+         Zfb3R3zTm9dwtMd4oo37gcwa/O28tCtNgN5JR/GY7u5DwPMZH9dHKEpDDusVT7JZQmqi
+         Uk8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Uk44ztAe48lqNdLBDktAqfGNRmjNHGTeQX0gFybUgTQ=;
-        b=fr5CtgMM/99cJJRUqQtWC77Hy74DifyOSGUmgd08dRm8eAjrUXI1rcLYSMgqwJ6XVw
-         67mgcR9JzPyDlykW1EGz3PjolnxZUgGAIJz4YwZx88BduqDejJwjNTkz4am4u8Ek7vO8
-         6AgqQIYRl2a9MJlVb7VDEKPHSqSrQ1ndJtwccj4mqNd7+ej6k09NA5N6pYPfzenCvT4a
-         gNbZ/lCDl4iW8nEE2rzG12Er8m2jenJ/FXhC9bxvW+5KmUR1Jb52fTL4UaORJ6ORb+ft
-         zv0Xnd/pPbksCkfhTidm/kdpm2G1QgPdVgBn/BH1GVkh29QzbYBwTysVpwL3TPGgaRRj
-         35JA==
-X-Gm-Message-State: AOAM530KkmUQGevdZjQZFzIE52N8SxqJ/MYsKperoihjCNrjRBbgmcYh
-        3ZF4zJLww6/Q3xjlZC6fp1GZUy/Eg6xcpw05tWWHhQAE
-X-Google-Smtp-Source: ABdhPJx1oVV5cxDdo/hatKQI586ybaSJkjo4/0W67hCSD+vg2fvEAcF0fP2HnOlNE64WKT5yKY7LtD/zz3tAVamJKyw=
-X-Received: by 2002:a25:d183:: with SMTP id i125mr2139469ybg.408.1628114562242;
- Wed, 04 Aug 2021 15:02:42 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=xvdAuZMwvx4/bGaUn0WGVJBHpvTUpDRyXvINUKXbHnM=;
+        b=iaJB/S1Q0WsxQSIsSfqeyzsVIaWhprLFYnBXpfS6L/nST6Fraqy77XC0SITMXVLq/W
+         aokbObL8Hs8RqicYuRxSPq9FZUScmdAPIsMLmKPPwCIrN+sMcElSbVT5qXvzcdWFZ9sL
+         9meSc/h/J9i+c9+Hp4UAfLZVdvvHKSEv1thMPpux8xwaV9i727oFC9GW3wV5bW29Z8en
+         XOZt43VyW/7t8pPoGWph4eGKgqqt2A8KDlfzzfLQ2RzVCtNWw6I1OcRu05s4UVK7Pb83
+         yDXvtMprAJWqzaR8TVDEAJZWTVUtlHGKI4DYMYXnHBeLkO1w7uZkOZTIqL8yKDXod3Ug
+         zYcw==
+X-Gm-Message-State: AOAM532Mz/Bky6mCZG1UcX/xpyDWyrbF3v+NXlp/oNMicT/UXTE/3UN1
+        20NN0ka60BLlMDfG6u/XDXjnIARe+SB2oJ5etG4=
+X-Google-Smtp-Source: ABdhPJziYB6rprlB5jMAN272UBoExmdb9hhB1K3o/b9bqFefA2tyIrZBJG5tJnCoeYdFat3m3Ag5EOWr7ctknuqgSMM=
+X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr2112504ybu.282.1628114714832;
+ Wed, 04 Aug 2021 15:05:14 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210803225050.95417-1-luiz.dentz@gmail.com> <6109d34e.1c69fb81.ac27d.18ec@mx.google.com>
-In-Reply-To: <6109d34e.1c69fb81.ac27d.18ec@mx.google.com>
+References: <20210803114317.801840-1-howardchung@google.com>
+In-Reply-To: <20210803114317.801840-1-howardchung@google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 4 Aug 2021 15:02:31 -0700
-Message-ID: <CABBYNZKEYsu8hNwNtT7gG7Uar92kU2oBwjKags8-0VpfVXyYZg@mail.gmail.com>
-Subject: Re: [v2] a2dp: Invalidate cache if SetConfiguration fails
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 4 Aug 2021 15:05:03 -0700
+Message-ID: <CABBYNZL9eY0ux92AMLZosUXa1p9t8d62WqLoTnrkxNg4Vq=3Ew@mail.gmail.com>
+Subject: Re: [Bluez PATCH v9 00/13] Admin policy series
+To:     Howard Chung <howardchung@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Yun-Hao Chung <howardchung@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Howard,
 
-On Tue, Aug 3, 2021 at 4:37 PM <bluez.test.bot@gmail.com> wrote:
+On Tue, Aug 3, 2021 at 4:43 AM Howard Chung <howardchung@google.com> wrote:
 >
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=525931
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.52 seconds
-> GitLint                       PASS      0.13 seconds
-> Prep - Setup ELL              PASS      51.39 seconds
-> Build - Prep                  PASS      0.13 seconds
-> Build - Configure             PASS      9.25 seconds
-> Build - Make                  PASS      220.91 seconds
-> Make Check                    PASS      9.38 seconds
-> Make Distcheck                PASS      261.96 seconds
-> Build w/ext ELL - Configure   PASS      9.37 seconds
-> Build w/ext ELL - Make        PASS      207.52 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - PASS
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
->
-> ##############################
-> Test: GitLint - PASS
-> Desc: Run gitlint with rule in .gitlint
->
-> ##############################
-> Test: Prep - Setup ELL - PASS
-> Desc: Clone, build, and install ELL
->
-> ##############################
-> Test: Build - Prep - PASS
-> Desc: Prepare environment for build
->
-> ##############################
-> Test: Build - Configure - PASS
-> Desc: Configure the BlueZ source tree
->
-> ##############################
-> Test: Build - Make - PASS
-> Desc: Build the BlueZ source tree
->
-> ##############################
-> Test: Make Check - PASS
-> Desc: Run 'make check'
->
-> ##############################
-> Test: Make Distcheck - PASS
-> Desc: Run distcheck to check the distribution
->
-> ##############################
-> Test: Build w/ext ELL - Configure - PASS
-> Desc: Configure BlueZ source with '--enable-external-ell' configuration
->
-> ##############################
-> Test: Build w/ext ELL - Make - PASS
-> Desc: Build BlueZ source with '--enable-external-ell' configuration
+> From: Yun-Hao Chung <howardchung@chromium.org>
 >
 >
+> Hi manintainers,
 >
-> ---
-> Regards,
-> Linux Bluetooth
+> This series is to
+> 1. Implement a few methods in core so that a plugin can have control of
+>    allowing / disallowing certain service connections.
+> 2. Implement the AdminPolicy plugin. The plugin provides interfaces
+>    AdminPolicySet and AdminPolicyStatus. For each policy, users should
+>    set the value thorugh AdminPolicySet and query the current setting
+>    through AdminPolicyStatus. We separeted these two interfaces so that
+>    developers can assign different groups of users to these interfaces.
+>    Currently the only policy is ServiceAllowList, which make bluez only
+>    allow a list of service by specified their UUIDs, but the plugin is
+>    also expected to provide more controls over other bluez behaviors.
+> Since the second part is a plugin, it might not be necessary to land in
+> upstream tree.
+>
+> Thanks.
+>
+> Changes in v9:
+> - Fix gitlint error in patch 'core: add device callbacks to adapter
+>   driver'
+>
+> Changes in v8:
+> - Remove changes in profiles/health/
+>
+> Changes in v7:
+> - Fix compiler errors in profiles/hdp.c
+>
+> Changes in v6:
+> - include <errno.h> instead of <error.h> in plugins/admin.c
+>
+> Changes in v5:
+> - Fix compiler errors in plugins/admin.c
+>
+> Changes in v4:
+> - Update commit message (admin_policy -> admin)
+> - remove old plugins/admin_policy.c
+>
+> Changes in v3:
+> - Rename plugins/admin_policy.c -> plugins/admin.c
+> - Use device_added callback in btd_adapter_driver instead of listen for
+>   dbus
+> - Add authorization method in profiles/health/mcap.c and block incoming
+>   connections in adapter authorization function.
+>
+> Changes in v2:
+> - Move bt_uuid_hash and bt_uuid_equal functions to adapter.c.
+> - Modify the criteria to say a device is `Affected` from any-of-uuid
+>   to any-of-auto-connect-profile.
+> - Remove the code to remove/reprobe disallowed/allowed profiles,
+>   instead, check if the service is allowed in bt_io_accept connect_cb.
+> - Fix a typo in emit_property_change in
+>   plugin/admin_policy.c:set_service_allowlist
+> - Instead of using device_state_cb, utilize D-BUS client to watch device
+>   added/removed.
+> - Add a document in doc/
+>
+> Yun-Hao Chung (13):
+>   core: add is_allowed property in btd_service
+>   core: add device callbacks to adapter driver
+>   core: add adapter and device allowed_uuid functions
+>   core: block not allowed UUID connect in auth
+>   plugins: new plugin
+>   plugins/admin: add admin_policy adapter driver
+>   plugins/admin: add ServiceAllowList method
+>   plugins/admin: add ServiceAllowList property
+>   plugins/admin: add device callbacks
+>   plugins/admin: add AffectedByPolicy property
+>   plugins/admin: persist policy settings
+>   doc: add description of admin policy
+>   doc: add admin policy file storage description
+>
+>  Makefile.plugins         |   5 +
+>  bootstrap-configure      |   1 +
+>  configure.ac             |   4 +
+>  doc/admin-policy-api.txt |  65 +++++
+>  doc/settings-storage.txt |  20 ++
+>  plugins/admin.c          | 590 +++++++++++++++++++++++++++++++++++++++
+>  src/adapter.c            | 169 ++++++++++-
+>  src/adapter.h            |  22 +-
+>  src/device.c             |  65 ++++-
+>  src/device.h             |   2 +
+>  src/profile.c            |  11 +
+>  src/service.c            |  33 +++
+>  src/service.h            |   2 +
+>  13 files changed, 980 insertions(+), 9 deletions(-)
+>  create mode 100644 doc/admin-policy-api.txt
+>  create mode 100644 plugins/admin.c
+>
+> --
+> 2.32.0.554.ge1b32706d8-goog
 
-Pushed.
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
