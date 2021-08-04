@@ -2,129 +2,309 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 315C3C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 10:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B337C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 10:27:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1954E601FC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 10:04:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5415760EB2
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 10:27:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237366AbhHDKFH (ORCPT
+        id S237304AbhHDK1Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 06:05:07 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:37632 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235419AbhHDKFG (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 06:05:06 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1628071494; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=01PL1JCEftvWMZM72aDccUWunAyiu+MxKdhkYk1qIOw=; b=l6LgS6C4LFrcJOdZQyp+5OOT6XsEtYHFm25/Ej9OSg4VAJ2/1yblWVFdS2eG89hw72UNSi8Z
- mv3QXZ2AMkRAfK8B6to00L6wXwZhQjyVZe6tWE+PHVoLfY6+owaGz44l7zahW+V38uI/SPmd
- +/gczFicoroBoIy79BYRHE7WUYQ=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 610a6634bcdc32aad357d115 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 04 Aug 2021 10:04:36
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 61656C433D3; Wed,  4 Aug 2021 10:04:36 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 72776C43460;
-        Wed,  4 Aug 2021 10:04:32 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org 72776C43460
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=zijuhu@codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v1] Bluetooth: btusb: Add support different nvm to distinguish different factory for WCN6855 controller
-Date:   Wed,  4 Aug 2021 18:04:27 +0800
-Message-Id: <1628071467-27190-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Wed, 4 Aug 2021 06:27:24 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:62871 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235383AbhHDK1X (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 4 Aug 2021 06:27:23 -0400
+Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 174AR0PO083503;
+        Wed, 4 Aug 2021 19:27:00 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
+ Wed, 04 Aug 2021 19:27:00 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 174AQx5B083499
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Wed, 4 Aug 2021 19:26:59 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: [PATCH v4] Bluetooth: defer cleanup of resources in
+ hci_unregister_dev()
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+To:     Linus Torvalds <torvalds@linux-foundation.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        LinMa <linma@zju.edu.cn>
+References: <290fe7c7-c14f-8685-af09-419faa0e4d1f@i-love.sakura.ne.jp>
+ <CAHk-=wgRzabeP3CLZmFWO5EXrqWSvSL8uKwbSYRWw2xT9RVBrQ@mail.gmail.com>
+ <c8cf9848-1405-af75-6f05-b7b82c2619a7@i-love.sakura.ne.jp>
+Message-ID: <e9e2738d-78a7-1def-a86f-937951d139a7@i-love.sakura.ne.jp>
+Date:   Wed, 4 Aug 2021 19:26:56 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <c8cf9848-1405-af75-6f05-b7b82c2619a7@i-love.sakura.ne.jp>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tim Jiang <tjiang@codeaurora.org>
+syzbot is hitting might_sleep() warning at hci_sock_dev_event()
+due to calling lock_sock() with rw spinlock held [1].
 
-we have different factory to produce wcn6855 soc chip, so we should use
-different nvm file with surfix to distinguish them.
+It seems that history of this locking problem is a trial and error.
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+Commit b40df5743ee8aed8 ("[PATCH] bluetooth: fix socket locking in
+hci_sock_dev_event()") in 2.6.21-rc4 changed bh_lock_sock() to lock_sock()
+as an attempt to fix lockdep warning.
+
+Then, commit 4ce61d1c7a8ef4c1 ("[BLUETOOTH]: Fix locking in
+hci_sock_dev_event().") in 2.6.22-rc2 changed lock_sock() to
+local_bh_disable() + bh_lock_sock_nested() as an attempt to fix
+sleep in atomic context warning.
+
+Then, commit 4b5dd696f81b210c ("Bluetooth: Remove local_bh_disable() from
+hci_sock.c") in 3.3-rc1 removed local_bh_disable().
+
+Then, commit e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF
+of hdev object") in 5.13-rc5 again changed bh_lock_sock_nested() to
+lock_sock() as an attempt to fix CVE-2021-3573.
+
+This difficulty comes from current implementation that
+hci_sock_dev_event(HCI_DEV_UNREG) is responsible for dropping all
+references from sockets because hci_unregister_dev() immediately reclaims
+resources as soon as returning from hci_sock_dev_event(HCI_DEV_UNREG).
+But the history suggests that hci_sock_dev_event(HCI_DEV_UNREG) was not
+doing what it should do.
+
+Therefore, instead of trying to detach sockets from device, let's accept
+not detaching sockets from device at hci_sock_dev_event(HCI_DEV_UNREG),
+by moving actual cleanup of resources from hci_unregister_dev() to
+hci_cleanup_dev() which is called by bt_host_release() when all references
+to this unregistered device (which is a kobject) are gone.
+
+Since hci_sock_dev_event(HCI_DEV_UNREG) no longer resets hci_pi(sk)->hdev,
+we need to check whether this device was unregistered and return an error
+based on HCI_UNREGISTER flag. There might be subtle behavioral difference
+in "monitor the hdev" functionality; please report if you found something
+went wrong due to this patch.
+
+Link: https://syzkaller.appspot.com/bug?extid=a5df189917e79d5e59c9 [1]
+Reported-by: syzbot <syzbot+a5df189917e79d5e59c9@syzkaller.appspotmail.com>
+Suggested-by: Linus Torvalds <torvalds@linux-foundation.org>
+Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Fixes: e305509e678b3a4a ("Bluetooth: use correct lock to prevent UAF of hdev object")
 ---
- drivers/bluetooth/btusb.c | 30 +++++++++++++++++++++++++-----
- 1 file changed, 25 insertions(+), 5 deletions(-)
+v4: Don't touch "monitor the hdev" functions.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b1a05bb9f4bf..cc9618575ab4 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4013,6 +4013,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
+v3: Unexport hci_unregister_dev because only bt_host_release calls it
+    and both hci_core.o and hci_sysfs.o are combined into bluetooth.o.
+
+    Rename hci_release_dev to hci_cleanup_dev and call it only when
+    HCI_UNREGISTER was set, for syzbot
+    <syzbot+47c6d0efbb7fe2f7a5b8@syzkaller.appspotmail.com> is reporting
+    that bt_host_release might be called without hci_register_dev and
+    hci_unregister_dev.
+
+    Return -EPIPE instead of 0 if HCI_UNREGISTER was set, in order to
+    make sure that userspace finds that the device was unregistred.
+
+v2: Add hci_release_dev and make bt_host_release call it instead of making
+    bt_host_release public.
+
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_core.c         | 16 +++++------
+ net/bluetooth/hci_sock.c         | 49 +++++++++++++++++++++-----------
+ net/bluetooth/hci_sysfs.c        |  3 ++
+ 4 files changed, 45 insertions(+), 24 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a53e94459ecd..db4312e44d47 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1230,6 +1230,7 @@ struct hci_dev *hci_alloc_dev(void);
+ void hci_free_dev(struct hci_dev *hdev);
+ int hci_register_dev(struct hci_dev *hdev);
+ void hci_unregister_dev(struct hci_dev *hdev);
++void hci_cleanup_dev(struct hci_dev *hdev);
+ int hci_suspend_dev(struct hci_dev *hdev);
+ int hci_resume_dev(struct hci_dev *hdev);
+ int hci_reset_dev(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 2560ed2f144d..e1a545c8a69f 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3996,14 +3996,10 @@ EXPORT_SYMBOL(hci_register_dev);
+ /* Unregister HCI device */
+ void hci_unregister_dev(struct hci_dev *hdev)
+ {
+-	int id;
+-
+ 	BT_DBG("%p name %s bus %d", hdev, hdev->name, hdev->bus);
  
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -4044,6 +4047,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ 	hci_dev_set_flag(hdev, HCI_UNREGISTER);
+ 
+-	id = hdev->id;
+-
+ 	write_lock(&hci_dev_list_lock);
+ 	list_del(&hdev->list);
+ 	write_unlock(&hci_dev_list_lock);
+@@ -4038,7 +4034,14 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	}
+ 
+ 	device_del(&hdev->dev);
++	/* Actual cleanup is deferred until hci_cleanup_dev(). */
++	hci_dev_put(hdev);
++}
++EXPORT_SYMBOL(hci_unregister_dev);
+ 
++/* Cleanup HCI device */
++void hci_cleanup_dev(struct hci_dev *hdev)
++{
+ 	debugfs_remove_recursive(hdev->debugfs);
+ 	kfree_const(hdev->hw_info);
+ 	kfree_const(hdev->fw_info);
+@@ -4063,11 +4066,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 	hci_blocked_keys_clear(hdev);
+ 	hci_dev_unlock(hdev);
+ 
+-	hci_dev_put(hdev);
+-
+-	ida_simple_remove(&hci_index_ida, id);
++	ida_simple_remove(&hci_index_ida, hdev->id);
+ }
+-EXPORT_SYMBOL(hci_unregister_dev);
+ 
+ /* Suspend HCI device */
+ int hci_suspend_dev(struct hci_dev *hdev)
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index b04a5a02ecf3..f1128c2134f0 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -59,6 +59,17 @@ struct hci_pinfo {
+ 	char              comm[TASK_COMM_LEN];
  };
  
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -4209,12 +4213,28 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
- 		/* if boardid equal 0, use default nvm without surfix */
- 		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
-+			/* if ram version is for gf factory, we should add surfix gf to
-+			 * distinguish with default one .
-+			 */
-+			if (ver->ram_version == WCN6855_2_0_RAM_VERSION_GF ||
-+					ver->ram_version == WCN6855_2_1_RAM_VERSION_GF) {
-+				snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_gf.bin",
-+					 le32_to_cpu(ver->rom_version));
-+			} else {
-+				snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-+					 le32_to_cpu(ver->rom_version));
-+			}
- 		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
-+			if (ver->ram_version == WCN6855_2_0_RAM_VERSION_GF ||
-+					ver->ram_version == WCN6855_2_1_RAM_VERSION_GF) {
-+				snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_gf_%04x.bin",
-+					le32_to_cpu(ver->rom_version),
-+					le16_to_cpu(ver->board_id));
-+			} else {
-+				snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-+					le32_to_cpu(ver->rom_version),
-+					le16_to_cpu(ver->board_id));
-+			}
++static struct hci_dev *hci_hdev_from_sock(struct sock *sk)
++{
++	struct hci_dev *hdev = hci_pi(sk)->hdev;
++
++	if (!hdev)
++		return ERR_PTR(-EBADFD);
++	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return ERR_PTR(-EPIPE);
++	return hdev;
++}
++
+ void hci_sock_set_flag(struct sock *sk, int nr)
+ {
+ 	set_bit(nr, &hci_pi(sk)->flags);
+@@ -759,19 +770,13 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+ 	if (event == HCI_DEV_UNREG) {
+ 		struct sock *sk;
+ 
+-		/* Detach sockets from device */
++		/* Wake up sockets using this dead device */
+ 		read_lock(&hci_sk_list.lock);
+ 		sk_for_each(sk, &hci_sk_list.head) {
+-			lock_sock(sk);
+ 			if (hci_pi(sk)->hdev == hdev) {
+-				hci_pi(sk)->hdev = NULL;
+ 				sk->sk_err = EPIPE;
+-				sk->sk_state = BT_OPEN;
+ 				sk->sk_state_change(sk);
+-
+-				hci_dev_put(hdev);
+ 			}
+-			release_sock(sk);
  		}
- 	} else {
- 		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+ 		read_unlock(&hci_sk_list.lock);
+ 	}
+@@ -930,10 +935,10 @@ static int hci_sock_reject_list_del(struct hci_dev *hdev, void __user *arg)
+ static int hci_sock_bound_ioctl(struct sock *sk, unsigned int cmd,
+ 				unsigned long arg)
+ {
+-	struct hci_dev *hdev = hci_pi(sk)->hdev;
++	struct hci_dev *hdev = hci_hdev_from_sock(sk);
+ 
+-	if (!hdev)
+-		return -EBADFD;
++	if (IS_ERR(hdev))
++		return PTR_ERR(hdev);
+ 
+ 	if (hci_dev_test_flag(hdev, HCI_USER_CHANNEL))
+ 		return -EBUSY;
+@@ -1103,6 +1108,18 @@ static int hci_sock_bind(struct socket *sock, struct sockaddr *addr,
+ 
+ 	lock_sock(sk);
+ 
++	/* Allow detaching from dead device and attaching to alive device, if
++	 * the caller wants to re-bind (instead of close) this socket in
++	 * response to hci_sock_dev_event(HCI_DEV_UNREG) notification.
++	 */
++	hdev = hci_pi(sk)->hdev;
++	if (hdev && hci_dev_test_flag(hdev, HCI_UNREGISTER)) {
++		hci_pi(sk)->hdev = NULL;
++		sk->sk_state = BT_OPEN;
++		hci_dev_put(hdev);
++	}
++	hdev = NULL;
++
+ 	if (sk->sk_state == BT_BOUND) {
+ 		err = -EALREADY;
+ 		goto done;
+@@ -1379,9 +1396,9 @@ static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
+ 
+ 	lock_sock(sk);
+ 
+-	hdev = hci_pi(sk)->hdev;
+-	if (!hdev) {
+-		err = -EBADFD;
++	hdev = hci_hdev_from_sock(sk);
++	if (IS_ERR(hdev)) {
++		err = PTR_ERR(hdev);
+ 		goto done;
+ 	}
+ 
+@@ -1743,9 +1760,9 @@ static int hci_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		goto done;
+ 	}
+ 
+-	hdev = hci_pi(sk)->hdev;
+-	if (!hdev) {
+-		err = -EBADFD;
++	hdev = hci_hdev_from_sock(sk);
++	if (IS_ERR(hdev)) {
++		err = PTR_ERR(hdev);
+ 		goto done;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 9874844a95a9..b69d88b88d2e 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -83,6 +83,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn)
+ static void bt_host_release(struct device *dev)
+ {
+ 	struct hci_dev *hdev = to_hci_dev(dev);
++
++	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		hci_cleanup_dev(hdev);
+ 	kfree(hdev);
+ 	module_put(THIS_MODULE);
+ }
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.18.4
+
 
