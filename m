@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D181AC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 04:40:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 25773C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 04:40:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3EB0610FD
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 04:40:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FE4760EBB
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  4 Aug 2021 04:40:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235036AbhHDElE (ORCPT
+        id S234920AbhHDElF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 00:41:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33922 "EHLO
+        Wed, 4 Aug 2021 00:41:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234791AbhHDEk7 (ORCPT
+        with ESMTP id S234668AbhHDElA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 00:40:59 -0400
-Received: from mail-pj1-x102e.google.com (mail-pj1-x102e.google.com [IPv6:2607:f8b0:4864:20::102e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7FC88C0613D5
-        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 21:40:45 -0700 (PDT)
-Received: by mail-pj1-x102e.google.com with SMTP id q17-20020a17090a2e11b02901757deaf2c8so1926587pjd.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 21:40:45 -0700 (PDT)
+        Wed, 4 Aug 2021 00:41:00 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74EA5C061798
+        for <linux-bluetooth@vger.kernel.org>; Tue,  3 Aug 2021 21:40:47 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id q2so1635839plr.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 03 Aug 2021 21:40:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=GCQCFZypUADyI+Udwui6E+ECa9VmRhuQmOWlz8VAMX4=;
-        b=WegkuV3d2CIy8kLVxAf23qt5AZmzsWoR1kwmiL63C+YgIZSf9dxpgnrg66Puzr4j2t
-         306aBFbEf19bGgNFdm4NYIy/wIFRYr8NoWEAlzgvbEmoZDtBqLRRBVhSpRgYho4/IK/v
-         w3F8qGrhZpkj6Avn5/yzsZKOzfLQ6OZ/QV28Ua49MwwUSUaH6dxL976iArAUto5WYzIs
-         dWe/Cbz4dKRIAGrmOSxuRgaGKRsxjkbQxKa0VC+rmhPNlBOesG1LSyb/7amg7k3og/3n
-         dUiRviM1qweWFgKb5J6HfYuinnjdXA1GxR0mmIVOzA/e0QusguMFZMUdKKCmp4zdd20x
-         uiSA==
+        bh=B25hHem+W7ZHvQjo+S7Hu9HsGQC1G+4tTx8YyYIVy2E=;
+        b=HXZiEmvDoOQcIJKaj0Whg2SAKAcr86C4aWNfHyFoq2YP8sNZVdsR7wAWokfxvktmIK
+         DMofhNqgpjKsGus0Pid6PRYheoB/98hGpkwGFN41JOUe1BajwvUu0iZ4smqkja8gzJOe
+         z7tV6D6Uj+DYArVoO+LMzQBM5Sf3dyEQaLdH7llyJNUsFrLPPNt+Xg0nk0RBJxyxiGNu
+         WzUpvtuMKY6B2SK1nktBSCamGFuokKb+6pB82RHV98W5hNSBOk9GoPOt8VF4+5JVrlY5
+         cZ02JW35SMNiqKi++s7G5GUAnVMG0F6nldHhzrC0L1KBayeMkhqS2W/wEGYx/R4zscZO
+         ZK7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=GCQCFZypUADyI+Udwui6E+ECa9VmRhuQmOWlz8VAMX4=;
-        b=RMbDQBvaFNcJDE8ymF9AVCNIC6+ZWyZGIec5SX+tM/Jw44kiDV4PaYc46Vblqmx4dI
-         f2316yV6H5U2mdx33zj3UJFoSoHXUJBd2AgXG2VD7M4tGv+2H+82wz6VpRLCsacILt9X
-         fU8tcaHjF7pYlHLhmziKAEPsabGKAz8UvJtez5wlH8dOOwsmo79O5/qm4L+LW2/c0c+L
-         VDq4qBorHLEBl/s6vFNJD64SDyJR50GN7UgFbwVHlo+Emaxqgd00zlDnUXEREokVT1i7
-         uPgXteilHOIyHRu0cbvOwMXV5BdXo0sZplb7D80d179ANjrqezLBEdYePk3FEGAWd/xC
-         IAGw==
-X-Gm-Message-State: AOAM532roZ2fekw2fawP4U9bpmuKEO/SrwLu1BhZa+cLr5qqLJkL77DH
-        NkgYbBBfYcfo3qBGQeOT6+n/RMqSbHQ=
-X-Google-Smtp-Source: ABdhPJyrtFOrBZabILpjpkCNMdF+6yooHUz4BRKE1vCHgYp5RzhbkaI1ARFEtgnAUoyOz/QsgkC7HA==
-X-Received: by 2002:aa7:80d3:0:b029:347:820c:fbf with SMTP id a19-20020aa780d30000b0290347820c0fbfmr25884688pfn.73.1628052044872;
-        Tue, 03 Aug 2021 21:40:44 -0700 (PDT)
+        bh=B25hHem+W7ZHvQjo+S7Hu9HsGQC1G+4tTx8YyYIVy2E=;
+        b=Uk6ymcuy9oYMvroa0cHPcyrvrK//aXKYO/Vc1EWKy3a+cWNo6dDcLdbDHXYRgb64ZW
+         UpCCK8+KCN0o5Tf7VkUOyHx589+sj30kfki0lxzW3SoJEkn8vHYE+z80Tip0Vs1+cWxo
+         HYFatXYSqsButFWIpTI7P0VUG+ZbWtrBdVV51RrUNswZoaWWMmOuUALOg/Kqnu3m02FB
+         2PmzWcaJbgsfZfKv5SeDpBVfFlB6Fj58fQqmK4NxxfZ3MDl6m0UPhNooUz1uohCH20lT
+         nChYzRC11otD+8nLqJ8UtBG3xhULHqYvg3KL8YlJXwCY2xgsybK9ONpZjxrF+vhhGaKZ
+         7C/Q==
+X-Gm-Message-State: AOAM5323x4TdxnD2PcmSzRKLkPh4QRM6fXBK69NEM1KZVShQ7W9yKuSm
+        EqclYUrHu+6I617dYlcKKP9ByRXoV/M=
+X-Google-Smtp-Source: ABdhPJzHQbvVHgs0iFYPdZNDUvN4uMC+AH0nYhvQJ5kLxOWiM2ll1/YSIWgQdli+JZkdq4Q1nvT7zg==
+X-Received: by 2002:a05:6a00:2490:b029:3bb:2cb3:25dc with SMTP id c16-20020a056a002490b02903bb2cb325dcmr15558705pfv.48.1628052046868;
+        Tue, 03 Aug 2021 21:40:46 -0700 (PDT)
 Received: from localhost.localdomain ([2601:1c0:6a01:d830:12af:cd05:f7eb:e8f5])
-        by smtp.gmail.com with ESMTPSA id w2sm835478pjq.5.2021.08.03.21.40.43
+        by smtp.gmail.com with ESMTPSA id w2sm835478pjq.5.2021.08.03.21.40.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 03 Aug 2021 21:40:43 -0700 (PDT)
+        Tue, 03 Aug 2021 21:40:45 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH v6 05/12] Bluetooth: btintel: Fix the first HCI command not work with ROM device
-Date:   Tue,  3 Aug 2021 21:40:25 -0700
-Message-Id: <20210804044032.59729-6-hj.tedd.an@gmail.com>
+Subject: [PATCH v6 06/12] Bluetooth: btintel: Fix the LED is not turning off immediately
+Date:   Tue,  3 Aug 2021 21:40:26 -0700
+Message-Id: <20210804044032.59729-7-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210804044032.59729-1-hj.tedd.an@gmail.com>
 References: <20210804044032.59729-1-hj.tedd.an@gmail.com>
@@ -75,95 +75,78 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-The some legacy ROM controllers have a bug with the first HCI command
-sent to it returning number of completed commands as zero, which would
-stall the command processing in the Bluetooth core.
+Some platforms have an issue with BT LED when the interface is
+down or BT radio is turned off, which takes 5 seconds to BT LED
+goes off. This command turns off the BT LED immediately.
 
-As a workaround, send HCI Rest command first which will reset the
-controller to fix the issue.
+This patch sends the Intel vendor command to turn off the LED.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- drivers/bluetooth/btintel.c | 20 ++++++++++++++++++++
+ drivers/bluetooth/btintel.c | 23 +++++++++++++++++++++++
  drivers/bluetooth/btintel.h |  1 +
- drivers/bluetooth/btusb.c   |  7 ++++++-
- 3 files changed, 27 insertions(+), 1 deletion(-)
+ 2 files changed, 24 insertions(+)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index a4c8329a8945..2cf3cdf8f9cb 100644
+index 2cf3cdf8f9cb..0d3893d135f1 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -1675,6 +1675,26 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+@@ -1736,6 +1736,13 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 		case 0x07:	/* WP */
+ 		case 0x08:	/* StP */
+ 			/* Legacy ROM product */
++
++			/* These devices have an issue with LED which doesn't
++			 * go off immediately during shutdown. Set the flag
++			 * here to send the LED OFF command during shutdown.
++			 */
++			btintel_set_flag(hdev, INTEL_BROKEN_LED);
++
+ 			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+@@ -1780,6 +1787,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ static int btintel_shutdown_combined(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
++	int ret;
  
- 	BT_DBG("%s", hdev->name);
+ 	/* Send HCI Reset to the controller to stop any BT activity which
+ 	 * were triggered. This will help to save power and maintain the
+@@ -1792,6 +1800,21 @@ static int btintel_shutdown_combined(struct hci_dev *hdev)
+ 	}
+ 	kfree_skb(skb);
  
-+	/* The some controllers have a bug with the first HCI command sent to it
-+	 * returning number of completed commands as zero. This would stall the
-+	 * command processing in the Bluetooth core.
-+	 *
-+	 * As a workaround, send HCI Reset command first which will reset the
-+	 * number of completed commands and allow normal command processing
-+	 * from now on.
++
++	/* Some platforms have an issue with BT LED when the interface is
++	 * down or BT radio is turned off, which takes 5 seconds to BT LED
++	 * goes off. This command turns off the BT LED immediately.
 +	 */
-+	if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD)) {
-+		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
-+				     HCI_INIT_TIMEOUT);
++	if (btintel_test_flag(hdev, INTEL_BROKEN_LED)) {
++		skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
 +		if (IS_ERR(skb)) {
-+			bt_dev_err(hdev,
-+				   "sending initial HCI reset failed (%ld)",
-+				   PTR_ERR(skb));
-+			return PTR_ERR(skb);
++			ret = PTR_ERR(skb);
++			bt_dev_err(hdev, "turning off Intel device LED failed");
++			return ret;
 +		}
 +		kfree_skb(skb);
 +	}
 +
- 	/* Starting from TyP device, the command parameter and response are
- 	 * changed even though the OCF for HCI_Intel_Read_Version command
- 	 * remains same. The legacy devices can handle even if the
+ 	return 0;
+ }
+ 
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index fb5e73ef71eb..8a49795ad5af 100644
+index 8a49795ad5af..aef04fa0e1ef 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
-@@ -144,6 +144,7 @@ enum {
- 	INTEL_FIRMWARE_LOADED,
+@@ -145,6 +145,7 @@ enum {
  	INTEL_FIRMWARE_FAILED,
  	INTEL_BOOTING,
-+	INTEL_BROKEN_INITIAL_NCMD,
+ 	INTEL_BROKEN_INITIAL_NCMD,
++	INTEL_BROKEN_LED,
  
  	__INTEL_NUM_FLAGS,
  };
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 53216274764a..f4b631673e89 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -61,6 +61,7 @@ static struct usb_driver btusb_driver;
- #define BTUSB_VALID_LE_STATES   0x800000
- #define BTUSB_QCA_WCN6855	0x1000000
- #define BTUSB_INTEL_NEWGEN	0x2000000
-+#define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
- 
- static const struct usb_device_id btusb_table[] = {
- 	/* Generic Bluetooth USB device */
-@@ -372,7 +373,8 @@ static const struct usb_device_id blacklist_table[] = {
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
- 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
--	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED },
-+	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
-+						     BTUSB_INTEL_BROKEN_INITIAL_NCMD },
- 	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
- 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_NEW |
- 						     BTUSB_WIDEBAND_SPEECH },
-@@ -4335,6 +4337,9 @@ static int btusb_probe(struct usb_interface *intf,
- 		set_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks);
- 		set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
-+
-+		if (id->driver_info & BTUSB_INTEL_BROKEN_INITIAL_NCMD)
-+			btintel_set_flag(hdev, INTEL_BROKEN_INITIAL_NCMD);
- 	}
- 
- 	if (id->driver_info & BTUSB_INTEL_NEW) {
 -- 
 2.25.1
 
