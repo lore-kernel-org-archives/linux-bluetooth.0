@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B8C5C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 00:32:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 77BBBC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 00:32:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 316636104F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 00:32:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60FD3610A8
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 00:32:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236270AbhHEAco (ORCPT
+        id S236244AbhHEAcq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 20:32:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50804 "EHLO
+        Wed, 4 Aug 2021 20:32:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236234AbhHEAcn (ORCPT
+        with ESMTP id S236252AbhHEAcn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 4 Aug 2021 20:32:43 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1003C061765
-        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 17:32:28 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id u16so5016392ple.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 17:32:28 -0700 (PDT)
+Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF2CFC0613D5
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 17:32:29 -0700 (PDT)
+Received: by mail-pj1-x1034.google.com with SMTP id b1-20020a17090a8001b029017700de3903so7123647pjn.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 17:32:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=cahrGMaPWpNbTUMEe/gJAsf9oILslRXsQ36He8t3GsI=;
-        b=URWH71a6US5X6HsrXi09mVkD20sJC7Ibl0PldT0PC9/zpII+7Ju3bmL2JW9p00LvqX
-         gwqV2x4mvGn5g+yO2YwWQ8aHM6pGKMboANFTyu7/9t6+yz2Y1fGS+Tv/lvbhVsdMA7R8
-         sfuPi8hfiynX5bcXNBmXy8WSqW8Ll2wsZpExdyfCVrorvx3o9pHy5GQuQIx4JHcWoSrw
-         /GQ3WvtR3ARg0/C/RpiRmPZwVnClzyp0eGDq5nwkfFwWF3qSnY0UOJv5H3YD7wXt3W+y
-         uQNWLJpBQ1u5UA2iP2mkJofHhOXaMMLVw20L2RbSHWRPYBm6X9dFtupwAgLATfDgzipL
-         jDIA==
+        bh=HyRlnPKfXJZVfzem9Vu8RtOJ2Jpi0DMrsSP3VHVcN8M=;
+        b=OJ2g7hxL7LxSKMlfjUKZeEl2wSBQwhAUGInpEDk5vx8UyOt3IbSglAeZl+3LQKBwRr
+         oMaNCKB2d6AbQ5ApmohnerJXPqYcHojMWmS6Pm5n/1dHQfUpDLVzztafIdhrAxIMbs0u
+         DxnuGrl8GwGtZQwFJpuVXLUpsFDqjm8SMO8LZrh8lnAflYYa/O97IXvR/EGP/0fimgg0
+         gjb9FuQ6d9o4DV3mouyKUlqFkysYdemjB8c4uRs1eSW3iTkWIVZZUwCUQgkWozr6t26w
+         HjTsCZExAe0Y1axKDyLmM/wE+AbQ/sAL5LxHdvyaH3ObxVTiVonTnI6XxlQsr0UMU8Ub
+         poTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=cahrGMaPWpNbTUMEe/gJAsf9oILslRXsQ36He8t3GsI=;
-        b=P/FNQwT5ocjZZlriNcN1FM36M1gaNNMO4tIclhQPIPPH6VhoPUp5sCVl74cvIBz76g
-         DYGZ0yEu0rLytvKa7OABDvKluWhLk2dsBIW3iSReBJAfMG1S+QO7USeooeO8t+BbTKbU
-         OESJPxdFkLeBthHmRvrA1Htt9dxRnqGhz+YrnQgFkRlSuqRvE7cCPuafLMnQAU4vOXtd
-         srgy916OR2JJTwO1WuvzyK2U3tRTB87zjg3qvk5FSJFL/njKPP/+mh1Sm351e7fsoS5k
-         R+BebKoU791G/KG5Uoksszt8sQ3fgoJfnuRdWdRQl9rf4YzOSeFpcHP2gmcPaq2GG9Ez
-         Nq9A==
-X-Gm-Message-State: AOAM530g496DZ0mVPRb+s0RSELO0UcNfacM9EwCyucR7dTFLB+uG5czB
-        F28qhuViiqUOHlvDrWrekthaQrYHNv4=
-X-Google-Smtp-Source: ABdhPJz8wBs4ODxaNsaKDFgKbDqeFQHSHaIhX4u7sl1H8uWyiQhrzDFyHhPEfo5cemG5zRjuCCYo+Q==
-X-Received: by 2002:a63:8948:: with SMTP id v69mr94377pgd.132.1628123548376;
-        Wed, 04 Aug 2021 17:32:28 -0700 (PDT)
+        bh=HyRlnPKfXJZVfzem9Vu8RtOJ2Jpi0DMrsSP3VHVcN8M=;
+        b=F0MMiUCHaJPtpUxNLcSYONFK1P+0K8ap3AOKZYvgVyip+38AK2nHq40zWQTlpcQ9VJ
+         zgyoce2Wjobk4u1I55juPwmOFnYGmLQV4xyZGl4e2QHXql3EcD0e2a84REO6OCPzwdQm
+         /1AZQzAUWZMIcM0EE+e83AjYcPphWGg5JyLQZZVj79fn7/d9vvEFt1jEkbGJIwBDerSK
+         Zt/uFWtzX7f6BrAeI8IVT9bHDaM3hisKNw9ZAdEmMOOLTbp7JROK70DbGST1vMOtQywb
+         WcHBKvno2LiHGykTS+bxeaapFgrDflUcvHV0OdZrWlvQitn0ZPAWoEKXlS5X7fCveQAR
+         wc4w==
+X-Gm-Message-State: AOAM533QQEJLAXO0RgsLiLHsYbb1XfW57E9f2TOzes/YSJ7Lkh/qViFb
+        8IgKpFlWie4GMKbijqaO1p1B4eWEWV8=
+X-Google-Smtp-Source: ABdhPJxyuxSjrpCHIOFodqwziNFAXtogDnbgy62zSQGS6ZpDzlSDyqDappmw/3P2hIZiUGkq8VgijQ==
+X-Received: by 2002:a63:88c7:: with SMTP id l190mr433415pgd.438.1628123549153;
+        Wed, 04 Aug 2021 17:32:29 -0700 (PDT)
 Received: from localhost.localdomain ([2601:1c0:6a01:d830:e0b8:5332:84:7056])
-        by smtp.gmail.com with ESMTPSA id q4sm4761787pgv.16.2021.08.04.17.32.27
+        by smtp.gmail.com with ESMTPSA id q4sm4761787pgv.16.2021.08.04.17.32.28
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 04 Aug 2021 17:32:28 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH v7 06/12] Bluetooth: btintel: Fix the LED is not turning off immediately
-Date:   Wed,  4 Aug 2021 17:32:13 -0700
-Message-Id: <20210805003219.23221-7-hj.tedd.an@gmail.com>
+Subject: [PATCH v7 07/12] Bluetooth: btintel: Add combined set_diag functions
+Date:   Wed,  4 Aug 2021 17:32:14 -0700
+Message-Id: <20210805003219.23221-8-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210805003219.23221-1-hj.tedd.an@gmail.com>
 References: <20210805003219.23221-1-hj.tedd.an@gmail.com>
@@ -75,75 +75,70 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-Some platforms have an issue with BT LED when the interface is
-down or BT radio is turned off, which takes 5 seconds to BT LED
-goes off. This command turns off the BT LED immediately.
-
-This patch sends the Intel vendor command to turn off the LED.
+This patch adds a combined set_diag functions.
+It also changes the btintel_set_diag_mfg() to static since it is no
+longer used by others.
 
 Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- drivers/bluetooth/btintel.c | 23 +++++++++++++++++++++++
+ drivers/bluetooth/btintel.c | 20 +++++++++++++++++++-
  drivers/bluetooth/btintel.h |  1 +
- 2 files changed, 24 insertions(+)
+ 2 files changed, 20 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 8e6b497a2164..fd947a8798a9 100644
+index fd947a8798a9..9e9fd2222294 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -1737,6 +1737,13 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+@@ -181,6 +181,23 @@ static int btintel_set_diag_mfg(struct hci_dev *hdev, bool enable)
+ 	return ret;
+ }
+ 
++static int btintel_set_diag_combined(struct hci_dev *hdev, bool enable)
++{
++	int ret;
++
++	/* Legacy ROM device needs to be in the manufacturer mode to apply
++	 * diagnostic setting
++	 *
++	 * This flag is set after reading the Intel version.
++	 */
++	if (btintel_test_flag(hdev, INTEL_ROM_LEGACY))
++		ret = btintel_set_diag_mfg(hdev, enable);
++	else
++		ret = btintel_set_diag(hdev, enable);
++
++	return ret;
++}
++
+ void btintel_hw_error(struct hci_dev *hdev, u8 code)
+ {
+ 	struct sk_buff *skb;
+@@ -1737,6 +1754,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
  		case 0x07:	/* WP */
  		case 0x08:	/* StP */
  			/* Legacy ROM product */
-+
-+			/* These devices have an issue with LED which doesn't
-+			 * go off immediately during shutdown. Set the flag
-+			 * here to send the LED OFF command during shutdown.
-+			 */
-+			btintel_set_flag(hdev, INTEL_BROKEN_LED);
-+
- 			err = btintel_legacy_rom_setup(hdev, &ver);
- 			break;
- 		case 0x0b:      /* SfP */
-@@ -1785,6 +1792,7 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- static int btintel_shutdown_combined(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-+	int ret;
++			btintel_set_flag(hdev, INTEL_ROM_LEGACY);
  
- 	/* Send HCI Reset to the controller to stop any BT activity which
- 	 * were triggered. This will help to save power and maintain the
-@@ -1797,6 +1805,21 @@ static int btintel_shutdown_combined(struct hci_dev *hdev)
- 	}
- 	kfree_skb(skb);
+ 			/* These devices have an issue with LED which doesn't
+ 			 * go off immediately during shutdown. Set the flag
+@@ -1828,7 +1846,7 @@ int btintel_configure_setup(struct hci_dev *hdev)
+ 	hdev->manufacturer = 2;
+ 	hdev->setup = btintel_setup_combined;
+ 	hdev->shutdown = btintel_shutdown_combined;
+-	hdev->set_diag = btintel_set_diag_mfg;
++	hdev->set_diag = btintel_set_diag_combined;
+ 	hdev->set_bdaddr = btintel_set_bdaddr;
  
-+
-+	/* Some platforms have an issue with BT LED when the interface is
-+	 * down or BT radio is turned off, which takes 5 seconds to BT LED
-+	 * goes off. This command turns off the BT LED immediately.
-+	 */
-+	if (btintel_test_flag(hdev, INTEL_BROKEN_LED)) {
-+		skb = __hci_cmd_sync(hdev, 0xfc3f, 0, NULL, HCI_INIT_TIMEOUT);
-+		if (IS_ERR(skb)) {
-+			ret = PTR_ERR(skb);
-+			bt_dev_err(hdev, "turning off Intel device LED failed");
-+			return ret;
-+		}
-+		kfree_skb(skb);
-+	}
-+
  	return 0;
- }
- 
 diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index 8a49795ad5af..aef04fa0e1ef 100644
+index aef04fa0e1ef..17cb62ac33f6 100644
 --- a/drivers/bluetooth/btintel.h
 +++ b/drivers/bluetooth/btintel.h
-@@ -145,6 +145,7 @@ enum {
- 	INTEL_FIRMWARE_FAILED,
+@@ -146,6 +146,7 @@ enum {
  	INTEL_BOOTING,
  	INTEL_BROKEN_INITIAL_NCMD,
-+	INTEL_BROKEN_LED,
+ 	INTEL_BROKEN_LED,
++	INTEL_ROM_LEGACY,
  
  	__INTEL_NUM_FLAGS,
  };
