@@ -2,191 +2,222 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8E22FC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 03:45:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 494CDC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 06:12:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72C70601FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 03:45:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B13A60F70
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 06:12:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238561AbhHEDpW (ORCPT
+        id S236099AbhHEGMw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 4 Aug 2021 23:45:22 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:56374
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232113AbhHEDpV (ORCPT
+        Thu, 5 Aug 2021 02:12:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40852 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235908AbhHEGMv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 4 Aug 2021 23:45:21 -0400
-Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPS id 11BA73F35C
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Aug 2021 03:45:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628135107;
-        bh=APPuhfsQfqQEMobjGYPZbM2beq7YPUNg/7gJvMYzqEQ=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=k8FkWpuWU6RVUROcm4UJeUpMEfhfTleKouatsYloqzfDTd74Pcmhrn5ZSlqM37nn2
-         2Z8CgQL/uM4cAGcuNyF30ImOg1UvllPEYgdVpDfKgm5cYohPFCsBtmau+PkbrLmtTh
-         eXkq514pru53dFZp7+z6gPVeizJVT93TS0QY0C1IVn4yq5nhPsJjOxOTmY33aAUGxz
-         sKSbWAeJ8Petu1M2Bd9AJOZ8ifFxmecpH8SZYtzu8MkaJJEh1He+qa7jaRNAVrBtIJ
-         dhPzEqi1B5C4cmutra0f/BSoNL2uEAdTsURUVpqhG9V2UaVWXzGrPxIruvoVLk/UCD
-         ld856R9E++8lA==
-Received: by mail-ed1-f70.google.com with SMTP id cm18-20020a0564020c92b02903bc7f21d540so2475789edb.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 20:45:07 -0700 (PDT)
+        Thu, 5 Aug 2021 02:12:51 -0400
+Received: from mail-io1-xd2f.google.com (mail-io1-xd2f.google.com [IPv6:2607:f8b0:4864:20::d2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770D8C061765
+        for <linux-bluetooth@vger.kernel.org>; Wed,  4 Aug 2021 23:12:36 -0700 (PDT)
+Received: by mail-io1-xd2f.google.com with SMTP id l20so3162990iom.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 04 Aug 2021 23:12:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=gU4DcyTuEfs53h2u5rnsqBhluzfPKtNUI3JuZEnf8Vw=;
+        b=QaFuazGqXKXVUefNfbHpKyMO2kZOt2tmGh6GlIXAYbiNGTZK3quOcskLunHY1oBsw7
+         cXQa9BCUXwsZiuBfWi3l1mUStvnlKWPBFzb/zCaaLlrhK4PeAItAGfXIiCKOChsIbIw1
+         imtfU8KUUFt+GlqdrPpgzUf6tdFKojOjJZchA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=APPuhfsQfqQEMobjGYPZbM2beq7YPUNg/7gJvMYzqEQ=;
-        b=JUBXzsbGJ20xZHpXHuLjdijl3MsMIs73L2mp9B9g7sp9jtcAwLK59MkD7sHUnGJjHR
-         EZzIIw11+8/lw4M+fjIf2+Z++pm0hVMsXpQTHMb95RCxUPJID1ikHOzfca9v8NkcYUTG
-         gwZ+CGDdlLizlQasgzMmalb2MV7MT1Pe4RpByUbSnkdw0OnaiS6HFk6nqB/4h2Wxw5vt
-         LiBaiu9jobOG7bxtFy2zfTpZ2tVO/p5AYjygV0KjbEpklzsh4E/43vTMkLPRc6+DPvbe
-         I3O1wfWk44CvA8t/iX3/+7kA5D/xMnDA4GTEYRDxZ0H6riVRucswkPDA1rE+HNiuQwZr
-         MbnQ==
-X-Gm-Message-State: AOAM530fCyF7pgkxLFqdX/r6ZGPgvEd4Giw+poXwQn7/89cWGzL/t1yF
-        zIoWd9x6WIBVO3OEbptFCe8a97YGQgX69uJcVPccomA/aIavCR3TCljb0qF50aL7psfjcoquolK
-        ehXcSIBiE9UfttEIXd/il+ifSLGP5YjHyM9qFwF62pk1F8QBT4yfX+bnbno3EFw==
-X-Received: by 2002:a17:906:4e52:: with SMTP id g18mr2646046ejw.432.1628135106722;
-        Wed, 04 Aug 2021 20:45:06 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxJs7u574RmyzXvUoIjt5iNmjnIw4M3B7uVx7H1vvmyilGjodSKKXJCaZP1PbcOo+n1gu13DGiBpmXYHSHP1GI=
-X-Received: by 2002:a17:906:4e52:: with SMTP id g18mr2646023ejw.432.1628135106429;
- Wed, 04 Aug 2021 20:45:06 -0700 (PDT)
+        bh=gU4DcyTuEfs53h2u5rnsqBhluzfPKtNUI3JuZEnf8Vw=;
+        b=I9i7o4sAZLQKHEn76V4+o++XAPkeRHmQ3nmBLFSafhSwnRCN5zWgShD/HXnpFbe6WY
+         VHFoHfso6PLC5VA3eSU/ZawnRyCazae4zZp0tWPOD4Im01wHm8We+nP51685X0r/POK5
+         CS1t2CN1bl5YuvJnt64Djs8FJv69XlQlXSiyDhc9OTfxxCB2zQQPlFDxJ6GajKjbDy3d
+         ggQjNPjLhRIx6mOpaHQAd6UR2M5vlmSAne2epCxItX68OyzimkXSGhW0tbvzBOCwAWr4
+         e6T74X6ujOj3d6g6xdLUN4R40/jM48Q5v5uOMXXoKVg59c62FUrKBRenSXUWsZhK0Oqe
+         f4/w==
+X-Gm-Message-State: AOAM530ug1OkgSkU/LjbuCJILNeFuTgHxoXsItPtURktHdeC/+dXEE0G
+        LDEbqzYYQ3qzSOinyfVBtXCNa5B8i+G3PcXhsPHXBQ==
+X-Google-Smtp-Source: ABdhPJzXqUglAP+NmPtfQU0dkX+5cbEMg5HBIIPjOt4LrWhXBRw9EtrOQxlXsDnGe7CIPi1CS6RfrPR6ZgSwCPKtbKE=
+X-Received: by 2002:a02:6a24:: with SMTP id l36mr3020270jac.4.1628143955837;
+ Wed, 04 Aug 2021 23:12:35 -0700 (PDT)
 MIME-Version: 1.0
 References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
  <20210802030538.2023-1-hdanton@sina.com> <CAAd53p4NO3KJkn2Zp=hxQOtR8vynkJpcPmNtwv2R6z=zei056Q@mail.gmail.com>
- <20210803074722.2383-1-hdanton@sina.com> <CAAd53p6wi7pk6yFgTnG-JDd9e4zCn3F40bioYyGbAqYg5kMHZQ@mail.gmail.com>
- <20210805030024.2603-1-hdanton@sina.com>
-In-Reply-To: <20210805030024.2603-1-hdanton@sina.com>
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date:   Thu, 5 Aug 2021 11:44:50 +0800
-Message-ID: <CAAd53p439uW9D1rK07JUQFhVfs1FCvm_rECExp0JmzFHB7dGNg@mail.gmail.com>
+In-Reply-To: <CAAd53p4NO3KJkn2Zp=hxQOtR8vynkJpcPmNtwv2R6z=zei056Q@mail.gmail.com>
+From:   Hsin-Yi Wang <hsinyi@chromium.org>
+Date:   Thu, 5 Aug 2021 14:12:10 +0800
+Message-ID: <CAJMQK-gT4e_xTc8WY+n52DJPUagPGce-0FJEtqZSwPm3U=LViQ@mail.gmail.com>
 Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
  flushed or cancelled
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
+Cc:     Hillf Danton <hdanton@sina.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Mattijs Korpershoek <mkorpershoek@baylibre.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluez <linux-bluetooth@vger.kernel.org>,
+        "bluez mailin list (linux-bluetooth@vger.kernel.org)" 
+        <linux-bluetooth@vger.kernel.org>,
+        Linux Netdev List <netdev@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 5, 2021 at 11:00 AM Hillf Danton <hdanton@sina.com> wrote:
+On Tue, Aug 3, 2021 at 2:45 PM Kai-Heng Feng
+<kai.heng.feng@canonical.com> wrote:
 >
-> On Wed, 4 Aug 2021 22:35:43 +0800 Kai-Heng Feng wrote:
-> >On Tue, Aug 3, 2021 at 3:47 PM Hillf Danton <hdanton@sina.com> wrote:
-> >>
-> >> On Tue, 3 Aug 2021 14:45:07 +0800 Kai-Heng Feng wrote:
-> >> >On Mon, Aug 2, 2021 at 11:05 AM Hillf Danton <hdanton@sina.com> wrote:
-> >> >>
-> >> >> Given the skb_get in hci_req_sync_complete makes it safe to free skb on
-> >> >> driver side, I doubt this patch is the correct fix as it is.
-> >> >
-> >> >Some workqueues are still active.
-> >> >The shutdown() should be called at least after hci_request_cancel_all().
-> >>
-> >> What is muddy then is how active workqueues prevent skb_get from protecting
-> >> kfree_skb. Can you spot what workqueue it is?
+> On Mon, Aug 2, 2021 at 11:05 AM Hillf Danton <hdanton@sina.com> wrote:
 > >
-> >I managed to reproduce the issue with another kernel splat:
-> >------------[ cut here ]------------
-> >kernel BUG at mm/slub.c:321!
-> >invalid opcode: 0000 [#1] SMP NOPTI
-> >CPU: 2 PID: 2208 Comm: kworker/u9:3 Not tainted 5.14.0-rc4+ #16
-> >Hardware name: HP HP ProBook 650 G8 Notebook PC/87ED, BIOS T74 Ver.
-> >01.03.04 01/07/2021
-> >Workqueue: hci0 discov_update [bluetooth]
-> >RIP: 0010:__slab_free+0x20c/0x3a0
-> >Code: 00 44 0f b6 54 24 1a 8b 74 24 14 44 0f b6 4c 24 1b 44 8b 44 24
-> >1c 48 89 44 24 08 48 8b 54 24 20 48 8b 7c 24 28 e9 ad fe ff ff <0f> 0b
-> >49 3b 54 24 28 0f 85 6b ff ff ff 49 89 5c 24 20 49 89 4c 24
-> >RSP: 0018:ffffaa0e4164fc50 EFLAGS: 00010246
-> >RAX: ffff9cc9a217e668 RBX: ffff9cc9a217e600 RCX: ffff9cc9a217e600
-> >RDX: 000000008010000e RSI: ffffd09044885f80 RDI: ffff9cc980e96500
-> >RBP: ffffaa0e4164fd00 R08: 0000000000000001 R09: ffffffff885b3a4e
-> >R10: ffff9cc999aab800 R11: ffff9cc9a217e600 R12: ffffd09044885f80
-> >R13: ffff9cc9a217e600 R14: ffff9cc980e96500 R15: ffff9cc9a217e600
-> >FS:  0000000000000000(0000) GS:ffff9cca2b900000(0000) knlGS:0000000000000000
-> >CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >CR2: 00007ffe164d5b98 CR3: 000000013f410002 CR4: 0000000000770ee0
-> >PKRU: 55555554
-> >Call Trace:
-> > ? psi_task_switch+0xc3/0x1e0
-> > ? __switch_to_asm+0x36/0x70
-> > ? skb_free_head+0x67/0x80
-> > kmem_cache_free+0x370/0x3d0
-> > ? kfree_skbmem+0x4e/0x90
-> > kfree_skbmem+0x4e/0x90
-> > kfree_skb+0x47/0xb0
-> > __hci_req_sync+0x134/0x2a0 [bluetooth]
-> > ? wait_woken+0x70/0x70
-> > discov_update+0x2ae/0x310 [bluetooth]
-> > process_one_work+0x21d/0x3c0
-> > worker_thread+0x53/0x420
-> > ? process_one_work+0x3c0/0x3c0
-> > kthread+0x127/0x150
-> > ? set_kthread_struct+0x50/0x50
-> > ret_from_fork+0x1f/0x30
->
-> [...]
->
+> > On Fri, 14 May 2021 15:14:52 +0800 Kai-Heng Feng wrote:
+> > > Rfkill block and unblock Intel USB Bluetooth [8087:0026] may make it
+> > > stops working:
+> > > [  509.691509] Bluetooth: hci0: HCI reset during shutdown failed
+> > > [  514.897584] Bluetooth: hci0: MSFT filter_enable is already on
+> > > [  530.044751] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
+> > > [  545.660350] usb 3-10: device descriptor read/64, error -110
+> > > [  561.283530] usb 3-10: device descriptor read/64, error -110
+> > > [  561.519682] usb 3-10: reset full-speed USB device number 5 using xhci_hcd
+> > > [  566.686650] Bluetooth: hci0: unexpected event for opcode 0x0500
+> > > [  568.752452] Bluetooth: hci0: urb 0000000096cd309b failed to resubmit (113)
+> > > [  578.797955] Bluetooth: hci0: Failed to read MSFT supported features (-110)
+> > > [  586.286565] Bluetooth: hci0: urb 00000000c522f633 failed to resubmit (113)
+> > > [  596.215302] Bluetooth: hci0: Failed to read MSFT supported features (-110)
+> > >
+> > > Or kernel panics because other workqueues already freed skb:
+> > > [ 2048.663763] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> > > [ 2048.663775] #PF: supervisor read access in kernel mode
+> > > [ 2048.663779] #PF: error_code(0x0000) - not-present page
+> > > [ 2048.663782] PGD 0 P4D 0
+> > > [ 2048.663787] Oops: 0000 [#1] SMP NOPTI
+> > > [ 2048.663793] CPU: 3 PID: 4491 Comm: rfkill Tainted: G        W         5.13.0-rc1-next-20210510+ #20
+> > > [ 2048.663799] Hardware name: HP HP EliteBook 850 G8 Notebook PC/8846, BIOS T76 Ver. 01.01.04 12/02/2020
+> > > [ 2048.663801] RIP: 0010:__skb_ext_put+0x6/0x50
+> > > [ 2048.663814] Code: 8b 1b 48 85 db 75 db 5b 41 5c 5d c3 be 01 00 00 00 e8 de 13 c0 ff eb e7 be 02 00 00 00 e8 d2 13 c0 ff eb db 0f 1f 44 00 00 55 <8b> 07 48 89 e5 83 f8 01 74 14 b8 ff ff ff ff f0 0f c1
+> > > 07 83 f8 01
+> > > [ 2048.663819] RSP: 0018:ffffc1d105b6fd80 EFLAGS: 00010286
+> > > [ 2048.663824] RAX: 0000000000000000 RBX: ffff9d9ac5649000 RCX: 0000000000000000
+> > > [ 2048.663827] RDX: ffffffffc0d1daf6 RSI: 0000000000000206 RDI: 0000000000000000
+> > > [ 2048.663830] RBP: ffffc1d105b6fd98 R08: 0000000000000001 R09: ffff9d9ace8ceac0
+> > > [ 2048.663834] R10: ffff9d9ace8ceac0 R11: 0000000000000001 R12: ffff9d9ac5649000
+> > > [ 2048.663838] R13: 0000000000000000 R14: 00007ffe0354d650 R15: 0000000000000000
+> > > [ 2048.663843] FS:  00007fe02ab19740(0000) GS:ffff9d9e5f8c0000(0000) knlGS:0000000000000000
+> > > [ 2048.663849] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [ 2048.663853] CR2: 0000000000000000 CR3: 0000000111a52004 CR4: 0000000000770ee0
+> > > [ 2048.663856] PKRU: 55555554
+> > > [ 2048.663859] Call Trace:
+> > > [ 2048.663865]  ? skb_release_head_state+0x5e/0x80
+> > > [ 2048.663873]  kfree_skb+0x2f/0xb0
+> > > [ 2048.663881]  btusb_shutdown_intel_new+0x36/0x60 [btusb]
+> > > [ 2048.663905]  hci_dev_do_close+0x48c/0x5e0 [bluetooth]
+> > > [ 2048.663954]  ? __cond_resched+0x1a/0x50
+> > > [ 2048.663962]  hci_rfkill_set_block+0x56/0xa0 [bluetooth]
+> > > [ 2048.664007]  rfkill_set_block+0x98/0x170
+> > > [ 2048.664016]  rfkill_fop_write+0x136/0x1e0
+> > > [ 2048.664022]  vfs_write+0xc7/0x260
+> > > [ 2048.664030]  ksys_write+0xb1/0xe0
+> > > [ 2048.664035]  ? exit_to_user_mode_prepare+0x37/0x1c0
+> > > [ 2048.664042]  __x64_sys_write+0x1a/0x20
+> > > [ 2048.664048]  do_syscall_64+0x40/0xb0
+> > > [ 2048.664055]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> > > [ 2048.664060] RIP: 0033:0x7fe02ac23c27
+> > > [ 2048.664066] Code: 0d 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 00 f3 0f 1e fa 64 8b 04 25 18 00 00 00 85 c0 75 10 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 51 c3 48 83 ec 28 48 89 54 24 18 48 89 74 24
+> > > [ 2048.664070] RSP: 002b:00007ffe0354d638 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+> > > [ 2048.664075] RAX: ffffffffffffffda RBX: 0000000000000001 RCX: 00007fe02ac23c27
+> > > [ 2048.664078] RDX: 0000000000000008 RSI: 00007ffe0354d650 RDI: 0000000000000003
+> > > [ 2048.664081] RBP: 0000000000000000 R08: 0000559b05998440 R09: 0000559b05998440
+> > > [ 2048.664084] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
+> > > [ 2048.664086] R13: 0000000000000000 R14: ffffffff00000000 R15: 00000000ffffffff
+> > >
+> > > So move the shutdown callback to a place where workqueues are either
+> > > flushed or cancelled to resolve the issue.
+> > >
+> > > Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> > > ---
+> > > v2:
+> > >  - Rebased on bluetooth-next.
+> > >
+> > >  net/bluetooth/hci_core.c | 16 ++++++++--------
+> > >  1 file changed, 8 insertions(+), 8 deletions(-)
+> > >
+> > > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > > index 7baf93eda936..6eedf334f943 100644
+> > > --- a/net/bluetooth/hci_core.c
+> > > +++ b/net/bluetooth/hci_core.c
+> > > @@ -1716,14 +1716,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> > >
+> > >       BT_DBG("%s %p", hdev->name, hdev);
+> > >
+> > > -     if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> > > -         !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> > > -         test_bit(HCI_UP, &hdev->flags)) {
+> > > -             /* Execute vendor specific shutdown routine */
+> > > -             if (hdev->shutdown)
+> > > -                     hdev->shutdown(hdev);
+> > > -     }
+> > > -
+> > >       cancel_delayed_work(&hdev->power_off);
+> > >       cancel_delayed_work(&hdev->ncmd_timer);
+> > >
+> > > @@ -1801,6 +1793,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
+> > >               clear_bit(HCI_INIT, &hdev->flags);
+> > >       }
+> > >
+> > > +     if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> > > +         !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> > > +         test_bit(HCI_UP, &hdev->flags)) {
+> > > +             /* Execute vendor specific shutdown routine */
+> > > +             if (hdev->shutdown)
+> > > +                     hdev->shutdown(hdev);
+> > > +     }
+> > > +
+> > >       /* flush cmd  work */
+> > >       flush_work(&hdev->cmd_work);
+> > >
+> > > --
+> > > 2.30.2
 > >
-> >So hci_request_cancel_all() -> cancel_work_sync(&hdev->discov_update)
-> >and can prevent the race from happening.
->
-> Given
->
-> __hci_req_sync
->   err = hci_req_run_skb(&req, hci_req_sync_complete);
->   kfree_skb(hdev->req_skb);
->
-> hci_req_sync_complete
->   if (skb)
->         hdev->req_skb = skb_get(skb);
->
-> once more skb_get makes the above race hard to understand, though it should
-> better check error before freeing skb there to avoid blind free.
->
+> > btusb_shutdown_intel_new
+> >   __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL, HCI_INIT_TIMEOUT);
+> >     __hci_cmd_sync_ev(hdev, opcode, plen, param, 0, timeout);
+> >       hci_req_run_skb(&req, hci_req_sync_complete);
 > >
-> >And the kernel splat is just one symptom of the issue, most of the
+> > hci_req_sync_complete
+> >   if (skb)
+> >         hdev->req_skb = skb_get(skb);
+> >
+> > Given the skb_get in hci_req_sync_complete makes it safe to free skb on
+> > driver side, I doubt this patch is the correct fix as it is.
 >
-> It fails to support your reasoning so far.
+> Some workqueues are still active.
+> The shutdown() should be called at least after hci_request_cancel_all().
+>
+Hello,
 
-How? Most of the time the BT controller can't be brought up again
-after shutdown(), and we need to stop other activities before that.
-What other reasoning is expected?
+The original patch 60789afc02f592b8d91217b60930e7a76271ae07
+("Bluetooth: Shutdown controller after workqueues are flushed or
+cancelled") is causing the tx fail when downloading fw on mediatek
+mt8183 device using QCA bluetooth:
 
-Kai-Heng
+[  225.205061] Bluetooth: qca_download_firmware() hci0: QCA
+Downloading qca/rampatch_00440302.bin
+[  227.252653] Bluetooth: hci_cmd_timeout() hci0: command 0xfc00 tx timeout
+...
+follows by a lot of:
+[  223.604971] Bluetooth: qca_recv() hci0: Frame reassembly failed (-84)
+[  223.605027] Bluetooth: qca_recv() hci0: Frame reassembly failed (-84)
 
->
-> >time it's just "Bluetooth: hci0: HCI reset during shutdown failed" in
-> >dmesg.
-> >
-> >Kai-Heng
->
->
-> +++ x/net/bluetooth/hci_request.c
-> @@ -257,8 +257,10 @@ int __hci_req_sync(struct hci_dev *hdev,
->                 break;
->         }
->
-> -       kfree_skb(hdev->req_skb);
-> -       hdev->req_skb = NULL;
-> +       if (!err) {
-> +               kfree_skb(hdev->req_skb);
-> +               hdev->req_skb = NULL;
-> +       }
->         hdev->req_status = hdev->req_result = 0;
->
->         bt_dev_dbg(hdev, "end: err %d", err);
+After applying the fixup to allow tx, the issue is solved.
+
+
+> Kai-Heng
