@@ -2,144 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74E6FC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 07:19:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ACB6AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 07:28:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4C51D6105A
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 07:19:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 833D060F58
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  5 Aug 2021 07:28:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238158AbhHEHUA (ORCPT
+        id S234413AbhHEH2w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 5 Aug 2021 03:20:00 -0400
-Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:42776
-        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S230471AbhHEHT6 (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 5 Aug 2021 03:19:58 -0400
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPS id 477233F230
-        for <linux-bluetooth@vger.kernel.org>; Thu,  5 Aug 2021 07:19:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628147984;
-        bh=dprqqFGKEqV7x72rJjapY3EuNeylEWr75863Ym1V8hE=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=UaawYewZNmUGp42wwo3WI+hloRHvyzr7nQCx3BEF0Bg+i7F//zdTz0YqcHTBeCt4E
-         WDN7y3zDb73kaGqYf8iPXJFZAgJf7LnIICQV4GfJL69ZCMkhueS+8qXIXdNSNaVXBd
-         9kmEqgqV7Zpm5zXfQyhck9Bq7wD0ZC0Njrcg+FJOiHGj5i1DYg13pyBXmx0o+X64bt
-         dc+zQY8lxM9XZpN3X9EWGq7sL9AGkjMExRQ11XLdi0PCUCykPhze+DdCRR10Vdm5EQ
-         oj5/kbSIR9GPVO5ppPVJW34bvZjCa3L4CAcbINpPKAP0V/aIRXkXypeiM4yHsAgrmv
-         KvlG7R4waPqTg==
-Received: by mail-ej1-f72.google.com with SMTP id zp23-20020a17090684f7b02905a13980d522so1718289ejb.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 05 Aug 2021 00:19:44 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=dprqqFGKEqV7x72rJjapY3EuNeylEWr75863Ym1V8hE=;
-        b=OJO7PXZcmO+8l8e91w/T8s8ckcg3b+yhu07WgiXetCeujqxgudX7KLaJ0bFEgANpld
-         s7Wa7vjQvAXAYDVgx+i1Qv0KbqJNvO36kxmIY6uY69lDjTvi1myH3YMcIIm98Ltguy/A
-         De6W2ftklBQeb3Mf5Bq7QXc4CwD90PCBQbCAXkocNXNp86n8S8VkdN5KtYgSqKa8GAMp
-         LgoOt5eK9STEZWMtsvir+97m7dQdDUEcqzvRZIfEFeZsfU3sB4xMictFK1bD95fLXsNj
-         0XnOkdr9s7CD/cAOiGh5YlVf0NTp+TPF/UCLvFBiw4yrQT7wprYh1xQ6u+rFmgIyB3fT
-         G+kg==
-X-Gm-Message-State: AOAM533s8uMGHrsCRPJxoNqhbrqBtk2BmdlllnXikatZiWpAYDoD8xj7
-        dpDfhEvZgqerRhEMWCI/JVWf2loYPSm4pmswUXYSFAH9ya0ydHCLOOC8NR+fKVjZrvdgv37VJwa
-        rcDKc6YkcLjg26xMA/9714TozEYrCx8ruU3uQKC+8EdQejANfokK6BiTlEaf2Sw==
-X-Received: by 2002:a17:906:79a:: with SMTP id l26mr3575772ejc.192.1628147983941;
-        Thu, 05 Aug 2021 00:19:43 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJzVYx4H8kX3IITvR/G2XnEd7cg1AeN9XxMaCTLuh5W0I1dUh/MVFTganzFvEkf0oFXCWq00D8/9Ojo4LD8FkXQ=
-X-Received: by 2002:a17:906:79a:: with SMTP id l26mr3575754ejc.192.1628147983672;
- Thu, 05 Aug 2021 00:19:43 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
- <20210802030538.2023-1-hdanton@sina.com> <CAAd53p4NO3KJkn2Zp=hxQOtR8vynkJpcPmNtwv2R6z=zei056Q@mail.gmail.com>
- <20210803074722.2383-1-hdanton@sina.com> <CAAd53p6wi7pk6yFgTnG-JDd9e4zCn3F40bioYyGbAqYg5kMHZQ@mail.gmail.com>
- <20210805030024.2603-1-hdanton@sina.com> <CAAd53p439uW9D1rK07JUQFhVfs1FCvm_rECExp0JmzFHB7dGNg@mail.gmail.com>
- <20210805063536.2698-1-hdanton@sina.com>
-In-Reply-To: <20210805063536.2698-1-hdanton@sina.com>
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date:   Thu, 5 Aug 2021 15:19:28 +0800
-Message-ID: <CAAd53p6BXj_Yxq+8GvDW4eNvbXisz2WK9uf5rcLrCwkMiSB4-g@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
- flushed or cancelled
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Bluez <linux-bluetooth@vger.kernel.org>,
+        Thu, 5 Aug 2021 03:28:52 -0400
+Received: from mail.zju.edu.cn ([61.164.42.155]:51480 "EHLO zju.edu.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231499AbhHEH2v (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 5 Aug 2021 03:28:51 -0400
+Received: by ajax-webmail-mail-app4 (Coremail) ; Thu, 5 Aug 2021 15:28:31
+ +0800 (GMT+08:00)
+X-Originating-IP: [10.214.160.77]
+Date:   Thu, 5 Aug 2021 15:28:31 +0800 (GMT+08:00)
+X-CM-HeaderCharset: UTF-8
+From:   LinMa <linma@zju.edu.cn>
+To:     "Ammar Faizi" <ammarfaizi2@gnuweeb.org>
+Cc:     "Hillf Danton" <hdanton@sina.com>,
+        "Marcel Holtmann" <marcel@holtmann.org>,
+        "Ammar Faizi" <ammarfaizi2@gmail.com>,
+        "Linux Bluetooth" <linux-bluetooth@vger.kernel.org>,
         LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: Re: WARNING: possible circular locking dependency
+ detected(hci_sock_dev_event+0x17d/0x1f0)
+X-Priority: 3
+X-Mailer: Coremail Webmail Server Version XT5.0.13 build 20210104(ab8c30b6)
+ Copyright (c) 2002-2021 www.mailtech.cn zju.edu.cn
+In-Reply-To: <c73c45fa-3d46-915f-02be-f9d2ede12bab@gnuweeb.org>
+References: <20210805020048.2509-1-hdanton@sina.com>
+ <c73c45fa-3d46-915f-02be-f9d2ede12bab@gnuweeb.org>
+Content-Transfer-Encoding: base64
+Content-Type: text/plain; charset=UTF-8
+MIME-Version: 1.0
+Message-ID: <1abc786e.74f8d.17b1536b2ea.Coremail.linma@zju.edu.cn>
+X-Coremail-Locale: en_US
+X-CM-TRANSID: cS_KCgBnmXQfkwth5KPLAQ--.59202W
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwQHElNG3DqHlgAEs0
+X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWxJw
+        CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
+        daVFxhVjvjDU=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[snipped]
-
-> >How? Most of the time the BT controller can't be brought up again
-> >after shutdown(), and we need to stop other activities before that.
-> >What other reasoning is expected?
->
-> See below.
-> >
-> >Kai-Heng
-> >
-> >>
-> >> >time it's just "Bluetooth: hci0: HCI reset during shutdown failed" in
-> >> >dmesg.
->
-> In drivers/bluetooth/btusb.c, there are three cases of
->
->         bt_dev_err(hdev, "HCI reset during shutdown failed");
->
-> and in btusb_shutdown_intel_new() it has nothing to do with kfree_skb()
-> because of IS_ERR(skb).
-
-No, kfree_skb() doesn't gets called in this case. But when that
-happens the BT controller won't work anymore.
-
->
-> Feel free to specify why an skb error links to the race you are trying to fix.
-
-The race here is that the btusb_shutdown_intel_new() is trying to
-reset the controller while other works like scanning or discovering
-are still underway.
-So the patch is to ensure that shutdown() callback is invoked after
-other works are cancelled.
-
-I think I understand what you are trying to ask, you want to know
-where the double kfree_skb() race happens.
-I didn't really investigate that because quiesce the other activities
-then call shutdown() is the right thing to do and I haven't seen the
-kernel splat since.
-
-Kai-Heng
-
->
-> >> >
-> >> >Kai-Heng
-> >>
-> >>
-> >> +++ x/net/bluetooth/hci_request.c
-> >> @@ -257,8 +257,10 @@ int __hci_req_sync(struct hci_dev *hdev,
-> >>                 break;
-> >>         }
-> >>
-> >> -       kfree_skb(hdev->req_skb);
-> >> -       hdev->req_skb = NULL;
-> >> +       if (!err) {
-> >> +               kfree_skb(hdev->req_skb);
-> >> +               hdev->req_skb = NULL;
-> >> +       }
-> >>         hdev->req_status = hdev->req_result = 0;
-> >>
-> >>         bt_dev_dbg(hdev, "end: err %d", err);
+PiA+IEFzIHRvIHRoYXQgVUFGLCBmZWVsIGZyZWUgdG8gbGV0IHVzIGtub3cgb25jZSB5b3UgaGF2
+ZSBhIHJlcHJvZHVjZXIKPiBmb3IgaXQsCj4gPiB0aGVuIGZpeCB0byBpdCBjYW4gYmUgcHJlcGFy
+ZWQuCj4gPgo+ID4gSGlsbGYKPiAKPiBBbHJpZ2h0LCBJIHdpbGwgdHJ5IG15IGJlc3QgdG8gYXQg
+bGVhc3QgdW5kZXJzdGFuZCB0aGUgVUFGIGlzc3VlIGZpcnN0Lgo+IAo+IEhpIExpbiwgY291bGQg
+eW91IGhlbHAgbWUgYWJvdXQgdGhlIFVBRj8KPiAKClN1cmUsIHNvcnJ5IGZvciB0aGUgZGVsYXkK
+CkNoZWNrIHRoaXM6IGh0dHBzOi8vd3d3Lm9wZW53YWxsLmNvbS9saXN0cy9vc3Mtc2VjdXJpdHkv
+MjAyMS8wNi8wOC8yCgo+IEJUVyBIaWxsZiwgd2h5IGNhbid0IEkgZmluZCBvdXIgY29udmVyc2F0
+aW9uIG9uIGxvcmUga2VybmVsLiBJdCBzZWVtcwo+IHdlJ3ZlIG1lc3NlZCB1cCB0aGUgdGhyZWFk
+LiBJIGRvbid0IGhhdmUgYW55IGlkZWEgd2h5IHRoaXMgY29udmVyc2F0aW9uCj4gY2FuJ3QgYmUg
+Zm91bmQgb24gdGhlcmUuCj4gCj4gLS0gCj4gQW1tYXIKClJlZ2FyZHMKTGluIE1hCg==
