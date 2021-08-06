@@ -2,163 +2,191 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F23BC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 07:18:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51042C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 08:51:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 10E4560BD3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 07:18:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28F6860F70
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 08:51:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243568AbhHFHSy (ORCPT
+        id S243591AbhHFIve (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 03:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43470 "EHLO
+        Fri, 6 Aug 2021 04:51:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241619AbhHFHSy (ORCPT
+        with ESMTP id S241956AbhHFIve (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 03:18:54 -0400
-Received: from mail-il1-x129.google.com (mail-il1-x129.google.com [IPv6:2607:f8b0:4864:20::129])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6382C061799
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 00:18:38 -0700 (PDT)
-Received: by mail-il1-x129.google.com with SMTP id c3so7836648ilh.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 00:18:38 -0700 (PDT)
+        Fri, 6 Aug 2021 04:51:34 -0400
+Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE73EC061799
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 01:51:17 -0700 (PDT)
+Received: by mail-wr1-x435.google.com with SMTP id c9so10063443wri.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 01:51:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=AfXhjKpSCetGLLmH2wYSMbPYpbDKNCyV0HNRYyDMQeA=;
-        b=HIqw9q6X5vyWEvkesEX5PjXRQM7ZTPej9g4yoakHyG9UUz9ZBim9nm2/15AqQwjYbp
-         FtLwFHfS7IuNoFwdgnAIGGIyI8drUyaEYoJ0wwedxxz4/wsxqNrAD+2RiKbI1AXYgzTz
-         HU7n7gdfF8E0WkfKempmVH+MvIVnLNUdDDeiDt8CyoVaWyTAzI43z8wxQw532biv1uEP
-         tMg8757wAA1hzr8cexj2ijuu8Jk9dxtGyhDmzDIEoxOMDFSGp8ZbKm2aGx90wawj3Gsa
-         hvjhMUYXqgsXgMX7Lc3AHP243i/srho+LQddDkpdGGOEgyNM6Mj8eBcvTjfieCNG97xY
-         GlfQ==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=i3HIreYA7e+PTu1uya0LcVYjOhfUuTdBKhb3eZlbvSg=;
+        b=zoURBE/zCK6Jg4cUCzmyQJIGyj71YgQhER3ymo6aSPDUoFev60BJfnaw+mAOCrN5fD
+         bw7oIJp5qEA05l44xiD7+bns6dI9WKYIgmzZRYxrklC3YhMomgIaR+ItVJmVxMTj+S4K
+         rLECMHDLQ25XJJxI4jk34iFtXQhsPtJI6xibQUhZdsngzxYdkzlu4U/MAy5AQZ+QgGlf
+         Motx9cIWsbXeG0wdyDbvwblZJCf9Js3fv8AwNfyHt7j1T9UHo3LXWzvayiJ1MBZL/y4y
+         py5MFPKewTyv716au90cxNhcJapwOhbBoBMKI5Hbr6MZ6mX7WUs6vfoEF27onHlIx4Nf
+         5q+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=AfXhjKpSCetGLLmH2wYSMbPYpbDKNCyV0HNRYyDMQeA=;
-        b=ZjKCsFll/yQV7EW8g5sTCLCN/Dx8OSPM+CptoICqJKTbGiwGD16IKQr08E96Vp4CCq
-         fKMgE02EjauSBn5gY+g+jKpEsx90NjyEvn2U2zBUFI/BdMqRFNa8SWezx6vT+cEuz0cI
-         BkwHRyqrkAEqqk0GNjCi55sygJMSwz7HDeXo8yEEZ5LIys4eHEGzrcmgk+gBhpWZvJTM
-         JNTthOAIKiJx2I//BUb4VJl1koKIrJqdeRPMcXmYgoRfHwhCzVFlMrIr5CZ/Hb3tjKVY
-         7XYWRmreRYfjbOkcloRzLGlYWnjZyVkLpPO8ZF58HnnbKJnptaHOSxdxw6Ir50pTDWuc
-         9TTw==
-X-Gm-Message-State: AOAM53365lzmGSFs1AL77iBXjtWN15Mv6BR5SPEKZwNEMudg4iHk6M9N
-        q6gWrEguMPHHt69Zju1wd/CMXm6oflc+aOHac0uMFg==
-X-Google-Smtp-Source: ABdhPJzDCVLK5V7LZPwSnnK3Ot1kGmgymxUIyCMxFioYlPkMkJkf6Zof5u9E1YTx97xz6BpltLo57X22iVIcj1sQcu0=
-X-Received: by 2002:a92:d3d2:: with SMTP id c18mr360857ilh.192.1628234317999;
- Fri, 06 Aug 2021 00:18:37 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=i3HIreYA7e+PTu1uya0LcVYjOhfUuTdBKhb3eZlbvSg=;
+        b=gZK200kD5oNJ2pnxRVJvMDEybJBxdhbHGuChbDDOC4ldJpRCsE0Tqpiqy/dUQJUpsf
+         Gzuc25Qyn9dKfni8Zur6Xcv0mPA/f5UOeUqOd+iAvCVbyOzeklz+trIegnb8krsbPwds
+         jHCEPFiEDYVb3Qlui6oRR88ueKdrIhh20vGzRFQ6Z4xBvUuNDXV+6PdOPbOtUUJe0HTI
+         dsCeUcKz+i++zIzIoa0aUNLgdjatOstrrKQ57mS1x0gXucfaxP3lvjbQxD6mDpho+6Vv
+         1urR9bCHTm3TwFUtZHae/4TnXqlCsasiKWcegDf15dlaSayu6kZhmTyeEy94mMlSGiYB
+         FI0g==
+X-Gm-Message-State: AOAM532ik0thUGMrFAdjgOO/1qXOkBWT8juxi1vh30o6CDbNqgX5zj5a
+        E7duwxTU+L8dJ/I/ZXW3bK7T9g==
+X-Google-Smtp-Source: ABdhPJwJeV37G5icUbCsLwbm3RQZzW8r3qxYqn1uYTQ3qULpCThIsIRQqL6WTfH8r6I6ljU3VE1sYg==
+X-Received: by 2002:a5d:6912:: with SMTP id t18mr9577971wru.234.1628239876154;
+        Fri, 06 Aug 2021 01:51:16 -0700 (PDT)
+Received: from localhost ([2a01:cb19:826e:8e00:92f3:12fa:e0ef:50e9])
+        by smtp.gmail.com with ESMTPSA id q14sm8988749wrm.66.2021.08.06.01.51.15
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Aug 2021 01:51:15 -0700 (PDT)
+From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Fabien Parent <fparent@baylibre.com>,
+        Sean Wang <sean.wang@mediatek.com>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
+ flushed or cancelled
+In-Reply-To: <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
+References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
+ <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org>
+ <8735ryk0o7.fsf@baylibre.com>
+ <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
+ <87y29o58su.fsf@baylibre.com>
+ <CAAd53p4Ss1Z-7CB4g=_xZYxo1xDz6ih6GHUuMcgncy+yNAfU4w@mail.gmail.com>
+ <87a6lzx7jf.fsf@baylibre.com>
+ <CAAd53p6T_K67CPthLPObF=OWWCEChW4pMFMwuq87qWmTmzP2VA@mail.gmail.com>
+ <87bl6cnzy2.fsf@baylibre.com>
+ <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
+Date:   Fri, 06 Aug 2021 10:51:14 +0200
+Message-ID: <87tuk3j6rh.fsf@baylibre.com>
 MIME-Version: 1.0
-References: <2c40741c-8c8f-a105-1846-aa1ed15a6c7e@gnuweeb.org>
- <20210804085651.2452-1-hdanton@sina.com> <80e24ed7-a34a-7fac-c709-06ccad6d2612@gnuweeb.org>
-In-Reply-To: <80e24ed7-a34a-7fac-c709-06ccad6d2612@gnuweeb.org>
-From:   "Anand K. Mistry" <amistry@google.com>
-Date:   Fri, 6 Aug 2021 17:18:25 +1000
-Message-ID: <CAATStaMjeyzU3Gj7D-Q1zGMdioC5ENoXbf4QB9Rmw8TCWRiagg@mail.gmail.com>
-Subject: Re: WARNING: possible circular locking dependency detected (hci_sock_dev_event+0x17d/0x1f0)
-To:     Ammar Faizi <ammarfaizi2@gnuweeb.org>
-Cc:     Hillf Danton <hdanton@sina.com>, Lin Ma <linma@zju.edu.cn>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Ammar Faizi <ammarfaizi2@gmail.com>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, 4 Aug 2021 at 21:43, Ammar Faizi <ammarfaizi2@gnuweeb.org> wrote:
->
-> See the original report here:
-> https://lore.kernel.org/lkml/2c40741c-8c8f-a105-1846-aa1ed15a6c7e@gnuweeb.org/
->
-> On 8/4/21 3:56 PM, Hillf Danton wrote:
-> > On Mon, 2 Aug 2021 20:17:02 +0700 Ammar Faizi wrote:
-> >> Hi everyone,
-> >>
-> >> I found a potential deadlock at hci_sock_dev_event.
-> >
-> > Thanks for your report.
-> >
-> > Can you try and see if reverting e305509e678b3a4af2b3cfd410f409f7cdaabb52
-> > ("Bluetooth: use correct lock to prevent UAF of hdev object") is a cure.
-> >
->
-> Hi Hillf,
->
-> Thank you for your response.
->
-> Here is what I have tried:
-> 1. Reverted e305509e678b3a4af2b3cfd410f409f7cdaabb52.
-> 2. Compile and install reverted version.
-> 3. Rebooted 5.14.0-rc3 (c7d102232649, before revert) and try to
-> reproduce again. At this point I am able to reproduce it.
-> 4. Booted 5.14.0-rc3 (the reverted version). The deadlock warning is
-> gone after reverting it. No more deadlock warning.
+Hi Kai-Heng,
 
-Can you try patching in
-https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/?id=58ce6d5b271ab25fb2056f84a8e5546945eb5fc9
-and see if that fixes it.
+Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
 
+> Hi Mattijs,
 >
-> ------------------------------------------------------------
-> [ 51207ee38ab65db86554655300a912e8c661525e is my local revert. ]
-> Revert diff:
-> ammarfaizi2@integral:~/project/now/linux$ git diff
-> c7d102232649226a69dddd58a4942cf13cff4f7c
-> diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
-> index b04a5a02ecf3..590467345c5f 100644
-> --- a/net/bluetooth/hci_sock.c
-> +++ b/net/bluetooth/hci_sock.c
-> @@ -762,7 +762,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
->                 /* Detach sockets from device */
->                 read_lock(&hci_sk_list.lock);
->                 sk_for_each(sk, &hci_sk_list.head) {
-> -                       lock_sock(sk);
-> +                       bh_lock_sock_nested(sk);
->                         if (hci_pi(sk)->hdev == hdev) {
->                                 hci_pi(sk)->hdev = NULL;
->                                 sk->sk_err = EPIPE;
-> @@ -771,7 +771,7 @@ void hci_sock_dev_event(struct hci_dev *hdev, int event)
+> On Thu, Aug 5, 2021 at 2:55 PM Mattijs Korpershoek
+> <mkorpershoek@baylibre.com> wrote:
+>>
+>> Hi Kai-Heng,
+>>
+>> Thanks for your patch,
+>>
+>> Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
+>>
 >
->                                 hci_dev_put(hdev);
->                         }
-> -                       release_sock(sk);
-> +                       bh_unlock_sock(sk);
->                 }
->                 read_unlock(&hci_sk_list.lock);
+> [snipped]
+>
+>> I confirm this diff works for me:
+>>
+>> root@i500-pumpkin:~# hciconfig hci0 up
+>> root@i500-pumpkin:~# hciconfig hci0 down
+>> root@i500-pumpkin:~# hciconfig hci0 up
+>> root@i500-pumpkin:~# hciconfig hci0
+>> hci0:   Type: Primary  Bus: SDIO
+>>         BD Address: 00:0C:E7:55:FF:12  ACL MTU: 1021:8  SCO MTU: 244:4
+>>         UP RUNNING
+>>         RX bytes:11268 acl:0 sco:0 events:829 errors:0
+>>         TX bytes:182569 acl:0 sco:0 commands:829 errors:0
+>>
+>> root@i500-pumpkin:~# hcitool scan
+>> Scanning ...
+>>         <redacted>       Pixel 3 XL
+>>
+>> Tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+>
+> I found that btmtksdio_flush() only cancels the work instead of doing
+> flush_work(). That probably explains why putting ->shutdown right
+> before ->flush doesn't work.
+> So can you please test the following again:
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index 9872ef18f9fea..b33c05ad2150b 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -649,9 +649,9 @@ static int btmtksdio_flush(struct hci_dev *hdev)
+>  {
+>         struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+>
+> -       skb_queue_purge(&bdev->txq);
+> +       flush_work(&bdev->tx_work);
+>
+> -       cancel_work_sync(&bdev->tx_work);
+> +       skb_queue_purge(&bdev->txq);
+>
+>         return 0;
+>  }
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 2560ed2f144d4..a61e610a400cb 100644
+>
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1785,6 +1785,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
+>         aosp_do_close(hdev);
+>         msft_do_close(hdev);
+>
+> +       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> +           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> +           test_bit(HCI_UP, &hdev->flags)) {
+> +               /* Execute vendor specific shutdown routine */
+> +               if (hdev->shutdown)
+> +                       hdev->shutdown(hdev);
+> +       }
+> +
+>         if (hdev->flush)
+>                 hdev->flush(hdev);
+>
+> @@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+>                 clear_bit(HCI_INIT, &hdev->flags);
 >         }
-> ammarfaizi2@integral:~/project/now/linux$
-> ------------------------------------------------------------
 >
-> Summary:
-> Reverting e305509e678b3a4af2b3cfd410f409f7cdaabb52 is a cure.
->
-> Although it fixes the deadlock, there is probably something still goes
-> wrong regarding "prevent UAF" as the commit message says.
->
-> Will anyone create a patch for this?
-> I want to be the tester, I am new at kernel development and want to
-> start contributing, so please guide me :)
->
-> I also attached dmesg log before and after revert if you want to see the
-> full log.
->
-> Adding Lin as the author of e305509e678b3a4af2b3cfd410f409f7cdaabb52 to
-> CC list...
->
->
-> --
-> Ammar
->
+> -       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> -           test_bit(HCI_UP, &hdev->flags)) {
+> -               /* Execute vendor specific shutdown routine */
+> -               if (hdev->shutdown)
+> -                       hdev->shutdown(hdev);
+> -       }
+> -
+>         /* flush cmd  work */
+>         flush_work(&hdev->cmd_work);
+I've tried this but I have the same (broken) symptoms as before.
 
+Here are some logs of v3:
+dmesg: https://pastebin.com/1x4UHkzy
+ftrace: https://pastebin.com/Lm1d6AWy
 
--- 
-Anand K. Mistry
-Software Engineer
-Google Australia
+Mattijs
+
+>
+> Kai-Heng
