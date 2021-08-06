@@ -2,429 +2,254 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B232C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:41:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F407C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:49:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33B2660EE9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:41:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DD5D61179
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:49:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244031AbhHFVlg (ORCPT
+        id S237987AbhHFVtu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 17:41:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42626 "EHLO
+        Fri, 6 Aug 2021 17:49:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44600 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244211AbhHFVlf (ORCPT
+        with ESMTP id S235641AbhHFVtu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 17:41:35 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D23C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 14:41:18 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id w17so17586936ybl.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 14:41:18 -0700 (PDT)
+        Fri, 6 Aug 2021 17:49:50 -0400
+Received: from mail-yb1-xb30.google.com (mail-yb1-xb30.google.com [IPv6:2607:f8b0:4864:20::b30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2195BC0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 14:49:33 -0700 (PDT)
+Received: by mail-yb1-xb30.google.com with SMTP id a93so17702845ybi.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 14:49:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=JUeBbfgLq+rcwLhhgRub7YKK/T4eEMwBuYidqpHiCRY=;
-        b=OeI7CztatU2SfXPo+xsOdiRVfsA9taBVXyKEmL/CKIQru/tnSSOPZoBzd51z8d76lL
-         w7TiaEyTY7VkxMaP8t2DVWkmncg7c97WMIyEuv6Z/OH8cxug8zJcSTE8+4p8VgwOKyQE
-         wUKzEt6kg4v9MV/TCK9fokRzLyXowJ/PD1DUlvFJbi4t/OnRT5FxDtLmJ4Q7sl2MuwFW
-         0Vmyy/cHNJL8WuM7rko1mUMirHdWGiYSFQVemLvXPAzySRRaqDje3DxXdH4V0Zg70y3/
-         y5uvGJ/wUeQrScHbuKQEK0M9gIwa3Ch7eQJU94m5mnMv4bR4fe5DtyNRLoAAGJ3Hq7v5
-         7eUg==
+        bh=65NLcBVii93tCdR0I2NeRh9AZKxqiVCt6NJy/jl3+7A=;
+        b=ibBZsmPXmJpWeNCVYQEXtNpYuIiHVOYgLo9q72sLuncucoTHMpsld8i5m3RMe33PNN
+         JMEAXouUX7ejkqu7he2aifc+Z4H1vFcOlPWzk7y6Pb7Lon8uiWgQtRFm18nCoWPiFM1l
+         In429g19/yHhsJreqGhUSYAFmOH6UsKJMLx2dAPY30M+U/uE/2sVxGG3Z5KUkgUZWUzD
+         bQi5aH3L7IeWrkr3Oa7RtZGPLpYNtUvQR9PxDw3WEhiHMT2HI+wG5YUDRFEW+LLDqh8H
+         LWJ+EUbsYdIh9Fl/brF5BCc/N3Gg1JIulQlsLRwbOJafB2UYbGRugD8CiL5ZRNcR10we
+         MKrQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=JUeBbfgLq+rcwLhhgRub7YKK/T4eEMwBuYidqpHiCRY=;
-        b=AkH7cuUUECaIumtAib3KOn9wD3EwNvAnST+An/otCR0uH7mR2H0xWq2QfPp0C6bSb4
-         jmpi6oQSTz6MlVfUOS+2ypMkTN0ipkbU8QPeFk7Wk9Mvgk5Yt30LCLCo511+76PZQKsU
-         vDy05KIA5X4JiJYzsbuRuBVHFPx5EpF3TasOEKbLuYbHWtZRFS9wmsIcMXykXllPwC/a
-         pHbNXh5IX9JFvcYgMuyKXDaJauK9qe11JOLtpZgKvD9asJFxfv71keHOYvRU+yTM1KVU
-         UUJBDabdMAQ0++1pR1sKTHxlwxQ3i7KUUgF+uulFsHn5ngHOnFNXgIAfHMpqK2w0dlTw
-         aqJA==
-X-Gm-Message-State: AOAM5323bEwDV3IW33hHqAyOOsqYntsjsftTPulNlTOytb6WZoeA1DX1
-        F/GOSGNhCj6Bh81sYeUiAw7xnKRq3u6MjuiTxug=
-X-Google-Smtp-Source: ABdhPJwP7/aYAsYY64jKP/mpiNpTvctnyQlvYY+G0+UizB1mI6+CDtSROQApUqmQs5C0IvBytyYjDF60bCu8dvqhb6A=
-X-Received: by 2002:a25:bd89:: with SMTP id f9mr8755457ybh.222.1628286077727;
- Fri, 06 Aug 2021 14:41:17 -0700 (PDT)
+        bh=65NLcBVii93tCdR0I2NeRh9AZKxqiVCt6NJy/jl3+7A=;
+        b=XsyGf7P4QyHAa2QiWc86/3VQfOLMfFW8l5RSaG5BaJfX+C2h7ry360jC1j9Y4sNVkh
+         juW7Y8mo3pl6LybMUbJPElkHAWbbHNiRNvIAhd/KhEoq+zynqlt6OnhVm0CuM8/m8pAs
+         XSxNkk5HPLp7St3cJ9o4oqAAi8HkuBE2JMwv/TrmhbZT3Hgh8IVPn8nDycBzLi4VJ332
+         sVjWjPzVEZ1jSBleS4TCr1T+KRRu8Nyl+cFLh+TbyIzjxIff9/8HndRe2PhjP5YLjjRt
+         kEzXf15hpwmQeoV7n5F1QaVHxH8lB9yye5thgZ7IyOsZZwQm/n4O8bEZr5w38PVOHMkx
+         Qr5g==
+X-Gm-Message-State: AOAM531RVDeKMI4U2ckOlEAjsGWFWjZL1G4bJig4lk+lRo0JTIXU6FKg
+        qWJqqcLEvSD7zx1t7d8hsoQ7wwFtlIc74zqHGbM=
+X-Google-Smtp-Source: ABdhPJzETM3JGbF/eFpGkTg36kKgOYN5U+jeyGZ53+0+SEYlffho/03gbC6GbU+traTr1CPCrenn44HaO+HbDCIeOkg=
+X-Received: by 2002:a25:d6c6:: with SMTP id n189mr16101161ybg.432.1628286572249;
+ Fri, 06 Aug 2021 14:49:32 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210806173706.v1.1.Ie7d876ad0b7defabfa86beb64e83f655f12be7ab@changeid>
- <20210806173706.v1.2.I1d1cf4fbc02b11d62f186f0db23c2c537e296a64@changeid>
-In-Reply-To: <20210806173706.v1.2.I1d1cf4fbc02b11d62f186f0db23c2c537e296a64@changeid>
+References: <20210806054941.31387-1-hj.tedd.an@gmail.com>
+In-Reply-To: <20210806054941.31387-1-hj.tedd.an@gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 6 Aug 2021 14:41:06 -0700
-Message-ID: <CABBYNZKfwObFHQaZmZ4YJt-Np_Obx_hxa5g9zBwz0d81Og0jqw@mail.gmail.com>
-Subject: Re: [PATCH v1 2/3] client: add service-allowlist command
-To:     Howard Chung <howardchung@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Yun-Hao Chung <howardchung@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>
+Date:   Fri, 6 Aug 2021 14:49:21 -0700
+Message-ID: <CABBYNZ+73-69pKiPGXuddA8QKFQfM0aKgruCe9-t2EF2O5LMLQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v3] doc: Add a doc for Intel hardware variants
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Howard,
+Hi Tedd,
 
-On Fri, Aug 6, 2021 at 2:38 AM Howard Chung <howardchung@google.com> wrote:
+On Fri, Aug 6, 2021 at 4:40 AM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
 >
-> From: Yun-Hao Chung <howardchung@chromium.org>
+> From: Tedd Ho-Jeong An <tedd.an@intel.com>
 >
-> This creates a menu - admin and adds two commands to bluetoothctl
-> - set-service-allowlist [uuid1 uuid2 ...]
-> - get-service-allowlist
-
-How about we just do:
-
-> allow [clear/uuid1 uuid2 ...]
-
-So when no command is set it just prints the current list and in case
-you want to clear it just enter allow clear.
-
-> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> This patch adds a document for Intel hardware variants currently
+> supported by the kernel and its firmware list.
 > ---
-> The following test steps were performed:
-> 1. [bluetooth]# - menu admin
-> 2. [bluetooth]# set-service-allowlist 1124 180A 180F 1812 1801
-> 3. [bluetooth]# get-service-allowlist
-> 4. Verify the printed UUIDs are the same as what we set.
+>  doc/intel-variants.txt | 159 +++++++++++++++++++++++++++++++++++++++++
+>  1 file changed, 159 insertions(+)
+>  create mode 100644 doc/intel-variants.txt
 >
->  Makefile.tools        |   4 +-
->  client/admin_policy.c | 133 ++++++++++++++++++++++++++++++++++++++++++
->  client/admin_policy.h |  25 ++++++++
->  client/main.c         |  72 +++++++++++++++++++++++
->  4 files changed, 233 insertions(+), 1 deletion(-)
->  create mode 100644 client/admin_policy.c
->  create mode 100644 client/admin_policy.h
->
-> diff --git a/Makefile.tools b/Makefile.tools
-> index c836b5984934..1b493d4d0ed6 100644
-> --- a/Makefile.tools
-> +++ b/Makefile.tools
-> @@ -9,7 +9,9 @@ client_bluetoothctl_SOURCES = client/main.c \
->                                         client/advertising.c \
->                                         client/adv_monitor.h \
->                                         client/adv_monitor.c \
-> -                                       client/gatt.h client/gatt.c
-> +                                       client/gatt.h client/gatt.c \
-> +                                       client/admin_policy.h \
-> +                                       client/admin_policy.c
->  client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
->                                 $(GLIB_LIBS) $(DBUS_LIBS) -lreadline
->  endif
-> diff --git a/client/admin_policy.c b/client/admin_policy.c
+> diff --git a/doc/intel-variants.txt b/doc/intel-variants.txt
 > new file mode 100644
-> index 000000000000..21062c4f6185
+> index 000000000..4f51ca9f5
 > --- /dev/null
-> +++ b/client/admin_policy.c
-> @@ -0,0 +1,133 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2021 Google LLC
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
+> +++ b/doc/intel-variants.txt
+> @@ -0,0 +1,159 @@
+> +Intel Hardware Varaints
+> +=======================
 > +
-> +#ifdef HAVE_CONFIG_H
-> +#include <config.h>
-> +#endif
+> +These are the list of Intel Bluetooth devices and its information.
 > +
-> +#include <stdio.h>
-> +#include <string.h>
-> +#include <stdlib.h>
+> +Some of devices were tested the following test cases:
+> +       Firmware loading after cold boot
+> +       Firmware loading after restart
+> +       Device discovery
+> +       Connection to LE Mouse
+> +       A2DP
+> +       HFP
+> +       Update to new firmware if available
 > +
-> +#include "gdbus/gdbus.h"
-> +#include "src/shared/shell.h"
+> +All Intel firmware can be found from linux-firmware git repo.
+> +https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git
 > +
-> +#include "admin_policy.h"
-> +#define _GNU_SOURCE
 > +
-> +static GDBusProxy *set_proxy;
-> +static GDBusProxy *status_proxy;
+> +Device List
+> +-----------
 > +
-> +void admin_policy_set_set_proxy(GDBusProxy *proxy)
-> +{
-> +       set_proxy = proxy;
-> +}
+> +Wilkins Peak (WP)
+> +- HW ID:       USB(0x8087:0x07dc)
+> +- Device Type: Legacy ROM device
+> +- Driver flag: BTUSB_INTEL_BROKEN_INITIAL_NCMD
+> +- HW variant:  0x07
+> +- FW files:
+> +       WP2 B3
+> +       intel/ibt-hw-37.7.10-fw-1.80.2.3.d.bseq
+> +               tested: Patch Version: 87    Release Version: 20.60.0.2
+> +                       70353356f ("linux-firmware: Update firmware patch for Intel Bluetooth 7260 (B3/B4)")
+> +       WP2 B5
+> +       intel/ibt-hw-37.7.10-fw-1.80.1.2d.d.bseq
+> +               tested: Patch Version: 42    Release Version: 20.60.0.2
+> +                       629a5e089 ("linux-firmware: Update firmware patch for Intel Bluetooth 7260 (B5/B6)")
 > +
-> +void admin_policy_set_status_proxy(GDBusProxy *proxy)
-> +{
-> +       status_proxy = proxy;
-> +}
+> +       WP1 B3
+> +       intel/ibt-hw-37.7.10-fw-1.0.1.2d.d.bseq
 > +
-> +void admin_policy_read_service_allowlist(DBusConnection *dbus_conn)
-> +{
-> +       DBusMessageIter iter, subiter;
-> +       char *uuid = NULL;
+> +       WP1 B3
+> +       intel/ibt-hw-37.7.10-fw-1.0.2.3.d.bseq
 > +
-> +       if (!status_proxy || !g_dbus_proxy_get_property(status_proxy,
-> +                                               "ServiceAllowList", &iter)) {
-> +               bt_shell_printf("Failed to get property\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
 > +
-> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
-> +               bt_shell_printf("Unexpected return type\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
+> +Stone Peak (StP)
+> +- HW ID:       USB(0x8087:0x0a2a)
+> +- Device Type: Legacy ROM device
+> +- HW variant:  0x08
+> +- FW files:
+> +       StP
+> +       intel/ibt-hw-37.8.10-fw-1.10.2.27.d.bseq
 > +
-> +       bt_shell_printf("Service AllowedList:\n");
-> +       dbus_message_iter_recurse(&iter, &subiter);
-> +       while (dbus_message_iter_get_arg_type(&subiter) ==
-> +                                               DBUS_TYPE_STRING) {
-> +               dbus_message_iter_get_basic(&subiter, &uuid);
-> +               bt_shell_printf("\t%s\n", uuid);
-> +               dbus_message_iter_next(&subiter);
-> +       }
+> +       StP D1
+> +       intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> +               tested: FW Build: REL_50_0002    Release Version: 20.60.0.2
+> +                       9489f5524 ("linux-firmware: Update firmware patch for Intel Bluetooth 7265 (D0)")
 > +
-> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +}
 > +
-> +struct uuid_list_data {
-> +       char **uuid_list;
-> +       size_t num;
-> +};
+> +Sandy Peak (SdP)
+> +- HW ID:       USB(0x8087:0x0aa7)
+> +- Device Type: Legacy ROM device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +- HW variant:  0x08
+> +       intel/ibt-hw-37.8.10-fw-22.50.19.14.f.bseq
+> +               tested: FW Patch Version: 0x42(66)
+> +                       195ecf149 ("linux-firmware: Intel BT 7265: Fix Security Issues")
 > +
-> +static void set_service_setup(DBusMessageIter *iter, void *user_data)
-> +{
-> +       struct uuid_list_data *data = user_data;
-> +       DBusMessageIter arr_iter;
-> +       size_t i;
 > +
-> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
-> +                                               DBUS_TYPE_STRING_AS_STRING,
-> +                                               &arr_iter);
+> +Snow Field Peak (SfP) / Windstorm Peak (WsP)
+> +- HW ID:       USB(0x8087:0x0a2b)
+> +- Device Type: Legacy Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +- HW variant:  0x0b
+> +       SfP
+> +       intel/ibt-11-5.sfi
+> +               tested: FW Build: REL0522    Release Version: 20.100.0.3
+> +                       f0896585b ("linux-firmware: Update firmware patch for Intel Bluetooth 8260")
+> +- HW variant:  0x0c
+> +       WsP
+> +       intel/ibt-12-16.sfi
+> +               tested: FW Build: REL1221    Release Version: 22.50.0.4
+> +                       4116d72b9 ("linux-firmware: Update firmware file for Intel Bluetooth 8265")
+> +               tested: FW Build: REL0306    Release Version: 21.10.0.6
+> +                       1f8ebdfc2 ("linux-firmware: Update firmware file for Intel Bluetooth 8265")
 > +
-> +       for (i = 0; i < data->num; i++) {
-> +               dbus_message_iter_append_basic(&arr_iter, DBUS_TYPE_STRING,
-> +                                                       &data->uuid_list[i]);
-> +       }
 > +
-> +       dbus_message_iter_close_container(iter, &arr_iter);
-> +}
+> +Jefferson Peak (JfP)
+> +- HW ID:       USB(0x8087:0x0aaa)
+> +- Device Type: Legacy Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +               HCI_QUIRK_VALID_LE_STATES
+> +- HW variant:  0x11
+> +       intel/ibt-17-0-1.sfi
+> +       intel/ibt-17-16-1.sfi
 > +
-> +static void set_service_reply(DBusMessage *message, void *user_data)
-> +{
-> +       DBusError error;
 > +
-> +       dbus_error_init(&error);
+> +Thunder Peak (ThP)
+> +- HW ID:       USB(0x8087:0x0025)
+> +- Device Type: Legacy Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +               HCI_QUIRK_VALID_LE_STATES
+> +- HW variant:  0x12
+> +       intel/ibt-18-0-1.sfi
+> +       intel/ibt-18-16-1.sfi
+> +               tested: FW Build: REL19718    Release Version: 22.50.0.4
+> +                       687d64a4d ("linux-firmware: Update firmware file for Intel Bluetooth 9260")
+> +               tested: FW Build: REL13313    Release Version: 21.120.0.4
+> +                       db3038082 ("linux-firmware: Update firmware file for Intel Bluetooth 9260")
 > +
-> +       if (!dbus_set_error_from_message(&error, message)) {
-> +               bt_shell_printf("Set allowed service successfully\n");
-> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
-> +       }
 > +
-> +       bt_shell_printf("Failed to set service allowed list: %s\n", error.name);
-> +       dbus_error_free(&error);
-> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +}
+> +Quasar(QsR) / Harrison Peak (HrP)
+> +- HW ID:       USB(0x8087:0x0026)
+> +- Device Type: Legacy Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +- HW variant:  0x13
+> +       Quasar with JfP
+> +       intel/ibt-19-0-1.sfi
+> +       intel/ibt-19-240-1.sfi
 > +
-> +void admin_policy_set_service_allowlist(DBusConnection *dbus_connd,
-> +                                                       int argc, char *argv[])
-> +{
-> +       struct uuid_list_data data;
+> +       Quasar with HrP
+> +       intel/ibt-19-0-4.sfi
+> +       intel/ibt-19-240-4.sfi
 > +
-> +       if (!set_proxy) {
-> +               bt_shell_printf("Set proxy not ready\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
+> +       intel/ibt-19-0-0.sfi
+> +       intel/ibt-19-16-4.sfi
+> +       intel/ibt-19-32-0.sfi
+> +       intel/ibt-19-32-1.sfi
+> +       intel/ibt-19-32-4.sfi
 > +
-> +       data.uuid_list = argv;
-> +       data.num = argc;
 > +
-> +       if (!g_dbus_proxy_method_call(set_proxy, "SetServiceAllowList",
-> +                                       set_service_setup, set_service_reply,
-> +                                       &data, NULL)) {
-> +               bt_shell_printf("Failed to call method\n");
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +}
-> diff --git a/client/admin_policy.h b/client/admin_policy.h
-> new file mode 100644
-> index 000000000000..1c8c2152d59d
-> --- /dev/null
-> +++ b/client/admin_policy.h
-> @@ -0,0 +1,25 @@
-> +/*
-> + *
-> + *  BlueZ - Bluetooth protocol stack for Linux
-> + *
-> + *  Copyright (C) 2021 Google LLC
-> + *
-> + *
-> + *  This program is free software; you can redistribute it and/or modify
-> + *  it under the terms of the GNU General Public License as published by
-> + *  the Free Software Foundation; either version 2 of the License, or
-> + *  (at your option) any later version.
-> + *
-> + *  This program is distributed in the hope that it will be useful,
-> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-> + *  GNU General Public License for more details.
-> + *
-> + */
+> +Cyclone Peak (CcP)
+> +- HW ID:       USB(0x8087:0x0029)
+> +- Device Type: Legacy Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +- HW variant:  0x14
+> +       intel/ibt-20-0-3.sfi
+> +       intel/ibt-20-1-3.sfi
+> +               tested: FW Build: REL25791    Release Version: 22.60.0.3
+> +                       34803c20f ("linux-firmware: Update firmware file for Intel Bluetooth AX200")
+> +       intel/ibt-20-1-4.sfi
 > +
-> +void admin_policy_set_set_proxy(GDBusProxy *proxy);
-> +void admin_policy_set_status_proxy(GDBusProxy *proxy);
 > +
-> +void admin_policy_read_service_allowlist(DBusConnection *dbus_conn);
-> +void admin_policy_set_service_allowlist(DBusConnection *dbus_conn,
-> +                                                       int argc, char *argv[]);
-> diff --git a/client/main.c b/client/main.c
-> index c1a62edb7f99..5297760c8cec 100644
-> --- a/client/main.c
-> +++ b/client/main.c
-> @@ -29,6 +29,7 @@
->  #include "gatt.h"
->  #include "advertising.h"
->  #include "adv_monitor.h"
-> +#include "admin_policy.h"
->
->  /* String display constants */
->  #define COLORED_NEW    COLOR_GREEN "NEW" COLOR_OFF
-> @@ -530,6 +531,23 @@ static void admon_manager_added(GDBusProxy *proxy)
->         adv_monitor_register_app(dbus_conn);
->  }
->
-> +static void admin_policy_set_added(GDBusProxy *proxy)
-> +{
-> +       admin_policy_set_set_proxy(proxy);
-> +}
+> +Typhon Peak (TyP)
+> +- HW ID:       USB(0x8087:0x0032)
+> +- Device Type: TLV based Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +- HW variant:  0x17
+> +       intel/ibt-0041-0041.sfi
+> +               tested: FW Build: REL25171    Release Version: 22.60.0.3
+> +                       25ddc612f ("linux-firmware: Update firmware file for Intel Bluetooth AX210")
+> +               tested: FW Build: REL17510    Release Version: 22.20.0.3
+> +                       28185ecdc ("linux-firmware: Update firmware file for Intel Bluetooth AX210")
 > +
-> +static void admin_policy_status_added(GDBusProxy *proxy)
-> +{
-> +       struct adapter *adapter;
 > +
-> +       adapter = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
-> +
-> +       if (!adapter)
-> +               return;
-> +
-> +       admin_policy_set_status_proxy(proxy);
-> +}
-> +
->  static void proxy_added(GDBusProxy *proxy, void *user_data)
->  {
->         const char *interface;
-> @@ -565,6 +583,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
->         } else if (!strcmp(interface,
->                                 "org.bluez.AdvertisementMonitorManager1")) {
->                 admon_manager_added(proxy);
-> +       } else if (!strcmp(interface, "org.bluez.AdminPolicySet1")) {
-> +               admin_policy_set_added(proxy);
-> +       } else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1")) {
-> +               admin_policy_status_added(proxy);
->         }
->  }
->
-> @@ -621,6 +643,23 @@ static void adapter_removed(GDBusProxy *proxy)
->         }
->  }
->
-> +static void admin_policy_set_removed(GDBusProxy *proxy)
-> +{
-> +       admin_policy_set_set_proxy(NULL);
-> +}
-> +
-> +static void admin_policy_status_removed(GDBusProxy *proxy)
-> +{
-> +       struct adapter *adapter;
-> +
-> +       adapter = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
-> +
-> +       if (!adapter)
-> +               return;
-> +
-> +       admin_policy_set_status_proxy(NULL);
-> +}
-> +
->  static void proxy_removed(GDBusProxy *proxy, void *user_data)
->  {
->         const char *interface;
-> @@ -661,6 +700,10 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
->         } else if (!strcmp(interface,
->                         "org.bluez.AdvertisementMonitorManager1")) {
->                 adv_monitor_remove_manager(dbus_conn);
-> +       } else if (!strcmp(interface, "org.bluez.AdminPolicySet1")) {
-> +               admin_policy_set_removed(proxy);
-> +       } else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1")) {
-> +               admin_policy_status_removed(proxy);
->         }
->  }
->
-> @@ -2824,6 +2867,22 @@ static void cmd_adv_monitor_get_supported_info(int argc, char *argv[])
->         adv_monitor_get_supported_info();
->  }
->
-> +static void cmd_set_service_allowlist(int argc, char *argv[])
-> +{
-> +       if (check_default_ctrl() == FALSE)
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +
-> +       admin_policy_set_service_allowlist(dbus_conn, argc - 1, argv + 1);
-> +}
-> +
-> +static void cmd_get_service_allowlist(int argc, char *argv[])
-> +{
-> +       if (check_default_ctrl() == FALSE)
-> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +
-> +       admin_policy_read_service_allowlist(dbus_conn);
-> +}
-> +
->  static const struct bt_shell_menu advertise_menu = {
->         .name = "advertise",
->         .desc = "Advertise Options Submenu",
-> @@ -2978,6 +3037,18 @@ static const struct bt_shell_menu gatt_menu = {
->         { } },
->  };
->
-> +static const struct bt_shell_menu admin_menu = {
-> +       .name = "admin",
-> +       .desc = "Admin Policy Submenu",
-> +       .entries = {
-> +       { "set-service-allowlist", "[uuid1 uuid2 ...]",
-> +                                               cmd_set_service_allowlist,
-> +                                               "Set service allowlist"},
-> +       { "get-service-allowlist", NULL, cmd_get_service_allowlist,
-> +                                               "Get service allowlist"},
-> +       {} },
-> +};
-> +
->  static const struct bt_shell_menu main_menu = {
->         .name = "main",
->         .entries = {
-> @@ -3075,6 +3146,7 @@ int main(int argc, char *argv[])
->         bt_shell_add_submenu(&advertise_monitor_menu);
->         bt_shell_add_submenu(&scan_menu);
->         bt_shell_add_submenu(&gatt_menu);
-> +       bt_shell_add_submenu(&admin_menu);
->         bt_shell_set_prompt(PROMPT_OFF);
->
->         if (agent_option)
+> +Garfield Peak (GfP)
+> +- HW ID:       USB(0x8087:0x0033)
+> +- Device Type: TLV based Bootloader device
+> +- HCI Quirks:  HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED
+> +               HCI_QUIRK_VALID_LE_STATES
+> +- HW variant:  0x18
 > --
-> 2.32.0.605.g8dce9f2422-goog
->
+> 2.25.1
 
+Applied, thanks.
 
 -- 
 Luiz Augusto von Dentz
