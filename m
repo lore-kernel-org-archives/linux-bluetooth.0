@@ -2,113 +2,429 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EC2B5C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:36:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4B232C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:41:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D50F161186
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 33B2660EE9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:41:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245268AbhHFVgU (ORCPT
+        id S244031AbhHFVlg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 17:36:20 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41400 "EHLO
+        Fri, 6 Aug 2021 17:41:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42626 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245260AbhHFVgT (ORCPT
+        with ESMTP id S244211AbhHFVlf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 17:36:19 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB0C6C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 14:36:02 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id l19so18734251pjz.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 14:36:02 -0700 (PDT)
+        Fri, 6 Aug 2021 17:41:35 -0400
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D23C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 14:41:18 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id w17so17586936ybl.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 14:41:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=h5O23deTS/YJXaWeLzUnVmuu6XP6/UdUDz9XhtpcMXY=;
-        b=vbVwbu3DiogbUhIsTn7kE4HHTObVoO8snQDIEEVKMg6AGJLu2xEQ65dvd8tkGSiU3Q
-         7IGZ9Y9hrSEvd4LwHnumHQVo+mBt3Fjakoso4/ydFEFzqaVmMAfRi2fRxl06iu+AhvOG
-         yAs96qi279zM5xBrgnhhfztO7zJ/Gc6+MowGKzpVuc5Wm0cu1x33y6OnGtUKod52Oo70
-         CyyZAaXYUQCHJVHRODe5I3RoxZDp+7pxGgEopx+qbZrPUlRkLknutE0ZL5M4GsKOEvvo
-         Y3LUfno4jgbLzCTKinVBfEGHWieM8G35w+vvBDCQpgGR8ckGX1TizRViqkNiGhFL0dF+
-         J9+w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=JUeBbfgLq+rcwLhhgRub7YKK/T4eEMwBuYidqpHiCRY=;
+        b=OeI7CztatU2SfXPo+xsOdiRVfsA9taBVXyKEmL/CKIQru/tnSSOPZoBzd51z8d76lL
+         w7TiaEyTY7VkxMaP8t2DVWkmncg7c97WMIyEuv6Z/OH8cxug8zJcSTE8+4p8VgwOKyQE
+         wUKzEt6kg4v9MV/TCK9fokRzLyXowJ/PD1DUlvFJbi4t/OnRT5FxDtLmJ4Q7sl2MuwFW
+         0Vmyy/cHNJL8WuM7rko1mUMirHdWGiYSFQVemLvXPAzySRRaqDje3DxXdH4V0Zg70y3/
+         y5uvGJ/wUeQrScHbuKQEK0M9gIwa3Ch7eQJU94m5mnMv4bR4fe5DtyNRLoAAGJ3Hq7v5
+         7eUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=h5O23deTS/YJXaWeLzUnVmuu6XP6/UdUDz9XhtpcMXY=;
-        b=fkghsY4aEyaamy//fwe7rsT38bKLw10/JOlT9BTRTAtXZe68Zq2+ppdYQmktwOAYuH
-         h5AOH7uaYN0TrxRJx2igOUVLJXAGihdWeUd1e2HbAP7DX2277+E4V2QiKj8a1YUBptfy
-         fMoDHCmoly2Rw7r73j28AiSLT7Wg4m7mjosE2eQvJwRUXQdUOoNPO6BY9yW7u7rmRDuL
-         CrJj0D4CjbC/o9/hZw1VzrFeB31Y9xMMh6azFu2cNdSXl+YmkG9V87pwsL2q5cJvm0ye
-         f3FXTCLK/dtDVmGuCVEpMy4CbM8E7zfLarjsioy3BNns4pb2ydwUk567JLxb8OBeGCbB
-         YFIg==
-X-Gm-Message-State: AOAM530yt8DbzjCprOLWTDJKhJytvpvVTybKbiRuX8rfoZhrYwaC6vcw
-        ZUGf296M9C5DIPE0GANdqqvygDUt9OQ=
-X-Google-Smtp-Source: ABdhPJzjRkVFtXHG+gGp6rk92GNxIoNHTXl/DlHxCQEfKnv8iQu78bnWuaF6em/SGIucLAejJf5RYQ==
-X-Received: by 2002:a17:90b:4a90:: with SMTP id lp16mr12213930pjb.74.1628285762176;
-        Fri, 06 Aug 2021 14:36:02 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h20sm11765201pfn.173.2021.08.06.14.36.01
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Aug 2021 14:36:01 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 4/4] monitor: Make --analyze output latencies in msec
-Date:   Fri,  6 Aug 2021 14:35:58 -0700
-Message-Id: <20210806213558.16442-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210806213558.16442-1-luiz.dentz@gmail.com>
-References: <20210806213558.16442-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=JUeBbfgLq+rcwLhhgRub7YKK/T4eEMwBuYidqpHiCRY=;
+        b=AkH7cuUUECaIumtAib3KOn9wD3EwNvAnST+An/otCR0uH7mR2H0xWq2QfPp0C6bSb4
+         jmpi6oQSTz6MlVfUOS+2ypMkTN0ipkbU8QPeFk7Wk9Mvgk5Yt30LCLCo511+76PZQKsU
+         vDy05KIA5X4JiJYzsbuRuBVHFPx5EpF3TasOEKbLuYbHWtZRFS9wmsIcMXykXllPwC/a
+         pHbNXh5IX9JFvcYgMuyKXDaJauK9qe11JOLtpZgKvD9asJFxfv71keHOYvRU+yTM1KVU
+         UUJBDabdMAQ0++1pR1sKTHxlwxQ3i7KUUgF+uulFsHn5ngHOnFNXgIAfHMpqK2w0dlTw
+         aqJA==
+X-Gm-Message-State: AOAM5323bEwDV3IW33hHqAyOOsqYntsjsftTPulNlTOytb6WZoeA1DX1
+        F/GOSGNhCj6Bh81sYeUiAw7xnKRq3u6MjuiTxug=
+X-Google-Smtp-Source: ABdhPJwP7/aYAsYY64jKP/mpiNpTvctnyQlvYY+G0+UizB1mI6+CDtSROQApUqmQs5C0IvBytyYjDF60bCu8dvqhb6A=
+X-Received: by 2002:a25:bd89:: with SMTP id f9mr8755457ybh.222.1628286077727;
+ Fri, 06 Aug 2021 14:41:17 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210806173706.v1.1.Ie7d876ad0b7defabfa86beb64e83f655f12be7ab@changeid>
+ <20210806173706.v1.2.I1d1cf4fbc02b11d62f186f0db23c2c537e296a64@changeid>
+In-Reply-To: <20210806173706.v1.2.I1d1cf4fbc02b11d62f186f0db23c2c537e296a64@changeid>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 6 Aug 2021 14:41:06 -0700
+Message-ID: <CABBYNZKfwObFHQaZmZ4YJt-Np_Obx_hxa5g9zBwz0d81Og0jqw@mail.gmail.com>
+Subject: Re: [PATCH v1 2/3] client: add service-allowlist command
+To:     Howard Chung <howardchung@google.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Yun-Hao Chung <howardchung@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Howard,
 
-Milisecconds is probably the best unit to have since it is unlikely that
-the controller can respond in under 1 msec as well as most time
-sensitive connection e.g. A2DP, HFP, etc, also don't expect the
-latencies to be over 1 sec.
----
- monitor/analyze.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+On Fri, Aug 6, 2021 at 2:38 AM Howard Chung <howardchung@google.com> wrote:
+>
+> From: Yun-Hao Chung <howardchung@chromium.org>
+>
+> This creates a menu - admin and adds two commands to bluetoothctl
+> - set-service-allowlist [uuid1 uuid2 ...]
+> - get-service-allowlist
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index aae153f94..bee05f467 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -110,12 +110,15 @@ static void conn_destroy(void *data)
- 	printf("    %lu RX packets\n", conn->rx_num);
- 	printf("    %lu TX packets\n", conn->tx_num);
- 	printf("    %lu TX completed packets\n", conn->tx_num_comp);
--	printf("    %ld.%06ld seconds min latency\n",
--			conn->tx_lat_min.tv_sec, conn->tx_lat_min.tv_usec);
--	printf("    %ld.%06ld seconds max latency\n",
--			conn->tx_lat_max.tv_sec, conn->tx_lat_max.tv_usec);
--	printf("    %ld.%06ld seconds median latency\n",
--			conn->tx_lat_med.tv_sec, conn->tx_lat_med.tv_usec);
-+	printf("    %ld msec min latency\n",
-+			conn->tx_lat_min.tv_sec * 1000 +
-+			conn->tx_lat_min.tv_usec / 1000);
-+	printf("    %ld msec max latency\n",
-+			conn->tx_lat_max.tv_sec * 1000 +
-+			conn->tx_lat_max.tv_usec / 1000);
-+	printf("    %ld msec median latency\n",
-+			conn->tx_lat_med.tv_sec * 1000 +
-+			conn->tx_lat_med.tv_usec / 1000);
- 	printf("    %u octets TX min packet size\n", conn->tx_pkt_min);
- 	printf("    %u octets TX max packet size\n", conn->tx_pkt_max);
- 	printf("    %u octets TX median packet size\n", conn->tx_pkt_med);
+How about we just do:
+
+> allow [clear/uuid1 uuid2 ...]
+
+So when no command is set it just prints the current list and in case
+you want to clear it just enter allow clear.
+
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> ---
+> The following test steps were performed:
+> 1. [bluetooth]# - menu admin
+> 2. [bluetooth]# set-service-allowlist 1124 180A 180F 1812 1801
+> 3. [bluetooth]# get-service-allowlist
+> 4. Verify the printed UUIDs are the same as what we set.
+>
+>  Makefile.tools        |   4 +-
+>  client/admin_policy.c | 133 ++++++++++++++++++++++++++++++++++++++++++
+>  client/admin_policy.h |  25 ++++++++
+>  client/main.c         |  72 +++++++++++++++++++++++
+>  4 files changed, 233 insertions(+), 1 deletion(-)
+>  create mode 100644 client/admin_policy.c
+>  create mode 100644 client/admin_policy.h
+>
+> diff --git a/Makefile.tools b/Makefile.tools
+> index c836b5984934..1b493d4d0ed6 100644
+> --- a/Makefile.tools
+> +++ b/Makefile.tools
+> @@ -9,7 +9,9 @@ client_bluetoothctl_SOURCES = client/main.c \
+>                                         client/advertising.c \
+>                                         client/adv_monitor.h \
+>                                         client/adv_monitor.c \
+> -                                       client/gatt.h client/gatt.c
+> +                                       client/gatt.h client/gatt.c \
+> +                                       client/admin_policy.h \
+> +                                       client/admin_policy.c
+>  client_bluetoothctl_LDADD = gdbus/libgdbus-internal.la src/libshared-glib.la \
+>                                 $(GLIB_LIBS) $(DBUS_LIBS) -lreadline
+>  endif
+> diff --git a/client/admin_policy.c b/client/admin_policy.c
+> new file mode 100644
+> index 000000000000..21062c4f6185
+> --- /dev/null
+> +++ b/client/admin_policy.c
+> @@ -0,0 +1,133 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2021 Google LLC
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + */
+> +
+> +#ifdef HAVE_CONFIG_H
+> +#include <config.h>
+> +#endif
+> +
+> +#include <stdio.h>
+> +#include <string.h>
+> +#include <stdlib.h>
+> +
+> +#include "gdbus/gdbus.h"
+> +#include "src/shared/shell.h"
+> +
+> +#include "admin_policy.h"
+> +#define _GNU_SOURCE
+> +
+> +static GDBusProxy *set_proxy;
+> +static GDBusProxy *status_proxy;
+> +
+> +void admin_policy_set_set_proxy(GDBusProxy *proxy)
+> +{
+> +       set_proxy = proxy;
+> +}
+> +
+> +void admin_policy_set_status_proxy(GDBusProxy *proxy)
+> +{
+> +       status_proxy = proxy;
+> +}
+> +
+> +void admin_policy_read_service_allowlist(DBusConnection *dbus_conn)
+> +{
+> +       DBusMessageIter iter, subiter;
+> +       char *uuid = NULL;
+> +
+> +       if (!status_proxy || !g_dbus_proxy_get_property(status_proxy,
+> +                                               "ServiceAllowList", &iter)) {
+> +               bt_shell_printf("Failed to get property\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       if (dbus_message_iter_get_arg_type(&iter) != DBUS_TYPE_ARRAY) {
+> +               bt_shell_printf("Unexpected return type\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       bt_shell_printf("Service AllowedList:\n");
+> +       dbus_message_iter_recurse(&iter, &subiter);
+> +       while (dbus_message_iter_get_arg_type(&subiter) ==
+> +                                               DBUS_TYPE_STRING) {
+> +               dbus_message_iter_get_basic(&subiter, &uuid);
+> +               bt_shell_printf("\t%s\n", uuid);
+> +               dbus_message_iter_next(&subiter);
+> +       }
+> +
+> +       return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +}
+> +
+> +struct uuid_list_data {
+> +       char **uuid_list;
+> +       size_t num;
+> +};
+> +
+> +static void set_service_setup(DBusMessageIter *iter, void *user_data)
+> +{
+> +       struct uuid_list_data *data = user_data;
+> +       DBusMessageIter arr_iter;
+> +       size_t i;
+> +
+> +       dbus_message_iter_open_container(iter, DBUS_TYPE_ARRAY,
+> +                                               DBUS_TYPE_STRING_AS_STRING,
+> +                                               &arr_iter);
+> +
+> +       for (i = 0; i < data->num; i++) {
+> +               dbus_message_iter_append_basic(&arr_iter, DBUS_TYPE_STRING,
+> +                                                       &data->uuid_list[i]);
+> +       }
+> +
+> +       dbus_message_iter_close_container(iter, &arr_iter);
+> +}
+> +
+> +static void set_service_reply(DBusMessage *message, void *user_data)
+> +{
+> +       DBusError error;
+> +
+> +       dbus_error_init(&error);
+> +
+> +       if (!dbus_set_error_from_message(&error, message)) {
+> +               bt_shell_printf("Set allowed service successfully\n");
+> +               return bt_shell_noninteractive_quit(EXIT_SUCCESS);
+> +       }
+> +
+> +       bt_shell_printf("Failed to set service allowed list: %s\n", error.name);
+> +       dbus_error_free(&error);
+> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +}
+> +
+> +void admin_policy_set_service_allowlist(DBusConnection *dbus_connd,
+> +                                                       int argc, char *argv[])
+> +{
+> +       struct uuid_list_data data;
+> +
+> +       if (!set_proxy) {
+> +               bt_shell_printf("Set proxy not ready\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +
+> +       data.uuid_list = argv;
+> +       data.num = argc;
+> +
+> +       if (!g_dbus_proxy_method_call(set_proxy, "SetServiceAllowList",
+> +                                       set_service_setup, set_service_reply,
+> +                                       &data, NULL)) {
+> +               bt_shell_printf("Failed to call method\n");
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +       }
+> +}
+> diff --git a/client/admin_policy.h b/client/admin_policy.h
+> new file mode 100644
+> index 000000000000..1c8c2152d59d
+> --- /dev/null
+> +++ b/client/admin_policy.h
+> @@ -0,0 +1,25 @@
+> +/*
+> + *
+> + *  BlueZ - Bluetooth protocol stack for Linux
+> + *
+> + *  Copyright (C) 2021 Google LLC
+> + *
+> + *
+> + *  This program is free software; you can redistribute it and/or modify
+> + *  it under the terms of the GNU General Public License as published by
+> + *  the Free Software Foundation; either version 2 of the License, or
+> + *  (at your option) any later version.
+> + *
+> + *  This program is distributed in the hope that it will be useful,
+> + *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+> + *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+> + *  GNU General Public License for more details.
+> + *
+> + */
+> +
+> +void admin_policy_set_set_proxy(GDBusProxy *proxy);
+> +void admin_policy_set_status_proxy(GDBusProxy *proxy);
+> +
+> +void admin_policy_read_service_allowlist(DBusConnection *dbus_conn);
+> +void admin_policy_set_service_allowlist(DBusConnection *dbus_conn,
+> +                                                       int argc, char *argv[]);
+> diff --git a/client/main.c b/client/main.c
+> index c1a62edb7f99..5297760c8cec 100644
+> --- a/client/main.c
+> +++ b/client/main.c
+> @@ -29,6 +29,7 @@
+>  #include "gatt.h"
+>  #include "advertising.h"
+>  #include "adv_monitor.h"
+> +#include "admin_policy.h"
+>
+>  /* String display constants */
+>  #define COLORED_NEW    COLOR_GREEN "NEW" COLOR_OFF
+> @@ -530,6 +531,23 @@ static void admon_manager_added(GDBusProxy *proxy)
+>         adv_monitor_register_app(dbus_conn);
+>  }
+>
+> +static void admin_policy_set_added(GDBusProxy *proxy)
+> +{
+> +       admin_policy_set_set_proxy(proxy);
+> +}
+> +
+> +static void admin_policy_status_added(GDBusProxy *proxy)
+> +{
+> +       struct adapter *adapter;
+> +
+> +       adapter = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+> +
+> +       if (!adapter)
+> +               return;
+> +
+> +       admin_policy_set_status_proxy(proxy);
+> +}
+> +
+>  static void proxy_added(GDBusProxy *proxy, void *user_data)
+>  {
+>         const char *interface;
+> @@ -565,6 +583,10 @@ static void proxy_added(GDBusProxy *proxy, void *user_data)
+>         } else if (!strcmp(interface,
+>                                 "org.bluez.AdvertisementMonitorManager1")) {
+>                 admon_manager_added(proxy);
+> +       } else if (!strcmp(interface, "org.bluez.AdminPolicySet1")) {
+> +               admin_policy_set_added(proxy);
+> +       } else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1")) {
+> +               admin_policy_status_added(proxy);
+>         }
+>  }
+>
+> @@ -621,6 +643,23 @@ static void adapter_removed(GDBusProxy *proxy)
+>         }
+>  }
+>
+> +static void admin_policy_set_removed(GDBusProxy *proxy)
+> +{
+> +       admin_policy_set_set_proxy(NULL);
+> +}
+> +
+> +static void admin_policy_status_removed(GDBusProxy *proxy)
+> +{
+> +       struct adapter *adapter;
+> +
+> +       adapter = find_ctrl(ctrl_list, g_dbus_proxy_get_path(proxy));
+> +
+> +       if (!adapter)
+> +               return;
+> +
+> +       admin_policy_set_status_proxy(NULL);
+> +}
+> +
+>  static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>  {
+>         const char *interface;
+> @@ -661,6 +700,10 @@ static void proxy_removed(GDBusProxy *proxy, void *user_data)
+>         } else if (!strcmp(interface,
+>                         "org.bluez.AdvertisementMonitorManager1")) {
+>                 adv_monitor_remove_manager(dbus_conn);
+> +       } else if (!strcmp(interface, "org.bluez.AdminPolicySet1")) {
+> +               admin_policy_set_removed(proxy);
+> +       } else if (!strcmp(interface, "org.bluez.AdminPolicyStatus1")) {
+> +               admin_policy_status_removed(proxy);
+>         }
+>  }
+>
+> @@ -2824,6 +2867,22 @@ static void cmd_adv_monitor_get_supported_info(int argc, char *argv[])
+>         adv_monitor_get_supported_info();
+>  }
+>
+> +static void cmd_set_service_allowlist(int argc, char *argv[])
+> +{
+> +       if (check_default_ctrl() == FALSE)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       admin_policy_set_service_allowlist(dbus_conn, argc - 1, argv + 1);
+> +}
+> +
+> +static void cmd_get_service_allowlist(int argc, char *argv[])
+> +{
+> +       if (check_default_ctrl() == FALSE)
+> +               return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> +
+> +       admin_policy_read_service_allowlist(dbus_conn);
+> +}
+> +
+>  static const struct bt_shell_menu advertise_menu = {
+>         .name = "advertise",
+>         .desc = "Advertise Options Submenu",
+> @@ -2978,6 +3037,18 @@ static const struct bt_shell_menu gatt_menu = {
+>         { } },
+>  };
+>
+> +static const struct bt_shell_menu admin_menu = {
+> +       .name = "admin",
+> +       .desc = "Admin Policy Submenu",
+> +       .entries = {
+> +       { "set-service-allowlist", "[uuid1 uuid2 ...]",
+> +                                               cmd_set_service_allowlist,
+> +                                               "Set service allowlist"},
+> +       { "get-service-allowlist", NULL, cmd_get_service_allowlist,
+> +                                               "Get service allowlist"},
+> +       {} },
+> +};
+> +
+>  static const struct bt_shell_menu main_menu = {
+>         .name = "main",
+>         .entries = {
+> @@ -3075,6 +3146,7 @@ int main(int argc, char *argv[])
+>         bt_shell_add_submenu(&advertise_monitor_menu);
+>         bt_shell_add_submenu(&scan_menu);
+>         bt_shell_add_submenu(&gatt_menu);
+> +       bt_shell_add_submenu(&admin_menu);
+>         bt_shell_set_prompt(PROMPT_OFF);
+>
+>         if (agent_option)
+> --
+> 2.32.0.605.g8dce9f2422-goog
+>
+
+
 -- 
-2.31.1
-
+Luiz Augusto von Dentz
