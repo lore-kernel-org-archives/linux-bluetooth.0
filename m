@@ -2,191 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 51042C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 08:51:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 35442C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 09:38:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28F6860F70
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 08:51:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16BE6611B0
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 09:38:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243591AbhHFIve (ORCPT
+        id S244493AbhHFJjE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 04:51:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36584 "EHLO
+        Fri, 6 Aug 2021 05:39:04 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47882 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241956AbhHFIve (ORCPT
+        with ESMTP id S231553AbhHFJjE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 04:51:34 -0400
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE73EC061799
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 01:51:17 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id c9so10063443wri.8
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 01:51:17 -0700 (PDT)
+        Fri, 6 Aug 2021 05:39:04 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 97AD9C061798
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 02:38:47 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id l26-20020a05620a0c1ab02903ca414e2173so607102qki.20
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 02:38:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=i3HIreYA7e+PTu1uya0LcVYjOhfUuTdBKhb3eZlbvSg=;
-        b=zoURBE/zCK6Jg4cUCzmyQJIGyj71YgQhER3ymo6aSPDUoFev60BJfnaw+mAOCrN5fD
-         bw7oIJp5qEA05l44xiD7+bns6dI9WKYIgmzZRYxrklC3YhMomgIaR+ItVJmVxMTj+S4K
-         rLECMHDLQ25XJJxI4jk34iFtXQhsPtJI6xibQUhZdsngzxYdkzlu4U/MAy5AQZ+QgGlf
-         Motx9cIWsbXeG0wdyDbvwblZJCf9Js3fv8AwNfyHt7j1T9UHo3LXWzvayiJ1MBZL/y4y
-         py5MFPKewTyv716au90cxNhcJapwOhbBoBMKI5Hbr6MZ6mX7WUs6vfoEF27onHlIx4Nf
-         5q+g==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=LFFb32v3xhyRKaISoTQcRhANyaQ38+5TSARoGpy4Z4I=;
+        b=PgwQKpHGHZmVFJfS6aJH/XZfzsjCP6cDi5BZ5jrz5LHoQRHrl7oEoT0oeE7YAEQOua
+         U2ZyNdjt6Ux4nJDxOjRZ8ss3V9DDIaYnTV7Z2dHR13vH1rvpVauEeosMoyOFJLh1XheU
+         1W0OPiUBME3VG1YGL0dSb+SG8lLr2RNbAuunKslDHjKZtAc5d65wJbCzwpxiEbRRtebX
+         IH/xS+GaTXFR1uYAQyEMiiK5fwaytNfG9Iq5dcrQmZHQ4k3CSAjWa32aK9FVpeWYv7rj
+         NJmPrdwFA8noqIsP1XByvT/OVbElEQhyOZk2V7x8j2zzkL38V2iMaj52jVUR5NpnWpEk
+         P5Xw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=i3HIreYA7e+PTu1uya0LcVYjOhfUuTdBKhb3eZlbvSg=;
-        b=gZK200kD5oNJ2pnxRVJvMDEybJBxdhbHGuChbDDOC4ldJpRCsE0Tqpiqy/dUQJUpsf
-         Gzuc25Qyn9dKfni8Zur6Xcv0mPA/f5UOeUqOd+iAvCVbyOzeklz+trIegnb8krsbPwds
-         jHCEPFiEDYVb3Qlui6oRR88ueKdrIhh20vGzRFQ6Z4xBvUuNDXV+6PdOPbOtUUJe0HTI
-         dsCeUcKz+i++zIzIoa0aUNLgdjatOstrrKQ57mS1x0gXucfaxP3lvjbQxD6mDpho+6Vv
-         1urR9bCHTm3TwFUtZHae/4TnXqlCsasiKWcegDf15dlaSayu6kZhmTyeEy94mMlSGiYB
-         FI0g==
-X-Gm-Message-State: AOAM532ik0thUGMrFAdjgOO/1qXOkBWT8juxi1vh30o6CDbNqgX5zj5a
-        E7duwxTU+L8dJ/I/ZXW3bK7T9g==
-X-Google-Smtp-Source: ABdhPJwJeV37G5icUbCsLwbm3RQZzW8r3qxYqn1uYTQ3qULpCThIsIRQqL6WTfH8r6I6ljU3VE1sYg==
-X-Received: by 2002:a5d:6912:: with SMTP id t18mr9577971wru.234.1628239876154;
-        Fri, 06 Aug 2021 01:51:16 -0700 (PDT)
-Received: from localhost ([2a01:cb19:826e:8e00:92f3:12fa:e0ef:50e9])
-        by smtp.gmail.com with ESMTPSA id q14sm8988749wrm.66.2021.08.06.01.51.15
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 06 Aug 2021 01:51:15 -0700 (PDT)
-From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Fabien Parent <fparent@baylibre.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
- flushed or cancelled
-In-Reply-To: <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
-References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
- <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org>
- <8735ryk0o7.fsf@baylibre.com>
- <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
- <87y29o58su.fsf@baylibre.com>
- <CAAd53p4Ss1Z-7CB4g=_xZYxo1xDz6ih6GHUuMcgncy+yNAfU4w@mail.gmail.com>
- <87a6lzx7jf.fsf@baylibre.com>
- <CAAd53p6T_K67CPthLPObF=OWWCEChW4pMFMwuq87qWmTmzP2VA@mail.gmail.com>
- <87bl6cnzy2.fsf@baylibre.com>
- <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
-Date:   Fri, 06 Aug 2021 10:51:14 +0200
-Message-ID: <87tuk3j6rh.fsf@baylibre.com>
-MIME-Version: 1.0
-Content-Type: text/plain
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=LFFb32v3xhyRKaISoTQcRhANyaQ38+5TSARoGpy4Z4I=;
+        b=sHPRgWJJSG9YD4XlNn2KR7pkhzhhSqIQH0+2UQYxnZcVQ9Bui/EoquugMW66YLSV38
+         9iktOM3jTqJe1N1shEUl8oca2TybVsjcJqB0N386Vv8BCqqkKxtMDA7Alv+aBXBMvaF1
+         3jMYIMI2IQ5BWpnRQNHR+lSUXu3nvqobRhVlqE9FWXlYM8TgH4X7nBMi7GbhiDDfg2J+
+         FhUvHTJHhQRnuO6vWDLonTmCQpJgHaR3VlFcFmIezu9oe/seRmw2WwUF36k6lfgGUq66
+         miia4wqxd4MQFPgzHJeq3ect5hygU9MZPCYZWnMZvjXRynoy9mqiOhrDM0sa12NHnRtI
+         GgHQ==
+X-Gm-Message-State: AOAM530m5BTxG1/lWLkDf55xUBYExlB9yrLDPkwDOLNspSpK4S9OHFCP
+        0Tm3YSQFO67jT4bwuDQVswhNnMqqjgfvqKe6Ih8oz2rkqJqXCI0gj2KM8Uiwm5RP7GYyyzKNvQH
+        mk4VjfJIbGMbv/YzvxYAOMGsoUjYYjA4FKBPCMe1wIUwikghO1e8aXF6c1VQTsxDfRZZgDRm6Fw
+        ZXhvF50uIDRbw=
+X-Google-Smtp-Source: ABdhPJzV66wBlgdRGTkZOX8lLmkX65w7gW3nYEwgU8yENIMjmxZ9lzztwRPrybcHwhDGZjnAR08TXiuj/slQEY6JEg==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:85ab:3c41:db28:3381])
+ (user=howardchung job=sendgmr) by 2002:a0c:be8e:: with SMTP id
+ n14mr9864178qvi.16.1628242726458; Fri, 06 Aug 2021 02:38:46 -0700 (PDT)
+Date:   Fri,  6 Aug 2021 17:38:32 +0800
+Message-Id: <20210806173706.v1.1.Ie7d876ad0b7defabfa86beb64e83f655f12be7ab@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
+Subject: [PATCH v1 1/3] shared/shell: fix missing stdbool in shell.h
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Yun-Hao Chung <howardchung@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai-Heng,
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
+bt_shell_menu_exists_t returns bool, but stdbool.h is not included.
 
-> Hi Mattijs,
->
-> On Thu, Aug 5, 2021 at 2:55 PM Mattijs Korpershoek
-> <mkorpershoek@baylibre.com> wrote:
->>
->> Hi Kai-Heng,
->>
->> Thanks for your patch,
->>
->> Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
->>
->
-> [snipped]
->
->> I confirm this diff works for me:
->>
->> root@i500-pumpkin:~# hciconfig hci0 up
->> root@i500-pumpkin:~# hciconfig hci0 down
->> root@i500-pumpkin:~# hciconfig hci0 up
->> root@i500-pumpkin:~# hciconfig hci0
->> hci0:   Type: Primary  Bus: SDIO
->>         BD Address: 00:0C:E7:55:FF:12  ACL MTU: 1021:8  SCO MTU: 244:4
->>         UP RUNNING
->>         RX bytes:11268 acl:0 sco:0 events:829 errors:0
->>         TX bytes:182569 acl:0 sco:0 commands:829 errors:0
->>
->> root@i500-pumpkin:~# hcitool scan
->> Scanning ...
->>         <redacted>       Pixel 3 XL
->>
->> Tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
->
-> I found that btmtksdio_flush() only cancels the work instead of doing
-> flush_work(). That probably explains why putting ->shutdown right
-> before ->flush doesn't work.
-> So can you please test the following again:
-> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-> index 9872ef18f9fea..b33c05ad2150b 100644
-> --- a/drivers/bluetooth/btmtksdio.c
-> +++ b/drivers/bluetooth/btmtksdio.c
-> @@ -649,9 +649,9 @@ static int btmtksdio_flush(struct hci_dev *hdev)
->  {
->         struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
->
-> -       skb_queue_purge(&bdev->txq);
-> +       flush_work(&bdev->tx_work);
->
-> -       cancel_work_sync(&bdev->tx_work);
-> +       skb_queue_purge(&bdev->txq);
->
->         return 0;
->  }
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 2560ed2f144d4..a61e610a400cb 100644
->
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1785,6 +1785,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
->         aosp_do_close(hdev);
->         msft_do_close(hdev);
->
-> +       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> +           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> +           test_bit(HCI_UP, &hdev->flags)) {
-> +               /* Execute vendor specific shutdown routine */
-> +               if (hdev->shutdown)
-> +                       hdev->shutdown(hdev);
-> +       }
-> +
->         if (hdev->flush)
->                 hdev->flush(hdev);
->
-> @@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
->                 clear_bit(HCI_INIT, &hdev->flags);
->         }
->
-> -       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> -           test_bit(HCI_UP, &hdev->flags)) {
-> -               /* Execute vendor specific shutdown routine */
-> -               if (hdev->shutdown)
-> -                       hdev->shutdown(hdev);
-> -       }
-> -
->         /* flush cmd  work */
->         flush_work(&hdev->cmd_work);
-I've tried this but I have the same (broken) symptoms as before.
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+---
 
-Here are some logs of v3:
-dmesg: https://pastebin.com/1x4UHkzy
-ftrace: https://pastebin.com/Lm1d6AWy
+ src/shared/shell.h | 1 +
+ 1 file changed, 1 insertion(+)
 
-Mattijs
+diff --git a/src/shared/shell.h b/src/shared/shell.h
+index 415194a40736..cc4f822fbf1d 100644
+--- a/src/shared/shell.h
++++ b/src/shared/shell.h
+@@ -8,6 +8,7 @@
+  *
+  */
+ #include <getopt.h>
++#include <stdbool.h>
+ 
+ #define COLOR_OFF	"\001\x1B[0m\002"
+ #define COLOR_RED	"\001\x1B[0;91m\002"
+-- 
+2.32.0.605.g8dce9f2422-goog
 
->
-> Kai-Heng
