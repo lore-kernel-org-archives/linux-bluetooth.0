@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5CDFDC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 23:49:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2BDC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 23:49:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31C5A6113B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 23:49:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 53F156113B
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 23:49:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234217AbhHFXtX (ORCPT
+        id S240164AbhHFXto (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 19:49:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42844 "EHLO
+        Fri, 6 Aug 2021 19:49:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42934 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232126AbhHFXtX (ORCPT
+        with ESMTP id S231531AbhHFXto (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 19:49:23 -0400
-Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4416AC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 16:49:06 -0700 (PDT)
-Received: by mail-pl1-x632.google.com with SMTP id a20so9253947plm.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 16:49:06 -0700 (PDT)
+        Fri, 6 Aug 2021 19:49:44 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A45C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 16:49:27 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id z3so9180370plg.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 16:49:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=9WOqVoAfj34+t/vHFiodLU5+26NK5uCE6eUgJpHFD/s=;
-        b=oBvnF0HxiGdkmjeqU/dwTV0OKtceXaehXuaBw+WjDLtroF6Us53O5cxseSx//9B7kc
-         M814mbZMPnUxyF6OoOn/f3ePdYCp4yVZyxl3db7QbRQllCnl2rt0SGECisX+IBA7/z1R
-         HoYkA9G2bbhHeHpC628c00jnP1fnSHdU4kmWQ=
+        bh=SAgDoDmNzfA4A8Ci/GzHIJWsO3tfeeOX/9c+QEbEDbg=;
+        b=jeHbK0nyHCw84WdIqWOEe0VppbLvy0d3nl58wWkhObVGOq6jcyll6F8NASsaVNtxVH
+         W/ae1UUL0PTrn8V+7bUpyhd7FMVMil4E5mr8KCOafDTd1m2IADb8S7QCklJETogybxOT
+         BCz69w69XLZQyto75ddxAfCw/f/9PJO89RgPU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9WOqVoAfj34+t/vHFiodLU5+26NK5uCE6eUgJpHFD/s=;
-        b=XqsdSGYVzq9S2BSvL/C7V3tT105KWS7JtftAkxXvCwPrx5S5YuQTMM/3q20nL0XKjW
-         NtOrPZLHiqA2+1OdspUSTLYxd99HtPF5R7hOoOLU0n5bYVZHVQsHLLc5CesPGKfFgaJI
-         D8PWAMuUg4JqqoXx99VUzqShAFS60C0tgEKj3EacFjxMWMV11OM3WqOUL5Ozn4KLE/Om
-         OLwOTTCaoeOICSboXR3OjaHLKgbyclWlEdtWM1IDkO8nvy0RxYSQJg7NIbfeUavu3jSg
-         Iz7GJkscqs1i8SAkXney8U/PSlYwG6vGEWRL3yP6g2bi8YF8wYiwi+cSegZq9sLgdzhb
-         JEVA==
-X-Gm-Message-State: AOAM532LCr+UE5zTgr0GPSMYorX/GzA4T3geO6s8xIHaokGRWBL54xju
-        WwElYOdSPURf6pgYIgA3WujBUrMIt0HFlg==
-X-Google-Smtp-Source: ABdhPJyi3v+W3nZz86TIphLsyJan1kVznH/cxcce70m/fBN7VW3HQcEAZT9pm64k7Q8QWg9vv3CGgw==
-X-Received: by 2002:a17:902:930b:b029:12c:a7f4:afb2 with SMTP id bc11-20020a170902930bb029012ca7f4afb2mr10989664plb.24.1628293745535;
-        Fri, 06 Aug 2021 16:49:05 -0700 (PDT)
+        bh=SAgDoDmNzfA4A8Ci/GzHIJWsO3tfeeOX/9c+QEbEDbg=;
+        b=JQ4a6cpHzCwwFApwHbxxZ6du5hUPm1OwFL+6Ajg1wB5G3upiy4O3o1mRWejKG3iMoR
+         DcDEMjYZh/kx0DHaax2hSHCC8us8AuMgkHiAn3MUxdtm6nQPDSYXWp6HNnXP03jE3qUm
+         /KWZ80zn55ztailmz0CsTVBT6O/f72Uveg7FW6ZCiQj8rOg7xixXRoHKUADadia3dbub
+         vnpsidLklIqDmEuoPjB8D650yGJGEtAcqxhnMj2C2qzwj/a29XU8UdtpoCbR809alFVX
+         7e2ChFrFKBbCE8fyNFw2rXb3JuaqDYxWlBWz+ip+1ulJG0yOqQxlN8WW2NtQJQQXVZpm
+         03NQ==
+X-Gm-Message-State: AOAM533SVSrUXE9QquH3cFfX8IPp1vCrcjpoU0CDsqNWkfjhkjgjO288
+        oxg1lO547sFGhH8kNo+f/OjWhK7hV2ZmlQ==
+X-Google-Smtp-Source: ABdhPJxwAygqG4KY3XvpSXGvTaBv+zGpPcZsnBI1QVXRUzIBlHrQ7UBArDHopp26MG3mDO9L7QpYAQ==
+X-Received: by 2002:a62:164f:0:b029:3a9:d265:e413 with SMTP id 76-20020a62164f0000b02903a9d265e413mr7318791pfw.8.1628293766953;
+        Fri, 06 Aug 2021 16:49:26 -0700 (PDT)
 Received: from localhost ([2620:15c:202:201:48a2:9887:4da1:32a4])
-        by smtp.gmail.com with UTF8SMTPSA id q21sm2069245pjg.55.2021.08.06.16.49.04
+        by smtp.gmail.com with UTF8SMTPSA id nm19sm13908710pjb.27.2021.08.06.16.49.25
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 06 Aug 2021 16:49:05 -0700 (PDT)
+        Fri, 06 Aug 2021 16:49:26 -0700 (PDT)
 From:   Miao-chen Chou <mcchou@chromium.org>
 To:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>
 Cc:     Marcel Holtmann <marcel@holtmann.org>,
@@ -61,9 +61,9 @@ Cc:     Marcel Holtmann <marcel@holtmann.org>,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
         Alain Michaud <alainm@chromium.org>,
         Miao-chen Chou <mcchou@chromium.org>
-Subject: [BlueZ PATCH v5 2/4] error: BR/EDR and LE connection failure reasons
-Date:   Fri,  6 Aug 2021 16:47:22 -0700
-Message-Id: <20210806164624.BlueZ.v5.2.If79c3f0720cc893be1770c6853fe2fbe626f2caa@changeid>
+Subject: [BlueZ PATCH v5 3/4] device: Include detailed error string in Connect() return
+Date:   Fri,  6 Aug 2021 16:47:24 -0700
+Message-Id: <20210806164624.BlueZ.v5.3.Idd761b9b9f4620480db8889e7885a17952c2c13a@changeid>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
 In-Reply-To: <20210806234720.286157-1-mcchou@chromium.org>
 References: <20210806234720.286157-1-mcchou@chromium.org>
@@ -73,252 +73,143 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The source of Connect() failures can be divided into the following
-three.
-- bluetoothd's device interface state transition and profile state
-  transition
-- Kernel's L2CAP layer state transition
-- Potential HCI error codes returned by the remote device
+This replaces generic strerror message with context detailed error
+string to better indicate the detailed failure reason so that the D-Bus
+clients can optimize their application to work better with BlueZ, e.g.
+introducing retry mechanism or building metrics.
 
 Reviewed-by: Alain Michaud <alainm@chromium.org>
 Reviewed-by: Howard Chung <howardchung@google.com>
 ---
 
 Changes in v5:
-- Replace uint16_t error code with string
+- Address the changes from error code to string
 
-Changes in v4:
-- Address make errors
+ src/device.c | 46 ++++++++++++++++++++++++++++++----------------
+ 1 file changed, 30 insertions(+), 16 deletions(-)
 
-Changes in v3:
-- Separate error-code.txt into its own commit
-
-Changes in v2:
-- Add error-code.txt
-- Remove BtdError from return string
-
- src/error.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
- src/error.h |  59 +++++++++++++++++++++++++++++++
- 2 files changed, 159 insertions(+)
-
-diff --git a/src/error.c b/src/error.c
-index 89517075e..411f36fcb 100644
---- a/src/error.c
-+++ b/src/error.c
-@@ -27,6 +27,8 @@
- #include <config.h>
- #endif
+diff --git a/src/device.c b/src/device.c
+index df440ce09..d4795dd6a 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1608,7 +1608,7 @@ void device_request_disconnect(struct btd_device *device, DBusMessage *msg)
  
-+#include <error.h>
-+#include <stdio.h>
- #include "gdbus/gdbus.h"
+ 	if (device->connect) {
+ 		DBusMessage *reply = btd_error_failed(device->connect,
+-								"Cancelled");
++						ERR_BREDR_CONN_CANCELED);
+ 		g_dbus_send_message(dbus_conn, reply);
+ 		dbus_message_unref(device->connect);
+ 		device->connect = NULL;
+@@ -1802,7 +1802,8 @@ done:
+ 		}
  
- #include "error.h"
-@@ -79,12 +81,24 @@ DBusMessage *btd_error_in_progress(DBusMessage *msg)
- 					"In Progress");
- }
+ 		g_dbus_send_message(dbus_conn,
+-				btd_error_failed(dev->connect, strerror(-err)));
++			btd_error_failed(dev->connect,
++					btd_error_bredr_conn_from_errno(err)));
+ 	} else {
+ 		/* Start passive SDP discovery to update known services */
+ 		if (dev->bredr && !dev->svc_refreshed && dev->refresh_discovery)
+@@ -2003,10 +2004,12 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+ 						dbus_message_get_sender(msg));
  
-+DBusMessage *btd_error_in_progress_str(DBusMessage *msg, const char *str)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
-+					"%s", str);
-+}
-+
- DBusMessage *btd_error_not_available(DBusMessage *msg)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
- 					"Operation currently not available");
- }
+ 	if (dev->pending || dev->connect || dev->browse)
+-		return btd_error_in_progress(msg);
++		return btd_error_in_progress_str(msg, ERR_BREDR_CONN_BUSY);
  
-+DBusMessage *btd_error_not_available_str(DBusMessage *msg, const char *str)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
-+					"%s", str);
-+}
-+
- DBusMessage *btd_error_does_not_exist(DBusMessage *msg)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
-@@ -121,8 +135,94 @@ DBusMessage *btd_error_not_ready(DBusMessage *msg)
- 					"Resource Not Ready");
- }
- 
-+DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str)
-+{
-+	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
-+					"%s", str);
-+}
-+
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
- {
- 	return g_dbus_create_error(msg, ERROR_INTERFACE
- 					".Failed", "%s", str);
- }
-+
-+const char* btd_error_bredr_conn_from_errno(int errno_code)
-+{
-+	switch (-errno_code) {
-+	case EALREADY:
-+	case EISCONN:
-+		return ERR_BREDR_CONN_ALREADY_CONNECTED;
-+	case EHOSTDOWN:
-+		return ERR_BREDR_CONN_PAGE_TIMEOUT;
-+	case ENOPROTOOPT:
-+		return ERR_BREDR_CONN_PROFILE_UNAVAILABLE;
-+	case EIO:
-+		return ERR_BREDR_CONN_CREATE_SOCKET;
-+	case EINVAL:
-+		return ERR_BREDR_CONN_INVALID_ARGUMENTS;
-+	case EHOSTUNREACH:
-+		return ERR_BREDR_CONN_ADAPTER_NOT_POWERED;
-+	case EOPNOTSUPP:
-+	case EPROTONOSUPPORT:
-+		return ERR_BREDR_CONN_NOT_SUPPORTED;
-+	case EBADFD:
-+		return ERR_BREDR_CONN_BAD_SOCKET;
-+	case ENOMEM:
-+		return ERR_BREDR_CONN_MEMORY_ALLOC;
-+	case EBUSY:
-+		return ERR_BREDR_CONN_BUSY;
-+	case EMLINK:
-+		return ERR_BREDR_CONN_CNCR_CONNECT_LIMIT;
-+	case ETIMEDOUT:
-+		return ERR_BREDR_CONN_TIMEOUT;
-+	case ECONNREFUSED:
-+		return ERR_BREDR_CONN_REFUSED;
-+	case ECONNRESET:
-+		return ERR_BREDR_CONN_ABORT_BY_REMOTE;
-+	case ECONNABORTED:
-+		return ERR_BREDR_CONN_ABORT_BY_LOCAL;
-+	case EPROTO:
-+		return ERR_BREDR_CONN_LMP_PROTO_ERROR;
-+	default:
-+		return ERR_BREDR_CONN_UNKNOWN;
+-	if (!btd_adapter_get_powered(dev->adapter))
+-		return btd_error_not_ready(msg);
++	if (!btd_adapter_get_powered(dev->adapter)) {
++		return btd_error_not_ready_str(msg,
++					ERR_BREDR_CONN_ADAPTER_NOT_POWERED);
 +	}
-+}
-+
-+const char* btd_error_le_conn_from_errno(int errno_code)
-+{
-+	switch (-errno_code) {
-+	case EINVAL:
-+		return ERR_LE_CONN_INVALID_ARGUMENTS;
-+	case EHOSTUNREACH:
-+		return ERR_LE_CONN_ADAPTER_NOT_POWERED;
-+	case EOPNOTSUPP:
-+	case EPROTONOSUPPORT:
-+		return ERR_LE_CONN_NOT_SUPPORTED;
-+	case EALREADY:
-+	case EISCONN:
-+		return ERR_LE_CONN_ALREADY_CONNECTED;
-+	case EBADFD:
-+		return ERR_LE_CONN_BAD_SOCKET;
-+	case ENOMEM:
-+		return ERR_LE_CONN_MEMORY_ALLOC;
-+	case EBUSY:
-+		return ERR_LE_CONN_BUSY;
-+	case ECONNREFUSED:
-+		return ERR_LE_CONN_REFUSED;
-+	case EIO:
-+		return ERR_LE_CONN_CREATE_SOCKET;
-+	case ETIMEDOUT:
-+		return ERR_LE_CONN_TIMEOUT;
-+	case EMLINK:
-+		return ERR_LE_CONN_SYNC_CONNECT_LIMIT;
-+	case ECONNRESET:
-+		return ERR_LE_CONN_ABORT_BY_REMOTE;
-+	case ECONNABORTED:
-+		return ERR_LE_CONN_ABORT_BY_LOCAL;
-+	case EPROTO:
-+		return ERR_LE_CONN_LL_PROTO_ERROR;
-+	default:
-+		return ERR_LE_CONN_UNKNOWN;
+ 
+ 	btd_device_set_temporary(dev, false);
+ 
+@@ -2019,10 +2022,12 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+ 			if (dbus_message_is_method_call(msg, DEVICE_INTERFACE,
+ 							"Connect") &&
+ 				find_service_with_state(dev->services,
+-						BTD_SERVICE_STATE_CONNECTED))
++						BTD_SERVICE_STATE_CONNECTED)) {
+ 				return dbus_message_new_method_return(msg);
+-			else
+-				return btd_error_not_available(msg);
++			} else {
++				return btd_error_not_available_str(msg,
++					ERR_BREDR_CONN_PROFILE_UNAVAILABLE);
++			}
+ 		}
+ 
+ 		goto resolve_services;
+@@ -2032,7 +2037,8 @@ static DBusMessage *connect_profiles(struct btd_device *dev, uint8_t bdaddr_type
+ 	if (err < 0) {
+ 		if (err == -EALREADY)
+ 			return dbus_message_new_method_return(msg);
+-		return btd_error_failed(msg, strerror(-err));
++		return btd_error_failed(msg,
++					btd_error_bredr_conn_from_errno(err));
+ 	}
+ 
+ 	dev->connect = dbus_message_ref(msg);
+@@ -2046,8 +2052,10 @@ resolve_services:
+ 		err = device_browse_sdp(dev, msg);
+ 	else
+ 		err = device_browse_gatt(dev, msg);
+-	if (err < 0)
+-		return btd_error_failed(msg, strerror(-err));
++	if (err < 0) {
++		return btd_error_failed(msg, bdaddr_type == BDADDR_BREDR ?
++			ERR_BREDR_CONN_SDP_SEARCH : ERR_LE_CONN_GATT_BROWSE);
 +	}
-+}
-diff --git a/src/error.h b/src/error.h
-index 7c8cad066..91a02654a 100644
---- a/src/error.h
-+++ b/src/error.h
-@@ -24,9 +24,62 @@
-  */
  
- #include <dbus/dbus.h>
-+#include <stdint.h>
+ 	return NULL;
+ }
+@@ -2157,8 +2165,10 @@ static DBusMessage *connect_profile(DBusConnection *conn, DBusMessage *msg,
+ 	DBusMessage *reply;
  
- #define ERROR_INTERFACE "org.bluez.Error"
+ 	if (!dbus_message_get_args(msg, NULL, DBUS_TYPE_STRING, &pattern,
+-							DBUS_TYPE_INVALID))
+-		return btd_error_invalid_args(msg);
++							DBUS_TYPE_INVALID)) {
++		return btd_error_invalid_args_str(msg,
++					ERR_BREDR_CONN_INVALID_ARGUMENTS);
++	}
  
-+/* BR/EDR connection failure reasons */
-+#define ERR_BREDR_CONN_ALREADY_CONNECTED	"BR/EDR connection already "\
-+						"connected"
-+#define ERR_BREDR_CONN_PAGE_TIMEOUT		"BR/EDR connection page timeout"
-+#define ERR_BREDR_CONN_PROFILE_UNAVAILABLE	"BR/EDR connection profile "\
-+						"unavailable"
-+#define ERR_BREDR_CONN_SDP_SEARCH		"BR/EDR connection SDP search"
-+#define ERR_BREDR_CONN_CREATE_SOCKET		"BR/EDR connection create "\
-+						"socket"
-+#define ERR_BREDR_CONN_INVALID_ARGUMENTS	"BR/EDR connection invalid "\
-+						"argument"
-+#define ERR_BREDR_CONN_ADAPTER_NOT_POWERED	"BR/EDR connection adapter "\
-+						"not powered"
-+#define ERR_BREDR_CONN_NOT_SUPPORTED		"BR/EDR connection not "\
-+						"suuported"
-+#define ERR_BREDR_CONN_BAD_SOCKET		"BR/EDR connection bad socket"
-+#define ERR_BREDR_CONN_MEMORY_ALLOC		"BR/EDR connection memory "\
-+						"allocation"
-+#define ERR_BREDR_CONN_BUSY			"BR/EDR connection busy"
-+#define ERR_BREDR_CONN_CNCR_CONNECT_LIMIT	"BR/EDR connection concurrent "\
-+						"connection limit"
-+#define ERR_BREDR_CONN_TIMEOUT			"BR/EDR connection timeout"
-+#define ERR_BREDR_CONN_REFUSED			"BR/EDR connection refused"
-+#define ERR_BREDR_CONN_ABORT_BY_REMOTE		"BR/EDR connection aborted by "\
-+						"remote"
-+#define ERR_BREDR_CONN_ABORT_BY_LOCAL		"BR/EDR connection aborted by "\
-+						"local"
-+#define ERR_BREDR_CONN_LMP_PROTO_ERROR		"BR/EDR connection LMP "\
-+						"protocol error"
-+#define ERR_BREDR_CONN_CANCELED			"BR/EDR connection canceled"
-+#define ERR_BREDR_CONN_UNKNOWN			"BR/EDR connection unknown"
-+
-+/* LE connection failure reasons */
-+#define ERR_LE_CONN_INVALID_ARGUMENTS	"LE connection invalid arguments"
-+#define ERR_LE_CONN_ADAPTER_NOT_POWERED	"LE connection adapter not powered"
-+#define ERR_LE_CONN_NOT_SUPPORTED	"LE connection not supported"
-+#define ERR_LE_CONN_ALREADY_CONNECTED	"LE connection already connected"
-+#define ERR_LE_CONN_BAD_SOCKET		"LE connection bad socket"
-+#define ERR_LE_CONN_MEMORY_ALLOC	"LE connection memory allocation"
-+#define ERR_LE_CONN_BUSY		"LE connection busy"
-+#define ERR_LE_CONN_REFUSED		"LE connection refused"
-+#define ERR_LE_CONN_CREATE_SOCKET	"LE connection create socket"
-+#define ERR_LE_CONN_TIMEOUT		"LE connection timeout"
-+#define ERR_LE_CONN_SYNC_CONNECT_LIMIT	"LE connection concurrent connection "\
-+					"limit"
-+#define ERR_LE_CONN_ABORT_BY_REMOTE	"LE connection abort by remote"
-+#define ERR_LE_CONN_ABORT_BY_LOCAL	"LE connection abort by local"
-+#define ERR_LE_CONN_LL_PROTO_ERROR	"LE connection link layer protocol "\
-+					"error"
-+#define ERR_LE_CONN_GATT_BROWSE		"LE connection GATT browsing"
-+#define ERR_LE_CONN_UNKNOWN		"LE connection unknown"
-+
- DBusMessage *btd_error_invalid_args(DBusMessage *msg);
- DBusMessage *btd_error_invalid_args_str(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_busy(DBusMessage *msg);
-@@ -35,11 +88,17 @@ DBusMessage *btd_error_not_supported(DBusMessage *msg);
- DBusMessage *btd_error_not_connected(DBusMessage *msg);
- DBusMessage *btd_error_already_connected(DBusMessage *msg);
- DBusMessage *btd_error_not_available(DBusMessage *msg);
-+DBusMessage *btd_error_not_available_str(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_in_progress(DBusMessage *msg);
-+DBusMessage *btd_error_in_progress_str(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_does_not_exist(DBusMessage *msg);
- DBusMessage *btd_error_not_authorized(DBusMessage *msg);
- DBusMessage *btd_error_not_permitted(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_no_such_adapter(DBusMessage *msg);
- DBusMessage *btd_error_agent_not_available(DBusMessage *msg);
- DBusMessage *btd_error_not_ready(DBusMessage *msg);
-+DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str);
- DBusMessage *btd_error_failed(DBusMessage *msg, const char *str);
-+
-+const char* btd_error_bredr_conn_from_errno(int errno_code);
-+const char* btd_error_le_conn_from_errno(int errno_code);
+ 	uuid = bt_name2string(pattern);
+ 	reply = connect_profiles(dev, BDADDR_BREDR, msg, uuid);
+@@ -2541,7 +2551,10 @@ static void browse_request_complete(struct browse_req *req, uint8_t type,
+ 			if (err == 0)
+ 				goto done;
+ 		}
+-		reply = btd_error_failed(req->msg, strerror(-err));
++		reply = btd_error_failed(req->msg,
++				bdaddr_type == BDADDR_BREDR ?
++				btd_error_bredr_conn_from_errno(err) :
++				btd_error_le_conn_from_errno(err));
+ 		goto done;
+ 	}
+ 
+@@ -3027,7 +3040,8 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+ 	 */
+ 	if (device->connect) {
+ 		DBG("connection removed while Connect() is waiting reply");
+-		reply = btd_error_failed(device->connect, "Disconnected early");
++		reply = btd_error_failed(device->connect,
++						ERR_BREDR_CONN_CANCELED);
+ 		g_dbus_send_message(dbus_conn, reply);
+ 		dbus_message_unref(device->connect);
+ 		device->connect = NULL;
+@@ -5414,7 +5428,7 @@ done:
+ 	if (device->connect) {
+ 		if (err < 0)
+ 			reply = btd_error_failed(device->connect,
+-							strerror(-err));
++					btd_error_le_conn_from_errno(err));
+ 		else
+ 			reply = dbus_message_new_method_return(device->connect);
+ 
 -- 
 2.32.0.605.g8dce9f2422-goog
 
