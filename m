@@ -2,212 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 946F9C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 15:36:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC60C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:36:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6372A60238
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 15:36:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8517061186
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  6 Aug 2021 21:36:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232225AbhHFPg3 (ORCPT
+        id S245262AbhHFVgS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 6 Aug 2021 11:36:29 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:45830
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231613AbhHFPg3 (ORCPT
+        Fri, 6 Aug 2021 17:36:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41386 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245255AbhHFVgR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 6 Aug 2021 11:36:29 -0400
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com [209.85.218.72])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPS id A221640662
-        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 15:36:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628264172;
-        bh=nn6L3pGPAVUAOexXMQWFiqKMMywY28ef7UC0JW8Ecg0=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=WmvDKVWor8VkbzreY0Ni/fYR8IV/8T3D77mb5VcXdxId8k4Z8ofYQzpJhl0+BFlyz
-         9RDw0LeysFrb33x2mNU5cR/1wh7hIjAHjWymIE3PUswEDj5ddKcpvm7n6TVxdr/rHN
-         U8T0N8ejw4HkpjxK4jXU0BJV0Jk5tY0ODSEyW8GMstckcLViqwojNT96MtGKdhpxiS
-         XvUD7so3iqMp7oe6aHpQuNYdOlwr5KzrXEeTDMRKv0dagi7P1U52o9MZ+xmgCdZJzl
-         u821woPThz5Wws3o3uiIwPSdZUtFtvnjrB7kofPSl2bnFnv9F8mYAywdMBiXuoLAD2
-         ADcFO5ppzEg5Q==
-Received: by mail-ej1-f72.google.com with SMTP id k21-20020a1709062a55b0290590e181cc34so3254310eje.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 08:36:12 -0700 (PDT)
+        Fri, 6 Aug 2021 17:36:17 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F568C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Fri,  6 Aug 2021 14:36:01 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id t3so8805372plg.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 06 Aug 2021 14:36:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
+         :content-transfer-encoding;
+        bh=P3IDmVuKO7O3HkuAlMjxQDVH5awewBmJogAj+DT7iIw=;
+        b=n4DVEB5DM+jTjoLxjxzatuaGuEw/LBB7DNQSbGX0hJVhKo6+Fw/0zMG3RbXq1BYY/g
+         OQYGBH/I5nrqtYU2Jfw4X7F0dhwXUb4vnO+1yl0bT0xAg7/00drMAVrunX1KB3wOgMzP
+         Vi91RWspgbygSyekn6beYtBYL3bsfn/iIerD3RaBEyzIv/0/XqhLJD69C39/b+Cd1DYX
+         BmkmA3fpPaRI4MAWjfRfIQxUVNz3Y+WiiMIohI5uUTgaY5pZaqYqKeziKjnxpb7RVifM
+         HqjbvzudV22tNAEiPrtHkDr/wjxxO2OAxXmNRDa6qNAntl6v8o9Xz/V7TwKNZJs1XVUA
+         +iJQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=nn6L3pGPAVUAOexXMQWFiqKMMywY28ef7UC0JW8Ecg0=;
-        b=bpAXxvAyplZ8KD53uLDqULMsQEz3yYVdLul81QPcgoFoYP/PKAv2R9cdn0buBAaB+s
-         FYTYwuFD3YzxtWEI7vFWEQtylbu64aiJaNKLjmZAdVmXJoZQlx7iXXoJaDUDGhAYzj+0
-         quiI0NO1PDXkz90vkORBwXAdK1h9nN5cTpPiqXln1GO04Sovu+XhA/XTsOTMLUfQP5eQ
-         EmZKohGium+3XTwhT0rEjhuzYz9Z2VcHCkYfBKMz5lJV6u/i4/h1u4ECwdrkRa8/80RY
-         pkr929zVW1Ny9oLkjAnP8apfg5KXJFS4UyNyRqtjMGmKQMXKW9NOyTq/xog6VsRvHwqm
-         NAZg==
-X-Gm-Message-State: AOAM5325/LfnDKO8kYEb21vy3TQYXSmP3QZv3MbDk2SAy/Fy//lm/jzW
-        5J4n1H32BsrX+WItqOtkd+CB+No5SZ/igxsEqQDOtmYzmU7dJEmNVzEg2SCF2jDAOEPXdBbWuS6
-        hknRxUywaXh/hUyPDMkQqzgT824ImM9PI/5yFx7qxo7J1N5z0W4LZIScDB/vtow==
-X-Received: by 2002:a17:906:79a:: with SMTP id l26mr10772917ejc.192.1628264172328;
-        Fri, 06 Aug 2021 08:36:12 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJwJqPGLR0PlJMC/OXDefak0pjjk5EqClsHvqh8s6/EmtI7kAm/K+l+Zroo4+IF9Cf6F8ZPDPs2bZKtQYy+55U0=
-X-Received: by 2002:a17:906:79a:: with SMTP id l26mr10772892ejc.192.1628264172061;
- Fri, 06 Aug 2021 08:36:12 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=P3IDmVuKO7O3HkuAlMjxQDVH5awewBmJogAj+DT7iIw=;
+        b=mpj8NOQUWujpQbtdyGegrujsQl4tedDhsTe3Wpy1WTQp75cz+4LfLc330PzED6XS7B
+         iSeJUlbBrwI8nS41D9q0+l3jbKUBeDWE2fH0Q4pqrFuvEgWpsu3WSCqkiqJo/W5LQPhB
+         RmJyow8NBATsS5FuqIvehdAUDxYnD53ukoHOTgMdDOoPwNNCG4lqhG4YxEsOs0Att1fC
+         +ZLYhIqZAzT0VvxJGoFZshMsnHre0tqZFdOH+p9zUzNf5a3qU0asuwzeNkd+IJj0tSnD
+         jN/nrXsmGhnIUewXkr4tPGwC2v32KwAShxgjO6vyKuDRznkrR5dzPi9bqFEuTtt46iTT
+         wqaA==
+X-Gm-Message-State: AOAM532EkmCaKOuqbhUEwGETcGg8h5PBx4GWOEi0PNZ3a9o4qwM6f/Ya
+        1pMmedTVON89o9JKXRlZdRCxlCuPNRw=
+X-Google-Smtp-Source: ABdhPJxyJnYnY/u4MzpzvgMWIjq4IQFjEsd82NgqqmtgEuIbrIXE5tL8eaBpvQkJWJC/ekdIYwo40w==
+X-Received: by 2002:a05:6a00:150d:b029:3c8:e86e:79ec with SMTP id q13-20020a056a00150db02903c8e86e79ecmr2161359pfu.62.1628285760688;
+        Fri, 06 Aug 2021 14:36:00 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h20sm11765201pfn.173.2021.08.06.14.36.00
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 06 Aug 2021 14:36:00 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 2/4] monitor: Fix minimun packet latency
+Date:   Fri,  6 Aug 2021 14:35:56 -0700
+Message-Id: <20210806213558.16442-2-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20210806213558.16442-1-luiz.dentz@gmail.com>
+References: <20210806213558.16442-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
-References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
- <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org> <8735ryk0o7.fsf@baylibre.com>
- <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
- <87y29o58su.fsf@baylibre.com> <CAAd53p4Ss1Z-7CB4g=_xZYxo1xDz6ih6GHUuMcgncy+yNAfU4w@mail.gmail.com>
- <87a6lzx7jf.fsf@baylibre.com> <CAAd53p6T_K67CPthLPObF=OWWCEChW4pMFMwuq87qWmTmzP2VA@mail.gmail.com>
- <87bl6cnzy2.fsf@baylibre.com> <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
- <87tuk3j6rh.fsf@baylibre.com>
-In-Reply-To: <87tuk3j6rh.fsf@baylibre.com>
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date:   Fri, 6 Aug 2021 23:36:00 +0800
-Message-ID: <CAAd53p7BU2=GwmyLUECKZfGhD830UQUk12mxU2y9HsXv=F_AfA@mail.gmail.com>
-Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
- flushed or cancelled
-To:     Mattijs Korpershoek <mkorpershoek@baylibre.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Fabien Parent <fparent@baylibre.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mattijs,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Aug 6, 2021 at 4:51 PM Mattijs Korpershoek
-<mkorpershoek@baylibre.com> wrote:
->
-> Hi Kai-Heng,
->
-> Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
->
-> > Hi Mattijs,
-> >
-> > On Thu, Aug 5, 2021 at 2:55 PM Mattijs Korpershoek
-> > <mkorpershoek@baylibre.com> wrote:
-> >>
-> >> Hi Kai-Heng,
-> >>
-> >> Thanks for your patch,
-> >>
-> >> Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
-> >>
-> >
-> > [snipped]
-> >
-> >> I confirm this diff works for me:
-> >>
-> >> root@i500-pumpkin:~# hciconfig hci0 up
-> >> root@i500-pumpkin:~# hciconfig hci0 down
-> >> root@i500-pumpkin:~# hciconfig hci0 up
-> >> root@i500-pumpkin:~# hciconfig hci0
-> >> hci0:   Type: Primary  Bus: SDIO
-> >>         BD Address: 00:0C:E7:55:FF:12  ACL MTU: 1021:8  SCO MTU: 244:4
-> >>         UP RUNNING
-> >>         RX bytes:11268 acl:0 sco:0 events:829 errors:0
-> >>         TX bytes:182569 acl:0 sco:0 commands:829 errors:0
-> >>
-> >> root@i500-pumpkin:~# hcitool scan
-> >> Scanning ...
-> >>         <redacted>       Pixel 3 XL
-> >>
-> >> Tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-> >
-> > I found that btmtksdio_flush() only cancels the work instead of doing
-> > flush_work(). That probably explains why putting ->shutdown right
-> > before ->flush doesn't work.
-> > So can you please test the following again:
-> > diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-> > index 9872ef18f9fea..b33c05ad2150b 100644
-> > --- a/drivers/bluetooth/btmtksdio.c
-> > +++ b/drivers/bluetooth/btmtksdio.c
-> > @@ -649,9 +649,9 @@ static int btmtksdio_flush(struct hci_dev *hdev)
-> >  {
-> >         struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-> >
-> > -       skb_queue_purge(&bdev->txq);
-> > +       flush_work(&bdev->tx_work);
-> >
-> > -       cancel_work_sync(&bdev->tx_work);
-> > +       skb_queue_purge(&bdev->txq);
-> >
-> >         return 0;
-> >  }
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 2560ed2f144d4..a61e610a400cb 100644
-> >
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -1785,6 +1785,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> >         aosp_do_close(hdev);
-> >         msft_do_close(hdev);
-> >
-> > +       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> > +           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> > +           test_bit(HCI_UP, &hdev->flags)) {
-> > +               /* Execute vendor specific shutdown routine */
-> > +               if (hdev->shutdown)
-> > +                       hdev->shutdown(hdev);
-> > +       }
-> > +
-> >         if (hdev->flush)
-> >                 hdev->flush(hdev);
-> >
-> > @@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> >                 clear_bit(HCI_INIT, &hdev->flags);
-> >         }
-> >
-> > -       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> > -           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> > -           test_bit(HCI_UP, &hdev->flags)) {
-> > -               /* Execute vendor specific shutdown routine */
-> > -               if (hdev->shutdown)
-> > -                       hdev->shutdown(hdev);
-> > -       }
-> > -
-> >         /* flush cmd  work */
-> >         flush_work(&hdev->cmd_work);
-> I've tried this but I have the same (broken) symptoms as before.
->
-> Here are some logs of v3:
-> dmesg: https://pastebin.com/1x4UHkzy
-> ftrace: https://pastebin.com/Lm1d6AWy
+It seems timer_sub can produce negative values leading to median packet
+latency to be negative e.g conn->last_tx_compl is ahead of
+conn->last_tx, in which case it should be discarded.
+---
+ monitor/analyze.c | 7 +++++--
+ 1 file changed, 5 insertions(+), 2 deletions(-)
 
-Thanks for your testing. I think I finally got it:
-btmtksdio_shutdown()
--> mtk_hci_wmt_sync()
- -> __hci_cmd_send()
-  then waiting for BTMTKSDIO_TX_WAIT_VND_EVT, which is cleared in
-btmtksdio_recv_event():
-btmtksdio_recv_event()
--> hci_recv_frame()
- -> queue_work(hdev->workqueue, &hdev->rx_work);
+diff --git a/monitor/analyze.c b/monitor/analyze.c
+index 5e0957ad1..d504c8d84 100644
+--- a/monitor/analyze.c
++++ b/monitor/analyze.c
+@@ -386,8 +386,9 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 		if (timerisset(&conn->last_tx)) {
+ 			timersub(&conn->last_tx_comp, &conn->last_tx, &res);
+ 
+-			if (!timerisset(&conn->tx_lat_min) ||
+-					timercmp(&res, &conn->tx_lat_min, <))
++			if ((!timerisset(&conn->tx_lat_min) ||
++					timercmp(&res, &conn->tx_lat_min, <)) &&
++					res.tv_sec >= 0 && res.tv_usec >= 0)
+ 				conn->tx_lat_min = res;
+ 
+ 			if (!timerisset(&conn->tx_lat_max) ||
+@@ -408,6 +409,8 @@ static void evt_num_completed_packets(struct hci_dev *dev, struct timeval *tv,
+ 						tmp.tv_usec -= 1000000;
+ 					}
+ 				}
++
++				conn->tx_lat_med = tmp;
+ 			} else
+ 				conn->tx_lat_med = res;
+ 
+-- 
+2.31.1
 
-That means it has to be done before the following drain_workqueue() call.
-Can you please see if moving the ->shutdown() part right before
-drain_workqueue() can fix the issue?
-
-Kai-Heng
-
->
-> Mattijs
->
-> >
-> > Kai-Heng
