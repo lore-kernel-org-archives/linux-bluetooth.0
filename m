@@ -2,346 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
-	version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9462C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 22:49:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A420EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 23:38:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCD246101E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 22:49:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C1FA60E52
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 23:38:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236866AbhHIWuJ (ORCPT
+        id S237026AbhHIXi1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 18:50:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47082 "EHLO
+        Mon, 9 Aug 2021 19:38:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57868 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236861AbhHIWuI (ORCPT
+        with ESMTP id S237017AbhHIXi0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 18:50:08 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE6DEC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 15:49:47 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id j1so30304174pjv.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 15:49:47 -0700 (PDT)
+        Mon, 9 Aug 2021 19:38:26 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBFC2C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 16:38:05 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id u16so18466566ple.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 16:38:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=y+RSEjmtvT3+m2SS+ib166a8ULm55XL3JqmWHCKZeOs=;
-        b=vYDxbVpRURACrQR0eOZm/Zm8rL3HbAt7BgBGFxZjxdBj61WWmne8qRRj7vDOpKZZ6N
-         ohLiQaavthb/k34T+6mzGA0GjlrdRYRjyQMVUjRY7iDH+ZjoB2F2heF8VyhSz1WcULVQ
-         6DX7F8sUVCFstxHmfhqpLJogKv6+bT/+hsfdqf9z1qTpS8cVcLaOuqLLsukWp1GlWp9u
-         ifEmbllDBy2Lp+Ur6Rzk+UV+DV43J9+FHFwzTpS+QqJ2lG30NBgjC0fDlerE/RHbcxLG
-         BH18WVaIsBCamAWkKZfW0EWIb1uXP4Gj8B/YwtdopV8KMWJ1KULpZV3cydCZ73Un7Da/
-         w11g==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=JDmfQKFpENgQAH2MN0rFw2KZZHFwx+BjjVi+Ee0fSmM=;
+        b=fDYEu4um4GCF+22IXFNSNATLW6GOInxU4GhZRp6zswXfoMV57kc6/mZYzkbmZHjLyx
+         MO4WCkS2//iXKyXp4WbJaKpOe5M9vZ31k04kyrTYxdcDCLNEYhHqWNVEz3UEGlTIrmlv
+         lgWd79YuC180/mXAkETehiVsBcdJeZFlLNhm8AWcB3/aj+GWV1PmMEVo1e6Q437n5Kqt
+         iM+Yt+8VcFFOgSO2zTwcY5ZNCIEVTNIPNOF9+wLsThKv93aoLKG7QHvZJCYSqAEIhLBU
+         h6LALMX1Tw8yNbqar2gHHboeRe+UqUl05ZqKiyeBDtGDWwjrcIV040fhyzLyBgBxT+BQ
+         QxEQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=y+RSEjmtvT3+m2SS+ib166a8ULm55XL3JqmWHCKZeOs=;
-        b=Dp8iWiHDQH8zRvXWwnlLWGM7iTSzulH6w/peskGj+0lKROSszJjZwlwWPBgHUyETGx
-         da3ZQN/or8RngKmlHAc6pmgVpGNDuyP8TrTAr+Ll3FbfQkj/wSNW5EyuJt6FIRDn5k5z
-         gFI05XIe+pmCDx4iivBFMItlC9I+VQlcrIlIl9EWBgbx71bPvfcldeilioZQmgnnffVp
-         Y9YKmAtpQTyk1zG5GGQeiO/g5wjd6bc8j4Cq+z7e0nEtOOwY16hHmKY5++xRVR72lgGT
-         d70CMuk6p/m4l90maqu8gzNNrlZ38b1pZDaGWaZcmjIPv/o0XklbV6KqrhvG1nax6Rxf
-         9uJw==
-X-Gm-Message-State: AOAM533WHi4wvoZtb8hovt/6FuX7ho5ARWUQA9A9CEgsSes+7F0QP4Yl
-        yjB04jRIK832cmjoob+QF5DJ3MF5Veo=
-X-Google-Smtp-Source: ABdhPJx4D/jrEqkMsQtvwhIekXwdUJinzB7OBG2wbwuJ50vB8a3kf3Hy9VS9BdHgDLpsZIXJhe55Dw==
-X-Received: by 2002:a65:5ac8:: with SMTP id d8mr444593pgt.34.1628549387037;
-        Mon, 09 Aug 2021 15:49:47 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id n35sm20826891pfv.152.2021.08.09.15.49.46
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=JDmfQKFpENgQAH2MN0rFw2KZZHFwx+BjjVi+Ee0fSmM=;
+        b=CXXv7gVxQHBxARVNb4CFKVx7A2KndUatSWkCLnSKt3Jxnx27VgYHB8B1uSY7UhKw9C
+         T4LgsM7PwxX3+CAqpkH1fAz94KhO72SMdJpn8UYmemNWKo9JGGJhSTNbHOPXu8CCokTS
+         u9KIwDXSGsdlsOXURMWa2dINwEo8K/uckh2lT7qceUBUt2s7hVTLvIWqLGDUmjdrToan
+         jGBnZEoJKMWnDYjbF/ZYzuxSF8r1RpY1aXOLHQzu7el8ZtxXhdlp7B6Pvs4zMKvRrcNq
+         de9Nzlj3YuOpi89C91KxFTbjZ9MBpf1dHvw4Zh7ksFtVLku8PTJ+LhkbqTW32qB9RfEk
+         KxCA==
+X-Gm-Message-State: AOAM530g2j8bDDgvzAXOHjv2qve0KNRvg96vBBnZPvk1useGXHa1ZgMw
+        uYFJ4Z6hXjZ1NskA/Zbu2vwuBQHrGPk=
+X-Google-Smtp-Source: ABdhPJw0HuinhLdppyuRtdZBnGHMYBTxgejHPzRGF/dtuUMZO4Cfl+SVoRZ9lOQCMCiSwoMwCpovAw==
+X-Received: by 2002:a17:90a:b303:: with SMTP id d3mr28167420pjr.199.1628552285216;
+        Mon, 09 Aug 2021 16:38:05 -0700 (PDT)
+Received: from [172.17.0.2] ([13.66.160.76])
+        by smtp.gmail.com with ESMTPSA id f6sm21216940pfe.10.2021.08.09.16.38.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 15:49:46 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH v2 5/5] monitor: Make --analyze print address OUI
-Date:   Mon,  9 Aug 2021 15:49:42 -0700
-Message-Id: <20210809224942.225915-5-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Mon, 09 Aug 2021 16:38:04 -0700 (PDT)
+Message-ID: <6111bc5c.1c69fb81.fec76.f926@mx.google.com>
+Date:   Mon, 09 Aug 2021 16:38:04 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6538836197339111096=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,v2,1/5] monitor: Fix median packet size
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20210809224942.225915-1-luiz.dentz@gmail.com>
 References: <20210809224942.225915-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6538836197339111096==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes analyze.c use packet_print_addr which does take care of
-decoding OUI portion of the address.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=528765
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.41 seconds
+GitLint                       PASS      0.65 seconds
+Prep - Setup ELL              PASS      50.18 seconds
+Build - Prep                  PASS      0.14 seconds
+Build - Configure             PASS      8.71 seconds
+Build - Make                  PASS      221.35 seconds
+Make Check                    PASS      9.39 seconds
+Make Distcheck                PASS      260.28 seconds
+Build w/ext ELL - Configure   PASS      8.99 seconds
+Build w/ext ELL - Make        PASS      210.04 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
- monitor/analyze.c  | 30 ++++++++++++-----------
- monitor/broadcom.c |  2 +-
- monitor/intel.c    | 10 ++++----
- monitor/l2cap.c    | 60 +---------------------------------------------
- monitor/lmp.c      |  2 +-
- monitor/packet.c   |  9 ++++---
- monitor/packet.h   |  2 +-
- 7 files changed, 29 insertions(+), 86 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/monitor/analyze.c b/monitor/analyze.c
-index bee05f467..4755c6ca6 100644
---- a/monitor/analyze.c
-+++ b/monitor/analyze.c
-@@ -13,6 +13,7 @@
- #include <config.h>
- #endif
- 
-+#define _GNU_SOURCE
- #include <stdio.h>
- #include <string.h>
- #include <sys/time.h>
-@@ -23,7 +24,9 @@
- #include "src/shared/queue.h"
- #include "src/shared/btsnoop.h"
- #include "monitor/bt.h"
--#include "analyze.h"
-+#include "monitor/display.h"
-+#include "monitor/packet.h"
-+#include "monitor/analyze.h"
- 
- struct hci_dev {
- 	uint16_t index;
-@@ -102,26 +105,25 @@ static void conn_destroy(void *data)
- 	conn->tx_pkt_med = conn->tx_bytes / conn->tx_num;
- 
- 	printf("  Found %s connection with handle %u\n", str, conn->handle);
--	printf("    BD_ADDR %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X\n",
--			conn->bdaddr[5], conn->bdaddr[4], conn->bdaddr[3],
--			conn->bdaddr[2], conn->bdaddr[1], conn->bdaddr[0]);
-+	/* TODO: Store address type */
-+	packet_print_addr("Address", conn->bdaddr, 0x00);
- 	if (!conn->setup_seen)
--		printf("    Connection setup missing\n");
--	printf("    %lu RX packets\n", conn->rx_num);
--	printf("    %lu TX packets\n", conn->tx_num);
--	printf("    %lu TX completed packets\n", conn->tx_num_comp);
--	printf("    %ld msec min latency\n",
-+		print_field("Connection setup missing");
-+	print_field("%lu RX packets", conn->rx_num);
-+	print_field("%lu TX packets", conn->tx_num);
-+	print_field("%lu TX completed packets", conn->tx_num_comp);
-+	print_field("%ld msec min latency",
- 			conn->tx_lat_min.tv_sec * 1000 +
- 			conn->tx_lat_min.tv_usec / 1000);
--	printf("    %ld msec max latency\n",
-+	print_field("%ld msec max latency",
- 			conn->tx_lat_max.tv_sec * 1000 +
- 			conn->tx_lat_max.tv_usec / 1000);
--	printf("    %ld msec median latency\n",
-+	print_field("%ld msec median latency",
- 			conn->tx_lat_med.tv_sec * 1000 +
- 			conn->tx_lat_med.tv_usec / 1000);
--	printf("    %u octets TX min packet size\n", conn->tx_pkt_min);
--	printf("    %u octets TX max packet size\n", conn->tx_pkt_max);
--	printf("    %u octets TX median packet size\n", conn->tx_pkt_med);
-+	print_field("%u octets TX min packet size", conn->tx_pkt_min);
-+	print_field("%u octets TX max packet size", conn->tx_pkt_max);
-+	print_field("%u octets TX median packet size", conn->tx_pkt_med);
- 
- 	queue_destroy(conn->tx_queue, free);
- 	free(conn);
-diff --git a/monitor/broadcom.c b/monitor/broadcom.c
-index b144032c3..5ee4ba04a 100644
---- a/monitor/broadcom.c
-+++ b/monitor/broadcom.c
-@@ -233,7 +233,7 @@ static void status_rsp(const void *data, uint8_t size)
- 
- static void write_bd_addr_cmd(const void *data, uint8_t size)
- {
--	packet_print_addr("Address", data, false);
-+	packet_print_addr("Address", data, 0x00);
- }
- 
- static void update_uart_baud_rate_cmd(const void *data, uint8_t size)
-diff --git a/monitor/intel.c b/monitor/intel.c
-index e9984bfe3..728bff587 100644
---- a/monitor/intel.c
-+++ b/monitor/intel.c
-@@ -233,7 +233,7 @@ static void print_version_tlv_min_fw(const struct intel_version_tlv *tlv,
- static void print_version_tlv_otp_bdaddr(const struct intel_version_tlv *tlv,
- 					 char *type_str)
- {
--	packet_print_addr(type_str, tlv->val, false);
-+	packet_print_addr(type_str, tlv->val, 0x00);
- }
- 
- static void print_version_tlv_unknown(const struct intel_version_tlv *tlv,
-@@ -535,7 +535,7 @@ static void write_bd_data_cmd(const void *data, uint8_t size)
- {
- 	uint8_t features[8];
- 
--	packet_print_addr("Address", data, false);
-+	packet_print_addr("Address", data, 0x00);
- 	packet_hexdump(data + 6, 6);
- 
- 	memcpy(features, data + 12, 8);
-@@ -553,13 +553,13 @@ static void read_bd_data_rsp(const void *data, uint8_t size)
- 	uint8_t status = get_u8(data);
- 
- 	print_status(status);
--	packet_print_addr("Address", data + 1, false);
-+	packet_print_addr("Address", data + 1, 0x00);
- 	packet_hexdump(data + 7, size - 7);
- }
- 
- static void write_bd_address_cmd(const void *data, uint8_t size)
- {
--	packet_print_addr("Address", data, false);
-+	packet_print_addr("Address", data, 0x00);
- }
- 
- static void act_deact_traces_cmd(const void *data, uint8_t size)
-@@ -1119,7 +1119,7 @@ static void sco_rejected_via_lmp_evt(const void *data, uint8_t size)
- {
- 	uint8_t reason = get_u8(data + 6);
- 
--	packet_print_addr("Address", data, false);
-+	packet_print_addr("Address", data, 0x00);
- 	packet_print_error("Reason", reason);
- }
- 
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index f16f82532..083e53561 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -2749,63 +2749,6 @@ static void att_packet(uint16_t index, bool in, uint16_t handle,
- 	opcode_data->func(&frame);
- }
- 
--static void print_addr(const uint8_t *addr, uint8_t addr_type)
--{
--	const char *str;
--
--	switch (addr_type) {
--	case 0x00:
--		print_field("Address: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
--						addr[5], addr[4], addr[3],
--						addr[2], addr[1], addr[0]);
--		break;
--	case 0x01:
--		switch ((addr[5] & 0xc0) >> 6) {
--		case 0x00:
--			str = "Non-Resolvable";
--			break;
--		case 0x01:
--			str = "Resolvable";
--			break;
--		case 0x03:
--			str = "Static";
--			break;
--		default:
--			str = "Reserved";
--			break;
--		}
--
--		print_field("Address: %2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X"
--					" (%s)", addr[5], addr[4], addr[3],
--					addr[2], addr[1], addr[0], str);
--		break;
--	default:
--		print_field("Address: %2.2X-%2.2X-%2.2X-%2.2X-%2.2X-%2.2X",
--						addr[5], addr[4], addr[3],
--						addr[2], addr[1], addr[0]);
--		break;
--	}
--}
--
--static void print_addr_type(uint8_t addr_type)
--{
--	const char *str;
--
--	switch (addr_type) {
--	case 0x00:
--		str = "Public";
--		break;
--	case 0x01:
--		str = "Random";
--		break;
--	default:
--		str = "Reserved";
--		break;
--	}
--
--	print_field("Address type: %s (0x%2.2x)", str, addr_type);
--}
--
- static void print_smp_io_capa(uint8_t io_capa)
- {
- 	const char *str;
-@@ -3038,8 +2981,7 @@ static void smp_ident_addr_info(const struct l2cap_frame *frame)
- {
- 	const struct bt_l2cap_smp_ident_addr_info *pdu = frame->data;
- 
--	print_addr_type(pdu->addr_type);
--	print_addr(pdu->addr, pdu->addr_type);
-+	packet_print_addr("Address", pdu->addr, pdu->addr_type);
- 
- 	keys_update_identity_addr(pdu->addr, pdu->addr_type);
- }
-diff --git a/monitor/lmp.c b/monitor/lmp.c
-index 0d17f5c98..037adf2e2 100644
---- a/monitor/lmp.c
-+++ b/monitor/lmp.c
-@@ -310,7 +310,7 @@ static void slot_offset(const void *data, uint8_t size)
- 	const struct bt_lmp_slot_offset *pdu = data;
- 
- 	print_field("Offset: %u usec", le16_to_cpu(pdu->offset));
--	packet_print_addr("Address", pdu->bdaddr, false);
-+	packet_print_addr("Address", pdu->bdaddr, 0x00);
- }
- 
- static void page_scan_mode_req(const void *data, uint8_t size)
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 025b7e9b0..9e849acc0 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -713,10 +713,9 @@ static void print_addr_resolve(const char *label, const uint8_t *addr,
- 	}
- }
- 
--static void print_addr(const char *label, const uint8_t *addr,
--						uint8_t addr_type)
-+static void print_addr(const char *label, const uint8_t *addr, uint8_t type)
- {
--	print_addr_resolve(label, addr, addr_type, true);
-+	print_addr_resolve(label, addr, type, true);
- }
- 
- static void print_bdaddr(const uint8_t *bdaddr)
-@@ -3780,9 +3779,9 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 		packet_hexdump(eir, eir_len - len);
- }
- 
--void packet_print_addr(const char *label, const void *data, bool random)
-+void packet_print_addr(const char *label, const void *data, uint8_t type)
- {
--	print_addr(label ? : "Address", data, random ? 0x01 : 0x00);
-+	print_addr(label ? : "Address", data, type);
- }
- 
- void packet_print_handle(uint16_t handle)
-diff --git a/monitor/packet.h b/monitor/packet.h
-index f859fa945..34f988e86 100644
---- a/monitor/packet.h
-+++ b/monitor/packet.h
-@@ -37,7 +37,7 @@ void packet_print_error(const char *label, uint8_t error);
- void packet_print_version(const char *label, uint8_t version,
- 				const char *sublabel, uint16_t subversion);
- void packet_print_company(const char *label, uint16_t company);
--void packet_print_addr(const char *label, const void *data, bool random);
-+void packet_print_addr(const char *label, const void *data, uint8_t type);
- void packet_print_handle(uint16_t handle);
- void packet_print_rssi(const char *label, int8_t rssi);
- void packet_print_ad(const void *data, uint8_t size);
--- 
-2.31.1
 
+--===============6538836197339111096==--
