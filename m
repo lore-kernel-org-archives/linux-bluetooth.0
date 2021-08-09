@@ -2,169 +2,185 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA88BC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 09:19:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E7E2C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:02:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CE63F61055
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 09:19:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4524B60F93
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:02:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234415AbhHIJUI (ORCPT
+        id S234249AbhHINCx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 05:20:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58414 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234405AbhHIJUH (ORCPT
+        Mon, 9 Aug 2021 09:02:53 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:32986 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234075AbhHINCw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 05:20:07 -0400
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33978C061796
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 02:19:47 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id l34-20020a05600c1d22b02902573c214807so14038891wms.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 02:19:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=5e4PmsQRlGxMmgnJTg6Pkw2CO7JWPy14wJKAd7YTXoA=;
-        b=hvypfmlDzIEtp+RFWIZ+IAjKcCtsgxKQl29O4edQD4OfnlIuLLtj86o1+LqmYpxp/h
-         9oNOkiI8Xus0N+SNEypAy9rrWnVHtWNWODgQBxfn9gW1l0bQ4XPa2rcb8BrefO7rdFB5
-         ZDeA9L/kpX7bTSYJ3fyLZBwdAeHINJLTZqUnQ7y1jGt2voEYnbPqOtnB8JbkgKn3KTA3
-         wlKbLIzE3mEq1e8hxWRssPrUZPcxwoj0OStCUmQKwrVisDtQV7xi10kPqPZFvHQw3eEH
-         M84+KkhL06mssoHFLZjPndCTjYbxp2wgoS4szLGzGFwhs4mFXZjSEBM4D4iE03K9qQ/+
-         h+wA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=5e4PmsQRlGxMmgnJTg6Pkw2CO7JWPy14wJKAd7YTXoA=;
-        b=iL32U77xWyX9V2i7Z8G+OuXka+M3uoUNuz3OB0wvjhgfb/ETDLNYVDTNNly7/5XuDC
-         doCIMOvtNPlgOURvwP/7ug1eu7FDpKe1vsY/TpdGpf7Px5qp/WSzOh5ZcXSDMaot1Aem
-         6TcklQQ+ghd4iMXhRCT0KsDZq1O6TV6H4SmVPTCphIqrKzUtgI6fFZ1LCzoZYxlo+c9h
-         Jaaa1MxCS6lG5iA3gfRX3JnCQ5cjmkFLrwzI0EHOl8K7+ZIcZ2lSlfZPFodesoActQfF
-         M+s6v1FBGHfAAK8+/CxvDwX3pSLURJFuoLTrC4J1+uUMsW+sUKvBIH/L6vBxpqH/1Gn4
-         f7vg==
-X-Gm-Message-State: AOAM532+DJ5359uyrY538xi0osEcTYapeiB7afcc6BnWCAAxSfv9gEtn
-        ymAXbxh1KrdGIaA0LZHdjNII5Q==
-X-Google-Smtp-Source: ABdhPJw9QL++xee1pGp15c5K3+y5HzRSDMKeZ3dhMUZEKX8fIkOyo+0wjtLG1eTf8hBJjB/DZlCY0w==
-X-Received: by 2002:a7b:c204:: with SMTP id x4mr15613475wmi.70.1628500785673;
-        Mon, 09 Aug 2021 02:19:45 -0700 (PDT)
-Received: from localhost ([2a01:cb19:826e:8e00:ef10:98d1:78e3:9e80])
-        by smtp.gmail.com with ESMTPSA id r129sm16719560wmr.7.2021.08.09.02.19.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 09 Aug 2021 02:19:45 -0700 (PDT)
-From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Fabien Parent <fparent@baylibre.com>,
-        Sean Wang <sean.wang@mediatek.com>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: Shutdown controller after workqueues are
- flushed or cancelled
-In-Reply-To: <CAAd53p7BU2=GwmyLUECKZfGhD830UQUk12mxU2y9HsXv=F_AfA@mail.gmail.com>
-References: <20210514071452.25220-1-kai.heng.feng@canonical.com>
- <576B26FD-81F8-4632-82F6-57C4A7C096C4@holtmann.org>
- <8735ryk0o7.fsf@baylibre.com>
- <CAAd53p7Zc3Zk21rwj_x1BLgf8tWRxaKBmXARkM6d7Kpkb+fDZA@mail.gmail.com>
- <87y29o58su.fsf@baylibre.com>
- <CAAd53p4Ss1Z-7CB4g=_xZYxo1xDz6ih6GHUuMcgncy+yNAfU4w@mail.gmail.com>
- <87a6lzx7jf.fsf@baylibre.com>
- <CAAd53p6T_K67CPthLPObF=OWWCEChW4pMFMwuq87qWmTmzP2VA@mail.gmail.com>
- <87bl6cnzy2.fsf@baylibre.com>
- <CAAd53p5TVJk3G4cArS_UO7cgUpJLONNGVHnpezXy0XTYoXd_uw@mail.gmail.com>
- <87tuk3j6rh.fsf@baylibre.com>
- <CAAd53p7BU2=GwmyLUECKZfGhD830UQUk12mxU2y9HsXv=F_AfA@mail.gmail.com>
-Date:   Mon, 09 Aug 2021 11:19:43 +0200
-Message-ID: <875ywfnff4.fsf@baylibre.com>
+        Mon, 9 Aug 2021 09:02:52 -0400
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 179D1wGH2026755, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 179D1wGH2026755
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Mon, 9 Aug 2021 21:01:58 +0800
+Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
+ RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Mon, 9 Aug 2021 21:01:57 +0800
+Received: from localhost (172.21.132.185) by RTEXMBS03.realtek.com.tw
+ (172.21.6.96) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Mon, 9 Aug 2021
+ 21:01:56 +0800
+From:   <max.chou@realtek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <luiz.dentz@gmail.com>, <matthias.bgg@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>,
+        <linux-mediatek@lists.infradead.org>
+CC:     <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
+        <kidman@realtek.com>, <apusaka@chromium.org>,
+        <abhishekpandit@chromium.org>, <josephsih@chromium.org>,
+        <max.chou@realtek.com>
+Subject: [PATCH] Bluetooth: btusb: Remove WAKEUP_DISABLE and add WAKEUP_AUTOSUSPEND  for Realtek devices
+Date:   Mon, 9 Aug 2021 21:01:52 +0800
+Message-ID: <20210809130152.12528-1-max.chou@realtek.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
 Content-Type: text/plain
+X-Originating-IP: [172.21.132.185]
+X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
+ RTEXMBS03.realtek.com.tw (172.21.6.96)
+X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: trusted connection
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/09/2021 12:50:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzgvOSCkV6TIIDA3OjA0OjAw?=
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-ServerInfo: RTEXH36502.realtek.com.tw, 9
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/09/2021 12:47:36
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 0
+X-KSE-AntiSpam-Info: Lua profiles 165471 [Aug 09 2021]
+X-KSE-AntiSpam-Info: Version: 5.9.20.0
+X-KSE-AntiSpam-Info: Envelope from: max.chou@realtek.com
+X-KSE-AntiSpam-Info: LuaCore: 454 454 39c6e442fd417993330528e7f9d13ac1bf7fdf8c
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;realtek.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
+X-KSE-AntiSpam-Info: Rate: 0
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 08/09/2021 12:50:00
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai-Heng,
+From: Max Chou <max.chou@realtek.com>
 
-Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
+For the commit of 9e45524a011107a73bc2cdde8370c61e82e93a4d, wakeup is
+always disabled for Realtek devices. However, there's the capability
+for Realtek devices to apply USB wake-up.
 
-> Hi Mattijs,
->
->> [snipped]
->
-> Thanks for your testing. I think I finally got it:
-> btmtksdio_shutdown()
-> -> mtk_hci_wmt_sync()
->  -> __hci_cmd_send()
->   then waiting for BTMTKSDIO_TX_WAIT_VND_EVT, which is cleared in
-> btmtksdio_recv_event():
-> btmtksdio_recv_event()
-> -> hci_recv_frame()
->  -> queue_work(hdev->workqueue, &hdev->rx_work);
->
-> That means it has to be done before the following drain_workqueue() call.
-> Can you please see if moving the ->shutdown() part right before
-> drain_workqueue() can fix the issue?
-I've tested the following patch:
+In this commit, remove WAKEUP_DISABLE feature for Realtek devices.
+If users would switch wake-up, they should access
+"/sys/bus/usb/.../power/wakeup"
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 2560ed2f144d..131e69a9a66a 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1757,6 +1757,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
-                        cancel_delayed_work_sync(&adv_instance->rpa_expired_cb);
-        }
+In this commit, it also adds the feature as WAKEUP_AUTOSUSPEND
+for Realtek devices because it should set do_remote_wakeup on autosuspend.
+
+Signed-off-by: Max Chou <max.chou@realtek.com>
+Tested-by: Hilda Wu <hildawu@realtek.com>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+---
+ drivers/bluetooth/btusb.c | 25 +++++++++----------------
+ 1 file changed, 9 insertions(+), 16 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 488f110e17e2..73a835bf37f7 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -527,7 +527,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
+ #define BTUSB_OOB_WAKE_ENABLED	11
+ #define BTUSB_HW_RESET_ACTIVE	12
+ #define BTUSB_TX_WAIT_VND_EVT	13
+-#define BTUSB_WAKEUP_DISABLE	14
++#define BTUSB_WAKEUP_AUTOSUSPEND	14
  
-+       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+           test_bit(HCI_UP, &hdev->flags)) {
-+               /* Execute vendor specific shutdown routine */
-+               if (hdev->shutdown)
-+                       hdev->shutdown(hdev);
-+       }
-+
-        /* Avoid potential lockdep warnings from the *_flush() calls by
-         * ensuring the workqueue is empty up front.
-         */
-@@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
-                clear_bit(HCI_INIT, &hdev->flags);
-        }
+ struct btusb_data {
+ 	struct hci_dev       *hdev;
+@@ -1349,13 +1349,6 @@ static int btusb_open(struct hci_dev *hdev)
  
--       if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
--           !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--           test_bit(HCI_UP, &hdev->flags)) {
--               /* Execute vendor specific shutdown routine */
--               if (hdev->shutdown)
--                       hdev->shutdown(hdev);
--       }
+ 	data->intf->needs_remote_wakeup = 1;
+ 
+-	/* Disable device remote wakeup when host is suspended
+-	 * For Realtek chips, global suspend without
+-	 * SET_FEATURE (DEVICE_REMOTE_WAKEUP) can save more power in device.
+-	 */
+-	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
+-		device_wakeup_disable(&data->udev->dev);
 -
-        /* flush cmd  work */
-        flush_work(&hdev->cmd_work);
+ 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
+ 		goto done;
+ 
+@@ -1422,7 +1415,7 @@ static int btusb_close(struct hci_dev *hdev)
+ 	data->intf->needs_remote_wakeup = 0;
+ 
+ 	/* Enable remote wake up for auto-suspend */
+-	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
++	if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags))
+ 		data->intf->needs_remote_wakeup = 1;
+ 
+ 	usb_autopm_put_interface(data->intf);
+@@ -3877,11 +3870,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hdev->shutdown = btrtl_shutdown_realtek;
+ 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
+ 
+-		/* Realtek devices lose their updated firmware over global
+-		 * suspend that means host doesn't send SET_FEATURE
+-		 * (DEVICE_REMOTE_WAKEUP)
+-		 */
+-		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
++		/* Realtek devices need to set remote wakeup on auto-suspend */
++		set_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags);
+ 	}
+ 
+ 	if (!reset)
+@@ -4056,12 +4046,15 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
+ 	 * Actually, it depends on whether the usb host sends
+ 	 * set feature (enable wakeup) or not.
+ 	 */
+-	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
++	if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags)) {
+ 		if (PMSG_IS_AUTO(message) &&
+ 		    device_can_wakeup(&data->udev->dev))
+ 			data->udev->do_remote_wakeup = 1;
+-		else if (!PMSG_IS_AUTO(message))
++		else if (!PMSG_IS_AUTO(message) &&
++			 !device_may_wakeup(&data->udev->dev)) {
++			data->udev->do_remote_wakeup = 0;
+ 			data->udev->reset_resume = 1;
++		}
+ 	}
+ 
+ 	return 0;
+-- 
+2.17.1
 
-It does not seem to fix the issue.
-Adding the bits in btmtksdio_flush() does not change the result of the
-above patch.
-
-Here are the logs. These are just with the above patch (not with the
-btmtksdio_flush() changes.
-
-dmesg: https://pastebin.com/FZZBkqGC
-btmtksdio_ftrace: https://pastebin.com/JQ0UWenY
-
-Mattijs
->
-> Kai-Heng
->
->>
->> Mattijs
->>
->> >
->> > Kai-Heng
