@@ -2,66 +2,78 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-6.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DE8C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BE14C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:49:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9BA66101E
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 65B726101E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:49:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233500AbhHIUhG (ORCPT
+        id S234632AbhHIUth (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 16:37:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45290 "EHLO
+        Mon, 9 Aug 2021 16:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48092 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232730AbhHIUhF (ORCPT
+        with ESMTP id S231439AbhHIUtg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 16:37:05 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48CBC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 13:36:44 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id p145so31905379ybg.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 13:36:44 -0700 (PDT)
+        Mon, 9 Aug 2021 16:49:36 -0400
+Received: from mail-ed1-x52f.google.com (mail-ed1-x52f.google.com [IPv6:2a00:1450:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6D5C0613D3
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 13:49:15 -0700 (PDT)
+Received: by mail-ed1-x52f.google.com with SMTP id by4so7883137edb.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 13:49:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=Ryv20aPbIu6uD2C4M3YrpsmICBxdwbVCK6ndQjLctTU=;
-        b=Ti2swcWvMq8PpSRWCqG+jqoebjhUTgMQJrKyKAGMN+HbU3XNqgZoW5wkb5jYv2JC/g
-         Zs305tDJLk/cMjvsU7Wg20nCQ9gELKIABKt8LSTUZxJrTHfFj9cUni0LBqj8YfbSReCx
-         sDL6D3Zdn2wrzJbw58FtbbM5K4/L/7ywmiEpajcwAhIElqzhLk3Fx6PbbTgSTtK/lfTZ
-         OL2Zx9oL/2N7DQCDZtPu50/0PHhhc6ajtpCNdrgVs2K2XGNflhThSB4FWNokAZW8jUot
-         AFnpmtUyPvP5usf8r3mH96tdCcDlsKGSAcpLt0fCXWE01DXm0foYSLBga3gwHTuPIkzU
-         JbhA==
+        bh=EtG2SKcqzTRDzOIRWaryRXW0Pnq2PB5zWj0AxQ8r3/w=;
+        b=WPs+rLYrU4u0D3LSY9OI6KG1OSPoLOHfV50aHv3R7s4IjUp2xuyga1WGpKdY5FxMtB
+         peuN1PHKyR6aeWu0Ql4BDfEliUyr2KRF4+G4PTaAeJNRHmM189mHrAk2s8UzvT1hO72u
+         5kOWEM5tBvH/DtXVs/VNMHo1C/t97LS06KXmY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=Ryv20aPbIu6uD2C4M3YrpsmICBxdwbVCK6ndQjLctTU=;
-        b=hlBGrQYWLp46k3T/+3U0G7T6evMvU42KTdJoblyzc7sHFyUzdVhFhShqAjjDZpWVsU
-         dFUu6k/O8c/ms2Mg3kxYI9lP84nMq0n4kTqw1KrPFaZkknIr/wVxvQUUD2w9xZhrvfPr
-         0MgjLu1asLqHB0H60/Ioot4+j9mSSGpbC/u+T9QRCcUFfYu0680mXisdv5BPavb0CuhK
-         N3Js5doGHljpQ8BiNpnISF/ndvREtk6NWxJQ+9aJOqTjqsUawrYnwLKQ1X6+Hk5uaN46
-         JW58wLyfJHY6hPDXPD6EGHOUW47sHs8yh5WppCfOZrVXZzNU5Qt3tvcnQtZv2AHn0ZUT
-         FUGw==
-X-Gm-Message-State: AOAM530k78gZ+aZ8TURbkU4nQ+qRvbzRT5FUSVnuBXA0Kio3Q0tj2QBs
-        ODyKoHdiNtpSaTRutc+E0BvYWotqIc/+MlXh0QRPBRax
-X-Google-Smtp-Source: ABdhPJwnUlyboc/9jFaW31Dxmpj7OabknV8ZvPW3GO2vSuAeAFcAUhZwc1Cn+BdGXSYXNKEiuz6yHi3Ub34fgq6GFMs=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr34346456ybk.91.1628541403879;
- Mon, 09 Aug 2021 13:36:43 -0700 (PDT)
+        bh=EtG2SKcqzTRDzOIRWaryRXW0Pnq2PB5zWj0AxQ8r3/w=;
+        b=B01F8wEJPkUnBHFQL4GXuMEbSTeSRy3rf7fhjrN3Ua5cL4NvAqtpjRuqaodln73Oyw
+         TIdFKnRDB2MX6KHqZsnGMPl8IjJ1qTzYliqFfeWbSFyTnbu49/IaRlE2bR2yUY/ZYv2j
+         CP7HaGJ3/FxUVUtRKwI0RJXtWmO9kOspHmc5+lurXzysm/ljMwNHKjIYjv4ThKWNAaPu
+         NrrBIivvBiyPbTjae5PtRCnhoXPCLwyrZxFzeQnQH50wvTLJ1F27tBbl63cz2TRXT11o
+         pHy3X9qUtNDo2mMQXNbFES1UsdHqxbhbtpcMYuFZUkbvQw9XCvA5sA4nLH29XN3TQP0U
+         0Dbw==
+X-Gm-Message-State: AOAM532CM/qZvktz0aLC2D91w+PlqIq2MIq0ZQEqk0Uq1pXjLpia0euZ
+        hpg9ezYR3NatxnkxH6jFzhGzjCRgXZPl2CMr
+X-Google-Smtp-Source: ABdhPJzfQttE9zNB+eECriwJMT5e30WisRV6a2iPnrRCkWEn5SJC0u58dGN3uySlJMKLcSTkvBMcfA==
+X-Received: by 2002:aa7:d815:: with SMTP id v21mr234848edq.262.1628542153988;
+        Mon, 09 Aug 2021 13:49:13 -0700 (PDT)
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com. [209.85.221.54])
+        by smtp.gmail.com with ESMTPSA id i17sm2282479ejo.121.2021.08.09.13.49.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Aug 2021 13:49:13 -0700 (PDT)
+Received: by mail-wr1-f54.google.com with SMTP id b13so23137920wrs.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 13:49:13 -0700 (PDT)
+X-Received: by 2002:adf:f809:: with SMTP id s9mr4284552wrp.370.1628542153088;
+ Mon, 09 Aug 2021 13:49:13 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210808143526.99726-1-marijn.suijten@somainline.org> <610fefe5.1c69fb81.531e9.1e1a@mx.google.com>
-In-Reply-To: <610fefe5.1c69fb81.531e9.1e1a@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 9 Aug 2021 13:36:32 -0700
-Message-ID: <CABBYNZL0f=22W1ZDiUnt+9Yqcy0Smf0yufiboNwRMWYP=NREdQ@mail.gmail.com>
-Subject: Re: [BlueZ] audio/avrcp: Use host/network order as appropriate for pdu->params_len
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Marijn Suijten <marijn.suijten@somainline.org>
+References: <CABBYNZKcr74zYzPMcLo5+-49Fv02Kxoyf11bNPSuSGWThz-eqQ@mail.gmail.com>
+ <9d386692-4c1c-b262-bca2-cec3568dc579@somainline.org> <CABBYNZLXRK9TN_TKdj5T7oP3D_HaeQiBsaCaRtE7nAK9hYuh-w@mail.gmail.com>
+ <f3e18adc-b1ad-2ab5-164e-43a1ae20f708@somainline.org> <CAO271mkpy5W0KB60X5G1mwp92bB+K2Ru3ODP8K2APCkjfkX70w@mail.gmail.com>
+ <391e3587-bb19-05be-cc36-08a8c91916de@somainline.org> <CAO271mk0N4yyA74kzB14y8nbFKfT914JNA7Hvq8QMCfs-VR2zw@mail.gmail.com>
+ <656381df-01bb-ecdb-a782-79bd8bd05423@somainline.org>
+In-Reply-To: <656381df-01bb-ecdb-a782-79bd8bd05423@somainline.org>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Mon, 9 Aug 2021 13:49:02 -0700
+X-Gmail-Original-Message-ID: <CAO271m=hQV8ooxAtL0iFO2A1Nw92cq=1DiciivDRJtiN_CHf9Q@mail.gmail.com>
+Message-ID: <CAO271m=hQV8ooxAtL0iFO2A1Nw92cq=1DiciivDRJtiN_CHf9Q@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Queue SetAbsoluteVolume if there is an in-progress one.
+To:     Marijn Suijten <marijn.suijten@somainline.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -69,101 +81,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marijn,
 
-On Sun, Aug 8, 2021 at 9:01 AM <bluez.test.bot@gmail.com> wrote:
+On Mon, Aug 9, 2021 at 1:31 PM Marijn Suijten
+<marijn.suijten@somainline.org> wrote:
 >
-> This is automated email and please do not reply to this email!
+> Hi Sonny,
 >
-> Dear submitter,
+> On 8/9/21 7:46 PM, Sonny Sasaka wrote:
+> > Hi Marijn,
+> >
+> > Thank you for following up. Chrome OS has temporarily adopted my patch
+> > to resolve the issue without changing the audio client. We will pick
+> > up your patch at the next uprev.
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=528099
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      0.27 seconds
-> GitLint                       FAIL      0.11 seconds
-> Prep - Setup ELL              PASS      39.58 seconds
-> Build - Prep                  PASS      0.10 seconds
-> Build - Configure             PASS      6.91 seconds
-> Build - Make                  PASS      171.89 seconds
-> Make Check                    PASS      8.76 seconds
-> Make Distcheck                PASS      201.76 seconds
-> Build w/ext ELL - Configure   PASS      6.97 seconds
-> Build w/ext ELL - Make        PASS      161.73 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> audio/avrcp: Use host/network order as appropriate for pdu->params_len
-> WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'e2b0f0d8d', maybe rebased or not pulled?
-> #15:
-> Fixes: e2b0f0d8d ("avrcp: Fix not checking if params_len match number of received bytes")
->
-> - total: 0 errors, 1 warnings, 11 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> "[PATCH] audio/avrcp: Use host/network order as appropriate for" has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: GitLint - FAIL
-> Desc: Run gitlint with rule in .gitlint
-> Output:
-> audio/avrcp: Use host/network order as appropriate for pdu->params_len
-> 11: B1 Line exceeds max length (89>80): "Fixes: e2b0f0d8d ("avrcp: Fix not checking if params_len match number of received bytes")"
->
->
-> ##############################
-> Test: Prep - Setup ELL - PASS
-> Desc: Clone, build, and install ELL
->
-> ##############################
-> Test: Build - Prep - PASS
-> Desc: Prepare environment for build
->
-> ##############################
-> Test: Build - Configure - PASS
-> Desc: Configure the BlueZ source tree
->
-> ##############################
-> Test: Build - Make - PASS
-> Desc: Build the BlueZ source tree
->
-> ##############################
-> Test: Make Check - PASS
-> Desc: Run 'make check'
->
-> ##############################
-> Test: Make Distcheck - PASS
-> Desc: Run distcheck to check the distribution
->
-> ##############################
-> Test: Build w/ext ELL - Configure - PASS
-> Desc: Configure BlueZ source with '--enable-external-ell' configuration
->
-> ##############################
-> Test: Build w/ext ELL - Make - PASS
-> Desc: Build BlueZ source with '--enable-external-ell' configuration
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+> Note that these patches are still draft in search for initial feedback
+> on the approach, even if the implementation itself is trivial.  Does
+> this mean you won't be able to test this locally until the next uprev?
+> Either way I will have to confirm their usefulness in PulseAudio too
+> before actually committing to this, so there's no hurry.
+Yes, Chrome OS is currently not working on solving this issue since
+there is already a local fix. We will adopt the BlueZ fix after your
+patch gets merged and is available in BlueZ future version when we
+rebase with upstream in the next uprev.
 
-Applied, thanks.
-
-
--- 
-Luiz Augusto von Dentz
+>
+> Marijn
