@@ -2,69 +2,66 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 114ADC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16DE8C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E865160EE9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E9BA66101E
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 20:36:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234962AbhHIUgZ (ORCPT
+        id S233500AbhHIUhG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 16:36:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45116 "EHLO
+        Mon, 9 Aug 2021 16:37:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233281AbhHIUgY (ORCPT
+        with ESMTP id S232730AbhHIUhF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 16:36:24 -0400
-Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C28B0C0613D3
-        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 13:36:03 -0700 (PDT)
-Received: by mail-yb1-xb2d.google.com with SMTP id a201so31890743ybg.12
-        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 13:36:03 -0700 (PDT)
+        Mon, 9 Aug 2021 16:37:05 -0400
+Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E48CBC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 13:36:44 -0700 (PDT)
+Received: by mail-yb1-xb35.google.com with SMTP id p145so31905379ybg.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 13:36:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=ldCuEgAmbjuKrD+sw36As0E4P3wQfku6RkjemjD5tRY=;
-        b=RUxwChjpdXbppWDPpOxl7h62QWlj3NXn1kpP5t+pXpMEXjWOQ4WH/weCBgfvuNJuKF
-         vR+GxQqtWNsgZjWzMoACfUu2xrkkakhsZ3PmrdKhtvQsNNT8qq+U09m+0t5m8eQrZ7oe
-         T7w3SRJMAvuLMiPELXkILe6SRa6YdjXz0e0TjxRDc4ZTmqDpBrs0JQ8mKYgwezFLPerU
-         q14qwEO9UoJUWFqJxB37x2dv0QDuxkMuD5pa/86eYDX49cdoLBDKpPDbPjbkgei9w3kj
-         PSXGHwz4SUDrLJmTMVAxlUcfQ9buSdI7R4e7iKRju5tSq3iajAB4pZsnDw5mTsJj5Yl4
-         JXxw==
+        bh=Ryv20aPbIu6uD2C4M3YrpsmICBxdwbVCK6ndQjLctTU=;
+        b=Ti2swcWvMq8PpSRWCqG+jqoebjhUTgMQJrKyKAGMN+HbU3XNqgZoW5wkb5jYv2JC/g
+         Zs305tDJLk/cMjvsU7Wg20nCQ9gELKIABKt8LSTUZxJrTHfFj9cUni0LBqj8YfbSReCx
+         sDL6D3Zdn2wrzJbw58FtbbM5K4/L/7ywmiEpajcwAhIElqzhLk3Fx6PbbTgSTtK/lfTZ
+         OL2Zx9oL/2N7DQCDZtPu50/0PHhhc6ajtpCNdrgVs2K2XGNflhThSB4FWNokAZW8jUot
+         AFnpmtUyPvP5usf8r3mH96tdCcDlsKGSAcpLt0fCXWE01DXm0foYSLBga3gwHTuPIkzU
+         JbhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=ldCuEgAmbjuKrD+sw36As0E4P3wQfku6RkjemjD5tRY=;
-        b=UI7Hu8EBKQ7LFSW4GtMGDfGLPBtrNIJLEvI/R9//+Q71pScNxYS9yyB9XaOM4J4ZqW
-         srJUoStsFFLwORNg03qfUX4vZyiMqcFFuTuuByrPfIRxFrJ6lmz82y7l8OrLYUw7CrqK
-         xIHRnr1X1N2uTMInc7Z6Ghk10kHdX/IthqaG/g++OUIapugLY9c1uFy2RTceybl/Qawm
-         alqvxuVzxCmMQ+X7oflcSDk3jcbsV6z9WrYK+5QPjJXEAr8pd5ztBgCrVoB6v/NnSidF
-         DFXKofUVGqGdoS0dgMEjlT8dsjQk8uJe8en2r2tb/HC1XC0G1smYonJPIlNKKpoXhkR7
-         64VQ==
-X-Gm-Message-State: AOAM532jSKYSsW2Q/wO++U6ymEHsfjCKOsR2yftcKdhbTfHn2dIMqfNX
-        WHcyYfkAqGNt+gKnZRGD/4QK5sCEObNUDpDxKyw=
-X-Google-Smtp-Source: ABdhPJyTUnqeT909MDyshugOMdWtKYUon7Pa0tWRBJno+rnpFP0B8Y3YEWzRTIbWhHk8PC25RuJFBowSjWw9OCjh8OI=
-X-Received: by 2002:a25:bd89:: with SMTP id f9mr27037805ybh.222.1628541362916;
- Mon, 09 Aug 2021 13:36:02 -0700 (PDT)
+        bh=Ryv20aPbIu6uD2C4M3YrpsmICBxdwbVCK6ndQjLctTU=;
+        b=hlBGrQYWLp46k3T/+3U0G7T6evMvU42KTdJoblyzc7sHFyUzdVhFhShqAjjDZpWVsU
+         dFUu6k/O8c/ms2Mg3kxYI9lP84nMq0n4kTqw1KrPFaZkknIr/wVxvQUUD2w9xZhrvfPr
+         0MgjLu1asLqHB0H60/Ioot4+j9mSSGpbC/u+T9QRCcUFfYu0680mXisdv5BPavb0CuhK
+         N3Js5doGHljpQ8BiNpnISF/ndvREtk6NWxJQ+9aJOqTjqsUawrYnwLKQ1X6+Hk5uaN46
+         JW58wLyfJHY6hPDXPD6EGHOUW47sHs8yh5WppCfOZrVXZzNU5Qt3tvcnQtZv2AHn0ZUT
+         FUGw==
+X-Gm-Message-State: AOAM530k78gZ+aZ8TURbkU4nQ+qRvbzRT5FUSVnuBXA0Kio3Q0tj2QBs
+        ODyKoHdiNtpSaTRutc+E0BvYWotqIc/+MlXh0QRPBRax
+X-Google-Smtp-Source: ABdhPJwnUlyboc/9jFaW31Dxmpj7OabknV8ZvPW3GO2vSuAeAFcAUhZwc1Cn+BdGXSYXNKEiuz6yHi3Ub34fgq6GFMs=
+X-Received: by 2002:a25:be02:: with SMTP id h2mr34346456ybk.91.1628541403879;
+ Mon, 09 Aug 2021 13:36:43 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210808143555.100258-1-marijn.suijten@somainline.org>
- <CABBYNZK9Hsf3zL7t62hnOkF1hm=UZNvVj_SQDx2Hxj7d0sB0sA@mail.gmail.com> <f681b6d4-2a84-28cd-e779-268b0a5b32eb@somainline.org>
-In-Reply-To: <f681b6d4-2a84-28cd-e779-268b0a5b32eb@somainline.org>
+References: <20210808143526.99726-1-marijn.suijten@somainline.org> <610fefe5.1c69fb81.531e9.1e1a@mx.google.com>
+In-Reply-To: <610fefe5.1c69fb81.531e9.1e1a@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 9 Aug 2021 13:35:51 -0700
-Message-ID: <CABBYNZKwSNKyNW9kHW=S5wPeiTzNwL2_Qt5o5F67=wSN23TCpQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] audio/transport: Only store volume when also
- emitting DBus prop change
-To:     Marijn Suijten <marijn.suijten@somainline.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Mon, 9 Aug 2021 13:36:32 -0700
+Message-ID: <CABBYNZL0f=22W1ZDiUnt+9Yqcy0Smf0yufiboNwRMWYP=NREdQ@mail.gmail.com>
+Subject: Re: [BlueZ] audio/avrcp: Use host/network order as appropriate for pdu->params_len
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Marijn Suijten <marijn.suijten@somainline.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -72,103 +69,101 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marijn,
 
-On Mon, Aug 9, 2021 at 1:26 PM Marijn Suijten
-<marijn.suijten@somainline.org> wrote:
+On Sun, Aug 8, 2021 at 9:01 AM <bluez.test.bot@gmail.com> wrote:
 >
-> Hi Luiz,
+> This is automated email and please do not reply to this email!
 >
-> On 8/9/21 8:37 PM, Luiz Augusto von Dentz wrote:
-> > Hi Marijn,
-> >
-> > On Sun, Aug 8, 2021 at 7:35 AM Marijn Suijten
-> > <marijn.suijten@somainline.org> wrote:
-> >>
-> >> By setting a2dp->volume early in set_volume() the resulting call to
-> >> media_transport_update_volume() when an AVRCP reply is received will
-> >> likely see the same volume received (unless the peer rounded it to
-> >> another value) and bail on equality, before emitting a DBus property
-> >> change.  This results in DBus clients not being made aware of the change
-> >> unless the peer is an audio source (that receives a notification about
-> >> changed volume, instead of a command to _set_ a new volume), where
-> >> set_volume() immediately raises the DBus signal.
-> >>
-> >> This issue is observed when playing back audio to headphones through an
-> >> AbsoluteVolume-enabled audio server like PulseAudio, which does not
-> >> receive the "Volume" change (while the peer does change volume) when
-> >> setting this property externally using ie. dbus-send.
-> >
-> > Have you confirmed this works with the likes of PulseAudio, afaik
-> > there was some problem when introducing this because the event may
-> > cause a double change on the volume so the server needs to be able to
-> > handle the volume == local volume, anyway if the headset rounds and
-> > the values doesn't match I guess the server will need to be smart
-> > enough to not trigger another volume change otherwise it could cause a
-> > loop where the server request x but the headset rounds to y over and
-> > over.
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=528099
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      0.27 seconds
+> GitLint                       FAIL      0.11 seconds
+> Prep - Setup ELL              PASS      39.58 seconds
+> Build - Prep                  PASS      0.10 seconds
+> Build - Configure             PASS      6.91 seconds
+> Build - Make                  PASS      171.89 seconds
+> Make Check                    PASS      8.76 seconds
+> Make Distcheck                PASS      201.76 seconds
+> Build w/ext ELL - Configure   PASS      6.97 seconds
+> Build w/ext ELL - Make        PASS      161.73 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> audio/avrcp: Use host/network order as appropriate for pdu->params_len
+> WARNING:UNKNOWN_COMMIT_ID: Unknown commit id 'e2b0f0d8d', maybe rebased or not pulled?
+> #15:
+> Fixes: e2b0f0d8d ("avrcp: Fix not checking if params_len match number of received bytes")
+>
+> - total: 0 errors, 1 warnings, 11 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> "[PATCH] audio/avrcp: Use host/network order as appropriate for" has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
 >
 >
-> Thank you for your concerns.  I as the author of AVRCP Absolute Volume
-> support in PulseAudio made sure to insert these equality checks against
-> the last known Absolute Volume value (separate from user-visible volume
-> managed by PA), both when Volume is received from the peer:
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint with rule in .gitlint
+> Output:
+> audio/avrcp: Use host/network order as appropriate for pdu->params_len
+> 11: B1 Line exceeds max length (89>80): "Fixes: e2b0f0d8d ("avrcp: Fix not checking if params_len match number of received bytes")"
 >
-> https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/blob/1a575bb0a708bc455e977629cb99412551867982/src/modules/bluetooth/bluez5-util.c#L614-621
 >
-> And when sending a new Volume back:
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
 >
-> https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/blob/1a575bb0a708bc455e977629cb99412551867982/src/modules/bluetooth/bluez5-util.c#L554-557
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
 >
-> These together make it impossible to call ".Set" on a value that is
-> identical to the last value received through the "PropertiesChanged"
-> signal.  It was made this way to prevent round-trips in the first place,
-> as receiving a Volume change and applying it to PA's sink/source would
-> also trigger the "volume changed" handler.  Even if the peer decides to
-> reply with Volume-1 for every request, there will still be no round-trip.
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
 >
-> > If the server never reacts if volume != local volume and instead
-> > just updates the local volume, which is probably the behavior we want,
-> > then I should be safe to apply this change.
-> That is exactly what happens because PA cannot distinguish between
-> replies to SetAbsoluteVolume and the ABSOLUTE_VOLUME_CHANGED
-> notification caused by button presses, when just looking at the Volume
-> property.
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
 >
-> Finally, I don't know what PipeWire does.  Someone will have to look
-> through the codebase and confirm that it performs the same checks, or
-> loop in one of the authors in cc to confirm.  Sonny from CrOS is already
-> included to make sure this doesn't break anything on their end.
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
 >
-> >
-> >> ---
-> >>   profiles/audio/transport.c | 6 +++---
-> >>   1 file changed, 3 insertions(+), 3 deletions(-)
-> >>
-> >> diff --git a/profiles/audio/transport.c b/profiles/audio/transport.c
-> >> index 8248014ae..d158fc97a 100644
-> >> --- a/profiles/audio/transport.c
-> >> +++ b/profiles/audio/transport.c
-> >> @@ -659,14 +659,14 @@ static void set_volume(const GDBusPropertyTable *property,
-> >>          if (a2dp->volume == volume)
-> >>                  return;
-> >>
-> >> -       a2dp->volume = volume;
-> >> -
-> >>          notify = transport->source_watch ? true : false;
-> >> -       if (notify)
-> >> +       if (notify) {
-> >> +               a2dp->volume = volume;
-> >>                  g_dbus_emit_property_changed(btd_get_dbus_connection(),
-> >>                                                  transport->path,
-> >>                                                  MEDIA_TRANSPORT_INTERFACE,
-> >>                                                  "Volume");
-> >> +       }
-> >>
-> >>          avrcp_set_volume(transport->device, volume, notify);
-> >>          return;
-> >> --
-> >> 2.32.0
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
 Applied, thanks.
+
 
 -- 
 Luiz Augusto von Dentz
