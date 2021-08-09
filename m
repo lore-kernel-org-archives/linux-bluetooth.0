@@ -2,127 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A255C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 17:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2FA8CC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 17:47:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2977260F25
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 17:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 14DD16023F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 17:47:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234550AbhHIRov (ORCPT
+        id S234689AbhHIRsA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 13:44:51 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:49196
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234821AbhHIRot (ORCPT
+        Mon, 9 Aug 2021 13:48:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34336 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234609AbhHIRr5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 13:44:49 -0400
-Received: from localhost.localdomain (1-171-221-113.dynamic-ip.hinet.net [1.171.221.113])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id E04A83F108;
-        Mon,  9 Aug 2021 17:44:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628531052;
-        bh=iEu8pX3ziO36ryx3wRkOZPEyw/YMnEi7g0A9wLQ7fqg=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=uFqOjEyOSzWGs9RABUyWVaLle2NxDyK0Y/3sDI7zraOizwLyHI/+VdKvjK1pYw3ib
-         zoQgeCJ1QbEaW9Rwfg2iJ+X+d5sCK2ISC4Z3ZLuu6omo+DCsJczQjhUJbZvwU3q7PB
-         WVZPYukTzf73a+gQwTpV4VLcw/QnJ3f8dCz++4mKB1zOEZ+t2mbjWga+1B1WKJLIPi
-         ju4HB3FVh0xmredvVnO9hV/hdUQExnuAKhv+YmrItROVQNfVwFPwKduMLZ9eGCo05/
-         zwFEIZmd6bpbsSyc5FetxiCNPYUqGlggPdJii2T2YtfD9hSB5CjBhfsb1zVc0TJDaD
-         lVwzh8iRUPW/w==
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
-        Hsin-Yi Wang <hsinyi@chromium.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM),
-        netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH] Bluetooth: Move shutdown callback before flushing tx and rx queue
-Date:   Tue, 10 Aug 2021 01:43:58 +0800
-Message-Id: <20210809174358.163525-1-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.31.1
+        Mon, 9 Aug 2021 13:47:57 -0400
+Received: from mail-ed1-x533.google.com (mail-ed1-x533.google.com [IPv6:2a00:1450:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F52AC0617B0
+        for <linux-bluetooth@vger.kernel.org>; Mon,  9 Aug 2021 10:47:03 -0700 (PDT)
+Received: by mail-ed1-x533.google.com with SMTP id i6so25882887edu.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 10:47:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qH0TRqWppPIPqnXAc5nbvnEZOagRMmsL70ywxduueCY=;
+        b=lrnA1nln5xh6wcd7XTKyTLAy2x+9W6myrtIBfd/PH931nFx4g/zqmXA8h5ZUJqF2dR
+         96Xl/aqdJBuMFjDB/hP0MrXsqHX3YWRnvUahMAzhKNfosb9IuHL6HWWN1mLWqRTpRJiV
+         SM9Hs5kvNqmfuHuwNA7l3aKVo45wVsdPkeBCM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=qH0TRqWppPIPqnXAc5nbvnEZOagRMmsL70ywxduueCY=;
+        b=P/fGm4vETChlKKjpDfJ9yxbQWaWKtQKtOm0cuI23ygiXVQT/5f2mqquDlvEvsNnZYf
+         ib9xm/ghtjo3SzU8QZbFtWUAE5e0vO0f7L53zJ8lYyOG911wYMIVN0jyPjdsk0DkHIzr
+         Aqf+Jo79LcVny5Gy3v/haaArNa4VnfLeZ3OqRsufrBCZyo7eFKswf5wfA+leUP82nDnv
+         pJHaaYiCjcd5nxWbVlOc7QS2AZsZhyidL1rdmVp9Ptrzh+jCw7/o9ZzRw+T3lCeYf0Pq
+         wAbyprVaY/en6dzGoqV/JIfVtWAFIwKvc0qxp/9HyihVAebahef//gCftUmnzbfIszhq
+         GsxA==
+X-Gm-Message-State: AOAM532OFp4tIO+U0ej2IJZnJvVCC7oOGl+kRB9qqWNkC+FaxwLw20ON
+        MJxhuS7TgiBVLm5u2ywzG3vv8t3Gt6AbtdoQ
+X-Google-Smtp-Source: ABdhPJwumXpXVQ8/a1fTMIaIoMta7fZ4YizSKsE0Ow31vxX8srvoaPjyoznJyYc+VXOG9id/6AIjuA==
+X-Received: by 2002:a05:6402:34d3:: with SMTP id w19mr14530070edc.81.1628531222002;
+        Mon, 09 Aug 2021 10:47:02 -0700 (PDT)
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com. [209.85.221.47])
+        by smtp.gmail.com with ESMTPSA id dt2sm1543425ejc.51.2021.08.09.10.47.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 09 Aug 2021 10:47:01 -0700 (PDT)
+Received: by mail-wr1-f47.google.com with SMTP id m12so22500598wru.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 09 Aug 2021 10:47:01 -0700 (PDT)
+X-Received: by 2002:a5d:5550:: with SMTP id g16mr26866105wrw.336.1628531221236;
+ Mon, 09 Aug 2021 10:47:01 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <CABBYNZKcr74zYzPMcLo5+-49Fv02Kxoyf11bNPSuSGWThz-eqQ@mail.gmail.com>
+ <9d386692-4c1c-b262-bca2-cec3568dc579@somainline.org> <CABBYNZLXRK9TN_TKdj5T7oP3D_HaeQiBsaCaRtE7nAK9hYuh-w@mail.gmail.com>
+ <f3e18adc-b1ad-2ab5-164e-43a1ae20f708@somainline.org> <CAO271mkpy5W0KB60X5G1mwp92bB+K2Ru3ODP8K2APCkjfkX70w@mail.gmail.com>
+ <391e3587-bb19-05be-cc36-08a8c91916de@somainline.org>
+In-Reply-To: <391e3587-bb19-05be-cc36-08a8c91916de@somainline.org>
+From:   Sonny Sasaka <sonnysasaka@chromium.org>
+Date:   Mon, 9 Aug 2021 10:46:50 -0700
+X-Gmail-Original-Message-ID: <CAO271mk0N4yyA74kzB14y8nbFKfT914JNA7Hvq8QMCfs-VR2zw@mail.gmail.com>
+Message-ID: <CAO271mk0N4yyA74kzB14y8nbFKfT914JNA7Hvq8QMCfs-VR2zw@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] Queue SetAbsoluteVolume if there is an in-progress one.
+To:     Marijn Suijten <marijn.suijten@somainline.org>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
-are flushed or cancelled") introduced a regression that makes mtkbtsdio
-driver stops working:
-[   36.593956] Bluetooth: hci0: Firmware already downloaded
-[   46.814613] Bluetooth: hci0: Execution of wmt command timed out
-[   46.814619] Bluetooth: hci0: Failed to send wmt func ctrl (-110)
+Hi Marijn,
 
-The shutdown callback depends on the result of hdev->rx_work, so we
-should call it before flushing rx_work:
--> btmtksdio_shutdown()
- -> mtk_hci_wmt_sync()
-  -> __hci_cmd_send()
-   -> wait for BTMTKSDIO_TX_WAIT_VND_EVT gets cleared
+Thank you for following up. Chrome OS has temporarily adopted my patch
+to resolve the issue without changing the audio client. We will pick
+up your patch at the next uprev.
 
--> btmtksdio_recv_event()
- -> hci_recv_frame()
-  -> queue_work(hdev->workqueue, &hdev->rx_work)
-   -> clears BTMTKSDIO_TX_WAIT_VND_EVT
 
-So move the shutdown callback before flushing TX/RX queue to resolve the
-issue.
-
-Reported-and-tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-Tested-by: Hsin-Yi Wang <hsinyi@chromium.org>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
----
- net/bluetooth/hci_core.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cb2e9e513907..8da04c899197 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1735,6 +1735,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 
- 	hci_leds_update_powered(hdev, false);
- 
-+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+	    test_bit(HCI_UP, &hdev->flags)) {
-+		/* Execute vendor specific shutdown routine */
-+		if (hdev->shutdown)
-+			hdev->shutdown(hdev);
-+	}
-+
- 	/* Flush RX and TX works */
- 	flush_work(&hdev->tx_work);
- 	flush_work(&hdev->rx_work);
-@@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
--	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
--	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--	    test_bit(HCI_UP, &hdev->flags)) {
--		/* Execute vendor specific shutdown routine */
--		if (hdev->shutdown)
--			hdev->shutdown(hdev);
--	}
--
- 	/* flush cmd  work */
- 	flush_work(&hdev->cmd_work);
- 
--- 
-2.31.1
-
+On Sun, Aug 8, 2021 at 3:15 AM Marijn Suijten
+<marijn.suijten@somainline.org> wrote:
+>
+> Hi Sonny,
+>
+> On 6/8/21 8:37 PM, Sonny Sasaka wrote:
+> > Hi Marijn,
+> >
+> > Thanks for your inputs. Having a separate SetAbsoluteVolume API that
+> > blocks (until the peer acknowledges the change) is certainly more
+> > featureful than this patch's approach, since the media player can
+> > decide what to do with pending SetAbsoluteVolume calls and have the
+> > flexibility to handle the situation. However, there is also a value in
+> > the shorter term approach that this patch without any changes in the
+> > media player part and has been tested to solve the janky slider issue
+> > in Chrome OS. I believe that this would also solve PulseAudio's
+> > similar janky slider issue for the short term.
+> >
+> > If Marijn and Luiz are okay with the shorter term approach first, I
+> > will continue updating this patch according to Luiz's comments, but
+> > otherwise I will abandon this patch in favor of the separate
+> > SetAbsoluteVolume API that Marijn will provide.
+>
+>
+> With no acknowledgement from Luiz yet I've gone ahead and added an
+> experimental `uint16 SetVolume(uint16)` call to "MediaTransport1" to
+> start testing this behaviour. You can find the commits here:
+>
+> https://github.com/MarijnS95/bluez/commits/master
+>
+> This has only been tested with dbus-send, the PA changes still have to
+> be written.  Given the original review on Sonny's patches we might want
+> to replace the allocation with `pending` members on the session instead,
+> so that we can possibly do some debouncing if multiple .Set calls
+> arrive.  Seems like we need three members then:
+>
+> volume:         current known volume between BlueZ and the peer.
+> pending_volume: an active AVRCP SetAbsoluteVolume call is in progress
+>                 with this value.  Though this could also be a non-null
+>                 DBusMessage *volume_reply; as we don't need the
+>                 requested volume anymore.
+> next_volume:    a client already queued a new value through .Set, while
+>                 SetAbsoluteVolume (pending_volume != -1) is still in
+>                 flight.
+>
+> While putting this together I noticed that manually calling `.Set
+> "MediaTransport1" "Volume" XX` doesn't notify other applications.  What
+> happens is that `a2dp->volume` is set to the actual volume (in
+> set_volume), and no "PropertiesChanged" is emitted unless we're in
+> "notify" mode ("we are the headphones").  Then, as soon as the peer
+> replies (avrcp_handle_set_volume, media_transport_update_device_volume,
+> media_transport_update_volume) we see that `a2dp->volume == volume` and
+> never emit "PropertiesChanged" either, leaving all other clients unaware
+> of the change.
+>
+> This seems simply addressed by not setting `a2dp->volume` set_volume()
+> and instead rely on that to happen in avrcp_handle_set_volume, just like
+> I'm doing in the handler for this new SetVolume function.
+> That might already solve your problem in CrOS, by simply waiting for a
+> property change notification before sending the next volume change.  We
+> however won't be able to distinguish it from a button-press on the
+> headphones by the user, but I'm not entirely sure anymore if that's
+> still needed.
+>
+> Marijn
+>
+> PS: Since these messages seem to come through, Luiz have you received my
+> patch to address AVRCP Absolute Volume missing when connected to Android
+> phones?
