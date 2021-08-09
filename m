@@ -2,185 +2,282 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E7E2C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:02:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF9D0C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:32:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4524B60F93
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:02:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AFFF761040
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  9 Aug 2021 13:32:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234249AbhHINCx (ORCPT
+        id S233102AbhHINc0 convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 9 Aug 2021 09:02:53 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:32986 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234075AbhHINCw (ORCPT
+        Mon, 9 Aug 2021 09:32:26 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47453 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233327AbhHINcZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 9 Aug 2021 09:02:52 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 179D1wGH2026755, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36502.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 179D1wGH2026755
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Mon, 9 Aug 2021 21:01:58 +0800
-Received: from RTEXMBS03.realtek.com.tw (172.21.6.96) by
- RTEXH36502.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Mon, 9 Aug 2021 21:01:57 +0800
-Received: from localhost (172.21.132.185) by RTEXMBS03.realtek.com.tw
- (172.21.6.96) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2106.2; Mon, 9 Aug 2021
- 21:01:56 +0800
-From:   <max.chou@realtek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <luiz.dentz@gmail.com>, <matthias.bgg@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>,
-        <linux-mediatek@lists.infradead.org>
-CC:     <alex_lu@realsil.com.cn>, <hildawu@realtek.com>,
-        <kidman@realtek.com>, <apusaka@chromium.org>,
-        <abhishekpandit@chromium.org>, <josephsih@chromium.org>,
-        <max.chou@realtek.com>
-Subject: [PATCH] Bluetooth: btusb: Remove WAKEUP_DISABLE and add WAKEUP_AUTOSUSPEND  for Realtek devices
-Date:   Mon, 9 Aug 2021 21:01:52 +0800
-Message-ID: <20210809130152.12528-1-max.chou@realtek.com>
-X-Mailer: git-send-email 2.17.1
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.185]
-X-ClientProxiedBy: RTEXMBS02.realtek.com.tw (172.21.6.95) To
- RTEXMBS03.realtek.com.tw (172.21.6.96)
-X-KSE-ServerInfo: RTEXMBS03.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/09/2021 12:50:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzgvOSCkV6TIIDA3OjA0OjAw?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36502.realtek.com.tw, 9
-X-KSE-Attachment-Filter-Triggered-Rules: Clean
-X-KSE-Attachment-Filter-Triggered-Filters: Clean
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-AntiSpam-Outbound-Interceptor-Info: scan successful
-X-KSE-AntiSpam-Version: 5.9.20, Database issued on: 08/09/2021 12:47:36
-X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
-X-KSE-AntiSpam-Method: none
-X-KSE-AntiSpam-Rate: 0
-X-KSE-AntiSpam-Info: Lua profiles 165471 [Aug 09 2021]
-X-KSE-AntiSpam-Info: Version: 5.9.20.0
-X-KSE-AntiSpam-Info: Envelope from: max.chou@realtek.com
-X-KSE-AntiSpam-Info: LuaCore: 454 454 39c6e442fd417993330528e7f9d13ac1bf7fdf8c
-X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
-X-KSE-AntiSpam-Info: 127.0.0.199:7.1.2;realtek.com:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1
-X-KSE-AntiSpam-Info: Rate: 0
-X-KSE-AntiSpam-Info: Status: not_detected
-X-KSE-AntiSpam-Info: Method: none
-X-KSE-AntiSpam-Info: Auth:dkim=none
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Heuristic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 08/09/2021 12:50:00
+        Mon, 9 Aug 2021 09:32:25 -0400
+Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 95A99CEE01;
+        Mon,  9 Aug 2021 15:32:03 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
+Subject: Re: [BlueZ PATCH v5 2/4] error: BR/EDR and LE connection failure
+ reasons
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210806164624.BlueZ.v5.2.If79c3f0720cc893be1770c6853fe2fbe626f2caa@changeid>
+Date:   Mon, 9 Aug 2021 15:32:03 +0200
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Howard Chung <howardchung@google.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Alain Michaud <alainm@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <991E0A86-77E3-46E1-8E19-CED2742D374F@holtmann.org>
+References: <20210806234720.286157-1-mcchou@chromium.org>
+ <20210806164624.BlueZ.v5.2.If79c3f0720cc893be1770c6853fe2fbe626f2caa@changeid>
+To:     Miao-chen Chou <mcchou@chromium.org>
+X-Mailer: Apple Mail (2.3654.100.0.2.22)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Max Chou <max.chou@realtek.com>
+Hi Miao-chen,
 
-For the commit of 9e45524a011107a73bc2cdde8370c61e82e93a4d, wakeup is
-always disabled for Realtek devices. However, there's the capability
-for Realtek devices to apply USB wake-up.
+> The source of Connect() failures can be divided into the following
+> three.
+> - bluetoothd's device interface state transition and profile state
+>  transition
+> - Kernel's L2CAP layer state transition
+> - Potential HCI error codes returned by the remote device
+> 
+> Reviewed-by: Alain Michaud <alainm@chromium.org>
+> Reviewed-by: Howard Chung <howardchung@google.com>
+> ---
+> 
+> Changes in v5:
+> - Replace uint16_t error code with string
+> 
+> Changes in v4:
+> - Address make errors
+> 
+> Changes in v3:
+> - Separate error-code.txt into its own commit
+> 
+> Changes in v2:
+> - Add error-code.txt
+> - Remove BtdError from return string
+> 
+> src/error.c | 100 ++++++++++++++++++++++++++++++++++++++++++++++++++++
+> src/error.h |  59 +++++++++++++++++++++++++++++++
+> 2 files changed, 159 insertions(+)
+> 
+> diff --git a/src/error.c b/src/error.c
+> index 89517075e..411f36fcb 100644
+> --- a/src/error.c
+> +++ b/src/error.c
+> @@ -27,6 +27,8 @@
+> #include <config.h>
+> #endif
+> 
+> +#include <error.h>
+> +#include <stdio.h>
+> #include "gdbus/gdbus.h"
+> 
+> #include "error.h"
+> @@ -79,12 +81,24 @@ DBusMessage *btd_error_in_progress(DBusMessage *msg)
+> 					"In Progress");
+> }
+> 
+> +DBusMessage *btd_error_in_progress_str(DBusMessage *msg, const char *str)
+> +{
+> +	return g_dbus_create_error(msg, ERROR_INTERFACE ".InProgress",
+> +					"%s", str);
+> +}
+> +
+> DBusMessage *btd_error_not_available(DBusMessage *msg)
+> {
+> 	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
+> 					"Operation currently not available");
+> }
+> 
+> +DBusMessage *btd_error_not_available_str(DBusMessage *msg, const char *str)
+> +{
+> +	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotAvailable",
+> +					"%s", str);
+> +}
+> +
+> DBusMessage *btd_error_does_not_exist(DBusMessage *msg)
+> {
+> 	return g_dbus_create_error(msg, ERROR_INTERFACE ".DoesNotExist",
+> @@ -121,8 +135,94 @@ DBusMessage *btd_error_not_ready(DBusMessage *msg)
+> 					"Resource Not Ready");
+> }
+> 
+> +DBusMessage *btd_error_not_ready_str(DBusMessage *msg, const char *str)
+> +{
+> +	return g_dbus_create_error(msg, ERROR_INTERFACE ".NotReady",
+> +					"%s", str);
+> +}
+> +
+> DBusMessage *btd_error_failed(DBusMessage *msg, const char *str)
+> {
+> 	return g_dbus_create_error(msg, ERROR_INTERFACE
+> 					".Failed", "%s", str);
+> }
+> +
+> +const char* btd_error_bredr_conn_from_errno(int errno_code)
+> +{
+> +	switch (-errno_code) {
+> +	case EALREADY:
+> +	case EISCONN:
+> +		return ERR_BREDR_CONN_ALREADY_CONNECTED;
+> +	case EHOSTDOWN:
+> +		return ERR_BREDR_CONN_PAGE_TIMEOUT;
+> +	case ENOPROTOOPT:
+> +		return ERR_BREDR_CONN_PROFILE_UNAVAILABLE;
+> +	case EIO:
+> +		return ERR_BREDR_CONN_CREATE_SOCKET;
+> +	case EINVAL:
+> +		return ERR_BREDR_CONN_INVALID_ARGUMENTS;
+> +	case EHOSTUNREACH:
+> +		return ERR_BREDR_CONN_ADAPTER_NOT_POWERED;
+> +	case EOPNOTSUPP:
+> +	case EPROTONOSUPPORT:
+> +		return ERR_BREDR_CONN_NOT_SUPPORTED;
+> +	case EBADFD:
+> +		return ERR_BREDR_CONN_BAD_SOCKET;
+> +	case ENOMEM:
+> +		return ERR_BREDR_CONN_MEMORY_ALLOC;
+> +	case EBUSY:
+> +		return ERR_BREDR_CONN_BUSY;
+> +	case EMLINK:
+> +		return ERR_BREDR_CONN_CNCR_CONNECT_LIMIT;
+> +	case ETIMEDOUT:
+> +		return ERR_BREDR_CONN_TIMEOUT;
+> +	case ECONNREFUSED:
+> +		return ERR_BREDR_CONN_REFUSED;
+> +	case ECONNRESET:
+> +		return ERR_BREDR_CONN_ABORT_BY_REMOTE;
+> +	case ECONNABORTED:
+> +		return ERR_BREDR_CONN_ABORT_BY_LOCAL;
+> +	case EPROTO:
+> +		return ERR_BREDR_CONN_LMP_PROTO_ERROR;
+> +	default:
+> +		return ERR_BREDR_CONN_UNKNOWN;
+> +	}
+> +}
+> +
+> +const char* btd_error_le_conn_from_errno(int errno_code)
+> +{
+> +	switch (-errno_code) {
+> +	case EINVAL:
+> +		return ERR_LE_CONN_INVALID_ARGUMENTS;
+> +	case EHOSTUNREACH:
+> +		return ERR_LE_CONN_ADAPTER_NOT_POWERED;
+> +	case EOPNOTSUPP:
+> +	case EPROTONOSUPPORT:
+> +		return ERR_LE_CONN_NOT_SUPPORTED;
+> +	case EALREADY:
+> +	case EISCONN:
+> +		return ERR_LE_CONN_ALREADY_CONNECTED;
+> +	case EBADFD:
+> +		return ERR_LE_CONN_BAD_SOCKET;
+> +	case ENOMEM:
+> +		return ERR_LE_CONN_MEMORY_ALLOC;
+> +	case EBUSY:
+> +		return ERR_LE_CONN_BUSY;
+> +	case ECONNREFUSED:
+> +		return ERR_LE_CONN_REFUSED;
+> +	case EIO:
+> +		return ERR_LE_CONN_CREATE_SOCKET;
+> +	case ETIMEDOUT:
+> +		return ERR_LE_CONN_TIMEOUT;
+> +	case EMLINK:
+> +		return ERR_LE_CONN_SYNC_CONNECT_LIMIT;
+> +	case ECONNRESET:
+> +		return ERR_LE_CONN_ABORT_BY_REMOTE;
+> +	case ECONNABORTED:
+> +		return ERR_LE_CONN_ABORT_BY_LOCAL;
+> +	case EPROTO:
+> +		return ERR_LE_CONN_LL_PROTO_ERROR;
+> +	default:
+> +		return ERR_LE_CONN_UNKNOWN;
+> +	}
+> +}
+> diff --git a/src/error.h b/src/error.h
+> index 7c8cad066..91a02654a 100644
+> --- a/src/error.h
+> +++ b/src/error.h
+> @@ -24,9 +24,62 @@
+>  */
+> 
+> #include <dbus/dbus.h>
+> +#include <stdint.h>
+> 
+> #define ERROR_INTERFACE "org.bluez.Error"
+> 
+> +/* BR/EDR connection failure reasons */
+> +#define ERR_BREDR_CONN_ALREADY_CONNECTED	"BR/EDR connection already "\
+> +						"connected"
+> +#define ERR_BREDR_CONN_PAGE_TIMEOUT		"BR/EDR connection page timeout"
+> +#define ERR_BREDR_CONN_PROFILE_UNAVAILABLE	"BR/EDR connection profile "\
+> +						"unavailable"
+> +#define ERR_BREDR_CONN_SDP_SEARCH		"BR/EDR connection SDP search"
+> +#define ERR_BREDR_CONN_CREATE_SOCKET		"BR/EDR connection create "\
+> +						"socket"
+> +#define ERR_BREDR_CONN_INVALID_ARGUMENTS	"BR/EDR connection invalid "\
+> +						"argument"
+> +#define ERR_BREDR_CONN_ADAPTER_NOT_POWERED	"BR/EDR connection adapter "\
+> +						"not powered"
+> +#define ERR_BREDR_CONN_NOT_SUPPORTED		"BR/EDR connection not "\
+> +						"suuported"
+> +#define ERR_BREDR_CONN_BAD_SOCKET		"BR/EDR connection bad socket"
+> +#define ERR_BREDR_CONN_MEMORY_ALLOC		"BR/EDR connection memory "\
+> +						"allocation"
+> +#define ERR_BREDR_CONN_BUSY			"BR/EDR connection busy"
+> +#define ERR_BREDR_CONN_CNCR_CONNECT_LIMIT	"BR/EDR connection concurrent "\
+> +						"connection limit"
+> +#define ERR_BREDR_CONN_TIMEOUT			"BR/EDR connection timeout"
+> +#define ERR_BREDR_CONN_REFUSED			"BR/EDR connection refused"
+> +#define ERR_BREDR_CONN_ABORT_BY_REMOTE		"BR/EDR connection aborted by "\
+> +						"remote"
+> +#define ERR_BREDR_CONN_ABORT_BY_LOCAL		"BR/EDR connection aborted by "\
+> +						"local"
+> +#define ERR_BREDR_CONN_LMP_PROTO_ERROR		"BR/EDR connection LMP "\
+> +						"protocol error"
+> +#define ERR_BREDR_CONN_CANCELED			"BR/EDR connection canceled"
+> +#define ERR_BREDR_CONN_UNKNOWN			"BR/EDR connection unknown"
+> +
+> +/* LE connection failure reasons */
+> +#define ERR_LE_CONN_INVALID_ARGUMENTS	"LE connection invalid arguments"
+> +#define ERR_LE_CONN_ADAPTER_NOT_POWERED	"LE connection adapter not powered"
+> +#define ERR_LE_CONN_NOT_SUPPORTED	"LE connection not supported"
+> +#define ERR_LE_CONN_ALREADY_CONNECTED	"LE connection already connected"
+> +#define ERR_LE_CONN_BAD_SOCKET		"LE connection bad socket"
+> +#define ERR_LE_CONN_MEMORY_ALLOC	"LE connection memory allocation"
+> +#define ERR_LE_CONN_BUSY		"LE connection busy"
+> +#define ERR_LE_CONN_REFUSED		"LE connection refused"
+> +#define ERR_LE_CONN_CREATE_SOCKET	"LE connection create socket"
+> +#define ERR_LE_CONN_TIMEOUT		"LE connection timeout"
+> +#define ERR_LE_CONN_SYNC_CONNECT_LIMIT	"LE connection concurrent connection "\
+> +					"limit"
+> +#define ERR_LE_CONN_ABORT_BY_REMOTE	"LE connection abort by remote"
+> +#define ERR_LE_CONN_ABORT_BY_LOCAL	"LE connection abort by local"
+> +#define ERR_LE_CONN_LL_PROTO_ERROR	"LE connection link layer protocol "\
+> +					"error"
+> +#define ERR_LE_CONN_GATT_BROWSE		"LE connection GATT browsing"
+> +#define ERR_LE_CONN_UNKNOWN		"LE connection unknown"
 
-In this commit, remove WAKEUP_DISABLE feature for Realtek devices.
-If users would switch wake-up, they should access
-"/sys/bus/usb/.../power/wakeup"
+I rather have you use strings like “le-connection-not-supported” to make this similar to what we are using for other strings in the API.
 
-In this commit, it also adds the feature as WAKEUP_AUTOSUSPEND
-for Realtek devices because it should set do_remote_wakeup on autosuspend.
+And I am always torn between using “bredr-“ and just using “br-“.
 
-Signed-off-by: Max Chou <max.chou@realtek.com>
-Tested-by: Hilda Wu <hildawu@realtek.com>
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
----
- drivers/bluetooth/btusb.c | 25 +++++++++----------------
- 1 file changed, 9 insertions(+), 16 deletions(-)
+Regards
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 488f110e17e2..73a835bf37f7 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -527,7 +527,7 @@ static const struct dmi_system_id btusb_needs_reset_resume_table[] = {
- #define BTUSB_OOB_WAKE_ENABLED	11
- #define BTUSB_HW_RESET_ACTIVE	12
- #define BTUSB_TX_WAIT_VND_EVT	13
--#define BTUSB_WAKEUP_DISABLE	14
-+#define BTUSB_WAKEUP_AUTOSUSPEND	14
- 
- struct btusb_data {
- 	struct hci_dev       *hdev;
-@@ -1349,13 +1349,6 @@ static int btusb_open(struct hci_dev *hdev)
- 
- 	data->intf->needs_remote_wakeup = 1;
- 
--	/* Disable device remote wakeup when host is suspended
--	 * For Realtek chips, global suspend without
--	 * SET_FEATURE (DEVICE_REMOTE_WAKEUP) can save more power in device.
--	 */
--	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
--		device_wakeup_disable(&data->udev->dev);
--
- 	if (test_and_set_bit(BTUSB_INTR_RUNNING, &data->flags))
- 		goto done;
- 
-@@ -1422,7 +1415,7 @@ static int btusb_close(struct hci_dev *hdev)
- 	data->intf->needs_remote_wakeup = 0;
- 
- 	/* Enable remote wake up for auto-suspend */
--	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags))
-+	if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags))
- 		data->intf->needs_remote_wakeup = 1;
- 
- 	usb_autopm_put_interface(data->intf);
-@@ -3877,11 +3870,8 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->shutdown = btrtl_shutdown_realtek;
- 		hdev->cmd_timeout = btusb_rtl_cmd_timeout;
- 
--		/* Realtek devices lose their updated firmware over global
--		 * suspend that means host doesn't send SET_FEATURE
--		 * (DEVICE_REMOTE_WAKEUP)
--		 */
--		set_bit(BTUSB_WAKEUP_DISABLE, &data->flags);
-+		/* Realtek devices need to set remote wakeup on auto-suspend */
-+		set_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags);
- 	}
- 
- 	if (!reset)
-@@ -4056,12 +4046,15 @@ static int btusb_suspend(struct usb_interface *intf, pm_message_t message)
- 	 * Actually, it depends on whether the usb host sends
- 	 * set feature (enable wakeup) or not.
- 	 */
--	if (test_bit(BTUSB_WAKEUP_DISABLE, &data->flags)) {
-+	if (test_bit(BTUSB_WAKEUP_AUTOSUSPEND, &data->flags)) {
- 		if (PMSG_IS_AUTO(message) &&
- 		    device_can_wakeup(&data->udev->dev))
- 			data->udev->do_remote_wakeup = 1;
--		else if (!PMSG_IS_AUTO(message))
-+		else if (!PMSG_IS_AUTO(message) &&
-+			 !device_may_wakeup(&data->udev->dev)) {
-+			data->udev->do_remote_wakeup = 0;
- 			data->udev->reset_resume = 1;
-+		}
- 	}
- 
- 	return 0;
--- 
-2.17.1
+Marcel
 
