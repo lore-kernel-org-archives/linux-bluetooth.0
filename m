@@ -2,132 +2,226 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5254C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Aug 2021 04:54:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E78E5C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Aug 2021 08:06:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B12C560527
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Aug 2021 04:54:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BEF5D61058
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 10 Aug 2021 08:06:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234999AbhHJEyr (ORCPT
+        id S237986AbhHJIGy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 10 Aug 2021 00:54:47 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:52434
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231329AbhHJEyq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 10 Aug 2021 00:54:46 -0400
-Received: from localhost.localdomain (1.general.khfeng.us.vpn [10.172.68.174])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id F38503F10F;
-        Tue, 10 Aug 2021 04:54:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628571263;
-        bh=5r4dLAsVk9DJOAlbYOUdKsSk8hgd3Xvb6spEiyz/nvw=;
-        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-        b=o/WpuF7GGzjkbQD+05kTc8H78Yfmov9dSV9XYvZN99t/OCwUZGBxv7TMBgm+deEVj
-         +gwSWzGYXWgxzqNQdsQqmj4guAiIqzgc/EDmUfhuV2GCsVO5AT5Oto1r1seSvCaeUd
-         95oq0X5gSViUFVEj9T7DD5L4kB33ZS4rz3AjmAjKsmUtQx47WbgfDwOrexH630LPo8
-         8692wW5Rx/p1E20AYLL9fPGfLqDiUBcFOMErlRHR7bIilrToqzcBdKmz3M6YRlw++y
-         pUKifGHn76IcbVc+dsfmLycB1QpEQIG3MTXjaJBAuHfiXexkt87oyNMy2yzY2Z3hqG
-         ZzyPBLB7+YR1Q==
-From:   Kai-Heng Feng <kai.heng.feng@canonical.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
-        Hsin-Yi Wang <hsinyi@chromium.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org (open list:BLUETOOTH SUBSYSTEM),
-        netdev@vger.kernel.org (open list:NETWORKING [GENERAL]),
-        linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH v2] Bluetooth: Move shutdown callback before flushing tx and rx queue
-Date:   Tue, 10 Aug 2021 12:53:15 +0800
-Message-Id: <20210810045315.184383-1-kai.heng.feng@canonical.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 10 Aug 2021 04:06:54 -0400
+Received: from mga09.intel.com ([134.134.136.24]:43659 "EHLO mga09.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237800AbhHJIGw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 10 Aug 2021 04:06:52 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10070"; a="214843629"
+X-IronPort-AV: E=Sophos;i="5.84,309,1620716400"; 
+   d="scan'208";a="214843629"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Aug 2021 01:06:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,309,1620716400"; 
+   d="scan'208";a="671617807"
+Received: from lkp-server01.sh.intel.com (HELO d053b881505b) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 10 Aug 2021 01:06:28 -0700
+Received: from kbuild by d053b881505b with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mDMmK-000KN3-7H; Tue, 10 Aug 2021 08:06:28 +0000
+Date:   Tue, 10 Aug 2021 16:06:03 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 146af22649020e6b163482bc66150683ebf893bf
+Message-ID: <6112336b.ZwAW8V1Eatt5gVZ0%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
-are flushed or cancelled") introduced a regression that makes mtkbtsdio
-driver stops working:
-[   36.593956] Bluetooth: hci0: Firmware already downloaded
-[   46.814613] Bluetooth: hci0: Execution of wmt command timed out
-[   46.814619] Bluetooth: hci0: Failed to send wmt func ctrl (-110)
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 146af22649020e6b163482bc66150683ebf893bf  Bluetooth: btusb: Fix fall-through warnings
 
-The shutdown callback depends on the result of hdev->rx_work, so we
-should call it before flushing rx_work:
--> btmtksdio_shutdown()
- -> mtk_hci_wmt_sync()
-  -> __hci_cmd_send()
-   -> wait for BTMTKSDIO_TX_WAIT_VND_EVT gets cleared
+elapsed time: 5436m
 
--> btmtksdio_recv_event()
- -> hci_recv_frame()
-  -> queue_work(hdev->workqueue, &hdev->rx_work)
-   -> clears BTMTKSDIO_TX_WAIT_VND_EVT
+configs tested: 159
+configs skipped: 3
 
-So move the shutdown callback before flushing TX/RX queue to resolve the
-issue.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-Reported-and-tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-Tested-by: Hsin-Yi Wang <hsinyi@chromium.org>
-Cc: Guenter Roeck <linux@roeck-us.net>
-Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
-Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                 randconfig-c001-20210804
+i386                 randconfig-c001-20210805
+sparc                       sparc64_defconfig
+sh                            migor_defconfig
+sh                  sh7785lcr_32bit_defconfig
+arm                              alldefconfig
+s390                             allyesconfig
+mips                malta_qemu_32r6_defconfig
+sh                           se7343_defconfig
+sh                             shx3_defconfig
+m68k                        stmark2_defconfig
+arc                     haps_hs_smp_defconfig
+m68k                        m5307c3_defconfig
+arm                          pcm027_defconfig
+arm                         lpc32xx_defconfig
+sh                           sh2007_defconfig
+mips                        nlm_xlp_defconfig
+ia64                             allmodconfig
+mips                     loongson1b_defconfig
+arm                           sama5_defconfig
+sh                     sh7710voipgw_defconfig
+sh                          rsk7264_defconfig
+mips                        qi_lb60_defconfig
+powerpc                         wii_defconfig
+sh                   rts7751r2dplus_defconfig
+arm                       imx_v6_v7_defconfig
+ia64                        generic_defconfig
+mips                        bcm47xx_defconfig
+mips                         tb0287_defconfig
+arm                       aspeed_g4_defconfig
+arm64                            alldefconfig
+arc                            hsdk_defconfig
+powerpc                    sam440ep_defconfig
+powerpc                      mgcoge_defconfig
+powerpc                       ebony_defconfig
+sh                   secureedge5410_defconfig
+mips                        jmr3927_defconfig
+powerpc                        fsp2_defconfig
+arm                      footbridge_defconfig
+arm                           spitz_defconfig
+powerpc                     stx_gp3_defconfig
+s390                       zfcpdump_defconfig
+arm                          moxart_defconfig
+powerpc                       ppc64_defconfig
+powerpc                 mpc837x_rdb_defconfig
+arm                          gemini_defconfig
+mips                       bmips_be_defconfig
+parisc                           allyesconfig
+s390                                defconfig
+arm                       cns3420vb_defconfig
+x86_64                            allnoconfig
+powerpc                 canyonlands_defconfig
+powerpc                      ppc44x_defconfig
+sh                               j2_defconfig
+csky                                defconfig
+arm                     am200epdkit_defconfig
+powerpc                          allmodconfig
+arm                      jornada720_defconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+nds32                               defconfig
+nios2                            allyesconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allmodconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                           allnoconfig
+x86_64               randconfig-a002-20210805
+x86_64               randconfig-a006-20210805
+x86_64               randconfig-a004-20210805
+x86_64               randconfig-a003-20210805
+x86_64               randconfig-a001-20210805
+x86_64               randconfig-a005-20210805
+i386                 randconfig-a005-20210804
+i386                 randconfig-a004-20210804
+i386                 randconfig-a002-20210804
+i386                 randconfig-a006-20210804
+i386                 randconfig-a003-20210804
+i386                 randconfig-a001-20210804
+i386                 randconfig-a005-20210806
+i386                 randconfig-a004-20210806
+i386                 randconfig-a002-20210806
+i386                 randconfig-a006-20210806
+i386                 randconfig-a003-20210806
+i386                 randconfig-a001-20210806
+i386                 randconfig-a005-20210805
+i386                 randconfig-a004-20210805
+i386                 randconfig-a002-20210805
+i386                 randconfig-a006-20210805
+i386                 randconfig-a003-20210805
+i386                 randconfig-a001-20210805
+x86_64               randconfig-a012-20210804
+x86_64               randconfig-a016-20210804
+x86_64               randconfig-a011-20210804
+x86_64               randconfig-a013-20210804
+x86_64               randconfig-a014-20210804
+x86_64               randconfig-a015-20210804
+i386                 randconfig-a012-20210807
+i386                 randconfig-a011-20210807
+i386                 randconfig-a015-20210807
+i386                 randconfig-a013-20210807
+i386                 randconfig-a014-20210807
+i386                 randconfig-a016-20210807
+i386                 randconfig-a012-20210804
+i386                 randconfig-a011-20210804
+i386                 randconfig-a015-20210804
+i386                 randconfig-a013-20210804
+i386                 randconfig-a014-20210804
+i386                 randconfig-a016-20210804
+i386                 randconfig-a012-20210806
+i386                 randconfig-a011-20210806
+i386                 randconfig-a015-20210806
+i386                 randconfig-a013-20210806
+i386                 randconfig-a014-20210806
+i386                 randconfig-a016-20210806
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                           allyesconfig
+x86_64                    rhel-8.3-kselftests
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                                  kexec
+
+clang tested configs:
+x86_64               randconfig-c001-20210804
+x86_64               randconfig-c001-20210805
+x86_64               randconfig-a002-20210804
+x86_64               randconfig-a006-20210804
+x86_64               randconfig-a004-20210804
+x86_64               randconfig-a003-20210804
+x86_64               randconfig-a001-20210804
+x86_64               randconfig-a005-20210804
+
 ---
-v2: 
- Move the shutdown callback before clearing HCI_UP, otherwise 1)
- shutdown callback won't be called and 2) other routines that depend on
- HCI_UP won't work.
-
- net/bluetooth/hci_core.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index cb2e9e513907..8622da2d9395 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1727,6 +1727,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 	hci_request_cancel_all(hdev);
- 	hci_req_sync_lock(hdev);
- 
-+	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-+	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-+	    test_bit(HCI_UP, &hdev->flags)) {
-+		/* Execute vendor specific shutdown routine */
-+		if (hdev->shutdown)
-+			hdev->shutdown(hdev);
-+	}
-+
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		cancel_delayed_work_sync(&hdev->cmd_timer);
- 		hci_req_sync_unlock(hdev);
-@@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 		clear_bit(HCI_INIT, &hdev->flags);
- 	}
- 
--	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
--	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
--	    test_bit(HCI_UP, &hdev->flags)) {
--		/* Execute vendor specific shutdown routine */
--		if (hdev->shutdown)
--			hdev->shutdown(hdev);
--	}
--
- 	/* flush cmd  work */
- 	flush_work(&hdev->cmd_work);
- 
--- 
-2.31.1
-
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
