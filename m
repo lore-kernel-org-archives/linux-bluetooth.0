@@ -2,148 +2,162 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DAD2CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 07:35:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFEC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 08:25:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B8AB060EBD
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 07:35:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6895360FD9
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 08:25:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235506AbhHKHgS (ORCPT
+        id S236119AbhHKIZr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Aug 2021 03:36:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44114 "EHLO
+        Wed, 11 Aug 2021 04:25:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234664AbhHKHgR (ORCPT
+        with ESMTP id S236083AbhHKIZn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Aug 2021 03:36:17 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDB74C061765
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 00:35:53 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so8275237pjr.1
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 00:35:53 -0700 (PDT)
+        Wed, 11 Aug 2021 04:25:43 -0400
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE074C061765
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 01:25:19 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id x12so1838883wrr.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 01:25:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=EyScIBLb1f5iH8LxwPl0JKRHO4pzv4UBYRPzpvqesiA=;
-        b=usKK+8BFbUOhfTDXyyj8esSvmp6jJt8U+NZX2bykYzZEwBIT88SFi+JXa92Cz/fRhq
-         2K08jeSAGGBMsc1VmWaZAk7ayu9AlR3jaPXifHSjJenECY5zTKdyT4BFgsQR6cqvk5CA
-         VqkmQuRd3cD4pOAZ/wRJPmFGa2yOJAM3djDu8czeXvQeRJ+gl4Sfr3+3/iGOQWgQITm2
-         t71kgKPwGWp37+EPP1i9GTsrvSxejZ5jkO6oyZzE2TDLSxpjczSxtsaPDtKqil6izZMC
-         9+Ap6B3IR59y/L+szzSq0LnZamzL3hzySH1s/AR/ZBdsCO4GtLCPU2xPiRwPFLI5vKAx
-         nf1g==
+        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
+        h=from:to:cc:subject:in-reply-to:references:date:message-id
+         :mime-version;
+        bh=JopxvpFcF/xGESdrh4YQ6rS5KF8DueMkBM15FR5p2zI=;
+        b=n3GjMA9nWMZfHn1qsTgkJAuyGzL7OvGstvZa+uwtSC2+i980Z9CA2iu8oOVRxObgnI
+         Aezd0jo4cnZVKdtebsXlMzqO10Q6xB2O8BzwtbmHl24c9jv5M6oyfUUaAH7bxs6uIenr
+         PbJclzvvkgFR4FwGJ5ueJGIurDvI092GZu3MAvZr5zYCIO2ndBJd/aCoHNOSOV9kEBUB
+         eqE78uIrrVM4Xd9n3xrmpsEfjY6oPgBlmdOGzcG9w5XyTZ9PTG19MMPUmjpRJPEqTrNQ
+         gRe7+3ARCXmXuoIe8vsh5v4FslmItbLzrM3ZumlK2nit9Fm5W2D2ovf5PV++CBuAfL+1
+         pmYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=EyScIBLb1f5iH8LxwPl0JKRHO4pzv4UBYRPzpvqesiA=;
-        b=lk+yCnA7KpCJSovROFMB1s/OPN9fqq9cJL7NwYRwHNbZBP4hUTQGGEC/WbFau/1BHp
-         PNr/RELJrEwNJKl3Xf2GO9BzG0O7miIIX4xX1TNI53KtlLh2FH3hc+jvOQEUY2KMF2Gq
-         IIUqtb85Z/L0TzB4UuL279nX06Ga4W1aUANGYgDLHwY8rcgIvXprTU+R1pGM1mgfXyfk
-         daCAwcQeDZgvaLvZ3/8RRs79eBLpw9eXG/otch+P0K/zxmE6kpFmYcuIxNorZP5HybPG
-         0Kv0b2tX85Bey5Pd3j5xg4tgoWpq9oqpWHR/3JrVrWmdZf5wajHVbloq2S+Gr0SaFzJs
-         AOOA==
-X-Gm-Message-State: AOAM532W7fArYwXKl+ds7+zjchOOA+0H0j+GlHVdsnmWy9mP2xaTtyon
-        SCS6kIU+VrYDPTR7mLcFroQmw8rugFM=
-X-Google-Smtp-Source: ABdhPJxgGBlBhAGKiA5JJXqO/+xpeZl2OrpZoOqJfOFy8+OkFDT/Uh9b8uk6rvQvcbMJT4zzLocSIw==
-X-Received: by 2002:a17:902:7294:b029:12d:f2:e8d5 with SMTP id d20-20020a1709027294b029012d00f2e8d5mr701816pll.5.1628667353205;
-        Wed, 11 Aug 2021 00:35:53 -0700 (PDT)
-Received: from [172.17.0.2] ([20.94.222.203])
-        by smtp.gmail.com with ESMTPSA id h16sm25946484pfn.215.2021.08.11.00.35.52
+        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
+         :message-id:mime-version;
+        bh=JopxvpFcF/xGESdrh4YQ6rS5KF8DueMkBM15FR5p2zI=;
+        b=GXdm2SmWIwf3YtdOGMluBttPP2Ayaa+NINQRyFXzpJ0RtsF9BU0LFZYRsP9fjmJg2k
+         /T8089d7FF1Pg8sTJK/mMqkQQEiYrydZtwWGsI4Ra0o5LYRjEvwqXyrSDxQftARbBOLW
+         +4RpcsBBDF+0eoWmk2+dH3PDlG2kA583WA4v72LOFjQVkt5nn0deOE4m/Z63NXEAeVrm
+         Ql0TnJJpmQgrtcYiOh98bHH/mR88XjMW4pVf5/8EoKpPyS7NeNx0w8TZq3WGD9eRP2It
+         iLHVLzcXuOnux468cMVfrWeU/XuuRWcyAzWj5GZaCIBwLA4u0tQ67p6O5979nEgfK7qZ
+         VlPg==
+X-Gm-Message-State: AOAM5315jM4LMor47qZEDlJ/FMOH5s6J28gN2BiwDGdnDDnSwvDGmRZ4
+        EKmC47AIN6J+G6tHkg4AS0ZRpQ==
+X-Google-Smtp-Source: ABdhPJzo1gv8/4u+SF3MPLGpjMOnRJmhlmd5mciRp3hwMU3HZV8PLwwodWiHGXiQrJKVriPPdr7lIg==
+X-Received: by 2002:a05:6000:120d:: with SMTP id e13mr11205849wrx.6.1628670318484;
+        Wed, 11 Aug 2021 01:25:18 -0700 (PDT)
+Received: from localhost ([2a01:cb19:826e:8e00:7c84:47f9:c111:a679])
+        by smtp.gmail.com with ESMTPSA id n8sm25498969wrx.46.2021.08.11.01.25.16
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 00:35:52 -0700 (PDT)
-Message-ID: <61137dd8.1c69fb81.530f8.c7bc@mx.google.com>
-Date:   Wed, 11 Aug 2021 00:35:52 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0181118328273124133=="
+        Wed, 11 Aug 2021 01:25:18 -0700 (PDT)
+From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>, marcel@holtmann.org,
+        johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
+        Hsin-Yi Wang <hsinyi@chromium.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] Bluetooth: Move shutdown callback before flushing tx
+ and rx queue
+In-Reply-To: <20210810045315.184383-1-kai.heng.feng@canonical.com>
+References: <20210810045315.184383-1-kai.heng.feng@canonical.com>
+Date:   Wed, 11 Aug 2021 10:25:09 +0200
+Message-ID: <87pmuk75i2.fsf@baylibre.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v1] plugins/admin: add uuid duplicate check
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210811151742.Bluez.v1.1.I3c1703ddae63da383b15e001bc965dadb4bd00b8@changeid>
-References: <20210811151742.Bluez.v1.1.I3c1703ddae63da383b15e001bc965dadb4bd00b8@changeid>
+Content-Type: text/plain
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0181118328273124133==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Kai-Heng,
 
-This is automated email and please do not reply to this email!
+Thank you for your patch.
 
-Dear submitter,
+Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=529641
+> Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
+> are flushed or cancelled") introduced a regression that makes mtkbtsdio
+> driver stops working:
+> [   36.593956] Bluetooth: hci0: Firmware already downloaded
+> [   46.814613] Bluetooth: hci0: Execution of wmt command timed out
+> [   46.814619] Bluetooth: hci0: Failed to send wmt func ctrl (-110)
+>
+> The shutdown callback depends on the result of hdev->rx_work, so we
+> should call it before flushing rx_work:
+> -> btmtksdio_shutdown()
+>  -> mtk_hci_wmt_sync()
+>   -> __hci_cmd_send()
+>    -> wait for BTMTKSDIO_TX_WAIT_VND_EVT gets cleared
+>
+> -> btmtksdio_recv_event()
+>  -> hci_recv_frame()
+>   -> queue_work(hdev->workqueue, &hdev->rx_work)
+>    -> clears BTMTKSDIO_TX_WAIT_VND_EVT
+>
+> So move the shutdown callback before flushing TX/RX queue to resolve the
+> issue.
+>
+> Reported-and-tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+> Tested-by: Hsin-Yi Wang <hsinyi@chromium.org>
+> Cc: Guenter Roeck <linux@roeck-us.net>
+> Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> ---
+> v2: 
+>  Move the shutdown callback before clearing HCI_UP, otherwise 1)
+>  shutdown callback won't be called and 2) other routines that depend on
+>  HCI_UP won't work.
+>
+>  net/bluetooth/hci_core.c | 16 ++++++++--------
+>  1 file changed, 8 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index cb2e9e513907..8622da2d9395 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1727,6 +1727,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
+>  	hci_request_cancel_all(hdev);
+>  	hci_req_sync_lock(hdev);
+>  
+> +	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> +	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> +	    test_bit(HCI_UP, &hdev->flags)) {
+> +		/* Execute vendor specific shutdown routine */
+> +		if (hdev->shutdown)
+> +			hdev->shutdown(hdev);
+> +	}
+> +
+>  	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+>  		cancel_delayed_work_sync(&hdev->cmd_timer);
+>  		hci_req_sync_unlock(hdev);
+> @@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+>  		clear_bit(HCI_INIT, &hdev->flags);
+>  	}
+>  
+> -	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
+> -	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
+> -	    test_bit(HCI_UP, &hdev->flags)) {
+> -		/* Execute vendor specific shutdown routine */
+> -		if (hdev->shutdown)
+> -			hdev->shutdown(hdev);
+> -	}
+> -
+>  	/* flush cmd  work */
+>  	flush_work(&hdev->cmd_work);
+I confirm this works fine on mt8183-pumpkin using the btmtksdio driver.
 
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.49 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      47.72 seconds
-Build - Prep                  PASS      0.15 seconds
-Build - Configure             PASS      8.39 seconds
-Build - Make                  PASS      212.01 seconds
-Make Check                    PASS      9.57 seconds
-Make Distcheck                PASS      249.30 seconds
-Build w/ext ELL - Configure   PASS      8.40 seconds
-Build w/ext ELL - Make        PASS      199.45 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============0181118328273124133==--
+Tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+>  
+> -- 
+> 2.31.1
