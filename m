@@ -2,162 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81CFEC4320A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 08:25:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D25DCC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 18:20:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6895360FD9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 08:25:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B95F660F46
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 18:20:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236119AbhHKIZr (ORCPT
+        id S230099AbhHKSVN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Aug 2021 04:25:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55482 "EHLO
+        Wed, 11 Aug 2021 14:21:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55560 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236083AbhHKIZn (ORCPT
+        with ESMTP id S230000AbhHKSVM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Aug 2021 04:25:43 -0400
-Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE074C061765
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 01:25:19 -0700 (PDT)
-Received: by mail-wr1-x431.google.com with SMTP id x12so1838883wrr.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 01:25:19 -0700 (PDT)
+        Wed, 11 Aug 2021 14:21:12 -0400
+Received: from mail-yb1-xb2d.google.com (mail-yb1-xb2d.google.com [IPv6:2607:f8b0:4864:20::b2d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44F47C061765
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 11:20:48 -0700 (PDT)
+Received: by mail-yb1-xb2d.google.com with SMTP id a93so6450835ybi.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 11:20:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20150623.gappssmtp.com; s=20150623;
-        h=from:to:cc:subject:in-reply-to:references:date:message-id
-         :mime-version;
-        bh=JopxvpFcF/xGESdrh4YQ6rS5KF8DueMkBM15FR5p2zI=;
-        b=n3GjMA9nWMZfHn1qsTgkJAuyGzL7OvGstvZa+uwtSC2+i980Z9CA2iu8oOVRxObgnI
-         Aezd0jo4cnZVKdtebsXlMzqO10Q6xB2O8BzwtbmHl24c9jv5M6oyfUUaAH7bxs6uIenr
-         PbJclzvvkgFR4FwGJ5ueJGIurDvI092GZu3MAvZr5zYCIO2ndBJd/aCoHNOSOV9kEBUB
-         eqE78uIrrVM4Xd9n3xrmpsEfjY6oPgBlmdOGzcG9w5XyTZ9PTG19MMPUmjpRJPEqTrNQ
-         gRe7+3ARCXmXuoIe8vsh5v4FslmItbLzrM3ZumlK2nit9Fm5W2D2ovf5PV++CBuAfL+1
-         pmYA==
+        d=gmail.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=QWRT0vYS1yUrtl9+XsBHYWCj7E2m+Q9DbUKHPnMYR48=;
+        b=UNK6R3Yu9jrsxaDc1oLm7gs8Sxic34oGLYgfN3E3kyFrNW3YuhePa9w0oH607BbdIG
+         p27bFy4QRHCPdpNwjusgRGP2qrJ2jiBVHqBLbe6zdlIYRYvhnUW90HXvp6RB194JnY/G
+         en9yToXhBeYtT+CgyAKckQSh8hpaw87aDMzJ9XAtlHr3cPunoZGRO4y1pxG8v/lP3mAB
+         90TSVbcSNaMm07Rd1IMYzZkBpa/RsrjMEtwA8BuQlYCs8PxvWORyYhxabr+UfOgHstgr
+         RnzjEYl6Di5Rd/73CaUmRa0iR91A32seHUfg9d7RQjIstDOw6GvwyA+MkAZdqhme6P3w
+         Kuow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:in-reply-to:references:date
-         :message-id:mime-version;
-        bh=JopxvpFcF/xGESdrh4YQ6rS5KF8DueMkBM15FR5p2zI=;
-        b=GXdm2SmWIwf3YtdOGMluBttPP2Ayaa+NINQRyFXzpJ0RtsF9BU0LFZYRsP9fjmJg2k
-         /T8089d7FF1Pg8sTJK/mMqkQQEiYrydZtwWGsI4Ra0o5LYRjEvwqXyrSDxQftARbBOLW
-         +4RpcsBBDF+0eoWmk2+dH3PDlG2kA583WA4v72LOFjQVkt5nn0deOE4m/Z63NXEAeVrm
-         Ql0TnJJpmQgrtcYiOh98bHH/mR88XjMW4pVf5/8EoKpPyS7NeNx0w8TZq3WGD9eRP2It
-         iLHVLzcXuOnux468cMVfrWeU/XuuRWcyAzWj5GZaCIBwLA4u0tQ67p6O5979nEgfK7qZ
-         VlPg==
-X-Gm-Message-State: AOAM5315jM4LMor47qZEDlJ/FMOH5s6J28gN2BiwDGdnDDnSwvDGmRZ4
-        EKmC47AIN6J+G6tHkg4AS0ZRpQ==
-X-Google-Smtp-Source: ABdhPJzo1gv8/4u+SF3MPLGpjMOnRJmhlmd5mciRp3hwMU3HZV8PLwwodWiHGXiQrJKVriPPdr7lIg==
-X-Received: by 2002:a05:6000:120d:: with SMTP id e13mr11205849wrx.6.1628670318484;
-        Wed, 11 Aug 2021 01:25:18 -0700 (PDT)
-Received: from localhost ([2a01:cb19:826e:8e00:7c84:47f9:c111:a679])
-        by smtp.gmail.com with ESMTPSA id n8sm25498969wrx.46.2021.08.11.01.25.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 01:25:18 -0700 (PDT)
-From:   Mattijs Korpershoek <mkorpershoek@baylibre.com>
-To:     Kai-Heng Feng <kai.heng.feng@canonical.com>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     Kai-Heng Feng <kai.heng.feng@canonical.com>,
-        Hsin-Yi Wang <hsinyi@chromium.org>,
-        Guenter Roeck <linux@roeck-us.net>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] Bluetooth: Move shutdown callback before flushing tx
- and rx queue
-In-Reply-To: <20210810045315.184383-1-kai.heng.feng@canonical.com>
-References: <20210810045315.184383-1-kai.heng.feng@canonical.com>
-Date:   Wed, 11 Aug 2021 10:25:09 +0200
-Message-ID: <87pmuk75i2.fsf@baylibre.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=QWRT0vYS1yUrtl9+XsBHYWCj7E2m+Q9DbUKHPnMYR48=;
+        b=YVViGspt3Wy00mEdRT+OWMmcokfERU+8ptcNO3hhLvRMmKOMoUqjFI4RmrmdbA6x2u
+         kXzUs/OiW/RBfMpySnEzr7IL83hnjF1al1XdeWFEzn7kGxqbfpWVpRQFepv68wxNuy04
+         r1EyIYnS6HDPOoUCTIOq7qXOehY6+MrUfR8T4RsKDunCtr7CnLiY3zRsbEnDkCq/I+Q4
+         ATo9ap03Z7PNAWCGSi8QH+THofusBRbaemSl9AYgvX6F4aoFSziyj5BYXyYXHEHytsBR
+         mVwwn5lqMqlzi1i8oql9qGrmLQFVA5dIFBxAy/l7HzK9Lrv/CahIsmk1wkTU7loLkjH1
+         vpSg==
+X-Gm-Message-State: AOAM532tfwqSGvDpsAg+Oj80w5eQpMJJazhDaQytqPEHrrXptr7J4iLH
+        WmVN7YYck9bOrHRLlC76hjmqocsbLZwugRm4obkzJaN/
+X-Google-Smtp-Source: ABdhPJxiUUSQ1pqB+btcN1lB/BjWbOSsTVYFh/FuHSd+pn/Lj7sLcKYHqO9xcxh1DWuEuPR0Nb7R4eRr77jBHW8A+bc=
+X-Received: by 2002:a25:bd89:: with SMTP id f9mr40476054ybh.222.1628706047255;
+ Wed, 11 Aug 2021 11:20:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain
+References: <20210811150752.v3.1.Ie7d876ad0b7defabfa86beb64e83f655f12be7ab@changeid>
+ <61137d4f.1c69fb81.d26ad.c894@mx.google.com>
+In-Reply-To: <61137d4f.1c69fb81.d26ad.c894@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 11 Aug 2021 11:20:36 -0700
+Message-ID: <CABBYNZKwMufxMDvef_DhvD=zKS-1szhtaF6jvSHGfvTu=C7JwA@mail.gmail.com>
+Subject: Re: [v3,1/3] shared/shell: fix missing stdbool in shell.h
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Yun-hao Chung <howardchung@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kai-Heng,
+Hi Howard,
 
-Thank you for your patch.
-
-Kai-Heng Feng <kai.heng.feng@canonical.com> writes:
-
-> Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
-> are flushed or cancelled") introduced a regression that makes mtkbtsdio
-> driver stops working:
-> [   36.593956] Bluetooth: hci0: Firmware already downloaded
-> [   46.814613] Bluetooth: hci0: Execution of wmt command timed out
-> [   46.814619] Bluetooth: hci0: Failed to send wmt func ctrl (-110)
+On Wed, Aug 11, 2021 at 12:35 AM <bluez.test.bot@gmail.com> wrote:
 >
-> The shutdown callback depends on the result of hdev->rx_work, so we
-> should call it before flushing rx_work:
-> -> btmtksdio_shutdown()
->  -> mtk_hci_wmt_sync()
->   -> __hci_cmd_send()
->    -> wait for BTMTKSDIO_TX_WAIT_VND_EVT gets cleared
+> This is automated email and please do not reply to this email!
 >
-> -> btmtksdio_recv_event()
->  -> hci_recv_frame()
->   -> queue_work(hdev->workqueue, &hdev->rx_work)
->    -> clears BTMTKSDIO_TX_WAIT_VND_EVT
+> Dear submitter,
 >
-> So move the shutdown callback before flushing TX/RX queue to resolve the
-> issue.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=529629
 >
-> Reported-and-tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
-> Tested-by: Hsin-Yi Wang <hsinyi@chromium.org>
-> Cc: Guenter Roeck <linux@roeck-us.net>
-> Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
-> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.88 seconds
+> GitLint                       PASS      0.30 seconds
+> Prep - Setup ELL              PASS      39.82 seconds
+> Build - Prep                  PASS      0.10 seconds
+> Build - Configure             PASS      6.97 seconds
+> Build - Make                  PASS      172.65 seconds
+> Make Check                    PASS      9.56 seconds
+> Make Distcheck                PASS      204.28 seconds
+> Build w/ext ELL - Configure   PASS      7.09 seconds
+> Build w/ext ELL - Make        PASS      163.00 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
 > ---
-> v2: 
->  Move the shutdown callback before clearing HCI_UP, otherwise 1)
->  shutdown callback won't be called and 2) other routines that depend on
->  HCI_UP won't work.
->
->  net/bluetooth/hci_core.c | 16 ++++++++--------
->  1 file changed, 8 insertions(+), 8 deletions(-)
->
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index cb2e9e513907..8622da2d9395 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1727,6 +1727,14 @@ int hci_dev_do_close(struct hci_dev *hdev)
->  	hci_request_cancel_all(hdev);
->  	hci_req_sync_lock(hdev);
->  
-> +	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> +	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> +	    test_bit(HCI_UP, &hdev->flags)) {
-> +		/* Execute vendor specific shutdown routine */
-> +		if (hdev->shutdown)
-> +			hdev->shutdown(hdev);
-> +	}
-> +
->  	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
->  		cancel_delayed_work_sync(&hdev->cmd_timer);
->  		hci_req_sync_unlock(hdev);
-> @@ -1798,14 +1806,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
->  		clear_bit(HCI_INIT, &hdev->flags);
->  	}
->  
-> -	if (!hci_dev_test_flag(hdev, HCI_UNREGISTER) &&
-> -	    !hci_dev_test_flag(hdev, HCI_USER_CHANNEL) &&
-> -	    test_bit(HCI_UP, &hdev->flags)) {
-> -		/* Execute vendor specific shutdown routine */
-> -		if (hdev->shutdown)
-> -			hdev->shutdown(hdev);
-> -	}
-> -
->  	/* flush cmd  work */
->  	flush_work(&hdev->cmd_work);
-I confirm this works fine on mt8183-pumpkin using the btmtksdio driver.
+> Regards,
+> Linux Bluetooth
 
-Tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
->  
-> -- 
-> 2.31.1
+Applied, thanks.
+
+-- 
+Luiz Augusto von Dentz
