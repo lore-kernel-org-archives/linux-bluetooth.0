@@ -2,274 +2,234 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1703BC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 10:55:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71AACC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 11:51:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E7C5260EE2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 10:55:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EDC06104F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 11:51:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236614AbhHLK4E (ORCPT
+        id S236091AbhHLLwI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 06:56:04 -0400
-Received: from mga02.intel.com ([134.134.136.20]:6920 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236478AbhHLK4D (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 06:56:03 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10073"; a="202515122"
-X-IronPort-AV: E=Sophos;i="5.84,315,1620716400"; 
-   d="scan'208";a="202515122"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 12 Aug 2021 03:55:37 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,315,1620716400"; 
-   d="scan'208";a="590591758"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmsmga001.fm.intel.com with ESMTP; 12 Aug 2021 03:55:37 -0700
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Thu, 12 Aug 2021 03:55:36 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Thu, 12 Aug 2021 03:55:36 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Thu, 12 Aug 2021 03:55:36 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TF63YktAMLhZHwJHDvupI+t22RouZZSLrlZUBW2YoIA1Yw4llR1+ZMtknCXlPC03FrvqomjIeQ7RIuCTPuZ46yWgskv1WyKYaXo3WFw5cQtJN01kzLaGwCsEcVMIswQEJwx4scvPdz7OJaupIcOMyH/9TUIg9QmjbLHTW6Gx5KeFneAnUr/a6grbmdq0d8nwLLZCx9fjD6OUx80BfWB+9p7E35XZqw8Mv5b/nYmT27DUchQQe1lvOIqhvcHI1Hlf3/L6GvBEp0i9MdEN5OWSEQ+R8ptXpSvAXjdk25L1ONzJUB9lHR4+G+9oDTkC64JtsfQU/BAHrwOsdq5Y+ksyZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nK2x6CuaG5m6P0aJDZSHyYzU03N2lY32UJ91GM/CkZ8=;
- b=DDhVstWREquX7FT/pDKFYAuPYMJ3X8HcPn0IFtZIBgWFvaCNOPhda/gOYbB+AlZUfqJdXghwU+G6BpuymYLgW9p+ve/ns6nurAgun0IghLMVWR4kffZ7W0nWkIUunrle56Ralu031MXfuokC4YNnR4OWrFHKQvNsApo7CCC9P16bQDlSlPxlvy1vQ9sySkeOnJ9NEHagEkIIwJ7KoEO0qKZJByFhxXpOtL+cCLurkK+/nmcT971Fq99v977P391nxEdtFD2uNh2wdJ8gS1dJVlZZZ1rYWXkBROEx7GH9d4EOmH4CZJmCdqvfflFps2/5WmFl3aydnUj1xwUwq/sRGA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nK2x6CuaG5m6P0aJDZSHyYzU03N2lY32UJ91GM/CkZ8=;
- b=bG8dKHb/kAd8VYKah6a87wCRAwf2D4QgCa0wpvEez/xLtrVUEw6yFDoQ1hgm1SI6JhR/Ex8YVRofjN9Rzp5bWNZWaP9niYpyeQ8o8i7ZgHjZu7lCgOGLSpzEYGwYvsNjCrcI7DUusNEBmb8tvAM8Qdc81HejAdqMKmPWuktBFFA=
-Received: from DM8PR11MB5573.namprd11.prod.outlook.com (2603:10b6:8:3b::7) by
- DM4PR11MB5566.namprd11.prod.outlook.com (2603:10b6:5:39c::20) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4415.16; Thu, 12 Aug 2021 10:55:35 +0000
-Received: from DM8PR11MB5573.namprd11.prod.outlook.com
- ([fe80::c134:db0a:48b:a88c]) by DM8PR11MB5573.namprd11.prod.outlook.com
- ([fe80::c134:db0a:48b:a88c%3]) with mapi id 15.20.4415.017; Thu, 12 Aug 2021
- 10:55:35 +0000
-From:   "K, Kiran" <kiran.k@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     BlueZ <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Subject: RE: [PATCH v1] Bluetooth: Fix race condition in handling NOP command
-Thread-Topic: [PATCH v1] Bluetooth: Fix race condition in handling NOP command
-Thread-Index: AQHXiVcmy61Y/5HvckOI5dFZpf8b3qtk5AYAgAGqIMCACS/vsA==
-Date:   Thu, 12 Aug 2021 10:55:35 +0000
-Message-ID: <DM8PR11MB55733AD00D7FB779732063B4F5F99@DM8PR11MB5573.namprd11.prod.outlook.com>
-References: <20210804173939.25496-1-kiran.k@intel.com>
- <CB7F6AB9-E997-4C77-B19D-D018F8044001@holtmann.org>
- <DM8PR11MB55738B15758672E2982D748AF5F39@DM8PR11MB5573.namprd11.prod.outlook.com>
-In-Reply-To: <DM8PR11MB55738B15758672E2982D748AF5F39@DM8PR11MB5573.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-dlp-reaction: no-action
-dlp-version: 11.5.1.3
-dlp-product: dlpe-windows
-authentication-results: holtmann.org; dkim=none (message not signed)
- header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 9141035b-08a3-489b-0e6c-08d95d7fb6c3
-x-ms-traffictypediagnostic: DM4PR11MB5566:
-x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM4PR11MB556621A93EFA8C04F7360533F5F99@DM4PR11MB5566.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:9508;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: I8tMUirhSoKdgYhCPC00cBTCCRVD9Vz0ywexgyAgn+YiPMWhZzayM9nUVa1ZtbUHS0CAroeI1x8Bc8RD0tlYng5+N99ZBw9sh521zO8SL2kg4K4EpwoaC2fy2rR8gIRyjv93K/vlaF4HRTfajUil5bvay/CaFr2APXrgivKWc0GSwdZKEMT/WsPhkU/f1IcySx13/X43eB/7Yc1I5nEj9c992rhsMhASAIijQI7KE0oVrfEC2qvOWcuOjYQlucSrYcP9IP4tt3APQYk8yREYXiXLVMXvA3ng8Dhd3XM4CjgVRcaIyqdon1q1YCowcFOX1Mw7/Ffnb821KRKrU7M6ApGnXw7Xiw71j62vS3dlIrOJeW2xg0UDMTLYVMna8uKwLh9uoyU8UL+gPLub3I3EsHcXTGTNNI5DZMGiWlydTQ4rjulI8H6WeiMK1j97PuNikUK+kPcD1HXEyUNsSSj63C0k4BKZIoyjb21hZoze8j2ZCMZqhItLhEReSs+tKSSVb1ZHa7zFrNKJpuITz1CaSMgCJt5t16ZjZWKW5QgWL1ClxbGIAfmQVY/4FqRyMU7HdwYve3/qHvtZZ2AEjD7Udr7hbrRIFATENd6Xj5qH4nlCWr55N7qJ4Sr5uxs1/7pLyTIwwURfKIR2OH1qE1bLrYYaCe/fFs6J6dbeVBg9UJqysXdxNJg8XPXxvR8x7ZYCthJWFa0QgZmW/viYhedLvQ==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(136003)(396003)(346002)(376002)(39860400002)(366004)(6506007)(83380400001)(9686003)(33656002)(8936002)(86362001)(55016002)(53546011)(66476007)(64756008)(122000001)(66556008)(66446008)(66946007)(316002)(8676002)(6916009)(2906002)(38070700005)(107886003)(38100700002)(54906003)(71200400001)(26005)(52536014)(5660300002)(4326008)(76116006)(478600001)(7696005)(186003);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?fKRN3Um3JjUidmkjxlhURZz4BVXZdQ8V5VecAm8hkXRyYn9vEdtxwAvFek0P?=
- =?us-ascii?Q?68J8RYiZTlmn4w8bntgMzyzD+5NoclSUXbBcZh07AiJz1qR7FArLomDB5W7j?=
- =?us-ascii?Q?zgJaRj6L8TDZjImfEMcFIZ0UA339Lnuq0XF/G1Avz7ySBOaO/5Go+DEYR5pd?=
- =?us-ascii?Q?MaxiYGfP4uOH0HRzIFYHnp3/9TV7VtkYDbmlHyChNPHM1rdz9hflAwVacR9t?=
- =?us-ascii?Q?jwBvCXV7beN6YvBjEA/MmG51C3XoKJyzQ5AURDGhqdRLfT5rJz5TCvi5Pwe4?=
- =?us-ascii?Q?7ZWvNDg/kRZCWatPkbXun/oQ2M4jnCKBcqPqoQ8jR+7kumNLhY6YdmykWdRy?=
- =?us-ascii?Q?eBrm5auep96fSZOSNZmwL0eroC7zDjXbrGcdwS2EMzIsOTeKxzGF75VBWtvb?=
- =?us-ascii?Q?ApcxrzMUA/HMKi0/L3I5j1lpOSSnnCV3vLAGRSmiXwcR44VsQpTFTBKf+pS4?=
- =?us-ascii?Q?54LGojsHmvRc4T7MkgQbvnAtEnGhaFRbmyyXw5pQrPVGW7+YKRIQA4RXFzE2?=
- =?us-ascii?Q?EamTT1cw74LGL1U7jcjdEHE5+aqMRDhf/BTff6IVyQ411S2oeUbsNKTYvQlr?=
- =?us-ascii?Q?42Nt99i6SmkRKOIH9niRTNH0SXnkNs5nGscOgCMSVOesPOccADA+htv04IZN?=
- =?us-ascii?Q?Uk1Op0DblsqjnU9JY5j+YEHXhxhnzFPhxQ4+1eHT37Ctx2nqgeuWX4pIyywG?=
- =?us-ascii?Q?K9AZsXFTxwLYFX42UjgHaDvcYk+aYunqxmreiXG3F2MUJjS24/aNYPPf1Ruf?=
- =?us-ascii?Q?oLK4tkOEBZcQlcpsqItHLKa1sjWcthx59qm2KSKgZ/2TTp1Oj4/2aPJU1QCG?=
- =?us-ascii?Q?eB0U3oMO9L8yJCV6SqBVFdfn43SB5Vv+ExgqSjlHTgR+ojQH0Pagb/mIgYxz?=
- =?us-ascii?Q?nCKCNC6SbmbD63Q55Dk/zqk0xJH3PTTcCp8f7Al1fiSB1QOSquij9DsZV8rd?=
- =?us-ascii?Q?Mw8H43PEyZ6nSOSwwZ7vNDtRmQtsEej5NVV2t6+Uc6iuN2e4iziqI5gBRhBr?=
- =?us-ascii?Q?7v19qRxrV4W4BMFTVo4/Pc+6B3hi8wHKXatCy9nx4uSG/4gTIBsxq+p0MGPI?=
- =?us-ascii?Q?uQ3RUcy2QtQ6XOy1wMKSFRGUl/Fw+/LzPvzZ/qjRcPDtdJGOoG7uubS3Azpl?=
- =?us-ascii?Q?p5qWfQATp8ETULlhgZwmthxtScISNPoS1b1X+CIsXFJxnamSS4qG36KvBcP5?=
- =?us-ascii?Q?V5Lf6O4LwdTL1F3H0KIByLSjQPZ10Z2tFYmDJWjM+45ylshua4OMa5/QIrsn?=
- =?us-ascii?Q?Tpc60iM3ZJGaiNwc5e3XvESuVvDMZ4v+ATFF57fcBV3D3jBQVcwYhkeSiF4E?=
- =?us-ascii?Q?BeQTxcChjH0OAXP1axhsRf3j?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        Thu, 12 Aug 2021 07:52:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40244 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231392AbhHLLwH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Aug 2021 07:52:07 -0400
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 50E0EC061798
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 04:51:42 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id m17so6395613ljp.7
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 04:51:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=rlpdpuyXj6YcNBgZUFrzgm9MUoy7FdsTwlVLZC96hnM=;
+        b=e8lal5KGHnYw27Nzezea4mPqS8PsL8syAdJLEzc7WSQamFLN7O+qo/grxGSjgYJDH2
+         43qh6N1fpxrYO92R0/tCL6V2jPa9PdLFphVpSKVji3ntNZKRznd467OTrpJQGmtyjINI
+         KxRX223o+nHAkva7iO3g3el91+XJk+PCWWzODif/QK4BrX9fi0oUPgNfAP2iHdfC7KSc
+         Jpei27UAMcx1/2l4PPTbuNjCBS7h8RsmIi6PdfV4VbGJNOBo5hUVjvZ/81lG5KIqWzLM
+         Jt7P/uO1qkHUK0q948a9AUrFzONbqXm+zqxfRwRVBnv8L2PJk8Yh0178bYNfiaG8WVlX
+         s7hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=rlpdpuyXj6YcNBgZUFrzgm9MUoy7FdsTwlVLZC96hnM=;
+        b=VRmHkp5ZygTVSaRG5VLAYFy2vEN2ojW2y0h9q70cNlvmufrJpa6LNKCAfbWJKSumzM
+         yywzBl4KT90+yqgRM8xwdQhwxT+BZ6+MZdb/o/9oy2jFZsKoPQQo1BuDER0dHMNsY1bG
+         wNFt2wOPhNaSfwBs8xZz45D9/u+Rcf/CGDqdXIMvAKmT9tDVM/pSdsFAOzzSihpDmFZE
+         jLTUh1e7ob/882aQ1HAZ/UzSv/LRNWpi+B31UzGG9hXjOZe94GohnMzkH1uGRFfUYK6G
+         xgbYqY6Zh3LQamVWvVQ0DEtkBXVhh73mD+kuMB/0dEu08Q2pVOLGo7nxaaX+TkxCbiyE
+         DCTA==
+X-Gm-Message-State: AOAM530A35e3B0mf4qdZaDH5uaIrPph7mN21/Ze7U4GysAeNRWRlXP5y
+        EzF1bURt24rd8k+IUoLkgMaW/6oZz/YpnQ==
+X-Google-Smtp-Source: ABdhPJzql9g5fBF4mq+NLEY566G+mWwLgg8dtZ4uSst93znXBx6EANp13aunHuiohly4Q6dSPuiZHQ==
+X-Received: by 2002:a2e:bc19:: with SMTP id b25mr2634281ljf.374.1628769100450;
+        Thu, 12 Aug 2021 04:51:40 -0700 (PDT)
+Received: from [192.168.1.211] ([37.153.55.125])
+        by smtp.gmail.com with ESMTPSA id n18sm239038lft.267.2021.08.12.04.51.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Aug 2021 04:51:40 -0700 (PDT)
+Subject: Re: [PATCH v3 2/7] regulator: qca6390: add support for QCA639x
+ powerup sequence
+To:     Ulf Hansson <ulf.hansson@linaro.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc:     Rob Herring <robh@kernel.org>, Peter Chen <peter.chen@kernel.org>,
+        Mark Brown <broonie@kernel.org>,
+        Andy Gross <agross@kernel.org>,
+        Liam Girdwood <lgirdwood@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        DTML <devicetree@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org
+References: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
+ <20210621223141.1638189-3-dmitry.baryshkov@linaro.org>
+ <CAPDyKFo6dmjw0TnaK7=35dq5Si_6YYpeeSa=gU++1od7WkQZ7A@mail.gmail.com>
+ <20210706115517.GB4529@sirena.org.uk>
+ <CAPDyKFr=8spZBD+bTe3SjS=nATL-ByFu_epnT2Z4chSuQNke2w@mail.gmail.com>
+ <CAA8EJppSV--TBjnGxGhaTHeKWdpM6uz70bg7diU3_K7OHoka4g@mail.gmail.com>
+ <20210714164710.GC2719790@robh.at.kernel.org>
+ <CAPDyKFokvTFSpbnhhKeCmZzAjqvSpUiwz7QjjQNdcd3Sd3T0rQ@mail.gmail.com>
+ <YRKjQJc0yiQXFqCD@builder.lan>
+ <CAPDyKFo+O34rvP7gbsC+ktd-p5QB9QAsbb+QEkWbiVqszChZJA@mail.gmail.com>
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Message-ID: <a053aef6-5f15-7b7c-7991-a4e74fb714ed@linaro.org>
+Date:   Thu, 12 Aug 2021 14:51:39 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9141035b-08a3-489b-0e6c-08d95d7fb6c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 12 Aug 2021 10:55:35.7146
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lfI9YfuRdkSF4BDbs+Lq64dvf6lupHJBdzu1joSwARSC5GrPt8DNNaRI9a+okv01sZ8bQ3ljgR6sIj7Mdldnog==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5566
-X-OriginatorOrg: intel.com
+In-Reply-To: <CAPDyKFo+O34rvP7gbsC+ktd-p5QB9QAsbb+QEkWbiVqszChZJA@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On 12/08/2021 12:48, Ulf Hansson wrote:
+> On Tue, 10 Aug 2021 at 18:03, Bjorn Andersson
+> <bjorn.andersson@linaro.org> wrote:
+>>
+>> On Tue 10 Aug 06:55 CDT 2021, Ulf Hansson wrote:
+>>
+>>> On Wed, 14 Jul 2021 at 18:47, Rob Herring <robh@kernel.org> wrote:
+>>>>
+>>>> On Thu, Jul 08, 2021 at 02:37:44PM +0300, Dmitry Baryshkov wrote:
+>>>>> Hi,
+>>>>>
+>>>>> On Thu, 8 Jul 2021 at 13:10, Ulf Hansson <ulf.hansson@linaro.org> wrote:
+>>>>>>
+>>>>>> - Peter (the email was bouncing)
+>>>>>
+>>>>> + Peter's kernel.org address
+>>>>>
+>>>>>>
+>>>>>> On Tue, 6 Jul 2021 at 13:55, Mark Brown <broonie@kernel.org> wrote:
+>>>>>>>
+>>>>>>> On Tue, Jul 06, 2021 at 09:54:03AM +0200, Ulf Hansson wrote:
+>>>>>>>> On Tue, 22 Jun 2021 at 00:32, Dmitry Baryshkov
+>>>>>>>
+>>>>>>>>> Qualcomm QCA6390/1 is a family of WiFi + Bluetooth SoCs, with BT part
+>>>>>>>>> being controlled through the UART and WiFi being present on PCIe
+>>>>>>>>> bus. Both blocks share common power sources. Add device driver handling
+>>>>>>>>> power sequencing of QCA6390/1.
+>>>>>>>
+>>>>>>>> Power sequencing of discoverable buses have been discussed several
+>>>>>>>> times before at LKML. The last attempt [1] I am aware of, was in 2017
+>>>>>>>> from Peter Chen. I don't think there is a common solution, yet.
+>>>>>>>
+>>>>>>> This feels a bit different to the power sequencing problem - it's not
+>>>>>>> exposing the individual inputs to the device but rather is a block that
+>>>>>>> manages everything but needs a bit of a kick to get things going (I'd
+>>>>>>> guess that with ACPI it'd be triggered via AML).  It's in the same space
+>>>>>>> but it's not quite the same issue I think, something that can handle
+>>>>>>> control of the individual resources might still struggle with this.
+>>>>>>
+>>>>>> Well, to me it looks very similar to those resouses we could manage
+>>>>>> with the mmc pwrseq, for SDIO. It's also typically the same kind of
+>>>>>> combo-chips that moved from supporting SDIO to PCIe, for improved
+>>>>>> performance I guess. More importantly, the same constraint to
+>>>>>> pre-power on the device is needed to allow it to be discovered/probed.
+>>>>>
+>>>>> In our case we'd definitely use pwrseq for PCIe bus and we can also
+>>>>> benefit from using pwrseq for serdev and for platform busses also (for
+>>>>> the same story of WiFi+BT chips).
+>>>>>
+>>>>> I can take a look at rewriting pwrseq code to also handle the PCIe
+>>>>> bus. Rewriting it to be a generic lib seems like an easy task,
+>>>>> plugging it into PCIe code would be more fun.
+>>>>>
+>>>>> Platform and serdev... Definitely even more fun.
+>>>>
+>>>> I don't want to see pwrseq (the binding) expanded to other buses. If
+>>>> that was the answer, we wouldn't be having this discussion. It was a
+>>>> mistake for MMC IMO.
+>>>
+>>> Let's make sure we get your point correctly. I think we have discussed
+>>> this in the past, but let's refresh our memories.
+>>>
+>>> If I recall correctly, you are against the mmc pwrseq DT bindings
+>>> because we are using a separate pwrseq OF node, that we point to via a
+>>> "mmc-pwrseq" property that contains a phandle from the mmc controller
+>>> device node. Is that correct?
+>>>
+>>> If we would have encoded the power sequence specific properties, from
+>>> within a child node for the mmc controller node, that would have been
+>>> okay for you, right?
+>>>
+>>
+>> In Dmitry's case, we have an external chip with that needs to be powered
+>> on per a specific sequence, at which point the WiFi driver on PCIe and
+>> BT driver on serdev will be able to communicate with the device.
+> 
+> Thanks for sharing more details.
+> 
+> So, not only do we have a discoverable device that needs to be powered
+> on in a device specific way before probing, but in fact we have two
+> consumers of that "combo chip", one (PCIe) for Wifi and one (serdev)
+> for Bluetooth.
+> 
+>>
+>> The extended case of this is where we have an SDX55 modem soldered onto
+>> the pcb next to the SoC, in which case the power sequencing is even more
+>> complex and additionally there are incoming gpios used to detect things
+>> such as the firmware of the modem has crashed and Linux needs to toggle
+>> power and rescan the PCIe bus.
+> 
+> That sounds very similar to what we manage for the SDIO bus already.
+> 
+> We have a mmc pwrseq node to describe what resources that are needed
+> to power on/off the external chip. The driver for the functional
+> device (Wifi chip for example) may then call SDIO APIs provided by the
+> mmc core to power on/off the device, in case some kind of reset would
+> be needed.
+> 
+> Additionally, we have a child node below the mmc controller node,
+> allowing us to describe device specific things for the SDIO functional
+> device, like an out-of-band IRQ line for example.
+> 
+> Overall, this seems to work fine, even if the DT bindings may be questionable.
+> 
+>>
+>> In both of these cases it seems quite reasonable to represent that
+>> external chip (and it's power needs) as a separate DT node. But we need
+>> a way to link the functional devices to that thing.
+> 
+> Don't get me wrong, I am not suggesting we should re-use the
+> mmc-pwrseq DT bindings - but just trying to share our experience
+> around them.
+> 
+> In the cases you describe, it certainly sounds like we need some kind
+> of minimal description in DT for these functional external devices.
+> For GPIO pins, for example.
+> 
+> How to describe this in DT is one thing, let's see if Rob can help to
+> point us in some direction of what could make sense.
+> 
+> When it comes to implementing a library/interface to manage these
+> functional devices, I guess we just have to continue to explore
+> various options. Perhaps just start simple with another subsystem,
+> like PCIe and see where this brings us.
 
-> -----Original Message-----
-> From: K, Kiran
-> Sent: Friday, August 6, 2021 8:14 PM
-> To: 'Marcel Holtmann' <marcel@holtmann.org>
-> Cc: BlueZ <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishankar
-> <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
-> <chethan.tumkur.narayan@intel.com>
-> Subject: RE: [PATCH v1] Bluetooth: Fix race condition in handling NOP
-> command
->=20
-> Hi Marcel,
->=20
-> > -----Original Message-----
-> > From: Marcel Holtmann <marcel@holtmann.org>
-> > Sent: Thursday, August 5, 2021 6:41 PM
-> > To: K, Kiran <kiran.k@intel.com>
-> > Cc: BlueZ <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishankar
-> > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
-> > <chethan.tumkur.narayan@intel.com>
-> > Subject: Re: [PATCH v1] Bluetooth: Fix race condition in handling NOP
-> > command
-> >
-> > Hi Kiran,
-> >
-> > > For NOP command, need to cancel work scheduled on cmd_timer, on
-> > > receiving command status or commmand complete event.
-> > >
-> > > Below use case might lead to race condition multiple when NOP
-> > > commands are queued sequentially:
-> > >
-> > > hci_cmd_work() {
-> > >   if (atomic_read(&hdev->cmd_cnt) {
-> > >            .
-> > >            .
-> > >            .
-> > >      atomic_dec(&hdev->cmd_cnt);
-> > >      hci_send_frame(hdev,...);
-> > >      schedule_delayed_work(&hdev->cmd_timer,...);
-> > >   }
-> > > }
-> > >
-> > > On receiving event for first NOP, the work scheduled on
-> > > hdev->cmd_timer is not cancelled and  second NOP is dequeued and
-> > > hdev->sent
-> > to controller.
-> > >
-> > > While waiting for an event for second NOP command, work scheduled on
-> > > cmd_timer for first NOP can get scheduled, resulting in sending
-> > > third NOP command not waiting for an event for second NOP. This
-> > > might cause issues at controller side (like memory overrun,
-> > > controller going
-> > > unresponsive) resulting in hci tx timeouts, hardware errors etc.
-> > >
-> > > Signed-off-by: Kiran K <kiran.k@intel.com>
-> > > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> > > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> > > ---
-> > > net/bluetooth/hci_event.c | 3 +--
-> > > 1 file changed, 1 insertion(+), 2 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index ea7fc09478be..14dfbdc8b81b 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -3271,8 +3271,7 @@ static void hci_remote_features_evt(struct
-> > > hci_dev *hdev, static inline void handle_cmd_cnt_and_timer(struct
-> > > hci_dev
-> > *hdev,
-> > > 					    u16 opcode, u8 ncmd)
-> > > {
-> > > -	if (opcode !=3D HCI_OP_NOP)
-> > > -		cancel_delayed_work(&hdev->cmd_timer);
-> > > +	cancel_delayed_work(&hdev->cmd_timer);
-> > >
-> > > 	if (!test_bit(HCI_RESET, &hdev->flags)) {
-> > > 		if (ncmd) {
-> >
-> > so this is conflicting with the patch introducing the ncmd timeout hand=
-ling.
-> >
-> My patch specifically addresses the issue observed in case of NOP command=
-.
-> It prevents the issue by handling NOP same as any other SIG command.
->=20
-> It looks commit de75cd0d9b2f3250d5f25846bb5632ccce6275f4 tries to
-> recover when controller goes bad.
->=20
-
-Do you have any further comments here ? Waiting for your input.=20
-
-> > commit de75cd0d9b2f3250d5f25846bb5632ccce6275f4
-> > Author: Manish Mandlik <mmandlik@google.com>
-> > Date:   Thu Apr 29 10:24:22 2021 -0700
-> >
-> >     Bluetooth: Add ncmd=3D0 recovery handling
-> >
-> >     During command status or command complete event, the controller
-> > may set
-> >     ncmd=3D0 indicating that it is not accepting any more commands. In =
-such a
-> >     case, host holds off sending any more commands to the controller. I=
-f the
-> >     controller doesn't recover from such condition, host will wait fore=
-ver,
-> >     until the user decides that the Bluetooth is broken and may power c=
-ycles
-> >     the Bluetooth.
-> >
-> >     This patch triggers the hardware error to reset the controller and
-> >     driver when it gets into such state as there is no other wat out.
-> >
-> > Nowhere in your commit description you are addressing why is this the
-> > right to do.
-> >
->=20
-> Will fix it in the next version if you are OK with the current fix. Pleas=
-e let me
-> know.
->=20
-> > Regards
-> >
-> > Marcel
->=20
-> Thanks,
-> Kiran
-
-Thanks,
-Kiran
+Thank you for your opinion and suggestions. In fact I'm probably going 
+to start working on non-discoverable busses first (by chaning support 
+for few other BT+WiFi Qualcomm chips), later shifting the attention to 
+the PCIe part. While this may seem like a longer path, I'd like to 
+narrow pwrseq subsystem first, before going into PCIe details.
 
 
+-- 
+With best wishes
+Dmitry
