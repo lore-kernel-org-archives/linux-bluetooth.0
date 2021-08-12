@@ -5,68 +5,67 @@ X-Spam-Level:
 X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DACF1C43214
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A70B1C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A72CF6101E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7DCEC60F00
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235856AbhHLJQl (ORCPT
+        id S235918AbhHLJQu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 05:16:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60858 "EHLO
+        Thu, 12 Aug 2021 05:16:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60874 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235827AbhHLJQk (ORCPT
+        with ESMTP id S235876AbhHLJQm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 05:16:40 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF21BC0613D3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:15 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id hv22-20020a17090ae416b0290178c579e424so9711574pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:15 -0700 (PDT)
+        Thu, 12 Aug 2021 05:16:42 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B9E7C061798
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:18 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id j1so8361191pjv.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=qo2S1l3e71xDGUQfWsHR5ktR7WTQXcYye34NKBDFtAI=;
-        b=deU0oWZd89aB+49trFKTOg7MKEehWm8yLg8rNgsXBEGCWV1v15OF44GlTt9DcEbp6a
-         51WTBNB+buaDEiLBGv9vdNpgrCepUTvheY31H1CuK4rkNnFp4qBBEd4YRiDV4xipvyvl
-         1GIrm64DUsJV2t3g7ECk4FbyrJgKHwddpTk8I=
+        bh=qxXfxfhTQ8I1FWAL9cuRyu2qW+TXm5vD2p6VKDoHTMY=;
+        b=fd3udbcS9E++cnTTFtndHAjez3IaOz1i+neRHFvp1oHgUghV1Qwc0h2r44beuB0VJo
+         U5VJBzdzbWN9ktpEW71t7ewnLzymUc4UPvOJ2g/aVFLxf+HTw9YF++xcv8zG7wQ3Vcpn
+         8/cNd42clr7ZGJ7naBwIleIH16zCSjyjRks18=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=qo2S1l3e71xDGUQfWsHR5ktR7WTQXcYye34NKBDFtAI=;
-        b=Ac6caMEi+gwjVmXUmCzfeExzXKw7J8ubpdhplJjK/LIxyEMo/Onyhp9kxVv7WHpnR8
-         jmvqzMTBhhvGJjTAF+eeMbDT/eeRZEQIoxFgX2ac6us8VeqcBjW+eFKtFfbV4xtSLd4r
-         H2sqvBVWJXmeRORhl8upxTk8l0e3/SRad9q5HNM8YLXDcAQF0hoDIldEtTO2g/n1LAqq
-         oTqmG2pYMD9r3R3FIaDJ9aBCbdTSS3NavQrsZIonAn9xEvj4tNT5nT5vxIwFVd4TK7+g
-         2tGn7p1KcAoINM/Jh52Wbez1yrmI19NTi3PpaRW5Dq2twuUEhfLecUiEobPxUmc9bYis
-         eicQ==
-X-Gm-Message-State: AOAM533x2qtBunYL6fV62aI9VbTrMttDbM42/SrIP2H3zUlkbooEO4aA
-        1txcWL7te3KovQ28Sn8luCRe1uX6WoDrXA==
-X-Google-Smtp-Source: ABdhPJzNk2Yzm3LutyAtcCBrSoc9D+D7v05i7cWh8iXHxER79J/h5SimnxqluGa/hkGVKVgl8CYJnQ==
-X-Received: by 2002:a17:90a:de8b:: with SMTP id n11mr15509950pjv.31.1628759775173;
-        Thu, 12 Aug 2021 02:16:15 -0700 (PDT)
+        bh=qxXfxfhTQ8I1FWAL9cuRyu2qW+TXm5vD2p6VKDoHTMY=;
+        b=nO/okP3nKNkIfAgHekLIJOaqM4qHUoaLLdBiDp4kET/xinM4zPa214o/BC4+CPeG9z
+         GpW3HuAImHcjcKc0XVlFDr+TnJIW+30SdbIl85WOu8x24whPf7LhLKPvmN8Ul+cgoD65
+         PXCi1MuQNvacuhjOy6T/ySMFRlV7DDDjDv0yv7PYq7si8FoDupL/MvlRFCPlEijx5LDX
+         lschQcx+O7PumUBPuWf0pET2I1skVPzGrSA+1l8vxv5PcBPsy3303oDIGzlhNwtTrNpI
+         cvIe1EyFb1JnsH2Y3zAiIIOGTY4LNQRJ9EofXaqzQGfMH9Kknmx9J0/Da2ETOvxN1p/P
+         VTyQ==
+X-Gm-Message-State: AOAM5312JTirH73WYTVlBl9x+l9rsQcokWs07XxNFvg7ovMqsa70CiMw
+        BmHcaYNbQV7eRAZ61LjndDLEGJshHX70Mg==
+X-Google-Smtp-Source: ABdhPJwCY1LvTFueH3bIUk8UPnLpJ0x1YtfTGQxKKijljHsE9nHr7jPxCayDJ4h1sKDNVYwE4SZ54Q==
+X-Received: by 2002:a17:90b:3144:: with SMTP id ip4mr15550715pjb.22.1628759777378;
+        Thu, 12 Aug 2021 02:16:17 -0700 (PDT)
 Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:8f67:7d0e:97df:b4b4])
-        by smtp.gmail.com with ESMTPSA id n32sm2563966pgl.69.2021.08.12.02.16.12
+        by smtp.gmail.com with ESMTPSA id n32sm2563966pgl.69.2021.08.12.02.16.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 12 Aug 2021 02:16:14 -0700 (PDT)
+        Thu, 12 Aug 2021 02:16:17 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
 Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
-        Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Kiran K <kiran.k@intel.com>,
         Joseph Hwang <josephsih@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v7 2/4] Bluetooth: btintel: support link statistics telemetry events
-Date:   Thu, 12 Aug 2021 17:15:59 +0800
-Message-Id: <20210812171533.v7.2.Ifb35feb49ec588106b256c508259500583582125@changeid>
+Subject: [PATCH v7 3/4] Bluetooth: set quality report callback for Intel
+Date:   Thu, 12 Aug 2021 17:16:00 +0800
+Message-Id: <20210812171533.v7.3.I50ffa4cd0b3ab11669ff2541fc719fee00b4e244@changeid>
 X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
 In-Reply-To: <20210812171533.v7.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
 References: <20210812171533.v7.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
@@ -76,14 +75,10 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
-
-This patch supports the link statistics telemetry events for
-intel controllers
+This patch sets up set_quality_report callback for Intel to
+set and reset the debug features.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
 Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
 
@@ -91,50 +86,160 @@ Changes in v7:
 - Rebase on Tedd's patches that moved functionality from btusb to
   btintel.
 
- drivers/bluetooth/btintel.c | 20 +++++++++++++++++++-
- 1 file changed, 19 insertions(+), 1 deletion(-)
+Changes in v5:
+- Removed CONFIG_BT_FEATURE_QUALITY_REPORT since there was no
+  large size impact.
+
+ drivers/bluetooth/btintel.c | 81 ++++++++++++++++++++++++++++++++++++-
+ drivers/bluetooth/btintel.h |  6 +++
+ 2 files changed, 86 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 0fe093fa5158..643e2194ca01 100644
+index 643e2194ca01..611c3ea5425f 100644
 --- a/drivers/bluetooth/btintel.c
 +++ b/drivers/bluetooth/btintel.c
-@@ -1285,8 +1285,10 @@ static int btintel_read_debug_features(struct hci_dev *hdev,
- static int btintel_set_debug_features(struct hci_dev *hdev,
- 			       const struct intel_debug_features *features)
- {
--	u8 mask[11] = { 0x0a, 0x92, 0x02, 0x07, 0x00, 0x00, 0x00, 0x00,
-+	u8 mask[11] = { 0x0a, 0x92, 0x02, 0x7f, 0x00, 0x00, 0x00, 0x00,
- 			0x00, 0x00, 0x00 };
-+	u8 period[5] = { 0x04, 0x91, 0x02, 0x05, 0x00 };
-+	u8 trace_enable = 0x02;
+@@ -1291,8 +1291,10 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
+ 	u8 trace_enable = 0x02;
  	struct sk_buff *skb;
  
- 	if (!features)
-@@ -1303,8 +1305,24 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
- 			   PTR_ERR(skb));
- 		return PTR_ERR(skb);
- 	}
-+	kfree_skb(skb);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc8b, 5, period, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Setting periodicity for link statistics traces failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
+-	if (!features)
++	if (!features) {
++		bt_dev_warn(hdev, "Debug features not read");
+ 		return -EINVAL;
 +	}
-+	kfree_skb(skb);
  
-+	skb = __hci_cmd_sync(hdev, 0xfca1, 1, &trace_enable, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Enable tracing of link statistics events failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
+ 	if (!(features->page1[0] & 0x3f)) {
+ 		bt_dev_info(hdev, "Telemetry exception format not supported");
+@@ -1323,9 +1325,77 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
+ 	}
  	kfree_skb(skb);
+ 
++	bt_dev_info(hdev, "set debug features: trace_enable 0x%02x mask 0x%02x",
++		    trace_enable, mask[3]);
 +
  	return 0;
  }
  
++static int btintel_reset_debug_features(struct hci_dev *hdev,
++				 const struct intel_debug_features *features)
++{
++	u8 mask[11] = { 0x0a, 0x92, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
++			0x00, 0x00, 0x00 };
++	u8 trace_enable = 0x00;
++	struct sk_buff *skb;
++
++	if (!features) {
++		bt_dev_warn(hdev, "Debug features not read");
++		return -EINVAL;
++	}
++
++	if (!(features->page1[0] & 0x3f)) {
++		bt_dev_info(hdev, "Telemetry exception format not supported");
++		return 0;
++	}
++
++	/* Should stop the trace before writing ddc event mask. */
++	skb = __hci_cmd_sync(hdev, 0xfca1, 1, &trace_enable, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Stop tracing of link statistics events failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++
++	skb = __hci_cmd_sync(hdev, 0xfc8b, 11, mask, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Setting Intel telemetry ddc write event mask failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++	kfree_skb(skb);
++
++	bt_dev_info(hdev, "reset debug features: trace_enable 0x%02x mask 0x%02x",
++		    trace_enable, mask[3]);
++
++	return 0;
++}
++
++int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
++{
++	struct intel_debug_features features;
++	int err;
++
++	bt_dev_dbg(hdev, "enable %d", enable);
++
++	/* Read the Intel supported features and if new exception formats
++	 * supported, need to load the additional DDC config to enable.
++	 */
++	err = btintel_read_debug_features(hdev, &features);
++	if (err)
++		return err;
++
++	/* Set or reset the debug features. */
++	if (enable)
++		err = btintel_set_debug_features(hdev, &features);
++	else
++		err = btintel_reset_debug_features(hdev, &features);
++
++	return err;
++}
++EXPORT_SYMBOL_GPL(btintel_set_quality_report);
++
+ static const struct firmware *btintel_legacy_rom_get_fw(struct hci_dev *hdev,
+ 					       struct intel_version *ver)
+ {
+@@ -1951,6 +2021,9 @@ static int btintel_bootloader_setup(struct hci_dev *hdev,
+ 		btintel_load_ddc_config(hdev, ddcname);
+ 	}
+ 
++	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
++	bt_dev_dbg(hdev, "HCI_QUALITY_REPORT cleared");
++
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version(hdev, &new_ver);
+ 	if (err)
+@@ -2132,6 +2205,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	 */
+ 	btintel_load_ddc_config(hdev, ddcname);
+ 
++	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
++	bt_dev_dbg(hdev, "HCI_QUALITY_REPORT cleared");
++
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version_tlv(hdev, &new_ver);
+ 	if (err)
+@@ -2230,6 +2306,9 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+ 	set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
+ 
++	/* Set up the quality report callback for Intel devices */
++	hdev->set_quality_report = btintel_set_quality_report;
++
+ 	/* For Legacy device, check the HW platform value and size */
+ 	if (skb->len == sizeof(ver) && skb->data[1] == 0x37) {
+ 		bt_dev_dbg(hdev, "Read the legacy Intel version information");
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index aa64072bbe68..fe02cb9ac96c 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -204,6 +204,7 @@ int btintel_configure_setup(struct hci_dev *hdev);
+ void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
+ void btintel_secure_send_result(struct hci_dev *hdev,
+ 				const void *ptr, unsigned int len);
++int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
+ #else
+ 
+ static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+@@ -294,4 +295,9 @@ static inline void btintel_secure_send_result(struct hci_dev *hdev,
+ 				const void *ptr, unsigned int len)
+ {
+ }
++
++static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
++{
++	return -ENODEV;
++}
+ #endif
 -- 
 2.32.0.605.g8dce9f2422-goog
 
