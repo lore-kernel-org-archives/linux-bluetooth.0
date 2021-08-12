@@ -2,213 +2,169 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A55C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:13:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB43C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 08:50:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B13760C3F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:13:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1B03560724
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 08:50:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230323AbhHLGNr (ORCPT
+        id S235237AbhHLIvS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 02:13:47 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:40688 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229460AbhHLGNq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 02:13:46 -0400
-Received: by mail-io1-f71.google.com with SMTP id d70-20020a6bb4490000b029057da994a827so2919349iof.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 23:13:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=DYL1J+oy4oDNfBwuAE6KH58xhAFOH+PfBaJADfwuBSo=;
-        b=CqQeLe8d4zA+A1sKcJMIHK3ocZnuTeczTAPOO+NiYtPk6LJB1KKq4fT1tG8tvSoept
-         z4xZ2F/z7lPFnD/LAe8rQiChHdfJ8r3/BDld9fgURicfiteIchw7aK4/dnRY5jim4Lyc
-         T5bwNw2WTiCYUJmLbBzLOpWrjjGcNwmH6MOB9v14ZiYVdJ9/LGRUW6ugmO02myV/UpZ2
-         lO+9Cg3ZbHaUs3Rqm/26ZRvdJy5yCIhanA+iqiT2Ab6Qfg/f30M4KUjeEEX2nTC7VgKQ
-         9JLNz4AkrM6UuxaJn6A+0pKC41PbiJYLpgdODguWmMphH9vIpJ1CSDCzrz1oVTuiM0dC
-         v1ng==
-X-Gm-Message-State: AOAM533nVGJ3OTS1A83AHW/IrpjXKxP/Kpu3ISQVNSoduBKNh3U4JhWv
-        SJf7bxqb9+ko8b8QPpc3rvAJe7IaVBSA0H3evZhSNjtxJ5U0
-X-Google-Smtp-Source: ABdhPJx29JmgnSj90+sgKDtBiuaIDX86xQPzbZV35OvVkv5qo14IzLyzCUCWmDrDPgPPfalGc0k4BcPMwjxlJEG29GePaKjMgL/g
-MIME-Version: 1.0
-X-Received: by 2002:a5d:9c58:: with SMTP id 24mr1800988iof.120.1628748801983;
- Wed, 11 Aug 2021 23:13:21 -0700 (PDT)
-Date:   Wed, 11 Aug 2021 23:13:21 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000c5482805c956a118@google.com>
-Subject: [syzbot] INFO: task hung in hci_req_sync
-From:   syzbot <syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        Thu, 12 Aug 2021 04:51:18 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:40922 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234605AbhHLIvP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Aug 2021 04:51:15 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1628758251; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=Ya9+Ha0SGv8ND1/LQ97Qs9nz9/yO8+sXj545J9GZXEQ=; b=C9Dod/6Qz7pTvGUEvhUmb3R0NlUnHbPM8XjOnhJ1nA2mR0zg0XCDJqFr8trZ1Srn/jM1Rqiv
+ OZ87krJVf+zd+3/SP/vuHVkJ1RdF4lKFdLhUq7SZdAlqsKjsC7+bC6AL1gL43heZParqMN5X
+ J/1i8Nwxpas6aeweUwrTMQOxTO4=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
+ 6114e0d176c3a9a17204dd70 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 12 Aug 2021 08:50:25
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 86A29C43460; Thu, 12 Aug 2021 08:50:24 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C2263C433F1;
+        Thu, 12 Aug 2021 08:50:20 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org C2263C433F1
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=zijuhu@codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v3] Bluetooth: btusb: Add support different nvm to distinguish different factory for WCN6855 controller
+Date:   Thu, 12 Aug 2021 16:50:16 +0800
+Message-Id: <1628758216-3201-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Tim Jiang <tjiang@codeaurora.org>
 
-syzbot found the following issue on:
+we have different factory to produce wcn6855 soc chip, so we should
+use different nvm file with suffix to distinguish them.
 
-HEAD commit:    c9194f32bfd9 Merge tag 'ext4_for_linus_stable' of git://gi..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=1488f59e300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
-dashboard link: https://syzkaller.appspot.com/bug?extid=be2baed593ea56c6a84c
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b5afc6300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fcd192300000
-
-Bisection is inconclusive: the issue happens on the oldest tested release.
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17dce4fa300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=143ce4fa300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=103ce4fa300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
-
-INFO: task syz-executor446:8489 blocked for more than 143 seconds.
-      Not tainted 5.14.0-rc4-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor446 state:D stack:28712 pid: 8489 ppid:  8452 flags:0x00000000
-Call Trace:
- context_switch kernel/sched/core.c:4683 [inline]
- __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
- schedule+0xd3/0x270 kernel/sched/core.c:6019
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
- __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
- __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
- hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
- hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
- hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
- sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
- sock_ioctl+0x477/0x6a0 net/socket.c:1221
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:1069 [inline]
- __se_sys_ioctl fs/ioctl.c:1055 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x446449
-RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
-RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
-RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000003
-R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
-INFO: task syz-executor446:8491 blocked for more than 143 seconds.
-      Not tainted 5.14.0-rc4-syzkaller #0
-"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-task:syz-executor446 state:D stack:28176 pid: 8491 ppid:  8452 flags:0x00000004
-Call Trace:
- context_switch kernel/sched/core.c:4683 [inline]
- __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
- schedule+0xd3/0x270 kernel/sched/core.c:6019
- schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
- __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
- __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
- hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
- hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
- hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
- sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
- sock_ioctl+0x477/0x6a0 net/socket.c:1221
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:1069 [inline]
- __se_sys_ioctl fs/ioctl.c:1055 [inline]
- __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x446449
-RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
-RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
-RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
-R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
-
-Showing all locks held in the system:
-6 locks held by kworker/u4:0/8:
-1 lock held by khungtaskd/1635:
- #0: ffffffff8b97c180 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6446
-1 lock held by in:imklog/8352:
- #0: ffff888033e1d4f0 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0xe9/0x100 fs/file.c:974
-1 lock held by syz-executor446/8486:
- #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
-1 lock held by syz-executor446/8489:
- #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
-1 lock held by syz-executor446/8491:
- #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
-
-=============================================
-
-NMI backtrace for cpu 1
-CPU: 1 PID: 1635 Comm: khungtaskd Not tainted 5.14.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
- nmi_cpu_backtrace.cold+0x44/0xd7 lib/nmi_backtrace.c:105
- nmi_trigger_cpumask_backtrace+0x1b3/0x230 lib/nmi_backtrace.c:62
- trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
- check_hung_uninterruptible_tasks kernel/hung_task.c:210 [inline]
- watchdog+0xd0a/0xfc0 kernel/hung_task.c:295
- kthread+0x3e5/0x4d0 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Sending NMI from CPU 1 to CPUs 0:
-NMI backtrace for cpu 0
-CPU: 0 PID: 8 Comm: kworker/u4:0 Not tainted 5.14.0-rc4-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: events_unbound toggle_allocation_gate
-RIP: 0010:csd_lock_wait kernel/smp.c:440 [inline]
-RIP: 0010:smp_call_function_many_cond+0x452/0xc20 kernel/smp.c:967
-Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 d0 47 0b 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 33 06 00 00 8b 43 08 31
-RSP: 0018:ffffc90000cd7a00 EFLAGS: 00000293
-RAX: 0000000000000000 RBX: ffff8880b9d570c0 RCX: 0000000000000000
-RDX: ffff88813fe6d4c0 RSI: ffffffff816a6400 RDI: 0000000000000003
-RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffffff816a6426 R11: 0000000000000000 R12: ffffed10173aae19
-R13: 0000000000000001 R14: ffff8880b9d570c8 R15: 0000000000000001
-FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f56e8f43000 CR3: 000000000b68e000 CR4: 0000000000350ef0
-Call Trace:
- on_each_cpu_cond_mask+0x56/0xa0 kernel/smp.c:1133
- on_each_cpu include/linux/smp.h:71 [inline]
- text_poke_sync arch/x86/kernel/alternative.c:929 [inline]
- text_poke_bp_batch+0x47d/0x560 arch/x86/kernel/alternative.c:1183
- text_poke_flush arch/x86/kernel/alternative.c:1268 [inline]
- text_poke_flush arch/x86/kernel/alternative.c:1265 [inline]
- text_poke_finish+0x16/0x30 arch/x86/kernel/alternative.c:1275
- arch_jump_label_transform_apply+0x13/0x20 arch/x86/kernel/jump_label.c:146
- jump_label_update+0x1d5/0x430 kernel/jump_label.c:830
- static_key_enable_cpuslocked+0x1b1/0x260 kernel/jump_label.c:177
- static_key_enable+0x16/0x20 kernel/jump_label.c:190
- toggle_allocation_gate mm/kfence/core.c:623 [inline]
- toggle_allocation_gate+0x100/0x390 mm/kfence/core.c:615
- process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
- worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
- kthread+0x3e5/0x4d0 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
-
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/btusb.c | 60 ++++++++++++++++++++++++++++++++++++++++-------
+ 1 file changed, 51 insertions(+), 9 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index b1a05bb9f4bf..d7b4e0f1c3e3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -4013,6 +4013,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -4044,6 +4047,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -4198,6 +4202,39 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static int btusb_setup_qca_form_nvm_name(char **fwname,
++					int max_size,
++					struct qca_version *ver,
++					char *factory)
++{
++	/* if boardid equal 0, use default nvm without suffix */
++	switch (le16_to_cpu(ver->board_id)) {
++	case 0x0:
++		/* we add suffix factory to distinguish with different factory. */
++		if (factory != NULL) {
++			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s.bin",
++				 le32_to_cpu(ver->rom_version),
++				 factory);
++		} else {
++			snprintf(*fwname, max_size, "qca/nvm_usb_%08x.bin",
++				 le32_to_cpu(ver->rom_version));
++		}
++		break;
++	default:
++		if (factory != NULL) {
++			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s_%04x.bin",
++				le32_to_cpu(ver->rom_version),
++				factory,
++				le16_to_cpu(ver->board_id));
++		} else {
++			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%04x.bin",
++				le32_to_cpu(ver->rom_version),
++				le16_to_cpu(ver->board_id));
++		}
++		break;
++	}
++}
++
+ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 				    struct qca_version *ver,
+ 				    const struct qca_device_info *info)
+@@ -4206,19 +4243,24 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 	char fwname[64];
+ 	int err;
+ 
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, "gf");
++		} else {
+ 			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+ 				 le32_to_cpu(ver->rom_version));
++		}
++		break;
++	default:
++		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, NULL);
+ 		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
++			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
++				 le32_to_cpu(ver->rom_version));
+ 		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++		break;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
