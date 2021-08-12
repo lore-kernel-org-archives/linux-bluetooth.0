@@ -2,220 +2,205 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BA606C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:48:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A93B4C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:49:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B52860FC4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:48:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7393760F21
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:49:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236363AbhHLJtF (ORCPT
+        id S236431AbhHLJth (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 05:49:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40288 "EHLO
+        Thu, 12 Aug 2021 05:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236323AbhHLJtE (ORCPT
+        with ESMTP id S236350AbhHLJtg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 05:49:04 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03C70C0613D5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:48:40 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id d16so1557729vsf.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:48:39 -0700 (PDT)
+        Thu, 12 Aug 2021 05:49:36 -0400
+Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7647DC061765;
+        Thu, 12 Aug 2021 02:49:11 -0700 (PDT)
+Received: by mail-lj1-x22f.google.com with SMTP id h9so9701382ljq.8;
+        Thu, 12 Aug 2021 02:49:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=IbLr+U6kbsLYPUHrhyJnM589L4UyonbadE9DVH0+ERM=;
-        b=Cb1sc9wxSCmOmvEr0naKHwOEBQxsRJPZzXPY3/30OAHVmVCC9Vd+9EgJ8M7WgwXSOY
-         EIUvz7kwNMVBTuy9adl70cTdScJP2o1dFdxsz79HUbpNXAJcLBZSdwXLEj9pNBoaW9cv
-         cRL3NljtNs9Po1aUE/SfslCaGQSm6yYHn4+bNQjgLgccop1khDwIXk1+NrP9ZJmuonbe
-         287hUz+rLBAHrOcxQEAIDDIneYpPorv3svSztRTsu2l3s+rKoRDfq1d7IkEHBkXZgJe2
-         SizruHQsupdtvrM/6zThCvvMEauOoYyzLxfZwDbsCyg3HYM0tAoj8mg0NL9+fPq4eLdf
-         QMyA==
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=WZthFEJ8KkVScOuLbPHTpjAuNA+7nGabUlW0Rl7a24I=;
+        b=gQAIe4s/JBqyPC2P9fza8HJYUZN81+kqjnI22VMCWKwe+NR9427X3wvs1kSEi6eAo1
+         bdJ+6Wp+tgNvDvq364U8Ti9Ol8S0UOcBJYioZBDuYf4OiQGOaKNyfdaDFImNam8+ZnHC
+         ZqWm/OF1OSyPxNY0o8VfURVxyyRPOdwuiJvfDEydxAO36rHk0LpwzW+sao5c6fOz5ZeM
+         5RkguveUEnnFoVfEGAbt/rmUa8WjY7+Y064+GAuffMU6tz/lRWvkqWaa3U5hONqYo9n4
+         +OYw7G1bZia6DHLzjiR7YJGfrlCzSMznIaANI/Tt+KPnDo55Jg06DfVT5s9SNb+uDs10
+         QgVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=IbLr+U6kbsLYPUHrhyJnM589L4UyonbadE9DVH0+ERM=;
-        b=rP7xkqIrg54TwnG5VkBQfmZUXu4OMEzY7Lf8n42xLve6fP592mZij05aN+LO96ywS0
-         Bj2fUSus+hlr4Gejnd7uhWFJrwAm+M2AOzq0ZwioWspqbS9bZ4qPnzmGps+fTK5HKJ7t
-         YBnEuedagQDXJcdMv9EI8Bx+OGSVcGgKkPPe05nLR2mIxzffPEwbNSdxOMLGgE0tUlGZ
-         /LU45RSuDrCbjbFcVjnMtT05almtAC2GJ3oIkZP4pN/8m0Z1TY7Bi+401gezzYaC8vrO
-         s5MT+O4awRe5wY2bm5hph6jotvrqP8PcM3SecFYkrndKwxG6RLdUla+gNCGYqze+TTiq
-         crRg==
-X-Gm-Message-State: AOAM532yCvqupy3Crw3ibkiOGFDnhN/LNQVLG8nCUS2xQ0+9FvzhvC/H
-        wAAr+VUiCYTpLMCzx/CX7nmCRrU3rQHArAt1Dpy2EQ==
-X-Google-Smtp-Source: ABdhPJw51I5gnHwWq9GYyg15yW0e53urVKvvJQwgKLtCH00UUmyJOKAlXZJoRACLd3glOR57D91YqvUcYvoEz5EYcW4=
-X-Received: by 2002:a67:3212:: with SMTP id y18mr1412234vsy.19.1628761718985;
- Thu, 12 Aug 2021 02:48:38 -0700 (PDT)
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=WZthFEJ8KkVScOuLbPHTpjAuNA+7nGabUlW0Rl7a24I=;
+        b=Sc/mozIzc851k/ABNY+lSQjVEWnyNzwcda06QahKZesmH2n1ABnmgGrv5PWLbgF27O
+         +eLWIWz4a5m9xO7frzF11YFaIqt41Tw0oXopqEy7e5ZxYpSPBnMUbyThHf7iKnoTyykT
+         QmY2WDsAjYs1JmeT9kxh+aJmuJlqx5eeAEEzob6V5b+pE7kabw0MvKS1G+gn/jPFwWxB
+         8t0qo4MTi55w9Lpu+yOPxtSsA8rIu61u8/c6Qd7d//N3QLXUHmHIFB4kvmeniOn215f2
+         gh6dlr4N/98Mg28ahf3OlxxFPwgmxX6O5iogpAzmr6anYDCwYd5Pu9MddFeE5IpZew0n
+         cdOQ==
+X-Gm-Message-State: AOAM531ugzJo5DkHPBYKKQriJSJSegZ5KHqGkc4NDKl4gMalackjPFqV
+        1YPJbZlZYLSU1zk4v8OXvlA=
+X-Google-Smtp-Source: ABdhPJwMzL2bT90OERiDPxPbF40q7QMmktAMESdfa9kh3Jt60pD+CeEdOxHjIF65kkSV0YNZhxdH6g==
+X-Received: by 2002:a05:651c:902:: with SMTP id e2mr1490792ljq.198.1628761749825;
+        Thu, 12 Aug 2021 02:49:09 -0700 (PDT)
+Received: from [192.168.1.11] ([46.235.67.232])
+        by smtp.gmail.com with ESMTPSA id l24sm208328lfe.272.2021.08.12.02.49.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 12 Aug 2021 02:49:09 -0700 (PDT)
+Subject: Re: [syzbot] INFO: task hung in hci_req_sync
+To:     syzbot <syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+References: <000000000000c5482805c956a118@google.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+Message-ID: <9365fdfa-3cee-f22e-c53d-6536a96d27ae@gmail.com>
+Date:   Thu, 12 Aug 2021 12:49:08 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
 MIME-Version: 1.0
-References: <20210621223141.1638189-1-dmitry.baryshkov@linaro.org>
- <20210621223141.1638189-3-dmitry.baryshkov@linaro.org> <CAPDyKFo6dmjw0TnaK7=35dq5Si_6YYpeeSa=gU++1od7WkQZ7A@mail.gmail.com>
- <20210706115517.GB4529@sirena.org.uk> <CAPDyKFr=8spZBD+bTe3SjS=nATL-ByFu_epnT2Z4chSuQNke2w@mail.gmail.com>
- <CAA8EJppSV--TBjnGxGhaTHeKWdpM6uz70bg7diU3_K7OHoka4g@mail.gmail.com>
- <20210714164710.GC2719790@robh.at.kernel.org> <CAPDyKFokvTFSpbnhhKeCmZzAjqvSpUiwz7QjjQNdcd3Sd3T0rQ@mail.gmail.com>
- <YRKjQJc0yiQXFqCD@builder.lan>
-In-Reply-To: <YRKjQJc0yiQXFqCD@builder.lan>
-From:   Ulf Hansson <ulf.hansson@linaro.org>
-Date:   Thu, 12 Aug 2021 11:48:02 +0200
-Message-ID: <CAPDyKFo+O34rvP7gbsC+ktd-p5QB9QAsbb+QEkWbiVqszChZJA@mail.gmail.com>
-Subject: Re: [PATCH v3 2/7] regulator: qca6390: add support for QCA639x
- powerup sequence
-To:     Bjorn Andersson <bjorn.andersson@linaro.org>
-Cc:     Rob Herring <robh@kernel.org>,
-        Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Peter Chen <peter.chen@kernel.org>,
-        Mark Brown <broonie@kernel.org>,
-        Andy Gross <agross@kernel.org>,
-        Liam Girdwood <lgirdwood@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-        DTML <devicetree@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+In-Reply-To: <000000000000c5482805c956a118@google.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 10 Aug 2021 at 18:03, Bjorn Andersson
-<bjorn.andersson@linaro.org> wrote:
->
-> On Tue 10 Aug 06:55 CDT 2021, Ulf Hansson wrote:
->
-> > On Wed, 14 Jul 2021 at 18:47, Rob Herring <robh@kernel.org> wrote:
-> > >
-> > > On Thu, Jul 08, 2021 at 02:37:44PM +0300, Dmitry Baryshkov wrote:
-> > > > Hi,
-> > > >
-> > > > On Thu, 8 Jul 2021 at 13:10, Ulf Hansson <ulf.hansson@linaro.org> wrote:
-> > > > >
-> > > > > - Peter (the email was bouncing)
-> > > >
-> > > > + Peter's kernel.org address
-> > > >
-> > > > >
-> > > > > On Tue, 6 Jul 2021 at 13:55, Mark Brown <broonie@kernel.org> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 06, 2021 at 09:54:03AM +0200, Ulf Hansson wrote:
-> > > > > > > On Tue, 22 Jun 2021 at 00:32, Dmitry Baryshkov
-> > > > > >
-> > > > > > > > Qualcomm QCA6390/1 is a family of WiFi + Bluetooth SoCs, with BT part
-> > > > > > > > being controlled through the UART and WiFi being present on PCIe
-> > > > > > > > bus. Both blocks share common power sources. Add device driver handling
-> > > > > > > > power sequencing of QCA6390/1.
-> > > > > >
-> > > > > > > Power sequencing of discoverable buses have been discussed several
-> > > > > > > times before at LKML. The last attempt [1] I am aware of, was in 2017
-> > > > > > > from Peter Chen. I don't think there is a common solution, yet.
-> > > > > >
-> > > > > > This feels a bit different to the power sequencing problem - it's not
-> > > > > > exposing the individual inputs to the device but rather is a block that
-> > > > > > manages everything but needs a bit of a kick to get things going (I'd
-> > > > > > guess that with ACPI it'd be triggered via AML).  It's in the same space
-> > > > > > but it's not quite the same issue I think, something that can handle
-> > > > > > control of the individual resources might still struggle with this.
-> > > > >
-> > > > > Well, to me it looks very similar to those resouses we could manage
-> > > > > with the mmc pwrseq, for SDIO. It's also typically the same kind of
-> > > > > combo-chips that moved from supporting SDIO to PCIe, for improved
-> > > > > performance I guess. More importantly, the same constraint to
-> > > > > pre-power on the device is needed to allow it to be discovered/probed.
-> > > >
-> > > > In our case we'd definitely use pwrseq for PCIe bus and we can also
-> > > > benefit from using pwrseq for serdev and for platform busses also (for
-> > > > the same story of WiFi+BT chips).
-> > > >
-> > > > I can take a look at rewriting pwrseq code to also handle the PCIe
-> > > > bus. Rewriting it to be a generic lib seems like an easy task,
-> > > > plugging it into PCIe code would be more fun.
-> > > >
-> > > > Platform and serdev... Definitely even more fun.
-> > >
-> > > I don't want to see pwrseq (the binding) expanded to other buses. If
-> > > that was the answer, we wouldn't be having this discussion. It was a
-> > > mistake for MMC IMO.
-> >
-> > Let's make sure we get your point correctly. I think we have discussed
-> > this in the past, but let's refresh our memories.
-> >
-> > If I recall correctly, you are against the mmc pwrseq DT bindings
-> > because we are using a separate pwrseq OF node, that we point to via a
-> > "mmc-pwrseq" property that contains a phandle from the mmc controller
-> > device node. Is that correct?
-> >
-> > If we would have encoded the power sequence specific properties, from
-> > within a child node for the mmc controller node, that would have been
-> > okay for you, right?
-> >
->
-> In Dmitry's case, we have an external chip with that needs to be powered
-> on per a specific sequence, at which point the WiFi driver on PCIe and
-> BT driver on serdev will be able to communicate with the device.
+On 8/12/21 9:13 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot found the following issue on:
+> 
+> HEAD commit:    c9194f32bfd9 Merge tag 'ext4_for_linus_stable' of git://gi..
+> git tree:       upstream
+> console output: https://syzkaller.appspot.com/x/log.txt?x=1488f59e300000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
+> dashboard link: https://syzkaller.appspot.com/bug?extid=be2baed593ea56c6a84c
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b5afc6300000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fcd192300000
+> 
+> Bisection is inconclusive: the issue happens on the oldest tested release.
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17dce4fa300000
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=143ce4fa300000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=103ce4fa300000
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+> 
+> INFO: task syz-executor446:8489 blocked for more than 143 seconds.
+>        Not tainted 5.14.0-rc4-syzkaller #0
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:syz-executor446 state:D stack:28712 pid: 8489 ppid:  8452 flags:0x00000000
+> Call Trace:
+>   context_switch kernel/sched/core.c:4683 [inline]
+>   __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
+>   schedule+0xd3/0x270 kernel/sched/core.c:6019
+>   schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
+>   __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+>   __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
+>   hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+>   hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
+>   hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
+>   sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
+>   sock_ioctl+0x477/0x6a0 net/socket.c:1221
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:1069 [inline]
+>   __se_sys_ioctl fs/ioctl.c:1055 [inline]
+>   __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
+>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>   do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> RIP: 0033:0x446449
+> RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
+> RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
+> RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
+> R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000003
+> R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
+> INFO: task syz-executor446:8491 blocked for more than 143 seconds.
+>        Not tainted 5.14.0-rc4-syzkaller #0
+> "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> task:syz-executor446 state:D stack:28176 pid: 8491 ppid:  8452 flags:0x00000004
+> Call Trace:
+>   context_switch kernel/sched/core.c:4683 [inline]
+>   __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
+>   schedule+0xd3/0x270 kernel/sched/core.c:6019
+>   schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
+>   __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+>   __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
+>   hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+>   hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
+>   hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
+>   sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
+>   sock_ioctl+0x477/0x6a0 net/socket.c:1221
+>   vfs_ioctl fs/ioctl.c:51 [inline]
+>   __do_sys_ioctl fs/ioctl.c:1069 [inline]
+>   __se_sys_ioctl fs/ioctl.c:1055 [inline]
+>   __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
+>   do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>   do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+>   entry_SYSCALL_64_after_hwframe+0x44/0xae
+> RIP: 0033:0x446449
+> RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+> RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
+> RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
+> RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
+> R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
+> 
+> Showing all locks held in the system:
+> 6 locks held by kworker/u4:0/8:
+> 1 lock held by khungtaskd/1635:
+>   #0: ffffffff8b97c180 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6446
+> 1 lock held by in:imklog/8352:
+>   #0: ffff888033e1d4f0 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0xe9/0x100 fs/file.c:974
+> 1 lock held by syz-executor446/8486:
+>   #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+> 1 lock held by syz-executor446/8489:
+>   #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+> 1 lock held by syz-executor446/8491:
+>   #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+> 
 
-Thanks for sharing more details.
+Looks like too big timeout is passed from ioctl:
 
-So, not only do we have a discoverable device that needs to be powered
-on in a device specific way before probing, but in fact we have two
-consumers of that "combo chip", one (PCIe) for Wifi and one (serdev)
-for Bluetooth.
 
->
-> The extended case of this is where we have an SDX55 modem soldered onto
-> the pcb next to the SoC, in which case the power sequencing is even more
-> complex and additionally there are incoming gpios used to detect things
-> such as the firmware of the modem has crashed and Linux needs to toggle
-> power and rescan the PCIe bus.
+C repro:
 
-That sounds very similar to what we manage for the SDIO bus already.
+     *(uint16_t*)0x200000c0 = 0;
+     *(uint16_t*)0x200000c2 = 0;
+     memcpy((void*)0x200000c4, "\xf0\x08\xa7", 3);
+     *(uint8_t*)0x200000c7 = 0x81;	<- ir.length
+     *(uint8_t*)0x200000c8 = 0;
+     syscall(__NR_ioctl, r[0], 0x800448f0, 0x200000c0ul);
 
-We have a mmc pwrseq node to describe what resources that are needed
-to power on/off the external chip. The driver for the functional
-device (Wifi chip for example) may then call SDIO APIs provided by the
-mmc core to power on/off the device, in case some kind of reset would
-be needed.
 
-Additionally, we have a child node below the mmc controller node,
-allowing us to describe device specific things for the SDIO functional
-device, like an out-of-band IRQ line for example.
+Then ir.length * msecs_to_jiffies(2000) timeout is passed to
+hci_req_sync(). Task will stuck here
 
-Overall, this seems to work fine, even if the DT bindings may be questionable.
+	err = wait_event_interruptible_timeout(hdev->req_wait_q,
+			hdev->req_status != HCI_REQ_PEND, timeout);
 
->
-> In both of these cases it seems quite reasonable to represent that
-> external chip (and it's power needs) as a separate DT node. But we need
-> a way to link the functional devices to that thing.
+for 258 seconds (I guess, it's because of test environment, but, maybe, 
+we should add sanity check for timeout value)
 
-Don't get me wrong, I am not suggesting we should re-use the
-mmc-pwrseq DT bindings - but just trying to share our experience
-around them.
 
-In the cases you describe, it certainly sounds like we need some kind
-of minimal description in DT for these functional external devices.
-For GPIO pins, for example.
 
-How to describe this in DT is one thing, let's see if Rob can help to
-point us in some direction of what could make sense.
-
-When it comes to implementing a library/interface to manage these
-functional devices, I guess we just have to continue to explore
-various options. Perhaps just start simple with another subsystem,
-like PCIe and see where this brings us.
-
->
-> Regards,
-> Bjorn
->
-
-[...]
-
-Kind regards
-Uffe
+With regards,
+Pavel Skripkin
