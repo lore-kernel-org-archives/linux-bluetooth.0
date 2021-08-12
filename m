@@ -2,169 +2,180 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BB43C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 08:50:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AD16BC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B03560724
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 08:50:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B09860FC4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 09:16:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235237AbhHLIvS (ORCPT
+        id S235853AbhHLJQl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 04:51:18 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:40922 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234605AbhHLIvP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 04:51:15 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1628758251; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=Ya9+Ha0SGv8ND1/LQ97Qs9nz9/yO8+sXj545J9GZXEQ=; b=C9Dod/6Qz7pTvGUEvhUmb3R0NlUnHbPM8XjOnhJ1nA2mR0zg0XCDJqFr8trZ1Srn/jM1Rqiv
- OZ87krJVf+zd+3/SP/vuHVkJ1RdF4lKFdLhUq7SZdAlqsKjsC7+bC6AL1gL43heZParqMN5X
- J/1i8Nwxpas6aeweUwrTMQOxTO4=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n06.prod.us-east-1.postgun.com with SMTP id
- 6114e0d176c3a9a17204dd70 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 12 Aug 2021 08:50:25
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 86A29C43460; Thu, 12 Aug 2021 08:50:24 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C2263C433F1;
-        Thu, 12 Aug 2021 08:50:20 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.3.2 smtp.codeaurora.org C2263C433F1
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=zijuhu@codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v3] Bluetooth: btusb: Add support different nvm to distinguish different factory for WCN6855 controller
-Date:   Thu, 12 Aug 2021 16:50:16 +0800
-Message-Id: <1628758216-3201-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Thu, 12 Aug 2021 05:16:41 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60848 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235843AbhHLJQi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Aug 2021 05:16:38 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72DCAC0613D3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:13 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id a8so8355413pjk.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 02:16:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6xPMr4/ugeTOejV/0npnKnxH7FKFFvNEuCvzfZr3CVQ=;
+        b=cgXuO8KxZP8omjWubSbzwTrtg3b/PQJyQhmIDSDO7tMYxMm11k61ea1d0p0wCvtYlg
+         K5hDtWTr7mGS5rDFJS4JWj1f1tZ0QRJ6ss1XKO821iA9UxaFgi2p6TzU3oIUuRCz+91v
+         6Xiz4z6FJpNRSndKfdiOvb+koupYvHFYAEmz8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=6xPMr4/ugeTOejV/0npnKnxH7FKFFvNEuCvzfZr3CVQ=;
+        b=OUUKkSjW3XAn4/6aM4lVCqWxVijZZNrf9EgzTkcG6kOMR2oXt8ysC62J5wGCUCjNIO
+         z9raaqfKDVXUYKaPQEqHRnUxmDfqXRLh6AQhhD6gE3B2+1OGNtsK+AM5NssnhI/DF6rZ
+         efih84/7rqDycZxfrdKdEufmAZkosGQWNfwPff2RuttgC6BbqQ88KMvwktl8LWptRXMH
+         39+kb/vrseUerdXx3yOUdHW4QR2ik1ecUk5RsTgzLWA4az8UebKcmsk7ElFnLqci2G0x
+         QrVonuAn+dUDPK5gWh1MQzmuSmgjwepDORH/zfMWuh+yYT/TVNWDhMnEuRMZtfKP06OD
+         IUbQ==
+X-Gm-Message-State: AOAM530v++4aQPpdsjxXdubSoMIHkPZpY4L4s0TvQHPF5/QosqunuCgR
+        ipD10gK+RlgRTz71aZotU6Ys7+QqAud51Q==
+X-Google-Smtp-Source: ABdhPJzeDt0keUxuuAzh40qBTOf2sm5IToI6wsNS8BXt5bz+he9bpAaqPkxttqmTsRdnIyg5jyaawQ==
+X-Received: by 2002:a63:1056:: with SMTP id 22mr3041922pgq.178.1628759772682;
+        Thu, 12 Aug 2021 02:16:12 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:8f67:7d0e:97df:b4b4])
+        by smtp.gmail.com with ESMTPSA id n32sm2563966pgl.69.2021.08.12.02.16.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 12 Aug 2021 02:16:11 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
+        Joseph Hwang <josephsih@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Kiran K <kiran.k@intel.com>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v7 1/4] Bluetooth: btusb: disable Intel link statistics telemetry events
+Date:   Thu, 12 Aug 2021 17:15:58 +0800
+Message-Id: <20210812171533.v7.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
+X-Mailer: git-send-email 2.32.0.605.g8dce9f2422-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tim Jiang <tjiang@codeaurora.org>
+To avoid the overhead on both the controller and the host, the
+Intel link statistics telemetry events are disabled by default.
 
-we have different factory to produce wcn6855 soc chip, so we should
-use different nvm file with suffix to distinguish them.
-
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
- drivers/bluetooth/btusb.c | 60 ++++++++++++++++++++++++++++++++++++++++-------
- 1 file changed, 51 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index b1a05bb9f4bf..d7b4e0f1c3e3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -4013,6 +4013,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
- 
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -4044,6 +4047,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -4198,6 +4202,39 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	return err;
- }
- 
-+static int btusb_setup_qca_form_nvm_name(char **fwname,
-+					int max_size,
-+					struct qca_version *ver,
-+					char *factory)
-+{
-+	/* if boardid equal 0, use default nvm without suffix */
-+	switch (le16_to_cpu(ver->board_id)) {
-+	case 0x0:
-+		/* we add suffix factory to distinguish with different factory. */
-+		if (factory != NULL) {
-+			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s.bin",
-+				 le32_to_cpu(ver->rom_version),
-+				 factory);
-+		} else {
-+			snprintf(*fwname, max_size, "qca/nvm_usb_%08x.bin",
-+				 le32_to_cpu(ver->rom_version));
-+		}
-+		break;
-+	default:
-+		if (factory != NULL) {
-+			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s_%04x.bin",
-+				le32_to_cpu(ver->rom_version),
-+				factory,
-+				le16_to_cpu(ver->board_id));
-+		} else {
-+			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%04x.bin",
-+				le32_to_cpu(ver->rom_version),
-+				le16_to_cpu(ver->board_id));
-+		}
-+		break;
-+	}
-+}
-+
- static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 				    struct qca_version *ver,
- 				    const struct qca_device_info *info)
-@@ -4206,19 +4243,24 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	char fwname[64];
+Changes in v7:
+- Rebase on Tedd's patches that moved functionality from btusb to
+  btintel.
+
+Changes in v6:
+- Rebase on the latest commit.
+
+Changes in v5:
+- Rebase this patch 1/4 to resolve conflicts.
+- There are changes in patches 3/4 and 4/4.
+
+Changes in v4:
+- The original 2 patches in Series-version 3 are split into
+  2 patches from each patch per reviewers' comments. There are
+  A total of 4 patches in this series now.
+- The callback function is renamed from hdev->set_vs_dbg_evt to
+  hdev->set_quality_report. Note that there are two different
+  specifications which will be integrated soon and enabled/disabled
+  with the same callback. One is Android Bluetooth Quality Report
+  (BQR), and the other Intel link statistics telemetry events here.
+  While most Bluetooth controller vendors have supported or are
+  supporting the Android specification in their controllers, it looks
+  making sense to use set_quality_report as the callback name.
+- Similarly, the config option BT_FEATURE_VS_DBG_EVT is renamed as
+  BT_FEATURE_QUALITY_REPORT which depends on BT now.
+- The BQR is controller specific. There needs to be a valid hdev in the
+  first place. This is fixed in set_exp_feature().
+- In set_exp_feature(), bluez will only set experimental feature to set
+  BQR when the feature is supported. Please refer to bluez CLs.
+- Also refer to bluez patches for the decoding support of btmon.
+
+Changes in v3:
+- fix the long line in the commit message
+
+Changes in v2:
+- take care of intel_newgen as well as intel_new
+- fix the long lines in mgmt.c
+
+ drivers/bluetooth/btintel.c | 20 --------------------
+ 1 file changed, 20 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index f1705b46fc88..0fe093fa5158 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1893,7 +1893,6 @@ static int btintel_bootloader_setup(struct hci_dev *hdev,
+ 	u32 boot_param;
+ 	char ddcname[64];
  	int err;
+-	struct intel_debug_features features;
  
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
-+	switch (ver->ram_version) {
-+	case WCN6855_2_0_RAM_VERSION_GF:
-+	case WCN6855_2_1_RAM_VERSION_GF:
-+		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, "gf");
-+		} else {
- 			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
- 				 le32_to_cpu(ver->rom_version));
-+		}
-+		break;
-+	default:
-+		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, NULL);
- 		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
-+			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-+				 le32_to_cpu(ver->rom_version));
- 		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
-+		break;
+ 	BT_DBG("%s", hdev->name);
+ 
+@@ -1934,15 +1933,6 @@ static int btintel_bootloader_setup(struct hci_dev *hdev,
+ 		btintel_load_ddc_config(hdev, ddcname);
  	}
  
- 	err = request_firmware(&fw, fwname, &hdev->dev);
+-	/* Read the Intel supported features and if new exception formats
+-	 * supported, need to load the additional DDC config to enable.
+-	 */
+-	err = btintel_read_debug_features(hdev, &features);
+-	if (!err) {
+-		/* Set DDC mask for available debug features */
+-		btintel_set_debug_features(hdev, &features);
+-	}
+-
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version(hdev, &new_ver);
+ 	if (err)
+@@ -2089,7 +2079,6 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	u32 boot_param;
+ 	char ddcname[64];
+ 	int err;
+-	struct intel_debug_features features;
+ 	struct intel_version_tlv new_ver;
+ 
+ 	bt_dev_dbg(hdev, "");
+@@ -2125,15 +2114,6 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	 */
+ 	btintel_load_ddc_config(hdev, ddcname);
+ 
+-	/* Read the Intel supported features and if new exception formats
+-	 * supported, need to load the additional DDC config to enable.
+-	 */
+-	err = btintel_read_debug_features(hdev, &features);
+-	if (!err) {
+-		/* Set DDC mask for available debug features */
+-		btintel_set_debug_features(hdev, &features);
+-	}
+-
+ 	/* Read the Intel version information after loading the FW  */
+ 	err = btintel_read_version_tlv(hdev, &new_ver);
+ 	if (err)
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.32.0.605.g8dce9f2422-goog
 
