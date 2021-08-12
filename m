@@ -2,94 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F07CAC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 14:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7F46C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 17:01:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D68B5610A7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 14:51:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C383D6108C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 17:01:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238168AbhHLOvg (ORCPT
+        id S233815AbhHLRCE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 10:51:36 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60150 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238158AbhHLOvf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 10:51:35 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id DB2C561102
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 14:51:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1628779869;
-        bh=W5fAeVv/MHiBZ6LNiX9YJyuaF/LDbNqVDBeguz2+Rg4=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=kvV6Gq9QmvVPfJYQ+14CXTaJKvjfT/zLxJ00nkjnBtPxBMGbYa3LgMxZ8wlGsCZhy
-         Zs3X+1bytMfewxZmCsITup9KMzCpyhrAomxH4xxyleM0WVqVxll8PEQ5lygFZO1Q6J
-         PaIG8MTkxXL0db/fAU9M0MQKBZu9ujQi2tmt6kXz6I29jSNvTaxXEXVWMaliBt9JLb
-         ULyLFmMm4vFhC4GQO+lIB6AvVj7u9QHhiCWLtJSXFbarhxh6vZRYSYLeGwGWRELbZA
-         SaeGLrJUyj+q1aDmYQSgxbeSH/XWVyiYvQC/Y0biWC7gWZn/WFr65IEMBYLGkVBI/d
-         52QT5Ai0mvQBA==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Thu, 12 Aug 2021 14:51:06 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-Zr50MSB6Jw@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Thu, 12 Aug 2021 13:02:04 -0400
+Received: from li1434-30.members.linode.com ([45.33.107.30]:46108 "EHLO
+        node.akkea.ca" rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233984AbhHLRCD (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 12 Aug 2021 13:02:03 -0400
+Received: from localhost (localhost [127.0.0.1])
+        by node.akkea.ca (Postfix) with ESMTP id 2159F55E344;
+        Thu, 12 Aug 2021 16:55:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akkea.ca; s=mail;
+        t=1628787340; bh=oZRecWo3hf7nFre+mVbt6VMymLHXbxnodvh5R5BevZo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=WtSlu69Qn2+pZz9PxZzurWKOXPiVVf6po72rDamBYmPdu452iWT9Y++trwV/FBxgO
+         fOpnDFD12uujNamm5rglvKZmTzZN9gQwmVpx20J+8FiGyy78hFdPypFxEKH5RXOAn3
+         4QzVZA1SLaAl0oMXjj14WiNUzZx0t+HEO0S8/jqM=
+X-Virus-Scanned: Debian amavisd-new at mail.akkea.ca
+Received: from node.akkea.ca ([127.0.0.1])
+        by localhost (mail.akkea.ca [127.0.0.1]) (amavisd-new, port 10024)
+        with ESMTP id lUV0yPLaj7jd; Thu, 12 Aug 2021 16:55:39 +0000 (UTC)
+Received: from midas.localdomain (S0106788a2041785e.gv.shawcable.net [70.66.86.75])
+        by node.akkea.ca (Postfix) with ESMTPSA id 7D8BC55E34E;
+        Thu, 12 Aug 2021 16:55:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akkea.ca; s=mail;
+        t=1628787339; bh=oZRecWo3hf7nFre+mVbt6VMymLHXbxnodvh5R5BevZo=;
+        h=From:To:Cc:Subject:Date:In-Reply-To:References;
+        b=Lp9jVdjOPS9N5SXmtEZik3+FFv1HC5eLp4M0X/7sENsE/zvF5WkkD/lFlZyQNmLhG
+         MXj2iKqDGLWwhrso1CGfDQY0BEdRWyuMJIQzJLCfNYtFuxLROo6m85FlBuM4ExSO0q
+         W+dFtKtnNrLU3L5JEx21l9IjdDgp4x+NZK7TPXSE=
+From:   Angus Ainslie <angus@akkea.ca>
+To:     kernel@puri.sm
+Cc:     Arend van Spriel <aspriel@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        linux-bluetooth@vger.kernel.org, Angus Ainslie <angus@akkea.ca>
+Subject: [PATCH v3 2/2] btbcm: add patch ram for bluetooth
+Date:   Thu, 12 Aug 2021 09:52:18 -0700
+Message-Id: <20210812165218.2508258-3-angus@akkea.ca>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20210812165218.2508258-1-angus@akkea.ca>
+References: <20210812165218.2508258-1-angus@akkea.ca>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+Bluetooth on the BCM43752 needs a patchram file to function correctly.
 
---- Comment #191 from Swyter (swyterzone@gmail.com) ---
-Good to hear. The force-suspend-for-everyone patch has landed on linux-next:
-https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git/commit/=
-?id=3Df4292e2faf522f899b642d2040a2edbcbd455b9f
+Signed-off-by: Angus Ainslie <angus@akkea.ca>
+---
+ drivers/bluetooth/btbcm.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-So that only leaves the `HCI_FLT_CLEAR_ALL` thing to do, so far. Maybe some=
-one
-else wants to tackle this one. I don't mind, but sending not-so-thoroughly
-tested patches for things I can't verify directly is a bit eh.
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index e5d706ed55ea..e4182acee488 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -387,6 +387,7 @@ struct bcm_subver_table {
+ };
+ 
+ static const struct bcm_subver_table bcm_uart_subver_table[] = {
++	{ 0x1111, "BCM4362A2"	},	/* 000.017.017 */
+ 	{ 0x4103, "BCM4330B1"	},	/* 002.001.003 */
+ 	{ 0x410d, "BCM4334B0"	},	/* 002.001.013 */
+ 	{ 0x410e, "BCM43341B0"	},	/* 002.001.014 */
+-- 
+2.25.1
 
-@Jay, does it work fine with just the first patch? That's important.
-
-Also please post your `hciconfig -a` *or* 'Read Local Version Information'
-packet from your `btmon -w my.log` as shown here:
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824#c119
-
-We're interested in the HCI Version / Revision and LMP Version / Subversion
-fields, which don't appear in your lsusb dumps, and show what really makes =
-your
-dongle unique.
-
-Thanks a lot, guys.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
