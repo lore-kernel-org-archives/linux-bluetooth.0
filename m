@@ -2,124 +2,213 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2750CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:00:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 98A55C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:13:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1DA560240
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:00:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5B13760C3F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 06:13:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234493AbhHLGA4 (ORCPT
+        id S230323AbhHLGNr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 02:00:56 -0400
-Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:32978
-        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S234386AbhHLGAz (ORCPT
+        Thu, 12 Aug 2021 02:13:47 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:40688 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229460AbhHLGNq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 02:00:55 -0400
-Received: from mail-oo1-f72.google.com (mail-oo1-f72.google.com [209.85.161.72])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPS id BC23740C97
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 06:00:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1628748029;
-        bh=uSyAF47q0itw6OVpblEuV2uLIqpCFYTPDCy9JiOpRIc=;
-        h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-         To:Cc:Content-Type;
-        b=PxM3GUApzqo0SpbORipt7su56tmXvbzXrl3UFaPZp9Dn2TEwjvx7oTijLf5LzzrYn
-         oAxib/HZYwxKKYh9U1/5H3KIqVizMyrG9P4wxihZvqJv0kQ/CmBIghFQZY6n6L8MPt
-         eYTXVNNeqfC/kj7VhN/yTjSWjqWiwB3Ot1peqLc8amrFS5EwDXc+6XjFEBUHmhGFzq
-         GgZ7A2Tr4qEPjNOJhKj9lFEcsi7LfqG4Hu3j4X9rclkpEu/BU48Lvjqj+2cbrU4jFI
-         H852TpsMlaQfzwLUYRtz54ganixUYj6sD8gF7az0NieDQFBjdT8cg596SkQGRoGDwE
-         gGua22uqTFHbQ==
-Received: by mail-oo1-f72.google.com with SMTP id k18-20020a4a94920000b029026767722880so1688463ooi.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 23:00:29 -0700 (PDT)
+        Thu, 12 Aug 2021 02:13:46 -0400
+Received: by mail-io1-f71.google.com with SMTP id d70-20020a6bb4490000b029057da994a827so2919349iof.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 23:13:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=uSyAF47q0itw6OVpblEuV2uLIqpCFYTPDCy9JiOpRIc=;
-        b=S+jXw+ZtqSObfZmnkOYI9qTpQJx4ZnchnWQzzAOt1kyoxl0+lA9V/csK98CAyyGWZ+
-         /fQedhh1quEtMgaAlF7swHWJcfGnNqOBOoj63zPNuly9pfKeQ28JY8CCncPizxNNIaQO
-         BSVhk5zH2mQ96vCJwvXu7AoRo01zHkrBMH+0/IidBgkh4uNcEhCNDXLtufIFR69xeKzi
-         0TkTl1TZuV+IDUtagTMxhb5qsj4wySBZDMkPvIB5i2GiBivt7hXlWOHMa/8ydyRz8qhp
-         i3cjx4J9iQSr41MBy7TckZMsG6w42iwCtGKG95crvEitAAGCGUjrsedC67ev5Jh2HrsD
-         vr5g==
-X-Gm-Message-State: AOAM530TtQMXRh/0hsxlN+EZYPMGtri2FRHTmgHfA0gmEE9dHXfb3tgA
-        GydhYEp4zLVy4ogFbMb0oN9y95PmBXTUQXZcBkC5TIKre3dQscb0FlvwpC5wfGJZIXiaPe+6psk
-        acWjQZOXVfG2ATpnb5fGWs2CkLUnfhadeaLbwFx1FqCEYHQVhVS9ru4bhxnhHWg==
-X-Received: by 2002:aca:3488:: with SMTP id b130mr10247234oia.17.1628748028548;
-        Wed, 11 Aug 2021 23:00:28 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJxXhhG2SxUfgm+yVgS/aK64lQbCtRd+iUDMRGDW6JE10MyaZ3+ynuD3BkcBngesBnZoHpJmZrA1KMjs5pO57Fs=
-X-Received: by 2002:aca:3488:: with SMTP id b130mr10247225oia.17.1628748028261;
- Wed, 11 Aug 2021 23:00:28 -0700 (PDT)
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=DYL1J+oy4oDNfBwuAE6KH58xhAFOH+PfBaJADfwuBSo=;
+        b=CqQeLe8d4zA+A1sKcJMIHK3ocZnuTeczTAPOO+NiYtPk6LJB1KKq4fT1tG8tvSoept
+         z4xZ2F/z7lPFnD/LAe8rQiChHdfJ8r3/BDld9fgURicfiteIchw7aK4/dnRY5jim4Lyc
+         T5bwNw2WTiCYUJmLbBzLOpWrjjGcNwmH6MOB9v14ZiYVdJ9/LGRUW6ugmO02myV/UpZ2
+         lO+9Cg3ZbHaUs3Rqm/26ZRvdJy5yCIhanA+iqiT2Ab6Qfg/f30M4KUjeEEX2nTC7VgKQ
+         9JLNz4AkrM6UuxaJn6A+0pKC41PbiJYLpgdODguWmMphH9vIpJ1CSDCzrz1oVTuiM0dC
+         v1ng==
+X-Gm-Message-State: AOAM533nVGJ3OTS1A83AHW/IrpjXKxP/Kpu3ISQVNSoduBKNh3U4JhWv
+        SJf7bxqb9+ko8b8QPpc3rvAJe7IaVBSA0H3evZhSNjtxJ5U0
+X-Google-Smtp-Source: ABdhPJx29JmgnSj90+sgKDtBiuaIDX86xQPzbZV35OvVkv5qo14IzLyzCUCWmDrDPgPPfalGc0k4BcPMwjxlJEG29GePaKjMgL/g
 MIME-Version: 1.0
-References: <20210812042305.277642-1-koba.ko@canonical.com>
- <4374EE78-86B9-43BF-B387-8C51C15CB943@holtmann.org> <CAJB-X+W22r8sDhKj0LwtLCu9h2f1f=mX65nQtAN9nr=UujjDSw@mail.gmail.com>
-In-Reply-To: <CAJB-X+W22r8sDhKj0LwtLCu9h2f1f=mX65nQtAN9nr=UujjDSw@mail.gmail.com>
-From:   Koba Ko <koba.ko@canonical.com>
-Date:   Thu, 12 Aug 2021 14:00:17 +0800
-Message-ID: <CAJB-X+WEDyQUpZwbWnS7mHOZvNmsnCJ=PJnuTTUjdmJpKDCzfw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: msft: add a bluetooth parameter, msft_enable
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Archie Pusaka <apusaka@google.com>
+X-Received: by 2002:a5d:9c58:: with SMTP id 24mr1800988iof.120.1628748801983;
+ Wed, 11 Aug 2021 23:13:21 -0700 (PDT)
+Date:   Wed, 11 Aug 2021 23:13:21 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000c5482805c956a118@google.com>
+Subject: [syzbot] INFO: task hung in hci_req_sync
+From:   syzbot <syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, Aug 12, 2021 at 1:37 PM Koba Ko <koba.ko@canonical.com> wrote:
->
-> On Thu, Aug 12, 2021 at 1:29 PM Marcel Holtmann <marcel@holtmann.org> wrote:
-> >
-> > Hi Koba,
-> >
-> > > With Intel AC9560, follow this scenario and can't turn on bt since.
-> > > 1. turn off BT
-> > > 2. then suspend&resume multiple times
-> > > 3. turn on BT
-> > >
-> > > Get this error message after turn on bt.
-> > > [ 877.194032] Bluetooth: hci0: urb 0000000061b9a002 failed to resubmit (113)
-> > > [ 886.941327] Bluetooth: hci0: Failed to read MSFT supported features (-110)
-> > >
-> > > Remove msft from compilation would be helpful.
-> > > Turn off msft would be also helpful.
-> > >
-> > > Because msft is enabled as default and can't turn off without
-> > > compliation,
-> > > Introduce a bluetooth parameter, msft_enable, to control.
-> > >
-> > > Signed-off-by: Koba Ko <koba.ko@canonical.com>
-> > > ---
-> > > include/net/bluetooth/hci_core.h |  1 +
-> > > net/bluetooth/hci_core.c         | 16 ++++++++++++++++
-> > > net/bluetooth/msft.c             | 30 +++++++++++++++++++++++++++++-
-> > > 3 files changed, 46 insertions(+), 1 deletion(-)
-> >
-> > NAK.
-> >
-> > This is for the Intel guys to figure out. Otherwise I am going to disable MSFT extension for AC9560 completely. What is your hw_variant for that hardware?
-> Would you please guide to dump hw_variant? thanks
-Found it,
-Bluetooth: hci0: Found Intel DDC parameters: intel/ibt-19-0-1.ddc
+Hello,
+
+syzbot found the following issue on:
+
+HEAD commit:    c9194f32bfd9 Merge tag 'ext4_for_linus_stable' of git://gi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1488f59e300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=343fd21f6f4da2d6
+dashboard link: https://syzkaller.appspot.com/bug?extid=be2baed593ea56c6a84c
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15b5afc6300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15fcd192300000
+
+Bisection is inconclusive: the issue happens on the oldest tested release.
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17dce4fa300000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=143ce4fa300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=103ce4fa300000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+
+INFO: task syz-executor446:8489 blocked for more than 143 seconds.
+      Not tainted 5.14.0-rc4-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor446 state:D stack:28712 pid: 8489 ppid:  8452 flags:0x00000000
+Call Trace:
+ context_switch kernel/sched/core.c:4683 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
+ schedule+0xd3/0x270 kernel/sched/core.c:6019
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
+ __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+ __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
+ hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+ hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
+ hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
+ sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
+ sock_ioctl+0x477/0x6a0 net/socket.c:1221
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:1069 [inline]
+ __se_sys_ioctl fs/ioctl.c:1055 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x446449
+RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
+RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
+RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000003
+R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
+INFO: task syz-executor446:8491 blocked for more than 143 seconds.
+      Not tainted 5.14.0-rc4-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor446 state:D stack:28176 pid: 8491 ppid:  8452 flags:0x00000004
+Call Trace:
+ context_switch kernel/sched/core.c:4683 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5940
+ schedule+0xd3/0x270 kernel/sched/core.c:6019
+ schedule_preempt_disabled+0xf/0x20 kernel/sched/core.c:6078
+ __mutex_lock_common kernel/locking/mutex.c:1036 [inline]
+ __mutex_lock+0x7b6/0x10a0 kernel/locking/mutex.c:1104
+ hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+ hci_inquiry+0x6f4/0x9e0 net/bluetooth/hci_core.c:1357
+ hci_sock_ioctl+0x1a7/0x910 net/bluetooth/hci_sock.c:1060
+ sock_do_ioctl+0xcb/0x2d0 net/socket.c:1094
+ sock_ioctl+0x477/0x6a0 net/socket.c:1221
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:1069 [inline]
+ __se_sys_ioctl fs/ioctl.c:1055 [inline]
+ __x64_sys_ioctl+0x193/0x200 fs/ioctl.c:1055
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x446449
+RSP: 002b:00007f36ab8342e8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 00000000004cb400 RCX: 0000000000446449
+RDX: 00000000200000c0 RSI: 00000000800448f0 RDI: 0000000000000004
+RBP: 00000000004cb40c R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000003
+R13: 0000000000000004 R14: 00007f36ab8346b8 R15: 00000000004cb408
+
+Showing all locks held in the system:
+6 locks held by kworker/u4:0/8:
+1 lock held by khungtaskd/1635:
+ #0: ffffffff8b97c180 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6446
+1 lock held by in:imklog/8352:
+ #0: ffff888033e1d4f0 (&f->f_pos_lock){+.+.}-{3:3}, at: __fdget_pos+0xe9/0x100 fs/file.c:974
+1 lock held by syz-executor446/8486:
+ #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+1 lock held by syz-executor446/8489:
+ #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+1 lock held by syz-executor446/8491:
+ #0: ffff8880349c4ff0 (&hdev->req_lock){+.+.}-{3:3}, at: hci_req_sync+0x33/0xd0 net/bluetooth/hci_request.c:276
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 PID: 1635 Comm: khungtaskd Not tainted 5.14.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:105
+ nmi_cpu_backtrace.cold+0x44/0xd7 lib/nmi_backtrace.c:105
+ nmi_trigger_cpumask_backtrace+0x1b3/0x230 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:210 [inline]
+ watchdog+0xd0a/0xfc0 kernel/hung_task.c:295
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 8 Comm: kworker/u4:0 Not tainted 5.14.0-rc4-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events_unbound toggle_allocation_gate
+RIP: 0010:csd_lock_wait kernel/smp.c:440 [inline]
+RIP: 0010:smp_call_function_many_cond+0x452/0xc20 kernel/smp.c:967
+Code: 0b 00 85 ed 74 4d 48 b8 00 00 00 00 00 fc ff df 4d 89 f4 4c 89 f5 49 c1 ec 03 83 e5 07 49 01 c4 83 c5 03 e8 d0 47 0b 00 f3 90 <41> 0f b6 04 24 40 38 c5 7c 08 84 c0 0f 85 33 06 00 00 8b 43 08 31
+RSP: 0018:ffffc90000cd7a00 EFLAGS: 00000293
+RAX: 0000000000000000 RBX: ffff8880b9d570c0 RCX: 0000000000000000
+RDX: ffff88813fe6d4c0 RSI: ffffffff816a6400 RDI: 0000000000000003
+RBP: 0000000000000003 R08: 0000000000000000 R09: 0000000000000001
+R10: ffffffff816a6426 R11: 0000000000000000 R12: ffffed10173aae19
+R13: 0000000000000001 R14: ffff8880b9d570c8 R15: 0000000000000001
+FS:  0000000000000000(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f56e8f43000 CR3: 000000000b68e000 CR4: 0000000000350ef0
+Call Trace:
+ on_each_cpu_cond_mask+0x56/0xa0 kernel/smp.c:1133
+ on_each_cpu include/linux/smp.h:71 [inline]
+ text_poke_sync arch/x86/kernel/alternative.c:929 [inline]
+ text_poke_bp_batch+0x47d/0x560 arch/x86/kernel/alternative.c:1183
+ text_poke_flush arch/x86/kernel/alternative.c:1268 [inline]
+ text_poke_flush arch/x86/kernel/alternative.c:1265 [inline]
+ text_poke_finish+0x16/0x30 arch/x86/kernel/alternative.c:1275
+ arch_jump_label_transform_apply+0x13/0x20 arch/x86/kernel/jump_label.c:146
+ jump_label_update+0x1d5/0x430 kernel/jump_label.c:830
+ static_key_enable_cpuslocked+0x1b1/0x260 kernel/jump_label.c:177
+ static_key_enable+0x16/0x20 kernel/jump_label.c:190
+ toggle_allocation_gate mm/kfence/core.c:623 [inline]
+ toggle_allocation_gate+0x100/0x390 mm/kfence/core.c:615
+ process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
+ worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
 
-> >
-> > Regards
-> >
-> > Marcel
-> >
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
