@@ -8,203 +8,253 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB356C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 17:31:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A662C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 18:00:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6DBA60E97
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 17:31:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 489EF60FED
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 18:00:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235935AbhHLRbp (ORCPT
+        id S237256AbhHLSAY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 12 Aug 2021 13:31:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34384 "EHLO
+        Thu, 12 Aug 2021 14:00:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230018AbhHLRbo (ORCPT
+        with ESMTP id S237238AbhHLSAY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 12 Aug 2021 13:31:44 -0400
-Received: from mail-yb1-xb31.google.com (mail-yb1-xb31.google.com [IPv6:2607:f8b0:4864:20::b31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59394C061756
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 10:31:19 -0700 (PDT)
-Received: by mail-yb1-xb31.google.com with SMTP id c5so175946ybn.5
-        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 10:31:19 -0700 (PDT)
+        Thu, 12 Aug 2021 14:00:24 -0400
+Received: from mail-yb1-xb34.google.com (mail-yb1-xb34.google.com [IPv6:2607:f8b0:4864:20::b34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE47C0613D9;
+        Thu, 12 Aug 2021 10:59:58 -0700 (PDT)
+Received: by mail-yb1-xb34.google.com with SMTP id k11so13419043ybf.6;
+        Thu, 12 Aug 2021 10:59:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=W2toyRmefsbj+1mEzDHLJG0NnopBql6wtFGACDkeACU=;
-        b=HpvOb+UsZEhGWC8oVsdjUO2+dnQ0Im0nRdZ8hshocirXecMdehQ7oivIHgLkwXqA0k
-         722R4pfMapYWLxnSbQ8XvjjHkW1KKhbAcvKqGA/diAnX8uZRlqDDgSrVCYVyQ9WRKFW0
-         x02Jf5/Yy2sYYF/C2u3Fsy9Ey6IMXtxlnNYIPqsrRgdkbCf5YswZbAfONpx9PpGJ2gqK
-         KoqXF1uQ+ghTMktoPbV0YWM9xLbr0hytFZWidASEEcMG3l2hd4Zi3xLFI4TR7fS7b5C/
-         A9Bpa2Ww9Ow/TW5I0ik0uev1ZhKy5FZFX8L89KuaZqIJ2892mQ2tn8w/miYVZHHBFZ1A
-         0q2Q==
+        bh=WnuUAU/QTfJ5Th8agjt5w1+nhW9QiiYUW0wxJH/GzBU=;
+        b=tFe1jyp+RK6ctD3P+R+SeRWA42UZ6gsmO/xzsFmNsJnDQ3K8fK78FxD4HxweylsV6H
+         97xBsATgnEIIXp1XxxVKuSJoeWvnRvJhdH/YJsMfu/y19K2b+P0dZHgxC68+BWols8dP
+         hdKEAQc5lBH5IV5kiorXNgrL6GtCMjju/PkBlSc9Om4RPY89ZZG0dvjmP7HT0jMlXWfh
+         +/tflf8Tjf53wqXd8EgfdVBpadOgy/97VuAGAcjFt8jTOAOfVFh77yTjuB7BWjhxDIF6
+         EAW5wxmTdi5AiuAxau1tzNyumHLIRBl6DTaWMm3chvk/PVMb32wXh9Kz1WG+A9da7ZKp
+         p2qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=W2toyRmefsbj+1mEzDHLJG0NnopBql6wtFGACDkeACU=;
-        b=hjx9bczA2Th9E7xt0AgteaSI/KqJd2GwMX1+NMOZNSYrsgw04ktSl5+ImMsZOeMpef
-         w40S5C3j0vMNLxGQi3ZR7G9cvQBnoh74VR5WfX4EdZAUPqGIJ0OedXfuxOPnxuoxRtYG
-         BQaX4NbT00VVYq0z3+6HJZir123JZF5Ba/TU9TF3eea/ARccpRvTGomfpp7eRSK2OgUh
-         4PdQqRlmLY1M7fGrwQRUSt6N2U17ulfoe25OVrEkgfxZ3oUlwWjjgjoYtE8zghGrg63L
-         pK4xlZ2b4+y0YsTwIuUiLvmeQIc7wfLLoUEXOf6YIN8BuuZPzsxf2Hmw44130S0gaDMi
-         BOtw==
-X-Gm-Message-State: AOAM5306tZG0+cINjnhbxsoMT6uYG/HKCZoSJQnTa2G5cF+nHohfrwe6
-        qkhtfmRiBxuPR6mLAX3ABsGytF1nomV9i9Ujo/XNF4Eg
-X-Google-Smtp-Source: ABdhPJwQ58J2+7khaSZHV0HCG4oM3MfVDj6YBWbRy0QMATZgIgZ4lWLRHcJJnwlQ2WBAGvpErP0IqDWUmZqBibGXlaQ=
-X-Received: by 2002:a25:bb13:: with SMTP id z19mr5879882ybg.347.1628789478513;
- Thu, 12 Aug 2021 10:31:18 -0700 (PDT)
+        bh=WnuUAU/QTfJ5Th8agjt5w1+nhW9QiiYUW0wxJH/GzBU=;
+        b=GdjuDUgcAI8OWfnHm627sY9JHu8L6QGZD/xJdpEd3BYT0rn3A9IkdDwljMKuugBSJi
+         mLAjKVILnj/JspdG4d0vQOKIspK2anEPscTNB1wPNum4juNgPbYTsYrP1NNog8bB5kXC
+         9x3FzPHiSHTAIEsFlDrK/o+rwca8G/dKFbmANHi8QM1fQIRdcglBcYP9NqjjWI5r9uvq
+         3gey+N3zGaGlvxIjes7ZaW1XypFDIxRZLO2XLl2lMva+dn8aPpq8Ir78XeXxY7ro20TD
+         Rexb7BUihCIhmChLimHPJNpt2NK4XXkYgB8ThBwtH88EFsi4iWJu52f1Np4keXOWYALN
+         WT5g==
+X-Gm-Message-State: AOAM53310o8aShT9pyFosRR54YtRFXzJ+EZOC1Pjh1dcFwhoqhZdPh52
+        pM184fQ1vKrriDepQTH/CgkFMRULfVDycGtg0fg=
+X-Google-Smtp-Source: ABdhPJzwadAgsGCCMz+o4oViNV5UnhTlsbjAjCK0S5Xmt/j+bFV/f72dqYPJ9NfCZla93pkGGkpY6+OL2M2rVwF31t0=
+X-Received: by 2002:a05:6902:114c:: with SMTP id p12mr6532628ybu.282.1628791198089;
+ Thu, 12 Aug 2021 10:59:58 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210804173939.25496-1-kiran.k@intel.com> <CB7F6AB9-E997-4C77-B19D-D018F8044001@holtmann.org>
- <DM8PR11MB55738B15758672E2982D748AF5F39@DM8PR11MB5573.namprd11.prod.outlook.com>
- <DM8PR11MB55733AD00D7FB779732063B4F5F99@DM8PR11MB5573.namprd11.prod.outlook.com>
-In-Reply-To: <DM8PR11MB55733AD00D7FB779732063B4F5F99@DM8PR11MB5573.namprd11.prod.outlook.com>
+References: <20210812171533.v7.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
+ <20210812171533.v7.3.I50ffa4cd0b3ab11669ff2541fc719fee00b4e244@changeid>
+In-Reply-To: <20210812171533.v7.3.I50ffa4cd0b3ab11669ff2541fc719fee00b4e244@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 12 Aug 2021 10:31:07 -0700
-Message-ID: <CABBYNZJNruwiLRZSsTzeSZzL4O2u-zpUCAOc=JgAPk0H3UHUUg@mail.gmail.com>
-Subject: Re: [PATCH v1] Bluetooth: Fix race condition in handling NOP command
-To:     "K, Kiran" <kiran.k@intel.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        BlueZ <linux-bluetooth@vger.kernel.org>,
-        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
-        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
-        Manish Mandlik <mmandlik@google.com>
+Date:   Thu, 12 Aug 2021 10:59:46 -0700
+Message-ID: <CABBYNZJKaFmoNAOOXROSNGtpqLtuaXDs7Fq_LjR8--Cmu38Zjw@mail.gmail.com>
+Subject: Re: [PATCH v7 3/4] Bluetooth: set quality report callback for Intel
+To:     Joseph Hwang <josephsih@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        Joseph Hwang <josephsih@google.com>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Joseph,
 
-On Thu, Aug 12, 2021 at 3:58 AM K, Kiran <kiran.k@intel.com> wrote:
+On Thu, Aug 12, 2021 at 2:16 AM Joseph Hwang <josephsih@chromium.org> wrote:
 >
-> Hi Marcel,
+> This patch sets up set_quality_report callback for Intel to
+> set and reset the debug features.
 >
-> > -----Original Message-----
-> > From: K, Kiran
-> > Sent: Friday, August 6, 2021 8:14 PM
-> > To: 'Marcel Holtmann' <marcel@holtmann.org>
-> > Cc: BlueZ <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishankar
-> > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
-> > <chethan.tumkur.narayan@intel.com>
-> > Subject: RE: [PATCH v1] Bluetooth: Fix race condition in handling NOP
-> > command
-> >
-> > Hi Marcel,
-> >
-> > > -----Original Message-----
-> > > From: Marcel Holtmann <marcel@holtmann.org>
-> > > Sent: Thursday, August 5, 2021 6:41 PM
-> > > To: K, Kiran <kiran.k@intel.com>
-> > > Cc: BlueZ <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishankar
-> > > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
-> > > <chethan.tumkur.narayan@intel.com>
-> > > Subject: Re: [PATCH v1] Bluetooth: Fix race condition in handling NOP
-> > > command
-> > >
-> > > Hi Kiran,
-> > >
-> > > > For NOP command, need to cancel work scheduled on cmd_timer, on
-> > > > receiving command status or commmand complete event.
-> > > >
-> > > > Below use case might lead to race condition multiple when NOP
-> > > > commands are queued sequentially:
-> > > >
-> > > > hci_cmd_work() {
-> > > >   if (atomic_read(&hdev->cmd_cnt) {
-> > > >            .
-> > > >            .
-> > > >            .
-> > > >      atomic_dec(&hdev->cmd_cnt);
-> > > >      hci_send_frame(hdev,...);
-> > > >      schedule_delayed_work(&hdev->cmd_timer,...);
-> > > >   }
-> > > > }
-> > > >
-> > > > On receiving event for first NOP, the work scheduled on
-> > > > hdev->cmd_timer is not cancelled and  second NOP is dequeued and
-> > > > hdev->sent
-> > > to controller.
-> > > >
-> > > > While waiting for an event for second NOP command, work scheduled on
-> > > > cmd_timer for first NOP can get scheduled, resulting in sending
-> > > > third NOP command not waiting for an event for second NOP. This
-> > > > might cause issues at controller side (like memory overrun,
-> > > > controller going
-> > > > unresponsive) resulting in hci tx timeouts, hardware errors etc.
-> > > >
-> > > > Signed-off-by: Kiran K <kiran.k@intel.com>
-> > > > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> > > > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> > > > ---
-> > > > net/bluetooth/hci_event.c | 3 +--
-> > > > 1 file changed, 1 insertion(+), 2 deletions(-)
-> > > >
-> > > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > > index ea7fc09478be..14dfbdc8b81b 100644
-> > > > --- a/net/bluetooth/hci_event.c
-> > > > +++ b/net/bluetooth/hci_event.c
-> > > > @@ -3271,8 +3271,7 @@ static void hci_remote_features_evt(struct
-> > > > hci_dev *hdev, static inline void handle_cmd_cnt_and_timer(struct
-> > > > hci_dev
-> > > *hdev,
-> > > >                                       u16 opcode, u8 ncmd)
-> > > > {
-> > > > - if (opcode != HCI_OP_NOP)
-> > > > -         cancel_delayed_work(&hdev->cmd_timer);
-> > > > + cancel_delayed_work(&hdev->cmd_timer);
-> > > >
-> > > >   if (!test_bit(HCI_RESET, &hdev->flags)) {
-> > > >           if (ncmd) {
-> > >
-> > > so this is conflicting with the patch introducing the ncmd timeout handling.
-> > >
-> > My patch specifically addresses the issue observed in case of NOP command.
-> > It prevents the issue by handling NOP same as any other SIG command.
-> >
-> > It looks commit de75cd0d9b2f3250d5f25846bb5632ccce6275f4 tries to
-> > recover when controller goes bad.
-> >
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> ---
 >
-> Do you have any further comments here ? Waiting for your input.
+> Changes in v7:
+> - Rebase on Tedd's patches that moved functionality from btusb to
+>   btintel.
 >
-> > > commit de75cd0d9b2f3250d5f25846bb5632ccce6275f4
-> > > Author: Manish Mandlik <mmandlik@google.com>
-> > > Date:   Thu Apr 29 10:24:22 2021 -0700
-> > >
-> > >     Bluetooth: Add ncmd=0 recovery handling
-> > >
-> > >     During command status or command complete event, the controller
-> > > may set
-> > >     ncmd=0 indicating that it is not accepting any more commands. In such a
-> > >     case, host holds off sending any more commands to the controller. If the
-> > >     controller doesn't recover from such condition, host will wait forever,
-> > >     until the user decides that the Bluetooth is broken and may power cycles
-> > >     the Bluetooth.
-> > >
-> > >     This patch triggers the hardware error to reset the controller and
-> > >     driver when it gets into such state as there is no other wat out.
-> > >
-> > > Nowhere in your commit description you are addressing why is this the
-> > > right to do.
-> > >
-> >
-> > Will fix it in the next version if you are OK with the current fix. Please let me
-> > know.
+> Changes in v5:
+> - Removed CONFIG_BT_FEATURE_QUALITY_REPORT since there was no
+>   large size impact.
+>
+>  drivers/bluetooth/btintel.c | 81 ++++++++++++++++++++++++++++++++++++-
+>  drivers/bluetooth/btintel.h |  6 +++
+>  2 files changed, 86 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index 643e2194ca01..611c3ea5425f 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -1291,8 +1291,10 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
+>         u8 trace_enable = 0x02;
+>         struct sk_buff *skb;
+>
+> -       if (!features)
+> +       if (!features) {
+> +               bt_dev_warn(hdev, "Debug features not read");
+>                 return -EINVAL;
+> +       }
+>
+>         if (!(features->page1[0] & 0x3f)) {
+>                 bt_dev_info(hdev, "Telemetry exception format not supported");
+> @@ -1323,9 +1325,77 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
+>         }
+>         kfree_skb(skb);
+>
+> +       bt_dev_info(hdev, "set debug features: trace_enable 0x%02x mask 0x%02x",
+> +                   trace_enable, mask[3]);
+> +
+>         return 0;
+>  }
+>
+> +static int btintel_reset_debug_features(struct hci_dev *hdev,
+> +                                const struct intel_debug_features *features)
+> +{
+> +       u8 mask[11] = { 0x0a, 0x92, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
+> +                       0x00, 0x00, 0x00 };
+> +       u8 trace_enable = 0x00;
+> +       struct sk_buff *skb;
+> +
+> +       if (!features) {
+> +               bt_dev_warn(hdev, "Debug features not read");
+> +               return -EINVAL;
+> +       }
+> +
+> +       if (!(features->page1[0] & 0x3f)) {
+> +               bt_dev_info(hdev, "Telemetry exception format not supported");
+> +               return 0;
+> +       }
+> +
+> +       /* Should stop the trace before writing ddc event mask. */
+> +       skb = __hci_cmd_sync(hdev, 0xfca1, 1, &trace_enable, HCI_INIT_TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               bt_dev_err(hdev, "Stop tracing of link statistics events failed (%ld)",
+> +                          PTR_ERR(skb));
+> +               return PTR_ERR(skb);
+> +       }
+> +       kfree_skb(skb);
+> +
+> +       skb = __hci_cmd_sync(hdev, 0xfc8b, 11, mask, HCI_INIT_TIMEOUT);
+> +       if (IS_ERR(skb)) {
+> +               bt_dev_err(hdev, "Setting Intel telemetry ddc write event mask failed (%ld)",
+> +                          PTR_ERR(skb));
+> +               return PTR_ERR(skb);
+> +       }
+> +       kfree_skb(skb);
+> +
+> +       bt_dev_info(hdev, "reset debug features: trace_enable 0x%02x mask 0x%02x",
+> +                   trace_enable, mask[3]);
+> +
+> +       return 0;
+> +}
+> +
+> +int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
+> +{
+> +       struct intel_debug_features features;
+> +       int err;
+> +
+> +       bt_dev_dbg(hdev, "enable %d", enable);
+> +
+> +       /* Read the Intel supported features and if new exception formats
+> +        * supported, need to load the additional DDC config to enable.
+> +        */
+> +       err = btintel_read_debug_features(hdev, &features);
+> +       if (err)
+> +               return err;
+> +
+> +       /* Set or reset the debug features. */
+> +       if (enable)
+> +               err = btintel_set_debug_features(hdev, &features);
+> +       else
+> +               err = btintel_reset_debug_features(hdev, &features);
+> +
+> +       return err;
+> +}
+> +EXPORT_SYMBOL_GPL(btintel_set_quality_report);
+> +
+>  static const struct firmware *btintel_legacy_rom_get_fw(struct hci_dev *hdev,
+>                                                struct intel_version *ver)
+>  {
+> @@ -1951,6 +2021,9 @@ static int btintel_bootloader_setup(struct hci_dev *hdev,
+>                 btintel_load_ddc_config(hdev, ddcname);
+>         }
+>
+> +       hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+> +       bt_dev_dbg(hdev, "HCI_QUALITY_REPORT cleared");
 
-Can you confirm this change doesn't break your patch above?
+I would remove such debugs since I don't think they have any value
+here, besides it doesn't seem HCI_QUALITY_REPORT is ever set anyway
+which perhaps should be done by the core itself after calling the
+callback.
 
-> >
-> > > Regards
-> > >
-> > > Marcel
-> >
-> > Thanks,
-> > Kiran
+>         /* Read the Intel version information after loading the FW  */
+>         err = btintel_read_version(hdev, &new_ver);
+>         if (err)
+> @@ -2132,6 +2205,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+>          */
+>         btintel_load_ddc_config(hdev, ddcname);
 >
-> Thanks,
-> Kiran
+> +       hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
+> +       bt_dev_dbg(hdev, "HCI_QUALITY_REPORT cleared");
+
+Ditto.
+
+>         /* Read the Intel version information after loading the FW  */
+>         err = btintel_read_version_tlv(hdev, &new_ver);
+>         if (err)
+> @@ -2230,6 +2306,9 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+>         set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
+>         set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
 >
+> +       /* Set up the quality report callback for Intel devices */
+> +       hdev->set_quality_report = btintel_set_quality_report;
+> +
+>         /* For Legacy device, check the HW platform value and size */
+>         if (skb->len == sizeof(ver) && skb->data[1] == 0x37) {
+>                 bt_dev_dbg(hdev, "Read the legacy Intel version information");
+> diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+> index aa64072bbe68..fe02cb9ac96c 100644
+> --- a/drivers/bluetooth/btintel.h
+> +++ b/drivers/bluetooth/btintel.h
+> @@ -204,6 +204,7 @@ int btintel_configure_setup(struct hci_dev *hdev);
+>  void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
+>  void btintel_secure_send_result(struct hci_dev *hdev,
+>                                 const void *ptr, unsigned int len);
+> +int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
+>  #else
+>
+>  static inline int btintel_check_bdaddr(struct hci_dev *hdev)
+> @@ -294,4 +295,9 @@ static inline void btintel_secure_send_result(struct hci_dev *hdev,
+>                                 const void *ptr, unsigned int len)
+>  {
+>  }
+> +
+> +static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
+> +{
+> +       return -ENODEV;
+> +}
+>  #endif
+> --
+> 2.32.0.605.g8dce9f2422-goog
 >
 
 
