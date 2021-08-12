@@ -2,222 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D8A7FC4320A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 23:20:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 161CAC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 04:23:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B929A61058
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 11 Aug 2021 23:20:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E23E260F00
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 12 Aug 2021 04:23:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232807AbhHKXUp (ORCPT
+        id S233853AbhHLEXk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 11 Aug 2021 19:20:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39492 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232725AbhHKXUo (ORCPT
+        Thu, 12 Aug 2021 00:23:40 -0400
+Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:55938
+        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229531AbhHLEXj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 11 Aug 2021 19:20:44 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C82A7C061765
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 16:20:20 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id a5so4794520plh.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 16:20:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=ubteHlrgBNF/kKcsV8PMoJ4rULPJeD+bwGIxtttssLc=;
-        b=gF7Yli4ve/Z7Irtf4Guarf1tQhfa4Io++VL55HsNy3mD8FWfAZyFYyAJzFy5jXxVQ9
-         XPjfnEEwXIlaZHXg0VF9ARb6cvHATBbRpuAtuh8A2yHE80hOne092Hj3ccyz/2KoYI0V
-         Ixczu4wo0WUV4H03wHtlPX5ssa/QcOCtKtrR6kcmrGbE4FPLEng4VY91mGL2nUKIzUYt
-         lHk6ySZCxozhcaQIoleEQI6TUo7dVtNdthSlLHaQuaKHEjd/ofQG8aTnmDRf9NsgbF3O
-         qiZ0iPcFFsgsoPsXB5tC9DELfwtooJBBJORS/rJztjBcKENy3n/7xaWvOJ5G7CV4n1j4
-         7FqA==
+        Thu, 12 Aug 2021 00:23:39 -0400
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com [209.85.216.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPS id 9934C3F051
+        for <linux-bluetooth@vger.kernel.org>; Thu, 12 Aug 2021 04:23:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1628742189;
+        bh=+L442i3SxtCcWzJaUttW6ED4hZuYNad+jI36fQtKVDY=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=j6/qJiIPE2mUv/U1CK6fX8j71JttKgDDK2vP5ihW7dzzf9SF/iE3azn0UdYOpvX0g
+         HB6tBu4bGsVgg1g4u5ffsoa47hIZiV7Pa/MDVZofYKzjnZsrLapfrPXSbyMs2qU8ba
+         nKV0r0DtXOLgOumQDLqz10fG/+pVb5e3aNh+Rpt9LfhWY5icSk8l1jkGbfRsL+xLRC
+         uzdRGkW3ctN1In3EpJaiq3/b/gsAWdQz6CyJRxtQnOuJebmfTBl7LBfTmbeBI2QOZZ
+         NQznDUs7Gw/vVEqCfzK5/8qd8jo5cNI5UsYUWik0lRJpilC7FZyh+rAw3tZtuAw9TL
+         U+mNLE7ZNn1aA==
+Received: by mail-pj1-f69.google.com with SMTP id 2-20020a17090a1742b0290178de0ca331so3323093pjm.1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 11 Aug 2021 21:23:09 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=ubteHlrgBNF/kKcsV8PMoJ4rULPJeD+bwGIxtttssLc=;
-        b=pGs62YDta0A7RhzNB1++xMFxSDVsOg/cz17zR7DV0YBxOhSuhYdbxab4ltKDfylc2w
-         V3z+/Kh0/oUA++cMYEpZb5Et0FEMtPrOkSC6c8d0NC4lXRoeVWufbMMPiYVh0z6cocJ8
-         3Jlny3L2t13OE9SYHSqCsnsOW9yezxShD84b6gZJKSCWTIjOhEJAuThURFyEKacNGCpI
-         VT5J4WVlLNWQEt725DmFq0GVMOf6+MzRholC0SSX1c4NW2U3H9G4gXb0jQKSpC8RCrN9
-         wwLupvdqPLfGDnkMgluAPPSC8q4qebTdA6EG2BiKB8AHPPzJnAQr7LpBXa1yts9oudd2
-         qhTQ==
-X-Gm-Message-State: AOAM530U3rwJHZ9lTzt7DZBlkaiZZa/32caKmH586Ph2FBgeDb2HEvGO
-        h1Qk1EJ4VRI3gfeIL0tah4JYx0znV1o=
-X-Google-Smtp-Source: ABdhPJwndNuJ8pYbXn0tOj1IGKFlLP7vLY5DnDoayWAEJ8ky7vmPEjknRdvLxATArn6pitTbP7ORmg==
-X-Received: by 2002:a17:902:9b87:b029:12c:c3ed:8a1d with SMTP id y7-20020a1709029b87b029012cc3ed8a1dmr1059796plp.7.1628724020172;
-        Wed, 11 Aug 2021 16:20:20 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e27sm672835pfj.23.2021.08.11.16.20.19
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=+L442i3SxtCcWzJaUttW6ED4hZuYNad+jI36fQtKVDY=;
+        b=jaCZOcE3xJ+OJj5/bOGmqrCyQ4VGLgqUvrg6D6DQEjxg88kE6D6XZNTJmpr0O2vodP
+         vp10Jlo5n9Pol8WSfxcMaLjY9yzzINNfdxRumxWAB+sRWIcSsfWISe6/X8zNjoMZp23R
+         Uq7dNzBSHj6h0qRgMox3xIaVnHMUR84Wlv8lF8dLV61DRqsaVzRaedUTUD/ChEwhlgN3
+         fqdT0Vh2IdEgbfNzsyKo4C4peY0fs1IKdrsDWAor1gPVuJzRS5oBL/PhXgoUqoy3t5xm
+         fXGxWxjtsPhVdZq4DFFGU2KE+dhywEoy1LCDWhpjmQte0G1Qx6g9FBsHaBSaU4NSSBGH
+         tXqA==
+X-Gm-Message-State: AOAM533fojcvPS41Pemtg6jem+JLsf4GeWpUYCU9Mv79kIWZlmxL256q
+        2NgrVBS++nt/V8VThP3M+7kB7dCeVlm9gEhTDeq0qPMVSAr3VGL4D4GoWD6Yi5Ky9xF29s1wVpk
+        5d36cHkQ/CMe1pv3Nz0tQWmf+uJnEXT7kCswviHRPKXGUrA==
+X-Received: by 2002:a17:90a:d702:: with SMTP id y2mr2320615pju.127.1628742187455;
+        Wed, 11 Aug 2021 21:23:07 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJyXjpzEwVLP/zQsF6dW6uJ5sYNGe1SPeFYLPOiehRNPqCxY0kzQvYXusthspuWxSYsiqLixyA==
+X-Received: by 2002:a17:90a:d702:: with SMTP id y2mr2320591pju.127.1628742187163;
+        Wed, 11 Aug 2021 21:23:07 -0700 (PDT)
+Received: from canonical.com (61-220-137-34.HINET-IP.hinet.net. [61.220.137.34])
+        by smtp.gmail.com with ESMTPSA id dw15sm1092861pjb.42.2021.08.11.21.23.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 11 Aug 2021 16:20:19 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 2/2] Bluetooth: Store advertising handle so it can be re-enabled
-Date:   Wed, 11 Aug 2021 16:20:16 -0700
-Message-Id: <20210811232016.757154-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210811232016.757154-1-luiz.dentz@gmail.com>
-References: <20210811232016.757154-1-luiz.dentz@gmail.com>
+        Wed, 11 Aug 2021 21:23:06 -0700 (PDT)
+From:   Koba Ko <koba.ko@canonical.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, apusaka@google.com
+Subject: [PATCH] Bluetooth: msft: add a bluetooth parameter, msft_enable
+Date:   Thu, 12 Aug 2021 12:23:05 +0800
+Message-Id: <20210812042305.277642-1-koba.ko@canonical.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+With Intel AC9560, follow this scenario and can't turn on bt since.
+1. turn off BT
+2. then suspend&resume multiple times
+3. turn on BT
 
-This stores the advertising handle/instance into hci_conn so it is
-accessible when re-enabling the advertising once disconnected.
+Get this error message after turn on bt.
+[ 877.194032] Bluetooth: hci0: urb 0000000061b9a002 failed to resubmit (113)
+[ 886.941327] Bluetooth: hci0: Failed to read MSFT supported features (-110)
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Remove msft from compilation would be helpful.
+Turn off msft would be also helpful.
+
+Because msft is enabled as default and can't turn off without
+compliation,
+Introduce a bluetooth parameter, msft_enable, to control.
+
+Signed-off-by: Koba Ko <koba.ko@canonical.com>
 ---
  include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/hci_event.c        | 45 ++++++++++++++++++++------------
- 2 files changed, 30 insertions(+), 16 deletions(-)
+ net/bluetooth/hci_core.c         | 16 ++++++++++++++++
+ net/bluetooth/msft.c             | 30 +++++++++++++++++++++++++++++-
+ 3 files changed, 46 insertions(+), 1 deletion(-)
 
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index a7d06d7da602..a7360c8c72f8 100644
+index a7d06d7da602..002753db936a 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -629,6 +629,7 @@ struct hci_conn {
- 	__u8		init_addr_type;
- 	bdaddr_t	resp_addr;
- 	__u8		resp_addr_type;
-+	__u8		adv_instance;
- 	__u16		handle;
- 	__u16		state;
- 	__u8		mode;
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index a8a199cfef60..1ee89d9b2ed4 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2348,19 +2348,20 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
- 
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(cp->handle));
- 	if (conn) {
--		u8 type = conn->type;
--
- 		mgmt_disconnect_failed(hdev, &conn->dst, conn->type,
- 				       conn->dst_type, status);
- 
-+		if (conn->type == LE_LINK) {
-+			hdev->cur_adv_instance = conn->adv_instance;
-+			hci_req_reenable_advertising(hdev);
-+		}
-+
- 		/* If the disconnection failed for any reason, the upper layer
- 		 * does not retry to disconnect in current implementation.
- 		 * Hence, we need to do some basic cleanup here and re-enable
- 		 * advertising if necessary.
- 		 */
- 		hci_conn_del(conn);
--		if (type == LE_LINK)
--			hci_req_reenable_advertising(hdev);
- 	}
- 
- 	hci_dev_unlock(hdev);
-@@ -2886,7 +2887,6 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	struct hci_conn_params *params;
- 	struct hci_conn *conn;
- 	bool mgmt_connected;
--	u8 type;
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
- 
-@@ -2941,10 +2941,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		}
- 	}
- 
--	type = conn->type;
--
- 	hci_disconn_cfm(conn, ev->reason);
--	hci_conn_del(conn);
- 
- 	/* The suspend notifier is waiting for all devices to disconnect so
- 	 * clear the bit from pending tasks and inform the wait queue.
-@@ -2964,8 +2961,12 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 	 * or until a connection is created or until the Advertising
- 	 * is timed out due to Directed Advertising."
- 	 */
--	if (type == LE_LINK)
-+	if (conn->type == LE_LINK) {
-+		hdev->cur_adv_instance = conn->adv_instance;
- 		hci_req_reenable_advertising(hdev);
-+	}
-+
-+	hci_conn_del(conn);
- 
- unlock:
- 	hci_dev_unlock(hdev);
-@@ -5323,6 +5324,13 @@ static void le_conn_complete_evt(struct hci_dev *hdev, u8 status,
- 	conn->handle = handle;
- 	conn->state = BT_CONFIG;
- 
-+	/* Store current advertising instance as connection advertising instance
-+	 * when sotfware rotation is in use so it can be re-enabled when
-+	 * disconnected.
-+	 */
-+	if (!ext_adv_capable(hdev))
-+		conn->adv_instance = hdev->cur_adv_instance;
-+
- 	conn->le_conn_interval = interval;
- 	conn->le_conn_latency = latency;
- 	conn->le_supv_timeout = supervision_timeout;
-@@ -5406,13 +5414,13 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
- 	struct hci_evt_le_ext_adv_set_term *ev = (void *) skb->data;
- 	struct hci_conn *conn;
-+	struct adv_info *adv;
- 
- 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
- 
--	if (ev->status) {
--		struct adv_info *adv;
-+	adv = hci_find_adv_instance(hdev, ev->handle);
- 
--		adv = hci_find_adv_instance(hdev, ev->handle);
-+	if (ev->status) {
- 		if (!adv)
- 			return;
- 
-@@ -5423,9 +5431,15 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
-+	if (adv)
-+		adv->enabled = false;
-+
- 	conn = hci_conn_hash_lookup_handle(hdev, __le16_to_cpu(ev->conn_handle));
- 	if (conn) {
--		struct adv_info *adv_instance;
-+		/* Store handle in the connection so the correct advertising
-+		 * instance can be re-enabled when disconnected.
-+		 */
-+		conn->adv_instance = ev->handle;
- 
- 		if (hdev->adv_addr_type != ADDR_LE_DEV_RANDOM ||
- 		    bacmp(&conn->resp_addr, BDADDR_ANY))
-@@ -5436,9 +5450,8 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 			return;
- 		}
- 
--		adv_instance = hci_find_adv_instance(hdev, ev->handle);
--		if (adv_instance)
--			bacpy(&conn->resp_addr, &adv_instance->random_addr);
-+		if (adv)
-+			bacpy(&conn->resp_addr, &adv->random_addr);
- 	}
+@@ -1229,6 +1229,7 @@ static inline void *hci_get_priv(struct hci_dev *hdev)
+ 	return (char *)hdev + sizeof(*hdev);
  }
  
++void hci_set_msft(bool enable);
+ struct hci_dev *hci_dev_get(int index);
+ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, u8 src_type);
+ 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb2e9e513907..9e1bdaea20a8 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1045,6 +1045,22 @@ static int hci_linkpol_req(struct hci_request *req, unsigned long opt)
+ 	return 0;
+ }
+ 
++void hci_set_msft(bool enable)
++{
++	struct hci_dev *hdev = NULL, *d;
++
++	read_lock(&hci_dev_list_lock);
++	list_for_each_entry(d, &hci_dev_list, list) {
++		hdev = hci_dev_hold(d);
++		if (enable)
++			msft_do_open(hdev);
++		else
++			msft_do_close(hdev);
++		hci_dev_put(hdev);
++	}
++	read_unlock(&hci_dev_list_lock);
++}
++
+ /* Get HCI device by index.
+  * Device is held on return. */
+ struct hci_dev *hci_dev_get(int index)
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index b4bfae41e8a5..0bb50ee11bf8 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -97,6 +97,34 @@ struct msft_data {
+ 	__u8 filter_enabled;
+ };
+ 
++static bool msft_enable = true;
++
++static int msft_set_enable(const char *s, const struct kernel_param *kp)
++{
++	bool do_enable;
++	int ret;
++
++	if (!s)
++		return 0;
++
++	ret = strtobool(s, &do_enable);
++	if (ret || msft_enable == do_enable)
++		return ret;
++
++	hci_set_msft(do_enable);
++
++	msft_enable = do_enable;
++
++	return ret;
++}
++
++static const struct kernel_param_ops msft_enable_ops = {
++	.set = msft_set_enable,
++	.get = param_get_bool,
++};
++
++module_param_cb(msft_enable, &msft_enable_ops, &msft_enable, 0644);
++
+ static int __msft_add_monitor_pattern(struct hci_dev *hdev,
+ 				      struct adv_monitor *monitor);
+ 
+@@ -186,7 +214,7 @@ void msft_do_open(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft;
+ 
+-	if (hdev->msft_opcode == HCI_OP_NOP)
++	if (!msft_enable || hdev->msft_opcode == HCI_OP_NOP)
+ 		return;
+ 
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
 -- 
-2.31.1
+2.25.1
 
