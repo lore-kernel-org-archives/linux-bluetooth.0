@@ -8,63 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2479DC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 722C9C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0D024610A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5AB1B60F00
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240493AbhHMMWd (ORCPT
+        id S240465AbhHMMWh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:22:33 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35834 "EHLO
+        Fri, 13 Aug 2021 08:22:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35852 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240497AbhHMMWd (ORCPT
+        with ESMTP id S240480AbhHMMWg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:22:33 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F654C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:06 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id t3-20020a0cf9830000b0290359840930bdso3472915qvn.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:06 -0700 (PDT)
+        Fri, 13 Aug 2021 08:22:36 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2665FC061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:10 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id n200-20020a25d6d10000b02905935ac4154aso8930059ybg.23
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=PEgddjQmHWVJb+RnTYguCWIfPVLsTPqKeJvEdYx/1K8=;
-        b=aozckpEaxtHQGS/EVkFQgrA1HKIEF4nMzXsUk+DiMGnbiTTDupVjPPfDmYWddKVLrg
-         R+fWJiguz83kl8Ip7Me/XTKhJPsVE6zH10APTw3GVhXLeH+NV65Mho05GFX95b3f0rPF
-         EQ5C0zBcfqF1kz6Rpdsl8IA5x9/qJca+0Je1++SB1+Fz3o4JHX3UiGhpn+ks0ePdqE3v
-         an5q6qVDlLZ/4qA9yC6R8ddRuOYz39JJhrULcQwp0BeWUGrNAKdQmrlKg1d0k4YyEp43
-         EcJSeQ9R3gq3j5xHkzGp9dHwvp0p1wK3NzFq720ffNMgH+s0+gU+HqNUCULJCbewW3RW
-         2W6A==
+        bh=CZqpxQe6u5bb/HMVukOEbGayrQPrXGOR9HJq0rbq8bA=;
+        b=ZUb8IcW+rlKD7IKKR5fTNO8BpQ6bKALmgG3TMUFr6czjcjebe5amMGSvJrQBOjaTdm
+         qoi7e5CdDSS/6bItIseWyZ3GtuA48gtvOwJ9M6uN8Kj+qANmL1+L2QJpITt05vqJE8j0
+         pzPq49rIEI1ebvKdCIxP5qoW3WTwoodhBYijaysdSpWlpE/HtsAEJ/5oHsHGSFvgGtPs
+         jUpf4KjvkXfFXgtkUJ4OQXC//RnzzFleBEErlkke1oTmIvF9F38YY3gTeeeamL728Zgq
+         bT9aN9iAwa2E013d+LEdaQwQCHil0BckpzGkgcdL0okFfq8/mSG9hM/OJZgBb4THPDB2
+         bH0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=PEgddjQmHWVJb+RnTYguCWIfPVLsTPqKeJvEdYx/1K8=;
-        b=ArT6a5dMWBKQb/0j00SM2SgF2uR8v2CRowcQAtzqIBG3H+ezBzAdL/LbjrHYy2NG4D
-         kHrDKanm0tJxnQ4SbDAaBnyPgthsxo03DlJrsIUqznNRw23uoxTv2OaSsIqGOySbgotG
-         Pshnae11JJ+f7Gg8q2Jei7RhUfkblrfwAy5Z5/J66bT0qK87QIfrmjGBMc8/hODb9AnY
-         1guW8j3uNjm3QXyacEPVmkDVBdzgLg/B+XCe0XA9yK8DTxTcGzmjzEsI5fPnzJmd9BU0
-         2L3OGXCZLJYleDZGmHZ7wKA39tSAsCJH+DrjlBnFJqv/iUNtkiRdPtDxtX6BtJiS0lFu
-         piVQ==
-X-Gm-Message-State: AOAM533jxQRw9UrydceDbKJHBTUFFW9W2astZnYGJM1N8a1lAt0Z0lNq
-        i22B6FcMTVZkM5y+IMyBJlT7urC98Xyw1I6Ov054cWQJnWt76laxZeIWZmRo0Yc7DjklebYaWJs
-        anyyJrPCW51Z+vMyJIfpUbiED6TBSTuqYUxKdAYSOBsMP2l7EouhBEH/5rnIIzwGjbgd7yW8jET
-        jf
-X-Google-Smtp-Source: ABdhPJyaPMp+xqa55Qz+Qys3iz1sjtJMz2D+Yu375ybMW805lSg5Euwq4rOucFxKCVmGE1fPoujNzcVns9x/
+        bh=CZqpxQe6u5bb/HMVukOEbGayrQPrXGOR9HJq0rbq8bA=;
+        b=f2WwgWKGUDmC1Zpn/Amw5rXUIupkysLr1ncTzG+nZXra0XQX/EYCZzTfy9tPw0Yts7
+         g5v0eIWMoPLSZt4yMMiz6mU6aebA8GjZ9D/3jD4Exhc9OxpyYahvKTnqWbEx97K+l3vh
+         KfwA9vw7gosNB4kTLjf+jgT+Gza8mvOCoKOYiGqOIj1xYqQEzlYjmbvWS6Muz6dvsW7q
+         O1qa51hvnjxNvd9hU87dyGMnqQ+xRq6MSwuxzRVub583lENiFcLf2Su/aNE6WPaHxmvm
+         bd/TZFd4HwBnHsndiW2mwJz67z/NbBFUQn9Ttero7A21sgGUFMDU+U/A2klwzwJrqOtJ
+         orEg==
+X-Gm-Message-State: AOAM5321xRnVK4wgO7P6+UYHDlAQ1PpHZJPgTX3/MELKDC0OBCYRK6dF
+        ZNLoI4AdV3fD2iE6r3I3HRzTAC/O/pvB3yB6LjjOHxLjJi0fAQGQVOqQu4ModPLbeq+8kH3azcq
+        1VmsKY711Ik8gubDKKVYneyCWG28nrt1elU5q8Y8FjJYuPVifjN1+qvMZfdmGuxbG8Un+biWii8
+        N4
+X-Google-Smtp-Source: ABdhPJxWfiykgfexTcBHphioJsIksy6Qd1mpEeE5oGW49FAEZqq9QYKAAXVSpk+s2tBlE1/Ij+iF6EfYuKvI
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a05:6214:2465:: with SMTP id
- im5mr2312814qvb.46.1628857325722; Fri, 13 Aug 2021 05:22:05 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:26 +0800
+ (user=apusaka job=sendgmr) by 2002:a25:a163:: with SMTP id
+ z90mr2635160ybh.378.1628857329343; Fri, 13 Aug 2021 05:22:09 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:27 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.41.Ibff40d723f7542fa72902f176293b5bda4abde93@changeid>
+Message-Id: <20210813201256.Bluez.42.I7f857a7b3ad6c99bef365a7ad645d5e37021ffcd@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 41/62] tools/hcitool: Inclusive language changes,
- central peripheral
+Subject: [Bluez PATCH 42/62] tools/hcitool: Inclusive language changes, accept list
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -77,97 +76,320 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central" and "peripheral" are the preferred terms, as reflected in
-the BT core spec 5.3.
+"accept list" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- tools/hcitool.c   | 12 ++++++------
- tools/hcitool.rst | 10 +++++-----
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ tools/hcitool.c   | 90 +++++++++++++++++++++++------------------------
+ tools/hcitool.rst | 20 +++++------
+ 2 files changed, 55 insertions(+), 55 deletions(-)
 
 diff --git a/tools/hcitool.c b/tools/hcitool.c
-index f7fca5216c..f61eae106c 100644
+index f61eae106c..082895bce4 100644
 --- a/tools/hcitool.c
 +++ b/tools/hcitool.c
-@@ -1210,10 +1210,10 @@ static struct option cc_options[] = {
- 
- static const char *cc_help =
+@@ -2474,7 +2474,7 @@ static struct option lescan_options[] = {
+ 	{ "static",	0, 0, 's' },
+ 	{ "privacy",	0, 0, 'p' },
+ 	{ "passive",	0, 0, 'P' },
+-	{ "whitelist",	0, 0, 'w' },
++	{ "acceptlist",	0, 0, 'a' },
+ 	{ "discovery",	1, 0, 'd' },
+ 	{ "duplicates",	0, 0, 'D' },
+ 	{ 0, 0, 0, 0 }
+@@ -2484,7 +2484,7 @@ static const char *lescan_help =
  	"Usage:\n"
--	"\tcc [--role=m|s] [--ptype=pkt_types] <bdaddr>\n"
-+	"\tcc [--role=c|p] [--ptype=pkt_types] <bdaddr>\n"
- 	"Example:\n"
- 	"\tcc --ptype=dm1,dh3,dh5 01:02:03:04:05:06\n"
--	"\tcc --role=m 01:02:03:04:05:06\n";
-+	"\tcc --role=c 01:02:03:04:05:06\n";
+ 	"\tlescan [--privacy] enable privacy\n"
+ 	"\tlescan [--passive] set scan type passive (default active)\n"
+-	"\tlescan [--whitelist] scan for address in the whitelist only\n"
++	"\tlescan [--acceptlist] scan for address in the accept list only\n"
+ 	"\tlescan [--discovery=g|l] enable general or limited discovery"
+ 		"procedure\n"
+ 	"\tlescan [--duplicates] don't filter duplicates\n";
+@@ -2511,8 +2511,8 @@ static void cmd_lescan(int dev_id, int argc, char **argv)
+ 		case 'P':
+ 			scan_type = 0x00; /* Passive */
+ 			break;
+-		case 'w':
+-			filter_policy = 0x01; /* Whitelist */
++		case 'a':
++			filter_policy = 0x01; /* Accept list */
+ 			break;
+ 		case 'd':
+ 			filter_type = optarg[0];
+@@ -2678,14 +2678,14 @@ static struct option lecc_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "static",	0, 0, 's' },
+ 	{ "random",	0, 0, 'r' },
+-	{ "whitelist",	0, 0, 'w' },
++	{ "acceptlist",	0, 0, 'a' },
+ 	{ 0, 0, 0, 0 }
+ };
  
- static void cmd_cc(int dev_id, int argc, char **argv)
+ static const char *lecc_help =
+ 	"Usage:\n"
+ 	"\tlecc [--static] [--random] <bdaddr>\n"
+-	"\tlecc --whitelist\n";
++	"\tlecc --acceptlist\n";
+ 
+ static void cmd_lecc(int dev_id, int argc, char **argv)
  {
-@@ -1360,10 +1360,10 @@ static void cmd_sr(int dev_id, int argc, char **argv)
+@@ -2707,8 +2707,8 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 		case 'r':
+ 			peer_bdaddr_type = LE_RANDOM_ADDRESS;
+ 			break;
+-		case 'w':
+-			initiator_filter = 0x01; /* Use white list */
++		case 'a':
++			initiator_filter = 0x01; /* Use accept list */
+ 			break;
+ 		default:
+ 			printf("%s", lecc_help);
+@@ -2753,34 +2753,34 @@ static void cmd_lecc(int dev_id, int argc, char **argv)
+ 	hci_close_dev(dd);
+ }
  
- 	str2ba(argv[0], &bdaddr);
- 	switch (argv[1][0]) {
--	case 'm':
-+	case 'c':
- 		role = 0;
- 		break;
--	case 's':
-+	case 'p':
- 		role = 1;
- 		break;
- 	default:
-@@ -3287,7 +3287,7 @@ static const char *lecup_help =
- 	"\t    --handle=<0xXXXX>  LE connection handle\n"
- 	"\t    --min=<interval>   Range: 0x0006 to 0x0C80\n"
- 	"\t    --max=<interval>   Range: 0x0006 to 0x0C80\n"
--	"\t    --latency=<range>  Slave latency. Range: 0x0000 to 0x03E8\n"
-+	"\t    --latency=<range>  Peripheral latency. Range: 0x0000 to 0x03E8\n"
- 	"\t    --timeout=<time>   N * 10ms. Range: 0x000A to 0x0C80\n"
- 	"\n\t min/max range: 7.5ms to 4s. Multiply factor: 1.25ms"
- 	"\n\t timeout range: 100ms to 32.0s. Larger than max interval\n";
-@@ -3379,7 +3379,7 @@ static struct {
- 	{ "con",      cmd_con,     "Display active connections"           },
- 	{ "cc",       cmd_cc,      "Create connection to remote device"   },
- 	{ "dc",       cmd_dc,      "Disconnect from remote device"        },
--	{ "sr",       cmd_sr,      "Switch master/slave role"             },
-+	{ "sr",       cmd_sr,      "Switch central/peripheral role"       },
- 	{ "cpt",      cmd_cpt,     "Change connection packet type"        },
- 	{ "rssi",     cmd_rssi,    "Display connection RSSI"              },
- 	{ "lq",       cmd_lq,      "Display link quality"                 },
+-static struct option lewladd_options[] = {
++static struct option lealall_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ "random",	0, 0, 'r' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+-static const char *lewladd_help =
++static const char *lealall_help =
+ 	"Usage:\n"
+-	"\tlewladd [--random] <bdaddr>\n";
++	"\tlealall [--random] <bdaddr>\n";
+ 
+-static void cmd_lewladd(int dev_id, int argc, char **argv)
++static void cmd_lealall(int dev_id, int argc, char **argv)
+ {
+ 	int err, opt, dd;
+ 	bdaddr_t bdaddr;
+ 	uint8_t bdaddr_type = LE_PUBLIC_ADDRESS;
+ 
+-	for_each_opt(opt, lewladd_options, NULL) {
++	for_each_opt(opt, lealall_options, NULL) {
+ 		switch (opt) {
+ 		case 'r':
+ 			bdaddr_type = LE_RANDOM_ADDRESS;
+ 			break;
+ 		default:
+-			printf("%s", lewladd_help);
++			printf("%s", lealall_help);
+ 			return;
+ 		}
+ 	}
+ 
+-	helper_arg(1, 1, &argc, &argv, lewladd_help);
++	helper_arg(1, 1, &argc, &argv, lealall_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2798,35 +2798,35 @@ static void cmd_lewladd(int dev_id, int argc, char **argv)
+ 
+ 	if (err < 0) {
+ 		err = -errno;
+-		fprintf(stderr, "Can't add to white list: %s(%d)\n",
++		fprintf(stderr, "Can't add to accept list: %s(%d)\n",
+ 							strerror(-err), -err);
+ 		exit(1);
+ 	}
+ }
+ 
+-static struct option lewlrm_options[] = {
++static struct option lealrm_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+-static const char *lewlrm_help =
++static const char *lealrm_help =
+ 	"Usage:\n"
+-	"\tlewlrm <bdaddr>\n";
++	"\tlealrm <bdaddr>\n";
+ 
+-static void cmd_lewlrm(int dev_id, int argc, char **argv)
++static void cmd_lealrm(int dev_id, int argc, char **argv)
+ {
+ 	int err, opt, dd;
+ 	bdaddr_t bdaddr;
+ 
+-	for_each_opt(opt, lewlrm_options, NULL) {
++	for_each_opt(opt, lealrm_options, NULL) {
+ 		switch (opt) {
+ 		default:
+-			printf("%s", lewlrm_help);
++			printf("%s", lealrm_help);
+ 			return;
+ 		}
+ 	}
+ 
+-	helper_arg(1, 1, &argc, &argv, lewlrm_help);
++	helper_arg(1, 1, &argc, &argv, lealrm_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2844,35 +2844,35 @@ static void cmd_lewlrm(int dev_id, int argc, char **argv)
+ 
+ 	if (err < 0) {
+ 		err = errno;
+-		fprintf(stderr, "Can't remove from white list: %s(%d)\n",
++		fprintf(stderr, "Can't remove from accept list: %s(%d)\n",
+ 							strerror(err), err);
+ 		exit(1);
+ 	}
+ }
+ 
+-static struct option lewlsz_options[] = {
++static struct option lealsz_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+-static const char *lewlsz_help =
++static const char *lealsz_help =
+ 	"Usage:\n"
+-	"\tlewlsz\n";
++	"\tlealsz\n";
+ 
+-static void cmd_lewlsz(int dev_id, int argc, char **argv)
++static void cmd_lealsz(int dev_id, int argc, char **argv)
+ {
+ 	int err, dd, opt;
+ 	uint8_t size;
+ 
+-	for_each_opt(opt, lewlsz_options, NULL) {
++	for_each_opt(opt, lealsz_options, NULL) {
+ 		switch (opt) {
+ 		default:
+-			printf("%s", lewlsz_help);
++			printf("%s", lealsz_help);
+ 			return;
+ 		}
+ 	}
+ 
+-	helper_arg(0, 0, &argc, &argv, lewlsz_help);
++	helper_arg(0, 0, &argc, &argv, lealsz_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2888,36 +2888,36 @@ static void cmd_lewlsz(int dev_id, int argc, char **argv)
+ 
+ 	if (err < 0) {
+ 		err = -errno;
+-		fprintf(stderr, "Can't read white list size: %s(%d)\n",
++		fprintf(stderr, "Can't read accept list size: %s(%d)\n",
+ 							strerror(-err), -err);
+ 		exit(1);
+ 	}
+ 
+-	printf("White list size: %d\n", size);
++	printf("Accept list size: %d\n", size);
+ }
+ 
+-static struct option lewlclr_options[] = {
++static struct option lealclr_options[] = {
+ 	{ "help",	0, 0, 'h' },
+ 	{ 0, 0, 0, 0 }
+ };
+ 
+-static const char *lewlclr_help =
++static const char *lealclr_help =
+ 	"Usage:\n"
+-	"\tlewlclr\n";
++	"\tlealclr\n";
+ 
+-static void cmd_lewlclr(int dev_id, int argc, char **argv)
++static void cmd_lealclr(int dev_id, int argc, char **argv)
+ {
+ 	int err, dd, opt;
+ 
+-	for_each_opt(opt, lewlclr_options, NULL) {
++	for_each_opt(opt, lealclr_options, NULL) {
+ 		switch (opt) {
+ 		default:
+-			printf("%s", lewlclr_help);
++			printf("%s", lealclr_help);
+ 			return;
+ 		}
+ 	}
+ 
+-	helper_arg(0, 0, &argc, &argv, lewlclr_help);
++	helper_arg(0, 0, &argc, &argv, lealclr_help);
+ 
+ 	if (dev_id < 0)
+ 		dev_id = hci_get_route(NULL);
+@@ -2933,7 +2933,7 @@ static void cmd_lewlclr(int dev_id, int argc, char **argv)
+ 
+ 	if (err < 0) {
+ 		err = -errno;
+-		fprintf(stderr, "Can't clear white list: %s(%d)\n",
++		fprintf(stderr, "Can't clear accept list: %s(%d)\n",
+ 							strerror(-err), -err);
+ 		exit(1);
+ 	}
+@@ -3394,10 +3394,10 @@ static struct {
+ 	{ "clock",    cmd_clock,   "Read local or remote clock"           },
+ 	{ "lescan",   cmd_lescan,  "Start LE scan"                        },
+ 	{ "leinfo",   cmd_leinfo,  "Get LE remote information"            },
+-	{ "lewladd",  cmd_lewladd, "Add device to LE White List"          },
+-	{ "lewlrm",   cmd_lewlrm,  "Remove device from LE White List"     },
+-	{ "lewlsz",   cmd_lewlsz,  "Read size of LE White List"           },
+-	{ "lewlclr",  cmd_lewlclr, "Clear LE White List"                  },
++	{ "lealall",  cmd_lealall, "Add device to LE Accept List"         },
++	{ "lealrm",   cmd_lealrm,  "Remove device from LE Accept List"    },
++	{ "lealsz",   cmd_lealsz,  "Read size of LE Accept List"          },
++	{ "lealclr",  cmd_lealclr, "Clear LE Accept List"                 },
+ 	{ "lerladd",  cmd_lerladd, "Add device to LE Resolving List"      },
+ 	{ "lerlrm",   cmd_lerlrm,  "Remove device from LE Resolving List" },
+ 	{ "lerlclr",  cmd_lerlclr, "Clear LE Resolving List"              },
 diff --git a/tools/hcitool.rst b/tools/hcitool.rst
-index f59d694078..80f8c6c22f 100644
+index 80f8c6c22f..36cf4fd66b 100644
 --- a/tools/hcitool.rst
 +++ b/tools/hcitool.rst
-@@ -74,7 +74,7 @@ cmd <*ogf*> <*ocf*> [*parameters*]
- con
-     Display active baseband connections
+@@ -157,23 +157,23 @@ clock [*bdaddr*] [*clock*]
+     The *clock* can be **0** for the local clock or **1** for the piconet
+     clock (which is default).
  
--cc [--*role*\=m|s] [--*pkt-type*\=<*ptype*>] <*bdaddr*>
-+cc [--*role*\=c|p] [--*pkt-type*\=<*ptype*>] <*bdaddr*>
-     Create baseband connection to remote device with Bluetooth address *bdaddr*.
+-lescan [--*privacy*] [--*passive*] [--*whitelist*] [--*discovery*\=g|l] [--*duplicates*]
++lescan [--*privacy*] [--*passive*] [--*acceptlist*] [--*discovery*\=g|l] [--*duplicates*]
+     Start LE scan
  
-     Option **--pkt-type** specifies a list  of  allowed packet types.
-@@ -82,9 +82,9 @@ cc [--*role*\=m|s] [--*pkt-type*\=<*ptype*>] <*bdaddr*>
-     packet types are **DM1**, **DM3**, **DM5**, **DH1**, **DH3**, **DH5**,
-     **HV1**, **HV2**, **HV3**. Default is to allow all packet types.
+ leinfo [--*static*] [--*random*] <*bdaddr*>
+     Get LE remote information
  
--    Option  **--role** can have value **m** (do not allow role switch, stay
--    master) or **s** (allow role switch, become slave if the peer asks to become
--    master). Default is **m**.
-+    Option  **--role** can have value **c** (do not allow role switch, stay
-+    central) or **p** (allow role switch, become peripheral if the peer asks to
-+    become central). Default is **c**.
+-lewladd [--*random*] <*bdaddr*>
+-    Add device to LE White List
++lealall [--*random*] <*bdaddr*>
++    Add device to LE Accept List
  
- dc <*bdaddr*> [*reason*]
-     Delete baseband connection from remote device with Bluetooth address
-@@ -96,7 +96,7 @@ dc <*bdaddr*> [*reason*]
+-lewlrm <*bdaddr*>
+-    Remove device from LE White List
++lealrm <*bdaddr*>
++    Remove device from LE Accept List
  
- sr <*bdaddr*> <*role*>
-     Switch role for the baseband connection from the remote device to
--    **master** or **slave**.
-+    **central** or **peripheral**.
+-lewlsz
+-    Read size of LE White List
++lealsz
++    Read size of LE Accept List
  
- cpt <*bdaddr*> <*ptypes*>
-     Change packet types for baseband connection to device with Bluetooth
+-lewlclr
+-    Clear LE White List
++lealclr
++    Clear LE Accept List
+ 
+ lerladd [--*local_irk*] [--*peer_irk*] [--*random*] <*bdaddr*>
+     Add device to LE Resolving List
+@@ -193,7 +193,7 @@ lerlon
+ lerloff
+     Disable LE Address Resolution
+ 
+-lecc [--*static*] [--*random*] <*bdaddr*> | [--*whitelist*]
++lecc [--*static*] [--*random*] <*bdaddr*> | [--*acceptlist*]
+     Create a LE Connection
+ 
+ ledc <*handle*> [*reason*]
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
