@@ -8,62 +8,63 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C60C6C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 555F3C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3560610FA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3FE1F61101
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240325AbhHMMUl (ORCPT
+        id S236930AbhHMMUn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:20:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35248 "EHLO
+        Fri, 13 Aug 2021 08:20:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35274 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240299AbhHMMUj (ORCPT
+        with ESMTP id S240299AbhHMMUm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:20:39 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C7DBC0617AE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:12 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id n20-20020a2540140000b0290593b8e64cd5so9016284yba.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:12 -0700 (PDT)
+        Fri, 13 Aug 2021 08:20:42 -0400
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8CCC061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:16 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id j6-20020a17090ac486b0290178ffdbd20dso2907754pjt.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=QwJGZ6YFLicAPJkwwIPCz7HAsuEhJaNimEfVks76qOY=;
-        b=S4RQjcNt9ukj8pLoUcaBEGDrX3ehidLEZX8maqM8AsLMmWZv72gIy5taaK+aaSBqIh
-         yfcsITaE7a5/R3e3QMDTNaiM4izRXa3ymXZNh38HtYMjlPxhuDrqpnaHkRals6kM6Jxa
-         ssJRuf7jgIm9Y9NKWv8EuiMhB3QMmuNyWIPuMcv4nxR7ePU+e1vpSxEc/giFvB+yiZ/y
-         cmbxm2AnqGwiaitI8652oOZmE1GQh2ho25lTMgVIbPx34tFjAqbCM8CqjWBT9NQM3mDC
-         j9i4uzX4SqVQDThuGVRHF8Y/L1W5T9G4Rtj0L/qL3EyN1w2nKnBn8nr3Kr1zhw54o8OE
-         vtgQ==
+        bh=iyAYbcC4s/NWf+n/ms4uj/u8ixL0E3asRmRgBJgfIAA=;
+        b=CDoB9oryEiq4qKPVoLwOPsSzylZ8PVj58wor0+onggK7ZVkWAoW/W/iJ9WYZvmqT9U
+         0jjrv0RqVAdO7iEhLP8a+Gx43SPknqghP8SB11l9P8gxbc6ulM7m6dPwfaF3FoTrp3rH
+         Zd5lNZHt3qc8TO44kFOIZ+yYxwm9Jy6AftSUS0uoZbtGfHV0cEBs+HBldNdXlKwzXnux
+         ppi9+4g73R9IiuhbS9jAsHoTL7a+FaRXzwhjbHsvllwTU8srvWvHgl8zbuhEi8OmU6Uk
+         1sn18fSJpLwVRhdOcz/YZzhiFILETvRMMvA22DNnvBy86/chW3vmkrw1QsMttKMVXMhq
+         PlIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=QwJGZ6YFLicAPJkwwIPCz7HAsuEhJaNimEfVks76qOY=;
-        b=ADyDBKuihV1dO9nXZwOe9vYVSXKt2AzkQFxfD3TrlP6NZyX/MTwC+1Al7CayAvyQV7
-         NmYA+V8qDSsp5crmCQTMr0g8h6fYaS5FGyrlMUrZjJOhgKdKWxYkmSQdmQzAoV8dlPOL
-         902itrufdS8c/ppU20KHrgbEBt76I2ii9aF5DDjX5lWSkl7UCgYdPMxeGsJTZdiR6js7
-         6NcuNs2dN508sb9SQrUPhc51cfH5k391iffpRAsp1XXB4KzGNbFUD21BQWVB0kQ0jXMS
-         u8cLuHDDZRsd6N2eY62/f0y7Pa2UbNaGAhU2GiibXKYej98arLtmdMqwWRSehq/bH6Eu
-         vduQ==
-X-Gm-Message-State: AOAM533h8/rdqZB0osYPMtBKsPunB3lDTfef/+LEOBJHY4Cq8ArCLcEG
-        Tg6IankszwvlibFCkzd6i3aeD4Se7gMIvCYL3BYm1X6yenJi8RbMxqR4jmPVDnhJ2YQLhizbzo9
-        DVFYip2MnPiVsgYl5Ym1MhWJwNLHoITU1xhI//lWVOb5PdRuoHDumhl91sBOIVyOICVuKuZGvR4
-        VN
-X-Google-Smtp-Source: ABdhPJwnXxLUWNPgdIBcDO/mbabXTDePGcexoeJ9Ftv+xdzBK3dwDcoWZGh4eDomZV5yee1Djo0dHmvAuNin
+        bh=iyAYbcC4s/NWf+n/ms4uj/u8ixL0E3asRmRgBJgfIAA=;
+        b=pjlyy9lyaabN9uOVGTjV4lzMZ49iK6qfle+JBnA/PIn4xB4t5lYmwMxh2lRXkYqfB8
+         FERgninI4j5prfUTLyVH0QMQ2iP148H5tQ3CyOX1vA6QRFxvFDOT+CixK37OXwmg7A0T
+         EEQLP2k0h0Z6Q2QNgMXGmLHDn5SsHSrQVB0+W9vpH5f5X4ztI4jwZP/xpoSYh3h6JPtg
+         6Av0P8KS+VNP71AFXKHdTvG2Ru2B+05lAVnELzQz/qkn1L10lk/1r67NquNF1YhptmMr
+         YVigNTnaiFFT4QpVy2Z1SuUFpphcxi5nLXLRfGhisMemcIXvatATnpCsIQQFaO9soxif
+         /DFA==
+X-Gm-Message-State: AOAM5311NVnZQoDTWy7iXz6Fv62amFmolQhqcB8XEclWLgSAwdC/WPOs
+        rxI+DK/MoGftfxUia5/j72k4WD0mjrwbsoZAGjCfjBFJ/GhBw6+dlpXNf5zx1VQ2gwuyICbXg8h
+        9wo/BWPdTHDj7+qemUzLtqNSJyU+JWTk9jFCnc6YPyh5PlHlamMt9sA4VcQJXEHa/Fj1PEIUNj0
+        Nm
+X-Google-Smtp-Source: ABdhPJyMoD6PtclKBB+8ikkDhJxo+TDla5vZdIFAx9Qwqw0htlZ5wU5VHlxohZy8NYuAsMq9pJSMowM9Ji3U
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:cf08:: with SMTP id
- f8mr2618119ybg.188.1628857211796; Fri, 13 Aug 2021 05:20:11 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:17:55 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6a00:8c7:b029:3a1:119b:736 with SMTP
+ id s7-20020a056a0008c7b02903a1119b0736mr2324163pfu.52.1628857215439; Fri, 13
+ Aug 2021 05:20:15 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:17:56 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.10.I42dbaec328499fe2c304308bd098c08535e4e93b@changeid>
+Message-Id: <20210813201256.Bluez.11.Idba293f890e2f391c383815e31e7c2708918e77e@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 10/62] shared/ad: Inclusive language changes
+Subject: [Bluez PATCH 11/62] shared/hfp: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,61 +77,63 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"peripheral" is preferred, as reflected in the BT core spec 5.3.
-Also prefer to use "reject list", as reflected in
+Prefer to use "rejected", as reflected in
 https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 ---
 
- src/shared/ad.c | 8 ++++----
- src/shared/ad.h | 2 +-
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ android/handsfree-client.c | 2 +-
+ src/shared/hfp.c           | 4 ++--
+ src/shared/hfp.h           | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/src/shared/ad.c b/src/shared/ad.c
-index d40d153316..27b76dc817 100644
---- a/src/shared/ad.c
-+++ b/src/shared/ad.c
-@@ -959,7 +959,7 @@ void bt_ad_clear_flags(struct bt_ad *ad)
- 							data_destroy);
- }
- 
--static uint8_t type_blacklist[] = {
-+static uint8_t type_reject_list[] = {
- 	BT_AD_FLAGS,
- 	BT_AD_UUID16_SOME,
- 	BT_AD_UUID16_ALL,
-@@ -976,7 +976,7 @@ static uint8_t type_blacklist[] = {
- 	BT_AD_DEVICE_ID,
- 	BT_AD_SMP_TK,
- 	BT_AD_SMP_OOB_FLAGS,
--	BT_AD_SLAVE_CONN_INTERVAL,
-+	BT_AD_PERIPHERAL_CONN_INTERVAL,
- 	BT_AD_SOLICIT16,
- 	BT_AD_SOLICIT128,
- 	BT_AD_SERVICE_DATA16,
-@@ -1012,8 +1012,8 @@ bool bt_ad_add_data(struct bt_ad *ad, uint8_t type, void *data, size_t len)
- 	if (len > (BT_AD_MAX_DATA_LEN - 2))
- 		return false;
- 
--	for (i = 0; i < sizeof(type_blacklist); i++) {
--		if (type == type_blacklist[i])
-+	for (i = 0; i < sizeof(type_reject_list); i++) {
-+		if (type == type_reject_list[i])
- 			return false;
+diff --git a/android/handsfree-client.c b/android/handsfree-client.c
+index 4c682fbb8f..c8f9e690ea 100644
+--- a/android/handsfree-client.c
++++ b/android/handsfree-client.c
+@@ -405,7 +405,7 @@ static void cmd_complete_cb(enum hfp_result result, enum hfp_error cme_err,
+ 	case HFP_RESULT_DELAYED:
+ 		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_DELAYED;
+ 		break;
+-	case HFP_RESULT_BLACKLISTED:
++	case HFP_RESULT_REJECTED:
+ 		ev.type = HAL_HF_CLIENT_CMD_COMP_ERR_BACKLISTED;
+ 		break;
+ 	case HFP_RESULT_CME_ERROR:
+diff --git a/src/shared/hfp.c b/src/shared/hfp.c
+index f41c70dfec..df6eab35d6 100644
+--- a/src/shared/hfp.c
++++ b/src/shared/hfp.c
+@@ -721,7 +721,7 @@ bool hfp_gw_send_result(struct hfp_gw *hfp, enum hfp_result result)
+ 	case HFP_RESULT_BUSY:
+ 	case HFP_RESULT_NO_ANSWER:
+ 	case HFP_RESULT_DELAYED:
+-	case HFP_RESULT_BLACKLISTED:
++	case HFP_RESULT_REJECTED:
+ 	case HFP_RESULT_CME_ERROR:
+ 	case HFP_RESULT_NO_DIALTONE:
+ 	case HFP_RESULT_CONNECT:
+@@ -1018,7 +1018,7 @@ static bool is_response(const char *prefix, enum hfp_result *result,
  	}
  
-diff --git a/src/shared/ad.h b/src/shared/ad.h
-index 84ef9dee9e..feb712f508 100644
---- a/src/shared/ad.h
-+++ b/src/shared/ad.h
-@@ -32,7 +32,7 @@
- #define BT_AD_DEVICE_ID			0x10
- #define BT_AD_SMP_TK			0x10
- #define BT_AD_SMP_OOB_FLAGS		0x11
--#define BT_AD_SLAVE_CONN_INTERVAL	0x12
-+#define BT_AD_PERIPHERAL_CONN_INTERVAL	0x12
- #define BT_AD_SOLICIT16			0x14
- #define BT_AD_SOLICIT128		0x15
- #define BT_AD_SERVICE_DATA16		0x16
+ 	if (strcmp(prefix, "BLACKLISTED") == 0) {
+-		*result = HFP_RESULT_BLACKLISTED;
++		*result = HFP_RESULT_REJECTED;
+ 		*cme_err = 0;
+ 		return true;
+ 	}
+diff --git a/src/shared/hfp.h b/src/shared/hfp.h
+index 1fb3ee8d32..600d084a73 100644
+--- a/src/shared/hfp.h
++++ b/src/shared/hfp.h
+@@ -20,7 +20,7 @@ enum hfp_result {
+ 	HFP_RESULT_BUSY		= 7,
+ 	HFP_RESULT_NO_ANSWER	= 8,
+ 	HFP_RESULT_DELAYED	= 9,
+-	HFP_RESULT_BLACKLISTED	= 10,
++	HFP_RESULT_REJECTED	= 10,
+ 	HFP_RESULT_CME_ERROR	= 11,
+ };
+ 
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
