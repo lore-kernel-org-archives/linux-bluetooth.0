@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 751CDC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E21CC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5EECF610CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8812B610A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240488AbhHMMW0 (ORCPT
+        id S240496AbhHMMWa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:22:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35800 "EHLO
+        Fri, 13 Aug 2021 08:22:30 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35822 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240480AbhHMMWZ (ORCPT
+        with ESMTP id S240486AbhHMMW3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:22:25 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49FE4C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:59 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id gw9-20020a0562140f0900b0035decb1dfecso2021839qvb.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:59 -0700 (PDT)
+        Fri, 13 Aug 2021 08:22:29 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36D88C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:03 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id j3-20020ac85f830000b029029113b02ff5so6260059qta.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=g7z76tPdiJR+T+r8soE6IulOGhW6nRRXU9Iaaohscjs=;
-        b=v42Sxq5J0QQtLc4nCPcDoKy5tMQhr+MqUgUcRTdcgGCcTSMd1wvBi2QavdLdDZtxja
-         Zm836EeBuOLLS3dg9WPOLSGGvdJdgqyaH26C+hiLF0Sv2+Fnw7z4h1Z69ZGnwUrX4ft9
-         mV08BTVLft61IkG7upU1zTPfMFly1Ri3FLZgtEl6g7pWfTyT4Ur6PdkI4WuHTECw7POc
-         hCazR6cHGfKGSqYlToyrz6B2WVfRrk2hMSqsVXaMoey8Yv69BnNjkTX0PJkHkTpkqzXU
-         LgJRjxewCnQj9TafvnBugPrBYWP5TGN8KpLzJHM5QYQ0Ncw3GjC39Tq5UzHhsE1IPM3Z
-         ooPA==
+        bh=YIhqjIy4Z1f9LlWA+2SAnStUjz7UiK1EetcELquEE5g=;
+        b=SmXfh+6e7Y/4R+zeA0AdYD035as0P7rRRRiNwnfOJka18jv8bjeEtzJC3hC0Ag0gf+
+         vhKHbVonhQUOpSQX16XM4lbRLQm7s6NlcsUj25EEVXAPL/AmxerADWGiEnCaye5Hry+b
+         vJJAnXH0YNME6LqYuCJLU9YmaDpNydhkizGKuMjcvUBgNQJt68qtWw+/iQRlsgSgnNdD
+         AW5utp8OM58OrZMBqYrmvuIxkkj3ePSYPVAlpws2gnGFpQ9R+yqGOMyCj9ODEUBvG8Vh
+         5UZB4MNakWG4GCA1tI36+cbl0oQjYWS+8O1/PGfcsfW/1LlQ1fTYpxk/bJRqwyYFeByc
+         0rNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=g7z76tPdiJR+T+r8soE6IulOGhW6nRRXU9Iaaohscjs=;
-        b=QbDgUP4/Ri25me6DIbbgf1JWnLLB6p/hSB0NFAtwFUASOopeAug0KCrCvySavTZlLB
-         hf6jPblXyjyHbKQFpfY7dtvS6ZbJzIk4Oph+la/rLNdJN+G40D63YSx8R6ZukE5Ou9FI
-         pOUdqPYw06L7/m0Ip04XZeLzNd74Ickm5WNBIs5oJf9w/ZOZZZpeQ7uLmtJmUfEiiW0b
-         o8JIk1QpQkjc/wjbYeqQtoZuM2XYwIgD5yUoVQIGpssD7qa6ZZRE16W//XcLCK/chGJQ
-         Q2zw/qLYfm/DQJr0X175f+DkaGuBANYX7UP32dYHJafe9TZTNgrgXctxtixCEM2I/Uj1
-         KZlA==
-X-Gm-Message-State: AOAM5309w9BKFSF4JCXF+qx6tqTM2DRYj2X1gAil70+35aZ7ILwQTART
-        ofs8p+orVNcoeM9yUiRAT1h58hUsyLtScm0coJia8AqAzIodqzQo8u88y3Gdet5bzpkzovJ4Vfx
-        43b16edi2GqqFkEHqlFK4o9K785y6RKQl0YEWRJWt47RBYjhEEkuZ31nZSOIEyY9bzhNwcINwXp
-        94
-X-Google-Smtp-Source: ABdhPJyZdOd5jDmIIqSIZRwXGF8rLf9y9YMuYjTs+lldSFQqcnEv3aMiN+0hGlTXx8WF+D2viVDGQjqDAtHn
+        bh=YIhqjIy4Z1f9LlWA+2SAnStUjz7UiK1EetcELquEE5g=;
+        b=P3/vpxH6VRadjL0Q39poAifl0seKibOx40/QHJjUUtN76DJ6JGIdnM5wQt8l4aPIsE
+         msBdcnUe8rAbbRjQGvIm1OPHqfgfw2NDkIH99yOGFYg2YOFbUgB2wJwbPtZT7vfJ7exX
+         wEvCdFj+2iS2xB6d5CGrtLGfjmKPUDB/Dhbjc9WTLW4nXnxK8aVHAHpCMPSEavIEAB0e
+         XeMKS+Wg4XHHCZjh8qx0Uw8DcPIsAu57JuX2PIt3czk4JS/XMrC5+FdgNjf1XTk4HjT+
+         nZ+Rw+ShdcxIpkLCQs/yMHtpFv2qNOMiPm0ELiz6s0vG0pDQctby41QyJ+I5Kpz5niTB
+         esEg==
+X-Gm-Message-State: AOAM531cIvRGBc2+T4oFIXJxt5DyCN54pbnTdnlhccII8/nI1DX0iNao
+        aUoDrmLp3EHNrF/7k56BC6Cf4ypKR6BakZw57KdJowAWAUG439JLkRduMAQpsxXUJ4f0NwhvIK3
+        4xl58JII3zSsP4U2o1ouEjzbcv7petCaGrve3+6FHvSWuAnuMTuMlIKYcC3McIJ35flg9oabOPz
+        VI
+X-Google-Smtp-Source: ABdhPJxbR2jFoXgcQLyRV8nK/E8Syp/4AoSbcv1lLp/Zk3yRMcu2yeNLMlVY90qNe3KtsIWx0qjyw29X8Ji1
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a05:6214:1142:: with SMTP id
- b2mr2431597qvt.0.1628857318440; Fri, 13 Aug 2021 05:21:58 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:24 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6214:8c6:: with SMTP id
+ da6mr2241634qvb.18.1628857322302; Fri, 13 Aug 2021 05:22:02 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:25 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.39.Ibab5aa88a5eaa8b297bd30886166806cd6fd1327@changeid>
+Message-Id: <20210813201256.Bluez.40.I08beeb185bf2986116252da72a42983b819413e8@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 39/62] tools/hci-tester: Inclusive language changes
+Subject: [Bluez PATCH 40/62] tools/btiotest: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,46 +76,108 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"accept list" is preferred, as reflected in the BT core spec 5.3.
+"central" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- tools/hci-tester.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ tools/btiotest.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/tools/hci-tester.c b/tools/hci-tester.c
-index 645d89e721..79193220fe 100644
---- a/tools/hci-tester.c
-+++ b/tools/hci-tester.c
-@@ -335,12 +335,12 @@ static void test_read_local_supported_codecs(const void *test_data)
- 	test_command(BT_HCI_CMD_READ_LOCAL_CODECS);
- }
- 
--static void test_le_read_white_list_size(const void *test_data)
-+static void test_le_read_accept_list_size(const void *test_data)
+diff --git a/tools/btiotest.c b/tools/btiotest.c
+index 3f4900a5a5..1da8c20caf 100644
+--- a/tools/btiotest.c
++++ b/tools/btiotest.c
+@@ -310,7 +310,7 @@ static void l2cap_connect(const char *src, const char *dst, uint8_t addr_type,
+ static void l2cap_listen(const char *src, uint8_t addr_type, uint16_t psm,
+ 				uint16_t cid, int defer, int reject,
+ 				int disconn, int accept, int sec,
+-				gboolean master)
++				gboolean central)
  {
- 	test_command(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE);
- }
+ 	struct io_data *data;
+ 	BtIOConnect conn;
+@@ -343,7 +343,7 @@ static void l2cap_listen(const char *src, uint8_t addr_type, uint16_t psm,
+ 					BT_IO_OPT_PSM, psm,
+ 					BT_IO_OPT_CID, cid,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_CENTRAL, master,
++					BT_IO_OPT_CENTRAL, central,
+ 					BT_IO_OPT_INVALID);
+ 	else
+ 		l2_srv = bt_io_listen(conn, cfm, data,
+@@ -353,7 +353,7 @@ static void l2cap_listen(const char *src, uint8_t addr_type, uint16_t psm,
+ 					BT_IO_OPT_PSM, psm,
+ 					BT_IO_OPT_CID, cid,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_CENTRAL, master,
++					BT_IO_OPT_CENTRAL, central,
+ 					BT_IO_OPT_INVALID);
  
--static void test_le_clear_white_list(const void *test_data)
-+static void test_le_clear_accept_list(const void *test_data)
+ 	if (!l2_srv) {
+@@ -402,7 +402,7 @@ static void rfcomm_connect(const char *src, const char *dst, uint8_t ch,
+ 
+ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
+ 				int reject, int disconn, int accept,
+-				int sec, gboolean master)
++				int sec, gboolean central)
  {
- 	test_command(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST);
- }
-@@ -944,10 +944,10 @@ int main(int argc, char *argv[])
- 	test_hci_local("Read Local Supported Codecs", NULL, NULL,
- 				test_read_local_supported_codecs);
+ 	struct io_data *data;
+ 	BtIOConnect conn;
+@@ -427,7 +427,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
+ 					BT_IO_OPT_SOURCE, src,
+ 					BT_IO_OPT_CHANNEL, ch,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_CENTRAL, master,
++					BT_IO_OPT_CENTRAL, central,
+ 					BT_IO_OPT_INVALID);
+ 	else
+ 		rc_srv = bt_io_listen(conn, cfm,
+@@ -435,7 +435,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
+ 					&err,
+ 					BT_IO_OPT_CHANNEL, ch,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_CENTRAL, master,
++					BT_IO_OPT_CENTRAL, central,
+ 					BT_IO_OPT_INVALID);
  
--	test_hci_local("LE Read White List Size", NULL, NULL,
--				test_le_read_white_list_size);
--	test_hci_local("LE Clear White List", NULL, NULL,
--				test_le_clear_white_list);
-+	test_hci_local("LE Read Accept List Size", NULL, NULL,
-+				test_le_read_accept_list_size);
-+	test_hci_local("LE Clear Accept List", NULL, NULL,
-+				test_le_clear_accept_list);
- 	test_hci_local("LE Encrypt", NULL, NULL,
- 				test_le_encrypt);
- 	test_hci_local("LE Rand", NULL, NULL,
+ 	if (!rc_srv) {
+@@ -540,7 +540,7 @@ static int opt_reject = -1;
+ static int opt_disconn = -1;
+ static int opt_accept = DEFAULT_ACCEPT_TIMEOUT;
+ static int opt_sec = 0;
+-static gboolean opt_master = FALSE;
++static gboolean opt_central = FALSE;
+ static int opt_priority = 0;
+ static int opt_cid = 0;
+ static guint8 opt_addr_type = 0;
+@@ -576,8 +576,8 @@ static GOptionEntry options[] = {
+ 				"Disconnect connection after N seconds" },
+ 	{ "accept", 'a', 0, G_OPTION_ARG_INT, &opt_accept,
+ 				"Accept connection after N seconds" },
+-	{ "master", 'm', 0, G_OPTION_ARG_NONE, &opt_master,
+-				"Master role switch (incoming connections)" },
++	{ "central", 'C', 0, G_OPTION_ARG_NONE, &opt_central,
++				"Central role switch (incoming connections)" },
+ 	{ "priority", 'P', 0, G_OPTION_ARG_INT, &opt_priority,
+ 				"Transmission priority: Setting a priority "
+ 				"outside the range 0 to 6 requires the"
+@@ -614,7 +614,7 @@ int main(int argc, char *argv[])
+ 		else
+ 			l2cap_listen(opt_dev, opt_addr_type, opt_psm, opt_cid,
+ 					opt_defer, opt_reject, opt_disconn,
+-					opt_accept, opt_sec, opt_master);
++					opt_accept, opt_sec, opt_central);
+ 	}
+ 
+ 	if (opt_channel != -1) {
+@@ -624,7 +624,7 @@ int main(int argc, char *argv[])
+ 		else
+ 			rfcomm_listen(opt_dev, opt_channel, opt_defer,
+ 					opt_reject, opt_disconn, opt_accept,
+-					opt_sec, opt_master);
++					opt_sec, opt_central);
+ 	}
+ 
+ 	if (opt_sco) {
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
