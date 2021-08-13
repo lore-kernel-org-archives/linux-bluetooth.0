@@ -8,63 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 58889C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 065CAC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3EB2F610A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF7BE610A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240497AbhHMMWl (ORCPT
+        id S240501AbhHMMWo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:22:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35876 "EHLO
+        Fri, 13 Aug 2021 08:22:44 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35900 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240514AbhHMMWk (ORCPT
+        with ESMTP id S240499AbhHMMWo (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:22:40 -0400
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E216CC061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:13 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id h19-20020a170902eed3b029012d3624d993so6005618plb.2
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:13 -0700 (PDT)
+        Fri, 13 Aug 2021 08:22:44 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB89C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:17 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id w19-20020ac87e930000b029025a2609eb04so6221473qtj.17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=QaeCZz/X417V82IwZkxYXDYRX2ARQzxCTvYni7UzYxc=;
-        b=LdYZKgt/W63wQ+jQoYQ4NsbjFP3ZA3LZBP7haYDG4466cyVhcYHUvod8MojQ8M2WPq
-         lSeBUTsT8F+s3BfRoqzQPJB3Wzioyv58RqSNzeizX1UamE24QKjdD2Dx6xvE2YcF8bky
-         gqnBjcqEQJcxcSWFNfMpO+xiG++AiypMPv6Kh339gcPjlXDmrBx5ZwapaE/xvCrEr8Ko
-         nlRubEBzqWnCbpiEaA8mqLAbjIQVnnmeShNXSX93GFoJVw9/9MOi6va0eJELDnoU3n8U
-         9LaatOhL592zszGpYW5j/gmC5osyx5XGYgID4+PnEgBH9HD/7otN6zab02a8Iri/8sxY
-         g2vA==
+        bh=2dgFyva0821C03h1TFtASoDBUUvCh+kg+Xf8M9Fofg4=;
+        b=BBlx3FgMnxq2h/BEqx/I7fSFyMUMcCbjqIdKqyaqT82DtZWv+UgvX1wCswIH+6yVqf
+         jIzlxFdAI545e4V+7Tao9uCX815BYiUIBAYT00hsEJ7G2fbOROoCLa8ot+ze9M5x9ncy
+         0OuG9stTOO+QkNueW/qOFbhH9buD5tGhvOhZMt+Qt8TopGy89CyfWg7Kzcs0AbFFT6dv
+         XTWU2AHDFPg8edGWwAZojrGEG5Jnmng+rOK83njnePampV/uLVWOsynFIloeI730pSqI
+         t4qHM02h/Fv6ADcai6uWs0Kw47S0s2WrakCdW36Kdrf9hSZhPBLdnH5Hk9lSzcodlD9j
+         MqXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=QaeCZz/X417V82IwZkxYXDYRX2ARQzxCTvYni7UzYxc=;
-        b=MLZdub03qKj7HX6zIQaIQP6eTijiBMbwWvYF+fH/3IFt9H/tjI8JaNcRe1XAODcogv
-         Imm4+24wkOxGYb44kMICI+WGgiziE5g21wa8+aajw3xatn2RyJ9pG0/6Ga3RZdk5QdAI
-         ayGtwEeGj7SRtY+X6B2V3Nr+QaZ7iZ7sZWy34tjVL38CUQFAbVMQxsNvD4vqBepky1mw
-         rUXTfpBfeHphnOVSCmxvBmDV9YA/ZCIXRneHK653KHdxvf8mwBYwo7GwgF10P0uNTUA6
-         cWRHUzjyY/JNH24BXkhHhDXai/VqxRjGa7BGps0nYyvEkSi9MDnD9CMOXTUhxJ3y1x2n
-         5UvA==
-X-Gm-Message-State: AOAM5331wqy8H8MQN8Lc5tgfnAn2ZnI1OofOc4qo/oQTQIqNsqMgTRzy
-        3v+XWYKHBTK1S7s7SE4qOvSX0Zw0BVaLIAzkc2Qc+qdDlpBCzKiGbGIzg9Y7oYug2M32xRJ/eha
-        tlKVE7Mjk2GzgNETv0PlYC5/KzY48jfKAdITmcltoO1Tozde9+mPwVSkEsZvfAm11cAI4prsuir
-        OW
-X-Google-Smtp-Source: ABdhPJy42Cu9gdnFpKx3qYciEuuPQbN+wvJpAu7GjkZ+rBqTdWpaa9hauT9Hg8uioddsvorUFppQSC3Oakp+
+        bh=2dgFyva0821C03h1TFtASoDBUUvCh+kg+Xf8M9Fofg4=;
+        b=bzmJTV3q10cIzDqZsl/l3N/RFRGjIAa4GnJuzqkH7Ot4Kn1elZh0aeoK14yXhzj+V5
+         JZkFMsB8MLWV3Pxoe0QMrrsk1ZXYsPyZskLgivsG31R//PTsDFiZCLtBPrYrVl2VqqW9
+         RKcJDL1YowT0N2wXtmTVXJQUhw7eOFUDwbAnXcNHd0aJS6XCYJNM7apeLPUcDMoizHuW
+         WKRaZR4uuGkK+8Gx7fBkdNm077mBykqHd0IwUmvK1coMpy6JiFW0D24dLx5cjd+5eAGd
+         rMlujyA/zgx6e7J8NdPbfCnidvUzO+bZ65BcBJuIbMdoaxqkC+gT9kt4+0sPr3l/4Uvh
+         oX0g==
+X-Gm-Message-State: AOAM533UnTRd+FmM71Yk6ebytvnop8MS3xjC38fGxZptIeWJzLxTdW9K
+        eIGtVS6aIjqh5e5GtlbkDWevQgvRblRJe2ynWjIK8OJX6GwfaBCd8pMCvxO/hketLI4PIrmVT6w
+        EwCEGNIDGHK7neq4lYeqNaWsQxO7LS41EoPKYvCfQnpIlM7XME8KZ8wPi1joAn5iQKUnYdyTFvi
+        jE
+X-Google-Smtp-Source: ABdhPJy025VTaI6tjONxsFlcEznaHjMDXfKRcgUU8tsG58pvKYG5asCzPuh1s6V1vlUcqn9fk+pA9kKvIKsu
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a17:902:bc84:b029:12c:f9b9:db98 with SMTP
- id bb4-20020a170902bc84b029012cf9b9db98mr1940081plb.19.1628857333349; Fri, 13
- Aug 2021 05:22:13 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:28 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6214:ca2:: with SMTP id
+ s2mr2191233qvs.35.1628857336749; Fri, 13 Aug 2021 05:22:16 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:29 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.43.I4fd145f86a01b9370af7bf7750a08090de2b5a03@changeid>
+Message-Id: <20210813201256.Bluez.44.Ie45c8a85e3d5aca1bd93de1c1772ec904528f716@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 43/62] tools/l2test: Inclusive language changes
+Subject: [Bluez PATCH 44/62] tools/rctest: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -80,78 +79,68 @@ From: Archie Pusaka <apusaka@chromium.org>
 "central" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- tools/l2test.c | 18 +++++++++---------
- 1 file changed, 9 insertions(+), 9 deletions(-)
+ tools/rctest.c   | 18 +++++++++---------
+ tools/rctest.rst |  4 ++--
+ 2 files changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 822cdc8cc9..ca58a6549b 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -110,7 +110,7 @@ static int seq_start = 0;
- static const char *filename = NULL;
+diff --git a/tools/rctest.c b/tools/rctest.c
+index 034ae167b2..7fd6c355de 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
+@@ -76,7 +76,7 @@ static const char *filename = NULL;
+ static const char *savefile = NULL;
+ static int save_fd = -1;
  
- static int rfcmode = 0;
 -static int master = 0;
 +static int central = 0;
  static int auth = 0;
  static int encr = 0;
  static int secure = 0;
-@@ -483,7 +483,7 @@ static int do_connect(char *svr)
+@@ -202,7 +202,7 @@ static int do_connect(const char *svr)
+ 
+ 	/* Set link mode */
  	opt = 0;
- 	if (reliable)
- 		opt |= L2CAP_LM_RELIABLE;
 -	if (master)
 +	if (central)
- 		opt |= L2CAP_LM_CENTRAL;
+ 		opt |= RFCOMM_LM_CENTRAL;
  	if (auth)
- 		opt |= L2CAP_LM_AUTH;
-@@ -586,7 +586,7 @@ static void do_listen(void (*handler)(int sk))
+ 		opt |= RFCOMM_LM_AUTH;
+@@ -293,7 +293,7 @@ static void do_listen(void (*handler)(int sk))
+ 
+ 	/* Set link mode */
  	opt = 0;
- 	if (reliable)
- 		opt |= L2CAP_LM_RELIABLE;
 -	if (master)
 +	if (central)
- 		opt |= L2CAP_LM_CENTRAL;
+ 		opt |= RFCOMM_LM_CENTRAL;
  	if (auth)
- 		opt |= L2CAP_LM_AUTH;
-@@ -1306,7 +1306,7 @@ static void usage(void)
- 		"\t[-W seconds] enable deferred setup\n"
+ 		opt |= RFCOMM_LM_AUTH;
+@@ -679,13 +679,13 @@ static void usage(void)
  		"\t[-B filename] use data packets from file\n"
- 		"\t[-N num] send num frames (default = infinite)\n"
+ 		"\t[-O filename] save received data to file\n"
+ 		"\t[-N num] number of frames to send\n"
 -		"\t[-C num] send num frames before delay (default = 1)\n"
 +		"\t[-M num] send num frames before delay (default = 1)\n"
  		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
- 		"\t[-K milliseconds] delay before receiving (default = 0)\n"
- 		"\t[-g milliseconds] delay before disconnecting (default = 0)\n"
-@@ -1323,7 +1323,7 @@ static void usage(void)
+ 		"\t[-Y priority] socket priority\n"
  		"\t[-A] request authentication\n"
  		"\t[-E] request encryption\n"
  		"\t[-S] secure connection\n"
 -		"\t[-M] become master\n"
 +		"\t[-C] become central\n"
- 		"\t[-T] enable timestamps\n"
- 		"\t[-V type] address type (help for list, default = bredr)\n"
- 		"\t[-e seq] initial sequence value (default = 0)\n");
-@@ -1337,7 +1337,7 @@ int main(int argc, char *argv[])
- 	bacpy(&bdaddr, BDADDR_ANY);
+ 		"\t[-T] enable timestamps\n");
+ }
  
- 	while ((opt = getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
--		"AB:C:D:EF:GH:I:J:K:L:MN:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
-+		"AB:CD:EF:GH:I:J:K:L:M:N:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
+@@ -697,7 +697,7 @@ int main(int argc, char *argv[])
+ 	bacpy(&bdaddr, BDADDR_ANY);
+ 	bacpy(&auto_bdaddr, BDADDR_ANY);
+ 
+-	while ((opt=getopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:MAESL:W:C:D:Y:T")) != EOF) {
++	while ((opt=getopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M:D:Y:T")) != EOF) {
  		switch (opt) {
  		case 'r':
  			mode = RECV;
-@@ -1442,7 +1442,7 @@ int main(int argc, char *argv[])
- 			num_frames = atoi(optarg);
- 			break;
- 
--		case 'C':
-+		case 'M':
- 			count = atoi(optarg);
- 			break;
- 
-@@ -1488,8 +1488,8 @@ int main(int argc, char *argv[])
- 			reliable = 1;
+@@ -769,8 +769,8 @@ int main(int argc, char *argv[])
+ 				uuid = atoi(optarg);
  			break;
  
 -		case 'M':
@@ -161,6 +150,37 @@ index 822cdc8cc9..ca58a6549b 100644
  			break;
  
  		case 'A':
+@@ -805,7 +805,7 @@ int main(int argc, char *argv[])
+ 			num_frames = atoi(optarg);
+ 			break;
+ 
+-		case 'C':
++		case 'M':
+ 			count = atoi(optarg);
+ 			break;
+ 
+diff --git a/tools/rctest.rst b/tools/rctest.rst
+index 23595112d7..e0982adc3f 100644
+--- a/tools/rctest.rst
++++ b/tools/rctest.rst
+@@ -56,7 +56,7 @@ OPTIONS
+ 
+ -N num          send num frames
+ 
+--C num          send num frames before delay (default: 1)
++-M num          send num frames before delay (default: 1)
+ 
+ -D milliseconds     delay milliseconds after sending num frames (default: 0)
+ 
+@@ -66,7 +66,7 @@ OPTIONS
+ 
+ -S              secure connection
+ 
+--M              become master
++-C              become central
+ 
+ -T              enable timestamps
+ 
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
