@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D4CCBC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B806FC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BBA56610CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E0EF610A4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240233AbhHMMU2 (ORCPT
+        id S240251AbhHMMUc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:20:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35192 "EHLO
+        Fri, 13 Aug 2021 08:20:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35208 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240175AbhHMMU2 (ORCPT
+        with ESMTP id S240175AbhHMMUb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:20:28 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD6C1C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:01 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id f64-20020a2538430000b0290593bfc4b046so8975202yba.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:01 -0700 (PDT)
+        Fri, 13 Aug 2021 08:20:31 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1643EC061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:05 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id bo13-20020a05621414adb029035561c68664so6918804qvb.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=6xRz0Qm0SECmn6Pgtavnhfow/nmGujogj3e0uaxrCNo=;
-        b=GC5iniwgQRS68xPq1n+30ZLfL7qpyGZ2BJDbXlk3k0INJsfcxy0TTYvn+yA7YKOE6Y
-         A9vlV2jqg0pVfAgrjrkzsk4AUIMcVcFJI+PJ2XsRKnJ4+P4flDxqqPucpxzMs+qng9n2
-         BIkrMnlsy9ume0ZzlU6w6vDeACkTn5vsuhOA9yxaE5LdIAxRKVjESIDY5sdAvAi/jqSU
-         q0CM3oW0zKehdkU7nCZ2j/pmFivca8LZLLzI6zQMuLTSqexB9pqOIMwDsKF6lwA5c+Fy
-         ttINYAHup54wofM7ww2EzEpo8M36DdjguCmchx8ZgliD5Eki/PkbV3T/IQC/Rsu33F26
-         TPvQ==
+        bh=QaLclhB85/cauEIPsHpq5YPbMmoQlX3Cg2QfR0Ui6yc=;
+        b=t8VC0g+m//6pk7vxpv20EkQuR2iPT3XG4p1jE84aA8vW/A3Gbru+YLT6+hque/pgcR
+         uzecx0XHyz0Wx5RHMbLsXQz71jH3v3W0iGAtylgmqM+3O/FQXlUZr4Y+RVaThVD42Vod
+         AbHCFTXyNaM5wPz2dpgLk5rIAKDzLEbqfqJ1wIZyCRoW/o6sTh1H7cBCkqP4squ8OmwQ
+         73+9jx0G+Cd4a0ZP0j/gVzHzk2lb/ZzDtqwN1AmxbUMt+7b88hifeCe1IwH7RH1Joom5
+         gusPMmbONtxzYxLa/eE6jBjs8f7GOkgjcs/ip7scvinFVIzAMvimHMhnoymE2qMunR1L
+         HqRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=6xRz0Qm0SECmn6Pgtavnhfow/nmGujogj3e0uaxrCNo=;
-        b=TfFv11twu6Ko6Yw5jwmMRLaNn7Yb1EbM1fjsBhnsIYabq1yjiOcqhc5J5V7duUyC41
-         eGbHQfkacTzNXosysS1DdotZdidfsD8hIEOeLFF8v0bhgvptdIX5+QccgvKImqCZEk8d
-         obQhUuuF1tEhpJnsPQNAr6upZ/d7fy5IkMqCvFZxJp4b0qxwxG0bXEoicJQzvkqUKA7P
-         bvIfptEnDLuGOnlB3TeQ3SQwUJMDnJ1DbSrM5PjlBz7z84ZtBuGCulzJ/Ves9lD17AZz
-         oDUgMHcPMvL9ZVTkTw4Z/mQ/ImlIp7uh/P5j4Wi1xgh4xq/YWHtCGEj+as2LCSr22otm
-         xRrg==
-X-Gm-Message-State: AOAM532PiGHX9Fj9L7TLwJIS+mjld4DrT1KirFOzeaqpErxVvfUFiI4D
-        kWwuxi9awI2dvbXp1OCpLtDgkfFxQqhONOvjq5HBlzSEzNTvjEb3koZtTEGuS5jzoOHzjulAFKm
-        cyqOCVxyINq9xa2FOqDCEuv2oOOcCOwUG1PFFAbyYp0H9c1w8iYNyYLxo/rNbxU05mbG4JA0xpe
-        Z8
-X-Google-Smtp-Source: ABdhPJy65nWs3IFeHLV0d4ZGvJ1anDX7YJhS2o/i6V8NAIGi18iCBPWZsTSJunWYVvgl6oSKY3Cr+/W8p4ka
+        bh=QaLclhB85/cauEIPsHpq5YPbMmoQlX3Cg2QfR0Ui6yc=;
+        b=cjmtsYeKT75OuNEMFSfGaU9peDpZxx3cFiD+M2aQ55nLukuErdcS4HWq+GG2DNbF03
+         s1+MuRXIjym8Ys0Hk9/JSD55Qcc5wVKmSlAzInTFRYuy2dTwszMt/Mb7T5nAVnXAPSx7
+         leFzSD8/xz87m9FZbYLp3nqwJJxy4DJW5PtpUxpRyQnVm3atwYjWGeoxIH/NUcGjFOxG
+         +VsoXYxZhVmaUMXUxovEB2BlLOIjwZc2W8mp0839WSknJ3cgKIQ9Vw5ZJIpKqG1TrL4a
+         G2+35+Pr5IETFBIrAY8z7+YmgR31FdCuteN5JX5AhLOiAxx5jZ2XXtFP2gqEukx5ZBPc
+         1BLg==
+X-Gm-Message-State: AOAM532H2lgN9x4urAsYN37ILaDkHbOsowRetLUE2FMXD6ULdZz5d8Ra
+        tPOwkEbhJbboskjqLpsQ4c0GTe5NspZsMpTlXPFqUtO46W99Ax/NonCD4dw+11TP5TBKKOjpjh2
+        YCD5Lt+posdxgmdiUhmSztI6EH9ViJ6/o2aE/WbAJhy36tjgJLAgtlMaJDmByzXUj1W7QC+f2Yn
+        QK
+X-Google-Smtp-Source: ABdhPJyxN6H6icnw4YWucR6CUXWBZ80xIeVIUr5wibieFqhzuqkoxk/lSZjljlr1QwD5Pw4lsbEKUiasMyj4
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:83ce:: with SMTP id
- v14mr2843618ybm.221.1628857200916; Fri, 13 Aug 2021 05:20:00 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:17:52 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:c250:: with SMTP id
+ w16mr2428319qvh.10.1628857204219; Fri, 13 Aug 2021 05:20:04 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:17:53 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.7.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
+Message-Id: <20210813201256.Bluez.8.I4df08516dd5129d4e9d2cf963121074f500201d9@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 07/62] lib/mgmt: Inclusive language for LTK
+Subject: [Bluez PATCH 08/62] doc/mgmt: Inclusive language update
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,113 +76,43 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central" is preferred, as reflected in the BT core spec 5.3.
+Update the docs to reflect the changes in lib/mgmt.c.
 ---
 
- android/bluetooth.c | 4 ++--
- lib/mgmt.h          | 2 +-
- monitor/control.c   | 4 ++--
- src/adapter.c       | 4 ++--
- tools/oobtest.c     | 4 ++--
- 5 files changed, 9 insertions(+), 9 deletions(-)
+ doc/mgmt-api.txt | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index c3ad503497..fe956b5d43 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2276,7 +2276,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
- 		ediv = le16_to_cpu(key->ediv);
- 		rand = le64_to_cpu(key->rand);
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 5355fedb00..97d33e30a1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -855,7 +855,7 @@ Load Long Term Keys Command
+ 					Address (6 Octets)
+ 					Address_Type (1 Octet)
+ 					Key_Type (1 Octet)
+-					Master (1 Octet)
++					Central (1 Octet)
+ 					Encryption_Size (1 Octet)
+ 					Encryption_Diversifier (2 Octets)
+ 					Random_Number (8 Octets)
+@@ -4019,7 +4019,7 @@ New Long Term Key Event
+ 					Address (6 Octets)
+ 					Address_Type (1 Octet)
+ 					Key_Type (1 Octet)
+-					Master (1 Octet)
++					Central (1 Octet)
+ 					Encryption Size (1 Octet)
+ 					Enc. Diversifier (2 Octets)
+ 					Random Number (8 Octets)
+@@ -4459,7 +4459,7 @@ New Signature Resolving Key Event
+ 				}
  
--		store_ltk(&key->addr.bdaddr, key->addr.type, key->master,
-+		store_ltk(&key->addr.bdaddr, key->addr.type, key->central,
- 				key->val, key->type, key->enc_size, ediv, rand);
- 	}
+ 	This event indicates that a new signature resolving key has been
+-	generated for either the master or slave device.
++	generated for either the central or peripheral device.
  
-@@ -3097,7 +3097,7 @@ static struct mgmt_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
- 	info->ediv = g_key_file_get_integer(key_file, peer, ediv_s, NULL);
- 	info->ediv = cpu_to_le16(info->ediv);
- 
--	info->master = master;
-+	info->central = master;
- 
- failed:
- 	g_free(key);
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 0a6349321a..0d1678f01d 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -179,7 +179,7 @@ struct mgmt_cp_load_link_keys {
- struct mgmt_ltk_info {
- 	struct mgmt_addr_info addr;
- 	uint8_t type;
--	uint8_t master;
-+	uint8_t central;
- 	uint8_t enc_size;
- 	uint16_t ediv;
- 	uint64_t rand;
-diff --git a/monitor/control.c b/monitor/control.c
-index d1ba97d377..97d7e789c4 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -308,13 +308,13 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
- 	/* LE SC keys are both for master and slave */
- 	switch (ev->key.type) {
- 	case 0x00:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Master (Unauthenticated)";
- 		else
- 			type = "Slave (Unauthenticated)";
- 		break;
- 	case 0x01:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Master (Authenticated)";
- 		else
- 			type = "Slave (Authenticated)";
-diff --git a/src/adapter.c b/src/adapter.c
-index 663b778e4a..a71ebd15c3 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4028,7 +4028,7 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
- 		key->rand = cpu_to_le64(info->rand);
- 		key->ediv = cpu_to_le16(info->ediv);
- 		key->type = info->authenticated;
--		key->master = info->master;
-+		key->central = info->master;
- 		key->enc_size = info->enc_size;
- 	}
- 
-@@ -8145,7 +8145,7 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 		rand = le64_to_cpu(key->rand);
- 
- 		store_longtermkey(adapter, &key->addr.bdaddr,
--					key->addr.type, key->val, key->master,
-+					key->addr.type, key->val, key->central,
- 					key->type, key->enc_size, ediv, rand);
- 
- 		device_set_bonded(device, addr->type);
-diff --git a/tools/oobtest.c b/tools/oobtest.c
-index c095036fe7..0368bc3865 100644
---- a/tools/oobtest.c
-+++ b/tools/oobtest.c
-@@ -133,13 +133,13 @@ static void new_long_term_key_event(uint16_t index, uint16_t len,
- 
- 	switch (ev->key.type) {
- 	case 0x00:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Unauthenticated, Master";
- 		else
- 			type = "Unauthenticated, Slave";
- 		break;
- 	case 0x01:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Authenticated, Master";
- 		else
- 			type = "Authenticated, Slave";
+ 	The Store_Hint parameter indicates whether the host is expected
+ 	to store the key persistently or not.
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
