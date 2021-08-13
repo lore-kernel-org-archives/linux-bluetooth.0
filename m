@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 065CAC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5C17C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DF7BE610A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE154610CF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240501AbhHMMWo (ORCPT
+        id S240499AbhHMMWs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:22:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35900 "EHLO
+        Fri, 13 Aug 2021 08:22:48 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240499AbhHMMWo (ORCPT
+        with ESMTP id S240500AbhHMMWs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:22:44 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BB89C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:17 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id w19-20020ac87e930000b029025a2609eb04so6221473qtj.17
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:17 -0700 (PDT)
+        Fri, 13 Aug 2021 08:22:48 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FA4CC0617AE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:21 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id p16-20020a05620a22b0b02903ca40d6cc81so6950540qkh.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=2dgFyva0821C03h1TFtASoDBUUvCh+kg+Xf8M9Fofg4=;
-        b=BBlx3FgMnxq2h/BEqx/I7fSFyMUMcCbjqIdKqyaqT82DtZWv+UgvX1wCswIH+6yVqf
-         jIzlxFdAI545e4V+7Tao9uCX815BYiUIBAYT00hsEJ7G2fbOROoCLa8ot+ze9M5x9ncy
-         0OuG9stTOO+QkNueW/qOFbhH9buD5tGhvOhZMt+Qt8TopGy89CyfWg7Kzcs0AbFFT6dv
-         XTWU2AHDFPg8edGWwAZojrGEG5Jnmng+rOK83njnePampV/uLVWOsynFIloeI730pSqI
-         t4qHM02h/Fv6ADcai6uWs0Kw47S0s2WrakCdW36Kdrf9hSZhPBLdnH5Hk9lSzcodlD9j
-         MqXQ==
+        bh=ozoJ/YrolzTZriEgu1OutpE94ifPkZNg0KX/vpOM5/k=;
+        b=Qi/BKAhrAqCmI7JCDs/U/gKZTs65o9rtb3Z7xufIbtEQxAFqQE4uV1slKVeGD09yk8
+         szi1oC6Pq4/H4+LoilvFys+QJPf5tFwcsaNtVAXizj9F8Yw9SwxhgtO0OJ/aaQV22/UN
+         raDVidMXzrzgN0DV+Olt2mVNpnxO5kMZ79CdcbhSDlc2CBMTgO19EqwKt4QIICYG+PN7
+         aHRHWLxC5Jp6mLNi8n9TlEMhAWrO54zEreAApDtsahD3zGtqqyfWdb4aYfD0ixg4zFi0
+         ZwdNGwFBgP6WWUbYZMTibWmXjB/gLkp7b+3VIiTR9dA7ainYUF472Yej7W12VwkaW8iC
+         CaxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=2dgFyva0821C03h1TFtASoDBUUvCh+kg+Xf8M9Fofg4=;
-        b=bzmJTV3q10cIzDqZsl/l3N/RFRGjIAa4GnJuzqkH7Ot4Kn1elZh0aeoK14yXhzj+V5
-         JZkFMsB8MLWV3Pxoe0QMrrsk1ZXYsPyZskLgivsG31R//PTsDFiZCLtBPrYrVl2VqqW9
-         RKcJDL1YowT0N2wXtmTVXJQUhw7eOFUDwbAnXcNHd0aJS6XCYJNM7apeLPUcDMoizHuW
-         WKRaZR4uuGkK+8Gx7fBkdNm077mBykqHd0IwUmvK1coMpy6JiFW0D24dLx5cjd+5eAGd
-         rMlujyA/zgx6e7J8NdPbfCnidvUzO+bZ65BcBJuIbMdoaxqkC+gT9kt4+0sPr3l/4Uvh
-         oX0g==
-X-Gm-Message-State: AOAM533UnTRd+FmM71Yk6ebytvnop8MS3xjC38fGxZptIeWJzLxTdW9K
-        eIGtVS6aIjqh5e5GtlbkDWevQgvRblRJe2ynWjIK8OJX6GwfaBCd8pMCvxO/hketLI4PIrmVT6w
-        EwCEGNIDGHK7neq4lYeqNaWsQxO7LS41EoPKYvCfQnpIlM7XME8KZ8wPi1joAn5iQKUnYdyTFvi
-        jE
-X-Google-Smtp-Source: ABdhPJy025VTaI6tjONxsFlcEznaHjMDXfKRcgUU8tsG58pvKYG5asCzPuh1s6V1vlUcqn9fk+pA9kKvIKsu
+        bh=ozoJ/YrolzTZriEgu1OutpE94ifPkZNg0KX/vpOM5/k=;
+        b=iJwy+2Qw+URohsNnOWztkVxS+HuwlBUIv4m1uzdzr0vZSH7E8YaLVmDDnxWrYLQH46
+         F1Hmjq3w1YDpbsxd63hxiWm8SyyVBvN2J0Wzw+suWiBTJhfG3qWu6Q20tOzSrQszVW8K
+         T9/Ax4qMiNjhittSgOY95rjtred1Mq0FleSZ5G3e6cPFrWGYRqrOIor+CMNnEJLKAW8L
+         m+HixhHXuhvVpAVGaEmJqWeGZDnmYGDYeWKwprCxlMUyt6qN1/ge8cDRPQR0SNXZRbSj
+         P/BCRDSdP6+P4T1t7ygVFzol8QFwkH7owO3mLniygKe95gkKoDjsnHbg4lElu1fBxkl0
+         +Fyw==
+X-Gm-Message-State: AOAM530znn3y+PKw5EGhaDfZqCiuW48s/rcdg8GvfYPFlVJQ9X38btID
+        DLVrmxNilyGKmFnVKXb+ziGrOxzXCV+hjw7y+YWQb93tMicATaokF3REQpBWEnPCtznIixGXyBs
+        KAnhhYv/SDtW4Tu9Vk4dPWTybf5QpoPGwd97fWXh8322C5ZeiJcl+x7AgwP7luW792ranuJ/q0S
+        3E
+X-Google-Smtp-Source: ABdhPJz8Lh1hWMHdk0ARZF3gxi3D14NQ3qtGCUYEh/eercKN0UUPDGiSnl+Bba930afzEfEqj9t9ZEGD3B6/
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a05:6214:ca2:: with SMTP id
- s2mr2191233qvs.35.1628857336749; Fri, 13 Aug 2021 05:22:16 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:29 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:8122:: with SMTP id
+ 31mr2398293qvc.26.1628857340419; Fri, 13 Aug 2021 05:22:20 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:30 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.44.Ie45c8a85e3d5aca1bd93de1c1772ec904528f716@changeid>
+Message-Id: <20210813201256.Bluez.45.I2b2dd01541d8410224c436889858ceeecb26c83d@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 44/62] tools/rctest: Inclusive language changes
+Subject: [Bluez PATCH 45/62] tools/rfcomm: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -79,68 +79,61 @@ From: Archie Pusaka <apusaka@chromium.org>
 "central" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- tools/rctest.c   | 18 +++++++++---------
- tools/rctest.rst |  4 ++--
- 2 files changed, 11 insertions(+), 11 deletions(-)
+ tools/rfcomm.c   | 14 +++++++-------
+ tools/rfcomm.rst |  2 +-
+ 2 files changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/tools/rctest.c b/tools/rctest.c
-index 034ae167b2..7fd6c355de 100644
---- a/tools/rctest.c
-+++ b/tools/rctest.c
-@@ -76,7 +76,7 @@ static const char *filename = NULL;
- static const char *savefile = NULL;
- static int save_fd = -1;
- 
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index 7ad7ca5ad6..51b397b6ef 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
+@@ -37,7 +37,7 @@ static int rfcomm_raw_tty = 0;
+ static int auth = 0;
+ static int encryption = 0;
+ static int secure = 0;
 -static int master = 0;
 +static int central = 0;
- static int auth = 0;
- static int encr = 0;
- static int secure = 0;
-@@ -202,7 +202,7 @@ static int do_connect(const char *svr)
+ static int linger = 0;
  
- 	/* Set link mode */
- 	opt = 0;
+ static char *rfcomm_state[] = {
+@@ -434,7 +434,7 @@ static void cmd_listen(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv
+ 	}
+ 
+ 	lm = 0;
 -	if (master)
 +	if (central)
- 		opt |= RFCOMM_LM_CENTRAL;
+ 		lm |= RFCOMM_LM_CENTRAL;
  	if (auth)
- 		opt |= RFCOMM_LM_AUTH;
-@@ -293,7 +293,7 @@ static void do_listen(void (*handler)(int sk))
+ 		lm |= RFCOMM_LM_AUTH;
+@@ -646,7 +646,7 @@ static void usage(void)
+ 		"\t-A, --auth                     Enable authentication\n"
+ 		"\t-E, --encrypt                  Enable encryption\n"
+ 		"\t-S, --secure                   Secure connection\n"
+-		"\t-M, --master                   Become the master of a piconet\n"
++		"\t-C, --central                  Become the central of a piconet\n"
+ 		"\t-L, --linger [seconds]         Set linger timeout\n"
+ 		"\t-a                             Show all devices (default)\n"
+ 		"\n");
+@@ -668,7 +668,7 @@ static struct option main_options[] = {
+ 	{ "auth",	0, 0, 'A' },
+ 	{ "encrypt",	0, 0, 'E' },
+ 	{ "secure",	0, 0, 'S' },
+-	{ "master",	0, 0, 'M' },
++	{ "central",	0, 0, 'C' },
+ 	{ "linger",	1, 0, 'L' },
+ 	{ 0, 0, 0, 0 }
+ };
+@@ -680,7 +680,7 @@ int main(int argc, char *argv[])
  
- 	/* Set link mode */
- 	opt = 0;
--	if (master)
-+	if (central)
- 		opt |= RFCOMM_LM_CENTRAL;
- 	if (auth)
- 		opt |= RFCOMM_LM_AUTH;
-@@ -679,13 +679,13 @@ static void usage(void)
- 		"\t[-B filename] use data packets from file\n"
- 		"\t[-O filename] save received data to file\n"
- 		"\t[-N num] number of frames to send\n"
--		"\t[-C num] send num frames before delay (default = 1)\n"
-+		"\t[-M num] send num frames before delay (default = 1)\n"
- 		"\t[-D milliseconds] delay after sending num frames (default = 0)\n"
- 		"\t[-Y priority] socket priority\n"
- 		"\t[-A] request authentication\n"
- 		"\t[-E] request encryption\n"
- 		"\t[-S] secure connection\n"
--		"\t[-M] become master\n"
-+		"\t[-C] become central\n"
- 		"\t[-T] enable timestamps\n");
- }
- 
-@@ -697,7 +697,7 @@ int main(int argc, char *argv[])
  	bacpy(&bdaddr, BDADDR_ANY);
- 	bacpy(&auto_bdaddr, BDADDR_ANY);
  
--	while ((opt=getopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:MAESL:W:C:D:Y:T")) != EOF) {
-+	while ((opt=getopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M:D:Y:T")) != EOF) {
- 		switch (opt) {
- 		case 'r':
- 			mode = RECV;
-@@ -769,8 +769,8 @@ int main(int argc, char *argv[])
- 				uuid = atoi(optarg);
+-	while ((opt = getopt_long(argc, argv, "+i:rahAESML:", main_options, NULL)) != -1) {
++	while ((opt = getopt_long(argc, argv, "+i:rahAESCL:", main_options, NULL)) != -1) {
+ 		switch(opt) {
+ 		case 'i':
+ 			if (strncmp(optarg, "hci", 3) == 0)
+@@ -713,8 +713,8 @@ int main(int argc, char *argv[])
+ 			secure = 1;
  			break;
  
 -		case 'M':
@@ -149,37 +142,19 @@ index 034ae167b2..7fd6c355de 100644
 +			central = 1;
  			break;
  
- 		case 'A':
-@@ -805,7 +805,7 @@ int main(int argc, char *argv[])
- 			num_frames = atoi(optarg);
- 			break;
+ 		case 'L':
+diff --git a/tools/rfcomm.rst b/tools/rfcomm.rst
+index 3c1b8cd682..cd5daa674d 100644
+--- a/tools/rfcomm.rst
++++ b/tools/rfcomm.rst
+@@ -47,7 +47,7 @@ OPTIONS
  
--		case 'C':
-+		case 'M':
- 			count = atoi(optarg);
- 			break;
+ -S     Secure connection
  
-diff --git a/tools/rctest.rst b/tools/rctest.rst
-index 23595112d7..e0982adc3f 100644
---- a/tools/rctest.rst
-+++ b/tools/rctest.rst
-@@ -56,7 +56,7 @@ OPTIONS
+--M     Become the master of a piconet
++-C     Become the central of a piconet
  
- -N num          send num frames
- 
---C num          send num frames before delay (default: 1)
-+-M num          send num frames before delay (default: 1)
- 
- -D milliseconds     delay milliseconds after sending num frames (default: 0)
- 
-@@ -66,7 +66,7 @@ OPTIONS
- 
- -S              secure connection
- 
---M              become master
-+-C              become central
- 
- -T              enable timestamps
+ -L <seconds>    Set linger timeout
  
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
