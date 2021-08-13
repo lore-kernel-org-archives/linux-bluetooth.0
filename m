@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F014C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B31ABC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4266F610A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EACF60F46
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240473AbhHMMWQ (ORCPT
+        id S240491AbhHMMWT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:22:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35746 "EHLO
+        Fri, 13 Aug 2021 08:22:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35758 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240487AbhHMMWP (ORCPT
+        with ESMTP id S240484AbhHMMWS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:22:15 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CC77C0617AE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:48 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id q11-20020a05620a05abb02903ca17a8eef8so7028633qkq.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:48 -0700 (PDT)
+        Fri, 13 Aug 2021 08:22:18 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23A48C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:52 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id p71-20020a25424a0000b029056092741626so8938781yba.19
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=vouSkgAMG+DVZeUk2gotEVKBasAFd5Ej/tSVjfE5nKg=;
-        b=uDDOJitherBRh+PoXwYXgqBBy/NoRyadOwLkuMM0wDcsNZ/c51aq7mge9X28ZSuJo0
-         Lga+fbnjyj4VCSYllHN50sKLitqii44Zj4tWmXwXBiYg6df/JdGA9q2WFUXHvBbY+whu
-         q+OYA+SbAxyPEA+UJGNv4wsxNVNQuD6h6LyCAyuVKDrapkLGPnUYeJQH4WZxgM7qN+Vx
-         mcEDhIpzVsYekkjaC0CpdsI4b6QEu+W1NfxEcPldjNfNCRnw+iYDSM2RHVwz6EBilfGJ
-         +k+62TS0XDjyxJxJLY+TTEqTIKsXAYBGWRj1+wYhasr3CO7M6Dx8Gs8mDLLBcSraEZvb
-         jZoA==
+        bh=hFED6TuRM/+XzE0+YqmrR4+hybFYu52VwoImVB7t2Hk=;
+        b=Z6J4MlO8B4XvbLeczjE1DOy4BsvEI+Y3uVws6EKU0FDoZ7LBW70cjbLFqFKZAC6+xw
+         RBpFS1nQglv8MGUdD19WfY7sdfK0zcJuyScBq8aXrG+jHIIhSwMBOYOPZ6XIJ9jwllmo
+         v8oWBQoADBAktgQTcoIOBqgEZSI/NN+9re5tqaDsewIBUTrrsX1b6Vxzf+vKszNBNvw6
+         SaQKdJFiJH/KqxaQl8v6tlzwbfRvjhKDtHVwoeJ+WFF19MhUKJJiWAFgDYOCWOO46x+8
+         gCt5Ue6y9xlE6D5BQ/XUdUv6JcfmWhai0C6RkhCNeGvayrFAuA4uAL990dsPXx5tWCLc
+         m3Mg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=vouSkgAMG+DVZeUk2gotEVKBasAFd5Ej/tSVjfE5nKg=;
-        b=rTxBDBY67X67sHrcBQb0B8FgCh+021B9oFMM2nF73QrNIlDBeLGsSyWNtqDtB0jb19
-         BTfzp3Sgei8fG572PIgMACgeojwAF6P3pIpcvF6j90lSH8qdiFLmIGRR0O59RQziro1Z
-         74IOxumF3SoTZW3q9cKrxr08ZUDF1ARCTNukRoVJNVgEpqIZitIvAmVOnV3dIPn3qDll
-         w3S2kBO86t8eq+r0rMTb7jQU1AmBYkn9y49AG21oPixsllvVylUoydgr1qwQ9oZW94FV
-         IOXKc5f6IGsOEZgHoPxTvKVgVoNXtwXxZCqrrZ1fUBHmvBSK0ZvKh7a3p8ZGpi1u5OQS
-         1kPQ==
-X-Gm-Message-State: AOAM533KOx/XfynU/CFFiw4zFVrl2EMEUNq7JN/+0czPOx+iAwX581Cl
-        POciZhdo2nz50XwiMikIZ7b36aR6UIeU69txYLHhjyPzAzIO2Gc3R43T0NwIxHtsvCnGPpeXQaO
-        tLlsWfxhXLOxBuGtwim0UJoVxcGEFAswjYnEY2gI53ceaNeZuta905uCx0JNE/uhlhux4R2UtpL
-        m2
-X-Google-Smtp-Source: ABdhPJxS/31JnGZEHPZSBkB9NQ1TmgHz8lR7v3byuk8arB32wtGfGg9xW9ZWAglaUqZ7eb5bh98Iz/Kc9dd/
+        bh=hFED6TuRM/+XzE0+YqmrR4+hybFYu52VwoImVB7t2Hk=;
+        b=ktFJ+CpjS8lcoW931oLWm89zkB5e2zU1Gw5VfraWHtLfgO6wnQ8nk9rTKKARRKKj+M
+         2yGd0q6yCnmWMOU3aSTDmmHHZ1FbCmdohHQKrA6Mbt2MCnw0Uv0DQWnyf0VHDiOQ7PAL
+         q8A8jGj0DrY4Z44+u3by0JYE8cpaCq2CKpF67VBxjFZW78K6X3L9A4ODCkRizlLbzIBW
+         unCnXcQhfe5zNl9+42q+fMvM9ro+K4U8tPA7d6xdygz4EVDa60NNc6hM7BGrGlxk/9Ql
+         QHyXa7W3NbEE2cmgf0YOZ0Y+JSGi7wBs3VgHEY5ntRr8AEx6eK7uqDVv8CWPe4FsrGe1
+         RNhQ==
+X-Gm-Message-State: AOAM533CK77RmS/N0/3VjXJc5I035WRB0CGoELO6V5GY7b2exzp6W10R
+        RnasegC8kOxXgSC3SP1KrlKbQBC8oHzmQ9pwIWbKDHVFOJWMREox5IQj7MFRdd9e0Gu7b7Wc9k/
+        +Aw7etw4gfhEwEc9f1DWxnrlmuxOjD8eBCU9Ua6JXrVppH7k04tD1o0CWtQ2Tfm9pemvoUwWXf7
+        84
+X-Google-Smtp-Source: ABdhPJyDVDcwZB3LppmjZIoD36gqaSkyyfks+AKk3B/cmQJ9A0h1/xqC+XbMYG2pqV3qdYpZAO6fSkOMIR80
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a05:6214:12a2:: with SMTP id
- w2mr2373982qvu.27.1628857307655; Fri, 13 Aug 2021 05:21:47 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:21 +0800
+ (user=apusaka job=sendgmr) by 2002:a5b:7c4:: with SMTP id t4mr2556051ybq.368.1628857311337;
+ Fri, 13 Aug 2021 05:21:51 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:22 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.36.I8543a76f6c0ff58cf40ad105102597738ad44241@changeid>
+Message-Id: <20210813201256.Bluez.37.I4b5bd03960384e2f0fab99057924e5dd409e53d4@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 36/62] tools/parser/csr: Inclusive language changes
+Subject: [Bluez PATCH 37/62] tools/btpclientctl: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,53 +76,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central" and "peripheral" are the preferred terms, as reflected in
-the BT core spec 5.3.
+"peripheral" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- tools/parser/csr.c | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ tools/btpclientctl.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/parser/csr.c b/tools/parser/csr.c
-index 36efc46332..bd50b1c760 100644
---- a/tools/parser/csr.c
-+++ b/tools/parser/csr.c
-@@ -257,7 +257,7 @@ static inline void pskey_dump(int level, struct frame *frm)
- 		uint16_dump(level + 1, "MAX_SCOS", frm);
- 		break;
- 	case 0x000f:
--		uint16_dump(level + 1, "MAX_REMOTE_MASTERS", frm);
-+		uint16_dump(level + 1, "MAX_REMOTE_CENTRALS", frm);
- 		break;
- 	case 0x00da:
- 		uint16_dump(level + 1, "ENC_KEY_LMIN", frm);
-@@ -546,7 +546,7 @@ static char *frag2str(uint8_t frag)
- void csr_dump(int level, struct frame *frm)
- {
- 	uint8_t desc, cid, type;
--	uint16_t handle, master, addr;
-+	uint16_t handle, central, addr;
- 
- 	desc = CSR_U8(frm);
- 
-@@ -576,12 +576,13 @@ void csr_dump(int level, struct frame *frm)
- 				return;
- 			case 0x12:
- 				handle = CSR_U16(frm);
--				master = CSR_U16(frm);
-+				central = CSR_U16(frm);
- 				addr = CSR_U16(frm);
- 				p_indent(level, frm);
--				printf("FHS: handle %d addr %d (%s)\n", handle,
--					addr, master ? "master" : "slave");
--				if (!master) {
-+				printf("FHS: handle %d addr %d (%s)\n",
-+					handle, addr,
-+					central ? "central" : "peripheral");
-+				if (!central) {
- 					char addr[18];
- 					p_ba2str((bdaddr_t *) frm->ptr, addr);
- 					p_indent(level + 1, frm);
+diff --git a/tools/btpclientctl.c b/tools/btpclientctl.c
+index 6553f2f3a7..c30d5bd4e7 100644
+--- a/tools/btpclientctl.c
++++ b/tools/btpclientctl.c
+@@ -676,7 +676,7 @@ const struct indexstr_data ad_type_table[] = {
+ 	{ 0x10, "BT_AD_DEVICE_ID" },
+ 	{ 0x10, "BT_AD_SMP_TK" },
+ 	{ 0x11, "BT_AD_SMP_OOB_FLAGS" },
+-	{ 0x12, "BT_AD_SLAVE_CONN_INTERVAL" },
++	{ 0x12, "BT_AD_PERIPHERAL_CONN_INTERVAL" },
+ 	{ 0x14, "BT_AD_SOLICIT16" },
+ 	{ 0x15, "BT_AD_SOLICIT128" },
+ 	{ 0x16, "BT_AD_SERVICE_DATA16" },
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
