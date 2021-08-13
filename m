@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDDB0C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:23:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37D78C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:23:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4D62610CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:23:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2079560F46
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:23:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240317AbhHMMXb (ORCPT
+        id S240520AbhHMMXf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:23:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36164 "EHLO
+        Fri, 13 Aug 2021 08:23:35 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240520AbhHMMXb (ORCPT
+        with ESMTP id S240354AbhHMMXe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:23:31 -0400
+        Fri, 13 Aug 2021 08:23:34 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BAD8C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:23:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id i32-20020a25b2200000b02904ed415d9d84so9032334ybj.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:23:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 101F3C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:23:08 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id n20-20020a2540140000b0290593b8e64cd5so9022090yba.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:23:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ZohIqjo/ruImR4KElZm/VS54ev6XvVTMH0+hw4pfbuU=;
-        b=aKT/akV9fbTTI7utKk5Gct85tix21jqtWeNWFlscGWEw7tgdEzDsJ27sarxnUH4BxO
-         s4HIq3kmARHwGN1LfYarkbzN5bbUQxgmkdytLczIWTlHS5Lel9sXXdUa2XGZNnAXystl
-         1Vf6gwPNyBHb9HF9qt3/7A4hcI0sQAb0yg8h3lTqQ3gy8WacPDAiKnuKzVHOVujGzNCH
-         NcyVwUB5YYjf6a/o67tVaZNS4x0DTBhnFYbla5iQdj6mhaq0TTO/dSrzS99wGPFl32Nf
-         rtjEoPpcuxU74S6qwvdpyjKMG7U4l9ujjvUC/2Zy+fiegX1dsFgzASdZ0Jc4FFjsEgwG
-         p7bA==
+        bh=xjAMHdWH+RljwloRpGWu9SopC3dgkKptTea/IQ7yf7M=;
+        b=Gtcdzgy44y4wJcrnXnW2CGaCsLUJTjtTqIoDEPZ2/QzNF7o94S7SyDsfhgIY+P+5YH
+         WcKrufGucppcxlizDK5vIx+I7Uq6zKj+m/H1k+jFjRtMAVjhFi3/TJ/jeF00J+XNcGJ9
+         5lbkiEy2OgbsaOFB2EExsVwGkxeZ/DrPDUqDmMn7STOjtM6aJYy/X+G0PH1q1QpSsz9E
+         KFkElQuZWf6RsJxBcuTQjdzDHmgONLNGAkIHlxR0fvYajyfcEw1+FIP2iMl0dW7TSnfW
+         v6glZ907ZtkB4fvfrVMG8IBtdDUs7sx8XtPsFmsZgYZg6L95Q+XupC9sB7hbsSLYQB+/
+         2mfQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ZohIqjo/ruImR4KElZm/VS54ev6XvVTMH0+hw4pfbuU=;
-        b=kJFxhQJq7PxyBgXP8dc6tvFx6EXJY6ZRQRjim6jdYI0TG4rJTYGE8AM9wbkjQEPeUi
-         Wx1qaZNeS4giuoDDxDnusrq5eiq8VC4OxyGuCO+/ANmLgWtkmyroNbzeRvaSPkS4Qj05
-         gABZpqXEkzYwEnDiDIzfT+Nwn+CGUzso//6uov54FNcW65lVEo7kVVY2afzHyMMBpxgJ
-         Z7NWeZ9BUK9nM+yBmGNQMr5PyhXp2RcFWJfhwUap3U6R3os6illF/5cYZPYYYLAzGZLe
-         p71AjcSq9xdJ2+QX87OKtFlupjUqrQekh55cFFsvLS6XQnAmhh8OYcOmb2owxQxs2aXj
-         OGGQ==
-X-Gm-Message-State: AOAM531syT1p9jkiyDxN7F0PFJWMB6G/hEvb3K0fuoiSpHbtsqT5K2Rl
-        pXJ14OixoCHtVRPOAd1YixvKBKKkwK8W9v56A68cgDqAMR+/D83dvAPGkoQtr8nXrV/nB/h+bfh
-        jXWwD26qmIQ4kHHqsQ0rtVSDDyN0SEHOmQ1vPzfBhYNfS34z2kZHNAfQnqqQVoTKLUO3qDLij/C
-        hd
-X-Google-Smtp-Source: ABdhPJyt2774jlNDYx58SEoBF0k2pdHAalYYn3Y3CsCmICbsl/rRwBmm8so4TGC4ZB3qZkE/bs8JrJGzpG25
+        bh=xjAMHdWH+RljwloRpGWu9SopC3dgkKptTea/IQ7yf7M=;
+        b=KV93vjOg8uZIFXFZonyZjPyTUdbjz4HVk1jgVA3AMVwxmmNd78KX2IKXA0gTkz7e1r
+         /Ug8ttQOISYnG1HNhnp9M/14OkSBeqYpcTiSeAWKTpWvVQaGw2k+Oj5ffrZRAyAN+Nl7
+         f6kbpVi4bNCN5/15DyfR7W7Qle3VtgWfD2tQa66U7EsHi5q/Vpz5lQQYJvE7g83z5kwF
+         91Y4tpKAwdfS3cvPuFHjna/HBB2sHHmiVdBbNYOWU3yIZf9YP9RaRKa5FHK20Yn+OO7T
+         ordhpRwsXABSv7tTxeOcLgE1o05Hv7jKNJTfiBJ2rybKz5EJgJhK71KFnp36kwXnWRp5
+         Xprg==
+X-Gm-Message-State: AOAM530mAW0aDrmuH8cWtRPripm2JiwTHr/5K64xal3t6jcS0MwtjCyJ
+        bPM8O0Ya5zAZiLtQJZCe3h3+9jYrF9k7jK4Hyl5RDyuiO6N+QHz+L8J0k9QzmG70K1+yvjLpR66
+        mMywWToUyZylGF+ZklDA6vvlLihPtRlBpgZRakcdpZDspd/sECrVPxjj26czFciJuSQl47HeIr8
+        d0
+X-Google-Smtp-Source: ABdhPJzhX7gWODTFJPzIbXvexMrz/XLFTGHW7Hye3PBqmRA81TDd+nlsshL35RGNsf3OCNx7zRIb2glT5gN3
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:25ce:: with SMTP id
- l197mr2700186ybl.255.1628857383806; Fri, 13 Aug 2021 05:23:03 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:42 +0800
+ (user=apusaka job=sendgmr) by 2002:a25:e7d0:: with SMTP id
+ e199mr2699541ybh.203.1628857387202; Fri, 13 Aug 2021 05:23:07 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:43 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.57.I864344f9ee91b9c051ae4212c9f5a236bdd49632@changeid>
+Message-Id: <20210813201256.Bluez.58.I5f75c985c564568baf50026123c14690eb650456@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 57/62] unit/mesh: Inclusive language changes
+Subject: [Bluez PATCH 58/62] doc/mesh: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -80,31 +80,22 @@ From: Archie Pusaka <apusaka@chromium.org>
 https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 ---
 
- unit/test-mesh-crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ doc/mesh-api.txt | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
-index 12709dace0..f9b7d81da7 100644
---- a/unit/test-mesh-crypto.c
-+++ b/unit/test-mesh-crypto.c
-@@ -111,7 +111,7 @@ static const struct mesh_crypto_test s8_1_2 = {
- };
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index f2c6b9e5c2..ce651c8017 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -585,7 +585,7 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
  
- static const struct mesh_crypto_test s8_1_3 = {
--	.name		= "8.1.3 k2 function (master)",
-+	.name		= "8.1.3 k2 function (flooding)",
- 	.net_key	= "f7a2a44f8e8a8029064f173ddc1e2b00",
- 	.p		= "00",
- 	.nid		= "7f",
-@@ -159,7 +159,7 @@ static const struct mesh_crypto_test s8_2_1 = {
- };
- 
- static const struct mesh_crypto_test s8_2_2 = {
--	.name		= "8.2.2 Encryption and privacy keys (Master)",
-+	.name		= "8.2.2 Encryption and privacy keys (flooding)",
- 	.net_key	= "7dd7364cd842ad18c17c2b820c84c3d6",
- 	.p		= "00",
- 	.nid		= "68",
+ 	void SetKeyPhase(uint16 net_index, uint8 phase)
+-		This method is used to set the master key update phase of the
++		This method is used to set the flooding key update phase of the
+ 		given subnet. When finalizing the procedure, it is important
+ 		to CompleteAppKeyUpdate() on all app keys that have been
+ 		updated during the procedure prior to setting phase 3.
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
