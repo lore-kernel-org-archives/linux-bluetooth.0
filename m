@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35099C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF60AC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1D100610CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9A3F3610CF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240359AbhHMMU6 (ORCPT
+        id S240353AbhHMMVC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:20:58 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35348 "EHLO
+        Fri, 13 Aug 2021 08:21:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35372 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240356AbhHMMU5 (ORCPT
+        with ESMTP id S240328AbhHMMVB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:20:57 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5C98C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:30 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id mi10-20020a17090b4b4ab0290178b6d7574aso7587187pjb.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:30 -0700 (PDT)
+        Fri, 13 Aug 2021 08:21:01 -0400
+Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26167C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:35 -0700 (PDT)
+Received: by mail-qt1-x84a.google.com with SMTP id o11-20020ac85a4b0000b029028acd99a680so6260948qta.19
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=BvVBO9aCuApqAW803ra4S/QragqrXZCjWak6ZmBt8sE=;
-        b=MJu7otQ+u4HfLussBhnpQOsFRGEGn9e4+UmaHcWHqavKWekMRxxXOM3LizFPoPofMj
-         ZXiZd4n0fcV+kmDz9AfgGr0tbs/VxJ5OTAk3GSC3RNRKy9l5DlnjOKuu/SuhvI2tbSRh
-         cvQ4iP6yEXzvXjmgjeG/53HaLGiWVQKRZkaMVhqWg8EDE1uc5GrMBDSO6qR01wiErMxp
-         x3CMqJ2XydbrkqbbFDE5KTGUKk3S4NRmHda1FkSv3pyCOcwHdwYh2Pvja2RxSULfFo4B
-         qQUDS6PpHYP3hr9x91Nf+q3NVy4xfQcohgV55So75sjU3JtmSpXWF6pXg8Iwfg/VSLVv
-         MDnQ==
+        bh=6XRTy1u6qcQ2jVTWezczK11htvvoo9E5OQO7JJGG20Y=;
+        b=cy4d+NjRhbKqTxUkDWOUuvcGiYoYfj/gAZcLgY1NH7PMCkrF5lRI9iWbI4LkYghp/f
+         ZTi7BEtIUBqV64otM00ZkIlKCWJsglQ/uY8OoHqDa5PuY2BQbx/5smdJVP6mX7rHGSNZ
+         Oa1JGYmthfMTp7OJQ5D9IwJrmtBn/sDE52tS7wZA9DebV/QxGlQDdo9sQzDHz3demPaO
+         FD9PxAi0/db8Qo2sqizUq5hal8oNtByK9UFo+HTsDL2fYFSN+/h/T4ilI+S8OAt3DSAm
+         K000nX/7nyJ6qdKM5kf0NStvuJWeXioLSDjJDqnYMMTNLeDYCFx/TkBNJHv4Cs+B92Ry
+         ertw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=BvVBO9aCuApqAW803ra4S/QragqrXZCjWak6ZmBt8sE=;
-        b=a7c0o+fByniJUQyUMTWuIwfdNFs37HxoJub2dk+NuYiU97Gu/YiJNQ71IWXaRUFzWA
-         kQ3nJAQLNVwCnNIXunBRCJ55UWDvObh3fi8QSSomZi/5LGDJmp03zbDKtymVLY4p3gwt
-         QrI2n8CjkzdpmmvW9pS23WLiEwDtpOqA2Nng421yilw6WfCI57K+Fxuf84qczTYS8jKf
-         ep5EO/todxDjI0T0nbeRDDG37jIMvDzs+NmpA4XbXvmuAFNg2PpTW0bccFKQJPHiIx8M
-         uZJ/zqfzq8jQUD8xS0v0b/3pFB0f3t2TXcGV1hjt9O+R6kippKC2BSyeePFnyRCNIoO5
-         EVRg==
-X-Gm-Message-State: AOAM533XlkaUL83N8fB0eMpGIs4ks4um7x0GtRx6hdd+cy6347D9nAkv
-        XngAudCvcftMZXqUYs4W+mVMw+fQC26jP7Z9dCaXkzwrYqPu+FWvCFu/GMFy/m++y2FPo31k/9J
-        0zZeFr6+J0RoC0neR1fsFInpji2CpuZoDRz2qq2mCDKVKApLFSmyERgr4a3YGlaCp12ig6iAbME
-        jd
-X-Google-Smtp-Source: ABdhPJy2jp/4q0pfOuB+EVRrcWn3KARk1iaBohLYZFMjA2gMpPnpRAi9iS70KoPtFHgGfdTbyWuvwA/glMg5
+        bh=6XRTy1u6qcQ2jVTWezczK11htvvoo9E5OQO7JJGG20Y=;
+        b=ZWrPVOYAoIZ1TsuMcFyZz9XvCAw3E4olfRh8cXZBIu0jt9YnOgVK3BvefXNubkAoIT
+         M3pW2gEll5nzVAhnqa3raaSkWgUvcwegarcx3zRPQoUh3qwTG3hW/kJW5ULbX22nzIgg
+         hz89er4GnUlgEgeXuf4mE199dLW1eI9QEqh5Jy4ZyQmQM1Mi4Z8Vuopt20DoggdUP8sK
+         NQmA/oEFqs61JoXaem18OIQxNfVarwvXPU5PRUlwyZDgfCtWk9QKz3bWz/sEwqPuNgtz
+         Z7r1B6OL5uxbLWgVFy3hH/HLBvY3Db/TufKLIwSYkdj9UbB/nzxX3tqpFT2ZeS1l45Oq
+         /N/Q==
+X-Gm-Message-State: AOAM531T7ge2ebTJ/6mPO9y5XpJS7r06xlJeX51vcaqEeYZbT/ROQVJ7
+        /mYFG4lOCC67RLm/FimmmJKqvR6hxr8WZWGjwWgdLdGLepTkaWmpJuJkwU1P7qPGwri74c39Kw3
+        qrTt1GkmJhFD710MhBEnF8GJYcTQ+89vCwB7OOLjgMm/rL9v+yU4raWBA++mS5iwf3pUqpV0/IC
+        DI
+X-Google-Smtp-Source: ABdhPJytDB6VxXoZSXsIz6DEXI6IwO/Xl/izKQ6icXpco5v3lwDIgEvc81P//t4DO3g+Egly7JEL+iLkvbJ6
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a17:90b:396:: with SMTP id
- ga22mr205729pjb.0.1628857229999; Fri, 13 Aug 2021 05:20:29 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:00 +0800
+ (user=apusaka job=sendgmr) by 2002:ad4:5c62:: with SMTP id
+ i2mr2413166qvh.32.1628857234285; Fri, 13 Aug 2021 05:20:34 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:01 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.15.I3a4295a824570e92a9274f94e8b59025c3fba576@changeid>
+Message-Id: <20210813201256.Bluez.16.I712b6ffc914c7a88acc173556e03021b31543e60@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 15/62] monitor: Inclusive language in LL feature
+Subject: [Bluez PATCH 16/62] monitor: Inclusive language in link key transaction
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,53 +76,99 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"peripheral" is preferred, as reflected in the BT core spec 5.3.
+"link key" or "temporary link key" are preferred, as reflected in
+the BT core spec 5.3.
 ---
 
- monitor/bt.h | 4 ++--
- monitor/ll.c | 6 +++---
- 2 files changed, 5 insertions(+), 5 deletions(-)
+ monitor/bt.h     |  8 ++++----
+ monitor/packet.c | 18 +++++++++---------
+ 2 files changed, 13 insertions(+), 13 deletions(-)
 
 diff --git a/monitor/bt.h b/monitor/bt.h
-index 3d3073e462..888dbe3d89 100644
+index 888dbe3d89..70e18cc171 100644
 --- a/monitor/bt.h
 +++ b/monitor/bt.h
-@@ -88,8 +88,8 @@ struct bt_ll_reject_ind {
- 	uint8_t  error;
+@@ -628,8 +628,8 @@ struct bt_hci_cmd_change_conn_link_key {
+ 	uint16_t handle;
  } __attribute__ ((packed));
  
--#define BT_LL_SLAVE_FEATURE_REQ	0x0e
--struct bt_ll_slave_feature_req {
-+#define BT_LL_PERIPHERAL_FEATURE_REQ	0x0e
-+struct bt_ll_peripheral_feature_req {
- 	uint8_t  features[8];
+-#define BT_HCI_CMD_MASTER_LINK_KEY		0x0417
+-struct bt_hci_cmd_master_link_key {
++#define BT_HCI_CMD_LINK_KEY_SELECTION		0x0417
++struct bt_hci_cmd_link_key_selection {
+ 	uint8_t  key_flag;
  } __attribute__ ((packed));
  
-diff --git a/monitor/ll.c b/monitor/ll.c
-index d1023c8a3e..d0db9194bd 100644
---- a/monitor/ll.c
-+++ b/monitor/ll.c
-@@ -449,9 +449,9 @@ static void reject_ind(const void *data, uint8_t size)
- 	packet_print_error("Error code", pdu->error);
+@@ -2931,8 +2931,8 @@ struct bt_hci_evt_change_conn_link_key_complete {
+ 	uint16_t handle;
+ } __attribute__ ((packed));
+ 
+-#define BT_HCI_EVT_MASTER_LINK_KEY_COMPLETE	0x0a
+-struct bt_hci_evt_master_link_key_complete {
++#define BT_HCI_EVT_LINK_KEY_TYPE_CHANGED	0x0a
++struct bt_hci_evt_link_key_type_changed {
+ 	uint8_t  status;
+ 	uint16_t handle;
+ 	uint8_t  key_flag;
+diff --git a/monitor/packet.c b/monitor/packet.c
+index 3609235d06..5c0fe400da 100644
+--- a/monitor/packet.c
++++ b/monitor/packet.c
+@@ -2901,7 +2901,7 @@ static const struct bitfield_data events_table[] = {
+ 	{  6, "Remote Name Request Complete"				},
+ 	{  7, "Encryption Change"					},
+ 	{  8, "Change Connection Link Key Complete"			},
+-	{  9, "Master Link Key Complete"				},
++	{  9, "Link Key Type Changed"					},
+ 	{ 10, "Read Remote Supported Features Complete"			},
+ 	{ 11, "Read Remote Version Information Complete"		},
+ 	{ 12, "QoS Setup Complete"					},
+@@ -4253,9 +4253,9 @@ static void change_conn_link_key_cmd(const void *data, uint8_t size)
+ 	print_handle(cmd->handle);
  }
  
--static void slave_feature_req(const void *data, uint8_t size)
-+static void peripheral_feature_req(const void *data, uint8_t size)
+-static void master_link_key_cmd(const void *data, uint8_t size)
++static void link_key_selection_cmd(const void *data, uint8_t size)
  {
--	const struct bt_ll_slave_feature_req *pdu = data;
-+	const struct bt_ll_peripheral_feature_req *pdu = data;
+-	const struct bt_hci_cmd_master_link_key *cmd = data;
++	const struct bt_hci_cmd_link_key_selection *cmd = data;
  
- 	packet_print_features_ll(pdu->features);
+ 	print_key_flag(cmd->key_flag);
  }
-@@ -702,7 +702,7 @@ static const struct llcp_data llcp_table[] = {
- 	{ 0x0b, "LL_PAUSE_ENC_RSP",         null_pdu,           0, true },
- 	{ 0x0c, "LL_VERSION_IND",           version_ind,        5, true },
- 	{ 0x0d, "LL_REJECT_IND",            reject_ind,         1, true },
--	{ 0x0e, "LL_SLAVE_FEATURE_REQ",     slave_feature_req,  8, true },
-+	{ 0x0e, "LL_PERIPHERAL_FEATURE_REQ", peripheral_feature_req, 8, true },
- 	{ 0x0f, "LL_CONNECTION_PARAM_REQ",  NULL,              23, true },
- 	{ 0x10, "LL_CONNECTION_PARAM_RSP",  NULL,              23, true },
- 	{ 0x11, "LL_REJECT_IND_EXT",        reject_ind_ext,     2, true },
+@@ -8416,8 +8416,8 @@ static const struct opcode_data opcode_table[] = {
+ 				set_conn_encrypt_cmd, 3, true },
+ 	{ 0x0415,  17, "Change Connection Link Key",
+ 				change_conn_link_key_cmd, 2, true },
+-	{ 0x0417,  18, "Master Link Key",
+-				master_link_key_cmd, 1, true },
++	{ 0x0417,  18, "Temporary Link Key",
++				link_key_selection_cmd, 1, true },
+ 	{ 0x0419,  19, "Remote Name Request",
+ 				remote_name_request_cmd, 10, true },
+ 	{ 0x041a,  20, "Remote Name Request Cancel",
+@@ -9493,9 +9493,9 @@ static void change_conn_link_key_complete_evt(const void *data, uint8_t size)
+ 	print_handle(evt->handle);
+ }
+ 
+-static void master_link_key_complete_evt(const void *data, uint8_t size)
++static void link_key_type_changed_evt(const void *data, uint8_t size)
+ {
+-	const struct bt_hci_evt_master_link_key_complete *evt = data;
++	const struct bt_hci_evt_link_key_type_changed *evt = data;
+ 
+ 	print_status(evt->status);
+ 	print_handle(evt->handle);
+@@ -11073,8 +11073,8 @@ static const struct event_data event_table[] = {
+ 				encrypt_change_evt, 4, true },
+ 	{ 0x09, "Change Connection Link Key Complete",
+ 				change_conn_link_key_complete_evt, 3, true },
+-	{ 0x0a, "Master Link Key Complete",
+-				master_link_key_complete_evt, 4, true },
++	{ 0x0a, "Link Key Type Changed",
++				link_key_type_changed_evt, 4, true },
+ 	{ 0x0b, "Read Remote Supported Features",
+ 				remote_features_complete_evt, 11, true },
+ 	{ 0x0c, "Read Remote Version Complete",
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
