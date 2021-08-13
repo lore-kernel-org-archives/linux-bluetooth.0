@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAE3EC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:19:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B864EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:19:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D2A7B610E9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:19:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A016E610CF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:19:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240145AbhHMMUR (ORCPT
+        id S240202AbhHMMUV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:20:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35134 "EHLO
+        Fri, 13 Aug 2021 08:20:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239683AbhHMMUR (ORCPT
+        with ESMTP id S240175AbhHMMUV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:20:17 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6544C0617AE
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:19:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id j21-20020a25d2150000b029057ac4b4e78fso8967980ybg.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:19:50 -0700 (PDT)
+        Fri, 13 Aug 2021 08:20:21 -0400
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2283C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:19:54 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id m4-20020a170902db04b029012d5b1d78d5so5969106plx.15
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:19:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=wf0eyxF5NWE4g86nU1WG74jgOVwEPEElvt764q6iHS0=;
-        b=TdycFAHGrabJYIYtAa3qRChuBh1zxoSB9h/Q9032lNXGk2V7cumVRzIJF+wAgvTrwG
-         lZdjo5z6I/OCDjg1Doy/9WSzpSZ4xnb4onRa72VgBLr/2LFDGWRMUn7CfBGVh5pSPrt+
-         dyRWjrSnmr7or2AD3b2JvClcNSsVLxoo+mnLL3p+w3q5gzRf8oCgOFG+6YWyA0DH+LtQ
-         xoEeWhxAqItQSEG77wyLdo34OthSz39CFAQssmxZtSGhitEpdFvDFu3F58yd/Jf+e+r6
-         fGvuSpCdFtFQldjVC2P8XKUdNpmm640k5SeJVuyV0n8JdyuzxwndvsOImjYsYGiic4yW
-         LnfQ==
+        bh=PiBtj+MsTnuwJd4EJgx4Ti6LcY37TLBitjCaDjrgtwY=;
+        b=BZncDvQkFO0wHxVVsVuRoAHPsWG68XjvhRDIPO5FNYTY2pJGMdeA1M2JcjU2I77BuE
+         mdHKNuIFx3eSBz3bIQzdaPlkMnZ5mJgJhFMy6X3V48L8pO17rCZ5egInWl2jOO/ORuVY
+         spUbHQsZsya3u0kXfjyQ+ONGoiu5H8Y9iizA5xQDILaJi+V53JcDS4oEmbFooOD5ikCW
+         WpD6QV1l6+5pCl4tVEaWEF4ak580/YHFuXNygq6X2gx2iI0V/m2cP4GoPYh16NyfEhXt
+         eDKE0j3lg0N/e3PCMXwazQObiXRsY2dTZJ1Tj1spjC2Xrb6fyic4JZ8mi+Hn2BTjDxJT
+         orkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=wf0eyxF5NWE4g86nU1WG74jgOVwEPEElvt764q6iHS0=;
-        b=oAwJogPIxg5qlcdjaiX8Aw3GknTTZFTNAnY7csGOVPYcUirfoie1NLT62OfZl5xMHG
-         hiTZ9b89ciKolSW3+9FEBcFfrDxQ5C+TcKBf6zxcIfQyzxqV66jNlx14dYcPbwx+aG6s
-         HN9XBvlezlDUUy/DDaXk1Ipm1LjYB2LANb8RubUYzlkzg0xMUJryUG2V+Omj7cXTHQ3d
-         EO0IV068swyUcM2iILKcEzkIkaHvClXUVNvaz+bFtkq+ELq7jjgOWsBeuY5Af8rF8ybI
-         bgIMhKediPXxa/jfPJ1X5Az23HYvUOrwoz4FWOh+yZMQtiwUrlgDkG7d/0okIu+QHfJW
-         zZKQ==
-X-Gm-Message-State: AOAM532sDyXH9fP6nruKlLLa3Nui7Y6OBVlsbvCRTTbKv0JCeEniaRTL
-        0j37OlJtLS1V2uPXpxi715+VPpoAOn7Fe7HDE60BRajwVmSC2LukaTmowhk+gDwCx3Xki+lRg46
-        dv8cbS3GXAcPrND22VHr9HVnOyyTMTzjjorFtFFabej0PAT6vwizR3j6DmPy3Ceiaq5SWY8ngZ+
-        l8
-X-Google-Smtp-Source: ABdhPJxlgwD7fyzZIVCvMg07bpKyjC5NzVTpxUd8UAVyiaHkrxMIg0mcepi5vJGEZVXRlXfevFEqpWAjyQ9c
+        bh=PiBtj+MsTnuwJd4EJgx4Ti6LcY37TLBitjCaDjrgtwY=;
+        b=P+cLhzrq97fcdNCGxJTrHfLaIWRnStO++eV7SI+x3djxKq7fFFEyT4XI6b8j/M1Q7g
+         V0+rPkwTZiJXExZTCCOAuFCNjDU0/vL7HY1QOVUBQUWtc3Uj86LqsULRvrMDFSCpqjKq
+         sS88UFnnj9s8MIjR+lwzLa8zimgQDwOk5DpKFA3SWNGQZ/zOHTXRJOgMvDkD1BJNCjOo
+         obQaKbmYKsyLKgafW/oITfS1SjBznTvbrPGVA33RpI4GGw479ctOIHaDo7mT5k0nGw5+
+         /yNeakhQfUtfICPZA3x49rn9+vhjSEfoHptxClefWjMrKlfIoNAgJxZaSbmM5oPdvsDL
+         ZKyg==
+X-Gm-Message-State: AOAM533jLu3+WpCUYThJ60Ypi8m2kwLuJhw+MAZ6PJPbD8xmzzK/cAWB
+        cJJfWfvVKamgzl/ZcZBaKPZCczvG/ewcaEt1bdIQRxpHM5/ZvtuIDKjFeJ4i8fu9VA14uz04xub
+        mvJf/tD/jbyt97xMtOg70GBrGtPC+tv9M9dAeh+3IN7MLTYkpwoJqIX3oNIku6bBiQ689HwL68w
+        9b
+X-Google-Smtp-Source: ABdhPJy5a08TQ3i2smtXTW6wf3eFCsq3/vEc+ADXRw3j9fQrCB/lJjg/PdEPAI6VZGMzDXv8JYV9TT63zt4q
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:c5d4:: with SMTP id
- v203mr2685627ybe.295.1628857190039; Fri, 13 Aug 2021 05:19:50 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:17:49 +0800
+ (user=apusaka job=sendgmr) by 2002:a17:90b:4504:: with SMTP id
+ iu4mr2430509pjb.209.1628857194016; Fri, 13 Aug 2021 05:19:54 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:17:50 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.4.I29592c8a1a134f751cfde25e962d389215836cb5@changeid>
+Message-Id: <20210813201256.Bluez.5.I598f2d795e09d5ffb1ba6cb16c2baef2ac595e8e@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 04/62] core: Inclusive language for l2cap
+Subject: [Bluez PATCH 05/62] core: Inclusive language for rfcomm
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,108 +76,94 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central" is preferred, as reflected on the BT core spec 5.3.
+"central" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- btio/btio.c            | 10 +++++-----
- lib/l2cap.h            |  2 +-
- profiles/health/mcap.c |  2 +-
- src/sdpd-server.c      |  2 +-
- tools/l2test.c         |  4 ++--
- 5 files changed, 10 insertions(+), 10 deletions(-)
+ btio/btio.c    | 10 +++++-----
+ lib/rfcomm.h   |  2 +-
+ tools/rctest.c |  4 ++--
+ tools/rfcomm.c |  2 +-
+ 4 files changed, 9 insertions(+), 9 deletions(-)
 
 diff --git a/btio/btio.c b/btio/btio.c
-index 1f1c374bca..9c4601e6f8 100644
+index 9c4601e6f8..ce958bdd09 100644
 --- a/btio/btio.c
 +++ b/btio/btio.c
-@@ -369,13 +369,13 @@ static int l2cap_set_master(int sock, int master)
+@@ -394,13 +394,13 @@ static int rfcomm_set_master(int sock, int master)
  		return -errno;
  
  	if (master) {
--		if (flags & L2CAP_LM_MASTER)
-+		if (flags & L2CAP_LM_CENTRAL)
+-		if (flags & RFCOMM_LM_MASTER)
++		if (flags & RFCOMM_LM_CENTRAL)
  			return 0;
--		flags |= L2CAP_LM_MASTER;
-+		flags |= L2CAP_LM_CENTRAL;
+-		flags |= RFCOMM_LM_MASTER;
++		flags |= RFCOMM_LM_CENTRAL;
  	} else {
--		if (!(flags & L2CAP_LM_MASTER))
-+		if (!(flags & L2CAP_LM_CENTRAL))
+-		if (!(flags & RFCOMM_LM_MASTER))
++		if (!(flags & RFCOMM_LM_CENTRAL))
  			return 0;
--		flags &= ~L2CAP_LM_MASTER;
-+		flags &= ~L2CAP_LM_CENTRAL;
+-		flags &= ~RFCOMM_LM_MASTER;
++		flags &= ~RFCOMM_LM_CENTRAL;
  	}
  
- 	if (setsockopt(sock, SOL_L2CAP, L2CAP_LM, &flags, sizeof(flags)) < 0)
-@@ -1180,7 +1180,7 @@ parse_opts:
+ 	if (setsockopt(sock, SOL_RFCOMM, RFCOMM_LM, &flags, sizeof(flags)) < 0)
+@@ -1345,7 +1345,7 @@ static gboolean rfcomm_get(int sock, GError **err, BtIOOption opt1,
  				return FALSE;
  			}
  			*(va_arg(args, gboolean *)) =
--				(flags & L2CAP_LM_MASTER) ? TRUE : FALSE;
-+				(flags & L2CAP_LM_CENTRAL) ? TRUE : FALSE;
+-				(flags & RFCOMM_LM_MASTER) ? TRUE : FALSE;
++				(flags & RFCOMM_LM_CENTRAL) ? TRUE : FALSE;
  			break;
  		case BT_IO_OPT_HANDLE:
- 			if (l2cap_get_info(sock, &handle, dev_class) < 0) {
-diff --git a/lib/l2cap.h b/lib/l2cap.h
-index 9197800df4..a0ea111839 100644
---- a/lib/l2cap.h
-+++ b/lib/l2cap.h
-@@ -52,7 +52,7 @@ struct l2cap_conninfo {
+ 			if (rfcomm_get_info(sock, &handle, dev_class) < 0) {
+diff --git a/lib/rfcomm.h b/lib/rfcomm.h
+index 0347ddc367..ab1df888c2 100644
+--- a/lib/rfcomm.h
++++ b/lib/rfcomm.h
+@@ -38,7 +38,7 @@ struct rfcomm_conninfo {
  };
  
- #define L2CAP_LM	0x03
--#define L2CAP_LM_MASTER		0x0001
-+#define L2CAP_LM_CENTRAL	0x0001
- #define L2CAP_LM_AUTH		0x0002
- #define L2CAP_LM_ENCRYPT	0x0004
- #define L2CAP_LM_TRUSTED	0x0008
-diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
-index be13af37a0..ab05a2bc24 100644
---- a/profiles/health/mcap.c
-+++ b/profiles/health/mcap.c
-@@ -2426,7 +2426,7 @@ static gboolean get_btrole(struct mcap_mcl *mcl)
- 	if (getsockopt(sock, SOL_L2CAP, L2CAP_LM, &flags, &len))
- 		DBG("CSP: could not read role");
- 
--	return flags & L2CAP_LM_MASTER;
-+	return flags & L2CAP_LM_CENTRAL;
- }
- 
- uint64_t mcap_get_timestamp(struct mcap_mcl *mcl,
-diff --git a/src/sdpd-server.c b/src/sdpd-server.c
-index 306b92a44c..c71e2c22da 100644
---- a/src/sdpd-server.c
-+++ b/src/sdpd-server.c
-@@ -72,7 +72,7 @@ static int init_server(uint16_t mtu, int master, int compat)
- 	}
- 
- 	if (master) {
--		int opt = L2CAP_LM_MASTER;
-+		int opt = L2CAP_LM_CENTRAL;
- 		if (setsockopt(l2cap_sock, SOL_L2CAP, L2CAP_LM, &opt, sizeof(opt)) < 0) {
- 			error("setsockopt: %s", strerror(errno));
- 			return -1;
-diff --git a/tools/l2test.c b/tools/l2test.c
-index 6e07f7b842..822cdc8cc9 100644
---- a/tools/l2test.c
-+++ b/tools/l2test.c
-@@ -484,7 +484,7 @@ static int do_connect(char *svr)
- 	if (reliable)
- 		opt |= L2CAP_LM_RELIABLE;
+ #define RFCOMM_LM	0x03
+-#define RFCOMM_LM_MASTER	0x0001
++#define RFCOMM_LM_CENTRAL	0x0001
+ #define RFCOMM_LM_AUTH		0x0002
+ #define RFCOMM_LM_ENCRYPT	0x0004
+ #define RFCOMM_LM_TRUSTED	0x0008
+diff --git a/tools/rctest.c b/tools/rctest.c
+index 7d688691c4..034ae167b2 100644
+--- a/tools/rctest.c
++++ b/tools/rctest.c
+@@ -203,7 +203,7 @@ static int do_connect(const char *svr)
+ 	/* Set link mode */
+ 	opt = 0;
  	if (master)
--		opt |= L2CAP_LM_MASTER;
-+		opt |= L2CAP_LM_CENTRAL;
+-		opt |= RFCOMM_LM_MASTER;
++		opt |= RFCOMM_LM_CENTRAL;
  	if (auth)
- 		opt |= L2CAP_LM_AUTH;
+ 		opt |= RFCOMM_LM_AUTH;
  	if (encr)
-@@ -587,7 +587,7 @@ static void do_listen(void (*handler)(int sk))
- 	if (reliable)
- 		opt |= L2CAP_LM_RELIABLE;
+@@ -294,7 +294,7 @@ static void do_listen(void (*handler)(int sk))
+ 	/* Set link mode */
+ 	opt = 0;
  	if (master)
--		opt |= L2CAP_LM_MASTER;
-+		opt |= L2CAP_LM_CENTRAL;
+-		opt |= RFCOMM_LM_MASTER;
++		opt |= RFCOMM_LM_CENTRAL;
  	if (auth)
- 		opt |= L2CAP_LM_AUTH;
+ 		opt |= RFCOMM_LM_AUTH;
  	if (encr)
+diff --git a/tools/rfcomm.c b/tools/rfcomm.c
+index 8e1db8ebaa..7ad7ca5ad6 100644
+--- a/tools/rfcomm.c
++++ b/tools/rfcomm.c
+@@ -435,7 +435,7 @@ static void cmd_listen(int ctl, int dev, bdaddr_t *bdaddr, int argc, char **argv
+ 
+ 	lm = 0;
+ 	if (master)
+-		lm |= RFCOMM_LM_MASTER;
++		lm |= RFCOMM_LM_CENTRAL;
+ 	if (auth)
+ 		lm |= RFCOMM_LM_AUTH;
+ 	if (encryption)
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
