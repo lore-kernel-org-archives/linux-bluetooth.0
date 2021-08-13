@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E5A9C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 322B7C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0E4EF610A4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BB4760F00
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:21:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240449AbhHMMVy (ORCPT
+        id S240454AbhHMMV6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:21:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35630 "EHLO
+        Fri, 13 Aug 2021 08:21:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240445AbhHMMVx (ORCPT
+        with ESMTP id S240455AbhHMMV5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:21:53 -0400
+        Fri, 13 Aug 2021 08:21:57 -0400
 Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAEFCC061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:26 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id x5-20020a0569020505b0290592c25b8c59so8956948ybs.18
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:26 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA73AC0617AE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:30 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p71-20020a25424a0000b029056092741626so8938086yba.19
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:21:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=7BkEGxjBIFv6NdrePU/6M5vHMKKs9MONg7YK1ajPNFc=;
-        b=UvvdT3JIBhzHCsVY+WublSyOCk5SA94hLNU+naC4dsODNyDbUF1Z5IAkrxChsYF95D
-         RKZryxFtd/30IhyI35mIqaZh3fjvJhZuVYQPjVq8NRLB4xCVnV69yx5d9m+XFSNF2/UM
-         JvsWLLBT/45TftRMIF91BDeSA4ffBxKFGmXBug3r/Rhdt0Q5DeedVVyQ0acV4RJfvody
-         VRb+y1MXRNfQs0MW7BV8K37bpQ8f2d1mX+bCHQuvxyeKW/TyptmVIdcHJaMUsq88gBsb
-         N76uuj4cs5suISYvVh+1w80oo1kECGElt20UKPfcpS5NrmxnmmIKLaZeoHpXT+XOMtkg
-         Updg==
+        bh=0K76jy7xQ+CS7QZZBof7U3SDrGmRBJr5J4axI2I3BAI=;
+        b=fl8DyJyk7GlyyKUSW7ydxbKkBroi7M395JGxopCNqvarZt2/xbYsjmfBHAtXkaugrh
+         NR1MkldtcfekzUOVEEGXdTh4cDO59zC+dpgCD387ZwSfS5YuGzhnSw+QZXje/AiVqu8Y
+         JepU6vnQYQHrOAX7lJIl3Zd+Dcd5DuAF77tjgW9uDfS4bvP8AdGhNyl6L6R96p4uTJNA
+         2XlB2be8YADSc9cffQuyJrPIEP3rV8M1XWOitv0V88UfGJ1EIR8H74QGbbuH/8z8s1uP
+         cSE3CQLNoc7J+MCjZ0EVQBCEtdlmsv5D2PdGtrs1f27luAQORZQnbMTg0TWbceRjYZhM
+         XKjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=7BkEGxjBIFv6NdrePU/6M5vHMKKs9MONg7YK1ajPNFc=;
-        b=ZhXoH7Jj+igTLpMutX6tboZh21QF0supiIQ8++dVBF+9znExRE2YP9qs0LZlU2sV2m
-         jN874Kpmtz1YdV2BmgTqVMdsw3ivJ7Wlao2neCX2DdKHkSHa++0SaF63Jr9AAqVMOobU
-         Fgs6/Mo7naTpMjOWoC9sTMK8gD7Nw5IhkqECjsIC5Sm7GKnKiviRiJYCWWe//3+9lG1n
-         sACysOMITRJg2mPBcp0OKTQ3IE7RkCqxFgPx2sn7UcuedKL9F25+ZFhaY3QdJXszslM8
-         WWOhAeAm/1YQCtcwEoo2X5PsIk47jD+KYZvobwN2iPFhW1293clQnIQm9h3n4zyUu/6B
-         fbYA==
-X-Gm-Message-State: AOAM533g/RgTam3W0BicpaeKoRVJQGNRlc07ploCMa5RtBjJU6VK8O8J
-        DxesaktIh2F4tjWSleyvoPhOOZ7PjMt93eSjatmSWSxRlOBIFd3Bv1gxeE/c/Cdwx5IqN8CuJx6
-        MpOzwWrwGKkiKne1VeckLeMWPQf3GJjbjBVBbiAOsd3TSp1yOu0fsNQUXuu2YlYlesjyjnC11uH
-        ie
-X-Google-Smtp-Source: ABdhPJwk1qVeIh8j5jRchL3iozR4vZ5QkWmC0VycU8XCcvYv1TcaG8nWPuLQVzyzGco3u/cOVNtxqHPFXYb5
+        bh=0K76jy7xQ+CS7QZZBof7U3SDrGmRBJr5J4axI2I3BAI=;
+        b=Oe7aMSHHVocqp7+bdW4upCE4bYGppdsOEtW5uca27A4GWOIme6Y3V1BMgVKv5apMgH
+         5g7W6hCOGHFvkP016Rmkc4dnjjVMb279ndOBrxS5ceMK+1ZzR3kf7xcAr1J/ARCvGDbE
+         NeV1DTcY8m1LNr23rRUvkA87hKECqV37NYFIvUKoFP72X1gfqWxj07eY/qCNmbCzEiW6
+         am/E/QjvPNAaEHF21m5haeEYb3XdP2EyBgOxBj/RZLH2n076/t201O10yGKqdYUaiUFc
+         J08uOklI+FVp5kulUY9cAZswsZIHe5l4uhinIOF6Jt2nM6jhTcW9gr6aU26NfHM9wT3r
+         Qs7A==
+X-Gm-Message-State: AOAM531v+z2LhLxhWiZ0WfgpVibSqjkHgdo1Y7mYWrHn+VPT0IatR0Xe
+        P7W/b9Y7TBEOmh7PcpbfbQm9chypB+CRm40dqBVZoZ//H70ClPUyj8Xz1O/7NozfPP7qIBIRBlg
+        jC+E8ERCB9xCFdDno5SAjwBr8Zcr0DG7BTiZ9rHkmyLct4j4GPEN5FXWb6S+NuyWgoT+PbFQ+na
+        tB
+X-Google-Smtp-Source: ABdhPJxIqJz9fXOR7gWpqbGEcSYlTppifXGvi9Crj2DUtwZrdmHwQw6C6nzv+cm5nNhcCwe3i4XniQp2ozxU
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:4086:: with SMTP id
- n128mr2495813yba.247.1628857286133; Fri, 13 Aug 2021 05:21:26 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:15 +0800
+ (user=apusaka job=sendgmr) by 2002:a25:cf82:: with SMTP id
+ f124mr2817024ybg.58.1628857290120; Fri, 13 Aug 2021 05:21:30 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:16 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.30.I89b23b8f5038b24df78e7108c9bfc7fef9aee423@changeid>
+Message-Id: <20210813201256.Bluez.31.Ib8aef56c04854b18342a791302d3460a40fff3e2@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 30/62] tools/hciconfig: Inclusive language changes
+Subject: [Bluez PATCH 31/62] tools/meshctl: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,85 +76,39 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central", "peripheral", and "reject list" are the preferred terms,
-as reflected in the BT core spec 5.3 and
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
+Use "parent" to describe the hierarchy.
 ---
 
- tools/hciconfig.c   | 26 +++++++++++++-------------
- tools/hciconfig.rst |  4 ++--
- 2 files changed, 15 insertions(+), 15 deletions(-)
+ tools/meshctl.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/tools/hciconfig.c b/tools/hciconfig.c
-index 491f216135..2bc9fe84c3 100644
---- a/tools/hciconfig.c
-+++ b/tools/hciconfig.c
-@@ -116,8 +116,8 @@ static void print_le_states(uint64_t states)
- 		"Directed Advertising State",
- 		"Passive Scanning State",
- 		"Active Scanning State",
--		"Initiating State/Connection State in Master Role",
--		"Connection State in the Slave Role",
-+		"Initiating State/Connection State in Central Role",
-+		"Connection State in the Peripheral Role",
- 		"Non-connectable Advertising State and Passive Scanning State combination",
- 		"Scannable Advertising State and Passive Scanning State combination",
- 		"Connectable Advertising State and Passive Scanning State combination",
-@@ -128,17 +128,17 @@ static void print_le_states(uint64_t states)
- 		"Directed Advertising State and Active Scanning State combination",
- 		"Non-connectable Advertising State and Initiating State combination",
- 		"Scannable Advertising State and Initiating State combination",
--		"Non-connectable Advertising State and Master Role combination",
--		"Scannable Advertising State and Master Role combination",
--		"Non-connectable Advertising State and Slave Role combination",
--		"Scannable Advertising State and Slave Role combination",
-+		"Non-connectable Advertising State and Central Role combination",
-+		"Scannable Advertising State and Central Role combination",
-+		"Non-connectable Advertising State and Peripheral Role combination",
-+		"Scannable Advertising State and Peripheral Role combination",
- 		"Passive Scanning State and Initiating State combination",
- 		"Active Scanning State and Initiating State combination",
--		"Passive Scanning State and Master Role combination",
--		"Active Scanning State and Master Role combination",
--		"Passive Scanning State and Slave Role combination",
--		"Active Scanning State and Slave Role combination",
--		"Initiating State and Master Role combination/Master Role and Master Role combination",
-+		"Passive Scanning State and Central Role combination",
-+		"Active Scanning State and Central Role combination",
-+		"Passive Scanning State and Peripheral Role combination",
-+		"Active Scanning State and Peripheral Role combination",
-+		"Initiating State and Central Role combination/Central Role and Central Role combination",
- 		NULL
- 	};
+diff --git a/tools/meshctl.c b/tools/meshctl.c
+index 9d7df2ccdc..18e20c40d2 100644
+--- a/tools/meshctl.c
++++ b/tools/meshctl.c
+@@ -541,19 +541,19 @@ static void print_uuids(GDBusProxy *proxy)
+ 	}
+ }
  
-@@ -1922,8 +1922,8 @@ static struct {
- 	{ "features",	cmd_features,	0,		"Display device features" },
- 	{ "version",	cmd_version,	0,		"Display version information" },
- 	{ "revision",	cmd_revision,	0,		"Display revision information" },
--	{ "block",	cmd_block,	"<bdaddr>",	"Add a device to the blacklist" },
--	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the blacklist" },
-+	{ "block",	cmd_block,	"<bdaddr>",	"Add a device to the reject list" },
-+	{ "unblock",	cmd_unblock,	"<bdaddr>",	"Remove a device from the reject list" },
- 	{ "lerandaddr", cmd_le_addr,	"<bdaddr>",	"Set LE Random Address" },
- 	{ "leadv",	cmd_le_adv,	"[type]",	"Enable LE advertising"
- 		"\n\t\t\t0 - Connectable undirected advertising (default)"
-diff --git a/tools/hciconfig.rst b/tools/hciconfig.rst
-index 6141fc2be7..2d56eeb413 100644
---- a/tools/hciconfig.rst
-+++ b/tools/hciconfig.rst
-@@ -230,10 +230,10 @@ lm [*mode*]
-     sockets.
+-static gboolean device_is_child(GDBusProxy *device, GDBusProxy *master)
++static gboolean device_is_child(GDBusProxy *device, GDBusProxy *parent)
+ {
+ 	DBusMessageIter iter;
+ 	const char *adapter, *path;
  
- block <*bdaddr*>
--    Add a device to the blacklist
-+    Add a device to the reject list
+-	if (!master)
++	if (!parent)
+ 		return FALSE;
  
- unblock <*bdaddr*>
--    Remove a device from the blacklist
-+    Remove a device from the reject list
+ 	if (g_dbus_proxy_get_property(device, "Adapter", &iter) == FALSE)
+ 		return FALSE;
  
- lerandaddr <*bdaddr*>
-     Set LE Random Address
+ 	dbus_message_iter_get_basic(&iter, &adapter);
+-	path = g_dbus_proxy_get_path(master);
++	path = g_dbus_proxy_get_path(parent);
+ 
+ 	if (!strcmp(path, adapter))
+ 		return TRUE;
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
