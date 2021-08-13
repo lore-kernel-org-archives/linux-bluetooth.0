@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FE8C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EB5A1C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E174660F46
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D15D060F46
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:22:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240517AbhHMMXJ (ORCPT
+        id S240516AbhHMMXM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:23:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36036 "EHLO
+        Fri, 13 Aug 2021 08:23:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36054 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240515AbhHMMXJ (ORCPT
+        with ESMTP id S240503AbhHMMXM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:23:09 -0400
-Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63357C061756
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:42 -0700 (PDT)
-Received: by mail-qk1-x749.google.com with SMTP id d22-20020a379b160000b02903d298616502so4346404qke.11
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:42 -0700 (PDT)
+        Fri, 13 Aug 2021 08:23:12 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D196C061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:45 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id gw9-20020a0562140f0900b0035decb1dfecso2022741qvb.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:22:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=/j4KemwE7+xppuC192Uv0/YiBWMRPUcz3vJJ8yYdfxQ=;
-        b=ATtWswlnnH4a59IkhobWQClSShhMbHIrTbMuvHf7iHGzH6Nqdh0+l9/SCiaOh6u73Y
-         O/AT5KNzk3CYvtIU/un1bDdtQ4quAiHjvb2H08kGMaLYWTXIy9Eiy5iOFSfirXLraMt6
-         aSeezQlEzdUz9S0HhXOkIL3v9PP1ka9YrLmIcatEWHY0iwB1O3oexKQF2tVwR20f6t0L
-         oX4B6Xbv3e+mnmXfNre/YH8UspBKDHdDfRqurhIt45SbKJUUi/D3ogQUUEBxkODZtOPo
-         GpaFWrvfhuwrPb9afcqcQuYMWuM8wk0ewRw11CoYZuRIMhwwzBz8A3heLI9mynDaJNk5
-         vZfQ==
+        bh=5Bdj2o6ZYeOwYY1a0I0/BvPdA+dHyUHJANEDS/vvIeo=;
+        b=b1bSdZ3laxTLyPLCySqp0bYYwSup8v00hy32/XfJVq8FMaIyI4q7IVv57/3H3lirgN
+         j9j+bNjzzMFbPSKuSgQ9cZsvggb3CQdxe4U3gJe7hkmK0z/qxfT2JNCZ5+X4edoeCUJo
+         fUsr6Jkn68g3IAhsGddKNFLk7FKw/WUw0YBRRa7mkuCJ61WT2J/9F5yOp7Uf8h+ojBbo
+         J5p/J4ZoZTzwRR1jgfqcOr4yGUCGZiXwoi7W0bRzucEBRyq/CZjGxJ5Epbtt0n1Phd5X
+         zUeTQ3MDVF1V0kds/yt+9bZgUIZngEASj707JGbwPLRJqhZighQt74l/BROYpkxNRr0v
+         nXNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=/j4KemwE7+xppuC192Uv0/YiBWMRPUcz3vJJ8yYdfxQ=;
-        b=c1c/AJHeVFVl06tsyYWw6jqyHZboJuHr5c6FgMVzE83MDVuu7waja24pvPRGDDTCkr
-         7m+S7/fZFFqbeFdHjGYCrMZMgMoTtm1EA3SKX8thhl2vW8YC81MXM0HRsb/hRKmdM650
-         BXzyN441lz7+Y1z61eYsIHq0SWcszRzzqJEe1CSQ0B0f1ZmeIojEnhjgbmq4YzYfUY0d
-         0kySf9JoVW7ioSNd6Y1cm+hFKFsP4ND8OHpXG/lxsUdmFNlGsmTlTOzOlyWEDsdB9Kp/
-         KCcY/TWBpx7Kk5smDRRJUNX+PPtsXakpBrOGRBgLDHKzUrMoZGSiuHvSVaJ8GB9ENtbn
-         7JLA==
-X-Gm-Message-State: AOAM532Y4hr2g9SomlONoBoIDEMQbiCY974rlH7S946zyjzBIEBl3fNf
-        fG6DvmJciWip99Qu8pCer2DzTilmkxJsG0f0M+/cJlkw93fbvZ3Djl8kJKfBYuy2rdvGM0vELxh
-        i6mb2NOlC0UeTLnHuDnF+I1JA40yUFyHbvFVQuSvNAlfG/+nJGTA7c5H7WKmwkMg/nmjYXnzvlk
-        fm
-X-Google-Smtp-Source: ABdhPJyw4hxHPzWndoAaXzs/y0UBXmWnBtu4RiOAa6oOnl9wFvHKB/qbzASAxHzRLascgJFAPf8lty2F12TM
+        bh=5Bdj2o6ZYeOwYY1a0I0/BvPdA+dHyUHJANEDS/vvIeo=;
+        b=ph04+8VlbXf1IxFi3ysHRoHiJPa7Ej2Ml8APsg6wUUXiQLWcawWO0l2iPl9nT8H2xQ
+         85pOLs0x5GlFTNiYGmQ4az7DfQmeCYK3E3ONT5qW5y/SmI001aWAe9IlfBgU5sUpRC5f
+         Tat1Fs/wuFXZNACU2dEDVf/uhRypwEI0dVRu1sDQIqrmClzm/YERtT3cEA20of/YZCgD
+         tt9zUKsWZ+R1Ulj3HZMihl0fEjSYCBcAjZB3RbSX0MTuPIjSU1cTsmATNdgq/+ETqTpv
+         jjr+Kn8Sq545qDBGqyfL7WEma+YSmOzuGDhShxIPrgBCJyiJ6s8HG5vG7X/aXPK9ULZ8
+         Og0w==
+X-Gm-Message-State: AOAM531mPuKndGeUVGXo75t0CyEx1ArKOsqBB+ML6AlLs4sPRf/VDxBc
+        FzeiaDfH/LfnDBySydYs9FHbTkbEyoM9hTRDwfyX8Co/s3+hF9QInUFbPe2FyNQRyKnxysP+RJX
+        /tPIInUGXRSZoUVv+esxm0K3QNVwI4WqMNaXabS4b4Izg3L/DX1FH/twj3FpxVK0o3bLZhKrBbu
+        8U
+X-Google-Smtp-Source: ABdhPJxCJOP7PWN8UT5MOwuDelvKdhkPZy4KCe9FpBGLLblrig8Wed2soFksO81KiCOTl6SgVUsjlnXlhveL
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a05:6214:10c4:: with SMTP id
- r4mr2346200qvs.58.1628857361273; Fri, 13 Aug 2021 05:22:41 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:36 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6214:d0c:: with SMTP id
+ 12mr2337564qvh.10.1628857364746; Fri, 13 Aug 2021 05:22:44 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:37 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.51.I90a92f48ae29b2a8d8b18f856ea2a43afba52299@changeid>
+Message-Id: <20210813201256.Bluez.52.If17a35783443b964af0262fd2c31f4c361fe238f@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 51/62] adapter: Inclusive language for storing LTK
+Subject: [Bluez PATCH 52/62] adapter: Inclusive language for device filtering
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,79 +76,126 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"central" and "peripheral" are the preferred terms, as reflected in
-the BT core spec 5.3.
+"accept list" and "reject list" are the preferred terms, as reflected
+in the BT core spec 5.3, also in
+https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 ---
 
- doc/settings-storage.txt |  4 ++--
- src/adapter.c            | 10 +++++-----
- 2 files changed, 7 insertions(+), 7 deletions(-)
+ src/adapter.c | 18 ++++++++++--------
+ src/adapter.h |  4 ++--
+ src/device.c  |  6 +++---
+ 3 files changed, 15 insertions(+), 13 deletions(-)
 
-diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
-index d21150f09e..79361d4228 100644
---- a/doc/settings-storage.txt
-+++ b/doc/settings-storage.txt
-@@ -294,9 +294,9 @@ Long term key) related to a remote device.
-   Rand			Integer		Randomizer
- 
- 
--[SlaveLongTermKey] group contains:
-+[PeripheralLongTermKey] group contains:
- 
--  Same as the [LongTermKey] group, except for slave keys.
-+  Same as the [LongTermKey] group, except for peripheral keys.
- 
- 
- [ConnectionParameters] group contains:
 diff --git a/src/adapter.c b/src/adapter.c
-index 60712f01a0..a23c438f34 100644
+index a23c438f34..3ed785bf08 100644
 --- a/src/adapter.c
 +++ b/src/adapter.c
-@@ -3651,7 +3651,7 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
- 									NULL);
- 	ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
+@@ -4957,7 +4957,7 @@ void adapter_connect_list_remove(struct btd_adapter *adapter,
+ 	trigger_passive_scanning(adapter);
+ }
  
--	central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
-+	central = g_key_file_get_boolean(key_file, group, "Central", &gerr);
- 	if (gerr)
- 		g_error_free(gerr);
- 	else
-@@ -3683,7 +3683,7 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
- 
- 	DBG("%s", peer);
- 
--	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-+	ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
- 	if (ltk)
- 		ltk->central = false;
- 
-@@ -5623,7 +5623,7 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
- 	g_free(str);
- 
- 	g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
--	g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
-+	g_key_file_set_integer(key_file, "LongTermKey", "Central", central);
- 	g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
- 	g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
- 
-@@ -8047,7 +8047,7 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 				uint8_t enc_size, uint16_t ediv,
- 				uint64_t rand)
+-static void add_whitelist_complete(uint8_t status, uint16_t length,
++static void add_accept_list_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
  {
--	const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
-+	const char *group = central ? "LongTermKey" : "PeripheralLongTermKey";
- 	char device_addr[18];
- 	char filename[PATH_MAX];
- 	GKeyFile *key_file;
-@@ -8069,7 +8069,7 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 	const struct mgmt_rp_add_device *rp = param;
+@@ -4988,10 +4988,11 @@ static void add_whitelist_complete(uint8_t status, uint16_t length,
+ 		return;
+ 	}
  
- 	/* Old files may contain this so remove it in case it exists */
--	g_key_file_remove_key(key_file, "LongTermKey", "Master", NULL);
-+	g_key_file_remove_key(key_file, "LongTermKey", "Central", NULL);
+-	DBG("%s added to kernel whitelist", addr);
++	DBG("%s added to kernel accept list", addr);
+ }
  
- 	for (i = 0; i < 16; i++)
- 		sprintf(key_str + (i * 2), "%2.2X", key[i]);
+-void adapter_whitelist_add(struct btd_adapter *adapter, struct btd_device *dev)
++void adapter_accept_list_add(struct btd_adapter *adapter,
++							struct btd_device *dev)
+ {
+ 	struct mgmt_cp_add_device cp;
+ 
+@@ -5005,10 +5006,10 @@ void adapter_whitelist_add(struct btd_adapter *adapter, struct btd_device *dev)
+ 
+ 	mgmt_send(adapter->mgmt, MGMT_OP_ADD_DEVICE,
+ 				adapter->dev_id, sizeof(cp), &cp,
+-				add_whitelist_complete, adapter, NULL);
++				add_accept_list_complete, adapter, NULL);
+ }
+ 
+-static void remove_whitelist_complete(uint8_t status, uint16_t length,
++static void remove_accept_list_complete(uint8_t status, uint16_t length,
+ 					const void *param, void *user_data)
+ {
+ 	const struct mgmt_rp_remove_device *rp = param;
+@@ -5027,10 +5028,11 @@ static void remove_whitelist_complete(uint8_t status, uint16_t length,
+ 		return;
+ 	}
+ 
+-	DBG("%s removed from kernel whitelist", addr);
++	DBG("%s removed from kernel accept list", addr);
+ }
+ 
+-void adapter_whitelist_remove(struct btd_adapter *adapter, struct btd_device *dev)
++void adapter_accept_list_remove(struct btd_adapter *adapter,
++							struct btd_device *dev)
+ {
+ 	struct mgmt_cp_remove_device cp;
+ 
+@@ -5043,7 +5045,7 @@ void adapter_whitelist_remove(struct btd_adapter *adapter, struct btd_device *de
+ 
+ 	mgmt_send(adapter->mgmt, MGMT_OP_REMOVE_DEVICE,
+ 				adapter->dev_id, sizeof(cp), &cp,
+-				remove_whitelist_complete, adapter, NULL);
++				remove_accept_list_complete, adapter, NULL);
+ }
+ 
+ static void add_device_complete(uint8_t status, uint16_t length,
+diff --git a/src/adapter.h b/src/adapter.h
+index 60b5e3bcca..19e7cf82ad 100644
+--- a/src/adapter.h
++++ b/src/adapter.h
+@@ -214,9 +214,9 @@ void adapter_auto_connect_add(struct btd_adapter *adapter,
+ 					struct btd_device *device);
+ void adapter_auto_connect_remove(struct btd_adapter *adapter,
+ 					struct btd_device *device);
+-void adapter_whitelist_add(struct btd_adapter *adapter,
++void adapter_accept_list_add(struct btd_adapter *adapter,
+ 						struct btd_device *dev);
+-void adapter_whitelist_remove(struct btd_adapter *adapter,
++void adapter_accept_list_remove(struct btd_adapter *adapter,
+ 						struct btd_device *dev);
+ 
+ void btd_adapter_set_oob_handler(struct btd_adapter *adapter,
+diff --git a/src/device.c b/src/device.c
+index b29aa195d1..4997d6ab6d 100644
+--- a/src/device.c
++++ b/src/device.c
+@@ -1122,7 +1122,7 @@ static void set_blocked(GDBusPendingPropertySet id, gboolean value, void *data)
+ 		break;
+ 	case EINVAL:
+ 		g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed",
+-					"Kernel lacks blacklist support");
++					"Kernel lacks reject list support");
+ 		break;
+ 	default:
+ 		g_dbus_pending_property_error(id, ERROR_INTERFACE ".Failed",
+@@ -5714,7 +5714,7 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary)
+ 
+ 	if (temporary) {
+ 		if (device->bredr)
+-			adapter_whitelist_remove(device->adapter, device);
++			adapter_accept_list_remove(device->adapter, device);
+ 		adapter_connect_list_remove(device->adapter, device);
+ 		if (device->auto_connect) {
+ 			device->disable_auto_connect = TRUE;
+@@ -5726,7 +5726,7 @@ void btd_device_set_temporary(struct btd_device *device, bool temporary)
+ 		clear_temporary_timer(device);
+ 
+ 	if (device->bredr)
+-		adapter_whitelist_add(device->adapter, device);
++		adapter_accept_list_add(device->adapter, device);
+ 
+ 	store_device_info(device);
+ 
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
