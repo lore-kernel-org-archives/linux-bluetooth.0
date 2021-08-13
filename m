@@ -2,68 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-18.4 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
-	version=3.4.0
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	UNWANTED_LANGUAGE_BODY,URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C448BC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96540C4320E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ABC3F600CC
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 80D4160F00
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 13 Aug 2021 12:20:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240368AbhHMMVV (ORCPT
+        id S240391AbhHMMVX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 13 Aug 2021 08:21:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35450 "EHLO
+        Fri, 13 Aug 2021 08:21:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240404AbhHMMVR (ORCPT
+        with ESMTP id S240385AbhHMMVU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 13 Aug 2021 08:21:17 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EE48C0617AD
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:50 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id w200-20020a25c7d10000b02905585436b530so9003576ybe.21
-        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:50 -0700 (PDT)
+        Fri, 13 Aug 2021 08:21:20 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1B6BAC061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:54 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id h186-20020a37b7c30000b02903b914d9e335so7008260qkf.17
+        for <linux-bluetooth@vger.kernel.org>; Fri, 13 Aug 2021 05:20:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=qX0op0RwNnb4SfUwmWelLnu1NmagbazjMSr5aFn1x1M=;
-        b=ZPZbxqcTod1mXB8Rd2argXY5uRt8ZOYSaclKG7SMXtWOIfBXzF1RDpkgeAVx4/nuw6
-         1Re+TqUVJgWrhLK7I90i+mWjidtqc/fcUOxZ3Ws/wgo4xNGAqUgBEL/IK+NNjEwTLaT+
-         KY6op28RMZnkep8n8iTYMbDbcqzzmXkIhbWnfluo+cegpsNus4r8pzCWCAEbZ1Qd4r4s
-         x95TuVGSOpJMqzoNCtxHWI7QAhh2+C9RrJOrWGON4lTXmXH9Ny3TLwHzygpIKb11B4fF
-         PpK+eLXV5plXj5TKw27rDtu2U3lkdAheWvkkICOOy+7q+2mbN4BxPIytlAzpEtyXuIyE
-         foOw==
+        bh=9YbHZD8oFVJ4SyQ7U1LgzwXlC0VCGcs2qhoFwmYqzP0=;
+        b=pMf5jEoNP+d7XwVMe3v0SnuqHC4rL6g37xgKsDk5/Mx0diZ0ol+uXNXYZyDOUdbFMA
+         mEnj1f2rB3VjnNQ/Ju8snCmziKdVJIb5+VfmIY2foSs3Zyk9XKqnvirUXN3c827DkVBH
+         Vdsau80H7ItOIDhQu0YhPVwKqxkB6y8A5WzAYJFq9oX6WzP6VfRwM/kiZBNTCKCtR0BA
+         7gHofn568U9e/pL8Mq+OgpSRRT6aErfRqXbu1eB2Pr4GqabXgwaSO2vJspjVVtYVpYAL
+         ENh0R517p3j5Q8hm+Kc4n3nB9yHN8Xn2x2pUQCHmO6rA7lD8Id+LVTKkzyyU0KVtlb4Q
+         uBFg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=qX0op0RwNnb4SfUwmWelLnu1NmagbazjMSr5aFn1x1M=;
-        b=jV4imWs72k3ou0rGUqWu8PXh59GyxPqkv+LZrHuJNJElAoQzaWFUJdGt1UCtVtPJjW
-         ZATYLVNtFuyh7Y9UwSNfBFKlLa8l+5UuRzmthEia+ht/W24YV5T+eErGYtn2tq342BEg
-         a+5UyxzqxyFi0uJPviDeQT3sbGUIcaI7fqXfhQ8tAC33r7D9ZSFYPoeDJUkmM8200ZT6
-         wjUlH858/A/NSSyzVFKFUoqmajWO4pedkZh/q8goEALWWvR1j3P0WAEorjXMPToD6nYr
-         jKwjn52B86CkszsxYcrMbtYHOVbJR2hkGoMnt+GlOSahQIZe0BiLFxI7Afyve2I8IbQj
-         La2g==
-X-Gm-Message-State: AOAM533puw3bD1GczbvFdu5J/nW8IS4Mo6WGmSYSLBgXniiwHtUORgpD
-        6A3AjCu6g3qskesGthbUkjJcTKyaRprPBfKDtMhHcnb47hwGABnGu0Gb3k7PcRnYYf7BX5zxon0
-        mzjKwQuzB1x7n3tF6m9HWIgfEBKeeQAhPkgK6ZQnnnmI9yLpg5KhQlGgFCf2i5bJo8RTTNYFCzw
-        qg
-X-Google-Smtp-Source: ABdhPJwAJpvnIFufGrREMgX7+yNFqZQq9S24RZojX4M7MP32+05EL9aLrDTvRnF97b0BLopiOfGmjwaVUX8I
+        bh=9YbHZD8oFVJ4SyQ7U1LgzwXlC0VCGcs2qhoFwmYqzP0=;
+        b=R36hinukvGp9UnaFxbLmDD/tSGB8Ua8aXZRtS4WOtuh578ZCEJ0NTO5zqFZmIoW7zM
+         JwX6yKxOe/NknVPi/2uXC8brf5i7CRfLnA2cpXhWUKQxWr8ULe3qH/LP4aOJgk4dRkiE
+         E8BAZRqa3S9iEIR+iw0+4OIuJ23RHICvVjCRKUk7nBDLmhKnyhzybgOF+9+IXCxsGY17
+         warvbyGEgYdtlHtMA3TDaDxfspf1C6V05Qcj6PFQRFoGQZdGNK07OVU2VJ4xkDejGaT3
+         libIexaW1l8i59PA6VkXJr7zdpld8hIG9wW1tPMarwr+3v4UMWujOWwICTo3HAITuzVA
+         HNgw==
+X-Gm-Message-State: AOAM532xxl7oHscO5xtGiShKXe9k/X/5+rpk6wAwr/ScDRF6edg47X+m
+        I8zaq9X/1WV/j95p9vSfJJIjQ36c7vinhItVKuuQOHR9NmbEMTktQx04XP50ycysnqYEJELfa0z
+        8/ekFYg0cnYjkti6T+Buvi+N2hC9HScuZYli9EePOiZcgpLuHD0i/mBctL6ISkNr/cCTwZ7y5bv
+        uY
+X-Google-Smtp-Source: ABdhPJyYSQ4YrZMQu7bdqlerbjr54d8OILLv1hHfAFpY9hRFVXpnOv+Y+4aBtrj+AVgiNVosiXeAMLDeqjy/
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:b68c:ff41:db76:21e9])
- (user=apusaka job=sendgmr) by 2002:a25:7497:: with SMTP id
- p145mr2660406ybc.338.1628857249767; Fri, 13 Aug 2021 05:20:49 -0700 (PDT)
-Date:   Fri, 13 Aug 2021 20:18:05 +0800
+ (user=apusaka job=sendgmr) by 2002:ad4:580e:: with SMTP id
+ dd14mr2401767qvb.2.1628857253249; Fri, 13 Aug 2021 05:20:53 -0700 (PDT)
+Date:   Fri, 13 Aug 2021 20:18:06 +0800
 In-Reply-To: <20210813121848.3686029-1-apusaka@google.com>
-Message-Id: <20210813201256.Bluez.20.I63cb796d677d5bd085fc77cb1cb7164278b8e1cd@changeid>
+Message-Id: <20210813201256.Bluez.21.Idde74d908204ede645812e49623e367d27c50e58@changeid>
 Mime-Version: 1.0
 References: <20210813121848.3686029-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-Subject: [Bluez PATCH 20/62] monitor: Inclusive language in filtering devices
+Subject: [Bluez PATCH 21/62] emulator: Inclusive language in naming
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,424 +76,397 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-"accept list" is preferred, as reflected in the BT core spec 5.3.
+"central" is preferred, as reflected in the BT core spec 5.3.
 ---
 
- emulator/btdev.c    | 24 +++++++++++------------
- emulator/le.c       | 32 +++++++++++++++----------------
- monitor/bt.h        | 14 +++++++-------
- monitor/packet.c    | 46 ++++++++++++++++++++++-----------------------
- tools/hci-tester.c  |  4 ++--
- tools/mgmt-tester.c |  4 ++--
- 6 files changed, 62 insertions(+), 62 deletions(-)
+ android/tester-main.c |  2 +-
+ emulator/hciemu.c     | 21 +++++++++++----------
+ emulator/hciemu.h     | 12 ++++++------
+ tools/l2cap-tester.c  | 16 ++++++++--------
+ tools/mgmt-tester.c   | 20 ++++++++++----------
+ tools/rfcomm-tester.c |  4 ++--
+ tools/sco-tester.c    |  2 +-
+ tools/smp-tester.c    |  6 +++---
+ 8 files changed, 42 insertions(+), 41 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 159ebe6ec5..89f7701714 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -3492,11 +3492,11 @@ static int cmd_le_create_conn_complete(struct btdev *dev, const void *data,
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 2bfa770bb5..ff5ecdf834 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -2786,7 +2786,7 @@ void emu_remote_connect_hci_action(void)
+ 	struct step *step = g_new0(struct step, 1);
+ 	const uint8_t *master_addr;
  
- static int cmd_read_wl_size(struct btdev *dev, const void *data, uint8_t len)
+-	master_addr = hciemu_get_master_bdaddr(data->hciemu);
++	master_addr = hciemu_get_central_bdaddr(data->hciemu);
+ 
+ 	tester_print("Trying to connect hci");
+ 
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index a3ec44243c..402d689d3c 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -84,7 +84,7 @@ static void run_command_hook(void *data, void *user_data)
+ 					run_data->len, hook->user_data);
+ }
+ 
+-static void master_command_callback(uint16_t opcode,
++static void central_command_callback(uint16_t opcode,
+ 				const void *data, uint8_t len,
+ 				btdev_callback callback, void *user_data)
  {
--	struct bt_hci_rsp_le_read_white_list_size rsp;
-+	struct bt_hci_rsp_le_read_accept_list_size rsp;
+@@ -230,7 +230,7 @@ static bool create_vhci(struct hciemu *hciemu)
+ 	if (!btdev)
+ 		return false;
  
- 	rsp.status = BT_HCI_ERR_SUCCESS;
- 	rsp.size = WL_SIZE;
--	cmd_complete(dev, BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE, &rsp,
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, &rsp,
- 						sizeof(rsp));
+-	btdev_set_command_handler(btdev, master_command_callback, hciemu);
++	btdev_set_command_handler(btdev, central_command_callback, hciemu);
  
- 	return 0;
-@@ -3544,7 +3544,7 @@ static int cmd_wl_clear(struct btdev *dev, const void *data, uint8_t len)
- 	wl_clear(dev);
+ 	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
+ 	if (fd < 0) {
+@@ -462,7 +462,7 @@ static void bthost_debug(const char *str, void *user_data)
+ 					"bthost: %s", str);
+ }
  
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_WHITE_LIST, &status,
-+	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, &status,
- 						sizeof(status));
- 
- 	return 0;
-@@ -3561,7 +3561,7 @@ static void wl_add(struct btdev_wl *wl, uint8_t type, bdaddr_t *addr)
- 
- static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
+-static void btdev_master_debug(const char *str, void *user_data)
++static void btdev_central_debug(const char *str, void *user_data)
  {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
- 	uint8_t status;
- 	bool exists = false;
- 	int i, pos = -1;
-@@ -3597,14 +3597,14 @@ static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
+ 	struct hciemu *hciemu = user_data;
  
- 	if (pos < 0) {
- 		cmd_status(dev, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
+@@ -500,7 +500,7 @@ bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
+ 	hciemu->debug_destroy = destroy;
+ 	hciemu->debug_data = user_data;
+ 
+-	btdev_set_debug(hciemu->dev, btdev_master_debug, hciemu, NULL);
++	btdev_set_debug(hciemu->dev, btdev_central_debug, hciemu, NULL);
+ 
+ 	queue_foreach(hciemu->clients, hciemu_client_set_debug, hciemu);
+ 
+@@ -528,7 +528,7 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu)
+ 	return btdev_get_features(hciemu->dev);
+ }
+ 
+-const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
++const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return NULL;
+@@ -556,7 +556,7 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
+ 	return hciemu_client_bdaddr(client);
+ }
+ 
+-uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
++uint8_t hciemu_get_central_scan_enable(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
  		return 0;
- 	}
- 
- 	wl_add(&dev->le_wl[pos], cmd->addr_type, (bdaddr_t *)&cmd->addr);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 						&status, sizeof(status));
- 
- 	return 0;
-@@ -3612,7 +3612,7 @@ static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
- 
- static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
- {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
- 	uint8_t status;
- 	int i;
- 	char addr[18];
-@@ -3652,7 +3652,7 @@ static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
- 		return -EINVAL;
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 						&status, sizeof(status));
- 
- 	return 0;
-@@ -4237,10 +4237,10 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
- 					cmd_set_scan_enable_complete), \
- 	CMD(BT_HCI_CMD_LE_CREATE_CONN, cmd_le_create_conn, \
- 					cmd_le_create_conn_complete), \
--	CMD(BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE, cmd_read_wl_size, NULL), \
--	CMD(BT_HCI_CMD_LE_CLEAR_WHITE_LIST, cmd_wl_clear, NULL), \
--	CMD(BT_HCI_CMD_LE_ADD_TO_WHITE_LIST, cmd_add_wl, NULL), \
--	CMD(BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST, cmd_remove_wl, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, cmd_read_wl_size, NULL), \
-+	CMD(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, cmd_wl_clear, NULL), \
-+	CMD(BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST, cmd_add_wl, NULL), \
-+	CMD(BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST, cmd_remove_wl, NULL), \
- 	CMD(BT_HCI_CMD_LE_CONN_UPDATE, cmd_conn_update, \
- 					cmd_conn_update_complete), \
- 	CMD(BT_HCI_CMD_LE_READ_REMOTE_FEATURES, cmd_le_read_remote_features, \
-diff --git a/emulator/le.c b/emulator/le.c
-index 4ffe3b16db..23f2579426 100644
---- a/emulator/le.c
-+++ b/emulator/le.c
-@@ -1211,12 +1211,12 @@ static void cmd_le_create_conn_cancel(struct bt_le *hci,
- static void cmd_le_read_white_list_size(struct bt_le *hci,
- 						const void *data, uint8_t size)
- {
--	struct bt_hci_rsp_le_read_white_list_size rsp;
-+	struct bt_hci_rsp_le_read_accept_list_size rsp;
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
- 	rsp.size = hci->le_white_list_size;
- 
--	cmd_complete(hci, BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE,
-+	cmd_complete(hci, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
- 							&rsp, sizeof(rsp));
+@@ -564,7 +564,7 @@ uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
+ 	return btdev_get_scan_enable(hciemu->dev);
  }
  
-@@ -1228,14 +1228,14 @@ static void cmd_le_clear_white_list(struct bt_le *hci,
- 	clear_white_list(hci);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_CLEAR_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
- 						&status, sizeof(status));
+-uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
++uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return 0;
+@@ -572,7 +572,8 @@ uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
+ 	return btdev_get_le_scan_enable(hciemu->dev);
  }
  
- static void cmd_le_add_to_white_list(struct bt_le *hci,
- 						const void *data, uint8_t size)
+-void hciemu_set_master_le_states(struct hciemu *hciemu, const uint8_t *le_states)
++void hciemu_set_central_le_states(struct hciemu *hciemu,
++						const uint8_t *le_states)
  {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
- 	uint8_t status;
- 	bool exists = false;
- 	int i, pos = -1;
-@@ -1243,7 +1243,7 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 	/* Valid range for address type is 0x00 to 0x01 */
- 	if (cmd->addr_type > 0x01) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
+ 	if (!hciemu || !hciemu->dev)
  		return;
+@@ -580,7 +581,7 @@ void hciemu_set_master_le_states(struct hciemu *hciemu, const uint8_t *le_states
+ 	btdev_set_le_states(hciemu->dev, le_states);
+ }
+ 
+-bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
++bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data)
+ {
+ 	struct hciemu_command_hook *hook;
+@@ -603,7 +604,7 @@ bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
+ 	return true;
+ }
+ 
+-bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu)
++bool hciemu_clear_central_post_command_hooks(struct hciemu *hciemu)
+ {
+ 	if (!hciemu)
+ 		return false;
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index 8bf2d070ea..3d3d93b4b0 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -50,14 +50,14 @@ struct bthost *hciemu_client_get_host(struct hciemu *hciemu);
+ const char *hciemu_get_address(struct hciemu *hciemu);
+ uint8_t *hciemu_get_features(struct hciemu *hciemu);
+ 
+-const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
++const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
+ 
+-uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu);
++uint8_t hciemu_get_central_scan_enable(struct hciemu *hciemu);
+ 
+-uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu);
++uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu);
+ 
+-void hciemu_set_master_le_states(struct hciemu *hciemu,
++void hciemu_set_central_le_states(struct hciemu *hciemu,
+ 						const uint8_t *le_states);
+ 
+ typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+@@ -66,10 +66,10 @@ typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+ typedef bool (*hciemu_hook_func_t)(const void *data, uint16_t len,
+ 							void *user_data);
+ 
+-bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
++bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data);
+ 
+-bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu);
++bool hciemu_clear_central_post_command_hooks(struct hciemu *hciemu);
+ 
+ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 				uint16_t opcode, hciemu_hook_func_t function,
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 11d549f22a..169a989f54 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -1116,7 +1116,7 @@ static int create_l2cap_sock(struct test_data *data, uint16_t psm,
+ 		return err;
  	}
  
-@@ -1259,13 +1259,13 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 
- 	if (exists) {
- 		cmd_status(hci, BT_HCI_ERR_UNSPECIFIED_ERROR,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
- 		return;
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		close(sk);
+@@ -1301,7 +1301,7 @@ static void test_connect(const void *test_data)
  	}
  
- 	if (pos < 0) {
- 		cmd_status(hci, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
- 		return;
+ 	if (l2data->direct_advertising)
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						direct_adv_cmd_complete, NULL);
+ 
+ 	sk = create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level,
+@@ -1419,7 +1419,7 @@ static gboolean test_close_socket_1_part_3(gpointer arg)
+ 		return FALSE;
  	}
  
-@@ -1273,21 +1273,21 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 	memcpy(&hci->le_white_list[pos][1], cmd->addr, 6);
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Delayed check whether scann is off failed");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1440,7 +1440,7 @@ static gboolean test_close_socket_1_part_2(gpointer args)
+ 	 * was added to kernel whitelist, and scan was started. We
+ 	 * should be still scanning.
+ 	 */
+-	if (!hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (!hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Error - should be still scanning");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1467,7 +1467,7 @@ static gboolean test_close_socket_2_part_3(gpointer arg)
+ 	int err;
  
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 						&status, sizeof(status));
- }
+ 	/* Scan should be already over, we're trying to create connection */
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Error - should no longer scan");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1563,7 +1563,7 @@ static void test_close_socket(const void *test_data)
+ 	const struct l2cap_data *l2data = data->test_data;
+ 	const uint8_t *client_bdaddr;
  
- static void cmd_le_remove_from_white_list(struct bt_le *hci,
- 						const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
- 	uint8_t status;
- 	int i, pos = -1;
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 					test_close_socket_router, data);
  
- 	/* Valid range for address type is 0x00 to 0x01 */
- 	if (cmd->addr_type > 0x01) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST);
-+					BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST);
- 		return;
+ 	if (l2data->client_bdaddr != NULL)
+@@ -1668,7 +1668,7 @@ static void test_connect_2(const void *test_data)
+ 	test_2_connect_cb_cnt = 0;
+ 	test_scan_enable_counter = 0;
+ 
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 				test_connect_2_router, data);
+ 
+ 	if (l2data->server_psm) {
+@@ -1869,7 +1869,7 @@ static void test_server(const void *test_data)
+ 		tester_print("Listening for connections");
  	}
  
-@@ -1302,7 +1302,7 @@ static void cmd_le_remove_from_white_list(struct bt_le *hci,
- 
- 	if (pos < 0) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST);
-+					BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST);
- 		return;
- 	}
- 
-@@ -1310,7 +1310,7 @@ static void cmd_le_remove_from_white_list(struct bt_le *hci,
- 	memset(&hci->le_white_list[pos][1], 0, 6);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 						&status, sizeof(status));
- }
- 
-@@ -1830,13 +1830,13 @@ static const struct {
- 				cmd_le_create_conn, 25, true },
- 	{ BT_HCI_CMD_LE_CREATE_CONN_CANCEL,
- 				cmd_le_create_conn_cancel, 0, true },
--	{ BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE,
-+	{ BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
- 				cmd_le_read_white_list_size, 0, true },
--	{ BT_HCI_CMD_LE_CLEAR_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
- 				cmd_le_clear_white_list, 0, true },
--	{ BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 				cmd_le_add_to_white_list,  7, true },
--	{ BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 				cmd_le_remove_from_white_list, 7, true },
- 
- 	{ BT_HCI_CMD_LE_ENCRYPT, cmd_le_encrypt, 32, true },
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 3144c25ff0..3150e82f3a 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -2072,22 +2072,22 @@ struct bt_hci_cmd_le_create_conn {
- 
- #define BT_HCI_CMD_LE_CREATE_CONN_CANCEL	0x200e
- 
--#define BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE	0x200f
--struct bt_hci_rsp_le_read_white_list_size {
-+#define BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE	0x200f
-+struct bt_hci_rsp_le_read_accept_list_size {
- 	uint8_t  status;
- 	uint8_t  size;
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_LE_CLEAR_WHITE_LIST		0x2010
-+#define BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST		0x2010
- 
--#define BT_HCI_CMD_LE_ADD_TO_WHITE_LIST		0x2011
--struct bt_hci_cmd_le_add_to_white_list {
-+#define BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST	0x2011
-+struct bt_hci_cmd_le_add_to_accept_list {
- 	uint8_t  addr_type;
- 	uint8_t  addr[6];
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST	0x2012
--struct bt_hci_cmd_le_remove_from_white_list {
-+#define BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST	0x2012
-+struct bt_hci_cmd_le_remove_from_accept_list {
- 	uint8_t  addr_type;
- 	uint8_t  addr[6];
- } __attribute__ ((packed));
-diff --git a/monitor/packet.c b/monitor/packet.c
-index 17da5a08d9..82763cc27b 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2164,16 +2164,16 @@ static void print_adv_filter_policy(const char *label, uint8_t value)
- 			"Allow Connect Request from Any";
- 		break;
- 	case 0x01:
--		str = "Allow Scan Request from White List Only, "
-+		str = "Allow Scan Request from Accept List Only, "
- 			"Allow Connect Request from Any";
- 		break;
- 	case 0x02:
- 		str = "Allow Scan Request from Any, "
--			"Allow Connect Request from White List Only";
-+			"Allow Connect Request from Accept List Only";
- 		break;
- 	case 0x03:
--		str = "Allow Scan Request from White List Only, "
--			"Allow Connect Request from White List Only";
-+		str = "Allow Scan Request from Accept List Only, "
-+			"Allow Connect Request from Accept List Only";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -6534,13 +6534,13 @@ static void print_scan_filter_policy(uint8_t policy)
- 		str = "Accept all advertisement";
- 		break;
- 	case 0x01:
--		str = "Ignore not in white list";
-+		str = "Ignore not in accept list";
- 		break;
- 	case 0x02:
- 		str = "Accept all advertisement, inc. directed unresolved RPA";
- 		break;
- 	case 0x03:
--		str = "Ignore not in white list, exc. directed unresolved RPA";
-+		str = "Ignore not in accept list, exc. directed unresolved RPA";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -6579,10 +6579,10 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
- 
- 	switch (cmd->filter_policy) {
- 	case 0x00:
--		str = "White list is not used";
-+		str = "Accept list is not used";
- 		break;
- 	case 0x01:
--		str = "White list is used";
-+		str = "Accept list is used";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -6605,25 +6605,25 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
- 	print_slot_625("Max connection length", cmd->max_length);
- }
- 
--static void le_read_white_list_size_rsp(const void *data, uint8_t size)
-+static void le_read_accept_list_size_rsp(const void *data, uint8_t size)
- {
--	const struct bt_hci_rsp_le_read_white_list_size *rsp = data;
-+	const struct bt_hci_rsp_le_read_accept_list_size *rsp = data;
- 
- 	print_status(rsp->status);
- 	print_field("Size: %u", rsp->size);
- }
- 
--static void le_add_to_white_list_cmd(const void *data, uint8_t size)
-+static void le_add_to_accept_list_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
- 
- 	print_addr_type("Address type", cmd->addr_type);
- 	print_addr("Address", cmd->addr, cmd->addr_type);
- }
- 
--static void le_remove_from_white_list_cmd(const void *data, uint8_t size)
-+static void le_remove_from_accept_list_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
- 
- 	print_addr_type("Address type", cmd->addr_type);
- 	print_addr("Address", cmd->addr, cmd->addr_type);
-@@ -7562,10 +7562,10 @@ static void le_ext_create_conn_cmd(const void *data, uint8_t size)
- 
- 	switch (cmd->filter_policy) {
- 	case 0x00:
--		str = "White list is not used";
-+		str = "Accept list is not used";
- 		break;
- 	case 0x01:
--		str = "White list is used";
-+		str = "Accept list is used";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -8990,17 +8990,17 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x200e, 213, "LE Create Connection Cancel",
- 				null_cmd, 0, true,
- 				status_rsp, 1, true },
--	{ 0x200f, 214, "LE Read White List Size",
-+	{ 0x200f, 214, "LE Read Accept List Size",
- 				null_cmd, 0, true,
--				le_read_white_list_size_rsp, 2, true },
--	{ 0x2010, 215, "LE Clear White List",
-+				le_read_accept_list_size_rsp, 2, true },
-+	{ 0x2010, 215, "LE Clear Accept List",
- 				null_cmd, 0, true,
- 				status_rsp, 1, true },
--	{ 0x2011, 216, "LE Add Device To White List",
--				le_add_to_white_list_cmd, 7, true,
-+	{ 0x2011, 216, "LE Add Device To Accept List",
-+				le_add_to_accept_list_cmd, 7, true,
- 				status_rsp, 1, true },
--	{ 0x2012, 217, "LE Remove Device From White List",
--				le_remove_from_white_list_cmd, 7, true,
-+	{ 0x2012, 217, "LE Remove Device From Accept List",
-+				le_remove_from_accept_list_cmd, 7, true,
- 				status_rsp, 1, true },
- 	{ 0x2013, 218, "LE Connection Update",
- 				le_conn_update_cmd, 14, true },
-diff --git a/tools/hci-tester.c b/tools/hci-tester.c
-index 0fb74e69c7..645d89e721 100644
---- a/tools/hci-tester.c
-+++ b/tools/hci-tester.c
-@@ -337,12 +337,12 @@ static void test_read_local_supported_codecs(const void *test_data)
- 
- static void test_le_read_white_list_size(const void *test_data)
- {
--	test_command(BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE);
-+	test_command(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE);
- }
- 
- static void test_le_clear_white_list(const void *test_data)
- {
--	test_command(BT_HCI_CMD_LE_CLEAR_WHITE_LIST);
-+	test_command(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST);
- }
- 
- static void test_le_encrypt_complete(const void *data, uint8_t size,
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index e369d7488b..26d78360d7 100644
+index 26d78360d7..30db2b2179 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -4248,7 +4248,7 @@ static const struct generic_data add_device_success_6 = {
- 	.expect_alt_ev = MGMT_EV_DEVICE_ADDED,
- 	.expect_alt_ev_param = add_device_success_param_6,
- 	.expect_alt_ev_len = sizeof(add_device_success_param_6),
--	.expect_hci_command = BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	.expect_hci_command = BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 	.expect_hci_param = le_add_to_white_list_param,
- 	.expect_hci_len = sizeof(le_add_to_white_list_param),
- };
-@@ -4418,7 +4418,7 @@ static const struct generic_data remove_device_success_7 = {
- 	.expect_param = remove_device_param_2,
- 	.expect_len = sizeof(remove_device_param_2),
- 	.expect_status = MGMT_STATUS_SUCCESS,
--	.expect_hci_command = BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	.expect_hci_command = BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 	.expect_hci_param = le_add_to_white_list_param,
- 	.expect_hci_len = sizeof(le_add_to_white_list_param),
- 	.expect_alt_ev = MGMT_EV_DEVICE_REMOVED,
+@@ -365,7 +365,7 @@ static void read_index_list_callback(uint8_t status, uint16_t length,
+ 		hciemu_set_debug(data->hciemu, print_debug, "hciemu: ", NULL);
+ 
+ 	if (test && test->setup_le_states)
+-		hciemu_set_master_le_states(data->hciemu, test->le_states);
++		hciemu_set_central_le_states(data->hciemu, test->le_states);
+ }
+ 
+ static void test_pre_setup(const void *test_data)
+@@ -7098,7 +7098,7 @@ static void command_setup_hci_callback(uint16_t opcode, const void *param,
+ 		return;
+ 	}
+ 
+-	hciemu_clear_master_post_command_hooks(data->hciemu);
++	hciemu_clear_central_post_command_hooks(data->hciemu);
+ 	test_setup_condition_complete(data);
+ }
+ 
+@@ -7164,7 +7164,7 @@ static void setup_command_generic(const void *test_data)
+ 		tester_print("Registering setup expected HCI command callback");
+ 		tester_print("Setup expected HCI command 0x%04x",
+ 					 test->setup_expect_hci_command);
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 					command_setup_hci_callback, data);
+ 		test_add_setup_condition(data);
+ 	}
+@@ -9487,7 +9487,7 @@ static void setup_ll_privacy_device(const void *test_data)
+ 
+ 	tester_print("Setup expected HCI command 0x%04x",
+ 					 test->setup_expect_hci_command);
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 					command_setup_hci_callback, data);
+ 	test_add_setup_condition(data);
+ 
+@@ -9644,7 +9644,7 @@ static void test_command_generic(const void *test_data)
+ 
+ 	if (test->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
+@@ -9678,13 +9678,13 @@ static void check_scan(void *user_data)
+ {
+ 	struct test_data *data = tester_get_data();
+ 
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_warn("LE scan still enabled");
+ 		tester_test_failed();
+ 		return;
+ 	}
+ 
+-	if (hciemu_get_master_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_scan_enable(data->hciemu)) {
+ 		tester_warn("BR/EDR scan still enabled");
+ 		tester_test_failed();
+ 		return;
+@@ -9775,7 +9775,7 @@ static void test_pairing_acceptor(const void *test_data)
+ 		test_add_condition(data);
+ 	}
+ 
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -9840,7 +9840,7 @@ static void test_command_generic_connect(const void *test_data)
+ 	data->mgmt_alt_ev_id = id;
+ 	test_add_condition(data);
+ 
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -9919,7 +9919,7 @@ static void add_device_callback(uint8_t status, uint16_t len, const void *param,
+ 	if (test->client_enable_adv)
+ 		return;
+ 
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 9bae5b9d54..78b08663bd 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -542,7 +542,7 @@ static void test_connect(const void *test_data)
+ 	bthost_add_rfcomm_server(bthost, cli->server_channel,
+ 						rfcomm_connect_cb, NULL);
+ 
+-	master_addr = hciemu_get_master_bdaddr(data->hciemu);
++	master_addr = hciemu_get_central_bdaddr(data->hciemu);
+ 	client_addr = hciemu_get_client_bdaddr(data->hciemu);
+ 
+ 	sk = create_rfcomm_sock((bdaddr_t *) master_addr, 0);
+@@ -680,7 +680,7 @@ static void test_server(const void *test_data)
+ 	GIOChannel *io;
+ 	int sk;
+ 
+-	master_addr = hciemu_get_master_bdaddr(data->hciemu);
++	master_addr = hciemu_get_central_bdaddr(data->hciemu);
+ 
+ 	sk = create_rfcomm_sock((bdaddr_t *) master_addr, srv->server_channel);
+ 	if (sk < 0) {
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 2b8dc0d4a8..7c83aee195 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -426,7 +426,7 @@ static int create_sco_sock(struct test_data *data)
+ 		return err;
+ 	}
+ 
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		return -ENODEV;
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index 644c451c29..b075c5df8a 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -767,7 +767,7 @@ static void init_bdaddr(struct test_data *data)
+ {
+ 	const uint8_t *master_bdaddr, *client_bdaddr;
+ 
+-	master_bdaddr = hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr = hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -808,7 +808,7 @@ static void test_client(const void *test_data)
+ 
+ 	if (smp->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
+@@ -889,7 +889,7 @@ static void test_server(const void *test_data)
+ 
+ 	if (smp->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
 -- 
 2.33.0.rc1.237.g0d66db33f3-goog
 
