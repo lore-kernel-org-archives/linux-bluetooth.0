@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4CCFC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3634AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD31660F51
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1BFAE61028
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237222AbhHNHWs (ORCPT
+        id S237324AbhHNHWx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Aug 2021 03:22:48 -0400
+        Sat, 14 Aug 2021 03:22:53 -0400
 Received: from mga04.intel.com ([192.55.52.120]:42835 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S237109AbhHNHWr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Aug 2021 03:22:47 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="213817672"
+        id S237258AbhHNHWt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 14 Aug 2021 03:22:49 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="213817677"
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="213817672"
+   d="scan'208";a="213817677"
 Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2021 00:22:19 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2021 00:22:21 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="640022050"
+   d="scan'208";a="640022061"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga005.jf.intel.com with ESMTP; 14 Aug 2021 00:22:17 -0700
+  by orsmga005.jf.intel.com with ESMTP; 14 Aug 2021 00:22:20 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Kiran K <kiran.k@intel.com>
-Subject: [PATCH v12 08/10] Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command
-Date:   Sat, 14 Aug 2021 12:56:27 +0530
-Message-Id: <20210814072629.11748-8-kiran.k@intel.com>
+Subject: [PATCH v12 10/10] Bluetooth: Add offload feature under experimental flag
+Date:   Sat, 14 Aug 2021 12:56:29 +0530
+Message-Id: <20210814072629.11748-10-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210814072629.11748-1-kiran.k@intel.com>
 References: <20210814072629.11748-1-kiran.k@intel.com>
@@ -43,374 +43,160 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-< HCI Command: Enhanced Setup Synchronous Connection (0x01|0x003d) plen 59
-        Handle: 256
-        Transmit bandwidth: 8000
-        Receive bandwidth: 8000
-        Max latency: 13
-        Packet type: 0x0380
-          3-EV3 may not be used
-          2-EV5 may not be used
-          3-EV5 may not be used
-        Retransmission effort: Optimize for link quality (0x02)
-> HCI Event: Command Status (0x0f) plen 4
-      Enhanced Setup Synchronous Connection (0x01|0x003d) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Synchronous Connect Complete (0x2c) plen 17
-        Status: Success (0x00)
-        Handle: 257
-        Address: CC:98:8B:92:04:FD (SONY Visual Products Inc.)
-        Link type: eSCO (0x02)
-        Transmission interval: 0x0c
-        Retransmission window: 0x06
-        RX packet length: 60
-        TX packet length: 60
-        Air mode: Transparent (0x03)
+Allow user level process to enable / disable codec offload
+feature through mgmt interface. By default offload codec feature
+is disabled.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
 Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
-* changes in v12:
-  - hci_dev_put needs to be called when done with hci_get_route
+changes in v12:
+- Move definiton of mgmt flag to control hfp offload to patch 04/10
 
-* changes in v11:
-  - Remove changes related to Kconfig
-  - s/use_enhanced_sco_conn/enhanced_sco_capable/g
-  - Minor review comments
+changes in v11:
+- Remove Kconfig
 
-* changes in v10:
-  - Fix typos and remove unwanted chunks
-* changes in v9:
-  - Fix review comments, use bt_dev_dbg instead of BT_DBG
+ net/bluetooth/mgmt.c | 98 +++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 97 insertions(+), 1 deletion(-)
 
- include/net/bluetooth/bluetooth.h |   3 +-
- include/net/bluetooth/hci.h       |  34 ++++++++++
- include/net/bluetooth/hci_core.h  |   6 +-
- net/bluetooth/hci_conn.c          | 105 +++++++++++++++++++++++++++++-
- net/bluetooth/hci_event.c         |  39 +++++++++++
- net/bluetooth/sco.c               |  12 +++-
- 6 files changed, 193 insertions(+), 6 deletions(-)
-
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 1a48b6732eef..f2df8bb108d9 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -173,7 +173,8 @@ struct bt_codecs {
- 	struct bt_codec	codecs[];
- } __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 1e21e014efd2..083365d89946 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3791,6 +3791,12 @@ static const u8 debug_uuid[16] = {
+ };
+ #endif
  
--#define CODING_FORMAT_CVSD	0x02
-+#define CODING_FORMAT_CVSD		0x02
-+#define CODING_FORMAT_TRANSPARENT	0x03
++/* a6695ace-ee7f-4fb9-881a-5fac66c629af */
++static const u8 offload_codecs_uuid[16] = {
++	0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f, 0x1a, 0x88,
++	0xb9, 0x4f, 0x7f, 0xee, 0xce, 0x5a, 0x69, 0xa6,
++};
++
+ /* 671b10b5-42c0-4696-9227-eb28d1b049d6 */
+ static const u8 simult_central_periph_uuid[16] = {
+ 	0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, 0x27, 0x92,
+@@ -3806,7 +3812,7 @@ static const u8 rpa_resolution_uuid[16] = {
+ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 				  void *data, u16 data_len)
+ {
+-	char buf[62];	/* Enough space for 3 features */
++	char buf[82];   /* Enough space for 4 features: 2 + 20 * 4 */
+ 	struct mgmt_rp_read_exp_features_info *rp = (void *)buf;
+ 	u16 idx = 0;
+ 	u32 flags;
+@@ -3850,6 +3856,26 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
+ 	}
  
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ad2d5dc81d07..dbbbb974ade6 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -872,6 +872,40 @@ struct hci_cp_logical_link_cancel {
- 	__u8     flow_spec_id;
- } __packed;
- 
-+#define HCI_OP_ENHANCED_SETUP_SYNC_CONN		0x043d
-+struct hci_coding_format {
-+	__u8	id;
-+	__le16	cid;
-+	__le16	vid;
-+} __packed;
++	if (hdev) {
++		if (hdev->get_data_path_id) {
++			/* BIT(0): indicating if offload codecs are
++			 * supported by controller.
++			 */
++			flags = BIT(0);
 +
-+struct hci_cp_enhanced_setup_sync_conn {
-+	__le16   handle;
-+	__le32   tx_bandwidth;
-+	__le32   rx_bandwidth;
-+	struct	 hci_coding_format tx_coding_format;
-+	struct	 hci_coding_format rx_coding_format;
-+	__le16	 tx_codec_frame_size;
-+	__le16	 rx_codec_frame_size;
-+	__le32	 in_bandwidth;
-+	__le32	 out_bandwidth;
-+	struct	 hci_coding_format in_coding_format;
-+	struct	 hci_coding_format out_coding_format;
-+	__le16   in_coded_data_size;
-+	__le16	 out_coded_data_size;
-+	__u8	 in_pcm_data_format;
-+	__u8	 out_pcm_data_format;
-+	__u8	 in_pcm_sample_payload_msb_pos;
-+	__u8	 out_pcm_sample_payload_msb_pos;
-+	__u8	 in_data_path;
-+	__u8	 out_data_path;
-+	__u8	 in_transport_unit_size;
-+	__u8	 out_transport_unit_size;
-+	__le16   max_latency;
-+	__le16   pkt_type;
-+	__u8     retrans_effort;
-+} __packed;
-+
- struct hci_rp_logical_link_cancel {
- 	__u8     status;
- 	__u8     phy_handle;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index cb8346527131..502af8af9d56 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -714,6 +714,7 @@ struct hci_conn {
- 	struct amp_mgr	*amp_mgr;
- 
- 	struct hci_conn	*link;
-+	struct bt_codec codec;
- 
- 	void (*connect_cfm_cb)	(struct hci_conn *conn, u8 status);
- 	void (*security_cfm_cb)	(struct hci_conn *conn, u8 status);
-@@ -1120,7 +1121,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- 				 u8 sec_level, u8 auth_type,
- 				 enum conn_reasons conn_reason);
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
--				 __u16 setting);
-+				 __u16 setting, struct bt_codec *codec);
- int hci_conn_check_link_mode(struct hci_conn *conn);
- int hci_conn_check_secure(struct hci_conn *conn, __u8 sec_level);
- int hci_conn_security(struct hci_conn *conn, __u8 sec_level, __u8 auth_type,
-@@ -1457,6 +1458,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- /* Use LL Privacy based address resolution if supported */
- #define use_ll_privacy(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
- 
-+/* Use enhanced synchronous connection if command is supported */
-+#define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
-+
- /* Use ext scanning if set ext scan param and ext scan enable is supported */
- #define use_ext_scan(dev) (((dev)->commands[37] & 0x20) && \
- 			   ((dev)->commands[37] & 0x40))
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index 2b5059a56cda..48943b01a356 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -307,13 +307,103 @@ static bool find_next_esco_param(struct hci_conn *conn,
- 	return conn->attempt <= size;
- }
- 
--bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
-+static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
-+{
-+	struct hci_dev *hdev = conn->hdev;
-+	struct hci_cp_enhanced_setup_sync_conn cp;
-+	const struct sco_param *param;
-+
-+	bt_dev_dbg(hdev, "hcon %p", conn);
-+
-+	conn->state = BT_CONNECT;
-+	conn->out = true;
-+
-+	conn->attempt++;
-+
-+	memset(&cp, 0x00, sizeof(cp));
-+
-+	cp.handle   = cpu_to_le16(handle);
-+
-+	cp.tx_bandwidth   = cpu_to_le32(0x00001f40);
-+	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
-+
-+	switch (conn->codec.id) {
-+	case CODING_FORMAT_TRANSPARENT:
-+		if (!find_next_esco_param(conn, esco_param_msbc,
-+					  ARRAY_SIZE(esco_param_msbc)))
-+			return false;
-+		param = &esco_param_msbc[conn->attempt - 1];
-+		cp.tx_coding_format.id = 0x03;
-+		cp.rx_coding_format.id = 0x03;
-+		cp.tx_codec_frame_size = __cpu_to_le16(60);
-+		cp.rx_codec_frame_size = __cpu_to_le16(60);
-+		cp.in_bandwidth = __cpu_to_le32(0x1f40);
-+		cp.out_bandwidth = __cpu_to_le32(0x1f40);
-+		cp.in_coding_format.id = 0x03;
-+		cp.out_coding_format.id = 0x03;
-+		cp.in_coded_data_size = __cpu_to_le16(16);
-+		cp.out_coded_data_size = __cpu_to_le16(16);
-+		cp.in_pcm_data_format = 2;
-+		cp.out_pcm_data_format = 2;
-+		cp.in_pcm_sample_payload_msb_pos = 0;
-+		cp.out_pcm_sample_payload_msb_pos = 0;
-+		cp.in_data_path = conn->codec.data_path;
-+		cp.out_data_path = conn->codec.data_path;
-+		cp.in_transport_unit_size = 1;
-+		cp.out_transport_unit_size = 1;
-+		break;
-+
-+	case CODING_FORMAT_CVSD:
-+		if (lmp_esco_capable(conn->link)) {
-+			if (!find_next_esco_param(conn, esco_param_cvsd,
-+						  ARRAY_SIZE(esco_param_cvsd)))
-+				return false;
-+			param = &esco_param_cvsd[conn->attempt - 1];
++			/* BIT(1): indicating if codec offload feature
++			 * is enabled.
++			 */
++			if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
++				flags |= BIT(1);
 +		} else {
-+			if (conn->attempt > ARRAY_SIZE(sco_param_cvsd))
-+				return false;
-+			param = &sco_param_cvsd[conn->attempt - 1];
++			flags = 0;
 +		}
-+		cp.tx_coding_format.id = 2;
-+		cp.rx_coding_format.id = 2;
-+		cp.tx_codec_frame_size = __cpu_to_le16(60);
-+		cp.rx_codec_frame_size = __cpu_to_le16(60);
-+		cp.in_bandwidth = __cpu_to_le32(16000);
-+		cp.out_bandwidth = __cpu_to_le32(16000);
-+		cp.in_coding_format.id = 4;
-+		cp.out_coding_format.id = 4;
-+		cp.in_coded_data_size = __cpu_to_le16(16);
-+		cp.out_coded_data_size = __cpu_to_le16(16);
-+		cp.in_pcm_data_format = 2;
-+		cp.out_pcm_data_format = 2;
-+		cp.in_pcm_sample_payload_msb_pos = 0;
-+		cp.out_pcm_sample_payload_msb_pos = 0;
-+		cp.in_data_path = conn->codec.data_path;
-+		cp.out_data_path = conn->codec.data_path;
-+		cp.in_transport_unit_size = 16;
-+		cp.out_transport_unit_size = 16;
-+		break;
-+	default:
-+		return false;
++		memcpy(rp->features[idx].uuid, offload_codecs_uuid, 16);
++		rp->features[idx].flags = cpu_to_le32(flags);
++		idx++;
 +	}
 +
-+	cp.retrans_effort = param->retrans_effort;
-+	cp.pkt_type = __cpu_to_le16(param->pkt_type);
-+	cp.max_latency = __cpu_to_le16(param->max_latency);
+ 	rp->feature_count = cpu_to_le16(idx);
+ 
+ 	/* After reading the experimental features information, enable
+@@ -3892,6 +3918,21 @@ static int exp_debug_feature_changed(bool enabled, struct sock *skip)
+ }
+ #endif
+ 
++static int exp_offload_codec_feature_changed(bool enabled, struct sock *skip)
++{
++	struct mgmt_ev_exp_feature_changed ev;
 +
-+	if (hci_send_cmd(hdev, HCI_OP_ENHANCED_SETUP_SYNC_CONN, sizeof(cp), &cp) < 0)
-+		return false;
++	BT_INFO("enabled %d", enabled);
 +
-+	return true;
++	memset(&ev, 0, sizeof(ev));
++	memcpy(ev.uuid, offload_codecs_uuid, 16);
++	ev.flags = cpu_to_le32(enabled ? BIT(0) : 0);
++
++	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, NULL,
++				  &ev, sizeof(ev),
++				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
 +}
 +
-+static bool hci_setup_sync_conn(struct hci_conn *conn, __u16 handle)
+ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 			   void *data, u16 data_len)
  {
- 	struct hci_dev *hdev = conn->hdev;
- 	struct hci_cp_setup_sync_conn cp;
- 	const struct sco_param *param;
+@@ -4038,6 +4079,61 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+ 		return err;
+ 	}
  
--	BT_DBG("hcon %p", conn);
-+	bt_dev_dbg(hdev, "hcon %p", conn);
- 
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
-@@ -359,6 +449,14 @@ bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
- 	return true;
- }
- 
-+bool hci_setup_sync(struct hci_conn *conn, __u16 handle)
-+{
-+	if (enhanced_sco_capable(conn->hdev))
-+		return hci_enhanced_setup_sync_conn(conn, handle);
++	if (!memcmp(cp->uuid, offload_codecs_uuid, 16)) {
++		bool val, changed;
++		int err;
 +
-+	return hci_setup_sync_conn(conn, handle);
-+}
++		/* Command requires to use a valid controller index */
++		if (!hdev)
++			return mgmt_cmd_status(sk, MGMT_INDEX_NONE,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_INDEX);
 +
- u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier)
- {
-@@ -1319,7 +1417,7 @@ struct hci_conn *hci_connect_acl(struct hci_dev *hdev, bdaddr_t *dst,
- }
- 
- struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
--				 __u16 setting)
-+				 __u16 setting, struct bt_codec *codec)
- {
- 	struct hci_conn *acl;
- 	struct hci_conn *sco;
-@@ -1344,6 +1442,7 @@ struct hci_conn *hci_connect_sco(struct hci_dev *hdev, int type, bdaddr_t *dst,
- 	hci_conn_hold(sco);
- 
- 	sco->setting = setting;
-+	sco->codec = *codec;
- 
- 	if (acl->state == BT_CONNECTED &&
- 	    (sco->state == BT_OPEN || sco->state == BT_CLOSED)) {
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 38decf474f31..8a8abc8376d0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2278,6 +2278,41 @@ static void hci_cs_setup_sync_conn(struct hci_dev *hdev, __u8 status)
- 	hci_dev_unlock(hdev);
- }
- 
-+static void hci_cs_enhanced_setup_sync_conn(struct hci_dev *hdev, __u8 status)
-+{
-+	struct hci_cp_enhanced_setup_sync_conn *cp;
-+	struct hci_conn *acl, *sco;
-+	__u16 handle;
++		/* Parameters are limited to a single octet */
++		if (data_len != MGMT_SET_EXP_FEATURE_SIZE + 1)
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_PARAMS);
 +
-+	bt_dev_dbg(hdev, "status 0x%2.2x", status);
++		/* Only boolean on/off is supported */
++		if (cp->param[0] != 0x00 && cp->param[0] != 0x01)
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_INVALID_PARAMS);
 +
-+	if (!status)
-+		return;
++		val = !!cp->param[0];
++		changed = (val != hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED));
 +
-+	cp = hci_sent_cmd_data(hdev, HCI_OP_ENHANCED_SETUP_SYNC_CONN);
-+	if (!cp)
-+		return;
-+
-+	handle = __le16_to_cpu(cp->handle);
-+
-+	bt_dev_dbg(hdev, "handle 0x%4.4x", handle);
-+
-+	hci_dev_lock(hdev);
-+
-+	acl = hci_conn_hash_lookup_handle(hdev, handle);
-+	if (acl) {
-+		sco = acl->link;
-+		if (sco) {
-+			sco->state = BT_CLOSED;
-+
-+			hci_connect_cfm(sco, status);
-+			hci_conn_del(sco);
++		if (!hdev->get_data_path_id) {
++			bt_dev_info(hdev, "offload codecs not supported");
++			return mgmt_cmd_status(sk, hdev->id,
++					       MGMT_OP_SET_EXP_FEATURE,
++					       MGMT_STATUS_NOT_SUPPORTED);
 +		}
++
++		if (changed) {
++			if (val)
++				hci_dev_set_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED);
++			else
++				hci_dev_clear_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED);
++		}
++
++		bt_dev_info(hdev, "offload codecs enable %d changed %d",
++			    val, changed);
++
++		memcpy(rp.uuid, offload_codecs_uuid, 16);
++		rp.flags = cpu_to_le32(val ? BIT(0) : 0);
++		hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++		err = mgmt_cmd_complete(sk, hdev->id,
++					MGMT_OP_SET_EXP_FEATURE, 0,
++					&rp, sizeof(rp));
++
++		if (changed)
++			exp_offload_codec_feature_changed(val, sk);
++
++		return err;
 +	}
 +
-+	hci_dev_unlock(hdev);
-+}
-+
- static void hci_cs_sniff_mode(struct hci_dev *hdev, __u8 status)
- {
- 	struct hci_cp_sniff_mode *cp;
-@@ -3757,6 +3792,10 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, struct sk_buff *skb,
- 		hci_cs_setup_sync_conn(hdev, ev->status);
- 		break;
- 
-+	case HCI_OP_ENHANCED_SETUP_SYNC_CONN:
-+		hci_cs_enhanced_setup_sync_conn(hdev, ev->status);
-+		break;
-+
- 	case HCI_OP_SNIFF_MODE:
- 		hci_cs_sniff_mode(hdev, ev->status);
- 		break;
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 130ecd4a7cc8..f8cb93f9f634 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -253,7 +253,7 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
- 		return -EOPNOTSUPP;
- 
- 	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
--			       sco_pi(sk)->setting);
-+			       sco_pi(sk)->setting, &sco_pi(sk)->codec);
- 	if (IS_ERR(hcon))
- 		return PTR_ERR(hcon);
- 
-@@ -938,6 +938,16 @@ static int sco_sock_setsockopt(struct socket *sock, int level, int optname,
- 		}
- 
- 		sco_pi(sk)->setting = voice.setting;
-+		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
-+				     BDADDR_BREDR);
-+		if (!hdev) {
-+			err = -EBADFD;
-+			break;
-+		}
-+		if (enhanced_sco_capable(hdev) &&
-+		    voice.setting == BT_VOICE_TRANSPARENT)
-+			sco_pi(sk)->codec.id = CODING_FORMAT_TRANSPARENT;
-+		hci_dev_put(hdev);
- 		break;
- 
- 	case BT_PKT_STATUS:
+ 	return mgmt_cmd_status(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
+ 			       MGMT_OP_SET_EXP_FEATURE,
+ 			       MGMT_STATUS_NOT_SUPPORTED);
 -- 
 2.17.1
 
