@@ -2,125 +2,457 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.9 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,UNWANTED_LANGUAGE_BODY,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B8F74C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22ECFC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8969460E8D
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0227560F51
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 07:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236970AbhHNHJ4 (ORCPT
+        id S237126AbhHNHWj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Aug 2021 03:09:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236519AbhHNHJz (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Aug 2021 03:09:55 -0400
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEB05C06175F
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Aug 2021 00:09:27 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id 1so1173104vkk.1
-        for <linux-bluetooth@vger.kernel.org>; Sat, 14 Aug 2021 00:09:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=z7pkFAI9aHs1wZC/RanppuJG6BLvSfn98JNatH3XzcI=;
-        b=liMRPvEjXS6ePuxRiJgWdXiq2nx1sGEboy3pkTfefNfT348sfd+9Lrmn8ap3O0SaY9
-         dT4moQTEaGJ1oQOgqsZEQkN4SUsfve3WmnxGRorApytVpchHnTnfuinDA3dNyN1SjC4b
-         Uh/s9SRFWg2bIuVHb8i8Aj/WvRik9n8fFFZNeR/jL1VcuyTeijWnlI2wfFVHlAjbPC7y
-         d76mrljXTfc3okPnqC1J82IyGrfPe83HWT1+0Ghlmsf8EZkcCpHElYBTJdDXid4o4kmR
-         iuxGAZ5ogAjHDIZXCyZeQXkSVMIQWay9d+VCGHYhQOIQUstOGdRr+nOoEiBGdwKtPhNx
-         +/Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=z7pkFAI9aHs1wZC/RanppuJG6BLvSfn98JNatH3XzcI=;
-        b=tEVQU5082S00+H2vRvC83OWdMpbqtmsnSFkGxflAUvqM+2AaoVmCjdiXWgVsBxEsIE
-         gOWxI4kBjMhvQ3+A3kMqcWREDjhmiczlv1+AZQdM8XvlSqOf5kpgnI281p/klPFefARz
-         1T8rfWm7P6Tv00+kYXa6bpVNpsR+Bi4WDDx8d7grBPGD9aQCDA7P9PZpubM4Q9to3pCJ
-         QkC+fIpoqBBYhR4uJqF1OK7Z6tv8cIvVWMiv9tTHqUxQ0tKJ41Tt+TaE2btUhaLpfz4k
-         ibongxfu2bzJ1wIylQD0+4KLQdn1Mu3uA9FJhLoCCh9npllf6BfNYzbKluYANUb4O6Ve
-         o+3g==
-X-Gm-Message-State: AOAM5319SicJRsinW9B6oGH/VJhGqlHlOLI1IgfLdp5cnIWdAnilh2/w
-        Xnf7w+QQVi028U5KeEDg4HG1DHxhVHePfjnA3kY=
-X-Google-Smtp-Source: ABdhPJz8+1UZlg11KqKvHbkpONGBdp56kxUqfCEPc7vk6eZ1G4Yp87SHg5sKGBZCp4xCB/6zfhWP8OZgVAzWF/Wvcis=
-X-Received: by 2002:a05:6122:91:: with SMTP id r17mr4369848vka.15.1628924966940;
- Sat, 14 Aug 2021 00:09:26 -0700 (PDT)
-MIME-Version: 1.0
-References: <YB1pt8WXsHO2gP5A@core-precision>
-In-Reply-To: <YB1pt8WXsHO2gP5A@core-precision>
-From:   Igor Kovalenko <igor.v.kovalenko@gmail.com>
-Date:   Sat, 14 Aug 2021 10:09:15 +0300
-Message-ID: <CAA8-O=Uw+QO6fK1B1WSMdt_OAQJe-o5EfeWPFy2K29-XACwZjg@mail.gmail.com>
-Subject: Re: Query on the patch series "define HCI packet size of USB Alts"
-To:     Sanchayan <maitysanchayan@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Sat, 14 Aug 2021 03:22:39 -0400
+Received: from mga04.intel.com ([192.55.52.120]:42835 "EHLO mga04.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236519AbhHNHWh (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 14 Aug 2021 03:22:37 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="213817649"
+X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
+   d="scan'208";a="213817649"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Aug 2021 00:22:09 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
+   d="scan'208";a="640021988"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orsmga005.jf.intel.com with ESMTP; 14 Aug 2021 00:22:07 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Kiran K <kiran.k@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+Subject: [PATCH v12 01/10] Bluetooth: Enumerate local supported codec and cache details
+Date:   Sat, 14 Aug 2021 12:56:20 +0530
+Message-Id: <20210814072629.11748-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Feb 5, 2021 at 6:52 PM Sanchayan <maitysanchayan@gmail.com> wrote:
->
-> Hello,
->
-> We currently have an opened merge request on adding mSBC support to PulseAudio.
-> https://gitlab.freedesktop.org/pulseaudio/pulseaudio/-/merge_requests/254
->
-> There currently seems to be an issue in getting the correct MTU. In the test
-> setup it works with the ofono backend, except for the assumed MTU. For getting
-> it to work, we had to use a MTU of 24. 48 does not work and renders silence.
-> getsockopt(card->fd, SOL_SCO, SCO_OPTIONS ... returns 64 which is too large.
->
-> The missing bits on the kernel side seems to be the below patch.
-> https://lore.kernel.org/patchwork/patch/1303411/
->
-> Second patch in the above series seem to have been applied but not the first.
->
-> The first patch in the series above, when applied seems to fix getsockopt
-> returning 24 bytes for the MTU. An additional correction on top of that
-> below
->
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index fd0dcfa9a390..35f9c0743014 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -1669,6 +1669,8 @@ static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts)
->                 err = __set_isoc_interface(hdev, new_alts);
->                 if (err < 0)
->                         return err;
-> +
-> +               hdev->sco_mtu = hci_packet_size_usb_alt[new_alts];
->         }
->
->         if (!test_and_set_bit(BTUSB_ISOC_RUNNING, &data->flags)) {
->
->
-> seems to make it work for all bluetooth usb devices.
->
-> Has there been any further development or way to push this forward?
->
-> - Sanchayan.
+Read supported local codecs, codec capabilities and cache
+the data.
 
-Gentle reminder, anything can be done to push this forward?
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+---
+* changes in v12:
+ - refactor funcions related to reading codec capabilities
 
-I believe we all use the same workaround discussed in patchwork
-thread https://lore.kernel.org/patchwork/patch/1303411/ but first SCO
-socket write either has to be delayed until first read succeeds, or first
-SCO socket write size may be incorrect since payload size of HCI
-packet is not propagated to socket MTU value.
+* changes in v11:
+ - Remove Kconfig related changes
+ - Address minor review comments
+ - Move codec related functions to new file hci_codec.c
 
-With https://lore.kernel.org/patchwork/patch/1303411/ and the change
-above to btusb_switch_alt_setting() first SCO socket write can be done
-with correct size right away.
+* changes in v10:
+ - define Kconfig to control offload feature at build time
+ - fix review comments
 
+* changes in v9:
+  - use shortname vnd instead of ven
+
+* changes in v8:
+  - add comments
+  - split __u8 codec_id[5] into {__u8 id; __le16 cid, vid }
+  - address review comment related codec caps structure
+
+* changes in v7:
+  - keep codec enumeration call in hci_init instead of having a separate
+    function
+  - Remove unused bitmasks defined for LE transports
+
+* changes  in v6:
+  - fix compiler warning reported for ARCH=arc
+
+* changes in v5:
+  - fix review comments
+  - move code used to read standard/vendor codecs caps into single function
+
+* changes in v4:
+  - convert  reading of codecs and codecs caps calls from async to sync
+
+* changes in v3
+  - move codec enumeration into a new init function
+
+* changes in v2
+  - add skb length check before accessing data
+
+ include/net/bluetooth/hci.h      |  41 ++++++++
+ include/net/bluetooth/hci_core.h |  17 +++
+ net/bluetooth/Makefile           |   2 +-
+ net/bluetooth/hci_codec.c        | 172 +++++++++++++++++++++++++++++++
+ net/bluetooth/hci_codec.h        |   6 ++
+ net/bluetooth/hci_core.c         |  11 +-
+ 6 files changed, 244 insertions(+), 5 deletions(-)
+ create mode 100644 net/bluetooth/hci_codec.c
+ create mode 100644 net/bluetooth/hci_codec.h
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index b80415011dcd..f76849c8eafd 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1307,6 +1307,28 @@ struct hci_rp_read_data_block_size {
+ } __packed;
+ 
+ #define HCI_OP_READ_LOCAL_CODECS	0x100b
++struct hci_std_codecs {
++	__u8	num;
++	__u8	codec[];
++} __packed;
++
++struct hci_vnd_codec {
++	/* company id */
++	__le16	cid;
++	/* vendor codec id */
++	__le16	vid;
++} __packed;
++
++struct hci_vnd_codecs {
++	__u8	num;
++	struct hci_vnd_codec codec[];
++} __packed;
++
++struct hci_rp_read_local_supported_codecs {
++	__u8	status;
++	struct hci_std_codecs std_codecs;
++	struct hci_vnd_codecs vnd_codecs;
++} __packed;
+ 
+ #define HCI_OP_READ_LOCAL_PAIRING_OPTS	0x100c
+ struct hci_rp_read_local_pairing_opts {
+@@ -1315,6 +1337,25 @@ struct hci_rp_read_local_pairing_opts {
+ 	__u8     max_key_size;
+ } __packed;
+ 
++#define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
++struct hci_op_read_local_codec_caps {
++	__u8	id;
++	__le16	cid;
++	__le16	vid;
++	__u8	transport;
++	__u8	direction;
++} __packed;
++
++struct hci_codec_caps {
++	__u8	len;
++	__u8	data[];
++} __packed;
++
++struct hci_rp_read_local_codec_caps {
++	__u8	status;
++	__u8	num_caps;
++} __packed;
++
+ #define HCI_OP_READ_PAGE_SCAN_ACTIVITY	0x0c1b
+ struct hci_rp_read_page_scan_activity {
+ 	__u8     status;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a7d06d7da602..0c711a5fcd25 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -131,6 +131,17 @@ struct bdaddr_list {
+ 	u8 bdaddr_type;
+ };
+ 
++struct codec_list {
++	struct list_head list;
++	u8	id;
++	__u16	cid;
++	__u16	vid;
++	u8	transport;
++	u8	num_caps;
++	u32	len;
++	struct hci_codec_caps caps[];
++};
++
+ struct bdaddr_list_with_irk {
+ 	struct list_head list;
+ 	bdaddr_t bdaddr;
+@@ -536,6 +547,7 @@ struct hci_dev {
+ 	struct list_head	pend_le_conns;
+ 	struct list_head	pend_le_reports;
+ 	struct list_head	blocked_keys;
++	struct list_head	local_codecs;
+ 
+ 	struct hci_dev_stats	stat;
+ 
+@@ -1866,4 +1878,9 @@ void hci_copy_identity_address(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ #define SCO_AIRMODE_CVSD       0x0000
+ #define SCO_AIRMODE_TRANSP     0x0003
+ 
++#define LOCAL_CODEC_ACL_MASK	BIT(0)
++#define LOCAL_CODEC_SCO_MASK	BIT(1)
++
++#define TRANSPORT_TYPE_MAX	0x04
++
+ #endif /* __HCI_CORE_H */
+diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
+index cc0995301f93..f3e439d98b85 100644
+--- a/net/bluetooth/Makefile
++++ b/net/bluetooth/Makefile
+@@ -14,7 +14,7 @@ bluetooth_6lowpan-y := 6lowpan.o
+ 
+ bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
+ 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
+-	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o
++	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o hci_codec.o
+ 
+ bluetooth-$(CONFIG_BT_BREDR) += sco.o
+ bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
+diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+new file mode 100644
+index 000000000000..f86ca6ba5814
+--- /dev/null
++++ b/net/bluetooth/hci_codec.c
+@@ -0,0 +1,172 @@
++// SPDX-License-Identifier: GPL-2.0
++
++/* Copyright (C) 2021 Intel Corporation */
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci_core.h>
++#include "hci_codec.h"
++
++static int hci_codec_list_add(struct list_head *list,
++			      struct hci_op_read_local_codec_caps *sent,
++			      struct hci_rp_read_local_codec_caps *rp,
++			      void *caps,
++			      __u32 len)
++{
++	struct codec_list *entry;
++
++	entry = kzalloc(sizeof(*entry) + len, GFP_KERNEL);
++	if (!entry)
++		return -ENOMEM;
++
++	entry->id = sent->id;
++	if (sent->id == 0xFF) {
++		entry->cid = __le16_to_cpu(sent->cid);
++		entry->vid = __le16_to_cpu(sent->vid);
++	}
++	entry->transport = sent->transport;
++	entry->len = len;
++	entry->num_caps = rp->num_caps;
++	if (rp->num_caps)
++		memcpy(entry->caps, caps, len);
++	list_add(&entry->list, list);
++
++	return 0;
++}
++
++void hci_codec_list_clear(struct list_head *codec_list)
++{
++	struct codec_list *c, *n;
++
++	list_for_each_entry_safe(c, n, codec_list, list) {
++		list_del(&c->list);
++		kfree(c);
++	}
++}
++
++static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
++					struct hci_op_read_local_codec_caps
++					*cmd)
++{
++	__u8 i;
++
++	for (i = 0; i < TRANSPORT_TYPE_MAX; i++) {
++		if (transport & BIT(i)) {
++			struct hci_rp_read_local_codec_caps *rp;
++			struct hci_codec_caps *caps;
++			struct sk_buff *skb;
++			__u8 j;
++			__u32 len;
++
++			cmd->transport = i;
++			skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
++					     sizeof(*cmd), cmd,
++					     HCI_CMD_TIMEOUT);
++			if (IS_ERR(skb)) {
++				bt_dev_err(hdev, "Failed to read codec capabilities (%ld)",
++					   PTR_ERR(skb));
++				continue;
++			}
++
++			if (skb->len < sizeof(*rp))
++				goto error;
++
++			rp = (void *)skb->data;
++
++			if (rp->status)
++				goto error;
++
++			if (!rp->num_caps) {
++				len = 0;
++				/* this codec doesn't have capabilities */
++				goto skip_caps_parse;
++			}
++
++			skb_pull(skb, sizeof(*rp));
++
++			for (j = 0, len = 0; j < rp->num_caps; j++) {
++				caps = (void *)skb->data;
++				if (skb->len < sizeof(*caps))
++					goto error;
++				if (skb->len < caps->len)
++					goto error;
++				len += sizeof(caps->len) + caps->len;
++				skb_pull(skb,  sizeof(caps->len) + caps->len);
++			}
++
++skip_caps_parse:
++			hci_dev_lock(hdev);
++			hci_codec_list_add(&hdev->local_codecs, cmd, rp,
++					   (__u8 *)rp + sizeof(*rp), len);
++			hci_dev_unlock(hdev);
++error:
++			kfree_skb(skb);
++		}
++	}
++}
++
++void hci_read_supported_codecs(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct hci_rp_read_local_supported_codecs *rp;
++	struct hci_std_codecs *std_codecs;
++	struct hci_vnd_codecs *vnd_codecs;
++	struct hci_op_read_local_codec_caps caps;
++	__u8 i;
++
++	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS, 0, NULL,
++			     HCI_CMD_TIMEOUT);
++
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
++			   PTR_ERR(skb));
++		return;
++	}
++
++	if (skb->len < sizeof(*rp))
++		goto error;
++
++	rp = (void *)skb->data;
++
++	if (rp->status)
++		goto error;
++
++	skb_pull(skb, sizeof(rp->status));
++
++	std_codecs = (void *)skb->data;
++
++	/* validate codecs length before accessing */
++	if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
++	    + sizeof(std_codecs->num))
++		goto error;
++
++	/* enumerate codec capabilities of standard codecs */
++	memset(&caps, 0, sizeof(caps));
++	for (i = 0; i < std_codecs->num; i++) {
++		caps.id = std_codecs->codec[i];
++		caps.direction = 0x00;
++		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
++	}
++
++	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
++		 + sizeof(std_codecs->num));
++
++	vnd_codecs = (void *)skb->data;
++
++	/* validate vendor codecs length before accessing */
++	if (skb->len <
++	    flex_array_size(vnd_codecs, codec, vnd_codecs->num)
++	    + sizeof(vnd_codecs->num))
++		goto error;
++
++	/* enumerate vendor codec capabilities */
++	for (i = 0; i < vnd_codecs->num; i++) {
++		caps.id = 0xFF;
++		caps.cid = vnd_codecs->codec[i].cid;
++		caps.vid = vnd_codecs->codec[i].vid;
++		caps.direction = 0x00;
++		hci_read_codec_capabilities(hdev, LOCAL_CODEC_ACL_MASK, &caps);
++	}
++
++error:
++	kfree_skb(skb);
++}
+diff --git a/net/bluetooth/hci_codec.h b/net/bluetooth/hci_codec.h
+new file mode 100644
+index 000000000000..efb0df634ac6
+--- /dev/null
++++ b/net/bluetooth/hci_codec.h
+@@ -0,0 +1,6 @@
++/* SPDX-License-Identifier: GPL-2.0 */
++
++/* Copyright (C) 2014 Intel Corporation */
++
++void hci_read_supported_codecs(struct hci_dev *hdev);
++void hci_codec_list_clear(struct list_head *codec_list);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index cb2e9e513907..c988c44da95c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -45,6 +45,7 @@
+ #include "leds.h"
+ #include "msft.h"
+ #include "aosp.h"
++#include "hci_codec.h"
+ 
+ static void hci_rx_work(struct work_struct *work);
+ static void hci_cmd_work(struct work_struct *work);
+@@ -838,10 +839,6 @@ static int hci_init4_req(struct hci_request *req, unsigned long opt)
+ 	if (hdev->commands[22] & 0x04)
+ 		hci_set_event_mask_page_2(req);
+ 
+-	/* Read local codec list if the HCI command is supported */
+-	if (hdev->commands[29] & 0x20)
+-		hci_req_add(req, HCI_OP_READ_LOCAL_CODECS, 0, NULL);
+-
+ 	/* Read local pairing options if the HCI command is supported */
+ 	if (hdev->commands[41] & 0x08)
+ 		hci_req_add(req, HCI_OP_READ_LOCAL_PAIRING_OPTS, 0, NULL);
+@@ -937,6 +934,10 @@ static int __hci_init(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		return err;
+ 
++	/* Read local codec list if the HCI command is supported */
++	if (hdev->commands[29] & 0x20)
++		hci_read_supported_codecs(hdev);
++
+ 	/* This function is only called when the controller is actually in
+ 	 * configured state. When the controller is marked as unconfigured,
+ 	 * this initialization procedure is not run.
+@@ -1841,6 +1842,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	memset(hdev->eir, 0, sizeof(hdev->eir));
+ 	memset(hdev->dev_class, 0, sizeof(hdev->dev_class));
+ 	bacpy(&hdev->random_addr, BDADDR_ANY);
++	hci_codec_list_clear(&hdev->local_codecs);
+ 
+ 	hci_req_sync_unlock(hdev);
+ 
+@@ -3850,6 +3852,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+ 	INIT_LIST_HEAD(&hdev->adv_instances);
+ 	INIT_LIST_HEAD(&hdev->blocked_keys);
+ 
++	INIT_LIST_HEAD(&hdev->local_codecs);
+ 	INIT_WORK(&hdev->rx_work, hci_rx_work);
+ 	INIT_WORK(&hdev->cmd_work, hci_cmd_work);
+ 	INIT_WORK(&hdev->tx_work, hci_tx_work);
 -- 
-Kind regards,
-Igor V. Kovalenko
+2.17.1
+
