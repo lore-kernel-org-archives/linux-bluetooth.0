@@ -7,84 +7,86 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2099CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:33:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89F7DC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:39:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA3FE60EFE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:33:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6CEF760EFE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:39:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237003AbhHNGeU (ORCPT
+        id S236943AbhHNGkF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Aug 2021 02:34:20 -0400
-Received: from mga11.intel.com ([192.55.52.93]:25604 "EHLO mga11.intel.com"
+        Sat, 14 Aug 2021 02:40:05 -0400
+Received: from mga03.intel.com ([134.134.136.65]:10101 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232021AbhHNGeT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Aug 2021 02:34:19 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="212548257"
+        id S236139AbhHNGkE (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 14 Aug 2021 02:40:04 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="215695044"
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="212548257"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2021 23:33:51 -0700
+   d="scan'208";a="215695044"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2021 23:39:35 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="518476095"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by FMSMGA003.fm.intel.com with ESMTP; 13 Aug 2021 23:33:50 -0700
-Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+   d="scan'208";a="508592089"
+Received: from fmsmsx604.amr.corp.intel.com ([10.18.126.84])
+  by fmsmga004.fm.intel.com with ESMTP; 13 Aug 2021 23:39:35 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
-Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
- ORSMSX609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
+ 15.1.2242.10; Fri, 13 Aug 2021 23:39:35 -0700
+Received: from fmsmsx609.amr.corp.intel.com (10.18.126.89) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
+ 15.1.2242.10; Fri, 13 Aug 2021 23:39:34 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx609.amr.corp.intel.com (10.18.126.89) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Fri, 13 Aug 2021 23:33:49 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ 15.1.2242.10 via Frontend Transport; Fri, 13 Aug 2021 23:39:34 -0700
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.177)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
+ 15.1.2242.10; Fri, 13 Aug 2021 23:39:34 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=fPmXmHbl8M11Y7QonB71zaOfdgw2Bdbf4jz4aiuItvfcghqGZbW1Fi1K981SO42DaPjVxp1tLGVnWcCzTAavRG95Dy7JN557hL5xneEcx3TN+H3ureZT58guBoD78bsXRDSII2tfPUom+dFq4KDSf2q7ZQjJtYyP0WXdS97OeG2vbV8wOp37ah6a3dac97mDpqw/Jjp4WIo8SXhAnKg94wSD7GDrNhBIKeu9MJ8vOBlMsOQjiQb/KdXTkylFuXvqKVG3Xn8ZVuVh72n9qOoO+6zxAiFuxIC3XZuyGQHUtVzyQHSem9XXzGbptildrtjyoRxSuEOr0hvDqcZgsrJ2Wg==
+ b=NYTu2tUQYQXKUTkflpukeOaci57w0Mw3UUlYLtIAjWOQbHftrDTXduM1D8QJ7if2f7K6pKzY7EeZkkE72Vd88SDd2kuxETTXD8ML90R4/HCmzfhDbo34Dd4149rs6TN3dBas9SwZjq+WxdUqERVpvHNaLXJlaDWxzd7QIxdVOJ35V4ytDLvBienUWz/kRIkqDGb6SGP8KOx7tW8kwQUXd9duyvKlc2HOKlj6hk5JnsCE7+jX6m4hoZa0ZjlwZgll9ijg6Uv1PJwEShBCR9OkkP+t0UPHFSjZe/pXCufytPLxTRnDp1SY7xd4l0xU2/QdExR5uEkQlUCltVDLn/x83w==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FKcN1qoWaaaWyircvypFWvw7PK2OhjLyPCdYeSEPrcg=;
- b=gmjfJ39gjp63fBtJuCLnP5pnZboirpPnamaFVKtsop3F/pr1rOirVfdyC8zlgu2czTODd4IfzZ8cY24QLdxU+S8UStCt1y4po/0PfJj2wwmvHQeLCEaQnX2IdYSPPuvLjDTIRKFhAuFLwjE+g1DbsGrIcBu9kJKnYPC3TP5CLppoLk/ng0VP68uxjzaLbPA2O6e8o6pZdNyY0NnsUbgecyo5TXEssFieWdXq93g0GebKpCJkLhin3NZuGE6jOCQi6U2/YYEKzLRGo1F8Ucou6JFZ5pLMIeN0eX5g+5lblBgyuNNgFLlocFdWsvYnO3xqTHnAMHkLpGmSaiODshO2tg==
+ bh=r2M+MOc1rG5t25VXqIpWAsVpLlEWpSOahmW7TDn824E=;
+ b=Pc2whmwqXlZCwwE6PMYhqDPTJrs43cOsVhvAwU64XVBbk/YgfHCT9S4WIXv/zmiNCoE9zED1SpoHwIyuy4QoIRNaX8OWTghpylhE3jcgtIMEAAuBYW3fP5G+cAtJ8cgnmX+IseRlwEEXMKjoR9Ta3SV3rNF+bAf/thB9N/uKbO/M3dSXwFUhPKyWeRI6ywfs2WUEtBe9kVWyCDRC97K+SFshZT3RytXAI7R5kXERhsXp+uJ+s3D1dy/op+pTpjAcfcQ6YT1N2Ad4a5o8nB0CBczA1cB01lIxeZc8wnYdnXiMtOoM6AeR5ghCOKLW0EbX7UNRCoKfmCBOrUyYdYrdQw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FKcN1qoWaaaWyircvypFWvw7PK2OhjLyPCdYeSEPrcg=;
- b=oACAMaAAeIbjt6X5k6h02CbaH5s3U5YiJAeKL6z+Jg5VZuFxrmrEy5FcqpmQcVDS30IxicNlENlsnU3o2U1BNHNcXsLrTmiB7oUD5FLdnpQK1oObJ5E71s9AIg27xj6V3RxhkJGj8e21lDURoJx4IQ6Wu0RqENRYoW26fOTuv+M=
+ bh=r2M+MOc1rG5t25VXqIpWAsVpLlEWpSOahmW7TDn824E=;
+ b=dQtlurVhEYs8UGjMt2ZuPF8UcWn9n7CYKXdkq4hpM9+xUdcifQHtqJ7t1VG0JkwfZRfykM2esdBLOCh9FAvm92Iu/K+iBD+LM3CuxeDfis/VecZTKMEcWvdlzzIdIZi5lp+2py1j3HPUJnNbT4dnpva2tz6yFloBBKSA10Z4gxE=
 Received: from DM8PR11MB5573.namprd11.prod.outlook.com (2603:10b6:8:3b::7) by
- DM8PR11MB5639.namprd11.prod.outlook.com (2603:10b6:8:24::15) with Microsoft
+ DM8PR11MB5605.namprd11.prod.outlook.com (2603:10b6:8:26::11) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4415.16; Sat, 14 Aug 2021 06:33:48 +0000
+ 15.20.4415.13; Sat, 14 Aug 2021 06:39:33 +0000
 Received: from DM8PR11MB5573.namprd11.prod.outlook.com
  ([fe80::c134:db0a:48b:a88c]) by DM8PR11MB5573.namprd11.prod.outlook.com
  ([fe80::c134:db0a:48b:a88c%3]) with mapi id 15.20.4415.021; Sat, 14 Aug 2021
- 06:33:48 +0000
+ 06:39:33 +0000
 From:   "K, Kiran" <kiran.k@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+To:     "K, Kiran" <kiran.k@intel.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+CC:     BlueZ <linux-bluetooth@vger.kernel.org>,
         "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
         "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Subject: RE: [PATCH v11 04/10] Bluetooth: Allow querying of supported offload
- codecs over SCO socket
-Thread-Topic: [PATCH v11 04/10] Bluetooth: Allow querying of supported offload
- codecs over SCO socket
-Thread-Index: AQHXgsNuP4nas++zU0OUeCZXf+Zos6tblNcAgBcSJ1A=
-Date:   Sat, 14 Aug 2021 06:33:48 +0000
-Message-ID: <DM8PR11MB55730E581A04C278B111B7E6F5FB9@DM8PR11MB5573.namprd11.prod.outlook.com>
+Subject: RE: [PATCH v11 06/10] Bluetooth: Allow setting of codec for HFP
+ offload usecase
+Thread-Topic: [PATCH v11 06/10] Bluetooth: Allow setting of codec for HFP
+ offload usecase
+Thread-Index: AQHXgsNsUDQlIlwej0OhupKFeyJzC6tblbAAgAPCm/CAE078MA==
+Date:   Sat, 14 Aug 2021 06:39:33 +0000
+Message-ID: <DM8PR11MB557322D6EB556D81B1AF44E9F5FB9@DM8PR11MB5573.namprd11.prod.outlook.com>
 References: <20210727084713.23038-1-kiran.k@intel.com>
- <20210727084713.23038-4-kiran.k@intel.com>
- <DF716A96-0774-4CD2-B2B9-95D41F1B0842@holtmann.org>
-In-Reply-To: <DF716A96-0774-4CD2-B2B9-95D41F1B0842@holtmann.org>
+ <20210727084713.23038-6-kiran.k@intel.com>
+ <2E192E47-B47A-4464-A5D5-3DC34DD22ECF@holtmann.org>
+ <DM8PR11MB557397CD63E11B0901F6FBF2F5EE9@DM8PR11MB5573.namprd11.prod.outlook.com>
+In-Reply-To: <DM8PR11MB557397CD63E11B0901F6FBF2F5EE9@DM8PR11MB5573.namprd11.prod.outlook.com>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -92,56 +94,56 @@ X-MS-TNEF-Correlator:
 dlp-reaction: no-action
 dlp-version: 11.5.1.3
 dlp-product: dlpe-windows
-authentication-results: holtmann.org; dkim=none (message not signed)
- header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
+authentication-results: intel.com; dkim=none (message not signed)
+ header.d=none;intel.com; dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 79f3215d-c13b-4160-b4dc-08d95eed792a
-x-ms-traffictypediagnostic: DM8PR11MB5639:
+x-ms-office365-filtering-correlation-id: a45f00d7-2db1-4bb2-146e-08d95eee46ca
+x-ms-traffictypediagnostic: DM8PR11MB5605:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM8PR11MB5639E6F170ED9FB587AED77EF5FB9@DM8PR11MB5639.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:6790;
+x-microsoft-antispam-prvs: <DM8PR11MB560539A0921B515C604AAF5CF5FB9@DM8PR11MB5605.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6430;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: fVi0PPwestbAvZNfJrx6aRKmJHdqACIGlSuV+eG/iOvbLJy7+PeYZw4K13vqlrUtr3SfQ56/gX0m2wPzroT6t/QZFdK9OkmvaFSpNW0+HxfgliEM26lJHBOKhIXeZXZB7nuUtv506Tynzhtohtdteh/wse5G2RryYqjyXEaG3Gg9/eQTiuW+UgCxTv84YD+TPE3VMJPkgDvtP4siRm/iy2oHUu3lhzoDAazVnGQ2Blo9jmd1VmlrPEGp5AlGlCf7eBjKwJjoaBUQeYnzZHh/doImsuYr13QFmI8yaYtt1jqFLOnQcaJR8+Azhot0UH5wNp8UTVlB6u6I2KmyRjY2zHpquChSfxcCjjlw62S5EgI4DIJsIgr5VwjzpA94s+vpGiJUVBBWz/ooVs7koAojl+D97/EpiRtz5QzdZ8dx6s+/RK0XFr/5lcd7/ukW9jlUWpBVFQBYTLTh9YOnwmnzhWzPVZfcDwTdlZ+lnsqC3fAtkWXkfxRIkP7tEwihHyUmhrCutqGkgDyT7Q/CIeffdgkuQSkGwHZUMPzzB5sXNyX36Dw7F8Ir2EHiejXTPY/VAl65SdQmsgkMTqnihlJndGPjP4Zw+LNcDD0fXTpfzUiNPi4n09pdRiSF+Z+s+bjvNggK7oSNvwxiOqa8dtQb1u64WnFotx0aXU2DB17OzDv2CiehcpVLxkRTMq09SaCjGNgTPuhkxzzRIYX8qFidzA==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(396003)(346002)(39860400002)(376002)(71200400001)(33656002)(478600001)(38070700005)(54906003)(7696005)(26005)(6506007)(53546011)(4326008)(5660300002)(107886003)(6916009)(8676002)(9686003)(66946007)(55016002)(76116006)(316002)(38100700002)(86362001)(66446008)(83380400001)(2906002)(64756008)(66476007)(52536014)(122000001)(66556008)(186003)(8936002);DIR:OUT;SFP:1102;
+x-microsoft-antispam-message-info: n/lLGl/IRB6ZaGRYysdsjBDjWpnjs4y/uDfj1h0HesJDcOMDlWQsFDdX0Fy0u1vTxMVoGmf54OQelNFHUL7dScsxin/auIVhGo5hlT5omtvvEIxkp9vk3asINVf1Mq5ww1pW/D3aq6eJ/rSKBiCoZKFhlfCgmF6VwTZqjtaCIrkqBvMDaf+7s421vq9t22vpS9t1s1f6MoPCHhpIJnoN9HhOT+HzrLoXmqjvuFABZ9WZei4JeFY2qve1YOZ0BvMcNGq9wBNwWLQcBmHbsGeFmwZ04nPidQHzPT7yvBz+OZKs9+7A5Nr8snfZBG+8P04jgort4Ws9mhi13MgVUCFxsD1Psor0Mf9OP3zQZb8p46HUG2l6oAM9K6U1jSyRVYoHmY/9WBJHyAYn/CwkIA3d7ShiXjKUy6G5AulF2cOgcVxrRmEc2B46TFKhxyZ19R/MIPIWHF70EyyCWcvIfddZKG8QgP4hWxSgTIRYIlJkfkUhOkL+7Dz7x8+J5h1qVtJlkMN6yfz5B00OpQFtuE9g+b7vQR0SnkkQlQ89ppKMPzOVASbmg3wlIJHBIv/pRSno90X1kEFdfTUA10AugCvEjZMspesfJnSjXKy0H/XXqzTvHxOHzeE7Dx6KIqqkt5zBV4sP03FbuaWuq1o6yNtXyV/bCLc25kbvkv3trBQX6hwi859Oft7ZitX0KhsYXOjXBrvI1/CmuotDZpsxZGmDaw==
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(376002)(39860400002)(136003)(346002)(396003)(66446008)(107886003)(66946007)(5660300002)(52536014)(66476007)(66556008)(64756008)(33656002)(4326008)(83380400001)(2906002)(8936002)(7696005)(186003)(8676002)(38100700002)(9686003)(26005)(54906003)(71200400001)(316002)(76116006)(55016002)(38070700005)(110136005)(86362001)(6506007)(122000001)(478600001)(53546011);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AMCER3T272GI6zaHq6HosCgtwPmNOkbxLtE6Blt/y5yTvQAPLISHM+t5fQI/?=
- =?us-ascii?Q?tWtvMrjvLBZDf5mPv9swKpdm1g3ZNgolHQWVEIf6vHWVehv1JADXGJiAYORo?=
- =?us-ascii?Q?+3AfUEtZlzw5+c5f58FQbg7nOvkHT4mL8j02bWwUd7liRYtV+NNcG2iaIVzX?=
- =?us-ascii?Q?XiQZasUg6PBasfO1V3T2X11C/gAmfZ6wW/ZkoH3+7XRwpaYAuPpgRWPwhlY5?=
- =?us-ascii?Q?uUUAHQxnPYy+/Ev3u4XUX46TT6WyblhFlGOA23Illn8ZLy4WNnYAFbLvoB2D?=
- =?us-ascii?Q?bVbpVmXN4GSUySFUHzCP1lcZWaXyiCv2NVOCysuT1Fy1IklqiP/lPo7rwlEh?=
- =?us-ascii?Q?jHyilO1QAZsa6Srr+BTXtlzWAphRbmv4hf3XjGXmXIUtV60d32NmB8XES16k?=
- =?us-ascii?Q?1H4PjyS+H3ZFWTA5nQgmed5TjRQE8YQdLdB+0JWuaQyxC5LdsbKSUXPr+2fV?=
- =?us-ascii?Q?0rASdUJZVqkserz5e6MlTEpdaJ+oa8u4LUZ+HJDEyiRUii7KrgtMzcklieY3?=
- =?us-ascii?Q?9rg6XjWOOt1TQbO9jfjB9E5oQTVq9DNxUGKRLlH7AqHfftd3crFWpEBDeH4u?=
- =?us-ascii?Q?Sxb6Qs8c4yf6UhY5TsL9fsw6b5nRUBIm+OYW60ppU4YvLuIMj6Fg5mc44sUO?=
- =?us-ascii?Q?hLPhk+WomhIpU8lZqy7qtCM31lz43AvjReQzZjK6A3rp9yfaUqgpznni6cne?=
- =?us-ascii?Q?LNnIZ0HffLc+5tbkWESYkiNHLoGGtExwSwxKQQj17EOvqv/LJlJUaGyLS2b1?=
- =?us-ascii?Q?ZiS+DBxjp5U70nT6VCxHrWxFxFnD9iNhdjO1EZrk/38gsf+AdaZx/It+LC20?=
- =?us-ascii?Q?+4feOC5w0g5aYK9LklpRm1+qHEAbJGzv3v5LZjDW4sH0JHkCmS3sO4gFiZNi?=
- =?us-ascii?Q?7AGNxGW9BKOTH46uZGkP9TscpajZBlV46ya95ATSZuAEDfC+SODgdPGxENxh?=
- =?us-ascii?Q?y8F8gZCtkuG8H3hH3ShLB9l1MANxzQ9gbCVeLFTJkTtX/erNVaC3L/iECxVW?=
- =?us-ascii?Q?EZR8CgEVN0Wt6G9kGBnfaU7RdAguPvIOuoKGg8Hap73Rk6vdUQp3rNQHrQxt?=
- =?us-ascii?Q?wODpBLl4P8SKsniYmXDr9lLuuRhbJlxtDyxp/hgU1Dz7QzgYRZ4FjiaoBs91?=
- =?us-ascii?Q?A+Oq082ENiNDRWc8uo17d0V+D4LkrBmlc8RXmgUX62RCodUn2MKOmrKTuJ57?=
- =?us-ascii?Q?3lUzZyieUp6Z7CbchRbnGhPkFlpoww4vvlGB9yYrIWMN0qYegDZ1CBfW8UNS?=
- =?us-ascii?Q?UjnIdpiXP+4Gv5T6ZSQTcDWRI5zSFmpc6PfUas5XhJzKkAQvruhLFKYp7sZ8?=
- =?us-ascii?Q?QziZkTF0kR7hrVFJPe0iw8ci?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3RlfOhnv2VZjYGiUzNBVNP7jZpWmb94nXdXKngMTXVfrSIzNRm8NxuepLvIA?=
+ =?us-ascii?Q?HXfK3NKYY9yLfDFwt7ohqD+0xxQFZjIuf+ckOAyprbt9nP73I44TKQc6qrAQ?=
+ =?us-ascii?Q?vqqtLI22bBhc3nXDCIZzByY38XiFPtbav1vTLbxI2xHQh5R+FWvSA+lLunhs?=
+ =?us-ascii?Q?twnAmLnqRm3vRVz6RZ02uQPKcatKeap0N8HL5e0/uUpx/MUSOsgcuKfEfHT6?=
+ =?us-ascii?Q?aldWo/F0sMSAvaVwbOhOw/nyN3Q3JjhbURdTivBwBZtV1RlcwMGbFfjKavSB?=
+ =?us-ascii?Q?f+PTcRWSXRwPYwipHSh4/c4lV781+9XXn1NZbX0tVzW1bdXTkwS9Cco+5wqX?=
+ =?us-ascii?Q?XhVvP7V/ensIm3JGbhVkcaOBKW18C53rrSp+LrkgEsdkYIC7M1LmGC0d+7AE?=
+ =?us-ascii?Q?O7uQ+OAnpmBgeNmLI9a/XLqj38Ox5ZK2JD3JNdcnLS83BTgweSDYYPdTrehA?=
+ =?us-ascii?Q?SQaiRO0DRuJ86hPtlCrypsbDAS3Pva04vbiqs6rc7f+EI69WB3NaalddRV1Q?=
+ =?us-ascii?Q?3VHTc9zk7am9mjwsDiSAnR8wyPMP4qRzqxNxk2hN75Nmznhc6rPTOTccnNo0?=
+ =?us-ascii?Q?OSrtM8Or3h4bfjNgoNOy0F3Qw7vwxcGHLsOyN9+ZHpRphqMvAvPsIsXvjA1x?=
+ =?us-ascii?Q?VNGkKJMaV667ab/Ga7CCZQthsh4F+H2vhGR/o+1w50O+3dJiGT55AlP7CnHw?=
+ =?us-ascii?Q?G5nFOjmRV5bGcIa1+tO8AZV+DjJgQGCIMbtmzdRlLQqoSqo1+D7Nzs911iP/?=
+ =?us-ascii?Q?Lmmird1uY+IUXsc25f2zhxHKJUWsP4MRDWjHXxjevULksfqbPDTvFtp8tnMw?=
+ =?us-ascii?Q?DqWLx6teUWB36oU94epcp/dxAZWTwVqs9Hb+cBPrZ5/ITZtYWYl61arX7pUx?=
+ =?us-ascii?Q?tmjXbM78uDmfUtXhRxRHGweMYPYAguFUPMMWeDtTT4A/fEIOkzdHV2CMPeJE?=
+ =?us-ascii?Q?lXjMtepQrfiYpAVDzR4NdMyNaBRRooWuAUV+fzD1IEmjAUsVQ01HvKFNU/KE?=
+ =?us-ascii?Q?ZP5KltYOO1KaWDD7ZcLxZsEUxRyby4QgbgqTpKskybl7aZtsJhp0nOroL9n/?=
+ =?us-ascii?Q?lCLQvKCxu1cbqSnrKlnB+QF89sso5XDnZ+Gp75wlXoCjw3I2Muq840HwtOGm?=
+ =?us-ascii?Q?bayB8l/xSamGI0XusjXbHyoHDZnbpwaVTQXd2JD2DZiXpgd3sQaBNU6cyUkz?=
+ =?us-ascii?Q?ZQ8T3/mopvjdzrRa/Aan3fT0iEKaFo9mTkbCrsvXPGlaHMgL+wfYmk+vTcKy?=
+ =?us-ascii?Q?Rr1XJ2GvTOwXyk9UTakXYqJmTSj7JizNxeyOSPWLfvQMIerF15iLxTOAc2mg?=
+ =?us-ascii?Q?TtFjrul34mleAmVtY1wQYkQ4?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 79f3215d-c13b-4160-b4dc-08d95eed792a
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2021 06:33:48.2100
+X-MS-Exchange-CrossTenant-Network-Message-Id: a45f00d7-2db1-4bb2-146e-08d95eee46ca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2021 06:39:33.1376
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: p8gnOZFpWr5IzSD5tl+tv7C9Rb6BynOVgaf205COOr3tGaskioBRDP6McnMrCbMCrbl+wTibWp8vNShYpzYa5A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5639
+X-MS-Exchange-CrossTenant-userprincipalname: ndCkXlt31UcKIUbiZZK0zq3T1daLhreRTF3nsjwDyieRKsNy1p9/+wfcOBv2yfVvid80/XaUYP1WHm4Uy8XjhQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5605
 X-OriginatorOrg: intel.com
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -150,147 +152,115 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 Hi Marcel,
 
 > -----Original Message-----
-> From: Marcel Holtmann <marcel@holtmann.org>
-> Sent: Friday, July 30, 2021 7:44 PM
-> To: K, Kiran <kiran.k@intel.com>
-> Cc: linux-bluetooth@vger.kernel.org; Srivatsa, Ravishankar
+> From: K, Kiran <kiran.k@intel.com>
+> Sent: Monday, August 2, 2021 5:16 AM
+> To: Marcel Holtmann <marcel@holtmann.org>
+> Cc: BlueZ <linux-bluetooth@vger.kernel.org>; Srivatsa, Ravishankar
 > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
 > <chethan.tumkur.narayan@intel.com>
-> Subject: Re: [PATCH v11 04/10] Bluetooth: Allow querying of supported
-> offload codecs over SCO socket
+> Subject: RE: [PATCH v11 06/10] Bluetooth: Allow setting of codec for HFP
+> offload usecase
 >=20
-> Hi Kiran,
+> Hi Marcel,
 >=20
-> > Add BT_CODEC option for getsockopt systemcall to get the details of
-> > offload codecs supported over SCO socket
 > >
-> > Signed-off-by: Kiran K <kiran.k@intel.com>
-> > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-> > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
-> > ---
-> > * changes in v11:
-> >  - Remove Kconfig related changes
-> > * changes in v10:
-> >  - In getsockopt, prepare data in advance and call copy_to_user
-> >    istead of calling put_user on each field of struct bt_codec
+> > Hi Kiran,
 > >
-> > include/net/bluetooth/bluetooth.h | 20 +++++++
-> > include/net/bluetooth/hci.h       |  4 ++
-> > include/net/bluetooth/hci_core.h  |  1 +
-> > net/bluetooth/sco.c               | 91 +++++++++++++++++++++++++++++++
-> > 4 files changed, 116 insertions(+)
+> > > For HFP offload usecase, controller needs to be configured with
+> > > codec data and capabilities. This patch uses Bluetooth SIG defined
+> > > command HCI_CONFIGURE_DATA_PATH to specify vendor specific data
+> and
+> > > allows userspace modules to set the codec via setsockopt systemcall.
+> > >
+> > > Signed-off-by: Kiran K <kiran.k@intel.com>
+> > > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+> > > Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+> > > ---
+> > > * changes in v11:
+> > >  - Remove changes related to Kconfig
+> > > * changes in v10:
+> > >  - patch refactor - having callback definition and usage in the same
+> > > patch
+> > >
+> > > include/net/bluetooth/bluetooth.h |   2 +
+> > > include/net/bluetooth/hci.h       |   8 ++
+> > > include/net/bluetooth/hci_core.h  |   3 +
+> > > net/bluetooth/sco.c               | 118 +++++++++++++++++++++++++++++=
++
+> > > 4 files changed, 131 insertions(+)
+> > >
+> > > diff --git a/include/net/bluetooth/bluetooth.h
+> > > b/include/net/bluetooth/bluetooth.h
+> > > index 64cddff0c9c4..1a48b6732eef 100644
+> > > --- a/include/net/bluetooth/bluetooth.h
+> > > +++ b/include/net/bluetooth/bluetooth.h
+> > > @@ -173,6 +173,8 @@ struct bt_codecs {
+> > > 	struct bt_codec	codecs[];
+> > > } __packed;
+> > >
+> > > +#define CODING_FORMAT_CVSD	0x02
+> > > +
+> > > __printf(1, 2)
+> > > void bt_info(const char *fmt, ...);
+> > > __printf(1, 2)
+> > > diff --git a/include/net/bluetooth/hci.h
+> > > b/include/net/bluetooth/hci.h index 22e872e60ff8..c998607fc517
+> > > 100644
+> > > --- a/include/net/bluetooth/hci.h
+> > > +++ b/include/net/bluetooth/hci.h
+> > > @@ -1250,6 +1250,14 @@ struct hci_rp_read_local_oob_ext_data {
+> > > 	__u8     rand256[16];
+> > > } __packed;
+> > >
+> > > +#define HCI_CONFIGURE_DATA_PATH	0x0c83
+> > > +struct hci_op_configure_data_path {
+> > > +	__u8	direction;
+> > > +	__u8	data_path_id;
+> > > +	__u8	vnd_len;
+> > > +	__u8	vnd_data[];
+> > > +} __packed;
+> > > +
+> > > #define HCI_OP_READ_LOCAL_VERSION	0x1001
+> > > struct hci_rp_read_local_version {
+> > > 	__u8     status;
+> > > diff --git a/include/net/bluetooth/hci_core.h
+> > > b/include/net/bluetooth/hci_core.h
+> > > index 71c409c8ab34..eafa6f8114cb 100644
+> > > --- a/include/net/bluetooth/hci_core.h
+> > > +++ b/include/net/bluetooth/hci_core.h
+> > > @@ -618,6 +618,9 @@ struct hci_dev {
+> > > 	void (*cmd_timeout)(struct hci_dev *hdev);
+> > > 	bool (*prevent_wake)(struct hci_dev *hdev);
+> > > 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
+> > > +	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
+> > > +				     struct bt_codec *codec, __u8 *vnd_len,
+> > > +				     __u8 **vnd_data);
 > >
-> > diff --git a/include/net/bluetooth/bluetooth.h
-> > b/include/net/bluetooth/bluetooth.h
-> > index 9125effbf448..64cddff0c9c4 100644
-> > --- a/include/net/bluetooth/bluetooth.h
-> > +++ b/include/net/bluetooth/bluetooth.h
-> > @@ -153,6 +153,26 @@ struct bt_voice {
-> >
-> > #define BT_SCM_PKT_STATUS	0x03
-> >
-> > +#define BT_CODEC	19
-> > +
-> > +struct	bt_codec_caps {
-> > +	__u8	len;
-> > +	__u8	data[];
-> > +} __packed;
-> > +
-> > +struct bt_codec {
-> > +	__u8	id;
-> > +	__u16	cid;
-> > +	__u16	vid;
-> > +	__u8	data_path;
-> > +	__u8	num_caps;
-> > +} __packed;
-> > +
-> > +struct bt_codecs {
-> > +	__u8		num_codecs;
-> > +	struct bt_codec	codecs[];
-> > +} __packed;
-> > +
-> > __printf(1, 2)
-> > void bt_info(const char *fmt, ...);
-> > __printf(1, 2)
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index b4e35cf5f4b1..22e872e60ff8 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -2621,6 +2621,10 @@ static inline struct hci_sco_hdr
-> *hci_sco_hdr(const struct sk_buff *skb)
-> > #define hci_iso_data_len(h)		((h) & 0x3fff)
-> > #define hci_iso_data_flags(h)		((h) >> 14)
-> >
-> > +/* codec transport types */
-> > +#define TRANSPORT_ACL		0x00
-> > +#define TRANSPORT_SCO_ESCO	0x01
-> > +
-> > /* le24 support */
-> > static inline void hci_cpu_to_le24(__u32 val, __u8 dst[3]) { diff
-> > --git a/include/net/bluetooth/hci_core.h
-> > b/include/net/bluetooth/hci_core.h
-> > index 6742e6ad7b37..71c409c8ab34 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -617,6 +617,7 @@ struct hci_dev {
-> > 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
-> > 	void (*cmd_timeout)(struct hci_dev *hdev);
-> > 	bool (*prevent_wake)(struct hci_dev *hdev);
-> > +	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
-> > };
-> >
-> > #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c index
-> > ffa2a77a3e4c..2f32693f09c1 100644
-> > --- a/net/bluetooth/sco.c
-> > +++ b/net/bluetooth/sco.c
-> > @@ -953,6 +953,12 @@ static int sco_sock_getsockopt(struct socket *sock=
-,
-> int level, int optname,
-> > 	struct bt_voice voice;
-> > 	u32 phys;
-> > 	int pkt_status;
-> > +	int buf_len;
-> > +	struct codec_list *c;
-> > +	u8 num_codecs, i, __user *ptr;
-> > +	struct hci_dev *hdev;
-> > +	struct hci_codec_caps *caps;
-> > +	struct bt_codec codec;
-> >
-> > 	BT_DBG("sk %p", sk);
-> >
-> > @@ -1017,6 +1023,91 @@ static int sco_sock_getsockopt(struct socket
-> *sock, int level, int optname,
-> > 			err =3D -EFAULT;
-> > 		break;
-> >
-> > +	case BT_CODEC:
-> > +		num_codecs =3D 0;
-> > +		buf_len =3D 0;
-> > +
-> > +		hdev =3D hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
-> BDADDR_BREDR);
-> > +		if (!hdev) {
-> > +			err =3D -EBADFD;
-> > +			break;
-> > +		}
-> > +
-> > +		if (!hdev->get_data_path_id) {
-> > +			err =3D -EOPNOTSUPP;
-> > +			break;
-> > +		}
+> > why are these two independent callbacks? I seem to remember saying
+> > that it looks like we only need one.
 >=20
-> so I did say that this needs to be put behind an experimental feature set=
-ting.
-> I am not committing to an userspace API until we have more feedback.
+> get_data_path_id,  gets called during getsockopt(BT_CODEC,...) when
+> populating codec details to user space.
+>=20
+> get_codec_config_data, gets called during setsockopt(BT_CODEC,...)
+>=20
+Not sure if I was clear here. The two callbacks serves different purpose. g=
+et_data_path_id gets called during getsockopt(BT_CODEC,...) and fetches dat=
+a_path_path_id.
+get_codec_config_data gets called during setsockopt(BT_CODEC,...) to fetch =
+the vendor specific codec data. This is data is used to configure the codec=
+ before opening SCO connection. This data is passed on to controller via HC=
+I_CONFIGURE_DATA_PATH command.=20
+> >
+> > Regards
+> >
+> > Marcel
+>=20
+> Regards,
+> Kiran
+>=20
 
-Ack.
->=20
-> Regards
->=20
-> Marcel
-
-Regards,
+Thanks,
 Kiran
 
 
