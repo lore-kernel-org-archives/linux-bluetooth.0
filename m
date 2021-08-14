@@ -7,80 +7,84 @@ X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C07FEC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:32:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2099CC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:33:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9AD9A60EFE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:32:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA3FE60EFE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 14 Aug 2021 06:33:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236964AbhHNGdY (ORCPT
+        id S237003AbhHNGeU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 14 Aug 2021 02:33:24 -0400
-Received: from mga05.intel.com ([192.55.52.43]:27004 "EHLO mga05.intel.com"
+        Sat, 14 Aug 2021 02:34:20 -0400
+Received: from mga11.intel.com ([192.55.52.93]:25604 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232021AbhHNGdX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 14 Aug 2021 02:33:23 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="301250545"
+        id S232021AbhHNGeT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 14 Aug 2021 02:34:19 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10075"; a="212548257"
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="301250545"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2021 23:32:55 -0700
+   d="scan'208";a="212548257"
+Received: from fmsmga003.fm.intel.com ([10.253.24.29])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Aug 2021 23:33:51 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,321,1620716400"; 
-   d="scan'208";a="674750071"
-Received: from fmsmsx605.amr.corp.intel.com ([10.18.126.85])
-  by fmsmga006.fm.intel.com with ESMTP; 13 Aug 2021 23:32:55 -0700
-Received: from fmsmsx604.amr.corp.intel.com (10.18.126.84) by
- fmsmsx605.amr.corp.intel.com (10.18.126.85) with Microsoft SMTP Server
+   d="scan'208";a="518476095"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by FMSMGA003.fm.intel.com with ESMTP; 13 Aug 2021 23:33:50 -0700
+Received: from orsmsx609.amr.corp.intel.com (10.22.229.22) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.4; Fri, 13 Aug 2021 23:32:55 -0700
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx604.amr.corp.intel.com (10.18.126.84) with Microsoft SMTP Server
+ 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
+Received: from orsmsx608.amr.corp.intel.com (10.22.229.21) by
+ ORSMSX609.amr.corp.intel.com (10.22.229.22) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.10 via Frontend Transport; Fri, 13 Aug 2021 23:32:54 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.108)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx608.amr.corp.intel.com (10.22.229.21) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2242.10 via Frontend Transport; Fri, 13 Aug 2021 23:33:49 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.10; Fri, 13 Aug 2021 23:32:54 -0700
+ 15.1.2242.10; Fri, 13 Aug 2021 23:33:49 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EcaAsEDUJgy4WIk2Qy7F0DuDBSprIO8UaexBT1+vIEaJMzXF4+ws/vp9Dl6U0Atv8RpX6afnNjZMnpV0E+4lis63r4+5UcEu8kjPLP3F494IZSKgSdb5DeT11d3QHRWmSTyEY4YIdXSUxt/GP3Br3Rnl4yeOqejdWgDcZtZj89xSymMl31nVT+AY4MF5GLqz86Rz5UyMozR+AAt/GklWP8Lp/CLFdevN5U4sHDqBmeCGLumyTU47FaiWat3Qx7O6Dm2w/2qPFIhOKPhV0jZeHIdoEcKruVx8VFC6MFGua3KEvTHlHqo1joi9tcPiPHecDCmX43ILMwoIkKhg8z6a6w==
+ b=fPmXmHbl8M11Y7QonB71zaOfdgw2Bdbf4jz4aiuItvfcghqGZbW1Fi1K981SO42DaPjVxp1tLGVnWcCzTAavRG95Dy7JN557hL5xneEcx3TN+H3ureZT58guBoD78bsXRDSII2tfPUom+dFq4KDSf2q7ZQjJtYyP0WXdS97OeG2vbV8wOp37ah6a3dac97mDpqw/Jjp4WIo8SXhAnKg94wSD7GDrNhBIKeu9MJ8vOBlMsOQjiQb/KdXTkylFuXvqKVG3Xn8ZVuVh72n9qOoO+6zxAiFuxIC3XZuyGQHUtVzyQHSem9XXzGbptildrtjyoRxSuEOr0hvDqcZgsrJ2Wg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9coxitoFb71ghuE9wyYhgFy92ysiXbl7ZphC4vEJ4p0=;
- b=KDxrVjNnqz6b2b4ir78g2q+tQ+eU+I6sPHNj+XW0rAOUM+qY1HyF2JWEQ5lr+nfiasBkdfCcVtFc+5rJ/m1jMDxIFyI6Ho+ov71rxlHENCXBekdJcu6L9L2SclwWh81nx4NM+kozVO7ngr4VvWNJTpRX5I0GT9IwvxlzfImQvLk1CZ7ojQAdQs288Pzufto+OaDA7x6i/QMruqpenOOwM/gTfBUQJ8IWj0Ev7lT/uDoT+V2lVFh0esn8tR6QvfwUjvQq19vGlJdbiBNl+ZmnfTA4cQhrmFdcW0n7SVQyMzOF4lritjUxNDTUNFeVoCIZMTQMV2cefZtOAztOV0832g==
+ bh=FKcN1qoWaaaWyircvypFWvw7PK2OhjLyPCdYeSEPrcg=;
+ b=gmjfJ39gjp63fBtJuCLnP5pnZboirpPnamaFVKtsop3F/pr1rOirVfdyC8zlgu2czTODd4IfzZ8cY24QLdxU+S8UStCt1y4po/0PfJj2wwmvHQeLCEaQnX2IdYSPPuvLjDTIRKFhAuFLwjE+g1DbsGrIcBu9kJKnYPC3TP5CLppoLk/ng0VP68uxjzaLbPA2O6e8o6pZdNyY0NnsUbgecyo5TXEssFieWdXq93g0GebKpCJkLhin3NZuGE6jOCQi6U2/YYEKzLRGo1F8Ucou6JFZ5pLMIeN0eX5g+5lblBgyuNNgFLlocFdWsvYnO3xqTHnAMHkLpGmSaiODshO2tg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
  s=selector2-intel-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9coxitoFb71ghuE9wyYhgFy92ysiXbl7ZphC4vEJ4p0=;
- b=pcIuoyxbfR4hbnc4Nx9FFeIyjU7f8/u8cYEXFoby5SY0VlSq8AeI5wMaTJr3Z+ydP32vB9yByOghE5fJ7EKicfxYYZeW+R+Gt5kjP1DyRy/qmBjXiZt13EJ4wy3kEMbvZi5zN1Ri8EpqQDNQkJCp0upWr8svEDcgVQyv7qlI1uE=
+ bh=FKcN1qoWaaaWyircvypFWvw7PK2OhjLyPCdYeSEPrcg=;
+ b=oACAMaAAeIbjt6X5k6h02CbaH5s3U5YiJAeKL6z+Jg5VZuFxrmrEy5FcqpmQcVDS30IxicNlENlsnU3o2U1BNHNcXsLrTmiB7oUD5FLdnpQK1oObJ5E71s9AIg27xj6V3RxhkJGj8e21lDURoJx4IQ6Wu0RqENRYoW26fOTuv+M=
 Received: from DM8PR11MB5573.namprd11.prod.outlook.com (2603:10b6:8:3b::7) by
  DM8PR11MB5639.namprd11.prod.outlook.com (2603:10b6:8:24::15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.4415.16; Sat, 14 Aug 2021 06:32:51 +0000
+ 15.20.4415.16; Sat, 14 Aug 2021 06:33:48 +0000
 Received: from DM8PR11MB5573.namprd11.prod.outlook.com
  ([fe80::c134:db0a:48b:a88c]) by DM8PR11MB5573.namprd11.prod.outlook.com
  ([fe80::c134:db0a:48b:a88c%3]) with mapi id 15.20.4415.021; Sat, 14 Aug 2021
- 06:32:51 +0000
+ 06:33:48 +0000
 From:   "K, Kiran" <kiran.k@intel.com>
 To:     Marcel Holtmann <marcel@holtmann.org>
 CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
         "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>
-Subject: RE: [PATCH v11 03/10] Bluetooth: btintel: Read supported offload
- usecases
-Thread-Topic: [PATCH v11 03/10] Bluetooth: btintel: Read supported offload
- usecases
-Thread-Index: AQHXgsNvVVWd71xaO0iF+CDavTVlMatbk7IAgBcS5UA=
-Date:   Sat, 14 Aug 2021 06:32:50 +0000
-Message-ID: <DM8PR11MB5573F9B6EDDBB7999D1860E4F5FB9@DM8PR11MB5573.namprd11.prod.outlook.com>
+Subject: RE: [PATCH v11 04/10] Bluetooth: Allow querying of supported offload
+ codecs over SCO socket
+Thread-Topic: [PATCH v11 04/10] Bluetooth: Allow querying of supported offload
+ codecs over SCO socket
+Thread-Index: AQHXgsNuP4nas++zU0OUeCZXf+Zos6tblNcAgBcSJ1A=
+Date:   Sat, 14 Aug 2021 06:33:48 +0000
+Message-ID: <DM8PR11MB55730E581A04C278B111B7E6F5FB9@DM8PR11MB5573.namprd11.prod.outlook.com>
 References: <20210727084713.23038-1-kiran.k@intel.com>
- <20210727084713.23038-3-kiran.k@intel.com>
- <3710CF06-1420-4C39-ADD1-FA39E4909FA9@holtmann.org>
-In-Reply-To: <3710CF06-1420-4C39-ADD1-FA39E4909FA9@holtmann.org>
+ <20210727084713.23038-4-kiran.k@intel.com>
+ <DF716A96-0774-4CD2-B2B9-95D41F1B0842@holtmann.org>
+In-Reply-To: <DF716A96-0774-4CD2-B2B9-95D41F1B0842@holtmann.org>
 Accept-Language: en-US
 Content-Language: en-US
 X-MS-Has-Attach: 
@@ -91,52 +95,52 @@ dlp-product: dlpe-windows
 authentication-results: holtmann.org; dkim=none (message not signed)
  header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
 x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 8ac948da-b859-4ac3-4618-08d95eed5714
+x-ms-office365-filtering-correlation-id: 79f3215d-c13b-4160-b4dc-08d95eed792a
 x-ms-traffictypediagnostic: DM8PR11MB5639:
 x-ms-exchange-transport-forked: True
-x-microsoft-antispam-prvs: <DM8PR11MB5639C3CE13283868E9D6B036F5FB9@DM8PR11MB5639.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:7219;
+x-microsoft-antispam-prvs: <DM8PR11MB5639E6F170ED9FB587AED77EF5FB9@DM8PR11MB5639.namprd11.prod.outlook.com>
+x-ms-oob-tlc-oobclassifiers: OLM:6790;
 x-ms-exchange-senderadcheck: 1
 x-ms-exchange-antispam-relay: 0
 x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: /N5Ry3EWIE7dbc4nZrKyzBjGg2Nell6HQxF0nGN3yzfVItsaOps4C/7GbHDPcmyj2IMHNt4txOZbC6kvLdXLzp3GCQUUOvnpEJTyJSPzwlCoX2UelQ5Q4TYG98ULre3ktkTZjS1rPZ5VtYbIF0+u/LH5qU++B9ZBfvGsLs7TEVRlzvyNt4rUOsgjhDgKio2q8NT9pKlsxJcjYtbiwyivBoNp0/KxrMrffkPHUxJHnNJEB0SrfpO5GS8ckhUSs4d4X/dJV9i03sdy4YxsEFmzar0NG+Y1YE+0pW3lcMvJmFDsh1SqI4I33Ce80rUHb2pnv1tRTb1sS3lvDtb/pf+7V1ijD0VvEnPiM2JDmUPT8InKnACPJgvjBfeHM8JTKAbxvr5o3S6NOQKiFk9nfU+U5FgfwxuQCS+TZaAv3/mLp7NDV8qDINJC2n3OK11X5a+Wic2kPoVQci/OWZDcahsT+gYGwlxX3BX+0dGEBISRfbjGKN6RIb6hiy74YF9KUAwVAsPUNEEsarte3EKXim5jQQN8X+pnZTWNVPCNkUztIEwvVW3Y+Lq771FvEz5yCuUwIL9jNVt6YUNqLxAvbYVP4PKg8W/0sgWFSMeJwWs0syyM/++mVSoz5NP4Ywdcqn2XyXzb5HOt8V2IqJNPeo54QqJhk6geb4pzoEGhkJkpDXDhhTV54GPDzFd56WFXCROmLOfilFozJ3htHTVkW5QS8A==
+x-microsoft-antispam-message-info: fVi0PPwestbAvZNfJrx6aRKmJHdqACIGlSuV+eG/iOvbLJy7+PeYZw4K13vqlrUtr3SfQ56/gX0m2wPzroT6t/QZFdK9OkmvaFSpNW0+HxfgliEM26lJHBOKhIXeZXZB7nuUtv506Tynzhtohtdteh/wse5G2RryYqjyXEaG3Gg9/eQTiuW+UgCxTv84YD+TPE3VMJPkgDvtP4siRm/iy2oHUu3lhzoDAazVnGQ2Blo9jmd1VmlrPEGp5AlGlCf7eBjKwJjoaBUQeYnzZHh/doImsuYr13QFmI8yaYtt1jqFLOnQcaJR8+Azhot0UH5wNp8UTVlB6u6I2KmyRjY2zHpquChSfxcCjjlw62S5EgI4DIJsIgr5VwjzpA94s+vpGiJUVBBWz/ooVs7koAojl+D97/EpiRtz5QzdZ8dx6s+/RK0XFr/5lcd7/ukW9jlUWpBVFQBYTLTh9YOnwmnzhWzPVZfcDwTdlZ+lnsqC3fAtkWXkfxRIkP7tEwihHyUmhrCutqGkgDyT7Q/CIeffdgkuQSkGwHZUMPzzB5sXNyX36Dw7F8Ir2EHiejXTPY/VAl65SdQmsgkMTqnihlJndGPjP4Zw+LNcDD0fXTpfzUiNPi4n09pdRiSF+Z+s+bjvNggK7oSNvwxiOqa8dtQb1u64WnFotx0aXU2DB17OzDv2CiehcpVLxkRTMq09SaCjGNgTPuhkxzzRIYX8qFidzA==
 x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM8PR11MB5573.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(136003)(396003)(346002)(39860400002)(376002)(71200400001)(33656002)(478600001)(38070700005)(54906003)(7696005)(26005)(6506007)(53546011)(4326008)(5660300002)(107886003)(6916009)(8676002)(9686003)(66946007)(55016002)(76116006)(316002)(38100700002)(86362001)(66446008)(83380400001)(2906002)(64756008)(66476007)(52536014)(122000001)(66556008)(186003)(8936002);DIR:OUT;SFP:1102;
 x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?bLqG7O9jyEZv9HUwYT8fETFWjSPqZTG81kIBYjLLrEGNw9ERGCLuHHE6YghZ?=
- =?us-ascii?Q?uPj5hczl7ZBG4MMmub8Ij/pEWe6Xxs54ZLqzR1hRV3mLgqj2R+KsfjQpOwYX?=
- =?us-ascii?Q?C1oiRI3pwCHXrkPBBAw2shggD551btbXQ1Xj4LpqczvF8qHs7vy/HrStFijc?=
- =?us-ascii?Q?87MoU4FXOIEIp/TOACll0IraFR2f1nuB9VVU1n4EvptpyxKTfLVZix8YpJsg?=
- =?us-ascii?Q?UoM8XCX7pDxDOvrcHkrHp/K7bHV6/eSjxNrtR1DSHFkSeQYRgjl2IJUMsvWe?=
- =?us-ascii?Q?9T6Kv819999box1nM0NddXYXNxwsK3Xo8LZOL9KfkITuIjYMzDODduHKH7ZN?=
- =?us-ascii?Q?gPP0UoC9Cj3SLFuY7YG/zacB7WmReayF9JGEfHqijqZGZqC1ntOsbuVAGE1J?=
- =?us-ascii?Q?AtFq76ROFPUaUCTIaLBUyg2FCQ73SZNzS9XJ6L0aFC1K/6AbKcQWn77bVwFR?=
- =?us-ascii?Q?aEC8uLbFxrpG8QNUDr++d8JWIIYUUzlCDXjnOa5u4gbLT2fPCqjvXQtrxRnb?=
- =?us-ascii?Q?reJaaGQE6i5mPYyIl4bLPVz2YcY9wfFOGnL5l2ddwPjzf1dliuLFL/AyJ/D1?=
- =?us-ascii?Q?WnLoWAQ39+ooMuD/jwOdvVFSSRC1NE9uflgFxCHoZLj8WsWoA06/gk+9P48l?=
- =?us-ascii?Q?aqh6d3mxIDVM+0IsnIl9JahTn+vBHxpQl0sRFESHoVQpyy+FpxRMTC7pu5jv?=
- =?us-ascii?Q?7HoaYc1h+IZR2Y2VV76CVPftWJFtSZ7/8iYV25bY25icJV1SWAVG3vHnsaqo?=
- =?us-ascii?Q?swlL96srZ5RGIOoBL85AMwvdF+/j2GcJZuEOgCTPYFLur33Mc74rgrdJkwHi?=
- =?us-ascii?Q?RShz7ftodJ3uwTwZf6q3L+6e2lAT+RXsJC60AUZ6eiDu0C+7KhaPX3c+geYh?=
- =?us-ascii?Q?zTtK4Wq8XR+tE0K281WTnSPWbwSrxDqi/wyW3b/Pfp97FPEPV2GRRv9FF0Fp?=
- =?us-ascii?Q?xBc0DAEWZTr1qj8YjG6YnvIjFjhET0n29Xk4KEysxk7m5LqQ/+oW01HFEqRt?=
- =?us-ascii?Q?v58CaUKOztLLf6FETQ8HiRxhqd6c0UT/YFXlcMSAJN0iCFFHAEk05uhywMbQ?=
- =?us-ascii?Q?42J11T8NQMCJIoRjrKeNBVOdnuhtJW5XbH4BlBaPDrqucnvkVRPNRN/FM8g0?=
- =?us-ascii?Q?q08ZgFdI2LpUf89A0Czm2jzcjb4z5XJUHJm4Rwr7EPHYuSJJI29HMjwXkMQr?=
- =?us-ascii?Q?Jp+dNO7T+Gs76Yx2K4m5QxMsMcQ6GXauuCxoHW1AEQD/QTSbP63ROM89M8E5?=
- =?us-ascii?Q?li0HHWFY7Ar+L56RC8LrR2Wdm+mh6WNHFGxChpb/3VyWs4odqgPAd9qHtiFi?=
- =?us-ascii?Q?GzVvFhBFhl9YwzooXXhI4q/z?=
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AMCER3T272GI6zaHq6HosCgtwPmNOkbxLtE6Blt/y5yTvQAPLISHM+t5fQI/?=
+ =?us-ascii?Q?tWtvMrjvLBZDf5mPv9swKpdm1g3ZNgolHQWVEIf6vHWVehv1JADXGJiAYORo?=
+ =?us-ascii?Q?+3AfUEtZlzw5+c5f58FQbg7nOvkHT4mL8j02bWwUd7liRYtV+NNcG2iaIVzX?=
+ =?us-ascii?Q?XiQZasUg6PBasfO1V3T2X11C/gAmfZ6wW/ZkoH3+7XRwpaYAuPpgRWPwhlY5?=
+ =?us-ascii?Q?uUUAHQxnPYy+/Ev3u4XUX46TT6WyblhFlGOA23Illn8ZLy4WNnYAFbLvoB2D?=
+ =?us-ascii?Q?bVbpVmXN4GSUySFUHzCP1lcZWaXyiCv2NVOCysuT1Fy1IklqiP/lPo7rwlEh?=
+ =?us-ascii?Q?jHyilO1QAZsa6Srr+BTXtlzWAphRbmv4hf3XjGXmXIUtV60d32NmB8XES16k?=
+ =?us-ascii?Q?1H4PjyS+H3ZFWTA5nQgmed5TjRQE8YQdLdB+0JWuaQyxC5LdsbKSUXPr+2fV?=
+ =?us-ascii?Q?0rASdUJZVqkserz5e6MlTEpdaJ+oa8u4LUZ+HJDEyiRUii7KrgtMzcklieY3?=
+ =?us-ascii?Q?9rg6XjWOOt1TQbO9jfjB9E5oQTVq9DNxUGKRLlH7AqHfftd3crFWpEBDeH4u?=
+ =?us-ascii?Q?Sxb6Qs8c4yf6UhY5TsL9fsw6b5nRUBIm+OYW60ppU4YvLuIMj6Fg5mc44sUO?=
+ =?us-ascii?Q?hLPhk+WomhIpU8lZqy7qtCM31lz43AvjReQzZjK6A3rp9yfaUqgpznni6cne?=
+ =?us-ascii?Q?LNnIZ0HffLc+5tbkWESYkiNHLoGGtExwSwxKQQj17EOvqv/LJlJUaGyLS2b1?=
+ =?us-ascii?Q?ZiS+DBxjp5U70nT6VCxHrWxFxFnD9iNhdjO1EZrk/38gsf+AdaZx/It+LC20?=
+ =?us-ascii?Q?+4feOC5w0g5aYK9LklpRm1+qHEAbJGzv3v5LZjDW4sH0JHkCmS3sO4gFiZNi?=
+ =?us-ascii?Q?7AGNxGW9BKOTH46uZGkP9TscpajZBlV46ya95ATSZuAEDfC+SODgdPGxENxh?=
+ =?us-ascii?Q?y8F8gZCtkuG8H3hH3ShLB9l1MANxzQ9gbCVeLFTJkTtX/erNVaC3L/iECxVW?=
+ =?us-ascii?Q?EZR8CgEVN0Wt6G9kGBnfaU7RdAguPvIOuoKGg8Hap73Rk6vdUQp3rNQHrQxt?=
+ =?us-ascii?Q?wODpBLl4P8SKsniYmXDr9lLuuRhbJlxtDyxp/hgU1Dz7QzgYRZ4FjiaoBs91?=
+ =?us-ascii?Q?A+Oq082ENiNDRWc8uo17d0V+D4LkrBmlc8RXmgUX62RCodUn2MKOmrKTuJ57?=
+ =?us-ascii?Q?3lUzZyieUp6Z7CbchRbnGhPkFlpoww4vvlGB9yYrIWMN0qYegDZ1CBfW8UNS?=
+ =?us-ascii?Q?UjnIdpiXP+4Gv5T6ZSQTcDWRI5zSFmpc6PfUas5XhJzKkAQvruhLFKYp7sZ8?=
+ =?us-ascii?Q?QziZkTF0kR7hrVFJPe0iw8ci?=
 Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
 X-MS-Exchange-CrossTenant-AuthAs: Internal
 X-MS-Exchange-CrossTenant-AuthSource: DM8PR11MB5573.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8ac948da-b859-4ac3-4618-08d95eed5714
-X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2021 06:32:50.9597
+X-MS-Exchange-CrossTenant-Network-Message-Id: 79f3215d-c13b-4160-b4dc-08d95eed792a
+X-MS-Exchange-CrossTenant-originalarrivaltime: 14 Aug 2021 06:33:48.2100
  (UTC)
 X-MS-Exchange-CrossTenant-fromentityheader: Hosted
 X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: tbgVQhtBNzGs3yS7HYs3PMa5TEHMBDx49SofIs0KrGd+9vw3OCeN1tVEZ3EywrJXcBZ+AvWAjIuRaKDvtMnYAg==
+X-MS-Exchange-CrossTenant-userprincipalname: p8gnOZFpWr5IzSD5tl+tv7C9Rb6BynOVgaf205COOr3tGaskioBRDP6McnMrCbMCrbl+wTibWp8vNShYpzYa5A==
 X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5639
 X-OriginatorOrg: intel.com
 Precedence: bulk
@@ -147,17 +151,18 @@ Hi Marcel,
 
 > -----Original Message-----
 > From: Marcel Holtmann <marcel@holtmann.org>
-> Sent: Friday, July 30, 2021 7:40 PM
+> Sent: Friday, July 30, 2021 7:44 PM
 > To: K, Kiran <kiran.k@intel.com>
 > Cc: linux-bluetooth@vger.kernel.org; Srivatsa, Ravishankar
 > <ravishankar.srivatsa@intel.com>; Tumkur Narayan, Chethan
 > <chethan.tumkur.narayan@intel.com>
-> Subject: Re: [PATCH v11 03/10] Bluetooth: btintel: Read supported offload
-> usecases
+> Subject: Re: [PATCH v11 04/10] Bluetooth: Allow querying of supported
+> offload codecs over SCO socket
 >=20
 > Hi Kiran,
 >=20
-> > Read offload usecases supported by controller.
+> > Add BT_CODEC option for getsockopt systemcall to get the details of
+> > offload codecs supported over SCO socket
 > >
 > > Signed-off-by: Kiran K <kiran.k@intel.com>
 > > Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
@@ -166,87 +171,120 @@ Hi Marcel,
 > > * changes in v11:
 > >  - Remove Kconfig related changes
 > > * changes in v10:
-> >  - restructure patch to have  definition and call of callaback in the
-> >    same patch
-> > * changes in v9:
-> >  - define a separate patch for core changes
+> >  - In getsockopt, prepare data in advance and call copy_to_user
+> >    istead of calling put_user on each field of struct bt_codec
 > >
-> > drivers/bluetooth/btintel.c | 30 ++++++++++++++++++++++++++++++
-> > drivers/bluetooth/btintel.h | 10 ++++++++++
-> > drivers/bluetooth/btusb.c   |  3 +++
-> > 3 files changed, 43 insertions(+)
+> > include/net/bluetooth/bluetooth.h | 20 +++++++
+> > include/net/bluetooth/hci.h       |  4 ++
+> > include/net/bluetooth/hci_core.h  |  1 +
+> > net/bluetooth/sco.c               | 91 +++++++++++++++++++++++++++++++
+> > 4 files changed, 116 insertions(+)
 > >
-> > diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> > index e44b6993cf91..a6b81914766e 100644
-> > --- a/drivers/bluetooth/btintel.c
-> > +++ b/drivers/bluetooth/btintel.c
-> > @@ -1272,6 +1272,36 @@ int btintel_set_debug_features(struct hci_dev
-> > *hdev, } EXPORT_SYMBOL_GPL(btintel_set_debug_features);
+> > diff --git a/include/net/bluetooth/bluetooth.h
+> > b/include/net/bluetooth/bluetooth.h
+> > index 9125effbf448..64cddff0c9c4 100644
+> > --- a/include/net/bluetooth/bluetooth.h
+> > +++ b/include/net/bluetooth/bluetooth.h
+> > @@ -153,6 +153,26 @@ struct bt_voice {
 > >
-> > +int btintel_configure_offload_usecases(struct hci_dev *hdev) {
-> > +	struct sk_buff *skb;
-> > +	int err =3D 0;
-> > +	struct intel_offload_usecases *usecases;
-> > +
-> > +	skb =3D __hci_cmd_sync(hdev, 0xfc86, 0, NULL, HCI_INIT_TIMEOUT);
-> > +	if (IS_ERR(skb)) {
-> > +		bt_dev_err(hdev, "Reading offload usecases failed (%ld)",
-> > +			   PTR_ERR(skb));
-> > +		return PTR_ERR(skb);
-> > +	}
-> > +
-> > +	if (skb->len < sizeof(*usecases)) {
-> > +		err =3D -EIO;
-> > +		goto error;
-> > +	}
-> > +
-> > +	usecases =3D (void *)skb->data;
-> > +
-> > +	if (usecases->status) {
-> > +		err =3D -bt_to_errno(skb->data[0]);
-> > +		goto error;
-> > +	}
-> > +error:
-> > +	kfree_skb(skb);
-> > +	return err;
-> > +}
-> > +EXPORT_SYMBOL_GPL(btintel_configure_offload_usecases);
-> > +
-> > MODULE_AUTHOR("Marcel Holtmann <marcel@holtmann.org>");
-> > MODULE_DESCRIPTION("Bluetooth support for Intel devices ver "
-> > VERSION); MODULE_VERSION(VERSION); diff --git
-> > a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h index
-> > d184064a5e7c..45ca5c4ccf37 100644
-> > --- a/drivers/bluetooth/btintel.h
-> > +++ b/drivers/bluetooth/btintel.h
-> > @@ -132,6 +132,11 @@ struct intel_debug_features {
-> > 	__u8    page1[16];
-> > } __packed;
+> > #define BT_SCM_PKT_STATUS	0x03
 > >
-> > +struct intel_offload_usecases {
-> > +	__u8	status;
-> > +	__u8	preset[8];
+> > +#define BT_CODEC	19
+> > +
+> > +struct	bt_codec_caps {
+> > +	__u8	len;
+> > +	__u8	data[];
 > > +} __packed;
 > > +
-> > #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) &
-> 0x0000ff00) >> 8))
-> > #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) &
-> 0x003f0000) >> 16))
-> > #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
-> > @@ -175,6 +180,7 @@ int btintel_read_debug_features(struct hci_dev
-> *hdev,
-> > 				struct intel_debug_features *features); int
-> > btintel_set_debug_features(struct hci_dev *hdev,
-> > 			       const struct intel_debug_features *features);
-> > +int btintel_configure_offload_usecases(struct hci_dev *hdev);
+> > +struct bt_codec {
+> > +	__u8	id;
+> > +	__u16	cid;
+> > +	__u16	vid;
+> > +	__u8	data_path;
+> > +	__u8	num_caps;
+> > +} __packed;
+> > +
+> > +struct bt_codecs {
+> > +	__u8		num_codecs;
+> > +	struct bt_codec	codecs[];
+> > +} __packed;
+> > +
+> > __printf(1, 2)
+> > void bt_info(const char *fmt, ...);
+> > __printf(1, 2)
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index b4e35cf5f4b1..22e872e60ff8 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -2621,6 +2621,10 @@ static inline struct hci_sco_hdr
+> *hci_sco_hdr(const struct sk_buff *skb)
+> > #define hci_iso_data_len(h)		((h) & 0x3fff)
+> > #define hci_iso_data_flags(h)		((h) >> 14)
+> >
+> > +/* codec transport types */
+> > +#define TRANSPORT_ACL		0x00
+> > +#define TRANSPORT_SCO_ESCO	0x01
+> > +
+> > /* le24 support */
+> > static inline void hci_cpu_to_le24(__u32 val, __u8 dst[3]) { diff
+> > --git a/include/net/bluetooth/hci_core.h
+> > b/include/net/bluetooth/hci_core.h
+> > index 6742e6ad7b37..71c409c8ab34 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -617,6 +617,7 @@ struct hci_dev {
+> > 	int (*set_bdaddr)(struct hci_dev *hdev, const bdaddr_t *bdaddr);
+> > 	void (*cmd_timeout)(struct hci_dev *hdev);
+> > 	bool (*prevent_wake)(struct hci_dev *hdev);
+> > +	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
+> > };
+> >
+> > #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+> > diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c index
+> > ffa2a77a3e4c..2f32693f09c1 100644
+> > --- a/net/bluetooth/sco.c
+> > +++ b/net/bluetooth/sco.c
+> > @@ -953,6 +953,12 @@ static int sco_sock_getsockopt(struct socket *sock=
+,
+> int level, int optname,
+> > 	struct bt_voice voice;
+> > 	u32 phys;
+> > 	int pkt_status;
+> > +	int buf_len;
+> > +	struct codec_list *c;
+> > +	u8 num_codecs, i, __user *ptr;
+> > +	struct hci_dev *hdev;
+> > +	struct hci_codec_caps *caps;
+> > +	struct bt_codec codec;
+> >
+> > 	BT_DBG("sk %p", sk);
+> >
+> > @@ -1017,6 +1023,91 @@ static int sco_sock_getsockopt(struct socket
+> *sock, int level, int optname,
+> > 			err =3D -EFAULT;
+> > 		break;
+> >
+> > +	case BT_CODEC:
+> > +		num_codecs =3D 0;
+> > +		buf_len =3D 0;
+> > +
+> > +		hdev =3D hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
+> BDADDR_BREDR);
+> > +		if (!hdev) {
+> > +			err =3D -EBADFD;
+> > +			break;
+> > +		}
+> > +
+> > +		if (!hdev->get_data_path_id) {
+> > +			err =3D -EOPNOTSUPP;
+> > +			break;
+> > +		}
 >=20
-> so usecases is not, it would be offload_use_cases. However
-> btintel_configure_offload is just fine as a function name. With the work =
-from
-> Tedd, this would be removed anyway and all done internally via the hdev-
-> >setup().
+> so I did say that this needs to be put behind an experimental feature set=
+ting.
+> I am not committing to an userspace API until we have more feedback.
 
-Ok. I will rebase my patches over Tedd's patches.
+Ack.
 >=20
 > Regards
 >=20
@@ -254,4 +292,5 @@ Ok. I will rebase my patches over Tedd's patches.
 
 Regards,
 Kiran
+
 
