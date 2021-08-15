@@ -2,78 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-14.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F3FB2C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 05:28:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 66106C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 08:50:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CD48B61038
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 05:28:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 406F760F4B
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 08:50:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229515AbhHOF3Q (ORCPT
+        id S231295AbhHOIvZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 15 Aug 2021 01:29:16 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47670 "EHLO mail.kernel.org"
+        Sun, 15 Aug 2021 04:51:25 -0400
+Received: from m12-14.163.com ([220.181.12.14]:35986 "EHLO m12-14.163.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229452AbhHOF3P (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 15 Aug 2021 01:29:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 229F4610CC
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Aug 2021 05:28:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629005326;
-        bh=PSJkQc1wwtdOKX7I3N8ssFa6TDwLukNMHxQADoHLMtg=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=a+c2HZb6A9waIJw/zuobllec790vHJwpsUZCSi/wWSHko89iXuasg5dZzCmbdOlO6
-         Ix2hPUk6L4Z3Q12XwYJpB3AgS7O87/EduIbgE1ZaI5JaCA8ayRSwoGhQ5w1TpYEiDz
-         PLyM4Ksx6SkxetUM+C0LhYJgXxmfGfYywe+dZt6+BHuzQQEhryzW4g8k3L5+w1jPAd
-         LwEzxcL8JF2JY0o0ym5o+V8XtzZ0DACGVnIjSaPJVIW39KatavLc9As/axohlCTb1L
-         g7WBoAzPO6ZQubDdvCvRGC+mLSYgwR23/CorarCGSVR72UWR+TXLeqTDfy7j2AAuNk
-         SweKMbOu2SYWA==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Sun, 15 Aug 2021 05:28:42 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: swyterzone@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-P7hvDafxuR@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S231194AbhHOIvY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 15 Aug 2021 04:51:24 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+        s=s110527; h=Date:From:Subject:Message-ID:MIME-Version; bh=s8BvO
+        7mfziwRyqqviF5rlMh9BJ3vGogmNF2i7VoPN+4=; b=Jo1I7CVqC0i6Bqd6JEZa2
+        W7VDvUwNp1Fe6jMZa4VwsPFooPH2SyFTfHSvx24T2bMem4U6y14V/oKzoCpilWuc
+        tCULBvnQnrnNcT3kK5625V4gnNLkWzqEbU6QEYMk3AHWGWObIVo697K52iBoT60n
+        QXGbtWYMzln9NZBNOrOFRo=
+Received: from nilus-desk (unknown [120.229.1.29])
+        by smtp10 (Coremail) with SMTP id DsCowAD31d5k1RhhCZeZCA--.31068S3;
+        Sun, 15 Aug 2021 16:50:45 +0800 (CST)
+Date:   Sun, 15 Aug 2021 16:50:44 +0800
+From:   Nil Yi <teroincn@163.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH] net: bluetooth: delete the redundant refcnt increment
+Message-ID: <20210815085044.GA70199@nilus-desk>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-CM-TRANSID: DsCowAD31d5k1RhhCZeZCA--.31068S3
+X-Coremail-Antispam: 1Uf129KBjvdXoW7XrWxuw1ktFWkuFWDGFWUtwb_yoWxZFX_Ww
+        18Za1xuw15G3yFy3y3AF48urW8ta95XF1kJrsaqrWUXa4vgr4UKr1IgFnxJFn2gw4kCFy3
+        ArykGas7Jr1xKjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUvcSsGvfC2KfnxnUUI43ZEXa7IU0HSoJUUUUU==
+X-Originating-IP: [120.229.1.29]
+X-CM-SenderInfo: 5whu0xxqfqqiywtou0bp/1tbiSgbvElPAPaDsbgAAs9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+As the chan's refcnt is increased in l2cap_chan_create,
+no need to increase it again for l2cap_pi(sk)->chan.
 
---- Comment #196 from Swyter (swyterzone@gmail.com) ---
-The 'Read Local Version Information' packet should show up when you unplug =
-and
-re-plug the dongle, it's one of the first HCI packets that get transmitted
-during initialization. Even if the dongle gets stuck it should happen after
-asking that.
+Signed-off-by: Nil Yi <teroincn@163.com>
+---
+ net/bluetooth/l2cap_sock.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
+index c99d65ef1..4804c311d 100644
+--- a/net/bluetooth/l2cap_sock.c
++++ b/net/bluetooth/l2cap_sock.c
+@@ -1831,8 +1831,7 @@ static struct sock *l2cap_sock_alloc(struct net *net, struct socket *sock,
+ 		return NULL;
+ 	}
+ 
+-	l2cap_chan_hold(chan);
+-
++	/* chan's refcnt is held in l2cap_chan_create() */
+ 	l2cap_pi(sk)->chan = chan;
+ 
+ 	return sk;
+-- 
+2.17.1
 
-You are receiving this mail because:
-You are the assignee for the bug.=
