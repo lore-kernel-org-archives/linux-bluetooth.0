@@ -2,246 +2,271 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1906C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 12:17:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC70EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 16:47:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6172610FD
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 12:17:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C6480611BF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 15 Aug 2021 16:47:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238188AbhHOMSL (ORCPT
+        id S231295AbhHOQry (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 15 Aug 2021 08:18:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52822 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238364AbhHOMSG (ORCPT
+        Sun, 15 Aug 2021 12:47:54 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:47710 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229603AbhHOQrw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 15 Aug 2021 08:18:06 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C638C061292
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Aug 2021 05:17:34 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id q2so17645437plr.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Aug 2021 05:17:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=aSVr80IhjUOnJgPcnfWVdZLH2OKYCY5KF4ob71Yd0zo=;
-        b=UBWDIFYJrUt4XpKnhamAGcsDI+1zS2pbLf0COlta8MNWwkTotUeYW4wIh9f+R2OlMD
-         3k7D9b4kCyP/rq1Mq97xg70arfSShSmzaaC+cVyXvn+p/VDObF+NIkVNj/K8C0KARPix
-         jbc7D4DFz9bxdgGyIdVTzH6NTct2vpmdUnlxk=
+        Sun, 15 Aug 2021 12:47:52 -0400
+Received: by mail-il1-f200.google.com with SMTP id c7-20020a928e070000b0290222cccb8651so8255596ild.14
+        for <linux-bluetooth@vger.kernel.org>; Sun, 15 Aug 2021 09:47:22 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=aSVr80IhjUOnJgPcnfWVdZLH2OKYCY5KF4ob71Yd0zo=;
-        b=nnYVOylpBxDrt6GhbGg1PwhXa+2KvUou9AFsLp7vSXhnoqJrU2rUCOqANfGLTPC9p1
-         TSlN6l5fWCPcZosYFLTYX5TxQWTtRRSL2y7odve1QlxrlcdEqfJxxH+k/CiNHET/o5Kj
-         E5mNilePAsfM1/TXBhjQiDQ01HWvv6+7Psdrge07G8vq5aju3E3xg4uTtTYPjUeBRnLw
-         WXGcrej7Y9CkTBxKCyLB0ahLX7wH/U+DLYGSLOFgb4SzdwqCs3n36+IpQrTKsidwGnVS
-         PbP3pKqohHr29udCW9gFbSIOpMompxo6/C6duu+Gl9vODKf9Bj1IbTIe0o6+4EOILxdW
-         qFXw==
-X-Gm-Message-State: AOAM532sgshqkJYYuIfa4/aiqwLMsWTck8iOFvMnW79IxvWOFIz/kJXu
-        HKwq7t0FXiz7SrzydLyWLJZzov4B67bWgQ==
-X-Google-Smtp-Source: ABdhPJyFGsyqTLVv3xCSsYVIpj7cjw86BIjP3qynOrQ1+qoReCzsuOIV+jlB/x7juBKjgLvV0UDxfg==
-X-Received: by 2002:a17:90b:4b45:: with SMTP id mi5mr1647365pjb.43.1629029853403;
-        Sun, 15 Aug 2021 05:17:33 -0700 (PDT)
-Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:9cee:5877:e805:fe2b])
-        by smtp.gmail.com with ESMTPSA id v20sm9773170pgi.39.2021.08.15.05.17.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 15 Aug 2021 05:17:33 -0700 (PDT)
-From:   Joseph Hwang <josephsih@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
-        Joseph Hwang <josephsih@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v9 5/5] Bluetooth: set quality report callback for Intel
-Date:   Sun, 15 Aug 2021 20:17:17 +0800
-Message-Id: <20210815201611.v9.5.I50ffa4cd0b3ab11669ff2541fc719fee00b4e244@changeid>
-X-Mailer: git-send-email 2.33.0.rc1.237.g0d66db33f3-goog
-In-Reply-To: <20210815201611.v9.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
-References: <20210815201611.v9.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=4u6e+Oil2S39cgjanzC4P/rDz71Nf/GOHI/svT7/rUo=;
+        b=TSi0r01w4PeGPom9++zKv9TtU2vX0ODqSM9V/jHTkXGkJz77auQIYmX+uRc3bVLiuO
+         ujPMlmpS/oHaBkl4oKTarAxsoaFvmLrCCdzlP/AASlHUaGfiyVaaMMFejdNT4QrpZg55
+         N9g5V504rU7M85KH9fYc85yJ/2ErWagw935ANAE+KgNiHEGOpJNzgckVnsyygqomNIPA
+         qvMNOvte9QjusXlq4/pt0KAcm+leet0c02vIdwCdj9U9pLJW5Z02V0osTerFjczUZP+A
+         MCSVTvfOSKv6GfzxL4vWhHtpFbFxSsaxXlGj2ZH4TfGmJCAe57+8DyZ8un7qINMRJaxC
+         Gwxw==
+X-Gm-Message-State: AOAM5304r1Oys6nf9N+oG5/yYtrqqIg/QHZlJ9mRlXYfWEEzEQXq833n
+        9fDkVkYXu6O4c02bimsMvmIvUBngL6a5QzHPA+3tEFgmhEtc
+X-Google-Smtp-Source: ABdhPJw5fGRJ33Q1jY5VAb8XtKYUYzcBe/LYhZgRjogvz3szE/3V4wzGz9XXS1WOHwAOqW41Qc5cD2U1Cck3cj9yWuxXnoz1H6Rg
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a5e:d91a:: with SMTP id n26mr9444745iop.96.1629046042639;
+ Sun, 15 Aug 2021 09:47:22 -0700 (PDT)
+Date:   Sun, 15 Aug 2021 09:47:22 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b1c39505c99bd67c@google.com>
+Subject: [syzbot] INFO: task can't die in __lock_sock
+From:   syzbot <syzbot+7d51f807c81b190a127d@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch sets up set_quality_report callback for Intel to
-set and reset the debug features.
+Hello,
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+syzbot found the following issue on:
+
+HEAD commit:    4b358aabb93a Add linux-next specific files for 20210813
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=1603f181300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b99612666fbe2d6a
+dashboard link: https://syzkaller.appspot.com/bug?extid=7d51f807c81b190a127d
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7d51f807c81b190a127d@syzkaller.appspotmail.com
+
+INFO: task syz-executor.4:21120 can't die for more than 143 seconds.
+task:syz-executor.4  state:D stack:28448 pid:21120 ppid:  6572 flags:0x00004004
+Call Trace:
+ context_switch kernel/sched/core.c:4711 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5966
+ schedule+0xd3/0x270 kernel/sched/core.c:6045
+ __lock_sock+0x13d/0x260 net/core/sock.c:2645
+ lock_sock_nested+0xf6/0x120 net/core/sock.c:3178
+ lock_sock include/net/sock.h:1612 [inline]
+ bt_sock_wait_state+0x249/0x590 net/bluetooth/af_bluetooth.c:557
+ rfcomm_sock_connect+0x3a5/0x460 net/bluetooth/rfcomm/sock.c:416
+ __sys_connect_file+0x155/0x1a0 net/socket.c:1890
+ __sys_connect+0x161/0x190 net/socket.c:1907
+ __do_sys_connect net/socket.c:1917 [inline]
+ __se_sys_connect net/socket.c:1914 [inline]
+ __x64_sys_connect+0x6f/0xb0 net/socket.c:1914
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665e9
+RSP: 002b:00007fa7b02bf188 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665e9
+RDX: 0000000000000080 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf80
+R13: 00007fffd83567bf R14: 00007fa7b02bf300 R15: 0000000000022000
+INFO: task syz-executor.4:21120 blocked for more than 143 seconds.
+      Not tainted 5.14.0-rc5-next-20210813-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.4  state:D stack:28448 pid:21120 ppid:  6572 flags:0x00004004
+Call Trace:
+ context_switch kernel/sched/core.c:4711 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5966
+ schedule+0xd3/0x270 kernel/sched/core.c:6045
+ __lock_sock+0x13d/0x260 net/core/sock.c:2645
+ lock_sock_nested+0xf6/0x120 net/core/sock.c:3178
+ lock_sock include/net/sock.h:1612 [inline]
+ bt_sock_wait_state+0x249/0x590 net/bluetooth/af_bluetooth.c:557
+ rfcomm_sock_connect+0x3a5/0x460 net/bluetooth/rfcomm/sock.c:416
+ __sys_connect_file+0x155/0x1a0 net/socket.c:1890
+ __sys_connect+0x161/0x190 net/socket.c:1907
+ __do_sys_connect net/socket.c:1917 [inline]
+ __se_sys_connect net/socket.c:1914 [inline]
+ __x64_sys_connect+0x6f/0xb0 net/socket.c:1914
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665e9
+RSP: 002b:00007fa7b02bf188 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665e9
+RDX: 0000000000000080 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf80
+R13: 00007fffd83567bf R14: 00007fa7b02bf300 R15: 0000000000022000
+INFO: task syz-executor.4:21124 can't die for more than 143 seconds.
+task:syz-executor.4  state:D stack:29104 pid:21124 ppid:  6572 flags:0x00000004
+Call Trace:
+ context_switch kernel/sched/core.c:4711 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5966
+ schedule+0xd3/0x270 kernel/sched/core.c:6045
+ __lock_sock+0x13d/0x260 net/core/sock.c:2645
+ lock_sock_nested+0xf6/0x120 net/core/sock.c:3178
+ lock_sock include/net/sock.h:1612 [inline]
+ rfcomm_sk_state_change+0xb4/0x390 net/bluetooth/rfcomm/sock.c:73
+ __rfcomm_dlc_close+0x1b6/0x8a0 net/bluetooth/rfcomm/core.c:489
+ rfcomm_dlc_close+0x1ea/0x240 net/bluetooth/rfcomm/core.c:520
+ __rfcomm_sock_close+0xac/0x260 net/bluetooth/rfcomm/sock.c:220
+ rfcomm_sock_shutdown+0xe9/0x210 net/bluetooth/rfcomm/sock.c:931
+ __sys_shutdown_sock net/socket.c:2242 [inline]
+ __sys_shutdown_sock net/socket.c:2236 [inline]
+ __sys_shutdown+0xf1/0x1b0 net/socket.c:2254
+ __do_sys_shutdown net/socket.c:2262 [inline]
+ __se_sys_shutdown net/socket.c:2260 [inline]
+ __x64_sys_shutdown+0x50/0x70 net/socket.c:2260
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665e9
+RSP: 002b:00007fa7b029e188 EFLAGS: 00000246 ORIG_RAX: 0000000000000030
+RAX: ffffffffffffffda RBX: 000000000056c038 RCX: 00000000004665e9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c038
+R13: 00007fffd83567bf R14: 00007fa7b029e300 R15: 0000000000022000
+INFO: task syz-executor.4:21124 blocked for more than 143 seconds.
+      Not tainted 5.14.0-rc5-next-20210813-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor.4  state:D stack:29104 pid:21124 ppid:  6572 flags:0x00000004
+Call Trace:
+ context_switch kernel/sched/core.c:4711 [inline]
+ __schedule+0x93a/0x26f0 kernel/sched/core.c:5966
+ schedule+0xd3/0x270 kernel/sched/core.c:6045
+ __lock_sock+0x13d/0x260 net/core/sock.c:2645
+ lock_sock_nested+0xf6/0x120 net/core/sock.c:3178
+ lock_sock include/net/sock.h:1612 [inline]
+ rfcomm_sk_state_change+0xb4/0x390 net/bluetooth/rfcomm/sock.c:73
+ __rfcomm_dlc_close+0x1b6/0x8a0 net/bluetooth/rfcomm/core.c:489
+ rfcomm_dlc_close+0x1ea/0x240 net/bluetooth/rfcomm/core.c:520
+ __rfcomm_sock_close+0xac/0x260 net/bluetooth/rfcomm/sock.c:220
+ rfcomm_sock_shutdown+0xe9/0x210 net/bluetooth/rfcomm/sock.c:931
+ __sys_shutdown_sock net/socket.c:2242 [inline]
+ __sys_shutdown_sock net/socket.c:2236 [inline]
+ __sys_shutdown+0xf1/0x1b0 net/socket.c:2254
+ __do_sys_shutdown net/socket.c:2262 [inline]
+ __se_sys_shutdown net/socket.c:2260 [inline]
+ __x64_sys_shutdown+0x50/0x70 net/socket.c:2260
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665e9
+RSP: 002b:00007fa7b029e188 EFLAGS: 00000246 ORIG_RAX: 0000000000000030
+RAX: ffffffffffffffda RBX: 000000000056c038 RCX: 00000000004665e9
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000004
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056c038
+R13: 00007fffd83567bf R14: 00007fa7b029e300 R15: 0000000000022000
+INFO: lockdep is turned off.
+NMI backtrace for cpu 1
+CPU: 1 PID: 27 Comm: khungtaskd Not tainted 5.14.0-rc5-next-20210813-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:105
+ nmi_trigger_cpumask_backtrace+0x1ae/0x220 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:254 [inline]
+ watchdog+0xcb7/0xed0 kernel/hung_task.c:339
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 6267 Comm: in:imklog Not tainted 5.14.0-rc5-next-20210813-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:__sanitizer_cov_trace_pc+0x37/0x60 kernel/kcov.c:197
+Code: 81 e1 00 01 00 00 65 48 8b 14 25 40 f0 01 00 a9 00 01 ff 00 74 0e 85 c9 74 35 8b 82 3c 15 00 00 85 c0 74 2b 8b 82 18 15 00 00 <83> f8 02 75 20 48 8b 8a 20 15 00 00 8b 92 1c 15 00 00 48 8b 01 48
+RSP: 0018:ffffc9000c577648 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff8880775b9c80 RSI: ffffffff83f260b5 RDI: 0000000000000003
+RBP: 0000000000000000 R08: 000000000000002f R09: 0000000000000000
+R10: ffffffff83f26037 R11: 0000000000000000 R12: 0000000000000004
+R13: ffffffff898ca243 R14: ffffc9008c577a4f R15: ffffc9000c577a51
+FS:  00007f9245542700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9a4b72b008 CR3: 000000006fe68000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ number+0x205/0xae0 lib/vsprintf.c:490
+ vsnprintf+0xf09/0x14f0 lib/vsprintf.c:2875
+ sprintf+0xc0/0x100 lib/vsprintf.c:3011
+ print_syslog kernel/printk/printk.c:1257 [inline]
+ info_print_prefix+0x2d5/0x340 kernel/printk/printk.c:1287
+ record_print_text+0x14d/0x3e0 kernel/printk/printk.c:1339
+ syslog_print+0x48c/0x580 kernel/printk/printk.c:1539
+ do_syslog.part.0+0x202/0x640 kernel/printk/printk.c:1658
+ do_syslog+0x49/0x60 kernel/printk/printk.c:1643
+ kmsg_read+0x90/0xb0 fs/proc/kmsg.c:40
+ pde_read fs/proc/inode.c:311 [inline]
+ proc_reg_read+0x119/0x300 fs/proc/inode.c:321
+ vfs_read+0x1b5/0x600 fs/read_write.c:494
+ ksys_read+0x12d/0x250 fs/read_write.c:634
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f9247b8522d
+Code: c1 20 00 00 75 10 b8 00 00 00 00 0f 05 48 3d 01 f0 ff ff 73 31 c3 48 83 ec 08 e8 4e fc ff ff 48 89 04 24 b8 00 00 00 00 0f 05 <48> 8b 3c 24 48 89 c2 e8 97 fc ff ff 48 89 d0 48 83 c4 08 48 3d 01
+RSP: 002b:00007f9245521580 EFLAGS: 00000293 ORIG_RAX: 0000000000000000
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f9247b8522d
+RDX: 0000000000001fa0 RSI: 00007f9245521da0 RDI: 0000000000000004
+RBP: 000055eb855a59d0 R08: 0000000000000000 R09: 0000000004000001
+R10: 0000000000000001 R11: 0000000000000293 R12: 00007f9245521da0
+R13: 0000000000001fa0 R14: 0000000000001f9f R15: 00007f9245521dd7
+----------------
+Code disassembly (best guess):
+   0:	81 e1 00 01 00 00    	and    $0x100,%ecx
+   6:	65 48 8b 14 25 40 f0 	mov    %gs:0x1f040,%rdx
+   d:	01 00 
+   f:	a9 00 01 ff 00       	test   $0xff0100,%eax
+  14:	74 0e                	je     0x24
+  16:	85 c9                	test   %ecx,%ecx
+  18:	74 35                	je     0x4f
+  1a:	8b 82 3c 15 00 00    	mov    0x153c(%rdx),%eax
+  20:	85 c0                	test   %eax,%eax
+  22:	74 2b                	je     0x4f
+  24:	8b 82 18 15 00 00    	mov    0x1518(%rdx),%eax
+  2a:	83 f8 02             	cmp    $0x2,%eax <-- trapping instruction
+  2d:	75 20                	jne    0x4f
+  2f:	48 8b 8a 20 15 00 00 	mov    0x1520(%rdx),%rcx
+  36:	8b 92 1c 15 00 00    	mov    0x151c(%rdx),%edx
+  3c:	48 8b 01             	mov    (%rcx),%rax
+  3f:	48                   	rex.W
+
+
 ---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-(no changes since v8)
-
-Changes in v8:
-- Removed the unsuitable debug messages.
-
-Changes in v7:
-- Rebase on Tedd's patches that moved functionality from btusb to
-  btintel.
-
-Changes in v5:
-- Removed CONFIG_BT_FEATURE_QUALITY_REPORT since there was no
-  large size impact.
-
- drivers/bluetooth/btintel.c | 79 ++++++++++++++++++++++++++++++++++++-
- drivers/bluetooth/btintel.h |  6 +++
- 2 files changed, 84 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 643e2194ca01..778d803159f3 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -1291,8 +1291,10 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
- 	u8 trace_enable = 0x02;
- 	struct sk_buff *skb;
- 
--	if (!features)
-+	if (!features) {
-+		bt_dev_warn(hdev, "Debug features not read");
- 		return -EINVAL;
-+	}
- 
- 	if (!(features->page1[0] & 0x3f)) {
- 		bt_dev_info(hdev, "Telemetry exception format not supported");
-@@ -1323,9 +1325,77 @@ static int btintel_set_debug_features(struct hci_dev *hdev,
- 	}
- 	kfree_skb(skb);
- 
-+	bt_dev_info(hdev, "set debug features: trace_enable 0x%02x mask 0x%02x",
-+		    trace_enable, mask[3]);
-+
- 	return 0;
- }
- 
-+static int btintel_reset_debug_features(struct hci_dev *hdev,
-+				 const struct intel_debug_features *features)
-+{
-+	u8 mask[11] = { 0x0a, 0x92, 0x02, 0x00, 0x00, 0x00, 0x00, 0x00,
-+			0x00, 0x00, 0x00 };
-+	u8 trace_enable = 0x00;
-+	struct sk_buff *skb;
-+
-+	if (!features) {
-+		bt_dev_warn(hdev, "Debug features not read");
-+		return -EINVAL;
-+	}
-+
-+	if (!(features->page1[0] & 0x3f)) {
-+		bt_dev_info(hdev, "Telemetry exception format not supported");
-+		return 0;
-+	}
-+
-+	/* Should stop the trace before writing ddc event mask. */
-+	skb = __hci_cmd_sync(hdev, 0xfca1, 1, &trace_enable, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Stop tracing of link statistics events failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc8b, 11, mask, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Setting Intel telemetry ddc write event mask failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+	kfree_skb(skb);
-+
-+	bt_dev_info(hdev, "reset debug features: trace_enable 0x%02x mask 0x%02x",
-+		    trace_enable, mask[3]);
-+
-+	return 0;
-+}
-+
-+int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
-+{
-+	struct intel_debug_features features;
-+	int err;
-+
-+	bt_dev_dbg(hdev, "enable %d", enable);
-+
-+	/* Read the Intel supported features and if new exception formats
-+	 * supported, need to load the additional DDC config to enable.
-+	 */
-+	err = btintel_read_debug_features(hdev, &features);
-+	if (err)
-+		return err;
-+
-+	/* Set or reset the debug features. */
-+	if (enable)
-+		err = btintel_set_debug_features(hdev, &features);
-+	else
-+		err = btintel_reset_debug_features(hdev, &features);
-+
-+	return err;
-+}
-+EXPORT_SYMBOL_GPL(btintel_set_quality_report);
-+
- static const struct firmware *btintel_legacy_rom_get_fw(struct hci_dev *hdev,
- 					       struct intel_version *ver)
- {
-@@ -1951,6 +2021,8 @@ static int btintel_bootloader_setup(struct hci_dev *hdev,
- 		btintel_load_ddc_config(hdev, ddcname);
- 	}
- 
-+	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
-+
- 	/* Read the Intel version information after loading the FW  */
- 	err = btintel_read_version(hdev, &new_ver);
- 	if (err)
-@@ -2132,6 +2204,8 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 	 */
- 	btintel_load_ddc_config(hdev, ddcname);
- 
-+	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
-+
- 	/* Read the Intel version information after loading the FW  */
- 	err = btintel_read_version_tlv(hdev, &new_ver);
- 	if (err)
-@@ -2230,6 +2304,9 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 	set_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY, &hdev->quirks);
- 	set_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks);
- 
-+	/* Set up the quality report callback for Intel devices */
-+	hdev->set_quality_report = btintel_set_quality_report;
-+
- 	/* For Legacy device, check the HW platform value and size */
- 	if (skb->len == sizeof(ver) && skb->data[1] == 0x37) {
- 		bt_dev_dbg(hdev, "Read the legacy Intel version information");
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index aa64072bbe68..fe02cb9ac96c 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -204,6 +204,7 @@ int btintel_configure_setup(struct hci_dev *hdev);
- void btintel_bootup(struct hci_dev *hdev, const void *ptr, unsigned int len);
- void btintel_secure_send_result(struct hci_dev *hdev,
- 				const void *ptr, unsigned int len);
-+int btintel_set_quality_report(struct hci_dev *hdev, bool enable);
- #else
- 
- static inline int btintel_check_bdaddr(struct hci_dev *hdev)
-@@ -294,4 +295,9 @@ static inline void btintel_secure_send_result(struct hci_dev *hdev,
- 				const void *ptr, unsigned int len)
- {
- }
-+
-+static inline int btintel_set_quality_report(struct hci_dev *hdev, bool enable)
-+{
-+	return -ENODEV;
-+}
- #endif
--- 
-2.33.0.rc1.237.g0d66db33f3-goog
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
