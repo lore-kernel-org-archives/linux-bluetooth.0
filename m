@@ -4,75 +4,92 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 61C90C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 15:46:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3242EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 15:49:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 45CBC60F36
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 15:46:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11C3060F58
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 15:49:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236242AbhHPPqa (ORCPT
+        id S236947AbhHPPuD convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Aug 2021 11:46:30 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49385 "EHLO
+        Mon, 16 Aug 2021 11:50:03 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53563 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236598AbhHPPqW (ORCPT
+        with ESMTP id S235241AbhHPPuC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Aug 2021 11:46:22 -0400
+        Mon, 16 Aug 2021 11:50:02 -0400
 Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 95832CECC9;
-        Mon, 16 Aug 2021 17:45:44 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id D0005CECC8;
+        Mon, 16 Aug 2021 17:49:25 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v2] Bluetooth: btusb: Remove WAKEUP_DISABLE and add
- WAKEUP_AUTOSUSPEND for Realtek devices
+Subject: Re: [PATCH v2] Bluetooth: Move shutdown callback before flushing tx
+ and rx queue
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210810020147.14276-1-max.chou@realtek.com>
-Date:   Mon, 16 Aug 2021 17:45:44 +0200
+In-Reply-To: <20210810045315.184383-1-kai.heng.feng@canonical.com>
+Date:   Mon, 16 Aug 2021 17:49:25 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, alex_lu@realsil.com.cn,
-        hildawu@realtek.com, kidman@realtek.com, apusaka@chromium.org,
-        abhishekpandit@chromium.org, josephsih@chromium.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <08B718ED-F885-4870-BB80-AB547FEC52B1@holtmann.org>
-References: <20210810020147.14276-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
+        Mattijs Korpershoek <mkorpershoek@baylibre.com>,
+        Hsin-Yi Wang <hsinyi@chromium.org>,
+        Guenter Roeck <linux@roeck-us.net>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        open list <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <453AB6D8-9CA8-42B8-9807-5AC249E8618B@holtmann.org>
+References: <20210810045315.184383-1-kai.heng.feng@canonical.com>
+To:     Kai-Heng Feng <kai.heng.feng@canonical.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
+Hi Kai-Heng,
 
-> For the commit of 9e45524a011107a73bc2cdde8370c61e82e93a4d, wakeup is
-> always disabled for Realtek devices. However, there's the capability
-> for Realtek devices to apply USB wake-up.
+> Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
+> are flushed or cancelled") introduced a regression that makes mtkbtsdio
+> driver stops working:
+> [   36.593956] Bluetooth: hci0: Firmware already downloaded
+> [   46.814613] Bluetooth: hci0: Execution of wmt command timed out
+> [   46.814619] Bluetooth: hci0: Failed to send wmt func ctrl (-110)
 > 
-> In this commit, remove WAKEUP_DISABLE feature for Realtek devices.
-> If users would switch wake-up, they should access
-> "/sys/bus/usb/.../power/wakeup"
+> The shutdown callback depends on the result of hdev->rx_work, so we
+> should call it before flushing rx_work:
+> -> btmtksdio_shutdown()
+> -> mtk_hci_wmt_sync()
+>  -> __hci_cmd_send()
+>   -> wait for BTMTKSDIO_TX_WAIT_VND_EVT gets cleared
 > 
-> In this commit, it also adds the feature as WAKEUP_AUTOSUSPEND
-> for Realtek devices because it should set do_remote_wakeup on autosuspend.
+> -> btmtksdio_recv_event()
+> -> hci_recv_frame()
+>  -> queue_work(hdev->workqueue, &hdev->rx_work)
+>   -> clears BTMTKSDIO_TX_WAIT_VND_EVT
 > 
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> Tested-by: Hilda Wu <hildawu@realtek.com>
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> So move the shutdown callback before flushing TX/RX queue to resolve the
+> issue.
+> 
+> Reported-and-tested-by: Mattijs Korpershoek <mkorpershoek@baylibre.com>
+> Tested-by: Hsin-Yi Wang <hsinyi@chromium.org>
+> Cc: Guenter Roeck <linux@roeck-us.net>
+> Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
+> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
 > ---
-> Changes in v2:
-> -fix the compiling error due to the incorrect patch file submited
-> ---
-> drivers/bluetooth/btusb.c | 28 +++++++++-------------------
-> 1 file changed, 9 insertions(+), 19 deletions(-)
+> v2: 
+> Move the shutdown callback before clearing HCI_UP, otherwise 1)
+> shutdown callback won't be called and 2) other routines that depend on
+> HCI_UP won't work.
+> 
+> net/bluetooth/hci_core.c | 16 ++++++++--------
+> 1 file changed, 8 insertions(+), 8 deletions(-)
 
-this does not apply cleanly to bluetooth-next tree.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
