@@ -2,71 +2,167 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-23.0 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A881C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 21:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82D4EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 21:05:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7066160EE5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 21:01:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5326060F39
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 16 Aug 2021 21:05:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233233AbhHPVBm (ORCPT
+        id S233135AbhHPVFb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Aug 2021 17:01:42 -0400
-Received: from mail-il1-f199.google.com ([209.85.166.199]:41640 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233191AbhHPVBm (ORCPT
+        Mon, 16 Aug 2021 17:05:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44112 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231726AbhHPVFa (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Aug 2021 17:01:42 -0400
-Received: by mail-il1-f199.google.com with SMTP id l4-20020a92d8c40000b02902242b6ea4b3so10403577ilo.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 14:01:10 -0700 (PDT)
+        Mon, 16 Aug 2021 17:05:30 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1B9EC061764;
+        Mon, 16 Aug 2021 14:04:57 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id c24so37024753lfi.11;
+        Mon, 16 Aug 2021 14:04:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:references:from:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language;
+        bh=qgWuFVDRT4OUjF2IBMPSEIvHlIqy9JyfPdGRKPLOLHA=;
+        b=SCxFDdHiNYq8A9cXDiWKQeVjFJHsHiOsGnoPuIj7jvPMLWbpN85CLnLEBqPG2j6gLc
+         dR8BYqtBfOOSt8DcueYseq1qyCcFSeCGOb+q9K8K7j7DdGuaYfXt9dWZQ8i1E7b9+YZd
+         24CeRwcExZSdasO9rBcb4/TZxEXYeBI9yqDg1FR/K5bXHFbyby1CaY17UsLBRJV4ckmA
+         IvmA06GZNps7zJtDopbpvAhMA8iyMzjARigcLX1YPcqOyA0vDxQJ3rrPSrDKeiltrCpf
+         WsoG9UfrrzMiyr3MXp7pvedfIpaXY9wkLjX800fVbqUKPbi7kkxggDBbNFmbjtUNWCI0
+         B4lw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=QdxFVZxxVpsbxj2o+V3LRFIQHQQnZrQkJLl5OL4ggRM=;
-        b=rPD1yue2qYhKbtYPcdbYR6CuprAmWU3WLrTL3/x4WckqsjSXgidHyJsm+IHjNehW4S
-         fr38bkfVfNLGHeChaF3wLcrBodn6i2/nfRsZZ5h43Fjr3Cgt3hyPvA8Yp2LYiHzQnLLF
-         coIWBOFvG9zNKDGB/ginWJknURZkNesIh0QOPlw9+6W5xRGt4hKJiOaklrARZm/2v6GK
-         TkmiFeNC2RhEN6OkCBFKW6jWOUggo3w+QyHgx4NeLzhuD0VswcDj6wze+d+YNlpsdNSH
-         Oq1klpUNNmANFWVP5wr+dISMxV8vMLCVjTK8ZrVtfzQtnhJFACk2ofcMl6i/NfTw25zp
-         ntaA==
-X-Gm-Message-State: AOAM531lYMgKm4anx07E0/ct1PUfQCEBk3u/1WZW3G9xXDnMB5lENR8x
-        s9FgkxlHTsxg6nCocbWKNru6HIkiB1rsQ9yIZkVMkCXqeGaW
-X-Google-Smtp-Source: ABdhPJwbLG6x/Nim7U+ZAhIBCiDjR+IfP2PInnWonRdz7ac8GlsIVYJT2H3mkthaKYjCFEL1injmoeKZyfkmc6VcPTKerPKls3PN
-MIME-Version: 1.0
-X-Received: by 2002:a05:6638:33a2:: with SMTP id h34mr513258jav.43.1629147669921;
- Mon, 16 Aug 2021 14:01:09 -0700 (PDT)
-Date:   Mon, 16 Aug 2021 14:01:09 -0700
-In-Reply-To: <568c354b-6e4b-d15a-613e-3389c99a93a1@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000027061b05c9b38026@google.com>
+        h=x-gm-message-state:subject:to:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language;
+        bh=qgWuFVDRT4OUjF2IBMPSEIvHlIqy9JyfPdGRKPLOLHA=;
+        b=ZHCJ5BHEe1sqb/9mO/uVUTWvCpssHpu4WJcN8Kwx1QZNgq+QnhLYDC1uhEjp0lLzX0
+         d0NwVsNdQ8WntxVxCWBAPdnhEw0fEAHEKSyYGCcnsDzJ0Kgo38WbQI34NX7CV73f7ZlJ
+         WicEZ5QeIK6CWnz+vCVQqAloQlKnA1OBiFlhafmjExVtUUKScRyzg/Zws6zPFmtfPWpG
+         9Gnu+1idf5EBbnHayo0TOKdQH2fgLNnFU/YZYEBGFhq6uDB39YTdY/YsYLHsdzUAud91
+         DO2vH6kvm/hKZnoDYE8G6En1hzc0copi7+RUmSO7R+MQ1OArsiOFSuDxkXRLhgPLWzim
+         LvMw==
+X-Gm-Message-State: AOAM531mbScuqsYpJTfa0fEvPSFSXQAyNTKFbCCdNoyPvbiaFwOhVf1/
+        7DYuPlnp6gY6Uhed+F2esao=
+X-Google-Smtp-Source: ABdhPJx/k1fwWiFCDf8nfgLXSNmRI6Sb0u3HD1zFlz5Ph96HsZqdoIdb4zxFjMiwtM9MLb0XYRoLTw==
+X-Received: by 2002:a19:7603:: with SMTP id c3mr188506lff.543.1629147896117;
+        Mon, 16 Aug 2021 14:04:56 -0700 (PDT)
+Received: from [192.168.1.11] ([46.235.67.232])
+        by smtp.gmail.com with ESMTPSA id b6sm2219lfv.167.2021.08.16.14.04.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 16 Aug 2021 14:04:55 -0700 (PDT)
 Subject: Re: [syzbot] INFO: task hung in hci_req_sync
-From:   syzbot <syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+To:     syzbot <syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        paskripkin@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        syzkaller-bugs@googlegroups.com
+References: <00000000000027061b05c9b38026@google.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+Message-ID: <04cbd217-21d2-c623-2d06-35d6040a3479@gmail.com>
+Date:   Tue, 17 Aug 2021 00:04:54 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <00000000000027061b05c9b38026@google.com>
+Content-Type: multipart/mixed;
+ boundary="------------1F033F9083733B0C5330BE2B"
+Content-Language: en-US
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This is a multi-part message in MIME format.
+--------------1F033F9083733B0C5330BE2B
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot tried to test the proposed patch but the build/boot failed:
+On 8/17/21 12:01 AM, syzbot wrote:
+> Hello,
+> 
+> syzbot tried to test the proposed patch but the build/boot failed:
+> 
+> net/bluetooth/hci_core.c:1346:18: error: 'HCI_MAX_TIMEOUT' undeclared (first use in this function); did you mean 'HCI_CMD_TIMEOUT'?
+> 
+> 
+> Tested on:
+> 
+> commit:         a2824f19 Merge tag 'mtd/fixes-for-5.14-rc7' of git://g..
+> git tree:       upstream
+> dashboard link: https://syzkaller.appspot.com/bug?extid=be2baed593ea56c6a84c
+> compiler:
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=145874a6300000
+> 
 
-net/bluetooth/hci_core.c:1346:18: error: 'HCI_MAX_TIMEOUT' undeclared (first use in this function); did you mean 'HCI_CMD_TIMEOUT'?
+
+Woooooops, I forgot to build-test after define rename.
+
+#syz test
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
 
-Tested on:
 
-commit:         a2824f19 Merge tag 'mtd/fixes-for-5.14-rc7' of git://g..
-git tree:       upstream
-dashboard link: https://syzkaller.appspot.com/bug?extid=be2baed593ea56c6a84c
-compiler:       
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=145874a6300000
 
+With regards,
+Pavel Skripkin
+
+--------------1F033F9083733B0C5330BE2B
+Content-Type: text/x-patch; charset=UTF-8;
+ name="0001-Bluetooth-add-timeout-sanity-check-to-hci_inquiry.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename*0="0001-Bluetooth-add-timeout-sanity-check-to-hci_inquiry.patch"
+
+From b03640e820c7cd3d577e3e472a61a9a7e64a4305 Mon Sep 17 00:00:00 2001
+From: Pavel Skripkin <paskripkin@gmail.com>
+Date: Mon, 16 Aug 2021 22:52:29 +0300
+Subject: [PATCH] Bluetooth: add timeout sanity check to hci_inquiry
+
+/* ... */
+
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+---
+ include/net/bluetooth/hci_sock.h | 1 +
+ net/bluetooth/hci_core.c         | 5 +++++
+ 2 files changed, 6 insertions(+)
+
+diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+index 9949870f7d78..1cd63d4da00b 100644
+--- a/include/net/bluetooth/hci_sock.h
++++ b/include/net/bluetooth/hci_sock.h
+@@ -168,6 +168,7 @@ struct hci_inquiry_req {
+ 	__u16 dev_id;
+ 	__u16 flags;
+ 	__u8  lap[3];
++#define HCI_INQUIRY_MAX_TIMEOUT		30
+ 	__u8  length;
+ 	__u8  num_rsp;
+ };
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e1a545c8a69f..104babf67351 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1343,6 +1343,11 @@ int hci_inquiry(void __user *arg)
+ 		goto done;
+ 	}
+ 
++	if (ir.length > HCI_INQUIRY_MAX_TIMEOUT) {
++		err = -EINVAL;
++		goto done;
++	}
++
+ 	hci_dev_lock(hdev);
+ 	if (inquiry_cache_age(hdev) > INQUIRY_CACHE_AGE_MAX ||
+ 	    inquiry_cache_empty(hdev) || ir.flags & IREQ_CACHE_FLUSH) {
+-- 
+2.32.0
+
+
+--------------1F033F9083733B0C5330BE2B--
