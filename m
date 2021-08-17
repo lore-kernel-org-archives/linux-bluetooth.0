@@ -2,148 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D007C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 03:39:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0915AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 04:55:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3E81A60F58
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 03:39:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC7BA60F5E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 04:55:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237408AbhHQDjr (ORCPT
+        id S234164AbhHQEzu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Aug 2021 23:39:47 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48782 "EHLO
+        Tue, 17 Aug 2021 00:55:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234051AbhHQDjp (ORCPT
+        with ESMTP id S230272AbhHQEzu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Aug 2021 23:39:45 -0400
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5209BC0613C1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 20:39:12 -0700 (PDT)
-Received: by mail-qk1-x72f.google.com with SMTP id m21so3712427qkm.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 20:39:12 -0700 (PDT)
+        Tue, 17 Aug 2021 00:55:50 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C522C061764;
+        Mon, 16 Aug 2021 21:55:17 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id j1so30097903pjv.3;
+        Mon, 16 Aug 2021 21:55:17 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=lDr5rJkylhakgsLiShLS00A/sWly0IZYM4Sf8Nqd63U=;
-        b=gkigQDbiQiB2KQ3Qs0u2msscqfhyntiaZlOuQW3GiagKJdpwN0Q+yXK76psrzPeimr
-         gRkH3Cd0IBUFvUqeetCH346b/s1HmbcK6ZfIRZYH5BslwKthNS4z5GWq91LemWOuoyPK
-         t2glhwVCKeNPPhl0EzOTZ0jE7vweifjJK75QBuwP0wcyM+3RSuW/3PePlbSZwi2Uat09
-         EE9vT0serXXUgAbW21kUVNG/y3OEFhmwV58bUkZRkxJhjd5bCX/bBQ6Ctfg9uRn1qNoO
-         vGkNgVM3etdpsB0UMFIopQ2Mv4NYdWOB4AqtWkX6rstLFsn9cjUSJu2UxqMGHMU/PvGC
-         al4w==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hAXABoom5XY+ws1/jiIFHmNJnWtweNFayiGnrPzUhKo=;
+        b=ewl9OoE2pnxQkOSLm43GnYt9fFJEhFLOIu9grvLJPILw3j5E4dnW+TOZAhmE/Apjxl
+         5x4TGw+X4B63h4YW4rmdCNkAHLi/K/OQdBPhM3czyyqDQOsDBvkISIWyEW0F89azcIvh
+         is5rfYxu6D/cNOpIskVZLvE1i1jfayvBLqf89Rhyf3uChgdMWHiR3j5GxhAxwRD6N3ok
+         Itgf2Mtpzx9yJW2mLZYxyizR9wKa2D7ska7MziSU0Q40+Bwy0k3qgk4ayZ+1UBn5aYNU
+         /qFXjNqV1+ZfB5WVduvwdpUZfAhZToy6gPn4MpWB7d74vvYjKyQO/AX0Avr37ZFT9Uc1
+         KEiA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=lDr5rJkylhakgsLiShLS00A/sWly0IZYM4Sf8Nqd63U=;
-        b=INW3gSuae6xo2vv6oI7RbaFeJqk2339lN6W9eYPTJNmK8EgWnmiaDsJul4gEihFwW0
-         qTVjUYWLgsag1D60Vr+Riq9CiC4RuwI8TdvEFO3KYLG1ILdgYMeidOBiCWOFXUn0Mx3D
-         /X704g5KcIhWqWfg48+JFPPsEMUSU/Rv0qNTKws19bDEwPcyvTErRZ4cZHP0kEXHu034
-         /a0RzKHWCrn5IeojWRCZlWO74w0+z/b3Yy4ctnl1KjuBwgZwLPDaohKh/xaxpC/bYaHe
-         W1ivbMMrFA0wGNYFzMob1rObUtxV/69eK8eu8RbZDvM9VWmChXWb9YbkJUVGgMEXN/eh
-         8vOg==
-X-Gm-Message-State: AOAM531CosdKQ4KdArQ17i1cRUfBb7a+T3H6PtSPpAzxmH4uart1iTAa
-        EDiqOgPdQd4SC2qrNtigRRE0ufpba15k8w==
-X-Google-Smtp-Source: ABdhPJx+K+xN9cHWHXpxO8wY+seSMfweqoUWrUJePYD9pE4FAdmvbx9hRKjscrEZevWfASkOwK1ncw==
-X-Received: by 2002:a05:620a:1913:: with SMTP id bj19mr1688175qkb.341.1629171551333;
-        Mon, 16 Aug 2021 20:39:11 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.25.92])
-        by smtp.gmail.com with ESMTPSA id w14sm560793qkm.81.2021.08.16.20.39.10
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=hAXABoom5XY+ws1/jiIFHmNJnWtweNFayiGnrPzUhKo=;
+        b=s3HsaSOqYyyFscYXB6FZYJN+ELCjZbodPdUg95+0JK9f4Bb1b6MfMrPQ39EaUs5kTk
+         0Tjbph6D/BXE5CY0/7DOGlgfjxNyaQ8+F0SDIP8BVoZC2TzrDASyuLR4CJI8nzx4KZiQ
+         MJHqQTjmADGf10Z01iXQjIv1OxUXxoAFue6APYawfCZuuire69K9z5sLp4mN4ZDnpeHH
+         BWh806e0Y9Ce/1Z09C6ED3SwNWj6ajGMA0X1n3+1eQHxGBRPKwjQ0056nvlOldimOLOR
+         AN7zluonsVSqVgw6WfeUrHrcXf32o4PjlxI6t4dIZvIqUwvVoDWofvOp7jzXYMBHskVa
+         Rqlg==
+X-Gm-Message-State: AOAM533HvmLtIMVfGul/L0/zFP8p6BS2tSgYsVhxhvXp1ivixumF0TSx
+        3i96nYQ/xL3lYHPHTddB/EU=
+X-Google-Smtp-Source: ABdhPJxhyhrtsbV/IkVXpjBzLeMLDOgoo0HmIE/UWAfWd+zR3AmkLu53p/slOhIqP2X4sg9Ehnu4fA==
+X-Received: by 2002:a63:7cb:: with SMTP id 194mr1724744pgh.308.1629176115852;
+        Mon, 16 Aug 2021 21:55:15 -0700 (PDT)
+Received: from localhost.localdomain ([1.240.193.107])
+        by smtp.googlemail.com with ESMTPSA id r9sm863091pfh.135.2021.08.16.21.55.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Aug 2021 20:39:10 -0700 (PDT)
-Message-ID: <611b2f5e.1c69fb81.2ec4b.365e@mx.google.com>
-Date:   Mon, 16 Aug 2021 20:39:10 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6617269992212770856=="
+        Mon, 16 Aug 2021 21:55:15 -0700 (PDT)
+From:   Kangmin Park <l4stpr0gr4m@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH net] Bluetooth: Fix return value in hci_dev_do_close()
+Date:   Tue, 17 Aug 2021 13:55:10 +0900
+Message-Id: <20210817045510.4479-1-l4stpr0gr4m@gmail.com>
+X-Mailer: git-send-email 2.26.2
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2] mgmt: Set offload codec mgmt feature
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210817030930.9211-1-kiran.k@intel.com>
-References: <20210817030930.9211-1-kiran.k@intel.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6617269992212770856==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+hci_error_reset() return without calling hci_dev_do_open() when
+hci_dev_do_close() return error value which is not 0.
 
-This is automated email and please do not reply to this email!
+Also, hci_dev_close() return hci_dev_do_close() function's return
+value.
 
-Dear submitter,
+But, hci_dev_do_close() return always 0 even if hdev->shutdown
+return error value. So, fix hci_dev_do_close() to save and return
+the return value of the hdev->shutdown when it is called.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=532441
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.35 seconds
-GitLint                       PASS      0.12 seconds
-Prep - Setup ELL              PASS      48.10 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.40 seconds
-Build - Make                  PASS      208.49 seconds
-Make Check                    PASS      9.26 seconds
-Make Distcheck                PASS      246.27 seconds
-Build w/ext ELL - Configure   PASS      8.42 seconds
-Build w/ext ELL - Make        PASS      194.12 seconds
-
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+Fixes: a44fecbd52a4d ("Bluetooth: Add shutdown callback before closing the device")
+Signed-off-by: Kangmin Park <l4stpr0gr4m@gmail.com>
 ---
-Regards,
-Linux Bluetooth
+ net/bluetooth/hci_core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e1a545c8a69f..5f3c7515a8f0 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1718,6 +1718,7 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
+ int hci_dev_do_close(struct hci_dev *hdev)
+ {
+ 	bool auto_off;
++	int ret = 0;
+ 
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
+@@ -1730,7 +1731,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+ 		cancel_delayed_work_sync(&hdev->cmd_timer);
+ 		hci_req_sync_unlock(hdev);
+-		return 0;
++		return ret;
+ 	}
+ 
+ 	hci_leds_update_powered(hdev, false);
+@@ -1803,7 +1804,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	    test_bit(HCI_UP, &hdev->flags)) {
+ 		/* Execute vendor specific shutdown routine */
+ 		if (hdev->shutdown)
+-			hdev->shutdown(hdev);
++			ret = hdev->shutdown(hdev);
+ 	}
+ 
+ 	/* flush cmd  work */
+@@ -1845,7 +1846,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_req_sync_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+-	return 0;
++	return ret;
+ }
+ 
+ int hci_dev_close(__u16 dev)
+-- 
+2.26.2
 
---===============6617269992212770856==--
