@@ -2,133 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABB61C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 06:44:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2CAEC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 08:45:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8708260F5C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 06:44:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BF8BF60FA0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 08:45:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238041AbhHQGou (ORCPT
+        id S235135AbhHQIpx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Aug 2021 02:44:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33668 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230094AbhHQGot (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Aug 2021 02:44:49 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06AC9C061764;
-        Mon, 16 Aug 2021 23:44:17 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so4732782pjl.4;
-        Mon, 16 Aug 2021 23:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qGW+/u32RfeHULBSPZGyDEkWYbTkSdQ+pj8g3ZZmAtc=;
-        b=mqctxBRs74ZzJjSEeMaWsZHYwP3Sl5ea4IY+Up3swBYWGUCjaNlFTWFWG7ngKe3ZeD
-         dZF3f7KVWbgbItP2LiZHwQIQhTv5eE1MCHNozDIct0ma/qF1j0jYuV6Pzac60PnUOdQh
-         Yc6K4mo15ceBG2vriCuA2q53cCf385HJcZ3gmgFXpDnzqfA6GpO/p5C1OBucHpcDQI/E
-         M6wHd0lueb8i28kR4eYaS9hFT6DVFV20kWeBgRnOhgvqdF7krJ8Ke+Zh0mQYTBb5E4+d
-         XHJpGCbFgGVFwFcJzHKbV6dOcgYvISlFWXumEmXYF4APsSKT88Y6LzIFrZYahjxEYqJw
-         OZAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qGW+/u32RfeHULBSPZGyDEkWYbTkSdQ+pj8g3ZZmAtc=;
-        b=H7u7+10AItE+C7iZ6gZZL4VmQGQcyU7DZf1bTt4nJvr6N/vz/u4xSmzdZVL8BrExny
-         ds0ZiaRp1eW2NXTipt5nrnrUgxlGy4deHdGBIV+aFjSjJzrNiLGQuZ2qhqZlriPnd0OT
-         cIvG3DBtUhn8wkKBoEgkPxJUVy47SyZZthoiuqhaXO6LhmFvX0OLtJh0WJCnUFoooehn
-         nQA8jvPQ/q5uVI9cqNCWJ/GZtHW2mmrL+lukTS8a59RLruKqcajdhEsA3mgiWdRGF5Bf
-         BmUa+v0JtkPRf7GG9Ev/EHvMG7jZdZe9s1Ip4ipPKJ/nJOuWeMFxI8y8Yc0uQ57jm/8/
-         O8cQ==
-X-Gm-Message-State: AOAM532YIqz8myIT0r9Ld65h9H+QoS9Fzm2HSVlL90LvvGoCDBmW6evf
-        4BS4QUvcTpkTPUYk+UqROsGAUvWboW70c5IvsuI=
-X-Google-Smtp-Source: ABdhPJxYbpn9kCLT1fi4MGjMSaFXdc5Za03AsrYBuk1cjQTNcYjUZigKFjQenBx/bqdN8VorIN51bg==
-X-Received: by 2002:a63:5509:: with SMTP id j9mr2064571pgb.329.1629182656474;
-        Mon, 16 Aug 2021 23:44:16 -0700 (PDT)
-Received: from localhost.localdomain ([1.240.193.107])
-        by smtp.googlemail.com with ESMTPSA id z11sm1301192pfn.69.2021.08.16.23.44.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Aug 2021 23:44:15 -0700 (PDT)
-From:   Kangmin Park <l4stpr0gr4m@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Fix return value in hci_dev_do_close()
-Date:   Tue, 17 Aug 2021 15:44:11 +0900
-Message-Id: <20210817064411.2378-1-l4stpr0gr4m@gmail.com>
-X-Mailer: git-send-email 2.26.2
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Tue, 17 Aug 2021 04:45:53 -0400
+Received: from mga14.intel.com ([192.55.52.115]:12889 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235078AbhHQIpx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 17 Aug 2021 04:45:53 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10078"; a="215749643"
+X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
+   d="scan'208";a="215749643"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Aug 2021 01:45:20 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,328,1620716400"; 
+   d="scan'208";a="680218547"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga005.fm.intel.com with ESMTP; 17 Aug 2021 01:45:18 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2] emulator: Add support enhanced SCO connection
+Date:   Tue, 17 Aug 2021 14:19:41 +0530
+Message-Id: <20210817084941.22484-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-hci_error_reset() return without calling hci_dev_do_open() when
-hci_dev_do_close() return error value which is not 0.
-
-Also, hci_dev_close() return hci_dev_do_close() function's return
-value.
-
-But, hci_dev_do_close() return always 0 even if hdev->shutdown
-return error value. So, fix hci_dev_do_close() to save and return
-the return value of the hdev->shutdown when it is called.
-
-Signed-off-by: Kangmin Park <l4stpr0gr4m@gmail.com>
+Add support for enhanced_setup_synchronous_connection command
+in btdev
 ---
- net/bluetooth/hci_core.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+changes in v2:
+ - Remove signoff line from commmit message
+ - fix checkpatch warnings
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8622da2d9395..84afc0d693a8 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -1718,6 +1718,7 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
- int hci_dev_do_close(struct hci_dev *hdev)
- {
- 	bool auto_off;
-+	int ret = 0;
- 
- 	BT_DBG("%s %p", hdev->name, hdev);
- 
-@@ -1732,13 +1733,13 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 	    test_bit(HCI_UP, &hdev->flags)) {
- 		/* Execute vendor specific shutdown routine */
- 		if (hdev->shutdown)
--			hdev->shutdown(hdev);
-+			ret = hdev->shutdown(hdev);
- 	}
- 
- 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
- 		cancel_delayed_work_sync(&hdev->cmd_timer);
- 		hci_req_sync_unlock(hdev);
--		return 0;
-+		return ret;
- 	}
- 
- 	hci_leds_update_powered(hdev, false);
-@@ -1845,7 +1846,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
- 	hci_req_sync_unlock(hdev);
- 
- 	hci_dev_put(hdev);
--	return 0;
-+	return ret;
+ emulator/btdev.c | 58 +++++++++++++++++++++++++++++++++++++++++++++++-
+ 1 file changed, 57 insertions(+), 1 deletion(-)
+
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index f8daf4587cd9..86c9b475098e 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -2488,6 +2488,59 @@ static void set_common_commands_bredr20(struct btdev *btdev)
+ 	btdev->commands[16] |= 0x04;	/* Enable Device Under Test Mode */
  }
  
- int hci_dev_close(__u16 dev)
++static int cmd_enhanced_setup_sync_conn(struct btdev *dev, const void *data,
++					uint8_t len)
++{
++	const struct bt_hci_cmd_enhanced_setup_sync_conn *cmd = data;
++	uint8_t status =  BT_HCI_ERR_SUCCESS;
++
++	if (cmd->tx_coding_format[0] > 5)
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++
++	cmd_status(dev, status, BT_HCI_EVT_SYNC_CONN_COMPLETE);
++
++	return 0;
++}
++
++static int cmd_enhanced_setup_sync_conn_complete(struct btdev *dev,
++						 const void *data, uint8_t len)
++{
++	const struct bt_hci_cmd_enhanced_setup_sync_conn *cmd = data;
++	struct bt_hci_evt_sync_conn_complete cc;
++	struct btdev_conn *conn;
++
++	memset(&cc, 0, sizeof(cc));
++
++	conn = queue_find(dev->conns, match_handle,
++				UINT_TO_PTR(le16_to_cpu(cmd->handle)));
++	if (!conn) {
++		cc.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
++		goto done;
++	}
++
++	conn = conn_add_sco(conn);
++	if (!conn) {
++		cc.status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
++	}
++
++	cc.status = BT_HCI_ERR_SUCCESS;
++	memcpy(cc.bdaddr, conn->link->dev->bdaddr, 6);
++
++	cc.handle = cpu_to_le16(conn->handle);
++	cc.link_type = 0x02;
++	cc.tx_interval = 0x000c;
++	cc.retrans_window = 0x06;
++	cc.rx_pkt_len = 60;
++	cc.tx_pkt_len = 60;
++	cc.air_mode = cmd->tx_coding_format[0];
++
++done:
++	send_event(dev, BT_HCI_EVT_SYNC_CONN_COMPLETE, &cc, sizeof(cc));
++
++	return 0;
++}
++
+ static int cmd_setup_sync_conn(struct btdev *dev, const void *data, uint8_t len)
+ {
+ 	cmd_status(dev, BT_HCI_ERR_SUCCESS, BT_HCI_EVT_SYNC_CONN_COMPLETE);
+@@ -2886,7 +2939,9 @@ static int cmd_get_mws_transport_config(struct btdev *dev, const void *data,
+ 	CMD(BT_HCI_CMD_READ_DATA_BLOCK_SIZE, cmd_read_data_block_size, NULL), \
+ 	CMD(BT_HCI_CMD_READ_LOCAL_CODECS, cmd_read_local_codecs, NULL), \
+ 	CMD(BT_HCI_CMD_GET_MWS_TRANSPORT_CONFIG, cmd_get_mws_transport_config, \
+-					NULL)
++					NULL), \
++	CMD(BT_HCI_CMD_ENHANCED_SETUP_SYNC_CONN, cmd_enhanced_setup_sync_conn, \
++					cmd_enhanced_setup_sync_conn_complete)
+ 
+ static const struct btdev_cmd cmd_bredr[] = {
+ 	CMD_COMMON_ALL,
+@@ -2919,6 +2974,7 @@ static void set_bredr_commands(struct btdev *btdev)
+ 	btdev->commands[20] |= 0x10;	/* Read Encryption Key Size */
+ 	btdev->commands[23] |= 0x04;	/* Read Data Block Size */
+ 	btdev->commands[29] |= 0x20;	/* Read Local Supported Codecs */
++	btdev->commands[29] |= 0x08;	/* Enhanced Setup Synchronous Conn */
+ 	btdev->commands[30] |= 0x08;	/* Get MWS Transport Layer Config */
+ 	btdev->cmds = cmd_bredr;
+ }
 -- 
-2.26.2
+2.17.1
 
