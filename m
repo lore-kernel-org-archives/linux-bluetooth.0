@@ -2,61 +2,61 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
-	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 81E41C4320E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 00:56:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 44427C4320E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 00:56:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6D85E60C40
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 00:56:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2CFDE60C40
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 00:56:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236490AbhHQA4q (ORCPT
+        id S235564AbhHQAzt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 16 Aug 2021 20:56:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40076 "EHLO
+        Mon, 16 Aug 2021 20:55:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40044 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236354AbhHQA4A (ORCPT
+        with ESMTP id S235108AbhHQAzr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 16 Aug 2021 20:56:00 -0400
+        Mon, 16 Aug 2021 20:55:47 -0400
 Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0FB4C06129E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 17:55:23 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id c12so17068360ljr.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 17:55:23 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C750C0613CF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 17:55:15 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id y7so30167032ljp.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 16 Aug 2021 17:55:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=OF+bSNrekE/+0wO+D2wfK4wViZM9bqH0gp92GYiunF8=;
-        b=cM7uNQKuu5dnPNA/r3uzwOSlkZGPgMBXADPm8THNYFEDMOjOGxMvMjdB3F7ehvUI0P
-         jSQA1m7WSHuioIu9NDWPO3OdHn8GAH0tzSEWc8j+mykFH4nrhKP5NzOx5cWlQkMdu0Dc
-         RA2uWCHVYIgOAWJ6jR9xFlJUQMdSzdNHIHTvXNti55cFv1as17iQHUl5vsZK8TFY2K61
-         exYI8oCWgFFX8pQABZBDMWguDSKljIB0UJPlHFiOj7SGwv6L2gJ6PL3xjWYwtE6FdD5K
-         vCdq3wGKZ851VeJQtub1ZdI7Y9d9Uu8uVXKZNBQLtLYE08MNV9fV3CjZzD2ejwh6ZdDx
-         m85g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=C/jXyVM8A6IIIf73CUW3opic/WD75vfkmRvuKQWW4Jo=;
+        b=Ilqv4TYrhWro5ne/pyK8Z8uNieTgQV6uYOzuf7BRghGmB8vnlhfGvOr/0/e/S1IwQs
+         7hQf66rKkZbN2FzNg/lAkY8kGf8968Opho/WF3Oda7z3Bq5zGkHWUDeKdTIMK9vnpdcr
+         Q21Q+ebQypHAX5SMsmdNk0shvXZpPmldQV8JkAnN+rTBj1EPUQqbI161vTAsodd2SjvZ
+         MCqb1O1Ze+1fb4BtL/U3gENTSpiIzkKkc+t3xLBPezJesXnuxw+T6kn1KhGum0t21LcO
+         jMIXT/hfLcwRdk65I9OuXZg0sgiZ+Ph1sisDURKJYN/RBaSvnazEEt1aLfLUFDVTen6Z
+         an+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=OF+bSNrekE/+0wO+D2wfK4wViZM9bqH0gp92GYiunF8=;
-        b=YvY/0KWyw1jbn6oJH00l/i8t+oPyim/m6BjPF/cwW2mgI+xd6h/E2Z3uh4xwUDT08s
-         4gct4jS+WFd/w0/Sk6Qpv0KGYKw4wpN3cP5lsydGBqQPzGda43NAsMaLUQzv83TI7aNs
-         UFrZh4bPSCXDlbqch1T8mKva56YFv3plKHkb84hV6Fci3R8Pjpbm+tI2QMxBPmZLOsv7
-         Lb0IwUpWB327OsQytLEean6Igrpb/S7maRyJgySXEItrrmxmFP1QCqAIegvwMHzqevFD
-         f/u3g3xDl+d0qnQpR3bBcCsmMmrzIMIgQClRa9yKY8vulus8AF/e9S583J0Y6OwY5mpU
-         r1nw==
-X-Gm-Message-State: AOAM530mAhLldiFWb4dzrfU/HSR8ZgLyiLFWpIamA4oCcYV5iSjsUMtT
-        aA3T9w7IzPyyTHyk+lAIN9RQpA==
-X-Google-Smtp-Source: ABdhPJxJzCYv9Dq92ptE7pADX3DwMYSV+uy30xcy0SMHC/VUEZ9Cq33n8a04O6lvZVB3SkR+ZA4+Yw==
-X-Received: by 2002:a05:651c:1507:: with SMTP id e7mr795429ljf.368.1629161722074;
-        Mon, 16 Aug 2021 17:55:22 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=C/jXyVM8A6IIIf73CUW3opic/WD75vfkmRvuKQWW4Jo=;
+        b=m9R0Mvg0c41brYUv0i8XXczgOi70ZcBDjMsxbPgitE8DTifTvDNE8nwPnin1/yJr1S
+         G2ksqf+SDZMEnosQMDyvAjr+78dsPELUAPAQfnxVPoKDhC2KSn306m0Gz2sAsjWygcwR
+         nFN4HHl09ugBX6AE8E79U3HuQ6ymWjwNHcX72FfHXeqSWd0/Ukpn4CveJxm3Lp5wE6Yp
+         QX2qrOAL3IOEHqP68ny9jooPWXkbjxFUsTUCqKPWRBV0FZkM+N3CSXtgrQvhWwm+tUJo
+         i9qsyhzlq56RguSh0ihky7d/IRPuxc5Woh1MVhWGeCUnmdyq7LuITvqVUOTwohbb08AG
+         2mpA==
+X-Gm-Message-State: AOAM533bH7oL7g4cXWYjuN7WOLs+2+5oHH5LZ4fCuWh2FOSSZ5fMySos
+        tLwtmwhIuWgSRUZ0cwskDomYHA==
+X-Google-Smtp-Source: ABdhPJxgPqsyxqeCXBI3IsVJLkcFyXipmzYz3hTJEmurF1pvQfTvThKjXBvusty3YDmk6qnRjBkDxQ==
+X-Received: by 2002:a05:651c:118f:: with SMTP id w15mr779302ljo.47.1629161713357;
+        Mon, 16 Aug 2021 17:55:13 -0700 (PDT)
 Received: from eriador.lan ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id z6sm40719lfb.251.2021.08.16.17.55.21
+        by smtp.gmail.com with ESMTPSA id z6sm40719lfb.251.2021.08.16.17.55.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 16 Aug 2021 17:55:21 -0700 (PDT)
+        Mon, 16 Aug 2021 17:55:12 -0700 (PDT)
 From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 To:     Andy Gross <agross@kernel.org>,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
@@ -72,90 +72,113 @@ Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [RFC PATCH 11/15] arm64: dts: qcom: sdm845-db845c: switch bt+wifi to qca power sequencer
-Date:   Tue, 17 Aug 2021 03:55:03 +0300
-Message-Id: <20210817005507.1507580-12-dmitry.baryshkov@linaro.org>
+Subject: [RFC PATCH 00/15] create power sequencing subsystem
+Date:   Tue, 17 Aug 2021 03:54:52 +0300
+Message-Id: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
-References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Switch sdm845-db845c device tree to use new power sequencer driver
-rather than separate regulators.
+This is an RFC of the proposed power sequencer subsystem. This is a
+generification of the MMC pwrseq code. The subsystem tries to abstract
+the idea of complex power-up/power-down/reset of the devices.
 
-Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
----
- arch/arm64/boot/dts/qcom/sdm845-db845c.dts | 21 ++++++++++++++-------
- arch/arm64/boot/dts/qcom/sdm845.dtsi       |  6 ++++++
- 2 files changed, 20 insertions(+), 7 deletions(-)
+The primary set of devices that promted me to create this patchset is
+the Qualcomm BT+WiFi family of chips. They reside on serial+platform
+interfaces (older generations) or on serial+PCIe (newer generations).
+They require a set of external voltage regulators to be powered on and
+(some of them) have separate WiFi and Bluetooth enable GPIOs.
 
-diff --git a/arch/arm64/boot/dts/qcom/sdm845-db845c.dts b/arch/arm64/boot/dts/qcom/sdm845-db845c.dts
-index 2d5533dd4ec2..c9b694e934d4 100644
---- a/arch/arm64/boot/dts/qcom/sdm845-db845c.dts
-+++ b/arch/arm64/boot/dts/qcom/sdm845-db845c.dts
-@@ -629,6 +629,16 @@ &qupv3_id_1 {
- 	status = "okay";
- };
- 
-+&qca_pwrseq {
-+	status = "okay";
-+
-+	vddio-supply = <&vreg_s4a_1p8>;
-+
-+	vddxo-supply = <&vreg_l7a_1p8>;
-+	vddrfa-supply = <&vreg_l17a_1p3>;
-+	vddch0-supply = <&vreg_l25a_3p3>;
-+};
-+
- &sdhc_2 {
- 	status = "okay";
- 
-@@ -916,10 +926,8 @@ &uart6 {
- 	bluetooth {
- 		compatible = "qcom,wcn3990-bt";
- 
--		vddio-supply = <&vreg_s4a_1p8>;
--		vddxo-supply = <&vreg_l7a_1p8>;
--		vddrf-supply = <&vreg_l17a_1p3>;
--		vddch0-supply = <&vreg_l25a_3p3>;
-+		bt-pwrseq = <&qca_pwrseq 1>;
-+
- 		max-speed = <3200000>;
- 	};
- };
-@@ -1036,9 +1044,8 @@ &wifi {
- 	status = "okay";
- 
- 	vdd-0.8-cx-mx-supply = <&vreg_l5a_0p8>;
--	vdd-1.8-xo-supply = <&vreg_l7a_1p8>;
--	vdd-1.3-rfa-supply = <&vreg_l17a_1p3>;
--	vdd-3.3-ch0-supply = <&vreg_l25a_3p3>;
-+
-+	wifi-pwrseq = <&qca_pwrseq 0>;
- 
- 	qcom,snoc-host-cap-8bit-quirk;
- };
-diff --git a/arch/arm64/boot/dts/qcom/sdm845.dtsi b/arch/arm64/boot/dts/qcom/sdm845.dtsi
-index 0a86fe71a66d..78e889b2c8dd 100644
---- a/arch/arm64/boot/dts/qcom/sdm845.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sdm845.dtsi
-@@ -1051,6 +1051,12 @@ psci {
- 		method = "smc";
- 	};
- 
-+	qca_pwrseq: qca-pwrseq {
-+		compatible = "qcom,wcn3990-pwrseq";
-+		#pwrseq-cells = <1>;
-+		status = "disabled";
-+	};
-+
- 	soc: soc@0 {
- 		#address-cells = <2>;
- 		#size-cells = <2>;
--- 
-2.30.2
+This patchset being an RFC tries to demonstrate the approach, design and
+usage of the pwrseq subsystem. Following issues are present in the RFC
+at this moment but will be fixed later if the overall approach would be
+viewed as acceptable:
+
+ - No documentation
+   While the code tries to be self-documenting proper documentation
+   would be required.
+
+ - Minimal device tree bindings changes
+   There are no proper updates for the DT bindings (thus neither Rob
+   Herring nor devicetree are included in the To/Cc lists). The dt
+   schema changes would be a part of v1.
+
+ - Lack of proper PCIe integration
+   At this moment support for PCIe is hacked up to be able to test the
+   PCIe part of qca6390. Proper PCIe support would require automatically
+   powering up the devices before the scan basing on the proper device
+   structure in the device tree.
+
+----------------------------------------------------------------
+Dmitry Baryshkov (15):
+      power: add power sequencer subsystem
+      pwrseq: port MMC's pwrseq drivers to new pwrseq subsystem
+      mmc: core: switch to new pwrseq subsystem
+      ath10k: add support for pwrseq sequencing
+      Bluetooth: hci_qca: merge qca_power into qca_serdev
+      Bluetooth: hci_qca: merge init paths
+      Bluetooth: hci_qca: merge qca_power_on with qca_regulators_init
+      Bluetooth: hci_qca: futher rework of power on/off handling
+      Bluetooth: hci_qca: add support for pwrseq
+      pwrseq: add support for QCA BT+WiFi power sequencer
+      arm64: dts: qcom: sdm845-db845c: switch bt+wifi to qca power sequencer
+      arm64: dts: qcom: qrb5165-rb5: add bluetooth support
+      arm64: dts: qcom: sdm845-db845c: add second channel support to qca power sequencer
+      WIP: PCI: qcom: use pwrseq to power up bus devices
+      WIP: arm64: dts: qcom: qrb5165-rb5: add bus-pwrseq property to pcie0
+
+ .../{mmc => power/pwrseq}/mmc-pwrseq-emmc.yaml     |   0
+ .../{mmc => power/pwrseq}/mmc-pwrseq-sd8787.yaml   |   0
+ .../{mmc => power/pwrseq}/mmc-pwrseq-simple.yaml   |   0
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts           |  51 +++
+ arch/arm64/boot/dts/qcom/sdm845-db845c.dts         |  28 +-
+ arch/arm64/boot/dts/qcom/sdm845.dtsi               |   6 +
+ drivers/bluetooth/hci_qca.c                        | 286 +++++++-------
+ drivers/mmc/core/Kconfig                           |  32 --
+ drivers/mmc/core/Makefile                          |   4 -
+ drivers/mmc/core/core.c                            |   9 +-
+ drivers/mmc/core/host.c                            |   8 +-
+ drivers/mmc/core/mmc.c                             |   3 +-
+ drivers/mmc/core/pwrseq.c                          | 117 ------
+ drivers/mmc/core/pwrseq.h                          |  58 ---
+ drivers/mmc/core/pwrseq_emmc.c                     | 120 ------
+ drivers/mmc/core/pwrseq_sd8787.c                   | 107 ------
+ drivers/mmc/core/pwrseq_simple.c                   | 164 --------
+ drivers/net/wireless/ath/ath10k/snoc.c             |  63 +++-
+ drivers/net/wireless/ath/ath10k/snoc.h             |   2 +
+ drivers/pci/controller/dwc/pcie-qcom.c             |  13 +
+ drivers/power/Kconfig                              |   1 +
+ drivers/power/Makefile                             |   1 +
+ drivers/power/pwrseq/Kconfig                       |  57 +++
+ drivers/power/pwrseq/Makefile                      |  11 +
+ drivers/power/pwrseq/core.c                        | 411 +++++++++++++++++++++
+ drivers/power/pwrseq/pwrseq_emmc.c                 | 118 ++++++
+ drivers/power/pwrseq/pwrseq_qca.c                  | 291 +++++++++++++++
+ drivers/power/pwrseq/pwrseq_sd8787.c               |  97 +++++
+ drivers/power/pwrseq/pwrseq_simple.c               | 160 ++++++++
+ include/linux/mmc/host.h                           |   4 +-
+ include/linux/pwrseq/consumer.h                    |  88 +++++
+ include/linux/pwrseq/driver.h                      |  71 ++++
+ 32 files changed, 1592 insertions(+), 789 deletions(-)
+ rename Documentation/devicetree/bindings/{mmc => power/pwrseq}/mmc-pwrseq-emmc.yaml (100%)
+ rename Documentation/devicetree/bindings/{mmc => power/pwrseq}/mmc-pwrseq-sd8787.yaml (100%)
+ rename Documentation/devicetree/bindings/{mmc => power/pwrseq}/mmc-pwrseq-simple.yaml (100%)
+ delete mode 100644 drivers/mmc/core/pwrseq.c
+ delete mode 100644 drivers/mmc/core/pwrseq.h
+ delete mode 100644 drivers/mmc/core/pwrseq_emmc.c
+ delete mode 100644 drivers/mmc/core/pwrseq_sd8787.c
+ delete mode 100644 drivers/mmc/core/pwrseq_simple.c
+ create mode 100644 drivers/power/pwrseq/Kconfig
+ create mode 100644 drivers/power/pwrseq/Makefile
+ create mode 100644 drivers/power/pwrseq/core.c
+ create mode 100644 drivers/power/pwrseq/pwrseq_emmc.c
+ create mode 100644 drivers/power/pwrseq/pwrseq_qca.c
+ create mode 100644 drivers/power/pwrseq/pwrseq_sd8787.c
+ create mode 100644 drivers/power/pwrseq/pwrseq_simple.c
+ create mode 100644 include/linux/pwrseq/consumer.h
+ create mode 100644 include/linux/pwrseq/driver.h
+
 
