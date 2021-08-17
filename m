@@ -2,210 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EA130C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 23:26:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEE8EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 23:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C30F660EB5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 23:26:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C605560295
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 23:35:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230072AbhHQX0g (ORCPT
+        id S234360AbhHQXgS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Aug 2021 19:26:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38712 "EHLO
+        Tue, 17 Aug 2021 19:36:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40832 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235155AbhHQX0f (ORCPT
+        with ESMTP id S229466AbhHQXgR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Aug 2021 19:26:35 -0400
-Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D08DC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 16:26:02 -0700 (PDT)
-Received: by mail-yb1-xb2c.google.com with SMTP id z128so1533049ybc.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 16:26:02 -0700 (PDT)
+        Tue, 17 Aug 2021 19:36:17 -0400
+Received: from mail-qk1-x735.google.com (mail-qk1-x735.google.com [IPv6:2607:f8b0:4864:20::735])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3EC06C061764
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 16:35:44 -0700 (PDT)
+Received: by mail-qk1-x735.google.com with SMTP id o123so851702qkf.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 16:35:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=DoT/B4nt60xDUAc0N33clEpKq4w4/5IIyE/m6aRf/Ms=;
-        b=Hf2qMqDOxtyk6bmIrxdbsVjN170gDGJpBbLG8pQjwF3J4JV3yU9Zw3/9ttERzbBoCt
-         Sm3D/JIg5zWZTrDaYq8HjNKxNKR3P7mQBJvd9ALNjrtdV1NNIVLsHwXjYraZrwl66XNQ
-         VV2qSNuARDN1hcCuWtEi4sfQNRD+IZwWh70v837tiKpC4MRjNW9kOBeqa2ceCDFU/3OG
-         ts1IC96HO2b81ZZrprLsYR3otK/0yMw6fGjEsgymetrzrubAh8lNHq8KTVnvbfUkfYxM
-         p/ObVqpkd83cJXzgg17j1wSQ2jgzTcbYsoIwcpXSHYAe6/x6KXPnzSmz/XlbtKdW6YOJ
-         5iYA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=GMlwJDclKhf2eFD83J/1xRqXaGC50/AqTT+5oo4SjMk=;
+        b=I8vU1we8fhSlIJYYhiV6TJ3u2ot54rzNbYdOjpXIvkk/WxJnwZxaXUrg1yB/EcUvFy
+         z6Xan6rao76TQ1rId1Jfd/H4dT97pKFRVPcRng4zWHc9zoz0Iy4YCtl1HoAUquj+W9k9
+         wizl3NrA5T18BLg5YWSf+aAnnZL/S5eCcBGmCdIqBmoxOH1DZq4KG7fe26M+nwqhNqg3
+         O9eb1Q8TDeM7v6OX1J6pNhbRQH3r68eoTOZA5hF9H1yRe7/5bs8DGIr9rv9ZfpsbDfKp
+         NFLvE3M0Mm2IOFJrkyCfiotg+1CHlNTAZ9Cxk/eWMzoOSihYEsV04UJ0COsoz0xA8tmM
+         Kyeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=DoT/B4nt60xDUAc0N33clEpKq4w4/5IIyE/m6aRf/Ms=;
-        b=G9QGvbePjVc3+TO9c2V+9fK2AsX9T0h5NKTCrJUNOi8mivyvtVmyV/YLReP6PYPYQP
-         36d2qhsgxFknkp9JKzGGFatXBBEgdgW9RqFToeOFuefa4NK/wwoYEAUVh+/aiUuObRHu
-         IopDbenqaEYs5Xti7GLPyy8mmyEQGc0d+WLTXrO7ELehZFOIslVE43jxQAly6XYopGBw
-         5EJPBMmj1PzDvfU/WVBsTCe+bV/clzgpZzK5cB0APDwy7aJ0L1nvsRY5x0u155Ifmyoo
-         qxg0cyGHg/c1vD+3PO1mya1rl3/dceOYBqQjvNYXHInb2/MkHn/VpNms+Wz7re8tXts1
-         AraA==
-X-Gm-Message-State: AOAM533t3KWL0IMs06RmLVNwleHT3kXwYI2Z0dPHPzAQc85NN8pAYP0e
-        WdXmgRExin6sBkubxHfLEqloYbD2USchfy599qX7N7Df
-X-Google-Smtp-Source: ABdhPJwdlvQaXHEkFqxkuW7FJ7EZZDHvHDQuN+V6Zc3bgs1NN2I2YO7l5unNwEXW9IaBBCWnjNrgsiY9kD92UHy318Y=
-X-Received: by 2002:a25:bb13:: with SMTP id z19mr7739488ybg.347.1629242761449;
- Tue, 17 Aug 2021 16:26:01 -0700 (PDT)
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=GMlwJDclKhf2eFD83J/1xRqXaGC50/AqTT+5oo4SjMk=;
+        b=qvC4w2hiZJE8ewpLZvG2IyMrPxW13ukZxmltJJ9oOALt73NVi93jZk1ggSlfu92vFK
+         19j1yEUNbql6GN2jTFHsJhvSB6P5exWVWsOahlMshLIXfjv2BppPb4BFoHctihLcF7Xz
+         db2ChzL1SPfpYeLWwP+GYqtNjuipkyhlhsoLiE26ZaOkUWSkc9Q43GJxCNcDnsqVr4iG
+         hn7twiIlmrdtdoH9dBHGsruJMYR7muI4betkqzf4le5nPIXys0+HDZ7zUSDKCn1ldgOl
+         eNHwncFkZjoNGRq6kBP6nRfLkllv5xPfzSba/R4ZX85lgkSM5tzWUmXuhCrcTLwBhywR
+         GEUA==
+X-Gm-Message-State: AOAM530N/km1m9kSdjvNQrZNkjN7XbB8d08neaXH2CibItSO8Zx+ITKM
+        z9YwIY11uZi0I0IJUrQJSYNgeLM0750Fjg==
+X-Google-Smtp-Source: ABdhPJxZhFNYlcTievWdgc4v8eW4+9jm8LuXYp+3CaWIF0914B0pZAWK9yGU2nHKIqJKxmPgkH+DHg==
+X-Received: by 2002:a37:a80c:: with SMTP id r12mr6369703qke.299.1629243343159;
+        Tue, 17 Aug 2021 16:35:43 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.0.202])
+        by smtp.gmail.com with ESMTPSA id u189sm2477688qkh.14.2021.08.17.16.35.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 17 Aug 2021 16:35:42 -0700 (PDT)
+Message-ID: <611c47ce.1c69fb81.d78e6.20e8@mx.google.com>
+Date:   Tue, 17 Aug 2021 16:35:42 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6747793400651557996=="
 MIME-Version: 1.0
-References: <20210817172909.18630-1-bernie@allthenticate.net> <20210817172909.18630-2-bernie@allthenticate.net>
-In-Reply-To: <20210817172909.18630-2-bernie@allthenticate.net>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 17 Aug 2021 16:25:50 -0700
-Message-ID: <CABBYNZKFcf3AvbdxuJw00ZZxwYpdhrea4Ks7_22EFDoRYEksmA@mail.gmail.com>
-Subject: Re: [RFC PATCH BlueZ 1/1] Added GDBusMethod to notify one device of
- characteristic change
-To:     Bernie Conrad <bernie@allthenticate.net>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ,DNM] Build: Test patch - Do Not Merge
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210817224643.412566-1-hj.tedd.an@gmail.com>
+References: <20210817224643.412566-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bernie,
+--===============6747793400651557996==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-On Tue, Aug 17, 2021 at 10:30 AM Bernie Conrad <bernie@allthenticate.net> wrote:
->
-> Implementation of the method and modification of the dbus method table.
->
-> ---
->  src/gatt-database.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 93 insertions(+)
->
-> diff --git a/src/gatt-database.c b/src/gatt-database.c
-> index 99c95f2d6..7e6b70a80 100644
-> --- a/src/gatt-database.c
-> +++ b/src/gatt-database.c
-> @@ -3615,6 +3615,93 @@ static DBusMessage *manager_unregister_app(DBusConnection *conn,
->         return dbus_message_new_method_return(msg);
->  }
->
-> +static DBusMessage *notify_characteristic_changed(DBusConnection *conn,
-> +                                                                                       DBusMessage *msg, void *user_data)
-> +{
-> +       struct btd_gatt_database *database = user_data;
-> +       uint8_t *value = NULL;
-> +       int value_len = 0;
-> +       DBusMessageIter args;
-> +       DBusMessageIter array;
-> +       const char *characteristic_path;
-> +       const char *client_path;
-> +       const char *application_path;
-> +       struct svc_match_data match_data;
-> +       const char *sender = dbus_message_get_sender(msg);
-> +       struct gatt_app *app;
-> +       struct external_service *service;
-> +       struct external_chrc *chrc;
-> +       struct notify notify;
-> +       struct device_state *client_state;
-> +       struct btd_device *client_device;
-> +
-> +       if (!dbus_message_iter_init(msg, &args))
-> +               return btd_error_invalid_args(msg);
-> +
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-> +               return btd_error_invalid_args(msg);
-> +       dbus_message_iter_get_basic(&args, &application_path);
-> +
-> +       dbus_message_iter_next(&args);
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-> +               return btd_error_invalid_args(msg);
-> +       dbus_message_iter_get_basic(&args, &client_path);
-> +
-> +       dbus_message_iter_next(&args);
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
-> +               return btd_error_invalid_args(msg);
-> +       dbus_message_iter_get_basic(&args, &characteristic_path);
-> +
-> +       dbus_message_iter_next(&args);
-> +       if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
-> +               return btd_error_invalid_args(msg);
-> +
-> +
-> +       dbus_message_iter_recurse(&args, &array);
-> +       dbus_message_iter_get_fixed_array(&array, &value, &value_len);
-> +
-> +       match_data.path = application_path;
-> +       match_data.sender = sender;
-> +       app = queue_find(database->apps, match_app, &match_data);
-> +       if (!app)
-> +               return btd_error_does_not_exist(msg);
-> +
-> +
-> +       service = queue_find(app->services, match_service_by_chrc,
-> +                                         characteristic_path);
-> +       if (!service)
-> +               return btd_error_does_not_exist(msg);
-> +
-> +
-> +       chrc = queue_find(service->chrcs, match_chrc, characteristic_path);
-> +       if (!chrc)
-> +               return btd_error_agent_not_available(msg);
-> +
-> +
-> +       client_device = btd_adapter_find_device_by_path(database->adapter,
-> +                                                                                                client_path);
-> +       if (!client_device)
-> +               return btd_error_does_not_exist(msg);
-> +
-> +       client_state = find_device_state(database,
-> +                                                               device_get_address(client_device),
-> +                                                               btd_device_get_bdaddr_type(client_device));
-> +       if (!client_state)
-> +               return btd_error_does_not_exist(msg);
-> +
-> +
-> +       notify.handle = gatt_db_attribute_get_handle(chrc->attrib);
-> +       notify.ccc_handle = gatt_db_attribute_get_handle(chrc->ccc);
-> +       notify.database = database;
-> +       notify.value = value;
-> +       notify.len = value_len;
-> +       notify.conf = conf_cb;
-> +
-> +       send_notification_to_device(client_state, &notify);
-> +       DBG("Notification/Indication sent to %s.", client_path);
-> +       return dbus_message_new_method_return(msg);
-> +}
-> +
->  static const GDBusMethodTable manager_methods[] = {
->         { GDBUS_ASYNC_METHOD("RegisterApplication",
->                                         GDBUS_ARGS({ "application", "o" },
-> @@ -3623,6 +3710,12 @@ static const GDBusMethodTable manager_methods[] = {
->         { GDBUS_ASYNC_METHOD("UnregisterApplication",
->                                         GDBUS_ARGS({ "application", "o" }),
->                                         NULL, manager_unregister_app) },
-> +       { GDBUS_ASYNC_METHOD("NotifyCharacteristicChanged",
-> +                                       GDBUS_ARGS({"application", "o" },
-> +                                       { "device", "o" },
-> +                                       { "characteristic_path", "o"},
-> +                                       { "value", "ay"}),
-> +                                       NULL, notify_characteristic_changed) },
+This is automated email and please do not reply to this email!
 
-I don't think this will gonna fly, we should actually emit for the
-server object and not directly to the device so I rather have a
-different property e.g. object, array{byte} DeviceValue, that said
-this is a bit of a layer violation since the GATT layer should be in
-controller of things like device address, etc, in fact it doesn't know
-which devices are subscribed to its CCC. In zephyr the way we handled
-this was to push this to the application by having it handling the CCC
-attribute, that said I think that can create non-compliant
-implementation of CCC so Im not sure if we should do that either,
-anyway we could block the DeviceValue notification if the device set
-is not in fact subscribed.
+Dear submitter,
 
->         { }
->  };
->
-> --
-> 2.17.1
->
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=533015
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.25 seconds
+GitLint                       PASS      0.11 seconds
+Prep - Setup ELL              PASS      40.89 seconds
+Build - Prep                  PASS      0.10 seconds
+Build - Configure             PASS      7.19 seconds
+Build - Make                  PASS      178.77 seconds
+Make Check                    PASS      8.63 seconds
+Make Distcheck                PASS      212.87 seconds
+Build w/ext ELL - Configure   PASS      7.26 seconds
+Build w/ext ELL - Make        PASS      167.68 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
 
 
--- 
-Luiz Augusto von Dentz
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6747793400651557996==--
