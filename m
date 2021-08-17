@@ -7,90 +7,186 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93CDBC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 19:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5978FC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 19:12:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7861060EBD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 19:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3EAD16103A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 17 Aug 2021 19:12:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232351AbhHQTNZ (ORCPT
+        id S233020AbhHQTN0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 17 Aug 2021 15:13:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37176 "EHLO
+        Tue, 17 Aug 2021 15:13:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37180 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229821AbhHQTNY (ORCPT
+        with ESMTP id S229821AbhHQTNZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 17 Aug 2021 15:13:24 -0400
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69739C061764
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 12:12:51 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id c4so164795plh.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 12:12:51 -0700 (PDT)
+        Tue, 17 Aug 2021 15:13:25 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FFD9C061764
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 12:12:52 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id m24-20020a17090a7f98b0290178b1a81700so359105pjl.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 12:12:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=allthenticate.net; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=MBsWNFkhIMUBFoI9YTzfePmiLn2xI7as3ABGeK/kjqI=;
-        b=O1LZPXuIeDzn3YOmcIi6N1JLPB7lHdRXDl+5IB4D79u04evRc1uStKAvdF7B3LGg5B
-         hxwKPQ8hFMx6ibvW2+YFYjm7ar4bfKLdrIHbnzGWe9bwgY4FBibyONbHzrK9rf2sN5lD
-         QE0VyrTbKG6AsbTsg8bvUAiqm4G4KfhuCH9Qh4iftVjs+A017DfLyjy8bbx6VFeHUudm
-         2SLBGU+tXIsVP9M1+NYLuzmwA6Fmi6cYRBHwjTzVVnMT2ZQffu2USj+PD0k9QqR1NWBq
-         VLr+wMEFxlKQLS3e2Vi+RX8yU8jelHqoQDBruKmhyN2tINtf+4tNe47C4837I7jQ7X2k
-         2MxQ==
+        h=from:to:cc:subject:date:message-id:in-reply-to:references;
+        bh=V84uFWH9Y7qj+zEdOZu407KCCT8ODRzTaQ9eKjpPUAE=;
+        b=1CA8ICtW4kR1syRIaC020UGVwYLnPO44fNuhkeki2FnKqRX1PY8oMfC35bdPqHVuo+
+         7nBJ4LAp80NgVMqrqF9/ckuhNF7ffASzvdwB2NYdKdSJif20D71uQatC0YONEpk+faeB
+         UsJgwbtWms8cuRdKet6Qk5bcA3j2xrmH+hq8L6J3IOcyBHp8hdNDfOLcJqQP7MXOKgqn
+         pwgvLfyhLlYzO4sUUaw1RmAeRukN1Sm9KvqflET138UJF5ZIkLi58FucgHF5LXjjUeyC
+         MCKQ2lZwB9OvzGwbWlzgVeiZ6ePt8vDFrrR/XOcUliE0reZc6KMWKH4H8FHVRTCy2e0h
+         c2Aw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=MBsWNFkhIMUBFoI9YTzfePmiLn2xI7as3ABGeK/kjqI=;
-        b=Z0uyLfLTL65ABQAXRIQlwosRL/BkvTsTTpWb2WAD9TVBsnde9kqv/bfDZD9FOmPIN7
-         8T5KZ5nlKR5E2E8aocdm5XdbaumM/Es+zkPOxx4x0jNBGQeFMEhWwl2FVXkYk4DXvS7P
-         HO9Qv4aamGYagQE8RP3X2iAAuzZauM08noIdvlmsU2BG/wMwHxko1HuyeCjtMDn7T4uV
-         JF5udkT3VBFWb1svLOIWFUzvQfPvF4lpB9B9QY6cUKZmQAFEFJ38r7wHh0DclmorpoLF
-         QajbIcuQXItVWzJwpEUl/vYJtz67l+fualcKeInyp1eb3KUQxZHl60+5Qc3nJl6HrNs7
-         dW5Q==
-X-Gm-Message-State: AOAM530R19fyEF7dFfGCr56hbXofDGl3Uc364oXWpgcNFY9QUWx7sN7G
-        29KuougGwMfbh0yXkoO9FqDUzzlT3R8eF7VA
-X-Google-Smtp-Source: ABdhPJybK6McIiYqEY1NpqD1evT34ASZs9y6gffZvyh74Od7O/c9Jc6rLwmKgC0EOojbGnH2TjH6Cw==
-X-Received: by 2002:a17:90b:f10:: with SMTP id br16mr5122210pjb.65.1629227570559;
-        Tue, 17 Aug 2021 12:12:50 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references;
+        bh=V84uFWH9Y7qj+zEdOZu407KCCT8ODRzTaQ9eKjpPUAE=;
+        b=MnK+fp9S+xyn2OYHtRkzb4J79k4B9dMphtsqmCxmKQObvtkkub059yac1AOO6bDnT8
+         v4NGtnImS2NY1fEPxXymRrANOi5oJHgcZfPJat5JO13UObsmMifHGUHFdcQnLmwEbjPw
+         B8XXB9OG8gKW5lsGqob4kpMdUAc/wh6lxNkqH5f8PUn5q3gfegq/ujOvVRroVOkWQ1a0
+         ZdSi+plx/TIJPcMM/3URiZ1t4zSA1UXXoV5oJ1v4VAmpVu6emOfnZeGKjO44R/fFT1qj
+         7y5t3feaS8jI0T3bGRAveDTvXjRLGjDr5iRnZF+MqY6qjWUeROljrWI5X2VOny06oHBw
+         ldIg==
+X-Gm-Message-State: AOAM53202nxExrwlQSSJBUbO7p7MdnKqfv3+kTSMSe+23RpUo+u7ST7i
+        8gHvryjnuq5bxeq1r+28zSXJFtS4AHaMDkwC
+X-Google-Smtp-Source: ABdhPJyEZnzGVHCSiHsWd25iWJ04CWkGgujeiOYXaeFVIGnGhWKsAJOEx1wiMltfOXH7QXkv6z7ayw==
+X-Received: by 2002:a63:5ec2:: with SMTP id s185mr4827614pgb.221.1629227571610;
+        Tue, 17 Aug 2021 12:12:51 -0700 (PDT)
 Received: from BernieDesktop.lan (wsip-72-222-70-2.sb.sd.cox.net. [72.222.70.2])
-        by smtp.gmail.com with ESMTPSA id ob6sm2814461pjb.4.2021.08.17.12.12.49
+        by smtp.gmail.com with ESMTPSA id ob6sm2814461pjb.4.2021.08.17.12.12.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 12:12:50 -0700 (PDT)
+        Tue, 17 Aug 2021 12:12:51 -0700 (PDT)
 From:   Bernie Conrad <bernie@allthenticate.net>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Bernie Conrad <bernie@allthenticate.net>
-Subject: [RFC PATCH BlueZ v3 0/1] method to notify/indicate to one device
-Date:   Tue, 17 Aug 2021 12:12:44 -0700
-Message-Id: <20210817191245.10846-1-bernie@allthenticate.net>
+Subject: [RFC PATCH v3 BlueZ] Added GDBusMethod to notify one device of characteristic change
+Date:   Tue, 17 Aug 2021 12:12:45 -0700
+Message-Id: <20210817191245.10846-2-bernie@allthenticate.net>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20210817191245.10846-1-bernie@allthenticate.net>
+References: <20210817191245.10846-1-bernie@allthenticate.net>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello maintainers,
+Updated implementation, fixed local formatting issue. Includes new 
+method and addition to method table.
 
-This is an RFC for an added method to be called over dbus by an
-application to be able to notify/indicate to one device rather than all
-subscribed devices. 
-
-This is motivated by similar functionality in the corebluetooth API with
-CBPeripheralManager's updateValue() method as well as the Android API's
-notifyCharacteristicChanged() method.
-
-There is a prior patch I submitted with this feature (12439517) with
-style issues that this RFC supersedes. There are some additions missing
-from this RFC that I can add if this is a feature the maintainers are
-interested in the form of added documentation and overall cleaning up
-the added method.  
-
-(Also my apologies for multiple versions so quickly, working on setting
-up dev environment to match style rules) 
-
-Bernie Conrad (1):
-  Added GDBusMethod to notify one device of characteristic change
-
+---
  src/gatt-database.c | 93 +++++++++++++++++++++++++++++++++++++++++++++
  1 file changed, 93 insertions(+)
 
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 99c95f2d6..8dcd5dd51 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -3615,6 +3615,93 @@ static DBusMessage *manager_unregister_app(DBusConnection *conn,
+ 	return dbus_message_new_method_return(msg);
+ }
+ 
++static DBusMessage *notify_characteristic_changed(DBusConnection *conn,
++					DBusMessage *msg, void *user_data)
++{
++	struct btd_gatt_database *database = user_data;
++	uint8_t *value = NULL;
++	int value_len = 0;
++	DBusMessageIter args;
++	DBusMessageIter array;
++	const char *characteristic_path;
++	const char *client_path;
++	const char *application_path;
++	struct svc_match_data match_data;
++	const char *sender = dbus_message_get_sender(msg);
++	struct gatt_app *app;
++	struct external_service *service;
++	struct external_chrc *chrc;
++	struct notify notify;
++	struct device_state *client_state;
++	struct btd_device *client_device;
++
++	if (!dbus_message_iter_init(msg, &args))
++		return btd_error_invalid_args(msg);
++
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++	dbus_message_iter_get_basic(&args, &application_path);
++
++	dbus_message_iter_next(&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++	dbus_message_iter_get_basic(&args, &client_path);
++
++	dbus_message_iter_next(&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_OBJECT_PATH)
++		return btd_error_invalid_args(msg);
++	dbus_message_iter_get_basic(&args, &characteristic_path);
++
++	dbus_message_iter_next(&args);
++	if (dbus_message_iter_get_arg_type(&args) != DBUS_TYPE_ARRAY)
++		return btd_error_invalid_args(msg);
++
++
++	dbus_message_iter_recurse(&args, &array);
++	dbus_message_iter_get_fixed_array(&array, &value, &value_len);
++
++	match_data.path = application_path;
++	match_data.sender = sender;
++	app = queue_find(database->apps, match_app, &match_data);
++	if (!app)
++		return btd_error_does_not_exist(msg);
++
++
++	service = queue_find(app->services, match_service_by_chrc,
++					  characteristic_path);
++	if (!service)
++		return btd_error_does_not_exist(msg);
++
++
++	chrc = queue_find(service->chrcs, match_chrc, characteristic_path);
++	if (!chrc)
++		return btd_error_agent_not_available(msg);
++
++
++	client_device = btd_adapter_find_device_by_path(database->adapter,
++								 client_path);
++	if (!client_device)
++		return btd_error_does_not_exist(msg);
++
++	client_state = find_device_state(database,
++				device_get_address(client_device),
++				btd_device_get_bdaddr_type(client_device));
++	if (!client_state)
++		return btd_error_does_not_exist(msg);
++
++
++	notify.handle = gatt_db_attribute_get_handle(chrc->attrib);
++	notify.ccc_handle = gatt_db_attribute_get_handle(chrc->ccc);
++	notify.database = database;
++	notify.value = value;
++	notify.len = value_len;
++	notify.conf = conf_cb;
++
++	send_notification_to_device(client_state, &notify);
++	DBG("Notification/Indication sent to %s.", client_path);
++	return dbus_message_new_method_return(msg);
++}
++
+ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("RegisterApplication",
+ 					GDBUS_ARGS({ "application", "o" },
+@@ -3623,6 +3710,12 @@ static const GDBusMethodTable manager_methods[] = {
+ 	{ GDBUS_ASYNC_METHOD("UnregisterApplication",
+ 					GDBUS_ARGS({ "application", "o" }),
+ 					NULL, manager_unregister_app) },
++	{ GDBUS_ASYNC_METHOD("NotifyCharacteristicChanged",
++					GDBUS_ARGS({"application", "o" },
++					{ "device", "o" },
++					{ "characteristic_path", "o"},
++					{ "value", "ay"}),
++					NULL, notify_characteristic_changed) },
+ 	{ }
+ };
+ 
 -- 
 2.17.1
 
