@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B1A49C43214
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3F5B5C432BE
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 23:06:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9A8ED610CF
+	by mail.kernel.org (Postfix) with ESMTP id 2607A610CD
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 23:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234914AbhHRXHW (ORCPT
+        id S234908AbhHRXHV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Aug 2021 19:07:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57460 "EHLO
+        Wed, 18 Aug 2021 19:07:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57454 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234904AbhHRXHU (ORCPT
+        with ESMTP id S234796AbhHRXHT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Aug 2021 19:07:20 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79ACBC0613CF
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 16:06:45 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id om1-20020a17090b3a8100b0017941c44ce4so10000363pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 16:06:45 -0700 (PDT)
+        Wed, 18 Aug 2021 19:07:19 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 985A4C061764
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 16:06:44 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id 18so3714624pfh.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 16:06:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=st96kQ+4FR4ibCaq5oiepxMtDBjTquqmApin8g9gi0U=;
-        b=itxcyOpQ6S6qvEb/i6VPFWxMzNPIlPW4E2/WJFT7NRp3Y5hfzUEc+0pT4M9atqmWHq
-         Ril/1uo5KRxuYRD+fG14kj2n6N4hP9NVDzeLkAEqFQPVJ5Jt+PS9+DwHWLAjK312NxiG
-         lmtcUbo4H+HBZxroPV0NzTW2KBOGrf6CWFOUZXE3QYtDwjFJUsXmC7/7Ha62I518A38I
-         3cV3sjVwz2VrQv6JehOug5e7Ltz75sQGInK10PeeRtfkgBxxwlDYTaSjusrEI8IN+0OE
-         eXByWUDr9PJ2CYdgTwC6lM+sJuUCPm8iG81X/+HThMtWx/b2309T1oWU7w67Zxa8al3J
-         G2lw==
+        bh=BrZPmojaZBd8qImGu/C/y4Ujr4Txu0cUgwZfjlLn+g8=;
+        b=Fdao8FJ6lxSovQEavfvnVOecANGGdSt3otNqP07oLbM5afa2Wv9XDwGGfm3gYPAq9j
+         5aWoZhgZMCpSpS+f1DncDNmpdmO6YpbYG9kFIDCl+4DOQJB4Qfgv4IHt1wlVIAkkSMNc
+         j70ueXXhJufD+KzuCO/Ph7lK/CrZ+ugB54Elu2pQQMspC7CZWIDC5SWZB6WRMBlu0PTd
+         9HdHk0pFayCGjEeTqJ/W7YEKuAhxKJoQSEjBXggAviC5idtHC1p3NEzqKpT0cR4hVIWS
+         RLf5nzyaW63SuRxxUE0ne7o9p0Hjbs459PafRzedEfxBxBnYDzQO80PX5LfJX0ELDaGk
+         STTQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=st96kQ+4FR4ibCaq5oiepxMtDBjTquqmApin8g9gi0U=;
-        b=a71zSPjyDaKmzNeF1iN0k7UclbLlpA8y1MLTNhZ+f6YxpCBq+DxOM6m/BsO1n3n/99
-         7XfBW9vEwGYvBit2Iy0bKVIin+vcqMtS+Qu2Ld1uDfvRiMRUPb57osL/OAa6QAx7citn
-         ttEZctCZm/buytkNLr0EM76hxfQZ2jD7HpXWHDQ7ozali0cv8IZZpvmsNM7Gwy9d/EIV
-         DaBYqrLb3wQi8Gq6/bS0LI37QBR8QAmX2jjX3k+MtOQfZ3eyUP8wKmUe9a2Za7ygOVwT
-         BRGCiUb1KXENkrAF6+AvyvBbEMHPTasbyCWGRR/ZPytDItT2uclYoAJkVHAtIGx2b+8b
-         OfDQ==
-X-Gm-Message-State: AOAM530SccSWRxfjrwtUjN7H5/Ti+mEa4MWwgItj++4k+L2faiW0ut23
-        BdkMeQ+yUstkIFgc4UmgM7RQ308Agbs=
-X-Google-Smtp-Source: ABdhPJzMiVz/+Es2XOwNtk7Heh3hefFzVqXNnhpV5ixQMRd5xpU4aNNFj0HckWff+1GU0kRUmNhn+A==
-X-Received: by 2002:a17:90a:c89:: with SMTP id v9mr11827961pja.175.1629328004839;
-        Wed, 18 Aug 2021 16:06:44 -0700 (PDT)
+        bh=BrZPmojaZBd8qImGu/C/y4Ujr4Txu0cUgwZfjlLn+g8=;
+        b=db65SoJmf27uJZjhtIslr5JMQPtyBCYZjnMJARVHE5MccDtq6Px5Hj7S8yVX6WWepH
+         dSVY89F0E/7IAoMLZG72z3NNhXP3zl9XQmyeqsbILCQisDIB4R4SaqdxU2u/581fxA6i
+         5azVc3ny5tNiF2TLHACIBdiXHBkl71M2PIPxwUUOgBsaepx9HbFruyZWS89DO048FD23
+         QSG29hl/Vf2B793yaoixuNgb4c1kkXtFzyj3XKP/I4ns3fAZwh9WsSubVriuf/kMO2/p
+         DVyuiTPiLoqwBcp7vIMJRpsziDxOo77sTIIHwX1UnsbyAhQqA/eJdOTjgXwcbFvILNN9
+         CetA==
+X-Gm-Message-State: AOAM533CaQsbAU2ivOesraTJkj5LQOAIXCJ8KRkFbZIA/yFQI/P7EWNd
+        DzCu4lbupBLMHanbx4710OTX28Q2vic=
+X-Google-Smtp-Source: ABdhPJxVqG8JbA47x43cEJgj/7/+5BHYcxDUZErUVq9srNsnWMFGNJJsHPkBKy4lNB3iKrQ0N36uog==
+X-Received: by 2002:a62:ed06:0:b029:32c:a800:ba47 with SMTP id u6-20020a62ed060000b029032ca800ba47mr11372636pfh.56.1629328003962;
+        Wed, 18 Aug 2021 16:06:43 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b6sm842830pgs.94.2021.08.18.16.06.44
+        by smtp.gmail.com with ESMTPSA id b6sm842830pgs.94.2021.08.18.16.06.43
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 18 Aug 2021 16:06:44 -0700 (PDT)
+        Wed, 18 Aug 2021 16:06:43 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/3] btdev: Fix removing advertising set if it was terminated
-Date:   Wed, 18 Aug 2021 16:06:41 -0700
-Message-Id: <20210818230641.168705-3-luiz.dentz@gmail.com>
+Subject: [RFC 2/3] btdev: Fix order of BT_HCI_EVT_LE_ADV_SET_TERM
+Date:   Wed, 18 Aug 2021 16:06:40 -0700
+Message-Id: <20210818230641.168705-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210818230641.168705-1-luiz.dentz@gmail.com>
 References: <20210818230641.168705-1-luiz.dentz@gmail.com>
@@ -75,25 +75,62 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Consider the advertising set disabled but don't remove it as the host
-may still reuse it.
+BT_HCI_EVT_LE_ADV_SET_TERM shall come after
+BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE otherwise the host doesn't know
+the connection handle.
 ---
- emulator/btdev.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ emulator/btdev.c | 14 ++++++++------
+ 1 file changed, 8 insertions(+), 6 deletions(-)
 
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 7e9fa14c2..4a4c8bdcd 100644
+index cd0cfa45f..7e9fa14c2 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -5120,7 +5120,7 @@ static void ext_adv_term(void *data, void *user_data)
- 	if (conn && adv->type & 0x01) {
- 		adv_set_terminate(adv->dev, 0x00, adv->handle, conn->handle,
- 									0x00);
--		le_ext_adv_free(adv);
-+		ext_adv_disable(adv, NULL);
+@@ -5129,22 +5129,17 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 			struct le_ext_adv *ext_adv,
+ 			uint8_t status)
+ {
++	struct btdev_conn *conn = NULL;
+ 	struct bt_hci_evt_le_enhanced_conn_complete ev;
+ 	struct bt_hci_le_ext_create_conn *lecc = (void *)cmd->data;
+ 
+ 	memset(&ev, 0, sizeof(ev));
+ 
+ 	if (!status) {
+-		struct btdev_conn *conn;
+-
+ 		conn = conn_add_acl(btdev, cmd->peer_addr, cmd->peer_addr_type);
+ 		if (!conn)
+ 			return;
+ 
+-		/* Disable EXT ADV */
+-		queue_foreach(btdev->le_ext_adv, ext_adv_term, conn);
+-		queue_foreach(conn->link->dev->le_ext_adv, ext_adv_term, conn);
+-
+ 		ev.status = status;
+ 		ev.peer_addr_type = btdev->le_scan_own_addr_type;
+ 		if (ev.peer_addr_type == 0x01)
+@@ -5166,6 +5161,9 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 		le_meta_event(conn->link->dev,
+ 				BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &ev,
+ 				sizeof(ev));
++
++		/* Disable EXT ADV */
++		queue_foreach(conn->link->dev->le_ext_adv, ext_adv_term, conn);
  	}
+ 
+ 	ev.status = status;
+@@ -5177,6 +5175,10 @@ static void le_ext_conn_complete(struct btdev *btdev,
+ 
+ 	le_meta_event(btdev, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &ev,
+ 						sizeof(ev));
++
++	/* Disable EXT ADV */
++	if (conn)
++		queue_foreach(btdev->le_ext_adv, ext_adv_term, conn);
  }
  
+ static int cmd_ext_create_conn_complete(struct btdev *dev, const void *data,
 -- 
 2.31.1
 
