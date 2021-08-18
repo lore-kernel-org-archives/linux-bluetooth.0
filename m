@@ -6,36 +6,36 @@ X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3E8DCC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 15:28:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DED10C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:08:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FD81610A1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 15:28:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD23A6108D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:08:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230360AbhHRP2w (ORCPT
+        id S231402AbhHRRJS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Aug 2021 11:28:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53402 "EHLO mail.kernel.org"
+        Wed, 18 Aug 2021 13:09:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:37162 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239411AbhHRP2u (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Aug 2021 11:28:50 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 0F96D610E5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 15:28:16 +0000 (UTC)
+        id S229883AbhHRRJM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Aug 2021 13:09:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id E74BB610CB
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 17:08:37 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629300496;
-        bh=bkzLADR/4kU4xpQ9m12IeSPX8nwtF0MgO9TUDTmHU1g=;
+        s=k20201202; t=1629306517;
+        bh=aQ4us2v8t4NK39OolxwdQp0E9RAybPeZkVwFbBVOAS8=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=lVPYNJGTWkJlQ/+HHyau84cIzBF36/tyHf0YFeEEVH+8zmdCnNzoSnhVT19Y/SLDv
-         Jd4Vi3OuZPfUWhznXCgRInrmJn1JqzFQ/N5CEZsCu+l7XtR2zTQSesctyBaiRtKQsQ
-         /9BhUDgSgox175ILMdZN98FeRTMnCYe2l3qkzrjLI++NJUksdvLHqIVHrrh/cvPDET
-         97l6NGVAM04m28WJKYPARIT06mKaTPOh7FC6ihG0luEovaQmF7rbi1cWoSPMJoOzNp
-         7D7ig/s75gxWijcVv5wxJFSlXxZwSkm8Rg997wlT9QvNoBTq/39NKaj8Y8Pa3dmsf5
-         gxoxjM+yKrKUg==
+        b=ipBxjpdr/ac7Ttcv+sgsP1M1cwrhPFqYedehCwK1bdTCCAHNgkZr/h0GTtXhYLCbG
+         6dY5Ow3tWcBRPh+4nXEgToPdJvoReqBzoW2XLZiUjNXqri5ZD1gdnjs38XJpUprVxL
+         gMucowHL33HZqdvXQoTJ4GlSaKxAByT4/V/U9Ea+IryqZXFSy1UTogtV9uqHek54/w
+         JtgPMVhY/n8A5oZm+frMnrQAqY9E7KCAn8hX97fWGCMKlkbynhpXEoMKz+zJVN8Nbd
+         i+j2BtgHia23GRBi41vdUytAoFUnm7WBGGtx7kBoSYw0Ts2sX9lmp97LBg/ahud+Ue
+         xRbBY4A9oH0Kg==
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 213923] Bluetooth: AC9560 doesn't respond any more after
  suspend multiple times
-Date:   Wed, 18 Aug 2021 15:28:15 +0000
+Date:   Wed, 18 Aug 2021 17:08:37 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -44,14 +44,14 @@ X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
 X-Bugzilla-Severity: high
-X-Bugzilla-Who: chethan.tumkur.narayan@intel.com
+X-Bugzilla-Who: koba.ko@canonical.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-213923-62941-qgM5vv5eH6@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-213923-62941-YnRGUO3Es8@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-213923-62941@https.bugzilla.kernel.org/>
 References: <bug-213923-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -65,42 +65,24 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D213923
 
-Chethan T N (chethan.tumkur.narayan@intel.com) changed:
+--- Comment #6 from KobaKo (koba.ko@canonical.com) ---
+@Chethan,
+Im using Ubuntu to reproduce on JSL platform.
+the issue could be observed since 5.14rc3 only with AC9560.
+With ax210, there's no issue.
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |chethan.tumkur.narayan@inte
-                   |                            |l.com
+The suspend&resume is a normal behavior when you don't use notebook any more
+and  suspend notebook for the power saving.
+User wouldn't know if bt fw is downloading when user want to suspend the his
+notebook.
 
---- Comment #5 from Chethan T N (chethan.tumkur.narayan@intel.com) ---
-Would you please help to provide more details on the test setup and test ca=
-se.
+I just use a scripts to run suspend&resume automatically.
+#for i in $(seq 10);do sleep 10;sudo rtcwake -m mem -s 10;done
 
-Setup details:
-Linux distribution : Ubuntu/Fedora  ??
-kernel version: 5.xx??
-Model name: ??
+you also can suspend by pushing suspend button manually.
 
-From the logs shared looks like one every suspend/resume Bluetooth device is
-getting enumerated and FW download sequence is initiated.
-
-May i know why the above behavior ?
-
-And also noticed that in most of the suspend/resume flow during the FW down=
-load
-sequence itself the system is entering the suspend state.
-
-//System entering SUSPEND State=20
-37213   2021-08-06 12:39:52.879966      host    controller      252=20=20=
-=20=20=20=20=20=20=20=20=20=20
-                Sent Intel Secure Send
-
-//System RESUME state
-37222   2021-08-06 12:40:16.529947      host    controller      3=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20
-                Sent Intel Read Version=20
-
-May i know why the above behavior?
+Could you share what's correct hw_variant of ac9560?
+0x11 or 0x13?
 
 --=20
 You may reply to this email to add a comment.
