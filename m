@@ -2,117 +2,259 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED,USER_AGENT_GIT autolearn=unavailable autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16757C43214
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 04:39:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7904BC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 05:49:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F1DD161058
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 04:39:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 55E7461029
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 05:49:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237585AbhHREjt (ORCPT
+        id S237797AbhHRFuX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Aug 2021 00:39:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52644 "EHLO
+        Wed, 18 Aug 2021 01:50:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237546AbhHREjt (ORCPT
+        with ESMTP id S237618AbhHRFuX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Aug 2021 00:39:49 -0400
-Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EFA3C0613D9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 21:39:15 -0700 (PDT)
-Received: by mail-pl1-x633.google.com with SMTP id o10so1093998plg.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 21:39:15 -0700 (PDT)
+        Wed, 18 Aug 2021 01:50:23 -0400
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71116C061764
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 22:49:48 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id x19so498776uat.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 17 Aug 2021 22:49:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RdYh0KzVSM6GfEPOUNKGwmds8J/gMHl6yf/nm5EaGwo=;
-        b=X/cmbieBqLTKIxbCHnmkgunhjwaIKPorKnk1/6Wwque4TYwFu3uY4W4ZbidEJM25fk
-         rAoEl49BCTVuCri5jNEnwPyphEu3F8Utqmen8mugWkqwt9bgvmdN4AhqRyAlnnTtWHm5
-         TThuObe62UlTKrCZlSHdLGZ/Ziace7M1m85BE=
+        d=google.com; s=20161025;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=8Qn1im2C26/pdifvb/kuJTeT1Tc9CnfljE4DMquw0Sg=;
+        b=cL2tUX2SM7uLX4/wkrottYL4tOg92dsJuReISIqOOnIakooWKALgbAeSwHhtGXRJXY
+         h3eILoqofomXWlYqU5F68XMJmRZ2657i2DgY+sQTutFR6cTM2jq1SBn7gYzBs+Bp6Sfr
+         wAoTsw254cYslLmqAkQH9nszkDJJyhQYSmocm7Tn963fpdXREdPd4lpTtmAC1VPXM+dr
+         vMH3b8TRlwq/TI4F05/5OWaL7V6m8th2ehFFw/HTXjvx3KSYndzI7lo3hCi4u1Ldyf1E
+         91XmJVq/p1zsFv6DyWsnFYd4qL0t0E6ohK+ehs4TF+mSPkDZqgfBlxB3gds1Qz9uOkV4
+         63Dg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RdYh0KzVSM6GfEPOUNKGwmds8J/gMHl6yf/nm5EaGwo=;
-        b=pfCvyyozc3tpXkITeJCoLIbWY3o0GPFI/WN1uSV7JzFVJVT5H9ivcB91/uKZwyotyK
-         Vc3MeSZKEwEOcsO2DlbpABOepEVhSPSAFgLDNvZSPDnEdkLcfQFSNik4rLDiI4kznnba
-         38uBM8Wsw7q4IfUeiN+LfBLnbTrcxtvvbc7zDfCkEylRC3HWxS5RtgO83LTJCD/oXfL7
-         U2FkPlyr9e1MNaie0/nWlE1388f39q8m3vJ3gIem0W1dy/XIFGFCrCO+C/Eo76g5U8Uw
-         SCOr219YnGSH1EzNRQZSel5hnQL2+rxa6BGU4jbitNp9RTWqASXpNW3QRz878XX/bwKB
-         Hu+g==
-X-Gm-Message-State: AOAM530oeu6bMnUrf7idi9/j7ToTj4i9ZsMRGrsc1FT/szhRjjTraqaA
-        nhxkzqJqCVkJTQCU3dky/FimEA==
-X-Google-Smtp-Source: ABdhPJxFPT7wVpzSlvT8DPbADw2xJozXJw6p/wgABDmTcU0Wr38l7tW8zwD75zO5rpG9oxsfn5DFzQ==
-X-Received: by 2002:a17:90b:d94:: with SMTP id bg20mr7153787pjb.61.1629261554669;
-        Tue, 17 Aug 2021 21:39:14 -0700 (PDT)
-Received: from www.outflux.net (smtp.outflux.net. [198.145.64.163])
-        by smtp.gmail.com with ESMTPSA id p30sm4389467pfh.116.2021.08.17.21.39.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 17 Aug 2021 21:39:13 -0700 (PDT)
-From:   Kees Cook <keescook@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Kees Cook <keescook@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: [PATCH] Bluetooth: mgmt: Pessimize compile-time bounds-check
-Date:   Tue, 17 Aug 2021 21:39:12 -0700
-Message-Id: <20210818043912.1466447-1-keescook@chromium.org>
-X-Mailer: git-send-email 2.30.2
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=8Qn1im2C26/pdifvb/kuJTeT1Tc9CnfljE4DMquw0Sg=;
+        b=CN6QXyzj9d3xeE+UW7Dxvg606qwbYg2pIZ5Me7wAI/enc66h8IS8RJ4DHHo+CX2YIo
+         TfI0tIu8JIKKQH8D60CAkDxu3TolSPvHGkI9ep3RyBKCvgQFuCgnnBcGdcWTnVee/Gwy
+         /cs5JGr8wolgVqkWYeiyK8pdXyDqQa3g5l4RRX0RsM+OHmDVogkVf7nHdd6H2c4gBsyc
+         jr5KNIdQOD+aVmI+hzr8CyiMD7vrVzmnnyhkEh2lGcgEwB20XRxPMoJhVVEqFtvfcwMz
+         vkzjeZ1YFEJbcEnY/vTWwBNudelWdWGaClZTwdbTo95icmbeZU8ATRDD99F5/2tt8XhX
+         8Tow==
+X-Gm-Message-State: AOAM531SOB5M3l3H0JOGEZH6mfoXOnY+VoTzCt0ybHa8OSskw8RvRUFi
+        nBB/iLXc+j4Lm++/170yTkyRtGH0QlLtz6MksY7YDg==
+X-Google-Smtp-Source: ABdhPJy7PzEtrWvtAEdhTjIMCPggrm+dEWmHLrkSJ3p+yuppnayrPaO2IZbyAVGXT25c2vgOJ52QFeCVyfxEzUwbigs=
+X-Received: by 2002:ab0:7014:: with SMTP id k20mr5435838ual.9.1629265787360;
+ Tue, 17 Aug 2021 22:49:47 -0700 (PDT)
 MIME-Version: 1.0
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1435; h=from:subject; bh=E0l6g+Q1UhnSMK4lDN7R/eQd0SuD7Heg/eD8YzK5Lic=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBhHI7vo8PzMk5HF85TGPbfFBW7iT4mrKvH5KZU5yn/ EkWlbBmJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCYRyO7wAKCRCJcvTf3G3AJny4D/ 9kWDf6kh3N+iOlTVivvviWpmxld7NQMSysukicQNgR4Dx8+v5gkpBVF24L+b/IjWlz1Q0bYoNeHz8Q 05okcO2+H3Z2d0C9lqy4dUvYk4v+lNQOuT1oQoc00+Ki7iMO5hIEEw0NcNALnAwNaWAZQyL316p1K0 BwBuVRms/OPZmrNjA7tNB4kTQYn8NKMEw4XmXd3bZGyPtOXHFdznKXPCHKLc7xfp9S5CWWMi74+3S7 XSRxLGCJJNwdqiSP5chMEwUzGdyMkLDloeWyknX4Qk3Mr28EyZXXkrILdpTlAPPCQ2194vXCy7tOEF b54oNbJI8g7HPCqh4oJsLC0R+OMbE/VEr/cobvPT9w6h53xo14s9rTsB7A9ppZr0xZDScpGNK/fj/H qbDej5cRTSDwG9VztYg6h+XLk3u9Sk/H23r0ASa5yszCJLho3tJLICpJhqUJXGxuH6pj17xAFZuh/S DqBArkMNxHyt2q2UmoqpGTR5Fpg4MeOxbzCNo087bCvFkXOembW+nbP7i51jiBaJf3dvtTIc7dl1df pn7CQGa5gcz+dUNskx58QRhJiyGNWpD+8BCP6Co/56dunORoba5Gnpso3ZQCi6Hf3iw/KgNd9/Ob60 YaURx0KP4qAqdhiOzeTVYgPZq+mM6wIV2p0zK/EVOB6DyUOr/U52eyoQBAiQ==
-X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
-Content-Transfer-Encoding: 8bit
+References: <20210815201611.v9.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
+ <61191554.1c69fb81.89ead.b7d9@mx.google.com> <CABBYNZLcEctR6=ovTK_CABqkKgU8UCKQQ30VsVsAJkdEA+xY0A@mail.gmail.com>
+ <CAHFy418ZxGDjGvr9RBkKAk1FJa9Lq6jB1D1esnJmX99eKadJbw@mail.gmail.com>
+In-Reply-To: <CAHFy418ZxGDjGvr9RBkKAk1FJa9Lq6jB1D1esnJmX99eKadJbw@mail.gmail.com>
+From:   Joseph Hwang <josephsih@google.com>
+Date:   Wed, 18 Aug 2021 13:49:36 +0800
+Message-ID: <CAHFy418sMhHOc1SAZ01P0qOAcWVfUGo3=0TC_9KSqs-2xscNUw@mail.gmail.com>
+Subject: Re: [v9,1/5] Bluetooth: btusb: disable Intel link statistics
+ telemetry events
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Miao-chen Chou <mcchou@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-After gaining __alloc_size hints, GCC thinks it can reach a memcpy()
-with eir_len == 0 (since it can't see into the rewrite of status).
-Instead, check eir_len == 0, avoiding this future warning:
+Hi Luiz:
 
-In function 'eir_append_data',
-    inlined from 'read_local_oob_ext_data_complete' at net/bluetooth/mgmt.c:7210:12:
-./include/linux/fortify-string.h:54:29: warning: '__builtin_memcpy' offset 5 is out of the bounds [0, 3] [-Warray-bounds]
-...
-net/bluetooth/hci_request.h:133:2: note: in expansion of macro 'memcpy'
-  133 |  memcpy(&eir[eir_len], data, data_len);
-      |  ^~~~~~
+  I am wondering if it is possible to merge these kernel patches
+before fixing the mgmt-tester?
 
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Kees Cook <keescook@chromium.org>
----
- net/bluetooth/mgmt.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  The mgmt-tester failed due to its checking against the fixed exp
+feature count and the corresponding exp UUIDs and flags. A more
+flexible tester may be required so that the tester would not be broken
+whenever a new exp feature is added.
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 1e21e014efd2..cea01e275f1e 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -7204,7 +7204,7 @@ static void read_local_oob_ext_data_complete(struct hci_dev *hdev, u8 status,
- 	if (!mgmt_rp)
- 		goto done;
- 
--	if (status)
-+	if (eir_len == 0)
- 		goto send_rsp;
- 
- 	eir_len = eir_append_data(mgmt_rp->eir, 0, EIR_CLASS_OF_DEV,
+Thanks and regards,
+Joseph
+
+On Tue, Aug 17, 2021 at 5:54 PM Joseph Hwang <josephsih@google.com> wrote:
+>
+> (Resent this email to contain only plaintext.)
+>
+> Hi Luiz:
+>
+>   It seems that mgmt-tester currently uses a fixed feature count.
+> Every time a new exp feature is added, the mgmt-tester would  be
+> broken. By checking the kernel, it seems that there are currently 2 or
+> 3 exp features, i.e., debug uuid, simultaneous central peripheral
+> uuid, and LL privacy uuid. Note that the debug exp feature is guarded
+> by CONFIG_BT_FEATURE_DEBUG. So I am not sure how the kernel is
+> configured and made on your test setup.
+>
+>   If we fix the mgmt-tester in bluez to have 3 or 4 (which one?)
+> features before merging the kernel changes here that adds a new
+> quality exp feature, it would not match the existing kernel which has
+> only 2 or 3 features.
+>
+>   Do you have any preference about how to fix the mgmt-tester?
+>
+>   My suggestion is to remove the checking of the feature count from
+> the mgmt-tester. The feature count changes over time. It is possible
+> to implement a customized exp_feat_check function which can be more
+> flexible. If a uuid is found in the MGMT response, its associated
+> flags are checked against.
+>
+>   The data currently used in the mgmt-tester:
+>
+> static const uint8_t read_exp_feat_param_success[] = {
+> 0x02, 0x00, /* Feature Count */
+> 0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, /* UUID - Simultaneous */
+> 0x27, 0x92, 0x96, 0x46, 0xc0, 0x42, /* Central Peripheral */
+> 0xb5, 0x10, 0x1b, 0x67,
+> 0x00, 0x00, 0x00, 0x00, /* Flags */
+> 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, /* UUID - LL Privacy */
+> 0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
+> 0x48, 0xa1, 0xc0, 0x15,
+> 0x02, 0x00, 0x00, 0x00, /* Flags */
+> };
+>
+>
+>   Please let me know what you think.
+>
+> Thanks and regards,
+> Joseph
+>
+>
+> On Tue, Aug 17, 2021 at 1:49 AM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Joseph,
+> >
+> > On Sun, Aug 15, 2021 at 6:25 AM <bluez.test.bot@gmail.com> wrote:
+> > >
+> > > This is automated email and please do not reply to this email!
+> > >
+> > > Dear submitter,
+> > >
+> > > Thank you for submitting the patches to the linux bluetooth mailing list.
+> > > This is a CI test results with your patch series:
+> > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=531683
+> > >
+> > > ---Test result---
+> > >
+> > > Test Summary:
+> > > CheckPatch                    PASS      2.92 seconds
+> > > GitLint                       PASS      0.61 seconds
+> > > BuildKernel                   PASS      598.41 seconds
+> > > TestRunner: Setup             PASS      394.12 seconds
+> > > TestRunner: l2cap-tester      PASS      2.89 seconds
+> > > TestRunner: bnep-tester       PASS      2.07 seconds
+> > > TestRunner: mgmt-tester       FAIL      30.94 seconds
+> > > TestRunner: rfcomm-tester     PASS      2.31 seconds
+> > > TestRunner: sco-tester        PASS      2.20 seconds
+> > > TestRunner: smp-tester        FAIL      2.27 seconds
+> > > TestRunner: userchan-tester   PASS      2.09 seconds
+> > >
+> > > Details
+> > > ##############################
+> > > Test: CheckPatch - PASS - 2.92 seconds
+> > > Run checkpatch.pl script with rule in .checkpatch.conf
+> > >
+> > >
+> > > ##############################
+> > > Test: GitLint - PASS - 0.61 seconds
+> > > Run gitlint with rule in .gitlint
+> > >
+> > >
+> > > ##############################
+> > > Test: BuildKernel - PASS - 598.41 seconds
+> > > Build Kernel with minimal configuration supports Bluetooth
+> > >
+> > >
+> > > ##############################
+> > > Test: TestRunner: Setup - PASS - 394.12 seconds
+> > > Setup environment for running Test Runner
+> > >
+> > >
+> > > ##############################
+> > > Test: TestRunner: l2cap-tester - PASS - 2.89 seconds
+> > > Run test-runner with l2cap-tester
+> > > Total: 40, Passed: 40 (100.0%), Failed: 0, Not Run: 0
+> > >
+> > > ##############################
+> > > Test: TestRunner: bnep-tester - PASS - 2.07 seconds
+> > > Run test-runner with bnep-tester
+> > > Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
+> > >
+> > > ##############################
+> > > Test: TestRunner: mgmt-tester - FAIL - 30.94 seconds
+> > > Run test-runner with mgmt-tester
+> > > Total: 448, Passed: 444 (99.1%), Failed: 1, Not Run: 3
+> > >
+> > > Failed Test Cases
+> > > Read Exp Feature - Success                           Failed       0.012 seconds
+> >
+> > Looks like there is a regression on mgmt-tester:
+> >
+> > Read Exp Feature - Success - run
+> >   Sending Read Experimental Features Information (0x0049)
+> >   Test condition added, total 1
+> >   Read Experimental Features Information (0x0049): Success (0x00)
+> >   Invalid cmd response parameter size
+> > Read Exp Feature - Success - test failed
+> >
+> > >
+> > > ##############################
+> > > Test: TestRunner: rfcomm-tester - PASS - 2.31 seconds
+> > > Run test-runner with rfcomm-tester
+> > > Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
+> > >
+> > > ##############################
+> > > Test: TestRunner: sco-tester - PASS - 2.20 seconds
+> > > Run test-runner with sco-tester
+> > > Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
+> > >
+> > > ##############################
+> > > Test: TestRunner: smp-tester - FAIL - 2.27 seconds
+> > > Run test-runner with smp-tester
+> > > Total: 8, Passed: 7 (87.5%), Failed: 1, Not Run: 0
+> > >
+> > > Failed Test Cases
+> > > SMP Client - SC Request 2                            Failed       0.024 seconds
+> > >
+> > > ##############################
+> > > Test: TestRunner: userchan-tester - PASS - 2.09 seconds
+> > > Run test-runner with userchan-tester
+> > > Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+> > >
+> > >
+> > >
+> > > ---
+> > > Regards,
+> > > Linux Bluetooth
+> > >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
+>
+>
+>
+> --
+>
+> Joseph Shyh-In Hwang
+> Email: josephsih@google.com
+
+
+
 -- 
-2.30.2
 
+Joseph Shyh-In Hwang
+Email: josephsih@google.com
