@@ -2,186 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+X-Spam-Status: No, score=-7.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=no
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC196C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 07:38:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61DAEC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 08:05:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B50B961076
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 07:38:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4AFDC6108B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 08:05:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238928AbhHRHim (ORCPT
+        id S239407AbhHRIFh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Aug 2021 03:38:42 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:63214 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238482AbhHRHil (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Aug 2021 03:38:41 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1629272287; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=d0yXr/T2VW4S7hBEk5V/ACcxbZ3MzyH062yZu9AHnlE=;
- b=awdU0otB2G0MzS3EnLykMR0rmvG5M6UNuZo97mJaKsb2RTiJ5db2wm2mZyNEZL7mvLYsZ0+U
- c/uyfEXibWRFHgor/NBGatfSuLEAXegUqKzwzCy82s53/E2uEagSTkwmvfUnp0PDWFiXUkNv
- 3oNP6KlEwl2tf2KVxlRj329Os8s=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 611cb8d2454b7a558fc7fa5c (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 18 Aug 2021 07:37:54
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id D9588C43616; Wed, 18 Aug 2021 07:37:53 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id A7317C43460;
-        Wed, 18 Aug 2021 07:37:51 +0000 (UTC)
+        Wed, 18 Aug 2021 04:05:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43542 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239270AbhHRIDh (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Aug 2021 04:03:37 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D21DC0617A8
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 01:02:49 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id gr13so3223596ejb.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 01:02:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares-net.20150623.gappssmtp.com; s=20150623;
+        h=to:references:from:subject:message-id:date:user-agent:mime-version
+         :in-reply-to:content-language:content-transfer-encoding;
+        bh=mZorCO9dHkK9Z+tLmMENe4sm60DKPCbLZG525gkchFY=;
+        b=q6tSnI/hcRssEOPOa+x3Tf6o11TQuaH2Vap6Kz/BOFM9d8cBeudswn2ue6jCVrUA4S
+         42aKPQUMpoBdV2RXEgmBUIuk69wyU09Q4FQn03q87aSLbbeEY54b2aoOEervw8/Vx+Ze
+         RCJDnJWxh+ehYx2l3x9QePYppFzgIhAk9I8Ez1Ui/r1WtLXPhmjlzTE3HypQH/Fmpzd7
+         SjM0w8dE0TQs34HsvUHqSMipeoMFYXXws5EnPFxxmOIzbHU88B37Y4hS/JToPTiLOeXH
+         AyFYW4fBlKR+vnJPKKKZP7U495i7gia5DqO5LG6OjQ4IZEWUmmQmIn1+olH/pn0q4YR7
+         i/iQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:to:references:from:subject:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=mZorCO9dHkK9Z+tLmMENe4sm60DKPCbLZG525gkchFY=;
+        b=ll6LyX3YrrfSe+B8hhqTaWH54UelQJ8VWbHbiHxUper6TeHO/OJNh60mp6ze8Pmb57
+         /YnaxHPx8/pyrLIwzA0e3MrrWfY9XoFSx/OfD7AmgZVrua8TLQfFjVnQSqz/5Z1s4nWw
+         Mn8AQ1FDApAjeglI+TAfBlQTV08eBJQ2lQvFkuRt28Sd7yFRNCC10mVv8EfcDDL1JEfw
+         oMhkRASqJJ2PIZBArJr/PC5Lhj6Y7J+VCQfMo3Q1FvHgJne7cQlNFDFghO/VZVsYl3rs
+         DHPMs7JkWVDQNDg/io6M1fyKkF2FMfcuvkl4ri0W8DVw6oCnbirJ3jERMje46giFiONN
+         Qzwg==
+X-Gm-Message-State: AOAM532Cwk7nJM1ZC9IHiPTLSBNOXhH160HaMsKnNBucMZTtCAQzDzmv
+        yFgoKhEY/9k/Sx5l6bR9X7h+sA==
+X-Google-Smtp-Source: ABdhPJx/EKzaFi+cRnqWvYi6W0WthKoTJQPIJ62VMOaDiheyKphteFXp8M2RNgE7IjrEAbkEAeFxvw==
+X-Received: by 2002:a17:906:c1da:: with SMTP id bw26mr8561207ejb.253.1629273767444;
+        Wed, 18 Aug 2021 01:02:47 -0700 (PDT)
+Received: from tsr-lap-08.nix.tessares.net ([213.211.156.192])
+        by smtp.gmail.com with ESMTPSA id c25sm2185584eds.93.2021.08.18.01.02.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 18 Aug 2021 01:02:47 -0700 (PDT)
+To:     syzbot <syzbot+7b938780d5deeaaf938f@syzkaller.appspotmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, mathew.j.martineau@linux.intel.com,
+        netdev@vger.kernel.org, pabeni@redhat.com,
+        syzkaller-bugs@googlegroups.com, viro@zeniv.linux.org.uk
+References: <00000000000012030e05c9c8bc85@google.com>
+From:   Matthieu Baerts <matthieu.baerts@tessares.net>
+Subject: Re: [syzbot] KFENCE: use-after-free in kvm_fastop_exception
+Message-ID: <58cef9e0-69de-efdb-4035-7c1ed3d23132@tessares.net>
+Date:   Wed, 18 Aug 2021 10:02:46 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 18 Aug 2021 15:37:51 +0800
-From:   tjiang@codeaurora.org
-To:     Zijun Hu <zijuhu@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add support different nvm to
- distinguish different factory for WCN6855 controller
-In-Reply-To: <1628758216-3201-1-git-send-email-zijuhu@codeaurora.org>
-References: <1628758216-3201-1-git-send-email-zijuhu@codeaurora.org>
-Message-ID: <fcd7e83c3cd39ea89c94345ec00b5c6c@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+In-Reply-To: <00000000000012030e05c9c8bc85@google.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hello,
 
-marcel:
-   could you help review this patch ? thank you.
-tjiang
+On 18/08/2021 00:21, syzbot wrote:
+> syzbot has bisected this issue to:
+> 
+> commit c4512c63b1193c73b3f09c598a6d0a7f88da1dd8
+> Author: Matthieu Baerts <matthieu.baerts@tessares.net>
+> Date:   Fri Jun 25 21:25:22 2021 +0000
+> 
+>     mptcp: fix 'masking a bool' warning
+> 
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=122b0655300000
+> start commit:   b9011c7e671d Add linux-next specific files for 20210816
+> git tree:       linux-next
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=112b0655300000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=162b0655300000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=a245d1aa4f055cc1
+> dashboard link: https://syzkaller.appspot.com/bug?extid=7b938780d5deeaaf938f
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=157a41ee300000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14f78ff9300000
 
-On 2021-08-12 16:50, Zijun Hu wrote:
-> From: Tim Jiang <tjiang@codeaurora.org>
-> 
-> we have different factory to produce wcn6855 soc chip, so we should
-> use different nvm file with suffix to distinguish them.
-> 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
-> ---
->  drivers/bluetooth/btusb.c | 60 
-> ++++++++++++++++++++++++++++++++++++++++-------
->  1 file changed, 51 insertions(+), 9 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index b1a05bb9f4bf..d7b4e0f1c3e3 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -4013,6 +4013,9 @@ static int btusb_set_bdaddr_wcn6855(struct 
-> hci_dev *hdev,
->  #define QCA_DFU_TIMEOUT		3000
->  #define QCA_FLAG_MULTI_NVM      0x80
-> 
-> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> +
->  struct qca_version {
->  	__le32	rom_version;
->  	__le32	patch_version;
-> @@ -4044,6 +4047,7 @@ static const struct qca_device_info
-> qca_devices_table[] = {
->  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
->  };
-> 
->  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
-> request,
-> @@ -4198,6 +4202,39 @@ static int btusb_setup_qca_load_rampatch(struct
-> hci_dev *hdev,
->  	return err;
->  }
-> 
-> +static int btusb_setup_qca_form_nvm_name(char **fwname,
-> +					int max_size,
-> +					struct qca_version *ver,
-> +					char *factory)
-> +{
-> +	/* if boardid equal 0, use default nvm without suffix */
-> +	switch (le16_to_cpu(ver->board_id)) {
-> +	case 0x0:
-> +		/* we add suffix factory to distinguish with different factory. */
-> +		if (factory != NULL) {
-> +			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s.bin",
-> +				 le32_to_cpu(ver->rom_version),
-> +				 factory);
-> +		} else {
-> +			snprintf(*fwname, max_size, "qca/nvm_usb_%08x.bin",
-> +				 le32_to_cpu(ver->rom_version));
-> +		}
-> +		break;
-> +	default:
-> +		if (factory != NULL) {
-> +			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%s_%04x.bin",
-> +				le32_to_cpu(ver->rom_version),
-> +				factory,
-> +				le16_to_cpu(ver->board_id));
-> +		} else {
-> +			snprintf(*fwname, max_size, "qca/nvm_usb_%08x_%04x.bin",
-> +				le32_to_cpu(ver->rom_version),
-> +				le16_to_cpu(ver->board_id));
-> +		}
-> +		break;
-> +	}
-> +}
-> +
->  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
->  				    struct qca_version *ver,
->  				    const struct qca_device_info *info)
-> @@ -4206,19 +4243,24 @@ static int btusb_setup_qca_load_nvm(struct
-> hci_dev *hdev,
->  	char fwname[64];
->  	int err;
-> 
-> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		/* if boardid equal 0, use default nvm without surfix */
-> -		if (le16_to_cpu(ver->board_id) == 0x0) {
-> +	switch (ver->ram_version) {
-> +	case WCN6855_2_0_RAM_VERSION_GF:
-> +	case WCN6855_2_1_RAM_VERSION_GF:
-> +		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, "gf");
-> +		} else {
->  			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
->  				 le32_to_cpu(ver->rom_version));
-> +		}
-> +		break;
-> +	default:
-> +		if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +			btusb_setup_qca_form_nvm_name(&fwname, sizeof(fwname), ver, NULL);
->  		} else {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -				le32_to_cpu(ver->rom_version),
-> -				le16_to_cpu(ver->board_id));
-> +			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> +				 le32_to_cpu(ver->rom_version));
->  		}
-> -	} else {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -			 le32_to_cpu(ver->rom_version));
-> +		break;
->  	}
-> 
->  	err = request_firmware(&fw, fwname, &hdev->dev);
+I'm pretty sure the commit c4512c63b119 ("mptcp: fix 'masking a bool'
+warning") doesn't introduce the reported bug. This minor fix is specific
+to MPTCP which doesn't seem to be used here.
+
+I'm not sure how I can tell syzbot this is a false positive.
+
+Cheers,
+Matt
+-- 
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
