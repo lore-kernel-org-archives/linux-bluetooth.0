@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-9.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DED10C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:08:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CF29C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:45:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD23A6108D
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:08:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 22B8460EFE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 18 Aug 2021 17:45:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231402AbhHRRJS (ORCPT
+        id S229667AbhHRRpn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 18 Aug 2021 13:09:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37162 "EHLO mail.kernel.org"
+        Wed, 18 Aug 2021 13:45:43 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58012 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229883AbhHRRJM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 18 Aug 2021 13:09:12 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id E74BB610CB
-        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 17:08:37 +0000 (UTC)
+        id S229448AbhHRRpm (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 18 Aug 2021 13:45:42 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id BBC55610CB
+        for <linux-bluetooth@vger.kernel.org>; Wed, 18 Aug 2021 17:45:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629306517;
-        bh=aQ4us2v8t4NK39OolxwdQp0E9RAybPeZkVwFbBVOAS8=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=ipBxjpdr/ac7Ttcv+sgsP1M1cwrhPFqYedehCwK1bdTCCAHNgkZr/h0GTtXhYLCbG
-         6dY5Ow3tWcBRPh+4nXEgToPdJvoReqBzoW2XLZiUjNXqri5ZD1gdnjs38XJpUprVxL
-         gMucowHL33HZqdvXQoTJ4GlSaKxAByT4/V/U9Ea+IryqZXFSy1UTogtV9uqHek54/w
-         JtgPMVhY/n8A5oZm+frMnrQAqY9E7KCAn8hX97fWGCMKlkbynhpXEoMKz+zJVN8Nbd
-         i+j2BtgHia23GRBi41vdUytAoFUnm7WBGGtx7kBoSYw0Ts2sX9lmp97LBg/ahud+Ue
-         xRbBY4A9oH0Kg==
+        s=k20201202; t=1629308707;
+        bh=EZuPOAXy4C5pKGV4yG9d4e9WtZOmPj8DI3uz+IVMzDc=;
+        h=From:To:Subject:Date:From;
+        b=jFhzZlKTx+9baLR2f3TUjlTQA8yJm2o/gHsQVn319KbxlGJR1aQL9muDINH7scsKn
+         Whw/lLUP9Iy1toHQoT2l17belmtub+oAXgYWrnTjHOZm/YKuFr/jIjvjUAoVVuOM1/
+         rY4ywsk/6nlpe7qLoeDYAD3NuRCmSIvHySFcJh1VkwI4Axcv3a2/CdhrebgQERblpg
+         0qz2VFCLUMudeOYHkYL0tOGGZJhHwTOwz6MAIVe4KC9chyFSPRQm/Jls2MvIS9kvTy
+         g4JOOKHsahrsXk+FljusYRXRZLPt8vNwSzyD4tgGU3Es/5tSAc9TiI4qQ7RWeukOE1
+         /xf7iH4jo6vcw==
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 213923] Bluetooth: AC9560 doesn't respond any more after
- suspend multiple times
-Date:   Wed, 18 Aug 2021 17:08:37 +0000
+Subject: [Bug 214103] New: HCI_CHANNEL_USER sockets leave device running
+ after exit
+Date:   Wed, 18 Aug 2021 17:45:07 +0000
 X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
+X-Bugzilla-Type: new
 X-Bugzilla-Watch-Reason: None
 X-Bugzilla-Product: Drivers
 X-Bugzilla-Component: Bluetooth
 X-Bugzilla-Version: 2.5
 X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: koba.ko@canonical.com
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: pab@pabigot.com
 X-Bugzilla-Status: NEW
 X-Bugzilla-Resolution: 
 X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-213923-62941-YnRGUO3Es8@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-213923-62941@https.bugzilla.kernel.org/>
-References: <bug-213923-62941@https.bugzilla.kernel.org/>
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-214103-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Bugzilla-URL: https://bugzilla.kernel.org/
@@ -63,26 +63,74 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D213923
+https://bugzilla.kernel.org/show_bug.cgi?id=3D214103
 
---- Comment #6 from KobaKo (koba.ko@canonical.com) ---
-@Chethan,
-Im using Ubuntu to reproduce on JSL platform.
-the issue could be observed since 5.14rc3 only with AC9560.
-With ax210, there's no issue.
+            Bug ID: 214103
+           Summary: HCI_CHANNEL_USER sockets leave device running after
+                    exit
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.11.0-7620-generic
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: pab@pabigot.com
+        Regression: No
 
-The suspend&resume is a normal behavior when you don't use notebook any more
-and  suspend notebook for the power saving.
-User wouldn't know if bt fw is downloading when user want to suspend the his
-notebook.
+Created attachment 298353
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D298353&action=3Dedit
+code to reproduce behavior
 
-I just use a scripts to run suspend&resume automatically.
-#for i in $(seq 10);do sleep 10;sudo rtcwake -m mem -s 10;done
+HCI_CHANNEL_USER is documented[1] as providing an exclusive (?[2]) Bluetooth
+socket channel for application use given CAP_NET_ADMIN. This channel type
+requires that the device be down when the socket is bound.  The device
+transitions to UP RUNNING as a side-effect of a successful binding.
 
-you also can suspend by pushing suspend button manually.
+When the socket is closed and the application exits, the device remains up =
+and
+running.  It's unclear whether this is a bug or a feature; in any case it is
+not what somebody might expect, as it prevents the application from starting
+again without external action to bring the device back down.
 
-Could you share what's correct hw_variant of ac9560?
-0x11 or 0x13?
+Reproducing example attached, and command sequence below.
+
+[1]:
+https://git.kernel.org/pub/scm/linux/kernel/git/stable/linux.git/commit/?h=
+=3Dv5.13.12&id=3D23500189d7e03a071f0746f43f2cce875a62c91c
+
+[2]: https://bugzilla.kernel.org/show_bug.cgi?id=3D135431
+
+
+tirzah[1050]$ sudo hciconfig hci0 down
+tirzah[1051]$ hciconfig hci0
+hci0:   Type: Primary  Bus: USB
+        BD Address: A4:C3:F0:F2:23:E3  ACL MTU: 1021:4  SCO MTU: 96:6
+        DOWN=20
+        RX bytes:64500 acl:0 sco:0 events:4125 errors:0
+        TX bytes:650824 acl:0 sco:0 commands:3992 errors:0
+
+tirzah[1052]$ gcc repro.c
+tirzah[1053]$ sudo setcap cap_net_raw,cap_net_admin=3Dep ./a.out
+tirzah[1054]$ getcap ./a.out
+./a.out =3D cap_net_admin,cap_net_raw+ep
+tirzah[1055]$ ./a.out=20
+opening device 0
+dd=3D3; binding to user channel
+bound to user channel; closing
+closed
+tirzah[1056]$ hciconfig hci0
+hci0:   Type: Primary  Bus: USB
+        BD Address: A4:C3:F0:F2:23:E3  ACL MTU: 1021:4  SCO MTU: 96:6
+        UP RUNNING=20
+        RX bytes:65256 acl:0 sco:0 events:4180 errors:0
+        TX bytes:653053 acl:0 sco:0 commands:4047 errors:0
+
+tirzah[1057]$
 
 --=20
 You may reply to this email to add a comment.
