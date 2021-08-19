@@ -2,107 +2,114 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-6.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D510CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:07:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D79DDC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:10:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B288D61130
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:07:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B6B5860EFE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:10:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238924AbhHSPIP convert rfc822-to-8bit (ORCPT
+        id S239539AbhHSPKj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:08:15 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34178 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238141AbhHSPIP (ORCPT
+        Thu, 19 Aug 2021 11:10:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52926 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232821AbhHSPKj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:08:15 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7E93ECED16;
-        Thu, 19 Aug 2021 17:07:37 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v3] Bluetooth: Fix return value in hci_dev_do_close()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210817064411.2378-1-l4stpr0gr4m@gmail.com>
-Date:   Thu, 19 Aug 2021 17:07:37 +0200
+        Thu, 19 Aug 2021 11:10:39 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 997BBC061575;
+        Thu, 19 Aug 2021 08:10:02 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id y34so13668058lfa.8;
+        Thu, 19 Aug 2021 08:10:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=5Z1QQroQWVoOLfcgLvsMByWTY84xsaRYlR2gMwC7hxk=;
+        b=Wph47GNrBXv6xnwCytTIYfUWyrKDGiYMLx8wDAPgogTj5qllaQVxbDbOxvOkVT8wkh
+         aBL1oMDTfuf7Dq/rz1FnOavTRnKppZcR0bX/0ZAZSpyqMnCdaMBmS0vnTJykEz3SvsD9
+         b7Azv/+91i/9zESgsuaTghrh+WiYQNdhDZtengbdIql+gxY4hhlSD3hSdsdvCsIiw7gV
+         ELvQg14IaG4yg1BU+GVRpQJPJjAqO6WdS3aGdrHLyFEKYDpmKWT+i81TutZmpv8HKelY
+         9X/NsfshCPQYUmVqEfj57itsP9knmanK5d8v8+ut7AQj1aW5RP+LVP8GiBJQbU9nc9zn
+         vf/w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=5Z1QQroQWVoOLfcgLvsMByWTY84xsaRYlR2gMwC7hxk=;
+        b=jXCrrkrV+VbM/HE5ACbeBxHputIq4msXVRpZyUUrGNNpe1SnJwlJqZkaP1ZoqOM4+V
+         YQcqlzY1ydUzk7cpUD3bNN3zjmpmkWds31NQIq0iL7KgKblHuEfMepuhfCJFXTif9LuD
+         Pp0qY5wIbFHc6Yt5soQ6cAGcdZb9IjxEo64yGheoNZtlAya5NtF4AGz51EtZK5Srd6iy
+         L3Fjnpo3Qo39T1F3zEmi16T0mucE0ocK9dlrvw8M7qpELBIB+i1iHMNv0bJ5K2QCIKW1
+         sVlQFOb+j9gCBcR+Cobq7r9ZpIccrglINyH12W8qmJTe+BVIW9Gk/ghhLM0pbuJGCGdC
+         iWWA==
+X-Gm-Message-State: AOAM5313/Xzof8pw+mlkq96sgChIsTgoAQ+ZXnoflCQNfTFhdykHRMxr
+        88cdy6wpPqg74Ed5Fr5vUN0=
+X-Google-Smtp-Source: ABdhPJwgWP38M/SP0uiucvEGNq6+a0txunVlUgBKtt8n9jnpujqJPWVmJzmYr/N0T2dlE19gdvxsFQ==
+X-Received: by 2002:a05:6512:2187:: with SMTP id b7mr11146881lft.185.1629385800800;
+        Thu, 19 Aug 2021 08:10:00 -0700 (PDT)
+Received: from [192.168.1.11] ([46.235.66.127])
+        by smtp.gmail.com with ESMTPSA id w12sm332511lfq.277.2021.08.19.08.10.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 19 Aug 2021 08:10:00 -0700 (PDT)
+Subject: Re: [PATCH] Bluetooth: add timeout sanity check to hci_inquiry
+To:     Marcel Holtmann <marcel@holtmann.org>
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <C0D6D79E-7325-4A7C-9153-FB35A88DD9CB@holtmann.org>
-References: <20210817064411.2378-1-l4stpr0gr4m@gmail.com>
-To:     Kangmin Park <l4stpr0gr4m@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        linux-kernel@vger.kernel.org,
+        syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+References: <20210817103108.1160-1-paskripkin@gmail.com>
+ <0038C6D9-DEAF-4CB2-874C-00F6CEFCF26C@holtmann.org>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+Message-ID: <c3e1a8ca-2ded-f992-a1c3-d144397a7b2a@gmail.com>
+Date:   Thu, 19 Aug 2021 18:09:58 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.12.0
+MIME-Version: 1.0
+In-Reply-To: <0038C6D9-DEAF-4CB2-874C-00F6CEFCF26C@holtmann.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kangmin,
-
-> hci_error_reset() return without calling hci_dev_do_open() when
-> hci_dev_do_close() return error value which is not 0.
+On 8/19/21 6:05 PM, Marcel Holtmann wrote:
+> Hi Pavel,
 > 
-> Also, hci_dev_close() return hci_dev_do_close() function's return
-> value.
+>> 	}
+>> 
 > 
-> But, hci_dev_do_close() return always 0 even if hdev->shutdown
-> return error value. So, fix hci_dev_do_close() to save and return
-> the return value of the hdev->shutdown when it is called.
-> 
-> Signed-off-by: Kangmin Park <l4stpr0gr4m@gmail.com>
-> ---
-> net/bluetooth/hci_core.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 8622da2d9395..84afc0d693a8 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -1718,6 +1718,7 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
-> int hci_dev_do_close(struct hci_dev *hdev)
-> {
-> 	bool auto_off;
-> +	int ret = 0;
-> 
-> 	BT_DBG("%s %p", hdev->name, hdev);
-> 
-> @@ -1732,13 +1733,13 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> 	    test_bit(HCI_UP, &hdev->flags)) {
-> 		/* Execute vendor specific shutdown routine */
-> 		if (hdev->shutdown)
-> -			hdev->shutdown(hdev);
-> +			ret = hdev->shutdown(hdev);
+> 	/* Restrict maximum inquiry length to 60 seconds */
+> 	if (ir.length > 60) {
+> 		..
 > 	}
 > 
-> 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
-> 		cancel_delayed_work_sync(&hdev->cmd_timer);
-> 		hci_req_sync_unlock(hdev);
-> -		return 0;
-> +		return ret;
-> 	}
+>> +	if (ir.length > HCI_INQUIRY_MAX_TIMEOUT) {
+>> +		err = -EINVAL;
+>> +		goto done;
+>> +	}
+>> +
 > 
-> 	hci_leds_update_powered(hdev, false);
-> @@ -1845,7 +1846,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
-> 	hci_req_sync_unlock(hdev);
+> I found this easier to read than adding anything define somewhere else. And since this is a legacy interface that is no longer used by bluetoothd, this should be fine. We will start to deprecate this eventually.
 > 
-> 	hci_dev_put(hdev);
-> -	return 0;
-> +	return ret;
-> }
+> And I prefer 1 minute max time here. Just to be safe.
+> 
 
-actually use variable name err instead of ret since that is more consistent in this code.
+I thought, that user-space should be aware of maximum value, that's why 
+I decided to add this define :) I didn't know, that this interface is 
+legacy.
 
-Regards
+Will fix in v2, thank you!
 
-Marcel
 
+With regards,
+Pavel Skripkin
