@@ -2,87 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A9CCC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:11:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A7BE3C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4663060200
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:11:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8760A60E76
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:15:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239538AbhHSPM3 (ORCPT
+        id S238663AbhHSPQI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:12:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:49935 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238587AbhHSPM2 (ORCPT
+        Thu, 19 Aug 2021 11:16:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54316 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232821AbhHSPQG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:12:28 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ABA47CED16;
-        Thu, 19 Aug 2021 17:11:50 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v3] Bluetooth: btusb: Remove WAKEUP_DISABLE and add 
- WAKEUP_AUTOSUSPEND for Realtek devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210817030312.27755-1-max.chou@realtek.com>
-Date:   Thu, 19 Aug 2021 17:11:50 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        matthias.bgg@gmail.com,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org,
-        Alex Lu <alex_lu@realsil.com.cn>,
-        Hilda Wu <hildawu@realtek.com>, kidman@realtek.com,
-        Archie Pusaka <apusaka@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        josephsih@chromium.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <F4EB3AD0-2ADF-44C4-83A1-F37F98530B1B@holtmann.org>
-References: <20210817030312.27755-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Thu, 19 Aug 2021 11:16:06 -0400
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5F1BC061575;
+        Thu, 19 Aug 2021 08:15:28 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id c12so12150528ljr.5;
+        Thu, 19 Aug 2021 08:15:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=vZjXPmOCbplWUcGOomjfHqgKyvdCopt0JA72wssuj18=;
+        b=qIY/kbWXI66jpRCw0g3aG654Q0g3cTSO8/Gc+/KbOiUuKcq1KvHgOn0PebKOA038o5
+         3k8lPgXmhG9O/nHDJMsFkEo7XRKFt4AS8jEJDyTmVQ7ELbZoGJlwuDrgoagiox71Ko/y
+         cI2h/DicOTZJRlGA9nPeYMp3M5mWeF9mjQ3hsPr7MRFr3dWK1YPGjVsDwdqwN9ejjy8n
+         2Ncq3D/mnYsf8TenPmorYaUJj2cW/0MuAtja7TCJKOLBEU/+SXolsAZz/g7dEIeeQyyq
+         pb/0rA4MfdCDK1jY7pnjTyx9HEhr2WMH8cVTzMSSJYvotOF6lcykoBHAszN6WOxWtfC5
+         XxvA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=vZjXPmOCbplWUcGOomjfHqgKyvdCopt0JA72wssuj18=;
+        b=Vrd5B5q/dUS2nsJC41hlp4VeyEwuO0jrqlu9u8JYwOZ6Xe2LLP1+MK36URm9f9YIeG
+         cxeLwWbkafsqQMlWOZEOKwyP7MXOYP7D2AQNJ+ORdqoJOgK4j9/vfpKj2bqNkJA74yDs
+         lYi89WRA7Q4CzkrHacBFgJj6hxWGC3jZtkEFWOJrb0AcM/g3c4bNlogay6F39GgqdWn4
+         mVMD8YdoBEObY8mYyiKuOho8Zmc8sB0izRUc4QPvbwHrd18YmRHynUjx560zwu73XO/0
+         6SSO55Cl6rh3vByS8fF7zEQkVAuQxktdp5TJdnGznuvN3jjBxNgDhvDPAdaX1pz7T5vB
+         bI0g==
+X-Gm-Message-State: AOAM530isGLb7MN630ZU3y7ROwP3IVfGZ1pB17muaRfGEwnn5LYoMxya
+        8oksDwOHm8RbKBavCzGe4Jo=
+X-Google-Smtp-Source: ABdhPJyAvTUD4BUAIU3FuCccZygogstrXmZzgehkWq/i4HWe50f4H9ujcTO+s3wFDonDLj7w6WFo+A==
+X-Received: by 2002:a2e:a54c:: with SMTP id e12mr12894890ljn.139.1629386127253;
+        Thu, 19 Aug 2021 08:15:27 -0700 (PDT)
+Received: from localhost.localdomain ([46.235.66.127])
+        by smtp.gmail.com with ESMTPSA id br33sm334616lfb.46.2021.08.19.08.15.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 08:15:26 -0700 (PDT)
+From:   Pavel Skripkin <paskripkin@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Pavel Skripkin <paskripkin@gmail.com>,
+        syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+Subject: [PATCH v2] Bluetooth: add timeout sanity check to hci_inquiry
+Date:   Thu, 19 Aug 2021 18:15:21 +0300
+Message-Id: <20210819151521.17380-1-paskripkin@gmail.com>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <0038C6D9-DEAF-4CB2-874C-00F6CEFCF26C@holtmann.org>
+References: <0038C6D9-DEAF-4CB2-874C-00F6CEFCF26C@holtmann.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
+Syzbot hit "task hung" bug in hci_req_sync(). The problem was in
+unreasonable huge inquiry timeout passed from userspace.
+Fix it by adding sanity check for timeout value to hci_inquiry().
 
-> For the commit of 9e45524a011107a73bc2cdde8370c61e82e93a4d, wakeup is
-> always disabled for Realtek devices. However, there's the capability
-> for Realtek devices to apply USB wakeup.
-> 
-> In this commit, remove WAKEUP_DISABLE feature for Realtek devices.
-> If users would switch wakeup, they should access
-> "/sys/bus/usb/.../power/wakeup"
-> 
-> In this commit, it also adds the feature as WAKEUP_AUTOSUSPEND
-> for Realtek devices because it should set do_remote_wakeup on autosuspend.
-> 
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> Tested-by: Hilda Wu <hildawu@realtek.com>
-> Reviewed-by: Archie Pusaka <apusaka@chromium.org>
-> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> ---
-> Changes in v2:
-> -fix the compiling error due to the incorrect patch file submited
-> 
-> Changes in v3:
-> -do rebase and make the patch on the latest revision
-> ---
-> drivers/bluetooth/btusb.c | 28 +++++++++-------------------
-> 1 file changed, 9 insertions(+), 19 deletions(-)
+Since hci_inquiry() is the only user of hci_req_sync() with user
+controlled timeout value, it makes sense to check timeout value in
+hci_inquiry() and don't touch hci_req_sync().
 
-patch has been applied to bluetooth-next tree.
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-and-tested-by: syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+---
 
-Regards
+Changes in v2:
+	Removed define + added comment suggested by Marcel
 
-Marcel
+---
+ net/bluetooth/hci_core.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e1a545c8a69f..170f513efa86 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1343,6 +1343,12 @@ int hci_inquiry(void __user *arg)
+ 		goto done;
+ 	}
+ 
++	/* Restrict maximum inquiry length to 60 seconds */
++	if (ir.length > 60) {
++		err = -EINVAL;
++		goto done;
++	}
++
+ 	hci_dev_lock(hdev);
+ 	if (inquiry_cache_age(hdev) > INQUIRY_CACHE_AGE_MAX ||
+ 	    inquiry_cache_empty(hdev) || ir.flags & IREQ_CACHE_FLUSH) {
+-- 
+2.32.0
 
