@@ -2,72 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8ED8CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:01:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83773C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6EC7A60E93
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:01:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6A44B61159
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240684AbhHSPCX convert rfc822-to-8bit (ORCPT
+        id S240691AbhHSPDv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:02:23 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59232 "EHLO
+        Thu, 19 Aug 2021 11:03:51 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44650 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240676AbhHSPCV (ORCPT
+        with ESMTP id S240652AbhHSPDs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:02:21 -0400
+        Thu, 19 Aug 2021 11:03:48 -0400
 Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 76A76CED16;
-        Thu, 19 Aug 2021 17:01:43 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5B6BCCED16;
+        Thu, 19 Aug 2021 17:03:10 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: how to cleanly shutdown an application using HCI_CHANNEL_USER
+Subject: Re: [PATCH] Bluetooth: hci_qca: Set SSR triggered flags when SSR
+ command is sent out
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <e17b2044-62cb-cbf7-64b8-c647aa7f6ee7@pabigot.com>
-Date:   Thu, 19 Aug 2021 17:01:42 +0200
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <086f2add931ff541c8a6349767ae2adc@codeaurora.org>
+Date:   Thu, 19 Aug 2021 17:03:09 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        open list <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>, pharish@codeaurora.org,
+        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        mcchou@chromium.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <A6782BCD-0C05-40AD-B567-7A1E163184E0@holtmann.org>
-References: <e17b2044-62cb-cbf7-64b8-c647aa7f6ee7@pabigot.com>
-To:     "Peter A. Bigot" <pab@pabigot.com>
+Message-Id: <6238C7AB-32D7-4D12-A14E-24D12A862405@holtmann.org>
+References: <1629091302-7893-1-git-send-email-bgodavar@codeaurora.org>
+ <1CE27E9C-EABD-4B25-B255-8925297D11BD@holtmann.org>
+ <086f2add931ff541c8a6349767ae2adc@codeaurora.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Peter,
+Hi Balakrishna,
 
-> I'm using an AF_BLUETOOTH socket bound with HCI_CHANNEL_USER from a
-> user-mode application with cap_net_admin=ep.  As expected this
-> requires the device be down, and brings the device up automatically.
-> 
-> When I close that socket and exit the application, the device appears
-> to remain up forever.  Which prevents me from re-starting the
-> application.
-> 
-> I tried to issue HCIDEVDOWN before closing, but that produces EBADFD
-> because ioctls cannot be performed with HCI_CHANNEL_RAW.
-> 
-> I can bring the interface down from within the application if, after
-> closing the socket, I wait a second or so, then create a new bound
-> HCI_CHANNEL_RAW socket and issue HCIDEVDOWN on it.
-> 
-> Is there some other way to cleanly shut down an application that used
-> HCI_CHANNEL_USER so that the device is returned to down state on exit?
-> Or is this supposed to happen automatically (I see code that suggests
-> it should)?
-> 
-> Kernel version is 5.11.0-7620-generic (System76), and I'm using go
-> 1.16, if that's relevant.
+>>> This change sets SSR triggered flags when QCA SSR command is sent to
+>>> SoC. After the SSR command sent, driver discards the incoming data from
+>>> the upper layers. This way will ensure to read full dumps from the
+>>> BT SoC without any flow control issues due to excess of data receiving
+>>> from the HOST in audio usecases.
+>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>>> ---
+>>> drivers/bluetooth/hci_qca.c | 10 ++++++++++
+>>> 1 file changed, 10 insertions(+)
+>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>> index 53deea2..5cbed6a 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -69,6 +69,8 @@
+>>> #define QCA_LAST_SEQUENCE_NUM		0xFFFF
+>>> #define QCA_CRASHBYTE_PACKET_LEN	1096
+>>> #define QCA_MEMDUMP_BYTE		0xFB
+>>> +#define QCA_SSR_OPCODE			0xFC0C
+>>> +#define QCA_SSR_PKT_LEN		5
+>>> enum qca_flags {
+>>> 	QCA_IBS_DISABLED,
+>>> @@ -871,6 +873,14 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
+>>> 	/* Prepend skb with frame type */
+>>> 	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
+>>> +	if (hci_skb_pkt_type(skb) == HCI_COMMAND_PKT &&
+>>> +	    skb->len == QCA_SSR_PKT_LEN &&
+>>> +	    hci_skb_opcode(skb) == QCA_SSR_OPCODE) {
+>>> +		bt_dev_info(hu->hdev, "Triggering ssr");
+>>> +		set_bit(QCA_SSR_TRIGGERED, &qca->flags);
+>>> +		set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
+>>> +	}
+>>> +
+>> can we please stop hacking around by parsing opcodes in an enqueue
+>> function. Sounds like someone is injecting raw HCI vendor commands and
+>> then having a driver react to it.
+> [Bala]: yes this opcode is injected via hcitool to test BT SoC dump procedure or
+> to collect the dumps to debug the issue during issue cases. When audio usecases are running,
+> HOST sends ACL packets to SoC, in meantime if this command is sent to SoC using hcitool
+> to collect dumps at particular point,  With out this check HOST is pumping continues data to
+> SoC and SoC RFR line goes high, sometimes SoC become unresponsive and driver starts logging
+> command timeout error. Instead here, once a cmd with this opcode is sent, timer is started
+> to ensure that SSR is in progress. If no response from SoC for 8 seconds. Driver will be restarted.
 
-I think you found a regression. Calling close() on the HCI User Channel should bring the device back down. This used to work correctly, can you please bisect which kernel patch broke this.
+so why would I add a kernel work-around for this?
 
-Back in the days I added tools/userchan-tester, but it seems I never included enough test cases to catch this regression.
+Design a proper interface for this and don’t rely on injecting HCI commands via HCI raw channel.
 
 Regards
 
