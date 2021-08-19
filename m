@@ -4,102 +4,112 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 83773C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:03:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA581C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:05:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A44B61159
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:03:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9CA82610A0
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:05:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240691AbhHSPDv convert rfc822-to-8bit (ORCPT
+        id S238634AbhHSPGU convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:03:51 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44650 "EHLO
+        Thu, 19 Aug 2021 11:06:20 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44635 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240652AbhHSPDs (ORCPT
+        with ESMTP id S238292AbhHSPGT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:03:48 -0400
+        Thu, 19 Aug 2021 11:06:19 -0400
 Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 5B6BCCED16;
-        Thu, 19 Aug 2021 17:03:10 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id E45AECED16;
+        Thu, 19 Aug 2021 17:05:41 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: hci_qca: Set SSR triggered flags when SSR
- command is sent out
+Subject: Re: [PATCH] Bluetooth: add timeout sanity check to hci_inquiry
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <086f2add931ff541c8a6349767ae2adc@codeaurora.org>
-Date:   Thu, 19 Aug 2021 17:03:09 +0200
+In-Reply-To: <20210817103108.1160-1-paskripkin@gmail.com>
+Date:   Thu, 19 Aug 2021 17:05:41 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>, pharish@codeaurora.org,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        mcchou@chromium.org
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
 Content-Transfer-Encoding: 8BIT
-Message-Id: <6238C7AB-32D7-4D12-A14E-24D12A862405@holtmann.org>
-References: <1629091302-7893-1-git-send-email-bgodavar@codeaurora.org>
- <1CE27E9C-EABD-4B25-B255-8925297D11BD@holtmann.org>
- <086f2add931ff541c8a6349767ae2adc@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Message-Id: <0038C6D9-DEAF-4CB2-874C-00F6CEFCF26C@holtmann.org>
+References: <20210817103108.1160-1-paskripkin@gmail.com>
+To:     Pavel Skripkin <paskripkin@gmail.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Pavel,
 
->>> This change sets SSR triggered flags when QCA SSR command is sent to
->>> SoC. After the SSR command sent, driver discards the incoming data from
->>> the upper layers. This way will ensure to read full dumps from the
->>> BT SoC without any flow control issues due to excess of data receiving
->>> from the HOST in audio usecases.
->>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->>> ---
->>> drivers/bluetooth/hci_qca.c | 10 ++++++++++
->>> 1 file changed, 10 insertions(+)
->>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->>> index 53deea2..5cbed6a 100644
->>> --- a/drivers/bluetooth/hci_qca.c
->>> +++ b/drivers/bluetooth/hci_qca.c
->>> @@ -69,6 +69,8 @@
->>> #define QCA_LAST_SEQUENCE_NUM		0xFFFF
->>> #define QCA_CRASHBYTE_PACKET_LEN	1096
->>> #define QCA_MEMDUMP_BYTE		0xFB
->>> +#define QCA_SSR_OPCODE			0xFC0C
->>> +#define QCA_SSR_PKT_LEN		5
->>> enum qca_flags {
->>> 	QCA_IBS_DISABLED,
->>> @@ -871,6 +873,14 @@ static int qca_enqueue(struct hci_uart *hu, struct sk_buff *skb)
->>> 	/* Prepend skb with frame type */
->>> 	memcpy(skb_push(skb, 1), &hci_skb_pkt_type(skb), 1);
->>> +	if (hci_skb_pkt_type(skb) == HCI_COMMAND_PKT &&
->>> +	    skb->len == QCA_SSR_PKT_LEN &&
->>> +	    hci_skb_opcode(skb) == QCA_SSR_OPCODE) {
->>> +		bt_dev_info(hu->hdev, "Triggering ssr");
->>> +		set_bit(QCA_SSR_TRIGGERED, &qca->flags);
->>> +		set_bit(QCA_MEMDUMP_COLLECTION, &qca->flags);
->>> +	}
->>> +
->> can we please stop hacking around by parsing opcodes in an enqueue
->> function. Sounds like someone is injecting raw HCI vendor commands and
->> then having a driver react to it.
-> [Bala]: yes this opcode is injected via hcitool to test BT SoC dump procedure or
-> to collect the dumps to debug the issue during issue cases. When audio usecases are running,
-> HOST sends ACL packets to SoC, in meantime if this command is sent to SoC using hcitool
-> to collect dumps at particular point,  With out this check HOST is pumping continues data to
-> SoC and SoC RFR line goes high, sometimes SoC become unresponsive and driver starts logging
-> command timeout error. Instead here, once a cmd with this opcode is sent, timer is started
-> to ensure that SSR is in progress. If no response from SoC for 8 seconds. Driver will be restarted.
+> Syzbot hit "task hung" bug in hci_req_sync(). The problem was in
+> unreasonable huge inquiry timeout passed from userspace.
+> Fix it by adding sanity check for timeout value and add constant to
+> hsi_sock.h to inform userspace, that hci_inquiry_req::length field has
+> maximum possible value.
+> 
+> Since hci_inquiry() is the only user of hci_req_sync() with user
+> controlled timeout value, it makes sense to check timeout value in
+> hci_inquiry() and don't touch hci_req_sync().
+> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-and-tested-by: syzbot+be2baed593ea56c6a84c@syzkaller.appspotmail.com
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> ---
+> 
+> Hi, Bluetooth maintainers/reviewers!
+> 
+> I believe, 60 seconds will be more than enough for inquiry request. I've
+> searched for examples on the internet and maximum ir.length I found was 
+> 8. Maybe, we have users, which need more than 60 seconds... I look forward
+> to receiving your views on this value.
+> 
+> ---
+> include/net/bluetooth/hci_sock.h | 1 +
+> net/bluetooth/hci_core.c         | 5 +++++
+> 2 files changed, 6 insertions(+)
+> 
+> diff --git a/include/net/bluetooth/hci_sock.h b/include/net/bluetooth/hci_sock.h
+> index 9949870f7d78..1cd63d4da00b 100644
+> --- a/include/net/bluetooth/hci_sock.h
+> +++ b/include/net/bluetooth/hci_sock.h
+> @@ -168,6 +168,7 @@ struct hci_inquiry_req {
+> 	__u16 dev_id;
+> 	__u16 flags;
+> 	__u8  lap[3];
+> +#define HCI_INQUIRY_MAX_TIMEOUT		30
+> 	__u8  length;
+> 	__u8  num_rsp;
+> };
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index e1a545c8a69f..104babf67351 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -1343,6 +1343,11 @@ int hci_inquiry(void __user *arg)
+> 		goto done;
+> 	}
+> 
 
-so why would I add a kernel work-around for this?
+	/* Restrict maximum inquiry length to 60 seconds */
+	if (ir.length > 60) {
+		..
+	}
 
-Design a proper interface for this and don’t rely on injecting HCI commands via HCI raw channel.
+> +	if (ir.length > HCI_INQUIRY_MAX_TIMEOUT) {
+> +		err = -EINVAL;
+> +		goto done;
+> +	}
+> +
+
+I found this easier to read than adding anything define somewhere else. And since this is a legacy interface that is no longer used by bluetoothd, this should be fine. We will start to deprecate this eventually.
+
+And I prefer 1 minute max time here. Just to be safe.
 
 Regards
 
