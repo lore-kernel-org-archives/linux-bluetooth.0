@@ -4,89 +4,70 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9BB6CC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:25:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EA6C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:26:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7815F610A3
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:25:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5932361029
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:26:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240012AbhHSPZf convert rfc822-to-8bit (ORCPT
+        id S240321AbhHSP1U convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:25:35 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:45472 "EHLO
+        Thu, 19 Aug 2021 11:27:20 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38214 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239151AbhHSPZf (ORCPT
+        with ESMTP id S238643AbhHSP1U (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:25:35 -0400
+        Thu, 19 Aug 2021 11:27:20 -0400
 Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id E2013CED18;
-        Thu, 19 Aug 2021 17:24:57 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 578CFCED18;
+        Thu, 19 Aug 2021 17:26:42 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Revert "Bluetooth: Shutdown controller after workqueues
- are flushed or cancelled"
+Subject: Re: [PATCH v3 2/2] btbcm: add patch ram for bluetooth
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210816231150.1478727-1-dmitry.baryshkov@linaro.org>
-Date:   Thu, 19 Aug 2021 17:24:57 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        Kai-Heng Feng <kai.heng.feng@canonical.com>
+In-Reply-To: <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
+Date:   Thu, 19 Aug 2021 17:26:42 +0200
+Cc:     Angus Ainslie <angus@akkea.ca>, kernel@puri.sm,
+        Arend van Spriel <aspriel@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <6CF07A82-966F-4DC2-B2B6-D0AB3DE354B5@holtmann.org>
-References: <20210816231150.1478727-1-dmitry.baryshkov@linaro.org>
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Message-Id: <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
+References: <20210812165218.2508258-1-angus@akkea.ca>
+ <20210812165218.2508258-3-angus@akkea.ca>
+ <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
+To:     Arend van Spriel <arend.vanspriel@broadcom.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+Hi Arend,
 
-> This reverts commit 0ea9fd001a14ebc294f112b0361a4e601551d508. It moved
-> calling shutdown callback after flushing the queues. In doing so it
-> disabled calling the shutdown hook completely: shutdown condition
-> tests for HCI_UP in hdev->flags, which gets cleared now before checking
-> this condition (see test_and_clear_bit(HCI_UP, ...) call). Thus shutdown
-> hook was never called.
+>> Bluetooth on the BCM43752 needs a patchram file to function correctly.
+>> Signed-off-by: Angus Ainslie <angus@akkea.ca>
+>> ---
+>>  drivers/bluetooth/btbcm.c | 1 +
+>>  1 file changed, 1 insertion(+)
+>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>> index e5d706ed55ea..e4182acee488 100644
+>> --- a/drivers/bluetooth/btbcm.c
+>> +++ b/drivers/bluetooth/btbcm.c
+>> @@ -387,6 +387,7 @@ struct bcm_subver_table {
+>>  };
+>>    static const struct bcm_subver_table bcm_uart_subver_table[] = {
+>> +	{ 0x1111, "BCM4362A2"	},	/* 000.017.017 */
 > 
-> This would not be a problem itself and could fixed with just removing
-> the HCI_UP condition (since if we are this point, we already know that
-> the HCI device was up before calling hci_dev_do_close(). However the
-> fact that shutdown hook was not called hid the fact that it is not
-> proper to call shutdown hook so late in the sequence. The hook would
-> usually call __hci_cmd_sync()/__hci_cmd_sync_ev(), which would timeout
-> without running queues.
-> 
-> Thus I think it is more proper at this moment to revert the commit and
-> look for a better solution.
-> 
-> Fixes: 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues are flushed or cancelled")
-> Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
-> net/bluetooth/hci_core.c | 16 ++++++++--------
-> 1 file changed, 8 insertions(+), 8 deletions(-)
+> Noticed Marcel applied this one already, but as I asked in earlier patch I would like to know why the commit message says 43752 but this entry says 4362? Still confused.
 
-I just merged this patch:
-
-commit 0ea53674d07fb6db2dd7a7ec2fdc85a12eb246c2
-Author: Kai-Heng Feng <kai.heng.feng@canonical.com>
-Date:   Tue Aug 10 12:53:15 2021 +0800
-
-    Bluetooth: Move shutdown callback before flushing tx and rx queue
-    
-    Commit 0ea9fd001a14 ("Bluetooth: Shutdown controller after workqueues
-    are flushed or cancelled") introduced a regression that makes mtkbtsdio
-    driver stops working:
-
-Please check if this works for you.
+seems I missed that part. Can you look internally what this hardware is and we fix it?
 
 Regards
 
