@@ -2,74 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 39E59C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:29:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4359AC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:43:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 148F061158
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:29:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 269A860EE4
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:43:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240038AbhHSP3y (ORCPT
+        id S240038AbhHSPoS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:29:54 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42186 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232821AbhHSP3x (ORCPT
+        Thu, 19 Aug 2021 11:44:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238587AbhHSPoS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:29:53 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A4850CED17;
-        Thu, 19 Aug 2021 17:29:15 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v4] Bluetooth: Fix return value in hci_dev_do_close()
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210819152718.2713-1-l4stpr0gr4m@gmail.com>
-Date:   Thu, 19 Aug 2021 17:29:15 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <31F9AB85-09D2-4EC0-B054-FD4EEF8CEEE4@holtmann.org>
-References: <20210819152718.2713-1-l4stpr0gr4m@gmail.com>
-To:     Kangmin Park <l4stpr0gr4m@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Thu, 19 Aug 2021 11:44:18 -0400
+Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5B8C061575;
+        Thu, 19 Aug 2021 08:43:41 -0700 (PDT)
+Received: by mail-ej1-x631.google.com with SMTP id gt38so13720352ejc.13;
+        Thu, 19 Aug 2021 08:43:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:date:message-id:in-reply-to:references:user-agent
+         :subject:mime-version:content-transfer-encoding;
+        bh=8ijfvDsyns8e3FukmUhdkOQH6x/qKdqiPKSWYcH8vCQ=;
+        b=uRArM1418rKa3Ik+eFB00LsUjzkgm36oxmEK4qhRf18YDCMT0Yj6uO3UdWZMesM+k5
+         AgOYoyXhbXJTRAmslaoytrJCNtewyodI71iH0yElf4j1MW+XwUA9JmeVzuLbAEy7Xy+2
+         Gs348JTcM7BsyEpsYPXGnaddijcdXuj3faxT1tn7xuJfTjb+jrlUrk83fLLHrDeg//g9
+         1awXgQnvbxRweafyGXmBs74HlGyONGnTFaWxw1VrHYofTm8FlZnTLWxctuDjFkT0RRDZ
+         Y6jFT0rbYNKG85a+fsoAAwduXw6sezPAWF87SA2Htv/PrsJlWx8L1R8T27PHKp8XQIuM
+         E76w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:date:message-id:in-reply-to
+         :references:user-agent:subject:mime-version
+         :content-transfer-encoding;
+        bh=8ijfvDsyns8e3FukmUhdkOQH6x/qKdqiPKSWYcH8vCQ=;
+        b=M73wMzZYV93QxSQdYXjdJV/ZpMIHzFSEEbLOyV8ETJXADAB/Ms4R34HfKB87Yv/qLn
+         ZjI1qBEb+BwsiITVOkVvwdEqqsblGohrdOHG+uKm1QZdam5euVjyngTHg+/hKC+gkKTe
+         /oF2dOXMrSGH9T4HYSs8iL8u/8Tb2jfVPUuLxF4qPExj1uOM9G1CWPriUJDnpbiXWCwX
+         X40ZrEqKuf06z30hc7iYOkqZrcss/gNN2AVdlmSR8+kgtkx1jssPAEPa/GVmw6FhONwD
+         XPmQDNCBNjhVeP32cmOo9I1GHiKArBa8dJv1vEWAUcyE0zvooNdmYP9+UTOmPhqEQiJV
+         uR1A==
+X-Gm-Message-State: AOAM531O45dz3qXtXL30co5mrQX11lWQZ3msd5FV1JuePKA2po1QRJG9
+        0VFesw8iumBrZYznm2uNdIw=
+X-Google-Smtp-Source: ABdhPJzYk8WPSyVPDcVziWsVFYS9DWtlTlJXLGKJAGueSaNlhcVXrqy9s/u14lPIBO4YpR6WKQHbJw==
+X-Received: by 2002:a17:906:f910:: with SMTP id lc16mr16206536ejb.478.1629387820145;
+        Thu, 19 Aug 2021 08:43:40 -0700 (PDT)
+Received: from [10.230.42.144] ([192.19.152.250])
+        by smtp.gmail.com with ESMTPSA id v13sm1428864ejh.62.2021.08.19.08.43.39
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Thu, 19 Aug 2021 08:43:39 -0700 (PDT)
+From:   Arend van Spriel <aspriel@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Arend van Spriel <arend.vanspriel@broadcom.com>
+CC:     Angus Ainslie <angus@akkea.ca>, <kernel@puri.sm>,
+        Franky Lin <franky.lin@broadcom.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        <linux-wireless@vger.kernel.org>,
+        <brcm80211-dev-list.pdl@broadcom.com>,
+        <linux-bluetooth@vger.kernel.org>
+Date:   Thu, 19 Aug 2021 17:43:38 +0200
+Message-ID: <17b5f150410.279b.9696ff82abe5fb6502268bdc3b0467d4@gmail.com>
+In-Reply-To: <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
+References: <20210812165218.2508258-1-angus@akkea.ca>
+ <20210812165218.2508258-3-angus@akkea.ca>
+ <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
+ <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
+User-Agent: AquaMail/1.30.1-1828 (build: 103001000)
+Subject: Re: [PATCH v3 2/2] btbcm: add patch ram for bluetooth
+MIME-Version: 1.0
+Content-Type: text/plain; format=flowed; charset="us-ascii"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kangmin,
+On August 19, 2021 5:26:42 PM Marcel Holtmann <marcel@holtmann.org> wrote:
 
-> hci_error_reset() return without calling hci_dev_do_open() when
-> hci_dev_do_close() return error value which is not 0.
-> 
-> Also, hci_dev_close() return hci_dev_do_close() function's return
-> value.
-> 
-> But, hci_dev_do_close() return always 0 even if hdev->shutdown
-> return error value. So, fix hci_dev_do_close() to save and return
-> the return value of the hdev->shutdown when it is called.
-> 
-> Signed-off-by: Kangmin Park <l4stpr0gr4m@gmail.com>
-> ---
-> Changes in v4:
-> - rename variable to err.
-> 
-> net/bluetooth/hci_core.c | 7 ++++---
-> 1 file changed, 4 insertions(+), 3 deletions(-)
+> Hi Arend,
+>
+>>> Bluetooth on the BCM43752 needs a patchram file to function correctly.
+>>> Signed-off-by: Angus Ainslie <angus@akkea.ca>
+>>> ---
+>>> drivers/bluetooth/btbcm.c | 1 +
+>>> 1 file changed, 1 insertion(+)
+>>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+>>> index e5d706ed55ea..e4182acee488 100644
+>>> --- a/drivers/bluetooth/btbcm.c
+>>> +++ b/drivers/bluetooth/btbcm.c
+>>> @@ -387,6 +387,7 @@ struct bcm_subver_table {
+>>> };
+>>> static const struct bcm_subver_table bcm_uart_subver_table[] = {
+>>> + { 0x1111, "BCM4362A2" }, /* 000.017.017 */
+>>
+>> Noticed Marcel applied this one already, but as I asked in earlier patch I 
+>> would like to know why the commit message says 43752 but this entry says 
+>> 4362? Still confused.
+>
+> seems I missed that part. Can you look internally what this hardware is and 
+> we fix it?
 
-patch has been applied to bluetooth-next tree.
+I will check although not internally as this is probably a Cypress chipset. 
+Anyway, I will follow up on this.
 
-Regards
+Regards,
+Arend
 
-Marcel
+
 
