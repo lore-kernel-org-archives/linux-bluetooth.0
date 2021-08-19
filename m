@@ -2,118 +2,121 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4359AC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:43:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F10DC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:46:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 269A860EE4
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:43:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EF0B961051
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:46:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240038AbhHSPoS (ORCPT
+        id S239990AbhHSPrR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:44:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32948 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238587AbhHSPoS (ORCPT
+        Thu, 19 Aug 2021 11:47:17 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:40698 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239151AbhHSPrQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:44:18 -0400
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B5B8C061575;
-        Thu, 19 Aug 2021 08:43:41 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id gt38so13720352ejc.13;
-        Thu, 19 Aug 2021 08:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=from:to:cc:date:message-id:in-reply-to:references:user-agent
-         :subject:mime-version:content-transfer-encoding;
-        bh=8ijfvDsyns8e3FukmUhdkOQH6x/qKdqiPKSWYcH8vCQ=;
-        b=uRArM1418rKa3Ik+eFB00LsUjzkgm36oxmEK4qhRf18YDCMT0Yj6uO3UdWZMesM+k5
-         AgOYoyXhbXJTRAmslaoytrJCNtewyodI71iH0yElf4j1MW+XwUA9JmeVzuLbAEy7Xy+2
-         Gs348JTcM7BsyEpsYPXGnaddijcdXuj3faxT1tn7xuJfTjb+jrlUrk83fLLHrDeg//g9
-         1awXgQnvbxRweafyGXmBs74HlGyONGnTFaWxw1VrHYofTm8FlZnTLWxctuDjFkT0RRDZ
-         Y6jFT0rbYNKG85a+fsoAAwduXw6sezPAWF87SA2Htv/PrsJlWx8L1R8T27PHKp8XQIuM
-         E76w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:date:message-id:in-reply-to
-         :references:user-agent:subject:mime-version
-         :content-transfer-encoding;
-        bh=8ijfvDsyns8e3FukmUhdkOQH6x/qKdqiPKSWYcH8vCQ=;
-        b=M73wMzZYV93QxSQdYXjdJV/ZpMIHzFSEEbLOyV8ETJXADAB/Ms4R34HfKB87Yv/qLn
-         ZjI1qBEb+BwsiITVOkVvwdEqqsblGohrdOHG+uKm1QZdam5euVjyngTHg+/hKC+gkKTe
-         /oF2dOXMrSGH9T4HYSs8iL8u/8Tb2jfVPUuLxF4qPExj1uOM9G1CWPriUJDnpbiXWCwX
-         X40ZrEqKuf06z30hc7iYOkqZrcss/gNN2AVdlmSR8+kgtkx1jssPAEPa/GVmw6FhONwD
-         XPmQDNCBNjhVeP32cmOo9I1GHiKArBa8dJv1vEWAUcyE0zvooNdmYP9+UTOmPhqEQiJV
-         uR1A==
-X-Gm-Message-State: AOAM531O45dz3qXtXL30co5mrQX11lWQZ3msd5FV1JuePKA2po1QRJG9
-        0VFesw8iumBrZYznm2uNdIw=
-X-Google-Smtp-Source: ABdhPJzYk8WPSyVPDcVziWsVFYS9DWtlTlJXLGKJAGueSaNlhcVXrqy9s/u14lPIBO4YpR6WKQHbJw==
-X-Received: by 2002:a17:906:f910:: with SMTP id lc16mr16206536ejb.478.1629387820145;
-        Thu, 19 Aug 2021 08:43:40 -0700 (PDT)
-Received: from [10.230.42.144] ([192.19.152.250])
-        by smtp.gmail.com with ESMTPSA id v13sm1428864ejh.62.2021.08.19.08.43.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 19 Aug 2021 08:43:39 -0700 (PDT)
-From:   Arend van Spriel <aspriel@gmail.com>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Arend van Spriel <arend.vanspriel@broadcom.com>
-CC:     Angus Ainslie <angus@akkea.ca>, <kernel@puri.sm>,
-        Franky Lin <franky.lin@broadcom.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        <linux-wireless@vger.kernel.org>,
-        <brcm80211-dev-list.pdl@broadcom.com>,
-        <linux-bluetooth@vger.kernel.org>
-Date:   Thu, 19 Aug 2021 17:43:38 +0200
-Message-ID: <17b5f150410.279b.9696ff82abe5fb6502268bdc3b0467d4@gmail.com>
-In-Reply-To: <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
-References: <20210812165218.2508258-1-angus@akkea.ca>
- <20210812165218.2508258-3-angus@akkea.ca>
- <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
- <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
-User-Agent: AquaMail/1.30.1-1828 (build: 103001000)
-Subject: Re: [PATCH v3 2/2] btbcm: add patch ram for bluetooth
-MIME-Version: 1.0
-Content-Type: text/plain; format=flowed; charset="us-ascii"
-Content-Transfer-Encoding: 8bit
+        Thu, 19 Aug 2021 11:47:16 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id 40BE6220B9;
+        Thu, 19 Aug 2021 15:46:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1629387999; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=Qy6ZWelWVTiWEo2cgoouc2nThDRWSzCg3aimoMrO26w=;
+        b=dUA/BhpeXNd6VmUOuzfeppvKxXlsHLkXBo4ZC8XP7gbxGYkWFvsmXdPXFNw5AfCzWiNtHC
+        YSZtvk7ZRD8CI0blF35dDbD40ZKpBxf9Jt2gHAN5SNSnfBqZaBwdBnJTHP2IQcIyjSpxs6
+        eU5/yzwodRH70OzSCsfjNf21cvdNqng=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1629387999;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type;
+        bh=Qy6ZWelWVTiWEo2cgoouc2nThDRWSzCg3aimoMrO26w=;
+        b=0fNbnPjJhHjqVK9dhqWqJazdAL0Aeyo6u3ojbctOvq2BYmrc5mYdoQkj2P0fBYSyk35KsO
+        JJFDbiIeVjQDiqDw==
+Received: from alsa1.suse.de (alsa1.suse.de [10.160.4.42])
+        by relay2.suse.de (Postfix) with ESMTP id 3C1F3A3B94;
+        Thu, 19 Aug 2021 15:46:39 +0000 (UTC)
+Date:   Thu, 19 Aug 2021 17:46:39 +0200
+Message-ID: <s5hv9418mjk.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     linux-kernel@vger.kernel.org
+Subject: CVE-2021-3640 and the unlimited block of lock_sock()
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
+ (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On August 19, 2021 5:26:42 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+Hi,
 
-> Hi Arend,
->
->>> Bluetooth on the BCM43752 needs a patchram file to function correctly.
->>> Signed-off-by: Angus Ainslie <angus@akkea.ca>
->>> ---
->>> drivers/bluetooth/btbcm.c | 1 +
->>> 1 file changed, 1 insertion(+)
->>> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->>> index e5d706ed55ea..e4182acee488 100644
->>> --- a/drivers/bluetooth/btbcm.c
->>> +++ b/drivers/bluetooth/btbcm.c
->>> @@ -387,6 +387,7 @@ struct bcm_subver_table {
->>> };
->>> static const struct bcm_subver_table bcm_uart_subver_table[] = {
->>> + { 0x1111, "BCM4362A2" }, /* 000.017.017 */
->>
->> Noticed Marcel applied this one already, but as I asked in earlier patch I 
->> would like to know why the commit message says 43752 but this entry says 
->> 4362? Still confused.
->
-> seems I missed that part. Can you look internally what this hardware is and 
-> we fix it?
+it seems that the recent fixes in bluetooth tree address most of
+issues in CVE-2021-3640 ("Use-After-Free vulnerability in function
+sco_sock_sendmsg()").  But there is still a problem left: although we
+cover the race with lock_sock() now, the lock may be blocked endlessly
+(as the task takes over with userfaultd), which result in the trigger
+of watchdog like:
 
-I will check although not internally as this is probably a Cypress chipset. 
-Anyway, I will follow up on this.
+-- 8< --
+[   23.226767][    T7] Bluetooth: hci0: command 0x0419 tx timeout
+[  284.985881][ T1529] INFO: task poc:7603 blocked for more than 143 seconds.
+[  284.989134][ T1529]       Not tainted 5.13.0-rc4+ #48
+[  284.990098][ T1529] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+[  284.991705][ T1529] task:poc             state:D stack:13784 pid: 7603 ppid:  7593 flags:0x00000000
+[  284.993414][ T1529] Call Trace:
+[  284.994025][ T1529]  __schedule+0x32e/0xb90
+[  284.994842][ T1529]  ? __local_bh_enable_ip+0x72/0xe0
+[  284.995987][ T1529]  schedule+0x38/0xe0
+[  284.996723][ T1529]  __lock_sock+0xa1/0x130
+[  284.997434][ T1529]  ? finish_wait+0x80/0x80
+[  284.998150][ T1529]  lock_sock_nested+0x9f/0xb0
+[  284.998914][ T1529]  sco_conn_del+0xb1/0x1a0
+[  284.999619][ T1529]  ? sco_conn_del+0x1a0/0x1a0
+[  285.000361][ T1529]  sco_disconn_cfm+0x3a/0x60
+[  285.001116][ T1529]  hci_conn_hash_flush+0x95/0x130
+[  285.001921][ T1529]  hci_dev_do_close+0x298/0x680
+[  285.002687][ T1529]  ? up_write+0x12/0x130
+[  285.003367][ T1529]  ? vhci_close_dev+0x20/0x20
+[  285.004107][ T1529]  hci_unregister_dev+0x9f/0x240
+[  285.004886][ T1529]  vhci_release+0x35/0x70
+[  285.005602][ T1529]  __fput+0xdf/0x360
+[  285.006225][ T1529]  task_work_run+0x86/0xd0
+[  285.006927][ T1529]  exit_to_user_mode_prepare+0x267/0x270
+[  285.007824][ T1529]  syscall_exit_to_user_mode+0x19/0x60
+[  285.008694][ T1529]  do_syscall_64+0x42/0xa0
+[  285.009393][ T1529]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[  285.010321][ T1529] RIP: 0033:0x4065c7
+-- 8< --
 
-Regards,
-Arend
+Is there any plan to address this?
+
+As a quick hack, I confirmed a workaround like below:
+
+-- 8< --
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2628,7 +2628,7 @@ void __lock_sock(struct sock *sk)
+ 		prepare_to_wait_exclusive(&sk->sk_lock.wq, &wait,
+ 					TASK_UNINTERRUPTIBLE);
+ 		spin_unlock_bh(&sk->sk_lock.slock);
+-		schedule();
++		schedule_timeout(msecs_to_jiffies(10 * 1000));
+ 		spin_lock_bh(&sk->sk_lock.slock);
+ 		if (!sock_owned_by_user(sk))
+ 			break;
+-- 8< --
+
+.... but I'm not sure whether it's the right way to go.
 
 
+thanks,
 
+Takashi
