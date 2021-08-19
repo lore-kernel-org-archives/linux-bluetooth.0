@@ -2,74 +2,136 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 71EA6C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:26:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A4F0EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:27:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5932361029
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:26:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 89CBD6101A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 15:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240321AbhHSP1U convert rfc822-to-8bit (ORCPT
+        id S238663AbhHSP2A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 11:27:20 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:38214 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238643AbhHSP1U (ORCPT
+        Thu, 19 Aug 2021 11:28:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57172 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239919AbhHSP2A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 11:27:20 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 578CFCED18;
-        Thu, 19 Aug 2021 17:26:42 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v3 2/2] btbcm: add patch ram for bluetooth
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
-Date:   Thu, 19 Aug 2021 17:26:42 +0200
-Cc:     Angus Ainslie <angus@akkea.ca>, kernel@puri.sm,
-        Arend van Spriel <aspriel@gmail.com>,
-        Franky Lin <franky.lin@broadcom.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        linux-wireless@vger.kernel.org,
-        brcm80211-dev-list.pdl@broadcom.com,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <5766C95B-D5A4-463C-A87F-41B35BF82046@holtmann.org>
-References: <20210812165218.2508258-1-angus@akkea.ca>
- <20210812165218.2508258-3-angus@akkea.ca>
- <1cd0e008-9239-f430-7294-865d34795a2f@broadcom.com>
-To:     Arend van Spriel <arend.vanspriel@broadcom.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Thu, 19 Aug 2021 11:28:00 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0860C061575;
+        Thu, 19 Aug 2021 08:27:23 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id u1so4150011plr.1;
+        Thu, 19 Aug 2021 08:27:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=V1JguQf7hSkeiryxCEqgeTY63Kh0FlvDJF1NBI4kCGQ=;
+        b=eQnQoVVjsf8bsXWyiIDFASybzoN7zEdNgUPiTk1ralgr09DlpR1pdTPpwEk+9jsX7h
+         cZLN7wntCgMLQ4HCjHjmwi82E4adgj/eSZKHpdIGZnw33dB4gAjmfvJ0Q3qf9VnC81sH
+         yzWJPH3O+45urtwUoZ+y+QAhfOWwquILAFnypfEF6Lb/ojm46vV8XOIZrMedrrVikLM1
+         2jJ/R12eXe4rR3VOtNUnj1lpOx1lLsoJWoPQknQWJu5wWmX2HSbXDqrmpXP/4HzSlPKh
+         T2jUILYjEzR3wojxbgOAGaqzVx7Qmp1Jy8inZLtja/NM8vWyGBH1MtK7uISYW7l3QIdL
+         7f2w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=V1JguQf7hSkeiryxCEqgeTY63Kh0FlvDJF1NBI4kCGQ=;
+        b=iZmSCEOoQvxnrQ0fwfKtyl1ALT/D5O/st9iqarTIFKX2Af41v+dXleYWpUbBZS3Nci
+         3ORG4giOareVmqm8wd7i2FQI3PSWvohDlU+En9D/iQTYwu84grjf0PPvPhZX3XsAhnUQ
+         Up8SzF/imbDelYCd7ePNuKFEcWvw1Xos3a5FJf3u5OLrT2YDogsyHySIrnDYECgAnG2y
+         BH17yZqiBnjCHzCrJbzZjSjxYkmpPHuotoo1TNK9RLR+haoy3Cg3p0oxkw+LPSHAA7xU
+         a5dwBTKXULkbkcWqLFMVIC3NpXjNmndyLK08fJe3+B9fXBLtFjHX9GOUm2qyrNvIQD/Q
+         a+IQ==
+X-Gm-Message-State: AOAM530Eq3/zxQI+mttNVZdT8XbNORRf/DDWkS7P+T3VmurRGe9ffUax
+        ZSSVZTfGjuAJNqZOzbX+INA=
+X-Google-Smtp-Source: ABdhPJxfS52irM5co5NNDAIy72pDRK/Ab1siHC/iqnb8jFn7+VGtUlQniIKdcnaAL4/5Fpcmxun1UA==
+X-Received: by 2002:a17:90a:8905:: with SMTP id u5mr15261390pjn.95.1629386843372;
+        Thu, 19 Aug 2021 08:27:23 -0700 (PDT)
+Received: from localhost.localdomain ([1.240.193.107])
+        by smtp.googlemail.com with ESMTPSA id z1sm3638332pjr.0.2021.08.19.08.27.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 19 Aug 2021 08:27:22 -0700 (PDT)
+From:   Kangmin Park <l4stpr0gr4m@gmail.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: Fix return value in hci_dev_do_close()
+Date:   Fri, 20 Aug 2021 00:27:18 +0900
+Message-Id: <20210819152718.2713-1-l4stpr0gr4m@gmail.com>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Arend,
+hci_error_reset() return without calling hci_dev_do_open() when
+hci_dev_do_close() return error value which is not 0.
 
->> Bluetooth on the BCM43752 needs a patchram file to function correctly.
->> Signed-off-by: Angus Ainslie <angus@akkea.ca>
->> ---
->>  drivers/bluetooth/btbcm.c | 1 +
->>  1 file changed, 1 insertion(+)
->> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
->> index e5d706ed55ea..e4182acee488 100644
->> --- a/drivers/bluetooth/btbcm.c
->> +++ b/drivers/bluetooth/btbcm.c
->> @@ -387,6 +387,7 @@ struct bcm_subver_table {
->>  };
->>    static const struct bcm_subver_table bcm_uart_subver_table[] = {
->> +	{ 0x1111, "BCM4362A2"	},	/* 000.017.017 */
-> 
-> Noticed Marcel applied this one already, but as I asked in earlier patch I would like to know why the commit message says 43752 but this entry says 4362? Still confused.
+Also, hci_dev_close() return hci_dev_do_close() function's return
+value.
 
-seems I missed that part. Can you look internally what this hardware is and we fix it?
+But, hci_dev_do_close() return always 0 even if hdev->shutdown
+return error value. So, fix hci_dev_do_close() to save and return
+the return value of the hdev->shutdown when it is called.
 
-Regards
+Signed-off-by: Kangmin Park <l4stpr0gr4m@gmail.com>
+---
+Changes in v4:
+ - rename variable to err.
 
-Marcel
+ net/bluetooth/hci_core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8622da2d9395..8ed19a07d69c 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1718,6 +1718,7 @@ static void hci_pend_le_actions_clear(struct hci_dev *hdev)
+ int hci_dev_do_close(struct hci_dev *hdev)
+ {
+ 	bool auto_off;
++	int err = 0;
+ 
+ 	BT_DBG("%s %p", hdev->name, hdev);
+ 
+@@ -1732,13 +1733,13 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	    test_bit(HCI_UP, &hdev->flags)) {
+ 		/* Execute vendor specific shutdown routine */
+ 		if (hdev->shutdown)
+-			hdev->shutdown(hdev);
++			err = hdev->shutdown(hdev);
+ 	}
+ 
+ 	if (!test_and_clear_bit(HCI_UP, &hdev->flags)) {
+ 		cancel_delayed_work_sync(&hdev->cmd_timer);
+ 		hci_req_sync_unlock(hdev);
+-		return 0;
++		return err;
+ 	}
+ 
+ 	hci_leds_update_powered(hdev, false);
+@@ -1845,7 +1846,7 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_req_sync_unlock(hdev);
+ 
+ 	hci_dev_put(hdev);
+-	return 0;
++	return err;
+ }
+ 
+ int hci_dev_close(__u16 dev)
+-- 
+2.26.2
 
