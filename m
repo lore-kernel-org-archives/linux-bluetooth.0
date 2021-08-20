@@ -2,162 +2,197 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8130EC4320A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 13:08:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 002E1C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 16:34:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A73C610CA
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 13:08:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D88BF6113E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 16:34:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240706AbhHTNJM (ORCPT
+        id S231685AbhHTQei (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Aug 2021 09:09:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44248 "EHLO
+        Fri, 20 Aug 2021 12:34:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36242 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240722AbhHTNJL (ORCPT
+        with ESMTP id S230036AbhHTQeh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Aug 2021 09:09:11 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9930BC061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 06:08:33 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id g11so7399070qtk.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 06:08:33 -0700 (PDT)
+        Fri, 20 Aug 2021 12:34:37 -0400
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04776C061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 09:33:59 -0700 (PDT)
+Received: by mail-ot1-x331.google.com with SMTP id o16-20020a9d2210000000b0051b1e56c98fso209700ota.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 09:33:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=TUaFXYR3HgX7rq/VVrgPte+1/jUiDRhyGavFeUWW8ns=;
-        b=qyykdYkmfS+sozWV6prsKemkogSdt6dw3JI6xplGBEyTZrCLVw/V2WrXps+vMYETkc
-         8Te8E/naVt9sCYftHN+RQWgeipXTUxRrtvWgldkYCu2Cbe9g6ADwtRoynUE5z+qBzTjG
-         54yO9pPGaOTEYQUVc1FEW/T8RQKm7EsP8D7GtvNgk4bFWoxEOLRtHkxavfl9A0+APfke
-         fUSP5CH+beQOqMRPOpWAxyXQpPSp8NBKx7ZcRxpsbapjzzBlp12z8K73a7u/zLR3Yi/5
-         /eO+ssNjqZxgkZLIbtO1QrlN47VLwXpLqfNwD+gSTbQel6v8qOEG9qHA3WYS7WzopQpP
-         XncQ==
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=/C8NeHo7GpZkUH1MXjk90wBsd8C6uuIwq8RGb1Hq5vo=;
+        b=IZP6XmBG5SL2HxTLGkkDDx0/FLxPIdyJJdRIudKqB/cJ5PKq6qEgam/BDbPyMLfM7f
+         0zg2lzUj8Xj4r6szTG6ovaYq+wgcPJhiyYiEed/J/YvFOCeyQytIO8nfzLWzRO9wn5y/
+         RYFQhWyBWqpIh7r+V2m8XKlZDol/Dz1Ls5qJGa+LUgPV74FcDLUpFTLELob79i2r4t2Z
+         7IVd9RkjubFRtkRPkv/3eOTKPUmKLUhfnfVKuUEtfupfUuv5Cc6AJD1qY2Nfu74lypAZ
+         NWx69F5Bm/YiQ14jsu+6OnJ/QvCKOiwflMtD3A/w2W2cADV+eD2Bt6hx8RqKWw3+cAD/
+         Conw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=TUaFXYR3HgX7rq/VVrgPte+1/jUiDRhyGavFeUWW8ns=;
-        b=bu65qkbXcLI8YeE2TLjGf/xtBWloBe4nmV4mJS6e/zMp9UeIgz97cIbi+A8Exo3CYe
-         8a8gFCGu5zt6RxAvOnwV2K8u4ljl9AvtLmbWk7aMimEHwxEFvENlFXjSsLmPRwlsSLnr
-         9yfT+fKGUeDrSkhA1mKgoZdG59sFwBs/qGhQCfRtg5fBgIVIwaPvtkgehz3EMX48HTVV
-         eyj+zC5PUrx2L6HBfXtXYqe8wlVSVYqDz/87V7xgeHpFWybnvt4VXmp2bWBxhLn4KngC
-         IZb8B/zuiRxzOoEciC1T/UuArJAiVdXXOE7AUKmnN7gsOngD5dkORIyQZyK4BFOVCCch
-         3eJQ==
-X-Gm-Message-State: AOAM531PgJMb6evRtgReFG1oJheQvqClUk85bPEXD/RbVSYrvfRezFPm
-        6Fayn7Ks45AwHeXl7y/fK5qnuZK7/sxxkxnvecoQQA==
-X-Google-Smtp-Source: ABdhPJyHXvzqFdkh92xFSl2Tfgr6Wq+GnxyuqFmSQJ3g0FPjwxN9S26JOc0IArVq879EP1YIZ1goBTULRA693ce45J8=
-X-Received: by 2002:a05:622a:13c8:: with SMTP id p8mr17705841qtk.238.1629464912762;
- Fri, 20 Aug 2021 06:08:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org> <1CA665D1-86F0-45A1-862D-17DAB3ABA974@holtmann.org>
-In-Reply-To: <1CA665D1-86F0-45A1-862D-17DAB3ABA974@holtmann.org>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Date:   Fri, 20 Aug 2021 16:08:21 +0300
-Message-ID: <CAA8EJpoOxerwmwQozL3gp1nX-+oxLMFUFjVPvRy-MoVfPuvqrw@mail.gmail.com>
-Subject: Re: [RFC PATCH 00/15] create power sequencing subsystem
-To:     Marcel Holtmann <marcel@holtmann.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=/C8NeHo7GpZkUH1MXjk90wBsd8C6uuIwq8RGb1Hq5vo=;
+        b=rMFuq78xoUx8ay6uj/6AicEsdheQ0b0DxFrafO5fVdmV5rUs1sK4qW5YEk0M+qlpTw
+         rHBpIh55e2nkZ/8FIsWIOR5O/3g86bLHcqhNY2QsIAXMLMoRH5WgjutKMwZQgn3H7gnA
+         8fnT5stykjofuiRGsQMmqIZkCvsZaNqy7XNOt3Lx/DdsbyalBiSs4OXX2/rU9reSuzXY
+         9xeSWLYh1hmqNJ0G7QcY99eLHvoceOTHHGjaZ9OjdqA2ERLUX49lxwXYciEZcfDoyN3T
+         ZpBMVT2WRwBeOEnOktG0kE4EXFAos6j0GXGzTHwsSeN8w/zsjFwMXBmkyNXJf2YBw64P
+         2glg==
+X-Gm-Message-State: AOAM533K9zWLneuilHWTZFp4zPu6dRG5k3MSkuhwCo95gcMaawMi8QST
+        mH6tortNHzyFHw3QT+3x6xteCg==
+X-Google-Smtp-Source: ABdhPJxBghjCh0btKNfjwzvGN2Vxx1KHZIfWf5hcsClQM0NLrJC694h/EB+IoLCQTcq+zXsFqp+5HA==
+X-Received: by 2002:a9d:7ccc:: with SMTP id r12mr17883793otn.350.1629477239291;
+        Fri, 20 Aug 2021 09:33:59 -0700 (PDT)
+Received: from ripper (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
+        by smtp.gmail.com with ESMTPSA id r20sm202737oot.16.2021.08.20.09.33.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 20 Aug 2021 09:33:58 -0700 (PDT)
+Date:   Fri, 20 Aug 2021 09:35:21 -0700
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
         Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         Kalle Valo <kvalo@codeaurora.org>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         Stanimir Varbanov <svarbanov@mm-sol.com>,
-        MSM <linux-arm-msm@vger.kernel.org>, linux-mmc@vger.kernel.org,
+        "open list:DRM DRIVER FOR MSM ADRENO GPU" 
+        <linux-arm-msm@vger.kernel.org>, linux-mmc@vger.kernel.org,
         open list <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        linux-bluetooth@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC PATCH 10/15] pwrseq: add support for QCA BT+WiFi power
+ sequencer
+Message-ID: <YR/ZyVrkmfVd0a8r@ripper>
+References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
+ <20210817005507.1507580-11-dmitry.baryshkov@linaro.org>
+ <YR7m43mURVJ8YufC@ripper>
+ <CAA8EJpr+=Yg2B_DzQWntW0GgvBfaSpAu0K+UD3NowdkusiYxrQ@mail.gmail.com>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAA8EJpr+=Yg2B_DzQWntW0GgvBfaSpAu0K+UD3NowdkusiYxrQ@mail.gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+On Fri 20 Aug 01:10 PDT 2021, Dmitry Baryshkov wrote:
 
-On Thu, 19 Aug 2021 at 18:23, Marcel Holtmann <marcel@holtmann.org> wrote:
-> > This is an RFC of the proposed power sequencer subsystem. This is a
-> > generification of the MMC pwrseq code. The subsystem tries to abstract
-> > the idea of complex power-up/power-down/reset of the devices.
+> Hi,
+> 
+> On Fri, 20 Aug 2021 at 02:17, Bjorn Andersson
+> <bjorn.andersson@linaro.org> wrote:
 > >
-> > The primary set of devices that promted me to create this patchset is
-> > the Qualcomm BT+WiFi family of chips. They reside on serial+platform
-> > interfaces (older generations) or on serial+PCIe (newer generations).
-> > They require a set of external voltage regulators to be powered on and
-> > (some of them) have separate WiFi and Bluetooth enable GPIOs.
+> > On Mon 16 Aug 17:55 PDT 2021, Dmitry Baryshkov wrote:
+> > [..]
+> > > diff --git a/drivers/power/pwrseq/pwrseq_qca.c b/drivers/power/pwrseq/pwrseq_qca.c
+> > > new file mode 100644
+> > > index 000000000000..3421a4821126
+> > > --- /dev/null
+> > > +++ b/drivers/power/pwrseq/pwrseq_qca.c
+> > > @@ -0,0 +1,290 @@
+> > > +// SPDX-License-Identifier: GPL-2.0-only
+> > > +/*
+> > > + * Copyright (c) 2021, Linaro Ltd.
+> > > + *
+> > > + * Author: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> > > + *
+> > > + * Power Sequencer for Qualcomm WiFi + BT SoCs
+> > > + */
+> > > +
+> > > +#include <linux/delay.h>
+> > > +#include <linux/gpio/consumer.h>
+> > > +#include <linux/platform_device.h>
+> > > +#include <linux/pwrseq/driver.h>
+> > > +#include <linux/regulator/consumer.h>
+> > > +
+> > > +/*
+> > > + * Voltage regulator information required for configuring the
+> > > + * QCA WiFi+Bluetooth chipset
+> > > + */
+> > > +struct qca_vreg {
+> > > +     const char *name;
+> > > +     unsigned int load_uA;
+> > > +};
+> > > +
+> > > +struct qca_device_data {
+> > > +     struct qca_vreg vddio;
 > >
-> > This patchset being an RFC tries to demonstrate the approach, design an=
-d
-> > usage of the pwrseq subsystem. Following issues are present in the RFC
-> > at this moment but will be fixed later if the overall approach would be
-> > viewed as acceptable:
-> >
-> > - No documentation
-> >   While the code tries to be self-documenting proper documentation
-> >   would be required.
-> >
-> > - Minimal device tree bindings changes
-> >   There are no proper updates for the DT bindings (thus neither Rob
-> >   Herring nor devicetree are included in the To/Cc lists). The dt
-> >   schema changes would be a part of v1.
-> >
-> > - Lack of proper PCIe integration
-> >   At this moment support for PCIe is hacked up to be able to test the
-> >   PCIe part of qca6390. Proper PCIe support would require automatically
-> >   powering up the devices before the scan basing on the proper device
-> >   structure in the device tree.
-> >
-> > ----------------------------------------------------------------
-> > Dmitry Baryshkov (15):
-> >      power: add power sequencer subsystem
-> >      pwrseq: port MMC's pwrseq drivers to new pwrseq subsystem
-> >      mmc: core: switch to new pwrseq subsystem
-> >      ath10k: add support for pwrseq sequencing
-> >      Bluetooth: hci_qca: merge qca_power into qca_serdev
-> >      Bluetooth: hci_qca: merge init paths
-> >      Bluetooth: hci_qca: merge qca_power_on with qca_regulators_init
-> >      Bluetooth: hci_qca: futher rework of power on/off handling
-> >      Bluetooth: hci_qca: add support for pwrseq
->
-> any chance you can try to abandon patching hci_qca. The serdev support in=
- hci_uart is rather hacking into old line discipline code and it is not agi=
-ng well. It is really becoming a mess.
+> > Any particular reason why this isn't just the first entry in vregs and
+> > operated as part of the bulk API?
+> 
+> Because VDDIO should be up before bringing the rest of the power
+> sources (at least for wcn39xx). This is usually the case since VDDIO
+> is S4A, but I'd still prefer to express this in the code.
+> And register_bulk_enable powers up all the supplies asynchronously,
+> thus it can not guarantee that the first entry would be powered up
+> first.
+> 
 
-I wanted to stay away from rewriting the BT code. But... New driver
-would have a bonus point that I don't have to be compatible with old
-bindings. In fact we can even make it the other way around: let the
-old driver always use regulators and make the new driver support only
-the pwrseq. Then it should be possible to drop the old hci_qca driver
-together with dropping the old bindings.
+Ahh, forgot about the async nature of bulk_enable. Make the code a
+little ugly, but it needs to be done like that.
 
-> I would say that the Qualcomm serial devices could use a separate standal=
-one serdev driver. A while I send an RFC for a new serdev driver.
->
-> https://www.spinics.net/lists/linux-bluetooth/msg74918.html
+Thinking about it, isn't there a required minimum time between vddio and
+the others in the wcn specification?
 
-Any reason why your driver stayed as an RFC and never made it into the
-kernel? Do you plan to revive your old RFCs on H:4 and H:5?
+> >
+> > > +     struct qca_vreg *vregs;
+> > > +     size_t num_vregs;
+> > > +     bool has_bt_en;
+> > > +     bool has_wifi_en;
+> > > +};
+> > > +
+> > > +struct pwrseq_qca;
+> > > +struct pwrseq_qca_one {
+> > > +     struct pwrseq_qca *common;
+> > > +     struct gpio_desc *enable;
+> > > +};
+> > > +
+> > > +#define PWRSEQ_QCA_WIFI 0
+> > > +#define PWRSEQ_QCA_BT 1
+> > > +
+> > > +#define PWRSEQ_QCA_MAX 2
+> > > +
+> > > +struct pwrseq_qca {
+> > > +     struct regulator *vddio;
+> > > +     struct gpio_desc *sw_ctrl;
+> > > +     struct pwrseq_qca_one pwrseq_qcas[PWRSEQ_QCA_MAX];
+> > > +     int num_vregs;
+> > > +     struct regulator_bulk_data vregs[];
+> > > +};
+> > > +
+> > > +static int pwrseq_qca_power_on(struct pwrseq *pwrseq)
+> > > +{
+> > > +     struct pwrseq_qca_one *qca_one = pwrseq_get_data(pwrseq);
+> > > +     int ret;
+> > > +
+> > > +     if (qca_one->common->vddio) {
+> >
+> > devm_regulator_get() doesn't return NULL, so this is always true.
+> 
+> This is more of the safety guard for the cases when the qca doesn't
+> have the special vddio supply.
+> 
 
-> There I had the idea that simple vendor specifics can be in that driver (=
-like the Broadcom part I added there), but frankly the QCA specifics are a =
-bit too specific and it should be a separate driver. However I think this w=
-ould be a good starting point.
->
-> In general a H:4 based Bluetooth driver is dead simple with the help of h=
-4_recv.h helper we have in the kernel. The complicated part is the power ma=
-nagement pieces or any vendor specific low-power protocol they are running =
-on that serial line. And since you are touching this anyway, doing a driver=
- from scratch might be lot simpler and cleaner. It would surely help all th=
-e new QCA device showing up in the future.
+If you think there's such a case coming up, then it makes sense.
+On the flip side, debugging the resulting panic when someone adds a new
+compatible without vddio is very minor...
 
---=20
-With best wishes
-Dmitry
+
+I think this looks good then.
+
+Regards,
+Bjorn
