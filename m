@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 73559C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 04:56:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F5E3C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 05:07:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 52F7B61004
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 04:56:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5DB9561029
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 05:07:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233646AbhHTE5b (ORCPT
+        id S232531AbhHTFHp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Aug 2021 00:57:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44300 "EHLO
+        Fri, 20 Aug 2021 01:07:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46594 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233108AbhHTE5b (ORCPT
+        with ESMTP id S229457AbhHTFHp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Aug 2021 00:57:31 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A124C061575
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 21:56:54 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so13018876pjr.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 21:56:54 -0700 (PDT)
+        Fri, 20 Aug 2021 01:07:45 -0400
+Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38497C061575
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 22:07:08 -0700 (PDT)
+Received: by mail-pj1-x1030.google.com with SMTP id hv22-20020a17090ae416b0290178c579e424so6442174pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 22:07:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=6tw02PyrxvO/DwhHU4sLaJ9eR7/inZjCudZ75oz8OYM=;
-        b=I6K1ljeDL6oDfD2Ak+ciC/kupG6YUGKTm3b1k0gEyxro5BcgM4TtRdAeW+ZICd3fIv
-         Vj4LEMS2I23Z7jrbDzMfpEUXYxuVp2Qr0aR2iVbAo69YOiI8CfaE/qC0bc+62j8JZpxM
-         7YqcSYOfp9ph2lkheIjTAhlbMwZzxDH2UXbvD+zD/QtfVH6NNe4n9xVgFdbX4NA0T+ty
-         Yo+uksotoG7vM30WhAuAelUK6knVyjvEgVSIp5YKWHampdx+hmnN5/RXyHYCUzXNZMT8
-         /YXHhFs3fzY+0E91w2mXlECUN5BOEcK+Ew6caW74wWVY3WcxK/OGN6Cb+C4VWeFbSwqL
-         eqZw==
+        bh=GHz2HSS5eMLDkFyaQYXEJuHIA7RR+Oj/OlhCx11WXow=;
+        b=eVdiWRaVehrCQ6HRZ/YyMkb5TcO2FbOwzjKeD8DI7epKLCv2SZpedppiIm9Iyvz3hb
+         Y0vPWw2b6Odf8c7KfvfZM6ERP7Z0XSt3mWoY/91l+ycAEBwcY9gl5PObPBCdbJTeXtGH
+         Suv25Vip+1uJnh5FWr13blfVjeDDHdcrmnoxiomYswFs7QuCNZ+9Q4TO16/Te1hw8oV6
+         GnY2uq4mzw2AS7zSXPTBalSIycCe3c9pPVicebl6lGRqDTNyCfZfKQfAZ2ZFIHppvGpM
+         y8FaJbz9n6rsHFnxpcKrkXeNE5lh/GA098QX0k4KbJ9ZemiEs9LuUYXn+9RSB9zr/1Dy
+         ViBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=6tw02PyrxvO/DwhHU4sLaJ9eR7/inZjCudZ75oz8OYM=;
-        b=UcGIfjX7cRMhtaZgwRAvVEk3Vii8Zrtpe13ExXlqhOkBCtFHqi7u97K+LfiW4gJ1oS
-         SYHR5N6LnE/DhGXvTzUI/rmZLOuozaMyoL6Z+Eqw2zPhNJwMPTCMjYd/hvWno8J/J3tg
-         BkY3MBBQQZCwnvk9auVxqHpp+bzZLRJY3nSjt/DieDJQRQlmmDCUHTDxoNfzZ9Y0ANvr
-         mtcHW7XCr6grsviLGLWaig1bifllvnqB/9o7rJWfHkTkSNlNFfU1O6tcjurSpuKAP4ml
-         RNk1vqKl9F/4JyXKqqAB1tIWXLXAuDL1c6CUKrC5TM3L5KVu1bkat2MiSuSlkT6Os4Ir
-         IiSQ==
-X-Gm-Message-State: AOAM530yba5uJpBIVQ3rGnWnJcbeydRPvXrBJuZxwIY3CFvDES7SRPC0
-        wfNkQofTLLx8FNaMxh1JJsN3ekSletY=
-X-Google-Smtp-Source: ABdhPJxQ9hKujVtkQXvJuPF6D6NzMtkL3nO17KJXdKMq/B2vO97C9m5WfGl19mEoTeqWDXpX/wPqSw==
-X-Received: by 2002:a17:90a:5305:: with SMTP id x5mr2574651pjh.135.1629435413514;
-        Thu, 19 Aug 2021 21:56:53 -0700 (PDT)
+        bh=GHz2HSS5eMLDkFyaQYXEJuHIA7RR+Oj/OlhCx11WXow=;
+        b=Yeq95CLn2HPVP7z8ggXLTRNbtmo+gz1xWFVA5HI7APpLpWy4dZTMpOFSRyFSADQ8Tu
+         8VFCL10a1vvGRsV8m0QDLNwAs0tMa3cHjHTlc9HSexJeei4ap7tKuNBx7xj6JNvS954l
+         Ynah8yAZDp6FKD+TwfWrWpFWije2+XDIFy/IZZi48FaWx8p6koQaCOhsPhU337SALj29
+         Q33pLzjrpTNlaZQfb15bP9N5D2CU9Q7OQPhd6qvR137cRmvAHofQaShHaYYo3/cySB9P
+         1vJ6FsA6FIR68Dd99n8Te6BE1g3GSrqxGAN7n0Jb4V3fNksYJ1vWI2IHJrJY5eS8Xx1l
+         KF3A==
+X-Gm-Message-State: AOAM5325nNOlfHPGkxNiycQ3zkH8MO3rbevn4RdZFuZAztDRFZGfSN9/
+        3qcNiiNM++XP7+4/BQ16ZH3Bf7X41Uo=
+X-Google-Smtp-Source: ABdhPJxK1DmNORBQL2Lj8PR8gUiNGwANIU0uf513Ew3DUNbJ/UiXX8P2jT6UquMIQxzYjYtzJKb70A==
+X-Received: by 2002:a17:90b:93:: with SMTP id bb19mr2704405pjb.224.1629436027276;
+        Thu, 19 Aug 2021 22:07:07 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:4f24:11af:6492:3c2b])
-        by smtp.gmail.com with ESMTPSA id j5sm10300971pjv.56.2021.08.19.21.56.52
+        by smtp.gmail.com with ESMTPSA id n1sm6302075pgt.63.2021.08.19.22.07.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 21:56:53 -0700 (PDT)
+        Thu, 19 Aug 2021 22:07:06 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [BlueZ PATCH] tools: userchan-tester: Add test case for the closing channel
-Date:   Thu, 19 Aug 2021 21:56:52 -0700
-Message-Id: <20210820045652.69761-1-hj.tedd.an@gmail.com>
+Date:   Thu, 19 Aug 2021 22:07:05 -0700
+Message-Id: <20210820050705.76853-1-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -79,11 +79,11 @@ after closing the user channel.
 When the user channel is closed, the controller should be powered down
 state.
 ---
- tools/userchan-tester.c | 70 +++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 70 insertions(+)
+ tools/userchan-tester.c | 69 +++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 69 insertions(+)
 
 diff --git a/tools/userchan-tester.c b/tools/userchan-tester.c
-index c17644fb8..ab95c0044 100644
+index c17644fb8..095ef2689 100644
 --- a/tools/userchan-tester.c
 +++ b/tools/userchan-tester.c
 @@ -40,6 +40,8 @@ struct test_data {
@@ -104,7 +104,7 @@ index c17644fb8..ab95c0044 100644
  	if (strcmp(hciemu_get_address(data->hciemu), addr)) {
  		tester_pre_setup_failed();
  		return;
-@@ -291,6 +295,69 @@ static void test_open_failed(const void *test_data)
+@@ -291,6 +295,68 @@ static void test_open_failed(const void *test_data)
  	tester_test_failed();
  }
  
@@ -123,8 +123,7 @@ index c17644fb8..ab95c0044 100644
 +	}
 +
 +	current_settings = btohl(rp->current_settings);
-+
-+	if (!(current_settings & MGMT_SETTING_POWERED)) {
++	if (current_settings & MGMT_SETTING_POWERED) {
 +		tester_print("Controller is powered");
 +		tester_test_failed();
 +		return;
@@ -174,7 +173,7 @@ index c17644fb8..ab95c0044 100644
  #define test_user(name, data, setup, func) \
  	do { \
  		struct test_data *user; \
-@@ -316,6 +383,9 @@ int main(int argc, char *argv[])
+@@ -316,6 +382,9 @@ int main(int argc, char *argv[])
  					setup_powered, test_open_failed);
  	test_user("User channel open - Power Toggle Success", INT_TO_PTR(true),
  					toggle_powered, test_open_success);
