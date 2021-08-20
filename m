@@ -2,148 +2,262 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0FF4C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 05:36:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 57E8EC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 08:10:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C767B60F92
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 05:36:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40D17610CF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 08:10:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238061AbhHTFhA (ORCPT
+        id S230518AbhHTILT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 20 Aug 2021 01:37:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53128 "EHLO
+        Fri, 20 Aug 2021 04:11:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231949AbhHTFg7 (ORCPT
+        with ESMTP id S229586AbhHTILS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 20 Aug 2021 01:36:59 -0400
-Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 36939C061575
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 22:36:22 -0700 (PDT)
-Received: by mail-qk1-x72c.google.com with SMTP id bk29so4018048qkb.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 22:36:22 -0700 (PDT)
+        Fri, 20 Aug 2021 04:11:18 -0400
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 298D4C061575
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 01:10:41 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id e3so646020qth.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 20 Aug 2021 01:10:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=bmIP7UfOB10FFnFwxZ8bnHrrUJh+JKDLfDYD/IzXQ6E=;
-        b=YHZmIauyZpWXL/Dvom9027IemihKGev35uF/536Dl1SoAAFDRe4MJP4LUDosPDn9hE
-         rr4Zd/gv/7uQ94i0R4s4UG/JQ1LhCxxXZh3pzOl/rU+GdyW9jh3DVrVXXt756ZpqwKIX
-         eLE5fNY/dKRz4eoqeYFeH1/67SNDapgkbdjOfYlBEvnNj+16pHbEKUVeq0WNEwhD/WfH
-         AJhcSG1zEn+8XtsKxMRSLKqog9heVzqYQGIl6f38hj1pV1B/wlJkOOTZJbsV9xNdjDVT
-         fzD3DmTxcfNIVpGRWU9eMK1qZv0qxYkpZ9ZxffTYL4mTXOG3TabXLtoM35k9LAzY0Dmk
-         9fXg==
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=g5IS6e3Hnyb2jRAb6f1KMnSZamwQJcSDoTsblYNlRlY=;
+        b=AZ9hPtV94XSFU7TEKvhcU+et+rJ+GpExWH9lrUhoqWoy0ewHu2M34a/uO6l9DjkV3W
+         f0oJk7nxCalOBi4OJVItLOhpuaLrPNMPtOlhahFsCqEnDmrPKqvI4ExcusqN0kmf2dmm
+         X6aVP3hh5uVmOusZVgIhxqBCEvpuDtGXIU0bCJxnBEYFye8qFaFZb0rRPDeTD4tGclZw
+         r6C1JJE68Lj5FmT8KeHnhA7VE0yN5hMhHlb84zbNqFmbhPEbOEPv33O68IOJr/4+cmXs
+         8UuTDZzFcGnR83wrcms+xf3UQTABzatiaTOhd2YkS23GfoR9Q7lX2ajxwnwJ0ubC8bl1
+         XkYw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=bmIP7UfOB10FFnFwxZ8bnHrrUJh+JKDLfDYD/IzXQ6E=;
-        b=Hsh7QRP41HtY1+e28CK/av7r7wZ9hUit3HgVUaipEjOvX44kBhA9kNtSPxKM5PBT5U
-         ZNtAeWEP/3ODpiWRgzJ82B44Q7OsDaER1R25jrxzyTqzgBk3wULyEFcXZFdKwZ2OuBqS
-         zlTBi8PxkYBARruInGi/A9+x5FYgFX6VlpBofyEGhfi+zv3uTSjyE+frjksY5LSjH3Eo
-         6jaCho9/9x+J+S4tJmjWZ79YNsdKYRZR/FG0azj6uUz0aTjDHth8Nd9EZVUUPJyn6xHQ
-         UdcLDSiF2fAke5ZmPZj0wy7wJnAgcuk+5khEqQ6J5UvtE80clznBsa3KThLUZ2KA6CB3
-         b2dA==
-X-Gm-Message-State: AOAM532Qag/bBhgb3uMD4ZLH1TjY8FRoMmFNQDi0eVT1DEXpWsbiwksU
-        E6uV92j+wbcqthFw4d0dGju4blMyktKfgw==
-X-Google-Smtp-Source: ABdhPJwk4Zi0dsSTcit/l/smKGQbYFFpNh9R2zP0eHOPAUOiaUgkFVnqU2wtgKZD3MqA0PfGN1sI6A==
-X-Received: by 2002:a37:45c9:: with SMTP id s192mr7414172qka.21.1629437781307;
-        Thu, 19 Aug 2021 22:36:21 -0700 (PDT)
-Received: from [172.17.0.2] ([52.170.72.103])
-        by smtp.gmail.com with ESMTPSA id u6sm2699815qkp.49.2021.08.19.22.36.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 22:36:21 -0700 (PDT)
-Message-ID: <611f3f55.1c69fb81.87ead.3fe5@mx.google.com>
-Date:   Thu, 19 Aug 2021 22:36:21 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1248797390288410040=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=g5IS6e3Hnyb2jRAb6f1KMnSZamwQJcSDoTsblYNlRlY=;
+        b=U0t+LmqP/yNX/ZNYgb5zlAoMjoF40X0ZJQAo5KiJ1ZXd2Crz3SV2x/kfvMoR2H4aPF
+         fp9Et7stMkOhFMluCm6iJkNkhqVpT9zQB/I1BA3N52StdaX6VTULjPPVNbvnuX5CU3iv
+         c2nq05Ahf+yxmpj9j6ryhKkvVvzHBbrh3iiUtsp610Gx10na9phgx/Gen6f7XewXlTCp
+         mwJUduuGijh374Yod7ioutfvH2EDRI//DuL/qjwgeIUcAHgBIqkNKd5fcYmcFPRldFz/
+         RF6Yh+P3+ohDs4dJiq3c/osvJ5eKGunrkzBOd64PlukVkEmfvLy9lwvnvYHfavVa0VWa
+         /Agg==
+X-Gm-Message-State: AOAM532tzPbGdxQx6WJxgJeUn2Av8hp6U9Rf9XaKahuq65PuB8XPlrzE
+        qvpfCqF+hkUvfGP6gdSOvmRhDZ2qdM742e56iFgOFw==
+X-Google-Smtp-Source: ABdhPJykvHLGPJLrte3XmQ+2fZnjn7MpEKijpvU45xzTfUuHaBNaF5vvWd95j2y77Xi7ngLBiT0SX8r507FJf1UymdA=
+X-Received: by 2002:a05:622a:13c8:: with SMTP id p8mr16634457qtk.238.1629447040101;
+ Fri, 20 Aug 2021 01:10:40 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ] tools: userchan-tester: Add test case for the closing channel
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210820045652.69761-1-hj.tedd.an@gmail.com>
-References: <20210820045652.69761-1-hj.tedd.an@gmail.com>
+References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
+ <20210817005507.1507580-11-dmitry.baryshkov@linaro.org> <YR7m43mURVJ8YufC@ripper>
+In-Reply-To: <YR7m43mURVJ8YufC@ripper>
+From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Date:   Fri, 20 Aug 2021 11:10:29 +0300
+Message-ID: <CAA8EJpr+=Yg2B_DzQWntW0GgvBfaSpAu0K+UD3NowdkusiYxrQ@mail.gmail.com>
+Subject: Re: [RFC PATCH 10/15] pwrseq: add support for QCA BT+WiFi power sequencer
+To:     Bjorn Andersson <bjorn.andersson@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanimir Varbanov <svarbanov@mm-sol.com>,
+        "open list:DRM DRIVER FOR MSM ADRENO GPU" 
+        <linux-arm-msm@vger.kernel.org>, linux-mmc@vger.kernel.org,
+        open list <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org, ath10k@lists.infradead.org,
+        linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1248797390288410040==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi,
 
-This is automated email and please do not reply to this email!
+On Fri, 20 Aug 2021 at 02:17, Bjorn Andersson
+<bjorn.andersson@linaro.org> wrote:
+>
+> On Mon 16 Aug 17:55 PDT 2021, Dmitry Baryshkov wrote:
+> [..]
+> > diff --git a/drivers/power/pwrseq/pwrseq_qca.c b/drivers/power/pwrseq/pwrseq_qca.c
+> > new file mode 100644
+> > index 000000000000..3421a4821126
+> > --- /dev/null
+> > +++ b/drivers/power/pwrseq/pwrseq_qca.c
+> > @@ -0,0 +1,290 @@
+> > +// SPDX-License-Identifier: GPL-2.0-only
+> > +/*
+> > + * Copyright (c) 2021, Linaro Ltd.
+> > + *
+> > + * Author: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+> > + *
+> > + * Power Sequencer for Qualcomm WiFi + BT SoCs
+> > + */
+> > +
+> > +#include <linux/delay.h>
+> > +#include <linux/gpio/consumer.h>
+> > +#include <linux/platform_device.h>
+> > +#include <linux/pwrseq/driver.h>
+> > +#include <linux/regulator/consumer.h>
+> > +
+> > +/*
+> > + * Voltage regulator information required for configuring the
+> > + * QCA WiFi+Bluetooth chipset
+> > + */
+> > +struct qca_vreg {
+> > +     const char *name;
+> > +     unsigned int load_uA;
+> > +};
+> > +
+> > +struct qca_device_data {
+> > +     struct qca_vreg vddio;
+>
+> Any particular reason why this isn't just the first entry in vregs and
+> operated as part of the bulk API?
 
-Dear submitter,
+Because VDDIO should be up before bringing the rest of the power
+sources (at least for wcn39xx). This is usually the case since VDDIO
+is S4A, but I'd still prefer to express this in the code.
+And register_bulk_enable powers up all the supplies asynchronously,
+thus it can not guarantee that the first entry would be powered up
+first.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=534641
+>
+> > +     struct qca_vreg *vregs;
+> > +     size_t num_vregs;
+> > +     bool has_bt_en;
+> > +     bool has_wifi_en;
+> > +};
+> > +
+> > +struct pwrseq_qca;
+> > +struct pwrseq_qca_one {
+> > +     struct pwrseq_qca *common;
+> > +     struct gpio_desc *enable;
+> > +};
+> > +
+> > +#define PWRSEQ_QCA_WIFI 0
+> > +#define PWRSEQ_QCA_BT 1
+> > +
+> > +#define PWRSEQ_QCA_MAX 2
+> > +
+> > +struct pwrseq_qca {
+> > +     struct regulator *vddio;
+> > +     struct gpio_desc *sw_ctrl;
+> > +     struct pwrseq_qca_one pwrseq_qcas[PWRSEQ_QCA_MAX];
+> > +     int num_vregs;
+> > +     struct regulator_bulk_data vregs[];
+> > +};
+> > +
+> > +static int pwrseq_qca_power_on(struct pwrseq *pwrseq)
+> > +{
+> > +     struct pwrseq_qca_one *qca_one = pwrseq_get_data(pwrseq);
+> > +     int ret;
+> > +
+> > +     if (qca_one->common->vddio) {
+>
+> devm_regulator_get() doesn't return NULL, so this is always true.
 
----Test result---
+This is more of the safety guard for the cases when the qca doesn't
+have the special vddio supply.
 
-Test Summary:
-CheckPatch                    PASS      0.38 seconds
-GitLint                       PASS      0.13 seconds
-Prep - Setup ELL              PASS      50.36 seconds
-Build - Prep                  PASS      0.15 seconds
-Build - Configure             PASS      9.09 seconds
-Build - Make                  PASS      220.21 seconds
-Make Check                    PASS      9.07 seconds
-Make Distcheck                PASS      258.98 seconds
-Build w/ext ELL - Configure   PASS      8.71 seconds
-Build w/ext ELL - Make        PASS      207.69 seconds
+>
+> > +             ret = regulator_enable(qca_one->common->vddio);
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+> > +
+> > +     ret = regulator_bulk_enable(qca_one->common->num_vregs, qca_one->common->vregs);
+> > +     if (ret)
+> > +             goto vddio_off;
+> > +
+> > +     if (qca_one->enable) {
+> > +             gpiod_set_value_cansleep(qca_one->enable, 0);
+> > +             msleep(50);
+> > +             gpiod_set_value_cansleep(qca_one->enable, 1);
+> > +             msleep(150);
+> > +     }
+> > +
+> > +     if (qca_one->common->sw_ctrl) {
+> > +             bool sw_ctrl_state = gpiod_get_value_cansleep(qca_one->common->sw_ctrl);
+> > +             dev_dbg(&pwrseq->dev, "SW_CTRL is %d", sw_ctrl_state);
+> > +     }
+> > +
+> > +     return 0;
+> > +
+> > +vddio_off:
+> > +     regulator_disable(qca_one->common->vddio);
+> > +
+> > +     return ret;
+> > +}
+> [..]
+> > +static int pwrseq_qca_probe(struct platform_device *pdev)
+> > +{
+> > +     struct pwrseq_qca *pwrseq_qca;
+> > +     struct pwrseq *pwrseq;
+> > +     struct pwrseq_provider *provider;
+> > +     struct device *dev = &pdev->dev;
+> > +     struct pwrseq_onecell_data *onecell;
+> > +     const struct qca_device_data *data;
+> > +     int ret, i;
+> > +
+> > +     data = device_get_match_data(dev);
+> > +     if (!data)
+> > +             return -EINVAL;
+> > +
+> > +     pwrseq_qca = devm_kzalloc(dev, struct_size(pwrseq_qca, vregs, data->num_vregs), GFP_KERNEL);
+> > +     if (!pwrseq_qca)
+> > +             return -ENOMEM;
+> > +
+> > +     onecell = devm_kzalloc(dev, struct_size(onecell, pwrseqs, PWRSEQ_QCA_MAX), GFP_KERNEL);
+> > +     if (!onecell)
+> > +             return -ENOMEM;
+> > +
+> > +     ret = pwrseq_qca_regulators_init(dev, pwrseq_qca, data);
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     if (data->has_wifi_en) {
+> > +             pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_WIFI].enable = devm_gpiod_get(dev, "wifi-enable", GPIOD_OUT_LOW);
+> > +             if (IS_ERR(pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_WIFI].enable)) {
+> > +                     return dev_err_probe(dev, PTR_ERR(pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_WIFI].enable),
+> > +                                     "failed to acquire WIFI enable GPIO\n");
+> > +             }
+> > +     }
+> > +
+> > +     if (data->has_bt_en) {
+> > +             pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_BT].enable = devm_gpiod_get(dev, "bt-enable", GPIOD_OUT_LOW);
+> > +             if (IS_ERR(pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_BT].enable)) {
+> > +                     return dev_err_probe(dev, PTR_ERR(pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_BT].enable),
+> > +                                     "failed to acquire BT enable GPIO\n");
+> > +             }
+> > +     }
+> > +
+> > +     pwrseq_qca->sw_ctrl = devm_gpiod_get_optional(dev, "swctrl", GPIOD_IN);
+> > +     if (IS_ERR(pwrseq_qca->sw_ctrl)) {
+> > +             return dev_err_probe(dev, PTR_ERR(pwrseq_qca->sw_ctrl),
+> > +                             "failed to acquire SW_CTRL gpio\n");
+> > +     } else if (!pwrseq_qca->sw_ctrl)
+> > +             dev_info(dev, "No SW_CTRL gpio\n");
+>
+> Some {} around the else as well please.
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+ack
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+> Regards,
+> Bjorn
 
 
 
----
-Regards,
-Linux Bluetooth
-
-
---===============1248797390288410040==--
+-- 
+With best wishes
+Dmitry
