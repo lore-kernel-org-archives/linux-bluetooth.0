@@ -2,157 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 19894C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 23:43:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7BD0FC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 03:28:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9C4C61028
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 19 Aug 2021 23:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 596C3610D2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 20 Aug 2021 03:28:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236809AbhHSXnl (ORCPT
+        id S238072AbhHTD3F (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 19 Aug 2021 19:43:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59026 "EHLO
+        Thu, 19 Aug 2021 23:29:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53112 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229468AbhHSXnk (ORCPT
+        with ESMTP id S234992AbhHTD3E (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 19 Aug 2021 19:43:40 -0400
-Received: from mail-oi1-x22a.google.com (mail-oi1-x22a.google.com [IPv6:2607:f8b0:4864:20::22a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24CDAC061575
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 16:43:04 -0700 (PDT)
-Received: by mail-oi1-x22a.google.com with SMTP id r26so10800607oij.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 16:43:04 -0700 (PDT)
+        Thu, 19 Aug 2021 23:29:04 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63C1BC061575
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 20:28:27 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id l85-20020a252558000000b0059537cd6aceso8580430ybl.16
+        for <linux-bluetooth@vger.kernel.org>; Thu, 19 Aug 2021 20:28:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=8LHZxCEWR5/C4vnwOrp7U43kFfte1OHNOyXMODVHA5A=;
-        b=eElLfnhKFd3yW9Uwfwg4ay/PWquxMgQp7A3/vCvgyeg+XrrSjsvEM1fvDeQ6ftAim6
-         8+ntIVwMzPYywiaGr/seW2o4K+wIinmrS0eHMHyszkSDtqcpnlzpTPiapaoE/U17o7rU
-         yO4YU7xRue4Vtzvvg4bq3iNNHFPdCE762BxVmGuSoJno/QV3EEhly0VHleUjEojGJaDN
-         dTun/wU4p3/n5/+OkIYIFQNTsuyTK9OZ+uJ14qe0k2CwQRc1Bj4XJEXlNdn5yeAXxgCs
-         Q+/WXhEBjdWiXi/qQHavSWMrMZ9OUUiUqa4BO7xZJzc9KQpFYVDqTX7emoc0ycEU6b7c
-         wa/w==
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=PPVWx1bdM2r6k6HCDP6FMLkldqZlCb3M27xZWJhcudQ=;
+        b=gJN5GOKfS246dQiqnCnxZvxuC/yXOqjmoGhZvQVQ2BLGma8RRmBU3gem6jqeHf+y4z
+         I/L1/iYKjkKHs3cQflrmo/FHJ9ltxCadW1advCtd+c0D0MO6WJiYxV2LjQG6kQoJwOuT
+         a5QEMxVkRWM/WDwb4JRs48V0egXca37UP7kdkA3VVU8jxtyw9ApSKkTAGX7G7XdO1Fmw
+         nOcFn7JwJbENq4wX3k6NV+rqoZyYqJdwU+kisrl8NmfDj9WaMsgCmC7G55hUQZZW8xEn
+         Jr5jt2xH84vG8N5ZXfw5J+6Nd/Z+1lMtP8ZbTqWVwWRVMtRUmbtT4nzDctfNmKFXh45l
+         xzAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=8LHZxCEWR5/C4vnwOrp7U43kFfte1OHNOyXMODVHA5A=;
-        b=aZ/V/fiDJNL84MhjVpT57+TLJx1C8AzMdCg4CkJ7vdcFtBrh4+Vc/50WuFI/i36SNN
-         554mm2OIEYID8JgwsQKiUriS6pRCDnJs7mTkdo63NRS+Yhfex+hyYK7uNEbh6NSjAkY4
-         or5aL8adG9ubqn8WXRXLQ/sBT4DqLivnA/qczSnTiCRG7/CjN8oa+zDth7K3XxgYt0hn
-         H/apxy+GHyCuiX6K0hSkeajteq9Q/LCkiNHIDSdSMZBBxSKl78pOtHukM7x0cR8gxOCd
-         xVUk5MkTkcDITKDP1p6eq+SzcxXxzXcC7n+IJ0YaDFRKBXwUxaV9QDTYLWziXVW4CY23
-         12Hg==
-X-Gm-Message-State: AOAM533Q9qEdzU0R/27o0PcraBXXs+JRfe9OANrIxhzIMzM1jAwvan4e
-        1r/NFSLQpm25wbmIzZeBEnu33w==
-X-Google-Smtp-Source: ABdhPJw1Q4apWWBHVYYvewNXXvqK3Xr2GzQSAu+2VXBrcwCXMXMTH9UZhRAI49Wn+01q1dGlrCzfkA==
-X-Received: by 2002:aca:1308:: with SMTP id e8mr926649oii.15.1629416583563;
-        Thu, 19 Aug 2021 16:43:03 -0700 (PDT)
-Received: from ripper (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id w14sm1040972otl.58.2021.08.19.16.43.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 19 Aug 2021 16:43:03 -0700 (PDT)
-Date:   Thu, 19 Aug 2021 16:44:26 -0700
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=PPVWx1bdM2r6k6HCDP6FMLkldqZlCb3M27xZWJhcudQ=;
+        b=C5fDaxDrY8sTgG9cSSzvEnVNqANyusitHewEPysrIcwJ0n1Cx7TLiyleanFxSatJk7
+         Duv43pfCrYc0TMHebC0Nfqg9fLUhoAu3tAaMGogsZUDJeZtq2ORVd2pteklSKYkAyx3A
+         BAEyLEyP46h+t3kmneBsXEGzt/qHT2xCA2MFzBzg3b07UDoLFX9EAQQF6rNJqUfFtF82
+         p6LVeRskcK99o6WsLKveM74VXMr2WVDQZFK5OJCDncOW0JQ9UuMCnsa7gcCFVHGQ14ki
+         keB2q5gcxT/zX1TbwCtxx52SSVlYfvF35penGjcYDLn8RWHCw3uMW4zRO5qJgMMbQHPx
+         d5yQ==
+X-Gm-Message-State: AOAM531/G30NeZ5tQZ7OjiHwE7yi9ZVXGckVdfuPNqcJ1/93V7Ne7pdt
+        SzqUcUYfiUW9Iwc2zJ0wPepK3RbbX+yyTA==
+X-Google-Smtp-Source: ABdhPJzCh/1CY9NFlmYEsuZDv3AWwnW88JmxfsBsDibcRNOWieWtPeEac36CDQ+YgoLoeoCGd7Zv1ubtLBAIMA==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f6f9:890a:ebc2:929c])
+ (user=mmandlik job=sendgmr) by 2002:a25:cec6:: with SMTP id
+ x189mr21255905ybe.89.1629430106592; Thu, 19 Aug 2021 20:28:26 -0700 (PDT)
+Date:   Thu, 19 Aug 2021 20:28:22 -0700
+Message-Id: <20210819202819.v5.1.Id9bc5434114de07512661f002cdc0ada8b3d6d02@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [PATCH v5] Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     Archie Pusaka <apusaka@chromium.org>,
+        linux-bluetooth@vger.kernel.org,
+        Alain Michaud <alainm@chromium.org>,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Manish Mandlik <mmandlik@google.com>,
         "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: Re: [RFC PATCH 14/15] WIP: PCI: qcom: use pwrseq to power up bus
- devices
-Message-ID: <YR7s2vK7jdUssx+A@ripper>
-References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
- <20210817005507.1507580-15-dmitry.baryshkov@linaro.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20210817005507.1507580-15-dmitry.baryshkov@linaro.org>
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon 16 Aug 17:55 PDT 2021, Dmitry Baryshkov wrote:
+From: Miao-chen Chou <mcchou@chromium.org>
 
-> Use bus-pwrseq device tree node to power up the devices on the bus. This
-> is to be rewritten with the proper code parsing the device tree and
-> powering up individual devices.
-> 
+This moves msft_do_close() from hci_dev_do_close() to
+hci_unregister_dev() to avoid clearing MSFT extension info. This also
+re-reads MSFT info upon every msft_do_open() even if MSFT extension has
+been initialized.
 
-How about describing the PCI device in DT and having the PCIe controller
-dig it up up from there? Although we won't have a struct device until
-later, so perhaps we need the of-based pwrseq_get() for that.
+The following test steps were performed.
+(1) boot the test device and verify the MSFT support debug log in syslog
+(2) restart bluetoothd and verify msft_do_close() doesn't get invoked
+    and msft_do_open re-reads the MSFT support.
 
-Regards,
-Bjorn
+Signed-off-by: Miao-chen Chou <mcchou@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Alain Michaud <alainm@chromium.org>
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+---
 
-> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-> ---
->  drivers/pci/controller/dwc/pcie-qcom.c | 13 +++++++++++++
->  drivers/power/pwrseq/pwrseq_qca.c      |  1 +
->  2 files changed, 14 insertions(+)
-> 
-> diff --git a/drivers/pci/controller/dwc/pcie-qcom.c b/drivers/pci/controller/dwc/pcie-qcom.c
-> index 8a7a300163e5..a60d41fbcd6f 100644
-> --- a/drivers/pci/controller/dwc/pcie-qcom.c
-> +++ b/drivers/pci/controller/dwc/pcie-qcom.c
-> @@ -23,6 +23,7 @@
->  #include <linux/pm_runtime.h>
->  #include <linux/platform_device.h>
->  #include <linux/phy/phy.h>
-> +#include <linux/pwrseq/consumer.h>
->  #include <linux/regulator/consumer.h>
->  #include <linux/reset.h>
->  #include <linux/slab.h>
-> @@ -1467,6 +1468,7 @@ static int qcom_pcie_probe(struct platform_device *pdev)
->  	struct pcie_port *pp;
->  	struct dw_pcie *pci;
->  	struct qcom_pcie *pcie;
-> +	struct pwrseq *pwrseq;
->  	int ret;
->  
->  	pcie = devm_kzalloc(dev, sizeof(*pcie), GFP_KERNEL);
-> @@ -1520,6 +1522,17 @@ static int qcom_pcie_probe(struct platform_device *pdev)
->  
->  	pp->ops = &qcom_pcie_dw_ops;
->  
-> +	pwrseq = devm_pwrseq_get_optional(dev, "bus");
-> +	if (IS_ERR(pwrseq)) {
-> +		ret = PTR_ERR(pwrseq);
-> +		goto err_pm_runtime_put;
-> +	}
-> +	if (pwrseq) {
-> +		ret = pwrseq_full_power_on(pwrseq);
-> +		if (ret)
-> +			goto err_pm_runtime_put;
-> +	}
-> +
->  	ret = phy_init(pcie->phy);
->  	if (ret) {
->  		pm_runtime_disable(&pdev->dev);
-> diff --git a/drivers/power/pwrseq/pwrseq_qca.c b/drivers/power/pwrseq/pwrseq_qca.c
-> index 3421a4821126..4107f0a9c05d 100644
-> --- a/drivers/power/pwrseq/pwrseq_qca.c
-> +++ b/drivers/power/pwrseq/pwrseq_qca.c
-> @@ -1,3 +1,4 @@
-> +#define DEBUG
->  // SPDX-License-Identifier: GPL-2.0-only
->  /*
->   * Copyright (c) 2021, Linaro Ltd.
-> -- 
-> 2.30.2
-> 
+Changes in v5:
+- Rebase on ToT and remove extra blank line
+
+Changes in v4:
+- Re-read the MSFT data instead of skipping if it's initiated already
+
+Changes in v3:
+- Remove the accepted commits from the series
+
+ net/bluetooth/hci_core.c |  3 ++-
+ net/bluetooth/msft.c     | 20 +++++++++++++++++---
+ 2 files changed, 19 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fb296478b86e..681c6dabb550 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -1798,7 +1798,6 @@ int hci_dev_do_close(struct hci_dev *hdev)
+ 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
+ 
+ 	aosp_do_close(hdev);
+-	msft_do_close(hdev);
+ 
+ 	if (hdev->flush)
+ 		hdev->flush(hdev);
+@@ -4026,6 +4025,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
+ 		cancel_work_sync(&hdev->suspend_prepare);
+ 	}
+ 
++	msft_do_close(hdev);
++
+ 	hci_dev_do_close(hdev);
+ 
+ 	if (!test_bit(HCI_INIT, &hdev->flags) &&
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index b4bfae41e8a5..c2568e93598a 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -184,16 +184,30 @@ static void reregister_monitor_on_restart(struct hci_dev *hdev, int handle)
+ 
+ void msft_do_open(struct hci_dev *hdev)
+ {
+-	struct msft_data *msft;
++	struct msft_data *msft = NULL;
+ 
+ 	if (hdev->msft_opcode == HCI_OP_NOP)
+ 		return;
+ 
+ 	bt_dev_dbg(hdev, "Initialize MSFT extension");
+ 
+-	msft = kzalloc(sizeof(*msft), GFP_KERNEL);
+-	if (!msft)
++	/* If MSFT data exists, reset its members */
++	if (hdev->msft_data) {
++		msft = hdev->msft_data;
++		hdev->msft_data = NULL;
++
++		msft->features = 0;
++		kfree(msft->evt_prefix);
++		msft->evt_prefix = NULL;
++		msft->evt_prefix_len = 0;
++	} else {
++		msft = kzalloc(sizeof(*msft), GFP_KERNEL);
++	}
++
++	if (!msft) {
++		bt_dev_err(hdev, "Failed to init MSFT extension");
+ 		return;
++	}
+ 
+ 	if (!read_supported_features(hdev, msft)) {
+ 		kfree(msft);
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
+
