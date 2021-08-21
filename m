@@ -2,124 +2,86 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46CAFC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Aug 2021 06:50:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C0EC8C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Aug 2021 16:59:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E78761156
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Aug 2021 06:50:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6A976121F
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 21 Aug 2021 16:59:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232425AbhHUGvY convert rfc822-to-8bit (ORCPT
+        id S229941AbhHURA3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 21 Aug 2021 02:51:24 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:54252 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231738AbhHUGvX (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 21 Aug 2021 02:51:23 -0400
-Received: from smtpclient.apple (p5b3d23f8.dip0.t-ipconnect.de [91.61.35.248])
-        by mail.holtmann.org (Postfix) with ESMTPSA id D102DCED43;
-        Sat, 21 Aug 2021 08:50:40 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.100.0.2.22\))
-Subject: Re: [RFC PATCH 00/15] create power sequencing subsystem
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAA8EJpoOxerwmwQozL3gp1nX-+oxLMFUFjVPvRy-MoVfPuvqrw@mail.gmail.com>
-Date:   Sat, 21 Aug 2021 08:50:40 +0200
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        MSM <linux-arm-msm@vger.kernel.org>, linux-mmc@vger.kernel.org,
-        open list <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <551758F2-0B00-4DEB-92C9-37472E46B75D@holtmann.org>
-References: <20210817005507.1507580-1-dmitry.baryshkov@linaro.org>
- <1CA665D1-86F0-45A1-862D-17DAB3ABA974@holtmann.org>
- <CAA8EJpoOxerwmwQozL3gp1nX-+oxLMFUFjVPvRy-MoVfPuvqrw@mail.gmail.com>
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-X-Mailer: Apple Mail (2.3654.100.0.2.22)
+        Sat, 21 Aug 2021 13:00:29 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:32311 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229617AbhHURA3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 21 Aug 2021 13:00:29 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1629565189; h=Date: Message-Id: Cc: To: References:
+ In-Reply-To: From: Subject: Content-Transfer-Encoding: MIME-Version:
+ Content-Type: Sender; bh=ujkhECNouapb26XerCTlAGVvB0uG94bkpEup23oyjvA=;
+ b=wDRKPUBzhHXdvMEH0ukn/2fFrI6Br8juoOypfg+10BPiDz/vp80u9EmMAiSx2ywJhcWFJWJj
+ qDD8lGN0kI9SvrmS8SOksH3utfLErMgJ1vD5KFpocLaHIjR+tMeE79qD1aSvxLcaYgW3IQzf
+ 615umG1IeT/PTGjcLFsvuWhMYd8=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
+ 612131021ea75edcc36d3703 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Sat, 21 Aug 2021 16:59:46
+ GMT
+Sender: kvalo=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 33227C43616; Sat, 21 Aug 2021 16:59:46 +0000 (UTC)
+Received: from tykki.adurom.net (tynnyri.adurom.net [51.15.11.48])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: kvalo)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id AF230C4338F;
+        Sat, 21 Aug 2021 16:59:43 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org AF230C4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH v3 1/2] brcmfmac: add 43752 SDIO ids and initialization
+From:   Kalle Valo <kvalo@codeaurora.org>
+In-Reply-To: <20210812165218.2508258-2-angus@akkea.ca>
+References: <20210812165218.2508258-2-angus@akkea.ca>
+To:     Angus Ainslie <angus@akkea.ca>
+Cc:     kernel@puri.sm, Arend van Spriel <aspriel@gmail.com>,
+        Franky Lin <franky.lin@broadcom.com>,
+        linux-wireless@vger.kernel.org,
+        brcm80211-dev-list.pdl@broadcom.com,
+        linux-bluetooth@vger.kernel.org, Angus Ainslie <angus@akkea.ca>
+User-Agent: pwcli/0.1.0-git (https://github.com/kvalo/pwcli/) Python/3.7.3
+Message-Id: <20210821165946.33227C43616@smtp.codeaurora.org>
+Date:   Sat, 21 Aug 2021 16:59:46 +0000 (UTC)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+Angus Ainslie <angus@akkea.ca> wrote:
 
->>> This is an RFC of the proposed power sequencer subsystem. This is a
->>> generification of the MMC pwrseq code. The subsystem tries to abstract
->>> the idea of complex power-up/power-down/reset of the devices.
->>> 
->>> The primary set of devices that promted me to create this patchset is
->>> the Qualcomm BT+WiFi family of chips. They reside on serial+platform
->>> interfaces (older generations) or on serial+PCIe (newer generations).
->>> They require a set of external voltage regulators to be powered on and
->>> (some of them) have separate WiFi and Bluetooth enable GPIOs.
->>> 
->>> This patchset being an RFC tries to demonstrate the approach, design and
->>> usage of the pwrseq subsystem. Following issues are present in the RFC
->>> at this moment but will be fixed later if the overall approach would be
->>> viewed as acceptable:
->>> 
->>> - No documentation
->>> While the code tries to be self-documenting proper documentation
->>> would be required.
->>> 
->>> - Minimal device tree bindings changes
->>> There are no proper updates for the DT bindings (thus neither Rob
->>> Herring nor devicetree are included in the To/Cc lists). The dt
->>> schema changes would be a part of v1.
->>> 
->>> - Lack of proper PCIe integration
->>> At this moment support for PCIe is hacked up to be able to test the
->>> PCIe part of qca6390. Proper PCIe support would require automatically
->>> powering up the devices before the scan basing on the proper device
->>> structure in the device tree.
->>> 
->>> ----------------------------------------------------------------
->>> Dmitry Baryshkov (15):
->>>    power: add power sequencer subsystem
->>>    pwrseq: port MMC's pwrseq drivers to new pwrseq subsystem
->>>    mmc: core: switch to new pwrseq subsystem
->>>    ath10k: add support for pwrseq sequencing
->>>    Bluetooth: hci_qca: merge qca_power into qca_serdev
->>>    Bluetooth: hci_qca: merge init paths
->>>    Bluetooth: hci_qca: merge qca_power_on with qca_regulators_init
->>>    Bluetooth: hci_qca: futher rework of power on/off handling
->>>    Bluetooth: hci_qca: add support for pwrseq
->> 
->> any chance you can try to abandon patching hci_qca. The serdev support in hci_uart is rather hacking into old line discipline code and it is not aging well. It is really becoming a mess.
+> Add HW and SDIO ids for use with the SparkLan AP6275S
+> Add the firmware mapping structures for the BRCM43752 chipset.
+> The 43752 needs some things setup similar to the 43012 chipset.
+> The WATERMARK shows better performance when initialized to the 4373 value.
 > 
-> I wanted to stay away from rewriting the BT code. But... New driver
-> would have a bonus point that I don't have to be compatible with old
-> bindings. In fact we can even make it the other way around: let the
-> old driver always use regulators and make the new driver support only
-> the pwrseq. Then it should be possible to drop the old hci_qca driver
-> together with dropping the old bindings.
-> 
->> I would say that the Qualcomm serial devices could use a separate standalone serdev driver. A while I send an RFC for a new serdev driver.
->> 
->> https://www.spinics.net/lists/linux-bluetooth/msg74918.html
-> 
-> Any reason why your driver stayed as an RFC and never made it into the
-> kernel? Do you plan to revive your old RFCs on H:4 and H:5?
+> Signed-off-by: Angus Ainslie <angus@akkea.ca>
 
-I was missing enough hardware to test it on and frankly I hoped that someone would pick up this work. The HCI line discipline “hack” needs to be removed soon. It is complicated, cumbersome and has a bunch of issues with locking. Mind you that originated in 2.4.6 kernel and is at its core bit-rotting.
+Patch applied to wireless-drivers-next.git, thanks.
 
-If you manage to put QCA support into a separate btqcauart driver, that would be awesome. The btmtkuart driver is another example where Mediatek got its own serdev based driver.
+d2587c57ffd8 brcmfmac: add 43752 SDIO ids and initialization
 
-Regards
+-- 
+https://patchwork.kernel.org/project/linux-wireless/patch/20210812165218.2508258-2-angus@akkea.ca/
 
-Marcel
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches
 
