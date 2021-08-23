@@ -2,75 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01184C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Aug 2021 15:43:05 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81EECC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 08:58:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3C9060C3E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 22 Aug 2021 15:43:05 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4EBC560FD7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 08:58:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233748AbhHVPnp (ORCPT
+        id S235619AbhHWI7U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 22 Aug 2021 11:43:45 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:61081 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230462AbhHVPnp (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 22 Aug 2021 11:43:45 -0400
-Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 17MFgudw066736;
-        Mon, 23 Aug 2021 00:42:56 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
- Mon, 23 Aug 2021 00:42:56 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 17MFgtKb066733
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Mon, 23 Aug 2021 00:42:56 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: Re: [PATCH] Bluetooth: reorganize functions from hci_sock_sendmsg()
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        LinMa <linma@zju.edu.cn>
-References: <20210722074208.8040-1-penguin-kernel@I-love.SAKURA.ne.jp>
- <CABBYNZKmF7vODFxkDyRwFsTd933mNNB3vwVOCcxsgof_St=ORw@mail.gmail.com>
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Message-ID: <246902bb-aafa-43bf-bf7c-ff26bfed5be1@i-love.sakura.ne.jp>
-Date:   Mon, 23 Aug 2021 00:42:50 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-In-Reply-To: <CABBYNZKmF7vODFxkDyRwFsTd933mNNB3vwVOCcxsgof_St=ORw@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+        Mon, 23 Aug 2021 04:59:20 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:32195 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229699AbhHWI7U (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 23 Aug 2021 04:59:20 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1629709118; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=T55Merzr/SXckbGnhzfre8Q+hDjDewsq/TcE4N/rGG0=; b=UfCN9QkAmeh54aD3GznHPR61i96cxKWXUvc6yY9FCIafs1NLEpn9g2f3HvODK3NaSwZvPxHW
+ hcYtUMLbn08NIcbXQ94E8M9CrWMG6u3PL1G3BPLD204eR/kV6yKzF9e/PixR/nOiCvnxOcn2
+ PESIR1HW3BjN/liM/lKlbWEsrxo=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n07.prod.us-east-1.postgun.com with SMTP id
+ 612363370f9b337f11b6e5e8 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 23 Aug 2021 08:58:31
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 63064C4360C; Mon, 23 Aug 2021 08:58:30 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9158EC4338F;
+        Mon, 23 Aug 2021 08:58:26 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 9158EC4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v4] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Date:   Mon, 23 Aug 2021 16:58:20 +0800
+Message-Id: <1629709100-9099-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2021/07/24 6:44, Luiz Augusto von Dentz wrote:
-> Hi Tetsuo,
-> 
-> On Thu, Jul 22, 2021 at 12:42 AM Tetsuo Handa
-> <penguin-kernel@i-love.sakura.ne.jp> wrote:
->>
->> Since userfaultfd mechanism allows sleeping with kernel lock held,
->> avoiding page fault with kernel lock held where possible will make
->> the module more robust. This patch just brings memcpy_from_msg() calls
->> to out of sock lock.
->>
->> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> 
-> Reviewed-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
+From: Tim Jiang <tjiang@codeaurora.org>
 
-Can this patch go to v5.15 ?
+we have variant wcn6855 soc chip from different vendors, so we should
+use different nvm file with suffix to distinguish them.
+
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+ drivers/bluetooth/btusb.c | 46 ++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 36 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 60d2fce59a71..9b4408307138 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3141,6 +3141,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -3172,6 +3175,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3326,22 +3330,24 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+-				    struct qca_version *ver,
+-				    const struct qca_device_info *info)
++static void btusb_generate_qca_nvm_name(char **fwname,
++					int max_size,
++					struct qca_version *ver,
++					char *separator,
++					char *vendor)
+ {
+-	const struct firmware *fw;
+-	char fwname[64];
+-	int err;
+-
+ 	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+ 		/* if boardid equal 0, use default nvm without surfix */
+ 		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
++			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x%s%s.bin",
++				 le32_to_cpu(ver->rom_version),
++				 separator,
++				 vendor);
+ 		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
++			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x%s%s%04x.bin",
+ 				le32_to_cpu(ver->rom_version),
++				separator,
++				vendor,
+ 				le16_to_cpu(ver->board_id));
+ 		}
+ 	} else {
+@@ -3349,6 +3355,26 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 			 le32_to_cpu(ver->rom_version));
+ 	}
+ 
++}
++
++static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
++				    struct qca_version *ver,
++				    const struct qca_device_info *info)
++{
++	const struct firmware *fw;
++	char fwname[64];
++	int err;
++
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++			btusb_generate_qca_nvm_name(&fwname, sizeof(fwname), ver, "_", "gf");
++		break;
++	default:
++			btusb_generate_qca_nvm_name(&fwname, sizeof(fwname), ver, NULL, NULL);
++		break;
++	}
++
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+ 	if (err) {
+ 		bt_dev_err(hdev, "failed to request NVM file: %s (%d)",
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
