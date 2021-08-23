@@ -2,144 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2310BC4338F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 18:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C6972C4338F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 20:32:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F3F4F6138B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 18:32:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9C61261357
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 20:32:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230253AbhHWScw (ORCPT
+        id S232383AbhHWUdc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Aug 2021 14:32:52 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33350 "EHLO mail.kernel.org"
+        Mon, 23 Aug 2021 16:33:32 -0400
+Received: from mga03.intel.com ([134.134.136.65]:57242 "EHLO mga03.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229883AbhHWScv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Aug 2021 14:32:51 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id EEF5F6138B
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Aug 2021 18:32:08 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629743529;
-        bh=Fnw8TrCpyhunwqk7KuajHMXBwy+umZ0kO5xE4WM73Fg=;
-        h=From:To:Subject:Date:From;
-        b=tp9ya5AqkAsCnJve5G5Dsb4bbs47kK+khH/tQEt+MkKOF/gBTvLWhy+85jD6H/Upg
-         4I5Rv5HgmDy+FnLXD69uHpLn1gtpx+FtbByzHqfyfShwloG7e6cKzzXfpPQeQaxS47
-         2ay2BI+32Z81s6Cf88O6r3echIWGlEA5asgDLY1oXDHZDUiQFPF/slguau94LwGvbq
-         iqU8EUOy2DR2GkzGIg7SIdvprSrbu4hHmQX7o3+rSGnMMfkkx5wiDX1eSLKfnpbV8W
-         2O1itJKDtK57TOVvpn5fWAu3uJjNbIpGccrpuxu73dXmpJ6rgIZRqXBebG8VW2YnJx
-         9uIw6Pw+9qLSA==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 214149] New: Bluetooth not working on MEDIATEK Corp. Device
- 7961
-Date:   Mon, 23 Aug 2021 18:32:08 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luxuridegaming@gmail.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-214149-62941@https.bugzilla.kernel.org/>
+        id S232237AbhHWUdb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 23 Aug 2021 16:33:31 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10085"; a="217207074"
+X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
+   d="scan'208";a="217207074"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2021 13:32:48 -0700
+X-IronPort-AV: E=Sophos;i="5.84,344,1620716400"; 
+   d="scan'208";a="535503407"
+Received: from trangn-mobl.amr.corp.intel.com ([10.209.102.243])
+  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Aug 2021 13:32:47 -0700
+Message-ID: <76f1ddc63531da892643527116aeec434d809091.camel@linux.intel.com>
+Subject: Re: how to cleanly shutdown an application using HCI_CHANNEL_USER
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     "Peter A. Bigot" <pab@pabigot.com>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>
+Date:   Mon, 23 Aug 2021 13:32:47 -0700
+In-Reply-To: <A6782BCD-0C05-40AD-B567-7A1E163184E0@holtmann.org>
+References: <e17b2044-62cb-cbf7-64b8-c647aa7f6ee7@pabigot.com>
+         <A6782BCD-0C05-40AD-B567-7A1E163184E0@holtmann.org>
+Organization: Intel Corporation
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+User-Agent: Evolution 3.36.5 (3.36.5-2.fc32) 
 MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214149
+Hi Peter
 
-            Bug ID: 214149
-           Summary: Bluetooth not working on MEDIATEK Corp. Device 7961
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.13.12
-          Hardware: x86-64
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: luxuridegaming@gmail.com
-        Regression: No
+On Thu, 2021-08-19 at 17:01 +0200, Marcel Holtmann wrote:
+> Hi Peter,
+> 
+> > I'm using an AF_BLUETOOTH socket bound with HCI_CHANNEL_USER from a
+> > user-mode application with cap_net_admin=ep.  As expected this
+> > requires the device be down, and brings the device up automatically.
+> > 
+> > When I close that socket and exit the application, the device appears
+> > to remain up forever.  Which prevents me from re-starting the
+> > application.
+> > 
+> > I tried to issue HCIDEVDOWN before closing, but that produces EBADFD
+> > because ioctls cannot be performed with HCI_CHANNEL_RAW.
+> > 
+> > I can bring the interface down from within the application if, after
+> > closing the socket, I wait a second or so, then create a new bound
+> > HCI_CHANNEL_RAW socket and issue HCIDEVDOWN on it.
+> > 
+> > Is there some other way to cleanly shut down an application that used
+> > HCI_CHANNEL_USER so that the device is returned to down state on exit?
+> > Or is this supposed to happen automatically (I see code that suggests
+> > it should)?
+> > 
+> > Kernel version is 5.11.0-7620-generic (System76), and I'm using go
+> > 1.16, if that's relevant.
+> 
+> I think you found a regression. Calling close() on the HCI User Channel should bring the device
+> back down. This used to work correctly, can you please bisect which kernel patch broke this.
+> 
+> Back in the days I added tools/userchan-tester, but it seems I never included enough test cases to
+> catch this regression.
+> 
+> Regards
+> 
+> Marcel
+> 
 
-Created attachment 298445
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D298445&action=3Dedit
-Dmesg
+Was bluetoothd running when you test?
+If then, try to run without running the bluetooth daemon and check to see if you have a same
+problem.
 
-> Bluetooth does not work on MEDIATEK Corp. Device 7961
+If you have to use the daemon, change the "AutoEnable" flag in the /etc/bluetooth/main.conf to false
+and restart the bluetooth daemon. This will prevent the HCI interface from powering on after cloing
+socket.
 
-> Wireless controller in lsusb
-Bus 003 Device 003: ID 13d3:3563 IMC Networks Wireless_Device
+Regards,
+Tedd
 
-> Wireless controller in lspci
-02:00.0 Network controller: MEDIATEK Corp. Device 7961
 
-> Blueman reports:
-blueman-manager 19.55.31 ERROR    Manager:137 on_dbus_name_appeared: Defaul=
-t=20
-adapter not found, trying first available.
 
-blueman-manager 19.55.31 ERROR    Manager:141 on_dbus_name_appeared: No
-adapter(s) found, exiting
-
-> Gnome bluetooth does not respond either
-
-> Systemctl status bluetooth
-=E2=97=8F bluetooth.service - Bluetooth service
-     Loaded: loaded (/usr/lib/systemd/system/bluetooth.service; enabled; ve=
-ndor
-preset: disabled)
-     Active: active (running) since Mon 2021-08-23 20:01:13 CEST; 8min ago
-       Docs: man:bluetoothd(8)
-   Main PID: 1994 (bluetoothd)
-     Status: "Running"
-      Tasks: 1 (limit: 47410)
-     Memory: 2.4M
-        CPU: 17ms
-     CGroup: /system.slice/bluetooth.service
-             =E2=94=94=E2=94=801994 /usr/lib/bluetooth/bluetoothd
-
-Aug 23 20:01:13 ArchZephyrus systemd[1]: Starting Bluetooth service...
-Aug 23 20:01:13 ArchZephyrus bluetoothd[1994]: Bluetooth daemon 5.60
-Aug 23 20:01:13 ArchZephyrus systemd[1]: Started Bluetooth service.
-Aug 23 20:01:13 ArchZephyrus bluetoothd[1994]: Starting SDP server
-Aug 23 20:01:13 ArchZephyrus bluetoothd[1994]: Bluetooth management interfa=
-ce
-1.20 initialized
-
-> Bluetooth in dmesg
-[   29.293856] Bluetooth: Core ver 2.22
-[   29.293892] Bluetooth: HCI device and connection manager initialized
-[   29.293895] Bluetooth: HCI socket layer initialized
-[   29.293897] Bluetooth: L2CAP socket layer initialized
-[   29.293900] Bluetooth: SCO socket layer initialized
-[   29.890810] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   29.890815] Bluetooth: BNEP filters: protocol multicast
-[   29.890819] Bluetooth: BNEP socket layer initialized
-
-> Acording to dmesg and systemctl it looks like bluetooth should be working
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
