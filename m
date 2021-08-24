@@ -2,164 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CD1DC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 23:51:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 49E6AC4320A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Aug 2021 08:28:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6AB6461378
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 23 Aug 2021 23:51:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2566761360
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Aug 2021 08:28:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233423AbhHWXvy (ORCPT
+        id S235249AbhHXI3B (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 23 Aug 2021 19:51:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46076 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233417AbhHWXvl (ORCPT
+        Tue, 24 Aug 2021 04:29:01 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:43320 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234997AbhHXI3A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 23 Aug 2021 19:51:41 -0400
-Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C861FC061760
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Aug 2021 16:50:57 -0700 (PDT)
-Received: by mail-yb1-xb2e.google.com with SMTP id z18so37423618ybg.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 23 Aug 2021 16:50:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=qqy2KRX7ie0ETXEvz8KE/mywNXQQPz8Wcbu9EL3eMdg=;
-        b=U4YxH5MDgt0Xj4R6y9OOcIu7UkqTDDbopJo3QB/EScQ6TXUImhIIPvqrVJ1PBwOYlE
-         Z+lic3ZUSEFY1ZimZSNZ2mkk+S6f5Vp46nZPT5Jp+0575Hs63u8asb4Enj2qFXpahi6N
-         1BZWRICE50Lal/fBQGmhk2eOmceV5Oat2CGNvmaEytpH/84S6L2dzJ6R2dZcwJ/eeYsD
-         TQWtTcSMEuPywl/Bo13uoYdYt8LDCa8lD7rIVrVw8ne2MqtsoN70AHjYGp4nWxExldQ8
-         3HW+/Yuc2+FLqcTOtWjofFJC5yLgMlvVB3XwTeug/tc1bhZuRnsCj67p935GwwV/Erit
-         00UA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=qqy2KRX7ie0ETXEvz8KE/mywNXQQPz8Wcbu9EL3eMdg=;
-        b=J+OMCdcXk5cfYPdAH1mWw+aD/Q5aHenUJJdlUnJ9VkE0zhso3InoSeADIBxDIVfR2k
-         VJUSvvzsk3HMr1GlaDr+IY+v4flCpUu9ODsJCEDSBQFRCQQZAjEGZh+R4C3JvdN6ueAY
-         j88TrdoNBPqPRBkqJ6H0RciYYYBdiDGAnKGYYcwQZFU1qkBIwFozf98SJyOW8/5zOrAM
-         CBxHXVW76oAhlu1i5eLlooahdjYAr6kzrixmbhZlh/DLX668J2lu4ufSgRF8XegPktwW
-         RrlRgxYolmVVvdQDbM92P2pDr4+sirsTeGwESfZ6BzWaYLgmbMgVk1C2PDsKwVJ6JKfz
-         x22w==
-X-Gm-Message-State: AOAM533Rlj3CR9uDy9uNfBh1CCWAZqH2uAK2f/uJFAXg90i2/qZiSA9K
-        +wqSs9ulmfi12w8Bp+mP9JrvxfddxqbP/PCVPzlenfMB
-X-Google-Smtp-Source: ABdhPJyG1hpFHMjUmu7F4RGhJtGqQolKStk7402/lSdRth2nn4ac63xFIqKaWeBjdYxU8x8BxqkriM7Q5V87lQAQM+8=
-X-Received: by 2002:a25:be02:: with SMTP id h2mr48378157ybk.91.1629762656836;
- Mon, 23 Aug 2021 16:50:56 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210823215729.87837-1-brian.gix@intel.com> <612429dc.1c69fb81.9ac39.1665@mx.google.com>
-In-Reply-To: <612429dc.1c69fb81.9ac39.1665@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 23 Aug 2021 16:50:45 -0700
-Message-ID: <CABBYNZLuYq=ySv8YE061VLLnv-zAa0TQ2aa7dAnH9VwoGW2xbQ@mail.gmail.com>
-Subject: Re: bluetooth: mgmt: Disallow legacy MGMT_OP_READ_LOCAL_OOB_EXT_DATA
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "Gix, Brian" <brian.gix@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 24 Aug 2021 04:29:00 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1629793696; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=WuylCgi/4XPRgUijyBbcjv2AT4kx6jzyKw0PfJfAgfc=; b=RtmqUNSHJYwPc9czy48nfnqoLt3IcS7dhfA+HsyoYmbnxfjLwMpz0HIzWz0jELQ4B0uU5K1b
+ LVmxY9NhMyOOs4j2Jo7ADmIz7sHBcWf5PMZCc2/DhTzbum9sPFFNTdEMi4RbnOXQjzhbgCps
+ 6wx5HwBqeiuSdbaB2Tca7EUNqLk=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n07.prod.us-east-1.postgun.com with SMTP id
+ 6124ada01567234b8c83463b (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 24 Aug 2021 08:28:16
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 52D8AC43617; Tue, 24 Aug 2021 08:28:15 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id A9609C4338F;
+        Tue, 24 Aug 2021 08:28:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org A9609C4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v5] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Date:   Tue, 24 Aug 2021 16:28:03 +0800
+Message-Id: <1629793683-28770-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Brian,
+From: Tim Jiang <tjiang@codeaurora.org>
 
-On Mon, Aug 23, 2021 at 4:08 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=536151
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.50 seconds
-> GitLint                       PASS      0.10 seconds
-> BuildKernel                   PASS      512.80 seconds
-> TestRunner: Setup             PASS      338.52 seconds
-> TestRunner: l2cap-tester      PASS      2.52 seconds
-> TestRunner: bnep-tester       PASS      1.89 seconds
-> TestRunner: mgmt-tester       PASS      30.54 seconds
-> TestRunner: rfcomm-tester     PASS      2.06 seconds
-> TestRunner: sco-tester        PASS      2.02 seconds
-> TestRunner: smp-tester        FAIL      2.05 seconds
-> TestRunner: userchan-tester   PASS      1.92 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - PASS - 0.50 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
->
->
-> ##############################
-> Test: GitLint - PASS - 0.10 seconds
-> Run gitlint with rule in .gitlint
->
->
-> ##############################
-> Test: BuildKernel - PASS - 512.80 seconds
-> Build Kernel with minimal configuration supports Bluetooth
->
->
-> ##############################
-> Test: TestRunner: Setup - PASS - 338.52 seconds
-> Setup environment for running Test Runner
->
->
-> ##############################
-> Test: TestRunner: l2cap-tester - PASS - 2.52 seconds
-> Run test-runner with l2cap-tester
-> Total: 40, Passed: 40 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: bnep-tester - PASS - 1.89 seconds
-> Run test-runner with bnep-tester
-> Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: mgmt-tester - PASS - 30.54 seconds
-> Run test-runner with mgmt-tester
-> Total: 448, Passed: 445 (99.3%), Failed: 0, Not Run: 3
->
-> ##############################
-> Test: TestRunner: rfcomm-tester - PASS - 2.06 seconds
-> Run test-runner with rfcomm-tester
-> Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: sco-tester - PASS - 2.02 seconds
-> Run test-runner with sco-tester
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: smp-tester - FAIL - 2.05 seconds
-> Run test-runner with smp-tester
-> Total: 8, Passed: 7 (87.5%), Failed: 1, Not Run: 0
->
-> Failed Test Cases
-> SMP Client - SC Request 2                            Failed       0.021 seconds
->
-> ##############################
-> Test: TestRunner: userchan-tester - PASS - 1.92 seconds
-> Run test-runner with userchan-tester
-> Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+we have variant wcn6855 soc chip from different foundries, so we should
+use different nvm file with suffix to distinguish them.
 
-Applied, thanks.
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+ drivers/bluetooth/btusb.c | 57 +++++++++++++++++++++++++++++++++++++----------
+ 1 file changed, 45 insertions(+), 12 deletions(-)
 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 60d2fce59a71..ad7734f8917c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3141,6 +3141,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -3172,6 +3175,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3326,27 +3330,56 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
+-static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+-				    struct qca_version *ver,
+-				    const struct qca_device_info *info)
++static void btusb_generate_qca_nvm_name(char **fwname,
++					int max_size,
++					struct qca_version *ver,
++					char *foundry)
+ {
+-	const struct firmware *fw;
+-	char fwname[64];
+-	int err;
++	char *separator;
++	u16 board_id;
++	u32 rom_version;
++
++	separator = (foundry == NULL) ? "" : "_";
++	board_id = le16_to_cpu(ver->board_id);
++	rom_version = le32_to_cpu(ver->rom_version);
+ 
+ 	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+ 		/* if boardid equal 0, use default nvm without surfix */
+ 		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
++			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x%s%s.bin",
++				 rom_version,
++				 separator,
++				 foundry);
+ 		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
++			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x%s%s%04x.bin",
++				rom_version,
++				separator,
++				foundry,
++				board_id);
+ 		}
+ 	} else {
+ 		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++			 rom_version);
++	}
++
++}
++
++static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
++				    struct qca_version *ver,
++				    const struct qca_device_info *info)
++{
++	const struct firmware *fw;
++	char fwname[64];
++	int err;
++
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++			btusb_generate_qca_nvm_name(&fwname, sizeof(fwname), ver, "gf");
++		break;
++	default:
++			btusb_generate_qca_nvm_name(&fwname, sizeof(fwname), ver, NULL);
++		break;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
 -- 
-Luiz Augusto von Dentz
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
