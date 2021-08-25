@@ -7,18 +7,18 @@ X-Spam-Status: No, score=-21.6 required=3.0 tests=BAYES_00,DKIM_INVALID,
 	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F606C432BE
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9247AC4320A
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 16:52:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3B88960FE7
+	by mail.kernel.org (Postfix) with ESMTP id 6BB4961058
 	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 16:52:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235063AbhHYQws (ORCPT
+        id S241216AbhHYQws (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Wed, 25 Aug 2021 12:52:48 -0400
-Received: from vern.gendns.com ([98.142.107.122]:36504 "EHLO vern.gendns.com"
+Received: from vern.gendns.com ([98.142.107.122]:36506 "EHLO vern.gendns.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230363AbhHYQwr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S230490AbhHYQwr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 25 Aug 2021 12:52:47 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         d=lechnology.com; s=default; h=Content-Transfer-Encoding:MIME-Version:
@@ -26,23 +26,24 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
         Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
         Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
         List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=Okqha9zGYw7gOum05FTweoMx0bZinn0Ns29etpuXzUI=; b=zIw/i2GdRi12fDTZYRo0gf/53x
-        CkkWUV1EFwOOa/6A0cWrGByoV3jQ332xPwkQfWcp0+WJ/d7vVfqss6AHh2rwoJW9BOg0vMLisOnpT
-        YUFQbvMvblCqZSEbpzph7iolGwXHzaPwwwgv8XHXvcyLA7O9Ajvk7Rbm8wnfscKvOoQRayDWZybGw
-        GgbK0XHS5vWteh7VqsF1NfosAXQB9OAQAIzNcr/T4yO4jMzI5Bbh9nKBLAuRHxJDaqlvfvsBxA0Lm
-        9mvgb+/fnonhmsKejLX/ZApvru2KAl7hr71dJTxMXggfAGXydwU/besg7Qf+ZUF23/PMNcDnegUJ5
-        fnh3G7wg==;
+        bh=i2sewKx1DejS4NgnSR4JcbA3dG8ziSGJVQAwDkdnnQc=; b=CTE1HsPt53sZZUAtSrKLLre+Ia
+        diXyjU/1GJe6fpH1AX4EeQWiTGIpYtELuR36q6p+yHrv7eDIvU0HA3RPqw2kfZUYnpzSKjJNi47RP
+        x0/FQZXdJzWnrC5Znw2e8nZLFifMuKvUqDQTbkpZn8L2SHnAuF/pLbhRhVhoouIBuESrpnrgNMgip
+        mY6HTw0V61p9NfewDbGJVtBF3d39f0fEct1W9A9+qoF3gBx80LXnDv4IONxFbasNldBKWKBAJzlub
+        vnfSuU1Y0zD60MRoIChRiCc4/78ohrZBvIi1HICqf/wcJkocnn2STsgEuTUxPvI6ZfpvQDnNb/QO3
+        9MtU4C3g==;
 Received: from [2600:1700:4830:1658::fb2] (port=60238 helo=freyr.lechnology.com)
         by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
         (Exim 4.94.2)
         (envelope-from <david@lechnology.com>)
-        id 1mIw7y-0006LP-Gd; Wed, 25 Aug 2021 12:51:58 -0400
+        id 1mIw7z-0006LP-5N; Wed, 25 Aug 2021 12:51:59 -0400
 From:   David Lechner <david@lechnology.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     David Lechner <david@lechnology.com>
-Subject: [PATCH BlueZ v2 1/2] device: clear eir_uuids list on disconnect
-Date:   Wed, 25 Aug 2021 11:51:24 -0500
-Message-Id: <20210825165125.2675544-2-david@lechnology.com>
+Cc:     David Lechner <david@lechnology.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ v2 2/2] device: set le_state.svc_resolved = false in gatt_cache_cleanup()
+Date:   Wed, 25 Aug 2021 11:51:25 -0500
+Message-Id: <20210825165125.2675544-3-david@lechnology.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20210825165125.2675544-1-david@lechnology.com>
 References: <20210825165125.2675544-1-david@lechnology.com>
@@ -62,34 +63,34 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The eir_uuids list contains GATT service UUIDs from advertising data.
-The device may advertise different UUIDs each time it is scanned and
-connected, so the list needs to be cleared when the device disconnects.
+When the GATT cache is cleared, there is no longer a list of GATT
+services, so we need to set le_state.svc_resolved = false so that
+the next time the device connects, it will enumerate the services
+again.
 
-This partially fixes an issue where the UUIDs D-Bus property is empty
+This partially fixes an issue where the UUIDs D-Bus property was empty
 after scanning, connecting, disconnecting and scanning again when
 [GATT] Cache = yes is set in main.conf.
 
 Issue: https://github.com/bluez/bluez/issues/192
+Suggested-by: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Signed-off-by: David Lechner <david@lechnology.com>
 ---
- src/device.c | 3 +++
- 1 file changed, 3 insertions(+)
+ src/device.c | 1 +
+ 1 file changed, 1 insertion(+)
 
 diff --git a/src/device.c b/src/device.c
-index 807106812..53ef3e9a1 100644
+index 53ef3e9a1..6d534c488 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -3129,6 +3129,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
+@@ -580,6 +580,7 @@ static void gatt_cache_cleanup(struct btd_device *device)
  
- 	device_update_last_seen(device, bdaddr_type);
+ 	bt_gatt_client_cancel_all(device->client);
+ 	gatt_db_clear(device->db);
++	device->le_state.svc_resolved = false;
+ }
  
-+	g_slist_free_full(device->eir_uuids, g_free);
-+	device->eir_uuids = NULL;
-+
- 	g_dbus_emit_property_changed(dbus_conn, device->path,
- 						DEVICE_INTERFACE, "Connected");
- 
+ static void gatt_client_cleanup(struct btd_device *device)
 -- 
 2.25.1
 
