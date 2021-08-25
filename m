@@ -2,148 +2,399 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6C7D1C4338F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Aug 2021 23:35:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 148FFC4338F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 00:31:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4AE8761101
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 24 Aug 2021 23:35:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DB47261038
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 00:31:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235041AbhHXXfw (ORCPT
+        id S236439AbhHYAcI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 24 Aug 2021 19:35:52 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34440 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235378AbhHXXfv (ORCPT
+        Tue, 24 Aug 2021 20:32:08 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:39846 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236135AbhHYAcI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 24 Aug 2021 19:35:51 -0400
-Received: from mail-qv1-xf2e.google.com (mail-qv1-xf2e.google.com [IPv6:2607:f8b0:4864:20::f2e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57469C0613CF
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Aug 2021 16:35:06 -0700 (PDT)
-Received: by mail-qv1-xf2e.google.com with SMTP id gf5so1145823qvb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Aug 2021 16:35:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=4pyAnRtB6BusjsxkdhbESMaZuodcjo7FNj0d8D/xHys=;
-        b=O/3Jw6Vyy5KfePuoP1dDErpafk8H0P3GEQnQMn8EXPA1wzd6tuP7G1XDnHCtWDv1GW
-         nh5K+0Jt+rYRYdETws/3hwcc66VWNlw8/c1IOC8LPBBrRGwctk+ariUGGkchGQcZt9Xd
-         OYAJQbEwtoEQNryO5qps3EbeJXtqvJwLu5JSWbo+cBrcqtPtXhPDxrJMHIK72XsDwOJh
-         bB4ibpAuHIVeDMed+/SKUdTW214OVi+xPVB6Jpb3dBX1MkJ1+rsUAz2MgpwRfRrJkkmV
-         SOCo7TnrcyXsRQG25EPIudmq72SBH5ce0gMnPQlD35/WFOm8x2A1d2GlhLTbNh8gDPUw
-         R06w==
+        Tue, 24 Aug 2021 20:32:08 -0400
+Received: by mail-io1-f72.google.com with SMTP id u22-20020a5d9f560000b02905058dc6c376so9766803iot.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 24 Aug 2021 17:31:23 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=4pyAnRtB6BusjsxkdhbESMaZuodcjo7FNj0d8D/xHys=;
-        b=jXp1DQOPSYrfB/jx864M3z+/uuP6/1vCyZhSKx3hbJR5pof0TznmKSHYF3AKXAM4cb
-         0BLB3zxIeW0rp/06FvXqdZOT+Y5QFH/vOYafkRxbYwkEPbH+tTlaFeCQg2ViLsA6lFUP
-         5h9QSQd/9Wm4HVxyAka4qOeM7IFAHdOwcyrSsYEIJ7Y9OQFcfWoe0tnJL22sFc3F9kHW
-         sAwDqRZ3VUNfLm+opBulMXsfjV6MeTAfjnPpV7338BTrG4Gp8BCgL5mFxzShKmo5SI7C
-         y29LexY1HcFcWO9d11Rl3zKAVfX/LIy2PfBYF8MDfVmyp1EAFT+Mo9pJZ5Fbyxcuma/l
-         SlaQ==
-X-Gm-Message-State: AOAM530qrWCrJ+OBRGGJqO4/9tHDxTLIGA8Shole0yRtBrijEMkAuWNs
-        dout7pynyi+9wMeidKivLetf+ZBxELOVWA==
-X-Google-Smtp-Source: ABdhPJwlag7MmOLZ0VKaiwyknYh/XoxdGfnQLLCsL8mmCNqpNGGsli8IzaH4D2RGxxc/MozImaoQKA==
-X-Received: by 2002:a05:6214:a02:: with SMTP id dw2mr41441419qvb.61.1629848105339;
-        Tue, 24 Aug 2021 16:35:05 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.85.52])
-        by smtp.gmail.com with ESMTPSA id o23sm9150418qtq.7.2021.08.24.16.35.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 24 Aug 2021 16:35:05 -0700 (PDT)
-Message-ID: <61258229.1c69fb81.8af0c.f2e0@mx.google.com>
-Date:   Tue, 24 Aug 2021 16:35:05 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4341210861556060948=="
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=vmWstVnnb830DoJmVbDhGcXaqdb96d+LhOSkNAujwuU=;
+        b=bnZLGIeYjk1o2/KrJKBhZ5JFN/B88F/4ZfcW8qW0qEjE/92HOX8OrDCKHdo9CsbYDQ
+         Y+u3Pz4uhbdxCrtEadPQRY6c/VCTgprxfNzwNhJIh3eMHt4m79xxjGgv4dXAYl6x5VFH
+         qSLhzWBipZ8zB8hjVkch8IHkx78hD8w6lMBdbYkVVkfJ5vPYuSNFAyLrcPnMk0TayIrv
+         yrUg8J3anQDqanfrVnweXaX5s6bOLlEnYMITZ2FvkLdPCASOhx3RgsHkrlexJzXIwbob
+         bH3+oyskdoVQhl2md+uiANNwr2ufbwcVBOyF2rKjWe0+8PIkOsXqdQfUmwP2TnP7phB5
+         rLng==
+X-Gm-Message-State: AOAM532tG/yUIgYUHMROEt5QiAH01D7twLnZe218KNs7oJ+sr3b8rRVa
+        NqyXKSCXNcQwJMLm4SqJt+klKMpqjBAfWfBMSKAErZt9MEhK
+X-Google-Smtp-Source: ABdhPJxT4wQRRiP5lkaHhBuxDJTHTz91hHXUA4+ybJWwz26CUCPKUbk99Hk7WuQcKftqx0oHzfWz1oif8it4eqm9fLsnxrXn3qWD
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] device: Remove GATT Attribute when device is removed
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210824225202.826941-1-luiz.dentz@gmail.com>
-References: <20210824225202.826941-1-luiz.dentz@gmail.com>
+X-Received: by 2002:a92:7304:: with SMTP id o4mr27933562ilc.75.1629851482954;
+ Tue, 24 Aug 2021 17:31:22 -0700 (PDT)
+Date:   Tue, 24 Aug 2021 17:31:22 -0700
+In-Reply-To: <00000000000065b14e05c282fd15@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000ada11305ca575e1e@google.com>
+Subject: Re: [syzbot] memory leak in mgmt_cmd_complete
+From:   syzbot <syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        phind.uet@gmail.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4341210861556060948==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+syzbot has found a reproducer for the following issue on:
 
-This is automated email and please do not reply to this email!
+HEAD commit:    6e764bcd1cf7 Merge tag 'for-linus' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=174af485300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a938918bd15e088e
+dashboard link: https://syzkaller.appspot.com/bug?extid=4c4ffd1e1094dae61035
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1355278d300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=150997c5300000
 
-Dear submitter,
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=536773
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.730s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
----Test result---
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.730s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-Test Summary:
-CheckPatch                    PASS      0.26 seconds
-GitLint                       PASS      0.10 seconds
-Prep - Setup ELL              PASS      39.79 seconds
-Build - Prep                  PASS      0.10 seconds
-Build - Configure             PASS      6.95 seconds
-Build - Make                  PASS      173.06 seconds
-Make Check                    PASS      8.48 seconds
-Make Distcheck                PASS      204.33 seconds
-Build w/ext ELL - Configure   PASS      7.06 seconds
-Build w/ext ELL - Make        PASS      163.01 seconds
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.780s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.780s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.840s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.840s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.900s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.900s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.950s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 25.950s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.010s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.010s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.060s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.070s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+BUG: memory leak
+unreferenced object 0xffff88811858bb00 (size 232):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.120s)
+  hex dump (first 32 bytes):
+    d0 14 3d 18 81 88 ff ff d0 14 3d 18 81 88 ff ff  ..=.......=.....
+    00 00 00 00 00 00 00 00 00 14 3d 18 81 88 ff ff  ..........=.....
+  backtrace:
+    [<ffffffff836e557f>] __alloc_skb+0x20f/0x280 net/core/skbuff.c:414
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+BUG: memory leak
+unreferenced object 0xffff888111f7c600 (size 512):
+  comm "kworker/u5:10", pid 8505, jiffies 4294950224 (age 26.120s)
+  hex dump (first 32 bytes):
+    01 00 03 00 07 00 05 00 00 82 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace:
+    [<ffffffff836e544f>] kmalloc_reserve net/core/skbuff.c:355 [inline]
+    [<ffffffff836e544f>] __alloc_skb+0xdf/0x280 net/core/skbuff.c:426
+    [<ffffffff83d1c5ed>] alloc_skb include/linux/skbuff.h:1112 [inline]
+    [<ffffffff83d1c5ed>] mgmt_cmd_complete+0x3d/0x1a0 net/bluetooth/mgmt_util.c:146
+    [<ffffffff83cdc8ee>] send_settings_rsp net/bluetooth/mgmt.c:1129 [inline]
+    [<ffffffff83cdc8ee>] settings_rsp+0x5e/0x170 net/bluetooth/mgmt.c:1282
+    [<ffffffff83d1c8d6>] mgmt_pending_foreach+0x76/0xa0 net/bluetooth/mgmt_util.c:226
+    [<ffffffff83ce80bc>] __mgmt_power_off+0x5c/0x1e0 net/bluetooth/mgmt.c:8583
+    [<ffffffff83cb8786>] hci_dev_do_close+0x5b6/0x710 net/bluetooth/hci_core.c:1774
+    [<ffffffff812636d9>] process_one_work+0x2c9/0x610 kernel/workqueue.c:2276
+    [<ffffffff81263fc9>] worker_thread+0x59/0x5d0 kernel/workqueue.c:2422
+    [<ffffffff8126d428>] kthread+0x188/0x1d0 kernel/kthread.c:319
+    [<ffffffff810022cf>] ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4341210861556060948==--
