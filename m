@@ -2,109 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS autolearn=ham
-	autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D636AC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 22:12:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 788EAC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 22:13:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B16DF60FE6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 22:12:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 59B0C61076
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 22:13:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230194AbhHYWNi (ORCPT
+        id S231708AbhHYWOR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Aug 2021 18:13:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35186 "EHLO
+        Wed, 25 Aug 2021 18:14:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35322 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229786AbhHYWNh (ORCPT
+        with ESMTP id S229786AbhHYWON (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Aug 2021 18:13:37 -0400
-Received: from mail-vs1-xe2d.google.com (mail-vs1-xe2d.google.com [IPv6:2607:f8b0:4864:20::e2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87BD4C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 15:12:51 -0700 (PDT)
-Received: by mail-vs1-xe2d.google.com with SMTP id s19so599917vsl.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 15:12:51 -0700 (PDT)
+        Wed, 25 Aug 2021 18:14:13 -0400
+Received: from mail-vs1-xe32.google.com (mail-vs1-xe32.google.com [IPv6:2607:f8b0:4864:20::e32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A6C0C061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 15:13:27 -0700 (PDT)
+Received: by mail-vs1-xe32.google.com with SMTP id h29so625180vsr.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 15:13:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=e7tpYiNA91JKB6yFoEePlEUH4sjor8tjoYm9dqO0s4E=;
-        b=LeJF2lqyFrF/7Yq74Q6WZGUC8I1a8Os13iVuqTksVnG7eOSAM8BohqMrLAsPw2T4Y5
-         j32a+OvCa0KAwCecUsnJO+oICBI4iaskAbDtlZvcoyArs/bmq+qcNqE6fVWzZanjeDeW
-         JjuEZms5YKjU4hgmEFzC+e4lTfK3apXg7wINPgfO8zaCUSE/GeF4f55WMQ85GG/eT6CM
-         IYq7B8sFCaYsukVDkaEqYTnAOD8TD52OK9c4uCUTKT/wC9xWW9XfYchFfTLsrVkRS+Lf
-         EF1bg5ZtEbr5p+kattO7lK2sVnrvhi2nNLoJsvK2sW/4qPkTBYI2JH49cyrDoBCPwM5T
-         7twg==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=OK/+jqAl453hx35MLn00NPeLf4ZPRP3aTgWBDICzl0g=;
+        b=G8GfS+cMAA0MY//7COFS4cYrAvfmtHZleaZRYSdmuSP2fXIhrCs7OxTEc2jKi23YJ/
+         Qc18SeDYwbvlNvXAH2eemCeAvZXjwzVWGDKVR8/Uye9RFOguCDdpHy9OTLEmI3D6D4JD
+         bFq2MBUoIXb3g2UK756IA5bLHKXBeK+nJSuQS+itN4HKb7a2m1x1hj8bKfUNEqYAkShh
+         J19kMEn1fhIqbMsKYPqc732u3hDB1zHi9wuHmU4yzhGdliy9BRW5nSOGqKM4qfcTAJAs
+         3niYmZOH0I1hxcRA6F55lsgiL8cgwGI8hoGC5OCd1VD1WAUaUA5ue4VXfg4w7sOhcgML
+         ZcLQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=e7tpYiNA91JKB6yFoEePlEUH4sjor8tjoYm9dqO0s4E=;
-        b=ZXk7AUnnlaUxV0hfIujtpogrvpYujLYZyY9eI23yuAgHtHjorAsbLg5ZgTOYvcmjIT
-         MMCrKRYMVbhrkaU9V7+2/9BAcJ6hWdIRfXCOqTUmxSRBv4lzE7rq0Ks6b9porgWgsSJN
-         HTs0vdr9LKflLqOdUkrpGE/gqe6V1LgtOeiiWXg6BDXK9xChWU6dUeG48bak/8tYq3B9
-         YvKLtEFoScPh5jj2zChfhg9raTbK6vYjOL4rMrP00/Nyy+bR5fDLg5INcvb1lz57Dqu1
-         MBwrgzZYiuPjGvq33LRqz/UROcR1BLxIkEiv9k+rcihCogT8Xd5TMtzTHl2h8IGQ7x21
-         +qdA==
-X-Gm-Message-State: AOAM531Y2bL0uGP1kMP8jj2M9zh7b7xqMNqylysyGlxeb15hSacemnxu
-        kbWzHZEGn/sHFM2L/LlJQlr3z/yqWXwoa6NTP2UVqdOf
-X-Google-Smtp-Source: ABdhPJyDtW1wMhluufIkHzuDPZ1az/MrxiTMANlV3GSzFahe47O1nwhUaMStziQMzQQ8vLLy0Zrq9TMhDJ3IESezZjc=
-X-Received: by 2002:a67:fa19:: with SMTP id i25mr519388vsq.7.1629929570557;
- Wed, 25 Aug 2021 15:12:50 -0700 (PDT)
+         :message-id:subject:to;
+        bh=OK/+jqAl453hx35MLn00NPeLf4ZPRP3aTgWBDICzl0g=;
+        b=CUVQMnGbwSj9gwJtuYgDxaA+OdCjjfG293KEV6xR0QgLILeEw6gQNrt3E9Qb9bwulm
+         oJg0hXy6sLf3cexXTxDXAPduvQe319eGL0P83Cy2WQxy/OrkqZLqaSRkk2apFLyu8lgf
+         72pdBYjsd35d5vGRf598NHDZred2h2b+lXH2MpiKcdM1j9XgJOPzNqPeRE7PbGavyYaK
+         iN1kRHWFFizv/q7dMRh4qbj4lAngjN5e8yhtuThl2ciY0BUE/eqhw+uGLGzUQ+S/mZ9v
+         lbVaCtjqtSbtmRen83UjjP8lMUV43MuzvG41Pd2ycy9oa21DA2U0YvE94uAYg4lzyose
+         5WNQ==
+X-Gm-Message-State: AOAM532AaGWjP8dc2Stk8nQT0D6rLUo5TAu10Dg+rfkL8A6tzim8K4H3
+        UCHKs/kAofFHJobBjt1JAovpMKKNWTdb7/6m8zVTB/Hh
+X-Google-Smtp-Source: ABdhPJwkL1O7TK8jGIZqZ/0rZ1ZXD8OCVGLkPYsDT2f+cOUJqQz0bKNmTxnShZIFPa7rRFHvJZyiJdlmtg9xrRvOy60=
+X-Received: by 2002:a67:1d07:: with SMTP id d7mr669892vsd.25.1629929606223;
+ Wed, 25 Aug 2021 15:13:26 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210825165125.2675544-1-david@lechnology.com> <20210825165125.2675544-2-david@lechnology.com>
-In-Reply-To: <20210825165125.2675544-2-david@lechnology.com>
+References: <20210824225202.826941-1-luiz.dentz@gmail.com> <61258229.1c69fb81.8af0c.f2e0@mx.google.com>
+In-Reply-To: <61258229.1c69fb81.8af0c.f2e0@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 25 Aug 2021 15:12:39 -0700
-Message-ID: <CABBYNZJzTmpvcaw5eDa9awvVZYQdJuKW7EQSYfpMOCzhorP8cg@mail.gmail.com>
-Subject: Re: [PATCH BlueZ v2 1/2] device: clear eir_uuids list on disconnect
-To:     David Lechner <david@lechnology.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 25 Aug 2021 15:13:15 -0700
+Message-ID: <CABBYNZKyWxSWuGV4VcsuhbpPFnrcNi1WCHLrYniHf=9McBQ3PQ@mail.gmail.com>
+Subject: Re: [BlueZ] device: Remove GATT Attribute when device is removed
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi David,
+Hi,
 
-On Wed, Aug 25, 2021 at 9:54 AM David Lechner <david@lechnology.com> wrote:
+On Tue, Aug 24, 2021 at 4:35 PM <bluez.test.bot@gmail.com> wrote:
 >
-> The eir_uuids list contains GATT service UUIDs from advertising data.
-> The device may advertise different UUIDs each time it is scanned and
-> connected, so the list needs to be cleared when the device disconnects.
+> This is automated email and please do not reply to this email!
 >
-> This partially fixes an issue where the UUIDs D-Bus property is empty
-> after scanning, connecting, disconnecting and scanning again when
-> [GATT] Cache = yes is set in main.conf.
+> Dear submitter,
 >
-> Issue: https://github.com/bluez/bluez/issues/192
-> Signed-off-by: David Lechner <david@lechnology.com>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=536773
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      0.26 seconds
+> GitLint                       PASS      0.10 seconds
+> Prep - Setup ELL              PASS      39.79 seconds
+> Build - Prep                  PASS      0.10 seconds
+> Build - Configure             PASS      6.95 seconds
+> Build - Make                  PASS      173.06 seconds
+> Make Check                    PASS      8.48 seconds
+> Make Distcheck                PASS      204.33 seconds
+> Build w/ext ELL - Configure   PASS      7.06 seconds
+> Build w/ext ELL - Make        PASS      163.01 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - PASS
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+>
+> ##############################
+> Test: GitLint - PASS
+> Desc: Run gitlint with rule in .gitlint
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
 > ---
->  src/device.c | 3 +++
->  1 file changed, 3 insertions(+)
->
-> diff --git a/src/device.c b/src/device.c
-> index 807106812..53ef3e9a1 100644
-> --- a/src/device.c
-> +++ b/src/device.c
-> @@ -3129,6 +3129,9 @@ void device_remove_connection(struct btd_device *device, uint8_t bdaddr_type)
->
->         device_update_last_seen(device, bdaddr_type);
->
-> +       g_slist_free_full(device->eir_uuids, g_free);
-> +       device->eir_uuids = NULL;
-> +
->         g_dbus_emit_property_changed(dbus_conn, device->path,
->                                                 DEVICE_INTERFACE, "Connected");
->
-> --
-> 2.25.1
+> Regards,
+> Linux Bluetooth
 
-Applied, thanks.
-
+Pushed.
 
 -- 
 Luiz Augusto von Dentz
