@@ -2,83 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-17.3 required=3.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
-	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,
-	USER_AGENT_SANE_1 autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EE8D9C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 17:44:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 230D8C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 17:57:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7D7F610E8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 17:44:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3A046023E
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 25 Aug 2021 17:57:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234638AbhHYRpj (ORCPT
+        id S231962AbhHYR6d (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Aug 2021 13:45:39 -0400
-Received: from vern.gendns.com ([98.142.107.122]:40544 "EHLO vern.gendns.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233405AbhHYRpj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Aug 2021 13:45:39 -0400
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=lechnology.com; s=default; h=Content-Transfer-Encoding:Content-Type:
-        In-Reply-To:MIME-Version:Date:Message-ID:From:References:To:Subject:Sender:
-        Reply-To:Cc:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-        List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-        bh=huGsUFwIPThK61p3wjNu91TtEXOY29J/+YXbtebsPz0=; b=yEgxNrj/6TLkFQQ7G+4INDvXD7
-        9Dwr7mCUucKEGdgR4u4DbIdbDYS7+dyx/QTEZfU90QLcY3sltSvJivCtAtQldnYBgpoPSK5zYlZRh
-        FZLnfMEauWwJS/0eFGqB1nVno+WrBnj/Gejv4mTRj4xjBy/FIyLWI1E3zCWlOKenL58tpqCKv1zF2
-        vhOGlq3CuO+vnWaoEPJdjhkl+k6NGRrb/SdEAVujLKjpDVLAoeRlfMWacFcW9uBWU9ST2VXtHPvnd
-        Q0rIaEaTYO1oHBNIIk2shOjVfIy/Sd4Yz2c3xVX/cnM/0O/7P3rYrilgLUdchklpd14TGgF8UCoUX
-        UhoEnLuQ==;
-Received: from 108-198-5-147.lightspeed.okcbok.sbcglobal.net ([108.198.5.147]:56538 helo=[192.168.0.134])
-        by vern.gendns.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-        (Exim 4.94.2)
-        (envelope-from <david@lechnology.com>)
-        id 1mIwx9-0007WS-Mc; Wed, 25 Aug 2021 13:44:52 -0400
-Subject: Re: [PATCH BlueZ] device: Remove GATT Attribute when device is
- removed
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-References: <20210824225202.826941-1-luiz.dentz@gmail.com>
-From:   David Lechner <david@lechnology.com>
-Message-ID: <0028fab2-5707-8011-d3f6-d14c7337d449@lechnology.com>
-Date:   Wed, 25 Aug 2021 12:44:51 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Wed, 25 Aug 2021 13:58:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34026 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229535AbhHYR6b (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 25 Aug 2021 13:58:31 -0400
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBABEC061757
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 10:57:45 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id e3so155339qth.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 10:57:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20161025;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=aVr7aeSAYBbXeldLmyGNFMeMurxtieAW4XjzD8Lz8Jg=;
+        b=Rn0utoRgJ2pQkiwdQgZ3MWqncCOXy+/IWuTS5dpHFttcqdgg/2DkPWYAEmMxNViBlb
+         9nOj5y0BuymSwnWituDkI6F7RlSxxxJl6FSgBXx7zJs3l7JR9XYIcx4sscgaWLI1TtMf
+         fgMJ3afyU8xW9CJ/XmvTkaEHn65GR9UaIiByW3m7zCH//wK/n237XzIMo9ixge64vNNh
+         7g91iAWIiIIVzsg8MTnwxQxxi0A7AHCO5J8DUVsrhORsfiQbPtCFB/dmHNN8c8arGVCb
+         r+LwVIxL6vXvspqsAsX9T0BM4/uWi0ZR4Gck4Y8kYaPE1rfR41IuI27aIM3dY13GLJGj
+         FDLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=aVr7aeSAYBbXeldLmyGNFMeMurxtieAW4XjzD8Lz8Jg=;
+        b=d3aw1PxSF3hMj1RsbHP8Uuf5V7zRN126PX33z/iMbYW0Cvd+Ge9cUvb22pY5Q/WWAQ
+         tc5UMn8zhDEmZFtHAH3x+aqQfXAv87wJhypW14w4zl5JDoaKLq1gG3aJBnaI/KirQFKe
+         9EHgBBgmUVcW/IVKGO9iti6bqKjCVboehILzjFSIEHyec0ipLKw88HwV9qr04Z6TRwH/
+         JjQcd7LJilEaSk3EKMyPzeSxiCTQFnSp/SvFPyNvtzTNiTDRVmhrUtJmFDnzdkcycN+n
+         q1KI/3iL9UJZ66vBahlXwOuDAHdB6RtamvdxAjeByNXpvMKM6YA2xHHWU6MV5Zw9TUAD
+         6Rsw==
+X-Gm-Message-State: AOAM530Z6cn2RDvCXv0Pp37jQZqncUiZvLx+Sth8IRfkYkIWHxjFd+iP
+        XIDCmDxZn8AG8woqwSrV5iwB+jf82yVXVg==
+X-Google-Smtp-Source: ABdhPJwNG+DAEKee13xKh2uPLo1lPZ+eoyWN7vILtr8G8P4Jyu1lvCQbd72/Ku++7KrFh7NxXBGT4Q==
+X-Received: by 2002:a05:622a:199d:: with SMTP id u29mr12636149qtc.357.1629914264595;
+        Wed, 25 Aug 2021 10:57:44 -0700 (PDT)
+Received: from [172.17.0.2] ([20.65.80.204])
+        by smtp.gmail.com with ESMTPSA id q10sm498988qke.108.2021.08.25.10.57.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 25 Aug 2021 10:57:44 -0700 (PDT)
+Message-ID: <61268498.1c69fb81.278b9.4716@mx.google.com>
+Date:   Wed, 25 Aug 2021 10:57:44 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6977814599810716762=="
 MIME-Version: 1.0
-In-Reply-To: <20210824225202.826941-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - vern.gendns.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - lechnology.com
-X-Get-Message-Sender-Via: vern.gendns.com: authenticated_id: davidmain+lechnology.com/only user confirmed/virtual account not confirmed
-X-Authenticated-Sender: vern.gendns.com: davidmain@lechnology.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, david@lechnology.com
+Subject: RE: [BlueZ] device: delete cache file when device is removed
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210825172936.2691027-1-david@lechnology.com>
+References: <20210825172936.2691027-1-david@lechnology.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 8/24/21 5:52 PM, Luiz Augusto von Dentz wrote:
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> 
-> This makes the GATT Attribute cache to be removed when device is removed
-> just like SDP ServiceRecords.
-> 
-> Fixes: https://github.com/bluez/bluez/issues/191
-> ---
-Tested-by: David Lechner <david@lechnology.com>
+--===============6977814599810716762==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-But wouldn't it be better to just delete the file altogether?
-This would prevent any future sections from being forgotten to
-be removed as well.
+This is automated email and please do not reply to this email!
 
-I sent an alternative patch that does this: "device: delete
-cache file when device is removed"
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=537293
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.28 seconds
+GitLint                       PASS      0.10 seconds
+Prep - Setup ELL              PASS      40.03 seconds
+Build - Prep                  PASS      0.09 seconds
+Build - Configure             PASS      7.02 seconds
+Build - Make                  PASS      175.01 seconds
+Make Check                    PASS      8.81 seconds
+Make Distcheck                PASS      206.38 seconds
+Build w/ext ELL - Configure   PASS      7.04 seconds
+Build w/ext ELL - Make        PASS      164.16 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============6977814599810716762==--
