@@ -2,323 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-20.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 249E1C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 00:02:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37F8FC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 04:31:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 01BFB610A7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 00:02:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16E5761076
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 04:31:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234178AbhHZADf (ORCPT
+        id S237793AbhHZEcf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 25 Aug 2021 20:03:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60088 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231535AbhHZADe (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 25 Aug 2021 20:03:34 -0400
-Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82621C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 17:02:48 -0700 (PDT)
-Received: by mail-ua1-x92d.google.com with SMTP id a4so660868uae.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 17:02:48 -0700 (PDT)
+        Thu, 26 Aug 2021 00:32:35 -0400
+Received: from mx01.fronius.com ([85.31.3.78]:59376 "EHLO mx01.fronius.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S237999AbhHZEce (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Aug 2021 00:32:34 -0400
+X-Greylist: delayed 365 seconds by postgrey-1.27 at vger.kernel.org; Thu, 26 Aug 2021 00:32:34 EDT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=P8cOUl5rJxM/M6K+Ul9Q4rIt9qo6Y2wKzGmCZaFJPoc=;
-        b=sD7FCD+IT6itdxXRgw91DIGcVEXm41Qtrp+JANS68b+vwOMvpNFNsz+yTHMZ4OLsXx
-         SMCvPhMyrHGpTNT45lVlnCrCfaQPRd89OGZ2uecHBPSba0rr/4wIR0wZ1m20uO9tUfTb
-         PNVGKD9l7J+SVYZtEyNlcBPGuvn7tK6s93zWPv4FZFRE4xOaCgV49AEjrP9nzmyIScCV
-         hT247gqzIM/XOk2u2OQofDbQZnpapz0DvXPEKGG7G13FiWVW3ziPshOeNsV9rEc5F34Q
-         gc6ffFTFOLOMssNfotT4vCWyvS4/cbCdT6qK4VrI13DO2ncZ+C8PSkaYWw5B+I0pvvpw
-         HeEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=P8cOUl5rJxM/M6K+Ul9Q4rIt9qo6Y2wKzGmCZaFJPoc=;
-        b=mdLDxcvffDs0BVcrU9kY7+8fTOTgUF9ccY4x2rrEu8md36wqZcaFFp4LWzy9aF50Cq
-         Xll04Lpiy047Vt78kwZ9YTUgbWL2WTrY5D0J7Jsu4Ia9dgxXEDNUjmuRh+NY4kbRZX2h
-         Yr/GbQZHpdHD1PBoYY+JGLcFwhCrc/mqxQ/gB6mEcBEf9kzO6f8cGqiIbLb3NPXYXE7K
-         jQ0mOGTH4r0FVx7pO3yAPZeT8Fci+hpzWbo2awfDRWZ4bS5lgDu58YI/RGF/YB3I1Yqq
-         /6eih4YNMOwJKuR8xgG7dvKIk3b/mc0bwfD4GtHVitIvzparEnEgGHAtah9kk23D3wrf
-         nSlg==
-X-Gm-Message-State: AOAM531j8icplXly1Li5P1jQVKyppVemUdm+QD6/h4hHT94zsz3LtShD
-        AZUomMFOO0/bZKVsdTsgkjL+7z+Ofs2FUz/8Wsh6XpqSp4U5Eg==
-X-Google-Smtp-Source: ABdhPJyQiTNcwxjC5DhxTAfrXsw1ARAdKy6mtpU228CB3x2Iw8bLE8/fbGsYr73BXMeDafMgZJTJV0UwrVjPX/3Qie4=
-X-Received: by 2002:ab0:56c3:: with SMTP id c3mr586658uab.61.1629936166073;
- Wed, 25 Aug 2021 17:02:46 -0700 (PDT)
+  d=fronius.com; s=s1;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TAPpeROFhLb9YvR0K6JZhc/qMFLPBUmJjigf2/qX8cU=;
+  b=DSYIczZhyMIIPNC9q0jgmzkyLjWrrTS9FWA3UJX4zK1+19yJjTWtLgmN
+   YTAyiK8U625urCn/G4IkElC2LMc/4btaq7B9kKt7eEu5E1NxAnq8SnPIZ
+   +cAosHZLPGmnT3FZjsmZCOIT+lSD6JPmlqUwk4ZxcwyswAnhik/40y08q
+   E=;
+Authentication-Results: mx01.fronius.com; dkim=none (message not signed) header.i=none
+IronPort-SDR: fctE3+pfT+H6tmwyrm5xy3Cq2UmYFkaKxXbt2OEw4j2JbIFET/m4tynKiQne+AIM0nV9Ve1blw
+ vhVf6RbvqkTw==
+IronPort-HdrOrdr: A9a23:5K3IKqkw8OqVc9qIDwHRTxysVNDpDfII3DAbv31ZSRFFG/Fwz/
+ re+8jy1XfP5wr5K0tQ/+xoX5PwPE80lKQFm7X5Uo3SPzUO1FHEEGgm1/qH/9SCIVyDygc+79
+ YDT0EWMrSZZjJHZITBkWyF+r0bruVvhZrJuQ6o9RZQpG9RB52IpD0JczpzWncGPDWuK6BJb6
+ ah2g==
+X-IronPort-AV: E=Sophos;i="5.84,352,1620684000"; 
+   d="scan'208";a="45051871"
+X-IronPort-Outbreak-Status: No, level 0, Unknown - Unknown
+Received: from unknown (HELO AT-ESXVM-613.fronius.com) ([10.2.6.13])
+  by mx01.fronius.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 26 Aug 2021 06:24:32 +0200
+Received: from AT-ESXVM-612.fronius.com (10.2.6.12) by
+ AT-ESXVM-613.fronius.com (10.2.6.13) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2176.14; Thu, 26 Aug 2021 06:24:32 +0200
+Received: from AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4]) by
+ AT-ESXVM-612.fronius.com ([fe80::b877:544f:b560:3fa4%5]) with mapi id
+ 15.01.2176.014; Thu, 26 Aug 2021 06:24:32 +0200
+From:   Eisenkolb Thomas <Eisenkolb.Thomas@fronius.com>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+CC:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        David Lechner <david@lechnology.com>
+Subject: AW: [PATCH BlueZ v2 1/2] device: clear eir_uuids list on disconnect
+Thread-Topic: [PATCH BlueZ v2 1/2] device: clear eir_uuids list on disconnect
+Thread-Index: AQHXmdGKvP68LPNXxUOjoqbQLOuJ+auEp3eAgACFxEA=
+Date:   Thu, 26 Aug 2021 04:24:32 +0000
+Message-ID: <c74ad033ff8240f8a77b00c6f8f678a0@fronius.com>
+References: <20210825165125.2675544-1-david@lechnology.com>
+ <20210825165125.2675544-2-david@lechnology.com>
+ <CABBYNZJzTmpvcaw5eDa9awvVZYQdJuKW7EQSYfpMOCzhorP8cg@mail.gmail.com>
+In-Reply-To: <CABBYNZJzTmpvcaw5eDa9awvVZYQdJuKW7EQSYfpMOCzhorP8cg@mail.gmail.com>
+Accept-Language: de-AT, en-US
+Content-Language: de-DE
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-originating-ip: [10.2.25.111]
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 MIME-Version: 1.0
-References: <20210815201611.v9.1.I41aec59e65ffd3226d368dabeb084af13cc133c8@changeid>
- <61191554.1c69fb81.89ead.b7d9@mx.google.com> <CABBYNZLcEctR6=ovTK_CABqkKgU8UCKQQ30VsVsAJkdEA+xY0A@mail.gmail.com>
- <CAHFy418ZxGDjGvr9RBkKAk1FJa9Lq6jB1D1esnJmX99eKadJbw@mail.gmail.com>
- <CAHFy418sMhHOc1SAZ01P0qOAcWVfUGo3=0TC_9KSqs-2xscNUw@mail.gmail.com>
- <CABBYNZJZrVv-kNFaV7RbEH8i3TGzuXMkcRU1Lt6tngs_qoAvFA@mail.gmail.com> <CAHFy419xvgeU7KUhXj7xDvOJ30KMJTWx7rc3d9uidNZFmEg6Eg@mail.gmail.com>
-In-Reply-To: <CAHFy419xvgeU7KUhXj7xDvOJ30KMJTWx7rc3d9uidNZFmEg6Eg@mail.gmail.com>
-From:   Joseph Hwang <josephsih@google.com>
-Date:   Thu, 26 Aug 2021 08:02:34 +0800
-Message-ID: <CAHFy41_mKZ+qaXbUoVgwCBQ9E-kmZabcn3hnVoswf1MOZ3CQnA@mail.gmail.com>
-Subject: Re: [v9,1/5] Bluetooth: btusb: disable Intel link statistics
- telemetry events
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@google.com>
-Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-(Resent in plaintext mode)
-
-Hi Luiz:
-
-  I have fixed the mgmt-tester on the bluez side. The "Read Exp
-Feature - Success" test passed on my local test setup.
-
-  Please let me know if there are any issues.
-
-Thanks and regards,
-Joseph
-
-
-On Fri, Aug 20, 2021 at 1:27 PM Joseph Hwang <josephsih@google.com> wrote:
->
-> Hi Luiz:
->
-> The mgmt-tester change to add the UUID of the new exp feature is just
-> sent for review:
->
-> https://patchwork.kernel.org/project/bluetooth/patch/20210820131751.BlueZ.v1.1.I165b6fc2b20d80c8d18946434005f0269d92f489@changeid/
->
->   The tester checks the exp features UUIDs and FLAGs. As the FLAG
-> values depend on how the test is set up. I set the flags to be all
-> 0x00 which passed the mgmt-tester in my local test setup. If that is
-> not the case upstream, please let me know.
->
-> Thanks and regards,
-> Joseph
->
-> On Fri, Aug 20, 2021 at 2:04 AM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Joseph,
-> >
-> > On Tue, Aug 17, 2021 at 10:49 PM Joseph Hwang <josephsih@google.com> wrote:
-> > >
-> > > Hi Luiz:
-> > >
-> > >   I am wondering if it is possible to merge these kernel patches
-> > > before fixing the mgmt-tester?
-> > >
-> > >   The mgmt-tester failed due to its checking against the fixed exp
-> > > feature count and the corresponding exp UUIDs and flags. A more
-> > > flexible tester may be required so that the tester would not be broken
-> > > whenever a new exp feature is added.
-> >
-> > I would prefer to have the mgmt-tester changes applied as well so we
-> > don't have false positives for other patches causing mgmt-tester to
-> > fail, in fact we include CI is useful to validate this changes so we
-> > can check the feature is correctly exposed to userspace and UUID is
-> > properly formatted, etc, it shouldn't be a big change to mgmt-tester
-> > thought if you just include the new UUID later on we can think about
-> > how we could make it more extensible so it doesn't break when a new
-> > feature is added.
-> >
-> > > On Tue, Aug 17, 2021 at 5:54 PM Joseph Hwang <josephsih@google.com> wrote:
-> > > >
-> > > > (Resent this email to contain only plaintext.)
-> > > >
-> > > > Hi Luiz:
-> > > >
-> > > >   It seems that mgmt-tester currently uses a fixed feature count.
-> > > > Every time a new exp feature is added, the mgmt-tester would  be
-> > > > broken. By checking the kernel, it seems that there are currently 2 or
-> > > > 3 exp features, i.e., debug uuid, simultaneous central peripheral
-> > > > uuid, and LL privacy uuid. Note that the debug exp feature is guarded
-> > > > by CONFIG_BT_FEATURE_DEBUG. So I am not sure how the kernel is
-> > > > configured and made on your test setup.
-> > > >
-> > > >   If we fix the mgmt-tester in bluez to have 3 or 4 (which one?)
-> > > > features before merging the kernel changes here that adds a new
-> > > > quality exp feature, it would not match the existing kernel which has
-> > > > only 2 or 3 features.
-> > > >
-> > > >   Do you have any preference about how to fix the mgmt-tester?
-> > > >
-> > > >   My suggestion is to remove the checking of the feature count from
-> > > > the mgmt-tester. The feature count changes over time. It is possible
-> > > > to implement a customized exp_feat_check function which can be more
-> > > > flexible. If a uuid is found in the MGMT response, its associated
-> > > > flags are checked against.
-> > > >
-> > > >   The data currently used in the mgmt-tester:
-> > > >
-> > > > static const uint8_t read_exp_feat_param_success[] = {
-> > > > 0x02, 0x00, /* Feature Count */
-> > > > 0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb, /* UUID - Simultaneous */
-> > > > 0x27, 0x92, 0x96, 0x46, 0xc0, 0x42, /* Central Peripheral */
-> > > > 0xb5, 0x10, 0x1b, 0x67,
-> > > > 0x00, 0x00, 0x00, 0x00, /* Flags */
-> > > > 0x04, 0x00, 0x13, 0xac, 0x42, 0x02, /* UUID - LL Privacy */
-> > > > 0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
-> > > > 0x48, 0xa1, 0xc0, 0x15,
-> > > > 0x02, 0x00, 0x00, 0x00, /* Flags */
-> > > > };
-> > > >
-> > > >
-> > > >   Please let me know what you think.
-> > > >
-> > > > Thanks and regards,
-> > > > Joseph
-> > > >
-> > > >
-> > > > On Tue, Aug 17, 2021 at 1:49 AM Luiz Augusto von Dentz
-> > > > <luiz.dentz@gmail.com> wrote:
-> > > > >
-> > > > > Hi Joseph,
-> > > > >
-> > > > > On Sun, Aug 15, 2021 at 6:25 AM <bluez.test.bot@gmail.com> wrote:
-> > > > > >
-> > > > > > This is automated email and please do not reply to this email!
-> > > > > >
-> > > > > > Dear submitter,
-> > > > > >
-> > > > > > Thank you for submitting the patches to the linux bluetooth mailing list.
-> > > > > > This is a CI test results with your patch series:
-> > > > > > PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=531683
-> > > > > >
-> > > > > > ---Test result---
-> > > > > >
-> > > > > > Test Summary:
-> > > > > > CheckPatch                    PASS      2.92 seconds
-> > > > > > GitLint                       PASS      0.61 seconds
-> > > > > > BuildKernel                   PASS      598.41 seconds
-> > > > > > TestRunner: Setup             PASS      394.12 seconds
-> > > > > > TestRunner: l2cap-tester      PASS      2.89 seconds
-> > > > > > TestRunner: bnep-tester       PASS      2.07 seconds
-> > > > > > TestRunner: mgmt-tester       FAIL      30.94 seconds
-> > > > > > TestRunner: rfcomm-tester     PASS      2.31 seconds
-> > > > > > TestRunner: sco-tester        PASS      2.20 seconds
-> > > > > > TestRunner: smp-tester        FAIL      2.27 seconds
-> > > > > > TestRunner: userchan-tester   PASS      2.09 seconds
-> > > > > >
-> > > > > > Details
-> > > > > > ##############################
-> > > > > > Test: CheckPatch - PASS - 2.92 seconds
-> > > > > > Run checkpatch.pl script with rule in .checkpatch.conf
-> > > > > >
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: GitLint - PASS - 0.61 seconds
-> > > > > > Run gitlint with rule in .gitlint
-> > > > > >
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: BuildKernel - PASS - 598.41 seconds
-> > > > > > Build Kernel with minimal configuration supports Bluetooth
-> > > > > >
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: Setup - PASS - 394.12 seconds
-> > > > > > Setup environment for running Test Runner
-> > > > > >
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: l2cap-tester - PASS - 2.89 seconds
-> > > > > > Run test-runner with l2cap-tester
-> > > > > > Total: 40, Passed: 40 (100.0%), Failed: 0, Not Run: 0
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: bnep-tester - PASS - 2.07 seconds
-> > > > > > Run test-runner with bnep-tester
-> > > > > > Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: mgmt-tester - FAIL - 30.94 seconds
-> > > > > > Run test-runner with mgmt-tester
-> > > > > > Total: 448, Passed: 444 (99.1%), Failed: 1, Not Run: 3
-> > > > > >
-> > > > > > Failed Test Cases
-> > > > > > Read Exp Feature - Success                           Failed       0.012 seconds
-> > > > >
-> > > > > Looks like there is a regression on mgmt-tester:
-> > > > >
-> > > > > Read Exp Feature - Success - run
-> > > > >   Sending Read Experimental Features Information (0x0049)
-> > > > >   Test condition added, total 1
-> > > > >   Read Experimental Features Information (0x0049): Success (0x00)
-> > > > >   Invalid cmd response parameter size
-> > > > > Read Exp Feature - Success - test failed
-> > > > >
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: rfcomm-tester - PASS - 2.31 seconds
-> > > > > > Run test-runner with rfcomm-tester
-> > > > > > Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: sco-tester - PASS - 2.20 seconds
-> > > > > > Run test-runner with sco-tester
-> > > > > > Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: smp-tester - FAIL - 2.27 seconds
-> > > > > > Run test-runner with smp-tester
-> > > > > > Total: 8, Passed: 7 (87.5%), Failed: 1, Not Run: 0
-> > > > > >
-> > > > > > Failed Test Cases
-> > > > > > SMP Client - SC Request 2                            Failed       0.024 seconds
-> > > > > >
-> > > > > > ##############################
-> > > > > > Test: TestRunner: userchan-tester - PASS - 2.09 seconds
-> > > > > > Run test-runner with userchan-tester
-> > > > > > Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > ---
-> > > > > > Regards,
-> > > > > > Linux Bluetooth
-> > > > > >
-> > > > >
-> > > > >
-> > > > > --
-> > > > > Luiz Augusto von Dentz
-> > > >
-> > > >
-> > > >
-> > > > --
-> > > >
-> > > > Joseph Shyh-In Hwang
-> > > > Email: josephsih@google.com
-> > >
-> > >
-> > >
-> > > --
-> > >
-> > > Joseph Shyh-In Hwang
-> > > Email: josephsih@google.com
-> >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
->
->
->
-> --
->
-> Joseph Shyh-In Hwang
-> Email: josephsih@google.com
-
-
-
--- 
-
-Joseph Shyh-In Hwang
-Email: josephsih@google.com
+SGVsbG8sDQoNCkkgaGF2ZSBqdXN0IGZvdW5kIHRoZSBzYW1lIHByb2JsZW0gZXZlbiBpZiBbR0FU
+VF0gQ2FjaGUgPSBubyBpcyBzZXQgaW4gbWFpbi5jb25mLg0KSXQgaXMgc2ltcGx5IHRoZSBzYW1l
+IGJlY2F1c2UgdGhlIGRldmljZSBpcyBoZWxkIGFzIHRlbXBvcmFyeSBkZXZpY2UuDQoNCkFkZGl0
+aW9uYWxseSB0aGUgbWV0aG9kICJkZXZfcHJvcGVydHlfZ2V0X3V1aWRzIiBpbiBkZXZpY2UuYyBv
+bmx5IHJldHVybnMgVVVJRHMgb2YgDQp0aGUgY2FjaGVkICh0ZW1wb3JhcnkgaG9sZCkgZGV2aWNl
+IGJlY2F1c2UgZGV2LT5sZV9zdGF0ZS5zdmNfcmVzb2x2ZWQgaXMgbm90IHR1cm5lZCANCnRvIGZh
+bHNlIG9uIGRpc2Nvbm5lY3QuIFNvIGlmIGEgZGlzY29ubmVjdGVkIGRldmljZSBhZHZlcnRpc2Vk
+IGFuIG5ldyBVVUlELCB5b3UgbmV2ZXINCmdldCBub3RpZmllZCBhYm91dCBpdCB0aHJvdWdoIGRi
+dXMuDQoNClRocm91Z2ggREJ1cyBkZXZpY2Ugbm9kZSBJIHdvdWxkIGV4cGVjdCB0byBnZXQgYm90
+aCBVVUlEIGxpc3RzLiBUaGUgY2FjaGVkIG9uZXMgYW5kIA0KYWxzbyB0aGUgYWR2ZXJ0aXNlZCBv
+bmVzLg0KQWN0dWFsbHkgSSBqdXN0IG1lcmdlIHRoZSB0d28gbGlzdHMgYW5kIHByb3ZpZGUgdGhl
+IHJlc3VsdCB0byBEQnVzIGRldmljZS0+VVVJRHMgcmVxdWVzdC4NCg0KSG9wZSB5b3UgY2FuIGNo
+YW5nZSB0aGlzLg0KDQpUaGFua3MuDQoNClRob21hcw0KDQotLS0tLVVyc3Byw7xuZ2xpY2hlIE5h
+Y2hyaWNodC0tLS0tDQpWb246IEx1aXogQXVndXN0byB2b24gRGVudHogW21haWx0bzpsdWl6LmRl
+bnR6QGdtYWlsLmNvbV0gDQpHZXNlbmRldDogRG9ubmVyc3RhZywgMjYuIEF1Z3VzdCAyMDIxIDAw
+OjEzDQpBbjogRGF2aWQgTGVjaG5lciA8ZGF2aWRAbGVjaG5vbG9neS5jb20+DQpDYzogbGludXgt
+Ymx1ZXRvb3RoQHZnZXIua2VybmVsLm9yZw0KQmV0cmVmZjogUmU6IFtQQVRDSCBCbHVlWiB2MiAx
+LzJdIGRldmljZTogY2xlYXIgZWlyX3V1aWRzIGxpc3Qgb24gZGlzY29ubmVjdA0KDQpIaSBEYXZp
+ZCwNCg0KT24gV2VkLCBBdWcgMjUsIDIwMjEgYXQgOTo1NCBBTSBEYXZpZCBMZWNobmVyIDxkYXZp
+ZEBsZWNobm9sb2d5LmNvbT4gd3JvdGU6DQo+DQo+IFRoZSBlaXJfdXVpZHMgbGlzdCBjb250YWlu
+cyBHQVRUIHNlcnZpY2UgVVVJRHMgZnJvbSBhZHZlcnRpc2luZyBkYXRhLg0KPiBUaGUgZGV2aWNl
+IG1heSBhZHZlcnRpc2UgZGlmZmVyZW50IFVVSURzIGVhY2ggdGltZSBpdCBpcyBzY2FubmVkIGFu
+ZCANCj4gY29ubmVjdGVkLCBzbyB0aGUgbGlzdCBuZWVkcyB0byBiZSBjbGVhcmVkIHdoZW4gdGhl
+IGRldmljZSBkaXNjb25uZWN0cy4NCj4NCj4gVGhpcyBwYXJ0aWFsbHkgZml4ZXMgYW4gaXNzdWUg
+d2hlcmUgdGhlIFVVSURzIEQtQnVzIHByb3BlcnR5IGlzIGVtcHR5IA0KPiBhZnRlciBzY2Fubmlu
+ZywgY29ubmVjdGluZywgZGlzY29ubmVjdGluZyBhbmQgc2Nhbm5pbmcgYWdhaW4gd2hlbiANCj4g
+W0dBVFRdIENhY2hlID0geWVzIGlzIHNldCBpbiBtYWluLmNvbmYuDQo+DQo+IElzc3VlOiBodHRw
+czovL2dpdGh1Yi5jb20vYmx1ZXovYmx1ZXovaXNzdWVzLzE5Mg0KPiBTaWduZWQtb2ZmLWJ5OiBE
+YXZpZCBMZWNobmVyIDxkYXZpZEBsZWNobm9sb2d5LmNvbT4NCj4gLS0tDQo+ICBzcmMvZGV2aWNl
+LmMgfCAzICsrKw0KPiAgMSBmaWxlIGNoYW5nZWQsIDMgaW5zZXJ0aW9ucygrKQ0KPg0KPiBkaWZm
+IC0tZ2l0IGEvc3JjL2RldmljZS5jIGIvc3JjL2RldmljZS5jIGluZGV4IDgwNzEwNjgxMi4uNTNl
+ZjNlOWExIA0KPiAxMDA2NDQNCj4gLS0tIGEvc3JjL2RldmljZS5jDQo+ICsrKyBiL3NyYy9kZXZp
+Y2UuYw0KPiBAQCAtMzEyOSw2ICszMTI5LDkgQEAgdm9pZCBkZXZpY2VfcmVtb3ZlX2Nvbm5lY3Rp
+b24oc3RydWN0IGJ0ZF9kZXZpY2UgDQo+ICpkZXZpY2UsIHVpbnQ4X3QgYmRhZGRyX3R5cGUpDQo+
+DQo+ICAgICAgICAgZGV2aWNlX3VwZGF0ZV9sYXN0X3NlZW4oZGV2aWNlLCBiZGFkZHJfdHlwZSk7
+DQo+DQo+ICsgICAgICAgZ19zbGlzdF9mcmVlX2Z1bGwoZGV2aWNlLT5laXJfdXVpZHMsIGdfZnJl
+ZSk7DQo+ICsgICAgICAgZGV2aWNlLT5laXJfdXVpZHMgPSBOVUxMOw0KPiArDQo+ICAgICAgICAg
+Z19kYnVzX2VtaXRfcHJvcGVydHlfY2hhbmdlZChkYnVzX2Nvbm4sIGRldmljZS0+cGF0aCwNCj4g
+ICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgREVWSUNFX0lO
+VEVSRkFDRSwgDQo+ICJDb25uZWN0ZWQiKTsNCj4NCj4gLS0NCj4gMi4yNS4xDQoNCkFwcGxpZWQs
+IHRoYW5rcy4NCg0KDQotLQ0KTHVpeiBBdWd1c3RvIHZvbiBEZW50eg0K
