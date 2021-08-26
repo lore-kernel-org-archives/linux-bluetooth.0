@@ -2,158 +2,187 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.7 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2742FC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 15:22:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 51B00C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 15:59:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2E4060F6F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 15:22:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 327DC61052
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 15:59:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242882AbhHZPXc (ORCPT
+        id S242940AbhHZQAI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Aug 2021 11:23:32 -0400
-Received: from mail.kernel.org ([198.145.29.99]:60794 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232271AbhHZPXb (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Aug 2021 11:23:31 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id B781C60F6F
-        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Aug 2021 15:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1629991362;
-        bh=jCMhW7Q/pqOUWcaQ+sqIe1Ef2VDXlNJBhyPdFJBhkfw=;
-        h=From:To:Subject:Date:From;
-        b=sbF+Ff4fuzdcDNvMxPyzR71LlIVdg7b1j8imz2vpJhU1sKLxExmbrnpGC0uB6zQCd
-         htGU1Rbg6aCkUpoFY1uvgoHwFKiyQqQgt30nPcFd3MqHD6xNqfV+Jn1jQfNzKg/SRO
-         aB//p3oqI/bxCa5YQ8jC0/MPA7PAi9+fPR8Kq1tJgjyyD3ncrWAoyfVoILJ/CMRqyh
-         dsRo0EXjjCrWlEfT3q42TvFycaHDAcbQmycax7+dvd+GwJzbdWLjLW33EfOBYrxgxR
-         vmG+NPyDdPXTh7kkoNm4qD9I9zddwJsu6lBeHlcDuQp6eQu1SuNI2Hb0f2VDdZ1z3S
-         fH/UeAYfQ4fsw==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 214187] New: Intel 7260 Chip Failures
-Date:   Thu, 26 Aug 2021 15:22:41 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: igorm@posteo.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression attachments.created
-Message-ID: <bug-214187-62941@https.bugzilla.kernel.org/>
+        Thu, 26 Aug 2021 12:00:08 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52602 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230203AbhHZQAI (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 26 Aug 2021 12:00:08 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE5C0C061757
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Aug 2021 08:59:20 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id u1-20020a25ab01000000b0059949024617so456018ybi.17
+        for <linux-bluetooth@vger.kernel.org>; Thu, 26 Aug 2021 08:59:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20161025;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=Thb1cLhJ9v9r0nfVCd0JlHvRp2GHWXtZe+Bm1Ldv8kM=;
+        b=YO/Ah3Z0siFcPqXaw8cliEXaLojBsqIRT1FThPU37L4Iu45fT4o5ybNQmS+EEXrnnp
+         tuMJ0yECvs3lCEzkMKxFHKMxhit4HNvADTFl9EGWAV4JW3LXHUh0XnpLTrZSNDD4j8qk
+         452awyn1P4PmgiPclwk7tw1YIEbpIkNXJaFrn2oePlcbDs9cUJoffXqaJGD6TbppnnrT
+         TxDeUMgf8eEf+FxQwlsgaelR58Xeer0O161IKMSoSiCuimzMTKVLUy38u4u4yb5c2L4U
+         6gILhSIRhpY7N6hm/wIV5F+AXKvIkFzmhw850gW+X0xy80qD/8yYXxmhY9UdwnCzzEcV
+         ykLQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=Thb1cLhJ9v9r0nfVCd0JlHvRp2GHWXtZe+Bm1Ldv8kM=;
+        b=MFFUTV6RdLopiagaa9FP7AI81twAKvISs50iccvGNCgGN7NgzMe7tb1pCivZD7zQrs
+         k4AY2UZB96vVFbHbBaq11VLjYe/t3EX0y8SzTtInRl0SWZqxmcmZUuxKzKZQ7sRPLSMT
+         pcOh8B4EYPAFvrCt7w6VzrfVOJZD56snAtnacdqyBAEn6KQDyEHnDTsiH2OSYzrczOAU
+         iMqHM02RcAdr6ZMw/1vMc6BEKUBGpxsNe4ei1UDW9ApZ1fec8WnPBwK3VP6UDXY0bikQ
+         B/ZaPY776+6Sx1d7tqS7z8gvOMKqBZySCT+EKLQhuj2sQvs3G+JH07q9DwWcWoBNLLbw
+         beMw==
+X-Gm-Message-State: AOAM530Xz+fuvRJJI086Q/s8xrkw07q7hA/s9uPMjVrlz93ueqBvkVB3
+        RRWGvF4H/i4DRGY2CW/EX8UIZ7FnkZDeUA==
+X-Google-Smtp-Source: ABdhPJyGmzozkYxWZNNom3ara1s0/IqeAfBnf9r0t6wBzQNU49FjeXMRqz3Pn5ksvQr2+awBQ+tPupB86PAxlQ==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:c962:4df3:558d:32ee])
+ (user=mmandlik job=sendgmr) by 2002:a25:1b06:: with SMTP id
+ b6mr6174264ybb.68.1629993560030; Thu, 26 Aug 2021 08:59:20 -0700 (PDT)
+Date:   Thu, 26 Aug 2021 08:59:14 -0700
+Message-Id: <20210826085906.BlueZ.v1.1.Iae4b26a8036d47ca4d0db470f2bb23247f6cac7d@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.rc2.250.ged5fa647cd-goog
+Subject: [BlueZ PATCH v1] adv_monitor: Clear any running DeviceLost timers on
+ power down
+From:   Manish Mandlik <mmandlik@google.com>
+To:     luiz.dentz@gmail.com, marcel@holtmann.org
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Manish Mandlik <mmandlik@google.com>, mcchou@google.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214187
+This patch clears any running Adv Monitor DeviceLost timers on bt power
+down. It'll also invoke DeviceLost event if the device is already found
+and is being tracked for the DeviceLost event.
 
-            Bug ID: 214187
-           Summary: Intel 7260 Chip Failures
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: Linux 5.13.12-193.current x86_64
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: igorm@posteo.net
-        Regression: No
+Verified this by adding a monitor using bluetoothctl and confirming that
+the DeviceLost event is getting triggered for already found device in
+case of bt power down.
 
-Created attachment 298489
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D298489&action=3Dedit
-Intel 7260 chip often fails
+Reviewed-by: mcchou@google.com
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+---
 
-Hi,
+ src/adapter.c     |  8 ++++++++
+ src/adv_monitor.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++
+ src/adv_monitor.h |  2 ++
+ 3 files changed, 62 insertions(+)
 
-At times, as I try to connect a Bluetooth device, the process fails and
-Bluetooth functionality temporarily disappears from the system. It comes ba=
-ck
-after a reboot. I can see no consistency in these failures. Sometimes they =
-just
-happen, sometimes they don't.
+diff --git a/src/adapter.c b/src/adapter.c
+index 84bc5a1b0..3af7d1f1a 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -2872,6 +2872,13 @@ static void clear_discoverable(struct btd_adapter *adapter)
+ 	set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x00);
+ }
+ 
++static void adv_monitor_notify_power_down(struct btd_adapter *adapter)
++{
++	/* Notify Adv Monitor about power down */
++	if (adapter->adv_monitor_manager)
++		btd_adv_monitor_notify_power_down(adapter->adv_monitor_manager);
++}
++
+ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+ 						DBusMessageIter *value,
+ 						GDBusPendingPropertySet id)
+@@ -2912,6 +2919,7 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
+ 		len = sizeof(mode);
+ 
+ 		if (!mode) {
++			adv_monitor_notify_power_down(adapter);
+ 			clear_discoverable(adapter);
+ 			remove_temporary_devices(adapter);
+ 		}
+diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+index 715ac5904..59f307ae9 100644
+--- a/src/adv_monitor.c
++++ b/src/adv_monitor.c
+@@ -2011,3 +2011,55 @@ static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
+ 					    NULL);
+ 	}
+ }
++
++/* Clears running DeviceLost timer for a given device */
++static void clear_device_lost_timer(void *data, void *user_data)
++{
++	struct adv_monitor_device *dev = data;
++	struct adv_monitor *monitor = NULL;
++
++	if (dev->lost_timer) {
++		timeout_remove(dev->lost_timer);
++		dev->lost_timer = 0;
++
++		monitor = dev->monitor;
++
++		DBG("Clearing device lost timer for device %p. "
++				"Calling DeviceLost() on Adv Monitor of "
++				"owner %s at path %s", dev->device,
++				monitor->app->owner, monitor->path);
++
++		g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
++				report_device_state_setup,
++				NULL, dev->device, NULL);
++	}
++}
++
++/* Clears running DeviceLost timers from each monitor */
++static void clear_lost_timers_from_monitor(void *data, void *user_data)
++{
++	struct adv_monitor *monitor = data;
++
++	queue_foreach(monitor->devices, clear_device_lost_timer, NULL);
++}
++
++/* Clears running DeviceLost timers from each app */
++static void clear_lost_timers_from_app(void *data, void *user_data)
++{
++	struct adv_monitor_app *app = data;
++
++	queue_foreach(app->monitors, clear_lost_timers_from_monitor, NULL);
++}
++
++/* Handles bt power down scenario */
++void btd_adv_monitor_notify_power_down(struct btd_adv_monitor_manager *manager)
++{
++	if (!manager) {
++		error("Unexpected NULL btd_adv_monitor_manager object upon "
++				"power down");
++		return;
++	}
++
++	/* Clear any running DeviceLost timers in case of power down */
++	queue_foreach(manager->apps, clear_lost_timers_from_app, NULL);
++}
+diff --git a/src/adv_monitor.h b/src/adv_monitor.h
+index 2b4f68abf..20da012d4 100644
+--- a/src/adv_monitor.h
++++ b/src/adv_monitor.h
+@@ -38,4 +38,6 @@ void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *manager,
+ void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
+ 				   struct btd_device *device);
+ 
++void btd_adv_monitor_notify_power_down(struct btd_adv_monitor_manager *manager);
++
+ #endif /* __ADV_MONITOR_H */
+-- 
+2.33.0.rc2.250.ged5fa647cd-goog
 
-These commands also bring Bluetooth functionality back. However, failures m=
-ay
-happen again.
-
-```
-sudo systemctl enable bluetooth
-sudo systemctl start Bluetooth
-```
-
-Another Bluetooth-related problem is the system may stall during a reboot. =
-This
-happens rarely and the following message is displayed after a long pause:
-
-[See the attached image.]
-
-I am not entirely sure but the Bluetooth card is most likely: Intel AC 8260
-IEEE 802.11ac Bluetooth 4.2 - Wi-Fi/Bluetooth Combo Adapter
-
-It has been like this for the last several months. Earlier I had other simi=
-lar
-Bluetooth problems on and off. I keep my system updated. Right now I am usi=
-ng:
-
-* Solus OS 4.3 Fortitude
-* Budgie DE 10.5.3-238 based on GNOME 40.3.0
-
-Relevant terminal output:
-
-```
-user@pc ~ $ lspci | egrep -i --color 'network|ethernet'
-[...]
-01:00.0 Network controller: Intel Corporation Wireless 7260 (rev 6b)
-user@pc ~ $=20
-```
-
-```
-user@pc ~ $ dmesg | grep -i blue
-[   19.751133] Bluetooth: Core ver 2.22
-[   19.751153] Bluetooth: HCI device and connection manager initialized
-[   19.751164] Bluetooth: HCI socket layer initialized
-[   19.751166] Bluetooth: L2CAP socket layer initialized
-[   19.751169] Bluetooth: SCO socket layer initialized
-[   20.068652] Bluetooth: hci0: read Intel version: 370710018002030d57
-[   20.068657] Bluetooth: hci0: Intel device is already patched. patch num:=
- 57
-[   20.084589] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   20.084595] Bluetooth: BNEP socket layer initialized
-[   35.947535] Bluetooth: RFCOMM TTY layer initialized
-[   35.947545] Bluetooth: RFCOMM socket layer initialized
-[   35.947552] Bluetooth: RFCOMM ver 1.11
-[16800.174315] bluetoothd[785]: segfault at 70 ip 000000000041ce1f sp
-00007ffe30709d30 error 4 in bluetoothd[40b000+ae000]
-user@pc ~ $
-```
-
-Could this be fixed?
-
-Thanks.
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
