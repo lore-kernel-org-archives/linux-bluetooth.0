@@ -2,96 +2,130 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B551EC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 05:16:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71DDDC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 10:27:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88965610C8
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 05:16:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 495406101A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 26 Aug 2021 10:27:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238100AbhHZFRh (ORCPT
+        id S241259AbhHZK16 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 26 Aug 2021 01:17:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45518 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229753AbhHZFRg (ORCPT
+        Thu, 26 Aug 2021 06:27:58 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:38378 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233966AbhHZK14 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 26 Aug 2021 01:17:36 -0400
-Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E505C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 22:16:50 -0700 (PDT)
-Received: by mail-il1-x135.google.com with SMTP id s16so2017117ilo.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 25 Aug 2021 22:16:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=mime-version:from:date:message-id:subject:to;
-        bh=oR2xLitZhI9DLS26jjoWWb4bI+/7VHYuEshTxW/fARE=;
-        b=Vi1syzG1IeFc0SO9VwxVMmzfghHLb5nJy+GrqYBJ+z9a7vSZhVZ5IvGX8UqeDCbKaL
-         p86GtHgYx698d4BWAnyEck6Z4nuFtuw8Lgj30vd49JI0aXgfbK8Iw1dHzz+2NmmFha4g
-         NYeadqbm1+2l5vJ85xHabeE4qkYNyynAx/+j1D/hSH4y5Be19Jc3JthBMIXaJxY9HeAR
-         91k7Can337wvaF+AqxPFhGcLBqyn6IfYs8yh/QgExv1rXFoawTcNFY331+yJc+gjTLbr
-         h/g/6KtB5rPFdnahYGmP6LolK8aYtTlkWuEe3GBxFu3pjIpL/xBlI5vp/QgMqEsnwcNY
-         3eQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
-        bh=oR2xLitZhI9DLS26jjoWWb4bI+/7VHYuEshTxW/fARE=;
-        b=O9jYn5RDjOt5iXopC/BXr2t2tpRBPvpIcbqd50hixsRassbdGuD+1ZmMyYs+r2if60
-         fc677OdY3RLE60xn5B3fWWkEzq/UZqBDQYSqHUb8zIpZCVNgaiwRJkrbiiCE+K5fFI56
-         TSeYUKwM0y4QTMcvC62W4tRuMKeaB/W35Nnz86i5ADmwrLEdbIFawvZhlQZMO3TloKf8
-         mgK/49rTZgZBGBwNkM4tSIf/CH8zXyReHTxg4d1M54wVmeampt+P/3BE3UyJ69sOKwQO
-         ftXRABk+nVEYABa76coSqqctclZfYCzhDXh2ZRYa8GqnGpE2dIycdF0pImdwcwuuqRlM
-         cZIw==
-X-Gm-Message-State: AOAM53303z0ClDXSOMoRqdJEU6TtbRJnPhPCCzJLW4Xr3UWEIPW7vPia
-        igX3pJzb/O/KbVAsaDHuRzZXZXdbyi+uZhdwwCyzEa59
-X-Google-Smtp-Source: ABdhPJwbrxd0Dxu6zGErETE/VM2lK3zOGrBqIAVvl3q17bQQhJ1bQkCo2aTXSk2JAi7Hi8DLFtxg/ObdZf8hbWofbyE=
-X-Received: by 2002:a05:6e02:1b07:: with SMTP id i7mr1527608ilv.94.1629955009414;
- Wed, 25 Aug 2021 22:16:49 -0700 (PDT)
-MIME-Version: 1.0
-From:   =?UTF-8?B?0J3QtdC60YLQviDQrw==?= <nektoya3214@gmail.com>
-Date:   Thu, 26 Aug 2021 08:16:37 +0300
-Message-ID: <CACWFqxK4o+xvxG08FsJuBGf9sJihf7c+G2xRCW6v2Y1vRP-sKQ@mail.gmail.com>
-Subject: L2CAP receive buffer overflow
+        Thu, 26 Aug 2021 06:27:56 -0400
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out1.suse.de (Postfix) with ESMTP id D5F0522089;
+        Thu, 26 Aug 2021 10:27:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1629973628; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i2Qc9NZt5j88nVYGQ9yE6lV/WtpjznJJ0WjbEvGTfnc=;
+        b=Thexjfvla1gfaAeMvxQUWTQMcDMBrTxgmvnG/gvftvv/kADvj39G6RTPuJdjtR0QBvgwsK
+        FDkYqUdedsnrX7xDAV/Ij5KXQXJtaqHrivdtkLw9LwnNhaY7Dmqi6v/b1jQ/7wCA611gzb
+        m48OH32Q2wFccBYh4+WqKRgl3k+teNU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1629973628;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=i2Qc9NZt5j88nVYGQ9yE6lV/WtpjznJJ0WjbEvGTfnc=;
+        b=2aE24URKUbrNdbYr7ZXaXKuJ8QDxb71tLm1+WJD5pSJ3tezkK5UyUGX4gj/DdflMHN3YML
+        uBxhjqFTljKmMwAg==
+Received: from alsa1.suse.de (alsa1.suse.de [10.160.4.42])
+        by relay2.suse.de (Postfix) with ESMTP id D01E1A3B8F;
+        Thu, 26 Aug 2021 10:27:08 +0000 (UTC)
+Date:   Thu, 26 Aug 2021 12:27:08 +0200
+Message-ID: <s5hk0k8wlfn.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
 To:     linux-bluetooth@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Cc:     linux-kernel@vger.kernel.org
+Subject: Re: CVE-2021-3640 and the unlimited block of lock_sock()
+In-Reply-To: <s5hv9418mjk.wl-tiwai@suse.de>
+References: <s5hv9418mjk.wl-tiwai@suse.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
+ (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+On Thu, 19 Aug 2021 17:46:39 +0200,
+Takashi Iwai wrote:
+> 
+> Hi,
+> 
+> it seems that the recent fixes in bluetooth tree address most of
+> issues in CVE-2021-3640 ("Use-After-Free vulnerability in function
+> sco_sock_sendmsg()").  But there is still a problem left: although we
+> cover the race with lock_sock() now, the lock may be blocked endlessly
+> (as the task takes over with userfaultd), which result in the trigger
+> of watchdog like:
+> 
+> -- 8< --
+> [   23.226767][    T7] Bluetooth: hci0: command 0x0419 tx timeout
+> [  284.985881][ T1529] INFO: task poc:7603 blocked for more than 143 seconds.
+> [  284.989134][ T1529]       Not tainted 5.13.0-rc4+ #48
+> [  284.990098][ T1529] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+> [  284.991705][ T1529] task:poc             state:D stack:13784 pid: 7603 ppid:  7593 flags:0x00000000
+> [  284.993414][ T1529] Call Trace:
+> [  284.994025][ T1529]  __schedule+0x32e/0xb90
+> [  284.994842][ T1529]  ? __local_bh_enable_ip+0x72/0xe0
+> [  284.995987][ T1529]  schedule+0x38/0xe0
+> [  284.996723][ T1529]  __lock_sock+0xa1/0x130
+> [  284.997434][ T1529]  ? finish_wait+0x80/0x80
+> [  284.998150][ T1529]  lock_sock_nested+0x9f/0xb0
+> [  284.998914][ T1529]  sco_conn_del+0xb1/0x1a0
+> [  284.999619][ T1529]  ? sco_conn_del+0x1a0/0x1a0
+> [  285.000361][ T1529]  sco_disconn_cfm+0x3a/0x60
+> [  285.001116][ T1529]  hci_conn_hash_flush+0x95/0x130
+> [  285.001921][ T1529]  hci_dev_do_close+0x298/0x680
+> [  285.002687][ T1529]  ? up_write+0x12/0x130
+> [  285.003367][ T1529]  ? vhci_close_dev+0x20/0x20
+> [  285.004107][ T1529]  hci_unregister_dev+0x9f/0x240
+> [  285.004886][ T1529]  vhci_release+0x35/0x70
+> [  285.005602][ T1529]  __fput+0xdf/0x360
+> [  285.006225][ T1529]  task_work_run+0x86/0xd0
+> [  285.006927][ T1529]  exit_to_user_mode_prepare+0x267/0x270
+> [  285.007824][ T1529]  syscall_exit_to_user_mode+0x19/0x60
+> [  285.008694][ T1529]  do_syscall_64+0x42/0xa0
+> [  285.009393][ T1529]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+> [  285.010321][ T1529] RIP: 0033:0x4065c7
+> -- 8< --
+> 
+> Is there any plan to address this?
+> 
+> As a quick hack, I confirmed a workaround like below:
+> 
+> -- 8< --
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2628,7 +2628,7 @@ void __lock_sock(struct sock *sk)
+>  		prepare_to_wait_exclusive(&sk->sk_lock.wq, &wait,
+>  					TASK_UNINTERRUPTIBLE);
+>  		spin_unlock_bh(&sk->sk_lock.slock);
+> -		schedule();
+> +		schedule_timeout(msecs_to_jiffies(10 * 1000));
+>  		spin_lock_bh(&sk->sk_lock.slock);
+>  		if (!sock_owned_by_user(sk))
+>  			break;
+> -- 8< --
+> 
+> .... but I'm not sure whether it's the right way to go.
 
-I am trying to send PC as wireless speaker with support for LDAC audio
-codec. I used bluealsa with libldacdec fork (this one:
-github.com/anonymix007/libldacdec) and it actually produced some sound
-(but not for a long time), and it shows "Dropping L2CAP data: receive
-buffer overflow" error in logs. Just as fork author, I modified kernel
-(see issue: github.com/Arkq/bluez-alsa/issues/482) to check if it will
-work and it indeed worked.
+Does anyone has an idea?
 
 
-This is how it looks like now:
+thanks,
 
-
-        if (chan->imtu < skb->len) {
-
-            BT_ERR("Dropping L2CAP data: receive buffer overflow -
-chan->imtu: %d, skb->len: %d", chan->imtu, skb->len);
-
-            //goto drop;
-
-        }
-
-And the error it prints:
-
-Dropping L2CAP data: receive buffer overflow - chan->imtu: 672, skb->len: 673
-
-
-I'm on LMDE 4 with kernel 5.10 (now modified 5.10.46 version), Android
-device I am using is OnePlus 7 Pro (Android 11, latest OS update)
-
-
-I can suggest increasing buffer size a bit to fix this issue.
+Takashi
