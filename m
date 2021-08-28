@@ -2,147 +2,141 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,
+	USER_AGENT_GIT autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE63C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Aug 2021 16:06:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B254BC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Aug 2021 16:18:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 97F9960E90
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Aug 2021 16:06:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BD6D600D1
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 28 Aug 2021 16:18:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231821AbhH1QHf (ORCPT
+        id S234449AbhH1QTQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 28 Aug 2021 12:07:35 -0400
-Received: from smtp-out2.suse.de ([195.135.220.29]:33614 "EHLO
-        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230290AbhH1QHf (ORCPT
+        Sat, 28 Aug 2021 12:19:16 -0400
+Received: from smtp-out1.suse.de ([195.135.220.28]:47556 "EHLO
+        smtp-out1.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229465AbhH1QTN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 28 Aug 2021 12:07:35 -0400
+        Sat, 28 Aug 2021 12:19:13 -0400
 Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
-        by smtp-out2.suse.de (Postfix) with ESMTP id 65F6B1FFF0;
-        Sat, 28 Aug 2021 16:06:43 +0000 (UTC)
+        by smtp-out1.suse.de (Postfix) with ESMTP id 48C142216D;
+        Sat, 28 Aug 2021 16:18:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-        t=1630166803; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+hbC3CoQ9GVXH6EUwVQgeUfZ0rKGJOCmzlFVSyEolJ8=;
-        b=kISMPvHHQ6O8y4GUBGL/H/u/F0Zg4JfidpT4awwChegbQm4rSecP9MHT53bxdlNuUfqHN3
-        5hxsvPpEva673ZNrGGuAEWaGDO6zxIyhZhTSUwOx0ieokZmvFZHGo71dkUDUSwznlff1A8
-        cPad3NU11BlUccwe7ofiJTvQqbXkzhU=
+        t=1630167502; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=7NrJ+Jhr63Y03bd2F44uKUO8GeWKhPO5AxFymYb2r/Y=;
+        b=QFGFJAzTU9QMlsLhfBkgnewcQrt7Y5lLid8CoeSLHXRfYp4HnsTWL5Uwe2oArxxlXXU1Tf
+        0Qu1iNS1M+fufqLQ4cwZ6lX59eekJkwo0Q9i2ZgjACNqXaTPJOlAFEOSQ8TUh+XbtYE8YW
+        YNPUlxCHqadOg3emwWoEILOEKbIrBno=
 DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-        s=susede2_ed25519; t=1630166803;
+        s=susede2_ed25519; t=1630167502;
         h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-         mime-version:mime-version:content-type:content-type:
-         in-reply-to:in-reply-to:references:references;
-        bh=+hbC3CoQ9GVXH6EUwVQgeUfZ0rKGJOCmzlFVSyEolJ8=;
-        b=fmISJ3gxhJnk41FlFazH1RZt4ZDZ8QvP5XEsQCVklpYTXWRol/3L5BhqSadzFaGvQMDrb3
-        MpbEl6WbJuN6uHAw==
-Received: from alsa1.suse.de (alsa1.suse.de [10.160.4.42])
-        by relay2.suse.de (Postfix) with ESMTP id 5FF18A3B88;
-        Sat, 28 Aug 2021 16:06:43 +0000 (UTC)
-Date:   Sat, 28 Aug 2021 18:06:43 +0200
-Message-ID: <s5h7dg5sgdo.wl-tiwai@suse.de>
+         mime-version:mime-version:  content-transfer-encoding:content-transfer-encoding;
+        bh=7NrJ+Jhr63Y03bd2F44uKUO8GeWKhPO5AxFymYb2r/Y=;
+        b=0pA5JPxTwbSi82qoLUOigRp7QS6I6qVGlSgTHqE+7BYixdOJSzpaO4jxHY2gfJItV+iyfL
+        GCuk5aL/ACqHlpDA==
+Received: from alsa1.nue.suse.com (alsa1.suse.de [10.160.4.42])
+        by relay2.suse.de (Postfix) with ESMTP id 30AF0A3B9D;
+        Sat, 28 Aug 2021 16:18:22 +0000 (UTC)
 From:   Takashi Iwai <tiwai@suse.de>
 To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
-Subject: Re: CVE-2021-3640 and the unlimited block of lock_sock()
-In-Reply-To: <CABBYNZ+1=k2eQ4u1WWdj9JcBaB3HmjXzv8rVhQ89gwHDf4YHTg@mail.gmail.com>
-References: <s5hv9418mjk.wl-tiwai@suse.de>
-        <s5hk0k8wlfn.wl-tiwai@suse.de>
-        <CABBYNZ+1=k2eQ4u1WWdj9JcBaB3HmjXzv8rVhQ89gwHDf4YHTg@mail.gmail.com>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
- FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
- (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
-MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
-Content-Type: text/plain; charset=US-ASCII
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH] Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
+Date:   Sat, 28 Aug 2021 18:18:18 +0200
+Message-Id: <20210828161818.31141-1-tiwai@suse.de>
+X-Mailer: git-send-email 2.26.2
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, 27 Aug 2021 03:28:09 +0200,
-Luiz Augusto von Dentz wrote:
-> 
-> Hi Takashi,
-> 
-> On Thu, Aug 26, 2021 at 3:29 AM Takashi Iwai <tiwai@suse.de> wrote:
-> >
-> > On Thu, 19 Aug 2021 17:46:39 +0200,
-> > Takashi Iwai wrote:
-> > >
-> > > Hi,
-> > >
-> > > it seems that the recent fixes in bluetooth tree address most of
-> > > issues in CVE-2021-3640 ("Use-After-Free vulnerability in function
-> > > sco_sock_sendmsg()").  But there is still a problem left: although we
-> > > cover the race with lock_sock() now, the lock may be blocked endlessly
-> > > (as the task takes over with userfaultd), which result in the trigger
-> > > of watchdog like:
-> > >
-> > > -- 8< --
-> > > [   23.226767][    T7] Bluetooth: hci0: command 0x0419 tx timeout
-> > > [  284.985881][ T1529] INFO: task poc:7603 blocked for more than 143 seconds.
-> > > [  284.989134][ T1529]       Not tainted 5.13.0-rc4+ #48
-> > > [  284.990098][ T1529] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
-> > > [  284.991705][ T1529] task:poc             state:D stack:13784 pid: 7603 ppid:  7593 flags:0x00000000
-> > > [  284.993414][ T1529] Call Trace:
-> > > [  284.994025][ T1529]  __schedule+0x32e/0xb90
-> > > [  284.994842][ T1529]  ? __local_bh_enable_ip+0x72/0xe0
-> > > [  284.995987][ T1529]  schedule+0x38/0xe0
-> > > [  284.996723][ T1529]  __lock_sock+0xa1/0x130
-> > > [  284.997434][ T1529]  ? finish_wait+0x80/0x80
-> > > [  284.998150][ T1529]  lock_sock_nested+0x9f/0xb0
-> > > [  284.998914][ T1529]  sco_conn_del+0xb1/0x1a0
-> > > [  284.999619][ T1529]  ? sco_conn_del+0x1a0/0x1a0
-> > > [  285.000361][ T1529]  sco_disconn_cfm+0x3a/0x60
-> > > [  285.001116][ T1529]  hci_conn_hash_flush+0x95/0x130
-> > > [  285.001921][ T1529]  hci_dev_do_close+0x298/0x680
-> > > [  285.002687][ T1529]  ? up_write+0x12/0x130
-> > > [  285.003367][ T1529]  ? vhci_close_dev+0x20/0x20
-> > > [  285.004107][ T1529]  hci_unregister_dev+0x9f/0x240
-> > > [  285.004886][ T1529]  vhci_release+0x35/0x70
-> > > [  285.005602][ T1529]  __fput+0xdf/0x360
-> > > [  285.006225][ T1529]  task_work_run+0x86/0xd0
-> > > [  285.006927][ T1529]  exit_to_user_mode_prepare+0x267/0x270
-> > > [  285.007824][ T1529]  syscall_exit_to_user_mode+0x19/0x60
-> > > [  285.008694][ T1529]  do_syscall_64+0x42/0xa0
-> > > [  285.009393][ T1529]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-> > > [  285.010321][ T1529] RIP: 0033:0x4065c7
-> > > -- 8< --
-> > >
-> > > Is there any plan to address this?
-> > >
-> > > As a quick hack, I confirmed a workaround like below:
-> > >
-> > > -- 8< --
-> > > --- a/net/core/sock.c
-> > > +++ b/net/core/sock.c
-> > > @@ -2628,7 +2628,7 @@ void __lock_sock(struct sock *sk)
-> > >               prepare_to_wait_exclusive(&sk->sk_lock.wq, &wait,
-> > >                                       TASK_UNINTERRUPTIBLE);
-> > >               spin_unlock_bh(&sk->sk_lock.slock);
-> > > -             schedule();
-> > > +             schedule_timeout(msecs_to_jiffies(10 * 1000));
-> > >               spin_lock_bh(&sk->sk_lock.slock);
-> > >               if (!sock_owned_by_user(sk))
-> > >                       break;
-> > > -- 8< --
-> > >
-> > > .... but I'm not sure whether it's the right way to go.
-> >
-> > Does anyone has an idea?
-> 
-> It seems that we need to rework some code so the functions affected by
-> userfaultfd are not used with sock_lock held.
+The sco_send_frame() also takes lock_sock() during memcpy_from_msg()
+call that may be endlessly blocked by a task with userfaultd
+technique, and this will result in a hung task watchdog trigger.
 
-OK, now I tried a similar way like the commit 92c685dc5de0 to move the
-memcpy_from_msg() call out of lock_sock(), and it seems working.
-I'm going to submit the fix.
+Just like the similar fix for hci_sock_sendmsg() in commit
+92c685dc5de0 ("Bluetooth: reorganize functions..."), this patch moves
+the  memcpy_from_msg() out of lock_sock() for addressing the hang.
 
+This should be the last piece for fixing CVE-2021-3640 after a few
+already queued fixes.
 
-thanks,
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+---
+ net/bluetooth/sco.c | 23 +++++++++++++++--------
+ 1 file changed, 15 insertions(+), 8 deletions(-)
 
-Takashi
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 98a881586512..687e05718aad 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -280,7 +280,8 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
+ 	return err;
+ }
+ 
+-static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
++static int sco_send_frame(struct sock *sk, void *buf, int len,
++			  unsigned int msg_flags)
+ {
+ 	struct sco_conn *conn = sco_pi(sk)->conn;
+ 	struct sk_buff *skb;
+@@ -292,15 +293,11 @@ static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
+ 
+ 	BT_DBG("sk %p len %d", sk, len);
+ 
+-	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
++	skb = bt_skb_send_alloc(sk, len, msg_flags & MSG_DONTWAIT, &err);
+ 	if (!skb)
+ 		return err;
+ 
+-	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
+-		kfree_skb(skb);
+-		return -EFAULT;
+-	}
+-
++	memcpy(skb_put(skb, len), buf, len);
+ 	hci_send_sco(conn->hcon, skb);
+ 
+ 	return len;
+@@ -725,6 +722,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len)
+ {
+ 	struct sock *sk = sock->sk;
++	void *buf;
+ 	int err;
+ 
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+@@ -736,14 +734,23 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
++	buf = kmalloc(len, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++	if (memcpy_from_msg(buf, msg, len)) {
++		kfree(buf);
++		return -EFAULT;
++	}
++
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = sco_send_frame(sk, msg, len);
++		err = sco_send_frame(sk, buf, len, msg->msg_flags);
+ 	else
+ 		err = -ENOTCONN;
+ 
+ 	release_sock(sk);
++	kfree(buf);
+ 	return err;
+ }
+ 
+-- 
+2.26.2
+
