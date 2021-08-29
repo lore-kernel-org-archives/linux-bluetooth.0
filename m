@@ -2,154 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
-	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9281EC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 14:53:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58F57C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7494360ED4
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 14:53:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2862460F42
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235492AbhH2OyH (ORCPT
+        id S235745AbhH2PvM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 Aug 2021 10:54:07 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41034 "EHLO
+        Sun, 29 Aug 2021 11:51:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53716 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235452AbhH2OyG (ORCPT
+        with ESMTP id S235711AbhH2PvL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 Aug 2021 10:54:06 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5C2BC061575;
-        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id u11-20020a17090adb4b00b00181668a56d6so8233224pjx.5;
-        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20161025;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=gZ/nenUcj9mad1OmYCCfvZwnAJEnEhtMP/nmkyY6NOM=;
-        b=SqRgue5J5BHXPuOWjfah7o4X0Mg0vV+2AHpa9GzTTbkeNGDaZCsDmBehausz0MNYaF
-         bHhlG8PxIgz2iW1Cmo83vEep3rsZzrKGQSKmJLNtqciTub6iPZW9hUbN2m663tEGgJJ/
-         /FnW4ospoz5MU7i3+pu/Rn6ETpJgnh5Ywarwg0YaqydcTOfpuKuZX3F+mPTZSHzvgRV8
-         x8i94JuHtgJkk1kdp7CTFd7iUM9edyroXd9FcO8Pmmv59kNgxtwFLk+NiyqaQhUmhco1
-         kVpiVNfRaNOiiBQ4WMphk+v0OpjwgoSfhPhLYWwbBMkHC0HirYofOnTJ1TNX/V5LhaCN
-         eUCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=gZ/nenUcj9mad1OmYCCfvZwnAJEnEhtMP/nmkyY6NOM=;
-        b=UO+wcUt/hCekNK7lyRaPmyAyEywyV7oGP8rZN6s+gNdq2M6cc3C1KftphMTs30Adnn
-         J85ctOm1eRTlL7atHDwwHmHw8UrwyuH39enYaSAz+XQbxjdGDyiU/Dp7tremsSHahaGc
-         AyGoKhZnhLOSAeApLdDXpJjiNQHrygspbr21MqsFa64qHiNszWw/ZitsHipeAAcUNt9D
-         iMWSCu+UgxfuTfWVVpQg+783jU7zhpS1xewf4l1GRDFHMUnnuJKMBHQcQjfmbdCPNrDm
-         cmgvDCxFGSRlcA+bpQYK9xzxg1DzhOaNQhTtbjN8FO6SE8uYTYDstnX+r1m0un6beLUW
-         TspQ==
-X-Gm-Message-State: AOAM533gz1+KhrhVMaUalwxRvZKwIQqcqG8buBLDyRt5Tk8Z0VHZO8Md
-        gz5MfpB5VmLnHHbhbOGkyNg=
-X-Google-Smtp-Source: ABdhPJxPHa7w5kquVU9Z/WHTw75OhAcL/7ILjKvG07d436dAB8mEf1pFhEPpzpbaTarZaI0AdPgPxg==
-X-Received: by 2002:a17:90a:e001:: with SMTP id u1mr30902387pjy.183.1630248794241;
-        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
-Received: from [192.168.1.237] ([118.200.190.93])
-        by smtp.gmail.com with ESMTPSA id n14sm19456487pjm.5.2021.08.29.07.53.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 29 Aug 2021 07:53:13 -0700 (PDT)
-Subject: Re: [syzbot] KASAN: use-after-free Write in sco_sock_timeout
-To:     Hillf Danton <hdanton@sina.com>
-Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.von.dentz@intel.com,
-        syzbot <syzbot+2bef95d3ab4daa10155b@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com
-References: <000000000000b2725705ca78de29@google.com>
- <20210827011931.2323-1-hdanton@sina.com>
- <20210829082929.2897-1-hdanton@sina.com>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <11a30bc1-574f-aa1a-21d6-b886de9fc981@gmail.com>
-Date:   Sun, 29 Aug 2021 22:53:10 +0800
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+        Sun, 29 Aug 2021 11:51:11 -0400
+Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20648C061575
+        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Aug 2021 08:50:19 -0700 (PDT)
+Received: from monolith.lan (91-152-122-41.elisa-laajakaista.fi [91.152.122.41])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pav)
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id C5F341B00188;
+        Sun, 29 Aug 2021 18:50:15 +0300 (EEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
+        t=1630252215;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2si6XWMCbQPjqdTAIENbIuOFv95gcAwkago37fkP+Qo=;
+        b=VXnAcE7DfbJNV4fzu+9CmBKRoOAiMyLlXPJHUFzp8fHh50WBQRUTta3Y3Ve/NqNXkSXxS2
+        kaw5hXHjRYSKbCsmygq5g0D+3l47fyOaLW7F2ScYkAxmQcTGiub+723XME88VQeDEz0ux+
+        PF6qzFxBEfHYMUOB/q3GHetDbqBtor/mQtX9c+9P8HZgisjnk1iBEKPx7LDXcZ9YTohGEZ
+        InnQD64Ik6zV+AuBPWDI+EECn85rq9yTAZBSKlPzUvpA4XPeWqrw5m+TCqQ3nuK/3ajpUG
+        lhjssPrZM0okoFri10FkHXFpikNIJfW6SHu5yit6kh2b+jd9+CFY/zZTLwXb/g==
+From:   Pauli Virtanen <pav@iki.fi>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Pauli Virtanen <pav@iki.fi>
+Subject: [PATCH BlueZ 0/2] AVDTP SEID pool seems too small
+Date:   Sun, 29 Aug 2021 18:50:10 +0300
+Message-Id: <20210829155012.164880-1-pav@iki.fi>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-In-Reply-To: <20210829082929.2897-1-hdanton@sina.com>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1630252215; a=rsa-sha256;
+        cv=none;
+        b=J8buDMQZHQuJWfCJLAJops8WVIGsVlOeSV9Qocs7nGDdfQ/NtB/0EHJwjKg71N5mhGnSFO
+        oXctvVoA28n913E0ZyQ6vAnQE6E3nJDltVdO3AXr8mHNa+EEIvNwXULtzpo1W28tNzbwU+
+        uEOTT29/NIJNmpagjE6Wglx4WKfrXuOLFCBmJz0BcgEa81rVX9Yp/nje/a4GnnBZ+6UZVw
+        9WFfSQECAzb7W6j4Ij0jj+18D6nAWfaFU/3qCcHpsq4XQlBqnQXHRDOuMrZ6MbjsYrvX3P
+        h5bsKtdRx/FpqdEBJ9ViAIWOrcul/ma6oZec0TJjYz+k4KG8pNckdtrilxvedw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
+        s=lahtoruutu; t=1630252215;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=2si6XWMCbQPjqdTAIENbIuOFv95gcAwkago37fkP+Qo=;
+        b=DOtZDGlJM6DZl7mlvB2CLEVZmXzXfEoTIgqFCmoIW07UZACM6mMKfGAo4vi+IzYQrLBzRW
+        Prm3r9V6mysjWN7z6WpiV5JENpvJTKaMq/Mpjqgs/XvQRCezD7vc9pkLldM49veZwirouz
+        sSyCraUWJ5yxBU9sl15wDdoRdD6ak8IGYSPQ0vi8hzcZ6X9Z20+HcuGBWmOM6xbaCDia+J
+        NhfK5Qq68iSkoHjw9wB78hbX3NszcCGYSjaBripXCtNpfcb49zveNIChoWsqYhG6MCYx9x
+        rw9knkuvMAEtId6U+42YwnMVHLTQGdR0jFX+qcBXOLCDBI84gEwhuKG6x0HGWw==
+ARC-Authentication-Results: i=1;
+        ORIGINATING;
+        auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 29/8/21 4:29 pm, Hillf Danton wrote:
-> On Fri, 27 Aug 2021 15:58:34 +0800 Desmond Cheong Zhi Xi wrote:
->> On 27/8/21 9:19 am, Hillf Danton wrote:
->>> On Thu, 26 Aug 2021 09:29:24 -0700
->>>> syzbot found the following issue on:
->>>>
->>>> HEAD commit:    e3f30ab28ac8 Merge branch 'pktgen-samples-next'
->>>> git tree:       net-next
->>>> console output: https://syzkaller.appspot.com/x/log.txt?x=13249c96300000
->>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=ef482942966bf763
->>>> dashboard link: https://syzkaller.appspot.com/bug?extid=2bef95d3ab4daa10155b
->>>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
->>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a29ea9300000
->>>>
->>>> The issue was bisected to:
->>>>
->>>> commit e1dee2c1de2b4dd00eb44004a4bda6326ed07b59
->>>> Author: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
->>>> Date:   Tue Aug 10 04:14:10 2021 +0000
->>>>
->>>>       Bluetooth: fix repeated calls to sco_sock_kill
-> 
-> To fix the uaf, grab another hold to sock to make the timeout work safe.
-> 
-> #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git e3f30ab28ac8
-> 
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -190,15 +190,14 @@ static void sco_conn_del(struct hci_conn
->   	sco_conn_unlock(conn);
->   
->   	if (sk) {
-> -		sock_hold(sk);
->   		lock_sock(sk);
->   		sco_sock_clear_timer(sk);
->   		sco_chan_del(sk, err);
->   		release_sock(sk);
-> -		sock_put(sk);
->   
->   		/* Ensure no more work items will run before freeing conn. */
->   		cancel_delayed_work_sync(&conn->timeout_work);
-> +		sock_put(sk);
+Hi,
 
-Hi Hillf,
+It seems that if media application is registered to multiple BT
+adapters, BlueZ can easily run out of free AVDTP SEIDs.  This occurs in
+practice when running Pipewire (or Pulseaudio) and plugging in 3+
+adapters: their media application has 10+ SEPs for various vendor A2DP
+codecs, registered for each adapter.  After having registered 32 SEPs
+across all adapters, Media1.RegisterApplication starts failing, due to
+SEP registration not finding free SEIDs.
 
-Saw that this passed the reproducer. But on closer inspection, I think 
-what's happening is that sco_conn_del is never run.
+However, if I understand the AVDTP spec and BlueZ implementation
+correctly, this behavior is not quite correct: (i) the SEID pool in
+BlueZ is limited to 8*sizeof(int) == 32 entries, which is smaller than
+the 0x3E = 62 entries (AVDTP1.3, 8.20.1).  Also, (ii) BlueZ allocates
+SEIDs from a pool shared by all adapters, whereas it seems they should
+be device & connection local (AVDTP1.3, 4.10). Since adapters are
+separate devices in this context, this then appears to imply that each
+should have separate SEID pool.
 
-So the extra sock_hold prevents a UAF, but that's because now the 
-reference count never goes to 0. In my opinion, something closer to your 
-previous proposal (+ also addressing other calls to __sco_sock_close) 
-where we call cancel_delayed_work_sync after the channel is deleted 
-would address the root cause better.
+If this interpretation is right (I don't know the AVDTP spec very
+well, so...), here are two patches that address this.  In (limited)
+tests this seemed to work.
 
-Just my two cents.
+Pauli Virtanen (2):
+  shared/util: use 64-bit bitmap in util_get/clear_uid
+  avdtp: use separate local SEID pool for each adapter
 
->   	}
->   
->   	hcon->sco_data = NULL;
-> @@ -212,6 +211,8 @@ static void __sco_chan_add(struct sco_co
->   
->   	sco_pi(sk)->conn = conn;
->   	conn->sk = sk;
-> +	/* make timeout_work safe; will be put in  sco_conn_del() */
-> +	sock_hold(sk);
->   
->   	INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
->   
-> --
-> 
+ android/avdtp.c        |  2 +-
+ profiles/audio/a2dp.c  |  2 +-
+ profiles/audio/avdtp.c | 55 ++++++++++++++++++++++++++++++++++++------
+ profiles/audio/avdtp.h |  4 ++-
+ src/advertising.c      |  2 +-
+ src/shared/util.c      | 27 ++++++++++++---------
+ src/shared/util.h      |  4 +--
+ unit/test-avdtp.c      |  2 +-
+ 8 files changed, 71 insertions(+), 27 deletions(-)
+
+-- 
+2.31.1
 
