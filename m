@@ -2,133 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-14.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,
+	MENTIONS_GIT_HOSTING,NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 268ACC43216
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 13:14:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9281EC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 14:53:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 124FD60F5D
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 13:14:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7494360ED4
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 14:53:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235382AbhH2NOE (ORCPT
+        id S235492AbhH2OyH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 29 Aug 2021 09:14:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46954 "EHLO
+        Sun, 29 Aug 2021 10:54:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235189AbhH2NOD (ORCPT
+        with ESMTP id S235452AbhH2OyG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 29 Aug 2021 09:14:03 -0400
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88390C061756
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Aug 2021 06:13:11 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id s10so424614lfr.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 29 Aug 2021 06:13:11 -0700 (PDT)
+        Sun, 29 Aug 2021 10:54:06 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5C2BC061575;
+        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id u11-20020a17090adb4b00b00181668a56d6so8233224pjx.5;
+        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=VaIELk3aejG928b4attVmLHeHooVAXSsVOw7u++6ic8=;
-        b=NBuVmcUEZj+2izFzWo7km7GIur/VKIWIdCygLu4Gtd5j+RVmNsWMrgh04N2TZuSMfU
-         qOCfcwDEjE8ZtdKrslnPtXszndze+62w2XWwb6xGVsH1q3jBWtuTLCb9KuSLNbPPRhlK
-         IbpDOICgqNbLc24No+PMG8DhLUM2mN/elJS0GRGV4rFr6iSEdeGZxaI/ykar8IBYY9uy
-         Mctoi0prxcBGI+UT9DvbqIAUUP2Iz4yWSGuhWEeXcrakwQ1fy45teTG3uj0aqnye2YP6
-         lXtLTZX24wvaqQuWHyNbc/msMLpxxBuORKzKEUoSATLWOgQ2fAAvsiPWesmAzPXBNpqI
-         WsVQ==
+        d=gmail.com; s=20161025;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=gZ/nenUcj9mad1OmYCCfvZwnAJEnEhtMP/nmkyY6NOM=;
+        b=SqRgue5J5BHXPuOWjfah7o4X0Mg0vV+2AHpa9GzTTbkeNGDaZCsDmBehausz0MNYaF
+         bHhlG8PxIgz2iW1Cmo83vEep3rsZzrKGQSKmJLNtqciTub6iPZW9hUbN2m663tEGgJJ/
+         /FnW4ospoz5MU7i3+pu/Rn6ETpJgnh5Ywarwg0YaqydcTOfpuKuZX3F+mPTZSHzvgRV8
+         x8i94JuHtgJkk1kdp7CTFd7iUM9edyroXd9FcO8Pmmv59kNgxtwFLk+NiyqaQhUmhco1
+         kVpiVNfRaNOiiBQ4WMphk+v0OpjwgoSfhPhLYWwbBMkHC0HirYofOnTJ1TNX/V5LhaCN
+         eUCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
          :content-transfer-encoding;
-        bh=VaIELk3aejG928b4attVmLHeHooVAXSsVOw7u++6ic8=;
-        b=pqQIF+4nQQt1DmncvSk0gG2oyt0SYG5FJT4v5E5h+NCVrvov+U4rFUWjQ4S04wbqGK
-         8Rex3wVvnKAwoirqh+YkaAp1wnTnzUQyl6/JYJhq5oaU3LezL1ijKgf3DGS+BO1yvb3r
-         7iYS5BseBW7Hmrv/nK4SF4lHn3YfqZB1kOeg7CeurbrREGUKmWMMj8uIpq+/4N7n1IvS
-         dsEqhEcoNAKhCf8lBlhKxcUAabfbgFHupqqV1uzuEC4qfatsqLTpzmTeTh4+t7zvnrkh
-         UEE2uKC3pyUxH5jodSVb1pzfUTQMRdwgSK5awiAseqBigm0Xug/RD1GBVmGKgharguk9
-         oP/g==
-X-Gm-Message-State: AOAM533Gf1o4a+8mMQWcO7x4dP3isSmEeXnY6PwGP/lDocxK4udHApVG
-        b1oU+To8erXp+lbxQR+8EaUAYQ==
-X-Google-Smtp-Source: ABdhPJxoTTCTULxN0AI0ux6Ox/vGsWyAWulCZNHRsyc3AM9WfbWCnshA9YjeDZK67Cxvk0WaVZLaHA==
-X-Received: by 2002:a05:6512:6cd:: with SMTP id u13mr13935373lff.184.1630242789821;
-        Sun, 29 Aug 2021 06:13:09 -0700 (PDT)
-Received: from eriador.lan ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id x13sm712503lfq.262.2021.08.29.06.13.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 29 Aug 2021 06:13:09 -0700 (PDT)
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>
-Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [RFC v2 00/13] create power sequencing subsystem
-Date:   Sun, 29 Aug 2021 16:12:52 +0300
-Message-Id: <20210829131305.534417-1-dmitry.baryshkov@linaro.org>
-X-Mailer: git-send-email 2.33.0
+        bh=gZ/nenUcj9mad1OmYCCfvZwnAJEnEhtMP/nmkyY6NOM=;
+        b=UO+wcUt/hCekNK7lyRaPmyAyEywyV7oGP8rZN6s+gNdq2M6cc3C1KftphMTs30Adnn
+         J85ctOm1eRTlL7atHDwwHmHw8UrwyuH39enYaSAz+XQbxjdGDyiU/Dp7tremsSHahaGc
+         AyGoKhZnhLOSAeApLdDXpJjiNQHrygspbr21MqsFa64qHiNszWw/ZitsHipeAAcUNt9D
+         iMWSCu+UgxfuTfWVVpQg+783jU7zhpS1xewf4l1GRDFHMUnnuJKMBHQcQjfmbdCPNrDm
+         cmgvDCxFGSRlcA+bpQYK9xzxg1DzhOaNQhTtbjN8FO6SE8uYTYDstnX+r1m0un6beLUW
+         TspQ==
+X-Gm-Message-State: AOAM533gz1+KhrhVMaUalwxRvZKwIQqcqG8buBLDyRt5Tk8Z0VHZO8Md
+        gz5MfpB5VmLnHHbhbOGkyNg=
+X-Google-Smtp-Source: ABdhPJxPHa7w5kquVU9Z/WHTw75OhAcL/7ILjKvG07d436dAB8mEf1pFhEPpzpbaTarZaI0AdPgPxg==
+X-Received: by 2002:a17:90a:e001:: with SMTP id u1mr30902387pjy.183.1630248794241;
+        Sun, 29 Aug 2021 07:53:14 -0700 (PDT)
+Received: from [192.168.1.237] ([118.200.190.93])
+        by smtp.gmail.com with ESMTPSA id n14sm19456487pjm.5.2021.08.29.07.53.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 29 Aug 2021 07:53:13 -0700 (PDT)
+Subject: Re: [syzbot] KASAN: use-after-free Write in sco_sock_timeout
+To:     Hillf Danton <hdanton@sina.com>
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.von.dentz@intel.com,
+        syzbot <syzbot+2bef95d3ab4daa10155b@syzkaller.appspotmail.com>,
+        syzkaller-bugs@googlegroups.com
+References: <000000000000b2725705ca78de29@google.com>
+ <20210827011931.2323-1-hdanton@sina.com>
+ <20210829082929.2897-1-hdanton@sina.com>
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+Message-ID: <11a30bc1-574f-aa1a-21d6-b886de9fc981@gmail.com>
+Date:   Sun, 29 Aug 2021 22:53:10 +0800
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <20210829082929.2897-1-hdanton@sina.com>
+Content-Type: text/plain; charset=windows-1252; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is the second RFC on the proposed power sequencer subsystem. This
-is a generification of the MMC pwrseq code. The subsystem tries to
-abstract the idea of complex power-up/power-down/reset of the devices.
+On 29/8/21 4:29 pm, Hillf Danton wrote:
+> On Fri, 27 Aug 2021 15:58:34 +0800 Desmond Cheong Zhi Xi wrote:
+>> On 27/8/21 9:19 am, Hillf Danton wrote:
+>>> On Thu, 26 Aug 2021 09:29:24 -0700
+>>>> syzbot found the following issue on:
+>>>>
+>>>> HEAD commit:    e3f30ab28ac8 Merge branch 'pktgen-samples-next'
+>>>> git tree:       net-next
+>>>> console output: https://syzkaller.appspot.com/x/log.txt?x=13249c96300000
+>>>> kernel config:  https://syzkaller.appspot.com/x/.config?x=ef482942966bf763
+>>>> dashboard link: https://syzkaller.appspot.com/bug?extid=2bef95d3ab4daa10155b
+>>>> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+>>>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a29ea9300000
+>>>>
+>>>> The issue was bisected to:
+>>>>
+>>>> commit e1dee2c1de2b4dd00eb44004a4bda6326ed07b59
+>>>> Author: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+>>>> Date:   Tue Aug 10 04:14:10 2021 +0000
+>>>>
+>>>>       Bluetooth: fix repeated calls to sco_sock_kill
+> 
+> To fix the uaf, grab another hold to sock to make the timeout work safe.
+> 
+> #syz test: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git e3f30ab28ac8
+> 
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -190,15 +190,14 @@ static void sco_conn_del(struct hci_conn
+>   	sco_conn_unlock(conn);
+>   
+>   	if (sk) {
+> -		sock_hold(sk);
+>   		lock_sock(sk);
+>   		sco_sock_clear_timer(sk);
+>   		sco_chan_del(sk, err);
+>   		release_sock(sk);
+> -		sock_put(sk);
+>   
+>   		/* Ensure no more work items will run before freeing conn. */
+>   		cancel_delayed_work_sync(&conn->timeout_work);
+> +		sock_put(sk);
 
-To ease migration to pwrseq and to provide compatibility with older
-device trees, while keeping drivers simple, this iteration of RFC
-introduces pwrseq fallback support: pwrseq driver can register fallback
-providers. If another device driver requests pwrseq instance and none
-was declared, the pwrseq fallback code would go through the list of
-fallback providers and if the match is found, driver would return a
-crafted pwrseq instance. For now this mechanism is limited to the OF
-device matching, but it can be extended further to use any combination
-of device IDs.
+Hi Hillf,
 
-The primary set of devices that promted me to create this patchset is
-the Qualcomm BT+WiFi family of chips. They reside on serial+platform or
-serial + SDIO interfaces (older generations) or on serial+PCIe (newer
-generations).  They require a set of external voltage regulators to be
-powered on and (some of them) have separate WiFi and Bluetooth enable
-GPIOs.
+Saw that this passed the reproducer. But on closer inspection, I think 
+what's happening is that sco_conn_del is never run.
 
-This patchset being an RFC tries to demonstrate the approach, design and
-usage of the pwrseq subsystem. Following issues are present in the RFC
-at this moment but will be fixed later if the overall approach would be
-viewed as acceptable:
+So the extra sock_hold prevents a UAF, but that's because now the 
+reference count never goes to 0. In my opinion, something closer to your 
+previous proposal (+ also addressing other calls to __sco_sock_close) 
+where we call cancel_delayed_work_sync after the channel is deleted 
+would address the root cause better.
 
- - No documentation
-   While the code tries to be self-documenting proper documentation
-   would be required.
+Just my two cents.
 
- - Minimal device tree bindings changes
-   There are no proper updates for the DT bindings (thus neither Rob
-   Herring nor devicetree are included in the To/Cc lists). The dt
-   schema changes would be a part of v1.
-
- - Lack of proper PCIe integration
-   At this moment support for PCIe is hacked up to be able to test the
-   PCIe part of qca6390. Proper PCIe support would require automatically
-   powering up the devices before the bus scan depending on the proper
-   device structure in the device tree.
-
-Changes since RFC v1:
- - Provider pwrseq fallback support
- - Implement fallback support in pwrseq_qca.
- - Mmove susclk handling to pwrseq_qca.
- - Significantly simplify hci_qca.c changes, by dropping all legacy
-   code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
-   parts of the chip.
-
+>   	}
+>   
+>   	hcon->sco_data = NULL;
+> @@ -212,6 +211,8 @@ static void __sco_chan_add(struct sco_co
+>   
+>   	sco_pi(sk)->conn = conn;
+>   	conn->sk = sk;
+> +	/* make timeout_work safe; will be put in  sco_conn_del() */
+> +	sock_hold(sk);
+>   
+>   	INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
+>   
+> --
+> 
 
