@@ -7,29 +7,29 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2125C4320E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DC04C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B3EC760F4C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 444EF60F4C
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 29 Aug 2021 15:50:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235714AbhH2PvN (ORCPT
+        id S235753AbhH2PvN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Sun, 29 Aug 2021 11:51:13 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53718 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53720 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235167AbhH2PvL (ORCPT
+        with ESMTP id S234180AbhH2PvL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Sun, 29 Aug 2021 11:51:11 -0400
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [IPv6:2a0b:5c81:1c1::37])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20EDBC06175F
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206CCC061756
         for <linux-bluetooth@vger.kernel.org>; Sun, 29 Aug 2021 08:50:19 -0700 (PDT)
 Received: from monolith.lan (91-152-122-41.elisa-laajakaista.fi [91.152.122.41])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
         (Authenticated sender: pav)
-        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 07BBC1B002C6;
+        by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 1945A1B002CC;
         Sun, 29 Aug 2021 18:50:16 +0300 (EEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
         t=1630252216;
@@ -37,18 +37,18 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Mp5iApx69YfcZKBsn2lUExWDUnwLiH0Jop2vWribr+E=;
-        b=Cl558A2YOMDrzwjEB2McAcO5WM5rXka7rHp6sg0zA+r+Z6qO9B1xJNOXa48kLzi/J3Mwxa
-        FTihevzHLW8bMyGCbYtdiL10LJdqkTlvrjgekkxF450eLa0fEfq4dKgR+3BqpupuEd22QT
-        rfoThyTf0lObeHXljE3hz/oET7BsO/Pr+L6gGzTt7SpMXXzbgTw/IxgbACEgogEcGTHFqp
-        jlhd/vUI04x1RVpUZxilEcv0N1Z0B4egBt4eMPRMpUc+3ISw4Vcy7T8ZEaGGpeHrjZ9wGh
-        gwmzjPDOUhvMKB5rYPRFVBn1PizuzexSdYl93rsZ59SYorGhufGwpVkfLhmhEA==
+        bh=YfNQ6rz6UbuaWbNb3joM7iLHYE+qdJLF1VLKqra/ka4=;
+        b=pzIje5SFPEW3U3V70pzt6Fo8liLP6MKYEmkuuYa0GNmTiwYEUlyA3+wMjvZhf/BYMPNx7E
+        +vYJmaNH8UPu9d5ZgVCImvhMgBhEYlzm6oWzLogyRLvar7ddS+1yzWHKaj8aCyOgX3xdMz
+        Y8Q+wPOWXy148x1s1ZUVbGQxjRji+4FunXud+/cc7Uqm7eH8tY35HDGVkcO4fHLQxhk3hm
+        NosiVC9+la4/4IVUhjk0b+bf+/IUfmYC/QRWXxsqKYfweCIrQBL6b4A40O+tohcnPrJ/52
+        Pz9XMaU/8k3oZ1StDQJaXdeBdODays+KJx71w3m0IjNdt9IAD5KthoXoqfIVyg==
 From:   Pauli Virtanen <pav@iki.fi>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Pauli Virtanen <pav@iki.fi>
-Subject: [PATCH BlueZ 1/2] shared/util: use 64-bit bitmap in util_get/clear_uid
-Date:   Sun, 29 Aug 2021 18:50:11 +0300
-Message-Id: <20210829155012.164880-2-pav@iki.fi>
+Subject: [PATCH BlueZ 2/2] avdtp: use separate local SEID pool for each adapter
+Date:   Sun, 29 Aug 2021 18:50:12 +0300
+Message-Id: <20210829155012.164880-3-pav@iki.fi>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210829155012.164880-1-pav@iki.fi>
 References: <20210829155012.164880-1-pav@iki.fi>
@@ -56,23 +56,23 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1630252216; a=rsa-sha256;
         cv=none;
-        b=fxsDn9k7yw4Kq2O0zMNLr6j3ZwE4wHNWpsG9/vwPnK9/kInFMuLVWfvcWNsXpLkaORRpyI
-        atp8gP4+lEcMUD26J48Ut7OvoDcHI/miGnIbSxE7mjO0c6CkyHNbQiFRXTaxNTaTxpRLeO
-        8NihWgEjHCiXwzljiSQT8S5bus356uiYBqmAgkbrDPghUGWUVolzem4LQJJhHCn7ZPs1Zx
-        900qPW4OyhyNRe+FsGjt+Hr/BLQmNX8j+tmze2JKz3H5bKCIvuiPVFwXZw1u1mGTv/46Lr
-        zpnBfMi0ghZ1kmavChk4abm5vplEUWJ5q6A3alawPPqDNctFLbDOVmusnv4vWw==
+        b=RTDYzVy1jlWEaVBVcrqaAv0MYvBxCmqeIR84HsBi9idBTCw2etVGxNiVq8WKRQ46bbJ35R
+        oZSe0NLiZGnSq18jb0kzFcaDSywzWmpXNpP/4HCrW1t84qM4aliR56CobMs4fuIfAEKuPk
+        27uX8vfuME6QempeJ6fgWggdp2Tj3tTCpThOvCYczYPVVhkYO/4HlZ7qzO2TTRXaxIPJxE
+        LYsXGiwJA/x21HXdHGWNkbgq7aMf+w8kg5kXGKYBuRnH6QtxXa29ChY5BNEZVeFoyRL9ai
+        Eqp/M70Feo4NOQ4fBvu5448z36MiR0TjTnfxw96oeRMSg1XJcu0wAT/JlMohCw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
         s=lahtoruutu; t=1630252216;
         h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
          to:to:cc:cc:mime-version:mime-version:
          content-transfer-encoding:content-transfer-encoding:
          in-reply-to:in-reply-to:references:references;
-        bh=Mp5iApx69YfcZKBsn2lUExWDUnwLiH0Jop2vWribr+E=;
-        b=PewGPKyRgeC63vqqBBAoXR6NnKIzWawEeUuAvGUjfILWjX9g+FDKMuhny3UvlflOaPR4f+
-        ORKbWRDz+f7S6zxCAsdTDDvw2gWiRREUAaC4rubc+cSvR6SY5rh0NiqKHUAFK1XZoIvRJc
-        JK2eaeq7FYk3Hi9niwHD67CTppX+cowdKQi2TQe74teiZAfxt3rk7h2GkJ/jAn3ESP90cE
-        oMn/YBtdyoOnicZceIQKLaM1AG/Mr471DertlF5Wuic4he41pkHTPBze2KsPLcrZDg8gjf
-        QB0dXTfYvW0ZlpfkDB+dyCHcWnKCIOeChS8PQpnQKiVWe/6IjQIKmpQwjd59+A==
+        bh=YfNQ6rz6UbuaWbNb3joM7iLHYE+qdJLF1VLKqra/ka4=;
+        b=ligFYyP9LmWQ1imcKjruEKZ/cR7WXKjJtkQHCdUA9YeJnT2dySpuacMzd2M902Xdk/aqg8
+        HjXRBbisSZDukYXYY8zAkDjSXf1DC4zAbc8u4l1GW25/r+4hJYhEjLHXzbZoW0+VBbAZ+Z
+        Y2n3ec23nN2TZztafPoJ8be4ta+qEhXzJyW9ET3jX0N5wgLmmPaFVqBTmktgiuNlGigyai
+        DqMWzsPObO5sQbFYMjAY5aPu0f4RgnDRKKxR2s0GpezW+mUFoPKq0aajIhlmcho1e5iKHZ
+        H5lbAeBLjgl32AzshzlEbv94lYGLvMw5HilQhkUTI+aFR79nVg/OYf9USQJAkg==
 ARC-Authentication-Results: i=1;
         ORIGINATING;
         auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
@@ -80,140 +80,162 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The util_get/clear_uid functions use int type for bitmap, and are used
-e.g. for SEID allocation. However, valid SEIDs are in range 1 to 0x3E
-(AVDTP spec v1.3, 8.20.1), and 8*sizeof(int) is often smaller than 0x3E.
+Local SEIDs are currently allocated from a pool that is common for all
+adapters. However, AVDTP spec v1.3, sec 4.10 states "To prevent
+conflicts, the scope of the SEID shall be both device-local and
+connection-local. The application is responsible for assigning a SEID,
+which is not in use on the connection to the same peer device." In
+practice, registering the same media application for multiple adapters
+can result to running out of SEIDs, even though the spec does not
+require SEIDs to be unique across adapters.
 
-The function is also used in src/advertising.c, but an explicit maximum
-value is always provided, so growing the bitmap size is safe there.
-
-Use 64-bit bitmap instead, to be able to cover the valid range.
+Use a separate SEID pool for each btd_adapter to fix this.
 ---
- android/avdtp.c        |  2 +-
- profiles/audio/avdtp.c |  2 +-
- src/advertising.c      |  2 +-
- src/shared/util.c      | 27 +++++++++++++++------------
- src/shared/util.h      |  4 ++--
- unit/test-avdtp.c      |  2 +-
- 6 files changed, 21 insertions(+), 18 deletions(-)
+ profiles/audio/a2dp.c  |  2 +-
+ profiles/audio/avdtp.c | 55 ++++++++++++++++++++++++++++++++++++------
+ profiles/audio/avdtp.h |  4 ++-
+ 3 files changed, 51 insertions(+), 10 deletions(-)
 
-diff --git a/android/avdtp.c b/android/avdtp.c
-index 8c2930ec1..a261a8e5f 100644
---- a/android/avdtp.c
-+++ b/android/avdtp.c
-@@ -34,7 +34,7 @@
- #include "../profiles/audio/a2dp-codecs.h"
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 02caa83e1..1e8a66b8a 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2615,7 +2615,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
  
- #define MAX_SEID 0x3E
--static unsigned int seids;
-+static uint64_t seids;
+ 	sep = g_new0(struct a2dp_sep, 1);
  
- #ifndef MAX
- # define MAX(x, y) ((x) > (y) ? (x) : (y))
+-	sep->lsep = avdtp_register_sep(server->seps, type,
++	sep->lsep = avdtp_register_sep(adapter, server->seps, type,
+ 					AVDTP_MEDIA_TYPE_AUDIO, codec,
+ 					delay_reporting, &endpoint_ind,
+ 					&cfm, sep);
 diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-index 946231b71..25520ceec 100644
+index 25520ceec..f2aa98b23 100644
 --- a/profiles/audio/avdtp.c
 +++ b/profiles/audio/avdtp.c
-@@ -44,7 +44,7 @@
+@@ -44,7 +44,6 @@
  #define AVDTP_PSM 25
  
  #define MAX_SEID 0x3E
--static unsigned int seids;
-+static uint64_t seids;
+-static uint64_t seids;
  
  #ifndef MAX
  # define MAX(x, y) ((x) > (y) ? (x) : (y))
-diff --git a/src/advertising.c b/src/advertising.c
-index bd79454d5..41b818650 100644
---- a/src/advertising.c
-+++ b/src/advertising.c
-@@ -48,7 +48,7 @@ struct btd_adv_manager {
- 	uint8_t max_scan_rsp_len;
- 	uint8_t max_ads;
- 	uint32_t supported_flags;
--	unsigned int instance_bitmap;
-+	uint64_t instance_bitmap;
- 	bool extended_add_cmds;
- 	int8_t min_tx_power;
- 	int8_t max_tx_power;
-diff --git a/src/shared/util.c b/src/shared/util.c
-index 244756456..723dedd75 100644
---- a/src/shared/util.c
-+++ b/src/shared/util.c
-@@ -124,30 +124,33 @@ unsigned char util_get_dt(const char *parent, const char *name)
+@@ -325,6 +324,7 @@ struct avdtp_local_sep {
+ 	GSList *caps;
+ 	struct avdtp_sep_ind *ind;
+ 	struct avdtp_sep_cfm *cfm;
++	struct btd_adapter *adapter;
+ 	void *user_data;
+ };
  
- /* Helpers for bitfield operations */
+@@ -414,6 +414,8 @@ struct avdtp {
  
--/* Find unique id in range from 1 to max but no bigger then
-- * sizeof(int) * 8. ffs() is used since it is POSIX standard
-- */
--uint8_t util_get_uid(unsigned int *bitmap, uint8_t max)
-+/* Find unique id in range from 1 to max but no bigger than 64. */
-+uint8_t util_get_uid(uint64_t *bitmap, uint8_t max)
- {
- 	uint8_t id;
+ static GSList *state_callbacks = NULL;
  
--	id = ffs(~*bitmap);
-+	if (max > 64)
-+		max = 64;
++static GHashTable *adapter_seids = NULL;
++
+ static int send_request(struct avdtp *session, gboolean priority,
+ 			struct avdtp_stream *stream, uint8_t signal_id,
+ 			void *buffer, size_t size);
+@@ -3768,7 +3770,41 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+ 							&req, sizeof(req));
+ }
  
--	if (!id || id > max)
--		return 0;
-+	for (id = 1; id <= max; ++id) {
-+		uint64_t mask = ((uint64_t)1) << (id - 1);
- 
--	*bitmap |= 1u << (id - 1);
-+		if (!(*bitmap & mask)) {
-+			*bitmap |= mask;
-+			return id;
-+		}
+-struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
++static uint8_t get_adapter_seid(struct btd_adapter *adapter)
++{
++	uint64_t *seids;
++
++	if (adapter_seids == NULL)
++		adapter_seids = g_hash_table_new_full(g_direct_hash,
++						g_direct_equal, NULL, g_free);
++
++	seids = g_hash_table_lookup(adapter_seids, adapter);
++
++	if (seids == NULL) {
++		seids = g_new0(uint64_t, 1);
++		g_hash_table_insert(adapter_seids, adapter, seids);
 +	}
- 
--	return id;
-+	return 0;
- }
- 
- /* Clear id bit in bitmap */
--void util_clear_uid(unsigned int *bitmap, uint8_t id)
-+void util_clear_uid(uint64_t *bitmap, uint8_t id)
++
++	return util_get_uid(seids, MAX_SEID);
++}
++
++static void clear_adapter_seid(struct btd_adapter *adapter, uint8_t seid)
++{
++	uint64_t *seids = adapter_seids ?
++			g_hash_table_lookup(adapter_seids, adapter) : NULL;
++
++	if (seids == NULL)
++		return;
++
++	util_clear_uid(seids, seid);
++
++	if (*seids == 0)
++		g_hash_table_remove(adapter_seids, adapter);
++}
++
++struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
++						struct queue *lseps,
++						uint8_t type,
+ 						uint8_t media_type,
+ 						uint8_t codec_type,
+ 						gboolean delay_reporting,
+@@ -3777,7 +3813,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 						void *user_data)
  {
--	if (!id)
-+	if (id == 0 || id > 64)
- 		return;
- 
--	*bitmap &= ~(1u << (id - 1));
-+	*bitmap &= ~(((uint64_t)1) << (id - 1));
- }
- 
- static const struct {
-diff --git a/src/shared/util.h b/src/shared/util.h
-index 9920b7f76..60908371d 100644
---- a/src/shared/util.h
-+++ b/src/shared/util.h
-@@ -102,8 +102,8 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
- 
- unsigned char util_get_dt(const char *parent, const char *name);
- 
--uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
--void util_clear_uid(unsigned int *bitmap, uint8_t id);
-+uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
-+void util_clear_uid(uint64_t *bitmap, uint8_t id);
- 
- const char *bt_uuid16_to_str(uint16_t uuid);
- const char *bt_uuid32_to_str(uint32_t uuid);
-diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-index f5340d6f3..4e8a68c6b 100644
---- a/unit/test-avdtp.c
-+++ b/unit/test-avdtp.c
-@@ -550,7 +550,7 @@ static void test_server_seid(gconstpointer data)
  	struct avdtp_local_sep *sep;
- 	unsigned int i;
+-	uint8_t seid = util_get_uid(&seids, MAX_SEID);
++	uint8_t seid = get_adapter_seid(adapter);
  
--	for (i = 0; i < sizeof(int) * 8; i++) {
-+	for (i = 0; i < MAX_SEID; i++) {
- 		sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
- 						AVDTP_MEDIA_TYPE_AUDIO,
- 						0x00, TRUE, &sep_ind, NULL,
+ 	if (!seid)
+ 		return NULL;
+@@ -3791,11 +3827,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+ 	sep->codec = codec_type;
+ 	sep->ind = ind;
+ 	sep->cfm = cfm;
++	sep->adapter = adapter;
+ 	sep->user_data = user_data;
+ 	sep->delay_reporting = delay_reporting;
+ 
+-	DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
+-			sep->info.type, sep->codec, sep->info.seid);
++	DBG("SEP %p registered: type:%d codec:%d adapter:%p seid:%d", sep,
++			sep->info.type, sep->codec, sep->adapter,
++			sep->info.seid);
+ 
+ 	if (!queue_push_tail(lseps, sep)) {
+ 		g_free(sep);
+@@ -3813,10 +3851,11 @@ int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
+ 	if (sep->stream)
+ 		release_stream(sep->stream, sep->stream->session);
+ 
+-	DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+-			sep->info.type, sep->codec, sep->info.seid);
++	DBG("SEP %p unregistered: type:%d codec:%d adapter:%p seid:%d", sep,
++			sep->info.type, sep->codec, sep->adapter,
++			sep->info.seid);
+ 
+-	util_clear_uid(&seids, sep->info.seid);
++	clear_adapter_seid(sep->adapter, sep->info.seid);
+ 	queue_remove(lseps, sep);
+ 	g_free(sep);
+ 
+diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+index b02534cd5..70807cff9 100644
+--- a/profiles/audio/avdtp.h
++++ b/profiles/audio/avdtp.h
+@@ -278,7 +278,9 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream);
+ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+ 							uint16_t delay);
+ 
+-struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
++struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
++						struct queue *lseps,
++						uint8_t type,
+ 						uint8_t media_type,
+ 						uint8_t codec_type,
+ 						gboolean delay_reporting,
 -- 
 2.31.1
 
