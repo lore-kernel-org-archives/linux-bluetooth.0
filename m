@@ -7,108 +7,114 @@ X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BDBCC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Aug 2021 15:04:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD026C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Aug 2021 15:08:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 151A360E77
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Aug 2021 15:04:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AB66060C3F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 30 Aug 2021 15:08:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237255AbhH3PFm (ORCPT
+        id S237402AbhH3PIx convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Aug 2021 11:05:42 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50766 "EHLO
+        Mon, 30 Aug 2021 11:08:53 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35273 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237123AbhH3PFm (ORCPT
+        with ESMTP id S237338AbhH3PIw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Aug 2021 11:05:42 -0400
+        Mon, 30 Aug 2021 11:08:52 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 40665CEC82;
-        Mon, 30 Aug 2021 17:04:47 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BAD0CCEC82;
+        Mon, 30 Aug 2021 17:07:55 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH 2/2] Bluetooth: btusb: Add protocol for MediaTek bluetooth
- devices(MT7922)
+Subject: Re: [PATCH v1] Bluetooth: btintel: Fix boot address
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210824154430.27689-2-mark-yw.chen@mediatek.com>
-Date:   Mon, 30 Aug 2021 17:04:47 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, sean.wang@mediatek.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
-        michaelfsun@google.com, mcchou@chromium.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <3BC55188-B231-4F16-994F-BE0D6E1455B2@holtmann.org>
-References: <20210824154430.27689-1-mark-yw.chen@mediatek.com>
- <20210824154430.27689-2-mark-yw.chen@mediatek.com>
-To:     =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>
+In-Reply-To: <20210820115808.15895-1-kiran.k@intel.com>
+Date:   Mon, 30 Aug 2021 17:07:55 +0200
+Cc:     "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <7E8C3893-19CD-44D6-B224-A3434F65BA95@holtmann.org>
+References: <20210820115808.15895-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mark,
+Hi Kiran,
 
-> The information in /sys/kernel/debug/usb/devices about the MT7922U
-> Bluetooth device is listed as the below.
+> Cache Boot address present in firmware file which
+> is later used Intel_Soft_Reset command to bring
+> controller from boot mode to operational mode.
 > 
-> T: Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#= 18 Spd=480 MxCh= 0
-> D: Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs= 1
-> P: Vendor=0e8d ProdID=7922 Rev= 1.00
-> S: Manufacturer=MediaTek Inc.
-> S: Product=Wireless_Device
-> S: SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A: FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=81(I) Atr=03(Int.) MxPS= 16 Ivl=125us
-> E: Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E: Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 0 Ivl=1ms
-> I: If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 9 Ivl=1ms
-> I: If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 17 Ivl=1ms
-> I: If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 25 Ivl=1ms
-> I: If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 33 Ivl=1ms
-> I: If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 49 Ivl=1ms
-> I: If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E: Ad=83(I) Atr=01(Isoc) MxPS= 63 Ivl=1ms
-> E: Ad=03(O) Atr=01(Isoc) MxPS= 63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E: Ad=8a(I) Atr=03(Int.) MxPS= 64 Ivl=125us
-> E: Ad=0a(O) Atr=03(Int.) MxPS= 64 Ivl=125us
-> I: If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E: Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
-> E: Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
-> 
-> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+> Signed-off-by: Kiran K <kiran.k@intel.com>
 > ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> drivers/bluetooth/btintel.c | 31 +++++++++++++------------------
+> 1 file changed, 13 insertions(+), 18 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 41e7c9f28d82..fe52f7b9548e 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -2821,6 +2821,8 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
-> 	case 0x7668:
-> 		fwname = FIRMWARE_MT7668;
-> 		break;
-> +	case 0x7922:
-> +		fallthrough;
+> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+> index f1705b46fc88..80d6dd7ae51a 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -1037,8 +1037,9 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+> 
+> 			params = (void *)(fw_ptr + sizeof(*cmd));
+> 
+> -			bt_dev_info(hdev, "Boot Address: 0x%x",
+> -				    le32_to_cpu(params->boot_addr));
+> +			*boot_addr = le32_to_cpu(params->boot_addr);
+> +
+> +			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+> 
 
-The fallthrough is not needed. Multiple case labels in a row are fine.
+so this hunk looks good and is described in the commit message.
+
+> 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+> 				    params->fw_build_num, params->fw_build_ww,
+> @@ -1071,9 +1072,6 @@ int btintel_download_firmware(struct hci_dev *hdev,
+> 		/* Skip version checking */
+> 		break;
+> 	default:
+> -		/* Skip reading firmware file version in bootloader mode */
+> -		if (ver->fw_variant == 0x06)
+> -			break;
+> 
+> 		/* Skip download if firmware has the same version */
+> 		if (btintel_firmware_version(hdev, ver->fw_build_num,
+> @@ -1114,19 +1112,16 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
+> 	int err;
+> 	u32 css_header_ver;
+> 
+> -	/* Skip reading firmware file version in bootloader mode */
+> -	if (ver->img_type != 0x01) {
+> -		/* Skip download if firmware has the same version */
+> -		if (btintel_firmware_version(hdev, ver->min_fw_build_nn,
+> -					     ver->min_fw_build_cw,
+> -					     ver->min_fw_build_yy,
+> -					     fw, boot_param)) {
+> -			bt_dev_info(hdev, "Firmware already loaded");
+> -			/* Return -EALREADY to indicate that firmware has
+> -			 * already been loaded.
+> -			 */
+> -			return -EALREADY;
+> -		}
+> +	/* Skip download if firmware has the same version */
+> +	if (btintel_firmware_version(hdev, ver->min_fw_build_nn,
+> +				     ver->min_fw_build_cw,
+> +				     ver->min_fw_build_yy,
+> +				     fw, boot_param)) {
+> +		bt_dev_info(hdev, "Firmware already loaded");
+> +		/* Return -EALREADY to indicate that firmware has
+> +		 * already been loaded.
+> +		 */
+> +		return -EALREADY;
+> 	}
+
+This part however isn’t.
 
 Regards
 
