@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D40F6C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 01:15:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 52CBFC4320E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 01:15:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1DFA60FD8
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 01:15:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2AAE46103C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 01:15:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239253AbhHaBQ2 (ORCPT
+        id S239244AbhHaBQ3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 30 Aug 2021 21:16:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56640 "EHLO
+        Mon, 30 Aug 2021 21:16:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56646 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239183AbhHaBQ0 (ORCPT
+        with ESMTP id S239248AbhHaBQ1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 30 Aug 2021 21:16:26 -0400
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C640C061575
+        Mon, 30 Aug 2021 21:16:27 -0400
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFF78C061575
         for <linux-bluetooth@vger.kernel.org>; Mon, 30 Aug 2021 18:15:32 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id r13so13234637pff.7
+Received: by mail-pl1-x62f.google.com with SMTP id q21so9621726plq.3
         for <linux-bluetooth@vger.kernel.org>; Mon, 30 Aug 2021 18:15:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20161025;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=BP8RayrDpeexAEqETs3zixs0Rar9P3UtLvTZ9Wt8oyU=;
-        b=CaqCD/4urLQk73oFHbh6NlqLdw007yaFQON2RcuxIp/8OJn+B3dFzALhXYyUSrDmMD
-         Swl1AAxSqLsqHIqJxotPN2liXxYy8/9zNx+XM3GlSVCzF+xCDM4U9fFQOeOu+78u+B2L
-         hsMDB77PqNP9fwAtGaG9THlxEVK4h3gVX51r/H+QRoI9+nefu/N6DWOnHZhyv0OWdJR/
-         QbAEd5hoBruZVajyCELlAu/5W+gfj+IVqi5vNyFh5j4Z+46SziEpbOQPT6iDosC3Y/8V
-         mX7WTSEooboZl+XMa+gVkWUmrucg9MEbQB3jN9/GhY2xndqIT8KhmvXQShC3AWKPYDlX
-         6l/Q==
+        bh=8LQ0W8o/Cd47UkUjFVIl5AJg9GhqnaY0ikl8hrCuAqc=;
+        b=f8JE2OQvSgOnXb35wjP4q//QYuedNsLc26DcvqE8zoCPzosLhlXHIN7myO+3hITE87
+         jgz2Hg3WvuocpwyzmRWpQLrVmp7pI+fMb/KShKuIdSTfCWJSESmSAb4mFdVGPm9QbJtD
+         aVIPXhbLeKX4hIWViQNOL7CkwCrbs7r9Gd7UuPbi5zVBjmCSUdXSF3vERTv+XHgkYGTv
+         V34nfxpruxT3qIzui/RBZT5ndIGAr546OX1KWpYVLKmrV/aq/wjMbsqljUzUwzURChxB
+         2+OFqE/k4lr/FrNoJ7gTVdl+mYKJvLGKFvh385rZdxZ4g/jhZVnAtedtihqiILkIYRWs
+         aINw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=BP8RayrDpeexAEqETs3zixs0Rar9P3UtLvTZ9Wt8oyU=;
-        b=hHzBAZbdoSDwWfLwyzN5WPy/ffjJ3a6uDE6VPZUBbSp3Jnfa+GXN4t4i6ns97DvvEE
-         iQpz91xTvzdevQE8uauZLqNMTnAQuqyFjMnF3iCs9C9CNI0MGGcp+vuk54KiS3GeiVCk
-         RWNqrlMpSv0H2tnrskb/K7qM0xkdctUGDh+wcEXmNvJpCJJk8oiJLL3Eb978Yb74hFeQ
-         NOXgkN8mpqd8i0h+TawwpTV/jDMdERgS310rK+RhdZyGf9tyPd/a8vN7E2MD0sWP9IKC
-         oLYjKYXNg+uwqyRytBkJ5PkrkP6gkXPzWWq+bFjRYH6vtN8v9gdukDr8BsovZ1JgCwKQ
-         lYzw==
-X-Gm-Message-State: AOAM531P/Tomds3d7KXpAFvNIEUW34elf6tk+joBNDXaPW4p0J1YsFOO
-        pPCUJ3iNP3FQBlCPQbvRtzPyN4Wp0Wc=
-X-Google-Smtp-Source: ABdhPJy+q2P5W6DmI0sjpvtRbfT9nJIdDtq4vifPEGI+MBXqt6unNc9P3/BwxxxlNZ6Ldbm5nwaoqg==
-X-Received: by 2002:a05:6a00:ac8:b029:320:a6bb:880d with SMTP id c8-20020a056a000ac8b0290320a6bb880dmr26031103pfl.41.1630372531280;
-        Mon, 30 Aug 2021 18:15:31 -0700 (PDT)
+        bh=8LQ0W8o/Cd47UkUjFVIl5AJg9GhqnaY0ikl8hrCuAqc=;
+        b=LqSAHSm51hyq64n+RJNX3w0gZL6hDvVCLTV3MAPYK+jwaBimulF+WSuN+Kr5ZC4JcX
+         lO5H2gJYB3MZb9FeOeIQtGU0Cyq+xzEdmoIx9aABCAlovYbF6DBCBLdaMxm8Luw0rqeI
+         6H7FkPOQuTvbr06GehWm4In859+/P3Z39slQlsvVzz52gXQufUCv0hzYhH5zL4vUJOPu
+         wDrFvKdMYrlooWZQ30odCQpGst9DrC1ixHQgqlKh1OJcwG6H+bo+8+tdytdlWNKbzEUF
+         DApJv1OB+x/EygggXzzidrAzWpWJsMdzRxurj+4679fUBkg0qh/NK2iTngNJ7TxEPa0e
+         PA0w==
+X-Gm-Message-State: AOAM5302hqMWKbUgfdeLtM3LRTy2DOPCzTEOpZhUxXRiWxwNtlXNuDhn
+        //nzI/9mOs9Xpb3qsSfX3k8O29dkJkk=
+X-Google-Smtp-Source: ABdhPJxcCBgWwT3bHNzanUYC4k06pRzMF2KpzthvCpdosqow/FF4Jyp8ICDj+eZhebw4MWerMjkTIQ==
+X-Received: by 2002:a17:90a:43c2:: with SMTP id r60mr2247918pjg.52.1630372532283;
+        Mon, 30 Aug 2021 18:15:32 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g18sm5020750pge.33.2021.08.30.18.15.30
+        by smtp.gmail.com with ESMTPSA id g18sm5020750pge.33.2021.08.30.18.15.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 30 Aug 2021 18:15:30 -0700 (PDT)
+        Mon, 30 Aug 2021 18:15:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC 3/4] Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg
-Date:   Mon, 30 Aug 2021 18:15:27 -0700
-Message-Id: <20210831011528.225877-3-luiz.dentz@gmail.com>
+Subject: [RFC 4/4] Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+Date:   Mon, 30 Aug 2021 18:15:28 -0700
+Message-Id: <20210831011528.225877-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210831011528.225877-1-luiz.dentz@gmail.com>
 References: <20210831011528.225877-1-luiz.dentz@gmail.com>
@@ -75,90 +75,153 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes use of bt_skb_sendmsg instead of allocating a different
-buffer to be used with memcpy_from_msg which cause one extra copy.
+This makes use of bt_skb_sendmmsg instead using memcpy_from_msg which
+is not considered safe to be used when lock_sock is held.
+
+Also make rfcomm_dlc_send handle skb with fragments and queue them all
+atomically.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/sco.c | 34 +++++++++++-----------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ net/bluetooth/rfcomm/core.c | 44 ++++++++++++++++++++++++++++------
+ net/bluetooth/rfcomm/sock.c | 48 ++++++++++---------------------------
+ 2 files changed, 49 insertions(+), 43 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b62c91c627e2..8a262fbc8aa8 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -280,27 +280,19 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
- 	return err;
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index f2bacb464ccf..361a60b4a670 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -549,22 +549,52 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
+ 	return dlc;
  }
  
--static int sco_send_frame(struct sock *sk, void *buf, int len,
--			  unsigned int msg_flags)
-+static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
++static int rfcomm_dlc_send_frag(struct rfcomm_dlc *d, struct sk_buff *frag)
++{
++	int len = frag->len;
++
++	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
++
++	if (len > d->mtu)
++		return -EINVAL;
++
++	rfcomm_make_uih(frag, d->addr);
++	__skb_queue_tail(&d->tx_queue, frag);
++
++	return len;
++}
++
+ int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
  {
- 	struct sco_conn *conn = sco_pi(sk)->conn;
--	struct sk_buff *skb;
--	int err;
+-	int len = skb->len;
++	struct sk_buff *frag;
++	int len;
  
- 	/* Check outgoing MTU */
--	if (len > conn->mtu)
-+	if (skb->len > conn->mtu)
- 		return -EINVAL;
+ 	if (d->state != BT_CONNECTED)
+ 		return -ENOTCONN;
  
--	BT_DBG("sk %p len %d", sk, len);
-+	BT_DBG("sk %p len %d", sk, skb->len);
+-	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
++	/* Queue all fragments atomically. */
++	spin_lock_bh(&d->tx_queue.lock);
  
--	skb = bt_skb_send_alloc(sk, len, msg_flags & MSG_DONTWAIT, &err);
--	if (!skb)
--		return err;
--
--	memcpy(skb_put(skb, len), buf, len);
- 	hci_send_sco(conn->hcon, skb);
+-	if (len > d->mtu)
+-		return -EINVAL;
++	len = rfcomm_dlc_send_frag(d, skb);
++	if (len < 0)
++		goto unlock;
  
--	return len;
-+	return skb->len;
+-	rfcomm_make_uih(skb, d->addr);
+-	skb_queue_tail(&d->tx_queue, skb);
++	skb_walk_frags(skb, frag) {
++		int ret;
++
++		ret = rfcomm_dlc_send_frag(d, frag);
++		if (ret < 0)
++			break;
++
++		len += ret;
++	}
++
++	skb_shinfo(skb)->frag_list = NULL;
++
++unlock:
++	spin_unlock_bh(&d->tx_queue.lock);
+ 
+-	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
++	if (len > 0 && !test_bit(RFCOMM_TX_THROTTLED, &d->flags))
+ 		rfcomm_schedule();
+ 	return len;
  }
- 
- static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
-@@ -722,7 +714,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 			    size_t len)
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 2c95bb58f901..9dec2ff510be 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -558,6 +558,7 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  {
  	struct sock *sk = sock->sk;
--	void *buf;
-+	struct sk_buff *skb;
- 	int err;
+ 	struct rfcomm_dlc *d = rfcomm_pi(sk)->dlc;
++	size_t size;
+ 	struct sk_buff *skb;
+ 	int sent;
  
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -734,24 +726,20 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
--	buf = kmalloc(len, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
--
--	if (memcpy_from_msg(buf, msg, len)) {
--		kfree(buf);
--		return -EFAULT;
--	}
-+	skb = bt_skb_sendmsg(sk, msg, len, 0);
-+	if (IS_ERR_OR_NULL(skb))
-+		return PTR_ERR(skb);
+@@ -574,47 +575,22 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  
  	lock_sock(sk);
  
- 	if (sk->sk_state == BT_CONNECTED)
--		err = sco_send_frame(sk, buf, len, msg->msg_flags);
-+		err = sco_send_frame(sk, skb);
- 	else
- 		err = -ENOTCONN;
+-	sent = bt_sock_wait_ready(sk, msg->msg_flags);
+-	if (sent)
+-		goto done;
++	size = min_t(size_t, len, d->mtu);
  
- 	release_sock(sk);
--	kfree(buf);
-+	if (err)
+-	while (len) {
+-		size_t size = min_t(size_t, len, d->mtu);
+-		int err;
+-
+-		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
+-				msg->msg_flags & MSG_DONTWAIT, &err);
+-		if (!skb) {
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
+-		skb_reserve(skb, RFCOMM_SKB_HEAD_RESERVE);
+-
+-		err = memcpy_from_msg(skb_put(skb, size), msg, size);
+-		if (err) {
+-			kfree_skb(skb);
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
++	sent = bt_sock_wait_ready(sk, msg->msg_flags);
+ 
+-		skb->priority = sk->sk_priority;
++	release_sock(sk);
+ 
+-		err = rfcomm_dlc_send(d, skb);
+-		if (err < 0) {
+-			kfree_skb(skb);
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
++	if (sent)
++		return sent;
+ 
+-		sent += size;
+-		len  -= size;
+-	}
++	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_RESERVE);
++	if (IS_ERR_OR_NULL(skb))
++		return PTR_ERR(skb);
+ 
+-done:
+-	release_sock(sk);
++	sent = rfcomm_dlc_send(d, skb);
++	if (sent < 0)
 +		kfree_skb(skb);
- 	return err;
- }
  
+ 	return sent;
+ }
 -- 
 2.31.1
 
