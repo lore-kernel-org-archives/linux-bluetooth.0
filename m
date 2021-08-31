@@ -2,142 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E791C4320A
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDAEC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:31:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E68B460FED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DFF761041
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:31:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241610AbhHaLwc (ORCPT
+        id S231266AbhHaMcD convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Aug 2021 07:52:32 -0400
-Received: from mga02.intel.com ([134.134.136.20]:36804 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241608AbhHaLwa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Aug 2021 07:52:30 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10092"; a="205674738"
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="205674738"
-Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 04:51:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="498264553"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga008.fm.intel.com with ESMTP; 31 Aug 2021 04:51:33 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Chethan T N <chethan.tumkur.narayan@intel.com>,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v13 12/12] Bluetooth: Allow usb to auto-suspend when SCO use non-HCI transport
-Date:   Tue, 31 Aug 2021 17:26:37 +0530
-Message-Id: <20210831115637.6713-12-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210831115637.6713-1-kiran.k@intel.com>
-References: <20210831115637.6713-1-kiran.k@intel.com>
+        Tue, 31 Aug 2021 08:32:03 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60540 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231134AbhHaMcC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 31 Aug 2021 08:32:02 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 0EDE0CECDA;
+        Tue, 31 Aug 2021 14:31:06 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH 1/2] Bluetooth: btusb: Support public address
+ configuration for MediaTek Chip.
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <SL2PR03MB4457513693916CBA07BE450BB3CC9@SL2PR03MB4457.apcprd03.prod.outlook.com>
+Date:   Tue, 31 Aug 2021 14:31:05 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Sean Wang <Sean.Wang@mediatek.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "linux-mediatek@lists.infradead.org" 
+        <linux-mediatek@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "michaelfsun@google.com" <michaelfsun@google.com>,
+        "mcchou@chromium.org" <mcchou@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <51A4788D-DDFD-4700-9D50-84F37ADD4883@holtmann.org>
+References: <20210824154430.27689-1-mark-yw.chen@mediatek.com>
+ <CF258C9C-BB3C-4C10-88B0-F6F3A03303D5@holtmann.org>
+ <SL2PR03MB4457513693916CBA07BE450BB3CC9@SL2PR03MB4457.apcprd03.prod.outlook.com>
+To:     =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
+        <Mark-YW.Chen@mediatek.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Chethan T N <chethan.tumkur.narayan@intel.com>
+Hi Mark,
 
-Currently usb tranport is not allowed to suspend when SCO over
-HCI tranport is active.
+>>> The MediaTek chip support vendor specific HCI command(0xfc1a) to
+>>> change the public address. Add hdev->set_bdaddr handler for MediaTek
+>>> Chip.
+>>> 
+>>> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+>>> ---
+>>> drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
+>>> 1 file changed, 18 insertions(+)
+>>> 
+>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>>> index 60d2fce59a71..41e7c9f28d82 100644
+>>> --- a/drivers/bluetooth/btusb.c
+>>> +++ b/drivers/bluetooth/btusb.c
+>>> @@ -2200,6 +2200,23 @@ struct btmtk_section_map {
+>>> 	};
+>>> } __packed;
+>>> 
+>>> +static int btusb_set_bdaddr_mtk(struct hci_dev *hdev, const bdaddr_t
+>>> +*bdaddr) {
+>>> +	struct sk_buff *skb;
+>>> +	long ret;
+>>> +
+>>> +	skb = __hci_cmd_sync(hdev, 0xfc1a, sizeof(bdaddr), bdaddr,
+>> HCI_INIT_TIMEOUT);
+>>> +	if (IS_ERR(skb)) {
+>>> +		ret = PTR_ERR(skb);
+>>> +		bt_dev_err(hdev, "changing Mediatek device address failed
+>> (%ld)",
+>>> +			   ret);
+>>> +		return ret;
+>>> +	}
+>>> +	kfree_skb(skb);
+>>> +
+>>> +	return 0;
+>>> +}
+>>> +
+>> 
+>> this is not a permanent change, correct? Meaning a power cycle will bring back
+>> the original BD_ADDR?
+>> 
+> 
+> Yes, it's not a permanent change.
+> After doing a power cycle or Mediatek specific Bluetooth reset, Mediatek Chips will bring back the original  BD_ADDRESS.
 
-This patch shall enable the usb tranport to suspend when SCO
-link use non-HCI transport
+ok, good. Then please re-submit against latest bluetooth-next tree. Unfortunately current patch doesn’t apply anymore.
 
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Kiran K <kiran.k@intel.com>
----
+Regards
 
-Notes:
-    changes in v13:
-    - suspend usb in HFP offload use case
-
- drivers/bluetooth/btintel.c       |  2 +-
- include/net/bluetooth/bluetooth.h |  4 ++++
- net/bluetooth/hci_event.c         | 20 +++++++++++---------
- net/bluetooth/sco.c               |  2 +-
- 4 files changed, 17 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 6091b691ddc2..2d64e289cf6e 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2215,7 +2215,7 @@ static int btintel_get_codec_config_data(struct hci_dev *hdev,
- static int btintel_get_data_path_id(struct hci_dev *hdev, __u8 *data_path_id)
- {
- 	/* Intel uses 1 as data path id for all the usecases */
--	*data_path_id = 1;
-+	*data_path_id = BT_SCO_PCM_PATH;
- 	return 0;
- }
- 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index c1fa90fb7502..9e2745863b33 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -177,6 +177,10 @@ struct bt_codecs {
- #define CODING_FORMAT_TRANSPARENT	0x03
- #define CODING_FORMAT_MSBC		0x05
- 
-+/* Audio data transport path used for SCO */
-+#define BT_SCO_HCI_PATH 0x00
-+#define BT_SCO_PCM_PATH 0x01
-+
- __printf(1, 2)
- void bt_info(const char *fmt, ...);
- __printf(1, 2)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index b48e24629fa4..7ff11cba89cf 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4516,15 +4516,17 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
- 
- 	bt_dev_dbg(hdev, "SCO connected with air mode: %02x", ev->air_mode);
- 
--	switch (ev->air_mode) {
--	case 0x02:
--		if (hdev->notify)
--			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
--		break;
--	case 0x03:
--		if (hdev->notify)
--			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_TRANSP);
--		break;
-+	if (conn->codec.data_path == BT_SCO_HCI_PATH) {
-+		switch (ev->air_mode) {
-+		case 0x02:
-+			if (hdev->notify)
-+				hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
-+			break;
-+		case 0x03:
-+			if (hdev->notify)
-+				hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_TRANSP);
-+			break;
-+		}
- 	}
- 
- 	hci_connect_cfm(conn, ev->status);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 004bce2b5eca..f35c12ca6aa5 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -506,7 +506,7 @@ static struct sock *sco_sock_alloc(struct net *net, struct socket *sock,
- 	sco_pi(sk)->codec.id = CODING_FORMAT_CVSD;
- 	sco_pi(sk)->codec.cid = 0xffff;
- 	sco_pi(sk)->codec.vid = 0xffff;
--	sco_pi(sk)->codec.data_path = 0x00;
-+	sco_pi(sk)->codec.data_path = BT_SCO_HCI_PATH;
- 
- 	bt_sock_link(&sco_sk_list, sk);
- 	return sk;
--- 
-2.17.1
+Marcel
 
