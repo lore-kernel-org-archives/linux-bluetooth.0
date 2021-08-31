@@ -2,105 +2,81 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2BDAEC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:31:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF0AFC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:55:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DFF761041
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:31:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B3C061041
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 12:55:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231266AbhHaMcD convert rfc822-to-8bit (ORCPT
+        id S231304AbhHaM4A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Aug 2021 08:32:03 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60540 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231134AbhHaMcC (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Aug 2021 08:32:02 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0EDE0CECDA;
-        Tue, 31 Aug 2021 14:31:06 +0200 (CEST)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH 1/2] Bluetooth: btusb: Support public address
- configuration for MediaTek Chip.
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <SL2PR03MB4457513693916CBA07BE450BB3CC9@SL2PR03MB4457.apcprd03.prod.outlook.com>
-Date:   Tue, 31 Aug 2021 14:31:05 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Sean Wang <Sean.Wang@mediatek.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-mediatek@lists.infradead.org" 
-        <linux-mediatek@lists.infradead.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "michaelfsun@google.com" <michaelfsun@google.com>,
-        "mcchou@chromium.org" <mcchou@chromium.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <51A4788D-DDFD-4700-9D50-84F37ADD4883@holtmann.org>
-References: <20210824154430.27689-1-mark-yw.chen@mediatek.com>
- <CF258C9C-BB3C-4C10-88B0-F6F3A03303D5@holtmann.org>
- <SL2PR03MB4457513693916CBA07BE450BB3CC9@SL2PR03MB4457.apcprd03.prod.outlook.com>
-To:     =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Tue, 31 Aug 2021 08:56:00 -0400
+Received: from mga17.intel.com ([192.55.52.151]:2326 "EHLO mga17.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229625AbhHaMz7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 31 Aug 2021 08:55:59 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10092"; a="198700647"
+X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
+   d="scan'208";a="198700647"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 05:55:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
+   d="scan'208";a="509929053"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orsmga001.jf.intel.com with ESMTP; 31 Aug 2021 05:54:59 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        tedd.an@intel.com, luiz.von.dentz@intel.com,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH v2 1/2] Bluetooth: btintel: Fix boot address
+Date:   Tue, 31 Aug 2021 18:30:04 +0530
+Message-Id: <20210831130005.4920-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mark,
+Cache Boot address present in firmware file which
+is later used in Intel_Soft_Reset command to bring
+controller from boot mode to operational mode.
 
->>> The MediaTek chip support vendor specific HCI command(0xfc1a) to
->>> change the public address. Add hdev->set_bdaddr handler for MediaTek
->>> Chip.
->>> 
->>> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
->>> ---
->>> drivers/bluetooth/btusb.c | 18 ++++++++++++++++++
->>> 1 file changed, 18 insertions(+)
->>> 
->>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>> index 60d2fce59a71..41e7c9f28d82 100644
->>> --- a/drivers/bluetooth/btusb.c
->>> +++ b/drivers/bluetooth/btusb.c
->>> @@ -2200,6 +2200,23 @@ struct btmtk_section_map {
->>> 	};
->>> } __packed;
->>> 
->>> +static int btusb_set_bdaddr_mtk(struct hci_dev *hdev, const bdaddr_t
->>> +*bdaddr) {
->>> +	struct sk_buff *skb;
->>> +	long ret;
->>> +
->>> +	skb = __hci_cmd_sync(hdev, 0xfc1a, sizeof(bdaddr), bdaddr,
->> HCI_INIT_TIMEOUT);
->>> +	if (IS_ERR(skb)) {
->>> +		ret = PTR_ERR(skb);
->>> +		bt_dev_err(hdev, "changing Mediatek device address failed
->> (%ld)",
->>> +			   ret);
->>> +		return ret;
->>> +	}
->>> +	kfree_skb(skb);
->>> +
->>> +	return 0;
->>> +}
->>> +
->> 
->> this is not a permanent change, correct? Meaning a power cycle will bring back
->> the original BD_ADDR?
->> 
-> 
-> Yes, it's not a permanent change.
-> After doing a power cycle or Mediatek specific Bluetooth reset, Mediatek Chips will bring back the original  BD_ADDRESS.
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
 
-ok, good. Then please re-submit against latest bluetooth-next tree. Unfortunately current patch doesn’t apply anymore.
+Notes:
+    * changes in v2:
+     - move reading of boot address to seprate patch
+    
+    * changes in v1:
+     - cache boot address
+     - read boot address irrespective of mode
 
-Regards
+ drivers/bluetooth/btintel.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Marcel
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 778d803159f3..14360370a2ac 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -1037,8 +1037,9 @@ static bool btintel_firmware_version(struct hci_dev *hdev,
+ 
+ 			params = (void *)(fw_ptr + sizeof(*cmd));
+ 
+-			bt_dev_info(hdev, "Boot Address: 0x%x",
+-				    le32_to_cpu(params->boot_addr));
++			*boot_addr = le32_to_cpu(params->boot_addr);
++
++			bt_dev_info(hdev, "Boot Address: 0x%x", *boot_addr);
+ 
+ 			bt_dev_info(hdev, "Firmware Version: %u-%u.%u",
+ 				    params->fw_build_num, params->fw_build_ww,
+-- 
+2.17.1
 
