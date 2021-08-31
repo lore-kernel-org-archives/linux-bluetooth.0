@@ -7,35 +7,35 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3750BC4320E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63D41C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 18EB160FED
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43C5A60FED
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 31 Aug 2021 11:51:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241604AbhHaLwZ (ORCPT
+        id S241605AbhHaLw1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 31 Aug 2021 07:52:25 -0400
+        Tue, 31 Aug 2021 07:52:27 -0400
 Received: from mga02.intel.com ([134.134.136.20]:36804 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241583AbhHaLwY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 31 Aug 2021 07:52:24 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10092"; a="205674723"
+        id S232238AbhHaLw1 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 31 Aug 2021 07:52:27 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10092"; a="205674731"
 X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="205674723"
+   d="scan'208";a="205674731"
 Received: from fmsmga008.fm.intel.com ([10.253.24.58])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 04:51:29 -0700
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Aug 2021 04:51:32 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.84,366,1620716400"; 
-   d="scan'208";a="498264532"
+   d="scan'208";a="498264542"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga008.fm.intel.com with ESMTP; 31 Aug 2021 04:51:28 -0700
+  by fmsmga008.fm.intel.com with ESMTP; 31 Aug 2021 04:51:31 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Kiran K <kiran.k@intel.com>
-Subject: [PATCH v13 08/12] Bluetooth: Configure codec for HFP offload use case
-Date:   Tue, 31 Aug 2021 17:26:33 +0530
-Message-Id: <20210831115637.6713-8-kiran.k@intel.com>
+Subject: [PATCH v13 10/12] Bluetooth: Add support for msbc coding format
+Date:   Tue, 31 Aug 2021 17:26:35 +0530
+Message-Id: <20210831115637.6713-10-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210831115637.6713-1-kiran.k@intel.com>
 References: <20210831115637.6713-1-kiran.k@intel.com>
@@ -43,145 +43,79 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-For HFP offload use case, codec needs to be configured
-before opening SCO connection. This patch sends
-HCI_CONFIGURE_DATA_PATH command to configure doec before
-opening SCO connection.
+In Enhanced_Setup_Synchronous_Command, add support for msbc
+coding format
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
+Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
 
 Notes:
-    * changes in v13(new patch):
-     - Configure codec for HFP use case before opening
-       SCO connection
+    * changes in v13:
+     - No changes
+    
+    * changes in v12:
+      - No change
+    
+    * changes in v11:
+      - Remove Kconfig
+    
+    * changes on v10:
+      - Fix typos and unwanted chunks
 
- include/net/bluetooth/hci.h      |  8 ++++++
- include/net/bluetooth/hci_core.h |  3 ++
- net/bluetooth/hci_conn.c         |  4 +++
- net/bluetooth/hci_request.c      | 47 ++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h      |  2 ++
- 5 files changed, 64 insertions(+)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/hci_conn.c          | 25 +++++++++++++++++++++++++
+ 2 files changed, 26 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3426ee4f0fa5..6def7a0fd5b7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1286,6 +1286,14 @@ struct hci_rp_read_local_oob_ext_data {
- 	__u8     rand256[16];
- } __packed;
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index f2df8bb108d9..c1fa90fb7502 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -175,6 +175,7 @@ struct bt_codecs {
  
-+#define HCI_CONFIGURE_DATA_PATH	0x0c83
-+struct hci_op_configure_data_path {
-+	__u8	direction;
-+	__u8	data_path_id;
-+	__u8	vnd_len;
-+	__u8	vnd_data[];
-+} __packed;
-+
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
- struct hci_rp_read_local_version {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fdfdd3bdde16..4c6485ac3e2c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -620,6 +620,9 @@ struct hci_dev {
- 	bool (*prevent_wake)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
- 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
-+	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
-+				     struct bt_codec *codec, __u8 *vnd_len,
-+				     __u8 **vnd_data);
- };
+ #define CODING_FORMAT_CVSD		0x02
+ #define CODING_FORMAT_TRANSPARENT	0x03
++#define CODING_FORMAT_MSBC		0x05
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
 diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9c61fc9ff89..43baadf5ec3e 100644
+index 43baadf5ec3e..4dcf845db40e 100644
 --- a/net/bluetooth/hci_conn.c
 +++ b/net/bluetooth/hci_conn.c
-@@ -315,6 +315,10 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
+@@ -332,6 +332,31 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
+ 	cp.rx_bandwidth   = cpu_to_le32(0x00001f40);
  
- 	bt_dev_dbg(hdev, "hcon %p", conn);
- 
-+	/* for offload use case, codec needs to configured before opening SCO */
-+	if (conn->codec.data_path)
-+		hci_req_configure_datapath(hdev, &conn->codec);
+ 	switch (conn->codec.id) {
++	case CODING_FORMAT_MSBC:
++		if (!find_next_esco_param(conn, esco_param_msbc,
++					  ARRAY_SIZE(esco_param_msbc)))
++			return false;
 +
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
- 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index f15626607b2d..47fb665277d4 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -3327,6 +3327,53 @@ bool hci_req_stop_discovery(struct hci_request *req)
- 	return ret;
- }
- 
-+static void config_data_path_complete(struct hci_dev *hdev, u8 status,
-+				      u16 opcode)
-+{
-+	bt_dev_dbg(hdev, "status %u", status);
-+}
-+
-+int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec)
-+{
-+	struct hci_request req;
-+	int err;
-+	__u8 vnd_len, *vnd_data = NULL;
-+	struct hci_op_configure_data_path *cmd = NULL;
-+
-+	hci_req_init(&req, hdev);
-+
-+	err = hdev->get_codec_config_data(hdev, ESCO_LINK, codec, &vnd_len,
-+					  &vnd_data);
-+	if (err < 0)
-+		goto error;
-+
-+	cmd = kzalloc(sizeof(*cmd) + vnd_len, GFP_KERNEL);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	err = hdev->get_data_path_id(hdev, &cmd->data_path_id);
-+	if (err < 0)
-+		goto error;
-+
-+	cmd->vnd_len = vnd_len;
-+	memcpy(cmd->vnd_data, vnd_data, vnd_len);
-+
-+	cmd->direction = 0x00;
-+	hci_req_add(&req, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + vnd_len, cmd);
-+
-+	cmd->direction = 0x01;
-+	hci_req_add(&req, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + vnd_len, cmd);
-+
-+	err = hci_req_run(&req, config_data_path_complete);
-+error:
-+
-+	kfree(cmd);
-+	kfree(vnd_data);
-+	return err;
-+}
-+
- static int stop_discovery(struct hci_request *req, unsigned long opt)
- {
- 	hci_dev_lock(req->hdev);
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 39ee8a18087a..aaf608720243 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -101,6 +101,8 @@ void __hci_req_update_class(struct hci_request *req);
- /* Returns true if HCI commands were queued */
- bool hci_req_stop_discovery(struct hci_request *req);
- 
-+int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec);
-+
- static inline void hci_req_update_scan(struct hci_dev *hdev)
- {
- 	queue_work(hdev->req_workqueue, &hdev->scan_update);
++		param = &esco_param_msbc[conn->attempt - 1];
++		cp.tx_coding_format.id = 0x05;
++		cp.rx_coding_format.id = 0x05;
++		cp.tx_codec_frame_size = __cpu_to_le16(60);
++		cp.rx_codec_frame_size = __cpu_to_le16(60);
++		cp.in_bandwidth = __cpu_to_le32(32000);
++		cp.out_bandwidth = __cpu_to_le32(32000);
++		cp.in_coding_format.id = 0x04;
++		cp.out_coding_format.id = 0x04;
++		cp.in_coded_data_size = __cpu_to_le16(16);
++		cp.out_coded_data_size = __cpu_to_le16(16);
++		cp.in_pcm_data_format = 2;
++		cp.out_pcm_data_format = 2;
++		cp.in_pcm_sample_payload_msb_pos = 0;
++		cp.out_pcm_sample_payload_msb_pos = 0;
++		cp.in_data_path = conn->codec.data_path;
++		cp.out_data_path = conn->codec.data_path;
++		cp.in_transport_unit_size = 1;
++		cp.out_transport_unit_size = 1;
++		break;
+ 	case CODING_FORMAT_TRANSPARENT:
+ 		if (!find_next_esco_param(conn, esco_param_msbc,
+ 					  ARRAY_SIZE(esco_param_msbc)))
 -- 
 2.17.1
 
