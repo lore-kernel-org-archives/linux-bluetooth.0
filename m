@@ -2,99 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38A85C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Sep 2021 08:00:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EB6DC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Sep 2021 17:34:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1E4176103A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Sep 2021 08:00:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0EA8C60FD7
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Sep 2021 17:34:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242827AbhIAIBd (ORCPT
+        id S1344410AbhIARfU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Sep 2021 04:01:33 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:55638 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242777AbhIAIBb (ORCPT
+        Wed, 1 Sep 2021 13:35:20 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:44761 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1344192AbhIARfT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Sep 2021 04:01:31 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 805A4CECEF;
-        Wed,  1 Sep 2021 10:00:33 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: btusb: btrtl: Add the new support ID for
- Realtek RTL8852A
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210901074845.1000-1-max.chou@realtek.com>
-Date:   Wed, 1 Sep 2021 10:00:32 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        matthias.bgg@gmail.com,
-        "open list:BLUETOOTH SUBSYSTEM" <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-arm-kernel@lists.infradead.org,
-        linux-mediatek@lists.infradead.org, alex_lu@realsil.com.cn,
-        hildawu@realtek.com, christian.bauer1.external@fujitsu.com
-Content-Transfer-Encoding: 7bit
-Message-Id: <83B481E5-389E-423F-A948-DCEEC94C0618@holtmann.org>
-References: <20210901074845.1000-1-max.chou@realtek.com>
-To:     Max Chou <max.chou@realtek.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Wed, 1 Sep 2021 13:35:19 -0400
+Received: by mail-io1-f72.google.com with SMTP id d15-20020a0566022befb02905b2e9040807so16601ioy.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Sep 2021 10:34:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
+         :from:to;
+        bh=srJXkmAF+nWxT8ylL4FoVSjjMIocddytugD8qbgQiqA=;
+        b=fDoA5zA5sFweUaYeBkmy39REB3XPQQclB+mqpElp7rbHEyUZz9IylelOCLFNNDW8T8
+         U1uxaXj7WXOK22tHyWvHVMP2iCTEsbyn65dBbquhghGJBwQg9542KAgNmZVQhyftmJmp
+         dSREqck7BzK9Buob4APuweLI0Ie2xNWXJEYK5Lyk3L+KfxBiBCwYHKUPMCr1UrgG5Yeo
+         ilUG88u3Ta2VeSAHNYLe+mKXh4BdEnppXDIpig3P7lpr6ov794VDHEZa023mjx9XLDw/
+         YeUHHmUJ+d9t3Lb8IJlKY71MLB1YCMo336xnxaiYGBConZ8fDRSckHqI/yP4nd+/yZtR
+         bQ+w==
+X-Gm-Message-State: AOAM531rN0kMAbeoVEOcnWP5ohEmnoWR2E0nVNUSv2B9QKKoAaxfwcZ6
+        3P2QX+5aANHdRh0TmQF0WtxFey/oORFFPnbgPj80D2Cs8fBj
+X-Google-Smtp-Source: ABdhPJysO4SrV5NdATT56CNymcoOrBjFyk6PjVpycBli2j2+fHNftPLkUCbG4hrSOTHJKEXG1AGQ0ASSyLp0wuvGMVhBvkYHyX+f
+MIME-Version: 1.0
+X-Received: by 2002:a05:6e02:1d9c:: with SMTP id h28mr466630ila.266.1630517661979;
+ Wed, 01 Sep 2021 10:34:21 -0700 (PDT)
+Date:   Wed, 01 Sep 2021 10:34:21 -0700
+In-Reply-To: <000000000000b1c39505c99bd67c@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000000ada7405caf27aba@google.com>
+Subject: Re: [syzbot] INFO: task can't die in __lock_sock
+From:   syzbot <syzbot+7d51f807c81b190a127d@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, desmondcheongzx@gmail.com,
+        johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Max,
+syzbot has found a reproducer for the following issue on:
 
-> Add the new support ID(0x04c5, 0x165c) to usb_device_id table for
-> Realtek RTL8852A.
-> 
-> The device info from /sys/kernel/debug/usb/devices as below.
-> 
-> T:  Bus=01 Lev=01 Prnt=01 Port=05 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=04c5 ProdID=165c Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Max Chou <max.chou@realtek.com>
-> Reviewed-by: Christian Bauer <christian.bauer1.external@fujitsu.com>
-> ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+HEAD commit:    c1b13fe76e95 Add linux-next specific files for 20210901
+git tree:       linux-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=12c6034d300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e2afff7bc32736e5
+dashboard link: https://syzkaller.appspot.com/bug?extid=7d51f807c81b190a127d
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=14d42469300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1107d815300000
 
-patch has been applied to bluetooth-next tree.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+7d51f807c81b190a127d@syzkaller.appspotmail.com
 
-Regards
+INFO: task syz-executor157:6562 blocked for more than 143 seconds.
+      Not tainted 5.14.0-next-20210901-syzkaller #0
+"echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disables this message.
+task:syz-executor157 state:D stack:26880 pid: 6562 ppid:  6530 flags:0x00004006
+Call Trace:
+ context_switch kernel/sched/core.c:4955 [inline]
+ __schedule+0x940/0x26f0 kernel/sched/core.c:6302
+ schedule+0xd3/0x270 kernel/sched/core.c:6381
+ __lock_sock+0x13d/0x260 net/core/sock.c:2644
+ lock_sock_nested+0xf6/0x120 net/core/sock.c:3185
+ lock_sock include/net/sock.h:1612 [inline]
+ rfcomm_sk_state_change+0xb4/0x390 net/bluetooth/rfcomm/sock.c:73
+ __rfcomm_dlc_close+0x1b6/0x8a0 net/bluetooth/rfcomm/core.c:489
+ rfcomm_dlc_close+0x1ea/0x240 net/bluetooth/rfcomm/core.c:520
+ __rfcomm_sock_close+0xac/0x260 net/bluetooth/rfcomm/sock.c:220
+ rfcomm_sock_shutdown+0xe9/0x210 net/bluetooth/rfcomm/sock.c:931
+ rfcomm_sock_release+0x5f/0x140 net/bluetooth/rfcomm/sock.c:951
+ __sock_release+0xcd/0x280 net/socket.c:649
+ sock_close+0x18/0x20 net/socket.c:1314
+ __fput+0x288/0x9f0 fs/file_table.c:280
+ task_work_run+0xdd/0x1a0 kernel/task_work.c:164
+ exit_task_work include/linux/task_work.h:32 [inline]
+ do_exit+0xbae/0x2a30 kernel/exit.c:825
+ do_group_exit+0x125/0x310 kernel/exit.c:922
+ get_signal+0x47f/0x2160 kernel/signal.c:2868
+ arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:865
+ handle_signal_work kernel/entry/common.c:148 [inline]
+ exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
+ exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:209
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:291 [inline]
+ syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:302
+ do_syscall_64+0x42/0xb0 arch/x86/entry/common.c:86
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x445fe9
+RSP: 002b:00007fff85049fe8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: fffffffffffffffc RBX: 0000000000000003 RCX: 0000000000445fe9
+RDX: 0000000000000080 RSI: 0000000020000000 RDI: 0000000000000004
+RBP: 0000000000000003 R08: 000000ff00000001 R09: 000000ff00000001
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000014112b8
+R13: 0000000000000072 R14: 00007fff8504a040 R15: 0000000000000003
 
-Marcel
+Showing all locks held in the system:
+1 lock held by khungtaskd/26:
+ #0: ffffffff8b97fbe0 (rcu_read_lock){....}-{1:2}, at: debug_show_all_locks+0x53/0x260 kernel/locking/lockdep.c:6446
+1 lock held by krfcommd/2876:
+ #0: ffffffff8d31ede8 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_process_sessions net/bluetooth/rfcomm/core.c:1979 [inline]
+ #0: ffffffff8d31ede8 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_run+0x2ed/0x4a20 net/bluetooth/rfcomm/core.c:2086
+1 lock held by in:imklog/6232:
+4 locks held by syz-executor157/6562:
+ #0: ffff888145e26210 (&sb->s_type->i_mutex_key#13){+.+.}-{3:3}, at: inode_lock include/linux/fs.h:786 [inline]
+ #0: ffff888145e26210 (&sb->s_type->i_mutex_key#13){+.+.}-{3:3}, at: __sock_release+0x86/0x280 net/socket.c:648
+ #1: ffff88801d622120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1612 [inline]
+ #1: ffff88801d622120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: rfcomm_sock_shutdown+0x54/0x210 net/bluetooth/rfcomm/sock.c:928
+ #2: ffffffff8d31ede8 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_dlc_close+0x34/0x240 net/bluetooth/rfcomm/core.c:507
+ #3: ffff88807edd9928 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x162/0x8a0 net/bluetooth/rfcomm/core.c:487
+
+=============================================
+
+NMI backtrace for cpu 1
+CPU: 1 PID: 26 Comm: khungtaskd Not tainted 5.14.0-next-20210901-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ nmi_cpu_backtrace.cold+0x47/0x144 lib/nmi_backtrace.c:105
+ nmi_trigger_cpumask_backtrace+0x1ae/0x220 lib/nmi_backtrace.c:62
+ trigger_all_cpu_backtrace include/linux/nmi.h:146 [inline]
+ check_hung_uninterruptible_tasks kernel/hung_task.c:254 [inline]
+ watchdog+0xcb7/0xed0 kernel/hung_task.c:339
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+Sending NMI from CPU 1 to CPUs 0:
+NMI backtrace for cpu 0
+CPU: 0 PID: 2958 Comm: systemd-journal Not tainted 5.14.0-next-20210901-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:check_kcov_mode kernel/kcov.c:163 [inline]
+RIP: 0010:__sanitizer_cov_trace_pc+0x7/0x60 kernel/kcov.c:197
+Code: fd ff ff b9 ff ff ff ff ba 08 00 00 00 4d 8b 03 48 0f bd ca 49 8b 45 00 48 63 c9 e9 64 ff ff ff 0f 1f 00 65 8b 05 39 e6 8b 7e <89> c1 48 8b 34 24 81 e1 00 01 00 00 65 48 8b 14 25 40 f0 01 00 a9
+RSP: 0018:ffffc900014dfde0 EFLAGS: 00000282
+RAX: 0000000080000000 RBX: ffffc900014dff58 RCX: 1ffff9200029bfc7
+RDX: dffffc0000000000 RSI: 1ffff9200029bfcd RDI: ffffc900014dfe38
+RBP: 0000000000000000 R08: 0000000000000000 R09: ffffffff8176c71a
+R10: ffffffff81765c97 R11: 0000000000000002 R12: 0000000000000053
+R13: 0000000000000002 R14: 0000000000000000 R15: ffffc900014dfe30
+FS:  00007f43756768c0(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4372a49000 CR3: 000000001a5d4000 CR4: 00000000001506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ get_current arch/x86/include/asm/current.h:15 [inline]
+ seccomp_run_filters kernel/seccomp.c:402 [inline]
+ __seccomp_filter+0x88/0x1040 kernel/seccomp.c:1180
+ __secure_computing+0xfc/0x360 kernel/seccomp.c:1311
+ syscall_trace_enter.constprop.0+0x94/0x270 kernel/entry/common.c:68
+ do_syscall_64+0x16/0xb0 arch/x86/entry/common.c:76
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7f4374931687
+Code: 00 b8 ff ff ff ff c3 0f 1f 40 00 48 8b 05 09 d8 2b 00 64 c7 00 5f 00 00 00 b8 ff ff ff ff c3 0f 1f 40 00 b8 53 00 00 00 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d e1 d7 2b 00 f7 d8 64 89 01 48
+RSP: 002b:00007ffc79978938 EFLAGS: 00000293 ORIG_RAX: 0000000000000053
+RAX: ffffffffffffffda RBX: 00007ffc7997b850 RCX: 00007f4374931687
+RDX: 00007f43753a2a00 RSI: 00000000000001ed RDI: 00005646c59898a0
+RBP: 00007ffc79978970 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000069 R11: 0000000000000293 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007ffc7997b850 R15: 00007ffc79978e60
+----------------
+Code disassembly (best guess), 3 bytes skipped:
+   0:	b9 ff ff ff ff       	mov    $0xffffffff,%ecx
+   5:	ba 08 00 00 00       	mov    $0x8,%edx
+   a:	4d 8b 03             	mov    (%r11),%r8
+   d:	48 0f bd ca          	bsr    %rdx,%rcx
+  11:	49 8b 45 00          	mov    0x0(%r13),%rax
+  15:	48 63 c9             	movslq %ecx,%rcx
+  18:	e9 64 ff ff ff       	jmpq   0xffffff81
+  1d:	0f 1f 00             	nopl   (%rax)
+  20:	65 8b 05 39 e6 8b 7e 	mov    %gs:0x7e8be639(%rip),%eax        # 0x7e8be660
+* 27:	89 c1                	mov    %eax,%ecx <-- trapping instruction
+  29:	48 8b 34 24          	mov    (%rsp),%rsi
+  2d:	81 e1 00 01 00 00    	and    $0x100,%ecx
+  33:	65 48 8b 14 25 40 f0 	mov    %gs:0x1f040,%rdx
+  3a:	01 00
+  3c:	a9                   	.byte 0xa9
 
