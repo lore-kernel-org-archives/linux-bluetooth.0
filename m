@@ -7,68 +7,69 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F5EAC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:50:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D576C4320E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1AD80610CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:50:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 56A6260698
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1343502AbhIBKvY (ORCPT
+        id S1343571AbhIBKwD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 06:51:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54252 "EHLO
+        Thu, 2 Sep 2021 06:52:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54264 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245446AbhIBKvC (ORCPT
+        with ESMTP id S245589AbhIBKvG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 06:51:02 -0400
+        Thu, 2 Sep 2021 06:51:06 -0400
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A040AC061575
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:04 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id j11-20020a0cf9cb000000b00375f0642d2dso1212041qvo.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6425AC061757
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:08 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id bp12-20020a05621407ec00b003773f981838so1175804qvb.22
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=3ksNWHZuL+bw9XLqlzjnelxqMppLfnVN/hj4E1qDLm4=;
-        b=ccLcxrWfQZnZUnJXItKXSde69z9zcVVrDXYeOReIEWeNU8ZYIJrAiLnJLaLeABjX/d
-         a5fMXm2Zeppn2ambWVLXnZquSbFVd1lvp83MnxdTVla+x//DpGkIRWFr+zlvNNRZpBG8
-         guwwh2m7X06y/mNWfj1zUypqV9fUL1EeQtttBuC5S/HoNGQhG9YVl84US5NUR7kmqHAc
-         Y5ROPhnaemuzk1Kp2z6ncyc748nhxar503NO1TSPJBpsvFWWatUGCrxvJRYapQ0CySJv
-         y2FBaHJegF6omvNmyTRSOYcRcxux/clLQfPlwUot5Br68x3zPvRR8h9OmdNkzMc1GXS3
-         ah1Q==
+         :cc:content-transfer-encoding;
+        bh=7M7qBIJcgQTJvm+S9pP4nDvV2Qnf3gQdrRAAjjAse7Q=;
+        b=toFULGtMH+1PsFoObLVQX218QPX8myCnP0xV3AUNrLD4aE+U2FxLtLSZWeuYbKnmCg
+         GPxpCcuGx9MC4IskikLuQ5CjI+LYYhUXKOdEC2qZqzeo2eEDHamOs7sgVJkqFIV/l5tz
+         887HGmCKcAwfgrxvqWaycy/amEL1QSgQNqtZz0eA1gp1M/rJwNfA2DK5Lz5ZFRE2PfIH
+         Q6c5T8ve7V2oVi5x+4WpGud6xyxMSidLfOWR1OC+a95yx9SDui17L2p+hJTjxgQX9ZJ7
+         rVFdYaqMN5eWA3XxdcRkY4V05s6ABJtrP0pu7oU3X94kCbkiGdDhn+9SxJJFxdP71Egk
+         bU9Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=3ksNWHZuL+bw9XLqlzjnelxqMppLfnVN/hj4E1qDLm4=;
-        b=VRhkQu3cw/4Oo0ZaTZUWpL6WmQXa8DPcSKg9HSyk/6eFFvZS8TApoJaVqpYVouxsoC
-         bHvfhX1LmzGsZ+MwXaTKxnfdD5likeAIWFDb6i98Q1V3TwDJmKg9RVYGGULeNUdGZIIc
-         er3e08GiYC3lvHXGWSg6HFgrWozyP842h+73FDnV9JzwhmXJ2iTwCRZAB9G9SnRaTLvM
-         /ZU4KOmaPYtKtTb5ZFdEa5M14KS7SOi7dw46p8+DIYVF55mqoaW1uGq+M7OV8v8JCVZ1
-         okV7mFF+aLw/tMvTcLp23NPVjtJDMk5EbuhZhtlMhsId04JsbP+7cDHT/Ltye1UtkTfe
-         QnDQ==
-X-Gm-Message-State: AOAM5306YU10MW2C488vAWmAlZP82OFgOuK4hACZkx/iKU1wdZEItE7Q
-        GuEIu/ipPPuz3r5w67Np9z4KH9Gzz/IIbDo6tPPDOWaND/txHcv3l11+d0e1acLHlYc6jdsTvL9
-        ceZymILHmiyoj9uc2JyQQhM+0fveH29VSRijgLR9+Qz/IUyOJZ5xpB0qaUMqVmUU0xvrOxyu89g
-        yd
-X-Google-Smtp-Source: ABdhPJwe/YMA0lzfYmVhCeukegYEWXSjrJ9QRoC9SQGnmeaVCooJj4kqFQqbayegH/ZWYhzl+4qCgPGhvGAA
+         :references:subject:from:to:cc:content-transfer-encoding;
+        bh=7M7qBIJcgQTJvm+S9pP4nDvV2Qnf3gQdrRAAjjAse7Q=;
+        b=LGooSu/AxaB7RlD7JrqeH5kQxsFoU2RIAzUStR7wI1+HiZR+uccvWKuRK+v3l3y5jB
+         pe75cEz3Ylc1uAOBMqRl+gvDAPCwp9ib0oZ912LCwWftyZuUa0YuqCMJiRk4Pf2tIl5+
+         J0OA97Zoq+j4fk8egbS9OuH5wWht1JotdN3k/qQjWlBrXvToRKa9MzXRB6KFPmwJkgp/
+         CnQWd/aDzImR9EwPwrqpJv8siW4hIbiPhqIZ5lrCe6mV8kvPPb/v42XPISxCIgxHqAD8
+         x3cv5gNekmPy0JwZ8/JYYLLVN5aCbTcZrbE2zL7fqmWLR7JIJvg9wqnzDNDG+Ea9Qn81
+         9dgg==
+X-Gm-Message-State: AOAM531ZlHFw7qwivUNWnBSFoJoHYMjFBH2KSzmi+NeTDc8V8Pvq4Uea
+        cWGIctwaUl5SkYSzGKult3N6MwffSHDmReQ3IPtkFFWaReCkYYI3v4VW+1AwCUF7Vp59mi0UEHV
+        cWQYJ7Epxn5AM4ZWFM0sgVoDa4o5H/pSDE7LoAPz1nJWJPMyZHUTNc9zvfZRhk0J99btCFvjdLc
+        SW
+X-Google-Smtp-Source: ABdhPJxmaOGuaL9X7VeKNV4g21VXR07cZkesoVjJS6+T+36RTAxyIrAKYtQt0qTVHn4jl8e9YAJZ1IbqDbWr
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:5249:e81c:3ce6:f50c])
- (user=apusaka job=sendgmr) by 2002:a05:6214:38c:: with SMTP id
- l12mr2176567qvy.57.1630579803799; Thu, 02 Sep 2021 03:50:03 -0700 (PDT)
-Date:   Thu,  2 Sep 2021 18:49:29 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:e509:: with SMTP id
+ l9mr2552170qvm.36.1630579807515; Thu, 02 Sep 2021 03:50:07 -0700 (PDT)
+Date:   Thu,  2 Sep 2021 18:49:30 +0800
 In-Reply-To: <20210902104938.824737-1-apusaka@google.com>
-Message-Id: <20210902184744.Bluez.v3.3.Iaa507a7e5c90b0ded462cac1363fce9ea916214e@changeid>
+Message-Id: <20210902184744.Bluez.v3.4.Idde74d908204ede645812e49623e367d27c50e58@changeid>
 Mime-Version: 1.0
 References: <20210902104938.824737-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [Bluez PATCH v3 03/12] monitor: Inclusive language changes
+Subject: [Bluez PATCH v3 04/12] emulator: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
         Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
@@ -77,7 +78,7 @@ From: Archie Pusaka <apusaka@chromium.org>
 
 BT core spec 5.3 promotes the usage of inclusive languages.
 This CL replaces some terms with the more appropriate counterparts,
-such as "central", "peripheral", "link key", and "accept list"
+such as "central", "peripheral", and "accept list".
 ---
 
 (no changes since v2)
@@ -85,1815 +86,1084 @@ such as "central", "peripheral", "link key", and "accept list"
 Changes in v2:
 * Merging several patches from the same directory into one
 
- emulator/btdev.c    |  58 +++----
- emulator/le.c       |  32 ++--
- emulator/smp.c      |   8 +-
- monitor/broadcom.c  |   8 +-
- monitor/bt.h        | 150 ++++++++--------
- monitor/control.c   |  10 +-
- monitor/l2cap.c     |  10 +-
- monitor/ll.c        |  60 ++++---
- monitor/lmp.c       |   2 +-
- monitor/packet.c    | 411 ++++++++++++++++++++++----------------------
- tools/3dsp.c        |  33 ++--
- tools/hci-tester.c  |   4 +-
- tools/mgmt-tester.c |   4 +-
- 13 files changed, 400 insertions(+), 390 deletions(-)
+ android/tester-main.c |   2 +-
+ emulator/btdev.c      | 148 +++++++++++++++++++++---------------------
+ emulator/hciemu.c     |  21 +++---
+ emulator/hciemu.h     |  12 ++--
+ emulator/le.c         |  84 ++++++++++++------------
+ emulator/serial.c     |   6 +-
+ tools/l2cap-tester.c  |  16 ++---
+ tools/mgmt-tester.c   |  20 +++---
+ tools/rfcomm-tester.c |   4 +-
+ tools/sco-tester.c    |   2 +-
+ tools/smp-tester.c    |   6 +-
+ 11 files changed, 161 insertions(+), 160 deletions(-)
 
+diff --git a/android/tester-main.c b/android/tester-main.c
+index 2bfa770bb5..ff5ecdf834 100644
+--- a/android/tester-main.c
++++ b/android/tester-main.c
+@@ -2786,7 +2786,7 @@ void emu_remote_connect_hci_action(void)
+ 	struct step *step =3D g_new0(struct step, 1);
+ 	const uint8_t *master_addr;
+=20
+-	master_addr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_addr =3D hciemu_get_central_bdaddr(data->hciemu);
+=20
+ 	tester_print("Trying to connect hci");
+=20
 diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 52c2b576d2..343c065760 100644
+index 343c065760..669174862b 100644
 --- a/emulator/btdev.c
 +++ b/emulator/btdev.c
-@@ -3568,11 +3568,11 @@ static int cmd_le_create_conn_complete(struct btdev *dev, const void *data,
- 
- static int cmd_read_wl_size(struct btdev *dev, const void *data, uint8_t len)
+@@ -33,7 +33,7 @@
+ #include "monitor/bt.h"
+ #include "btdev.h"
+=20
+-#define WL_SIZE			16
++#define AL_SIZE			16
+ #define RL_SIZE			16
+ #define CIS_SIZE		3
+=20
+@@ -61,7 +61,7 @@ struct btdev_conn {
+ 	struct btdev_conn *link;
+ };
+=20
+-struct btdev_wl {
++struct btdev_al {
+ 	uint8_t type;
+ 	bdaddr_t addr;
+ };
+@@ -191,7 +191,7 @@ struct btdev {
+ 	} __attribute__ ((packed)) le_cig;
+ 	uint8_t  le_iso_path[2];
+=20
+-	struct btdev_wl le_wl[WL_SIZE];
++	struct btdev_al le_al[AL_SIZE];
+ 	struct btdev_rl le_rl[RL_SIZE];
+ 	uint8_t  le_rl_enable;
+ 	uint16_t le_rl_timeout;
+@@ -445,18 +445,18 @@ static int cmd_set_event_mask(struct btdev *dev, cons=
+t void *data, uint8_t len)
+ 	return 0;
+ }
+=20
+-static void wl_reset(struct btdev_wl *wl)
++static void al_reset(struct btdev_al *al)
  {
--	struct bt_hci_rsp_le_read_white_list_size rsp;
-+	struct bt_hci_rsp_le_read_accept_list_size rsp;
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
- 	rsp.size = WL_SIZE;
--	cmd_complete(dev, BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE, &rsp,
-+	cmd_complete(dev, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, &rsp,
+-	wl->type =3D 0xff;
+-	bacpy(&wl->addr, BDADDR_ANY);
++	al->type =3D 0xff;
++	bacpy(&al->addr, BDADDR_ANY);
+ }
+=20
+-static void wl_clear(struct btdev *dev)
++static void al_clear(struct btdev *dev)
+ {
+ 	int i;
+=20
+-	for (i =3D 0; i < WL_SIZE; i++)
+-		wl_reset(&dev->le_wl[i]);
++	for (i =3D 0; i < AL_SIZE; i++)
++		al_reset(&dev->le_al[i]);
+ }
+=20
+ static void rl_reset(struct btdev_rl *rl)
+@@ -484,7 +484,7 @@ static void btdev_reset(struct btdev *btdev)
+ 	btdev->le_scan_enable		=3D 0x00;
+ 	btdev->le_adv_enable		=3D 0x00;
+=20
+-	wl_clear(btdev);
++	al_clear(btdev);
+ 	rl_clear(btdev);
+ }
+=20
+@@ -3566,25 +3566,25 @@ static int cmd_le_create_conn_complete(struct btdev=
+ *dev, const void *data,
+ 	return 0;
+ }
+=20
+-static int cmd_read_wl_size(struct btdev *dev, const void *data, uint8_t l=
+en)
++static int cmd_read_al_size(struct btdev *dev, const void *data, uint8_t l=
+en)
+ {
+ 	struct bt_hci_rsp_le_read_accept_list_size rsp;
+=20
+ 	rsp.status =3D BT_HCI_ERR_SUCCESS;
+-	rsp.size =3D WL_SIZE;
++	rsp.size =3D AL_SIZE;
+ 	cmd_complete(dev, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, &rsp,
  						sizeof(rsp));
- 
+=20
  	return 0;
-@@ -3620,7 +3620,7 @@ static int cmd_wl_clear(struct btdev *dev, const void *data, uint8_t len)
- 	wl_clear(dev);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_WHITE_LIST, &status,
-+	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, &status,
- 						sizeof(status));
- 
- 	return 0;
-@@ -3637,7 +3637,7 @@ static void wl_add(struct btdev_wl *wl, uint8_t type, bdaddr_t *addr)
- 
- static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
+ }
+=20
+-static bool wl_can_change(struct btdev *dev)
++static bool al_can_change(struct btdev *dev)
  {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
+-	 /* filter policy uses the White List and advertising is enable. */
++	 /* filter policy uses the Accept List and advertising is enable. */
+ 	if (dev->le_adv_enable && dev->le_adv_filter_policy)
+ 		return false;
+=20
+-	/* scanning filter policy uses the White List and scanning is enabled */
++	/* scan filter policy uses the Accept List and scanning is enabled */
+ 	if (dev->le_scan_enable) {
+ 		switch (dev->le_scan_filter_policy) {
+ 		case 0x00:
+@@ -3601,23 +3601,23 @@ static bool wl_can_change(struct btdev *dev)
+ 	return true;
+ }
+=20
+-static int cmd_wl_clear(struct btdev *dev, const void *data, uint8_t len)
++static int cmd_al_clear(struct btdev *dev, const void *data, uint8_t len)
+ {
  	uint8_t status;
- 	bool exists = false;
- 	int i, pos = -1;
-@@ -3673,14 +3673,14 @@ static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
- 
- 	if (pos < 0) {
- 		cmd_status(dev, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
+=20
+ 	/* This command shall not be used when:
+-	 * =E2=80=A2 any advertising filter policy uses the White List and advert=
+ising
++	 * =E2=80=A2 any advertising filter policy uses the Accept List and adver=
+tising
+ 	 * is enabled,
+-	 * =E2=80=A2 the scanning filter policy uses the White List and scanning =
+is
++	 * =E2=80=A2 the scanning filter policy uses the Accept List and scanning=
+ is
+ 	 * enabled, or
+-	 * =E2=80=A2 the initiator filter policy uses the White List and an
++	 * =E2=80=A2 the initiator filter policy uses the Accept List and an
+ 	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
+ 	 * command is outstanding.
+ 	 */
+-	if (!wl_can_change(dev))
++	if (!al_can_change(dev))
+ 		return -EPERM;
+=20
+-	wl_clear(dev);
++	al_clear(dev);
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, &status,
+@@ -3626,16 +3626,16 @@ static int cmd_wl_clear(struct btdev *dev, const vo=
+id *data, uint8_t len)
+ 	return 0;
+ }
+=20
+-#define WL_ADDR_EQUAL(_wl, _type, _addr) \
+-	(_wl->type =3D=3D _type && !bacmp(&_wl->addr, (bdaddr_t *)_addr))
++#define AL_ADDR_EQUAL(_al, _type, _addr) \
++	(_al->type =3D=3D _type && !bacmp(&_al->addr, (bdaddr_t *)_addr))
+=20
+-static void wl_add(struct btdev_wl *wl, uint8_t type, bdaddr_t *addr)
++static void al_add(struct btdev_al *al, uint8_t type, bdaddr_t *addr)
+ {
+-	wl->type =3D type;
+-	bacpy(&wl->addr, addr);
++	al->type =3D type;
++	bacpy(&al->addr, addr);
+ }
+=20
+-static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
++static int cmd_add_al(struct btdev *dev, const void *data, uint8_t len)
+ {
+ 	const struct bt_hci_cmd_le_add_to_accept_list *cmd =3D data;
+ 	uint8_t status;
+@@ -3643,28 +3643,28 @@ static int cmd_add_wl(struct btdev *dev, const void=
+ *data, uint8_t len)
+ 	int i, pos =3D -1;
+=20
+ 	/* This command shall not be used when:
+-	 * =E2=80=A2 any advertising filter policy uses the White List and advert=
+ising
++	 * =E2=80=A2 any advertising filter policy uses the Accept List and adver=
+tising
+ 	 * is enabled,
+-	 * =E2=80=A2 the scanning filter policy uses the White List and scanning =
+is
++	 * =E2=80=A2 the scanning filter policy uses the Accept List and scanning=
+ is
+ 	 * enabled, or
+-	 * =E2=80=A2 the initiator filter policy uses the White List and an
++	 * =E2=80=A2 the initiator filter policy uses the Accept List and an
+ 	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
+ 	 * command is outstanding.
+ 	 */
+-	if (!wl_can_change(dev))
++	if (!al_can_change(dev))
+ 		return -EPERM;
+=20
+ 	/* Valid range for address type is 0x00 to 0x01 */
+ 	if (cmd->addr_type > 0x01)
+ 		return -EINVAL;
+=20
+-	for (i =3D 0; i < WL_SIZE; i++) {
+-		struct btdev_wl *wl =3D &dev->le_wl[i];
++	for (i =3D 0; i < AL_SIZE; i++) {
++		struct btdev_al *al =3D &dev->le_al[i];
+=20
+-		if (WL_ADDR_EQUAL(wl, cmd->addr_type, &cmd->addr)) {
++		if (AL_ADDR_EQUAL(al, cmd->addr_type, &cmd->addr)) {
+ 			exists =3D true;
+ 			break;
+-		} else if (pos < 0 && wl->type =3D=3D 0xff)
++		} else if (pos < 0 && al->type =3D=3D 0xff)
+ 			pos =3D i;
+ 	}
+=20
+@@ -3677,7 +3677,7 @@ static int cmd_add_wl(struct btdev *dev, const void *=
+data, uint8_t len)
  		return 0;
  	}
- 
- 	wl_add(&dev->le_wl[pos], cmd->addr_type, (bdaddr_t *)&cmd->addr);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 						&status, sizeof(status));
- 
+=20
+-	wl_add(&dev->le_wl[pos], cmd->addr_type, (bdaddr_t *)&cmd->addr);
++	al_add(&dev->le_al[pos], cmd->addr_type, (bdaddr_t *)&cmd->addr);
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
+@@ -3686,7 +3686,7 @@ static int cmd_add_wl(struct btdev *dev, const void *=
+data, uint8_t len)
  	return 0;
-@@ -3688,7 +3688,7 @@ static int cmd_add_wl(struct btdev *dev, const void *data, uint8_t len)
- 
- static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
+ }
+=20
+-static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
++static int cmd_remove_al(struct btdev *dev, const void *data, uint8_t len)
  {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
+ 	const struct bt_hci_cmd_le_remove_from_accept_list *cmd =3D data;
  	uint8_t status;
- 	int i;
+@@ -3694,37 +3694,37 @@ static int cmd_remove_wl(struct btdev *dev, const v=
+oid *data, uint8_t len)
  	char addr[18];
-@@ -3728,7 +3728,7 @@ static int cmd_remove_wl(struct btdev *dev, const void *data, uint8_t len)
+=20
+ 	/* This command shall not be used when:
+-	 * =E2=80=A2 any advertising filter policy uses the White List and advert=
+ising
++	 * =E2=80=A2 any advertising filter policy uses the Accept List and adver=
+tising
+ 	 * is enabled,
+-	 * =E2=80=A2 the scanning filter policy uses the White List and scanning =
+is
++	 * =E2=80=A2 the scanning filter policy uses the Accept List and scanning=
+ is
+ 	 * enabled, or
+-	 * =E2=80=A2 the initiator filter policy uses the White List and an
++	 * =E2=80=A2 the initiator filter policy uses the Accept List and an
+ 	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
+ 	 * command is outstanding.
+ 	 */
+-	if (!wl_can_change(dev))
++	if (!al_can_change(dev))
+ 		return -EPERM;
+=20
+ 	/* Valid range for address type is 0x00 to 0x01 */
+ 	if (cmd->addr_type > 0x01)
  		return -EINVAL;
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 						&status, sizeof(status));
- 
- 	return 0;
-@@ -4313,10 +4313,10 @@ static int cmd_gen_dhkey(struct btdev *dev, const void *data, uint8_t len)
+=20
+-	for (i =3D 0; i < WL_SIZE; i++) {
+-		struct btdev_wl *wl =3D &dev->le_wl[i];
++	for (i =3D 0; i < AL_SIZE; i++) {
++		struct btdev_al *al =3D &dev->le_al[i];
+=20
+-		ba2str(&wl->addr, addr);
++		ba2str(&al->addr, addr);
+=20
+ 		util_debug(dev->debug_callback, dev->debug_data,
+-				"type 0x%02x addr %s", dev->le_wl[i].type,
++				"type 0x%02x addr %s", dev->le_al[i].type,
+ 				addr);
+=20
+-		if (WL_ADDR_EQUAL(wl, cmd->addr_type, &cmd->addr)) {
+-			wl_reset(wl);
++		if (AL_ADDR_EQUAL(al, cmd->addr_type, &cmd->addr)) {
++			al_reset(al);
+ 			break;
+ 		}
+ 	}
+=20
+-	if (i =3D=3D WL_SIZE)
++	if (i =3D=3D AL_SIZE)
+ 		return -EINVAL;
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+@@ -4313,10 +4313,10 @@ static int cmd_gen_dhkey(struct btdev *dev, const v=
+oid *data, uint8_t len)
  					cmd_set_scan_enable_complete), \
  	CMD(BT_HCI_CMD_LE_CREATE_CONN, cmd_le_create_conn, \
  					cmd_le_create_conn_complete), \
--	CMD(BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE, cmd_read_wl_size, NULL), \
--	CMD(BT_HCI_CMD_LE_CLEAR_WHITE_LIST, cmd_wl_clear, NULL), \
--	CMD(BT_HCI_CMD_LE_ADD_TO_WHITE_LIST, cmd_add_wl, NULL), \
--	CMD(BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST, cmd_remove_wl, NULL), \
-+	CMD(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, cmd_read_wl_size, NULL), \
-+	CMD(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, cmd_wl_clear, NULL), \
-+	CMD(BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST, cmd_add_wl, NULL), \
-+	CMD(BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST, cmd_remove_wl, NULL), \
+-	CMD(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, cmd_read_wl_size, NULL), \
+-	CMD(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, cmd_wl_clear, NULL), \
+-	CMD(BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST, cmd_add_wl, NULL), \
+-	CMD(BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST, cmd_remove_wl, NULL), \
++	CMD(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, cmd_read_al_size, NULL), \
++	CMD(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST, cmd_al_clear, NULL), \
++	CMD(BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST, cmd_add_al, NULL), \
++	CMD(BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST, cmd_remove_al, NULL), \
  	CMD(BT_HCI_CMD_LE_CONN_UPDATE, cmd_conn_update, \
  					cmd_conn_update_complete), \
  	CMD(BT_HCI_CMD_LE_READ_REMOTE_FEATURES, cmd_le_read_remote_features, \
-@@ -5408,24 +5408,24 @@ static void le_cis_estabilished(struct btdev *dev, struct btdev_conn *conn,
- 		struct btdev *remote = conn->link->dev;
- 
- 		/* TODO: Figure out if these values makes sense */
--		memcpy(evt.cig_sync_delay, remote->le_cig.params.m_interval,
--				sizeof(remote->le_cig.params.m_interval));
--		memcpy(evt.cis_sync_delay, remote->le_cig.params.s_interval,
--				sizeof(remote->le_cig.params.s_interval));
--		memcpy(evt.m_latency, &remote->le_cig.params.m_latency,
--				sizeof(remote->le_cig.params.m_latency));
--		memcpy(evt.s_latency, &remote->le_cig.params.s_latency,
--				sizeof(remote->le_cig.params.s_latency));
--		evt.m_phy = remote->le_cig.cis[0].m_phy;
--		evt.s_phy = remote->le_cig.cis[0].s_phy;
-+		memcpy(evt.cig_sync_delay, remote->le_cig.params.c_interval,
-+				sizeof(remote->le_cig.params.c_interval));
-+		memcpy(evt.cis_sync_delay, remote->le_cig.params.p_interval,
-+				sizeof(remote->le_cig.params.p_interval));
-+		memcpy(evt.c_latency, &remote->le_cig.params.c_latency,
-+				sizeof(remote->le_cig.params.c_latency));
-+		memcpy(evt.p_latency, &remote->le_cig.params.p_latency,
-+				sizeof(remote->le_cig.params.p_latency));
-+		evt.c_phy = remote->le_cig.cis[0].c_phy;
-+		evt.p_phy = remote->le_cig.cis[0].p_phy;
- 		evt.nse = 0x01;
--		evt.m_bn = 0x01;
--		evt.s_bn = 0x01;
--		evt.m_ft = 0x01;
--		evt.s_ft = 0x01;
--		evt.m_mtu = remote->le_cig.cis[0].m_sdu;
--		evt.s_mtu = remote->le_cig.cis[0].s_sdu;
--		evt.interval = remote->le_cig.params.m_latency;
-+		evt.c_bn = 0x01;
-+		evt.p_bn = 0x01;
-+		evt.c_ft = 0x01;
-+		evt.p_ft = 0x01;
-+		evt.c_mtu = remote->le_cig.cis[0].c_sdu;
-+		evt.p_mtu = remote->le_cig.cis[0].p_sdu;
-+		evt.interval = remote->le_cig.params.c_latency;
+@@ -5887,10 +5887,10 @@ static void set_le_commands(struct btdev *btdev)
+ 	btdev->commands[26] |=3D 0x04;	/* LE Set Scan Parameters */
+ 	btdev->commands[26] |=3D 0x08;	/* LE Set Scan Enable */
+ 	btdev->commands[26] |=3D 0x10;	/* LE Create Connection */
+-	btdev->commands[26] |=3D 0x40;	/* LE Read White List Size */
+-	btdev->commands[26] |=3D 0x80;	/* LE Clear White List */
+-	btdev->commands[27] |=3D 0x01;	/* LE Add Device to White List */
+-	btdev->commands[27] |=3D 0x02;	/* LE Remove Device from White List */
++	btdev->commands[26] |=3D 0x40;	/* LE Read Accept List Size */
++	btdev->commands[26] |=3D 0x80;	/* LE Clear Accept List */
++	btdev->commands[27] |=3D 0x01;	/* LE Add Device to Accept List */
++	btdev->commands[27] |=3D 0x02;	/* LE Remove Device from Accept List */
+ 	btdev->commands[27] |=3D 0x04;	/* LE Connection Update */
+ 	btdev->commands[27] |=3D 0x20;	/* LE Read Remote Used Features */
+ 	btdev->commands[27] |=3D 0x40;	/* LE Encrypt */
+@@ -6077,13 +6077,13 @@ static void set_bredrle_features(struct btdev *btde=
+v)
+ 	btdev->features[2] |=3D 0x08;	/* Transparent SCO */
+ 	btdev->features[3] |=3D 0x40;	/* RSSI with inquiry results */
+ 	btdev->features[3] |=3D 0x80;	/* Extended SCO link */
+-	btdev->features[4] |=3D 0x08;	/* AFH capable slave */
+-	btdev->features[4] |=3D 0x10;	/* AFH classification slave */
++	btdev->features[4] |=3D 0x08;	/* AFH capable peripheral */
++	btdev->features[4] |=3D 0x10;	/* AFH classification peripheral */
+ 	btdev->features[4] |=3D 0x40;	/* LE Supported */
+ 	btdev->features[5] |=3D 0x02;	/* Sniff subrating */
+ 	btdev->features[5] |=3D 0x04;	/* Pause encryption */
+-	btdev->features[5] |=3D 0x08;	/* AFH capable master */
+-	btdev->features[5] |=3D 0x10;	/* AFH classification master */
++	btdev->features[5] |=3D 0x08;	/* AFH capable central */
++	btdev->features[5] |=3D 0x10;	/* AFH classification central */
+ 	btdev->features[6] |=3D 0x01;	/* Extended Inquiry Response */
+ 	btdev->features[6] |=3D 0x02;	/* Simultaneous LE and BR/EDR */
+ 	btdev->features[6] |=3D 0x08;	/* Secure Simple Pairing */
+@@ -6113,15 +6113,15 @@ static void set_bredrle_features(struct btdev *btde=
+v)
+=20
+ 	if (btdev->type >=3D BTDEV_TYPE_BREDRLE52) {
+ 		btdev->le_features[1] |=3D 0x20;  /* LE PER ADV */
+-		btdev->le_features[3] |=3D 0x10;  /* LE CIS Master */
+-		btdev->le_features[3] |=3D 0x20;  /* LE CIS Slave */
++		btdev->le_features[3] |=3D 0x10;  /* LE CIS Central */
++		btdev->le_features[3] |=3D 0x20;  /* LE CIS Peripheral */
+ 		btdev->le_features[3] |=3D 0x40;  /* LE ISO Broadcaster */
+ 		btdev->le_features[3] |=3D 0x80;  /* LE Synchronized Receiver */
+ 		btdev->le_features[4] |=3D 0x01;  /* LE ISO channels */
  	}
- 
- 	le_meta_event(dev, BT_HCI_EVT_LE_CIS_ESTABLISHED, &evt, sizeof(evt));
+=20
+-	btdev->feat_page_2[0] |=3D 0x01;	/* CSB - Master Operation */
+-	btdev->feat_page_2[0] |=3D 0x02;	/* CSB - Slave Operation */
++	btdev->feat_page_2[0] |=3D 0x01;	/* CPB - Central Operation */
++	btdev->feat_page_2[0] |=3D 0x02;	/* CPB - Peripheral Operation */
+ 	btdev->feat_page_2[0] |=3D 0x04;	/* Synchronization Train */
+ 	btdev->feat_page_2[0] |=3D 0x08;	/* Synchronization Scan */
+ 	btdev->feat_page_2[0] |=3D 0x10;	/* Inquiry Response Notification */
+@@ -6139,12 +6139,12 @@ static void set_bredr_features(struct btdev *btdev)
+ 	btdev->features[1] |=3D 0x08;	/* SCO link */
+ 	btdev->features[3] |=3D 0x40;	/* RSSI with inquiry results */
+ 	btdev->features[3] |=3D 0x80;	/* Extended SCO link */
+-	btdev->features[4] |=3D 0x08;	/* AFH capable slave */
+-	btdev->features[4] |=3D 0x10;	/* AFH classification slave */
++	btdev->features[4] |=3D 0x08;	/* AFH capable peripheral */
++	btdev->features[4] |=3D 0x10;	/* AFH classification peripheral */
+ 	btdev->features[5] |=3D 0x02;	/* Sniff subrating */
+ 	btdev->features[5] |=3D 0x04;	/* Pause encryption */
+-	btdev->features[5] |=3D 0x08;	/* AFH capable master */
+-	btdev->features[5] |=3D 0x10;	/* AFH classification master */
++	btdev->features[5] |=3D 0x08;	/* AFH capable central */
++	btdev->features[5] |=3D 0x10;	/* AFH classification central */
+ 	btdev->features[6] |=3D 0x01;	/* Extended Inquiry Response */
+ 	btdev->features[6] |=3D 0x08;	/* Secure Simple Pairing */
+ 	btdev->features[6] |=3D 0x10;	/* Encapsulated PDU */
+@@ -6165,12 +6165,12 @@ static void set_bredr20_features(struct btdev *btde=
+v)
+ 	btdev->features[1] |=3D 0x08;	/* SCO link */
+ 	btdev->features[3] |=3D 0x40;	/* RSSI with inquiry results */
+ 	btdev->features[3] |=3D 0x80;	/* Extended SCO link */
+-	btdev->features[4] |=3D 0x08;	/* AFH capable slave */
+-	btdev->features[4] |=3D 0x10;	/* AFH classification slave */
++	btdev->features[4] |=3D 0x08;	/* AFH capable peripheral */
++	btdev->features[4] |=3D 0x10;	/* AFH classification peripheral */
+ 	btdev->features[5] |=3D 0x02;	/* Sniff subrating */
+ 	btdev->features[5] |=3D 0x04;	/* Pause encryption */
+-	btdev->features[5] |=3D 0x08;	/* AFH capable master */
+-	btdev->features[5] |=3D 0x10;	/* AFH classification master */
++	btdev->features[5] |=3D 0x08;	/* AFH capable central */
++	btdev->features[5] |=3D 0x10;	/* AFH classification central */
+ 	btdev->features[7] |=3D 0x80;	/* Extended features */
+=20
+ 	btdev->max_page =3D 1;
+@@ -6185,7 +6185,7 @@ static void set_le_features(struct btdev *btdev)
+=20
+ 	btdev->le_features[0] |=3D 0x01;	/* LE Encryption */
+ 	btdev->le_features[0] |=3D 0x02;	/* Connection Parameters Request */
+-	btdev->le_features[0] |=3D 0x08;	/* Slave-initiated Features Exchange */
++	btdev->le_features[0] |=3D 0x08;	/* Peripheral-initiated Features Exchang=
+e */
+ }
+=20
+ static void set_le_states(struct btdev *btdev)
+@@ -6198,7 +6198,7 @@ static void set_le_states(struct btdev *btdev)
+ 	btdev->le_states[4] =3D 0xff;
+ 	btdev->le_states[5] =3D 0x03;
+=20
+-	wl_clear(btdev);
++	al_clear(btdev);
+ 	rl_clear(btdev);
+ 	btdev->le_rl_enable =3D 0x00;
+ 	btdev->le_rl_timeout =3D 0x0384;	/* 900 secs or 15 minutes */
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index fe5ef747a2..bd6bf1e631 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -84,7 +84,7 @@ static void run_command_hook(void *data, void *user_data)
+ 					run_data->len, hook->user_data);
+ }
+=20
+-static void master_command_callback(uint16_t opcode,
++static void central_command_callback(uint16_t opcode,
+ 				const void *data, uint8_t len,
+ 				btdev_callback callback, void *user_data)
+ {
+@@ -230,7 +230,7 @@ static bool create_vhci(struct hciemu *hciemu)
+ 	if (!btdev)
+ 		return false;
+=20
+-	btdev_set_command_handler(btdev, master_command_callback, hciemu);
++	btdev_set_command_handler(btdev, central_command_callback, hciemu);
+=20
+ 	fd =3D open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
+ 	if (fd < 0) {
+@@ -462,7 +462,7 @@ static void bthost_print(const char *str, void *user_da=
+ta)
+ 					"bthost: %s", str);
+ }
+=20
+-static void btdev_master_debug(const char *str, void *user_data)
++static void btdev_central_debug(const char *str, void *user_data)
+ {
+ 	struct hciemu *hciemu =3D user_data;
+=20
+@@ -500,7 +500,7 @@ bool hciemu_set_debug(struct hciemu *hciemu, hciemu_deb=
+ug_func_t callback,
+ 	hciemu->debug_destroy =3D destroy;
+ 	hciemu->debug_data =3D user_data;
+=20
+-	btdev_set_debug(hciemu->dev, btdev_master_debug, hciemu, NULL);
++	btdev_set_debug(hciemu->dev, btdev_central_debug, hciemu, NULL);
+=20
+ 	queue_foreach(hciemu->clients, hciemu_client_set_debug, hciemu);
+=20
+@@ -528,7 +528,7 @@ uint8_t *hciemu_get_features(struct hciemu *hciemu)
+ 	return btdev_get_features(hciemu->dev);
+ }
+=20
+-const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu)
++const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return NULL;
+@@ -556,7 +556,7 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *=
+hciemu)
+ 	return hciemu_client_bdaddr(client);
+ }
+=20
+-uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu)
++uint8_t hciemu_get_central_scan_enable(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return 0;
+@@ -564,7 +564,7 @@ uint8_t hciemu_get_master_scan_enable(struct hciemu *hc=
+iemu)
+ 	return btdev_get_scan_enable(hciemu->dev);
+ }
+=20
+-uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu)
++uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return 0;
+@@ -572,7 +572,8 @@ uint8_t hciemu_get_master_le_scan_enable(struct hciemu =
+*hciemu)
+ 	return btdev_get_le_scan_enable(hciemu->dev);
+ }
+=20
+-void hciemu_set_master_le_states(struct hciemu *hciemu, const uint8_t *le_=
+states)
++void hciemu_set_central_le_states(struct hciemu *hciemu,
++						const uint8_t *le_states)
+ {
+ 	if (!hciemu || !hciemu->dev)
+ 		return;
+@@ -580,7 +581,7 @@ void hciemu_set_master_le_states(struct hciemu *hciemu,=
+ const uint8_t *le_states
+ 	btdev_set_le_states(hciemu->dev, le_states);
+ }
+=20
+-bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
++bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data)
+ {
+ 	struct hciemu_command_hook *hook;
+@@ -603,7 +604,7 @@ bool hciemu_add_master_post_command_hook(struct hciemu =
+*hciemu,
+ 	return true;
+ }
+=20
+-bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu)
++bool hciemu_clear_central_post_command_hooks(struct hciemu *hciemu)
+ {
+ 	if (!hciemu)
+ 		return false;
+diff --git a/emulator/hciemu.h b/emulator/hciemu.h
+index 8bf2d070ea..3d3d93b4b0 100644
+--- a/emulator/hciemu.h
++++ b/emulator/hciemu.h
+@@ -50,14 +50,14 @@ struct bthost *hciemu_client_get_host(struct hciemu *hc=
+iemu);
+ const char *hciemu_get_address(struct hciemu *hciemu);
+ uint8_t *hciemu_get_features(struct hciemu *hciemu);
+=20
+-const uint8_t *hciemu_get_master_bdaddr(struct hciemu *hciemu);
++const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu);
+ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu);
+=20
+-uint8_t hciemu_get_master_scan_enable(struct hciemu *hciemu);
++uint8_t hciemu_get_central_scan_enable(struct hciemu *hciemu);
+=20
+-uint8_t hciemu_get_master_le_scan_enable(struct hciemu *hciemu);
++uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu);
+=20
+-void hciemu_set_master_le_states(struct hciemu *hciemu,
++void hciemu_set_central_le_states(struct hciemu *hciemu,
+ 						const uint8_t *le_states);
+=20
+ typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
+@@ -66,10 +66,10 @@ typedef void (*hciemu_command_func_t)(uint16_t opcode, =
+const void *data,
+ typedef bool (*hciemu_hook_func_t)(const void *data, uint16_t len,
+ 							void *user_data);
+=20
+-bool hciemu_add_master_post_command_hook(struct hciemu *hciemu,
++bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
+ 			hciemu_command_func_t function, void *user_data);
+=20
+-bool hciemu_clear_master_post_command_hooks(struct hciemu *hciemu);
++bool hciemu_clear_central_post_command_hooks(struct hciemu *hciemu);
+=20
+ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 				uint16_t opcode, hciemu_hook_func_t function,
 diff --git a/emulator/le.c b/emulator/le.c
-index 4ffe3b16db..23f2579426 100644
+index 23f2579426..0735b81e6e 100644
 --- a/emulator/le.c
 +++ b/emulator/le.c
-@@ -1211,12 +1211,12 @@ static void cmd_le_create_conn_cancel(struct bt_le *hci,
- static void cmd_le_read_white_list_size(struct bt_le *hci,
+@@ -34,7 +34,7 @@
+ #include "phy.h"
+ #include "le.h"
+=20
+-#define WHITE_LIST_SIZE		16
++#define ACCEPT_LIST_SIZE	16
+ #define RESOLV_LIST_SIZE	16
+ #define SCAN_CACHE_SIZE		64
+=20
+@@ -102,8 +102,8 @@ struct bt_le {
+ 	uint8_t  le_conn_own_addr_type;
+ 	uint8_t  le_conn_enable;
+=20
+-	uint8_t  le_white_list_size;
+-	uint8_t  le_white_list[WHITE_LIST_SIZE][7];
++	uint8_t  le_accept_list_size;
++	uint8_t  le_accept_list[ACCEPT_LIST_SIZE][7];
+ 	uint8_t  le_states[8];
+=20
+ 	uint16_t le_default_tx_len;
+@@ -122,27 +122,27 @@ struct bt_le {
+ 	uint8_t scan_cache_count;
+ };
+=20
+-static bool is_in_white_list(struct bt_le *hci, uint8_t addr_type,
++static bool is_in_accept_list(struct bt_le *hci, uint8_t addr_type,
+ 							const uint8_t addr[6])
+ {
+ 	int i;
+=20
+-	for (i =3D 0; i < hci->le_white_list_size; i++) {
+-		if (hci->le_white_list[i][0] =3D=3D addr_type &&
+-				!memcmp(&hci->le_white_list[i][1], addr, 6))
++	for (i =3D 0; i < hci->le_accept_list_size; i++) {
++		if (hci->le_accept_list[i][0] =3D=3D addr_type &&
++				!memcmp(&hci->le_accept_list[i][1], addr, 6))
+ 			return true;
+ 	}
+=20
+ 	return false;
+ }
+=20
+-static void clear_white_list(struct bt_le *hci)
++static void clear_accept_list(struct bt_le *hci)
+ {
+ 	int i;
+=20
+-	for (i =3D 0; i < hci->le_white_list_size; i++) {
+-		hci->le_white_list[i][0] =3D 0xff;
+-		memset(&hci->le_white_list[i][1], 0, 6);
++	for (i =3D 0; i < hci->le_accept_list_size; i++) {
++		hci->le_accept_list[i][0] =3D 0xff;
++		memset(&hci->le_accept_list[i][1], 0, 6);
+ 	}
+ }
+=20
+@@ -243,10 +243,10 @@ static void reset_defaults(struct bt_le *hci)
+ 	hci->commands[26] |=3D 0x08;	/* LE Set Scan Enable */
+ 	hci->commands[26] |=3D 0x10;	/* LE Create Connection */
+ 	hci->commands[26] |=3D 0x20;	/* LE Create Connection Cancel */
+-	hci->commands[26] |=3D 0x40;	/* LE Read White List Size */
+-	hci->commands[26] |=3D 0x80;	/* LE Clear White List */
+-	hci->commands[27] |=3D 0x01;	/* LE Add Device To White List */
+-	hci->commands[27] |=3D 0x02;	/* LE Remove Device From White List */
++	hci->commands[26] |=3D 0x40;	/* LE Read Accept List Size */
++	hci->commands[26] |=3D 0x80;	/* LE Clear Accept List */
++	hci->commands[27] |=3D 0x01;	/* LE Add Device To Accept List */
++	hci->commands[27] |=3D 0x02;	/* LE Remove Device From Accept List */
+ 	//hci->commands[27] |=3D 0x04;	/* LE Connection Update */
+ 	//hci->commands[27] |=3D 0x08;	/* LE Set Host Channel Classification */
+ 	//hci->commands[27] |=3D 0x10;	/* LE Read Channel Map */
+@@ -343,7 +343,7 @@ static void reset_defaults(struct bt_le *hci)
+ 	hci->le_features[0] |=3D 0x01;	/* LE Encryption */
+ 	//hci->le_features[0] |=3D 0x02;	/* Connection Parameter Request Procedur=
+e */
+ 	//hci->le_features[0] |=3D 0x04;	/* Extended Reject Indication */
+-	//hci->le_features[0] |=3D 0x08;	/* Slave-initiated Features Exchange */
++	//hci->le_features[0] |=3D 0x08;	/* Peripheral-initiated Features Exchang=
+e */
+ 	hci->le_features[0] |=3D 0x10;	/* LE Ping */
+ 	hci->le_features[0] |=3D 0x20;	/* LE Data Packet Length Extension */
+ 	hci->le_features[0] |=3D 0x40;	/* LL Privacy */
+@@ -389,8 +389,8 @@ static void reset_defaults(struct bt_le *hci)
+=20
+ 	hci->le_conn_enable =3D 0x00;
+=20
+-	hci->le_white_list_size =3D WHITE_LIST_SIZE;
+-	clear_white_list(hci);
++	hci->le_accept_list_size =3D ACCEPT_LIST_SIZE;
++	clear_accept_list(hci);
+=20
+ 	memset(hci->le_states, 0, sizeof(hci->le_states));
+ 	hci->le_states[0] |=3D 0x01;	/* Non-connectable Advertising */
+@@ -399,8 +399,8 @@ static void reset_defaults(struct bt_le *hci)
+ 	hci->le_states[0] |=3D 0x08;	/* High Duty Cycle Directed Advertising */
+ 	hci->le_states[0] |=3D 0x10;	/* Passive Scanning */
+ 	hci->le_states[0] |=3D 0x20;	/* Active Scanning */
+-	hci->le_states[0] |=3D 0x40;	/* Initiating + Connection (Master Role) */
+-	hci->le_states[0] |=3D 0x80;	/* Connection (Slave Role) */
++	hci->le_states[0] |=3D 0x40;	/* Initiating + Connection (Central Role) */
++	hci->le_states[0] |=3D 0x80;	/* Connection (Peripheral Role) */
+ 	hci->le_states[1] |=3D 0x01;	/* Passive Scanning +
+ 					 * Non-connectable Advertising */
+=20
+@@ -1208,31 +1208,31 @@ static void cmd_le_create_conn_cancel(struct bt_le =
+*hci,
+ 							&evt, sizeof(evt));
+ }
+=20
+-static void cmd_le_read_white_list_size(struct bt_le *hci,
++static void cmd_le_read_accept_list_size(struct bt_le *hci,
  						const void *data, uint8_t size)
  {
--	struct bt_hci_rsp_le_read_white_list_size rsp;
-+	struct bt_hci_rsp_le_read_accept_list_size rsp;
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
- 	rsp.size = hci->le_white_list_size;
- 
--	cmd_complete(hci, BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE,
-+	cmd_complete(hci, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
+ 	struct bt_hci_rsp_le_read_accept_list_size rsp;
+=20
+ 	rsp.status =3D BT_HCI_ERR_SUCCESS;
+-	rsp.size =3D hci->le_white_list_size;
++	rsp.size =3D hci->le_accept_list_size;
+=20
+ 	cmd_complete(hci, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
  							&rsp, sizeof(rsp));
  }
- 
-@@ -1228,14 +1228,14 @@ static void cmd_le_clear_white_list(struct bt_le *hci,
- 	clear_white_list(hci);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_CLEAR_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
- 						&status, sizeof(status));
- }
- 
- static void cmd_le_add_to_white_list(struct bt_le *hci,
+=20
+-static void cmd_le_clear_white_list(struct bt_le *hci,
++static void cmd_le_clear_accept_list(struct bt_le *hci,
  						const void *data, uint8_t size)
  {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
  	uint8_t status;
- 	bool exists = false;
- 	int i, pos = -1;
-@@ -1243,7 +1243,7 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 	/* Valid range for address type is 0x00 to 0x01 */
- 	if (cmd->addr_type > 0x01) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
- 		return;
- 	}
- 
-@@ -1259,13 +1259,13 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 
- 	if (exists) {
- 		cmd_status(hci, BT_HCI_ERR_UNSPECIFIED_ERROR,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
- 		return;
- 	}
- 
- 	if (pos < 0) {
- 		cmd_status(hci, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
--					BT_HCI_CMD_LE_ADD_TO_WHITE_LIST);
-+					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
- 		return;
- 	}
- 
-@@ -1273,21 +1273,21 @@ static void cmd_le_add_to_white_list(struct bt_le *hci,
- 	memcpy(&hci->le_white_list[pos][1], cmd->addr, 6);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
+=20
+-	clear_white_list(hci);
++	clear_accept_list(hci);
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(hci, BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
  						&status, sizeof(status));
  }
- 
- static void cmd_le_remove_from_white_list(struct bt_le *hci,
+=20
+-static void cmd_le_add_to_white_list(struct bt_le *hci,
++static void cmd_le_add_to_accept_list(struct bt_le *hci,
  						const void *data, uint8_t size)
  {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
- 	uint8_t status;
- 	int i, pos = -1;
- 
- 	/* Valid range for address type is 0x00 to 0x01 */
- 	if (cmd->addr_type > 0x01) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST);
-+					BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST);
+ 	const struct bt_hci_cmd_le_add_to_accept_list *cmd =3D data;
+@@ -1247,13 +1247,13 @@ static void cmd_le_add_to_white_list(struct bt_le *=
+hci,
  		return;
  	}
- 
-@@ -1302,7 +1302,7 @@ static void cmd_le_remove_from_white_list(struct bt_le *hci,
- 
- 	if (pos < 0) {
- 		cmd_status(hci, BT_HCI_ERR_INVALID_PARAMETERS,
--					BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST);
-+					BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST);
+=20
+-	for (i =3D 0; i < hci->le_white_list_size; i++) {
+-		if (hci->le_white_list[i][0] =3D=3D cmd->addr_type &&
+-				!memcmp(&hci->le_white_list[i][1],
++	for (i =3D 0; i < hci->le_accept_list_size; i++) {
++		if (hci->le_accept_list[i][0] =3D=3D cmd->addr_type &&
++				!memcmp(&hci->le_accept_list[i][1],
+ 							cmd->addr, 6)) {
+ 			exists =3D true;
+ 			break;
+-		} else if (pos < 0 && hci->le_white_list[i][0] =3D=3D 0xff)
++		} else if (pos < 0 && hci->le_accept_list[i][0] =3D=3D 0xff)
+ 			pos =3D i;
+ 	}
+=20
+@@ -1269,15 +1269,15 @@ static void cmd_le_add_to_white_list(struct bt_le *=
+hci,
  		return;
  	}
- 
-@@ -1310,7 +1310,7 @@ static void cmd_le_remove_from_white_list(struct bt_le *hci,
- 	memset(&hci->le_white_list[pos][1], 0, 6);
- 
- 	status = BT_HCI_ERR_SUCCESS;
--	cmd_complete(hci, BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	cmd_complete(hci, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
+=20
+-	hci->le_white_list[pos][0] =3D cmd->addr_type;
+-	memcpy(&hci->le_white_list[pos][1], cmd->addr, 6);
++	hci->le_accept_list[pos][0] =3D cmd->addr_type;
++	memcpy(&hci->le_accept_list[pos][1], cmd->addr, 6);
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(hci, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
  						&status, sizeof(status));
  }
- 
-@@ -1830,13 +1830,13 @@ static const struct {
- 				cmd_le_create_conn, 25, true },
+=20
+-static void cmd_le_remove_from_white_list(struct bt_le *hci,
++static void cmd_le_remove_from_accept_list(struct bt_le *hci,
+ 						const void *data, uint8_t size)
+ {
+ 	const struct bt_hci_cmd_le_remove_from_accept_list *cmd =3D data;
+@@ -1291,9 +1291,9 @@ static void cmd_le_remove_from_white_list(struct bt_l=
+e *hci,
+ 		return;
+ 	}
+=20
+-	for (i =3D 0; i < hci->le_white_list_size; i++) {
+-		if (hci->le_white_list[i][0] =3D=3D cmd->addr_type &&
+-				!memcmp(&hci->le_white_list[i][1],
++	for (i =3D 0; i < hci->le_accept_list_size; i++) {
++		if (hci->le_accept_list[i][0] =3D=3D cmd->addr_type &&
++				!memcmp(&hci->le_accept_list[i][1],
+ 							cmd->addr, 6)) {
+ 			pos =3D i;
+ 			break;
+@@ -1306,8 +1306,8 @@ static void cmd_le_remove_from_white_list(struct bt_l=
+e *hci,
+ 		return;
+ 	}
+=20
+-	hci->le_white_list[pos][0] =3D 0xff;
+-	memset(&hci->le_white_list[pos][1], 0, 6);
++	hci->le_accept_list[pos][0] =3D 0xff;
++	memset(&hci->le_accept_list[pos][1], 0, 6);
+=20
+ 	status =3D BT_HCI_ERR_SUCCESS;
+ 	cmd_complete(hci, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
+@@ -1831,13 +1831,13 @@ static const struct {
  	{ BT_HCI_CMD_LE_CREATE_CONN_CANCEL,
  				cmd_le_create_conn_cancel, 0, true },
--	{ BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE,
-+	{ BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
- 				cmd_le_read_white_list_size, 0, true },
--	{ BT_HCI_CMD_LE_CLEAR_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
- 				cmd_le_clear_white_list, 0, true },
--	{ BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 				cmd_le_add_to_white_list,  7, true },
--	{ BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	{ BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 				cmd_le_remove_from_white_list, 7, true },
- 
+ 	{ BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE,
+-				cmd_le_read_white_list_size, 0, true },
++				cmd_le_read_accept_list_size, 0, true },
+ 	{ BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST,
+-				cmd_le_clear_white_list, 0, true },
++				cmd_le_clear_accept_list, 0, true },
+ 	{ BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
+-				cmd_le_add_to_white_list,  7, true },
++				cmd_le_add_to_accept_list,  7, true },
+ 	{ BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
+-				cmd_le_remove_from_white_list, 7, true },
++				cmd_le_remove_from_accept_list, 7, true },
+=20
  	{ BT_HCI_CMD_LE_ENCRYPT, cmd_le_encrypt, 32, true },
-diff --git a/emulator/smp.c b/emulator/smp.c
-index 21a34dde61..2a36437a00 100644
---- a/emulator/smp.c
-+++ b/emulator/smp.c
-@@ -383,7 +383,7 @@ static void distribute_keys(struct smp_conn *conn)
- 	if (conn->local_key_dist & DIST_ENC_KEY) {
- 		memset(buf, 0, sizeof(buf));
- 		smp_send(conn, BT_L2CAP_SMP_ENCRYPT_INFO, buf, sizeof(buf));
--		smp_send(conn, BT_L2CAP_SMP_MASTER_IDENT, buf, 10);
-+		smp_send(conn, BT_L2CAP_SMP_CENTRAL_IDENT, buf, 10);
- 	}
- 
- 	if (conn->local_key_dist & DIST_ID_KEY) {
-@@ -571,7 +571,7 @@ static void encrypt_info(struct smp_conn *conn, const void *data, uint16_t len)
- {
- }
- 
--static void master_ident(struct smp_conn *conn, const void *data, uint16_t len)
-+static void central_ident(struct smp_conn *conn, const void *data, uint16_t len)
- {
- 	conn->remote_key_dist &= ~DIST_ENC_KEY;
- 
-@@ -727,8 +727,8 @@ void smp_data(void *conn_data, const void *data, uint16_t len)
- 	case BT_L2CAP_SMP_ENCRYPT_INFO:
- 		encrypt_info(conn, data, len);
- 		break;
--	case BT_L2CAP_SMP_MASTER_IDENT:
--		master_ident(conn, data, len);
-+	case BT_L2CAP_SMP_CENTRAL_IDENT:
-+		central_ident(conn, data, len);
- 		break;
- 	case BT_L2CAP_SMP_IDENT_ADDR_INFO:
- 		ident_addr_info(conn, data, len);
-diff --git a/monitor/broadcom.c b/monitor/broadcom.c
-index 5ee4ba04a4..21a86461ba 100644
---- a/monitor/broadcom.c
-+++ b/monitor/broadcom.c
-@@ -120,10 +120,10 @@ static void print_sync_mode(uint8_t mode)
- 
- 	switch (mode) {
- 	case 0x00:
--		str = "Slave";
-+		str = "Peripheral";
- 		break;
- 	case 0x01:
--		str = "Master";
-+		str = "Central";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -139,10 +139,10 @@ static void print_clock_mode(uint8_t mode)
- 
- 	switch (mode) {
- 	case 0x00:
--		str = "Slave";
-+		str = "Peripheral";
- 		break;
- 	case 0x01:
--		str = "Master";
-+		str = "Central";
- 		break;
- 	default:
- 		str = "Reserved";
-diff --git a/monitor/bt.h b/monitor/bt.h
-index 0bc5718a0e..c7afc7fd8f 100644
---- a/monitor/bt.h
-+++ b/monitor/bt.h
-@@ -88,8 +88,8 @@ struct bt_ll_reject_ind {
- 	uint8_t  error;
- } __attribute__ ((packed));
- 
--#define BT_LL_SLAVE_FEATURE_REQ	0x0e
--struct bt_ll_slave_feature_req {
-+#define BT_LL_PERIPHERAL_FEATURE_REQ	0x0e
-+struct bt_ll_peripheral_feature_req {
- 	uint8_t  features[8];
- } __attribute__ ((packed));
- 
-@@ -127,8 +127,8 @@ struct bt_ll_phy {
- 
- #define BT_LL_PHY_UPDATE_IND	0x18
- struct bt_ll_phy_update_ind {
--	uint8_t  m_phy;
--	uint8_t  s_phy;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
- 	uint16_t instant;
- } __attribute__ ((packed));
- 
-@@ -168,19 +168,19 @@ struct bt_ll_clock_acc {
- struct bt_ll_cis_req {
- 	uint8_t  cig;
- 	uint8_t  cis;
--	uint8_t  m_phy;
--	uint8_t  s_phy;
--	uint16_t m_sdu;
--	uint16_t s_sdu;
--	uint8_t  m_interval[3];
--	uint8_t  s_interval[3];
--	uint8_t  m_pdu;
--	uint8_t  s_pdu;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint8_t  c_interval[3];
-+	uint8_t  p_interval[3];
-+	uint8_t  c_pdu;
-+	uint8_t  p_pdu;
- 	uint8_t  nse;
- 	uint8_t  sub_interval[3];
- 	uint8_t  bn;
--	uint8_t  m_ft;
--	uint8_t  s_ft;
-+	uint8_t  c_ft;
-+	uint8_t  p_ft;
- 	uint16_t iso_interval;
- 	uint8_t  offset_min[3];
- 	uint8_t  offset_max[3];
-@@ -628,8 +628,8 @@ struct bt_hci_cmd_change_conn_link_key {
- 	uint16_t handle;
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_MASTER_LINK_KEY		0x0417
--struct bt_hci_cmd_master_link_key {
-+#define BT_HCI_CMD_LINK_KEY_SELECTION		0x0417
-+struct bt_hci_cmd_link_key_selection {
- 	uint8_t  key_flag;
- } __attribute__ ((packed));
- 
-@@ -898,8 +898,8 @@ struct bt_hci_cmd_truncated_page_cancel {
- 	uint8_t  bdaddr[6];
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_SET_SLAVE_BROADCAST		0x0441
--struct bt_hci_cmd_set_slave_broadcast {
-+#define BT_HCI_CMD_SET_PERIPHERAL_BROADCAST	0x0441
-+struct bt_hci_cmd_set_peripheral_broadcast {
- 	uint8_t  enable;
- 	uint8_t  lt_addr;
- 	uint8_t  lpo_allowed;
-@@ -908,14 +908,14 @@ struct bt_hci_cmd_set_slave_broadcast {
- 	uint16_t max_interval;
- 	uint16_t timeout;
- } __attribute__ ((packed));
--struct bt_hci_rsp_set_slave_broadcast {
-+struct bt_hci_rsp_set_peripheral_broadcast {
- 	uint8_t  status;
- 	uint8_t  lt_addr;
- 	uint16_t interval;
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_SET_SLAVE_BROADCAST_RECEIVE	0x0442
--struct bt_hci_cmd_set_slave_broadcast_receive {
-+#define BT_HCI_CMD_SET_PERIPHERAL_BROADCAST_RECEIVE	0x0442
-+struct bt_hci_cmd_set_peripheral_broadcast_receive {
- 	uint8_t  enable;
- 	uint8_t  bdaddr[6];
- 	uint8_t  lt_addr;
-@@ -928,7 +928,7 @@ struct bt_hci_cmd_set_slave_broadcast_receive {
- 	uint16_t pkt_type;
- 	uint8_t  map[10];
- } __attribute__ ((packed));
--struct bt_hci_rsp_set_slave_broadcast_receive {
-+struct bt_hci_rsp_set_peripheral_broadcast_receive {
- 	uint8_t  status;
- 	uint8_t  bdaddr[6];
- 	uint8_t  lt_addr;
-@@ -1599,13 +1599,13 @@ struct bt_hci_rsp_delete_reserved_lt_addr {
- 	uint8_t  lt_addr;
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_SET_SLAVE_BROADCAST_DATA	0x0c76
--struct bt_hci_cmd_set_slave_broadcast_data {
-+#define BT_HCI_CMD_SET_PERIPHERAL_BROADCAST_DATA	0x0c76
-+struct bt_hci_cmd_set_peripheral_broadcast_data {
- 	uint8_t  lt_addr;
- 	uint8_t  fragment;
- 	uint8_t  length;
- } __attribute__ ((packed));
--struct bt_hci_rsp_set_slave_broadcast_data {
-+struct bt_hci_rsp_set_peripheral_broadcast_data {
- 	uint8_t  status;
- 	uint8_t  lt_addr;
- } __attribute__ ((packed));
-@@ -2072,22 +2072,22 @@ struct bt_hci_cmd_le_create_conn {
- 
- #define BT_HCI_CMD_LE_CREATE_CONN_CANCEL	0x200e
- 
--#define BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE	0x200f
--struct bt_hci_rsp_le_read_white_list_size {
-+#define BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE	0x200f
-+struct bt_hci_rsp_le_read_accept_list_size {
- 	uint8_t  status;
- 	uint8_t  size;
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_LE_CLEAR_WHITE_LIST		0x2010
-+#define BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST		0x2010
- 
--#define BT_HCI_CMD_LE_ADD_TO_WHITE_LIST		0x2011
--struct bt_hci_cmd_le_add_to_white_list {
-+#define BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST	0x2011
-+struct bt_hci_cmd_le_add_to_accept_list {
- 	uint8_t  addr_type;
- 	uint8_t  addr[6];
- } __attribute__ ((packed));
- 
--#define BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST	0x2012
--struct bt_hci_cmd_le_remove_from_white_list {
-+#define BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST	0x2012
-+struct bt_hci_cmd_le_remove_from_accept_list {
- 	uint8_t  addr_type;
- 	uint8_t  addr[6];
- } __attribute__ ((packed));
-@@ -2646,23 +2646,23 @@ struct bt_hci_rsp_le_read_iso_tx_sync {
- #define BT_HCI_BIT_LE_SET_CIG_PARAMS		BT_HCI_CMD_BIT(41, 7)
- struct bt_hci_cis_params {
- 	uint8_t  cis_id;
--	uint16_t m_sdu;
--	uint16_t s_sdu;
--	uint8_t  m_phy;
--	uint8_t  s_phy;
--	uint8_t  m_rtn;
--	uint8_t  s_rtn;
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint8_t  c_rtn;
-+	uint8_t  p_rtn;
- } __attribute__ ((packed));
- 
- struct bt_hci_cmd_le_set_cig_params {
- 	uint8_t  cig_id;
--	uint8_t  m_interval[3];
--	uint8_t  s_interval[3];
-+	uint8_t  c_interval[3];
-+	uint8_t  p_interval[3];
- 	uint8_t  sca;
- 	uint8_t  packing;
- 	uint8_t  framing;
--	uint16_t m_latency;
--	uint16_t s_latency;
-+	uint16_t c_latency;
-+	uint16_t p_latency;
- 	uint8_t  num_cis;
- 	struct bt_hci_cis_params cis[0];
- } __attribute__ ((packed));
-@@ -2679,22 +2679,22 @@ struct bt_hci_rsp_le_set_cig_params {
- struct bt_hci_cis_params_test {
- 	uint8_t  cis_id;
- 	uint8_t  nse;
--	uint16_t m_sdu;
--	uint16_t s_sdu;
--	uint16_t m_pdu;
--	uint16_t s_pdu;
--	uint8_t  m_phy;
--	uint8_t  s_phy;
--	uint8_t  m_bn;
--	uint8_t  s_bn;
-+	uint16_t c_sdu;
-+	uint16_t p_sdu;
-+	uint16_t c_pdu;
-+	uint16_t p_pdu;
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
-+	uint8_t  c_bn;
-+	uint8_t  p_bn;
- } __attribute__ ((packed));
- 
- struct bt_hci_cmd_le_set_cig_params_test {
- 	uint8_t  cig_id;
--	uint8_t  m_interval[3];
--	uint8_t  s_interval[3];
--	uint8_t  m_ft;
--	uint8_t  s_ft;
-+	uint8_t  c_interval[3];
-+	uint8_t  p_interval[3];
-+	uint8_t  c_ft;
-+	uint8_t  p_ft;
- 	uint16_t iso_interval;
- 	uint8_t  sca;
- 	uint8_t  packing;
-@@ -2931,8 +2931,8 @@ struct bt_hci_evt_change_conn_link_key_complete {
- 	uint16_t handle;
- } __attribute__ ((packed));
- 
--#define BT_HCI_EVT_MASTER_LINK_KEY_COMPLETE	0x0a
--struct bt_hci_evt_master_link_key_complete {
-+#define BT_HCI_EVT_LINK_KEY_TYPE_CHANGED	0x0a
-+struct bt_hci_evt_link_key_type_changed {
- 	uint8_t  status;
- 	uint16_t handle;
- 	uint8_t  key_flag;
-@@ -3325,8 +3325,8 @@ struct bt_hci_evt_sync_train_received {
- 	uint8_t  service_data;
- } __attribute__ ((packed));
- 
--#define BT_HCI_EVT_SLAVE_BROADCAST_RECEIVE	0x51
--struct bt_hci_evt_slave_broadcast_receive {
-+#define BT_HCI_EVT_PERIPHERAL_BROADCAST_RECEIVE	0x51
-+struct bt_hci_evt_peripheral_broadcast_receive {
- 	uint8_t  bdaddr[6];
- 	uint8_t  lt_addr;
- 	uint32_t clock;
-@@ -3336,8 +3336,8 @@ struct bt_hci_evt_slave_broadcast_receive {
- 	uint8_t  length;
- } __attribute__ ((packed));
- 
--#define BT_HCI_EVT_SLAVE_BROADCAST_TIMEOUT	0x52
--struct bt_hci_evt_slave_broadcast_timeout {
-+#define BT_HCI_EVT_PERIPHERAL_BROADCAST_TIMEOUT	0x52
-+struct bt_hci_evt_peripheral_broadcast_timeout {
- 	uint8_t  bdaddr[6];
- 	uint8_t  lt_addr;
- } __attribute__ ((packed));
-@@ -3348,10 +3348,10 @@ struct bt_hci_evt_truncated_page_complete {
- 	uint8_t  bdaddr[6];
- } __attribute__ ((packed));
- 
--#define BT_HCI_EVT_SLAVE_PAGE_RESPONSE_TIMEOUT	0x54
-+#define BT_HCI_EVT_PERIPHERAL_PAGE_RESPONSE_TIMEOUT	0x54
- 
--#define BT_HCI_EVT_SLAVE_BROADCAST_CHANNEL_MAP_CHANGE	0x55
--struct bt_hci_evt_slave_broadcast_channel_map_change {
-+#define BT_HCI_EVT_PERIPHERAL_BROADCAST_CHANNEL_MAP_CHANGE	0x55
-+struct bt_hci_evt_peripheral_broadcast_channel_map_change {
- 	uint8_t  map[10];
- } __attribute__ ((packed));
- 
-@@ -3571,17 +3571,17 @@ struct bt_hci_evt_le_cis_established {
- 	uint16_t conn_handle;
- 	uint8_t  cig_sync_delay[3];
- 	uint8_t  cis_sync_delay[3];
--	uint8_t  m_latency[3];
--	uint8_t  s_latency[3];
--	uint8_t  m_phy;
--	uint8_t  s_phy;
-+	uint8_t  c_latency[3];
-+	uint8_t  p_latency[3];
-+	uint8_t  c_phy;
-+	uint8_t  p_phy;
- 	uint8_t  nse;
--	uint8_t  m_bn;
--	uint8_t  s_bn;
--	uint8_t  m_ft;
--	uint8_t  s_ft;
--	uint16_t m_mtu;
--	uint16_t s_mtu;
-+	uint8_t  c_bn;
-+	uint8_t  p_bn;
-+	uint8_t  c_ft;
-+	uint8_t  p_ft;
-+	uint16_t c_mtu;
-+	uint16_t p_mtu;
- 	uint16_t interval;
- } __attribute__ ((packed));
- 
-@@ -4026,8 +4026,8 @@ struct bt_l2cap_smp_encrypt_info {
- 	uint8_t  ltk[16];
- } __attribute__ ((packed));
- 
--#define BT_L2CAP_SMP_MASTER_IDENT	0x07
--struct bt_l2cap_smp_master_ident {
-+#define BT_L2CAP_SMP_CENTRAL_IDENT	0x07
-+struct bt_l2cap_smp_central_ident {
- 	uint16_t ediv;
- 	uint64_t rand;
- } __attribute__ ((packed));
-diff --git a/monitor/control.c b/monitor/control.c
-index dad23a0e62..009cf15209 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -305,19 +305,19 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
+ 	{ BT_HCI_CMD_LE_RAND, cmd_le_rand, 0, true },
+@@ -1963,7 +1963,7 @@ static void phy_recv_callback(uint16_t type, const vo=
+id *data,
+=20
+ 			if (hci->le_scan_filter_policy =3D=3D 0x01 ||
+ 					hci->le_scan_filter_policy =3D=3D 0x03) {
+-				if (!is_in_white_list(hci, tx_addr_type,
++				if (!is_in_accept_list(hci, tx_addr_type,
+ 								tx_addr))
+ 					break;
+ 			}
+diff --git a/emulator/serial.c b/emulator/serial.c
+index b44af0dcce..c9e6d7cd67 100644
+--- a/emulator/serial.c
++++ b/emulator/serial.c
+@@ -151,19 +151,19 @@ static void open_pty(struct serial *serial)
+=20
+ 	serial->fd =3D posix_openpt(O_RDWR | O_NOCTTY);
+ 	if (serial->fd < 0) {
+-		perror("Failed to get master pseudo terminal");
++		perror("Failed to get central pseudo terminal");
  		return;
  	}
- 
--	/* LE SC keys are both for master and slave */
-+	/* LE SC keys are both for central and peripheral */
- 	switch (ev->key.type) {
- 	case 0x00:
- 		if (ev->key.central)
--			type = "Master (Unauthenticated)";
-+			type = "Central (Unauthenticated)";
- 		else
--			type = "Slave (Unauthenticated)";
-+			type = "Peripheral (Unauthenticated)";
- 		break;
- 	case 0x01:
- 		if (ev->key.central)
--			type = "Master (Authenticated)";
-+			type = "Central (Authenticated)";
- 		else
--			type = "Slave (Authenticated)";
-+			type = "Peripheral (Authenticated)";
- 		break;
- 	case 0x02:
- 		type = "SC (Unauthenticated)";
-diff --git a/monitor/l2cap.c b/monitor/l2cap.c
-index 083e535613..4e449854ae 100644
---- a/monitor/l2cap.c
-+++ b/monitor/l2cap.c
-@@ -1280,7 +1280,7 @@ static void sig_conn_param_req(const struct l2cap_frame *frame)
- 
- 	print_field("Min interval: %d", le16_to_cpu(pdu->min_interval));
- 	print_field("Max interval: %d", le16_to_cpu(pdu->max_interval));
--	print_field("Slave latency: %d", le16_to_cpu(pdu->latency));
-+	print_field("Peripheral latency: %d", le16_to_cpu(pdu->latency));
- 	print_field("Timeout multiplier: %d", le16_to_cpu(pdu->timeout));
- }
- 
-@@ -2960,9 +2960,9 @@ static void smp_encrypt_info(const struct l2cap_frame *frame)
- 	print_hex_field("Long term key", pdu->ltk, 16);
- }
- 
--static void smp_master_ident(const struct l2cap_frame *frame)
-+static void smp_central_ident(const struct l2cap_frame *frame)
- {
--	const struct bt_l2cap_smp_master_ident *pdu = frame->data;
-+	const struct bt_l2cap_smp_central_ident *pdu = frame->data;
- 
- 	print_field("EDIV: 0x%4.4x", le16_to_cpu(pdu->ediv));
- 	print_field("Rand: 0x%16.16" PRIx64, le64_to_cpu(pdu->rand));
-@@ -3065,8 +3065,8 @@ static const struct smp_opcode_data smp_opcode_table[] = {
- 			smp_pairing_failed, 1, true },
- 	{ 0x06, "Encryption Information",
- 			smp_encrypt_info, 16, true },
--	{ 0x07, "Master Identification",
--			smp_master_ident, 10, true },
-+	{ 0x07, "Central Identification",
-+			smp_central_ident, 10, true },
- 	{ 0x08, "Identity Information",
- 			smp_ident_info, 16, true },
- 	{ 0x09, "Identity Address Information",
-diff --git a/monitor/ll.c b/monitor/ll.c
-index cf93647e03..f588d5e992 100644
---- a/monitor/ll.c
-+++ b/monitor/ll.c
-@@ -186,7 +186,7 @@ static void advertising_packet(const void *data, uint8_t size)
- 		print_field("Transmit window size: %u", win_size);
- 		print_field("Transmit window offset: %u", win_offset);
- 		print_field("Connection interval: %u", interval);
--		print_field("Connection slave latency: %u", latency);
-+		print_field("Connection peripheral latency: %u", latency);
- 		print_field("Connection supervision timeout: %u", timeout);
- 
- 		packet_print_channel_map_ll(ptr + 30);
-@@ -371,8 +371,10 @@ static void conn_update_req(const void *data, uint8_t size)
- 	print_field("Transmit window size: %u", pdu->win_size);
- 	print_field("Transmit window offset: %u", le16_to_cpu(pdu->win_offset));
- 	print_field("Connection interval: %u", le16_to_cpu(pdu->interval));
--	print_field("Connection slave latency: %u", le16_to_cpu(pdu->latency));
--	print_field("Connection supervision timeout: %u", le16_to_cpu(pdu->timeout));
-+	print_field("Connection peripheral latency: %u",
-+						le16_to_cpu(pdu->latency));
-+	print_field("Connection supervision timeout: %u",
-+						le16_to_cpu(pdu->timeout));
- 	print_field("Connection instant: %u", le16_to_cpu(pdu->instant));
- }
- 
-@@ -397,16 +399,16 @@ static void enc_req(const void *data, uint8_t size)
- 
- 	print_field("Rand: 0x%16.16" PRIx64, le64_to_cpu(pdu->rand));
- 	print_field("EDIV: 0x%4.4x", le16_to_cpu(pdu->ediv));
--	print_field("SKD (master): 0x%16.16" PRIx64, le64_to_cpu(pdu->skd));
--	print_field("IV (master): 0x%8.8x", le32_to_cpu(pdu->iv));
-+	print_field("SKD (central): 0x%16.16" PRIx64, le64_to_cpu(pdu->skd));
-+	print_field("IV (central): 0x%8.8x", le32_to_cpu(pdu->iv));
- }
- 
- static void enc_rsp(const void *data, uint8_t size)
- {
- 	const struct bt_ll_enc_rsp *pdu = data;
- 
--	print_field("SKD (slave): 0x%16.16" PRIx64, le64_to_cpu(pdu->skd));
--	print_field("IV (slave): 0x%8.8x", le32_to_cpu(pdu->iv));
-+	print_field("SKD (peripheral): 0x%16.16" PRIx64, le64_to_cpu(pdu->skd));
-+	print_field("IV (peripheral): 0x%8.8x", le32_to_cpu(pdu->iv));
- }
- 
- static const char *opcode_to_string(uint8_t opcode);
-@@ -449,9 +451,9 @@ static void reject_ind(const void *data, uint8_t size)
- 	packet_print_error("Error code", pdu->error);
- }
- 
--static void slave_feature_req(const void *data, uint8_t size)
-+static void peripheral_feature_req(const void *data, uint8_t size)
- {
--	const struct bt_ll_slave_feature_req *pdu = data;
-+	const struct bt_ll_peripheral_feature_req *pdu = data;
- 
- 	packet_print_features_ll(pdu->features);
- }
-@@ -505,16 +507,16 @@ static void phy_update_ind(const void *data, uint8_t size)
- 	const struct bt_ll_phy_update_ind *pdu = data;
- 	uint8_t mask;
- 
--	print_field("M_TO_S_PHY: 0x%2.2x", pdu->m_phy);
-+	print_field("C_TO_P_PHY: 0x%2.2x", pdu->c_phy);
- 
--	mask = print_bitfield(2, pdu->m_phy, le_phys);
-+	mask = print_bitfield(2, pdu->c_phy, le_phys);
- 	if (mask)
- 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
- 							" (0x%2.2x)", mask);
- 
--	print_field("S_TO_M_PHY: 0x%2.2x", pdu->s_phy);
-+	print_field("P_TO_C_PHY: 0x%2.2x", pdu->p_phy);
- 
--	mask = print_bitfield(2, pdu->s_phy, le_phys);
-+	mask = print_bitfield(2, pdu->p_phy, le_phys);
- 	if (mask)
- 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
- 							" (0x%2.2x)", mask);
-@@ -596,38 +598,40 @@ static void cis_req(const void *data, uint8_t size)
- 
- 	print_field("CIG ID: 0x%2.2x", cmd->cig);
- 	print_field("CIS ID: 0x%2.2x", cmd->cis);
--	print_field("Master to Slave PHY: 0x%2.2x", cmd->m_phy);
-+	print_field("Central to Peripheral PHY: 0x%2.2x", cmd->c_phy);
- 
--	mask = print_bitfield(2, cmd->m_phy, le_phys);
-+	mask = print_bitfield(2, cmd->c_phy, le_phys);
- 	if (mask)
- 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
- 							" (0x%2.2x)", mask);
- 
--	print_field("Slave To Master PHY: 0x%2.2x", cmd->s_phy);
-+	print_field("Peripheral To Central PHY: 0x%2.2x", cmd->p_phy);
- 
--	mask = print_bitfield(2, cmd->s_phy, le_phys);
-+	mask = print_bitfield(2, cmd->p_phy, le_phys);
- 	if (mask)
- 		print_text(COLOR_UNKNOWN_OPTIONS_BIT, "  Reserved"
- 							" (0x%2.2x)", mask);
- 
--	print_field("Master to Slave Maximum SDU: %u", cmd->m_sdu);
--	print_field("Slave to Master Maximum SDU: %u", cmd->s_sdu);
-+	print_field("Central to Peripheral Maximum SDU: %u", cmd->c_sdu);
-+	print_field("Peripheral to Central Maximum SDU: %u", cmd->p_sdu);
- 
--	memcpy(&interval, cmd->m_interval, sizeof(cmd->m_interval));
--	print_field("Master to Slave Interval: 0x%6.6x", le32_to_cpu(interval));
--	memcpy(&interval, cmd->s_interval, sizeof(cmd->s_interval));
--	print_field("Slave to Master Interval: 0x%6.6x", le32_to_cpu(interval));
-+	memcpy(&interval, cmd->c_interval, sizeof(cmd->c_interval));
-+	print_field("Central to Peripheral Interval: 0x%6.6x",
-+							le32_to_cpu(interval));
-+	memcpy(&interval, cmd->p_interval, sizeof(cmd->p_interval));
-+	print_field("Peripheral to Central Interval: 0x%6.6x",
-+							le32_to_cpu(interval));
- 
--	print_field("Master to Slave Maximum PDU: %u", cmd->m_pdu);
--	print_field("Slave to Master Maximum PDU: %u", cmd->s_pdu);
-+	print_field("Central to Peripheral Maximum PDU: %u", cmd->c_pdu);
-+	print_field("Peripheral to Central Maximum PDU: %u", cmd->p_pdu);
- 
- 	print_field("Burst Number: %u us", cmd->bn);
- 
- 	memcpy(&interval, cmd->sub_interval, sizeof(cmd->sub_interval));
- 	print_field("Sub-Interval: 0x%6.6x", le32_to_cpu(interval));
- 
--	print_field("Master to Slave Flush Timeout: %u", cmd->m_ft);
--	print_field("Slave to Master Flush Timeout: %u", cmd->s_ft);
-+	print_field("Central to Peripheral Flush Timeout: %u", cmd->c_ft);
-+	print_field("Peripheral to Central Flush Timeout: %u", cmd->p_ft);
- 
- 	print_field("ISO Interval: 0x%4.4x", le16_to_cpu(cmd->iso_interval));
- 
-@@ -702,7 +706,7 @@ static const struct llcp_data llcp_table[] = {
- 	{ 0x0b, "LL_PAUSE_ENC_RSP",         null_pdu,           0, true },
- 	{ 0x0c, "LL_VERSION_IND",           version_ind,        5, true },
- 	{ 0x0d, "LL_REJECT_IND",            reject_ind,         1, true },
--	{ 0x0e, "LL_SLAVE_FEATURE_REQ",     slave_feature_req,  8, true },
-+	{ 0x0e, "LL_PERIPHERAL_FEATURE_REQ", peripheral_feature_req, 8, true },
- 	{ 0x0f, "LL_CONNECTION_PARAM_REQ",  NULL,              23, true },
- 	{ 0x10, "LL_CONNECTION_PARAM_RSP",  NULL,              23, true },
- 	{ 0x11, "LL_REJECT_IND_EXT",        reject_ind_ext,     2, true },
-diff --git a/monitor/lmp.c b/monitor/lmp.c
-index 037adf2e25..d415699e46 100644
---- a/monitor/lmp.c
-+++ b/monitor/lmp.c
-@@ -839,7 +839,7 @@ void lmp_packet(const void *data, uint8_t size, bool padded)
- 	tid = ((const uint8_t *) data)[0] & 0x01;
- 	opcode = (((const uint8_t *) data)[0] & 0xfe) >> 1;
- 
--	tid_str = tid == 0x00 ? "Master" : "Slave";
-+	tid_str = tid == 0x00 ? "Central" : "Peripheral";
- 
- 	switch (opcode) {
- 	case 127:
-diff --git a/monitor/packet.c b/monitor/packet.c
-index c4273484ec..2e0e487ba4 100644
---- a/monitor/packet.c
-+++ b/monitor/packet.c
-@@ -2171,16 +2171,16 @@ static void print_adv_filter_policy(const char *label, uint8_t value)
- 			"Allow Connect Request from Any";
- 		break;
- 	case 0x01:
--		str = "Allow Scan Request from White List Only, "
-+		str = "Allow Scan Request from Accept List Only, "
- 			"Allow Connect Request from Any";
- 		break;
- 	case 0x02:
- 		str = "Allow Scan Request from Any, "
--			"Allow Connect Request from White List Only";
-+			"Allow Connect Request from Accept List Only";
- 		break;
- 	case 0x03:
--		str = "Allow Scan Request from White List Only, "
--			"Allow Connect Request from White List Only";
-+		str = "Allow Scan Request from Accept List Only, "
-+			"Allow Connect Request from Accept List Only";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -2234,10 +2234,10 @@ static void print_role(uint8_t role)
- 
- 	switch (role) {
- 	case 0x00:
--		str = "Master";
-+		str = "Central";
- 		break;
- 	case 0x01:
--		str = "Slave";
-+		str = "Peripheral";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -2556,16 +2556,16 @@ static const struct bitfield_data features_page0[] = {
- 	{ 31, "Extended SCO link (EV3 packets)"		},
- 	{ 32, "EV4 packets"				},
- 	{ 33, "EV5 packets"				},
--	{ 35, "AFH capable slave"			},
--	{ 36, "AFH classification slave"		},
-+	{ 35, "AFH capable peripheral"			},
-+	{ 36, "AFH classification peripheral"		},
- 	{ 37, "BR/EDR Not Supported"			},
- 	{ 38, "LE Supported (Controller)"		},
- 	{ 39, "3-slot Enhanced Data Rate ACL packets"	},
- 	{ 40, "5-slot Enhanced Data Rate ACL packets"	},
- 	{ 41, "Sniff subrating"				},
- 	{ 42, "Pause encryption"			},
--	{ 43, "AFH capable master"			},
--	{ 44, "AFH classification master"		},
-+	{ 43, "AFH capable central"			},
-+	{ 44, "AFH classification central"		},
- 	{ 45, "Enhanced Data Rate eSCO 2 Mbps mode"	},
- 	{ 46, "Enhanced Data Rate eSCO 3 Mbps mode"	},
- 	{ 47, "3-slot Enhanced Data Rate eSCO packets"	},
-@@ -2591,17 +2591,17 @@ static const struct bitfield_data features_page1[] = {
- };
- 
- static const struct bitfield_data features_page2[] = {
--	{  0, "Connectionless Slave Broadcast - Master"	},
--	{  1, "Connectionless Slave Broadcast - Slave"	},
--	{  2, "Synchronization Train"			},
--	{  3, "Synchronization Scan"			},
--	{  4, "Inquiry Response Notification Event"	},
--	{  5, "Generalized interlaced scan"		},
--	{  6, "Coarse Clock Adjustment"			},
--	{  8, "Secure Connections (Controller Support)"	},
--	{  9, "Ping"					},
--	{ 10, "Slot Availability Mask"			},
--	{ 11, "Train nudging"				},
-+	{  0, "Connectionless Peripheral Broadcast - Central"	},
-+	{  1, "Connectionless Peripheral Broadcast - Peripheral"},
-+	{  2, "Synchronization Train"				},
-+	{  3, "Synchronization Scan"				},
-+	{  4, "Inquiry Response Notification Event"		},
-+	{  5, "Generalized interlaced scan"			},
-+	{  6, "Coarse Clock Adjustment"				},
-+	{  8, "Secure Connections (Controller Support)"		},
-+	{  9, "Ping"						},
-+	{ 10, "Slot Availability Mask"				},
-+	{ 11, "Train nudging"					},
- 	{ }
- };
- 
-@@ -2609,7 +2609,7 @@ static const struct bitfield_data features_le[] = {
- 	{  0, "LE Encryption"					},
- 	{  1, "Connection Parameter Request Procedure"		},
- 	{  2, "Extended Reject Indication"			},
--	{  3, "Slave-initiated Features Exchange"		},
-+	{  3, "Peripheral-initiated Features Exchange"		},
- 	{  4, "LE Ping"						},
- 	{  5, "LE Data Packet Length Extension"			},
- 	{  6, "LL Privacy"					},
-@@ -2634,8 +2634,8 @@ static const struct bitfield_data features_le[] = {
- 	{ 25, "Periodic Advertising Sync Transfer - Recipient"	},
- 	{ 26, "Sleep Clock Accuracy Updates"			},
- 	{ 27, "Remote Public Key Validation"			},
--	{ 28, "Connected Isochronous Stream - Master"		},
--	{ 29, "Connected Isochronous Stream - Slave"		},
-+	{ 28, "Connected Isochronous Stream - Central"		},
-+	{ 29, "Connected Isochronous Stream - Peripheral"	},
- 	{ 30, "Isochronous Broadcaster"				},
- 	{ 31, "Synchronized Receiver"				},
- 	{ 32, "Isochronous Channels (Host Support)"		},
-@@ -2729,11 +2729,11 @@ void packet_print_features_msft(const uint8_t *features)
- #define LE_STATE_ACTIVE_SCAN		0x0020
- #define LE_STATE_PASSIVE_SCAN		0x0040
- #define LE_STATE_INITIATING		0x0080
--#define LE_STATE_CONN_MASTER		0x0100
--#define LE_STATE_CONN_SLAVE		0x0200
--#define LE_STATE_MASTER_MASTER		0x0400
--#define LE_STATE_SLAVE_SLAVE		0x0800
--#define LE_STATE_MASTER_SLAVE		0x1000
-+#define LE_STATE_CONN_CENTRAL		0x0100
-+#define LE_STATE_CONN_PERIPHERAL	0x0200
-+#define LE_STATE_CENTRAL_CENTRAL	0x0400
-+#define LE_STATE_PERIPHERAL_PERIPHERAL	0x0800
-+#define LE_STATE_CENTRAL_PERIPHERAL	0x1000
- 
- static const struct bitfield_data le_states_desc_table[] = {
- 	{  0, "Scannable Advertising State"			},
-@@ -2744,11 +2744,11 @@ static const struct bitfield_data le_states_desc_table[] = {
- 	{  5, "Active Scanning State"				},
- 	{  6, "Passive Scanning State"				},
- 	{  7, "Initiating State"				},
--	{  8, "Connection State (Master Role)"			},
--	{  9, "Connection State (Slave Role)"			},
--	{ 10, "Master Role & Master Role"			},
--	{ 11, "Slave Role & Slave Role"				},
--	{ 12, "Master Role & Slave Role"			},
-+	{  8, "Connection State (Central Role)"			},
-+	{  9, "Connection State (Peripheral Role)"		},
-+	{ 10, "Central Role & Central Role"			},
-+	{ 11, "Peripheral Role & Peripheral Role"		},
-+	{ 12, "Central Role & Peripheral Role"			},
- 	{ }
- };
- 
-@@ -2756,59 +2756,59 @@ static const struct {
- 	uint8_t bit;
- 	uint16_t states;
- } le_states_comb_table[] = {
--	{  0, LE_STATE_NONCONN_ADV				},
--	{  1, LE_STATE_SCAN_ADV					},
--	{  2, LE_STATE_CONN_ADV					},
--	{  3, LE_STATE_HIGH_DIRECT_ADV				},
--	{  4, LE_STATE_PASSIVE_SCAN				},
--	{  5, LE_STATE_ACTIVE_SCAN				},
--	{  6, LE_STATE_INITIATING | LE_STATE_CONN_MASTER	},
--	{  7, LE_STATE_CONN_SLAVE				},
--	{  8, LE_STATE_PASSIVE_SCAN | LE_STATE_NONCONN_ADV	},
--	{  9, LE_STATE_PASSIVE_SCAN | LE_STATE_SCAN_ADV		},
--	{ 10, LE_STATE_PASSIVE_SCAN | LE_STATE_CONN_ADV		},
--	{ 11, LE_STATE_PASSIVE_SCAN | LE_STATE_HIGH_DIRECT_ADV	},
--	{ 12, LE_STATE_ACTIVE_SCAN | LE_STATE_NONCONN_ADV	},
--	{ 13, LE_STATE_ACTIVE_SCAN | LE_STATE_SCAN_ADV		},
--	{ 14, LE_STATE_ACTIVE_SCAN | LE_STATE_CONN_ADV		},
--	{ 15, LE_STATE_ACTIVE_SCAN | LE_STATE_HIGH_DIRECT_ADV	},
--	{ 16, LE_STATE_INITIATING | LE_STATE_NONCONN_ADV	},
--	{ 17, LE_STATE_INITIATING | LE_STATE_SCAN_ADV		},
--	{ 18, LE_STATE_CONN_MASTER | LE_STATE_NONCONN_ADV	},
--	{ 19, LE_STATE_CONN_MASTER | LE_STATE_SCAN_ADV		},
--	{ 20, LE_STATE_CONN_SLAVE | LE_STATE_NONCONN_ADV	},
--	{ 21, LE_STATE_CONN_SLAVE | LE_STATE_SCAN_ADV		},
--	{ 22, LE_STATE_INITIATING | LE_STATE_PASSIVE_SCAN	},
--	{ 23, LE_STATE_INITIATING | LE_STATE_ACTIVE_SCAN	},
--	{ 24, LE_STATE_CONN_MASTER | LE_STATE_PASSIVE_SCAN	},
--	{ 25, LE_STATE_CONN_MASTER | LE_STATE_ACTIVE_SCAN	},
--	{ 26, LE_STATE_CONN_SLAVE | LE_STATE_PASSIVE_SCAN	},
--	{ 27, LE_STATE_CONN_SLAVE | LE_STATE_ACTIVE_SCAN	},
--	{ 28, LE_STATE_INITIATING | LE_STATE_CONN_MASTER |
--					LE_STATE_MASTER_MASTER	},
--	{ 29, LE_STATE_LOW_DIRECT_ADV				},
--	{ 30, LE_STATE_LOW_DIRECT_ADV | LE_STATE_PASSIVE_SCAN	},
--	{ 31, LE_STATE_LOW_DIRECT_ADV | LE_STATE_ACTIVE_SCAN	},
-+	{  0, LE_STATE_NONCONN_ADV					},
-+	{  1, LE_STATE_SCAN_ADV						},
-+	{  2, LE_STATE_CONN_ADV						},
-+	{  3, LE_STATE_HIGH_DIRECT_ADV					},
-+	{  4, LE_STATE_PASSIVE_SCAN					},
-+	{  5, LE_STATE_ACTIVE_SCAN					},
-+	{  6, LE_STATE_INITIATING | LE_STATE_CONN_CENTRAL		},
-+	{  7, LE_STATE_CONN_PERIPHERAL					},
-+	{  8, LE_STATE_PASSIVE_SCAN | LE_STATE_NONCONN_ADV		},
-+	{  9, LE_STATE_PASSIVE_SCAN | LE_STATE_SCAN_ADV			},
-+	{ 10, LE_STATE_PASSIVE_SCAN | LE_STATE_CONN_ADV			},
-+	{ 11, LE_STATE_PASSIVE_SCAN | LE_STATE_HIGH_DIRECT_ADV		},
-+	{ 12, LE_STATE_ACTIVE_SCAN | LE_STATE_NONCONN_ADV		},
-+	{ 13, LE_STATE_ACTIVE_SCAN | LE_STATE_SCAN_ADV			},
-+	{ 14, LE_STATE_ACTIVE_SCAN | LE_STATE_CONN_ADV			},
-+	{ 15, LE_STATE_ACTIVE_SCAN | LE_STATE_HIGH_DIRECT_ADV		},
-+	{ 16, LE_STATE_INITIATING | LE_STATE_NONCONN_ADV		},
-+	{ 17, LE_STATE_INITIATING | LE_STATE_SCAN_ADV			},
-+	{ 18, LE_STATE_CONN_CENTRAL | LE_STATE_NONCONN_ADV		},
-+	{ 19, LE_STATE_CONN_CENTRAL | LE_STATE_SCAN_ADV			},
-+	{ 20, LE_STATE_CONN_PERIPHERAL | LE_STATE_NONCONN_ADV		},
-+	{ 21, LE_STATE_CONN_PERIPHERAL | LE_STATE_SCAN_ADV		},
-+	{ 22, LE_STATE_INITIATING | LE_STATE_PASSIVE_SCAN		},
-+	{ 23, LE_STATE_INITIATING | LE_STATE_ACTIVE_SCAN		},
-+	{ 24, LE_STATE_CONN_CENTRAL | LE_STATE_PASSIVE_SCAN		},
-+	{ 25, LE_STATE_CONN_CENTRAL | LE_STATE_ACTIVE_SCAN		},
-+	{ 26, LE_STATE_CONN_PERIPHERAL | LE_STATE_PASSIVE_SCAN		},
-+	{ 27, LE_STATE_CONN_PERIPHERAL | LE_STATE_ACTIVE_SCAN		},
-+	{ 28, LE_STATE_INITIATING | LE_STATE_CONN_CENTRAL |
-+					LE_STATE_CENTRAL_CENTRAL	},
-+	{ 29, LE_STATE_LOW_DIRECT_ADV					},
-+	{ 30, LE_STATE_LOW_DIRECT_ADV | LE_STATE_PASSIVE_SCAN		},
-+	{ 31, LE_STATE_LOW_DIRECT_ADV | LE_STATE_ACTIVE_SCAN		},
- 	{ 32, LE_STATE_INITIATING | LE_STATE_CONN_ADV |
--					LE_STATE_MASTER_SLAVE	},
-+					LE_STATE_CENTRAL_PERIPHERAL	},
- 	{ 33, LE_STATE_INITIATING | LE_STATE_HIGH_DIRECT_ADV |
--					LE_STATE_MASTER_SLAVE	},
-+					LE_STATE_CENTRAL_PERIPHERAL	},
- 	{ 34, LE_STATE_INITIATING | LE_STATE_LOW_DIRECT_ADV |
--					LE_STATE_MASTER_SLAVE	},
--	{ 35, LE_STATE_CONN_MASTER | LE_STATE_CONN_ADV |
--					LE_STATE_MASTER_SLAVE	},
--	{ 36, LE_STATE_CONN_MASTER | LE_STATE_HIGH_DIRECT_ADV |
--					LE_STATE_MASTER_SLAVE	},
--	{ 37, LE_STATE_CONN_MASTER | LE_STATE_LOW_DIRECT_ADV |
--					LE_STATE_MASTER_SLAVE	},
--	{ 38, LE_STATE_CONN_SLAVE | LE_STATE_CONN_ADV |
--					LE_STATE_MASTER_SLAVE	},
--	{ 39, LE_STATE_CONN_SLAVE | LE_STATE_HIGH_DIRECT_ADV |
--					LE_STATE_SLAVE_SLAVE	},
--	{ 40, LE_STATE_CONN_SLAVE | LE_STATE_LOW_DIRECT_ADV |
--					LE_STATE_SLAVE_SLAVE	},
--	{ 41, LE_STATE_INITIATING | LE_STATE_CONN_SLAVE |
--					LE_STATE_MASTER_SLAVE	},
-+					LE_STATE_CENTRAL_PERIPHERAL	},
-+	{ 35, LE_STATE_CONN_CENTRAL | LE_STATE_CONN_ADV |
-+					LE_STATE_CENTRAL_PERIPHERAL	},
-+	{ 36, LE_STATE_CONN_CENTRAL | LE_STATE_HIGH_DIRECT_ADV |
-+					LE_STATE_CENTRAL_PERIPHERAL	},
-+	{ 37, LE_STATE_CONN_CENTRAL | LE_STATE_LOW_DIRECT_ADV |
-+					LE_STATE_CENTRAL_PERIPHERAL	},
-+	{ 38, LE_STATE_CONN_PERIPHERAL | LE_STATE_CONN_ADV |
-+					LE_STATE_CENTRAL_PERIPHERAL	},
-+	{ 39, LE_STATE_CONN_PERIPHERAL | LE_STATE_HIGH_DIRECT_ADV |
-+					LE_STATE_PERIPHERAL_PERIPHERAL	},
-+	{ 40, LE_STATE_CONN_PERIPHERAL | LE_STATE_LOW_DIRECT_ADV |
-+					LE_STATE_PERIPHERAL_PERIPHERAL	},
-+	{ 41, LE_STATE_INITIATING | LE_STATE_CONN_PERIPHERAL |
-+					LE_STATE_CENTRAL_PERIPHERAL	},
- 	{ }
- };
- 
-@@ -2908,7 +2908,7 @@ static const struct bitfield_data events_table[] = {
- 	{  6, "Remote Name Request Complete"				},
- 	{  7, "Encryption Change"					},
- 	{  8, "Change Connection Link Key Complete"			},
--	{  9, "Master Link Key Complete"				},
-+	{  9, "Link Key Type Changed"					},
- 	{ 10, "Read Remote Supported Features Complete"			},
- 	{ 11, "Read Remote Version Information Complete"		},
- 	{ 12, "QoS Setup Complete"					},
-@@ -2989,11 +2989,11 @@ static const struct bitfield_data events_page2_table[] = {
- 	{ 14, "Triggered Clock Capture"					},
- 	{ 15, "Synchronization Train Complete"				},
- 	{ 16, "Synchronization Train Received"				},
--	{ 17, "Connectionless Slave Broadcast Receive"			},
--	{ 18, "Connectionless Slave Broadcast Timeout"			},
-+	{ 17, "Connectionless Peripheral Broadcast Receive"		},
-+	{ 18, "Connectionless Peripheral Broadcast Timeout"		},
- 	{ 19, "Truncated Page Complete"					},
--	{ 20, "Slave Page Response Timeout"				},
--	{ 21, "Connectionless Slave Broadcast Channel Map Change"	},
-+	{ 20, "Peripheral Page Response Timeout"			},
-+	{ 21, "Connectionless Peripheral Broadcast Channel Map Change"	},
- 	{ 22, "Inquiry Response Notification"				},
- 	{ 23, "Authenticated Payload Timeout Expired"			},
- 	{ 24, "SAM Status Change"					},
-@@ -3065,7 +3065,7 @@ static void print_fec(uint8_t fec)
- #define BT_EIR_DEVICE_ID		0x10
- #define BT_EIR_SMP_TK			0x10
- #define BT_EIR_SMP_OOB_FLAGS		0x11
--#define BT_EIR_SLAVE_CONN_INTERVAL	0x12
-+#define BT_EIR_PERIPHERAL_CONN_INTERVAL	0x12
- #define BT_EIR_SERVICE_UUID16		0x14
- #define BT_EIR_SERVICE_UUID128		0x15
- #define BT_EIR_SERVICE_DATA		0x16
-@@ -3675,10 +3675,10 @@ static void print_eir(const uint8_t *eir, uint8_t eir_len, bool le)
- 			print_field("SMP OOB Flags: 0x%2.2x", *data);
- 			break;
- 
--		case BT_EIR_SLAVE_CONN_INTERVAL:
-+		case BT_EIR_PERIPHERAL_CONN_INTERVAL:
- 			if (data_len < 4)
- 				break;
--			print_field("Slave Conn. Interval: 0x%4.4x - 0x%4.4x",
-+			print_field("Peripheral Conn. Interval: 0x%4.4x - 0x%4.4x",
- 							get_le16(&data[0]),
- 							get_le16(&data[2]));
- 			break;
-@@ -4147,10 +4147,10 @@ static void create_conn_cmd(const void *data, uint8_t size)
- 
- 	switch (cmd->role_switch) {
- 	case 0x00:
--		str = "Stay master";
-+		str = "Stay central";
- 		break;
- 	case 0x01:
--		str = "Allow slave";
-+		str = "Allow peripheral";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -4260,9 +4260,9 @@ static void change_conn_link_key_cmd(const void *data, uint8_t size)
- 	print_handle(cmd->handle);
- }
- 
--static void master_link_key_cmd(const void *data, uint8_t size)
-+static void link_key_selection_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_master_link_key *cmd = data;
-+	const struct bt_hci_cmd_link_key_selection *cmd = data;
- 
- 	print_key_flag(cmd->key_flag);
- }
-@@ -4554,9 +4554,9 @@ static void truncated_page_cancel_cmd(const void *data, uint8_t size)
- 	print_bdaddr(cmd->bdaddr);
- }
- 
--static void set_slave_broadcast_cmd(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_set_slave_broadcast *cmd = data;
-+	const struct bt_hci_cmd_set_peripheral_broadcast *cmd = data;
- 
- 	print_field("Enable: 0x%2.2x", cmd->enable);
- 	print_lt_addr(cmd->lt_addr);
-@@ -4567,18 +4567,18 @@ static void set_slave_broadcast_cmd(const void *data, uint8_t size)
- 	print_slot_625("Supervision timeout", cmd->timeout);
- }
- 
--static void set_slave_broadcast_rsp(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_rsp(const void *data, uint8_t size)
- {
--	const struct bt_hci_rsp_set_slave_broadcast *rsp = data;
-+	const struct bt_hci_rsp_set_peripheral_broadcast *rsp = data;
- 
- 	print_status(rsp->status);
- 	print_lt_addr(rsp->lt_addr);
- 	print_interval(rsp->interval);
- }
- 
--static void set_slave_broadcast_receive_cmd(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_receive_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_set_slave_broadcast_receive *cmd = data;
-+	const struct bt_hci_cmd_set_peripheral_broadcast_receive *cmd = data;
- 
- 	print_field("Enable: 0x%2.2x", cmd->enable);
- 	print_bdaddr(cmd->bdaddr);
-@@ -4594,9 +4594,9 @@ static void set_slave_broadcast_receive_cmd(const void *data, uint8_t size)
- 	print_channel_map(cmd->map);
- }
- 
--static void set_slave_broadcast_receive_rsp(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_receive_rsp(const void *data, uint8_t size)
- {
--	const struct bt_hci_rsp_set_slave_broadcast_receive *rsp = data;
-+	const struct bt_hci_rsp_set_peripheral_broadcast_receive *rsp = data;
- 
- 	print_status(rsp->status);
- 	print_bdaddr(rsp->bdaddr);
-@@ -5665,9 +5665,9 @@ static void delete_reserved_lt_addr_rsp(const void *data, uint8_t size)
- 	print_lt_addr(rsp->lt_addr);
- }
- 
--static void set_slave_broadcast_data_cmd(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_data_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_set_slave_broadcast_data *cmd = data;
-+	const struct bt_hci_cmd_set_peripheral_broadcast_data *cmd = data;
- 
- 	print_lt_addr(cmd->lt_addr);
- 	print_broadcast_fragment(cmd->fragment);
-@@ -5680,9 +5680,9 @@ static void set_slave_broadcast_data_cmd(const void *data, uint8_t size)
- 	packet_hexdump(data + 3, size - 3);
- }
- 
--static void set_slave_broadcast_data_rsp(const void *data, uint8_t size)
-+static void set_peripheral_broadcast_data_rsp(const void *data, uint8_t size)
- {
--	const struct bt_hci_rsp_set_slave_broadcast_data *rsp = data;
-+	const struct bt_hci_rsp_set_peripheral_broadcast_data *rsp = data;
- 
- 	print_status(rsp->status);
- 	print_lt_addr(rsp->lt_addr);
-@@ -6541,13 +6541,13 @@ static void print_scan_filter_policy(uint8_t policy)
- 		str = "Accept all advertisement";
- 		break;
- 	case 0x01:
--		str = "Ignore not in white list";
-+		str = "Ignore not in accept list";
- 		break;
- 	case 0x02:
- 		str = "Accept all advertisement, inc. directed unresolved RPA";
- 		break;
- 	case 0x03:
--		str = "Ignore not in white list, exc. directed unresolved RPA";
-+		str = "Ignore not in accept list, exc. directed unresolved RPA";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -6586,10 +6586,10 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
- 
- 	switch (cmd->filter_policy) {
- 	case 0x00:
--		str = "White list is not used";
-+		str = "Accept list is not used";
- 		break;
- 	case 0x01:
--		str = "White list is used";
-+		str = "Accept list is used";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -6612,25 +6612,25 @@ static void le_create_conn_cmd(const void *data, uint8_t size)
- 	print_slot_625("Max connection length", cmd->max_length);
- }
- 
--static void le_read_white_list_size_rsp(const void *data, uint8_t size)
-+static void le_read_accept_list_size_rsp(const void *data, uint8_t size)
- {
--	const struct bt_hci_rsp_le_read_white_list_size *rsp = data;
-+	const struct bt_hci_rsp_le_read_accept_list_size *rsp = data;
- 
- 	print_status(rsp->status);
- 	print_field("Size: %u", rsp->size);
- }
- 
--static void le_add_to_white_list_cmd(const void *data, uint8_t size)
-+static void le_add_to_accept_list_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_le_add_to_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_add_to_accept_list *cmd = data;
- 
- 	print_addr_type("Address type", cmd->addr_type);
- 	print_addr("Address", cmd->addr, cmd->addr_type);
- }
- 
--static void le_remove_from_white_list_cmd(const void *data, uint8_t size)
-+static void le_remove_from_accept_list_cmd(const void *data, uint8_t size)
- {
--	const struct bt_hci_cmd_le_remove_from_white_list *cmd = data;
-+	const struct bt_hci_cmd_le_remove_from_accept_list *cmd = data;
- 
- 	print_addr_type("Address type", cmd->addr_type);
- 	print_addr("Address", cmd->addr, cmd->addr_type);
-@@ -7569,10 +7569,10 @@ static void le_ext_create_conn_cmd(const void *data, uint8_t size)
- 
- 	switch (cmd->filter_policy) {
- 	case 0x00:
--		str = "White list is not used";
-+		str = "Accept list is not used";
- 		break;
- 	case 0x01:
--		str = "White list is used";
-+		str = "Accept list is used";
- 		break;
- 	default:
- 		str = "Reserved";
-@@ -8030,16 +8030,16 @@ static void print_cis_params(const void *data, int i)
- 	const struct bt_hci_cis_params *cis = data;
- 
- 	print_field("CIS ID: 0x%2.2x", cis->cis_id);
--	print_field("Master to Slave Maximum SDU Size: %u",
--						le16_to_cpu(cis->m_sdu));
--	print_field("Slave to Master Maximum SDU Size: %u",
--						le16_to_cpu(cis->s_sdu));
--	print_le_phy("Master to Slave PHY", cis->m_phy);
--	print_le_phy("Slave to Master PHY", cis->s_phy);
--	print_field("Master to Slave Retransmission attempts: 0x%2.2x",
--							cis->m_rtn);
--	print_field("Slave to Master Retransmission attempts: 0x%2.2x",
--							cis->s_rtn);
-+	print_field("Central to Peripheral Maximum SDU Size: %u",
-+						le16_to_cpu(cis->c_sdu));
-+	print_field("Peripheral to Central Maximum SDU Size: %u",
-+						le16_to_cpu(cis->p_sdu));
-+	print_le_phy("Central to Peripheral PHY", cis->c_phy);
-+	print_le_phy("Peripheral to Central PHY", cis->p_phy);
-+	print_field("Central to Peripheral Retransmission attempts: 0x%2.2x",
-+							cis->c_rtn);
-+	print_field("Peripheral to Central Retransmission attempts: 0x%2.2x",
-+							cis->p_rtn);
- }
- 
- static void le_set_cig_params_cmd(const void *data, uint8_t size)
-@@ -8047,15 +8047,17 @@ static void le_set_cig_params_cmd(const void *data, uint8_t size)
- 	const struct bt_hci_cmd_le_set_cig_params *cmd = data;
- 
- 	print_field("CIG ID: 0x%2.2x", cmd->cig_id);
--	print_usec_interval("Master to Slave SDU Interval", cmd->m_interval);
--	print_usec_interval("Slave to Master SDU Interval", cmd->s_interval);
-+	print_usec_interval("Central to Peripheral SDU Interval",
-+							cmd->c_interval);
-+	print_usec_interval("Peripheral to Central SDU Interval",
-+							cmd->p_interval);
- 	print_sca(cmd->sca);
- 	print_packing(cmd->packing);
- 	print_framing(cmd->framing);
--	print_field("Master to Slave Maximum Latency: %d ms (0x%4.4x)",
--		le16_to_cpu(cmd->m_latency), le16_to_cpu(cmd->m_latency));
--	print_field("Slave to Master Maximum Latency: %d ms (0x%4.4x)",
--		le16_to_cpu(cmd->s_latency), le16_to_cpu(cmd->s_latency));
-+	print_field("Central to Peripheral Maximum Latency: %d ms (0x%4.4x)",
-+		le16_to_cpu(cmd->c_latency), le16_to_cpu(cmd->c_latency));
-+	print_field("Peripheral to Central Maximum Latency: %d ms (0x%4.4x)",
-+		le16_to_cpu(cmd->p_latency), le16_to_cpu(cmd->p_latency));
- 	print_field("Number of CIS: %u", cmd->num_cis);
- 
- 	size -= sizeof(*cmd);
-@@ -8070,18 +8072,18 @@ static void print_cis_params_test(const void *data, int i)
- 
- 	print_field("CIS ID: 0x%2.2x", cis->cis_id);
- 	print_field("NSE: 0x%2.2x", cis->nse);
--	print_field("Master to Slave Maximum SDU: 0x%4.4x",
--						le16_to_cpu(cis->m_sdu));
--	print_field("Slave to Master Maximum SDU: 0x%4.4x",
--						le16_to_cpu(cis->s_sdu));
--	print_field("Master to Slave Maximum PDU: 0x%4.4x",
--						le16_to_cpu(cis->m_pdu));
--	print_field("Slave to Master Maximum PDU: 0x%4.4x",
--						le16_to_cpu(cis->s_pdu));
--	print_le_phy("Master to Slave PHY", cis->m_phy);
--	print_le_phy("Slave to Master PHY", cis->s_phy);
--	print_field("Master to Slave Burst Number: 0x%2.2x", cis->m_bn);
--	print_field("Slave to Master Burst Number: 0x%2.2x", cis->s_bn);
-+	print_field("Central to Peripheral Maximum SDU: 0x%4.4x", 
-+						le16_to_cpu(cis->c_sdu));
-+	print_field("Peripheral to Central Maximum SDU: 0x%4.4x",
-+						le16_to_cpu(cis->p_sdu));
-+	print_field("Central to Peripheral Maximum PDU: 0x%4.4x",
-+						le16_to_cpu(cis->c_pdu));
-+	print_field("Peripheral to Central Maximum PDU: 0x%4.4x",
-+						le16_to_cpu(cis->p_pdu));
-+	print_le_phy("Central to Peripheral PHY", cis->c_phy);
-+	print_le_phy("Peripheral to Central PHY", cis->p_phy);
-+	print_field("Central to Peripheral Burst Number: 0x%2.2x", cis->c_bn);
-+	print_field("Peripheral to Central Burst Number: 0x%2.2x", cis->p_bn);
- }
- 
- static void le_set_cig_params_test_cmd(const void *data, uint8_t size)
-@@ -8089,10 +8091,12 @@ static void le_set_cig_params_test_cmd(const void *data, uint8_t size)
- 	const struct bt_hci_cmd_le_set_cig_params_test *cmd = data;
- 
- 	print_field("CIG ID: 0x%2.2x", cmd->cig_id);
--	print_usec_interval("Master to Slave SDU Interval", cmd->m_interval);
--	print_usec_interval("Slave to Master SDU Interval", cmd->s_interval);
--	print_field("Master to Slave Flush Timeout: 0x%2.2x", cmd->m_ft);
--	print_field("Slave to Master Flush Timeout: 0x%2.2x", cmd->s_ft);
-+	print_usec_interval("Central to Peripheral SDU Interval",
-+							cmd->c_interval);
-+	print_usec_interval("Peripheral to Central SDU Interval",
-+							cmd->p_interval);
-+	print_field("Central to Peripheral Flush Timeout: 0x%2.2x", cmd->c_ft);
-+	print_field("Peripheral to Central Flush Timeout: 0x%2.2x", cmd->p_ft);
- 	print_field("ISO Interval: %.2f ms (0x%4.4x)",
- 				le16_to_cpu(cmd->iso_interval) * 1.25,
- 				le16_to_cpu(cmd->iso_interval));
-@@ -8425,8 +8429,8 @@ static const struct opcode_data opcode_table[] = {
- 				set_conn_encrypt_cmd, 3, true },
- 	{ 0x0415,  17, "Change Connection Link Key",
- 				change_conn_link_key_cmd, 2, true },
--	{ 0x0417,  18, "Master Link Key",
--				master_link_key_cmd, 1, true },
-+	{ 0x0417,  18, "Temporary Link Key",
-+				link_key_selection_cmd, 1, true },
- 	{ 0x0419,  19, "Remote Name Request",
- 				remote_name_request_cmd, 10, true },
- 	{ 0x041a,  20, "Remote Name Request Cancel",
-@@ -8499,12 +8503,12 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x0440, 247, "Truncated Page Cancel",
- 				truncated_page_cancel_cmd, 6, true,
- 				status_bdaddr_rsp, 7, true },
--	{ 0x0441, 248, "Set Connectionless Slave Broadcast",
--				set_slave_broadcast_cmd, 11, true,
--				set_slave_broadcast_rsp, 4, true },
--	{ 0x0442, 249, "Set Connectionless Slave Broadcast Receive",
--				set_slave_broadcast_receive_cmd, 34, true,
--				set_slave_broadcast_receive_rsp, 8, true },
-+	{ 0x0441, 248, "Set Connectionless Peripheral Broadcast",
-+				set_peripheral_broadcast_cmd, 11, true,
-+				set_peripheral_broadcast_rsp, 4, true },
-+	{ 0x0442, 249, "Set Connectionless Peripheral Broadcast Receive",
-+				set_peripheral_broadcast_receive_cmd, 34, true,
-+				set_peripheral_broadcast_receive_rsp, 8, true },
- 	{ 0x0443, 250, "Start Synchronization Train",
- 				null_cmd, 0, true },
- 	{ 0x0444, 251, "Receive Synchronization Train",
-@@ -8805,9 +8809,9 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x0c75, 253, "Delete Reserved LT_ADDR",
- 				delete_reserved_lt_addr_cmd, 1, true,
- 				delete_reserved_lt_addr_rsp, 2, true },
--	{ 0x0c76, 254, "Set Connectionless Slave Broadcast Data",
--				set_slave_broadcast_data_cmd, 3, false,
--				set_slave_broadcast_data_rsp, 2, true },
-+	{ 0x0c76, 254, "Set Connectionless Peripheral Broadcast Data",
-+				set_peripheral_broadcast_data_cmd, 3, false,
-+				set_peripheral_broadcast_data_rsp, 2, true },
- 	{ 0x0c77, 255, "Read Synchronization Train Parameters",
- 				null_cmd, 0, true,
- 				read_sync_train_params_rsp, 8, true },
-@@ -8995,17 +8999,17 @@ static const struct opcode_data opcode_table[] = {
- 	{ 0x200e, 213, "LE Create Connection Cancel",
- 				null_cmd, 0, true,
- 				status_rsp, 1, true },
--	{ 0x200f, 214, "LE Read White List Size",
-+	{ 0x200f, 214, "LE Read Accept List Size",
- 				null_cmd, 0, true,
--				le_read_white_list_size_rsp, 2, true },
--	{ 0x2010, 215, "LE Clear White List",
-+				le_read_accept_list_size_rsp, 2, true },
-+	{ 0x2010, 215, "LE Clear Accept List",
- 				null_cmd, 0, true,
- 				status_rsp, 1, true },
--	{ 0x2011, 216, "LE Add Device To White List",
--				le_add_to_white_list_cmd, 7, true,
-+	{ 0x2011, 216, "LE Add Device To Accept List",
-+				le_add_to_accept_list_cmd, 7, true,
- 				status_rsp, 1, true },
--	{ 0x2012, 217, "LE Remove Device From White List",
--				le_remove_from_white_list_cmd, 7, true,
-+	{ 0x2012, 217, "LE Remove Device From Accept List",
-+				le_remove_from_accept_list_cmd, 7, true,
- 				status_rsp, 1, true },
- 	{ 0x2013, 218, "LE Connection Update",
- 				le_conn_update_cmd, 14, true },
-@@ -9502,9 +9506,9 @@ static void change_conn_link_key_complete_evt(const void *data, uint8_t size)
- 	print_handle(evt->handle);
- }
- 
--static void master_link_key_complete_evt(const void *data, uint8_t size)
-+static void link_key_type_changed_evt(const void *data, uint8_t size)
- {
--	const struct bt_hci_evt_master_link_key_complete *evt = data;
-+	const struct bt_hci_evt_link_key_type_changed *evt = data;
- 
- 	print_status(evt->status);
- 	print_handle(evt->handle);
-@@ -10209,9 +10213,9 @@ static void sync_train_received_evt(const void *data, uint8_t size)
- 	print_field("Service Data: 0x%2.2x", evt->service_data);
- }
- 
--static void slave_broadcast_receive_evt(const void *data, uint8_t size)
-+static void peripheral_broadcast_receive_evt(const void *data, uint8_t size)
- {
--	const struct bt_hci_evt_slave_broadcast_receive *evt = data;
-+	const struct bt_hci_evt_peripheral_broadcast_receive *evt = data;
- 
- 	print_bdaddr(evt->bdaddr);
- 	print_lt_addr(evt->lt_addr);
-@@ -10231,9 +10235,9 @@ static void slave_broadcast_receive_evt(const void *data, uint8_t size)
- 		packet_hexdump(data + 18, size - 18);
- }
- 
--static void slave_broadcast_timeout_evt(const void *data, uint8_t size)
-+static void peripheral_broadcast_timeout_evt(const void *data, uint8_t size)
- {
--	const struct bt_hci_evt_slave_broadcast_timeout *evt = data;
-+	const struct bt_hci_evt_peripheral_broadcast_timeout *evt = data;
- 
- 	print_bdaddr(evt->bdaddr);
- 	print_lt_addr(evt->lt_addr);
-@@ -10247,13 +10251,14 @@ static void truncated_page_complete_evt(const void *data, uint8_t size)
- 	print_bdaddr(evt->bdaddr);
- }
- 
--static void slave_page_response_timeout_evt(const void *data, uint8_t size)
-+static void peripheral_page_response_timeout_evt(const void *data, uint8_t size)
- {
- }
- 
--static void slave_broadcast_channel_map_change_evt(const void *data, uint8_t size)
-+static void peripheral_broadcast_channel_map_change_evt(const void *data,
-+								uint8_t size)
- {
--	const struct bt_hci_evt_slave_broadcast_channel_map_change *evt = data;
-+	const struct bt_hci_evt_peripheral_broadcast_channel_map_change *evt = data;
- 
- 	print_channel_map(evt->map);
- }
-@@ -10287,7 +10292,7 @@ static void le_conn_complete_evt(const void *data, uint8_t size)
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
--	print_field("Master clock accuracy: 0x%2.2x", evt->clock_accuracy);
-+	print_field("Central clock accuracy: 0x%2.2x", evt->clock_accuracy);
- 
- 	if (evt->status == 0x00)
- 		assign_handle(le16_to_cpu(evt->handle), 0x01);
-@@ -10408,7 +10413,7 @@ static void le_enhanced_conn_complete_evt(const void *data, uint8_t size)
- 	print_field("Supervision timeout: %d msec (0x%4.4x)",
- 					le16_to_cpu(evt->supv_timeout) * 10,
- 					le16_to_cpu(evt->supv_timeout));
--	print_field("Master clock accuracy: 0x%2.2x", evt->clock_accuracy);
-+	print_field("Central clock accuracy: 0x%2.2x", evt->clock_accuracy);
- 
- 	if (evt->status == 0x00)
- 		assign_handle(le16_to_cpu(evt->handle), 0x01);
-@@ -10784,17 +10789,17 @@ static void le_cis_established_evt(const void *data, uint8_t size)
- 	print_field("Connection Handle: %d", le16_to_cpu(evt->conn_handle));
- 	print_usec_interval("CIG Synchronization Delay", evt->cig_sync_delay);
- 	print_usec_interval("CIS Synchronization Delay", evt->cis_sync_delay);
--	print_usec_interval("Master to Slave Latency", evt->m_latency);
--	print_usec_interval("Slave to Master Latency", evt->s_latency);
--	print_le_phy("Master to Slave PHY", evt->m_phy);
--	print_le_phy("Slave to Master PHY", evt->s_phy);
-+	print_usec_interval("Central to Peripheral Latency", evt->c_latency);
-+	print_usec_interval("Peripheral to Central Latency", evt->p_latency);
-+	print_le_phy("Central to Peripheral PHY", evt->c_phy);
-+	print_le_phy("Peripheral to Central PHY", evt->p_phy);
- 	print_field("Number of Subevents: %u", evt->nse);
--	print_field("Master to Slave Burst Number: %u", evt->m_bn);
--	print_field("Slave to Master Burst Number: %u", evt->s_bn);
--	print_field("Master to Slave Flush Timeout: %u", evt->m_ft);
--	print_field("Slave to Master Flush Timeout: %u", evt->s_ft);
--	print_field("Master to Slave MTU: %u", le16_to_cpu(evt->m_mtu));
--	print_field("Slave to Master MTU: %u", le16_to_cpu(evt->s_mtu));
-+	print_field("Central to Peripheral Burst Number: %u", evt->c_bn);
-+	print_field("Peripheral to Central Burst Number: %u", evt->p_bn);
-+	print_field("Central to Peripheral Flush Timeout: %u", evt->c_ft);
-+	print_field("Peripheral to Central Flush Timeout: %u", evt->p_ft);
-+	print_field("Central to Peripheral MTU: %u", le16_to_cpu(evt->c_mtu));
-+	print_field("Peripheral to Central MTU: %u", le16_to_cpu(evt->p_mtu));
- 	print_field("ISO Interval: %u", le16_to_cpu(evt->interval));
- }
- 
-@@ -11082,8 +11087,8 @@ static const struct event_data event_table[] = {
- 				encrypt_change_evt, 4, true },
- 	{ 0x09, "Change Connection Link Key Complete",
- 				change_conn_link_key_complete_evt, 3, true },
--	{ 0x0a, "Master Link Key Complete",
--				master_link_key_complete_evt, 4, true },
-+	{ 0x0a, "Link Key Type Changed",
-+				link_key_type_changed_evt, 4, true },
- 	{ 0x0b, "Read Remote Supported Features",
- 				remote_features_complete_evt, 11, true },
- 	{ 0x0c, "Read Remote Version Complete",
-@@ -11199,16 +11204,16 @@ static const struct event_data event_table[] = {
- 				sync_train_complete_evt, 1, true },
- 	{ 0x50, "Synchronization Train Received",
- 				sync_train_received_evt, 29, true },
--	{ 0x51, "Connectionless Slave Broadcast Receive",
--				slave_broadcast_receive_evt, 18, false },
--	{ 0x52, "Connectionless Slave Broadcast Timeout",
--				slave_broadcast_timeout_evt, 7, true },
-+	{ 0x51, "Connectionless Peripheral Broadcast Receive",
-+				peripheral_broadcast_receive_evt, 18, false },
-+	{ 0x52, "Connectionless Peripheral Broadcast Timeout",
-+				peripheral_broadcast_timeout_evt, 7, true },
- 	{ 0x53, "Truncated Page Complete",
- 				truncated_page_complete_evt, 7, true },
--	{ 0x54, "Slave Page Response Timeout",
--				slave_page_response_timeout_evt, 0, true },
--	{ 0x55, "Connectionless Slave Broadcast Channel Map Change",
--				slave_broadcast_channel_map_change_evt, 10, true },
-+	{ 0x54, "Peripheral Page Response Timeout",
-+				peripheral_page_response_timeout_evt, 0, true },
-+	{ 0x55, "Connectionless Peripheral Broadcast Channel Map Change",
-+			peripheral_broadcast_channel_map_change_evt, 10, true },
- 	{ 0x56, "Inquiry Response Notification",
- 				inquiry_response_notify_evt, 4, true },
- 	{ 0x57, "Authenticated Payload Timeout Expired",
-@@ -12171,7 +12176,7 @@ static void mgmt_print_long_term_key(const void *data)
- {
- 	uint8_t address_type = get_u8(data + 6);
- 	uint8_t key_type = get_u8(data + 7);
--	uint8_t master = get_u8(data + 8);
-+	uint8_t central = get_u8(data + 8);
- 	uint8_t enc_size = get_u8(data + 9);
- 	const char *str;
- 
-@@ -12199,7 +12204,7 @@ static void mgmt_print_long_term_key(const void *data)
+=20
+ 	if (grantpt(serial->fd) < 0) {
+-		perror("Failed to grant slave pseudo terminal");
++		perror("Failed to grant peripheral pseudo terminal");
+ 		close(serial->fd);
+ 		serial->fd =3D -1;
+ 		return;
  	}
- 
- 	print_field("Key type: %s (0x%2.2x)", str, key_type);
--	print_field("Master: 0x%2.2x", master);
-+	print_field("Central: 0x%2.2x", central);
- 	print_field("Encryption size: %u", enc_size);
- 	print_hex_field("Diversifier", data + 10, 2);
- 	print_hex_field("Randomizer", data + 12, 8);
-diff --git a/tools/3dsp.c b/tools/3dsp.c
-index 99c1ac82bc..5227c30b63 100644
---- a/tools/3dsp.c
-+++ b/tools/3dsp.c
-@@ -122,7 +122,7 @@ static void sync_train_received(const void *data, uint8_t size,
- 							void *user_data)
- {
- 	const struct bt_hci_evt_sync_train_received *evt = data;
--	struct bt_hci_cmd_set_slave_broadcast_receive cmd;
-+	struct bt_hci_cmd_set_peripheral_broadcast_receive cmd;
- 
- 	if (evt->status) {
- 		printf("Failed to synchronize with 3D display\n");
-@@ -147,7 +147,7 @@ static void sync_train_received(const void *data, uint8_t size,
- 	cmd.pkt_type = cpu_to_le16(PKT_TYPE);
- 	memcpy(cmd.map, evt->map, 10);
- 
--	bt_hci_send(hci_dev, BT_HCI_CMD_SET_SLAVE_BROADCAST_RECEIVE,
-+	bt_hci_send(hci_dev, BT_HCI_CMD_SET_PERIPHERAL_BROADCAST_RECEIVE,
- 				&cmd, sizeof(cmd),
- 				set_slave_broadcast_receive, NULL, NULL);
- }
-@@ -156,7 +156,7 @@ static void brcm_sync_train_received(const void *data, uint8_t size,
- 							void *user_data)
- {
- 	const struct brcm_evt_sync_train_received *evt = data;
--	struct bt_hci_cmd_set_slave_broadcast_receive cmd;
-+	struct bt_hci_cmd_set_peripheral_broadcast_receive cmd;
- 
- 	if (evt->status) {
- 		printf("Failed to synchronize with 3D display\n");
-@@ -181,7 +181,7 @@ static void brcm_sync_train_received(const void *data, uint8_t size,
- 	cmd.pkt_type = cpu_to_le16(PKT_TYPE);
- 	memcpy(cmd.map, evt->map, 10);
- 
--	bt_hci_send(hci_dev, BT_HCI_CMD_SET_SLAVE_BROADCAST_RECEIVE,
-+	bt_hci_send(hci_dev, BT_HCI_CMD_SET_PERIPHERAL_BROADCAST_RECEIVE,
- 				&cmd, sizeof(cmd),
- 				set_slave_broadcast_receive, NULL, NULL);
- }
-@@ -212,7 +212,7 @@ static void truncated_page_complete(const void *data, uint8_t size,
- static void slave_broadcast_timeout(const void *data, uint8_t size,
- 							void *user_data)
- {
--	const struct bt_hci_evt_slave_broadcast_timeout *evt = data;
-+	const struct bt_hci_evt_peripheral_broadcast_timeout *evt = data;
- 	struct bt_hci_cmd_receive_sync_train cmd;
- 
- 	printf("Re-synchronizing with 3D display\n");
-@@ -229,7 +229,7 @@ static void slave_broadcast_timeout(const void *data, uint8_t size,
- static void slave_broadcast_receive(const void *data, uint8_t size,
- 							void *user_data)
- {
--	const struct bt_hci_evt_slave_broadcast_receive *evt = data;
-+	const struct bt_hci_evt_peripheral_broadcast_receive *evt = data;
- 	struct bt_hci_cmd_read_clock cmd;
- 
- 	if (evt->status != 0x00)
-@@ -326,9 +326,9 @@ static void start_glasses(void)
- 
- 	bt_hci_register(hci_dev, BT_HCI_EVT_TRUNCATED_PAGE_COMPLETE,
- 					truncated_page_complete, NULL, NULL);
--	bt_hci_register(hci_dev, BT_HCI_EVT_SLAVE_BROADCAST_TIMEOUT,
-+	bt_hci_register(hci_dev, BT_HCI_EVT_PERIPHERAL_BROADCAST_TIMEOUT,
- 					slave_broadcast_timeout, NULL, NULL);
--	bt_hci_register(hci_dev, BT_HCI_EVT_SLAVE_BROADCAST_RECEIVE,
-+	bt_hci_register(hci_dev, BT_HCI_EVT_PERIPHERAL_BROADCAST_RECEIVE,
- 					slave_broadcast_receive, NULL, NULL);
- 
- 	start_inquiry();
-@@ -443,13 +443,13 @@ static void read_clock(const void *data, uint8_t size, void *user_data)
- 	msg.frame_sync_period_fraction = 0;
- 	memcpy(bcastdata + 3, &msg, sizeof(msg));
- 
--	bt_hci_send(hci_dev, BT_HCI_CMD_SET_SLAVE_BROADCAST_DATA,
-+	bt_hci_send(hci_dev, BT_HCI_CMD_SET_PERIPHERAL_BROADCAST_DATA,
- 			bcastdata, sizeof(bcastdata), NULL, NULL, NULL);
- }
- 
- static void set_slave_broadcast(const void *data, uint8_t size, void *user_data)
- {
--	const struct bt_hci_rsp_set_slave_broadcast *rsp = data;
-+	const struct bt_hci_rsp_set_peripheral_broadcast *rsp = data;
- 	struct bt_hci_cmd_read_clock cmd;
- 
- 	if (rsp->status) {
-@@ -467,7 +467,7 @@ static void set_slave_broadcast(const void *data, uint8_t size, void *user_data)
- 
- static void start_display(void)
- {
--	struct bt_hci_cmd_set_slave_broadcast cmd;
-+	struct bt_hci_cmd_set_peripheral_broadcast cmd;
- 	uint8_t evtmask1[] = { 0x1c, 0xe0, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
- 	uint8_t evtmask2[] = { 0x00, 0xc0, 0x74, 0x00, 0x00, 0x00, 0x00, 0x00 };
- 	uint8_t sspmode = 0x01;
-@@ -492,10 +492,11 @@ static void start_display(void)
- 	bt_hci_register(hci_dev, BT_HCI_EVT_CONN_REQUEST,
- 						conn_request, NULL, NULL);
- 
--	bt_hci_register(hci_dev, BT_HCI_EVT_SLAVE_PAGE_RESPONSE_TIMEOUT,
-+	bt_hci_register(hci_dev, BT_HCI_EVT_PERIPHERAL_PAGE_RESPONSE_TIMEOUT,
- 				slave_page_response_timeout, NULL, NULL);
--	bt_hci_register(hci_dev, BT_HCI_EVT_SLAVE_BROADCAST_CHANNEL_MAP_CHANGE,
--				slave_broadcast_channel_map_change, NULL, NULL);
-+	bt_hci_register(hci_dev,
-+			BT_HCI_EVT_PERIPHERAL_BROADCAST_CHANNEL_MAP_CHANGE,
-+			slave_broadcast_channel_map_change, NULL, NULL);
- 	bt_hci_register(hci_dev, BT_HCI_EVT_SYNC_TRAIN_COMPLETE,
- 					sync_train_complete, NULL, NULL);
- 
-@@ -510,8 +511,8 @@ static void start_display(void)
- 	cmd.max_interval = cpu_to_le16(0x00a0);		/* 100 ms */
- 	cmd.timeout = cpu_to_le16(0xfffe);
- 
--	bt_hci_send(hci_dev, BT_HCI_CMD_SET_SLAVE_BROADCAST, &cmd, sizeof(cmd),
--					set_slave_broadcast, NULL, NULL);
-+	bt_hci_send(hci_dev, BT_HCI_CMD_SET_PERIPHERAL_BROADCAST, &cmd,
-+			sizeof(cmd), set_slave_broadcast, NULL, NULL);
- }
- 
- static void signal_callback(int signum, void *user_data)
-diff --git a/tools/hci-tester.c b/tools/hci-tester.c
-index 0fb74e69c7..645d89e721 100644
---- a/tools/hci-tester.c
-+++ b/tools/hci-tester.c
-@@ -337,12 +337,12 @@ static void test_read_local_supported_codecs(const void *test_data)
- 
- static void test_le_read_white_list_size(const void *test_data)
- {
--	test_command(BT_HCI_CMD_LE_READ_WHITE_LIST_SIZE);
-+	test_command(BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE);
- }
- 
- static void test_le_clear_white_list(const void *test_data)
- {
--	test_command(BT_HCI_CMD_LE_CLEAR_WHITE_LIST);
-+	test_command(BT_HCI_CMD_LE_CLEAR_ACCEPT_LIST);
- }
- 
- static void test_le_encrypt_complete(const void *data, uint8_t size,
+=20
+ 	if (unlockpt(serial->fd) < 0) {
+-		perror("Failed to unlock slave pseudo terminal");
++		perror("Failed to unlock peripheral pseudo terminal");
+ 		close(serial->fd);
+ 		serial->fd =3D -1;
+ 		return;
+diff --git a/tools/l2cap-tester.c b/tools/l2cap-tester.c
+index 11d549f22a..169a989f54 100644
+--- a/tools/l2cap-tester.c
++++ b/tools/l2cap-tester.c
+@@ -1116,7 +1116,7 @@ static int create_l2cap_sock(struct test_data *data, =
+uint16_t psm,
+ 		return err;
+ 	}
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		close(sk);
+@@ -1301,7 +1301,7 @@ static void test_connect(const void *test_data)
+ 	}
+=20
+ 	if (l2data->direct_advertising)
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						direct_adv_cmd_complete, NULL);
+=20
+ 	sk =3D create_l2cap_sock(data, 0, l2data->cid, l2data->sec_level,
+@@ -1419,7 +1419,7 @@ static gboolean test_close_socket_1_part_3(gpointer a=
+rg)
+ 		return FALSE;
+ 	}
+=20
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Delayed check whether scann is off failed");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1440,7 +1440,7 @@ static gboolean test_close_socket_1_part_2(gpointer a=
+rgs)
+ 	 * was added to kernel whitelist, and scan was started. We
+ 	 * should be still scanning.
+ 	 */
+-	if (!hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (!hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Error - should be still scanning");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1467,7 +1467,7 @@ static gboolean test_close_socket_2_part_3(gpointer a=
+rg)
+ 	int err;
+=20
+ 	/* Scan should be already over, we're trying to create connection */
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_print("Error - should no longer scan");
+ 		tester_test_failed();
+ 		return FALSE;
+@@ -1563,7 +1563,7 @@ static void test_close_socket(const void *test_data)
+ 	const struct l2cap_data *l2data =3D data->test_data;
+ 	const uint8_t *client_bdaddr;
+=20
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 					test_close_socket_router, data);
+=20
+ 	if (l2data->client_bdaddr !=3D NULL)
+@@ -1668,7 +1668,7 @@ static void test_connect_2(const void *test_data)
+ 	test_2_connect_cb_cnt =3D 0;
+ 	test_scan_enable_counter =3D 0;
+=20
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 				test_connect_2_router, data);
+=20
+ 	if (l2data->server_psm) {
+@@ -1869,7 +1869,7 @@ static void test_server(const void *test_data)
+ 		tester_print("Listening for connections");
+ 	}
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
 diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index da53e4484d..ccc082a488 100644
+index ccc082a488..dc53faf3af 100644
 --- a/tools/mgmt-tester.c
 +++ b/tools/mgmt-tester.c
-@@ -4248,7 +4248,7 @@ static const struct generic_data add_device_success_6 = {
- 	.expect_alt_ev = MGMT_EV_DEVICE_ADDED,
- 	.expect_alt_ev_param = add_device_success_param_6,
- 	.expect_alt_ev_len = sizeof(add_device_success_param_6),
--	.expect_hci_command = BT_HCI_CMD_LE_ADD_TO_WHITE_LIST,
-+	.expect_hci_command = BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
- 	.expect_hci_param = le_add_to_white_list_param,
- 	.expect_hci_len = sizeof(le_add_to_white_list_param),
- };
-@@ -4418,7 +4418,7 @@ static const struct generic_data remove_device_success_7 = {
- 	.expect_param = remove_device_param_2,
- 	.expect_len = sizeof(remove_device_param_2),
- 	.expect_status = MGMT_STATUS_SUCCESS,
--	.expect_hci_command = BT_HCI_CMD_LE_REMOVE_FROM_WHITE_LIST,
-+	.expect_hci_command = BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
- 	.expect_hci_param = le_add_to_white_list_param,
- 	.expect_hci_len = sizeof(le_add_to_white_list_param),
- 	.expect_alt_ev = MGMT_EV_DEVICE_REMOVED,
--- 
+@@ -365,7 +365,7 @@ static void read_index_list_callback(uint8_t status, ui=
+nt16_t length,
+ 		hciemu_set_debug(data->hciemu, print_debug, "hciemu: ", NULL);
+=20
+ 	if (test && test->setup_le_states)
+-		hciemu_set_master_le_states(data->hciemu, test->le_states);
++		hciemu_set_central_le_states(data->hciemu, test->le_states);
+ }
+=20
+ static void test_pre_setup(const void *test_data)
+@@ -7136,7 +7136,7 @@ static void command_setup_hci_callback(uint16_t opcod=
+e, const void *param,
+ 		return;
+ 	}
+=20
+-	hciemu_clear_master_post_command_hooks(data->hciemu);
++	hciemu_clear_central_post_command_hooks(data->hciemu);
+ 	test_setup_condition_complete(data);
+ }
+=20
+@@ -7202,7 +7202,7 @@ static void setup_command_generic(const void *test_da=
+ta)
+ 		tester_print("Registering setup expected HCI command callback");
+ 		tester_print("Setup expected HCI command 0x%04x",
+ 					 test->setup_expect_hci_command);
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 					command_setup_hci_callback, data);
+ 		test_add_setup_condition(data);
+ 	}
+@@ -9529,7 +9529,7 @@ static void setup_ll_privacy_device(const void *test_=
+data)
+=20
+ 	tester_print("Setup expected HCI command 0x%04x",
+ 					 test->setup_expect_hci_command);
+-	hciemu_add_master_post_command_hook(data->hciemu,
++	hciemu_add_central_post_command_hook(data->hciemu,
+ 					command_setup_hci_callback, data);
+ 	test_add_setup_condition(data);
+=20
+@@ -9686,7 +9686,7 @@ static void test_command_generic(const void *test_dat=
+a)
+=20
+ 	if (test->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
+@@ -9720,13 +9720,13 @@ static void check_scan(void *user_data)
+ {
+ 	struct test_data *data =3D tester_get_data();
+=20
+-	if (hciemu_get_master_le_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_le_scan_enable(data->hciemu)) {
+ 		tester_warn("LE scan still enabled");
+ 		tester_test_failed();
+ 		return;
+ 	}
+=20
+-	if (hciemu_get_master_scan_enable(data->hciemu)) {
++	if (hciemu_get_central_scan_enable(data->hciemu)) {
+ 		tester_warn("BR/EDR scan still enabled");
+ 		tester_test_failed();
+ 		return;
+@@ -9817,7 +9817,7 @@ static void test_pairing_acceptor(const void *test_da=
+ta)
+ 		test_add_condition(data);
+ 	}
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -9882,7 +9882,7 @@ static void test_command_generic_connect(const void *=
+test_data)
+ 	data->mgmt_alt_ev_id =3D id;
+ 	test_add_condition(data);
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -9961,7 +9961,7 @@ static void add_device_callback(uint8_t status, uint1=
+6_t len, const void *param,
+ 	if (test->client_enable_adv)
+ 		return;
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+diff --git a/tools/rfcomm-tester.c b/tools/rfcomm-tester.c
+index 9bae5b9d54..78b08663bd 100644
+--- a/tools/rfcomm-tester.c
++++ b/tools/rfcomm-tester.c
+@@ -542,7 +542,7 @@ static void test_connect(const void *test_data)
+ 	bthost_add_rfcomm_server(bthost, cli->server_channel,
+ 						rfcomm_connect_cb, NULL);
+=20
+-	master_addr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_addr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	client_addr =3D hciemu_get_client_bdaddr(data->hciemu);
+=20
+ 	sk =3D create_rfcomm_sock((bdaddr_t *) master_addr, 0);
+@@ -680,7 +680,7 @@ static void test_server(const void *test_data)
+ 	GIOChannel *io;
+ 	int sk;
+=20
+-	master_addr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_addr =3D hciemu_get_central_bdaddr(data->hciemu);
+=20
+ 	sk =3D create_rfcomm_sock((bdaddr_t *) master_addr, srv->server_channel);
+ 	if (sk < 0) {
+diff --git a/tools/sco-tester.c b/tools/sco-tester.c
+index 2b8dc0d4a8..7c83aee195 100644
+--- a/tools/sco-tester.c
++++ b/tools/sco-tester.c
+@@ -426,7 +426,7 @@ static int create_sco_sock(struct test_data *data)
+ 		return err;
+ 	}
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		return -ENODEV;
+diff --git a/tools/smp-tester.c b/tools/smp-tester.c
+index 644c451c29..b075c5df8a 100644
+--- a/tools/smp-tester.c
++++ b/tools/smp-tester.c
+@@ -767,7 +767,7 @@ static void init_bdaddr(struct test_data *data)
+ {
+ 	const uint8_t *master_bdaddr, *client_bdaddr;
+=20
+-	master_bdaddr =3D hciemu_get_master_bdaddr(data->hciemu);
++	master_bdaddr =3D hciemu_get_central_bdaddr(data->hciemu);
+ 	if (!master_bdaddr) {
+ 		tester_warn("No master bdaddr");
+ 		tester_test_failed();
+@@ -808,7 +808,7 @@ static void test_client(const void *test_data)
+=20
+ 	if (smp->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
+@@ -889,7 +889,7 @@ static void test_server(const void *test_data)
+=20
+ 	if (smp->expect_hci_command) {
+ 		tester_print("Registering HCI command callback");
+-		hciemu_add_master_post_command_hook(data->hciemu,
++		hciemu_add_central_post_command_hook(data->hciemu,
+ 						command_hci_callback, data);
+ 		test_add_condition(data);
+ 	}
+--=20
 2.33.0.259.gc128427fd7-goog
 
