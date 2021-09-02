@@ -2,129 +2,156 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E5EC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:49:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA0CC4320E
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 08:57:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC075600CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:49:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CF273610E6
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 08:57:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243172AbhIBHuT (ORCPT
+        id S244850AbhIBI6A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 03:50:19 -0400
-Received: from mail.kernel.org ([198.145.29.99]:47282 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233360AbhIBHuT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 03:50:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 45572610A4
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 07:49:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1630568961;
-        bh=sdG36ds5Ve48sK3fExMHWuwkNhAnWtUQR7dVwC7JHjc=;
-        h=From:To:Subject:Date:From;
-        b=mUTYAZH+AQfnYG4T9+X9UOCYshejutA2APrvbI//0bU1Mkf1F4WelxStD6MEwOPfE
-         Do0laGPASqMmRa1zdFFlMYW+mgXrmAlrevXDu7v2ElQmejCcfwPB97rUkTLRtopH1C
-         J5O7jrA8Tj5Iz6G2BPqw08EOB7L2YyGKaG112wKiFAPhbcWVrt8l77YueNz1+ekoXK
-         TjpEs27eV1aAONtWjUVVGQWg0LIEoy7NZjszRX91hbdm2mEQ5sc7zthhw7m82pIjr2
-         XKxOYS2A8CTGeyM9e4l2bu6ADVCTSnAxLiRlQwReO0evIS0lPQeF/Ro07bUbwmUD1C
-         SisTPMFcs9CaA==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 214273] New: AX201 Bluetooth unusable after: Shutdown
- controller after workqueues are flushed or cancelled
-Date:   Thu, 02 Sep 2021 07:49:21 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kubrick@fgv6.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-214273-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        Thu, 2 Sep 2021 04:58:00 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:27249 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244864AbhIBI57 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Sep 2021 04:57:59 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1630573021; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=H6hpSVRunzvfqnycIZ6/BaR3NskiDQJfsejgtp/GrDE=; b=NEq+umCZMD5zJa/t0qsfjEhvhAjus3UPDCPV/Uyf75lqoRzd2zw0mvvbLs10P+E/IS0ELwbs
+ j9qDCX1u3nZAlZU7AjjvkINTIwXMZa/1BBsoS4Fh2HsVIjtjxIozNLPLj3omgM8Hy5aU6NEO
+ 61m/ViQsJENlYDz4eDi8hXPTSsw=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n01.prod.us-east-1.postgun.com with SMTP id
+ 613091c6cd680e8969802f81 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 02 Sep 2021 08:56:38
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 94BA5C4360D; Thu,  2 Sep 2021 08:56:37 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2C3EFC4338F;
+        Thu,  2 Sep 2021 08:56:29 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 2C3EFC4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v7] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Date:   Thu,  2 Sep 2021 16:56:26 +0800
+Message-Id: <1630572986-30786-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214273
+From: Tim Jiang <tjiang@codeaurora.org>
 
-            Bug ID: 214273
-           Summary: AX201 Bluetooth unusable after: Shutdown controller
-                    after workqueues are flushed or cancelled
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.14
-          Hardware: Intel
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: kubrick@fgv6.net
-        Regression: No
+the RF perfermence of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-I've been using 5.14 since today, and I have had to revert
-60789afc02f592b8d91217b60930e7a76271ae07 so that bluetooth works again with=
- a
-8087:0026 Intel Corp. AX201 Bluetooth on a Dell XPS 9300.
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+ drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 13 deletions(-)
 
-This is the dmesg:
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 928cbfa4c42d..218547f6097e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver,
++					char *variant)
++{
++	char *separator = (strlen(variant) == 0) ? "" : "_";
++	u16 board_id = le16_to_cpu(ver->board_id);
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++
++	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
++				 rom_version, separator, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
++				rom_version, separator,	variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			 rom_version);
++	}
++
++}
++
+ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 				    struct qca_version *ver,
+ 				    const struct qca_device_info *info)
+@@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 	char fwname[64];
+ 	int err;
+ 
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
++		break;
++	default:
++			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
++		break;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
-------
-
-[   16.531286] Bluetooth: Core ver 2.22
-[   16.531306] Bluetooth: HCI device and connection manager initialized
-[   16.531309] Bluetooth: HCI socket layer initialized
-[   16.531312] Bluetooth: L2CAP socket layer initialized
-[   16.531314] Bluetooth: SCO socket layer initialized
-[   16.649289] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
-[   16.768878] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[   16.768883] Bluetooth: BNEP filters: protocol multicast
-[   16.768886] Bluetooth: BNEP socket layer initialized
-[   19.048260] Bluetooth: RFCOMM TTY layer initialized
-[   19.048267] Bluetooth: RFCOMM socket layer initialized
-[   19.048272] Bluetooth: RFCOMM ver 1.11
-[ 7043.393714] Bluetooth: hci0: unexpected event for opcode 0x0500
-[ 7043.394091] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
-[25277.172310] Bluetooth: hci0: unexpected event for opcode 0x0500
-[25277.173307] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
-[32499.334342] Bluetooth: hci0: unexpected event for opcode 0x0500
-[32511.644752] Bluetooth: hci0: Failed to read MSFT supported features (-11=
-0)
-[32605.228360] Bluetooth: hci0: urb 000000009218d7b4 failed to resubmit (11=
-3)
-[32614.898106] Bluetooth: hci0: Failed to read MSFT supported features (-11=
-0)
-[32956.688532] Bluetooth: hci0: urb 000000002e945dc3 failed to resubmit (11=
-3)
-[32966.471603] Bluetooth: hci0: Failed to read MSFT supported features (-11=
-0)
-
-
-Best regards,
-Fran=C3=A7ois
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
