@@ -4,100 +4,153 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E73D0C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:39:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A351C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:41:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CDAAB61008
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:39:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F288260FDC
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:41:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245145AbhIBJkB (ORCPT
+        id S245565AbhIBJmI convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 05:40:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:45646 "EHLO
+        Thu, 2 Sep 2021 05:42:08 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:52596 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242310AbhIBJkA (ORCPT
+        with ESMTP id S245505AbhIBJmH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 05:40:00 -0400
+        Thu, 2 Sep 2021 05:42:07 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 739C0CECDD;
-        Thu,  2 Sep 2021 11:39:01 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7A46DCECDD;
+        Thu,  2 Sep 2021 11:41:07 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: btusb: Add support for IMC Networks Mediatek
- Chip(MT7921)
+Subject: Re: [PATCH v7] Bluetooth: btusb: Add support using different nvm for
+ variant WCN6855 controller
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210901113015.25622-1-mark-yw.chen@mediatek.com>
-Date:   Thu, 2 Sep 2021 11:39:01 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, chris.lu@mediatek.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-mediatek@lists.infradead.org,
+In-Reply-To: <1630572986-30786-1-git-send-email-zijuhu@codeaurora.org>
+Date:   Thu, 2 Sep 2021 11:41:07 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         open list <linux-kernel@vger.kernel.org>,
-        Michael Sun <michaelfsun@google.com>, mcchou@chromium.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <0DE4ACF3-F38A-4C8B-A890-51D24063CE01@holtmann.org>
-References: <20210901113015.25622-1-mark-yw.chen@mediatek.com>
-To:     =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rocky Liao <rjliao@codeaurora.org>, tjiang@codeaurora.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <E3D0B31D-FFFE-4F56-A2E0-CFCC936AED48@holtmann.org>
+References: <1630572986-30786-1-git-send-email-zijuhu@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Mark,
+Hi Zijun,
 
-> Add support for another IMC Networks Mediatek Chip(MT7921)
+> the RF perfermence of wcn6855 soc chip from different foundries will be
+
+spelling check please.
+
+> difference, so we should use different nvm to configure them.
 > 
-> * /sys/kernel/debug/usb/devices
-> T:  Bus=05 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
-> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=13d3 ProdID=3564 Rev= 1.00
-> S:  Manufacturer=MediaTek Inc.
-> S:  Product=Wireless_Device
-> S:  SerialNumber=000000000
-> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
-> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
-> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
-> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
-> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
-> 
-> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 > ---
-> drivers/bluetooth/btusb.c | 3 +++
-> 1 file changed, 3 insertions(+)
+> drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
+> 1 file changed, 37 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 928cbfa4c42d..218547f6097e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+> #define QCA_DFU_TIMEOUT		3000
+> #define QCA_FLAG_MULTI_NVM      0x80
+> 
+> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
+> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+> +
+> struct qca_version {
+> 	__le32	rom_version;
+> 	__le32	patch_version;
+> @@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
+> 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+> 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+> 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+> };
+> 
+> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+> @@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+> 	return err;
+> }
+> 
+> +static void btusb_generate_qca_nvm_name(char *fwname,
+> +					size_t max_size,
+> +					struct qca_version *ver,
+> +					char *variant)
+> +{
+> +	char *separator = (strlen(variant) == 0) ? "" : "_";
 
-patch has been applied to bluetooth-next tree.
+Shortcut this variable name to sep.
+
+> +	u16 board_id = le16_to_cpu(ver->board_id);
+> +	u32 rom_version = le32_to_cpu(ver->rom_version);
+> +
+> +	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> +		/* if boardid equal 0, use default nvm without suffix */
+> +		if (board_id == 0x0) {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
+> +				 rom_version, separator, variant);
+> +		} else {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
+> +				rom_version, separator,	variant, board_id);
+> +		}
+> +	} else {
+> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
+> +			 rom_version);
+> +	}
+> +
+> +}
+> +
+> static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+> 				    struct qca_version *ver,
+> 				    const struct qca_device_info *info)
+> @@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+> 	char fwname[64];
+> 	int err;
+> 
+> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		/* if boardid equal 0, use default nvm without surfix */
+> -		if (le16_to_cpu(ver->board_id) == 0x0) {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -				 le32_to_cpu(ver->rom_version));
+> -		} else {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -				le32_to_cpu(ver->rom_version),
+> -				le16_to_cpu(ver->board_id));
+> -		}
+> -	} else {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -			 le32_to_cpu(ver->rom_version));
+> +	switch (ver->ram_version) {
+> +	case WCN6855_2_0_RAM_VERSION_GF:
+> +	case WCN6855_2_1_RAM_VERSION_GF:
+> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
+> +		break;
+> +	default:
+> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
+> +		break;
+
+Indentation mistake.
+
+> 	}
+> 
+> 	err = request_firmware(&fw, fwname, &hdev->dev);
 
 Regards
 
