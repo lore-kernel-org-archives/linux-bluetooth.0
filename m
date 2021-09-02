@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A30A2C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2CE63C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8024860698
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 16444610E5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244248AbhIBKwV (ORCPT
+        id S245512AbhIBKwZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 06:52:21 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54514 "EHLO
+        Thu, 2 Sep 2021 06:52:25 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54524 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245589AbhIBKwG (ORCPT
+        with ESMTP id S1343591AbhIBKwH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 06:52:06 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C49DCC0617AF
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:34 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id j11-20020a0cf9cb000000b00375f0642d2dso1212802qvo.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:34 -0700 (PDT)
+        Thu, 2 Sep 2021 06:52:07 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48879C0612E7
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:38 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id r5-20020ac85e85000000b0029bd6ee5179so978749qtx.18
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=+chwaZbbMAUDVjk5/HeDGz0egFmhkV86cNDd2nRvrXU=;
-        b=F5H4Tm8X7ZHK2VRpN7X1/01T5QzW0QUC7lX6mI0JGF/PfhD73GOyA/FG9eVqs/xYO5
-         bE2at3dJs24FBxKcgmrZF1BdrfW9GFZ9blJ6mkDV7DPm5Fhj8Pcs2FFHXrFZnDCPJq5H
-         TpV7A0nIGit43VQ1Nh4waYkm91nUKD71DmE1BtXW8eCdrbWhncCFaShX/wkmZYLTjxzL
-         SkF91mgIicxRgRuBKPFqROY5KOQUOBALUGjAT1p4cusejc38ug4y4DF9RVdqPmDQa98O
-         cNuVHi91CobK87oUutmIX94sHdmM6edh4NfVZDb/S2YJsenaK4Px4EKxmjcAHb02ttND
-         tPMA==
+        bh=RieolaYymu0TqLrGWt8ZqwktYw8m2WgVp44tZhA2mJ0=;
+        b=VnrdskhlKE+GpEPuliFGQtuQik4sBStOLJVSkc4l8kL1icxpKpEvgupJd0eGUUVpR6
+         EqF8HgrjObuZVZugr9uXG845mBcQ8HcyvpfenHl1Pa5zcGSBV7dl3jAgO3dAzjdvf+uk
+         KxPXMl1OvpYYHP+5u8vc3wVHUnZQzZrk1PGEiDRe10JAbzQfYyj87BYSd/p085VL/aDT
+         xtaP2SyHEwmM0PsCL4Op3OWo/UxKc0cu+C5+h0GvjjlG/PE0G5I9FTUAuGKmtUjCOsq8
+         VeEOI+DHaf4Eo0nfB9EoEEkHiG5gOHfE0+QfadbYbgmi79rJHfynjMrOPd6ynscqo7Bp
+         rpoQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=+chwaZbbMAUDVjk5/HeDGz0egFmhkV86cNDd2nRvrXU=;
-        b=KVgyRBlH02Zcbl9Epw22C6qFflUd8VxgnHUl412mlsB2I8LHAwnMIZS31IeaF2AbKy
-         C0Qmm8O/HrqdEY2LVyJPgwQxU9tIPGLqbVEhdzTv6cae06P7uRZEcCRbpnZPm9PQTm5I
-         v6sucrECpFczq6E8rM/kjyLeGEoTt6ryrlu73m8rnfGkKFoU901/jda2KvGnqsmjp+kU
-         4HCsUzE7+euf37xpCPTlgLu80wERedftfYHY0qQeV9VczBkhMemM6m3epAidwFcP+HFd
-         9rcSS4iCVkn97s8/4jeUJL1RNcMqcCggRmFToxT/pkXNIbSrip4TLDslGVDbUZV9xeYi
-         K39g==
-X-Gm-Message-State: AOAM533apGYS8yyoQ7Dij50LfTI6nA8gsK1aMXmHnkX6GtoSQubwnxJP
-        TWKh8HNk7Jl4nv1XVErb36MtKQKP2FX6+dPtWLV0F1Li5vL2M/9YrG2EiLUR2yTmdFbvl6hw1qi
-        3Ub70CpRJV4dpPRRYBHyHghEHFIVNHXJcQvJU3OIzSwS822aSKi0EEJu6OWmsvMUHn/gmIJj5cR
-        w9
-X-Google-Smtp-Source: ABdhPJxTSzLSl5YhhQPOWCx5bFSlM8h0KDzCtEm/vvAXDeP54vnPyu4lOFaudSYvQt5wys5/DWJx5fMWMU9/
+        bh=RieolaYymu0TqLrGWt8ZqwktYw8m2WgVp44tZhA2mJ0=;
+        b=ZQHwjVW6SS3mMsOr3m2+MQ2lA8dhzs2jMpibmMHgerjghJLhOqqabIAdPEosPfW2ZV
+         /NwVeGlgoY/v9Hfm9uE3WLbLsy9rVewwU+/2fX8zgngcMfNCK2sk2L6grftB/38eW0bN
+         4vfXTKncOZYEvKFCoybe4eXKA7Dqno/DUk6KB+mNPxebOk2NmomHmj+aRY4y0Ispqnx7
+         EL/VVwJ6GVktWpFxWuS0PGVJ1gXWU8DLd13RpXYSCbzxVhmPEFB2DqybW3tFZa2TiKFk
+         qb3yqCtrE9z2PIOM7KHKHr4/fvhWjDcRhNkpxtCmGYE944gi4x0BsoOfAx1HjWsP7dSt
+         QWdA==
+X-Gm-Message-State: AOAM5322B6BJ1XNqCn9/yClOMX6ItDoLd6gMfmiTTZIfxalvgNGEeLp5
+        NEqSk9/bIdMqQfOE3uKtSx+J9D/lA5kXK6UZwa7kzSCqNZBiOJLpYZ2uANKCOlGZe+7L6YB66oE
+        ZFxe3d3gtSDAedJBi2svv+XQ1W3hw0zQXUWKDbAf4iqEW3P1PZoSftiWqZkcIKvg9TdZCZIBPHt
+        Iz
+X-Google-Smtp-Source: ABdhPJxi2GSx2BTr7ofveup+AeaTW4gAWr3lkXviQJ5/eB4vCY7W96jrgFR88zic6++7fizdkuX66Q982Zop
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:5249:e81c:3ce6:f50c])
- (user=apusaka job=sendgmr) by 2002:a0c:f901:: with SMTP id
- v1mr2166083qvn.45.1630579833988; Thu, 02 Sep 2021 03:50:33 -0700 (PDT)
-Date:   Thu,  2 Sep 2021 18:49:37 +0800
+ (user=apusaka job=sendgmr) by 2002:a05:6214:2385:: with SMTP id
+ fw5mr2288880qvb.56.1630579837450; Thu, 02 Sep 2021 03:50:37 -0700 (PDT)
+Date:   Thu,  2 Sep 2021 18:49:38 +0800
 In-Reply-To: <20210902104938.824737-1-apusaka@google.com>
-Message-Id: <20210902184744.Bluez.v3.11.I864344f9ee91b9c051ae4212c9f5a236bdd49632@changeid>
+Message-Id: <20210902184744.Bluez.v3.12.I4df08516dd5129d4e9d2cf963121074f500201d9@changeid>
 Mime-Version: 1.0
 References: <20210902104938.824737-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [Bluez PATCH v3 11/12] unit/mesh: Inclusive language changes
+Subject: [Bluez PATCH v3 12/12] doc: Inclusive language update
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -75,38 +75,63 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-According to
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-"flooding" is the preferred term.
+Update the docs to reflect the changes for the other inclusive
+language updates.
 ---
 
-(no changes since v1)
+(no changes since v2)
 
- unit/test-mesh-crypto.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Changes in v2:
+* Merging several patches from the same directory into one
 
-diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
-index 12709dace0..f9b7d81da7 100644
---- a/unit/test-mesh-crypto.c
-+++ b/unit/test-mesh-crypto.c
-@@ -111,7 +111,7 @@ static const struct mesh_crypto_test s8_1_2 = {
- };
+ doc/mesh-api.txt | 2 +-
+ doc/mgmt-api.txt | 6 +++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
+index f2c6b9e5c2..ce651c8017 100644
+--- a/doc/mesh-api.txt
++++ b/doc/mesh-api.txt
+@@ -585,7 +585,7 @@ Methods:
+ 			org.bluez.mesh.Error.InvalidArguments
  
- static const struct mesh_crypto_test s8_1_3 = {
--	.name		= "8.1.3 k2 function (master)",
-+	.name		= "8.1.3 k2 function (flooding)",
- 	.net_key	= "f7a2a44f8e8a8029064f173ddc1e2b00",
- 	.p		= "00",
- 	.nid		= "7f",
-@@ -159,7 +159,7 @@ static const struct mesh_crypto_test s8_2_1 = {
- };
+ 	void SetKeyPhase(uint16 net_index, uint8 phase)
+-		This method is used to set the master key update phase of the
++		This method is used to set the flooding key update phase of the
+ 		given subnet. When finalizing the procedure, it is important
+ 		to CompleteAppKeyUpdate() on all app keys that have been
+ 		updated during the procedure prior to setting phase 3.
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 5355fedb00..97d33e30a1 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -855,7 +855,7 @@ Load Long Term Keys Command
+ 					Address (6 Octets)
+ 					Address_Type (1 Octet)
+ 					Key_Type (1 Octet)
+-					Master (1 Octet)
++					Central (1 Octet)
+ 					Encryption_Size (1 Octet)
+ 					Encryption_Diversifier (2 Octets)
+ 					Random_Number (8 Octets)
+@@ -4019,7 +4019,7 @@ New Long Term Key Event
+ 					Address (6 Octets)
+ 					Address_Type (1 Octet)
+ 					Key_Type (1 Octet)
+-					Master (1 Octet)
++					Central (1 Octet)
+ 					Encryption Size (1 Octet)
+ 					Enc. Diversifier (2 Octets)
+ 					Random Number (8 Octets)
+@@ -4459,7 +4459,7 @@ New Signature Resolving Key Event
+ 				}
  
- static const struct mesh_crypto_test s8_2_2 = {
--	.name		= "8.2.2 Encryption and privacy keys (Master)",
-+	.name		= "8.2.2 Encryption and privacy keys (flooding)",
- 	.net_key	= "7dd7364cd842ad18c17c2b820c84c3d6",
- 	.p		= "00",
- 	.nid		= "68",
+ 	This event indicates that a new signature resolving key has been
+-	generated for either the master or slave device.
++	generated for either the central or peripheral device.
+ 
+ 	The Store_Hint parameter indicates whether the host is expected
+ 	to store the key persistently or not.
 -- 
 2.33.0.259.gc128427fd7-goog
 
