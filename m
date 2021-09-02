@@ -2,81 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7655BC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 18:13:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A3A8DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 18:46:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 58A57610A2
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 18:13:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8705C6113A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 18:46:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346776AbhIBSOK (ORCPT
+        id S1347073AbhIBSrk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 14:14:10 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:52823 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346886AbhIBSOG (ORCPT
+        Thu, 2 Sep 2021 14:47:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52042 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1347066AbhIBSri (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 14:14:06 -0400
-Received: by mail-io1-f72.google.com with SMTP id e18-20020a6b7312000000b005be766a70dbso1966402ioh.19
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 11:13:07 -0700 (PDT)
+        Thu, 2 Sep 2021 14:47:38 -0400
+Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468CBC061575
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 11:46:40 -0700 (PDT)
+Received: by mail-ua1-x929.google.com with SMTP id t26so1435724uao.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 11:46:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=rjsQdC+6HYWIHU4HZq4nKUY8gvR8SwbnJNcdRM06csA=;
+        b=UsA8fRLE2nriNuu6xN1YZIKCcqPYJQj0aOc6dFbsEsa0Kc527oX4ubfUJaD7/SVGLN
+         ibEOUwtaKr7I5qfpQMv72oU7Gh4vJjQuK5L8iPUnHgC4+ukAG//rZ8BuPjhWd3nQgcF6
+         GJ5uh2H94UjNPjZwgOh4+7kWXu2NFi2TYTNhniTjv/ZdIyV/U3HatvfSiJM1evkDQFF8
+         FbJZtapObDGSeioZ8S6+2QDVraEomknE3zbYt8pivMxSJqeEOpLNxTA1TB6YQUmTySnt
+         CBz5B0VPrV/yUte6LDClISNToP0gs89K7RSOrTc6uzO8CVGzYJd8aFN1npRxsFn37B9D
+         pkdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=SKqbmxS+RsaX2s2wlkIqfPl2jpAwEZUOKc/WPcjCCI4=;
-        b=gfRc4HZ949nQRhcdpxv2j5coyhZt3aYwoMBIRCxwhnVNMBOynth5hjtD1rz0CyN64u
-         XhZE8+t80KqvdWxm2upzc7LPWvbe434tnb1oSRsR5RmkK/FVjHIN4mtVO3GN67C+Cpux
-         SdyVQi19HZcqKyU/aad6nYFp5oV1nzf0xBG5FIZ95GD27kKL1/3wllG4zhkt4yT7jiW0
-         GUpJbVrTOoa4fxSBbJDGzQT+Uuw5J9LkadWkL6bxXQ/LxmUUXjHnMcZH24kyl7C8aJ9r
-         BMLlnXUc/w+bebMtYqBWsQHTJtgEKhESUJdC/O9p8PKO1zsEhA4tA+FP/UPXDrHpLWW9
-         KVhw==
-X-Gm-Message-State: AOAM532ez0qWxWv4dCZu4ReycDGel0HLDIETRy53rzmYTw0bfwDkXSdK
-        ees3gnL5GEQsg+LsRti4onw2awnrfuM5ouNiU55dHIEFD+s2
-X-Google-Smtp-Source: ABdhPJwD0D7+AptQ8EA9ckgdTuikiRxn9vuAi6y42y6HBFgaRe792GZ/6WBHMCptEET95qkqIwwzNODir9aTMaslfmsTvAlBugdE
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=rjsQdC+6HYWIHU4HZq4nKUY8gvR8SwbnJNcdRM06csA=;
+        b=nBI/w66DoBo1HiVUTj+4Siev0dddvenscdy9Vk5+CJ5mrRmvbnA4IG/frs6mhNZXT/
+         G1u62IMuyF3hEQvJEMKPHCAHSN0oJNkpL5pMGVSd1SmG+RwMYjIg24njHJmXW3G23xAN
+         y+E9AVvxrW60OgBSgY5S21qWfF0/bQFKu9yotJStW9rylLM4h1xrx1wpIupK/53EpsuO
+         ZejLXhmlhwJbQmroOZe8d1sKhS2fIt8GFTBcrsTmW5wXh0NmluWu5QJtsRRWPwIoeG2J
+         du+GQSP+A4ETxrez6msE1Pj3RD6tDvuUt5tE7GvLQaagJPKxyhCplegaZTO87L0tJh/F
+         tsuA==
+X-Gm-Message-State: AOAM531GhzY7kkAjkDSHoH3/Ve2p41YszqmJitEwE1fuc4ftVdHDvUMW
+        uqV7bi+7vgvHOIl1IRYzyhkjiv5Y0KPPmEHvSxVQu+5wKQk=
+X-Google-Smtp-Source: ABdhPJx1nQx4khAoJSI8eXWdtP4SL0KjT4S2xV2WE2HeBygI+7b+mnrhzaLtSyIaBsTo74zK95NtrtRRdPA6VJDw5dY=
+X-Received: by 2002:ab0:2b13:: with SMTP id e19mr3255739uar.3.1630608399301;
+ Thu, 02 Sep 2021 11:46:39 -0700 (PDT)
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1d9c:: with SMTP id h28mr3424101ila.266.1630606387606;
- Thu, 02 Sep 2021 11:13:07 -0700 (PDT)
-Date:   Thu, 02 Sep 2021 11:13:07 -0700
-In-Reply-To: <00000000000034712e05ca9741e8@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000080826005cb07223c@google.com>
-Subject: Re: [syzbot] KASAN: null-ptr-deref Write in __pm_runtime_resume
-From:   syzbot <syzbot+7d41312fe3f123a6f605@syzkaller.appspotmail.com>
-To:     abhishekpandit@chromium.org, apusaka@chromium.org,
-        davem@davemloft.net, gregkh@linuxfoundation.org,
-        hildawu@realtek.com, johan.hedberg@gmail.com, kuba@kernel.org,
-        len.brown@intel.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-pm@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        pavel@ucw.cz, rjw@rjwysocki.net, syzkaller-bugs@googlegroups.com
+References: <15f5a46.b79d9.17ba6802ccd.Coremail.linma@zju.edu.cn>
+In-Reply-To: <15f5a46.b79d9.17ba6802ccd.Coremail.linma@zju.edu.cn>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 2 Sep 2021 11:46:28 -0700
+Message-ID: <CABBYNZKSJAHK-YPx=XAiq2FYLU-dOiNY9rYuOVG1a1V4pH2c-Q@mail.gmail.com>
+Subject: Re: Help needed in patching CVE-2021-3640
+To:     LinMa <linma@zju.edu.cn>
+Cc:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hi Li,
 
-commit 66f077dde74943e9dd84a9205b4951b19556c9ea
-Author: Archie Pusaka <apusaka@chromium.org>
-Date:   Fri Jul 23 11:31:55 2021 +0000
+On Thu, Sep 2, 2021 at 5:40 AM LinMa <linma@zju.edu.cn> wrote:
+>
+> Hello there,
+>
+> There is one bug (CVE-2021-3640: https://www.openwall.com/lists/oss-secur=
+ity/2021/07/22/1) that is similar to the recently fixed CVE-2021-3573.
+>
+> The key point here is that the sco_conn_del() function can be called when=
+ syscalls like sco_sendmsg() is undergoing.
+> I think the easiest fix is to hang the sco_conn_del() using lock_sock() l=
+ike below.
+>
+> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+> index d9a4e88dacbb..3da1ad441463 100644
+> --- a/net/bluetooth/sco.c
+> +++ b/net/bluetooth/sco.c
+> @@ -173,10 +173,10 @@ static void sco_conn_del(struct hci_conn *hcon, int=
+ err)
+>
+>         if (sk) {
+>                 sock_hold(sk);
+> -               bh_lock_sock(sk);
+> +               lock_sock(sk);
+>                 sco_sock_clear_timer(sk);
+>                 sco_chan_del(sk, err);
+> -               bh_unlock_sock(sk);
+> +               release_sock(sk);
+>                 sco_sock_kill(sk);
+>                 sock_put(sk);
+>         }
+>
+> This can make sure the kfree() will wait for the sock held by the sco_sen=
+dmsg() function. However, this patch can incur WARNING report like below. (=
+I don't really know if this report is correct).
+>
+> [   75.147515] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [   75.149955] WARNING: possible circular locking dependency detected
+> [   75.150546] 5.11.11+ #58 Not tainted
+> [   75.150895] ------------------------------------------------------
+> [   75.151485] poc.sco/127 is trying to acquire lock:
+> [   75.151947] ffff888012212120 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-=
+{0:0}, at: sco_conn_del+0xf6/0x0
+> [   75.152863]
+> [   75.152863] but task is already holding lock:
+> [   75.153420] ffffffff85b43948 (hci_cb_list_lock){+.+.}-{3:3}, at: hci_c=
+onn_hash_flush+0xb3/0x1f0
+> [   75.154256]
+> [   75.154256] which lock already depends on the new lock.
 
-    Bluetooth: hci_h5: add WAKEUP_DISABLE flag
+Im not really sure what to make it out of this, they are not the same
+lock so how does it establish the relationship of hci_cb_list_lock and
+sock_lock? Anyway it seems pretty obvious that sock_lock must be used
+to prevent concurrent operation like these to happen, but if we can't
+use sock_lock then perhaps something needs to change in the way we
+acquire hci_cb_list_lock.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17258e45300000
-start commit:   835d31d319d9 Merge tag 'media/v5.15-1' of git://git.kernel..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=14a58e45300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=10a58e45300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d793523866f2daea
-dashboard link: https://syzkaller.appspot.com/bug?extid=7d41312fe3f123a6f605
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17608125300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17465ffe300000
+> P.S. find the POC code in openwall report
+>
+> With the lesson I learnt in last bad patch e305509e678b ("Bluetooth: use =
+correct lock to prevent UAF of hdev object"). I don't really expect this as=
+ the final correct patch.
+>
+> I then try to use the technique in e04480920d1e ("Bluetooth: defer cleanu=
+p of resources in hci_unregister_dev()"). I mean, I want to defer the kfree=
+ of sco_conn object. However, the sco connection/disconnection mechanism is=
+ somewhat weird and I didn't really understand it by now.
+>
+> Let's see this __sco_sock_close() function, which will be called from sco=
+_sock_release().
+>
+> static void __sco_sock_close(struct sock *sk)
+> {
+>         BT_DBG("sk %p state %d socket %p", sk, sk->sk_state, sk->sk_socke=
+t);
+>
+>         switch (sk->sk_state) {
+>         case BT_LISTEN:
+>                 sco_sock_cleanup_listen(sk);
+>                 break;
+>
+>         case BT_CONNECTED:
+>         case BT_CONFIG:
+>                 if (sco_pi(sk)->conn->hcon) {
+>                         sk->sk_state =3D BT_DISCONN;
+>                         sco_sock_set_timer(sk, SCO_DISCONN_TIMEOUT);
+>                         sco_conn_lock(sco_pi(sk)->conn);
+>                         hci_conn_drop(sco_pi(sk)->conn->hcon);
+>                         sco_pi(sk)->conn->hcon =3D NULL;
+>                         sco_conn_unlock(sco_pi(sk)->conn);
+>                 } else
+>                         sco_chan_del(sk, ECONNRESET);
+>                 break;
+>
+>         case BT_CONNECT2:
+>         case BT_CONNECT:
+>         case BT_DISCONN:
+>                 sco_chan_del(sk, ECONNRESET);
+>                 break;
+>
+>         default:
+>                 sock_set_flag(sk, SOCK_ZAPPED);
+>                 break;
+>         }
+> }
+>
+> As you can see, though one socket is in BT_CONNECTED state, this function=
+ will just drop the kref of sco_pi(sk)->conn->hcon but do nothing with sco_=
+pi(sk)->conn object. Then how this conn object is released? Where should I =
+defer the deallocation function to?
+>
+> I think I need help and discussion to settle down the solution for this. =
+T_T
+>
+> Best Wishes
+> Lin Ma
 
-Reported-by: syzbot+7d41312fe3f123a6f605@syzkaller.appspotmail.com
-Fixes: 66f077dde749 ("Bluetooth: hci_h5: add WAKEUP_DISABLE flag")
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+--=20
+Luiz Augusto von Dentz
