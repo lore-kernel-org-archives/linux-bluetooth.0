@@ -7,63 +7,62 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D6E51C4320E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 04:08:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30268C4320A
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 04:08:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B6D85610CD
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 04:08:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 184F6610CC
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 04:08:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232627AbhIBEJ0 (ORCPT
+        id S235569AbhIBEJ2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 00:09:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48300 "EHLO
+        Thu, 2 Sep 2021 00:09:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48316 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242235AbhIBEJV (ORCPT
+        with ESMTP id S231152AbhIBEJY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 00:09:21 -0400
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5841BC061575
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Sep 2021 21:08:23 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id y1-20020a17090a154100b00196156bbc18so368263pja.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Sep 2021 21:08:23 -0700 (PDT)
+        Thu, 2 Sep 2021 00:09:24 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DDDC061575
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Sep 2021 21:08:27 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id 62-20020a3706410000b02903d2cdd9acf0so601727qkg.21
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Sep 2021 21:08:26 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=wQW5sRYp/dvG+wXe86fcE1hrtE67nnkl7q2mYx1x44c=;
-        b=FK71F/GgFtxrxniBXkbEfROuWokzdKpC+Wap3U733iBGMkEhlErvi2MBnaMuNA8YVw
-         ErvlIR5qBwwy/6vj717b8iuPmksq/iIfIIMOK/vhE+bWJgBG9/2I9HSZb30WGMtMf0D1
-         yUKVD3CZ8gFzlnGx5HKhWNr0v0l2OeHsbt3cWy3hOKNBLF3P9j6c1dcsvt0lfmWofSXh
-         0bN3M68IBYmM9jyoTNhGh2KHvxWK6f55JL/0nvScusXzDpuOkLkYUinKf5I1B0z5O9/n
-         FbgnSUheDc4PFi2/KY0YONtrKwAlW83/alyASnIlEkuIJxdjkY0bJylHO2N0VPoiqYn/
-         IgAg==
+        bh=ntTbkCFsC0XIkarphR8FQnkoIMpe7M+avaoRzPz8lgo=;
+        b=LbebAqgk9jlefA4fCCL77++Hh0oECRnh373hGNBK3F4/KSCVjuw8bvOxJRn8CsJ7FM
+         uW2aeXChQ0Qi9PFDdmF2AkSQph5qYxRcFJsWjHXLroLQNEzOVMzNduxkwlv0wV92Z3oA
+         fX5F0djjakmXgtIrmxfyWu9/o7x9FA86CpboYig+8WHPwU7pSVamKKl2TNs7hju6Oz5T
+         f/UmjsT+U9AvWnC2e7UXNiZ3Lvau6Rpeo7m7OF7X5FXuhjrHfvYYKD0JYGQUXU3q/4QA
+         oNSeAVdl4LqK9RqkpKB1gu6kxc79Qe07m2m1E69oRyeCDyQ0B/n3f0oTu4/dWmXbSjPv
+         WjBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=wQW5sRYp/dvG+wXe86fcE1hrtE67nnkl7q2mYx1x44c=;
-        b=hnHZQWNuBdnVfyl9BLbqMJsO5VRDtp+q97IptWmdNKIBPjj1GtbJC67AXzXizT0cZr
-         j1d6aHRPIAqADflXxVEhD0mCyAtaJD/BEZF/qEpCIHiBkifT8CPYhBGTl8rxXaBLlJku
-         bbvNxh9wksufVXVFejCIU+mPO8atYfnRvWzx18lGm9eurNULjuPbZCdAhctXBuInkb1v
-         ne4qSd4PwnN9eIdTBN8M5JvDzxHiskb0nMgoSMKsDnHHq1+yVskOh5KtfDzDr8TyHj7K
-         jsa3TSFtlFndjwgQaWAr+gqpdu3OkwR6y1zrd6xnpatU574tGZHXBb6GiDl76jYMEtpu
-         y6hQ==
-X-Gm-Message-State: AOAM5331Rq5kMdl/R69w7OpaA5pWEMErDt2v7qY3h4+cMkP4Z6Ph5RV4
-        2il9ZQkFfCl3X/K/Zdr+lF+Qd2pR+tD1g/qDyfZGOqs/kqnXMM1ogb9lydMa8lK4Y1MIM/h17SA
-        TZdr/vr6XExd0+XYoLOBOrKQMEnIAT01DfV+37bGhBdPyGra7ItUMWEfk5mdJgbqysuVGGxAhI0
-        WC
-X-Google-Smtp-Source: ABdhPJz7o70cRN7NP5rWGpFnrqBSz2Xiiyw6j9Ds7FhGhzGfs311ZGjOInxm013Vxq9KLlDhABSuvAllQvBs
+        bh=ntTbkCFsC0XIkarphR8FQnkoIMpe7M+avaoRzPz8lgo=;
+        b=qnl4Bnxi+bH2txwXn11x7vZkAHpw1uCJT+BHHE3iS540VTqZlSmJPVMH7M7enPrRf0
+         GjSgcNqiy0pvu3LbsJNRlT/MF0iP15kNGtXVI/IN8x0bou26vEQLxpitDHA9bzuEAOsE
+         DZuNbefw0pk0k1olXVVcyYveYDP9MAyhmAr9j30dJrclkFTL1Dx6W6XzLQWnokl77/cL
+         VTyEiKRoHYkYzaOcXV0Eahy315qXJ0K2KdAdW/Q/6M4j58AZx/1j+Z9bmYZ21TkvMN3z
+         n57JfWkdy6jgLnzN1Py51wUYmqEfxKFa5+W+U4jmokPi/ijNsHseO3C4U7wW51ec8dIJ
+         PxQA==
+X-Gm-Message-State: AOAM532LqIZfHcJFMdnKIe9iJ48LqMpLkTJEaGGMf7noRMrQV4LfyHCp
+        HFOrZQyJOGPU4COSM3rSB3pC72iZ+j/r19h7jHz2cyYxoL2usxPZQVINrmGCbWknZ4WqU970Y1a
+        A1+t4UFT95qoOiQllchT73XfKxTTOKVKiWOMAH5dVeEBVr1nckaZ78aD4aAnq2cth5VrEyFC8RP
+        lE
+X-Google-Smtp-Source: ABdhPJyzLZeRrgbrumLqa7Hmgn8eQ50uW8uV9I9g4ToUeHnkky7Z+/r82CMJTAWV4uo5sAlBCA1T7WlsU9Hy
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:5249:e81c:3ce6:f50c])
- (user=apusaka job=sendgmr) by 2002:a17:902:ff02:b0:138:b944:e0f0 with SMTP id
- f2-20020a170902ff0200b00138b944e0f0mr1077314plj.34.1630555702780; Wed, 01 Sep
- 2021 21:08:22 -0700 (PDT)
-Date:   Thu,  2 Sep 2021 12:07:10 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:e803:: with SMTP id
+ y3mr1292645qvn.39.1630555706224; Wed, 01 Sep 2021 21:08:26 -0700 (PDT)
+Date:   Thu,  2 Sep 2021 12:07:11 +0800
 In-Reply-To: <20210902040711.665952-1-apusaka@google.com>
-Message-Id: <20210902120509.Bluez.v2.12.I4df08516dd5129d4e9d2cf963121074f500201d9@changeid>
+Message-Id: <20210902120509.Bluez.v2.13.I90a92f48ae29b2a8d8b18f856ea2a43afba52299@changeid>
 Mime-Version: 1.0
 References: <20210902040711.665952-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [Bluez PATCH v2 12/13] doc: Inclusive language update
+Subject: [Bluez PATCH v2 13/13] adapter: Inclusive language for storing LTK
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -76,61 +75,82 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Update the docs to reflect the changes for the other inclusive
-language updates.
+BT core spec 5.3 promotes the usage of inclusive languages.
+This CL replaces some terms with the more appropriate counterparts,
+such as "central" and "peripheral"
 ---
 
-Changes in v2:
-* Merging several patches from the same directory into one
+(no changes since v1)
 
- doc/mesh-api.txt | 2 +-
- doc/mgmt-api.txt | 6 +++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
+ doc/settings-storage.txt |  4 ++--
+ src/adapter.c            | 10 +++++-----
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
-diff --git a/doc/mesh-api.txt b/doc/mesh-api.txt
-index f2c6b9e5c2..ce651c8017 100644
---- a/doc/mesh-api.txt
-+++ b/doc/mesh-api.txt
-@@ -585,7 +585,7 @@ Methods:
- 			org.bluez.mesh.Error.InvalidArguments
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+index 1d96cd66d9..3c637c3521 100644
+--- a/doc/settings-storage.txt
++++ b/doc/settings-storage.txt
+@@ -314,9 +314,9 @@ Long term key) related to a remote device.
+   Rand			Integer		Randomizer
  
- 	void SetKeyPhase(uint16 net_index, uint8 phase)
--		This method is used to set the master key update phase of the
-+		This method is used to set the flooding key update phase of the
- 		given subnet. When finalizing the procedure, it is important
- 		to CompleteAppKeyUpdate() on all app keys that have been
- 		updated during the procedure prior to setting phase 3.
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 5355fedb00..97d33e30a1 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -855,7 +855,7 @@ Load Long Term Keys Command
- 					Address (6 Octets)
- 					Address_Type (1 Octet)
- 					Key_Type (1 Octet)
--					Master (1 Octet)
-+					Central (1 Octet)
- 					Encryption_Size (1 Octet)
- 					Encryption_Diversifier (2 Octets)
- 					Random_Number (8 Octets)
-@@ -4019,7 +4019,7 @@ New Long Term Key Event
- 					Address (6 Octets)
- 					Address_Type (1 Octet)
- 					Key_Type (1 Octet)
--					Master (1 Octet)
-+					Central (1 Octet)
- 					Encryption Size (1 Octet)
- 					Enc. Diversifier (2 Octets)
- 					Random Number (8 Octets)
-@@ -4459,7 +4459,7 @@ New Signature Resolving Key Event
- 				}
  
- 	This event indicates that a new signature resolving key has been
--	generated for either the master or slave device.
-+	generated for either the central or peripheral device.
+-[SlaveLongTermKey] group contains:
++[PeripheralLongTermKey] group contains:
  
- 	The Store_Hint parameter indicates whether the host is expected
- 	to store the key persistently or not.
+-  Same as the [LongTermKey] group, except for slave keys.
++  Same as the [LongTermKey] group, except for peripheral keys.
+ 
+ 
+ [ConnectionParameters] group contains:
+diff --git a/src/adapter.c b/src/adapter.c
+index 4ad53a3a24..8528e2b6e0 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3745,7 +3745,7 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
+ 									NULL);
+ 	ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
+ 
+-	central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
++	central = g_key_file_get_boolean(key_file, group, "Central", &gerr);
+ 	if (gerr)
+ 		g_error_free(gerr);
+ 	else
+@@ -3777,7 +3777,7 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
+ 
+ 	DBG("%s", peer);
+ 
+-	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
++	ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
+ 	if (ltk)
+ 		ltk->central = false;
+ 
+@@ -5780,7 +5780,7 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
+ 	g_free(str);
+ 
+ 	g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
+-	g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
++	g_key_file_set_integer(key_file, "LongTermKey", "Central", central);
+ 	g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
+ 	g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
+ 
+@@ -8211,7 +8211,7 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+ 				uint8_t enc_size, uint16_t ediv,
+ 				uint64_t rand)
+ {
+-	const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
++	const char *group = central ? "LongTermKey" : "PeripheralLongTermKey";
+ 	char device_addr[18];
+ 	char filename[PATH_MAX];
+ 	GKeyFile *key_file;
+@@ -8233,7 +8233,7 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+ 	g_key_file_load_from_file(key_file, filename, 0, NULL);
+ 
+ 	/* Old files may contain this so remove it in case it exists */
+-	g_key_file_remove_key(key_file, "LongTermKey", "Master", NULL);
++	g_key_file_remove_key(key_file, "LongTermKey", "Central", NULL);
+ 
+ 	for (i = 0; i < 16; i++)
+ 		sprintf(key_str + (i * 2), "%2.2X", key[i]);
 -- 
 2.33.0.259.gc128427fd7-goog
 
