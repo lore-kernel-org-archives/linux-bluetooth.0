@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F88DC432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A30A2C432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19EFD61054
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8024860698
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 10:51:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245597AbhIBKwS (ORCPT
+        id S244248AbhIBKwV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 06:52:18 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54472 "EHLO
+        Thu, 2 Sep 2021 06:52:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54514 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245324AbhIBKv6 (ORCPT
+        with ESMTP id S245589AbhIBKwG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 06:51:58 -0400
+        Thu, 2 Sep 2021 06:52:06 -0400
 Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29D03C0617AD
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:31 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id e14-20020a056214162e00b00375ec21dd99so1178421qvw.23
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:31 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C49DCC0617AF
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 03:50:34 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id j11-20020a0cf9cb000000b00375f0642d2dso1212802qvo.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 03:50:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20161025;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=wQ1N5+Ddr0eaO2n9hWRKFI9YgaqOGcTS9ekCFeYvano=;
-        b=UIxckb6UQy3YYglYRX4sz48ubjhpHfnLO1ugMcJzsrTO0uemWj9VOGonOh7C535mEH
-         rgmZyRqi1Smyd2lAUi/1RFsBohtsnXjPPMjkxF7NOMXeQylO2kmxvLwyxMUF/vSobSWo
-         3ZM+nvELT2jr+S6EMC4eWAdtCA9c7vIfs4lZHXeYqKjfaozG4VxPcwJI8Fw/MK0aj/ob
-         sHTV9zafl83+63Misa8F/i47yDVkI6Eizw67JoInLeDaHLkoVo7HfXEVyKheAabAyD2k
-         xN5qIQjsNv5LEdpn+IpPAxG2s1sf9Iy0CZOBZwR5xcI1PpFiGn1Tlgd2C9tCybyDqAW8
-         12lg==
+        bh=+chwaZbbMAUDVjk5/HeDGz0egFmhkV86cNDd2nRvrXU=;
+        b=F5H4Tm8X7ZHK2VRpN7X1/01T5QzW0QUC7lX6mI0JGF/PfhD73GOyA/FG9eVqs/xYO5
+         bE2at3dJs24FBxKcgmrZF1BdrfW9GFZ9blJ6mkDV7DPm5Fhj8Pcs2FFHXrFZnDCPJq5H
+         TpV7A0nIGit43VQ1Nh4waYkm91nUKD71DmE1BtXW8eCdrbWhncCFaShX/wkmZYLTjxzL
+         SkF91mgIicxRgRuBKPFqROY5KOQUOBALUGjAT1p4cusejc38ug4y4DF9RVdqPmDQa98O
+         cNuVHi91CobK87oUutmIX94sHdmM6edh4NfVZDb/S2YJsenaK4Px4EKxmjcAHb02ttND
+         tPMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=wQ1N5+Ddr0eaO2n9hWRKFI9YgaqOGcTS9ekCFeYvano=;
-        b=IFOlcMDHPV76PyKbXarnIWOERa1eOUysSmOd6IsjP1snQphfGW7+qrVHouUh0HSYWN
-         ekM+WYubhiEDSnvM6trFxPBeeP+OtXFPd+ayJahvT/wYjQwUFgWRVZ70B0qESrFnLlin
-         GIYyCKrdFjQSm3Vq6cS6IhT+2l9uKwc9edyp7HydY0MoiTpLJPlqrVeaDs0gXLxF0B/+
-         3Rsl4FoyGIm7ZOcA6ij/UVc33LRvNQEytVxXaIWGA4omeuvs5tP30AYJ4C62r0j4oVz3
-         vZGfhhFU3uqzwQoQV0cpNGZuIKhUbpvqJPwDSy2hyxb8mGlIPmSgjvzZlMyrWcancQWY
-         Z0LA==
-X-Gm-Message-State: AOAM532IzaeKYcaIpPbpU7w0H/hzEo3WqNA3rJb0PkoOFKrbniV5p3jq
-        uisezcFAqIBg6UXXuY8XEpGZIArg6zrNwgwGnVyel8RToVz+O166oLBpuzDFHT6qffl+W4nwvwp
-        1pCafz+DstvGWEkQTZQ+lzZxYo7/eM/bxF0EihPCze5YogeHuzTbfu6eCSILBENjbXX1+iMrlHx
-        jI
-X-Google-Smtp-Source: ABdhPJy2Q5ocev7epFEx5rFb0C7xyb4hNvJ2G8tmwndXkss4bOfr2fNUByZAOtCL5peWdV7kUViEInOjh4Dt
+        bh=+chwaZbbMAUDVjk5/HeDGz0egFmhkV86cNDd2nRvrXU=;
+        b=KVgyRBlH02Zcbl9Epw22C6qFflUd8VxgnHUl412mlsB2I8LHAwnMIZS31IeaF2AbKy
+         C0Qmm8O/HrqdEY2LVyJPgwQxU9tIPGLqbVEhdzTv6cae06P7uRZEcCRbpnZPm9PQTm5I
+         v6sucrECpFczq6E8rM/kjyLeGEoTt6ryrlu73m8rnfGkKFoU901/jda2KvGnqsmjp+kU
+         4HCsUzE7+euf37xpCPTlgLu80wERedftfYHY0qQeV9VczBkhMemM6m3epAidwFcP+HFd
+         9rcSS4iCVkn97s8/4jeUJL1RNcMqcCggRmFToxT/pkXNIbSrip4TLDslGVDbUZV9xeYi
+         K39g==
+X-Gm-Message-State: AOAM533apGYS8yyoQ7Dij50LfTI6nA8gsK1aMXmHnkX6GtoSQubwnxJP
+        TWKh8HNk7Jl4nv1XVErb36MtKQKP2FX6+dPtWLV0F1Li5vL2M/9YrG2EiLUR2yTmdFbvl6hw1qi
+        3Ub70CpRJV4dpPRRYBHyHghEHFIVNHXJcQvJU3OIzSwS822aSKi0EEJu6OWmsvMUHn/gmIJj5cR
+        w9
+X-Google-Smtp-Source: ABdhPJxTSzLSl5YhhQPOWCx5bFSlM8h0KDzCtEm/vvAXDeP54vnPyu4lOFaudSYvQt5wys5/DWJx5fMWMU9/
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:5249:e81c:3ce6:f50c])
- (user=apusaka job=sendgmr) by 2002:a0c:e3cb:: with SMTP id
- e11mr2541311qvl.16.1630579830368; Thu, 02 Sep 2021 03:50:30 -0700 (PDT)
-Date:   Thu,  2 Sep 2021 18:49:36 +0800
+ (user=apusaka job=sendgmr) by 2002:a0c:f901:: with SMTP id
+ v1mr2166083qvn.45.1630579833988; Thu, 02 Sep 2021 03:50:33 -0700 (PDT)
+Date:   Thu,  2 Sep 2021 18:49:37 +0800
 In-Reply-To: <20210902104938.824737-1-apusaka@google.com>
-Message-Id: <20210902184744.Bluez.v3.10.I9802817b065e02b0060e91cf8ce11a8f5fec973a@changeid>
+Message-Id: <20210902184744.Bluez.v3.11.I864344f9ee91b9c051ae4212c9f5a236bdd49632@changeid>
 Mime-Version: 1.0
 References: <20210902104938.824737-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.259.gc128427fd7-goog
-Subject: [Bluez PATCH v3 10/12] mesh: Inclusive language changes
+Subject: [Bluez PATCH v3 11/12] unit/mesh: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -77,185 +77,36 @@ From: Archie Pusaka <apusaka@chromium.org>
 
 According to
 https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-"flooding", "accept list", and "reject list" are the preferred terms.
+"flooding" is the preferred term.
 ---
 
 (no changes since v1)
 
- mesh/net-keys.c | 38 +++++++++++++++++++-------------------
- mesh/net-keys.h |  8 ++++----
- mesh/net.h      |  4 ++--
- 3 files changed, 25 insertions(+), 25 deletions(-)
+ unit/test-mesh-crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/mesh/net-keys.c b/mesh/net-keys.c
-index e0060df746..ee7bbf0c05 100644
---- a/mesh/net-keys.c
-+++ b/mesh/net-keys.c
-@@ -45,7 +45,7 @@ struct net_key {
- 	uint16_t beacon_enables;
- 	uint8_t friend_key;
- 	uint8_t nid;
--	uint8_t master[16];
-+	uint8_t flooding[16];
- 	uint8_t encrypt[16];
- 	uint8_t privacy[16];
- 	uint8_t beacon[16];
-@@ -53,7 +53,7 @@ struct net_key {
+diff --git a/unit/test-mesh-crypto.c b/unit/test-mesh-crypto.c
+index 12709dace0..f9b7d81da7 100644
+--- a/unit/test-mesh-crypto.c
++++ b/unit/test-mesh-crypto.c
+@@ -111,7 +111,7 @@ static const struct mesh_crypto_test s8_1_2 = {
  };
  
- static struct l_queue *keys = NULL;
--static uint32_t last_master_id = 0;
-+static uint32_t last_flooding_id = 0;
+ static const struct mesh_crypto_test s8_1_3 = {
+-	.name		= "8.1.3 k2 function (master)",
++	.name		= "8.1.3 k2 function (flooding)",
+ 	.net_key	= "f7a2a44f8e8a8029064f173ddc1e2b00",
+ 	.p		= "00",
+ 	.nid		= "7f",
+@@ -159,7 +159,7 @@ static const struct mesh_crypto_test s8_2_1 = {
+ };
  
- /* To avoid re-decrypting same packet for multiple nodes, cache and check */
- static uint8_t cache_pkt[29];
-@@ -63,11 +63,11 @@ static size_t cache_plainlen;
- static uint32_t cache_id;
- static uint32_t cache_iv_index;
- 
--static bool match_master(const void *a, const void *b)
-+static bool match_flooding(const void *a, const void *b)
- {
- 	const struct net_key *key = a;
- 
--	return (memcmp(key->master, b, sizeof(key->master)) == 0);
-+	return (memcmp(key->flooding, b, sizeof(key->flooding)) == 0);
- }
- 
- static bool match_id(const void *a, const void *b)
-@@ -87,9 +87,9 @@ static bool match_network(const void *a, const void *b)
- }
- 
- /* Key added from Provisioning, NetKey Add or NetKey update */
--uint32_t net_key_add(const uint8_t master[16])
-+uint32_t net_key_add(const uint8_t flooding[16])
- {
--	struct net_key *key = l_queue_find(keys, match_master, master);
-+	struct net_key *key = l_queue_find(keys, match_flooding, flooding);
- 	uint8_t p[] = {0};
- 	bool result;
- 
-@@ -102,22 +102,22 @@ uint32_t net_key_add(const uint8_t master[16])
- 		keys = l_queue_new();
- 
- 	key = l_new(struct net_key, 1);
--	memcpy(key->master, master, 16);
-+	memcpy(key->flooding, flooding, 16);
- 	key->ref_cnt++;
--	result = mesh_crypto_k2(master, p, sizeof(p), &key->nid, key->encrypt,
-+	result = mesh_crypto_k2(flooding, p, sizeof(p), &key->nid, key->encrypt,
- 								key->privacy);
- 	if (!result)
- 		goto fail;
- 
--	result = mesh_crypto_k3(master, key->network);
-+	result = mesh_crypto_k3(flooding, key->network);
- 	if (!result)
- 		goto fail;
- 
--	result = mesh_crypto_nkbk(master, key->beacon);
-+	result = mesh_crypto_nkbk(flooding, key->beacon);
- 	if (!result)
- 		goto fail;
- 
--	key->id = ++last_master_id;
-+	key->id = ++last_flooding_id;
- 	l_queue_push_tail(keys, key);
- 	return key->id;
- 
-@@ -126,11 +126,11 @@ fail:
- 	return 0;
- }
- 
--uint32_t net_key_frnd_add(uint32_t master_id, uint16_t lpn, uint16_t frnd,
-+uint32_t net_key_frnd_add(uint32_t flooding_id, uint16_t lpn, uint16_t frnd,
- 					uint16_t lp_cnt, uint16_t fn_cnt)
- {
- 	const struct net_key *key = l_queue_find(keys, match_id,
--						L_UINT_TO_PTR(master_id));
-+						L_UINT_TO_PTR(flooding_id));
- 	struct net_key *frnd_key;
- 	uint8_t p[9] = {0x01};
- 	bool result;
-@@ -145,7 +145,7 @@ uint32_t net_key_frnd_add(uint32_t master_id, uint16_t lpn, uint16_t frnd,
- 	l_put_be16(lp_cnt, p + 5);
- 	l_put_be16(fn_cnt, p + 7);
- 
--	result = mesh_crypto_k2(key->master, p, sizeof(p), &frnd_key->nid,
-+	result = mesh_crypto_k2(key->flooding, p, sizeof(p), &frnd_key->nid,
- 				frnd_key->encrypt, frnd_key->privacy);
- 
- 	if (!result) {
-@@ -155,7 +155,7 @@ uint32_t net_key_frnd_add(uint32_t master_id, uint16_t lpn, uint16_t frnd,
- 
- 	frnd_key->friend_key = true;
- 	frnd_key->ref_cnt++;
--	frnd_key->id = ++last_master_id;
-+	frnd_key->id = ++last_flooding_id;
- 	l_queue_push_head(keys, frnd_key);
- 
- 	return frnd_key->id;
-@@ -174,22 +174,22 @@ void net_key_unref(uint32_t id)
- 	}
- }
- 
--bool net_key_confirm(uint32_t id, const uint8_t master[16])
-+bool net_key_confirm(uint32_t id, const uint8_t flooding[16])
- {
- 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
- 
- 	if (key)
--		return memcmp(key->master, master, sizeof(key->master)) == 0;
-+		return !memcmp(key->flooding, flooding, sizeof(key->flooding));
- 
- 	return false;
- }
- 
--bool net_key_retrieve(uint32_t id, uint8_t *master)
-+bool net_key_retrieve(uint32_t id, uint8_t *flooding)
- {
- 	struct net_key *key = l_queue_find(keys, match_id, L_UINT_TO_PTR(id));
- 
- 	if (key) {
--		memcpy(master, key->master, sizeof(key->master));
-+		memcpy(flooding, key->flooding, sizeof(key->flooding));
- 		return true;
- 	}
- 
-diff --git a/mesh/net-keys.h b/mesh/net-keys.h
-index 70b3d22c3a..420618f710 100644
---- a/mesh/net-keys.h
-+++ b/mesh/net-keys.h
-@@ -13,10 +13,10 @@
- #define IV_INDEX_UPDATE		0x02
- 
- void net_key_cleanup(void);
--bool net_key_confirm(uint32_t id, const uint8_t master[16]);
--bool net_key_retrieve(uint32_t id, uint8_t *master);
--uint32_t net_key_add(const uint8_t master[16]);
--uint32_t net_key_frnd_add(uint32_t master_id, uint16_t lpn, uint16_t frnd,
-+bool net_key_confirm(uint32_t id, const uint8_t flooding[16]);
-+bool net_key_retrieve(uint32_t id, uint8_t *flooding);
-+uint32_t net_key_add(const uint8_t flooding[16]);
-+uint32_t net_key_frnd_add(uint32_t flooding_id, uint16_t lpn, uint16_t frnd,
- 					uint16_t lp_cnt, uint16_t fn_cnt);
- void net_key_unref(uint32_t id);
- uint32_t net_key_decrypt(uint32_t iv_index, const uint8_t *pkt, size_t len,
-diff --git a/mesh/net.h b/mesh/net.h
-index 4dbc94b8b3..465d889090 100644
---- a/mesh/net.h
-+++ b/mesh/net.h
-@@ -86,8 +86,8 @@ struct mesh_node;
- #define PROXY_OP_FILTER_STATUS		0x03
- 
- /* Proxy Filter Defines */
--#define PROXY_FILTER_WHITELIST		0x00
--#define PROXY_FILTER_BLACKLIST		0x01
-+#define PROXY_FILTER_ACCEPT_LIST	0x00
-+#define PROXY_FILTER_REJECT_LIST	0x01
- 
- /* Network Tranport Opcodes */
- #define NET_OP_SEG_ACKNOWLEDGE		0x00
+ static const struct mesh_crypto_test s8_2_2 = {
+-	.name		= "8.2.2 Encryption and privacy keys (Master)",
++	.name		= "8.2.2 Encryption and privacy keys (flooding)",
+ 	.net_key	= "7dd7364cd842ad18c17c2b820c84c3d6",
+ 	.p		= "00",
+ 	.nid		= "68",
 -- 
 2.33.0.259.gc128427fd7-goog
 
