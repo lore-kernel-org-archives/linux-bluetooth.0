@@ -2,156 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EDA0CC4320E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 08:57:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2663AC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:29:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF273610E6
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 08:57:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0ED1461058
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 09:29:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244850AbhIBI6A (ORCPT
+        id S1343538AbhIBJaK convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 04:58:00 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:27249 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244864AbhIBI57 (ORCPT
+        Thu, 2 Sep 2021 05:30:10 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44496 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1343539AbhIBJaE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 04:57:59 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1630573021; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=H6hpSVRunzvfqnycIZ6/BaR3NskiDQJfsejgtp/GrDE=; b=NEq+umCZMD5zJa/t0qsfjEhvhAjus3UPDCPV/Uyf75lqoRzd2zw0mvvbLs10P+E/IS0ELwbs
- j9qDCX1u3nZAlZU7AjjvkINTIwXMZa/1BBsoS4Fh2HsVIjtjxIozNLPLj3omgM8Hy5aU6NEO
- 61m/ViQsJENlYDz4eDi8hXPTSsw=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-east-1.postgun.com with SMTP id
- 613091c6cd680e8969802f81 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 02 Sep 2021 08:56:38
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 94BA5C4360D; Thu,  2 Sep 2021 08:56:37 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2C3EFC4338F;
-        Thu,  2 Sep 2021 08:56:29 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 2C3EFC4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v7] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
-Date:   Thu,  2 Sep 2021 16:56:26 +0800
-Message-Id: <1630572986-30786-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Thu, 2 Sep 2021 05:30:04 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5DF76CECDE;
+        Thu,  2 Sep 2021 11:29:05 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [Bluez PATCH v2 13/13] adapter: Inclusive language for storing
+ LTK
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210902120509.Bluez.v2.13.I90a92f48ae29b2a8d8b18f856ea2a43afba52299@changeid>
+Date:   Thu, 2 Sep 2021 11:29:04 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1F544696-4D64-440F-B92E-5A0E05A64EE2@holtmann.org>
+References: <20210902040711.665952-1-apusaka@google.com>
+ <20210902120509.Bluez.v2.13.I90a92f48ae29b2a8d8b18f856ea2a43afba52299@changeid>
+To:     Archie Pusaka <apusaka@google.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tim Jiang <tjiang@codeaurora.org>
+Hi Archie,
 
-the RF perfermence of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+> BT core spec 5.3 promotes the usage of inclusive languages.
+> This CL replaces some terms with the more appropriate counterparts,
+> such as "central" and "peripheral"
+> ---
+> 
+> (no changes since v1)
+> 
+> doc/settings-storage.txt |  4 ++--
+> src/adapter.c            | 10 +++++-----
+> 2 files changed, 7 insertions(+), 7 deletions(-)
+> 
+> diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+> index 1d96cd66d9..3c637c3521 100644
+> --- a/doc/settings-storage.txt
+> +++ b/doc/settings-storage.txt
+> @@ -314,9 +314,9 @@ Long term key) related to a remote device.
+>   Rand			Integer		Randomizer
+> 
+> 
+> -[SlaveLongTermKey] group contains:
+> +[PeripheralLongTermKey] group contains:
+> 
+> -  Same as the [LongTermKey] group, except for slave keys.
+> +  Same as the [LongTermKey] group, except for peripheral keys.
+> 
+> 
+> [ConnectionParameters] group contains:
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 4ad53a3a24..8528e2b6e0 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -3745,7 +3745,7 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
+> 									NULL);
+> 	ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
+> 
+> -	central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
+> +	central = g_key_file_get_boolean(key_file, group, "Central", &gerr);
+> 	if (gerr)
+> 		g_error_free(gerr);
+> 	else
+> @@ -3777,7 +3777,7 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
+> 
+> 	DBG("%s", peer);
+> 
+> -	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+> +	ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
+> 	if (ltk)
+> 		ltk->central = false;
+> 
+> @@ -5780,7 +5780,7 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
+> 	g_free(str);
+> 
+> 	g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
+> -	g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
+> +	g_key_file_set_integer(key_file, "LongTermKey", "Central", central);
+> 	g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
+> 	g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
----
- drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 13 deletions(-)
+this is just not going to work. You are going to break existing installations that upgrade to a new version. The storage format, D-Bus API and libbluetooth API are something that you can not search+replace.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 928cbfa4c42d..218547f6097e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
- 
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	return err;
- }
- 
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver,
-+					char *variant)
-+{
-+	char *separator = (strlen(variant) == 0) ? "" : "_";
-+	u16 board_id = le16_to_cpu(ver->board_id);
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
-+
-+	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-+				 rom_version, separator, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-+				rom_version, separator,	variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			 rom_version);
-+	}
-+
-+}
-+
- static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 				    struct qca_version *ver,
- 				    const struct qca_device_info *info)
-@@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	char fwname[64];
- 	int err;
- 
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
-+	switch (ver->ram_version) {
-+	case WCN6855_2_0_RAM_VERSION_GF:
-+	case WCN6855_2_1_RAM_VERSION_GF:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-+		break;
-+	default:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-+		break;
- 	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+Regards
+
+Marcel
 
