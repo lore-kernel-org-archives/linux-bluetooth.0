@@ -2,119 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-18.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6AE55C432BE
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:18:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D7E5EC432BE
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:49:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 467CB60FDA
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:18:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC075600CD
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Sep 2021 07:49:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242439AbhIBHTW (ORCPT
+        id S243172AbhIBHuT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 03:19:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34092 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233363AbhIBHTV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 03:19:21 -0400
-Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE46AC061575
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 00:18:23 -0700 (PDT)
-Received: by mail-lf1-x12e.google.com with SMTP id m28so2194460lfj.6
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Sep 2021 00:18:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20161025;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=h0lO15BsZhqJ5zr4ij6dUqV7gA4LRjgZyNDSiyYM/a8=;
-        b=MmoqMgO3qoZ3lkORg7FzxXVXSvm73MqxJEICPOm8lwZpE/t0oR0bn0azZ3oAzkYJQh
-         KaOnL1x1uPlkUHcCIvOlRerqFHFsMErkbysprZiCvPmIcVxlgkiglpitIej9xrZ4OQXA
-         LjCUDDGYmxVygEdq0JaH+B0kq9yiN6VrcU8/X2Akna6ZwbcxoY/fZVjlzEnF5fP2IBHw
-         /WbmCvi/r+RSk14VR3W8a0LYnJO5IFPfoRa0QI/SK26qHa30E9ess771Boqapze/BqWE
-         5z6rmWxrlk72ACJHcg4n/q1HKR411ZTSDoacpNpurnyXIbO9D67HZS+KxxoogssI8d/k
-         XC2g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=h0lO15BsZhqJ5zr4ij6dUqV7gA4LRjgZyNDSiyYM/a8=;
-        b=NqRvCpGbfjkjXg9YCUgM0+MG3MFJAJLJUz3ZAwMOy8WaOvPCzh58vbfnqUDM3MJ3qx
-         tnDoM77JbXPdsRMXWz3QgpjePf3MeNFtK9DTfmLoCGbaW7ks9md5HX9LC3gH77OMIoYB
-         zP4lphpzt9aFMZ1CT2NGds4FIFAyxCGjio3WJMmQqkQ8bp0n/5o8Z0EN2Nci1s+rqpIn
-         J3wybrfqFUW4QGtSf3ePyFDiQCo5mi8C9yB+4CfSsu/s2uq6U8y9PcnlS9uyUd0gV4cN
-         8d1mkaFQDcP3DI3FgHBGrlmo1SXcl4xSnqzXKnkGFXc9EK9kR1DC39PkphERhSL5JPWM
-         ewGQ==
-X-Gm-Message-State: AOAM532rzQpaQAqUsU4PAAavXKB7ZsbX5yVKjry0J9CDoFkbCGuicDhB
-        LWebJoSE/HZ3bSYQ2okChkNfaHI1d4s1oG7/MRi2sA==
-X-Google-Smtp-Source: ABdhPJxAa1gZKZ7GWG89kgr2+FX1vFncNNqtfsQ4EzZaNtsNEg1+0RdMWeVH2f5zyjAiyzFQ8ZXyg1gMEJ1Zh/C/STc=
-X-Received: by 2002:a05:6512:15e:: with SMTP id m30mr1576651lfo.82.1630567101814;
- Thu, 02 Sep 2021 00:18:21 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210902040711.665952-1-apusaka@google.com> <20210902120509.Bluez.v2.1.I3be2e373e96293524fa38328ebac177eddc71938@changeid>
- <3D29644F-F6C1-463C-83E6-23CB3FD00057@holtmann.org>
-In-Reply-To: <3D29644F-F6C1-463C-83E6-23CB3FD00057@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Thu, 2 Sep 2021 15:18:10 +0800
-Message-ID: <CAJQfnxEHbXzfm_2+zvZyKwwGOdyLYSKbXiMuZd3qo6RK9a494w@mail.gmail.com>
-Subject: Re: [Bluez PATCH v2 01/13] lib: Inclusive language changes
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
+        Thu, 2 Sep 2021 03:50:19 -0400
+Received: from mail.kernel.org ([198.145.29.99]:47282 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233360AbhIBHuT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Sep 2021 03:50:19 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 45572610A4
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Sep 2021 07:49:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1630568961;
+        bh=sdG36ds5Ve48sK3fExMHWuwkNhAnWtUQR7dVwC7JHjc=;
+        h=From:To:Subject:Date:From;
+        b=mUTYAZH+AQfnYG4T9+X9UOCYshejutA2APrvbI//0bU1Mkf1F4WelxStD6MEwOPfE
+         Do0laGPASqMmRa1zdFFlMYW+mgXrmAlrevXDu7v2ElQmejCcfwPB97rUkTLRtopH1C
+         J5O7jrA8Tj5Iz6G2BPqw08EOB7L2YyGKaG112wKiFAPhbcWVrt8l77YueNz1+ekoXK
+         TjpEs27eV1aAONtWjUVVGQWg0LIEoy7NZjszRX91hbdm2mEQ5sc7zthhw7m82pIjr2
+         XKxOYS2A8CTGeyM9e4l2bu6ADVCTSnAxLiRlQwReO0evIS0lPQeF/Ro07bUbwmUD1C
+         SisTPMFcs9CaA==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 214273] New: AX201 Bluetooth unusable after: Shutdown
+ controller after workqueues are flushed or cancelled
+Date:   Thu, 02 Sep 2021 07:49:21 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kubrick@fgv6.net
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-214273-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D214273
 
-Could you give me pointers on this libbluetooth API?
-I can't seem to figure out which ones of these replacements belong to
-libbluetooth.
+            Bug ID: 214273
+           Summary: AX201 Bluetooth unusable after: Shutdown controller
+                    after workqueues are flushed or cancelled
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.14
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: kubrick@fgv6.net
+        Regression: No
 
-Thanks,
-Archie
+I've been using 5.14 since today, and I have had to revert
+60789afc02f592b8d91217b60930e7a76271ae07 so that bluetooth works again with=
+ a
+8087:0026 Intel Corp. AX201 Bluetooth on a Dell XPS 9300.
 
-On Thu, 2 Sept 2021 at 15:13, Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Archie,
->
-> > BT core spec 5.3 promotes the usage of inclusive languages.
-> > This CL replaces some terms with the more appropriate counterparts,
-> > such as "central", "peripheral", and "accept list".
-> > ---
-> >
-> > Changes in v2:
-> > * Merging several patches from the same directory into one
-> >
-> > android/bluetooth.c    |  4 ++--
-> > btio/btio.c            | 20 ++++++++--------
-> > lib/hci.c              | 52 +++++++++++++++++++++---------------------
-> > lib/hci.h              | 44 +++++++++++++++++------------------
-> > lib/hci_lib.h          |  8 +++----
-> > lib/l2cap.h            |  2 +-
-> > lib/mgmt.h             |  2 +-
-> > lib/rfcomm.h           |  2 +-
-> > monitor/control.c      |  4 ++--
-> > profiles/health/mcap.c |  2 +-
-> > src/adapter.c          |  4 ++--
-> > src/sdpd-server.c      |  2 +-
-> > tools/hcitool.c        |  8 +++----
-> > tools/l2test.c         |  4 ++--
-> > tools/oobtest.c        |  4 ++--
-> > tools/parser/hci.c     | 14 ++++++------
-> > tools/rctest.c         |  4 ++--
-> > tools/rfcomm.c         |  2 +-
-> > 18 files changed, 91 insertions(+), 91 deletions(-)
->
-> so I am not sure if my comments were unclear last time, but touching libbluetooth is no go until we have deprecated it. So as long as it can be still installed by distributions (and it is), you can not break API.
->
-> Regards
->
-> Marcel
->
+This is the dmesg:
+
+------
+
+[   16.531286] Bluetooth: Core ver 2.22
+[   16.531306] Bluetooth: HCI device and connection manager initialized
+[   16.531309] Bluetooth: HCI socket layer initialized
+[   16.531312] Bluetooth: L2CAP socket layer initialized
+[   16.531314] Bluetooth: SCO socket layer initialized
+[   16.649289] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
+[   16.768878] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
+[   16.768883] Bluetooth: BNEP filters: protocol multicast
+[   16.768886] Bluetooth: BNEP socket layer initialized
+[   19.048260] Bluetooth: RFCOMM TTY layer initialized
+[   19.048267] Bluetooth: RFCOMM socket layer initialized
+[   19.048272] Bluetooth: RFCOMM ver 1.11
+[ 7043.393714] Bluetooth: hci0: unexpected event for opcode 0x0500
+[ 7043.394091] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
+[25277.172310] Bluetooth: hci0: unexpected event for opcode 0x0500
+[25277.173307] Bluetooth: hci0: Firmware revision 0.0 build 191 week 21 2021
+[32499.334342] Bluetooth: hci0: unexpected event for opcode 0x0500
+[32511.644752] Bluetooth: hci0: Failed to read MSFT supported features (-11=
+0)
+[32605.228360] Bluetooth: hci0: urb 000000009218d7b4 failed to resubmit (11=
+3)
+[32614.898106] Bluetooth: hci0: Failed to read MSFT supported features (-11=
+0)
+[32956.688532] Bluetooth: hci0: urb 000000002e945dc3 failed to resubmit (11=
+3)
+[32966.471603] Bluetooth: hci0: Failed to read MSFT supported features (-11=
+0)
+
+
+Best regards,
+Fran=C3=A7ois
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
