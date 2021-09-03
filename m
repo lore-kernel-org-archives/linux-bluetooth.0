@@ -2,222 +2,253 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F25C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D38C5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:49:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12DF260C51
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B67B96101A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:49:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234673AbhICW2j (ORCPT
+        id S235112AbhICWux (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 18:28:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35870 "EHLO
+        Fri, 3 Sep 2021 18:50:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233033AbhICW2j (ORCPT
+        with ESMTP id S232112AbhICWuw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 18:28:39 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B922AC061575
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 15:27:38 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso455699pjh.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 15:27:38 -0700 (PDT)
+        Fri, 3 Sep 2021 18:50:52 -0400
+Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F165CC061575
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 15:49:51 -0700 (PDT)
+Received: by mail-vs1-xe2b.google.com with SMTP id p14so601472vsm.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 15:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=cLcSl8nMUeEmOer03hxjSfU3oPUHGSQDxIvzfp/OHI0=;
-        b=jc59hr3Z8Eif/3ubpcV+GLSd+Vi/XpmV7vL/8X7XFil8tzQIGnVZWFj3BeybSakOsF
-         QtyYUYSwRCfTSYyuV/61oC+9Q41PoSL1xQL+XaDNNJe89B89ycDr81QMkYlzI997r+Ri
-         dwPhaV0vGA27xbdYDUi42XN+LrOhYSzZp2dDitCFaS6Zdnfad22Na0OZMTFtIthpneaa
-         8RLp0eI5pqknfUEd/0apMfajtjSFyqesN+jitgGkayRsHwkz+/lxEVWWiJ2i3U8VfaVk
-         3Xjwn/atYvur8MvM16epSkCzggGQvrtBZ6J12+XDfVtA/m/4EUtGd3J0qeui+OzsCVx3
-         ZtUQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XAX2U/8mtUmawWtvW6sh0MbLS6kbD2yznGYQpYDhu1U=;
+        b=JrOZFn7BHpDJ11i94USSt5o2cV7OEon2xDHXsLIm5+NxPYBHq0HDTvnmwGw1bxW4OA
+         lkfCAsf32bqYkT5PGb09Fsp1b+0/epzMZD1+d4PQkjh1Hmi6NMrpH8/RWfTw76OLGGHI
+         TnE2vWJmNBo2WADiz71UJvzv9WZapAVA8Ay5X4BB4A8i27gTe/iPEqsVIc/zchnTWXur
+         TEyi1lpG7ExWfI2jhOaMjRpkuj6HzrMEB1qDVKiziWp7wpAzsy9kvCPvpurer/d1+37h
+         fxGYjgVAzHR73LBbwSPVYfu61RokKZkmfUH/qAecqbTmDBaWcs6bFkq/MOh/2dnwKUhj
+         FuWg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=cLcSl8nMUeEmOer03hxjSfU3oPUHGSQDxIvzfp/OHI0=;
-        b=JbfCvyZthpW00E+97l8qWAAdUQbTsyiv5gMawzOEGAGtKeO5ae0lF/13jcN7EiHecU
-         xND4LmikJ2Gk2CE6RSl5V+nt2q4bCI0XW5EboTYmkeBTd6lcKEFu8HdjpzvU5ccATNGX
-         jE8fwdYgeuYZ+lgNYXGdWH1S+FW/VDG+zbIL4yZ5VEOsuFvpeH0+Gd548DOsVEJ6uvyV
-         Aud7wMcC/D9cs90Dga5+jl6VE+5yOnmrcDcTUNVGys++opi/w5pC+Px642/yQe5QH+1B
-         km8AWX4o2f2FK3EvZeX/3fGN49eOLNvdtAKiv5zozBtteEUA6H1GhWq87lF9wnmKJGYF
-         VW7A==
-X-Gm-Message-State: AOAM533ZUg1kYMo3SZWR8ExyQSCgP/prEwcmXVg4PUJIlel3+7yLO9gA
-        0x7v91JX4iIAKig7n7YYYGjZj2RX3jE=
-X-Google-Smtp-Source: ABdhPJxHk3cT1Aj9Z7b7dTbQkr/0UH7CkQJTdNHl3IyWBVcWM6y+iye1Eq64N56/raB1nCqsxj45nQ==
-X-Received: by 2002:a17:90a:ce8e:: with SMTP id g14mr1108561pju.241.1630708058019;
-        Fri, 03 Sep 2021 15:27:38 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x4sm225796pjq.20.2021.09.03.15.27.37
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 15:27:37 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 4/4] Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
-Date:   Fri,  3 Sep 2021 15:27:32 -0700
-Message-Id: <20210903222732.1472560-4-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210903222732.1472560-1-luiz.dentz@gmail.com>
-References: <20210903222732.1472560-1-luiz.dentz@gmail.com>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XAX2U/8mtUmawWtvW6sh0MbLS6kbD2yznGYQpYDhu1U=;
+        b=s3XFz0QpcAH2eM6JIqVvHz/HiHhdRDxflEMSb3stFF8QqxZb9jGRq6ZXVaYDHZWurk
+         MbQIaM1NuPZWT+4LCITZfn9cj/uQBPQ8ezqxcunNOC44oaO1n1hIFTunZEsCqVVWQHyA
+         HBlPVNKTN/e+QZC5zwwx3296l4+yUQaEWuVhminvKTg8mHm3oijjauCe3I53TPS8GQGh
+         UPQku/eWddEDUzSENgcgsogDDfVAlPzROkc8ZQXuk3GSL5sRFX55QcsFIDdmvqlZc/KM
+         8R9vubm8LDT/wpt5uDKMB8D0vs60gsAnDw9dueT0JKz3RL2wsOqtxQWlrPNyjL9iIOfO
+         pxNA==
+X-Gm-Message-State: AOAM533Aunw6+vEP977hrIikNkmdiMXwhDkL8QG7mFQd6wPbLoJWGjKZ
+        ishiekSiorOjyR4+Mgpw4yjQ/hjMdBotO5vTJEhyeBo4
+X-Google-Smtp-Source: ABdhPJwttlnitb8EFlgZqFLy2q2SFAcmbp2vbes2SR9NAAv4m3MufrdbquttHk6cSIKMNmIp3LFClVu432CdZ7dWEwg=
+X-Received: by 2002:a05:6102:3ec8:: with SMTP id n8mr1057864vsv.39.1630709390850;
+ Fri, 03 Sep 2021 15:49:50 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210829155012.164880-1-pav@iki.fi> <20210829155012.164880-3-pav@iki.fi>
+In-Reply-To: <20210829155012.164880-3-pav@iki.fi>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 3 Sep 2021 15:49:40 -0700
+Message-ID: <CABBYNZK6b=HrLWSufVyRwNJ9jnhFaQ3d0dabQY+BW0_qbkNB7A@mail.gmail.com>
+Subject: Re: [PATCH BlueZ 2/2] avdtp: use separate local SEID pool for each adapter
+To:     Pauli Virtanen <pav@iki.fi>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Pauli,
 
-This makes use of bt_skb_sendmmsg instead using memcpy_from_msg which
-is not considered safe to be used when lock_sock is held.
+On Sun, Aug 29, 2021 at 8:52 AM Pauli Virtanen <pav@iki.fi> wrote:
+>
+> Local SEIDs are currently allocated from a pool that is common for all
+> adapters. However, AVDTP spec v1.3, sec 4.10 states "To prevent
+> conflicts, the scope of the SEID shall be both device-local and
+> connection-local. The application is responsible for assigning a SEID,
+> which is not in use on the connection to the same peer device." In
+> practice, registering the same media application for multiple adapters
+> can result to running out of SEIDs, even though the spec does not
+> require SEIDs to be unique across adapters.
+>
+> Use a separate SEID pool for each btd_adapter to fix this.
+> ---
+>  profiles/audio/a2dp.c  |  2 +-
+>  profiles/audio/avdtp.c | 55 ++++++++++++++++++++++++++++++++++++------
+>  profiles/audio/avdtp.h |  4 ++-
+>  3 files changed, 51 insertions(+), 10 deletions(-)
+>
+> diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> index 02caa83e1..1e8a66b8a 100644
+> --- a/profiles/audio/a2dp.c
+> +++ b/profiles/audio/a2dp.c
+> @@ -2615,7 +2615,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
+>
+>         sep = g_new0(struct a2dp_sep, 1);
+>
+> -       sep->lsep = avdtp_register_sep(server->seps, type,
+> +       sep->lsep = avdtp_register_sep(adapter, server->seps, type,
+>                                         AVDTP_MEDIA_TYPE_AUDIO, codec,
+>                                         delay_reporting, &endpoint_ind,
+>                                         &cfm, sep);
 
-Also make rfcomm_dlc_send handle skb with fragments and queue them all
-atomically.
+avdtp.c shall not have dependencies on adapter.c, or any btd_ function
+that is daemon specific.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/rfcomm/core.c | 50 +++++++++++++++++++++++++++++++------
- net/bluetooth/rfcomm/sock.c | 46 ++++++++--------------------------
- 2 files changed, 53 insertions(+), 43 deletions(-)
+> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> index 25520ceec..f2aa98b23 100644
+> --- a/profiles/audio/avdtp.c
+> +++ b/profiles/audio/avdtp.c
+> @@ -44,7 +44,6 @@
+>  #define AVDTP_PSM 25
+>
+>  #define MAX_SEID 0x3E
+> -static uint64_t seids;
+>
+>  #ifndef MAX
+>  # define MAX(x, y) ((x) > (y) ? (x) : (y))
+> @@ -325,6 +324,7 @@ struct avdtp_local_sep {
+>         GSList *caps;
+>         struct avdtp_sep_ind *ind;
+>         struct avdtp_sep_cfm *cfm;
+> +       struct btd_adapter *adapter;
 
-diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
-index f2bacb464ccf..7324764384b6 100644
---- a/net/bluetooth/rfcomm/core.c
-+++ b/net/bluetooth/rfcomm/core.c
-@@ -549,22 +549,58 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
- 	return dlc;
- }
- 
-+static int rfcomm_dlc_send_frag(struct rfcomm_dlc *d, struct sk_buff *frag)
-+{
-+	int len = frag->len;
-+
-+	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
-+
-+	if (len > d->mtu)
-+		return -EINVAL;
-+
-+	rfcomm_make_uih(frag, d->addr);
-+	__skb_queue_tail(&d->tx_queue, frag);
-+
-+	return len;
-+}
-+
- int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
- {
--	int len = skb->len;
-+	unsigned long flags;
-+	struct sk_buff *frag, *next;
-+	int len;
- 
- 	if (d->state != BT_CONNECTED)
- 		return -ENOTCONN;
- 
--	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
-+	frag = skb_shinfo(skb)->frag_list;
-+	skb_shinfo(skb)->frag_list = NULL;
- 
--	if (len > d->mtu)
--		return -EINVAL;
-+	/* Queue all fragments atomically. */
-+	spin_lock_irqsave(&d->tx_queue.lock, flags);
- 
--	rfcomm_make_uih(skb, d->addr);
--	skb_queue_tail(&d->tx_queue, skb);
-+	len = rfcomm_dlc_send_frag(d, skb);
-+	if (len < 0 || !frag)
-+		goto unlock;
-+
-+	for (; frag; frag = next) {
-+		int ret;
-+
-+		next = frag->next;
-+
-+		ret = rfcomm_dlc_send_frag(d, frag);
-+		if (ret < 0) {
-+			kfree_skb(frag);
-+			goto unlock;
-+		}
-+
-+		len += ret;
-+	}
-+
-+unlock:
-+	spin_unlock_irqrestore(&d->tx_queue.lock, flags);
- 
--	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
-+	if (len > 0 && !test_bit(RFCOMM_TX_THROTTLED, &d->flags))
- 		rfcomm_schedule();
- 	return len;
- }
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 2c95bb58f901..5938af3e9936 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -575,46 +575,20 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	sent = bt_sock_wait_ready(sk, msg->msg_flags);
--	if (sent)
--		goto done;
--
--	while (len) {
--		size_t size = min_t(size_t, len, d->mtu);
--		int err;
--
--		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
--				msg->msg_flags & MSG_DONTWAIT, &err);
--		if (!skb) {
--			if (sent == 0)
--				sent = err;
--			break;
--		}
--		skb_reserve(skb, RFCOMM_SKB_HEAD_RESERVE);
--
--		err = memcpy_from_msg(skb_put(skb, size), msg, size);
--		if (err) {
--			kfree_skb(skb);
--			if (sent == 0)
--				sent = err;
--			break;
--		}
- 
--		skb->priority = sk->sk_priority;
-+	release_sock(sk);
- 
--		err = rfcomm_dlc_send(d, skb);
--		if (err < 0) {
--			kfree_skb(skb);
--			if (sent == 0)
--				sent = err;
--			break;
--		}
-+	if (sent)
-+		return sent;
- 
--		sent += size;
--		len  -= size;
--	}
-+	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
-+			      RFCOMM_SKB_TAIL_RESERVE);
-+	if (IS_ERR_OR_NULL(skb))
-+		return PTR_ERR(skb);
- 
--done:
--	release_sock(sk);
-+	sent = rfcomm_dlc_send(d, skb);
-+	if (sent < 0)
-+		kfree_skb(skb);
- 
- 	return sent;
- }
+We should probably use the list (server->seps) instead to avoid
+depending on the btd_adapter here.
+
+>         void *user_data;
+>  };
+>
+> @@ -414,6 +414,8 @@ struct avdtp {
+>
+>  static GSList *state_callbacks = NULL;
+>
+> +static GHashTable *adapter_seids = NULL;
+
+I rather not use glib structures in new code.
+
+>  static int send_request(struct avdtp *session, gboolean priority,
+>                         struct avdtp_stream *stream, uint8_t signal_id,
+>                         void *buffer, size_t size);
+> @@ -3768,7 +3770,41 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+>                                                         &req, sizeof(req));
+>  }
+>
+> -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> +static uint8_t get_adapter_seid(struct btd_adapter *adapter)
+> +{
+> +       uint64_t *seids;
+> +
+> +       if (adapter_seids == NULL)
+> +               adapter_seids = g_hash_table_new_full(g_direct_hash,
+> +                                               g_direct_equal, NULL, g_free);
+> +
+> +       seids = g_hash_table_lookup(adapter_seids, adapter);
+> +
+> +       if (seids == NULL) {
+> +               seids = g_new0(uint64_t, 1);
+> +               g_hash_table_insert(adapter_seids, adapter, seids);
+> +       }
+> +
+> +       return util_get_uid(seids, MAX_SEID);
+> +}
+> +
+> +static void clear_adapter_seid(struct btd_adapter *adapter, uint8_t seid)
+> +{
+> +       uint64_t *seids = adapter_seids ?
+> +                       g_hash_table_lookup(adapter_seids, adapter) : NULL;
+> +
+> +       if (seids == NULL)
+> +               return;
+> +
+> +       util_clear_uid(seids, seid);
+> +
+> +       if (*seids == 0)
+> +               g_hash_table_remove(adapter_seids, adapter);
+> +}
+> +
+> +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
+> +                                               struct queue *lseps,
+> +                                               uint8_t type,
+>                                                 uint8_t media_type,
+>                                                 uint8_t codec_type,
+>                                                 gboolean delay_reporting,
+> @@ -3777,7 +3813,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+>                                                 void *user_data)
+>  {
+>         struct avdtp_local_sep *sep;
+> -       uint8_t seid = util_get_uid(&seids, MAX_SEID);
+> +       uint8_t seid = get_adapter_seid(adapter);
+
+Perhaps the uid pool should be passed instead of self generated by
+avdtp.c, that way each server instance can contain its own seid pool
+which can be passed to avdtp_register_sep, or better yet it can pass
+the seid directly so the avdtp.c code is no longer responsible for
+managing it and that is transfer to the caller which is already
+managing the list anyway.
+
+>
+>         if (!seid)
+>                 return NULL;
+> @@ -3791,11 +3827,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+>         sep->codec = codec_type;
+>         sep->ind = ind;
+>         sep->cfm = cfm;
+> +       sep->adapter = adapter;
+>         sep->user_data = user_data;
+>         sep->delay_reporting = delay_reporting;
+>
+> -       DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
+> -                       sep->info.type, sep->codec, sep->info.seid);
+> +       DBG("SEP %p registered: type:%d codec:%d adapter:%p seid:%d", sep,
+> +                       sep->info.type, sep->codec, sep->adapter,
+> +                       sep->info.seid);
+>
+>         if (!queue_push_tail(lseps, sep)) {
+>                 g_free(sep);
+> @@ -3813,10 +3851,11 @@ int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
+>         if (sep->stream)
+>                 release_stream(sep->stream, sep->stream->session);
+>
+> -       DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+> -                       sep->info.type, sep->codec, sep->info.seid);
+> +       DBG("SEP %p unregistered: type:%d codec:%d adapter:%p seid:%d", sep,
+> +                       sep->info.type, sep->codec, sep->adapter,
+> +                       sep->info.seid);
+>
+> -       util_clear_uid(&seids, sep->info.seid);
+> +       clear_adapter_seid(sep->adapter, sep->info.seid);
+>         queue_remove(lseps, sep);
+>         g_free(sep);
+>
+> diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> index b02534cd5..70807cff9 100644
+> --- a/profiles/audio/avdtp.h
+> +++ b/profiles/audio/avdtp.h
+> @@ -278,7 +278,9 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream);
+>  int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+>                                                         uint16_t delay);
+>
+> -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
+> +                                               struct queue *lseps,
+> +                                               uint8_t type,
+>                                                 uint8_t media_type,
+>                                                 uint8_t codec_type,
+>                                                 gboolean delay_reporting,
+> --
+> 2.31.1
+>
+
+
 -- 
-2.31.1
-
+Luiz Augusto von Dentz
