@@ -2,156 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-7.5 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_SANE_1 autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFE75C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 04:03:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9D89C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 04:40:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8E3AB603E9
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 04:03:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7E41861059
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 04:40:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbhICEEn (ORCPT
+        id S232277AbhICEl0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 00:04:43 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:50040 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231934AbhICEDv (ORCPT
+        Fri, 3 Sep 2021 00:41:26 -0400
+Received: from www262.sakura.ne.jp ([202.181.97.72]:56708 "EHLO
+        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232164AbhICElZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 00:03:51 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1630641771; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=EMhgptSs9B0phDTNF/T32JFQu6DIrhsYsE9MW/ujn2U=; b=hH5QWV7k0lEcKUQBdbFcXxrBqF/rCyV9jklv2ZKO71ozqnE0HV/vRnmmM89AXI7wzooTR+2C
- QT6yzgiX/t/igk8au0r/ydUGwwooU201tM6ZHTUD+FZH4MvrAgXikkUrVNZ0bwru8FJ5SNeP
- 9ef7sJMydOgFyjFWJLZ2Y7Q+JWw=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n07.prod.us-east-1.postgun.com with SMTP id
- 61319e66e0fcecca190f8543 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 03 Sep 2021 04:02:46
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id CDEADC43617; Fri,  3 Sep 2021 04:02:45 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 283BBC4338F;
-        Fri,  3 Sep 2021 04:02:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 283BBC4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v8] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
-Date:   Fri,  3 Sep 2021 12:02:38 +0800
-Message-Id: <1630641758-22281-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Fri, 3 Sep 2021 00:41:25 -0400
+Received: from fsav117.sakura.ne.jp (fsav117.sakura.ne.jp [27.133.134.244])
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1834eBIB061707;
+        Fri, 3 Sep 2021 13:40:11 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Received: from www262.sakura.ne.jp (202.181.97.72)
+ by fsav117.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp);
+ Fri, 03 Sep 2021 13:40:11 +0900 (JST)
+X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav117.sakura.ne.jp)
+Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
+        (authenticated bits=0)
+        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1834eBWj061704
+        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
+        Fri, 3 Sep 2021 13:40:11 +0900 (JST)
+        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
+Subject: Re: [PATCH] Bluetooth: avoid page fault from sco_send_frame()
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     LinMa <linma@zju.edu.cn>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>
+References: <15f5a46.b79d9.17ba6802ccd.Coremail.linma@zju.edu.cn>
+ <c998d16d-f45a-8be4-2898-9e94509cb2ea@i-love.sakura.ne.jp>
+ <60f604f8-2a89-fd3f-996f-9d9e4a229427@i-love.sakura.ne.jp>
+ <CABBYNZK-JvPcB_T39_NUE-O6ztE6crNEfmFxszEtAu3OkrKF2A@mail.gmail.com>
+From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Message-ID: <a7bed103-dbb1-6783-aba7-f18a4d495c13@i-love.sakura.ne.jp>
+Date:   Fri, 3 Sep 2021 13:40:12 +0900
+User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
+MIME-Version: 1.0
+In-Reply-To: <CABBYNZK-JvPcB_T39_NUE-O6ztE6crNEfmFxszEtAu3OkrKF2A@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tim Jiang <tjiang@codeaurora.org>
+On 2021/09/03 12:48, Luiz Augusto von Dentz wrote:
+> There is a set already handing this sort of problem:
+> 
+> https://patchwork.kernel.org/project/bluetooth/patch/20210901002621.414016-3-luiz.dentz@gmail.com/
 
-the RF perfermance of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+OK, I didn't know that. (I'm not subscribed to bluethooth ML.)
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
----
- drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 13 deletions(-)
+But can we please keep the fix minimal? Multiple distributors are
+waiting for the fix (which can be backported) for more than one month.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 928cbfa4c42d..0f5d2222d624 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
- 
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	return err;
- }
- 
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver,
-+					char *variant)
-+{
-+	char *sep = (strlen(variant) == 0) ? "" : "_";
-+	u16 board_id = le16_to_cpu(ver->board_id);
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
-+
-+	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-+				rom_version, sep, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-+				rom_version, sep, variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			rom_version);
-+	}
-+
-+}
-+
- static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 				    struct qca_version *ver,
- 				    const struct qca_device_info *info)
-@@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	char fwname[64];
- 	int err;
- 
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
-+	switch (ver->ram_version) {
-+	case WCN6855_2_0_RAM_VERSION_GF:
-+	case WCN6855_2_1_RAM_VERSION_GF:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-+		break;
-+	default:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-+		break;
- 	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+  https://security-tracker.debian.org/tracker/CVE-2021-3640
+  https://access.redhat.com/security/cve/cve-2021-3640
+
+And it looks to me that your
+"[3/4] Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg"
+contains a new use-after-free or memory corruption bug...   :-(
 
