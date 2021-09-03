@@ -2,191 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+X-Spam-Status: No, score=-14.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EC48C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 10:53:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20238C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 14:01:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 333CF60698
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 10:53:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08B76610CC
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 14:01:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349161AbhICKya (ORCPT
+        id S235681AbhICOCg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 06:54:30 -0400
-Received: from mga02.intel.com ([134.134.136.20]:35162 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349239AbhICKyX (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 06:54:23 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10095"; a="206611738"
-X-IronPort-AV: E=Sophos;i="5.85,265,1624345200"; 
-   d="scan'208";a="206611738"
-Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Sep 2021 03:53:16 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,265,1624345200"; 
-   d="scan'208";a="692090439"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga005.fm.intel.com with ESMTP; 03 Sep 2021 03:53:14 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        tedd.an@intel.com, luiz.von.dentz@intel.com,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v14 08/12] Bluetooth: Configure codec for HFP offload use case
-Date:   Fri,  3 Sep 2021 16:28:09 +0530
-Message-Id: <20210903105813.2440-8-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20210903105813.2440-1-kiran.k@intel.com>
-References: <20210903105813.2440-1-kiran.k@intel.com>
+        Fri, 3 Sep 2021 10:02:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60204 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229818AbhICOCc (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 3 Sep 2021 10:02:32 -0400
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E53F9C061575
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 07:01:30 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id a21so4422957vsp.12
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 07:01:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jLr4l/e2yUPIFPLD6Z6dbCgxggzYg1YohgRbf0t5c1Q=;
+        b=FPCXac0G4iMq3UvtOJtr60EL6ra8Ez/piRMpGFVdtBwB6RIXJ3rPYO7II1jfEg/s1y
+         oZMWXV1e4X0uSdad349v2QNi+SeROGLZ62uPQa3XgZfVdfYOwdbCHbTAa5PSbVafdp7l
+         0X2T+1YlifXHVTJftjsvPM3qclhT2mZOqmPnw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=jLr4l/e2yUPIFPLD6Z6dbCgxggzYg1YohgRbf0t5c1Q=;
+        b=Q00oIWtectFLHGFIDL+WagjwCvrZ5H3IwHIh8czIr1S9OTp+K29Ng09pfK2+b5Uzn/
+         uOwXCGl9eClr7SE1myZ+2hMCdWInZLo9NfeXC2DEHmrWpMM/PtArUEY/fTPxyxLKi9Lo
+         jTS9m0+pYouIzdGvBF5VrqWeZDYWssMrKvFWityy+FnQ7KfumADoPw80Wj/lixb33hmI
+         hVfQfD0eL8CbZv8jexXvsmxIros4H6hBAn6Wl5FL1KpoqZH7yuF1G+CKM09U0CERDQJD
+         a+TanwSD8yphtkVoSV6SUQRjq8ugO7GDvvKYz5OK9Merzw4TJlGfspxj0bXa4tlChf4Z
+         4hLg==
+X-Gm-Message-State: AOAM530TBFiX9VBQiaF+lzNmfZdMu/9oWkr+rt8pD17tTPICeE/oDFbU
+        cGmJHG1+SnzsgXWFOz/ozQTRMI5T4V6Ysj5H
+X-Google-Smtp-Source: ABdhPJxt6K5pxfZWm5C2+/aIr8A2KIaAVRAZAZ4zdJbK/3+X9gFROuA8LzNRjeixP16McXKMAcWX+g==
+X-Received: by 2002:a67:24c6:: with SMTP id k189mr2695299vsk.3.1630677689781;
+        Fri, 03 Sep 2021 07:01:29 -0700 (PDT)
+Received: from alain.c.googlers.com.com (39.119.74.34.bc.googleusercontent.com. [34.74.119.39])
+        by smtp.gmail.com with ESMTPSA id s46sm506583uad.20.2021.09.03.07.01.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Sep 2021 07:01:29 -0700 (PDT)
+From:   Alain Michaud <alainm@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc:     Alain Michaud <alainm@chromium.org>
+Subject: [Bluez PATCH] shared/shell: don't allow completion fallback
+Date:   Fri,  3 Sep 2021 14:01:18 +0000
+Message-Id: <20210903140118.3469656-1-alainm@chromium.org>
+X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-For HFP offload use case, codec needs to be configured
-before opening SCO connection. This patch sends
-HCI_CONFIGURE_DATA_PATH command to configure doec before
-opening SCO connection.
+When using bluetoothctl, if the user enters a quotation mark before
+pressing tab, the completion handler falls back to the shell's handler
+which ends up printing the current folder's file content.  This behavior
+is never desired in bt_shell's menu.
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
+This was verified by typing " then tab-tab before and after the change as
+been made to confirm the desired behavior and verified that all other
+argument completions (such as address completion) continues to function.
+
 ---
 
-Notes:
-    * changes in v14:
-     - No changes
-    
-    * changes in v13(new patch):
-     - Configure codec for HFP use case before opening
-       SCO connection
+ src/shared/shell.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
 
- include/net/bluetooth/hci.h      |  8 ++++++
- include/net/bluetooth/hci_core.h |  3 ++
- net/bluetooth/hci_conn.c         |  4 +++
- net/bluetooth/hci_request.c      | 47 ++++++++++++++++++++++++++++++++
- net/bluetooth/hci_request.h      |  2 ++
- 5 files changed, 64 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 3426ee4f0fa5..6def7a0fd5b7 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1286,6 +1286,14 @@ struct hci_rp_read_local_oob_ext_data {
- 	__u8     rand256[16];
- } __packed;
+diff --git a/src/shared/shell.c b/src/shared/shell.c
+index 21e8b50cd..cbb9b8b88 100644
+--- a/src/shared/shell.c
++++ b/src/shared/shell.c
+@@ -903,6 +903,8 @@ static char **shell_completion(const char *text, int start, int end)
+ {
+ 	char **matches = NULL;
  
-+#define HCI_CONFIGURE_DATA_PATH	0x0c83
-+struct hci_op_configure_data_path {
-+	__u8	direction;
-+	__u8	data_path_id;
-+	__u8	vnd_len;
-+	__u8	vnd_data[];
-+} __packed;
++	rl_attempted_completion_over = 1;
 +
- #define HCI_OP_READ_LOCAL_VERSION	0x1001
- struct hci_rp_read_local_version {
- 	__u8     status;
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fdfdd3bdde16..4c6485ac3e2c 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -620,6 +620,9 @@ struct hci_dev {
- 	bool (*prevent_wake)(struct hci_dev *hdev);
- 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
- 	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
-+	int (*get_codec_config_data)(struct hci_dev *hdev, __u8 type,
-+				     struct bt_codec *codec, __u8 *vnd_len,
-+				     __u8 **vnd_data);
- };
+ 	if (!data.menu)
+ 		return NULL;
  
- #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index b9c61fc9ff89..43baadf5ec3e 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -315,6 +315,10 @@ static bool hci_enhanced_setup_sync_conn(struct hci_conn *conn, __u16 handle)
+@@ -925,9 +927,6 @@ static char **shell_completion(const char *text, int start, int end)
+ 		matches = rl_completion_matches(text, cmd_generator);
+ 	}
  
- 	bt_dev_dbg(hdev, "hcon %p", conn);
- 
-+	/* for offload use case, codec needs to configured before opening SCO */
-+	if (conn->codec.data_path)
-+		hci_req_configure_datapath(hdev, &conn->codec);
-+
- 	conn->state = BT_CONNECT;
- 	conn->out = true;
- 
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index f15626607b2d..47fb665277d4 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -3327,6 +3327,53 @@ bool hci_req_stop_discovery(struct hci_request *req)
- 	return ret;
+-	if (!matches)
+-		rl_attempted_completion_over = 1;
+-
+ 	return matches;
  }
  
-+static void config_data_path_complete(struct hci_dev *hdev, u8 status,
-+				      u16 opcode)
-+{
-+	bt_dev_dbg(hdev, "status %u", status);
-+}
-+
-+int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec)
-+{
-+	struct hci_request req;
-+	int err;
-+	__u8 vnd_len, *vnd_data = NULL;
-+	struct hci_op_configure_data_path *cmd = NULL;
-+
-+	hci_req_init(&req, hdev);
-+
-+	err = hdev->get_codec_config_data(hdev, ESCO_LINK, codec, &vnd_len,
-+					  &vnd_data);
-+	if (err < 0)
-+		goto error;
-+
-+	cmd = kzalloc(sizeof(*cmd) + vnd_len, GFP_KERNEL);
-+	if (!cmd) {
-+		err = -ENOMEM;
-+		goto error;
-+	}
-+
-+	err = hdev->get_data_path_id(hdev, &cmd->data_path_id);
-+	if (err < 0)
-+		goto error;
-+
-+	cmd->vnd_len = vnd_len;
-+	memcpy(cmd->vnd_data, vnd_data, vnd_len);
-+
-+	cmd->direction = 0x00;
-+	hci_req_add(&req, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + vnd_len, cmd);
-+
-+	cmd->direction = 0x01;
-+	hci_req_add(&req, HCI_CONFIGURE_DATA_PATH, sizeof(*cmd) + vnd_len, cmd);
-+
-+	err = hci_req_run(&req, config_data_path_complete);
-+error:
-+
-+	kfree(cmd);
-+	kfree(vnd_data);
-+	return err;
-+}
-+
- static int stop_discovery(struct hci_request *req, unsigned long opt)
- {
- 	hci_dev_lock(req->hdev);
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 39ee8a18087a..aaf608720243 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -101,6 +101,8 @@ void __hci_req_update_class(struct hci_request *req);
- /* Returns true if HCI commands were queued */
- bool hci_req_stop_discovery(struct hci_request *req);
- 
-+int hci_req_configure_datapath(struct hci_dev *hdev, struct bt_codec *codec);
-+
- static inline void hci_req_update_scan(struct hci_dev *hdev)
- {
- 	queue_work(hdev->req_workqueue, &hdev->scan_update);
 -- 
-2.17.1
+2.33.0.153.gba50c8fa24-goog
 
