@@ -2,217 +2,551 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8387DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:59:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0944C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 23:12:00 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5BDD66101A
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:59:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9073C6108E
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 23:12:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237358AbhICXAT (ORCPT
+        id S1350427AbhICXNA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 19:00:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42748 "EHLO
+        Fri, 3 Sep 2021 19:13:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236815AbhICXAR (ORCPT
+        with ESMTP id S1349369AbhICXM7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 19:00:17 -0400
-Received: from mail-io1-xd33.google.com (mail-io1-xd33.google.com [IPv6:2607:f8b0:4864:20::d33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7521CC061575
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 15:59:15 -0700 (PDT)
-Received: by mail-io1-xd33.google.com with SMTP id n24so565820ion.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 15:59:15 -0700 (PDT)
+        Fri, 3 Sep 2021 19:12:59 -0400
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E66BDC061575
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 16:11:58 -0700 (PDT)
+Received: by mail-ua1-x934.google.com with SMTP id g16so431413uam.7
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 16:11:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=bhyW2/kiIZAeGvEvUt1EhOgL8HQZ9+AY9IOQ7u36+Yo=;
-        b=UoEBKt4fr9qed6vom0AzBsyC+pevZiObB1ka28Oip14bhNdjGLHpL8XcLfYWwaOTdm
-         dzuj494n+L0ALnGXIwcHo0tA8GEwUN9SBeGYX9CDo14mSY1XPRJDuv+dhsETiaN16FK1
-         MoHYZBpCITCuoCIN3g2eKBlGQSqOsEJgZvr666xdtCrXZkET2ajfLjOy+aY95vxnM0bn
-         gRulvgowUWv5x8rMqXKBIdqWXrAbAXUfJBqj2x3gM8wFqxFVyYjC3IFATSmiGbT8C+3P
-         afd2jUkatfnnmKpaFThGZnhc3jKyzUdgwfT9nY3J7szasJCVEEMOibTCMmXpGuir6Bkv
-         UTyg==
+         :cc:content-transfer-encoding;
+        bh=sd594KvbZ1dG6SEsLOz7bokZYP96xYNBscQY44YRHJc=;
+        b=Xpam+Sawzwi4OdxS2lQE6q6bPbJCKGZ7WwpsAEdKy3Sq0s0Yh/giVt/VAOdg2oWBcV
+         bXdMBvB8sAoF8+8o2Mzk7+pz2p3FaBCzRa3NL9BGxkw1olWc40YYkNxkycCiNOZ8IqHD
+         x/9TRPwbWO+Uxo53LJoEqE7HpOSDDeYSQ0NW+mLckqaKnnXPpmxv36c1Ru3ZYyQETNjM
+         fUDx0p6rqiooDN0n+ZJWOOMcEvz+X+Y56Ro/ax0BsT8xZOM4kuJ+ZXIhihp7l6iGMQn4
+         7NGGfu90tOJ47ohuzywixg+jjqjhYz+BWXrc98u+VdzTCiG5dKdRC4WFaX0oHSopa2cO
+         EDgg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=bhyW2/kiIZAeGvEvUt1EhOgL8HQZ9+AY9IOQ7u36+Yo=;
-        b=XDHCiKZBUhEX51BnhgRs+ocObbqsl0wQq7DEkdCGpFzOdBlwotnMmtQ9DZtIOmLHQ9
-         HWo6a/N6p7EIXZXJS3ECCU8/OsPjjnEnWD3yFpiHDQV6Crw7f7gULgNExlVzB28u/6ve
-         wKavDBpwBxNASOW2HnCYgRDRyqAhogZ80advnAyesg7PtKvz++i+Wc2NMAuCpJVj1X1+
-         Zc1vyOYppCMC6s5WIi7AO8FSfKR/hcp0WHAqAD+uw03jfzA6Ca4NEIqeHW2+Hhuqz/Hy
-         RYiOMniF0FcbzOvvTmamHPOnNUy3PUruPqRUNAAuyIHmESVPhnyiFE8t4R7Anx+0KYNn
-         QCYQ==
-X-Gm-Message-State: AOAM533/mxKHxZWR9kYuZTHehAo86otwhW7K14UCAI1KYN4TB+xWn24P
-        YIMkPfy24uet15nWXkYv635LKQdwTv9zRcHIwOm01cqplLA=
-X-Google-Smtp-Source: ABdhPJwqW+TBQAvDhq8t4zrHKoW0zTDQfVkRVUcvgjSGiVxycXMUxfUxKgcjTiOqfty5mskcCRK9MwmIQ+Yrw6T1u9E=
-X-Received: by 2002:a02:cf05:: with SMTP id q5mr1187915jar.132.1630709954624;
- Fri, 03 Sep 2021 15:59:14 -0700 (PDT)
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=sd594KvbZ1dG6SEsLOz7bokZYP96xYNBscQY44YRHJc=;
+        b=jbKJn2L1Hud5dOZYqc3BlGbD1X59Bj3010XJyOY55XQbH2eYveYIXfzdi3VG4e4rFx
+         wH0DBPOCcDxS2PYwczBWe2ariosKKjaSt/803JaUlV+NoATI87r9P5Xof+v68U/IMBNq
+         7R+g9HtsWT6pJUyTRI6GHlYjnu2Ru8YHCEFdGkvTNMVlO1gysS5EJ+3ga2E8JFBM8Tsn
+         eIMHkllwd2RyhYkG6hqrRhJwfRTOc/R4BAMLHKYJF+Y9BPzNXqHyD7whFQDHvw9rkIWA
+         mG1JVgLL0OjFEa6BNbPD2iMCDhrWcGxY34IO7MVO0AwAZ+quAGstrOqojr3oDBjiqmki
+         N8Kw==
+X-Gm-Message-State: AOAM530HQx/jhPJOIs0Q98hveJf/C2Q9bB78PbclrM63Gtln4jewyd6M
+        HMzl+u07rQQ1Ti6Z7mIF2kHWnMOfOSioLsWl5KxhzS1Lbqg=
+X-Google-Smtp-Source: ABdhPJwjdQ7HxeqtmZujVK/NYMaMKKcEue3qALg6NrsD1kZ6wEnRF2cnIKxEH7yGVTeJLqBI6O0gVUYqq6vynJLK0cU=
+X-Received: by 2002:ab0:71d8:: with SMTP id n24mr785225uao.129.1630710717634;
+ Fri, 03 Sep 2021 16:11:57 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210829155012.164880-1-pav@iki.fi> <20210829155012.164880-2-pav@iki.fi>
-In-Reply-To: <20210829155012.164880-2-pav@iki.fi>
+References: <20210902120509.Bluez.v2.1.I3be2e373e96293524fa38328ebac177eddc71938@changeid>
+ <61305652.1c69fb81.afbf6.43ab@mx.google.com>
+In-Reply-To: <61305652.1c69fb81.afbf6.43ab@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 3 Sep 2021 15:59:03 -0700
-Message-ID: <CABBYNZKpq5ZjL2JxT2kssOOS1XYqTE7Hm66npst8FbLCd4hvpQ@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/2] shared/util: use 64-bit bitmap in util_get/clear_uid
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Fri, 3 Sep 2021 16:11:46 -0700
+Message-ID: <CABBYNZ+Sv3O67MSngcNisyxAv11x5Ks3jnFo3nqaRu8hpevTFA@mail.gmail.com>
+Subject: Re: Inclusive language changes
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Archie Pusaka <apusaka@google.com>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi Archie, Tedd,
 
-On Sun, Aug 29, 2021 at 8:52 AM Pauli Virtanen <pav@iki.fi> wrote:
+On Wed, Sep 1, 2021 at 9:51 PM <bluez.test.bot@gmail.com> wrote:
 >
-> The util_get/clear_uid functions use int type for bitmap, and are used
-> e.g. for SEID allocation. However, valid SEIDs are in range 1 to 0x3E
-> (AVDTP spec v1.3, 8.20.1), and 8*sizeof(int) is often smaller than 0x3E.
+> This is automated email and please do not reply to this email!
 >
-> The function is also used in src/advertising.c, but an explicit maximum
-> value is always provided, so growing the bitmap size is safe there.
+> Dear submitter,
 >
-> Use 64-bit bitmap instead, to be able to cover the valid range.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=3D540=
+975
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      4.45 seconds
+> GitLint                       FAIL      1.28 seconds
+> Prep - Setup ELL              PASS      39.55 seconds
+> Build - Prep                  PASS      0.10 seconds
+> Build - Configure             PASS      6.94 seconds
+> Build - Make                  PASS      171.01 seconds
+> Make Check                    PASS      8.97 seconds
+> Make Distcheck                PASS      207.59 seconds
+> Build w/ext ELL - Configure   PASS      7.26 seconds
+> Build w/ext ELL - Make        PASS      160.39 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> lib: Inclusive language changes
+> ERROR:SPACING: space required after that ',' (ctx:VxV)
+> #146: FILE: lib/hci.c:739:
+> +               { "<AFH class. perip.>",LMP_AFH_CLS_PRP },      /* Bit 4 =
+*/
+>                                        ^
+>
+> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute_=
+_((packed))
+> #296: FILE: lib/hci.h:427:
+> +} __attribute__ ((packed)) central_link_key_cp;
+>
+> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute_=
+_((packed))
+> #312: FILE: lib/hci.h:1568:
+> +} __attribute__ ((packed)) le_read_accept_list_size_rp;
+>
+> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute_=
+_((packed))
+> #325: FILE: lib/hci.h:1577:
+> +} __attribute__ ((packed)) le_add_device_to_accept_list_cp;
+>
+> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute_=
+_((packed))
+> #335: FILE: lib/hci.h:1584:
+> +} __attribute__ ((packed)) le_remove_device_from_accept_list_cp;
+>
+> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute_=
+_((packed))
+> #352: FILE: lib/hci.h:1812:
+> +} __attribute__ ((packed)) evt_central_link_key_complete;
+
+@Tedd we should probably shut down warnings like above, since that
+only apply to the kernel tree.
+
+> WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+> #378: FILE: lib/hci_lib.h:120:
+> +int hci_le_add_accept_list(int dd, const bdaddr_t *bdaddr, uint8_t type,=
+ int to);
+>
+> - total: 1 errors, 6 warnings, 531 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] lib: Inclusive language changes" has style problems, please revi=
+ew.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> monitor: Inclusive language changes
+> WARNING:LONG_LINE_STRING: line length of 83 exceeds 80 columns
+> #1147: FILE: monitor/packet.c:3681:
+> +                       print_field("Peripheral Conn. Interval: 0x%4.4x -=
+ 0x%4.4x",
+>
+> ERROR:TRAILING_WHITESPACE: trailing whitespace
+> #1388: FILE: monitor/packet.c:8075:
+> +^Iprint_field("Central to Peripheral Maximum SDU: 0x%4.4x", $
+>
+> WARNING:LONG_LINE: line length of 84 exceeds 80 columns
+> #1538: FILE: monitor/packet.c:10261:
+> +       const struct bt_hci_evt_peripheral_broadcast_channel_map_change *=
+evt =3D data;
+
+@Archie Pusaka you will need to fix these long lines going past 80
+columns, also maybe it would have been better to cut
+peripheral_broadcast from the struct name above since channel_map
+should be enough to distinct from other events.
+
+> - total: 1 errors, 2 warnings, 1635 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> NOTE: Whitespace errors detected.
+>       You may wish to use scripts/cleanpatch or scripts/cleanfile
+>
+> "[PATCH] monitor: Inclusive language changes" has style problems, please =
+review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> emulator: Inclusive language changes
+> WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
+> #130: FILE: emulator/btdev.c:3609:
+> +        * =E2=80=A2 any advertising filter policy uses the Accept List a=
+nd advertising
+>
+> WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
+> #177: FILE: emulator/btdev.c:3646:
+> +        * =E2=80=A2 any advertising filter policy uses the Accept List a=
+nd advertising
+>
+> WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
+> #232: FILE: emulator/btdev.c:3697:
+> +        * =E2=80=A2 any advertising filter policy uses the Accept List a=
+nd advertising
+>
+> WARNING:LONG_LINE_COMMENT: line length of 84 exceeds 80 columns
+> #383: FILE: emulator/btdev.c:6188:
+> +       btdev->le_features[0] |=3D 0x08;  /* Peripheral-initiated Feature=
+s Exchange */
+>
+> WARNING:LONG_LINE_COMMENT: line length of 84 exceeds 80 columns
+> #607: FILE: emulator/le.c:346:
+> +       //hci->le_features[0] |=3D 0x08;  /* Peripheral-initiated Feature=
+s Exchange */
+>
+> WARNING:LONG_LINE_COMMENT: line length of 84 exceeds 80 columns
+> #628: FILE: emulator/le.c:402:
+> +       hci->le_states[0] |=3D 0x40;      /* Initiating + Connection (Cen=
+tral Role) */
+>
+> - total: 0 errors, 6 warnings, 894 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] emulator: Inclusive language changes" has style problems, please=
+ review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> tools: Inclusive language changes
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (pref=
+er a maximum 75 chars per line)
+> #10:
+> https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Lang=
+uage_Mapping_Table.pdf
+>
+> WARNING:LONG_LINE: line length of 92 exceeds 80 columns
+> #340: FILE: tools/hciconfig.c:1925:
+> +       { "block",      cmd_block,      "<bdaddr>",     "Add a device to =
+the reject list" },
+>
+> WARNING:LONG_LINE: line length of 97 exceeds 80 columns
+> #341: FILE: tools/hciconfig.c:1926:
+> +       { "unblock",    cmd_unblock,    "<bdaddr>",     "Remove a device =
+from the reject list" },
+>
+> ERROR:INITIALISED_STATIC: do not initialise statics to 0
+> #861: FILE: tools/l2test.c:113:
+> +static int central =3D 0;
+>
+> WARNING:MISSING_SPACE: break quoted strings at a space character
+> #906: FILE: tools/l2test.c:1340:
+>         while ((opt =3D getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
+> +               "AB:CD:EF:GH:I:J:K:L:M:N:O:P:Q:RSTUV:W:X:Y:Z:")) !=3D EOF=
+) {
+>
+> ERROR:FUNCTION_WITHOUT_ARGS: Bad function definition - void setup_accept_=
+list() should probably be void setup_accept_list(void)
+> #1033: FILE: tools/mesh-gatt/net.c:944:
+> +static void setup_accept_list()
+>
+> WARNING:LONG_LINE_STRING: line length of 86 exceeds 80 columns
+> #1657: FILE: tools/mgmt-tester.c:11605:
+> +       test_bredrle50_full("Ext Adv. connectable & connected (peripheral=
+) - Success",
+>
+> WARNING:LONG_LINE_STRING: line length of 90 exceeds 80 columns
+> #1664: FILE: tools/mgmt-tester.c:11610:
+> +       test_bredrle50_full("Ext Adv. non-connectable & connected (periph=
+eral) - Success",
+>
+> WARNING:LONG_LINE_STRING: line length of 83 exceeds 80 columns
+> #1671: FILE: tools/mgmt-tester.c:11615:
+> +       test_bredrle50_full("Ext Adv. connectable & connected (central) -=
+ Success",
+>
+> WARNING:LONG_LINE_STRING: line length of 87 exceeds 80 columns
+> #1678: FILE: tools/mgmt-tester.c:11620:
+> +       test_bredrle50_full("Ext Adv. non-connectable & connected (centra=
+l) - Success",
+>
+> WARNING:LONG_LINE_STRING: line length of 86 exceeds 80 columns
+> #1725: FILE: tools/parser/avdtp.c:662:
+> +               printf("AVDTP(c): ver %d %s%scc %d %spt %d seqn %d time %=
+d ssrc %d\n",
+>
+> WARNING:LONG_LINE: line length of 81 exceeds 80 columns
+> #1874: FILE: tools/parser/hci.c:1643:
+> +                       (cp->filter =3D=3D 0x01 ? "accept list only" : "r=
+eserved")));
+>
+> ERROR:INITIALISED_STATIC: do not initialise statics to 0
+> #2196: FILE: tools/rctest.c:79:
+> +static int central =3D 0;
+>
+> WARNING:LONG_LINE: line length of 90 exceeds 80 columns
+> #2239: FILE: tools/rctest.c:700:
+> +       while ((opt=3Dgetopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M=
+:D:Y:T")) !=3D EOF) {
+>
+> ERROR:SPACING: spaces required around that '=3D' (ctx:VxV)
+> #2239: FILE: tools/rctest.c:700:
+> +       while ((opt=3Dgetopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M=
+:D:Y:T")) !=3D EOF) {
+>                    ^
+>
+> ERROR:SPACING: space required after that ',' (ctx:VxV)
+> #2239: FILE: tools/rctest.c:700:
+> +       while ((opt=3Dgetopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M=
+:D:Y:T")) !=3D EOF) {
+>                                ^
+>
+> ERROR:SPACING: space required after that ',' (ctx:VxV)
+> #2239: FILE: tools/rctest.c:700:
+> +       while ((opt=3Dgetopt(argc,argv,"rdscuwmna:b:i:P:U:B:O:N:CAESL:W:M=
+:D:Y:T")) !=3D EOF) {
+>                                     ^
+>
+> ERROR:INITIALISED_STATIC: do not initialise statics to 0
+> #2347: FILE: tools/rfcomm.c:40:
+> +static int central =3D 0;
+>
+> WARNING:LONG_LINE: line length of 91 exceeds 80 columns
+> #2383: FILE: tools/rfcomm.c:683:
+> +       while ((opt =3D getopt_long(argc, argv, "+i:rahAESCL:", main_opti=
+ons, NULL)) !=3D -1) {
+>
+> - total: 7 errors, 12 warnings, 2159 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] tools: Inclusive language changes" has style problems, please re=
+view.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> profiles: Inclusive language changes
+> WARNING:LONG_LINE_COMMENT: line length of 85 exceeds 80 columns
+> #87: FILE: profiles/health/mcap.c:56:
+> +       guint           remote_caps;    /* CSP-Peripheral: remote central=
+ got caps */
+>
+> WARNING:LONG_LINE_COMMENT: line length of 90 exceeds 80 columns
+> #88: FILE: profiles/health/mcap.c:57:
+> +       guint           rem_req_acc;    /* CSP-Peripheral: accuracy requi=
+red by central */
+>
+> WARNING:LONG_LINE_COMMENT: line length of 81 exceeds 80 columns
+> #94: FILE: profiles/health/mcap.c:63:
+> +       void            *csp_priv_data; /* CSP-Central: In-flight request=
+ data */
+>
+> WARNING:LONG_LINE_COMMENT: line length of 100 exceeds 80 columns
+> #116: FILE: profiles/health/mcap.h:273:
+> +       mcap_info_ind_event_cb  mcl_sync_infoind_cb;    /* (CSP Central) =
+Received info indication */
+>
+> - total: 0 errors, 4 warnings, 87 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] profiles: Inclusive language changes" has style problems, please=
+ review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> src: Inclusive language changes
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (pref=
+er a maximum 75 chars per line)
+> #10:
+> https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Lang=
+uage_Mapping_Table.pdf
+>
+> ERROR:INITIALISED_STATIC: do not initialise statics to NULL
+> #36: FILE: src/adapter.c:115:
+> +static struct mgmt *mgmt_primary =3D NULL;
+>
+> - total: 1 errors, 1 warnings, 478 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] src: Inclusive language changes" has style problems, please revi=
+ew.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> mesh: Inclusive language changes
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (pref=
+er a maximum 75 chars per line)
+> #7:
+> https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Lang=
+uage_Mapping_Table.pdf
+>
+> ERROR:INITIALISED_STATIC: do not initialise statics to 0
+> #28: FILE: mesh/net-keys.c:56:
+> +static uint32_t last_flooding_id =3D 0;
+>
+> - total: 1 errors, 1 warnings, 146 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] mesh: Inclusive language changes" has style problems, please rev=
+iew.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+> unit/mesh: Inclusive language changes
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (pref=
+er a maximum 75 chars per line)
+> #7:
+> https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Lang=
+uage_Mapping_Table.pdf
+>
+> - total: 0 errors, 1 warnings, 16 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inpl=
+ace.
+>
+> "[PATCH] unit/mesh: Inclusive language changes" has style problems, pleas=
+e review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FI=
+LE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRIN=
+G SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+You should probably add a hook like the following
+
+cat .git/hooks/pre-commit
+exec git diff --cached | <pathto:checkpatch.pl> -q --no-signoff
+--ignore CAMELCASE,NEW_TYPEDEFS,INITIALISED_STATIC,GLOBAL_INITIALISERS,PREF=
+ER_PACKED,SPACING,FSF_MAILING_ADDRESS,TRAILING_STATEMENTS,RETURN_VOID,FILE_=
+PATH_CHANGES,COMPLEX_MACRO,SPLIT_STRING,OPEN_BRACE,MISSING_SPACE,STATIC_CON=
+ST_CHAR_ARRAY,LINE_SPACING,SYMBOLIC_PERMS,SPDX_LICENSE_TAG,SUSPECT_CODE_IND=
+ENT,SSCANF_TO_KSTRTO,EXECUTE_PERMISSIONS
+--show-types -
+
+I should probably add something like this to HACKING so I don't have
+to remind contributors how to use checkpatch locally.
+
+>
+> ##############################
+> Test: GitLint - FAIL
+> Desc: Run gitlint with rule in .gitlint
+> Output:
+> tools: Inclusive language changes
+> 7: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetoo=
+th.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
+>
+> src: Inclusive language changes
+> 7: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetoo=
+th.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
+>
+> mesh: Inclusive language changes
+> 4: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetoo=
+th.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
+>
+> unit/mesh: Inclusive language changes
+> 4: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetoo=
+th.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
+>
+>
+> ##############################
+> Test: Prep - Setup ELL - PASS
+> Desc: Clone, build, and install ELL
+>
+> ##############################
+> Test: Build - Prep - PASS
+> Desc: Prepare environment for build
+>
+> ##############################
+> Test: Build - Configure - PASS
+> Desc: Configure the BlueZ source tree
+>
+> ##############################
+> Test: Build - Make - PASS
+> Desc: Build the BlueZ source tree
+>
+> ##############################
+> Test: Make Check - PASS
+> Desc: Run 'make check'
+>
+> ##############################
+> Test: Make Distcheck - PASS
+> Desc: Run distcheck to check the distribution
+>
+> ##############################
+> Test: Build w/ext ELL - Configure - PASS
+> Desc: Configure BlueZ source with '--enable-external-ell' configuration
+>
+> ##############################
+> Test: Build w/ext ELL - Make - PASS
+> Desc: Build BlueZ source with '--enable-external-ell' configuration
+>
+>
+>
 > ---
->  android/avdtp.c        |  2 +-
->  profiles/audio/avdtp.c |  2 +-
->  src/advertising.c      |  2 +-
->  src/shared/util.c      | 27 +++++++++++++++------------
->  src/shared/util.h      |  4 ++--
->  unit/test-avdtp.c      |  2 +-
->  6 files changed, 21 insertions(+), 18 deletions(-)
->
-> diff --git a/android/avdtp.c b/android/avdtp.c
-> index 8c2930ec1..a261a8e5f 100644
-> --- a/android/avdtp.c
-> +++ b/android/avdtp.c
-> @@ -34,7 +34,7 @@
->  #include "../profiles/audio/a2dp-codecs.h"
->
->  #define MAX_SEID 0x3E
-> -static unsigned int seids;
-> +static uint64_t seids;
->
->  #ifndef MAX
->  # define MAX(x, y) ((x) > (y) ? (x) : (y))
-> diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> index 946231b71..25520ceec 100644
-> --- a/profiles/audio/avdtp.c
-> +++ b/profiles/audio/avdtp.c
-> @@ -44,7 +44,7 @@
->  #define AVDTP_PSM 25
->
->  #define MAX_SEID 0x3E
-> -static unsigned int seids;
-> +static uint64_t seids;
->
->  #ifndef MAX
->  # define MAX(x, y) ((x) > (y) ? (x) : (y))
-> diff --git a/src/advertising.c b/src/advertising.c
-> index bd79454d5..41b818650 100644
-> --- a/src/advertising.c
-> +++ b/src/advertising.c
-> @@ -48,7 +48,7 @@ struct btd_adv_manager {
->         uint8_t max_scan_rsp_len;
->         uint8_t max_ads;
->         uint32_t supported_flags;
-> -       unsigned int instance_bitmap;
-> +       uint64_t instance_bitmap;
->         bool extended_add_cmds;
->         int8_t min_tx_power;
->         int8_t max_tx_power;
-> diff --git a/src/shared/util.c b/src/shared/util.c
-> index 244756456..723dedd75 100644
-> --- a/src/shared/util.c
-> +++ b/src/shared/util.c
-> @@ -124,30 +124,33 @@ unsigned char util_get_dt(const char *parent, const char *name)
->
->  /* Helpers for bitfield operations */
->
-> -/* Find unique id in range from 1 to max but no bigger then
-> - * sizeof(int) * 8. ffs() is used since it is POSIX standard
-> - */
-> -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max)
-> +/* Find unique id in range from 1 to max but no bigger than 64. */
-> +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max)
->  {
->         uint8_t id;
->
-> -       id = ffs(~*bitmap);
-
-Can't we use ffsll instead of using a for loop testing every bit?
-Afaik long long should be at least 64 bits.
-
-> +       if (max > 64)
-> +               max = 64;
->
-> -       if (!id || id > max)
-> -               return 0;
-> +       for (id = 1; id <= max; ++id) {
-> +               uint64_t mask = ((uint64_t)1) << (id - 1);
->
-> -       *bitmap |= 1u << (id - 1);
-> +               if (!(*bitmap & mask)) {
-> +                       *bitmap |= mask;
-> +                       return id;
-> +               }
-> +       }
->
-> -       return id;
-> +       return 0;
->  }
->
->  /* Clear id bit in bitmap */
-> -void util_clear_uid(unsigned int *bitmap, uint8_t id)
-> +void util_clear_uid(uint64_t *bitmap, uint8_t id)
->  {
-> -       if (!id)
-> +       if (id == 0 || id > 64)
->                 return;
->
-> -       *bitmap &= ~(1u << (id - 1));
-> +       *bitmap &= ~(((uint64_t)1) << (id - 1));
->  }
->
->  static const struct {
-> diff --git a/src/shared/util.h b/src/shared/util.h
-> index 9920b7f76..60908371d 100644
-> --- a/src/shared/util.h
-> +++ b/src/shared/util.h
-> @@ -102,8 +102,8 @@ void util_hexdump(const char dir, const unsigned char *buf, size_t len,
->
->  unsigned char util_get_dt(const char *parent, const char *name);
->
-> -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
-> -void util_clear_uid(unsigned int *bitmap, uint8_t id);
-> +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
-> +void util_clear_uid(uint64_t *bitmap, uint8_t id);
->
->  const char *bt_uuid16_to_str(uint16_t uuid);
->  const char *bt_uuid32_to_str(uint32_t uuid);
-> diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-> index f5340d6f3..4e8a68c6b 100644
-> --- a/unit/test-avdtp.c
-> +++ b/unit/test-avdtp.c
-> @@ -550,7 +550,7 @@ static void test_server_seid(gconstpointer data)
->         struct avdtp_local_sep *sep;
->         unsigned int i;
->
-> -       for (i = 0; i < sizeof(int) * 8; i++) {
-> +       for (i = 0; i < MAX_SEID; i++) {
->                 sep = avdtp_register_sep(context->lseps, AVDTP_SEP_TYPE_SINK,
->                                                 AVDTP_MEDIA_TYPE_AUDIO,
->                                                 0x00, TRUE, &sep_ind, NULL,
-> --
-> 2.31.1
+> Regards,
+> Linux Bluetooth
 >
 
 
--- 
+--=20
 Luiz Augusto von Dentz
