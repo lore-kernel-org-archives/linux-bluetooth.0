@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E70C7C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31F25C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C9D73610A1
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 12DF260C51
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 22:27:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234285AbhICW2i (ORCPT
+        id S234673AbhICW2j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 18:28:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35860 "EHLO
+        Fri, 3 Sep 2021 18:28:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35870 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233033AbhICW2i (ORCPT
+        with ESMTP id S233033AbhICW2j (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 18:28:38 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA6B1C061575
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 15:27:37 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id mj9-20020a17090b368900b001965618d019so458597pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 15:27:37 -0700 (PDT)
+        Fri, 3 Sep 2021 18:28:39 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B922AC061575
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Sep 2021 15:27:38 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id n13-20020a17090a4e0d00b0017946980d8dso455699pjh.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 15:27:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=bUG5RFoU/MlbNuIj3tMKfHg8hf0P6016JQmHbmqnbzw=;
-        b=nCIHcKI1aUHii/T75cabONlKCoCS8f2CKkSsdyOUfH5KiIcc/d6apTnqS3MzJ7+xJb
-         rm6KqOHLz5L+sV1IFdyfSwSKN1GyRgWX6R6RKz+GuNqRFgW/O8GTuMC3UjYDgwB6vKgM
-         X4uGq8bu536VUuERsKRwJ2xsZn0KvxdLddVFz4F9RfSoKwfZgjFrrQpAL9bmhH7O0DLL
-         NEvYyMkIGV5ZDxkGN9pMDUZ0zk7qyeOpZLRM0DoAZrkiMn3s13RdsI8u/DpZlpIDh4Bf
-         hbvT7gjccLCrmLPBTjHLbvcNhbmwRraO9TqXrAstJFV1s/G+T2sVCoNfNZHfGlU9MTUv
-         2lOQ==
+        bh=cLcSl8nMUeEmOer03hxjSfU3oPUHGSQDxIvzfp/OHI0=;
+        b=jc59hr3Z8Eif/3ubpcV+GLSd+Vi/XpmV7vL/8X7XFil8tzQIGnVZWFj3BeybSakOsF
+         QtyYUYSwRCfTSYyuV/61oC+9Q41PoSL1xQL+XaDNNJe89B89ycDr81QMkYlzI997r+Ri
+         dwPhaV0vGA27xbdYDUi42XN+LrOhYSzZp2dDitCFaS6Zdnfad22Na0OZMTFtIthpneaa
+         8RLp0eI5pqknfUEd/0apMfajtjSFyqesN+jitgGkayRsHwkz+/lxEVWWiJ2i3U8VfaVk
+         3Xjwn/atYvur8MvM16epSkCzggGQvrtBZ6J12+XDfVtA/m/4EUtGd3J0qeui+OzsCVx3
+         ZtUQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=bUG5RFoU/MlbNuIj3tMKfHg8hf0P6016JQmHbmqnbzw=;
-        b=tYeFaQhEsNZvck8yMYSUCmf/jnzl5ayMBMmnFi0B2l0dPQMi0c36YxPAnr8RUop7/L
-         Df71l15kqN9OvUROTz/JriT4bKellxsT27ty+q5k8LUKhWsSC/Un/4H0TtoqZuRk+WsZ
-         kUlzdxHHcZbLnfwaUfb+z5N8NS2mmoeiXL5CKY7bLMYCDR5wVzgmm5HUcu4JdjRVHDxJ
-         OPumv2WVnQ2IhxTjTtKnZfRDJQ+fWAfvlr9xGPdZQoNdadDJRlEboKhesPfMFT63DH5k
-         RNIGOtJZMI20PP4sMonk/V5gITLUkF4VapkvWNO9L5Czg0XOo3xLYGICgFKT+ZoaeWj3
-         piwA==
-X-Gm-Message-State: AOAM5309mKALSHrVJBf+Vw2p8gUwh3qdJNdNdYgaYJXr/UAgSacaIyzo
-        97WOE9tbKO/n5ev7MvXzGWOp6PEvc/0=
-X-Google-Smtp-Source: ABdhPJxCrl3vBIaK7HmyVY6qkxZb0gU0GltTOH+Etx0fgtPR4DQyBaYteyuriPv8duEomHRuBsjDaQ==
-X-Received: by 2002:a17:902:e0c3:b0:134:fde4:63c2 with SMTP id e3-20020a170902e0c300b00134fde463c2mr913440pla.43.1630708056960;
-        Fri, 03 Sep 2021 15:27:36 -0700 (PDT)
+        bh=cLcSl8nMUeEmOer03hxjSfU3oPUHGSQDxIvzfp/OHI0=;
+        b=JbfCvyZthpW00E+97l8qWAAdUQbTsyiv5gMawzOEGAGtKeO5ae0lF/13jcN7EiHecU
+         xND4LmikJ2Gk2CE6RSl5V+nt2q4bCI0XW5EboTYmkeBTd6lcKEFu8HdjpzvU5ccATNGX
+         jE8fwdYgeuYZ+lgNYXGdWH1S+FW/VDG+zbIL4yZ5VEOsuFvpeH0+Gd548DOsVEJ6uvyV
+         Aud7wMcC/D9cs90Dga5+jl6VE+5yOnmrcDcTUNVGys++opi/w5pC+Px642/yQe5QH+1B
+         km8AWX4o2f2FK3EvZeX/3fGN49eOLNvdtAKiv5zozBtteEUA6H1GhWq87lF9wnmKJGYF
+         VW7A==
+X-Gm-Message-State: AOAM533ZUg1kYMo3SZWR8ExyQSCgP/prEwcmXVg4PUJIlel3+7yLO9gA
+        0x7v91JX4iIAKig7n7YYYGjZj2RX3jE=
+X-Google-Smtp-Source: ABdhPJxHk3cT1Aj9Z7b7dTbQkr/0UH7CkQJTdNHl3IyWBVcWM6y+iye1Eq64N56/raB1nCqsxj45nQ==
+X-Received: by 2002:a17:90a:ce8e:: with SMTP id g14mr1108561pju.241.1630708058019;
+        Fri, 03 Sep 2021 15:27:38 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x4sm225796pjq.20.2021.09.03.15.27.36
+        by smtp.gmail.com with ESMTPSA id x4sm225796pjq.20.2021.09.03.15.27.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 03 Sep 2021 15:27:36 -0700 (PDT)
+        Fri, 03 Sep 2021 15:27:37 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/4] Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg
-Date:   Fri,  3 Sep 2021 15:27:31 -0700
-Message-Id: <20210903222732.1472560-3-luiz.dentz@gmail.com>
+Subject: [PATCH v3 4/4] Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+Date:   Fri,  3 Sep 2021 15:27:32 -0700
+Message-Id: <20210903222732.1472560-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210903222732.1472560-1-luiz.dentz@gmail.com>
 References: <20210903222732.1472560-1-luiz.dentz@gmail.com>
@@ -75,90 +75,149 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This makes use of bt_skb_sendmsg instead of allocating a different
-buffer to be used with memcpy_from_msg which cause one extra copy.
+This makes use of bt_skb_sendmmsg instead using memcpy_from_msg which
+is not considered safe to be used when lock_sock is held.
+
+Also make rfcomm_dlc_send handle skb with fragments and queue them all
+atomically.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/sco.c | 34 +++++++++++-----------------------
- 1 file changed, 11 insertions(+), 23 deletions(-)
+ net/bluetooth/rfcomm/core.c | 50 +++++++++++++++++++++++++++++++------
+ net/bluetooth/rfcomm/sock.c | 46 ++++++++--------------------------
+ 2 files changed, 53 insertions(+), 43 deletions(-)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b62c91c627e2..901097c1f484 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -280,27 +280,19 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
- 	return err;
+diff --git a/net/bluetooth/rfcomm/core.c b/net/bluetooth/rfcomm/core.c
+index f2bacb464ccf..7324764384b6 100644
+--- a/net/bluetooth/rfcomm/core.c
++++ b/net/bluetooth/rfcomm/core.c
+@@ -549,22 +549,58 @@ struct rfcomm_dlc *rfcomm_dlc_exists(bdaddr_t *src, bdaddr_t *dst, u8 channel)
+ 	return dlc;
  }
  
--static int sco_send_frame(struct sock *sk, void *buf, int len,
--			  unsigned int msg_flags)
-+static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
++static int rfcomm_dlc_send_frag(struct rfcomm_dlc *d, struct sk_buff *frag)
++{
++	int len = frag->len;
++
++	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
++
++	if (len > d->mtu)
++		return -EINVAL;
++
++	rfcomm_make_uih(frag, d->addr);
++	__skb_queue_tail(&d->tx_queue, frag);
++
++	return len;
++}
++
+ int rfcomm_dlc_send(struct rfcomm_dlc *d, struct sk_buff *skb)
  {
- 	struct sco_conn *conn = sco_pi(sk)->conn;
--	struct sk_buff *skb;
--	int err;
+-	int len = skb->len;
++	unsigned long flags;
++	struct sk_buff *frag, *next;
++	int len;
  
- 	/* Check outgoing MTU */
--	if (len > conn->mtu)
-+	if (skb->len > conn->mtu)
- 		return -EINVAL;
+ 	if (d->state != BT_CONNECTED)
+ 		return -ENOTCONN;
  
--	BT_DBG("sk %p len %d", sk, len);
-+	BT_DBG("sk %p len %d", sk, skb->len);
+-	BT_DBG("dlc %p mtu %d len %d", d, d->mtu, len);
++	frag = skb_shinfo(skb)->frag_list;
++	skb_shinfo(skb)->frag_list = NULL;
  
--	skb = bt_skb_send_alloc(sk, len, msg_flags & MSG_DONTWAIT, &err);
--	if (!skb)
--		return err;
--
--	memcpy(skb_put(skb, len), buf, len);
- 	hci_send_sco(conn->hcon, skb);
+-	if (len > d->mtu)
+-		return -EINVAL;
++	/* Queue all fragments atomically. */
++	spin_lock_irqsave(&d->tx_queue.lock, flags);
  
--	return len;
-+	return skb->len;
+-	rfcomm_make_uih(skb, d->addr);
+-	skb_queue_tail(&d->tx_queue, skb);
++	len = rfcomm_dlc_send_frag(d, skb);
++	if (len < 0 || !frag)
++		goto unlock;
++
++	for (; frag; frag = next) {
++		int ret;
++
++		next = frag->next;
++
++		ret = rfcomm_dlc_send_frag(d, frag);
++		if (ret < 0) {
++			kfree_skb(frag);
++			goto unlock;
++		}
++
++		len += ret;
++	}
++
++unlock:
++	spin_unlock_irqrestore(&d->tx_queue.lock, flags);
+ 
+-	if (!test_bit(RFCOMM_TX_THROTTLED, &d->flags))
++	if (len > 0 && !test_bit(RFCOMM_TX_THROTTLED, &d->flags))
+ 		rfcomm_schedule();
+ 	return len;
  }
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index 2c95bb58f901..5938af3e9936 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -575,46 +575,20 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
  
- static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
-@@ -722,7 +714,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 			    size_t len)
- {
- 	struct sock *sk = sock->sk;
--	void *buf;
-+	struct sk_buff *skb;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -734,24 +726,20 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
--	buf = kmalloc(len, GFP_KERNEL);
--	if (!buf)
--		return -ENOMEM;
+ 	sent = bt_sock_wait_ready(sk, msg->msg_flags);
+-	if (sent)
+-		goto done;
 -
--	if (memcpy_from_msg(buf, msg, len)) {
--		kfree(buf);
--		return -EFAULT;
+-	while (len) {
+-		size_t size = min_t(size_t, len, d->mtu);
+-		int err;
+-
+-		skb = sock_alloc_send_skb(sk, size + RFCOMM_SKB_RESERVE,
+-				msg->msg_flags & MSG_DONTWAIT, &err);
+-		if (!skb) {
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
+-		skb_reserve(skb, RFCOMM_SKB_HEAD_RESERVE);
+-
+-		err = memcpy_from_msg(skb_put(skb, size), msg, size);
+-		if (err) {
+-			kfree_skb(skb);
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
+ 
+-		skb->priority = sk->sk_priority;
++	release_sock(sk);
+ 
+-		err = rfcomm_dlc_send(d, skb);
+-		if (err < 0) {
+-			kfree_skb(skb);
+-			if (sent == 0)
+-				sent = err;
+-			break;
+-		}
++	if (sent)
++		return sent;
+ 
+-		sent += size;
+-		len  -= size;
 -	}
-+	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
++	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
++			      RFCOMM_SKB_TAIL_RESERVE);
 +	if (IS_ERR_OR_NULL(skb))
 +		return PTR_ERR(skb);
  
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = sco_send_frame(sk, buf, len, msg->msg_flags);
-+		err = sco_send_frame(sk, skb);
- 	else
- 		err = -ENOTCONN;
- 
- 	release_sock(sk);
--	kfree(buf);
-+	if (err)
+-done:
+-	release_sock(sk);
++	sent = rfcomm_dlc_send(d, skb);
++	if (sent < 0)
 +		kfree_skb(skb);
- 	return err;
- }
  
+ 	return sent;
+ }
 -- 
 2.31.1
 
