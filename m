@@ -2,138 +2,309 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.2 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.5 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_SANE_1 autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E650AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 02:44:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 45D43C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 03:17:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB85D60F4B
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 02:44:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28B8261054
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Sep 2021 03:17:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345668AbhICCpo (ORCPT
+        id S233976AbhICDSn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Sep 2021 22:45:44 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:63755 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232101AbhICCpn (ORCPT
+        Thu, 2 Sep 2021 23:18:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55412 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230499AbhICDSl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Sep 2021 22:45:43 -0400
-Received: from fsav415.sakura.ne.jp (fsav415.sakura.ne.jp [133.242.250.114])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 1832iWme057819;
-        Fri, 3 Sep 2021 11:44:33 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav415.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp);
- Fri, 03 Sep 2021 11:44:32 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav415.sakura.ne.jp)
-Received: from [192.168.1.9] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 1832iWRB057815
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Fri, 3 Sep 2021 11:44:32 +0900 (JST)
-        (envelope-from penguin-kernel@i-love.sakura.ne.jp)
-Subject: [PATCH] Bluetooth: avoid page fault from sco_send_frame()
-From:   Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-To:     LinMa <linma@zju.edu.cn>, linux-bluetooth@vger.kernel.org,
+        Thu, 2 Sep 2021 23:18:41 -0400
+Received: from mail-qk1-x736.google.com (mail-qk1-x736.google.com [IPv6:2607:f8b0:4864:20::736])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EBD7C061575;
+        Thu,  2 Sep 2021 20:17:36 -0700 (PDT)
+Received: by mail-qk1-x736.google.com with SMTP id a10so4505989qka.12;
+        Thu, 02 Sep 2021 20:17:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=subject:to:cc:references:from:message-id:date:user-agent
+         :mime-version:in-reply-to:content-language:content-transfer-encoding;
+        bh=aw1AMx/pPvGtbdn3PAzX0YhIxkagW/gAxNchSTLLbyk=;
+        b=jc+WgAo76n9czMhQ4T47b9oyIKI4vfBmJF1K7zGsFLf/SiOgnVLELs/za/OVkx0CJa
+         UhNqOz7u451Ui0/2Ow5PP9Ppo6YcV1BBUfQZaimfuXa0IPWDDACdA8UfIjzNeKgz+t/H
+         elGABYshUiUD+UT7DKA8VnuHjSMO1kgeaffyXt9BIq0IWABcUMAlh97PJLM2RakXsdjA
+         JznE7KjnVF1oomxXB+2CR8RSITBfmJF5e3SQhxKnmS69Bin8Jr4liPQ2boTbW6EdLuka
+         95JE+OX3zJWdWek3FXdGB43rPPKU7Okvl8wMDojz1zj3E86N7Qyj7RKUWxdvyCR29Wkv
+         WXFQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20161025;
+        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
+         :user-agent:mime-version:in-reply-to:content-language
+         :content-transfer-encoding;
+        bh=aw1AMx/pPvGtbdn3PAzX0YhIxkagW/gAxNchSTLLbyk=;
+        b=K9fye0Ali1Fit+oruuEHxM2g4pSrzePHOg6cArTrdLLHDze31BlewBIHkWBxIJW6aS
+         LwkaIcQ/yts/TVamn1ZFVWFeB2Vbb1fmaKxd8EqW3wa99ZtiBG40mf+5imG/ivdwCmBP
+         zyL9gHs3efcbSEK22qvSIHW+NwsD3Iqvbf0Ms9LnPR653ToU+I2LdcwCPjvTaxCFQXX2
+         m1cg9cgqyQSM5ERZycNnnRG95KKZ3XWhjJZYwAdnuCk7QaDNEfxOIPWJ4CWsGCOPM8un
+         1Tixd6YRu67XsZOseqb/lGIwef+97s/hYfxL0erg5nT+lsesbHfuW+IpeNRq94CsVhDk
+         dFVw==
+X-Gm-Message-State: AOAM5308bLkdPiecpIjpJmfJ7F51vNrIsBXoO7OTPOJFN145FQfOm8MY
+        pIPhJ+93kPrAQcAXYnvvlGc=
+X-Google-Smtp-Source: ABdhPJxpFBQyuNMOoedOpMzfaYqR90ZTCRTiO7SOjujmD2/Tw5uZhkguYeg80XgR/e5G8NGUPkLBdw==
+X-Received: by 2002:a05:620a:1aa5:: with SMTP id bl37mr1424038qkb.84.1630639055204;
+        Thu, 02 Sep 2021 20:17:35 -0700 (PDT)
+Received: from [192.168.4.142] (pool-72-82-21-11.prvdri.fios.verizon.net. [72.82.21.11])
+        by smtp.gmail.com with ESMTPSA id o19sm2373692qtv.85.2021.09.02.20.17.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 02 Sep 2021 20:17:34 -0700 (PDT)
+Subject: Re: [PATCH v6 1/6] Bluetooth: schedule SCO timeouts with delayed_work
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Eric Dumazet <eric.dumazet@gmail.com>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-References: <15f5a46.b79d9.17ba6802ccd.Coremail.linma@zju.edu.cn>
- <c998d16d-f45a-8be4-2898-9e94509cb2ea@i-love.sakura.ne.jp>
-Cc:     Linus Torvalds <torvalds@linux-foundation.org>
-Message-ID: <60f604f8-2a89-fd3f-996f-9d9e4a229427@i-love.sakura.ne.jp>
-Date:   Fri, 3 Sep 2021 11:44:33 +0900
-User-Agent: Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, sudipm.mukherjee@gmail.com,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        skhan@linuxfoundation.org,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+2f6d7c28bb4bf7e82060@syzkaller.appspotmail.com
+References: <20210810041410.142035-1-desmondcheongzx@gmail.com>
+ <20210810041410.142035-2-desmondcheongzx@gmail.com>
+ <0b33a7fe-4da0-058c-cff3-16bb5cfe8f45@gmail.com>
+ <bad67d05-366b-bebe-cbdb-6555386497de@gmail.com>
+ <94942257-927c-efbc-b3fd-44cc097ad71f@gmail.com>
+ <fa269649-21eb-be76-e552-36a3aa4f3da4@gmail.com>
+ <e54b3c01-6804-4f0d-3e4b-eba49f881039@gmail.com>
+ <CABBYNZJaPFzU-oXcYkuob0zw16tNcVgoVx8N-_GvL8=nT0Kn3Q@mail.gmail.com>
+From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+Message-ID: <4aaa52c1-59dc-59ad-60c6-0fac9ecd5189@gmail.com>
+Date:   Thu, 2 Sep 2021 23:17:33 -0400
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 MIME-Version: 1.0
-In-Reply-To: <c998d16d-f45a-8be4-2898-9e94509cb2ea@i-love.sakura.ne.jp>
-Content-Type: text/plain; charset=utf-8
+In-Reply-To: <CABBYNZJaPFzU-oXcYkuob0zw16tNcVgoVx8N-_GvL8=nT0Kn3Q@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
 Content-Language: en-US
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Since userfaultfd mechanism allows sleeping with kernel lock held,
-avoiding page fault with kernel lock held where possible will make
-the module more robust. This patch just brings memcpy_from_msg() calls
-to out of sock lock.
+Hi Luiz,
 
-This patch is an instant mitigation for CVE-2021-3640. To fully close
-the race window for this use-after-free problem, we need more changes.
+On 2/9/21 7:42 pm, Luiz Augusto von Dentz wrote:
+> Hi Desmond,
+> 
+> On Thu, Sep 2, 2021 at 4:05 PM Desmond Cheong Zhi Xi
+> <desmondcheongzx@gmail.com> wrote:
+>>
+>> On 2/9/21 6:53 pm, Desmond Cheong Zhi Xi wrote:
+>>> On 2/9/21 5:41 pm, Eric Dumazet wrote:
+>>>>
+>>>>
+>>>> On 9/2/21 12:32 PM, Desmond Cheong Zhi Xi wrote:
+>>>>>
+>>>>> Hi Eric,
+>>>>>
+>>>>> This actually seems to be a pre-existing error in sco_sock_connect
+>>>>> that we now hit in sco_sock_timeout.
+>>>>>
+>>>>> Any thoughts on the following patch to address the problem?
+>>>>>
+>>>>> Link:
+>>>>> https://lore.kernel.org/lkml/20210831065601.101185-1-desmondcheongzx@gmail.com/
+>>>>>
+>>>>
+>>>>
+>>>> syzbot is still working on finding a repro, this is obviously not
+>>>> trivial,
+>>>> because this is a race window.
+>>>>
+>>>> I think this can happen even with a single SCO connection.
+>>>>
+>>>> This might be triggered more easily forcing a delay in sco_sock_timeout()
+>>>>
+>>>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>>>> index
+>>>> 98a88158651281c9f75c4e0371044251e976e7ef..71ebe0243fab106c676c308724fe3a3f92a62cbd
+>>>> 100644
+>>>> --- a/net/bluetooth/sco.c
+>>>> +++ b/net/bluetooth/sco.c
+>>>> @@ -84,8 +84,14 @@ static void sco_sock_timeout(struct work_struct *work)
+>>>>           sco_conn_lock(conn);
+>>>>           sk = conn->sk;
+>>>> -       if (sk)
+>>>> +       if (sk) {
+>>>> +               // lets pretend cpu has been busy (in interrupts) for
+>>>> 100ms
+>>>> +               int i;
+>>>> +               for (i=0;i<100000;i++)
+>>>> +                       udelay(1);
+>>>> +
+>>>>                   sock_hold(sk);
+>>>> +       }>          sco_conn_unlock(conn);
+>>>>           if (!sk)
+>>>>
+>>>>
+>>>> Stack trace tells us that sco_sock_timeout() is running after last
+>>>> reference
+>>>> on socket has been released.
+>>>>
+>>>> __refcount_add include/linux/refcount.h:199 [inline]
+>>>>    __refcount_inc include/linux/refcount.h:250 [inline]
+>>>>    refcount_inc include/linux/refcount.h:267 [inline]
+>>>>    sock_hold include/net/sock.h:702 [inline]
+>>>>    sco_sock_timeout+0x216/0x290 net/bluetooth/sco.c:88
+>>>>    process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
+>>>>    worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
+>>>>    kthread+0x3e5/0x4d0 kernel/kthread.c:319
+>>>>    ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+>>>>
+>>>> This is why I suggested to delay sock_put() to make sure this can not
+>>>> happen.
+>>>>
+>>>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>>>> index
+>>>> 98a88158651281c9f75c4e0371044251e976e7ef..bd0222e3f05a6bcb40cffe8405c9dfff98d7afde
+>>>> 100644
+>>>> --- a/net/bluetooth/sco.c
+>>>> +++ b/net/bluetooth/sco.c
+>>>> @@ -195,10 +195,11 @@ static void sco_conn_del(struct hci_conn *hcon,
+>>>> int err)
+>>>>                   sco_sock_clear_timer(sk);
+>>>>                   sco_chan_del(sk, err);
+>>>>                   release_sock(sk);
+>>>> -               sock_put(sk);
+>>>>                   /* Ensure no more work items will run before freeing
+>>>> conn. */
+>>>>                   cancel_delayed_work_sync(&conn->timeout_work);
+>>>> +
+>>>> +               sock_put(sk);
+>>>>           }
+>>>>           hcon->sco_data = NULL;
+>>>>
+>>>
+>>> I see where you're going with this, but once sco_chan_del returns, any
+>>> instance of sco_sock_timeout that hasn't yet called sock_hold will
+>>> simply return, because conn->sk is NULL. Adding a delay to the
+>>> sco_conn_lock critical section in sco_sock_timeout would not affect this
+>>> because sco_chan_del clears conn->sk while holding onto the lock.
+>>>
+>>> The main reason that cancel_delayed_work_sync is run there is to make
+>>> sure that we don't have a UAF on the SCO connection itself after we free
+>>> conn.
+>>>
+>>
+>> Now that I think about this, the init and cleanup isn't quite right
+>> either. The delayed work should be initialized when the connection is
+>> allocated, and we should always cancel all work before freeing:
+>>
+>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>> index ea18e5b56343..bba5cdb4cb4a 100644
+>> --- a/net/bluetooth/sco.c
+>> +++ b/net/bluetooth/sco.c
+>> @@ -133,6 +133,7 @@ static struct sco_conn *sco_conn_add(struct hci_conn *hcon)
+>>                  return NULL;
+>>
+>>          spin_lock_init(&conn->lock);
+>> +       INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
+>>
+>>          hcon->sco_data = conn;
+>>          conn->hcon = hcon;
+>> @@ -197,11 +198,11 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
+>>                  sco_chan_del(sk, err);
+>>                  release_sock(sk);
+>>                  sock_put(sk);
+>> -
+>> -               /* Ensure no more work items will run before freeing conn. */
+>> -               cancel_delayed_work_sync(&conn->timeout_work);
+>>          }
+>>
+>> +       /* Ensure no more work items will run before freeing conn. */
+>> +       cancel_delayed_work_sync(&conn->timeout_work);
+>> +
+>>          hcon->sco_data = NULL;
+>>          kfree(conn);
+>>    }
+>> @@ -214,8 +215,6 @@ static void __sco_chan_add(struct sco_conn *conn, struct sock *sk,
+>>          sco_pi(sk)->conn = conn;
+>>          conn->sk = sk;
+>>
+>> -       INIT_DELAYED_WORK(&conn->timeout_work, sco_sock_timeout);
+>> -
+>>          if (parent)
+>>                  bt_accept_enqueue(parent, sk, true);
+>>    }
+> 
+> I have come to something similar, do you care to send a proper patch
+> so we can get this merged.
+> 
 
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
- net/bluetooth/sco.c | 21 ++++++++++++++-------
- 1 file changed, 14 insertions(+), 7 deletions(-)
+Sounds good. Just finished running some tests locally, I'll send out the 
+patches now.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index d9a4e88dacbb..e4b079b31ce9 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -273,7 +273,7 @@ static int sco_connect(struct sock *sk)
- 	return err;
- }
- 
--static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
-+static int sco_send_frame(struct sock *sk, const void *buf, int len, int flags)
- {
- 	struct sco_conn *conn = sco_pi(sk)->conn;
- 	struct sk_buff *skb;
-@@ -285,14 +285,11 @@ static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
- 
- 	BT_DBG("sk %p len %d", sk, len);
- 
--	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
-+	skb = bt_skb_send_alloc(sk, len, flags & MSG_DONTWAIT, &err);
- 	if (!skb)
- 		return err;
- 
--	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
--		kfree_skb(skb);
--		return -EFAULT;
--	}
-+	memcpy(skb_put(skb, len), buf, len);
- 
- 	hci_send_sco(conn->hcon, skb);
- 
-@@ -714,6 +711,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 			    size_t len)
- {
- 	struct sock *sk = sock->sk;
-+	void *buf;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -725,14 +723,23 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	buf = kmalloc(len, GFP_KERNEL | __GFP_NOWARN);
-+	if (!buf)
-+		return -ENOMEM;
-+	if (memcpy_from_msg(buf, msg, len)) {
-+		kfree(buf);
-+		return -EFAULT;
-+	}
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = sco_send_frame(sk, msg, len);
-+		err = sco_send_frame(sk, buf, len, msg->msg_flags);
- 	else
- 		err = -ENOTCONN;
- 
- 	release_sock(sk);
-+	kfree(buf);
- 	return err;
- }
- 
--- 
-2.30.2
-
+>>> For a single SCO connection with well-formed channel, I think there
+>>> can't be a race. Here's the reasoning:
+>>>
+>>> - For the timeout to be scheduled, a socket must have a channel with a
+>>> connection.
+>>>
+>>> - When a channel between a socket and connection is established, the
+>>> socket transitions from BT_OPEN to BT_CONNECTED, BT_CONNECT, or
+>>> BT_CONNECT2.
+>>>
+>>> - For a socket to be released, it has to be zapped. For sockets that
+>>> have a state of BT_CONNECTED, BT_CONNECT, or BT_CONNECT2, they are
+>>> zapped only when the channel is deleted.
+>>>
+>>> - If the channel is deleted (which is protected by sco_conn_lock), then
+>>> conn->sk is NULL, and sco_sock_timeout simply exits. If we had entered
+>>> the critical section in sco_sock_timeout before the channel was deleted,
+>>> then we increased the reference count on the socket, so it won't be
+>>> freed until sco_sock_timeout is done.
+>>>
+>>> Hence, sco_sock_timeout doesn't race with the release of a socket that
+>>> has a well-formed channel with a connection.
+>>>
+>>> But if multiple connections are allocated and overwritten in
+>>> sco_sock_connect, then none of the above assumptions hold because the
+>>> SCO connection can't be cleaned up (i.e. conn->sk cannot be set to NULL)
+>>> when the associated socket is released. This scenario happens in the
+>>> syzbot reproducer for the crash here:
+>>> https://syzkaller.appspot.com/bug?id=bcc246d137428d00ed14b476c2068579515fe2bc
+>>>
+>>>
+>>> That aside, upon taking a closer look, I think there is indeed a race
+>>> lurking in sco_conn_del, but it's not the one that syzbot is hitting.
+>>> Our sock_hold simply comes too late, and by the time it's called we
+>>> might have already have freed the socket.
+>>>
+>>> So probably something like this needs to happen:
+>>>
+>>> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+>>> index fa25b07120c9..ea18e5b56343 100644
+>>> --- a/net/bluetooth/sco.c
+>>> +++ b/net/bluetooth/sco.c
+>>> @@ -187,10 +187,11 @@ static void sco_conn_del(struct hci_conn *hcon,
+>>> int err)
+>>>        /* Kill socket */
+>>>        sco_conn_lock(conn);
+>>>        sk = conn->sk;
+>>> +    if (sk)
+>>> +        sock_hold(sk);
+>>>        sco_conn_unlock(conn);
+>>>
+>>>        if (sk) {
+>>> -        sock_hold(sk);
+>>>            lock_sock(sk);
+>>>            sco_sock_clear_timer(sk);
+>>>            sco_chan_del(sk, err);
+>>
+> 
+> 
 
