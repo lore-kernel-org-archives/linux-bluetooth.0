@@ -2,83 +2,205 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 997B5C43217
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 02:06:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 962EDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:02:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6FA4261057
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 02:06:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75E4461051
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236166AbhIDCHN (ORCPT
+        id S1350899AbhIDKDJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Sep 2021 22:07:13 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:38882 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235441AbhIDCHM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Sep 2021 22:07:12 -0400
-Received: by mail-io1-f71.google.com with SMTP id n8-20020a6b7708000000b005bd491bdb6aso650339iom.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Sep 2021 19:06:11 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=zRIZHEuwoWOZaFEYOhQYWbRsZA/HnSh/xL4xkgPXzcc=;
-        b=e4dV+yadDanRlcX9BA3ymgzbZHB/bdCy61kHadYIlpiLpnZvLhpzGu3mKGug7eNQhl
-         BjfDm4F+yed6BvPDF6pRq8/KT6n7c3QtoYTuJO3cpkF3FdtQ0PSTguByTijcyXoT0uE/
-         Vq81IgqXyARPQhWXLFCysw/uXZSJQa5Wre96ydBYMg4uWikbZE3OFnnTJBFeXeIfmyNm
-         6nYy5eYgMTfTIEGYITQ4xcPBpP9RNL5389JCfd9bHkLD37Pfl8taLTHqnV16hZV9wSqN
-         LAAYs7wCqTTgO6hqv7+5xIkR0m5tqsmTUj8VXoehP0+OfikWxn8EUmb6OrDuAj5gsj3j
-         xSXg==
-X-Gm-Message-State: AOAM533wdk8NIb4lJY9Yrs3lxOx0M+xu4m9od10DoS7WAIq8d82+Xj6M
-        wcPD7oE7aJnnvs4bKGSte7D10pj7H2s3FjZC9OPGSqhMOCbO
-X-Google-Smtp-Source: ABdhPJw9Np9RoKEz/LYgjUEKyZW1euqFQbMviBTa0A8MNSn66Y8d6bK+OvzYK041vGvMfoC0VmTIIndIbGS42wYFBjUHFOu/w5Dq
-MIME-Version: 1.0
-X-Received: by 2002:a92:cda4:: with SMTP id g4mr1287797ild.236.1630721171596;
- Fri, 03 Sep 2021 19:06:11 -0700 (PDT)
-Date:   Fri, 03 Sep 2021 19:06:11 -0700
-In-Reply-To: <000000000000f0cdb005cb1ff6ec@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000292cce05cb21dcd8@google.com>
-Subject: Re: [syzbot] WARNING: kmalloc bug in hash_net_create
-From:   syzbot <syzbot+2b8443c35458a617c904@syzkaller.appspotmail.com>
-To:     axboe@kernel.dk, chaitanya.kulkarni@wdc.com,
-        coreteam@netfilter.org, davem@davemloft.net,
-        eric.dumazet@gmail.com, fw@strlen.de, hch@lst.de,
-        ira.weiny@intel.com, johan.hedberg@gmail.com, kadlec@netfilter.org,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, martin.petersen@oracle.com,
-        netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
-        pablo@netfilter.org, syzkaller-bugs@googlegroups.com
+        Sat, 4 Sep 2021 06:03:09 -0400
+Received: from mout01.posteo.de ([185.67.36.141]:40523 "EHLO mout01.posteo.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235973AbhIDKDI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 4 Sep 2021 06:03:08 -0400
+X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Sat, 04 Sep 2021 06:03:08 EDT
+Received: from submission (posteo.de [89.146.220.130]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 44DB8240027
+        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 11:54:57 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4H1qlN5NfJz9rxT
+        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 11:54:56 +0200 (CEST)
+Message-ID: <bb969660ab4fac16395cd9796cb1b3b745911789.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 1/2] shared/util: use 64-bit bitmap in
+ util_get/clear_uid
+From:   Pauli Virtanen <pav@iki.fi>
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Sat, 04 Sep 2021 09:54:56 +0000
+In-Reply-To: <CABBYNZKpq5ZjL2JxT2kssOOS1XYqTE7Hm66npst8FbLCd4hvpQ@mail.gmail.com>
+References: <20210829155012.164880-1-pav@iki.fi>
+         <20210829155012.164880-2-pav@iki.fi>
+         <CABBYNZKpq5ZjL2JxT2kssOOS1XYqTE7Hm66npst8FbLCd4hvpQ@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot has bisected this issue to:
+Hi Luiz,
 
-commit e6e7471706dc42cbe0e01278540c0730138d43e5
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Tue Jul 27 05:56:34 2021 +0000
+pe, 2021-09-03 kello 15:59 -0700, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+> 
+> On Sun, Aug 29, 2021 at 8:52 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > The util_get/clear_uid functions use int type for bitmap, and are used
+> > e.g. for SEID allocation. However, valid SEIDs are in range 1 to 0x3E
+> > (AVDTP spec v1.3, 8.20.1), and 8*sizeof(int) is often smaller than 0x3E.
+> > 
+> > The function is also used in src/advertising.c, but an explicit maximum
+> > value is always provided, so growing the bitmap size is safe there.
+> > 
+> > Use 64-bit bitmap instead, to be able to cover the valid range.
+> > ---
+> >  android/avdtp.c        |  2 +-
+> >  profiles/audio/avdtp.c |  2 +-
+> >  src/advertising.c      |  2 +-
+> >  src/shared/util.c      | 27 +++++++++++++++------------
+> >  src/shared/util.h      |  4 ++--
+> >  unit/test-avdtp.c      |  2 +-
+> >  6 files changed, 21 insertions(+), 18 deletions(-)
+> > 
+> > diff --git a/android/avdtp.c b/android/avdtp.c
+> > index 8c2930ec1..a261a8e5f 100644
+> > --- a/android/avdtp.c
+> > +++ b/android/avdtp.c
+> > @@ -34,7 +34,7 @@
+> >  #include "../profiles/audio/a2dp-codecs.h"
+> > 
+> >  #define MAX_SEID 0x3E
+> > -static unsigned int seids;
+> > +static uint64_t seids;
+> > 
+> >  #ifndef MAX
+> >  # define MAX(x, y) ((x) > (y) ? (x) : (y))
+> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
+> > index 946231b71..25520ceec 100644
+> > --- a/profiles/audio/avdtp.c
+> > +++ b/profiles/audio/avdtp.c
+> > @@ -44,7 +44,7 @@
+> >  #define AVDTP_PSM 25
+> > 
+> >  #define MAX_SEID 0x3E
+> > -static unsigned int seids;
+> > +static uint64_t seids;
+> > 
+> >  #ifndef MAX
+> >  # define MAX(x, y) ((x) > (y) ? (x) : (y))
+> > diff --git a/src/advertising.c b/src/advertising.c
+> > index bd79454d5..41b818650 100644
+> > --- a/src/advertising.c
+> > +++ b/src/advertising.c
+> > @@ -48,7 +48,7 @@ struct btd_adv_manager {
+> >         uint8_t max_scan_rsp_len;
+> >         uint8_t max_ads;
+> >         uint32_t supported_flags;
+> > -       unsigned int instance_bitmap;
+> > +       uint64_t instance_bitmap;
+> >         bool extended_add_cmds;
+> >         int8_t min_tx_power;
+> >         int8_t max_tx_power;
+> > diff --git a/src/shared/util.c b/src/shared/util.c
+> > index 244756456..723dedd75 100644
+> > --- a/src/shared/util.c
+> > +++ b/src/shared/util.c
+> > @@ -124,30 +124,33 @@ unsigned char util_get_dt(const char *parent, const char *name)
+> > 
+> >  /* Helpers for bitfield operations */
+> > 
+> > -/* Find unique id in range from 1 to max but no bigger then
+> > - * sizeof(int) * 8. ffs() is used since it is POSIX standard
+> > - */
+> > -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max)
+> > +/* Find unique id in range from 1 to max but no bigger than 64. */
+> > +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max)
+> >  {
+> >         uint8_t id;
+> > 
+> > -       id = ffs(~*bitmap);
+> 
+> Can't we use ffsll instead of using a for loop testing every bit?
+> Afaik long long should be at least 64 bits.
 
-    bvec: add a bvec_kmap_local helper
+Ok, I now see GNU extensions are fine here. I'll use ffsll to make it
+simpler.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12d7ad33300000
-start commit:   a9c9a6f741cd Merge tag 'scsi-misc' of git://git.kernel.org..
-git tree:       upstream
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=11d7ad33300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=16d7ad33300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1ac29107aeb2a552
-dashboard link: https://syzkaller.appspot.com/bug?extid=2b8443c35458a617c904
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12fba55d300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15bd2f49300000
+> > +       if (max > 64)
+> > +               max = 64;
+> > 
+> > -       if (!id || id > max)
+> > -               return 0;
+> > +       for (id = 1; id <= max; ++id) {
+> > +               uint64_t mask = ((uint64_t)1) << (id - 1);
+> > 
+> > -       *bitmap |= 1u << (id - 1);
+> > +               if (!(*bitmap & mask)) {
+> > +                       *bitmap |= mask;
+> > +                       return id;
+> > +               }
+> > +       }
+> > 
+> > -       return id;
+> > +       return 0;
+> >  }
+> > 
+> >  /* Clear id bit in bitmap */
+> > -void util_clear_uid(unsigned int *bitmap, uint8_t id)
+> > +void util_clear_uid(uint64_t *bitmap, uint8_t id)
+> >  {
+> > -       if (!id)
+> > +       if (id == 0 || id > 64)
+> >                 return;
+> > 
+> > -       *bitmap &= ~(1u << (id - 1));
+> > +       *bitmap &= ~(((uint64_t)1) << (id - 1));
+> >  }
+> > 
+> >  static const struct {
+> > diff --git a/src/shared/util.h b/src/shared/util.h
+> > index 9920b7f76..60908371d 100644
+> > --- a/src/shared/util.h
+> > +++ b/src/shared/util.h
+> > @@ -102,8 +102,8 @@ void util_hexdump(const char dir, const
+> > unsigned char *buf, size_t len,
+> > 
+> >  unsigned char util_get_dt(const char *parent, const char *name);
+> > 
+> > -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
+> > -void util_clear_uid(unsigned int *bitmap, uint8_t id);
+> > +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
+> > +void util_clear_uid(uint64_t *bitmap, uint8_t id);
+> > 
+> >  const char *bt_uuid16_to_str(uint16_t uuid);
+> >  const char *bt_uuid32_to_str(uint32_t uuid);
+> > diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
+> > index f5340d6f3..4e8a68c6b 100644
+> > --- a/unit/test-avdtp.c
+> > +++ b/unit/test-avdtp.c
+> > @@ -550,7 +550,7 @@ static void test_server_seid(gconstpointer
+> > data)
+> >         struct avdtp_local_sep *sep;
+> >         unsigned int i;
+> > 
+> > -       for (i = 0; i < sizeof(int) * 8; i++) {
+> > +       for (i = 0; i < MAX_SEID; i++) {
+> >                 sep = avdtp_register_sep(context->lseps,
+> > AVDTP_SEP_TYPE_SINK,
+> >                                                 AVDTP_MEDIA_TYPE_AU
+> > DIO,
+> >                                                 0x00, TRUE,
+> > &sep_ind, NULL,
+> > --
+> > 2.31.1
+> > 
+> 
+> 
 
-Reported-by: syzbot+2b8443c35458a617c904@syzkaller.appspotmail.com
-Fixes: e6e7471706dc ("bvec: add a bvec_kmap_local helper")
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
