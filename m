@@ -3,251 +3,208 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
 X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EEAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:36:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D90ACC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 12:16:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EAF0860F3A
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:36:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B670060231
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 12:16:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236025AbhIDKh6 (ORCPT
+        id S236418AbhIDMRG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Sep 2021 06:37:58 -0400
-Received: from mout01.posteo.de ([185.67.36.141]:42231 "EHLO mout01.posteo.de"
+        Sat, 4 Sep 2021 08:17:06 -0400
+Received: from mga05.intel.com ([192.55.52.43]:44170 "EHLO mga05.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234482AbhIDKh5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Sep 2021 06:37:57 -0400
-Received: from submission (posteo.de [89.146.220.130]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id EE6AC24002A
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 12:36:54 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4H1rgp3p4Tz6tmR;
-        Sat,  4 Sep 2021 12:36:54 +0200 (CEST)
-Message-ID: <c2d67b7cfe2d7bc087ec8bd3b9e34cf487d54c81.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 2/2] avdtp: use separate local SEID pool for each
- adapter
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Sat, 04 Sep 2021 10:36:54 +0000
-In-Reply-To: <CABBYNZK6b=HrLWSufVyRwNJ9jnhFaQ3d0dabQY+BW0_qbkNB7A@mail.gmail.com>
-References: <20210829155012.164880-1-pav@iki.fi>
-         <20210829155012.164880-3-pav@iki.fi>
-         <CABBYNZK6b=HrLWSufVyRwNJ9jnhFaQ3d0dabQY+BW0_qbkNB7A@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        id S236349AbhIDMRF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 4 Sep 2021 08:17:05 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10096"; a="305193339"
+X-IronPort-AV: E=Sophos;i="5.85,268,1624345200"; 
+   d="scan'208";a="305193339"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Sep 2021 05:16:03 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,268,1624345200"; 
+   d="scan'208";a="692829539"
+Received: from lkp-server01.sh.intel.com (HELO 2115029a3e5c) ([10.239.97.150])
+  by fmsmga005.fm.intel.com with ESMTP; 04 Sep 2021 05:16:01 -0700
+Received: from kbuild by 2115029a3e5c with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mMUaX-0001UN-8b; Sat, 04 Sep 2021 12:16:01 +0000
+Date:   Sat, 04 Sep 2021 20:15:43 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 49d8a5606428ca0962d09050a5af81461ff90fbb
+Message-ID: <6133636f.i1HJf5hYN9V3YWer%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 49d8a5606428ca0962d09050a5af81461ff90fbb  Bluetooth: fix init and cleanup of sco_conn.timeout_work
 
-pe, 2021-09-03 kello 15:49 -0700, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
-> 
-> On Sun, Aug 29, 2021 at 8:52 AM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > Local SEIDs are currently allocated from a pool that is common for all
-> > adapters. However, AVDTP spec v1.3, sec 4.10 states "To prevent
-> > conflicts, the scope of the SEID shall be both device-local and
-> > connection-local. The application is responsible for assigning a SEID,
-> > which is not in use on the connection to the same peer device." In
-> > practice, registering the same media application for multiple adapters
-> > can result to running out of SEIDs, even though the spec does not
-> > require SEIDs to be unique across adapters.
-> > 
-> > Use a separate SEID pool for each btd_adapter to fix this.
-> > ---
-> >  profiles/audio/a2dp.c  |  2 +-
-> >  profiles/audio/avdtp.c | 55 ++++++++++++++++++++++++++++++++++++------
-> >  profiles/audio/avdtp.h |  4 ++-
-> >  3 files changed, 51 insertions(+), 10 deletions(-)
-> > 
-> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
-> > index 02caa83e1..1e8a66b8a 100644
-> > --- a/profiles/audio/a2dp.c
-> > +++ b/profiles/audio/a2dp.c
-> > @@ -2615,7 +2615,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
-> > 
-> >         sep = g_new0(struct a2dp_sep, 1);
-> > 
-> > -       sep->lsep = avdtp_register_sep(server->seps, type,
-> > +       sep->lsep = avdtp_register_sep(adapter, server->seps, type,
-> >                                         AVDTP_MEDIA_TYPE_AUDIO, codec,
-> >                                         delay_reporting, &endpoint_ind,
-> >                                         &cfm, sep);
-> 
-> avdtp.c shall not have dependencies on adapter.c, or any btd_ function
-> that is daemon specific.
+elapsed time: 727m
 
-Ack.
+configs tested: 141
+configs skipped: 4
 
-> > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > index 25520ceec..f2aa98b23 100644
-> > --- a/profiles/audio/avdtp.c
-> > +++ b/profiles/audio/avdtp.c
-> > @@ -44,7 +44,6 @@
-> >  #define AVDTP_PSM 25
-> > 
-> >  #define MAX_SEID 0x3E
-> > -static uint64_t seids;
-> > 
-> >  #ifndef MAX
-> >  # define MAX(x, y) ((x) > (y) ? (x) : (y))
-> > @@ -325,6 +324,7 @@ struct avdtp_local_sep {
-> >         GSList *caps;
-> >         struct avdtp_sep_ind *ind;
-> >         struct avdtp_sep_cfm *cfm;
-> > +       struct btd_adapter *adapter;
-> 
-> We should probably use the list (server->seps) instead to avoid
-> depending on the btd_adapter here.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-This would mean that a2dp_server owns the SEID pool.
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                 randconfig-c001-20210904
+um                               alldefconfig
+powerpc                     kilauea_defconfig
+sh                           se7343_defconfig
+mips                        workpad_defconfig
+powerpc                      pasemi_defconfig
+sh                   sh7770_generic_defconfig
+powerpc                mpc7448_hpc2_defconfig
+arm                         socfpga_defconfig
+arm                        spear6xx_defconfig
+powerpc                 mpc8560_ads_defconfig
+m68k                         amcore_defconfig
+sparc                       sparc64_defconfig
+sh                           se7206_defconfig
+mips                       capcella_defconfig
+microblaze                      mmu_defconfig
+arm                          collie_defconfig
+powerpc                 mpc836x_mds_defconfig
+arc                     haps_hs_smp_defconfig
+powerpc                    klondike_defconfig
+powerpc                     tqm8548_defconfig
+powerpc                        cell_defconfig
+h8300                     edosk2674_defconfig
+s390                             allmodconfig
+powerpc                     mpc83xx_defconfig
+mips                           gcw0_defconfig
+riscv                               defconfig
+xtensa                       common_defconfig
+powerpc                     tqm8540_defconfig
+sh                          urquell_defconfig
+xtensa                  nommu_kc705_defconfig
+mips                         rt305x_defconfig
+mips                        maltaup_defconfig
+arm                         s5pv210_defconfig
+arm                           viper_defconfig
+powerpc                  mpc866_ads_defconfig
+powerpc                 mpc8313_rdb_defconfig
+arm                      pxa255-idp_defconfig
+ia64                         bigsur_defconfig
+nds32                            alldefconfig
+powerpc                          g5_defconfig
+arm                         lubbock_defconfig
+h8300                    h8300h-sim_defconfig
+openrisc                 simple_smp_defconfig
+arm                    vt8500_v6_v7_defconfig
+arm                            lart_defconfig
+sh                         ecovec24_defconfig
+sh                   rts7751r2dplus_defconfig
+powerpc                      makalu_defconfig
+powerpc                     akebono_defconfig
+sh                         microdev_defconfig
+mips                      maltaaprp_defconfig
+powerpc                 mpc85xx_cds_defconfig
+sh                          rsk7264_defconfig
+powerpc                     tqm5200_defconfig
+mips                    maltaup_xpa_defconfig
+arm                  randconfig-c002-20210904
+x86_64                            allnoconfig
+ia64                             allmodconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                             allnoconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+x86_64               randconfig-a006-20210904
+x86_64               randconfig-a004-20210904
+x86_64               randconfig-a003-20210904
+x86_64               randconfig-a005-20210904
+x86_64               randconfig-a001-20210904
+x86_64               randconfig-a002-20210904
+i386                 randconfig-a005-20210904
+i386                 randconfig-a004-20210904
+i386                 randconfig-a006-20210904
+i386                 randconfig-a002-20210904
+i386                 randconfig-a003-20210904
+i386                 randconfig-a001-20210904
+arc                  randconfig-r043-20210904
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                             allnoconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                                  kexec
 
-a2dp_server is the only local SEP user, and there's 1-to-1
-correspondence with adapters, so that should work currently. But I
-don't know (so far...) the big picture / plans for BlueZ design, so not
-yet clear to me who should own the pool.
+clang tested configs:
+s390                 randconfig-c005-20210904
+mips                 randconfig-c004-20210904
+powerpc              randconfig-c003-20210904
+x86_64               randconfig-c007-20210904
+i386                 randconfig-c001-20210904
+arm                  randconfig-c002-20210904
+riscv                randconfig-c006-20210904
+x86_64               randconfig-a011-20210904
+x86_64               randconfig-a016-20210904
+x86_64               randconfig-a012-20210904
+x86_64               randconfig-a015-20210904
+x86_64               randconfig-a014-20210904
+x86_64               randconfig-a013-20210904
+i386                 randconfig-a012-20210904
+i386                 randconfig-a015-20210904
+i386                 randconfig-a011-20210904
+i386                 randconfig-a013-20210904
+i386                 randconfig-a014-20210904
+i386                 randconfig-a016-20210904
+riscv                randconfig-r042-20210904
+hexagon              randconfig-r045-20210904
+s390                 randconfig-r044-20210904
+hexagon              randconfig-r041-20210904
 
-If a2dp_server owns it, as you write below, it's better then to just
-have it own the bitmap.
-
-> 
-> >         void *user_data;
-> >  };
-> > 
-> > @@ -414,6 +414,8 @@ struct avdtp {
-> > 
-> >  static GSList *state_callbacks = NULL;
-> > 
-> > +static GHashTable *adapter_seids = NULL;
-> 
-> I rather not use glib structures in new code.
-> 
-> >  static int send_request(struct avdtp *session, gboolean priority,
-> >                         struct avdtp_stream *stream, uint8_t signal_id,
-> >                         void *buffer, size_t size);
-> > @@ -3768,7 +3770,41 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
-> >                                                         &req, sizeof(req));
-> >  }
-> > 
-> > -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
-> > +static uint8_t get_adapter_seid(struct btd_adapter *adapter)
-> > +{
-> > +       uint64_t *seids;
-> > +
-> > +       if (adapter_seids == NULL)
-> > +               adapter_seids = g_hash_table_new_full(g_direct_hash,
-> > +                                               g_direct_equal, NULL, g_free);
-> > +
-> > +       seids = g_hash_table_lookup(adapter_seids, adapter);
-> > +
-> > +       if (seids == NULL) {
-> > +               seids = g_new0(uint64_t, 1);
-> > +               g_hash_table_insert(adapter_seids, adapter, seids);
-> > +       }
-> > +
-> > +       return util_get_uid(seids, MAX_SEID);
-> > +}
-> > +
-> > +static void clear_adapter_seid(struct btd_adapter *adapter, uint8_t seid)
-> > +{
-> > +       uint64_t *seids = adapter_seids ?
-> > +                       g_hash_table_lookup(adapter_seids, adapter) : NULL;
-> > +
-> > +       if (seids == NULL)
-> > +               return;
-> > +
-> > +       util_clear_uid(seids, seid);
-> > +
-> > +       if (*seids == 0)
-> > +               g_hash_table_remove(adapter_seids, adapter);
-> > +}
-> > +
-> > +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
-> > +                                               struct queue *lseps,
-> > +                                               uint8_t type,
-> >                                                 uint8_t media_type,
-> >                                                 uint8_t codec_type,
-> >                                                 gboolean delay_reporting,
-> > @@ -3777,7 +3813,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
-> >                                                 void *user_data)
-> >  {
-> >         struct avdtp_local_sep *sep;
-> > -       uint8_t seid = util_get_uid(&seids, MAX_SEID);
-> > +       uint8_t seid = get_adapter_seid(adapter);
-> 
-> Perhaps the uid pool should be passed instead of self generated by
-> avdtp.c, that way each server instance can contain its own seid pool
-> which can be passed to avdtp_register_sep, or better yet it can pass
-> the seid directly so the avdtp.c code is no longer responsible for
-> managing it and that is transfer to the caller which is already
-> managing the list anyway.
-
-I'll change this to a2dp_server owning the bitmap.
-
-For knowledge of MAX_SEID and error handling, it may be cleaner if the
-pool is passed in.
-
-> > 
-> >         if (!seid)
-> >                 return NULL;
-> > @@ -3791,11 +3827,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
-> >         sep->codec = codec_type;
-> >         sep->ind = ind;
-> >         sep->cfm = cfm;
-> > +       sep->adapter = adapter;
-> >         sep->user_data = user_data;
-> >         sep->delay_reporting = delay_reporting;
-> > 
-> > -       DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
-> > -                       sep->info.type, sep->codec, sep->info.seid);
-> > +       DBG("SEP %p registered: type:%d codec:%d adapter:%p seid:%d", sep,
-> > +                       sep->info.type, sep->codec, sep->adapter,
-> > +                       sep->info.seid);
-> > 
-> >         if (!queue_push_tail(lseps, sep)) {
-> >                 g_free(sep);
-> > @@ -3813,10 +3851,11 @@ int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
-> >         if (sep->stream)
-> >                 release_stream(sep->stream, sep->stream->session);
-> > 
-> > -       DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
-> > -                       sep->info.type, sep->codec, sep->info.seid);
-> > +       DBG("SEP %p unregistered: type:%d codec:%d adapter:%p seid:%d", sep,
-> > +                       sep->info.type, sep->codec, sep->adapter,
-> > +                       sep->info.seid);
-> > 
-> > -       util_clear_uid(&seids, sep->info.seid);
-> > +       clear_adapter_seid(sep->adapter, sep->info.seid);
-> >         queue_remove(lseps, sep);
-> >         g_free(sep);
-> > 
-> > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
-> > index b02534cd5..70807cff9 100644
-> > --- a/profiles/audio/avdtp.h
-> > +++ b/profiles/audio/avdtp.h
-> > @@ -278,7 +278,9 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream);
-> >  int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
-> >                                                         uint16_t delay);
-> > 
-> > -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
-> > +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
-> > +                                               struct queue *lseps,
-> > +                                               uint8_t type,
-> >                                                 uint8_t media_type,
-> >                                                 uint8_t codec_type,
-> >                                                 gboolean delay_reporting,
-> > --
-> > 2.31.1
-> > 
-> 
-> 
-
--- 
-Pauli Virtanen
-
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
