@@ -6,201 +6,248 @@ X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 962EDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16EEAC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:36:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 75E4461051
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:02:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EAF0860F3A
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Sep 2021 10:36:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350899AbhIDKDJ (ORCPT
+        id S236025AbhIDKh6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Sep 2021 06:03:09 -0400
-Received: from mout01.posteo.de ([185.67.36.141]:40523 "EHLO mout01.posteo.de"
+        Sat, 4 Sep 2021 06:37:58 -0400
+Received: from mout01.posteo.de ([185.67.36.141]:42231 "EHLO mout01.posteo.de"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235973AbhIDKDI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Sep 2021 06:03:08 -0400
-X-Greylist: delayed 429 seconds by postgrey-1.27 at vger.kernel.org; Sat, 04 Sep 2021 06:03:08 EDT
+        id S234482AbhIDKh5 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 4 Sep 2021 06:37:57 -0400
 Received: from submission (posteo.de [89.146.220.130]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 44DB8240027
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 11:54:57 +0200 (CEST)
+        by mout01.posteo.de (Postfix) with ESMTPS id EE6AC24002A
+        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 12:36:54 +0200 (CEST)
 Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4H1qlN5NfJz9rxT
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Sep 2021 11:54:56 +0200 (CEST)
-Message-ID: <bb969660ab4fac16395cd9796cb1b3b745911789.camel@iki.fi>
-Subject: Re: [PATCH BlueZ 1/2] shared/util: use 64-bit bitmap in
- util_get/clear_uid
+        by submission (posteo.de) with ESMTPSA id 4H1rgp3p4Tz6tmR;
+        Sat,  4 Sep 2021 12:36:54 +0200 (CEST)
+Message-ID: <c2d67b7cfe2d7bc087ec8bd3b9e34cf487d54c81.camel@iki.fi>
+Subject: Re: [PATCH BlueZ 2/2] avdtp: use separate local SEID pool for each
+ adapter
 From:   Pauli Virtanen <pav@iki.fi>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Sat, 04 Sep 2021 09:54:56 +0000
-In-Reply-To: <CABBYNZKpq5ZjL2JxT2kssOOS1XYqTE7Hm66npst8FbLCd4hvpQ@mail.gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Sat, 04 Sep 2021 10:36:54 +0000
+In-Reply-To: <CABBYNZK6b=HrLWSufVyRwNJ9jnhFaQ3d0dabQY+BW0_qbkNB7A@mail.gmail.com>
 References: <20210829155012.164880-1-pav@iki.fi>
-         <20210829155012.164880-2-pav@iki.fi>
-         <CABBYNZKpq5ZjL2JxT2kssOOS1XYqTE7Hm66npst8FbLCd4hvpQ@mail.gmail.com>
+         <20210829155012.164880-3-pav@iki.fi>
+         <CABBYNZK6b=HrLWSufVyRwNJ9jnhFaQ3d0dabQY+BW0_qbkNB7A@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Luiz,
 
-pe, 2021-09-03 kello 15:59 -0700, Luiz Augusto von Dentz kirjoitti:
+pe, 2021-09-03 kello 15:49 -0700, Luiz Augusto von Dentz kirjoitti:
 > Hi Pauli,
 > 
 > On Sun, Aug 29, 2021 at 8:52 AM Pauli Virtanen <pav@iki.fi> wrote:
 > > 
-> > The util_get/clear_uid functions use int type for bitmap, and are used
-> > e.g. for SEID allocation. However, valid SEIDs are in range 1 to 0x3E
-> > (AVDTP spec v1.3, 8.20.1), and 8*sizeof(int) is often smaller than 0x3E.
+> > Local SEIDs are currently allocated from a pool that is common for all
+> > adapters. However, AVDTP spec v1.3, sec 4.10 states "To prevent
+> > conflicts, the scope of the SEID shall be both device-local and
+> > connection-local. The application is responsible for assigning a SEID,
+> > which is not in use on the connection to the same peer device." In
+> > practice, registering the same media application for multiple adapters
+> > can result to running out of SEIDs, even though the spec does not
+> > require SEIDs to be unique across adapters.
 > > 
-> > The function is also used in src/advertising.c, but an explicit maximum
-> > value is always provided, so growing the bitmap size is safe there.
-> > 
-> > Use 64-bit bitmap instead, to be able to cover the valid range.
+> > Use a separate SEID pool for each btd_adapter to fix this.
 > > ---
-> >  android/avdtp.c        |  2 +-
-> >  profiles/audio/avdtp.c |  2 +-
-> >  src/advertising.c      |  2 +-
-> >  src/shared/util.c      | 27 +++++++++++++++------------
-> >  src/shared/util.h      |  4 ++--
-> >  unit/test-avdtp.c      |  2 +-
-> >  6 files changed, 21 insertions(+), 18 deletions(-)
+> >  profiles/audio/a2dp.c  |  2 +-
+> >  profiles/audio/avdtp.c | 55 ++++++++++++++++++++++++++++++++++++------
+> >  profiles/audio/avdtp.h |  4 ++-
+> >  3 files changed, 51 insertions(+), 10 deletions(-)
 > > 
-> > diff --git a/android/avdtp.c b/android/avdtp.c
-> > index 8c2930ec1..a261a8e5f 100644
-> > --- a/android/avdtp.c
-> > +++ b/android/avdtp.c
-> > @@ -34,7 +34,7 @@
-> >  #include "../profiles/audio/a2dp-codecs.h"
+> > diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+> > index 02caa83e1..1e8a66b8a 100644
+> > --- a/profiles/audio/a2dp.c
+> > +++ b/profiles/audio/a2dp.c
+> > @@ -2615,7 +2615,7 @@ struct a2dp_sep *a2dp_add_sep(struct btd_adapter *adapter, uint8_t type,
 > > 
-> >  #define MAX_SEID 0x3E
-> > -static unsigned int seids;
-> > +static uint64_t seids;
+> >         sep = g_new0(struct a2dp_sep, 1);
 > > 
-> >  #ifndef MAX
-> >  # define MAX(x, y) ((x) > (y) ? (x) : (y))
+> > -       sep->lsep = avdtp_register_sep(server->seps, type,
+> > +       sep->lsep = avdtp_register_sep(adapter, server->seps, type,
+> >                                         AVDTP_MEDIA_TYPE_AUDIO, codec,
+> >                                         delay_reporting, &endpoint_ind,
+> >                                         &cfm, sep);
+> 
+> avdtp.c shall not have dependencies on adapter.c, or any btd_ function
+> that is daemon specific.
+
+Ack.
+
 > > diff --git a/profiles/audio/avdtp.c b/profiles/audio/avdtp.c
-> > index 946231b71..25520ceec 100644
+> > index 25520ceec..f2aa98b23 100644
 > > --- a/profiles/audio/avdtp.c
 > > +++ b/profiles/audio/avdtp.c
-> > @@ -44,7 +44,7 @@
+> > @@ -44,7 +44,6 @@
 > >  #define AVDTP_PSM 25
 > > 
 > >  #define MAX_SEID 0x3E
-> > -static unsigned int seids;
-> > +static uint64_t seids;
+> > -static uint64_t seids;
 > > 
 > >  #ifndef MAX
 > >  # define MAX(x, y) ((x) > (y) ? (x) : (y))
-> > diff --git a/src/advertising.c b/src/advertising.c
-> > index bd79454d5..41b818650 100644
-> > --- a/src/advertising.c
-> > +++ b/src/advertising.c
-> > @@ -48,7 +48,7 @@ struct btd_adv_manager {
-> >         uint8_t max_scan_rsp_len;
-> >         uint8_t max_ads;
-> >         uint32_t supported_flags;
-> > -       unsigned int instance_bitmap;
-> > +       uint64_t instance_bitmap;
-> >         bool extended_add_cmds;
-> >         int8_t min_tx_power;
-> >         int8_t max_tx_power;
-> > diff --git a/src/shared/util.c b/src/shared/util.c
-> > index 244756456..723dedd75 100644
-> > --- a/src/shared/util.c
-> > +++ b/src/shared/util.c
-> > @@ -124,30 +124,33 @@ unsigned char util_get_dt(const char *parent, const char *name)
-> > 
-> >  /* Helpers for bitfield operations */
-> > 
-> > -/* Find unique id in range from 1 to max but no bigger then
-> > - * sizeof(int) * 8. ffs() is used since it is POSIX standard
-> > - */
-> > -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max)
-> > +/* Find unique id in range from 1 to max but no bigger than 64. */
-> > +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max)
-> >  {
-> >         uint8_t id;
-> > 
-> > -       id = ffs(~*bitmap);
+> > @@ -325,6 +324,7 @@ struct avdtp_local_sep {
+> >         GSList *caps;
+> >         struct avdtp_sep_ind *ind;
+> >         struct avdtp_sep_cfm *cfm;
+> > +       struct btd_adapter *adapter;
 > 
-> Can't we use ffsll instead of using a for loop testing every bit?
-> Afaik long long should be at least 64 bits.
+> We should probably use the list (server->seps) instead to avoid
+> depending on the btd_adapter here.
 
-Ok, I now see GNU extensions are fine here. I'll use ffsll to make it
-simpler.
+This would mean that a2dp_server owns the SEID pool.
 
-> > +       if (max > 64)
-> > +               max = 64;
+a2dp_server is the only local SEP user, and there's 1-to-1
+correspondence with adapters, so that should work currently. But I
+don't know (so far...) the big picture / plans for BlueZ design, so not
+yet clear to me who should own the pool.
+
+If a2dp_server owns it, as you write below, it's better then to just
+have it own the bitmap.
+
+> 
+> >         void *user_data;
+> >  };
 > > 
-> > -       if (!id || id > max)
-> > -               return 0;
-> > +       for (id = 1; id <= max; ++id) {
-> > +               uint64_t mask = ((uint64_t)1) << (id - 1);
+> > @@ -414,6 +414,8 @@ struct avdtp {
 > > 
-> > -       *bitmap |= 1u << (id - 1);
-> > +               if (!(*bitmap & mask)) {
-> > +                       *bitmap |= mask;
-> > +                       return id;
-> > +               }
+> >  static GSList *state_callbacks = NULL;
+> > 
+> > +static GHashTable *adapter_seids = NULL;
+> 
+> I rather not use glib structures in new code.
+> 
+> >  static int send_request(struct avdtp *session, gboolean priority,
+> >                         struct avdtp_stream *stream, uint8_t signal_id,
+> >                         void *buffer, size_t size);
+> > @@ -3768,7 +3770,41 @@ int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+> >                                                         &req, sizeof(req));
+> >  }
+> > 
+> > -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> > +static uint8_t get_adapter_seid(struct btd_adapter *adapter)
+> > +{
+> > +       uint64_t *seids;
+> > +
+> > +       if (adapter_seids == NULL)
+> > +               adapter_seids = g_hash_table_new_full(g_direct_hash,
+> > +                                               g_direct_equal, NULL, g_free);
+> > +
+> > +       seids = g_hash_table_lookup(adapter_seids, adapter);
+> > +
+> > +       if (seids == NULL) {
+> > +               seids = g_new0(uint64_t, 1);
+> > +               g_hash_table_insert(adapter_seids, adapter, seids);
 > > +       }
+> > +
+> > +       return util_get_uid(seids, MAX_SEID);
+> > +}
+> > +
+> > +static void clear_adapter_seid(struct btd_adapter *adapter, uint8_t seid)
+> > +{
+> > +       uint64_t *seids = adapter_seids ?
+> > +                       g_hash_table_lookup(adapter_seids, adapter) : NULL;
+> > +
+> > +       if (seids == NULL)
+> > +               return;
+> > +
+> > +       util_clear_uid(seids, seid);
+> > +
+> > +       if (*seids == 0)
+> > +               g_hash_table_remove(adapter_seids, adapter);
+> > +}
+> > +
+> > +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
+> > +                                               struct queue *lseps,
+> > +                                               uint8_t type,
+> >                                                 uint8_t media_type,
+> >                                                 uint8_t codec_type,
+> >                                                 gboolean delay_reporting,
+> > @@ -3777,7 +3813,7 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> >                                                 void *user_data)
+> >  {
+> >         struct avdtp_local_sep *sep;
+> > -       uint8_t seid = util_get_uid(&seids, MAX_SEID);
+> > +       uint8_t seid = get_adapter_seid(adapter);
+> 
+> Perhaps the uid pool should be passed instead of self generated by
+> avdtp.c, that way each server instance can contain its own seid pool
+> which can be passed to avdtp_register_sep, or better yet it can pass
+> the seid directly so the avdtp.c code is no longer responsible for
+> managing it and that is transfer to the caller which is already
+> managing the list anyway.
+
+I'll change this to a2dp_server owning the bitmap.
+
+For knowledge of MAX_SEID and error handling, it may be cleaner if the
+pool is passed in.
+
 > > 
-> > -       return id;
-> > +       return 0;
-> >  }
+> >         if (!seid)
+> >                 return NULL;
+> > @@ -3791,11 +3827,13 @@ struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> >         sep->codec = codec_type;
+> >         sep->ind = ind;
+> >         sep->cfm = cfm;
+> > +       sep->adapter = adapter;
+> >         sep->user_data = user_data;
+> >         sep->delay_reporting = delay_reporting;
 > > 
-> >  /* Clear id bit in bitmap */
-> > -void util_clear_uid(unsigned int *bitmap, uint8_t id)
-> > +void util_clear_uid(uint64_t *bitmap, uint8_t id)
-> >  {
-> > -       if (!id)
-> > +       if (id == 0 || id > 64)
-> >                 return;
+> > -       DBG("SEP %p registered: type:%d codec:%d seid:%d", sep,
+> > -                       sep->info.type, sep->codec, sep->info.seid);
+> > +       DBG("SEP %p registered: type:%d codec:%d adapter:%p seid:%d", sep,
+> > +                       sep->info.type, sep->codec, sep->adapter,
+> > +                       sep->info.seid);
 > > 
-> > -       *bitmap &= ~(1u << (id - 1));
-> > +       *bitmap &= ~(((uint64_t)1) << (id - 1));
-> >  }
+> >         if (!queue_push_tail(lseps, sep)) {
+> >                 g_free(sep);
+> > @@ -3813,10 +3851,11 @@ int avdtp_unregister_sep(struct queue *lseps, struct avdtp_local_sep *sep)
+> >         if (sep->stream)
+> >                 release_stream(sep->stream, sep->stream->session);
 > > 
-> >  static const struct {
-> > diff --git a/src/shared/util.h b/src/shared/util.h
-> > index 9920b7f76..60908371d 100644
-> > --- a/src/shared/util.h
-> > +++ b/src/shared/util.h
-> > @@ -102,8 +102,8 @@ void util_hexdump(const char dir, const
-> > unsigned char *buf, size_t len,
+> > -       DBG("SEP %p unregistered: type:%d codec:%d seid:%d", sep,
+> > -                       sep->info.type, sep->codec, sep->info.seid);
+> > +       DBG("SEP %p unregistered: type:%d codec:%d adapter:%p seid:%d", sep,
+> > +                       sep->info.type, sep->codec, sep->adapter,
+> > +                       sep->info.seid);
 > > 
-> >  unsigned char util_get_dt(const char *parent, const char *name);
+> > -       util_clear_uid(&seids, sep->info.seid);
+> > +       clear_adapter_seid(sep->adapter, sep->info.seid);
+> >         queue_remove(lseps, sep);
+> >         g_free(sep);
 > > 
-> > -uint8_t util_get_uid(unsigned int *bitmap, uint8_t max);
-> > -void util_clear_uid(unsigned int *bitmap, uint8_t id);
-> > +uint8_t util_get_uid(uint64_t *bitmap, uint8_t max);
-> > +void util_clear_uid(uint64_t *bitmap, uint8_t id);
+> > diff --git a/profiles/audio/avdtp.h b/profiles/audio/avdtp.h
+> > index b02534cd5..70807cff9 100644
+> > --- a/profiles/audio/avdtp.h
+> > +++ b/profiles/audio/avdtp.h
+> > @@ -278,7 +278,9 @@ int avdtp_abort(struct avdtp *session, struct avdtp_stream *stream);
+> >  int avdtp_delay_report(struct avdtp *session, struct avdtp_stream *stream,
+> >                                                         uint16_t delay);
 > > 
-> >  const char *bt_uuid16_to_str(uint16_t uuid);
-> >  const char *bt_uuid32_to_str(uint32_t uuid);
-> > diff --git a/unit/test-avdtp.c b/unit/test-avdtp.c
-> > index f5340d6f3..4e8a68c6b 100644
-> > --- a/unit/test-avdtp.c
-> > +++ b/unit/test-avdtp.c
-> > @@ -550,7 +550,7 @@ static void test_server_seid(gconstpointer
-> > data)
-> >         struct avdtp_local_sep *sep;
-> >         unsigned int i;
-> > 
-> > -       for (i = 0; i < sizeof(int) * 8; i++) {
-> > +       for (i = 0; i < MAX_SEID; i++) {
-> >                 sep = avdtp_register_sep(context->lseps,
-> > AVDTP_SEP_TYPE_SINK,
-> >                                                 AVDTP_MEDIA_TYPE_AU
-> > DIO,
-> >                                                 0x00, TRUE,
-> > &sep_ind, NULL,
+> > -struct avdtp_local_sep *avdtp_register_sep(struct queue *lseps, uint8_t type,
+> > +struct avdtp_local_sep *avdtp_register_sep(struct btd_adapter *adapter,
+> > +                                               struct queue *lseps,
+> > +                                               uint8_t type,
+> >                                                 uint8_t media_type,
+> >                                                 uint8_t codec_type,
+> >                                                 gboolean delay_reporting,
 > > --
 > > 2.31.1
 > > 
 > 
 > 
 
-
+-- 
+Pauli Virtanen
 
