@@ -2,272 +2,244 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8C5FCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:39:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EC864C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 16:05:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6F8B260E94
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:39:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CC41560F6B
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 16:05:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241049AbhIFIkG (ORCPT
+        id S243651AbhIFQHA convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Sep 2021 04:40:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37790 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240556AbhIFIkF (ORCPT
+        Mon, 6 Sep 2021 12:07:00 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44991 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243510AbhIFQHA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Sep 2021 04:40:05 -0400
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E68EC061575
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Sep 2021 01:39:01 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id a5so3629819qvq.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Sep 2021 01:39:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=yfDRXw6R9Jp3gU836CocmruD00ciV9lL3PfJRYYQEeM=;
-        b=fjH5FQEiBS9c0ifC2PP9WsuZeTGuL45LHMR1kM4GAwvlMiXd/pcucRpHzsl0x0QbXQ
-         +/3TbJZ58cghc3ODmn/eSXfsxSQefTVBSxPGrJVh+1da++zp8jb9fp5m81HLFmrAIfk7
-         nkj7OPK6PRP32/jut0eFEFC5F7PKxCzYK835l2YTcdu3PKujcEZh/8prByA1IwpmHUf6
-         VciSj5rE42GuyM3aT2r9nD8h5pzcuHrqOu95JsKQo+4xRIVX1kwkYSUtr0KSBDJuKT6r
-         vcK55b57gfDlpR57MdmInaYYew2IVI4A7GmeTEWfx9rJ5TDoq3vHoo1AI1Wimrikbma9
-         5hMg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=yfDRXw6R9Jp3gU836CocmruD00ciV9lL3PfJRYYQEeM=;
-        b=VsRqcAAgDV351QAFHECoTM13Oc7o1hDzx0EAXLaW7fHKPR635Fyhyuyf/+UJnyv6UY
-         pe81tHSJvLvTT6NI7RCPrcKVU6XWpyWdf4DV4k7LHQrKQ/JlybuPOLwzI0p2YRj1k9Kb
-         v9Kohrm8VHZvwXtJc5wjfDlULqE/iPIWhG1U5qPf6AlpoajlI9LvJpLMUbAsuJuksEjY
-         LebxHayIM+NQEHdR4cJCIlZbq0J8c3E6ofX2NJmk0RMyxCMCoN21/tWIivCn0lgn7ZOd
-         bz0td0+xeFGYT+5g8ToFt17BxPeeNrKwpXNtpY+zIEi2FTs29s0rGb2HQFbhXdVDul5C
-         7a7A==
-X-Gm-Message-State: AOAM5302sDcfyTIsmUi3wsYdRHet+5GBFnK3sbZhff0yX/2deum10Ctz
-        DGvqf3ZBQp4FDEa7ov6YShm0bfq7y9HDDg==
-X-Google-Smtp-Source: ABdhPJzFcZLz0w4urIbx10bUYN8PIyTP1XnidHmmElVVQDJowlVI1UrxkHwA4TobKZqX3hQ4ypA+eQ==
-X-Received: by 2002:a05:6214:332:: with SMTP id j18mr10742997qvu.12.1630917540047;
-        Mon, 06 Sep 2021 01:39:00 -0700 (PDT)
-Received: from [172.17.0.2] ([52.251.123.226])
-        by smtp.gmail.com with ESMTPSA id d20sm5980015qkl.13.2021.09.06.01.38.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 06 Sep 2021 01:38:59 -0700 (PDT)
-Message-ID: <6135d3a3.1c69fb81.fd258.f33c@mx.google.com>
-Date:   Mon, 06 Sep 2021 01:38:59 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4592171304734531728=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: Inclusive language changes
-Reply-To: linux-bluetooth@vger.kernel.org
+        Mon, 6 Sep 2021 12:07:00 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 35FDACECD1;
+        Mon,  6 Sep 2021 18:05:54 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [Bluez PATCH v4 01/12] lib: Inclusive language changes
+From:   Marcel Holtmann <marcel@holtmann.org>
 In-Reply-To: <20210906160340.Bluez.v4.1.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
-References: <20210906160340.Bluez.v4.1.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
+Date:   Mon, 6 Sep 2021 18:05:53 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <35AC05A9-E7F9-461C-9EAA-1FBB4898B699@holtmann.org>
+References: <20210906080450.1771211-1-apusaka@google.com>
+ <20210906160340.Bluez.v4.1.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
+To:     Archie Pusaka <apusaka@google.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4592171304734531728==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Archie,
 
-This is automated email and please do not reply to this email!
+> BT core spec 5.3 promotes the usage of inclusive languages.
+> This CL replaces some terms with the more appropriate counterparts,
+> such as "central", "peripheral", and "accept list".
+> ---
+> 
+> (no changes since v3)
+> 
+> Changes in v3:
+> * Not replacing some terms which belong to libluetooth API
+> 
+> Changes in v2:
+> * Merging several patches from the same directory into one
+> 
+> android/bluetooth.c |  4 ++--
+> lib/hci.c           | 22 +++++++++++-----------
+> lib/mgmt.h          |  2 +-
+> monitor/control.c   |  4 ++--
+> src/adapter.c       |  4 ++--
+> tools/oobtest.c     |  4 ++--
+> 6 files changed, 20 insertions(+), 20 deletions(-)
+> 
+> diff --git a/android/bluetooth.c b/android/bluetooth.c
+> index c3ad503497..fe956b5d43 100644
+> --- a/android/bluetooth.c
+> +++ b/android/bluetooth.c
+> @@ -2276,7 +2276,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+> 		ediv = le16_to_cpu(key->ediv);
+> 		rand = le64_to_cpu(key->rand);
+> 
+> -		store_ltk(&key->addr.bdaddr, key->addr.type, key->master,
+> +		store_ltk(&key->addr.bdaddr, key->addr.type, key->central,
+> 				key->val, key->type, key->enc_size, ediv, rand);
+> 	}
+> 
+> @@ -3097,7 +3097,7 @@ static struct mgmt_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
+> 	info->ediv = g_key_file_get_integer(key_file, peer, ediv_s, NULL);
+> 	info->ediv = cpu_to_le16(info->ediv);
+> 
+> -	info->master = master;
+> +	info->central = master;
+> 
+> failed:
+> 	g_free(key);
+> diff --git a/lib/hci.c b/lib/hci.c
+> index 53af0a1148..a2dd7a2ae6 100644
+> --- a/lib/hci.c
+> +++ b/lib/hci.c
+> @@ -288,7 +288,7 @@ int hci_strtolp(char *str, unsigned int *val)
+> static hci_map link_mode_map[] = {
+> 	{ "NONE",	0		},
+> 	{ "ACCEPT",	HCI_LM_ACCEPT	},
+> -	{ "MASTER",	HCI_LM_MASTER	},
+> +	{ "CENTRAL",	HCI_LM_MASTER	},
+> 	{ "AUTH",	HCI_LM_AUTH	},
+> 	{ "ENCRYPT",	HCI_LM_ENCRYPT	},
+> 	{ "TRUSTED",	HCI_LM_TRUSTED	},
 
-Dear submitter,
+you can't do this since it actually maps to input of hciconfig tool. You really need to check where link_mode_map is used.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=542379
+> @@ -305,7 +305,7 @@ char *hci_lmtostr(unsigned int lm)
+> 
+> 	*str = 0;
+> 	if (!(lm & HCI_LM_MASTER))
+> -		strcpy(str, "SLAVE ");
+> +		strcpy(str, "PERIPHERAL ");
+> 
+> 	s = hci_bit2str(link_mode_map, lm);
+> 	if (!s) {
+> @@ -345,7 +345,7 @@ static hci_map commands_map[] = {
+> 
+> 	{ "Set Connection Encryption",			16  },
+> 	{ "Change Connection Link Key",			17  },
+> -	{ "Master Link Key",				18  },
+> +	{ "Temporary Link Key",				18  },
+> 	{ "Remote Name Request",			19  },
+> 	{ "Cancel Remote Name Request",			20  },
+> 	{ "Read Remote Supported Features",		21  },
+> @@ -565,11 +565,11 @@ static hci_map commands_map[] = {
+> 	{ "LE Set Scan Enable",				211 },
+> 	{ "LE Create Connection",			212 },
+> 	{ "LE Create Connection Cancel",		213 },
+> -	{ "LE Read White List Size",			214 },
+> -	{ "LE Clear White List",			215 },
+> +	{ "LE Read Accept List Size",			214 },
+> +	{ "LE Clear Accept List",			215 },
+> 
+> -	{ "LE Add Device To White List",		216 },
+> -	{ "LE Remove Device From White List",		217 },
+> +	{ "LE Add Device To Accept List",		216 },
+> +	{ "LE Remove Device From Accept List",		217 },
+> 	{ "LE Connection Update",			218 },
+> 	{ "LE Set Host Channel Classification",		219 },
+> 	{ "LE Read Channel Map",			220 },
+> @@ -735,8 +735,8 @@ static hci_map lmp_features_map[8][9] = {
+> 		{ "<EV4 packets>",	LMP_EV4		},	/* Bit 0 */
+> 		{ "<EV5 packets>",	LMP_EV5		},	/* Bit 1 */
+> 		{ "<no. 34>",		0x04		},	/* Bit 2 */
+> -		{ "<AFH cap. slave>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
+> -		{ "<AFH class. slave>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
+> +		{ "<AFH cap. perip.>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
+> +		{ "<AFH cls. perip.>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
+> 		{ "<BR/EDR not supp.>",	LMP_NO_BREDR	},	/* Bit 5 */
+> 		{ "<LE support>",	LMP_LE		},	/* Bit 6 */
+> 		{ "<3-slot EDR ACL>",	LMP_EDR_3SLOT	},	/* Bit 7 */
+> @@ -746,8 +746,8 @@ static hci_map lmp_features_map[8][9] = {
+> 		{ "<5-slot EDR ACL>",	LMP_EDR_5SLOT	},	/* Bit 0 */
+> 		{ "<sniff subrating>",	LMP_SNIFF_SUBR	},	/* Bit 1 */
+> 		{ "<pause encryption>",	LMP_PAUSE_ENC	},	/* Bit 2 */
+> -		{ "<AFH cap. master>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
+> -		{ "<AFH class. master>",LMP_AFH_CLS_MST	},	/* Bit 4 */
+> +		{ "<AFH cap. central>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
+> +		{ "<AFH cls. central>", LMP_AFH_CLS_MST	},	/* Bit 4 */
+> 		{ "<EDR eSCO 2 Mbps>",	LMP_EDR_ESCO_2M	},	/* Bit 5 */
+> 		{ "<EDR eSCO 3 Mbps>",	LMP_EDR_ESCO_3M	},	/* Bit 6 */
+> 		{ "<3-slot EDR eSCO>",	LMP_EDR_3S_ESCO	},	/* Bit 7 */
+> diff --git a/lib/mgmt.h b/lib/mgmt.h
+> index 0a6349321a..0d1678f01d 100644
+> --- a/lib/mgmt.h
+> +++ b/lib/mgmt.h
+> @@ -179,7 +179,7 @@ struct mgmt_cp_load_link_keys {
+> struct mgmt_ltk_info {
+> 	struct mgmt_addr_info addr;
+> 	uint8_t type;
+> -	uint8_t master;
+> +	uint8_t central;
+> 	uint8_t enc_size;
+> 	uint16_t ediv;
+> 	uint64_t rand;
+> diff --git a/monitor/control.c b/monitor/control.c
+> index 266602a34c..dad23a0e62 100644
+> --- a/monitor/control.c
+> +++ b/monitor/control.c
+> @@ -308,13 +308,13 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
+> 	/* LE SC keys are both for master and slave */
+> 	switch (ev->key.type) {
+> 	case 0x00:
+> -		if (ev->key.master)
+> +		if (ev->key.central)
+> 			type = "Master (Unauthenticated)";
+> 		else
+> 			type = "Slave (Unauthenticated)";
+> 		break;
+> 	case 0x01:
+> -		if (ev->key.master)
+> +		if (ev->key.central)
+> 			type = "Master (Authenticated)";
+> 		else
+> 			type = "Slave (Authenticated)";
+> diff --git a/src/adapter.c b/src/adapter.c
+> index ddd8967515..ac1e02af6c 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -4122,7 +4122,7 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+> 		key->rand = cpu_to_le64(info->rand);
+> 		key->ediv = cpu_to_le16(info->ediv);
+> 		key->type = info->authenticated;
+> -		key->master = info->master;
+> +		key->central = info->master;
+> 		key->enc_size = info->enc_size;
+> 	}
+> 
+> @@ -8307,7 +8307,7 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
+> 		rand = le64_to_cpu(key->rand);
+> 
+> 		store_longtermkey(adapter, &key->addr.bdaddr,
+> -					key->addr.type, key->val, key->master,
+> +					key->addr.type, key->val, key->central,
+> 					key->type, key->enc_size, ediv, rand);
+> 
+> 		device_set_bonded(device, addr->type);
+> diff --git a/tools/oobtest.c b/tools/oobtest.c
+> index c095036fe7..0368bc3865 100644
+> --- a/tools/oobtest.c
+> +++ b/tools/oobtest.c
+> @@ -133,13 +133,13 @@ static void new_long_term_key_event(uint16_t index, uint16_t len,
+> 
+> 	switch (ev->key.type) {
+> 	case 0x00:
+> -		if (ev->key.master)
+> +		if (ev->key.central)
+> 			type = "Unauthenticated, Master";
+> 		else
+> 			type = "Unauthenticated, Slave";
+> 		break;
+> 	case 0x01:
+> -		if (ev->key.master)
+> +		if (ev->key.central)
+> 			type = "Authenticated, Master";
+> 		else
+> 			type = "Authenticated, Slave";
 
----Test result---
+These strings you could have changed. It is just a test tool and not installed.
 
-Test Summary:
-CheckPatch                    FAIL      4.00 seconds
-GitLint                       FAIL      1.20 seconds
-Prep - Setup ELL              PASS      39.57 seconds
-Build - Prep                  PASS      0.09 seconds
-Build - Configure             PASS      7.17 seconds
-Build - Make                  PASS      167.55 seconds
-Make Check                    PASS      8.70 seconds
-Make Distcheck                PASS      202.81 seconds
-Build w/ext ELL - Configure   PASS      7.12 seconds
-Build w/ext ELL - Make        PASS      158.55 seconds
+Regards
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-tools: Inclusive language changes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#10: 
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
+Marcel
 
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#985: FILE: tools/l2test.c:113:
-+static int central = 0;
-
-WARNING:MISSING_SPACE: break quoted strings at a space character
-#1030: FILE: tools/l2test.c:1340:
- 	while ((opt = getopt(argc, argv, "a:b:cde:g:i:mnpqrstuwxyz"
-+		"AB:CD:EF:GH:I:J:K:L:M:N:O:P:Q:RSTUV:W:X:Y:Z:")) != EOF) {
-
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#2331: FILE: tools/rctest.c:79:
-+static int central = 0;
-
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#2483: FILE: tools/rfcomm.c:40:
-+static int central = 0;
-
-- total: 3 errors, 2 warnings, 2296 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] tools: Inclusive language changes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-profiles: Inclusive language changes
-WARNING:LONG_LINE_COMMENT: line length of 100 exceeds 80 columns
-#116: FILE: profiles/health/mcap.h:273:
-+	mcap_info_ind_event_cb	mcl_sync_infoind_cb;	/* (CSP Central) Received info indication */
-
-- total: 0 errors, 1 warnings, 87 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] profiles: Inclusive language changes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-src: Inclusive language changes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#10: 
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-
-ERROR:INITIALISED_STATIC: do not initialise statics to NULL
-#36: FILE: src/adapter.c:115:
-+static struct mgmt *mgmt_primary = NULL;
-
-- total: 1 errors, 1 warnings, 478 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] src: Inclusive language changes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-mesh: Inclusive language changes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#7: 
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-
-ERROR:INITIALISED_STATIC: do not initialise statics to 0
-#28: FILE: mesh/net-keys.c:56:
-+static uint32_t last_flooding_id = 0;
-
-- total: 1 errors, 1 warnings, 146 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] mesh: Inclusive language changes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-unit/mesh: Inclusive language changes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#7: 
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-
-- total: 0 errors, 1 warnings, 16 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] unit/mesh: Inclusive language changes" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-tools: Inclusive language changes
-7: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
-
-src: Inclusive language changes
-7: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
-
-mesh: Inclusive language changes
-4: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
-
-unit/mesh: Inclusive language changes
-4: B1 Line exceeds max length (95>80): "https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf"
-
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============4592171304734531728==--
