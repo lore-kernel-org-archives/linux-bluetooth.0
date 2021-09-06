@@ -7,58 +7,62 @@ X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
 	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CD4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:04:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 08A21C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:05:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3BB0B60F43
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:04:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5C1460F43
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:05:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240536AbhIFIGB (ORCPT
+        id S240582AbhIFIGG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Sep 2021 04:06:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57958 "EHLO
+        Mon, 6 Sep 2021 04:06:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57986 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240500AbhIFIGA (ORCPT
+        with ESMTP id S240500AbhIFIGF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Sep 2021 04:06:00 -0400
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E49C061757
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Sep 2021 01:04:56 -0700 (PDT)
-Received: by mail-qt1-x849.google.com with SMTP id 13-20020ac8560d000000b0029f69548889so8780526qtr.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Sep 2021 01:04:56 -0700 (PDT)
+        Mon, 6 Sep 2021 04:06:05 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 569E9C061575
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Sep 2021 01:05:01 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id et12-20020a056214176c00b0037279a2ce4cso10523319qvb.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Sep 2021 01:05:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=X+91x5XKoUfrfKTqDx3QI4eHyqzJIQ3/p9sD2Futs+E=;
-        b=FmXYY4NyCZmTb9NhAIqrZJz8Nb2CsMNJk0JRyjWNf8yT9FvOg5kViheIUkN0GyB6On
-         NAa4i25YDp3OfpiqzunD7OSJYGt6O5c3kkdSOdIl7NIf2VVX4V/GkwNFYX/d0xAiEja+
-         QT0Id5o49/HUWPD/mOUpS0Pt5hU0neMl0N5VXm46ms+4JU9l7cQpa/wdkC5o4x+Xgyfa
-         WdDGd0Ux0r2XYPD5IAfycSX6eIpMUKizaT7gj8CIXvm1N2zJizgGBR8lTI54TJe9avju
-         6YWipZhil84biJl+mQYGJJ1TUcGN1OMxmFsr6Y82Cp55ca6W7Fn15mPt2WS4kt7IGp14
-         gyzQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=vjdv2eDSSQjRfkdcX9Nk4TvGfDPdWk1rKNE7WNnSqEE=;
+        b=ofSbZ9IyPYaH+X4JqR9HYZgG5nnBbCtXdbFeYYYEG//MQJ9wSc0UvNyWjeOswZKelo
+         BQDq3JDcaXB6nYW6Xi1OhuM62T7J9WGXYWP0SY9T9ywAmzoGV8SHOhwFzv8My4TkqmEk
+         MIfFyVXuM2gDjXPcZnzyCCwsDGPqVRldjCG8JP3FxmkhbXdjuHNLBAOG1QRttiy/4Vuc
+         HOUnwxaE8GnRPm3m6FlFiHMSR8iz9IUToPxxHgAjIWFxC8vGtceZgxxIv+d8QB6XBE6L
+         WPQqAjTLYWLMjTs8571Mq73G1emoNZBO38bt9XrSlC+xJKddG0SAs+BwZjfKbaNbPPYq
+         44LQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=X+91x5XKoUfrfKTqDx3QI4eHyqzJIQ3/p9sD2Futs+E=;
-        b=Rsiwj7ZEpeuvOeySAqzVbJRounR483nhefOSmOY1qivDqhxSCkJ+fFNVfxI0TNi5kv
-         AbkzssFtcnUePpkO60urTlyB/SZO9AUlsWMpHxQ/pWsuAP2GHrbP6JHnezz18yxpOGz9
-         Q4lKrqOtPlg+yfZUDE0u+2+PeJtf3kNx5QehwbLly9SsVh9TGXwNENHINiYCc3UxE9oM
-         KSkx3ceaKFMhu65OR+T6dGZA3oR6k6tGKdsrJYx5FgESR/WLNiulH54gcWpjWY/ewC9W
-         eODn7vpdQVpS822jYq8wU2Co+ow0N0Jp7COiM6BUUj9wIFOjsuLeEfofdXZ2IlCET4XO
-         jn/Q==
-X-Gm-Message-State: AOAM531lKx6E4xIIA5Uy539NjjL/fbYUuWrzEVXBXUKlj7uZHikJkD7+
-        cXedW94bLxzAjVAqCTA71relQlTzSxKsBlZB7XqtXznrG1e29Bx5IACfqCJ+eqHr6TMC8lSC6Ft
-        g+Qmbo2H5d/yhNP6zIoO5+2yqdUHWwLyNYXQMmQAJo6m/az6JcF6SylEj38Hy6BHoJ0ozCsnIZH
-        Xs
-X-Google-Smtp-Source: ABdhPJz2MMShuYr47Js56WsCUCnQKoWXG2wJtzfywXOI8SMFH54pVNDg7ulcpsdO91deZjq/wE0YP7ajbuiX
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=vjdv2eDSSQjRfkdcX9Nk4TvGfDPdWk1rKNE7WNnSqEE=;
+        b=DiBDTyrb7Mdo4vBb43U4pES/StUnzU+N81kB1Pqla0ayZkzfP0UIlyIru8rE7gSUX0
+         om1aDEu0BDEnQmECd5Z4mE4vpjRUfsZPICsS0rpEwnz0sCOiw5ehLzIYi0270UahoTUc
+         cHGYEszOKDMORzFkF+gTwzz9RmwD4aXBKrmCkWyHHV6XtPa/IgW5IpKcK9tamNEoH3pf
+         0xf/F0FtSbcUkHIBZPvRvX+SVy3w7C81yAKkWRFNRRmwbapCd1foWvdPQwNaUc5Yz4rF
+         CdWpYlkJNQYvuVFMQnYGwhStuAbXpCt1ozp2NfpyR1U9AgEZfw0Y89Nj4WJMr6vJskV5
+         eWgQ==
+X-Gm-Message-State: AOAM530yaeGTRPR5Sj9Pl0+zYX4Yt+akaAawvHj4AHBNvjXui01i9uXh
+        prznc0cZf6aQzx+31aTo2oRKBHbMSpM+WZqkpb/UC8Dmv6nYt7au5qrIrZJd28pOzqlijAFYjYN
+        6qHgitSMQwV/lE++dDUAfA2TMQr+wIzSlQW+a/zgMOs2r7eqfqW4/XmAzlX8PWaJDeUt0KivFpt
+        bp
+X-Google-Smtp-Source: ABdhPJw/cWmKCcamu/+ueVOqZG91FWgrksGVlFHQKC25+jDJNbOXO7m7Y3Gm9av2gjXXB16tnUvx6g5MlKcJ
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:3b13:95ba:12e5:7134])
- (user=apusaka job=sendgmr) by 2002:a05:6214:2427:: with SMTP id
- gy7mr10859783qvb.20.1630915494943; Mon, 06 Sep 2021 01:04:54 -0700 (PDT)
-Date:   Mon,  6 Sep 2021 16:04:38 +0800
-Message-Id: <20210906080450.1771211-1-apusaka@google.com>
+ (user=apusaka job=sendgmr) by 2002:a05:6214:aaf:: with SMTP id
+ ew15mr10782348qvb.14.1630915500417; Mon, 06 Sep 2021 01:05:00 -0700 (PDT)
+Date:   Mon,  6 Sep 2021 16:04:39 +0800
+In-Reply-To: <20210906080450.1771211-1-apusaka@google.com>
+Message-Id: <20210906160340.Bluez.v4.1.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
 Mime-Version: 1.0
+References: <20210906080450.1771211-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [Bluez PATCH v4 00/12] Inclusive language changes
+Subject: [Bluez PATCH v4 01/12] lib: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -71,28 +75,12 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Hi BlueZ maintainers,
+BT core spec 5.3 promotes the usage of inclusive languages.
+This CL replaces some terms with the more appropriate counterparts,
+such as "central", "peripheral", and "accept list".
+---
 
-This series of patches promotes the usage of the more inclusive terms
-such as central/peripheral, accept list/reject list, or their
-equivalent where appropriate.
-
-This is also reflected on the changes to Core spec v5.3 and the
-appropriate language mapping table by Bluetooth SIG
-https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
-
-As you suggested, I dropped the Android changes and merge patches
-which belong to the same directory into one patch.
-
-Note that the following terms are not replaced:
-(1) those involving storage format (i.e. storing LTK)
-(2) those which belong to the libbluetooth API
-
-Thanks,
-Archie
-
-Changes in v4:
-* Fix line over 80 columns
+(no changes since v3)
 
 Changes in v3:
 * Not replacing some terms which belong to libluetooth API
@@ -100,101 +88,180 @@ Changes in v3:
 Changes in v2:
 * Merging several patches from the same directory into one
 
-Archie Pusaka (12):
-  lib: Inclusive language changes
-  btio: Inclusive language changes
-  monitor: Inclusive language changes
-  emulator: Inclusive language changes
-  tools: Inclusive language changes
-  plugins/sixaxis: Inclusive language changes
-  profiles: Inclusive language changes
-  src: Inclusive language changes
-  client: Inclusive language changes
-  mesh: Inclusive language changes
-  unit/mesh: Inclusive language changes
-  doc: Inclusive language update
+ android/bluetooth.c |  4 ++--
+ lib/hci.c           | 22 +++++++++++-----------
+ lib/mgmt.h          |  2 +-
+ monitor/control.c   |  4 ++--
+ src/adapter.c       |  4 ++--
+ tools/oobtest.c     |  4 ++--
+ 6 files changed, 20 insertions(+), 20 deletions(-)
 
- android/a2dp.c             |   2 +-
- android/bluetooth.c        |   4 +-
- android/handsfree-client.c |   2 +-
- android/tester-main.c      |   2 +-
- btio/btio.c                |  42 ++--
- btio/btio.h                |   2 +-
- client/main.c              |   6 +-
- doc/mesh-api.txt           |   2 +-
- doc/mgmt-api.txt           |   6 +-
- emulator/btdev.c           | 204 +++++++++---------
- emulator/hciemu.c          |  21 +-
- emulator/hciemu.h          |  12 +-
- emulator/le.c              | 116 +++++------
- emulator/serial.c          |   6 +-
- emulator/smp.c             |   8 +-
- lib/hci.c                  |  22 +-
- lib/mgmt.h                 |   2 +-
- mesh/net-keys.c            |  38 ++--
- mesh/net-keys.h            |   8 +-
- mesh/net.h                 |   4 +-
- monitor/broadcom.c         |   8 +-
- monitor/bt.h               | 150 +++++++-------
- monitor/control.c          |  14 +-
- monitor/l2cap.c            |  10 +-
- monitor/ll.c               |  60 +++---
- monitor/lmp.c              |   2 +-
- monitor/packet.c           | 411 +++++++++++++++++++------------------
- plugins/sixaxis.c          |  44 ++--
- profiles/audio/a2dp.c      |   2 +-
- profiles/audio/avctp.c     |  10 +-
- profiles/audio/avctp.h     |   2 +-
- profiles/health/mcap.c     |  20 +-
- profiles/health/mcap.h     |   2 +-
- profiles/sap/server.c      |   2 +-
- src/adapter.c              | 113 +++++-----
- src/adapter.h              |   4 +-
- src/device.c               |   6 +-
- src/sdpd-server.c          |   8 +-
- src/sdpd.h                 |   2 +-
- src/shared/ad.c            |   8 +-
- src/shared/ad.h            |   2 +-
- src/shared/hfp.c           |   4 +-
- src/shared/hfp.h           |   2 +-
- tools/3dsp.c               |  62 +++---
- tools/bdaddr.rst           |   2 +-
- tools/btiotest.c           |  22 +-
- tools/btpclientctl.c       |   2 +-
- tools/hci-tester.c         |  16 +-
- tools/hciconfig.c          | 148 ++++++++-----
- tools/hciconfig.rst        |  24 +--
- tools/hcitool.c            | 102 ++++-----
- tools/hcitool.rst          |  30 +--
- tools/l2cap-tester.c       |  36 ++--
- tools/l2test.c             |  18 +-
- tools/mesh-cfgclient.c     |   4 +-
- tools/mesh-gatt/mesh-net.h |   4 +-
- tools/mesh-gatt/net.c      |  60 +++---
- tools/mesh/mesh-db.c       |  28 ++-
- tools/mesh/mesh-db.h       |   4 +-
- tools/mesh/remote.c        |  53 +++--
- tools/mesh/remote.h        |   5 +-
- tools/meshctl.c            |   6 +-
- tools/mgmt-tester.c        | 138 +++++++------
- tools/oobtest.c            |  12 +-
- tools/parser/avdtp.c       |  11 +-
- tools/parser/csr.c         |  17 +-
- tools/parser/ericsson.c    |   2 +-
- tools/parser/hci.c         |  38 ++--
- tools/parser/lmp.c         | 112 +++++-----
- tools/parser/parser.h      |   2 +-
- tools/parser/smp.c         |  12 +-
- tools/rctest.c             |  19 +-
- tools/rctest.rst           |   4 +-
- tools/rfcomm-tester.c      |  14 +-
- tools/rfcomm.c             |  15 +-
- tools/rfcomm.rst           |   2 +-
- tools/sco-tester.c         |  10 +-
- tools/smp-tester.c         |  16 +-
- unit/test-mesh-crypto.c    |   4 +-
- 79 files changed, 1256 insertions(+), 1193 deletions(-)
-
+diff --git a/android/bluetooth.c b/android/bluetooth.c
+index c3ad503497..fe956b5d43 100644
+--- a/android/bluetooth.c
++++ b/android/bluetooth.c
+@@ -2276,7 +2276,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
+ 		ediv = le16_to_cpu(key->ediv);
+ 		rand = le64_to_cpu(key->rand);
+ 
+-		store_ltk(&key->addr.bdaddr, key->addr.type, key->master,
++		store_ltk(&key->addr.bdaddr, key->addr.type, key->central,
+ 				key->val, key->type, key->enc_size, ediv, rand);
+ 	}
+ 
+@@ -3097,7 +3097,7 @@ static struct mgmt_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
+ 	info->ediv = g_key_file_get_integer(key_file, peer, ediv_s, NULL);
+ 	info->ediv = cpu_to_le16(info->ediv);
+ 
+-	info->master = master;
++	info->central = master;
+ 
+ failed:
+ 	g_free(key);
+diff --git a/lib/hci.c b/lib/hci.c
+index 53af0a1148..a2dd7a2ae6 100644
+--- a/lib/hci.c
++++ b/lib/hci.c
+@@ -288,7 +288,7 @@ int hci_strtolp(char *str, unsigned int *val)
+ static hci_map link_mode_map[] = {
+ 	{ "NONE",	0		},
+ 	{ "ACCEPT",	HCI_LM_ACCEPT	},
+-	{ "MASTER",	HCI_LM_MASTER	},
++	{ "CENTRAL",	HCI_LM_MASTER	},
+ 	{ "AUTH",	HCI_LM_AUTH	},
+ 	{ "ENCRYPT",	HCI_LM_ENCRYPT	},
+ 	{ "TRUSTED",	HCI_LM_TRUSTED	},
+@@ -305,7 +305,7 @@ char *hci_lmtostr(unsigned int lm)
+ 
+ 	*str = 0;
+ 	if (!(lm & HCI_LM_MASTER))
+-		strcpy(str, "SLAVE ");
++		strcpy(str, "PERIPHERAL ");
+ 
+ 	s = hci_bit2str(link_mode_map, lm);
+ 	if (!s) {
+@@ -345,7 +345,7 @@ static hci_map commands_map[] = {
+ 
+ 	{ "Set Connection Encryption",			16  },
+ 	{ "Change Connection Link Key",			17  },
+-	{ "Master Link Key",				18  },
++	{ "Temporary Link Key",				18  },
+ 	{ "Remote Name Request",			19  },
+ 	{ "Cancel Remote Name Request",			20  },
+ 	{ "Read Remote Supported Features",		21  },
+@@ -565,11 +565,11 @@ static hci_map commands_map[] = {
+ 	{ "LE Set Scan Enable",				211 },
+ 	{ "LE Create Connection",			212 },
+ 	{ "LE Create Connection Cancel",		213 },
+-	{ "LE Read White List Size",			214 },
+-	{ "LE Clear White List",			215 },
++	{ "LE Read Accept List Size",			214 },
++	{ "LE Clear Accept List",			215 },
+ 
+-	{ "LE Add Device To White List",		216 },
+-	{ "LE Remove Device From White List",		217 },
++	{ "LE Add Device To Accept List",		216 },
++	{ "LE Remove Device From Accept List",		217 },
+ 	{ "LE Connection Update",			218 },
+ 	{ "LE Set Host Channel Classification",		219 },
+ 	{ "LE Read Channel Map",			220 },
+@@ -735,8 +735,8 @@ static hci_map lmp_features_map[8][9] = {
+ 		{ "<EV4 packets>",	LMP_EV4		},	/* Bit 0 */
+ 		{ "<EV5 packets>",	LMP_EV5		},	/* Bit 1 */
+ 		{ "<no. 34>",		0x04		},	/* Bit 2 */
+-		{ "<AFH cap. slave>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
+-		{ "<AFH class. slave>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
++		{ "<AFH cap. perip.>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
++		{ "<AFH cls. perip.>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
+ 		{ "<BR/EDR not supp.>",	LMP_NO_BREDR	},	/* Bit 5 */
+ 		{ "<LE support>",	LMP_LE		},	/* Bit 6 */
+ 		{ "<3-slot EDR ACL>",	LMP_EDR_3SLOT	},	/* Bit 7 */
+@@ -746,8 +746,8 @@ static hci_map lmp_features_map[8][9] = {
+ 		{ "<5-slot EDR ACL>",	LMP_EDR_5SLOT	},	/* Bit 0 */
+ 		{ "<sniff subrating>",	LMP_SNIFF_SUBR	},	/* Bit 1 */
+ 		{ "<pause encryption>",	LMP_PAUSE_ENC	},	/* Bit 2 */
+-		{ "<AFH cap. master>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
+-		{ "<AFH class. master>",LMP_AFH_CLS_MST	},	/* Bit 4 */
++		{ "<AFH cap. central>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
++		{ "<AFH cls. central>", LMP_AFH_CLS_MST	},	/* Bit 4 */
+ 		{ "<EDR eSCO 2 Mbps>",	LMP_EDR_ESCO_2M	},	/* Bit 5 */
+ 		{ "<EDR eSCO 3 Mbps>",	LMP_EDR_ESCO_3M	},	/* Bit 6 */
+ 		{ "<3-slot EDR eSCO>",	LMP_EDR_3S_ESCO	},	/* Bit 7 */
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 0a6349321a..0d1678f01d 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -179,7 +179,7 @@ struct mgmt_cp_load_link_keys {
+ struct mgmt_ltk_info {
+ 	struct mgmt_addr_info addr;
+ 	uint8_t type;
+-	uint8_t master;
++	uint8_t central;
+ 	uint8_t enc_size;
+ 	uint16_t ediv;
+ 	uint64_t rand;
+diff --git a/monitor/control.c b/monitor/control.c
+index 266602a34c..dad23a0e62 100644
+--- a/monitor/control.c
++++ b/monitor/control.c
+@@ -308,13 +308,13 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
+ 	/* LE SC keys are both for master and slave */
+ 	switch (ev->key.type) {
+ 	case 0x00:
+-		if (ev->key.master)
++		if (ev->key.central)
+ 			type = "Master (Unauthenticated)";
+ 		else
+ 			type = "Slave (Unauthenticated)";
+ 		break;
+ 	case 0x01:
+-		if (ev->key.master)
++		if (ev->key.central)
+ 			type = "Master (Authenticated)";
+ 		else
+ 			type = "Slave (Authenticated)";
+diff --git a/src/adapter.c b/src/adapter.c
+index ddd8967515..ac1e02af6c 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4122,7 +4122,7 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ 		key->rand = cpu_to_le64(info->rand);
+ 		key->ediv = cpu_to_le16(info->ediv);
+ 		key->type = info->authenticated;
+-		key->master = info->master;
++		key->central = info->master;
+ 		key->enc_size = info->enc_size;
+ 	}
+ 
+@@ -8307,7 +8307,7 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
+ 		rand = le64_to_cpu(key->rand);
+ 
+ 		store_longtermkey(adapter, &key->addr.bdaddr,
+-					key->addr.type, key->val, key->master,
++					key->addr.type, key->val, key->central,
+ 					key->type, key->enc_size, ediv, rand);
+ 
+ 		device_set_bonded(device, addr->type);
+diff --git a/tools/oobtest.c b/tools/oobtest.c
+index c095036fe7..0368bc3865 100644
+--- a/tools/oobtest.c
++++ b/tools/oobtest.c
+@@ -133,13 +133,13 @@ static void new_long_term_key_event(uint16_t index, uint16_t len,
+ 
+ 	switch (ev->key.type) {
+ 	case 0x00:
+-		if (ev->key.master)
++		if (ev->key.central)
+ 			type = "Unauthenticated, Master";
+ 		else
+ 			type = "Unauthenticated, Slave";
+ 		break;
+ 	case 0x01:
+-		if (ev->key.master)
++		if (ev->key.central)
+ 			type = "Authenticated, Master";
+ 		else
+ 			type = "Authenticated, Slave";
 -- 
 2.33.0.153.gba50c8fa24-goog
 
