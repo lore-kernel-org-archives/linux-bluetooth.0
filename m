@@ -2,64 +2,69 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.5 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	UNWANTED_LANGUAGE_BODY,USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham
-	autolearn_force=no version=3.4.0
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CE7BCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBE12C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:04:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A95AC60F92
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:03:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D13460F92
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:04:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239476AbhIFGEe (ORCPT
+        id S239500AbhIFGEq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Sep 2021 02:04:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58664 "EHLO
+        Mon, 6 Sep 2021 02:04:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58676 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239433AbhIFGEb (ORCPT
+        with ESMTP id S239473AbhIFGEe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Sep 2021 02:04:31 -0400
-Received: from mail-qv1-xf4a.google.com (mail-qv1-xf4a.google.com [IPv6:2607:f8b0:4864:20::f4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD323C061575
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Sep 2021 23:03:26 -0700 (PDT)
-Received: by mail-qv1-xf4a.google.com with SMTP id l3-20020a056214104300b00366988901acso10474039qvr.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Sep 2021 23:03:26 -0700 (PDT)
+        Mon, 6 Sep 2021 02:04:34 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22602C061575
+        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Sep 2021 23:03:30 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id q13-20020a05620a038d00b003d38f784161so9890242qkm.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Sep 2021 23:03:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=pTDaSxJkExjIr9d5Cl6MptNCwx4AFUjqpvcw+0x4KLs=;
-        b=MSWAGvQqQzO110b/zcJCPQiXnu0gGELOYu0PTcrs8DwTa4Mz2xSdQIXw876fkzukzP
-         USDbx3TGwI2/Z56YnpRRxYHHjK62yAeVf2klNI385MRVPSKwOzBd3a+SeZXgVErg74Gr
-         IslkmPXHZEkivRegfzjP0AshMjZEKgYUNu1VBfuNz4PjWhaeqymNDjscZzes6SwM0x8r
-         8uOnmW2HPirvsmk+K7hs4iHx7W4/mvnaDfdrddZ9TkOfllFIK0AxU/gIKw5NZatxlvc7
-         /xI/vffTSU96UFOQIhC9nOtgBN03ygm82ynMMc3HTJuOKS7P7nM0VPzUC795gEZ3DckG
-         MpeA==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=n4Db1g8V13yhlIoYZHlELRgMzrffU04Ne3qI6LPD+r8=;
+        b=tHRFJTpJhlg7x0MARzJ/stRRZS6fXrd+AW0/MkOd+pQ2u0Hntvg5eyQHkDt2a3gXsy
+         9zmj+YDkTa/GV1ngK75qJ0b2EHAdelTtaAWb2B+5d4jiHu4Nzp5af1KvBg+n0t1dCd3r
+         yknjPFM2Eh1xrAPxer3NrKrpOlQAeUPGxvnDzlvsEZaJySb+TFTW4z6BdDJjANoHlmYy
+         /+AwvgWAyHHeSgAqz6JskN+lKhE0hbWFDUDelEyppZVwJ42L+k9Lla738hLg3RliL337
+         JxaGf5nXn6e8OFYOdMiLxC8zq7KSu68MRXViS/oN6MABXlt2PfhjVfcJyA52Bm6ncRbx
+         VJ5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=pTDaSxJkExjIr9d5Cl6MptNCwx4AFUjqpvcw+0x4KLs=;
-        b=T1bnwP3Bf7kAYVCnscmyIrBxEiwt1Mvc6tuSz0ElOZXEQwW03Z9/G+0itIlVGRpkhD
-         +/oaXAbL66U1D2hljKEALb86463xKamb4WO8OXpeaQ1jLw/sHzCoZHUHv7YF5vxN+vEk
-         pnW5SYG2Q5cYQ2cyYUZGW0E9FAlZQ2HaHVNy+VVGoO+0294kgRYSmxis/r2d/po1AP0R
-         +WtKZ7TCozmi4zKEal8RHQM/Y5EVw1f3L/xzbJTWKBy3dhYzxE7aODcPIBJTjXGoDUQf
-         T4ljc+54t1IBPptgoiao84nvKeiIh/L/g3nkB6pT/TsZvyHBjgZeTtt1q2XzZ6Q4+kql
-         LLoQ==
-X-Gm-Message-State: AOAM532aFntqJslI2fwaX9vtpdIvgAowm/K+zGKNzwdJRafFv5sID8pl
-        YREM07+Y40oKm6EWOnxdalKBVHbPPCdBJT3pysEiMS0dPaWoapHQq6jU65Jcb1xnEQNtQ4bB4iW
-        RfxhXnO6OYd6pSKeVT+0OcQw/fc1iqQdFsDsY7imvn2FGTPoRjaRwg0QeTdX3HXq0M55jB7poNJ
-        cLSAOQyuSTywc=
-X-Google-Smtp-Source: ABdhPJx0T8il61G8GCkJcYkWxIHJL50oT1yNKcedlX9perEkxZKKekGigJrdK9PHPiy+fsU/uqdnQ2vDYLHjIERRog==
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=n4Db1g8V13yhlIoYZHlELRgMzrffU04Ne3qI6LPD+r8=;
+        b=N04kuTlWOzvLtRcoDJWM/B/tVeO3NT7f2Xf1dUitSDxYGj3WXdM3p6zp3tqQ8to+If
+         UNeZqlOOO98zds9vOBuUi17N2355h7KLwOhpBWErCzuaNz8sB2MUe/wuUiutZEL1lujJ
+         DSIJTMQ2WnUr+0DINWx/pMMN7iHJdMLol6r3hwdTgb7HfeEVDtaiz9lkUazvcJyHiLoO
+         UKUYzCPCtYLddOw4qkFkqyZEJKbCN6mK2pH/bgKTRrVTW8m4/sr7rRTGpeF2FQgBLFcv
+         fnYTanqwkDb4RQqsJ8pTwyYyd+jFHHzlo+BTQywY+lqbjhGm8GcfuKvR5tLyZGQnAE6e
+         J0xQ==
+X-Gm-Message-State: AOAM532VHmNSqnAel6lqDDrQtJ28g9SLIVhOvpug20AGc7u04oRkVnAL
+        8OM19BVSJLnbihZOA2t7CLPHUnYxyElC9xwlRrvS497fWvvQT5N+Pz1YGlwnL+BsN37oZ67Zjcl
+        RMp2SV970wOB++6YyNg2qibfqGzAjWP8Y9/DLu6t8HU2C/66ooWrAyF/jdflVtdhDJHVhZlRV+N
+        xT6A61uIQsZMU=
+X-Google-Smtp-Source: ABdhPJxQTgcjwrB2cWSzMHWkFKONyAkmgpuA28YxdrsB3UQjsXHn2kFddEWmvn0HloMzOsKEdhmCUN4yqiVbHI6oRA==
 X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:d42:c8a9:b5b9:8c48])
- (user=howardchung job=sendgmr) by 2002:ad4:562c:: with SMTP id
- cb12mr10144872qvb.6.1630908205758; Sun, 05 Sep 2021 23:03:25 -0700 (PDT)
-Date:   Mon,  6 Sep 2021 14:03:16 +0800
-Message-Id: <20210906140250.Bluez.v2.1.Id597e5ae87e680e6a744a8ed08d5000aacfce867@changeid>
+ (user=howardchung job=sendgmr) by 2002:ad4:55eb:: with SMTP id
+ bu11mr10565563qvb.57.1630908209316; Sun, 05 Sep 2021 23:03:29 -0700 (PDT)
+Date:   Mon,  6 Sep 2021 14:03:17 +0800
+In-Reply-To: <20210906140250.Bluez.v2.1.Id597e5ae87e680e6a744a8ed08d5000aacfce867@changeid>
+Message-Id: <20210906140250.Bluez.v2.2.Id6fa258f1381f5913f06dfa27f3946339033cec3@changeid>
 Mime-Version: 1.0
+References: <20210906140250.Bluez.v2.1.Id597e5ae87e680e6a744a8ed08d5000aacfce867@changeid>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
-Subject: [Bluez PATCH v2 1/2] plugins/admin: add adapter_remove handler
+Subject: [Bluez PATCH v2 2/2] plugins/admin: create admin_policy_settings if
+ not exists
 From:   Howard Chung <howardchung@google.com>
 To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
 Cc:     Yun-Hao Chung <howardchung@chromium.org>,
@@ -72,105 +77,49 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Yun-Hao Chung <howardchung@chromium.org>
 
-Currently admin doesn't handle adapter removed callbacks, which causes
-interfaces AdminPolicySet1 and AdminPolicyStatus1 not being
-unregistered, which in turns causes these interfaces can not be
-re-registered once adapter is back.
-
-This adds handler for adapter_remove.
+If admin_policy_settings is not found when loading, we should create one
+instead of printing error.
 
 Reviewed-by: Shyh-In Hwang <josephsih@chromium.org>
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
-tested with following steps
-1. rmmod btusb
-2. modprobe btusb
-3. read allowlist via bluetoothctl
+This patch has been tested with following steps:
+rm /var/lib/bluetooth/admin_policy_settings and restart bluetoothd.
+Check if the file is created.
 
-Changes in v2:
-1. Fix make errors
+(no changes since v1)
 
- plugins/admin.c | 35 ++++++++++++++++++++++++++++-------
- 1 file changed, 28 insertions(+), 7 deletions(-)
+ plugins/admin.c | 10 +++-------
+ 1 file changed, 3 insertions(+), 7 deletions(-)
 
 diff --git a/plugins/admin.c b/plugins/admin.c
-index 02fec04568ba..82c00cabdb6b 100644
+index 82c00cabdb6b..8390f3c32bbd 100644
 --- a/plugins/admin.c
 +++ b/plugins/admin.c
-@@ -85,6 +85,17 @@ static void admin_policy_free(void *data)
- 	g_free(admin_policy);
+@@ -67,7 +67,7 @@ static struct btd_admin_policy *admin_policy_new(struct btd_adapter *adapter)
+ 
+ 	admin_policy->adapter = adapter;
+ 	admin_policy->adapter_id = btd_adapter_get_index(adapter);
+-	admin_policy->service_allowlist = NULL;
++	admin_policy->service_allowlist = queue_new();
+ 
+ 	return admin_policy;
  }
+@@ -335,12 +335,8 @@ static void load_policy_settings(struct btd_admin_policy *admin_policy)
+ 	char *filename = ADMIN_POLICY_STORAGE;
+ 	struct stat st;
  
-+static void admin_policy_destroy(struct btd_admin_policy *admin_policy)
-+{
-+	const char *path = adapter_get_path(admin_policy->adapter);
-+
-+	g_dbus_unregister_interface(dbus_conn, path,
-+						ADMIN_POLICY_SET_INTERFACE);
-+	g_dbus_unregister_interface(dbus_conn, path,
-+						ADMIN_POLICY_STATUS_INTERFACE);
-+	admin_policy_free(admin_policy);
-+}
-+
- static bool uuid_match(const void *data, const void *match_data)
- {
- 	const bt_uuid_t *uuid = data;
-@@ -492,7 +503,7 @@ static int admin_policy_adapter_probe(struct btd_adapter *adapter)
- 	if (!g_dbus_register_interface(dbus_conn, adapter_path,
- 					ADMIN_POLICY_SET_INTERFACE,
- 					admin_policy_adapter_methods, NULL,
--					NULL, policy_data, admin_policy_free)) {
-+					NULL, policy_data, NULL)) {
- 		btd_error(policy_data->adapter_id,
- 			"Admin Policy Set interface init failed on path %s",
- 								adapter_path);
-@@ -506,7 +517,7 @@ static int admin_policy_adapter_probe(struct btd_adapter *adapter)
- 					ADMIN_POLICY_STATUS_INTERFACE,
- 					NULL, NULL,
- 					admin_policy_adapter_properties,
--					policy_data, admin_policy_free)) {
-+					policy_data, NULL)) {
- 		btd_error(policy_data->adapter_id,
- 			"Admin Policy Status interface init failed on path %s",
- 								adapter_path);
-@@ -574,10 +585,24 @@ static void admin_policy_device_removed(struct btd_adapter *adapter,
- 		unregister_device_data(data, NULL);
- }
+-	if (stat(filename, &st) < 0) {
+-		btd_error(admin_policy->adapter_id,
+-				"Failed to get file %s information",
+-				filename);
+-		return;
+-	}
++	if (stat(filename, &st) < 0)
++		store_policy_settings(policy_data);
  
-+static void admin_policy_remove(struct btd_adapter *adapter)
-+{
-+	DBG("");
-+
-+	queue_foreach(devices, unregister_device_data, NULL);
-+	queue_destroy(devices, g_free);
-+
-+	if (policy_data) {
-+		admin_policy_destroy(policy_data);
-+		policy_data = NULL;
-+	}
-+}
-+
- static struct btd_adapter_driver admin_policy_driver = {
- 	.name	= "admin_policy",
- 	.probe	= admin_policy_adapter_probe,
- 	.resume = NULL,
-+	.remove = admin_policy_remove,
- 	.device_resolved = admin_policy_device_added,
- 	.device_removed = admin_policy_device_removed
- };
-@@ -597,11 +622,7 @@ static void admin_exit(void)
- 	DBG("");
+ 	key_file = g_key_file_new();
  
- 	btd_unregister_adapter_driver(&admin_policy_driver);
--	queue_foreach(devices, unregister_device_data, NULL);
--	queue_destroy(devices, g_free);
--
--	if (policy_data)
--		admin_policy_free(policy_data);
-+	admin_policy_remove(NULL);
- }
- 
- BLUETOOTH_PLUGIN_DEFINE(admin, VERSION,
 -- 
 2.33.0.153.gba50c8fa24-goog
 
