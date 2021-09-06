@@ -2,148 +2,199 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 990CCC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:40:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 65CD4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:04:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 713B860F92
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 06:40:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3BB0B60F43
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Sep 2021 08:04:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239528AbhIFGlL (ORCPT
+        id S240536AbhIFIGB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Sep 2021 02:41:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38662 "EHLO
+        Mon, 6 Sep 2021 04:06:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57958 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239244AbhIFGlL (ORCPT
+        with ESMTP id S240500AbhIFIGA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Sep 2021 02:41:11 -0400
-Received: from mail-qv1-xf32.google.com (mail-qv1-xf32.google.com [IPv6:2607:f8b0:4864:20::f32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59F91C061575
-        for <linux-bluetooth@vger.kernel.org>; Sun,  5 Sep 2021 23:40:07 -0700 (PDT)
-Received: by mail-qv1-xf32.google.com with SMTP id 4so3482064qvp.3
-        for <linux-bluetooth@vger.kernel.org>; Sun, 05 Sep 2021 23:40:07 -0700 (PDT)
+        Mon, 6 Sep 2021 04:06:00 -0400
+Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64E49C061757
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Sep 2021 01:04:56 -0700 (PDT)
+Received: by mail-qt1-x849.google.com with SMTP id 13-20020ac8560d000000b0029f69548889so8780526qtr.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 06 Sep 2021 01:04:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=JVzYmZGQKLhEeUPEA+xNAmt2zNP+Ngp3oPl2Ypb8r78=;
-        b=hWmyNV241EDIi6qAq90Mp72betT1f9Z3OnXXzbzQmlWLdQEbLYJghsJOhnVxsK2TWD
-         7Zl7OY4hE+xotFma0VcoMJ6lfpNbTZa7G1EG8Inx3rji8Q0XN17rNXHC5rLPQgHWqPvh
-         qOkR0HvaZ37P0wD3VZ9jDpm2r6sGzoNoAVfswAiDLQyZlgjUvasU9ODNAAeOXshMFWK8
-         WnMSH081PwhY7mljR837zUkpxPfmCs/ybzezzMaxhYjQ6DJWZy+4HnIjEZaD8fmr/wr5
-         z3X5UZ8d/q7g3rPwH+VADayj/4i+DAOUotlOMP5B9WlwIguvMFy7rXa4TuSTY92xVuqe
-         h+0A==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=X+91x5XKoUfrfKTqDx3QI4eHyqzJIQ3/p9sD2Futs+E=;
+        b=FmXYY4NyCZmTb9NhAIqrZJz8Nb2CsMNJk0JRyjWNf8yT9FvOg5kViheIUkN0GyB6On
+         NAa4i25YDp3OfpiqzunD7OSJYGt6O5c3kkdSOdIl7NIf2VVX4V/GkwNFYX/d0xAiEja+
+         QT0Id5o49/HUWPD/mOUpS0Pt5hU0neMl0N5VXm46ms+4JU9l7cQpa/wdkC5o4x+Xgyfa
+         WdDGd0Ux0r2XYPD5IAfycSX6eIpMUKizaT7gj8CIXvm1N2zJizgGBR8lTI54TJe9avju
+         6YWipZhil84biJl+mQYGJJ1TUcGN1OMxmFsr6Y82Cp55ca6W7Fn15mPt2WS4kt7IGp14
+         gyzQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=JVzYmZGQKLhEeUPEA+xNAmt2zNP+Ngp3oPl2Ypb8r78=;
-        b=SLqxOo7yJI+21wFClXCJFiObhAVrdmGGPYTVli5S9/7g57w2o54IvVohy7NLf376Q6
-         thiVQsR0Z/3XgJ828zSFsk2zV2pObmcO9RJ9xcfuuLI3AQbn4McmdbgpwIuajpMBu10v
-         uTr7UO5/dGcrN44O1TXyYLaR/Lz9Pg8eBse2lxbaMl8zuAJhsh1NSRA23OMFnGy44r0k
-         j076o+4GKAemVontx8lusKjzrZm+6SbFoErAHRBNdcFjVSSZn1l+6YwtC//9zNBJRIM0
-         DeIgbCqtxwgOQsJgQ4xwVzyqrlketL2XXQCb9YAtl6osTpCQGoDurooFryOAnAFFZfSC
-         ONiw==
-X-Gm-Message-State: AOAM530dgP5zaLOrN5gZSyS8BXcQ5PYh7+0L/l3MppWP4+sFAqmEOr6j
-        IU3E+9r+zS4+36+v3wO1QI4J/v6S5O/GSQ==
-X-Google-Smtp-Source: ABdhPJy8ONMilxhsg9fjiObA1jH6T6BFwmlnm9gysvc0CH3a2CoSkt9kcK4SMqM42J6EGfynF5I8ew==
-X-Received: by 2002:a05:6214:762:: with SMTP id f2mr10578369qvz.48.1630910406359;
-        Sun, 05 Sep 2021 23:40:06 -0700 (PDT)
-Received: from [172.17.0.2] ([20.190.224.119])
-        by smtp.gmail.com with ESMTPSA id e22sm4764627qte.57.2021.09.05.23.40.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 05 Sep 2021 23:40:06 -0700 (PDT)
-Message-ID: <6135b7c6.1c69fb81.7a59d.90d3@mx.google.com>
-Date:   Sun, 05 Sep 2021 23:40:06 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7445914430567690383=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, howardchung@google.com
-Subject: RE: [Bluez,v2,1/2] plugins/admin: add adapter_remove handler
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210906140250.Bluez.v2.1.Id597e5ae87e680e6a744a8ed08d5000aacfce867@changeid>
-References: <20210906140250.Bluez.v2.1.Id597e5ae87e680e6a744a8ed08d5000aacfce867@changeid>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=X+91x5XKoUfrfKTqDx3QI4eHyqzJIQ3/p9sD2Futs+E=;
+        b=Rsiwj7ZEpeuvOeySAqzVbJRounR483nhefOSmOY1qivDqhxSCkJ+fFNVfxI0TNi5kv
+         AbkzssFtcnUePpkO60urTlyB/SZO9AUlsWMpHxQ/pWsuAP2GHrbP6JHnezz18yxpOGz9
+         Q4lKrqOtPlg+yfZUDE0u+2+PeJtf3kNx5QehwbLly9SsVh9TGXwNENHINiYCc3UxE9oM
+         KSkx3ceaKFMhu65OR+T6dGZA3oR6k6tGKdsrJYx5FgESR/WLNiulH54gcWpjWY/ewC9W
+         eODn7vpdQVpS822jYq8wU2Co+ow0N0Jp7COiM6BUUj9wIFOjsuLeEfofdXZ2IlCET4XO
+         jn/Q==
+X-Gm-Message-State: AOAM531lKx6E4xIIA5Uy539NjjL/fbYUuWrzEVXBXUKlj7uZHikJkD7+
+        cXedW94bLxzAjVAqCTA71relQlTzSxKsBlZB7XqtXznrG1e29Bx5IACfqCJ+eqHr6TMC8lSC6Ft
+        g+Qmbo2H5d/yhNP6zIoO5+2yqdUHWwLyNYXQMmQAJo6m/az6JcF6SylEj38Hy6BHoJ0ozCsnIZH
+        Xs
+X-Google-Smtp-Source: ABdhPJz2MMShuYr47Js56WsCUCnQKoWXG2wJtzfywXOI8SMFH54pVNDg7ulcpsdO91deZjq/wE0YP7ajbuiX
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:3b13:95ba:12e5:7134])
+ (user=apusaka job=sendgmr) by 2002:a05:6214:2427:: with SMTP id
+ gy7mr10859783qvb.20.1630915494943; Mon, 06 Sep 2021 01:04:54 -0700 (PDT)
+Date:   Mon,  6 Sep 2021 16:04:38 +0800
+Message-Id: <20210906080450.1771211-1-apusaka@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
+Subject: [Bluez PATCH v4 00/12] Inclusive language changes
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7445914430567690383==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Archie Pusaka <apusaka@chromium.org>
 
-This is automated email and please do not reply to this email!
+Hi BlueZ maintainers,
 
-Dear submitter,
+This series of patches promotes the usage of the more inclusive terms
+such as central/peripheral, accept list/reject list, or their
+equivalent where appropriate.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=542331
+This is also reflected on the changes to Core spec v5.3 and the
+appropriate language mapping table by Bluetooth SIG
+https://specificationrefs.bluetooth.com/language-mapping/Appropriate_Language_Mapping_Table.pdf
 
----Test result---
+As you suggested, I dropped the Android changes and merge patches
+which belong to the same directory into one patch.
 
-Test Summary:
-CheckPatch                    PASS      0.46 seconds
-GitLint                       PASS      0.20 seconds
-Prep - Setup ELL              PASS      40.61 seconds
-Build - Prep                  PASS      0.09 seconds
-Build - Configure             PASS      7.15 seconds
-Build - Make                  PASS      177.46 seconds
-Make Check                    PASS      9.32 seconds
-Make Distcheck                PASS      214.73 seconds
-Build w/ext ELL - Configure   PASS      7.19 seconds
-Build w/ext ELL - Make        PASS      167.46 seconds
+Note that the following terms are not replaced:
+(1) those involving storage format (i.e. storing LTK)
+(2) those which belong to the libbluetooth API
 
-Details
-##############################
-Test: CheckPatch - PASS
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Thanks,
+Archie
 
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
+Changes in v4:
+* Fix line over 80 columns
 
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
+Changes in v3:
+* Not replacing some terms which belong to libluetooth API
 
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
+Changes in v2:
+* Merging several patches from the same directory into one
 
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
+Archie Pusaka (12):
+  lib: Inclusive language changes
+  btio: Inclusive language changes
+  monitor: Inclusive language changes
+  emulator: Inclusive language changes
+  tools: Inclusive language changes
+  plugins/sixaxis: Inclusive language changes
+  profiles: Inclusive language changes
+  src: Inclusive language changes
+  client: Inclusive language changes
+  mesh: Inclusive language changes
+  unit/mesh: Inclusive language changes
+  doc: Inclusive language update
 
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
+ android/a2dp.c             |   2 +-
+ android/bluetooth.c        |   4 +-
+ android/handsfree-client.c |   2 +-
+ android/tester-main.c      |   2 +-
+ btio/btio.c                |  42 ++--
+ btio/btio.h                |   2 +-
+ client/main.c              |   6 +-
+ doc/mesh-api.txt           |   2 +-
+ doc/mgmt-api.txt           |   6 +-
+ emulator/btdev.c           | 204 +++++++++---------
+ emulator/hciemu.c          |  21 +-
+ emulator/hciemu.h          |  12 +-
+ emulator/le.c              | 116 +++++------
+ emulator/serial.c          |   6 +-
+ emulator/smp.c             |   8 +-
+ lib/hci.c                  |  22 +-
+ lib/mgmt.h                 |   2 +-
+ mesh/net-keys.c            |  38 ++--
+ mesh/net-keys.h            |   8 +-
+ mesh/net.h                 |   4 +-
+ monitor/broadcom.c         |   8 +-
+ monitor/bt.h               | 150 +++++++-------
+ monitor/control.c          |  14 +-
+ monitor/l2cap.c            |  10 +-
+ monitor/ll.c               |  60 +++---
+ monitor/lmp.c              |   2 +-
+ monitor/packet.c           | 411 +++++++++++++++++++------------------
+ plugins/sixaxis.c          |  44 ++--
+ profiles/audio/a2dp.c      |   2 +-
+ profiles/audio/avctp.c     |  10 +-
+ profiles/audio/avctp.h     |   2 +-
+ profiles/health/mcap.c     |  20 +-
+ profiles/health/mcap.h     |   2 +-
+ profiles/sap/server.c      |   2 +-
+ src/adapter.c              | 113 +++++-----
+ src/adapter.h              |   4 +-
+ src/device.c               |   6 +-
+ src/sdpd-server.c          |   8 +-
+ src/sdpd.h                 |   2 +-
+ src/shared/ad.c            |   8 +-
+ src/shared/ad.h            |   2 +-
+ src/shared/hfp.c           |   4 +-
+ src/shared/hfp.h           |   2 +-
+ tools/3dsp.c               |  62 +++---
+ tools/bdaddr.rst           |   2 +-
+ tools/btiotest.c           |  22 +-
+ tools/btpclientctl.c       |   2 +-
+ tools/hci-tester.c         |  16 +-
+ tools/hciconfig.c          | 148 ++++++++-----
+ tools/hciconfig.rst        |  24 +--
+ tools/hcitool.c            | 102 ++++-----
+ tools/hcitool.rst          |  30 +--
+ tools/l2cap-tester.c       |  36 ++--
+ tools/l2test.c             |  18 +-
+ tools/mesh-cfgclient.c     |   4 +-
+ tools/mesh-gatt/mesh-net.h |   4 +-
+ tools/mesh-gatt/net.c      |  60 +++---
+ tools/mesh/mesh-db.c       |  28 ++-
+ tools/mesh/mesh-db.h       |   4 +-
+ tools/mesh/remote.c        |  53 +++--
+ tools/mesh/remote.h        |   5 +-
+ tools/meshctl.c            |   6 +-
+ tools/mgmt-tester.c        | 138 +++++++------
+ tools/oobtest.c            |  12 +-
+ tools/parser/avdtp.c       |  11 +-
+ tools/parser/csr.c         |  17 +-
+ tools/parser/ericsson.c    |   2 +-
+ tools/parser/hci.c         |  38 ++--
+ tools/parser/lmp.c         | 112 +++++-----
+ tools/parser/parser.h      |   2 +-
+ tools/parser/smp.c         |  12 +-
+ tools/rctest.c             |  19 +-
+ tools/rctest.rst           |   4 +-
+ tools/rfcomm-tester.c      |  14 +-
+ tools/rfcomm.c             |  15 +-
+ tools/rfcomm.rst           |   2 +-
+ tools/sco-tester.c         |  10 +-
+ tools/smp-tester.c         |  16 +-
+ unit/test-mesh-crypto.c    |   4 +-
+ 79 files changed, 1256 insertions(+), 1193 deletions(-)
 
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
+-- 
+2.33.0.153.gba50c8fa24-goog
 
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7445914430567690383==--
