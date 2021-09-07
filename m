@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C7F6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 152F0C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 361FB6108E
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E4E16610FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242310AbhIGKIk (ORCPT
+        id S244056AbhIGKIm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Sep 2021 06:08:40 -0400
-Received: from mga17.intel.com ([192.55.52.151]:1669 "EHLO mga17.intel.com"
+        Tue, 7 Sep 2021 06:08:42 -0400
+Received: from mga17.intel.com ([192.55.52.151]:1677 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233299AbhIGKIj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Sep 2021 06:08:39 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10099"; a="200362812"
+        id S243953AbhIGKIl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Sep 2021 06:08:41 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10099"; a="200362820"
 X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
-   d="scan'208";a="200362812"
+   d="scan'208";a="200362820"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 03:07:33 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 03:07:35 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
-   d="scan'208";a="512785086"
+   d="scan'208";a="512785107"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga001.jf.intel.com with ESMTP; 07 Sep 2021 03:07:31 -0700
+  by orsmga001.jf.intel.com with ESMTP; 07 Sep 2021 03:07:33 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
         luiz.von.dentz@intel.com, michaelfsun@google.com,
         Kiran K <kiran.k@intel.com>
-Subject: [PATCH v15 02/13] Bluetooth: Add support for Read Local Supported Codecs V2
-Date:   Tue,  7 Sep 2021 15:42:38 +0530
-Message-Id: <20210907101249.7323-2-kiran.k@intel.com>
+Subject: [PATCH v15 03/13] Bluetooth: btintel: Read supported offload use cases
+Date:   Tue,  7 Sep 2021 15:42:39 +0530
+Message-Id: <20210907101249.7323-3-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210907101249.7323-1-kiran.k@intel.com>
 References: <20210907101249.7323-1-kiran.k@intel.com>
@@ -45,53 +45,11 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Use V2 version of read local supported command is controller
-supports
-
-snoop:
-> HCI Event: Command Complete (0x0e) plen 20
-      Read Local Supported Codecs V2 (0x04|0x000d) ncmd 1
-        Status: Success (0x00)
-        Number of supported codecs: 7
-          Codec: u-law log (0x00)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: A-law log (0x01)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: CVSD (0x02)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Transparent (0x03)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Linear PCM (0x04)
-          Logical Transport Type: 0x02
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: Reserved (0x08)
-          Logical Transport Type: 0x03
-            Codec supported over BR/EDR ACL
-            Codec supported over BR/EDR SCO and eSCO
-          Codec: mSBC (0x05)
-          Logical Transport Type: 0x03
-            Codec supported over BR/EDR ACL
-            Codec supported over BR/EDR SCO and eSCO
-        Number of vendor codecs: 0
-......
-< HCI Command: Read Local Suppor.. (0x04|0x000e) plen 7
-        Codec: mSBC (0x05)
-        Logical Transport Type: 0x00
-        Direction: Input (Host to Controller) (0x00)
-> HCI Event: Command Complete (0x0e) plen 12
-      Read Local Supported Codec Capabilities (0x04|0x000e) ncmd 1
-        Status: Success (0x00)
-        Number of codec capabilities: 1
-         Capabilities #0:
-        00 00 11 15 02 33
+Read offload use cases supported by controller.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
-Signed-off-by: Chethan T N <chethan.tumkur.narayan@intel.com>
-Signed-off-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
+Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
 
 Notes:
@@ -105,185 +63,86 @@ Notes:
      - No changes
     
     * changes in v12:
-     - Refactor code related to reading codec capabilities
+     - s/usecase/use_case/g
     
     * changes in v11:
       - Remove Kconfig related changes
-      - Move codec related functions to hci_codec.c
-    
     * changes in v10:
-      no changes
-    
+      - restructure patch to have  definition and call of callaback in the
+        same patch
     * changes in v9:
-      use vnd as shortcut name for vendor instead of ven
-    
-    * changes in v8:
-      no changes
-    
-    * changes in v7:
-      call codec enumeration code in hci_init instead of having it in a separate
-      function
-    
-    * changes in v6
-      no changes
-    
-    * changes in v5:
-      fix review comments
-    
-    * changes in v4:
-      converts codec read capabilities calls from async to sync
-    
-    * changes in v3:
-      No changes
-    
-    * changes in v2:
-      add length check for event data before accessing
+      - define a separate patch for core changes
 
- include/net/bluetooth/hci.h | 29 ++++++++++++++++
- net/bluetooth/hci_codec.c   | 66 +++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_codec.h   |  1 +
- net/bluetooth/hci_core.c    |  4 ++-
- 4 files changed, 99 insertions(+), 1 deletion(-)
+ drivers/bluetooth/btintel.c | 32 ++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btintel.h |  5 +++++
+ 2 files changed, 37 insertions(+)
 
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 13a93da6b76c..ad88e5d44d7c 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -1338,6 +1338,35 @@ struct hci_rp_read_local_pairing_opts {
- 	__u8     max_key_size;
- } __packed;
- 
-+#define HCI_OP_READ_LOCAL_CODECS_V2	0x100d
-+struct hci_std_codec_v2 {
-+	__u8	id;
-+	__u8	transport;
-+} __packed;
-+
-+struct hci_std_codecs_v2 {
-+	__u8	num;
-+	struct hci_std_codec_v2 codec[];
-+} __packed;
-+
-+struct hci_vnd_codec_v2 {
-+	__u8	id;
-+	__le16	cid;
-+	__le16	vid;
-+	__u8	transport;
-+} __packed;
-+
-+struct hci_vnd_codecs_v2 {
-+	__u8	num;
-+	struct hci_vnd_codec_v2 codec[];
-+} __packed;
-+
-+struct hci_rp_read_local_supported_codecs_v2 {
-+	__u8	status;
-+	struct hci_std_codecs_v2 std_codecs;
-+	struct hci_vnd_codecs_v2 vendor_codecs;
-+} __packed;
-+
- #define HCI_OP_READ_LOCAL_CODEC_CAPS	0x100e
- struct hci_op_read_local_codec_caps {
- 	__u8	id;
-diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
-index f86ca6ba5814..f0421d0edaa3 100644
---- a/net/bluetooth/hci_codec.c
-+++ b/net/bluetooth/hci_codec.c
-@@ -170,3 +170,69 @@ void hci_read_supported_codecs(struct hci_dev *hdev)
- error:
- 	kfree_skb(skb);
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 7236f40b7a9c..60f9866c6792 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2158,6 +2158,35 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+ 	return err;
  }
-+
-+void hci_read_supported_codecs_v2(struct hci_dev *hdev)
+ 
++static int btintel_configure_offload(struct hci_dev *hdev)
 +{
 +	struct sk_buff *skb;
-+	struct hci_rp_read_local_supported_codecs_v2 *rp;
-+	struct hci_std_codecs_v2 *std_codecs;
-+	struct hci_vnd_codecs_v2 *vnd_codecs;
-+	struct hci_op_read_local_codec_caps caps;
-+	__u8 i;
++	int err = 0;
++	struct intel_offload_use_cases *use_cases;
 +
-+	skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODECS_V2, 0, NULL,
-+			     HCI_CMD_TIMEOUT);
-+
++	skb = __hci_cmd_sync(hdev, 0xfc86, 0, NULL, HCI_INIT_TIMEOUT);
 +	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Failed to read local supported codecs (%ld)",
++		bt_dev_err(hdev, "Reading offload use cases failed (%ld)",
 +			   PTR_ERR(skb));
-+		return;
++		return PTR_ERR(skb);
 +	}
 +
-+	if (skb->len < sizeof(*rp))
++	if (skb->len < sizeof(*use_cases)) {
++		err = -EIO;
 +		goto error;
-+
-+	rp = (void *)skb->data;
-+
-+	if (rp->status)
-+		goto error;
-+
-+	skb_pull(skb, sizeof(rp->status));
-+
-+	std_codecs = (void *)skb->data;
-+
-+	/* check for payload data length before accessing */
-+	if (skb->len < flex_array_size(std_codecs, codec, std_codecs->num)
-+	    + sizeof(std_codecs->num))
-+		goto error;
-+
-+	memset(&caps, 0, sizeof(caps));
-+
-+	for (i = 0; i < std_codecs->num; i++) {
-+		caps.id = std_codecs->codec[i].id;
-+		hci_read_codec_capabilities(hdev, std_codecs->codec[i].transport,
-+					    &caps);
 +	}
 +
-+	skb_pull(skb, flex_array_size(std_codecs, codec, std_codecs->num)
-+		 + sizeof(std_codecs->num));
++	use_cases = (void *)skb->data;
 +
-+	vnd_codecs = (void *)skb->data;
-+
-+	/* check for payload data length before accessing */
-+	if (skb->len <
-+	    flex_array_size(vnd_codecs, codec, vnd_codecs->num)
-+	    + sizeof(vnd_codecs->num))
++	if (use_cases->status) {
++		err = -bt_to_errno(skb->data[0]);
 +		goto error;
-+
-+	for (i = 0; i < vnd_codecs->num; i++) {
-+		caps.id = 0xFF;
-+		caps.cid = vnd_codecs->codec[i].cid;
-+		caps.vid = vnd_codecs->codec[i].vid;
-+		hci_read_codec_capabilities(hdev, vnd_codecs->codec[i].transport,
-+					    &caps);
 +	}
-+
 +error:
 +	kfree_skb(skb);
++	return err;
 +}
-diff --git a/net/bluetooth/hci_codec.h b/net/bluetooth/hci_codec.h
-index efb0df634ac6..a2751930f123 100644
---- a/net/bluetooth/hci_codec.h
-+++ b/net/bluetooth/hci_codec.h
-@@ -3,4 +3,5 @@
- /* Copyright (C) 2014 Intel Corporation */
++
+ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 					struct intel_version_tlv *ver)
+ {
+@@ -2199,6 +2228,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
+ 	 */
+ 	btintel_load_ddc_config(hdev, ddcname);
  
- void hci_read_supported_codecs(struct hci_dev *hdev);
-+void hci_read_supported_codecs_v2(struct hci_dev *hdev);
- void hci_codec_list_clear(struct list_head *codec_list);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index a80d813ef743..5236faa397fa 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -935,7 +935,9 @@ static int __hci_init(struct hci_dev *hdev)
- 		return err;
++	/* Read supported use cases and set callbacks to fetch datapath id */
++	btintel_configure_offload(hdev);
++
+ 	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
  
- 	/* Read local codec list if the HCI command is supported */
--	if (hdev->commands[29] & 0x20)
-+	if (hdev->commands[45] & 0x04)
-+		hci_read_supported_codecs_v2(hdev);
-+	else if (hdev->commands[29] & 0x20)
- 		hci_read_supported_codecs(hdev);
+ 	/* Read the Intel version information after loading the FW  */
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index fe02cb9ac96c..e500c0d7a729 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -132,6 +132,11 @@ struct intel_debug_features {
+ 	__u8    page1[16];
+ } __packed;
  
- 	/* This function is only called when the controller is actually in
++struct intel_offload_use_cases {
++	__u8	status;
++	__u8	preset[8];
++} __packed;
++
+ #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
+ #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
+ #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
 -- 
 2.17.1
 
