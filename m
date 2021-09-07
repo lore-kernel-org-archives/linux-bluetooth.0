@@ -7,37 +7,37 @@ X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 152F0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D4E40C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E4E16610FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B3D7A61103
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 10:07:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244056AbhIGKIm (ORCPT
+        id S244099AbhIGKIq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Sep 2021 06:08:42 -0400
+        Tue, 7 Sep 2021 06:08:46 -0400
 Received: from mga17.intel.com ([192.55.52.151]:1677 "EHLO mga17.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243953AbhIGKIl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Sep 2021 06:08:41 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10099"; a="200362820"
+        id S244061AbhIGKIo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Sep 2021 06:08:44 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10099"; a="200362826"
 X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
-   d="scan'208";a="200362820"
+   d="scan'208";a="200362826"
 Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 03:07:35 -0700
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Sep 2021 03:07:38 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,274,1624345200"; 
-   d="scan'208";a="512785107"
+   d="scan'208";a="512785124"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by orsmga001.jf.intel.com with ESMTP; 07 Sep 2021 03:07:33 -0700
+  by orsmga001.jf.intel.com with ESMTP; 07 Sep 2021 03:07:36 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
         luiz.von.dentz@intel.com, michaelfsun@google.com,
         Kiran K <kiran.k@intel.com>
-Subject: [PATCH v15 03/13] Bluetooth: btintel: Read supported offload use cases
-Date:   Tue,  7 Sep 2021 15:42:39 +0530
-Message-Id: <20210907101249.7323-3-kiran.k@intel.com>
+Subject: [PATCH v15 04/13] Bluetooth: Allow querying of supported offload codecs over SCO socket
+Date:   Tue,  7 Sep 2021 15:42:40 +0530
+Message-Id: <20210907101249.7323-4-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
 In-Reply-To: <20210907101249.7323-1-kiran.k@intel.com>
 References: <20210907101249.7323-1-kiran.k@intel.com>
@@ -45,7 +45,8 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Read offload use cases supported by controller.
+Add BT_CODEC option for getsockopt systemcall to get the details
+of offload codecs supported over SCO socket
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
@@ -54,95 +55,215 @@ Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 
 Notes:
     * changes in v15:
-     - No changes
+     - s/TRANSPORT_SCO_ESCO/HCI_TRANSPORT_SCO_ESCO/g
+     - Remove unused macro TRAMSPORT_ACL
     
     * changes in v14:
-     - No changes
+     - No chnages
     
     * changes in v13:
      - No changes
     
     * changes in v12:
-     - s/usecase/use_case/g
+     - check for mgmt flag before querying codecs
     
     * changes in v11:
-      - Remove Kconfig related changes
+     - Remove Kconfig related changes
+    
     * changes in v10:
-      - restructure patch to have  definition and call of callaback in the
-        same patch
-    * changes in v9:
-      - define a separate patch for core changes
+     - In getsockopt, prepare data in advance and call copy_to_user
+       instead of calling put_user on each field of struct bt_codec
 
- drivers/bluetooth/btintel.c | 32 ++++++++++++++++++++++++++++++++
- drivers/bluetooth/btintel.h |  5 +++++
- 2 files changed, 37 insertions(+)
+ include/net/bluetooth/bluetooth.h |  20 ++++++
+ include/net/bluetooth/hci.h       |   4 ++
+ include/net/bluetooth/hci_core.h  |   1 +
+ net/bluetooth/sco.c               | 101 ++++++++++++++++++++++++++++++
+ 4 files changed, 126 insertions(+)
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 7236f40b7a9c..60f9866c6792 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2158,6 +2158,35 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 	return err;
- }
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 9125effbf448..64cddff0c9c4 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -153,6 +153,26 @@ struct bt_voice {
  
-+static int btintel_configure_offload(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	int err = 0;
-+	struct intel_offload_use_cases *use_cases;
-+
-+	skb = __hci_cmd_sync(hdev, 0xfc86, 0, NULL, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		bt_dev_err(hdev, "Reading offload use cases failed (%ld)",
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	if (skb->len < sizeof(*use_cases)) {
-+		err = -EIO;
-+		goto error;
-+	}
-+
-+	use_cases = (void *)skb->data;
-+
-+	if (use_cases->status) {
-+		err = -bt_to_errno(skb->data[0]);
-+		goto error;
-+	}
-+error:
-+	kfree_skb(skb);
-+	return err;
-+}
-+
- static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 					struct intel_version_tlv *ver)
- {
-@@ -2199,6 +2228,9 @@ static int btintel_bootloader_setup_tlv(struct hci_dev *hdev,
- 	 */
- 	btintel_load_ddc_config(hdev, ddcname);
+ #define BT_SCM_PKT_STATUS	0x03
  
-+	/* Read supported use cases and set callbacks to fetch datapath id */
-+	btintel_configure_offload(hdev);
++#define BT_CODEC	19
 +
- 	hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);
- 
- 	/* Read the Intel version information after loading the FW  */
-diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
-index fe02cb9ac96c..e500c0d7a729 100644
---- a/drivers/bluetooth/btintel.h
-+++ b/drivers/bluetooth/btintel.h
-@@ -132,6 +132,11 @@ struct intel_debug_features {
- 	__u8    page1[16];
- } __packed;
- 
-+struct intel_offload_use_cases {
-+	__u8	status;
-+	__u8	preset[8];
++struct	bt_codec_caps {
++	__u8	len;
++	__u8	data[];
 +} __packed;
 +
- #define INTEL_HW_PLATFORM(cnvx_bt)	((u8)(((cnvx_bt) & 0x0000ff00) >> 8))
- #define INTEL_HW_VARIANT(cnvx_bt)	((u8)(((cnvx_bt) & 0x003f0000) >> 16))
- #define INTEL_CNVX_TOP_TYPE(cnvx_top)	((cnvx_top) & 0x00000fff)
++struct bt_codec {
++	__u8	id;
++	__u16	cid;
++	__u16	vid;
++	__u8	data_path;
++	__u8	num_caps;
++} __packed;
++
++struct bt_codecs {
++	__u8		num_codecs;
++	struct bt_codec	codecs[];
++} __packed;
++
+ __printf(1, 2)
+ void bt_info(const char *fmt, ...);
+ __printf(1, 2)
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index ad88e5d44d7c..c20e11f4b54c 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -331,6 +331,7 @@ enum {
+ 	HCI_CMD_PENDING,
+ 	HCI_FORCE_NO_MITM,
+ 	HCI_QUALITY_REPORT,
++	HCI_OFFLOAD_CODECS_ENABLED,
+ 
+ 	__HCI_NUM_FLAGS,
+ };
+@@ -2622,6 +2623,9 @@ static inline struct hci_sco_hdr *hci_sco_hdr(const struct sk_buff *skb)
+ #define hci_iso_data_len(h)		((h) & 0x3fff)
+ #define hci_iso_data_flags(h)		((h) >> 14)
+ 
++/* codec transport types */
++#define HCI_TRANSPORT_SCO_ESCO	0x01
++
+ /* le24 support */
+ static inline void hci_cpu_to_le24(__u32 val, __u8 dst[3])
+ {
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 585cbe7ff67d..655e2a119e7f 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -619,6 +619,7 @@ struct hci_dev {
+ 	void (*cmd_timeout)(struct hci_dev *hdev);
+ 	bool (*prevent_wake)(struct hci_dev *hdev);
+ 	int (*set_quality_report)(struct hci_dev *hdev, bool enable);
++	int (*get_data_path_id)(struct hci_dev *hdev, __u8 *data_path);
+ };
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 6e047e178c0a..df8cba0c9cc4 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -972,6 +972,12 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct bt_voice voice;
+ 	u32 phys;
+ 	int pkt_status;
++	int buf_len;
++	struct codec_list *c;
++	u8 num_codecs, i, __user *ptr;
++	struct hci_dev *hdev;
++	struct hci_codec_caps *caps;
++	struct bt_codec codec;
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+@@ -1036,6 +1042,101 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 			err = -EFAULT;
+ 		break;
+ 
++	case BT_CODEC:
++		num_codecs = 0;
++		buf_len = 0;
++
++		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
++		if (!hdev) {
++			err = -EBADFD;
++			break;
++		}
++
++		if (!hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED)) {
++			hci_dev_put(hdev);
++			err = -EOPNOTSUPP;
++			break;
++		}
++
++		if (!hdev->get_data_path_id) {
++			hci_dev_put(hdev);
++			err = -EOPNOTSUPP;
++			break;
++		}
++
++		/* find total buffer size required to copy codec + caps */
++		hci_dev_lock(hdev);
++		list_for_each_entry(c, &hdev->local_codecs, list) {
++			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
++				continue;
++			num_codecs++;
++			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
++				buf_len += 1 + caps->len;
++				caps = (void *)&caps->data[caps->len];
++			}
++			buf_len += sizeof(struct bt_codec);
++		}
++		hci_dev_unlock(hdev);
++
++		buf_len += sizeof(struct bt_codecs);
++		if (buf_len > len) {
++			hci_dev_put(hdev);
++			err = -ENOBUFS;
++			break;
++		}
++		ptr = optval;
++
++		if (put_user(num_codecs, ptr)) {
++			hci_dev_put(hdev);
++			err = -EFAULT;
++			break;
++		}
++		ptr += sizeof(num_codecs);
++
++		/* Iterate all the codecs supported over SCO and populate
++		 * codec data
++		 */
++		hci_dev_lock(hdev);
++		list_for_each_entry(c, &hdev->local_codecs, list) {
++			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
++				continue;
++
++			codec.id = c->id;
++			codec.cid = c->cid;
++			codec.vid = c->vid;
++			err = hdev->get_data_path_id(hdev, &codec.data_path);
++			if (err < 0)
++				break;
++			codec.num_caps = c->num_caps;
++			if (copy_to_user(ptr, &codec, sizeof(codec))) {
++				err = -EFAULT;
++				break;
++			}
++			ptr += sizeof(codec);
++
++			/* find codec capabilities data length */
++			len = 0;
++			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
++				len += 1 + caps->len;
++				caps = (void *)&caps->data[caps->len];
++			}
++
++			/* copy codec capabilities data */
++			if (len && copy_to_user(ptr, c->caps, len)) {
++				err = -EFAULT;
++				break;
++			}
++			ptr += len;
++		}
++
++		if (!err && put_user(buf_len, optlen))
++			err = -EFAULT;
++
++		hci_dev_unlock(hdev);
++		hci_dev_put(hdev);
++
++		break;
++
+ 	default:
+ 		err = -ENOPROTOOPT;
+ 		break;
 -- 
 2.17.1
 
