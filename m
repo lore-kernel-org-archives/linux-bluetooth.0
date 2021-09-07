@@ -2,167 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 880E2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 22:07:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 39580C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 22:30:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6A51C610A3
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 22:07:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2119761101
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Sep 2021 22:30:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346840AbhIGWJB (ORCPT
+        id S1346427AbhIGWbR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Sep 2021 18:09:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36254 "EHLO
+        Tue, 7 Sep 2021 18:31:17 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41326 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231251AbhIGWJA (ORCPT
+        with ESMTP id S1344382AbhIGWbR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Sep 2021 18:09:00 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB0AC061575
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Sep 2021 15:07:53 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id a15so527493iot.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Sep 2021 15:07:53 -0700 (PDT)
+        Tue, 7 Sep 2021 18:31:17 -0400
+Received: from mail-pj1-x102f.google.com (mail-pj1-x102f.google.com [IPv6:2607:f8b0:4864:20::102f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C14AC061575
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Sep 2021 15:30:10 -0700 (PDT)
+Received: by mail-pj1-x102f.google.com with SMTP id m21-20020a17090a859500b00197688449c4so100336pjn.0
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Sep 2021 15:30:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=PZA+xvanC7A3HMagvoleXRmk6Q05IjiZFkTm8d3pv4A=;
-        b=fRC5b9IkBR2bf4+kDGttpObj84Kxkt7jMZOr2MDGzNdkXTRgIceeBXLxMzSmCKYdIY
-         eOIrIdb0zFHMK9cCqFEZkA7EaO5O3pN/JHlKmHZ/4aa7ApBYbIEBrq7OR5KFdVWLMtIO
-         cEdavt0GOGKQFyKu+TJlpcZXlhKgi4bDXk+t+KXPeSYktyQ8B+j9WNNkGFLC4aMYu0MU
-         jv7iGEiBNxkNHW6QzNll72BVEEyEUOPNX8OFIPpHEOYfYuiE/4fpbWjwuIbd1m9P8qzw
-         lmr7GtWfsoEFlmalnsKfKrk6QBktPiiPCCuL+FQNKJqAszTZpCC9cEw7fMNo41BhSOnd
-         iSDA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=i3F0z84ohA3gaRU7vi+1lhrskpPB6p/jomHClZ+pLRo=;
+        b=P5hPvn0Ix5xYNy8gy17/CwJtd1ToB8LW+W/yFaFU42fhFyaf1bsc/Mrp7Fz7blkIqz
+         gU/mNtfYZa2y4NYjQogPr7StfbNt8IqI++1iEdX/iSxcuKtBNNXoR9nIEVlSRJ21RZcS
+         iZcQOTuzDUEtZ+MZPsQSZwaLaSkhZcOL8NWsFCwmRwhJkhT4D3FtiOO4iDkR7HP2Pbeu
+         zSodc/CA+1KzD77MJihsZJzqodluS00Eor8IxIrfFfeFHQzurnhAj1G+ouV3I9MR+qZK
+         AWbcp9Ihjg5SfGEPFl2PeA/CpRpHaqlzpGY4mCTMug+gkcwKWKXWcZbm9AoEYUpWlyB9
+         cW4g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20161025;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=PZA+xvanC7A3HMagvoleXRmk6Q05IjiZFkTm8d3pv4A=;
-        b=TIBMRIOwFnX8kf2VXY66MOqXgK8Ae/frdHJstcRN1Ks3v59RIBvuqMVLvbVdssP7UZ
-         41G55W72j/5Y/aM4d3PgxEzXZeDrsjxfaIKswa3lY1jfM8tE4YvCHfn6Fp8/MC0ukCf/
-         UIqs/98gOZA6YjNx230tcUUPIQpTLEMTjZoj9HFntNw+caOO+PpWNpJQEJhK0luXjLZR
-         sIfJZ6vF2m47T/y9hAuiXeBNejUTaFFvfXgpnDVtgUTZmCqbRnWKR69pePxqm9R2CH9g
-         rrBh6zUv01myEO31tqkP4VBLQp1XbtHNzHHWN7rzSZX9peTlisfHEOW9ddLQMOiqSZhw
-         6XSg==
-X-Gm-Message-State: AOAM530vubiP4/SQ3llHnSEMKKK87MR+xzQ/UuFDszeBFcoWFb43NFzB
-        mLkeTskSPqRecd0hZbMszuQy0afBuz8FiD6o4IVBTp1q
-X-Google-Smtp-Source: ABdhPJx9K/Pg066uXyegxYrcgq/OoAY9QD1sgynxVB2mHPiDEPS7ocr7xz9YAgkgECEsHIdKDqxkuHDvbHD1kL5zAm4=
-X-Received: by 2002:a5e:990e:: with SMTP id t14mr339404ioj.75.1631052473186;
- Tue, 07 Sep 2021 15:07:53 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210907112556.11848-1-kiran.k@intel.com> <613752d2.1c69fb81.c33e2.0212@mx.google.com>
-In-Reply-To: <613752d2.1c69fb81.c33e2.0212@mx.google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=i3F0z84ohA3gaRU7vi+1lhrskpPB6p/jomHClZ+pLRo=;
+        b=nZa3oppRfc0d5M0BwvsbCg7bOtEnENqUsCaM97llQSVKSlKb6IvHqEed0rSCc7Ggrb
+         lbShYzVQacC4bftL4e9ukpCuDM81V73Xr4709Y9U+omC319o3dt3leAnskFJyRCRhLoK
+         HndZCl9CJGHWIbBPu+iNmm9tJ6PKugr0oYstILW93EHt8JdeJxbxLlrJg3WEH9UlIqKp
+         qz1B/OEbrSW1PH4kLHNPwSOkWoe2pOfYbft3jbKC7zXm0GeWAEtX7OYXllEzOWRGWIRx
+         B3JLYh+MGoShWgRodIgyg+edBRUw7WViBuXf4ND6pKJVfaYA/1IyK0R6qa7WpS6E837C
+         cvlg==
+X-Gm-Message-State: AOAM531KMXa90rMIMOGNerlEftJkpR82KhL4LycU97Djm9qDbOs9fEFN
+        49eCoZD5Y2mEYIXnEPs6XTST5Sq/V3E=
+X-Google-Smtp-Source: ABdhPJxYo/WalW8B9K42cPcOtO6yz2Jo3OUOCZkre5vtaXqPw6WK68Fyw2i/XwHEdPoNdn/P/FzQPQ==
+X-Received: by 2002:a17:90a:2:: with SMTP id 2mr666115pja.77.1631053809593;
+        Tue, 07 Sep 2021 15:30:09 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id x19sm153811pgk.37.2021.09.07.15.30.09
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Sep 2021 15:30:09 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 7 Sep 2021 15:07:42 -0700
-Message-ID: <CABBYNZJXgqBJe5QF-KTF0s2uY2FttbwjrJRpJQ561Oubi+9M5A@mail.gmail.com>
-Subject: Re: [v2,1/3] tools/sco-tester: add test cases to get offload codecs
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Kiran K <kiran.k@intel.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/5] adapter-api: Add Experimental property
+Date:   Tue,  7 Sep 2021 15:30:04 -0700
+Message-Id: <20210907223008.2322035-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Kiran,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Tue, Sep 7, 2021 at 4:58 AM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=543085
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      0.72 seconds
-> GitLint                       PASS      0.31 seconds
-> Prep - Setup ELL              PASS      41.19 seconds
-> Build - Prep                  PASS      0.09 seconds
-> Build - Configure             PASS      7.12 seconds
-> Build - Make                  PASS      178.50 seconds
-> Make Check                    PASS      8.98 seconds
-> Make Distcheck                PASS      219.84 seconds
-> Build w/ext ELL - Configure   PASS      7.29 seconds
-> Build w/ext ELL - Make        PASS      166.16 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> tools/sco-tester: add test cases to get offload codecs
-> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-> #27: FILE: lib/bluetooth.h:154:
-> +} __attribute__((packed));
->
-> WARNING:PREFER_DEFINED_ATTRIBUTE_MACRO: Prefer __packed over __attribute__((packed))
-> #32: FILE: lib/bluetooth.h:159:
-> +} __attribute__((packed));
->
-> - total: 0 errors, 2 warnings, 149 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> "[PATCH] tools/sco-tester: add test cases to get offload codecs" has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: GitLint - PASS
-> Desc: Run gitlint with rule in .gitlint
->
-> ##############################
-> Test: Prep - Setup ELL - PASS
-> Desc: Clone, build, and install ELL
->
-> ##############################
-> Test: Build - Prep - PASS
-> Desc: Prepare environment for build
->
-> ##############################
-> Test: Build - Configure - PASS
-> Desc: Configure the BlueZ source tree
->
-> ##############################
-> Test: Build - Make - PASS
-> Desc: Build the BlueZ source tree
->
-> ##############################
-> Test: Make Check - PASS
-> Desc: Run 'make check'
->
-> ##############################
-> Test: Make Distcheck - PASS
-> Desc: Run distcheck to check the distribution
->
-> ##############################
-> Test: Build w/ext ELL - Configure - PASS
-> Desc: Configure BlueZ source with '--enable-external-ell' configuration
->
-> ##############################
-> Test: Build w/ext ELL - Make - PASS
-> Desc: Build BlueZ source with '--enable-external-ell' configuration
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+This adds Experimental property which indicates what experimental
+features are currently enabled.
+---
+ doc/adapter-api.txt | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-Applied, thanks.
-
+diff --git a/doc/adapter-api.txt b/doc/adapter-api.txt
+index 464434a81..490608e8d 100644
+--- a/doc/adapter-api.txt
++++ b/doc/adapter-api.txt
+@@ -335,3 +335,8 @@ Properties	string Address [readonly]
+ 				"peripheral": Supports the peripheral role.
+ 				"central-peripheral": Supports both roles
+ 						      concurrently.
++
++		array{string} ExperimentalFeatures [readonly, optional]
++
++			List of 128-bit UUIDs that represents the experimental
++			features currently enabled.
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
