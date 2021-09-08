@@ -7,53 +7,53 @@ X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
 	USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6D1BEC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 11:20:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 29F32C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 11:20:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4FA4861139
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 11:20:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0B42C61078
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 11:20:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349147AbhIHLVJ (ORCPT
+        id S1351430AbhIHLVP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Sep 2021 07:21:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44552 "EHLO
+        Wed, 8 Sep 2021 07:21:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44568 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348280AbhIHLVJ (ORCPT
+        with ESMTP id S1351384AbhIHLVL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Sep 2021 07:21:09 -0400
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6826C061575
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 04:20:01 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id n34so1752287pfv.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Sep 2021 04:20:01 -0700 (PDT)
+        Wed, 8 Sep 2021 07:21:11 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44B84C06175F
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 04:20:04 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id u1so1091394plq.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Sep 2021 04:20:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=chromium.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=Coy2eW1XyQHI0Kys17CdQehAZIVSSakTIxwVO2f+uuk=;
-        b=ix7iuG6AMjXW4gtpi0mlq7XdWkNLJKw+27HLSTWoqCkn38ZqFuZWvO2p4u87CdJ06/
-         IvQGdOkCOdrhd4R3yZ+gfSMX3eoNlJFTcHBH8KxuwbVDqqK+42HnUOkpuUUTrxKxbwQ1
-         TXNQSxUUFS2ZT17aRGVRtsEcrtiV66t2TTnTo=
+        bh=pmk2a81JVl4SkAncwyxKrhCXZFyctOgBxo36TTei3kc=;
+        b=AWG1220m9+DCOAGn5Ytl/f+I2ojC1KPGwYixzk2HOe/AqaVO3K9yqyNxd/B9HKWV1T
+         du/mzJWSwa6TLuad+dcXAYyNHmm5m2yb6c95yjmS0YvspxMQORTQJrETXD3xiiEvEbf/
+         zLBg0dbQfcSQv0JXkIwPxqWZKyMQpeM14Cxog=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20161025;
+        d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Coy2eW1XyQHI0Kys17CdQehAZIVSSakTIxwVO2f+uuk=;
-        b=MuQfFsWY7OmJJyrFE1WzI7BWtBQXmOtcP8kyu2FQz0Y83Bk+sbCK4VWor/E2RT8rjT
-         CcxY2RixkPJMPiC7bNThcyG0lCkWpp33tlf5JTDg6Cmk9hj3wTM+iZ1fT8+JZ9bO4bbJ
-         kt40TlCzkumB9k9v/JS4E06U+ZsYpHx1jwfX3tFJ/zaBBX5PRL3cdK6sB2lCc4RwA0LM
-         f0IkE1TT6JGmSDyg6fm2jry+og3mzDWOqQaMF0NpqoYTLDN6ttBWROf6KajEyWjcTeJh
-         XiFZ238j2UbNO93ARyoKlzwhQzO1ya5jHpFHr1Xe/lTaa7EKU8vhNeCkrUxHzIpn/N4l
-         326Q==
-X-Gm-Message-State: AOAM530ZSRPDBTdogDy1h7b0lt4KyKCkTflT/rokBx2LWf+ykyCohssU
-        6rKR3uWdfSdvTm3NyFODoThEN7CvDJDfWQ==
-X-Google-Smtp-Source: ABdhPJw79A14sqmPxPpGF554ONNVKxU4Ccz7p0hqCDsDNCsj7Ug6QTvaEp1kipObIucWxMYDNen1Gg==
-X-Received: by 2002:a05:6a00:14c4:b0:412:444e:f600 with SMTP id w4-20020a056a0014c400b00412444ef600mr3039154pfu.83.1631100001200;
-        Wed, 08 Sep 2021 04:20:01 -0700 (PDT)
+        bh=pmk2a81JVl4SkAncwyxKrhCXZFyctOgBxo36TTei3kc=;
+        b=HPrmHkKqgMP4vTtW6FJI288g3nn3LKQOLwXxv3oK7dMcKoaDRaXmXPR/Ke/NPi0OVS
+         9Tn+BciAYVSrz0tPaFPNX/5SMZsTplr7RlJoKZ2+jWKcCEgqR8aiyd1nMjRDmobNiy0w
+         hZRJy485JmV0IQ4zTof0JUuOZ0QkRrFarnRCzv7HWwwapHnZAxs/KRQpZ1iemRXLgkp3
+         cR3S5VY1GiMBYH9Wr+B3WcYSE0qb/H7dvKvsR6FtAQEf82mnI4J4wMNUMq3T/kmxNdC/
+         JqWpzQqf12t1u0QIOHkWqL8NtxZNbqOH62uL7xAZ7Z+7ZMUzThRyHwhdSz9UF+Y9SxgX
+         xe+g==
+X-Gm-Message-State: AOAM5327Ax1CwdyO+ISri6SVVSGmaLyKRuzp58Y5p+Y1BG+FdeBmfPCO
+        4jEt+hWkqqJXqYuIt/jko5JnpsAQzitA9Q==
+X-Google-Smtp-Source: ABdhPJxHbqzFAiURaotJ7J2wZ1NVUHXZuEv5T02En4QRCuPNLGNTg50874q3/ZcCbJ9rEkc5ktwr2w==
+X-Received: by 2002:a17:902:b713:b0:132:5a48:18cb with SMTP id d19-20020a170902b71300b001325a4818cbmr2583683pls.50.1631100003426;
+        Wed, 08 Sep 2021 04:20:03 -0700 (PDT)
 Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:6939:f2f4:4be:bf22])
-        by smtp.gmail.com with ESMTPSA id v6sm2160881pjr.41.2021.09.08.04.19.59
+        by smtp.gmail.com with ESMTPSA id v6sm2160881pjr.41.2021.09.08.04.20.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 08 Sep 2021 04:20:00 -0700 (PDT)
+        Wed, 08 Sep 2021 04:20:03 -0700 (PDT)
 From:   Joseph Hwang <josephsih@chromium.org>
 To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
         luiz.dentz@gmail.com, pali@kernel.org
@@ -62,9 +62,9 @@ Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
         Miao-chen Chou <mcchou@chromium.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org
-Subject: [PATCH v2 2/3] Bluetooth: hci_qca: Set up Qualcomm WCN399x for Android BQR commands
-Date:   Wed,  8 Sep 2021 19:19:50 +0800
-Message-Id: <20210908191915.v2.2.Ie2014b5e6ed62dee26015805cf9c9b00d8dc64e5@changeid>
+Subject: [PATCH v2 3/3] Bluetooth: btrtl: Set up Realtek 8822CE for Android BQR commands
+Date:   Wed,  8 Sep 2021 19:19:51 +0800
+Message-Id: <20210908191915.v2.3.Ic8dcac2622d16775748f9d36c0a5e893372aa48d@changeid>
 X-Mailer: git-send-email 2.33.0.153.gba50c8fa24-goog
 In-Reply-To: <20210908191915.v2.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
 References: <20210908191915.v2.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
@@ -74,7 +74,7 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch sets up Qualcomm WCN399x to support the Android BQR commands.
+This patch sets up Realtek 8822CE to support the Android BQR commands.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 Signed-off-by: Joseph Hwang <josephsih@chromium.org>
@@ -83,29 +83,36 @@ Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 Changes in v2:
 - Fix the title
 
- drivers/bluetooth/hci_qca.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/bluetooth/btrtl.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index 53deea2eb7b4..bf576046681d 100644
---- a/drivers/bluetooth/hci_qca.c
-+++ b/drivers/bluetooth/hci_qca.c
-@@ -38,6 +38,7 @@
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 1f8afa0244d8..e0bcdbe03eca 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -14,6 +14,7 @@
+ #include <net/bluetooth/hci_core.h>
  
- #include "hci_uart.h"
- #include "btqca.h"
+ #include "btrtl.h"
 +#include "btandroid.h"
  
- /* HCI_IBS protocol messages */
- #define HCI_IBS_SLEEP_IND	0xFE
-@@ -1730,6 +1731,7 @@ static int qca_setup(struct hci_uart *hu)
- 	if (qca_is_wcn399x(soc_type) ||
- 	    qca_is_wcn6750(soc_type)) {
- 		set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
-+		hdev->set_quality_report = btandroid_set_quality_report;
+ #define VERSION "0.1"
  
- 		ret = qca_read_soc_version(hdev, &ver, soc_type);
- 		if (ret)
+@@ -740,12 +741,13 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
+ 	/* Enable central-peripheral role (able to create new connections with
+ 	 * an existing connection in slave role).
+ 	 */
+-	/* Enable WBS supported for the specific Realtek devices. */
++	/* Enable WBS and quality report supported by the specific devices. */
+ 	switch (btrtl_dev->project_id) {
+ 	case CHIP_ID_8822C:
+ 	case CHIP_ID_8852A:
+ 		set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
++		hdev->set_quality_report = btandroid_set_quality_report;
+ 		break;
+ 	default:
+ 		rtl_dev_dbg(hdev, "Central-peripheral role not enabled.");
 -- 
 2.33.0.153.gba50c8fa24-goog
 
