@@ -8,61 +8,63 @@ X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A07AC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 17:13:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EA1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 17:18:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4E34461158
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 17:13:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 712A661158
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 17:18:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352378AbhIHROh (ORCPT
+        id S230217AbhIHRTm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Sep 2021 13:14:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41314 "EHLO
+        Wed, 8 Sep 2021 13:19:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42470 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352434AbhIHROf (ORCPT
+        with ESMTP id S229744AbhIHRTm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Sep 2021 13:14:35 -0400
+        Wed, 8 Sep 2021 13:19:42 -0400
 Received: from mail-vs1-xe29.google.com (mail-vs1-xe29.google.com [IPv6:2607:f8b0:4864:20::e29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05A85C061757
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 10:13:25 -0700 (PDT)
-Received: by mail-vs1-xe29.google.com with SMTP id bf15so2724826vsb.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Sep 2021 10:13:24 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08292C061575
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 10:18:34 -0700 (PDT)
+Received: by mail-vs1-xe29.google.com with SMTP id o124so2700426vsc.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Sep 2021 10:18:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=+q/rfkz/M3nlsIMVBFbnTrBFEeVkJ7HjHw0Ttc6Xt/Q=;
-        b=IjvEh0RW6lKAcq/+ELlvSWdNHrOG5XFmq8GZoRl1JhlTvOLvcvwpOYttMWbiXzokO5
-         HJhyXEPWiqZB0be7OmnT64HJemQ5AcBVGsx/SeE5H/5U3bhpjq5R9pm6eAoa4ihQq13A
-         AfqhrkmHrU/IMW2lOcTuFUpA63rhniSZPlzsPZ2DiAaN35sLaDj8FCkmVTnYzPdcyDpX
-         RQAcio2ZTxlJbBgsTIyohJqo6xYqSvUdi1pkbKCHcNDFmBpIyM3cwDIVx0fC4imf67ga
-         hOJcwKelUvER7ERRkGCk1TIfjW1m1wl+eDZAUL0jfUCWpa8CtDyh+ERAo44fq280NKjk
-         PIOw==
+        bh=KBgIBYhNiuhRoAQwhL4+76fZcU+4oA2Ww+wpi6gpLPE=;
+        b=DtM87flCRRGm4s5aHxj7CBDUPt7/rcN07S+A9o8B4/9O8H/RyASReCIXdIAy8q2a59
+         8nK+tD8/gWcUa+COio97UYmyJofYCiKgQMZTLpA68KzwIrHAVdFRtGbOsQ+X68/Q2D8F
+         W3tn44Ub550yYR24zSFNPrksWJYw7s5zkl7aAE0grrnFcwJmq/UgKNkRHxoh1R4mnw+r
+         9Jy2clLegMigApGIp9r31gn4knMNzrzxr+sEw3+5NXvNXEyURyp+Zc1/awV3zbDOh2/x
+         DEzCj9jdjHZrURYwpgOVSV3Ze7qCP2bFY/CHGPwkgXDSYJxY9zD9QQC3B7JwNqVldQDJ
+         9qkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=+q/rfkz/M3nlsIMVBFbnTrBFEeVkJ7HjHw0Ttc6Xt/Q=;
-        b=6myOyotwXqH4URLT5yPlppvgMsl7iihR3pOQpagCQvn5KX1I1wODUiRdOeqH+wN/Nx
-         f+UcCx813W3a8zwvCEpXVRimgCknTet8CvYYX8TTkWTzbmMqD8bZBeZ3UYk1Bqd4MmUT
-         BxUHv0WpJkHzRj1mxj2Js3p0DrPIcgwD6fhEaC9zDRhklJHwMNtqqlH8idDdP/rzgIm8
-         8Pg2SG1ndIma/XPbubjVmkLQc1qrJEJnSfilDSK6qLjvSDK0zmMC8FRyt/Jb1tx55K97
-         ul2YlIx88cN5XxJ2vigJVukiMtxQ7eYOBrEjh6sYaNuzud7hZUIOGC5hGTwK54WLT+qZ
-         o73Q==
-X-Gm-Message-State: AOAM5323HZsiTWg8Tj3usJemG0UOdIUOUkbKDmtVMI9aZMv/vBsyDOiW
-        GtXmcM6GNhZMVS4uvd5KvFgl5H42r6pMNlC5N+PXAAFC
-X-Google-Smtp-Source: ABdhPJynODqDBM10TvixViim10+93QGJHz9LZAoZYVEI2NIqHEgrEZK3Tft+FGPxPtKSiHm5wzlEcT5Zi1SUaaojTuc=
-X-Received: by 2002:a67:d604:: with SMTP id n4mr3283068vsj.39.1631121203887;
- Wed, 08 Sep 2021 10:13:23 -0700 (PDT)
+        bh=KBgIBYhNiuhRoAQwhL4+76fZcU+4oA2Ww+wpi6gpLPE=;
+        b=nsrrhW+seSR/7NHR81haYuBBLjOWjvLvawy53EDGzKwzSwJ7RYWdv8DZjmoeTFNM5A
+         OM6675BFaB87HmCOWuwilo/P/gyAI7v+xnxWIzc9sgzjmBxTiOKR5GMGlHMb+2Hq0raZ
+         KBUN1NByN8H/VNk+j82XvM2OSnJ1sSVOJwtA7gWbzdQLrGvzqONQRpnrBzJtEZbq4Y8X
+         HJSRbRoIo+DZbarXvmjYOLqA6rihK9j7kLcS8oiFu/767P3qaTnRG3FrIU3dwL3doBQk
+         waU1kvhsEEJuK9EJZ1rNYsW04XyIQgVWHq2zcAuqR2yiN8zjwbIXFYOeHjdCbD3JJ8p5
+         r56Q==
+X-Gm-Message-State: AOAM5330HTpyAbuK/7cOEkRaUmKyL49UktIa9Y1ZkdMyTvoyFAtfQFHB
+        LJlbU6vqF5jZXtR/AnHsp1V9vJjhHzIURPksAporvHda
+X-Google-Smtp-Source: ABdhPJw8pc7nfIIgtbRghdjTmxEdRIII6HhIPYSffFlKtGB6EIjoo3552v1rKp+7FJdN0e2fUUYTBnMP8MAkfZq288c=
+X-Received: by 2002:a05:6102:31a5:: with SMTP id d5mr3460211vsh.23.1631121513082;
+ Wed, 08 Sep 2021 10:18:33 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210903222732.1472560-1-luiz.dentz@gmail.com>
-In-Reply-To: <20210903222732.1472560-1-luiz.dentz@gmail.com>
+References: <20210831163545.3646157-1-pab@pabigot.com> <3CBFA8E8-ABA1-495F-BFD4-A4E3CBC1E21B@holtmann.org>
+ <c3b21654-8d46-4b12-7d9b-b3eeb12678f9@pabigot.com>
+In-Reply-To: <c3b21654-8d46-4b12-7d9b-b3eeb12678f9@pabigot.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Sep 2021 10:13:13 -0700
-Message-ID: <CABBYNZK4WwrC53udCCXa4m2mzfV=eKLwSULDkFjpZ+z5MUdJGw@mail.gmail.com>
-Subject: Re: [PATCH v3 1/4] Bluetooth: Add bt_skb_sendmsg helper
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>
+Date:   Wed, 8 Sep 2021 10:18:22 -0700
+Message-ID: <CABBYNZJLU9nDMcpkZ4uZ+dspRRrHjBYH3jYf2LWKO-77G1m=aA@mail.gmail.com>
+Subject: Re: [BlueZ PATCH] lib: fix variable-length array declarations in hci structures
+To:     "Peter A. Bigot" <pab@pabigot.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -70,64 +72,48 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Marcel,
 
-On Fri, Sep 3, 2021 at 3:27 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
+On Tue, Aug 31, 2021 at 2:54 PM Peter A. Bigot <pab@pabigot.com> wrote:
 >
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> On 8/31/21 2:23 PM, Marcel Holtmann wrote:
+> > Hi Peter,
+> >
+> >> Use of zero as the size for arrays as the last element of a structure
+> >> is a GNU C extension, which as of GCC 10 produces diagnostics when
+> >> values in the extended array are referenced.  Switch to the C99
+> >> standard idiom for flexible array members, already in use in a few
+> >> other headers.
+> >>
+> >> Signed-off-by: Peter A. Bigot <pab@pabigot.com>
+> >> ---
+> >>
+> >> No changes from previous submission except the BlueZ subject prefix
+> >> that I hope will get this into bluez.
+> >>
+> >> lib/hci.h | 16 ++++++++--------
+> >> 1 file changed, 8 insertions(+), 8 deletions(-)
+> >>
+> >> diff --git a/lib/hci.h b/lib/hci.h
+> >> index 3382b87bf..a61568bce 100644
+> >> --- a/lib/hci.h
+> >> +++ b/lib/hci.h
+> >> @@ -729,7 +729,7 @@ typedef struct {
+> >> typedef struct {
+> >>      uint8_t         flt_type;
+> >>      uint8_t         cond_type;
+> >> -    uint8_t         condition[0];
+> >> +    uint8_t         condition[];
+> >> } __attribute__ ((packed)) set_event_flt_cp;
+> >> #define SET_EVENT_FLT_CP_SIZE 2
+> > does this break any API assumptions? Since as long as libbluetooth exists these headers are API.
 >
-> bt_skb_sendmsg helps takes care of allocation the skb and copying the
-> the contents of msg over to the skb while checking for possible errors
-> so it should be safe to call it without holding lock_sock.
+> The size of the structure remains the same; there should be no API
+> changes.  I've done this sort of change multiple times over the years
+> and nobody's reported any problems.
 >
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
->  include/net/bluetooth/bluetooth.h | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
->
-> diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-> index 9125effbf448..aa6f8fe897ce 100644
-> --- a/include/net/bluetooth/bluetooth.h
-> +++ b/include/net/bluetooth/bluetooth.h
-> @@ -420,6 +420,34 @@ static inline struct sk_buff *bt_skb_send_alloc(struct sock *sk,
->         return NULL;
->  }
->
-> +/* Shall not be called with lock_sock held */
-> +static inline struct sk_buff *bt_skb_sendmsg(struct sock *sk,
-> +                                            struct msghdr *msg,
-> +                                            size_t len, size_t mtu,
-> +                                            size_t headroom, size_t tailroom)
-> +{
-> +       struct sk_buff *skb;
-> +       size_t size = min_t(size_t, len, mtu);
-> +       int err;
-> +
-> +       skb = bt_skb_send_alloc(sk, size + headroom + tailroom,
-> +                               msg->msg_flags & MSG_DONTWAIT, &err);
-> +       if (!skb)
-> +               return ERR_PTR(err);
-> +
-> +       skb_reserve(skb, headroom);
-> +       skb_tailroom_reserve(skb, mtu, tailroom);
-> +
-> +       if (!copy_from_iter_full(skb_put(skb, size), size, &msg->msg_iter)) {
-> +               kfree_skb(skb);
-> +               return ERR_PTR(-EFAULT);
-> +       }
-> +
-> +       skb->priority = sk->sk_priority;
-> +
-> +       return skb;
-> +}
-> +
->  int bt_to_errno(u16 code);
->
->  void hci_sock_set_flag(struct sock *sk, int nr);
-> --
-> 2.31.1
+> Peter
 
-Any comments on this set? I did incorporate the skb_tailroom_reserver as well.
-
+Looks like we also use [] in the kernel so I think it should be safe
+to do this change on userspace as well.
 
 -- 
 Luiz Augusto von Dentz
