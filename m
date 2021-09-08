@@ -2,182 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 23C76C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 21:14:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C172BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 22:40:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E51ED60F5E
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 21:14:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9E51A60F5E
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Sep 2021 22:40:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235913AbhIHVPR (ORCPT
+        id S238770AbhIHWlp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Sep 2021 17:15:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39184 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233068AbhIHVPQ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Sep 2021 17:15:16 -0400
-Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9491EC061575
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 14:14:08 -0700 (PDT)
-Received: by mail-vk1-xa2f.google.com with SMTP id d7so1250609vko.6
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Sep 2021 14:14:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=Ovi3EmYy2hCZfAntPoqHPTZ8oOnPqPlOA/UGBACHokQ=;
-        b=iPnPJXStQhQS6GgaVQKiHN6ds5btj6ybROr+EsNR6xEPThWbpGl4o3fZC7Bz5mv3HI
-         cKrI3wdWPAs7kilRxTAbpLUyhvB8eCIvXr6VKHoR7Xlo28VlsGbVjj1UQtMShaA5OQFb
-         iXggTn6s3XW4sgQFQ1q2AEsu2D1d3BBvRit1yFagp1J56qkjxBVhltxbQ/TRsXPGSANS
-         IerHBZiUzaLsaLcpz2O2D2yjBEaBeed4oRdmfv1XENieqnspRx4/Z/dA+PJNCUIW8H05
-         88wtgk//jpZvTlrozXVG0p+jsvOm0AVbD2Recy+NOhZijNwuXvh3ucl3sEjwGQr9r/nO
-         3Jow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=Ovi3EmYy2hCZfAntPoqHPTZ8oOnPqPlOA/UGBACHokQ=;
-        b=nCkIotwBM6OA/XiA4Tkq91wdH1ai1KmZOJR0ut2+3h4g/vYDm8P/Hpu0TQ8hLyV+O+
-         qeNA8Mmi1LY1Jhh8KhyCk6gkDnogS70FoBeBXRwUHOlosFelBZp5Ymi7OZ16/n1R07AQ
-         WRy2qDZCsKDt4Z/kuxtDKx7nCBPNOXfS3TTx0qdQsYuamV8WFlPkVPy2IzvNcKamv7Wu
-         qZNQ/dMNH6L4AZxsxxW0KPCyi0QM6PGDjxnySFKU28offsJjyZ2N39ludGWyyLCYk57t
-         +nLV3AExz242MuXtBcDjquubW5K78jRQ+zpTj/TR7WtQH1ReDRUZD0DSQSZu3SfZYn/Z
-         HikA==
-X-Gm-Message-State: AOAM531sd450uGCeNXjMa4g2zGMKVRQrOXsWp6ZbZPMtFThwgkHrWtTG
-        ZiKP/xnCG68fbUcmtljn665svYJvIy+K6Ga8P2buwSD3
-X-Google-Smtp-Source: ABdhPJyNdC9GaoIvVXw5UgW/YzMPCB/54v+CuegNeD3/u9UZqCKHKMUrGG6fs2CXcJmrfCHaV+VGob2wOcAr8ThnApY=
-X-Received: by 2002:a1f:5e58:: with SMTP id s85mr99488vkb.3.1631135647364;
- Wed, 08 Sep 2021 14:14:07 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210907223008.2322035-1-luiz.dentz@gmail.com> <6137ee1a.1c69fb81.2d1e8.27ab@mx.google.com>
-In-Reply-To: <6137ee1a.1c69fb81.2d1e8.27ab@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Sep 2021 14:13:56 -0700
-Message-ID: <CABBYNZKeCxZ0PON5asWoA=3hqWuMX3YY1F0v+pm1KxPkQMaDDA@mail.gmail.com>
-Subject: Re: [BlueZ,1/5] adapter-api: Add Experimental property
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+        Wed, 8 Sep 2021 18:41:45 -0400
+Received: from mail.kernel.org ([198.145.29.99]:45984 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S241339AbhIHWlo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 8 Sep 2021 18:41:44 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id A29C0611BF
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Sep 2021 22:40:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631140835;
+        bh=TCKkYWmWlBJLtAmfVWkFF3ngmGfn94S1O+K8lNZxJYY=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=K59oEaw62j7J2OoW7+nQrbxMAaaNlUNHEpCmxR+y1HUebKHzvsZuhFGvRZXUXWajG
+         VSBEO/YHWNM6Fe6RBzt5s2CHlW8RIkdMZjgxfN+CxgiZE+dQT5W4PX7KT7HEoMRgmN
+         nWGWwVyGS94MHcMZObX7B0IxmfEadG6kNlG6lUlDG3ODe6uB2JtXsLrioEuhLt326P
+         toj4Hfa6orvYCm9RQwEkA1hZbHlvTsBhca5H+eWpSLr+3W6f96N7wm4kfFCWJUMw3k
+         ZG6F3g7po7OuaZ0+fZPpPVI5KAnKDcHpnZpb4iI58ATi8baDj93uPXBfDF+F9m+Jqr
+         7G3hwaNglk92Q==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Wed, 08 Sep 2021 22:40:32 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: guimarcalsilva@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-hllkETSSDH@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-On Tue, Sep 7, 2021 at 3:56 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=543375
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      2.03 seconds
-> GitLint                       FAIL      0.62 seconds
-> Prep - Setup ELL              PASS      48.33 seconds
-> Build - Prep                  PASS      0.11 seconds
-> Build - Configure             PASS      8.39 seconds
-> Build - Make                  PASS      208.28 seconds
-> Make Check                    PASS      9.35 seconds
-> Make Distcheck                PASS      246.88 seconds
-> Build w/ext ELL - Configure   PASS      8.45 seconds
-> Build w/ext ELL - Make        PASS      196.29 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> client: Add support for printing ExperimentalFeatures property
-> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-> #11:
->         Experimental: BlueZ Experimental LL p.. (15c0a148-c273-11ea-b3de-0242ac130004)
->
-> - total: 0 errors, 1 warnings, 64 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> "[PATCH] client: Add support for printing ExperimentalFeatures" has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
-> main.conf: Allow passing a list of UUIDs to Experimental
-> WARNING:STATIC_CONST_CHAR_ARRAY: static const char * array should probably be static const char * const
-> #267: FILE: src/main.c:568:
-> +static const char *valid_uuids[] = {
->
-> - total: 0 errors, 1 warnings, 375 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> "[PATCH] main.conf: Allow passing a list of UUIDs to Experimental" has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
-> ##############################
-> Test: GitLint - FAIL
-> Desc: Run gitlint with rule in .gitlint
-> Output:
-> client: Add support for printing ExperimentalFeatures property
-> 7: B3 Line contains hard tab characters (\t): " Experimental: BlueZ Experimental LL p.. (15c0a148-c273-11ea-b3de-0242ac130004)"
->
->
-> ##############################
-> Test: Prep - Setup ELL - PASS
-> Desc: Clone, build, and install ELL
->
-> ##############################
-> Test: Build - Prep - PASS
-> Desc: Prepare environment for build
->
-> ##############################
-> Test: Build - Configure - PASS
-> Desc: Configure the BlueZ source tree
->
-> ##############################
-> Test: Build - Make - PASS
-> Desc: Build the BlueZ source tree
->
-> ##############################
-> Test: Make Check - PASS
-> Desc: Run 'make check'
->
-> ##############################
-> Test: Make Distcheck - PASS
-> Desc: Run distcheck to check the distribution
->
-> ##############################
-> Test: Build w/ext ELL - Configure - PASS
-> Desc: Configure BlueZ source with '--enable-external-ell' configuration
->
-> ##############################
-> Test: Build w/ext ELL - Make - PASS
-> Desc: Build BlueZ source with '--enable-external-ell' configuration
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+guimarcalsilva@gmail.com changed:
 
-Pushed.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |guimarcalsilva@gmail.com
 
--- 
-Luiz Augusto von Dentz
+--- Comment #198 from guimarcalsilva@gmail.com ---
+I tested it using a live image of Fedora Rawride from September 8 2021 with=
+ the
+development version of Kernel 5.15. The dongle is detected but I can't turn=
+ it
+on in the settings or in blueman:
+
+[1125.221008] usb 1-4: USB disconnect, device number 14
+[1130.356918] usb 1-4: new full-speed USB device number 15 using xhci_hcd
+[1130.486202] usb 1-4: New USB device found, idVendor=3D0a12, idProduct-000=
+1,
+bcdDevice=3D25.20
+[1130.486219] usb 1-4: New USB device strings: Mfr=3D0, Product=3D2, Serial=
+Number=3D0
+[1130.486227] usb 1-4: Product: CSR8510 A10
+[1130.496424] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+workarounds and force-suspending once...=20
+[1135.982384] Bluetooth: hci0: CSR: Failed to suspend the device for our Ba=
+rrot
+8041a02 receive-issue workaround
+[1141.099165] Bluetooth: hci0: setting interface failed (110)
+
+My dongle is packaged as a Bluetooth 5 device. Unfortunately I couldn't run
+hciconfig because for some reason dnf refused to work on the live image. I'=
+ll
+try bringing more logs later.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
