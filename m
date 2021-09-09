@@ -7,43 +7,44 @@ X-Spam-Status: No, score=-19.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
 	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A5EEFC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 13:44:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 855AFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 13:44:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 927A26120E
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 13:44:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6FB236120F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 13:44:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356345AbhIINqC (ORCPT
+        id S1344741AbhIINqF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Sep 2021 09:46:02 -0400
-Received: from mail.kernel.org ([198.145.29.99]:40988 "EHLO mail.kernel.org"
+        Thu, 9 Sep 2021 09:46:05 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33700 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1352798AbhIIMrH (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Sep 2021 08:47:07 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3033D6321D;
-        Thu,  9 Sep 2021 11:56:23 +0000 (UTC)
+        id S1356445AbhIIMzM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Sep 2021 08:55:12 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 7CEFA6324B;
+        Thu,  9 Sep 2021 11:58:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631188583;
-        bh=GWtLeHNh+4Lhw0zo8Dbmtj5K0wnZNN1EKa6rdiXkKcQ=;
+        s=k20201202; t=1631188686;
+        bh=jiKXfvgkyuHxQ+RIYMyD+/R8H8NZHouqkWZGnTRv5wg=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=FD0CjlczVEIJBFmvns6BFMTemUsyojMqsXQOkoIPU8n8XEmZCR7dLxbnoLW9cjcbi
-         OYhUwdgBHAzmlr9Kkys3SOePkLcmz7wPZWo1ZmD0UxdnCJ24JIZJiVZJtY+kCZ3jPW
-         O7cx+KqZbaiV2EDg+TnfUZQHGFocdpHoe61UkTRt7p4hjefAZaFJqsGkrtXYQwrO3N
-         mMPCuevLbUX9gp5GivwosLi/e+PBYoEhpZzAGnjBbFLjyVAPjHBDYSVSqviZ0q6ZMr
-         WEF5XTcy9N+Cqxlo9N0CbFiEqFSRGICVB0hmygMm8xwYkdwHNvAQq6CEr8roqo7sjj
-         Wou714PL3CqOg==
+        b=ITe1clypZWT2FWP3v+bpB13S3Ipy0YSGh16fdo1VE6ZhFYDUD5v8PDyDDfuP3w+Va
+         49o2RrcyKX2rpbtjoN69BXV/ygQlJQ2FTIUj27Z+8Ojt1AaZzvyx2NnfsT3+KhQuGk
+         1/zDYtW9n+AB5aPChg2i5MaQZzjicGDk+cR2E0rDJY0M4kPy+pDSfkdrAvk2mKlymS
+         luTJbGwVJcvP5mnAenl0cQSwz+ZQyHdqk1uYlLkZGQKEhaw5UrdXbj4YLVDy9GOaYq
+         4Fbcb+fru+Cm1TnTYytE5j8/J0FZ6n2qUHpapvBZ7alphBtlN0Vh67QUKweMHxZ2lB
+         UyLcKLBhRgkwA==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com,
+        Marcel Holtmann <marcel@holtmann.org>,
         Sasha Levin <sashal@kernel.org>,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 060/109] Bluetooth: avoid circular locks in sco_sock_connect
-Date:   Thu,  9 Sep 2021 07:54:17 -0400
-Message-Id: <20210909115507.147917-60-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 32/74] Bluetooth: skip invalid hci_sync_conn_complete_evt
+Date:   Thu,  9 Sep 2021 07:56:44 -0400
+Message-Id: <20210909115726.149004-32-sashal@kernel.org>
 X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20210909115507.147917-1-sashal@kernel.org>
-References: <20210909115507.147917-1-sashal@kernel.org>
+In-Reply-To: <20210909115726.149004-1-sashal@kernel.org>
+References: <20210909115726.149004-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -54,233 +55,55 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
 
-[ Upstream commit 734bc5ff783115aa3164f4e9dd5967ae78e0a8ab ]
+[ Upstream commit 92fe24a7db751b80925214ede43f8d2be792ea7b ]
 
-In a future patch, calls to bh_lock_sock in sco.c should be replaced
-by lock_sock now that none of the functions are run in IRQ context.
+Syzbot reported a corrupted list in kobject_add_internal [1]. This
+happens when multiple HCI_EV_SYNC_CONN_COMPLETE event packets with
+status 0 are sent for the same HCI connection. This causes us to
+register the device more than once which corrupts the kset list.
 
-However, doing so results in a circular locking dependency:
+As this is forbidden behavior, we add a check for whether we're
+trying to process the same HCI_EV_SYNC_CONN_COMPLETE event multiple
+times for one connection. If that's the case, the event is invalid, so
+we report an error that the device is misbehaving, and ignore the
+packet.
 
-======================================================
-WARNING: possible circular locking dependency detected
-5.14.0-rc4-syzkaller #0 Not tainted
-------------------------------------------------------
-syz-executor.2/14867 is trying to acquire lock:
-ffff88803e3c1120 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at:
-lock_sock include/net/sock.h:1613 [inline]
-ffff88803e3c1120 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}, at:
-sco_conn_del+0x12a/0x2a0 net/bluetooth/sco.c:191
-
-but task is already holding lock:
-ffffffff8d2dc7c8 (hci_cb_list_lock){+.+.}-{3:3}, at:
-hci_disconn_cfm include/net/bluetooth/hci_core.h:1497 [inline]
-ffffffff8d2dc7c8 (hci_cb_list_lock){+.+.}-{3:3}, at:
-hci_conn_hash_flush+0xda/0x260 net/bluetooth/hci_conn.c:1608
-
-which lock already depends on the new lock.
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (hci_cb_list_lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       hci_connect_cfm include/net/bluetooth/hci_core.h:1482 [inline]
-       hci_remote_features_evt net/bluetooth/hci_event.c:3263 [inline]
-       hci_event_packet+0x2f4d/0x7c50 net/bluetooth/hci_event.c:6240
-       hci_rx_work+0x4f8/0xd30 net/bluetooth/hci_core.c:5122
-       process_one_work+0x98d/0x1630 kernel/workqueue.c:2276
-       worker_thread+0x658/0x11f0 kernel/workqueue.c:2422
-       kthread+0x3e5/0x4d0 kernel/kthread.c:319
-       ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-
--> #1 (&hdev->lock){+.+.}-{3:3}:
-       __mutex_lock_common kernel/locking/mutex.c:959 [inline]
-       __mutex_lock+0x12a/0x10a0 kernel/locking/mutex.c:1104
-       sco_connect net/bluetooth/sco.c:245 [inline]
-       sco_sock_connect+0x227/0xa10 net/bluetooth/sco.c:601
-       __sys_connect_file+0x155/0x1a0 net/socket.c:1879
-       __sys_connect+0x161/0x190 net/socket.c:1896
-       __do_sys_connect net/socket.c:1906 [inline]
-       __se_sys_connect net/socket.c:1903 [inline]
-       __x64_sys_connect+0x6f/0xb0 net/socket.c:1903
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_SCO){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3051 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3174 [inline]
-       validate_chain kernel/locking/lockdep.c:3789 [inline]
-       __lock_acquire+0x2a07/0x54a0 kernel/locking/lockdep.c:5015
-       lock_acquire kernel/locking/lockdep.c:5625 [inline]
-       lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
-       lock_sock_nested+0xca/0x120 net/core/sock.c:3170
-       lock_sock include/net/sock.h:1613 [inline]
-       sco_conn_del+0x12a/0x2a0 net/bluetooth/sco.c:191
-       sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1202
-       hci_disconn_cfm include/net/bluetooth/hci_core.h:1500 [inline]
-       hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1608
-       hci_dev_do_close+0x528/0x1130 net/bluetooth/hci_core.c:1778
-       hci_unregister_dev+0x1c0/0x5a0 net/bluetooth/hci_core.c:4015
-       vhci_release+0x70/0xe0 drivers/bluetooth/hci_vhci.c:340
-       __fput+0x288/0x920 fs/file_table.c:280
-       task_work_run+0xdd/0x1a0 kernel/task_work.c:164
-       exit_task_work include/linux/task_work.h:32 [inline]
-       do_exit+0xbd4/0x2a60 kernel/exit.c:825
-       do_group_exit+0x125/0x310 kernel/exit.c:922
-       get_signal+0x47f/0x2160 kernel/signal.c:2808
-       arch_do_signal_or_restart+0x2a9/0x1c40 arch/x86/kernel/signal.c:865
-       handle_signal_work kernel/entry/common.c:148 [inline]
-       exit_to_user_mode_loop kernel/entry/common.c:172 [inline]
-       exit_to_user_mode_prepare+0x17d/0x290 kernel/entry/common.c:209
-       __syscall_exit_to_user_mode_work kernel/entry/common.c:291 [inline]
-       syscall_exit_to_user_mode+0x19/0x60 kernel/entry/common.c:302
-       ret_from_fork+0x15/0x30 arch/x86/entry/entry_64.S:288
-
-other info that might help us debug this:
-
-Chain exists of:
-  sk_lock-AF_BLUETOOTH-BTPROTO_SCO --> &hdev->lock --> hci_cb_list_lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(hci_cb_list_lock);
-                               lock(&hdev->lock);
-                               lock(hci_cb_list_lock);
-  lock(sk_lock-AF_BLUETOOTH-BTPROTO_SCO);
-
- *** DEADLOCK ***
-
-The issue is that the lock hierarchy should go from &hdev->lock -->
-hci_cb_list_lock --> sk_lock-AF_BLUETOOTH-BTPROTO_SCO. For example,
-one such call trace is:
-
-  hci_dev_do_close():
-    hci_dev_lock();
-    hci_conn_hash_flush():
-      hci_disconn_cfm():
-        mutex_lock(&hci_cb_list_lock);
-        sco_disconn_cfm():
-        sco_conn_del():
-          lock_sock(sk);
-
-However, in sco_sock_connect, we call lock_sock before calling
-hci_dev_lock inside sco_connect, thus inverting the lock hierarchy.
-
-We fix this by pulling the call to hci_dev_lock out from sco_connect.
-
+Link: https://syzkaller.appspot.com/bug?extid=66264bf2fd0476be7e6c [1]
+Reported-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
+Tested-by: syzbot+66264bf2fd0476be7e6c@syzkaller.appspotmail.com
 Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/sco.c | 39 ++++++++++++++++-----------------------
- 1 file changed, 16 insertions(+), 23 deletions(-)
+ net/bluetooth/hci_event.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b74d4dec465a..67c9259fbac5 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -236,44 +236,32 @@ static int sco_chan_add(struct sco_conn *conn, struct sock *sk,
- 	return err;
- }
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 45cc864cf2b3..714a45355610 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4083,6 +4083,21 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
  
--static int sco_connect(struct sock *sk)
-+static int sco_connect(struct hci_dev *hdev, struct sock *sk)
- {
- 	struct sco_conn *conn;
- 	struct hci_conn *hcon;
--	struct hci_dev  *hdev;
- 	int err, type;
- 
- 	BT_DBG("%pMR -> %pMR", &sco_pi(sk)->src, &sco_pi(sk)->dst);
- 
--	hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
--	if (!hdev)
--		return -EHOSTUNREACH;
--
--	hci_dev_lock(hdev);
--
- 	if (lmp_esco_capable(hdev) && !disable_esco)
- 		type = ESCO_LINK;
- 	else
- 		type = SCO_LINK;
- 
- 	if (sco_pi(sk)->setting == BT_VOICE_TRANSPARENT &&
--	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev))) {
--		err = -EOPNOTSUPP;
--		goto done;
--	}
-+	    (!lmp_transp_capable(hdev) || !lmp_esco_capable(hdev)))
-+		return -EOPNOTSUPP;
- 
- 	hcon = hci_connect_sco(hdev, type, &sco_pi(sk)->dst,
- 			       sco_pi(sk)->setting);
--	if (IS_ERR(hcon)) {
--		err = PTR_ERR(hcon);
--		goto done;
--	}
-+	if (IS_ERR(hcon))
-+		return PTR_ERR(hcon);
- 
- 	conn = sco_conn_add(hcon);
- 	if (!conn) {
- 		hci_conn_drop(hcon);
--		err = -ENOMEM;
--		goto done;
-+		return -ENOMEM;
- 	}
- 
- 	/* Update source addr of the socket */
-@@ -281,7 +269,7 @@ static int sco_connect(struct sock *sk)
- 
- 	err = sco_chan_add(conn, sk, NULL);
- 	if (err)
--		goto done;
-+		return err;
- 
- 	if (hcon->state == BT_CONNECTED) {
- 		sco_sock_clear_timer(sk);
-@@ -291,9 +279,6 @@ static int sco_connect(struct sock *sk)
- 		sco_sock_set_timer(sk, sk->sk_sndtimeo);
- 	}
- 
--done:
--	hci_dev_unlock(hdev);
--	hci_dev_put(hdev);
- 	return err;
- }
- 
-@@ -577,6 +562,7 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
- {
- 	struct sockaddr_sco *sa = (struct sockaddr_sco *) addr;
- 	struct sock *sk = sock->sk;
-+	struct hci_dev  *hdev;
- 	int err;
- 
- 	BT_DBG("sk %p", sk);
-@@ -591,12 +577,19 @@ static int sco_sock_connect(struct socket *sock, struct sockaddr *addr, int alen
- 	if (sk->sk_type != SOCK_SEQPACKET)
- 		return -EINVAL;
- 
-+	hdev = hci_get_route(&sa->sco_bdaddr, &sco_pi(sk)->src, BDADDR_BREDR);
-+	if (!hdev)
-+		return -EHOSTUNREACH;
-+	hci_dev_lock(hdev);
+ 	switch (ev->status) {
+ 	case 0x00:
++		/* The synchronous connection complete event should only be
++		 * sent once per new connection. Receiving a successful
++		 * complete event when the connection status is already
++		 * BT_CONNECTED means that the device is misbehaving and sent
++		 * multiple complete event packets for the same new connection.
++		 *
++		 * Registering the device more than once can corrupt kernel
++		 * memory, hence upon detecting this invalid event, we report
++		 * an error and ignore the packet.
++		 */
++		if (conn->state == BT_CONNECTED) {
++			bt_dev_err(hdev, "Ignoring connect complete event for existing connection");
++			goto unlock;
++		}
 +
- 	lock_sock(sk);
- 
- 	/* Set destination address and psm */
- 	bacpy(&sco_pi(sk)->dst, &sa->sco_bdaddr);
- 
--	err = sco_connect(sk);
-+	err = sco_connect(hdev, sk);
-+	hci_dev_unlock(hdev);
-+	hci_dev_put(hdev);
- 	if (err)
- 		goto done;
- 
+ 		conn->handle = __le16_to_cpu(ev->handle);
+ 		conn->state  = BT_CONNECTED;
+ 		conn->type   = ev->link_type;
 -- 
 2.30.2
 
