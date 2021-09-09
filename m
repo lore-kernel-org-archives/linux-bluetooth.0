@@ -2,212 +2,413 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-12.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE177C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:08:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3D6C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8FF20610FF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:08:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7CC460ED8
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238291AbhIIXKG (ORCPT
+        id S1347053AbhIIXKT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Sep 2021 19:10:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50558 "EHLO
+        Thu, 9 Sep 2021 19:10:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50608 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233987AbhIIXKG (ORCPT
+        with ESMTP id S244621AbhIIXKS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Sep 2021 19:10:06 -0400
-Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40902C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Sep 2021 16:08:56 -0700 (PDT)
-Received: by mail-ua1-x935.google.com with SMTP id t26so40509uao.12
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Sep 2021 16:08:56 -0700 (PDT)
+        Thu, 9 Sep 2021 19:10:18 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770F1C061756
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Sep 2021 16:09:08 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id w7so30833pgk.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Sep 2021 16:09:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=5qMS1mpJ5wNCPyK8/l7Zgddv+58AolL5uq4uSXUD10w=;
-        b=T3vFLVfVAr3fAWS/LfDrrOKCddgEpDZhWj6WqJONwA76fOiVqSmkdU2nGf4iQvEYUe
-         hIfs8cW43EvAT1VOc0siZv4fl9+87aT6OcLzDigNeDb2aDniKnVR2qfX2EJhyh1vf9yD
-         sMCcaCwh7e44CcoJpkT8cHak+CMKKraGcgrZqFys/uKtUGZp/EEPOafzzYMsqGBgIHVV
-         z5G9MqHw36NGvGa9O/+HFm3vw8ZLvc/clKfcCkY1B/JZPAZ5347IYnA/LtYMfxfV7dj6
-         bUrbLQkk0CP6oP/ck3J1s69x1Dd1m5sX1lPPBdPSqW3aOs6QLAiEtCdci+MBm6ZrIfaF
-         2SFg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yyHvWInz3uuTDAiQ5ACOjUA89TJOt2Ed2qTMRVnSqVY=;
+        b=gRVG9VC2d8KBGz3XEqe5K+EjLxvsBgGHi6D/W8Xmtvdtepr+MLxHlTbgFwH2pEFk4w
+         EwSZX+977VuuuQhaC+7wVKTnyrko21lrWGlLBdbccsY/Op2ZhBKhuqPnr/iqA+Dy/AaK
+         pjq2sCSSB5QYSLJ0PvCS29P04lWYZLfYy32uH3LzQqt9DpmLwuSqCGIcgybIbv50mlpw
+         lDuU14FvhOYCSelwWep4LMKYRM6+pIs3Id3setn47i8QS5NBeeEHGweJRwx9y1kc16xo
+         ej2y7fGK0i/hby/+3VaP9+GXuZ/jSAXtCbv4vy1F+wOwPErCiGMlz+kgqOOAno3J4Rq9
+         ndoA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=5qMS1mpJ5wNCPyK8/l7Zgddv+58AolL5uq4uSXUD10w=;
-        b=blffRljMPR/yyWiLesiNzbiMN359vdbhxl8BKpob4+d9yIH5EEVdJAjgPR2VAhEdBW
-         WcNwiV/k3YUtmvS0Jzp2eio9U6R+yD9BpIP95xzvcgjOGo3EbIDRcGq52U7QNwhVfx2A
-         W7naBio5sU0cKLcj8WtHx5IlzvxUszAhzvJKhbeMr80BBL18mLe0Lf3YFkqzJwZqVbm4
-         edMFW3ONnhDKrFacUuu1Ozy1d0IipuUXiazaW1au/p9a6ct2IR7+DzW2qP/AwoTolddr
-         VysXUWT/KoE2Gq6B9ArqjwBMzbJp1JrDOzDo0iQXDOP3iW/GABot7eV38gluFry3ZuDp
-         z0IQ==
-X-Gm-Message-State: AOAM530i5IWNa75o+CWT4z2ADQlBVFVVHtPvAde0aBdDxybdYssTSrPU
-        M2O9wYEV0DCsOHPWlbA4eRtN9ecFroNgMO2mMeY=
-X-Google-Smtp-Source: ABdhPJxFZapqa0jVJjMYJlKIidQQvjPvgLYHL2BsRek1WoA2APWtRnnLoVUaXdxc3bUwxo4BvUR16M0IhssXKd/H1JM=
-X-Received: by 2002:ab0:3b93:: with SMTP id p19mr4123611uaw.72.1631228935244;
- Thu, 09 Sep 2021 16:08:55 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=yyHvWInz3uuTDAiQ5ACOjUA89TJOt2Ed2qTMRVnSqVY=;
+        b=z4grfmEIk3LULxeSB6/yzfU3E2mh6fbv+woIVnMS8DUp1sIDHnmWt1PG58wUPePh3n
+         SNawpyAn5NYu1x1GjZgvwXnGx5JNAjPxRAPjIcbc+BrDxULubrJpPY/E3O4RyCQedYUK
+         71A9XuVj8vF8FJDmd5Qy7lwR1GTBF4T1COCMAwy+3k+2tgiEQ59IPFglsZtRA2J6yO74
+         +iB6VTcOavGrXewp+xefiXVf3jxgMKHnUj8axsMGePzZ4eOQ2b88HmE0IAuTkNIlbXBh
+         ++P20Wb0V1SQX78u0w8xJN0A9eKtqyTzzmAGCy7bXg9vRkO+WjS4K4JjZXktRaigtMQx
+         dvcA==
+X-Gm-Message-State: AOAM533nkRMw2ktV82Xyx8dws0AXGm/+l9gRjcRGRKnujGLZwapePx9+
+        stJU/ie/RcfTfz27UT4goTbFYGqYPJE=
+X-Google-Smtp-Source: ABdhPJzJ3VUGKpygIjrJDfJERzgWjWag3ecaEyz50RcoZCeUdju9gN7i9iNrMbXXBTKN+wRA6A329g==
+X-Received: by 2002:a63:e74b:: with SMTP id j11mr4782060pgk.322.1631228947457;
+        Thu, 09 Sep 2021 16:09:07 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:cfe1:5bc7:a7f1:cb9f])
+        by smtp.gmail.com with ESMTPSA id n11sm3425982pjh.23.2021.09.09.16.09.06
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Sep 2021 16:09:07 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH] tools/mgmt-tester: Add test cases for load_long_term_keys command
+Date:   Thu,  9 Sep 2021 16:09:06 -0700
+Message-Id: <20210909230906.165577-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20210826085906.BlueZ.v1.1.Iae4b26a8036d47ca4d0db470f2bb23247f6cac7d@changeid>
-In-Reply-To: <20210826085906.BlueZ.v1.1.Iae4b26a8036d47ca4d0db470f2bb23247f6cac7d@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Thu, 9 Sep 2021 16:08:44 -0700
-Message-ID: <CABBYNZJsOLTk6iO1stc=6SBBdDms6xi-=j2s8hXLGVUnqqFm-w@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v1] adv_monitor: Clear any running DeviceLost timers
- on power down
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Miao-chen Chou <mcchou@google.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Thu, Aug 26, 2021 at 8:59 AM Manish Mandlik <mmandlik@google.com> wrote:
->
-> This patch clears any running Adv Monitor DeviceLost timers on bt power
-> down. It'll also invoke DeviceLost event if the device is already found
-> and is being tracked for the DeviceLost event.
->
-> Verified this by adding a monitor using bluetoothctl and confirming that
-> the DeviceLost event is getting triggered for already found device in
-> case of bt power down.
->
-> Reviewed-by: mcchou@google.com
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+This patch adds extra test cases for load_long_term_keys command.
+---
+ tools/mgmt-tester.c | 299 ++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 299 insertions(+)
 
-We don't use signed-off-by on userspace.
-
-> ---
->
->  src/adapter.c     |  8 ++++++++
->  src/adv_monitor.c | 52 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/adv_monitor.h |  2 ++
->  3 files changed, 62 insertions(+)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index 84bc5a1b0..3af7d1f1a 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -2872,6 +2872,13 @@ static void clear_discoverable(struct btd_adapter *adapter)
->         set_mode(adapter, MGMT_OP_SET_CONNECTABLE, 0x00);
->  }
->
-> +static void adv_monitor_notify_power_down(struct btd_adapter *adapter)
-> +{
-> +       /* Notify Adv Monitor about power down */
-> +       if (adapter->adv_monitor_manager)
-> +               btd_adv_monitor_notify_power_down(adapter->adv_monitor_manager);
-> +}
-
-I guess we could just check for NULL inside btd_adv_monitor*, also I
-would rename it to btd_adv_monitor_power_down.
-
->  static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
->                                                 DBusMessageIter *value,
->                                                 GDBusPendingPropertySet id)
-> @@ -2912,6 +2919,7 @@ static void property_set_mode(struct btd_adapter *adapter, uint32_t setting,
->                 len = sizeof(mode);
->
->                 if (!mode) {
-> +                       adv_monitor_notify_power_down(adapter);
->                         clear_discoverable(adapter);
->                         remove_temporary_devices(adapter);
->                 }
-> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-> index 715ac5904..59f307ae9 100644
-> --- a/src/adv_monitor.c
-> +++ b/src/adv_monitor.c
-> @@ -2011,3 +2011,55 @@ static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
->                                             NULL);
->         }
->  }
-> +
-> +/* Clears running DeviceLost timer for a given device */
-> +static void clear_device_lost_timer(void *data, void *user_data)
-> +{
-> +       struct adv_monitor_device *dev = data;
-> +       struct adv_monitor *monitor = NULL;
-> +
-> +       if (dev->lost_timer) {
-> +               timeout_remove(dev->lost_timer);
-> +               dev->lost_timer = 0;
-> +
-> +               monitor = dev->monitor;
-> +
-> +               DBG("Clearing device lost timer for device %p. "
-> +                               "Calling DeviceLost() on Adv Monitor of "
-> +                               "owner %s at path %s", dev->device,
-> +                               monitor->app->owner, monitor->path);
-
-The function name should already give the information about clearing
-device lost timer so I'm not why you have to be so verbose about this
-action.
-
-> +               g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
-> +                               report_device_state_setup,
-> +                               NULL, dev->device, NULL);
-> +       }
-> +}
-> +
-> +/* Clears running DeviceLost timers from each monitor */
-> +static void clear_lost_timers_from_monitor(void *data, void *user_data)
-> +{
-> +       struct adv_monitor *monitor = data;
-> +
-> +       queue_foreach(monitor->devices, clear_device_lost_timer, NULL);
-> +}
-> +
-> +/* Clears running DeviceLost timers from each app */
-> +static void clear_lost_timers_from_app(void *data, void *user_data)
-> +{
-> +       struct adv_monitor_app *app = data;
-> +
-> +       queue_foreach(app->monitors, clear_lost_timers_from_monitor, NULL);
-> +}
-> +
-> +/* Handles bt power down scenario */
-> +void btd_adv_monitor_notify_power_down(struct btd_adv_monitor_manager *manager)
-> +{
-> +       if (!manager) {
-> +               error("Unexpected NULL btd_adv_monitor_manager object upon "
-> +                               "power down");
-> +               return;
-> +       }
-
-So you are doing the manager pointer check so it is even more a reason
-to not have a wrapper around it.
-
-> +       /* Clear any running DeviceLost timers in case of power down */
-> +       queue_foreach(manager->apps, clear_lost_timers_from_app, NULL);
-> +}
-> diff --git a/src/adv_monitor.h b/src/adv_monitor.h
-> index 2b4f68abf..20da012d4 100644
-> --- a/src/adv_monitor.h
-> +++ b/src/adv_monitor.h
-> @@ -38,4 +38,6 @@ void btd_adv_monitor_notify_monitors(struct btd_adv_monitor_manager *manager,
->  void btd_adv_monitor_device_remove(struct btd_adv_monitor_manager *manager,
->                                    struct btd_device *device);
->
-> +void btd_adv_monitor_notify_power_down(struct btd_adv_monitor_manager *manager);
-> +
->  #endif /* __ADV_MONITOR_H */
-> --
-> 2.33.0.rc2.250.ged5fa647cd-goog
->
-
-
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index da53e4484..3feb62f1a 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -2690,6 +2690,224 @@ static const struct generic_data load_link_keys_invalid_params_test_3 = {
+ };
+ 
+ static const char load_ltks_valid_param_1[] = { 0x00, 0x00 };
++
++static const char load_ltks_valid_param_2[] = {
++	0x01, 0x00,					/* count */
++	0x00, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++};
++
++/* 20 keys at once */
++static const char load_ltks_valid_param_20[] = {
++	0x14, 0x00,					/* count */
++	0x00, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x01, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x02, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x03, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x04, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x05, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x06, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x07, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x08, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x09, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0a, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0b, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0c, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0d, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0e, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x0f, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x10, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x11, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x12, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++
++	0x13, 0x01, 0x02, 0x03, 0x04, 0x05,		/* bdaddr */
++	0x01,						/* addr type */
++	0x00,						/* authenticated */
++	0x00,						/* master */
++	0x00,						/* encryption size */
++	0x00, 0x00,					/* diversifier */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* rand */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (1/2) */
++	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,	/* value (2/2) */
++};
++
+ /* Invalid key count */
+ static const char load_ltks_invalid_param_1[] = { 0x01, 0x00 };
+ /* Invalid addr type */
+@@ -2726,6 +2944,35 @@ static const struct generic_data load_ltks_success_test_1 = {
+ 	.expect_status = MGMT_STATUS_SUCCESS,
+ };
+ 
++static const struct generic_data load_ltks_success_test_2 = {
++	.send_opcode = MGMT_OP_LOAD_LONG_TERM_KEYS,
++	.send_param = load_ltks_valid_param_2,
++	.send_len = sizeof(load_ltks_valid_param_2),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
++static const struct generic_data load_ltks_success_test_3 = {
++	.send_opcode = MGMT_OP_LOAD_LONG_TERM_KEYS,
++	.send_param = load_ltks_valid_param_2,
++	.send_len = sizeof(load_ltks_valid_param_2),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
++static const struct generic_data load_ltks_success_test_4 = {
++	.send_opcode = MGMT_OP_LOAD_LONG_TERM_KEYS,
++	.send_param = load_ltks_valid_param_20,
++	.send_len = sizeof(load_ltks_valid_param_20),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
++static const struct generic_data load_ltks_success_test_5 = {
++	.setup_settings = settings_powered_le,
++	.send_opcode = MGMT_OP_LOAD_LONG_TERM_KEYS,
++	.send_param = load_ltks_valid_param_20,
++	.send_len = sizeof(load_ltks_valid_param_20),
++	.expect_status = MGMT_STATUS_SUCCESS,
++};
++
+ static const struct generic_data load_ltks_invalid_params_test_1 = {
+ 	.send_opcode = MGMT_OP_LOAD_LONG_TERM_KEYS,
+ 	.send_param = load_ltks_invalid_param_1,
+@@ -6312,6 +6559,46 @@ static void setup_uuid_mix(const void *test_data)
+ 					setup_powered_callback, NULL, NULL);
+ }
+ 
++static void setup_load_ltks_callback(uint8_t status, uint16_t length,
++					const void *param, void *user_data)
++{
++	if (status != MGMT_STATUS_SUCCESS) {
++		tester_setup_failed();
++		return;
++	}
++
++	tester_print("Loaded Long Term Key");
++}
++
++static void setup_load_ltks_20_by_1(const void *test_data)
++{
++	struct test_data *data = tester_get_data();
++	struct mgmt_cp_load_long_term_keys *cp;
++	struct mgmt_ltk_info *info;
++	unsigned char param[sizeof(*cp) + sizeof(*info)] = { 0x00 };
++	unsigned char param_on[] = { 0x01 };
++	int i;
++
++	cp = (struct mgmt_cp_load_long_term_keys *)param;
++	cp->key_count = 1;
++
++	info = (struct mgmt_ltk_info *)cp->keys;
++	info->addr.type = 0x01;		/* LE Public */
++
++	for (i = 0; i < 20; i++) {
++		/* Update BDADDR */
++		info->addr.bdaddr.b[0] = i + 1;
++
++		mgmt_send(data->mgmt, MGMT_OP_LOAD_LONG_TERM_KEYS,
++			  data->mgmt_index, sizeof(param), param,
++			  setup_load_ltks_callback, NULL, NULL);
++	}
++
++	mgmt_send(data->mgmt, MGMT_OP_SET_POWERED, data->mgmt_index,
++					sizeof(param_on), param_on,
++					setup_powered_callback, NULL, NULL);
++}
++
+ static void setup_add_device(const void *test_data)
+ {
+ 	struct test_data *data = tester_get_data();
+@@ -10632,6 +10919,18 @@ int main(int argc, char *argv[])
+ 	test_bredrle("Load Long Term Keys - Success 1",
+ 				&load_ltks_success_test_1,
+ 				NULL, test_command_generic);
++	test_bredrle("Load Long Term Keys - Success 2",
++				&load_ltks_success_test_2,
++				NULL, test_command_generic);
++	test_bredrle("Load Long Term Keys - Success 3 (20 with count 1)",
++				&load_ltks_success_test_3,
++				setup_load_ltks_20_by_1, test_command_generic);
++	test_bredrle("Load Long Term Keys - Success 4 (20 with count 20)",
++				&load_ltks_success_test_4,
++				NULL, test_command_generic);
++	test_bredrle("Load Long Term Keys - Success 5 (Power On and 20 keys)",
++				&load_ltks_success_test_5,
++				NULL, test_command_generic);
+ 	test_bredrle("Load Long Term Keys - Invalid Parameters 1",
+ 				&load_ltks_invalid_params_test_1,
+ 				NULL, test_command_generic);
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
