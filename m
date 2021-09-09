@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF3D6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15CE5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D7CC460ED8
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA97E61108
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Sep 2021 23:09:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347053AbhIIXKT (ORCPT
+        id S244621AbhIIXKh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Sep 2021 19:10:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50608 "EHLO
+        Thu, 9 Sep 2021 19:10:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50678 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244621AbhIIXKS (ORCPT
+        with ESMTP id S231814AbhIIXKf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Sep 2021 19:10:18 -0400
-Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 770F1C061756
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Sep 2021 16:09:08 -0700 (PDT)
-Received: by mail-pg1-x533.google.com with SMTP id w7so30833pgk.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Sep 2021 16:09:08 -0700 (PDT)
+        Thu, 9 Sep 2021 19:10:35 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12E0DC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Sep 2021 16:09:25 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id c13-20020a17090a558d00b00198e6497a4fso108845pji.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Sep 2021 16:09:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=yyHvWInz3uuTDAiQ5ACOjUA89TJOt2Ed2qTMRVnSqVY=;
-        b=gRVG9VC2d8KBGz3XEqe5K+EjLxvsBgGHi6D/W8Xmtvdtepr+MLxHlTbgFwH2pEFk4w
-         EwSZX+977VuuuQhaC+7wVKTnyrko21lrWGlLBdbccsY/Op2ZhBKhuqPnr/iqA+Dy/AaK
-         pjq2sCSSB5QYSLJ0PvCS29P04lWYZLfYy32uH3LzQqt9DpmLwuSqCGIcgybIbv50mlpw
-         lDuU14FvhOYCSelwWep4LMKYRM6+pIs3Id3setn47i8QS5NBeeEHGweJRwx9y1kc16xo
-         ej2y7fGK0i/hby/+3VaP9+GXuZ/jSAXtCbv4vy1F+wOwPErCiGMlz+kgqOOAno3J4Rq9
-         ndoA==
+        b=LLwUMhOJVnFWK7Nke/kfiVCYMGzQ+JzwoyWO82+ozMs41UPpaQK9vasjsdHHNVBwkT
+         LF3Ho2qR9u8gobtNRxft3AvUYTHPm/3Jorpqez2Fkf8rJsHjHjSMFgZRC81FuKRiS8AU
+         77RIwpdX/XpDwpokhB019hNYpOEtjny+5lpePm54uzP5F+JNu1NVkGWotMyAG+ITJk5e
+         wYqpqzC3Lhzw/zxa8jl6+gsc/w+xMYQNXOY6VpnEzGNEy6fHxOhpPKWXR9zrPUmPZQNu
+         /2U3/DMCmWKW7ObC6b7+vhd5EmN95p6eh/+O49uuu7HqYIUePB1r+7hWgOM1lvgNm72f
+         z8BQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=yyHvWInz3uuTDAiQ5ACOjUA89TJOt2Ed2qTMRVnSqVY=;
-        b=z4grfmEIk3LULxeSB6/yzfU3E2mh6fbv+woIVnMS8DUp1sIDHnmWt1PG58wUPePh3n
-         SNawpyAn5NYu1x1GjZgvwXnGx5JNAjPxRAPjIcbc+BrDxULubrJpPY/E3O4RyCQedYUK
-         71A9XuVj8vF8FJDmd5Qy7lwR1GTBF4T1COCMAwy+3k+2tgiEQ59IPFglsZtRA2J6yO74
-         +iB6VTcOavGrXewp+xefiXVf3jxgMKHnUj8axsMGePzZ4eOQ2b88HmE0IAuTkNIlbXBh
-         ++P20Wb0V1SQX78u0w8xJN0A9eKtqyTzzmAGCy7bXg9vRkO+WjS4K4JjZXktRaigtMQx
-         dvcA==
-X-Gm-Message-State: AOAM533nkRMw2ktV82Xyx8dws0AXGm/+l9gRjcRGRKnujGLZwapePx9+
-        stJU/ie/RcfTfz27UT4goTbFYGqYPJE=
-X-Google-Smtp-Source: ABdhPJzJ3VUGKpygIjrJDfJERzgWjWag3ecaEyz50RcoZCeUdju9gN7i9iNrMbXXBTKN+wRA6A329g==
-X-Received: by 2002:a63:e74b:: with SMTP id j11mr4782060pgk.322.1631228947457;
-        Thu, 09 Sep 2021 16:09:07 -0700 (PDT)
+        b=o++Q6on+tjEgCGWpLxtyaAlUw5zRxHtR1tQKd2XC8iiEGXqsDWUKjKtLUHILRXVNpY
+         +M+pmoQbbRK0WjmUVzmkmyo3DF0jG1nEVw6Hx0JzwNcTOUfYuk3CMd3SWvbwEWEMySh+
+         x3a2ePa+nWz8jNKEFGF4xjjQXiFyXjacIM36ZxwJ15qcHenbYqnXYouJLOgOWmdsbAkp
+         PfAb5bU8Pd9+6YTYQ2NtvchsxekY89sTtdbKypVZV23U2K3TkR0CsDYhvGBGThWlwAEG
+         fwMqR7DO5VUKym1hgQ1pZG7LxodaqxHfQt8aIPuCaKTm9LF/PW3mzdgZSopZDEab6mT9
+         fpPg==
+X-Gm-Message-State: AOAM532Vk08NoqD8/ny3hUAtackSBEnFsT/lTlSy82iM6fYxp/3JG7CE
+        psBw6pV76y/dftf5k1IhaAYyymvSe5k=
+X-Google-Smtp-Source: ABdhPJxccQEn6l0MJ/kj5k/e3y7O7gQgGuep6AOodE9O3//KxB4bTSxhiP4z4+Gb/P367nHWnmkJYA==
+X-Received: by 2002:a17:90b:1d8d:: with SMTP id pf13mr6246589pjb.130.1631228964230;
+        Thu, 09 Sep 2021 16:09:24 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:cfe1:5bc7:a7f1:cb9f])
-        by smtp.gmail.com with ESMTPSA id n11sm3425982pjh.23.2021.09.09.16.09.06
+        by smtp.gmail.com with ESMTPSA id m21sm3418183pfa.216.2021.09.09.16.09.23
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Sep 2021 16:09:07 -0700 (PDT)
+        Thu, 09 Sep 2021 16:09:23 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH] tools/mgmt-tester: Add test cases for load_long_term_keys command
-Date:   Thu,  9 Sep 2021 16:09:06 -0700
-Message-Id: <20210909230906.165577-1-hj.tedd.an@gmail.com>
+Subject: [BlueZ PATCH V2] tools/mgmt-tester: Add test cases for load_long_term_keys command
+Date:   Thu,  9 Sep 2021 16:09:23 -0700
+Message-Id: <20210909230923.165649-1-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
