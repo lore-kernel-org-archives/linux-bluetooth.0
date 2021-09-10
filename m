@@ -2,67 +2,194 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-16.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93B50C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:39:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2886DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:47:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7DACB611BF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:39:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0D6DF60F92
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:47:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231603AbhIJHk3 convert rfc822-to-8bit (ORCPT
+        id S231611AbhIJHse (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Sep 2021 03:40:29 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60054 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231587AbhIJHk1 (ORCPT
+        Fri, 10 Sep 2021 03:48:34 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52054 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231402AbhIJHsd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Sep 2021 03:40:27 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 0A876CED3D;
-        Fri, 10 Sep 2021 09:39:15 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: hci: fix GPF in h5_recv
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210902202756.25378-1-paskripkin@gmail.com>
-Date:   Fri, 10 Sep 2021 09:39:14 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        apusaka@chromium.org, abhishekpandit@chromium.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        syzbot+7d41312fe3f123a6f605@syzkaller.appspotmail.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <EF01F61D-7765-49C1-A813-55EB130FCCE1@holtmann.org>
-References: <20210902202756.25378-1-paskripkin@gmail.com>
-To:     Pavel Skripkin <paskripkin@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Fri, 10 Sep 2021 03:48:33 -0400
+Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 772FDC061756
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Sep 2021 00:47:22 -0700 (PDT)
+Received: by mail-pj1-x1036.google.com with SMTP id c13-20020a17090a558d00b00198e6497a4fso883384pji.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Sep 2021 00:47:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=SM4gxs9XjX0uBbpU8UEiIwwD+CDm0lpp+C8IphN8qTY=;
+        b=XfXxMqnb/ez1gIo7dVeNiFQkM2ztbEv5x5lAO8RaoFR8VDlfPgFZymvDX4KsBTYOtO
+         Tco5x/lVlygmW7mYCSihej026lHudEca0pCrCF8sb5o4ZckHWzc5l+65k8DynjxXXSaH
+         Be7Hd7VFyPZjL1LiDL1zwmdvfgO0h31tSXAJs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=SM4gxs9XjX0uBbpU8UEiIwwD+CDm0lpp+C8IphN8qTY=;
+        b=QSyR2NlSJE0Q0ULePIkPbm32gktl9pi6DkesH3Oq6MwXZJmz64H2U+VjORQis+dGA3
+         LzaNXYBPnIyJm77uvsLNNvTP0SMyaRwYeLv9JNI4qmQly+3GJjdMEQYV7qXWHWiHYksw
+         NnteHe5MH1Z8gicVAg4v7U4+CTj4eUzyoJqwgZ/U2PGMMcNG6GIAU6uK+ybE0I1SZEi5
+         F5ET01gDzYrDFd/SfdsAtlwm90hUQ79AqcLHv0W6oTfPC4/+HXS8D/Xgezj+3EokjGC7
+         uSycERRstderBUjUrmabRYFOxTtDG3UwXibUT6eUpAV+ftdZGIXU1b6bCuIsSoElvbQG
+         0dvQ==
+X-Gm-Message-State: AOAM531mU36aprxfRi2czckfhrH/WTQkmtbDA958Cc+3zRptNBlgtCVc
+        hXHgJK0WoOJB1l7qTx26engbHW/VYfSrCw==
+X-Google-Smtp-Source: ABdhPJzzbFTvqEhkngPbSrojBBVkm7UY+A/nqb1uIBwa2bNJTfGdfsoUsy36m53Q2Qvuj1C6ETP2dQ==
+X-Received: by 2002:a17:902:834b:b0:13a:347b:8a00 with SMTP id z11-20020a170902834b00b0013a347b8a00mr6444471pln.54.1631260041974;
+        Fri, 10 Sep 2021 00:47:21 -0700 (PDT)
+Received: from localhost ([2620:15c:202:201:c1fe:57b:eb6:58a5])
+        by smtp.gmail.com with UTF8SMTPSA id bx2sm4110027pjb.35.2021.09.10.00.47.20
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 10 Sep 2021 00:47:21 -0700 (PDT)
+Date:   Fri, 10 Sep 2021 00:47:19 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        rjliao@codeaurora.org, tjiang@codeaurora.org
+Subject: Re: [PATCH v8] Bluetooth: btusb: Add support using different nvm for
+ variant WCN6855 controller
+Message-ID: <YTsNh+Y9eTD6id7e@google.com>
+References: <1630641758-22281-1-git-send-email-zijuhu@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1630641758-22281-1-git-send-email-zijuhu@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pavel,
+On Fri, Sep 03, 2021 at 12:02:38PM +0800, Zijun Hu wrote:
+> From: Tim Jiang <tjiang@codeaurora.org>
+> 
+> the RF perfermance of wcn6855 soc chip from different foundries will be
 
-> Syzbot hit general protection fault in h5_recv(). The problem was in
-> missing NULL check.
+as Marcel commented on a previous version: 'perfermence' => 'performance'
+
+> difference, so we should use different nvm to configure them.
 > 
-> hu->serdev can be NULL and we cannot blindly pass &serdev->dev
-> somewhere, since it can cause GPF.
-> 
-> Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
-> Reported-and-tested-by: syzbot+7d41312fe3f123a6f605@syzkaller.appspotmail.com
-> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+
+For the third time, you should also add your own 'Signed-off-by' tag, i.e.
+'Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>'
+
+If you have any doubts about comments you receive ask for clarification,
+just ignoring them generally won't satisfy your reviewers.
+
 > ---
-> drivers/bluetooth/hci_h5.c | 8 +++++---
-> 1 file changed, 5 insertions(+), 3 deletions(-)
+>  drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 37 insertions(+), 13 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 928cbfa4c42d..0f5d2222d624 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+>  #define QCA_DFU_TIMEOUT		3000
+>  #define QCA_FLAG_MULTI_NVM      0x80
+>  
+> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
+> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+> +
+>  struct qca_version {
+>  	__le32	rom_version;
+>  	__le32	patch_version;
+> @@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
+>  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+>  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+>  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+>  };
+>  
+>  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+> @@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+>  	return err;
+>  }
+>  
+> +static void btusb_generate_qca_nvm_name(char *fwname,
+> +					size_t max_size,
+> +					struct qca_version *ver,
+> +					char *variant)
 
-patch has been applied to bluetooth-next tree.
+The variant parameter should probably be removed (see coment below), if it is
+kept it should be 'const char *'.
 
-Regards
+> +{
+> +	char *sep = (strlen(variant) == 0) ? "" : "_";
+> +	u16 board_id = le16_to_cpu(ver->board_id);
+> +	u32 rom_version = le32_to_cpu(ver->rom_version);
+> +
+> +	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> +		/* if boardid equal 0, use default nvm without suffix */
 
-Marcel
+This comment isn't useful, please remove it.
 
+Ok, it was already in btusb_setup_qca_load_nvm(), but still it's a
+good opportunity to remove it.
+
+> +		if (board_id == 0x0) {
+
+Just use '0' instead of the single digit hex number.
+
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
+> +				rom_version, sep, variant);
+> +		} else {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
+> +				rom_version, sep, variant, board_id);
+> +		}
+> +	} else {
+> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
+> +			rom_version);
+> +	}
+> +
+
+delete empty line
+
+> +}
+> +
+>  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>  				    struct qca_version *ver,
+>  				    const struct qca_device_info *info)
+> @@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>  	char fwname[64];
+>  	int err;
+>  
+> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		/* if boardid equal 0, use default nvm without surfix */
+> -		if (le16_to_cpu(ver->board_id) == 0x0) {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -				 le32_to_cpu(ver->rom_version));
+> -		} else {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -				le32_to_cpu(ver->rom_version),
+> -				le16_to_cpu(ver->board_id));
+> -		}
+> -	} else {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -			 le32_to_cpu(ver->rom_version));
+> +	switch (ver->ram_version) {
+> +	case WCN6855_2_0_RAM_VERSION_GF:
+> +	case WCN6855_2_1_RAM_VERSION_GF:
+> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
+> +		break;
+> +	default:
+> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
+> +		break;
+
+Actually it would make more sense to have the above switch statement in
+btusb_generate_qca_nvm_name(), rather than passing the variant string.
