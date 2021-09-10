@@ -2,93 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-4.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 121F5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1297AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:37:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA1E661153
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:36:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E6AB3610C8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:37:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231465AbhIJHhj convert rfc822-to-8bit (ORCPT
+        id S231489AbhIJHi3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Sep 2021 03:37:39 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:44475 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231290AbhIJHhi (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Sep 2021 03:37:38 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 989BDCED3D;
-        Fri, 10 Sep 2021 09:36:25 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH 1/2] Bluetooth: call sock_hold earlier in sco_conn_del
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210903031306.78292-2-desmondcheongzx@gmail.com>
-Date:   Fri, 10 Sep 2021 09:36:25 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        eric.dumazet@gmail.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <7AEB2618-111A-45F4-8C00-CF40FCBE92EC@holtmann.org>
-References: <20210903031306.78292-1-desmondcheongzx@gmail.com>
- <20210903031306.78292-2-desmondcheongzx@gmail.com>
-To:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Fri, 10 Sep 2021 03:38:29 -0400
+Received: from mail.kernel.org ([198.145.29.99]:33666 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231290AbhIJHi3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Sep 2021 03:38:29 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 7016A61221
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Sep 2021 07:37:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1631259438;
+        bh=d8JvH2ZnHSTHpRwTSnD0IAWwbmnlu9LWGyyu8z5ET24=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=sFViFBeHpWO99HUN8SK1cGZXurkHlwEK4nOLigIVgWOW+qfEQR6ka8yn3LNSOu3Jo
+         9xDfICdEwVkd+xYnQIlCpH4uccYYg6bTAhFbdT+9Uh0UyknxfISH5ds5M5bOPvfPn3
+         Nt/5Y0c27ymBXd6Ch3AosD37WNeD9pWjFe7jJKNwMlmB2fHX7iR/2Q1VJlGVEpFZTK
+         xFC4eYJB+b946T9dpayQeqbMcbSdfKT82XzXBgDi1/qP9XELCqXliygmKR9aO/VACr
+         fFZ7sRiUo9drqDKXngT8RJpXwIahQg3WsOullcadJtoa1NZ+Ds8VxGFHojTiZ43Wry
+         r5SClbXnoCq6w==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Fri, 10 Sep 2021 07:37:14 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: swyterzone@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-TnujWDvzXu@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Desmond,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-> In sco_conn_del, conn->sk is read while holding on to the
-> sco_conn.lock to avoid races with a socket that could be released
-> concurrently.
-> 
-> However, in between unlocking sco_conn.lock and calling sock_hold,
-> it's possible for the socket to be freed, which would cause a
-> use-after-free write when sock_hold is finally called.
-> 
-> To fix this, the reference count of the socket should be increased
-> while the sco_conn.lock is still held.
-> 
-> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-> ---
-> net/bluetooth/sco.c | 3 ++-
-> 1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-> index b62c91c627e2..4a057f99b60a 100644
-> --- a/net/bluetooth/sco.c
-> +++ b/net/bluetooth/sco.c
-> @@ -187,10 +187,11 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
-> 	/* Kill socket */
-> 	sco_conn_lock(conn);
-> 	sk = conn->sk;
+--- Comment #201 from Swyter (swyterzone@gmail.com) ---
+Quick update: I have received two e-mails from gregkh saying that he has ad=
+ded
+my "Bluetooth: btusb: Make the CSR clone chip force-suspend workaround more
+generic" patch to the 5.14-stable and 5.13-stable trees. So, hopefully, if =
+I'm
+not wrong, this means that it will get a lot more use and feedback in the
+following months. Neat. =C2=AF\_(=E3=83=84)_/=C2=AF
 
-please add a comment here on why we are doing it.
+--=20
+You may reply to this email to add a comment.
 
-> +	if (sk)
-> +		sock_hold(sk);
-> 	sco_conn_unlock(conn);
-> 
-> 	if (sk) {
-> -		sock_hold(sk);
-> 		lock_sock(sk);
-> 		sco_sock_clear_timer(sk);
-> 		sco_chan_del(sk, err);
-
-Regards
-
-Marcel
-
+You are receiving this mail because:
+You are the assignee for the bug.=
