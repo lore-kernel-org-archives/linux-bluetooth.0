@@ -4,143 +4,74 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35628C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:30:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC75BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:33:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 12280611C3
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:30:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9080061153
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Sep 2021 07:33:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231504AbhIJHbR convert rfc822-to-8bit (ORCPT
+        id S231492AbhIJHfB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Sep 2021 03:31:17 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:58657 "EHLO
+        Fri, 10 Sep 2021 03:35:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:38777 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231364AbhIJHbQ (ORCPT
+        with ESMTP id S231408AbhIJHfA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Sep 2021 03:31:16 -0400
+        Fri, 10 Sep 2021 03:35:00 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id EAB79CED3D;
-        Fri, 10 Sep 2021 09:30:03 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5973CCED3D;
+        Fri, 10 Sep 2021 09:33:46 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v8] Bluetooth: btusb: Add support using different nvm for
- variant WCN6855 controller
+Subject: Re: [PATCH -next] Bluetooth: btusb: Fix the application of sizeof to
+ pointer
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1630641758-22281-1-git-send-email-zijuhu@codeaurora.org>
-Date:   Fri, 10 Sep 2021 09:30:03 +0200
+In-Reply-To: <1630653392-45523-1-git-send-email-yang.lee@linux.alibaba.com>
+Date:   Fri, 10 Sep 2021 09:33:45 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Rocky Liao <rjliao@codeaurora.org>, tjiang@codeaurora.org
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <1A6C7105-5BA3-44C4-9F94-BB71FBDBE8F5@holtmann.org>
-References: <1630641758-22281-1-git-send-email-zijuhu@codeaurora.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
+Message-Id: <AE0FD6C9-75DA-49E3-91F9-6F095284BCB2@holtmann.org>
+References: <1630653392-45523-1-git-send-email-yang.lee@linux.alibaba.com>
+To:     Yang Li <yang.lee@linux.alibaba.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Yang,
 
-> the RF perfermance of wcn6855 soc chip from different foundries will be
-> difference, so we should use different nvm to configure them.
+> sizeof() when applied to a pointer typed expression gives the size of
+> the pointer.
 > 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> Clean up coccicheck warning:
+> ./drivers/bluetooth/btusb.c:2210:36-42: ERROR: application of sizeof to
+> pointer
+> 
+> Reported-by: Abaci Robot <abaci@linux.alibaba.com>
+> Signed-off-by: Yang Li <yang.lee@linux.alibaba.com>
 > ---
-> drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
-> 1 file changed, 37 insertions(+), 13 deletions(-)
+> drivers/bluetooth/btusb.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 928cbfa4c42d..0f5d2222d624 100644
+> index 928cbfa..5bf479e 100644
 > --- a/drivers/bluetooth/btusb.c
 > +++ b/drivers/bluetooth/btusb.c
-> @@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
-> #define QCA_DFU_TIMEOUT		3000
-> #define QCA_FLAG_MULTI_NVM      0x80
+> @@ -2207,7 +2207,7 @@ static int btusb_set_bdaddr_mtk(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> 	struct sk_buff *skb;
+> 	long ret;
 > 
-> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> +
-> struct qca_version {
-> 	__le32	rom_version;
-> 	__le32	patch_version;
-> @@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
-> 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-> 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-> 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-> };
-> 
-> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> @@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-> 	return err;
-> }
-> 
-> +static void btusb_generate_qca_nvm_name(char *fwname,
-> +					size_t max_size,
-> +					struct qca_version *ver,
-> +					char *variant)
-> +{
-> +	char *sep = (strlen(variant) == 0) ? "" : "_";
-> +	u16 board_id = le16_to_cpu(ver->board_id);
-> +	u32 rom_version = le32_to_cpu(ver->rom_version);
-> +
-> +	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +		/* if boardid equal 0, use default nvm without suffix */
-> +		if (board_id == 0x0) {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-> +				rom_version, sep, variant);
-> +		} else {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-> +				rom_version, sep, variant, board_id);
-> +		}
-> +	} else {
-> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-> +			rom_version);
-> +	}
-> +
-> +}
-> +
-> static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-> 				    struct qca_version *ver,
-> 				    const struct qca_device_info *info)
-> @@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-> 	char fwname[64];
-> 	int err;
-> 
-> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		/* if boardid equal 0, use default nvm without surfix */
-> -		if (le16_to_cpu(ver->board_id) == 0x0) {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -				 le32_to_cpu(ver->rom_version));
-> -		} else {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -				le32_to_cpu(ver->rom_version),
-> -				le16_to_cpu(ver->board_id));
-> -		}
-> -	} else {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -			 le32_to_cpu(ver->rom_version));
-> +	switch (ver->ram_version) {
-> +	case WCN6855_2_0_RAM_VERSION_GF:
-> +	case WCN6855_2_1_RAM_VERSION_GF:
-> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-> +		break;
-> +	default:
-> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-> +		break;
+> -	skb = __hci_cmd_sync(hdev, 0xfc1a, sizeof(bdaddr), bdaddr, HCI_INIT_TIMEOUT);
+> +	skb = __hci_cmd_sync(hdev, 0xfc1a, sizeof(*bdaddr), bdaddr, HCI_INIT_TIMEOUT);
 
-I mentioned this multiple times now, the indentation is wrong here.
+lets just do 0xfc1a, 6, bdaddr like the other functions do as well.
 
 Regards
 
