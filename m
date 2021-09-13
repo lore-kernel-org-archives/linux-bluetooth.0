@@ -4,147 +4,88 @@ X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 X-Spam-Level: 
 X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93E2DC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 14:30:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 193E1C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 14:35:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D9B2610CB
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 14:30:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 07F0F60E08
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 14:35:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345094AbhIMObb convert rfc822-to-8bit (ORCPT
+        id S1345856AbhIMOgb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 10:31:31 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:43419 "EHLO
+        Mon, 13 Sep 2021 10:36:31 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42773 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243853AbhIMO2o (ORCPT
+        with ESMTP id S1344589AbhIMOeE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 10:28:44 -0400
+        Mon, 13 Sep 2021 10:34:04 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BB12ACED1E;
-        Mon, 13 Sep 2021 16:27:22 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id AFFE3CED1E;
+        Mon, 13 Sep 2021 16:32:45 +0200 (CEST)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v9] Bluetooth: btusb: Add support using different nvm for
- variant WCN6855 controller
+Subject: Re: [PATCH v3 1/3] Bluetooth: btandroid: Support Android Bluetooth
+ Quality Report
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1631513399-22826-1-git-send-email-zijuhu@codeaurora.org>
-Date:   Mon, 13 Sep 2021 16:27:22 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20210913152801.v3.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
+Date:   Mon, 13 Sep 2021 16:32:45 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Rocky Liao <rjliao@codeaurora.org>, tjiang@codeaurora.org
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        Joseph Hwang <josephsih@google.com>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        kernel test robot <lkp@intel.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <2A714E81-3DF7-44D9-87B4-1D915CB3155D@holtmann.org>
-References: <1631513399-22826-1-git-send-email-zijuhu@codeaurora.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
+Message-Id: <D38B22EC-EFC8-44A0-84BE-F3710380C022@holtmann.org>
+References: <20210913152801.v3.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
+To:     Joseph Hwang <josephsih@chromium.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Zijun,
+Hi Joseph,
 
-> the RF performance of wcn6855 soc chip from different foundries will be
-> difference, so we should use different nvm to configure them.
+> Add the btandroid.c file to support Android BQR commands.
 > 
-> Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+> This module may be referenced by btusb, btrtl, and hci_qca when a
+> Bluetooth controller supports the Android Bluetooth Quality Report.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> 
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 > ---
-> drivers/bluetooth/btusb.c | 51 +++++++++++++++++++++++++++++++++++------------
-> 1 file changed, 38 insertions(+), 13 deletions(-)
 > 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 928cbfa4c42d..7b23cfd131f6 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
-> #define QCA_DFU_TIMEOUT		3000
-> #define QCA_FLAG_MULTI_NVM      0x80
+> Changes in v3:
+> - Fix the auto build test ERROR
+>  "undefined symbol: btandroid_set_quality_report" that occurred
+>  with some kernel configs.
+> - Note that the mgmt-tester "Read Exp Feature - Success" failed.
+>  But on my test device, the same test passed. Please kindly let me
+>  know what may be going wrong. These patches do not actually
+>  modify read/set experimental features.
+> - As to CheckPatch failed. No need to modify the MAINTAINERS file.
+>  Thanks.
 > 
-> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> +
-> struct qca_version {
-> 	__le32	rom_version;
-> 	__le32	patch_version;
-> @@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
-> 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-> 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-> 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-> };
+> Changes in v2:
+> - Fix the titles of patches 2/3 and 3/3 and reduce their lengths.
 > 
-> static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> @@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-> 	return err;
-> }
-> 
-> +static void btusb_generate_qca_nvm_name(char *fwname,
-> +					size_t max_size,
-> +					struct qca_version *ver,
-> +					char *variant)
-> +{
-> +	char *sep = (strlen(variant) == 0) ? "" : "_";
-> +	u16 board_id = le16_to_cpu(ver->board_id);
-> +	u32 rom_version = le32_to_cpu(ver->rom_version);
-> +
-> +	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +		/* if boardid equal 0, use default nvm without suffix */
-> +		if (board_id == 0x0) {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-> +				rom_version, sep, variant);
-> +		} else {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-> +				rom_version, sep, variant, board_id);
-> +		}
-> +	} else {
-> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-> +			rom_version);
-> +	}
-> +
-> +}
-> +
+> drivers/bluetooth/Kconfig     |   5 ++
+> drivers/bluetooth/Makefile    |   1 +
+> drivers/bluetooth/btandroid.c | 106 ++++++++++++++++++++++++++++++++++
+> drivers/bluetooth/btandroid.h |  10 ++++
+> 4 files changed, 122 insertions(+)
+> create mode 100644 drivers/bluetooth/btandroid.c
+> create mode 100644 drivers/bluetooth/btandroid.h
 
-you have not addressed a single comment from Matthias.
-
-> static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-> 				    struct qca_version *ver,
-> 				    const struct qca_device_info *info)
-> @@ -3354,19 +3383,15 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-> 	char fwname[64];
-> 	int err;
-> 
-> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		/* if boardid equal 0, use default nvm without surfix */
-> -		if (le16_to_cpu(ver->board_id) == 0x0) {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -				 le32_to_cpu(ver->rom_version));
-> -		} else {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -				le32_to_cpu(ver->rom_version),
-> -				le16_to_cpu(ver->board_id));
-> -		}
-> -	} else {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -			 le32_to_cpu(ver->rom_version));
-> +	switch (ver->ram_version) {
-> +	case WCN6855_2_0_RAM_VERSION_GF:
-> +	case WCN6855_2_1_RAM_VERSION_GF:
-> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-> +		break;
-> +
-> +	default:
-> +			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-> +		break;
-
-And this indentation is still wrong. I have lost track how many times I mentioned it. I am not going to mention it anymore and I will not review this patch until review comments are actually addressed. It is a blind disrespect towards the maintainers and reviewers.
+I am confused now. Did you read my review comments? I do _not_ want it this way; so please read my previous response and don’t send the exact same patch again.
 
 Regards
 
