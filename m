@@ -2,241 +2,198 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-0.9 required=3.0 tests=BAYES_00,
-	CHARSET_FARAWAY_HEADER,DKIMWL_WL_HIGH,DKIM_SIGNED,DKIM_VALID,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 845A8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 04:47:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FF2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 05:15:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5A44360F9B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 04:47:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C0E8460F92
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 05:15:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229963AbhIMEtI (ORCPT
+        id S236968AbhIMFQj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 00:49:08 -0400
-Received: from mail-gw101.jp.ricoh.com ([133.139.20.91]:43086 "EHLO
-        mail-gw101.jp.ricoh.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229722AbhIMEtH (ORCPT
+        Mon, 13 Sep 2021 01:16:39 -0400
+Received: from mail-io1-f69.google.com ([209.85.166.69]:38732 "EHLO
+        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229563AbhIMFQj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 00:49:07 -0400
-X-Greylist: delayed 901 seconds by postgrey-1.27 at vger.kernel.org; Mon, 13 Sep 2021 00:49:07 EDT
-Received: from smtp02.os5.jp.ricoh.com ([10.230.97.112])
-        by cmsmtp with ESMTP
-        id PdeEmiGDagSnxPdeEm2QXu; Mon, 13 Sep 2021 13:32:50 +0900
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ricoh.com;
-        s=s20170401; t=1631507570;
-        bh=beoXhZAF+6/ljnzEoLqYxGtyyQa8CziaEl3qN+zJo4A=;
-        h=From:To:Subject:Date;
-        b=pxpQdKWXOcHh5hW5MzK/qMKiWQoOQsXEEw2+HQrMN93rMykNSC1ttH03weUuzzHzv
-         wYBMtCvP4imI9QFauk2UecGfyfVABbwF/6vq4NlBaSJp78di/2dQR0MPE9mjKTnfz8
-         V3wEwNM6+EHP1Dnabtc/5+1E+AWCNqZ26jVBU+XY=
-X-VirusScan: scaned
-X-Flow-Control-Result: 
-Received: from localhost.localdomain (localhost [127.0.0.1])
-        by smtp02.os5.jp.ricoh.com (Postfix) with ESMTP id DEE689C102F
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 13:32:50 +0900 (JST)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hCS0iCSwPlm88UD4eRmVaWzKQgB9iRUTCGo0psIn/x7fWSL6Vx3gTREpE4cd1bVnGpGZsOBdw4UlQsfWPwMOU9u2ipQcYGlMJ6nq9fi9MVHrPd8M07l0XehEPm7DzfB/kj1q6Ev4AODG7fNHVoS5QNkp0lIOzV2Pc+VEc5gNvhHtRlumWc8l+COqJzOsvQWEbfycAG1sAQV1fxDNGfkFiGmwiX6Ty92jJRp2TW/2KrQFdqWsr/Hv34Jt4YTooGCwc2k1K2hoLyJ2rNsTTc6vSju9GGtyaZXUUMkvkNMHpRFSPgjhUU1B4pluJqNX46tdaKf11sllGNEizJONvTnX1Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901; h=From:Date:Subject:Message-ID:Content-Type:MIME-Version;
- bh=HRj/R2MHBB67YO4kcbsEXyn8LEeldAFlwEdjWcPSlYY=;
- b=A1PNM6bRCUv5cqCbh2lUWE0Sq3pbbdYJC/31ytEtD4T8MNFYChsfWnsL4aeSGzfYvPfhBZTWIeEEFddJALa2rzPHiCxL8vvpGXCfOxdNgvh9HKc9OSbfaTXJh+QiVRjtq8RAViEmMXXdWyh5JWdUk6ipqMaCwS7mUKnDflx2oQX4RWGCcEOUL1dCGze+ou4DPHBwU6aGLen6bLt+gKIf5qTl8No+n0NczO20flR0xmegLBhUoJaSKOb8eL5HAIXdis1+2zV8Uv2U5KAvM3+QWyaxcyqrpClMyyKZuiKlb8Mr3Co2UROoYi6p3sP4X67GCUKE5NxKZ6DLN2xkMTEEtQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=jp.ricoh.com; dmarc=pass action=none header.from=jp.ricoh.com;
- dkim=pass header.d=jp.ricoh.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=rfgricoh.onmicrosoft.com; s=selector2-rfgricoh-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HRj/R2MHBB67YO4kcbsEXyn8LEeldAFlwEdjWcPSlYY=;
- b=IfIVW6b/D8bA15dmsFXEkxzdZ1pTRtoSnrNWAjK+Na9QaIWxRi/cPUrOxyPcWxsUetN56RkkpSfB3P86/XdW1kqVqvboxDnWgFZQczqL3BFh736xacg24rPRzQ/Vp6Be+0QW3PuZ7kZQEDKlwl2a78OcRr7VFE6kSt5GEpSzh7o=
-Received: from OS3PR01MB6837.jpnprd01.prod.outlook.com (2603:1096:604:12f::11)
- by OS0PR01MB6417.jpnprd01.prod.outlook.com (2603:1096:604:105::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4500.14; Mon, 13 Sep
- 2021 04:32:49 +0000
-Received: from OS3PR01MB6837.jpnprd01.prod.outlook.com
- ([fe80::3437:58b3:7d23:8856]) by OS3PR01MB6837.jpnprd01.prod.outlook.com
- ([fe80::3437:58b3:7d23:8856%9]) with mapi id 15.20.4500.018; Mon, 13 Sep 2021
- 04:32:49 +0000
-From:   =?iso-2022-jp?B?VGFrYWhhc2hpIEhpZGVraSAyICgbJEJ8YjY2GyhCIBskQjFRPHkbKEIp?= 
-        <hideki.takahashi2@jp.ricoh.com>
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: hci link tx timeout with BCM43438
-Thread-Topic: hci link tx timeout with BCM43438
-Thread-Index: AdeoOVU2nJW+v6AbSHe5kxZzVur3oA==
-Date:   Mon, 13 Sep 2021 04:32:49 +0000
-Message-ID: <OS3PR01MB68374959D142463F88FD383684D99@OS3PR01MB6837.jpnprd01.prod.outlook.com>
-Accept-Language: ja-JP, en-US
-Content-Language: ja-JP
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: vger.kernel.org; dkim=none (message not signed)
- header.d=none;vger.kernel.org; dmarc=none action=none
- header.from=jp.ricoh.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 618680cc-f5ff-4b4a-32f8-08d9766f8aef
-x-ms-traffictypediagnostic: OS0PR01MB6417:
-x-microsoft-antispam-prvs: <OS0PR01MB64175F21793C7A0D6C68951484D99@OS0PR01MB6417.jpnprd01.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1303;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: Q/AKKpDmvR87j0COJmWyoj/2YWj+34xZdn3MsoGFJmHzPOuzJvYHvOq0aHElH31mCrhTk/P4WzX8v63awQhZN3A6/rsrBDYn+Eg5/NLdqOtYtqiKBMXKw/sBnhTrXwwOCw28bwb4iQn0KeYSJXMhV9qZqVi6xBV4PTkTmRHXmiYcQ/wT43HEk181Sa4xKdsSsUJRx4TktvgZnLe41HNcn0UqGS08m2SCsZxViXShi8WKiKaWtpxIFs/c6zSLWhdVwUum6mWHF8Tdfr5+YUbsE8nxeVuIUiz3jxum0M01sILfFWd1wC3HKwacy1G5syQasg/S8dqM1QGQSSor3tohGqSFY082RVFIz+U/wmG1lZUSoCH9f/RznnuDbRH5MFtUgsJSrWsYjPUa1qI4aJdeAP48oVbyjo4q5HUn/PYN4xXpIZYiez+l8XMiV9Pg85NC4t4K/S7Nl/Jbf1UDs1fPcWsOTAN4fafCUJCJPHX3Ww6PDcCPoYtlHVQp19tKBM0Zm1e8lqR549qd3o/iiHIX9TScWAN8O9i7sAuj2eOa5ca7Mbxzkgik8jQzPTszqITDcaMLjS6BQ+UFxZ5HvhB06z9ADHfA5Zs1l945uY7QbQK4i+Xr9ArJ4+FsOthi1IaqVX/eGDm9ghSpvTeUMrkIJiHOXmt+0aAAehz5ePgH2DkMsUgUCtYMzqyNzLNiGJkPbib0Brn5J2CLdR19n3y1Zw==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:OS3PR01MB6837.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(396003)(376002)(136003)(39860400002)(346002)(38100700002)(122000001)(52536014)(9686003)(55016002)(6506007)(66946007)(186003)(5660300002)(85182001)(478600001)(76116006)(66556008)(38070700005)(64756008)(8936002)(86362001)(66446008)(71200400001)(26005)(6916009)(8676002)(316002)(33656002)(7696005)(2906002)(66476007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-2022-jp?B?VWc4RUliUHhVZDB5S3FUZmZLMlpYMGFFUUQ2YStLSFpPNndJZzFUUm5h?=
- =?iso-2022-jp?B?YUhBd0lWTFRvWjk1Y2pQWDk2UUpYQUxlZUcybDJXZmR4ckU3MWlRN1Mw?=
- =?iso-2022-jp?B?dEZGRmhZcFlITWNtaU9qZlY2VFI5T3hyaVVMRnZjT1JDWUc0U2FPNktQ?=
- =?iso-2022-jp?B?TXZFaTFjcWdmSXFDRGFuZ2dGUEIrSzZETStTSHlNRkRibGRIRHJ6bmgw?=
- =?iso-2022-jp?B?Kzc5R0kvTXV5ME5abFEvZEJDMHVhZ0x3d012WUo4emh0OWFTZEtIZ2JY?=
- =?iso-2022-jp?B?bGpvYU9MRWlPeTE3RXRPL2hIQ2dMYnA5RWlTRFRWNGl1VkRQYUF1N1Zq?=
- =?iso-2022-jp?B?Y2hhZElHOTJ5dUNsbHVEY1NHYTR3ZzlaK3hhZWdlZXhRczUzUDBKUTNu?=
- =?iso-2022-jp?B?Z0M2Mmx0UytPbFF5L3RYUXdlVzg4d3A2NjBrcHNQUzVhQjgyYWtjZ2xq?=
- =?iso-2022-jp?B?OVR6SUtKWGpFRmZ6cEVJYWVLVmw1NWlkZTBkckVnSWtmR2ZwK3ZtRHdM?=
- =?iso-2022-jp?B?WUU4MjFvTEp2bzNjWVUrWWN2M3BaZDFOam1zMlRPTEI1bHlpSWpUTjNE?=
- =?iso-2022-jp?B?MTM2Nk1QRDBka2V0c05veWZDMkdZeDl3eWlDeTc5VWR6R2ViQWNtK21j?=
- =?iso-2022-jp?B?MUROODRQMXRYb0xmaXFsUXdBaVFwR3B2amhLTjFQeUIvRU1aZk1rc2Jn?=
- =?iso-2022-jp?B?Zm1NcUROR2tpblNnQVZZSDF6NDhic2k3aEY5czF1Q3BxQkZobjVQUGxj?=
- =?iso-2022-jp?B?R3dqNmozSkM0V2hZT2hDT2h6SVE0MUo0ZGhKOEwvTlRqcHBQTEJicUQ2?=
- =?iso-2022-jp?B?QmxoWVhYcjVHTlI5VUNLczIvcjEvMUdzaXpvRjJPbnEwVy93c1JmTnRy?=
- =?iso-2022-jp?B?cU85QzFWcU5LNUZWSUwzdUFWSkVyTjBENVR0ZEdZNSs1VmlFTzh0R3ZE?=
- =?iso-2022-jp?B?R3Y2OEhKUHZUejA2SDBEVlhTc2lZcXEwcWFLRG8xN3k1YWsyQWdxY01O?=
- =?iso-2022-jp?B?RlZaNFl0em0wM1R5cWZ3WmFXellqdzlPUHRUWFdkNVZzdlJwdlRzVkJQ?=
- =?iso-2022-jp?B?blJjNmhlUXd4WW1vU0xRVy9MVzh3RzlxNEpsQkdVRlJUVG16YU1KMU1G?=
- =?iso-2022-jp?B?Z2xza0N1L21jSGpQSVY4eDlSU2NrOXZrTWhUN2dqallTTnp4di9yajFw?=
- =?iso-2022-jp?B?YnBkMGJrWmNhSzdZNmQ5NEw0ZUZQQnY2ZzQ2dWJ2QUpQbmZmUWFsQmZl?=
- =?iso-2022-jp?B?UDEwbmFUaThwMmpuOERRN3psN3pBbFFLdW9rQy9obUVPZndOV1FqdDZk?=
- =?iso-2022-jp?B?eGNPQVhpODhWb29IWFNQMDdjMXdCOEwyQ1NyZHRRYkFXWVFrOFlMN0VZ?=
- =?iso-2022-jp?B?b2J0MWFvY0orb0xrWldyL21jaERyWVFraFFYYndHbVBLZHg4b2RUbXhh?=
- =?iso-2022-jp?B?UWFUbkxuQVhQeldxSERQMVdUUTJFeUo3VjZjV0dJRG05N0dWcTkxNDZh?=
- =?iso-2022-jp?B?WHo5MFVscjY5VU1PR0JQT0laY0hZQW1aUFlXRHpzNnpneE9yand2Z1hz?=
- =?iso-2022-jp?B?c0k0elpSVWNDbFhGOElkcnVORXFyUG5ybzFiMXZpSC9QRVhvYTh1UHpq?=
- =?iso-2022-jp?B?UmFCOFVzOTBTb0grcjRzamVYYmNnSUkxZi9wUE5HMVJxcW9CaVdIQUxP?=
- =?iso-2022-jp?B?MlZVKzd6WE1qU1kxSEZ4dkJ0RHRFc0pPQXBFTGZuV1VnY2txbkp5dG02?=
- =?iso-2022-jp?B?VGR3T3BMeXdIYkhpRG1HZW9wVFlRbWlCa3JJSXBxQXllcVVWaEYwUGFH?=
- =?iso-2022-jp?B?YzVudXlNV2VGNTBTMTJaeWl0ZHlhV09yN29xS00wM25lV3Rvc2dmVm15?=
- =?iso-2022-jp?B?ejJPdzV2KzdxYVJ4ZVUyR0h0ZzhBPQ==?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="iso-2022-jp"
-content-transfer-encoding: quoted-printable
+        Mon, 13 Sep 2021 01:16:39 -0400
+Received: by mail-io1-f69.google.com with SMTP id n8-20020a6b7708000000b005bd491bdb6aso13128159iom.5
+        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Sep 2021 22:15:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=dTVsWZPyEZSZb6YETT9aCHK9GgOqBT0Lc4pHP3Lx6e8=;
+        b=MsTEGrt5zIAnUU6NH8y1c26nsZHCGnC4vjd4tMPLt8u2WKmCP5CHEHLTMyfIfnU8Rq
+         B16GvGp2K4sIo9TU1ie3iWeN+A4xbR8yTZHWdFL9gD64Av04EU+40UvA7S7PHK+4vbKL
+         nAjHw6gWPrbiIQvOTYoRfG33Bz+VLMjWoOO91wWVsESJ7YE6/HX4O4uNe+i7UM95tp7K
+         pdQ35XZ8sd+i1BaL5qrd28U6dP2I9XjGakVBhTfjUA2Q6wmNVlW3OA5cVbU+GiKVm2ri
+         xov0nlpx4hi/Sv56DaKOxl4b74uWPB6RTIEq+TkFteiWjLY5pZR7Uj2GZBUy09daaiWv
+         1jRw==
+X-Gm-Message-State: AOAM533Z7NaKjolsrQH2ePydTHsnzBky9IU92WYeHWxz5O+1wUrAfTsV
+        8Xpy1toLDr49badhTYHFVO9lwYWQ0wz1NEs/WG+iWJFS1kco
+X-Google-Smtp-Source: ABdhPJwO7iV5Xgy+j0Lqk/9D8z0ZhHnqpHxWMiJvuG9Vcu9TbDCEif0fnrEUbAbQSchI7yx4o/iva7NqZw76Vn3WUO2k9LiIPSBi
 MIME-Version: 1.0
-X-OriginatorOrg: jp.ricoh.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: OS3PR01MB6837.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 618680cc-f5ff-4b4a-32f8-08d9766f8aef
-X-MS-Exchange-CrossTenant-originalarrivaltime: 13 Sep 2021 04:32:49.2750
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: e717ec3d-6036-4776-b72e-41f49481d91e
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: gGq4oFDHC8t2U6smUTI7a0ldhBMhhkXKROu2afAe97q3t12SHlj61Sbv4kxRMMh5oFS2nW6VlfBRSjR+5zRcAz802y54wuHGsWTUC2rRED8=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: OS0PR01MB6417
+X-Received: by 2002:a02:3b58:: with SMTP id i24mr8092839jaf.144.1631510123863;
+ Sun, 12 Sep 2021 22:15:23 -0700 (PDT)
+Date:   Sun, 12 Sep 2021 22:15:23 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000061641905cbd98d7b@google.com>
+Subject: [syzbot] possible deadlock in rfcomm_sk_state_change
+From:   syzbot <syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com>
+To:     akpm@linux-foundation.org, davem@davemloft.net,
+        desmondcheongzx@gmail.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com, tedd.an@intel.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello All,
+Hello,
 
-I am developing a system that communicates with BLE on Raspberry Pi.
-When the developed system is operated, HCI link down occurs several times=
- a week and BLE communication is disconnected.
-Shows the results of syslog and hcidump when communication is interrupted=
-.
-From the result of hcidump, I think that it is a problem of hci because c=
-ommunication is not interrupted, but what kind of cause can be considered=
-?
-Would you please suggest a solution?
+syzbot found the following issue on:
 
-Thank you for your help.
-Best regards,
-Hideki Takahashi
+HEAD commit:    a3fa7a101dcf Merge branches 'akpm' and 'akpm-hotfixes' (pa..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=10d61a8b300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a9b60f3b657f313d
+dashboard link: https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15247a7d300000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a2642b300000
 
-[Execution environment]
-=1B$B!&=1B(BRaspberry pi 3 model b
-=1B$B!&=1B(BRaspbian Buster 10 Linux raspberrypi 4.19.57-v7+
-=1B$B!&=1B(BBlueZ 5.58
-=1B$B!&=1B(BBroadcom BCM43438
+The issue was bisected to:
 
-[syslog]
-Jun  1 14:59:31 raspberrypi kernel: [2678208.088754] Bluetooth: hci0: lin=
-k tx timeout
-Jun  1 14:59:31 raspberrypi kernel: [2678208.088765] Bluetooth: hci0: kil=
-ling stalled connection xx:xx:xx:xx:xx:xx
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/adapter.c:dev_disconnect=
-ed() Device xx:xx:xx:xx:xx:xx disconnected, reason 2
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/adapter.c:adapter_remove=
-_connection() =
+commit 1804fdf6e494e5e2938c65d8391690b59bcff897
+Author: Tedd Ho-Jeong An <tedd.an@intel.com>
+Date:   Thu Aug 5 00:32:19 2021 +0000
 
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: plugins/policy.c:disconnect_=
-cb() reason 2
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/adapter.c:bonding_attemp=
-t_complete() hci0 bdaddr xx:xx:xx:xx:xx:xx type 1 status 0xe
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/device.c:device_bonding_=
-complete() bonding (nil) status 0x0e
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/device.c:device_bonding_=
-failed() status 14
-Jun  1 14:59:31 raspberrypi bluetoothd[901]: src/adapter.c:resume_discove=
-ry() =
+    Bluetooth: btintel: Combine setting up MSFT extension
 
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:add_default_agen=
-t() Default agent set to :1.108 /org/bluez/agent
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:set_mode() sen=
-ding set mode command for index 0
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:agent_ref() 0x56=
-8110: ref=3D1
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:register_agent()=
- agent :1.108
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:new_settings_c=
-allback() Settings: 0x00000ad1
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:settings_chang=
-ed() Changed settings: 0x00000010
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:settings_chang=
-ed() Pending settings: 0x00000000
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/device.c:device_remove()=
- Removing device /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/device.c:btd_device_unre=
-f() Freeing device /org/bluez/hci0/dev_xx_xx_xx_xx_xx_xx
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/device.c:device_free() 0=
-x56bfb8
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:agent_disconnect=
-() Agent :1.108 disconnected
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:remove_default_a=
-gent() Default agent cleared
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:set_mode() sen=
-ding set mode command for index 0
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:agent_destroy() =
-agent :1.108
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/agent.c:agent_unref() 0x=
-568110: ref=3D0
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:new_settings_c=
-allback() Settings: 0x00000ac1
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:settings_chang=
-ed() Changed settings: 0x00000010
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:settings_chang=
-ed() Pending settings: 0x00000000
-Jun  1 14:59:34 raspberrypi bluetoothd[901]: src/adapter.c:discovering_ca=
-llback() hci0 type 6 discovering 1 method 0
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=125f4163300000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=115f4163300000
+console output: https://syzkaller.appspot.com/x/log.txt?x=165f4163300000
 
-[hcidump]
-2021-06-01 14:59:31.304383 > ACL data: handle 64 flags 0x02 dlen 27
-    ATT: Handle notify (0x1b)
-      handle 0x0012
-2021-06-01 14:59:31.304682 < HCI Command: Disconnect (0x01|0x0006) plen 3=
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
+Fixes: 1804fdf6e494 ("Bluetooth: btintel: Combine setting up MSFT extension")
 
-    handle 64 reason 0x13
-    Reason: Remote User Terminated Connection
-2021-06-01 14:59:31.305089 > HCI Event: Command Status (0x0f) plen 4
-    Disconnect (0x01|0x0006) status 0x00 ncmd 1
-2021-06-01 14:59:31.345332 > HCI Event: Disconn Complete (0x05) plen 4
-    status 0x00 handle 64 reason 0x16
-    Reason: Connection Terminated by Local Host
-2021-06-01 14:59:34.992038 < HCI Command: LE Set Random Address (0x08|0x0=
-005) plen 6
-    bdaddr 37:68:FE:C8:77:51
-2021-06-01 14:59:34.992509 > HCI Event: Command Complete (0x0e) plen 4
-    LE Set Random Address (0x08|0x0005) ncmd 1
-    status 0x00
+======================================================
+WARNING: possible circular locking dependency detected
+5.14.0-syzkaller #0 Not tainted
+------------------------------------------------------
+krfcommd/2875 is trying to acquire lock:
+ffff888012b9d120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1612 [inline]
+ffff888012b9d120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
+
+but task is already holding lock:
+ffff88807cf12528 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
+
+which lock already depends on the new lock.
 
 
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&d->lock){+.+.}-{3:3}:
+       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
+       __mutex_lock_common+0x1df/0x2550 kernel/locking/mutex.c:596
+       __mutex_lock kernel/locking/mutex.c:729 [inline]
+       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:743
+       __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
+       rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
+       rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
+       rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
+       kthread+0x453/0x480 kernel/kthread.c:319
+       ret_from_fork+0x1f/0x30
+
+-> #1 (rfcomm_mutex){+.+.}-{3:3}:
+       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
+       __mutex_lock_common+0x1df/0x2550 kernel/locking/mutex.c:596
+       __mutex_lock kernel/locking/mutex.c:729 [inline]
+       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:743
+       rfcomm_dlc_open+0x25/0x50 net/bluetooth/rfcomm/core.c:425
+       rfcomm_sock_connect+0x285/0x470 net/bluetooth/rfcomm/sock.c:413
+       __sys_connect_file net/socket.c:1896 [inline]
+       __sys_connect+0x38a/0x410 net/socket.c:1913
+       __do_sys_connect net/socket.c:1923 [inline]
+       __se_sys_connect net/socket.c:1920 [inline]
+       __x64_sys_connect+0x76/0x80 net/socket.c:1920
+       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
+       entry_SYSCALL_64_after_hwframe+0x44/0xae
+
+-> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3051 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3174 [inline]
+       validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3789
+       __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5015
+       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
+       lock_sock_nested+0xc6/0x110 net/core/sock.c:3191
+       lock_sock include/net/sock.h:1612 [inline]
+       rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
+       __rfcomm_dlc_close+0x2cc/0x480 net/bluetooth/rfcomm/core.c:489
+       rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
+       rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
+       rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
+       kthread+0x453/0x480 kernel/kthread.c:319
+       ret_from_fork+0x1f/0x30
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM --> rfcomm_mutex --> &d->lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&d->lock);
+                               lock(rfcomm_mutex);
+                               lock(&d->lock);
+  lock(sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM);
+
+ *** DEADLOCK ***
+
+2 locks held by krfcommd/2875:
+ #0: ffffffff8dac7488 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_process_sessions+0x21/0x3f0 net/bluetooth/rfcomm/core.c:1979
+ #1: ffff88807cf12528 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
+
+stack backtrace:
+CPU: 1 PID: 2875 Comm: krfcommd Not tainted 5.14.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1dc/0x2d8 lib/dump_stack.c:106
+ check_noncircular+0x2f9/0x3b0 kernel/locking/lockdep.c:2131
+ check_prev_add kernel/locking/lockdep.c:3051 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3174 [inline]
+ validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3789
+ __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5015
+ lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
+ lock_sock_nested+0xc6/0x110 net/core/sock.c:3191
+ lock_sock include/net/sock.h:1612 [inline]
+ rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
+ __rfcomm_dlc_close+0x2cc/0x480 net/bluetooth/rfcomm/core.c:489
+ rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
+ rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
+ rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
+ kthread+0x453/0x480 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
