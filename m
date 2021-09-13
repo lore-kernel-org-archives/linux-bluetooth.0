@@ -2,167 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-10.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C28D0C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 18:42:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5482C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 20:13:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A2A7C610D2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 18:42:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF4A361106
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 20:13:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236873AbhIMSnt (ORCPT
+        id S242861AbhIMUPD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 14:43:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48558 "EHLO
+        Mon, 13 Sep 2021 16:15:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41620 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236221AbhIMSnr (ORCPT
+        with ESMTP id S241556AbhIMUO7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 14:43:47 -0400
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0C4B6C061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 11:42:31 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id w17so8985522qta.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 11:42:31 -0700 (PDT)
+        Mon, 13 Sep 2021 16:14:59 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7540C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 13:13:42 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id u13-20020a17090abb0db0290177e1d9b3f7so341784pjr.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 13:13:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=iEcOZQDX7tVv0sTgKAJwChCzLyCUcv1C2XavMwxmS2I=;
-        b=Xoh2ZqZWvLGXpQDZ0kS6xOZMpYiOSbQ5lrl5S2Ljs37v22hTSLbSY4qL1Mn9rPuUCL
-         wK41jBGQ8jbPCFpvVGY9K0F3p5C8oCWYT9mBf1GCZHX4w59OIcJfKOyHeC1jcqQiehNl
-         EMfZ+4cTzNIlOikqtT4J8FVhWKS3/+KY0KQWlXK6WN0Pcmg57jHTF5aW/Na0cf3U8CbL
-         aF37haqk2GPT7KhSu7XDUbchJmAuva0jRJMraPiQyTjZcS2AuQzHO5BruTKu1F0pIitj
-         zEsah3Aws7+43GU4HF4HRtbTW4Rp7rpTD4DZ2PR53Sw5Gwv+nKpX/pkr1aTT6P992B1J
-         e/iA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=A76cooCpSZl8MrGzyyuDAXU2K6jHx/FCZWRJCRunqAM=;
+        b=IUIawFj+uKB6vDDCaW1zKjPqQO7I2mIf/SLkiat/JEEf1hd6DBlz4iJ78QnmXHLL8G
+         zKAFvjj+P8LEpysyF9J4I7f7ngXqF3gTSB60E6pWFaOOAoXcaKD7i9mcz1p/Ht/jugp6
+         WuU1yULaIjDzLNtWDhSZccjVZeGDesYmC957VmG9W+aSp5zXY9YFbAspwmX7xQ2NqUHX
+         dVWZeWyLNQfkYCje5gv+YEoB8JNKHktZf34mOTmobmFxafDm/6pnbuJRx6Je6kMCWvJT
+         ALfRoaesP3wiZCmFcx7Tl1C45hZXt20r+KC8xOS0yM7ceRVBH+nnX3BX5e4WDvYSUr9S
+         gELg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=iEcOZQDX7tVv0sTgKAJwChCzLyCUcv1C2XavMwxmS2I=;
-        b=p0IqKGIleLxYPHwkZUS3KyqxpLJdZBWS5lNPXoch7bHACcBqc/michplH/fe4ct/+5
-         uVu50S3T+FVJsVVBJu0ATo1ySbh/V8DvK20kefUsE0p/0gbM49uFLxsBFbvI30Ixmaej
-         0OqcUbWv8vYUZinYRjViH91pN0zPA100VrB1BvfDSagYW+fOD4dgD3zh+DmijWEQT1N6
-         YqulFlYzRI0iGRj5jleYkQRQHaSF9GpoEUDGC0hXdtQF5XCIJYBKS3YoGBGTuqgb1W2z
-         fqla5rWGQ+krnBI+B18h0LBFvjPx/FhqvTrGJIImq9EJga/b3Np/qeRn7lh034GRq5o6
-         pdSA==
-X-Gm-Message-State: AOAM531HDKYnfrTyJJL34bWRWEw8SN5OkbdCpo5tqkwT8fR2V6a0q3Of
-        KlShMUIx/wsdTPOIGtjwUGtM483wzkmURQ==
-X-Google-Smtp-Source: ABdhPJwh1PPGHxBU/yay+ybE6B642XzoIXpEDl1KTa90r+ZxD1fe0wznJ1lY72dpyhWdRR8ylxsFQg==
-X-Received: by 2002:ac8:59c4:: with SMTP id f4mr967889qtf.334.1631558549994;
-        Mon, 13 Sep 2021 11:42:29 -0700 (PDT)
-Received: from [172.17.0.2] ([52.149.181.159])
-        by smtp.gmail.com with ESMTPSA id x2sm4559588qtr.6.2021.09.13.11.42.29
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=A76cooCpSZl8MrGzyyuDAXU2K6jHx/FCZWRJCRunqAM=;
+        b=RGyBUmqZ0BsWwS5ZJj4d71eo4uwd+5SQ/WL1X8J5Wqp6s+Qdcsz17MU/QkjiVuKLKt
+         +VaopQTKn9Q0yYJfXvnaVRoIF/eDWC/wp/ZoQeVBMJ3FKYVJx0yJ/lITbGfhwdcnaaZ1
+         DaEts+4XeZ7chafKVPYj/l/K9O9j4HDAF1xeL8K5UH+df3dOdMY40PAsFOOrjSMDBOl+
+         D2pQd0XM/UabCtZCIAfGGCgVCaKWDmTXyn89UrKwkY8NAybQzlHpq5FfFcoKPBB8V4qn
+         CPNUFgiQ9bamN1OOPYPteBteYeVivlTZ2vKt68RAsM6VwMmZ3vJaGIJ9VcpIskKcANWD
+         iIaA==
+X-Gm-Message-State: AOAM530E15h4uKiwB2VmnD2hb2SsT2vwAfwBifRmcgxCId/wTFd8p7Gm
+        AZvoix7UIJtujIcTtP7UjhX+gBeniuk=
+X-Google-Smtp-Source: ABdhPJxYojUOSgrkg7FURTf4BQlgCSytkKwrw1+6OCCsSNwpQjEbhsNDA0I2eIp+HZEMCpbDSoOdSw==
+X-Received: by 2002:a17:90a:7185:: with SMTP id i5mr1346443pjk.236.1631564022158;
+        Mon, 13 Sep 2021 13:13:42 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u15sm8289651pfl.14.2021.09.13.13.13.41
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Sep 2021 11:42:29 -0700 (PDT)
-Message-ID: <613f9b95.1c69fb81.f1777.b933@mx.google.com>
-Date:   Mon, 13 Sep 2021 11:42:29 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0107602462253004042=="
+        Mon, 13 Sep 2021 13:13:41 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] shared/util: Add conversion function for 24 bits
+Date:   Mon, 13 Sep 2021 13:13:40 -0700
+Message-Id: <20210913201341.3515285-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] shared/util: Add convertion function for 24 bits
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210913180552.3468107-1-luiz.dentz@gmail.com>
-References: <20210913180552.3468107-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0107602462253004042==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=546035
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.61 seconds
-GitLint                       PASS      0.25 seconds
-Prep - Setup ELL              PASS      49.40 seconds
-Build - Prep                  PASS      0.11 seconds
-Build - Configure             PASS      8.64 seconds
-Build - Make                  PASS      214.82 seconds
-Make Check                    PASS      9.30 seconds
-Make Distcheck                PASS      254.50 seconds
-Build w/ext ELL - Configure   PASS      8.93 seconds
-Build w/ext ELL - Make        PASS      203.09 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-shared/util: Add convertion function for 24 bits
-WARNING:TYPO_SPELLING: 'convertion' may be misspelled - perhaps 'conversion'?
-#4: 
-Subject: [PATCH] shared/util: Add convertion function for 24 bits
-                                  ^^^^^^^^^^
-
-- total: 0 errors, 1 warnings, 38 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-"[PATCH] shared/util: Add convertion function for 24 bits" has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - PASS
-Desc: Run gitlint with rule in .gitlint
-
-##############################
-Test: Prep - Setup ELL - PASS
-Desc: Clone, build, and install ELL
-
-##############################
-Test: Build - Prep - PASS
-Desc: Prepare environment for build
-
-##############################
-Test: Build - Configure - PASS
-Desc: Configure the BlueZ source tree
-
-##############################
-Test: Build - Make - PASS
-Desc: Build the BlueZ source tree
-
-##############################
-Test: Make Check - PASS
-Desc: Run 'make check'
-
-##############################
-Test: Make Distcheck - PASS
-Desc: Run distcheck to check the distribution
-
-##############################
-Test: Build w/ext ELL - Configure - PASS
-Desc: Configure BlueZ source with '--enable-external-ell' configuration
-
-##############################
-Test: Build w/ext ELL - Make - PASS
-Desc: Build BlueZ source with '--enable-external-ell' configuration
-
-
-
+This adds get/put 24 bits variants.
 ---
-Regards,
-Linux Bluetooth
+ src/shared/util.h | 26 ++++++++++++++++++++++++++
+ 1 file changed, 26 insertions(+)
 
+diff --git a/src/shared/util.h b/src/shared/util.h
+index 60908371d..ac70117ca 100644
+--- a/src/shared/util.h
++++ b/src/shared/util.h
+@@ -131,6 +131,20 @@ static inline uint16_t get_be16(const void *ptr)
+ 	return be16_to_cpu(get_unaligned((const uint16_t *) ptr));
+ }
+ 
++static inline uint32_t get_le24(const void *ptr)
++{
++	const uint8_t *src = ptr;
++
++	return ((uint32_t)src[2] << 16) | get_le16(ptr);
++}
++
++static inline uint32_t get_be24(const void *ptr)
++{
++	const uint8_t *src = ptr;
++
++	return ((uint32_t)src[0] << 16) | get_be16(&src[1]);
++}
++
+ static inline uint32_t get_le32(const void *ptr)
+ {
+ 	return le32_to_cpu(get_unaligned((const uint32_t *) ptr));
+@@ -161,6 +175,18 @@ static inline void put_be16(uint16_t val, const void *ptr)
+ 	put_unaligned(cpu_to_be16(val), (uint16_t *) ptr);
+ }
+ 
++static inline void put_le24(uint32_t val, void *ptr)
++{
++	put_le16(val, ptr);
++	put_unaligned(val >> 16, (uint8_t *) ptr + 2);
++}
++
++static inline void put_be24(uint32_t val, void *ptr)
++{
++	put_unaligned(val >> 16, (uint8_t *) ptr + 2);
++	put_be16(val, ptr + 1);
++}
++
+ static inline void put_le32(uint32_t val, void *dst)
+ {
+ 	put_unaligned(cpu_to_le32(val), (uint32_t *) dst);
+-- 
+2.31.1
 
---===============0107602462253004042==--
