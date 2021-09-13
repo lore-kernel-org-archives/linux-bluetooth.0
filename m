@@ -2,154 +2,277 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-19.1 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC37C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 06:10:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C2ACC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 07:28:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9150C60F9B
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 06:10:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2984860FDA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 07:28:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237259AbhIMGLz (ORCPT
+        id S237632AbhIMHaB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 02:11:55 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:15559 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234655AbhIMGLy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 02:11:54 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1631513439; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=X0lqQRbWV8fWiShZFkmLGQXY4Cdbj1ipT5h/wddHdkw=; b=pQ1Z3QssjBppfEr0KBehrzy/7GFmCtX/tzuJ+vfzESeKbu1N2KOosvFON6fO1ju6Lo5uOpmq
- Kh7STswk7CB2Y7BBS91pjMf+srbirr9HuO3Ot9CzYDB3jTaNYzKZKpfWdbQJNlLqVEZ+Shby
- AYONs0tpxlUMZk0cFLmgDlg2JPQ=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
- 613eeb3e648642cc1cc3d5b2 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 13 Sep 2021 06:10:06
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 59DFBC4360C; Mon, 13 Sep 2021 06:10:06 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C88DAC4338F;
-        Mon, 13 Sep 2021 06:10:02 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org C88DAC4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v9] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
-Date:   Mon, 13 Sep 2021 14:09:59 +0800
-Message-Id: <1631513399-22826-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Mon, 13 Sep 2021 03:30:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33164 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237603AbhIMHaA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Sep 2021 03:30:00 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7C81C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 00:28:44 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id bg1so5201001plb.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 00:28:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DnoYR5x/DwI9mRpxTVlQwvsfoxsFdaE2SzPcs+yYnk8=;
+        b=njbPXFywfXR+xOmYU3z+sSYoLjhwfEyrdlj+CwD2HXM0s09iyTR72harRqICh/4+UZ
+         1a4u/M+XDdnyEJhasMj8jGa2fiua74bxGbyiMnhqYy6ZzFpZGmqYUNK9GdSVBrRiZZys
+         7T9AKPlAQeS0s4KNdRBbnLKbhecNb14ghu1x4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=DnoYR5x/DwI9mRpxTVlQwvsfoxsFdaE2SzPcs+yYnk8=;
+        b=UH1KHajidFIL4F9hXZe2YUxAxvxiCInV+QjbmJU7wHP1cJLsL2WrVZwd5WX0lvsDvM
+         JY/cOkyxoBprodJnn79/N5vgnp3fQbJdXvpCxOrUzymiXxX16An1zyNugQXWwanen1oO
+         kRbu+TzOEcr6j/48b7c70spp/yNxDQQmgnK3XqG7lfB0w4pHe/c00Spt1a+VdQ7UAxdz
+         f9CinYQC5yDsG+ceJnvMbQvwejGZeVzjvoqUv0rnuPfBc87g9+M/AAUZkwuRZdejLC6U
+         w8/aOlDgvPX17Vu+wk4o+LcakVE2nmQIgpcGWEP++21cqFg1m7LOZ/6e2YmKIfK34bqI
+         tHMg==
+X-Gm-Message-State: AOAM530SdCbo7TZARMsnmGS0KAHjFzbt72OV7eg3A/uP4zYOMtmAuW/5
+        2pFuzHnDzNxt67zPpTY3nJolWmAxrHSrqA==
+X-Google-Smtp-Source: ABdhPJyIXiW/sfh6i4lN8UmYLjjuq2GGPYZKMncz+ZlPySfACwqkuEAp19mPfM1R4zlmNgsHCfdoUQ==
+X-Received: by 2002:a17:90b:1c07:: with SMTP id oc7mr11579080pjb.209.1631518124059;
+        Mon, 13 Sep 2021 00:28:44 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:b418:a601:c444:4951])
+        by smtp.gmail.com with ESMTPSA id g8sm5688019pfv.51.2021.09.13.00.28.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 13 Sep 2021 00:28:43 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
+        Joseph Hwang <josephsih@chromium.org>,
+        kernel test robot <lkp@intel.com>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH v3 1/3] Bluetooth: btandroid: Support Android Bluetooth Quality Report
+Date:   Mon, 13 Sep 2021 15:28:36 +0800
+Message-Id: <20210913152801.v3.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
+X-Mailer: git-send-email 2.33.0.309.g3052b89438-goog
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-the RF performance of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+Add the btandroid.c file to support Android BQR commands.
 
-Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+This module may be referenced by btusb, btrtl, and hci_qca when a
+Bluetooth controller supports the Android Bluetooth Quality Report.
+
+Reported-by: kernel test robot <lkp@intel.com>
+
+Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 ---
- drivers/bluetooth/btusb.c | 51 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 38 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 928cbfa4c42d..7b23cfd131f6 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
+Changes in v3:
+- Fix the auto build test ERROR
+  "undefined symbol: btandroid_set_quality_report" that occurred
+  with some kernel configs.
+- Note that the mgmt-tester "Read Exp Feature - Success" failed.
+  But on my test device, the same test passed. Please kindly let me
+  know what may be going wrong. These patches do not actually
+  modify read/set experimental features.
+- As to CheckPatch failed. No need to modify the MAINTAINERS file.
+  Thanks.
+
+Changes in v2:
+- Fix the titles of patches 2/3 and 3/3 and reduce their lengths.
+
+ drivers/bluetooth/Kconfig     |   5 ++
+ drivers/bluetooth/Makefile    |   1 +
+ drivers/bluetooth/btandroid.c | 106 ++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btandroid.h |  10 ++++
+ 4 files changed, 122 insertions(+)
+ create mode 100644 drivers/bluetooth/btandroid.c
+ create mode 100644 drivers/bluetooth/btandroid.h
+
+diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
+index 851842372c9b..0be352cdc6c9 100644
+--- a/drivers/bluetooth/Kconfig
++++ b/drivers/bluetooth/Kconfig
+@@ -19,10 +19,14 @@ config BT_QCA
+ 	tristate
+ 	select FW_LOADER
  
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++config BT_HCIBTANDROID
++	tristate
 +
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
- };
+ config BT_HCIBTUSB
+ 	tristate "HCI USB driver"
+ 	depends on USB
+ 	select BT_INTEL
++	select BT_HCIBTANDROID
+ 	help
+ 	  Bluetooth HCI USB driver.
+ 	  This driver is required if you want to use Bluetooth devices with
+@@ -90,6 +94,7 @@ config BT_HCIUART
+ 	depends on SERIAL_DEV_BUS || !SERIAL_DEV_BUS
+ 	depends on NVMEM || !NVMEM
+ 	depends on TTY
++	select BT_HCIBTANDROID
+ 	help
+ 	  Bluetooth HCI UART driver.
+ 	  This driver is required if you want to use Bluetooth devices with
+diff --git a/drivers/bluetooth/Makefile b/drivers/bluetooth/Makefile
+index 16286ea2655d..3a2ca2eb7cd7 100644
+--- a/drivers/bluetooth/Makefile
++++ b/drivers/bluetooth/Makefile
+@@ -13,6 +13,7 @@ obj-$(CONFIG_BT_HCIBT3C)	+= bt3c_cs.o
+ obj-$(CONFIG_BT_HCIBLUECARD)	+= bluecard_cs.o
  
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	return err;
- }
+ obj-$(CONFIG_BT_HCIBTUSB)	+= btusb.o
++obj-$(CONFIG_BT_HCIBTANDROID)	+= btandroid.o
+ obj-$(CONFIG_BT_HCIBTSDIO)	+= btsdio.o
  
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver,
-+					char *variant)
+ obj-$(CONFIG_BT_INTEL)		+= btintel.o
+diff --git a/drivers/bluetooth/btandroid.c b/drivers/bluetooth/btandroid.c
+new file mode 100644
+index 000000000000..fffacc8d67cc
+--- /dev/null
++++ b/drivers/bluetooth/btandroid.c
+@@ -0,0 +1,106 @@
++// SPDX-License-Identifier: GPL-2.0-or-later
++/*
++ *  Support for Android Bluetooth Quality Report (BQR) specifications
++ *      https://source.android.com/devices/bluetooth/hci_requirements
++ *
++ *  Copyright (C) 2021 Google Corporation
++ */
++
++#include <linux/module.h>
++
++#include <net/bluetooth/bluetooth.h>
++#include <net/bluetooth/hci.h>
++
++#include "btandroid.h"
++
++#define VERSION "0.1"
++
++/*
++ * Reference for the command op codes and parameters below:
++ *   https://source.android.com/devices/bluetooth/hci_requirements#bluetooth-quality-report-command
++ */
++#define BQR_COMMAND_OCF			0x015e
++#define BQR_OPCODE			hci_opcode_pack(0x3f, BQR_COMMAND_OCF)
++
++/* report action */
++#define REPORT_ACTION_ADD		0x00
++#define REPORT_ACTION_DELETE		0x01
++#define REPORT_ACTION_CLEAR		0x02
++
++/* BQR event masks */
++#define QUALITY_MONITORING		(1 << 0)
++#define APPRAOCHING_LSTO		(1 << 1)
++#define A2DP_AUDIO_CHOPPY		(1 << 2)
++#define SCO_VOICE_CHOPPY		(1 << 3)
++
++#define DEFAULT_BQR_EVENT_MASK	(QUALITY_MONITORING | APPRAOCHING_LSTO | \
++				 A2DP_AUDIO_CHOPPY | SCO_VOICE_CHOPPY)
++
++/*
++ * Reporting at seconds so as not to stress the controller too much.
++ * Range: 0 ~ 65535 ms
++ */
++#define DEFALUT_REPORT_INTERVAL_MS	5000
++
++struct android_bqr_cp {
++	__u8	report_action;
++	__u32	event_mask;
++	__u16	min_report_interval;
++} __packed;
++
++static int enable_quality_report(struct hci_dev *hdev)
 +{
-+	char *sep = (strlen(variant) == 0) ? "" : "_";
-+	u16 board_id = le16_to_cpu(ver->board_id);
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
++	struct sk_buff *skb;
++	struct android_bqr_cp cp;
 +
-+	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-+				rom_version, sep, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-+				rom_version, sep, variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			rom_version);
++	cp.report_action = REPORT_ACTION_ADD;
++	cp.event_mask = DEFAULT_BQR_EVENT_MASK;
++	cp.min_report_interval = DEFALUT_REPORT_INTERVAL_MS;
++
++	skb = __hci_cmd_sync(hdev, BQR_OPCODE, sizeof(cp), &cp,
++							HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Enabling Android BQR failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
 +	}
 +
++	kfree_skb(skb);
++	return 0;
 +}
 +
- static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 				    struct qca_version *ver,
- 				    const struct qca_device_info *info)
-@@ -3354,19 +3383,15 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	char fwname[64];
- 	int err;
- 
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
-+	switch (ver->ram_version) {
-+	case WCN6855_2_0_RAM_VERSION_GF:
-+	case WCN6855_2_1_RAM_VERSION_GF:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-+		break;
++static int disable_quality_report(struct hci_dev *hdev)
++{
++	struct sk_buff *skb;
++	struct android_bqr_cp cp = { 0 };
 +
-+	default:
-+			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-+		break;
- 	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
++	cp.report_action = REPORT_ACTION_CLEAR;
++
++	skb = __hci_cmd_sync(hdev, BQR_OPCODE, sizeof(cp), &cp,
++							HCI_CMD_TIMEOUT);
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "Disabling Android BQR failed (%ld)",
++			   PTR_ERR(skb));
++		return PTR_ERR(skb);
++	}
++
++	kfree_skb(skb);
++	return 0;
++}
++
++int btandroid_set_quality_report(struct hci_dev *hdev, bool enable)
++{
++	bt_dev_info(hdev, "quality report enable %d", enable);
++
++	/* Enable or disable the quality report feature. */
++	if (enable)
++		return enable_quality_report(hdev);
++	else
++		return disable_quality_report(hdev);
++}
++EXPORT_SYMBOL_GPL(btandroid_set_quality_report);
++
++MODULE_AUTHOR("Google");
++MODULE_DESCRIPTION("Support for Android Bluetooth Specification " VERSION);
++MODULE_VERSION(VERSION);
++MODULE_LICENSE("GPL");
+diff --git a/drivers/bluetooth/btandroid.h b/drivers/bluetooth/btandroid.h
+new file mode 100644
+index 000000000000..6abc9e8e0838
+--- /dev/null
++++ b/drivers/bluetooth/btandroid.h
+@@ -0,0 +1,10 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++/*
++ *  Bluetooth support for Android specifications
++ *
++ *  Copyright (C) 2021 Google Corporation
++ */
++
++#include <net/bluetooth/hci_core.h>
++
++int btandroid_set_quality_report(struct hci_dev *hdev, bool enable);
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.33.0.309.g3052b89438-goog
 
