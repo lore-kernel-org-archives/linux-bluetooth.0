@@ -2,198 +2,154 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2FF2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 05:15:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AEC37C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 06:10:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C0E8460F92
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 05:15:25 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9150C60F9B
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 06:10:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236968AbhIMFQj (ORCPT
+        id S237259AbhIMGLz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 01:16:39 -0400
-Received: from mail-io1-f69.google.com ([209.85.166.69]:38732 "EHLO
-        mail-io1-f69.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229563AbhIMFQj (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 01:16:39 -0400
-Received: by mail-io1-f69.google.com with SMTP id n8-20020a6b7708000000b005bd491bdb6aso13128159iom.5
-        for <linux-bluetooth@vger.kernel.org>; Sun, 12 Sep 2021 22:15:24 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=dTVsWZPyEZSZb6YETT9aCHK9GgOqBT0Lc4pHP3Lx6e8=;
-        b=MsTEGrt5zIAnUU6NH8y1c26nsZHCGnC4vjd4tMPLt8u2WKmCP5CHEHLTMyfIfnU8Rq
-         B16GvGp2K4sIo9TU1ie3iWeN+A4xbR8yTZHWdFL9gD64Av04EU+40UvA7S7PHK+4vbKL
-         nAjHw6gWPrbiIQvOTYoRfG33Bz+VLMjWoOO91wWVsESJ7YE6/HX4O4uNe+i7UM95tp7K
-         pdQ35XZ8sd+i1BaL5qrd28U6dP2I9XjGakVBhTfjUA2Q6wmNVlW3OA5cVbU+GiKVm2ri
-         xov0nlpx4hi/Sv56DaKOxl4b74uWPB6RTIEq+TkFteiWjLY5pZR7Uj2GZBUy09daaiWv
-         1jRw==
-X-Gm-Message-State: AOAM533Z7NaKjolsrQH2ePydTHsnzBky9IU92WYeHWxz5O+1wUrAfTsV
-        8Xpy1toLDr49badhTYHFVO9lwYWQ0wz1NEs/WG+iWJFS1kco
-X-Google-Smtp-Source: ABdhPJwO7iV5Xgy+j0Lqk/9D8z0ZhHnqpHxWMiJvuG9Vcu9TbDCEif0fnrEUbAbQSchI7yx4o/iva7NqZw76Vn3WUO2k9LiIPSBi
-MIME-Version: 1.0
-X-Received: by 2002:a02:3b58:: with SMTP id i24mr8092839jaf.144.1631510123863;
- Sun, 12 Sep 2021 22:15:23 -0700 (PDT)
-Date:   Sun, 12 Sep 2021 22:15:23 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000061641905cbd98d7b@google.com>
-Subject: [syzbot] possible deadlock in rfcomm_sk_state_change
-From:   syzbot <syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com>
-To:     akpm@linux-foundation.org, davem@davemloft.net,
-        desmondcheongzx@gmail.com, johan.hedberg@gmail.com,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-mm@kvack.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com, tedd.an@intel.com
-Content-Type: text/plain; charset="UTF-8"
+        Mon, 13 Sep 2021 02:11:55 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:15559 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S234655AbhIMGLy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 13 Sep 2021 02:11:54 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1631513439; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=X0lqQRbWV8fWiShZFkmLGQXY4Cdbj1ipT5h/wddHdkw=; b=pQ1Z3QssjBppfEr0KBehrzy/7GFmCtX/tzuJ+vfzESeKbu1N2KOosvFON6fO1ju6Lo5uOpmq
+ Kh7STswk7CB2Y7BBS91pjMf+srbirr9HuO3Ot9CzYDB3jTaNYzKZKpfWdbQJNlLqVEZ+Shby
+ AYONs0tpxlUMZk0cFLmgDlg2JPQ=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 613eeb3e648642cc1cc3d5b2 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 13 Sep 2021 06:10:06
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 59DFBC4360C; Mon, 13 Sep 2021 06:10:06 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C88DAC4338F;
+        Mon, 13 Sep 2021 06:10:02 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org C88DAC4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v9] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Date:   Mon, 13 Sep 2021 14:09:59 +0800
+Message-Id: <1631513399-22826-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-syzbot found the following issue on:
-
-HEAD commit:    a3fa7a101dcf Merge branches 'akpm' and 'akpm-hotfixes' (pa..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10d61a8b300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9b60f3b657f313d
-dashboard link: https://syzkaller.appspot.com/bug?extid=d7ce59b06b3eb14fd218
-compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15247a7d300000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a2642b300000
-
-The issue was bisected to:
-
-commit 1804fdf6e494e5e2938c65d8391690b59bcff897
-Author: Tedd Ho-Jeong An <tedd.an@intel.com>
-Date:   Thu Aug 5 00:32:19 2021 +0000
-
-    Bluetooth: btintel: Combine setting up MSFT extension
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=125f4163300000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=115f4163300000
-console output: https://syzkaller.appspot.com/x/log.txt?x=165f4163300000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+d7ce59b06b3eb14fd218@syzkaller.appspotmail.com
-Fixes: 1804fdf6e494 ("Bluetooth: btintel: Combine setting up MSFT extension")
-
-======================================================
-WARNING: possible circular locking dependency detected
-5.14.0-syzkaller #0 Not tainted
-------------------------------------------------------
-krfcommd/2875 is trying to acquire lock:
-ffff888012b9d120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1612 [inline]
-ffff888012b9d120 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}, at: rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
-
-but task is already holding lock:
-ffff88807cf12528 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #2 (&d->lock){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
-       __mutex_lock_common+0x1df/0x2550 kernel/locking/mutex.c:596
-       __mutex_lock kernel/locking/mutex.c:729 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:743
-       __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
-       rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
-       rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
-       rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
-       kthread+0x453/0x480 kernel/kthread.c:319
-       ret_from_fork+0x1f/0x30
-
--> #1 (rfcomm_mutex){+.+.}-{3:3}:
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
-       __mutex_lock_common+0x1df/0x2550 kernel/locking/mutex.c:596
-       __mutex_lock kernel/locking/mutex.c:729 [inline]
-       mutex_lock_nested+0x1a/0x20 kernel/locking/mutex.c:743
-       rfcomm_dlc_open+0x25/0x50 net/bluetooth/rfcomm/core.c:425
-       rfcomm_sock_connect+0x285/0x470 net/bluetooth/rfcomm/sock.c:413
-       __sys_connect_file net/socket.c:1896 [inline]
-       __sys_connect+0x38a/0x410 net/socket.c:1913
-       __do_sys_connect net/socket.c:1923 [inline]
-       __se_sys_connect net/socket.c:1920 [inline]
-       __x64_sys_connect+0x76/0x80 net/socket.c:1920
-       do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-       do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
-       entry_SYSCALL_64_after_hwframe+0x44/0xae
-
--> #0 (sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM){+.+.}-{0:0}:
-       check_prev_add kernel/locking/lockdep.c:3051 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3174 [inline]
-       validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3789
-       __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5015
-       lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
-       lock_sock_nested+0xc6/0x110 net/core/sock.c:3191
-       lock_sock include/net/sock.h:1612 [inline]
-       rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
-       __rfcomm_dlc_close+0x2cc/0x480 net/bluetooth/rfcomm/core.c:489
-       rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
-       rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
-       rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
-       kthread+0x453/0x480 kernel/kthread.c:319
-       ret_from_fork+0x1f/0x30
-
-other info that might help us debug this:
-
-Chain exists of:
-  sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM --> rfcomm_mutex --> &d->lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&d->lock);
-                               lock(rfcomm_mutex);
-                               lock(&d->lock);
-  lock(sk_lock-AF_BLUETOOTH-BTPROTO_RFCOMM);
-
- *** DEADLOCK ***
-
-2 locks held by krfcommd/2875:
- #0: ffffffff8dac7488 (rfcomm_mutex){+.+.}-{3:3}, at: rfcomm_process_sessions+0x21/0x3f0 net/bluetooth/rfcomm/core.c:1979
- #1: ffff88807cf12528 (&d->lock){+.+.}-{3:3}, at: __rfcomm_dlc_close+0x281/0x480 net/bluetooth/rfcomm/core.c:487
-
-stack backtrace:
-CPU: 1 PID: 2875 Comm: krfcommd Not tainted 5.14.0-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x1dc/0x2d8 lib/dump_stack.c:106
- check_noncircular+0x2f9/0x3b0 kernel/locking/lockdep.c:2131
- check_prev_add kernel/locking/lockdep.c:3051 [inline]
- check_prevs_add kernel/locking/lockdep.c:3174 [inline]
- validate_chain+0x1dfb/0x8240 kernel/locking/lockdep.c:3789
- __lock_acquire+0x1382/0x2b00 kernel/locking/lockdep.c:5015
- lock_acquire+0x19f/0x4d0 kernel/locking/lockdep.c:5625
- lock_sock_nested+0xc6/0x110 net/core/sock.c:3191
- lock_sock include/net/sock.h:1612 [inline]
- rfcomm_sk_state_change+0x63/0x300 net/bluetooth/rfcomm/sock.c:73
- __rfcomm_dlc_close+0x2cc/0x480 net/bluetooth/rfcomm/core.c:489
- rfcomm_process_dlcs+0x92/0x620 net/bluetooth/rfcomm/core.c:1844
- rfcomm_process_sessions+0x2f6/0x3f0 net/bluetooth/rfcomm/core.c:2003
- rfcomm_run+0x195/0x2c0 net/bluetooth/rfcomm/core.c:2086
- kthread+0x453/0x480 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30
-
-
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/btusb.c | 51 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 38 insertions(+), 13 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-syzbot can test patches for this issue, for details see:
-https://goo.gl/tpsmEJ#testing-patches
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 928cbfa4c42d..7b23cfd131f6 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver,
++					char *variant)
++{
++	char *sep = (strlen(variant) == 0) ? "" : "_";
++	u16 board_id = le16_to_cpu(ver->board_id);
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++
++	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
++				rom_version, sep, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
++				rom_version, sep, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 				    struct qca_version *ver,
+ 				    const struct qca_device_info *info)
+@@ -3354,19 +3383,15 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 	char fwname[64];
+ 	int err;
+ 
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
++		break;
++
++	default:
++			btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
++		break;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
