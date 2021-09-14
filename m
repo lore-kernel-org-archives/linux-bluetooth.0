@@ -2,153 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
-	autolearn=unavailable autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A524C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 10:08:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BB45DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 17:37:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 02DB9610CE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 10:08:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 90BA560F92
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 17:37:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231150AbhINKJ6 (ORCPT
+        id S229985AbhINRiq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Sep 2021 06:09:58 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:45838 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229969AbhINKJy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Sep 2021 06:09:54 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1631614117; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=XPF3ihCMAX+tX0noIpuQ+Pi13rzql/r9yG3jtqdHxXs=; b=eNTUuoWeHHWIyjMW0xX4WgTYomfo21gVxne9hAdmIcPyf8NlvX57EN7zxdF0vOzHAZHI9DqT
- UdqTqe2j8SFwlBH+zT+h8ZeSSZ9NMXIR7pfl4vo+Es5GnOJq0HMe/redg+ZehQ2EHEmJ0xEj
- Hqzgi1DNPTJ0tMtCF4Sp9j2+wsc=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n06.prod.us-west-2.postgun.com with SMTP id
- 61407497b585cc7d24b27cd3 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 14 Sep 2021 10:08:23
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 3D0E0C43619; Tue, 14 Sep 2021 10:08:23 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D98F8C4338F;
-        Tue, 14 Sep 2021 10:08:19 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org D98F8C4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v10] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
-Date:   Tue, 14 Sep 2021 18:08:16 +0800
-Message-Id: <1631614096-24613-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Tue, 14 Sep 2021 13:38:46 -0400
+Received: from mail-il1-f197.google.com ([209.85.166.197]:45019 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229464AbhINRip (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Sep 2021 13:38:45 -0400
+Received: by mail-il1-f197.google.com with SMTP id d4-20020a923604000000b0022a2b065b0aso19115176ila.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Sep 2021 10:37:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=ATCgKLO9n3GamsUnOnt5kLvtcJYFA9pwPWjRgjaEo5o=;
+        b=PI+BspUgN+mhOalIdoGgw7MnSoi/BvJUMwSd5EEaHqpOV9dyXr2EECMrNCiWqv4PP9
+         RcPt0uGGemKyV533/hIsD9YN9frRJcmq51ioWLQr61tt9m3jBdV7uAmNuqgXfbg0zvOh
+         bO2kl+iqbKAWICyLutxKzKmLdCVEuxQLE9P8XB0jz2OqPgJmOnDztJAvGe+QS7U/A6Bx
+         uS+g7u5pKnwftx99PYz9N2z0bhPcGjbnwfOxQMi9udZzxncxBCEGVmNx4zmRF2KpDisK
+         /L4vtH2SSf3asyDgo0r2QVNo3aUrQUxtPr0/rnU19i8xJzu5DY/WTf5bfCEXcOlv0cqG
+         KqKA==
+X-Gm-Message-State: AOAM533gjxD3foL1vA4oOI3Rv8wNLk/faVlOnznVjau66VdcDhmHqL+e
+        DPHvHGPAXR71aPaUgaZHyZH6DLEnCeg9L0DOp9nRsBxirOoC
+X-Google-Smtp-Source: ABdhPJzjK4K3/9mPPr1ed/2ix/JTjNgPF6bgEk8tGxBzYYeMWG5otRA095e+TUbmNeqRTIAhuSJ5qKn5kCfpS0YOu9RmdpUo5KwW
+MIME-Version: 1.0
+X-Received: by 2002:a02:6d59:: with SMTP id e25mr2294116jaf.68.1631641048289;
+ Tue, 14 Sep 2021 10:37:28 -0700 (PDT)
+Date:   Tue, 14 Sep 2021 10:37:28 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000001597e105cbf8090a@google.com>
+Subject: [syzbot] WARNING: refcount bug in sco_conn_del
+From:   syzbot <syzbot+284f5086a790a6246920@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-the RF performance of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+Hello,
 
-Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+syzbot found the following issue on:
+
+HEAD commit:    bf9f243f23e6 Merge tag '5.15-rc-ksmbd-part2' of git://git...
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=171c4ec7300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=e87940ff463e6c56
+dashboard link: https://syzkaller.appspot.com/bug?extid=284f5086a790a6246920
+compiler:       Debian clang version 11.0.1-2, GNU ld (GNU Binutils for Debian) 2.35.1
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+284f5086a790a6246920@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+refcount_t: addition on 0; use-after-free.
+WARNING: CPU: 0 PID: 8391 at lib/refcount.c:25 refcount_warn_saturate+0x13d/0x1a0 lib/refcount.c:25
+Modules linked in:
+CPU: 0 PID: 8391 Comm: syz-executor.4 Not tainted 5.14.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:refcount_warn_saturate+0x13d/0x1a0 lib/refcount.c:25
+Code: c7 60 d4 b3 8a 31 c0 e8 61 22 3d fd 0f 0b eb a3 e8 28 eb 71 fd c6 05 65 2e b8 09 01 48 c7 c7 c0 d4 b3 8a 31 c0 e8 43 22 3d fd <0f> 0b eb 85 e8 0a eb 71 fd c6 05 48 2e b8 09 01 48 c7 c7 20 d5 b3
+RSP: 0018:ffffc90006557a08 EFLAGS: 00010246
+RAX: 7631d2209bb18500 RBX: 0000000000000002 RCX: 0000000000040000
+RDX: ffffc90011c64000 RSI: 000000000003ffff RDI: 0000000000040000
+RBP: 0000000000000002 R08: ffffffff81681fd2 R09: ffffed10173857a8
+R10: ffffed10173857a8 R11: 0000000000000000 R12: dffffc0000000000
+R13: ffff88801f90c968 R14: ffff888078a85000 R15: 0000000000000067
+FS:  00007f49f645e700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000001b2be21000 CR3: 000000008081c000 CR4: 00000000001526f0
+Call Trace:
+ __refcount_inc include/linux/refcount.h:250 [inline]
+ refcount_inc include/linux/refcount.h:267 [inline]
+ sock_hold include/net/sock.h:702 [inline]
+ sco_conn_del+0x242/0x2f0 net/bluetooth/sco.c:193
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1518 [inline]
+ hci_conn_hash_flush+0x112/0x240 net/bluetooth/hci_conn.c:1608
+ hci_dev_do_close+0x93e/0xeb0 net/bluetooth/hci_core.c:1793
+ hci_rfkill_set_block+0x10f/0x180 net/bluetooth/hci_core.c:2233
+ rfkill_set_block+0x1f1/0x440 net/rfkill/core.c:344
+ rfkill_fop_write+0x5a4/0x760 net/rfkill/core.c:1268
+ vfs_write+0x320/0xe70 fs/read_write.c:592
+ ksys_write+0x18f/0x2c0 fs/read_write.c:647
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x44/0xd0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x4665f9
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f49f645e188 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 000000000056bf80 RCX: 00000000004665f9
+RDX: 0000000000000008 RSI: 0000000020000040 RDI: 0000000000000003
+RBP: 00000000004bfcc4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 000000000056bf80
+R13: 00007ffdc243488f R14: 00007f49f645e300 R15: 0000000000022000
+
+
 ---
- drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
- 1 file changed, 37 insertions(+), 13 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 928cbfa4c42d..6dc645698e30 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
- #define QCA_DFU_TIMEOUT		3000
- #define QCA_FLAG_MULTI_NVM      0x80
- 
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
- struct qca_version {
- 	__le32	rom_version;
- 	__le32	patch_version;
-@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
- 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
- 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
- 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
- };
- 
- static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
- 	return err;
- }
- 
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver,
-+					char *variant)
-+{
-+	char *sep = (strlen(variant) == 0) ? "" : "_";
-+	u16 board_id = le16_to_cpu(ver->board_id);
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
-+
-+	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
-+				rom_version, sep, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
-+				rom_version, sep, variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			rom_version);
-+	}
-+
-+}
-+
- static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 				    struct qca_version *ver,
- 				    const struct qca_device_info *info)
-@@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
- 	char fwname[64];
- 	int err;
- 
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
-+	switch (ver->ram_version) {
-+	case WCN6855_2_0_RAM_VERSION_GF:
-+	case WCN6855_2_1_RAM_VERSION_GF:
-+		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
-+		break;
-+	default:
-+		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
-+		break;
- 	}
- 
- 	err = request_firmware(&fw, fwname, &hdev->dev);
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
