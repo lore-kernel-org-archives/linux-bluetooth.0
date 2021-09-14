@@ -2,154 +2,153 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-9.2 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-16.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 269C1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 23:40:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1A524C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 10:08:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 09DE760EE0
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Sep 2021 23:40:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 02DB9610CE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 14 Sep 2021 10:08:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243980AbhIMXl1 (ORCPT
+        id S231150AbhINKJ6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Sep 2021 19:41:27 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60002 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243754AbhIMXlQ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Sep 2021 19:41:16 -0400
-Received: from mail-oi1-x22d.google.com (mail-oi1-x22d.google.com [IPv6:2607:f8b0:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D66B4C061766
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 16:39:59 -0700 (PDT)
-Received: by mail-oi1-x22d.google.com with SMTP id p2so16427581oif.1
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Sep 2021 16:39:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=kali.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-transfer-encoding:content-language;
-        bh=ihysQIdGR8w+AiS+ReWp8DK2aVapwmF1UvOCNcDhHKc=;
-        b=IRIIEViIbrzd5kpmoPo6R+Oy3FbupEZKJ6mcTM8r782MvEpzOb2C7MJtR4EBx3lXie
-         CHl/9FYY3aeP6vQqOWBveC/ddBGSnwPWxnSDNX+l8j/LyDSs0YyJA0V5kzPVq7OqGLUj
-         AEtm0/7Jp51ctNjxsGlrTzmlPOU5/8x2CSs0IpWDN90SvGP5TfTkt/g/hzR+tufLr6UW
-         yuDGmsKRIR8E1QzgPqi5oDRRANvSTE9+mxDwDs94C0lx6P9LsTFRwoTL9CrjQGlmDaN4
-         HDVImDXi1v0SNfnC3VTDuj2dkOAwgst8eQllcU1qKkyr+yCz3r7Jo2YSvd1sJU/nVriu
-         D+9Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-transfer-encoding
-         :content-language;
-        bh=ihysQIdGR8w+AiS+ReWp8DK2aVapwmF1UvOCNcDhHKc=;
-        b=xgneKkKTJcA8oHAU83vI4YzBE/oiqLfoj5NF8PsKc6xTcVAMnli9ZFdX8FCvPv1AsR
-         qPYob3MTI8aTS+z2Ix8nyAswZSPlDztXtcsX7+hYWH/m+grKc5jOAcVsBIqj+0UQZce1
-         J3rn2FdH1UWtmCgsH2B+7zSiwX2v0/UW2ygCl3hg0uGbYmrFfD3H3UigOYQWUsXcEQ0w
-         SFHwemxZS2G3zJY36XEzthOq96lcDC0Em+cr2Zh8uEdCiIBbq65ihtUIwTLTjw/F5hc/
-         y4G74nJrlviABgYw/IZ4cH5kIJtEYgNf/DK+G2ZRGCpbX6SE5W8dENAwgeIApUwyYTA0
-         x6+w==
-X-Gm-Message-State: AOAM533jW6ytJlbKPuYL69FsN4pMsh4AYwi0K6rlwT4UJDhxQsEDUkBa
-        Bq7b1vP9xubAKc2jl4AS+P9Ikw==
-X-Google-Smtp-Source: ABdhPJwV6GzMZQ+mNOpdRRBX3HLArICooddBup3dlenG8aQ6qcgGviIlOFg9Jtdit/VWiu2IZB/GZw==
-X-Received: by 2002:aca:914:: with SMTP id 20mr9750235oij.9.1631576397694;
-        Mon, 13 Sep 2021 16:39:57 -0700 (PDT)
-Received: from MacBook-Pro.hackershack.net (cpe-173-173-107-246.satx.res.rr.com. [173.173.107.246])
-        by smtp.gmail.com with ESMTPSA id u15sm2208500oor.34.2021.09.13.16.39.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 13 Sep 2021 16:39:57 -0700 (PDT)
-Subject: Re: [RFC v2 00/13] create power sequencing subsystem
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>,
-        Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>
-Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20210829131305.534417-1-dmitry.baryshkov@linaro.org>
-From:   Steev Klimaszewski <steev@kali.org>
-Message-ID: <4a508fc1-6253-9c11-67fb-f84f17fd2719@kali.org>
-Date:   Mon, 13 Sep 2021 18:39:55 -0500
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:78.0)
- Gecko/20100101 Thunderbird/78.14.0
-MIME-Version: 1.0
-In-Reply-To: <20210829131305.534417-1-dmitry.baryshkov@linaro.org>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
+        Tue, 14 Sep 2021 06:09:58 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:45838 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229969AbhINKJy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Sep 2021 06:09:54 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1631614117; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=XPF3ihCMAX+tX0noIpuQ+Pi13rzql/r9yG3jtqdHxXs=; b=eNTUuoWeHHWIyjMW0xX4WgTYomfo21gVxne9hAdmIcPyf8NlvX57EN7zxdF0vOzHAZHI9DqT
+ UdqTqe2j8SFwlBH+zT+h8ZeSSZ9NMXIR7pfl4vo+Es5GnOJq0HMe/redg+ZehQ2EHEmJ0xEj
+ Hqzgi1DNPTJ0tMtCF4Sp9j2+wsc=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n06.prod.us-west-2.postgun.com with SMTP id
+ 61407497b585cc7d24b27cd3 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 14 Sep 2021 10:08:23
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 3D0E0C43619; Tue, 14 Sep 2021 10:08:23 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id D98F8C4338F;
+        Tue, 14 Sep 2021 10:08:19 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org D98F8C4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v10] Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Date:   Tue, 14 Sep 2021 18:08:16 +0800
+Message-Id: <1631614096-24613-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-On 8/29/21 8:12 AM, Dmitry Baryshkov wrote:
-> This is the second RFC on the proposed power sequencer subsystem. This
-> is a generification of the MMC pwrseq code. The subsystem tries to
-> abstract the idea of complex power-up/power-down/reset of the devices.
->
-> To ease migration to pwrseq and to provide compatibility with older
-> device trees, while keeping drivers simple, this iteration of RFC
-> introduces pwrseq fallback support: pwrseq driver can register fallback
-> providers. If another device driver requests pwrseq instance and none
-> was declared, the pwrseq fallback code would go through the list of
-> fallback providers and if the match is found, driver would return a
-> crafted pwrseq instance. For now this mechanism is limited to the OF
-> device matching, but it can be extended further to use any combination
-> of device IDs.
->
-> The primary set of devices that promted me to create this patchset is
-> the Qualcomm BT+WiFi family of chips. They reside on serial+platform or
-> serial + SDIO interfaces (older generations) or on serial+PCIe (newer
-> generations).  They require a set of external voltage regulators to be
-> powered on and (some of them) have separate WiFi and Bluetooth enable
-> GPIOs.
->
-> This patchset being an RFC tries to demonstrate the approach, design and
-> usage of the pwrseq subsystem. Following issues are present in the RFC
-> at this moment but will be fixed later if the overall approach would be
-> viewed as acceptable:
->
->  - No documentation
->    While the code tries to be self-documenting proper documentation
->    would be required.
->
->  - Minimal device tree bindings changes
->    There are no proper updates for the DT bindings (thus neither Rob
->    Herring nor devicetree are included in the To/Cc lists). The dt
->    schema changes would be a part of v1.
->
->  - Lack of proper PCIe integration
->    At this moment support for PCIe is hacked up to be able to test the
->    PCIe part of qca6390. Proper PCIe support would require automatically
->    powering up the devices before the bus scan depending on the proper
->    device structure in the device tree.
->
-> Changes since RFC v1:
->  - Provider pwrseq fallback support
->  - Implement fallback support in pwrseq_qca.
->  - Mmove susclk handling to pwrseq_qca.
->  - Significantly simplify hci_qca.c changes, by dropping all legacy
->    code. Now hci_qca uses only pwrseq calls to power up/down bluetooth
->    parts of the chip.
->
-I tested this here, on the Lenovo Yoga C630, after creating a patch to
-do basically the same thing as the db845c does.  One thing I noticed, if
-PWRSEQ=y and the rest are =m, there is a build error.  I suppose once
-the full set is posted and not RFC, I can send the patch for that. 
+Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
+---
+ drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
+ 1 file changed, 37 insertions(+), 13 deletions(-)
 
-One question I have, if you don't mind, in patch 11, you add a second
-channel to qca power sequencer.  I've added that here, but in the c630's
-dts, "vreg_l23a_3p3: ldo23" is empty, so I added the same numbers in for
-the regulator, and I'm wondering how to test that it's actually working
-correctly?
-
--- steev
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 928cbfa4c42d..6dc645698e30 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
+ #define QCA_DFU_TIMEOUT		3000
+ #define QCA_FLAG_MULTI_NVM      0x80
+ 
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+ struct qca_version {
+ 	__le32	rom_version;
+ 	__le32	patch_version;
+@@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
+ 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+ 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+ 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+ };
+ 
+ static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+@@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
+ 	return err;
+ }
+ 
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver,
++					char *variant)
++{
++	char *sep = (strlen(variant) == 0) ? "" : "_";
++	u16 board_id = le16_to_cpu(ver->board_id);
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++
++	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s.bin",
++				rom_version, sep, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s%s_%04x.bin",
++				rom_version, sep, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 				    struct qca_version *ver,
+ 				    const struct qca_device_info *info)
+@@ -3354,19 +3383,14 @@ static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+ 	char fwname[64];
+ 	int err;
+ 
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "gf");
++		break;
++	default:
++		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
++		break;
+ 	}
+ 
+ 	err = request_firmware(&fw, fwname, &hdev->dev);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
 
