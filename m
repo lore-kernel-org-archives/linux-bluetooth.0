@@ -2,130 +2,148 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 456E0C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 23:36:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 897D4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 23:36:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 26ACC61242
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 23:36:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6949C60F25
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 23:36:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231816AbhIOXhZ (ORCPT
+        id S232796AbhIOXiS (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Sep 2021 19:37:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43890 "EHLO
+        Wed, 15 Sep 2021 19:38:18 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44078 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231233AbhIOXhY (ORCPT
+        with ESMTP id S231771AbhIOXiR (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Sep 2021 19:37:24 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9DA35C061766
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 16:36:04 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id j6so4209872pfa.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 16:36:04 -0700 (PDT)
+        Wed, 15 Sep 2021 19:38:17 -0400
+Received: from mail-qk1-x72c.google.com (mail-qk1-x72c.google.com [IPv6:2607:f8b0:4864:20::72c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88D44C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 16:36:57 -0700 (PDT)
+Received: by mail-qk1-x72c.google.com with SMTP id p4so5522165qki.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 16:36:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=qX2dfn2x26WX07e7xdzg2ywb6Njzmd8j8daHrFRGUlY=;
-        b=S9hxECxPlRtRHDWSMhtmv5c+YaspcIfsWlDNnJsV1ys9XFGvSfmWqH+atQf4YaaiCC
-         NVRqzvo2929RZt/poJT3+qT5eGsbME3yvCe2xq810FFFag3SCkVZgRJ/5yiktkYvSEMl
-         9KlrKdCp4P333wkju5p3QsKxgQaJ7GibScOIAPu+QD6cH7st8fUB6p56f1qhN+DZOUQ3
-         pB8m9aE0p/k9nm/qKgv5Rh55lwojhJ0bVo7SneOeqWRHC7IWIfHrPttGc0g12UogAF40
-         dJLtasREcpWs8SoNMq8JjTW068URZq6VEreMp61gBWGVR31EyJiUWFp7aZcnHwESQfNR
-         yJcA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=2BfCbu0DdHl4CkXyysAv88sQ5EVZyqO9Ye6GNy/B6I0=;
+        b=BRWcskHOrefHdihc4q2NedTS1TBUI0i5PsYid+ozjZgz0dbzTVlbbcJ95xB8xekkrd
+         uRqWCAcnnQNJrGWlbTRlx8y0+HxnNLn9dYBXG+tf2BiDHC0yltc6YyB5x4wVb6kuv0m/
+         OR1uxQtnNlyCe/Bk9p/NbNvyyDJbu3xnbmKFqBlmRsrJ4PDcYxDP7Ytx6+mAQY+soG58
+         VRZkTrJFJpWTtuxcBHTk2Ss0RXTvdfJVqo7Y2dJh0KTp8AD48Ns0tUm1e3nPr4Mq3vLt
+         xix0cWOQKlUvu2A/3pPuHAHG6LYh9eQoyU6Sy8ODsoYR6iCKO/67m2cbgHyxXMhZQUM7
+         Oh/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qX2dfn2x26WX07e7xdzg2ywb6Njzmd8j8daHrFRGUlY=;
-        b=TcFsiJqxE62jy4khtFt2o8qGVrztnEwN10ss1lkQ/GAnMzm6T3DvKVp+kD/BtY8rdp
-         Vjd+a0LPS0midE0ncYKmMTR/w57rk67c8umDZo2LHCLZdHKnVi8vElf92g/jbALdGAB3
-         o1u3OiBrjvZ63EN2mTzXq3obT6tweTQ1SAhauEVB5mVzSl7MzfJMLDIBY4ae3IYsroyy
-         X43e/K/9uu2qYdNs7HMOoawckRpQm+ZHwHxP19/Ec9xOQXLnS+lc4SKFOauwCwnzVVHL
-         XOUa1woyvnk35ykvadm7nvZG6u1uJH9q2IQIL+JsbKz4ofwdhL52tR3UxdI5100BnEYZ
-         RrJg==
-X-Gm-Message-State: AOAM531bspo//C/v8KV3k6JbiYHPUUziwlS+YeOOUtcZAyRVlDAnqlCR
-        i+kRZiLc3S6OX1oHGRtesR1MO1kuKik=
-X-Google-Smtp-Source: ABdhPJxmrPbDD8k4DjxXRCWW623mF/wEAde8pPq5L9qqFD7bUr+VocNDYFYz1AiuKHO8O+rJ5Iem6g==
-X-Received: by 2002:a62:4e0f:0:b0:3ee:668d:b841 with SMTP id c15-20020a624e0f000000b003ee668db841mr2424880pfb.48.1631748963876;
-        Wed, 15 Sep 2021 16:36:03 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x13sm890980pff.70.2021.09.15.16.36.02
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=2BfCbu0DdHl4CkXyysAv88sQ5EVZyqO9Ye6GNy/B6I0=;
+        b=Kt6aoXkKL8R68X4FhMJf/+d0sPa5uyc7EmsvoYNdDpmxccx4ZpU1gj31TDRBj9JFx1
+         SMKrCc2kxG7YzsFXjyYRwx0TzxnV4IzGatCAMs9BWXvoUTebJvS+HD7gpZGRHlbniEeP
+         nJJiMOGvSVUSQzGhRI+sjtX/G3X5RXjLAc0Q04QwurOyrvE93WHrCPVaYPKhVmy0sy8l
+         xCxTMLtbULReMe3pvvXZtqn0xMIGtXTAwcldDkYEn7AMmG9oARUGwGuOrmkRRayH1ytz
+         Vr1e/2Hps/f/SsZf7koIw6Rc+4zg0tTdHwTWagaOscC2fOFJjOyPBIavB6G+20Hx+Y8X
+         OaXg==
+X-Gm-Message-State: AOAM5323KI3NQoYoAxR1mKSG8G7PoFt8Vi94Sjzgalylc/7agpFwEuMB
+        DHc9arnc7JxR+y/62lzvCUO0RrXVugcdhA==
+X-Google-Smtp-Source: ABdhPJweQy103b+/6zhMVPMnk5rYhfplDhBu/oPLFVH6+ONQDP4jEsbjmLKl0GSAFYZ9B7zkB5HazQ==
+X-Received: by 2002:ae9:f44c:: with SMTP id z12mr2498239qkl.433.1631749016503;
+        Wed, 15 Sep 2021 16:36:56 -0700 (PDT)
+Received: from [172.17.0.2] ([20.62.108.30])
+        by smtp.gmail.com with ESMTPSA id h66sm358834qkc.5.2021.09.15.16.36.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 15 Sep 2021 16:36:03 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 3/4] Bluetooth: Fix passing NULL to PTR_ERR
-Date:   Wed, 15 Sep 2021 16:35:59 -0700
-Message-Id: <20210915233600.4129808-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210915233600.4129808-1-luiz.dentz@gmail.com>
-References: <20210915233600.4129808-1-luiz.dentz@gmail.com>
+        Wed, 15 Sep 2021 16:36:56 -0700 (PDT)
+Message-ID: <61428398.1c69fb81.835d3.2a9a@mx.google.com>
+Date:   Wed, 15 Sep 2021 16:36:56 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8679596074026736454=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] sco-tester: Add tests for sending data
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210915230156.4107466-1-luiz.dentz@gmail.com>
+References: <20210915230156.4107466-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============8679596074026736454==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Passing NULL to PTR_ERR will result in 0 (success), also since the likes of
-bt_skb_sendmsg does never return NULL it is safe to replace the instances of
-IS_ERR_OR_NULL with IS_ERR when checking its return.
+This is automated email and please do not reply to this email!
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=547625
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.45 seconds
+GitLint                       PASS      0.88 seconds
+Prep - Setup ELL              PASS      48.09 seconds
+Build - Prep                  PASS      0.48 seconds
+Build - Configure             PASS      8.66 seconds
+Build - Make                  PASS      207.03 seconds
+Make Check                    PASS      9.95 seconds
+Make Distcheck                PASS      244.27 seconds
+Build w/ext ELL - Configure   PASS      8.75 seconds
+Build w/ext ELL - Make        PASS      195.58 seconds
+
+Details
+##############################
+Test: CheckPatch - PASS
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+
+##############################
+Test: GitLint - PASS
+Desc: Run gitlint with rule in .gitlint
+
+##############################
+Test: Prep - Setup ELL - PASS
+Desc: Clone, build, and install ELL
+
+##############################
+Test: Build - Prep - PASS
+Desc: Prepare environment for build
+
+##############################
+Test: Build - Configure - PASS
+Desc: Configure the BlueZ source tree
+
+##############################
+Test: Build - Make - PASS
+Desc: Build the BlueZ source tree
+
+##############################
+Test: Make Check - PASS
+Desc: Run 'make check'
+
+##############################
+Test: Make Distcheck - PASS
+Desc: Run distcheck to check the distribution
+
+##############################
+Test: Build w/ext ELL - Configure - PASS
+Desc: Configure BlueZ source with '--enable-external-ell' configuration
+
+##############################
+Test: Build w/ext ELL - Make - PASS
+Desc: Build BlueZ source with '--enable-external-ell' configuration
+
+
+
 ---
- include/net/bluetooth/bluetooth.h | 2 +-
- net/bluetooth/rfcomm/sock.c       | 2 +-
- net/bluetooth/sco.c               | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index aa221c1a27c6..3271870fd85e 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -496,7 +496,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
- 		struct sk_buff *tmp;
- 
- 		tmp = bt_skb_sendmsg(sk, msg, len, mtu, headroom, tailroom);
--		if (IS_ERR_OR_NULL(tmp)) {
-+		if (IS_ERR(tmp)) {
- 			kfree_skb(skb);
- 			return tmp;
- 		}
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 5938af3e9936..4bf4ea6cbb5e 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -583,7 +583,7 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
- 			      RFCOMM_SKB_TAIL_RESERVE);
--	if (IS_ERR_OR_NULL(skb))
-+	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
- 	sent = rfcomm_dlc_send(d, skb);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 446f871f11ed..f51399d1b9cb 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -733,7 +733,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		return -EOPNOTSUPP;
- 
- 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
--	if (IS_ERR_OR_NULL(skb))
-+	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
- 	lock_sock(sk);
--- 
-2.31.1
 
+--===============8679596074026736454==--
