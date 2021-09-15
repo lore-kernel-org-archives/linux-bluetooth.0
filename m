@@ -2,162 +2,281 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
+	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D11B2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 01:01:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C294C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 02:32:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFEE561184
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 01:01:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4639B6108F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 02:32:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231403AbhIOBCi (ORCPT
+        id S229756AbhIOCdy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 14 Sep 2021 21:02:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45144 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229716AbhIOBCh (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 14 Sep 2021 21:02:37 -0400
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 948EDC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Sep 2021 18:01:19 -0700 (PDT)
-Received: by mail-ua1-x931.google.com with SMTP id j31so597068uad.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 14 Sep 2021 18:01:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=cPi8e7LvtkQklhB9sjyO1jTceWSNlY7GoGT965tIY/Q=;
-        b=Nf54MOL/fnC3CuOMPHOEhjKPN4fFDIdj1iwS1/atlWNV5a6HxBBOZyGsKVvEahaXSI
-         wN2kmujOn/tvSBRl15sNUEs76ISqabA/AUCoE+nErwjsTABACqM4yyQS4F97GBPAyCrb
-         Qn3cEMEBkD5L6ofVwW9rwuTcpNQ0R5Cx/BlB1Oi5nRaPg3Gdg8ova2zzgIUkBkYPm7GF
-         TFSkOmlpDg2pcslqQD40v1xDBCRY7Ly/iNpCglwAQS7l+1WLal5i46eDTvmf9gq6t2T2
-         GUT9cW9xRvStxuyFp0kpvW9IuhDgR/1/xOUqY5bUXg6gdWhGJhQortCFW90vqLCWQb/x
-         nHUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=cPi8e7LvtkQklhB9sjyO1jTceWSNlY7GoGT965tIY/Q=;
-        b=gvhNLyFS0Kw0p8DzCAnVkrSXqmQV9BTq+i8CEeLUksXTHu5898VZK/wRsI+EUm3qMI
-         UnIrhlYw2rO17ZTspIS0ItJ7CfGXi9FhM23LFi90WMKz8HvfksAlYPRM0KBijAFJ2/68
-         PB0wXH/CphPT9+ESCvbixoXxN0f5dQ9me/0Iwj2scBvVWa4suII3Pf/WYs39wizAzyLO
-         dQWHikukUQWFVmSN+A3LNbFP+NQt4d/f9Y0ZgzUa+aVg4KJQYuebpzbAY03R1pYeeGlo
-         RXGQJgXaSE7+vA7d5MWZ/DyZyyJAa4k8jGkvRoMofw5xjFgIWvPxrL1mj253DslXQYOQ
-         A7gg==
-X-Gm-Message-State: AOAM5314iC2k7qWB6j6iQj4PwkWL5P642atMBHGFlZ7jEPK57+R4Hf0s
-        mrJr2UpTi0wXC+VKc21Qr5+dAxEhOPMguhFLPtHykoh1
-X-Google-Smtp-Source: ABdhPJyRpWJMQoJuqpG8NdiKF1rS/leQlzLmV0dBcYnipDJj3EHguwhDbNIEeZJl/TjOodUbJC4gQPAOhlBz0Izk088=
-X-Received: by 2002:ab0:6616:: with SMTP id r22mr6690636uam.129.1631667678539;
- Tue, 14 Sep 2021 18:01:18 -0700 (PDT)
+        Tue, 14 Sep 2021 22:33:54 -0400
+Received: from mga05.intel.com ([192.55.52.43]:24121 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229595AbhIOCdy (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 14 Sep 2021 22:33:54 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10107"; a="307741921"
+X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
+   d="scan'208";a="307741921"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Sep 2021 19:32:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,292,1624345200"; 
+   d="scan'208";a="698070896"
+Received: from lkp-server01.sh.intel.com (HELO 730d49888f40) ([10.239.97.150])
+  by fmsmga006.fm.intel.com with ESMTP; 14 Sep 2021 19:32:34 -0700
+Received: from kbuild by 730d49888f40 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mQKiw-0008yy-73; Wed, 15 Sep 2021 02:32:34 +0000
+Date:   Wed, 15 Sep 2021 10:31:39 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 81be03e026dc0c16dc1c64e088b2a53b73caa895
+Message-ID: <61415b0b.3rTPblcJh/R3tZnL%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-References: <20210914220403.3848971-1-luiz.dentz@gmail.com> <614129dd.1c69fb81.22f2b.5c81@mx.google.com>
-In-Reply-To: <614129dd.1c69fb81.22f2b.5c81@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 14 Sep 2021 18:01:07 -0700
-Message-ID: <CABBYNZL-Og4aOQYH5px-KU_uf=4=tTFV4AiPL9aXGNggzQ2LTg@mail.gmail.com>
-Subject: Re: Bluetooth: hci_sock: Replace use of memcpy_from_msg with bt_skb_sendmsg
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 81be03e026dc0c16dc1c64e088b2a53b73caa895  Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
 
-On Tue, Sep 14, 2021 at 4:01 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=546957
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.51 seconds
-> GitLint                       PASS      0.11 seconds
-> BuildKernel                   PASS      524.96 seconds
-> TestRunner: Setup             PASS      348.84 seconds
-> TestRunner: l2cap-tester      PASS      2.57 seconds
-> TestRunner: bnep-tester       PASS      1.88 seconds
-> TestRunner: mgmt-tester       FAIL      32.39 seconds
-> TestRunner: rfcomm-tester     PASS      2.56 seconds
-> TestRunner: sco-tester        PASS      2.01 seconds
-> TestRunner: smp-tester        PASS      2.13 seconds
-> TestRunner: userchan-tester   PASS      1.93 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - PASS - 0.51 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
->
->
-> ##############################
-> Test: GitLint - PASS - 0.11 seconds
-> Run gitlint with rule in .gitlint
->
->
-> ##############################
-> Test: BuildKernel - PASS - 524.96 seconds
-> Build Kernel with minimal configuration supports Bluetooth
->
->
-> ##############################
-> Test: TestRunner: Setup - PASS - 348.84 seconds
-> Setup environment for running Test Runner
->
->
-> ##############################
-> Test: TestRunner: l2cap-tester - PASS - 2.57 seconds
-> Run test-runner with l2cap-tester
-> Total: 40, Passed: 40 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: bnep-tester - PASS - 1.88 seconds
-> Run test-runner with bnep-tester
-> Total: 1, Passed: 1 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: mgmt-tester - FAIL - 32.39 seconds
-> Run test-runner with mgmt-tester
-> Total: 452, Passed: 451 (99.8%), Failed: 1, Not Run: 0
->
-> Failed Test Cases
-> Read Exp Feature - Success                           Failed       0.014 seconds
->
-> ##############################
-> Test: TestRunner: rfcomm-tester - PASS - 2.56 seconds
-> Run test-runner with rfcomm-tester
-> Total: 9, Passed: 9 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: sco-tester - PASS - 2.01 seconds
-> Run test-runner with sco-tester
-> Total: 11, Passed: 11 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: smp-tester - PASS - 2.13 seconds
-> Run test-runner with smp-tester
-> Total: 8, Passed: 8 (100.0%), Failed: 0, Not Run: 0
->
-> ##############################
-> Test: TestRunner: userchan-tester - PASS - 1.93 seconds
-> Run test-runner with userchan-tester
-> Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+elapsed time: 1779m
 
-Applied, thanks.
+configs tested: 210
+configs skipped: 4
 
--- 
-Luiz Augusto von Dentz
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                 randconfig-c001-20210913
+i386                 randconfig-c001-20210914
+nds32                            alldefconfig
+parisc                generic-64bit_defconfig
+powerpc                          g5_defconfig
+mips                         mpc30x_defconfig
+powerpc                      acadia_defconfig
+sh                        sh7785lcr_defconfig
+powerpc                   motionpro_defconfig
+arm                         axm55xx_defconfig
+powerpc                 mpc8540_ads_defconfig
+m68k                        m5307c3_defconfig
+powerpc                      ppc6xx_defconfig
+arm                     eseries_pxa_defconfig
+powerpc                   currituck_defconfig
+powerpc                     skiroot_defconfig
+mips                       lemote2f_defconfig
+sh                   sh7724_generic_defconfig
+sh                          kfr2r09_defconfig
+sh                     sh7710voipgw_defconfig
+mips                 decstation_r4k_defconfig
+arm                       aspeed_g4_defconfig
+sparc                            alldefconfig
+mips                          rb532_defconfig
+powerpc                     ksi8560_defconfig
+powerpc                 mpc834x_mds_defconfig
+powerpc                  mpc885_ads_defconfig
+mips                         rt305x_defconfig
+mips                     loongson1b_defconfig
+powerpc                   lite5200b_defconfig
+powerpc                 xes_mpc85xx_defconfig
+xtensa                    xip_kc705_defconfig
+powerpc                 mpc8313_rdb_defconfig
+arm                             mxs_defconfig
+arm                     davinci_all_defconfig
+powerpc                     redwood_defconfig
+arm                       netwinder_defconfig
+powerpc                        cell_defconfig
+mips                      maltasmvp_defconfig
+powerpc                    ge_imp3a_defconfig
+powerpc                    gamecube_defconfig
+sh                      rts7751r2d1_defconfig
+arm                          gemini_defconfig
+arm                           h3600_defconfig
+arm                         lubbock_defconfig
+powerpc                           allnoconfig
+sh                                  defconfig
+mips                           ip27_defconfig
+powerpc                      katmai_defconfig
+powerpc                     tqm8555_defconfig
+arm                          ixp4xx_defconfig
+mips                   sb1250_swarm_defconfig
+powerpc                 mpc836x_rdk_defconfig
+sh                           se7705_defconfig
+arm                            qcom_defconfig
+arc                 nsimosci_hs_smp_defconfig
+arm                        magician_defconfig
+arm                           corgi_defconfig
+m68k                            mac_defconfig
+xtensa                          iss_defconfig
+arm                           sama5_defconfig
+arm                          lpd270_defconfig
+arc                          axs101_defconfig
+alpha                            alldefconfig
+powerpc                    mvme5100_defconfig
+microblaze                      mmu_defconfig
+um                                  defconfig
+mips                        omega2p_defconfig
+ia64                        generic_defconfig
+sh                           se7721_defconfig
+arm                       aspeed_g5_defconfig
+riscv                    nommu_virt_defconfig
+xtensa                  audio_kc705_defconfig
+alpha                               defconfig
+s390                             alldefconfig
+sh                           se7206_defconfig
+arc                         haps_hs_defconfig
+m68k                          sun3x_defconfig
+arm                        neponset_defconfig
+sh                          r7785rp_defconfig
+m68k                       m5275evb_defconfig
+arm                           spitz_defconfig
+arm                        spear6xx_defconfig
+mips                           xway_defconfig
+arm                            mmp2_defconfig
+powerpc                        fsp2_defconfig
+arc                              alldefconfig
+arc                      axs103_smp_defconfig
+mips                         bigsur_defconfig
+x86_64               randconfig-c001-20210914
+arm                  randconfig-c002-20210914
+x86_64               randconfig-c001-20210913
+arm                  randconfig-c002-20210913
+x86_64               randconfig-c001-20210915
+arm                  randconfig-c002-20210915
+i386                 randconfig-c001-20210915
+ia64                             allmodconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                                defconfig
+m68k                             allmodconfig
+m68k                             allyesconfig
+nios2                               defconfig
+nds32                             allnoconfig
+arc                              allyesconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                            allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+xtensa                           allyesconfig
+parisc                              defconfig
+s390                             allmodconfig
+s390                                defconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allmodconfig
+powerpc                          allyesconfig
+x86_64               randconfig-a002-20210913
+x86_64               randconfig-a003-20210913
+x86_64               randconfig-a006-20210913
+x86_64               randconfig-a004-20210913
+x86_64               randconfig-a005-20210913
+x86_64               randconfig-a001-20210913
+x86_64               randconfig-a002-20210915
+x86_64               randconfig-a003-20210915
+x86_64               randconfig-a004-20210915
+x86_64               randconfig-a006-20210915
+x86_64               randconfig-a005-20210915
+x86_64               randconfig-a001-20210915
+i386                 randconfig-a004-20210913
+i386                 randconfig-a005-20210913
+i386                 randconfig-a002-20210913
+i386                 randconfig-a006-20210913
+i386                 randconfig-a003-20210913
+i386                 randconfig-a001-20210913
+x86_64               randconfig-a013-20210914
+x86_64               randconfig-a016-20210914
+x86_64               randconfig-a012-20210914
+x86_64               randconfig-a011-20210914
+x86_64               randconfig-a014-20210914
+x86_64               randconfig-a015-20210914
+i386                 randconfig-a016-20210914
+i386                 randconfig-a015-20210914
+i386                 randconfig-a011-20210914
+i386                 randconfig-a012-20210914
+i386                 randconfig-a013-20210914
+i386                 randconfig-a014-20210914
+arc                  randconfig-r043-20210913
+riscv                          rv32_defconfig
+riscv                    nommu_k210_defconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                            allyesconfig
+riscv                            allmodconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                                  kexec
+
+clang tested configs:
+riscv                randconfig-c006-20210913
+x86_64               randconfig-c007-20210913
+mips                 randconfig-c004-20210913
+powerpc              randconfig-c003-20210913
+i386                 randconfig-c001-20210913
+arm                  randconfig-c002-20210913
+s390                 randconfig-c005-20210913
+riscv                randconfig-c006-20210914
+x86_64               randconfig-c007-20210914
+powerpc              randconfig-c003-20210914
+arm                  randconfig-c002-20210914
+i386                 randconfig-c001-20210914
+s390                 randconfig-c005-20210914
+i386                 randconfig-a004-20210914
+i386                 randconfig-a005-20210914
+i386                 randconfig-a006-20210914
+i386                 randconfig-a002-20210914
+i386                 randconfig-a001-20210914
+i386                 randconfig-a003-20210914
+x86_64               randconfig-a016-20210913
+x86_64               randconfig-a013-20210913
+x86_64               randconfig-a012-20210913
+x86_64               randconfig-a011-20210913
+x86_64               randconfig-a014-20210913
+x86_64               randconfig-a015-20210913
+x86_64               randconfig-a002-20210914
+x86_64               randconfig-a003-20210914
+x86_64               randconfig-a004-20210914
+x86_64               randconfig-a006-20210914
+x86_64               randconfig-a005-20210914
+x86_64               randconfig-a001-20210914
+i386                 randconfig-a016-20210913
+i386                 randconfig-a011-20210913
+i386                 randconfig-a015-20210913
+i386                 randconfig-a012-20210913
+i386                 randconfig-a013-20210913
+i386                 randconfig-a014-20210913
+hexagon              randconfig-r045-20210914
+hexagon              randconfig-r041-20210914
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
