@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-21.2 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
 	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
 	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6D44C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 08:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 91EDAC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 08:32:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7CD661179
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 08:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 79F7160F23
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Sep 2021 08:32:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236773AbhIOIdq (ORCPT
+        id S236813AbhIOIdv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Sep 2021 04:33:46 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33742 "EHLO
+        Wed, 15 Sep 2021 04:33:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231672AbhIOIdp (ORCPT
+        with ESMTP id S231672AbhIOIdu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Sep 2021 04:33:45 -0400
-Received: from mail-qt1-x84a.google.com (mail-qt1-x84a.google.com [IPv6:2607:f8b0:4864:20::84a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 11BCDC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 01:32:27 -0700 (PDT)
-Received: by mail-qt1-x84a.google.com with SMTP id r6-20020a05622a034600b002a0ba9994f4so1811647qtw.22
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 01:32:27 -0700 (PDT)
+        Wed, 15 Sep 2021 04:33:50 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CBC6C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 01:32:32 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id y134-20020a25dc8c000000b0059f0301df0fso2597426ybe.21
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Sep 2021 01:32:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ZT4B0dTuU8s9sedeykOmQ0CQKwWJBoEkx2aEh8AAfh0=;
-        b=nAv4hg1VJ2athgC3BHcDBqviZAy3lHceTW4vlNo4qSn6C635tpWwPc/woIi0TDZlYI
-         piLj+m+2cDAUvkP0YbypX7QqeZsWMTWLBVJUHiKcqvlpBxHlu5aE/qK39IvzC3hvRKOV
-         cqkYOlbf6w6khSxIauLMBJrg70wQ7dV6hQP7qq7+uc1aKsFayJDjRwxzjl0qLtpDjHVW
-         rMWQ2WuuO0hiKxfSSiqD/bar50Q4QDcA5sMryj183gPsYV4QP0l7nSfdtlW6hlsjY52Y
-         Rlhw4DyLZY/10mG09fJ69FDinswe9FdfdGFwu8nnN0j9GrUrfHNY1wGO/NZinYpSMOcg
-         GNaQ==
+        bh=L2mLZCJYMe4s8kNVpXe4uGgypQsZDot5+m89W7GkJqk=;
+        b=rmpUMxD7DWx56MycEc1J/7DMbhtkveJlOZkQj4rrMfzp1zkSG7CSjJs5sSzlp8iZmk
+         7BQEakB2VJ82ouW7CA38ILsWUVWDyCAvwL49s6MdBo9x9C3m7RAhSYuwabTwAwdis2LM
+         0ig+4uaudMJJbHCMXtZkiKSUmErGainFwvHAIrZhtJ5nEDKa4z3HrjP2GMsOr06nOjKy
+         OM2eQBuLiKjl33gfaCh9TZn2AAoUK/atSnecKQy9nQ95ALVceyu3/6OMtsjdpJx7AOIS
+         LnKOKFpMCDhhjndJ11zLPCjREWRPZ133gb/WvYZkr/+vUH11LHUjtzZLFGzYtyTuKQfG
+         WRvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ZT4B0dTuU8s9sedeykOmQ0CQKwWJBoEkx2aEh8AAfh0=;
-        b=fx5Xz6jXvPdwBXhirKdBKmp9bVuO6J3CLHzSgCuSSo7VLAFcUwW8kiWHpdWHc4PfQI
-         ZazeqZTqAuK/CrHD3ODsV0uwFo3V1Loed4wVZiafHWTkTZ0f5XXjVLwc9d1jqji0u1cd
-         VBuS22aP6j46ybb9968aIMsKTEd8CO1GfWaHCQuhl82B77g5edgPklAs+OuyN901iKMX
-         /MPVunCpp3UJNuvGJ6pg8glbFRNtJI/Eua1NlqkdcOIz9rXCZiDFfLOxOufllemtgnhC
-         eyw/sd9iBevTfsRu177vhP1d8+UFfw6FpFGtdqMsPdFDTjGXWbAD1Nn7JAZDwQpl3tVe
-         nJMg==
-X-Gm-Message-State: AOAM532nbDgUg1AsFDdSZLmDBQubC34rvux+vVQ0YzKL723q8yPiryUj
-        ygZ+i/5+6tGi0Fj15dX2nzg0h2bHvExcn5UkoPyQXYp7ozMBr+Wx1W0395y0zbebKtV2XPTzwpm
-        YmgtATtvzTItZM63CA/2YM9u5BZlGEWaqG9504nMU93ZrppYwFo0pBpvUB+N3u/faN1XXs5tq9b
-        u/
-X-Google-Smtp-Source: ABdhPJy8AdBLxrGABBJ/Ke3++yny0e3AH/kgk0CWobalUypZ5Pt7s/xOWmPJliSu5/UomEA6pJ4PfVorTIlg
+        bh=L2mLZCJYMe4s8kNVpXe4uGgypQsZDot5+m89W7GkJqk=;
+        b=SvJFwt9kAHGEjve8gGGYuyPhgLu+uDDM6uYMFe51fNlcBCUvpbO/6oryzVJ8VjqF/Y
+         74cSfyl/UDuTrGLw6hdmvJHpS2CIcRzCmHjQfPaxh0ck8HKfS7pje18b2i2ppjXeHXTQ
+         aHdlsetH+g3WQlmj4XsR0+nn/bZEx7j07UCg5uXL9NIeR2Y3J8fa065sUv/I5D6FsnDb
+         NeJ/tuyZMjoMIcOkfHOt6qfFmPiBWT9l0KhN5qrNAb3c8kHtb0xayGDoZZ4Vu+/I7Eb8
+         PpajLVaUXUaezmaArkljzJumvKQnrLyysbke8D4lSk60U9+DI8g2L20WsujzdSF5PZjH
+         jGhg==
+X-Gm-Message-State: AOAM531/1oPYjW9UjyLGU0TV32FDwHZnqshBokEOqGOXZuPT48As/Cv0
+        iZqcFtGFjzokf17mZ9Gkje0jR7F7wIbIwuYg4M0EXO9z13UNgre6SSbroNhDPtNYCf9sBU9CxJB
+        Fl1x6fRFwC9wa5tjzyBQskyqPCNw/jE6OFi8m6y6Tc0sHhAbZ5+qOXMa/IzfjAD5hKCdYk+h45I
+        UQ
+X-Google-Smtp-Source: ABdhPJyiEvaSxbhGQOLCWZ6/4ThY/+fFQPw3E7mWpS7brAJS5Y/vwBEoJX6V2hxFnJUlV+Gq0nfefiSY5OzR
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:3c6b:8053:7e45:276b])
- (user=apusaka job=sendgmr) by 2002:ad4:5506:: with SMTP id
- az6mr9543225qvb.8.1631694746250; Wed, 15 Sep 2021 01:32:26 -0700 (PDT)
-Date:   Wed, 15 Sep 2021 16:31:55 +0800
+ (user=apusaka job=sendgmr) by 2002:a25:b98b:: with SMTP id
+ r11mr4615970ybg.189.1631694751319; Wed, 15 Sep 2021 01:32:31 -0700 (PDT)
+Date:   Wed, 15 Sep 2021 16:31:56 +0800
 In-Reply-To: <20210915083207.243957-1-apusaka@google.com>
-Message-Id: <20210915162843.Bluez.v5.1.I2169032b03520f33b73ca4dc7f2ae7ab0a901da3@changeid>
+Message-Id: <20210915162843.Bluez.v5.2.Ieb652c069b1583fec1439ee784a0f49a02afed11@changeid>
 Mime-Version: 1.0
 References: <20210915083207.243957-1-apusaka@google.com>
 X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
-Subject: [Bluez PATCH v5 01/13] lib: Inclusive language changes
+Subject: [Bluez PATCH v5 02/13] btio: Inclusive language changes
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>
@@ -77,210 +77,289 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Archie Pusaka <apusaka@chromium.org>
 
 BT core spec 5.3 promotes the usage of inclusive languages.
-This CL replaces some terms with the more appropriate counterparts,
-such as "central", "peripheral", and "accept list".
+This CL uses "central" as it is deemed to be more appropriate.
 ---
 
-Changes in v5:
-* Support the original term as input parameter for tools
+(no changes since v1)
 
-Changes in v3:
-* Not replacing some terms which belong to libluetooth API
+ android/a2dp.c         |  2 +-
+ btio/btio.c            | 42 +++++++++++++++++++++---------------------
+ btio/btio.h            |  2 +-
+ profiles/audio/a2dp.c  |  2 +-
+ profiles/audio/avctp.c |  2 +-
+ profiles/sap/server.c  |  2 +-
+ tools/btiotest.c       |  8 ++++----
+ 7 files changed, 30 insertions(+), 30 deletions(-)
 
-Changes in v2:
-* Merging several patches from the same directory into one
-
- android/bluetooth.c |  4 ++--
- lib/hci.c           | 32 ++++++++++++++++++++------------
- lib/mgmt.h          |  2 +-
- monitor/control.c   |  4 ++--
- src/adapter.c       |  4 ++--
- tools/oobtest.c     |  4 ++--
- 6 files changed, 29 insertions(+), 21 deletions(-)
-
-diff --git a/android/bluetooth.c b/android/bluetooth.c
-index c3ad503497..fe956b5d43 100644
---- a/android/bluetooth.c
-+++ b/android/bluetooth.c
-@@ -2276,7 +2276,7 @@ static void new_long_term_key_event(uint16_t index, uint16_t length,
- 		ediv = le16_to_cpu(key->ediv);
- 		rand = le64_to_cpu(key->rand);
- 
--		store_ltk(&key->addr.bdaddr, key->addr.type, key->master,
-+		store_ltk(&key->addr.bdaddr, key->addr.type, key->central,
- 				key->val, key->type, key->enc_size, ediv, rand);
- 	}
- 
-@@ -3097,7 +3097,7 @@ static struct mgmt_ltk_info *get_ltk_info(GKeyFile *key_file, const char *peer,
- 	info->ediv = g_key_file_get_integer(key_file, peer, ediv_s, NULL);
- 	info->ediv = cpu_to_le16(info->ediv);
- 
--	info->master = master;
-+	info->central = master;
- 
- failed:
- 	g_free(key);
-diff --git a/lib/hci.c b/lib/hci.c
-index 53af0a1148..5141f20ac7 100644
---- a/lib/hci.c
-+++ b/lib/hci.c
-@@ -288,7 +288,7 @@ int hci_strtolp(char *str, unsigned int *val)
- static hci_map link_mode_map[] = {
- 	{ "NONE",	0		},
- 	{ "ACCEPT",	HCI_LM_ACCEPT	},
--	{ "MASTER",	HCI_LM_MASTER	},
-+	{ "CENTRAL",	HCI_LM_MASTER	},
- 	{ "AUTH",	HCI_LM_AUTH	},
- 	{ "ENCRYPT",	HCI_LM_ENCRYPT	},
- 	{ "TRUSTED",	HCI_LM_TRUSTED	},
-@@ -305,7 +305,7 @@ char *hci_lmtostr(unsigned int lm)
- 
- 	*str = 0;
- 	if (!(lm & HCI_LM_MASTER))
--		strcpy(str, "SLAVE ");
-+		strcpy(str, "PERIPHERAL ");
- 
- 	s = hci_bit2str(link_mode_map, lm);
- 	if (!s) {
-@@ -320,7 +320,15 @@ char *hci_lmtostr(unsigned int lm)
- 
- int hci_strtolm(char *str, unsigned int *val)
- {
--	return hci_str2bit(link_mode_map, str, val);
-+	int ret = hci_str2bit(link_mode_map, str, val);
-+
-+	/* Deprecated name. Kept for compatibility. */
-+	if (strcasestr(str, "MASTER")) {
-+		ret = 1;
-+		*val |= HCI_LM_MASTER;
-+	}
-+
-+	return ret;
+diff --git a/android/a2dp.c b/android/a2dp.c
+index e24f79348d..029107cf5c 100644
+--- a/android/a2dp.c
++++ b/android/a2dp.c
+@@ -1692,7 +1692,7 @@ bool bt_a2dp_register(struct ipc *ipc, const bdaddr_t *addr, uint8_t mode)
+ 				BT_IO_OPT_SOURCE_BDADDR, &adapter_addr,
+ 				BT_IO_OPT_PSM, AVDTP_PSM,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_MASTER, true,
++				BT_IO_OPT_CENTRAL, true,
+ 				BT_IO_OPT_INVALID);
+ 	if (!server) {
+ 		error("Failed to listen on AVDTP channel: %s", err->message);
+diff --git a/btio/btio.c b/btio/btio.c
+index 1f1c374bca..f4f53574c8 100644
+--- a/btio/btio.c
++++ b/btio/btio.c
+@@ -61,7 +61,7 @@ struct set_opts {
+ 	uint16_t mtu;
+ 	uint16_t imtu;
+ 	uint16_t omtu;
+-	int master;
++	int central;
+ 	uint8_t mode;
+ 	int flushable;
+ 	uint32_t priority;
+@@ -359,7 +359,7 @@ static int l2cap_connect(int sock, const bdaddr_t *dst, uint8_t dst_type,
+ 	return 0;
  }
  
- /* Command mapping */
-@@ -345,7 +353,7 @@ static hci_map commands_map[] = {
+-static int l2cap_set_master(int sock, int master)
++static int l2cap_set_central(int sock, int central)
+ {
+ 	int flags;
+ 	socklen_t len;
+@@ -368,7 +368,7 @@ static int l2cap_set_master(int sock, int master)
+ 	if (getsockopt(sock, SOL_L2CAP, L2CAP_LM, &flags, &len) < 0)
+ 		return -errno;
  
- 	{ "Set Connection Encryption",			16  },
- 	{ "Change Connection Link Key",			17  },
--	{ "Master Link Key",				18  },
-+	{ "Temporary Link Key",				18  },
- 	{ "Remote Name Request",			19  },
- 	{ "Cancel Remote Name Request",			20  },
- 	{ "Read Remote Supported Features",		21  },
-@@ -565,11 +573,11 @@ static hci_map commands_map[] = {
- 	{ "LE Set Scan Enable",				211 },
- 	{ "LE Create Connection",			212 },
- 	{ "LE Create Connection Cancel",		213 },
--	{ "LE Read White List Size",			214 },
--	{ "LE Clear White List",			215 },
-+	{ "LE Read Accept List Size",			214 },
-+	{ "LE Clear Accept List",			215 },
+-	if (master) {
++	if (central) {
+ 		if (flags & L2CAP_LM_MASTER)
+ 			return 0;
+ 		flags |= L2CAP_LM_MASTER;
+@@ -384,7 +384,7 @@ static int l2cap_set_master(int sock, int master)
+ 	return 0;
+ }
  
--	{ "LE Add Device To White List",		216 },
--	{ "LE Remove Device From White List",		217 },
-+	{ "LE Add Device To Accept List",		216 },
-+	{ "LE Remove Device From Accept List",		217 },
- 	{ "LE Connection Update",			218 },
- 	{ "LE Set Host Channel Classification",		219 },
- 	{ "LE Read Channel Map",			220 },
-@@ -735,8 +743,8 @@ static hci_map lmp_features_map[8][9] = {
- 		{ "<EV4 packets>",	LMP_EV4		},	/* Bit 0 */
- 		{ "<EV5 packets>",	LMP_EV5		},	/* Bit 1 */
- 		{ "<no. 34>",		0x04		},	/* Bit 2 */
--		{ "<AFH cap. slave>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
--		{ "<AFH class. slave>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
-+		{ "<AFH cap. perip.>",	LMP_AFH_CAP_SLV	},	/* Bit 3 */
-+		{ "<AFH cls. perip.>",	LMP_AFH_CLS_SLV	},	/* Bit 4 */
- 		{ "<BR/EDR not supp.>",	LMP_NO_BREDR	},	/* Bit 5 */
- 		{ "<LE support>",	LMP_LE		},	/* Bit 6 */
- 		{ "<3-slot EDR ACL>",	LMP_EDR_3SLOT	},	/* Bit 7 */
-@@ -746,8 +754,8 @@ static hci_map lmp_features_map[8][9] = {
- 		{ "<5-slot EDR ACL>",	LMP_EDR_5SLOT	},	/* Bit 0 */
- 		{ "<sniff subrating>",	LMP_SNIFF_SUBR	},	/* Bit 1 */
- 		{ "<pause encryption>",	LMP_PAUSE_ENC	},	/* Bit 2 */
--		{ "<AFH cap. master>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
--		{ "<AFH class. master>",LMP_AFH_CLS_MST	},	/* Bit 4 */
-+		{ "<AFH cap. central>",	LMP_AFH_CAP_MST	},	/* Bit 3 */
-+		{ "<AFH cls. central>", LMP_AFH_CLS_MST	},	/* Bit 4 */
- 		{ "<EDR eSCO 2 Mbps>",	LMP_EDR_ESCO_2M	},	/* Bit 5 */
- 		{ "<EDR eSCO 3 Mbps>",	LMP_EDR_ESCO_3M	},	/* Bit 6 */
- 		{ "<3-slot EDR eSCO>",	LMP_EDR_3S_ESCO	},	/* Bit 7 */
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 0a6349321a..0d1678f01d 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -179,7 +179,7 @@ struct mgmt_cp_load_link_keys {
- struct mgmt_ltk_info {
- 	struct mgmt_addr_info addr;
- 	uint8_t type;
--	uint8_t master;
-+	uint8_t central;
- 	uint8_t enc_size;
- 	uint16_t ediv;
- 	uint64_t rand;
-diff --git a/monitor/control.c b/monitor/control.c
-index 266602a34c..dad23a0e62 100644
---- a/monitor/control.c
-+++ b/monitor/control.c
-@@ -308,13 +308,13 @@ static void mgmt_new_long_term_key(uint16_t len, const void *buf)
- 	/* LE SC keys are both for master and slave */
- 	switch (ev->key.type) {
- 	case 0x00:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Master (Unauthenticated)";
- 		else
- 			type = "Slave (Unauthenticated)";
- 		break;
- 	case 0x01:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Master (Authenticated)";
- 		else
- 			type = "Slave (Authenticated)";
-diff --git a/src/adapter.c b/src/adapter.c
-index 3f947c42a2..857a298ee0 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -4208,7 +4208,7 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
- 		key->rand = cpu_to_le64(info->rand);
- 		key->ediv = cpu_to_le16(info->ediv);
- 		key->type = info->authenticated;
--		key->master = info->master;
-+		key->central = info->master;
- 		key->enc_size = info->enc_size;
+-static int rfcomm_set_master(int sock, int master)
++static int rfcomm_set_central(int sock, int central)
+ {
+ 	int flags;
+ 	socklen_t len;
+@@ -393,7 +393,7 @@ static int rfcomm_set_master(int sock, int master)
+ 	if (getsockopt(sock, SOL_RFCOMM, RFCOMM_LM, &flags, &len) < 0)
+ 		return -errno;
+ 
+-	if (master) {
++	if (central) {
+ 		if (flags & RFCOMM_LM_MASTER)
+ 			return 0;
+ 		flags |= RFCOMM_LM_MASTER;
+@@ -656,7 +656,7 @@ static gboolean set_le_mode(int sock, uint8_t mode, GError **err)
+ 
+ static gboolean l2cap_set(int sock, uint8_t src_type, int sec_level,
+ 				uint16_t imtu, uint16_t omtu, uint8_t mode,
+-				int master, int flushable, uint32_t priority,
++				int central, int flushable, uint32_t priority,
+ 				GError **err)
+ {
+ 	if (imtu || omtu || mode) {
+@@ -676,8 +676,8 @@ static gboolean l2cap_set(int sock, uint8_t src_type, int sec_level,
+ 			return ret;
  	}
  
-@@ -8395,7 +8395,7 @@ static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 		rand = le64_to_cpu(key->rand);
+-	if (master >= 0 && l2cap_set_master(sock, master) < 0) {
+-		ERROR_FAILED(err, "l2cap_set_master", errno);
++	if (central >= 0 && l2cap_set_central(sock, central) < 0) {
++		ERROR_FAILED(err, "l2cap_set_central", errno);
+ 		return FALSE;
+ 	}
  
- 		store_longtermkey(adapter, &key->addr.bdaddr,
--					key->addr.type, key->val, key->master,
-+					key->addr.type, key->val, key->central,
- 					key->type, key->enc_size, ediv, rand);
+@@ -733,13 +733,13 @@ static int rfcomm_connect(int sock, const bdaddr_t *dst, uint8_t channel)
+ 	return 0;
+ }
  
- 		device_set_bonded(device, addr->type);
-diff --git a/tools/oobtest.c b/tools/oobtest.c
-index c095036fe7..0368bc3865 100644
---- a/tools/oobtest.c
-+++ b/tools/oobtest.c
-@@ -133,13 +133,13 @@ static void new_long_term_key_event(uint16_t index, uint16_t len,
+-static gboolean rfcomm_set(int sock, int sec_level, int master, GError **err)
++static gboolean rfcomm_set(int sock, int sec_level, int central, GError **err)
+ {
+ 	if (sec_level && !set_sec_level(sock, BT_IO_RFCOMM, sec_level, err))
+ 		return FALSE;
  
- 	switch (ev->key.type) {
- 	case 0x00:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Unauthenticated, Master";
- 		else
- 			type = "Unauthenticated, Slave";
+-	if (master >= 0 && rfcomm_set_master(sock, master) < 0) {
+-		ERROR_FAILED(err, "rfcomm_set_master", errno);
++	if (central >= 0 && rfcomm_set_central(sock, central) < 0) {
++		ERROR_FAILED(err, "rfcomm_set_central", errno);
+ 		return FALSE;
+ 	}
+ 
+@@ -828,7 +828,7 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 	/* Set defaults */
+ 	opts->type = BT_IO_SCO;
+ 	opts->defer = DEFAULT_DEFER_TIMEOUT;
+-	opts->master = -1;
++	opts->central = -1;
+ 	opts->mode = L2CAP_MODE_BASIC;
+ 	opts->flushable = -1;
+ 	opts->priority = 0;
+@@ -889,8 +889,8 @@ static gboolean parse_set_opts(struct set_opts *opts, GError **err,
+ 			if (!opts->mtu)
+ 				opts->mtu = opts->imtu;
+ 			break;
+-		case BT_IO_OPT_MASTER:
+-			opts->master = va_arg(args, gboolean);
++		case BT_IO_OPT_CENTRAL:
++			opts->central = va_arg(args, gboolean);
+ 			break;
+ 		case BT_IO_OPT_MODE:
+ 			opts->mode = va_arg(args, int);
+@@ -1171,7 +1171,7 @@ parse_opts:
+ 		case BT_IO_OPT_IMTU:
+ 			*(va_arg(args, uint16_t *)) = l2o.imtu;
+ 			break;
+-		case BT_IO_OPT_MASTER:
++		case BT_IO_OPT_CENTRAL:
+ 			len = sizeof(flags);
+ 			if (getsockopt(sock, SOL_L2CAP, L2CAP_LM, &flags,
+ 								&len) < 0) {
+@@ -1336,7 +1336,7 @@ static gboolean rfcomm_get(int sock, GError **err, BtIOOption opt1,
+ 
+ 			*(va_arg(args, uint8_t *)) = dst.rc_channel;
+ 			break;
+-		case BT_IO_OPT_MASTER:
++		case BT_IO_OPT_CENTRAL:
+ 			len = sizeof(flags);
+ 			if (getsockopt(sock, SOL_RFCOMM, RFCOMM_LM, &flags,
+ 								&len) < 0) {
+@@ -1484,7 +1484,7 @@ static gboolean sco_get(int sock, GError **err, BtIOOption opt1, va_list args)
+ 		case BT_IO_OPT_DEST_CHANNEL:
+ 		case BT_IO_OPT_PSM:
+ 		case BT_IO_OPT_CID:
+-		case BT_IO_OPT_MASTER:
++		case BT_IO_OPT_CENTRAL:
+ 		case BT_IO_OPT_MODE:
+ 		case BT_IO_OPT_FLUSHABLE:
+ 		case BT_IO_OPT_PRIORITY:
+@@ -1578,10 +1578,10 @@ gboolean bt_io_set(GIOChannel *io, GError **err, BtIOOption opt1, ...)
+ 	switch (type) {
+ 	case BT_IO_L2CAP:
+ 		return l2cap_set(sock, opts.src_type, opts.sec_level, opts.imtu,
+-					opts.omtu, opts.mode, opts.master,
++					opts.omtu, opts.mode, opts.central,
+ 					opts.flushable, opts.priority, err);
+ 	case BT_IO_RFCOMM:
+-		return rfcomm_set(sock, opts.sec_level, opts.master, err);
++		return rfcomm_set(sock, opts.sec_level, opts.central, err);
+ 	case BT_IO_SCO:
+ 		return sco_set(sock, opts.mtu, opts.voice, err);
+ 	case BT_IO_INVALID:
+@@ -1628,7 +1628,7 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+ 			goto failed;
+ 		if (!l2cap_set(sock, opts->src_type, opts->sec_level,
+ 				opts->imtu, opts->omtu, opts->mode,
+-				opts->master, opts->flushable, opts->priority,
++				opts->central, opts->flushable, opts->priority,
+ 				err))
+ 			goto failed;
  		break;
- 	case 0x01:
--		if (ev->key.master)
-+		if (ev->key.central)
- 			type = "Authenticated, Master";
- 		else
- 			type = "Authenticated, Slave";
+@@ -1641,7 +1641,7 @@ static GIOChannel *create_io(gboolean server, struct set_opts *opts,
+ 		if (rfcomm_bind(sock, &opts->src,
+ 					server ? opts->channel : 0, err) < 0)
+ 			goto failed;
+-		if (!rfcomm_set(sock, opts->sec_level, opts->master, err))
++		if (!rfcomm_set(sock, opts->sec_level, opts->central, err))
+ 			goto failed;
+ 		break;
+ 	case BT_IO_SCO:
+diff --git a/btio/btio.h b/btio/btio.h
+index f0259cf1db..50a2a4dc02 100644
+--- a/btio/btio.h
++++ b/btio/btio.h
+@@ -36,7 +36,7 @@ typedef enum {
+ 	BT_IO_OPT_MTU,
+ 	BT_IO_OPT_OMTU,
+ 	BT_IO_OPT_IMTU,
+-	BT_IO_OPT_MASTER,
++	BT_IO_OPT_CENTRAL,
+ 	BT_IO_OPT_HANDLE,
+ 	BT_IO_OPT_CLASS,
+ 	BT_IO_OPT_MODE,
+diff --git a/profiles/audio/a2dp.c b/profiles/audio/a2dp.c
+index 9d3aaa1363..031ece6287 100644
+--- a/profiles/audio/a2dp.c
++++ b/profiles/audio/a2dp.c
+@@ -2519,7 +2519,7 @@ static bool a2dp_server_listen(struct a2dp_server *server)
+ 				BT_IO_OPT_PSM, AVDTP_PSM,
+ 				BT_IO_OPT_MODE, mode,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_MASTER, true,
++				BT_IO_OPT_CENTRAL, true,
+ 				BT_IO_OPT_INVALID);
+ 	if (server->io)
+ 		return true;
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 50de336181..9f717f35bb 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1625,7 +1625,7 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean master,
+ 				BT_IO_OPT_SOURCE_BDADDR, src,
+ 				BT_IO_OPT_PSM, psm,
+ 				BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_MEDIUM,
+-				BT_IO_OPT_MASTER, master,
++				BT_IO_OPT_CENTRAL, master,
+ 				BT_IO_OPT_MODE, mode,
+ 				BT_IO_OPT_INVALID);
+ 	if (!io) {
+diff --git a/profiles/sap/server.c b/profiles/sap/server.c
+index 82365fca90..e6f3024ea6 100644
+--- a/profiles/sap/server.c
++++ b/profiles/sap/server.c
+@@ -1369,7 +1369,7 @@ int sap_server_register(struct btd_adapter *adapter)
+ 			btd_adapter_get_address(adapter),
+ 			BT_IO_OPT_CHANNEL, SAP_SERVER_CHANNEL,
+ 			BT_IO_OPT_SEC_LEVEL, BT_IO_SEC_HIGH,
+-			BT_IO_OPT_MASTER, TRUE,
++			BT_IO_OPT_CENTRAL, TRUE,
+ 			BT_IO_OPT_INVALID);
+ 	if (!io) {
+ 		error("Can't listen at channel %d.", SAP_SERVER_CHANNEL);
+diff --git a/tools/btiotest.c b/tools/btiotest.c
+index cb8cc35348..3f4900a5a5 100644
+--- a/tools/btiotest.c
++++ b/tools/btiotest.c
+@@ -343,7 +343,7 @@ static void l2cap_listen(const char *src, uint8_t addr_type, uint16_t psm,
+ 					BT_IO_OPT_PSM, psm,
+ 					BT_IO_OPT_CID, cid,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_MASTER, master,
++					BT_IO_OPT_CENTRAL, master,
+ 					BT_IO_OPT_INVALID);
+ 	else
+ 		l2_srv = bt_io_listen(conn, cfm, data,
+@@ -353,7 +353,7 @@ static void l2cap_listen(const char *src, uint8_t addr_type, uint16_t psm,
+ 					BT_IO_OPT_PSM, psm,
+ 					BT_IO_OPT_CID, cid,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_MASTER, master,
++					BT_IO_OPT_CENTRAL, master,
+ 					BT_IO_OPT_INVALID);
+ 
+ 	if (!l2_srv) {
+@@ -427,7 +427,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
+ 					BT_IO_OPT_SOURCE, src,
+ 					BT_IO_OPT_CHANNEL, ch,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_MASTER, master,
++					BT_IO_OPT_CENTRAL, master,
+ 					BT_IO_OPT_INVALID);
+ 	else
+ 		rc_srv = bt_io_listen(conn, cfm,
+@@ -435,7 +435,7 @@ static void rfcomm_listen(const char *src, uint8_t ch, gboolean defer,
+ 					&err,
+ 					BT_IO_OPT_CHANNEL, ch,
+ 					BT_IO_OPT_SEC_LEVEL, sec,
+-					BT_IO_OPT_MASTER, master,
++					BT_IO_OPT_CENTRAL, master,
+ 					BT_IO_OPT_INVALID);
+ 
+ 	if (!rc_srv) {
 -- 
 2.33.0.464.g1972c5931b-goog
 
