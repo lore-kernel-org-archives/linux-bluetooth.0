@@ -2,115 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-18.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0CCD4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 08:41:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 63F1EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 17:09:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E087861241
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 08:41:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4D18F60F38
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 17:09:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232265AbhIPIma (ORCPT
+        id S1345214AbhIPRKa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Sep 2021 04:42:30 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:55879 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235130AbhIPIm3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Sep 2021 04:42:29 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1631781669; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=vH/3PJSvt6dKKjRhpN7SN/NYDcrVA+09ITtulvlItFs=; b=xISPuWT8sn1fhPJWzG+4wy3WMpeK7gyiVE2lRTT2mCGA12KWIx5MDzdLFFq6H9go5Oja9zef
- IWi0krajAJwpec5hGc+MUK7MNNm9HdwpQqkyQHjBjpqzas4TqX5u/1xitG1nnZHiuukVwlIJ
- 8ORpdixeNoV8hiK2PGte1UJzGCo=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-east-1.postgun.com with SMTP id
- 61430324d914b05182d9ba13 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 16 Sep 2021 08:41:08
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id D59ADC4360D; Thu, 16 Sep 2021 08:41:06 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        Thu, 16 Sep 2021 13:10:30 -0400
+Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:54310
+        "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S1345213AbhIPRI2 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 16 Sep 2021 13:08:28 -0400
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com [209.85.128.69])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 2264CC4338F;
-        Thu, 16 Sep 2021 08:41:06 +0000 (UTC)
+        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 3C06C40295
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 17:05:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1631811931;
+        bh=LNYgyUdmOLuXkjD9g2BDNjy4wJVnJNKR41YhWEm7EZw=;
+        h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+        b=YmLGLmSyWzQVyehHmg+s+kW7r1UPUVn1muJE3vznlcEt9ZsB7Bu/YM8uazw6+ZW2b
+         NTdnMOquYCsTujRh7KE+DHKAAwK83KU2f5B1k79yDDNGgy2CE5vEeQvUt8nTFNQ1la
+         GFLT5kyUQsxP0B/G9y4haKs7p5GkOTWHUQLLkd55c+n3j4qZnyXu6q9WfD76KOWFgJ
+         y6SNK6/G3aBVIsrmTGy0RL53yEkarBY2x0q61Y599g6zQoFX3Kefds3kc5sySCXlzB
+         rePOyYp6NebuLD8Q/5fhVbxSXk1+lLgM+wB0cU/0EtwWFipgpj+26NLA6OKwUwCFvN
+         LsFU7GHP5BTBA==
+Received: by mail-wm1-f69.google.com with SMTP id j21-20020a05600c1c1500b00300f1679e4dso2810099wms.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 10:05:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=LNYgyUdmOLuXkjD9g2BDNjy4wJVnJNKR41YhWEm7EZw=;
+        b=KAwjHRbOR2Cfn1m4J7+VwQI6ghKsn5PLpsIs3pmkbR2Eo0drVEZ2+WhbecKeaU72e6
+         H6R9VyphnFD98qiG4VdLVPX5n9rJ9rbMhapADc2FPqHKg+hC57PB+I+9tY7mI5fLTGBE
+         ZVmRf6U7vBwvbk8QEHS0R82O6gW4gew1Jy2sxFrj+Ja/zsE3ugbCzKHwGyVAm9+mluZF
+         2Z5tdbeprr3GsixW9DS9xixP1oEKHNnI0dU+Crox3SVnYEE4FwmssUfLkwTkLrzhvlCL
+         ylGsoUPvnWDQssN+GE8ojRAsebJZPK6lJGB6dDoBs919qu3Xet+q3wfDe2Zim9gVfrQt
+         6l7w==
+X-Gm-Message-State: AOAM530FjyxTLW35sFB5TR3J65JAdjo4Q0zs43fvBUmxlKLZ3IodgCJ0
+        chQLY+J5FcbICOsA8zuBILDi+E41ACxiWUXMQYRuDVp2A7TUCUWAc/dvyAa4T0bzaRibcaEnR+b
+        m7jcXq02n4tk5+DTgyjWZBQC4wvo8FwEQvve7Li8ZIyAInQ==
+X-Received: by 2002:adf:b319:: with SMTP id j25mr7420828wrd.256.1631811930824;
+        Thu, 16 Sep 2021 10:05:30 -0700 (PDT)
+X-Google-Smtp-Source: ABdhPJzuWdr3LHYQAlkhUF2LhdnvbqjpaHH/IYbTuQZ8JReG2xn2D6IRAY1c2YETkzuaX7analAfAw==
+X-Received: by 2002:adf:b319:: with SMTP id j25mr7420800wrd.256.1631811930645;
+        Thu, 16 Sep 2021 10:05:30 -0700 (PDT)
+Received: from kozik-lap.lan (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
+        by smtp.gmail.com with ESMTPSA id u13sm4153069wrt.41.2021.09.16.10.05.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Sep 2021 10:05:30 -0700 (PDT)
+From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+To:     linux-kernel@vger.kernel.org
+Cc:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: hci_bcm: remove duplicated brcm,bcm4330-bt compatible
+Date:   Thu, 16 Sep 2021 19:05:28 +0200
+Message-Id: <20210916170528.138275-1-krzysztof.kozlowski@canonical.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Thu, 16 Sep 2021 16:41:06 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v1] Bluetooth: btusb: Add gpio reset way for qca btsoc in 
- cmd_timeout
-Message-ID: <f1548c4ca5186597a21a8a9ee6655b58@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-if platform provide gpio connect to BT_EN reset pin of qca btsoc chip,
-we can do hardware reset instead of usb port reset.
+brcm,bcm4330-bt is already on the list.
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+Fixes: 81534d4835de ("Bluetooth: btbcm: Add BCM4330 and BCM4334 compatibles")
+Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 ---
-  drivers/bluetooth/btusb.c | 22 ++++++++++++++++++++++
-  1 file changed, 22 insertions(+)
+ drivers/bluetooth/hci_bcm.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 8ef4e0f6e0bb..da85cc14f931 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -657,11 +657,33 @@ static void btusb_rtl_cmd_timeout(struct hci_dev 
-*hdev)
-  static void btusb_qca_cmd_timeout(struct hci_dev *hdev)
-  {
-  	struct btusb_data *data = hci_get_drvdata(hdev);
-+	struct gpio_desc *reset_gpio = data->reset_gpio;
-  	int err;
-
-  	if (++data->cmd_timeout_cnt < 5)
-  		return;
-
-+	if (reset_gpio) {
-+		bt_dev_err(hdev, "Reset qca device via bt_en gpio");
-+
-+		/* Toggle the hard reset line. The qca bt device is going to
-+		 * yank itself off the USB and then replug. The cleanup is handled
-+		 * correctly on the way out (standard USB disconnect), and the new
-+		 * device is detected cleanly and bound to the driver again like
-+		 * it should be.
-+		 */
-+		if (test_and_set_bit(BTUSB_HW_RESET_ACTIVE, &data->flags)) {
-+			bt_dev_err(hdev, "last reset failed? Not resetting again");
-+			return;
-+		}
-+
-+		gpiod_set_value_cansleep(reset_gpio, 0);
-+		msleep(200);
-+		gpiod_set_value_cansleep(reset_gpio, 1);
-+
-+		return;
-+	}
-+
-  	bt_dev_err(hdev, "Multiple cmd timeouts seen. Resetting usb device.");
-  	/* This is not an unbalanced PM reference since the device will reset 
-*/
-  	err = usb_autopm_get_interface(data->intf);
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index ef54afa29357..7852abf15ddf 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1508,7 +1508,6 @@ static const struct of_device_id bcm_bluetooth_of_match[] = {
+ 	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm4334-bt" },
+ 	{ .compatible = "brcm,bcm4345c5" },
+-	{ .compatible = "brcm,bcm4330-bt" },
+ 	{ .compatible = "brcm,bcm43438-bt", .data = &bcm43438_device_data },
+ 	{ .compatible = "brcm,bcm43540-bt", .data = &bcm4354_device_data },
+ 	{ .compatible = "brcm,bcm4335a0" },
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
-Forum, a Linux Foundation Collaborative Project
+2.30.2
+
