@@ -8,62 +8,62 @@ X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT autolearn=ham
 	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F3A6C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 18:55:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 543FBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 18:55:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 029A461212
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 18:55:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E1A2611C8
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 18:55:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243696AbhIPS4j (ORCPT
+        id S243083AbhIPS4k (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Sep 2021 14:56:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52076 "EHLO
+        Thu, 16 Sep 2021 14:56:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52058 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344157AbhIPS4e (ORCPT
+        with ESMTP id S235451AbhIPS4f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Sep 2021 14:56:34 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EABAC043087
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 11:03:38 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id mv7-20020a17090b198700b0019c843e7233so1630075pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 11:03:38 -0700 (PDT)
+        Thu, 16 Sep 2021 14:56:35 -0400
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31D90C043088
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 11:03:39 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id t4so4447426plo.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 11:03:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=rpv1FaQ9oQ4VD4XcDBX4LDce+ctNlKY97mbkm3KNwuc=;
-        b=p/432OUWAjBhfesC4L7qSyIH9zUxLxfdlG3xIzYBlp5Z0r672ksQyrqGSgkc27r4Zo
-         gojjvuheC7jFXtUZyUcxFabeFxHnU+Mx36zByciTsm2of6ZHmN1Z/3ZExnR0PTcvd7i9
-         5z0aROXqW3uBS2/GAsBK1WhAAURkhpIX0Aio3i11XcMXoRKm4onO7wrJ2VGhIMzHZCo1
-         1bR0pe2tZlkBln0NdLZ4Vr98ftBxHKxomEdRmPJb63jkMGQH0lMdqZ6Ot8arDqPPUFWX
-         DUWLFSn16pi3RxNm8BF+uyVKmAftclz3zG1TjdkxkTn5pBfJmGKSUsTkO2GJpkq8egEi
-         o9aQ==
+        bh=BdKc4Ax9P05al+3resQTTjrI8Gsvugf9kA+LrRNaE9E=;
+        b=XBxjQZiJkB0vcUOOf/QNizLPHFz6QBrKhz2V9d47QVncpqfX5F6umt54LHDX5m3ef+
+         7swe/pfrfaTeFqfXq2EJCy12HPfelLOkM6udH0nDesibZ+s47FylrWHpvTcs9MFbuXd6
+         jvnxK63H23JSVUxhGXBrdRGkuXJ382nc0MomFbh511J0cbHglUJVLidvcqt8NiGtofU0
+         DpDGzFsDmroB2N5y2Yk6ZzAErLvY0J80Af7XkKR8FVmsMPpmIQDD8zQCMPjfpkbj5gb5
+         9jCxg1hAHZPRhpFbJnDD/OR51oJT3N8k4doLvFPLneWmtdlDQpw9/NkJX94c+4wz3Bjo
+         TXlw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=rpv1FaQ9oQ4VD4XcDBX4LDce+ctNlKY97mbkm3KNwuc=;
-        b=1G3xI2N7DCAcZjWHpbLuPuh/+exp1d3DUVx4xAlUdHbavXs/Xl3N0Ka/iWdAKtHtZK
-         Gftbk0yk7zjST1GWjcmy/Fs1JfW+M4Fm3pEhhBAI9pwNJ417oHyzLzQljdHKEzFm4aHI
-         PVOPHsGsIqRaLZRvxMUEZMwquK6Q5yg8XYpeMKPdEhmyojMowBMp1b6Az//4cZI0OBoF
-         m8CfULMpU+dv9tSqwknaX7E7OJKQGqJrPHRcdEFP+ISKVrs/i3blnR5DyXITQNmI8Mix
-         mL4CHyVEhFxVjALzlXqMuD2OCa10Si72NmWYiS6v1aqmuLmrvgjZs0bFSG6S0hbX/bWt
-         Xcmg==
-X-Gm-Message-State: AOAM5323An/sBLbI3jN31ogyq2pjRAJusx9RXt6vmsqwSyGyYkGOUBil
-        dapsNY57ohZu3nQ6yRnDADN81JDcJ0I=
-X-Google-Smtp-Source: ABdhPJwhZ0MHDj9aPwl5B2Q9KPwVYSC4aPXQB8M/i9EULcA1V5bcKvlDFgee9wjQJTbOOq1CbPa/Ww==
-X-Received: by 2002:a17:902:784c:b0:138:f4e5:9df8 with SMTP id e12-20020a170902784c00b00138f4e59df8mr5870357pln.14.1631815417772;
-        Thu, 16 Sep 2021 11:03:37 -0700 (PDT)
+        bh=BdKc4Ax9P05al+3resQTTjrI8Gsvugf9kA+LrRNaE9E=;
+        b=tHDZOxfP7oleUZr9xc34kTaK1hzyd7fTnj6pQe5wIDMQ6l8+C72v7ah2Ba+/Sz00HM
+         DpnxgEUQ+SFRgxXVEbdtkKQgHugcX8ZzP7JjoQozWoZ6SqY4WcXQ+WB91qZq4DbBe3rH
+         noMMPp1+FLdfEXI201ngcVZilpFQRgRG1XxyGNHMzzGAGf16E3YS3mpxehC1HGOOtEci
+         UK58sbzD8+sh64+HluqGv61He18rS14VdigGV03o7WLOgSQRlksd0pRBLqNB+0Ux5Mi1
+         m0gHoK/HYkhw7NXVijesZCAuFfup9oeguc/3p+Urt1JPOJhVLosrvWXHcK7PWxy2c5YE
+         2QrQ==
+X-Gm-Message-State: AOAM5304AWyzXlRH2pArQfr+R6Zif96FFNfI0WO/UdZZT72LNfOif6x6
+        VCMSnlYX0E9PaBvzgedre2hkw7hFv2I=
+X-Google-Smtp-Source: ABdhPJxu35EqFaTw0BlKiJXPl5B/EqWs7i1Ela9+u740Dbhn73mhd2hiQSAgH2JaHNSnE/8m5CKPiw==
+X-Received: by 2002:a17:90a:eb02:: with SMTP id j2mr16409355pjz.174.1631815418483;
+        Thu, 16 Sep 2021 11:03:38 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
         by smtp.gmail.com with ESMTPSA id p24sm3580432pfh.136.2021.09.16.11.03.37
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 16 Sep 2021 11:03:37 -0700 (PDT)
+        Thu, 16 Sep 2021 11:03:38 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 3/4] Bluetooth: Fix passing NULL to PTR_ERR
-Date:   Thu, 16 Sep 2021 11:03:34 -0700
-Message-Id: <20210916180335.75976-3-luiz.dentz@gmail.com>
+Subject: [PATCH v5 4/4] Bluetooth: SCO: Fix sco_send_frame returning skb->len
+Date:   Thu, 16 Sep 2021 11:03:35 -0700
+Message-Id: <20210916180335.75976-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210916180335.75976-1-luiz.dentz@gmail.com>
 References: <20210916180335.75976-1-luiz.dentz@gmail.com>
@@ -75,58 +75,51 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Passing NULL to PTR_ERR will result in 0 (success), also since the likes of
-bt_skb_sendmsg does never return NULL it is safe to replace the instances of
-IS_ERR_OR_NULL with IS_ERR when checking its return.
+The skb in modified by hci_send_sco which pushes SCO headers thus
+changing skb->len causing sco_sock_sendmsg to fail.
 
-Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+Fixes: 0771cbb3b97d ("Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg")
 Tested-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h | 2 +-
- net/bluetooth/rfcomm/sock.c       | 2 +-
- net/bluetooth/sco.c               | 2 +-
- 3 files changed, 3 insertions(+), 3 deletions(-)
+ net/bluetooth/sco.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index aa221c1a27c6..3271870fd85e 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -496,7 +496,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
- 		struct sk_buff *tmp;
- 
- 		tmp = bt_skb_sendmsg(sk, msg, len, mtu, headroom, tailroom);
--		if (IS_ERR_OR_NULL(tmp)) {
-+		if (IS_ERR(tmp)) {
- 			kfree_skb(skb);
- 			return tmp;
- 		}
-diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
-index 5938af3e9936..4bf4ea6cbb5e 100644
---- a/net/bluetooth/rfcomm/sock.c
-+++ b/net/bluetooth/rfcomm/sock.c
-@@ -583,7 +583,7 @@ static int rfcomm_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 
- 	skb = bt_skb_sendmmsg(sk, msg, len, d->mtu, RFCOMM_SKB_HEAD_RESERVE,
- 			      RFCOMM_SKB_TAIL_RESERVE);
--	if (IS_ERR_OR_NULL(skb))
-+	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
- 
- 	sent = rfcomm_dlc_send(d, skb);
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 446f871f11ed..f51399d1b9cb 100644
+index f51399d1b9cb..8eabf41b2993 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -733,7 +733,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 		return -EOPNOTSUPP;
+@@ -284,16 +284,17 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
+ static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct sco_conn *conn = sco_pi(sk)->conn;
++	int len = skb->len;
  
- 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
--	if (IS_ERR_OR_NULL(skb))
-+	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
+ 	/* Check outgoing MTU */
+-	if (skb->len > conn->mtu)
++	if (len > conn->mtu)
+ 		return -EINVAL;
  
- 	lock_sock(sk);
+-	BT_DBG("sk %p len %d", sk, skb->len);
++	BT_DBG("sk %p len %d", sk, len);
+ 
+ 	hci_send_sco(conn->hcon, skb);
+ 
+-	return skb->len;
++	return len;
+ }
+ 
+ static void sco_recv_frame(struct sco_conn *conn, struct sk_buff *skb)
+@@ -744,7 +745,8 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 		err = -ENOTCONN;
+ 
+ 	release_sock(sk);
+-	if (err)
++
++	if (err < 0)
+ 		kfree_skb(skb);
+ 	return err;
+ }
 -- 
 2.31.1
 
