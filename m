@@ -2,141 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_PASS,USER_AGENT_SANE_1 autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ABF3DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 19:26:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D2EBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 19:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8670F610E9
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 19:26:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40D116113A
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 19:31:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229823AbhIPT16 (ORCPT
+        id S233102AbhIPTcX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Sep 2021 15:27:58 -0400
-Received: from smtp-relay-internal-1.canonical.com ([185.125.188.123]:58580
-        "EHLO smtp-relay-internal-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229455AbhIPT16 (ORCPT
+        Thu, 16 Sep 2021 15:32:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60470 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232971AbhIPTcW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Sep 2021 15:27:58 -0400
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com [209.85.221.69])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 5A75E4025C
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 19:26:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1631820396;
-        bh=hthyLwHWx+KEvuJBuzDNi3dTold2mGmgMiAxn5ZC9BI=;
-        h=Subject:To:References:From:Message-ID:Date:MIME-Version:
-         In-Reply-To:Content-Type;
-        b=fjOahzyLrUoYN0MAWmLmsa5uDpn/GWigEg5atXi65WOtg99LPwh9e7SaYi783vXwX
-         dKbm6OZKiX2X1Vr71DSM9RAHI5OVDViig/+SZNl1dkBkjkLtiOloUI1t9VQ+PjxT3+
-         awxWet/bkdYOKEn6KKoDOkjV9UguGdQPgZyE2VtpUknIZuNAzu1cFoZB6IxWAdNKH2
-         FgFu143H3gRChXcH5DCgjrebOG5ucehR6ptsrArE1J7RpjCDM0dU3ZoGBaUZVumX4D
-         vrZ8Lb40GaJ29HbXzgRqZTRJ0sf3JI9i699yIrdCQj/G2Uzf39MRwf1IiwJGBUoEuy
-         0ewCzkjFiZ2tA==
-Received: by mail-wr1-f69.google.com with SMTP id i16-20020adfded0000000b001572ebd528eso2822072wrn.19
-        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 12:26:36 -0700 (PDT)
+        Thu, 16 Sep 2021 15:32:22 -0400
+Received: from mail-qv1-xf2a.google.com (mail-qv1-xf2a.google.com [IPv6:2607:f8b0:4864:20::f2a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DBA3C061764
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 12:31:01 -0700 (PDT)
+Received: by mail-qv1-xf2a.google.com with SMTP id gs10so4881141qvb.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 12:31:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=e6L9KeBVM0iK54wl1xOE5zf2w2bd2EzLjHGod1esdmA=;
+        b=gAdyDnDT1AVneIA5UYirmH4iHtslDBnnTOx2k0xH/B1/yopMC8Ns8isXiMj1ExRcom
+         yDe0q/QADIqPV0AEwEO9JGu2WL//wozgba2p1x//suwqNAEaIhkgv5uN7B8Hvd0huNEs
+         GcNUS6MqLplUmUwOSYh5rVVtCaKHtimrT4PKGCf2TitloeaSGdn+ilKnIlA3Y1uxvrMc
+         V9pCMrRf5ccBpxhbOOjKZF1hSzsOyD38DkkNThbKulDHa8PaU2aLcgMd6pOpca+f5mBf
+         k3vV3PBZuC+HAtQ8rrsUh3bAheSEGRGHI3lTHI8Z54ra5KNGFZjJ/vwTky5Y3QjBI7AE
+         3rOQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=hthyLwHWx+KEvuJBuzDNi3dTold2mGmgMiAxn5ZC9BI=;
-        b=Sk0/L5kGLorYzRmQeaMaFYjmqlcNm5ISKxjOOgxIwUbXQFBJf4gSEKn24WZBcir2qx
-         VNCOycYWDLaS6FD9+8lDwJWnBtpuELXzgtlE9WZ7PWT56P2+gywywdGMoZt0ZjDwq8Ki
-         W6SMEg8bxhIEpSbVwA6CO4LC/uNWUa2U4ep/1/euJxaz4NQMWCTwhpPddbw6yU7gCPUy
-         gBEKbuKFRjP4aeCzHAqhgByv7MQl/hE526gJZ0Z646zA0UvVrtezCK0uhq3BCbz018Ys
-         pr/+iAn7g/1nIh1lVpLL1gORO8TyPCxAx9fvg2tLumdI7CQtklXx2uL7IH9FKfeOWu8c
-         gR7g==
-X-Gm-Message-State: AOAM533SaGrdV7wbqOk/VpD6eMdL8xYvfxnzwlz9HeAlq6g/OwqJJRir
-        IscPYtKblpAcolmOIE7uoZgHHkBWY2dCaNaIUFZuSdWHanEj2w4M/uf7KtoY9U/ls3S7HI+HBl4
-        3DSkRcBCNC0xW/2BF9wOiHXSw/lYWbKea/DKYU+qmTgmABA==
-X-Received: by 2002:a7b:c384:: with SMTP id s4mr6757625wmj.108.1631820394527;
-        Thu, 16 Sep 2021 12:26:34 -0700 (PDT)
-X-Google-Smtp-Source: ABdhPJyL9M4RIZwRkAGaHz0YUhvb/dAGXWekeYxToaptcRiM6Z4TKTRIqPvxTa9kfRB2QzXhA9i8Fg==
-X-Received: by 2002:a7b:c384:: with SMTP id s4mr6757612wmj.108.1631820394261;
-        Thu, 16 Sep 2021 12:26:34 -0700 (PDT)
-Received: from [192.168.2.211] (lk.84.20.244.219.dc.cable.static.lj-kabel.net. [84.20.244.219])
-        by smtp.gmail.com with ESMTPSA id h16sm4304634wre.52.2021.09.16.12.26.33
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 16 Sep 2021 12:26:33 -0700 (PDT)
-Subject: Re: Bluetooth: hci_bcm: remove duplicated brcm,bcm4330-bt compatible
-To:     linux-bluetooth@vger.kernel.org
-References: <20210916170528.138275-1-krzysztof.kozlowski@canonical.com>
- <61438790.1c69fb81.b0356.7bdc@mx.google.com>
-From:   Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
-Message-ID: <413556b2-61c6-941c-60b0-991965e41e87@canonical.com>
-Date:   Thu, 16 Sep 2021 21:26:32 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=e6L9KeBVM0iK54wl1xOE5zf2w2bd2EzLjHGod1esdmA=;
+        b=MHerskdX6fjt6asKLnJfsVxNjZ89C1LLg+Q0hOj/JWLiU6afdkiVTYhZzrJUOI0fc7
+         DHrVyZsrgy+7LZF6T67UK8TzCW/j0ageakgJCoi/+Bsv3PgCRKXPa0YgYVR/9xtSgR6a
+         9kxsXG+m9IV73qeX/2biRqH/AKpyrCLCBtqMixI+72ImF7nGvOlRHiN+8sjREHvyo4LH
+         aMezGxPmLjPeTmgf9P83s85PI33fWEEjq3lSjSFSV1t/YYMxQB8mTdgKzOo14QUajKeD
+         jVo1C9qirYT37LlyzO6O8ruXBi6pVR6WRaLjpSQckCW65tcSuM6uDry94f70e3K12d1Y
+         UDEQ==
+X-Gm-Message-State: AOAM5321X5rlK6hcWAhSphO2vcP7DV4+fv9VaGtTxFTHhO1eW2gIL1oz
+        hIMQLDVWHQlaeyDYdN/fC9PW/TKzkzYj2g==
+X-Google-Smtp-Source: ABdhPJynDbTEWEpK4E0tIGKT9ZlO3HSxfEAqV4m0VCimlRNnRTea/StGtoZGlvBKs872/hIjVP7nSg==
+X-Received: by 2002:a0c:e052:: with SMTP id y18mr6968002qvk.1.1631820660515;
+        Thu, 16 Sep 2021 12:31:00 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.127.144])
+        by smtp.gmail.com with ESMTPSA id j184sm3210982qkd.74.2021.09.16.12.30.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Sep 2021 12:31:00 -0700 (PDT)
+Message-ID: <61439b74.1c69fb81.cd793.a8db@mx.google.com>
+Date:   Thu, 16 Sep 2021 12:31:00 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1848924320044148423=="
 MIME-Version: 1.0
-In-Reply-To: <61438790.1c69fb81.b0356.7bdc@mx.google.com>
-Content-Type: text/plain; charset=windows-1252
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] service: Add btd_service_is_initiator
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210916184021.83775-1-luiz.dentz@gmail.com>
+References: <20210916184021.83775-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 16/09/2021 20:06, bluez.test.bot@gmail.com wrote:
-> This is automated email and please do not reply to this email!
-> 
-> Dear submitter,
-> 
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=548291
-> 
-> ---Test result---
-> 
-> Test Summary:
-> CheckPatch                    FAIL      0.44 seconds
-> GitLint                       PASS      0.10 seconds
-> BuildKernel                   PASS      519.20 seconds
-> TestRunner: Setup             PASS      345.93 seconds
-> TestRunner: l2cap-tester      PASS      2.70 seconds
-> TestRunner: bnep-tester       PASS      1.93 seconds
-> TestRunner: mgmt-tester       PASS      31.31 seconds
-> TestRunner: rfcomm-tester     PASS      2.09 seconds
-> TestRunner: sco-tester        PASS      2.12 seconds
-> TestRunner: smp-tester        PASS      2.16 seconds
-> TestRunner: userchan-tester   PASS      1.95 seconds
-> 
-> Details
-> ##############################
-> Test: CheckPatch - FAIL - 0.44 seconds
-> Run checkpatch.pl script with rule in .checkpatch.conf
-> Bluetooth: hci_bcm: remove duplicated brcm,bcm4330-bt compatible
-> WARNING: Unknown commit id '81534d4835de', maybe rebased or not pulled?
-> #9: 
-> Fixes: 81534d4835de ("Bluetooth: btbcm: Add BCM4330 and BCM4334 compatibles")
+--===============1848924320044148423==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Although you asked not to reply to this email, but you also sent it to
-public mailing list, so I will reply.
+This is automated email and please do not reply to this email!
 
-Your report is incorrect. Commit ID 81534d4835de is from mainline,
-merged into Linus' tree as: v5.13-rc1~94^2~197^2~38
+Dear submitter,
 
-> 
-> total: 0 errors, 1 warnings, 7 lines checked
-> 
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
-> 
-> "[PATCH] Bluetooth: hci_bcm: remove duplicated brcm,bcm4330-bt" has style problems, please review.
-> 
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=548375
 
-Checkpatch does not report any warnings like that, so this is false
-positive of your system, not checkpatch.
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.68 seconds
+GitLint                       PASS      1.80 seconds
+Prep - Setup ELL              PASS      40.71 seconds
+Build - Prep                  PASS      0.46 seconds
+Build - Configure             PASS      7.46 seconds
+Build - Make                  PASS      174.81 seconds
+Make Check                    PASS      8.77 seconds
+Make Distcheck                PASS      206.27 seconds
+Build w/ext ELL - Configure   PASS      7.46 seconds
+Build w/ext ELL - Make        PASS      164.85 seconds
 
 
 
-Best regards,
-Krzysztof
+---
+Regards,
+Linux Bluetooth
+
+
+--===============1848924320044148423==--
