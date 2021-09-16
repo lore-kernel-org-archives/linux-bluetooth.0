@@ -2,90 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-6.4 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 262DDC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 21:56:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B18EEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 22:27:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0217E60F4A
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 21:56:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97C88610D1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Sep 2021 22:27:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237959AbhIPV5s (ORCPT
+        id S241015AbhIPW3Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Sep 2021 17:57:48 -0400
-Received: from mail.kernel.org ([198.145.29.99]:53468 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S234142AbhIPV5r (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Sep 2021 17:57:47 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 445F861074;
-        Thu, 16 Sep 2021 21:56:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1631829386;
-        bh=KqcwjMSbYMAR0WEwC7rc9H2/fH2JYcnSySalojHI2s8=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=GYAKiL9AXWsjfc4KK/mv+LhMr9K+MeXxcID0ZGH0gEpcTDCQRLGN8FXJfCZ6hBba9
-         y22LP+aQQwuJ8XdpbzGtCef34GrQu1R6LrQBWWMLO25szksQOeQs+XJTkMOicDSv6K
-         AscvhFdlC5crsYEeL9W0e81LQW32SOGpR1wcnMdez0HrSlgCShVGMM7jfGzKjoXR6l
-         m/5yFyvCcnx4GLS4mBgDWIPhY2iaZTpRLSI5cXIlmoywpNC6zRUCnebtKiNzR5yCs5
-         F3TeQZ1OLb7cIXljHx83Hx+8tyO7SqqHImuyyWy/NzlYlt33h1AzbmWyzNwd/RmDHi
-         3VfTp577mF20g==
-Date:   Thu, 16 Sep 2021 14:56:25 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-Cc:     linux-bluetooth@vger.kernel.org,
+        Thu, 16 Sep 2021 18:29:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44906 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240999AbhIPW3P (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 16 Sep 2021 18:29:15 -0400
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 641A2C061756
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 15:27:54 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id c8so24718732lfi.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Sep 2021 15:27:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=XWXkBi7iY7atu68gT71ZZEaVf2W0kM1WsfKKAtmYUFA=;
+        b=AopwVjCCPIGZ1r8vZaX1wkBl4BenfCnJiGN3pnowbFamFiXCYBQiniP2FDA45DZXKK
+         e57L/a0KWLcKqPskoX13b8te/WxC60Ip8r7V6iF/tGE5T8ogbRE0q7+onwdx8yfdpz7k
+         Kjy1vWxiE8fvxFj5qWrfAJEX0M82XHIjXwFB1PLSlqr5CGbDqgtW67RaXoDo8O0PFzGo
+         18v3/cuMiBVZjpeohh07jQLJBhiaaFdogZWNb1Kpdkwh4pJQq+Ycyiyaw5viC5sHkkAo
+         JzD2PJAOS+nwpOFsmYCRNI9S0/iCXI6wgJ4+8cunq8JDU9D8Fy3AFscbM2g40LjryirL
+         l1xg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=XWXkBi7iY7atu68gT71ZZEaVf2W0kM1WsfKKAtmYUFA=;
+        b=Kn0myodzgCHI1gsSy38kALyD0U1wXPTMUQHMt2wAyPaiMZL3Mu8Vbt8tFjVaH+nTpg
+         8k2R4PDM8DT7o58jFJ20G1O0UjxRWSKZytk0sjDmnQCVfGSNTp7axNAoFSd67jveMUDn
+         YcsLhu04TKih2yXSi2VT7cjDK2S4aIgZ3Q0eUGKpkz1gv1Vnhe9ONlMm6KZHc3enqakT
+         eazhRm3WB01mlDjJI6FT3AQ3LMXWJZk5cNvC2S9O1bCGKJOSbJO8fb54+o+mPk5S4awp
+         ok99MjjHbIMXZ1ZC6/1UCcDuf+0q5hWGPyEjDZ/5A1Vy6x+L6IiJmYDbrleMo4cNB+BV
+         xbzA==
+X-Gm-Message-State: AOAM5336s/9sCR4JLzzfi737SRh4tPsyKDTOoNhT7CqzvX/SFcvYrxiB
+        nh7o/3300O+kDX13pVEEYUBFI4VCvIxKuWtFMUyoYLcQdac=
+X-Google-Smtp-Source: ABdhPJxKXtIOidEmaWHCX/zod07OcGynK0tXF1rBtyFqK0cUDFLBboUEyUTmFZnMcybZdcVgrn1MRaeuUS42qDdDBUQ=
+X-Received: by 2002:a05:6512:132a:: with SMTP id x42mr5728985lfu.291.1631831272820;
+ Thu, 16 Sep 2021 15:27:52 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210916170528.138275-1-krzysztof.kozlowski@canonical.com>
+In-Reply-To: <20210916170528.138275-1-krzysztof.kozlowski@canonical.com>
+From:   Linus Walleij <linus.walleij@linaro.org>
+Date:   Fri, 17 Sep 2021 00:27:41 +0200
+Message-ID: <CACRpkdbNfXGfK8Z0nhMjMfnp4UqJV2p=eVjNyH8VdguGu9Ea5w@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: hci_bcm: remove duplicated brcm,bcm4330-bt compatible
+To:     Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
+Cc:     linux-kernel <linux-kernel@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: Re: Intel bt broken on linux-next?
-Message-ID: <20210916145625.4e0b8c8e@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <ae7804e8a9877f94a7c798ac4c787a7f7f7f21af.camel@linux.intel.com>
-References: <20210916132747.218fb12f@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-        <ae7804e8a9877f94a7c798ac4c787a7f7f7f21af.camel@linux.intel.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Thu, 16 Sep 2021 14:46:13 -0700 Tedd Ho-Jeong An wrote:
-> > looks like my Bluetooth stopped working after upgrade to linux-next 
-> > as of yesterday (next-20210915). Is this a known problem?
-> > 
-> > [   19.594522] Bluetooth: hci0: Bootloader revision 0.1 build 42 week 52 2015
-> > [   19.595515] Bluetooth: hci0: Device revision is 2
-> > [   19.595517] Bluetooth: hci0: Secure boot is enabled
-> > [   19.595517] Bluetooth: hci0: OTP lock is enabled
-> > [   19.595518] Bluetooth: hci0: API lock is enabled
-> > [   19.595519] Bluetooth: hci0: Debug lock is disabled
-> > [   19.595520] Bluetooth: hci0: Minimum firmware build 1 week 10 2014
-> > [   19.661829] Bluetooth: hci0: Found device firmware: intel/ibt-17-16-1.sfi
-> > [   19.661924] Bluetooth: hci0: Boot Address: 0x40800
-> > [   19.661925] Bluetooth: hci0: Firmware Version: 6-12.21
-> > [   21.971023] Bluetooth: hci0: command 0xfc09 tx timeout
-> > [   29.970995] Bluetooth: hci0: Failed to send firmware data (-110)
-> > [   29.971108] Bluetooth: hci0: sending frame failed (-19)
-> > [   29.971119] Bluetooth: hci0: Intel reset sent to retry FW download
-> > [   30.123040] Bluetooth: hci0: sending frame failed (-19)
-> > [   32.097392] Bluetooth: hci0: command 0xfc1e tx timeout
-> > [   32.097408] Bluetooth: hci0: Failed to read MSFT supported features (-110)
-> > 
-> > I think it's part of:
-> > 
-> > 00:14.3 Network controller: Intel Corporation Cannon Point-LP CNVi [Wireless-AC] (rev 30)  
-> 
-> I don't think it was known issue to me. 
-> What was your previous kernel before switching to next-20210915?
+On Thu, Sep 16, 2021 at 7:05 PM Krzysztof Kozlowski
+<krzysztof.kozlowski@canonical.com> wrote:
 
-v5.14.3
+> brcm,bcm4330-bt is already on the list.
+>
+> Fixes: 81534d4835de ("Bluetooth: btbcm: Add BCM4330 and BCM4334 compatibles")
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@canonical.com>
 
-> Also, do you still have a problem after cold reboot the system? (completely shutdown and wait some
-> seconds before start).
+Ooops.
+Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
-Let me get back to you on that.
-
-Thanks!
-
-> From the log above, the command (0xfc09) is failing which the device may in the weird state.
+Yours,
+Linus Walleij
