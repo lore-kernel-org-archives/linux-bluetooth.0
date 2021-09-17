@@ -2,80 +2,133 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C3C94C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 08:14:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B8601C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 12:27:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F2BA60E97
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 08:14:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9B6A1611C4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 12:27:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232207AbhIQIPW (ORCPT
+        id S243651AbhIQM3N (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Sep 2021 04:15:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34934 "EHLO
+        Fri, 17 Sep 2021 08:29:13 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36284 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229837AbhIQIPW (ORCPT
+        with ESMTP id S235941AbhIQM3M (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Sep 2021 04:15:22 -0400
-X-Greylist: delayed 520 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 17 Sep 2021 01:14:00 PDT
-Received: from relay04.th.seeweb.it (relay04.th.seeweb.it [IPv6:2001:4b7a:2000:18::165])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BF01C061767
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Sep 2021 01:14:00 -0700 (PDT)
-Received: from SoMainline.org (94-209-165-62.cable.dynamic.v4.ziggo.nl [94.209.165.62])
+        Fri, 17 Sep 2021 08:29:12 -0400
+Received: from mout-p-102.mailbox.org (mout-p-102.mailbox.org [IPv6:2001:67c:2050::465:102])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5AF39C061574;
+        Fri, 17 Sep 2021 05:27:49 -0700 (PDT)
+Received: from smtp202.mailbox.org (smtp202.mailbox.org [IPv6:2001:67c:2050:105:465:1:4:0])
         (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
         (No client certificate requested)
-        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id E65811FACD;
-        Fri, 17 Sep 2021 10:04:37 +0200 (CEST)
-Date:   Fri, 17 Sep 2021 10:04:36 +0200
-From:   Marijn Suijten <marijn.suijten@somainline.org>
-To:     Barry Byford <31baz66@gmail.com>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Sanchayan Maity <maitysanchayan@gmail.com>,
-        Sanchayan Maity <sanchayan@asymptotic.io>
-Subject: Re: Deprecated Python Libraries
-Message-ID: <20210917080436.hjs3fsezznlqcxay@SoMainline.org>
-References: <CAAu3APZAJD-uPUO1d4g=7smD34LUzkn87MkQKfdEcTC41FM5Vg@mail.gmail.com>
+        by mout-p-102.mailbox.org (Postfix) with ESMTPS id 4H9tWd0rlbzQjgX;
+        Fri, 17 Sep 2021 14:27:41 +0200 (CEST)
+X-Virus-Scanned: amavisd-new at heinlein-support.de
+From:   =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>
+To:     Amitkumar Karwar <amitkarwar@gmail.com>,
+        Ganapathi Bhat <ganapathi017@gmail.com>,
+        Xinming Hu <huxinming820@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     =?UTF-8?q?Jonas=20Dre=C3=9Fler?= <verdre@v0yd.nl>,
+        Tsuchiya Yuto <kitakar@gmail.com>,
+        linux-wireless@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        Maximilian Luz <luzmaximilian@gmail.com>,
+        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+        =?UTF-8?q?Pali=20Roh=C3=A1r?= <pali@kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Lower passive lescan interval on Marvell 88W8897
+Date:   Fri, 17 Sep 2021 14:27:18 +0200
+Message-Id: <20210917122718.86776-1-verdre@v0yd.nl>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAAu3APZAJD-uPUO1d4g=7smD34LUzkn87MkQKfdEcTC41FM5Vg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Rspamd-Queue-Id: 9094037F
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Barry,
+The Marvell 88W8897 combined wifi and bluetooth card (pcie+usb version)
+is used in a lot of Microsoft Surface devices, and all those devices
+suffer from very low 2.4GHz wifi connection speeds while bluetooth is
+enabled. The reason for that is that the default passive scanning
+interval for Bluetooth Low Energy devices is quite high on Linux
+(interval of 60 msec and scan window of 30 msec, see le_scan_interval
+and le_scan_window in hci_core.c), and the Marvell chip is known for its
+bad bt+wifi coexisting performance.
 
-On 2021-09-17 08:03:36, Barry Byford wrote:
-> The Python examples in the test directory have some dependencies that
-> have issues:
-> [..]
-> Would there be any interest in getting patches to change to these
-> different libraries?
-> Are these test scripts used in any of the automated tests?
-> Can I submit a PR via https://github.com/bluez/bluez/pulls?
+So decrease that passive scan interval and make the scan window shorter
+on this particular device to allow for spending more time transmitting
+wifi signals: The new scan interval is 250 msec (0x190 * 0.625 msec) and
+the new scan window is 6.25 msec (0xa * 0.625 msec).
 
-Perhaps of relevance: Sanchayan (cc'd) imporved some scripts for Python
-3 compatibility (Python 2 is already deprecated for the better part of
-1.5 years) and proper formatting [1] while working on BT LDAC [2], some
-patches made it to the list [3] but were ultimately never merged.
-Sanchayan, would you be willing to resubmit these?  Alternatively Barry
-can pick them up as part of their quest to improve the scripts for
-longevity?
+This change has a very large impact on the 2.4GHz wifi speeds and gets
+it up to performance comparable with the Windows driver, which seems to
+apply a similar quirk.
 
-Disclaimer: I'm not a maintainer, merely a passer-by so don't take my
-comment as an acknowledgement to go ahead with the changes.  But if you
-do I think everyone appreciates improved shebangs and PEP8 style
-formatting (I find `black` to perform formatting nicely) along the way
-just like Sanchayan's patches.
+The scan interval and scan window length were tested and found to work
+very well with a bunch of Bluetooth Low Energy devices, including the
+Surface Pen, a Bluetooth Speaker and two modern Bluetooth headphones.
+All devices were discovered immediately after turning them on. Even
+lower values were also tested, but these introduced longer delays until
+devices get discovered.
 
-[1]: https://gitlab.freedesktop.org/SanchayanMaity/bluez/-/commits/python3/
-[2]: https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/merge_requests/1621
-[3]: https://lore.kernel.org/linux-bluetooth/?q=sanchayan
+Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
+---
+ drivers/bluetooth/btusb.c | 15 +++++++++++++++
+ 1 file changed, 15 insertions(+)
 
-Thanks!
-- Marijn
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 60d2fce59a71..05b11179c839 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
+ #define BTUSB_VALID_LE_STATES   0x800000
+ #define BTUSB_QCA_WCN6855	0x1000000
++#define BTUSB_LOWER_LESCAN_INTERVAL	0x2000000
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
+ 
+ static const struct usb_device_id btusb_table[] = {
+@@ -356,6 +357,7 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x1286, 0x2044), .driver_info = BTUSB_MARVELL },
+ 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
+ 	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
++	{ USB_DEVICE(0x1286, 0x204c), .driver_info = BTUSB_LOWER_LESCAN_INTERVAL },
+ 
+ 	/* Intel Bluetooth devices */
+ 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_COMBINED },
+@@ -3813,6 +3815,19 @@ static int btusb_probe(struct usb_interface *intf,
+ 	if (id->driver_info & BTUSB_MARVELL)
+ 		hdev->set_bdaddr = btusb_set_bdaddr_marvell;
+ 
++	/* The Marvell 88W8897 combined wifi and bluetooth card is known for
++	 * very bad bt+wifi coexisting performance.
++	 *
++	 * Decrease the passive BT Low Energy scan interval a bit
++	 * (0x0190 * 0.625 msec = 250 msec) and make the scan window shorter
++	 * (0x000a * 0,625 msec = 6.25 msec). This allows for significantly
++	 * higher wifi throughput while passively scanning for BT LE devices.
++	 */
++	if (id->driver_info & BTUSB_LOWER_LESCAN_INTERVAL) {
++		hdev->le_scan_interval = 0x0190;
++		hdev->le_scan_window = 0x000a;
++	}
++
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_MTK) &&
+ 	    (id->driver_info & BTUSB_MEDIATEK)) {
+ 		hdev->setup = btusb_mtk_setup;
+-- 
+2.31.1
+
