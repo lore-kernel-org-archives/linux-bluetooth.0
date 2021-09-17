@@ -2,162 +2,118 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.7 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-3.7 required=3.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 97A72C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 13:32:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4A5BCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 18:07:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 713A761019
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 13:32:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C07061164
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Sep 2021 18:07:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238074AbhIQNeF (ORCPT
+        id S236644AbhIQSIs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Sep 2021 09:34:05 -0400
-Received: from mout-p-101.mailbox.org ([80.241.56.151]:27724 "EHLO
-        mout-p-101.mailbox.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231887AbhIQNeE (ORCPT
+        Fri, 17 Sep 2021 14:08:48 -0400
+Received: from mail-il1-f200.google.com ([209.85.166.200]:53925 "EHLO
+        mail-il1-f200.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233148AbhIQSIr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Sep 2021 09:34:04 -0400
-Received: from smtp1.mailbox.org (smtp1.mailbox.org [80.241.60.240])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-384) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-        (No client certificate requested)
-        by mout-p-101.mailbox.org (Postfix) with ESMTPS id 4H9vyc3DlTzQk9P;
-        Fri, 17 Sep 2021 15:32:40 +0200 (CEST)
-X-Virus-Scanned: amavisd-new at heinlein-support.de
-Subject: Re: [PATCH] Bluetooth: btusb: Lower passive lescan interval on
- Marvell 88W8897
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Amitkumar Karwar <amitkarwar@gmail.com>,
-        Ganapathi Bhat <ganapathi017@gmail.com>,
-        Xinming Hu <huxinming820@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Tsuchiya Yuto <kitakar@gmail.com>,
-        linux-wireless@vger.kernel.org,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        Maximilian Luz <luzmaximilian@gmail.com>,
-        Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
-        =?UTF-8?Q?Pali_Roh=c3=a1r?= <pali@kernel.org>
-References: <20210917122718.86776-1-verdre@v0yd.nl>
- <B9F09991-0B67-4848-86DE-C13BF3850D15@holtmann.org>
- <3e5b7e27-e643-ae9b-db40-d885ca441385@v0yd.nl>
- <9D2F9512-0045-4464-AB1B-A1AA04E21F3D@holtmann.org>
-From:   =?UTF-8?Q?Jonas_Dre=c3=9fler?= <verdre@v0yd.nl>
-Message-ID: <2000816e-c478-274c-76e1-31e71ae0c77d@v0yd.nl>
-Date:   Fri, 17 Sep 2021 15:32:32 +0200
+        Fri, 17 Sep 2021 14:08:47 -0400
+Received: by mail-il1-f200.google.com with SMTP id t10-20020a056e02160a00b0022c6a64f952so22717377ilu.20
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Sep 2021 11:07:25 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=veJzQ72AWxxL+dvzV9cICjYgzqmC1otqE4lYiPabm08=;
+        b=4RhRGIWyY9d1dwPRdT/Va7fUohI7WejDO4sahFGK/eHwLnx8LzmX/AJFU6EmzVvIT/
+         pudJ6AnXeWdUEkmyVQ5epR0/BobBL8o+Q+K0+5G/opXRucgHTkyAIcf+qF/k9pgDlMMm
+         3/d/ZoQsCHbRERL/+1Rp7JcTcJfy+jhFdnqkejU16iwA2U5YsLvGluC8RMjVunFGMI6s
+         1jcr2t4RPRmpm0L1oT2le3bXJ6fzZrAoW9hl9TCx7+WfhcyuCTga9fm/u1kXf7ejvM5Z
+         hafFo+cUEIs/G1Mdi3Zfl7Ow9z3mIn5pyxRmEpb5KhDvzXGEBBL+1Ff/FmKKgIbErPWr
+         perA==
+X-Gm-Message-State: AOAM531JZkZgQhWvOedQCztJbyAyh1itjhJbHk4Im/vcxcwRWslHd8Cq
+        WvfyggEvFM/Vz941HV7G2Q0UmqOSDkIseNjg6A9o/l4ABZZC
+X-Google-Smtp-Source: ABdhPJwZhNXAwwnK0Qh+clUHQDE/55QI/OcFJuZV51dTTflISlGp0fb9zKMHsL6rVoYkIjo93SoshYAbL7qWZ+uU6YCGz6apkw8K
 MIME-Version: 1.0
-In-Reply-To: <9D2F9512-0045-4464-AB1B-A1AA04E21F3D@holtmann.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: 04A21188C
+X-Received: by 2002:a5d:9c53:: with SMTP id 19mr9335696iof.192.1631902045394;
+ Fri, 17 Sep 2021 11:07:25 -0700 (PDT)
+Date:   Fri, 17 Sep 2021 11:07:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000b9605b05cc34cd28@google.com>
+Subject: [syzbot] WARNING: locking bug in sco_sock_timeout
+From:   syzbot <syzbot+91ba852bd0ad0581a0e3@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 9/17/21 3:18 PM, Marcel Holtmann wrote:
-> Hi Jonas,
-> 
->>>> The Marvell 88W8897 combined wifi and bluetooth card (pcie+usb version)
->>>> is used in a lot of Microsoft Surface devices, and all those devices
->>>> suffer from very low 2.4GHz wifi connection speeds while bluetooth is
->>>> enabled. The reason for that is that the default passive scanning
->>>> interval for Bluetooth Low Energy devices is quite high on Linux
->>>> (interval of 60 msec and scan window of 30 msec, see le_scan_interval
->>>> and le_scan_window in hci_core.c), and the Marvell chip is known for its
->>>> bad bt+wifi coexisting performance.
->>>>
->>>> So decrease that passive scan interval and make the scan window shorter
->>>> on this particular device to allow for spending more time transmitting
->>>> wifi signals: The new scan interval is 250 msec (0x190 * 0.625 msec) and
->>>> the new scan window is 6.25 msec (0xa * 0.625 msec).
->>>>
->>>> This change has a very large impact on the 2.4GHz wifi speeds and gets
->>>> it up to performance comparable with the Windows driver, which seems to
->>>> apply a similar quirk.
->>>>
->>>> The scan interval and scan window length were tested and found to work
->>>> very well with a bunch of Bluetooth Low Energy devices, including the
->>>> Surface Pen, a Bluetooth Speaker and two modern Bluetooth headphones.
->>>> All devices were discovered immediately after turning them on. Even
->>>> lower values were also tested, but these introduced longer delays until
->>>> devices get discovered.
->>>>
->>>> Signed-off-by: Jonas Dreßler <verdre@v0yd.nl>
->>>> ---
->>>> drivers/bluetooth/btusb.c | 15 +++++++++++++++
->>>> 1 file changed, 15 insertions(+)
->>>>
->>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>> index 60d2fce59a71..05b11179c839 100644
->>>> --- a/drivers/bluetooth/btusb.c
->>>> +++ b/drivers/bluetooth/btusb.c
->>>> @@ -59,6 +59,7 @@ static struct usb_driver btusb_driver;
->>>> #define BTUSB_WIDEBAND_SPEECH	0x400000
->>>> #define BTUSB_VALID_LE_STATES   0x800000
->>>> #define BTUSB_QCA_WCN6855	0x1000000
->>>> +#define BTUSB_LOWER_LESCAN_INTERVAL	0x2000000
->>>> #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
->>>>
->>>> static const struct usb_device_id btusb_table[] = {
->>>> @@ -356,6 +357,7 @@ static const struct usb_device_id blacklist_table[] = {
->>>> 	{ USB_DEVICE(0x1286, 0x2044), .driver_info = BTUSB_MARVELL },
->>>> 	{ USB_DEVICE(0x1286, 0x2046), .driver_info = BTUSB_MARVELL },
->>>> 	{ USB_DEVICE(0x1286, 0x204e), .driver_info = BTUSB_MARVELL },
->>>> +	{ USB_DEVICE(0x1286, 0x204c), .driver_info = BTUSB_LOWER_LESCAN_INTERVAL },
->>>>
->>>> 	/* Intel Bluetooth devices */
->>>> 	{ USB_DEVICE(0x8087, 0x0025), .driver_info = BTUSB_INTEL_COMBINED },
->>>> @@ -3813,6 +3815,19 @@ static int btusb_probe(struct usb_interface *intf,
->>>> 	if (id->driver_info & BTUSB_MARVELL)
->>>> 		hdev->set_bdaddr = btusb_set_bdaddr_marvell;
->>>>
->>>> +	/* The Marvell 88W8897 combined wifi and bluetooth card is known for
->>>> +	 * very bad bt+wifi coexisting performance.
->>>> +	 *
->>>> +	 * Decrease the passive BT Low Energy scan interval a bit
->>>> +	 * (0x0190 * 0.625 msec = 250 msec) and make the scan window shorter
->>>> +	 * (0x000a * 0,625 msec = 6.25 msec). This allows for significantly
->>>> +	 * higher wifi throughput while passively scanning for BT LE devices.
->>>> +	 */
->>>> +	if (id->driver_info & BTUSB_LOWER_LESCAN_INTERVAL) {
->>>> +		hdev->le_scan_interval = 0x0190;
->>>> +		hdev->le_scan_window = 0x000a;
->>>> +	}
->>>> +
->>> you can not do it this way. Modifying hci_dev internals from within the driver is not acceptable.
->>> Regards
->>> Marcel
->>
->>
->> hmm okay, it seems to me that the intention of your commit bef64738e3fb87eabc6fbeededad0c44ea173384 was to allow configuring it on a per controller basis, also btusb changes a bunch of other hci_dev properties? Given that we also have to match by usb-id, I don't think there's another place to do that other than the usb driver, or is there?
-> 
-> you can change most defaults via mgmt commands.
-> 
-> The things the a driver should set in hci_dev is really limited and it only affects its ability to run as a transport driver. It shouldn’t deal with anything that is actually HCI upper layer operation.
-> 
-> Regards
-> 
-> Marcel
-> 
+Hello,
 
-Hmm, having users of this wifi chip run a script at boot doesn't sound 
-great to me, or can you point me to somewhere in bluez where I could put 
-a device-specific quirk for this? IMHO this is a real bug with the 
-hardware that needs to be quirked somewhere, note that this is not a 
-minor performance improvement, this bumps wifi 2.4ghz speeds up from 800 
-KB/s to >5 MB/s.
+syzbot found the following issue on:
 
-Other than that, there's also the possibility of changing the 
-kernel-wide defaults, but as mentioned in my other answer, I don't have 
-enough hardware laying around to test that at all.
+HEAD commit:    f11ee2ad25b2 net: mana: Prefer struct_size over open coded..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=14a96963300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=16e23f04679ec35e
+dashboard link: https://syzkaller.appspot.com/bug?extid=91ba852bd0ad0581a0e3
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.1
 
-Jonas
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+91ba852bd0ad0581a0e3@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(1)
+WARNING: CPU: 1 PID: 32344 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:203 [inline]
+WARNING: CPU: 1 PID: 32344 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:192 [inline]
+WARNING: CPU: 1 PID: 32344 at kernel/locking/lockdep.c:203 check_wait_context kernel/locking/lockdep.c:4688 [inline]
+WARNING: CPU: 1 PID: 32344 at kernel/locking/lockdep.c:203 __lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
+Modules linked in:
+CPU: 1 PID: 32344 Comm: kworker/1:0 Not tainted 5.14.0-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: events sco_sock_timeout
+RIP: 0010:hlock_class kernel/locking/lockdep.c:203 [inline]
+RIP: 0010:hlock_class kernel/locking/lockdep.c:192 [inline]
+RIP: 0010:check_wait_context kernel/locking/lockdep.c:4688 [inline]
+RIP: 0010:__lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
+Code: 08 84 d2 0f 85 f1 3d 00 00 8b 05 df 9a 13 0c 85 c0 0f 85 f4 fd ff ff 48 c7 c6 60 03 8c 89 48 c7 c7 20 f7 8b 89 e8 79 ff 96 07 <0f> 0b 31 ed e9 b7 f0 ff ff e8 de 49 7b 02 85 c0 0f 84 12 fe ff ff
+RSP: 0018:ffffc900161efa88 EFLAGS: 00010082
+RAX: 0000000000000000 RBX: ffff88801ec820a0 RCX: 0000000000000000
+RDX: ffff8880247b9c80 RSI: ffffffff815dbd58 RDI: fffff52002c3df43
+RBP: 0000000000000b04 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff815d5afe R11: 0000000000000000 R12: ffff8880247ba6c8
+R13: ffff8880247b9c80 R14: 0000000000040000 R15: 0000000000040b04
+FS:  0000000000000000(0000) GS:ffff8880b9d00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc98ea0b718 CR3: 000000001cc2b000 CR4: 00000000001506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ lock_acquire kernel/locking/lockdep.c:5625 [inline]
+ lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:135 [inline]
+ _raw_spin_lock_bh+0x2f/0x40 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:368 [inline]
+ lock_sock_nested+0x40/0x120 net/core/sock.c:3183
+ lock_sock include/net/sock.h:1612 [inline]
+ sco_sock_timeout+0xd2/0x290 net/bluetooth/sco.c:96
+ process_one_work+0x9bf/0x16b0 kernel/workqueue.c:2297
+ worker_thread+0x658/0x11f0 kernel/workqueue.c:2444
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
