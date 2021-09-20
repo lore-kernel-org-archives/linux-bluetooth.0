@@ -2,142 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-7.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,
-	SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.0
+X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 702FEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Sep 2021 13:45:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 639ECC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Sep 2021 12:57:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 36EC760232
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Sep 2021 13:45:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 40BC8610A1
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Sep 2021 12:57:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231294AbhISNq7 (ORCPT
+        id S236309AbhITM7P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 19 Sep 2021 09:46:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35090 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230520AbhISNq6 (ORCPT
+        Mon, 20 Sep 2021 08:59:15 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([216.205.24.124]:60054 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229719AbhITM7N (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 19 Sep 2021 09:46:58 -0400
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F4DFC061574
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Sep 2021 06:45:33 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id eg28so27007028edb.1
-        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Sep 2021 06:45:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=6exTQj2H8K+ahbQLkHM9yRcZGgvoa3LOgXfJ3HggxwQ=;
-        b=U48E6hmW45ep5MWXSmELGCeEnx1aJV0XG2i7asG9sJ41X3A4wef5PFhqqvTnwc02a3
-         nh8InO3tqg8ilbWomLwYnIuiiti6zegkiSscx4z2jappgilFMK0Tu3W/1L3WBd/A+909
-         5ChMXiYXw6Ww8N3iNKUzbr+QMRHikMhDLR7dUANph8dMHb3ssd85UTkb05g7H/PuZO4Q
-         8bjQGTgAjafrq++J96Afs7REKKbG+2p4Qny/BWjYXYStvFFLiw19Mbpg9ufOoxiftIto
-         Mo2Y8RP3HS3pM737FuIV6tOByyQwaeKuWZzkh9kt8TWHtRgMT4XY9a6gtAqJhEJY92Yr
-         i7Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=6exTQj2H8K+ahbQLkHM9yRcZGgvoa3LOgXfJ3HggxwQ=;
-        b=02j50CFF2vTA9RH2M6UUuNNH2Sb0uzzmbqTwKZPjPJQ6pnpRSubM0CMNNYKfEmfQqH
-         2rYCJnxj4/esBR6skT1SXbXbq6BugDQ0eGMCxe58wGr+0937byS4+DHzHQBdeykI7d5a
-         ftYf1nVgHK1rV3u4vCteibH05VJBxV1/ppLoC3u4MsC9QuZ37jNaT1ZTcapxXnJw9YLJ
-         a9c9mw5BTRr76shKfjTb2sN6eUA8zfD+OTSNiooqIm74O1mYuYkZ4W+4mb5RTpNJoNif
-         ZNC7mGjl/aHFDVyM9IjDcGCO46hWJF68oOwTcBkYJxyFtZS/XIPSw/Znw5X30IdEeAq1
-         HJ9A==
-X-Gm-Message-State: AOAM530exgt0zDBMcq/MF0pR7w8Uuz5XOjbnS4WsG++NAZ0IzdbJ5dGH
-        p39qSM1KhULtmZahQYTZ04ItRRQwKKF+XNQmm1ERb1TmsXs=
-X-Google-Smtp-Source: ABdhPJzpqLyz9hjGxcmkqe6bgDb5bQjZkDJ/ACZAOt6JLPZ0Vv3xvPaGa+iupinoTXNbY8MMYasXGuVC9mQ3U5f2e5o=
-X-Received: by 2002:a50:fa89:: with SMTP id w9mr24432490edr.113.1632059131507;
- Sun, 19 Sep 2021 06:45:31 -0700 (PDT)
+        Mon, 20 Sep 2021 08:59:13 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1632142666;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:
+         content-transfer-encoding:content-transfer-encoding;
+        bh=rVUOOaCgoBsCCyZfatRP3uiZYtMxgn7N6vs6RYEfHX0=;
+        b=eH8clCrh6KgKe8jn6Hl7ZYBT5Mkodop+8b8qSUU15k1jtpzesU7C4HDOb0ThIEgUNwU3TC
+        7z6XIYh+WQYsUo3a+aET+34UB8CkDBuC+EXKXX0Me763Nn0nvqN4avGJrOgv0hI9hI/UhC
+        3ubT9LYG6oD+kQ/WsAgXQJIAqKKkarQ=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-179-4eHCm5D0PYmIqvRAOlWE0w-1; Mon, 20 Sep 2021 08:57:43 -0400
+X-MC-Unique: 4eHCm5D0PYmIqvRAOlWE0w-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.phx2.redhat.com [10.5.11.13])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 2A99F10168C8;
+        Mon, 20 Sep 2021 12:57:42 +0000 (UTC)
+Received: from x1.localdomain.com (unknown [10.39.194.118])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id A38A377BF5;
+        Mon, 20 Sep 2021 12:57:40 +0000 (UTC)
+From:   Hans de Goede <hdegoede@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Hans de Goede <hdegoede@redhat.com>,
+        linux-bluetooth@vger.kernel.org,
+        Archie Pusaka <apusaka@chromium.org>
+Subject: [PATCH 5.15 regression fix] Bluetooth: hci_h5: Fix (runtime)suspend issues on RTL8723BS HCIs
+Date:   Mon, 20 Sep 2021 14:57:39 +0200
+Message-Id: <20210920125739.111846-1-hdegoede@redhat.com>
 MIME-Version: 1.0
-References: <CAAu3APZAJD-uPUO1d4g=7smD34LUzkn87MkQKfdEcTC41FM5Vg@mail.gmail.com>
- <20210917080436.hjs3fsezznlqcxay@SoMainline.org>
-In-Reply-To: <20210917080436.hjs3fsezznlqcxay@SoMainline.org>
-From:   Barry Byford <31baz66@gmail.com>
-Date:   Sun, 19 Sep 2021 14:45:20 +0100
-Message-ID: <CAAu3APb=YP_C8zB2YXiw9oa9h5CScXqmufSREWWvSO2J5td8Rg@mail.gmail.com>
-Subject: Re: Deprecated Python Libraries
-To:     Marijn Suijten <marijn.suijten@somainline.org>
-Cc:     Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Sanchayan Maity <maitysanchayan@gmail.com>,
-        Sanchayan Maity <sanchayan@asymptotic.io>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.13
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello Marijn,
+The recently added H5_WAKEUP_DISABLE h5->flags flag gets checked in
+h5_btrtl_open(), but it gets set in h5_serdev_probe() *after*
+calling  hci_uart_register_device() and thus after h5_btrtl_open()
+is called, set this flag earlier.
 
-On Fri, 17 Sept 2021 at 09:04, Marijn Suijten
-<marijn.suijten@somainline.org> wrote:
->
-> Hi Barry,
->
-> On 2021-09-17 08:03:36, Barry Byford wrote:
-> > The Python examples in the test directory have some dependencies that
-> > have issues:
-> > [..]
-> > Would there be any interest in getting patches to change to these
-> > different libraries?
-> > Are these test scripts used in any of the automated tests?
-> > Can I submit a PR via https://github.com/bluez/bluez/pulls?
->
-> Perhaps of relevance: Sanchayan (cc'd) imporved some scripts for Python
-> 3 compatibility (Python 2 is already deprecated for the better part of
-> 1.5 years) and proper formatting [1] while working on BT LDAC [2], some
-> patches made it to the list [3] but were ultimately never merged.
-> Sanchayan, would you be willing to resubmit these?  Alternatively Barry
-> can pick them up as part of their quest to improve the scripts for
-> longevity?
->
-> Disclaimer: I'm not a maintainer, merely a passer-by so don't take my
-> comment as an acknowledgement to go ahead with the changes.  But if you
-> do I think everyone appreciates improved shebangs and PEP8 style
-> formatting (I find `black` to perform formatting nicely) along the way
-> just like Sanchayan's patches.
->
-> [1]: https://gitlab.freedesktop.org/SanchayanMaity/bluez/-/commits/python3/
-> [2]: https://gitlab.freedesktop.org/gstreamer/gst-plugins-bad/-/merge_requests/1621
-> [3]: https://lore.kernel.org/linux-bluetooth/?q=sanchayan
->
+Also on devices where suspend/resume involves fully re-probing the HCI,
+runtime-pm suspend should not be used, make the runtime-pm setup
+conditional on the H5_WAKEUP_DISABLE flag too.
 
-Thanks for the feedback and references.
+This fixes the HCI being removed and then re-added every 10 seconds
+because it was being reprobed as soon as it was runtime-suspended.
 
-I'm not quite sure of the purpose of the the Python scripts in the
-test directory.
-Do they serve the automated tests? In which case any changes need to
-be carefully considered.
-Or are they a base for people to interactively test BlueZ and see how
-to do an implementation with the D-Bus API.
-The use of bluezutils.py file seems to be inconsistent so I'm not sure
-if it is preferred or not.
-I regularly refer people to the Python scripts as an example of using
-the BlueZ D-Bus APi and that is my motivation for wanting to see them
-be improved.
+Cc: Archie Pusaka <apusaka@chromium.org>
+Fixes: 66f077dde749 ("Bluetooth: hci_h5: add WAKEUP_DISABLE flag")
+Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
+Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+---
+ drivers/bluetooth/hci_h5.c | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-I've taken a look at moving the test-adapter script across to the Gio
-bindings and argparse.
-This meant updating the bluezutils.py also. Once I started
-restructuring things I may have got slightly carried away. I've also
-added some functionality such as being able to Introspect the
-interface.
+diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
+index 0c0dedece59c..59b712742d33 100644
+--- a/drivers/bluetooth/hci_h5.c
++++ b/drivers/bluetooth/hci_h5.c
+@@ -846,6 +846,8 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 		h5->vnd = data->vnd;
+ 	}
+ 
++	if (data->driver_info & H5_INFO_WAKEUP_DISABLE)
++		set_bit(H5_WAKEUP_DISABLE, &h5->flags);
+ 
+ 	h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
+ 	if (IS_ERR(h5->enable_gpio))
+@@ -860,9 +862,6 @@ static int h5_serdev_probe(struct serdev_device *serdev)
+ 	if (err)
+ 		return err;
+ 
+-	if (data->driver_info & H5_INFO_WAKEUP_DISABLE)
+-		set_bit(H5_WAKEUP_DISABLE, &h5->flags);
+-
+ 	return 0;
+ }
+ 
+@@ -962,11 +961,13 @@ static void h5_btrtl_open(struct h5 *h5)
+ 	serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
+ 	serdev_device_set_baudrate(h5->hu->serdev, 115200);
+ 
+-	pm_runtime_set_active(&h5->hu->serdev->dev);
+-	pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
+-	pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
+-					 SUSPEND_TIMEOUT_MS);
+-	pm_runtime_enable(&h5->hu->serdev->dev);
++	if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags)) {
++		pm_runtime_set_active(&h5->hu->serdev->dev);
++		pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
++		pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
++						 SUSPEND_TIMEOUT_MS);
++		pm_runtime_enable(&h5->hu->serdev->dev);
++	}
+ 
+ 	/* The controller needs up to 500ms to wakeup */
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 1);
+@@ -976,7 +977,8 @@ static void h5_btrtl_open(struct h5 *h5)
+ 
+ static void h5_btrtl_close(struct h5 *h5)
+ {
+-	pm_runtime_disable(&h5->hu->serdev->dev);
++	if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags))
++		pm_runtime_disable(&h5->hu->serdev->dev);
+ 
+ 	gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
+ 	gpiod_set_value_cansleep(h5->enable_gpio, 0);
+-- 
+2.31.1
 
-Anyway, the result of my experiment is at:
-https://github.com/ukBaz/bluez/commit/44f9c205f798232f9417879401b2baefa1ef01ac
-
-Any guidance from the maintainers as to what is required of the Python
-scripts in the test directory would be appreciated. Are there any
-scripts in the directory that you think are good examples of what you
-are looking for?
-
-Regards,
-Barry
-
-
-> Thanks!
-> - Marijn
