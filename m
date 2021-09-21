@@ -2,381 +2,415 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-15.7 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED,USER_AGENT_GIT
-	autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-26.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
+	USER_AGENT_GIT,USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35B17C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 18:25:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB1D4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 21:47:43 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 19A1761242
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 18:25:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 920E660F3A
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 21:47:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232951AbhIUS0i (ORCPT
+        id S235622AbhIUVtL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Sep 2021 14:26:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35338 "EHLO
+        Tue, 21 Sep 2021 17:49:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53778 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232644AbhIUS0g (ORCPT
+        with ESMTP id S233911AbhIUVtK (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Sep 2021 14:26:36 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B2DEC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Sep 2021 11:25:08 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id nn5-20020a17090b38c500b0019af1c4b31fso243262pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Sep 2021 11:25:08 -0700 (PDT)
+        Tue, 21 Sep 2021 17:49:10 -0400
+Received: from mail-oo1-xc49.google.com (mail-oo1-xc49.google.com [IPv6:2607:f8b0:4864:20::c49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6A7CDC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Sep 2021 14:47:41 -0700 (PDT)
+Received: by mail-oo1-xc49.google.com with SMTP id j26-20020a4a92da000000b002a80a30e964so252120ooh.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Sep 2021 14:47:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc
          :content-transfer-encoding;
-        bh=W/f3b4u2kEgQ+20UHKn0LDzErQDeUyizAnTJKvNQL6g=;
-        b=U16KpPAv1cUvNMP3RUS8gkRqtcblpwFbx8YiDIsH4zuS21KvSbWMMBDWmNzo8g63SY
-         x6b8N1wyMFTCWtpGtAp1Ry77KmpR6Df32eulQBz1a4jQcic0VFDFsu7WwzMqqlqv8INN
-         ZxN11lfYXRRNbYNXbuKdvNVAu0ERex0TrzDsNul034dwljQZs8gWMUKQYLiEwMfmkmlS
-         YcJ+eFlReYswwOjBGUtGEQ0aKucS8juLGUxXRbri5zlCjnNK0/fI34BvNxkerzXr1Rnf
-         2oYvoKLxfRMf4nXHePjStPv724D+zGALZepLhIACeqNPdNgSFz3jw3j4HeYIJe5g4eBJ
-         ae9g==
+        bh=HmPUo7NP84irG+fpbG/9RGxaqmMyeDRhG4gEokC1TiU=;
+        b=PWm6HO7VNfgOGGz8s2UmG7/ruYnSj98+qJ6XhjtSE02dBcbgXmoAvLE07O+zKH5Yqh
+         QFin2LgemJShzHUlpJd835AdDJhsleAWY93PexfgRlpbJ6ycDZQHiicZaok9PjH9ii4F
+         ez2OmbzVM4pW4ZN8dXIC9p8BevvD47dfXmF6vqJZGuRiLyFtLIxoW2k8XXdVay7QmCoa
+         8Z7K5wo9qmUdR3qlHiJuI3M61oWRRE1P/fvs4KXASXPVwgCU/cHRkRsWGRx2eNVGJU7+
+         Zgz9yni/oZHNkqwNMC8lw1A+Yz4KZ5Vs2yFT0xdf1dmuuATezv8BpzP5uP8UDiphrk5J
+         Rf0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc
          :content-transfer-encoding;
-        bh=W/f3b4u2kEgQ+20UHKn0LDzErQDeUyizAnTJKvNQL6g=;
-        b=V6XyEHQYDW6dlWSI6b0wY0lo69FmY+6aEeUG9P4sKTyFPaa9XAbKwj6VVLQo+XQbbZ
-         BHea+mVLYEQ3jKu1uwuBwaWEv2RKPJloo0jcJQtDelMyhTk2ehjEs7j7jLqnXkYmmmQq
-         6cGb9/X0v3yaWQy29139Mcmk42l4SXLC5+QxbV/AznHLKVMLMSrpIKN9GfAjLFxzd168
-         2RIosnQ93wxyZyOJHT8jBpOjzDjWdj3dr9z80y+nf8H4FD7eyfg5dMbr5iDZtpFklwKv
-         B2eUfB9NqhPMWizg49Qx08bQSjwPRWg3+mJiGyTTKLMeHKfbhWEsBf+gyuPtU7PLBr/o
-         2QAw==
-X-Gm-Message-State: AOAM531OK9tqRqJxEVP8pPkY8t1/s3ehMv/cLIsV3Z/RDr9PLB9ACVpf
-        uTd/NDxNyiDq8bspGkMZ9/kcEPHxefg=
-X-Google-Smtp-Source: ABdhPJxIivGsg+XYbWYULVaHpouwB7Y/qgtA2Gd6lLVDc1eYDv1TvNNXE/+eGBx1v2dfgboNOfxUuQ==
-X-Received: by 2002:a17:90a:ca0d:: with SMTP id x13mr6816852pjt.210.1632248707024;
-        Tue, 21 Sep 2021 11:25:07 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y26sm17921350pfe.69.2021.09.21.11.25.06
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 21 Sep 2021 11:25:06 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_core: Move all debugfs handling to hci_debugfs.c
-Date:   Tue, 21 Sep 2021 11:25:04 -0700
-Message-Id: <20210921182504.1308610-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        bh=HmPUo7NP84irG+fpbG/9RGxaqmMyeDRhG4gEokC1TiU=;
+        b=mjgcM7YLhkkeuFWxrJ6eW+/JkaHSwJ2rJMLJfw3YqDJ81XV2uf+x5hb1WgHu1Rn4Yr
+         1NmfBqOv4Q2AKWCGxE92xYY7eaS1y9WkSWk9fYMFH2yC6vRaqs3vRGOWUEJcyD6Kk12i
+         /Ccdl++ng/w/UE3NbJ6mY8O4L7T2L92ytbqxnaTPWOMyAdZVJ8ulV8Zvip+iuzF1YgbY
+         Tk7ri6XjhzYavAxFtcgLsbXblP3hGRSl4T80gj99eMm7dMP1Eh7mWmwDbUohccxQhfPL
+         acDaTPjrUPOv9wZ7tybyLrSi5MqiRHT70oCaTwSRjsLRu7Jy3jGm3Xvcxz4l476oMFJY
+         s9mg==
+X-Gm-Message-State: AOAM531iXz7UGHRAiod4nMGNNN0SL8lCgQ6VC8V72xY/clt3ne2bAj0u
+        K59L3Jr/I16D0e+FnNsaB1IljJsgRszBEg==
+X-Google-Smtp-Source: ABdhPJztfHXMNM3813FeExLvw4XPSZsY2Bse4pN4NA/CaCvAZgE7gwqOxMNfSajxKHhJcP0I+BAiRB+ZsaBsBA==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:98fb:b541:26ee:9c8a])
+ (user=mmandlik job=sendgmr) by 2002:a25:1d86:: with SMTP id
+ d128mr41342099ybd.406.1632260849068; Tue, 21 Sep 2021 14:47:29 -0700 (PDT)
+Date:   Tue, 21 Sep 2021 14:47:10 -0700
+Message-Id: <20210921144640.v3.1.Ib31940aba2253e3f25cbca09a2d977d27170e163@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.464.g1972c5931b-goog
+Subject: [PATCH v3] bluetooth: Fix Advertisement Monitor Suspend/Resume
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Manish Mandlik <mmandlik@google.com>,
+        Archie Pusaka <apusaka@google.com>,
+        Miao-chen Chou <mcchou@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+During system suspend, advertisement monitoring is disabled by setting
+the=C2=A0HCI_VS_MSFT_LE_Set_Advertisement_Filter_Enable to False. This
+disables the monitoring during suspend, however, if the controller is
+monitoring a device, it sends HCI_VS_MSFT_LE_Monitor_Device_Event to
+indicate that the monitoring has been stopped for that particular
+device. This event may occur after suspend depending on the
+low_threshold_timeout and peer device advertisement frequency, which
+causes early wake up.
 
-This moves hci_debugfs_create_basic to hci_debugfs.c which is where all
-the others debugfs entries are handled.
+Right way to disable the monitoring for suspend is by removing all the
+monitors before suspend and re-monitor after resume to ensure no events
+are received=C2=A0during suspend. This patch fixes this suspend/resume issu=
+e.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Following tests are performed:
+- Add monitors before suspend and make sure DeviceFound gets triggered
+- Suspend the system and verify that all monitors are removed by kernel
+  but not Released by bluetoothd
+- Wake up and verify that all monitors are added again and DeviceFound
+  gets triggered
+
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+Reviewed-by: Archie Pusaka <apusaka@google.com>
+Reviewed-by: Miao-chen Chou <mcchou@google.com>
 ---
- net/bluetooth/hci_core.c    | 124 ------------------------------------
- net/bluetooth/hci_debugfs.c | 123 +++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_debugfs.h |   5 ++
- 3 files changed, 128 insertions(+), 124 deletions(-)
 
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 52ab168c05ea..aeec5a3031a6 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -62,130 +62,6 @@ DEFINE_MUTEX(hci_cb_list_lock);
- /* HCI ID Numbering */
- static DEFINE_IDA(hci_index_ida);
- 
--/* ---- HCI debugfs entries ---- */
--
--static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
--			     size_t count, loff_t *ppos)
--{
--	struct hci_dev *hdev = file->private_data;
--	char buf[3];
--
--	buf[0] = hci_dev_test_flag(hdev, HCI_DUT_MODE) ? 'Y' : 'N';
--	buf[1] = '\n';
--	buf[2] = '\0';
--	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
--}
--
--static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
--			      size_t count, loff_t *ppos)
--{
--	struct hci_dev *hdev = file->private_data;
--	struct sk_buff *skb;
--	bool enable;
--	int err;
--
--	if (!test_bit(HCI_UP, &hdev->flags))
--		return -ENETDOWN;
--
--	err = kstrtobool_from_user(user_buf, count, &enable);
--	if (err)
--		return err;
--
--	if (enable == hci_dev_test_flag(hdev, HCI_DUT_MODE))
--		return -EALREADY;
--
--	hci_req_sync_lock(hdev);
--	if (enable)
--		skb = __hci_cmd_sync(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL,
--				     HCI_CMD_TIMEOUT);
--	else
--		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
--				     HCI_CMD_TIMEOUT);
--	hci_req_sync_unlock(hdev);
--
--	if (IS_ERR(skb))
--		return PTR_ERR(skb);
--
--	kfree_skb(skb);
--
--	hci_dev_change_flag(hdev, HCI_DUT_MODE);
--
--	return count;
--}
--
--static const struct file_operations dut_mode_fops = {
--	.open		= simple_open,
--	.read		= dut_mode_read,
--	.write		= dut_mode_write,
--	.llseek		= default_llseek,
--};
--
--static ssize_t vendor_diag_read(struct file *file, char __user *user_buf,
--				size_t count, loff_t *ppos)
--{
--	struct hci_dev *hdev = file->private_data;
--	char buf[3];
--
--	buf[0] = hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) ? 'Y' : 'N';
--	buf[1] = '\n';
--	buf[2] = '\0';
--	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
--}
--
--static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
--				 size_t count, loff_t *ppos)
--{
--	struct hci_dev *hdev = file->private_data;
--	bool enable;
--	int err;
--
--	err = kstrtobool_from_user(user_buf, count, &enable);
--	if (err)
--		return err;
--
--	/* When the diagnostic flags are not persistent and the transport
--	 * is not active or in user channel operation, then there is no need
--	 * for the vendor callback. Instead just store the desired value and
--	 * the setting will be programmed when the controller gets powered on.
--	 */
--	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
--	    (!test_bit(HCI_RUNNING, &hdev->flags) ||
--	     hci_dev_test_flag(hdev, HCI_USER_CHANNEL)))
--		goto done;
--
--	hci_req_sync_lock(hdev);
--	err = hdev->set_diag(hdev, enable);
--	hci_req_sync_unlock(hdev);
--
--	if (err < 0)
--		return err;
--
--done:
--	if (enable)
--		hci_dev_set_flag(hdev, HCI_VENDOR_DIAG);
--	else
--		hci_dev_clear_flag(hdev, HCI_VENDOR_DIAG);
--
--	return count;
--}
--
--static const struct file_operations vendor_diag_fops = {
--	.open		= simple_open,
--	.read		= vendor_diag_read,
--	.write		= vendor_diag_write,
--	.llseek		= default_llseek,
--};
--
--static void hci_debugfs_create_basic(struct hci_dev *hdev)
--{
--	debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
--			    &dut_mode_fops);
--
--	if (hdev->set_diag)
--		debugfs_create_file("vendor_diag", 0644, hdev->debugfs, hdev,
--				    &vendor_diag_fops);
--}
--
- static int hci_reset_req(struct hci_request *req, unsigned long opt)
- {
- 	BT_DBG("%s %ld", req->hdev->name, opt);
-diff --git a/net/bluetooth/hci_debugfs.c b/net/bluetooth/hci_debugfs.c
-index 841393389f7b..902b40a90b91 100644
---- a/net/bluetooth/hci_debugfs.c
-+++ b/net/bluetooth/hci_debugfs.c
-@@ -27,6 +27,7 @@
- #include <net/bluetooth/hci_core.h>
- 
- #include "smp.h"
-+#include "hci_request.h"
- #include "hci_debugfs.h"
- 
- #define DEFINE_QUIRK_ATTRIBUTE(__name, __quirk)				      \
-@@ -1250,3 +1251,125 @@ void hci_debugfs_create_conn(struct hci_conn *conn)
- 	snprintf(name, sizeof(name), "%u", conn->handle);
- 	conn->debugfs = debugfs_create_dir(name, hdev->debugfs);
+Changes in v3:
+- Updated the msft_{suspend/resume} function names
+
+Changes in v2:
+- Updated the Reviewd-by names
+
+ net/bluetooth/hci_request.c |  15 +++--
+ net/bluetooth/msft.c        | 117 +++++++++++++++++++++++++++++++-----
+ net/bluetooth/msft.h        |   5 ++
+ 3 files changed, 116 insertions(+), 21 deletions(-)
+
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 47fb665277d4..25eeca3ab495 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1281,21 +1281,24 @@ static void suspend_req_complete(struct hci_dev *hd=
+ev, u8 status, u16 opcode)
+ 	}
  }
-+
-+static ssize_t dut_mode_read(struct file *file, char __user *user_buf,
-+			     size_t count, loff_t *ppos)
+=20
+-static void hci_req_add_set_adv_filter_enable(struct hci_request *req,
+-					      bool enable)
++static void hci_req_prepare_adv_monitor_suspend(struct hci_request *req,
++						bool suspending)
+ {
+ 	struct hci_dev *hdev =3D req->hdev;
+=20
+ 	switch (hci_get_adv_monitor_offload_ext(hdev)) {
+ 	case HCI_ADV_MONITOR_EXT_MSFT:
+-		msft_req_add_set_filter_enable(req, enable);
++		if (suspending)
++			msft_suspend(hdev);
++		else
++			msft_resume(hdev);
+ 		break;
+ 	default:
+ 		return;
+ 	}
+=20
+ 	/* No need to block when enabling since it's on resume path */
+-	if (hdev->suspended && !enable)
++	if (hdev->suspended && suspending)
+ 		set_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks);
+ }
+=20
+@@ -1362,7 +1365,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, en=
+um suspended_state next)
+ 		}
+=20
+ 		/* Disable advertisement filters */
+-		hci_req_add_set_adv_filter_enable(&req, false);
++		hci_req_prepare_adv_monitor_suspend(&req, true);
+=20
+ 		/* Prevent disconnects from causing scanning to be re-enabled */
+ 		hdev->scanning_paused =3D true;
+@@ -1404,7 +1407,7 @@ void hci_req_prepare_suspend(struct hci_dev *hdev, en=
+um suspended_state next)
+ 		/* Reset passive/background scanning to normal */
+ 		__hci_update_background_scan(&req);
+ 		/* Enable all of the advertisement filters */
+-		hci_req_add_set_adv_filter_enable(&req, true);
++		hci_req_prepare_adv_monitor_suspend(&req, false);
+=20
+ 		/* Unpause directed advertising */
+ 		hdev->advertising_paused =3D false;
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 21b1787e7893..255cffa554ee 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -94,11 +94,14 @@ struct msft_data {
+ 	__u16 pending_add_handle;
+ 	__u16 pending_remove_handle;
+ 	__u8 reregistering;
++	__u8 suspending;
+ 	__u8 filter_enabled;
+ };
+=20
+ static int __msft_add_monitor_pattern(struct hci_dev *hdev,
+ 				      struct adv_monitor *monitor);
++static int __msft_remove_monitor(struct hci_dev *hdev,
++				 struct adv_monitor *monitor, u16 handle);
+=20
+ bool msft_monitor_supported(struct hci_dev *hdev)
+ {
+@@ -154,7 +157,7 @@ static bool read_supported_features(struct hci_dev *hde=
+v,
+ }
+=20
+ /* This function requires the caller holds hdev->lock */
+-static void reregister_monitor_on_restart(struct hci_dev *hdev, int handle=
+)
++static void reregister_monitor(struct hci_dev *hdev, int handle)
+ {
+ 	struct adv_monitor *monitor;
+ 	struct msft_data *msft =3D hdev->msft_data;
+@@ -182,6 +185,69 @@ static void reregister_monitor_on_restart(struct hci_d=
+ev *hdev, int handle)
+ 	}
+ }
+=20
++/* This function requires the caller holds hdev->lock */
++static void remove_monitor_on_suspend(struct hci_dev *hdev, int handle)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
-+
-+	buf[0] = hci_dev_test_flag(hdev, HCI_DUT_MODE) ? 'Y' : 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
-+}
-+
-+static ssize_t dut_mode_write(struct file *file, const char __user *user_buf,
-+			      size_t count, loff_t *ppos)
-+{
-+	struct hci_dev *hdev = file->private_data;
-+	struct sk_buff *skb;
-+	bool enable;
++	struct adv_monitor *monitor;
++	struct msft_data *msft =3D hdev->msft_data;
 +	int err;
 +
-+	if (!test_bit(HCI_UP, &hdev->flags))
-+		return -ENETDOWN;
++	while (1) {
++		monitor =3D idr_get_next(&hdev->adv_monitors_idr, &handle);
++		if (!monitor) {
++			/* All monitors have been removed */
++			msft->suspending =3D false;
++			hci_update_background_scan(hdev);
++			return;
++		}
 +
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
++		msft->pending_remove_handle =3D (u16)handle;
++		err =3D __msft_remove_monitor(hdev, monitor, handle);
 +
-+	if (enable == hci_dev_test_flag(hdev, HCI_DUT_MODE))
-+		return -EALREADY;
++		/* If success, return and wait for monitor removed callback */
++		if (!err)
++			return;
 +
-+	hci_req_sync_lock(hdev);
-+	if (enable)
-+		skb = __hci_cmd_sync(hdev, HCI_OP_ENABLE_DUT_MODE, 0, NULL,
-+				     HCI_CMD_TIMEOUT);
-+	else
-+		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
-+				     HCI_CMD_TIMEOUT);
-+	hci_req_sync_unlock(hdev);
-+
-+	if (IS_ERR(skb))
-+		return PTR_ERR(skb);
-+
-+	kfree_skb(skb);
-+
-+	hci_dev_change_flag(hdev, HCI_DUT_MODE);
-+
-+	return count;
++		/* Otherwise free the monitor and keep removing */
++		hci_free_adv_monitor(hdev, monitor);
++		handle++;
++	}
 +}
 +
-+static const struct file_operations dut_mode_fops = {
-+	.open		= simple_open,
-+	.read		= dut_mode_read,
-+	.write		= dut_mode_write,
-+	.llseek		= default_llseek,
-+};
-+
-+static ssize_t vendor_diag_read(struct file *file, char __user *user_buf,
-+				size_t count, loff_t *ppos)
++/* This function requires the caller holds hdev->lock */
++void msft_suspend(struct hci_dev *hdev)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	char buf[3];
++	struct msft_data *msft =3D hdev->msft_data;
 +
-+	buf[0] = hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) ? 'Y' : 'N';
-+	buf[1] = '\n';
-+	buf[2] = '\0';
-+	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++	if (!msft)
++		return;
++
++	if (msft_monitor_supported(hdev)) {
++		msft->suspending =3D true;
++		/* Quitely remove all monitors on suspend to avoid waking up
++		 * the system.
++		 */
++		remove_monitor_on_suspend(hdev, 0);
++	}
 +}
 +
-+static ssize_t vendor_diag_write(struct file *file, const char __user *user_buf,
-+				 size_t count, loff_t *ppos)
++/* This function requires the caller holds hdev->lock */
++void msft_resume(struct hci_dev *hdev)
 +{
-+	struct hci_dev *hdev = file->private_data;
-+	bool enable;
-+	int err;
++	struct msft_data *msft =3D hdev->msft_data;
 +
-+	err = kstrtobool_from_user(user_buf, count, &enable);
-+	if (err)
-+		return err;
++	if (!msft)
++		return;
 +
-+	/* When the diagnostic flags are not persistent and the transport
-+	 * is not active or in user channel operation, then there is no need
-+	 * for the vendor callback. Instead just store the desired value and
-+	 * the setting will be programmed when the controller gets powered on.
-+	 */
-+	if (test_bit(HCI_QUIRK_NON_PERSISTENT_DIAG, &hdev->quirks) &&
-+	    (!test_bit(HCI_RUNNING, &hdev->flags) ||
-+	     hci_dev_test_flag(hdev, HCI_USER_CHANNEL)))
-+		goto done;
-+
-+	hci_req_sync_lock(hdev);
-+	err = hdev->set_diag(hdev, enable);
-+	hci_req_sync_unlock(hdev);
-+
-+	if (err < 0)
-+		return err;
-+
-+done:
-+	if (enable)
-+		hci_dev_set_flag(hdev, HCI_VENDOR_DIAG);
-+	else
-+		hci_dev_clear_flag(hdev, HCI_VENDOR_DIAG);
-+
-+	return count;
++	if (msft_monitor_supported(hdev)) {
++		msft->reregistering =3D true;
++		/* Monitors are removed on suspend, so we need to add all
++		 * monitors on resume.
++		 */
++		reregister_monitor(hdev, 0);
++	}
 +}
 +
-+static const struct file_operations vendor_diag_fops = {
-+	.open		= simple_open,
-+	.read		= vendor_diag_read,
-+	.write		= vendor_diag_write,
-+	.llseek		= default_llseek,
-+};
+ void msft_do_open(struct hci_dev *hdev)
+ {
+ 	struct msft_data *msft =3D hdev->msft_data;
+@@ -214,7 +280,7 @@ void msft_do_open(struct hci_dev *hdev)
+ 		/* Monitors get removed on power off, so we need to explicitly
+ 		 * tell the controller to re-monitor.
+ 		 */
+-		reregister_monitor_on_restart(hdev, 0);
++		reregister_monitor(hdev, 0);
+ 	}
+ }
+=20
+@@ -382,8 +448,7 @@ static void msft_le_monitor_advertisement_cb(struct hci=
+_dev *hdev,
+=20
+ 	/* If in restart/reregister sequence, keep registering. */
+ 	if (msft->reregistering)
+-		reregister_monitor_on_restart(hdev,
+-					      msft->pending_add_handle + 1);
++		reregister_monitor(hdev, msft->pending_add_handle + 1);
+=20
+ 	hci_dev_unlock(hdev);
+=20
+@@ -420,13 +485,25 @@ static void msft_le_cancel_monitor_advertisement_cb(s=
+truct hci_dev *hdev,
+ 	if (handle_data) {
+ 		monitor =3D idr_find(&hdev->adv_monitors_idr,
+ 				   handle_data->mgmt_handle);
+-		if (monitor)
 +
-+void hci_debugfs_create_basic(struct hci_dev *hdev)
++		if (monitor && monitor->state =3D=3D ADV_MONITOR_STATE_OFFLOADED)
++			monitor->state =3D ADV_MONITOR_STATE_REGISTERED;
++
++		/* Do not free the monitor if it is being removed due to
++		 * suspend. It will be re-monitored on resume.
++		 */
++		if (monitor && !msft->suspending)
+ 			hci_free_adv_monitor(hdev, monitor);
+=20
+ 		list_del(&handle_data->list);
+ 		kfree(handle_data);
+ 	}
+=20
++	/* If in suspend/remove sequence, keep removing. */
++	if (msft->suspending)
++		remove_monitor_on_suspend(hdev,
++					  msft->pending_remove_handle + 1);
++
+ 	/* If remove all monitors is required, we need to continue the process
+ 	 * here because the earlier it was paused when waiting for the
+ 	 * response from controller.
+@@ -445,7 +522,8 @@ static void msft_le_cancel_monitor_advertisement_cb(str=
+uct hci_dev *hdev,
+ 	hci_dev_unlock(hdev);
+=20
+ done:
+-	hci_remove_adv_monitor_complete(hdev, status);
++	if (!msft->suspending)
++		hci_remove_adv_monitor_complete(hdev, status);
+ }
+=20
+ static void msft_le_set_advertisement_filter_enable_cb(struct hci_dev *hde=
+v,
+@@ -578,15 +656,15 @@ int msft_add_monitor_pattern(struct hci_dev *hdev, st=
+ruct adv_monitor *monitor)
+ 	if (!msft)
+ 		return -EOPNOTSUPP;
+=20
+-	if (msft->reregistering)
++	if (msft->reregistering || msft->suspending)
+ 		return -EBUSY;
+=20
+ 	return __msft_add_monitor_pattern(hdev, monitor);
+ }
+=20
+ /* This function requires the caller holds hdev->lock */
+-int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
+-			u16 handle)
++static int __msft_remove_monitor(struct hci_dev *hdev,
++				 struct adv_monitor *monitor, u16 handle)
+ {
+ 	struct msft_cp_le_cancel_monitor_advertisement cp;
+ 	struct msft_monitor_advertisement_handle_data *handle_data;
+@@ -594,12 +672,6 @@ int msft_remove_monitor(struct hci_dev *hdev, struct a=
+dv_monitor *monitor,
+ 	struct msft_data *msft =3D hdev->msft_data;
+ 	int err =3D 0;
+=20
+-	if (!msft)
+-		return -EOPNOTSUPP;
+-
+-	if (msft->reregistering)
+-		return -EBUSY;
+-
+ 	handle_data =3D msft_find_handle_data(hdev, monitor->handle, true);
+=20
+ 	/* If no matched handle, just remove without telling controller */
+@@ -619,6 +691,21 @@ int msft_remove_monitor(struct hci_dev *hdev, struct a=
+dv_monitor *monitor,
+ 	return err;
+ }
+=20
++/* This function requires the caller holds hdev->lock */
++int msft_remove_monitor(struct hci_dev *hdev, struct adv_monitor *monitor,
++			u16 handle)
 +{
-+	debugfs_create_file("dut_mode", 0644, hdev->debugfs, hdev,
-+			    &dut_mode_fops);
++	struct msft_data *msft =3D hdev->msft_data;
 +
-+	if (hdev->set_diag)
-+		debugfs_create_file("vendor_diag", 0644, hdev->debugfs, hdev,
-+				    &vendor_diag_fops);
++	if (!msft)
++		return -EOPNOTSUPP;
++
++	if (msft->reregistering || msft->suspending)
++		return -EBUSY;
++
++	return __msft_remove_monitor(hdev, monitor, handle);
 +}
-diff --git a/net/bluetooth/hci_debugfs.h b/net/bluetooth/hci_debugfs.h
-index 4444dc8cedc2..9a8a7c93bb12 100644
---- a/net/bluetooth/hci_debugfs.h
-+++ b/net/bluetooth/hci_debugfs.h
-@@ -26,6 +26,7 @@ void hci_debugfs_create_common(struct hci_dev *hdev);
- void hci_debugfs_create_bredr(struct hci_dev *hdev);
- void hci_debugfs_create_le(struct hci_dev *hdev);
- void hci_debugfs_create_conn(struct hci_conn *conn);
-+void hci_debugfs_create_basic(struct hci_dev *hdev);
- 
++
+ void msft_req_add_set_filter_enable(struct hci_request *req, bool enable)
+ {
+ 	struct hci_dev *hdev =3D req->hdev;
+diff --git a/net/bluetooth/msft.h b/net/bluetooth/msft.h
+index 8018948c5975..27d73f82b9de 100644
+--- a/net/bluetooth/msft.h
++++ b/net/bluetooth/msft.h
+@@ -24,6 +24,8 @@ int msft_remove_monitor(struct hci_dev *hdev, struct adv_=
+monitor *monitor,
+ 			u16 handle);
+ void msft_req_add_set_filter_enable(struct hci_request *req, bool enable);
+ int msft_set_filter_enable(struct hci_dev *hdev, bool enable);
++void msft_suspend(struct hci_dev *hdev);
++void msft_resume(struct hci_dev *hdev);
+ bool msft_curve_validity(struct hci_dev *hdev);
+=20
  #else
- 
-@@ -45,4 +46,8 @@ static inline void hci_debugfs_create_conn(struct hci_conn *conn)
- {
+@@ -59,6 +61,9 @@ static inline int msft_set_filter_enable(struct hci_dev *=
+hdev, bool enable)
+ 	return -EOPNOTSUPP;
  }
- 
-+static inline void hci_debugfs_create_basic(struct hci_dev *hdev)
-+{
-+}
+=20
++void msft_suspend(struct hci_dev *hdev) {}
++void msft_resume(struct hci_dev *hdev) {}
 +
- #endif
--- 
-2.31.1
+ static inline bool msft_curve_validity(struct hci_dev *hdev)
+ {
+ 	return false;
+--=20
+2.33.0.464.g1972c5931b-goog
 
