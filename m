@@ -2,88 +2,61 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+X-Spam-Status: No, score=-18.7 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
-	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=unavailable
-	autolearn_force=no version=3.4.0
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CC34C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 08:40:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1DD5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 08:46:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F2C0A611EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 08:40:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF5CB60ED5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Sep 2021 08:46:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231243AbhIUIlw (ORCPT
+        id S231301AbhIUIsM convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Sep 2021 04:41:52 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60296 "EHLO
+        Tue, 21 Sep 2021 04:48:12 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:55477 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230497AbhIUIlv (ORCPT
+        with ESMTP id S231295AbhIUIsM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Sep 2021 04:41:51 -0400
+        Tue, 21 Sep 2021 04:48:12 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 2F8E2CED13;
-        Tue, 21 Sep 2021 10:40:22 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 95BEDCED13;
+        Tue, 21 Sep 2021 10:46:42 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v1] bluetooth: Fix Advertisement Monitor Suspend/Resume
+Subject: Re: [PATCH v6 1/4] Bluetooth: hci_sock: Add support for
+ BT_{SND,RCV}BUF
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210920162929.v1.1.Ib31940aba2253e3f25cbca09a2d977d27170e163@changeid>
-Date:   Tue, 21 Sep 2021 10:40:21 +0200
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@google.com>,
-        Miao-chen Chou <mcchou@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        netdev@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <7017A035-DC77-4532-B8C5-DF8F540FB260@holtmann.org>
-References: <20210920162929.v1.1.Ib31940aba2253e3f25cbca09a2d977d27170e163@changeid>
-To:     Manish Mandlik <mmandlik@google.com>
+In-Reply-To: <20210916201049.114392-1-luiz.dentz@gmail.com>
+Date:   Tue, 21 Sep 2021 10:46:42 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <1F53E938-77D3-4520-B119-11F81C991D44@holtmann.org>
+References: <20210916201049.114392-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Luiz,
 
-> During system suspend, advertisement monitoring is disabled by setting
-> the HCI_VS_MSFT_LE_Set_Advertisement_Filter_Enable to False. This
-> disables the monitoring during suspend, however, if the controller is
-> monitoring a device, it sends HCI_VS_MSFT_LE_Monitor_Device_Event to
-> indicate that the monitoring has been stopped for that particular
-> device. This event may occur after suspend depending on the
-> low_threshold_timeout and peer device advertisement frequency, which
-> causes early wake up.
+> This adds support for BT_{SND,RCV}BUF so userspace can set MTU based on
+> the channel usage.
 > 
-> Right way to disable the monitoring for suspend is by removing all the
-> monitors before suspend and re-monitor after resume to ensure no events
-> are received during suspend. This patch fixes this suspend/resume issue.
+> Fixes: https://github.com/bluez/bluez/issues/201
 > 
-> Following tests are performed:
-> - Add monitors before suspend and make sure DeviceFound gets triggered
-> - Suspend the system and verify that all monitors are removed by kernel
->  but not Released by bluetoothd
-> - Wake up and verify that all monitors are added again and DeviceFound
->  gets triggered
-> 
-> Reviewed-by: apusaka@google.com
-> Reviewed-by: mcchou@google.com
-
-this come after your s-o-b line and they requires clear name as well.
-
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> 
-> net/bluetooth/hci_request.c |  15 +++--
-> net/bluetooth/msft.c        | 117 +++++++++++++++++++++++++++++++-----
-> net/bluetooth/msft.h        |   5 ++
-> 3 files changed, 116 insertions(+), 21 deletions(-)
+> net/bluetooth/hci_sock.c | 102 ++++++++++++++++++++++++++++++++++-----
+> 1 file changed, 91 insertions(+), 11 deletions(-)
+
+so I applied patches 1, 3 and 4 to bluetooth-next tree.
+
+The patch 2 needs a more details review when I have time since I remember there were cases where the SKB copy was really needed.
 
 Regards
 
