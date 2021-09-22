@@ -7,62 +7,62 @@ X-Spam-Status: No, score=-10.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E1EDAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 21:34:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFB08C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 21:34:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3B5F60F13
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 21:34:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9D35C611CA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 21:34:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238109AbhIVVfh (ORCPT
+        id S238110AbhIVVfi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Sep 2021 17:35:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43444 "EHLO
+        Wed, 22 Sep 2021 17:35:38 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43446 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237852AbhIVVfg (ORCPT
+        with ESMTP id S238095AbhIVVfg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 22 Sep 2021 17:35:36 -0400
-Received: from mail-pf1-x435.google.com (mail-pf1-x435.google.com [IPv6:2607:f8b0:4864:20::435])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D322C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 14:34:05 -0700 (PDT)
-Received: by mail-pf1-x435.google.com with SMTP id k17so3852406pff.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 14:34:05 -0700 (PDT)
+Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1258C061756
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 14:34:06 -0700 (PDT)
+Received: by mail-pg1-x52c.google.com with SMTP id t1so4191083pgv.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 14:34:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=A1BV8yc+WIVMTyKQmRATYHHHU1eqohBieG5PCWeCseE=;
-        b=C31y1csEvJJyddwNkKs6HY4pQIRKFYIR5Ma/0N4kBZDLta0xnahd3tbr3tTEyUlBT0
-         YMtzZPaoirdJPkOHEadqqYUIg0hGFrxKGR3R1/vICDU6e1Pe1eyXOuqx873Mb89cFu7W
-         PbqSi1xHN58crOnxgQdnTxRxpbtut/TVo0fEYAVbVmF5k+v2ubDrLuIY7vS0yspZRjSq
-         ni98kAkG0F6imDqBhyxhdywQRLrhpY4RQWfkzxIa2y4PAnioyuV7zuD/IAoGhYz6W+WO
-         4B4b7FCbDN2u6keHUR2J9ZWwl6cVFav2GL9C0DVv0oz3L6AMZk/CxgXy/RaLNPlwl05K
-         44Ew==
+        bh=9OxrZIWGpEmRGj6uQ1qyfI73FR4n2zyX+n1QWCYZ1sw=;
+        b=WTZLQeeLQg5LmVTFoEhouWVOdP7JXv4zwn+wySpIr04gAFIbddFxU5y/LZHTos3t42
+         lemcuJPS0yo6rt+2Ek2ms9guzZlrz2NybYhGkv34bYwyRRfZj+ZgR3WnXG23LN6fcua/
+         MtRezdIR1WF/y3q6UoI89KHHE1omeSsvISC7PwC+wSPbx+uOgqeZoPq2kLH/lW1IVe1X
+         lXEQ7wpgl4PIm2POMf9OVYv8Y3QEATm44pcNbK1ryh+vVeujrx3ckpKQJdyXMO8Wqxiy
+         3G4cGOSnkgYHgAmtDQms4Zv/hCo9VZpkch/i8zpicWIeOClhDC6tEswJOoxLocZepBgH
+         PpkA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=A1BV8yc+WIVMTyKQmRATYHHHU1eqohBieG5PCWeCseE=;
-        b=XXANZtyttYLnaACclXXEO0+NL/YBoMPepvppm+9uNvuEJftUc5GBD95lxBeZ39+wrk
-         An/X4qzTaMk8U+c4kT5gTGFUCNiYMAH3Za47AYO8WT5tW9t/TZb0fTGPWsFPlvRvGRrg
-         hs7E3214Lnxt0iea1BcOW9IHCmIl6KzfGSIiap92PJZFH9z+su8lb8d+CCYPAtFDtwbt
-         /2kSKWNM4DG4Z9UfkfzdnzVi0tlxM1RgVYRQIGKxuNm03X35oo6r0LX8GUxmxI3x/Wlk
-         D/p4/z0ND0jQ8DtLtZyEW+DHcD9Stu2itMbmlwoZWzXZRHOcuFVzzVHxmBIv89DG+VFh
-         r7kg==
-X-Gm-Message-State: AOAM5314XEHGA0gPFcwEIOslh043x5a8x9WvGQLM0WzdBRMSuMSBV3U/
-        2IsVk8ovRjWBmnpgBzzwqtERLtMOeOw=
-X-Google-Smtp-Source: ABdhPJx9doWyv+jXCGZ+Mn1t5w5cmszDM86UbA64R2dfPmPtFsW8smwT1aIRRca0ThHkmVaytC92EQ==
-X-Received: by 2002:a63:5fd8:: with SMTP id t207mr27567pgb.123.1632346445069;
+        bh=9OxrZIWGpEmRGj6uQ1qyfI73FR4n2zyX+n1QWCYZ1sw=;
+        b=ylATuVfmTKrjDqY+YuuQDwAg1/JjpIc96JPDn3/QWKMo4ZdbXwF+Cg8tmwjCKHy/FS
+         0aAMYyhZZKw67OWpJ+WIJ7UzqpJTAyVlvOoz4NOzTQyYJu1qDDTsqoOjHZg6TThsxT75
+         +WSmf2gmzHU8KzNLPJqMuLE0HXz+oe64Z9H2agij7HmwEhqKiS2Zx4gSBt7Ti70g8PWc
+         PNc0ryJyewa2AQWhTMpmVQLx/U/1qVYUoE4tqcjzCImlNxwmJtVZ57K7QUA9E41kyDOf
+         OUH0fcTKugpID3boRL2lMSE3eVJTXM3qYtMy/20IGX4lw0A36uDP0+zussT9nJ98TP+0
+         hrFQ==
+X-Gm-Message-State: AOAM531O0syULGFRZ0kCmYE/4GZpE00aEH77tzVoZ2Jkr/R5idZuRxWp
+        sBKEpoEAaNGAHeRLU6yLW0C69SGaJVE=
+X-Google-Smtp-Source: ABdhPJxbjHTzysem1eA01hjsf3TykPsDDFauhYY02D/n0cC2oKfK3kUwg2osTNrKz3VPKcCoGq5wuw==
+X-Received: by 2002:a63:590e:: with SMTP id n14mr954385pgb.434.1632346445868;
         Wed, 22 Sep 2021 14:34:05 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id i12sm6378596pjv.19.2021.09.22.14.34.04
+        by smtp.gmail.com with ESMTPSA id i12sm6378596pjv.19.2021.09.22.14.34.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 14:34:04 -0700 (PDT)
+        Wed, 22 Sep 2021 14:34:05 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 3/4] shared/mgmt: Add mgmt_get_mtu
-Date:   Wed, 22 Sep 2021 14:34:01 -0700
-Message-Id: <20210922213402.1978215-3-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 4/4] adapter: Truncate number of LTKs loaded if over MGMT MTU
+Date:   Wed, 22 Sep 2021 14:34:02 -0700
+Message-Id: <20210922213402.1978215-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210922213402.1978215-1-luiz.dentz@gmail.com>
 References: <20210922213402.1978215-1-luiz.dentz@gmail.com>
@@ -74,39 +74,85 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds mgmt_get_mtu function which can be used to query the
-transport MTU.
+If MGMT MTU cannot accomodate all the existing LTKs only send the ones
+that fit in the MTU and leave the remaining as unpaired.
 ---
- src/shared/mgmt.c | 8 ++++++++
- src/shared/mgmt.h | 2 ++
- 2 files changed, 10 insertions(+)
+ src/adapter.c | 32 ++++++++++++++++++--------------
+ 1 file changed, 18 insertions(+), 14 deletions(-)
 
-diff --git a/src/shared/mgmt.c b/src/shared/mgmt.c
-index cec8993e7..41457b430 100644
---- a/src/shared/mgmt.c
-+++ b/src/shared/mgmt.c
-@@ -963,3 +963,11 @@ bool mgmt_unregister_all(struct mgmt *mgmt)
+diff --git a/src/adapter.c b/src/adapter.c
+index 45c187a18..5846f0396 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -4163,8 +4163,9 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ {
+ 	struct mgmt_cp_load_long_term_keys *cp;
+ 	struct mgmt_ltk_info *key;
+-	size_t key_count, cp_size;
++	size_t key_count, max_key_count, cp_size;
+ 	GSList *l;
++	uint16_t mtu;
  
- 	return true;
- }
+ 	/*
+ 	 * If the controller does not support Low Energy operation,
+@@ -4180,6 +4181,9 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ 		return;
+ 
+ 	key_count = g_slist_length(keys);
++	mtu = mgmt_get_mtu(adapter->mgmt);
++	max_key_count = (mtu - sizeof(*cp)) / sizeof(*key);
++	key_count = MIN(max_key_count, key_count);
+ 
+ 	DBG("hci%u keys %zu", adapter->dev_id, key_count);
+ 
+@@ -4199,8 +4203,10 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ 	 */
+ 	cp->key_count = htobs(key_count);
+ 
+-	for (l = keys, key = cp->keys; l != NULL; l = g_slist_next(l), key++) {
++	for (l = keys, key = cp->keys; l && key_count;
++			l = g_slist_next(l), key++, key_count--) {
+ 		struct smp_ltk_info *info = l->data;
++		struct btd_device *dev;
+ 
+ 		bacpy(&key->addr.bdaddr, &info->bdaddr);
+ 		key->addr.type = info->bdaddr_type;
+@@ -4210,6 +4216,16 @@ static void load_ltks(struct btd_adapter *adapter, GSList *keys)
+ 		key->type = info->authenticated;
+ 		key->central = info->central;
+ 		key->enc_size = info->enc_size;
 +
-+uint16_t mgmt_get_mtu(struct mgmt *mgmt)
-+{
-+	if (!mgmt)
-+		return 0;
-+
-+	return mgmt->mtu;
-+}
-diff --git a/src/shared/mgmt.h b/src/shared/mgmt.h
-index 808bf4c7f..56add613d 100644
---- a/src/shared/mgmt.h
-+++ b/src/shared/mgmt.h
-@@ -76,3 +76,5 @@ unsigned int mgmt_register(struct mgmt *mgmt, uint16_t event, uint16_t index,
- bool mgmt_unregister(struct mgmt *mgmt, unsigned int id);
- bool mgmt_unregister_index(struct mgmt *mgmt, uint16_t index);
- bool mgmt_unregister_all(struct mgmt *mgmt);
-+
-+uint16_t mgmt_get_mtu(struct mgmt *mgmt);
++		/* Mark device as paired as their LTKs can be loaded. */
++		dev = btd_adapter_find_device(adapter, &info->bdaddr,
++							info->bdaddr_type);
++		if (dev) {
++			device_set_paired(dev, info->bdaddr_type);
++			device_set_bonded(dev, info->bdaddr_type);
++			device_set_ltk_enc_size(dev, info->enc_size);
++			device_set_ltk_enc_size(dev, info->enc_size);
++		}
+ 	}
+ 
+ 	adapter->load_ltks_id = mgmt_send(adapter->mgmt,
+@@ -4769,18 +4785,6 @@ device_exist:
+ 			device_set_bonded(device, BDADDR_BREDR);
+ 		}
+ 
+-		if (ltk_info || peripheral_ltk_info) {
+-			device_set_paired(device, bdaddr_type);
+-			device_set_bonded(device, bdaddr_type);
+-
+-			if (ltk_info)
+-				device_set_ltk_enc_size(device,
+-							ltk_info->enc_size);
+-			else if (peripheral_ltk_info)
+-				device_set_ltk_enc_size(device,
+-						peripheral_ltk_info->enc_size);
+-		}
+-
+ free:
+ 		g_key_file_free(key_file);
+ 	}
 -- 
 2.31.1
 
