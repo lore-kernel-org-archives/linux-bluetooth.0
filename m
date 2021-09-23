@@ -2,131 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84163C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 22:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68E35C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6ADA7610A0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Sep 2021 22:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3C14361038
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238293AbhIVWhR (ORCPT
+        id S239037AbhIWD2l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Sep 2021 18:37:17 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57362 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229506AbhIVWhN (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Sep 2021 18:37:13 -0400
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEF54C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 15:35:42 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id 138so15034435qko.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 15:35:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=QzJDN4hvwg9H4KyG7nyyS8CQ6gK5uU+WvxWUyvyu9Kc=;
-        b=N3cRK3uCqgMIhKByxNJMSYvnCEWH7Orn1mWrJMXB2702Izvz9XulR1ZETezqjI0Neg
-         HtBCk6Ofw5EYDjfmJ7LQ3vyAQJ/tMFUX0RJijAB2jA/rJ9tcHEaeWqvKQIIP4PqDkgEn
-         Jmd3ncTsmQAd4hwp8F6P7mRNH4FqLWNBzUcieRJhtMagC24BnamqtAVZU6OqtApH8gpp
-         DH2T64G+JZuIeEwZS4EBYA9r5fscx5Iu9Ix6pNpnp70wxfGpn+vfGMof4i070OnGt8Qn
-         0wTxvxurFpc5haFqrwih6YNPIRls3eXDQ0jOs3g6DPVHc2WmMtJMzjJfXcjveBehepxc
-         qtHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=QzJDN4hvwg9H4KyG7nyyS8CQ6gK5uU+WvxWUyvyu9Kc=;
-        b=WPYPSbJoFBVWvJ9iPZo3SBTVulAtf77QLh+V4DAO7Xd46f2Bsx8NHIF14AxhUWYL13
-         YVNyKjmV0Ff+x3y7rmvmprCFYbY0noZ189RJ6h798Z3b7Vq+XJDueKOXoq/+uTPlPPE3
-         5qbPjZ/4S5WmtwujqEqQu7cE63ssDUOXZyg89BUptFaLA6IrOaBvyb9QqvV13x3Xme/k
-         o9Yt3YEhc1GbJf44KjwlkwZeHGwAiDqyKvo1qYsfPp3W+yqwPoO5NMurU375BOH6ZHcp
-         bIIC9bFLJELBom1wnGBRHjKLdtRh8tlR4a8V7ixQPbMD1lHwhKvoG/fbEezkIkNOhWJI
-         QDOg==
-X-Gm-Message-State: AOAM533bYOMKrvBlYI/E1siDNSfaJ+pieJOd9Q2z7oYZsXXDxf5Qj9V6
-        Run9DIyjDGSrX9x4W1P6XAO+IbjfJaP1lg==
-X-Google-Smtp-Source: ABdhPJw11JnstP6ur6/3ge32lAJ9nC0ZenZ788a/Cg+icRMUcP46oPPu2CZuLog9ZiYl1a5r7t3EbA==
-X-Received: by 2002:a37:8287:: with SMTP id e129mr1794254qkd.415.1632350141818;
-        Wed, 22 Sep 2021 15:35:41 -0700 (PDT)
-Received: from [172.17.0.2] ([40.84.35.13])
-        by smtp.gmail.com with ESMTPSA id l1sm2349816qti.94.2021.09.22.15.35.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Sep 2021 15:35:41 -0700 (PDT)
-Message-ID: <614bafbd.1c69fb81.c4aa.37ba@mx.google.com>
-Date:   Wed, 22 Sep 2021 15:35:41 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5818766418056963531=="
+        Wed, 22 Sep 2021 23:28:41 -0400
+Received: from mga11.intel.com ([192.55.52.93]:16373 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235623AbhIWD2k (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 Sep 2021 23:28:40 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555887"
+X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
+   d="scan'208";a="220555887"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:48 -0700
+X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
+   d="scan'208";a="534072311"
+Received: from jdudwadk-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.205.211])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:47 -0700
+From:   Inga Stotland <inga.stotland@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
+Subject: [PATCH BlueZ 00/20] Mesh Configuration Database
+Date:   Wed, 22 Sep 2021 20:25:43 -0700
+Message-Id: <20210923032603.50536-1-inga.stotland@intel.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/4] shared/mgmt: Set MTU to UINT16_MAX
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210922213402.1978215-1-luiz.dentz@gmail.com>
-References: <20210922213402.1978215-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5818766418056963531==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+This patch set (I apologize for its size, but this cannot be helped)
+implements support for the newly published Mesh Configuration Database
+Profile.
 
-This is automated email and please do not reply to this email!
+The changes are mostly contained to tools/mesh-cfgclient.c and tools/mesh
+subdirectory. The only exception is the introduction of a new D-Bus mesh
+API method ExportKeys() on org.bluez.mesh.Management1 interface.
 
-Dear submitter,
+The new functionality allows to export a snapshot of mesh state
+from the point of view of mesh provisioner/configuration manager in
+a standard format that can be used for to transferring the "ownership"
+of the mesh configuration to another provisioner/configuration manager.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=551265
+The changes break backwards compatibility with for the previous
+versions of config-db.json that were generated when using
+mesh-cfgclient tool. This can be amended by manually correcting the
+field names and property values.
 
----Test result---
+Inga Stotland (20):
+  tools/mesh-cfgclient: Save provisioner info
+  tools/mesh-cfgclient: Add timestamp to config database
+  tools/mesh-cfgclient: Update stored NetKey and AppKey
+  tools/mesh-cfgclient: Keep track of updated keys
+  tools/mesh: Add new info to stored remote nodes
+  tools/mesh-cfgclient: Overwrite config values when adding new ones
+  tools/mesh-cfgclient: Store remote node's model bindings
+  tools/mesh-cfgclient: Store remote node's model subs
+  tools/mesh-cfgclient: Disallow model commands w/o composition
+  tools/mesh-cfgclient: Store remote's model publication info
+  tools/mesh-cfgclient: Check the result of config save
+  tools/mesh-cfgclient: Rename mesh-db APIs for consistency
+  tools/mesh-cfgclient: Save remote node feature setting
+  tools/mesh-cfgclient: Store remote's heartbeat sub/pub
+  tools/mesh-cfgclient: Add group parent address for DB compliance
+  doc/mesh-api: Add ExportKeys call
+  mesh: Implement ExportKeys() method
+  tools/mesh-cfgclient: Store UUIDs in standard format
+  tools/mesh-cfgclient: Excluded addresses property
+  tools/mesh-cfgclient: Export configuration database
 
-Test Summary:
-CheckPatch                    FAIL      5.36 seconds
-GitLint                       PASS      3.57 seconds
-Prep - Setup ELL              PASS      40.85 seconds
-Build - Prep                  PASS      0.48 seconds
-Build - Configure             PASS      7.30 seconds
-Build - Make                  PASS      173.82 seconds
-Make Check                    PASS      8.95 seconds
-Make Distcheck                PASS      204.82 seconds
-Build w/ext ELL - Configure   PASS      7.29 seconds
-Build w/ext ELL - Make        PASS      163.18 seconds
+ doc/mesh-api.txt       |   56 ++
+ mesh/keyring.c         |  286 ++++++++-
+ mesh/keyring.h         |    2 +
+ mesh/manager.c         |   35 ++
+ tools/mesh-cfgclient.c |  212 ++++++-
+ tools/mesh/cfgcli.c    |  284 ++++++---
+ tools/mesh/keys.c      |    4 +-
+ tools/mesh/mesh-db.c   | 1260 +++++++++++++++++++++++++++++++++++++---
+ tools/mesh/mesh-db.h   |   66 ++-
+ tools/mesh/model.h     |   13 +-
+ tools/mesh/remote.c    |  205 +++++--
+ tools/mesh/remote.h    |   11 +-
+ 12 files changed, 2206 insertions(+), 228 deletions(-)
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,4/4] adapter: Truncate number of LTKs loaded if over MGMT MTU
-WARNING:TYPO_SPELLING: 'accomodate' may be misspelled - perhaps 'accommodate'?
-#91: 
-If MGMT MTU cannot accomodate all the existing LTKs only send the ones
-                   ^^^^^^^^^^
+-- 
+2.31.1
 
-/github/workspace/src/12511495.patch total: 0 errors, 1 warnings, 64 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12511495.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5818766418056963531==--
