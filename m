@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 954ADC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4BA7DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7C51161131
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30E6D61131
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239063AbhIWD2y (ORCPT
+        id S239085AbhIWD2z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Sep 2021 23:28:54 -0400
-Received: from mga11.intel.com ([192.55.52.93]:16377 "EHLO mga11.intel.com"
+        Wed, 22 Sep 2021 23:28:55 -0400
+Received: from mga11.intel.com ([192.55.52.93]:16381 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239062AbhIWD2p (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S239045AbhIWD2p (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 22 Sep 2021 23:28:45 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555926"
+X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555932"
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="220555926"
+   d="scan'208";a="220555932"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:59 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:27:02 -0700
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="534072384"
+   d="scan'208";a="534072404"
 Received: from jdudwadk-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.205.211])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:59 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:27:02 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 14/20] tools/mesh-cfgclient: Store remote's heartbeat sub/pub
-Date:   Wed, 22 Sep 2021 20:25:57 -0700
-Message-Id: <20210923032603.50536-15-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 17/20] mesh: Implement ExportKeys() method
+Date:   Wed, 22 Sep 2021 20:26:00 -0700
+Message-Id: <20210923032603.50536-18-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210923032603.50536-1-inga.stotland@intel.com>
 References: <20210923032603.50536-1-inga.stotland@intel.com>
@@ -43,237 +43,388 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Store remote node's heartbeat publication or subscription info upon
-receiving CONFIG_HEARTBEAT_PUB_STATUS or CONFIG_HEARTBEAT_SUB_STATUS
-messages when the messages' status code is set to Success.
+Add implementation for new method ExportKeys() on
+org.bluez.mesh.Management1 interface.
+This method is used by the authorized application to export information
+about network keys, application keys and device keys present in the
+local key database.
 ---
- tools/mesh/cfgcli.c  |  30 +++++++++---
- tools/mesh/mesh-db.c | 113 +++++++++++++++++++++++++++++++++++++++++--
- tools/mesh/mesh-db.h |   4 ++
- 3 files changed, 135 insertions(+), 12 deletions(-)
+ mesh/keyring.c | 286 ++++++++++++++++++++++++++++++++++++++++++++++++-
+ mesh/keyring.h |   2 +
+ mesh/manager.c |  35 ++++++
+ 3 files changed, 322 insertions(+), 1 deletion(-)
 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index b5f39df18..2bf1a1503 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -400,7 +400,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- {
- 	uint32_t opcode, mod_id;
- 	const struct cfg_cmd *cmd;
--	uint16_t app_idx, net_idx, addr, ele_addr;
-+	uint16_t app_idx, net_idx, addr, ele_addr, features;
- 	struct mesh_group *grp;
- 	struct model_pub pub;
- 	int n;
-@@ -813,13 +813,21 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		bt_shell_printf("\nNode %4.4x Heartbeat publish status %s\n",
- 				src, mesh_status_str(data[0]));
+diff --git a/mesh/keyring.c b/mesh/keyring.c
+index f27fe4291..4b901643c 100644
+--- a/mesh/keyring.c
++++ b/mesh/keyring.c
+@@ -26,6 +26,7 @@
  
--		bt_shell_printf("Destination\t%4.4x\n", get_le16(data + 1));
--		bt_shell_printf("Count\t\t%2.2x\n", data[3]);
--		bt_shell_printf("Period\t\t%2.2x\n", data[4]);
-+		if (data[0] != MESH_STATUS_SUCCESS)
-+			return true;
-+
-+		addr = get_le16(data + 1);
-+		bt_shell_printf("Destination\t%4.4x\n", addr);
-+		bt_shell_printf("CountLog\t\t%2.2x\n", data[3]);
-+		bt_shell_printf("PeriodLog\t\t%2.2x\n", data[4]);
- 		bt_shell_printf("TTL\t\t%2.2x\n", data[5]);
--		bt_shell_printf("Features\t%4.4x\n", get_le16(data + 6));
-+		features = get_le16(data + 6);
-+		bt_shell_printf("Features\t%4.4x\n", features);
- 		net_idx = get_le16(data + 8);
- 		bt_shell_printf("Net_Idx\t%u (0x%3.3x)\n", net_idx, net_idx);
-+
-+		saved = mesh_db_node_set_hb_pub(src, addr, net_idx, data[4],
-+							data[5], features);
- 		break;
+ #include "mesh/mesh-defs.h"
  
- 	/* Per Mesh Profile 4.3.2.66 */
-@@ -830,12 +838,20 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 		bt_shell_printf("\nNode %4.4x Heartbeat subscribe status %s\n",
- 				src, mesh_status_str(data[0]));
++#include "mesh/dbus.h"
+ #include "mesh/node.h"
+ #include "mesh/keyring.h"
  
--		bt_shell_printf("Source\t\t%4.4x\n", get_le16(data + 1));
--		bt_shell_printf("Destination\t%4.4x\n", get_le16(data + 3));
-+		if (data[0] != MESH_STATUS_SUCCESS)
-+			return true;
-+
-+		ele_addr = get_le16(data + 1);
-+		bt_shell_printf("Source\t\t%4.4x\n", ele_addr);
-+		addr = get_le16(data + 3);
-+		bt_shell_printf("Destination\t%4.4x\n", addr);
- 		bt_shell_printf("Period\t\t%2.2x\n", data[5]);
- 		bt_shell_printf("Count\t\t%2.2x\n", data[6]);
- 		bt_shell_printf("Min Hops\t%2.2x\n", data[7]);
- 		bt_shell_printf("Max Hops\t%2.2x\n", data[8]);
-+
-+		saved = mesh_db_node_set_hb_sub(src, ele_addr, addr);
-+
- 		break;
+@@ -276,7 +277,6 @@ bool keyring_get_remote_dev_key(struct mesh_node *node, uint16_t unicast,
  
- 	/* Per Mesh Profile 4.3.2.71 */
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index 3290c5b8e..42ba831d4 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -963,12 +963,24 @@ static void jarray_string_del(json_object *jarray, const char *str, size_t len)
- 	}
- }
- 
-+static bool add_array_string(json_object *jarray, const char *str)
-+{
-+	json_object *jstring;
-+
-+	jstring = json_object_new_string(str);
-+	if (!jstring)
-+		return false;
-+
-+	json_object_array_add(jarray, jstring);
-+	return true;
-+}
-+
- static bool update_model_string_array(uint16_t unicast, uint16_t ele_addr,
- 						bool vendor, uint32_t mod_id,
- 						const char *str, uint32_t len,
- 						const char *keyword, bool add)
- {
--	json_object *jarray, *jmod, *jstring;
-+	json_object *jarray, *jmod;
- 
- 	if (!cfg || !cfg->jcfg)
- 		return false;
-@@ -988,12 +1000,9 @@ static bool update_model_string_array(uint16_t unicast, uint16_t ele_addr,
- 	if (!add)
- 		return true;
- 
--	jstring = json_object_new_string(str);
--	if (!jstring)
-+	if (!add_array_string(jarray, str))
- 		return false;
- 
--	json_object_array_add(jarray, jstring);
+ 	snprintf(key_file, PATH_MAX, "%s%s/%4.4x", node_path, dev_key_dir,
+ 								unicast);
 -
- 	return save_config();
- }
+ 	fd = open(key_file, O_RDONLY);
+ 	if (fd >= 0) {
+ 		if (read(fd, dev_key, 16) == 16)
+@@ -349,3 +349,287 @@ bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
  
-@@ -1179,6 +1188,100 @@ fail:
- 	return false;
+ 	return true;
  }
- 
-+bool mesh_db_node_set_hb_pub(uint16_t unicast, uint16_t dst, uint16_t net_idx,
-+						uint8_t period_log, uint8_t ttl,
-+							uint16_t features)
++
++static DIR *open_key_dir(const char *node_path, const char *key_dir_name)
 +{
-+	json_object *jnode, *jpub, *jarray = NULL;
-+	uint32_t period;
++	char dir_path[PATH_MAX];
++	DIR *key_dir;
 +
-+	if (!cfg || !cfg->jcfg)
-+		return false;
++	if (strlen(node_path) + strlen(key_dir_name) + 1 >= PATH_MAX)
++		return NULL;
 +
-+	if (period_log > 0x12 || ttl > 0x7F)
-+		return  false;
++	snprintf(dir_path, PATH_MAX, "%s%s", node_path, key_dir_name);
 +
-+	jnode = get_node_by_unicast(cfg->jcfg, unicast);
-+	if (!jnode)
-+		return false;
++	key_dir = opendir(dir_path);
++	if (!key_dir) {
++		l_error("Failed to open keyring storage directory: %s",
++								dir_path);
++		return NULL;
++	}
 +
-+	jpub = json_object_new_object();
-+
-+	if (!write_uint16_hex(jpub, "address", dst))
-+		goto fail;
-+
-+	period = period_log ? 1 << (period_log - 1) : 0;
-+
-+	if (!write_int(jpub, "period", period))
-+		goto fail;
-+
-+	if (!write_int(jpub, "ttl", ttl))
-+		goto fail;
-+
-+	if (!write_int(jpub, "index", net_idx))
-+		goto fail;
-+
-+	jarray = json_object_new_array();
-+
-+	if (features & FEATURE_PROXY)
-+		if (!add_array_string(jarray, "proxy"))
-+			goto fail;
-+
-+	if (features & FEATURE_RELAY)
-+		if (!add_array_string(jarray, "relay"))
-+			goto fail;
-+
-+	if (features & FEATURE_FRIEND)
-+		if (!add_array_string(jarray, "friend"))
-+			goto fail;
-+
-+	if (features & FEATURE_LPN)
-+		if (!add_array_string(jarray, "lowPower"))
-+			goto fail;
-+
-+	json_object_object_add(jpub, "features", jarray);
-+	json_object_object_del(jnode, "heartbeatPub");
-+	json_object_object_add(jnode, "heartbeatPub", jpub);
-+
-+	return save_config();
-+
-+fail:
-+	if (jarray)
-+		json_object_put(jarray);
-+
-+	json_object_put(jpub);
-+	return false;
++	return key_dir;
 +}
 +
-+bool mesh_db_node_set_hb_sub(uint16_t unicast, uint16_t src, uint16_t dst)
++static int open_key_dir_entry(int dir_fd, struct dirent *entry,
++							uint8_t fname_len)
 +{
-+	json_object *jnode, *jsub;
++	if (entry->d_type != DT_REG)
++		return -1;
 +
-+	if (!cfg || !cfg->jcfg)
-+		return false;
++	/* Check the file name length */
++	if (strlen(entry->d_name) != fname_len)
++		return -1;
 +
-+	jnode = get_node_by_unicast(cfg->jcfg, unicast);
-+	if (!jnode)
-+		return false;
-+
-+	jsub = json_object_new_object();
-+
-+	if (!write_uint16_hex(jsub, "source", src))
-+		goto fail;
-+
-+	if (!write_uint16_hex(jsub, "destination", dst))
-+		goto fail;
-+
-+	json_object_object_del(jnode, "heartbeatSub");
-+	json_object_object_add(jnode, "heartbeatSub", jsub);
-+
-+	return save_config();
-+
-+fail:
-+	json_object_put(jsub);
-+	return false;
++	return openat(dir_fd, entry->d_name, O_RDONLY);
 +}
 +
- static void jarray_key_del(json_object *jarray, int16_t idx)
++static void append_old_key(struct l_dbus_message_builder *builder,
++							const uint8_t key[16])
++{
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', "OldKey");
++	l_dbus_message_builder_enter_variant(builder, "ay");
++	dbus_append_byte_array(builder, key, 16);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++}
++
++static void build_app_keys_reply(const char *node_path,
++					struct l_dbus_message_builder *builder,
++					uint16_t net_idx, uint8_t phase)
++{
++	DIR *key_dir;
++	int key_dir_fd;
++	struct dirent *entry;
++
++	key_dir = open_key_dir(node_path, app_key_dir);
++	if (!key_dir)
++		return;
++
++	key_dir_fd = dirfd(key_dir);
++
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', "AppKeys");
++	l_dbus_message_builder_enter_variant(builder, "a(qaya{sv})");
++	l_dbus_message_builder_enter_array(builder, "(qaya{sv})");
++
++	while ((entry = readdir(key_dir)) != NULL) {
++		struct keyring_app_key key;
++		int fd = open_key_dir_entry(key_dir_fd, entry, 3);
++
++		if (fd < 0)
++			continue;
++
++		if (read(fd, &key, sizeof(key)) != sizeof(key) ||
++						key.net_idx != net_idx) {
++			close(fd);
++			continue;
++		}
++
++		close(fd);
++
++		l_dbus_message_builder_enter_struct(builder, "qaya{sv}");
++
++		l_dbus_message_builder_append_basic(builder, 'q', &key.app_idx);
++		dbus_append_byte_array(builder, key.new_key, 16);
++
++		l_dbus_message_builder_enter_array(builder, "{sv}");
++
++		if (phase != KEY_REFRESH_PHASE_NONE)
++			append_old_key(builder, key.old_key);
++
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_struct(builder);
++	}
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++
++	closedir(key_dir);
++}
++
++static bool build_net_keys_reply(const char *node_path,
++					struct l_dbus_message_builder *builder)
++{
++	DIR *key_dir;
++	int key_dir_fd;
++	struct dirent *entry;
++	bool result = false;
++
++	key_dir = open_key_dir(node_path, net_key_dir);
++	if (!key_dir)
++		return false;
++
++	key_dir_fd = dirfd(key_dir);
++
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', "NetKeys");
++	l_dbus_message_builder_enter_variant(builder, "a(qaya{sv})");
++	l_dbus_message_builder_enter_array(builder, "(qaya{sv})");
++
++	while ((entry = readdir(key_dir)) != NULL) {
++		struct keyring_net_key key;
++		int fd = open_key_dir_entry(key_dir_fd, entry, 3);
++
++		if (fd < 0)
++			continue;
++
++		if (read(fd, &key, sizeof(key)) != sizeof(key)) {
++			close(fd);
++			goto done;
++		}
++
++		close(fd);
++
++		/*
++		 * If network key is stuck in phase 3, keyring
++		 * write failed and this key info is unreliable.
++		 */
++		if (key.phase == KEY_REFRESH_PHASE_THREE)
++			continue;
++
++		l_dbus_message_builder_enter_struct(builder, "qaya{sv}");
++
++		l_dbus_message_builder_append_basic(builder, 'q', &key.net_idx);
++		dbus_append_byte_array(builder, key.new_key, 16);
++
++		l_dbus_message_builder_enter_array(builder, "{sv}");
++
++		if (key.phase != KEY_REFRESH_PHASE_NONE) {
++			dbus_append_dict_entry_basic(builder, "Phase", "y",
++								&key.phase);
++			append_old_key(builder, key.old_key);
++		}
++
++		build_app_keys_reply(node_path, builder, key.net_idx,
++								key.phase);
++
++		l_dbus_message_builder_leave_array(builder);
++		l_dbus_message_builder_leave_struct(builder);
++	}
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++
++	result = true;
++done:
++	closedir(key_dir);
++
++	return result;
++
++}
++
++struct dev_key_entry {
++	uint16_t unicast;
++	uint8_t value[16];
++};
++
++static bool match_key_value(const void *a, const void *b)
++{
++	const struct dev_key_entry *key = a;
++	const uint8_t *value = b;
++
++	return (memcmp(key->value, value, 16) == 0);
++}
++
++static void build_dev_key_entry(void *a, void *b)
++{
++	struct dev_key_entry *key = a;
++	struct l_dbus_message_builder *builder = b;
++
++	l_dbus_message_builder_enter_struct(builder, "qay");
++	l_dbus_message_builder_append_basic(builder, 'q', &key->unicast);
++	dbus_append_byte_array(builder, key->value, 16);
++	l_dbus_message_builder_leave_struct(builder);
++}
++
++static bool build_dev_keys_reply(const char *node_path,
++					struct l_dbus_message_builder *builder)
++{
++	DIR *key_dir;
++	int key_dir_fd;
++	struct dirent *entry;
++	struct l_queue *keys;
++	bool result = false;
++
++	key_dir = open_key_dir(node_path, dev_key_dir);
++	/*
++	 * There is always at least one device key present for a local node.
++	 * Therefore, return false, if the directory does not exist.
++	 */
++	if (!key_dir)
++		return false;
++
++	key_dir_fd = dirfd(key_dir);
++
++	keys = l_queue_new();
++
++	while ((entry = readdir(key_dir)) != NULL) {
++		uint8_t buf[16];
++		uint16_t unicast;
++		struct dev_key_entry *key;
++		int fd = open_key_dir_entry(key_dir_fd, entry, 4);
++
++		if (fd < 0)
++			continue;
++
++		if (read(fd, buf, 16) != 16) {
++			close(fd);
++			goto done;
++		}
++
++		close(fd);
++
++		if (sscanf(entry->d_name, "%04hx", &unicast) != 1)
++			goto done;
++
++		key = l_queue_find(keys, match_key_value, buf);
++
++		if (key) {
++			if (key->unicast > unicast)
++				key->unicast = unicast;
++			continue;
++		}
++
++		key = l_new(struct dev_key_entry, 1);
++		key->unicast = unicast;
++		memcpy(key->value, buf, 16);
++		l_queue_push_tail(keys, key);
++	}
++
++	l_dbus_message_builder_enter_dict(builder, "sv");
++	l_dbus_message_builder_append_basic(builder, 's', "DevKeys");
++	l_dbus_message_builder_enter_variant(builder, "a(qay)");
++	l_dbus_message_builder_enter_array(builder, "(qay)");
++
++	l_queue_foreach(keys, build_dev_key_entry, builder);
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_leave_variant(builder);
++	l_dbus_message_builder_leave_dict(builder);
++
++	result = true;
++done:
++	l_queue_destroy(keys, l_free);
++	closedir(key_dir);
++
++	return result;
++}
++
++bool keyring_build_export_keys_reply(struct mesh_node *node,
++					struct l_dbus_message_builder *builder)
++{
++	const char *node_path;
++
++	if (!node)
++		return false;
++
++	node_path = node_get_storage_dir(node);
++
++	if (!build_net_keys_reply(node_path, builder))
++		return false;
++
++	return build_dev_keys_reply(node_path, builder);
++}
+diff --git a/mesh/keyring.h b/mesh/keyring.h
+index c2d38e9ff..ecf62cbc1 100644
+--- a/mesh/keyring.h
++++ b/mesh/keyring.h
+@@ -39,3 +39,5 @@ bool keyring_put_remote_dev_key(struct mesh_node *node, uint16_t unicast,
+ 					uint8_t count, uint8_t dev_key[16]);
+ bool keyring_del_remote_dev_key(struct mesh_node *node, uint16_t unicast,
+ 								uint8_t count);
++bool keyring_build_export_keys_reply(struct mesh_node *node,
++					struct l_dbus_message_builder *builder);
+diff --git a/mesh/manager.c b/mesh/manager.c
+index d70993e3b..e66b1a45b 100644
+--- a/mesh/manager.c
++++ b/mesh/manager.c
+@@ -776,6 +776,38 @@ static struct l_dbus_message *set_key_phase_call(struct l_dbus *dbus,
+ 	return l_dbus_message_new_method_return(msg);
+ }
+ 
++static struct l_dbus_message *export_keys_call(struct l_dbus *dbus,
++						struct l_dbus_message *msg,
++						void *user_data)
++{
++	const char *sender = l_dbus_message_get_sender(msg);
++	struct l_dbus_message_builder *builder;
++	struct l_dbus_message *reply;
++	struct mesh_node *node = user_data;
++
++	l_debug("Export Keys");
++
++	if (strcmp(sender, node_get_owner(node)))
++		return dbus_error(msg, MESH_ERROR_NOT_AUTHORIZED, NULL);
++
++	reply = l_dbus_message_new_method_return(msg);
++	builder = l_dbus_message_builder_new(reply);
++
++	l_dbus_message_builder_enter_array(builder, "{sv}");
++
++	if (!keyring_build_export_keys_reply(node, builder)) {
++		l_dbus_message_builder_destroy(builder);
++		l_dbus_message_unref(reply);
++		return dbus_error(msg, MESH_ERROR_FAILED, NULL);
++	}
++
++	l_dbus_message_builder_leave_array(builder);
++	l_dbus_message_builder_finalize(builder);
++	l_dbus_message_builder_destroy(builder);
++
++	return reply;
++}
++
+ static void setup_management_interface(struct l_dbus_interface *iface)
  {
- 	int i, sz = json_object_array_length(jarray);
-diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
-index b3b0bce79..16c46c046 100644
---- a/tools/mesh/mesh-db.h
-+++ b/tools/mesh/mesh-db.h
-@@ -74,6 +74,10 @@ bool mesh_db_node_model_del_sub_all(uint16_t unicast, uint16_t ele, bool vendor,
- bool mesh_db_node_model_set_pub(uint16_t unicast, uint16_t ele_addr,
- 					bool vendor, uint32_t mod_id,
- 					struct model_pub *pub, bool virt);
-+bool mesh_db_node_set_hb_pub(uint16_t unicast, uint16_t dst, uint16_t net_idx,
-+						uint8_t period_log, uint8_t ttl,
-+							uint16_t features);
-+bool mesh_db_node_set_hb_sub(uint16_t unicast, uint16_t src, uint16_t dst);
- struct l_queue *mesh_db_load_groups(void);
- bool mesh_db_add_group(struct mesh_group *grp);
- bool mesh_db_add_rejected_addr(uint16_t unicast, uint32_t iv_index);
+ 	l_dbus_interface_method(iface, "AddNode", 0, add_node_call, "",
+@@ -807,6 +839,9 @@ static void setup_management_interface(struct l_dbus_interface *iface)
+ 							"app_index", "app_key");
+ 	l_dbus_interface_method(iface, "SetKeyPhase", 0, set_key_phase_call, "",
+ 						"qy", "net_index", "phase");
++	l_dbus_interface_method(iface, "ExportKeys", 0, export_keys_call,
++							"a(qaya{sv})a(qay)", "",
++							"net_keys", "dev_keys");
+ }
+ 
+ bool manager_dbus_init(struct l_dbus *bus)
 -- 
 2.31.1
 
