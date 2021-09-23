@@ -2,107 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+X-Spam-Status: No, score=-17.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=no autolearn_force=no version=3.4.0
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,MENTIONS_GIT_HOSTING,SPF_HELO_NONE,SPF_PASS,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E2F3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 16:52:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 872DBC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 21:04:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5091561211
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 16:52:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 696ED61242
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 21:04:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233389AbhIWQyT (ORCPT
+        id S243213AbhIWVFq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Sep 2021 12:54:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53612 "EHLO
+        Thu, 23 Sep 2021 17:05:46 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55002 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231982AbhIWQyS (ORCPT
+        with ESMTP id S243209AbhIWVFq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Sep 2021 12:54:18 -0400
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF5C1C061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 09:52:46 -0700 (PDT)
-Received: by mail-qt1-x82a.google.com with SMTP id t13so901569qtc.7
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 09:52:46 -0700 (PDT)
+        Thu, 23 Sep 2021 17:05:46 -0400
+Received: from mail-vk1-xa2e.google.com (mail-vk1-xa2e.google.com [IPv6:2607:f8b0:4864:20::a2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 40074C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 14:04:14 -0700 (PDT)
+Received: by mail-vk1-xa2e.google.com with SMTP id f73so3148447vkf.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 14:04:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ZWuXLt9njjO8N3oG0x5ko4j0aH+VumJJVD/Y8vaguF8=;
-        b=pxsA6Frh9jEtefK81b+KXvKnY74dBWY6+NF1gpsJjfcqU0EZ/WbaTB2h5QBoS48eai
-         V+w+AISVhuV/iqIhJAnsoX2E8xFq7UcLpT+14xrN08aExrUs3xZd+HSuC2w04WMtBWiv
-         I0/33PwpauXqbQC7AxrTCfZQgGwZfsXRw8mxp4NHwPhDEEi5CVaO4Js3lUk3ofAa4Dd3
-         Ykl6BTNBTvW+uQBFfoFtG3jEUw9xpV7jbnj95TQOqGJdXg6XMM2PC4UjD1zJPlDP7vGn
-         fsj8KyRuF6CILymNjE89Q1Atu2/Oxsbpx2oMgys9lgDfjR2h6BdBhPBmm8aRU7vQtw5G
-         z48w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=LBvhhleKp1K0/C7xC8Ic0X0Vda3XkzefmUrMq40BeQc=;
+        b=pTAFsww0nD//wFjzhdQbWi9sjmtX44O+PReWs4QGsQEyghaG3Ku9EzAX0FgFc6Pe9A
+         uPyy9p/tf1Ktm/JfhmKPX0oSv44hSv587MxouoEbI7VnhvcagDdA5CMBJXS2iJm9qbLO
+         YHR7GPg84yIvs9uroYLf7Z5kXIQTkuJ00JNDrh+gOIlaeC4KT2U5JDpAPJNFGXvuMzuw
+         0/hDxxk5iS2l4QwIaoK2UncUM85iHd4wTVfHdwhpfAfy+jUxBeSXFdhv4qQjPttylEY2
+         2o/zG6Ax/FKb2cCZxzSXZHPquERK9Okh2a4hQ67SCCydDEiq7S1dZgbw0/E0e5kBede7
+         Ll+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ZWuXLt9njjO8N3oG0x5ko4j0aH+VumJJVD/Y8vaguF8=;
-        b=fp8T7fxfvwtQvbFq06/xk9PZ1sRPuM9jTJ0y0dh1sR+7CyfVs1brMV8PhBz5Kc9Qno
-         7VeX98OkhcaYkamMVbkE4dkcVjKe8STwdbYzAbIZd9rEZzbbJBVSfEVaRtyPkLaZaYbt
-         wyCcFcCF1LUatuPKDAJFLHFGpUOWiH16YDrOQlAVSXBxRc1f1pHDgIc5cTp3H6uqYBGJ
-         DyMX1SqlqGxQPekc9+qdlcB9GulvcJ3++0VpGot0KHtLNgUPzyQOmpL7KI0nQ2MQejbs
-         10nVjohY/6YU2wXhXuS9evvItq/L/R7e0+lyzAqwWFixWIu8Pxtw1/dD5OJjQXILyWr4
-         6Bfg==
-X-Gm-Message-State: AOAM530Z/PBhflizTxczwlGTAEgWLZfccJ/bRbMDoBozp0CX64bArVjG
-        7Wg1Pqsvim2mJ3pTrCa8dDj4ePJhWmP3NQ==
-X-Google-Smtp-Source: ABdhPJw/Y1kLy3rAJlAkwwG3HlZ1Dvrxct8Sv7bAQ/L5e2Vdn8sU6LMvF9hWF1vjGcEb0CBwfololw==
-X-Received: by 2002:a05:622a:130c:: with SMTP id v12mr2218375qtk.315.1632415965874;
-        Thu, 23 Sep 2021 09:52:45 -0700 (PDT)
-Received: from [172.17.0.2] ([20.57.126.148])
-        by smtp.gmail.com with ESMTPSA id u9sm4460220qke.91.2021.09.23.09.52.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Sep 2021 09:52:45 -0700 (PDT)
-Message-ID: <614cb0dd.1c69fb81.a826d.2a81@mx.google.com>
-Date:   Thu, 23 Sep 2021 09:52:45 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6472471686899915652=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=LBvhhleKp1K0/C7xC8Ic0X0Vda3XkzefmUrMq40BeQc=;
+        b=dCJAf+wxXp7ykExCHpeyBhwPJw/pFHXwNx3PwWyt/WjxxSYgUlB4XZOja93phEP9+u
+         IzLBp/PfRzCYsSSQlaBp0l8CJDVDJRyaCOaQmKypTm3sWwXf79UpFsq1HigZuJWDmu1c
+         wGf6hyWlzRd9/qwLAuWdYniNGZq8P7yrLW/bFv+tOTJWyDdtYpmNOsiQynLjzQxoUg0h
+         oabdU1W/HIs6Jx8DtNnPauiPJs9rrRJzhXVZ1uTO4aF0GivA923wFj0QbSKN9k9/AtQI
+         tbF6xshvUMadDQYA6X6ITfSQv19y8YB3/h82VbwjDIrfapHBlrPgSZpcDrfuTDNkWpgD
+         ByWw==
+X-Gm-Message-State: AOAM530VFIfHRYWuveZuUUENnPd5DDh19vkKf92tx8q17Pid/DCuuln6
+        MsBDAV+jgNF0hiKyoOwnYJ+zqn5gOeVvChNMuo69aLqscS4=
+X-Google-Smtp-Source: ABdhPJxIXRVKZnUrc0ikjQt72cn8xAdonXFH56jUrrGgBsYF1A+zOnff5zp2+aZQh4R0FQixioeJamOt5MDtZhR55co=
+X-Received: by 2002:a1f:a9c4:: with SMTP id s187mr5073874vke.9.1632431053295;
+ Thu, 23 Sep 2021 14:04:13 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
-Subject: RE: Mesh Configuration Database
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210923032603.50536-2-inga.stotland@intel.com>
-References: <20210923032603.50536-2-inga.stotland@intel.com>
+References: <20210916201049.114392-1-luiz.dentz@gmail.com> <1F53E938-77D3-4520-B119-11F81C991D44@holtmann.org>
+ <CABBYNZJhaJGvbuvydtdBa7mHK7kM1Rt+KxKQ9PyNGPM4thwFuA@mail.gmail.com> <53BDC874-DDC8-4700-BB26-2BAF21403D73@holtmann.org>
+In-Reply-To: <53BDC874-DDC8-4700-BB26-2BAF21403D73@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 23 Sep 2021 14:04:02 -0700
+Message-ID: <CABBYNZ+ubDjUpm21BesXmm1oH08KH_d=QppZu_iZnY==ArDsrA@mail.gmail.com>
+Subject: Re: [PATCH v6 1/4] Bluetooth: hci_sock: Add support for BT_{SND,RCV}BUF
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6472471686899915652==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Marcel,
 
-This is automated email and please do not reply to this email!
+On Wed, Sep 22, 2021 at 7:19 AM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Luiz,
+>
+> >>> This adds support for BT_{SND,RCV}BUF so userspace can set MTU based on
+> >>> the channel usage.
+> >>>
+> >>> Fixes: https://github.com/bluez/bluez/issues/201
+> >>>
+> >>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>> ---
+> >>> net/bluetooth/hci_sock.c | 102 ++++++++++++++++++++++++++++++++++-----
+> >>> 1 file changed, 91 insertions(+), 11 deletions(-)
+> >>
+> >> so I applied patches 1, 3 and 4 to bluetooth-next tree.
+> >>
+> >> The patch 2 needs a more details review when I have time since I remember there were cases where the SKB copy was really needed.
+> >
+> > Is that something not covered by CI testing? Note we still have a copy
+> > done internally with create_monitor_ctrl_command.
+>
+> there are cases where the SKB handed down is in hdev->send() and that one is owned by the driver to make whatever modifications to headroom it pleases. So if the stack needs to send it out via other sockets, it needs a copy.
+>
+> We can optimize here, but need to be careful.
 
-Dear submitter,
+I guess you are referring to instances of hci_send_to_channel, which
+appears there only one instance that is changed in the diff bellow:
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=551419
+        if (chan->channel == HCI_CHANNEL_CONTROL) {
+-               struct sk_buff *skb;
++               struct sk_buff *cmd;
 
----Test result---
+                /* Send event to monitor */
+-               skb = create_monitor_ctrl_command(sk, index, opcode, len,
+-                                                 buf + sizeof(*hdr));
+-               if (skb) {
+-                       hci_send_to_channel(HCI_CHANNEL_MONITOR, skb,
++               cmd = create_monitor_ctrl_command(sk, index, opcode, len,
++                                                 skb->data + sizeof(*hdr));
++               if (cmd) {
++                       hci_send_to_channel(HCI_CHANNEL_MONITOR, cmd,
+                                            HCI_SOCK_TRUSTED, NULL);
+-                       kfree_skb(skb);
++                       kfree_skb(cmd);
+                }
+        }
 
-Test Summary:
-CheckPatch                    PASS      31.26 seconds
-GitLint                       PASS      18.98 seconds
-Prep - Setup ELL              PASS      51.32 seconds
-Build - Prep                  PASS      0.56 seconds
-Build - Configure             PASS      9.78 seconds
-Build - Make                  PASS      232.28 seconds
-Make Check                    PASS      9.78 seconds
-Make Distcheck                PASS      276.41 seconds
-Build w/ext ELL - Configure   PASS      9.97 seconds
-Build w/ext ELL - Make        PASS      223.01 seconds
+Ive only changed the variable name since the original code use skb
+which is now used as the original data instead of buf (extra copy), so
+nothing has changed in this regard, also running this with KSAN, etc,
+doesn't seem to produce any traces nor there seems to be anything
+wrong in btmon either.
+
+Note with this we are eliminating the extra copy on buf:
+
+msg -> skb (new) vs msg-> buf -> skb (old)
+
+> Regards
+>
+> Marcel
+>
 
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============6472471686899915652==--
+-- 
+Luiz Augusto von Dentz
