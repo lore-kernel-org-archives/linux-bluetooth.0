@@ -6,34 +6,34 @@ X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
 	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
 	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DDCE1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF06EC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C6D1961038
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7D90610A1
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239090AbhIWD2v (ORCPT
+        id S239069AbhIWD2w (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Sep 2021 23:28:51 -0400
-Received: from mga11.intel.com ([192.55.52.93]:16381 "EHLO mga11.intel.com"
+        Wed, 22 Sep 2021 23:28:52 -0400
+Received: from mga11.intel.com ([192.55.52.93]:16377 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239046AbhIWD2o (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        id S239057AbhIWD2o (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 22 Sep 2021 23:28:44 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555922"
+X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555919"
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="220555922"
+   d="scan'208";a="220555919"
 Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:58 -0700
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:57 -0700
 X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="534072376"
+   d="scan'208";a="534072365"
 Received: from jdudwadk-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.205.211])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:58 -0700
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:26:57 -0700
 From:   Inga Stotland <inga.stotland@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 12/20] tools/mesh-cfgclient: Rename mesh-db APIs for consistency
-Date:   Wed, 22 Sep 2021 20:25:55 -0700
-Message-Id: <20210923032603.50536-13-inga.stotland@intel.com>
+Subject: [PATCH BlueZ 10/20] tools/mesh-cfgclient: Store remote's model publication info
+Date:   Wed, 22 Sep 2021 20:25:53 -0700
+Message-Id: <20210923032603.50536-11-inga.stotland@intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20210923032603.50536-1-inga.stotland@intel.com>
 References: <20210923032603.50536-1-inga.stotland@intel.com>
@@ -43,327 +43,238 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Update remote node's model publication after a successful completion
+of "pub-set" or "pub-get" commands.
 ---
- tools/mesh-cfgclient.c | 12 ++++++------
- tools/mesh/cfgcli.c    |  2 +-
- tools/mesh/keys.c      |  4 ++--
- tools/mesh/mesh-db.c   | 24 ++++++++++++------------
- tools/mesh/mesh-db.h   | 26 +++++++++++++-------------
- tools/mesh/remote.c    | 16 ++++++++--------
- 6 files changed, 42 insertions(+), 42 deletions(-)
+ tools/mesh/cfgcli.c  | 42 +++++++++++++++++------
+ tools/mesh/mesh-db.c | 81 ++++++++++++++++++++++++++++++++++++++++++++
+ tools/mesh/mesh-db.h |  4 +++
+ tools/mesh/model.h   | 13 ++++---
+ 4 files changed, 124 insertions(+), 16 deletions(-)
 
-diff --git a/tools/mesh-cfgclient.c b/tools/mesh-cfgclient.c
-index 62dcecb2f..beeb115dc 100644
---- a/tools/mesh-cfgclient.c
-+++ b/tools/mesh-cfgclient.c
-@@ -1041,15 +1041,15 @@ static void mgr_key_reply(struct l_dbus_proxy *proxy,
- 
- 	if (!strcmp("CreateSubnet", method)) {
- 		keys_add_net_key(idx);
--		mesh_db_net_key_add(idx);
-+		mesh_db_add_net_key(idx);
- 	} else if (!strcmp("DeleteSubnet", method)) {
- 		keys_del_net_key(idx);
--		mesh_db_net_key_del(idx);
-+		mesh_db_del_net_key(idx);
- 	} else if (!strcmp("UpdateSubnet", method)) {
- 		keys_set_net_key_phase(idx, KEY_REFRESH_PHASE_ONE, true);
- 	} else if (!strcmp("DeleteAppKey", method)) {
- 		keys_del_app_key(idx);
--		mesh_db_app_key_del(idx);
-+		mesh_db_del_app_key(idx);
- 	}
- }
- 
-@@ -1133,13 +1133,13 @@ static void add_key_reply(struct l_dbus_proxy *proxy,
- 
- 	if (!strcmp(method, "ImportSubnet")) {
- 		keys_add_net_key(net_idx);
--		mesh_db_net_key_add(net_idx);
-+		mesh_db_add_net_key(net_idx);
- 		return;
- 	}
- 
- 	app_idx = (uint16_t) req->arg2;
- 	keys_add_app_key(net_idx, app_idx);
--	mesh_db_app_key_add(net_idx, app_idx);
-+	mesh_db_add_app_key(net_idx, app_idx);
- }
- 
- static void import_appkey_setup(struct l_dbus_message *msg, void *user_data)
-@@ -1824,7 +1824,7 @@ static struct l_dbus_message *join_complete(struct l_dbus *dbus,
- 	}
- 
- 	keys_add_net_key(PRIMARY_NET_IDX);
--	mesh_db_net_key_add(PRIMARY_NET_IDX);
-+	mesh_db_add_net_key(PRIMARY_NET_IDX);
- 
- 	remote_add_node(app.uuid, 0x0001, 1, PRIMARY_NET_IDX);
- 	mesh_db_add_node(app.uuid, 0x0001, 1, PRIMARY_NET_IDX);
 diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 9399228c8..b30edca19 100644
+index 19a42947e..2766d47ca 100644
 --- a/tools/mesh/cfgcli.c
 +++ b/tools/mesh/cfgcli.c
-@@ -617,7 +617,7 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 			return true;
+@@ -334,7 +334,7 @@ static void print_pub(uint16_t ele_addr, uint32_t mod_id,
+ 						struct model_pub *pub)
+ {
+ 	bt_shell_printf("\tElement: %4.4x\n", ele_addr);
+-	bt_shell_printf("\tPub Addr: %4.4x\n", pub->u.addr16);
++	bt_shell_printf("\tPub Addr: %4.4x\n", pub->u.addr);
  
- 		bt_shell_printf("Node %4.4x Default TTL %d\n", src, data[0]);
--		saved = mesh_db_node_ttl_set(src, data[0]);
-+		saved = mesh_db_node_set_ttl(src, data[0]);
+ 	if (mod_id < VENDOR_ID_MASK)
+ 		bt_shell_printf("\tModel: %8.8x\n", mod_id);
+@@ -634,31 +634,51 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
+ 
+ 		mod_id = print_mod_id(data + 10, len == 14, "");
+ 
+-		pub.u.addr16 = get_le16(data + 3);
++		pub.u.addr = get_le16(data + 3);
++
+ 		pub.app_idx = get_le16(data + 5);
++		pub.cred = ((pub.app_idx & 0x1000) != 0);
++		pub.app_idx &= 0x3ff;
++
+ 		pub.ttl = data[7];
+-		pub.period = data[8];
+-		n = (data[8] & 0x3f);
++		pub.prd_steps = (data[8] & 0x3f);
+ 
+ 		print_pub(ele_addr, mod_id, &pub);
+ 
+ 		switch (data[8] >> 6) {
+ 		case 0:
+-			bt_shell_printf("Period\t\t%d ms\n", n * 100);
++			pub.prd_res = 100;
+ 			break;
+ 		case 2:
+-			n *= 10;
+-			/* fall through */
++			pub.prd_res = 10;
++			break;
+ 		case 1:
+-			bt_shell_printf("Period\t\t%d sec\n", n);
++			pub.prd_res = 10000;
+ 			break;
+ 		case 3:
+-			bt_shell_printf("Period\t\t%d min\n", n * 10);
++			pub.prd_res = 600000;
+ 			break;
+ 		}
+ 
+-		bt_shell_printf("Rexmit count\t%d\n", data[9] & 0x7);
+-		bt_shell_printf("Rexmit steps\t%d\n", data[9] >> 3);
++		bt_shell_printf("Period\t\t%d ms\n", pub.period);
++
++		pub.rtx_cnt = data[9] & 0x7;
++		pub.rtx_interval = ((data[9] >> 3) + 1) * 50;
++		bt_shell_printf("Rexmit count\t%d\n", pub.rtx_cnt);
++		bt_shell_printf("Rexmit steps\t%d\n", pub.rtx_interval);
++
++		if (IS_VIRTUAL(pub.u.addr)) {
++			grp = l_queue_find(groups, match_group_addr,
++						L_UINT_TO_PTR(pub.u.addr));
++			if (!grp)
++				return true;
++
++			memcpy(pub.u.label, grp->label, sizeof(pub.u.label));
++
++		}
++
++		mesh_db_node_model_set_pub(src, ele_addr, len == 14, mod_id,
++						&pub, IS_VIRTUAL(pub.u.addr));
  
  		break;
  
-diff --git a/tools/mesh/keys.c b/tools/mesh/keys.c
-index c08348bff..134c1a10e 100644
---- a/tools/mesh/keys.c
-+++ b/tools/mesh/keys.c
-@@ -54,7 +54,7 @@ static void delete_bound_appkey(void *a)
- {
- 	uint32_t idx = L_PTR_TO_UINT(a);
- 
--	mesh_db_app_key_del(idx);
-+	mesh_db_del_app_key(idx);
- }
- 
- void keys_add_net_key(uint16_t net_idx)
-@@ -102,7 +102,7 @@ void keys_set_net_key_phase(uint16_t net_idx, uint8_t phase, bool save)
- 
- 	key->phase = phase;
- 
--	if (save && !mesh_db_net_key_phase_set(net_idx, phase))
-+	if (save && !mesh_db_set_net_key_phase(net_idx, phase))
- 		bt_shell_printf("Failed to save updated KR phase\n");
- }
- 
 diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index f63edd5ae..46efb81ea 100644
+index 8445d33f4..f63edd5ae 100644
 --- a/tools/mesh/mesh-db.c
 +++ b/tools/mesh/mesh-db.c
-@@ -648,7 +648,7 @@ fail:
- 	return false;
+@@ -32,6 +32,7 @@
+ #include "tools/mesh/keys.h"
+ #include "tools/mesh/remote.h"
+ #include "tools/mesh/cfgcli.h"
++#include "tools/mesh/model.h"
+ #include "tools/mesh/mesh-db.h"
+ 
+ #define KEY_IDX_INVALID NET_IDX_INVALID
+@@ -992,6 +993,86 @@ bool mesh_db_node_model_overwrt_sub_virt(uint16_t unicast, uint16_t ele,
+ 	return sub_overwrite(unicast, ele, vendor, mod_id, buf);
  }
  
--bool mesh_db_node_ttl_set(uint16_t unicast, uint8_t ttl)
-+bool mesh_db_node_set_ttl(uint16_t unicast, uint8_t ttl)
++static bool add_transmit_info(json_object *jobj, int cnt, int interval,
++							const char *desc)
++{
++	json_object *jtxmt;
++
++	jtxmt = json_object_new_object();
++
++	if (!write_int(jtxmt, "count", cnt))
++		return false;
++
++	if (!write_int(jtxmt, "interval", interval))
++		return false;
++
++	json_object_object_add(jobj, desc, jtxmt);
++	return true;
++}
++
++bool mesh_db_node_model_set_pub(uint16_t unicast, uint16_t ele_addr,
++					bool vendor, uint32_t mod_id,
++					struct model_pub *pub, bool virt)
++{
++	json_object *jmod, *jpub, *jobj = NULL;
++
++	if (!cfg || !cfg->jcfg)
++		return false;
++
++	jmod = get_model(unicast, ele_addr, mod_id, vendor);
++	if (!jmod)
++		return false;
++
++	jpub = json_object_new_object();
++
++	if (!virt && !write_uint16_hex(jpub, "address", pub->u.addr))
++		goto fail;
++
++	if (virt) {
++		char buf[33];
++
++		hex2str(pub->u.label, 16, buf, sizeof(buf));
++
++		if (!add_string(jpub, "address", buf))
++			goto fail;
++	}
++
++	if (!write_int(jpub, "index", pub->app_idx))
++		goto fail;
++
++	if (!write_int(jpub, "ttl", pub->ttl))
++		goto fail;
++
++	if (!write_int(jpub, "credentials", pub->cred ? 1 : 0))
++		goto fail;
++
++	if (!add_transmit_info(jpub, pub->rtx_cnt, pub->rtx_interval,
++							"retransmit"))
++		goto fail;
++
++	jobj = json_object_new_object();
++
++	if (!write_int(jobj, "numberOfSteps", pub->prd_steps))
++		goto fail;
++
++	if (!write_int(jobj, "resolution", pub->prd_res))
++		goto fail;
++
++	json_object_object_add(jpub, "period", jobj);
++
++	json_object_object_del(jmod, "publish");
++	json_object_object_add(jmod, "publish", jpub);
++
++	return save_config();
++
++fail:
++	if (jobj)
++		json_object_put(jobj);
++
++	json_object_put(jpub);
++	return false;
++}
++
+ static void jarray_key_del(json_object *jarray, int16_t idx)
  {
- 	json_object *jnode;
- 
-@@ -1106,7 +1106,7 @@ static bool delete_key(json_object *jobj, const char *desc, uint16_t idx)
- 	return save_config();
- }
- 
--bool mesh_db_node_net_key_add(uint16_t unicast, uint16_t idx)
-+bool mesh_db_node_add_net_key(uint16_t unicast, uint16_t idx)
- {
- 	json_object *jnode;
- 
-@@ -1120,7 +1120,7 @@ bool mesh_db_node_net_key_add(uint16_t unicast, uint16_t idx)
- 	return add_node_key(jnode, "netKeys", idx);
- }
- 
--bool mesh_db_node_net_key_del(uint16_t unicast, uint16_t net_idx)
-+bool mesh_db_node_del_net_key(uint16_t unicast, uint16_t net_idx)
- {
- 	json_object *jnode;
- 
-@@ -1168,12 +1168,12 @@ static bool key_update(uint16_t unicast, int16_t idx, bool updated,
- 	return false;
- }
- 
--bool mesh_db_node_net_key_update(uint16_t unicast, uint16_t idx, bool updated)
-+bool mesh_db_node_update_net_key(uint16_t unicast, uint16_t idx, bool updated)
- {
- 	return key_update(unicast, idx, updated, "netKeys");
- }
- 
--bool mesh_db_node_app_key_add(uint16_t unicast, uint16_t idx)
-+bool mesh_db_node_add_app_key(uint16_t unicast, uint16_t idx)
- {
- 	json_object *jnode;
- 
-@@ -1187,7 +1187,7 @@ bool mesh_db_node_app_key_add(uint16_t unicast, uint16_t idx)
- 	return add_node_key(jnode, "appKeys", idx);
- }
- 
--bool mesh_db_node_app_key_del(uint16_t unicast, uint16_t idx)
-+bool mesh_db_node_del_app_key(uint16_t unicast, uint16_t idx)
- {
- 	json_object *jnode;
- 
-@@ -1201,7 +1201,7 @@ bool mesh_db_node_app_key_del(uint16_t unicast, uint16_t idx)
- 	return delete_key(jnode, "appKeys", idx);
- }
- 
--bool mesh_db_node_app_key_update(uint16_t unicast, uint16_t idx, bool updated)
-+bool mesh_db_node_update_app_key(uint16_t unicast, uint16_t idx, bool updated)
- {
- 	return key_update(unicast, idx, updated, "appKeys");
- }
-@@ -1260,7 +1260,7 @@ static bool load_keys(json_object *jobj)
- 	return true;
- }
- 
--bool mesh_db_net_key_add(uint16_t net_idx)
-+bool mesh_db_add_net_key(uint16_t net_idx)
- {
- 	json_object *jkey, *jarray;
- 	char buf[12];
-@@ -1303,7 +1303,7 @@ fail:
- 	return false;
- }
- 
--bool mesh_db_net_key_del(uint16_t net_idx)
-+bool mesh_db_del_net_key(uint16_t net_idx)
- {
- 	if (!cfg || !cfg->jcfg)
- 		return false;
-@@ -1311,7 +1311,7 @@ bool mesh_db_net_key_del(uint16_t net_idx)
- 	return delete_key(cfg->jcfg, "netKeys", net_idx);
- }
- 
--bool mesh_db_net_key_phase_set(uint16_t net_idx, uint8_t phase)
-+bool mesh_db_set_net_key_phase(uint16_t net_idx, uint8_t phase)
- {
- 	json_object *jval, *jarray, *jkey;
- 
-@@ -1335,7 +1335,7 @@ bool mesh_db_net_key_phase_set(uint16_t net_idx, uint8_t phase)
- 	return save_config();
- }
- 
--bool mesh_db_app_key_add(uint16_t net_idx, uint16_t app_idx)
-+bool mesh_db_add_app_key(uint16_t net_idx, uint16_t app_idx)
- {
- 	if (!cfg || !cfg->jcfg)
- 		return false;
-@@ -1346,7 +1346,7 @@ bool mesh_db_app_key_add(uint16_t net_idx, uint16_t app_idx)
- 	return save_config();
- }
- 
--bool mesh_db_app_key_del(uint16_t app_idx)
-+bool mesh_db_del_app_key(uint16_t app_idx)
- {
- 	if (!cfg || !cfg->jcfg)
- 		return false;
+ 	int i, sz = json_object_array_length(jarray);
 diff --git a/tools/mesh/mesh-db.h b/tools/mesh/mesh-db.h
-index 885dabe90..147fbf98c 100644
+index 384376cbd..885dabe90 100644
 --- a/tools/mesh/mesh-db.h
 +++ b/tools/mesh/mesh-db.h
-@@ -20,13 +20,13 @@ bool mesh_db_load(const char *fname);
- bool mesh_db_get_token(uint8_t token[8]);
- bool mesh_db_set_iv_index(uint32_t ivi);
- uint32_t mesh_db_get_iv_index(void);
--bool mesh_db_net_key_add(uint16_t idx);
--bool mesh_db_net_key_del(uint16_t idx);
--bool mesh_db_net_key_phase_set(uint16_t net_idx, uint8_t phase);
--bool mesh_db_app_key_add(uint16_t net_idx, uint16_t app_idx);
--bool mesh_db_app_key_del(uint16_t app_idx);
--bool mesh_db_get_addr_range(uint16_t *low, uint16_t *high);
+@@ -11,6 +11,7 @@
+ #include "mesh/mesh-config.h"
  
-+bool mesh_db_add_net_key(uint16_t idx);
-+bool mesh_db_del_net_key(uint16_t idx);
-+bool mesh_db_set_net_key_phase(uint16_t net_idx, uint8_t phase);
-+bool mesh_db_add_app_key(uint16_t net_idx, uint16_t app_idx);
-+bool mesh_db_del_app_key(uint16_t app_idx);
-+bool mesh_db_get_addr_range(uint16_t *low, uint16_t *high);
- bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
- 							uint16_t net_idx);
- bool mesh_db_del_node(uint16_t unicast);
-@@ -37,13 +37,13 @@ bool mesh_db_add_provisioner(const char *name, uint8_t uuid[16],
- 				uint16_t group_low, uint16_t group_high);
- bool mesh_db_node_set_net_transmit(uint16_t unicast, uint8_t cnt,
- 							uint16_t interval);
--bool mesh_db_node_net_key_add(uint16_t unicast, uint16_t idx);
--bool mesh_db_node_net_key_del(uint16_t unicast, uint16_t idx);
--bool mesh_db_node_net_key_update(uint16_t unicast, uint16_t idx, bool updated);
--bool mesh_db_node_app_key_add(uint16_t unicast, uint16_t idx);
--bool mesh_db_node_app_key_del(uint16_t unicast, uint16_t idx);
--bool mesh_db_node_app_key_update(uint16_t unicast, uint16_t idx, bool updated);
--bool mesh_db_node_ttl_set(uint16_t unicast, uint8_t ttl);
-+bool mesh_db_node_add_net_key(uint16_t unicast, uint16_t idx);
-+bool mesh_db_node_del_net_key(uint16_t unicast, uint16_t idx);
-+bool mesh_db_node_update_net_key(uint16_t unicast, uint16_t idx, bool updated);
-+bool mesh_db_node_add_app_key(uint16_t unicast, uint16_t idx);
-+bool mesh_db_node_del_app_key(uint16_t unicast, uint16_t idx);
-+bool mesh_db_node_update_app_key(uint16_t unicast, uint16_t idx, bool updated);
-+bool mesh_db_node_set_ttl(uint16_t unicast, uint8_t ttl);
- bool mesh_db_node_write_mode(uint16_t unicast, const char *keyword, int value);
- bool mesh_db_node_model_bind(uint16_t unicast, uint16_t ele_addr, bool vendor,
- 					uint32_t mod_id, uint16_t app_idx);
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-index dd294fe4d..054da5300 100644
---- a/tools/mesh/remote.c
-+++ b/tools/mesh/remote.c
-@@ -233,7 +233,7 @@ bool remote_add_net_key(uint16_t addr, uint16_t net_idx, bool save)
- 	l_queue_push_tail(rmt->net_keys, key);
+ struct mesh_group;
++struct model_pub;
  
- 	if (save)
--		return mesh_db_node_net_key_add(addr, net_idx);
-+		return mesh_db_node_add_net_key(addr, net_idx);
- 	else
- 		return true;
- }
-@@ -252,14 +252,14 @@ bool remote_del_net_key(uint16_t addr, uint16_t net_idx)
- 	if (!key)
- 		return false;
+ bool mesh_db_create(const char *fname, const uint8_t token[8],
+ 							const char *name);
+@@ -65,6 +66,9 @@ bool mesh_db_node_model_overwrt_sub_virt(uint16_t unicast, uint16_t ele,
+ 								uint8_t *label);
+ bool mesh_db_node_model_del_sub_all(uint16_t unicast, uint16_t ele, bool vendor,
+ 							uint32_t mod_id);
++bool mesh_db_node_model_set_pub(uint16_t unicast, uint16_t ele_addr,
++					bool vendor, uint32_t mod_id,
++					struct model_pub *pub, bool virt);
+ struct l_queue *mesh_db_load_groups(void);
+ bool mesh_db_add_group(struct mesh_group *grp);
+ bool mesh_db_add_rejected_addr(uint16_t unicast, uint32_t iv_index);
+diff --git a/tools/mesh/model.h b/tools/mesh/model.h
+index 7359ea7df..5e20719b2 100644
+--- a/tools/mesh/model.h
++++ b/tools/mesh/model.h
+@@ -25,14 +25,17 @@ typedef int (*model_bind_func_t)(uint16_t app_idx, int action);
  
--	mesh_db_node_net_key_del(addr, net_idx);
-+	mesh_db_node_del_net_key(addr, net_idx);
+ struct model_pub {
+ 	uint16_t app_idx;
++	uint16_t period;
+ 	union {
+-		uint16_t addr16;
+-		uint8_t va_128[16];
++		uint16_t addr;
++		uint8_t label[16];
+ 	} u;
++	bool cred;
++	uint32_t prd_res;
++	uint16_t rtx_interval;
++	uint8_t prd_steps;
++	uint8_t rtx_cnt;
+ 	uint8_t ttl;
+-	uint8_t credential;
+-	uint8_t period;
+-	uint8_t retransmit;
+ };
  
- 	l_free(key);
- 	key = l_queue_remove_if(rmt->app_keys, match_bound_key,
- 						L_UINT_TO_PTR(net_idx));
- 
- 	while (key) {
--		mesh_db_node_app_key_del(rmt->unicast, key->idx);
-+		mesh_db_node_del_app_key(rmt->unicast, key->idx);
- 		l_free(key);
- 
- 		key = l_queue_remove_if(rmt->app_keys, match_bound_key,
-@@ -284,7 +284,7 @@ bool remote_update_net_key(uint16_t addr, uint16_t net_idx, bool update,
- 	key->updated = update;
- 
- 	if (save)
--		return mesh_db_node_net_key_update(addr, net_idx, update);
-+		return mesh_db_node_update_net_key(addr, net_idx, update);
- 	else
- 		return true;
- }
-@@ -310,7 +310,7 @@ bool remote_add_app_key(uint16_t addr, uint16_t app_idx, bool save)
- 	l_queue_push_tail(rmt->app_keys, key);
- 
- 	if (save)
--		return mesh_db_node_app_key_add(addr, app_idx);
-+		return mesh_db_node_add_app_key(addr, app_idx);
- 	else
- 		return true;
- }
-@@ -328,7 +328,7 @@ bool remote_del_app_key(uint16_t addr, uint16_t app_idx)
- 						L_UINT_TO_PTR(app_idx));
- 	l_free(key);
- 
--	return mesh_db_node_app_key_del(addr, app_idx);
-+	return mesh_db_node_del_app_key(addr, app_idx);
- }
- 
- bool remote_update_app_key(uint16_t addr, uint16_t app_idx, bool update,
-@@ -346,7 +346,7 @@ bool remote_update_app_key(uint16_t addr, uint16_t app_idx, bool update,
- 	key->updated = update;
- 
- 	if (save)
--		return mesh_db_node_app_key_update(addr, app_idx, update);
-+		return mesh_db_node_update_app_key(addr, app_idx, update);
- 	else
- 		return true;
- }
-@@ -375,7 +375,7 @@ bool remote_finish_key_refresh(uint16_t addr, uint16_t net_idx)
- 
- 		key->updated = false;
- 
--		res &= mesh_db_node_app_key_update(addr, key->idx, false);
-+		res &= mesh_db_node_update_app_key(addr, key->idx, false);
- 	}
- 
- 	return res;
+ typedef int (*model_pub_func_t)(struct model_pub *pub);
 -- 
 2.31.1
 
