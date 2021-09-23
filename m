@@ -2,110 +2,140 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-11.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS,USER_AGENT_GIT autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-2.8 required=3.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
+	autolearn=no autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD676C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8CDDEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 04:00:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9415A60F48
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 03:27:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 624636103D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Sep 2021 04:00:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239091AbhIWD27 (ORCPT
+        id S230062AbhIWEB7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Sep 2021 23:28:59 -0400
-Received: from mga11.intel.com ([192.55.52.93]:16373 "EHLO mga11.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S239072AbhIWD2q (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Sep 2021 23:28:46 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10115"; a="220555935"
-X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="220555935"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:27:03 -0700
-X-IronPort-AV: E=Sophos;i="5.85,315,1624345200"; 
-   d="scan'208";a="534072410"
-Received: from jdudwadk-mobl.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.205.211])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Sep 2021 20:27:03 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ 19/20] tools/mesh-cfgclient: Excluded addresses property
-Date:   Wed, 22 Sep 2021 20:26:02 -0700
-Message-Id: <20210923032603.50536-20-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20210923032603.50536-1-inga.stotland@intel.com>
-References: <20210923032603.50536-1-inga.stotland@intel.com>
+        Thu, 23 Sep 2021 00:01:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45300 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229583AbhIWEB5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Sep 2021 00:01:57 -0400
+Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CF01C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 21:00:26 -0700 (PDT)
+Received: by mail-qv1-xf33.google.com with SMTP id e5so3158839qvq.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Sep 2021 21:00:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=qZeUhL4I6E7TcnMmvzmRl8lJjou3W+XLlx7yODtsB70=;
+        b=YZ/5NVW+TUACdPV2QwBFcPb2pkxJA5MOYFxEz49eBGcqHAjfLoE5TPqU36axsJE9Gw
+         kel6Fwtxsa5zUr0m6Ca138mNrJElEx4PmJy3qQ21jISv5Vi+DycXDkVq5BiWD5nfBVNR
+         y3BL821LG2y3La8njURmTNq/XVcHdhxxYFLUQnQo2dXtEAm1ZUDz+R2lkEz4e+Z3Rw6c
+         pZ13EWfFd7j6P1T6qGXADnBEJmugJNId98hg4dIT6ZMRCF28+2hFmveVzoYqcuIW+zgJ
+         EEqcNf7MdW+qtjiYWtPPLfWcJr0a6UJmhIU+Aq4zXeHrXMJmwA8aaLMbpnC1UN9GWoOc
+         2lhA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=qZeUhL4I6E7TcnMmvzmRl8lJjou3W+XLlx7yODtsB70=;
+        b=FFr7vNUmGUVIUjG82BBBsNnK+1KaijIzOnFLPqra/emkKulZxLI2+NneDMeGs1X7jN
+         /qcTv4iScdd4pqOLHQEg4Kdwfz5+eX7rgz0tqG5G5yB5/q5bnOAZUiLoUxmfKiqO6uQI
+         BkGSzW86227qzuZUx0zPGAr+Ump2GjM3v3I3uYZ0NWqt0azQQ2r73Sq1gLgPixCvqSWm
+         rjeyKQ/34A9Im2JIHtU7cK/JqbjuZG6lx2o183PCc9m2VZpRFsfUKxoIxs1D1tpViMoh
+         U/ul9UGkYqAjJF9zx2sbDsJyrgXABlHq3TaC+J5vcpciAF+5hW9W/bGOG7NPHnTNVrhO
+         Kw2Q==
+X-Gm-Message-State: AOAM531RS+UT/LmUZhLge/awcjbH07TVjyVOHDOIr3WbkPu28jfR8taa
+        laRjKdGi+HdJ1e0DpOjFyITNY3o0CGoQ0A==
+X-Google-Smtp-Source: ABdhPJxN455c4jE4uvG5PWfh9a2wenJitPRIosGI1kY5H3UR/KPoLQe/6ZwsBMiWs6xXaAkwDODjQw==
+X-Received: by 2002:ad4:4765:: with SMTP id d5mr2274457qvx.51.1632369625209;
+        Wed, 22 Sep 2021 21:00:25 -0700 (PDT)
+Received: from [172.17.0.2] ([20.65.116.202])
+        by smtp.gmail.com with ESMTPSA id r139sm3380540qke.84.2021.09.22.21.00.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 22 Sep 2021 21:00:24 -0700 (PDT)
+Message-ID: <614bfbd8.1c69fb81.a75af.a5f5@mx.google.com>
+Date:   Wed, 22 Sep 2021 21:00:24 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============8050000670953850281=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: Mesh Configuration Database
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20210923032603.50536-2-inga.stotland@intel.com>
+References: <20210923032603.50536-2-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The correct name for a property that contains a list of addresses
-not allowed in circulation is "networkExclusions"
-The "excluded" property in "nodes" array entry is used to indicated that
-this node has been removed from a mesh network and it's address should not
-be re-used.
+--===============8050000670953850281==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=551419
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      30.23 seconds
+GitLint                       FAIL      18.49 seconds
+Prep - Setup ELL              PASS      49.39 seconds
+Build - Prep                  PASS      0.51 seconds
+Build - Configure             PASS      9.05 seconds
+Build - Make                  PASS      216.88 seconds
+Make Check                    PASS      10.03 seconds
+Make Distcheck                PASS      252.94 seconds
+Build w/ext ELL - Configure   PASS      9.10 seconds
+Build w/ext ELL - Make        PASS      205.82 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[BlueZ,01/20] tools/mesh-cfgclient: Save provisioner info
+1: T3 Title has trailing punctuation (.): "This adds "provisioners" property to the config database."
+
+[BlueZ,02/20] tools/mesh-cfgclient: Add timestamp to config database
+1: T3 Title has trailing punctuation (.): "This adds timestamp property to the configuration database."
+
+[BlueZ,03/20] tools/mesh-cfgclient: Update stored NetKey and AppKey
+1: T3 Title has trailing punctuation (:): "NetKeys:"
+
+[BlueZ,04/20] tools/mesh-cfgclient: Keep track of updated keys
+1: T8 Title is too short (3<5): "---"
+
+[BlueZ,05/20] tools/mesh: Add new info to stored remote nodes
+1: T3 Title has trailing punctuation (,): "When adding a new remote node into configuration database,"
+
+[BlueZ,12/20] tools/mesh-cfgclient: Rename mesh-db APIs for consistency
+1: T8 Title is too short (3<5): "---"
+
+[BlueZ,15/20] tools/mesh-cfgclient: Add group parent address for DB compliance
+1: T8 Title is too short (3<5): "---"
+
+[BlueZ,16/20] doc/mesh-api: Add ExportKeys call
+1: T3 Title has trailing punctuation (:): "Add description for a new method:"
+
+[BlueZ,20/20] tools/mesh-cfgclient: Export configuration database
+1: T3 Title has trailing punctuation (.): "This adds main menu command "export-db"."
+
+
+
+
 ---
- tools/mesh/mesh-db.c | 13 ++++++-------
- 1 file changed, 6 insertions(+), 7 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index b45212fc9..262a274c7 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -1724,7 +1724,7 @@ bool mesh_db_add_node(uint8_t uuid[16], uint8_t num_els, uint16_t unicast,
- 	if (!add_string(jnode, "security", "secure"))
- 		goto fail;
- 
--	if (!write_bool(jnode, "blacklisted", false))
-+	if (!write_bool(jnode, "excluded", false))
- 		goto fail;
- 
- 	if (!write_bool(jnode, "configComplete", false))
-@@ -2165,7 +2165,7 @@ static bool load_rejected_addresses(json_object *jobj)
- 	json_object *jarray;
- 	int i, cnt;
- 
--	json_object_object_get_ex(jobj, "blacklistedAddresses", &jarray);
-+	json_object_object_get_ex(jobj, "networkExclusions", &jarray);
- 	if (!jarray || json_object_get_type(jarray) != json_type_array)
- 		return true;
- 
-@@ -2212,11 +2212,10 @@ bool mesh_db_add_rejected_addr(uint16_t unicast, uint32_t iv_index)
- 	if (!cfg || !cfg->jcfg)
- 		return false;
- 
--	json_object_object_get_ex(cfg->jcfg, "blacklistedAddresses", &jarray);
-+	json_object_object_get_ex(cfg->jcfg, "networkExclusions", &jarray);
- 	if (!jarray) {
- 		jarray = json_object_new_array();
--		json_object_object_add(cfg->jcfg, "blacklistedAddresses",
--									jarray);
-+		json_object_object_add(cfg->jcfg, "networkExclusions", jarray);
- 	}
- 
- 	idx = get_rejected_by_iv_index(jarray, iv_index);
-@@ -2261,7 +2260,7 @@ bool mesh_db_clear_rejected(uint32_t iv_index)
- 	if (!cfg || !cfg->jcfg)
- 		return false;
- 
--	json_object_object_get_ex(cfg->jcfg, "blacklistedAddresses", &jarray);
-+	json_object_object_get_ex(cfg->jcfg, "networkExclusions", &jarray);
- 	if (!jarray || json_object_get_type(jarray) != json_type_array)
- 		return false;
- 
-@@ -2338,7 +2337,7 @@ bool mesh_db_create(const char *fname, const uint8_t token[8],
- 	if (!jarray)
- 		goto fail;
- 
--	json_object_object_add(jcfg, "blacklistedAddresses", jarray);
-+	json_object_object_add(jcfg, "networkExclusions", jarray);
- 
- 	write_int(jcfg, "ivIndex", 0);
- 
--- 
-2.31.1
 
+--===============8050000670953850281==--
