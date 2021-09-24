@@ -2,324 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A2BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:18:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEB43C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:35:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 70FA860F4C
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:18:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C51CA61242
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:35:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347312AbhIXVUD (ORCPT
+        id S1344112AbhIXVhO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Sep 2021 17:20:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48136 "EHLO
+        Fri, 24 Sep 2021 17:37:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52022 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233640AbhIXVUC (ORCPT
+        with ESMTP id S231430AbhIXVhN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Sep 2021 17:20:02 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E106C061571
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:18:29 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id m21so10993680pgu.13
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:18:29 -0700 (PDT)
+        Fri, 24 Sep 2021 17:37:13 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C017AC061571
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:35:39 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id 73so29774090qki.4
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:35:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=820GNTOJT4J+HSWHU2q3Ca+6SK5sZEeyFivGidgkOcY=;
-        b=RQWWqODU08NP+FABI4dJySoMQKtAbA1thliePKeTtQx1Tek3xQiZPSvkw/Qfo05Pv4
-         TLMC7wtnGpQV0ZymnAODhdRgaJmglWQ8Gji/DmZ1qgfvEBtz04lXj7pbFUZPUDMQ4Mug
-         dBz1FRhdOJlnnTfT3a+PT1+kDdOeeyW/FgKvVUTAixgyZIRH0KxHAjiBI/JxS8NA1nzJ
-         RWpUGvYJogfNnjRKLKTgaZN+46ksdmDWXvPqi3g/OeHY0Tp+lrdVIDAgBzgXS4aYV+23
-         NgW2ri192Bob7RwCETay6912NzIOFWSNAaejEUaUfjeFEGRZ1t1/De1TPLCINUbAbFor
-         9ebA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=r+XJZlHSV9HEU+vgLj7LMdmPdxohqONuaY4QgMYVbIQ=;
+        b=ES22Z6xWJA6oGbrsRaO42hh/rODr64UMr6M5cn91IIokk6Ez3xe74iwdYCshvZaRjA
+         KjGelI8of1boC+4PDjJIorKQ674FZlmpt2mAa3VBg4Z467yvHAY84Ir0nOl0uRHRWdtR
+         EXm71h07tnpakMvmEZYPAU00MaU00yW1+Hz/TrL87LacF4L3TPyHtmLrul6fFbB/Gwo9
+         2rdY5aN3j5MabljvGSuulCS1X9/wnFEsgqjYEXSbR1tEcYIbsCePyT6b8yMEe+aHslgx
+         WY+pI/+svNBReRU/Y1Srwo7zgAwfiR0frvHDPi9KWJugeTLMnWDAvrRIUxotmB0ngOCL
+         w3ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=820GNTOJT4J+HSWHU2q3Ca+6SK5sZEeyFivGidgkOcY=;
-        b=q9f5TIsOvI8lCCbhcmZW8ETEPZuw4eeNTtRUmhvgwxOIVvAqsNgLUOmpIge3PjguFx
-         KE9G95W9mdWiV3CagZnDlqMjBJtAhUP3LDa8/X99YKgF4qkMbf4zoLMyBYypaX0V5Bgs
-         1G9cZvYMt9FZHyuUomJ+jOSQYF3P+Iue2MZ/12u9YsgubzgGTbLG7z0nX1Udpvh2YZae
-         ZzJ61gNgKD4rdXKGbsTyp0dLgCDyByE70ytgjtpC1k5znzUeHzOeDa9f50jAuq7qIqg5
-         qu2hwPdigpz9HURKecVOd1AciWYhKWZV3W1YV4aauoEvcC6RvXQuMryaWwwPSehthSSy
-         VEHw==
-X-Gm-Message-State: AOAM531fdaOpprITWXK3Gus+oeTCuox6HrRdr4YEZZQxhmmWPW7el44E
-        bwDEySKunSew7TswJJ+AhnH7k9pRK+U=
-X-Google-Smtp-Source: ABdhPJybHu8cV5VjvoOAHaOMxAlJMLNIzbYTVIvBkfeRU8RMKSQxWpro+hTbpNvsTlYM4xcR+9EIRg==
-X-Received: by 2002:a65:6a0a:: with SMTP id m10mr5529150pgu.82.1632518308457;
-        Fri, 24 Sep 2021 14:18:28 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h18sm9946138pfr.89.2021.09.24.14.18.27
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=r+XJZlHSV9HEU+vgLj7LMdmPdxohqONuaY4QgMYVbIQ=;
+        b=PhPpo6VzugmyMa2BbFfHWHcWIbtNaT0yD5hiHTMe3v0R103TBr6dXERgd1BM3BhsQs
+         mBXzFUMhV3Ka+RW2CA5bKAXPpN0ItXAEUhKl7sWBOVLbmaBWLNQccE2ujD9yidaMxFa6
+         SbLLNL4zr7femT0y2FcuteEZ+U1lXeV9F+MLcUBVNuqO+y27mo0KuKnqg5iz33+DXA5g
+         aiSxOSBshDBMXEbpxfiGqAJutRYT5N61mZrmsjhOhJD5LXK5t+UnaWmeDGpyJd4RKAiP
+         oeLGzYz8h5FrDyOuolSD+UOHaC9R7pIKOxSavOIKLSmKIiAVUT0YY63WvYso/sBanukX
+         7zvg==
+X-Gm-Message-State: AOAM531Kk1sCfdqlBpZ8cRrOMdYZzlmVL5tM3mUkWjGNkalyN14NvkS1
+        foJ3BuGMhvj+zlHiAYCJMAjm+gsZ48teTg==
+X-Google-Smtp-Source: ABdhPJxKMox5ZMnJIPkWA8DaA/c9pvAtRpHaHeBMSOugq/iK0Yrlr2zok7s92ByFXxm2ZKcaffAkag==
+X-Received: by 2002:a37:a850:: with SMTP id r77mr12908469qke.52.1632519338734;
+        Fri, 24 Sep 2021 14:35:38 -0700 (PDT)
+Received: from [172.17.0.2] ([104.46.121.241])
+        by smtp.gmail.com with ESMTPSA id h2sm4122705qkk.10.2021.09.24.14.35.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Sep 2021 14:18:28 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] avrcp: Fix browsing support in SDP record
-Date:   Fri, 24 Sep 2021 14:18:24 -0700
-Message-Id: <20210924211824.2318562-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 24 Sep 2021 14:35:38 -0700 (PDT)
+Message-ID: <614e44aa.1c69fb81.97ea4.01fd@mx.google.com>
+Date:   Fri, 24 Sep 2021 14:35:38 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============1040330872781233634=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] avctp: Fix not handling when kernel has ERTM disabled
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20210924211824.2318562-1-luiz.dentz@gmail.com>
 References: <20210924211824.2318562-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1040330872781233634==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Browsing features shall only be marked as supported when ERTM is also
-available.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=552627
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      3.15 seconds
+GitLint                       PASS      4.05 seconds
+Prep - Setup ELL              PASS      53.45 seconds
+Build - Prep                  PASS      0.52 seconds
+Build - Configure             PASS      9.81 seconds
+Build - Make                  PASS      238.59 seconds
+Make Check                    PASS      9.85 seconds
+Make Distcheck                PASS      286.99 seconds
+Build w/ext ELL - Configure   PASS      10.04 seconds
+Build w/ext ELL - Make        PASS      227.25 seconds
+
+
+
 ---
- profiles/audio/avctp.c |   5 +-
- profiles/audio/avctp.h |   2 +-
- profiles/audio/avrcp.c | 101 +++++++++++++++++++++--------------------
- 3 files changed, 57 insertions(+), 51 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
-index 81320de1b..72509edec 100644
---- a/profiles/audio/avctp.c
-+++ b/profiles/audio/avctp.c
-@@ -1636,7 +1636,7 @@ static GIOChannel *avctp_server_socket(const bdaddr_t *src, gboolean central,
- 	return io;
- }
- 
--int avctp_register(struct btd_adapter *adapter, gboolean central)
-+int avctp_register(struct btd_adapter *adapter, bool central, bool *browsing)
- {
- 	struct avctp_server *server;
- 	const bdaddr_t *src = btd_adapter_get_address(adapter);
-@@ -1649,8 +1649,11 @@ int avctp_register(struct btd_adapter *adapter, gboolean central)
- 		g_free(server);
- 		return -1;
- 	}
-+
- 	server->browsing_io = avctp_server_socket(src, central, BT_IO_MODE_ERTM,
- 							AVCTP_BROWSING_PSM);
-+	if (browsing)
-+		*browsing = server->browsing_io ? true : false;
- 
- 	server->adapter = btd_adapter_ref(adapter);
- 
-diff --git a/profiles/audio/avctp.h b/profiles/audio/avctp.h
-index ca5ff9126..02712bf0e 100644
---- a/profiles/audio/avctp.h
-+++ b/profiles/audio/avctp.h
-@@ -145,7 +145,7 @@ unsigned int avctp_add_state_cb(struct btd_device *dev, avctp_state_cb cb,
- 							void *user_data);
- gboolean avctp_remove_state_cb(unsigned int id);
- 
--int avctp_register(struct btd_adapter *adapter, gboolean central);
-+int avctp_register(struct btd_adapter *adapter, bool central, bool *browsing);
- void avctp_unregister(struct btd_adapter *adapter);
- 
- struct avctp *avctp_connect(struct btd_device *device);
-diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-index 22bd5df20..7c280203c 100644
---- a/profiles/audio/avrcp.c
-+++ b/profiles/audio/avrcp.c
-@@ -208,6 +208,7 @@ struct get_total_number_of_items_rsp {
- 
- struct avrcp_server {
- 	struct btd_adapter *adapter;
-+	bool browsing;
- 	uint32_t tg_record_id;
- 	uint32_t ct_record_id;
- 	GSList *players;
-@@ -367,21 +368,49 @@ static uint32_t company_ids[] = {
- static void avrcp_register_notification(struct avrcp *session, uint8_t event);
- static GList *player_list_settings(struct avrcp_player *player);
- 
--static sdp_record_t *avrcp_ct_record(void)
-+static void avrcp_browsing_record(sdp_record_t *record, sdp_data_t *version)
- {
--	sdp_list_t *svclass_id, *pfseq, *apseq, *apseq1, *root;
-+	sdp_list_t *apseq;
-+	uuid_t l2cap, avctp;
-+	sdp_list_t *aproto, *proto[2];
-+	sdp_data_t *psm;
-+	uint16_t ap = AVCTP_BROWSING_PSM;
-+
-+	sdp_uuid16_create(&l2cap, L2CAP_UUID);
-+	proto[0] = sdp_list_append(NULL, &l2cap);
-+	psm = sdp_data_alloc(SDP_UINT16, &ap);
-+	proto[0] = sdp_list_append(proto[0], psm);
-+	apseq = sdp_list_append(NULL, proto[0]);
-+
-+	sdp_uuid16_create(&avctp, AVCTP_UUID);
-+	proto[1] = sdp_list_append(NULL, &avctp);
-+	proto[1] = sdp_list_append(proto[1], version);
-+	apseq = sdp_list_append(apseq, proto[1]);
-+
-+	aproto = sdp_list_append(NULL, apseq);
-+	sdp_set_add_access_protos(record, aproto);
-+
-+	free(psm);
-+	sdp_list_free(proto[0], NULL);
-+	sdp_list_free(proto[1], NULL);
-+	sdp_list_free(apseq, NULL);
-+	sdp_list_free(aproto, NULL);
-+}
-+
-+static sdp_record_t *avrcp_ct_record(bool browsing)
-+{
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
- 	uuid_t root_uuid, l2cap, avctp, avrct, avrctr;
- 	sdp_profile_desc_t profile[1];
--	sdp_list_t *aproto, *aproto1, *proto[2], *proto1[2];
-+	sdp_list_t *aproto, *proto[2];
- 	sdp_record_t *record;
- 	sdp_data_t *psm[2], *version, *features;
--	uint16_t lp = AVCTP_CONTROL_PSM, ap = AVCTP_BROWSING_PSM;
-+	uint16_t lp = AVCTP_CONTROL_PSM;
- 	uint16_t avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 						AVRCP_FEATURE_CATEGORY_2 |
- 						AVRCP_FEATURE_CATEGORY_3 |
--						AVRCP_FEATURE_CATEGORY_4 |
--						AVRCP_FEATURE_BROWSING);
-+						AVRCP_FEATURE_CATEGORY_4);
- 
- 	record = sdp_record_alloc();
- 	if (!record)
-@@ -415,19 +444,10 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_set_access_protos(record, aproto);
- 
- 	/* Additional Protocol Descriptor List */
--	sdp_uuid16_create(&l2cap, L2CAP_UUID);
--	proto1[0] = sdp_list_append(NULL, &l2cap);
--	psm[1] = sdp_data_alloc(SDP_UINT16, &ap);
--	proto1[0] = sdp_list_append(proto1[0], psm[1]);
--	apseq1 = sdp_list_append(NULL, proto1[0]);
--
--	sdp_uuid16_create(&avctp, AVCTP_UUID);
--	proto1[1] = sdp_list_append(NULL, &avctp);
--	proto1[1] = sdp_list_append(proto1[1], version);
--	apseq1 = sdp_list_append(apseq1, proto1[1]);
--
--	aproto1 = sdp_list_append(NULL, apseq1);
--	sdp_set_add_access_protos(record, aproto1);
-+	if (browsing) {
-+		feat |= AVRCP_FEATURE_BROWSING;
-+		avrcp_browsing_record(record, version);
-+	}
- 
- 	/* Bluetooth Profile Descriptor List */
- 	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-@@ -441,15 +461,10 @@ static sdp_record_t *avrcp_ct_record(void)
- 	sdp_set_info_attr(record, "AVRCP CT", NULL, NULL);
- 
- 	free(psm[0]);
--	free(psm[1]);
- 	free(version);
- 	sdp_list_free(proto[0], NULL);
- 	sdp_list_free(proto[1], NULL);
- 	sdp_list_free(apseq, NULL);
--	sdp_list_free(proto1[0], NULL);
--	sdp_list_free(proto1[1], NULL);
--	sdp_list_free(aproto1, NULL);
--	sdp_list_free(apseq1, NULL);
- 	sdp_list_free(pfseq, NULL);
- 	sdp_list_free(aproto, NULL);
- 	sdp_list_free(root, NULL);
-@@ -458,23 +473,20 @@ static sdp_record_t *avrcp_ct_record(void)
- 	return record;
- }
- 
--static sdp_record_t *avrcp_tg_record(void)
-+static sdp_record_t *avrcp_tg_record(bool browsing)
- {
--	sdp_list_t *svclass_id, *pfseq, *apseq, *root, *apseq_browsing;
-+	sdp_list_t *svclass_id, *pfseq, *apseq, *root;
- 	uuid_t root_uuid, l2cap, avctp, avrtg;
- 	sdp_profile_desc_t profile[1];
- 	sdp_list_t *aproto_control, *proto_control[2];
- 	sdp_record_t *record;
--	sdp_data_t *psm_control, *version, *features, *psm_browsing;
--	sdp_list_t *aproto_browsing, *proto_browsing[2] = {0};
-+	sdp_data_t *psm_control, *version, *features;
- 	uint16_t lp = AVCTP_CONTROL_PSM;
--	uint16_t lp_browsing = AVCTP_BROWSING_PSM;
- 	uint16_t avctp_ver = 0x0103;
- 	uint16_t feat = ( AVRCP_FEATURE_CATEGORY_1 |
- 					AVRCP_FEATURE_CATEGORY_2 |
- 					AVRCP_FEATURE_CATEGORY_3 |
- 					AVRCP_FEATURE_CATEGORY_4 |
--					AVRCP_FEATURE_BROWSING |
- 					AVRCP_FEATURE_PLAYER_SETTINGS );
- 
- 	record = sdp_record_alloc();
-@@ -505,17 +517,12 @@ static sdp_record_t *avrcp_tg_record(void)
- 
- 	aproto_control = sdp_list_append(NULL, apseq);
- 	sdp_set_access_protos(record, aproto_control);
--	proto_browsing[0] = sdp_list_append(NULL, &l2cap);
--	psm_browsing = sdp_data_alloc(SDP_UINT16, &lp_browsing);
--	proto_browsing[0] = sdp_list_append(proto_browsing[0], psm_browsing);
--	apseq_browsing = sdp_list_append(NULL, proto_browsing[0]);
--
--	proto_browsing[1] = sdp_list_append(NULL, &avctp);
--	proto_browsing[1] = sdp_list_append(proto_browsing[1], version);
--	apseq_browsing = sdp_list_append(apseq_browsing, proto_browsing[1]);
- 
--	aproto_browsing = sdp_list_append(NULL, apseq_browsing);
--	sdp_set_add_access_protos(record, aproto_browsing);
-+	/* Additional Protocol Descriptor List */
-+	if (browsing) {
-+		feat |= AVRCP_FEATURE_BROWSING;
-+		avrcp_browsing_record(record, version);
-+	}
- 
- 	/* Bluetooth Profile Descriptor List */
- 	sdp_uuid16_create(&profile[0].uuid, AV_REMOTE_PROFILE_ID);
-@@ -528,12 +535,6 @@ static sdp_record_t *avrcp_tg_record(void)
- 
- 	sdp_set_info_attr(record, "AVRCP TG", NULL, NULL);
- 
--	free(psm_browsing);
--	sdp_list_free(proto_browsing[0], NULL);
--	sdp_list_free(proto_browsing[1], NULL);
--	sdp_list_free(apseq_browsing, NULL);
--	sdp_list_free(aproto_browsing, NULL);
--
- 	free(psm_control);
- 	free(version);
- 	sdp_list_free(proto_control[0], NULL);
-@@ -4364,12 +4365,14 @@ static void state_changed(struct btd_device *device, avctp_state_t old_state,
- static struct avrcp_server *avrcp_server_register(struct btd_adapter *adapter)
- {
- 	struct avrcp_server *server;
-+	bool browsing;
- 
--	if (avctp_register(adapter, TRUE) < 0)
-+	if (avctp_register(adapter, TRUE, &browsing) < 0)
- 		return NULL;
- 
- 	server = g_new0(struct avrcp_server, 1);
- 	server->adapter = btd_adapter_ref(adapter);
-+	server->browsing = browsing;
- 
- 	servers = g_slist_append(servers, server);
- 
-@@ -4687,7 +4690,7 @@ static int avrcp_target_server_probe(struct btd_profile *p,
- 		return -EPROTONOSUPPORT;
- 
- done:
--	record = avrcp_tg_record();
-+	record = avrcp_tg_record(server->browsing);
- 	if (!record) {
- 		error("Unable to allocate new service record");
- 		avrcp_target_server_remove(p, adapter);
-@@ -4770,7 +4773,7 @@ static int avrcp_controller_server_probe(struct btd_profile *p,
- 		return -EPROTONOSUPPORT;
- 
- done:
--	record = avrcp_ct_record();
-+	record = avrcp_ct_record(server->browsing);
- 	if (!record) {
- 		error("Unable to allocate new service record");
- 		avrcp_controller_server_remove(p, adapter);
--- 
-2.31.1
 
+--===============1040330872781233634==--
