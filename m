@@ -2,102 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-13.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_CR_TRAILER,INCLUDES_PATCH,
+	MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=ham autolearn_force=no
+	version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF8FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:29:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 81F42C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:37:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 547BC61039
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:29:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 661B860FDC
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:37:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244963AbhIXJbM (ORCPT
+        id S245252AbhIXJij (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Sep 2021 05:31:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53546 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245135AbhIXJbC (ORCPT
+        Fri, 24 Sep 2021 05:38:39 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:33970 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245054AbhIXJii (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Sep 2021 05:31:02 -0400
-Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C0AC061757
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
-Received: by mail-qv1-xf49.google.com with SMTP id da19-20020a05621408d300b00382307badfeso449756qvb.10
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=nqejF+iEkzA+Wb1GzwvyyPKXZSAGBGaNNmXYrhpofGk=;
-        b=FB65Qtvpj3TCB/jzTTEyEFq4gh7YV86s63MDBgmzg3KRzPfiOf6irFFhJ3dSUzygKq
-         sfG3y4bpmBWG1mmYbTUsGt+0aKbOhk8g52/Lay6t0Y63lOItDiwP4PYXmtQNtfTpbJLz
-         yFBYDvlm6VekWYDwj0w1CB3C+tVwgjU833Lsz0cGWHGvzsSvG6EP8ga3e4kPGCsJ0Cbc
-         LiStwhd+BRJh19gKiBM13BpJd8YunmPmNl/bVW3cdqp/Vdc/8zx4bXQbTM4GZkQT8yZC
-         sr4esPX93f0wQZhNt+yYyKvD9BaUnM++2xVqZITcouNmuuNatCJFBoXgeiEKoYdKcJ35
-         Gy3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=nqejF+iEkzA+Wb1GzwvyyPKXZSAGBGaNNmXYrhpofGk=;
-        b=KpbE01uJHCg/Nudgq6Bm91d8j6S4ib7qpKm78hHrMobY83RS6fx7jTr0lnaAo9MzdL
-         S5vpn3ZFIKO2DuDRf4r8FosGq8HjUMZkI+7KdMNu2nD72AKJuQGG7QiazXq50SX7BXl/
-         PAWg/YdZzqU7+VBnG5FVxjI68yYsgCjJmevbQ5B+FFa/K531WP83KoDtgxZUZG3xer4r
-         asj0kiLEMd6fS2/6GgLUDxUt6eghlOcS85vm7sKSl9pbbEvlx2IKYRhttC1PZog/odSq
-         aRXUh0DzPDa5lq/2I3roqXiJumm9j6oOFNWPA9Rz+x71OCivc99ulwL7zY/bUWg0Oubb
-         gXcQ==
-X-Gm-Message-State: AOAM531YfRJ9dn8CBzk2gCA8ofnxG0gz9g1VFpwcvypyOi0h4YJe1bXQ
-        WSMjaun6mcJ1jwTQbDyBv77OaNLQ4/y/4tDsNlqpNPHxQZrWbyFR80x71uB237WF4fCoR7GT+O6
-        XWk37IgPMUmbhZlW6YPYQgiHZ7yBnTo3Tg07c1GcC/Wd6kE/RMRyKY2oNE/cs2h53emC0N0kCRj
-        Su
-X-Google-Smtp-Source: ABdhPJyTm+7bWVNFrv+WJaGpReMtfiEPHqSbvm3emasqaRkZIggSOxP+h38NM5zwoW6hxEGhIyvlC1F8r9d2
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:ad44:810f:6cc1:6931])
- (user=apusaka job=sendgmr) by 2002:a05:6214:6ed:: with SMTP id
- bk13mr9009934qvb.47.1632475769018; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 17:29:21 +0800
-Message-Id: <20210924172910.Bluez.1.I9b71a5f022d2b7197de347c7afa6005bd1d21b5b@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [Bluez PATCH] tools/hcitool: Fix the descriptions of leal* commands
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Fri, 24 Sep 2021 05:38:38 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 59F6ACECF2;
+        Fri, 24 Sep 2021 11:37:04 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH 5.15 regression fix] Bluetooth: hci_h5: Fix
+ (runtime)suspend issues on RTL8723BS HCIs
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210920125739.111846-1-hdegoede@redhat.com>
+Date:   Fri, 24 Sep 2021 11:37:03 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <5B663F6D-3856-4CC8-93D7-A16AE3F50C95@holtmann.org>
+References: <20210920125739.111846-1-hdegoede@redhat.com>
+To:     Hans de Goede <hdegoede@redhat.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+Hi Hans,
 
-The descriptions of leal* commands are copied from lewl* commands.
-However they should use "accept list" instead.
----
+> The recently added H5_WAKEUP_DISABLE h5->flags flag gets checked in
+> h5_btrtl_open(), but it gets set in h5_serdev_probe() *after*
+> calling  hci_uart_register_device() and thus after h5_btrtl_open()
+> is called, set this flag earlier.
+> 
+> Also on devices where suspend/resume involves fully re-probing the HCI,
+> runtime-pm suspend should not be used, make the runtime-pm setup
+> conditional on the H5_WAKEUP_DISABLE flag too.
+> 
+> This fixes the HCI being removed and then re-added every 10 seconds
+> because it was being reprobed as soon as it was runtime-suspended.
+> 
+> Cc: Archie Pusaka <apusaka@chromium.org>
+> Fixes: 66f077dde749 ("Bluetooth: hci_h5: add WAKEUP_DISABLE flag")
+> Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
+> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+> ---
+> drivers/bluetooth/hci_h5.c | 20 +++++++++++---------
+> 1 file changed, 11 insertions(+), 9 deletions(-)
 
- tools/hcitool.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index b6f4a4e665..639ee6a511 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -3400,10 +3400,10 @@ static struct {
- 	{ "clock",    cmd_clock,   "Read local or remote clock"           },
- 	{ "lescan",   cmd_lescan,  "Start LE scan"                        },
- 	{ "leinfo",   cmd_leinfo,  "Get LE remote information"            },
--	{ "lealadd",  cmd_lealadd, "Add device to LE White List"          },
--	{ "lealrm",   cmd_lealrm,  "Remove device from LE White List"     },
--	{ "lealsz",   cmd_lealsz,  "Read size of LE White List"           },
--	{ "lealclr",  cmd_lealclr, "Clear LE White List"                  },
-+	{ "lealadd",  cmd_lealadd, "Add device to LE Accept List"         },
-+	{ "lealrm",   cmd_lealrm,  "Remove device from LE Accept List"    },
-+	{ "lealsz",   cmd_lealsz,  "Read size of LE Accept List"          },
-+	{ "lealclr",  cmd_lealclr, "Clear LE Accept List"                 },
- 	{ "lewladd",  cmd_lealadd, "Deprecated. Use lealadd instead."     },
- 	{ "lewlrm",   cmd_lealrm,  "Deprecated. Use lealrm instead."      },
- 	{ "lewlsz",   cmd_lealsz,  "Deprecated. Use lealsz instead."      },
--- 
-2.33.0.685.g46640cef36-goog
+Regards
+
+Marcel
 
