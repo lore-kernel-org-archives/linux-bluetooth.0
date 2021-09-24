@@ -2,132 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
-	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-21.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,USER_AGENT_GIT,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCCBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:20:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6FF8FC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:29:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83B8F60F70
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:20:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 547BC61039
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:29:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244842AbhIXJVz (ORCPT
+        id S244963AbhIXJbM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Sep 2021 05:21:55 -0400
-Received: from mout.kundenserver.de ([212.227.126.133]:49321 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244460AbhIXJVv (ORCPT
+        Fri, 24 Sep 2021 05:31:12 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53546 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S245135AbhIXJbC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Sep 2021 05:21:51 -0400
-Received: from mail-wr1-f48.google.com ([209.85.221.48]) by
- mrelayeu.kundenserver.de (mreue012 [213.165.67.97]) with ESMTPSA (Nemesis) id
- 1N7xml-1myivx0Xxb-014yY9; Fri, 24 Sep 2021 11:20:10 +0200
-Received: by mail-wr1-f48.google.com with SMTP id u18so25373704wrg.5;
-        Fri, 24 Sep 2021 02:20:10 -0700 (PDT)
-X-Gm-Message-State: AOAM531ZRidaFLxqjNvq8+5WzrW2DGyhvsdhV+Gt6CfEeVn3/rT2Tg7M
-        x9FA+F6Al1cZDkZLbqo5UDJk4GhhurJXCkjzKhs=
-X-Google-Smtp-Source: ABdhPJw/DaP5MFHWrAmrBawPKujxvaEy1saNan1Sv6h0Z1PGsCq9rfbxkvoJYM9RN7S6vpATkMqaPUC+Jg7uZduun2c=
-X-Received: by 2002:a1c:23cb:: with SMTP id j194mr956579wmj.1.1632475209761;
- Fri, 24 Sep 2021 02:20:09 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAFcO6XOvGQrRTaTkaJ0p3zR7y7nrAWD79r48=L_BbOyrK9X-vA@mail.gmail.com>
-In-Reply-To: <CAFcO6XOvGQrRTaTkaJ0p3zR7y7nrAWD79r48=L_BbOyrK9X-vA@mail.gmail.com>
-From:   Arnd Bergmann <arnd@arndb.de>
-Date:   Fri, 24 Sep 2021 11:19:53 +0200
-X-Gmail-Original-Message-ID: <CAK8P3a0kG_gdpaOoLb5H2qeq-T7orQ+2n19NNWQaRKgVNotDkw@mail.gmail.com>
-Message-ID: <CAK8P3a0kG_gdpaOoLb5H2qeq-T7orQ+2n19NNWQaRKgVNotDkw@mail.gmail.com>
-Subject: Re: There is an array-index-out-bounds bug in detach_capi_ctr in drivers/isdn/capi/kcapi.c
-To:     butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Cc:     Karsten Keil <isdn@linux-pingi.de>, Arnd Bergmann <arnd@arndb.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Networking <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Fri, 24 Sep 2021 05:31:02 -0400
+Received: from mail-qv1-xf49.google.com (mail-qv1-xf49.google.com [IPv6:2607:f8b0:4864:20::f49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C0AC061757
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
+Received: by mail-qv1-xf49.google.com with SMTP id da19-20020a05621408d300b00382307badfeso449756qvb.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=nqejF+iEkzA+Wb1GzwvyyPKXZSAGBGaNNmXYrhpofGk=;
+        b=FB65Qtvpj3TCB/jzTTEyEFq4gh7YV86s63MDBgmzg3KRzPfiOf6irFFhJ3dSUzygKq
+         sfG3y4bpmBWG1mmYbTUsGt+0aKbOhk8g52/Lay6t0Y63lOItDiwP4PYXmtQNtfTpbJLz
+         yFBYDvlm6VekWYDwj0w1CB3C+tVwgjU833Lsz0cGWHGvzsSvG6EP8ga3e4kPGCsJ0Cbc
+         LiStwhd+BRJh19gKiBM13BpJd8YunmPmNl/bVW3cdqp/Vdc/8zx4bXQbTM4GZkQT8yZC
+         sr4esPX93f0wQZhNt+yYyKvD9BaUnM++2xVqZITcouNmuuNatCJFBoXgeiEKoYdKcJ35
+         Gy3w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=nqejF+iEkzA+Wb1GzwvyyPKXZSAGBGaNNmXYrhpofGk=;
+        b=KpbE01uJHCg/Nudgq6Bm91d8j6S4ib7qpKm78hHrMobY83RS6fx7jTr0lnaAo9MzdL
+         S5vpn3ZFIKO2DuDRf4r8FosGq8HjUMZkI+7KdMNu2nD72AKJuQGG7QiazXq50SX7BXl/
+         PAWg/YdZzqU7+VBnG5FVxjI68yYsgCjJmevbQ5B+FFa/K531WP83KoDtgxZUZG3xer4r
+         asj0kiLEMd6fS2/6GgLUDxUt6eghlOcS85vm7sKSl9pbbEvlx2IKYRhttC1PZog/odSq
+         aRXUh0DzPDa5lq/2I3roqXiJumm9j6oOFNWPA9Rz+x71OCivc99ulwL7zY/bUWg0Oubb
+         gXcQ==
+X-Gm-Message-State: AOAM531YfRJ9dn8CBzk2gCA8ofnxG0gz9g1VFpwcvypyOi0h4YJe1bXQ
+        WSMjaun6mcJ1jwTQbDyBv77OaNLQ4/y/4tDsNlqpNPHxQZrWbyFR80x71uB237WF4fCoR7GT+O6
+        XWk37IgPMUmbhZlW6YPYQgiHZ7yBnTo3Tg07c1GcC/Wd6kE/RMRyKY2oNE/cs2h53emC0N0kCRj
+        Su
+X-Google-Smtp-Source: ABdhPJyTm+7bWVNFrv+WJaGpReMtfiEPHqSbvm3emasqaRkZIggSOxP+h38NM5zwoW6hxEGhIyvlC1F8r9d2
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:ad44:810f:6cc1:6931])
+ (user=apusaka job=sendgmr) by 2002:a05:6214:6ed:: with SMTP id
+ bk13mr9009934qvb.47.1632475769018; Fri, 24 Sep 2021 02:29:29 -0700 (PDT)
+Date:   Fri, 24 Sep 2021 17:29:21 +0800
+Message-Id: <20210924172910.Bluez.1.I9b71a5f022d2b7197de347c7afa6005bd1d21b5b@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [Bluez PATCH] tools/hcitool: Fix the descriptions of leal* commands
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
-X-Provags-ID: V03:K1:rnFoH1whtbLGVQn+3VN4wntYNHUQOXRXk7zPH9bvqtgXohY11vo
- C8KTKSYUKDh0phjnjkHGaDp3bYqZwFi5F+NFKCl0lr5vwD0h8GENPyqLvWY7/wjAs1QDDcG
- pCGGyggcEhaSCsMJNJwvGRBEyZmh0AepN6pd4wkEmja7dfN49d+zbS9+utqBHTa1nNKBx16
- A1P1YpVScUt/T9rkbEGnw==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:nvRV0zLpxWY=:yZFM86dTtJo1FCIewACwn9
- Uwi0pwnOcovaVLfodk8KOnQoZ4f9Iti8kxWQaTMcawizc93f2HHXX7XkiOyVxdJkSsPEZbudB
- +jD+KXcah4mW6Er0/ycH+FsBDwjwqib2g8ViLSHOenV95iKFx6qVFeZYujzv9mE3kp82TpKgr
- aJffI2GIoOjMktFKcvja4wd1+MTYwLSLdomffWaefgpKWhezWx2z6Wo8x3HOdSdpCEvJQvXLs
- eNdO+C6p0ffyoCicarMGG0kOwKe3PergOn2YhQX/YSiI/0fOrqgwIe3dWLw7uWsNaT/X5HVEp
- PkvbbwIz7HAqq0ewYgGXaxofNr2qiz++3XcYTJzNSErnbaUXIAQYxcAGgNRKaHj5V0vX4KFA7
- yEzO6D/W9dhwxeG2OqWZ2fvFlPxi+TrQ4R3MkqmdX4/x0r3dOfqz5ZWkOTurAOhWrEI4Y45ZD
- TBGdj2Hx2rmpkot+Hu8BPf989/ebbTn+rIOREsWtjx/b5L7KsivdA7aMfCfYi+18GhyEXnI/2
- xl4vh1xIlm9f2kSU3JvHhxVRsQaCw4ZwPpLXaQ1GnbKzIHuDEj+JqBYt28VSAfcnlX8z+0A+c
- j5xVq+d0esx8b/yQ1s+aMb+YnX6fevnovQfBj/RfsNlCNCcEQTyO8wOE4saUXcrSnmr+p7NJP
- IUtKXSIOvnHOLWGLLFb0izMrMKD8PNw/AjhOhgtg5lb+UA4FKlzxDLaaO4D1KwWQZ334+4I9r
- EUz+46CAA6cH2EzrDuNHZLwiR3pkiRus7qIoUVHif6iKbhKlwNwTS1F5gIrCI66RKl6CmQE58
- rYTjGfHo/P5MtY5lNrVR9R25NLV3sOq3zB/fPBDNw3AC8STLzLzNVzd+8Tsw/fW+BrSaoj2xz
- qnY7lsajBFliz1oAa81Q==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 10:44 AM butt3rflyh4ck
-<butterflyhuangxx@gmail.com> wrote:
->
-> Hi, there is an array-index-out-bounds bug in detach_capi_ctr in
-> drivers/isdn/capi/kcapi.c and I reproduce it on 5.15.0-rc2+.
+From: Archie Pusaka <apusaka@chromium.org>
 
-Thank you for the detailed report!
+The descriptions of leal* commands are copied from lewl* commands.
+However they should use "accept list" instead.
+---
 
-> ###Analyze
->  we can call CMTPCONNADD ioctl and it would invoke
-> do_cmtp_sock_ioctl(), it would call cmtp_add_connection().
-> the chain of call is as follows.
-> ioctl(CMTPCONNADD)
->    ->cmtp_sock_ioctl()
->          -->do_cmtp_sock_ioctl()
->             --->cmtp_add_connection()
->                 ---->kthread_run()
->                 ---->cmtp_attach_device()
-> the function would add a cmtp session to a controller. Let us see the code.
+ tools/hcitool.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-When I last touched the capi code, I tried to remove it all, but we then
-left it in the kernel because the bluetooth cmtp code can still theoretically
-use it.
+diff --git a/tools/hcitool.c b/tools/hcitool.c
+index b6f4a4e665..639ee6a511 100644
+--- a/tools/hcitool.c
++++ b/tools/hcitool.c
+@@ -3400,10 +3400,10 @@ static struct {
+ 	{ "clock",    cmd_clock,   "Read local or remote clock"           },
+ 	{ "lescan",   cmd_lescan,  "Start LE scan"                        },
+ 	{ "leinfo",   cmd_leinfo,  "Get LE remote information"            },
+-	{ "lealadd",  cmd_lealadd, "Add device to LE White List"          },
+-	{ "lealrm",   cmd_lealrm,  "Remove device from LE White List"     },
+-	{ "lealsz",   cmd_lealsz,  "Read size of LE White List"           },
+-	{ "lealclr",  cmd_lealclr, "Clear LE White List"                  },
++	{ "lealadd",  cmd_lealadd, "Add device to LE Accept List"         },
++	{ "lealrm",   cmd_lealrm,  "Remove device from LE Accept List"    },
++	{ "lealsz",   cmd_lealsz,  "Read size of LE Accept List"          },
++	{ "lealclr",  cmd_lealclr, "Clear LE Accept List"                 },
+ 	{ "lewladd",  cmd_lealadd, "Deprecated. Use lealadd instead."     },
+ 	{ "lewlrm",   cmd_lealrm,  "Deprecated. Use lealrm instead."      },
+ 	{ "lewlsz",   cmd_lealsz,  "Deprecated. Use lealsz instead."      },
+-- 
+2.33.0.685.g46640cef36-goog
 
-May I ask how you managed to run into this? Did you find the bug through
-inspection first and then produce it using cmtp, or did you actually use
-cmtp?
-
-If the only purpose of cmtp is now to be a target for exploits, then I
-would suggest we consider removing both cmtp and capi for
-good after backporting your fix to stable kernels. Obviously
-if it turns out that someone actually uses cmtp and/or capi, we
-should not remove it.
-
-> If the cmtp_add_connection() call cmtp_attach_device() not yet, the
-> cmtp_session->capi_ctr->cnr just is an ZERO.
->
-> The capi_controller[-1] make no sense. so should check that the
-> cmtp_session->capi_ctr->cnr is not an ZERO
-
-I would consider that a problem in cmtp, not in capi, though making
-capi more robust as in your patch does address the immediate issue.
-
-> diff --git a/drivers/isdn/capi/kcapi.c b/drivers/isdn/capi/kcapi.c
-> index cb0afe897162..38502a955f13 100644
-> --- a/drivers/isdn/capi/kcapi.c
-> +++ b/drivers/isdn/capi/kcapi.c
-> @@ -480,7 +480,7 @@ int detach_capi_ctr(struct capi_ctr *ctr)
->
->         ctr_down(ctr, CAPI_CTR_DETACHED);
->
-> -       if (capi_controller[ctr->cnr - 1] != ctr) {
-> +       if (!ctr->cnr || capi_controller[ctr->cnr - 1] != ctr) {
->                 err = -EINVAL;
->                 goto unlock_out;
->         }
-
-I think the API that is meant to be used here is
-get_capi_ctr_by_nr(), which has that check.
-
-        Arnd
