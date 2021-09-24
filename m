@@ -1,138 +1,116 @@
 Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
-X-Spam-Level: 
-X-Spam-Status: No, score=-17.2 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS
-	autolearn=unavailable autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2B4FC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 13:54:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D3250C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:18:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A137B60F11
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 13:54:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A679D611C8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 21:18:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233427AbhIXN4L (ORCPT
+        id S1347290AbhIXVUC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Sep 2021 09:56:11 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57964 "EHLO
+        Fri, 24 Sep 2021 17:20:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48132 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234615AbhIXN4K (ORCPT
+        with ESMTP id S233640AbhIXVUB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Sep 2021 09:56:10 -0400
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E12BBC061571
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 06:54:37 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id il14-20020a17090b164e00b0019c7a7c362dso7754322pjb.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 06:54:37 -0700 (PDT)
+        Fri, 24 Sep 2021 17:20:01 -0400
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46D8EC061571
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:18:28 -0700 (PDT)
+Received: by mail-pl1-x632.google.com with SMTP id y1so7336976plk.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 14:18:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:content-transfer-encoding:in-reply-to;
-        bh=Kz5TrqcLU+ze8Yfi6qwiX1dvpIqN0ksd5g5a+3awDeg=;
-        b=IGX6xsmxueczgFJR3x6mOdbU7KRPAnhnANNs+jc6CmAmQjVc2LlFTYhDk4c5eY9WSO
-         mZxc+Uhoyr/PuybtyIxgtyOFIw/cTdm5nzqbZ1rcuPlv4TBJgI2cgl+cg3k3P85+5xqL
-         UxeH7QhnVUDCEyORBzEnNLgW3IfN/8p+/hpcQ=
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XVgcto0G1nPAGGzSlr64oP9Jssuk90Nd0uHAd0BwbwQ=;
+        b=Qu8kMm6W2gVQta3XhMadaKPPaN5zt+oRw9pu51XojBD6THFE7k7HVIQeQZd6E1/r2f
+         tdg6GOarwZiDO213NF1MT9GpEo7NspOI6KrWI7CcFgjDEUXKtxtyP70pw9bprGTHbO0O
+         QoNhsgdQTXSQRztdrLJnE5CurXyLj7ZysPiK9/ehV6Gs9AMOvpj+NytQdcdaCgqbvM0j
+         I2Hrb2wfolcYO+JqRHh+EfwxZ8+xTFKcpGPLY/N0J6VwQb5MEiupjSfWziKQWPYyZ92j
+         6nLwhCRWNWRb/L1RfEiQzHTSFeCMR1s8KAvj0qbuuRGZi0TbOmG39bTx8hxfPkWHo0V4
+         sweQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:content-transfer-encoding
-         :in-reply-to;
-        bh=Kz5TrqcLU+ze8Yfi6qwiX1dvpIqN0ksd5g5a+3awDeg=;
-        b=ElQPZ322ElKZBGiT5PThi3H3o+QRr6gjeLYoXP+N3ncLH1l153Rs1hC7Xh91QCn59j
-         6zsJM7heOL67IolNCh80uxWEqbK7N/MCe/9DapkV/B6cNdk0iq1jRtxlFpeOttisOFy0
-         egcr9By2dlJ4F3ItwwSwfqvYk4qlcgB6t75RLUiG1jgNt9XUoTw22xqhWHta85e/nnc5
-         ZsAM6nM2RQUEQ7NNkKvPdG52JKhjaF76fIRczMiLCHy0GEG7bdzLnCGF7cqFuMnkhdXf
-         hzhn9lOh5wfQbuRMJ8tlZKKHY4V/mNI7oWduDEMSbRR1p+eZRa5ir9/8X+gntUoWZ9Iw
-         ClTg==
-X-Gm-Message-State: AOAM530Zs1rPvdXp9K3sI6AVeSRhCsP9IZ3bWiGRxH+AzhYriIr+bNgT
-        UY5Vr7Syd54muMXNscebY7ff1A==
-X-Google-Smtp-Source: ABdhPJx/Dtx19wxdYEYlyQ/SP788dP1lFmKMoyuYgE00j90jxbMh3uBJ6+huVy4ts0WEaSERoq/ERg==
-X-Received: by 2002:a17:90a:130f:: with SMTP id h15mr2428449pja.183.1632491677501;
-        Fri, 24 Sep 2021 06:54:37 -0700 (PDT)
-Received: from localhost ([2620:15c:202:201:973:9109:7e32:e4da])
-        by smtp.gmail.com with UTF8SMTPSA id n26sm9509706pfo.19.2021.09.24.06.54.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Sep 2021 06:54:37 -0700 (PDT)
-Date:   Fri, 24 Sep 2021 06:54:35 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Zijun Hu <zijuhu@codeaurora.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org, tjiang@codeaurora.org
-Subject: Re: [PATCH v10] Bluetooth: btusb: Add support using different nvm
- for variant WCN6855 controller
-Message-ID: <YU3Ym8Oa9yJVqN44@google.com>
-References: <1631614096-24613-1-git-send-email-zijuhu@codeaurora.org>
- <C7D16218-F9EF-4CF3-AFE1-C8589A8810D5@holtmann.org>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XVgcto0G1nPAGGzSlr64oP9Jssuk90Nd0uHAd0BwbwQ=;
+        b=qKorZcJfbdYiNgUpUtG3Vk3UNnseUlfeD8eiB7LfW5toHNV43WMWepp30mC3+QMV5P
+         bgFGBnbTgnGv/EjJuPN6L2vpM5qFa2qoPEwc/+RAtUltOdMToM01zc4FzMb774w4YCIr
+         RXLCSe0yHOy50dsX1T70E+aoJq4KZoxayXln1lNx9vUziY7tJFXhZ9Z3RdUyFSzibfxB
+         GbkGiGa13dOaAl3OSOUp3EISeVJy2rjhibIgVe88xtnC+gkFuWUuqrYT7a8Mb905Hec1
+         PEloPGSiRP8f7/kRPfHk5NaWXe3FlhDjhMtfwv66fU4MzMuTuMHRMQuwuUPxqgAbVOTD
+         BBdg==
+X-Gm-Message-State: AOAM533Job3ebP5PuIvZ9ZLyh9yosaBDyUSNzqoTZEE3iSUt6Fm4iu8r
+        n9wL0+drgrvrgNoWQYKHEEiY8BHUmbg=
+X-Google-Smtp-Source: ABdhPJykHyt8A45sZ7Sd2kSxdF+Biyrtoex4ojlyG3t2MT9W58TwKJd7z9jNaqhwfj7rD1XnyeMH7g==
+X-Received: by 2002:a17:902:c612:b0:13c:9801:a336 with SMTP id r18-20020a170902c61200b0013c9801a336mr10812350plr.27.1632518307435;
+        Fri, 24 Sep 2021 14:18:27 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h18sm9946138pfr.89.2021.09.24.14.18.26
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Sep 2021 14:18:27 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ 1/2] avctp: Fix not handling when kernel has ERTM disabled
+Date:   Fri, 24 Sep 2021 14:18:23 -0700
+Message-Id: <20210924211824.2318562-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <C7D16218-F9EF-4CF3-AFE1-C8589A8810D5@holtmann.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Sep 24, 2021 at 12:10:41PM +0200, Marcel Holtmann wrote:
-> Hi Zijun,
-> 
-> > the RF performance of wcn6855 soc chip from different foundries will be
-> > difference, so we should use different nvm to configure them.
-> > 
-> > Signed-off-by: Zijun Hu <zijuhu@codeaurora.org>
-> > ---
-> > drivers/bluetooth/btusb.c | 50 +++++++++++++++++++++++++++++++++++------------
-> > 1 file changed, 37 insertions(+), 13 deletions(-)
-> > 
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 928cbfa4c42d..6dc645698e30 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -3161,6 +3161,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev *hdev,
-> > #define QCA_DFU_TIMEOUT		3000
-> > #define QCA_FLAG_MULTI_NVM      0x80
-> > 
-> > +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> > +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> > +
-> > struct qca_version {
-> > 	__le32	rom_version;
-> > 	__le32	patch_version;
-> > @@ -3192,6 +3195,7 @@ static const struct qca_device_info qca_devices_table[] = {
-> > 	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-> > 	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-> > 	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> > +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-> > };
-> > 
-> > static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> > @@ -3346,6 +3350,31 @@ static int btusb_setup_qca_load_rampatch(struct hci_dev *hdev,
-> > 	return err;
-> > }
-> > 
-> > +static void btusb_generate_qca_nvm_name(char *fwname,
-> > +					size_t max_size,
-> > +					struct qca_version *ver,
-> > +					char *variant)
-> > +{
-> 
-> you are really not listening to review feedback. Use “const char *variant”.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Yeah, also as I mentioned earlier, this function has all the information
-to determine the variant itself, there is no need to clutter
-btusb_setup_qca_load_nvm() and the interface of this function with
-variant stuff, it should be internal business of btusb_generate_qca_nvm_name().
+If kernel module is loaded with disable_ertm ERTM won't be available
+thus browsing channel won't be able to be created, but it shall be
+possible to still use AVRCP without it.
 
-> 
-> > +	char *sep = (strlen(variant) == 0) ? "" : "_";
-> 
-> This is crazy.
+Fixes: https://github.com/bluez/bluez/issues/209
+---
+ profiles/audio/avctp.c | 17 +++++------------
+ 1 file changed, 5 insertions(+), 12 deletions(-)
 
-It can also go away if the function determines the variant itself.
+diff --git a/profiles/audio/avctp.c b/profiles/audio/avctp.c
+index 702ded136..81320de1b 100644
+--- a/profiles/audio/avctp.c
++++ b/profiles/audio/avctp.c
+@@ -1651,15 +1651,6 @@ int avctp_register(struct btd_adapter *adapter, gboolean central)
+ 	}
+ 	server->browsing_io = avctp_server_socket(src, central, BT_IO_MODE_ERTM,
+ 							AVCTP_BROWSING_PSM);
+-	if (!server->browsing_io) {
+-		if (server->control_io) {
+-			g_io_channel_shutdown(server->control_io, TRUE, NULL);
+-			g_io_channel_unref(server->control_io);
+-			server->control_io = NULL;
+-		}
+-		g_free(server);
+-		return -1;
+-	}
+ 
+ 	server->adapter = btd_adapter_ref(adapter);
+ 
+@@ -1681,9 +1672,11 @@ void avctp_unregister(struct btd_adapter *adapter)
+ 
+ 	servers = g_slist_remove(servers, server);
+ 
+-	g_io_channel_shutdown(server->browsing_io, TRUE, NULL);
+-	g_io_channel_unref(server->browsing_io);
+-	server->browsing_io = NULL;
++	if (server->browsing_io) {
++		g_io_channel_shutdown(server->browsing_io, TRUE, NULL);
++		g_io_channel_unref(server->browsing_io);
++		server->browsing_io = NULL;
++	}
+ 
+ 	g_io_channel_shutdown(server->control_io, TRUE, NULL);
+ 	g_io_channel_unref(server->control_io);
+-- 
+2.31.1
+
