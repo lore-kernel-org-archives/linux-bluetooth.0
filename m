@@ -2,110 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
-	autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-8.8 required=3.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,
+	SPF_PASS autolearn=ham autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9386FC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 03:11:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DCCBC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:20:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 72EC560EB4
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 03:11:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83B8F60F70
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 09:20:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243971AbhIXDMo (ORCPT
+        id S244842AbhIXJVz (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Sep 2021 23:12:44 -0400
-Received: from mail.kernel.org ([198.145.29.99]:59444 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243954AbhIXDMn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Sep 2021 23:12:43 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 828886124B
-        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 03:11:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1632453071;
-        bh=uWnM/Eaoy+xnud08OOnOvl5GMRM8HWbDwC8VLVlw5PE=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=inUBW0fKGsxUnfyMTZeguYZ9++uyDewgfeSwKFaqL55k1CiQkPvJK9v3VIUwLrD6q
-         SMMgfNNEFqSdqfGfQOlVEJzsch/wbr+NvjbJqm+OA8WF/2qCzS3GmQtQlzgXlSuqLa
-         UrBHDX76uC7AH6I5jKBVdkTvd6XATi+2GFnLgAwJA2KQbIpPgWVaemJ7C6zROFvmaL
-         nUpfw/sYRp4eW/yfrAVyATdosDZgg3fKrFbJHw6KnOBw5QbZfUUa7CCQ1Hq6VAmv7W
-         IJ4IcLtHWmgvRTyKzevz4fV5YlHwAok1sNgRp2CQKfdKOkYkMka13jtSnd6480ATn5
-         6JskKOd2+a+sw==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Fri, 24 Sep 2021 03:11:07 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: sakuramail@tutanota.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-60824-62941-7oZdiEbMoL@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Fri, 24 Sep 2021 05:21:55 -0400
+Received: from mout.kundenserver.de ([212.227.126.133]:49321 "EHLO
+        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244460AbhIXJVv (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 24 Sep 2021 05:21:51 -0400
+Received: from mail-wr1-f48.google.com ([209.85.221.48]) by
+ mrelayeu.kundenserver.de (mreue012 [213.165.67.97]) with ESMTPSA (Nemesis) id
+ 1N7xml-1myivx0Xxb-014yY9; Fri, 24 Sep 2021 11:20:10 +0200
+Received: by mail-wr1-f48.google.com with SMTP id u18so25373704wrg.5;
+        Fri, 24 Sep 2021 02:20:10 -0700 (PDT)
+X-Gm-Message-State: AOAM531ZRidaFLxqjNvq8+5WzrW2DGyhvsdhV+Gt6CfEeVn3/rT2Tg7M
+        x9FA+F6Al1cZDkZLbqo5UDJk4GhhurJXCkjzKhs=
+X-Google-Smtp-Source: ABdhPJw/DaP5MFHWrAmrBawPKujxvaEy1saNan1Sv6h0Z1PGsCq9rfbxkvoJYM9RN7S6vpATkMqaPUC+Jg7uZduun2c=
+X-Received: by 2002:a1c:23cb:: with SMTP id j194mr956579wmj.1.1632475209761;
+ Fri, 24 Sep 2021 02:20:09 -0700 (PDT)
 MIME-Version: 1.0
+References: <CAFcO6XOvGQrRTaTkaJ0p3zR7y7nrAWD79r48=L_BbOyrK9X-vA@mail.gmail.com>
+In-Reply-To: <CAFcO6XOvGQrRTaTkaJ0p3zR7y7nrAWD79r48=L_BbOyrK9X-vA@mail.gmail.com>
+From:   Arnd Bergmann <arnd@arndb.de>
+Date:   Fri, 24 Sep 2021 11:19:53 +0200
+X-Gmail-Original-Message-ID: <CAK8P3a0kG_gdpaOoLb5H2qeq-T7orQ+2n19NNWQaRKgVNotDkw@mail.gmail.com>
+Message-ID: <CAK8P3a0kG_gdpaOoLb5H2qeq-T7orQ+2n19NNWQaRKgVNotDkw@mail.gmail.com>
+Subject: Re: There is an array-index-out-bounds bug in detach_capi_ctr in drivers/isdn/capi/kcapi.c
+To:     butt3rflyh4ck <butterflyhuangxx@gmail.com>
+Cc:     Karsten Keil <isdn@linux-pingi.de>, Arnd Bergmann <arnd@arndb.de>,
+        "David S. Miller" <davem@davemloft.net>,
+        Networking <netdev@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>,
+        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Provags-ID: V03:K1:rnFoH1whtbLGVQn+3VN4wntYNHUQOXRXk7zPH9bvqtgXohY11vo
+ C8KTKSYUKDh0phjnjkHGaDp3bYqZwFi5F+NFKCl0lr5vwD0h8GENPyqLvWY7/wjAs1QDDcG
+ pCGGyggcEhaSCsMJNJwvGRBEyZmh0AepN6pd4wkEmja7dfN49d+zbS9+utqBHTa1nNKBx16
+ A1P1YpVScUt/T9rkbEGnw==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:nvRV0zLpxWY=:yZFM86dTtJo1FCIewACwn9
+ Uwi0pwnOcovaVLfodk8KOnQoZ4f9Iti8kxWQaTMcawizc93f2HHXX7XkiOyVxdJkSsPEZbudB
+ +jD+KXcah4mW6Er0/ycH+FsBDwjwqib2g8ViLSHOenV95iKFx6qVFeZYujzv9mE3kp82TpKgr
+ aJffI2GIoOjMktFKcvja4wd1+MTYwLSLdomffWaefgpKWhezWx2z6Wo8x3HOdSdpCEvJQvXLs
+ eNdO+C6p0ffyoCicarMGG0kOwKe3PergOn2YhQX/YSiI/0fOrqgwIe3dWLw7uWsNaT/X5HVEp
+ PkvbbwIz7HAqq0ewYgGXaxofNr2qiz++3XcYTJzNSErnbaUXIAQYxcAGgNRKaHj5V0vX4KFA7
+ yEzO6D/W9dhwxeG2OqWZ2fvFlPxi+TrQ4R3MkqmdX4/x0r3dOfqz5ZWkOTurAOhWrEI4Y45ZD
+ TBGdj2Hx2rmpkot+Hu8BPf989/ebbTn+rIOREsWtjx/b5L7KsivdA7aMfCfYi+18GhyEXnI/2
+ xl4vh1xIlm9f2kSU3JvHhxVRsQaCw4ZwPpLXaQ1GnbKzIHuDEj+JqBYt28VSAfcnlX8z+0A+c
+ j5xVq+d0esx8b/yQ1s+aMb+YnX6fevnovQfBj/RfsNlCNCcEQTyO8wOE4saUXcrSnmr+p7NJP
+ IUtKXSIOvnHOLWGLLFb0izMrMKD8PNw/AjhOhgtg5lb+UA4FKlzxDLaaO4D1KwWQZ334+4I9r
+ EUz+46CAA6cH2EzrDuNHZLwiR3pkiRus7qIoUVHif6iKbhKlwNwTS1F5gIrCI66RKl6CmQE58
+ rYTjGfHo/P5MtY5lNrVR9R25NLV3sOq3zB/fPBDNw3AC8STLzLzNVzd+8Tsw/fW+BrSaoj2xz
+ qnY7lsajBFliz1oAa81Q==
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+On Fri, Sep 24, 2021 at 10:44 AM butt3rflyh4ck
+<butterflyhuangxx@gmail.com> wrote:
+>
+> Hi, there is an array-index-out-bounds bug in detach_capi_ctr in
+> drivers/isdn/capi/kcapi.c and I reproduce it on 5.15.0-rc2+.
 
-sakuramail@tutanota.com changed:
+Thank you for the detailed report!
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |sakuramail@tutanota.com
+> ###Analyze
+>  we can call CMTPCONNADD ioctl and it would invoke
+> do_cmtp_sock_ioctl(), it would call cmtp_add_connection().
+> the chain of call is as follows.
+> ioctl(CMTPCONNADD)
+>    ->cmtp_sock_ioctl()
+>          -->do_cmtp_sock_ioctl()
+>             --->cmtp_add_connection()
+>                 ---->kthread_run()
+>                 ---->cmtp_attach_device()
+> the function would add a cmtp session to a controller. Let us see the code.
 
---- Comment #202 from sakuramail@tutanota.com ---
-Last tested on 5.10/5.11/5.12, the controller was detected and I was able to
-power it on with bluetoothctl, but was never able to pair with anything due=
- to
-a protocol error on dmesg. Testing now on:
+When I last touched the capi code, I tried to remove it all, but we then
+left it in the kernel because the bluetooth cmtp code can still theoretically
+use it.
 
-$ uname -r
-5.14.6-artix1-1
+May I ask how you managed to run into this? Did you find the bug through
+inspection first and then produce it using cmtp, or did you actually use
+cmtp?
 
-$ lsusb
-Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Don=
-gle
-(HCI mode)
+If the only purpose of cmtp is now to be a target for exploits, then I
+would suggest we consider removing both cmtp and capi for
+good after backporting your fix to stable kernels. Obviously
+if it turns out that someone actually uses cmtp and/or capi, we
+should not remove it.
 
-# dmesg
-[16890.185351] usb 1-2: new full-speed USB device number 4 using xhci_hcd
-[16890.502677] usb 1-2: New USB device found, idVendor=3D0a12, idProduct=3D=
-0001,
-bcdDevice=3D25.20
-[16890.502684] usb 1-2: New USB device strings: Mfr=3D0, Product=3D2,
-SerialNumber=3D0
-[16890.502686] usb 1-2: Product: CSR8510 A10
-[16890.518436] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
-workarounds and force-suspending once...
-[16895.708850] Bluetooth: hci0: CSR: Failed to suspend the device for our
-Barrot 8041a02 receive-issue workaround
-[16900.829464] Bluetooth: hci0: setting interface failed (110)
+> If the cmtp_add_connection() call cmtp_attach_device() not yet, the
+> cmtp_session->capi_ctr->cnr just is an ZERO.
+>
+> The capi_controller[-1] make no sense. so should check that the
+> cmtp_session->capi_ctr->cnr is not an ZERO
 
-[mgmt]# info
-Index list with 0 items
+I would consider that a problem in cmtp, not in capi, though making
+capi more robust as in your patch does address the immediate issue.
 
-The controller does not appear anymore, tried multiple usb ports.
+> diff --git a/drivers/isdn/capi/kcapi.c b/drivers/isdn/capi/kcapi.c
+> index cb0afe897162..38502a955f13 100644
+> --- a/drivers/isdn/capi/kcapi.c
+> +++ b/drivers/isdn/capi/kcapi.c
+> @@ -480,7 +480,7 @@ int detach_capi_ctr(struct capi_ctr *ctr)
+>
+>         ctr_down(ctr, CAPI_CTR_DETACHED);
+>
+> -       if (capi_controller[ctr->cnr - 1] != ctr) {
+> +       if (!ctr->cnr || capi_controller[ctr->cnr - 1] != ctr) {
+>                 err = -EINVAL;
+>                 goto unlock_out;
+>         }
 
---=20
-You may reply to this email to add a comment.
+I think the API that is meant to be used here is
+get_capi_ctr_by_nr(), which has that check.
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+        Arnd
