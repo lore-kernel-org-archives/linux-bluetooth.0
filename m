@@ -2,164 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 X-Spam-Level: 
-X-Spam-Status: No, score=-23.3 required=3.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	INCLUDES_CR_TRAILER,INCLUDES_PATCH,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.0
+X-Spam-Status: No, score=-5.5 required=3.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,MAILING_LIST_MULTI,SPF_HELO_NONE,SPF_PASS autolearn=no
+	autolearn_force=no version=3.4.0
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CB7FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 02:57:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9386FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 03:11:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B3FB60C40
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 02:57:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 72EC560EB4
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Sep 2021 03:11:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243960AbhIXC7A (ORCPT
+        id S243971AbhIXDMo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Sep 2021 22:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50062 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234930AbhIXC7A (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Sep 2021 22:59:00 -0400
-Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87B9CC061574
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 19:57:27 -0700 (PDT)
-Received: by mail-wr1-x42d.google.com with SMTP id t7so22749604wrw.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Sep 2021 19:57:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=yGHXGrdGXxK061QNP8riHSRvPlRLcFCMH+WwFTSwsco=;
-        b=hQ5rkBWXQ7t648EhHaY0OCvGFbhA2bkJm588PLYdWMPXHOHG58EyzfN6zu1zo+XGoO
-         CKM6WyTEtYbHlX8xSa7PGYGK/X9ldHUGR749dJte67eDwrRnVK54SPS/lsnId5HqTV5f
-         WZyAKTI6uI0vrDotKrlHl9eJsXTZgkZU6D69lUsX8qU4yPRkWBuYQYU74Ugg8K1R6V5j
-         5z1WPHIKsBe5Zb8phN/zThG7Ae9noiZ2Jwuo/c0WHQjJXbyP3keNo7Jb6phmvd6Dsw5i
-         4e66nBI/LCPYydO+yLfHGawqYnXEInshmO4wDNBFagnxXSSBd7f1nUG3mvkO6ZH2F5M6
-         zM5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=yGHXGrdGXxK061QNP8riHSRvPlRLcFCMH+WwFTSwsco=;
-        b=UT0ort74SKPTjSloQH54s0KrLqVDlzzBuMUngLKZOIfwIBS+6H86CGZo37vodfEDB/
-         oUqZVOIfzYWiPPkJh2KTdbfw7Egy/AEC5S0S5B2AIVRFZpL+MliFqkqDGCk9JBOyBorO
-         wu13k5tTVGblRF60+1rMwU5PVhcsRTQhR2uW+C3EbW7k2xsZu3dEhG0q66QHCN9o+EzK
-         3ynBirO8L3PrgY5bbHshggHjBw9AOY09ORR9YmGTB4YToEDluMdxVAHLSySBYaS2tOnH
-         xwXNArnAtkZ5xu+e278Op5x0Z/K6K5PklRC78x7FrBQ0SrM46yDcPl13ieXxTMLdNE5x
-         HIDg==
-X-Gm-Message-State: AOAM5313v4F9CMxUwnB34aJHN6wgv+4vIwX2cYycczJG9taxa6tSmNfT
-        dNMsT0+CyVZpSCt4iGLSgZ3FF6PenqVum6b1kGTksA==
-X-Google-Smtp-Source: ABdhPJyjOQ8H1S35D/FSttlwfixAH03xCrF6eeNhPa1elL3upAVwNRvlOKMt35hm0uBYVZ/h++orey60VihYJpLV2AU=
-X-Received: by 2002:a7b:c947:: with SMTP id i7mr7574919wml.179.1632452245857;
- Thu, 23 Sep 2021 19:57:25 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210920125739.111846-1-hdegoede@redhat.com>
-In-Reply-To: <20210920125739.111846-1-hdegoede@redhat.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 24 Sep 2021 10:57:15 +0800
-Message-ID: <CAJQfnxHarzJOqTjG_-bpgTTna0E3EfcWrrVrvkpyFTwkJeBVkw@mail.gmail.com>
-Subject: Re: [PATCH 5.15 regression fix] Bluetooth: hci_h5: Fix
- (runtime)suspend issues on RTL8723BS HCIs
-To:     Hans de Goede <hdegoede@redhat.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        Archie Pusaka <apusaka@chromium.org>
+        Thu, 23 Sep 2021 23:12:44 -0400
+Received: from mail.kernel.org ([198.145.29.99]:59444 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S243954AbhIXDMn (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Sep 2021 23:12:43 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id 828886124B
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Sep 2021 03:11:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1632453071;
+        bh=uWnM/Eaoy+xnud08OOnOvl5GMRM8HWbDwC8VLVlw5PE=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=inUBW0fKGsxUnfyMTZeguYZ9++uyDewgfeSwKFaqL55k1CiQkPvJK9v3VIUwLrD6q
+         SMMgfNNEFqSdqfGfQOlVEJzsch/wbr+NvjbJqm+OA8WF/2qCzS3GmQtQlzgXlSuqLa
+         UrBHDX76uC7AH6I5jKBVdkTvd6XATi+2GFnLgAwJA2KQbIpPgWVaemJ7C6zROFvmaL
+         nUpfw/sYRp4eW/yfrAVyATdosDZgg3fKrFbJHw6KnOBw5QbZfUUa7CCQ1Hq6VAmv7W
+         IJ4IcLtHWmgvRTyKzevz4fV5YlHwAok1sNgRp2CQKfdKOkYkMka13jtSnd6480ATn5
+         6JskKOd2+a+sw==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Fri, 24 Sep 2021 03:11:07 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sakuramail@tutanota.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-60824-62941-7oZdiEbMoL@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Hans,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-On Mon, 20 Sept 2021 at 20:57, Hans de Goede <hdegoede@redhat.com> wrote:
->
-> The recently added H5_WAKEUP_DISABLE h5->flags flag gets checked in
-> h5_btrtl_open(), but it gets set in h5_serdev_probe() *after*
-> calling  hci_uart_register_device() and thus after h5_btrtl_open()
-> is called, set this flag earlier.
->
-> Also on devices where suspend/resume involves fully re-probing the HCI,
-> runtime-pm suspend should not be used, make the runtime-pm setup
-> conditional on the H5_WAKEUP_DISABLE flag too.
->
-> This fixes the HCI being removed and then re-added every 10 seconds
-> because it was being reprobed as soon as it was runtime-suspended.
->
-> Cc: Archie Pusaka <apusaka@chromium.org>
-> Fixes: 66f077dde749 ("Bluetooth: hci_h5: add WAKEUP_DISABLE flag")
-> Fixes: d9dd833cf6d2 ("Bluetooth: hci_h5: Add runtime suspend")
-> Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+sakuramail@tutanota.com changed:
 
-You are correct, I should have checked H5_WAKEUP_DISABLE before using
-autosuspend.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |sakuramail@tutanota.com
 
-Reviewed-by: Archie Pusaka <apusaka@chromium.org>
+--- Comment #202 from sakuramail@tutanota.com ---
+Last tested on 5.10/5.11/5.12, the controller was detected and I was able to
+power it on with bluetoothctl, but was never able to pair with anything due=
+ to
+a protocol error on dmesg. Testing now on:
 
-> ---
->  drivers/bluetooth/hci_h5.c | 20 +++++++++++---------
->  1 file changed, 11 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> index 0c0dedece59c..59b712742d33 100644
-> --- a/drivers/bluetooth/hci_h5.c
-> +++ b/drivers/bluetooth/hci_h5.c
-> @@ -846,6 +846,8 @@ static int h5_serdev_probe(struct serdev_device *serdev)
->                 h5->vnd = data->vnd;
->         }
->
-> +       if (data->driver_info & H5_INFO_WAKEUP_DISABLE)
-> +               set_bit(H5_WAKEUP_DISABLE, &h5->flags);
->
->         h5->enable_gpio = devm_gpiod_get_optional(dev, "enable", GPIOD_OUT_LOW);
->         if (IS_ERR(h5->enable_gpio))
-> @@ -860,9 +862,6 @@ static int h5_serdev_probe(struct serdev_device *serdev)
->         if (err)
->                 return err;
->
-> -       if (data->driver_info & H5_INFO_WAKEUP_DISABLE)
-> -               set_bit(H5_WAKEUP_DISABLE, &h5->flags);
-> -
+$ uname -r
+5.14.6-artix1-1
 
-We can simplify by just returning err and not check its value.
+$ lsusb
+Bus 001 Device 004: ID 0a12:0001 Cambridge Silicon Radio, Ltd Bluetooth Don=
+gle
+(HCI mode)
 
->         return 0;
->  }
->
-> @@ -962,11 +961,13 @@ static void h5_btrtl_open(struct h5 *h5)
->         serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
->         serdev_device_set_baudrate(h5->hu->serdev, 115200);
->
-> -       pm_runtime_set_active(&h5->hu->serdev->dev);
-> -       pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
-> -       pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
-> -                                        SUSPEND_TIMEOUT_MS);
-> -       pm_runtime_enable(&h5->hu->serdev->dev);
-> +       if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags)) {
-> +               pm_runtime_set_active(&h5->hu->serdev->dev);
-> +               pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
-> +               pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
-> +                                                SUSPEND_TIMEOUT_MS);
-> +               pm_runtime_enable(&h5->hu->serdev->dev);
-> +       }
->
->         /* The controller needs up to 500ms to wakeup */
->         gpiod_set_value_cansleep(h5->enable_gpio, 1);
-> @@ -976,7 +977,8 @@ static void h5_btrtl_open(struct h5 *h5)
->
->  static void h5_btrtl_close(struct h5 *h5)
->  {
-> -       pm_runtime_disable(&h5->hu->serdev->dev);
-> +       if (!test_bit(H5_WAKEUP_DISABLE, &h5->flags))
-> +               pm_runtime_disable(&h5->hu->serdev->dev);
->
->         gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
->         gpiod_set_value_cansleep(h5->enable_gpio, 0);
-> --
-> 2.31.1
->
+# dmesg
+[16890.185351] usb 1-2: new full-speed USB device number 4 using xhci_hcd
+[16890.502677] usb 1-2: New USB device found, idVendor=3D0a12, idProduct=3D=
+0001,
+bcdDevice=3D25.20
+[16890.502684] usb 1-2: New USB device strings: Mfr=3D0, Product=3D2,
+SerialNumber=3D0
+[16890.502686] usb 1-2: Product: CSR8510 A10
+[16890.518436] Bluetooth: hci0: CSR: Unbranded CSR clone detected; adding
+workarounds and force-suspending once...
+[16895.708850] Bluetooth: hci0: CSR: Failed to suspend the device for our
+Barrot 8041a02 receive-issue workaround
+[16900.829464] Bluetooth: hci0: setting interface failed (110)
 
-Thanks,
-Archie
+[mgmt]# info
+Index list with 0 items
+
+The controller does not appear anymore, tried multiple usb ports.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
