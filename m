@@ -2,144 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82FF0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 07:15:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18D33C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 08:36:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 515F361038
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 07:15:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EE867610A2
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 08:36:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231151AbhIZHQh (ORCPT
+        id S229610AbhIZIiE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Sep 2021 03:16:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38842 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230507AbhIZHQg (ORCPT
+        Sun, 26 Sep 2021 04:38:04 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:43391 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229551AbhIZIiD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Sep 2021 03:16:36 -0400
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29FF5C061575
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Sep 2021 00:15:01 -0700 (PDT)
-Received: by mail-yb1-xb35.google.com with SMTP id z5so16042827ybj.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Sep 2021 00:15:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=s1g20qcSNH830RtMZtRpnOZCy3q88nhA1Ng5Qpk6pp0=;
-        b=W+6aH9e2hLiOSIlYxiFF98dEGX47ClamZIUZWbaIbq+P0Mv4q+z7yrqWwRC4P8wW7I
-         mS5hmVG15a7+JjD7BRYoiIIcwNw7VG+Ry7IBaq9M+IyL+vJd8Yjmwnz/xopGepbNLkDZ
-         YhPQcrL9NML7kl3pDfxm+7yE4RoSIhIX1EAfbXIJwgA/G9MwSEoUOb06tQADOh0ChaOb
-         WGXpnKF18pJbfeb5wtUlgOnJF1Dc3VOjYeoc8HK8HfNjSR+rUZ8GstafSmsI7Fr+j8ZM
-         oUc6YZb8RvaZ5x/AVbxzXd2kl/m4J7aS9xoEQeRzJ8j+Kgib9wcn6DWQ4O+z7y8zAuLN
-         1JFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=s1g20qcSNH830RtMZtRpnOZCy3q88nhA1Ng5Qpk6pp0=;
-        b=HGlPDTmIw6tEyXqHXpG/CGLLwM/bJJjVcbPw46Ptpxi1J6Ew8+7auoWF9am4e+dpP2
-         Lyab4DVFgy3lsy9pp5c/Hm/aGtWW9vDnIBU6rcbxVmxJNKGWx3uR+ODI4pXU+/5pMs3H
-         lBeCi0ypDW6VsrpCgsE8SDBBGIzhg/pR8HZKOJeHLk9uKLs0JM+xZjY1ICUCRZZn8afa
-         ND02rCWM2ATXVBvLuTIfSZV8tXA5oF5aFZ0pKIIJlgtlmC05Wm7iVl8mp61AneN6tz28
-         kJd0SMJZBqevbXPETvNfeVO4m3ETkigmai75JxkttfZa6MbXQDGwT/roeyva/NmsQlbn
-         OPAQ==
-X-Gm-Message-State: AOAM5316iZMwgUzNg1ZAxoYRLlNAMFYN5YN8CPLE2sE6anZRovmta9X5
-        rMwk2CoX9tuZ5Zfsr7qGoprcXXv2hcjeGoNPRIJRig==
-X-Google-Smtp-Source: ABdhPJwlEBD94uYnxGfImHkndQZbTRG/EoxrtKkSK8AW/Bx1zgjC/nJ6EV5FXl9Q3nAnM9isXWsKDOh+nwofzZYCLkE=
-X-Received: by 2002:a25:d8a:: with SMTP id 132mr15204847ybn.90.1632640499900;
- Sun, 26 Sep 2021 00:14:59 -0700 (PDT)
+        Sun, 26 Sep 2021 04:38:03 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1632645387; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=02NvsHV6MI2l4CF9wO2M1FZEsdQr289LOHiQs0BW8+A=; b=JhsUXqHH4eHr5pi4lsbm1mgBnf2cafc1y9wy9JhCaR2rQfOoVaRUVfRnju4QJxPlj4x5Q91c
+ bnQ3spMyOKnMJJXrnPZ00hTHdjPHHsehLerBfeXpQsYE3ge+n9IB/hU+ljwQM4JoCRph9cOt
+ xB1JDO1Va3sBIrAKEPuhGc9RJpk=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
+ 615030f763b1f186582c340e (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Sun, 26 Sep 2021 08:36:07
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 20997C4360C; Sun, 26 Sep 2021 08:36:07 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 4013FC4338F;
+        Sun, 26 Sep 2021 08:36:06 +0000 (UTC)
 MIME-Version: 1.0
-References: <20210913152801.v3.1.I17f57656757b83a1c0fb4b78525d8aca581725db@changeid>
- <D38B22EC-EFC8-44A0-84BE-F3710380C022@holtmann.org>
-In-Reply-To: <D38B22EC-EFC8-44A0-84BE-F3710380C022@holtmann.org>
-From:   Joseph Hwang <josephsih@google.com>
-Date:   Sun, 26 Sep 2021 15:14:48 +0800
-Message-ID: <CAHFy41-iVHf9wqBo20gHa7gR2EiXjLdb0faDXQjkekz3YbjMiQ@mail.gmail.com>
-Subject: Re: [PATCH v3 1/3] Bluetooth: btandroid: Support Android Bluetooth
- Quality Report
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        kernel test robot <lkp@intel.com>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Sun, 26 Sep 2021 16:36:06 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v11] Bluetooth: btusb: Add support using different nvm for 
+ variant WCN6855 controller
+Message-ID: <25d13858fced474d0d71faed2d829032@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel:
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-  I am very sorry that I missed your review comment! I have used
-net/bluetooth/aosp.c to replace drivers/bluetooth/btandroid.c, and
-enable the aosp capability by hci_set_aosp_capable() in the drivers.
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+  drivers/bluetooth/btusb.c | 49 
+++++++++++++++++++++++++++++++++++-------------
+  1 file changed, 36 insertions(+), 13 deletions(-)
 
-  The new patch subject is
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index da85cc14f931..c32e941818dd 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3186,6 +3186,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
+*hdev,
+  #define QCA_DFU_TIMEOUT		3000
+  #define QCA_FLAG_MULTI_NVM      0x80
 
-      [v4,1/4] Bluetooth: aosp: Support AOSP Bluetooth Quality Report
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+  struct qca_version {
+  	__le32	rom_version;
+  	__le32	patch_version;
+@@ -3217,6 +3220,7 @@ static const struct qca_device_info 
+qca_devices_table[] = {
+  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+  };
 
-  (https://patchwork.kernel.org/project/bluetooth/patch/20210926150657.v4.1=
-.Iaa4a0269e51d8e8d8784a6ac8e05899b49a1377d@changeid/)
+  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+request,
+@@ -3371,6 +3375,30 @@ static int btusb_setup_qca_load_rampatch(struct 
+hci_dev *hdev,
+  	return err;
+  }
 
-  Please take a look.
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver,
++					const char *variant)
++{
++	u16 board_id = le16_to_cpu(ver->board_id);
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++
++	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
++				rom_version, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
++				rom_version, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+  				    struct qca_version *ver,
+  				    const struct qca_device_info *info)
+@@ -3379,19 +3407,14 @@ static int btusb_setup_qca_load_nvm(struct 
+hci_dev *hdev,
+  	char fwname[64];
+  	int err;
 
-Thanks and regards,
-Joseph
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
++	switch (ver->ram_version) {
++	case WCN6855_2_0_RAM_VERSION_GF:
++	case WCN6855_2_1_RAM_VERSION_GF:
++		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "_gf");
++		break;
++	default:
++		btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver, "");
++		break;
+  	}
 
-
-On Mon, Sep 13, 2021 at 10:32 PM Marcel Holtmann <marcel@holtmann.org> wrot=
-e:
->
-> Hi Joseph,
->
-> > Add the btandroid.c file to support Android BQR commands.
-> >
-> > This module may be referenced by btusb, btrtl, and hci_qca when a
-> > Bluetooth controller supports the Android Bluetooth Quality Report.
-> >
-> > Reported-by: kernel test robot <lkp@intel.com>
-> >
-> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
-> > ---
-> >
-> > Changes in v3:
-> > - Fix the auto build test ERROR
-> >  "undefined symbol: btandroid_set_quality_report" that occurred
-> >  with some kernel configs.
-> > - Note that the mgmt-tester "Read Exp Feature - Success" failed.
-> >  But on my test device, the same test passed. Please kindly let me
-> >  know what may be going wrong. These patches do not actually
-> >  modify read/set experimental features.
-> > - As to CheckPatch failed. No need to modify the MAINTAINERS file.
-> >  Thanks.
-> >
-> > Changes in v2:
-> > - Fix the titles of patches 2/3 and 3/3 and reduce their lengths.
-> >
-> > drivers/bluetooth/Kconfig     |   5 ++
-> > drivers/bluetooth/Makefile    |   1 +
-> > drivers/bluetooth/btandroid.c | 106 ++++++++++++++++++++++++++++++++++
-> > drivers/bluetooth/btandroid.h |  10 ++++
-> > 4 files changed, 122 insertions(+)
-> > create mode 100644 drivers/bluetooth/btandroid.c
-> > create mode 100644 drivers/bluetooth/btandroid.h
->
-> I am confused now. Did you read my review comments? I do _not_ want it th=
-is way; so please read my previous response and don=E2=80=99t send the exac=
-t same patch again.
->
-> Regards
->
-> Marcel
->
-
-
---=20
-
-Joseph Shyh-In Hwang
-Email: josephsih@google.com
+  	err = request_firmware(&fw, fwname, &hdev->dev);
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
+Forum, a Linux Foundation Collaborative Project
