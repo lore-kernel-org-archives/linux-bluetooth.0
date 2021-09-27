@@ -2,128 +2,303 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 294D5C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:43:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 564CCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:45:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 145AC61074
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:43:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 352B76109F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:45:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236825AbhI0Uoz (ORCPT
+        id S237045AbhI0UrQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Sep 2021 16:44:55 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60968 "EHLO
+        Mon, 27 Sep 2021 16:47:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236818AbhI0Uoy (ORCPT
+        with ESMTP id S237014AbhI0UrL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Sep 2021 16:44:54 -0400
-Received: from mail-oi1-x232.google.com (mail-oi1-x232.google.com [IPv6:2607:f8b0:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3693C061575;
-        Mon, 27 Sep 2021 13:43:15 -0700 (PDT)
-Received: by mail-oi1-x232.google.com with SMTP id 24so27339458oix.0;
-        Mon, 27 Sep 2021 13:43:15 -0700 (PDT)
+        Mon, 27 Sep 2021 16:47:11 -0400
+Received: from mail-qk1-x749.google.com (mail-qk1-x749.google.com [IPv6:2607:f8b0:4864:20::749])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D39CAC061604
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:45:32 -0700 (PDT)
+Received: by mail-qk1-x749.google.com with SMTP id h4-20020a05620a244400b004334ede5036so75809233qkn.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:45:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=sender:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=lDkezwqLjLnwHuvOL/9dDAYKvPWPnTDjSvsZp/DEcvA=;
-        b=Fpp4rrJGmbpEQjUc4RDESo6JawFloekhVjAHTCymSHLMZTNmcHAFMqoxRmoRXC5jr9
-         jWrldbvWva9Dhcd6E1Nxw5EXSKzhGzMEWPUF6+t2ODEtHzTTg1BLHaJwmtFbDiF8PRdT
-         8+LXE+3P8L6r9P04YRTNMefQF0+LEHcTdqNFs7ThyDPN3oMIsxz9IrE+KVRutPnutoUJ
-         5KHkwLxR58NQFlA7RYoQK0exrsPDQYU/6h50RgBslsMLvVsYLsnn6m2R4s62GqYs9Jja
-         MisXtJEqZJ9Ru1FDKUz5VW5X287t5cly/sIqjmmynGbjOJ7YcGrHYsOEoNHN6H4fipN1
-         lzYw==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=4H750WdlE+myrUpYgnk2R4AjBcEk4k1kPvzzhGr+CC4=;
+        b=SQkvFEQRk7cdMn0lZ1uQpPts8fU7lY6KV821JmoUCf9QwLpf4NDx9B3Su+xvN3LAwD
+         BmRorJzbqjM9CnWo03RJQSibXGZC7nEKNgCAeobNRmwE8TCj9my9UDtCg1Q/hVGcQks0
+         Ch1CI9w3BNNuCTx5NC7yARkAySZO+WbVXARINPiLFGb0EuTvgFXVoPdu/oL28PUalLGf
+         JW5L4F7eono7wTz2aMj+yxIqrG7W8mf2YlsCRXr7Aq6k6SbOwwrCJtlt1ye0lo00I4ZX
+         zllzTORnhBZ6BjyerCTspiyJnOOXAfawMHJVepg7e1ZgpyLoHJ0HzBdKvtDjKojtKjFV
+         Zo5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:sender:from:to:cc:subject:date:message-id
-         :mime-version:content-transfer-encoding;
-        bh=lDkezwqLjLnwHuvOL/9dDAYKvPWPnTDjSvsZp/DEcvA=;
-        b=GWusl0b/4TWPWee8OwznCf2+NnmOkQbTlDOq6mtl1fM6Z4Y9tnFbEv8sWkTGpAmGrl
-         prAvhJsNqB6XOSykG9r6zZsy2iZfD2APg9bNdBXusbP8ejCDCErMTWe5eMLzzgF/f1jV
-         9FOiVC1jF0O1RFXn+NIOzbuurBBzX3kkzQsH280JPyfVfOurDa+fanAk5dTZve3DfQDu
-         +gqTig9id6xDeerD+eQiUYf1ecVHOHNVjNrSc/WfkLUSQ9W7LEbsqRY+pW9zaJoBrZ6s
-         tebw6lTbl4U/Al41oXgA7kR6JIs8UgowuEMRZ/5F2tZEd3jGnWo+Q/yyKpwLm8dTSncS
-         tqbQ==
-X-Gm-Message-State: AOAM530FykvNtca8QIxtLHce0ntSHEXbRxgq5rksHPzxwx1UtbKQgQ3T
-        0f9jVKa8OPo7f46nTYoGot4=
-X-Google-Smtp-Source: ABdhPJw34KCfO+uH/wW0TZcn95Cn00cMamiw43flV4HdHy5lVMi3khWNNrzGpNxZ9CDaml7D5KYssg==
-X-Received: by 2002:aca:3555:: with SMTP id c82mr809101oia.29.1632775395178;
-        Mon, 27 Sep 2021 13:43:15 -0700 (PDT)
-Received: from 2603-8090-2005-39b3-0000-0000-0000-1014.res6.spectrum.com.com (2603-8090-2005-39b3-0000-0000-0000-1014.res6.spectrum.com. [2603:8090:2005:39b3::1014])
-        by smtp.gmail.com with ESMTPSA id f61sm4206180otf.73.2021.09.27.13.43.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 13:43:14 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-From:   Larry Finger <Larry.Finger@lwfinger.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Gustavo Padovan <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
-        Larry Finger <Larry.Finger@lwfinger.net>,
-        Stable <stable@vger.kernel.org>
-Subject: [PATCH] bluetooth: Add another Bluetooth part for Realtek 8852AE
-Date:   Mon, 27 Sep 2021 15:43:02 -0500
-Message-Id: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
-X-Mailer: git-send-email 2.33.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=4H750WdlE+myrUpYgnk2R4AjBcEk4k1kPvzzhGr+CC4=;
+        b=Wazt3nGufNGm8VBuAW3GOO6FcBM3+dGHqsU6uUGjXvx+cbMqv9FS9yyHmYToML9EHO
+         hoNjr+a12SkPNPmfQUmlcFdi6orlmCsXZm2MFEBz6ZUXU8yWn5sn8C0DODKswOCYjmm6
+         /piPLdtL4sAH3pOxqiFz3Kp754kb7Ak9KDF1GwRxQavWZYqssH080Ab4eWcPbIRYWn7V
+         WzomKesmnjEzUJZc2WqMJsofZs4jyZoZ83dOMFWaTT2Q24kQqGMRQIjHOererQXIC1Ba
+         PDq4fjR4b+2RAIlv3xGhj1AQ9LT/pO1rKcVgY/21HX6KhyDB1ImU4kWxvghjXbQUKvaf
+         92bg==
+X-Gm-Message-State: AOAM530JgxFXSPJowmx1Y5yxr46im5eD+rbhFoKfphCn1YPUTwCno5yg
+        aSJcO4PFkOWrf07K5qhzJDD2YLSroInSgQ==
+X-Google-Smtp-Source: ABdhPJyMB1V/owBAqWfyZ4shYTz/1p1APTesxWHe1FPDMv0GMSRuhgjJ559xbyv5hJgZVwdFf+fh6n04+fBVZw==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:8f29:89eb:dfbc:3b00])
+ (user=mmandlik job=sendgmr) by 2002:a0c:f20b:: with SMTP id
+ h11mr1929166qvk.66.1632775531875; Mon, 27 Sep 2021 13:45:31 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 13:45:25 -0700
+Message-Id: <20210927134453.v1.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [PATCH v1] bluetooth: Add support to handle MSFT Monitor Device event
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Manish Mandlik <mmandlik@google.com>,
+        Archie Pusaka <mcchou@google.com>,
+        Miao-chen Chou <apusaka@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This Realtek device has both wifi and BT components. The latter reports
-a USB ID of 0bda:4852, which is not in the table.
+MSFT Monitor Device event indicates that the controller has either
+started or stopped monitoring a Bluetooth device. This event is used by
+the bluetoothd to notify clients with DeviceFound/DeviceLost.
 
-The portion of /sys/kernel/debug/usb/devices pertaining to this device is
+Test performed:
+- verified by logs that the Monitor Device event is received from the
+  controller and sent to the bluetoothd when the controller starts/stops
+  monitoring a bluetooth device.
 
-T:  Bus=06 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0bda ProdID=4852 Rev= 0.00
-S:  Manufacturer=Realtek
-S:  Product=Bluetooth Radio
-S:  SerialNumber=00e04c000001
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-
-Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
-Cc: Stable <stable@vger.kernel.org>
+Signed-off-by: Manish Mandlik <mmandlik@google.com>
+Reviewed-by: Archie Pusaka <mcchou@google.com>
+Reviewed-by: Miao-chen Chou <apusaka@google.com>
 ---
- drivers/bluetooth/btusb.c | 2 ++
- 1 file changed, 2 insertions(+)
+Hello Bt-Maintainers,
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 60d2fce59a71..7e1e43c216ec 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -384,6 +384,8 @@ static const struct usb_device_id blacklist_table[] = {
- 	/* Realtek 8852AE Bluetooth devices */
- 	{ USB_DEVICE(0x0bda, 0xc852), .driver_info = BTUSB_REALTEK |
- 						     BTUSB_WIDEBAND_SPEECH },
-+	{ USB_DEVICE(0x0bda, 0x4852), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+As mentioned in the bluez patch series [1] that introduces a new MGMT
+event MGMT_EV_ADV_MONITOR_TRACKING, we need to capture the Monitor
+Device event from the controller and pass it to the bluetoothd.
+
+This is required to further optimize the power consumption by avoiding
+handling of RSSI thresholds and timeouts in the user space and let the
+controller do the RSSI tracking.
+
+This patch adds support to read HCI_VS_MSFT_LE_Monitor_Device_Event,
+introduces a new MGMT interface MGMT_EV_ADV_MONITOR_TRACKING and sends
+information received in MSFT event to the bluetoothd via new MGMT event.
+
+Please let me know what you think about this or if you have any further
+questions.
+
+[1]
+https://patchwork.kernel.org/project/bluetooth/patch/20210927131456.BlueZ.v1.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid/
+
+Thanks,
+Manish.
+
+ include/net/bluetooth/hci_core.h |  2 +
+ include/net/bluetooth/mgmt.h     |  7 +++
+ net/bluetooth/mgmt.c             | 14 +++++
+ net/bluetooth/msft.c             | 88 ++++++++++++++++++++++++--------
+ 4 files changed, 90 insertions(+), 21 deletions(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index d46e342328b1..f8ca0dd62934 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1896,6 +1896,8 @@ void mgmt_adv_monitor_removed(struct hci_dev *hdev, u16 handle);
+ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
+ int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
+ int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
++void mgmt_adv_monitor_tracking(struct hci_dev *hdev, u16 handle, u8 state,
++			       bdaddr_t *addr, u8 addr_type);
  
- 	/* Realtek Bluetooth devices */
- 	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+ u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
+ 		      u16 to_multiplier);
+diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
+index 7ffc5d9d3e56..2724fdb3de9e 100644
+--- a/include/net/bluetooth/mgmt.h
++++ b/include/net/bluetooth/mgmt.h
+@@ -1104,3 +1104,10 @@ struct mgmt_ev_controller_resume {
+ #define MGMT_WAKE_REASON_NON_BT_WAKE		0x0
+ #define MGMT_WAKE_REASON_UNEXPECTED		0x1
+ #define MGMT_WAKE_REASON_REMOTE_WAKE		0x2
++
++#define MGMT_EV_ADV_MONITOR_TRACKING	0x002f
++struct mgmt_ev_adv_monitor_tracking {
++	__le16 monitor_handle;
++	__u8   monitor_state;
++	struct mgmt_addr_info addr;
++} __packed;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index c88f1a72296f..78f1f948dc03 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -199,6 +199,7 @@ static const u16 mgmt_untrusted_events[] = {
+ 	MGMT_EV_EXP_FEATURE_CHANGED,
+ 	MGMT_EV_ADV_MONITOR_ADDED,
+ 	MGMT_EV_ADV_MONITOR_REMOVED,
++	MGMT_EV_ADV_MONITOR_TRACKING,
+ };
+ 
+ #define CACHE_TIMEOUT	msecs_to_jiffies(2 * 1000)
+@@ -4339,6 +4340,19 @@ void mgmt_adv_monitor_removed(struct hci_dev *hdev, u16 handle)
+ 	mgmt_event(MGMT_EV_ADV_MONITOR_REMOVED, hdev, &ev, sizeof(ev), sk_skip);
+ }
+ 
++void mgmt_adv_monitor_tracking(struct hci_dev *hdev, u16 handle, u8 state,
++			       bdaddr_t *addr, u8 addr_type)
++{
++	struct mgmt_ev_adv_monitor_tracking ev;
++
++	ev.monitor_handle = cpu_to_le16(handle);
++	ev.monitor_state = state;
++	bacpy(&ev.addr.bdaddr, addr);
++	ev.addr.type = addr_type;
++
++	mgmt_event(MGMT_EV_ADV_MONITOR_TRACKING, hdev, &ev, sizeof(ev), NULL);
++}
++
+ static int read_adv_mon_features(struct sock *sk, struct hci_dev *hdev,
+ 				 void *data, u16 len)
+ {
+diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
+index 2b10abb73b40..2dc4324fe1d9 100644
+--- a/net/bluetooth/msft.c
++++ b/net/bluetooth/msft.c
+@@ -79,6 +79,14 @@ struct msft_rp_le_set_advertisement_filter_enable {
+ 	__u8 sub_opcode;
+ } __packed;
+ 
++#define MSFT_EV_LE_MONITOR_DEVICE	0x02
++struct msft_ev_le_monitor_device {
++	__u8     addr_type;
++	bdaddr_t bdaddr;
++	__u8     monitor_handle;
++	__u8     monitor_state;
++} __packed;
++
+ struct msft_monitor_advertisement_handle_data {
+ 	__u8  msft_handle;
+ 	__u16 mgmt_handle;
+@@ -104,6 +112,26 @@ bool msft_monitor_supported(struct hci_dev *hdev)
+ 	return !!(msft_get_features(hdev) & MSFT_FEATURE_MASK_LE_ADV_MONITOR);
+ }
+ 
++/* is_mgmt = true matches the handle exposed to userspace via mgmt.
++ * is_mgmt = false matches the handle used by the msft controller.
++ * This function requires the caller holds hdev->lock
++ */
++static struct msft_monitor_advertisement_handle_data *msft_find_handle_data
++				(struct hci_dev *hdev, u16 handle, bool is_mgmt)
++{
++	struct msft_monitor_advertisement_handle_data *entry;
++	struct msft_data *msft = hdev->msft_data;
++
++	list_for_each_entry(entry, &msft->handle_map, list) {
++		if (is_mgmt && entry->mgmt_handle == handle)
++			return entry;
++		if (!is_mgmt && entry->msft_handle == handle)
++			return entry;
++	}
++
++	return NULL;
++}
++
+ static bool read_supported_features(struct hci_dev *hdev,
+ 				    struct msft_data *msft)
+ {
+@@ -254,6 +282,32 @@ void msft_power_off(struct hci_dev *hdev)
+ 	}
+ }
+ 
++/* This function requires the caller holds hdev->lock */
++static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
++{
++	struct msft_ev_le_monitor_device *ev = (void *)skb->data;
++	struct msft_monitor_advertisement_handle_data *handle_data;
++
++	if (skb->len < sizeof(*ev)) {
++		bt_dev_err(hdev,
++			   "MSFT vendor event %u: insufficient data (len: %u)",
++			   MSFT_EV_LE_MONITOR_DEVICE, skb->len);
++		return;
++	}
++	skb_pull(skb, sizeof(*ev));
++
++	bt_dev_dbg(hdev,
++		   "MSFT vendor event %u: handle 0x%04x state %d addr %pMR",
++		   MSFT_EV_LE_MONITOR_DEVICE, ev->monitor_handle,
++		   ev->monitor_state, &ev->bdaddr);
++
++	handle_data = msft_find_handle_data(hdev, ev->monitor_handle, false);
++
++	mgmt_adv_monitor_tracking(hdev, handle_data->mgmt_handle,
++				  ev->monitor_state, &ev->bdaddr,
++				  ev->addr_type);
++}
++
+ void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	struct msft_data *msft = hdev->msft_data;
+@@ -281,37 +335,29 @@ void msft_vendor_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	if (skb->len < 1)
+ 		return;
+ 
++	hci_dev_lock(hdev);
++
+ 	event = *skb->data;
+ 	skb_pull(skb, 1);
+ 
+-	bt_dev_dbg(hdev, "MSFT vendor event %u", event);
+-}
++	switch (event) {
++	case MSFT_EV_LE_MONITOR_DEVICE:
++		msft_monitor_device_evt(hdev, skb);
++		break;
+ 
+-__u64 msft_get_features(struct hci_dev *hdev)
+-{
+-	struct msft_data *msft = hdev->msft_data;
++	default:
++		bt_dev_dbg(hdev, "MSFT vendor event %u", event);
++		break;
++	}
+ 
+-	return msft ? msft->features : 0;
++	hci_dev_unlock(hdev);
+ }
+ 
+-/* is_mgmt = true matches the handle exposed to userspace via mgmt.
+- * is_mgmt = false matches the handle used by the msft controller.
+- * This function requires the caller holds hdev->lock
+- */
+-static struct msft_monitor_advertisement_handle_data *msft_find_handle_data
+-				(struct hci_dev *hdev, u16 handle, bool is_mgmt)
++__u64 msft_get_features(struct hci_dev *hdev)
+ {
+-	struct msft_monitor_advertisement_handle_data *entry;
+ 	struct msft_data *msft = hdev->msft_data;
+ 
+-	list_for_each_entry(entry, &msft->handle_map, list) {
+-		if (is_mgmt && entry->mgmt_handle == handle)
+-			return entry;
+-		if (!is_mgmt && entry->msft_handle == handle)
+-			return entry;
+-	}
+-
+-	return NULL;
++	return msft ? msft->features : 0;
+ }
+ 
+ static void msft_le_monitor_advertisement_cb(struct hci_dev *hdev,
 -- 
-2.33.0
+2.33.0.685.g46640cef36-goog
 
