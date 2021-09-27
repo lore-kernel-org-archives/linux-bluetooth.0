@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 964E8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:17:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BCAF0C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:17:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D39360FF2
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:17:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 98935600CC
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:17:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236804AbhI0USy (ORCPT
+        id S236895AbhI0US6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Sep 2021 16:18:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55006 "EHLO
+        Mon, 27 Sep 2021 16:18:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55026 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236889AbhI0USx (ORCPT
+        with ESMTP id S236921AbhI0US5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Sep 2021 16:18:53 -0400
+        Mon, 27 Sep 2021 16:18:57 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 184ECC061575
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:17:15 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id p20-20020a25d814000000b005b6a75a370cso2371778ybg.14
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:17:15 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8619FC061575
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:17:19 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 81-20020a251254000000b005b6220d81efso16160570ybs.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:17:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=9QqyaGF5JbGqnPKRFDn9L/txayGrCgZHqvLhXfmbP9E=;
-        b=ovOC0zNyqsygqy4pfrfqYUif+H9OBv9b3NlGRi07npWH22eNcoubwrpFOvRjavitQG
-         E1ddZeobeG8McmKQd4GpeM2eOPW79DS+Kl99ZD54sBLnTWqW2Up4MIedUPWoLAx3lfdr
-         nR1uTnjBxHaW80gtFVNJKlRkwvYuCq31/rshxKJe+fSlgadOWy9B62iKpNJprhASw3Ji
-         Gt1nAkXSdsgMU8Nn6ABCE2nF7M21pxOmldGr+zpxh3BmItJrkbeN0xXCR+Fl5npExdAv
-         hdeXduGhNKsV3NkpmTVqlhHBUxnlMEcOC91As2Ba+VrRqj/ykzvKA358mZnX9HhKB9Xs
-         vyDw==
+        bh=rzTIu1JoB+uKHekR8/Dw77In6oKArKQgMAGVIKHvT64=;
+        b=s2jn2oYi+1Ad+zeEmTxtbT20c5gUTbyaShzfn4zXSK45HWu7K72qcWG/iIbx+gaF0v
+         Ee9lNoPvSbBPcfon0J4XwkDtdUnQsmqydEgn5AuSzr4wOzdn8AVcd+JpkSCF9t+okp+k
+         XIGKEfHwOG72M9Vg/hZLQnZGs7gE1q5LYxqGeqCv02N0pIxmdPnIzt5RSs2cjCRd8q0I
+         tI03/JYQCx6KFbGACu05v9XfTExBohqApvDqe4QZ5Wdrpsmkl/USMpwDEbY7AJp/8dqK
+         H7+qkpxbKPN9evPHqtB1i7jFZZkaURShkCvkj3g/R3gD/GrU6EecujWq9fc5wIACM6LS
+         +Q7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=9QqyaGF5JbGqnPKRFDn9L/txayGrCgZHqvLhXfmbP9E=;
-        b=miKUbBvTx9FJgi4sy0nFiyOfmkYq8F85gTRuw/DBTMEY6JO8fI9jRyozlAHgvBi8s6
-         RPsNfWXiHqxzBRNewx71+YCE1+54EDoBcimjoMK7JBd/IrZ/gYpc64hYmxPUMANMxbwZ
-         kvsM1j4n+aDeQ3Qq9qn5FRQvsOF8mv9EPmntSchI2SG7RNaqh1EEHzk/6/irlrCtKF9A
-         PlgKKUlrorFzM3653JKZJk5iNSJsEhDfCKM0i+rhJgeF2RFdfwxD9puQCVnI1/zFOk2W
-         by8nYfmMNXUsqeQ3pJOxE2xXhzSqHxzCqwD7lccbEc+rPkfZNsOf+D7vONzutwkWyqwJ
-         MWUg==
-X-Gm-Message-State: AOAM5320VBcVFqE5fe7LERxW0p3yWYp7hKibxEugO0abKABwJPaqSamF
-        3HiSvjxTKB2fzCrB8kyYHAQZxUW62xe0cw==
-X-Google-Smtp-Source: ABdhPJwofqbkkZoO0w6D9cbnsKmVp2d6kAsA1yoYYBolU5RpRfZrHNu5HGJWdOMrLlPF6fOlj9CJviFYL7+jpQ==
+        bh=rzTIu1JoB+uKHekR8/Dw77In6oKArKQgMAGVIKHvT64=;
+        b=g2V1xo3tSvzwAfSRlLShkutg+O5HdRBO8E5MR1tSjcgf+v8xyuLBfmaQeuVTZf6RG1
+         bfvvRTltmfLh3o1p4wo1yTL8zNmKBSvLlUTWFhQ2aikukkaSOzx0skJgeVUtN/tdJNI5
+         n4IuB9LgCmYFEqFWV/elTpzW+cy0HIDNxE6sGMl/62zfCE4ZcclvNigjAY+beU4txR33
+         0pr8G/w9yuXYrryYjfMI1gI0PqoFQNCuq4rO9C2E6ORDJvDllp7EidJFTO71lPBgV+Rt
+         CY1W+L+2bhgSTsqzuatC14Fmb+nn1wgpmGPyfDBr3WieJ9SrqjFkq3DOdCxhDz6BlDs1
+         f7zQ==
+X-Gm-Message-State: AOAM532DguIqGH7gBqgjKYTPmVYdKJd4OqrbFC0MdKhGAoMvRGygQD0L
+        PtYPoYnxg8C5qPhnsbm2bLHk7AJX6NXIxQ==
+X-Google-Smtp-Source: ABdhPJzUA8rkftMPTyZf7bTELOYcop2naNsntYSW0UOX+AQePVgMOMJS1h0538KvzzgVscFXceEGa1FJFvS+0Q==
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:8f29:89eb:dfbc:3b00])
- (user=mmandlik job=sendgmr) by 2002:a25:5956:: with SMTP id
- n83mr2108922ybb.194.1632773834349; Mon, 27 Sep 2021 13:17:14 -0700 (PDT)
-Date:   Mon, 27 Sep 2021 13:16:56 -0700
+ (user=mmandlik job=sendgmr) by 2002:a25:5e09:: with SMTP id
+ s9mr2082275ybb.417.1632773838776; Mon, 27 Sep 2021 13:17:18 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 13:16:57 -0700
 In-Reply-To: <20210927201657.593569-1-mmandlik@google.com>
-Message-Id: <20210927131456.BlueZ.v1.2.Ied4afb8c4c882e573f4a23670fc060cbc3e319c9@changeid>
+Message-Id: <20210927131456.BlueZ.v1.3.I68039747acc3c63f758278452889d6ed2bfff065@changeid>
 Mime-Version: 1.0
 References: <20210927201657.593569-1-mmandlik@google.com>
 X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
-Subject: [BlueZ PATCH v1 2/3] lib: Add definition of AdvMonitor Tracking event
+Subject: [BlueZ PATCH v1 3/3] adv_monitor: Receive Device Tracking event
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     linux-bluetooth@vger.kernel.org,
@@ -66,40 +66,62 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch adds a definition of the Advertisement Monitor Device
-Tracking event.
+This patch registers a callback function to receive Advertisement
+Monitor Device Tracking event.
+
+Test performed:
+- verified by logs that Monitor Device is received from the controller
+  and sent to the bluetoothd when the controller starts/stops monitoring
+  a bluetooth device.
 
 ---
 
- lib/mgmt.h | 8 ++++++++
- 1 file changed, 8 insertions(+)
+ src/adv_monitor.c | 25 +++++++++++++++++++++++++
+ 1 file changed, 25 insertions(+)
 
-diff --git a/lib/mgmt.h b/lib/mgmt.h
-index 0a6349321..f23041f96 100644
---- a/lib/mgmt.h
-+++ b/lib/mgmt.h
-@@ -1014,6 +1014,13 @@ struct mgmt_ev_controller_resume {
- 	uint8_t wake_reason;
- } __packed;
+diff --git a/src/adv_monitor.c b/src/adv_monitor.c
+index 715ac5904..05bd49134 100644
+--- a/src/adv_monitor.c
++++ b/src/adv_monitor.c
+@@ -1531,6 +1531,27 @@ static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
+ 		ev->monitor_handle);
+ }
  
-+#define MGMT_EV_ADV_MONITOR_TRACKING	0x002f
-+struct mgmt_ev_adv_monitor_tracking {
-+	uint16_t monitor_handle;
-+	uint8_t monitor_state;
-+	struct mgmt_addr_info addr;
-+} __packed;
++/* Processes Adv Monitor tracking event from kernel */
++static void adv_monitor_tracking_callback(uint16_t index, uint16_t length,
++					  const void *param, void *user_data)
++{
++	struct btd_adv_monitor_manager *manager = user_data;
++	const struct mgmt_ev_adv_monitor_tracking *ev = param;
++	uint16_t handle = le16_to_cpu(ev->monitor_handle);
++	const uint16_t adapter_id = manager->adapter_id;
++	char addr[18];
 +
- static const char *mgmt_op[] = {
- 	"<0x0000>",
- 	"Read Version",
-@@ -1152,6 +1159,7 @@ static const char *mgmt_ev[] = {
- 	"Advertisement Monitor Removed",
- 	"Controller Suspend",
- 	"Controller Resume",
-+	"Advertisement Monitor Device Tracking",	/* 0x002f */
- };
++	if (length < sizeof(*ev)) {
++		btd_error(adapter_id,
++				"Wrong size of Adv Monitor Tracking event");
++		return;
++	}
++
++	ba2str(&ev->addr.bdaddr, addr);
++	DBG("Adv monitor with handle 0x%04x %s tracking device %s", handle,
++			ev->monitor_state ? "started" : "stopped", addr);
++}
++
+ /* Allocates a manager object */
+ static struct btd_adv_monitor_manager *manager_new(
+ 						struct btd_adapter *adapter,
+@@ -1555,6 +1576,10 @@ static struct btd_adv_monitor_manager *manager_new(
+ 			manager->adapter_id, adv_monitor_removed_callback,
+ 			manager, NULL);
  
- static const char *mgmt_status[] = {
++	mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_TRACKING,
++			manager->adapter_id, adv_monitor_tracking_callback,
++			manager, NULL);
++
+ 	return manager;
+ }
+ 
 -- 
 2.33.0.685.g46640cef36-goog
 
