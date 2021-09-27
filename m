@@ -2,99 +2,224 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37B15C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 17:50:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE0BAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:06:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1587960F44
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 17:50:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C5BAB60FC0
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 20:06:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236187AbhI0RwE (ORCPT
+        id S236766AbhI0UHw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Sep 2021 13:52:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48022 "EHLO
+        Mon, 27 Sep 2021 16:07:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52318 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237464AbhI0Rvy (ORCPT
+        with ESMTP id S236657AbhI0UHv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Sep 2021 13:51:54 -0400
-Received: from mail-vk1-xa2a.google.com (mail-vk1-xa2a.google.com [IPv6:2607:f8b0:4864:20::a2a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 08DA7C061769
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 10:45:47 -0700 (PDT)
-Received: by mail-vk1-xa2a.google.com with SMTP id o204so7281695vko.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 10:45:46 -0700 (PDT)
+        Mon, 27 Sep 2021 16:07:51 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C777EC061575
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:06:13 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id x8so9729695plv.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 13:06:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=CJXXdFQHlxtsw2JhEE7ByqgYExAxkcRQj+gmmzJWWG8=;
-        b=ZUhweIcERQ4VlH/V7SheG9xLscd5oU7sR+5mal40p9qigaSFT1WS/OKJR4NT0b0Ybk
-         FyxEfp9YAaoeZImsOr/ELli8dP/IpHyB4WLjq0dNvRHOxX8BH1Qx/ctAIAQfRzxrj9B0
-         MXpQQPDIBhfHx2EgXvQvAbWid69B40SGDBaYQJXHlhrKRt3taE9ema2m5Rp95Ik2F/Vn
-         xHIShgGi+OYCVhUa/V63G0OddlfWcEXI25aHUtw3kSJEOl4GEsv9WidbzmO7Jz6pQ9QY
-         Mv8dQqb7FhaYY8Fejs45H+nB7CJwZ6wjVc/eidof7Ybip5ZyHf7hUfNXJDZdFvLg7Wv7
-         /MLA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GCWNNxwm0ZwDH2eXf0Cai1T6ld0NKMDb+enYV+Xv9GI=;
+        b=lhY5Tf2s3zfPLIYMfh3tmn5iK3W83F2qPL90o+6em2zsEOw/rj9417oFEvPsIAPU1M
+         853h32e1wNwFDvgMsnoGVycifxRHF+mmu/QJBaquooWl+bRBMcwrxp+LjbiFH9hMJk2Y
+         O2QyxEN+WpZqRzR/BrOVC6cLzJr158XY/QgD0bfP6e5VDhraWEGb4S6qi29pa3FIU/FW
+         /ceBwq5j79EdM7o1M31lzszDjeOwXCGHoNynrE2axX/kZEIV5aHslxbDV7vUA9ei+fM+
+         UgHf5GAbUnvuuCpMcMRBxuV5X1thqIrJjroeERPfP8Ga64rMSeo4JvIcsJ9Ww9uC5s+P
+         uBNQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=CJXXdFQHlxtsw2JhEE7ByqgYExAxkcRQj+gmmzJWWG8=;
-        b=IBRs9NgKR3n3lAO5nCqHUP/77xGL2QbibjBJh9nNT+Mt03TQBV43bjM51RxwMZhIp9
-         H0gV8oz7fCqH3IKhKjLNke1XNDVM/GxyI5yNbyYUuEMBlvGTP+ciVLi38FGap92QtjQN
-         DTin6Pqvgg1S+jmTC3Zr40Pt98NjemtTdDHVDrsFcalTI5Zo82P3fx0KjDmaR7Xa7+3R
-         VDY3RqNtlQR64pLprj1w2mc9XxLtf5wXVczRzjlwtymEKEVTzaF6BJCNBoKFSg7XYaNW
-         MTwZjNEvQ4zHAygCOx4diqRfs0nPyNGCxTqoyEX0/EoReh+G8TXqwwAONR8Nz4Y9hlR8
-         pj+w==
-X-Gm-Message-State: AOAM53149hJbSv7W5YIDuRhvTCcJnSWffR4m2P15ipowouR1kNck2zIZ
-        U9DWPWkXecsDMCiWpxWtCU0re2GcaroDioUONWpQ78kQ
-X-Google-Smtp-Source: ABdhPJxon8u2Xxl2KvhlhO4I6kAa3Y5ipgEqf8VxtMfV1fQ0T+Ec7O2nyYqCRWHLGwzjeMcqXjZPkEPtuUEMqNSOh6k=
-X-Received: by 2002:a1f:a9c4:: with SMTP id s187mr1383479vke.9.1632764745976;
- Mon, 27 Sep 2021 10:45:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20210926170039.49865-2-martinez.dagan@gmail.com> <6150b012.1c69fb81.98232.f6ef@mx.google.com>
-In-Reply-To: <6150b012.1c69fb81.98232.f6ef@mx.google.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GCWNNxwm0ZwDH2eXf0Cai1T6ld0NKMDb+enYV+Xv9GI=;
+        b=2NxByyWGjMyiDLOmxLFudeY/Ca7xt3/cVZbXSU8ekBDK4bjdNPo6z5GeFO1SwFWW7O
+         vtrchcvm6M6qAwiHRtZpFExOVGCIEs2LRqpURscMdJ/KPSHMgIZwh3NJvKgjMtEnSF8g
+         YZFZ6mUwj8sNS/zWpWHjzhe/hk5+MxSczjyrAQaczTjcCOwyJ8jrjB3ys/yAOWlB06Zo
+         x4NfAvDm08mdTvjTMLHX9HtxgJisqMCCa6BjvArJ/+3eZwcKKJyAXTTdAq4auLPWzycT
+         apekMCTiVKOzyPjhnFbGw7gEl6/U/O8eGuOAtuXRRjJinzl7kPUwtnniqvnKpucsn2Nc
+         9pEQ==
+X-Gm-Message-State: AOAM531/bG+/IfDAUJjTUWArXHeYn+RwI5dxuOAl5Gy1R0tpJbbP9dQi
+        JYTfL8Ufh9AnkxJJKUylXh7wPOxu94k=
+X-Google-Smtp-Source: ABdhPJz6MhGtbznWFOaVsl4oQ4o314Fk3ofIKBK2ezU7VQCYuDuw5jSX9liwOJVWRkZTYRHRUQe8iw==
+X-Received: by 2002:a17:90a:b288:: with SMTP id c8mr984270pjr.67.1632773172773;
+        Mon, 27 Sep 2021 13:06:12 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id y5sm17742830pfb.207.2021.09.27.13.06.12
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Sep 2021 13:06:12 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 27 Sep 2021 10:45:35 -0700
-Message-ID: <CABBYNZKiUs9MLe8QKjYa4OyvMaCj0iXvhXyQW16XzNktFjBGVw@mail.gmail.com>
-Subject: Re: gatt: remove superfluous extended properties
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     martinez.dagan@gmail.com
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: Make use of hci_{suspend,resume}_dev on suspend notifier
+Date:   Mon, 27 Sep 2021 13:06:09 -0700
+Message-Id: <20210927200611.2722757-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dagan,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Sep 26, 2021 at 11:00 AM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=553055
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      0.45 seconds
-> GitLint                       PASS      0.29 seconds
-> Prep - Setup ELL              PASS      50.88 seconds
-> Build - Prep                  PASS      0.24 seconds
-> Build - Configure             PASS      9.15 seconds
-> Build - Make                  PASS      219.00 seconds
-> Make Check                    PASS      9.85 seconds
-> Make Distcheck                PASS      256.92 seconds
-> Build w/ext ELL - Configure   PASS      8.96 seconds
-> Build w/ext ELL - Make        PASS      207.23 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+This moves code from hci_suspend_notifier to hci_{suspend,resume}_dev
+since some driver may handle pm directly using
+HCI_QUIRK_NO_SUSPEND_NOTIFIER.
 
-Applied, thanks.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ net/bluetooth/hci_core.c | 116 ++++++++++++++++++++++-----------------
+ 1 file changed, 67 insertions(+), 49 deletions(-)
 
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index aeec5a3031a6..ea063ce4d7af 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -3626,55 +3626,12 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
+ 	struct hci_dev *hdev =
+ 		container_of(nb, struct hci_dev, suspend_notifier);
+ 	int ret = 0;
+-	u8 state = BT_RUNNING;
+-
+-	/* If powering down, wait for completion. */
+-	if (mgmt_powering_down(hdev)) {
+-		set_bit(SUSPEND_POWERING_DOWN, hdev->suspend_tasks);
+-		ret = hci_suspend_wait_event(hdev);
+-		if (ret)
+-			goto done;
+-	}
+ 
+-	/* Suspend notifier should only act on events when powered. */
+-	if (!hdev_is_powered(hdev) ||
+-	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
+-		goto done;
+-
+-	if (action == PM_SUSPEND_PREPARE) {
+-		/* Suspend consists of two actions:
+-		 *  - First, disconnect everything and make the controller not
+-		 *    connectable (disabling scanning)
+-		 *  - Second, program event filter/accept list and enable scan
+-		 */
+-		ret = hci_change_suspend_state(hdev, BT_SUSPEND_DISCONNECT);
+-		if (!ret)
+-			state = BT_SUSPEND_DISCONNECT;
+-
+-		/* Only configure accept list if disconnect succeeded and wake
+-		 * isn't being prevented.
+-		 */
+-		if (!ret && !(hdev->prevent_wake && hdev->prevent_wake(hdev))) {
+-			ret = hci_change_suspend_state(hdev,
+-						BT_SUSPEND_CONFIGURE_WAKE);
+-			if (!ret)
+-				state = BT_SUSPEND_CONFIGURE_WAKE;
+-		}
++	if (action == PM_SUSPEND_PREPARE)
++		ret = hci_suspend_dev(hdev);
++	else if (action == PM_POST_SUSPEND)
++		ret = hci_resume_dev(hdev);
+ 
+-		hci_clear_wake_reason(hdev);
+-		mgmt_suspending(hdev, state);
+-
+-	} else if (action == PM_POST_SUSPEND) {
+-		ret = hci_change_suspend_state(hdev, BT_RUNNING);
+-
+-		mgmt_resuming(hdev, hdev->wake_reason, &hdev->wake_addr,
+-			      hdev->wake_addr_type);
+-	}
+-
+-done:
+-	/* We always allow suspend even if suspend preparation failed and
+-	 * attempt to recover in resume.
+-	 */
+ 	if (ret)
+ 		bt_dev_err(hdev, "Suspend notifier action (%lu) failed: %d",
+ 			   action, ret);
+@@ -4017,16 +3974,77 @@ EXPORT_SYMBOL(hci_release_dev);
+ /* Suspend HCI device */
+ int hci_suspend_dev(struct hci_dev *hdev)
+ {
++	int ret;
++	u8 state = BT_RUNNING;
++
++	bt_dev_dbg(hdev, "");
++
++	/* Suspend should only act on when powered. */
++	if (!hdev_is_powered(hdev) ||
++	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
++	/* If powering down, wait for completion. */
++	if (mgmt_powering_down(hdev)) {
++		set_bit(SUSPEND_POWERING_DOWN, hdev->suspend_tasks);
++		ret = hci_suspend_wait_event(hdev);
++		if (ret)
++			goto done;
++	}
++
++	/* Suspend consists of two actions:
++	 *  - First, disconnect everything and make the controller not
++	 *    connectable (disabling scanning)
++	 *  - Second, program event filter/accept list and enable scan
++	 */
++	ret = hci_change_suspend_state(hdev, BT_SUSPEND_DISCONNECT);
++	if (!ret)
++		state = BT_SUSPEND_DISCONNECT;
++
++	/* Only configure accept list if disconnect succeeded and wake
++	 * isn't being prevented.
++	 */
++	if (!ret && !(hdev->prevent_wake && hdev->prevent_wake(hdev))) {
++		ret = hci_change_suspend_state(hdev, BT_SUSPEND_CONFIGURE_WAKE);
++		if (!ret)
++			state = BT_SUSPEND_CONFIGURE_WAKE;
++	}
++
++	hci_clear_wake_reason(hdev);
++	mgmt_suspending(hdev, state);
++
++done:
++	/* We always allow suspend even if suspend preparation failed and
++	 * attempt to recover in resume.
++	 */
+ 	hci_sock_dev_event(hdev, HCI_DEV_SUSPEND);
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL(hci_suspend_dev);
+ 
+ /* Resume HCI device */
+ int hci_resume_dev(struct hci_dev *hdev)
+ {
++	int ret;
++
++	bt_dev_dbg(hdev, "");
++
++	/* Resume should only act on when powered. */
++	if (!hdev_is_powered(hdev) ||
++	    hci_dev_test_flag(hdev, HCI_UNREGISTER))
++		return 0;
++
++	/* If powering down don't attempt to resume */
++	if (mgmt_powering_down(hdev))
++		return 0;
++
++	ret = hci_change_suspend_state(hdev, BT_RUNNING);
++
++	mgmt_resuming(hdev, hdev->wake_reason, &hdev->wake_addr,
++			      hdev->wake_addr_type);
++
+ 	hci_sock_dev_event(hdev, HCI_DEV_RESUME);
+-	return 0;
++	return ret;
+ }
+ EXPORT_SYMBOL(hci_resume_dev);
+ 
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
