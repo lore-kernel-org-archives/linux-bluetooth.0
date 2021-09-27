@@ -2,102 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 93847C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 17:38:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5EE2AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 11:58:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 63E1260FC1
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 26 Sep 2021 17:38:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3108860FD7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Sep 2021 11:58:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229515AbhIZRkE (ORCPT
+        id S234131AbhI0MAG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 26 Sep 2021 13:40:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34042 "EHLO
+        Mon, 27 Sep 2021 08:00:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50270 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229496AbhIZRkD (ORCPT
+        with ESMTP id S234094AbhI0MAF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 26 Sep 2021 13:40:03 -0400
-Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3287EC061570
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Sep 2021 10:38:27 -0700 (PDT)
-Received: by mail-pj1-x102d.google.com with SMTP id bj3-20020a17090b088300b0019e6603fe89so10024094pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 26 Sep 2021 10:38:27 -0700 (PDT)
+        Mon, 27 Sep 2021 08:00:05 -0400
+Received: from mail-qk1-x74a.google.com (mail-qk1-x74a.google.com [IPv6:2607:f8b0:4864:20::74a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60255C061714
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 04:58:27 -0700 (PDT)
+Received: by mail-qk1-x74a.google.com with SMTP id i16-20020a05620a249000b004558dcb5663so66500052qkn.9
+        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 04:58:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=ALeQqce+2CWGu2hv391s8TQ8cj9sCrAlHf0KFNtNX2I=;
-        b=D9NRI9sAJ4173WYQ81KrhnBmVcHFhE0adpUI5cldV8/LqwYydSKE/YakQQ64p50eCY
-         VyrJNa7xNqzlAI2D8xAeWwNIAAx5ANRaYbpCka16zFhmtDNpvyFUJw1fkKXuA94B8gzS
-         V/j5p6cfM1aSXIPeDnoexOLrO1o0soRJwrH/E7v8M6InqWduPCFLkuJd+BlusI1wD2Ds
-         86DQPwOXqhuLIJjOSQOWMwmgF8T96u+Cozic65n1DJPYQydbbzduLsOfwHk1nliw2kTJ
-         JCcKX5wNDOdNjM77j0/ZV6gxHz1jo7acwmr0+nl+3E+srf8L1sNSK6UBq9innrFnKPIj
-         uJqg==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=FHQuGPAsx7HYP87vGVnx/78AZl3+QiedtSpkbOjt7EQ=;
+        b=PQ4wLEoHwibbQljKZZiGlG0QC+UQZ0CprAOKwd9fPGtN4DGicTZ+rV6TcK1FpX3B0r
+         dSW4x/IRQBcxSHKTlFm0edXdUh4XHcwxEu2l/+vzYtdaeQeQp18tGGGNjmG/drcRaq1L
+         lCU2NPYODwZkL/wtwQEPKbOhaL1rh0dwPIdophSYaLznP/0CNNXF+DFLffslQPwPWeD0
+         Y4uFtw5VeD2YFPiLADaxQjd1Ox8uhjgj9crlLO5aul80Y9FdHATm41JEzAarFEpg7akL
+         o6NAZtj+eD4CXXAB0CIf5BtovcNHAVjNhoeGlKR5yXibVTWx01pjTwALi/B4btMuJA65
+         3SCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=ALeQqce+2CWGu2hv391s8TQ8cj9sCrAlHf0KFNtNX2I=;
-        b=JYLSJZEvmeTPX0lHfakQk16C0f3BWccnMoR3zRBJJ+BBNE7EG5XhUojiUJOLmK/w/s
-         7OEwk76sjyuPEImey/9P1k2YJF/fsXTiKsB3zXm9UCWhk3fV65dHKQoBze+FyKmJQ9Zf
-         Rsixon8pTZuUv0qomAl448DogBZgoT65xGE27TvkCoD2d3yTd90mmpn5kjFqaU53Spfe
-         6TyOVTX81zfgxp9D6m2PaVXdSTcMwVkKRNcIQdDH+e5LEKRBqw6z6MiRijwKwsQh9Sev
-         ll1vSsnlLa4j4Z0PNG7FNwNK3CaOiLqKhDu/K3Hn9Lr9aNAwcf0Mq4DmSoSzGMqTml9n
-         Fbzw==
-X-Gm-Message-State: AOAM532iAePQrLgeGwnE4RHM6W/hdI1BJKJFzqNVanAVg5HN4JmY55Ru
-        6vO1aExt/rkpE7A0HgO8d6n9KZv5eaE=
-X-Google-Smtp-Source: ABdhPJwS1/BONHepW6j192adI8htlVNk3ud/HtOh1q1qX2MAkgD/XIcPhe+ro52q6SAZ39m6PQbKyQ==
-X-Received: by 2002:a17:90a:7d11:: with SMTP id g17mr14999037pjl.150.1632677906396;
-        Sun, 26 Sep 2021 10:38:26 -0700 (PDT)
-Received: from [172.17.0.2] ([52.183.9.191])
-        by smtp.gmail.com with ESMTPSA id u16sm14537002pfn.68.2021.09.26.10.38.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 26 Sep 2021 10:38:26 -0700 (PDT)
-Message-ID: <6150b012.1c69fb81.98232.f6ef@mx.google.com>
-Date:   Sun, 26 Sep 2021 10:38:26 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3138402987975510484=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, martinez.dagan@gmail.com
-Subject: RE: gatt: remove superfluous extended properties
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210926170039.49865-2-martinez.dagan@gmail.com>
-References: <20210926170039.49865-2-martinez.dagan@gmail.com>
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=FHQuGPAsx7HYP87vGVnx/78AZl3+QiedtSpkbOjt7EQ=;
+        b=WQXe+6oDvRiiQVtB9qheJCPWO5hhHpqoX8gqqRIY9a0yjC0AC49b+vWAfFUhsGO/T6
+         pFBTvlSFs0M4zjCSH0vWAFRP2EdJAysWEAo+/jMs79mFFcmzim1QBa36jM1DxdmWWaOa
+         l9qaPuShJ6QWvv6gFt9mMlKsgRAKA8ey2fw7okXV9db8SSSx6v4sDzC45bFloixZXgbe
+         pgTUnuvR0/FkBgNtDP88d9NIAipY2gjclEl5EMTq6ko6LvIZLIZy+EHAVWD/uGzX1rF1
+         uyXhpW/o83U6ee2heTtUFtVAwq20sD05SYzaQqP4vy0K25AR127hje0rkfHiZmiluhvp
+         cd5g==
+X-Gm-Message-State: AOAM530MOzR6paHWOHzFsHrjGv62SLXwquQ2KlvBVQp+ONq607kF0a5+
+        0DGmrNZ04TEorbTFfa50bsXmcHArZyu9U8y/I6EOGMcIfF8d0fkKgfHA/SYV1FLrTmfZFg1OXOr
+        K+hM/6rysePaTat/EyIePBu4iqhgPjXMlbAuSjD7j+R9mWxj0cd+UOpHQ1kXU0Iqg2J7/ALrMBx
+        Uo/DY/ikJyNRA=
+X-Google-Smtp-Source: ABdhPJwxxL0oGSpJvwRblD9qlcbwwPQ+tDtlTTHiKbr8IQ3TpLAjYHO/AVzFhLwGY9EBaegrTxetCJayRzvfWAQQsA==
+X-Received: from howardchung-p920.tpe.corp.google.com ([2401:fa00:1:10:9751:55fe:4e2:1c04])
+ (user=howardchung job=sendgmr) by 2002:ad4:4989:: with SMTP id
+ t9mr22237qvx.29.1632743906497; Mon, 27 Sep 2021 04:58:26 -0700 (PDT)
+Date:   Mon, 27 Sep 2021 19:58:01 +0800
+Message-Id: <20210927195737.v1.1.Id56e280fc8cac32561e3ea49df34308d26d559c9@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.685.g46640cef36-goog
+Subject: [PATCH v1] Bluetooth: Fix wrong opcode when LL privacy enabled
+From:   Howard Chung <howardchung@google.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Yun-Hao Chung <howardchung@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3138402987975510484==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Yun-Hao Chung <howardchung@chromium.org>
 
-This is automated email and please do not reply to this email!
+The returned opcode of command status of remove_adv is
+wrong when LL privacy is enabled.
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=553055
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.45 seconds
-GitLint                       PASS      0.29 seconds
-Prep - Setup ELL              PASS      50.88 seconds
-Build - Prep                  PASS      0.24 seconds
-Build - Configure             PASS      9.15 seconds
-Build - Make                  PASS      219.00 seconds
-Make Check                    PASS      9.85 seconds
-Make Distcheck                PASS      256.92 seconds
-Build w/ext ELL - Configure   PASS      8.96 seconds
-Build w/ext ELL - Make        PASS      207.23 seconds
-
-
-
+Signed-off-by: Yun-Hao Chung <howardchung@chromium.org>
 ---
-Regards,
-Linux Bluetooth
+Test with following steps:
+1. btmgmt --index 0
+2. [btmgmt] power off; [btmgmt] exp-privacy on; [btmgmt] power on
+3. [btmgmt] rm-adv 1
+4. Check if the 'Not supported' message is present in terminal
 
+ net/bluetooth/mgmt.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
---===============3138402987975510484==--
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index cea01e275f1ea..87acf0d783a07 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -8222,7 +8222,7 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
+ 	 * advertising.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
+-		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
++		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADVERTISING,
+ 				       MGMT_STATUS_NOT_SUPPORTED);
+ 
+ 	hci_dev_lock(hdev);
+-- 
+2.33.0.685.g46640cef36-goog
+
