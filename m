@@ -2,89 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 09:43:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EAC1BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 10:10:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 31A896023B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 09:43:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CE1EB610A2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 10:10:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239827AbhI1Jph (ORCPT
+        id S240104AbhI1KL7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 05:45:37 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:51298 "EHLO
+        Tue, 28 Sep 2021 06:11:59 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60843 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235071AbhI1Jpg (ORCPT
+        with ESMTP id S240094AbhI1KL6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 05:45:36 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 587E8CECD8;
-        Tue, 28 Sep 2021 11:43:56 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] bluetooth: Add another Bluetooth part for Realtek 8852AE
+        Tue, 28 Sep 2021 06:11:58 -0400
+Received: from fedora.. (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 961C7CECD9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 12:10:18 +0200 (CEST)
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
-Date:   Tue, 28 Sep 2021 11:43:55 +0200
-Cc:     "Gustavo F. Padovan" <gustavo@padovan.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Hilda Wu <hildawu@realtek.com>, Stable <stable@vger.kernel.org>
-Content-Transfer-Encoding: 7bit
-Message-Id: <AC19C8F8-6AC8-4B1F-AFB0-7D72F57D885D@holtmann.org>
-References: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
-To:     Larry Finger <Larry.Finger@lwfinger.net>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 2/2] Bluetooth: Fix handling of experimental feature for codec offload
+Date:   Tue, 28 Sep 2021 12:10:15 +0200
+Message-Id: <20210928101015.27026-2-marcel@holtmann.org>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Larry,
+The existence of the experimental feature identifiy is the indication
+that it is supported or not. No extra flag needed and the initial flag
+should define if a feature is enabled or not. This is actually defined
+in the management API definition.
 
-> This Realtek device has both wifi and BT components. The latter reports
-> a USB ID of 0bda:4852, which is not in the table.
-> 
-> The portion of /sys/kernel/debug/usb/devices pertaining to this device is
-> 
-> T:  Bus=06 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
-> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0bda ProdID=4852 Rev= 0.00
-> S:  Manufacturer=Realtek
-> S:  Product=Bluetooth Radio
-> S:  SerialNumber=00e04c000001
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> 
-> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
-> Cc: Stable <stable@vger.kernel.org>
-> ---
-> drivers/bluetooth/btusb.c | 2 ++
-> 1 file changed, 2 insertions(+)
+Fixes: ad93315183285 ("Bluetooth: Add offload feature under experimental flag")
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+---
+ net/bluetooth/mgmt.c | 17 ++++-------------
+ 1 file changed, 4 insertions(+), 13 deletions(-)
 
-patch does not apply cleanly to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 84336be4d00d..3e5283607b97 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3874,21 +3874,12 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 		idx++;
+ 	}
+ 
+-	if (hdev) {
+-		if (hdev->get_data_path_id) {
+-			/* BIT(0): indicating if offload codecs are
+-			 * supported by controller.
+-			 */
++	if (hdev && hdev->get_data_path_id) {
++		if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
+ 			flags = BIT(0);
+-
+-			/* BIT(1): indicating if codec offload feature
+-			 * is enabled.
+-			 */
+-			if (hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED))
+-				flags |= BIT(1);
+-		} else {
++		else
+ 			flags = 0;
+-		}
++
+ 		memcpy(rp->features[idx].uuid, offload_codecs_uuid, 16);
+ 		rp->features[idx].flags = cpu_to_le32(flags);
+ 		idx++;
+-- 
+2.31.1
 
