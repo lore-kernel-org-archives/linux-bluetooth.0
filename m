@@ -2,102 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38B47C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 02:31:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B2669C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 03:50:53 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1B08961156
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 02:31:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8F4D161266
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 03:50:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238698AbhI1CdT (ORCPT
+        id S238864AbhI1Dwb convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Sep 2021 22:33:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55744 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238655AbhI1CdT (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Sep 2021 22:33:19 -0400
-Received: from mail-qk1-x72b.google.com (mail-qk1-x72b.google.com [IPv6:2607:f8b0:4864:20::72b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAA7AC061575
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 19:31:40 -0700 (PDT)
-Received: by mail-qk1-x72b.google.com with SMTP id 72so39026542qkk.7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Sep 2021 19:31:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=hgXeUvY3FreIWoSqOi5C0NGyXT3IP9LX4NZoZTbxmC0=;
-        b=EtCj2raLk0rFsmoNJGHuLe5vGQwSYxTlag42hfh8f7LVTzZ1pOBWJ8Z7O2K1Hu2A/G
-         cbUJvDWOemZkk4LDFH/VO5v1MCmHb3NpUKV9sKV6tL0v8SSzuVjJ7fL78dk0WW9gMCOo
-         XX1D15M/3YLWITQbq1iQYP9ByhN0C8fSpKMkdkhjCc/F6763bE9A4MCI04tz01OdEKmL
-         AKdcMIwAByyCxsk4XeKt8HfyBOUkmXfz4wvw+cWj0OZFV7K9tB9iqlWgJtf+0fyvoWdX
-         0ZplbgGNMCk5Dq9P2I5dgF2aMr3VRTzgNonxR7OJpiadHZMIvf/C2BYdDx4pcoiXb+ob
-         6+Jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=hgXeUvY3FreIWoSqOi5C0NGyXT3IP9LX4NZoZTbxmC0=;
-        b=SWKBoEykDIewVvjvhJPEG2+xQkdteo0P/RZpk5hIkSdCYpvJzRM2/lerOxjDBsRklh
-         yvjGbYzeqcHfD1aewCurBD2ch+fUATL3wXcMl+nFEjtWr+JOlREy05K5KR7xzrcnOGZk
-         OfWcFnfv8XibJ2AoWfdspuuKAqB1VQerY3pVWj/6YeDto12xvx+vMy1hmD7OJSzi0Xj/
-         G/wilXBrrYNoPHXUFGU+lkXCXPZu/2GozH8FyO7q3mMBLJPzqTvu8r6BYnEaaNtCyVIS
-         G0AwGmtb6f/HbjwX+hnBTbHaM1f/TKTiNPISS5+gSvPULKrLEjWK07XS0c6G5gcSoTog
-         x+Bg==
-X-Gm-Message-State: AOAM530oT5lfMw0S+jNIoiTjtr2hmxmWpEB7T5wMWxLi7cw8ukMK+W9g
-        BKMmSFPg3XDa1hLm2YGZGCfb641HvsPv/w==
-X-Google-Smtp-Source: ABdhPJzxLPMInVFpAYmDu3RDsiyP7zcKX9TAE1NbTNl/hlhiHyuGlO0XZtJCvX4x8nx2Pd0ZLw3HQQ==
-X-Received: by 2002:a37:6146:: with SMTP id v67mr3290284qkb.242.1632796299864;
-        Mon, 27 Sep 2021 19:31:39 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.72.210])
-        by smtp.gmail.com with ESMTPSA id d24sm13635732qka.7.2021.09.27.19.31.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Sep 2021 19:31:39 -0700 (PDT)
-Message-ID: <61527e8b.1c69fb81.91cdb.2376@mx.google.com>
-Date:   Mon, 27 Sep 2021 19:31:39 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============4046227887275867592=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [BlueZ] tools/mgmt-tester: Add suspend/resume test cases
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210928013820.288289-1-hj.tedd.an@gmail.com>
-References: <20210928013820.288289-1-hj.tedd.an@gmail.com>
+        Mon, 27 Sep 2021 23:52:31 -0400
+Received: from mga06.intel.com ([134.134.136.31]:45703 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S238850AbhI1Dwa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 27 Sep 2021 23:52:30 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10120"; a="285625770"
+X-IronPort-AV: E=Sophos;i="5.85,328,1624345200"; 
+   d="scan'208";a="285625770"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2021 20:50:50 -0700
+X-IronPort-AV: E=Sophos;i="5.85,328,1624345200"; 
+   d="scan'208";a="518824827"
+Received: from msaber-mobl.amr.corp.intel.com (HELO [10.209.117.154]) ([10.209.117.154])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Sep 2021 20:50:50 -0700
+User-Agent: Microsoft-MacOutlook/16.53.21091200
+Date:   Mon, 27 Sep 2021 20:50:49 -0700
+Subject: Re: [PATCH] bluetooth: Add another Bluetooth part for Realtek 8852AE
+From:   Tedd An <tedd.an@linux.intel.com>
+To:     Larry Finger <Larry.Finger@lwfinger.net>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+CC:     <linux-bluetooth@vger.kernel.org>, Hilda Wu <hildawu@realtek.com>,
+        Stable <stable@vger.kernel.org>
+Message-ID: <16103760-4979-45E1-9BEF-09618B584F1C@linux.intel.com>
+Thread-Topic: [PATCH] bluetooth: Add another Bluetooth part for Realtek 8852AE
+References: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
+In-Reply-To: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
+Mime-version: 1.0
+Content-type: text/plain;
+        charset="UTF-8"
+Content-transfer-encoding: 8BIT
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4046227887275867592==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Larry
 
-This is automated email and please do not reply to this email!
+﻿On 9/27/21, 1:43 PM, "Larry Finger" <larry.finger@gmail.com on behalf of Larry.Finger@lwfinger.net> wrote:
 
-Dear submitter,
+    This Realtek device has both wifi and BT components. The latter reports
+    a USB ID of 0bda:4852, which is not in the table.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=553871
+    The portion of /sys/kernel/debug/usb/devices pertaining to this device is
 
----Test result---
+    T:  Bus=06 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+    D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+    P:  Vendor=0bda ProdID=4852 Rev= 0.00
+    S:  Manufacturer=Realtek
+    S:  Product=Bluetooth Radio
+    S:  SerialNumber=00e04c000001
+    C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+    I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+    E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+    I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+    I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+    I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+    I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+    I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+    I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+    E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+    E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Test Summary:
-CheckPatch                    PASS      1.83 seconds
-GitLint                       PASS      1.01 seconds
-Prep - Setup ELL              PASS      56.08 seconds
-Build - Prep                  PASS      0.54 seconds
-Build - Configure             PASS      10.62 seconds
-Build - Make                  PASS      247.73 seconds
-Make Check                    PASS      9.78 seconds
-Make Distcheck                PASS      280.72 seconds
-Build w/ext ELL - Configure   PASS      9.92 seconds
-Build w/ext ELL - Make        PASS      222.60 seconds
+    Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+    Cc: Stable <stable@vger.kernel.org>
+    ---
+     drivers/bluetooth/btusb.c | 2 ++
+     1 file changed, 2 insertions(+)
 
+    diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+    index 60d2fce59a71..7e1e43c216ec 100644
+    --- a/drivers/bluetooth/btusb.c
+    +++ b/drivers/bluetooth/btusb.c
+    @@ -384,6 +384,8 @@ static const struct usb_device_id blacklist_table[] = {
+     	/* Realtek 8852AE Bluetooth devices */
+     	{ USB_DEVICE(0x0bda, 0xc852), .driver_info = BTUSB_REALTEK |
+     						     BTUSB_WIDEBAND_SPEECH },
+    +	{ USB_DEVICE(0x0bda, 0x4852), .driver_info = BTUSB_REALTEK |
+    +						     BTUSB_WIDEBAND_SPEECH },
 
+Not able to apply patch to the bluetooth-next thus cannot run CI.
+Please rebase to the tip and submit again.
 
----
+     	/* Realtek Bluetooth devices */
+     	{ USB_VENDOR_AND_INTERFACE_INFO(0x0bda, 0xe0, 0x01, 0x01),
+    -- 
+    2.33.0
+
 Regards,
-Linux Bluetooth
+Tedd
 
 
---===============4046227887275867592==--
