@@ -2,78 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F0ABC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 22:56:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F41CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 23:00:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2E6166138F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 22:56:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 863646138F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 23:00:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243128AbhI1W5t (ORCPT
+        id S243174AbhI1XCG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 18:57:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57546 "EHLO
+        Tue, 28 Sep 2021 19:02:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58488 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243098AbhI1W5s (ORCPT
+        with ESMTP id S243149AbhI1XCD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 18:57:48 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E367C06161C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 15:56:08 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id w19so268880pfn.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 15:56:08 -0700 (PDT)
+        Tue, 28 Sep 2021 19:02:03 -0400
+Received: from mail-pg1-x535.google.com (mail-pg1-x535.google.com [IPv6:2607:f8b0:4864:20::535])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CB54C06161C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 16:00:22 -0700 (PDT)
+Received: by mail-pg1-x535.google.com with SMTP id m21so578510pgu.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 16:00:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=allthenticate.net; s=google;
         h=from:to:cc:subject:date:message-id;
-        bh=9sZY0x6/mJvx9vTCYEUn4Fg9Bf6lafZDXnWkmr4feH4=;
-        b=is8QHgTZsGEbJA4+yR0n0U3e2wDqJYI1hoAoWs93akp+8709EJ82I0jHCXV9K9GNWb
-         G9GjX4sN3ykJy+6+azmlkwyB5/j16XWSEu1RlzoQ6k5meBQcRTJ/MLhWkVBTDVnHrQwB
-         J7sALMVKXAt7XLh5P1THQ9l73ABz0BLPM2dQPUvGVkmK0A1HDHmrHR7UxleE683gBKo1
-         EljPUHkHzrD7HrdFAfyKTZCNyG8/fq3NTywFdPzTW+UgHR4qCkvWilZiFC7H+vzARVwj
-         S3Fj7g/TAxJk9boiGU0LKykOpr84C1OATRTMYsjaNWvr0fqi7t8oLr76GRij5JzCjnpu
-         hO/g==
+        bh=QmVRwo97hcdrl5wADlhDu1RqHEFI31lA7lyQk2sSIi4=;
+        b=IIKDNqKsd7JxNNE50AH4VMe840jppSLamUjy9C+A+lnkwVccVueRy5B4OsntB1waJ5
+         /hNlFnlDQJJPrQMOxyiSnUJ8lT/eGuv6y3IV/3l6BR3abb4/vkad9vIvK117MO9J0pBG
+         kDi1lfJaXKLF+HmKiOePx2QmZerybD5n7HR2glxJu+nCZtE9RuZ0UJC6KQi6WIRgDx3d
+         SIX0HS9yBLsdPrebTVyKqSf+I9Ug39nSfKXEHuPaEwga38KKGhNU15yBU+a9pKPgkGvH
+         rA20iYBrCylgs10TjVKbI6mRZwO0OJltlJWt9QEMH4kGoPJVzPb+A2xUaps6LnmtjqgA
+         wFZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=9sZY0x6/mJvx9vTCYEUn4Fg9Bf6lafZDXnWkmr4feH4=;
-        b=GFsczepTBcXDT1DKXRBDcPY7DLqE6Drd/I3OevTKo02akP5A1pEoPTYlR8BTdfxhHI
-         fM9ORNjgyMOgdK7BXmqNJ+F6ZaLxh7Sa0PjS3XEYhGTGL68E/LxIF68oO3Me9Fpvmgpb
-         jjxVGQRoSicukT9YfR2/7gZB4CnFdnXSxznrh1FW04IYy93TtvAcWRoyjxRYTD93OtKP
-         XIPPDF+vpWMpKrTtUsOEEj+QpW2dcOfzqwezmWkj8GACBXU+wdFdxNh5b6lLpdPcc2nE
-         CTt2MkMr54hjr/mvbvoNgb1ee9ijrLyCzrawast5x3jxpWEGzCRkpbBzzo9KyeeKrqof
-         5j0w==
-X-Gm-Message-State: AOAM530MVc3vyKbIuXawLfHoY1Cb0RIKpMBEliuHq8fsMeiwPJhWI/qh
-        P2GSjpthSFAKRm2+KwopNJSDAH5EQ1Shkf07
-X-Google-Smtp-Source: ABdhPJxOciqWSv89P4n0LNaInSbESq1z8PB0hdutCIZTcHRhTtVjo0aLeZjclgZ91xbnJ17i5vh8Dw==
-X-Received: by 2002:a63:7e41:: with SMTP id o1mr6727546pgn.436.1632869767524;
-        Tue, 28 Sep 2021 15:56:07 -0700 (PDT)
+        bh=QmVRwo97hcdrl5wADlhDu1RqHEFI31lA7lyQk2sSIi4=;
+        b=E718JMYQj8MEc7Cx9EtXxihmUv6x4Dby5LsnD5udMEkF3wPmMtVZhNepBr5L1jcvdo
+         sEykqqJJtIZ0WttZIlNxgx60wjOXce8A+pHJjDI2eb4tSxE5DWFWtjyywUu+ovaTySdZ
+         JPfZwClagcJA6jdd+dw4HtjCMnqxHsTrH2cmCSGGIMLt4v1cKJvDENQPT41PTnZSx4iP
+         CpsVr4FEPzGM7wxVI18lfA2bQf5imPjxCLAVUNJI0kCUBX2bjD1aWmg2w16bwXUmaNwZ
+         Z8fBegn93Q6GS8mi09VPs/XrkjT7c+hZdph68A/wopWMN5CneNglV6ywz3MlpXn3hgQE
+         /Z5Q==
+X-Gm-Message-State: AOAM5336YPFNxEKUTbSz5uH6JGf0/DUFGbRZqsGjMFxUJUKZSBgSj55O
+        huvfG3lZ0hJwrEt37B2zv6PbciBA8bVomAP0
+X-Google-Smtp-Source: ABdhPJzBhhNTyLw0vQYJMFoMU0P4HcEl+UnwXiCVEUTwKZ1fUDLiCdzypwk22dYCQJDjlH0L68gFBQ==
+X-Received: by 2002:a63:4622:: with SMTP id t34mr6808129pga.293.1632870021172;
+        Tue, 28 Sep 2021 16:00:21 -0700 (PDT)
 Received: from BernieDesktop.lan (wsip-72-222-70-2.sb.sd.cox.net. [72.222.70.2])
-        by smtp.gmail.com with ESMTPSA id p2sm193844pgd.84.2021.09.28.15.56.06
+        by smtp.gmail.com with ESMTPSA id p9sm207664pgn.36.2021.09.28.16.00.19
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 15:56:07 -0700 (PDT)
+        Tue, 28 Sep 2021 16:00:20 -0700 (PDT)
 From:   Bernie Conrad <bernie@allthenticate.net>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Bernie Conrad <bernie@allthenticate.net>
-Subject: [RFC PATCH BlueZ] Cleaning up gatt operations on a disconnect to fix possible use after free
-Date:   Tue, 28 Sep 2021 15:55:51 -0700
-Message-Id: <20210928225551.25505-1-bernie@allthenticate.net>
+Subject: [RFC PATCH BlueZ v2] Cleaning up gatt operations on a disconnect to fix possible use after free
+Date:   Tue, 28 Sep 2021 16:00:15 -0700
+Message-Id: <20210928230015.26295-1-bernie@allthenticate.net>
 X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 There is a current use after free possible on a gatt server if a client
-disconnects while a WriteValue call is being processed with dbus. 
+disconnects while a WriteValue call is being processed with dbus.
 
 This patch includes the addition of a pending disconnect callback to handle
 cleanup better if a disconnect occurs during a write, an acquire write
-or read operation using bt_att_register_disconnect with the cb.  
+or read operation using bt_att_register_disconnect with the cb.
+
+v2: Fixed a bad call to pending_read_new
 
 ---
  src/gatt-database.c | 115 +++++++++++++++++++++++++-------------------
  1 file changed, 65 insertions(+), 50 deletions(-)
 
 diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 1f7ce5f02..584d572c5 100644
+index 1f7ce5f02..a03c579cf 100644
 --- a/src/gatt-database.c
 +++ b/src/gatt-database.c
 @@ -933,6 +933,24 @@ static struct btd_device *att_get_device(struct bt_att *att)
@@ -151,7 +153,7 @@ index 1f7ce5f02..584d572c5 100644
 +	op->link_type = bt_att_get_link_type(att);
  	queue_push_tail(owner_queue, op);
  
-+	bt_att_register_disconnect(att, pending_read_new, op, NULL);
++	bt_att_register_disconnect(att, pending_disconnect_cb, op, NULL);
 +
  	return op;
  }
