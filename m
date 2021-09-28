@@ -2,90 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 49A5DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:03:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCC0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:05:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 332DA6108F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:03:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 790986113E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:05:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240286AbhI1LFS convert rfc822-to-8bit (ORCPT
+        id S240350AbhI1LHB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 07:05:18 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59007 "EHLO
+        Tue, 28 Sep 2021 07:07:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:48518 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239306AbhI1LFQ (ORCPT
+        with ESMTP id S240328AbhI1LHA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 07:05:16 -0400
+        Tue, 28 Sep 2021 07:07:00 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 072DDCECD9;
-        Tue, 28 Sep 2021 13:03:35 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 1865ACECD9;
+        Tue, 28 Sep 2021 13:05:20 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v11] Bluetooth: btusb: Add support using different nvm for
-  variant WCN6855 controller
+Subject: Re: [RFC] bt control interface out from debugfs
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <25d13858fced474d0d71faed2d829032@codeaurora.org>
-Date:   Tue, 28 Sep 2021 13:03:35 +0200
+In-Reply-To: <CAD8XO3Z3FDFdaJOgoXgjn=_Ly6AQp+wugKNDN01098EVJB4qEw@mail.gmail.com>
+Date:   Tue, 28 Sep 2021 13:05:19 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        open list <linux-kernel@vger.kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
+        netdev@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+        =?utf-8?Q?Fran=C3=A7ois_Ozog?= <francois.ozog@linaro.org>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C8C7AC2D-7A0C-4FCB-8D60-5705D86BC50B@holtmann.org>
-References: <25d13858fced474d0d71faed2d829032@codeaurora.org>
-To:     tjiang@codeaurora.org
+Message-Id: <98214D73-18D8-4A7E-BB66-6E69E8A608DB@holtmann.org>
+References: <CAD8XO3Z3FDFdaJOgoXgjn=_Ly6AQp+wugKNDN01098EVJB4qEw@mail.gmail.com>
+To:     Maxim Uvarov <maxim.uvarov@linaro.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tim,
+Hi Maxim,
 
-> the RF performance of wcn6855 soc chip from different foundries will be
-> difference, so we should use different nvm to configure them.
+> I think we need to move control for BT 6lowpan connection out of
+> kernel debugfs to user space tools. I.e. use hcitool or iproute2 and
+> add proper non debug kernel interface for the tools.
+> I would like to hear about some suggestions on what is the best interface here.
 > 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
-> ---
-> drivers/bluetooth/btusb.c | 49 ++++++++++++++++++++++++++++++++++-------------
-> 1 file changed, 36 insertions(+), 13 deletions(-)
+> Currently commands to setup connection are:
+> echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
+> echo "connect 80:E1:26:1B:95:81 1" > /sys/kernel/debug/bluetooth/6lowpan_control
+> 
+> It looks logical to enable 6lowpan inside hcitool. I.e. extend current
+> AF_BLUETOOTH socket protocol:
+> dd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI)
+> getsockopt(dd, SOL_HCI, HCI_FILTER, ..
+> add some HCI_6LOWPAN_ENABLE call.
+> What are your thoughts on that?
 
-I am done reviewing this patch and frankly I don’t care how urgent this is for your new chip; and how many times you ping me privately about it. So please find someone else to write and send patches. This is not acceptable behavior here.
+NAK.
 
-If you are blindly ignoring the review comments from Matthias, then I have no idea what to do. This is such a simple patch and it takes 12 revision to get this done.
+> 
+> Then we have an IP stack on top of the BT layer, and hcitool does not
+> intend to setup ip connection. iproute2 might be more suitable for
+> this case. Something like:
+> ip link connect dev bt0 type bt 80:E1:26:1B:95:81 type local
+> (type 1- local, 2- public) .
+> 
+> But here is the problem that "ip link connect" is missing in current
+> tools. And usually we just set up a local connection and connect from
+> the app using a socket.  With IP over BT connection is different  -
+> we should be connected before.
+> 
+> If we implement "ip link connect" then it will be possible to reuse it
+> for all other pear to pear connections like vpn wireguard.
+> 
+> Any thoughts on an interface here?
 
-static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size, const struct qca_version *ver)
-{
-	u32 rom_version = le32_to_cpu(ver->rom_version);
-
-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-		u16 board_id = le16_to_cpu(ver->board_id);
-		const char *variant;
-
-		switch (le32_to_cpu(ver->ram_version)) {
-		case WCN6855_2_0_RAM_VERSION_GF:
-		case WCN6855_2_1_RAM_VERSION_GF:
-			variant = “_gf”;
-			break;
-		default:
-			variant = “”;
-			break;
-		}
-
-		/* if boardid equal 0, use default nvm without suffix */
-		if (board_id == 0x0)
-			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin”,
-				 rom_version, variant);
-		else
-			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin”,
-				 rom_version, variant, board_id);
-	} else {
-		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin”, rom_version);
-	}
-}
+Sure, give that a spin.
 
 Regards
 
