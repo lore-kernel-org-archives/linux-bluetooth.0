@@ -2,162 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 53DD7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 08:35:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 544E6C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 09:43:59 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2F9DE611C7
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 08:35:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 31A896023B
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 09:43:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239560AbhI1Ihb (ORCPT
+        id S239827AbhI1Jph (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 04:37:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52988 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235918AbhI1Iha (ORCPT
+        Tue, 28 Sep 2021 05:45:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:51298 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235071AbhI1Jpg (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 04:37:30 -0400
-Received: from mail-yb1-xb2b.google.com (mail-yb1-xb2b.google.com [IPv6:2607:f8b0:4864:20::b2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718F2C061575;
-        Tue, 28 Sep 2021 01:35:51 -0700 (PDT)
-Received: by mail-yb1-xb2b.google.com with SMTP id b82so29223157ybg.1;
-        Tue, 28 Sep 2021 01:35:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=VkqOXfHINA+UZ7ncjJqcgVt9KM5mqN2AU4qxmIR04Ww=;
-        b=KwmceUcpNHtIhwmgml8dRJAWZBkf3N1tz0837q7wOglPnhgZbiBiaHveMoI+GKCkaO
-         9fSRAuTZqHX/B2+Wz8yq6JlVanohWSYcMGNt+k1n05jAdqgZVPrRT+q6KDUuxVf5+FYe
-         nUan9ZSqN603cNiZhtD/zIZRjqAVEHmZGGg2OKd3/Wr11Bm24G8bPnxYR2w/WoqDSdrA
-         L8k7ZZ/aGoP0gaWuL8/ZtoS+022b4ofGF0gNoW65h9ztD2mU15MFNH+IDWPYzSjf49Wy
-         0XYrqkD/YsDSyoLqg29hVIv8S7m5BhPfbCjggfCMtKtfj88B9uj8VSK5/SbIukv3josw
-         97Mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=VkqOXfHINA+UZ7ncjJqcgVt9KM5mqN2AU4qxmIR04Ww=;
-        b=3m6aAKhJmWbVv5DYz499ERg8rGFSc7A5n2PTWbAIpBAGvqWUjDRQm1a6qK2bJcsqoJ
-         0hIFEcsX2sSKJsBySKhuR9bEJdFNK+mYTFWtkOg3NNPXaonSW2uoLYHyvBHfadnZ9CkA
-         2bdWHNKAQdf+QW9hqdFfLz5o35il9i9CAexELXssavMgO4JEfRmamDlsjjEYckDDKuoH
-         1un0zBdi24QQVaDM6BQtVrGe9rTxrtzlJJKqxzLXW9L9soIlzBG6I40LX6igMGMIvPrM
-         kn7Ck1TxlzUew3Q3XeHWpiNrE5Qgh2U5M82QyZSVUAsR0EFImTTWmVEjj0Ymp1UCq3xT
-         LLxg==
-X-Gm-Message-State: AOAM533dXooNO5bSQwzC1LuYWQjKMzN7oFvpFEhGt3JrJupOJElCwfh9
-        jRzZlyEf75WvZtMWgEl+sxVNhEhqZhng+CBA638=
-X-Google-Smtp-Source: ABdhPJx+N772rkFl8TgYYnPHITbDZML6nU9VQF7XwiTvq7xfQ2qVjaojJfNShYL3RWazPhIqaTSyhA+wWnbzc+FrEBQ=
-X-Received: by 2002:a25:cc8:: with SMTP id 191mr5207905ybm.63.1632818150581;
- Tue, 28 Sep 2021 01:35:50 -0700 (PDT)
-MIME-Version: 1.0
-References: <CAFcO6XOvGQrRTaTkaJ0p3zR7y7nrAWD79r48=L_BbOyrK9X-vA@mail.gmail.com>
- <CAK8P3a0kG_gdpaOoLb5H2qeq-T7orQ+2n19NNWQaRKgVNotDkw@mail.gmail.com> <CAFcO6XOgtizsTQbeWcD14yiMAaRp82QomNhSehCJ4t=d2CRx+g@mail.gmail.com>
-In-Reply-To: <CAFcO6XOgtizsTQbeWcD14yiMAaRp82QomNhSehCJ4t=d2CRx+g@mail.gmail.com>
-From:   butt3rflyh4ck <butterflyhuangxx@gmail.com>
-Date:   Tue, 28 Sep 2021 16:35:39 +0800
-Message-ID: <CAFcO6XN+N-O3hSd+HK+Zn76B1tKpeFueTkbdV0vycwGpJq4PtA@mail.gmail.com>
-Subject: Re: There is an array-index-out-bounds bug in detach_capi_ctr in drivers/isdn/capi/kcapi.c
-To:     Arnd Bergmann <arnd@arndb.de>
-Cc:     Karsten Keil <isdn@linux-pingi.de>,
-        "David S. Miller" <davem@davemloft.net>,
-        Networking <netdev@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>,
-        Bluez mailing list <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
+        Tue, 28 Sep 2021 05:45:36 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 587E8CECD8;
+        Tue, 28 Sep 2021 11:43:56 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH] bluetooth: Add another Bluetooth part for Realtek 8852AE
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
+Date:   Tue, 28 Sep 2021 11:43:55 +0200
+Cc:     "Gustavo F. Padovan" <gustavo@padovan.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Type: multipart/mixed; boundary="000000000000dac7b105cd0a1934"
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hilda Wu <hildawu@realtek.com>, Stable <stable@vger.kernel.org>
+Content-Transfer-Encoding: 7bit
+Message-Id: <AC19C8F8-6AC8-4B1F-AFB0-7D72F57D885D@holtmann.org>
+References: <20210927204302.10871-1-Larry.Finger@lwfinger.net>
+To:     Larry Finger <Larry.Finger@lwfinger.net>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---000000000000dac7b105cd0a1934
-Content-Type: text/plain; charset="UTF-8"
+Hi Larry,
 
-Hi, I make a patch for this issue.
+> This Realtek device has both wifi and BT components. The latter reports
+> a USB ID of 0bda:4852, which is not in the table.
+> 
+> The portion of /sys/kernel/debug/usb/devices pertaining to this device is
+> 
+> T:  Bus=06 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+> D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0bda ProdID=4852 Rev= 0.00
+> S:  Manufacturer=Realtek
+> S:  Product=Bluetooth Radio
+> S:  SerialNumber=00e04c000001
+> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> 
+> Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+> Cc: Stable <stable@vger.kernel.org>
+> ---
+> drivers/bluetooth/btusb.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
-Regards,
- butt3rflyh4ck.
+patch does not apply cleanly to bluetooth-next tree.
 
+Regards
 
-On Fri, Sep 24, 2021 at 6:02 PM butt3rflyh4ck
-<butterflyhuangxx@gmail.com> wrote:
->
-> > When I last touched the capi code, I tried to remove it all, but we then
-> > left it in the kernel because the bluetooth cmtp code can still theoretically
-> > use it.
-> >
-> > May I ask how you managed to run into this? Did you find the bug through
-> > inspection first and then produce it using cmtp, or did you actually use
-> > cmtp?
->
-> I fuzz the bluez system and find a crash to analyze it and reproduce it.
->
-> > If the only purpose of cmtp is now to be a target for exploits, then I
-> > would suggest we consider removing both cmtp and capi for
-> > good after backporting your fix to stable kernels. Obviously
-> > if it turns out that someone actually uses cmtp and/or capi, we
-> > should not remove it.
-> >
-> Yes, I think this should be feasible.
->
-> Regards
->   butt3rflyh4ck.
->
->
-> --
-> Active Defense Lab of Venustech
+Marcel
 
-
-
--- 
-Active Defense Lab of Venustech
-
---000000000000dac7b105cd0a1934
-Content-Type: text/x-patch; charset="US-ASCII"; 
-	name="0001-isdn-cpai-check-ctr-cnr-to-avoid-array-index-out-of-.patch"
-Content-Disposition: attachment; 
-	filename="0001-isdn-cpai-check-ctr-cnr-to-avoid-array-index-out-of-.patch"
-Content-Transfer-Encoding: base64
-Content-ID: <f_ku3tr7kr0>
-X-Attachment-Id: f_ku3tr7kr0
-
-RnJvbSAxNTQ0OWJiNWFhYzFmODI4ZGM4MjA1NDY1MWZlOGY0ZGNhMzdiZWY3IE1vbiBTZXAgMTcg
-MDA6MDA6MDAgMjAwMQpGcm9tOiBYaWFvbG9uZyBIdWFuZyA8YnV0dGVyZmx5aHVhbmd4eEBnbWFp
-bC5jb20+CkRhdGU6IFR1ZSwgMjggU2VwIDIwMjEgMTM6MDM6NDEgKzA4MDAKU3ViamVjdDogW1BB
-VENIXSBpc2RuOiBjcGFpOiBjaGVjayBjdHItPmNuciB0byBhdm9pZCBhcnJheSBpbmRleCBvdXQg
-b2YgYm91bmQKClRoZSBjbXRwX2FkZF9jb25uZWN0aW9uKCkgd291bGQgYWRkIGEgY210cCBzZXNz
-aW9uIHRvIGEgY29udHJvbGxlciBhbmQgcnVuIGEga2VybmVsCnRocmVhZCB0byBwcm9jZXNzIGNt
-dHAuCgoJX19tb2R1bGVfZ2V0KFRISVNfTU9EVUxFKTsKCXNlc3Npb24tPnRhc2sgPSBrdGhyZWFk
-X3J1bihjbXRwX3Nlc3Npb24sIHNlc3Npb24sICJrY210cGRfY3RyXyVkIiwKCQkJCQkJCQlzZXNz
-aW9uLT5udW0pOwoKRHVyaW5nIHRoaXMgcHJvY2VzcywgdGhlIGtlcm5lbCB0aHJlYWQgd291bGQg
-Y2FsbCBkZXRhY2hfY2FwaV9jdHIoKQp0byBkZXRhY2ggYSByZWdpc3RlciBjb250cm9sbGVyLiBp
-ZiB0aGUgY29udHJvbGxlciB3YXMgbm90IGF0dGFjaGVkIHlldCwgZGV0YWNoX2NhcGlfY3RyKCkK
-d291bGQgdHJpZ2dlciBhbiBhcnJheS1pbmRleC1vdXQtYm91bmRzIGJ1Zy4KClsgICA0Ni44NjYw
-NjldWyBUNjQ3OV0gVUJTQU46IGFycmF5LWluZGV4LW91dC1vZi1ib3VuZHMgaW4KZHJpdmVycy9p
-c2RuL2NhcGkva2NhcGkuYzo0ODM6MjEKWyAgIDQ2Ljg2NzE5Nl1bIFQ2NDc5XSBpbmRleCAtMSBp
-cyBvdXQgb2YgcmFuZ2UgZm9yIHR5cGUgJ2NhcGlfY3RyICpbMzJdJwpbICAgNDYuODY3OTgyXVsg
-VDY0NzldIENQVTogMSBQSUQ6IDY0NzkgQ29tbToga2NtdHBkX2N0cl8wIE5vdCB0YWludGVkCjUu
-MTUuMC1yYzIrICM4ClsgICA0Ni44NjkwMDJdWyBUNjQ3OV0gSGFyZHdhcmUgbmFtZTogUUVNVSBT
-dGFuZGFyZCBQQyAoaTQ0MEZYICsgUElJWCwKMTk5NiksIEJJT1MgMS4xNC4wLTIgMDQvMDEvMjAx
-NApbICAgNDYuODcwMTA3XVsgVDY0NzldIENhbGwgVHJhY2U6ClsgICA0Ni44NzA0NzNdWyBUNjQ3
-OV0gIGR1bXBfc3RhY2tfbHZsKzB4NTcvMHg3ZApbICAgNDYuODcwOTc0XVsgVDY0NzldICB1YnNh
-bl9lcGlsb2d1ZSsweDUvMHg0MApbICAgNDYuODcxNDU4XVsgVDY0NzldICBfX3Vic2FuX2hhbmRs
-ZV9vdXRfb2ZfYm91bmRzLmNvbGQrMHg0My8weDQ4ClsgICA0Ni44NzIxMzVdWyBUNjQ3OV0gIGRl
-dGFjaF9jYXBpX2N0cisweDY0LzB4YzAKWyAgIDQ2Ljg3MjYzOV1bIFQ2NDc5XSAgY210cF9zZXNz
-aW9uKzB4NWM4LzB4NWQwClsgICA0Ni44NzMxMzFdWyBUNjQ3OV0gID8gX19pbml0X3dhaXRxdWV1
-ZV9oZWFkKzB4NjAvMHg2MApbICAgNDYuODczNzEyXVsgVDY0NzldICA/IGNtdHBfYWRkX21zZ3Bh
-cnQrMHgxMjAvMHgxMjAKWyAgIDQ2Ljg3NDI1Nl1bIFQ2NDc5XSAga3RocmVhZCsweDE0Ny8weDE3
-MApbICAgNDYuODc0NzA5XVsgVDY0NzldICA/IHNldF9rdGhyZWFkX3N0cnVjdCsweDQwLzB4NDAK
-WyAgIDQ2Ljg3NTI0OF1bIFQ2NDc5XSAgcmV0X2Zyb21fZm9yaysweDFmLzB4MzAKWyAgIDQ2Ljg3
-NTc3M11bIFQ2NDc5XQoKU2lnbmVkLW9mZi1ieTogWGlhb2xvbmcgSHVhbmcgPGJ1dHRlcmZseWh1
-YW5neHhAZ21haWwuY29tPgotLS0KIGRyaXZlcnMvaXNkbi9jYXBpL2tjYXBpLmMgfCA1ICsrKysr
-CiAxIGZpbGUgY2hhbmdlZCwgNSBpbnNlcnRpb25zKCspCgpkaWZmIC0tZ2l0IGEvZHJpdmVycy9p
-c2RuL2NhcGkva2NhcGkuYyBiL2RyaXZlcnMvaXNkbi9jYXBpL2tjYXBpLmMKaW5kZXggY2IwYWZl
-ODk3MTYyLi43MzEzNDU0ZTQwM2EgMTAwNjQ0Ci0tLSBhL2RyaXZlcnMvaXNkbi9jYXBpL2tjYXBp
-LmMKKysrIGIvZHJpdmVycy9pc2RuL2NhcGkva2NhcGkuYwpAQCAtNDgwLDYgKzQ4MCwxMSBAQCBp
-bnQgZGV0YWNoX2NhcGlfY3RyKHN0cnVjdCBjYXBpX2N0ciAqY3RyKQogCiAJY3RyX2Rvd24oY3Ry
-LCBDQVBJX0NUUl9ERVRBQ0hFRCk7CiAKKwlpZiAoY3RyLT5jbnIgPCAxIHx8IGN0ci0+Y25yIC0g
-MSA+PSBDQVBJX01BWENPTlRSKSB7CisJCWVyciA9IC1FSU5WQUw7CisJCWdvdG8gdW5sb2NrX291
-dDsKKwl9CisKIAlpZiAoY2FwaV9jb250cm9sbGVyW2N0ci0+Y25yIC0gMV0gIT0gY3RyKSB7CiAJ
-CWVyciA9IC1FSU5WQUw7CiAJCWdvdG8gdW5sb2NrX291dDsKLS0gCjIuMjUuMQoK
---000000000000dac7b105cd0a1934--
