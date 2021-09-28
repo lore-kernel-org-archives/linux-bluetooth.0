@@ -2,85 +2,74 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CCC0C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:05:23 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C95BFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:09:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 790986113E
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:05:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 97DB961159
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Sep 2021 11:09:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240350AbhI1LHB convert rfc822-to-8bit (ORCPT
+        id S240293AbhI1LL0 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 07:07:01 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:48518 "EHLO
+        Tue, 28 Sep 2021 07:11:26 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:43712 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240328AbhI1LHA (ORCPT
+        with ESMTP id S240210AbhI1LL0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 07:07:00 -0400
+        Tue, 28 Sep 2021 07:11:26 -0400
 Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 1865ACECD9;
-        Tue, 28 Sep 2021 13:05:20 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id CE470CECDA;
+        Tue, 28 Sep 2021 13:09:45 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [RFC] bt control interface out from debugfs
+Subject: Re: [PATCH v4 3/4] Bluetooth: btrtl: enable Realtek 8822C/8852A to
+ support AOSP extension
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CAD8XO3Z3FDFdaJOgoXgjn=_Ly6AQp+wugKNDN01098EVJB4qEw@mail.gmail.com>
-Date:   Tue, 28 Sep 2021 13:05:19 +0200
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20210926150657.v4.3.Iba6327b2544d1904bbcb17f369dcd3761b566153@changeid>
+Date:   Tue, 28 Sep 2021 13:09:45 +0200
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        netdev@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-        =?utf-8?Q?Fran=C3=A7ois_Ozog?= <francois.ozog@linaro.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <98214D73-18D8-4A7E-BB66-6E69E8A608DB@holtmann.org>
-References: <CAD8XO3Z3FDFdaJOgoXgjn=_Ly6AQp+wugKNDN01098EVJB4qEw@mail.gmail.com>
-To:     Maxim Uvarov <maxim.uvarov@linaro.org>
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        Joseph Hwang <josephsih@google.com>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <61F35FD1-C78A-4E50-80EA-D8098A859D26@holtmann.org>
+References: <20210926150657.v4.1.Iaa4a0269e51d8e8d8784a6ac8e05899b49a1377d@changeid>
+ <20210926150657.v4.3.Iba6327b2544d1904bbcb17f369dcd3761b566153@changeid>
+To:     Joseph Hwang <josephsih@chromium.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Maxim,
+Hi Joseph,
 
-> I think we need to move control for BT 6lowpan connection out of
-> kernel debugfs to user space tools. I.e. use hcitool or iproute2 and
-> add proper non debug kernel interface for the tools.
-> I would like to hear about some suggestions on what is the best interface here.
+> This patch enables Realtek 8822C and 8852A to support the AOSP
+> extension.
 > 
-> Currently commands to setup connection are:
-> echo 1 > /sys/kernel/debug/bluetooth/6lowpan_enable
-> echo "connect 80:E1:26:1B:95:81 1" > /sys/kernel/debug/bluetooth/6lowpan_control
+> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 > 
-> It looks logical to enable 6lowpan inside hcitool. I.e. extend current
-> AF_BLUETOOTH socket protocol:
-> dd = socket(AF_BLUETOOTH, SOCK_RAW | SOCK_CLOEXEC, BTPROTO_HCI)
-> getsockopt(dd, SOL_HCI, HCI_FILTER, ..
-> add some HCI_6LOWPAN_ENABLE call.
-> What are your thoughts on that?
+> ---
+> 
+> Changes in v4:
+> - Call hci_set_aosp_capable in the driver.
+> 
+> Changes in v3:
+> - Fix the auto build test ERROR
+>  "undefined symbol: btandroid_set_quality_report" that occurred
+>  with some kernel configs.
+> 
+> Changes in v2:
+> - Fix the title
+> 
+> drivers/bluetooth/btrtl.c | 1 +
+> 1 file changed, 1 insertion(+)
 
-NAK.
-
-> 
-> Then we have an IP stack on top of the BT layer, and hcitool does not
-> intend to setup ip connection. iproute2 might be more suitable for
-> this case. Something like:
-> ip link connect dev bt0 type bt 80:E1:26:1B:95:81 type local
-> (type 1- local, 2- public) .
-> 
-> But here is the problem that "ip link connect" is missing in current
-> tools. And usually we just set up a local connection and connect from
-> the app using a socket.  With IP over BT connection is different  -
-> we should be connected before.
-> 
-> If we implement "ip link connect" then it will be possible to reuse it
-> for all other pear to pear connections like vpn wireguard.
-> 
-> Any thoughts on an interface here?
-
-Sure, give that a spin.
+patch has been applied to bluetooth-next tree.
 
 Regards
 
