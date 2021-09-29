@@ -2,115 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E0B52C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:44:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DA6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:47:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BEC5361462
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:44:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BA58861439
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:47:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347320AbhI2WqY (ORCPT
+        id S1347323AbhI2Wsy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Sep 2021 18:46:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45238 "EHLO
+        Wed, 29 Sep 2021 18:48:54 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45806 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346997AbhI2WqX (ORCPT
+        with ESMTP id S1346734AbhI2Wsy (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Sep 2021 18:46:23 -0400
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A815C06161C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:44:42 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id 37so2742736uaq.11
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:44:42 -0700 (PDT)
+        Wed, 29 Sep 2021 18:48:54 -0400
+Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF7EC06161C
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:47:12 -0700 (PDT)
+Received: by mail-ua1-x930.google.com with SMTP id 64so2745214uab.12
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:47:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=9o0jJdAUCZkunVukdFNl8xKZYDuj6B8MgEEVKNvohwA=;
-        b=VIy7haNQiXUWoQcVqXK9sV67h9RIAi0vgS13Xutr1sH2SsbJhpP8VpQ3npz6dK3YRl
-         qi/7mZK1p7oI5BJPn9e7f9VuGu0QGLB5X1LCQUtVs6MVT7KuWL2807GDGSvJlbjFD0JX
-         9u054DzSSjKRF4kpcVJgwE4lisNfQ7b+LbcMc7SJCrHvDlSXZWr+udn9HwZVCo4i2QLk
-         ZvnlI7G5ExD6YkQimIgapDDOgfboeut5d8wbU3aKSSl7+qVnaZVTfnMGmACIMwnfDiwO
-         VHxUkSI1fAS6T1g/+ARazGRITQgbSSjlNvoyOWhDj6SzymbiHqHKFUZekucBnK4IH+U6
-         gzWA==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
+        bh=sIbQ/ee8lsT1u69FQZUM/MlcxSG2d2zzf7wj1zG2r68=;
+        b=bAni+PcZDzRy7WYrbA8L1U1BOz5Pu60TCMMq3r6BwvhzaVeHiZFWt+TGug/fG3gLuv
+         jpXdIDDImQcwCyS+84aKjqItUhmuHCYsN4LD7NdujRW/aSxi9+RhSJn1ju/XuUzXEbVF
+         G9Jgsv2kqyA4loPdACzVg8rvOMOzbTA8rjQFDG7E3BG05QRusKgzbBA1B1UUHRby8x8n
+         xcMFm6FTSGHzMNb0KalcCI07c/S9R5axY92GEPo7kgQyBPiYnj0PgYo+Q4kbxskmi89r
+         wBV+sXaNEdFI1hOW8fK2xd8TbJNIldC2/KqL2pny7St6iioI7BbclDqWQCyvEVgdlErk
+         Vg3w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=9o0jJdAUCZkunVukdFNl8xKZYDuj6B8MgEEVKNvohwA=;
-        b=yeXXC4GNPXZp526Bl/q349upDxkesDJJynQzm6UijQ0Ew9xavSmdufvzkVZWnlVSI7
-         vcEXV9vjWEYIjuH4ldn8h3nTReTE6YmG0UbmIFBEA3o4TpZxsHYw2RbqIkY9DQPV4XbF
-         irwLBkG8KsWwilDNXOc/ox1XZ5jEiJF/DHUu2NToIIR5MAStHTiqs2otUIKquYesPbyl
-         06UmW2DBQrOhZvV8Gvn5dy+7B0p4iw4rw5bcX7umlaRDZO+QZxbM8g7foyGLlHwdFpaO
-         kOaq7E9JriDDPh85Uk4lX8kpyWNtHacmpom2EdcJ3XAfSpZrbBOjHQBCAapFDedr9jp9
-         hUIw==
-X-Gm-Message-State: AOAM531NAqxW0i2E01MOAzZQyHCMeBVffDEIZc1mnJ0EeosETuNHbKzS
-        zVIUmGp0B/t4j1k2C3QmLnPtqHTS3OTyDGdU5XfwOe3w
-X-Google-Smtp-Source: ABdhPJzO0rTpSZklvZ9vA7mszDSRYp/tMywSuMFhlySteiYehuquGBgv9FqQ/sWzIOfev61kHyzoBMVetGiZZPkX6eM=
-X-Received: by 2002:ab0:6616:: with SMTP id r22mr2744665uam.129.1632955481472;
- Wed, 29 Sep 2021 15:44:41 -0700 (PDT)
+         :message-id:subject:to;
+        bh=sIbQ/ee8lsT1u69FQZUM/MlcxSG2d2zzf7wj1zG2r68=;
+        b=j9ad8Nxw/7PDx8sj5uqMqqaUgZreLmVMVbQTA8rOx3k/14TgSYPlaGvoNhpXcAZCLu
+         k3NDXzJQl+UWfGZKurBghpYMydCFE/dI/kQ75lrY5H4wCIbM3PvERM/VhL5mnrA+MKP+
+         SFu8GHXbugkTeRLGnqLyM+/lI9G+Ygj3geadFEf6afN0xy7Wk/f9FS+FlRYZbG2etvKi
+         uCC9EP/5D7WZh+G2XJSQAQCMgjqDb32Rq7EsywUiO6VUbNes4p7Yx/p7DkCKCnqSzCGq
+         Z1TDI2XvNtW3avqxOgYAZ0KDfG9lDVXB5mQVNEWiupPngYaBR1GimLatLlT4giVQiQTg
+         N6Jw==
+X-Gm-Message-State: AOAM530wbWiu9dY+w67W6hvpLlCxgFCjFlVlG7g+7TwT0Lb3CZW2yzyJ
+        GqmLpx+jHQ+YKcxcFjtEzpbg9cswVFx1V7lHGPkeAhxz
+X-Google-Smtp-Source: ABdhPJxQxXHGhqfQKnySmZaJLhsR9fDbP2unTOnQ7tTbDyS4CEBb2aprpzNMPUNgK5EnoTjbACRT+2+bH69gQIueERk=
+X-Received: by 2002:ab0:5b89:: with SMTP id y9mr2759125uae.47.1632955631463;
+ Wed, 29 Sep 2021 15:47:11 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210929210049.35597-1-hj.tedd.an@gmail.com>
-In-Reply-To: <20210929210049.35597-1-hj.tedd.an@gmail.com>
+References: <20210928235447.3077055-1-luiz.dentz@gmail.com> <6153c08d.1c69fb81.f5831.4749@mx.google.com>
+In-Reply-To: <6153c08d.1c69fb81.f5831.4749@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 29 Sep 2021 15:44:30 -0700
-Message-ID: <CABBYNZLtBmnPAxNoBddy=z1ZFu0nCjsM0dE7b7wkAZmrjC_dUg@mail.gmail.com>
-Subject: Re: [BlueZ PATCH] tools/mgmt-tester: Fix Read Experiemental Feature
- test case
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 29 Sep 2021 15:47:00 -0700
+Message-ID: <CABBYNZLKvLjzrTbG5Uvy8T49cOMOcRUJOUr0qo620CV8vd_WVA@mail.gmail.com>
+Subject: Re: [BlueZ,1/5] gatt-api: Add MTU property to GattCharacteristic1
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi,
 
-On Wed, Sep 29, 2021 at 2:34 PM Tedd Ho-Jeong An <hj.tedd.an@gmail.com> wrote:
+On Tue, Sep 28, 2021 at 6:25 PM <bluez.test.bot@gmail.com> wrote:
 >
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> This is automated email and please do not reply to this email!
 >
-> The quality report feature is supported only if the device support it.
-> Current emulator/btdev doesn't support it yet.
+> Dear submitter,
 >
-> This patch updates the supported experimental feature list to align with
-> the current btdev implementation.
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=554631
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      6.84 seconds
+> GitLint                       PASS      4.61 seconds
+> Prep - Setup ELL              PASS      50.24 seconds
+> Build - Prep                  PASS      0.49 seconds
+> Build - Configure             PASS      9.07 seconds
+> Build - Make                  PASS      219.53 seconds
+> Make Check                    PASS      9.21 seconds
+> Make Distcheck                PASS      256.90 seconds
+> Build w/ext ELL - Configure   PASS      9.34 seconds
+> Build w/ext ELL - Make        PASS      205.94 seconds
+>
+>
+>
 > ---
->  tools/mgmt-tester.c | 8 ++------
->  1 file changed, 2 insertions(+), 6 deletions(-)
->
-> diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-> index 9c5b26c9a..e62c4dcdc 100644
-> --- a/tools/mgmt-tester.c
-> +++ b/tools/mgmt-tester.c
-> @@ -9334,7 +9334,7 @@ static const struct generic_data set_dev_flags_fail_3 = {
->  };
->
->  static const uint8_t read_exp_feat_param_success[] = {
-> -       0x04, 0x00,                             /* Feature Count */
-> +       0x03, 0x00,                             /* Feature Count */
->         0xd6, 0x49, 0xb0, 0xd1, 0x28, 0xeb,     /* UUID - Simultaneous */
->         0x27, 0x92, 0x96, 0x46, 0xc0, 0x42,     /* Central Peripheral */
->         0xb5, 0x10, 0x1b, 0x67,
-> @@ -9343,14 +9343,10 @@ static const uint8_t read_exp_feat_param_success[] = {
->         0xde, 0xb3, 0xea, 0x11, 0x73, 0xc2,
->         0x48, 0xa1, 0xc0, 0x15,
->         0x02, 0x00, 0x00, 0x00,                 /* Flags */
-> -       0x7f, 0x03, 0x14, 0x06, 0x6f, 0x9a,     /* UUID - Quality Report */
-> -       0x70, 0x93, 0x2d, 0x49, 0x06, 0x75,
-> -       0xbc, 0x59, 0x08, 0x33,
-> -       0x00, 0x00, 0x00, 0x00,                 /* Flags */
->         0xaf, 0x29, 0xc6, 0x66, 0xac, 0x5f,     /* UUID - Codec Offload */
->         0x1a, 0x88, 0xb9, 0x4f, 0x7f, 0xee,
->         0xce, 0x5a, 0x69, 0xa6,
-> -       0x01, 0x00, 0x00, 0x00                  /* Flags */
-> +       0x00, 0x00, 0x00, 0x00                  /* Flags */
->  };
->
->  static const struct generic_data read_exp_feat_success = {
-> --
-> 2.25.1
+> Regards,
+> Linux Bluetooth
 
-Applied, thanks.
+Pushed.
 
 -- 
 Luiz Augusto von Dentz
