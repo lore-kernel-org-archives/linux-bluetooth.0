@@ -2,102 +2,224 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 75B18C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 01:25:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5DDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 05:09:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4A594613E6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 01:25:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 399E260F6B
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 05:09:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243578AbhI2B1W (ORCPT
+        id S244120AbhI2FLI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Sep 2021 21:27:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34796 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243515AbhI2B1U (ORCPT
+        Wed, 29 Sep 2021 01:11:08 -0400
+Received: from mail-4325.protonmail.ch ([185.70.43.25]:50629 "EHLO
+        mail-4325.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234626AbhI2FLI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Sep 2021 21:27:20 -0400
-Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63F02C06161C
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 18:25:35 -0700 (PDT)
-Received: by mail-qt1-x831.google.com with SMTP id c20so868200qtb.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 28 Sep 2021 18:25:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=rSAEnmGTu9O5HVou3Sdtzzx2K+IA0UCpG/aay3DY4Hs=;
-        b=FiRnSvqDF9/TNWnce/Os9+OuN21LyBFQAzqwLsO9j3mOQGivIgvEBBZegnALAhsaUB
-         D2LWXAg1nKqNWVDpqbYa+XFl+D8l+5WjIu9R+w/v+koDc4pJJqnJh4uwdwUQvMU7kQyC
-         c/qagnK1HZU3mQIpX2r3c2vP6WXBnYtufmRXIqihn69kTe5glAho91cLazg8on0yMOs3
-         c9tOX8NRtPlC+iFGm6lKmpBxJXM+aDGDYgkZoFNuJS0JeIO5K+Iho16/OXtGjq5sdh/k
-         liOvlDkw1VREfQH8Eow+JOf3bdcsPSRD1qywVM4G9zOoms1mCxhEDI1DsB5q1+pcyoX0
-         otVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=rSAEnmGTu9O5HVou3Sdtzzx2K+IA0UCpG/aay3DY4Hs=;
-        b=AKXiM8iM1sasJz2DxSyge1eH4G0qylg9kjCKLMqVNBk68uW6v1l9OHsmc8sJ+p/NtL
-         d2c2ioj7lwxg9J+hkltVGshS07q1e3FSm5VwbQDuwZfYgPiRA0N1ZcVn1AI1WHiqyIly
-         4nrEFAXg7eyuBPxoYLUnE4uEcwAHEPk2JDuGyDYjtCf9+jT11OjLzoH9B+uOQ9pVysPh
-         8eUp5l4J7YhEAxPaLbdeqjJqefj8U9L5ujDBnTGhs9Q9A1NFYR6dfGx0EedhkS4fqhJf
-         JomEX9foYUY8TLo+qOVXR5YAs0CfLAEn2Bo7K4fOR63rhiGqVq5ou/VsMh1YaoEtWeXg
-         CY6A==
-X-Gm-Message-State: AOAM530TzZEJK69t1NFR1+N+1fNOgBigbiB9e7Lox8uhq9c6ksBbRx+C
-        W1Dqq5SgnI4PoR3VTsOYkWKFfV40zg0GLg==
-X-Google-Smtp-Source: ABdhPJzhrRtBVXhHEJCQL+WLEh0fHumN0RiBEg3I/uK1eoswqXLVEmOpIikNmKFZB0TZGlfYlnVkhQ==
-X-Received: by 2002:ac8:4c85:: with SMTP id j5mr9372433qtv.230.1632878734289;
-        Tue, 28 Sep 2021 18:25:34 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.13.121])
-        by smtp.gmail.com with ESMTPSA id 9sm616187qkc.52.2021.09.28.18.25.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Sep 2021 18:25:33 -0700 (PDT)
-Message-ID: <6153c08d.1c69fb81.f5831.4749@mx.google.com>
-Date:   Tue, 28 Sep 2021 18:25:33 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============8249687517907158285=="
+        Wed, 29 Sep 2021 01:11:08 -0400
+Date:   Wed, 29 Sep 2021 05:09:17 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail; t=1632892166;
+        bh=4/h3hHhx8+ST7KvURyRE3yY/JnALcxX0E3zpkWI8jvg=;
+        h=Date:To:From:Cc:Reply-To:Subject:From;
+        b=XuQHetD+L6k3gd44OMGH7fMo2iDvLzhlMNdCvnYpktQdOhSfZOR17JOHqbRfQDZSk
+         O96JOytkGsWrPR+r0wu0LGxmHmehafr7DhpS8OxdQJK8uUVmmvNuVm+Idd3BxCku2Y
+         rJimkNqLcdFUg9UssX12p5v5grZ5HlmTw81dijIg=
+To:     linux-bluetooth@vger.kernel.org
+From:   Orlando Chamberlain <redecorating@protonmail.com>
+Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
+        sonnysasaka@chromium.org, danielwinkler@google.com,
+        marcel@holtmann.org, johan.hedberg@intel.com
+Reply-To: Orlando Chamberlain <redecorating@protonmail.com>
+Subject: [regression] Bluetooth: Query LE tx power on startup broke Bluetooth on MacBookPro16,1
+Message-ID: <4970a940-211b-25d6-edab-21a815313954@protonmail.com>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/5] gatt-api: Add MTU property to GattCharacteristic1
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20210928235447.3077055-1-luiz.dentz@gmail.com>
-References: <20210928235447.3077055-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============8249687517907158285==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Commit 7c395ea521e6 made Bluetooth stop working on the MacBookPro16,1. I
 
-This is automated email and please do not reply to this email!
+believe this also affected the iMac20,1. The patch below introduces a quirk
 
-Dear submitter,
+disabling Read LE Min/Max Tx Power for affected computers, based off the br=
+cm
+chip
+ id 150.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=554631
 
----Test result---
 
-Test Summary:
-CheckPatch                    PASS      6.84 seconds
-GitLint                       PASS      4.61 seconds
-Prep - Setup ELL              PASS      50.24 seconds
-Build - Prep                  PASS      0.49 seconds
-Build - Configure             PASS      9.07 seconds
-Build - Make                  PASS      219.53 seconds
-Make Check                    PASS      9.21 seconds
-Make Distcheck                PASS      256.90 seconds
-Build w/ext ELL - Configure   PASS      9.34 seconds
-Build w/ext ELL - Make        PASS      205.94 seconds
+I think there are a couple of issues with this patch that I don't have the
+
+knowledge to resolve:
+
+1. I don't know how accurate the description of the quirk is, I based it of=
+f
+
+   the commit message of 7c395ea521e6m, however I don't understand much abo=
+ut
+
+   how Bluetooth works. Other Bluetooth quirks also have explanations as to
+
+   why they are needed, I don't know why this quirk is needed (is it that
+
+   these chips incorrectly say they support read le minmax tx power? I just
+
+   don't know).
+
+2. It may be a bug in the min max le tx power code that could be fixed inst=
+ead
+
+   of disabling it for the affected devices.
+
+
+
+I haven't had much success in figuring out exactly why reading le minmax tx
+
+power stops Bluetooth from working. I have noticed that these lines are not
+
+present in dmesg when Bluetooth is not working due to this issue:
+
+
+
+Bluetooth: RFCOMM TTY layer initialized
+
+Bluetooth: RFCOMM socket layer initialized
+
+Bluetooth: RFCOMM ver 1.11
+
+
+
+I have also added some logging around the changes in 7c395ea521e6, the two
+
+patches (one with bt working one without) I tried and their associated dmes=
+gs
+
+are here https://gist.github.com/Redecorating/8330bb58a7cb8730be3956058ba45=
+99f
+
+
+
+Regards,
+
+Orlando Chamberlain
 
 
 
 ---
-Regards,
-Linux Bluetooth
+
+ drivers/bluetooth/btbcm.c   | 4 ++++
+
+ include/net/bluetooth/hci.h | 9 +++++++++
+
+ net/bluetooth/hci_core.c    | 3 ++-
+
+ 3 files changed, 15 insertions(+), 1 deletion(-)
 
 
---===============8249687517907158285==--
+
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+
+index e4182acee488..4ecc50d93107 100644
+
+--- a/drivers/bluetooth/btbcm.c
+
++++ b/drivers/bluetooth/btbcm.c
+
+@@ -353,6 +353,10 @@ static int btbcm_read_info(struct hci_dev *hdev)
+
+ =09=09return PTR_ERR(skb);
+
+
+
+ =09bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
+
++
+
++=09if (skb->data[1] =3D=3D 150)
+
++=09=09set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
+
++
+
+ =09kfree_skb(skb);
+
+
+
+ =09/* Read Controller Features */
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+
+index b80415011dcd..9ce46cb8564d 100644
+
+--- a/include/net/bluetooth/hci.h
+
++++ b/include/net/bluetooth/hci.h
+
+@@ -246,6 +246,15 @@ enum {
+
+ =09 * HCI after resume.
+
+ =09 */
+
+ =09HCI_QUIRK_NO_SUSPEND_NOTIFIER,
+
++
+
++=09/*
+
++=09 * When this quirk is set, LE tx power is not queried on startup
+
++=09 * and the min/max tx power values default to HCI_TX_POWER_INVALID.
+
++=09 *
+
++=09 * This quirk can be set before hci_register_dev is called or
+
++=09 * during the hdev->setup vendor callback.
+
++=09 */
+
++=09HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+
+ };
+
+
+
+ /* HCI device flags */
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+
+index 8a47a3017d61..9a23fe7c8d67 100644
+
+--- a/net/bluetooth/hci_core.c
+
++++ b/net/bluetooth/hci_core.c
+
+@@ -742,7 +742,8 @@ static int hci_init3_req(struct hci_request *req, unsig=
+ned long opt)
+
+ =09=09=09hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+
+ =09=09}
+
+
+
+-=09=09if (hdev->commands[38] & 0x80) {
+
++=09=09if (hdev->commands[38] & 0x80 &&
+
++=09    =09!test_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks)) =
+{
+
+ =09=09=09/* Read LE Min/Max Tx Power*/
+
+ =09=09=09hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
+
+ =09=09=09=09    0, NULL);
+
+--
+
+2.33.0
+
