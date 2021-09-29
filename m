@@ -2,224 +2,163 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7C5DDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 05:09:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DD67FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 08:36:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 399E260F6B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 05:09:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BE486600EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 08:36:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244120AbhI2FLI (ORCPT
+        id S244644AbhI2IiM (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Sep 2021 01:11:08 -0400
-Received: from mail-4325.protonmail.ch ([185.70.43.25]:50629 "EHLO
-        mail-4325.protonmail.ch" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234626AbhI2FLI (ORCPT
+        Wed, 29 Sep 2021 04:38:12 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:44483 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244610AbhI2IiL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Sep 2021 01:11:08 -0400
-Date:   Wed, 29 Sep 2021 05:09:17 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1632892166;
-        bh=4/h3hHhx8+ST7KvURyRE3yY/JnALcxX0E3zpkWI8jvg=;
-        h=Date:To:From:Cc:Reply-To:Subject:From;
-        b=XuQHetD+L6k3gd44OMGH7fMo2iDvLzhlMNdCvnYpktQdOhSfZOR17JOHqbRfQDZSk
-         O96JOytkGsWrPR+r0wu0LGxmHmehafr7DhpS8OxdQJK8uUVmmvNuVm+Idd3BxCku2Y
-         rJimkNqLcdFUg9UssX12p5v5grZ5HlmTw81dijIg=
-To:     linux-bluetooth@vger.kernel.org
-From:   Orlando Chamberlain <redecorating@protonmail.com>
-Cc:     "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        sonnysasaka@chromium.org, danielwinkler@google.com,
-        marcel@holtmann.org, johan.hedberg@intel.com
-Reply-To: Orlando Chamberlain <redecorating@protonmail.com>
-Subject: [regression] Bluetooth: Query LE tx power on startup broke Bluetooth on MacBookPro16,1
-Message-ID: <4970a940-211b-25d6-edab-21a815313954@protonmail.com>
+        Wed, 29 Sep 2021 04:38:11 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1632904587; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=EIi/7R+B4A7qgjfMhR7sZN90W0plkrmN1FfTlJIQ8EA=; b=ZjHSTaZsyqmgaNeFK53KI69z3M8d/11c+5VJDVwO1Fmpf5d0unghtUYY4I6oe59X1u0U89k0
+ jdLcSzBzNc4/IpxSxyDIomzVjk43sjoiAuA4wvlOdnZj4lZPgc2osbQ9et1oO3FdXIWL+uMP
+ v1zOKknpkpHHLG7SHozR4uWnqJw=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
+ 61542587713d5d6f968dc315 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 29 Sep 2021 08:36:23
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 7E2DFC43460; Wed, 29 Sep 2021 08:36:22 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9A52CC4338F;
+        Wed, 29 Sep 2021 08:36:20 +0000 (UTC)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 29 Sep 2021 16:36:20 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v12] Bluetooth: btusb: Add support using different nvm for 
+ variant WCN6855 controller
+Message-ID: <a1ce8bbbf391d39f126d4f8fa7cae541@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Commit 7c395ea521e6 made Bluetooth stop working on the MacBookPro16,1. I
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-believe this also affected the iMac20,1. The patch below introduces a quirk
-
-disabling Read LE Min/Max Tx Power for affected computers, based off the br=
-cm
-chip
- id 150.
-
-
-
-I think there are a couple of issues with this patch that I don't have the
-
-knowledge to resolve:
-
-1. I don't know how accurate the description of the quirk is, I based it of=
-f
-
-   the commit message of 7c395ea521e6m, however I don't understand much abo=
-ut
-
-   how Bluetooth works. Other Bluetooth quirks also have explanations as to
-
-   why they are needed, I don't know why this quirk is needed (is it that
-
-   these chips incorrectly say they support read le minmax tx power? I just
-
-   don't know).
-
-2. It may be a bug in the min max le tx power code that could be fixed inst=
-ead
-
-   of disabling it for the affected devices.
-
-
-
-I haven't had much success in figuring out exactly why reading le minmax tx
-
-power stops Bluetooth from working. I have noticed that these lines are not
-
-present in dmesg when Bluetooth is not working due to this issue:
-
-
-
-Bluetooth: RFCOMM TTY layer initialized
-
-Bluetooth: RFCOMM socket layer initialized
-
-Bluetooth: RFCOMM ver 1.11
-
-
-
-I have also added some logging around the changes in 7c395ea521e6, the two
-
-patches (one with bt working one without) I tried and their associated dmes=
-gs
-
-are here https://gist.github.com/Redecorating/8330bb58a7cb8730be3956058ba45=
-99f
-
-
-
-Regards,
-
-Orlando Chamberlain
-
-
-
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
 ---
+  drivers/bluetooth/btusb.c | 54 
++++++++++++++++++++++++++++++++++++------------
+  1 file changed, 40 insertions(+), 14 deletions(-)
 
- drivers/bluetooth/btbcm.c   | 4 ++++
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index da85cc14f931..0a75c82796aa 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3186,6 +3186,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
+*hdev,
+  #define QCA_DFU_TIMEOUT		3000
+  #define QCA_FLAG_MULTI_NVM      0x80
 
- include/net/bluetooth/hci.h | 9 +++++++++
-
- net/bluetooth/hci_core.c    | 3 ++-
-
- 3 files changed, 15 insertions(+), 1 deletion(-)
-
-
-
-diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-
-index e4182acee488..4ecc50d93107 100644
-
---- a/drivers/bluetooth/btbcm.c
-
-+++ b/drivers/bluetooth/btbcm.c
-
-@@ -353,6 +353,10 @@ static int btbcm_read_info(struct hci_dev *hdev)
-
- =09=09return PTR_ERR(skb);
-
-
-
- =09bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
-
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
 +
+  struct qca_version {
+  	__le32	rom_version;
+  	__le32	patch_version;
+@@ -3217,6 +3220,7 @@ static const struct qca_device_info 
+qca_devices_table[] = {
+  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+  };
 
-+=09if (skb->data[1] =3D=3D 150)
+  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+request,
+@@ -3371,6 +3375,41 @@ static int btusb_setup_qca_load_rampatch(struct 
+hci_dev *hdev,
+  	return err;
+  }
 
-+=09=09set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver)
++{
++	u32 rom_version = le32_to_cpu(ver->rom_version);
 +
-
- =09kfree_skb(skb);
-
-
-
- =09/* Read Controller Features */
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-
-index b80415011dcd..9ce46cb8564d 100644
-
---- a/include/net/bluetooth/hci.h
-
-+++ b/include/net/bluetooth/hci.h
-
-@@ -246,6 +246,15 @@ enum {
-
- =09 * HCI after resume.
-
- =09 */
-
- =09HCI_QUIRK_NO_SUSPEND_NOTIFIER,
-
++	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		u16 board_id = le16_to_cpu(ver->board_id);
++		const char *variant;
 +
++		switch (ver->ram_version) {
++		case WCN6855_2_0_RAM_VERSION_GF:
++		case WCN6855_2_1_RAM_VERSION_GF:
++			variant = "_gf";
++			break;
++		default:
++			variant = "";
++			break;
++		}
++
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
++				rom_version, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
++				rom_version, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+  				    struct qca_version *ver,
+  				    const struct qca_device_info *info)
+@@ -3379,20 +3418,7 @@ static int btusb_setup_qca_load_nvm(struct 
+hci_dev *hdev,
+  	char fwname[64];
+  	int err;
 
-+=09/*
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
+-	}
++	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
 
-+=09 * When this quirk is set, LE tx power is not queried on startup
-
-+=09 * and the min/max tx power values default to HCI_TX_POWER_INVALID.
-
-+=09 *
-
-+=09 * This quirk can be set before hci_register_dev is called or
-
-+=09 * during the hdev->setup vendor callback.
-
-+=09 */
-
-+=09HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
-
- };
-
-
-
- /* HCI device flags */
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-
-index 8a47a3017d61..9a23fe7c8d67 100644
-
---- a/net/bluetooth/hci_core.c
-
-+++ b/net/bluetooth/hci_core.c
-
-@@ -742,7 +742,8 @@ static int hci_init3_req(struct hci_request *req, unsig=
-ned long opt)
-
- =09=09=09hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
-
- =09=09}
-
-
-
--=09=09if (hdev->commands[38] & 0x80) {
-
-+=09=09if (hdev->commands[38] & 0x80 &&
-
-+=09    =09!test_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks)) =
-{
-
- =09=09=09/* Read LE Min/Max Tx Power*/
-
- =09=09=09hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
-
- =09=09=09=09    0, NULL);
-
---
-
-2.33.0
-
+  	err = request_firmware(&fw, fwname, &hdev->dev);
+  	if (err) {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
+Forum, a Linux Foundation Collaborative Project
