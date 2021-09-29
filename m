@@ -2,97 +2,376 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2DA6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:47:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 14132C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:48:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BA58861439
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:47:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D7B2761425
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 29 Sep 2021 22:48:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347323AbhI2Wsy (ORCPT
+        id S1347330AbhI2Wtw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 29 Sep 2021 18:48:54 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45806 "EHLO
+        Wed, 29 Sep 2021 18:49:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46034 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1346734AbhI2Wsy (ORCPT
+        with ESMTP id S1346734AbhI2Wtv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 29 Sep 2021 18:48:54 -0400
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CF7EC06161C
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:47:12 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id 64so2745214uab.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:47:12 -0700 (PDT)
+        Wed, 29 Sep 2021 18:49:51 -0400
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 103FBC061767
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:48:10 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id n17so4972828vsr.10
+        for <linux-bluetooth@vger.kernel.org>; Wed, 29 Sep 2021 15:48:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=sIbQ/ee8lsT1u69FQZUM/MlcxSG2d2zzf7wj1zG2r68=;
-        b=bAni+PcZDzRy7WYrbA8L1U1BOz5Pu60TCMMq3r6BwvhzaVeHiZFWt+TGug/fG3gLuv
-         jpXdIDDImQcwCyS+84aKjqItUhmuHCYsN4LD7NdujRW/aSxi9+RhSJn1ju/XuUzXEbVF
-         G9Jgsv2kqyA4loPdACzVg8rvOMOzbTA8rjQFDG7E3BG05QRusKgzbBA1B1UUHRby8x8n
-         xcMFm6FTSGHzMNb0KalcCI07c/S9R5axY92GEPo7kgQyBPiYnj0PgYo+Q4kbxskmi89r
-         wBV+sXaNEdFI1hOW8fK2xd8TbJNIldC2/KqL2pny7St6iioI7BbclDqWQCyvEVgdlErk
-         Vg3w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=qt7W0NlF549nNCHl0j2wIhVHk1II8GAPV4kbtsgL6Ng=;
+        b=N57EgxoK784ZIId57GzmmUFIeCC+3agSZk+vzGBYPFGWpcLctKM6jZ9GpGzsJ3y8u6
+         yKsHNoFTW4we4BKY581HZ2d4PDOtehOzwEOAosdyKbTee58LdiB4SEDutyP+eR1gzzAV
+         y3B1sVuGXNkGUi0RsqZs4/gVpjGhjFEd0hVZeAitYkpd1m1/cVLZZ5oUwF36JnjwNpNZ
+         t9Tq4IrbBiuvuOlgfe12FgUmJv79bhrQ5zfOZiD7pqYWnmC9vNc7ntUiJh1m9SsnRTYU
+         uWvNiybJ4RuAEbJIHLkQkRT6ufwi1XcL43MPmLJ3PiozFW+gt9zheHeezmxnaRMItcR/
+         Z12Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=sIbQ/ee8lsT1u69FQZUM/MlcxSG2d2zzf7wj1zG2r68=;
-        b=j9ad8Nxw/7PDx8sj5uqMqqaUgZreLmVMVbQTA8rOx3k/14TgSYPlaGvoNhpXcAZCLu
-         k3NDXzJQl+UWfGZKurBghpYMydCFE/dI/kQ75lrY5H4wCIbM3PvERM/VhL5mnrA+MKP+
-         SFu8GHXbugkTeRLGnqLyM+/lI9G+Ygj3geadFEf6afN0xy7Wk/f9FS+FlRYZbG2etvKi
-         uCC9EP/5D7WZh+G2XJSQAQCMgjqDb32Rq7EsywUiO6VUbNes4p7Yx/p7DkCKCnqSzCGq
-         Z1TDI2XvNtW3avqxOgYAZ0KDfG9lDVXB5mQVNEWiupPngYaBR1GimLatLlT4giVQiQTg
-         N6Jw==
-X-Gm-Message-State: AOAM530wbWiu9dY+w67W6hvpLlCxgFCjFlVlG7g+7TwT0Lb3CZW2yzyJ
-        GqmLpx+jHQ+YKcxcFjtEzpbg9cswVFx1V7lHGPkeAhxz
-X-Google-Smtp-Source: ABdhPJxQxXHGhqfQKnySmZaJLhsR9fDbP2unTOnQ7tTbDyS4CEBb2aprpzNMPUNgK5EnoTjbACRT+2+bH69gQIueERk=
-X-Received: by 2002:ab0:5b89:: with SMTP id y9mr2759125uae.47.1632955631463;
- Wed, 29 Sep 2021 15:47:11 -0700 (PDT)
+         :message-id:subject:to:cc;
+        bh=qt7W0NlF549nNCHl0j2wIhVHk1II8GAPV4kbtsgL6Ng=;
+        b=gLLQIy6MWLKn7b8EeWeRwyFkNufmFl6spuySujxtKyjOF3QC0g0cmarCBqnq7emYpl
+         S9elcvxUV+bYksEiItyDZQ2IdIWc+YG2ktAvylqal/gsb0ObOCTX/GMdkvBKkwxUotO7
+         KOIrO392xOngWuNcHWjymjsP4HOVe5bGuf6T/zFMjQVKzP7p96znkD+nF5c49dwiMd/6
+         5Xl8WjUke092EYJwk7KYrvXrOuSAKWItXMYUx4KJcTK7vdyGloIs5SezuxNEigiGysJf
+         mIxM3EqL4DsdbkE5th0uZpLbEbxLoJ2AR3VWcsB99Fl3kVtQp1VdrFIYqrI767bFJeXh
+         XD4Q==
+X-Gm-Message-State: AOAM531ch+6Lp9abaTAHQEoREzesLnBW8iJz3hb9Dg1DjiZxIjqta+R1
+        /lCkrqIQwhA8IYMWUq+MFW9PBOJZH2X/lzVigH0RDpqC
+X-Google-Smtp-Source: ABdhPJw4QGav5dcRQQmx6MOnKpVWamUWouLRADYOXg+Ik9AZgvju+ktNSYtXPEYs3XCoKHpj2WdzoZj9Wvk/jZexMls=
+X-Received: by 2002:a05:6102:2757:: with SMTP id p23mr1227588vsu.61.1632955689059;
+ Wed, 29 Sep 2021 15:48:09 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210928235447.3077055-1-luiz.dentz@gmail.com> <6153c08d.1c69fb81.f5831.4749@mx.google.com>
-In-Reply-To: <6153c08d.1c69fb81.f5831.4749@mx.google.com>
+References: <20210928230015.26295-1-bernie@allthenticate.net> <CABBYNZLv5=Wj_PJ7UVtLouWiAudaZDcvJiAhKzQRSmDbzXy5kg@mail.gmail.com>
+In-Reply-To: <CABBYNZLv5=Wj_PJ7UVtLouWiAudaZDcvJiAhKzQRSmDbzXy5kg@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 29 Sep 2021 15:47:00 -0700
-Message-ID: <CABBYNZLKvLjzrTbG5Uvy8T49cOMOcRUJOUr0qo620CV8vd_WVA@mail.gmail.com>
-Subject: Re: [BlueZ,1/5] gatt-api: Add MTU property to GattCharacteristic1
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 29 Sep 2021 15:47:57 -0700
+Message-ID: <CABBYNZKvbOf2R1ZXwOopTcNE4D=W8sXcwvsp9+Fk+JWaVn+nrg@mail.gmail.com>
+Subject: Re: [RFC PATCH BlueZ v2] Cleaning up gatt operations on a disconnect
+ to fix possible use after free
+To:     Bernie Conrad <bernie@allthenticate.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Bernie,
 
-On Tue, Sep 28, 2021 at 6:25 PM <bluez.test.bot@gmail.com> wrote:
+On Wed, Sep 29, 2021 at 2:05 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
 >
-> This is automated email and please do not reply to this email!
+> Hi Bernie,
 >
-> Dear submitter,
+> On Tue, Sep 28, 2021 at 4:01 PM Bernie Conrad <bernie@allthenticate.net> wrote:
+> >
+> > There is a current use after free possible on a gatt server if a client
+> > disconnects while a WriteValue call is being processed with dbus.
+> >
+> > This patch includes the addition of a pending disconnect callback to handle
+> > cleanup better if a disconnect occurs during a write, an acquire write
+> > or read operation using bt_att_register_disconnect with the cb.
+> >
+> > v2: Fixed a bad call to pending_read_new
+> >
+> > ---
+> >  src/gatt-database.c | 115 +++++++++++++++++++++++++-------------------
+> >  1 file changed, 65 insertions(+), 50 deletions(-)
+> >
+> > diff --git a/src/gatt-database.c b/src/gatt-database.c
+> > index 1f7ce5f02..a03c579cf 100644
+> > --- a/src/gatt-database.c
+> > +++ b/src/gatt-database.c
+> > @@ -933,6 +933,24 @@ static struct btd_device *att_get_device(struct bt_att *att)
+> >         return btd_adapter_find_device(adapter, &dst, dst_type);
+> >  }
+> >
+> > +
+> > +static void pending_op_free(void *data)
+> > +{
+> > +       struct pending_op *op = data;
+> > +
+> > +       if (op->owner_queue)
+> > +               queue_remove(op->owner_queue, op);
+> > +
+> > +       free(op);
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=554631
+> We might need to do something like the following:
 >
-> ---Test result---
+> https://gist.github.com/Vudentz/958d540591d1ae6a32d226ef8a0d6d54
 >
-> Test Summary:
-> CheckPatch                    PASS      6.84 seconds
-> GitLint                       PASS      4.61 seconds
-> Prep - Setup ELL              PASS      50.24 seconds
-> Build - Prep                  PASS      0.49 seconds
-> Build - Configure             PASS      9.07 seconds
-> Build - Make                  PASS      219.53 seconds
-> Make Check                    PASS      9.21 seconds
-> Make Distcheck                PASS      256.90 seconds
-> Build w/ext ELL - Configure   PASS      9.34 seconds
-> Build w/ext ELL - Make        PASS      205.94 seconds
+> Otherwise we risk the op being freeing when the op is completely
+> properly but when att is disconnected it still runs
+> pending_disconnect_cb causing a UAF.
+>
+> > +}
+> > +
+> > +static void pending_disconnect_cb(int err, void *user_data)
+> > +{
+> > +       struct pending_op *op = user_data;
+> > +
+> > +       op->owner_queue = NULL;
+> > +}
+> > +
+> >  static struct pending_op *pending_ccc_new(struct bt_att *att,
+> >                                         struct gatt_db_attribute *attrib,
+> >                                         uint16_t value,
+> > @@ -956,17 +974,12 @@ static struct pending_op *pending_ccc_new(struct bt_att *att,
+> >         op->attrib = attrib;
+> >         op->link_type = link_type;
+> >
+> > -       return op;
+> > -}
+> > +       bt_att_register_disconnect(att,
+> > +                                  pending_disconnect_cb,
+> > +                                  op,
+> > +                                  NULL);
+> >
+> > -static void pending_op_free(void *data)
+> > -{
+> > -       struct pending_op *op = data;
+> > -
+> > -       if (op->owner_queue)
+> > -               queue_remove(op->owner_queue, op);
+> > -
+> > -       free(op);
+> > +       return op;
+> >  }
+> >
+> >  static void gatt_ccc_write_cb(struct gatt_db_attribute *attrib,
+> > @@ -2169,24 +2182,26 @@ done:
+> >         gatt_db_attribute_read_result(op->attrib, op->id, ecode, value, len);
+> >  }
+> >
+> > -static struct pending_op *pending_read_new(struct btd_device *device,
+> > +
+> > +static struct pending_op *pending_read_new(struct bt_att *att,
+> >                                         struct queue *owner_queue,
+> >                                         struct gatt_db_attribute *attrib,
+> > -                                       unsigned int id, uint16_t offset,
+> > -                                       uint8_t link_type)
+> > +                                       unsigned int id, uint16_t offset)
+> >  {
+> >         struct pending_op *op;
+> >
+> >         op = new0(struct pending_op, 1);
+> >
+> >         op->owner_queue = owner_queue;
+> > -       op->device = device;
+> > +       op->device = att_get_device(att);
+> >         op->attrib = attrib;
+> >         op->id = id;
+> >         op->offset = offset;
+> > -       op->link_type = link_type;
+> > +       op->link_type = bt_att_get_link_type(att);
+> >         queue_push_tail(owner_queue, op);
+> >
+> > +       bt_att_register_disconnect(att, pending_disconnect_cb, op, NULL);
+> > +
+> >         return op;
+> >  }
+> >
+> > @@ -2243,18 +2258,16 @@ static void read_setup_cb(DBusMessageIter *iter, void *user_data)
+> >         dbus_message_iter_close_container(iter, &dict);
+> >  }
+> >
+> > -static struct pending_op *send_read(struct btd_device *device,
+> > +static struct pending_op *send_read(struct bt_att *att,
+> >                                         struct gatt_db_attribute *attrib,
+> >                                         GDBusProxy *proxy,
+> >                                         struct queue *owner_queue,
+> >                                         unsigned int id,
+> > -                                       uint16_t offset,
+> > -                                       uint8_t link_type)
+> > +                                       uint16_t offset)
+> >  {
+> >         struct pending_op *op;
+> >
+> > -       op = pending_read_new(device, owner_queue, attrib, id, offset,
+> > -                                                       link_type);
+> > +       op = pending_read_new(att, owner_queue, attrib, id, offset);
+> >
+> >         if (g_dbus_proxy_method_call(proxy, "ReadValue", read_setup_cb,
+> >                                 read_reply_cb, op, pending_op_free) == TRUE)
+> > @@ -2337,15 +2350,17 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
+> >         }
+> >
+> >  done:
+> > -       gatt_db_attribute_write_result(op->attrib, op->id, ecode);
+> > +       // Make sure that only reply if the device is connected
+> > +       if (btd_device_is_connected(op->device))
+> > +               gatt_db_attribute_write_result(op->attrib, op->id, ecode);
+> >  }
+> >
+> > -static struct pending_op *pending_write_new(struct btd_device *device,
+> > +static struct pending_op *pending_write_new(struct bt_att *att,
+> >                                         struct queue *owner_queue,
+> >                                         struct gatt_db_attribute *attrib,
+> >                                         unsigned int id,
+> >                                         const uint8_t *value, size_t len,
+> > -                                       uint16_t offset, uint8_t link_type,
+> > +                                       uint16_t offset,
+> >                                         bool is_characteristic,
+> >                                         bool prep_authorize)
+> >  {
+> > @@ -2356,33 +2371,37 @@ static struct pending_op *pending_write_new(struct btd_device *device,
+> >         op->data.iov_base = (uint8_t *) value;
+> >         op->data.iov_len = len;
+> >
+> > -       op->device = device;
+> > +       op->device = att_get_device(att);
+> >         op->owner_queue = owner_queue;
+> >         op->attrib = attrib;
+> >         op->id = id;
+> >         op->offset = offset;
+> > -       op->link_type = link_type;
+> > +       op->link_type = bt_att_get_link_type(att);
+> >         op->is_characteristic = is_characteristic;
+> >         op->prep_authorize = prep_authorize;
+> >         queue_push_tail(owner_queue, op);
+> >
+> > +       bt_att_register_disconnect(att,
+> > +                           pending_disconnect_cb,
+> > +                           op, NULL);
+> > +
+> >         return op;
+> >  }
+> >
+> > -static struct pending_op *send_write(struct btd_device *device,
+> > +static struct pending_op *send_write(struct bt_att *att,
+> >                                         struct gatt_db_attribute *attrib,
+> >                                         GDBusProxy *proxy,
+> >                                         struct queue *owner_queue,
+> >                                         unsigned int id,
+> >                                         const uint8_t *value, size_t len,
+> > -                                       uint16_t offset, uint8_t link_type,
+> > +                                       uint16_t offset,
+> >                                         bool is_characteristic,
+> >                                         bool prep_authorize)
+> >  {
+> >         struct pending_op *op;
+> >
+> > -       op = pending_write_new(device, owner_queue, attrib, id, value, len,
+> > -                                       offset, link_type, is_characteristic,
+> > +       op = pending_write_new(att, owner_queue, attrib, id, value, len,
+> > +                                       offset, is_characteristic,
+> >                                         prep_authorize);
+> >
+> >         if (g_dbus_proxy_method_call(proxy, "WriteValue", write_setup_cb,
+> > @@ -2558,17 +2577,16 @@ static void acquire_write_setup(DBusMessageIter *iter, void *user_data)
+> >  }
+> >
+> >  static struct pending_op *acquire_write(struct external_chrc *chrc,
+> > -                                       struct btd_device *device,
+> > +                                       struct bt_att *att,
+> >                                         struct gatt_db_attribute *attrib,
+> >                                         unsigned int id,
+> > -                                       const uint8_t *value, size_t len,
+> > -                                       uint8_t link_type)
+> > +                                       const uint8_t *value, size_t len)
+> >  {
+> >         struct pending_op *op;
+> >         bool acquiring = !queue_isempty(chrc->pending_writes);
+> >
+> > -       op = pending_write_new(device, chrc->pending_writes, attrib, id, value,
+> > -                               len, 0, link_type, false, false);
+> > +       op = pending_write_new(att, chrc->pending_writes, attrib, id, value,
+> > +                               len, 0, false, false);
+> >
+> >         if (acquiring)
+> >                 return op;
+> > @@ -2851,8 +2869,8 @@ static void desc_read_cb(struct gatt_db_attribute *attrib,
+> >                 goto fail;
+> >         }
+> >
+> > -       if (send_read(device, attrib, desc->proxy, desc->pending_reads, id,
+> > -                                       offset, bt_att_get_link_type(att)))
+> > +       if (send_read(att, attrib, desc->proxy, desc->pending_reads, id,
+> > +                                       offset))
+> >                 return;
+> >
+> >  fail:
+> > @@ -2883,10 +2901,9 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
+> >         if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
+> >                 if (!device_is_trusted(device) && !desc->prep_authorized &&
+> >                                                 desc->req_prep_authorization)
+> > -                       send_write(device, attrib, desc->proxy,
+> > +                       send_write(att, attrib, desc->proxy,
+> >                                         desc->pending_writes, id, value, len,
+> > -                                       offset, bt_att_get_link_type(att),
+> > -                                       false, true);
+> > +                                       offset, false, true);
+> >                 else
+> >                         gatt_db_attribute_write_result(attrib, id, 0);
+> >
+> > @@ -2896,9 +2913,8 @@ static void desc_write_cb(struct gatt_db_attribute *attrib,
+> >         if (opcode == BT_ATT_OP_EXEC_WRITE_REQ)
+> >                 desc->prep_authorized = false;
+> >
+> > -       if (send_write(device, attrib, desc->proxy, desc->pending_writes, id,
+> > -                       value, len, offset, bt_att_get_link_type(att), false,
+> > -                       false))
+> > +       if (send_write(att, attrib, desc->proxy, desc->pending_writes, id,
+> > +                       value, len, offset, false, false))
+> >                 return;
+> >
+> >  fail:
+> > @@ -2977,8 +2993,8 @@ static void chrc_read_cb(struct gatt_db_attribute *attrib,
+> >                 goto fail;
+> >         }
+> >
+> > -       if (send_read(device, attrib, chrc->proxy, chrc->pending_reads, id,
+> > -                                       offset, bt_att_get_link_type(att)))
+> > +       if (send_read(att, attrib, chrc->proxy, chrc->pending_reads, id,
+> > +              offset))
+> >                 return;
+> >
+> >  fail:
+> > @@ -3016,9 +3032,9 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+> >         if (opcode == BT_ATT_OP_PREP_WRITE_REQ) {
+> >                 if (!device_is_trusted(device) && !chrc->prep_authorized &&
+> >                                                 chrc->req_prep_authorization)
+> > -                       send_write(device, attrib, chrc->proxy, queue,
+> > +                       send_write(att, attrib, chrc->proxy, queue,
+> >                                         id, value, len, offset,
+> > -                                       bt_att_get_link_type(att), true, true);
+> > +                                       true, true);
+> >                 else
+> >                         gatt_db_attribute_write_result(attrib, id, 0);
+> >
+> > @@ -3039,13 +3055,12 @@ static void chrc_write_cb(struct gatt_db_attribute *attrib,
+> >         }
+> >
+> >         if (g_dbus_proxy_get_property(chrc->proxy, "WriteAcquired", &iter)) {
+> > -               if (acquire_write(chrc, device, attrib, id, value, len,
+> > -                                               bt_att_get_link_type(att)))
+> > +               if (acquire_write(chrc, att, attrib, id, value, len))
+> >                         return;
+> >         }
+> >
+> > -       if (send_write(device, attrib, chrc->proxy, queue, id, value, len,
+> > -                       offset, bt_att_get_link_type(att), false, false))
+> > +       if (send_write(att, attrib, chrc->proxy, queue, id, value, len,
+> > +                       offset, false, false))
+> >                 return;
+> >
+> >  fail:
+> > --
+> > 2.17.1
+> >
 >
 >
->
-> ---
-> Regards,
-> Linux Bluetooth
+> --
+> Luiz Augusto von Dentz
 
-Pushed.
+I went ahead and applied this with my changes on top, thanks.
 
 -- 
 Luiz Augusto von Dentz
