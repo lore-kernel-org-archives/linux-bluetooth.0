@@ -2,127 +2,110 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE62C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 13:30:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78D75C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 14:14:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88B5861528
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 13:30:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5A15C61268
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 14:14:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349759AbhI3NcB (ORCPT
+        id S1351800AbhI3OPs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 09:32:01 -0400
-Received: from mail-io1-f72.google.com ([209.85.166.72]:42969 "EHLO
-        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1351466AbhI3NcA (ORCPT
+        Thu, 30 Sep 2021 10:15:48 -0400
+Received: from mail-0201.mail-europe.com ([51.77.79.158]:46414 "EHLO
+        mail-0201.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240149AbhI3OPq (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 09:32:00 -0400
-Received: by mail-io1-f72.google.com with SMTP id j7-20020a0566022cc700b005d65f61a95fso5841805iow.9
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 06:30:18 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=uOUIkwSqXsHUz22QAwCD8teZ8Qa66munAvVJYiu3USM=;
-        b=tP5eY1/Fu69MyuJ5TR+wV57wr0J7tQze8bFOSaHg8r+1BE0wO+eVPvLrrOx1TrFHDT
-         E5SzVoJ/h2PjtEzHyok9Za7csj4S4t6vWib71dGbWdvUefoTIGiVrDfaiMSVo+fFuvWe
-         GQ6V6f5JW0P9PipqYKjAswJLEW/EAuCP2c2UrTAITtcz7EHaMOiGJoTmjw7AneDwPD5S
-         osj3zc245Ql8AoWB1UxCQhOVcAhmye7nzMjQUJ0DyhdRNzm7HctqBs0i+HPm65HTk9+Y
-         dkLeRhiMWSFNxoVXJ3evP5tz0m7L6BFajvOV/Ka/GVh/Y2gnlXdy4xfEDbtCNsSHtXCJ
-         CZMw==
-X-Gm-Message-State: AOAM5311anP2WOyAYfhRKXOvXUbMJD+3Q5Gpxwu+HwzqdQI/UUx6009Z
-        efb7AZ66GYc1HNElJJCbW+R/A0K/dngbJzzKT7vTSEkwCHjL
-X-Google-Smtp-Source: ABdhPJxuESSAZaVGFwsofN7m0Tto/CFvmTFTzbZlIHl48VOYxeADPGxOgb37gXdyeYCeOiSmyLCk7ODRU580ognkelAkVucPExdV
+        Thu, 30 Sep 2021 10:15:46 -0400
+Date:   Thu, 30 Sep 2021 14:13:53 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail; t=1633011240;
+        bh=SKiqC0vYIWy4echhG6w2Xl9hrL12Zgq/Z/lU6fDKHW4=;
+        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
+        b=aru8gaDrHxFdIk3jKlURKD4jTHxAOo3vsGPtXj71HwDKUNVAtiiksjbfkfrETokVz
+         hRmLMcFwTxOlCLlg52Rq/bl1bfwYTnvJD7ILcJvqsd6dhH7Deq5Oh6nVxdsAFSqrGZ
+         oFKihfmNYbZlcNGYL5r4gl1EgGJtLLneCiomS3EY=
+To:     redecorating@protonmail.com
+From:   Orlando Chamberlain <redecorating@protonmail.com>
+Cc:     danielwinkler@google.com, johan.hedberg@intel.com,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        regressions@lists.linux.dev, sonnysasaka@chromium.org,
+        linux-kernel@vger.kernel.org
+Reply-To: Orlando Chamberlain <redecorating@protonmail.com>
+Subject: [PATCH] Bluetooth: add quirk disabling query LE tx power
+Message-ID: <20210930141256.19943-1-redecorating@protonmail.com>
+In-Reply-To: <20210930063106.19881-1-redecorating@protonmail.com>
+References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com> <20210930063106.19881-1-redecorating@protonmail.com>
 MIME-Version: 1.0
-X-Received: by 2002:a6b:5114:: with SMTP id f20mr3982006iob.97.1633008618003;
- Thu, 30 Sep 2021 06:30:18 -0700 (PDT)
-Date:   Thu, 30 Sep 2021 06:30:17 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000097631805cd367200@google.com>
-Subject: [syzbot] WARNING: locking bug in sco_conn_del
-From:   syzbot <syzbot+cd697685f3b1d78acd79@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+Querying LE tx power on startup broke Bluetooth on some Broadcom chips
+in Apple computers (at least MacBookPro16,1 and iMac20,1). Added a quirk
+disabling this query for affected devices, based off their common chip
+id 150. Affected devices will not be able to query LE tx power, however
+they were not doing this before.
 
-syzbot found the following issue on:
-
-HEAD commit:    a3b397b4fffb Merge branch 'akpm' (patches from Andrew)
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15c28837300000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6826c0a4e4b4e294
-dashboard link: https://syzkaller.appspot.com/bug?extid=cd697685f3b1d78acd79
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+cd697685f3b1d78acd79@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-DEBUG_LOCKS_WARN_ON(1)
-WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:203 [inline]
-WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:192 [inline]
-WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 check_wait_context kernel/locking/lockdep.c:4688 [inline]
-WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 __lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
-Modules linked in:
-CPU: 0 PID: 7578 Comm: syz-executor.4 Not tainted 5.15.0-rc2-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-RIP: 0010:hlock_class kernel/locking/lockdep.c:203 [inline]
-RIP: 0010:hlock_class kernel/locking/lockdep.c:192 [inline]
-RIP: 0010:check_wait_context kernel/locking/lockdep.c:4688 [inline]
-RIP: 0010:__lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
-Code: 08 84 d2 0f 85 f1 3d 00 00 8b 05 3f 72 13 0c 85 c0 0f 85 f4 fd ff ff 48 c7 c6 40 04 8c 89 48 c7 c7 00 f8 8b 89 e8 09 60 97 07 <0f> 0b 31 ed e9 b7 f0 ff ff e8 ae a1 7b 02 85 c0 0f 84 12 fe ff ff
-RSP: 0018:ffffc9000a697770 EFLAGS: 00010086
-RAX: 0000000000000000 RBX: ffff88802fcf3120 RCX: 0000000000000000
-RDX: 0000000000040000 RSI: ffffffff815dbd98 RDI: fffff520014d2ee0
-RBP: 0000000000001877 R08: 0000000000000000 R09: 0000000000000000
-R10: ffffffff815d5b3e R11: 0000000000000000 R12: ffff88807355c398
-R13: ffff88807355b900 R14: 0000000000040000 R15: 0000000000041877
-FS:  00007fc7fb487700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f1facaf4018 CR3: 000000001ce35000 CR4: 0000000000350ef0
-Call Trace:
- lock_acquire kernel/locking/lockdep.c:5625 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
- lock_sock_nested+0x2f/0xf0 net/core/sock.c:3183
- lock_sock include/net/sock.h:1612 [inline]
- sco_conn_del+0x12a/0x2b0 net/bluetooth/sco.c:194
- sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1205
- hci_disconn_cfm include/net/bluetooth/hci_core.h:1518 [inline]
- hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1608
- hci_dev_do_close+0x57d/0x1130 net/bluetooth/hci_core.c:1793
- hci_rfkill_set_block+0x19c/0x1d0 net/bluetooth/hci_core.c:2233
- rfkill_set_block+0x1f9/0x540 net/rfkill/core.c:344
- rfkill_fop_write+0x267/0x500 net/rfkill/core.c:1268
- do_loop_readv_writev fs/read_write.c:753 [inline]
- do_loop_readv_writev fs/read_write.c:737 [inline]
- do_iter_write+0x4f8/0x710 fs/read_write.c:857
- vfs_writev+0x1aa/0x630 fs/read_write.c:928
- do_writev+0x27f/0x300 fs/read_write.c:971
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x44/0xae
-RIP: 0033:0x7fc7fdf10709
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fc7fb487188 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
-RAX: ffffffffffffffda RBX: 00007fc7fe014f60 RCX: 00007fc7fdf10709
-RDX: 0000000000000001 RSI: 0000000020000000 RDI: 0000000000000006
-RBP: 00007fc7fdf6acb4 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffe9a33e8ff R14: 00007fc7fb487300 R15: 0000000000022000
-
-
+Fixes: 7c395ea521e6m ("Bluetooth: Query LE tx power on startup")
+Signed-off-by: Orlando Chamberlain <redecorating@protonmail.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ drivers/bluetooth/btbcm.c   | 4 ++++
+ include/net/bluetooth/hci.h | 8 ++++++++
+ net/bluetooth/hci_core.c    | 3 ++-
+ 3 files changed, 14 insertions(+), 1 deletion(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index e4182acee488..4ecc50d93107 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -353,6 +353,10 @@ static int btbcm_read_info(struct hci_dev *hdev)
+ =09=09return PTR_ERR(skb);
+=20
+ =09bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
++
++=09if (skb->data[1] =3D=3D 150)
++=09=09set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
++
+ =09kfree_skb(skb);
+=20
+ =09/* Read Controller Features */
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index b80415011dcd..5e0dd0c39ade 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -246,6 +246,14 @@ enum {
+ =09 * HCI after resume.
+ =09 */
+ =09HCI_QUIRK_NO_SUSPEND_NOTIFIER,
++
++=09/*
++=09 * When this quirk is set, LE tx power is not queried on startup.
++=09 *
++=09 * This quirk can be set before hci_register_dev is called or
++=09 * during the hdev->setup vendor callback.
++=09 */
++=09HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
+ };
+=20
+ /* HCI device flags */
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index 8a47a3017d61..16e39739c662 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -742,7 +742,8 @@ static int hci_init3_req(struct hci_request *req, unsig=
+ned long opt)
+ =09=09=09hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
+ =09=09}
+=20
+-=09=09if (hdev->commands[38] & 0x80) {
++=09=09if (hdev->commands[38] & 0x80 &&
++=09=09=09!test_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks)) {
+ =09=09=09/* Read LE Min/Max Tx Power*/
+ =09=09=09hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
+ =09=09=09=09    0, NULL);
+--=20
+2.33.0
+
+
