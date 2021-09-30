@@ -2,117 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 16525C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 10:36:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9DE62C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 13:30:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F09B761882
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 10:36:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 88B5861528
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 13:30:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349855AbhI3Kii (ORCPT
+        id S1349759AbhI3NcB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 06:38:38 -0400
-Received: from rtits2.realtek.com ([211.75.126.72]:33360 "EHLO
-        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241052AbhI3Kih (ORCPT
+        Thu, 30 Sep 2021 09:32:01 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:42969 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1351466AbhI3NcA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 06:38:37 -0400
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 18UAae5tB001743, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36503.realtek.com.tw[172.21.6.25])
-        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 18UAae5tB001743
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-        Thu, 30 Sep 2021 18:36:40 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36503.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2308.14; Thu, 30 Sep 2021 18:36:40 +0800
-Received: from localhost.localdomain (172.21.132.99) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2106.2; Thu, 30 Sep 2021 18:36:39 +0800
-From:   <hildawu@realtek.com>
-To:     <marcel@holtmann.org>
-CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
-        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <kai.heng.feng@canonical.com>, <apusaka@chromium.org>,
-        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
-        <kidman@realtek.com>
-Subject: [PATCH] Bluetooth: btrtl: Ask ic_info to drop firmware
-Date:   Thu, 30 Sep 2021 18:36:34 +0800
-Message-ID: <20210930103634.1710-1-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
+        Thu, 30 Sep 2021 09:32:00 -0400
+Received: by mail-io1-f72.google.com with SMTP id j7-20020a0566022cc700b005d65f61a95fso5841805iow.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 06:30:18 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=uOUIkwSqXsHUz22QAwCD8teZ8Qa66munAvVJYiu3USM=;
+        b=tP5eY1/Fu69MyuJ5TR+wV57wr0J7tQze8bFOSaHg8r+1BE0wO+eVPvLrrOx1TrFHDT
+         E5SzVoJ/h2PjtEzHyok9Za7csj4S4t6vWib71dGbWdvUefoTIGiVrDfaiMSVo+fFuvWe
+         GQ6V6f5JW0P9PipqYKjAswJLEW/EAuCP2c2UrTAITtcz7EHaMOiGJoTmjw7AneDwPD5S
+         osj3zc245Ql8AoWB1UxCQhOVcAhmye7nzMjQUJ0DyhdRNzm7HctqBs0i+HPm65HTk9+Y
+         dkLeRhiMWSFNxoVXJ3evP5tz0m7L6BFajvOV/Ka/GVh/Y2gnlXdy4xfEDbtCNsSHtXCJ
+         CZMw==
+X-Gm-Message-State: AOAM5311anP2WOyAYfhRKXOvXUbMJD+3Q5Gpxwu+HwzqdQI/UUx6009Z
+        efb7AZ66GYc1HNElJJCbW+R/A0K/dngbJzzKT7vTSEkwCHjL
+X-Google-Smtp-Source: ABdhPJxuESSAZaVGFwsofN7m0Tto/CFvmTFTzbZlIHl48VOYxeADPGxOgb37gXdyeYCeOiSmyLCk7ODRU580ognkelAkVucPExdV
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.99]
-X-ClientProxiedBy: RTEXH36504.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: trusted connection
-X-KSE-Antiphishing-Info: Clean
-X-KSE-Antiphishing-ScanningType: Deterministic
-X-KSE-Antiphishing-Method: None
-X-KSE-Antiphishing-Bases: 09/30/2021 01:34:00
-X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
- rules found
-X-KSE-Antivirus-Interceptor-Info: scan successful
-X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzkvMjkgpFWkyCAxMToyNzowMA==?=
-X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
-X-KSE-ServerInfo: RTEXH36503.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
+X-Received: by 2002:a6b:5114:: with SMTP id f20mr3982006iob.97.1633008618003;
+ Thu, 30 Sep 2021 06:30:18 -0700 (PDT)
+Date:   Thu, 30 Sep 2021 06:30:17 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000097631805cd367200@google.com>
+Subject: [syzbot] WARNING: locking bug in sco_conn_del
+From:   syzbot <syzbot+cd697685f3b1d78acd79@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Hilda Wu <hildawu@realtek.com>
+Hello,
 
-Some un-support wakeup platforms keep USB power and suspend signal
-is coming late, this makes Realtek some chip keep its firmware,
-and make it never load new firmware.
+syzbot found the following issue on:
 
-So use vendor specific HCI command to ask them drop its firmware after
-system shutdown or resume.
+HEAD commit:    a3b397b4fffb Merge branch 'akpm' (patches from Andrew)
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15c28837300000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6826c0a4e4b4e294
+dashboard link: https://syzkaller.appspot.com/bug?extid=cd697685f3b1d78acd79
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+cd697685f3b1d78acd79@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+DEBUG_LOCKS_WARN_ON(1)
+WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:203 [inline]
+WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 hlock_class kernel/locking/lockdep.c:192 [inline]
+WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 check_wait_context kernel/locking/lockdep.c:4688 [inline]
+WARNING: CPU: 0 PID: 7578 at kernel/locking/lockdep.c:203 __lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
+Modules linked in:
+CPU: 0 PID: 7578 Comm: syz-executor.4 Not tainted 5.15.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+RIP: 0010:hlock_class kernel/locking/lockdep.c:203 [inline]
+RIP: 0010:hlock_class kernel/locking/lockdep.c:192 [inline]
+RIP: 0010:check_wait_context kernel/locking/lockdep.c:4688 [inline]
+RIP: 0010:__lock_acquire+0x1344/0x54a0 kernel/locking/lockdep.c:4965
+Code: 08 84 d2 0f 85 f1 3d 00 00 8b 05 3f 72 13 0c 85 c0 0f 85 f4 fd ff ff 48 c7 c6 40 04 8c 89 48 c7 c7 00 f8 8b 89 e8 09 60 97 07 <0f> 0b 31 ed e9 b7 f0 ff ff e8 ae a1 7b 02 85 c0 0f 84 12 fe ff ff
+RSP: 0018:ffffc9000a697770 EFLAGS: 00010086
+RAX: 0000000000000000 RBX: ffff88802fcf3120 RCX: 0000000000000000
+RDX: 0000000000040000 RSI: ffffffff815dbd98 RDI: fffff520014d2ee0
+RBP: 0000000000001877 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffff815d5b3e R11: 0000000000000000 R12: ffff88807355c398
+R13: ffff88807355b900 R14: 0000000000040000 R15: 0000000000041877
+FS:  00007fc7fb487700(0000) GS:ffff8880b9c00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f1facaf4018 CR3: 000000001ce35000 CR4: 0000000000350ef0
+Call Trace:
+ lock_acquire kernel/locking/lockdep.c:5625 [inline]
+ lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
+ lock_sock_nested+0x2f/0xf0 net/core/sock.c:3183
+ lock_sock include/net/sock.h:1612 [inline]
+ sco_conn_del+0x12a/0x2b0 net/bluetooth/sco.c:194
+ sco_disconn_cfm+0x71/0xb0 net/bluetooth/sco.c:1205
+ hci_disconn_cfm include/net/bluetooth/hci_core.h:1518 [inline]
+ hci_conn_hash_flush+0x127/0x260 net/bluetooth/hci_conn.c:1608
+ hci_dev_do_close+0x57d/0x1130 net/bluetooth/hci_core.c:1793
+ hci_rfkill_set_block+0x19c/0x1d0 net/bluetooth/hci_core.c:2233
+ rfkill_set_block+0x1f9/0x540 net/rfkill/core.c:344
+ rfkill_fop_write+0x267/0x500 net/rfkill/core.c:1268
+ do_loop_readv_writev fs/read_write.c:753 [inline]
+ do_loop_readv_writev fs/read_write.c:737 [inline]
+ do_iter_write+0x4f8/0x710 fs/read_write.c:857
+ vfs_writev+0x1aa/0x630 fs/read_write.c:928
+ do_writev+0x27f/0x300 fs/read_write.c:971
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+RIP: 0033:0x7fc7fdf10709
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 bc ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc7fb487188 EFLAGS: 00000246 ORIG_RAX: 0000000000000014
+RAX: ffffffffffffffda RBX: 00007fc7fe014f60 RCX: 00007fc7fdf10709
+RDX: 0000000000000001 RSI: 0000000020000000 RDI: 0000000000000006
+RBP: 00007fc7fdf6acb4 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffe9a33e8ff R14: 00007fc7fb487300 R15: 0000000000022000
+
+
 ---
- drivers/bluetooth/btrtl.c | 12 +++++++-----
- 1 file changed, 7 insertions(+), 5 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 1f8afa0244d8..60ddba8962ff 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -594,8 +594,10 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 	hci_rev = le16_to_cpu(resp->hci_rev);
- 	lmp_subver = le16_to_cpu(resp->lmp_subver);
- 
--	if (resp->hci_ver == 0x8 && le16_to_cpu(resp->hci_rev) == 0x826c &&
--	    resp->lmp_ver == 0x8 && le16_to_cpu(resp->lmp_subver) == 0xa99e)
-+	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
-+					    hdev->bus);
-+
-+	if (!btrtl_dev->ic_info)
- 		btrtl_dev->drop_fw = true;
- 
- 	if (btrtl_dev->drop_fw) {
-@@ -634,13 +636,13 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
- 		hci_ver = resp->hci_ver;
- 		hci_rev = le16_to_cpu(resp->hci_rev);
- 		lmp_subver = le16_to_cpu(resp->lmp_subver);
-+
-+		btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
-+						    hdev->bus);
- 	}
- out_free:
- 	kfree_skb(skb);
- 
--	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
--					    hdev->bus);
--
- 	if (!btrtl_dev->ic_info) {
- 		rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
- 			    lmp_subver, hci_rev, hci_ver);
--- 
-2.17.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
