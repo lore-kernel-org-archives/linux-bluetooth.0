@@ -2,104 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 672B3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 15:08:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6492AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 17:43:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4BC1261882
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 15:08:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 30BE9619F6
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 17:43:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244724AbhI3PKg (ORCPT
+        id S1352812AbhI3Rpj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 11:10:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45298 "EHLO
+        Thu, 30 Sep 2021 13:45:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53944 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239388AbhI3PKX (ORCPT
+        with ESMTP id S1352732AbhI3Rpj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 11:10:23 -0400
-Received: from mail-qt1-x833.google.com (mail-qt1-x833.google.com [IPv6:2607:f8b0:4864:20::833])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0052C06176A
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 08:08:34 -0700 (PDT)
-Received: by mail-qt1-x833.google.com with SMTP id m26so5983139qtn.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 08:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=starry.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RIhQ6uh2LQ0nck1gqy4vQfAyci3k4/52EoefsnVDAjM=;
-        b=pMBmQ5rYmq0hwbbOowCVAmjuqjutt9bYxqLJwaW/XeUMEM5XEke8JiT5NOeHhTCXqi
-         LrPOmdB289oRpj2aYgbGAJUQZfulLWA8ca2kTfP/bKNt8CIeIBJfgaFGmUfkIuZ7J+Gk
-         ZEYfCs5D1EczLTMh4816XHJ4wxF8EZ+0kWPm4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=RIhQ6uh2LQ0nck1gqy4vQfAyci3k4/52EoefsnVDAjM=;
-        b=fIWF1KQpMOzw0OSKuDfTe5gsDo/eT/uVel9vlmbheJLBPnoSsylDdo+S/Dyia11V2H
-         bkl3Qa8V2YtLCoG4Hi8Iye6hxxBq4ySIIGlfZlvezYGmWADE1vuH6pyBfuANdiFS8WnS
-         cc9CsoUad5EH0u4j3twPlUvzdV/RUyENkEJBRQEcMM7eE7j5wZY+MQP5ipy0rTt2600U
-         TngPxLa1aRaK4ozUy3p+MXpQRsdHeMt384oVI6m0E1eGaeZap/oJrDOcvbQdLCBBmyV1
-         YRtjdp/v5ldDpgacHkJP46WsZ/FWSmd20Q5PY92hzK7MhFmQop72VIlOgS2VtW0B2nk7
-         iu3A==
-X-Gm-Message-State: AOAM531tRryj+Inu4MzamVkXva+4Y0YQJpKzUghLyN817CndbjcqhwyR
-        OGZuChc25ZVzckry9+7yQq4LexUP9gJl3bUN
-X-Google-Smtp-Source: ABdhPJxDe8Su7TR/GAP5Nw33V+MrhxK4q2rpg8h+v4imYi6G3pVOCSySMTG8/X17BLIneO9GRScN4w==
-X-Received: by 2002:ac8:560b:: with SMTP id 11mr7239429qtr.319.1633014513983;
-        Thu, 30 Sep 2021 08:08:33 -0700 (PDT)
-Received: from MrComputer.nevonetnext (205-201-16-55.starry-inc.net. [205.201.16.55])
-        by smtp.gmail.com with ESMTPSA id w17sm1573741qkf.97.2021.09.30.08.08.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Sep 2021 08:08:33 -0700 (PDT)
-From:   Dagan Martinez <dmartinez@starry.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Dagan Martinez <dmartinez@starry.com>
-Subject: [PATCH BlueZ v3 0/2] Optionally require security for notify/indicate
-Date:   Thu, 30 Sep 2021 11:08:17 -0400
-Message-Id: <20210930150819.34270-1-dmartinez@starry.com>
-X-Mailer: git-send-email 2.31.1
+        Thu, 30 Sep 2021 13:45:39 -0400
+X-Greylist: delayed 2413 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 30 Sep 2021 10:43:55 PDT
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C004EC06176A;
+        Thu, 30 Sep 2021 10:43:55 -0700 (PDT)
+Received: from ip4d14bdef.dynamic.kabel-deutschland.de ([77.20.189.239] helo=[192.168.66.200]); authenticated
+        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+        id 1mVzT7-0000ha-IF; Thu, 30 Sep 2021 19:03:37 +0200
+Message-ID: <43fb97ad-69eb-95ad-d50a-b8f1113dbee6@leemhuis.info>
+Date:   Thu, 30 Sep 2021 19:03:36 +0200
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Content-Language: en-BS
+To:     Orlando Chamberlain <redecorating@protonmail.com>
+Cc:     danielwinkler@google.com, johan.hedberg@intel.com,
+        linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        regressions@lists.linux.dev, sonnysasaka@chromium.org,
+        linux-kernel@vger.kernel.org
+References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com>
+ <20210930063106.19881-1-redecorating@protonmail.com>
+ <20210930141256.19943-1-redecorating@protonmail.com>
+From:   Thorsten Leemhuis <linux@leemhuis.info>
+Subject: Re: [PATCH] Bluetooth: add quirk disabling query LE tx power
+In-Reply-To: <20210930141256.19943-1-redecorating@protonmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;linux@leemhuis.info;1633023836;f21159eb;
+X-HE-SMSGID: 1mVzT7-0000ha-IF
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In some cases, it is desirable to require encryption and/or
-authentication for server-initiated updates, as they may contain
-sensitive data.
+On 30.09.21 16:13, Orlando Chamberlain wrote:
+> Querying LE tx power on startup broke Bluetooth on some Broadcom chips
+> in Apple computers (at least MacBookPro16,1 and iMac20,1). Added a quirk
+> disabling this query for affected devices, based off their common chip
+> id 150. Affected devices will not be able to query LE tx power, however
+> they were not doing this before.
+> 
+> Fixes: 7c395ea521e6m ("Bluetooth: Query LE tx power on startup")
+> Signed-off-by: Orlando Chamberlain <redecorating@protonmail.com>
 
-Currently, there is no way to do this with BlueZ.
+FWIW, if you need to respin this for some reason, could you do me a
+favour and add the following after the "Fixes" line please:
 
-Here is a query about this feature from 2019:
-https://stackoverflow.com/questions/55884233
+Link:
+https://lore.kernel.org/r/4970a940-211b-25d6-edab-21a815313954@protonmail.com
 
-This patch implements this feature by introducing new `x-notify` and
-`x-indicate` flags that allow a user to restrict access to a
-characteristic's CCCD (as well as documentation for those flags).
+That makes is easier to find related discussions and rationale behind a
+certain change, as explained here:
+https://www.kernel.org/doc/html/latest/maintainer/configure-git.html
 
-Note that `x-notify` and `x-indicate` each enforce security for ALL
-server-initiated updates. That is, you cannot require one level of
-security for notifications and another security level for indications on
-the same CCCD. I could not think of a reason why somebody would want
-that feature, and did not think the accuracy of terms would be worth the
-introduced complexity, so I didn't implement it.
+This line is not crucial, but it makes my life easier as well, as I
+slowly start to track regressions again. And this time I'm doing it with
+the help of a software I wrote just for this purpose. I used your report
+as one of the first few to give this "regzbot" a test, hence the issue
+can now be seen in the webinterface (which is still a bit ugly, but it
+does the job):
 
----
-Changes in v3:
-- Split the `x-asynchronous` flags into `x-notify` and `x-indicate`
-- Fix a mixed code and declaration error
+https://linux-regtracking.leemhuis.info/regzbot/mainline.html
 
-Changes in v2:
-- Fix line-width issues brought up by CI
+And the thing is: when regzbot sees a patch with above Link:-tag hit
+mainline it will automatically mark the issue as resolved, saving me
+some work.
 
+Thx!
 
-Dagan Martinez (2):
-  gatt: Allow GATT server to dicate CCC permissions
-  doc/gatt-api: Add 'X-notify`/`X-indicate`
-
- doc/gatt-api.txt       | 15 ++++++++++++++-
- src/gatt-database.c    | 42 ++++++++++++++++++++++++++++++++++++++----
- src/shared/att-types.h |  4 ++++
- 3 files changed, 56 insertions(+), 5 deletions(-)
-
--- 
-2.31.1
-
+Ciao, Thorsten
