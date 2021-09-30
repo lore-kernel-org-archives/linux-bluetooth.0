@@ -2,115 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44584C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 17:59:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A823C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 19:57:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 29DEE619E5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 17:59:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D9F1F61265
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 19:57:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352929AbhI3SAm convert rfc822-to-8bit (ORCPT
+        id S1347025AbhI3T7U (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 14:00:42 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:47060 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1352882AbhI3SAl (ORCPT
+        Thu, 30 Sep 2021 15:59:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56530 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229745AbhI3T7T (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 14:00:41 -0400
-Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 12109CED17;
-        Thu, 30 Sep 2021 19:58:55 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: add quirk disabling query LE tx power
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20210930141256.19943-1-redecorating@protonmail.com>
-Date:   Thu, 30 Sep 2021 19:58:54 +0200
-Cc:     danielwinkler@google.com, Johan Hedberg <johan.hedberg@intel.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        regressions@lists.linux.dev, sonnysasaka@chromium.org,
-        linux-kernel@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FA02CDD7-CFEC-4481-9940-BA95D81FD3F3@holtmann.org>
-References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com>
- <20210930063106.19881-1-redecorating@protonmail.com>
- <20210930141256.19943-1-redecorating@protonmail.com>
-To:     Orlando Chamberlain <redecorating@protonmail.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Thu, 30 Sep 2021 15:59:19 -0400
+Received: from mail-ua1-x935.google.com (mail-ua1-x935.google.com [IPv6:2607:f8b0:4864:20::935])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8179CC06176A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 12:57:36 -0700 (PDT)
+Received: by mail-ua1-x935.google.com with SMTP id 64so5102134uab.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 12:57:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=yqFYeSCJXad6aS6S39heRo7FkDv01VeVP/ND29gKDgc=;
+        b=dDxNVZAVqLPNNUs35D+eAe8okbmBzHKKnoi/MeyAfd64bbc77OdaNLmUDzQmhe3ppt
+         VDjkAY8n83ss8owGrAkQS32J9gVE0hJoMWIaTphyKqaej3r1NhCxqqFNUnV/nt8Rc51R
+         ad73RJDSzTtz7d0E4xsU+M5obJLA6clinrUI7Z0PymPnYIez+2U+mFrF5dgDMtkWl+Xw
+         H6lsckibzaSzxD7lSc6AxRmjk0WAOkglCL+D9X6djIFulgstkjZTPHPreqBWXj02ttsy
+         J1jxyCnLSZrGybgqlFxhO+2JRGeMhGhZWjgpJIwTup85wfUmDuA1//6mCTuMtSyZ9xRd
+         xl+A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=yqFYeSCJXad6aS6S39heRo7FkDv01VeVP/ND29gKDgc=;
+        b=eYQ0JAGCfxKaEgyd7kk7LbTzc2i6W2thQ+pW/wXwgrp7XcRtJg/8VRgO4T/WJFSTkl
+         zPXv26dmRZ261edbRQ10ldoV+AUMewb70NXOrG5aGqNidiff+2HVCWRWLF1somzLWPJz
+         od+f1wWUmvkwW0GQz1o7vQxcPMR1O8cqB1SgjUfDJjmS/fbDWnhePPA/18zB7rE0Tq5S
+         Gvp0aKfunqvAfopuxEsaDLjoYXAbq+sdAV8lsx3rBY+ebVklggOaD55GmDXUcRCELP0N
+         skNu/cbSd6Z9ozYYIQ956fUbC3S8mSDVqdpLaDdpZwxVsgy0G2KUnlG+PWiwljyEEFJu
+         FIGA==
+X-Gm-Message-State: AOAM533QY4tc0FUWP3FprzmTywH8ogRNwOydTFlXEbmJD9qFIyESilkD
+        qRslGc1qFH0zzRnL1AHNGPY67zs4DSmCCy/UpTlesU4P
+X-Google-Smtp-Source: ABdhPJyvalBYJ18rv9m6O69eQPJK+QCFzJLR4G8a8hapTtKqjLEHXH30tdvbh+9e8AYkcdiOnQ8raOQZFTsMuj/85+0=
+X-Received: by 2002:ab0:5741:: with SMTP id t1mr7531328uac.72.1633031855422;
+ Thu, 30 Sep 2021 12:57:35 -0700 (PDT)
+MIME-Version: 1.0
+References: <20210929174819.66551-1-marcel@holtmann.org> <6154ace0.1c69fb81.9de0c.2c2a@mx.google.com>
+In-Reply-To: <6154ace0.1c69fb81.9de0c.2c2a@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Thu, 30 Sep 2021 12:57:24 -0700
+Message-ID: <CABBYNZ+yK7tcvQHXR-S1z9Hnd7PRpHMXDAxKVhyZFN0kKWtTeA@mail.gmail.com>
+Subject: Re: Bluetooth: btrtl: Add support for MSFT extension to rtl8821c devices
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Orlando,
+Hi Marcel,
 
-> Querying LE tx power on startup broke Bluetooth on some Broadcom chips
-> in Apple computers (at least MacBookPro16,1 and iMac20,1). Added a quirk
-> disabling this query for affected devices, based off their common chip
-> id 150. Affected devices will not be able to query LE tx power, however
-> they were not doing this before.
-> 
-> Fixes: 7c395ea521e6m ("Bluetooth: Query LE tx power on startup")
-> Signed-off-by: Orlando Chamberlain <redecorating@protonmail.com>
+On Wed, Sep 29, 2021 at 11:21 AM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=555161
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      1.55 seconds
+> GitLint                       PASS      0.97 seconds
+> BuildKernel                   PASS      627.69 seconds
+> TestRunner: Setup             PASS      460.24 seconds
+> TestRunner: l2cap-tester      PASS      10.26 seconds
+> TestRunner: bnep-tester       PASS      5.46 seconds
+> TestRunner: mgmt-tester       FAIL      85.35 seconds
+> TestRunner: rfcomm-tester     PASS      6.76 seconds
+> TestRunner: sco-tester        PASS      7.07 seconds
+> TestRunner: smp-tester        PASS      6.77 seconds
+> TestRunner: userchan-tester   PASS      5.86 seconds
+>
+> Details
+> ##############################
+> Test: TestRunner: mgmt-tester - FAIL - 85.35 seconds
+> Run test-runner with mgmt-tester
+> Total: 452, Passed: 451 (99.8%), Failed: 1, Not Run: 0
+>
+> Failed Test Cases
+> Read Exp Feature - Success                           Failed       0.112 seconds
+>
+>
+>
 > ---
-> drivers/bluetooth/btbcm.c   | 4 ++++
-> include/net/bluetooth/hci.h | 8 ++++++++
-> net/bluetooth/hci_core.c    | 3 ++-
-> 3 files changed, 14 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
-> index e4182acee488..4ecc50d93107 100644
-> --- a/drivers/bluetooth/btbcm.c
-> +++ b/drivers/bluetooth/btbcm.c
-> @@ -353,6 +353,10 @@ static int btbcm_read_info(struct hci_dev *hdev)
-> 		return PTR_ERR(skb);
-> 
-> 	bt_dev_info(hdev, "BCM: chip id %u", skb->data[1]);
-> +
-> +	if (skb->data[1] == 150)
-> +		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
-> +
-> 	kfree_skb(skb);
-> 
-> 	/* Read Controller Features */
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index b80415011dcd..5e0dd0c39ade 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -246,6 +246,14 @@ enum {
-> 	 * HCI after resume.
-> 	 */
-> 	HCI_QUIRK_NO_SUSPEND_NOTIFIER,
-> +
-> +	/*
-> +	 * When this quirk is set, LE tx power is not queried on startup.
-> +	 *
-> +	 * This quirk can be set before hci_register_dev is called or
-> +	 * during the hdev->setup vendor callback.
-> +	 */
-> +	HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER,
-> };
-> 
-> /* HCI device flags */
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 8a47a3017d61..16e39739c662 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -742,7 +742,8 @@ static int hci_init3_req(struct hci_request *req, unsigned long opt)
-> 			hci_req_add(req, HCI_OP_LE_READ_ADV_TX_POWER, 0, NULL);
-> 		}
-> 
-> -		if (hdev->commands[38] & 0x80) {
-> +		if (hdev->commands[38] & 0x80 &&
-> +			!test_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks)) {
-> 			/* Read LE Min/Max Tx Power*/
-> 			hci_req_add(req, HCI_OP_LE_READ_TRANSMIT_POWER,
-> 				    0, NULL);
+> Regards,
+> Linux Bluetooth
 
-so I really need the btmon traces from the device init (so unload and reload the module) and we need to see what commands are supported and what commands are failing.
+Applied, thanks.
 
-Since you say this is on a MacBook, I assume this is an UART based Broadcom chip. Sometimes Broadcom has been really flaky with their actually implemented commands. However in some cases firmware updates do fix this. So any chance you can boot OS X and check that the latest firmware is loaded.
-
-Regards
-
-Marcel
-
+-- 
+Luiz Augusto von Dentz
