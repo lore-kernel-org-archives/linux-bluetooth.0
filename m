@@ -2,100 +2,117 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4EBDEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 08:32:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 16525C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 10:36:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33199615A7
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 08:32:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F09B761882
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 30 Sep 2021 10:36:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349210AbhI3IeJ (ORCPT
+        id S1349855AbhI3Kii (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 04:34:09 -0400
-Received: from mail.flinny.org ([145.239.104.49]:58311 "EHLO mail.flinny.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1349240AbhI3IeB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 04:34:01 -0400
-X-Greylist: delayed 548 seconds by postgrey-1.27 at vger.kernel.org; Thu, 30 Sep 2021 04:34:00 EDT
-Received: from localhost (localhost [127.0.0.1])
-        by mail.flinny.org (Postfix) with ESMTP id 8D27C210BD;
-        Thu, 30 Sep 2021 08:23:09 +0000 (UTC)
-X-Virus-Scanned: Debian amavisd-new at flinny.org
-Received: from mail.flinny.org ([127.0.0.1])
-        by localhost (mail.flinny.org [127.0.0.1]) (amavisd-new, port 10024)
-        with ESMTP id vG642tgy5d62; Thu, 30 Sep 2021 08:23:08 +0000 (UTC)
-Received: from rampage.fritz.box (overkill.flinny.org [62.3.65.209])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (Client did not present a certificate)
-        by mail.flinny.org (Postfix) with ESMTPSA id 03DD92105D;
-        Thu, 30 Sep 2021 08:23:06 +0000 (UTC)
-From:   Nicholas Flintham <nick@flinny.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     linux-bluetooth@vger.kernel.org,
-        Nicholas Flintham <nick@flinny.org>
-Subject: [PATCH] Bluetooth: btusb: Add support for TP-Link UB500 Adapter
-Date:   Thu, 30 Sep 2021 09:22:39 +0100
-Message-Id: <20210930082239.3699395-1-nick@flinny.org>
-X-Mailer: git-send-email 2.32.0
+        Thu, 30 Sep 2021 06:38:38 -0400
+Received: from rtits2.realtek.com ([211.75.126.72]:33360 "EHLO
+        rtits2.realtek.com.tw" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S241052AbhI3Kih (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 30 Sep 2021 06:38:37 -0400
+Authenticated-By: 
+X-SpamFilter-By: ArmorX SpamTrap 5.73 with qID 18UAae5tB001743, This message is accepted by code: ctloc85258
+Received: from mail.realtek.com (rtexh36503.realtek.com.tw[172.21.6.25])
+        by rtits2.realtek.com.tw (8.15.2/2.71/5.88) with ESMTPS id 18UAae5tB001743
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+        Thu, 30 Sep 2021 18:36:40 +0800
+Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
+ RTEXH36503.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2308.14; Thu, 30 Sep 2021 18:36:40 +0800
+Received: from localhost.localdomain (172.21.132.99) by
+ RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2106.2; Thu, 30 Sep 2021 18:36:39 +0800
+From:   <hildawu@realtek.com>
+To:     <marcel@holtmann.org>
+CC:     <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>,
+        <linux-bluetooth@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kai.heng.feng@canonical.com>, <apusaka@chromium.org>,
+        <max.chou@realtek.com>, <alex_lu@realsil.com.cn>,
+        <kidman@realtek.com>
+Subject: [PATCH] Bluetooth: btrtl: Ask ic_info to drop firmware
+Date:   Thu, 30 Sep 2021 18:36:34 +0800
+Message-ID: <20210930103634.1710-1-hildawu@realtek.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [172.21.132.99]
+X-ClientProxiedBy: RTEXH36504.realtek.com.tw (172.21.6.27) To
+ RTEXMBS04.realtek.com.tw (172.21.6.97)
+X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: trusted connection
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Deterministic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 09/30/2021 01:34:00
+X-KSE-AttachmentFiltering-Interceptor-Info: no applicable attachment filtering
+ rules found
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: =?big5?B?Q2xlYW4sIGJhc2VzOiAyMDIxLzkvMjkgpFWkyCAxMToyNzowMA==?=
+X-KSE-BulkMessagesFiltering-Scan-Result: protection disabled
+X-KSE-ServerInfo: RTEXH36503.realtek.com.tw, 9
+X-KSE-AntiSpam-Interceptor-Info: fallback
+X-KSE-Antivirus-Interceptor-Info: fallback
+X-KSE-AntiSpam-Interceptor-Info: fallback
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add support for TP-Link UB500 Adapter (RTL8761B)
+From: Hilda Wu <hildawu@realtek.com>
 
-* /sys/kernel/debug/usb/devices
-T:  Bus=01 Lev=02 Prnt=05 Port=01 Cnt=01 Dev#= 78 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=2357 ProdID=0604 Rev= 2.00
-S:  Manufacturer=
-S:  Product=TP-Link UB500 Adapter
-S:  SerialNumber=E848B8C82000
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+Some un-support wakeup platforms keep USB power and suspend signal
+is coming late, this makes Realtek some chip keep its firmware,
+and make it never load new firmware.
 
-Signed-off-by: Nicholas Flintham <nick@flinny.org>
+So use vendor specific HCI command to ask them drop its firmware after
+system shutdown or resume.
+
+Signed-off-by: Hilda Wu <hildawu@realtek.com>
 ---
- drivers/bluetooth/btusb.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/bluetooth/btrtl.c | 12 +++++++-----
+ 1 file changed, 7 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 60d2fce59a71..79d0db542da3 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -433,6 +433,10 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0bda, 0xb009), .driver_info = BTUSB_REALTEK },
- 	{ USB_DEVICE(0x2ff8, 0xb011), .driver_info = BTUSB_REALTEK },
+diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+index 1f8afa0244d8..60ddba8962ff 100644
+--- a/drivers/bluetooth/btrtl.c
++++ b/drivers/bluetooth/btrtl.c
+@@ -594,8 +594,10 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 	hci_rev = le16_to_cpu(resp->hci_rev);
+ 	lmp_subver = le16_to_cpu(resp->lmp_subver);
  
-+	/* Additional Realtek 8761B Bluetooth devices */
-+	{ USB_DEVICE(0x2357, 0x0604), .driver_info = BTUSB_REALTEK |
-+						     BTUSB_WIDEBAND_SPEECH },
+-	if (resp->hci_ver == 0x8 && le16_to_cpu(resp->hci_rev) == 0x826c &&
+-	    resp->lmp_ver == 0x8 && le16_to_cpu(resp->lmp_subver) == 0xa99e)
++	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
++					    hdev->bus);
 +
- 	/* Additional Realtek 8761BU Bluetooth devices */
- 	{ USB_DEVICE(0x0b05, 0x190e), .driver_info = BTUSB_REALTEK |
- 	  					     BTUSB_WIDEBAND_SPEECH },
++	if (!btrtl_dev->ic_info)
+ 		btrtl_dev->drop_fw = true;
+ 
+ 	if (btrtl_dev->drop_fw) {
+@@ -634,13 +636,13 @@ struct btrtl_device_info *btrtl_initialize(struct hci_dev *hdev,
+ 		hci_ver = resp->hci_ver;
+ 		hci_rev = le16_to_cpu(resp->hci_rev);
+ 		lmp_subver = le16_to_cpu(resp->lmp_subver);
++
++		btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
++						    hdev->bus);
+ 	}
+ out_free:
+ 	kfree_skb(skb);
+ 
+-	btrtl_dev->ic_info = btrtl_match_ic(lmp_subver, hci_rev, hci_ver,
+-					    hdev->bus);
+-
+ 	if (!btrtl_dev->ic_info) {
+ 		rtl_dev_info(hdev, "unknown IC info, lmp subver %04x, hci rev %04x, hci ver %04x",
+ 			    lmp_subver, hci_rev, hci_ver);
 -- 
-2.32.0
+2.17.1
 
