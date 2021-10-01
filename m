@@ -2,203 +2,201 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B6555C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 03:37:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 27EC4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 03:59:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 924C161A40
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 03:37:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC1A36187D
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 03:59:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230462AbhJADjI (ORCPT
+        id S229726AbhJAEBT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 30 Sep 2021 23:39:08 -0400
-Received: from mail-0301.mail-europe.com ([188.165.51.139]:41734 "EHLO
-        mail-0301.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230405AbhJADjH (ORCPT
+        Fri, 1 Oct 2021 00:01:19 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229563AbhJAEBT (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 30 Sep 2021 23:39:07 -0400
-Date:   Fri, 01 Oct 2021 03:37:12 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
-        s=protonmail; t=1633059441;
-        bh=wbT/YxksNbpXIxygDUBBltEQxbsIjbL1dpqdJhyCWhs=;
-        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
-        b=jQTOqCJ17snc2K7xVW85S02omw7lzG3eBod0NjAsxgOaH3tQO8UlUNC7EC3Zwj7d8
-         /xvI4dAc2co/C5eyA0poho2CXP1VWXXgeOIXLHBW1oAnAtdNLug6GHryyCVjpCP2Lh
-         jEWIH1fBr6zvEMZzK5EVXD4eG6HlH/Zgry01Udzc=
-To:     Marcel Holtmann <marcel@holtmann.org>
-From:   Orlando Chamberlain <redecorating@protonmail.com>
-Cc:     danielwinkler@google.com, Johan Hedberg <johan.hedberg@intel.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        regressions@lists.linux.dev, sonnysasaka@chromium.org,
-        linux-kernel@vger.kernel.org
-Reply-To: Orlando Chamberlain <redecorating@protonmail.com>
-Subject: Re: [PATCH] Bluetooth: add quirk disabling query LE tx power
-Message-ID: <275acce4-9eab-9cba-7145-5a75a69ca530@protonmail.com>
-In-Reply-To: <FA02CDD7-CFEC-4481-9940-BA95D81FD3F3@holtmann.org>
-References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com> <20210930063106.19881-1-redecorating@protonmail.com> <20210930141256.19943-1-redecorating@protonmail.com> <FA02CDD7-CFEC-4481-9940-BA95D81FD3F3@holtmann.org>
+        Fri, 1 Oct 2021 00:01:19 -0400
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FBEBC06176A
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 20:59:35 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 66so7833291pgc.9
+        for <linux-bluetooth@vger.kernel.org>; Thu, 30 Sep 2021 20:59:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3I6UaDAWyC0xJ5aLbjWxOfpYvVUOVoaj3FSq09LRVgg=;
+        b=b5Zojm7vKnlm5MeZ4s9/GH6lwImX7n3I8G80pHcusbffXPIaYThOMVkMToHsKkbHNs
+         0aq96LEg1PDEvP361KHAOliFK612tzcbCWzwg1DWM3hHysLA6LGYKaBlwn+Rkuu7uBEo
+         TipUCShjBPVWbripdlhd/X56KwdU5KYR7KiCy5XsE4w3SAqkbpH40XhIAj8xww2+RgmT
+         tPX0PlfIEz3nH8hkFk+5uDcT/7TZCG2+UMsXyBlIP4XB7Maeiydgba26vyIOcNXTU4BN
+         3UV5IRWkJmxK/D8WjpYlKsP2K7tFH49kJDMxZR7dGgSYZtHVRGtJZXk82NPZH4dXlMnT
+         Vr9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3I6UaDAWyC0xJ5aLbjWxOfpYvVUOVoaj3FSq09LRVgg=;
+        b=gy9BHjFRwSORtFjonIEj2jOd36RUrVufPXwRDq8IR/ADXX23ytGiDySnH/cGGgDVtQ
+         7Cf+MVqDIPd9YSUkCWWvip5i7WAzkueoFntY4hjwVNR8cEuVU1dgH8ZKF7DlKuq6VASc
+         iNuTiVXpz+QwTlsf4hW8zzgEOPnmP7/cxrB4df09plbMVfPY08hTWhOnUkneAHKmcfvZ
+         ZRwPK+NVfZo3hj+r2H0pztw5dzbE/upm7FhfCyKDoN60bEMyTOSGU5LiA13utNgxGs87
+         h8ayZ5XGBnohDU4wofRAOyVU+PEVdzGAcKvww/VZ9rOplAa6lC/MDVZEJjotQmhzY4UC
+         nhDQ==
+X-Gm-Message-State: AOAM531BRif/WkDdUgggvgYSlh+iWhfhLGXL4/l1THGWXonaPlXrpBYl
+        GhK5r05XLhHBHFmWqs2JCCxWqw85P+U=
+X-Google-Smtp-Source: ABdhPJwTrZ3iqm7wzG+bbIBPTX9JAdJOoYMtuMzknGwBMe85D+Dp3gGqT/vJMkQt2QNFqB4siVTzJA==
+X-Received: by 2002:a63:f84f:: with SMTP id v15mr7986297pgj.204.1633060774781;
+        Thu, 30 Sep 2021 20:59:34 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:5f38:eae3:6b80:5a92])
+        by smtp.gmail.com with ESMTPSA id e15sm4399936pfc.134.2021.09.30.20.59.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Sep 2021 20:59:34 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [RFC PATCH] Bluetooth: hci_sock: Set flag to all sockets
+Date:   Thu, 30 Sep 2021 20:59:31 -0700
+Message-Id: <20211001035931.50485-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="b1_QyD3q1wsYzPCN4Wpoew4UPb3trelXIZ8pQMlvRTglU"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
---b1_QyD3q1wsYzPCN4Wpoew4UPb3trelXIZ8pQMlvRTglU
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+The mgmt_limited_event() send the event to the socket that matches the
+flag type, but also it skips to the given socket object in the
+parameter.
 
-On 1/10/21 03:58, Marcel Holtmann wrote:
-> so I really need the btmon traces from the device init (so unload and rel=
-oad the module) and we need to see what commands are supported and what com=
-mands are failing.
-I'll attach the full file I got with btmon -w MacBookPro16,1.btsnoop, but t=
-hese seem
-like the important bits:
+For Local Out of Band Data Updated Event and Experimental Feature
+Changed Event, it sets flags only for the socket which the change was
+triggered, the event cannot be sent to the client via any sockets
+because the flag is not set for other sockets and it doens't send to the
+socket which the change was triggered.
 
-< HCI Command: Read Local Supported Commands (0x04|0x0002) plen 0=09#43 [hc=
-i0] 9.217379
+This patch adds the function that sets the flag for all available
+management sockets, so the mgmt_limited_event() still can send the event
+to the management sockets other than the one through which the change
+was triggered.
 
-> HCI Event: Command Complete (0x0e) plen 68=09=09=09=09#44 [hci0] 9.218033
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/hci_sock.c          |  9 +++++++++
+ net/bluetooth/mgmt.c              | 16 ++++++++--------
+ 3 files changed, 18 insertions(+), 8 deletions(-)
 
-      Read Local Supported Commands (0x04|0x0002) ncmd 1
-
-        Status: Success (0x00)
-
-        Commands: 223 entries
-=09## many many lines here ##
-=09LE Read Transmit Power (Octet 38 - Bit 7)
-=09LE Read RF Path Compensation (Octet 39 - Bit 0)
-
-=09LE Write RF Path Compensation (Octet 39 - Bit 1)
-
-=09LE Set Privacy Mode (Octet 39 - Bit 2)
-
-=09Read Local Simple Pairing Options (Octet 41 - Bit=20
-
-At the end of the trace:
-
-< HCI Command: LE Read Transmit Power (0x08|0x004b) plen 0=09=09#69 [hci0] =
-9.226953
-> HCI Event: Command Complete (0x0e) plen 4=09=09=09=09#70 [hci0] 9.227515
-      LE Read Transmit Power (0x08|0x004b) ncmd 1
-        Status: Unknown HCI Command (0x01)
-=3D Close Index: F8:FF:C2:06:46:63=09=09=09=09=09[hci0] 9.227666
-
-I'm guessing that this means it reports that it supports the command but it=
- doesn't,
-so if this is the case, I'd have to change the description of the quirk to =
-clarify that.
-
-> Since you say this is on a MacBook, I assume this is an UART based Broadc=
-om chip. Sometimes Broadcom has been really flaky with their actually imple=
-mented commands. However in some cases firmware updates do fix this. So any=
- chance you can boot OS X and check that the latest firmware is loaded.
-
-Bluetooth for this device is indeed through uart:
-
-# lspci -vvvnnd '8086:a328'
-00:1e.0 Communication controller [0780]: Intel Corporation Cannon Lake PCH =
-Serial IO UART Host Controller    [8086:a328] (rev 10)
-
-    Subsystem: Intel Corporation Device [8086:7270]
-
-    Control: I/O- Mem+ BusMaster+ SpecCycle- MemWINV- VGASnoop- ParErr- Ste=
-pping- SERR- FastB2B- DisINTx-
-
-    Status: Cap+ 66MHz- UDF- FastB2B- ParErr- DEVSEL=3Dfast >TAbort- <TAbor=
-t- <MAbort- >SERR- <PERR- INTx-
-
-    Latency: 0, Cache Line Size: 256 bytes
-
-    Interrupt: pin A routed to IRQ 20
-
-    IOMMU group: 8
-
-    Region 0: Memory at 4000000000 (64-bit, non-prefetchable) [size=3D4K]
-
-    Capabilities: [80] Power Management version 3
-
-        Flags: PMEClk- DSI- D1- D2- AuxCurrent=3D0mA PME(D0-,D1-,D2-,D3hot-=
-,D3cold-)
-
-        Status: D0 NoSoftRst+ PME-Enable- DSel=3D0 DScale=3D0 PME-
-
-    Capabilities: [90] Vendor Specific Information: Len=3D14 <?>
-
-    Kernel driver in use: intel-lpss
-
-    Kernel modules: intel_lpss_pci
-
-$ cat /sys/bus/pci/devices/0000:00:1e.0/dw-apb-uart.0/serial0/serial0-0/mod=
-alias
-
-acpi:BCM2E7C:APPLE-UART-BLTH:
-
-I've just updated macOS to 11.6, which should have updated firmware. The is=
-sue is still present.
---b1_QyD3q1wsYzPCN4Wpoew4UPb3trelXIZ8pQMlvRTglU
-Content-Type: application/octet-stream; name=MacBookPro161.btsnoop
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename=MacBookPro161.btsnoop
-
-YnRzbm9vcAAAAAABAAAH0QAAACUAAAAl//8ADAAAAAAA4qr05JEcSExpbnV4IHZlcnNpb24gNS4x
-Mi4xOS0yLW1icCAoeDg2XzY0KQAAAAAhAAAAIf//AAwAAAAAAOKq9OSRHElCbHVldG9vdGggc3Vi
-c3lzdGVtIHZlcnNpb24gMi4yMgAAAAAeAAAAHv//AA4AAAAAAOKq9OSRHEoBAAAAAgABEwABAAAA
-EGJsdWV0b290aGQAAAAAAAAAAAAQAAAAEAAAAAAAAAAAAOKq9OUXQPUAAwAAAAAAAGhjaTAAAAAA
-AAAAAAAAAAAAAAAIAAAAAADiqvTlF0ErAAAACAAAAAgAAAAKAAAAAADiqvTlF0EyAAAAAAAADwAA
-AAAJAAAACQAAAAIAAAAAAOKq9OUXQjoY/AYAAMDGLQAAAAAGAAAABgAAAAMAAAAAAOKq9OUazrcO
-BAEY/AwAAAADAAAAAwAAAAIAAAAAAOKq9OUaz6oDDAAAAAAGAAAABgAAAAMAAAAAAOKq9OUa4IUO
-BAEDDAAAAAADAAAAAwAAAAIAAAAAAOKq9OUcfTgBEAAAAAAOAAAADgAAAAMAAAAAAOKq9OUcf1cO
-DAEBEAAJXBAJDwBBMAAAAAMAAAADAAAAAgAAAAAA4qr05RyAM3n8AAAAAAwAAAAMAAAAAwAAAAAA
-4qr05RyClQ4KAXn8AJb+//9cAAAAAAMAAAADAAAAAgAAAAAA4qr05RyDiG78AAAAAA4AAAAOAAAA
-AwAAAAAA4qr05RyFpw4MAW78AAcAAAAAAAAAAAAAAwAAAAMAAAACAAAAAADiqvTlHIaOFAwAAAAA
-/gAAAP4AAAADAAAAAADiqvTlHIwvDvwBFAwAQkNNNDM2NEIzIFRyaW5pZGFkIE9seW1waWMgR0VO
-IChNRkcpAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAwAA
-AAIAAAAAAOKq9OUcjWQDDAAAAAAGAAAABgAAAAMAAAAAAOKq9OUcmvQOBAEDDAAAAAADAAAAAwAA
-AAIAAAAAAOKq9OUcm1UDEAAAAAAOAAAADgAAAAMAAAAAAOKq9OUcnWEODAEDEAC//s/+2/97hwAA
-AAMAAAADAAAAAgAAAAAA4qr05RyduAEQAAAAAA4AAAAOAAAAAwAAAAAA4qr05Ryfow4MAQEQAAlc
-EAkPAEEwAAAAAwAAAAMAAAACAAAAAADiqvTlHJ/yCRAAAAAADAAAAAwAAAADAAAAAADiqvTlHKH9
-DgoBCRAAY0YGwv/4AAAAAwAAAAMAAAACAAAAAADiqvTlHKLXBRAAAAAADQAAAA0AAAADAAAAAADi
-qvTlHKSDDgsBBRAA/QNACAABAAAAAAMAAAADAAAAAgAAAAAA4qr05RykzyMMAAAAAAkAAAAJAAAA
-AwAAAAAA4qr05RynKQ4HASMMAAAAAAAAAAMAAAADAAAAAgAAAAAA4qr05RynfRQMAAAAAP4AAAD+
-AAAAAwAAAAAA4qr05RytJQ78ARQMAEJDTTQzNjRCMyBUcmluaWRhZCBPbHltcGljIEdFTiAoTUZH
-KQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwAAAAMAAAACAAAA
-AADiqvTlHK15JQwAAAAACAAAAAgAAAADAAAAAADiqvTlHK9VDgYBJQwAYAAAAAADAAAAAwAAAAIA
-AAAAAOKq9OUcr6Q4DAAAAAAHAAAABwAAAAMAAAAAAOKq9OUcsjgOBQE4DAAEAAAAAwAAAAMAAAAC
-AAAAAADiqvTlHLKMOQwAAAAACgAAAAoAAAADAAAAAADiqvTlHLSwDggBOQwAATOLngAAAAQAAAAE
-AAAAAgAAAAAA4qr05Ry1AQUMAQAAAAAGAAAABgAAAAMAAAAAAOKq9OUctxMOBAEFDAAAAAAFAAAA
-BQAAAAIAAAAAAOKq9OUct2YWDAIAfQAAAAYAAAAGAAAAAwAAAAAA4qr05Ry5bw4EARYMAAAAAAMA
-AAADAAAAAgAAAAAA4qr05Ry5wAIgAAAAAAkAAAAJAAAAAwAAAAAA4qr05Ry8CA4HAQIgAPsADwAA
-AAMAAAADAAAAAgAAAAAA4qr05Ry8VgMgAAAAAA4AAAAOAAAAAwAAAAAA4qr05Ry+gA4MAQMgAP8B
-AQgAAAAAAAAAAwAAAAMAAAACAAAAAADiqvTlHL7SHCAAAAAADgAAAA4AAAADAAAAAADiqvTlHMEP
-DgwBHCAA//////8DAAAAAAADAAAAAwAAAAIAAAAAAOKq9OUcwWMCEAAAAABGAAAARgAAAAMAAAAA
-AOKq9OUcw/EORAECEAD///8DzP/v/////B/yD+j+P/eP/xwABABh9///f/j///////8BAMAHAAgA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA9AAAAPQAAAACAAAAAADiqvTlHMRAUgzxAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-AAAAAAAAAAYAAAAGAAAAAwAAAAAA4qr05RzJaA4EAVIMAAAAAAQAAAAEAAAAAgAAAAAA4qr05RzJ
-t0UMAQIAAAAGAAAABgAAAAMAAAAAAOKq9OUczMwOBAFFDAAAAAADAAAAAwAAAAIAAAAAAOKq9OUc
-zOtYDAAAAAAHAAAABwAAAAMAAAAAAOKq9OUczywOBQFYDAAEAAAABAAAAAQAAAACAAAAAADiqvTl
-HM9ABBABAQAAABAAAAAQAAAAAwAAAAAA4qr05RzSAg4OAQQQAAECAAAAAAAAAAAAAAALAAAACwAA
-AAIAAAAAAOKq9OUc0k4BDAj///v/B/i/PQAAAAYAAAAGAAAAAwAAAAAA4qr05RzUFA4EAQEMAAAA
-AAoAAAAKAAAAAgAAAAAA4qr05RzULA0MBwAAAAAAAAEAAAAKAAAACgAAAAMAAAAAAOKq9OUc2BgO
-CAENDAAHAAAAAAAABQAAAAUAAAACAAAAAADiqvTlHNgvDwgCBQAAAAAGAAAABgAAAAMAAAAAAOKq
-9OUc2dkOBAEPCAAAAAADAAAAAwAAAAIAAAAAAOKq9OUc2e4bDAAAAAAKAAAACgAAAAMAAAAAAOKq
-9OUc3MAOCAEbDAAACBIAAAAAAwAAAAMAAAACAAAAAADiqvTlHNzUWgwAAAAABwAAAAcAAAADAAAA
-AADiqvTlHN9NDgUBWgwAAAAAAAMAAAADAAAAAgAAAAAA4qr05RzflkYMAAAAAAcAAAAHAAAAAwAA
-AAAA4qr05Rzhvw4FAUYMAAAAAAALAAAACwAAAAIAAAAAAOKq9OUc4eQBIAj/DwAAAAAAAAAAAAYA
-AAAGAAAAAwAAAAAA4qr05RzkCw4EAQEgAAAAAAMAAAADAAAAAgAAAAAA4qr05RzkLwcgAAAAAAcA
-AAAHAAAAAwAAAAAA4qr05RzmoQ4FAQcgAAwAAAADAAAAAwAAAAIAAAAAAOKq9OUc5slLIAAAAAAG
-AAAABgAAAAMAAAAAAOKq9OUc6PsOBAFLIAEAAAAAAAAAAAAAAAkAAAAAAOKq9OUc6ZI=
-
---b1_QyD3q1wsYzPCN4Wpoew4UPb3trelXIZ8pQMlvRTglU--
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 3271870fd85e..e7ff29842137 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -513,6 +513,7 @@ static inline struct sk_buff *bt_skb_sendmmsg(struct sock *sk,
+ int bt_to_errno(u16 code);
+ 
+ void hci_sock_set_flag(struct sock *sk, int nr);
++void hci_sock_set_flag_all(int nr);
+ void hci_sock_clear_flag(struct sock *sk, int nr);
+ int hci_sock_test_flag(struct sock *sk, int nr);
+ unsigned short hci_sock_get_channel(struct sock *sk);
+diff --git a/net/bluetooth/hci_sock.c b/net/bluetooth/hci_sock.c
+index 99de17922bda..eba86c141ced 100644
+--- a/net/bluetooth/hci_sock.c
++++ b/net/bluetooth/hci_sock.c
+@@ -162,6 +162,15 @@ static struct bt_sock_list hci_sk_list = {
+ 	.lock = __RW_LOCK_UNLOCKED(hci_sk_list.lock)
+ };
+ 
++void hci_sock_set_flag_all(int nr)
++{
++	struct sock *sk;
++
++	sk_for_each(sk, &hci_sk_list.head) {
++		hci_sock_set_flag(sk, nr);
++	}
++}
++
+ static bool is_filtered_packet(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct hci_filter *flt;
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 3e5283607b97..333e2aa5b176 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3890,7 +3890,7 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ 	/* After reading the experimental features information, enable
+ 	 * the events to update client on any future change.
+ 	 */
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 
+ 	return mgmt_cmd_complete(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
+ 				 MGMT_OP_READ_EXP_FEATURES_INFO,
+@@ -3975,7 +3975,7 @@ static int set_zero_key_func(struct sock *sk, struct hci_dev *hdev,
+ 			exp_ll_privacy_feature_changed(false, hdev, sk);
+ 	}
+ 
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 
+ 	return mgmt_cmd_complete(sk, hdev ? hdev->id : MGMT_INDEX_NONE,
+ 				 MGMT_OP_SET_EXP_FEATURE, 0,
+@@ -4016,7 +4016,7 @@ static int set_debug_func(struct sock *sk, struct hci_dev *hdev,
+ 	memcpy(rp.uuid, debug_uuid, 16);
+ 	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
+ 
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 
+ 	err = mgmt_cmd_complete(sk, MGMT_INDEX_NONE,
+ 				MGMT_OP_SET_EXP_FEATURE, 0,
+@@ -4082,7 +4082,7 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
+ 	memcpy(rp.uuid, rpa_resolution_uuid, 16);
+ 	rp.flags = cpu_to_le32(flags);
+ 
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 
+ 	err = mgmt_cmd_complete(sk, hdev->id,
+ 				MGMT_OP_SET_EXP_FEATURE, 0,
+@@ -4150,7 +4150,7 @@ static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	memcpy(rp.uuid, quality_report_uuid, 16);
+ 	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 	err = mgmt_cmd_complete(sk, hdev->id,
+ 				MGMT_OP_SET_EXP_FEATURE, 0,
+ 				&rp, sizeof(rp));
+@@ -4223,7 +4223,7 @@ static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	memcpy(rp.uuid, offload_codecs_uuid, 16);
+ 	rp.flags = cpu_to_le32(val ? BIT(0) : 0);
+-	hci_sock_set_flag(sk, HCI_MGMT_EXP_FEATURE_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_EXP_FEATURE_EVENTS);
+ 	err = mgmt_cmd_complete(sk, hdev->id,
+ 				MGMT_OP_SET_EXP_FEATURE, 0,
+ 				&rp, sizeof(rp));
+@@ -7460,7 +7460,7 @@ static void read_local_oob_ext_data_complete(struct hci_dev *hdev, u8 status,
+ 	if (err < 0 || status)
+ 		goto done;
+ 
+-	hci_sock_set_flag(cmd->sk, HCI_MGMT_OOB_DATA_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_OOB_DATA_EVENTS);
+ 
+ 	err = mgmt_limited_event(MGMT_EV_LOCAL_OOB_DATA_UPDATED, hdev,
+ 				 mgmt_rp, sizeof(*mgmt_rp) + eir_len,
+@@ -7636,7 +7636,7 @@ static int read_local_oob_ext_data(struct sock *sk, struct hci_dev *hdev,
+ 
+ 	hci_dev_unlock(hdev);
+ 
+-	hci_sock_set_flag(sk, HCI_MGMT_OOB_DATA_EVENTS);
++	hci_sock_set_flag_all(HCI_MGMT_OOB_DATA_EVENTS);
+ 
+ 	status = MGMT_STATUS_SUCCESS;
+ 
+-- 
+2.25.1
 
