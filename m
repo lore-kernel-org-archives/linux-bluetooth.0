@@ -2,106 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1993EC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 14:18:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2EF17C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 14:18:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E55B861A6F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 14:18:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 15D7D61A8A
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 14:18:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231806AbhJAOTo (ORCPT
+        id S1354328AbhJAOTp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Oct 2021 10:19:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51176 "EHLO
+        Fri, 1 Oct 2021 10:19:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51184 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231820AbhJAOTl (ORCPT
+        with ESMTP id S231837AbhJAOTm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Oct 2021 10:19:41 -0400
-Received: from mail-qv1-xf2d.google.com (mail-qv1-xf2d.google.com [IPv6:2607:f8b0:4864:20::f2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57FC4C06177C
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Oct 2021 07:17:57 -0700 (PDT)
-Received: by mail-qv1-xf2d.google.com with SMTP id n6so5630065qvp.7
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Oct 2021 07:17:57 -0700 (PDT)
+        Fri, 1 Oct 2021 10:19:42 -0400
+Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CA91C06177E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Oct 2021 07:17:58 -0700 (PDT)
+Received: by mail-qk1-x72a.google.com with SMTP id 138so9215844qko.10
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Oct 2021 07:17:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=starry.com; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ff7NuoYiNUyCHAMxfVqHJeSZ7mD0kEq92COF9ph4GDs=;
-        b=Ea/3zotpRemuM8vjCotiHW2K8vjF9iJMaKBh2/zGMCo0ogrSb2FtIoPkujr+DIEeVu
-         3uQcOiiTvKhYJjTPe+lGaE8YoaNE6bsx8H88eCt9yQzf0CkDQHeooLJa79Oat6zYkfrC
-         c+lusd6Mhc6zUZlD3nJZXwy1QfoHkXJjzLX3o=
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=FSHGA3tXnHvQVeFSiws1NOa8MPZXtIUMcBVyxdzNy1U=;
+        b=pDRiGHUEMJLKOwRMzIDYq9lugGZ8f/30ttqQa78BzlcZNQIFd4MltpNOawbhYYI0yt
+         Q8AOvWcE9JhULhbm/Cd6D9iRCKhsL8nn6MlnmGAAqVX5gX1AIAu85ff6PlUBJhz9OtTN
+         khf6oGGUVLAIvWY51w1P4iBJ3Xmec1AkbMepI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ff7NuoYiNUyCHAMxfVqHJeSZ7mD0kEq92COF9ph4GDs=;
-        b=yFxEw1tWr5BCR7Q510/K5UmNZLKnuWCfk/V5xkhMqxo3naxgB1V99XbUDqr37uVBY2
-         UwW+4qaycQBTc3l+6ZIcSy2MHhuVtZj7OjPFSWNHXGtVMcFg0+ouoQm4ZMkhYFSpMQZd
-         cHs07f8Ks6htFD3TAix0mNQ/SW0JYNy4jZ4wxxQ/wFGO+YfB+Zewv6Hf2YQO9GdGSdBt
-         2ProwN2EP8+zLLGZ65BfiOT/jOOHa+co6rh1cpwtzLNULgO/0bLVEHtzwipbYcZS21b8
-         Yuuk03r2LkseRytQRG7TP3U5KaRy/s8rBbJ7i/ZR51hhrfkl5RowP+2uPFyhS5iBWTQy
-         2C1w==
-X-Gm-Message-State: AOAM532uljWR2U0AuTvRCkWgHbQ+WkhswFkW6mmkNXBI1ui2u5DotFeD
-        i3Z7fJMiqp+giA91jrj6B4XRDVFazv6BWXeR
-X-Google-Smtp-Source: ABdhPJzRn2dHhaJ9IqPYCE4wLFvn3N6mBSPisqZ/rsSOIGDYpPsHFZppHrqNxZXQq5iHv7I+G16gmg==
-X-Received: by 2002:a0c:8045:: with SMTP id 63mr9211587qva.63.1633097876454;
-        Fri, 01 Oct 2021 07:17:56 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=FSHGA3tXnHvQVeFSiws1NOa8MPZXtIUMcBVyxdzNy1U=;
+        b=XiZKyF10/r8+Z1ZbXBgTzSZ0Le3ezhL/DBqGda0l6pPRctt4ZjYoDzsz8nSsT784LM
+         6VqSM+QNl2+wCX0QHCS4oJWrQt8XpUbYhLB2RazcOh4G+UqKSjiNjhsM2hEe+lPfGFvu
+         bjApyxzRIfALusI98pqUP0GGfox3gThVVzSyZWjhHyL8j6WcC3HczERkdW6ERhxFqN8H
+         r6ebPTLcW7SLwYZsa0aQAA3KbxqIqePyKYu2CtZIPgf8LAZzgCPfDIkkPj3imIEFHN3n
+         h1HmlBDxOsA/tVUjD9LNvCxVp6cYY1maTurDMoe0G8hZVb/P40HDBe+HuzLRtZduJEs3
+         58uw==
+X-Gm-Message-State: AOAM5322ORoxroH1eb18s13xBzVo2bCAZXe7CN1yJDRBGh29rtOrXmYl
+        k8OKgOPYzKPpmuVfwj3T1nJjN15/9vnIXLGt
+X-Google-Smtp-Source: ABdhPJyf4roaNzAp8B6hqFhgTbzZvG+ZpXzA6QColgrGdUXwLpqdrTVCcjEFFoXrjBKZh11h26DFDw==
+X-Received: by 2002:a37:946:: with SMTP id 67mr9497409qkj.473.1633097877605;
+        Fri, 01 Oct 2021 07:17:57 -0700 (PDT)
 Received: from MrComputer.nevonetnext (205-201-16-55.starry-inc.net. [205.201.16.55])
-        by smtp.gmail.com with ESMTPSA id u12sm3767299qtw.73.2021.10.01.07.17.56
+        by smtp.gmail.com with ESMTPSA id u12sm3767299qtw.73.2021.10.01.07.17.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Oct 2021 07:17:56 -0700 (PDT)
+        Fri, 01 Oct 2021 07:17:57 -0700 (PDT)
 From:   Dagan Martinez <dmartinez@starry.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     Dagan Martinez <dmartinez@starry.com>
-Subject: [PATCH BlueZ v4 0/2] Optionally require security for notify/indicate
-Date:   Fri,  1 Oct 2021 10:17:17 -0400
-Message-Id: <20211001141719.180087-1-dmartinez@starry.com>
+Subject: [PATCH BlueZ v4 2/2] doc/gatt-api: Add 'X-notify`/`X-indicate`
+Date:   Fri,  1 Oct 2021 10:17:19 -0400
+Message-Id: <20211001141719.180087-3-dmartinez@starry.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211001141719.180087-1-dmartinez@starry.com>
+References: <20211001141719.180087-1-dmartinez@starry.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-In some cases, it is desirable to require encryption and/or
-authentication for server-initiated updates, as they may contain
-sensitive data.
-
-Currently, there is no way to do this with BlueZ.
-
-Here is a query about this feature from 2019:
-https://stackoverflow.com/questions/55884233
-
-This patch implements this feature by introducing new `x-notify` and
-`x-indicate` flags that allow a user to restrict access to a
-characteristic's CCCD (as well as documentation for those flags).
-
-Note that `x-notify` and `x-indicate` each enforce security for ALL
-server-initiated updates. That is, you cannot require one level of
-security for notifications and another security level for indications on
-the same CCCD. I could not think of a reason why somebody would want
-that feature, and did not think the accuracy of terms would be worth the
-introduced complexity, so I didn't implement it.
-
+Update docs to reflect the addition of the `X-notify` and `X-indicate`
+characteristic flags, which allow a GATT server to restrict CCC write
+permissions.
 ---
-Changes in v4:
-- Directly set flags on CCCD instead of having new intermediate
-    permissions
+ doc/gatt-api.txt | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-Changes in v3:
-- Split the `x-asynchronous` flags into `x-notify` and `x-indicate`
-- Fix a mixed code and declaration error
-
-Changes in v2:
-- Fix line-width issues brought up by CI
-
-Dagan Martinez (2):
-  gatt: Allow GATT server to dicate CCC permissions
-  doc/gatt-api: Add 'X-notify`/`X-indicate`
-
- doc/gatt-api.txt    | 15 ++++++++++++-
- src/gatt-database.c | 52 ++++++++++++++++++++++++++++++++++++---------
- 2 files changed, 56 insertions(+), 11 deletions(-)
-
+diff --git a/doc/gatt-api.txt b/doc/gatt-api.txt
+index 120b23d1a..af0aa761d 100644
+--- a/doc/gatt-api.txt
++++ b/doc/gatt-api.txt
+@@ -253,7 +253,14 @@ Properties	string UUID [read-only]
+ 			Defines how the characteristic value can be used. See
+ 			Core spec "Table 3.5: Characteristic Properties bit
+ 			field", and "Table 3.8: Characteristic Extended
+-			Properties bit field". Allowed values:
++			Properties bit field".
++
++			The "x-notify" and "x-indicate" flags restrict access
++			to notifications and indications by imposing write
++			restrictions on a characteristic's client
++			characteristic configuration descriptor.
++
++			Allowed values:
+ 
+ 				"broadcast"
+ 				"read"
+@@ -267,10 +274,16 @@ Properties	string UUID [read-only]
+ 				"writable-auxiliaries"
+ 				"encrypt-read"
+ 				"encrypt-write"
++				"encrypt-notify" (Server only)
++				"encrypt-indicate" (Server only)
+ 				"encrypt-authenticated-read"
+ 				"encrypt-authenticated-write"
++				"encrypt-authenticated-notify" (Server only)
++				"encrypt-authenticated-indicate" (Server only)
+ 				"secure-read" (Server only)
+ 				"secure-write" (Server only)
++				"secure-notify" (Server only)
++				"secure-indicate" (Server only)
+ 				"authorize"
+ 
+ 		uint16 Handle [read-write, optional] (Server Only)
 -- 
 2.31.1
 
