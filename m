@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E34C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 20:21:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BBD91C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 20:22:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0DACA619EC
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 20:21:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99B8961A8F
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 20:22:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230042AbhJAUX0 (ORCPT
+        id S230099AbhJAUYU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Oct 2021 16:23:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51554 "EHLO
+        Fri, 1 Oct 2021 16:24:20 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229888AbhJAUX0 (ORCPT
+        with ESMTP id S1355034AbhJAUYS (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Oct 2021 16:23:26 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7758C061775
-        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Oct 2021 13:21:41 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id q23so8933813pfs.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Oct 2021 13:21:41 -0700 (PDT)
+        Fri, 1 Oct 2021 16:24:18 -0400
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 901BAC06177E
+        for <linux-bluetooth@vger.kernel.org>; Fri,  1 Oct 2021 13:22:33 -0700 (PDT)
+Received: by mail-pj1-x102a.google.com with SMTP id d13-20020a17090ad3cd00b0019e746f7bd4so10183962pjw.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 01 Oct 2021 13:22:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=A5rl0S62hahQyCu6Ur7O7T7yx7Pp1mb6dO23e6uKip0=;
-        b=Up0m97M+XBAY78movWh4ahO3Rvi0yfknX6seej47Ak6jVXeBfxUZZfWBlSY7Bj0HOg
-         YcmvOv8uQt8alwGvApWxuWoyCgFZU4IOo3y4dDUGkGPHf7nlQzQqXbEVlVO8/PJTZjpH
-         t5rOXkj+MA7fFdTECN4Pbsn9bqpnjyTA25eIQj2EXO0SmucGNahmWcWrYYYdSbly3ehh
-         S50PMhYTn+3KsLQfA7t6uuXJRKALJkzrA+6gKr8JtjQ0jA8Psa7K+2K/wNyWKhJ0upM2
-         PTg3F/DyFvs3s2V8dNDp1XrMRRjKctCQq/BHiWcGWHKvncWcYfNhbuediFuL2AZXMHg7
-         tnWw==
+        b=g7cc7Po6W/p3oY1t/3r4DneBzLuNCCtwvoylgLaW4Q8YuJ+sPHhZ7oO4UP6po1Ur2A
+         mrBPaGHtsGK0fWSdCEqk1a5UVRCUgBIr5m3UCSJBb18imE24IwtZI8oRxQUYEaJ5tq53
+         f9XEzB/P/a0is/PEVUt8ahqHVWxbTPkebjup6Vv1VHrz4s60PlKXz2h4754KbV84C+GE
+         R9250/XF0j+C8sXQfDWBQ4+Vj5KNeyD9pGPtHgR/DWVS0kg8stAe9y7954pTkB3z3mO3
+         5OsRGcq/BpJ2Kw24tNCrapycfNK+yWRmNY7j6J1ykbEFs5j0U0/ZILOTm4l6jgObqw+h
+         I5XQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
         bh=A5rl0S62hahQyCu6Ur7O7T7yx7Pp1mb6dO23e6uKip0=;
-        b=C9G/BHmQWYZPh2LFNrEEEN4c/HYLzdO09PMdru4aHAxS2f4eYnUNdSoBh0pvNZdR/7
-         VC7ZKNBvtHuRkIJ67yjIA0cnFsDdd99kfjc3cQYRZzsysJHnNHPrH2kaI/NFEjSOrJeZ
-         utk3sxFyB8TGlSV5FSZ59W/0c37WaBp8i6v0TJ5fI2XXxGJejqmlXgQOE8J2wiapejZ9
-         5Q0Pz1bkjSitdWv+LE+03LrkVdof17zuDY+KI1fbVlwslVeMudXAO1Ex1LVZfC/qrmMv
-         EfpXfkGizpMyHFfM02Dy52caa503M5saPuqI60FtgW6GKXLOYWQlKFzSuVPm8lnWdbJj
-         pX5g==
-X-Gm-Message-State: AOAM533OhIAoQqpJ9Wi+aCFhZL6ELYBhfxN33MOe55Nrt4dlYVY0VLOc
-        2CU+GuSxf7XzUI5UJ4M3NMinT73kzjI=
-X-Google-Smtp-Source: ABdhPJycJdeKubGQEwM/GC1amaiOCtBiHNvCESRg0WVaC63xIwAUVtVeL6bSvzAweBbh+ptJ43zaNw==
-X-Received: by 2002:a63:9a01:: with SMTP id o1mr11186271pge.441.1633119700796;
-        Fri, 01 Oct 2021 13:21:40 -0700 (PDT)
+        b=au+blEynDKOE0o3gRS7d9QGLeSV1y7DtMMmMrwE3wBDYEr4pwyf412DSN49tzpW/2J
+         piHXlcyBgwbB7RAxVxLYezacGKjQLCESyORI7YH0a8f7WAIgNAyUsHVUtF6iPMwVU3w+
+         euwVfPodYBSYwqcgsU/Dz3G06KDZKr+7NsjgEGE8cp/Ws9tqUO9Y6gcKd8HrV/2VBQrf
+         6+1J+amnDWSLDOZoH1nrpPV5aQQHbwnKyCi3SORJNTccYdkEclY9TZocl0bqh39s51gu
+         oIpEVeNPc3pKXqRWEH49LWGCM/WBJkCQbMTFGeiTSBXxiRzbZF1Ge2tpvRBXCtJamfsG
+         B3rg==
+X-Gm-Message-State: AOAM531yPYPrN6Yco3eKtQk7O0sc8+L+bcgHjrAVyfHnwfZb49/zd458
+        frYjiOKq7eO5KxpATnCzk2wCcGGDe3w=
+X-Google-Smtp-Source: ABdhPJwOI/+ph90WiTHF71W84Sfwrzy/Dx2hiWHG4q7Cex5yesdxOWf+3tsnhKV1DyWEhXOQYt6Xgw==
+X-Received: by 2002:a17:90a:4618:: with SMTP id w24mr15488320pjg.142.1633119752603;
+        Fri, 01 Oct 2021 13:22:32 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id r2sm7162908pgn.8.2021.10.01.13.21.39
+        by smtp.gmail.com with ESMTPSA id k14sm6659330pji.45.2021.10.01.13.22.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Oct 2021 13:21:40 -0700 (PDT)
+        Fri, 01 Oct 2021 13:22:32 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
 Subject: [PATCH] Bluetooth: Rename driver .prevent_wake to .wakeup
-Date:   Fri,  1 Oct 2021 13:21:39 -0700
-Message-Id: <20211001202139.3598667-1-luiz.dentz@gmail.com>
+Date:   Fri,  1 Oct 2021 13:22:31 -0700
+Message-Id: <20211001202231.3599199-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
