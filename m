@@ -2,167 +2,246 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 92BDAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 22:07:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFEFCC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 23:08:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6680161A8F
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 22:07:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A7BC161ACE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  1 Oct 2021 23:08:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355715AbhJAWJX (ORCPT
+        id S231915AbhJAXKk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 1 Oct 2021 18:09:23 -0400
-Received: from mga04.intel.com ([192.55.52.120]:49906 "EHLO mga04.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230307AbhJAWJW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 1 Oct 2021 18:09:22 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10124"; a="223696167"
-X-IronPort-AV: E=Sophos;i="5.85,340,1624345200"; 
-   d="scan'208";a="223696167"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Oct 2021 15:07:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,340,1624345200"; 
-   d="scan'208";a="480752077"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga007.fm.intel.com with ESMTP; 01 Oct 2021 15:07:30 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12; Fri, 1 Oct 2021 15:07:29 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2242.12 via Frontend Transport; Fri, 1 Oct 2021 15:07:29 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2242.12; Fri, 1 Oct 2021 15:07:29 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=cjbYlJEbeM8UU2pKmr8tuK5uxUnxG9511HYWB10nvtfCBXzuv9yBEMBH65Jp2pPP+X7y+vm9xpCeD14tuF+AT6+5/OE8hAaZrMLjfUdgoeiypvUlJaWMt1Ctl3SRWCQScqDiF4NEqabLCcDArP0QnURDXPHn6d7L+FFU+uhPeh5E21W2UVJddbW0vOX/6Q41HfURpzm7duuumpqWMGrwR8VYh0xtk09IGhwT5c8z9KFADyVMyog5RDEpkDNydNxt1KlhpXpbe1w1zQzbRQTxWT1lpKm7L0an/FZZBdbrlICFYGiRBQOBwilkdkY4hm4onprO7Eu9On/lsbLlyo9EeA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FZsAMrvJ93w9I/afLGe+ZR321W6/MJyljIk94rjgMJA=;
- b=fwpHoe/PZorO0TcwnYEWWBA4f+IX7DloUzZ6ytJnZ5kcxfTXuHNybkuJehwBXFdMBx9dxoF0JLn3zSEaIxG3G0YUKqSd649Fh133XShx5ABYV1Zp5P7n7cRtk867gjqtASmg+eb2kJ4OWAk1A8ECxGIsphPfoRAwuHj+BZGIjT/DoErI+eQ8MEUMF6Ob3YC5IN95M0NyOcR11liY5hj7HmCTZD/tIzsXtKkTwXsZXxKvfwRx0maRUWEkEdA1iNo78BN+CJU6jO9YiBz3RUGPKeKtiwV+g2SvtdyzD9tpTiJ2S0XnLVTEL1f/H57gX/betedYDkqsPt8AthAMPGIGSg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=intel.onmicrosoft.com;
- s=selector2-intel-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FZsAMrvJ93w9I/afLGe+ZR321W6/MJyljIk94rjgMJA=;
- b=sOt3iVDe0djK3M3xyB7oJ/nlVKNSDQ2kk/PzWpsoavEZ1UdKiloB4dn1GSh/azFHuExTrDIajhPbGmEDqUWFb0N9wxkPui1tKPyVbYCTd2PppUv+XTwQuACDoGk6MnezQ+Kdg8ywZD1W2bvRpzjLjVMH99JVm4J+MSF3VuV2+WE=
-Received: from MW3PR11MB4748.namprd11.prod.outlook.com (2603:10b6:303:2e::9)
- by CO1PR11MB5123.namprd11.prod.outlook.com (2603:10b6:303:94::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4566.15; Fri, 1 Oct
- 2021 22:07:23 +0000
-Received: from MW3PR11MB4748.namprd11.prod.outlook.com
- ([fe80::194c:9213:9b06:8c7f]) by MW3PR11MB4748.namprd11.prod.outlook.com
- ([fe80::194c:9213:9b06:8c7f%7]) with mapi id 15.20.4544.025; Fri, 1 Oct 2021
- 22:07:23 +0000
-From:   "An, Tedd" <tedd.an@intel.com>
-To:     "marcel@holtmann.org" <marcel@holtmann.org>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: Re: [RFC PATCH] Bluetooth: hci_sock: Set flag to all sockets
-Thread-Topic: [RFC PATCH] Bluetooth: hci_sock: Set flag to all sockets
-Thread-Index: AQHXtnjEQEJs7Rz2v02CAi8rkx0PFau9oaEAgAES2AA=
-Date:   Fri, 1 Oct 2021 22:07:22 +0000
-Message-ID: <11b22e65a1d36055c966527bc081f402221f6ec7.camel@intel.com>
-References: <20211001035931.50485-1-hj.tedd.an@gmail.com>
-         <E6D38153-42EC-4AE2-9292-9EFE7F61318B@holtmann.org>
-In-Reply-To: <E6D38153-42EC-4AE2-9292-9EFE7F61318B@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-user-agent: Evolution 3.36.5 (3.36.5-2.fc32) 
-authentication-results: holtmann.org; dkim=none (message not signed)
- header.d=none;holtmann.org; dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: e7eac409-c9ff-4bb9-50d0-08d98527d875
-x-ms-traffictypediagnostic: CO1PR11MB5123:
-x-microsoft-antispam-prvs: <CO1PR11MB512306F7A25BDEC0FB75811AFFAB9@CO1PR11MB5123.namprd11.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:10000;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: sY7ugtFs7yQs95oWVjzjptO3F0YS8XBi2g+yi4LephaepcTz1pp0b8Dt+aP2MGVnMi3TKKsQHSOcA7ls10h0v2CnaG1UVpIV27mgd1lDtfcSAldCKk5POEuWiyRGvrHjULGIeciBQLn2a/UfH3IqB9TxmFsPVNyONDKgXf6hnchLt1wSdXgjcesh7xVYb2qay1P3REEAjPR+/dDcBuyvQml5+hiYQZkxlsBKK9yioCNSXg1/mXUwKtMz2JdrLPgGheAZEvYxIXPkpEmeP497Vg8St/v7/DGfndd69jqhckJv/f/tV2ulNPf5RUSxcIpsmrcmlBMk+mx2iomDswtg6xI6jc+QfpHzDHsSTa2F5n6Ga1OUgPv5exO7IYtRffHxhejyO10g0fwV393Wk4JzfSJOuRi7CybAUiE+di7dIw7skDSMd0IWR/XEL7GFkGwFS8ywyPk++PiGR881ZzAxWXIFNIBXfD2eMgCGs7Wxhhoe9Itq6IU6Cy2Y41vOJ/eM3VIYBsRep8evE0YombShSm0MJxagXCzOUp4UhmmQOw9RhOnd9cbr2kDZCRnga4ab3HltyRtL2pbj7t6Q1HyIy6Vn4aFfPW2SdHhXSbGA51WV1Vd/Zff7lBhjxAvEJkFZ5d/T1iGoX+bsfaolHNmQNyCsgy9V5Bdk91is7EuFtZC92/zeaU54pkoNDDfIFQYeTg5JiN3JAnEGJJsvFG9Pdg==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW3PR11MB4748.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(71200400001)(36756003)(316002)(8676002)(38100700002)(83380400001)(6512007)(4326008)(66946007)(64756008)(66556008)(66476007)(66446008)(186003)(122000001)(6486002)(76116006)(2616005)(6506007)(91956017)(38070700005)(6916009)(8936002)(2906002)(86362001)(508600001)(26005)(5660300002);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?utf-8?B?YWpxS3N6QzhNcjN0MXJvSkpYUU52YkN6dkZNYVBaRnpnTU1nYzdQVzR5WkV3?=
- =?utf-8?B?RkhiVmtyMnNyVTFoWGVEc2FlZWZTQUpzRTV4T2QwM1ZOQ2RZZGN6b0hqS2l1?=
- =?utf-8?B?Y2lDQ3lCVFducUxKTURnYkRRWkh2VWlKTXQxRlhNQ2dwSjZHblhVTGE5eHBK?=
- =?utf-8?B?elo2SjVYOEpTWFRsYVR0SGhieVlhUGRZMVRrMldhYm5OcW1tTzA5QTBKVXo3?=
- =?utf-8?B?ZStQYXJweTYxQ2hkaG5GZG9oOFdwQWhjVFM5ZGpIVWhWZHhDcmZ1dHRZTjkr?=
- =?utf-8?B?aUhucGNnamhTME9kTlFHZDZYeGNXbGpnN05hZForWitwUDcxYWJaQWJkY2lG?=
- =?utf-8?B?cUVpM2U1MjYxT3BVaytqb3RZUDhRcWtvSjVrOW5Sa3p5aUd0a3ZtWWJUMGdn?=
- =?utf-8?B?ZVVHUDE1S0ZHU1RrR2kzcGdHVFRyQjZ2OGdqKzZWcGJ4QjMyS2ZrYjNsMVha?=
- =?utf-8?B?c1RnNk9sTFU5VjZObmY3djcxWHNtL2tlOFBqQTBBZWNaVytPVU9xUzIrZ2lk?=
- =?utf-8?B?QXNmSktTU29iTWpJUnpLdlpXaWZ1U0dKMEZEcUNKcEIvM3dDdC91a0xYaDl6?=
- =?utf-8?B?VkZyL3JJQXdPL0tXaElidy83eDVTN2czak1IT2MxUjNXUHEvb0lVSkkrUnBa?=
- =?utf-8?B?Q1RFWXc4QjZTOE8yTHByQ2xwb2pjM21MdytWNjVwQ3FvbTNqN3ozRVMwN1ZI?=
- =?utf-8?B?S2xuMDF1SWpyemN1U0tmTGdMcCt0Y21SYkEwQjFNNjgzV1hFb1QyZmxVNTdr?=
- =?utf-8?B?TlRMcXQ2Y0ZIQ3loektoQ2hic21ZSTVrQ28rc2tUUVNCVVEyamx1d25BVkI5?=
- =?utf-8?B?WG56NUUxRXdCRnRpL1BNS1JVbmRhaEdOYWcyclIyMUZTaFNRZElhVDcrak15?=
- =?utf-8?B?Y29wdFhFdno0bkxNM1drWnVZaVJ5cU5kNTdnZERPMGNrZURBNDcyMGNrVnBV?=
- =?utf-8?B?NWpIQlRUbEl4OC9CNGdaZkl2WGQ2Unc3ZDNnRWEyWm1uY2UyTnhYTFlhVVFk?=
- =?utf-8?B?dEMwbHFpOUFVUDRLMjNtbzk0dWE2WHBuMVJUQWJ1NjJNNHZ4TEJSTWdlN1RS?=
- =?utf-8?B?RXUrUkpJUzBhbkloOEV6Q3dYVzJoNGl0ODRCNGxhbTczWUR0R29BeGJKOUZs?=
- =?utf-8?B?SmJsWVJiekNXcEtHcEpmVXhuUHI2VEU3NHNrK3R3OHZrK09EU2dRTlZNUGlS?=
- =?utf-8?B?WDFUREtQMHZCTVpyUzdPTVBWQzZyQU0vSElmcVc2RVNEdTF5SFM3TkNqQkdF?=
- =?utf-8?B?UWFHL21ySVV3ODVxc1gyblc4MTNSYTh4bTdiMXRIQU0xOTlSb28vSzNOMVY2?=
- =?utf-8?B?ZFNqM2dEVzVCdlppWnJsSlBCTkFwK0tlMVpKVEJET0l5clZ0UDJ1RUF6V0ZL?=
- =?utf-8?B?a0dYcHAybzVsV2FNVVdxcDdmbVFhclJtU0haTk9VWGxaOGFjU09vYmE0REhj?=
- =?utf-8?B?a0ZIeDNpWUFWOUxORlA3czM1T3cwaXZmRHlzMFp1dWYxbEdlR3Frdkc4MUYr?=
- =?utf-8?B?UitrTmx0NE5USk5hSDB2VnlIaWE5cStsbWF3aURsbTlwR2VLVzdxN3VEUTVl?=
- =?utf-8?B?TmtlOGdVT0tSS2tnTitCOE5oYS9BOTdkdEZDT29INHp4QmxLWnR5NFgzdXdm?=
- =?utf-8?B?WDZWSzZkNkZYcVJKd3JvWFd5blBvaUEvWlpvakhLc2pBNVAyM2IwN0pOK0Mz?=
- =?utf-8?B?WFhuekkyL2RJNTZJMFVuVkhHYW1wUVpFOFAzVWNtN1MwV0dXaS9qYURDRzI5?=
- =?utf-8?Q?TuLbObuFopKz8JOel5wEDj77OWFehdZA6w5qZXW?=
-x-ms-exchange-transport-forked: True
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <89A1056407528C4AB92BB395A35940F7@namprd11.prod.outlook.com>
-Content-Transfer-Encoding: base64
+        Fri, 1 Oct 2021 19:10:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33184 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230337AbhJAXKj (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 1 Oct 2021 19:10:39 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6AD3C061775;
+        Fri,  1 Oct 2021 16:08:54 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id k26so9224458pfi.5;
+        Fri, 01 Oct 2021 16:08:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cF0sk0lfmMnYmidKqZYIYKVpJrh4J/J6wCo7fVgd9ps=;
+        b=jOWhaLV7RGzroGIfJpK2Bu8M/A9jqPAKIyJLMwKqFQ6+bAQPhHY80srW1CXjb8Sb7u
+         ppfVIRGcIDJ/FEabYBGarepfry9b5d2chPzpnXmT5LqHGQ/f2Oua1Dfkc+DOWlcLIN/c
+         vEtuJF1uzZ5uh3l3mZjXg1n5Wxap47HfSYudmw9IzYPwhoIOqggr/la/2laPa79RzEqx
+         oEeUPABhL3JXgsji09oq255TaWKiG1gAsYpxl6gge/qvrq4J6EaKweQvDQAs8PfyLJM/
+         Z78Pv7uA5yo/TTr3tC1qixpdcO6yOMdzW9vkK0MXHhgujfo8oimUGiLc5O/K5vSlh9ri
+         2+9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=cF0sk0lfmMnYmidKqZYIYKVpJrh4J/J6wCo7fVgd9ps=;
+        b=rtWDpc8oYZU37dtAWQRXXR59J0MEGPPo8a733sU5AWVc2Z1iAugqQ1oXh9ay6wgyPG
+         alC0UHo0SX60lP9FwckwMJboDVx367Z19VRkn0LTApaBH0ROiCxKrs3MFzMMl3ySlgL1
+         uTJ46ws6VxOJ6/ERjrXhONQiSo+VihZGgpE/qlcHMZNBgr3VX2yxxad9Tl2CPm0j72Zh
+         RBBwnupyCnw1ow38OlYMYfGxfdZ/OD/mvjzBh1J891mlXYPrcLXfI9FYsp8Abm7lrMNk
+         XEmzu8Lw5XOmvaJUMm+I8EmKO8i2HiKDSXmWSofxEMZ7MZ23GISNXzERT0M2lZuoNvge
+         TGIg==
+X-Gm-Message-State: AOAM530q50p/n4rFkiXRlsvInDPfmYKdX6S7JUfqpKPSnnEYY352GWbl
+        siPzo0NeMK3s61zLZNlo4PgWy4yUu3I=
+X-Google-Smtp-Source: ABdhPJxfFBRLMld0HUzuBNipnWV9bSoBHc9c+piqeuu1r/gn7jFu54E3RDC8CGgma2YAPIfs9KrFaQ==
+X-Received: by 2002:a63:5942:: with SMTP id j2mr547943pgm.78.1633129734264;
+        Fri, 01 Oct 2021 16:08:54 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u12sm8601532pjr.2.2021.10.01.16.08.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Oct 2021 16:08:53 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2021-10-01
+Date:   Fri,  1 Oct 2021 16:08:50 -0700
+Message-Id: <20211001230850.3635543-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW3PR11MB4748.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e7eac409-c9ff-4bb9-50d0-08d98527d875
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Oct 2021 22:07:23.0928
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: aZF6g9Ny9GqEfoooex6A+29nyeMfWheBq/SYFGaPp90w3D7XzvOPyV3uZwC9HA+hkZhgMkr2RrmLWIE5bCUz4A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5123
-X-OriginatorOrg: intel.com
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-SGkgTWFyY2VsDQoNCk9uIEZyaSwgMjAyMS0xMC0wMSBhdCAwNzo0MyArMDIwMCwgTWFyY2VsIEhv
-bHRtYW5uIHdyb3RlOg0KPiBIaSBUZWRkLA0KPiANCj4gPiBUaGUgbWdtdF9saW1pdGVkX2V2ZW50
-KCkgc2VuZCB0aGUgZXZlbnQgdG8gdGhlIHNvY2tldCB0aGF0IG1hdGNoZXMgdGhlDQo+ID4gZmxh
-ZyB0eXBlLCBidXQgYWxzbyBpdCBza2lwcyB0byB0aGUgZ2l2ZW4gc29ja2V0IG9iamVjdCBpbiB0
-aGUNCj4gPiBwYXJhbWV0ZXIuDQo+ID4gDQo+ID4gRm9yIExvY2FsIE91dCBvZiBCYW5kIERhdGEg
-VXBkYXRlZCBFdmVudCBhbmQgRXhwZXJpbWVudGFsIEZlYXR1cmUNCj4gPiBDaGFuZ2VkIEV2ZW50
-LCBpdCBzZXRzIGZsYWdzIG9ubHkgZm9yIHRoZSBzb2NrZXQgd2hpY2ggdGhlIGNoYW5nZSB3YXMN
-Cj4gPiB0cmlnZ2VyZWQsIHRoZSBldmVudCBjYW5ub3QgYmUgc2VudCB0byB0aGUgY2xpZW50IHZp
-YSBhbnkgc29ja2V0cw0KPiA+IGJlY2F1c2UgdGhlIGZsYWcgaXMgbm90IHNldCBmb3Igb3RoZXIg
-c29ja2V0cyBhbmQgaXQgZG9lbnMndCBzZW5kIHRvIHRoZQ0KPiA+IHNvY2tldCB3aGljaCB0aGUg
-Y2hhbmdlIHdhcyB0cmlnZ2VyZWQuDQo+ID4gDQo+ID4gVGhpcyBwYXRjaCBhZGRzIHRoZSBmdW5j
-dGlvbiB0aGF0IHNldHMgdGhlIGZsYWcgZm9yIGFsbCBhdmFpbGFibGUNCj4gPiBtYW5hZ2VtZW50
-IHNvY2tldHMsIHNvIHRoZSBtZ210X2xpbWl0ZWRfZXZlbnQoKSBzdGlsbCBjYW4gc2VuZCB0aGUg
-ZXZlbnQNCj4gPiB0byB0aGUgbWFuYWdlbWVudCBzb2NrZXRzIG90aGVyIHRoYW4gdGhlIG9uZSB0
-aHJvdWdoIHdoaWNoIHRoZSBjaGFuZ2UNCj4gPiB3YXMgdHJpZ2dlcmVkLg0KPiANCj4gYWN0dWFs
-bHkgdGhhdCBpcyBvbiBwdXJwb3NlLiBPbmx5IHRoZSBzb2NrZXQgdGhhdCB1c2VkIGEgc3BlY2lm
-aWMgbWdtdCBjb21tYW5kcyBnZXRzIHRvIHNlZSB0aGUNCj4gbmV3IGV2ZW50cy4gU28gaWYgeW91
-IGhhdmUgYSBzZWNvbmQgbGlzdGVuaW5nIHNvY2tldCB0aGF0IGp1c3QgY2FyZXMgYWJvdXQgdGhl
-IGV2ZW50cywgaXQgaGFzIHRvDQo+IGF0IGxlYXN0IGlzc3VlIHRoZSDigJxyZWFk4oCdIGNvbW1h
-bmQgdG8gdGVsbCBtZ210IHRoYXQgaXQgZG9lcyB1bmRlcnN0YW5kIGl0LiBUaGVyZSBpcyBubyBw
-b2ludCBpbg0KPiBzZW5kaW5nIG91dCBzaWduYWxzIHRvIGFsbCBtZ210IHNvY2tldHMgaWYgeW91
-IGhhdmVu4oCZdCByZWFkIGFuIGluaXRpYWwgc3RhdHVzIGZpcnN0LiBUaGUgdXBkYXRlcw0KPiB3
-b3VsZCBtYWtlIG5vIHNlbnNlIHRvIHlvdS4NCj4gDQpUaGFua3MgZm9yIHRoZSBkZXRhaWxzLiBB
-bmQgdGhlIGNvZGUgbWFrZSBzZW5zZSBub3cuIE5lZWQgdG8gdXBkYXRlIG1nbXQtdGVzdGVyIHdp
-dGggdGhlc2UgdGhlbi4NCg0KPiBSZWdhcmRzDQo+IA0KPiBNYXJjZWwNCj4gDQoNClJlZ2FyZHMs
-DQoNClRlZGQNCg==
+The following changes since commit 1b9fbe813016b08e08b22ddba4ddbf9cb1b04b00:
+
+  net: ipv4: Fix the warning for dereference (2021-08-30 12:47:09 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-10-01
+
+for you to fetch changes up to 4539ca67fe8edef34f522fd53da138e2ede13464:
+
+  Bluetooth: Rename driver .prevent_wake to .wakeup (2021-10-01 15:46:15 -0700)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add support for MediaTek MT7922 and MT7921
+ - Enable support for AOSP extention in Qualcomm WCN399x and Realtek
+   8822C/8852A.
+ - Add initial support for link quality and audio/codec offload.
+ - Rework of sockets sendmsg to avoid locking issues.
+ - Add vhci suspend/resume emulation.
+
+----------------------------------------------------------------
+Brian Gix (1):
+      Bluetooth: mgmt: Disallow legacy MGMT_OP_READ_LOCAL_OOB_EXT_DATA
+
+Chethan T N (2):
+      Bluetooth: btintel: support link statistics telemetry events
+      Bluetooth: Allow usb to auto-suspend when SCO use non-HCI transport
+
+Colin Ian King (1):
+      Bluetooth: btintel: Fix incorrect out of memory check
+
+Desmond Cheong Zhi Xi (2):
+      Bluetooth: call sock_hold earlier in sco_conn_del
+      Bluetooth: fix init and cleanup of sco_conn.timeout_work
+
+Dinghao Liu (1):
+      Bluetooth: btmtkuart: fix a memleak in mtk_hci_wmt_sync
+
+Hans de Goede (2):
+      Bluetooth: hci_h5: Fix (runtime)suspend issues on RTL8723BS HCIs
+      Bluetooth: hci_h5: directly return hci_uart_register_device() ret-val
+
+Hilda Wu (1):
+      Bluetooth: btrtl: Ask ic_info to drop firmware
+
+Joseph Hwang (6):
+      Bluetooth: btusb: disable Intel link statistics telemetry events
+      Bluetooth: refactor set_exp_feature with a feature table
+      Bluetooth: Support the quality report events
+      Bluetooth: set quality report callback for Intel
+      Bluetooth: hci_qca: enable Qualcomm WCN399x for AOSP extension
+      Bluetooth: btrtl: enable Realtek 8822C/8852A to support AOSP extension
+
+Kiran K (14):
+      Bluetooth: btintel: Fix boot address
+      Bluetooth: btintel: Read boot address irrespective of controller mode
+      Bluetooth: Enumerate local supported codec and cache details
+      Bluetooth: Add support for Read Local Supported Codecs V2
+      Bluetooth: btintel: Read supported offload use cases
+      Bluetooth: Allow querying of supported offload codecs over SCO socket
+      Bluetooth: btintel: Define callback to fetch data_path_id
+      Bluetooth: Allow setting of codec for HFP offload use case
+      Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command
+      Bluetooth: Configure codec for HFP offload use case
+      Bluetooth: btintel: Define a callback to fetch codec config data
+      Bluetooth: Add support for msbc coding format
+      Bluetooth: Add offload feature under experimental flag
+      Bluetooth: hci_vhci: Add support for offload codecs over SCO
+
+Larry Finger (1):
+      Bbluetooth: btusb: Add another Bluetooth part for Realtek 8852AE
+
+Luiz Augusto von Dentz (17):
+      Bluetooth: Fix enabling advertising for central role
+      Bluetooth: Fix using address type from events
+      Bluetooth: Fix using RPA when address has been resolved
+      Bluetooth: Add bt_skb_sendmsg helper
+      Bluetooth: Add bt_skb_sendmmsg helper
+      Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg
+      Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
+      Bluetooth: eir: Move EIR/Adv Data functions to its own file
+      Bluetooth: hci_sock: Add support for BT_{SND,RCV}BUF
+      Bluetooth: Fix passing NULL to PTR_ERR
+      Bluetooth: SCO: Fix sco_send_frame returning skb->len
+      Bluetooth: hci_core: Move all debugfs handling to hci_debugfs.c
+      Bluetooth: Make use of hci_{suspend,resume}_dev on suspend notifier
+      Bluetooth: hci_vhci: Add force_suspend entry
+      Bluetooth: hci_vhci: Add force_prevent_wake entry
+      Bluetooth: hci_sock: Replace use of memcpy_from_msg with bt_skb_sendmsg
+      Bluetooth: Rename driver .prevent_wake to .wakeup
+
+Manish Mandlik (1):
+      Bluetooth: Fix Advertisement Monitor Suspend/Resume
+
+Marcel Holtmann (4):
+      Bluetooth: Fix handling of experimental feature for quality reports
+      Bluetooth: Fix handling of experimental feature for codec offload
+      Bluetooth: btrtl: Set VsMsftOpCode based on device table
+      Bluetooth: btrtl: Add support for MSFT extension to rtl8821c devices
+
+Max Chou (1):
+      Bluetooth: btusb: Add the new support ID for Realtek RTL8852A
+
+Mianhan Liu (1):
+      Bluetooth: btrsi: remove superfluous header files from btrsi.c
+
+Miao-chen Chou (1):
+      Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle
+
+Nicholas Flintham (1):
+      Bluetooth: btusb: Add support for TP-Link UB500 Adapter
+
+Pavel Skripkin (1):
+      Bluetooth: hci_uart: fix GPF in h5_recv
+
+Takashi Iwai (1):
+      Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
+
+Tetsuo Handa (1):
+      Bluetooth: reorganize functions from hci_sock_sendmsg()
+
+Thadeu Lima de Souza Cascardo (1):
+      Bluetooth: hci_ldisc: require CAP_NET_ADMIN to attach N_HCI ldisc
+
+Wang ShaoBo (1):
+      Bluetooth: fix use-after-free error in lock_sock_nested()
+
+Yun-Hao Chung (1):
+      Bluetooth: Fix wrong opcode when LL privacy enabled
+
+mark-yw.chen (3):
+      Bluetooth: btusb: Support public address configuration for MediaTek Chip.
+      Bluetooth: btusb: Add protocol for MediaTek bluetooth devices(MT7922)
+      Bluetooth: btusb: Add support for IMC Networks Mediatek Chip(MT7921)
+
+tjiang@codeaurora.org (1):
+      Bluetooth: btusb: Add gpio reset way for qca btsoc in cmd_timeout
+
+ drivers/bluetooth/btintel.c       | 239 ++++++++++++++++---
+ drivers/bluetooth/btintel.h       |  11 +
+ drivers/bluetooth/btmrvl_main.c   |   6 +-
+ drivers/bluetooth/btmtkuart.c     |  13 +-
+ drivers/bluetooth/btrsi.c         |   1 -
+ drivers/bluetooth/btrtl.c         |  26 ++-
+ drivers/bluetooth/btusb.c         |  64 ++++-
+ drivers/bluetooth/hci_h5.c        |  35 ++-
+ drivers/bluetooth/hci_ldisc.c     |   3 +
+ drivers/bluetooth/hci_qca.c       |   5 +-
+ drivers/bluetooth/hci_vhci.c      | 122 ++++++++++
+ include/net/bluetooth/bluetooth.h |  90 +++++++
+ include/net/bluetooth/hci.h       | 117 ++++++++++
+ include/net/bluetooth/hci_core.h  |  75 +++---
+ net/bluetooth/Makefile            |   3 +-
+ net/bluetooth/eir.c               | 335 ++++++++++++++++++++++++++
+ net/bluetooth/eir.h               |  72 ++++++
+ net/bluetooth/hci_codec.c         | 238 +++++++++++++++++++
+ net/bluetooth/hci_codec.h         |   7 +
+ net/bluetooth/hci_conn.c          | 168 ++++++++++++--
+ net/bluetooth/hci_core.c          | 320 +++++++++++--------------
+ net/bluetooth/hci_debugfs.c       | 123 ++++++++++
+ net/bluetooth/hci_debugfs.h       |   5 +
+ net/bluetooth/hci_event.c         | 135 +++++++----
+ net/bluetooth/hci_request.c       | 478 ++++++--------------------------------
+ net/bluetooth/hci_request.h       |  25 +-
+ net/bluetooth/hci_sock.c          | 214 ++++++++++-------
+ net/bluetooth/l2cap_core.c        |   2 +-
+ net/bluetooth/l2cap_sock.c        |  10 +-
+ net/bluetooth/mgmt.c              | 445 ++++++++++++++++++++++++++---------
+ net/bluetooth/msft.c              | 172 ++++++++++++--
+ net/bluetooth/msft.h              |   9 +
+ net/bluetooth/rfcomm/core.c       |  50 +++-
+ net/bluetooth/rfcomm/sock.c       |  46 +---
+ net/bluetooth/sco.c               | 209 +++++++++++++++--
+ 35 files changed, 2789 insertions(+), 1084 deletions(-)
+ create mode 100644 net/bluetooth/eir.c
+ create mode 100644 net/bluetooth/eir.h
+ create mode 100644 net/bluetooth/hci_codec.c
+ create mode 100644 net/bluetooth/hci_codec.h
