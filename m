@@ -2,125 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E6DCC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Oct 2021 10:38:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AADB9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 11:15:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E547461B30
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  3 Oct 2021 10:38:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8E1FB611C8
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 11:15:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230025AbhJCKjp (ORCPT
+        id S231575AbhJDLRY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 3 Oct 2021 06:39:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45642 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229994AbhJCKjo (ORCPT
+        Mon, 4 Oct 2021 07:17:24 -0400
+Received: from mail-0201.mail-europe.com ([51.77.79.158]:38757 "EHLO
+        mail-0201.mail-europe.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230418AbhJDLRX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 3 Oct 2021 06:39:44 -0400
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30CAC0613EC
-        for <linux-bluetooth@vger.kernel.org>; Sun,  3 Oct 2021 03:37:57 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id o13so2612161qvm.4
-        for <linux-bluetooth@vger.kernel.org>; Sun, 03 Oct 2021 03:37:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Y4fCh2p8kPZOD9nG/Y2gDmV8L5k7+QisCW+XGat/ImM=;
-        b=AmR3UVermgO3atyDRMU+bP2KqwgtvGzXqmJQEYBHu/tUb7IjgDUxNUR+S+swpmXvXW
-         FGZ6pTYGZX+dwBHzkbCZ2cSp156k8amXf0oDkz4zCwQfesdMBXY4j6MWl+VzBm+dMD3G
-         q9zXDQ2k3GeYtqOOLgxapZyF67EYgVV84UDGDX8aJsXu2hpX4FS88oOvNX7Z0TxBtwYO
-         nw8z7T1+0rMca2Giz9GC+ylcwQX0D3giVeM6Oe525MeuQqTEdRjZuWlRPbvYfqLPBjaC
-         iPGO09KRFV69uQDX8ik1oCxHch63EOrD1rcJ7zjVlwJwzieL9uqMfvENBdrYU6Qb3UF5
-         PYnA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Y4fCh2p8kPZOD9nG/Y2gDmV8L5k7+QisCW+XGat/ImM=;
-        b=5VYV2CTV3K6APgbNFLO4xNuTDEIXY26mKpYCPU9AW+UTC48L3LwQuAWjCrBpG+7wsi
-         vpm3aMOGeb56Yd/qET+lJbYhpbUxrYv7dVHaQaozzJ1wrCcoflwXDEwej5Lq+Yj/J6O5
-         IQGq1oQYFexAWSEapyptwBlr21kmwn1xSJoFQUuWksqrajBpg9cc3hMU3dZHTrKuOBIK
-         T+PA+eEA+m+DF0Z+63AVhO1uVlLUEDzyXl2NLLgVnXhZ5xdJg5J5N1D9Pd3onaDNz8vj
-         qNW6vDV0d2PqvqRGx/ygwG4DL0yX9//MweANaYSmJdzkeHOL0TWRo+vVDTbHKHnA1JA4
-         4cBA==
-X-Gm-Message-State: AOAM530rOVwMMYIaA2C6eJ9/BL7fwsAe9scKSClJCeP+EDgYE+5q6oMb
-        jzQJlwWThuNCR147FLgW7SRtMpNrsNROqA==
-X-Google-Smtp-Source: ABdhPJybf139ADR5QPeBdtOSHWI1S7xEtJbYlgNEa+CQYNIgaMDMFzjvstTBxz5W39g9BZ8s2iKfbw==
-X-Received: by 2002:a0c:b45a:: with SMTP id e26mr17474171qvf.59.1633257476445;
-        Sun, 03 Oct 2021 03:37:56 -0700 (PDT)
-Received: from [172.17.0.2] ([20.102.84.83])
-        by smtp.gmail.com with ESMTPSA id 14sm7382754qty.93.2021.10.03.03.37.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Oct 2021 03:37:56 -0700 (PDT)
-Message-ID: <61598804.1c69fb81.d279a.fe3f@mx.google.com>
-Date:   Sun, 03 Oct 2021 03:37:56 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7026465660761341193=="
+        Mon, 4 Oct 2021 07:17:23 -0400
+Date:   Mon, 04 Oct 2021 11:15:25 +0000
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=protonmail.com;
+        s=protonmail; t=1633346131;
+        bh=MWuT8mIn2VJodxSXcssCZqS3+0I75k3kLJZh2U5Wl5I=;
+        h=Date:To:From:Cc:Reply-To:Subject:In-Reply-To:References:From;
+        b=hs8jv6oGpNOETf1LT6xqq7C7WfYiw6PM/fZhZ9iISVxZ9ZPkYGazyO2+t2wiRV9Sb
+         j+dEgnQgjXyllQFLUfteUL9Zxpp9cs0xSD+ObQwTdOmr/dU7j95bWOfxle81P4K1cf
+         I1ZduSlFJK7a4MrNb8e82et7o4jQl8lCflDPfc5c=
+To:     Marcel Holtmann <marcel@holtmann.org>
+From:   Orlando Chamberlain <redecorating@protonmail.com>
+Cc:     danielwinkler@google.com, Johan Hedberg <johan.hedberg@intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        regressions@lists.linux.dev, sonnysasaka@chromium.org
+Reply-To: Orlando Chamberlain <redecorating@protonmail.com>
+Subject: Re: [PATCHv2] Bluetooth: quirk disabling LE Read Transmit Power
+Message-ID: <20211004111518.0765650c@localhost>
+In-Reply-To: <20211001132756.434e56bb@localhost>
+References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com> <20210930063106.19881-1-redecorating@protonmail.com> <20210930141256.19943-1-redecorating@protonmail.com> <FA02CDD7-CFEC-4481-9940-BA95D81FD3F3@holtmann.org> <275acce4-9eab-9cba-7145-5a75a69ca530@protonmail.com> <20211001083412.3078-1-redecorating@protonmail.com> <1D2217A9-EA73-4D93-8D0B-5BC2718D4788@holtmann.org> <20211001132756.434e56bb@localhost>
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, thomas@t-8ch.de
-Subject: RE: [BlueZ] Use accurate icons for headphones and headsets
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211003101834.45448-1-thomas@t-8ch.de>
-References: <20211003101834.45448-1-thomas@t-8ch.de>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7026465660761341193==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Fri, 01 Oct 2021 23:28:03 +1000
+"Orlando Chamberlain" <redecorating@protonmail.com> wrote:
+> On Fri, 01 Oct 2021 19:35:16 +1000
+> "Marcel Holtmann" <marcel@holtmann.org> wrote:
+>=20
+> > I would really prefer to do that via the ACPI table matching in
+> > hci_bcm.c and not via some magic chip id check.
+>=20
+> Initially I thought we may be able to do this based off BCM2E7C (which
+> is in the DSDT table which I'll attach), however it seems like many
+> Macs also have that (i.e. MacBookPro14,1, MacBookAir8,1, MacBook9,1),
+> so unless all these don't support LE Read Transmit Power, (which
+> would be hard to determine), I don't know if BCM2E7C can be used to
+> quirk it.
 
-This is automated email and please do not reply to this email!
+I think there aren't any Macs that support LE Read Transmit Power.
 
-Dear submitter,
+I checked the Bluetooth spec here
+https://www.bluetooth.com/specifications/specs/core-specification-5-1/
+and it seems like 5.1 is the first version that mentions LE Read
+Transmit Power. It says 5.1 was adopted on 21 Jan 2019.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=556811
+As far as I know, all of the models released after that date that have
+ever had working Bluetooth were affected, while unaffected models were
+released before that date (and thus shouldn't support LE Read Transmit
+Power? This is at least true for the MacBookPro15,1, a 2018 model that
+doesn't support the command).
 
----Test result---
+I think this means that no Apple computer released so far supports the
+command, so disabling LE Read Transmit Power for all Apple controllers
+based off "apple-uart-blth" (probably a better choice than "BCM2E7C")
+won't affect any controllers that actually support it.
 
-Test Summary:
-CheckPatch                    FAIL      1.36 seconds
-GitLint                       PASS      0.92 seconds
-Prep - Setup ELL              PASS      47.51 seconds
-Build - Prep                  PASS      0.46 seconds
-Build - Configure             PASS      8.78 seconds
-Build - Make                  PASS      194.30 seconds
-Make Check                    PASS      8.98 seconds
-Make Distcheck                PASS      228.49 seconds
-Build w/ext ELL - Configure   PASS      8.21 seconds
-Build w/ext ELL - Make        PASS      176.63 seconds
+Device (BLTH)
+{
+    Name (_HID, EisaId ("BCM2E7C"))  // _HID: Hardware ID
+    Name (_CID, "apple-uart-blth")  // _CID: Compatible ID
+    Name (_UID, One)  // _UID: Unique ID
+    Name (_ADR, Zero)  // _ADR: Address
 
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] Use accurate icons for headphones and headsets
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#50: 
-are in practice implemented by at least Adwaita, Gnome, Oxygen, Arc and Breeze
+As to future Apple computers, they seem to no longer be using UART and
+instead have a second Broadcom PCI device (the first being for WiFi)
+that is for Bluetooth. 3 Intel Macs Models have this second device
+(MacBookPro15,4, MacBookPro16,3 and MacBookAir9,1), and so do the M1
+ones.
 
-/github/workspace/src/12532673.patch total: 0 errors, 1 warnings, 11 lines checked
+I can't say that they won't move back to UART at some point and then
+support LE Read Transmit Power, but if they do, I don't think they
+would move back to x86_64, so only having this quirk activated when
+compiling for x86_64 might be an option if that's an issue.
 
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
+> I'll try to see if I can find something else in the ACPI tables that
+> can be used as a quirk. (I'll see if I can get the table of a similar
+> model that wasn't affected and compare the BLTH sections)
 
-/github/workspace/src/12532673.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+The BLTH sections were the same for affected and unaffected macs.
 
 
 
+Would disabling LE Read Transmit Power if the controller is
+"apple-uart-blth" work for you?
+--=20
 
----
-Regards,
-Linux Bluetooth
-
-
---===============7026465660761341193==--
