@@ -2,247 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E2667C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:21:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE53FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:27:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B2C5613A3
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:21:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B338561131
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235089AbhJDWXi (ORCPT
+        id S235430AbhJDW3P (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Oct 2021 18:23:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
+        Mon, 4 Oct 2021 18:29:15 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49366 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233722AbhJDWXh (ORCPT
+        with ESMTP id S235403AbhJDW3L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Oct 2021 18:23:37 -0400
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ECE0C061745;
-        Mon,  4 Oct 2021 15:21:48 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id 187so11294745pfc.10;
-        Mon, 04 Oct 2021 15:21:48 -0700 (PDT)
+        Mon, 4 Oct 2021 18:29:11 -0400
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 937DEC061749
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 15:27:20 -0700 (PDT)
+Received: by mail-vs1-xe34.google.com with SMTP id 188so21579291vsv.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 15:27:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=r5nXv9D7HIrxZo6HyfXHL96yJIOG1wOMeZuiwKD02xU=;
-        b=Sm0zHfY3qe3kqn9MMy79G/ekatvZvMK4mlgtjy9NgMqY4KSWiGorQRB+hJktnsAAxx
-         0fBasihhxysIdWV7uzEEYpVCFxA0wb8HRN7hSo1nXl5/8gjytg1/IM9cxaYt86ZtWyKS
-         BO8igT29TTuQUskHATycYjJ5ee8ohVh/BD0s2Xy8dgDjYfKr8EYWgnxqYNJHoz1iqr3c
-         BGHQ5HEi6NvNWinKRWTXEJi6YpLyXBFsZ8S4q4BnPg+5w+oyvAMmidMfIV4djQiz+CLj
-         MQTN8wZ0T68V2Ii0hEI6Bd+30lwUtHyi3RRISHE2VVj3W6WPBLRH97JcMeXOKDF16ZPX
-         nf7A==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DzsoDfL5TbsUHKc+xJthg9t1Fetv2C21Qknd4IE5Lhs=;
+        b=h8eX5GoDKyW3lBPgDWnM2GltaPx5+GhVqMN+X/+tJMgmCmkuYuiY4UudyeHaS8mbfU
+         /18T3PodGCZUL3R/6Dnw0dVHj2VtqV+qY6uEmHUoqz32A8fe1TerPsOua45zbAyL7sxP
+         QBuh7EbCiE/9HBuC/m4vfqv1oHXN2pSpMGQ3NMcDnazcYJQSaPtfDrxLIbpuqJMuNP7f
+         LPGO0V8MlPudLUogSgEGll/CbvNyK3ODbtOkvMS8LGnVGIs55aeTEDrxH85lrVlsF9D3
+         /XVO2wk8fjgDHvG7smZeATdOpgSOrT3sNkpNvtOVyBoDPbWaUVvnvbiZifrXCg9dgMjj
+         vmDw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=r5nXv9D7HIrxZo6HyfXHL96yJIOG1wOMeZuiwKD02xU=;
-        b=sWCCa5tZzdiGkkCKm/lXQ5kQ9pf9EgIDRF3qD9ZQsrr2rq42MK5wAcybZrnY+mNSm8
-         heaDUqOlC+YUvds/6D1XCryA41v4TjUMwKMnpFKTzG5xNDAZ487/aYS9wvYDu34Qkjlh
-         xv776oSubx20lyizQ9485AyNYzF8DVH4fRs7eOOcP4Oi7C5Kd8w375LLxczMvqXKObyx
-         HaUbu+4AMMAC5me6X60sam7y0WwRiYDouNwQ1/rIXENFYRvWZvQUx1/oFKR89pT7W9Fn
-         iIx601KhXhdqedqKwKT7r3KR2y6kF5+4g2NT4TOWA9yyRoiBfns+Pzc2dfaH0Gas/oqc
-         06/w==
-X-Gm-Message-State: AOAM531z5sxpCUgAgIJCa3tuNVPWr/SKZd9pWL5aWEdiVC0SgGvzWuH5
-        ue22vcWuuCh0NXwnmoJNx3U=
-X-Google-Smtp-Source: ABdhPJw4rJ1STGk4p6Kb1RJhvmq4NTnxyUG7bIUZiHgJcNZ5WouueddbxHrkJkC4UuXCpa9Fs3KYvQ==
-X-Received: by 2002:a63:1a1b:: with SMTP id a27mr12783363pga.220.1633386107604;
-        Mon, 04 Oct 2021 15:21:47 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h9sm17294830pjg.9.2021.10.04.15.21.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 15:21:47 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2021-10-04
-Date:   Mon,  4 Oct 2021 15:21:46 -0700
-Message-Id: <20211004222146.251892-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DzsoDfL5TbsUHKc+xJthg9t1Fetv2C21Qknd4IE5Lhs=;
+        b=7LAJw3fPtROGGjUjmgodgcbjQWZo/XfWNBWPDl9iOI0ZtHPB6y7xH8xCfz4vTGvMQm
+         wPEBDptMVz8t9t/yy9CXsfGrO6T/Jem22sczs7D19Bd2t69OzA5sC8By77psDlwpiGSu
+         0gN2ijC966TLXwOCPDeHigMrdkcgBfhA9J93lqNDcfgTADBC/+StkVhvbmn791oX7Ivi
+         4MARlzg3oo/Sf31VLlVN6XSe0uWkv0GKER3M3Z+WM2tV2CTSbTXJlI/AgpHTud9+I8a9
+         Ov4Bk4fgO4eU4Ep4Y+AHrvpV4K7RUnjqF1aN0aXoK1yB23vDMrsMrKJJ7y7Gh0RZ5L6B
+         uKug==
+X-Gm-Message-State: AOAM5327QjRMmpOioDEJW5korO8g40TwFfqSmQ2Kg8Xn3QRXfbDxYEIX
+        1c6tdkN8/Z91GSoWPEGIZwNMtbM/zTiOR+BEkxs=
+X-Google-Smtp-Source: ABdhPJz/cJP/9n+sr6yIC5nqluvxH37vBi4HdhzBnEG0q0ux9aCXDyNYhhPxHnDAATljeDT/LMjK0Oots94ChiRblXs=
+X-Received: by 2002:a05:6102:21d0:: with SMTP id r16mr16165699vsg.39.1633386439675;
+ Mon, 04 Oct 2021 15:27:19 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211002182109.165456-1-hj.tedd.an@gmail.com> <86E45D71-62B4-4ED0-A31A-FB021D86F9B3@holtmann.org>
+In-Reply-To: <86E45D71-62B4-4ED0-A31A-FB021D86F9B3@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 4 Oct 2021 15:27:08 -0700
+Message-ID: <CABBYNZJp5phSoGwOZ7yUQ0o9E9Pf5wi-Kh3u1WjAf_1iDk2Bhw@mail.gmail.com>
+Subject: Re: [RFC PATCH] Bluetooth: hci_vhci: Fix to set force_wakeup value
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit 1660034361904dfcb82714aa48615a9b66462ee6:
+Hi Marcel, Tedd,
 
-  Merge branch 'phy-10g-mode-helper' (2021-10-04 13:50:05 +0100)
+On Sat, Oct 2, 2021 at 2:04 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Tedd,
+>
+> > This patch sets the wakeup value in the vhci driver data after reading
+> > the value.
+> >
+> > Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> > ---
+> > drivers/bluetooth/hci_vhci.c | 2 ++
+> > 1 file changed, 2 insertions(+)
+> >
+> > diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+> > index b45db0db347c..5fd91106e853 100644
+> > --- a/drivers/bluetooth/hci_vhci.c
+> > +++ b/drivers/bluetooth/hci_vhci.c
+> > @@ -176,6 +176,8 @@ static ssize_t force_wakeup_write(struct file *file,
+> >       if (data->wakeup == enable)
+> >               return -EALREADY;
+> >
+> > +     data->wakeup = enable;
+> > +
+> >       return count;
+>
+> patch looks good, but the commit message is confusing.
 
-are available in the Git repository at:
+Ive ended up fixing the original patch since I had to force push due
+to the pull request problem with committer/sign-off problem.
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-10-04
+> Regards
+>
+> Marcel
+>
 
-for you to fetch changes up to 43f51bd946dab69bb38b05863898dd711b7e4506:
 
-  Bluetooth: Rename driver .prevent_wake to .wakeup (2021-10-04 15:15:36 -0700)
-
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add support for MediaTek MT7922 and MT7921
- - Add support for TP-Link UB500
- - Enable support for AOSP extention in Qualcomm WCN399x and Realtek
-   8822C/8852A.
- - Add initial support for link quality and audio/codec offload.
- - Rework of sockets sendmsg to avoid locking issues.
- - Add vhci suspend/resume emulation.
-
-----------------------------------------------------------------
-Brian Gix (1):
-      Bluetooth: mgmt: Disallow legacy MGMT_OP_READ_LOCAL_OOB_EXT_DATA
-
-Chethan T N (2):
-      Bluetooth: btintel: support link statistics telemetry events
-      Bluetooth: Allow usb to auto-suspend when SCO use non-HCI transport
-
-Colin Ian King (1):
-      Bluetooth: btintel: Fix incorrect out of memory check
-
-Desmond Cheong Zhi Xi (2):
-      Bluetooth: call sock_hold earlier in sco_conn_del
-      Bluetooth: fix init and cleanup of sco_conn.timeout_work
-
-Dinghao Liu (1):
-      Bluetooth: btmtkuart: fix a memleak in mtk_hci_wmt_sync
-
-Hans de Goede (2):
-      Bluetooth: hci_h5: Fix (runtime)suspend issues on RTL8723BS HCIs
-      Bluetooth: hci_h5: directly return hci_uart_register_device() ret-val
-
-Hilda Wu (1):
-      Bluetooth: btrtl: Ask ic_info to drop firmware
-
-Joseph Hwang (6):
-      Bluetooth: btusb: disable Intel link statistics telemetry events
-      Bluetooth: refactor set_exp_feature with a feature table
-      Bluetooth: Support the quality report events
-      Bluetooth: set quality report callback for Intel
-      Bluetooth: hci_qca: enable Qualcomm WCN399x for AOSP extension
-      Bluetooth: btrtl: enable Realtek 8822C/8852A to support AOSP extension
-
-Kiran K (14):
-      Bluetooth: btintel: Fix boot address
-      Bluetooth: btintel: Read boot address irrespective of controller mode
-      Bluetooth: Enumerate local supported codec and cache details
-      Bluetooth: Add support for Read Local Supported Codecs V2
-      Bluetooth: btintel: Read supported offload use cases
-      Bluetooth: Allow querying of supported offload codecs over SCO socket
-      Bluetooth: btintel: Define callback to fetch data_path_id
-      Bluetooth: Allow setting of codec for HFP offload use case
-      Bluetooth: Add support for HCI_Enhanced_Setup_Synchronous_Connection command
-      Bluetooth: Configure codec for HFP offload use case
-      Bluetooth: btintel: Define a callback to fetch codec config data
-      Bluetooth: Add support for msbc coding format
-      Bluetooth: Add offload feature under experimental flag
-      Bluetooth: hci_vhci: Add support for offload codecs over SCO
-
-Larry Finger (1):
-      Bbluetooth: btusb: Add another Bluetooth part for Realtek 8852AE
-
-Luiz Augusto von Dentz (17):
-      Bluetooth: Fix enabling advertising for central role
-      Bluetooth: Fix using address type from events
-      Bluetooth: Fix using RPA when address has been resolved
-      Bluetooth: Add bt_skb_sendmsg helper
-      Bluetooth: Add bt_skb_sendmmsg helper
-      Bluetooth: SCO: Replace use of memcpy_from_msg with bt_skb_sendmsg
-      Bluetooth: RFCOMM: Replace use of memcpy_from_msg with bt_skb_sendmmsg
-      Bluetooth: eir: Move EIR/Adv Data functions to its own file
-      Bluetooth: hci_sock: Add support for BT_{SND,RCV}BUF
-      Bluetooth: Fix passing NULL to PTR_ERR
-      Bluetooth: SCO: Fix sco_send_frame returning skb->len
-      Bluetooth: hci_core: Move all debugfs handling to hci_debugfs.c
-      Bluetooth: Make use of hci_{suspend,resume}_dev on suspend notifier
-      Bluetooth: hci_vhci: Add force_suspend entry
-      Bluetooth: hci_vhci: Add force_prevent_wake entry
-      Bluetooth: hci_sock: Replace use of memcpy_from_msg with bt_skb_sendmsg
-      Bluetooth: Rename driver .prevent_wake to .wakeup
-
-Manish Mandlik (1):
-      Bluetooth: Fix Advertisement Monitor Suspend/Resume
-
-Marcel Holtmann (4):
-      Bluetooth: Fix handling of experimental feature for quality reports
-      Bluetooth: Fix handling of experimental feature for codec offload
-      Bluetooth: btrtl: Set VsMsftOpCode based on device table
-      Bluetooth: btrtl: Add support for MSFT extension to rtl8821c devices
-
-Max Chou (1):
-      Bluetooth: btusb: Add the new support ID for Realtek RTL8852A
-
-Mianhan Liu (1):
-      Bluetooth: btrsi: remove superfluous header files from btrsi.c
-
-Miao-chen Chou (1):
-      Bluetooth: Keep MSFT ext info throughout a hci_dev's life cycle
-
-Nicholas Flintham (1):
-      Bluetooth: btusb: Add support for TP-Link UB500 Adapter
-
-Pavel Skripkin (1):
-      Bluetooth: hci_uart: fix GPF in h5_recv
-
-Takashi Iwai (1):
-      Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
-
-Tetsuo Handa (1):
-      Bluetooth: reorganize functions from hci_sock_sendmsg()
-
-Thadeu Lima de Souza Cascardo (1):
-      Bluetooth: hci_ldisc: require CAP_NET_ADMIN to attach N_HCI ldisc
-
-Wang ShaoBo (1):
-      Bluetooth: fix use-after-free error in lock_sock_nested()
-
-Yun-Hao Chung (1):
-      Bluetooth: Fix wrong opcode when LL privacy enabled
-
-mark-yw.chen (3):
-      Bluetooth: btusb: Support public address configuration for MediaTek Chip.
-      Bluetooth: btusb: Add protocol for MediaTek bluetooth devices(MT7922)
-      Bluetooth: btusb: Add support for IMC Networks Mediatek Chip(MT7921)
-
-tjiang@codeaurora.org (1):
-      Bluetooth: btusb: Add gpio reset way for qca btsoc in cmd_timeout
-
- drivers/bluetooth/btintel.c       | 239 ++++++++++++++++---
- drivers/bluetooth/btintel.h       |  11 +
- drivers/bluetooth/btmrvl_main.c   |   6 +-
- drivers/bluetooth/btmtkuart.c     |  13 +-
- drivers/bluetooth/btrsi.c         |   1 -
- drivers/bluetooth/btrtl.c         |  26 ++-
- drivers/bluetooth/btusb.c         |  64 ++++-
- drivers/bluetooth/hci_h5.c        |  35 ++-
- drivers/bluetooth/hci_ldisc.c     |   3 +
- drivers/bluetooth/hci_qca.c       |   5 +-
- drivers/bluetooth/hci_vhci.c      | 124 ++++++++++
- include/net/bluetooth/bluetooth.h |  90 +++++++
- include/net/bluetooth/hci.h       | 117 ++++++++++
- include/net/bluetooth/hci_core.h  |  75 +++---
- net/bluetooth/Makefile            |   3 +-
- net/bluetooth/eir.c               | 335 ++++++++++++++++++++++++++
- net/bluetooth/eir.h               |  72 ++++++
- net/bluetooth/hci_codec.c         | 238 +++++++++++++++++++
- net/bluetooth/hci_codec.h         |   7 +
- net/bluetooth/hci_conn.c          | 168 ++++++++++++--
- net/bluetooth/hci_core.c          | 320 +++++++++++--------------
- net/bluetooth/hci_debugfs.c       | 123 ++++++++++
- net/bluetooth/hci_debugfs.h       |   5 +
- net/bluetooth/hci_event.c         | 135 +++++++----
- net/bluetooth/hci_request.c       | 478 ++++++--------------------------------
- net/bluetooth/hci_request.h       |  25 +-
- net/bluetooth/hci_sock.c          | 214 ++++++++++-------
- net/bluetooth/l2cap_core.c        |   2 +-
- net/bluetooth/l2cap_sock.c        |  10 +-
- net/bluetooth/mgmt.c              | 445 ++++++++++++++++++++++++++---------
- net/bluetooth/msft.c              | 172 ++++++++++++--
- net/bluetooth/msft.h              |   9 +
- net/bluetooth/rfcomm/core.c       |  50 +++-
- net/bluetooth/rfcomm/sock.c       |  46 +---
- net/bluetooth/sco.c               | 209 +++++++++++++++--
- 35 files changed, 2791 insertions(+), 1084 deletions(-)
- create mode 100644 net/bluetooth/eir.c
- create mode 100644 net/bluetooth/eir.h
- create mode 100644 net/bluetooth/hci_codec.c
- create mode 100644 net/bluetooth/hci_codec.h
+-- 
+Luiz Augusto von Dentz
