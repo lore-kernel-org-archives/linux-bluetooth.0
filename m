@@ -2,139 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98BCDC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 18:12:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47142C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 19:44:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7F1BC61247
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 18:12:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1F09C61372
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 19:44:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237536AbhJDSN7 (ORCPT
+        id S233592AbhJDTqj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Oct 2021 14:13:59 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46924 "EHLO
+        Mon, 4 Oct 2021 15:46:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40540 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236050AbhJDSN6 (ORCPT
+        with ESMTP id S233382AbhJDTqi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Oct 2021 14:13:58 -0400
-Received: from mail-qk1-x72a.google.com (mail-qk1-x72a.google.com [IPv6:2607:f8b0:4864:20::72a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDC85C061745;
-        Mon,  4 Oct 2021 11:12:09 -0700 (PDT)
-Received: by mail-qk1-x72a.google.com with SMTP id 73so17380663qki.4;
-        Mon, 04 Oct 2021 11:12:09 -0700 (PDT)
+        Mon, 4 Oct 2021 15:46:38 -0400
+Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5958EC06174E
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 12:44:49 -0700 (PDT)
+Received: by mail-oi1-x233.google.com with SMTP id 24so23153004oix.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 12:44:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=+fT+aA8O5oRqS8Fx8O+K4w9xvhEfwcMTbFUqJDULxaY=;
-        b=cB8begJI5ATh6WUeF3PsZL0eN0zkI5dsdFYEZsxDXbahwFjHCE1LT8VFlsj9Lzs7/j
-         Jmu/pnTyPj5S+Fm/F9qYXTzyt8PT95g2kYwLN9j+Tyu+yiMElJlKLkLaso0lI5fd8zOQ
-         8aikJdx6bbwK0b4VlPhSQGhg3iUjzqBBi0LBltW4vu8eeDkG4nF6JyhWEyPQbE4QM4x6
-         e5iIa+gy3aim9dxo2/Lhxkkdm/9LBYhyL/YErgBSFkwgRcBPqEnGsPjCkdX4bTXXD6Am
-         uXRC8r/AvgiBFtEY8N7CPtTQmEtAR6muZNgeF1XFRg1hGD1UHOSUVA5Wk6j3ANGQ+glD
-         RaIQ==
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=5lPwZ+iwsuPnoAxmrkeLnm/5OtvoYrkkwPtp9yTV4PE=;
+        b=hgF1ZS5hnGhwUx2jX7oe2GHCphP61nmlCP4jO1u7qYsCENPZl9Qq27TGGNB+bkKiac
+         jdQn2fj8+mXEEmTTF6pL+5RGN3fhZ9Mc5u6QUYrdVHMefiUrfQvD3gfU4n6+G0lQThA5
+         g+MynwqkJ3Y7M+fZUlMYwhxFJU8oRv1d5a5USP7B1XsA0TjlUPEtd2l2VyabrC8owMJT
+         1ae6r6JkuwqaaK5hC6lHMiG4iAM7Umrh2CRIEjUwLH0VH0mt7+X76isPUD6aUXldQV1j
+         KvISpuM2NO8ZbrBKQyIohf6z9eiKHATGZe2xJACeqb2PiuDlaYzUnn5XiXQM9Gi3hMRT
+         5WDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=+fT+aA8O5oRqS8Fx8O+K4w9xvhEfwcMTbFUqJDULxaY=;
-        b=5fLsraFjhG1lwxIgZiT6OMdPZuSsZFMG6V9Fpvss3WHUzx1MkW0IAIV1njH8q5w+wW
-         h7kA1gtKm8nKS3R3Oxrluqpeg+2ixEc/mf1HDRirpf2DPHo6o/NPczJmkWhxn5OOAA0o
-         LgntKCnhtLyVX/fswc229A6aC3NvMSWJjmb0pxS2hl5c8O5IsH15dzkVOdZKewEj46WM
-         BfjDrZ2i3Y0gRl7xee7QYEY/zGDlBNtsCyPNX8wsFxA7sqqYuQMAPK9W/M3KgAv9+GXR
-         Ef2yNm8FuBtYAp3i05joTY+4+ROBjMxf4xuN64uTlw9Bi3wsmuzF9VrVsF4m8x3Yecpc
-         ho6g==
-X-Gm-Message-State: AOAM531teUz6KYVY3PT45BW5edOr1hXdfpFAD1Oh6VTFfBcs61eeiVaj
-        o0VQlTkC/+ulBB52nc2WIb4dRIbxPB/HwM2GLSo=
-X-Google-Smtp-Source: ABdhPJw+p5LDAu4EWLtXrEVmBgi6I2O8BSJ/cp3rVmaxsAJHduNSbNYqlpna5byopgrCWGY7tfR9Bg==
-X-Received: by 2002:a37:e14:: with SMTP id 20mr11478184qko.250.1633371128922;
-        Mon, 04 Oct 2021 11:12:08 -0700 (PDT)
-Received: from [192.168.4.191] (pool-72-82-21-11.prvdri.fios.verizon.net. [72.82.21.11])
-        by smtp.gmail.com with ESMTPSA id g12sm9179316qtm.59.2021.10.04.11.12.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Oct 2021 11:12:08 -0700 (PDT)
-Subject: Re: [PATCH 1/2] Bluetooth: call sock_hold earlier in sco_conn_del
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=5lPwZ+iwsuPnoAxmrkeLnm/5OtvoYrkkwPtp9yTV4PE=;
+        b=iInWo4HF6PYYvwr2UMvkZ+0Brt6OXwCwANhWoUKg6hsV3zD4r4bz/wgbIW3Obe9c3w
+         VaqzUehQBLPbuf/WyE7vDNE8bTd0UbwCZTQTvxVuAtgWxLcf5ZdI7DI4BCFdJhuUtsT9
+         ayNfXjHDPE5e9QxdXQ26CRv6Jsz2hBReaG60Fp5rVNUeU7uKF1ard4qyfVNuCH8Svz+h
+         8uGgJOiztlUkazrBBVGXzcWkpLl7p7Cx7pHRPgNOaEdw8ORvP/jaggZcmyPbLoRy+cCT
+         KHZoQbJs9HiGlowvXmqjkkRY9GiG61ex1+rmNzRTb5uu2e58sJmJcRVrqY4+Sf+hHMHp
+         CaVw==
+X-Gm-Message-State: AOAM531k/HOky7eVN17FSa6nh+1SpREoIkqcFSEHnl9WUeKTPuf8Hc1E
+        vY6OnQcp6JXHlLKz/skBGWKnwg==
+X-Google-Smtp-Source: ABdhPJwI92lYk3R3FU/4z6wR+/EiRyFE+2CPENxQiTRDE+M3rjZ6qwYRkxV0gelImXKGjpQ2x+ZpAQ==
+X-Received: by 2002:aca:f0c3:: with SMTP id o186mr13729435oih.37.1633376688632;
+        Mon, 04 Oct 2021 12:44:48 -0700 (PDT)
+Received: from ripper ([2600:1700:a0:3dc8:205:1bff:fec0:b9b3])
+        by smtp.gmail.com with ESMTPSA id j10sm2972251oog.39.2021.10.04.12.44.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Oct 2021 12:44:48 -0700 (PDT)
+Date:   Mon, 4 Oct 2021 12:46:31 -0700
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Mianhan Liu <liumh1@shanghaitech.edu.cn>
+Cc:     Andy Gross <agross@kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>,
-        eric.dumazet@gmail.com
-References: <20210903031306.78292-1-desmondcheongzx@gmail.com>
- <20210903031306.78292-2-desmondcheongzx@gmail.com>
- <7AEB2618-111A-45F4-8C00-CF40FCBE92EC@holtmann.org>
-From:   Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Message-ID: <1203215b-13bf-ce0c-ef23-5664544607a1@gmail.com>
-Date:   Mon, 4 Oct 2021 14:12:07 -0400
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+        linux-arm-msm@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: Re: [PATCH -next -v2] ./drivers/bluetooth/btqcomsmd.c: remove
+ superfluous header files from btqcomsmd.c
+Message-ID: <YVtaF1YD/T9r8Ucy@ripper>
+References: <20210928200811.22059-1-liumh1@shanghaitech.edu.cn>
 MIME-Version: 1.0
-In-Reply-To: <7AEB2618-111A-45F4-8C00-CF40FCBE92EC@holtmann.org>
-Content-Type: text/plain; charset=windows-1252; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20210928200811.22059-1-liumh1@shanghaitech.edu.cn>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+On Tue 28 Sep 13:08 PDT 2021, Mianhan Liu wrote:
 
-On 10/9/21 3:36 am, Marcel Holtmann wrote:
-> Hi Desmond,
-> 
->> In sco_conn_del, conn->sk is read while holding on to the
->> sco_conn.lock to avoid races with a socket that could be released
->> concurrently.
->>
->> However, in between unlocking sco_conn.lock and calling sock_hold,
->> it's possible for the socket to be freed, which would cause a
->> use-after-free write when sock_hold is finally called.
->>
->> To fix this, the reference count of the socket should be increased
->> while the sco_conn.lock is still held.
->>
->> Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
->> ---
->> net/bluetooth/sco.c | 3 ++-
->> 1 file changed, 2 insertions(+), 1 deletion(-)
->>
->> diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
->> index b62c91c627e2..4a057f99b60a 100644
->> --- a/net/bluetooth/sco.c
->> +++ b/net/bluetooth/sco.c
->> @@ -187,10 +187,11 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
->> 	/* Kill socket */
->> 	sco_conn_lock(conn);
->> 	sk = conn->sk;
-> 
-> please add a comment here on why we are doing it.
-> 
+If you run a "git log --oneline -- drivers/bluetooth/btqcomsmd.c" you
+will see that the appropriate prefix would be "Bluetooth: btqcomsmd: "
 
-So sorry for the very delayed response. I was looking through old email 
-threads to check if my recently resent patch was still necessary, and 
-just realized I missed this email.
+In other words, a better $subject would be:
 
-This patch was merged into the bluetooth-next tree before your feedback 
-came in. Would you still like me to write a separate patch to add the 
-requested comment?
+[PATCH v2] Bluetooth: btqcomsmd: remove superfluous includes
 
-Best wishes,
-Desmond
-
->> +	if (sk)
->> +		sock_hold(sk);
->> 	sco_conn_unlock(conn);
->>
->> 	if (sk) {
->> -		sock_hold(sk);
->> 		lock_sock(sk);
->> 		sco_sock_clear_timer(sk);
->> 		sco_chan_del(sk, err);
+> btqcomsmd.c hasn't use any macro or function declared in linux/of.h
+> and linux/slab.h.
+> Thus, these files can be removed from btqcomsmd.c safely without
+> affecting the compilation of the ./drivers/bluetooth module
 > 
-> Regards
+> Signed-off-by: Mianhan Liu <liumh1@shanghaitech.edu.cn>
 > 
-> Marcel
+> ---
+
+Here is an excellent place to state "Changes since v1" and mention that
+you no longer remove btqca.h and you added your S-o-b.
+
+>  drivers/bluetooth/btqcomsmd.c | 2 --
+>  1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btqcomsmd.c b/drivers/bluetooth/btqcomsmd.c
+> index 2acb719e5..e556d96a4 100644
+> --- a/drivers/bluetooth/btqcomsmd.c
+> +++ b/drivers/bluetooth/btqcomsmd.c
+> @@ -5,9 +5,7 @@
+>   */
+>  
+>  #include <linux/module.h>
+> -#include <linux/slab.h>
+>  #include <linux/rpmsg.h>
+> -#include <linux/of.h>
+>  
+
+This looks reasonable.
+
+Regards,
+Bjorn
+
+>  #include <linux/soc/qcom/wcnss_ctrl.h>
+>  #include <linux/platform_device.h>
+> -- 
+> 2.25.1
+> 
 > 
