@@ -2,114 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBF94C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:47:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 37979C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:48:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id ACE726113A
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:47:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A7196113A
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  4 Oct 2021 22:48:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236774AbhJDWtj (ORCPT
+        id S236894AbhJDWuB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Oct 2021 18:49:39 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54114 "EHLO
+        Mon, 4 Oct 2021 18:50:01 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54204 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233501AbhJDWti (ORCPT
+        with ESMTP id S233501AbhJDWuB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Oct 2021 18:49:38 -0400
-Received: from mail-vk1-xa31.google.com (mail-vk1-xa31.google.com [IPv6:2607:f8b0:4864:20::a31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54792C061745
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 15:47:49 -0700 (PDT)
-Received: by mail-vk1-xa31.google.com with SMTP id b67so8417463vkb.13
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 15:47:49 -0700 (PDT)
+        Mon, 4 Oct 2021 18:50:01 -0400
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF9EC061745
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 15:48:11 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id 188so21627582vsv.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 15:48:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=K4bkWGF+I8ewZ97VzVY3bAyRXjrlH7knH95Ik/OioE4=;
-        b=P7lwDfL8v5tCmTJi6FYQ2Y/b+mYnbgAVE7CjxGx+m1UBsH+xxz8YtzIUIXEQ/7Cknl
-         YS9lRmDn3UkUZvk5gJOfMuKnrWVLIXUDxJ/e36H1J0Kq6SQrCbIs8Hw4eLxhLKlJupO2
-         u2F7Dnql+5Wd46ftytTQZC7fuRgYFsMcYv8BJZaam8rNJqHZdr49eVFpzIm4iDQw1fh9
-         MdxOMkVo2pkYymjUOGIqRprb2VQLSoUzNT0FaDr4b+1W48lCMslb5BCh3aDWcWNur4Xi
-         5uqlzIQEQGxCa3z+ErovnnexXQka0YZNDzA9fdFrY5iHtUb3p1srkQinhiUnIGIGEuJR
-         4wAg==
+        bh=ZvxCRJ3W65P7QqyG0dGWqzex/Oyw+5PGS6wynx4t+vI=;
+        b=Vm+uukhJI++Xq0v9Z0HCGT45wA/YAiNJcOP+dnKB5f6JYe+7WkkdNE0zRUICGVSwSx
+         9TF2QplzRl/MrhWcbJvCZo9EwAsmS9U/9ln9Be/VAvwcj6Fs3z9B9V5Xxxp6UOS7Pf3y
+         5ly3cvK7QtYPppSnK5+ZROMU7UJ5/gK5Wsu4hgKy6O+O5aRShaZ2R/vSLs9Dg+0iOgBG
+         7BFnXeXoVuYgH0ODsbZfkQ3Sy5HjXaRE2MWl2kEsgtDm3lHNQ0iUMgE7QTlp6sMwKZOw
+         KuKUp8y9f+CkK/ISUlU1Nazh3fQEJhLiJkAEb5lEgZavcoG6U7HOVXPX4kc1G/p/VKBu
+         vKlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=K4bkWGF+I8ewZ97VzVY3bAyRXjrlH7knH95Ik/OioE4=;
-        b=1OFDQFc2fvYZjP83V6oh//WCt8EMgsukVtSI8ec/ZerBSMLDCrTrqn4+I7lI6Sd1he
-         OE/4b+XmJc+LTbwXsQmKFYoS2atFFP7ZNU7sGVdQADWplMDAvxFio8QZeK9EOqgrlF3A
-         zyXgrndbExpUFHXKZV0j6zAV0fNeuPcuy1CiGqmF6vWruMOoMngVMQ9+w5lx3fKdR08e
-         Y/O2AWBMP5OP2oYLDWKHG3xIc1K4oXdkNGdV0FjTl1McHDKjWg2lVUsoqvqALEmPXW1T
-         IoU9FfsVxxIisk/VOY9csK8GwlJr/8NvKYKjPzEDpsrZEFT2fBaLiLhxcLU2rPF44p8/
-         G59w==
-X-Gm-Message-State: AOAM531xbL7yzOz+7HquXuON30z9kx4yMUw1s+rIbmq0YCoK0iuMA0zJ
-        03BXTzwIKfoD4IPGJUaohsO+maTsot5cR6zm21w=
-X-Google-Smtp-Source: ABdhPJySwWjPqLPzjZ6wrShPyqOvJbbg48IaB5TCmZ8di1uV0Zlbt3wuem4z19dApEbA7YPhowi8IhfMW0s0Owov32o=
-X-Received: by 2002:a1f:a9c4:: with SMTP id s187mr19438936vke.9.1633387668260;
- Mon, 04 Oct 2021 15:47:48 -0700 (PDT)
+        bh=ZvxCRJ3W65P7QqyG0dGWqzex/Oyw+5PGS6wynx4t+vI=;
+        b=IxyNP64e27by3Rs3rVSddjmZmTdv7jysJcL2X/toXnJyNhC3j8mopNkQNuu8Zv7n7s
+         SJuOp2Ij1f8vQdm31QNmp/o747qZazedkJ4eDrIOwiN9jgCa3G1hSYRJhfAmqpSfHZEE
+         K5WI+d21NHdk3+d54jJL26R/O3X5jzvQSmlxs3Rj3bPLdm/3p0Ovasr5e+rKr3OafSPd
+         ZsGQDGU+gdiJwby4/kUBTGlDita9mD0K+eBiSc9J3qMfLOGtQJiux3I5NMqrcTq38El5
+         xxa4/sAIT1FTAi/mGE6jaMGV/DDxAPqpRaaKrnpSNfaGVwMQD8G5ErWOoub3iIWijTty
+         0EcA==
+X-Gm-Message-State: AOAM531m7ju/CEMfy/uYwpxGL07tGdEQyhgmVSi2gTy90wAaLVyfqaTs
+        UWRpAe4GImqcboLlgePCoBvtXAraQlydP6JwceQ=
+X-Google-Smtp-Source: ABdhPJzNERw6rJ7OhE2rOuB0RiBqjpxHpgtSxlCIsMXnAr1BxocB9QaM6NwTQDHpk1dlJL19eyiW6LcD/OMWBbuk19k=
+X-Received: by 2002:a05:6102:21d0:: with SMTP id r16mr16211859vsg.39.1633387690878;
+ Mon, 04 Oct 2021 15:48:10 -0700 (PDT)
 MIME-Version: 1.0
-References: <20210921181243.BlueZ.v1.1.I261f9c1ee78b90f81a6c323c23065615be917c33@changeid>
- <CAGPPCLDZF_BFbGV4Cd1s0SOKYJwwpM-cM3zvDdjHOTtBcvDT0Q@mail.gmail.com>
-In-Reply-To: <CAGPPCLDZF_BFbGV4Cd1s0SOKYJwwpM-cM3zvDdjHOTtBcvDT0Q@mail.gmail.com>
+References: <20210930223726.2886139-1-mcchou@chromium.org>
+In-Reply-To: <20210930223726.2886139-1-mcchou@chromium.org>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 4 Oct 2021 15:47:37 -0700
-Message-ID: <CABBYNZJYjecA503BWTDc-+SgDTAnda3p079H2d4W4j3xS-VpZw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v1] adv_monitor: Mark the device as lost on device_lost_timeout
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Yun-Hao Chung <howardchung@google.com>
+Date:   Mon, 4 Oct 2021 15:48:00 -0700
+Message-ID: <CABBYNZL2cX9Rx25DqFd3ggmRM8ZQXF2nPK5dUSWNB5c1qmjN9Q@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v7 0/4] Detailed error string
+To:     Miao-chen Chou <mcchou@chromium.org>
+Cc:     Bluetooth Kernel Mailing List <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+        Howard Chung <howardchung@google.com>,
+        Alain Michaud <alainm@chromium.org>,
+        Marcel Holtmann <marcel@holtmann.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Miao,
 
-On Mon, Sep 27, 2021 at 11:30 AM Manish Mandlik <mmandlik@google.com> wrote:
+On Thu, Sep 30, 2021 at 3:46 PM Miao-chen Chou <mcchou@chromium.org> wrote:
 >
-> Friendly reminder to review this patch. :)
+> Chromium OS has been working closely with Linux Bluetooth community to
+> improve BlueZ stack, and there are increasing needs from applications
+> building their features around Bluetooth. One of the major feedback
+> from these application is the lack of the detailed failure reasons as
+> return for D-Bus method call, and these failure reasons can be used in
+> metrics, optimizing retry mechanism, hinting the reproduce scenario to
+> improve BlueZ stack. The current org.bluez.Error.* are serving the
+> generic errors well. However,g given org.bluez.Error.* errors are used
+> across different interface context which does not serve the detailed
+> failure reasons well. (See https://github.com/bluez/bluez/issues/131)
 >
-> Regards,
-> Manish.
+> Changes in v7:
+> - Fix nits
 >
+> Changes in v6:
+> - Rephrase error string
 >
-> On Tue, Sep 21, 2021 at 6:13 PM Manish Mandlik <mmandlik@google.com> wrote:
->>
->> Mark the device as lost on device_lost_timeout so that it can be found
->> again next time.
->>
->> Verified this by adding a monitor using bluetoothctl and confirming that
->> the DeviceLost event is getting triggered when bt peer stops advertising
->> and DeviceFound event gets triggered again when the bt peer restarts the
->> advertising.
->>
->> Reviewed-by: Yun-Hao Chung <howardchung@google.com>
->> ---
->>
->>  src/adv_monitor.c | 2 ++
->>  1 file changed, 2 insertions(+)
->>
->> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
->> index 715ac5904..a55e1ea2d 100644
->> --- a/src/adv_monitor.c
->> +++ b/src/adv_monitor.c
->> @@ -1892,7 +1892,9 @@ static bool handle_device_lost_timeout(gpointer user_data)
->>         g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
->>                                  report_device_state_setup,
->>                                  NULL, dev->device, NULL);
->> +
->>         dev->lost_timer = 0;
->> +       dev->found = false;
->>
->>         return FALSE;
->>  }
->> --
->> 2.33.0.464.g1972c5931b-goog
->>
+> Changes in v5:
+> - Replace error code with error string
+>
+> Changes in v4:
+> - Address make errors.
+>
+> Changes in v3:
+> - Correct error-codes.txt.
+>
+> Changes in v2:
+> - Add documentation for error codes
+>
+> Miao-chen Chou (4):
+>   Add errors.txt to describe errors of D-Bus method returns
+>   BR/EDR and LE connection failure reasons
+>   Include detailed error string in Connect() return
+>   Print error code for connect methods
+>
+>  client/main.c  |   3 +-
+>  doc/errors.txt | 233 +++++++++++++++++++++++++++++++++++++++++++++++++
+>  src/device.c   |  46 ++++++----
+>  src/error.c    | 100 +++++++++++++++++++++
+>  src/error.h    |  57 ++++++++++++
+>  5 files changed, 422 insertions(+), 17 deletions(-)
+>  create mode 100644 doc/errors.txt
+>
+> --
+> 2.33.0.800.g4c38ced690-goog
 
 Applied, thanks.
 
