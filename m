@@ -2,94 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 562E4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 03:47:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 905BFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 04:15:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1A0F26140B
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 03:47:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6AB4761409
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 04:15:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230510AbhJEDth (ORCPT
+        id S229780AbhJEERk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Oct 2021 23:49:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
+        Tue, 5 Oct 2021 00:17:40 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43124 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229659AbhJEDth (ORCPT
+        with ESMTP id S229659AbhJEERj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Oct 2021 23:49:37 -0400
-Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2040BC061745;
-        Mon,  4 Oct 2021 20:47:47 -0700 (PDT)
-Received: by mail-vs1-xe34.google.com with SMTP id 188so22222539vsv.0;
-        Mon, 04 Oct 2021 20:47:47 -0700 (PDT)
+        Tue, 5 Oct 2021 00:17:39 -0400
+Received: from mail-vs1-xe2f.google.com (mail-vs1-xe2f.google.com [IPv6:2607:f8b0:4864:20::e2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91B5EC061745
+        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 21:15:49 -0700 (PDT)
+Received: by mail-vs1-xe2f.google.com with SMTP id g10so4670838vsb.8
+        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 21:15:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=UDsljUijqnZ5Wx+bun2KCPdz3eZ9B9kNij17UG2PwQI=;
-        b=O0fHoYqc6PSsqeZJWcPeKmzbT7zjxQ1uas7QyrV3q1wM90ZuYW3mq8hTMZ0vOx1/qf
-         59/4hZaUpJQTRjsj0YNr6+aenjmxSBguQF4SoWsBaDQt0CS0VMxblFKZSHa9NRZRwUMb
-         UsEveLiaC0OSttPne5WeJSHFGqyF5z0KAdkfQzqOsXISf4RBT6kJUy5r+on6mHwGf+K+
-         BnIvdLlTKDqbx4F/sx/yt7sKpH+MJzkKx9phPctyep4SWZosILeemYprdkCehjCb+AM8
-         ucXIl+8mseOJ6Pm+iz1eWB5AUl8P5GuYlBDh3DVEChFT9vJpyjFv+882i2tU+B4lWS7p
-         IjMQ==
+        bh=MtxXfra+M4n3fU/PBqoyOdvraBuzKL/ZyAXA3SdKue0=;
+        b=FQup+IBrX0VDFyuT8RacrhtlH0yHqWxtZmXI0pXxcgIiAzpttNfgDg+8kT6W6SkHT6
+         rQJ829aMFxGlJpiivEQips3fQVYpVxYqKRgx+kNz/JL5UcKx99V1twi62t+CrjPahy/x
+         gKkAgBllty7cgRHmo0qMHEfZE4bbDoZm41ngkBzmmf09LFpkBgQYuVf9gZ0xvVWzRx5u
+         OGGRfPR+VSPkcoVSCJIGv4E3eHfKb3w9pY2Qj+We/AISciMHQUpIHY+eZKwNe5pD1mig
+         XYY+lt5h7Lj1t9mVwo9NsdwV7RlAsRxPmXAORxSO7qds2b/LbeiWsxa8ljd08lXXB4fR
+         48Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=UDsljUijqnZ5Wx+bun2KCPdz3eZ9B9kNij17UG2PwQI=;
-        b=xb6aS5zIc/Hz6JU8u+sSO1wqsg45+OAn7IJcq/pJRSpgt50BKosyZH1NJ0Ynm1oA90
-         nY7nchbrjb7QNFoRZ7wDyWF0hm+ogEttjEMRwguzBcFalaJCWkWDq0hk5AFsOVC1QlGz
-         I51lsTJe5aBcZGk28wzfk0Q3ywKdaYbuQKrtphV04Sm8eMdjI6e3N5b0Nu/k3Q0OtwWH
-         yIFae0MhF8QDZNb6r4mu+EJML0YVQFn7Hpfk7jCUFSkkCwTK1wHrfLUKz+vWOa75b+eC
-         m1aoRSaUpOxndzjS5IS/0OU1adHTBbBS0bceAzkMafml4HdPexDi5SdbXcUEkDvw0va3
-         ZJfw==
-X-Gm-Message-State: AOAM531wz2tfDuNWV/L26h97PNCsRIwf6UyT0r6vH3oklp0XoYSyKXDU
-        xxL2wTD0vnYxzsOxhveFnf1HOAGylJmyGBoqCWIMEEFq
-X-Google-Smtp-Source: ABdhPJzKSLKE/L/ExSnE+Xjn7b/Jpy2TNylzklhwSdCgHM8cexlM4/LvcunGLjLBFzqv6sCzlJAU8dFthMp26atztfA=
-X-Received: by 2002:a05:6102:318d:: with SMTP id c13mr17169978vsh.10.1633405666008;
- Mon, 04 Oct 2021 20:47:46 -0700 (PDT)
+        bh=MtxXfra+M4n3fU/PBqoyOdvraBuzKL/ZyAXA3SdKue0=;
+        b=fRyMPq0KWwQj/ctZ7XVhJdGqbKAQ6to4oZxbGYmNTUA8S/c/lDUplN/3oE2MahLNwI
+         GoECG8bmPlyLkNcvqHOURBLa+gA7yz69wudVoCtK0J06ivJG0F130b3zWkvPlu0wwBUk
+         UN7k5lxrxVcPXHg5oGOCUbEmuhTiMkwm66N7RGKgzyo4M1wrVJWjYwHmdUdf5P+9UV3B
+         4sjDWwcMnp/vhMsi0fPavJF+uAs1UsgVHi1eIGjcOibw6LUwe14PALPrp9iHmBjWIvl2
+         QE3ckRmbx51K/bvUknG33wxU1ZDiNVAIc1sXN4VHN6KoWLyGXx8QyxmNWygt0VG+5tFU
+         zhLA==
+X-Gm-Message-State: AOAM531Wc975JmOTdQjRZzBTDZ2X75gSobf2bG750O/FavB4jtWKxsE+
+        qfVUmfpvyZ1TzFj4C/F21fy6TPxdo7Y6z5nTXQ/r+whk
+X-Google-Smtp-Source: ABdhPJxmiASfpxyYG5mn0J/oqtSmFaOe20q79Did2DEW9UDq6L6LOhhqShjhyaImVtl2+2H/Sw7Ao2Vt/cyjRnw6iBk=
+X-Received: by 2002:a05:6102:318d:: with SMTP id c13mr17213998vsh.10.1633407348478;
+ Mon, 04 Oct 2021 21:15:48 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211004222146.251892-1-luiz.dentz@gmail.com> <20211004182158.10df611b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <20211004182158.10df611b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+References: <20211003101834.45448-1-thomas@t-8ch.de> <61598804.1c69fb81.d279a.fe3f@mx.google.com>
+In-Reply-To: <61598804.1c69fb81.d279a.fe3f@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 4 Oct 2021 20:47:35 -0700
-Message-ID: <CABBYNZKJaD01+o8Tuh7AX7=3Hct_6YqzQcWWzDvOcRpRdPOizQ@mail.gmail.com>
-Subject: Re: pull request: bluetooth 2021-10-04
-To:     Jakub Kicinski <kuba@kernel.org>
-Cc:     David Miller <davem@davemloft.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Date:   Mon, 4 Oct 2021 21:15:37 -0700
+Message-ID: <CABBYNZ+-7QASvCoA9XJQ_Jmi8=e2-dZQSnL4Xft4Ci_WGb=nPA@mail.gmail.com>
+Subject: Re: [BlueZ] Use accurate icons for headphones and headsets
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     thomas@t-8ch.de
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+Hi Thomas,
 
-On Mon, Oct 4, 2021 at 6:22 PM Jakub Kicinski <kuba@kernel.org> wrote:
+On Sun, Oct 3, 2021 at 3:40 AM <bluez.test.bot@gmail.com> wrote:
 >
-> On Mon,  4 Oct 2021 15:21:46 -0700 Luiz Augusto von Dentz wrote:
-> > bluetooth-next pull request for net-next:
-> >
-> >  - Add support for MediaTek MT7922 and MT7921
-> >  - Add support for TP-Link UB500
-> >  - Enable support for AOSP extention in Qualcomm WCN399x and Realtek
-> >    8822C/8852A.
-> >  - Add initial support for link quality and audio/codec offload.
-> >  - Rework of sockets sendmsg to avoid locking issues.
-> >  - Add vhci suspend/resume emulation.
+> This is automated email and please do not reply to this email!
 >
-> Now it's flipped, it's complaining about Luiz being the committer
-> but there's only a sign off from Marcel :(
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=556811
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      1.36 seconds
+> GitLint                       PASS      0.92 seconds
+> Prep - Setup ELL              PASS      47.51 seconds
+> Build - Prep                  PASS      0.46 seconds
+> Build - Configure             PASS      8.78 seconds
+> Build - Make                  PASS      194.30 seconds
+> Make Check                    PASS      8.98 seconds
+> Make Distcheck                PASS      228.49 seconds
+> Build w/ext ELL - Configure   PASS      8.21 seconds
+> Build w/ext ELL - Make        PASS      176.63 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> [BlueZ] Use accurate icons for headphones and headsets
+> WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+> #50:
+> are in practice implemented by at least Adwaita, Gnome, Oxygen, Arc and Breeze
+>
+> /github/workspace/src/12532673.patch total: 0 errors, 1 warnings, 11 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12532673.patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-I did have both sign-off, or are you saying Ive now become the
-committer of other patches as well? Which means whoever rebases the
-tree has to sign-off the entire set as well, I guess other trees does
-better with this because they don't have multiple committer but once
-you have that it is kind hard to maintain this rule of committer must
-sign-off, shouldn't we actually just check if there is one sign-off by
-one of the maintainers that shall be considered acceptable? Or perhaps
-there is some documentation on the matter?
+Shouldn't they be proposed to be added to the standard before we do
+these changes? I mean it is better to have an icon then not have
+anything or is there a fallback mechanism e.g. audio prefix fallback
+to audio-card?
 
 -- 
 Luiz Augusto von Dentz
