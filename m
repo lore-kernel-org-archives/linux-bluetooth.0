@@ -2,92 +2,87 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E6A4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 14:51:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ABBDC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 15:14:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4360A6128A
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 14:51:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6489561108
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 15:14:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235599AbhJEOxa (ORCPT
+        id S235714AbhJEPQV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 10:53:30 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58562 "EHLO mail.kernel.org"
+        Tue, 5 Oct 2021 11:16:21 -0400
+Received: from mga11.intel.com ([192.55.52.93]:63735 "EHLO mga11.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235090AbhJEOxY (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 10:53:24 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E497961216;
-        Tue,  5 Oct 2021 14:51:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1633445494;
-        bh=H4au8cRKsKlT2WzVzVUciC3U/eOkaJQmybq+e0GbWOk=;
-        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-        b=SnE2WI3jxMf2cz6uVcQbgGBPvXjU9qHKP+8K8GW5RPHi2epco2Ye2/6d3CLfCUkZN
-         cAaHPnBU5yEkfCF1xOVevl0+MutHaG7tOIMvxzxDiwQCWHHDEqPa8r5nmBKlB7Oe/i
-         P5GoMkXSagskClxL7bUlIRTugUuNlrWByg92P5O1v7twzlFFD1CA7Vx5sfd0v2x84q
-         eFYbHfcRRF/2a1mlVfg8z4TDra3zYn/7o8wSNPaaqocDWu8xzubBklQw5sNZFnVv0P
-         nAUrC+M4z1Z0yS8XcHdMFP+0kbVcrAXb7eAzhAJK3+lBJEQIvwP/CQzlosVKdc0Mg9
-         lVdwI8p+pnBYg==
-Date:   Tue, 5 Oct 2021 07:51:33 -0700
-From:   Jakub Kicinski <kuba@kernel.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     David Miller <davem@davemloft.net>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: pull request: bluetooth 2021-10-04
-Message-ID: <20211005075133.38a31995@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-In-Reply-To: <CABBYNZKJaD01+o8Tuh7AX7=3Hct_6YqzQcWWzDvOcRpRdPOizQ@mail.gmail.com>
-References: <20211004222146.251892-1-luiz.dentz@gmail.com>
-        <20211004182158.10df611b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-        <CABBYNZKJaD01+o8Tuh7AX7=3Hct_6YqzQcWWzDvOcRpRdPOizQ@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+        id S229936AbhJEPQU (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 5 Oct 2021 11:16:20 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10128"; a="223172076"
+X-IronPort-AV: E=Sophos;i="5.85,349,1624345200"; 
+   d="scan'208";a="223172076"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Oct 2021 07:40:29 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.85,349,1624345200"; 
+   d="scan'208";a="712587455"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Oct 2021 07:40:27 -0700
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        Kiran K <kiran.k@intel.com>
+Subject: [PATCH v1] Bluetooth: Read codec capabilities only if supported
+Date:   Tue,  5 Oct 2021 20:15:56 +0530
+Message-Id: <20211005144556.22074-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Mon, 4 Oct 2021 20:47:35 -0700 Luiz Augusto von Dentz wrote:
-> On Mon, Oct 4, 2021 at 6:22 PM Jakub Kicinski <kuba@kernel.org> wrote:
-> > On Mon,  4 Oct 2021 15:21:46 -0700 Luiz Augusto von Dentz wrote:  
-> > > bluetooth-next pull request for net-next:
-> > >
-> > >  - Add support for MediaTek MT7922 and MT7921
-> > >  - Add support for TP-Link UB500
-> > >  - Enable support for AOSP extention in Qualcomm WCN399x and Realtek
-> > >    8822C/8852A.
-> > >  - Add initial support for link quality and audio/codec offload.
-> > >  - Rework of sockets sendmsg to avoid locking issues.
-> > >  - Add vhci suspend/resume emulation.  
-> >
-> > Now it's flipped, it's complaining about Luiz being the committer
-> > but there's only a sign off from Marcel :(  
-> 
-> I did have both sign-off, or are you saying Ive now become the
-> committer of other patches as well? Which means whoever rebases the
-> tree has to sign-off the entire set as well, I guess other trees does
-> better with this because they don't have multiple committer but once
-> you have that it is kind hard to maintain this rule of committer must
-> sign-off, shouldn't we actually just check if there is one sign-off by
-> one of the maintainers that shall be considered acceptable?
+Read codec capabilities only if HCI_READ_LOCAL_CODEC_CAPABILITIES
+command is supported. If capablities are not supported, then
+cache codec data without caps.
 
-I think most trees don't do rebases. The issue does indeed seem to be
-that whoever does a rebase becomes the committer, so you need to make
-sure that whenever you rebase you add your sign-off to the commits
-initially done by other maintainers (in the range of commits that are
-being modified).
+Signed-off-by: Kiran K <kiran.k@intel.com>
+---
+ net/bluetooth/hci_codec.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-> Or perhaps there is some documentation on the matter?
+diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+index f0421d0edaa3..38201532f58e 100644
+--- a/net/bluetooth/hci_codec.c
++++ b/net/bluetooth/hci_codec.c
+@@ -25,9 +25,11 @@ static int hci_codec_list_add(struct list_head *list,
+ 	}
+ 	entry->transport = sent->transport;
+ 	entry->len = len;
+-	entry->num_caps = rp->num_caps;
+-	if (rp->num_caps)
++	entry->num_caps = 0;
++	if (rp) {
++		entry->num_caps = rp->num_caps;
+ 		memcpy(entry->caps, caps, len);
++	}
+ 	list_add(&entry->list, list);
+ 
+ 	return 0;
+@@ -58,6 +60,18 @@ static void hci_read_codec_capabilities(struct hci_dev *hdev, __u8 transport,
+ 			__u32 len;
+ 
+ 			cmd->transport = i;
++
++			/* If Read_Codec_Capabilities command is not supported
++			 * then just add codec to the list without caps
++			 */
++			if (!(hdev->commands[45] & 0x08)) {
++				hci_dev_lock(hdev);
++				hci_codec_list_add(&hdev->local_codecs, cmd,
++						   NULL, NULL, 0);
++				hci_dev_unlock(hdev);
++				continue;
++			}
++
+ 			skb = __hci_cmd_sync(hdev, HCI_OP_READ_LOCAL_CODEC_CAPS,
+ 					     sizeof(*cmd), cmd,
+ 					     HCI_CMD_TIMEOUT);
+-- 
+2.17.1
 
-I don't think there's any docs.
-
-
-Since this looks very painful to fix at this point I'll pull as is
-from the initial PR from Oct 1st (since it had fewer warnings).
-
-About the content of the PR there is a whole bunch of things here
-(fixes, simple device ID additions) which really look like they should
-have been targeting net, not net-next.
-
-Okay, enough complaining ;)  
-
-Pulled v1, thanks!
