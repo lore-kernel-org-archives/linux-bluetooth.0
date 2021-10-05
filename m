@@ -2,102 +2,94 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 35A49C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 02:27:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 562E4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 03:47:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 203E0613CF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 02:27:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A0F26140B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  5 Oct 2021 03:47:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231297AbhJEC3p (ORCPT
+        id S230510AbhJEDth (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 4 Oct 2021 22:29:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47508 "EHLO
+        Mon, 4 Oct 2021 23:49:37 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36894 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230237AbhJEC3p (ORCPT
+        with ESMTP id S229659AbhJEDth (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 4 Oct 2021 22:29:45 -0400
-Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD905C061745
-        for <linux-bluetooth@vger.kernel.org>; Mon,  4 Oct 2021 19:27:55 -0700 (PDT)
-Received: by mail-pg1-x52b.google.com with SMTP id s11so18363638pgr.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 04 Oct 2021 19:27:55 -0700 (PDT)
+        Mon, 4 Oct 2021 23:49:37 -0400
+Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2040BC061745;
+        Mon,  4 Oct 2021 20:47:47 -0700 (PDT)
+Received: by mail-vs1-xe34.google.com with SMTP id 188so22222539vsv.0;
+        Mon, 04 Oct 2021 20:47:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=1X8IvpmQwkFbG3/5X/xnESXValGPLFiGe10zMJWnW1k=;
-        b=BQc9i7vs+i5omO5HpehZqRRvEKDUo0XRZHqB0h3yOqD0YRa7BwU6BYFG3/xXmO2748
-         2iq3k2R7wM4HovCjubsvFI94GZJQJolgyb8bdGs7yJg/XlbwYcNHFf2nTeYDDcU7+jS9
-         kqMioVjXJVp9JFglT0qBo0rBL3/ET/XXWCOKbRa0z4gdd8EdGflpTMRQfs9pUCF9SYlN
-         ZVlo3WP2nFxZ8Du5FxDqmi8bABXJAQRjNqN0yRPmIkSYI9TWnwrrzguD47CiILG6xNKl
-         QjMPFw6+kFdHKj4frjAvuJL5Q5mEWUB73gflEPCp52hW+fA4E/XdrHTbjmfMIdOAH2nN
-         8n1w==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=UDsljUijqnZ5Wx+bun2KCPdz3eZ9B9kNij17UG2PwQI=;
+        b=O0fHoYqc6PSsqeZJWcPeKmzbT7zjxQ1uas7QyrV3q1wM90ZuYW3mq8hTMZ0vOx1/qf
+         59/4hZaUpJQTRjsj0YNr6+aenjmxSBguQF4SoWsBaDQt0CS0VMxblFKZSHa9NRZRwUMb
+         UsEveLiaC0OSttPne5WeJSHFGqyF5z0KAdkfQzqOsXISf4RBT6kJUy5r+on6mHwGf+K+
+         BnIvdLlTKDqbx4F/sx/yt7sKpH+MJzkKx9phPctyep4SWZosILeemYprdkCehjCb+AM8
+         ucXIl+8mseOJ6Pm+iz1eWB5AUl8P5GuYlBDh3DVEChFT9vJpyjFv+882i2tU+B4lWS7p
+         IjMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=1X8IvpmQwkFbG3/5X/xnESXValGPLFiGe10zMJWnW1k=;
-        b=2GBDyQ5A7kReQwkmYI2Jr6mVEzAdMuNPMpeKGaELK8V7sB511azxF5q7GL7t3z+Cbm
-         pfCSyqxTvQuEZtDC3WeOF8Apoq7pr+lsaYadSAAwRbdrzoTICkMcWCboG4X9TrDUXHdL
-         WCsw+11QhBBdA1aIxyRaDJD9dHtaTIjBUQwM5A8rltZiNqxbZaIHjQpnXteno655ERfO
-         bUPr6Enkaihza9Mtlqq7b+lpAuJtHeRkHHFWvYkahzvTVuwsjU9J0BZS+1KEKHZelC5v
-         4RNym94ACNAwg2haVlmBbJ9P6N9DD+ppquqnWpQrWROptHynpy/ywAP3dmADQH71F0pd
-         aZZg==
-X-Gm-Message-State: AOAM532RiWo60uqfrw7eLlqQ1hpc3Wyy7+wVxou6zmGfuxc/qFjXcayI
-        tc4udOmpgJK3tfwBAmmQoW1wlNDXlPc=
-X-Google-Smtp-Source: ABdhPJwc5y5SnmvmxESnPdzyjcXQ8A1mBCnrWJO1BVNxnlWZBVwDq4ZY3riFZF7fd+5wjRGZI3mZGg==
-X-Received: by 2002:a63:4520:: with SMTP id s32mr13551517pga.27.1633400874876;
-        Mon, 04 Oct 2021 19:27:54 -0700 (PDT)
-Received: from [172.17.0.2] ([52.137.126.61])
-        by smtp.gmail.com with ESMTPSA id fh3sm170834pjb.8.2021.10.04.19.27.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Oct 2021 19:27:54 -0700 (PDT)
-Message-ID: <615bb82a.1c69fb81.4696d.0f11@mx.google.com>
-Date:   Mon, 04 Oct 2021 19:27:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============7419548105079098530=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=UDsljUijqnZ5Wx+bun2KCPdz3eZ9B9kNij17UG2PwQI=;
+        b=xb6aS5zIc/Hz6JU8u+sSO1wqsg45+OAn7IJcq/pJRSpgt50BKosyZH1NJ0Ynm1oA90
+         nY7nchbrjb7QNFoRZ7wDyWF0hm+ogEttjEMRwguzBcFalaJCWkWDq0hk5AFsOVC1QlGz
+         I51lsTJe5aBcZGk28wzfk0Q3ywKdaYbuQKrtphV04Sm8eMdjI6e3N5b0Nu/k3Q0OtwWH
+         yIFae0MhF8QDZNb6r4mu+EJML0YVQFn7Hpfk7jCUFSkkCwTK1wHrfLUKz+vWOa75b+eC
+         m1aoRSaUpOxndzjS5IS/0OU1adHTBbBS0bceAzkMafml4HdPexDi5SdbXcUEkDvw0va3
+         ZJfw==
+X-Gm-Message-State: AOAM531wz2tfDuNWV/L26h97PNCsRIwf6UyT0r6vH3oklp0XoYSyKXDU
+        xxL2wTD0vnYxzsOxhveFnf1HOAGylJmyGBoqCWIMEEFq
+X-Google-Smtp-Source: ABdhPJzKSLKE/L/ExSnE+Xjn7b/Jpy2TNylzklhwSdCgHM8cexlM4/LvcunGLjLBFzqv6sCzlJAU8dFthMp26atztfA=
+X-Received: by 2002:a05:6102:318d:: with SMTP id c13mr17169978vsh.10.1633405666008;
+ Mon, 04 Oct 2021 20:47:46 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [DNM,BlueZ,v3] Build: Test patch - Do Not Merge
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211005011901.402910-1-hj.tedd.an@gmail.com>
-References: <20211005011901.402910-1-hj.tedd.an@gmail.com>
+References: <20211004222146.251892-1-luiz.dentz@gmail.com> <20211004182158.10df611b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <20211004182158.10df611b@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 4 Oct 2021 20:47:35 -0700
+Message-ID: <CABBYNZKJaD01+o8Tuh7AX7=3Hct_6YqzQcWWzDvOcRpRdPOizQ@mail.gmail.com>
+Subject: Re: pull request: bluetooth 2021-10-04
+To:     Jakub Kicinski <kuba@kernel.org>
+Cc:     David Miller <davem@davemloft.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============7419548105079098530==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Jakub,
 
-This is automated email and please do not reply to this email!
+On Mon, Oct 4, 2021 at 6:22 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Mon,  4 Oct 2021 15:21:46 -0700 Luiz Augusto von Dentz wrote:
+> > bluetooth-next pull request for net-next:
+> >
+> >  - Add support for MediaTek MT7922 and MT7921
+> >  - Add support for TP-Link UB500
+> >  - Enable support for AOSP extention in Qualcomm WCN399x and Realtek
+> >    8822C/8852A.
+> >  - Add initial support for link quality and audio/codec offload.
+> >  - Rework of sockets sendmsg to avoid locking issues.
+> >  - Add vhci suspend/resume emulation.
+>
+> Now it's flipped, it's complaining about Luiz being the committer
+> but there's only a sign off from Marcel :(
 
-Dear submitter,
+I did have both sign-off, or are you saying Ive now become the
+committer of other patches as well? Which means whoever rebases the
+tree has to sign-off the entire set as well, I guess other trees does
+better with this because they don't have multiple committer but once
+you have that it is kind hard to maintain this rule of committer must
+sign-off, shouldn't we actually just check if there is one sign-off by
+one of the maintainers that shall be considered acceptable? Or perhaps
+there is some documentation on the matter?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=557449
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.51 seconds
-GitLint                       PASS      0.31 seconds
-Prep - Setup ELL              PASS      53.23 seconds
-Build - Prep                  PASS      0.25 seconds
-Build - Configure             PASS      9.67 seconds
-Build - Make                  PASS      211.61 seconds
-Make Check                    PASS      9.64 seconds
-Make Distcheck                PASS      242.65 seconds
-Build w/ext ELL - Configure   PASS      8.60 seconds
-Build w/ext ELL - Make        PASS      187.63 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============7419548105079098530==--
+-- 
+Luiz Augusto von Dentz
