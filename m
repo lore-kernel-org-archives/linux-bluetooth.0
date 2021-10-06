@@ -2,63 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id ADF7FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 21:37:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB053C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 21:37:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 93CD9610CC
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 21:37:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF3F4610CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 21:37:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S239597AbhJFVjB (ORCPT
+        id S239734AbhJFVjC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 6 Oct 2021 17:39:01 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53194 "EHLO
+        Wed, 6 Oct 2021 17:39:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53196 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229576AbhJFVjA (ORCPT
+        with ESMTP id S230213AbhJFVjB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 6 Oct 2021 17:39:00 -0400
-Received: from mail-pf1-x42d.google.com (mail-pf1-x42d.google.com [IPv6:2607:f8b0:4864:20::42d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2A2EC061746
-        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Oct 2021 14:37:07 -0700 (PDT)
-Received: by mail-pf1-x42d.google.com with SMTP id s16so3573093pfk.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Oct 2021 14:37:07 -0700 (PDT)
+        Wed, 6 Oct 2021 17:39:01 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C9A0C061753
+        for <linux-bluetooth@vger.kernel.org>; Wed,  6 Oct 2021 14:37:08 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id 145so3494895pfz.11
+        for <linux-bluetooth@vger.kernel.org>; Wed, 06 Oct 2021 14:37:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=zQoQWOHtg+xqx/g3tsUgc6AI4/i0B378SYVjJ/euaKc=;
-        b=eH29H/tqKUVs9UD/X1H06QXjJ/KKEvcS5xet9PsEcDlgfPZRWkOfZiUu4kc+MUvKGF
-         yDmd66yBsZ1Jq4SoBR3ubtRaK5QKIuadX9nHWTlRB+nnlSyeJiSYtQEKSJYL4QW+PI0V
-         G3hDylUo5Ubhh6PLbBORCJhVAvEgisFgP1+tmwoIbX1MSYbpaRMWvy71u8nYUEwyjuGQ
-         rK//wWUJTgAaY5Xhg2uQMaeIhBHc+6Ue3by5Upe9HNweFMex5zooZaGt9k9pIAbkBYQ7
-         RYC8ckfsi82igh5Znf5kGZujMVOi5o6t4U7KLD0JNd7btjj2MDXGarQdUapz6cnS3GrU
-         KxVw==
+        bh=Zuu2MMsVUHGTX+V/QwYrfuWltouxp3ZzUBUJkH9tyhc=;
+        b=Xwv+uW5XApI1E6OSk49zAvh/YGJXcXh35nY94LcieUqNYJUD/graIrc5quMdk7Upcp
+         qHa33ft1mMbJ1+f2W51tLMr4qHFE2UKuUfXr7lWE8CJAdZpwJPwcGq66OS0evkTu/mIV
+         NE88MOX2GdWq3xqjJNPnkI9mFTiTiLFFi2jnU+qEkkd485hqbSRdobicWHPeiSYFDFKC
+         3Rvzij2Pfa8QyS/dhT1XAs6hVCChoLoSqDJYHqlMbE6XWWVBCLaNSgxkEVIDQgdAILDc
+         vsA1fKtO8Gt2QqlUpvCeFayZQt66DTGccce7MvUrBoL3rAac+sjgqfhp0FvcKS2O/vgD
+         Yc7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=zQoQWOHtg+xqx/g3tsUgc6AI4/i0B378SYVjJ/euaKc=;
-        b=QDIDNzoj60eYEzuxl1oCqBXs87N7FJ58NuKCTHsDwMwb0koT9nrjqYYUWWPArMzF6G
-         AZvLFuEsmcTayDsWz50Zl+M9D/ClfVFSm8agtB9ApW+Ptq98EZacnkZCvSaA91gJnQAQ
-         Uou1qMts9myE8mAYZScEebGDkjZObG/mfNLcuoHbRr77xY3DE1U3Ka15QHhh++6ZODBM
-         mIXKYkzeFlAoNmLfuu6M+yr4Fs6iHimEJjuv8Xad6yN3inI1z8k1Sw5UJae1V/GN+6zS
-         FhPSP1jOV8IZzP0tkFX9NmMedIibcd+fLwkQUVy53qeYxubNLeC8+pMT7sCuK0nl+23t
-         WMVw==
-X-Gm-Message-State: AOAM531+u1HGnPxnrVkr620bgtpFDtwiyhzZDqDLqu+mD/B1KNJVR4PP
-        y4KthDiqT0b6OyBvcMJcFC+Uiof1BNo=
-X-Google-Smtp-Source: ABdhPJzYbBTJURcNUigPRA/2STzv218KHGXZgua4mDVngnnU2mwVnp62oN3+mhiAEqme8iSMc6LyFg==
-X-Received: by 2002:a63:fc65:: with SMTP id r37mr343254pgk.28.1633556226858;
-        Wed, 06 Oct 2021 14:37:06 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=Zuu2MMsVUHGTX+V/QwYrfuWltouxp3ZzUBUJkH9tyhc=;
+        b=HL0t0hxVnlgIqcyE8sASK0WWNO13bHy7tZVCrTxmCi6jVpzCV0kAWWUYGZjh1BWLB5
+         VxKiGWq9ti6e7xQlK82JntG/oBw98aeN7FKd0/2+fCCbTh09bcWa3wTtJiLw6YjSZh7d
+         K6zQtNrwWtPTwr4QCaFHsrc6vxytspQfTbinfTWitAzDyk54X9AjSxkq2SCLvn0FHOyF
+         FVKW52mZmZrP6g0yM7rwVTgrNsrGD2Jj9vQ2ncd5UXOLaSdR02YzUTYXLDb+Jn5R+P/8
+         50xeautEnJr2nlMXTsSWjo2o7XW6sqzNWDC8mGVhoHF0w4jBMctZ+DzQBQ4HtrcL9V21
+         y5HA==
+X-Gm-Message-State: AOAM530egFWad326YHeEn79fxmxV9iawsCNEHkdfcMox5qh33aXbTAiU
+        fpYxv1QZZHLFtjJnD0E9UXvIrFEtBKs=
+X-Google-Smtp-Source: ABdhPJxJ6lAWB4SUkvyQVQcj8hjtflNuRrEJMA5BpTmoq4AO45SeoOKsUN9veJ6s22pXAbvEu0zqwQ==
+X-Received: by 2002:a63:7d04:: with SMTP id y4mr320555pgc.131.1633556227541;
+        Wed, 06 Oct 2021 14:37:07 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id e6sm11858763pgf.59.2021.10.06.14.37.06
+        by smtp.gmail.com with ESMTPSA id e6sm11858763pgf.59.2021.10.06.14.37.07
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Oct 2021 14:37:06 -0700 (PDT)
+        Wed, 06 Oct 2021 14:37:07 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/4] shared/att: Add bt_att_resend
-Date:   Wed,  6 Oct 2021 14:37:01 -0700
-Message-Id: <20211006213704.1093265-1-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 2/4] shared/gatt-client: Make use of bt_att_resend
+Date:   Wed,  6 Oct 2021 14:37:02 -0700
+Message-Id: <20211006213704.1093265-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211006213704.1093265-1-luiz.dentz@gmail.com>
+References: <20211006213704.1093265-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,101 +69,96 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds bt_att_resend which can be used with procedures that needs to
-send multiple PDUs to complete (e.g. Read Long, Write Long, etc.) so
-they are pushed to the head instead of the tail of the queue so one can
-retain its position on the queue.
+This makes use of bt_att_resend when sending continuation of PDUs such
+as BT_ATT_OP_READ_BLOB_REQ and BT_ATT_OP_PREP_WRITE_REQ to avoid having
+it interleave with other procedures, which is both simpler for the
+peripheral to handle as well as it should reduce the lifetime of the
+objects used for tracking the state of these procedures.
 ---
- src/shared/att.c | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
- src/shared/att.h |  5 ++++
- 2 files changed, 64 insertions(+)
+ src/shared/gatt-client.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
-diff --git a/src/shared/att.c b/src/shared/att.c
-index 2387fe4c3..169f726e4 100644
---- a/src/shared/att.c
-+++ b/src/shared/att.c
-@@ -1615,6 +1615,65 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 	return op->id;
- }
+diff --git a/src/shared/gatt-client.c b/src/shared/gatt-client.c
+index 094922486..be0d3b091 100644
+--- a/src/shared/gatt-client.c
++++ b/src/shared/gatt-client.c
+@@ -2865,17 +2865,18 @@ static void read_long_cb(uint8_t opcode, const void *pdu,
  
-+int bt_att_resend(struct bt_att *att, unsigned int id, uint8_t opcode,
-+				const void *pdu, uint16_t length,
-+				bt_att_response_func_t callback,
-+				void *user_data,
-+				bt_att_destroy_func_t destroy)
-+{
-+	const struct queue_entry *entry;
-+	struct att_send_op *op;
-+	bool result;
-+
-+	if (!att || !id)
-+		return -EINVAL;
-+
-+	/* Lookup request on each channel */
-+	for (entry = queue_get_entries(att->chans); entry;
-+						entry = entry->next) {
-+		struct bt_att_chan *chan = entry->data;
-+
-+		if (chan->pending_req && chan->pending_req->id == id)
-+			break;
-+	}
-+
-+	if (!entry)
-+		return -ENOENT;
-+
-+	/* Only allow requests to be resend */
-+	if (get_op_type(opcode) != ATT_OP_TYPE_REQ)
-+		return -EOPNOTSUPP;
-+
-+	op = create_att_send_op(att, opcode, pdu, length, callback, user_data,
-+								destroy);
-+	if (!op)
-+		return -ENOMEM;
-+
-+	op->id = id;
-+
-+	switch (opcode) {
-+	/* Only prepend requests that could be a continuation */
-+	case BT_ATT_OP_READ_BLOB_REQ:
-+	case BT_ATT_OP_PREP_WRITE_REQ:
-+	case BT_ATT_OP_EXEC_WRITE_REQ:
-+		result = queue_push_head(att->req_queue, op);
-+		break;
-+	default:
-+		result = queue_push_tail(att->req_queue, op);
-+		break;
-+	}
-+
-+	if (!result) {
-+		free(op->pdu);
-+		free(op);
-+		return -ENOMEM;
-+	}
-+
-+	wakeup_writer(att);
-+
-+	return 0;
-+}
-+
- unsigned int bt_att_chan_send(struct bt_att_chan *chan, uint8_t opcode,
- 				const void *pdu, uint16_t len,
- 				bt_att_response_func_t callback,
-diff --git a/src/shared/att.h b/src/shared/att.h
-index de136a066..4aa3de87b 100644
---- a/src/shared/att.h
-+++ b/src/shared/att.h
-@@ -63,6 +63,11 @@ unsigned int bt_att_send(struct bt_att *att, uint8_t opcode,
- 					bt_att_response_func_t callback,
- 					void *user_data,
- 					bt_att_destroy_func_t destroy);
-+int bt_att_resend(struct bt_att *att, unsigned int id, uint8_t opcode,
-+					const void *pdu, uint16_t length,
-+					bt_att_response_func_t callback,
-+					void *user_data,
-+					bt_att_destroy_func_t destroy);
- unsigned int bt_att_chan_send(struct bt_att_chan *chan, uint8_t opcode,
- 					const void *pdu, uint16_t len,
- 					bt_att_response_func_t callback,
+ 	if (length >= bt_att_get_mtu(op->client->att) - 1) {
+ 		uint8_t pdu[4];
++		int err;
+ 
+ 		put_le16(op->value_handle, pdu);
+ 		put_le16(op->offset, pdu + 2);
+ 
+-		req->att_id = bt_att_send(op->client->att,
++		err = bt_att_resend(op->client->att, req->att_id,
+ 							BT_ATT_OP_READ_BLOB_REQ,
+ 							pdu, sizeof(pdu),
+ 							read_long_cb,
+ 							request_ref(req),
+ 							request_unref);
+-		if (req->att_id)
++		if (!err)
+ 			return;
+ 
+ 		request_unref(req);
+@@ -3121,6 +3122,7 @@ static void handle_next_prep_write(struct request *req)
+ 	struct long_write_op *op = req->data;
+ 	bool success = true;
+ 	uint8_t *pdu;
++	int err;
+ 
+ 	pdu = malloc(op->cur_length + 4);
+ 	if (!pdu) {
+@@ -3132,12 +3134,13 @@ static void handle_next_prep_write(struct request *req)
+ 	put_le16(op->offset + op->index, pdu + 2);
+ 	memcpy(pdu + 4, op->value + op->index, op->cur_length);
+ 
+-	req->att_id = bt_att_send(op->client->att, BT_ATT_OP_PREP_WRITE_REQ,
+-							pdu, op->cur_length + 4,
+-							prepare_write_cb,
+-							request_ref(req),
+-							request_unref);
+-	if (!req->att_id) {
++	err = bt_att_resend(op->client->att, req->att_id,
++						BT_ATT_OP_PREP_WRITE_REQ,
++						pdu, op->cur_length + 4,
++						prepare_write_cb,
++						request_ref(req),
++						request_unref);
++	if (err) {
+ 		request_unref(req);
+ 		success = false;
+ 	}
+@@ -3207,6 +3210,7 @@ static void complete_write_long_op(struct request *req, bool success,
+ {
+ 	struct long_write_op *op = req->data;
+ 	uint8_t pdu;
++	int err;
+ 
+ 	op->success = success;
+ 	op->att_ecode = att_ecode;
+@@ -3217,12 +3221,13 @@ static void complete_write_long_op(struct request *req, bool success,
+ 	else
+ 		pdu = 0x00;  /* Cancel */
+ 
+-	req->att_id = bt_att_send(op->client->att, BT_ATT_OP_EXEC_WRITE_REQ,
+-							&pdu, sizeof(pdu),
+-							execute_write_cb,
+-							request_ref(req),
+-							request_unref);
+-	if (req->att_id)
++	err = bt_att_resend(op->client->att, req->att_id,
++					BT_ATT_OP_EXEC_WRITE_REQ,
++					&pdu, sizeof(pdu),
++					execute_write_cb,
++					request_ref(req),
++					request_unref);
++	if (!err)
+ 		return;
+ 
+ 	request_unref(req);
 -- 
 2.31.1
 
