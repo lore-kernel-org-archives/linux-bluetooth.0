@@ -2,54 +2,54 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4E5F7C43217
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:54:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 30E3DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:54:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 353BB611C1
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:54:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1DC8E611C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:54:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237553AbhJFD4Z (ORCPT
+        id S237525AbhJFD4Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 23:56:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32984 "EHLO
+        Tue, 5 Oct 2021 23:56:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32974 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237372AbhJFD4L (ORCPT
+        with ESMTP id S237278AbhJFD4K (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 23:56:11 -0400
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41833C061768
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:54:19 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id i4so4605226lfv.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:54:19 -0700 (PDT)
+        Tue, 5 Oct 2021 23:56:10 -0400
+Received: from mail-lf1-x12f.google.com (mail-lf1-x12f.google.com [IPv6:2a00:1450:4864:20::12f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51C9EC0613EC
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:54:18 -0700 (PDT)
+Received: by mail-lf1-x12f.google.com with SMTP id u18so4429970lfd.12
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:54:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=NeHIhsZMUr5ykJB6Caqyp6Vh5XIKp8x7h5mO8Gk2lJA=;
-        b=JUxbS46H6NBi4pyhUO9ZGHUxljkmmFsu0pJ1MztZTmIx0lOvzlLsrza/qzXhdcfkqA
-         tzHNBu7cho4Ik8BtD9OCsxGoTX0Zhkwq7V+9F31Nt/K4XnLL1j9MSWzoIl+BfwAi2zvB
-         cnoAJpYHzi8Km7qVHJnTMsUttYGJWKqH5V5h3gMpzb4xJ14mpDQrGrl7RvE2hInpCSoP
-         MSAkuk5ii1PH1RSLcCglGm7JDtaOdzA5caqSLHHPViXNkIbGS7xeO+YNFWkqoYHM5IAS
-         MMI7xXBA/oj04pXU6xndAQjW3s2+1gueXHAu78GYMaidhyyqvCgOyGi6JYaoeHC87Xo2
-         bLQw==
+        bh=mcNit0g6jUmmUjsU7FAtIRduJRJ7wpPHtyysZeeAHFY=;
+        b=Xh2nneBb/87+tArNL4Ub5gViAzfXJDIt0nN7Bymb9OpZLb9P/imlrckWJlA/M+3cTt
+         7c8eGMzP7lXSIDLkTnIlfWXLR6Xt8rclJjKYOUk4e73SzYY5wYBvp2wpcbGuRMrQRVAv
+         pNJ0hBoGw9uU0TfZASPIBvt36O//ykJfspidjcIBqyIqYOZBX/QzyrooyiirypL/kuXu
+         8tdfTQXThfx9NQsFJCPxqhgIjTpcA6bKlxLAp0JTBCeEwhnvOiswNRfaC3Rhbx2jvg2N
+         enaYRfssXa/hK05/CkZxpLji7C7cni+x1/ooPHyZAFJhfzZw6eKLiuxEBSKAx79g7fSf
+         cqyA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=NeHIhsZMUr5ykJB6Caqyp6Vh5XIKp8x7h5mO8Gk2lJA=;
-        b=zZo2QzrJLP61xBPFQUXKhfR2DBSI/boSAxBP4Pmc3aYPEIowDUPca6AM0d2RKpfRWR
-         w3D9k3ZCA/6sbjC/JAzSzzM+DI8QRqL01KSK6AaIaY4SbiCmGtyVHDARP9RF08IPPVfC
-         D6c88lIKHrqhc3GlJLvXR6/MZsspocvhdS9/C6REXFUgDgz6Kc1SKJkhx79g1FHFjsty
-         4h3SqjPzV4q8S1Qt02PJAstcd0MzuwVqlPpKQ+9RFKADVH75jLLoXk8PONMT21xoF68X
-         wm5OnJVknp1+okyidAHulQq+Fktn4vSV7Jv9Ntk/dOQF61pXASvw3uYoM7L7RObNELF7
-         m4DA==
-X-Gm-Message-State: AOAM5309qjSNLVqFbPJBwBhxFJLd1jgOUfLQK0Q3/hnsp6YL6hJZNxt2
-        Gi0JxTTD/laQx6XAnlIEn6jIfQ==
-X-Google-Smtp-Source: ABdhPJyK9tu7tnCJm/AWi0OyoXXi8YhLObOtc76v0sfowxgHmlXe9CSRMktSA+i8KUxBsBoAP8bIPg==
-X-Received: by 2002:a19:7109:: with SMTP id m9mr7621114lfc.112.1633492457604;
-        Tue, 05 Oct 2021 20:54:17 -0700 (PDT)
+        bh=mcNit0g6jUmmUjsU7FAtIRduJRJ7wpPHtyysZeeAHFY=;
+        b=me4SWuXDaX9gSii+mGgXEhtlkkRPZ3yN6nON2VNYZ61Sh2jEPtmNH6sp98/atW3E4D
+         ESAEC9EtPglY0H0922ehTqyIlmvgHvuOa5DjQmWWcgtWQNJxXxI3VTedWENKM0DAOOzY
+         X5np5F/12IsfVi/QDyNObthmatfzbwWlKnG4dVRNDHT79g0t2Bxv2S7ZxlrghNPA4KMl
+         6C45e8LKddjS60A/K9+Rzs2A7sZ92eA3E+cgG8aZJFzl8F+0OGpzR3vD55tixJ2vwylf
+         g0XWQlUmSNXaHYcKPX9DRp/96acVC5P/eH0Ulw2bXGmjyJw0WZ4fFmvJh9QV7TbD5pGV
+         vr3Q==
+X-Gm-Message-State: AOAM5307FsQ11xpQAFEnADTCN0k2QrJP2jYDbNTvmp45n1LF+EwP0VfA
+        IJCHcValWdp8dMjTbonQtALvng==
+X-Google-Smtp-Source: ABdhPJz1kFyKYOWjo2k7SexA6deiKwcYASU6DfLmY4tB7DuImqXPFUkuj8BoRxRFiJxUQoWHk0T4Xg==
+X-Received: by 2002:a05:651c:1615:: with SMTP id f21mr11860995ljq.318.1633492456613;
+        Tue, 05 Oct 2021 20:54:16 -0700 (PDT)
 Received: from eriador.lan ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id s4sm2142967lfd.103.2021.10.05.20.54.16
+        by smtp.gmail.com with ESMTPSA id s4sm2142967lfd.103.2021.10.05.20.54.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Tue, 05 Oct 2021 20:54:16 -0700 (PDT)
 From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
@@ -67,9 +67,9 @@ Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH v1 07/15] pwrseq: add fallback support
-Date:   Wed,  6 Oct 2021 06:53:59 +0300
-Message-Id: <20211006035407.1147909-8-dmitry.baryshkov@linaro.org>
+Subject: [PATCH v1 06/15] pwrseq: add support for QCA BT+WiFi power sequencer
+Date:   Wed,  6 Oct 2021 06:53:58 +0300
+Message-Id: <20211006035407.1147909-7-dmitry.baryshkov@linaro.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
 References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
@@ -79,215 +79,438 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Power sequencer support requires changing device tree. To ease migration
-to pwrseq, add support for pwrseq 'fallback': let the power sequencer
-driver register special handler that if matched will create pwrseq
-instance basing on the consumer device tree data.
+Add support for power sequencer used in the Qualcomm BT+WiFi SoCs. They
+require several external volate regulators and some of them use separate
+BT and WiFi enable GPIO pins. This code is mostly extracted from the
+hci_qca.c bluetooth driver and ath10k WiFi driver. Instead of having
+each of them manage pins, different requirements, regulator types, move
+this knowledge to the common power sequencer driver. Currently original
+drivers are not stripped from the regulator code, this will be done
+later (to keep compatibility with the old device trees).
 
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 ---
- drivers/power/pwrseq/Makefile   |  2 +-
- drivers/power/pwrseq/core.c     |  3 ++
- drivers/power/pwrseq/fallback.c | 88 +++++++++++++++++++++++++++++++++
- include/linux/pwrseq/fallback.h | 60 ++++++++++++++++++++++
- 4 files changed, 152 insertions(+), 1 deletion(-)
- create mode 100644 drivers/power/pwrseq/fallback.c
- create mode 100644 include/linux/pwrseq/fallback.h
+ drivers/power/pwrseq/Kconfig      |  14 ++
+ drivers/power/pwrseq/Makefile     |   1 +
+ drivers/power/pwrseq/pwrseq_qca.c | 373 ++++++++++++++++++++++++++++++
+ 3 files changed, 388 insertions(+)
+ create mode 100644 drivers/power/pwrseq/pwrseq_qca.c
 
+diff --git a/drivers/power/pwrseq/Kconfig b/drivers/power/pwrseq/Kconfig
+index 1985f13d9193..7983e37c7855 100644
+--- a/drivers/power/pwrseq/Kconfig
++++ b/drivers/power/pwrseq/Kconfig
+@@ -22,6 +22,20 @@ config PWRSEQ_EMMC
+ 	  This driver can also be built as a module. If so, the module
+ 	  will be called pwrseq_emmc.
+ 
++config PWRSEQ_QCA
++	tristate "Power Sequencer for Qualcomm WiFi + BT SoCs"
++	depends on OF
++	help
++	  If you say yes to this option, support will be included for Qualcomm
++	  WCN399x,QCA639x,QCA67xx families of hybrid WiFi and Bluetooth SoCs.
++	  Note, this driver supports only power control for these SoC, you
++	  still have to enable individual Bluetooth and WiFi drivers. This
++	  driver is only necessary on ARM platforms with these chips. PCIe
++	  cards handle power sequencing on their own.
++
++	  Say M here if you want to include support for Qualcomm WiFi+BT SoCs
++	  as a module. This will build a module called "pwrseq_qca".
++
+ config PWRSEQ_SD8787
+ 	tristate "HW reset support for SD8787 BT + Wifi module"
+ 	depends on OF
 diff --git a/drivers/power/pwrseq/Makefile b/drivers/power/pwrseq/Makefile
-index 556bf5582d47..949ec848cf00 100644
+index 6f359d228843..556bf5582d47 100644
 --- a/drivers/power/pwrseq/Makefile
 +++ b/drivers/power/pwrseq/Makefile
-@@ -3,7 +3,7 @@
- # Makefile for power sequencer drivers.
- #
- 
--obj-$(CONFIG_PWRSEQ) += core.o
-+obj-$(CONFIG_PWRSEQ) += core.o fallback.o
+@@ -6,5 +6,6 @@
+ obj-$(CONFIG_PWRSEQ) += core.o
  
  obj-$(CONFIG_PWRSEQ_EMMC)	+= pwrseq_emmc.o
- obj-$(CONFIG_PWRSEQ_QCA)	+= pwrseq_qca.o
-diff --git a/drivers/power/pwrseq/core.c b/drivers/power/pwrseq/core.c
-index 3dffa52f65ee..30380ca6159a 100644
---- a/drivers/power/pwrseq/core.c
-+++ b/drivers/power/pwrseq/core.c
-@@ -14,6 +14,7 @@
- #include <linux/of.h>
- #include <linux/pwrseq/consumer.h>
- #include <linux/pwrseq/driver.h>
-+#include <linux/pwrseq/fallback.h>
- #include <linux/slab.h>
- 
- #define	to_pwrseq(a)	(container_of((a), struct pwrseq, dev))
-@@ -120,6 +121,8 @@ struct pwrseq * pwrseq_get(struct device *dev, const char *id)
- 	struct pwrseq *pwrseq;
- 
- 	pwrseq = _of_pwrseq_get(dev, id);
-+	if (pwrseq == NULL)
-+		pwrseq = pwrseq_fallback_get(dev, id);
- 	if (IS_ERR_OR_NULL(pwrseq))
- 		return pwrseq;
- 
-diff --git a/drivers/power/pwrseq/fallback.c b/drivers/power/pwrseq/fallback.c
++obj-$(CONFIG_PWRSEQ_QCA)	+= pwrseq_qca.o
+ obj-$(CONFIG_PWRSEQ_SD8787)	+= pwrseq_sd8787.o
+ obj-$(CONFIG_PWRSEQ_SIMPLE)	+= pwrseq_simple.o
+diff --git a/drivers/power/pwrseq/pwrseq_qca.c b/drivers/power/pwrseq/pwrseq_qca.c
 new file mode 100644
-index 000000000000..b83bd5795ccb
+index 000000000000..c15508cc80d2
 --- /dev/null
-+++ b/drivers/power/pwrseq/fallback.c
-@@ -0,0 +1,88 @@
++++ b/drivers/power/pwrseq/pwrseq_qca.c
+@@ -0,0 +1,373 @@
 +// SPDX-License-Identifier: GPL-2.0-only
 +/*
-+ * Copyright 2021 (c) Linaro Ltd.
-+ * Author: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-+ */
-+
-+#include <linux/device.h>
-+#include <linux/module.h>
-+#include <linux/mutex.h>
-+#include <linux/of_device.h>
-+#include <linux/pwrseq/fallback.h>
-+#include <linux/slab.h>
-+
-+static DEFINE_MUTEX(pwrseq_fallback_mutex);
-+static LIST_HEAD(pwrseq_fallback_list);
-+
-+/**
-+ * __pwrseq_fallback_register - internal helper for pwrseq_fallback_register
-+ * @fallback - struct pwrseq_fallback to be registered
-+ * @owner: module containing fallback callback
++ * Copyright (c) 2021, Linaro Ltd.
 + *
-+ * Internal helper for pwrseq_fallback_register. It should not be called directly.
++ * Author: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
++ *
++ * Power Sequencer for Qualcomm WiFi + BT SoCs
 + */
-+int __pwrseq_fallback_register(struct pwrseq_fallback *fallback, struct module *owner)
++
++#include <linux/clk.h>
++#include <linux/delay.h>
++#include <linux/gpio/consumer.h>
++#include <linux/mod_devicetable.h>
++#include <linux/platform_device.h>
++#include <linux/property.h>
++#include <linux/pwrseq/driver.h>
++#include <linux/regulator/consumer.h>
++
++/* susclk rate */
++#define SUSCLK_RATE_32KHZ	32768
++
++/*
++ * Voltage regulator information required for configuring the
++ * QCA WiFi+Bluetooth chipset
++ */
++struct qca_vreg {
++	const char *name;
++	unsigned int load_uA;
++};
++
++struct qca_device_data {
++	bool has_enable_gpios;
++
++	/*
++	 * VDDIO has to be enabled before the rest of regulators, so we treat
++	 * it separately
++	 */
++	struct qca_vreg vddio;
++
++	size_t num_vregs;
++	struct qca_vreg vregs[];
++};
++
++struct pwrseq_qca_common {
++	struct gpio_desc *sw_ctrl;
++	struct clk *susclk;
++
++	/*
++	 * Again vddio is separate so that it can be enabled before enabling
++	 * other regulators.
++	 */
++	struct regulator *vddio;
++	int num_vregs;
++	struct regulator_bulk_data vregs[];
++};
++
++struct pwrseq_qca_one {
++	struct pwrseq_qca_common *common;
++	struct gpio_desc *enable;
++};
++
++#define PWRSEQ_QCA_WIFI 0
++#define PWRSEQ_QCA_BT 1
++
++#define PWRSEQ_QCA_MAX 2
++
++struct pwrseq_qca {
++	struct pwrseq_qca_one pwrseq_qcas[PWRSEQ_QCA_MAX];
++	struct pwrseq_qca_common common;
++};
++
++static int pwrseq_qca_pre_power_on(struct pwrseq *pwrseq)
 +{
-+	if (!try_module_get(owner))
-+		return -EPROBE_DEFER;
++	struct pwrseq_qca_one *qca_one = pwrseq_get_drvdata(pwrseq);
 +
-+	fallback->owner = owner;
-+
-+	mutex_lock(&pwrseq_fallback_mutex);
-+	list_add_tail(&fallback->list, &pwrseq_fallback_list);
-+	mutex_unlock(&pwrseq_fallback_mutex);
++	if (qca_one->enable) {
++		gpiod_set_value_cansleep(qca_one->enable, 0);
++		msleep(50);
++	}
 +
 +	return 0;
 +}
-+EXPORT_SYMBOL_GPL(__pwrseq_fallback_register);
 +
-+/**
-+ * pwrseq_fallback_unregister() - unregister fallback helper
-+ * @fallback - struct pwrseq_fallback to unregister
-+ *
-+ * Unregister pwrseq fallback handler registered by pwrseq_fallback_handler.
-+ */
-+void pwrseq_fallback_unregister(struct pwrseq_fallback *fallback)
++static int pwrseq_qca_power_on(struct pwrseq *pwrseq)
 +{
-+	mutex_lock(&pwrseq_fallback_mutex);
-+	list_del(&fallback->list);
-+	mutex_unlock(&pwrseq_fallback_mutex);
++	struct pwrseq_qca_one *qca_one = pwrseq_get_drvdata(pwrseq);
++	int ret;
 +
-+	module_put(fallback->owner);
-+
-+	kfree(fallback);
-+}
-+EXPORT_SYMBOL_GPL(pwrseq_fallback_unregister);
-+
-+static bool pwrseq_fallback_match(struct device *dev, struct pwrseq_fallback *fallback)
-+{
-+	if (of_match_device(fallback->of_match_table, dev) != NULL)
-+		return true;
-+
-+	/* We might add support for other matching options later */
-+
-+	return false;
-+}
-+
-+struct pwrseq *pwrseq_fallback_get(struct device *dev, const char *id)
-+{
-+	struct pwrseq_fallback *fallback;
-+	struct pwrseq *pwrseq = ERR_PTR(-ENODEV);
-+
-+	mutex_lock(&pwrseq_fallback_mutex);
-+
-+	list_for_each_entry(fallback, &pwrseq_fallback_list, list) {
-+		if (!pwrseq_fallback_match(dev, fallback))
-+			continue;
-+
-+		pwrseq = fallback->get(dev, id);
-+		break;
++	if (qca_one->common->vddio) {
++		ret = regulator_enable(qca_one->common->vddio);
++		if (ret)
++			return ret;
 +	}
 +
-+	mutex_unlock(&pwrseq_fallback_mutex);
++	ret = regulator_bulk_enable(qca_one->common->num_vregs, qca_one->common->vregs);
++	if (ret)
++		goto err_bulk;
 +
-+	if (!IS_ERR_OR_NULL(pwrseq))
-+		dev_warn(dev, "legacy pwrseq support used for the device\n");
++	ret = clk_prepare_enable(qca_one->common->susclk);
++	if (ret)
++		goto err_clk;
 +
-+	return pwrseq;
++	if (qca_one->enable) {
++		gpiod_set_value_cansleep(qca_one->enable, 1);
++		msleep(150);
++	}
++
++	if (qca_one->common->sw_ctrl) {
++		bool sw_ctrl_state = gpiod_get_value_cansleep(qca_one->common->sw_ctrl);
++		dev_dbg(&pwrseq->dev, "SW_CTRL is %d", sw_ctrl_state);
++	}
++
++	return 0;
++
++err_clk:
++	regulator_bulk_disable(qca_one->common->num_vregs, qca_one->common->vregs);
++err_bulk:
++	regulator_disable(qca_one->common->vddio);
++
++	return ret;
 +}
-diff --git a/include/linux/pwrseq/fallback.h b/include/linux/pwrseq/fallback.h
-new file mode 100644
-index 000000000000..14f9aa527692
---- /dev/null
-+++ b/include/linux/pwrseq/fallback.h
-@@ -0,0 +1,60 @@
-+/* SPDX-License-Identifier: GPL-2.0-or-later */
-+/*
-+ * Copyright (c) 2021 Linaro Ltd.
-+ */
 +
-+#ifndef __LINUX_PWRSEQ_FALLBACK_H__
-+#define __LINUX_PWRSEQ_FALLBACK_H__
++static void pwrseq_qca_power_off(struct pwrseq *pwrseq)
++{
++	struct pwrseq_qca_one *qca_one = pwrseq_get_drvdata(pwrseq);
 +
-+#include <linux/list.h>
++	if (qca_one->enable) {
++		gpiod_set_value_cansleep(qca_one->enable, 0);
++		msleep(50);
++	}
 +
-+struct pwrseq;
++	clk_disable_unprepare(qca_one->common->susclk);
 +
-+struct device;
-+struct module;
-+struct of_device_id;
++	regulator_bulk_disable(qca_one->common->num_vregs, qca_one->common->vregs);
++	regulator_disable(qca_one->common->vddio);
 +
-+/**
-+ * struct pwrseq_fallback - structure providing fallback data/
-+ * @list: a list node for the fallback handlers
-+ * @owner: module containing fallback callback
-+ * @of_match_table: match table for this fallback
-+ *
-+ * Pwrseq fallback is a mechanism for handling backwards compatibility in the
-+ * case device tree was not updated to use proper pwrseq providers.
-+ *
-+ * In case the pwrseq instance is not registered, core will automatically try
-+ * locating and calling fallback getter. If the requesting device matches
-+ * against @of_match_table, the @get callback will be called to retrieve pwrseq
-+ * instance.
-+ *
-+ * The driver should fill of_match_table and @get fields only. @list and @owner
-+ * will be filled by the core code.
-+ */
-+struct pwrseq_fallback {
-+	struct list_head list;
-+	struct module *owner;
++	if (qca_one->common->sw_ctrl) {
++		bool sw_ctrl_state = gpiod_get_value_cansleep(qca_one->common->sw_ctrl);
++		dev_dbg(&pwrseq->dev, "SW_CTRL is %d", sw_ctrl_state);
++	}
++}
 +
-+	const struct of_device_id *of_match_table;
-+
-+	struct pwrseq *(*get)(struct device *dev, const char *id);
++static const struct pwrseq_ops pwrseq_qca_ops = {
++	.pre_power_on = pwrseq_qca_pre_power_on,
++	.power_on = pwrseq_qca_power_on,
++	.power_off = pwrseq_qca_power_off,
 +};
 +
-+/* provider interface */
++static int pwrseq_qca_common_init(struct device *dev, struct pwrseq_qca_common *qca_common,
++		const struct qca_device_data *data)
++{
++	int ret, i;
 +
-+int __pwrseq_fallback_register(struct pwrseq_fallback *fallback, struct module *owner);
++	if (data->vddio.name) {
++		qca_common->vddio = devm_regulator_get(dev, data->vddio.name);
++		if (IS_ERR(qca_common->vddio))
++			return PTR_ERR(qca_common->vddio);
 +
-+/**
-+ * pwrseq_fallback_register() - register fallback helper
-+ * @fallback - struct pwrseq_fallback to be registered
-+ *
-+ * Register pwrseq fallback handler to assist pwrseq core.
-+ */
-+#define pwrseq_fallback_register(fallback) __pwrseq_fallback_register(fallback, THIS_MODULE)
++		ret = regulator_set_load(qca_common->vddio, data->vddio.load_uA);
++		if (ret)
++			return ret;
++	}
 +
-+void pwrseq_fallback_unregister(struct pwrseq_fallback *fallback);
++	qca_common->num_vregs = data->num_vregs;
 +
-+/* internal interface to be used by pwrseq core */
-+struct pwrseq *pwrseq_fallback_get(struct device *dev, const char *id);
++	for (i = 0; i < qca_common->num_vregs; i++)
++		qca_common->vregs[i].supply = data->vregs[i].name;
 +
-+#endif /* __LINUX_PWRSEQ_DRIVER_H__ */
++	ret = devm_regulator_bulk_get(dev, qca_common->num_vregs, qca_common->vregs);
++	if (ret)
++		return ret;
++
++	for (i = 0; i < qca_common->num_vregs; i++) {
++		if (!data->vregs[i].load_uA)
++			continue;
++
++		ret = regulator_set_load(qca_common->vregs[i].consumer, data->vregs[i].load_uA);
++		if (ret)
++			return ret;
++	}
++
++	qca_common->susclk = devm_clk_get_optional(dev, NULL);
++	if (IS_ERR(qca_common->susclk)) {
++		dev_err(dev, "failed to acquire clk\n");
++		return PTR_ERR(qca_common->susclk);
++	}
++
++	qca_common->sw_ctrl = devm_gpiod_get_optional(dev, "swctrl", GPIOD_IN);
++	if (IS_ERR(qca_common->sw_ctrl)) {
++		return dev_err_probe(dev, PTR_ERR(qca_common->sw_ctrl),
++				"failed to acquire SW_CTRL gpio\n");
++	} else if (!qca_common->sw_ctrl)
++		dev_info(dev, "No SW_CTRL gpio\n");
++
++	return 0;
++}
++
++static void pwrseq_qca_unprepare_susclk(void *data)
++{
++	struct pwrseq_qca_common *qca_common = data;
++
++	clk_disable_unprepare(qca_common->susclk);
++}
++
++static const struct qca_device_data qca_soc_data_default = {
++	.num_vregs = 0,
++	.has_enable_gpios = true,
++};
++
++static int pwrseq_qca_probe(struct platform_device *pdev)
++{
++	struct pwrseq_qca *pwrseq_qca;
++	struct pwrseq *pwrseq;
++	struct pwrseq_provider *provider;
++	struct device *dev = &pdev->dev;
++	struct pwrseq_onecell_data *onecell;
++	const struct qca_device_data *data;
++	int ret, i;
++
++	data = device_get_match_data(dev);
++	if (!data)
++		data = &qca_soc_data_default;
++
++	pwrseq_qca = devm_kzalloc(dev, struct_size(pwrseq_qca, common.vregs, data->num_vregs), GFP_KERNEL);
++	if (!pwrseq_qca)
++		return -ENOMEM;
++
++	onecell = devm_kzalloc(dev, struct_size(onecell, pwrseqs, PWRSEQ_QCA_MAX), GFP_KERNEL);
++	if (!onecell)
++		return -ENOMEM;
++
++	ret = pwrseq_qca_common_init(dev, &pwrseq_qca->common, data);
++	if (ret)
++		return ret;
++
++	if (data->has_enable_gpios) {
++		struct gpio_desc *gpiod;
++
++		gpiod = devm_gpiod_get_optional(dev, "wifi-enable", GPIOD_OUT_LOW);
++		if (IS_ERR(gpiod))
++			return dev_err_probe(dev, PTR_ERR(gpiod), "failed to acquire WIFI enable GPIO\n");
++		else if (!gpiod)
++			dev_warn(dev, "No WiFi enable GPIO declared\n");
++
++		pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_WIFI].enable = gpiod;
++
++		gpiod = devm_gpiod_get_optional(dev, "bt-enable", GPIOD_OUT_LOW);
++		if (IS_ERR(gpiod))
++			return dev_err_probe(dev, PTR_ERR(gpiod), "failed to acquire BT enable GPIO\n");
++		else if (!gpiod)
++			dev_warn(dev, "No BT enable GPIO declared\n");
++
++		pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_BT].enable = gpiod;
++	}
++
++	/* If we have no control over device's enablement, make sure that sleep clock is always running */
++	if (!pwrseq_qca->common.vddio ||
++	    !pwrseq_qca->common.num_vregs ||
++	    !(pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_BT].enable &&
++	      pwrseq_qca->pwrseq_qcas[PWRSEQ_QCA_WIFI].enable)) {
++		ret = clk_set_rate(pwrseq_qca->common.susclk, SUSCLK_RATE_32KHZ);
++		if (ret)
++			return ret;
++
++		ret = clk_prepare_enable(pwrseq_qca->common.susclk);
++		if (ret)
++			return ret;
++
++		ret = devm_add_action_or_reset(dev, pwrseq_qca_unprepare_susclk, &pwrseq_qca->common);
++		if (ret)
++			return ret;
++	}
++
++	for (i = 0; i < PWRSEQ_QCA_MAX; i++) {
++		pwrseq_qca->pwrseq_qcas[i].common = &pwrseq_qca->common;
++
++		pwrseq = devm_pwrseq_create(dev, &pwrseq_qca_ops);
++		if (IS_ERR(pwrseq))
++			return PTR_ERR(pwrseq);
++
++		pwrseq_set_drvdata(pwrseq, &pwrseq_qca->pwrseq_qcas[i]);
++
++		onecell->pwrseqs[i] = pwrseq;
++	}
++
++	onecell->num = PWRSEQ_QCA_MAX;
++
++	provider = devm_of_pwrseq_provider_register(dev, of_pwrseq_xlate_onecell, onecell);
++
++	return PTR_ERR_OR_ZERO(provider);
++}
++
++static const struct qca_device_data qca_soc_data_qca6390 = {
++	.vddio = { "vddio", 20000 },
++	.vregs = {
++		/* 2.0 V */
++		{ "vddpcie2", 15000 },
++		{ "vddrfa3", 400000 },
++
++		/* 0.95 V */
++		{ "vddaon", 100000 },
++		{ "vddpmu", 1250000 },
++		{ "vddrfa1", 200000 },
++
++		/* 1.35 V */
++		{ "vddrfa2", 400000 },
++		{ "vddpcie1", 35000 },
++	},
++	.num_vregs = 7,
++	.has_enable_gpios = true,
++};
++
++/* Shared between wcn3990 and wcn3991 */
++static const struct qca_device_data qca_soc_data_wcn3990 = {
++	.vddio = { "vddio", 15000 },
++	.vregs = {
++		{ "vddxo", 80000  },
++		{ "vddrf", 300000 },
++		{ "vddch0", 450000 },
++		{ "vddch1", 450000 },
++	},
++	.num_vregs = 4,
++};
++
++static const struct qca_device_data qca_soc_data_wcn3998 = {
++	.vddio = { "vddio", 10000 },
++	.vregs = {
++		{ "vddxo", 80000  },
++		{ "vddrf", 300000 },
++		{ "vddch0", 450000 },
++		{ "vddch1", 450000 },
++	},
++	.num_vregs = 4,
++};
++
++static const struct qca_device_data qca_soc_data_wcn6750 = {
++	.vddio = { "vddio", 5000 },
++	.vregs = {
++		{ "vddaon", 26000 },
++		{ "vddbtcxmx", 126000 },
++		{ "vddrfacmn", 12500 },
++		{ "vddrfa0p8", 102000 },
++		{ "vddrfa1p7", 302000 },
++		{ "vddrfa1p2", 257000 },
++		{ "vddrfa2p2", 1700000 },
++		{ "vddasd", 200 },
++	},
++	.num_vregs = 8,
++	.has_enable_gpios = true,
++};
++
++static const struct of_device_id pwrseq_qca_of_match[] = {
++	{ .compatible = "qcom,qca6174-pwrseq", },
++	{ .compatible = "qcom,qca6390-pwrseq", .data = &qca_soc_data_qca6390 },
++	{ .compatible = "qcom,qca9377-pwrseq" },
++	{ .compatible = "qcom,wcn3990-pwrseq", .data = &qca_soc_data_wcn3990 },
++	{ .compatible = "qcom,wcn3991-pwrseq", .data = &qca_soc_data_wcn3990 },
++	{ .compatible = "qcom,wcn3998-pwrseq", .data = &qca_soc_data_wcn3998 },
++	{ .compatible = "qcom,wcn6750-pwrseq", .data = &qca_soc_data_wcn6750 },
++	{ /* sentinel */ },
++};
++MODULE_DEVICE_TABLE(of, pwrseq_qca_of_match);
++
++static struct platform_driver pwrseq_qca_driver = {
++	.probe = pwrseq_qca_probe,
++	.driver = {
++		.name = "pwrseq_qca",
++		.of_match_table = pwrseq_qca_of_match,
++	},
++};
++
++module_platform_driver(pwrseq_qca_driver);
++MODULE_LICENSE("GPL v2");
 -- 
 2.33.0
 
