@@ -2,141 +2,144 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0DFA8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 00:51:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6E2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CB0B76120F
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 00:51:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7D7CA60FD8
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236953AbhJFAxA (ORCPT
+        id S233994AbhJFBLb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 20:53:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49030 "EHLO
+        Tue, 5 Oct 2021 21:11:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53154 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbhJFAw7 (ORCPT
+        with ESMTP id S230218AbhJFBLb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 20:52:59 -0400
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE773C061749
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 17:51:07 -0700 (PDT)
-Received: by mail-pj1-x1035.google.com with SMTP id pi19-20020a17090b1e5300b0019fdd3557d3so977955pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 17:51:07 -0700 (PDT)
+        Tue, 5 Oct 2021 21:11:31 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46213C061749
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 18:09:40 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id oa4so223333pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 18:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=0AJNHjUwYYwrWBM5+4BiDPzTx25ECd3t4lmtori7faY=;
-        b=A2hjdPbm0unNe66NDzxpHJGGX/UXhd4EeOPSKGfTLIpmmlLxoF+iCw6Pjv6iBMpf+K
-         XPxpu9opP+n0hNQCM6pfY0GVrF/7AF2TOInpSFUhJGQSpWViYYicksWeaQ4YMnIdE+ws
-         RB8FxQm5RuNHmpl/eP+EZ+ZB3SaB6dMDImWoVRUg33Q7wjgc8crEkNPtLSZGOM0Z63++
-         7MD2sjNDPEIqAHM8csY1dkhDC1B1GS6sbXUrY8VtaePTnzosUSmXTewMbsRHFixuLzf8
-         WjE43eTc/LGB4GLF3/jSVDmAhPZGfvUt2bGRDEx2mrRk5WPOJo2g+gst6xn3Fld58DU9
-         BGAA==
+        bh=JImQxPscmbjSSk43SXCJ7gIjxsRo4McgRKHqq5eurAw=;
+        b=VAmSTECzUJTWa4qCjrb/nTcQ34L/OGjmESVCXksW5YCRcL20YmaLj+03sQ3qjJcreu
+         cme2BNzPlwNWti3AjrhXO4FF/7eC/iqGwMObM4WER+zG8pIfgJ5Q8KxIswlz5zfNmm2U
+         TOmT8/p/bR/nsUn0eSyDggQbGmT+7igmS8oFlmBAPpBPQh2uiO0F/s/0MtYtxjgYWgEw
+         Wqup9l1qWcSdK2IinImhUtL7zt+qS7zPGa4tYOHjlJFAThOv2uPdmYtB5A5v5F/tuekv
+         mSeuEJWzsGzqVWWab6UE8MlMI5kDPE3Qu9UNLZfjc6uwbfzJrfnjz4sRV+L2tZ2wcyRv
+         f72g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=0AJNHjUwYYwrWBM5+4BiDPzTx25ECd3t4lmtori7faY=;
-        b=SPdLHIAQyGiCFTvLs3yKvy1+CAmujw11obK1Sgj/FSwgV3E/0xJNLVUgYWvWt/EF6T
-         RtS700VRwD2/waT1WguRg064EsDVMdQX6ai4pjq/HOBb4oh32GhLvuwxJkLowWN1P3In
-         RVXUD6wsQbmqrW0XtRo654IRDjvJjp0dTdI+c0OsG1fFUvGT5+yVun3f1Ux3vBfF0tP/
-         RwtPMEFKqKSIFdEurwG0mwSaVugVXD+NMpD9cOhUw678hhjcJ8G1NEIJLNWzIFb11jgQ
-         Jbht8Hqev/lv5CSssEmncDrLbJ6Jx7paUUccvAszc8EdtkJXwlQ3xSaOATDJ7XxSb0/g
-         2iKA==
-X-Gm-Message-State: AOAM533fjEKcuhgxyBofpq6VLgj6SZrvNSpYEstXYD5hLzD+y2MdTA7i
-        b/887Dq1E4MDeF177+hZDbFYO4x5ChE8BA==
-X-Google-Smtp-Source: ABdhPJzmRUrFb4nz5n8O90Ir8i612QuaQp8EfdZ0vrCx6Fy4YxVfvgBmY1vPYT6g+T4TWhTv/t77KQ==
-X-Received: by 2002:a17:90b:388a:: with SMTP id mu10mr7496818pjb.0.1633481467054;
-        Tue, 05 Oct 2021 17:51:07 -0700 (PDT)
-Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:b80e:8aa2:35bc:9d60])
-        by smtp.gmail.com with ESMTPSA id j9sm8062842pgn.68.2021.10.05.17.51.06
+        bh=JImQxPscmbjSSk43SXCJ7gIjxsRo4McgRKHqq5eurAw=;
+        b=ytui3y/KH12BunnKRDjmXxXiCFvkn6xNZWehQWg65uv+IpX2WifREOOLPNoxazGKtB
+         Ai9DvhY3n7if+N/WnC7tc68Eltt+O0K3OCbnTWHhr+9dK8IA52SxfG5mQ4yVaniKf0SD
+         xm+uLU/ygpVakSWRvGVGflLYj7n/hWduHbflUQDW8BH6thkXjDjaPXLGyFl0tJmn8aUK
+         98VkU4tIGPxpH3h1XhGowCULiktaSxiaPscErRk9Ki8pTg8mebkG7oKDUBK7QX6dZpti
+         Vr6Jx4bXJ3PDedbLlWvvqmdQT03E/1ERg2DbDj8gIC9v9KxjfRZBZ1lg6w7g77zIzGC5
+         9vLA==
+X-Gm-Message-State: AOAM5311/m2iwit1l16TQC1XDxrdbgMYmqLMVhglA4Kt3+Vd3N2rFlZ1
+        UEGkvufdI4Br2Sk4A+0JR9vSkQz8AvA=
+X-Google-Smtp-Source: ABdhPJx7z2nPb18FL+TEnncoyzwo7erOxF6iM2rMprS+0H21YFFA4nSstKIVg1m5FTlLFNYhrcQ4DA==
+X-Received: by 2002:a17:903:124f:b0:13e:25e6:f733 with SMTP id u15-20020a170903124f00b0013e25e6f733mr8113091plh.42.1633482579396;
+        Tue, 05 Oct 2021 18:09:39 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id nr14sm3158988pjb.24.2021.10.05.18.09.38
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 17:51:06 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+        Tue, 05 Oct 2021 18:09:38 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH] Bluetooth: mgmt: Fix Experimental Feature Changed event
-Date:   Tue,  5 Oct 2021 17:51:04 -0700
-Message-Id: <20211006005104.98564-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
+Subject: [PATCH 1/3] Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
+Date:   Tue,  5 Oct 2021 18:09:33 -0700
+Message-Id: <20211006010935.902645-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This patch fixes the controller index in the Experimental Features
-Changed event for the offload_codec and the quality_report features to
-use the actual hdev index instead of non-controller index(0xffff) so the
-client can receive the event and know which controller the event is for.
+Defer calls to hci_{suspend,resume}_dev to work so it doesn't block the
+processing of the events.
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/mgmt.c | 15 +++++++++------
- 1 file changed, 9 insertions(+), 6 deletions(-)
+ drivers/bluetooth/hci_vhci.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 3e5283607b97..44683443300c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3927,7 +3927,9 @@ static int exp_debug_feature_changed(bool enabled, struct sock *skip)
- }
- #endif
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 5fd91106e853..56c6b22be10b 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -38,6 +38,7 @@ struct vhci_data {
  
--static int exp_quality_report_feature_changed(bool enabled, struct sock *skip)
-+static int exp_quality_report_feature_changed(bool enabled,
-+					      struct hci_dev *hdev,
-+					      struct sock *skip)
- {
- 	struct mgmt_ev_exp_feature_changed ev;
+ 	struct mutex open_mutex;
+ 	struct delayed_work open_timeout;
++	struct work_struct suspend_work;
  
-@@ -3935,7 +3937,7 @@ static int exp_quality_report_feature_changed(bool enabled, struct sock *skip)
- 	memcpy(ev.uuid, quality_report_uuid, 16);
- 	ev.flags = cpu_to_le32(enabled ? BIT(0) : 0);
- 
--	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, NULL,
-+	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
- 				  &ev, sizeof(ev),
- 				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
- }
-@@ -4156,14 +4158,15 @@ static int set_quality_report_func(struct sock *sk, struct hci_dev *hdev,
- 				&rp, sizeof(rp));
- 
- 	if (changed)
--		exp_quality_report_feature_changed(val, sk);
-+		exp_quality_report_feature_changed(val, hdev, sk);
- 
- unlock_quality_report:
- 	hci_req_sync_unlock(hdev);
- 	return err;
+ 	bool suspended;
+ 	bool wakeup;
+@@ -114,6 +115,17 @@ static ssize_t force_suspend_read(struct file *file, char __user *user_buf,
+ 	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
  }
  
--static int exp_offload_codec_feature_changed(bool enabled, struct sock *skip)
-+static int exp_offload_codec_feature_changed(bool enabled, struct hci_dev *hdev,
-+					     struct sock *skip)
- {
- 	struct mgmt_ev_exp_feature_changed ev;
++static void vhci_suspend_work(struct work_struct *work)
++{
++	struct vhci_data *data = container_of(work, struct vhci_data,
++					      suspend_work);
++
++	if (data->suspended)
++		hci_suspend_dev(data->hdev);
++	else
++		hci_resume_dev(data->hdev);
++}
++
+ static ssize_t force_suspend_write(struct file *file,
+ 				   const char __user *user_buf,
+ 				   size_t count, loff_t *ppos)
+@@ -129,16 +141,10 @@ static ssize_t force_suspend_write(struct file *file,
+ 	if (data->suspended == enable)
+ 		return -EALREADY;
  
-@@ -4171,7 +4174,7 @@ static int exp_offload_codec_feature_changed(bool enabled, struct sock *skip)
- 	memcpy(ev.uuid, offload_codecs_uuid, 16);
- 	ev.flags = cpu_to_le32(enabled ? BIT(0) : 0);
+-	if (enable)
+-		err = hci_suspend_dev(data->hdev);
+-	else
+-		err = hci_resume_dev(data->hdev);
+-
+-	if (err)
+-		return err;
+-
+ 	data->suspended = enable;
  
--	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, NULL,
-+	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
- 				  &ev, sizeof(ev),
- 				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
++	schedule_work(&data->suspend_work);
++
+ 	return count;
  }
-@@ -4229,7 +4232,7 @@ static int set_offload_codec_func(struct sock *sk, struct hci_dev *hdev,
- 				&rp, sizeof(rp));
  
- 	if (changed)
--		exp_offload_codec_feature_changed(val, sk);
-+		exp_offload_codec_feature_changed(val, hdev, sk);
+@@ -442,6 +448,7 @@ static int vhci_open(struct inode *inode, struct file *file)
  
- 	return err;
- }
+ 	mutex_init(&data->open_mutex);
+ 	INIT_DELAYED_WORK(&data->open_timeout, vhci_open_timeout);
++	INIT_WORK(&data->suspend_work, vhci_suspend_work);
+ 
+ 	file->private_data = data;
+ 	nonseekable_open(inode, file);
+@@ -457,6 +464,7 @@ static int vhci_release(struct inode *inode, struct file *file)
+ 	struct hci_dev *hdev;
+ 
+ 	cancel_delayed_work_sync(&data->open_timeout);
++	flush_work(&data->suspend_work);
+ 
+ 	hdev = data->hdev;
+ 
 -- 
-2.25.1
+2.31.1
 
