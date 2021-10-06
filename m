@@ -2,100 +2,134 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6893EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:57:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AF8DEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 04:14:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 500A1611AE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:57:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B4E861248
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 04:14:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237454AbhJFD7A (ORCPT
+        id S229715AbhJFEQO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 23:59:00 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32970 "EHLO
+        Wed, 6 Oct 2021 00:16:14 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37404 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237448AbhJFD5v (ORCPT
+        with ESMTP id S229554AbhJFEQN (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 23:57:51 -0400
-Received: from mail-lf1-x132.google.com (mail-lf1-x132.google.com [IPv6:2a00:1450:4864:20::132])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0487C0613AF
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:54:26 -0700 (PDT)
-Received: by mail-lf1-x132.google.com with SMTP id i4so4606214lfv.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:54:26 -0700 (PDT)
+        Wed, 6 Oct 2021 00:16:13 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C19AC061749
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 21:14:22 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id r2so1271540pgl.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 21:14:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=DZOpdA3eYjpudg4OpQFFkH8jLHw3BxsNdxzTMff7kgw=;
-        b=Vqowca4UgiaC+fBXqBcu/uY1PBquzcLUSNLvI4m85X7UrokO3SMSU2VjgjwlLvMQmh
-         qsx0PVYwuS97nctSczbW0/EPVJ0QBpI8npXxHwrFMaNxAVtaIlRSrtfDr/01lMkJFIzk
-         NeLaREUo2x9NAHKctYTeKFJdcbLKG3DGrW4TE6vnxKsvxVRzGpwnzWZPAhbV6qTOP1TZ
-         8albRcafCq9VIoNGF5i1EtEgCzTR7YeJxiTMPsw8rZxBFCSGpBQwXD+jrBjbyyQnVjnb
-         ujZ8iI+IoHoh/d/5ZhPx+FNiAsGnS4MzGWDOWNQ3qbBfyZhavzipupkGO+MkveylWsCR
-         B8HA==
+        d=gmail.com; s=20210112;
+        h=message-id:subject:from:to:cc:date:in-reply-to:references
+         :user-agent:mime-version:content-transfer-encoding;
+        bh=QB2g/LuMmgWE230SknQt7sQYcYCMaAAhRhHqYKtCFLs=;
+        b=ebURxrGOyrs7k3Uh4syCI8IySCnLNiFosbxdPxi4w0bawR8bxR1cy9nmLO9tfJcCcX
+         9VvVGJFnOQ1hQRYBPjG6ZWu0PzZ87a+9/0O/jxMIREq/QgFZKi3KI3lpbLo07fK6oVoX
+         tFoMXP/MzstqrOdcunQmaog7DTENQuCxwnPTvsanBR9G2OqPqccAH0WGI3/DJQp6EdRz
+         gTPuYkQbPv52GAZhLfG20KTpn+CgcGdLLWRFFDMk3hFbrE6msWYNPNPp7J8TQmyAr5pR
+         ws+kmAUakYmzNjMxw5jxkB8MFAbMh9z65BMJJ6q+DK5H0dl2filaCg6tZiBi0KGVVpKH
+         x21g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=DZOpdA3eYjpudg4OpQFFkH8jLHw3BxsNdxzTMff7kgw=;
-        b=5jHf5125BNvY+E32iaBEbbZuouQPT3EzGyT0f/qd78HHs+4Owvmlsd7XU3SU0NObpU
-         4rGj+YFe/0nWr185nLMlsQIgf0fhzJgRVKwltC9OdHzLEFsNOD5a5YHn6I97JYKt7xxV
-         XUtJG5IR4DASBeTI3TGSYUj/l4ccgQkOsuHyPknVNfLcMzFP3HFkTRrQq1bWWy9gBzEM
-         43pMAy3njhUtoDxuIr86+enJukUgnJ73kQpzoXWXtbjp+b/W1lEZWhCryr7N7r0L5JB2
-         ZzjetNNd34vUEQ0ioCZ1IvBGpBoiyy3H2jHm+gII/SC7fR6JTfvxBGuI4vZAdK56incY
-         BqOA==
-X-Gm-Message-State: AOAM5334levZS0bj2xQDVJ3JeEVSe2rDdLr16bhcaPkSmLJ9G6vbJ5Ks
-        +MU/HR43aDxd+UZ1MqX0h/EaOQ==
-X-Google-Smtp-Source: ABdhPJzAuciR0Bs89UsVK2ICmqc78PA7gPD8wfVqylDag0DqJdI3Y1HguWHKaOEbTu8SD0HZCDgojQ==
-X-Received: by 2002:a2e:480a:: with SMTP id v10mr25910067lja.268.1633492465108;
-        Tue, 05 Oct 2021 20:54:25 -0700 (PDT)
-Received: from eriador.lan ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id s4sm2142967lfd.103.2021.10.05.20.54.24
+        h=x-gm-message-state:message-id:subject:from:to:cc:date:in-reply-to
+         :references:user-agent:mime-version:content-transfer-encoding;
+        bh=QB2g/LuMmgWE230SknQt7sQYcYCMaAAhRhHqYKtCFLs=;
+        b=K15S09Wa7fcT+GLE2x/ON4aWFgzY3kcylktzSD1CkLWV9Bmd8I79yDstqz6abWzg/y
+         c28mD3NBWVWBCdhYYZXNo8WxgaUaKeMKznKZPOVwiM9rGaX7udl8j+BbMvXJDid7lARY
+         948XsdgTSZyb+xFqg6/apdh7139eFK5+dvUGgXRqgEw9Vl+RjLfnFFYu0cqU7Qt8Rkuk
+         TH2Qi41xKcRRFhTtRjVYN39sJr5Kj/bkhjWa9lVg39tzE62ndvHRdrXLw+PptMyUgowZ
+         qs2xAAuWepoitistSfYHKCucWgnbPoYIjIYJ0GyXXQgD/TdepJMOJyxkObDoSd/uvgrW
+         cyTA==
+X-Gm-Message-State: AOAM5308Gn/pKlsRXGQMdJqFzjYq3UCTDyiujQGIP3Zt4Tdb7TmJXNTS
+        XSJtBfKqS+HjFB4PK5r2oF8gdEnfu+aUKQ==
+X-Google-Smtp-Source: ABdhPJzcVYmxtYOouqMtUX/HsoBpWGunTpX3IC42L1UHNJQmnjVf1xyDgPG02qA55HeORDjBBMD5QQ==
+X-Received: by 2002:a63:b341:: with SMTP id x1mr18931774pgt.69.1633493661504;
+        Tue, 05 Oct 2021 21:14:21 -0700 (PDT)
+Received: from han1-NUC8i7BEH ([2601:1c0:6a01:d830:8e4c:2d64:6206:9120])
+        by smtp.gmail.com with ESMTPSA id q14sm3386954pjm.17.2021.10.05.21.14.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 20:54:24 -0700 (PDT)
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-To:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>
-Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH v1 15/15] WIP: arm64: dts: qcom: qrb5165-rb5: add bus-pwrseq property to pcie0
-Date:   Wed,  6 Oct 2021 06:54:07 +0300
-Message-Id: <20211006035407.1147909-16-dmitry.baryshkov@linaro.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
-References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
+        Tue, 05 Oct 2021 21:14:21 -0700 (PDT)
+Message-ID: <cbe1d2ae745ae380d2819877bb07e5cc8ba56c44.camel@gmail.com>
+Subject: Re: [PATCH v1] Bluetooth: btintel: Fix bdaddress comparison with
+ garbage value
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     Kiran K <kiran.k@intel.com>, linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        tedd.an@intel.com
+Date:   Tue, 05 Oct 2021 21:14:20 -0700
+In-Reply-To: <20211005042613.9946-1-kiran.k@intel.com>
+References: <20211005042613.9946-1-kiran.k@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.36.5-0ubuntu1 
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
----
- arch/arm64/boot/dts/qcom/qrb5165-rb5.dts | 1 +
- 1 file changed, 1 insertion(+)
+On Tue, 2021-10-05 at 09:56 +0530, Kiran K wrote:
+> Intel Read Verision(TLV) data is parsed into a local structure
+> variable
+> and it contains a field for bd address. Bd address is returned only
+> in
+> bootloader mode and hence bd address in TLV structure needs to be
+> validated
+> only if controller is present in boot loader mode.
+> 
 
-diff --git a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts b/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
-index 326330f528fc..0c347cb6f8e0 100644
---- a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
-+++ b/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
-@@ -689,6 +689,7 @@ wifi-therm@1 {
- 
- &pcie0 {
- 	status = "okay";
-+	bus-pwrseq = <&qca_pwrseq 0>;
- };
- 
- &pcie0_phy {
--- 
-2.33.0
+Reviewed-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+
+> Signed-off-by: Kiran K <kiran.k@intel.com>
+> ---
+>  drivers/bluetooth/btintel.c | 19 +++++++++++--------
+>  1 file changed, 11 insertions(+), 8 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btintel.c
+> b/drivers/bluetooth/btintel.c
+> index 9359bff47296..d1703cc99705 100644
+> --- a/drivers/bluetooth/btintel.c
+> +++ b/drivers/bluetooth/btintel.c
+> @@ -2081,14 +2081,16 @@ static int
+> btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+>  	if (ver->img_type == 0x03) {
+>  		btintel_clear_flag(hdev, INTEL_BOOTLOADER);
+>  		btintel_check_bdaddr(hdev);
+> -	}
+> -
+> -	/* If the OTP has no valid Bluetooth device address, then there
+> will
+> -	 * also be no valid address for the operational firmware.
+> -	 */
+> -	if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+> -		bt_dev_info(hdev, "No device address configured");
+> -		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +	} else {
+> +		/*
+> +		 * Check for valid bd address in boot loader mode.
+> Device
+> +		 * will be marked as unconfigured if empty bd address
+> is
+> +		 * found.
+> +		 */
+> +		if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+> +			bt_dev_info(hdev, "No device address
+> configured");
+> +			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev-
+> >quirks);
+> +		}
+>  	}
+>  
+>  	btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
+> @@ -2466,6 +2468,7 @@ static int btintel_setup_combined(struct
+> hci_dev *hdev)
+>  		goto exit_error;
+>  	}
+>  
+> +	memset(&ver_tlv, 0, sizeof(ver_tlv));
+>  	/* For TLV type device, parse the tlv data */
+>  	err = btintel_parse_version_tlv(hdev, &ver_tlv, skb);
+>  	if (err) {
 
