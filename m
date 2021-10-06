@@ -2,56 +2,56 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 243A0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:55:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2832AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:55:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0CA3161248
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 11C3F611C1
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:55:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237583AbhJFD52 (ORCPT
+        id S237979AbhJFD5g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 23:57:28 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32934 "EHLO
+        Tue, 5 Oct 2021 23:57:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32976 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232934AbhJFD4F (ORCPT
+        with ESMTP id S237595AbhJFD4b (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 23:56:05 -0400
-Received: from mail-lf1-x130.google.com (mail-lf1-x130.google.com [IPv6:2a00:1450:4864:20::130])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6A3C061753
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:54:13 -0700 (PDT)
-Received: by mail-lf1-x130.google.com with SMTP id x27so4495658lfa.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:54:13 -0700 (PDT)
+        Tue, 5 Oct 2021 23:56:31 -0400
+Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35A22C0617B0
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:54:24 -0700 (PDT)
+Received: by mail-lf1-x134.google.com with SMTP id x27so4497012lfa.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:54:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=linaro.org; s=google;
         h=from:to:cc:subject:date:message-id:in-reply-to:references
          :mime-version:content-transfer-encoding;
-        bh=0QbCWpC0YUHd4oM8ALhGkUXV2GRwREBEvhvGaNVxQyo=;
-        b=he2kT439AhNtxiuqDLrNaZpNYt38+4H16zAkk/pYeKvytO6jQI9YrfDulq+/ku2ae6
-         QcjskLIWgJBzMoIQi0R91D2cctBB27lEMBdcuYBNl1HRLoyuq5WQRO/M8fZI0e/eaEWd
-         sINOv6L6kKh0sh5q3Gj4F1V2jcH1vNu7KSKbOJFm7UG2hdj6vvWkvE73ie0jGA+nIM0Y
-         t6Z1V4bddNVkkWhw8u7pOiI2jhSPajejhaCgdcxmdmpZkHfz35vCMKx36LYu5awMpEY2
-         nVj9Hb4/4m9nCEHG9DRzBH3FEma/IlB2fgdRMh3xMWOJE1+ti3mLeKUTppV80/OiPgZ5
-         eS1w==
+        bh=fc0GoKyWHbaDUKZRwzSCHWvKPWvkUL1O7EIfFaZFJjw=;
+        b=ek+UBm52N/dNF84c5mtTjMTJvJ5oGZ0lbXTAAjAyV1XvQDUOFH0l/tTMhfVzJAVy1s
+         5A9IIqqQjiddD6Xxi2TTAaGdSgVqpk0Rmqtk98pIDkXppBKhslgFJvZPuN4VYjg8Kh/k
+         NvN7a6TOOxfaYoA9A7SJwXWmEtuPXBVt4gb8badGbZhlGOA620Gyxh4R+YbZd6q49MOv
+         2Qi1wfxZ+XCc8YcurEshmk0YU/rcgY4765nt9Wx5F406K53k2YpQJYrDUJTkWqNBikGf
+         xKtKknzKdnRkKPLuVnIzXFOf+W03r/taVjHXCFr1DlAWSxc5MKil96Ym1SLsZZZJqpo+
+         ufLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=0QbCWpC0YUHd4oM8ALhGkUXV2GRwREBEvhvGaNVxQyo=;
-        b=SI6Q6JDBzXirXkButykdA8Z3nEfsTSZkfP3ElRFeT7WCKZ1S0ZlLnOFa6wQAqA14e8
-         ZRealFvORd3vM9027QJtUkGobRaeQFYkILh9vW6QD4/sI0gwKJ82op5gRDoX0MykE5+b
-         LjwNw0BjU6/JrP7Zcf6X45nYxllpVYesDyBbImAZ9GOER5sXfF/HVpFQb0rEO93/tWnn
-         lItZZxrr7EZiq0sDxzzJ2sZsr8MN9wzN13l+g0LixOhevrk+E7tAbY92dmhf2eWDJsa+
-         Y87v6cP82WGU7dI+zjxfbz8TtTQgq9s9qntxZ85tYFQ3PSsgaQmpOzXAOvfzr/MJYRSY
-         ZDzg==
-X-Gm-Message-State: AOAM531KVJKBaAc+goxvCnAxLSFNbf/EABttP9MXy0OnonNx/XZuUzgQ
-        lVAstsn82FWyFbLfYRzJZD4wwQ==
-X-Google-Smtp-Source: ABdhPJzUyTSbGQqEZmbXX4rYk8Wj34+52wMw1vr6OKUpbP6w62OKwylW2IUSus9+fPfMVxbFfNEITg==
-X-Received: by 2002:a2e:550:: with SMTP id 77mr27560874ljf.478.1633492452244;
-        Tue, 05 Oct 2021 20:54:12 -0700 (PDT)
+        bh=fc0GoKyWHbaDUKZRwzSCHWvKPWvkUL1O7EIfFaZFJjw=;
+        b=QuA47KUgISmWpYbxs+YscMMtiyTwvn4uo2t7NGjj3YwQd2IR8bLkWIh8dGXFUpNdH1
+         UubYobL43Nh1fMJiIgxyc9kDH/fUskw1Hj4KfQ4+bRDuTkmLTVZx6cwUiXJKg5WsENXa
+         bXUcwMvkSsN8RQ7GgD0Tl8Zzudv3qcct+29ewbMqDhDyicc7gjEjX/yE2JMCHPwJNaRi
+         GDZd27nMRyD+LN9a3PMu6fWJvlPJOOP3md2DL9NAwEr/248BQpAph/5sUiYz2Mbxm4QC
+         6wSwLtDWKnj8QPgF34ylG4/HZRdEhZw/pCXNDfXacoFtK2cAX/6miIj+kd36d7T7Ow3X
+         MG4Q==
+X-Gm-Message-State: AOAM531B2rrFaASWalkVHuzvi9nrA4aOIbdumE3HtbX7zQt7WkXSoQKz
+        Z+iK46stHYxK6qDMKMb8klQxKw==
+X-Google-Smtp-Source: ABdhPJwsKWl3H1d1iLra8+QrQS59nd54fvK9Etapf6nvAyz9n7l6E+sLHM/FZUi8R5GtNZVbuy881Q==
+X-Received: by 2002:a2e:9893:: with SMTP id b19mr26949222ljj.112.1633492462601;
+        Tue, 05 Oct 2021 20:54:22 -0700 (PDT)
 Received: from eriador.lan ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id s4sm2142967lfd.103.2021.10.05.20.54.11
+        by smtp.gmail.com with ESMTPSA id s4sm2142967lfd.103.2021.10.05.20.54.21
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 20:54:11 -0700 (PDT)
+        Tue, 05 Oct 2021 20:54:22 -0700 (PDT)
 From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 To:     Andy Gross <agross@kernel.org>,
         Bjorn Andersson <bjorn.andersson@linaro.org>,
@@ -67,9 +67,9 @@ Cc:     linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
         netdev@vger.kernel.org
-Subject: [PATCH v1 01/15] dt-bindings: add pwrseq device tree bindings
-Date:   Wed,  6 Oct 2021 06:53:53 +0300
-Message-Id: <20211006035407.1147909-2-dmitry.baryshkov@linaro.org>
+Subject: [PATCH v1 12/15] arm64: dts: qcom: qrb5165-rb5: add bluetooth support
+Date:   Wed,  6 Oct 2021 06:54:04 +0300
+Message-Id: <20211006035407.1147909-13-dmitry.baryshkov@linaro.org>
 X-Mailer: git-send-email 2.33.0
 In-Reply-To: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
 References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
@@ -79,55 +79,97 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add device tree bindings for the new power sequencer subsystem.
-Consumers would reference pwrseq nodes using "foo-pwrseq" properties.
-Providers would use '#pwrseq-cells' property to declare the amount of
-cells in the pwrseq specifier.
+Add support for the bluetooth part of the QCA6391 BT+WiFi chip present
+on the RB5 board. WiFi is not supported yet, as it requires separate
+handling of the PCIe device power.
 
 Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
 ---
- .../bindings/power/pwrseq/pwrseq.yaml         | 32 +++++++++++++++++++
- 1 file changed, 32 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
+ arch/arm64/boot/dts/qcom/qrb5165-rb5.dts | 50 ++++++++++++++++++++++++
+ 1 file changed, 50 insertions(+)
 
-diff --git a/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml b/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
-new file mode 100644
-index 000000000000..4a8f6c0218bf
---- /dev/null
-+++ b/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
-@@ -0,0 +1,32 @@
-+# SPDX-License-Identifier: GPL-2.0
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/power/pwrseq/pwrseq.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
+diff --git a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts b/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
+index 8ac96f8e79d4..326330f528fc 100644
+--- a/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
++++ b/arch/arm64/boot/dts/qcom/qrb5165-rb5.dts
+@@ -19,6 +19,7 @@ / {
+ 
+ 	aliases {
+ 		serial0 = &uart12;
++		serial1 = &uart6;
+ 		sdhc2 = &sdhc_2;
+ 	};
+ 
+@@ -98,6 +99,25 @@ lt9611_3v3: lt9611-3v3 {
+ 		regulator-always-on;
+ 	};
+ 
++	qca_pwrseq: qca-pwrseq {
++		compatible = "qcom,qca6390-pwrseq";
 +
-+title: Power Sequencer devices
++		#pwrseq-cells = <1>;
 +
-+maintainers:
-+  - Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
++		vddaon-supply = <&vreg_s6a_0p95>;
++		vddpmu-supply = <&vreg_s2f_0p95>;
++		vddrfa1-supply = <&vreg_s2f_0p95>;
++		vddrfa2-supply = <&vreg_s8c_1p3>;
++		vddrfa3-supply = <&vreg_s5a_1p9>;
++		vddpcie1-supply = <&vreg_s8c_1p3>;
++		vddpcie2-supply = <&vreg_s5a_1p9>;
++		vddio-supply = <&vreg_s4a_1p8>;
 +
-+properties:
-+  "#powerseq-cells":
-+    description:
-+      Number of cells in a pwrseq specifier.
++		bt-enable-gpios = <&tlmm 21 GPIO_ACTIVE_HIGH>;
++		wifi-enable-gpios = <&tlmm 20 GPIO_ACTIVE_HIGH>;
++		swctrl-gpios = <&tlmm 124 GPIO_ACTIVE_HIGH>;
++	};
 +
-+patternProperties:
-+  ".*-pwrseq$":
-+    description: Power sequencer supply phandle(s) for this node
+ 	thermal-zones {
+ 		conn-thermal {
+ 			polling-delay-passive = <0>;
+@@ -804,6 +824,26 @@ lt9611_rst_pin: lt9611-rst-pin {
+ 	};
+ };
+ 
++&qup_uart6_default {
++	ctsrx {
++		pins = "gpio16", "gpio19";
++		drive-strength = <2>;
++		bias-disable;
++	};
 +
-+additionalProperties: true
++	rts {
++		pins = "gpio17";
++		drive-strength = <2>;
++		bias-disable;
++	};
 +
-+examples:
-+  - |
-+    qca_pwrseq: qca-pwrseq {
-+      #pwrseq-cells = <1>;
-+    };
++	tx {
++		pins = "gpio18";
++		drive-strength = <2>;
++		bias-pull-up;
++	};
++};
 +
-+    bluetooth {
-+      bt-pwrseq = <&qca_pwrseq 1>;
-+    };
-+...
+ &qupv3_id_0 {
+ 	status = "okay";
+ };
+@@ -1193,6 +1233,16 @@ sdc2_card_det_n: sd-card-det-n {
+ 	};
+ };
+ 
++&uart6 {
++	status = "okay";
++	bluetooth {
++		compatible = "qcom,qca6390-bt";
++		clocks = <&sleep_clk>;
++
++		bt-pwrseq = <&qca_pwrseq 1>;
++	};
++};
++
+ &uart12 {
+ 	status = "okay";
+ };
 -- 
 2.33.0
 
