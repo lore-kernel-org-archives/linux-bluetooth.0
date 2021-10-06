@@ -2,63 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF6E2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 046F4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D7CA60FD8
+	by mail.kernel.org (Postfix) with ESMTP id D68EB60FD8
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233994AbhJFBLb (ORCPT
+        id S234027AbhJFBLc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 21:11:31 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53154 "EHLO
+        Tue, 5 Oct 2021 21:11:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53158 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230218AbhJFBLb (ORCPT
+        with ESMTP id S231855AbhJFBLb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 5 Oct 2021 21:11:31 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46213C061749
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A95B6C061749
         for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 18:09:40 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id oa4so223333pjb.2
+Received: by mail-pf1-x434.google.com with SMTP id m5so944761pfk.7
         for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 18:09:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=JImQxPscmbjSSk43SXCJ7gIjxsRo4McgRKHqq5eurAw=;
-        b=VAmSTECzUJTWa4qCjrb/nTcQ34L/OGjmESVCXksW5YCRcL20YmaLj+03sQ3qjJcreu
-         cme2BNzPlwNWti3AjrhXO4FF/7eC/iqGwMObM4WER+zG8pIfgJ5Q8KxIswlz5zfNmm2U
-         TOmT8/p/bR/nsUn0eSyDggQbGmT+7igmS8oFlmBAPpBPQh2uiO0F/s/0MtYtxjgYWgEw
-         Wqup9l1qWcSdK2IinImhUtL7zt+qS7zPGa4tYOHjlJFAThOv2uPdmYtB5A5v5F/tuekv
-         mSeuEJWzsGzqVWWab6UE8MlMI5kDPE3Qu9UNLZfjc6uwbfzJrfnjz4sRV+L2tZ2wcyRv
-         f72g==
+        bh=UujgEphjMrEFczsS+HOszjq8VaQaCdHEXS9ra14Xg/Y=;
+        b=iL+2ggrS0T6JsxdS97ruXStQMy6a3nTn6mvkABnxv8SMvTzAfLgOHy5EBzDZfNAZt+
+         1h+WVG8ar3CzYzAouQhs+RcOt/JlDk5Gy1J7xIUS6MWz4cvLnkZeHt06Quk6D083SVkl
+         y9RlrzYbhRJ3ZlmxSgpASoDHts0JyrMZEuHKDbx77IVtMkk511ETTNivy0mJbY9NcYJ7
+         lQeYUPdsIVajqfj7X+dz4RU0nBIlR4aLURworR7gs0zLMuuNdzrQnNWOA5NvPgG1JwjM
+         JjOZlObeknLtuZF6DE0vYTJYQRUM8LVpFJ7g3aBngqgfJLN9UobDcmm+ckrjR1WBDkbL
+         XyAg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=JImQxPscmbjSSk43SXCJ7gIjxsRo4McgRKHqq5eurAw=;
-        b=ytui3y/KH12BunnKRDjmXxXiCFvkn6xNZWehQWg65uv+IpX2WifREOOLPNoxazGKtB
-         Ai9DvhY3n7if+N/WnC7tc68Eltt+O0K3OCbnTWHhr+9dK8IA52SxfG5mQ4yVaniKf0SD
-         xm+uLU/ygpVakSWRvGVGflLYj7n/hWduHbflUQDW8BH6thkXjDjaPXLGyFl0tJmn8aUK
-         98VkU4tIGPxpH3h1XhGowCULiktaSxiaPscErRk9Ki8pTg8mebkG7oKDUBK7QX6dZpti
-         Vr6Jx4bXJ3PDedbLlWvvqmdQT03E/1ERg2DbDj8gIC9v9KxjfRZBZ1lg6w7g77zIzGC5
-         9vLA==
-X-Gm-Message-State: AOAM5311/m2iwit1l16TQC1XDxrdbgMYmqLMVhglA4Kt3+Vd3N2rFlZ1
-        UEGkvufdI4Br2Sk4A+0JR9vSkQz8AvA=
-X-Google-Smtp-Source: ABdhPJx7z2nPb18FL+TEnncoyzwo7erOxF6iM2rMprS+0H21YFFA4nSstKIVg1m5FTlLFNYhrcQ4DA==
-X-Received: by 2002:a17:903:124f:b0:13e:25e6:f733 with SMTP id u15-20020a170903124f00b0013e25e6f733mr8113091plh.42.1633482579396;
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=UujgEphjMrEFczsS+HOszjq8VaQaCdHEXS9ra14Xg/Y=;
+        b=kIha3Z2+k0UTaGkjmCKqzjyxu8E/28jR8f8PG8gIk11m1F9kzy2xT8jI0j1R8iShN5
+         C9phoBfGysZowkYg/Zq71VEkBO3iqi1oehlH1wmXSPD8MOfBJl1dwIW3HodHGIBTQCXR
+         yCFuWXAAY6lPrloWU3/kwL7kud15zLzmi0b+CzpcO0KECDDoN0qFqemL2zbLh1SVJuw7
+         Dq4ExRH/0r2VbKtcJWLQj2bXn32mKmieURe0DnE38JrnMcjcTMFt2AGe2VwoE08cPPGl
+         aXZM4MwKVfpPTOvE1joEfIP+1/QDFdNq1SZ45dNjCcH+rPB4VJfzWeOjIV9se94twyOu
+         g0dw==
+X-Gm-Message-State: AOAM531asLtlgiDtznoRqT9injUbAxBgFNvndqIdqSRoEgnVfssGzmx4
+        BUueWWRj2gOb3H0cPG/cTIPYVXffJUM=
+X-Google-Smtp-Source: ABdhPJwpgE/TrgdQqgk/OSCjb7HQDMCcp8nWXOY7uXq7irrQmNx5zSoKENrep2NMvTcUCCksY+gqfw==
+X-Received: by 2002:a62:9242:0:b0:446:5771:7901 with SMTP id o63-20020a629242000000b0044657717901mr33394410pfd.81.1633482579983;
         Tue, 05 Oct 2021 18:09:39 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id nr14sm3158988pjb.24.2021.10.05.18.09.38
+        by smtp.gmail.com with ESMTPSA id nr14sm3158988pjb.24.2021.10.05.18.09.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 18:09:38 -0700 (PDT)
+        Tue, 05 Oct 2021 18:09:39 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 1/3] Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
-Date:   Tue,  5 Oct 2021 18:09:33 -0700
-Message-Id: <20211006010935.902645-1-luiz.dentz@gmail.com>
+Subject: [PATCH 2/3] Bluetooth: Fix handling of SUSPEND_DISCONNECTING
+Date:   Tue,  5 Oct 2021 18:09:34 -0700
+Message-Id: <20211006010935.902645-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211006010935.902645-1-luiz.dentz@gmail.com>
+References: <20211006010935.902645-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,79 +69,84 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Defer calls to hci_{suspend,resume}_dev to work so it doesn't block the
-processing of the events.
+When SUSPEND_DISCONNECTING bit is set that means Disconnect is pending
+but the code was evaluating if the list is empty before calling
+hci_conn_del which does the actual cleanup and remove the connection
+from the list thus the bit is never cleared causing the suspend
+procedure to always timeout when there are connections to be
+disconnected:
+
+Suspend/Resume - Success 5 (Pairing - Legacy) - waiting done
+  Set the system into Suspend via force_suspend
+= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.200458
+= mgmt-tester: Set the system into Suspend via force_suspend    17:03:13.205812
+< HCI Command: Write Scan E.. (0x03|0x001a) plen 1  #122 [hci0] 17:03:13.213561
+        Scan enable: No Scans (0x00)
+> HCI Event: Command Complete (0x0e) plen 4         #123 [hci0] 17:03:13.214710
+      Write Scan Enable (0x03|0x001a) ncmd 1
+        Status: Success (0x00)
+< HCI Command: Disconnect (0x01|0x0006) plen 3      #124 [hci0] 17:03:13.215830
+        Handle: 42
+        Reason: Remote Device Terminated due to Power Off (0x15)
+> HCI Event: Command Status (0x0f) plen 4           #125 [hci0] 17:03:13.216602
+      Disconnect (0x01|0x0006) ncmd 1
+        Status: Success (0x00)
+> HCI Event: Disconnect Complete (0x05) plen 4      #126 [hci0] 17:03:13.217342
+        Status: Success (0x00)
+        Handle: 42
+        Reason: Remote Device Terminated due to Power Off (0x15)
+@ MGMT Event: Device Disconn.. (0x000c) plen 8  {0x0002} [hci0] 17:03:13.217688
+        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
+        Reason: Connection terminated by local host for suspend (0x05)
+@ MGMT Event: Device Disconn.. (0x000c) plen 8  {0x0001} [hci0] 17:03:13.217688
+        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
+        Reason: Connection terminated by local host for suspend (0x05)
+Suspend/Resume - Success 5 (Pairing - Legacy) - test timed out
+= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.939317
+Suspend/Resume - Success 5 (Pairing - Legacy) - teardown
+= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.947267
+[   13.284291] Bluetooth: hci0: Timed out waiting for suspend events
+[   13.287324] Bluetooth: hci0: Suspend timeout bit: 6
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/hci_vhci.c | 24 ++++++++++++++++--------
- 1 file changed, 16 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_event.c | 16 ++++++++--------
+ 1 file changed, 8 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 5fd91106e853..56c6b22be10b 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -38,6 +38,7 @@ struct vhci_data {
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7d0db1ca1248..3cba2bbefcd6 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -2987,14 +2987,6 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
- 	struct mutex open_mutex;
- 	struct delayed_work open_timeout;
-+	struct work_struct suspend_work;
+ 	hci_disconn_cfm(conn, ev->reason);
  
- 	bool suspended;
- 	bool wakeup;
-@@ -114,6 +115,17 @@ static ssize_t force_suspend_read(struct file *file, char __user *user_buf,
- 	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
- }
- 
-+static void vhci_suspend_work(struct work_struct *work)
-+{
-+	struct vhci_data *data = container_of(work, struct vhci_data,
-+					      suspend_work);
-+
-+	if (data->suspended)
-+		hci_suspend_dev(data->hdev);
-+	else
-+		hci_resume_dev(data->hdev);
-+}
-+
- static ssize_t force_suspend_write(struct file *file,
- 				   const char __user *user_buf,
- 				   size_t count, loff_t *ppos)
-@@ -129,16 +141,10 @@ static ssize_t force_suspend_write(struct file *file,
- 	if (data->suspended == enable)
- 		return -EALREADY;
- 
--	if (enable)
--		err = hci_suspend_dev(data->hdev);
--	else
--		err = hci_resume_dev(data->hdev);
+-	/* The suspend notifier is waiting for all devices to disconnect so
+-	 * clear the bit from pending tasks and inform the wait queue.
+-	 */
+-	if (list_empty(&hdev->conn_hash.list) &&
+-	    test_and_clear_bit(SUSPEND_DISCONNECTING, hdev->suspend_tasks)) {
+-		wake_up(&hdev->suspend_wait_q);
+-	}
 -
--	if (err)
--		return err;
--
- 	data->suspended = enable;
+ 	/* Re-enable advertising if necessary, since it might
+ 	 * have been disabled by the connection. From the
+ 	 * HCI_LE_Set_Advertise_Enable command description in
+@@ -3012,6 +3004,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
  
-+	schedule_work(&data->suspend_work);
+ 	hci_conn_del(conn);
+ 
++	/* The suspend notifier is waiting for all devices to disconnect so
++	 * clear the bit from pending tasks and inform the wait queue.
++	 */
++	if (list_empty(&hdev->conn_hash.list) &&
++	    test_and_clear_bit(SUSPEND_DISCONNECTING, hdev->suspend_tasks)) {
++		wake_up(&hdev->suspend_wait_q);
++	}
 +
- 	return count;
+ unlock:
+ 	hci_dev_unlock(hdev);
  }
- 
-@@ -442,6 +448,7 @@ static int vhci_open(struct inode *inode, struct file *file)
- 
- 	mutex_init(&data->open_mutex);
- 	INIT_DELAYED_WORK(&data->open_timeout, vhci_open_timeout);
-+	INIT_WORK(&data->suspend_work, vhci_suspend_work);
- 
- 	file->private_data = data;
- 	nonseekable_open(inode, file);
-@@ -457,6 +464,7 @@ static int vhci_release(struct inode *inode, struct file *file)
- 	struct hci_dev *hdev;
- 
- 	cancel_delayed_work_sync(&data->open_timeout);
-+	flush_work(&data->suspend_work);
- 
- 	hdev = data->hdev;
- 
 -- 
 2.31.1
 
