@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 046F4C433F5
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D59DEC4332F
 	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D68EB60FD8
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A9C5860F0F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 01:09:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234027AbhJFBLc (ORCPT
+        id S236953AbhJFBLd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 21:11:32 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53158 "EHLO
+        Tue, 5 Oct 2021 21:11:33 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231855AbhJFBLb (ORCPT
+        with ESMTP id S231855AbhJFBLc (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 21:11:31 -0400
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A95B6C061749
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 18:09:40 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id m5so944761pfk.7
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 18:09:40 -0700 (PDT)
+        Tue, 5 Oct 2021 21:11:32 -0400
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80A1DC061749
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 18:09:41 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id pi19-20020a17090b1e5300b0019fdd3557d3so1005408pjb.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 18:09:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=UujgEphjMrEFczsS+HOszjq8VaQaCdHEXS9ra14Xg/Y=;
-        b=iL+2ggrS0T6JsxdS97ruXStQMy6a3nTn6mvkABnxv8SMvTzAfLgOHy5EBzDZfNAZt+
-         1h+WVG8ar3CzYzAouQhs+RcOt/JlDk5Gy1J7xIUS6MWz4cvLnkZeHt06Quk6D083SVkl
-         y9RlrzYbhRJ3ZlmxSgpASoDHts0JyrMZEuHKDbx77IVtMkk511ETTNivy0mJbY9NcYJ7
-         lQeYUPdsIVajqfj7X+dz4RU0nBIlR4aLURworR7gs0zLMuuNdzrQnNWOA5NvPgG1JwjM
-         JjOZlObeknLtuZF6DE0vYTJYQRUM8LVpFJ7g3aBngqgfJLN9UobDcmm+ckrjR1WBDkbL
-         XyAg==
+        bh=rx3d2c0kphzvb05A8Ead/k4LuBdJQpLK45fxj0cCwJ0=;
+        b=qKICO+A5GIuhwV98iQimYR0juazyWQwnoFSHsloVylKbAPd2SEsQNKUW4TqUnNd80f
+         6FQ0b9Gj2RoebkdhZd4wZbJPqJecQoIc5iT/mqe5rLJk54XsYcTud4jDUhtGjkhr6yWB
+         0TnNmrOoXFQDl5v4tb6asXjyKm8XlyBuBUIcZoHarB9DyZ4s5lOhbOG3HsqsdLHEgOZV
+         myxm04GBWZ0ZtOqpbW1p64Vdt9PmGnbx6NF2LUE/x00/eWEEkyZtUTCxfhFhNMcrQZPD
+         mmIU0X7v+OSYqJyhf0YxQao0jno8NJuKTkrnn6QARNlJgI4vZfOU9oGuyumPugxCkkYV
+         O7EA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=UujgEphjMrEFczsS+HOszjq8VaQaCdHEXS9ra14Xg/Y=;
-        b=kIha3Z2+k0UTaGkjmCKqzjyxu8E/28jR8f8PG8gIk11m1F9kzy2xT8jI0j1R8iShN5
-         C9phoBfGysZowkYg/Zq71VEkBO3iqi1oehlH1wmXSPD8MOfBJl1dwIW3HodHGIBTQCXR
-         yCFuWXAAY6lPrloWU3/kwL7kud15zLzmi0b+CzpcO0KECDDoN0qFqemL2zbLh1SVJuw7
-         Dq4ExRH/0r2VbKtcJWLQj2bXn32mKmieURe0DnE38JrnMcjcTMFt2AGe2VwoE08cPPGl
-         aXZM4MwKVfpPTOvE1joEfIP+1/QDFdNq1SZ45dNjCcH+rPB4VJfzWeOjIV9se94twyOu
-         g0dw==
-X-Gm-Message-State: AOAM531asLtlgiDtznoRqT9injUbAxBgFNvndqIdqSRoEgnVfssGzmx4
-        BUueWWRj2gOb3H0cPG/cTIPYVXffJUM=
-X-Google-Smtp-Source: ABdhPJwpgE/TrgdQqgk/OSCjb7HQDMCcp8nWXOY7uXq7irrQmNx5zSoKENrep2NMvTcUCCksY+gqfw==
-X-Received: by 2002:a62:9242:0:b0:446:5771:7901 with SMTP id o63-20020a629242000000b0044657717901mr33394410pfd.81.1633482579983;
-        Tue, 05 Oct 2021 18:09:39 -0700 (PDT)
+        bh=rx3d2c0kphzvb05A8Ead/k4LuBdJQpLK45fxj0cCwJ0=;
+        b=ndBB98CEVMmVwvk1cidhRSy8kxg8yHvQjFTqcoMZsqbaqnWgLsRxNLlYMSDvkzLFED
+         FvjNVZ1vNos5HjbtB5mTRJgqeg79pTH5ObQqcJFLhW0WKA4elykfjEURk8HsiNE8djBI
+         qjOXWiGv+SBkyRJtoehjpbQf7/3mj56WkKafHSJEkcSEZ57z33cO7DzgIWdmCfqXhKx6
+         VYOYyXYEoOFbznHWS5Cne058xnaL2DHUC30sA381KInqF0ZyhvsE6qoNJMepe3yWjBc5
+         nmivkiqozEEPytI8jd4WrCwBUeJUsrOMhEcCWEBMzWOFLXEYd7QRons7UMmAR+m8pI00
+         MNuQ==
+X-Gm-Message-State: AOAM5331ms0had0NSAXt2qWuq8JOOs/ewzyGzFfZp3Nmkx8lH1+KIvw3
+        XCj35wlv6E0koO9W2oK8gmGh05KycVk=
+X-Google-Smtp-Source: ABdhPJypxOAUl2l1LkjZ0QS3cCzsd7gTjI8+iWpFFasHGDK27A8lxIBH/wn/h9cg4Ca4rJSnJN0yWA==
+X-Received: by 2002:a17:902:7e4b:b0:13d:b90d:cdc1 with SMTP id a11-20020a1709027e4b00b0013db90dcdc1mr8386658pln.72.1633482580740;
+        Tue, 05 Oct 2021 18:09:40 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id nr14sm3158988pjb.24.2021.10.05.18.09.39
+        by smtp.gmail.com with ESMTPSA id nr14sm3158988pjb.24.2021.10.05.18.09.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 18:09:39 -0700 (PDT)
+        Tue, 05 Oct 2021 18:09:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH 2/3] Bluetooth: Fix handling of SUSPEND_DISCONNECTING
-Date:   Tue,  5 Oct 2021 18:09:34 -0700
-Message-Id: <20211006010935.902645-2-luiz.dentz@gmail.com>
+Subject: [PATCH 3/3] Bluetooth: Fix wake up suspend_wait_q prematurely
+Date:   Tue,  5 Oct 2021 18:09:35 -0700
+Message-Id: <20211006010935.902645-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211006010935.902645-1-luiz.dentz@gmail.com>
 References: <20211006010935.902645-1-luiz.dentz@gmail.com>
@@ -69,84 +69,51 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When SUSPEND_DISCONNECTING bit is set that means Disconnect is pending
-but the code was evaluating if the list is empty before calling
-hci_conn_del which does the actual cleanup and remove the connection
-from the list thus the bit is never cleared causing the suspend
-procedure to always timeout when there are connections to be
-disconnected:
-
-Suspend/Resume - Success 5 (Pairing - Legacy) - waiting done
-  Set the system into Suspend via force_suspend
-= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.200458
-= mgmt-tester: Set the system into Suspend via force_suspend    17:03:13.205812
-< HCI Command: Write Scan E.. (0x03|0x001a) plen 1  #122 [hci0] 17:03:13.213561
-        Scan enable: No Scans (0x00)
-> HCI Event: Command Complete (0x0e) plen 4         #123 [hci0] 17:03:13.214710
-      Write Scan Enable (0x03|0x001a) ncmd 1
-        Status: Success (0x00)
-< HCI Command: Disconnect (0x01|0x0006) plen 3      #124 [hci0] 17:03:13.215830
-        Handle: 42
-        Reason: Remote Device Terminated due to Power Off (0x15)
-> HCI Event: Command Status (0x0f) plen 4           #125 [hci0] 17:03:13.216602
-      Disconnect (0x01|0x0006) ncmd 1
-        Status: Success (0x00)
-> HCI Event: Disconnect Complete (0x05) plen 4      #126 [hci0] 17:03:13.217342
-        Status: Success (0x00)
-        Handle: 42
-        Reason: Remote Device Terminated due to Power Off (0x15)
-@ MGMT Event: Device Disconn.. (0x000c) plen 8  {0x0002} [hci0] 17:03:13.217688
-        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
-        Reason: Connection terminated by local host for suspend (0x05)
-@ MGMT Event: Device Disconn.. (0x000c) plen 8  {0x0001} [hci0] 17:03:13.217688
-        BR/EDR Address: 00:AA:01:01:00:00 (Intel Corporation)
-        Reason: Connection terminated by local host for suspend (0x05)
-Suspend/Resume - Success 5 (Pairing - Legacy) - test timed out
-= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.939317
-Suspend/Resume - Success 5 (Pairing - Legacy) - teardown
-= mgmt-tester: Suspend/Resume - Success 5 (Pairing -..   17:03:13.947267
-[   13.284291] Bluetooth: hci0: Timed out waiting for suspend events
-[   13.287324] Bluetooth: hci0: Suspend timeout bit: 6
+suspend_req_complete shall only attempt to wake up if there no tasks
+left otherwise the WAKE_COND will evaluate to false causing a premature
+timeout when in fact the tasks are still in progress.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_event.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ net/bluetooth/hci_request.c | 21 ++++++++++++++-------
+ 1 file changed, 14 insertions(+), 7 deletions(-)
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7d0db1ca1248..3cba2bbefcd6 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -2987,14 +2987,6 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_disconn_cfm(conn, ev->reason);
- 
--	/* The suspend notifier is waiting for all devices to disconnect so
--	 * clear the bit from pending tasks and inform the wait queue.
--	 */
--	if (list_empty(&hdev->conn_hash.list) &&
--	    test_and_clear_bit(SUSPEND_DISCONNECTING, hdev->suspend_tasks)) {
--		wake_up(&hdev->suspend_wait_q);
--	}
--
- 	/* Re-enable advertising if necessary, since it might
- 	 * have been disabled by the connection. From the
- 	 * HCI_LE_Set_Advertise_Enable command description in
-@@ -3012,6 +3004,14 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	hci_conn_del(conn);
- 
-+	/* The suspend notifier is waiting for all devices to disconnect so
-+	 * clear the bit from pending tasks and inform the wait queue.
-+	 */
-+	if (list_empty(&hdev->conn_hash.list) &&
-+	    test_and_clear_bit(SUSPEND_DISCONNECTING, hdev->suspend_tasks)) {
-+		wake_up(&hdev->suspend_wait_q);
-+	}
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 92611bfc0b9e..209f4fe17237 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -1092,17 +1092,24 @@ static void suspend_req_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ {
+ 	bt_dev_dbg(hdev, "Request complete opcode=0x%x, status=0x%x", opcode,
+ 		   status);
+-	if (test_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks) ||
+-	    test_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks)) {
+-		clear_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
+-		clear_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
 +
- unlock:
- 	hci_dev_unlock(hdev);
++	if (status) {
+ 		wake_up(&hdev->suspend_wait_q);
++		return;
+ 	}
+ 
+-	if (test_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks)) {
+-		clear_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks);
++	/* Clear all tasks that could be initiated using suspend_req_complete as
++	 * callback.
++	 */
++	clear_bit(SUSPEND_PAUSE_DISCOVERY, hdev->suspend_tasks);
++	clear_bit(SUSPEND_PAUSE_ADVERTISING, hdev->suspend_tasks);
++	clear_bit(SUSPEND_SCAN_ENABLE, hdev->suspend_tasks);
++	clear_bit(SUSPEND_SCAN_DISABLE, hdev->suspend_tasks);
++	clear_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks);
++
++	/* Wake up only if there are no tasks left */
++	if (!hdev->suspend_tasks)
+ 		wake_up(&hdev->suspend_wait_q);
+-	}
  }
+ 
+ static void hci_req_prepare_adv_monitor_suspend(struct hci_request *req,
 -- 
 2.31.1
 
