@@ -2,114 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 345EEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 02:40:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EF418C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:02:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 196226115A
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 02:40:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C3C65611F0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  6 Oct 2021 03:02:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237235AbhJFCmQ (ORCPT
+        id S237158AbhJFDEC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 5 Oct 2021 22:42:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44966 "EHLO
+        Tue, 5 Oct 2021 23:04:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229908AbhJFCmQ (ORCPT
+        with ESMTP id S230306AbhJFDEB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 5 Oct 2021 22:42:16 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE43EC061749
-        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 19:40:24 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id oa12-20020a17090b1bcc00b0019f715462a8so1147458pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 19:40:24 -0700 (PDT)
+        Tue, 5 Oct 2021 23:04:01 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B6321C061749
+        for <linux-bluetooth@vger.kernel.org>; Tue,  5 Oct 2021 20:02:09 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id a13so1128312qtw.10
+        for <linux-bluetooth@vger.kernel.org>; Tue, 05 Oct 2021 20:02:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=87lHPkRARbCPrsf6XsX9vExWJu40BU0Q33czj1EDd/E=;
-        b=ESHchqt4XeSBusnSVYnX9+ZjvKjYOzMcmaab6eqeSq/KjAHcPNBo4zEP6xXC6f8NIi
-         9Jr7yMf9VaX61ZbhBFRRKDovAbxBc85snj0HS/CRO9wEepHBIhcdlBhLqjVKjgQWhrhd
-         uyEWcPpt5iFDeONAc7+YocUJerbQdUFwjkSgVdVP1BBonB8l3LUYLekx6fUgGZG6vUYA
-         f7eISIx3TOjxJirCVTGoQjaSwZ/i1JD5pp0wvjW0PHPCjcV52Qs3Zsyl2NQo3jjRUrF5
-         ONhRv/VuaRJSW9ABXz+v8Rnbzs1RwKXPlWJ4+iqA67BYM10rgAFciLoNhiUeINBuAPD2
-         woZw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=f4hZcCNsWzY5b3dwl82nAfXkX4uAkst/4vjZ/lF686k=;
+        b=JYBjNSTqpJePg2cCTqzzXnEVZoyFIf1Dasc05lGsPhHtB1xsMQgtba2Ukr8/RPqZ2i
+         K8tANAMprClZXgPVeaqMFXbYgevbQIiZKtp+rQAFhvYGTL4bUduzPw1aMjTHmxdk+yMl
+         icSQC95lmddbfWjNadnmweAmM2ZJyBzC2+lDet7DbIQ5OpjWtKk7wIvKQHUsRXWlwWFE
+         /VBffFJQDx1G35yjuZlzVeEMYg/7wq+6dzYjzgRb27gmWNnGlqZeHBF6fAbdKDovc8JO
+         NboCo0BxOZwSgfT5/aZqyn5aYl6u135HQDorwnW3Y5eTJxG+uq9sgnOU8TuxswF039Oe
+         euLg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=87lHPkRARbCPrsf6XsX9vExWJu40BU0Q33czj1EDd/E=;
-        b=oEtDQRX6KgrO5eSeGVJ03LJUtswvztrQfG522/5TGnQYQsH6I1JGKEkly8aHYNnLET
-         SPVVtj2c4wZZcDw0toYj51EX4TbnWH6hOYS/qwKVdTD+kczVoRWVEOZycwOMlqqcgmVS
-         InCbE3TAOqyyCT97sDh+taSDnviWluDeaVU/2HH2S2Amso0ViA962rOqjTTi01GHWPON
-         n62RPKp69pTpZCgCHu3qJOXCEjPjJS562qq3uweb+hylEshnZJxjoC3rMDvujXp45s69
-         y1XGzgOfdbCb5LqrxwBmTsOHEQmgq5aPCqLb2z0kiScDwa2xakrcjwOyMS6PZ+kskTm7
-         xvxQ==
-X-Gm-Message-State: AOAM532rWFr2CoiBVRXfrTXyQ7tY6c8FMrw8mByGzGoxPKsjAdiJCYtl
-        4gYYBW6Ep26ZXuZpTV0GU/+RTeIPTD49FQ==
-X-Google-Smtp-Source: ABdhPJxjNsTRc+N5I8B755CfBiTFGeM/aqmME/uYV4d3GUuY1ozhrClZ7TeMz6gsJQntrg4SgeJL0w==
-X-Received: by 2002:a17:90b:3147:: with SMTP id ip7mr4521819pjb.13.1633488024220;
-        Tue, 05 Oct 2021 19:40:24 -0700 (PDT)
-Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:b80e:8aa2:35bc:9d60])
-        by smtp.gmail.com with ESMTPSA id q21sm17961406pgk.71.2021.10.05.19.40.23
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=f4hZcCNsWzY5b3dwl82nAfXkX4uAkst/4vjZ/lF686k=;
+        b=fQVO7VJBiIMcx2ibPdIBQKlMmD0olNG3BREGQDdcN0BUpSkEi/ukbezW43piSRWQcC
+         3tkStL/WVJjinBNiJ6mTEQThh/vTkKc7I0AB8uZs5YSat9xVPCmRL9nW8W8MU/YTgO64
+         Nlu9A2RWv43GG5aQE97k/cj+NR+aYpW3Y1tCuwAgXWM5MKBLw2Gr6gF24z8JuO7T7QQj
+         qC39J8ggOear1I1zfpGA7SwICeB000P598M8866oVNCqkedyk6LLdtkMlxroRX+mq1vA
+         qMaMuuaRDzdZ8buD+svG5jCYqDmIeN/IkZHmatLXwD6fumi0Db9+0clqO7gTuL5Ln7FY
+         jipg==
+X-Gm-Message-State: AOAM533/fJlwWhV2lYOBnr16wubVp2sY1hIdbM2XxMbYRHCC3n2rIvyE
+        Uer4/2iWa0lN7Oe9HqzQnRFXpynUcjcbXw==
+X-Google-Smtp-Source: ABdhPJyWxcAhGTYCUgZwbBakwfuIIrz86Y9P0FDlWoNjZK8N3bwK2laSsFsGk/0nYJhkBDljWYvP+A==
+X-Received: by 2002:ac8:5ad5:: with SMTP id d21mr24818207qtd.345.1633489328743;
+        Tue, 05 Oct 2021 20:02:08 -0700 (PDT)
+Received: from [172.17.0.2] ([52.232.196.166])
+        by smtp.gmail.com with ESMTPSA id x9sm213265qtw.84.2021.10.05.20.02.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Oct 2021 19:40:23 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH] tools/mgmt-tester: Update the correct suspend reason for disconnect
-Date:   Tue,  5 Oct 2021 19:40:22 -0700
-Message-Id: <20211006024022.111584-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        Tue, 05 Oct 2021 20:02:08 -0700 (PDT)
+Message-ID: <615d11b0.1c69fb81.689fa.1bd2@mx.google.com>
+Date:   Tue, 05 Oct 2021 20:02:08 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============7239119544006627918=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: [BlueZ] tools/mgmt-tester: Update the correct suspend reason for disconnect
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211006024022.111584-1-hj.tedd.an@gmail.com>
+References: <20211006024022.111584-1-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+--===============7239119544006627918==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch fixes the suspend reason for the pairing test cases to the
-disconnect.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=558253
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.42 seconds
+GitLint                       PASS      0.92 seconds
+Prep - Setup ELL              PASS      47.11 seconds
+Build - Prep                  PASS      0.50 seconds
+Build - Configure             PASS      9.03 seconds
+Build - Make                  PASS      201.78 seconds
+Make Check                    PASS      9.71 seconds
+Make Distcheck                PASS      238.39 seconds
+Build w/ext ELL - Configure   PASS      8.76 seconds
+Build w/ext ELL - Make        PASS      190.52 seconds
+
+
+
 ---
- tools/mgmt-tester.c | 12 ++++--------
- 1 file changed, 4 insertions(+), 8 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 611bf3dbf..1a2aba7fd 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -10414,10 +10414,6 @@ static void test_50_controller_cap_response(const void *test_data)
- 						data, NULL);
- }
- 
--static const uint8_t suspend_state_param_running[] = {
--	0x00,
--};
--
- static const uint8_t suspend_state_param_disconnect[] = {
- 	0x01,
- };
-@@ -10587,8 +10583,8 @@ static const struct generic_data suspend_resume_success_5 = {
- 	.client_pin = pair_device_pin,
- 	.client_pin_len = sizeof(pair_device_pin),
- 	.expect_alt_ev = MGMT_EV_CONTROLLER_SUSPEND,
--	.expect_alt_ev_param = suspend_state_param_running,
--	.expect_alt_ev_len = sizeof(suspend_state_param_running),
-+	.expect_alt_ev_param = suspend_state_param_disconnect,
-+	.expect_alt_ev_len = sizeof(suspend_state_param_disconnect),
- };
- 
- static void trigger_force_suspend(void *user_data)
-@@ -10616,8 +10612,8 @@ static const struct generic_data suspend_resume_success_6 = {
- 	.setup_settings = settings_powered_connectable_bondable_ssp,
- 	.client_enable_ssp = true,
- 	.expect_alt_ev = MGMT_EV_CONTROLLER_SUSPEND,
--	.expect_alt_ev_param = suspend_state_param_running,
--	.expect_alt_ev_len = sizeof(suspend_state_param_running),
-+	.expect_alt_ev_param = suspend_state_param_disconnect,
-+	.expect_alt_ev_len = sizeof(suspend_state_param_disconnect),
- 	.expect_hci_command = BT_HCI_CMD_USER_CONFIRM_REQUEST_REPLY,
- 	.expect_hci_func = client_bdaddr_param_func,
- 	.io_cap = 0x03, /* NoInputNoOutput */
--- 
-2.25.1
 
+--===============7239119544006627918==--
