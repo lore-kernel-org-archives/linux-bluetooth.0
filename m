@@ -2,102 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FDF1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 15:39:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B78C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 15:47:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4227460FC3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 15:39:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EC6EE610EA
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 15:47:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242335AbhJGPlB (ORCPT
+        id S241756AbhJGPth convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Oct 2021 11:41:01 -0400
-Received: from smtp-relay-canonical-1.canonical.com ([185.125.188.121]:50794
-        "EHLO smtp-relay-canonical-1.canonical.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S241276AbhJGPk6 (ORCPT
+        Thu, 7 Oct 2021 11:49:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:39927 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232870AbhJGPth (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Oct 2021 11:40:58 -0400
-Received: from [10.172.193.212] (1.general.cking.uk.vpn [10.172.193.212])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id 33A633FFE5;
-        Thu,  7 Oct 2021 15:39:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-        s=20210705; t=1633621141;
-        bh=XjqgtqwqDFgS7tw+AK2jjUrsaYkkIjhm3C/y4nw1Jn4=;
-        h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-         In-Reply-To:Content-Type;
-        b=DhMgNsh15/n7ow3GLR/XDpppd3e2zVZ+rnKR+I/4T58OQt8qKtuihFAKB+RWj4DwZ
-         7msVplHtUf9Kp0hEgiEeJ1IgGe6hurnQNZJWSLmsQX7/zm+0KMnc3IptRy6HShGjZd
-         hMh7BBhZcJvm09KSCM+ILiHAlh0EItSIk839rNWfR3qbT8c8RClr5s2kuMWh670Zdu
-         +uYuQzyRKz9RYtLQkoAJJo80dBLxL3pXvikZle1ke0neGTOMAslKF+jhp6KVHec8RS
-         2DCztjnCkoV8dQ2R+PX0DDAfqzDsldB9NBoVHYfwopc8v0c5TTIIhuHmR7hk1jg4Wx
-         A/+MNapE2LEpw==
-Message-ID: <51ce4458-cf8c-6219-e945-3333226dbdcc@canonical.com>
-Date:   Thu, 7 Oct 2021 16:39:00 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.1.2
+        Thu, 7 Oct 2021 11:49:37 -0400
+Received: from smtpclient.apple (p5b3d2185.dip0.t-ipconnect.de [91.61.33.133])
+        by mail.holtmann.org (Postfix) with ESMTPSA id A8422CECE5;
+        Thu,  7 Oct 2021 17:47:41 +0200 (CEST)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
 Subject: Re: [PATCH][next] Bluetooth: use bitmap_empty to check if a bitmap
  has any bits set
-Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <CABBYNZKzVtyZ_qO8pvenSLFRdm9aumxD_-Src4VG3UHQa8y+1w@mail.gmail.com>
+Date:   Thu, 7 Oct 2021 17:47:41 +0200
+Cc:     Colin King <colin.king@canonical.com>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        "David S . Miller" <davem@davemloft.net>,
+        "David S. Miller" <davem@davemloft.net>,
         Jakub Kicinski <kuba@kernel.org>,
         "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
         "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
         kernel-janitors@vger.kernel.org,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <888C3A95-5410-4B53-8805-4BAE9A9E6010@holtmann.org>
 References: <20211007111713.12207-1-colin.king@canonical.com>
  <CABBYNZKzVtyZ_qO8pvenSLFRdm9aumxD_-Src4VG3UHQa8y+1w@mail.gmail.com>
-From:   Colin Ian King <colin.king@canonical.com>
-In-Reply-To: <CABBYNZKzVtyZ_qO8pvenSLFRdm9aumxD_-Src4VG3UHQa8y+1w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 07/10/2021 16:34, Luiz Augusto von Dentz wrote:
-> Hi Colin,
-> 
-> On Thu, Oct 7, 2021 at 4:17 AM Colin King <colin.king@canonical.com> wrote:
->>
->> From: Colin Ian King <colin.king@canonical.com>
->>
+Hi Luiz,
+
 >> The check to see if any tasks are left checks if bitmap array is zero
 >> rather than using the appropriate bitmap helper functions to check the
 >> bits in the array. Fix this by using bitmap_empty on the bitmap.
->>
+>> 
 >> Addresses-Coverity: (" Array compared against 0")
 >> Fixes: 912730b52552 ("Bluetooth: Fix wake up suspend_wait_q prematurely")
 >> Signed-off-by: Colin Ian King <colin.king@canonical.com>
 >> ---
->>   net/bluetooth/hci_request.c | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
+>> net/bluetooth/hci_request.c | 2 +-
+>> 1 file changed, 1 insertion(+), 1 deletion(-)
+>> 
 >> diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
 >> index 209f4fe17237..bad3b9c895ba 100644
 >> --- a/net/bluetooth/hci_request.c
 >> +++ b/net/bluetooth/hci_request.c
 >> @@ -1108,7 +1108,7 @@ static void suspend_req_complete(struct hci_dev *hdev, u8 status, u16 opcode)
->>          clear_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks);
->>
->>          /* Wake up only if there are no tasks left */
+>>        clear_bit(SUSPEND_SET_ADV_FILTER, hdev->suspend_tasks);
+>> 
+>>        /* Wake up only if there are no tasks left */
 >> -       if (!hdev->suspend_tasks)
 >> +       if (!bitmap_empty(hdev->suspend_tasks, __SUSPEND_NUM_TASKS))
->>                  wake_up(&hdev->suspend_wait_q);
->>   }
->>
+>>                wake_up(&hdev->suspend_wait_q);
+>> }
+>> 
 >> --
 >> 2.32.0
 > 
 > I was going to revert this change since it appears wake_up does
 > actually check the wake condition there is no premature wake up after
 > all.
-> 
-OK, makes sense.
 
-Colin
+so should I take the patch "Fix wake up suspend_wait_q prematurely” completely out?
+
+Regards
+
+Marcel
+
