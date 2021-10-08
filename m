@@ -2,138 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5FB60C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 01:32:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95079C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 05:43:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A1806120C
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 01:32:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 69C8361100
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 05:43:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231137AbhJHBeD (ORCPT
+        id S229681AbhJHFo6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Oct 2021 21:34:03 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40364 "EHLO
+        Fri, 8 Oct 2021 01:44:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39810 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229524AbhJHBeD (ORCPT
+        with ESMTP id S229511AbhJHFo5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Oct 2021 21:34:03 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2EE26C061570
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Oct 2021 18:32:09 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id u7so6792875pfg.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Oct 2021 18:32:09 -0700 (PDT)
+        Fri, 8 Oct 2021 01:44:57 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5268DC061570
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Oct 2021 22:43:03 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id k23so6748713pji.0
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Oct 2021 22:43:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=87dyFrImn+QA+dwqG46qqBDxMNauqPEruZgeF21OQaQ=;
-        b=Cb5ClIOyb3eJXzWsJdE0fVSu+b0m7DdFXstbmBV5IEce7Irs22Ecm3L0CbZdMoJplb
-         vqBgMeG4kdmCOUHpMtFeDqGF0KezjQ6XFe9UK33Jp1uDBQFscUgPiVqgw0FIXmIbVsZQ
-         xuUnl7zbZLuNGC64N2bX6aO99tD+gwYZ+JP8YQ2YI4WqOTKvqA/0W14cuSTB8TseU+Sm
-         vWI7QIs7oKBTsEWWnWHI9wI5DR76aSs+jwY8url0P2tf3hqi7IvFXi6wCy7QyYVbcITY
-         owmATFX9SDnoVkrnzm8yrN2ufTtYr/7KEffvKbUlLEFGF4MCX3Dgqtd/Sb5QfNH4AJm5
-         +UrA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tb8KnJ3skiflfLlObqVQY/XrKpSYGl1Yg0t7YexW514=;
+        b=civVxl+LNWUFYAB2cxA/76xTrYmzFhQ009ZIt04oGy6UXluAZbrxB8nFhQ42a1pf2x
+         D+k6q5PfxkZXd/CsmGvW+ZjwELDC5LPXYd6sbSPSwFsyFwi7sfamRiLJmCziB6Uyp5DO
+         zVVldMqgZ8AkipiWjolgmQIr3VEfJ13wJpjZaAOkwS/sBhTnrHvD9RYXsAipDNOiFrXa
+         irfISDf4rcpXwlkqOAmws0+oS/TxnOm43c9kJPrwEFUXlwWmuUNeAyHAys34ktNZZ5ZQ
+         DbUn03iTRvcxpPoi8n6Yu61eqL7OrnhrIBXkZhWTjY64fWNubi+UwzqzpiLbQbXUcyjA
+         gTiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=87dyFrImn+QA+dwqG46qqBDxMNauqPEruZgeF21OQaQ=;
-        b=4u7ygSWmVkz+dR7NOJ4AwcXzPRdjjLFafV3vChyk6/YRG9sYUB1ZO2DGxGd50f/jwV
-         h+D6JSOq8jyVjuZk5/bn8vCdiEnBFcKKR/pqaGBXq6D4EBYBvzQa+IpnF0mEvJE8edmK
-         H3EZMAEe4AX3PVXIi4B6svWQnXJRAhpevvycIANX/rsh6v2jQNfjtpHrWcuo6Iu71ICU
-         GT0EbHK0K9nZyf7O3IH05sPxHfi6qw6ot5HSSagSthtyEA7InK04Oo3fOGai3le1+2yu
-         TwdiWMQRKZnMKp8ZDI+DGhmR9k/JSvdWmWo+6nyn3EqxPyhHThlR5K8AMBwshiXX3vk2
-         EoHQ==
-X-Gm-Message-State: AOAM530MBjBQtVKs/cZG8J/TxN8MwHqb+lXAPmTzMKDZDMQUwgiry2ZE
-        YKDfDAGtODrWBbZhAOhW3EwgSVdZEoM=
-X-Google-Smtp-Source: ABdhPJwLwqUe75rPpruKAoCy+JimZtYIePrDkuGHRu6/TAQJyoeOlvNDluqJrNq4DpUP96tM6fYblw==
-X-Received: by 2002:a65:47cd:: with SMTP id f13mr2344792pgs.439.1633656728507;
-        Thu, 07 Oct 2021 18:32:08 -0700 (PDT)
-Received: from [172.17.0.2] ([20.114.24.209])
-        by smtp.gmail.com with ESMTPSA id o12sm417387pjm.57.2021.10.07.18.32.07
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Tb8KnJ3skiflfLlObqVQY/XrKpSYGl1Yg0t7YexW514=;
+        b=CJFADWX1NSl0MJfj9H1s5/VsQ4/PkQ63ah8uyMznpIQ3qivhKk6yDzHrFV/a53ZDUw
+         w61bxL6ACROrrpbOn5fRbXua0QCWIIcBSGgFzy3N+PXz2ccBpnQzmQiwI0ELlKdYRBUG
+         2t6KWY913UXIwoCsDE638IH1KvrqUiKtTNWYbvh9XHj6+gDXyfwzcSZiiE7uP2QEKFnT
+         ZoGWaJ/qhofLtuMI7sCIVSRsoJ7fJG1gbuZUE9XiA2SrTJYNud2WzqfUDT3mf5nT0R5D
+         SKz1PMF07BInQN4EWJAuvHLstxUwt/9wSxRgCqF/SoJHvc5Aulg7gaB9QJe1XN2QN4Ch
+         nV1Q==
+X-Gm-Message-State: AOAM531CPQKus0j3kxEz104UOI32MaRyJMuOqTVRDBU0bsHHg0FJgkyq
+        sz2Xkl+5pK/ck9P/gTD56GpGYrJMvr+4yw==
+X-Google-Smtp-Source: ABdhPJxymD8mF/dcDYTG5gvmbTudVyKNDRTY48qwM5RUeTvQob6PXu1prpZ1r8YBg4FMLZ6sOYfFoA==
+X-Received: by 2002:a17:902:c214:b0:13e:cc54:7ca2 with SMTP id 20-20020a170902c21400b0013ecc547ca2mr7726340pll.52.1633671782407;
+        Thu, 07 Oct 2021 22:43:02 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:3e91:8dc3:f28b:c60b])
+        by smtp.gmail.com with ESMTPSA id x23sm1266315pfq.146.2021.10.07.22.43.00
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 18:32:07 -0700 (PDT)
-Message-ID: <615f9f97.1c69fb81.7cebf.1f71@mx.google.com>
-Date:   Thu, 07 Oct 2021 18:32:07 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============5014863636058251002=="
+        Thu, 07 Oct 2021 22:43:01 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH v2 1/3] doc/tester-config: Enable Runtime Debugging Feature
+Date:   Thu,  7 Oct 2021 22:42:58 -0700
+Message-Id: <20211008054300.27989-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, bernie@allthenticate.net
-Subject: RE: [BlueZ] gatt: more fixes with cleanup on disconnect/timeout
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211008001629.7024-1-bernie@allthenticate.net>
-References: <20211008001629.7024-1-bernie@allthenticate.net>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5014863636058251002==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=559591
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      0.74 seconds
-GitLint                       FAIL      0.32 seconds
-Prep - Setup ELL              PASS      43.52 seconds
-Build - Prep                  PASS      0.22 seconds
-Build - Configure             PASS      8.39 seconds
-Build - Make                  PASS      186.80 seconds
-Make Check                    PASS      8.86 seconds
-Make Distcheck                PASS      219.70 seconds
-Build w/ext ELL - Configure   PASS      7.52 seconds
-Build w/ext ELL - Make        PASS      181.99 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] gatt: more fixes with cleanup on disconnect/timeout
-WARNING:LONG_LINE: line length of 90 exceeds 80 columns
-#187: FILE: src/shared/gatt-db.c:1922:
-+		p->disconn_id = bt_att_register_disconnect(att, pending_read_cb, p, NULL);
-
-WARNING:LONG_LINE: line length of 91 exceeds 80 columns
-#212: FILE: src/shared/gatt-db.c:2027:
-+		p->disconn_id = bt_att_register_disconnect(att, pending_write_cb, p, NULL);
-
-/github/workspace/src/12543903.patch total: 0 errors, 2 warnings, 107 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12543903.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[BlueZ] gatt: more fixes with cleanup on disconnect/timeout
-7: B2 Line has trailing whitespace: "being properly unregistered because they were not assigned a disconn_id. "
-12: B2 Line has trailing whitespace: "read/write if a disconnect has occurred to skip the use.  "
-
-
-
-
+This patch adds CONFIG_BT_FEATURE_DEBUG=y in tester config to enable the
+runtime debug option.
 ---
-Regards,
-Linux Bluetooth
+ doc/tester.config | 1 +
+ 1 file changed, 1 insertion(+)
 
+diff --git a/doc/tester.config b/doc/tester.config
+index 892fd5eb3..011475661 100644
+--- a/doc/tester.config
++++ b/doc/tester.config
+@@ -32,6 +32,7 @@ CONFIG_BT_LE=y
+ CONFIG_BT_HS=y
+ CONFIG_BT_MSFTEXT=y
+ CONFIG_BT_AOSPEXT=y
++CONFIG_BT_FEATURE_DEBUG=y
+ 
+ CONFIG_BT_HCIVHCI=y
+ 
+-- 
+2.25.1
 
---===============5014863636058251002==--
