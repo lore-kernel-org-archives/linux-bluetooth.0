@@ -2,100 +2,209 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 91B14C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 18:48:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0069EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 19:00:33 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 76B0960F92
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 18:48:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D03F061029
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 19:00:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231459AbhJHSuh (ORCPT
+        id S231350AbhJHTC1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Oct 2021 14:50:37 -0400
-Received: from mga06.intel.com ([134.134.136.31]:15201 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231316AbhJHSug (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Oct 2021 14:50:36 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10131"; a="287450127"
-X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
-   d="scan'208";a="287450127"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 11:48:40 -0700
-X-IronPort-AV: E=Sophos;i="5.85,358,1624345200"; 
-   d="scan'208";a="569122739"
-Received: from ksanitha-mobl1.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.147.176])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 11:48:40 -0700
-From:   Inga Stotland <inga.stotland@intel.com>
+        Fri, 8 Oct 2021 15:02:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53440 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231312AbhJHTCY (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 Oct 2021 15:02:24 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27C30C061570
+        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Oct 2021 12:00:28 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id g13-20020a17090a3c8d00b00196286963b9so10009164pjc.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Oct 2021 12:00:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=allthenticate.net; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=YE7DbRr1qBjBDU00xDvr15AOMRdLAQsTeS6gxL7TYLs=;
+        b=aDcPDccxguHD6TE8v/ucujn9pr0Q0XEvzU7jIJL8k5TEwH3ZAQ/vW+fCkuk6V8IeTd
+         sYD0hfJu1UkXA+emCSoNGR+E7LsRzotUnH08dNVx9ttPwhZmKcrGD/+XDhXNFjdU92RC
+         jlJImgoEuITYo6x5l3mVIXf7sU2ncKYI67dpXmY//1p59r0mN27gkL3/QULFCEaAGta1
+         M2N/TD+e+ehAKAxpKEPtqKTPwqmBDaaGaGgvyHwcUmzx+4aM86QLwJbS6R1WfdEn6cDn
+         IuWHr9DQiHifN9bls3nFv5wTxU2LR306iA2A+RvNn7lhtuyKTDePFyjTNFHEShz1+iYv
+         QJPQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=YE7DbRr1qBjBDU00xDvr15AOMRdLAQsTeS6gxL7TYLs=;
+        b=Z3t01O3AaiKWiudIpJq+r17BVicODo0zUyNX1txa5EFmshpCpJqQsVoVY6TgGddqXw
+         c/lJEFAVWM8hWgE5KMhnE62Tb6adV5kpXTUvSMJHnGi6s/+yfRy0mMVFBS6VtECCdoNk
+         UYr3EqQAUkSp7R+qzJRhSjO0b7u0iNrLeZ0CrsIEBAjvShNXDZPqf8ITQxIDBqA0oSvn
+         vexNAle5hUUs9vuEdAPhhQjTHRAeT3K1UrlXM3e9e8SvdiJN/Mma6JzPLT1MPOLT7Orv
+         gPFg3xB6kg0to9E9tD23ABc5MYZL/hOaT5k+GRkvolmReBiTXPoyqCgHkSxHQA5feux/
+         aNjA==
+X-Gm-Message-State: AOAM530DkO4ZkknyH0YV3V0SlENr5+PfoW+PRsIAT5At7jo9yJWC98Cl
+        tKDgyiWgsE5YE7WvcbHuS+FovQr/P3jDNLSv
+X-Google-Smtp-Source: ABdhPJxtwocimmQuH2ck54M52y0MSsO+aaHE01/L62cJjGy5LPMFGX+YtfwWKRhJfaZ6JGkz4AW5+A==
+X-Received: by 2002:a17:90a:b382:: with SMTP id e2mr13698965pjr.119.1633719627253;
+        Fri, 08 Oct 2021 12:00:27 -0700 (PDT)
+Received: from BernieDesktop.lan (wsip-72-222-70-2.sb.sd.cox.net. [72.222.70.2])
+        by smtp.gmail.com with ESMTPSA id u12sm11455270pjr.2.2021.10.08.12.00.26
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Oct 2021 12:00:26 -0700 (PDT)
+From:   Bernie Conrad <bernie@allthenticate.net>
 To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] tools/mesh-cfg-client: Fix NULL pointer dereferencing
-Date:   Fri,  8 Oct 2021 11:48:30 -0700
-Message-Id: <20211008184830.24276-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Bernie Conrad <bernie@allthenticate.com>
+Subject: [BlueZ v2] gatt: more fixes with cleanup on disconnect/timeout
+Date:   Fri,  8 Oct 2021 12:00:23 -0700
+Message-Id: <20211008190023.15462-1-bernie@allthenticate.net>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch fixes a number of potential NULL pointer dereferencing
-cases.
----
- tools/mesh/cfgcli.c  | 2 --
- tools/mesh/mesh-db.c | 3 ++-
- tools/mesh/remote.c  | 6 ++++++
- 3 files changed, 8 insertions(+), 3 deletions(-)
+From: Bernie Conrad <bernie@allthenticate.com>
 
-diff --git a/tools/mesh/cfgcli.c b/tools/mesh/cfgcli.c
-index 2bf1a1503..f815c513c 100644
---- a/tools/mesh/cfgcli.c
-+++ b/tools/mesh/cfgcli.c
-@@ -668,8 +668,6 @@ static bool msg_recvd(uint16_t src, uint16_t idx, uint8_t *data,
- 			break;
- 		}
+The changes in gatt-database.c fix a use after free that was introduced
+after the last cleanup patch, ccc_new and write_new operations were not
+being properly unregistered because they were not assigned a disconn_id.
+
+The changes in gatt-db add similar cleanup to pending reads/writes where
+timeouts after a disconnect would cause a similar use after free with
+already cleaned up resoureces, this adds a simple cb to set on a pending
+read/write if a disconnect has occurred to skip the use.
+
+v2: Fixing formatting issues
+
+---
+ src/gatt-database.c  |  4 ++--
+ src/shared/gatt-db.c | 38 ++++++++++++++++++++++++++++++++++++--
+ 2 files changed, 38 insertions(+), 4 deletions(-)
+
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 475e7873c..00647cf08 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -978,7 +978,7 @@ static struct pending_op *pending_ccc_new(struct bt_att *att,
+ 	op->attrib = attrib;
+ 	op->link_type = link_type;
  
--		bt_shell_printf("Period\t\t%d ms\n", pub.period);
--
- 		pub.rtx_cnt = data[9] & 0x7;
- 		pub.rtx_interval = ((data[9] >> 3) + 1) * 50;
- 		bt_shell_printf("Rexmit count\t%d\n", pub.rtx_cnt);
-diff --git a/tools/mesh/mesh-db.c b/tools/mesh/mesh-db.c
-index 12055c1a9..1a1ba380b 100644
---- a/tools/mesh/mesh-db.c
-+++ b/tools/mesh/mesh-db.c
-@@ -2508,7 +2508,8 @@ void *mesh_db_prepare_export(void)
- 	jarray = json_object_new_array();
- 	json_object_object_add(export, "scenes", jarray);
+-	bt_att_register_disconnect(att,
++	op->disconn_id = bt_att_register_disconnect(att,
+ 				   pending_disconnect_cb,
+ 				   op,
+ 				   NULL);
+@@ -2418,7 +2418,7 @@ static struct pending_op *pending_write_new(struct bt_att *att,
+ 	op->prep_authorize = prep_authorize;
+ 	queue_push_tail(owner_queue, op);
  
--	write_bool(export, "partial", false);
-+	if (!write_bool(export, "partial", false))
-+		l_warn("Failed to write\"partial\" property");
+-	bt_att_register_disconnect(att,
++	op->disconn_id = bt_att_register_disconnect(att,
+ 			    pending_disconnect_cb,
+ 			    op, NULL);
  
- 	return export;
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 3a02289ce..8423961f8 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -77,17 +77,23 @@ struct attribute_notify {
+ 
+ struct pending_read {
+ 	struct gatt_db_attribute *attrib;
++	struct bt_att *att;
+ 	unsigned int id;
+ 	unsigned int timeout_id;
+ 	gatt_db_attribute_read_t func;
++	bool disconn;
++	unsigned int disconn_id;
+ 	void *user_data;
+ };
+ 
+ struct pending_write {
+ 	struct gatt_db_attribute *attrib;
++	struct bt_att *att;
+ 	unsigned int id;
+ 	unsigned int timeout_id;
+ 	gatt_db_attribute_write_t func;
++	bool disconn;
++	unsigned int disconn_id;
+ 	void *user_data;
+ };
+ 
+@@ -139,8 +145,10 @@ static void pending_read_result(struct pending_read *p, int err,
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, data, length, p->user_data);
++	if (!p->disconn)
++		p->func(p->attrib, err, data, length, p->user_data);
+ 
++	bt_att_unregister_disconnect(p->att, p->disconn_id);
+ 	free(p);
  }
-diff --git a/tools/mesh/remote.c b/tools/mesh/remote.c
-index 054da5300..6ec220a6f 100644
---- a/tools/mesh/remote.c
-+++ b/tools/mesh/remote.c
-@@ -281,6 +281,9 @@ bool remote_update_net_key(uint16_t addr, uint16_t net_idx, bool update,
  
- 	key = l_queue_find(rmt->net_keys, match_key,
- 						L_UINT_TO_PTR(net_idx));
-+	if (!key)
-+		return false;
+@@ -156,8 +164,10 @@ static void pending_write_result(struct pending_write *p, int err)
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, p->user_data);
++	if (!p->disconn)
++		p->func(p->attrib, err, p->user_data);
+ 
++	bt_att_unregister_disconnect(p->att, p->disconn_id);
+ 	free(p);
+ }
+ 
+@@ -1868,6 +1878,13 @@ bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
+ 	return true;
+ }
+ 
++static void pending_read_cb(int err, void *user_data)
++{
++	struct pending_read *p = user_data;
 +
- 	key->updated = update;
- 
- 	if (save)
-@@ -343,6 +346,9 @@ bool remote_update_app_key(uint16_t addr, uint16_t app_idx, bool update,
- 
- 	key = l_queue_find(rmt->app_keys, match_key,
- 						L_UINT_TO_PTR(app_idx));
-+	if (!key)
-+		return false;
++	p->disconn = 1;
++}
 +
- 	key->updated = update;
+ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 				uint8_t opcode, struct bt_att *att,
+ 				gatt_db_attribute_read_t func, void *user_data)
+@@ -1901,6 +1918,11 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		p->func = func;
+ 		p->user_data = user_data;
  
- 	if (save)
++		p->disconn = 0;
++		p->disconn_id = bt_att_register_disconnect(att,
++				     	pending_read_cb, p, NULL);
++		p->att = att;
++
+ 		queue_push_tail(attrib->pending_reads, p);
+ 
+ 		attrib->read_func(attrib, p->id, offset, opcode, att,
+@@ -1956,6 +1978,13 @@ static bool write_timeout(void *user_data)
+ 	return false;
+ }
+ 
++static void pending_write_cb(int err, void *user_data)
++{
++	struct pending_write *p = user_data;
++
++	p->disconn = 1;
++}
++
+ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 					const uint8_t *value, size_t len,
+ 					uint8_t opcode, struct bt_att *att,
+@@ -1995,6 +2024,11 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		p->func = func;
+ 		p->user_data = user_data;
+ 
++		p->disconn = 0;
++		p->disconn_id = bt_att_register_disconnect(att,
++					pending_write_cb, p, NULL);
++		p->att = att;
++
+ 		queue_push_tail(attrib->pending_writes, p);
+ 
+ 		attrib->write_func(attrib, p->id, offset, value, len, opcode,
 -- 
-2.31.1
+2.17.1
 
