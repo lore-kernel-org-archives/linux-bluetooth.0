@@ -2,287 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0A686C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 14:03:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5DD81C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 14:03:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E656561042
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 14:03:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3E7CF61029
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 14:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234008AbhJHOFG (ORCPT
+        id S236071AbhJHOFI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Oct 2021 10:05:06 -0400
+        Fri, 8 Oct 2021 10:05:08 -0400
 Received: from mga04.intel.com ([192.55.52.120]:22400 "EHLO mga04.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232821AbhJHOFF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Oct 2021 10:05:05 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10130"; a="225286231"
+        id S234096AbhJHOFI (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 8 Oct 2021 10:05:08 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10130"; a="225286249"
 X-IronPort-AV: E=Sophos;i="5.85,357,1624345200"; 
-   d="scan'208";a="225286231"
+   d="scan'208";a="225286249"
 Received: from fmsmga005.fm.intel.com ([10.253.24.32])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 07:02:44 -0700
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Oct 2021 07:02:48 -0700
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.85,357,1624345200"; 
-   d="scan'208";a="715520988"
+   d="scan'208";a="715521010"
 Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga005.fm.intel.com with ESMTP; 08 Oct 2021 07:02:42 -0700
+  by fmsmga005.fm.intel.com with ESMTP; 08 Oct 2021 07:02:46 -0700
 From:   Kiran K <kiran.k@intel.com>
 To:     linux-bluetooth@vger.kernel.org
 Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
         luiz.von.dentz@intel.com, Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2 1/7] Bluetooth: Refactor code to read supported codecs in getsockopt
-Date:   Fri,  8 Oct 2021 19:37:53 +0530
-Message-Id: <20211008140759.15493-1-kiran.k@intel.com>
+Subject: [PATCH v2 3/7] Bluetooth: btintel: cache offload use case data
+Date:   Fri,  8 Oct 2021 19:37:55 +0530
+Message-Id: <20211008140759.15493-3-kiran.k@intel.com>
 X-Mailer: git-send-email 2.17.1
+In-Reply-To: <20211008140759.15493-1-kiran.k@intel.com>
+References: <20211008140759.15493-1-kiran.k@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch moves reading of supported codecs from cache to a new
-function to reuse over L2CAP sockets to be used in a2dp offload
-use case.
+Keep a copy of use cases preset information in
+driver data. Use cases preset data can be re-used
+later instead of reading from controller every time.
 
 Signed-off-by: Kiran K <kiran.k@intel.com>
 ---
- net/bluetooth/hci_codec.c | 88 +++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_codec.h |  2 +
- net/bluetooth/sco.c       | 98 +++------------------------------------
- 3 files changed, 96 insertions(+), 92 deletions(-)
+ drivers/bluetooth/btintel.c | 6 ++++++
+ drivers/bluetooth/btintel.h | 1 +
+ 2 files changed, 7 insertions(+)
 
-diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
-index 38201532f58e..f4d8d3a253d8 100644
---- a/net/bluetooth/hci_codec.c
-+++ b/net/bluetooth/hci_codec.c
-@@ -250,3 +250,91 @@ void hci_read_supported_codecs_v2(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index 9359bff47296..f1431143eff5 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2219,6 +2219,7 @@ static int btintel_configure_offload(struct hci_dev *hdev)
+ 	struct sk_buff *skb;
+ 	int err = 0;
+ 	struct intel_offload_use_cases *use_cases;
++	struct btintel_data *intel_data;
+ 
+ 	skb = __hci_cmd_sync(hdev, 0xfc86, 0, NULL, HCI_INIT_TIMEOUT);
+ 	if (IS_ERR(skb)) {
+@@ -2239,10 +2240,15 @@ static int btintel_configure_offload(struct hci_dev *hdev)
+ 		goto error;
+ 	}
+ 
++	intel_data = hci_get_priv((hdev));
++
++	intel_data->use_cases = *use_cases;
++
+ 	if (use_cases->preset[0] & 0x03) {
+ 		hdev->get_data_path_id = btintel_get_data_path_id;
+ 		hdev->get_codec_config_data = btintel_get_codec_config_data;
+ 	}
++
  error:
  	kfree_skb(skb);
- }
-+
-+int hci_get_supported_codecs(struct hci_dev *hdev, u8 type, char __user *optval,
-+			     int __user *optlen, int len)
-+{
-+	int n = 0, buf_len = 0, err = 0;
-+	struct hci_codec_caps *caps;
-+	struct bt_codec codec;
-+	u8 num_codecs = 0, i, __user *ptr;
-+	struct codec_list *c;
-+
-+	if (!hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED)) {
-+		err = -EOPNOTSUPP;
-+		goto error;
-+	}
-+
-+	if (!hdev->get_data_path_id) {
-+		err = -EOPNOTSUPP;
-+		goto error;
-+	}
-+
-+	/* find total buffer size required to copy codec + capabilities */
-+	hci_dev_lock(hdev);
-+	list_for_each_entry(c, &hdev->local_codecs, list) {
-+		if (c->transport != type)
-+			continue;
-+		num_codecs++;
-+		for (i = 0, caps = c->caps; i < c->num_caps; i++) {
-+			buf_len += 1 + caps->len;
-+			caps = (void *)&caps->data[caps->len];
-+		}
-+		buf_len += sizeof(struct bt_codec);
-+	}
-+	hci_dev_unlock(hdev);
-+
-+	buf_len += sizeof(struct bt_codecs);
-+	if (buf_len > len) {
-+		err = -ENOBUFS;
-+		goto error;
-+	}
-+	ptr = optval;
-+
-+	if (put_user(num_codecs, ptr)) {
-+		err = -EFAULT;
-+		goto error;
-+	}
-+	ptr += sizeof(num_codecs);
-+
-+	/* Iterate over all the codecs on required transport */
-+	hci_dev_lock(hdev);
-+	list_for_each_entry(c, &hdev->local_codecs, list) {
-+		if (c->transport != type)
-+			continue;
-+
-+		codec.id = c->id;
-+		codec.cid = c->cid;
-+		codec.vid = c->vid;
-+		err = hdev->get_data_path_id(hdev, &codec.data_path);
-+		if (err < 0)
-+			break;
-+		codec.num_caps = c->num_caps;
-+		if (copy_to_user(ptr, &codec, sizeof(codec))) {
-+			err = -EFAULT;
-+			break;
-+		}
-+		ptr += sizeof(codec);
-+
-+		/* find codec capabilities data length */
-+		n = 0;
-+		for (i = 0, caps = c->caps; i < c->num_caps; i++) {
-+			n += 1 + caps->len;
-+			caps = (void *)&caps->data[caps->len];
-+		}
-+
-+		/* copy codec capabilities data */
-+		if (n && copy_to_user(ptr, c->caps, n)) {
-+			err = -EFAULT;
-+			break;
-+		}
-+		ptr += n;
-+	}
-+	hci_dev_unlock(hdev);
-+
-+	if (!err && put_user(buf_len, optlen))
-+		err = -EFAULT;
-+
-+error:
-+	return err;
-+}
-diff --git a/net/bluetooth/hci_codec.h b/net/bluetooth/hci_codec.h
-index a2751930f123..6e849c7d75b9 100644
---- a/net/bluetooth/hci_codec.h
-+++ b/net/bluetooth/hci_codec.h
-@@ -5,3 +5,5 @@
- void hci_read_supported_codecs(struct hci_dev *hdev);
- void hci_read_supported_codecs_v2(struct hci_dev *hdev);
- void hci_codec_list_clear(struct list_head *codec_list);
-+int hci_get_supported_codecs(struct hci_dev *hdev, u8 type, char __user *optval,
-+			     int __user *optlen, int len);
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 8eabf41b2993..0af814c13b5f 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -33,6 +33,8 @@
- #include <net/bluetooth/hci_core.h>
- #include <net/bluetooth/sco.h>
+ 	return err;
+diff --git a/drivers/bluetooth/btintel.h b/drivers/bluetooth/btintel.h
+index e500c0d7a729..091528d75256 100644
+--- a/drivers/bluetooth/btintel.h
++++ b/drivers/bluetooth/btintel.h
+@@ -158,6 +158,7 @@ enum {
  
-+#include "hci_codec.h"
-+
- static bool disable_esco;
+ struct btintel_data {
+ 	DECLARE_BITMAP(flags, __INTEL_NUM_FLAGS);
++	struct intel_offload_use_cases use_cases;
+ };
  
- static const struct proto_ops sco_sock_ops;
-@@ -1032,12 +1034,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 	struct bt_voice voice;
- 	u32 phys;
- 	int pkt_status;
--	int buf_len;
--	struct codec_list *c;
--	u8 num_codecs, i, __user *ptr;
- 	struct hci_dev *hdev;
--	struct hci_codec_caps *caps;
--	struct bt_codec codec;
- 
- 	BT_DBG("sk %p", sk);
- 
-@@ -1103,98 +1100,15 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
- 		break;
- 
- 	case BT_CODEC:
--		num_codecs = 0;
--		buf_len = 0;
--
--		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
-+		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
-+				     BDADDR_BREDR);
- 		if (!hdev) {
- 			err = -EBADFD;
- 			break;
- 		}
--
--		if (!hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED)) {
--			hci_dev_put(hdev);
--			err = -EOPNOTSUPP;
--			break;
--		}
--
--		if (!hdev->get_data_path_id) {
--			hci_dev_put(hdev);
--			err = -EOPNOTSUPP;
--			break;
--		}
--
--		/* find total buffer size required to copy codec + caps */
--		hci_dev_lock(hdev);
--		list_for_each_entry(c, &hdev->local_codecs, list) {
--			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
--				continue;
--			num_codecs++;
--			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
--				buf_len += 1 + caps->len;
--				caps = (void *)&caps->data[caps->len];
--			}
--			buf_len += sizeof(struct bt_codec);
--		}
--		hci_dev_unlock(hdev);
--
--		buf_len += sizeof(struct bt_codecs);
--		if (buf_len > len) {
--			hci_dev_put(hdev);
--			err = -ENOBUFS;
--			break;
--		}
--		ptr = optval;
--
--		if (put_user(num_codecs, ptr)) {
--			hci_dev_put(hdev);
--			err = -EFAULT;
--			break;
--		}
--		ptr += sizeof(num_codecs);
--
--		/* Iterate all the codecs supported over SCO and populate
--		 * codec data
--		 */
--		hci_dev_lock(hdev);
--		list_for_each_entry(c, &hdev->local_codecs, list) {
--			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
--				continue;
--
--			codec.id = c->id;
--			codec.cid = c->cid;
--			codec.vid = c->vid;
--			err = hdev->get_data_path_id(hdev, &codec.data_path);
--			if (err < 0)
--				break;
--			codec.num_caps = c->num_caps;
--			if (copy_to_user(ptr, &codec, sizeof(codec))) {
--				err = -EFAULT;
--				break;
--			}
--			ptr += sizeof(codec);
--
--			/* find codec capabilities data length */
--			len = 0;
--			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
--				len += 1 + caps->len;
--				caps = (void *)&caps->data[caps->len];
--			}
--
--			/* copy codec capabilities data */
--			if (len && copy_to_user(ptr, c->caps, len)) {
--				err = -EFAULT;
--				break;
--			}
--			ptr += len;
--		}
--
--		if (!err && put_user(buf_len, optlen))
--			err = -EFAULT;
--
--		hci_dev_unlock(hdev);
-+		err = hci_get_supported_codecs(hdev, HCI_TRANSPORT_SCO_ESCO,
-+					       optval, optlen, len);
- 		hci_dev_put(hdev);
--
- 		break;
- 
- 	default:
+ #define btintel_set_flag(hdev, nr)					\
 -- 
 2.17.1
 
