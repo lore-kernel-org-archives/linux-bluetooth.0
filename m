@@ -2,125 +2,205 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4FA2FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 20:26:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 20B62C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 00:16:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 388876103B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  7 Oct 2021 20:26:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0789960E54
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 00:16:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242204AbhJGU2e (ORCPT
+        id S234233AbhJHASc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 7 Oct 2021 16:28:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56126 "EHLO
+        Thu, 7 Oct 2021 20:18:32 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242188AbhJGU2c (ORCPT
+        with ESMTP id S232350AbhJHASb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 7 Oct 2021 16:28:32 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A8FEC061570
-        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Oct 2021 13:26:27 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id x8so4641593plv.8
-        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Oct 2021 13:26:27 -0700 (PDT)
+        Thu, 7 Oct 2021 20:18:31 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44265C061570
+        for <linux-bluetooth@vger.kernel.org>; Thu,  7 Oct 2021 17:16:37 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id 145so6681632pfz.11
+        for <linux-bluetooth@vger.kernel.org>; Thu, 07 Oct 2021 17:16:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IGbnUIj88kv4IctJqhWuPp16vyq/nK0+wFYaOnm/rak=;
-        b=OvP6bBw+OiyQ4quwOqVIj9hOMjJbr/zI/bx9vCtdlqCaMXCLU+zJpqqAZ7cTFZagKP
-         5FdLlrGggAGPVKUxJ1G30atzPKJEKZPjcbZKXiwDWOKZN9TsTBpLJRW7o3l1MYFgGWGO
-         FQfF4rYb7AsBUo77W77eHSO8maw+P7RrHpQvzLquKgq4SghgLPtjdmGHAAXUGFVbD9/m
-         e0OCQgdc3G9NamJiVG3HlaXfiAeW1qQpjsU+iLARuIQxf6EoUR141DaupqR4PY1EhM/g
-         Zl++FJl7dZeMkfN6Wv9OhbCNpm0koX4TCY07gJMXhUWjfkTWizs2orgdR/XoeihEdimr
-         q0RQ==
+        d=allthenticate.net; s=google;
+        h=from:to:cc:subject:date:message-id;
+        bh=qtstk6Vt7vSIwxfUmsL+6aZ9l2AVJjZlwVg8NGImmPo=;
+        b=wciYN3/KZDQZVusEQo4O59Oi1IbZktAulua9YvVCUTCxnN68aHnny+ZTTVuU++eeQo
+         r/84tufueltKsivs/+bWJ/r+GeE6vnEI1joXd+hbGftb6uREqMpU/lhoDS4DKLX/CzD+
+         TBuPf0VOZbrXEGPX6Cmo/vsO2jSY5Qe44E9A4c+/vGHsdA/bdCeUsrRA55F1OExV77Zj
+         xM0AmBT0wZUAps6kcF32xVxe7Yjlr28EEmw0cMd47w5uA5cXTO556qCAp+ToVlSQNXMd
+         zaRXudtEIG0Soheey4+P1luaIqn6LAOV3NxSWFEluHfgKJYmsYqcAibEuuVEzk6LNaFy
+         qG+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=IGbnUIj88kv4IctJqhWuPp16vyq/nK0+wFYaOnm/rak=;
-        b=F2mo2sNZ8WZd0zNFEOWMEeBFr/30TYZrXikt8gE/u28JSCgdoteoxzNoUMDdXQ76GB
-         VJVXuTh0iH+s3TLhEbnCiPpHiAtqE6uIOfLo3jPD4HpofDeQEHIoMHgvDsxfTyZRA+rv
-         94xb1a93tFOokk4p8SBlMGUv3XuDMDppS3Gt4jEAxZPgLPczMOsB8LRCqWYeMGDejT/W
-         Gr1ytyz1Yq1wsJoPafo7ceRP4TqJY76sZFqqmnptUQsL9svpWaK9eMHvjroRNEq5YQ1U
-         pHVtr9Xjp54ogEUVhFokv6lU3p4IXmTlzTeWI0mnk88bV+n4wg/dbRr1IbjFndB+Fgv9
-         zWyw==
-X-Gm-Message-State: AOAM530I+ssuMLt3phSlIs1v/E/Gq40vAmwM5QDeXI7CDEZI2b1kypJ7
-        mWZYtJxv1uoo6/cUYKogwxI17kXczts=
-X-Google-Smtp-Source: ABdhPJwV+jZhx1j2BNxj8tGfoNZj0s3uar7uDe5PfQPM3dDCJkZxEbqUuiWR5PR37q4SIOjZL9CXgw==
-X-Received: by 2002:a17:90b:1d0d:: with SMTP id on13mr7280025pjb.118.1633638386669;
-        Thu, 07 Oct 2021 13:26:26 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id o2sm9184580pja.7.2021.10.07.13.26.26
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id;
+        bh=qtstk6Vt7vSIwxfUmsL+6aZ9l2AVJjZlwVg8NGImmPo=;
+        b=75+nrcChgiJxVC1JYrV2Lp991nDDrfBPqtQUipk+SKZAj8BelaEJjh56Fk6NHDbVA5
+         EO37WUOTfGphoSlxDuTczTAHv671z6xmNJLAMGjKy16BQdclcNia4+J52GkD4EZdqNLb
+         9GlFl6yi1dxAvVXyK0RkQRbP0ySSfoLG9n7PZuJsIaV281D+ZvjItnOGNzPE9VIhKz74
+         EAoFt7+NE+/+sCW+RuGGbAPYeQqtF6tM7EG5J5Izha6IdcpDrwaAYFqVoirXefMT6lWS
+         uVKjDdGn/zr/VR7bbkAJ1PW9/oeAjH5FYzv5UlMzeaaUMFZYf6TlNjoZWRFWAl6uPSs8
+         bueQ==
+X-Gm-Message-State: AOAM532Oq4xQuD56nqp3BNQU9oQPxzE94uqmKxuy9a2+mhtkzecuSyNk
+        v1fi9//3wP8ShC6iyg0St1rCVBu8ZABp0gjO
+X-Google-Smtp-Source: ABdhPJy86W9OcYKBomPJPM5HzZjnBY8nw+9T4Sgel6cRPgkqUDpDj9yht7+vieFa/LC1nHg0WqunhA==
+X-Received: by 2002:aa7:8609:0:b0:44b:346a:7404 with SMTP id p9-20020aa78609000000b0044b346a7404mr7025076pfn.86.1633652196361;
+        Thu, 07 Oct 2021 17:16:36 -0700 (PDT)
+Received: from BernieDesktop.lan (wsip-72-222-70-2.sb.sd.cox.net. [72.222.70.2])
+        by smtp.gmail.com with ESMTPSA id d137sm521036pfd.72.2021.10.07.17.16.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Oct 2021 13:26:26 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Thu, 07 Oct 2021 17:16:36 -0700 (PDT)
+From:   Bernie Conrad <bernie@allthenticate.net>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: L2CAP: Fix not initializing sk_peer_pid
-Date:   Thu,  7 Oct 2021 13:26:25 -0700
-Message-Id: <20211007202625.1462550-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Cc:     Bernie Conrad <bernie@allthenticate.com>
+Subject: [BlueZ] gatt: more fixes with cleanup on disconnect/timeout
+Date:   Thu,  7 Oct 2021 17:16:29 -0700
+Message-Id: <20211008001629.7024-1-bernie@allthenticate.net>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+From: Bernie Conrad <bernie@allthenticate.com>
 
-In order to group sockets being connected using L2CAP_MODE_EXT_FLOWCTL
-the pid is used but sk_peer_pid was not being initialized as it is
-currently only done for af_unix.
+The changes in gatt-database.c fix a use after free that was introduced
+after the last cleanup patch, ccc_new and write_new operations were not
+being properly unregistered because they were not assigned a disconn_id. 
 
-Fixes: b48596d1dc25 "Bluetooth: L2CAP: Add get_peer_pid callback"
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+The changes in gatt-db add similar cleanup to pending reads/writes where
+timeouts after a disconnect would cause a similar use after free with
+already cleaned up resoureces, this adds a simple cb to set on a pending
+read/write if a disconnect has occurred to skip the use.  
+
 ---
- net/bluetooth/l2cap_sock.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ src/gatt-database.c  |  4 ++--
+ src/shared/gatt-db.c | 36 ++++++++++++++++++++++++++++++++++--
+ 2 files changed, 36 insertions(+), 4 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 160c016a5dfb..4574c5cb1b59 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -172,6 +172,21 @@ static int l2cap_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
- 	return err;
+diff --git a/src/gatt-database.c b/src/gatt-database.c
+index 475e7873c..00647cf08 100644
+--- a/src/gatt-database.c
++++ b/src/gatt-database.c
+@@ -978,7 +978,7 @@ static struct pending_op *pending_ccc_new(struct bt_att *att,
+ 	op->attrib = attrib;
+ 	op->link_type = link_type;
+ 
+-	bt_att_register_disconnect(att,
++	op->disconn_id = bt_att_register_disconnect(att,
+ 				   pending_disconnect_cb,
+ 				   op,
+ 				   NULL);
+@@ -2418,7 +2418,7 @@ static struct pending_op *pending_write_new(struct bt_att *att,
+ 	op->prep_authorize = prep_authorize;
+ 	queue_push_tail(owner_queue, op);
+ 
+-	bt_att_register_disconnect(att,
++	op->disconn_id = bt_att_register_disconnect(att,
+ 			    pending_disconnect_cb,
+ 			    op, NULL);
+ 
+diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
+index 3a02289ce..c1e676607 100644
+--- a/src/shared/gatt-db.c
++++ b/src/shared/gatt-db.c
+@@ -77,17 +77,23 @@ struct attribute_notify {
+ 
+ struct pending_read {
+ 	struct gatt_db_attribute *attrib;
++	struct bt_att *att;
+ 	unsigned int id;
+ 	unsigned int timeout_id;
+ 	gatt_db_attribute_read_t func;
++	bool disconn;
++	unsigned int disconn_id;
+ 	void *user_data;
+ };
+ 
+ struct pending_write {
+ 	struct gatt_db_attribute *attrib;
++	struct bt_att *att;
+ 	unsigned int id;
+ 	unsigned int timeout_id;
+ 	gatt_db_attribute_write_t func;
++	bool disconn;
++	unsigned int disconn_id;
+ 	void *user_data;
+ };
+ 
+@@ -139,8 +145,10 @@ static void pending_read_result(struct pending_read *p, int err,
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, data, length, p->user_data);
++	if (!p->disconn)
++		p->func(p->attrib, err, data, length, p->user_data);
+ 
++	bt_att_unregister_disconnect(p->att, p->disconn_id);
+ 	free(p);
  }
  
-+static void l2cap_sock_init_pid(struct sock *sk)
+@@ -156,8 +164,10 @@ static void pending_write_result(struct pending_write *p, int err)
+ 	if (p->timeout_id > 0)
+ 		timeout_remove(p->timeout_id);
+ 
+-	p->func(p->attrib, err, p->user_data);
++	if (!p->disconn)
++		p->func(p->attrib, err, p->user_data);
+ 
++	bt_att_unregister_disconnect(p->att, p->disconn_id);
+ 	free(p);
+ }
+ 
+@@ -1868,6 +1878,13 @@ bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
+ 	return true;
+ }
+ 
++static void pending_read_cb(int err, void *user_data)
 +{
-+	struct l2cap_chan *chan = l2cap_pi(sk)->chan;
++	struct pending_read *p = user_data;
 +
-+	/* Only L2CAP_MODE_EXT_FLOWCTL ever need to access the PID in order to
-+	 * group the channels being requested.
-+	 */
-+	if (chan->mode != L2CAP_MODE_EXT_FLOWCTL)
-+		return;
-+
-+	spin_lock(&sk->sk_peer_lock);
-+	sk->sk_peer_pid = get_pid(task_tgid(current));
-+	spin_unlock(&sk->sk_peer_lock);
++	p->disconn = 1;
 +}
 +
- static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 			      int alen, int flags)
- {
-@@ -243,6 +258,8 @@ static int l2cap_sock_connect(struct socket *sock, struct sockaddr *addr,
- 	if (chan->psm && bdaddr_type_is_le(chan->src_type) && !chan->mode)
- 		chan->mode = L2CAP_MODE_LE_FLOWCTL;
+ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 				uint8_t opcode, struct bt_att *att,
+ 				gatt_db_attribute_read_t func, void *user_data)
+@@ -1901,6 +1918,10 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		p->func = func;
+ 		p->user_data = user_data;
  
-+	l2cap_sock_init_pid(sk);
++		p->disconn = 0;
++		p->disconn_id = bt_att_register_disconnect(att, pending_read_cb, p, NULL);
++		p->att = att;
 +
- 	err = l2cap_chan_connect(chan, la.l2_psm, __le16_to_cpu(la.l2_cid),
- 				 &la.l2_bdaddr, la.l2_bdaddr_type);
- 	if (err)
-@@ -298,6 +315,8 @@ static int l2cap_sock_listen(struct socket *sock, int backlog)
- 		goto done;
- 	}
+ 		queue_push_tail(attrib->pending_reads, p);
  
-+	l2cap_sock_init_pid(sk);
+ 		attrib->read_func(attrib, p->id, offset, opcode, att,
+@@ -1956,6 +1977,13 @@ static bool write_timeout(void *user_data)
+ 	return false;
+ }
+ 
++static void pending_write_cb(int err, void *user_data)
++{
++	struct pending_write *p = user_data;
 +
- 	sk->sk_max_ack_backlog = backlog;
- 	sk->sk_ack_backlog = 0;
++	p->disconn = 1;
++}
++
+ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 					const uint8_t *value, size_t len,
+ 					uint8_t opcode, struct bt_att *att,
+@@ -1995,6 +2023,10 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
+ 		p->func = func;
+ 		p->user_data = user_data;
  
++		p->disconn = 0;
++		p->disconn_id = bt_att_register_disconnect(att, pending_write_cb, p, NULL);
++		p->att = att;
++
+ 		queue_push_tail(attrib->pending_writes, p);
+ 
+ 		attrib->write_func(attrib, p->id, offset, value, len, opcode,
 -- 
-2.31.1
+2.17.1
 
