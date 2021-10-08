@@ -2,99 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B15FBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 21:40:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 918A8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:20:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8B5D160FE3
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 21:40:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 77E9561027
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:20:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243447AbhJHVmQ (ORCPT
+        id S243594AbhJHWWt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Oct 2021 17:42:16 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34060 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243348AbhJHVmP (ORCPT
+        Fri, 8 Oct 2021 18:22:49 -0400
+Received: from mailgw01.mediatek.com ([216.200.240.184]:49937 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231859AbhJHWWs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Oct 2021 17:42:15 -0400
-Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57FFFC061570
-        for <linux-bluetooth@vger.kernel.org>; Fri,  8 Oct 2021 14:40:19 -0700 (PDT)
-Received: by mail-vs1-xe36.google.com with SMTP id l22so9569717vsq.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 08 Oct 2021 14:40:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=0xuW6G4lp4XAe3klxT7l9/J9vDhXT2U7BADelxkJyoM=;
-        b=fDo3ClDAoQmGigdHChZcgeArdxazh6s9b7Tw59LsGEEK/iHi4sykgXW6OMq2dxRLPk
-         GmIYil2+QRXGtSLAV0dw/oiZvDCzpfBTBeSiOmGQUT20FKDol/OSUMHUCPX2XViJkVfv
-         6c996OqX+SxeuOd36dSb59wPvDNzcZ7FntD9xW8Try9BOy6LVLn/de10LBKx77KAC8OG
-         nkCesdAH/r1R8gmkIW4JiHhNpqDTxd7khoTum+mmzo1R8aVYiOg+i6d43b/2DB0bRiD1
-         Sj34uNsyiNod8JFlwfQlKh0iAkTDfVXrKYnM0k2mfP96rDJYgI9EJPVODfQOvfwm5D3l
-         XTBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=0xuW6G4lp4XAe3klxT7l9/J9vDhXT2U7BADelxkJyoM=;
-        b=nYCEOMSkoW2MmnjfUIXofcEMKPn5Sh6Bu13Ul/Uvzc6DAyqAM+l1xrDRL2q5tqsl49
-         qERQiHZGSsLKsWQJzRtSgkmvdUz+nJU6jOndiuyxzUgELCfvusL/nBsKEQgTDR0LC5hw
-         p7TlygQWg/qdUTPuqMI6Q445uGwaB/cxOXa+8YgcV6uDzc167u9mtEZBmzD8Fr3bOgvR
-         1Jxsd6APbspV3RMs2Gh6VSIqf9NswkgAXqMWgp7ZW3dLKZ7aa7GVkiS4VgzxOpOU2lDt
-         P6bi5KqPXKR0AmyJ3+tIRLP9Qmm3TE9P8DEEOnBMfyymBwis+SIT4l2KCk94fP3jJv3n
-         wZWg==
-X-Gm-Message-State: AOAM532hBf4P+IUN9Wc4uuHqj8bQtEy3pJ5l61+Q1MWyQurhOKPktzLE
-        Y6iMOlgynUzJ1eXiqT9yFQNjQPzogYltR/mXoV1m3wwX
-X-Google-Smtp-Source: ABdhPJw2IvOf1wnTv9Fqqhuw4JwaD1yeC3yVhlexRz3j187SEcN70U48nQt/bGJ83X6i8I5Jp93MMKH/qSgFs8YMEdY=
-X-Received: by 2002:a05:6102:3593:: with SMTP id h19mr14082706vsu.23.1633729216484;
- Fri, 08 Oct 2021 14:40:16 -0700 (PDT)
+        Fri, 8 Oct 2021 18:22:48 -0400
+X-Greylist: delayed 305 seconds by postgrey-1.27 at vger.kernel.org; Fri, 08 Oct 2021 18:22:48 EDT
+X-UUID: 5a3e3fc19dda4dbe9ad46d2af6bddfde-20211008
+X-UUID: 5a3e3fc19dda4dbe9ad46d2af6bddfde-20211008
+Received: from mtkcas66.mediatek.inc [(172.29.193.44)] by mailgw01.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (musrelay.mediatek.com ESMTP with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 2027970551; Fri, 08 Oct 2021 15:15:41 -0700
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ MTKMBS62DR.mediatek.inc (172.29.94.18) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Fri, 8 Oct 2021 15:10:33 -0700
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Sat, 9 Oct 2021 06:10:32 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
+        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
+        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <jemele@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH v1 03/10] Bluetooth: btmtksdio: add .set_bdaddr support
+Date:   Sat, 9 Oct 2021 06:10:10 +0800
+Message-ID: <25dbae25981183da4dee40487e01c2201a1f1990.1633728573.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1633728573.git.objelf@gmail.com>
+References: <cover.1633728573.git.objelf@gmail.com>
 MIME-Version: 1.0
-References: <20211008193628.39347-1-hj.tedd.an@gmail.com> <6160a1b5.1c69fb81.114d8.18b4@mx.google.com>
-In-Reply-To: <6160a1b5.1c69fb81.114d8.18b4@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 8 Oct 2021 14:40:05 -0700
-Message-ID: <CABBYNZJPkcjLvHznoqA+cfjZNLV0zd1ytqFTf8Qn+Lvd+Ha8Bw@mail.gmail.com>
-Subject: Re: [BlueZ,v3,1/3] doc/tester-config: Enable Runtime Debugging Feature
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+From: Sean Wang <sean.wang@mediatek.com>
 
-On Fri, Oct 8, 2021 at 12:55 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=560147
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      4.39 seconds
-> GitLint                       PASS      2.75 seconds
-> Prep - Setup ELL              PASS      40.26 seconds
-> Build - Prep                  PASS      0.45 seconds
-> Build - Configure             PASS      7.46 seconds
-> Build - Make                  PASS      174.06 seconds
-> Make Check                    PASS      9.00 seconds
-> Make Distcheck                PASS      211.98 seconds
-> Build w/ext ELL - Configure   PASS      7.81 seconds
-> Build w/ext ELL - Make        PASS      162.27 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+add .set_bdaddr support
 
-Applied, thanks.
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ drivers/bluetooth/btmtksdio.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 53682a4c2ced..77d1c4ac582d 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -834,6 +834,8 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	hdev->setup    = btmtksdio_setup;
+ 	hdev->shutdown = btmtksdio_shutdown;
+ 	hdev->send     = btmtksdio_send_frame;
++	hdev->set_bdaddr = btmtk_set_bdaddr;
++
+ 	SET_HCIDEV_DEV(hdev, &func->dev);
+ 
+ 	hdev->manufacturer = 70;
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
