@@ -2,33 +2,32 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 65F03C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:20:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAA40C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:21:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 54AD961040
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:20:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A959A61040
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  8 Oct 2021 22:21:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243656AbhJHWWx (ORCPT
+        id S243744AbhJHWXU (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 8 Oct 2021 18:22:53 -0400
-Received: from mailgw01.mediatek.com ([216.200.240.184]:49937 "EHLO
+        Fri, 8 Oct 2021 18:23:20 -0400
+Received: from mailgw01.mediatek.com ([216.200.240.184]:36675 "EHLO
         mailgw01.mediatek.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243610AbhJHWWv (ORCPT
+        with ESMTP id S243642AbhJHWXI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 8 Oct 2021 18:22:51 -0400
-X-Greylist: delayed 305 seconds by postgrey-1.27 at vger.kernel.org; Fri, 08 Oct 2021 18:22:48 EDT
-X-UUID: 2b5793be12d442638ea72d1a4bfc03c5-20211008
-X-UUID: 2b5793be12d442638ea72d1a4bfc03c5-20211008
+        Fri, 8 Oct 2021 18:23:08 -0400
+X-UUID: 431fb91993654d2b814cf9bbe0a2a408-20211008
+X-UUID: 431fb91993654d2b814cf9bbe0a2a408-20211008
 Received: from mtkcas66.mediatek.inc [(172.29.193.44)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (musrelay.mediatek.com ESMTP with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 883912663; Fri, 08 Oct 2021 15:15:41 -0700
+        with ESMTP id 1638295555; Fri, 08 Oct 2021 15:20:06 -0700
 Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- MTKMBS62DR.mediatek.inc (172.29.94.18) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Fri, 8 Oct 2021 15:10:23 -0700
+ MTKMBS62N1.mediatek.inc (172.29.193.41) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Fri, 8 Oct 2021 15:10:37 -0700
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 9 Oct 2021 06:10:23 +0800
+ Transport; Sat, 9 Oct 2021 06:10:36 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -45,11 +44,14 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>, Sean Wang <objelf@gmail.com>
-Subject: [PATCH v1 00/10] Add MT7921 SDIO Bluetooth support
-Date:   Sat, 9 Oct 2021 06:10:07 +0800
-Message-ID: <cover.1633728573.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>,
+        Mark-yw Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH v1 04/10] Bluetooth: btmtksdio: explicitly set WHISR as write-1-clear
+Date:   Sat, 9 Oct 2021 06:10:11 +0800
+Message-ID: <e03f16855e0a2ed5eefdde99d8f4b91452d8d848.1633728573.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <cover.1633728573.git.objelf@gmail.com>
+References: <cover.1633728573.git.objelf@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-MTK:  N
@@ -57,54 +59,50 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <objelf@gmail.com>
+From: Sean Wang <sean.wang@mediatek.com>
 
-The patchset adds the MT7921 SDIO (MT7921s) Blutooth support to btmtksdio
-driver, which basically are made up of 3 parts.
+That is a preliminary patch to introduce mt7921s support.
 
-PART 1: patch 1-3 to create btmtk module to rely on
+Explicitly set WHISR as write-1-clear method to all devices that is
+the expected behavior the driver rely on.
 
-These are preliminary patches for MT7921s driver to move the common
-firmware download procedure and the common functions from MT7921u to btmtk
-module to make MT7921u, MT7921s and other devices can share with to reduce
-the unnecessary duplicated code being created.
+Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+---
+ drivers/bluetooth/btmtksdio.c | 11 ++++++++---
+ 1 file changed, 8 insertions(+), 3 deletions(-)
 
-PART 2: patch 4-8 to refactor btmtksdio prior to adding MT7921s
-
-These are preliminary patches for MT7921s driver to refactor the current
-btmtksdio to make MT7921S is able to coexist with the devices the current
-driver can support with the generic code and improve the performance on
-packet transmitting and receving process.
-
-PART 3: patch 9-10 to add specific MT7921s logic
-
-Add the specific logic regarding to MT7921s bluetooth.
-
-Mark-yw Chen (1):
-  Bluetooth: btmtksdio: transmit packet according to the status TX_EMPTY
-
-Sean Wang (9):
-  Bluetooth: mediatek: add BT_MTK module
-  Bluetooth: btmtksido: rely on BT_MTK module
-  Bluetooth: btmtksdio: add .set_bdaddr support
-  Bluetooth: btmtksdio: explicitly set WHISR as write-1-clear
-  Bluetooth: btmtksdio: move interrupt service to work
-  Bluetooth: btmtksdio: update register CSDIOCSR operation
-  Bluetooth: btmtksdio: use register CRPLR to read packet length
-  mmc: add MT7921 SDIO identifiers for MediaTek Bluetooth devices
-  Bluetooth: btmtksdio: add MT7921s Bluetooth support
-
- drivers/bluetooth/Kconfig     |   6 +
- drivers/bluetooth/Makefile    |   1 +
- drivers/bluetooth/btmtk.c     | 288 ++++++++++++++++++++
- drivers/bluetooth/btmtk.h     | 101 +++++++
- drivers/bluetooth/btmtksdio.c | 496 +++++++++++++++++-----------------
- drivers/bluetooth/btusb.c     | 331 +----------------------
- include/linux/mmc/sdio_ids.h  |   1 +
- 7 files changed, 647 insertions(+), 577 deletions(-)
- create mode 100644 drivers/bluetooth/btmtk.c
- create mode 100644 drivers/bluetooth/btmtk.h
-
---
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index 77d1c4ac582d..57126a95e292 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -487,8 +487,8 @@ static void btmtksdio_interrupt(struct sdio_func *func)
+ static int btmtksdio_open(struct hci_dev *hdev)
+ {
+ 	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	u32 status, val;
+ 	int err;
+-	u32 status;
+ 
+ 	sdio_claim_host(bdev->func);
+ 
+@@ -533,8 +533,13 @@ static int btmtksdio_open(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		goto err_release_irq;
+ 
+-	/* Setup write-1-clear for CHISR register */
+-	sdio_writel(bdev->func, C_INT_CLR_CTRL, MTK_REG_CHCR, &err);
++	/* Explitly set write-1-clear method */
++	val = sdio_readl(bdev->func, MTK_REG_CHCR, &err);
++	if (err < 0)
++		goto err_release_irq;
++
++	val |= C_INT_CLR_CTRL;
++	sdio_writel(bdev->func, val, MTK_REG_CHCR, &err);
+ 	if (err < 0)
+ 		goto err_release_irq;
+ 
+-- 
 2.25.1
 
