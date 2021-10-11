@@ -2,162 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A2B1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 10:49:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E39C0C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 21:11:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6E37961038
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 10:49:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BD20560F43
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 21:11:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235987AbhJKKvD (ORCPT
+        id S234073AbhJKVNu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Oct 2021 06:51:03 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:51120 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235970AbhJKKvB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Oct 2021 06:51:01 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1633949341; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=FqTEb0CozCkO/Xg1ORp7X/hCkBubMbUiKCfvP9a61tw=; b=AVhbe2l6P12nBj6NDtmFGgmtcvlXofz29vPT7iQq/fSs56kWmoWrqaufGH7u1OeR0/s7ctF+
- FmJ5KuzxMubBhFGAyPOuEpqskgWxdKetGQxDmPxfLJ+I6JMi4Zg5u0JeXxneO0gA8HBK8XUK
- qW3oQqp92qAEJO1aiQk1lxnToTI=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 61641696446c6db0cb307fdf (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 11 Oct 2021 10:48:54
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 9FE0EC4360D; Mon, 11 Oct 2021 10:48:53 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 14338C4338F;
-        Mon, 11 Oct 2021 10:48:52 +0000 (UTC)
+        Mon, 11 Oct 2021 17:13:50 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52196 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231994AbhJKVNu (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 11 Oct 2021 17:13:50 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EA9AC061570
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Oct 2021 14:11:49 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id 21so5936309plo.13
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Oct 2021 14:11:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ngp3++O79al+cad27OV1IHGZYfV5z88NY3J14fxoyMU=;
+        b=PB6J5o8RXCljvFIS41ziad6LdnDpovGBwtgeXpvsgSxvvjYJGv3MPf3amnsUrvOBq5
+         2uVkFUlyW+KbBsiUcyGn3uQU43HWcy7j+/nvH7D75u2lOBkv6tbOuxvhygkwOBnNWS19
+         WmlC4QmNaV9yXRf6PcsJ8Wsbgwwh6BHYf4daVVI+pGPDJlQjkJUJdE41EP0FoxacCtel
+         N/A0yMFy1qCuS+n2EvRiRcyeO10BMeUCWp2xYk3Y39IrxwpGz1XSwrvSRCDL/YSAEpiB
+         15UaZz6eU+WhBi3czNSg2YrJz2ItxurQKftgsdw8KU1IVh6AJqR72xD1u9Malpj/JE0Y
+         tX7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ngp3++O79al+cad27OV1IHGZYfV5z88NY3J14fxoyMU=;
+        b=Ut2IFfFhBM1ioAN6GTn1ijmMkga9lPWrTXnYbAflkD16mJi30r1lM3LsPCYcALWt99
+         hhv0/0QGBMUbD9RJO/JdgL/ifoCuuUqVb3kKSyV93xfTRo8mVqHvuWcfOwiyb0WWqMoJ
+         P3KBM0RYDfX9iV+TM+5JA8zpRNe97gfoadxkpt0lsv5zpZu6E/LH4oVbpEVZRg++94A2
+         TwYWwm4nTLP8aOaCLC1xFrOz/HXs//FhlDEYywvY59cpxk2FAG5ZVxMYvI0IA7nWbrqr
+         z6el0ASjOx8++6lPtcpiqs7ZLasV8jzxSo9vTrmzhxTjvMvkgAdMBmSptZo2CHO4Kz2d
+         6HyQ==
+X-Gm-Message-State: AOAM532iSNN4UuOa78XdbUlx09DDTKbfsnbBsJZDtMaVri1P35p9zWzj
+        8hVEpMF2b0uqfhw77OQ3YKKQq98XI5U=
+X-Google-Smtp-Source: ABdhPJwquvsGYKIa29hKZPrbSQVppTasznAjPR4CHVm3KDq5A2h1yip/1HJGBSiOW9tb8EA1oK3GuA==
+X-Received: by 2002:a17:90a:4814:: with SMTP id a20mr1471834pjh.154.1633986708866;
+        Mon, 11 Oct 2021 14:11:48 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id e1sm9335145pgi.43.2021.10.11.14.11.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 14:11:48 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [RFC] Bluetooth: vhci: Add support for setting msft_opcode
+Date:   Mon, 11 Oct 2021 14:11:47 -0700
+Message-Id: <20211011211147.2379624-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 11 Oct 2021 18:48:52 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v1] Bluetooth: btusb: Add support for variant WCN6855 by using
-  different nvm
-Message-ID: <7bdbdd186289635cd481562642f35cb8@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-the RF performance of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+This adds a debugfs entry to set msft_opcode enabling vhci to emulate
+controllers with MSFT extention support.
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-  drivers/bluetooth/btusb.c | 54 
-+++++++++++++++++++++++++++++++++++------------
-  1 file changed, 40 insertions(+), 14 deletions(-)
+ drivers/bluetooth/hci_vhci.c | 32 ++++++++++++++++++++++++++++++++
+ 1 file changed, 32 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 75c83768c257..ed1ccf061a54 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
-*hdev,
-  #define QCA_DFU_TIMEOUT		3000
-  #define QCA_FLAG_MULTI_NVM      0x80
-
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 56c6b22be10b..ac122299bacc 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -194,6 +194,34 @@ static const struct file_operations force_wakeup_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
 +
-  struct qca_version {
-  	__le32	rom_version;
-  	__le32	patch_version;
-@@ -3221,6 +3224,7 @@ static const struct qca_device_info 
-qca_devices_table[] = {
-  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-  };
-
-  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
-request,
-@@ -3375,6 +3379,41 @@ static int btusb_setup_qca_load_rampatch(struct 
-hci_dev *hdev,
-  	return err;
-  }
-
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver)
++static int msft_opcode_set(void *data, u64 val)
 +{
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
++	struct vhci_data *vhci = data;
++	uint16_t ogf = (val & 0xffff >> 10);
 +
-+	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		u16 board_id = le16_to_cpu(ver->board_id);
-+		const char *variant;
++	if (val > 0xffff || ogf != 0x3f)
++		return -EINVAL;
 +
-+		switch (ver->ram_version) {
-+		case WCN6855_2_0_RAM_VERSION_GF:
-+		case WCN6855_2_1_RAM_VERSION_GF:
-+			variant = "_gf";
-+			break;
-+		default:
-+			variant = "";
-+			break;
-+		}
++	hci_set_msft_opcode(vhci->hdev, val);
 +
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
-+				rom_version, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
-+				rom_version, variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			rom_version);
-+	}
-+
++	return 0;
 +}
 +
-  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-  				    struct qca_version *ver,
-  				    const struct qca_device_info *info)
-@@ -3383,20 +3422,7 @@ static int btusb_setup_qca_load_nvm(struct 
-hci_dev *hdev,
-  	char fwname[64];
-  	int err;
-
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
--	}
-+	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
-
-  	err = request_firmware(&fw, fwname, &hdev->dev);
-  	if (err) {
++static int msft_opcode_get(void *data, u64 *val)
++{
++	struct vhci_data *vhci = data;
++
++	hci_dev_lock(vhci->hdev);
++	*val = vhci->hdev->msft_opcode;
++	hci_dev_unlock(vhci->hdev);
++
++	return 0;
++}
++
++DEFINE_DEBUGFS_ATTRIBUTE(msft_opcode_fops, msft_opcode_get, msft_opcode_set,
++			 "%llu\n");
++
+ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+@@ -259,6 +287,10 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
+ 			    &force_wakeup_fops);
+ 
++	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
++		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
++				    &msft_opcode_fops);
++
+ 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+ 
+ 	skb_put_u8(skb, 0xff);
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
-Forum, a Linux Foundation Collaborative Project
+2.31.1
+
