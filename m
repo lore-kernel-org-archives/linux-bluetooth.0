@@ -2,216 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CDEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 04:26:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 492B9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 07:00:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 44C3A61039
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 04:26:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1D6F860EFE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 11 Oct 2021 07:00:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233473AbhJKE2p (ORCPT
+        id S234370AbhJKHCD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 11 Oct 2021 00:28:45 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47376 "EHLO
+        Mon, 11 Oct 2021 03:02:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53130 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232659AbhJKE2p (ORCPT
+        with ESMTP id S233148AbhJKHCC (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 11 Oct 2021 00:28:45 -0400
-Received: from mail-io1-xd2d.google.com (mail-io1-xd2d.google.com [IPv6:2607:f8b0:4864:20::d2d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A90C061570
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Oct 2021 21:26:45 -0700 (PDT)
-Received: by mail-io1-xd2d.google.com with SMTP id h196so5477814iof.2
-        for <linux-bluetooth@vger.kernel.org>; Sun, 10 Oct 2021 21:26:45 -0700 (PDT)
+        Mon, 11 Oct 2021 03:02:02 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D98C061570
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Oct 2021 00:00:03 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id r18so52763950wrg.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 11 Oct 2021 00:00:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Ye4mMpcq7ZL34zS0ab98oVagHCnSb65BU9VjVM+JDoA=;
-        b=qfC2RaKJixxJT3b+t5sOejG+KMfXTNpx/ioByK6beqSjOelewah2pXQZhhfmufO6cY
-         hI+Oy+oqHFfnRjKXRq71UoVpEpuK6mU+OMyYx9lrl2Zz7g0hsu2w8s3/pv/a45i9DsD8
-         QVCSkIU166AieRYR5MKqE9/k/t7l8aqbqaqQy+xrLX1hCW8BQuSljxpCVplWNjcozwkk
-         zavc8BblyN/pO7TkyKJYNtuBCmXxSXmlDfCKkDAjASF9mZ1GQcBmxs8+nSQs2mnG/O8/
-         tGSfYNvGpGTWEW5O0T6CvYlnt9kVJdfM2+wNyclFac6/ZtxNZHn4N8JsVTcwHin87S8A
-         aThQ==
+        h=sender:date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=OFwvO+5O26jNeJwoqotjqSerIJKGdnZeWd3xTRtCT7w=;
+        b=mvJcpty7kt+1nZiphV30bvaToBP06DmQdDZ5kVlZqeL5/dWP2hOVGQwnlte1Izb+QC
+         TaC7KAopbLnv2jxCRWqe/soYLUFVKzcRfcOgQLQWebBs+6sFmLdFM7uKJdTEDbYNyHZR
+         2EqWuSZNMMZX96yJAhkxe8X+H32XZw/gLi0EydFfH1+18pEUZb3GnNWrKzp1O/96BTmk
+         iy2kPFSAMjMsQwXR50U9PZ5b8QmLcmiLQMFbgpHVHPXeNr2tqzk8LndXLhlQ4C2mLDrq
+         r96yWMSoEhIurmPaXQEFmxUIq8k+3URZQYm1tkW/0iPERUYoKaNUq+J/uRE2IPHbbG+1
+         Nd5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Ye4mMpcq7ZL34zS0ab98oVagHCnSb65BU9VjVM+JDoA=;
-        b=uKe8p9abOLkUwWHdSaf7lEAoZ3oGr2GuqYlsAGZusxkqnJwb8EGfYDVKOMqGjSiN4l
-         0DLWoVSVwR6+Ju0goe/5fM/NCLw81+qojOIWNovQaNl2O7oTMEXj/FgmH0k+23svAeFz
-         3gswVRretCHDiUL0VHG+u9KaOBCYALJFe5gZ+4l7Wt6eSONu5LuNMGWH3YkRolMzMvdw
-         LfaeiLEfu/w88O4zcX48mbdxPeA9rWkeaRkJUhuqqPd8lKv4zlPlN2GnI2pnuzBlOhQn
-         vifjiP6TlD2W7I6NdhfAfMoyj4rDYsIzmu6E4Y085o5ZUWWg8gJY75kesSziE3L8EYl9
-         2CXw==
-X-Gm-Message-State: AOAM532EEuF+md9OPS0oVXhdJrV69QkVOFcm2Ibl8qX5P+r6uIqFBvZo
-        xuhndHxkSK1x8hgctt2RELiRltSlhyX/SUrXJqs=
-X-Google-Smtp-Source: ABdhPJx2Nvsq6EPSH8sh5F2lJ/+/QarKch12ckZ5DYUZgIqEKzI32/JWIrG9LpbpVRaED4597YojMb4HqdW1j8gu/Ws=
-X-Received: by 2002:a05:6602:160b:: with SMTP id x11mr17737696iow.108.1633926405218;
- Sun, 10 Oct 2021 21:26:45 -0700 (PDT)
+        h=x-gm-message-state:sender:date:from:to:cc:subject:message-id
+         :references:mime-version:content-disposition:in-reply-to;
+        bh=OFwvO+5O26jNeJwoqotjqSerIJKGdnZeWd3xTRtCT7w=;
+        b=aR3V/6Jp/9o22sYEUleXttzYuAVb9yiVaxQAGr0Mmy11QTvVoxgQnXtXdcAXqeGd69
+         U0W9FLwII36X5uEJW7DxdBYPtP2+cq4p2pL1tKYIj8m7l4BZIjuTMWyAxnibRlZHWylx
+         myvZRR6WCh+cUv9JokksnpOydj0xs2IXBD/zUTGrq7aUfieb+PYcLmzd6GF46OjosAoN
+         MokigHsS5ROnB0DJzjhj1f5MbmfNTNsUqRaYsnbBaDXTHLfin6ZqM/FLSJWeKg94UesW
+         Pg1vwGmjWGO2ILFjiuvVgJDfPn08g9i65VuBS9VB28Zl/gtudSF3yD9Rh2/klm4TnQeZ
+         8o5A==
+X-Gm-Message-State: AOAM532j+kYN/j+r4YZJ315fp8O1LjbPTAPtqzz1qtWzDwflkfAiQHYg
+        AQiJTuUINcLPCO8i1SktrvM=
+X-Google-Smtp-Source: ABdhPJzPh2SL9sg4YAVqdUPmxADpUwZo/aixtjieh5mQA4fxYb8PNbgblqUr2h0/2eSbm6vIgoqirg==
+X-Received: by 2002:adf:a45e:: with SMTP id e30mr22396222wra.269.1633935601776;
+        Mon, 11 Oct 2021 00:00:01 -0700 (PDT)
+Received: from eldamar (80-218-24-251.dclient.hispeed.ch. [80.218.24.251])
+        by smtp.gmail.com with ESMTPSA id n7sm7017389wra.37.2021.10.11.00.00.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 11 Oct 2021 00:00:00 -0700 (PDT)
+Sender: Salvatore Bonaccorso <salvatore.bonaccorso@gmail.com>
+Date:   Mon, 11 Oct 2021 09:00:00 +0200
+From:   Salvatore Bonaccorso <carnil@debian.org>
+To:     Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        LinMa <linma@zju.edu.cn>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linus Torvalds <torvalds@linux-foundation.org>, tiwai@suse.com
+Subject: Re: [PATCH] Bluetooth: avoid page fault from sco_send_frame()
+Message-ID: <YWPg8Ck2ZbXZxOtD@eldamar.lan>
+References: <15f5a46.b79d9.17ba6802ccd.Coremail.linma@zju.edu.cn>
+ <c998d16d-f45a-8be4-2898-9e94509cb2ea@i-love.sakura.ne.jp>
+ <60f604f8-2a89-fd3f-996f-9d9e4a229427@i-love.sakura.ne.jp>
+ <CABBYNZK-JvPcB_T39_NUE-O6ztE6crNEfmFxszEtAu3OkrKF2A@mail.gmail.com>
+ <a7bed103-dbb1-6783-aba7-f18a4d495c13@i-love.sakura.ne.jp>
+ <883dc4b7-d1a1-3d31-a5a8-8fa1791084b6@i-love.sakura.ne.jp>
 MIME-Version: 1.0
-References: <20211010171447.35355-1-pav@iki.fi>
-In-Reply-To: <20211010171447.35355-1-pav@iki.fi>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Sun, 10 Oct 2021 21:26:34 -0700
-Message-ID: <CABBYNZKgXNA1jqdhXV3t44bhRjXiKboTb7nOPMtidmi4dHAQpA@mail.gmail.com>
-Subject: Re: [PATCH BlueZ] avrcp: keep track of last volume, and use as
- transport init_volume
-To:     Pauli Virtanen <pav@iki.fi>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <883dc4b7-d1a1-3d31-a5a8-8fa1791084b6@i-love.sakura.ne.jp>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Pauli,
+Hi,
 
-On Sun, Oct 10, 2021 at 10:20 AM Pauli Virtanen <pav@iki.fi> wrote:
->
-> Some devices may send AVRCP VolumeChanged notification before AVDTP
-> SetConfiguration occurs, and not send another until a hardware button on
-> the device is pressed. If a media_player is registered to BlueZ, the
-> volume from the event is stored on the player, and used as init_volume
-> for new transports.  However, if no media_player is registered,
-> transports are created with volume missing.
->
-> If that occurs, the DBus "Volume" attribute on transports will be
-> missing until a hardware button is pressed.  Consequently, applications
-> cannot get or set volume, even though it is actually possible.
->
-> Address this by keeping track of the last device volume set in AVRCP
-> session. If no media_player is registered, use that as the init_volume
-> for new transports.  This has a similar effect as if a dummy media
-> player was registered.
->
-> This fixes AVRCP absolute volume not being available on some headphones
-> on Pipewire & Pulseaudio until HW button press.
-> ---
->  profiles/audio/avrcp.c | 23 +++++++++++++++++++++++
->  profiles/audio/avrcp.h |  1 +
->  profiles/audio/media.c |  3 +++
->  3 files changed, 27 insertions(+)
->
-> diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> index 7c280203c..0df416d2c 100644
-> --- a/profiles/audio/avrcp.c
-> +++ b/profiles/audio/avrcp.c
-> @@ -276,6 +276,8 @@ struct avrcp {
->         uint8_t transaction;
->         uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
->         struct pending_pdu *pending_pdu;
-> +
-> +       int8_t last_device_volume;
+On Sat, Sep 04, 2021 at 11:02:58AM +0900, Tetsuo Handa wrote:
+> Commit 99c23da0eed4fd20 ("Bluetooth: sco: Fix lock_sock() blockage
+> by memcpy_from_msg()") in linux-next.git should be sent to linux.git
+> now as a mitigation for CVE-2021-3640.
+> 
+> But I think "[PATCH v3 3/4] Bluetooth: SCO: Replace use of
+> memcpy_from_msg with bt_skb_sendmsg" still contains bug.
 
-We can probably keep this short and just call it volume.
+Did his one felt through the cracks? I'm confused about the statement
+in https://bugzilla.suse.com/show_bug.cgi?id=1188172#c8 so Cc'ing
+Takashi Iwai as well.
 
->  };
->
->  struct passthrough_handler {
-> @@ -1759,6 +1761,7 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
->         volume = pdu->params[0] & 0x7F;
->
->         media_transport_update_device_volume(session->dev, volume);
-> +       session->last_device_volume = volume;
->
->         return AVC_CTYPE_ACCEPTED;
->
-> @@ -3731,6 +3734,7 @@ static void avrcp_volume_changed(struct avrcp *session,
->
->         /* Always attempt to update the transport volume */
->         media_transport_update_device_volume(session->dev, volume);
-> +       session->last_device_volume = volume;
->
->         if (player)
->                 player->cb->set_volume(volume, session->dev, player->user_data);
-> @@ -4145,6 +4149,7 @@ static void target_init(struct avrcp *session)
->
->                 init_volume = media_player_get_device_volume(session->dev);
->                 media_transport_update_device_volume(session->dev, init_volume);
-> +               session->last_device_volume = init_volume;
->         }
->
->         session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
-> @@ -4308,6 +4313,7 @@ static struct avrcp *session_create(struct avrcp_server *server,
->         session->server = server;
->         session->conn = avctp_connect(device);
->         session->dev = device;
-> +       session->last_device_volume = -1;
->
->         server->sessions = g_slist_append(server->sessions, session);
->
-> @@ -4497,6 +4503,7 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
->
->         /* Always attempt to update the transport volume */
->         media_transport_update_device_volume(session->dev, volume);
-> +       session->last_device_volume = volume;
-
-So if I understand this right we are going to cache the volume here
-since media_transport_update_device_volume may not have a transport
-yet? If that is the case we probably need to be checking if there is a
-transport or not beforehand instead of doing this blindly.
-
->
->         if (player != NULL)
->                 player->cb->set_volume(volume, session->dev, player->user_data);
-> @@ -4598,6 +4605,22 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
->                                         avrcp_handle_set_volume, session);
->  }
->
-> +int8_t avrcp_get_last_volume(struct btd_device *dev)
-> +{
-> +       struct avrcp_server *server;
-> +       struct avrcp *session;
-> +
-> +       server = find_server(servers, device_get_adapter(dev));
-> +       if (server == NULL)
-> +               return -1;
-> +
-> +       session = find_session(server->sessions, dev);
-> +       if (session == NULL)
-> +               return -1;
-> +
-> +       return session->last_device_volume;
-> +}
-> +
->  struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev)
->  {
->         struct avrcp_server *server;
-> diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-> index dcc580e37..952f0eea9 100644
-> --- a/profiles/audio/avrcp.h
-> +++ b/profiles/audio/avrcp.h
-> @@ -91,6 +91,7 @@ struct avrcp_player_cb {
->  };
->
->  int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify);
-> +int8_t avrcp_get_last_volume(struct btd_device *dev);
-
-Let's have it as avrcp_get_volume so it is symmetric to avrcp_set_volume.
-
->  struct avrcp_player *avrcp_register_player(struct btd_adapter *adapter,
->                                                 struct avrcp_player_cb *cb,
-> diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> index 521902ed8..a37378393 100644
-> --- a/profiles/audio/media.c
-> +++ b/profiles/audio/media.c
-> @@ -494,6 +494,9 @@ static gboolean set_configuration(struct media_endpoint *endpoint,
->                 return FALSE;
->
->         init_volume = media_player_get_device_volume(device);
-> +       if (init_volume < 0)
-> +               init_volume = avrcp_get_last_volume(device);
-
-I wonder if we shouldn't be better to move the call to
-avrcp_get_volume inside media_player_get_device_volume so it does the
-fallback automatically if there is no volume set.
-
->         media_transport_update_volume(transport, init_volume);
->
->         msg = dbus_message_new_method_call(endpoint->sender, endpoint->path,
-> --
-> 2.31.1
->
-
-
--- 
-Luiz Augusto von Dentz
+Regards,
+Salvatore
