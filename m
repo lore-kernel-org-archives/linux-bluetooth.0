@@ -2,164 +2,247 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD46DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:34:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B33C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:43:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9503E6103D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:34:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EB8B560E0C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:43:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232986AbhJLUgh (ORCPT
+        id S234896AbhJLUpX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 16:36:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59476 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229771AbhJLUgg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:36:36 -0400
-Received: from mail-vk1-xa29.google.com (mail-vk1-xa29.google.com [IPv6:2607:f8b0:4864:20::a29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46EF7C061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 13:34:34 -0700 (PDT)
-Received: by mail-vk1-xa29.google.com with SMTP id m199so272453vka.6
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 13:34:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7LrTBLh42sX3zt76SRMqTop+IPVwQ3cxF76xw3y2vWc=;
-        b=Iw88lQYYhsIwWPN0EhfSzo9R3FJpcjYIulEaDdH8Qw/8gqFkGDiyWIiP8DVp6S69pH
-         4U1pqRV8EUxlrflQvu3vatcOoDngslkU4uG2BZwOlc9Kykatujn37veQjK3WvLzN6swU
-         gntN5zrgLUXaXFkjFGc/oexWULQFHKfQRxqwpb8Qu6G/eJiNtS7HSjTc/gpPX4+5h8by
-         X6qoCm8+rjksDjC7lRHvDFgJjUI05cOsjfDMpajvwO/s/rVnMF/WodLPhm1sn7aLm4H3
-         BLwV4j6XeJAuMff8/BUJY3TGA9zISrakc36rHauWTOf7bP2xO/XlM2osfa+hD6u9aK9f
-         w5Ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7LrTBLh42sX3zt76SRMqTop+IPVwQ3cxF76xw3y2vWc=;
-        b=GGfxU6+obAHTtqP/GJlIGmjgqaQWsNcrnITJT8WQVQQmyDSK1MtBdz8L4AJ//YelOU
-         hLaDPo9X+d7tV/GUbD+ABVyvLVF2vScVudKp+1szR17yUEdhUPUpJLg+17ubbSN0cNVc
-         nArx8g41xOBJ64coKscYIJkE663frgg80JV1U4e/usR/2PyL9BatiMWwKrcUQESIDCbN
-         rVxnunp5V+0H55PyfukYhYv9p612ckFIrUK7ZxjbhYgntKzTytHb3fcsmJboTj2dHglV
-         C8Rwezcq9miGDiulJVKwDhetDYYT9eVvPnnB6hu58NF8Cwrvi7XjbBnj8ERW2ecxepsv
-         BWoA==
-X-Gm-Message-State: AOAM532W98TrfprfxZlLWddwIHUXkAJJZeDQAZIcKA7858SZzudQ6IF+
-        3997Q9+iijgPPjYI4ejhMj5mqdBFY/7NBW44p3RRyoBA5JI=
-X-Google-Smtp-Source: ABdhPJxjfD7NY2vptiY6wx8ZfClj/kjGh6JxkYTIlrrbiL4YhbYdGnKEerqmhVCSO2/QUOy2pinM8XrJ8iHcZuT6SLE=
-X-Received: by 2002:a1f:d782:: with SMTP id o124mr29393918vkg.6.1634070873189;
- Tue, 12 Oct 2021 13:34:33 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211012075634.8041-1-weiyongjun1@huawei.com> <3EC78E44-6E60-4B99-B880-2F5CC468C424@holtmann.org>
-In-Reply-To: <3EC78E44-6E60-4B99-B880-2F5CC468C424@holtmann.org>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 12 Oct 2021 13:34:22 -0700
-Message-ID: <CABBYNZL=wSZaLsLAm7Btg6Tmv=K7z903kQxfvRRVPPH0nAcsOA@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix memory leak of hci device
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Wei Yongjun <weiyongjun1@huawei.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>
+        Tue, 12 Oct 2021 16:45:23 -0400
+Received: from mout01.posteo.de ([185.67.36.141]:50147 "EHLO mout01.posteo.de"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S233140AbhJLUpW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Oct 2021 16:45:22 -0400
+X-Greylist: delayed 479 seconds by postgrey-1.27 at vger.kernel.org; Tue, 12 Oct 2021 16:45:22 EDT
+Received: from submission (posteo.de [89.146.220.130]) 
+        by mout01.posteo.de (Postfix) with ESMTPS id 52847240028
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 22:35:19 +0200 (CEST)
+Received: from customer (localhost [127.0.0.1])
+        by submission (posteo.de) with ESMTPSA id 4HTS8k4LV8z9rxQ;
+        Tue, 12 Oct 2021 22:35:18 +0200 (CEST)
+Message-ID: <097b7a889f73ea9cee42b9a0c99683a1d7ee8069.camel@iki.fi>
+Subject: Re: [PATCH BlueZ] avrcp: keep track of last volume, and use as
+ transport init_volume
+From:   Pauli Virtanen <pav@iki.fi>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 12 Oct 2021 20:35:17 +0000
+In-Reply-To: <CABBYNZKgXNA1jqdhXV3t44bhRjXiKboTb7nOPMtidmi4dHAQpA@mail.gmail.com>
+References: <20211010171447.35355-1-pav@iki.fi>
+         <CABBYNZKgXNA1jqdhXV3t44bhRjXiKboTb7nOPMtidmi4dHAQpA@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wei, Marcel,
+Hi Luiz,
 
-On Tue, Oct 12, 2021 at 8:54 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
->
-> Hi Wei,
->
-> > Fault injection test reported memory leak of hci device as follows:
-> >
-> > unreferenced object 0xffff88800b858000 (size 8192):
-> >  comm "kworker/0:2", pid 167, jiffies 4294955747 (age 557.148s)
-> >  hex dump (first 32 bytes):
-> >    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-> >    00 00 00 00 00 00 00 00 00 00 00 00 ad 4e ad de  .............N..
-> >  backtrace:
-> >    [<0000000070eb1059>] kmem_cache_alloc_trace mm/slub.c:3208
-> >    [<00000000015eb521>] hci_alloc_dev_priv include/linux/slab.h:591
-> >    [<00000000dcfc1e21>] bpa10x_probe include/net/bluetooth/hci_core.h:1=
-240
-> >    [<000000005d3028c7>] usb_probe_interface drivers/usb/core/driver.c:3=
-97
-> >    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
-> >    [<0000000024cab3f0>] __driver_probe_device drivers/base/dd.c:751
-> >    [<00000000202135cb>] driver_probe_device drivers/base/dd.c:782
-> >    [<000000000761f2bc>] __device_attach_driver drivers/base/dd.c:899
-> >    [<00000000f7d63134>] bus_for_each_drv drivers/base/bus.c:427
-> >    [<00000000c9551f0b>] __device_attach drivers/base/dd.c:971
-> >    [<000000007f79bd16>] bus_probe_device drivers/base/bus.c:487
-> >    [<000000007bb8b95a>] device_add drivers/base/core.c:3364
-> >    [<000000009564d9ea>] usb_set_configuration drivers/usb/core/message.=
-c:2171
-> >    [<00000000e4657087>] usb_generic_driver_probe drivers/usb/core/gener=
-ic.c:239
-> >    [<0000000071ede518>] usb_probe_device drivers/usb/core/driver.c:294
-> >    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
-> >
-> > hci_alloc_dev() do not init the device's flag. And hci_free_dev()
-> > using put_device() to free the memory allocated for this device,
-> > but it calls just kfree(dev) only in case of HCI_UNREGISTER flag
-> > is set. So any error handing before hci_register_dev() success
-> > will cause memory leak.
-> >
-> > To avoid this behaviour we need to set hdev HCI_UNREGISTER flag
-> > in hci_alloc_dev_priv().
-> >
-> > Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> >
-> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> > index 8a47a3017d61..42410f568e90 100644
-> > --- a/net/bluetooth/hci_core.c
-> > +++ b/net/bluetooth/hci_core.c
-> > @@ -3876,6 +3876,11 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_pr=
-iv)
-> >       INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-> >       INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
-> >
-> > +     /* We need to set HCI_UNREGISTER flag to correctly release
-> > +      * the device in hci_free_dev()
-> > +      */
-> > +     hci_dev_set_flag(hdev, HCI_UNREGISTER);
+Thanks,
+
+su, 2021-10-10 kello 21:26 -0700, Luiz Augusto von Dentz kirjoitti:
+> Hi Pauli,
+> 
+> On Sun, Oct 10, 2021 at 10:20 AM Pauli Virtanen <pav@iki.fi> wrote:
+> > 
+> > Some devices may send AVRCP VolumeChanged notification before AVDTP
+> > SetConfiguration occurs, and not send another until a hardware button on
+> > the device is pressed. If a media_player is registered to BlueZ, the
+> > volume from the event is stored on the player, and used as init_volume
+> > for new transports.  However, if no media_player is registered,
+> > transports are created with volume missing.
+> > 
+> > If that occurs, the DBus "Volume" attribute on transports will be
+> > missing until a hardware button is pressed.  Consequently, applications
+> > cannot get or set volume, even though it is actually possible.
+> > 
+> > Address this by keeping track of the last device volume set in AVRCP
+> > session. If no media_player is registered, use that as the init_volume
+> > for new transports.  This has a similar effect as if a dummy media
+> > player was registered.
+> > 
+> > This fixes AVRCP absolute volume not being available on some headphones
+> > on Pipewire & Pulseaudio until HW button press.
+> > ---
+> >  profiles/audio/avrcp.c | 23 +++++++++++++++++++++++
+> >  profiles/audio/avrcp.h |  1 +
+> >  profiles/audio/media.c |  3 +++
+> >  3 files changed, 27 insertions(+)
+> > 
+> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
+> > index 7c280203c..0df416d2c 100644
+> > --- a/profiles/audio/avrcp.c
+> > +++ b/profiles/audio/avrcp.c
+> > @@ -276,6 +276,8 @@ struct avrcp {
+> >         uint8_t transaction;
+> >         uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
+> >         struct pending_pdu *pending_pdu;
 > > +
->
-> I can see the point in the bug report, but I don=E2=80=99t see that the f=
-ix is correct. Can you prove that this fix is correct when hci_register_dev=
- is actually called.
+> > +       int8_t last_device_volume;
+> 
+> We can probably keep this short and just call it volume.
 
-I also wonder where is the actual check for HCI_UNREGISTER that the
-commit description says prevents the kfree? hci_free_dev itself just
-calls put_device, so perhaps it is actually talking about the check in
-bt_host_release, anyway in for this to work the HCI_UNREGISTER would
-have to be cleared by hci_register_dev otherwise the likes of
-hci_dev_do_open don't work as it checks if HCI_UNREGISTER had been
-called.
+Ok.
 
-We also would need to check if it is safe to call hci_release_dev if
-the workqueues, etc, had not been initialized yet, or perhaps don't
-really use HCI_UNREGISTER and just do something like this:
+> >  };
+> > 
+> >  struct passthrough_handler {
+> > @@ -1759,6 +1761,7 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
+> >         volume = pdu->params[0] & 0x7F;
+> > 
+> >         media_transport_update_device_volume(session->dev, volume);
+> > + session->last_device_volume = volume;
+> > 
+> >         return AVC_CTYPE_ACCEPTED;
+> > 
+> > @@ -3731,6 +3734,7 @@ static void avrcp_volume_changed(struct avrcp *session,
+> > 
+> >         /* Always attempt to update the transport volume */
+> >         media_transport_update_device_volume(session->dev, volume);
+> > + session->last_device_volume = volume;
+> > 
+> >         if (player)
+> >                 player->cb->set_volume(volume, session->dev, player->user_data);
+> > @@ -4145,6 +4149,7 @@ static void target_init(struct avrcp *session)
+> > 
+> >                 init_volume = media_player_get_device_volume(session->dev);
+> >                 media_transport_update_device_volume(session->dev, init_volume);
+> > + session->last_device_volume = init_volume;
+> >         }
+> > 
+> >         session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
+> > @@ -4308,6 +4313,7 @@ static struct avrcp *session_create(struct avrcp_server *server,
+> >         session->server = server;
+> >         session->conn = avctp_connect(device);
+> >         session->dev = device;
+> > + session->last_device_volume = -1;
+> > 
+> >         server->sessions = g_slist_append(server->sessions, session);
+> > 
+> > @@ -4497,6 +4503,7 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
+> > 
+> >         /* Always attempt to update the transport volume */
+> >         media_transport_update_device_volume(session->dev, volume);
+> > + session->last_device_volume = volume;
+> 
+> So if I understand this right we are going to cache the volume here
+> since media_transport_update_device_volume may not have a transport
+> yet? If that is the case we probably need to be checking if there is a
+> transport or not beforehand instead of doing this blindly.
 
-diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-index 7827639ecf5c..81c50b47183f 100644
---- a/net/bluetooth/hci_sysfs.c
-+++ b/net/bluetooth/hci_sysfs.c
-@@ -86,6 +86,9 @@ static void bt_host_release(struct device *dev)
+Yes, so that avrcp volume received previously is exhibited in
+transports created next. I now see that this is the same issue as in
+4b6153b0501c ("audio/transport: supply volume on transport init"), but
+in the case when there are no local players registered, and the fix
+there does not work.
 
-        if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
-                hci_release_dev(hdev);
-+       else
-+               kfree(hdev);
-+
-        module_put(THIS_MODULE);
+Currently, if there is a local player registered, the current volume is
+cached in the player volume whether there are transports or not.
+Caching always in struct avrcp would then make the zero-players case
+the same. I don't immediately see something incorrect.
 
-If this doesn't fix all the leaks that probably means part of the
-hci_release_dev still needs to be executed which can probably be done
-by having the check for HCI_UNREGISTER around the code that does
-actually depend on hci_register_dev.
+Albeit, this probably should be only done for BlueZ as CT, so shouldn't
+cache in avrcp_handle_set_absolute_volume. That could be a minimal v2?
 
---=20
-Luiz Augusto von Dentz
+***
+
+There's also something confusing in the code in current master
+branch: why are avrcp_handle_set_volume and avrcp_volume_changed
+setting the volume on local target->player, which I thought is a BlueZ
+as TG thing? 
+
+I see that df7d3fa50023 ("audio/avrcp: Always update transport volume
+regardless of player") moved most of what player->set_volume does to
+the callbacks, and the player volumes seem to be currently used only to
+provide initial volume for transports. The volume probably should be
+stored elsewhere than in local players?
+
+In fact, it causes problems because there's just a single player that
+has long lifetime: BlueZ sink/TG use as the initial volume, the volume
+of a previously connected different remote device sink/TG. Also, having
+multiple remote device TG/sink makes the initial volumes conflict. So
+there seems to be something to fix (separate patch?).
+
+Caching in struct avrcp session doesn't have these problems, but
+df7d3fa50023 mentions there's some issue with avrcp session appearing
+late. I'll need to think a bit how to fix this.
+
+> > 
+> >         if (player != NULL)
+> >                 player->cb->set_volume(volume, session->dev, player->user_data);
+> > @@ -4598,6 +4605,22 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
+> >                                         avrcp_handle_set_volume, session);
+> >  }
+> > 
+> > +int8_t avrcp_get_last_volume(struct btd_device *dev)
+> > +{
+> > +       struct avrcp_server *server;
+> > +       struct avrcp *session;
+> > +
+> > +       server = find_server(servers, device_get_adapter(dev));
+> > +       if (server == NULL)
+> > +               return -1;
+> > +
+> > +       session = find_session(server->sessions, dev);
+> > +       if (session == NULL)
+> > +               return -1;
+> > +
+> > +       return session->last_device_volume;
+> > +}
+> > +
+> >  struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev)
+> >  {
+> >         struct avrcp_server *server;
+> > diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
+> > index dcc580e37..952f0eea9 100644
+> > --- a/profiles/audio/avrcp.h
+> > +++ b/profiles/audio/avrcp.h
+> > @@ -91,6 +91,7 @@ struct avrcp_player_cb {
+> >  };
+> > 
+> >  int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify);
+> > +int8_t avrcp_get_last_volume(struct btd_device *dev);
+> 
+> Let's have it as avrcp_get_volume so it is symmetric to avrcp_set_volume.
+
+Ok.
+
+> >  struct avrcp_player *avrcp_register_player(struct btd_adapter
+> > *adapter,
+> >                                                 struct
+> > avrcp_player_cb *cb,
+> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c
+> > index 521902ed8..a37378393 100644
+> > --- a/profiles/audio/media.c
+> > +++ b/profiles/audio/media.c
+> > @@ -494,6 +494,9 @@ static gboolean set_configuration(struct
+> > media_endpoint *endpoint,
+> >                 return FALSE;
+> > 
+> >         init_volume = media_player_get_device_volume(device);
+> > + if (init_volume < 0)
+> > + init_volume = avrcp_get_last_volume(device);
+> 
+> I wonder if we shouldn't be better to move the call to
+> avrcp_get_volume inside media_player_get_device_volume so it does the
+> fallback automatically if there is no volume set.
+
+Ok.
+
+> >         media_transport_update_volume(transport, init_volume);
+> > 
+> >         msg = dbus_message_new_method_call(endpoint->sender,
+> > endpoint->path,
+> > --
+> > 2.31.1
+> > 
+> 
+> 
+
+
+
+
+
