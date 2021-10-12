@@ -2,247 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 13B33C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:43:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CD68CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 21:32:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EB8B560E0C
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 20:43:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ABF806109E
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 21:32:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234896AbhJLUpX (ORCPT
+        id S233785AbhJLVeD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 16:45:23 -0400
-Received: from mout01.posteo.de ([185.67.36.141]:50147 "EHLO mout01.posteo.de"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S233140AbhJLUpW (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 16:45:22 -0400
-X-Greylist: delayed 479 seconds by postgrey-1.27 at vger.kernel.org; Tue, 12 Oct 2021 16:45:22 EDT
-Received: from submission (posteo.de [89.146.220.130]) 
-        by mout01.posteo.de (Postfix) with ESMTPS id 52847240028
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 22:35:19 +0200 (CEST)
-Received: from customer (localhost [127.0.0.1])
-        by submission (posteo.de) with ESMTPSA id 4HTS8k4LV8z9rxQ;
-        Tue, 12 Oct 2021 22:35:18 +0200 (CEST)
-Message-ID: <097b7a889f73ea9cee42b9a0c99683a1d7ee8069.camel@iki.fi>
-Subject: Re: [PATCH BlueZ] avrcp: keep track of last volume, and use as
- transport init_volume
-From:   Pauli Virtanen <pav@iki.fi>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Date:   Tue, 12 Oct 2021 20:35:17 +0000
-In-Reply-To: <CABBYNZKgXNA1jqdhXV3t44bhRjXiKboTb7nOPMtidmi4dHAQpA@mail.gmail.com>
-References: <20211010171447.35355-1-pav@iki.fi>
-         <CABBYNZKgXNA1jqdhXV3t44bhRjXiKboTb7nOPMtidmi4dHAQpA@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 12 Oct 2021 17:34:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44534 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233221AbhJLVeC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Oct 2021 17:34:02 -0400
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 206DEC061570
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 14:32:00 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id x4so411333pln.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 14:32:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zo3acUqq8twKFzumVmhpJkegGdJmcwOMCz2VVIrU+J8=;
+        b=RTHEs/dsaG9HqkCX1zmv/djpAsJ46Z//FhWJRQayAnUsYweD7gQ4QzAHv6UgUH9wRd
+         UlHRL4HDQvEVjKuJrv2m+VcfpQcIDMRfeAEGOWi4SdaNMx+mBrwXpAlKuzhqnv2oXpZg
+         cRvwksZ+qzzhuvzhwRd7A8ZStJBNfhVgZikUhj3hUnMwnz0ZvoOZKHJ3swfyIwZUffSd
+         aotIBcIo/6sS7d9sbBHWoOF7ugy9nudq+pfi7P7J5C17EiwhCzTuLirHq6OCtwOeJOsV
+         mr3Klqxo5PO1boYjWvxKz3lwHmekdvWluZeed9u1kEDthtXgt53CJUpBv7gB9C9mztAf
+         xXUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=Zo3acUqq8twKFzumVmhpJkegGdJmcwOMCz2VVIrU+J8=;
+        b=K96HExVIH8rkQ24wVwV3tVtgJkTvBWI3PzyG888zbSiPpxitrzeifqh0h1ZUD15r7K
+         KrDfc9l89+7+E4pXczPXIifPhcy/8TJ0lA9Jhb0HB+oq5RPNOg7fZ4XPVqcHg2inNgwC
+         WkxmpcMSyLzBjh7KFYSNi+xRrNXBdvwYhkh8muEQig/WoQyUMNilZGB+BKhDqYpL47CL
+         MYxzkSckbGjkLDBP0UWoEG3lnSpOjTX1E7F670e0AW670EbFZohx5WpZKTSIzskh58K3
+         1FlHrYcrs8t0AOGj/wnaLMagDQI1QOuF6LOPOFbb5FLesjpbmL927uPC7f/tqUvQG1MW
+         wg9w==
+X-Gm-Message-State: AOAM531vr3dO7qQfHMGwW2Xkd0moikwi/XnGaJ4YyckYe8FP9NLc8Cq6
+        q6V6bTIvpTSvzeSp2viTBDO4ZuDV55U=
+X-Google-Smtp-Source: ABdhPJxb9kCbauvCUmc5Gq3BKNZ5aDEB9ndOo6Lyb9eg7C3Fdz7F4QPfZSDm8EXGNM/B4lZOofW9sQ==
+X-Received: by 2002:a17:90b:1910:: with SMTP id mp16mr8837155pjb.30.1634074319256;
+        Tue, 12 Oct 2021 14:31:59 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id on17sm3940900pjb.47.2021.10.12.14.31.58
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 12 Oct 2021 14:31:58 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/4] Bluetooth: Only allow setting msft_opcode at setup stage
+Date:   Tue, 12 Oct 2021 14:31:55 -0700
+Message-Id: <20211012213158.2635219-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Thanks,
+The msft_opcode shall only be changed while at the setup stage otherwise
+it can possible cause problems where different opcodes are used while
+running.
 
-su, 2021-10-10 kello 21:26 -0700, Luiz Augusto von Dentz kirjoitti:
-> Hi Pauli,
-> 
-> On Sun, Oct 10, 2021 at 10:20 AM Pauli Virtanen <pav@iki.fi> wrote:
-> > 
-> > Some devices may send AVRCP VolumeChanged notification before AVDTP
-> > SetConfiguration occurs, and not send another until a hardware button on
-> > the device is pressed. If a media_player is registered to BlueZ, the
-> > volume from the event is stored on the player, and used as init_volume
-> > for new transports.  However, if no media_player is registered,
-> > transports are created with volume missing.
-> > 
-> > If that occurs, the DBus "Volume" attribute on transports will be
-> > missing until a hardware button is pressed.  Consequently, applications
-> > cannot get or set volume, even though it is actually possible.
-> > 
-> > Address this by keeping track of the last device volume set in AVRCP
-> > session. If no media_player is registered, use that as the init_volume
-> > for new transports.  This has a similar effect as if a dummy media
-> > player was registered.
-> > 
-> > This fixes AVRCP absolute volume not being available on some headphones
-> > on Pipewire & Pulseaudio until HW button press.
-> > ---
-> >  profiles/audio/avrcp.c | 23 +++++++++++++++++++++++
-> >  profiles/audio/avrcp.h |  1 +
-> >  profiles/audio/media.c |  3 +++
-> >  3 files changed, 27 insertions(+)
-> > 
-> > diff --git a/profiles/audio/avrcp.c b/profiles/audio/avrcp.c
-> > index 7c280203c..0df416d2c 100644
-> > --- a/profiles/audio/avrcp.c
-> > +++ b/profiles/audio/avrcp.c
-> > @@ -276,6 +276,8 @@ struct avrcp {
-> >         uint8_t transaction;
-> >         uint8_t transaction_events[AVRCP_EVENT_LAST + 1];
-> >         struct pending_pdu *pending_pdu;
-> > +
-> > +       int8_t last_device_volume;
-> 
-> We can probably keep this short and just call it volume.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
-Ok.
-
-> >  };
-> > 
-> >  struct passthrough_handler {
-> > @@ -1759,6 +1761,7 @@ static uint8_t avrcp_handle_set_absolute_volume(struct avrcp *session,
-> >         volume = pdu->params[0] & 0x7F;
-> > 
-> >         media_transport_update_device_volume(session->dev, volume);
-> > + session->last_device_volume = volume;
-> > 
-> >         return AVC_CTYPE_ACCEPTED;
-> > 
-> > @@ -3731,6 +3734,7 @@ static void avrcp_volume_changed(struct avrcp *session,
-> > 
-> >         /* Always attempt to update the transport volume */
-> >         media_transport_update_device_volume(session->dev, volume);
-> > + session->last_device_volume = volume;
-> > 
-> >         if (player)
-> >                 player->cb->set_volume(volume, session->dev, player->user_data);
-> > @@ -4145,6 +4149,7 @@ static void target_init(struct avrcp *session)
-> > 
-> >                 init_volume = media_player_get_device_volume(session->dev);
-> >                 media_transport_update_device_volume(session->dev, init_volume);
-> > + session->last_device_volume = init_volume;
-> >         }
-> > 
-> >         session->supported_events |= (1 << AVRCP_EVENT_STATUS_CHANGED) |
-> > @@ -4308,6 +4313,7 @@ static struct avrcp *session_create(struct avrcp_server *server,
-> >         session->server = server;
-> >         session->conn = avctp_connect(device);
-> >         session->dev = device;
-> > + session->last_device_volume = -1;
-> > 
-> >         server->sessions = g_slist_append(server->sessions, session);
-> > 
-> > @@ -4497,6 +4503,7 @@ static gboolean avrcp_handle_set_volume(struct avctp *conn, uint8_t code,
-> > 
-> >         /* Always attempt to update the transport volume */
-> >         media_transport_update_device_volume(session->dev, volume);
-> > + session->last_device_volume = volume;
-> 
-> So if I understand this right we are going to cache the volume here
-> since media_transport_update_device_volume may not have a transport
-> yet? If that is the case we probably need to be checking if there is a
-> transport or not beforehand instead of doing this blindly.
-
-Yes, so that avrcp volume received previously is exhibited in
-transports created next. I now see that this is the same issue as in
-4b6153b0501c ("audio/transport: supply volume on transport init"), but
-in the case when there are no local players registered, and the fix
-there does not work.
-
-Currently, if there is a local player registered, the current volume is
-cached in the player volume whether there are transports or not.
-Caching always in struct avrcp would then make the zero-players case
-the same. I don't immediately see something incorrect.
-
-Albeit, this probably should be only done for BlueZ as CT, so shouldn't
-cache in avrcp_handle_set_absolute_volume. That could be a minimal v2?
-
-***
-
-There's also something confusing in the code in current master
-branch: why are avrcp_handle_set_volume and avrcp_volume_changed
-setting the volume on local target->player, which I thought is a BlueZ
-as TG thing? 
-
-I see that df7d3fa50023 ("audio/avrcp: Always update transport volume
-regardless of player") moved most of what player->set_volume does to
-the callbacks, and the player volumes seem to be currently used only to
-provide initial volume for transports. The volume probably should be
-stored elsewhere than in local players?
-
-In fact, it causes problems because there's just a single player that
-has long lifetime: BlueZ sink/TG use as the initial volume, the volume
-of a previously connected different remote device sink/TG. Also, having
-multiple remote device TG/sink makes the initial volumes conflict. So
-there seems to be something to fix (separate patch?).
-
-Caching in struct avrcp session doesn't have these problems, but
-df7d3fa50023 mentions there's some issue with avrcp session appearing
-late. I'll need to think a bit how to fix this.
-
-> > 
-> >         if (player != NULL)
-> >                 player->cb->set_volume(volume, session->dev, player->user_data);
-> > @@ -4598,6 +4605,22 @@ int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify)
-> >                                         avrcp_handle_set_volume, session);
-> >  }
-> > 
-> > +int8_t avrcp_get_last_volume(struct btd_device *dev)
-> > +{
-> > +       struct avrcp_server *server;
-> > +       struct avrcp *session;
-> > +
-> > +       server = find_server(servers, device_get_adapter(dev));
-> > +       if (server == NULL)
-> > +               return -1;
-> > +
-> > +       session = find_session(server->sessions, dev);
-> > +       if (session == NULL)
-> > +               return -1;
-> > +
-> > +       return session->last_device_volume;
-> > +}
-> > +
-> >  struct avrcp_player *avrcp_get_target_player_by_device(struct btd_device *dev)
-> >  {
-> >         struct avrcp_server *server;
-> > diff --git a/profiles/audio/avrcp.h b/profiles/audio/avrcp.h
-> > index dcc580e37..952f0eea9 100644
-> > --- a/profiles/audio/avrcp.h
-> > +++ b/profiles/audio/avrcp.h
-> > @@ -91,6 +91,7 @@ struct avrcp_player_cb {
-> >  };
-> > 
-> >  int avrcp_set_volume(struct btd_device *dev, int8_t volume, bool notify);
-> > +int8_t avrcp_get_last_volume(struct btd_device *dev);
-> 
-> Let's have it as avrcp_get_volume so it is symmetric to avrcp_set_volume.
-
-Ok.
-
-> >  struct avrcp_player *avrcp_register_player(struct btd_adapter
-> > *adapter,
-> >                                                 struct
-> > avrcp_player_cb *cb,
-> > diff --git a/profiles/audio/media.c b/profiles/audio/media.c
-> > index 521902ed8..a37378393 100644
-> > --- a/profiles/audio/media.c
-> > +++ b/profiles/audio/media.c
-> > @@ -494,6 +494,9 @@ static gboolean set_configuration(struct
-> > media_endpoint *endpoint,
-> >                 return FALSE;
-> > 
-> >         init_volume = media_player_get_device_volume(device);
-> > + if (init_volume < 0)
-> > + init_volume = avrcp_get_last_volume(device);
-> 
-> I wonder if we shouldn't be better to move the call to
-> avrcp_get_volume inside media_player_get_device_volume so it does the
-> fallback automatically if there is no volume set.
-
-Ok.
-
-> >         media_transport_update_volume(transport, init_volume);
-> > 
-> >         msg = dbus_message_new_method_call(endpoint->sender,
-> > endpoint->path,
-> > --
-> > 2.31.1
-> > 
-> 
-> 
-
-
-
-
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index dd8840e70e25..eb5d4ea88c3a 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1272,11 +1272,15 @@ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
+ __printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+ __printf(2, 3) void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
+ 
+-static inline void hci_set_msft_opcode(struct hci_dev *hdev, __u16 opcode)
++static inline int hci_set_msft_opcode(struct hci_dev *hdev, __u16 opcode)
+ {
++	if (!hci_dev_test_flag(hdev, HCI_SETUP))
++		return -EPERM;
++
+ #if IS_ENABLED(CONFIG_BT_MSFTEXT)
+ 	hdev->msft_opcode = opcode;
+ #endif
++	return 0;
+ }
+ 
+ static inline void hci_set_aosp_capable(struct hci_dev *hdev)
+-- 
+2.31.1
 
