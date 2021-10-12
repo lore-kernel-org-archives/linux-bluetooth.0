@@ -2,165 +2,68 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E12C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 13:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95B92C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:38:52 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AC8EE6101D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 13:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 75BCB6108F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:38:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236647AbhJLNEh (ORCPT
+        id S237430AbhJLPkw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 09:04:37 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:53643 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236541AbhJLNEf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 09:04:35 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634043754; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=+RuWrUD96ruUitCjWxda8u0OBJx6ljQt/5IhGPpIbhI=; b=w9HmrPxW2KFdAaq2ikdRYRahLZvqyKeuWUNhR+D2eWsMb4H8T7tIqvarCRgm7iFbupnt0kT2
- xooR7DkTdktniHCja5VnrPr4r2gsoklJL58zSlkL+e+Sn5GPS2QTfM8p1ROUHcqc2bfj3nBK
- /BYCtiMviOYkQwbztLEmFVSoyrM=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 6165875df3e5b80f1f247c03 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 13:02:21
- GMT
-Sender: bgodavar=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 20E8EC4360C; Tue, 12 Oct 2021 13:02:21 +0000 (UTC)
-Received: from bgodavar-linux.qualcomm.com (unknown [202.46.22.19])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 3735CC4338F;
-        Tue, 12 Oct 2021 13:02:15 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 3735CC4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        bjorn.andersson@linaro.org
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, pharish@codeaurora.org,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        saluvala@codeaurora.org, abhishekpandit@chromium.org,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Subject: [PATCH v2] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
-Date:   Tue, 12 Oct 2021 18:31:38 +0530
-Message-Id: <1634043698-20256-1-git-send-email-bgodavar@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Tue, 12 Oct 2021 11:40:52 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:42155 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237218AbhJLPkt (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Oct 2021 11:40:49 -0400
+Received: from smtpclient.apple (p4fefcb73.dip0.t-ipconnect.de [79.239.203.115])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 20798CECE1;
+        Tue, 12 Oct 2021 17:38:46 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH] Bluetooth: hci_sock: purge socket queues in the
+ destruct() callback
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211007190424.196281-1-phind.uet@gmail.com>
+Date:   Tue, 12 Oct 2021 17:38:45 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-kernel-mentees@lists.linuxfoundation.org,
+        syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com
+Content-Transfer-Encoding: 7bit
+Message-Id: <8C82DF3C-98B1-4C41-B9D8-3415DD64138F@holtmann.org>
+References: <20211007190424.196281-1-phind.uet@gmail.com>
+To:     Nguyen Dinh Phi <phind.uet@gmail.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
+Hi Nguyen,
 
-Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
----
-v2: 
-  * merged two patches into one
-  * Removed unused comments
-  * Removed pinmux & pin conf.
-  * Addressed reviewers comments 
+> The receive path may take the socket right before hci_sock_release(),
+> but it may enqueue the packets to the socket queues after the call to
+> skb_queue_purge(), therefore the socket can be destroyed without clear
+> its queues completely.
+> 
+> Moving these skb_queue_purge() to the hci_sock_destruct() will fix this
+> issue, because nothing is referencing the socket at this point.
+> 
+> Signed-off-by: Nguyen Dinh Phi <phind.uet@gmail.com>
+> Reported-by: syzbot+4c4ffd1e1094dae61035@syzkaller.appspotmail.com
+> ---
+> net/bluetooth/hci_sock.c | 11 +++++++----
+> 1 file changed, 7 insertions(+), 4 deletions(-)
 
-v1: initial patch
----
- arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  6 ++++++
- arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 25 +++++++++++++++++++++++++
- arch/arm64/boot/dts/qcom/sc7280-idp2.dts |  6 ++++++
- 3 files changed, 37 insertions(+)
+patch has been applied to bluetooth-next tree.
 
-diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dts b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
-index 64fc22a..d8b9262 100644
---- a/arch/arm64/boot/dts/qcom/sc7280-idp.dts
-+++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
-@@ -16,7 +16,9 @@
- 	compatible = "qcom,sc7280-idp", "google,senor", "qcom,sc7280";
- 
- 	aliases {
-+		bluetooth0 = &bluetooth;
- 		serial0 = &uart5;
-+		serial1 = &uart7;
- 	};
- 
- 	chosen {
-@@ -68,3 +70,7 @@
- 		qcom,pre-scaling = <1 1>;
- 	};
- };
-+
-+&bluetooth {
-+	vddio-supply = <&vreg_l19b_1p8>;
-+};
-diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
-index 272d5ca..09adc802 100644
---- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
-@@ -393,6 +393,23 @@
- 				<&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
- 	pinctrl-names = "default", "sleep";
- 	pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
-+
-+	bluetooth: wcn6750-bt {
-+		compatible = "qcom,wcn6750-bt";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&bt_en_default>;
-+		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
-+		swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
-+		vddaon-supply = <&vreg_s7b_0p9>;
-+		vddbtcxmx-supply = <&vreg_s7b_0p9>;
-+		vddrfacmn-supply = <&vreg_s7b_0p9>;
-+		vddrfa0p8-supply = <&vreg_s7b_0p9>;
-+		vddrfa1p7-supply = <&vreg_s1b_1p8>;
-+		vddrfa1p2-supply = <&vreg_s8b_1p2>;
-+		vddrfa2p2-supply = <&vreg_s1c_2p2>;
-+		vddasd-supply = <&vreg_l11c_2p8>;
-+		max-speed = <3200000>;
-+	};
- };
- 
- /* PINCTRL - additions to nodes defined in sc7280.dtsi */
-@@ -504,6 +521,14 @@
- 		 */
- 		bias-pull-up;
- 	};
-+
-+	bt_en_default: bt_en_default {
-+		pins = "gpio85";
-+		function = "gpio";
-+		drive-strength = <2>;
-+		output-low;
-+		bias-pull-down;
-+	};
- };
- 
- &sdc1_on {
-diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
-index 1fc2add..e60fa88 100644
---- a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
-+++ b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
-@@ -14,10 +14,16 @@
- 	compatible = "qcom,sc7280-idp2", "google,piglin", "qcom,sc7280";
- 
- 	aliases {
-+		bluetooth0 = &bluetooth;
- 		serial0 = &uart5;
-+		serial1 = &uart7;
- 	};
- 
- 	chosen {
- 		stdout-path = "serial0:115200n8";
- 	};
- };
-+
-+&bluetooth {
-+	vddio-supply = <&vreg_l18b_1p8>;
-+};
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
-a Linux Foundation Collaborative Project
+Regards
+
+Marcel
 
