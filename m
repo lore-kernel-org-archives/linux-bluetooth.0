@@ -2,104 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 54096C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 10:02:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D2E12C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 13:02:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3616F60698
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 10:02:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AC8EE6101D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 13:02:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235835AbhJLKEg (ORCPT
+        id S236647AbhJLNEh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 06:04:36 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:60454 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235771AbhJLKEg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 06:04:36 -0400
+        Tue, 12 Oct 2021 09:04:37 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:53643 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S236541AbhJLNEf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Oct 2021 09:04:35 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634032954; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=KzrF2C1DpEGFxREoByICYhE38ZCMJzobznNOOwUoPhY=;
- b=c36sHRhoBAQSlu8j3KQweiJKV2ug6CHexAR98MVNGqRqoewexl8ryf2CYBmSn1PHEO5jkvH3
- mriKn13oVcJ3+UT7cLjObMst//mBQQV0iovCHrO18+JN5X4INzthJfHyl/rm9kxkvL/19Ug0
- DMhlLnZv5rZRhaRoA9k3FUeoDaw=
-X-Mailgun-Sending-Ip: 198.61.254.9
+ s=smtp; t=1634043754; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=+RuWrUD96ruUitCjWxda8u0OBJx6ljQt/5IhGPpIbhI=; b=w9HmrPxW2KFdAaq2ikdRYRahLZvqyKeuWUNhR+D2eWsMb4H8T7tIqvarCRgm7iFbupnt0kT2
+ xooR7DkTdktniHCja5VnrPr4r2gsoklJL58zSlkL+e+Sn5GPS2QTfM8p1ROUHcqc2bfj3nBK
+ /BYCtiMviOYkQwbztLEmFVSoyrM=
+X-Mailgun-Sending-Ip: 69.72.43.7
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 61655d3a446c6db0cb9fc403 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 10:02:34
+ smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
+ 6165875df3e5b80f1f247c03 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 13:02:21
  GMT
 Sender: bgodavar=codeaurora.org@mg.codeaurora.org
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id A2160C4338F; Tue, 12 Oct 2021 10:02:33 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        id 20E8EC4360C; Tue, 12 Oct 2021 13:02:21 +0000 (UTC)
+Received: from bgodavar-linux.qualcomm.com (unknown [202.46.22.19])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id D78A4C4360C;
-        Tue, 12 Oct 2021 10:02:31 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Tue, 12 Oct 2021 15:32:31 +0530
-From:   bgodavar@codeaurora.org
-To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Cc:     marcel@holtmann.org, bjorn.andersson@linaro.org,
-        johan.hedberg@gmail.com, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        rjliao@codeaurora.org, pharish@codeaurora.org,
-        abhishekpandit@chromium.org
-Subject: Re: [PATCH v1 2/2] arm64: dts: qcom: sc7280: update bluetooth node in
- SC7280 IDP2 board
-In-Reply-To: <fee220ea-4d20-79a2-fe3a-4df09535eca1@linaro.org>
-References: <1633523403-32264-1-git-send-email-bgodavar@codeaurora.org>
- <1633523403-32264-2-git-send-email-bgodavar@codeaurora.org>
- <fee220ea-4d20-79a2-fe3a-4df09535eca1@linaro.org>
-Message-ID: <34c0794417eab5dd75ecc25cbd15a976@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 3735CC4338F;
+        Tue, 12 Oct 2021 13:02:15 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 3735CC4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Balakrishna Godavarthi <bgodavar@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        bjorn.andersson@linaro.org
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, pharish@codeaurora.org,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        saluvala@codeaurora.org, abhishekpandit@chromium.org,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>
+Subject: [PATCH v2] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
+Date:   Tue, 12 Oct 2021 18:31:38 +0530
+Message-Id: <1634043698-20256-1-git-send-email-bgodavar@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dmitry,
+Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
 
-On 2021-10-06 22:18, Dmitry Baryshkov wrote:
-> On 06/10/2021 15:30, Balakrishna Godavarthi wrote:
->> This patch updates bluetooth node in SC7280 IDP2 board.
->> 
->> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
->> ---
->>   arch/arm64/boot/dts/qcom/sc7280-idp2.dts | 6 ++++++
->>   1 file changed, 6 insertions(+)
->> 
->> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts 
->> b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
->> index 1fc2add..5c8d54b 100644
->> --- a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
->> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
->> @@ -15,9 +15,15 @@
->>     	aliases {
->>   		serial0 = &uart5;
->> +		bluetooth0 = &bluetooth;
->> +		hsuart0 = &uart7;
-> 
-> hsuartX does not follow existing aliases definition, so it was frowned
-> upon by Rob Herring in the past.
-> 
-[Bala]: Thanks for pointing out will do in similar way.
+Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+---
+v2: 
+  * merged two patches into one
+  * Removed unused comments
+  * Removed pinmux & pin conf.
+  * Addressed reviewers comments 
 
->>   	};
->>     	chosen {
->>   		stdout-path = "serial0:115200n8";
->>   	};
->>   };
->> +
->> +&bluetooth: wcn6750-bt {
->> +	vddio-supply = <&vreg_l18b_1p8>;
->> +};
->> 
+v1: initial patch
+---
+ arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  6 ++++++
+ arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 25 +++++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sc7280-idp2.dts |  6 ++++++
+ 3 files changed, 37 insertions(+)
+
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dts b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
+index 64fc22a..d8b9262 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-idp.dts
++++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
+@@ -16,7 +16,9 @@
+ 	compatible = "qcom,sc7280-idp", "google,senor", "qcom,sc7280";
+ 
+ 	aliases {
++		bluetooth0 = &bluetooth;
+ 		serial0 = &uart5;
++		serial1 = &uart7;
+ 	};
+ 
+ 	chosen {
+@@ -68,3 +70,7 @@
+ 		qcom,pre-scaling = <1 1>;
+ 	};
+ };
++
++&bluetooth {
++	vddio-supply = <&vreg_l19b_1p8>;
++};
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+index 272d5ca..09adc802 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
++++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+@@ -393,6 +393,23 @@
+ 				<&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
+ 	pinctrl-names = "default", "sleep";
+ 	pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
++
++	bluetooth: wcn6750-bt {
++		compatible = "qcom,wcn6750-bt";
++		pinctrl-names = "default";
++		pinctrl-0 = <&bt_en_default>;
++		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
++		swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
++		vddaon-supply = <&vreg_s7b_0p9>;
++		vddbtcxmx-supply = <&vreg_s7b_0p9>;
++		vddrfacmn-supply = <&vreg_s7b_0p9>;
++		vddrfa0p8-supply = <&vreg_s7b_0p9>;
++		vddrfa1p7-supply = <&vreg_s1b_1p8>;
++		vddrfa1p2-supply = <&vreg_s8b_1p2>;
++		vddrfa2p2-supply = <&vreg_s1c_2p2>;
++		vddasd-supply = <&vreg_l11c_2p8>;
++		max-speed = <3200000>;
++	};
+ };
+ 
+ /* PINCTRL - additions to nodes defined in sc7280.dtsi */
+@@ -504,6 +521,14 @@
+ 		 */
+ 		bias-pull-up;
+ 	};
++
++	bt_en_default: bt_en_default {
++		pins = "gpio85";
++		function = "gpio";
++		drive-strength = <2>;
++		output-low;
++		bias-pull-down;
++	};
+ };
+ 
+ &sdc1_on {
+diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
+index 1fc2add..e60fa88 100644
+--- a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
++++ b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
+@@ -14,10 +14,16 @@
+ 	compatible = "qcom,sc7280-idp2", "google,piglin", "qcom,sc7280";
+ 
+ 	aliases {
++		bluetooth0 = &bluetooth;
+ 		serial0 = &uart5;
++		serial1 = &uart7;
+ 	};
+ 
+ 	chosen {
+ 		stdout-path = "serial0:115200n8";
+ 	};
+ };
++
++&bluetooth {
++	vddio-supply = <&vreg_l18b_1p8>;
++};
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum,
+a Linux Foundation Collaborative Project
+
