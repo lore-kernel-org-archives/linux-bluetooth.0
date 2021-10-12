@@ -2,49 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A3FC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 09:55:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B31C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 10:01:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 32E7561040
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 09:55:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E424561078
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 10:01:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230389AbhJLJ5e (ORCPT
+        id S235796AbhJLKD5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 05:57:34 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:30143 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235263AbhJLJ5e (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 05:57:34 -0400
+        Tue, 12 Oct 2021 06:03:57 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:21505 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S230389AbhJLKD4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 12 Oct 2021 06:03:56 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634032533; h=Message-ID: References: In-Reply-To: Subject:
+ s=smtp; t=1634032915; h=Message-ID: References: In-Reply-To: Subject:
  Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=5qSQYtrGHjpBWl/ojCdJhEuYiM0d4NPaFPe3p9m6H/w=;
- b=Aqf/9lFmnt1sIUODnSWdosourSez/yRXRhla9PscFzwkyEYLiqVZl56rWHY52IR8qnXYTs/m
- L6vcIs9WxXzJvVmZmNOnT7ZsaEzj35njiwH8fMt1K7orQEFI3aysbB83ymbo/aRAvXf1teVV
- tKwD7iH6Fzt7tMhyHIsNfDUHHE4=
-X-Mailgun-Sending-Ip: 198.61.254.9
+ MIME-Version: Sender; bh=bf4kIc6kjkQWlbI+cz9eUtnDezcOBvpXGOdTGTr61Eg=;
+ b=L7VSQeZyrRJN+Y+GeHYkHh342PlqOQR5qfkssZLGdZmIkZvO4AjkUmV9XLsgfXNuaQdv5fVq
+ B6b3FTigm3S2h5SUFnmkOeBvlDgk5UYqJ+YCubzRyovejTwerBbmMwmuJvOP8G3AVI6/goJJ
+ MDrRTOeOHkpsqRLjOVYORpb5UwQ=
+X-Mailgun-Sending-Ip: 69.72.43.7
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 61655b8103355859c84bb50d (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 09:55:13
+ smtp-out-n02.prod.us-west-2.postgun.com with SMTP id
+ 61655d0c8ea00a941f1f6d70 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 10:01:48
  GMT
 Sender: bgodavar=codeaurora.org@mg.codeaurora.org
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id F012AC4360C; Tue, 12 Oct 2021 09:55:12 +0000 (UTC)
+        id 15F3FC43616; Tue, 12 Oct 2021 10:01:48 +0000 (UTC)
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
         (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
         (No client certificate requested)
         (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 45EAEC4338F;
-        Tue, 12 Oct 2021 09:55:11 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 8D138C4360C;
+        Tue, 12 Oct 2021 10:01:46 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 12 Oct 2021 15:25:11 +0530
+Date:   Tue, 12 Oct 2021 15:31:46 +0530
 From:   bgodavar@codeaurora.org
 To:     Matthias Kaehlcke <mka@chromium.org>
 Cc:     marcel@holtmann.org, bjorn.andersson@linaro.org,
@@ -52,12 +51,13 @@ Cc:     marcel@holtmann.org, bjorn.andersson@linaro.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org, rjliao@codeaurora.org,
         pharish@codeaurora.org, abhishekpandit@chromium.org
-Subject: Re: [PATCH v1 1/2] arm64: dts: qcom: sc7280: Add bluetooth node on
- SC7280 IDP board
-In-Reply-To: <YV3cVzI4aVeCjMt2@google.com>
+Subject: Re: [PATCH v1 2/2] arm64: dts: qcom: sc7280: update bluetooth node in
+ SC7280 IDP2 board
+In-Reply-To: <YV3fVjd5ngQhuA4K@google.com>
 References: <1633523403-32264-1-git-send-email-bgodavar@codeaurora.org>
- <YV3cVzI4aVeCjMt2@google.com>
-Message-ID: <bac51fc71002bdd9c20b92571d3e1c7e@codeaurora.org>
+ <1633523403-32264-2-git-send-email-bgodavar@codeaurora.org>
+ <YV3fVjd5ngQhuA4K@google.com>
+Message-ID: <03a5d78d834a8c0b1463004bc1e4b015@codeaurora.org>
 X-Sender: bgodavar@codeaurora.org
 User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
@@ -66,102 +66,57 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Matthias,
 
-On 2021-10-06 22:56, Matthias Kaehlcke wrote:
-> On Wed, Oct 06, 2021 at 06:00:02PM +0530, Balakrishna Godavarthi wrote:
->> Add bluetooth SoC WCN6750 node for SC7280 IDP board.
+On 2021-10-06 23:09, Matthias Kaehlcke wrote:
+> On Wed, Oct 06, 2021 at 06:00:03PM +0530, Balakrishna Godavarthi wrote:
+>> Subject: arm64: dts: qcom: sc7280: update bluetooth node in SC7280 
+>> IDP2 board
+> 
+> Not super helpful, what does 'update' mean?
+> 
+> It might be easier to have a single patch for both IDP boards, since
+> the Bluetooth node is added in the common sc7280-idp.dtsi board,
+> rather than explaining what this patch does :)
+[Bala]: Sure will have one patch.
+
+> 
+>> This patch updates bluetooth node in SC7280 IDP2 board.
 >> 
 >> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
 >> ---
->>  arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  2 ++
->>  arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 31 
->> +++++++++++++++++++++++++++++++
->>  2 files changed, 33 insertions(+)
+>>  arch/arm64/boot/dts/qcom/sc7280-idp2.dts | 6 ++++++
+>>  1 file changed, 6 insertions(+)
 >> 
->> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dts 
->> b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
->> index 64fc22a..d3f5393 100644
->> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dts
->> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
->> @@ -17,6 +17,8 @@
+>> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts 
+>> b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
+>> index 1fc2add..5c8d54b 100644
+>> --- a/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
+>> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp2.dts
+>> @@ -15,9 +15,15 @@
 >> 
 >>  	aliases {
 >>  		serial0 = &uart5;
 >> +		bluetooth0 = &bluetooth;
 >> +		hsuart0 = &uart7;
-> 
-> Sort aliases alphabetically.
-> 
-> Also 'hsuart' should not be used, as Dmitry already pointed out on
-> patch 2/2. I suppose it should be 'serial1', as in 'second serial
-> port of the board'.
-> 
-[Bala]: will update it.
 >>  	};
+> 
+> Sort aliases alphabetically
+> 
 >> 
 >>  	chosen {
->> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi 
->> b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> index 272d5ca..05aa729 100644
->> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> @@ -393,6 +393,24 @@
->>  				<&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
->>  	pinctrl-names = "default", "sleep";
->>  	pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, 
->> <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
->> +
->> +	bluetooth: wcn6750-bt {
->> +		compatible = "qcom,wcn6750-bt";
->> +		pinctrl-names = "default";
->> +		pinctrl-0 = <&bt_en_default>;
-> 
-> Do we also need a pinctrl entry for 'swctrl' ?
-[Bala]: It is in input to APPS and op of BT SoC.
-I don't think to set any configuration as BT SOC will take care of it.
-
-> 
->> +		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>; /* BT_EN */
->> +		swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>; /* SW_CTRL */
-> 
-> The comments aren't useful, the property names say the same.
-> 
-[Bala]: will remove them
-
->> +		vddio-supply = <&vreg_l19b_1p8>;
->> +		vddaon-supply = <&vreg_s7b_0p9>;
->> +		vddbtcxmx-supply = <&vreg_s7b_0p9>;
->> +		vddrfacmn-supply = <&vreg_s7b_0p9>;
->> +		vddrfa0p8-supply = <&vreg_s7b_0p9>;
->> +		vddrfa1p7-supply = <&vreg_s1b_1p8>;
->> +		vddrfa1p2-supply = <&vreg_s8b_1p2>;
->> +		vddrfa2p2-supply = <&vreg_s1c_2p2>;
->> +		vddasd-supply = <&vreg_l11c_2p8>;
->> +		max-speed = <3200000>;
->> +	};
->>  };
->> 
->>  /* PINCTRL - additions to nodes defined in sc7280.dtsi */
->> @@ -504,6 +522,19 @@
->>  		 */
->>  		bias-pull-up;
+>>  		stdout-path = "serial0:115200n8";
 >>  	};
+>>  };
 >> +
->> +	bt_en_default: bt_en_default {
+>> +&bluetooth: wcn6750-bt {
 > 
-> 	bt_en: bt-en {
+> &bluetooth {
 > 
->> +		pinmux {
->> +			pins = "gpio85";
->> +			function = "gpio";
->> +		};
->> +		pinconf {
->> +			pins = "gpio85";
->> +			drive-strength = <2>;
->> +			output-low;
->> +			bias-pull-down;
->> +		};
+>> +	vddio-supply = <&vreg_l18b_1p8>;
 > 
-> No pinmux & pinconf nodes, see configuration for other pins.
-[Bala]: Thanks for pointing will update in next version
+> nit: if it's not really common across IDP boards or a default, you 
+> could
+> leave it unconfigured in sc7280-idp.dtsi, and set in both board files.
+> Just an idea, with only two boards it doesn't really matter too much.
 
+[Bala]: Sure will update in similar way.
 
