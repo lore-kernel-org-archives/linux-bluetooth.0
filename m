@@ -2,165 +2,166 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE06C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:56:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 60A3FC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 09:55:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EA2826101D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:56:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 32E7561040
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 09:55:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234439AbhJLH6A (ORCPT
+        id S230389AbhJLJ5e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 03:58:00 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:54336 "EHLO
+        Tue, 12 Oct 2021 05:57:34 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:30143 "EHLO
         so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232541AbhJLH6A (ORCPT
+        with ESMTP id S235263AbhJLJ5e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 03:58:00 -0400
+        Tue, 12 Oct 2021 05:57:34 -0400
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634025359; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=96X9VuZYresXMYy8CSPQup19Qrt5vZ+1GegB/kjwYDg=; b=PiJYNvLQffEOn+YiWKkYTjpd7yXV1l5T1DwiTaVai5K8KbNeSyuwmzFc0ZS8daioytkW0IB2
- dl48keHjuruz2QhDeQhQv4Uh9LjP4+X6JMNJR5G16vEx36kkmHwbA2XARPFyfheWxrQvyrk8
- LBRrwCRW1P0BFjUUuNwaIsLZe+o=
+ s=smtp; t=1634032533; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=5qSQYtrGHjpBWl/ojCdJhEuYiM0d4NPaFPe3p9m6H/w=;
+ b=Aqf/9lFmnt1sIUODnSWdosourSez/yRXRhla9PscFzwkyEYLiqVZl56rWHY52IR8qnXYTs/m
+ L6vcIs9WxXzJvVmZmNOnT7ZsaEzj35njiwH8fMt1K7orQEFI3aysbB83ymbo/aRAvXf1teVV
+ tKwD7iH6Fzt7tMhyHIsNfDUHHE4=
 X-Mailgun-Sending-Ip: 198.61.254.9
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n07.prod.us-west-2.postgun.com with SMTP id
- 61653f8eff0285fb0a3e0278 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 07:55:58
+ smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
+ 61655b8103355859c84bb50d (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 09:55:13
  GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Sender: bgodavar=codeaurora.org@mg.codeaurora.org
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id AA4CCC4360C; Tue, 12 Oct 2021 07:55:57 +0000 (UTC)
+        id F012AC4360C; Tue, 12 Oct 2021 09:55:12 +0000 (UTC)
 Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
         (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id B75F1C4338F;
-        Tue, 12 Oct 2021 07:55:56 +0000 (UTC)
+        (Authenticated sender: bgodavar)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 45EAEC4338F;
+        Tue, 12 Oct 2021 09:55:11 +0000 (UTC)
 MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII;
  format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 12 Oct 2021 15:55:56 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by using
-  different nvm
-Message-ID: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
+Date:   Tue, 12 Oct 2021 15:25:11 +0530
+From:   bgodavar@codeaurora.org
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, bjorn.andersson@linaro.org,
+        johan.hedberg@gmail.com, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
+        linux-arm-msm@vger.kernel.org, rjliao@codeaurora.org,
+        pharish@codeaurora.org, abhishekpandit@chromium.org
+Subject: Re: [PATCH v1 1/2] arm64: dts: qcom: sc7280: Add bluetooth node on
+ SC7280 IDP board
+In-Reply-To: <YV3cVzI4aVeCjMt2@google.com>
+References: <1633523403-32264-1-git-send-email-bgodavar@codeaurora.org>
+ <YV3cVzI4aVeCjMt2@google.com>
+Message-ID: <bac51fc71002bdd9c20b92571d3e1c7e@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
 User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-the RF performance of wcn6855 soc chip from different foundries will be
-difference, so we should use different nvm to configure them.
+Hi Matthias,
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
----
-  drivers/bluetooth/btusb.c | 56 
-+++++++++++++++++++++++++++++++++++------------
-  1 file changed, 42 insertions(+), 14 deletions(-)
+On 2021-10-06 22:56, Matthias Kaehlcke wrote:
+> On Wed, Oct 06, 2021 at 06:00:02PM +0530, Balakrishna Godavarthi wrote:
+>> Add bluetooth SoC WCN6750 node for SC7280 IDP board.
+>> 
+>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>> ---
+>>  arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  2 ++
+>>  arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 31 
+>> +++++++++++++++++++++++++++++++
+>>  2 files changed, 33 insertions(+)
+>> 
+>> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dts 
+>> b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
+>> index 64fc22a..d3f5393 100644
+>> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dts
+>> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dts
+>> @@ -17,6 +17,8 @@
+>> 
+>>  	aliases {
+>>  		serial0 = &uart5;
+>> +		bluetooth0 = &bluetooth;
+>> +		hsuart0 = &uart7;
+> 
+> Sort aliases alphabetically.
+> 
+> Also 'hsuart' should not be used, as Dmitry already pointed out on
+> patch 2/2. I suppose it should be 'serial1', as in 'second serial
+> port of the board'.
+> 
+[Bala]: will update it.
+>>  	};
+>> 
+>>  	chosen {
+>> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi 
+>> b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> index 272d5ca..05aa729 100644
+>> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> @@ -393,6 +393,24 @@
+>>  				<&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
+>>  	pinctrl-names = "default", "sleep";
+>>  	pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, 
+>> <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
+>> +
+>> +	bluetooth: wcn6750-bt {
+>> +		compatible = "qcom,wcn6750-bt";
+>> +		pinctrl-names = "default";
+>> +		pinctrl-0 = <&bt_en_default>;
+> 
+> Do we also need a pinctrl entry for 'swctrl' ?
+[Bala]: It is in input to APPS and op of BT SoC.
+I don't think to set any configuration as BT SOC will take care of it.
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 75c83768c257..f352ff351b61 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
-*hdev,
-  #define QCA_DFU_TIMEOUT		3000
-  #define QCA_FLAG_MULTI_NVM      0x80
+> 
+>> +		enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>; /* BT_EN */
+>> +		swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>; /* SW_CTRL */
+> 
+> The comments aren't useful, the property names say the same.
+> 
+[Bala]: will remove them
 
-+#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-+#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-+
-  struct qca_version {
-  	__le32	rom_version;
-  	__le32	patch_version;
-@@ -3221,6 +3224,7 @@ static const struct qca_device_info 
-qca_devices_table[] = {
-  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
-  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
-  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-+	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
-  };
+>> +		vddio-supply = <&vreg_l19b_1p8>;
+>> +		vddaon-supply = <&vreg_s7b_0p9>;
+>> +		vddbtcxmx-supply = <&vreg_s7b_0p9>;
+>> +		vddrfacmn-supply = <&vreg_s7b_0p9>;
+>> +		vddrfa0p8-supply = <&vreg_s7b_0p9>;
+>> +		vddrfa1p7-supply = <&vreg_s1b_1p8>;
+>> +		vddrfa1p2-supply = <&vreg_s8b_1p2>;
+>> +		vddrfa2p2-supply = <&vreg_s1c_2p2>;
+>> +		vddasd-supply = <&vreg_l11c_2p8>;
+>> +		max-speed = <3200000>;
+>> +	};
+>>  };
+>> 
+>>  /* PINCTRL - additions to nodes defined in sc7280.dtsi */
+>> @@ -504,6 +522,19 @@
+>>  		 */
+>>  		bias-pull-up;
+>>  	};
+>> +
+>> +	bt_en_default: bt_en_default {
+> 
+> 	bt_en: bt-en {
+> 
+>> +		pinmux {
+>> +			pins = "gpio85";
+>> +			function = "gpio";
+>> +		};
+>> +		pinconf {
+>> +			pins = "gpio85";
+>> +			drive-strength = <2>;
+>> +			output-low;
+>> +			bias-pull-down;
+>> +		};
+> 
+> No pinmux & pinconf nodes, see configuration for other pins.
+[Bala]: Thanks for pointing will update in next version
 
-  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
-request,
-@@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct 
-hci_dev *hdev,
-  	return err;
-  }
 
-+static void btusb_generate_qca_nvm_name(char *fwname,
-+					size_t max_size,
-+					struct qca_version *ver)
-+{
-+	u32 rom_version = le32_to_cpu(ver->rom_version);
-+	u16 flag = le16_to_cpu(ver->flag);
-+
-+	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-+		u16 board_id = le16_to_cpu(ver->board_id);
-+		u32 ram_version = le32_to_cpu(ver->ram_version);
-+		const char *variant;
-+
-+		switch (ram_version) {
-+		case WCN6855_2_0_RAM_VERSION_GF:
-+		case WCN6855_2_1_RAM_VERSION_GF:
-+			variant = "_gf";
-+			break;
-+		default:
-+			variant = "";
-+			break;
-+		}
-+
-+		/* if boardid equal 0, use default nvm without suffix */
-+		if (board_id == 0x0) {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
-+				rom_version, variant);
-+		} else {
-+			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
-+				rom_version, variant, board_id);
-+		}
-+	} else {
-+		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-+			rom_version);
-+	}
-+
-+}
-+
-  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
-  				    struct qca_version *ver,
-  				    const struct qca_device_info *info)
-@@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
-hci_dev *hdev,
-  	char fwname[64];
-  	int err;
-
--	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		/* if boardid equal 0, use default nvm without surfix */
--		if (le16_to_cpu(ver->board_id) == 0x0) {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--				 le32_to_cpu(ver->rom_version));
--		} else {
--			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
--				le32_to_cpu(ver->rom_version),
--				le16_to_cpu(ver->board_id));
--		}
--	} else {
--		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
--			 le32_to_cpu(ver->rom_version));
--	}
-+	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
-
-  	err = request_firmware(&fw, fwname, &hdev->dev);
-  	if (err) {
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
-Forum, a Linux Foundation Collaborative Project
