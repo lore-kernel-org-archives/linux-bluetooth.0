@@ -2,95 +2,109 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 04666C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:54:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5E72C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:56:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D8FEC60EE5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:54:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8AA96103D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 15:56:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237377AbhJLP4f convert rfc822-to-8bit (ORCPT
+        id S237322AbhJLP6h convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 11:56:35 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:41950 "EHLO
+        Tue, 12 Oct 2021 11:58:37 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56225 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234892AbhJLP4f (ORCPT
+        with ESMTP id S237538AbhJLP6g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 11:56:35 -0400
+        Tue, 12 Oct 2021 11:58:36 -0400
 Received: from smtpclient.apple (p4fefcb73.dip0.t-ipconnect.de [79.239.203.115])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 9DA0ACECE1;
-        Tue, 12 Oct 2021 17:54:32 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 5D9C2CECE1;
+        Tue, 12 Oct 2021 17:56:33 +0200 (CEST)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: Fix memory leak of hci device
+Subject: Re: [PATCH v1] Bluetooth: btintel: Fix bdaddress comparison with
+ garbage value
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211012075634.8041-1-weiyongjun1@huawei.com>
-Date:   Tue, 12 Oct 2021 17:54:32 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+In-Reply-To: <DM8PR11MB557322FB90F730BDE853E742F5B19@DM8PR11MB5573.namprd11.prod.outlook.com>
+Date:   Tue, 12 Oct 2021 17:56:32 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        "An, Tedd" <tedd.an@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <3EC78E44-6E60-4B99-B880-2F5CC468C424@holtmann.org>
-References: <20211012075634.8041-1-weiyongjun1@huawei.com>
-To:     Wei Yongjun <weiyongjun1@huawei.com>
+Message-Id: <23272CA9-FEE5-4E66-942F-E66FA1E513ED@holtmann.org>
+References: <20211005042613.9946-1-kiran.k@intel.com>
+ <79B0A1CF-17D0-473C-A321-39E1BC291A89@holtmann.org>
+ <CABBYNZL9f1j6sEcNm6B9ONg6yV=Pt=msuOd3Urb-0d-5vmm7qw@mail.gmail.com>
+ <DM8PR11MB557322FB90F730BDE853E742F5B19@DM8PR11MB5573.namprd11.prod.outlook.com>
+To:     "K, Kiran" <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wei,
+Hi Kiran,
 
-> Fault injection test reported memory leak of hci device as follows:
+>>>> Intel Read Verision(TLV) data is parsed into a local structure
+>>>> variable and it contains a field for bd address. Bd address is
+>>>> returned only in bootloader mode and hence bd address in TLV
+>>>> structure needs to be validated only if controller is present in boot loader
+>> mode.
+>>>> 
+>>>> Signed-off-by: Kiran K <kiran.k@intel.com>
+>>>> ---
+>>>> drivers/bluetooth/btintel.c | 19 +++++++++++--------
+>>>> 1 file changed, 11 insertions(+), 8 deletions(-)
+>>>> 
+>>>> diff --git a/drivers/bluetooth/btintel.c
+>>>> b/drivers/bluetooth/btintel.c index 9359bff47296..d1703cc99705
+>>>> 100644
+>>>> --- a/drivers/bluetooth/btintel.c
+>>>> +++ b/drivers/bluetooth/btintel.c
+>>>> @@ -2081,14 +2081,16 @@ static int
+>> btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
+>>>>      if (ver->img_type == 0x03) {
+>>>>              btintel_clear_flag(hdev, INTEL_BOOTLOADER);
+>>>>              btintel_check_bdaddr(hdev);
+>>>> -     }
+>>>> -
+>>>> -     /* If the OTP has no valid Bluetooth device address, then there will
+>>>> -      * also be no valid address for the operational firmware.
+>>>> -      */
+>>>> -     if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+>>>> -             bt_dev_info(hdev, "No device address configured");
+>>>> -             set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+>>>> +     } else {
+>>>> +             /*
+>>>> +              * Check for valid bd address in boot loader mode. Device
+>>>> +              * will be marked as unconfigured if empty bd address is
+>>>> +              * found.
+>>>> +              */
+>>>> +             if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
+>>>> +                     bt_dev_info(hdev, "No device address configured");
+>>>> +                     set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+>>>> +             }
+>>>>      }
+>>>> 
+>>>>      btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
+>>>> @@ -2466,6 +2468,7 @@ static int btintel_setup_combined(struct
+>> hci_dev *hdev)
+>>>>              goto exit_error;
+>>>>      }
+>>>> 
+>>>> +     memset(&ver_tlv, 0, sizeof(ver_tlv));
+>>> 
+>>> this change is not described in the commit message. Why is that now out of
+>> a sudden needed?
+>> 
+>> I guess this is just to make sure the ver_tlv is initialized so its otp_bd_addr be
+>> set to all zeros (BDADDR_ANY) otherwise the code above doesn't work as it
+>> attempts to compare to BDADDR_ANY.
 > 
-> unreferenced object 0xffff88800b858000 (size 8192):
->  comm "kworker/0:2", pid 167, jiffies 4294955747 (age 557.148s)
->  hex dump (first 32 bytes):
->    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->    00 00 00 00 00 00 00 00 00 00 00 00 ad 4e ad de  .............N..
->  backtrace:
->    [<0000000070eb1059>] kmem_cache_alloc_trace mm/slub.c:3208
->    [<00000000015eb521>] hci_alloc_dev_priv include/linux/slab.h:591
->    [<00000000dcfc1e21>] bpa10x_probe include/net/bluetooth/hci_core.h:1240
->    [<000000005d3028c7>] usb_probe_interface drivers/usb/core/driver.c:397
->    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
->    [<0000000024cab3f0>] __driver_probe_device drivers/base/dd.c:751
->    [<00000000202135cb>] driver_probe_device drivers/base/dd.c:782
->    [<000000000761f2bc>] __device_attach_driver drivers/base/dd.c:899
->    [<00000000f7d63134>] bus_for_each_drv drivers/base/bus.c:427
->    [<00000000c9551f0b>] __device_attach drivers/base/dd.c:971
->    [<000000007f79bd16>] bus_probe_device drivers/base/bus.c:487
->    [<000000007bb8b95a>] device_add drivers/base/core.c:3364
->    [<000000009564d9ea>] usb_set_configuration drivers/usb/core/message.c:2171
->    [<00000000e4657087>] usb_generic_driver_probe drivers/usb/core/generic.c:239
->    [<0000000071ede518>] usb_probe_device drivers/usb/core/driver.c:294
->    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
-> 
-> hci_alloc_dev() do not init the device's flag. And hci_free_dev()
-> using put_device() to free the memory allocated for this device,
-> but it calls just kfree(dev) only in case of HCI_UNREGISTER flag
-> is set. So any error handing before hci_register_dev() success
-> will cause memory leak.
-> 
-> To avoid this behaviour we need to set hdev HCI_UNREGISTER flag
-> in hci_alloc_dev_priv().
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-> 
-> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-> index 8a47a3017d61..42410f568e90 100644
-> --- a/net/bluetooth/hci_core.c
-> +++ b/net/bluetooth/hci_core.c
-> @@ -3876,6 +3876,11 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
-> 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
-> 	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
-> 
-> +	/* We need to set HCI_UNREGISTER flag to correctly release
-> +	 * the device in hci_free_dev()
-> +	 */
-> +	hci_dev_set_flag(hdev, HCI_UNREGISTER);
-> +
+> Yes. If not memset, then garbage value is compared against BDADDR_ANY.
 
-I can see the point in the bug report, but I don’t see that the fix is correct. Can you prove that this fix is correct when hci_register_dev is actually called.
+since that is not obviously clear, the takeaway from my review should have been that you either describe this properly in the commit message or you add a comment.
 
 Regards
 
