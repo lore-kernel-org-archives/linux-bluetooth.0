@@ -2,108 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1F1ADC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 21:52:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C1AE0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 22:35:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0058A6101D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 21:52:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A4A9261039
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 22:35:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235718AbhJLVyE (ORCPT
+        id S235323AbhJLWhK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 17:54:04 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49024 "EHLO
+        Tue, 12 Oct 2021 18:37:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58434 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232272AbhJLVyB (ORCPT
+        with ESMTP id S229588AbhJLWhJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 17:54:01 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E934C061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 14:51:59 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id 133so385577pgb.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 14:51:59 -0700 (PDT)
+        Tue, 12 Oct 2021 18:37:09 -0400
+Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74086C061570
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 15:35:07 -0700 (PDT)
+Received: by mail-qt1-x82d.google.com with SMTP id v17so898267qtp.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 15:35:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=allthenticate.net; s=google;
-        h=from:to:cc:subject:date:message-id;
-        bh=EEidnOeF02qPGgC2PjxclUbGbu5ab7r+8hAInS1fBpI=;
-        b=kAsK+zJbOKTCK11DQl4k8FGt7+yJOh9dAAm3dyhycNLa2x48P0qdlgrvV31nFFY4/x
-         NfTVQu2gvjZViJKXNBjcqcfV+C2cVDMqLiwPfCaNoljXY2ddsvsMhOyoCdBxGXw+kIsL
-         QYh8Y4bwxCftykpzuiTnuH/lDE2H5Y8lZBVhvV59A38O01O53DZMXL9tJ6Jqcug5nBmI
-         IHheHVGVjI0cu1plsW7tsTgOUkerSN+8V9qXD7MuVvzaUA7QrpQo4mvpxyhegTvneIOO
-         IYrbIUOXS3oR5kvJMZYsA8GO52z0jrVqq+ZJxbHP61iUL2/GwPOOWmx2SBt50kN06bM9
-         wSuQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=oGJm8M60WMY0PWqCYF+MaRwRdv7JFbRNwamh+9+v5wk=;
+        b=gFdKjd0H11+WTGY0CoboEB5h4kuU5P7Z/appOFy+V8wzFUmJNfUP1Pi9qcK7+c0zBL
+         E2X5Nodf4YrMTmaR+DCU4+xWuCIOWVmH0+oTqVXXbdNqVrdPP9cXqgsojuiYSRHKLEHE
+         0YyfalAQ0kKBy+Ke6jQaa8g84ZjMMZa8YH9QL89yGAcbYvBRBYeT8pnX97VGy2JxdxWi
+         +rvBCg3Ll9p6/frltza8v4piEE7+GIEG8UXxYYOFcM93RWgIyvWj35nppT3aqk5CwIwQ
+         ESPyrFo3brARANmIdoMeS++GVOSS6hFmFcUkmp2fLrVw9umLQRV1qbw8Poub2hKX/mpk
+         LWuA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id;
-        bh=EEidnOeF02qPGgC2PjxclUbGbu5ab7r+8hAInS1fBpI=;
-        b=lZ4QcA7i0m/r4EyXnCWaexPTm7SktNA6rM3uxETZVx6bQSbI/Xsnswb8cXmhtFIvMF
-         S5aD7tB9C6bxqmTFCne2qUc/vJPMKSWREYXoooHLSPDmQZ9AvVdP9x+K/nxL7DTpMYHN
-         dxPZqqZJE0+Z6qcWwQObfooWi0PJ871aQ5Vf+D2JRNsRtlDwtin7v/xGcQwDdwoL22C/
-         0w40a4z1vwBCYGAZNGhHG6p7btQSP5/hkXFzDj0bxHVWzxabYyl0XZcw/QWlpHoYnqpB
-         hX5UAoyIiCSRTS0w091tLgzflxNocoX0nL8VF6pxh+reUZMAgYyacRUkAVzexAw+lsjB
-         mv4Q==
-X-Gm-Message-State: AOAM531g0yxbuI3OBZ3dBf40BTzbIM921uOAlSx/BltNlBIMQ26Sof/x
-        p1nONuTrCp9wkk51k48XIoSPn4WMQh1bi1Vf
-X-Google-Smtp-Source: ABdhPJxoTTRPdfbJUovYd3mzavJM8RWhicE5NOF5g/dbYpalWnnicaeu/lbWwJ4iDkjCjmLPEK74kA==
-X-Received: by 2002:a63:cf41:: with SMTP id b1mr25017917pgj.407.1634075518820;
-        Tue, 12 Oct 2021 14:51:58 -0700 (PDT)
-Received: from BernieDesktop.lan (wsip-72-222-70-2.sb.sd.cox.net. [72.222.70.2])
-        by smtp.gmail.com with ESMTPSA id p20sm12504615pfw.124.2021.10.12.14.51.58
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=oGJm8M60WMY0PWqCYF+MaRwRdv7JFbRNwamh+9+v5wk=;
+        b=Iv6wbvwliYfiHIU1C9qCMDf6E96EfQFfCn/877u1oBL3Is6M8LPx8I/5TMkU1uaJSP
+         I5IbiUzfzHUJS4P7B5yRSsoErTRoQKI2p8NeiKejzpuBFURPNsPn73vfmTDlshuwOaQj
+         bw0fZMWCXvvL9mAZwtZEBKSEUzJsErNvY6wF0AWcDooUg/Nv7Goxmm16fi+qzIVUXX7l
+         K2z5fpdILuz+ofDYMTzo3Fv92S/LYVYXw+O8c00ay5EJPQGPbrX+nO3VdvA0RAVKAw3r
+         YWQ8bVUZpFj70RPSGtdKpqhxXIQmQGaz7ZmNbOCYwM3TB/gdfBbCx0fOo7Ck3eCbNtnP
+         tzRA==
+X-Gm-Message-State: AOAM5320IUSbvUYQdXJKJNPFFO2LxrPyZKahLqDeA+vtg/tWlSs+5jwO
+        rzmmky3dQRN8VgvGEKhOmHi0Kb7oJEU+GA==
+X-Google-Smtp-Source: ABdhPJz+k+Df2dO63uMhLwMEC/DcpljtBNRqm1/V9TeZ8OQotOTSewlPXBblKC0zn1o4qjn+5485+A==
+X-Received: by 2002:a05:622a:1a11:: with SMTP id f17mr26261341qtb.30.1634078106478;
+        Tue, 12 Oct 2021 15:35:06 -0700 (PDT)
+Received: from [172.17.0.2] ([20.97.238.180])
+        by smtp.gmail.com with ESMTPSA id u3sm1685435qkj.53.2021.10.12.15.35.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 14:51:58 -0700 (PDT)
-From:   Bernie Conrad <bernie@allthenticate.net>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Bernie Conrad <bernie@allthenticate.com>
-Subject: [BlueZ] gatt: added missing disconn_id's and removed extra check
-Date:   Tue, 12 Oct 2021 14:51:51 -0700
-Message-Id: <20211012215151.15772-1-bernie@allthenticate.net>
-X-Mailer: git-send-email 2.17.1
+        Tue, 12 Oct 2021 15:35:06 -0700 (PDT)
+Message-ID: <61660d9a.1c69fb81.2ee57.cd72@mx.google.com>
+Date:   Tue, 12 Oct 2021 15:35:06 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6896099212408589188=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, bernie@allthenticate.net
+Subject: RE: [BlueZ] gatt: added missing disconn_id's and removed extra check
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211012215151.15772-1-bernie@allthenticate.net>
+References: <20211012215151.15772-1-bernie@allthenticate.net>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Bernie Conrad <bernie@allthenticate.com>
+--===============6896099212408589188==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Adds missing assignment to disconn_id for pending operations and removes
-check that is already handled by checking if the owner_queue of the op
-is gone at the start of write_reply_cb. 
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=562169
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.65 seconds
+GitLint                       FAIL      0.92 seconds
+Prep - Setup ELL              PASS      41.66 seconds
+Build - Prep                  PASS      0.47 seconds
+Build - Configure             PASS      7.42 seconds
+Build - Make                  PASS      172.66 seconds
+Make Check                    PASS      9.43 seconds
+Make Distcheck                PASS      207.02 seconds
+Build w/ext ELL - Configure   PASS      7.64 seconds
+Build w/ext ELL - Make        PASS      163.95 seconds
+
+Details
+##############################
+Test: GitLint - FAIL
+Desc: Run gitlint with rule in .gitlint
+Output:
+[BlueZ] gatt: added missing disconn_id's and removed extra check
+7: B2 Line has trailing whitespace: "is gone at the start of write_reply_cb. "
+
+
+
 
 ---
- src/gatt-database.c | 8 +++-----
- 1 file changed, 3 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/gatt-database.c b/src/gatt-database.c
-index 475e7873c..dbe9415a3 100644
---- a/src/gatt-database.c
-+++ b/src/gatt-database.c
-@@ -978,7 +978,7 @@ static struct pending_op *pending_ccc_new(struct bt_att *att,
- 	op->attrib = attrib;
- 	op->link_type = link_type;
- 
--	bt_att_register_disconnect(att,
-+	op->disconn_id = bt_att_register_disconnect(att,
- 				   pending_disconnect_cb,
- 				   op,
- 				   NULL);
-@@ -2387,9 +2387,7 @@ static void write_reply_cb(DBusMessage *message, void *user_data)
- 	}
- 
- done:
--	/* Make sure that only reply if the device is connected */
--	if (!bt_att_get_fd(op->att))
--		gatt_db_attribute_write_result(op->attrib, op->id, ecode);
-+	gatt_db_attribute_write_result(op->attrib, op->id, ecode);
- }
- 
- static struct pending_op *pending_write_new(struct bt_att *att,
-@@ -2418,7 +2416,7 @@ static struct pending_op *pending_write_new(struct bt_att *att,
- 	op->prep_authorize = prep_authorize;
- 	queue_push_tail(owner_queue, op);
- 
--	bt_att_register_disconnect(att,
-+	op->disconn_id = bt_att_register_disconnect(att,
- 			    pending_disconnect_cb,
- 			    op, NULL);
- 
--- 
-2.17.1
 
+--===============6896099212408589188==--
