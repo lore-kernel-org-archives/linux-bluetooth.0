@@ -2,100 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC4B5C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:42:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FE06C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:56:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5F5C60D43
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:42:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id EA2826101D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 12 Oct 2021 07:56:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234123AbhJLHo5 (ORCPT
+        id S234439AbhJLH6A (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 03:44:57 -0400
-Received: from szxga08-in.huawei.com ([45.249.212.255]:25124 "EHLO
-        szxga08-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234105AbhJLHo5 (ORCPT
+        Tue, 12 Oct 2021 03:58:00 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:54336 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232541AbhJLH6A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 03:44:57 -0400
-Received: from dggeml709-chm.china.huawei.com (unknown [172.30.72.56])
-        by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4HT6zf1xftz1DHYX;
-        Tue, 12 Oct 2021 15:41:18 +0800 (CST)
-Received: from localhost.localdomain.localdomain (10.175.113.25) by
- dggeml709-chm.china.huawei.com (10.3.17.139) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
- 15.1.2308.8; Tue, 12 Oct 2021 15:42:53 +0800
-From:   Wei Yongjun <weiyongjun1@huawei.com>
-To:     <linux-bluetooth@vger.kernel.org>
-CC:     Wei Yongjun <weiyongjun1@huawei.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Subject: [PATCH] Bluetooth: Fix memory leak of hci device
-Date:   Tue, 12 Oct 2021 15:56:34 +0800
-Message-ID: <20211012075634.8041-1-weiyongjun1@huawei.com>
-X-Mailer: git-send-email 2.20.1
+        Tue, 12 Oct 2021 03:58:00 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1634025359; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=96X9VuZYresXMYy8CSPQup19Qrt5vZ+1GegB/kjwYDg=; b=PiJYNvLQffEOn+YiWKkYTjpd7yXV1l5T1DwiTaVai5K8KbNeSyuwmzFc0ZS8daioytkW0IB2
+ dl48keHjuruz2QhDeQhQv4Uh9LjP4+X6JMNJR5G16vEx36kkmHwbA2XARPFyfheWxrQvyrk8
+ LBRrwCRW1P0BFjUUuNwaIsLZe+o=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n07.prod.us-west-2.postgun.com with SMTP id
+ 61653f8eff0285fb0a3e0278 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 12 Oct 2021 07:55:58
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id AA4CCC4360C; Tue, 12 Oct 2021 07:55:57 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id B75F1C4338F;
+        Tue, 12 Oct 2021 07:55:56 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 7BIT
-Content-Type:   text/plain; charset=US-ASCII
-X-Originating-IP: [10.175.113.25]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggeml709-chm.china.huawei.com (10.3.17.139)
-X-CFilter-Loop: Reflected
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 12 Oct 2021 15:55:56 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by using
+  different nvm
+Message-ID: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Fault injection test reported memory leak of hci device as follows:
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-unreferenced object 0xffff88800b858000 (size 8192):
-  comm "kworker/0:2", pid 167, jiffies 4294955747 (age 557.148s)
-  hex dump (first 32 bytes):
-    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
-    00 00 00 00 00 00 00 00 00 00 00 00 ad 4e ad de  .............N..
-  backtrace:
-    [<0000000070eb1059>] kmem_cache_alloc_trace mm/slub.c:3208
-    [<00000000015eb521>] hci_alloc_dev_priv include/linux/slab.h:591
-    [<00000000dcfc1e21>] bpa10x_probe include/net/bluetooth/hci_core.h:1240
-    [<000000005d3028c7>] usb_probe_interface drivers/usb/core/driver.c:397
-    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
-    [<0000000024cab3f0>] __driver_probe_device drivers/base/dd.c:751
-    [<00000000202135cb>] driver_probe_device drivers/base/dd.c:782
-    [<000000000761f2bc>] __device_attach_driver drivers/base/dd.c:899
-    [<00000000f7d63134>] bus_for_each_drv drivers/base/bus.c:427
-    [<00000000c9551f0b>] __device_attach drivers/base/dd.c:971
-    [<000000007f79bd16>] bus_probe_device drivers/base/bus.c:487
-    [<000000007bb8b95a>] device_add drivers/base/core.c:3364
-    [<000000009564d9ea>] usb_set_configuration drivers/usb/core/message.c:2171
-    [<00000000e4657087>] usb_generic_driver_probe drivers/usb/core/generic.c:239
-    [<0000000071ede518>] usb_probe_device drivers/usb/core/driver.c:294
-    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+  drivers/bluetooth/btusb.c | 56 
++++++++++++++++++++++++++++++++++++------------
+  1 file changed, 42 insertions(+), 14 deletions(-)
 
-hci_alloc_dev() do not init the device's flag. And hci_free_dev()
-using put_device() to free the memory allocated for this device,
-but it calls just kfree(dev) only in case of HCI_UNREGISTER flag
-is set. So any error handing before hci_register_dev() success
-will cause memory leak.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 75c83768c257..f352ff351b61 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
+*hdev,
+  #define QCA_DFU_TIMEOUT		3000
+  #define QCA_FLAG_MULTI_NVM      0x80
 
-To avoid this behaviour we need to set hdev HCI_UNREGISTER flag
-in hci_alloc_dev_priv().
-
-Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
-
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 8a47a3017d61..42410f568e90 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3876,6 +3876,11 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	INIT_DELAYED_WORK(&hdev->cmd_timer, hci_cmd_timeout);
- 	INIT_DELAYED_WORK(&hdev->ncmd_timer, hci_ncmd_timeout);
- 
-+	/* We need to set HCI_UNREGISTER flag to correctly release
-+	 * the device in hci_free_dev()
-+	 */
-+	hci_dev_set_flag(hdev, HCI_UNREGISTER);
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
 +
- 	hci_request_setup(hdev);
- 
- 	hci_init_sysfs(hdev);
--- 
-2.25.1
+  struct qca_version {
+  	__le32	rom_version;
+  	__le32	patch_version;
+@@ -3221,6 +3224,7 @@ static const struct qca_device_info 
+qca_devices_table[] = {
+  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+  };
 
+  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+request,
+@@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct 
+hci_dev *hdev,
+  	return err;
+  }
+
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					struct qca_version *ver)
++{
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++	u16 flag = le16_to_cpu(ver->flag);
++
++	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		u16 board_id = le16_to_cpu(ver->board_id);
++		u32 ram_version = le32_to_cpu(ver->ram_version);
++		const char *variant;
++
++		switch (ram_version) {
++		case WCN6855_2_0_RAM_VERSION_GF:
++		case WCN6855_2_1_RAM_VERSION_GF:
++			variant = "_gf";
++			break;
++		default:
++			variant = "";
++			break;
++		}
++
++		/* if boardid equal 0, use default nvm without suffix */
++		if (board_id == 0x0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
++				rom_version, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
++				rom_version, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+  				    struct qca_version *ver,
+  				    const struct qca_device_info *info)
+@@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
+hci_dev *hdev,
+  	char fwname[64];
+  	int err;
+
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
+-	}
++	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+
+  	err = request_firmware(&fw, fwname, &hdev->dev);
+  	if (err) {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
+Forum, a Linux Foundation Collaborative Project
