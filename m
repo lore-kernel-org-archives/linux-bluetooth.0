@@ -2,102 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E145C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 19:31:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E5B62C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 20:14:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 461C1611CA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 19:31:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B798060FDA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 20:14:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236976AbhJMTdu (ORCPT
+        id S238804AbhJMUQ1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 15:33:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36150 "EHLO
+        Wed, 13 Oct 2021 16:16:27 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45920 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231725AbhJMTdt (ORCPT
+        with ESMTP id S231308AbhJMUQZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 15:33:49 -0400
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC950C061749
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 12:31:45 -0700 (PDT)
-Received: by mail-pj1-x1036.google.com with SMTP id oa4so3039948pjb.2
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 12:31:45 -0700 (PDT)
+        Wed, 13 Oct 2021 16:16:25 -0400
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD196C061746
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 13:14:21 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id p6-20020a9d7446000000b0054e6bb223f3so5290286otk.3
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 13:14:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=P2HfFWUncSbM5+MSRIGdTUxrIsPmuLqa9M7a6zwyxjE=;
-        b=auW+6Z5t5z8oSQ4PcJXMCWkB3U4MNdzVpJIX5opSD++em5ErW089bkCzaF98El+8uH
-         H4FfJbY4si8QAGZFpxhigqaC8GWUNAfpRy8F5SQ1fF/UyV9OIevOeg0CChs99j7lj2bi
-         lBNytAyeKvjNokRYyB0cfA6t8Bb8eIEpD1FLtO0FnoyDAY6KACtJmZDeCTAPkkVfJ63G
-         fUDS+KDnU7qnUWU0Dz7skD2ctpIoJ+7hDAFmfVOu3emYPnuaSf2+1sWdzs51ScZU6Wyj
-         O3WzjjCAxwLnBrWMSztfua3wWTvREK02Ls91JjpXxw6EXHaxYvzwu5pvhtrhS+qJoH53
-         44Tw==
+        d=chromium.org; s=google;
+        h=mime-version:in-reply-to:references:from:user-agent:date:message-id
+         :subject:to:cc;
+        bh=QyTd56Yy55oJcpmoXXse3UQ4TanL7tsHe7pndupRnAM=;
+        b=UkgUzXgrhkocHJb5SORkvSsGhkAluE52o5vGR5B/f7J0XVrXZDQnrqJ2kt91A1un3H
+         h3tpGowokJymNG3IgJkju/eTuWrTzHaUEgIXfvWKsfKj8hUwi0p6VZwPd58V/kBk/TeH
+         W+xJEtq6ROaCfFT7KZndQGTvZJm1CLF9y8pMM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=P2HfFWUncSbM5+MSRIGdTUxrIsPmuLqa9M7a6zwyxjE=;
-        b=OFxCXUmdo/fndNK9/TQGac8Mk2bOX7fQyE+PnyGsCj+uVc3mWil+1MfCfZPr9vBbTY
-         Ov1olNdj4u/DoZw4dFI4hW4HK8eZYlIoEa5vTzTJi1+L0k+ppnvGlC+Tv8919XhBanCL
-         Bmb2VwD0zkd4lYl3e30iWi+PB9eYkqCSb4tkovrGh1M44U8e3s94bWApWCuRPiJ8J015
-         D0mNhsNpWdW4Gubke/+ys/JIQieZ+Cwzp4kMP7MYwfZRTsYpSs3XuW7t4wa6Ps4/ZUxc
-         58eKRdAsLkzV7itb2eIEMWYjYi61MCL17LYnpQ/LNdAzG5xrdmQNBlWdi4Ses747LZDZ
-         nG8w==
-X-Gm-Message-State: AOAM532vPvagm8aN3k5nc6zMa03Q5+ROYiFwrYyIQ7hmVFC7/gxaPYiH
-        sLWdLman8ntULad1La3716wZ3U6S0wo=
-X-Google-Smtp-Source: ABdhPJxBMvEDHB2NQxSVqvOk/eVG0bgVsdw/2UJa7UoGyNIL0lZ+kTlz1w3DU+AGrN2MFyS9gz3C7g==
-X-Received: by 2002:a17:903:120e:b0:138:d732:3b01 with SMTP id l14-20020a170903120e00b00138d7323b01mr1022286plh.21.1634153505004;
-        Wed, 13 Oct 2021 12:31:45 -0700 (PDT)
-Received: from [172.17.0.2] ([20.69.106.69])
-        by smtp.gmail.com with ESMTPSA id j13sm250866pff.213.2021.10.13.12.31.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 13 Oct 2021 12:31:44 -0700 (PDT)
-Message-ID: <61673420.1c69fb81.1a3f0.1111@mx.google.com>
-Date:   Wed, 13 Oct 2021 12:31:44 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============1853679467273730717=="
+        h=x-gm-message-state:mime-version:in-reply-to:references:from
+         :user-agent:date:message-id:subject:to:cc;
+        bh=QyTd56Yy55oJcpmoXXse3UQ4TanL7tsHe7pndupRnAM=;
+        b=feBivQSvvnF64dqNcXmJYHTjGNJzXerkXKpWkurHWpjcbTBDwxD1knuQR/Isq46E2k
+         Ofetn67agRQ3gnXNnJN/7SmTQ5pAJ6spAoOZfUYTY5E6CtqImg6SsEzLXYmwZijmcI6a
+         ML6fOph9V5GDC57MfnEkCIXuT008TD8okhXHhJ+34s+waI1/1wU0i9zGE3YBrtPivFAd
+         BFj3G9crjhfJLNav/B1HusQq0gbG35NyQrvZtECj5QQ22H5MZtWIn0c674Vl8u2NK4D8
+         kkMQ/53Heg40k7LoPrO5Sunc3ISjAqHdJKfj3eDIUdTHjv/JL9nvFXMSV9O3DJLruwlp
+         qwaQ==
+X-Gm-Message-State: AOAM530BNdSY+VXD6vqIU+H6EVEIfcar6EOIA8v0dsw7pGIY4uLegmdH
+        NAPnbZQGJlcmJmloKVkctl3DEMEeCFqwOu9pUsryqw==
+X-Google-Smtp-Source: ABdhPJytWQESFwO9jS9EtdyTNqqN92VtGeoE9cEZU0Mp7ZYuw/Y5egTeTQdvmNfwErFI0oZQLfUa5L7oHbKH+PA2/rM=
+X-Received: by 2002:a9d:12f4:: with SMTP id g107mr1096988otg.77.1634156061042;
+ Wed, 13 Oct 2021 13:14:21 -0700 (PDT)
+Received: from 753933720722 named unknown by gmailapi.google.com with
+ HTTPREST; Wed, 13 Oct 2021 15:14:20 -0500
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, mmandlik@google.com
-Subject: RE: Add Advertisement Monitor Device Lost event
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211013115927.BlueZ.v3.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
-References: <20211013115927.BlueZ.v3.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+In-Reply-To: <46cc793cf651822ef90c448682598a02@codeaurora.org>
+References: <1634043698-20256-1-git-send-email-bgodavar@codeaurora.org>
+ <CAE-0n52uUh5TrKpJq9-qkJTdWWU_EZFvoROWFeGEjuc1Ebc8xg@mail.gmail.com> <46cc793cf651822ef90c448682598a02@codeaurora.org>
+From:   Stephen Boyd <swboyd@chromium.org>
+User-Agent: alot/0.9.1
+Date:   Wed, 13 Oct 2021 15:14:20 -0500
+Message-ID: <CAE-0n52+ONDV7YVWcUL1WYEyPhCyxh994613BWKAibsuDwDw6w@mail.gmail.com>
+Subject: Re: [PATCH v2] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
+To:     bgodavar@codeaurora.org
+Cc:     bjorn.andersson@linaro.org, johan.hedberg@gmail.com,
+        marcel@holtmann.org, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        pharish@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, saluvala@codeaurora.org,
+        abhishekpandit@chromium.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1853679467273730717==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Quoting bgodavar@codeaurora.org (2021-10-12 22:30:50)
+> On 2021-10-12 22:54, Stephen Boyd wrote:
+> > Quoting Balakrishna Godavarthi (2021-10-12 06:01:38)
+> >> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+> >> b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+> >> index 272d5ca..09adc802 100644
+> >> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+> >> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+> >> +               compatible = "qcom,wcn6750-bt";
+> >> +               pinctrl-names = "default";
+> >> +               pinctrl-0 = <&bt_en_default>;
+> >> +               enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
+> >> +               swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
+> >
+> > Is there any pinctrl config for gpio 86?
+> >
+> [Bala]: This is input GPIO to apps, BT SOC will handle configurations.
 
-This is automated email and please do not reply to this email!
+Ok. So there should be some pinctrl stating that the function is "gpio"
+and the biasing is probably bias-disable. The BT SOC will handle setting
+any pull, either up or down?
 
-Dear submitter,
+>
+> >> +               vddaon-supply = <&vreg_s7b_0p9>;
+> >> +               vddbtcxmx-supply = <&vreg_s7b_0p9>;
+> >> +               vddrfacmn-supply = <&vreg_s7b_0p9>;
+> >> +               vddrfa0p8-supply = <&vreg_s7b_0p9>;
+> >> +               vddrfa1p7-supply = <&vreg_s1b_1p8>;
+> >> +               vddrfa1p2-supply = <&vreg_s8b_1p2>;
+> >> +               vddrfa2p2-supply = <&vreg_s1c_2p2>;
+> >> +               vddasd-supply = <&vreg_l11c_2p8>;
+> >> +               max-speed = <3200000>;
+> >> +       };
+> >>  };
+> >>
+> >>  /* PINCTRL - additions to nodes defined in sc7280.dtsi */
+> >> @@ -504,6 +521,14 @@
+> >>                  */
+> >>                 bias-pull-up;
+> >>         };
+> >> +
+> >> +       bt_en_default: bt_en_default {
+> >
+> > bt_en: bt-en {
+> >
+> > Node names shouldn't have underscores and 'default' is redundant.
+> >
+> [Bala]: will update in next patch.
+>
+> >> +               pins = "gpio85";
+> >> +               function = "gpio";
+> >> +               drive-strength = <2>;
+> >> +               output-low;
+> >> +               bias-pull-down;
+> >
+> > Why is there a pull down on an output gpio? Shouldn't this be
+> > bias-disable?
+> >
+>
+> [Bala]: BT_EN pin is OP of apps and input to BT SoC.
+> by default we want the state of BT_EN to be low. so used pull down
+> instead of bias-disable
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=562967
+The pin state will be low because of the 'output-low' property.
 
----Test result---
+> as AFAIK bias-disable may trigger a tristate on BT_EN pin, which may
+> trigger BT SoC enable
+> if it is not actually triggered.
 
-Test Summary:
-CheckPatch                    PASS      1.30 seconds
-GitLint                       PASS      0.85 seconds
-Prep - Setup ELL              PASS      48.42 seconds
-Build - Prep                  PASS      0.25 seconds
-Build - Configure             PASS      8.57 seconds
-Build - Make                  PASS      202.56 seconds
-Make Check                    PASS      9.36 seconds
-Make Distcheck                PASS      243.99 seconds
-Build w/ext ELL - Configure   PASS      8.72 seconds
-Build w/ext ELL - Make        PASS      191.73 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============1853679467273730717==--
+Is the pin ever "turned around" and made an input? If not then it will
+be output and be driving low until the enable-gpios is set to output
+active. The pull down is probably wasting power when the pin is being
+driven either high or low.
