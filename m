@@ -2,98 +2,97 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AE04EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 07:59:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00AECC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 08:41:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D4CC60EE9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 07:59:44 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D4BB760D43
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 08:41:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232892AbhJMIBq (ORCPT
+        id S234135AbhJMIn3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 04:01:46 -0400
-Received: from mga05.intel.com ([192.55.52.43]:47469 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232711AbhJMIBp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 04:01:45 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10135"; a="313574441"
-X-IronPort-AV: E=Sophos;i="5.85,370,1624345200"; 
-   d="scan'208";a="313574441"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 13 Oct 2021 00:59:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.85,370,1624345200"; 
-   d="scan'208";a="547748254"
-Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
-  by fmsmga004.fm.intel.com with ESMTP; 13 Oct 2021 00:59:41 -0700
-From:   Kiran K <kiran.k@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
-        tedd.an@intel.com, luiz.von.dentz@intel.com,
-        Kiran K <kiran.k@intel.com>
-Subject: [PATCH v2] Bluetooth: btintel: Fix bdaddress comparison with garbage value
-Date:   Wed, 13 Oct 2021 13:35:11 +0530
-Message-Id: <20211013080511.23945-1-kiran.k@intel.com>
-X-Mailer: git-send-email 2.17.1
+        Wed, 13 Oct 2021 04:43:29 -0400
+Received: from szxga02-in.huawei.com ([45.249.212.188]:14343 "EHLO
+        szxga02-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235764AbhJMIn2 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Oct 2021 04:43:28 -0400
+Received: from dggeml709-chm.china.huawei.com (unknown [172.30.72.55])
+        by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4HTm8y50qlz900t;
+        Wed, 13 Oct 2021 16:36:34 +0800 (CST)
+Received: from localhost.localdomain.localdomain (10.175.113.25) by
+ dggeml709-chm.china.huawei.com (10.3.17.139) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id
+ 15.1.2308.8; Wed, 13 Oct 2021 16:41:24 +0800
+From:   Wei Yongjun <weiyongjun1@huawei.com>
+To:     <linux-bluetooth@vger.kernel.org>
+CC:     Wei Yongjun <weiyongjun1@huawei.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH v2] Bluetooth: Fix memory leak of hci device
+Date:   Wed, 13 Oct 2021 16:55:01 +0800
+Message-ID: <20211013085501.101286-1-weiyongjun1@huawei.com>
+X-Mailer: git-send-email 2.20.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7BIT
+Content-Type:   text/plain; charset=US-ASCII
+X-Originating-IP: [10.175.113.25]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggeml709-chm.china.huawei.com (10.3.17.139)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Intel Read Verision(TLV) data is parsed into a local structure variable
-and it contains a field for bd address. Bd address is returned only in
-bootloader mode and hence bd address in TLV structure needs to be validated
-only if controller is present in boot loader mode.
+Fault injection test reported memory leak of hci device as follows:
 
-Signed-off-by: Kiran K <kiran.k@intel.com>
-Reviewed-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
+unreferenced object 0xffff88800b858000 (size 8192):
+  comm "kworker/0:2", pid 167, jiffies 4294955747 (age 557.148s)
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 ad 4e ad de  .............N..
+  backtrace:
+    [<0000000070eb1059>] kmem_cache_alloc_trace mm/slub.c:3208
+    [<00000000015eb521>] hci_alloc_dev_priv include/linux/slab.h:591
+    [<00000000dcfc1e21>] bpa10x_probe include/net/bluetooth/hci_core.h:1240
+    [<000000005d3028c7>] usb_probe_interface drivers/usb/core/driver.c:397
+    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
+    [<0000000024cab3f0>] __driver_probe_device drivers/base/dd.c:751
+    [<00000000202135cb>] driver_probe_device drivers/base/dd.c:782
+    [<000000000761f2bc>] __device_attach_driver drivers/base/dd.c:899
+    [<00000000f7d63134>] bus_for_each_drv drivers/base/bus.c:427
+    [<00000000c9551f0b>] __device_attach drivers/base/dd.c:971
+    [<000000007f79bd16>] bus_probe_device drivers/base/bus.c:487
+    [<000000007bb8b95a>] device_add drivers/base/core.c:3364
+    [<000000009564d9ea>] usb_set_configuration drivers/usb/core/message.c:2171
+    [<00000000e4657087>] usb_generic_driver_probe drivers/usb/core/generic.c:239
+    [<0000000071ede518>] usb_probe_device drivers/usb/core/driver.c:294
+    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
 
-Notes:
-    changes in v2:
-    - Add comment for memsetting ver_tlv
+hci_alloc_dev() do not init the device's flag. And hci_free_dev()
+using put_device() to free the memory allocated for this device,
+but it calls just put_device(dev) only in case of HCI_UNREGISTER
+flag is set, So any error handing before hci_register_dev() success
+will cause memory leak.
 
- drivers/bluetooth/btintel.c | 22 ++++++++++++++--------
- 1 file changed, 14 insertions(+), 8 deletions(-)
+To avoid this behaviour we can using kfree() to release dev before
+hci_register_dev() success.
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index 9359bff47296..8f9109b40961 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -2081,14 +2081,16 @@ static int btintel_prepare_fw_download_tlv(struct hci_dev *hdev,
- 	if (ver->img_type == 0x03) {
- 		btintel_clear_flag(hdev, INTEL_BOOTLOADER);
- 		btintel_check_bdaddr(hdev);
--	}
--
--	/* If the OTP has no valid Bluetooth device address, then there will
--	 * also be no valid address for the operational firmware.
--	 */
--	if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
--		bt_dev_info(hdev, "No device address configured");
--		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+	} else {
-+		/*
-+		 * Check for valid bd address in boot loader mode. Device
-+		 * will be marked as unconfigured if empty bd address is
-+		 * found.
-+		 */
-+		if (!bacmp(&ver->otp_bd_addr, BDADDR_ANY)) {
-+			bt_dev_info(hdev, "No device address configured");
-+			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+		}
- 	}
+Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 7827639ecf5c..4e3e0451b08c 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -86,6 +86,8 @@ static void bt_host_release(struct device *dev)
  
- 	btintel_get_fw_name_tlv(ver, fwname, sizeof(fwname), "sfi");
-@@ -2466,6 +2468,10 @@ static int btintel_setup_combined(struct hci_dev *hdev)
- 		goto exit_error;
- 	}
+ 	if (hci_dev_test_flag(hdev, HCI_UNREGISTER))
+ 		hci_release_dev(hdev);
++	else
++		kfree(hdev);
+ 	module_put(THIS_MODULE);
+ }
  
-+	/* memset ver_tlv to start with clean state as few fields are exclusive
-+	 * to bootloader mode and are not populated in operational mode
-+	 */
-+	memset(&ver_tlv, 0, sizeof(ver_tlv));
- 	/* For TLV type device, parse the tlv data */
- 	err = btintel_parse_version_tlv(hdev, &ver_tlv, skb);
- 	if (err) {
 -- 
-2.17.1
+2.25.1
 
