@@ -2,84 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B38C5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:32:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A7A5C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:42:56 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9B132610C8
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:32:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 43EB16023D
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:42:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233125AbhJMMe0 convert rfc822-to-8bit (ORCPT
+        id S234305AbhJMMo5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 08:34:26 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:37053 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233182AbhJMMe0 (ORCPT
+        Wed, 13 Oct 2021 08:44:57 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52780 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234141AbhJMMoz (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:34:26 -0400
-Received: from smtpclient.apple (p4ff9f2d2.dip0.t-ipconnect.de [79.249.242.210])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 34190CECF6;
-        Wed, 13 Oct 2021 14:32:22 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v2] Bluetooth: Fix memory leak of hci device
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211013085501.101286-1-weiyongjun1@huawei.com>
-Date:   Wed, 13 Oct 2021 14:32:22 +0200
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B826720E-29DC-45FA-9A34-692254C51033@holtmann.org>
-References: <20211013085501.101286-1-weiyongjun1@huawei.com>
-To:     Wei Yongjun <weiyongjun1@huawei.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+        Wed, 13 Oct 2021 08:44:55 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80770C061753
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:42:52 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id p8-20020a056902114800b005bad2571fbeso2873698ybu.23
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:42:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=1mAFPS/bGBXyFYGcprUNaHQCPmzvwa9glEucWATbAv0=;
+        b=redqpoknCLS2ICQffg8NGQxkU3fHMeMs5+mPK3cclAGMlFUaYPoc4KA+tj+1ndIWRp
+         lsQQc6p+M0XIvtQcCpDV2Il++6vBXaQwD9IR+wIIKF5tl0PHuKTIZRz+eiuX8mBxxe8A
+         CZTyaWm+Ax3kAug+q962D8br+N/0kbv0dX9dFii3e5NPu26e8dU0/aYt2w7rDrXSCEpH
+         qPLTFHeAlD1/SHHkKlqfR9A5/c+QfvGrRFsMz4FwZhkfgQlHcBqCzg5EpK1xHTUItdIZ
+         jNEix5NRXRwz05NGBCnvnceWkJ2yanM+YERoQFBgn1IV0QWTufJkl2lHk3kOkrOZA4/a
+         1Yfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=1mAFPS/bGBXyFYGcprUNaHQCPmzvwa9glEucWATbAv0=;
+        b=KQ/OviYmme+aUmgKLeSToUkFZYiVa7SrWYyiYBTabbNWtrynSeUx8+ZBzVV9m6g+uR
+         pUPtz3e9mTYYrIfslsm0cyZN9Qja1o+osfpxtknyGAougRXuhY/nuka/cLSUeRFxcIyy
+         E49cUBhAg9RaTriSXWNjnfQOrouKDBH9sDD8dgZHa6e6HF6Ewh3pQyab0+R/0F8ovlvc
+         4U7n6ifawNXjAONx8SdcpEV8yK7+5ll9fShoRpVDpNbMqDR+Edlp1ElapO4su6q/CeYJ
+         kuIS8kjeRbgRLt6nFDabO3bFOR/QmgpaHD0XZemOpyN5RNjDCZyIYWFRb2vslZyGsUx9
+         CAGQ==
+X-Gm-Message-State: AOAM530xs62pKqhePaBhOWC1XKjrBHwmAURJAjuBt5p2na2/P8mDpofS
+        6+v3/j9bXsUPw4DT6TlHa/2Z15fSPW51kQ==
+X-Google-Smtp-Source: ABdhPJy2y5rUQE5cAjQ6Y6wX0fcqBmfrfQ0nwYnKIX1s47aR5z5WQMttFs8QihkGCv18ZirA6Ke8fLz7mqJFZQ==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f8a0:57c1:fc2b:3837])
+ (user=mmandlik job=sendgmr) by 2002:a25:bd04:: with SMTP id
+ f4mr34120640ybk.372.1634128971744; Wed, 13 Oct 2021 05:42:51 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 05:42:07 -0700
+Message-Id: <20211013124210.1454876-1-mmandlik@google.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
+Subject: [BlueZ PATCH v2 0/3] Update Device Found event and add Adv Monitor
+ Device Lost event
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Manish Mandlik <mmandlik@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wei,
 
+Hello Bt-Maintainers,
 
-> Fault injection test reported memory leak of hci device as follows:
-> 
-> unreferenced object 0xffff88800b858000 (size 8192):
->  comm "kworker/0:2", pid 167, jiffies 4294955747 (age 557.148s)
->  hex dump (first 32 bytes):
->    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
->    00 00 00 00 00 00 00 00 00 00 00 00 ad 4e ad de  .............N..
->  backtrace:
->    [<0000000070eb1059>] kmem_cache_alloc_trace mm/slub.c:3208
->    [<00000000015eb521>] hci_alloc_dev_priv include/linux/slab.h:591
->    [<00000000dcfc1e21>] bpa10x_probe include/net/bluetooth/hci_core.h:1240
->    [<000000005d3028c7>] usb_probe_interface drivers/usb/core/driver.c:397
->    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
->    [<0000000024cab3f0>] __driver_probe_device drivers/base/dd.c:751
->    [<00000000202135cb>] driver_probe_device drivers/base/dd.c:782
->    [<000000000761f2bc>] __device_attach_driver drivers/base/dd.c:899
->    [<00000000f7d63134>] bus_for_each_drv drivers/base/bus.c:427
->    [<00000000c9551f0b>] __device_attach drivers/base/dd.c:971
->    [<000000007f79bd16>] bus_probe_device drivers/base/bus.c:487
->    [<000000007bb8b95a>] device_add drivers/base/core.c:3364
->    [<000000009564d9ea>] usb_set_configuration drivers/usb/core/message.c:2171
->    [<00000000e4657087>] usb_generic_driver_probe drivers/usb/core/generic.c:239
->    [<0000000071ede518>] usb_probe_device drivers/usb/core/driver.c:294
->    [<00000000cbac9243>] really_probe drivers/base/dd.c:517
-> 
-> hci_alloc_dev() do not init the device's flag. And hci_free_dev()
-> using put_device() to free the memory allocated for this device,
-> but it calls just put_device(dev) only in case of HCI_UNREGISTER
-> flag is set, So any error handing before hci_register_dev() success
-> will cause memory leak.
-> 
-> To avoid this behaviour we can using kfree() to release dev before
-> hci_register_dev() success.
-> 
-> Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+Bluetooth Advertisement Monitor API was introduced to support background
+scanning and proximity detection based on the application specified RSSI
+thresholds and content filters on LE advertisement packets.
 
-patch has been applied to bluetooth-next tree.
+To optimize the power consumption, the API offloads the content
+filtering and RSSI tracking to the controller if the controller
+offloading support is available. However, this monitoring is not
+completely offloaded as the bluetoothd also handles RSSI thresholds and
+timeouts in order to fulfill high/low thresholds/timeouts filtering with
+D-bus clients.
 
-Regards
+There is further room to achieve better power optimization by supporting
+the controller event HCI_VS_MSFT_LE_Monitor_Device_Event to fulfill true
+monitor offloading. This is currently not supported as it was originally
+desired to minimize the changes to the MGMT interface and reuse the
+existing MGMT event - MGMT_EV_DEVICE_FOUND to pass advertisements to
+bluetoothd and let bluetoothd handle the RSSI thresholds and timeouts in
+order to fulfill the D-bus API requirements for the client.
 
-Marcel
+This patch series adds a flag in the exiting 'Device Found' event to
+indicate that the device is being tracked by an Advertisement Monitor.
+Kernel updates this flag based on the receipt of the controller event
+HCI_VS_MSFT_LE_Monitor_Device_Event. A new MGMT event - 'Device Lost'
+has been added to indicate that the controller has stopped tracking a
+device already being tracked.
+
+Please let me know what you think about this or if you have any further
+questions.
+
+Thanks,
+Manish.
+
+Changes in v2:
+- Instead of creating a new 'Device Tracking' event, add a flag 'Device
+  Tracked' in the existing 'Device Found' event and add a new 'Device
+  Lost' event to indicate that the controller has stopped tracking that
+  device.
+- Instead of creating a new 'Device Tracking' event, add a flag 'Device
+  Tracked' in the existing 'Device Found' event and add a new 'Device
+  Lost' event to indicate that the controller has stopped tracking that
+  device.
+- Update function name adv_monitor_tracking_callback() to
+  adv_monitor_device_lost_callback() as it will receive only Device Lost
+  event.
+
+Manish Mandlik (3):
+  doc: Introduce the Adv Monitor Device Lost event
+  lib: Add definition of the Adv Monitor Device Lost event
+  adv_monitor: Receive the Device Lost event
+
+ doc/mgmt-api.txt  | 32 +++++++++++++++++++++++++++++++-
+ lib/mgmt.h        |  9 +++++++++
+ src/adv_monitor.c | 25 +++++++++++++++++++++++++
+ 3 files changed, 65 insertions(+), 1 deletion(-)
+
+-- 
+2.33.0.882.g93a45727a2-goog
 
