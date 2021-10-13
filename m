@@ -2,102 +2,147 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF3C9C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 01:32:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0976C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 05:31:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8EA760FDA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 01:32:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id CFFC160ED4
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 05:31:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231516AbhJMBeg (ORCPT
+        id S237660AbhJMFdF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 21:34:36 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41442 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231200AbhJMBef (ORCPT
+        Wed, 13 Oct 2021 01:33:05 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:64164 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229514AbhJMFdF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 12 Oct 2021 21:34:35 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D18AC061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 18:32:33 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id d23so736871pgh.8
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 18:32:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=CDrWJhNR3EsJWaVN0czFAsAE3GZUP+/ZVvXxyVdXV+g=;
-        b=q2KfcMa9zyuL8ZxvKSYGgj31ynlFp66w7rUmMFQSU07/R6e9iAb0Yo/kF4LKcFn1md
-         VZQM6lbuhAu8e7jFsTl4LfPAXI0xHESI1i0UYaTtjy6wTeWXcn/eaXWORPTj9ea9GmsC
-         O71bnLEjA+3kr2ygWxRJecVqOTh1edyQRxUi69YHakM4WR1O8TN3/QwW4lDbMX3X/T95
-         iGpfG12BPn8YVfHLBHgKMHWAGiutC1cv0boHsV2aGCR8KXkM8TngyKx3RA/K0rbOcq7T
-         LbKMVCi9kdNEwP+ssh4C9XWpkEWxZ0z18nUGkoyeSKS3Fj9SkV9vKBUnDlDgebDpg+2l
-         QeQw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=CDrWJhNR3EsJWaVN0czFAsAE3GZUP+/ZVvXxyVdXV+g=;
-        b=2jDqUCl4drc+OJxruItOjU2Bv48431WiEUXERVzAqY7Wl7VqfKSBGBDk7qFJC2ZXyK
-         ynoDwQY1O2Xc1JG2zIS9xHvJy8fckHm9a0EjhqCIb95/eNvOAl3VcGZW9I4DW/pfpvbm
-         DhrJ5nyg8TfQSxmSjXk5ohWyGoIzLvmDfCj6bxLsMUb2JbuT1xRIjiJg7Jih5DW3Dw3Z
-         JhkcKctJZJOedAyopT7ejnQGeULXSEK6xRLxdzBFIyBPTZyCd5oBgU9D7z1QOtwJ3GhW
-         tIHpZ9er/Nt1Byzu2E+ANfaaE3o4KFDIfr4Du0DXQTG2Z97BNuEe3DcqImNHNK1eRaDo
-         aTCA==
-X-Gm-Message-State: AOAM531+/2vhUWK65eMn0S2MpU+OeI370Pmi65F3J2fuUO/ASEUDLiy6
-        7g2s0/fKGLon+LGAvjiQIaOitysewvo7Jg==
-X-Google-Smtp-Source: ABdhPJyCfELBV9Gp44up+3I7u3dgbKkjVGDCtVFbH46HY/+wHChIwr/3jORMWcOk6kaBw4PkKYRqfw==
-X-Received: by 2002:a63:7d0e:: with SMTP id y14mr12759439pgc.229.1634088751994;
-        Tue, 12 Oct 2021 18:32:31 -0700 (PDT)
-Received: from [172.17.0.2] ([20.94.210.195])
-        by smtp.gmail.com with ESMTPSA id oo9sm91951pjb.53.2021.10.12.18.32.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 18:32:31 -0700 (PDT)
-Message-ID: <6166372f.1c69fb81.d63b6.0685@mx.google.com>
-Date:   Tue, 12 Oct 2021 18:32:31 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============3899976507211363130=="
+        Wed, 13 Oct 2021 01:33:05 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1634103062; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=Knclx6wR1kvoxnA2zY3oGlpVlJCs7kumqLTKNns8fg0=;
+ b=EGonT9laoR7/vT8F1nQj3UtDs6R+CBmQ9L551MBpCDTuf/bXLPqK5doannxTMcQDQhKqehjc
+ ZLbj5weWLXP0bVijIFWWiCFVUTCICZC2sAyahpt4poXBxtPYTiziUe/ec79NNVxleRhtLP1i
+ SsihKMP7rLl2B38cfIUuYzYDZJQ=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 61666f0ca45ca7530706e46e (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 13 Oct 2021 05:30:52
+ GMT
+Sender: bgodavar=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 4EB1CC43617; Wed, 13 Oct 2021 05:30:51 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: bgodavar)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 938D0C4338F;
+        Wed, 13 Oct 2021 05:30:50 +0000 (UTC)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [RFC,BlueZ] monitor: Add packet definitions for MSFT extension
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211013002627.2661081-1-luiz.dentz@gmail.com>
-References: <20211013002627.2661081-1-luiz.dentz@gmail.com>
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 13 Oct 2021 11:00:50 +0530
+From:   bgodavar@codeaurora.org
+To:     Stephen Boyd <swboyd@chromium.org>
+Cc:     bjorn.andersson@linaro.org, johan.hedberg@gmail.com,
+        marcel@holtmann.org, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        pharish@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, saluvala@codeaurora.org,
+        abhishekpandit@chromium.org
+Subject: Re: [PATCH v2] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
+In-Reply-To: <CAE-0n52uUh5TrKpJq9-qkJTdWWU_EZFvoROWFeGEjuc1Ebc8xg@mail.gmail.com>
+References: <1634043698-20256-1-git-send-email-bgodavar@codeaurora.org>
+ <CAE-0n52uUh5TrKpJq9-qkJTdWWU_EZFvoROWFeGEjuc1Ebc8xg@mail.gmail.com>
+Message-ID: <46cc793cf651822ef90c448682598a02@codeaurora.org>
+X-Sender: bgodavar@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============3899976507211363130==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Stephen Boyd,
 
-This is automated email and please do not reply to this email!
+On 2021-10-12 22:54, Stephen Boyd wrote:
+> Quoting Balakrishna Godavarthi (2021-10-12 06:01:38)
+>> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi 
+>> b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> index 272d5ca..09adc802 100644
+>> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
+>> @@ -393,6 +393,23 @@
+>>                                 <&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
+>>         pinctrl-names = "default", "sleep";
+>>         pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, 
+>> <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
+>> +
+>> +       bluetooth: wcn6750-bt {
+> 
+> bluetooth: bluetooth {
+> 
+> Node names should be generic.
+> 
 
-Dear submitter,
+[Bala]: will update in next patch.
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=562229
+>> +               compatible = "qcom,wcn6750-bt";
+>> +               pinctrl-names = "default";
+>> +               pinctrl-0 = <&bt_en_default>;
+>> +               enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
+>> +               swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
+> 
+> Is there any pinctrl config for gpio 86?
+> 
+[Bala]: This is input GPIO to apps, BT SOC will handle configurations.
 
----Test result---
+>> +               vddaon-supply = <&vreg_s7b_0p9>;
+>> +               vddbtcxmx-supply = <&vreg_s7b_0p9>;
+>> +               vddrfacmn-supply = <&vreg_s7b_0p9>;
+>> +               vddrfa0p8-supply = <&vreg_s7b_0p9>;
+>> +               vddrfa1p7-supply = <&vreg_s1b_1p8>;
+>> +               vddrfa1p2-supply = <&vreg_s8b_1p2>;
+>> +               vddrfa2p2-supply = <&vreg_s1c_2p2>;
+>> +               vddasd-supply = <&vreg_l11c_2p8>;
+>> +               max-speed = <3200000>;
+>> +       };
+>>  };
+>> 
+>>  /* PINCTRL - additions to nodes defined in sc7280.dtsi */
+>> @@ -504,6 +521,14 @@
+>>                  */
+>>                 bias-pull-up;
+>>         };
+>> +
+>> +       bt_en_default: bt_en_default {
+> 
+> bt_en: bt-en {
+> 
+> Node names shouldn't have underscores and 'default' is redundant.
+> 
+[Bala]: will update in next patch.
 
-Test Summary:
-CheckPatch                    PASS      0.80 seconds
-GitLint                       PASS      0.32 seconds
-Prep - Setup ELL              PASS      53.20 seconds
-Build - Prep                  PASS      0.25 seconds
-Build - Configure             PASS      9.52 seconds
-Build - Make                  PASS      230.45 seconds
-Make Check                    PASS      9.82 seconds
-Make Distcheck                PASS      271.95 seconds
-Build w/ext ELL - Configure   PASS      9.75 seconds
-Build w/ext ELL - Make        PASS      218.57 seconds
+>> +               pins = "gpio85";
+>> +               function = "gpio";
+>> +               drive-strength = <2>;
+>> +               output-low;
+>> +               bias-pull-down;
+> 
+> Why is there a pull down on an output gpio? Shouldn't this be
+> bias-disable?
+> 
 
+[Bala]: BT_EN pin is OP of apps and input to BT SoC.
+by default we want the state of BT_EN to be low. so used pull down 
+instead of bias-disable
+as AFAIK bias-disable may trigger a tristate on BT_EN pin, which may 
+trigger BT SoC enable
+if it is not actually triggered.
 
-
----
-Regards,
-Linux Bluetooth
-
-
---===============3899976507211363130==--
+>> +       };
+>>  };
+>> 
+>>  &sdc1_on {
