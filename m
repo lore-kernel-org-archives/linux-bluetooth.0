@@ -2,60 +2,61 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2ACBEC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:43:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E01BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:43:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 14A60610D0
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:43:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E475E610FB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 12:43:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234793AbhJMMpI (ORCPT
+        id S234587AbhJMMpL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 08:45:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52826 "EHLO
+        Wed, 13 Oct 2021 08:45:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52814 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234817AbhJMMpD (ORCPT
+        with ESMTP id S234505AbhJMMpH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 08:45:03 -0400
+        Wed, 13 Oct 2021 08:45:07 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 462DBC061765
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:43:00 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id t7-20020a258387000000b005b6d7220c79so2908890ybk.16
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:43:00 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FA2FC061746
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:43:04 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v203-20020a25c5d4000000b005bb21580411so2876100ybe.19
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 05:43:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=hSSFo//MURqtYxEZ8dRqQdSYUUGjXXrfvc2E2Lj7oc4=;
-        b=FwFcHy6sslzGrxK14SL9welSPBLMCMGPHoQGXpwFpbwLw9cIkebkfmBC2ltupkVaPL
-         fq1f06vMUB+mh6xPR0Jv0mBf1ThAS3nHbrxa0GvMGfQCIGue+w02DJVhAUWYLEo8biWQ
-         Z+z7GB0RcpUYm/BFWpunv5oFQt9x5+RnDcXqbSuj2Lsh1nXqRoYWoZ995rrTkEp0+4UU
-         nvMZIkvvOuxPDVoMx1zuKfAiSyJdbBInnq+l+cJcrBidU37FfcxM/HnD447SOuCiVvxJ
-         yDPtFR2rOQDgaUWMhS+mK9FzgizdcuWrp6ImCtwkQDoHiuDcBTtHKOieT9NOFun+R6+H
-         sZaQ==
+        bh=cSVE9/r0djkXzQTDMYaFKUO18EGrjuvx2ljj44H0Ioc=;
+        b=JDYh/uc+lMPJ5GOW89LDdVydP8QebAa68jF+oHuZpHpuHCGxTohQ5ldlAhXQRO/aLQ
+         7KKDRXrm7eQnOgJ5KsDLCVshpaYxIMRL5X1rLCtkNHo7gCpoKJQSP+zzilpDbMRYRwqv
+         k3NOzwgbTvk3MrIIL6CTlIx2s24V/NmqKr95I6H4UewIFl9WMqrwSC8WTu8ZVZAR+owQ
+         8hOOUHHrQCf5Bc4cPH0XyDUxh8BjEPA5HwuFCXPXtvVItT5Z0ZAlBFWg1k0aY5L5GbQf
+         s4DV2V+Tm24NtwIHnQCpLN/Nz9qdGzQTrT2EasJZodl5X2eYUR1eVXkwRUhg72Rvi1VY
+         ZAiw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=hSSFo//MURqtYxEZ8dRqQdSYUUGjXXrfvc2E2Lj7oc4=;
-        b=TytqCT35QsbcvlmfO+qym7K2TSm1eDROKByF92URpEvvRQPd6p4j/5k803lDBa0oHn
-         6f2Qes5Qqyb51Y7SAa2eSUTNG2sI8oE6PN/ApgcYiqQw4LmozAQhyO8sTWqGtJDp3ga5
-         nCo3HiH32eMyBInLAxYMw690RJO18qPRMHgMvLebbsTFb7HXLiVHsrXmrKsT3smaizY3
-         rW3zMkU2OAtVDV3e26/WJH54L1WbzoDj7dq7aEmjy/w0J+pZ0yu2MaV2/ziQ2+INabtV
-         idWReqcv3HJBUkDSp1iRk4ySmO0oexyw0vrO00b4H94booIJA3rGNhO2eyyjo0Y0cFSf
-         jyYw==
-X-Gm-Message-State: AOAM530ET9P/DPMOG2+nwrBQ7MFfrPbtLt8ZB/pyiOAq/+50fSVgPIFY
-        0NMP6vwk+oZbYL9x4RmArE9YA2LS6G4NwQ==
-X-Google-Smtp-Source: ABdhPJzc1NwwTE7P6Zv+NeFqqgvp9pZFWtz3endT1FlQwWd6t3dPu7B5b3yL1tw1VAVitJx0RYm+PKOsog8sQg==
+        bh=cSVE9/r0djkXzQTDMYaFKUO18EGrjuvx2ljj44H0Ioc=;
+        b=Vyyz2UjOvyMdDTXkRgT8u8NGiqGE3PtqqHHVtx9xWHAwisweR7EWdWTV2j18xCPems
+         f0T1upO2uhA8vSUs77EtPyNiNKfLDXvQEpsBRWQL9CNzU204py4NqJo94lUSbIuaUAA5
+         EqiywjCQju6OfQEzOXqT6qgQIWzYySVx7taSOunW6FQbZheZrg85Z76bE4V50ZhGwXXy
+         SPeW6UiWZjPVaKgpRN3OZBMr/cpn56clDsdsch7ZvWfhlp2B7pL/nkqVEcTufUBSTymP
+         mpH8rh8RtfehdsNa+uBX3JzapcICzGPaWt6CGFFrl3G3BQuguJ4nudDE8P7sZFDAwpcw
+         nELA==
+X-Gm-Message-State: AOAM5322sKkbIiN9lYcT1ISHIPhLBzsnGmV1luDcppf7XOCMBEetLvqE
+        QjsTGuPCvsUyBYOh1WT5r8UhPNLO6hZ4cw==
+X-Google-Smtp-Source: ABdhPJwtN9CVQW0VAxd4qmdNig8X8SxmQPgA8hpTLcXYK3ZI/py3Fs2nw0q0iyvwh9/ORFQVropIuMrrt42FbQ==
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:f8a0:57c1:fc2b:3837])
- (user=mmandlik job=sendgmr) by 2002:a25:5e06:: with SMTP id
- s6mr36266938ybb.175.1634128979527; Wed, 13 Oct 2021 05:42:59 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 05:42:08 -0700
+ (user=mmandlik job=sendgmr) by 2002:a25:56:: with SMTP id 83mr36477743yba.262.1634128983504;
+ Wed, 13 Oct 2021 05:43:03 -0700 (PDT)
+Date:   Wed, 13 Oct 2021 05:42:09 -0700
 In-Reply-To: <20211013124210.1454876-1-mmandlik@google.com>
-Message-Id: <20211013053935.BlueZ.v2.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+Message-Id: <20211013053935.BlueZ.v2.2.Ied4afb8c4c882e573f4a23670fc060cbc3e319c9@changeid>
 Mime-Version: 1.0
 References: <20211013124210.1454876-1-mmandlik@google.com>
 X-Mailer: git-send-email 2.33.0.882.g93a45727a2-goog
-Subject: [BlueZ PATCH v2 1/3] doc: Introduce the Adv Monitor Device Lost event
+Subject: [BlueZ PATCH v2 2/3] lib: Add definition of the Adv Monitor Device
+ Lost event
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     chromeos-bluetooth-upstreaming@chromium.org,
@@ -66,12 +67,10 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Add a flag 'Device Tracked' to the existing 'Device Found' event to
-indicate that the controller has started tracking the device matching
-an Advertisement Monitor with handle 'Monitor_Handle'.
-
-Add a new event 'Adv Monitor Device Lost' to indicate that the
-controller has stopped tracking that particular device.
+This patch adds a flag to the Device Found event to indicate that the
+controller is tracking a device and adds definition of the new Device
+Lost event to indicate that the controller has stopped tracking that
+device.
 
 ---
 
@@ -81,77 +80,49 @@ Changes in v2:
   Lost' event to indicate that the controller has stopped tracking that
   device.
 
- doc/mgmt-api.txt | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ lib/mgmt.h | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 5355fedb0..0fd884ed0 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -107,7 +107,8 @@ Configuration command, Default Runtime Configuration Changed event, Get
- Device Flags command, Set Device Flags command, Device Flags Changed event,
- Read Advertisement Monitor Features command, Add Advertisement Patterns
- Monitor command, Remove Advertisement Monitor command, Advertisement Monitor
--Added event and Advertisement Monitor Removed event.
-+Added event, Advertisement Monitor Removed event, Updated Device Found event
-+and Added Advertisement Monitor Device Lost event.
+diff --git a/lib/mgmt.h b/lib/mgmt.h
+index 0a6349321..70e3d31f9 100644
+--- a/lib/mgmt.h
++++ b/lib/mgmt.h
+@@ -856,12 +856,14 @@ struct mgmt_ev_auth_failed {
+ #define MGMT_DEV_FOUND_CONFIRM_NAME	0x01
+ #define MGMT_DEV_FOUND_LEGACY_PAIRING	0x02
+ #define MGMT_DEV_FOUND_NOT_CONNECTABLE	0x04
++#define MGMT_DEV_FOUND_MONITORING	0x10
  
+ #define MGMT_EV_DEVICE_FOUND		0x0012
+ struct mgmt_ev_device_found {
+ 	struct mgmt_addr_info addr;
+ 	int8_t rssi;
+ 	uint32_t flags;
++	uint16_t monitor_handle;
+ 	uint16_t eir_len;
+ 	uint8_t eir[0];
+ } __packed;
+@@ -1014,6 +1016,12 @@ struct mgmt_ev_controller_resume {
+ 	uint8_t wake_reason;
+ } __packed;
  
- Example
-@@ -4247,6 +4248,7 @@ Device Found Event
- 				Address_Type (1 Octet)
- 				RSSI (1 Octet)
- 				Flags (4 Octets)
-+				Monitor_Handle (2 Octets)
- 				EIR_Data_Length (2 Octets)
- 				EIR_Data (0-65535 Octets)
++#define MGMT_EV_ADV_MONITOR_DEVICE_LOST		0x002f
++struct mgmt_ev_adv_monitor_device_lost {
++	uint16_t monitor_handle;
++	struct mgmt_addr_info addr;
++} __packed;
++
+ static const char *mgmt_op[] = {
+ 	"<0x0000>",
+ 	"Read Version",
+@@ -1152,6 +1160,7 @@ static const char *mgmt_ev[] = {
+ 	"Advertisement Monitor Removed",
+ 	"Controller Suspend",
+ 	"Controller Resume",
++	"Advertisement Monitor Device Lost",		/* 0x002f */
+ };
  
-@@ -4263,6 +4265,7 @@ Device Found Event
- 		1	Legacy Pairing
- 		2	Not Connectable
- 		3	Reserved (not in use)
-+		4	Device Tracked
- 
- 	For the RSSI field a value of 127 indicates that the RSSI is
- 	not available. That can happen with Bluetooth 1.1 and earlier
-@@ -4285,6 +4288,10 @@ Device Found Event
- 	accept any connections. This can be indicated by Low Energy
- 	devices that are in broadcaster role.
- 
-+	The Device Tracked flag indicates that the controller has started
-+	monitoring a particular device matching the Advertisement Monitor
-+	with handle Monitor_Handle.
-+
- 
- Discovering Event
- =================
-@@ -4910,3 +4917,26 @@ Controller Resume Event
- 	Address_Type. Otherwise, Address and Address_Type will both be zero.
- 
- 	This event will be sent to all management sockets.
-+
-+
-+Advertisement Monitor Device Lost Event
-+=======================================
-+
-+	Event code:		0x002f
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Monitor_Handle (2 Octets)
-+				Address (6 Octets)
-+				Address_Type (1 Octet)
-+
-+	This event indicates that the controller has stopped tracking the
-+	device that was being tracked by monitor with handle Monitor_Handle.
-+
-+	The address of the device being tracked will be shared in Address and
-+	Address_Type.
-+
-+	Possible values for the Address_Type parameter:
-+		0	BR/EDR
-+		1	LE Public
-+		2	LE Random
-+
-+	This event will be sent to all management sockets.
+ static const char *mgmt_status[] = {
 -- 
 2.33.0.882.g93a45727a2-goog
 
