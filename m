@@ -2,152 +2,122 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 461BFC43219
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 50FF3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 16:22:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 27DE5610C9
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 16:18:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2DC1C60551
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 16:22:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230248AbhJMQUX (ORCPT
+        id S229931AbhJMQYP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 12:20:23 -0400
-Received: from foss.arm.com ([217.140.110.172]:41924 "EHLO foss.arm.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229529AbhJMQUV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 12:20:21 -0400
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-        by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 588C61063;
-        Wed, 13 Oct 2021 09:18:17 -0700 (PDT)
-Received: from e120937-lin (unknown [172.31.20.19])
-        by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 25FED3F694;
-        Wed, 13 Oct 2021 09:18:07 -0700 (PDT)
-Date:   Wed, 13 Oct 2021 17:18:04 +0100
-From:   Cristian Marussi <cristian.marussi@arm.com>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
-        Richard Weinberger <richard@nod.at>,
-        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-        Jason Wang <jasowang@redhat.com>,
-        Paolo Bonzini <pbonzini@redhat.com>,
-        Stefan Hajnoczi <stefanha@redhat.com>,
-        Jens Axboe <axboe@kernel.dk>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Matt Mackall <mpm@selenic.com>,
-        Herbert Xu <herbert@gondor.apana.org.au>,
-        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Gonglei <arei.gonglei@huawei.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Sudeep Holla <sudeep.holla@arm.com>,
-        "Enrico Weigelt, metux IT consult" <info@metux.net>,
-        Viresh Kumar <vireshk@kernel.org>,
-        Linus Walleij <linus.walleij@linaro.org>,
-        Bartosz Golaszewski <brgl@bgdev.pl>,
-        David Airlie <airlied@linux.ie>,
-        Gerd Hoffmann <kraxel@redhat.com>,
-        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
-        Jean-Philippe Brucker <jean-philippe@linaro.org>,
-        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        Dan Williams <dan.j.williams@intel.com>,
-        Vishal Verma <vishal.l.verma@intel.com>,
-        Dave Jiang <dave.jiang@intel.com>,
-        Ira Weiny <ira.weiny@intel.com>,
-        Ohad Ben-Cohen <ohad@wizery.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Mathieu Poirier <mathieu.poirier@linaro.org>,
-        "James E.J. Bottomley" <jejb@linux.ibm.com>,
-        "Martin K. Petersen" <martin.petersen@oracle.com>,
-        David Hildenbrand <david@redhat.com>,
-        Vivek Goyal <vgoyal@redhat.com>,
-        Miklos Szeredi <miklos@szeredi.hu>,
-        Eric Van Hensbergen <ericvh@gmail.com>,
-        Latchesar Ionkov <lucho@ionkov.net>,
-        Dominique Martinet <asmadeus@codewreck.org>,
-        Stefano Garzarella <sgarzare@redhat.com>,
-        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-        Jaroslav Kysela <perex@perex.cz>,
-        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
-        virtualization@lists.linux-foundation.org,
-        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
-        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
-        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
-        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
-        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
-        alsa-devel@alsa-project.org
-Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
-Message-ID: <20211013161804.GB6376@e120937-lin>
-References: <20211013105226.20225-1-mst@redhat.com>
+        Wed, 13 Oct 2021 12:24:15 -0400
+Received: from mailgw01.mediatek.com ([60.244.123.138]:33090 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S229529AbhJMQYO (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 13 Oct 2021 12:24:14 -0400
+X-UUID: 6066434251bb44b98f7276b93295e32b-20211014
+X-UUID: 6066434251bb44b98f7276b93295e32b-20211014
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw01.mediatek.com
+        (envelope-from <mark-yw.chen@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1541090320; Thu, 14 Oct 2021 00:22:06 +0800
+Received: from mtkexhb02.mediatek.inc (172.21.101.103) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.792.15; Thu, 14 Oct 2021 00:22:05 +0800
+Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb02.mediatek.inc
+ (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 14 Oct
+ 2021 00:22:05 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas11.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 14 Oct 2021 00:22:05 +0800
+From:   <mark-yw.chen@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <mark-yw.chen@mediatek.com>, <will-cy.lee@mediatek.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: fix memory leak in btusb_mtk_submit_wmt_recv_urb()
+Date:   Thu, 14 Oct 2021 00:22:04 +0800
+Message-ID: <20211013162204.13919-1-mark-yw.chen@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
-User-Agent: Mutt/1.9.4 (2018-02-28)
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
-> This will enable cleanups down the road.
-> The idea is to disable cbs, then add "flush_queued_cbs" callback
-> as a parameter, this way drivers can flush any work
-> queued after callbacks have been disabled.
-> 
-> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
-> ---
->  arch/um/drivers/virt-pci.c                 | 2 +-
->  drivers/block/virtio_blk.c                 | 4 ++--
->  drivers/bluetooth/virtio_bt.c              | 2 +-
->  drivers/char/hw_random/virtio-rng.c        | 2 +-
->  drivers/char/virtio_console.c              | 4 ++--
->  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
->  drivers/firmware/arm_scmi/virtio.c         | 2 +-
->  drivers/gpio/gpio-virtio.c                 | 2 +-
->  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
->  drivers/i2c/busses/i2c-virtio.c            | 2 +-
->  drivers/iommu/virtio-iommu.c               | 2 +-
->  drivers/net/caif/caif_virtio.c             | 2 +-
->  drivers/net/virtio_net.c                   | 4 ++--
->  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
->  drivers/nvdimm/virtio_pmem.c               | 2 +-
->  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
->  drivers/scsi/virtio_scsi.c                 | 2 +-
->  drivers/virtio/virtio.c                    | 5 +++++
->  drivers/virtio/virtio_balloon.c            | 2 +-
->  drivers/virtio/virtio_input.c              | 2 +-
->  drivers/virtio/virtio_mem.c                | 2 +-
->  fs/fuse/virtio_fs.c                        | 4 ++--
->  include/linux/virtio.h                     | 1 +
->  net/9p/trans_virtio.c                      | 2 +-
->  net/vmw_vsock/virtio_transport.c           | 4 ++--
->  sound/virtio/virtio_card.c                 | 4 ++--
->  26 files changed, 39 insertions(+), 33 deletions(-)
-> 
-[snip]
-> diff --git a/drivers/firmware/arm_scmi/virtio.c b/drivers/firmware/arm_scmi/virtio.c
-> index 11e8efb71375..6b8d93fe8848 100644
-> --- a/drivers/firmware/arm_scmi/virtio.c
-> +++ b/drivers/firmware/arm_scmi/virtio.c
-> @@ -452,7 +452,7 @@ static void scmi_vio_remove(struct virtio_device *vdev)
->  	 * outstanding message on any vqueue to be ignored by complete_cb: now
->  	 * we can just stop processing buffers and destroy the vqueues.
->  	 */
-> -	vdev->config->reset(vdev);
-> +	virtio_reset_device(vdev);
->  	vdev->config->del_vqs(vdev);
->  	/* Ensure scmi_vdev is visible as NULL */
->  	smp_store_mb(scmi_vdev, NULL);
+From: Mark-YW.Chen <mark-yw.chen@mediatek.com>
 
+Driver should free `usb->setup_packet` to avoid the leak.
 
-Reviewed-by: Cristian Marussi <cristian.marussi@arm.com>
+$ cat /sys/kernel/debug/kmemleak
+unreferenced object 0xffffffa564a58080 (size 128):
+    backtrace:
+        [<000000007eb8dd70>] kmem_cache_alloc_trace+0x22c/0x384
+        [<000000008a44191d>] btusb_mtk_hci_wmt_sync+0x1ec/0x994
+    [btusb]
+        [<00000000ca7189a3>] btusb_mtk_setup+0x6b8/0x13cc
+    [btusb]
+        [<00000000c6105069>] hci_dev_do_open+0x290/0x974
+    [bluetooth]
+        [<00000000a583f8b8>] hci_power_on+0xdc/0x3cc [bluetooth]
+        [<000000005d80e687>] process_one_work+0x514/0xc80
+        [<00000000f4d57637>] worker_thread+0x818/0xd0c
+        [<00000000dc7bdb55>] kthread+0x2f8/0x3b8
+        [<00000000f9999513>] ret_from_fork+0x10/0x30
 
-Thanks,
-Cristian
+Signed-off-by: Mark-YW.Chen <mark-yw.chen@mediatek.com>
+---
+ drivers/bluetooth/btusb.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 75c83768c257..1bfcbcabc7d3 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2265,6 +2265,7 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
+ 		skb = bt_skb_alloc(HCI_WMT_MAX_EVENT_SIZE, GFP_ATOMIC);
+ 		if (!skb) {
+ 			hdev->stat.err_rx++;
++			kfree(urb->setup_packet);
+ 			return;
+ 		}
+ 
+@@ -2285,6 +2286,7 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
+ 			data->evt_skb = skb_clone(skb, GFP_ATOMIC);
+ 			if (!data->evt_skb) {
+ 				kfree_skb(skb);
++				kfree(urb->setup_packet);
+ 				return;
+ 			}
+ 		}
+@@ -2293,6 +2295,7 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
+ 		if (err < 0) {
+ 			kfree_skb(data->evt_skb);
+ 			data->evt_skb = NULL;
++			kfree(urb->setup_packet);
+ 			return;
+ 		}
+ 
+@@ -2303,6 +2306,7 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
+ 			wake_up_bit(&data->flags,
+ 				    BTUSB_TX_WAIT_VND_EVT);
+ 		}
++		kfree(urb->setup_packet);
+ 		return;
+ 	} else if (urb->status == -ENOENT) {
+ 		/* Avoid suspend failed when usb_kill_urb */
+@@ -2323,6 +2327,7 @@ static void btusb_mtk_wmt_recv(struct urb *urb)
+ 	usb_anchor_urb(urb, &data->ctrl_anchor);
+ 	err = usb_submit_urb(urb, GFP_ATOMIC);
+ 	if (err < 0) {
++		kfree(urb->setup_packet);
+ 		/* -EPERM: urb is being killed;
+ 		 * -ENODEV: device got disconnected
+ 		 */
+-- 
+2.18.0
 
