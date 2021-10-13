@@ -2,147 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id F0976C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 05:31:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF1F2C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 06:35:14 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CFFC160ED4
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 05:31:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9821E60FDC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 06:35:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237660AbhJMFdF (ORCPT
+        id S230359AbhJMGhQ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 01:33:05 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:64164 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229514AbhJMFdF (ORCPT
+        Wed, 13 Oct 2021 02:37:16 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:56895 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S237867AbhJMGhP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 01:33:05 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634103062; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=Knclx6wR1kvoxnA2zY3oGlpVlJCs7kumqLTKNns8fg0=;
- b=EGonT9laoR7/vT8F1nQj3UtDs6R+CBmQ9L551MBpCDTuf/bXLPqK5doannxTMcQDQhKqehjc
- ZLbj5weWLXP0bVijIFWWiCFVUTCICZC2sAyahpt4poXBxtPYTiziUe/ec79NNVxleRhtLP1i
- SsihKMP7rLl2B38cfIUuYzYDZJQ=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
- 61666f0ca45ca7530706e46e (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 13 Oct 2021 05:30:52
- GMT
-Sender: bgodavar=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 4EB1CC43617; Wed, 13 Oct 2021 05:30:51 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: bgodavar)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 938D0C4338F;
-        Wed, 13 Oct 2021 05:30:50 +0000 (UTC)
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 13 Oct 2021 11:00:50 +0530
-From:   bgodavar@codeaurora.org
-To:     Stephen Boyd <swboyd@chromium.org>
-Cc:     bjorn.andersson@linaro.org, johan.hedberg@gmail.com,
-        marcel@holtmann.org, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
-        pharish@codeaurora.org, rjliao@codeaurora.org,
-        hbandi@codeaurora.org, saluvala@codeaurora.org,
-        abhishekpandit@chromium.org
-Subject: Re: [PATCH v2] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
-In-Reply-To: <CAE-0n52uUh5TrKpJq9-qkJTdWWU_EZFvoROWFeGEjuc1Ebc8xg@mail.gmail.com>
-References: <1634043698-20256-1-git-send-email-bgodavar@codeaurora.org>
- <CAE-0n52uUh5TrKpJq9-qkJTdWWU_EZFvoROWFeGEjuc1Ebc8xg@mail.gmail.com>
-Message-ID: <46cc793cf651822ef90c448682598a02@codeaurora.org>
-X-Sender: bgodavar@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+        Wed, 13 Oct 2021 02:37:15 -0400
+Received: from smtpclient.apple (p4ff9f2d2.dip0.t-ipconnect.de [79.249.242.210])
+        by mail.holtmann.org (Postfix) with ESMTPSA id C90F7CECF3;
+        Wed, 13 Oct 2021 08:35:06 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [PATCH v2 1/4] Bluetooth: Only allow setting msft_opcode at setup
+ stage
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211013003055.2664728-1-luiz.dentz@gmail.com>
+Date:   Wed, 13 Oct 2021 08:35:06 +0200
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <3AF15FB4-3BE9-4758-9782-C1935A0F8B3D@holtmann.org>
+References: <20211013003055.2664728-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Stephen Boyd,
+Hi Luiz,
 
-On 2021-10-12 22:54, Stephen Boyd wrote:
-> Quoting Balakrishna Godavarthi (2021-10-12 06:01:38)
->> diff --git a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi 
->> b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> index 272d5ca..09adc802 100644
->> --- a/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> +++ b/arch/arm64/boot/dts/qcom/sc7280-idp.dtsi
->> @@ -393,6 +393,23 @@
->>                                 <&tlmm 31 IRQ_TYPE_EDGE_FALLING>;
->>         pinctrl-names = "default", "sleep";
->>         pinctrl-1 = <&qup_uart7_sleep_cts>, <&qup_uart7_sleep_rts>, 
->> <&qup_uart7_sleep_tx>, <&qup_uart7_sleep_rx>;
->> +
->> +       bluetooth: wcn6750-bt {
+> The msft_opcode shall only be changed while at the setup stage otherwise
+> it can possible cause problems where different opcodes are used while
+> running.
 > 
-> bluetooth: bluetooth {
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> v2: Fix typos: s/extention/extension/g
 > 
-> Node names should be generic.
+> include/net/bluetooth/hci_core.h | 6 +++++-
+> 1 file changed, 5 insertions(+), 1 deletion(-)
 > 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index dd8840e70e25..eb5d4ea88c3a 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1272,11 +1272,15 @@ int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
+> __printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+> __printf(2, 3) void hci_set_fw_info(struct hci_dev *hdev, const char *fmt, ...);
+> 
+> -static inline void hci_set_msft_opcode(struct hci_dev *hdev, __u16 opcode)
+> +static inline int hci_set_msft_opcode(struct hci_dev *hdev, __u16 opcode)
+> {
+> +	if (!hci_dev_test_flag(hdev, HCI_SETUP))
+> +		return -EPERM;
+> +
+> #if IS_ENABLED(CONFIG_BT_MSFTEXT)
+> 	hdev->msft_opcode = opcode;
+> #endif
+> +	return 0;
+> }
 
-[Bala]: will update in next patch.
+this is also not going to work since some driver might set it in their probe() routine before calling hci_register_dev.
 
->> +               compatible = "qcom,wcn6750-bt";
->> +               pinctrl-names = "default";
->> +               pinctrl-0 = <&bt_en_default>;
->> +               enable-gpios = <&tlmm 85 GPIO_ACTIVE_HIGH>;
->> +               swctrl-gpios = <&tlmm 86 GPIO_ACTIVE_HIGH>;
-> 
-> Is there any pinctrl config for gpio 86?
-> 
-[Bala]: This is input GPIO to apps, BT SOC will handle configurations.
+Regards
 
->> +               vddaon-supply = <&vreg_s7b_0p9>;
->> +               vddbtcxmx-supply = <&vreg_s7b_0p9>;
->> +               vddrfacmn-supply = <&vreg_s7b_0p9>;
->> +               vddrfa0p8-supply = <&vreg_s7b_0p9>;
->> +               vddrfa1p7-supply = <&vreg_s1b_1p8>;
->> +               vddrfa1p2-supply = <&vreg_s8b_1p2>;
->> +               vddrfa2p2-supply = <&vreg_s1c_2p2>;
->> +               vddasd-supply = <&vreg_l11c_2p8>;
->> +               max-speed = <3200000>;
->> +       };
->>  };
->> 
->>  /* PINCTRL - additions to nodes defined in sc7280.dtsi */
->> @@ -504,6 +521,14 @@
->>                  */
->>                 bias-pull-up;
->>         };
->> +
->> +       bt_en_default: bt_en_default {
-> 
-> bt_en: bt-en {
-> 
-> Node names shouldn't have underscores and 'default' is redundant.
-> 
-[Bala]: will update in next patch.
+Marcel
 
->> +               pins = "gpio85";
->> +               function = "gpio";
->> +               drive-strength = <2>;
->> +               output-low;
->> +               bias-pull-down;
-> 
-> Why is there a pull down on an output gpio? Shouldn't this be
-> bias-disable?
-> 
-
-[Bala]: BT_EN pin is OP of apps and input to BT SoC.
-by default we want the state of BT_EN to be low. so used pull down 
-instead of bias-disable
-as AFAIK bias-disable may trigger a tristate on BT_EN pin, which may 
-trigger BT SoC enable
-if it is not actually triggered.
-
->> +       };
->>  };
->> 
->>  &sdc1_on {
