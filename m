@@ -2,244 +2,207 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B61C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 21:38:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7ED4BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 22:17:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83D3B611AE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 21:38:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 60DA1610CC
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 22:17:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229879AbhJMVkZ (ORCPT
+        id S230290AbhJMWTH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 13 Oct 2021 17:40:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36722 "EHLO
+        Wed, 13 Oct 2021 18:19:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45844 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229839AbhJMVkY (ORCPT
+        with ESMTP id S230429AbhJMWTG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 13 Oct 2021 17:40:24 -0400
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B746C061570
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 14:38:21 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id e2so7420105uax.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 14:38:21 -0700 (PDT)
+        Wed, 13 Oct 2021 18:19:06 -0400
+Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4510FC061570
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 15:17:03 -0700 (PDT)
+Received: by mail-pj1-x102b.google.com with SMTP id np13so3309166pjb.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 13 Oct 2021 15:17:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=FyH9RmIzG4YX4jNe5NXGI749bARheOagvQaZWj2xWz4=;
-        b=YRcGX9YFODpzFbKHKzM1dVvCqSNbrKETKpVA6KbaXy7qnyToQ1h7cLjdh4q7u192HC
-         6/dq23h2UcCU8bzCzFqzmAK2YBKhSJ5IL4IFv5pvw239lLAVFm2sUvtLhTxrWj0tMQDZ
-         +jSWxEF5L8ExxWPAmAC7KbpYYJ0LORd9aiFEM4RKCn0dTjfCUbiOIavkJ0eWs1fYJ5kt
-         IG1zgphGgW6bac6yiuGONpKr9QpJ457AeZ7zne0fLKkHkzh9rVoOeMz2UlFQbUkTx9N5
-         lqxx7hwseYJH9x3IFuBe8emE+NJsl/sA8Xq/0Mrn/OlMuhKlBr1T2gdn1tWTE7TvS4iI
-         S2HQ==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GEWO+tSkLfZRrI/O5OcmkK+2eMHpg/T0ri94OenQkFk=;
+        b=M0DrMBovbz46KIRE3RXPydwpULx35aijxi1R6gdsNuYzasmxhVXyxrOcydaeBCTKg5
+         GOX4KknHIwb2OKPeTjxoAEI/ysjntMGvC0seneOtVe0yhTZnuqfxY6ZDdwkONTTFog53
+         GjUY5W1XdHp4FJB4DcOizwmJiSQlPMVItGu7WjPmY3EDZzdxnqzwDirEuvfGXO28gH8J
+         PupborGVIirq8+rQn6jvZA7RKVsy73QoUqdrnBhoTQ51Vmctp0ZcGWsxwoAVEnisY1x0
+         I8Qg/UrxZ5IVrEYdER7YbB7sUF4OL/U8GspV+9zTKpQbmGeqzZwBzKBxYLYSfAFM6H66
+         QZsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=FyH9RmIzG4YX4jNe5NXGI749bARheOagvQaZWj2xWz4=;
-        b=jcSFupVRkFL9POFpS5uQwU+oTh65rkZH5DVi0n3olT7t3KCMbu5RmlkPZ29d9pPxjM
-         lA8U5fLigIA2NKN7cFFfYVZMfeNCPQ5VjSDmERhox5s18p1OZgSdYlZqAnLC8N4ADPea
-         UvAi4DdKmR41mEz2FUVSwrkXIg8v8BWKpAz3/Prm8gGdCcjDnFhWE3T4MpS74wKYL3HD
-         uHTeuDoaj2D8XUyzr3XM6TWoihdrml84dxlF/MJ/7MoUIRAsVhGjzrd+P2meHKj+iT6P
-         mGDuNpNRlmNh/42dtDqgl6S8ClbjvyLecwSyVPg2OhQ+TIBe/KBQ6FTUbAMitp44F68p
-         pg/g==
-X-Gm-Message-State: AOAM533rtgs+8iMzM20DRHWpT2ToDzdfjSEuq5FLhZdjt5qPYSpruX3J
-        dWQrdnzbfXJOwS2xLifPfiVk2Tx02t5CrEX8V88cnfA0
-X-Google-Smtp-Source: ABdhPJyj58wmKzcQwN4YzHr2u0MwTCNeZlccK6YwkhwnT8sY8egi4Ty+HLnSB8Iib2QANMOrBezOlNaLgtYzZVxc1Ds=
-X-Received: by 2002:ab0:29da:: with SMTP id i26mr2117236uaq.129.1634161100355;
- Wed, 13 Oct 2021 14:38:20 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211008190023.15462-1-bernie@allthenticate.net> <CABBYNZLx8HCO3f6+NsPaAUVKSshdiPM_eEq2qK82mkwno-1pkw@mail.gmail.com>
-In-Reply-To: <CABBYNZLx8HCO3f6+NsPaAUVKSshdiPM_eEq2qK82mkwno-1pkw@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=GEWO+tSkLfZRrI/O5OcmkK+2eMHpg/T0ri94OenQkFk=;
+        b=QhCIQMV2STPVZI2Nrp+3Yq+OM2S5dtk2UqV79UeUkoWm/VkoOfLOlTYhkusSGdpvNA
+         H0byy9x3roks11uOqa4RR/M6wUnXpAwuzg5wnxWhhGRTWYtCRKnMDKTN2FjmQJtlTOcZ
+         kPLn3/VNeDxv30dXjHf+bGo2RIT6dYTZC0yQD/2SUcqOpzX8a9Jwgn1pzmZQNibdN34J
+         KnZs3W6H5GR1DLusfouXV6ikk2RJx/dnV9cr1ur9QjfbLRtb8AdGe5FAKYofV00StoCR
+         h8/NRJvmDl0qn1WzE7uSFuC2S0o11GZs39F6lzFO8omHxTvvUqf3dOuVFnMYyKaVOnSk
+         RtFw==
+X-Gm-Message-State: AOAM531zg+GUnXGeQwrYv921OThF+0GjTck6fhZYzSJVjc1C00DkSj47
+        2cN1rU2nH7Jk89RFwhRJ66WTdkyy7yk=
+X-Google-Smtp-Source: ABdhPJwIMH8oKuswp8qsZYtL55In4+vXOWL5lkubqNCwOZrVfSKWuYJaNH79heF429KGHPFZKyH13g==
+X-Received: by 2002:a17:90a:4306:: with SMTP id q6mr16292483pjg.202.1634163422445;
+        Wed, 13 Oct 2021 15:17:02 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u74sm438355pfc.87.2021.10.13.15.17.01
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 13 Oct 2021 15:17:02 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 13 Oct 2021 14:38:09 -0700
-Message-ID: <CABBYNZ+G+kHrkjZkCt6+A31eM_84VEghtnGSWYcBFPauXr4+Hg@mail.gmail.com>
-Subject: Re: [BlueZ v2] gatt: more fixes with cleanup on disconnect/timeout
-To:     Bernie Conrad <bernie@allthenticate.net>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Bernie Conrad <bernie@allthenticate.com>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3] Bluetooth: vhci: Add support for setting msft_opcode and aosp_capable
+Date:   Wed, 13 Oct 2021 15:17:01 -0700
+Message-Id: <20211013221701.2826793-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Bernie,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Fri, Oct 8, 2021 at 12:24 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Bernie,
->
-> On Fri, Oct 8, 2021 at 12:01 PM Bernie Conrad <bernie@allthenticate.net> wrote:
-> >
-> > From: Bernie Conrad <bernie@allthenticate.com>
-> >
-> > The changes in gatt-database.c fix a use after free that was introduced
-> > after the last cleanup patch, ccc_new and write_new operations were not
-> > being properly unregistered because they were not assigned a disconn_id.
-> >
-> > The changes in gatt-db add similar cleanup to pending reads/writes where
-> > timeouts after a disconnect would cause a similar use after free with
-> > already cleaned up resoureces, this adds a simple cb to set on a pending
-> > read/write if a disconnect has occurred to skip the use.
-> >
-> > v2: Fixing formatting issues
-> >
-> > ---
-> >  src/gatt-database.c  |  4 ++--
-> >  src/shared/gatt-db.c | 38 ++++++++++++++++++++++++++++++++++++--
-> >  2 files changed, 38 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/src/gatt-database.c b/src/gatt-database.c
-> > index 475e7873c..00647cf08 100644
-> > --- a/src/gatt-database.c
-> > +++ b/src/gatt-database.c
-> > @@ -978,7 +978,7 @@ static struct pending_op *pending_ccc_new(struct bt_att *att,
-> >         op->attrib = attrib;
-> >         op->link_type = link_type;
-> >
-> > -       bt_att_register_disconnect(att,
-> > +       op->disconn_id = bt_att_register_disconnect(att,
-> >                                    pending_disconnect_cb,
-> >                                    op,
-> >                                    NULL);
-> > @@ -2418,7 +2418,7 @@ static struct pending_op *pending_write_new(struct bt_att *att,
-> >         op->prep_authorize = prep_authorize;
-> >         queue_push_tail(owner_queue, op);
-> >
-> > -       bt_att_register_disconnect(att,
-> > +       op->disconn_id = bt_att_register_disconnect(att,
-> >                             pending_disconnect_cb,
-> >                             op, NULL);
->
-> These changes above shall be split into another patch.
->
-> > diff --git a/src/shared/gatt-db.c b/src/shared/gatt-db.c
-> > index 3a02289ce..8423961f8 100644
-> > --- a/src/shared/gatt-db.c
-> > +++ b/src/shared/gatt-db.c
-> > @@ -77,17 +77,23 @@ struct attribute_notify {
-> >
-> >  struct pending_read {
-> >         struct gatt_db_attribute *attrib;
-> > +       struct bt_att *att;
-> >         unsigned int id;
-> >         unsigned int timeout_id;
-> >         gatt_db_attribute_read_t func;
-> > +       bool disconn;
-> > +       unsigned int disconn_id;
-> >         void *user_data;
-> >  };
-> >
-> >  struct pending_write {
-> >         struct gatt_db_attribute *attrib;
-> > +       struct bt_att *att;
-> >         unsigned int id;
-> >         unsigned int timeout_id;
-> >         gatt_db_attribute_write_t func;
-> > +       bool disconn;
-> > +       unsigned int disconn_id;
-> >         void *user_data;
-> >  };
-> >
-> > @@ -139,8 +145,10 @@ static void pending_read_result(struct pending_read *p, int err,
-> >         if (p->timeout_id > 0)
-> >                 timeout_remove(p->timeout_id);
-> >
-> > -       p->func(p->attrib, err, data, length, p->user_data);
-> > +       if (!p->disconn)
-> > +               p->func(p->attrib, err, data, length, p->user_data);
-> >
-> > +       bt_att_unregister_disconnect(p->att, p->disconn_id);
-> >         free(p);
-> >  }
-> >
-> > @@ -156,8 +164,10 @@ static void pending_write_result(struct pending_write *p, int err)
-> >         if (p->timeout_id > 0)
-> >                 timeout_remove(p->timeout_id);
-> >
-> > -       p->func(p->attrib, err, p->user_data);
-> > +       if (!p->disconn)
-> > +               p->func(p->attrib, err, p->user_data);
-> >
-> > +       bt_att_unregister_disconnect(p->att, p->disconn_id);
-> >         free(p);
-> >  }
->
-> I wonder if it wouldn't be better to use a specific error to inform it
-> the operation has been aborted e.g. -ECONNABORTED instead of
-> duplicating the handling of disconnection, btw if we don't call the
-> callback who is doing the cleanup in gatt-server.c, we still need to
-> call async_read_op_destroy/async_write_op_destroy or that is taken
-> care somewhere else?
->
-> Also it would be great if we had a test in unit/test-gatt.c that
-> covers such scenarios, e.g disconnect while read/write is pending.
+This adds a debugfs entries to set msft_opcode and aosp_capable enabling
+vhci to emulate controllers with MSFT/AOSP extension support.
 
-Is there something not clear about the direction given here, or they
-are understood but you still haven't had time to work on them?
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Fix typos: s/extention/extension/g
+v3: Remove checks for HCI_SETUP, merge changes to introduce MSFT/AOSP support
+at the same time.
 
-> > @@ -1868,6 +1878,13 @@ bool gatt_db_attribute_set_fixed_length(struct gatt_db_attribute *attrib,
-> >         return true;
-> >  }
-> >
-> > +static void pending_read_cb(int err, void *user_data)
-> > +{
-> > +       struct pending_read *p = user_data;
-> > +
-> > +       p->disconn = 1;
-> > +}
-> > +
-> >  bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-> >                                 uint8_t opcode, struct bt_att *att,
-> >                                 gatt_db_attribute_read_t func, void *user_data)
-> > @@ -1901,6 +1918,11 @@ bool gatt_db_attribute_read(struct gatt_db_attribute *attrib, uint16_t offset,
-> >                 p->func = func;
-> >                 p->user_data = user_data;
-> >
-> > +               p->disconn = 0;
-> > +               p->disconn_id = bt_att_register_disconnect(att,
-> > +                                       pending_read_cb, p, NULL);
-> > +               p->att = att;
-> > +
-> >                 queue_push_tail(attrib->pending_reads, p);
-> >
-> >                 attrib->read_func(attrib, p->id, offset, opcode, att,
-> > @@ -1956,6 +1978,13 @@ static bool write_timeout(void *user_data)
-> >         return false;
-> >  }
-> >
-> > +static void pending_write_cb(int err, void *user_data)
-> > +{
-> > +       struct pending_write *p = user_data;
-> > +
-> > +       p->disconn = 1;
-> > +}
-> > +
-> >  bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-> >                                         const uint8_t *value, size_t len,
-> >                                         uint8_t opcode, struct bt_att *att,
-> > @@ -1995,6 +2024,11 @@ bool gatt_db_attribute_write(struct gatt_db_attribute *attrib, uint16_t offset,
-> >                 p->func = func;
-> >                 p->user_data = user_data;
-> >
-> > +               p->disconn = 0;
-> > +               p->disconn_id = bt_att_register_disconnect(att,
-> > +                                       pending_write_cb, p, NULL);
-> > +               p->att = att;
-> > +
-> >                 queue_push_tail(attrib->pending_writes, p);
-> >
-> >                 attrib->write_func(attrib, p->id, offset, value, len, opcode,
-> > --
-> > 2.17.1
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+ drivers/bluetooth/hci_vhci.c | 92 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 92 insertions(+)
 
-
-
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 56c6b22be10b..dc05729104a1 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -42,6 +42,8 @@ struct vhci_data {
+ 
+ 	bool suspended;
+ 	bool wakeup;
++	__u16 msft_opcode;
++	bool aosp_capable;
+ };
+ 
+ static int vhci_open_dev(struct hci_dev *hdev)
+@@ -194,6 +196,82 @@ static const struct file_operations force_wakeup_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
++static int msft_opcode_set(void *data, u64 val)
++{
++	struct vhci_data *vhci = data;
++
++	if (val > 0xffff || (val & 0xffff >> 10) != 0x3f)
++		return -EINVAL;
++
++	vhci->msft_opcode = val;
++
++	return 0;
++}
++
++static int msft_opcode_get(void *data, u64 *val)
++{
++	struct vhci_data *vhci = data;
++
++	*val = vhci->msft_opcode;
++
++	return 0;
++}
++
++DEFINE_DEBUGFS_ATTRIBUTE(msft_opcode_fops, msft_opcode_get, msft_opcode_set,
++			 "%llu\n");
++
++static ssize_t aosp_capable_read(struct file *file, char __user *user_buf,
++				 size_t count, loff_t *ppos)
++{
++	struct vhci_data *vhci = file->private_data;
++	char buf[3];
++
++	buf[0] = vhci->aosp_capable ? 'Y' : 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t aosp_capable_write(struct file *file,
++				  const char __user *user_buf, size_t count,
++				  loff_t *ppos)
++{
++	struct vhci_data *vhci = file->private_data;
++	bool enable;
++	int err;
++
++	err = kstrtobool_from_user(user_buf, count, &enable);
++	if (err)
++		return err;
++
++	if (vhci->aosp_capable == enable)
++		return -EALREADY;
++
++	vhci->aosp_capable = enable;
++
++	return count;
++}
++
++static const struct file_operations aosp_capable_fops = {
++	.open		= simple_open,
++	.read		= aosp_capable_read,
++	.write		= aosp_capable_write,
++	.llseek		= default_llseek,
++};
++
++static int vhci_setup(struct hci_dev *hdev)
++{
++	struct vhci_data *vhci = hci_get_drvdata(hdev);
++
++	if (vhci->msft_opcode)
++		hci_set_msft_opcode(hdev, vhci->msft_opcode);
++
++	if (vhci->aosp_capable)
++		hci_set_aosp_capable(hdev);
++
++	return 0;
++}
++
+ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+@@ -237,6 +315,12 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	hdev->get_codec_config_data = vhci_get_codec_config_data;
+ 	hdev->wakeup = vhci_wakeup;
+ 
++	/* Enable custom setup if CONFIG_BT_MSFTEXT or CONFIG_BT_AOSPEXT is
++	 * selected.
++	 */
++	hdev->setup = vhci_setup;
++	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
++
+ 	/* bit 6 is for external configuration */
+ 	if (opcode & 0x40)
+ 		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
+@@ -259,6 +343,14 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
+ 			    &force_wakeup_fops);
+ 
++	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
++		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
++				    &msft_opcode_fops);
++
++	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
++		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
++				    &aosp_capable_fops);
++
+ 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+ 
+ 	skb_put_u8(skb, 0xff);
 -- 
-Luiz Augusto von Dentz
+2.31.1
+
