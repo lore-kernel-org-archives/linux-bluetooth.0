@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CC6BFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 00:31:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCD9C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 00:31:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B0F7260F23
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 00:31:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E612D60F21
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 13 Oct 2021 00:31:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234252AbhJMAdF (ORCPT
+        id S235711AbhJMAdG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 12 Oct 2021 20:33:05 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55914 "EHLO
+        Tue, 12 Oct 2021 20:33:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55922 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234297AbhJMAdE (ORCPT
+        with ESMTP id S235064AbhJMAdE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Tue, 12 Oct 2021 20:33:04 -0400
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04DCC061746
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 17:30:59 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id i65so895120pfe.12
-        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 17:30:59 -0700 (PDT)
+Received: from mail-pl1-x62d.google.com (mail-pl1-x62d.google.com [IPv6:2607:f8b0:4864:20::62d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3495FC06174E
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 17:31:01 -0700 (PDT)
+Received: by mail-pl1-x62d.google.com with SMTP id w14so649976pll.2
+        for <linux-bluetooth@vger.kernel.org>; Tue, 12 Oct 2021 17:31:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=6UoyUe+ax+jaKr28X/12cCN2wqR6maKQNLjAocK5Tr0=;
-        b=M5g2Gdq2K1CQgIhiugXeF3LSdLf2YOvfIOQEclIVa9UHj1WOaNJsmGLnpzQHsyyA/E
-         45g6jyI+cCJjcF1rgagBknnjpcb0nLNvZ3fYcQSiz/wW0w3Es7FokZOp3Jt6fNIsoHu/
-         ZeBPD44ejajTkVBiJUnbJF6qgJm5r8M5KvJi4cXIBy0PV08ROfeX2ueZfIokscyE99pt
-         pzwsVhQCg2lwjAZpxkyxPlgfJlak96EdFxCocsaNzkGKMg2xk6acQmbvj2Bdj3xlkR52
-         g8Heg6JHkw7g9Tv2fUzrfjyxAbHKz3LhITorpujcrxSfoSPNKjFlKhKMogaX+aVUdcYV
-         H2dA==
+        bh=0+E1AGudb1w+bAlldCshhuhzoFxZiJC+ny9qr/1FI2Y=;
+        b=dkAmzhpPca1GRfIvyX7dPhBTXjIUEPNTQ89ff/OYs5wlfY0wSSOA1MVK/meQvgCrRK
+         qbYc/B6o5LxsR4bge6UXQ/muTFQow10cEd0qApiGezU7ltRCsfUaA/lpbrSUv3L+ykEu
+         Iz/H4HSkuVPzL7SpH3ChjL3viEV+XT004q63WNHGWA9fcGG8WJz+CIr3/Mymw2fwGJ9z
+         LafTH4z5KRvL/mLS/THy1krJnTmypMWfmU3TgkipjN/Bl/mBv1CJzb1/tgUDg+F8piyh
+         2BdmLtzmipSaE6eQfcfgXrwo0+03olP1IP1dVLQC3WEUExqiv7tlRF40nvaI9l80cuUS
+         AF+A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6UoyUe+ax+jaKr28X/12cCN2wqR6maKQNLjAocK5Tr0=;
-        b=iYXa2W27b0bk9fFKKv9rzoeWw2BQYlil/pKxiA4mq6TzAbHAnRtci5sTsINyWx9jV4
-         ew6oaNe/6YGrI6mNr2sE4JsHhvnCGZyQyG+mjGjyeCFmYbgAP+mxLTR3CL3CKTQi+7L9
-         n/CH5jF+segfmQLCCgNqxGnc2a8X6G0Rwoy6/uq97yrYiiqxSEU4Lso1bMj0MyGUvK9X
-         GkixdRx1NimdktponuIDhA3Cx4keNWhqLZMlTLY8IDicdSVCJkV0+hpC+Em9bPdmxNlk
-         VZRdzWos0zj1gPORqWES8s6IQFv9u8nnKYhPfv0JrB5LAUReDAppTIp1ab2lQ0/j1eZL
-         6pUg==
-X-Gm-Message-State: AOAM533eJpI9Rtj0YgEKkKnm7c0J6eqXoonJNpRZDqjycSh79j4zseDS
-        HO5d37wf/uDmueO4KWswHtVbvnmdsHc=
-X-Google-Smtp-Source: ABdhPJz3Rpn6A1OYpe+Knt21gAyUf3YP5ocZ9E5mD0LHZtRMXHYvjFryfcNJ051KqHzVDcK19W5ggw==
-X-Received: by 2002:a05:6a00:b41:b0:44c:4d36:7f61 with SMTP id p1-20020a056a000b4100b0044c4d367f61mr34585980pfo.59.1634085058885;
-        Tue, 12 Oct 2021 17:30:58 -0700 (PDT)
+        bh=0+E1AGudb1w+bAlldCshhuhzoFxZiJC+ny9qr/1FI2Y=;
+        b=jQi0irlvBQG26hmr22BGsW/64qdwsyCjftTcVvyrV+8bVAHj0zevvA8+RPvPeizcE3
+         AwPOO12qoRzS7cz8eFyr9dZEpmHNBM2QunI6N+J+/vsT+Drdb+4JUHLdasnPKATM6R/L
+         tnedku4GXw8JMJDtIn6laUEQUp/HrkxwLaxehhUnyVij1oNYs8M9ozsKRL8ykgWtRR+Q
+         A0xj3KZT7Hcqige7pa0pLC55z7cKeCFpAZmvCa8MyjS4ZzqyWhGq+g88RZSS/TqmlN1W
+         oebWlfUMj4fbaraWACoeunlLF4yL2LwSf7eU55rfvNlmwO6JMrLm+9M7fXbvhlR1SA5+
+         kyzA==
+X-Gm-Message-State: AOAM531hsvBxgHBGJ/9bHQiwgOOSDMaAbPcswj3aRKKGnFtoexaJNC2H
+        QEPZUVCCUkx0ArLVimNlZsQQq6Z75pA=
+X-Google-Smtp-Source: ABdhPJy5mG7BcTycACNVCVQkfNQv2evuA3fxchb7JfxZj45a0aeheViS/IIo2BfQ2TwjPt+uJ+Maew==
+X-Received: by 2002:a17:90b:4014:: with SMTP id ie20mr4399659pjb.146.1634085060406;
+        Tue, 12 Oct 2021 17:31:00 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id s2sm11839996pfe.215.2021.10.12.17.30.58
+        by smtp.gmail.com with ESMTPSA id s2sm11839996pfe.215.2021.10.12.17.30.59
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 12 Oct 2021 17:30:58 -0700 (PDT)
+        Tue, 12 Oct 2021 17:31:00 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] Bluetooth: Only allow setting AOSP capable at setup stage
-Date:   Tue, 12 Oct 2021 17:30:53 -0700
-Message-Id: <20211013003055.2664728-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/4] Bluetooth: vhci: Add support for setting aosp_capable
+Date:   Tue, 12 Oct 2021 17:30:55 -0700
+Message-Id: <20211013003055.2664728-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211013003055.2664728-1-luiz.dentz@gmail.com>
 References: <20211013003055.2664728-1-luiz.dentz@gmail.com>
@@ -69,36 +69,124 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The aosp_capable flag shall only be changed while at the setup stage
-otherwise it can possible take no effect.
+This adds a debugfs entry to set aosp_capable enabling vhci to emulate
+controllers with AOSP extension support.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_vhci.c | 68 +++++++++++++++++++++++++++++++++---
+ 1 file changed, 64 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index eb5d4ea88c3a..ac81745d2ac4 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1283,11 +1283,16 @@ static inline int hci_set_msft_opcode(struct hci_dev *hdev, __u16 opcode)
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 68a970db8db1..f9aa3fe14995 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -45,6 +45,9 @@ struct vhci_data {
+ #if IS_ENABLED(CONFIG_BT_MSFTEXT)
+ 	__u16 msft_opcode;
+ #endif
++#if IS_ENABLED(CONFIG_BT_AOSPEXT)
++	__u16 aosp_capable;
++#endif
+ };
+ 
+ static int vhci_open_dev(struct hci_dev *hdev)
+@@ -223,18 +226,68 @@ static int msft_opcode_get(void *data, u64 *val)
+ DEFINE_DEBUGFS_ATTRIBUTE(msft_opcode_fops, msft_opcode_get, msft_opcode_set,
+ 			 "%llu\n");
+ 
++#endif /* CONFIG_BT_MSFTEXT */
++
++#if IS_ENABLED(CONFIG_BT_AOSPEXT)
++
++static ssize_t aosp_capable_read(struct file *file, char __user *user_buf,
++				 size_t count, loff_t *ppos)
++{
++	struct vhci_data *vhci = file->private_data;
++	char buf[3];
++
++	buf[0] = vhci->aosp_capable ? 'Y' : 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t aosp_capable_write(struct file *file,
++				  const char __user *user_buf, size_t count,
++				  loff_t *ppos)
++{
++	struct vhci_data *vhci = file->private_data;
++	bool enable;
++	int err;
++
++	err = kstrtobool_from_user(user_buf, count, &enable);
++	if (err)
++		return err;
++
++	if (vhci->aosp_capable == enable)
++		return -EALREADY;
++
++	vhci->aosp_capable = enable;
++
++	return count;
++}
++
++static const struct file_operations aosp_capable_fops = {
++	.open		= simple_open,
++	.read		= aosp_capable_read,
++	.write		= aosp_capable_write,
++	.llseek		= default_llseek,
++};
++
++#endif /* CONFIG_BT_AOSEXT */
++
+ static int vhci_setup(struct hci_dev *hdev)
+ {
+ 	struct vhci_data *vhci = hci_get_drvdata(hdev);
+ 
++#if IS_ENABLED(CONFIG_BT_MSFTEXT)
+ 	if (vhci->msft_opcode)
+ 		hci_set_msft_opcode(hdev, vhci->msft_opcode);
++#endif
++
++#if IS_ENABLED(CONFIG_BT_AOSPEXT)
++	if (vhci->aosp_capable)
++		hci_set_aosp_capable(hdev);
++#endif
+ 
  	return 0;
  }
  
--static inline void hci_set_aosp_capable(struct hci_dev *hdev)
-+static inline int hci_set_aosp_capable(struct hci_dev *hdev)
+-#endif /* CONFIG_BT_MSFTEXT */
+-
+ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
  {
-+	if (!hci_dev_test_flag(hdev, HCI_SETUP))
-+		return -EPERM;
-+
- #if IS_ENABLED(CONFIG_BT_AOSPEXT)
- 	hdev->aosp_capable = true;
- #endif
-+
-+	return 0;
- }
+ 	struct hci_dev *hdev;
+@@ -278,8 +331,10 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	hdev->get_codec_config_data = vhci_get_codec_config_data;
+ 	hdev->wakeup = vhci_wakeup;
  
- int hci_dev_open(__u16 dev);
+-	/* Enable custom setup if CONFIG_BT_MSFTEXT is selected */
+-#if IS_ENABLED(CONFIG_BT_MSFTEXT)
++	/* Enable custom setup if CONFIG_BT_MSFTEXT or CONFIG_BT_AOSPEXT is
++	 * selected.
++	 */
++#if IS_ENABLED(CONFIG_BT_MSFTEXT) || IS_ENABLED(CONFIG_BT_AOSPEXT)
+ 	hdev->setup = vhci_setup;
+ 	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+ #endif
+@@ -311,6 +366,11 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 			    &msft_opcode_fops);
+ #endif
+ 
++#if IS_ENABLED(CONFIG_BT_AOSPEXT)
++	debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
++			    &aosp_capable_fops);
++#endif
++
+ 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+ 
+ 	skb_put_u8(skb, 0xff);
 -- 
 2.31.1
 
