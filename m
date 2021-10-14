@@ -2,57 +2,137 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9E997C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Oct 2021 07:46:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C28DC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Oct 2021 08:36:40 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7FDDE60FF2
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Oct 2021 07:46:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id ECD17610D2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 14 Oct 2021 08:36:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230010AbhJNHsp (ORCPT
+        id S230253AbhJNIim (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 14 Oct 2021 03:48:45 -0400
-Received: from mail.foldedly.com ([212.237.10.209]:41312 "EHLO
-        mail.foldedly.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229910AbhJNHso (ORCPT
+        Thu, 14 Oct 2021 04:38:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43658 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230161AbhJNIij (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 14 Oct 2021 03:48:44 -0400
-Received: by mail.foldedly.com (Postfix, from userid 1001)
-        id 7329D85A72; Thu, 14 Oct 2021 08:46:28 +0100 (BST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=foldedly.com; s=mail;
-        t=1634197598; bh=LrnK0zvEt1kljd1mU4DOdzPOwDec9w8/ii89Wf2jAkc=;
-        h=Date:From:To:Subject:From;
-        b=rF59mX8yl3CUZ/JKMmHm22/2GzOx6wL9fdhg9BmK8nsXALWfd1WEq4RdO7N9TwBgQ
-         w4oRSG8vGu6M5BoeOmxhMJmDYmFBZdtLtY2Q0vym6EI3MrEkt5Bv6MlZXYWww1QMxK
-         rx8Shd3Mcn3zBoIj7I/bVU1cikwoChEFHZnhZjVJuwoPqVD/zIV3vGimbBnwKKD+CW
-         G3iTVR0UwmRim6YoINLHPx7dqU/FIVLRSJt2IjXhFe3DSqC+qCs/wO7pKkams2Z9nh
-         kFVeXN8aw6XfI65Pxt4gg2X3aL92glJyd2O4iSuKiVt1vQ6ABaerV/sYvwiTWXlLfu
-         A4LJZCJJ2al9Q==
-Received: by mail.foldedly.com for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 07:46:21 GMT
-Message-ID: <20211014074500-0.1.z.2bcm.0.vp96efnhx8@foldedly.com>
-Date:   Thu, 14 Oct 2021 07:46:21 GMT
-From:   "Nazario Davalos" <nazario.davalos@foldedly.com>
-To:     <linux-bluetooth@vger.kernel.org>
-Subject: Servicio de la flota
-X-Mailer: mail.foldedly.com
+        Thu, 14 Oct 2021 04:38:39 -0400
+Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC972C061767
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
+Received: by mail-wr1-x433.google.com with SMTP id r18so16948281wrg.6
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 01:36:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
+        b=h40uJnzRy4bIKfqfvwm3i/kik60+Kgx2sfXbHxmv0MsZax7HkeDmryc9yctryM7xlU
+         37bg2VuoZWdH4kTXGosC95Fa3QYJayYirIbI/UeFVNH/Nzn2/7/VodB6g1hiMuG9zp+p
+         egl0Br7pM5vnKxSuUDa7BUq17cmPH9MsIYOosVtDeEDQMUaCZ6h+AWD2esXOH1LRk+zZ
+         X2uV1Nn3ulaudun/4f5AT6jS5oilV0myDq9ozSQAqUnytF1YgcEInQmj+cCLjl5OgT5o
+         004n5bwSXge4iP3a4skCS8avlQccw5QvPN8BVpAjam8zZmlkvShcDVpQvgmxjplGDMKz
+         pkRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=cfakvhen/wxw5fHdRu0DEuLT5DMfJlXe2a/johLjqxo=;
+        b=VKKBqElgZVoW13XJGexZqmBFrk+8zela+7GHyq+rKKhpoVde5lUc1/Rej2lW4ao4If
+         toWH89WZAw69xZmPgG49PPS1dVbFsFX+M97tgElrd0bOs9ZSBvG+cY9PDgGJI4xsPV63
+         a8GW+jOT/I+8oZhDHOH1z1djy43Or9mSOPhE9qZ5qJpnBVuHcM94PZxlmoAUy1gY5bfu
+         SH1wW4Gy3Y2BMUjXbIpcL1fL4XyzHsRlDtAT1dhx8a8nBl9qpp0HshGXTIpImCqCBUbR
+         yBP6bDd76ebeiQbTNu5htrMb+POCQ8FwOo03jnA8WPKHOpQD4G9rhAsgUeIYbSQ26PiI
+         4ncQ==
+X-Gm-Message-State: AOAM532Cxz2+nNqbv8z+CmXJ67DmEHFCu+nFiWpsDPNzS3jpZymsAUE6
+        5php5GMHrhaUnI2hdNqxFjws4Q==
+X-Google-Smtp-Source: ABdhPJzpVg8OIER+zTALG2ilasSHxD7bC/dTlVAeWBUDgRwrRvN9DCthCd2lRX0ZyZDpw2FTk6Hq6g==
+X-Received: by 2002:a5d:59a9:: with SMTP id p9mr5151873wrr.386.1634200593067;
+        Thu, 14 Oct 2021 01:36:33 -0700 (PDT)
+Received: from myrica (cpc92880-cmbg19-2-0-cust679.5-4.cable.virginm.net. [82.27.106.168])
+        by smtp.gmail.com with ESMTPSA id r4sm2299114wrz.58.2021.10.14.01.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 14 Oct 2021 01:36:32 -0700 (PDT)
+Date:   Thu, 14 Oct 2021 09:36:09 +0100
+From:   Jean-Philippe Brucker <jean-philippe@linaro.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Stefan Hajnoczi <stefanha@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YWfr+Z0wgpQ48yC5@myrica>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Buenos d=C3=ADas:
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+> 
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+> ---
 
-Le escribo para hablarle sobre una de las mejores herramientas GPS en el =
-mercado.
+>  drivers/iommu/virtio-iommu.c               | 2 +-
 
-La herramienta, que me gustar=C3=ADa presentarle brevemente, dispone de m=
-uchas funciones =C3=BAtiles para su trabajo, que optimizan los procesos d=
-e transporte y le ayudan a realizar tareas de campo de manera m=C3=A1s ef=
-iciente.
-
-=C2=BFQuiere conocer los detalles?
-
-
-Atentamente,
-Nazario Davalos
+Reviewed-by: Jean-Philippe Brucker <jean-philippe@linaro.org>
