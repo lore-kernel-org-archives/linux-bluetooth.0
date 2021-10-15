@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7CD1C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Oct 2021 05:09:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A80EFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Oct 2021 05:09:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id CF90F60EE9
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Oct 2021 05:09:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 894D0611C8
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 15 Oct 2021 05:09:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235376AbhJOFLl (ORCPT
+        id S235381AbhJOFLn (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Oct 2021 01:11:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39886 "EHLO
+        Fri, 15 Oct 2021 01:11:43 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39902 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235371AbhJOFLl (ORCPT
+        with ESMTP id S235378AbhJOFLm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Oct 2021 01:11:41 -0400
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84905C061570
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 22:09:34 -0700 (PDT)
-Received: by mail-pg1-x529.google.com with SMTP id m21so7519515pgu.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 22:09:34 -0700 (PDT)
+        Fri, 15 Oct 2021 01:11:42 -0400
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F16B0C061570
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 22:09:36 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id g14so7431038pfm.1
+        for <linux-bluetooth@vger.kernel.org>; Thu, 14 Oct 2021 22:09:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=6HiqdN1EnaqgNPuACA4aSekCO4Mw/k8EzrGEcvzIWsU=;
-        b=LuagkbXZIy1H2WHa4+FIP6H2RxupMBuylH8apF3s+LAJzDs3kJL8tfvYh0uxDR9VXu
-         aaLTM3FnOmfBHgQVqdZmqjfM7JIjFjOx1KF9L6s7PiRSWrW7tRtLjm01lMTMSZOUk5eq
-         iKfSDTprPYkJdGRjyZLk9EoDk2HF8yuk3MnH27hj8VwJLreN6GwysWo1oVK2k5wxUlkA
-         L1k+kQX4BofFEGSBvMV0CJHJXqo90DOY6b1uCtRl72YwWw+7UgzmZ6JbZaR/90n1i/ae
-         m1RImjtcHmm15DBXH2IJizUzEpy8NK/mksdR9a5Ksft4budywI7J14k+7FnNUclepmCq
-         VjAw==
+        bh=w1mMCvF27i1shfq0x29JnQ90JoLQlHf6WTUx95RhffA=;
+        b=WWJVDWilA/vMC9byqSQBzIVhSCsjlsRXd0Ge75wj+KVjO39euYJXJ/7iEbrNQnbJot
+         o96ED9kSCQ72r6YG7bLN8oxuF+KFBC5ajKzOXED29Wnkkcf3DyBoXEsdLNmVQkxwb+TM
+         +VJH+dy8YCDBKf/K/5z/qbORS4NwJ8b00mIUMqvuRCo0VJj6UIl7XhdmwHa4aDNQurA7
+         8J4huz23uoARRyLaid8j7vFnQPHpdCGd7H7AoWl21YYEhFypqV3H2v5hAs2q8uTne1Wk
+         NEn5b8yasg+yAcYvsLebALrPLi2rmhGpclLt4fE+DaQWSD0VLWKhgQjUMfRiFYaM8j0P
+         TNOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=6HiqdN1EnaqgNPuACA4aSekCO4Mw/k8EzrGEcvzIWsU=;
-        b=gVvLME7DlTImOGGcPz0HnlzbpLyZZ0XUAiPNpSLJy/q+19aL5/ItFd4PX659k2/MG9
-         FjnZgQDAhEmZRQgZQVP48H4Gu3F/rKT5WHn1Sx+hVIKLSxji2H12skxte1Fx6PWG7BlV
-         lUEoGQNKzeNWFkEaO4If/2xPc60I5cHGs2aRwenA07z4K9KzzeY/9f25FT+QydWadEHV
-         yHuQnTcQwG5cpJlnslXFQ8G2GspPCYkmc6CShtjfHk9RYf3e35KXg4SEQPERZOwZE4YL
-         lYQrgoB489GoZq9g6jtAXhny0J8pepNiwqg/cdZ5YyeGEJx2jh4uXiz/I8JYI0j0wo4s
-         nB7g==
-X-Gm-Message-State: AOAM533sVB6OKpIiBGEaleLuTZdKwP0WDeLVp7UyRar3tptCP1m/dBzZ
-        k/hjbMdSOc6qFZ1cmVXq/fn8N1Ttkro=
-X-Google-Smtp-Source: ABdhPJyPbqtXhpFF1c4GHuQTwIB9g5gfJWWuJrCHmswI+KiOFuYztq17eXBDhWIZfwZG5f+qYs4LRg==
-X-Received: by 2002:a63:b253:: with SMTP id t19mr7528020pgo.48.1634274573708;
-        Thu, 14 Oct 2021 22:09:33 -0700 (PDT)
+        bh=w1mMCvF27i1shfq0x29JnQ90JoLQlHf6WTUx95RhffA=;
+        b=Cm+lORLw/WXtXt3T6MwElVbWkDyPRCjrB/YJEj+ovp81nIJBIXSXUV0uYILvASJcz4
+         3HL9mcaoFhprt1wPZohOnC0cGixN8OioH8YF6+oP1YzwuRPCOjWKMhYoCC8bEbm4hsYm
+         0bWDjbmaIjYxaoJHdIu7eNF5D1OVvTzWuM608uQ8+UctkVJLYY5ZrEo5ZJa5WU1YzK5V
+         WgiYIutVPsqoBvPmJ1YvUf58FPOk0Ki8y1ud2BH0PNEHIpIaMjMzlh6RGBpe3xL/uvXG
+         DMMwXizfnYnHqbYnrlUJLh+7Xwgix3KmvNdN9QJ5jK8EuAACOonR56OJlOWhZhbn88MU
+         iOpA==
+X-Gm-Message-State: AOAM530lSohRNB6qg6SxRDx1XeZ3mRnrYaLLHQvjgaSU8IKxWu9baLaN
+        js8voOWymbSeeM+esuRqOowjJ0f8Dd4=
+X-Google-Smtp-Source: ABdhPJwlRUBrrfJrEGyrPk0HeC/Y9FtRWbG0lBZDJg3/2R8itotRfl/+9M6CXe9gSwJlriLeY39t+Q==
+X-Received: by 2002:a63:4622:: with SMTP id t34mr7422329pga.293.1634274576017;
+        Thu, 14 Oct 2021 22:09:36 -0700 (PDT)
 Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p17sm10347510pju.34.2021.10.14.22.09.33
+        by smtp.gmail.com with ESMTPSA id p17sm10347510pju.34.2021.10.14.22.09.35
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 14 Oct 2021 22:09:33 -0700 (PDT)
+        Thu, 14 Oct 2021 22:09:35 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/7] monitor: Make use of MSFT packet definitions
-Date:   Thu, 14 Oct 2021 22:09:24 -0700
-Message-Id: <20211015050929.3130100-2-luiz.dentz@gmail.com>
+Subject: [PATCH BlueZ 5/7] hciemu: Use vhci_open to instanciate a vhci btdev
+Date:   Thu, 14 Oct 2021 22:09:27 -0700
+Message-Id: <20211015050929.3130100-5-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211015050929.3130100-1-luiz.dentz@gmail.com>
 References: <20211015050929.3130100-1-luiz.dentz@gmail.com>
@@ -69,264 +69,414 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This make use of the packet definitions for MSFT extension.
+This makes use of vhci_open to isntanciate the vhci btdev since that
+has proper support for reading the index assigned to it.
 ---
- monitor/msft.c | 144 ++++++++++++++++++++++++++++++++++++++++---------
- monitor/msft.h |  11 ++--
- 2 files changed, 125 insertions(+), 30 deletions(-)
+ Makefile.tools      |   8 +++
+ android/Makefile.am |   2 +
+ emulator/btdev.c    |   8 ++-
+ emulator/hciemu.c   | 127 ++++++++++++++++++++++++++------------------
+ 4 files changed, 91 insertions(+), 54 deletions(-)
 
-diff --git a/monitor/msft.c b/monitor/msft.c
-index 46e765489..ccb232f3b 100644
---- a/monitor/msft.c
-+++ b/monitor/msft.c
-@@ -30,6 +30,9 @@
- #include <stdio.h>
- #include <inttypes.h>
+diff --git a/Makefile.tools b/Makefile.tools
+index 8cfaf8972..c7bdff83f 100644
+--- a/Makefile.tools
++++ b/Makefile.tools
+@@ -115,6 +115,7 @@ tools_3dsp_LDADD = src/libshared-mainloop.la
  
-+#include "lib/bluetooth.h"
-+#include "lib/uuid.h"
+ tools_mgmt_tester_SOURCES = tools/mgmt-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -123,6 +124,7 @@ tools_mgmt_tester_LDADD = lib/libbluetooth-internal.la \
+ 
+ tools_l2cap_tester_SOURCES = tools/l2cap-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -131,6 +133,7 @@ tools_l2cap_tester_LDADD = lib/libbluetooth-internal.la \
+ 
+ tools_rfcomm_tester_SOURCES = tools/rfcomm-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -139,6 +142,7 @@ tools_rfcomm_tester_LDADD = lib/libbluetooth-internal.la \
+ 
+ tools_bnep_tester_SOURCES = tools/bnep-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -147,6 +151,7 @@ tools_bnep_tester_LDADD = lib/libbluetooth-internal.la \
+ 
+ tools_smp_tester_SOURCES = tools/smp-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -155,6 +160,7 @@ tools_smp_tester_LDADD = lib/libbluetooth-internal.la \
+ 
+ tools_gap_tester_SOURCES = tools/gap-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -165,6 +171,7 @@ tools_gap_tester_LDADD =  lib/libbluetooth-internal.la \
+ 
+ tools_sco_tester_SOURCES = tools/sco-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+@@ -176,6 +183,7 @@ tools_hci_tester_LDADD = src/libshared-glib.la $(GLIB_LIBS)
+ 
+ tools_userchan_tester_SOURCES = tools/userchan-tester.c monitor/bt.h \
+ 				emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c
+diff --git a/android/Makefile.am b/android/Makefile.am
+index a370598a2..309910147 100644
+--- a/android/Makefile.am
++++ b/android/Makefile.am
+@@ -148,6 +148,7 @@ android_haltest_LDADD = -ldl -lm
+ noinst_PROGRAMS += android/android-tester
+ 
+ android_android_tester_SOURCES = emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c \
+@@ -172,6 +173,7 @@ android_android_tester_LDFLAGS = $(AM_LDFLAGS) -pthread
+ noinst_PROGRAMS += android/ipc-tester
+ 
+ android_ipc_tester_SOURCES = emulator/hciemu.h emulator/hciemu.c \
++				emulator/vhci.h emulator/vhci.c \
+ 				emulator/btdev.h emulator/btdev.c \
+ 				emulator/bthost.h emulator/bthost.c \
+ 				emulator/smp.c \
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index 148e32b7d..0c0ebde40 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -21,6 +21,8 @@
+ #include <sys/uio.h>
+ #include <stdint.h>
+ #include <errno.h>
++#include <fcntl.h>
++#include <unistd.h>
+ 
+ #include "lib/bluetooth.h"
+ #include "lib/hci.h"
+@@ -44,6 +46,8 @@
+ #define ISO_HANDLE 257
+ #define SCO_HANDLE 257
+ 
++#define DEBUGFS_PATH "/sys/kernel/debug/bluetooth"
 +
- #include "src/shared/util.h"
- #include "display.h"
- #include "packet.h"
-@@ -49,46 +52,132 @@ static void null_rsp(const void *data, uint16_t size)
+ struct hook {
+ 	btdev_hook_func handler;
+ 	void *user_data;
+@@ -93,6 +97,7 @@ struct le_ext_adv {
  
- static void read_supported_features_rsp(const void *data, uint16_t size)
- {
--	uint8_t evt_prefix_len = get_u8(data + 8);
-+	const struct msft_rsp_read_supported_features *rsp = data;
-+
-+	packet_print_features_msft(rsp->features);
-+	print_field("Event prefix length: %u", rsp->evt_prefix_len);
-+	print_field("Event prefix:");
-+	packet_hexdump(rsp->evt_prefix, rsp->evt_prefix_len);
-+	packet_set_msft_evt_prefix(rsp->evt_prefix, rsp->evt_prefix_len);
-+}
-+
-+static void monitor_rssi_cmd(const void *data, uint16_t size)
-+{
-+	const struct msft_cmd_monitor_rssi *cmd = data;
-+
-+	print_field("Connection handle: 0x%04x", cmd->handle);
-+	packet_print_rssi("RSSI threshold high", cmd->rssi_high);
-+	packet_print_rssi("RSSI threshold low", cmd->rssi_low);
-+	print_field("RSSI threshold low time interval: %u sec (0x%2.2x)",
-+						cmd->rssi_low_interval,
-+						cmd->rssi_low_interval);
-+	print_field("RSSI sampling period: %u msec (0x%2.2x)",
-+						cmd->rssi_period * 100,
-+						cmd->rssi_period);
-+}
+ struct btdev {
+ 	enum btdev_type type;
++	uint16_t id;
  
--	packet_print_features_msft(data);
--	print_field("Event prefix length: %u", evt_prefix_len);
--	packet_hexdump(data + 9, size - 9);
-+static void cancel_monitor_rssi_cmd(const void *data, uint16_t size)
-+{
-+	const struct msft_cmd_cancel_monitor_rssi *cmd = data;
+ 	struct queue *conns;
  
--	packet_set_msft_evt_prefix(data + 9, evt_prefix_len);
-+	print_field("Connection handle: 0x%04x", cmd->handle);
- }
+@@ -135,6 +140,7 @@ struct btdev {
+ 	uint8_t  le_features[8];
+ 	uint8_t  le_states[8];
+ 	const struct btdev_cmd *cmds;
++	uint16_t msft_opcode;
  
- static void le_monitor_advertisement_cmd(const void *data, uint16_t size)
- {
--	int8_t threshold_high = get_s8(data);
--	int8_t threshold_low = get_s8(data + 1);
--	uint8_t threshold_low_time_interval = get_u8(data + 2);
--	uint8_t sampling_period = get_u8(data + 3);
-+	const struct msft_cmd_le_monitor_adv *cmd = data;
-+	const struct msft_le_monitor_adv_patterns *patterns;
-+	const struct msft_le_monitor_adv_uuid *uuid;
-+	const struct msft_le_monitor_adv_irk *irk;
-+	const struct msft_le_monitor_adv_addr *addr;
-+	const char *str;
-+	char uuidstr[MAX_LEN_UUID_STR];
- 
--	packet_print_rssi("RSSI threshold high", threshold_high);
--	packet_print_rssi("RSSI threshold low", threshold_low);
-+	packet_print_rssi("RSSI threshold high", cmd->rssi_high);
-+	packet_print_rssi("RSSI threshold low", cmd->rssi_low);
- 	print_field("RSSI threshold low time interval: %u sec (0x%2.2x)",
--						threshold_low_time_interval,
--						threshold_low_time_interval);
-+						cmd->rssi_low_interval,
-+						cmd->rssi_low_interval);
- 	print_field("RSSI sampling period: %u msec (0x%2.2x)",
--						sampling_period * 100,
--						sampling_period);
--	packet_hexdump(data + 4, size - 4);
-+						cmd->rssi_period * 100,
-+						cmd->rssi_period);
-+
-+	switch (cmd->type) {
-+	case MSFT_SUBCMD_LE_MONITOR_ADV_PATTERN:
-+		print_field("Type: Pattern (0x%2.2x)", cmd->type);
-+		patterns = (void *)cmd->data;
-+		print_field("Number of patterns: %u", patterns->num);
-+		packet_hexdump((void *)patterns->data,
-+			       size - (sizeof(*cmd) + sizeof(*patterns)));
-+		break;
-+	case MSFT_SUBCMD_LE_MONITOR_ADV_UUID:
-+		print_field("Type: UUID (0x%2.2x)", cmd->type);
-+		uuid = (void *)cmd->data;
-+
-+		switch (uuid->type) {
-+		case 0x01:
-+			str = bt_uuid16_to_str(uuid->value.u16);
-+			print_field("UUID: %s (0x%4.4x)", str, uuid->value.u16);
-+			break;
-+		case 0x02:
-+			str = bt_uuid32_to_str(uuid->value.u32);
-+			print_field("UUID: %s (0x%8.8x)", str, uuid->value.u32);
-+			break;
-+		case 0x03:
-+			sprintf(uuidstr, "%8.8x-%4.4x-%4.4x-%4.4x-%8.8x%4.4x",
-+				get_le32(uuid->value.u128 + 12),
-+				get_le16(uuid->value.u128 + 10),
-+				get_le16(uuid->value.u128 + 8),
-+				get_le16(uuid->value.u128 + 6),
-+				get_le32(uuid->value.u128 + 2),
-+				get_le16(uuid->value.u128 + 0));
-+			str = bt_uuidstr_to_str(uuidstr);
-+			print_field("UUID: %s (%s)", str, uuidstr);
-+			break;
-+		default:
-+			packet_hexdump((void *)&uuid->value,
-+					size - sizeof(*cmd));
-+			break;
-+		}
-+		break;
-+	case MSFT_SUBCMD_LE_MONITOR_ADV_IRK:
-+		print_field("Type: IRK (0x%2.2x)", cmd->type);
-+		irk = (void *)cmd->data;
-+		print_field("IRK:");
-+		packet_hexdump(irk->irk, size - sizeof(*cmd));
-+		break;
-+	case MSFT_SUBCMD_LE_MONITOR_ADV_ADDR:
-+		print_field("Type: Adderss (0x%2.2x)", cmd->type);
-+		addr = (void *)cmd->data;
-+		packet_print_addr(NULL, addr->addr, addr->type);
-+		break;
-+	default:
-+		print_field("Type: Unknown (0x%2.2x)", cmd->type);
-+		packet_hexdump(cmd->data, size - sizeof(*cmd));
-+		break;
-+	}
- }
- 
- static void le_monitor_advertisement_rsp(const void *data, uint16_t size)
- {
--	uint8_t handle = get_u8(data);
-+	const struct msft_rsp_le_monitor_adv *rsp = data;
-+
-+	print_field("Monitor handle: %u", rsp->handle);
-+}
-+
-+static void le_cancel_monitor_adv_cmd(const void *data, uint16_t size)
-+{
-+	const struct msft_cmd_le_cancel_monitor_adv *cmd = data;
- 
--	print_field("Monitor handle: %u", handle);
-+	print_field("Monitor handle: %u", cmd->handle);
- }
- 
- static void set_adv_filter_enable_cmd(const void *data, uint16_t size)
- {
--	uint8_t enable = get_u8(data);
-+	const struct msft_cmd_le_monitor_adv_enable *cmd = data;
- 	const char *str;
- 
--	switch (enable) {
-+	switch (cmd->enable) {
- 	case 0x00:
- 		str = "Current allow list";
- 		break;
-@@ -100,7 +189,7 @@ static void set_adv_filter_enable_cmd(const void *data, uint16_t size)
- 		break;
+ 	uint16_t default_link_policy;
+ 	uint8_t  event_mask[8];
+@@ -6230,7 +6236,7 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
  	}
  
--	print_field("Enable: %s (0x%2.2x)", str, enable);
-+	print_field("Enable: %s (0x%2.2x)", str, cmd->enable);
+ 	btdev->type = type;
+-
++	btdev->id = id;
+ 	btdev->manufacturer = 63;
+ 	btdev->revision = 0x0000;
+ 
+diff --git a/emulator/hciemu.c b/emulator/hciemu.c
+index bd6bf1e63..3557efc93 100644
+--- a/emulator/hciemu.c
++++ b/emulator/hciemu.c
+@@ -28,6 +28,7 @@
+ #include "lib/hci.h"
+ 
+ #include "monitor/bt.h"
++#include "emulator/vhci.h"
+ #include "emulator/btdev.h"
+ #include "emulator/bthost.h"
+ #include "src/shared/util.h"
+@@ -45,9 +46,8 @@ struct hciemu_client {
+ struct hciemu {
+ 	int ref_count;
+ 	enum btdev_type btdev_type;
+-	struct btdev *dev;
++	struct vhci *vhci;
+ 	struct queue *clients;
+-	guint source;
+ 	struct queue *post_command_hooks;
+ 	char bdaddr_str[18];
+ 
+@@ -221,37 +221,15 @@ static guint create_source_btdev(int fd, struct btdev *btdev)
+ 
+ static bool create_vhci(struct hciemu *hciemu)
+ {
+-	struct btdev *btdev;
+-	uint8_t create_req[2];
+-	ssize_t written;
+-	int fd;
+-
+-	btdev = btdev_create(hciemu->btdev_type, 0x00);
+-	if (!btdev)
+-		return false;
++	struct vhci *vhci;
+ 
+-	btdev_set_command_handler(btdev, central_command_callback, hciemu);
+-
+-	fd = open("/dev/vhci", O_RDWR | O_NONBLOCK | O_CLOEXEC);
+-	if (fd < 0) {
+-		perror("Opening /dev/vhci failed");
+-		btdev_destroy(btdev);
+-		return false;
+-	}
+-
+-	create_req[0] = HCI_VENDOR_PKT;
+-	create_req[1] = HCI_PRIMARY;
+-
+-	written = write(fd, create_req, sizeof(create_req));
+-	if (written < 0) {
+-		close(fd);
+-		btdev_destroy(btdev);
++	vhci = vhci_open(hciemu->btdev_type);
++	if (!vhci)
+ 		return false;
+-	}
+ 
+-	hciemu->dev = btdev;
+-
+-	hciemu->source = create_source_btdev(fd, btdev);
++	btdev_set_command_handler(vhci_get_btdev(vhci),
++					central_command_callback, hciemu);
++	hciemu->vhci = vhci;
+ 
+ 	return true;
+ }
+@@ -448,8 +426,7 @@ void hciemu_unref(struct hciemu *hciemu)
+ 	queue_destroy(hciemu->post_command_hooks, destroy_command_hook);
+ 	queue_destroy(hciemu->clients, hciemu_client_destroy);
+ 
+-	g_source_remove(hciemu->source);
+-	btdev_destroy(hciemu->dev);
++	vhci_close(hciemu->vhci);
+ 
+ 	free(hciemu);
+ }
+@@ -462,12 +439,12 @@ static void bthost_print(const char *str, void *user_data)
+ 					"bthost: %s", str);
  }
  
- typedef void (*func_t) (const void *data, uint16_t size);
-@@ -114,12 +203,15 @@ static const struct {
- 	{ 0x00, "Read Supported Features",
- 			null_cmd,
- 			read_supported_features_rsp },
--	{ 0x01, "Monitor RSSI" },
--	{ 0x02, "Cancel Monitor RSSI" },
-+	{ 0x01, "Monitor RSSI",
-+			monitor_rssi_cmd },
-+	{ 0x02, "Cancel Monitor RSSI",
-+			cancel_monitor_rssi_cmd },
- 	{ 0x03, "LE Monitor Advertisement",
- 			le_monitor_advertisement_cmd,
- 			le_monitor_advertisement_rsp },
--	{ 0x04, "LE Cancel Monitor Advertisement" },
-+	{ 0x04, "LE Cancel Monitor Advertisement",
-+			le_cancel_monitor_adv_cmd },
- 	{ 0x05, "LE Set Advertisement Filter Enable",
- 			set_adv_filter_enable_cmd,
- 			null_rsp },
-@@ -156,7 +248,7 @@ static void msft_cmd(const void *data, uint8_t size)
- 						" (0x%2.2x)", code);
+-static void btdev_central_debug(const char *str, void *user_data)
++static void vhci_debug(const char *str, void *user_data)
+ {
+ 	struct hciemu *hciemu = user_data;
  
- 	if (code_func)
--		code_func(data + 1, size - 1);
-+		code_func(data, size);
- 	else
- 		packet_hexdump(data + 1, size - 1);
+ 	util_debug(hciemu->debug_callback, hciemu->debug_data,
+-					"btdev: %s", str);
++					"vhci: %s", str);
  }
-@@ -193,7 +285,7 @@ static void msft_rsp(const void *data, uint8_t size)
- 	packet_print_error("Status", status);
  
- 	if (code_func)
--		code_func(data + 2, size - 2);
-+		code_func(data, size);
- 	else
- 		packet_hexdump(data + 2, size - 2);
+ static void btdev_client_debug(const char *str, void *user_data)
+@@ -475,7 +452,7 @@ static void btdev_client_debug(const char *str, void *user_data)
+ 	struct hciemu *hciemu = user_data;
+ 
+ 	util_debug(hciemu->debug_callback, hciemu->debug_data,
+-					"btdev[bthost]: %s", str);
++					"btdev: %s", str);
  }
-diff --git a/monitor/msft.h b/monitor/msft.h
-index 90a64117a..4f4bdd992 100644
---- a/monitor/msft.h
-+++ b/monitor/msft.h
-@@ -68,6 +68,7 @@ struct msft_rsp_cancel_monitor_rssi {
  
- #define MSFT_SUBCMD_LE_MONITOR_ADV		0x03
+ static void hciemu_client_set_debug(void *data, void *user_data)
+@@ -500,7 +477,7 @@ bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
+ 	hciemu->debug_destroy = destroy;
+ 	hciemu->debug_data = user_data;
  
-+#define MSFT_SUBCMD_LE_MONITOR_ADV_PATTERN	0x01
- struct msft_le_monitor_pattern {
- 	uint8_t  len;
- 	uint8_t  type;
-@@ -75,12 +76,13 @@ struct msft_le_monitor_pattern {
- 	uint8_t  data[];
- } __attribute__((packed));
+-	btdev_set_debug(hciemu->dev, btdev_central_debug, hciemu, NULL);
++	vhci_set_debug(hciemu->vhci, vhci_debug, hciemu, NULL);
  
--struct msft_le_monitor_adv_pattern_type {
--	uint8_t num_patterns;
-+struct msft_le_monitor_adv_patterns {
-+	uint8_t num;
- 	struct msft_le_monitor_pattern data[];
- } __attribute__((packed));
+ 	queue_foreach(hciemu->clients, hciemu_client_set_debug, hciemu);
  
--struct msft_le_monitor_adv_uuid_type {
-+#define MSFT_SUBCMD_LE_MONITOR_ADV_UUID		0x02
-+struct msft_le_monitor_adv_uuid {
- 	uint8_t  type;
- 	union {
- 		uint16_t u16;
-@@ -89,7 +91,8 @@ struct msft_le_monitor_adv_uuid_type {
- 	} value;
- } __attribute__((packed));
+@@ -510,11 +487,16 @@ bool hciemu_set_debug(struct hciemu *hciemu, hciemu_debug_func_t callback,
+ const char *hciemu_get_address(struct hciemu *hciemu)
+ {
+ 	const uint8_t *addr;
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
++		return NULL;
  
--struct msft_le_monitor_adv_irk_type {
-+#define MSFT_SUBCMD_LE_MONITOR_ADV_IRK		0x03
-+struct msft_le_monitor_adv_irk {
- 	uint8_t  irk[8];
- } __attribute__((packed));
+-	if (!hciemu || !hciemu->dev)
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
+ 		return NULL;
  
+-	addr = btdev_get_bdaddr(hciemu->dev);
++	addr = btdev_get_bdaddr(dev);
+ 	sprintf(hciemu->bdaddr_str, "%2.2X:%2.2X:%2.2X:%2.2X:%2.2X:%2.2X",
+ 			addr[5], addr[4], addr[3], addr[2], addr[1], addr[0]);
+ 	return hciemu->bdaddr_str;
+@@ -522,18 +504,30 @@ const char *hciemu_get_address(struct hciemu *hciemu)
+ 
+ uint8_t *hciemu_get_features(struct hciemu *hciemu)
+ {
+-	if (!hciemu || !hciemu->dev)
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
+ 		return NULL;
+ 
+-	return btdev_get_features(hciemu->dev);
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
++		return NULL;
++
++	return btdev_get_features(dev);
+ }
+ 
+ const uint8_t *hciemu_get_central_bdaddr(struct hciemu *hciemu)
+ {
+-	if (!hciemu || !hciemu->dev)
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
++		return NULL;
++
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
+ 		return NULL;
+ 
+-	return btdev_get_bdaddr(hciemu->dev);
++	return btdev_get_bdaddr(dev);
+ }
+ 
+ const uint8_t *hciemu_client_bdaddr(struct hciemu_client *client)
+@@ -558,27 +552,45 @@ const uint8_t *hciemu_get_client_bdaddr(struct hciemu *hciemu)
+ 
+ uint8_t hciemu_get_central_scan_enable(struct hciemu *hciemu)
+ {
+-	if (!hciemu || !hciemu->dev)
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
++		return 0;
++
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
+ 		return 0;
+ 
+-	return btdev_get_scan_enable(hciemu->dev);
++	return btdev_get_scan_enable(dev);
+ }
+ 
+ uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu)
+ {
+-	if (!hciemu || !hciemu->dev)
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
+ 		return 0;
+ 
+-	return btdev_get_le_scan_enable(hciemu->dev);
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
++		return 0;
++
++	return btdev_get_le_scan_enable(dev);
+ }
+ 
+ void hciemu_set_central_le_states(struct hciemu *hciemu,
+ 						const uint8_t *le_states)
+ {
+-	if (!hciemu || !hciemu->dev)
++	struct btdev *dev;
++
++	if (!hciemu || !hciemu->vhci)
++		return;
++
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
+ 		return;
+ 
+-	btdev_set_le_states(hciemu->dev, le_states);
++	btdev_set_le_states(dev, le_states);
+ }
+ 
+ bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
+@@ -619,10 +631,15 @@ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 				void *user_data)
+ {
+ 	enum btdev_hook_type hook_type;
++	struct btdev *dev;
+ 
+-	if (!hciemu)
++	if (!hciemu || !hciemu->vhci)
+ 		return -1;
+ 
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
++		return 0;
++
+ 	switch (type) {
+ 	case HCIEMU_HOOK_PRE_CMD:
+ 		hook_type = BTDEV_HOOK_PRE_CMD;
+@@ -640,16 +657,20 @@ int hciemu_add_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 		return -1;
+ 	}
+ 
+-	return btdev_add_hook(hciemu->dev, hook_type, opcode, function,
+-								user_data);
++	return btdev_add_hook(dev, hook_type, opcode, function, user_data);
+ }
+ 
+ bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 								uint16_t opcode)
+ {
+ 	enum btdev_hook_type hook_type;
++	struct btdev *dev;
+ 
+-	if (!hciemu)
++	if (!hciemu || !hciemu->vhci)
++		return false;
++
++	dev = vhci_get_btdev(hciemu->vhci);
++	if (!dev)
+ 		return false;
+ 
+ 	switch (type) {
+@@ -669,5 +690,5 @@ bool hciemu_del_hook(struct hciemu *hciemu, enum hciemu_hook_type type,
+ 		return false;
+ 	}
+ 
+-	return btdev_del_hook(hciemu->dev, hook_type, opcode);
++	return btdev_del_hook(dev, hook_type, opcode);
+ }
 -- 
 2.31.1
 
