@@ -2,304 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFD1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:25:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1C7E7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 18:00:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0FD116120A
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:25:18 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 014036115C
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 18:00:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236573AbhJPA1Y (ORCPT
+        id S244469AbhJPSCx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Oct 2021 20:27:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50990 "EHLO
+        Sat, 16 Oct 2021 14:02:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54290 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236193AbhJPA1X (ORCPT
+        with ESMTP id S237257AbhJPSCv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Oct 2021 20:27:23 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22EBC061570
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:25:16 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id nn3-20020a17090b38c300b001a03bb6c4ebso8489335pjb.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:25:16 -0700 (PDT)
+        Sat, 16 Oct 2021 14:02:51 -0400
+Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E6F8C061765
+        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Oct 2021 11:00:43 -0700 (PDT)
+Received: by mail-pg1-x531.google.com with SMTP id 66so11755615pgc.9
+        for <linux-bluetooth@vger.kernel.org>; Sat, 16 Oct 2021 11:00:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:subject:message-id:mime-version
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=LETtB3Bhroo+8zQAJewreZl1AxxBF89GIAhjZ09BFv8=;
-        b=gsuwTPu3H+YIAI93/cbIQI2qEAaS+ItYbLOyy+cFr0BeZzSAayiB5qwCu+VeaKzOwl
-         S4PqyWwborlIz0zRS1BWixY/4b+4dWXlvoOwxXK4vny8WSe75t/gi/Z65g4C6pxvGkzx
-         17eTxUGYI2Htqdpxws/xAc9vwjsWwEFSPUfer6wN2vhl0aK9KRjoXfsvPgnP1CSdiOJz
-         Yg83sBRYQIz4NxKl3XRMg6pJpm2f2VPi3mQS4SDjTNleLKRwBpiZtx3zRmZIPaGtboDy
-         5TVSSo2IyQwBORUldZsy3AtplBQR+8TL+D2+Lz7rhKMBvX8kK6zF0cWd+9lE/rL49VX1
-         Gfnw==
+        bh=M085LcD41LDDIK8Rg13RjGP6BPFnmb74fCHiD2WUIlI=;
+        b=HllmaOadpV7PuhG1PxpnlIyM9Umf15yDGIJ+DMtKtfx9HqwJBYyDURzJHy8PmwjNYq
+         CbpG136paxsCdiNjto46fDZrhKhjMFhPjGXQXqVixaCuNf0XOoBAtpGlsVEMJ728hy/C
+         sU+XSVx+j7ek4wbf8wXiOuucwBwSo/yucRv7iczoHf9pPxDbUDRmU1wC7u3P5LcRP8YV
+         apREmUi0TySsYUM+1gA7WxYxkNkTgk51USW1MKfolgC3V8a52Gnvz63yyHrVCZdkOANx
+         ElB27nqb1PoUeQSCS+fl6NZ35wUo2ALL2jKY1BfA9LtvYe2xe9tZUdTv85QVo4VnN+Hi
+         F8JQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=LETtB3Bhroo+8zQAJewreZl1AxxBF89GIAhjZ09BFv8=;
-        b=t5j65WnHHk2o/1MfyrhV9TPUbrF3TQtVj/eLp7J8Ii/YAuZW3zM7JaG2+LZV16ISoC
-         DltcFKE97nF5v4HawKoS0z/fZ9mK8LDkjp8baICyuupveAj3QQThbeBocSguU6TxEaZO
-         EB5P4B2pDhjjTTINygbRholNNF1VLcRziY7CtroFD8pQ13Xsv+/a/4GRuCssMXfazOyI
-         DUcGzMp5+taC4UazDu+7ha7neOwYn9Ac9EEQDNnf5SAvYS7ghMP4gJ8PP63/WGNWWLLm
-         t/tf8SLAeH5LtzBQmWkhdg1rpgTZqw/ZTI40FBZy9L77tN/muKEN58SD2KS7lLFhP4U7
-         Fz/Q==
-X-Gm-Message-State: AOAM531zxsDAndhkNGQw8yBBBDdLa3hmC5ZLccSb9lmiHxdmyQ2LJqGJ
-        EoRbBth3FyF4XxbmFHVdD67ok2QUONqzKA==
-X-Google-Smtp-Source: ABdhPJxWe+BbUogiUVUTxywvx6Nh1vhhL0RwXNG0Wjieny8a3Jqceo94bLlN17v7rEXynkKskw6uWw==
-X-Received: by 2002:a17:90b:1bc3:: with SMTP id oa3mr17091970pjb.75.1634343915954;
-        Fri, 15 Oct 2021 17:25:15 -0700 (PDT)
-Received: from hermes.local (204-195-33-123.wavecable.com. [204.195.33.123])
-        by smtp.gmail.com with ESMTPSA id j20sm5503397pgb.2.2021.10.15.17.25.15
+        bh=M085LcD41LDDIK8Rg13RjGP6BPFnmb74fCHiD2WUIlI=;
+        b=GBDklOQH1A72N7dcugmpjnmJWy/Gs1M1U432QK722y081k4OnB9tcLx/dUTL+uhm7T
+         F6L2V0EHTGp344BO2fB4pzloq0WSVqie9GKrKdPZ9kfYtHM+qavKSGF106f0B1KCnZyG
+         r7ZiJriplg40kiUnijJplh7DS3fEHW6agtQBCxq73+jing0ZYVZUFbagqddWgyK2nsJD
+         v1y6El+jmP5pJAj3bXJiCFu1LF0OtrpCJZ64WGFKp77Dh/51GmfYMU1pitTV2dXsP5fD
+         K8huQFJtXyJHTP8+pmbBpQ4etrZlizhIdBx/pC8XP+JbmlK1imWr28Zw6QRrkB0sma1h
+         iFLA==
+X-Gm-Message-State: AOAM533J0k0aCn+nGONC84tSjRMPjqVi9XQWHvx6KkxoLduDpvPZHD6O
+        nAUsdmr5eDYcJA4LCuFNbHbRRJ0+hEAIeQ==
+X-Google-Smtp-Source: ABdhPJwUo0YdMn2ZeDqfIKmUbf88ByJMXs47+UZyEynUexIYLa+c9kRPggX0prSr2Jy7YZmvzOio5Q==
+X-Received: by 2002:a63:1cd:: with SMTP id 196mr14740824pgb.39.1634407242780;
+        Sat, 16 Oct 2021 11:00:42 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:7cf0:730:2c83:c489])
+        by smtp.gmail.com with ESMTPSA id o14sm8321470pfh.84.2021.10.16.11.00.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 17:25:15 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 17:25:13 -0700
-From:   Stephen Hemminger <stephen@networkplumber.org>
+        Sat, 16 Oct 2021 11:00:42 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: Fw: [Bug 214729] New: Information leakage from kernel to user space
- in /net/bluetooth/hci_sock.c
-Message-ID: <20211015172513.2836ed31@hermes.local>
+Subject: [BlueZ PATCH] build: Fix build error with ell/cleanup.h
+Date:   Sat, 16 Oct 2021 11:00:41 -0700
+Message-Id: <20211016180041.477315-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
+This patch fixes the build error due to missing ell/cleanup.h.
 
-Begin forwarded message:
+./ell/util.h:33:10: fatal error: ell/cleanup.h: No such file or directory
+   33 | #include <ell/cleanup.h>
+      |          ^~~~~~~~~~~~~~~
+---
+ Makefile.am | 1 +
+ 1 file changed, 1 insertion(+)
 
-Date: Fri, 15 Oct 2021 22:14:56 +0000
-From: bugzilla-daemon@bugzilla.kernel.org
-To: stephen@networkplumber.org
-Subject: [Bug 214729] New: Information leakage from kernel to user space in=
- /net/bluetooth/hci_sock.c
+diff --git a/Makefile.am b/Makefile.am
+index 268c797cb..a9439588a 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -145,6 +145,7 @@ ell_headers = ell/util.h \
+ 			ell/tls-private.h \
+ 			ell/ecc.h \
+ 			ell/ecc-private.h \
++			ell/cleanup.h \
+ 			ell/ecdh.h
+ 
+ ell_sources = ell/private.h ell/missing.h \
+-- 
+2.25.1
 
-
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214729
-
-            Bug ID: 214729
-           Summary: Information leakage from kernel to user space in
-                    /net/bluetooth/hci_sock.c
-           Product: Networking
-           Version: 2.5
-    Kernel Version: 5.15-rc5
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Other
-          Assignee: stephen@networkplumber.org
-          Reporter: bao00065@umn.edu
-        Regression: No
-
-Hi Maintainers,
-I recently reviewed the uninitialized value use bug in Linux kernel:
-
-https://syzkaller.appspot.com/bug?id=3D739ce0bc6e4097668cbf94c862f3b643b364=
-d589.=20
-and patch:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=
-id=3Db42b3a2744b3e8f427de79896720c72823af91ad
-
-The vulnerable function is:
-int __sys_getsockname(int fd, struct sockaddr __user *usockaddr,
-                      int __user *usockaddr_len)
-{
-        struct socket *sock;
-        struct sockaddr_storage address; // allocation
-        int err, fput_needed;
-
-        sock =3D sockfd_lookup_light(fd, &err, &fput_needed);
-        if (!sock)
-                goto out;
-
-        err =3D security_socket_getsockname(sock);
-        if (err)
-                goto out_put;
-
-        err =3D sock->ops->getname(sock, (struct sockaddr *)&address, 0); //
-initialization
-        if (err < 0)
-                goto out_put;
-        /* "err" is actually length in this case */
-        err =3D move_addr_to_user(&address, err, usockaddr, usockaddr_len);=
- //use
-
-out_put:
-        fput_light(sock->file, fput_needed);
-out:
-        return err;
-}
-
-static int move_addr_to_user(struct sockaddr_storage *kaddr, int klen,
-                             void __user *uaddr, int __user *ulen)
-{
-        int err;
-        int len;
-
-        BUG_ON(klen > sizeof(struct sockaddr_storage));
-        err =3D get_user(len, ulen);
-        if (err)
-                return err;
-        if (len > klen)
-                len =3D klen;
-        if (len < 0)
-                return -EINVAL;
-        if (len) {
-                if (audit_sockaddr(klen, kaddr))
-                        return -ENOMEM;
-                if (copy_to_user(uaddr, kaddr, len)) // use=20
-                        return -EFAULT;
-        }
-        /*
-         *      "fromlen shall refer to the value before truncation.."
-         *                      1003.1g
-         */
-        return __put_user(klen, ulen);
-}
-
-
-the variable address is allocated in __sys_getsockname, and then is initial=
-ized
-in sock->ops->getname(sock, (struct sockaddr *)& address, 0); After that,
-address is passed to move_addr_to_user() and finally it passed to
-copy_to_user(), leading to uninitialized value use.=20
-
-Main reason for this bug: initialization in sock->ops->getname(sock, (struct
-sockaddr *)&address, 0) is partially initialized.  It only initializes the
-fields in the struct but not the holes between the fields. As a result, sin=
-ce
-uaddr will be passed to copy_to_user(), and the holes inside the uaddr stru=
-ct=20
-contain uninitialized data inherited from the kernel stack, it may cause
-information leakage from kernel space to user space
-
-Here is the initialization function:
-
-static int isotp_getname(struct socket *sock, struct sockaddr *uaddr, int p=
-eer)
-{
-        struct sockaddr_can *addr =3D (struct sockaddr_can *)uaddr;
-        struct sock *sk =3D sock->sk;
-        struct isotp_sock *so =3D isotp_sk(sk);
-
-        if (peer)
-                return -EOPNOTSUPP;
-
-        +memset(addr, 0, ISOTP_MIN_NAMELEN);//patch
-        addr->can_family =3D AF_CAN;
-        addr->can_ifindex =3D so->ifindex;
-        addr->can_addr.tp.rx_id =3D so->rxid;
-        addr->can_addr.tp.tx_id =3D so->txid;
-
-        return ISOTP_MIN_NAMELEN;
-}
-
-The patch: memset() initializes the whole struct sockaddr_can, including the
-holes within the struct sockaddr_can.
-
-Sockaddr_can is declared here:
-struct sockaddr_can {
-        __kernel_sa_family_t can_family;
-        int         can_ifindex;
-        union {
-                /* transport protocol class address information (e.g. ISOTP=
-) */
-                struct { canid_t rx_id, tx_id; } tp;
-
-                /* J1939 address information */
-                struct {
-                        /* 8 byte name when using dynamic addressing */
-                        __u64 name;
-
-                        /* pgn:
-                         * 8 bit: PS in PDU2 case, else 0
-                         * 8 bit: PF
-                         * 1 bit: DP
-                         * 1 bit: reserved
-                         */
-                        __u32 pgn;
-
-                        /* 1 byte address */
-                        __u8 addr;
-                } j1939;
-
-                /* reserved for future CAN protocols address information */
-        } can_addr;
-};
-There are a few holes inside the struct, but it doesn=E2=80=99t explicitly =
-set to 0 in=20
-isotp_getname()
-
-At the same time, I realized  sock->ops->getname(sock, (struct sockaddr
-*)&address, 0) is an indirect call. Thus it may go to different functions at
-the run time. If one of these functions doesn't initialize the holes within=
- the
-struct, it may cause an information leak from kernel space to userspace.=20
-
-
-My tools find similar cloned bugs
-The same bug happen in /net/bluetooth/hci_sock.c
-
-s
-static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
-                            int peer)
-{
-        struct sockaddr_hci *haddr =3D (struct sockaddr_hci *)addr;
-        struct sock *sk =3D sock->sk;
-        struct hci_dev *hdev;
-        int err =3D 0;
-
-        BT_DBG("sock %p sk %p", sock, sk);
-
-        if (peer)
-                return -EOPNOTSUPP;
-
-        lock_sock(sk);
-
-        hdev =3D hci_hdev_from_sock(sk);
-        if (IS_ERR(hdev)) {
-                err =3D PTR_ERR(hdev);
-                goto done;
-        }
-
-        haddr->hci_family =3D AF_BLUETOOTH;
-        haddr->hci_dev    =3D hdev->id;
-        haddr->hci_channel=3D hci_pi(sk)->channel;
-        err =3D sizeof(*haddr);
-
-done:
-        release_sock(sk);
-        return err;
-}
-sockaddr_hci is declared here:
-
-struct sockaddr_hci {
-        sa_family_t    hci_family;
-        unsigned short hci_dev;
-        unsigned short hci_channel;
-};
-
-We can see there is a hole between family and dev. Thus, we have to explici=
-tly
-set the hole to zero. Otherwise, the address will be passed to copy_to_user=
- and
-cause information leakage.
-
-Suggested patch:
-memset(maddr, 0, sizeof(sockaddr_hci));
-
-
-Thank you for the review. I appreciate your time.=20
-
-Andrew Bao
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.
