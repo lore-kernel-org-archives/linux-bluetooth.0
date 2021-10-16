@@ -2,65 +2,63 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E4ED2C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:24:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2DFD1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:25:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BB988611F0
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:24:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0FD116120A
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 16 Oct 2021 00:25:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236535AbhJPA0f (ORCPT
+        id S236573AbhJPA1Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 15 Oct 2021 20:26:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50806 "EHLO
+        Fri, 15 Oct 2021 20:27:24 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50990 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236193AbhJPA0e (ORCPT
+        with ESMTP id S236193AbhJPA1X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 15 Oct 2021 20:26:34 -0400
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6583AC061570
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:24:27 -0700 (PDT)
-Received: by mail-pg1-x52a.google.com with SMTP id 133so10020315pgb.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:24:27 -0700 (PDT)
+        Fri, 15 Oct 2021 20:27:23 -0400
+Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D22EBC061570
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:25:16 -0700 (PDT)
+Received: by mail-pj1-x1029.google.com with SMTP id nn3-20020a17090b38c300b001a03bb6c4ebso8489335pjb.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 15 Oct 2021 17:25:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=networkplumber-org.20210112.gappssmtp.com; s=20210112;
-        h=date:from:to:cc:subject:message-id:mime-version
+        h=date:from:to:subject:message-id:mime-version
          :content-transfer-encoding;
-        bh=svFroZCghWmERPzr3TaoO/0tvjCGY3iaHZlY2nsuBKg=;
-        b=dJh29VUzxDU63klcLS6l8F+ceT3CKJEVSDOKkNQhIJZBErFrmswttUDZvPq8mLCi+o
-         dOSwJzsNLzNKOPTYLbgfsLtD3CyDOJ/6+RQH4upp4BcitzXR27UFZzx3m4fJbT0gH725
-         Tyk28ULkEN8EEvAK5pAzU9asEG6HRA9kBVgHwW5R1x+MMtxatTiKZ76SRHNmHKHFtkfU
-         A60YhU4TnsZjYNZcWhX4Sl3yfedoEVehgq5zqFvTjZaX1xiSpQpNunxg0Zgu4zaR0VuT
-         IjeJE2/i6kWneJmU5lvhIrT3wbDXWG/yduAO6NLYduZwGlw0zoKUcPTcE99m0CnykTBQ
-         JfVQ==
+        bh=LETtB3Bhroo+8zQAJewreZl1AxxBF89GIAhjZ09BFv8=;
+        b=gsuwTPu3H+YIAI93/cbIQI2qEAaS+ItYbLOyy+cFr0BeZzSAayiB5qwCu+VeaKzOwl
+         S4PqyWwborlIz0zRS1BWixY/4b+4dWXlvoOwxXK4vny8WSe75t/gi/Z65g4C6pxvGkzx
+         17eTxUGYI2Htqdpxws/xAc9vwjsWwEFSPUfer6wN2vhl0aK9KRjoXfsvPgnP1CSdiOJz
+         Yg83sBRYQIz4NxKl3XRMg6pJpm2f2VPi3mQS4SDjTNleLKRwBpiZtx3zRmZIPaGtboDy
+         5TVSSo2IyQwBORUldZsy3AtplBQR+8TL+D2+Lz7rhKMBvX8kK6zF0cWd+9lE/rL49VX1
+         Gfnw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:mime-version
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
          :content-transfer-encoding;
-        bh=svFroZCghWmERPzr3TaoO/0tvjCGY3iaHZlY2nsuBKg=;
-        b=6kdI/hkUxgncnQnz6QiWaDRzA8pe6uTdviALJ1SBqseDszlofH7GYAJTf8XBA0MvSP
-         8N4X1reGtvXOLXVkx/h48n4X79f1IPNPozTmNwMqTPZpU/oSrq+7j6AjVKnlB9p9sd+A
-         pL93x5+8IdWqqF1GxG5+V+gOaJ1+Texn+f61y+5pT46jact2X/eXUWiotoV2jjwbz12P
-         A01sqgnqn9HlYrzJDK/9fwytsjf2fSJSc+RPxu4tGZDwDiZZ4LM6s02pfWkIv1XLLfOb
-         KohhO77JW2i7R8kJk35xlA3AV401v0Ms4SvsBrb3Bhu59nLmpxcjgGvHom8ugHe8juPi
-         aBVw==
-X-Gm-Message-State: AOAM531sipztOS6Ltb1GpePgZ3YLW9OvkZl3CMN0kJWa7Huupms/ZR9P
-        fwxTJKBRkmE/ZFdc+6Jbi/IAms70zSxNbQ==
-X-Google-Smtp-Source: ABdhPJxzegtPnYkX8BMJSZTXMtjyaPOJVGw3GGkTawLEqcNjisuRNmKnAkdXwq6TKftIFwvKc4TyOQ==
-X-Received: by 2002:a63:2c4f:: with SMTP id s76mr6611025pgs.155.1634343866875;
-        Fri, 15 Oct 2021 17:24:26 -0700 (PDT)
+        bh=LETtB3Bhroo+8zQAJewreZl1AxxBF89GIAhjZ09BFv8=;
+        b=t5j65WnHHk2o/1MfyrhV9TPUbrF3TQtVj/eLp7J8Ii/YAuZW3zM7JaG2+LZV16ISoC
+         DltcFKE97nF5v4HawKoS0z/fZ9mK8LDkjp8baICyuupveAj3QQThbeBocSguU6TxEaZO
+         EB5P4B2pDhjjTTINygbRholNNF1VLcRziY7CtroFD8pQ13Xsv+/a/4GRuCssMXfazOyI
+         DUcGzMp5+taC4UazDu+7ha7neOwYn9Ac9EEQDNnf5SAvYS7ghMP4gJ8PP63/WGNWWLLm
+         t/tf8SLAeH5LtzBQmWkhdg1rpgTZqw/ZTI40FBZy9L77tN/muKEN58SD2KS7lLFhP4U7
+         Fz/Q==
+X-Gm-Message-State: AOAM531zxsDAndhkNGQw8yBBBDdLa3hmC5ZLccSb9lmiHxdmyQ2LJqGJ
+        EoRbBth3FyF4XxbmFHVdD67ok2QUONqzKA==
+X-Google-Smtp-Source: ABdhPJxWe+BbUogiUVUTxywvx6Nh1vhhL0RwXNG0Wjieny8a3Jqceo94bLlN17v7rEXynkKskw6uWw==
+X-Received: by 2002:a17:90b:1bc3:: with SMTP id oa3mr17091970pjb.75.1634343915954;
+        Fri, 15 Oct 2021 17:25:15 -0700 (PDT)
 Received: from hermes.local (204-195-33-123.wavecable.com. [204.195.33.123])
-        by smtp.gmail.com with ESMTPSA id p16sm2651634pgd.78.2021.10.15.17.24.26
+        by smtp.gmail.com with ESMTPSA id j20sm5503397pgb.2.2021.10.15.17.25.15
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 15 Oct 2021 17:24:26 -0700 (PDT)
-Date:   Fri, 15 Oct 2021 17:24:23 -0700
+        Fri, 15 Oct 2021 17:25:15 -0700 (PDT)
+Date:   Fri, 15 Oct 2021 17:25:13 -0700
 From:   Stephen Hemminger <stephen@networkplumber.org>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: Fw: [Bug 214731] New: Information leakage from kernel to user space
- in /net/bluetooth/sco.c
-Message-ID: <20211015172423.56598763@hermes.local>
+To:     linux-bluetooth@vger.kernel.org
+Subject: Fw: [Bug 214729] New: Information leakage from kernel to user space
+ in /net/bluetooth/hci_sock.c
+Message-ID: <20211015172513.2836ed31@hermes.local>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
@@ -72,18 +70,18 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Begin forwarded message:
 
-Date: Fri, 15 Oct 2021 22:20:47 +0000
+Date: Fri, 15 Oct 2021 22:14:56 +0000
 From: bugzilla-daemon@bugzilla.kernel.org
 To: stephen@networkplumber.org
-Subject: [Bug 214731] New: Information leakage from kernel to user space in=
- /net/bluetooth/sco.c
+Subject: [Bug 214729] New: Information leakage from kernel to user space in=
+ /net/bluetooth/hci_sock.c
 
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214731
+https://bugzilla.kernel.org/show_bug.cgi?id=3D214729
 
-            Bug ID: 214731
+            Bug ID: 214729
            Summary: Information leakage from kernel to user space in
-                    /net/bluetooth/sco.c
+                    /net/bluetooth/hci_sock.c
            Product: Networking
            Version: 2.5
     Kernel Version: 5.15-rc5
@@ -91,7 +89,7 @@ https://bugzilla.kernel.org/show_bug.cgi?id=3D214731
                 OS: Linux
               Tree: Mainline
             Status: NEW
-          Severity: normal
+          Severity: high
           Priority: P1
          Component: Other
           Assignee: stephen@networkplumber.org
@@ -247,38 +245,53 @@ struct, it may cause an information leak from kernel space to userspace.=20
 My tools find similar cloned bugs
 The same bug happen in /net/bluetooth/hci_sock.c
 
-
-static int sco_sock_getname(struct socket *sock, struct sockaddr *addr,
+s
+static int hci_sock_getname(struct socket *sock, struct sockaddr *addr,
                             int peer)
 {
-        struct sockaddr_sco *sa =3D (struct sockaddr_sco *) addr;
+        struct sockaddr_hci *haddr =3D (struct sockaddr_hci *)addr;
         struct sock *sk =3D sock->sk;
+        struct hci_dev *hdev;
+        int err =3D 0;
 
-        BT_DBG("sock %p, sk %p", sock, sk);
-
-        addr->sa_family =3D AF_BLUETOOTH;
+        BT_DBG("sock %p sk %p", sock, sk);
 
         if (peer)
-                bacpy(&sa->sco_bdaddr, &sco_pi(sk)->dst);
-        else
-                bacpy(&sa->sco_bdaddr, &sco_pi(sk)->src);
+                return -EOPNOTSUPP;
 
-        return sizeof(struct sockaddr_sco);
+        lock_sock(sk);
+
+        hdev =3D hci_hdev_from_sock(sk);
+        if (IS_ERR(hdev)) {
+                err =3D PTR_ERR(hdev);
+                goto done;
+        }
+
+        haddr->hci_family =3D AF_BLUETOOTH;
+        haddr->hci_dev    =3D hdev->id;
+        haddr->hci_channel=3D hci_pi(sk)->channel;
+        err =3D sizeof(*haddr);
+
+done:
+        release_sock(sk);
+        return err;
 }
-sockaddr_sco is declared here:
+sockaddr_hci is declared here:
 
-struct sockaddr_sco {
-        sa_family_t     sco_family;
-        bdaddr_t        sco_bdaddr;
+struct sockaddr_hci {
+        sa_family_t    hci_family;
+        unsigned short hci_dev;
+        unsigned short hci_channel;
 };
 
-We can see there is a hole between sco_family and sco_bdaddr. Thus, we have=
- to
-explicitly set the hole to zero. Otherwise, the address will be passed to
-copy_to_user and cause information leakage.
+We can see there is a hole between family and dev. Thus, we have to explici=
+tly
+set the hole to zero. Otherwise, the address will be passed to copy_to_user=
+ and
+cause information leakage.
 
 Suggested patch:
-memset(maddr, 0, sizeof(sockaddr_sco));
+memset(maddr, 0, sizeof(sockaddr_hci));
 
 
 Thank you for the review. I appreciate your time.=20
