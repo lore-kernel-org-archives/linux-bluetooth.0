@@ -2,172 +2,173 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2E5C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 07:50:01 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DC47FC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 48E00610C7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 07:50:01 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C4DE9610A6
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 09:11:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230478AbhJRHwL (ORCPT
+        id S231452AbhJRJOA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Oct 2021 03:52:11 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:29837 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230470AbhJRHwK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Oct 2021 03:52:10 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634543400; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=6HipczTezmULgaScktOZMpGhxT1DDNz2p3RjJWu6EVQ=;
- b=em1iqM7JPu2B65k5YlDft7Du+x9+V091ZbiEhYVS7oh9TREtW+JHV1CEbKopLCoc3rBG+9M6
- X8hjU8gK+kMrfunHzfjz/vyavNgUcduhPKoDMrtqrNU/hM3Tn9fkkVMlD2I2FotzbHQYTVmx
- a/tRBCiB786M3Dlrj8ygK4GagmM=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
- 616d271c0605239689401cad (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 18 Oct 2021 07:49:48
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id A115BC4360C; Mon, 18 Oct 2021 07:49:47 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        Mon, 18 Oct 2021 05:14:00 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47990 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S231418AbhJRJNz (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 Oct 2021 05:13:55 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1634548304;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=0Q56wj21GGdBKSsvdrGkUKMB3bovLQF+EDH+bXTHBkA=;
+        b=N0vaMvauF0ccCq2YZXgMI5mhKzGodUEXPgSRnsH39xAYnZb7rwFoCc1rP+pgNtYe2CahDQ
+        DHr5nqPct8u3d2kwtMraqRZ4xCd0j8EOe4SisWUK0YeXoB3Q93GNCqm/HwnRKOTyY/r7Yh
+        bvVm9G6bVbkOTOgNpE97ZF2hMDrKnHs=
+Received: from mimecast-mx01.redhat.com (mimecast-mx01.redhat.com
+ [209.132.183.4]) (Using TLS) by relay.mimecast.com with ESMTP id
+ us-mta-138-xrfhSSOmOkixr02B7l7AAg-1; Mon, 18 Oct 2021 05:11:41 -0400
+X-MC-Unique: xrfhSSOmOkixr02B7l7AAg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.phx2.redhat.com [10.5.11.14])
+        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C9A66C4338F;
-        Mon, 18 Oct 2021 07:49:46 +0000 (UTC)
+        by mimecast-mx01.redhat.com (Postfix) with ESMTPS id 750F619057A4;
+        Mon, 18 Oct 2021 09:11:39 +0000 (UTC)
+Received: from localhost (unknown [10.39.195.158])
+        by smtp.corp.redhat.com (Postfix) with ESMTP id 3119A5DF36;
+        Mon, 18 Oct 2021 09:11:25 +0000 (UTC)
+Date:   Mon, 18 Oct 2021 10:11:24 +0100
+From:   Stefan Hajnoczi <stefanha@redhat.com>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
+Cc:     linux-kernel@vger.kernel.org, Jeff Dike <jdike@addtoit.com>,
+        Richard Weinberger <richard@nod.at>,
+        Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Paolo Bonzini <pbonzini@redhat.com>,
+        Jens Axboe <axboe@kernel.dk>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Matt Mackall <mpm@selenic.com>,
+        Herbert Xu <herbert@gondor.apana.org.au>,
+        Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+        Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Gonglei <arei.gonglei@huawei.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Sudeep Holla <sudeep.holla@arm.com>,
+        Cristian Marussi <cristian.marussi@arm.com>,
+        "Enrico Weigelt, metux IT consult" <info@metux.net>,
+        Viresh Kumar <vireshk@kernel.org>,
+        Linus Walleij <linus.walleij@linaro.org>,
+        Bartosz Golaszewski <brgl@bgdev.pl>,
+        David Airlie <airlied@linux.ie>,
+        Gerd Hoffmann <kraxel@redhat.com>,
+        Daniel Vetter <daniel@ffwll.ch>, Jie Deng <jie.deng@intel.com>,
+        Jean-Philippe Brucker <jean-philippe@linaro.org>,
+        Joerg Roedel <joro@8bytes.org>, Will Deacon <will@kernel.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johannes Berg <johannes@sipsolutions.net>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        Dan Williams <dan.j.williams@intel.com>,
+        Vishal Verma <vishal.l.verma@intel.com>,
+        Dave Jiang <dave.jiang@intel.com>,
+        Ira Weiny <ira.weiny@intel.com>,
+        Ohad Ben-Cohen <ohad@wizery.com>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Mathieu Poirier <mathieu.poirier@linaro.org>,
+        "James E.J. Bottomley" <jejb@linux.ibm.com>,
+        "Martin K. Petersen" <martin.petersen@oracle.com>,
+        David Hildenbrand <david@redhat.com>,
+        Vivek Goyal <vgoyal@redhat.com>,
+        Miklos Szeredi <miklos@szeredi.hu>,
+        Eric Van Hensbergen <ericvh@gmail.com>,
+        Latchesar Ionkov <lucho@ionkov.net>,
+        Dominique Martinet <asmadeus@codewreck.org>,
+        Stefano Garzarella <sgarzare@redhat.com>,
+        Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+        Jaroslav Kysela <perex@perex.cz>,
+        Takashi Iwai <tiwai@suse.com>, linux-um@lists.infradead.org,
+        virtualization@lists.linux-foundation.org,
+        linux-block@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-crypto@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+        linux-gpio@vger.kernel.org, dri-devel@lists.freedesktop.org,
+        linux-i2c@vger.kernel.org, iommu@lists.linux-foundation.org,
+        netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+        nvdimm@lists.linux.dev, linux-remoteproc@vger.kernel.org,
+        linux-scsi@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+        v9fs-developer@lists.sourceforge.net, kvm@vger.kernel.org,
+        alsa-devel@alsa-project.org
+Subject: Re: [PATCH RFC] virtio: wrap config->reset calls
+Message-ID: <YW06PCof8Z76MXtC@stefanha-x1.localdomain>
+References: <20211013105226.20225-1-mst@redhat.com>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Mon, 18 Oct 2021 15:49:46 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by
- using different nvm
-In-Reply-To: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
-References: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
-Message-ID: <03517c8d44e6c20d28b9c9f285d8f857@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Type: multipart/signed; micalg=pgp-sha256;
+        protocol="application/pgp-signature"; boundary="nfeOsJT4P4stmsz9"
+Content-Disposition: inline
+In-Reply-To: <20211013105226.20225-1-mst@redhat.com>
+X-Scanned-By: MIMEDefang 2.79 on 10.5.11.14
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-marcel:
-   sorry to disturb you , could you help review this patch ? thank you.
 
-regards.
-tim
+--nfeOsJT4P4stmsz9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-
-On 2021-10-12 15:55, tjiang@codeaurora.org wrote:
-> the RF performance of wcn6855 soc chip from different foundries will be
-> difference, so we should use different nvm to configure them.
-> 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+On Wed, Oct 13, 2021 at 06:55:31AM -0400, Michael S. Tsirkin wrote:
+> This will enable cleanups down the road.
+> The idea is to disable cbs, then add "flush_queued_cbs" callback
+> as a parameter, this way drivers can flush any work
+> queued after callbacks have been disabled.
+>=20
+> Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
 > ---
->  drivers/bluetooth/btusb.c | 56 
-> +++++++++++++++++++++++++++++++++++------------
->  1 file changed, 42 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 75c83768c257..f352ff351b61 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct 
-> hci_dev *hdev,
->  #define QCA_DFU_TIMEOUT		3000
->  #define QCA_FLAG_MULTI_NVM      0x80
-> 
-> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> +
->  struct qca_version {
->  	__le32	rom_version;
->  	__le32	patch_version;
-> @@ -3221,6 +3224,7 @@ static const struct qca_device_info
-> qca_devices_table[] = {
->  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
->  };
-> 
->  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
-> request,
-> @@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct
-> hci_dev *hdev,
->  	return err;
->  }
-> 
-> +static void btusb_generate_qca_nvm_name(char *fwname,
-> +					size_t max_size,
-> +					struct qca_version *ver)
-> +{
-> +	u32 rom_version = le32_to_cpu(ver->rom_version);
-> +	u16 flag = le16_to_cpu(ver->flag);
-> +
-> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +		u16 board_id = le16_to_cpu(ver->board_id);
-> +		u32 ram_version = le32_to_cpu(ver->ram_version);
-> +		const char *variant;
-> +
-> +		switch (ram_version) {
-> +		case WCN6855_2_0_RAM_VERSION_GF:
-> +		case WCN6855_2_1_RAM_VERSION_GF:
-> +			variant = "_gf";
-> +			break;
-> +		default:
-> +			variant = "";
-> +			break;
-> +		}
-> +
-> +		/* if boardid equal 0, use default nvm without suffix */
-> +		if (board_id == 0x0) {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
-> +				rom_version, variant);
-> +		} else {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
-> +				rom_version, variant, board_id);
-> +		}
-> +	} else {
-> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-> +			rom_version);
-> +	}
-> +
-> +}
-> +
->  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
->  				    struct qca_version *ver,
->  				    const struct qca_device_info *info)
-> @@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
-> hci_dev *hdev,
->  	char fwname[64];
->  	int err;
-> 
-> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		/* if boardid equal 0, use default nvm without surfix */
-> -		if (le16_to_cpu(ver->board_id) == 0x0) {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -				 le32_to_cpu(ver->rom_version));
-> -		} else {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -				le32_to_cpu(ver->rom_version),
-> -				le16_to_cpu(ver->board_id));
-> -		}
-> -	} else {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -			 le32_to_cpu(ver->rom_version));
-> -	}
-> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
-> 
->  	err = request_firmware(&fw, fwname, &hdev->dev);
->  	if (err) {
+>  arch/um/drivers/virt-pci.c                 | 2 +-
+>  drivers/block/virtio_blk.c                 | 4 ++--
+>  drivers/bluetooth/virtio_bt.c              | 2 +-
+>  drivers/char/hw_random/virtio-rng.c        | 2 +-
+>  drivers/char/virtio_console.c              | 4 ++--
+>  drivers/crypto/virtio/virtio_crypto_core.c | 8 ++++----
+>  drivers/firmware/arm_scmi/virtio.c         | 2 +-
+>  drivers/gpio/gpio-virtio.c                 | 2 +-
+>  drivers/gpu/drm/virtio/virtgpu_kms.c       | 2 +-
+>  drivers/i2c/busses/i2c-virtio.c            | 2 +-
+>  drivers/iommu/virtio-iommu.c               | 2 +-
+>  drivers/net/caif/caif_virtio.c             | 2 +-
+>  drivers/net/virtio_net.c                   | 4 ++--
+>  drivers/net/wireless/mac80211_hwsim.c      | 2 +-
+>  drivers/nvdimm/virtio_pmem.c               | 2 +-
+>  drivers/rpmsg/virtio_rpmsg_bus.c           | 2 +-
+>  drivers/scsi/virtio_scsi.c                 | 2 +-
+>  drivers/virtio/virtio.c                    | 5 +++++
+>  drivers/virtio/virtio_balloon.c            | 2 +-
+>  drivers/virtio/virtio_input.c              | 2 +-
+>  drivers/virtio/virtio_mem.c                | 2 +-
+>  fs/fuse/virtio_fs.c                        | 4 ++--
+>  include/linux/virtio.h                     | 1 +
+>  net/9p/trans_virtio.c                      | 2 +-
+>  net/vmw_vsock/virtio_transport.c           | 4 ++--
+>  sound/virtio/virtio_card.c                 | 4 ++--
+>  26 files changed, 39 insertions(+), 33 deletions(-)
+
+Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+
+--nfeOsJT4P4stmsz9
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEEhpWov9P5fNqsNXdanKSrs4Grc8gFAmFtOjkACgkQnKSrs4Gr
+c8gexAf6AlqH6xn5qy4PTBIyVWqBNKslYRUY3StOZeOLM+CPmkOFP+txQ8EkZk8Q
+CoN3LYe7SYgM+Ta9+IaB/5DMPe0oGp4HL47kDEaEdzoQ9X3xaM5sjDQ7fAauSqhb
+gcL3J12kjjI6wrP3O8u9Dp56doY0k43WCsghVyJ90yZ6C8o9DQEAQZcon2vrQnO7
+dHlQQkT29XNt6VmZeKoyx55lRentw0HeuxR5CBrYMdVDHbL3SoXm3fACGBB2ci5i
+KxES5tR0Wq5ibMq5TbU1/40QKB+JfW8unQNAHCxd0EU2QVWaYe/4eaL1gHLvR1V0
+6Xa1DS0k8l/mV2V9drYFwRnygjMH1Q==
+=g/hu
+-----END PGP SIGNATURE-----
+
+--nfeOsJT4P4stmsz9--
+
