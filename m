@@ -2,128 +2,172 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E98A7C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Oct 2021 18:05:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A2E5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 07:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7F7B60C4C
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 17 Oct 2021 18:05:07 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 48E00610C7
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 07:50:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242531AbhJQSHP (ORCPT
+        id S230478AbhJRHwL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 17 Oct 2021 14:07:15 -0400
-Received: from mail.kernel.org ([198.145.29.99]:50362 "EHLO mail.kernel.org"
+        Mon, 18 Oct 2021 03:52:11 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:29837 "EHLO m43-7.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230463AbhJQSHP (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 17 Oct 2021 14:07:15 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 3498460F70
-        for <linux-bluetooth@vger.kernel.org>; Sun, 17 Oct 2021 18:05:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1634493905;
-        bh=yrc2xT02W9cFRAjZRjvHFyXhlWGFvhSS/5f6fixmeLg=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=LTndkZS1QnE6LxKS0SGiGmox2A4eDXGJlFhXy/sSmvmDvKmJidayGUu8aiolgkQFg
-         zNuPcFW2TIZxXuzkqK+eWdIMjAwr9TrWCkWF3Zvbjjl5+mDnfoBHnuCPCWCDydxRLa
-         e5p80r6hpnjRHWtSuX2JCC+H+niJCRI2fV749zeJRxsGs8qlQPAjw/PGO2BBkXxVom
-         aOyFN3Qo50FpftAZsQsADAMndhSCkD/M9DMSHTr6pDxpdGSqLwpJJGiXiQPTsa8Vts
-         +qvWJAdTBTDnAHOlygHpn4whNnTtN1gOl/U+UAIzYD0QO9TMTWdmJi5UW89R2/kdF7
-         WARAyhonVc09A==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 213829] Intel AX210 Bluetooth controller doesn't start from
- warm boot
-Date:   Sun, 17 Oct 2021 18:05:04 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: gbin@gootz.net
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-213829-62941-EqhONenYdh@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-213829-62941@https.bugzilla.kernel.org/>
-References: <bug-213829-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S230470AbhJRHwK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 18 Oct 2021 03:52:10 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1634543400; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=6HipczTezmULgaScktOZMpGhxT1DDNz2p3RjJWu6EVQ=;
+ b=em1iqM7JPu2B65k5YlDft7Du+x9+V091ZbiEhYVS7oh9TREtW+JHV1CEbKopLCoc3rBG+9M6
+ X8hjU8gK+kMrfunHzfjz/vyavNgUcduhPKoDMrtqrNU/hM3Tn9fkkVMlD2I2FotzbHQYTVmx
+ a/tRBCiB786M3Dlrj8ygK4GagmM=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n04.prod.us-east-1.postgun.com with SMTP id
+ 616d271c0605239689401cad (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Mon, 18 Oct 2021 07:49:48
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id A115BC4360C; Mon, 18 Oct 2021 07:49:47 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C9A66C4338F;
+        Mon, 18 Oct 2021 07:49:46 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Mon, 18 Oct 2021 15:49:46 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by
+ using different nvm
+In-Reply-To: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
+References: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
+Message-ID: <03517c8d44e6c20d28b9c9f285d8f857@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D213829
+marcel:
+   sorry to disturb you , could you help review this patch ? thank you.
 
---- Comment #13 from Guillaume Binet (gbin@gootz.net) ---
-I continued to investigate. The major difference between a cold boot and a =
-warm
-boot is the driver trying to load a firmware.
+regards.
+tim
 
-For the science, I just disabled this behavior and it looks like the device=
- and
-driver recover on a warm boot. Consider this a workaround and not a fix but=
- at
-least it works for me, bluetooth is available on a warm boot.
 
-```
-pal =E2=9E=9C  linux-5.14.12  diff -u drivers/bluetooth/btintel.c.old
-drivers/bluetooth/btintel.c=20
---- drivers/bluetooth/btintel.c.old     2021-10-17 13:56:23.583338189 -0400
-+++ drivers/bluetooth/btintel.c 2021-10-17 14:01:16.113344330 -0400
-@@ -1034,17 +1034,6 @@
-                /* Skip reading firmware file version in bootloader mode */
-                if (ver->fw_variant =3D=3D 0x06)
-                        break;
--
--               /* Skip download if firmware has the same version */
--               if (btintel_firmware_version(hdev, ver->fw_build_num,
--                                            ver->fw_build_ww,
-ver->fw_build_yy,
--                                            fw, boot_param)) {
--                       bt_dev_info(hdev, "Firmware already loaded");
--                       /* Return -EALREADY to indicate that the firmware h=
-as
--                        * already been loaded.
--                        */
--                       return -EALREADY;
--               }
-        }
-
-        /* The firmware variant determines if the device is in bootloader
-@@ -1074,21 +1063,6 @@
-        int err;
-        u32 css_header_ver;
-
--       /* Skip reading firmware file version in bootloader mode */
--       if (ver->img_type !=3D 0x01) {
--               /* Skip download if firmware has the same version */
--               if (btintel_firmware_version(hdev, ver->min_fw_build_nn,
--                                            ver->min_fw_build_cw,
--                                            ver->min_fw_build_yy,
--                                            fw, boot_param)) {
--                       bt_dev_info(hdev, "Firmware already loaded");
--                       /* Return -EALREADY to indicate that firmware has
--                        * already been loaded.
--                        */
--                       return -EALREADY;
--               }
--       }
--
-        /* The firmware variant determines if the device is in bootloader
-         * mode or is running operational firmware. The value 0x01 identifi=
-es
-         * the bootloader and the value 0x03 identifies the operational
-```
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+On 2021-10-12 15:55, tjiang@codeaurora.org wrote:
+> the RF performance of wcn6855 soc chip from different foundries will be
+> difference, so we should use different nvm to configure them.
+> 
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> ---
+>  drivers/bluetooth/btusb.c | 56 
+> +++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 42 insertions(+), 14 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 75c83768c257..f352ff351b61 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct 
+> hci_dev *hdev,
+>  #define QCA_DFU_TIMEOUT		3000
+>  #define QCA_FLAG_MULTI_NVM      0x80
+> 
+> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
+> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+> +
+>  struct qca_version {
+>  	__le32	rom_version;
+>  	__le32	patch_version;
+> @@ -3221,6 +3224,7 @@ static const struct qca_device_info
+> qca_devices_table[] = {
+>  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+>  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+>  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+>  };
+> 
+>  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+> request,
+> @@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct
+> hci_dev *hdev,
+>  	return err;
+>  }
+> 
+> +static void btusb_generate_qca_nvm_name(char *fwname,
+> +					size_t max_size,
+> +					struct qca_version *ver)
+> +{
+> +	u32 rom_version = le32_to_cpu(ver->rom_version);
+> +	u16 flag = le16_to_cpu(ver->flag);
+> +
+> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> +		u16 board_id = le16_to_cpu(ver->board_id);
+> +		u32 ram_version = le32_to_cpu(ver->ram_version);
+> +		const char *variant;
+> +
+> +		switch (ram_version) {
+> +		case WCN6855_2_0_RAM_VERSION_GF:
+> +		case WCN6855_2_1_RAM_VERSION_GF:
+> +			variant = "_gf";
+> +			break;
+> +		default:
+> +			variant = "";
+> +			break;
+> +		}
+> +
+> +		/* if boardid equal 0, use default nvm without suffix */
+> +		if (board_id == 0x0) {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
+> +				rom_version, variant);
+> +		} else {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
+> +				rom_version, variant, board_id);
+> +		}
+> +	} else {
+> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
+> +			rom_version);
+> +	}
+> +
+> +}
+> +
+>  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>  				    struct qca_version *ver,
+>  				    const struct qca_device_info *info)
+> @@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
+> hci_dev *hdev,
+>  	char fwname[64];
+>  	int err;
+> 
+> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		/* if boardid equal 0, use default nvm without surfix */
+> -		if (le16_to_cpu(ver->board_id) == 0x0) {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -				 le32_to_cpu(ver->rom_version));
+> -		} else {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -				le32_to_cpu(ver->rom_version),
+> -				le16_to_cpu(ver->board_id));
+> -		}
+> -	} else {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -			 le32_to_cpu(ver->rom_version));
+> -	}
+> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+> 
+>  	err = request_firmware(&fw, fwname, &hdev->dev);
+>  	if (err) {
