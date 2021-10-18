@@ -2,32 +2,32 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 64CDAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 21:30:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 13346C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 21:30:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 447FE6113D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 21:30:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E596B6113D
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 21:30:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232815AbhJRVct (ORCPT
+        id S232894AbhJRVdA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Oct 2021 17:32:49 -0400
-Received: from mailgw02.mediatek.com ([216.200.240.185]:24721 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231234AbhJRVct (ORCPT
+        Mon, 18 Oct 2021 17:33:00 -0400
+Received: from mailgw01.mediatek.com ([216.200.240.184]:36115 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231234AbhJRVc7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Oct 2021 17:32:49 -0400
-X-UUID: 4caaa648d7ec4175b7851ca336735ebc-20211018
-X-UUID: 4caaa648d7ec4175b7851ca336735ebc-20211018
-Received: from mtkcas68.mediatek.inc [(172.29.94.19)] by mailgw02.mediatek.com
+        Mon, 18 Oct 2021 17:32:59 -0400
+X-UUID: c30dd1dbf9904701b4e638f9c4041f17-20211018
+X-UUID: c30dd1dbf9904701b4e638f9c4041f17-20211018
+Received: from mtkcas66.mediatek.inc [(172.29.193.44)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (musrelay.mediatek.com ESMTP with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 730971796; Mon, 18 Oct 2021 14:30:35 -0700
+        with ESMTP id 955275006; Mon, 18 Oct 2021 14:30:45 -0700
 Received: from mtkcas11.mediatek.inc (172.21.101.40) by
  MTKMBS62N2.mediatek.inc (172.29.193.42) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 18 Oct 2021 14:30:33 -0700
+ 15.0.1497.2; Mon, 18 Oct 2021 14:30:43 -0700
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 19 Oct 2021 05:30:32 +0800
+ Transport; Tue, 19 Oct 2021 05:30:42 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -44,10 +44,11 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH v2 02/10] Bluetooth: btmtksido: rely on BT_MTK module
-Date:   Tue, 19 Oct 2021 05:30:13 +0800
-Message-ID: <bc03fff4c15bd7f7ec39a6424addb10948c1fba6.1634592181.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>,
+        Mark-yw Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH v2 05/10] Bluetooth: btmtksdio: move interrupt service to work
+Date:   Tue, 19 Oct 2021 05:30:16 +0800
+Message-ID: <f7dd8cfec4b21c96925b6bc280b6fd766178a974.1634592181.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 In-Reply-To: <cover.1634592181.git.objelf@gmail.com>
 References: <cover.1634592181.git.objelf@gmail.com>
@@ -60,366 +61,225 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Rely on btmtk module to reduce duplicated code
+btmtksdio belongs to WIFI/BT combo chip that would serve two radios in one
+sdio_irq so that we have to move interrupt service to worker to ensure ISR
+as short as possible.
 
+The worker would serve the both Tx and Rx in a batch to effectively reduce
+many interrupts to the host and to avoid excessive sdio lock contention
+between various context (even from WiFi driver) and help to be more
+efficient to complete command/event transation.
+
+Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/bluetooth/Kconfig     |   1 +
- drivers/bluetooth/btmtk.h     |   3 +
- drivers/bluetooth/btmtksdio.c | 192 +++++-----------------------------
- 3 files changed, 28 insertions(+), 168 deletions(-)
+ drivers/bluetooth/btmtksdio.c | 132 ++++++++++++++++------------------
+ 1 file changed, 63 insertions(+), 69 deletions(-)
 
-diff --git a/drivers/bluetooth/Kconfig b/drivers/bluetooth/Kconfig
-index 24c3aea4a7d6..36380e618ba4 100644
---- a/drivers/bluetooth/Kconfig
-+++ b/drivers/bluetooth/Kconfig
-@@ -388,6 +388,7 @@ config BT_ATH3K
- config BT_MTKSDIO
- 	tristate "MediaTek HCI SDIO driver"
- 	depends on MMC
-+	select BT_MTK
- 	help
- 	  MediaTek Bluetooth HCI SDIO driver.
- 	  This driver is required if you want to use MediaTek Bluetooth
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 87c25c6cf969..18f43c641b3b 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -9,6 +9,9 @@
- 
- enum {
- 	BTMTK_WMT_PATCH_DWNLD = 0x1,
-+	BTMTK_WMT_TEST = 0x2,
-+	BTMTK_WMT_WAKEUP = 0x3,
-+	BTMTK_WMT_HIF = 0x4,
- 	BTMTK_WMT_FUNC_CTRL = 0x6,
- 	BTMTK_WMT_RST = 0x7,
- 	BTMTK_WMT_SEMAPHORE = 0x17,
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 9872ef18f9fe..53682a4c2ced 100644
+index 57126a95e292..f712b52e5797 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -12,7 +12,6 @@
- 
- #include <asm/unaligned.h>
- #include <linux/atomic.h>
--#include <linux/firmware.h>
- #include <linux/init.h>
- #include <linux/iopoll.h>
- #include <linux/kernel.h>
-@@ -28,12 +27,10 @@
- #include <net/bluetooth/hci_core.h>
- 
- #include "h4_recv.h"
-+#include "btmtk.h"
- 
- #define VERSION "0.1"
- 
--#define FIRMWARE_MT7663		"mediatek/mt7663pr2h.bin"
--#define FIRMWARE_MT7668		"mediatek/mt7668pr2h.bin"
--
- #define MTKBTSDIO_AUTOSUSPEND_DELAY	8000
- 
- static bool enable_autosuspend;
-@@ -90,69 +87,12 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
- 
- #define BTMTKSDIO_TX_WAIT_VND_EVT	1
- 
--enum {
--	MTK_WMT_PATCH_DWNLD = 0x1,
--	MTK_WMT_TEST = 0x2,
--	MTK_WMT_WAKEUP = 0x3,
--	MTK_WMT_HIF = 0x4,
--	MTK_WMT_FUNC_CTRL = 0x6,
--	MTK_WMT_RST = 0x7,
--	MTK_WMT_SEMAPHORE = 0x17,
--};
--
--enum {
--	BTMTK_WMT_INVALID,
--	BTMTK_WMT_PATCH_UNDONE,
--	BTMTK_WMT_PATCH_DONE,
--	BTMTK_WMT_ON_UNDONE,
--	BTMTK_WMT_ON_DONE,
--	BTMTK_WMT_ON_PROGRESS,
--};
--
- struct mtkbtsdio_hdr {
- 	__le16	len;
- 	__le16	reserved;
- 	u8	bt_type;
- } __packed;
- 
--struct mtk_wmt_hdr {
--	u8	dir;
--	u8	op;
--	__le16	dlen;
--	u8	flag;
--} __packed;
--
--struct mtk_hci_wmt_cmd {
--	struct mtk_wmt_hdr hdr;
--	u8 data[256];
--} __packed;
--
--struct btmtk_hci_wmt_evt {
--	struct hci_event_hdr hhdr;
--	struct mtk_wmt_hdr whdr;
--} __packed;
--
--struct btmtk_hci_wmt_evt_funcc {
--	struct btmtk_hci_wmt_evt hwhdr;
--	__be16 status;
--} __packed;
--
--struct btmtk_tci_sleep {
--	u8 mode;
--	__le16 duration;
--	__le16 host_duration;
--	u8 host_wakeup_pin;
--	u8 time_compensation;
--} __packed;
--
--struct btmtk_hci_wmt_params {
--	u8 op;
--	u8 flag;
--	u16 dlen;
--	const void *data;
--	u32 *status;
--};
--
- struct btmtksdio_dev {
- 	struct hci_dev *hdev;
+@@ -98,7 +98,7 @@ struct btmtksdio_dev {
  	struct sdio_func *func;
-@@ -174,27 +114,32 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	struct btmtk_hci_wmt_evt_funcc *wmt_evt_funcc;
- 	u32 hlen, status = BTMTK_WMT_INVALID;
- 	struct btmtk_hci_wmt_evt *wmt_evt;
--	struct mtk_hci_wmt_cmd wc;
--	struct mtk_wmt_hdr *hdr;
-+	struct btmtk_hci_wmt_cmd *wc;
-+	struct btmtk_wmt_hdr *hdr;
- 	int err;
+ 	struct device *dev;
  
-+	/* Send the WMT command and wait until the WMT event returns */
- 	hlen = sizeof(*hdr) + wmt_params->dlen;
- 	if (hlen > 255)
- 		return -EINVAL;
+-	struct work_struct tx_work;
++	struct work_struct txrx_work;
+ 	unsigned long tx_state;
+ 	struct sk_buff_head txq;
  
--	hdr = (struct mtk_wmt_hdr *)&wc;
-+	wc = kzalloc(hlen, GFP_KERNEL);
-+	if (!wc)
-+		return -ENOMEM;
-+
-+	hdr = &wc->hdr;
- 	hdr->dir = 1;
- 	hdr->op = wmt_params->op;
- 	hdr->dlen = cpu_to_le16(wmt_params->dlen + 1);
- 	hdr->flag = wmt_params->flag;
--	memcpy(wc.data, wmt_params->data, wmt_params->dlen);
-+	memcpy(wc->data, wmt_params->data, wmt_params->dlen);
- 
- 	set_bit(BTMTKSDIO_TX_WAIT_VND_EVT, &bdev->tx_state);
- 
--	err = __hci_cmd_send(hdev, 0xfc6f, hlen, &wc);
-+	err = __hci_cmd_send(hdev, 0xfc6f, hlen, wc);
- 	if (err < 0) {
- 		clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT, &bdev->tx_state);
--		return err;
-+		goto err_free_wc;
- 	}
- 
- 	/* The vendor specific WMT commands are all answered by a vendor
-@@ -211,13 +156,14 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	if (err == -EINTR) {
- 		bt_dev_err(hdev, "Execution of wmt command interrupted");
- 		clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT, &bdev->tx_state);
--		return err;
-+		goto err_free_wc;
- 	}
- 
- 	if (err) {
- 		bt_dev_err(hdev, "Execution of wmt command timed out");
- 		clear_bit(BTMTKSDIO_TX_WAIT_VND_EVT, &bdev->tx_state);
--		return -ETIMEDOUT;
-+		err = -ETIMEDOUT;
-+		goto err_free_wc;
- 	}
- 
- 	/* Parse and handle the return WMT event */
-@@ -230,13 +176,13 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
- 	}
- 
- 	switch (wmt_evt->whdr.op) {
--	case MTK_WMT_SEMAPHORE:
-+	case BTMTK_WMT_SEMAPHORE:
- 		if (wmt_evt->whdr.flag == 2)
- 			status = BTMTK_WMT_PATCH_UNDONE;
- 		else
- 			status = BTMTK_WMT_PATCH_DONE;
- 		break;
--	case MTK_WMT_FUNC_CTRL:
-+	case BTMTK_WMT_FUNC_CTRL:
- 		wmt_evt_funcc = (struct btmtk_hci_wmt_evt_funcc *)wmt_evt;
- 		if (be16_to_cpu(wmt_evt_funcc->status) == 0x404)
- 			status = BTMTK_WMT_ON_DONE;
-@@ -253,6 +199,8 @@ static int mtk_hci_wmt_sync(struct hci_dev *hdev,
- err_free_skb:
- 	kfree_skb(bdev->evt_skb);
- 	bdev->evt_skb = NULL;
-+err_free_wc:
-+	kfree(wc);
- 
- 	return err;
- }
-@@ -663,7 +611,7 @@ static int btmtksdio_func_query(struct hci_dev *hdev)
- 	u8 param = 0;
- 
- 	/* Query whether the function is enabled */
--	wmt_params.op = MTK_WMT_FUNC_CTRL;
-+	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
- 	wmt_params.flag = 4;
- 	wmt_params.dlen = sizeof(param);
- 	wmt_params.data = &param;
-@@ -678,96 +626,6 @@ static int btmtksdio_func_query(struct hci_dev *hdev)
- 	return status;
+@@ -249,32 +249,6 @@ static u32 btmtksdio_drv_own_query(struct btmtksdio_dev *bdev)
+ 	return sdio_readl(bdev->func, MTK_REG_CHLPCR, NULL);
  }
  
--static int mtk_setup_firmware(struct hci_dev *hdev, const char *fwname)
+-static void btmtksdio_tx_work(struct work_struct *work)
 -{
--	struct btmtk_hci_wmt_params wmt_params;
--	const struct firmware *fw;
--	const u8 *fw_ptr;
--	size_t fw_size;
--	int err, dlen;
--	u8 flag, param;
+-	struct btmtksdio_dev *bdev = container_of(work, struct btmtksdio_dev,
+-						  tx_work);
+-	struct sk_buff *skb;
+-	int err;
 -
--	err = request_firmware(&fw, fwname, &hdev->dev);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to load firmware file (%d)", err);
--		return err;
--	}
+-	pm_runtime_get_sync(bdev->dev);
 -
--	/* Power on data RAM the firmware relies on. */
--	param = 1;
--	wmt_params.op = MTK_WMT_FUNC_CTRL;
--	wmt_params.flag = 3;
--	wmt_params.dlen = sizeof(param);
--	wmt_params.data = &param;
--	wmt_params.status = NULL;
+-	sdio_claim_host(bdev->func);
 -
--	err = mtk_hci_wmt_sync(hdev, &wmt_params);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to power on data RAM (%d)", err);
--		goto free_fw;
--	}
--
--	fw_ptr = fw->data;
--	fw_size = fw->size;
--
--	/* The size of patch header is 30 bytes, should be skip */
--	if (fw_size < 30) {
--		err = -EINVAL;
--		goto free_fw;
--	}
--
--	fw_size -= 30;
--	fw_ptr += 30;
--	flag = 1;
--
--	wmt_params.op = MTK_WMT_PATCH_DWNLD;
--	wmt_params.status = NULL;
--
--	while (fw_size > 0) {
--		dlen = min_t(int, 250, fw_size);
--
--		/* Tell device the position in sequence */
--		if (fw_size - dlen <= 0)
--			flag = 3;
--		else if (fw_size < fw->size - 30)
--			flag = 2;
--
--		wmt_params.flag = flag;
--		wmt_params.dlen = dlen;
--		wmt_params.data = fw_ptr;
--
--		err = mtk_hci_wmt_sync(hdev, &wmt_params);
+-	while ((skb = skb_dequeue(&bdev->txq))) {
+-		err = btmtksdio_tx_packet(bdev, skb);
 -		if (err < 0) {
--			bt_dev_err(hdev, "Failed to send wmt patch dwnld (%d)",
--				   err);
--			goto free_fw;
+-			bdev->hdev->stat.err_tx++;
+-			skb_queue_head(&bdev->txq, skb);
+-			break;
 -		}
--
--		fw_size -= dlen;
--		fw_ptr += dlen;
 -	}
 -
--	wmt_params.op = MTK_WMT_RST;
--	wmt_params.flag = 4;
--	wmt_params.dlen = 0;
--	wmt_params.data = NULL;
--	wmt_params.status = NULL;
+-	sdio_release_host(bdev->func);
 -
--	/* Activate funciton the firmware providing to */
--	err = mtk_hci_wmt_sync(hdev, &wmt_params);
--	if (err < 0) {
--		bt_dev_err(hdev, "Failed to send wmt rst (%d)", err);
--		goto free_fw;
--	}
--
--	/* Wait a few moments for firmware activation done */
--	usleep_range(10000, 12000);
--
--free_fw:
--	release_firmware(fw);
--	return err;
+-	pm_runtime_mark_last_busy(bdev->dev);
+-	pm_runtime_put_autosuspend(bdev->dev);
 -}
 -
- static int btmtksdio_setup(struct hci_dev *hdev)
+ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
  {
  	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-@@ -782,7 +640,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 	calltime = ktime_get();
+@@ -425,63 +399,81 @@ static int btmtksdio_rx_packet(struct btmtksdio_dev *bdev, u16 rx_size)
+ 	return err;
+ }
  
- 	/* Query whether the firmware is already download */
--	wmt_params.op = MTK_WMT_SEMAPHORE;
-+	wmt_params.op = BTMTK_WMT_SEMAPHORE;
- 	wmt_params.flag = 1;
- 	wmt_params.dlen = 0;
- 	wmt_params.data = NULL;
-@@ -800,7 +658,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 	}
+-static void btmtksdio_interrupt(struct sdio_func *func)
++static void btmtksdio_txrx_work(struct work_struct *work)
+ {
+-	struct btmtksdio_dev *bdev = sdio_get_drvdata(func);
++	struct btmtksdio_dev *bdev = container_of(work, struct btmtksdio_dev,
++						  txrx_work);
++	unsigned long txrx_timeout;
++	struct sk_buff *skb;
+ 	u32 int_status;
+ 	u16 rx_size;
+-
+-	/* It is required that the host gets ownership from the device before
+-	 * accessing any register, however, if SDIO host is not being released,
+-	 * a potential deadlock probably happens in a circular wait between SDIO
+-	 * IRQ work and PM runtime work. So, we have to explicitly release SDIO
+-	 * host here and claim again after the PM runtime work is all done.
+-	 */
+-	sdio_release_host(bdev->func);
++	int err;
  
- 	/* Setup a firmware which the device definitely requires */
--	err = mtk_setup_firmware(hdev, bdev->data->fwname);
-+	err = btmtk_setup_firmware(hdev, bdev->data->fwname, mtk_hci_wmt_sync);
- 	if (err < 0)
- 		return err;
- 
-@@ -823,7 +681,7 @@ static int btmtksdio_setup(struct hci_dev *hdev)
- 	}
- 
- 	/* Enable Bluetooth protocol */
--	wmt_params.op = MTK_WMT_FUNC_CTRL;
-+	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
- 	wmt_params.flag = 0;
- 	wmt_params.dlen = sizeof(param);
- 	wmt_params.data = &param;
-@@ -891,7 +749,7 @@ static int btmtksdio_shutdown(struct hci_dev *hdev)
  	pm_runtime_get_sync(bdev->dev);
  
- 	/* Disable the device */
--	wmt_params.op = MTK_WMT_FUNC_CTRL;
-+	wmt_params.op = BTMTK_WMT_FUNC_CTRL;
- 	wmt_params.flag = 0;
- 	wmt_params.dlen = sizeof(param);
- 	wmt_params.data = &param;
-@@ -1112,5 +970,3 @@ MODULE_AUTHOR("Sean Wang <sean.wang@mediatek.com>");
- MODULE_DESCRIPTION("MediaTek Bluetooth SDIO driver ver " VERSION);
- MODULE_VERSION(VERSION);
- MODULE_LICENSE("GPL");
--MODULE_FIRMWARE(FIRMWARE_MT7663);
--MODULE_FIRMWARE(FIRMWARE_MT7668);
+ 	sdio_claim_host(bdev->func);
+ 
+ 	/* Disable interrupt */
+-	sdio_writel(func, C_INT_EN_CLR, MTK_REG_CHLPCR, NULL);
++	sdio_writel(bdev->func, C_INT_EN_CLR, MTK_REG_CHLPCR, 0);
+ 
+-	int_status = sdio_readl(func, MTK_REG_CHISR, NULL);
++	while ((skb = skb_dequeue(&bdev->txq))) {
++		err = btmtksdio_tx_packet(bdev, skb);
++		if (err < 0) {
++			bdev->hdev->stat.err_tx++;
++			skb_queue_head(&bdev->txq, skb);
++			break;
++		}
++	}
+ 
+-	/* Ack an interrupt as soon as possible before any operation on
+-	 * hardware.
+-	 *
+-	 * Note that we don't ack any status during operations to avoid race
+-	 * condition between the host and the device such as it's possible to
+-	 * mistakenly ack RX_DONE for the next packet and then cause interrupts
+-	 * not be raised again but there is still pending data in the hardware
+-	 * FIFO.
+-	 */
+-	sdio_writel(func, int_status, MTK_REG_CHISR, NULL);
++	txrx_timeout = jiffies + 5 * HZ;
++
++	do {
++		int_status = sdio_readl(bdev->func, MTK_REG_CHISR, NULL);
++
++		/* Ack an interrupt as soon as possible before any operation on
++		 * hardware.
++		 *
++		 * Note that we don't ack any status during operations to avoid race
++		 * condition between the host and the device such as it's possible to
++		 * mistakenly ack RX_DONE for the next packet and then cause interrupts
++		 * not be raised again but there is still pending data in the hardware
++		 * FIFO.
++		 */
++		sdio_writel(bdev->func, int_status, MTK_REG_CHISR, NULL);
++
++		if (int_status & FW_OWN_BACK_INT)
++			bt_dev_dbg(bdev->hdev, "Get fw own back");
++
++		if (int_status & TX_EMPTY)
++			schedule_work(&bdev->txrx_work);
++		else if (unlikely(int_status & TX_FIFO_OVERFLOW))
++			bt_dev_warn(bdev->hdev, "Tx fifo overflow");
++
++		if (int_status & RX_DONE_INT) {
++			rx_size = (int_status & RX_PKT_LEN) >> 16;
++			if (btmtksdio_rx_packet(bdev, rx_size) < 0)
++				bdev->hdev->stat.err_rx++;
++		}
+ 
+-	if (unlikely(!int_status))
+-		bt_dev_err(bdev->hdev, "CHISR is 0");
++	} while (int_status || time_is_before_jiffies(txrx_timeout));
+ 
+-	if (int_status & FW_OWN_BACK_INT)
+-		bt_dev_dbg(bdev->hdev, "Get fw own back");
++	/* Enable interrupt */
++	sdio_writel(bdev->func, C_INT_EN_SET, MTK_REG_CHLPCR, 0);
+ 
+-	if (int_status & TX_EMPTY)
+-		schedule_work(&bdev->tx_work);
+-	else if (unlikely(int_status & TX_FIFO_OVERFLOW))
+-		bt_dev_warn(bdev->hdev, "Tx fifo overflow");
++	sdio_release_host(bdev->func);
+ 
+-	if (int_status & RX_DONE_INT) {
+-		rx_size = (int_status & RX_PKT_LEN) >> 16;
++	pm_runtime_mark_last_busy(bdev->dev);
++	pm_runtime_put_autosuspend(bdev->dev);
++}
+ 
+-		if (btmtksdio_rx_packet(bdev, rx_size) < 0)
+-			bdev->hdev->stat.err_rx++;
+-	}
++static void btmtksdio_interrupt(struct sdio_func *func)
++{
++	struct btmtksdio_dev *bdev = sdio_get_drvdata(func);
+ 
+-	/* Enable interrupt */
+-	sdio_writel(func, C_INT_EN_SET, MTK_REG_CHLPCR, NULL);
++	/* Disable interrupt */
++	sdio_writel(bdev->func, C_INT_EN_CLR, MTK_REG_CHLPCR, 0);
+ 
+-	pm_runtime_mark_last_busy(bdev->dev);
+-	pm_runtime_put_autosuspend(bdev->dev);
++	schedule_work(&bdev->txrx_work);
+ }
+ 
+ static int btmtksdio_open(struct hci_dev *hdev)
+@@ -583,6 +575,8 @@ static int btmtksdio_close(struct hci_dev *hdev)
+ 
+ 	sdio_release_irq(bdev->func);
+ 
++	cancel_work_sync(&bdev->txrx_work);
++
+ 	/* Return ownership to the device */
+ 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, NULL);
+ 
+@@ -604,7 +598,7 @@ static int btmtksdio_flush(struct hci_dev *hdev)
+ 
+ 	skb_queue_purge(&bdev->txq);
+ 
+-	cancel_work_sync(&bdev->tx_work);
++	cancel_work_sync(&bdev->txrx_work);
+ 
+ 	return 0;
+ }
+@@ -795,7 +789,7 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	skb_queue_tail(&bdev->txq, skb);
+ 
+-	schedule_work(&bdev->tx_work);
++	schedule_work(&bdev->txrx_work);
+ 
+ 	return 0;
+ }
+@@ -818,7 +812,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	bdev->dev = &func->dev;
+ 	bdev->func = func;
+ 
+-	INIT_WORK(&bdev->tx_work, btmtksdio_tx_work);
++	INIT_WORK(&bdev->txrx_work, btmtksdio_txrx_work);
+ 	skb_queue_head_init(&bdev->txq);
+ 
+ 	/* Initialize and register HCI device */
 -- 
 2.25.1
 
