@@ -2,287 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE512C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 16:24:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 513B4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 17:28:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A67BA61077
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 16:24:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 35CF960EE9
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 18 Oct 2021 17:28:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233706AbhJRQ0o (ORCPT
+        id S234099AbhJRRaw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 18 Oct 2021 12:26:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47608 "EHLO
+        Mon, 18 Oct 2021 13:30:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:34036 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231787AbhJRQ0j (ORCPT
+        with ESMTP id S233692AbhJRRav (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 18 Oct 2021 12:26:39 -0400
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8604C061765
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Oct 2021 09:24:27 -0700 (PDT)
-Received: by mail-ua1-x92c.google.com with SMTP id i15so6251433uap.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Oct 2021 09:24:27 -0700 (PDT)
+        Mon, 18 Oct 2021 13:30:51 -0400
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 679CFC06161C
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Oct 2021 10:28:40 -0700 (PDT)
+Received: by mail-pl1-x62e.google.com with SMTP id i5so5506742pla.5
+        for <linux-bluetooth@vger.kernel.org>; Mon, 18 Oct 2021 10:28:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=hXqQMu4CFpRJyXFFj2tY9v4jAiViSyYBSZFwPlFWY5Q=;
-        b=j0TG+TL78EU5pwR/jmXMP3euQ5fkZgh0I+Wk93/Xv/MoO8AkA+mG6JIeKKiTJel8rx
-         o/dQv7JqNXrZq3d/jwqUWZsXM9TmMGDCd1T9z7T10S6e6CHPaOeSQV/xUO3a2v7u3ygM
-         Ee5CLN/JIBO/W9cYJwV2++x5kc+ICkVBNThpjgmkmZbHP9y/G4AgAndTf4DNB5pYl3Vs
-         YIniUuHg9cuqbnvdI8iTT+JqE2EM9bn9rqw8ZEnjNm5w9doIZjX096R4THhGO1Ra4an0
-         RfqMLm+zcqvMJgJJIsGmRonEwR4DM5wsSuhgDSLGBEFgOjBuomQbaMdjqCfNlm6MifhL
-         TyOg==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oPGiMYVcFP/PRF1iUKLfRdTZL2d6ebR3k2DQI7qC/DY=;
+        b=aHbq26lhgagSzppCtiWKmlolH+OhGP4KxHSHIVz6th939mHqDyPenLHn/NMHTxTmTM
+         zvIMPgv6Y+Vn9WdqDBePD4vRT9YYtEwBzqHP8N/+Zp+9tEcN93wN1WKhN7+1LFBnTPAa
+         sxEkDVas0m6i41gZDQS76NjnJnd0UZ7I7wX28oZOkLfQNO+vm7V64MHFCjuDkIFxTTNG
+         9+tDnGYooVHLfa0gHtg3Ahp/wc+9xD2jZLwiC9QBObh6FM9xVrVUQbm9pMKCCzNLo2Ty
+         7CBNM335FXkg1KJbGXMvKhI9TqnREVb5XwR34iUZz2XGtdl1lNfPi6kbn1dHf6U+nwgG
+         x3cw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=hXqQMu4CFpRJyXFFj2tY9v4jAiViSyYBSZFwPlFWY5Q=;
-        b=jPG+3n7eNtP3ZZ1AJWkQHnO1DGSSfIDKSz7HJXqBbld6oVy1aAqjHcN2FStGm8r24d
-         +0if5G148LM+9pskpgGlSptCUA0zdbXGftbX/Vc34DRwUMTlLzsWIFdHdeHx2QieckJg
-         g7a8JPSGqd21C/zTBX6uyWtrC5Uvl4L+Ba+GyFOJ99i0diy2iXBMJRuLHc5+zwF9vH+k
-         79qrJ200cRWSvtDH5oKbgAL9f4cTO9p0CECCriVxwhU2Eg6AI1PYUSABgsQ+dyD049eX
-         AMwPBWRH1vmB+b/S8YUSz+8+0PtJiDX/RjhKrtzpi2pFHZhCdsctAG2Xvh56/PD27ZHs
-         sz4w==
-X-Gm-Message-State: AOAM5321HWkRcMVpX2uqds4wBmvieZfA2ICHmsb+Hvm5I4NQnXHiwpdm
-        y6zwby/LvIRhNJYtnHOtBvxTmwjoOWJ8t7wpjNqTaUV5
-X-Google-Smtp-Source: ABdhPJw9ib2UAhfjBZI8XnEyuiCT1xsucqlgBVt5jJznyUBgpAFF9mZ/kwx43CeFwCV1zIDX3u1awERvRd9Af4QL1/o=
-X-Received: by 2002:a67:2e16:: with SMTP id u22mr29066509vsu.61.1634574266832;
- Mon, 18 Oct 2021 09:24:26 -0700 (PDT)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=oPGiMYVcFP/PRF1iUKLfRdTZL2d6ebR3k2DQI7qC/DY=;
+        b=55xFs7pIG29U6huAZNCz4LrtHFsvGnBaIKhjzFctt+xLiU7IqCTpdfhETTkko5jyYY
+         PCi1T5kyWHE+aWb7YlmvZ3Peq2wVSAkwuj1+kL3B3mbBTYyV9z3Exjz513Zf9IR3jh2t
+         dnp95gPrGpSdqcH+XidAc68pJ0ESbmtE2h0tPjWAxRLSZmcXH9BngYqZNXgbUa5K0noW
+         /Qmd4ftpmV4XKssuA+gUyxtCye+rmym34kNoFFr03F3zYy7r7kHlo6IR4jry/qKfjilN
+         HpXJHTuBr9zZXwCDfszcw/6HsoGnh5hwcnsZ50CxkmZ4E9FgvT1xN5rBwt1Ag4d75WAH
+         gJQw==
+X-Gm-Message-State: AOAM533ITCDhrsLVD/3Mzbg4GUIQRpwvSPQkHbiPCynDttfuTSOCE/5X
+        AOICvSHAQc5k11YQ3s9zLr6r2iPr9RlHRA==
+X-Google-Smtp-Source: ABdhPJxHX7qCkbPLfPz9WA92mQAqGiCAqyF0041EFBuIq0SmpJTrpgurpPJpI9ShmRHPLXlFvJzOWw==
+X-Received: by 2002:a17:90b:33c3:: with SMTP id lk3mr189721pjb.237.1634578119618;
+        Mon, 18 Oct 2021 10:28:39 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:a510:aebd:a4ae:453c])
+        by smtp.gmail.com with ESMTPSA id fv9sm51156pjb.26.2021.10.18.10.28.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 18 Oct 2021 10:28:39 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [BlueZ PATCH 0/9] Fix unchecked return value
+Date:   Mon, 18 Oct 2021 10:28:24 -0700
+Message-Id: <20211018172833.534191-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-References: <20211015050929.3130100-1-luiz.dentz@gmail.com> <CAGPPCLDFYFeiwfiyRX=6PquYYQ-Fp_LpN4Gw2745jyWzQKEBRQ@mail.gmail.com>
-In-Reply-To: <CAGPPCLDFYFeiwfiyRX=6PquYYQ-Fp_LpN4Gw2745jyWzQKEBRQ@mail.gmail.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 18 Oct 2021 09:24:16 -0700
-Message-ID: <CABBYNZJVLD1gw062NepifuHssKfekk9LHEx+xu5XSX6AwWts_w@mail.gmail.com>
-Subject: Re: [PATCH BlueZ 1/7] monitor: Add packet definitions for MSFT extension
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-On Mon, Oct 18, 2021 at 7:53 AM Manish Mandlik <mmandlik@google.com> wrote:
->
-> Hi Luiz,
->
-> On Fri, Oct 15, 2021 at 1:09 AM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
->>
->> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>
->> This adds proper packet definitions for command and response of MSFT
->> extension.
->> ---
->>  monitor/msft.h | 148 +++++++++++++++++++++++++++++++++++++++++++++++++
->>  1 file changed, 148 insertions(+)
->>
->> diff --git a/monitor/msft.h b/monitor/msft.h
->> index a268f4bc7..90a64117a 100644
->> --- a/monitor/msft.h
->> +++ b/monitor/msft.h
->> @@ -24,6 +24,154 @@
->>
->>  #include <stdint.h>
->>
->> +#define MSFT_SUBCMD_READ_SUPPORTED_FEATURES    0x00
->> +
->> +struct msft_cmd_read_supported_features {
->> +       uint8_t subcmd;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_read_supported_features {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +       uint8_t  features[8];
->> +       uint8_t  evt_prefix_len;
->> +       uint8_t  evt_prefix[];
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_MONITOR_RSSI               0x01
->> +
->> +struct msft_cmd_monitor_rssi {
->> +       uint8_t  subcmd;
->> +       uint16_t handle;
->> +       int8_t   rssi_high;
->> +       int8_t   rssi_low;
->> +       uint8_t  rssi_low_interval;
->> +       uint8_t  rssi_period;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_monitor_rssi {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_CANCEL_MONITOR_RSSI                0x02
->> +
->> +struct msft_cmd_cancel_monitor_rssi {
->> +       uint8_t  subcmd;
->> +       uint16_t handle;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_cancel_monitor_rssi {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_LE_MONITOR_ADV             0x03
->> +
->> +struct msft_le_monitor_pattern {
->> +       uint8_t  len;
->> +       uint8_t  type;
->> +       uint8_t  start;
->> +       uint8_t  data[];
->> +} __attribute__((packed));
->> +
->
->
-> +    #define MSFT_COND_LE_MONITOR_ADV_PATTERN                0x01
->>
->> +struct msft_le_monitor_adv_pattern_type {
->> +       uint8_t num_patterns;
->> +       struct msft_le_monitor_pattern data[];
->> +} __attribute__((packed));
->> +
->
->
-> +    #define MSFT_COND_LE_MONITOR_ADV_UUID                0x02
->>
->> +struct msft_le_monitor_adv_uuid_type {
->> +       uint8_t  type;
->> +       union {
->> +               uint16_t u16;
->> +               uint32_t u32;
->> +               uint8_t  u128[8];
->> +       } value;
->> +} __attribute__((packed));
->> +
->
->
-> +   #define MSFT_COND_LE_MONITOR_ADV_IRK                0x03
->>
->> +struct msft_le_monitor_adv_irk_type {
->> +       uint8_t  irk[8];
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_LE_MONITOR_ADV_ADDR                0x04
->
-> I think this is not a subcommand. Instead, it is a condition type. So we can rename this to something else, e.g. MSFT_COND_LE_MONITOR_ADV_ADDR.
-> Similarly, we'll have to define other three condition types as well for msft_le_monitor_adv_pattern_type, msft_le_monitor_adv_uuid_type and msft_le_monitor_adv_irk_type as mentioned above.
+This patch series fixes the unchecked return value(CWE-252) issues
+reported by the Coverity scan.
 
-Right I will fix it since the intent was to have it as conditions,
-thanks for reviewing.
+The idea is to make the change as simple as possible without changing
+the functional flow. So, it logs the output when the function fails
+after checking the return value.
 
->> +struct msft_le_monitor_adv_addr {
->> +       uint8_t  type;
->> +       uint8_t  addr[6];
->> +} __attribute__((packed));
->> +
->> +struct msft_cmd_le_monitor_adv {
->> +       uint8_t  subcmd;
->> +       int8_t   rssi_low;
->> +       int8_t   rssi_high;
->
-> Order should be:
-> +       int8_t   rssi_high;
-> +       int8_t   rssi_low;
->>
->> +       uint8_t  rssi_low_interval;
->> +       uint8_t  rssi_period;
->> +       uint8_t  type;
->> +       uint8_t  data[];
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_le_monitor_adv {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +       uint8_t  handle;
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_LE_CANCEL_MONITOR_ADV      0x04
->> +
->> +struct msft_cmd_le_cancel_monitor_adv {
->> +       uint8_t  subcmd;
->> +       uint8_t  handle;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_le_cancel_monitor_adv {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_LE_MONITOR_ADV_ENABLE      0x05
->> +
->> +struct msft_cmd_le_monitor_adv_enable {
->> +       uint8_t  subcmd;
->> +       uint8_t  enable;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_le_monitor_adv_enable {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBCMD_READ_ABS_RSSI              0x06
->> +
->> +struct msft_cmd_read_abs_rssi {
->> +       uint8_t  subcmd;
->> +       uint16_t handle;
->> +} __attribute__((packed));
->> +
->> +struct msft_rsp_read_abs_rssi {
->> +       uint8_t  status;
->> +       uint8_t  subcmd;
->> +       uint16_t handle;
->> +       uint8_t  rssi;
+Tedd Ho-Jeong An (9):
+  device: Fix unchecked return value
+  adapter: Fix unchecked return value
+  attrib-server: Fix unchecked return value
+  plugins/admin: Fix unchecked return value
+  profiles/a2dp: Fix unchecked return value
+  profiles/input: Fix unchecked return value
+  mesh: Fix unchecked return value
+  obexd: Fix unchecked return value
+  peripheral: Fix unchecked return value
 
-Ack.
-
-> 'int8_t rssi' instead of 'uint8_t rssi'
->
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBEVT_RSSI                       0x01
->> +
->> +struct msft_evt_rssi {
->> +       uint8_t  subevt;
->> +       uint8_t  status;
->> +       uint16_t handle;
->> +       uint8_t  rssi;
->
-> same as above - 'int8_t rssi' instead of 'uint8_t rssi'
-
-Ack.
-
->
->> +} __attribute__((packed));
->> +
->> +#define MSFT_SUBEVT_MONITOR_DEVICE             0x02
->> +
->> +struct msft_evt_monitor_device {
->> +       uint8_t  subevt;
->> +       uint8_t  addr_type;
->> +       uint8_t  addr[6];
->> +       uint8_t  handle;
->> +       uint8_t  state;
->> +} __attribute__((packed));
->> +
->>  struct vendor_ocf;
->>  struct vendor_evt;
->>
->> --
->> 2.31.1
->>
->
-> Rest of the changes look good to me.
->
-> Thanks,
-> Manish.
-
-
+ mesh/keyring.c          |   6 +-
+ mesh/mesh-io-unit.c     |   6 +-
+ mesh/rpl.c              |  22 ++--
+ mesh/util.c             |  11 +-
+ obexd/client/transfer.c |  12 +-
+ obexd/plugins/pcsuite.c |   4 +-
+ obexd/src/main.c        |   4 +-
+ peripheral/main.c       |   3 +-
+ plugins/admin.c         |  15 ++-
+ profiles/audio/a2dp.c   |  33 +++++-
+ profiles/input/device.c |   6 +-
+ src/adapter.c           | 249 ++++++++++++++++++++++++++++++++++------
+ src/attrib-server.c     |  21 +++-
+ src/device.c            | 141 +++++++++++++++++++----
+ 14 files changed, 441 insertions(+), 92 deletions(-)
 
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
