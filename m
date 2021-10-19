@@ -2,64 +2,75 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E7411C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:27:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A6BECC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:29:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C71006137F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:27:39 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8B34C61260
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:29:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232633AbhJSS3v (ORCPT
+        id S234361AbhJSSbm convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Oct 2021 14:29:51 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:60413 "EHLO
+        Tue, 19 Oct 2021 14:31:42 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:53923 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231783AbhJSS3v (ORCPT
+        with ESMTP id S231783AbhJSSbm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Oct 2021 14:29:51 -0400
+        Tue, 19 Oct 2021 14:31:42 -0400
 Received: from smtpclient.apple (p54899aa7.dip0.t-ipconnect.de [84.137.154.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 81A70CED07;
-        Tue, 19 Oct 2021 20:27:37 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 3A778CED07;
+        Tue, 19 Oct 2021 20:29:28 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH 2/2] bluetooth: use dev_addr_set()
+Subject: Re: [PATCH 1/2] Bluetooth: btrtl: Add support for RTL8822C hci_ver
+ 0x08
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211019163346.1384785-2-kuba@kernel.org>
-Date:   Tue, 19 Oct 2021 20:27:37 +0200
+In-Reply-To: <20211019095738.2098486-2-adeep@lexina.in>
+Date:   Tue, 19 Oct 2021 20:29:27 +0200
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <AE0C60C4-E752-4516-87B1-325BC03CBB01@holtmann.org>
-References: <20211019163346.1384785-1-kuba@kernel.org>
- <20211019163346.1384785-2-kuba@kernel.org>
-To:     Jakub Kicinski <kuba@kernel.org>
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        chbgdn <chbgdn@gmail.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F99878E7-51E7-48B0-921B-8CDD53693E04@holtmann.org>
+References: <20211019095738.2098486-1-adeep@lexina.in>
+ <20211019095738.2098486-2-adeep@lexina.in>
+To:     Vyacheslav Bocharov <adeep@lexina.in>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Jakub,
+Hi Vyacheslav,
 
-> Commit 406f42fa0d3c ("net-next: When a bond have a massive amount
-> of VLANs...") introduced a rbtree for faster Ethernet address look
-> up. To maintain netdev->dev_addr in this tree we need to make all
-> the writes to it got through appropriate helpers.
+> Add detection of RTL8822CS controller with hci_ver = 0x08
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: marcel@holtmann.org
-> CC: johan.hedberg@gmail.com
-> CC: luiz.dentz@gmail.com
-> CC: linux-bluetooth@vger.kernel.org
-> ---
-> net/bluetooth/6lowpan.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
+> Signed-off-by: chbgdn <chbgdn@gmail.com>
 
-please also take this directly via net-next.
+clear name please.
 
-Acked-by: Marcel Holtmann <marcel@holtmann.org>
-Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
+> Signed-off-by: Vyacheslav Bocharov <adeep@lexina.in>
+> ---
+> drivers/bluetooth/btrtl.c | 7 +++++++
+> 1 file changed, 7 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
+> index 1f8afa0244d8..60c4a9976d5a 100644
+> --- a/drivers/bluetooth/btrtl.c
+> +++ b/drivers/bluetooth/btrtl.c
+> @@ -152,6 +152,13 @@ static const struct id_table ic_id_table[] = {
+> 	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
+> 	  .cfg_name = "rtl_bt/rtl8822cs_config" },
+> 
+> +	/* 8822C with UART interface */
+> +	{ IC_INFO(RTL_ROM_LMP_8822B, 0xc, 0x8, HCI_UART),
+> +	  .config_needed = true,
+> +	  .has_rom_version = true,
+> +	  .fw_name  = "rtl_bt/rtl8822cs_fw.bin",
+> +	  .cfg_name = "rtl_bt/rtl8822cs_config" },
+> +
+
+what about the .has_msft_ext here. Does this one support the Microsoft extension?
 
 Regards
 
