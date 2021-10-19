@@ -2,37 +2,37 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 07061C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:26:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E7411C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:27:39 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D4E266139D
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:26:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C71006137F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 18:27:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233944AbhJSS2z (ORCPT
+        id S232633AbhJSS3v (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Oct 2021 14:28:55 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:37080 "EHLO
+        Tue, 19 Oct 2021 14:29:51 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:60413 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234531AbhJSS2y (ORCPT
+        with ESMTP id S231783AbhJSS3v (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Oct 2021 14:28:54 -0400
+        Tue, 19 Oct 2021 14:29:51 -0400
 Received: from smtpclient.apple (p54899aa7.dip0.t-ipconnect.de [84.137.154.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7A818CED07;
-        Tue, 19 Oct 2021 20:26:40 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 81A70CED07;
+        Tue, 19 Oct 2021 20:27:37 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [1/2] bluetooth: use eth_hw_addr_set()
+Subject: Re: [PATCH 2/2] bluetooth: use dev_addr_set()
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211019110533.5665cc90@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
-Date:   Tue, 19 Oct 2021 20:26:39 +0200
-Cc:     bluez.test.bot@gmail.com,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <20211019163346.1384785-2-kuba@kernel.org>
+Date:   Tue, 19 Oct 2021 20:27:37 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <90247148-9F5A-4D25-9700-27070659C4C5@holtmann.org>
+Message-Id: <AE0C60C4-E752-4516-87B1-325BC03CBB01@holtmann.org>
 References: <20211019163346.1384785-1-kuba@kernel.org>
- <616f0064.1c69fb81.3a2d8.9416@mx.google.com>
- <20211019110533.5665cc90@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+ <20211019163346.1384785-2-kuba@kernel.org>
 To:     Jakub Kicinski <kuba@kernel.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
@@ -41,22 +41,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Jakub,
 
->> Thank you for submitting the patches to the linux bluetooth mailing list.
->> This is a CI test results with your patch series:
->> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=566505
+> Commit 406f42fa0d3c ("net-next: When a bond have a massive amount
+> of VLANs...") introduced a rbtree for faster Ethernet address look
+> up. To maintain netdev->dev_addr in this tree we need to make all
+> the writes to it got through appropriate helpers.
 > 
-> Eish, sorry, you need 40af35fdf79c ("netdevice: demote the type of some
-> dev_addr_set() helpers") from net-next for this change to build cleanly.
-> 
-> What are your plans on sending a PR for net-next? Probably easiest if I
-> resend this after such PR? Or apply directly to net-next.
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: marcel@holtmann.org
+> CC: johan.hedberg@gmail.com
+> CC: luiz.dentz@gmail.com
+> CC: linux-bluetooth@vger.kernel.org
+> ---
+> net/bluetooth/6lowpan.c | 4 +++-
+> 1 file changed, 3 insertions(+), 1 deletion(-)
 
-we have one more pull request for you in the works, but I was not planning
-to rebase bluetooth-next if not needed. So just go ahead and take the patch
-directly into net-next.
+please also take this directly via net-next.
 
-Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
 Acked-by: Marcel Holtmann <marcel@holtmann.org>
+Reviewed-by: Marcel Holtmann <marcel@holtmann.org>
 
 Regards
 
