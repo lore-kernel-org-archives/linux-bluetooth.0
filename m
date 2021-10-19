@@ -2,107 +2,333 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3762C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 12:07:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 129B9C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 12:11:51 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B5740610A3
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 12:07:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DF6706113D
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 12:11:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235573AbhJSMJn (ORCPT
+        id S235544AbhJSMOC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Oct 2021 08:09:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60090 "EHLO
+        Tue, 19 Oct 2021 08:14:02 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32866 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235566AbhJSMJm (ORCPT
+        with ESMTP id S230129AbhJSMOB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Oct 2021 08:09:42 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9AB1C061745
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 05:07:29 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id q10-20020a17090a1b0a00b001a076a59640so1838778pjq.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 05:07:29 -0700 (PDT)
+        Tue, 19 Oct 2021 08:14:01 -0400
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3214C06161C
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 05:11:48 -0700 (PDT)
+Received: by mail-yb1-xb2f.google.com with SMTP id l80so7086054ybf.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 05:11:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=FVIQT82jcRb7GPMNtR+z9+ttpCLcsjQyVlSrcNJwXOo=;
-        b=EX+vS61JMITPqLH96+nqUjYjcawuaPHoSesPYtZl1n7rBxiwMf2CPx/+7ad2X7WcuS
-         kW8kp5lC6ebvYfNylNrL0KzX3tR0lDDDStyiQC9S9qO7CvZAiy/XJN0LaaebFnT+n3Ns
-         E1+rykixHr7OAAQVvKS7e6ZQi53IZ5JY05XqM=
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=imTFDrWe85v4P6kkmQziiHJ0XlRBvngkTyOsy1ovX1A=;
+        b=MHQ1lkouaegpQAmfQVB6poDsGHxVDgGqpCqsaU8e2cYImbn17EDdTRHxwb4Xoiw+fc
+         xLUwt0nMvHga7UHcu5wGsAWDCmAg3IEjIBVx268YEEcqmBTo+NNB8HEdaCQLvHryMCgz
+         hJvUxJ/zcDwpl9gMxLyKTWxqnQqEQwftQUks61MjH5UOaUGNr1ca/h0jv05ULEBtXZ1/
+         ZQrkZMfiHQ5+q8fvg2FwDy4jAslfWEu1eLybh3xVAa8Dh2pMg2SfH9lw2/Dmvf5Snfa9
+         zd8SoXV1lwajus2VU1648HU3srnLpgM6AfTEfybCRFicnXlC+K/hgFGQlBDIn4UVLO14
+         qyig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=FVIQT82jcRb7GPMNtR+z9+ttpCLcsjQyVlSrcNJwXOo=;
-        b=pG1IpTZEGAFiR42R2qRq5k8AEad/2dMo2JBrU7k4XRBBR9qNAPxFD6cd+EBzqjgnaJ
-         B4nhcT4skGspnoZjUBdhuDot82EEOHWwtQrWli7aGSEzVxIgVpL/0rpP8HU/6eI2JyUl
-         v514ClHD8JkpYymiAomBFkJq1gqjhzNfwiWsdqlmpFombNHbI8ZR3flP9i4qTg8964qN
-         mgaxncemPqZORulhMdJXDW0mdSBjN8YBc9dIhjAkJ+yNAZ/o1gKJI/Jfl2l9xuhWj4va
-         vWxwbp68PfVYQ6y/dINwWZDG/Y3L7GGhhqXEzWlukJGHprwxqXO7zGxdG072Utab+Cx+
-         mwVA==
-X-Gm-Message-State: AOAM532oqk62M1/mbaqfRazuDr5vkG99M0EDhG70NadGjLNfAO6sJbSz
-        IWyL8oComLE7cy6Bw8vVO25YXPeRwP8LMw==
-X-Google-Smtp-Source: ABdhPJzjbEBfYj1NJaCL6KZizsoAX8NL57PBxlOdEyuR5fwk5opRhttrYLoodMKKcptVYabTjzO6Tw==
-X-Received: by 2002:a17:90b:4f90:: with SMTP id qe16mr6333304pjb.137.1634645249158;
-        Tue, 19 Oct 2021 05:07:29 -0700 (PDT)
-Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:1d7c:b745:dee:c8a4])
-        by smtp.gmail.com with ESMTPSA id k16sm5236160pgt.57.2021.10.19.05.07.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 19 Oct 2021 05:07:28 -0700 (PDT)
-From:   Joseph Hwang <josephsih@chromium.org>
-To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
-        luiz.dentz@gmail.com, pali@kernel.org
-Cc:     josephsih@google.com, chromeos-bluetooth-upstreaming@chromium.org,
-        Joseph Hwang <josephsih@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>,
-        Mark-YW Chen <mark-yw.chen@mediatek.corp-partner.google.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Brugger <matthias.bgg@gmail.com>,
-        linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-        linux-mediatek@lists.infradead.org
-Subject: [PATCH v5 3/3] Bluetooth: btusb: enable Mediatek to support AOSP extension
-Date:   Tue, 19 Oct 2021 20:07:15 +0800
-Message-Id: <20211019200701.v5.3.I257ac5cfaf955d15670479efc311bbab702397f4@changeid>
-X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
-In-Reply-To: <20211019200701.v5.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
-References: <20211019200701.v5.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=imTFDrWe85v4P6kkmQziiHJ0XlRBvngkTyOsy1ovX1A=;
+        b=iwivIQN8HkhL/sQqMMRUHnUkKGfZwGqh/pM/Nkj4eNIv3SMmtj7UTSOKVEkCqAaoRf
+         AK+hHrggoH1xdJqBxQqmLfxvUl363CHXrVSy5X2CF9vu3XEaZ7mZbfqOWp3COVuKq0hc
+         r3qC0Fv+3FGUEG31opAPZeHfCcnwTE1bekTvVzn9LPz6dQKjKW3vahb3jhn0FE8ld7n3
+         KnapOd0iCMOeASEjlsSwDuJU0En22ez3CoBHnurgdceDyPpAGkKIPfwFTYWZXwuqSGl+
+         P0REyJCS48Eg1lfTO7EGKaikoZpaf9SPUbd0euw93/BovnOPkZdI1XxFiv2QgEyT8SyJ
+         TQQQ==
+X-Gm-Message-State: AOAM5301MyS1nFTtoaJFhgGLgIC/0kQK7z1MEmrEYonFZMsrOBmX9d79
+        3mKxvbS2k7O2XfAqeMLM7SyjaGXMVLlPPU3xDNrXhQ==
+X-Google-Smtp-Source: ABdhPJxpGMJU0jUkBjGwARUpg9mOUyflDlUDvPVtfk54oNFIqj7YInNVhE+/JaXLBYpwo6bBlo3ZdmQ+NK7l2BQu5/Y=
+X-Received: by 2002:a25:3817:: with SMTP id f23mr34089287yba.436.1634645507522;
+ Tue, 19 Oct 2021 05:11:47 -0700 (PDT)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20210926150657.v4.1.Iaa4a0269e51d8e8d8784a6ac8e05899b49a1377d@changeid>
+ <4A480983-CAF2-46B7-B462-9BC84E1783CC@holtmann.org>
+In-Reply-To: <4A480983-CAF2-46B7-B462-9BC84E1783CC@holtmann.org>
+From:   Joseph Hwang <josephsih@google.com>
+Date:   Tue, 19 Oct 2021 20:11:35 +0800
+Message-ID: <CAHFy41-sPBtMDtA7pmQz2Ey-3saaeKREX19uyHe20mnX6ngnTQ@mail.gmail.com>
+Subject: Re: [PATCH v4 1/4] Bluetooth: aosp: Support AOSP Bluetooth Quality Report
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        =?UTF-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        open list <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch enables Mediatek to support the AOSP extension.
+Hi Marcel:
 
-Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-Reviewed-by: Mark-YW Chen <mark-yw.chen@mediatek.corp-partner.google.com>
-Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+  Thanks for the RFC. I have fixed the patches per your request and
+submitted them for re-review.
 
----
+Thanks and regards!
 
-Changes in v5:
-- Let the vendor command in aosp_do_open() to determine what
-  capabilities are supported.
 
-Changes in v4:
-- Call hci_set_aosp_capable in the driver.
-- This patch is added in this Series-changes 4.
+On Tue, Sep 28, 2021 at 6:45 PM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Joseph,
+>
+> > This patch adds the support of the AOSP Bluetooth Quality Report
+> > (BQR) events.
+> >
+> > Multiple vendors have supported the AOSP Bluetooth Quality Report.
+> > When a Bluetooth controller supports the capability, it can enable
+> > the capability through hci_set_aosp_capable. Then hci_core will
+> > set up the hdev->set_quality_report callback accordingly.
+> >
+> > Note that Intel also supports a distinct telemetry quality report
+> > specification. Intel sets up the hdev->set_quality_report callback
+> > in the btusb driver module.
+> >
+> > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
+> > Signed-off-by: Joseph Hwang <josephsih@chromium.org>
+> >
+> > ---
+> >
+> > Changes in v4:
+> > - Move the AOSP BQR support from the driver level to net/bluetooth/aosp=
+.
+> > - Fix the drivers to use hci_set_aosp_capable to enable aosp.
+> > - Add Mediatek to support the capability too.
+> >
+> > Changes in v3:
+> > - Fix the auto build test ERROR
+> >  "undefined symbol: btandroid_set_quality_report" that occurred
+> >  with some kernel configs.
+> > - Note that the mgmt-tester "Read Exp Feature - Success" failed.
+> >  But on my test device, the same test passed. Please kindly let me
+> >  know what may be going wrong. These patches do not actually
+> >  modify read/set experimental features.
+> > - As to CheckPatch failed. No need to modify the MAINTAINERS file.
+> >  Thanks.
+> >
+> > Changes in v2:
+> > - Fix the titles of patches 2/3 and 3/3 and reduce their lengths.
+> >
+> > net/bluetooth/aosp.c     | 79 ++++++++++++++++++++++++++++++++++++++++
+> > net/bluetooth/aosp.h     |  7 ++++
+> > net/bluetooth/hci_core.c | 17 +++++++++
+> > 3 files changed, 103 insertions(+)
+> >
+> > diff --git a/net/bluetooth/aosp.c b/net/bluetooth/aosp.c
+> > index a1b7762335a5..c2b22bc83fb2 100644
+> > --- a/net/bluetooth/aosp.c
+> > +++ b/net/bluetooth/aosp.c
+> > @@ -33,3 +33,82 @@ void aosp_do_close(struct hci_dev *hdev)
+> >
+> >       bt_dev_dbg(hdev, "Cleanup of AOSP extension");
+> > }
+> > +
+> > +/* BQR command */
+> > +#define BQR_OPCODE                   hci_opcode_pack(0x3f, 0x015e)
+> > +
+> > +/* BQR report action */
+> > +#define REPORT_ACTION_ADD            0x00
+> > +#define REPORT_ACTION_DELETE         0x01
+> > +#define REPORT_ACTION_CLEAR          0x02
+> > +
+> > +/* BQR event masks */
+> > +#define QUALITY_MONITORING           BIT(0)
+> > +#define APPRAOCHING_LSTO             BIT(1)
+> > +#define A2DP_AUDIO_CHOPPY            BIT(2)
+> > +#define SCO_VOICE_CHOPPY             BIT(3)
+> > +
+> > +#define DEFAULT_BQR_EVENT_MASK       (QUALITY_MONITORING | APPRAOCHING=
+_LSTO | \
+> > +                              A2DP_AUDIO_CHOPPY | SCO_VOICE_CHOPPY)
+> > +
+> > +/* Reporting at milliseconds so as not to stress the controller too mu=
+ch.
+> > + * Range: 0 ~ 65535 ms
+> > + */
+> > +#define DEFALUT_REPORT_INTERVAL_MS   5000
+> > +
+> > +struct aosp_bqr_cp {
+> > +     __u8    report_action;
+> > +     __u32   event_mask;
+> > +     __u16   min_report_interval;
+> > +} __packed;
+> > +
+> > +static int enable_quality_report(struct hci_dev *hdev)
+> > +{
+> > +     struct sk_buff *skb;
+> > +     struct aosp_bqr_cp cp;
+> > +
+> > +     cp.report_action =3D REPORT_ACTION_ADD;
+> > +     cp.event_mask =3D DEFAULT_BQR_EVENT_MASK;
+> > +     cp.min_report_interval =3D DEFALUT_REPORT_INTERVAL_MS;
+> > +
+> > +     skb =3D __hci_cmd_sync(hdev, BQR_OPCODE, sizeof(cp), &cp,
+> > +                          HCI_CMD_TIMEOUT);
+> > +     if (IS_ERR(skb)) {
+> > +             bt_dev_err(hdev, "Enabling Android BQR failed (%ld)",
+> > +                        PTR_ERR(skb));
+> > +             return PTR_ERR(skb);
+> > +     }
+> > +
+> > +     kfree_skb(skb);
+> > +     return 0;
+> > +}
+> > +
+> > +static int disable_quality_report(struct hci_dev *hdev)
+> > +{
+> > +     struct sk_buff *skb;
+> > +     struct aosp_bqr_cp cp =3D { 0 };
+> > +
+> > +     cp.report_action =3D REPORT_ACTION_CLEAR;
+> > +
+> > +     skb =3D __hci_cmd_sync(hdev, BQR_OPCODE, sizeof(cp), &cp,
+> > +                          HCI_CMD_TIMEOUT);
+> > +     if (IS_ERR(skb)) {
+> > +             bt_dev_err(hdev, "Disabling Android BQR failed (%ld)",
+> > +                        PTR_ERR(skb));
+> > +             return PTR_ERR(skb);
+> > +     }
+> > +
+> > +     kfree_skb(skb);
+> > +     return 0;
+> > +}
+> > +
+> > +int aosp_set_quality_report(struct hci_dev *hdev, bool enable)
+> > +{
+> > +     bt_dev_info(hdev, "quality report enable %d", enable);
+> > +
+> > +     /* Enable or disable the quality report feature. */
+> > +     if (enable)
+> > +             return enable_quality_report(hdev);
+> > +     else
+> > +             return disable_quality_report(hdev);
+> > +}
+> > diff --git a/net/bluetooth/aosp.h b/net/bluetooth/aosp.h
+> > index 328fc6d39f70..384e111c1260 100644
+> > --- a/net/bluetooth/aosp.h
+> > +++ b/net/bluetooth/aosp.h
+> > @@ -8,9 +8,16 @@
+> > void aosp_do_open(struct hci_dev *hdev);
+> > void aosp_do_close(struct hci_dev *hdev);
+> >
+> > +int aosp_set_quality_report(struct hci_dev *hdev, bool enable);
+> > +
+> > #else
+> >
+> > static inline void aosp_do_open(struct hci_dev *hdev) {}
+> > static inline void aosp_do_close(struct hci_dev *hdev) {}
+> >
+> > +static inline int aosp_set_quality_report(struct hci_dev *hdev, bool e=
+nable)
+> > +{
+> > +     return false;
+> > +}
+> > +
+> > #endif
+> > diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> > index aeec5a3031a6..a2c22a4921d4 100644
+> > --- a/net/bluetooth/hci_core.c
+> > +++ b/net/bluetooth/hci_core.c
+> > @@ -1315,6 +1315,21 @@ static void hci_dev_get_bd_addr_from_property(st=
+ruct hci_dev *hdev)
+> >       bacpy(&hdev->public_addr, &ba);
+> > }
+> >
+> > +static void hci_set_quality_report(struct hci_dev *hdev)
+> > +{
+> > +#ifdef CONFIG_BT_AOSPEXT
+> > +     if (hdev->aosp_capable) {
+> > +             /* The hdev->set_quality_report callback is setup here fo=
+r
+> > +              * the vendors that support AOSP quality report specifica=
+tion.
+> > +              * Note that Intel, while supporting a distinct telemetry
+> > +              * quality report specification, sets up the
+> > +              * hdev->set_quality_report callback in the btusb module.
+> > +              */
+> > +             hdev->set_quality_report =3D aosp_set_quality_report;
+> > +     }
+> > +#endif
+> > +}
+> > +
+>
+> I think that I wasn=E2=80=99t super clear in my review on how I wanted th=
+is feature. So hdev->set_quality_report should really only ever set by a tr=
+ansport driver. The core stack should never touch it.
+>
+> So I wanted something like this:
+>
+>         if (hdev->set_quality_report)
+>                 err =3D hdev->set_quality_report(hdev, val);
+>         else
+>                 err =3D aosp_set_quality_report(hdev, val);
+>
+> I send a RFC showing you how I think this should be done.
+>
+> An extra important step of course is to check if the Android extension ac=
+tually supports the quality report feature in the first place.
+>
+> And while writing that patch, I realized that your initial support has a =
+mistake. I send a patch for fixing it. The mgmt document is pretty clear on=
+ how experimental flags are defined.
+>
+> Read Experimental Features Information Command
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>
+>         Command Code:           0x0049
+>         Controller Index:       <controller id> or <non-controller>
+>         Command Parameters:
+>         Return Parameters:      Feature_Count (2 Octets)
+>                                 Feature1 {
+>                                         UUID (16 Octets)
+>                                         Flags (4 Octets)
+>                                 }
+>                                 Feature2 {  }
+>                                 ...
+>
+>         This command is used to retrieve the supported experimental featu=
+res
+>         by the host stack.
+>
+>         The UUID values are not defined here. They can change over time a=
+nd
+>         are on purpose not stable. Features that mature will be removed a=
+t
+>         some point. The mapping of feature UUID to the actual functionali=
+ty
+>         of a given feature is out of scope here.
+>
+>         The following bits are defined for the Flags parameter:
+>
+>                 0       Feature active
+>                 1       Causes change in supported settings
+>
+> So please don=E2=80=99t just make up things and exp UUID should only be p=
+resent if they are supported. If they are not supported because the hardwar=
+e is lacking support, they should not be reported.
+>
+> Regards
+>
+> Marcel
+>
 
- drivers/bluetooth/btusb.c | 1 +
- 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 87b71740fad8..30c63031592d 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -3876,6 +3876,7 @@ static int btusb_probe(struct usb_interface *intf,
- 		hdev->set_bdaddr = btusb_set_bdaddr_mtk;
- 		set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
- 		data->recv_acl = btusb_recv_acl_mtk;
-+		hci_set_aosp_capable(hdev);
- 	}
- 
- 	if (id->driver_info & BTUSB_SWAVE) {
--- 
-2.33.0.1079.g6e70778dc9-goog
+--=20
 
+Joseph Shyh-In Hwang
+Email: josephsih@google.com
