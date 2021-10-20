@@ -2,200 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1158EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 04:02:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00848C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 08:15:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3DAD61004
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 04:02:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D5FBE60F46
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 08:15:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229741AbhJTEDQ (ORCPT
+        id S229836AbhJTIR1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Oct 2021 00:03:16 -0400
-Received: from m43-7.mailgun.net ([69.72.43.7]:13092 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229458AbhJTEDO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Oct 2021 00:03:14 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634702461; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=P3DYTaaiVLsvcsVBCW0eBADburMciZ8lW+laDg9RToQ=;
- b=ppM8JCbdCB+w7tcbNfISjo8TB+MZ7yctVphwnNuR+KZfBeDy6DVhfLM15U2Bsd434lTWu8iE
- 60lowX/7nvnDemWXHvNJUGA0asBB0IR60pGzNnSXBwJg47rsYY9OVb4gpbeIPjWf3ODBL37O
- qnO/HXjWjuAEUp1LwH86YSbly9g=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 616f94753416c2cb701e6d89 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 20 Oct 2021 04:00:53
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id ECEF3C4360C; Wed, 20 Oct 2021 04:00:52 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 1FFAFC4338F;
-        Wed, 20 Oct 2021 04:00:52 +0000 (UTC)
+        Wed, 20 Oct 2021 04:17:27 -0400
+Received: from giacobini.uberspace.de ([185.26.156.129]:52610 "EHLO
+        giacobini.uberspace.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229911AbhJTIRX (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Oct 2021 04:17:23 -0400
+Received: (qmail 18277 invoked from network); 20 Oct 2021 08:15:01 -0000
+Received: from localhost (HELO localhost) (127.0.0.1)
+  by giacobini.uberspace.de with SMTP; 20 Oct 2021 08:15:01 -0000
+From:   Soenke Huster <soenke.huster@eknoes.de>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Soenke Huster <soenke.huster@eknoes.de>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: virtio_bt: fix memory leak in virtbt_rx_handle()
+Date:   Wed, 20 Oct 2021 10:14:44 +0200
+Message-Id: <20211020081444.37324-1-soenke.huster@eknoes.de>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
-Date:   Wed, 20 Oct 2021 12:00:52 +0800
-From:   tjiang@codeaurora.org
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by
- using different nvm
-In-Reply-To: <YW8csSr/I1IRgAaT@google.com>
-References: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
- <YW8csSr/I1IRgAaT@google.com>
-Message-ID: <39ca0c9102265d6e14f3e0da94fec40d@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Thanks Matthias for the comments. please see my comments inline .
+On the reception of packets with an invalid packet type, the memory of
+the allocated socket buffers is never freed. Add a default case that frees
+these to avoid a memory leak.
 
-BTW: marcel , do you agree with Matthias comments ? if fine , I will 
-align Matthias comments and make the final version.
+Signed-off-by: Soenke Huster <soenke.huster@eknoes.de>
+---
+Changes in v2:
+  - Add break; to default case
 
-regards.
-tim
-On 2021-10-20 03:29, Matthias Kaehlcke wrote:
-> On Tue, Oct 12, 2021 at 03:55:56PM +0800, tjiang@codeaurora.org wrote:
->> the RF performance of wcn6855 soc chip from different foundries will 
->> be
->> difference, so we should use different nvm to configure them.
->> 
->> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
->> ---
->>  drivers/bluetooth/btusb.c | 56
->> +++++++++++++++++++++++++++++++++++------------
->>  1 file changed, 42 insertions(+), 14 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> index 75c83768c257..f352ff351b61 100644
->> --- a/drivers/bluetooth/btusb.c
->> +++ b/drivers/bluetooth/btusb.c
->> @@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct 
->> hci_dev
->> *hdev,
->>  #define QCA_DFU_TIMEOUT		3000
->>  #define QCA_FLAG_MULTI_NVM      0x80
->> 
->> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
->> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
->> +
->>  struct qca_version {
->>  	__le32	rom_version;
->>  	__le32	patch_version;
->> @@ -3221,6 +3224,7 @@ static const struct qca_device_info
->> qca_devices_table[] = {
->>  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->>  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->>  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
->> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
->>  };
->> 
->>  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
->> request,
->> @@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct
->> hci_dev *hdev,
->>  	return err;
->>  }
->> 
->> +static void btusb_generate_qca_nvm_name(char *fwname,
->> +					size_t max_size,
->> +					struct qca_version *ver)
-> 
-> => const struct qca_version *ver
-> 
->> +{
->> +	u32 rom_version = le32_to_cpu(ver->rom_version);
->> +	u16 flag = le16_to_cpu(ver->flag);
->> +
->> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
->> +		u16 board_id = le16_to_cpu(ver->board_id);
->> +		u32 ram_version = le32_to_cpu(ver->ram_version);
->> +		const char *variant;
->> +
->> +		switch (ram_version) {
->> +		case WCN6855_2_0_RAM_VERSION_GF:
->> +		case WCN6855_2_1_RAM_VERSION_GF:
->> +			variant = "_gf";
->> +			break;
->> +		default:
->> +			variant = "";
-> 
-> instead of the default branch you could assign a default to 'variant' 
-> at
-> declaration time, but it's fine either way.
+ drivers/bluetooth/virtio_bt.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-[Tim] this code style is recommend by marcel.
+diff --git a/drivers/bluetooth/virtio_bt.c b/drivers/bluetooth/virtio_bt.c
+index 57908ce4fae8..076e4942a3f0 100644
+--- a/drivers/bluetooth/virtio_bt.c
++++ b/drivers/bluetooth/virtio_bt.c
+@@ -202,6 +202,9 @@ static void virtbt_rx_handle(struct virtio_bluetooth *vbt, struct sk_buff *skb)
+ 		hci_skb_pkt_type(skb) = pkt_type;
+ 		hci_recv_frame(vbt->hdev, skb);
+ 		break;
++	default:
++		kfree_skb(skb);
++		break;
+ 	}
+ }
+ 
+-- 
+2.33.1
 
-> 
->> +			break;
->> +		}
->> +
->> +		/* if boardid equal 0, use default nvm without suffix */
-> 
-> delete the comment, it just states the obvious
-> 
->> +		if (board_id == 0x0) {
-> 
-> nit: is there really any value in using a hex number here instead of a
-> plain decimal 0?
-
-[Tim] this line is inherit from last change , if you think I should 
-change 0x0 to 0 , I am fine.
-
-> 
->> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
->> +				rom_version, variant);
->> +		} else {
->> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
->> +				rom_version, variant, board_id);
->> +		}
->> +	} else {
->> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
->> +			rom_version);
->> +	}
->> +
->> +}
->> +
->>  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
->>  				    struct qca_version *ver,
->>  				    const struct qca_device_info *info)
->> @@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
->> hci_dev
->> *hdev,
->>  	char fwname[64];
->>  	int err;
->> 
->> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
->> -		/* if boardid equal 0, use default nvm without surfix */
->> -		if (le16_to_cpu(ver->board_id) == 0x0) {
->> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
->> -				 le32_to_cpu(ver->rom_version));
->> -		} else {
->> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
->> -				le32_to_cpu(ver->rom_version),
->> -				le16_to_cpu(ver->board_id));
->> -		}
->> -	} else {
->> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
->> -			 le32_to_cpu(ver->rom_version));
->> -	}
->> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
->> 
->>  	err = request_firmware(&fw, fwname, &hdev->dev);
->>  	if (err) {
