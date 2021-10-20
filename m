@@ -2,113 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CE33C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 12:11:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A712AC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 12:55:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7CF7B611C6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 12:11:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7C377611B0
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 12:55:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229941AbhJTMNv (ORCPT
+        id S230187AbhJTM5P convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 20 Oct 2021 08:13:51 -0400
-Received: from mout.kundenserver.de ([212.227.126.135]:54627 "EHLO
-        mout.kundenserver.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229702AbhJTMNu (ORCPT
+        Wed, 20 Oct 2021 08:57:15 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:47519 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229702AbhJTM5P (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 20 Oct 2021 08:13:50 -0400
-Received: from [192.168.0.8] ([89.1.56.22]) by mrelayeu.kundenserver.de
- (mreue011 [212.227.15.167]) with ESMTPSA (Nemesis) id
- 1Mbzdn-1nGd3p1brj-00dU5J for <linux-bluetooth@vger.kernel.org>; Wed, 20 Oct
- 2021 14:11:34 +0200
-To:     linux-bluetooth@vger.kernel.org
-From:   Bisseling <spam@bisseling.de>
-Subject: [PATCH] avoid garbled names and segmentation faults in "hcitool scan"
- command
-Message-ID: <c44d5f62-31b3-02f1-49c1-e3fd14a33ae8@bisseling.de>
-Date:   Wed, 20 Oct 2021 14:11:34 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
-MIME-Version: 1.0
-Content-Type: multipart/mixed;
- boundary="------------AA580AB32007041A5C037B6D"
-Content-Language: en-US
-X-Provags-ID: V03:K1:YZUkJMyUizxgdNHF+RNS577TqluOmDeFFNGBncR8+vmHTyzMlgD
- lvyN8wtkv7z9q1IwWELVqutgHf/TYoDVWjMT8hyeC5bKZyCoXWRstRLRB0lDnTO//2NkDeP
- DZOMSxrt2TQgXAkXKq4Jf8zxJ5luv7rgUNbwUabYj21aU3zG6iOu2oL53Uvg3vkUpL4O0Ne
- 7hep7SfMoWHMhexl6gzIA==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:UE1XuWjZYSo=:Kg9nj5p3speyeaANvhEOla
- FMvsLHEWCi3Au+im6jrPb3te2oyE7trTHqL1DtHlsjMFJt8TYMbvMcy114ZKCYuIk0RCXquIc
- z7tMd5IPZyxpownwGzfwLsty6DDi51zEDkOzmWxK0KVYs0uJA99unIQYixylAaEdv1m89kWHZ
- UZYwQFA1r0OiahwqSDAaq25lMz6UkPu8obt7La5Q9BKokOws1TveCfN6Nze2OSNBCrJRENhw4
- LcLrh/2BJHpEJV6x2WSuAJdg8ZiaC0fxr4pruBQ2PPJh6L29Szxf2RZKOU0eWtKFdFTcAOsE/
- ecVNXHo+s2Jig4hsPvxDiUQ0QjQwOnQ33lQ6C2+IFfRKnyiEcfACN6W4KzmSVHEmxNXFPLlxo
- kelyRuufs1ACEzY9IEOc2XFxJto2S+krcnW4xMJc3rjmpo2Bn8lpZZzQ3QWyPI3rS4ZHAVdJe
- g3wZyGpzcrFMrOrhoT+OZaFovpZc5ZbZ1ihpast0yJJXiFTGhrfhtV2iuJPy5mdmvan97uTHp
- HBZSSJyX+Fz/0d4JlQtgaYad6+1SAJGov8sBE9Y6G+fNmqhjSgW3NLhsmKNKOgzta7lumWoyL
- eSVvyg5Q/AWPlMwds9layXaUPID3tiS0r+kNFiGxMlHwEVMlIFl6L05yRh/DU06ytLds2+Y5i
- /XAiHp0D2UE565CglTiuRyGxWDDLTsz5uWv7qCS6rv9oKXsyrzVqq+BREMbd1ZVtxBl7i9U6k
- XVKTs1BjRTmnz3xoKM7tsPn0KKFmxF0cSHxQRw==
+        Wed, 20 Oct 2021 08:57:15 -0400
+Received: from smtpclient.apple (p54899aa7.dip0.t-ipconnect.de [84.137.154.167])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 7E51DCED1B;
+        Wed, 20 Oct 2021 14:54:59 +0200 (CEST)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
+Subject: Re: [BlueZ PATCH v3 1/3] doc: Introduce the Adv Monitor Device Lost
+ event
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211013115927.BlueZ.v3.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+Date:   Wed, 20 Oct 2021 14:54:58 +0200
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <95CDCED5-0B56-4CA1-9E7A-56082CB3A777@holtmann.org>
+References: <20211013190035.1876237-1-mmandlik@google.com>
+ <20211013115927.BlueZ.v3.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+To:     Manish Mandlik <mmandlik@google.com>
+X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This is a multi-part message in MIME format.
---------------AA580AB32007041A5C037B6D
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hi Manish,
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index b6f4a4e66..11e2f7841 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -673,8 +673,8 @@ static void cmd_scan(int dev_id, int argc, char **argv)
-                                 strcpy(name, "n/a");
+> Add a new event 'Adv Monitor Device Lost' to indicate that the
+> controller has stopped tracking a particular device.
+> 
+> ---
+> 
+> Changes in v3:
+> - Discard changes to the Device Found event and notify bluetoothd only
+>  when the controller stops monitoring the device via new Device Lost
+>  event.
+> 
+> Changes in v2:
+> - Instead of creating a new 'Device Tracking' event, add a flag 'Device
+>  Tracked' in the existing 'Device Found' event and add a new 'Device
+>  Lost' event to indicate that the controller has stopped tracking that
+>  device.
+> 
+> doc/mgmt-api.txt | 26 +++++++++++++++++++++++++-
+> 1 file changed, 25 insertions(+), 1 deletion(-)
+> 
+> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+> index 5355fedb0..712bb362d 100644
+> --- a/doc/mgmt-api.txt
+> +++ b/doc/mgmt-api.txt
+> @@ -107,7 +107,8 @@ Configuration command, Default Runtime Configuration Changed event, Get
+> Device Flags command, Set Device Flags command, Device Flags Changed event,
+> Read Advertisement Monitor Features command, Add Advertisement Patterns
+> Monitor command, Remove Advertisement Monitor command, Advertisement Monitor
+> -Added event and Advertisement Monitor Removed event.
+> +Added event, Advertisement Monitor Removed event and Advertisement Monitor
+> +Device Lost event.
+> 
+> 
+> Example
+> @@ -4910,3 +4911,26 @@ Controller Resume Event
+> 	Address_Type. Otherwise, Address and Address_Type will both be zero.
+> 
+> 	This event will be sent to all management sockets.
 
-                         for (n = 0; n < 248 && name[n]; n++) {
--                               if ((unsigned char) name[i] < 32 ||
-name[i] == 127)
--                                       name[i] = '.';
-+                               if ((unsigned char) name[n] < 32 ||
-name[n] == 127)
-+                                       name[n] = '.';
-                         }
+I would consider adding a Advertising Monitor Device Found Event that is similar to the Device Found event, but also includes the Monitor_Handle. It just makes this whole thing a bit more symmetric.
 
-                         name[248] = '\0';
+> +
+> +
+> +Advertisement Monitor Device Lost Event
+> +=======================================
+> +
+> +	Event code:		0x002f
+> +	Controller Index:	<controller_id>
+> +	Event Parameters:	Monitor_Handle (2 Octets)
+> +				Address (6 Octets)
+> +				Address_Type (1 Octet)
+> +
+> +	This event indicates that the controller has stopped tracking the
+> +	device that was being tracked by monitor with handle Monitor_Handle.
+> +
+> +	The address of the device being tracked will be shared in Address and
+> +	Address_Type.
+> +
+> +	Possible values for the Address_Type parameter:
+> +		0	BR/EDR
+> +		1	LE Public
+> +		2	LE Random
+> +
+> +	This event will be sent to all management sockets.
 
---------------AA580AB32007041A5C037B6D
-Content-Type: text/x-patch; charset=UTF-8;
- name="0001-Use-correct-index-variable-when-patching-characters-.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename*0="0001-Use-correct-index-variable-when-patching-characters-.pa";
- filename*1="tch"
+And as noted by Luiz, make 0 Reserved since we only do this for LE at the moment.
 
-From 9843309ca33dc33d9c9ae989cc9dee19cb5ad219 Mon Sep 17 00:00:00 2001
-From: Georg Bisseling <spam@bisseling.de>
-Date: Tue, 22 Sep 2020 16:06:02 +0200
-Subject: [PATCH] Use correct index variable when patching characters in name
+Regards
 
----
- tools/hcitool.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Marcel
 
-diff --git a/tools/hcitool.c b/tools/hcitool.c
-index b6f4a4e66..11e2f7841 100644
---- a/tools/hcitool.c
-+++ b/tools/hcitool.c
-@@ -673,8 +673,8 @@ static void cmd_scan(int dev_id, int argc, char **argv)
- 				strcpy(name, "n/a");
- 
- 			for (n = 0; n < 248 && name[n]; n++) {
--				if ((unsigned char) name[i] < 32 || name[i] == 127)
--					name[i] = '.';
-+				if ((unsigned char) name[n] < 32 || name[n] == 127)
-+					name[n] = '.';
- 			}
- 
- 			name[248] = '\0';
--- 
-2.17.1
-
-
---------------AA580AB32007041A5C037B6D--
