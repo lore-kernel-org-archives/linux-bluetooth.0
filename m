@@ -2,147 +2,200 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3BDDCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 21:17:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1158EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 04:02:03 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2291E60FD9
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 19 Oct 2021 21:17:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D3DAD61004
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 20 Oct 2021 04:02:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229548AbhJSVTx (ORCPT
+        id S229741AbhJTEDQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 19 Oct 2021 17:19:53 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45314 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229625AbhJSVTu (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 19 Oct 2021 17:19:50 -0400
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C5E8C061746
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 14:17:37 -0700 (PDT)
-Received: by mail-ua1-x931.google.com with SMTP id i22so2653006ual.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 19 Oct 2021 14:17:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=fbIhq0CHxYNjhfi4w7ry3tJI6g5AZi4JJSy/6O2ouH0=;
-        b=cGW031XmaphQLlIQ2Nc0U8Y8u09MyxCTHlqObLgm/cE+pNc97LEZxvyQmaO7X6J3fB
-         njpQtaEETAAvaO+qo8jHvBRIYzsesIRd6gHby9mdRz6qFJXBbBMgWDE/CW10h9s35chL
-         2Rf3EdU5gjtGqs00uZs2fuMzpFLwrVrLGAX68ScO27jfGg84ex9EBGBYJcLcmPVP8p1y
-         c9nimZ53ulQ3PZTibteIADpVnzNL3IGz449KWPVqlXmkd5vw2RebqYNgXJMKXPjz9idn
-         TuORgoqB6z2gxjRFlx01ppaEHv2ZJob3fZVhGzb8v8t/QL7/ZwB3gqa0uRgdnJZowJcD
-         7CPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=fbIhq0CHxYNjhfi4w7ry3tJI6g5AZi4JJSy/6O2ouH0=;
-        b=OKQXmrAzWVDrWIylyNq6n8f+1m6MrGK/x7hzjZc9konS1D9XL+gGzp24kCxaVKmQm7
-         6dUPnsXwB26P6Jvr6Dxs8iK820ZJAFfUXTMRwyCxHZLuLIoB8+uumE1Yu8EOD0OcWJT5
-         eqcid83QK5gCs1KzaCBKs6BsTi6eGj07ym4UxEdo/Zr3+a+z/1meIPQ85WiBn3QlZoGl
-         YgIX6H7nz/aH0RYE0rrFCBRYDpekjp0rg8hZe5T0kSKrEu9nBKr8qY0SjFIOhHWLpiQO
-         YOCeZOCJwbtJ975X/2TqDW0LP/vqixNNAYM07oySXrd7OwpFAIJ3IWWrciNgIRjcjbKN
-         eItw==
-X-Gm-Message-State: AOAM530SiMC9uHneT+99mDGYY8PVug7igU+ryvsg9yJ55J8YLMtwzlM6
-        xIdMY5vWmIGgx+OEn6UqIK69g46zAf3TRODnqTQ=
-X-Google-Smtp-Source: ABdhPJwrEBzrhxbS4lq3upnkhlQrWvuYOjyOuV/Ssjw6+uovO1CaFRmCIGKGZqGFw0M4Gq+tG353luhA8RrhtJ5Dwoc=
-X-Received: by 2002:ab0:3cac:: with SMTP id a44mr3058330uax.129.1634678256169;
- Tue, 19 Oct 2021 14:17:36 -0700 (PDT)
+        Wed, 20 Oct 2021 00:03:16 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:13092 "EHLO m43-7.mailgun.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229458AbhJTEDO (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 20 Oct 2021 00:03:14 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1634702461; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=P3DYTaaiVLsvcsVBCW0eBADburMciZ8lW+laDg9RToQ=;
+ b=ppM8JCbdCB+w7tcbNfISjo8TB+MZ7yctVphwnNuR+KZfBeDy6DVhfLM15U2Bsd434lTWu8iE
+ 60lowX/7nvnDemWXHvNJUGA0asBB0IR60pGzNnSXBwJg47rsYY9OVb4gpbeIPjWf3ODBL37O
+ qnO/HXjWjuAEUp1LwH86YSbly9g=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
+ 616f94753416c2cb701e6d89 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Wed, 20 Oct 2021 04:00:53
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id ECEF3C4360C; Wed, 20 Oct 2021 04:00:52 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 1FFAFC4338F;
+        Wed, 20 Oct 2021 04:00:52 +0000 (UTC)
 MIME-Version: 1.0
-References: <20211013190035.1876237-1-mmandlik@google.com> <20211013115927.BlueZ.v3.3.I68039747acc3c63f758278452889d6ed2bfff065@changeid>
-In-Reply-To: <20211013115927.BlueZ.v3.3.I68039747acc3c63f758278452889d6ed2bfff065@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 19 Oct 2021 14:17:25 -0700
-Message-ID: <CABBYNZJ=0yyrqV4PV6jJC-j2Jjo5Agj6K0GFntDtAy93+1x7qQ@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v3 3/3] adv_monitor: Receive the Device Lost event
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Wed, 20 Oct 2021 12:00:52 +0800
+From:   tjiang@codeaurora.org
+To:     Matthias Kaehlcke <mka@chromium.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by
+ using different nvm
+In-Reply-To: <YW8csSr/I1IRgAaT@google.com>
+References: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
+ <YW8csSr/I1IRgAaT@google.com>
+Message-ID: <39ca0c9102265d6e14f3e0da94fec40d@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Thanks Matthias for the comments. please see my comments inline .
 
-On Wed, Oct 13, 2021 at 12:00 PM Manish Mandlik <mmandlik@google.com> wrote:
->
-> This patch registers a callback function to receive Advertisement
-> Monitor Device Lost event.
->
-> Test performed:
-> - verified by logs that Monitor Device is received from the controller
->   and sent to the bluetoothd when the controller starts/stops monitoring
->   a bluetooth device.
->
-> ---
->
-> Changes in v3:
-> - Fix indentation of the adv_monitor_device_lost_callback() name and
->   it's arguments.
->
-> Changes in v2:
-> - Update function name adv_monitor_tracking_callback() to
->   adv_monitor_device_lost_callback() as it will receive only Device Lost
->   event.
->
->  src/adv_monitor.c | 25 +++++++++++++++++++++++++
->  1 file changed, 25 insertions(+)
->
-> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-> index 715ac5904..385ab26e6 100644
-> --- a/src/adv_monitor.c
-> +++ b/src/adv_monitor.c
-> @@ -1531,6 +1531,27 @@ static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
->                 ev->monitor_handle);
->  }
->
-> +/* Processes Adv Monitor tracking event from kernel */
-> +static void adv_monitor_device_lost_callback(uint16_t index, uint16_t length,
-> +                                       const void *param, void *user_data)
-> +{
-> +       struct btd_adv_monitor_manager *manager = user_data;
-> +       const struct mgmt_ev_adv_monitor_device_lost *ev = param;
-> +       uint16_t handle = le16_to_cpu(ev->monitor_handle);
-> +       const uint16_t adapter_id = manager->adapter_id;
-> +       char addr[18];
-> +
-> +       if (length < sizeof(*ev)) {
-> +               btd_error(adapter_id,
-> +                               "Wrong size of Adv Monitor Device Lost event");
-> +               return;
-> +       }
-> +
-> +       ba2str(&ev->addr.bdaddr, addr);
-> +       DBG("Adv monitor with handle 0x%04x stopped tracking the device %s",
-> +                       handle, addr);
+BTW: marcel , do you agree with Matthias comments ? if fine , I will 
+align Matthias comments and make the final version.
 
-Isn't there a DeviceLost in the AdvertisementMonitor1 interface?
-Otherwise this is quite pointless since the only thing it is doing is
-printing the event without taking any action.
+regards.
+tim
+On 2021-10-20 03:29, Matthias Kaehlcke wrote:
+> On Tue, Oct 12, 2021 at 03:55:56PM +0800, tjiang@codeaurora.org wrote:
+>> the RF performance of wcn6855 soc chip from different foundries will 
+>> be
+>> difference, so we should use different nvm to configure them.
+>> 
+>> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+>> ---
+>>  drivers/bluetooth/btusb.c | 56
+>> +++++++++++++++++++++++++++++++++++------------
+>>  1 file changed, 42 insertions(+), 14 deletions(-)
+>> 
+>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+>> index 75c83768c257..f352ff351b61 100644
+>> --- a/drivers/bluetooth/btusb.c
+>> +++ b/drivers/bluetooth/btusb.c
+>> @@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct 
+>> hci_dev
+>> *hdev,
+>>  #define QCA_DFU_TIMEOUT		3000
+>>  #define QCA_FLAG_MULTI_NVM      0x80
+>> 
+>> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
+>> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+>> +
+>>  struct qca_version {
+>>  	__le32	rom_version;
+>>  	__le32	patch_version;
+>> @@ -3221,6 +3224,7 @@ static const struct qca_device_info
+>> qca_devices_table[] = {
+>>  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+>>  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+>>  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+>> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+>>  };
+>> 
+>>  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+>> request,
+>> @@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct
+>> hci_dev *hdev,
+>>  	return err;
+>>  }
+>> 
+>> +static void btusb_generate_qca_nvm_name(char *fwname,
+>> +					size_t max_size,
+>> +					struct qca_version *ver)
+> 
+> => const struct qca_version *ver
+> 
+>> +{
+>> +	u32 rom_version = le32_to_cpu(ver->rom_version);
+>> +	u16 flag = le16_to_cpu(ver->flag);
+>> +
+>> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+>> +		u16 board_id = le16_to_cpu(ver->board_id);
+>> +		u32 ram_version = le32_to_cpu(ver->ram_version);
+>> +		const char *variant;
+>> +
+>> +		switch (ram_version) {
+>> +		case WCN6855_2_0_RAM_VERSION_GF:
+>> +		case WCN6855_2_1_RAM_VERSION_GF:
+>> +			variant = "_gf";
+>> +			break;
+>> +		default:
+>> +			variant = "";
+> 
+> instead of the default branch you could assign a default to 'variant' 
+> at
+> declaration time, but it's fine either way.
 
-> +}
-> +
->  /* Allocates a manager object */
->  static struct btd_adv_monitor_manager *manager_new(
->                                                 struct btd_adapter *adapter,
-> @@ -1555,6 +1576,10 @@ static struct btd_adv_monitor_manager *manager_new(
->                         manager->adapter_id, adv_monitor_removed_callback,
->                         manager, NULL);
->
-> +       mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_DEVICE_LOST,
-> +                       manager->adapter_id, adv_monitor_device_lost_callback,
-> +                       manager, NULL);
-> +
->         return manager;
->  }
->
-> --
-> 2.33.0.882.g93a45727a2-goog
->
+[Tim] this code style is recommend by marcel.
 
+> 
+>> +			break;
+>> +		}
+>> +
+>> +		/* if boardid equal 0, use default nvm without suffix */
+> 
+> delete the comment, it just states the obvious
+> 
+>> +		if (board_id == 0x0) {
+> 
+> nit: is there really any value in using a hex number here instead of a
+> plain decimal 0?
 
--- 
-Luiz Augusto von Dentz
+[Tim] this line is inherit from last change , if you think I should 
+change 0x0 to 0 , I am fine.
+
+> 
+>> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
+>> +				rom_version, variant);
+>> +		} else {
+>> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
+>> +				rom_version, variant, board_id);
+>> +		}
+>> +	} else {
+>> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
+>> +			rom_version);
+>> +	}
+>> +
+>> +}
+>> +
+>>  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>>  				    struct qca_version *ver,
+>>  				    const struct qca_device_info *info)
+>> @@ -3383,20 +3424,7 @@ static int btusb_setup_qca_load_nvm(struct 
+>> hci_dev
+>> *hdev,
+>>  	char fwname[64];
+>>  	int err;
+>> 
+>> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+>> -		/* if boardid equal 0, use default nvm without surfix */
+>> -		if (le16_to_cpu(ver->board_id) == 0x0) {
+>> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+>> -				 le32_to_cpu(ver->rom_version));
+>> -		} else {
+>> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+>> -				le32_to_cpu(ver->rom_version),
+>> -				le16_to_cpu(ver->board_id));
+>> -		}
+>> -	} else {
+>> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+>> -			 le32_to_cpu(ver->rom_version));
+>> -	}
+>> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+>> 
+>>  	err = request_firmware(&fw, fwname, &hdev->dev);
+>>  	if (err) {
