@@ -2,149 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DC8DFC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 21:38:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C20FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 21:56:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7FED6135E
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 21:38:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E0F27604DA
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 21:56:40 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231655AbhJUVkt (ORCPT
+        id S231309AbhJUV64 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Oct 2021 17:40:49 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53908 "EHLO
+        Thu, 21 Oct 2021 17:58:56 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57994 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231573AbhJUVks (ORCPT
+        with ESMTP id S230233AbhJUV6z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Oct 2021 17:40:48 -0400
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41F83C061348
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 14:38:32 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id u6-20020a17090a3fc600b001a00250584aso4176344pjm.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 14:38:32 -0700 (PDT)
+        Thu, 21 Oct 2021 17:58:55 -0400
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3895CC061764
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 14:56:39 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 193-20020a1c01ca000000b00327775075f7so1132553wmb.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 14:56:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=zBYAh8x6q+4hWRefICFgMMwREIi/GYDaFmX1YUM46Rc=;
-        b=QcEOYBi4WyBGkg0Vr2AIuSaZOXVOjnIgxAgN/aguYyjwcDqaTd/Qu7P6Lp22bVW/cw
-         VOaSZzgvv9gJnqxo711N8+1shRRCHSqm3WMqj6IujveHZPjSmWc22WUOwZgZqkweRtXw
-         pR+X8wvAqakMr31HcDWSJ/pVOL7x+lsTqYCjk+mqxktWlT9Z/U7vTw/q0VnM/Ej9RNsH
-         xfdnOnszQsidTlupMmHB0gLUpMii9VymYXPnIEXscie0x7ah7I9WEu7f2GpbRyuaY5m6
-         aBME9MtB9yV2Kb3fJ0KhRHv7uEKLotHe3ht3nTNKby0ky5//aBrKT/OpGV63McNw419B
-         w9dg==
+        d=chrisdown.name; s=google;
+        h=date:from:to:subject:message-id:mime-version:content-disposition
+         :user-agent;
+        bh=8/WzqVKsA/pF7x/EvFRKZUIUCmf5u87XsdIABM+z/rE=;
+        b=tngvLlpG5vvkzKa5fL/PmCdT7FVJN518qalSTmFfxO3187lPG7xuprhKoCbTwoEBKj
+         FZ9+16uzEKHwqEbV3pe35G2La8nCIbYnkNo/apDDq61GGMbHQqyszNI3dLVqzqOCxrYh
+         9nnG4faD7V4uuNpg0ClO8gEW2w/mAuMbcdOd4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=zBYAh8x6q+4hWRefICFgMMwREIi/GYDaFmX1YUM46Rc=;
-        b=blnGX7wLvc4/pyif+wEI1gEoqzav3csmy93QSuS6efzowJGrubVlziXzqiJB4S5+iy
-         XWSSO5GlMXhaNmabNsmswF5qGM520FcXjxS6ODVhJGPjLsEXacXRxEEITtl7n/bhBd3R
-         yTwrrOpL1WmtdXzDHiA7opFp73oBVG20Lg1i2cX3yq1YtV5OHULENRrm3Qr18QlJX9HX
-         itLPx0K0/uh+zZRiZhWYt3HRVa+kocv4rx2oK2OaohTJiHY2hP3bsOqDtfykrEfIJVq1
-         6nj0fpRMCo0aGdY82sATVahzX0YSPUo4cGcKv/rbmX+Gz+Nu00eplfNAKqfD4wvW3feC
-         w0XQ==
-X-Gm-Message-State: AOAM530YdF/2OFHJhNoxMAQbuSWxobBgLwwwNsum4ZWLB29/tYzHi5sb
-        hxDvG5+UWr9fyHOm3A90fS6Slsr6POM=
-X-Google-Smtp-Source: ABdhPJxBF32GQv9d7W2zx8midlPv0ml4B6IiyvEcw8sLUQdJcSe8eKQkrd7KPaV/BoTw2RWdc+Qk/Q==
-X-Received: by 2002:a17:90a:1657:: with SMTP id x23mr9675820pje.148.1634852311404;
-        Thu, 21 Oct 2021 14:38:31 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 66sm6818473pfu.185.2021.10.21.14.38.30
+        h=x-gm-message-state:date:from:to:subject:message-id:mime-version
+         :content-disposition:user-agent;
+        bh=8/WzqVKsA/pF7x/EvFRKZUIUCmf5u87XsdIABM+z/rE=;
+        b=6jOUudnCfHgFJFIcc75RcTNf0ECLuWQnFZ2v2SO08EYwKT6Ie6KpDvSjZJ9dOVbm+v
+         Ov4dbPAL/8XkUV3WtWOWRjAkMSlT/WYQql+C1pAAYjuimO7B55uRKbm4i0YgSFLgnSmD
+         KvgzoMpi3p/+kUCRoQADxVEYCP5brtzrJoxOUR751T1Hc3ffISLKvRMDMUspSkc7lFFb
+         03ezC/Z/L9GEN/GYztcUIw8CvDR0rZvk5kWOxw+5GNaM1gggGCsjikvS+c5MpNz/18w7
+         joJlWWGZ3krvpsA5tHLXdyjzj3cnsiFtfLAx02J8xw/d37p2QVemY+mlrlIaSGHZdTwQ
+         wgcg==
+X-Gm-Message-State: AOAM533I0iJiImFdSqgDFQG7zRehjMiGZ7UlGBXMvTApBBb7NSwkUGYE
+        FVeA88+TTUZ8WhRYENS0Wyhjv2fnBRUzil4K
+X-Google-Smtp-Source: ABdhPJx037Q92fRIt6nIgwR80Qad8pAk5cs14iwWfLaGqK96vB6wm13kxGyAunQQ4jGoQhhQBUkL3Q==
+X-Received: by 2002:a05:600c:378f:: with SMTP id o15mr9560006wmr.63.1634853397517;
+        Thu, 21 Oct 2021 14:56:37 -0700 (PDT)
+Received: from localhost ([2620:10d:c093:400::5:9962])
+        by smtp.gmail.com with ESMTPSA id n11sm5975864wrw.43.2021.10.21.14.56.36
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 14:38:31 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+        Thu, 21 Oct 2021 14:56:37 -0700 (PDT)
+Date:   Thu, 21 Oct 2021 22:56:36 +0100
+From:   Chris Down <chris@chrisdown.name>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] btdev: Set Local RPA when own_addr_type is 0x03
-Date:   Thu, 21 Oct 2021 14:38:28 -0700
-Message-Id: <20211021213828.640557-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20211021213828.640557-1-luiz.dentz@gmail.com>
-References: <20211021213828.640557-1-luiz.dentz@gmail.com>
+Subject: DBus assertion failures after upgrade to BlueZ 5.62
+Message-ID: <YXHiFKv+RamKGkCi@chrisdown.name>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+User-Agent: Mutt/2.1.3 (987dde4c) (2021-09-10)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi folks,
 
-This enables the emulator to properly emulate the generation of a Local
-RPA so it always set the random_addr when Create Connection sets 0x03 as
-own_addr_type 0x03:
+After upgrading to BlueZ 5.62 on Arch Linux, intermittently bluetoothd crashes 
+like this:
 
-< HCI Command: LE Extended.. (0x08|0x0043) plen 26
-        Filter policy: Accept list is not used (0x00)
-        Own address type: Random (0x03)
-        Peer address type: Public (0x00)
-        Peer address: 00:AA:01:01:00:00 (Intel Corporation)
-        Initiating PHYs: 0x01
-        Entry 0: LE 1M
-          Scan interval: 60.000 msec (0x0060)
-          Scan window: 60.000 msec (0x0060)
-          Min connection interval: 30.00 msec (0x0018)
-          Max connection interval: 50.00 msec (0x0028)
-          Connection latency: 0 (0x0000)
-          Supervision timeout: 420 msec (0x002a)
-          Min connection length: 0.000 msec (0x0000)
-          Max connection length: 0.000 msec (0x0000)
-> HCI Event: Command Status (0x0f) plen 4
-      LE Extended Create Connection (0x08|0x0043) ncmd 1
-        Status: Success (0x00)
-> HCI Event: LE Meta Event (0x3e) plen 31
-      LE Enhanced Connection Complete (0x0a)
-        Status: Success (0x00)
-        Handle: 42
-        Role: Central (0x00)
-        Peer address type: Public (0x00)
-        Peer address: 00:AA:01:01:00:00 (Intel Corporation)
-        Local resolvable private address: 60:0C:C5:B9:10:5D (Resolvable)
-        Peer resolvable private address: 00:00:00:00:00:00 (Non-Resolvable)
-        Connection interval: 50.00 msec (0x0028)
-        Connection latency: 0 (0x0000)
-        Supervision timeout: 420 msec (0x002a)
-        Central clock accuracy: 0x00
----
- emulator/btdev.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+     bluetoothd[161733]: dbus[161733]: arguments to dbus_message_new_method_call() were incorrect, assertion "destination == NULL || _dbus_check_is_valid_bus_name (destination)" failed in file dbus-message.c line 1364.
+     bluetoothd[161733]: This is normally a bug in some application using the D-Bus library.
+     bluetoothd[161733]: profiles/audio/media.c:release_endpoint() Couldn't allocate D-Bus message
+     bluetoothd[161733]: Stopping SDP server
+     bluetoothd[161733]: Exit
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 096ba2da4..a5f468447 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -3545,7 +3545,7 @@ static void le_conn_complete(struct btdev *btdev,
- 
- 		cc.status = status;
- 		cc.peer_addr_type = btdev->le_scan_own_addr_type;
--		if (cc.peer_addr_type == 0x01)
-+		if (cc.peer_addr_type == 0x01 || cc.peer_addr_type == 0x03)
- 			memcpy(cc.peer_addr, btdev->random_addr, 6);
- 		else
- 			memcpy(cc.peer_addr, btdev->bdaddr, 6);
-@@ -5149,7 +5149,7 @@ static void le_ext_conn_complete(struct btdev *btdev,
- 
- 		ev.status = status;
- 		ev.peer_addr_type = btdev->le_scan_own_addr_type;
--		if (ev.peer_addr_type == 0x01)
-+		if (ev.peer_addr_type == 0x01 || ev.peer_addr_type == 0x03)
- 			memcpy(ev.peer_addr, btdev->random_addr, 6);
- 		else
- 			memcpy(ev.peer_addr, btdev->bdaddr, 6);
-@@ -5178,7 +5178,13 @@ static void le_ext_conn_complete(struct btdev *btdev,
- 	memcpy(ev.peer_addr, cmd->peer_addr, 6);
- 	ev.role = 0x00;
- 
--	memset(ev.local_rpa, 0, sizeof(ev.local_rpa));
-+	/* Use random address as Local RPA if Create Connection own_addr_type
-+	 * is 0x03 since that expects the controller to generate the RPA.
-+	 */
-+	if (btdev->le_scan_own_addr_type == 0x03)
-+		memcpy(ev.local_rpa, btdev->random_addr, 6);
-+	else
-+		memset(ev.local_rpa, 0, sizeof(ev.local_rpa));
- 
- 	le_meta_event(btdev, BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE, &ev,
- 						sizeof(ev));
--- 
-2.31.1
+This behaviour started after upgrading from 5.61. No upgrade to dbus, which is 
+still at 1.12.20 and has been for some time.
 
+Any ideas?
+
+Thanks,
+
+Chris
