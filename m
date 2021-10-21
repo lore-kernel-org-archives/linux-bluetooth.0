@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 944D0C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 17:48:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F0195C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 17:48:34 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7D9AF6137F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 17:48:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id D32CF61440
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 17:48:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231976AbhJURuu (ORCPT
+        id S232307AbhJURuu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
         Thu, 21 Oct 2021 13:50:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58398 "EHLO
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58392 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232370AbhJURul (ORCPT
+        with ESMTP id S232439AbhJURuk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Oct 2021 13:50:41 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 93063C061226
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 10:48:08 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id n11so946434plf.4
-        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 10:48:08 -0700 (PDT)
+        Thu, 21 Oct 2021 13:50:40 -0400
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 92900C061224
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 10:48:07 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id i1so910987plr.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 21 Oct 2021 10:48:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=SjIRrC7ic/vsPQiDiTqzWwz8nfW4impqpkTFLACRKus=;
-        b=S73ZhkjenWfvrs7bMAO3prG+/I0fw37qyb4iZwWjeraU9uhVSwmpTVrb1quo4aLYKy
-         lSHN0Z9sFpH9FxEUGLIZDgljt2sPXwV0avEG3ULs34ANrXdHLWg7qtmka80G+3s6IGRu
-         ttdWirH9yfe/syX+C/ZKzC2xaOrjHWgqHFjpTB5/WbYcbeVKM1FbIqJQ7h2hEkmHrKIt
-         emn2lI1nmvnVQoWKYZ8MpJH+zghPF6bmLhPl7x0O7CzBG01DKafYwLcGa/eB+WxxW4kK
-         3Zw0MjyV0jJnVdyAVJmJ90d3KY1XHSLLHLmu+TVhS1HkbjaXqprL2TaaXR3NkaCmjZ5q
-         eu4Q==
+        bh=a92ewmJCIhCXFTeCxJwy0bcIgrcxBRq6irNBLVf+kLY=;
+        b=jdyrLahWOdjeG+znbZ1LI2at4GZjUATIhFTB7pH/hDA5ZaT/dksciGRunXHG1AQl0L
+         P2L+qpVINeTWteIXjAvYZ8XuSeadgVK052zsvG0tAkOM+4UP0CtHrHZKyx8slR888Owi
+         fYOVJVGd5/XCaKQQcMZvYvINmfcsPU08EG48LEhmOGBG1axx1MZ/+vAuIgS5Ee8ZKfmk
+         XSWDDIC7iBIszGPq1nB5dcS8RfuvX0X/oO/B1K+Q3rdy5kzsmL6R9neILtDNfK+Z8P8k
+         SZiJrOOx3Y/49JgUlNX2ySRP6miKc9znB7dSgvdx66rLCT9EKfV+X+ycAMSGiBD/GJ+v
+         Kznw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=SjIRrC7ic/vsPQiDiTqzWwz8nfW4impqpkTFLACRKus=;
-        b=wOqSIAZMoYX+qgtGXa2B/U3iUNZzeniIg5uzPseb/39vkQmrS1EGSgD/7oaAQxt2jM
-         cI6C9HuepKLc1ZFwaKPA010+OvpaKlTj5Yr4ck59wh4JA2kMZvXewqKdQ3H3Jgg+MfEV
-         65dbmshVFVJH4KOB2ahYfYH9GwHqBPNqcrvkMzCxDWyYicbyDae+p7DV+vcTO6wJ3cfz
-         AR0h1t6fHC88plTyys5c6VrjcaNwqGWY2Pm5cEdCWjm0LgHSuqqwnuklMAlfEY2Jar1c
-         eOKoZB4U3bA8g6AHxJM/ISnOITGpHYAcjpVl2PyyQTTaNR/rh8h433Jm+w1+4wCQlJi6
-         TQIg==
-X-Gm-Message-State: AOAM532iL8jrvFbnFDeqxJYimDLVkl+1bI55HDTgpjo15o1bDCc+EHyB
-        CFmdtpFlCmK4QyL09Ei3rV517V//KaHr1w==
-X-Google-Smtp-Source: ABdhPJyNEwwcNIFe+Vd0rrRn8t+d9yRfJkwW3s+j1WXkEe52E1oiRXzUQ7PWpG9RukC5ozA6eBysCA==
-X-Received: by 2002:a17:902:be0c:b0:13e:2b53:d3 with SMTP id r12-20020a170902be0c00b0013e2b5300d3mr6615421pls.86.1634838487920;
-        Thu, 21 Oct 2021 10:48:07 -0700 (PDT)
+        bh=a92ewmJCIhCXFTeCxJwy0bcIgrcxBRq6irNBLVf+kLY=;
+        b=Y1XRqKddb5FCQ4GuTVSowdGurYtSgQzMdiBL15BThQZdOJpH9ePNQaeiTxtsb04FXN
+         JSqrwiCeyBsOzk6XDTCz9xAwq1W8PmvADfwGk7+su98RWsDp+LOrZDlUvwU5ETVGSXnY
+         LbTfHee3v05sL7BGbBf7rq/beS68Yh8n7oZI3PVC3+5PkoT/7kZMdfk9+7JDln+wlfwQ
+         XuORNvbkW+lXP5NWOWEy9I5bM5FQ2+KizeF6vSgt2z/tTTXfaNAHxmQOwYord7/FL3eV
+         DIVUwzwhFcPHe7mfz6GWvjunGQCUpK56ZcV/yuMzd4j+tcEhoCCIjzGMvkh/5BT/tSk0
+         CWGg==
+X-Gm-Message-State: AOAM532W/UVghM94H4Uoyl4+lrdOTIqfowKuMB5Q02fWlNRfMQEqpWb2
+        InT+0P8hkl3VUai52AG2awMuZzwI8KuCAg==
+X-Google-Smtp-Source: ABdhPJxsNcDpAv8Wtj/MF+R08MLNCEShtpAiEwEkLOsyE7sD1s0jVhUh9lN4/ii3Ko0UMY3b8ypTwQ==
+X-Received: by 2002:a17:902:c94e:b0:13f:1b02:e539 with SMTP id i14-20020a170902c94e00b0013f1b02e539mr6404408pla.72.1634838486593;
+        Thu, 21 Oct 2021 10:48:06 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:e439:7541:94af:b362])
-        by smtp.gmail.com with ESMTPSA id g4sm5732586pgs.42.2021.10.21.10.48.07
+        by smtp.gmail.com with ESMTPSA id g4sm5732586pgs.42.2021.10.21.10.48.06
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 21 Oct 2021 10:48:07 -0700 (PDT)
+        Thu, 21 Oct 2021 10:48:06 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [RFC BlueZ PATCH v13 4/5] tools/mgmt-tester: Add support for experimental feature in setup
-Date:   Thu, 21 Oct 2021 10:48:03 -0700
-Message-Id: <20211021174804.340160-4-hj.tedd.an@gmail.com>
+Subject: [RFC BlueZ PATCH v13 2/5] emulator: bthost: Add support LE Ext Adv Report
+Date:   Thu, 21 Oct 2021 10:48:01 -0700
+Message-Id: <20211021174804.340160-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211021174804.340160-1-hj.tedd.an@gmail.com>
 References: <20211021174804.340160-1-hj.tedd.an@gmail.com>
@@ -69,63 +69,220 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds support for experimental feature in setup_settings
-options.
+This patch adds support LE_Extended_Advertising_Report Eevnt in bthost.
 ---
- tools/mgmt-tester.c | 18 ++++++++++++++++++
- 1 file changed, 18 insertions(+)
+ emulator/bthost.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
+ emulator/bthost.h |   5 ++
+ 2 files changed, 123 insertions(+)
 
-diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
-index 64a5e1c3d..08fd16985 100644
---- a/tools/mgmt-tester.c
-+++ b/tools/mgmt-tester.c
-@@ -260,6 +260,7 @@ struct generic_data {
- 	const uint16_t *setup_settings;
- 	bool setup_nobredr;
- 	bool setup_limited_discov;
-+	const void *setup_exp_feat_param;
- 	uint16_t setup_expect_hci_command;
- 	const void *setup_expect_hci_param;
- 	uint8_t setup_expect_hci_len;
-@@ -7222,6 +7223,7 @@ proceed:
- 		unsigned char privacy_param[] = { 0x01,
- 			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,
- 			0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };
-+		unsigned char set_exp_feat_param[17] = { 0x00 };
- 		unsigned char *param = simple_param;
- 		size_t param_size = sizeof(simple_param);
- 		mgmt_request_func_t func = NULL;
-@@ -7250,14 +7252,30 @@ proceed:
- 				memcpy(param, test->setup_discovery_param, 1);
- 		}
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 4f1598f0d..61f1cd361 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -25,6 +25,7 @@
  
-+		if (*cmd == MGMT_OP_SET_EXP_FEATURE) {
-+			if (test->setup_exp_feat_param) {
-+				memcpy(set_exp_feat_param,
-+				       test->setup_exp_feat_param, 17);
-+				param_size = sizeof(set_exp_feat_param);
-+				param = set_exp_feat_param;
-+			}
+ #include "src/shared/util.h"
+ #include "src/shared/tester.h"
++#include "src/shared/queue.h"
+ #include "monitor/bt.h"
+ #include "monitor/rfcomm.h"
+ #include "bthost.h"
+@@ -187,6 +188,15 @@ struct rfcomm_connection_data {
+ 	void *user_data;
+ };
+ 
++struct le_ext_adv {
++	struct bthost *bthost;
++	uint16_t event_type;
++	uint8_t  addr_type;
++	uint8_t  addr[6];
++	uint8_t  direct_addr_type;
++	uint8_t  direct_addr[6];
++};
++
+ struct bthost {
+ 	bool ready;
+ 	bthost_ready_cb ready_cb;
+@@ -215,6 +225,8 @@ struct bthost {
+ 	bool le;
+ 	bool sc;
+ 
++	struct queue *le_ext_adv;
++
+ 	bthost_debug_func_t debug_callback;
+ 	bthost_destroy_func_t debug_destroy;
+ 	void *debug_data;
+@@ -234,6 +246,8 @@ struct bthost *bthost_create(void)
+ 		return NULL;
+ 	}
+ 
++	bthost->le_ext_adv = queue_new();
++
+ 	/* Set defaults */
+ 	bthost->io_capability = 0x03;
+ 
+@@ -403,6 +417,32 @@ static struct rfcomm_conn_cb_data *bthost_find_rfcomm_cb_by_channel(
+ 	return NULL;
+ }
+ 
++static struct le_ext_adv *le_ext_adv_new(struct bthost *bthost)
++{
++	struct le_ext_adv *ext_adv;
++
++	ext_adv = new0(struct le_ext_adv, 1);
++	ext_adv->bthost = bthost;
++
++	/* Add to queue */
++	if (!queue_push_tail(bthost->le_ext_adv, ext_adv)) {
++		free(ext_adv);
++		return NULL;
++	}
++
++	return ext_adv;
++}
++
++static void le_ext_adv_free(void *data)
++{
++	struct le_ext_adv *ext_adv = data;
++
++	/* Remove from queue */
++	queue_remove(ext_adv->bthost->le_ext_adv, ext_adv);
++
++	free(ext_adv);
++}
++
+ void bthost_destroy(struct bthost *bthost)
+ {
+ 	if (!bthost)
+@@ -449,6 +489,8 @@ void bthost_destroy(struct bthost *bthost)
+ 
+ 	smp_stop(bthost->smp_data);
+ 
++	queue_destroy(bthost->le_ext_adv, le_ext_adv_free);
++
+ 	free(bthost);
+ }
+ 
+@@ -1306,6 +1348,38 @@ static void evt_le_cis_req(struct bthost *bthost, const void *data, uint8_t len)
+ 	send_command(bthost, BT_HCI_CMD_LE_ACCEPT_CIS, &cmd, sizeof(cmd));
+ }
+ 
++static void evt_le_ext_adv_report(struct bthost *bthost, const void *data,
++								uint8_t len)
++{
++	const struct bt_hci_evt_le_ext_adv_report *ev = data;
++	const struct bt_hci_le_ext_adv_report *report;
++	struct le_ext_adv *le_ext_adv;
++	int i;
++
++	data += sizeof(ev->num_reports);
++
++	for (i = 0; i < ev->num_reports; i++) {
++		char addr_str[18];
++
++		report = data;
++		ba2str((bdaddr_t *) report->addr, addr_str);
++
++		bthost_debug(bthost, "le ext adv report: %s (0x%02x)",
++						addr_str, report->addr_type);
++
++		/* Add ext event to the queue */
++		le_ext_adv = le_ext_adv_new(bthost);
++		if (le_ext_adv) {
++			le_ext_adv->addr_type = report->addr_type;
++			memcpy(le_ext_adv->addr, report->addr, 6);
++			le_ext_adv->direct_addr_type = report->direct_addr_type;
++			memcpy(le_ext_adv->direct_addr, report->direct_addr, 6);
 +		}
 +
- 		if (*cmd == MGMT_OP_SET_LE && test->setup_nobredr) {
- 			unsigned char off[] = { 0x00 };
-+			tester_print("Setup sending %s (0x%04x)",
-+							mgmt_opstr(*cmd), *cmd);
- 			mgmt_send(data->mgmt, *cmd, data->mgmt_index,
- 					param_size, param, NULL, NULL, NULL);
-+			tester_print("Setup sending %s (0x%04x)",
-+					mgmt_opstr(MGMT_OP_SET_BREDR),
-+					MGMT_OP_SET_BREDR);
- 			mgmt_send(data->mgmt, MGMT_OP_SET_BREDR,
- 					data->mgmt_index, sizeof(off), off,
- 					func, data, NULL);
- 		} else {
-+			tester_print("Setup sending %s (0x%04x)",
-+							mgmt_opstr(*cmd), *cmd);
- 			mgmt_send(data->mgmt, *cmd, data->mgmt_index,
- 					param_size, param, func, data, NULL);
- 		}
++		data += (sizeof(*report) + report->data_len);
++	}
++}
++
+ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 								uint8_t len)
+ {
+@@ -1333,6 +1407,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
+ 		evt_le_ext_conn_complete(bthost, evt_data, len - 1);
+ 		break;
++	case BT_HCI_EVT_LE_EXT_ADV_REPORT:
++		evt_le_ext_adv_report(bthost, evt_data, len - 1);
++		break;
+ 	case BT_HCI_EVT_LE_CIS_REQ:
+ 		evt_le_cis_req(bthost, evt_data, len - 1);
+ 		break;
+@@ -2583,6 +2660,29 @@ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_ADV_ENABLE, &enable, 1);
+ }
+ 
++void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
++				uint8_t addr_type, uint8_t filter_policy)
++{
++	struct bt_hci_cmd_le_set_scan_parameters cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.type = scan_type;
++	cp.own_addr_type = addr_type;
++	cp.filter_policy = filter_policy;
++	send_command(bthost, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
++							&cp, sizeof(cp));
++}
++
++void bthost_set_scan_enable(struct bthost *bthost, uint8_t enable)
++{
++	struct bt_hci_cmd_le_set_scan_enable cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = enable;
++	send_command(bthost, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++							&cp, sizeof(cp));
++}
++
+ void bthost_set_ext_adv_params(struct bthost *bthost)
+ {
+ 	struct bt_hci_cmd_le_set_ext_adv_params cp;
+@@ -2612,6 +2712,24 @@ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, cp, 6);
+ }
+ 
++bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr)
++{
++	const struct queue_entry *entry;
++
++	if (queue_isempty(bthost->le_ext_adv))
++		return false;
++
++	for (entry = queue_get_entries(bthost->le_ext_adv); entry;
++							entry = entry->next) {
++		struct le_ext_adv *le_ext_adv = entry->data;
++
++		if (!memcmp(le_ext_adv->addr, addr, 6))
++			return true;
++	}
++
++	return false;
++}
++
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode)
+ {
+ 	send_command(bthost, BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE, &mode, 1);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 3dec44514..868af5469 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -84,6 +84,11 @@ void bthost_set_ext_adv_data(struct bthost *bthost, const uint8_t *data,
+ 								uint8_t len);
+ void bthost_set_ext_adv_params(struct bthost *bthost);
+ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable);
++bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
++
++void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
++				uint8_t addr_type, uint8_t filter_policy);
++void bthost_set_scan_enable(struct bthost *bthost, uint8_t enable);
+ 
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode);
+ 
 -- 
 2.25.1
 
