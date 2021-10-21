@@ -2,187 +2,216 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 15C21C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 04:08:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF13BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 05:52:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DED9760F59
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 04:08:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94E7760E9B
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 21 Oct 2021 05:52:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229700AbhJUEKS (ORCPT
+        id S229854AbhJUFye (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 21 Oct 2021 00:10:18 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:16106 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229499AbhJUEKR (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 21 Oct 2021 00:10:17 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1634789282; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=8c4/kNiuom4eEOmtGKm3oUHjG7xt34YXANV6W1v+Mxs=;
- b=vfEEEEcvcIYrOLbJ6DXkjsEXDBLnrxMCTrzEYrpBMu8GIP3gX6le7tnkmpBW4jCJ6K/HvsJE
- eR7MNBK1N97YeSXmAbBf6sRW0HIYYPAuSpIYXZ5KQ7TYvROq1HABmcoYCnNC0f4kJeuWsPSm
- z1gI5WlZMwhiE0/gNXDr49f2oWk=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 6170e79b67f107c611dbc477 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 21 Oct 2021 04:07:55
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 662CCC4360C; Thu, 21 Oct 2021 04:07:55 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 78F3FC4338F;
-        Thu, 21 Oct 2021 04:07:54 +0000 (UTC)
+        Thu, 21 Oct 2021 01:54:34 -0400
+Received: from mga06.intel.com ([134.134.136.31]:25362 "EHLO mga06.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229499AbhJUFyd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 21 Oct 2021 01:54:33 -0400
+X-IronPort-AV: E=McAfee;i="6200,9189,10143"; a="289794252"
+X-IronPort-AV: E=Sophos;i="5.87,168,1631602800"; 
+   d="scan'208";a="289794252"
+Received: from orsmga006.jf.intel.com ([10.7.209.51])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Oct 2021 22:52:18 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,168,1631602800"; 
+   d="scan'208";a="444653646"
+Received: from lkp-server02.sh.intel.com (HELO 08b2c502c3de) ([10.239.97.151])
+  by orsmga006.jf.intel.com with ESMTP; 20 Oct 2021 22:52:16 -0700
+Received: from kbuild by 08b2c502c3de with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mdQzw-000E3b-75; Thu, 21 Oct 2021 05:52:16 +0000
+Date:   Thu, 21 Oct 2021 13:52:14 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 7a517ac9c00bab519770c0790b47845b8f5ecebb
+Message-ID: <6171000e.aAb8X3Bv3HATlzoC%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-Date:   Thu, 21 Oct 2021 12:07:54 +0800
-From:   tjiang@codeaurora.org
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: Re: [PATCH v2] Bluetooth: btusb: Add support for variant WCN6855 by
- using different nvm
-In-Reply-To: <YXA1+tEiCoY8yPRR@google.com>
-References: <81add00a4a038008e9f734c5f5e5b712@codeaurora.org>
- <YW8csSr/I1IRgAaT@google.com>
- <39ca0c9102265d6e14f3e0da94fec40d@codeaurora.org>
- <YXA1+tEiCoY8yPRR@google.com>
-Message-ID: <f42cb074563111526e0e5e419a540419@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-thanks Matthias for the new comments.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 7a517ac9c00bab519770c0790b47845b8f5ecebb  Bluetooth: btsdio: Do not bind to non-removable BCM4345 and BCM43455
 
-marcel :
-   do you agree with my comments which response to Matthias , if is OK, I 
-will make the final version for the next patch, thank you for the help.
+elapsed time: 990m
 
-regards.
-tim
+configs tested: 152
+configs skipped: 4
 
-On 2021-10-20 23:30, Matthias Kaehlcke wrote:
-> On Wed, Oct 20, 2021 at 12:00:52PM +0800, tjiang@codeaurora.org wrote:
->> Thanks Matthias for the comments. please see my comments inline .
->> 
->> BTW: marcel , do you agree with Matthias comments ? if fine , I will 
->> align
->> Matthias comments and make the final version.
->> 
->> regards.
->> tim
->> On 2021-10-20 03:29, Matthias Kaehlcke wrote:
->> > On Tue, Oct 12, 2021 at 03:55:56PM +0800, tjiang@codeaurora.org wrote:
->> > > the RF performance of wcn6855 soc chip from different foundries will
->> > > be
->> > > difference, so we should use different nvm to configure them.
->> > >
->> > > Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
->> > > ---
->> > >  drivers/bluetooth/btusb.c | 56
->> > > +++++++++++++++++++++++++++++++++++------------
->> > >  1 file changed, 42 insertions(+), 14 deletions(-)
->> > >
->> > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->> > > index 75c83768c257..f352ff351b61 100644
->> > > --- a/drivers/bluetooth/btusb.c
->> > > +++ b/drivers/bluetooth/btusb.c
->> > > @@ -3190,6 +3190,9 @@ static int btusb_set_bdaddr_wcn6855(struct
->> > > hci_dev
->> > > *hdev,
->> > >  #define QCA_DFU_TIMEOUT		3000
->> > >  #define QCA_FLAG_MULTI_NVM      0x80
->> > >
->> > > +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
->> > > +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
->> > > +
->> > >  struct qca_version {
->> > >  	__le32	rom_version;
->> > >  	__le32	patch_version;
->> > > @@ -3221,6 +3224,7 @@ static const struct qca_device_info
->> > > qca_devices_table[] = {
->> > >  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->> > >  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->> > >  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
->> > > +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
->> > >  };
->> > >
->> > >  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8
->> > > request,
->> > > @@ -3375,6 +3379,43 @@ static int btusb_setup_qca_load_rampatch(struct
->> > > hci_dev *hdev,
->> > >  	return err;
->> > >  }
->> > >
->> > > +static void btusb_generate_qca_nvm_name(char *fwname,
->> > > +					size_t max_size,
->> > > +					struct qca_version *ver)
->> >
->> > => const struct qca_version *ver
-[Tim] fine ,will modify it in next version.
->> >
->> > > +{
->> > > +	u32 rom_version = le32_to_cpu(ver->rom_version);
->> > > +	u16 flag = le16_to_cpu(ver->flag);
->> > > +
->> > > +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
->> > > +		u16 board_id = le16_to_cpu(ver->board_id);
->> > > +		u32 ram_version = le32_to_cpu(ver->ram_version);
->> > > +		const char *variant;
->> > > +
->> > > +		switch (ram_version) {
->> > > +		case WCN6855_2_0_RAM_VERSION_GF:
->> > > +		case WCN6855_2_1_RAM_VERSION_GF:
->> > > +			variant = "_gf";
->> > > +			break;
->> > > +		default:
->> > > +			variant = "";
->> >
->> > instead of the default branch you could assign a default to 'variant' at
->> > declaration time, but it's fine either way.
->> 
->> [Tim] this code style is recommend by marcel.
-> 
-> Both are ok, if Marcel prefers the default branch let's keep it that 
-> way.
-> 
->> >
->> > > +			break;
->> > > +		}
->> > > +
->> > > +		/* if boardid equal 0, use default nvm without suffix */
->> >
->> > delete the comment, it just states the obvious
-[Tim] fine, will modify it in next version.
->> >
->> > > +		if (board_id == 0x0) {
->> >
->> > nit: is there really any value in using a hex number here instead of a
->> > plain decimal 0?
->> 
->> [Tim] this line is inherit from last change , if you think I should 
->> change
->> 0x0 to 0 , I am fine.
-> 
-> Since this patch touches/moves this code it seems a good opportunity to 
-> clean
-> things up a bit. It's also true that there are quite a few instances of 
-> this
-> and comparisons with '0x00' in other parts of the kernel, so I guess 
-> it's
-> also fine to leave it as is.
-[Tim] I am OK to change from 0x0 to 0 in next version.
+The following configs have been built successfully.
+More configs may be tested in the coming days.
+
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allmodconfig
+arm                              allyesconfig
+i386                 randconfig-c001-20211019
+powerpc                    amigaone_defconfig
+mips                        maltaup_defconfig
+arm                      pxa255-idp_defconfig
+arm                            hisi_defconfig
+s390                             alldefconfig
+sh                           se7780_defconfig
+powerpc                     mpc5200_defconfig
+m68k                        mvme16x_defconfig
+openrisc                            defconfig
+h8300                     edosk2674_defconfig
+powerpc                 mpc834x_itx_defconfig
+mips                     decstation_defconfig
+arm                         shannon_defconfig
+csky                             alldefconfig
+m68k                          sun3x_defconfig
+powerpc                      ppc40x_defconfig
+sh                             shx3_defconfig
+sh                             espt_defconfig
+arc                           tb10x_defconfig
+arm                         palmz72_defconfig
+arm                             ezx_defconfig
+h8300                            alldefconfig
+sh                            hp6xx_defconfig
+nds32                             allnoconfig
+arm                         s3c6400_defconfig
+powerpc                   lite5200b_defconfig
+sh                           se7712_defconfig
+arm                        vexpress_defconfig
+sh                 kfr2r09-romimage_defconfig
+sh                          kfr2r09_defconfig
+powerpc                     sequoia_defconfig
+arm                          exynos_defconfig
+arm                         orion5x_defconfig
+mips                         rt305x_defconfig
+mips                        workpad_defconfig
+arm                          gemini_defconfig
+arm                             mxs_defconfig
+arm                        mini2440_defconfig
+mips                      maltasmvp_defconfig
+mips                             allyesconfig
+arm                            mps2_defconfig
+powerpc                     ppa8548_defconfig
+mips                           gcw0_defconfig
+mips                       rbtx49xx_defconfig
+mips                          ath25_defconfig
+xtensa                  nommu_kc705_defconfig
+arm                  randconfig-c002-20211019
+x86_64               randconfig-c001-20211019
+ia64                             allmodconfig
+ia64                                defconfig
+ia64                             allyesconfig
+m68k                                defconfig
+m68k                             allmodconfig
+m68k                             allyesconfig
+nios2                               defconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+parisc                              defconfig
+s390                             allmodconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+i386                              debian-10.3
+arc                              allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+i386                 randconfig-a004-20211020
+i386                 randconfig-a003-20211020
+i386                 randconfig-a002-20211020
+i386                 randconfig-a005-20211020
+i386                 randconfig-a006-20211020
+i386                 randconfig-a001-20211020
+x86_64               randconfig-a015-20211019
+x86_64               randconfig-a012-20211019
+x86_64               randconfig-a016-20211019
+x86_64               randconfig-a014-20211019
+x86_64               randconfig-a013-20211019
+x86_64               randconfig-a011-20211019
+i386                 randconfig-a014-20211019
+i386                 randconfig-a016-20211019
+i386                 randconfig-a011-20211019
+i386                 randconfig-a015-20211019
+i386                 randconfig-a012-20211019
+i386                 randconfig-a013-20211019
+i386                 randconfig-a012-20211021
+i386                 randconfig-a013-20211021
+i386                 randconfig-a011-20211021
+i386                 randconfig-a016-20211021
+i386                 randconfig-a015-20211021
+i386                 randconfig-a014-20211021
+riscv                            allyesconfig
+riscv                             allnoconfig
+riscv                               defconfig
+riscv                            allmodconfig
+riscv                    nommu_k210_defconfig
+riscv                    nommu_virt_defconfig
+riscv                          rv32_defconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+um                             i386_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                                  kexec
+
+clang tested configs:
+arm                  randconfig-c002-20211019
+mips                 randconfig-c004-20211019
+i386                 randconfig-c001-20211019
+s390                 randconfig-c005-20211019
+x86_64               randconfig-c007-20211019
+riscv                randconfig-c006-20211019
+powerpc              randconfig-c003-20211019
+x86_64               randconfig-a004-20211019
+x86_64               randconfig-a006-20211019
+x86_64               randconfig-a005-20211019
+x86_64               randconfig-a001-20211019
+x86_64               randconfig-a002-20211019
+x86_64               randconfig-a003-20211019
+i386                 randconfig-a001-20211019
+i386                 randconfig-a003-20211019
+i386                 randconfig-a004-20211019
+i386                 randconfig-a005-20211019
+i386                 randconfig-a002-20211019
+i386                 randconfig-a006-20211019
+x86_64               randconfig-a013-20211020
+x86_64               randconfig-a015-20211020
+x86_64               randconfig-a011-20211020
+x86_64               randconfig-a014-20211020
+x86_64               randconfig-a016-20211020
+x86_64               randconfig-a012-20211020
+hexagon              randconfig-r041-20211019
+hexagon              randconfig-r045-20211019
+riscv                randconfig-r042-20211020
+s390                 randconfig-r044-20211020
+hexagon              randconfig-r045-20211020
+hexagon              randconfig-r041-20211020
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
