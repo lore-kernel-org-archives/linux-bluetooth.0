@@ -2,97 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 120FFC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 04:48:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 00154C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 05:35:45 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id DA4E1610E7
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 04:48:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7DD661037
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 05:35:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231627AbhJVEvK (ORCPT
+        id S230295AbhJVFiB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Oct 2021 00:51:10 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:50886 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229957AbhJVEvG (ORCPT
+        Fri, 22 Oct 2021 01:38:01 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:13436 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229545AbhJVFh6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Oct 2021 00:51:06 -0400
-Received: from smtpclient.apple (p54899aa7.dip0.t-ipconnect.de [84.137.154.167])
-        by mail.holtmann.org (Postfix) with ESMTPSA id B8669CED3E;
-        Fri, 22 Oct 2021 06:48:47 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH] Bluetooth: cmtp: fix possible panic when
- cmtp_init_sockets() fails
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211022034417.766659-1-wanghai38@huawei.com>
-Date:   Fri, 22 Oct 2021 06:48:47 +0200
-Cc:     Karsten Keil <isdn@linux-pingi.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+        Fri, 22 Oct 2021 01:37:58 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1634880941; h=Message-ID: Subject: Cc: To: From: Date:
+ Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
+ bh=89F8xJvCrlSlLbEL6WG25xOvvgYOnHNdU38GRSzzzYA=; b=djd1h7RYYp65DkadR+F+QZ8ibrdrzzfvq9R1kq0He3Ysy+gUgL8es6ZVzOR4NNOYsMvy6kEi
+ tDdYB5XaozD5gFRHaVi80T1rqgd2Qn/nXZv7edImJUsjGZsPLEX+jNeN59VqB/ESsy7qqfoQ
+ 04UmF7/QNvs/80ZEgqB6cIWyIEE=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
+ 61724dab321f2400519cc5c2 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 22 Oct 2021 05:35:39
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 9B90DC4360D; Fri, 22 Oct 2021 05:35:39 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id C9672C4338F;
+        Fri, 22 Oct 2021 05:35:38 +0000 (UTC)
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <9D8B1F5B-8EFE-40CB-BC85-F6EC3483CC61@holtmann.org>
-References: <20211022034417.766659-1-wanghai38@huawei.com>
-To:     Wang Hai <wanghai38@huawei.com>
-X-Mailer: Apple Mail (2.3654.120.0.1.13)
+Date:   Fri, 22 Oct 2021 13:35:38 +0800
+From:   tjiang@codeaurora.org
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
+Subject: [PATCH v3] Bluetooth: btusb: Add support for variant WCN6855 by using
+  different nvm
+Message-ID: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wang,
+the RF performance of wcn6855 soc chip from different foundries will be
+difference, so we should use different nvm to configure them.
 
-> I got a kernel BUG report when doing fault injection test:
-> 
-> ------------[ cut here ]------------
-> kernel BUG at lib/list_debug.c:45!
-> ...
-> RIP: 0010:__list_del_entry_valid.cold+0x12/0x4d
-> ...
-> Call Trace:
-> proto_unregister+0x83/0x220
-> cmtp_cleanup_sockets+0x37/0x40 [cmtp]
-> cmtp_exit+0xe/0x1f [cmtp]
-> do_syscall_64+0x35/0xb0
-> entry_SYSCALL_64_after_hwframe+0x44/0xae
-> 
-> If cmtp_init_sockets() in cmtp_init() fails, cmtp_init() still returns
-> success. This will cause a kernel bug when accessing uncreated ctmp
-> related data when the module exits.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
-> ---
-> net/bluetooth/cmtp/core.c | 6 ++++--
-> 1 file changed, 4 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/bluetooth/cmtp/core.c b/net/bluetooth/cmtp/core.c
-> index 0a2d78e811cf..ccf48f50afdf 100644
-> --- a/net/bluetooth/cmtp/core.c
-> +++ b/net/bluetooth/cmtp/core.c
-> @@ -499,11 +499,13 @@ int cmtp_get_conninfo(struct cmtp_conninfo *ci)
-> 
-> static int __init cmtp_init(void)
-> {
-> +	int err;
-> +
-> 	BT_INFO("CMTP (CAPI Emulation) ver %s", VERSION);
-> 
-> -	cmtp_init_sockets();
-> +	err = cmtp_init_sockets();
-> 
-> -	return 0;
-> +	return err;
-> }
+Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+---
+  drivers/bluetooth/btusb.c | 55 
++++++++++++++++++++++++++++++++++++------------
+  1 file changed, 41 insertions(+), 14 deletions(-)
 
-just do return cmtp_init_sockets();
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 87b71740fad8..a5fe57e7cd7e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3195,6 +3195,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev 
+*hdev,
+  #define QCA_DFU_TIMEOUT		3000
+  #define QCA_FLAG_MULTI_NVM      0x80
 
-Regards
++#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
++#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
++
+  struct qca_version {
+  	__le32	rom_version;
+  	__le32	patch_version;
+@@ -3226,6 +3229,7 @@ static const struct qca_device_info 
+qca_devices_table[] = {
+  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
++	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+  };
 
-Marcel
+  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 
+request,
+@@ -3380,6 +3384,42 @@ static int btusb_setup_qca_load_rampatch(struct 
+hci_dev *hdev,
+  	return err;
+  }
 
++static void btusb_generate_qca_nvm_name(char *fwname,
++					size_t max_size,
++					const struct qca_version *ver)
++{
++	u32 rom_version = le32_to_cpu(ver->rom_version);
++	u16 flag = le16_to_cpu(ver->flag);
++
++	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
++		u16 board_id = le16_to_cpu(ver->board_id);
++		u32 ram_version = le32_to_cpu(ver->ram_version);
++		const char *variant = NULL;
++
++		switch (ram_version) {
++		case WCN6855_2_0_RAM_VERSION_GF:
++		case WCN6855_2_1_RAM_VERSION_GF:
++			variant = "_gf";
++			break;
++		default:
++			variant = "";
++			break;
++		}
++
++		if (board_id == 0) {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
++				rom_version, variant);
++		} else {
++			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
++				rom_version, variant, board_id);
++		}
++	} else {
++		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
++			rom_version);
++	}
++
++}
++
+  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+  				    struct qca_version *ver,
+  				    const struct qca_device_info *info)
+@@ -3388,20 +3428,7 @@ static int btusb_setup_qca_load_nvm(struct 
+hci_dev *hdev,
+  	char fwname[64];
+  	int err;
+
+-	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+-		/* if boardid equal 0, use default nvm without surfix */
+-		if (le16_to_cpu(ver->board_id) == 0x0) {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-				 le32_to_cpu(ver->rom_version));
+-		} else {
+-			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+-				le32_to_cpu(ver->rom_version),
+-				le16_to_cpu(ver->board_id));
+-		}
+-	} else {
+-		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+-			 le32_to_cpu(ver->rom_version));
+-	}
++	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+
+  	err = request_firmware(&fw, fwname, &hdev->dev);
+  	if (err) {
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
+Forum, a Linux Foundation Collaborative Project
