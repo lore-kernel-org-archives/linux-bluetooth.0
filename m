@@ -2,210 +2,319 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA39AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 21:34:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 442BDC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 22:27:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B45C061038
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 21:34:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 18ADA60E05
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 22 Oct 2021 22:27:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231363AbhJVVge (ORCPT
+        id S234338AbhJVW37 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 22 Oct 2021 17:36:34 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37482 "EHLO
+        Fri, 22 Oct 2021 18:29:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49268 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229583AbhJVVge (ORCPT
+        with ESMTP id S233793AbhJVW36 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 22 Oct 2021 17:36:34 -0400
-Received: from mail-qt1-x82d.google.com (mail-qt1-x82d.google.com [IPv6:2607:f8b0:4864:20::82d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29325C061764
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Oct 2021 14:34:16 -0700 (PDT)
-Received: by mail-qt1-x82d.google.com with SMTP id t16so4778726qto.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Oct 2021 14:34:16 -0700 (PDT)
+        Fri, 22 Oct 2021 18:29:58 -0400
+Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EF4E4C061764
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Oct 2021 15:27:39 -0700 (PDT)
+Received: by mail-pl1-x635.google.com with SMTP id i1so3686011plr.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 22 Oct 2021 15:27:39 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=JBYKZzHq49T8qcMsnIanN+aW2nn2eQRn/6nbsdcVxD8=;
-        b=VVoEauHYFrYdNPFqRog1JvDWCCM6gredQkvlS+DR1LwFYObsKu4J/L4C3kcWG7JQEY
-         HOMl8rXMKbkow2epFOxq8uuJvrmIT6CGdOxdF822CmoU3UASH75zTFe9ODUQ+PS3KeDh
-         7GkEimYLEPz2dTqtaPvETMCLenex+WE302Zd+Ru+4M4MwV9oWkBt2aARUlN821PoARjO
-         1EKa29OAoPDJ8P+uRrKW8E7xzASprhgjLaMYPWoeDIRTSzeDfJHMXsCKmVXYwZx350T5
-         Z9Mu9g0NDnYy2at0qFQODEslZzE5SsYC57hhj5nsUknrlMH+0wimx64YDy2HZlZRbnsR
-         MlMQ==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZI0QpHBx22DTTymHPcUoFhx4Zy1Gb38J6QqU2uNq7Q8=;
+        b=SlCBo1olBfMqKBvQafCjt/z6xTyiR2Bz4J5doiCdhRMpkTPj+eGlh4AkuiVnj1ilD1
+         8Xw/U8r4fbF4gZqa54Fc7miW2ISP/r2fFuUe5AJHeqCRHgK4YVzFy+h6ujzjqyMXOGXy
+         NooRC3opLtISDXtdWO+BSkxdRxd8Fmz0S4qOqeQWKAGhsfmVDiJWzVSfO70r/OkzO1oN
+         OOB+tiYM22mB73RyZZzK1T2Rr5T5adhAvr+zmEdBP4mLL2yOXBk+XSY4MmyUSSqd78C7
+         ehdE8Y5q1IrbtPi2t2UyNu313+RY3cuRocv5T80vpFVKlWJWntvUun0IfdWKshkb9itU
+         0COw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=JBYKZzHq49T8qcMsnIanN+aW2nn2eQRn/6nbsdcVxD8=;
-        b=eezm+pY1MipFMC6NlVg7mZ6g6QHY31Xa43rxUpu7y8hBmd1rLLukied66yrX/hcazm
-         ZFQmGpI9bm8Rye5C4AN3c2QR0MOd8A4CUgj6O9K0xI7Oy8sENF1j7y5YIIE8O7ZHamPk
-         8f6h4D6CV7/dgTNOCuKiStSjw/moCAIj4Qtf+KC2jQCWWlWoX09Sb5OUn7zqS95Xkr1j
-         +K9QaxbZc6WHOFOxzb/hvoeoeLF7LTlc3J+1VuqU7jKh4K2kxgop8cUtOooRl6mUSTNL
-         IJ43mT3ox1m2Kcp+0H4eV0Q3z9lJeqli/2Yx+pxYwaxQvYbPUb3MOqSuERiNNFzmRMsM
-         nAnA==
-X-Gm-Message-State: AOAM533l9grt2zBhI33rR8ZH/F+kUkl2wJTjdQjw7Qy2eZF2uM5XEJ4T
-        zvXIKOesmC6UcewqYl3ScyRV5uY02SY=
-X-Google-Smtp-Source: ABdhPJxwwPQmwxN9SmRvgJdlG5EsfthplIqbGgAnTOcsAuSqhwZiPn9bx8YMkQtVnu0/ZBEZi4pMwQ==
-X-Received: by 2002:ac8:4298:: with SMTP id o24mr2629029qtl.188.1634938453806;
-        Fri, 22 Oct 2021 14:34:13 -0700 (PDT)
-Received: from [172.17.0.2] ([40.70.190.172])
-        by smtp.gmail.com with ESMTPSA id s17sm4073600qtw.95.2021.10.22.14.34.13
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZI0QpHBx22DTTymHPcUoFhx4Zy1Gb38J6QqU2uNq7Q8=;
+        b=QsHgZZvDF8kmV9omu8T1DfbrS1MN/RGPvgHU3kJMhOIMeU9RG77Z/xkx5bTJNlYm11
+         380OwM8NubSWQeylfATr8TsvejGovOwruPocvHGPCGxhIbVCJ0CKqic0iRfvikYeLA7a
+         S/4yr2g1fjBynH21U6wRFPKDB8JeC+XwduZH0HOgyrPMIVgyCSLrzEpQpn2kwp74YhOu
+         +3dv9mkBEFlJ1cW7LxJ3Ekk9fwGXnLB6CjjbJgMxnUO6BL3Upvk4yNAbit0zdj3nFdMy
+         h+9xgRzpyQSAEQ3q04JVuyUDeSjLF7Lv/fipug4gtoGm7CK1I27H+hvCjcXjapHrEPGv
+         Apbg==
+X-Gm-Message-State: AOAM530nQtr/5NE0SEtsWHyDz7kTwoOtjrDEHOXzsXgh5u6DO/TTW5XR
+        yLXoJUkduVIqSzu9gvBOvz2TS1EaqJo=
+X-Google-Smtp-Source: ABdhPJwxvay/s/lSCVNaA9mSdjmCVLapf39tdHOvqZ5elHJep2cfOVeqCk9UfJTgaZrnOTwyHZAQtQ==
+X-Received: by 2002:a17:903:1207:b0:138:e2f9:6c98 with SMTP id l7-20020a170903120700b00138e2f96c98mr2725889plh.11.1634941658667;
+        Fri, 22 Oct 2021 15:27:38 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h3sm10779380pfr.98.2021.10.22.15.27.37
+        for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 22 Oct 2021 14:34:13 -0700 (PDT)
-Message-ID: <61732e55.1c69fb81.68d6d.b06d@mx.google.com>
-Date:   Fri, 22 Oct 2021 14:34:13 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0319983633703366539=="
+        Fri, 22 Oct 2021 15:27:38 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH BlueZ] btdev: Fix using the callback return as command complete
+Date:   Fri, 22 Oct 2021 15:27:37 -0700
+Message-Id: <20211022222737.807013-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
-Subject: RE: [RFC,BlueZ,v14,1/5] emulator: Add support to config the accept and resolve list
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211022204825.397952-1-hj.tedd.an@gmail.com>
-References: <20211022204825.397952-1-hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0319983633703366539==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=568805
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      9.36 seconds
-GitLint                       FAIL      4.99 seconds
-Prep - Setup ELL              PASS      46.47 seconds
-Build - Prep                  PASS      0.50 seconds
-Build - Configure             PASS      8.67 seconds
-Build - Make                  PASS      199.78 seconds
-Make Check                    PASS      9.67 seconds
-Make Distcheck                PASS      237.61 seconds
-Build w/ext ELL - Configure   PASS      8.56 seconds
-Build w/ext ELL - Make        PASS      191.12 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[RFC,BlueZ,v14,5/5] tools/mgmt-tester: Add LL Privacy test cases
-ERROR:SPACING: space prohibited before that ',' (ctx:WxW)
-#756: FILE: tools/mgmt-tester.c:10115:
-+					MGMT_OP_SET_EXP_FEATURE , 0 };
- 					                        ^
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1262: FILE: tools/mgmt-tester.c:10620:
-+// ^Istruct test_data *data = tester_get_data();$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1263: FILE: tools/mgmt-tester.c:10621:
-+// ^Iunsigned char param[] = { 0x01 };$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1264: FILE: tools/mgmt-tester.c:10622:
-+// ^Iconst uint8_t *ext_feat_param;$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1265: FILE: tools/mgmt-tester.c:10623:
-+// ^Isize_t ext_feat_len;$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1266: FILE: tools/mgmt-tester.c:10624:
-+// ^Iunsigned char privacy_param[] = { 0x01,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1267: FILE: tools/mgmt-tester.c:10625:
-+// ^I^I^I0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1268: FILE: tools/mgmt-tester.c:10626:
-+// ^I^I^I0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08 };$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1270: FILE: tools/mgmt-tester.c:10628:
-+// ^Itester_print("Enabling LL Privacy feature");$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1272: FILE: tools/mgmt-tester.c:10630:
-+// ^Iext_feat_param = set_exp_feat_param_ll_privacy;$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1273: FILE: tools/mgmt-tester.c:10631:
-+// ^Iext_feat_len = sizeof(set_exp_feat_param_ll_privacy);$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1275: FILE: tools/mgmt-tester.c:10633:
-+// ^Imgmt_send(data->mgmt, MGMT_OP_SET_LE, data->mgmt_index,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1276: FILE: tools/mgmt-tester.c:10634:
-+// ^I^I^I^I^Isizeof(param), &param,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1277: FILE: tools/mgmt-tester.c:10635:
-+// ^I^I^I^I^INULL, NULL, NULL);$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1279: FILE: tools/mgmt-tester.c:10637:
-+// ^Imgmt_send(data->mgmt, MGMT_OP_SET_PRIVACY, data->mgmt_index,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1280: FILE: tools/mgmt-tester.c:10638:
-+// ^I^I^I^I^Isizeof(privacy_param), privacy_param,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1281: FILE: tools/mgmt-tester.c:10639:
-+// ^I^I^I^I^INULL, NULL, NULL);$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1283: FILE: tools/mgmt-tester.c:10641:
-+// ^Imgmt_send(data->mgmt, MGMT_OP_SET_EXP_FEATURE, data->mgmt_index,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1284: FILE: tools/mgmt-tester.c:10642:
-+// ^I^I^I^I^Iext_feat_len, ext_feat_param,$
-
-WARNING:SPACE_BEFORE_TAB: please, no space before tabs
-#1285: FILE: tools/mgmt-tester.c:10643:
-+// ^I^I^I^I^Isetup_exp_feat_callback, NULL, NULL);$
-
-/github/workspace/src/12579045.patch total: 1 errors, 19 warnings, 2340 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12579045.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-##############################
-Test: GitLint - FAIL
-Desc: Run gitlint with rule in .gitlint
-Output:
-[RFC,BlueZ,v14,4/5] tools/mgmt-tester: Add support for experimental feature in setup
-1: T1 Title exceeds max length (84>80): "[RFC,BlueZ,v14,4/5] tools/mgmt-tester: Add support for experimental feature in setup"
-
-
-
-
+Command callback can only be used when generating a command status as
+command complete can carry more than just the status.
 ---
-Regards,
-Linux Bluetooth
+ emulator/btdev.c | 120 +++++++++++++++++++++++++++++++++--------------
+ 1 file changed, 84 insertions(+), 36 deletions(-)
 
+diff --git a/emulator/btdev.c b/emulator/btdev.c
+index e129b5cda..7b311f347 100644
+--- a/emulator/btdev.c
++++ b/emulator/btdev.c
+@@ -3677,12 +3677,16 @@ static int cmd_add_al(struct btdev *dev, const void *data, uint8_t len)
+ 	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
+ 	 * command is outstanding.
+ 	 */
+-	if (!al_can_change(dev))
+-		return -EPERM;
++	if (!al_can_change(dev)) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	for (i = 0; i < dev->le_al_len; i++) {
+ 		struct btdev_al *al = &dev->le_al[i];
+@@ -3694,18 +3698,25 @@ static int cmd_add_al(struct btdev *dev, const void *data, uint8_t len)
+ 			pos = i;
+ 	}
+ 
+-	if (exists)
+-		return -EALREADY;
++	/* If the device is already in the Filter Accept List, the Controller
++	 * should not add the device to the Filter Accept List again and should
++	 * return success.
++	 */
++	if (exists) {
++		status = BT_HCI_ERR_SUCCESS;
++		goto done;
++	}
+ 
+ 	if (pos < 0) {
+-		cmd_status(dev, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
+-					BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST);
+-		return 0;
++		status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
+ 	}
+ 
+ 	al_add(&dev->le_al[pos], cmd->addr_type, (bdaddr_t *)&cmd->addr);
+ 
+ 	status = BT_HCI_ERR_SUCCESS;
++
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_ACCEPT_LIST,
+ 						&status, sizeof(status));
+ 
+@@ -3728,12 +3739,16 @@ static int cmd_remove_al(struct btdev *dev, const void *data, uint8_t len)
+ 	 * HCI_LE_Create_Connection or HCI_LE_Extended_Create_Connection
+ 	 * command is outstanding.
+ 	 */
+-	if (!al_can_change(dev))
+-		return -EPERM;
++	if (!al_can_change(dev)) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	for (i = 0; i < dev->le_al_len; i++) {
+ 		struct btdev_al *al = &dev->le_al[i];
+@@ -3750,10 +3765,14 @@ static int cmd_remove_al(struct btdev *dev, const void *data, uint8_t len)
+ 		}
+ 	}
+ 
+-	if (i == dev->le_al_len)
+-		return -EINVAL;
++	if (i == dev->le_al_len) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	status = BT_HCI_ERR_SUCCESS;
++
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_ACCEPT_LIST,
+ 						&status, sizeof(status));
+ 
+@@ -3774,12 +3793,16 @@ static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
+ 	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
+ 	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
+ 	 */
+-	if (dev->le_adv_enable || dev->le_scan_enable)
+-		return -EPERM;
++	if (dev->le_adv_enable || dev->le_scan_enable) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	for (i = 0; i < dev->le_rl_len; i++) {
+ 		struct btdev_rl *rl = &dev->le_rl[i];
+@@ -3791,13 +3814,18 @@ static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
+ 			pos = i;
+ 	}
+ 
+-	if (exists)
+-		return -EALREADY;
++	/* If an entry already exists in the resolving list with the same four
++	 * parameter values, the Controller shall either reject the command or
++	 * not add the device to the resolving list again and return success.
++	 */
++	if (exists) {
++		status = BT_HCI_ERR_SUCCESS;
++		goto done;
++	}
+ 
+ 	if (pos < 0) {
+-		cmd_status(dev, BT_HCI_ERR_MEM_CAPACITY_EXCEEDED,
+-					BT_HCI_CMD_LE_ADD_TO_RESOLV_LIST);
+-		return 0;
++		status = BT_HCI_ERR_MEM_CAPACITY_EXCEEDED;
++		goto done;
+ 	}
+ 
+ 	dev->le_rl[pos].type = cmd->addr_type;
+@@ -3806,6 +3834,8 @@ static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
+ 	memcpy(dev->le_rl[pos].local_irk, cmd->local_irk, 16);
+ 
+ 	status = BT_HCI_ERR_SUCCESS;
++
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_ADD_TO_RESOLV_LIST,
+ 						&status, sizeof(status));
+ 
+@@ -3825,12 +3855,16 @@ static int cmd_remove_rl(struct btdev *dev, const void *data, uint8_t len)
+ 	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
+ 	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
+ 	 */
+-	if (dev->le_adv_enable || dev->le_scan_enable)
+-		return -EPERM;
++	if (dev->le_adv_enable || dev->le_scan_enable) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	for (i = 0; i < dev->le_rl_len; i++) {
+ 		struct btdev_rl *rl = &dev->le_rl[i];
+@@ -3841,10 +3875,14 @@ static int cmd_remove_rl(struct btdev *dev, const void *data, uint8_t len)
+ 		}
+ 	}
+ 
+-	if (i == dev->le_rl_len)
+-		return -EINVAL;
++	if (i == dev->le_rl_len) {
++		status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	status = BT_HCI_ERR_SUCCESS;
++
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_REMOVE_FROM_RESOLV_LIST,
+ 						&status, sizeof(status));
+ 
+@@ -3862,12 +3900,16 @@ static int cmd_clear_rl(struct btdev *dev, const void *data, uint8_t len)
+ 	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
+ 	 * or HCI_LE_Periodic_Advertising_Create_Sync command is outstanding.
+ 	 */
+-	if (dev->le_adv_enable || dev->le_scan_enable)
+-		return -EPERM;
++	if (dev->le_adv_enable || dev->le_scan_enable) {
++		status = BT_HCI_ERR_COMMAND_DISALLOWED;
++		goto done;
++	}
+ 
+ 	rl_clear(dev);
+ 
+ 	status = BT_HCI_ERR_SUCCESS;
++
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_CLEAR_RESOLV_LIST,
+ 						&status, sizeof(status));
+ 
+@@ -3894,12 +3936,15 @@ static int cmd_read_peer_rl_addr(struct btdev *dev, const void *data,
+ 	struct bt_hci_rsp_le_read_peer_resolv_addr rsp;
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
+ 	memset(rsp.addr, 0, 6);
+ 
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_READ_PEER_RESOLV_ADDR,
+ 							&rsp, sizeof(rsp));
+ 
+@@ -3913,12 +3958,15 @@ static int cmd_read_local_rl_addr(struct btdev *dev, const void *data,
+ 	struct bt_hci_rsp_le_read_local_resolv_addr rsp;
+ 
+ 	/* Valid range for address type is 0x00 to 0x01 */
+-	if (cmd->addr_type > 0x01)
+-		return -EINVAL;
++	if (cmd->addr_type > 0x01) {
++		rsp.status = BT_HCI_ERR_INVALID_PARAMETERS;
++		goto done;
++	}
+ 
+ 	rsp.status = BT_HCI_ERR_UNKNOWN_CONN_ID;
+ 	memset(rsp.addr, 0, 6);
+ 
++done:
+ 	cmd_complete(dev, BT_HCI_CMD_LE_READ_LOCAL_RESOLV_ADDR,
+ 							&rsp, sizeof(rsp));
+ 
+-- 
+2.31.1
 
---===============0319983633703366539==--
