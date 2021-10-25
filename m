@@ -2,144 +2,143 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0FB23C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 21:02:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7410FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E5739603E7
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 21:02:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3F6EB60F46
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233438AbhJYVEc (ORCPT
+        id S235429AbhJYXn3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Oct 2021 17:04:32 -0400
-Received: from relay04.th.seeweb.it ([5.144.164.165]:60553 "EHLO
-        relay04.th.seeweb.it" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231339AbhJYVEc (ORCPT
+        Mon, 25 Oct 2021 19:43:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53894 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234775AbhJYXn1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Oct 2021 17:04:32 -0400
-X-Greylist: delayed 8664 seconds by postgrey-1.27 at vger.kernel.org; Mon, 25 Oct 2021 17:04:31 EDT
-Received: from SoMainline.org (94-209-165-62.cable.dynamic.v4.ziggo.nl [94.209.165.62])
-        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-         key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        by m-r1.th.seeweb.it (Postfix) with ESMTPSA id 8D9611F5FA;
-        Mon, 25 Oct 2021 23:02:07 +0200 (CEST)
-Date:   Mon, 25 Oct 2021 23:02:06 +0200
-From:   Marijn Suijten <marijn.suijten@somainline.org>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Pauli Virtanen <pav@iki.fi>,
-        Marek Czerski <ma.czerski@gmail.com>,
-        Yu Liu <yudiliu@google.com>
-Subject: Re: [PATCH BlueZ v2] audio/avrcp: Determine Absolute Volume support
- from feature category 2
-Message-ID: <20211025210206.bkt5wovzmkmt6teg@SoMainline.org>
-References: <20211019091648.120910-1-marijn.suijten@somainline.org>
- <CABBYNZKvicPfaqoun8nomNw=_qxT8k4n0+TiHxALfQOV+Ns2+A@mail.gmail.com>
- <20211025134201.v3rh4ro4zkskbfjs@SoMainline.org>
- <CABBYNZ+M_y7JLM777Jwo1y5JQ7EfrmUcWzx6CwSnajnxrJAqVg@mail.gmail.com>
- <20211025183742.jx3h77ko3rbapisv@SoMainline.org>
- <CABBYNZJcx9tC6vNw38X-9d09k-Pe5-=DARY7qPz=dNpaYJqz1g@mail.gmail.com>
+        Mon, 25 Oct 2021 19:43:27 -0400
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47C44C061745
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
+Received: by mail-pl1-x630.google.com with SMTP id w16so370542plg.3
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t4RcHhvqOeHJOnULxKttT+7jKGmubwaTQfyZzVejIXM=;
+        b=DTJoECgqLkI6xBdODwaf20bBXgNh/mCtocxtWLX/c4noXmrMKB1UDRvY6H1RGk/JaP
+         l3H0Z0dTeJPsN5vSH7oPouFo8vFBICqDNFw5Vuw99ZbnkOPG/rVbu1onRNUSmeTSmF4R
+         CDhHa5HjFSscTVWX/NhviGiAruuBC57avi0UBM1i0srokoGvKw3L7uMfjBkrXmoqssbC
+         9AsVcqSubu7H+qZGSx3pZu3GCXTWCPwEnog7YwyjwVcihtIoe+1LIupz+Er8SjF6Zq05
+         6ChxB2cOu2bRoWktrd/W1hOQeO9yPDg/JzytMR8qJhoSGBacvuOdw35aknDIwl85EOYk
+         CK6w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=t4RcHhvqOeHJOnULxKttT+7jKGmubwaTQfyZzVejIXM=;
+        b=7iCr0TsQaUrOso2IR5PpIGF+OwJdWL0Dac7Mvwl7gx3zXGgh7KZ0jWzZu58/soviEZ
+         cEk1g5Cv7bqqvZXs57VkwEmiuDfAHzRXeS9YOn9iXi9SiEemTjd0Aulqto13/0WXGl3R
+         Zq87Z2kzO/S121UsDHOoM215V1Ocxu3BRZObJo7GYs3jEnakxMHCecmZh0X8WAESGqsJ
+         ms837HGYx8VkR2Af9rezD00ONGk2f84ixhRn8pfPQhqdCqDD+y2i64HVMeTHhqujcL6I
+         BhBIMakeoqYubsIbdbkNn9RtfPnp7L6H7cZ1jad2f3GendKoFoBnHHxP0oEJVNNbuXu7
+         xHdQ==
+X-Gm-Message-State: AOAM531mEVmj8HAy5cIZzUeiVWdQxi9hKFdQr6RrvBYDsW3mjS1ndxg0
+        0yYWjEtEOTSWlI6YUF9yfkC9nx64NtU=
+X-Google-Smtp-Source: ABdhPJz0Pjq6ptw/d/+c0vTdF4QGxj/XbUwDEpVgqu+0Z4Gz+M79pxhhuxzHnnGkuhJ4S+5lZG/RZA==
+X-Received: by 2002:a17:90b:4a0f:: with SMTP id kk15mr38955742pjb.34.1635205263358;
+        Mon, 25 Oct 2021 16:41:03 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id g7sm16607133pgp.17.2021.10.25.16.41.02
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 25 Oct 2021 16:41:03 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v5 00/23] Bluetooth: HCI command synchronization
+Date:   Mon, 25 Oct 2021 16:40:39 -0700
+Message-Id: <20211025234102.1140719-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CABBYNZJcx9tC6vNw38X-9d09k-Pe5-=DARY7qPz=dNpaYJqz1g@mail.gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On 2021-10-25 13:32:50, Luiz Augusto von Dentz wrote:
-> Hi Marijn,
-> 
-> On Mon, Oct 25, 2021 at 11:37 AM Marijn Suijten
-> <marijn.suijten@somainline.org> wrote:
-> >
-> > Hi Luiz,
-> >
-> > On 2021-10-25 10:48:34, Luiz Augusto von Dentz wrote:
-> > > Hi Marijn,
-> > >
-> > > On Mon, Oct 25, 2021 at 6:42 AM Marijn Suijten
-> > > <marijn.suijten@somainline.org> wrote:
-> > > >
-> > > > Hi Luiz,
-> > > > [..]
-> > > > As far as I'm aware AVRCP 1.3 doesn't define FEATURE_CATEGORY_2 either
-> > > > (but I don't have that spec available to check) so IOP would only find
-> > > > this if it combines v1.3 with that feature bit and then tries to check
-> > > > CAP_EVENTS_SUPPORTED.  But if it does that, it should also find that
-> > > > we're not even checking for the controller supporting FEATURE_CATEGORY_2
-> > > > in the first place, nor are disallowing the controller to send
-> > > > SetAbsoluteVolume.  That's something we should add for sure, even if we
-> > > > don't go ahead with decreasing the minimum version for category-2
-> > > > features below 1.4.
-> > > > I can send a preliminary patch enforcing this if you want.
-> > >
-> > > So you are saying FEATURE_CATEGORY_2 is not defined in AVRCP 1.3
-> > > either? If the is the case we should probably make it clear on the
-> > > code with a code comment that we will be going to verify it only
-> > > because of Android using it with AVRCP 1.3, but I wonder if there is
-> > > anything in the records that you give us the information that it is
-> > > indeed Android and we should be fine doing such check since AOSP has
-> > > been doing this for a while.
-> >
-> > I'm not sure since I don't have access to the 1.3 spec and haven't found
-> > it online in a quick search.  This however makes the most sense since
-> > feature category 2 seems to _only_ concern itself with volume-related
-> > functionality, which are merely SetAbsoluteVolume and
-> > EVENT_VOLUME_CHANGED and introduced only since 1.4.
-> >
-> > I wonder if there's anything specific besides the class indicating a
-> > phone factor and the appearance of an avrcp controller with v1.3 but
-> > this feature bit set.
-> >
-> > I'll send a followup in two stages: one that introduces a
-> > FEATURE_CATEGORY_2 check around all volume handling, and another that
-> > bumps the requirement for the peer-controller down to v1.3 with clear
-> > comments about AOSP - unless you have better ideas to detect it :)
-> >
-> > > > [..]
-> > > >
-> > > > Finally, on the subject of incorrect behaviour and IOP, I found
-> > > > 179ccb936 ("avrcp: Set volume if volume changed event is registered")
-> > > > which also seems counter-intuitive besides going completely against the
-> > > > spec.  It doesn't seem to have gone in through the mailing lists nor
-> > > > discusses the affected device and any potential misbehaviour as a
-> > > > result.  If you're concerned with this patch, is that something you'd
-> > > > like to keep as well?
-> >
-> > Anything on this commit?  I'd like to improve the FEATURE_CATEGORY_2
-> > checks and this is quite alarming and conflicting with that.
-> 
-> So you want to change that check to check for FEATURE_CATEGORY_2
-> instead of checking if AVRCP_EVENT_VOLUME_CHANGED has been registered?
-> Note that the reason why this was done like that is because there is
-> no record to check the version so I assume there are no features to
-> check either, I wonder how these devices are even qualified like that.
+This is the initial work to move away from the current design of
+batch up commands with hci_req_run to be executed asynchronously to
+instead run them synchronously which enables handling errors properly.
 
-Yeah I'd check for the TG version (done before that patch) and
-FEATURE_CATEGORY_2 here, but the patch clearly mentions that there's no
-target to begin with.  This seems counter-intuitive and more like a
-fluke (maybe the SDP cache got of date, or the device dynamically
-"un"-publishes this record) and without knowing what device this was
-happening on it's very hard to validate if/whether this is still valid.
+It specially targets enabling the so called LL Privacy feature and
+simplifying Suspend/Resume code paths since those are the most
+complicated ones involving multiple state machines (Connection,
+Advertising, Scanning and Adv Monitor) which requires a bunch commands
+to be send making the code very complicated to follow.
 
-> Anyway we probably need more code comments when we are doing something
-> like that, and perhaps we could have some entry on main.conf, under
-> AVRCPO, to make these checks less strict so the system can allow
-> things like 1.3 with FEATURE_CATEGORY_2 and target without record.
+As a result of these changes the LL Privacy is enabled for the
+peripheral role, previously only central role had support for it, so it
+is possible to have advertising sets when LL Privacy is enabled.
 
-I totally agree that all these edge-cases should use extra comments to
-detail what's going on, and I like the idea of hiding them behind config
-flags.  That way we can pass validation without worries and at the same
-time give distros and individuals the ability to be less strict, though
-we'll have to think about the default value for for example this AOSP
-workaround.
+Suspend/Resume have been reworked so it no longer needs a state machine
+to track its progress, the whole process of suspending is handled by
+hci_suspend_sync and hci_resume_sync for resuming, we also took the time
+to document the source code to make clear what is their expected behavior.
 
-Based on your suggestion I'll also move absolute volume control without
-target SDP record behind a similar flag, and add Yu Liu to the CC here
-to see if we can get some more clarification. Yu, can you detail what
-device this was happening on, and if this is still the case?  Thanks!
+In order to properly test these changes a number of new tests are being
+introduced see:
 
-- Marijn
+https://patchwork.kernel.org/project/bluetooth/list/?series=565857
+
+Brian Gix (13):
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
+  Bluetooth: hci_sync: Enable synch'd set_bredr
+  Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
+  Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
+  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
+  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
+  Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
+  Bluetooth: hci_sync: Convert adv_expire
+  Bluetooth: hci_sync: Convert MGMT_OP_SSP
+
+Luiz Augusto von Dentz (9):
+  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
+  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
+  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
+  Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
+  Bluetooth: hci_sync: Rework background scan
+  Bluetooth: hci_sync: Convert MGMT_SET_POWERED
+  Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
+  Bluetooth: hci_sync: Rework init stages
+  Bluetooth: hci_sync: Rework hci_suspend_notifier
+
+Marcel Holtmann (1):
+  Bluetooth: Add helper for serialized HCI command execution
+
+ include/net/bluetooth/bluetooth.h |    2 +
+ include/net/bluetooth/hci_core.h  |   21 +-
+ include/net/bluetooth/hci_sync.h  |   98 +
+ net/bluetooth/Makefile            |    2 +-
+ net/bluetooth/hci_conn.c          |   20 +-
+ net/bluetooth/hci_core.c          | 1333 +-------
+ net/bluetooth/hci_event.c         |  153 +-
+ net/bluetooth/hci_request.c       |  338 +-
+ net/bluetooth/hci_request.h       |   10 +
+ net/bluetooth/hci_sync.c          | 4788 +++++++++++++++++++++++++++++
+ net/bluetooth/mgmt.c              | 2050 ++++++------
+ net/bluetooth/mgmt_util.c         |   15 +-
+ net/bluetooth/mgmt_util.h         |    4 +
+ net/bluetooth/msft.c              |  511 +--
+ net/bluetooth/msft.h              |   15 +-
+ 15 files changed, 6370 insertions(+), 2990 deletions(-)
+ create mode 100644 include/net/bluetooth/hci_sync.h
+ create mode 100644 net/bluetooth/hci_sync.c
+
+-- 
+2.31.1
+
