@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C61AAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47DE8C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:09 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A073960F70
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 26D1760F70
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 23:41:09 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235481AbhJYXna (ORCPT
+        id S235486AbhJYXnb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Oct 2021 19:43:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53898 "EHLO
+        Mon, 25 Oct 2021 19:43:31 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53904 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235411AbhJYXn1 (ORCPT
+        with ESMTP id S235426AbhJYXn2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Oct 2021 19:43:27 -0400
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEE31C061745
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
-Received: by mail-pj1-x1029.google.com with SMTP id n11-20020a17090a2bcb00b001a1e7a0a6a6so726889pje.0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
+        Mon, 25 Oct 2021 19:43:28 -0400
+Received: from mail-pf1-x42b.google.com (mail-pf1-x42b.google.com [IPv6:2607:f8b0:4864:20::42b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A58CAC061767
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:05 -0700 (PDT)
+Received: by mail-pf1-x42b.google.com with SMTP id v193so5774289pfc.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 25 Oct 2021 16:41:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=FS7hlay7CZmcCjjq7eLGr5fEpt6s4Ik6bkK1UXAdBJY=;
-        b=mNKoBmq4cbjhQO8j44owjLTaYue34++ElMNf+4t0eqjzS3q/2dnZpHIHbygh+gYm6S
-         XJvEkhw5mXUaz6V2bh5Ncju07Rl52K42C3T5PYoP9rUcvCr19n4px7KARIi+Pr9Prza1
-         Pq2B54XAWk/STKA9sUhNS/K26hTDxnI5rIPNAmM1DT4bST7K/gHT7wboYJLLCCcVO5jh
-         qJk4iH7fhjB2SoKDjpZ1VDhHaFZldgwIoNWFj7t8KDIlh+2vBabmzO8OdG9F3kqDwn13
-         7+mA6jRyKJj7eKI28qfgyCZhLS6KZLihUshU/NdHFcaW/F/4WYqbdt7+R1zKmydu9e9c
-         ZnfQ==
+        bh=VnhR5kNuH0dTcJMt94ZEOssw4aW9JZKLXTbRp6RlD4c=;
+        b=bJ6sLXmpAe8joLqyCyr3+ecvNlrMQ6gnr3Rt8JyEDO2rp3QiKxOF+fy9uBXD01wWZe
+         jg8cnY7CcLqrnlNfFj6q2iC5u5jcAh1AE3bHhiZKK5NJiJHqsqaDM3ff3QMsUG5hmI/y
+         u3XMkI7uMmpmnQ+nz4efxHpcLngS4D1Fn5CmjEE8mItwuPimVsDj6PwhbNaypqSt/2CK
+         c2WD1zo41YZKE8tbfY/0jINXRVWIo6iAlJqfiXqDsY4jnnpxOjS3uNS/XUxhd9q7A1/n
+         l2FdPvb/c5IMOEJwz8qGupe/eeLffJPDBXqYh3x2ZBop9oE63MdxWcmFvYlStqNbGRNf
+         a6qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=FS7hlay7CZmcCjjq7eLGr5fEpt6s4Ik6bkK1UXAdBJY=;
-        b=wsIsxEOWOeQTa59sR3FAQTyti0Uo+giLgHxN/gqCBI0U/4d8R19w/PKPBcw+uGz5Tl
-         GkUbsm3tjKxxNZLuP6lTIRCcmVpfPdGi88h86mxokxCTXIbOW9zKmww7Kz/LPcl9kCD4
-         4tyUrvkdcKMieNFeU7pLh0SVwpKsBdK6ozinMTR0R62JSe9D8Ganl62LN3AtSdbSIe1Q
-         WpNlsvLbvpcWdk9oycrpbZMJNmFBkpnGIUffIJKbQeEr/DUO58YRKapz8G6EtBDflmVr
-         GleppxOjuqaj5LajxHf0P2HjDUzdfgJphqf8357q11zV8jGGNWkKxA01SHC6b+6Q5zwY
-         FTkA==
-X-Gm-Message-State: AOAM5302WU0sF87rNHRFZup5SsgPDp3lrkqnhVCWCX6n0s2CBgmH0vXY
-        dycezYXP5S1iFqXF1RxEZMoExUWR4lo=
-X-Google-Smtp-Source: ABdhPJxj1SWTgoHchQUFHAeWQInS3uPyJk4ZUM1q1TJpVVtaltJNrxBlTUWdNuRAbCwyCgp8GcrrmQ==
-X-Received: by 2002:a17:902:780f:b0:13a:3919:e365 with SMTP id p15-20020a170902780f00b0013a3919e365mr19142340pll.63.1635205263986;
-        Mon, 25 Oct 2021 16:41:03 -0700 (PDT)
+        bh=VnhR5kNuH0dTcJMt94ZEOssw4aW9JZKLXTbRp6RlD4c=;
+        b=Rcju9iPaVEmrSRtULbOfsMEBiPjQKyCEZiQYmtVDT+EkWPOx9lSZIMQasMvhtzh0rB
+         sRi66rmgeB9OCfk8VWn4uZ8v6rI5iaEtYqSUYt7TTEEqkjrs3UZhU2NSLnmiwFK5SNy/
+         kQPSm1d9h7i7xlJk61b8wuOUHBvOyKNimh7bLK0ThGxzEho+7cHjX5sTkrCtTdeQUzF4
+         71/O/sfR8ZAtiyl06zOCLiwKfPBV1dO1LSomuVRtplJBasXkcs6wThIX/ogWz+wDxMSs
+         kKtTlOs8YCb0DHFoJRUAdnuhzau0BeVd2OzOe8KpHakTWPpgxc47eNWBg7R6KBEstil8
+         imXA==
+X-Gm-Message-State: AOAM531UsnxxzziYWqzTykN2G/KOyAAMmCBSVcadZC6xM88lnxmohmZt
+        1mhmDARle0BYOLYBE4ysAQkH65dPpYE=
+X-Google-Smtp-Source: ABdhPJymRq9lQd/2aGH6KojcRgVbHjuBQgoEytlAd/atcQ5QOA/xULXZmzNf1jngCdAE1RQ9FDAMKg==
+X-Received: by 2002:a63:8f49:: with SMTP id r9mr15934314pgn.208.1635205264643;
+        Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id g7sm16607133pgp.17.2021.10.25.16.41.03
+        by smtp.gmail.com with ESMTPSA id g7sm16607133pgp.17.2021.10.25.16.41.04
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 25 Oct 2021 16:41:03 -0700 (PDT)
+        Mon, 25 Oct 2021 16:41:04 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 01/23] Bluetooth: Add helper for serialized HCI command execution
-Date:   Mon, 25 Oct 2021 16:40:40 -0700
-Message-Id: <20211025234102.1140719-2-luiz.dentz@gmail.com>
+Subject: [PATCH v5 02/23] Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
+Date:   Mon, 25 Oct 2021 16:40:41 -0700
+Message-Id: <20211025234102.1140719-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211025234102.1140719-1-luiz.dentz@gmail.com>
 References: <20211025234102.1140719-1-luiz.dentz@gmail.com>
@@ -67,634 +67,587 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Marcel Holtmann <marcel@holtmann.org>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-The usage of __hci_cmd_sync() within the hdev->setup() callback allows for
-a nice and simple serialized execution of HCI commands. More importantly
-it allows for result processing before issueing the next command.
+This make use of hci_cmd_sync_queue for the following MGMT commands:
 
-With the current usage of hci_req_run() it is possible to batch up
-commands and execute them, but it is impossible to react to their
-results or errors.
+Set Device Class
+Set Device ID
+Add UUID
+Remove UUID
 
-This is an attempt to generalize the hdev->setup() handling and provide
-a simple way of running multiple HCI commands from a single function
-context.
+tools/mgmt-tester -s "Set Device Class"
 
-There are multiple struct work that are decdicated to certain tasks
-already used right now. It is add a lot of bloat to hci_dev struct and
-extra handling code. So it might be possible to put all of these behind
-a common HCI command infrastructure and just execute the HCI commands
-from the same work context in a serialized fashion.
+Test Summary
+------------
+Set Device Class - Success 1                         Passed
+Set Device Class - Success 2                         Passed
+Set Device Class - Invalid parameters 1              Passed
+Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.0599 seconds
 
-For example updating the white list and resolving list can be done now
-without having to know the list size ahead of time. Also preparing for
-suspend or resume shouldn't require a state machine anymore. There are
-other tasks that should be simplified as well.
+tools/mgmt-tester -s "Set Device ID"
 
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
+Test Summary
+------------
+Set Device ID - Success 1                            Passed
+Set Device ID - Success 2                            Passed
+Set Device ID - Disable                              Passed
+Set Device ID - Power off and Power on               Passed
+Set Device ID - SSP off and Power on                 Passed
+Set Device ID - Invalid Parameter                    Passed
+Total: 6, Passed: 6 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.107 seconds
+
+tools/mgmt-tester -s "Add UUID"
+
+Test Summary
+------------
+Add UUID - UUID-16 1                                 Passed
+Add UUID - UUID-16 multiple 1                        Passed
+Add UUID - UUID-16 partial 1                         Passed
+Add UUID - UUID-32 1                                 Passed
+Add UUID - UUID-32 multiple 1                        Passed
+Add UUID - UUID-32 partial 1                         Passed
+Add UUID - UUID-128 1                                Passed
+Add UUID - UUID-128 multiple 1                       Passed
+Add UUID - UUID-128 partial 1                        Passed
+Add UUID - UUID mix                                  Passed
+Total: 10, Passed: 10 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.198 seconds
+
+tools/mgmt-tester -s "Remove UUID"
+
+Test Summary
+------------
+Remove UUID - Success 1                              Passed
+Remove UUID - All UUID - Success 2                   Passed
+Remove UUID - Power Off - Success 3                  Passed
+Remove UUID - Power Off and On - Success 4           Passed
+Remove UUID - Not Exist - Invalid Params 1           Passed
+Total: 5, Passed: 5 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.0908 seconds
+
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |  11 +-
- include/net/bluetooth/hci_sync.h |  42 ++++
- net/bluetooth/Makefile           |   2 +-
- net/bluetooth/hci_core.c         |  23 +--
- net/bluetooth/hci_request.c      |  68 -------
- net/bluetooth/hci_request.h      |   4 +
- net/bluetooth/hci_sync.c         | 330 +++++++++++++++++++++++++++++++
- 7 files changed, 385 insertions(+), 95 deletions(-)
- create mode 100644 include/net/bluetooth/hci_sync.h
- create mode 100644 net/bluetooth/hci_sync.c
+ include/net/bluetooth/hci_sync.h |   3 +
+ net/bluetooth/hci_request.c      |   4 +-
+ net/bluetooth/hci_request.h      |   6 +
+ net/bluetooth/hci_sync.c         |  72 ++++++++++++
+ net/bluetooth/mgmt.c             | 192 +++++++++++++++----------------
+ net/bluetooth/mgmt_util.c        |  15 ++-
+ net/bluetooth/mgmt_util.h        |   3 +
+ 7 files changed, 193 insertions(+), 102 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index dd8840e70e25..17ddea51d161 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -30,6 +30,7 @@
- #include <linux/rculist.h>
- 
- #include <net/bluetooth/hci.h>
-+#include <net/bluetooth/hci_sync.h>
- #include <net/bluetooth/hci_sock.h>
- 
- /* HCI priority */
-@@ -475,6 +476,9 @@ struct hci_dev {
- 	struct work_struct	power_on;
- 	struct delayed_work	power_off;
- 	struct work_struct	error_reset;
-+	struct work_struct	cmd_sync_work;
-+	struct list_head	cmd_sync_work_list;
-+	struct mutex		cmd_sync_work_lock;
- 
- 	__u16			discov_timeout;
- 	struct delayed_work	discov_off;
-@@ -1690,10 +1694,6 @@ static inline int hci_check_conn_params(u16 min, u16 max, u16 latency,
- int hci_register_cb(struct hci_cb *hcb);
- int hci_unregister_cb(struct hci_cb *hcb);
- 
--struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
--			       const void *param, u32 timeout);
--struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
--				  const void *param, u8 event, u32 timeout);
- int __hci_cmd_send(struct hci_dev *hdev, u16 opcode, u32 plen,
- 		   const void *param);
- 
-@@ -1704,9 +1704,6 @@ void hci_send_sco(struct hci_conn *conn, struct sk_buff *skb);
- 
- void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode);
- 
--struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
--			     const void *param, u32 timeout);
--
- u32 hci_conn_get_phy(struct hci_conn *conn);
- 
- /* ----- HCI Sockets ----- */
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-new file mode 100644
-index 000000000000..fcfdeb3cbd7c
---- /dev/null
+index fcfdeb3cbd7c..fe77ff97bc8e 100644
+--- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -0,0 +1,42 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2021 Intel Corporation
-+ */
-+
-+typedef int (*hci_cmd_sync_work_func_t)(struct hci_dev *hdev, void *data);
-+typedef void (*hci_cmd_sync_work_destroy_t)(struct hci_dev *hdev, void *data,
-+					    int err);
-+
-+struct hci_cmd_sync_work_entry {
-+	struct list_head list;
-+	hci_cmd_sync_work_func_t func;
-+	void *data;
-+	hci_cmd_sync_work_destroy_t destroy;
-+};
-+
-+/* Function with sync suffix shall not be called with hdev->lock held as they
-+ * wait the command to complete and in the meantime an event could be received
-+ * which could attempt to acquire hdev->lock causing a deadlock.
-+ */
-+struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			       const void *param, u32 timeout);
-+struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			     const void *param, u32 timeout);
-+struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				  const void *param, u8 event, u32 timeout);
-+struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				  const void *param, u8 event, u32 timeout,
-+				  struct sock *sk);
-+int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			  const void *param, u32 timeout);
-+int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			     const void *param, u8 event, u32 timeout,
-+			     struct sock *sk);
-+
-+void hci_cmd_sync_init(struct hci_dev *hdev);
-+void hci_cmd_sync_clear(struct hci_dev *hdev);
-+
-+int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
-+		       void *data, hci_cmd_sync_work_destroy_t destroy);
-diff --git a/net/bluetooth/Makefile b/net/bluetooth/Makefile
-index 291770fc9551..a52bba8500e1 100644
---- a/net/bluetooth/Makefile
-+++ b/net/bluetooth/Makefile
-@@ -15,7 +15,7 @@ bluetooth_6lowpan-y := 6lowpan.o
- bluetooth-y := af_bluetooth.o hci_core.o hci_conn.o hci_event.o mgmt.o \
- 	hci_sock.o hci_sysfs.o l2cap_core.o l2cap_sock.o smp.o lib.o \
- 	ecdh_helper.o hci_request.o mgmt_util.o mgmt_config.o hci_codec.o \
--	eir.o
-+	eir.o hci_sync.o
+@@ -40,3 +40,6 @@ void hci_cmd_sync_clear(struct hci_dev *hdev);
  
- bluetooth-$(CONFIG_BT_BREDR) += sco.o
- bluetooth-$(CONFIG_BT_HS) += a2mp.o amp.o
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 98533def61a3..fdc1cce5eb5b 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3747,6 +3747,8 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
- 	INIT_WORK(&hdev->error_reset, hci_error_reset);
- 	INIT_WORK(&hdev->suspend_prepare, hci_prepare_suspend);
- 
-+	hci_cmd_sync_init(hdev);
+ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 		       void *data, hci_cmd_sync_work_destroy_t destroy);
 +
- 	INIT_DELAYED_WORK(&hdev->power_off, hci_power_off);
- 
- 	skb_queue_head_init(&hdev->rx_q);
-@@ -3905,6 +3907,8 @@ void hci_unregister_dev(struct hci_dev *hdev)
- 
- 	cancel_work_sync(&hdev->power_on);
- 
-+	hci_cmd_sync_clear(hdev);
-+
- 	if (!test_bit(HCI_QUIRK_NO_SUSPEND_NOTIFIER, &hdev->quirks)) {
- 		hci_suspend_clear_tasks(hdev);
- 		unregister_pm_notifier(&hdev->suspend_notifier);
-@@ -4271,25 +4275,6 @@ void *hci_sent_cmd_data(struct hci_dev *hdev, __u16 opcode)
- 	return hdev->sent_cmd->data + HCI_COMMAND_HDR_SIZE;
- }
- 
--/* Send HCI command and wait for command complete event */
--struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
--			     const void *param, u32 timeout)
--{
--	struct sk_buff *skb;
--
--	if (!test_bit(HCI_UP, &hdev->flags))
--		return ERR_PTR(-ENETDOWN);
--
--	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
--
--	hci_req_sync_lock(hdev);
--	skb = __hci_cmd_sync(hdev, opcode, plen, param, timeout);
--	hci_req_sync_unlock(hdev);
--
--	return skb;
--}
--EXPORT_SYMBOL(hci_cmd_sync);
--
- /* Send ACL data */
- static void hci_add_acl_hdr(struct sk_buff *skb, __u16 handle, __u16 flags)
- {
++int hci_update_eir_sync(struct hci_dev *hdev);
++int hci_update_class_sync(struct hci_dev *hdev);
 diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 92611bfc0b9e..c98340bba5c7 100644
+index c98340bba5c7..b1b33432c68d 100644
 --- a/net/bluetooth/hci_request.c
 +++ b/net/bluetooth/hci_request.c
-@@ -32,10 +32,6 @@
- #include "msft.h"
- #include "eir.h"
- 
--#define HCI_REQ_DONE	  0
--#define HCI_REQ_PEND	  1
--#define HCI_REQ_CANCELED  2
--
- void hci_req_init(struct hci_request *req, struct hci_dev *hdev)
- {
- 	skb_queue_head_init(&req->cmd_q);
-@@ -126,70 +122,6 @@ void hci_req_sync_cancel(struct hci_dev *hdev, int err)
- 	}
+@@ -97,8 +97,8 @@ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete)
+ 	return req_run(req, NULL, complete);
  }
  
--struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
--				  const void *param, u8 event, u32 timeout)
--{
--	struct hci_request req;
--	struct sk_buff *skb;
--	int err = 0;
--
--	bt_dev_dbg(hdev, "");
--
--	hci_req_init(&req, hdev);
--
--	hci_req_add_ev(&req, opcode, plen, param, event);
--
--	hdev->req_status = HCI_REQ_PEND;
--
--	err = hci_req_run_skb(&req, hci_req_sync_complete);
--	if (err < 0)
--		return ERR_PTR(err);
--
--	err = wait_event_interruptible_timeout(hdev->req_wait_q,
--			hdev->req_status != HCI_REQ_PEND, timeout);
--
--	if (err == -ERESTARTSYS)
--		return ERR_PTR(-EINTR);
--
--	switch (hdev->req_status) {
--	case HCI_REQ_DONE:
--		err = -bt_to_errno(hdev->req_result);
--		break;
--
--	case HCI_REQ_CANCELED:
--		err = -hdev->req_result;
--		break;
--
--	default:
--		err = -ETIMEDOUT;
--		break;
--	}
--
--	hdev->req_status = hdev->req_result = 0;
--	skb = hdev->req_skb;
--	hdev->req_skb = NULL;
--
--	bt_dev_dbg(hdev, "end: err %d", err);
--
--	if (err < 0) {
--		kfree_skb(skb);
--		return ERR_PTR(err);
--	}
--
--	if (!skb)
--		return ERR_PTR(-ENODATA);
--
--	return skb;
--}
--EXPORT_SYMBOL(__hci_cmd_sync_ev);
--
--struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
--			       const void *param, u32 timeout)
--{
--	return __hci_cmd_sync_ev(hdev, opcode, plen, param, 0, timeout);
--}
--EXPORT_SYMBOL(__hci_cmd_sync);
--
- /* Execute request and wait for completion. */
- int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 						     unsigned long opt),
+-static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+-				  struct sk_buff *skb)
++void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
++			   struct sk_buff *skb)
+ {
+ 	bt_dev_dbg(hdev, "result 0x%2.2x", result);
+ 
 diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index f31420f58525..74c5de5970a7 100644
+index 74c5de5970a7..ba75c2da70f4 100644
 --- a/net/bluetooth/hci_request.h
 +++ b/net/bluetooth/hci_request.h
-@@ -25,6 +25,10 @@
- #define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
- #define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+@@ -22,6 +22,10 @@
+ 
+ #include <asm/unaligned.h>
  
 +#define HCI_REQ_DONE	  0
 +#define HCI_REQ_PEND	  1
 +#define HCI_REQ_CANCELED  2
 +
- struct hci_request {
- 	struct hci_dev		*hdev;
- 	struct sk_buff_head	cmd_q;
+ #define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
+ #define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+ 
+@@ -44,6 +48,8 @@ void hci_req_purge(struct hci_request *req);
+ bool hci_req_status_pend(struct hci_dev *hdev);
+ int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete);
++void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
++			   struct sk_buff *skb);
+ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
+ 		 const void *param);
+ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-new file mode 100644
-index 000000000000..b2048287fe90
---- /dev/null
+index b2048287fe90..8546cbcae10c 100644
+--- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -0,0 +1,330 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * BlueZ - Bluetooth protocol stack for Linux
-+ *
-+ * Copyright (C) 2021 Intel Corporation
-+ */
+@@ -11,6 +11,7 @@
+ 
+ #include "hci_request.h"
+ #include "smp.h"
++#include "eir.h"
+ 
+ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ 				  struct sk_buff *skb)
+@@ -328,3 +329,74 @@ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 	return 0;
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_queue);
 +
-+#include <net/bluetooth/bluetooth.h>
-+#include <net/bluetooth/hci_core.h>
-+#include <net/bluetooth/mgmt.h>
-+
-+#include "hci_request.h"
-+#include "smp.h"
-+
-+static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
-+				  struct sk_buff *skb)
++int hci_update_eir_sync(struct hci_dev *hdev)
 +{
-+	bt_dev_dbg(hdev, "result 0x%2.2x", result);
++	struct hci_cp_write_eir cp;
 +
-+	if (hdev->req_status != HCI_REQ_PEND)
-+		return;
++	bt_dev_dbg(hdev, "");
 +
-+	hdev->req_result = result;
-+	hdev->req_status = HCI_REQ_DONE;
++	if (!hdev_is_powered(hdev))
++		return 0;
 +
-+	wake_up_interruptible(&hdev->req_wait_q);
++	if (!lmp_ext_inq_capable(hdev))
++		return 0;
++
++	if (!hci_dev_test_flag(hdev, HCI_SSP_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	eir_create(hdev, cp.data);
++
++	if (memcmp(cp.data, hdev->eir, sizeof(cp.data)) == 0)
++		return 0;
++
++	memcpy(hdev->eir, cp.data, sizeof(cp.data));
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp,
++				     HCI_CMD_TIMEOUT);
 +}
 +
-+static struct sk_buff *hci_cmd_sync_alloc(struct hci_dev *hdev, u16 opcode,
-+					  u32 plen, const void *param,
-+					  struct sock *sk)
++static u8 get_service_classes(struct hci_dev *hdev)
 +{
-+	int len = HCI_COMMAND_HDR_SIZE + plen;
-+	struct hci_command_hdr *hdr;
-+	struct sk_buff *skb;
++	struct bt_uuid *uuid;
++	u8 val = 0;
 +
-+	skb = bt_skb_alloc(len, GFP_ATOMIC);
-+	if (!skb)
-+		return NULL;
++	list_for_each_entry(uuid, &hdev->uuids, list)
++		val |= uuid->svc_hint;
 +
-+	hdr = skb_put(skb, HCI_COMMAND_HDR_SIZE);
-+	hdr->opcode = cpu_to_le16(opcode);
-+	hdr->plen   = plen;
-+
-+	if (plen)
-+		skb_put_data(skb, param, plen);
-+
-+	bt_dev_dbg(hdev, "skb len %d", skb->len);
-+
-+	hci_skb_pkt_type(skb) = HCI_COMMAND_PKT;
-+	hci_skb_opcode(skb) = opcode;
-+
-+	return skb;
++	return val;
 +}
 +
-+static void hci_cmd_sync_add(struct hci_request *req, u16 opcode, u32 plen,
-+			     const void *param, u8 event, struct sock *sk)
++int hci_update_class_sync(struct hci_dev *hdev)
 +{
-+	struct hci_dev *hdev = req->hdev;
-+	struct sk_buff *skb;
++	u8 cod[3];
 +
-+	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
++	bt_dev_dbg(hdev, "");
 +
-+	/* If an error occurred during request building, there is no point in
-+	 * queueing the HCI command. We can simply return.
-+	 */
-+	if (req->err)
-+		return;
++	if (!hdev_is_powered(hdev))
++		return 0;
 +
-+	skb = hci_cmd_sync_alloc(hdev, opcode, plen, param, sk);
-+	if (!skb) {
-+		bt_dev_err(hdev, "no memory for command (opcode 0x%4.4x)",
-+			   opcode);
-+		req->err = -ENOMEM;
-+		return;
++	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	cod[0] = hdev->minor_class;
++	cod[1] = hdev->major_class;
++	cod[2] = get_service_classes(hdev);
++
++	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
++		cod[1] |= 0x20;
++
++	if (memcmp(cod, hdev->dev_class, 3) == 0)
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_CLASS_OF_DEV,
++				     sizeof(cod), cod, HCI_CMD_TIMEOUT);
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 44683443300c..ec6aa7af482f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -276,10 +276,39 @@ static const u8 mgmt_status_table[] = {
+ 	MGMT_STATUS_CONNECT_FAILED,	/* MAC Connection Failed */
+ };
+ 
+-static u8 mgmt_status(u8 hci_status)
++static u8 mgmt_errno_status(int err)
+ {
+-	if (hci_status < ARRAY_SIZE(mgmt_status_table))
+-		return mgmt_status_table[hci_status];
++	switch (err) {
++	case 0:
++		return MGMT_STATUS_SUCCESS;
++	case -EPERM:
++		return MGMT_STATUS_REJECTED;
++	case -EINVAL:
++		return MGMT_STATUS_INVALID_PARAMS;
++	case -EOPNOTSUPP:
++		return MGMT_STATUS_NOT_SUPPORTED;
++	case -EBUSY:
++		return MGMT_STATUS_BUSY;
++	case -ETIMEDOUT:
++		return MGMT_STATUS_AUTH_FAILED;
++	case -ENOMEM:
++		return MGMT_STATUS_NO_RESOURCES;
++	case -EISCONN:
++		return MGMT_STATUS_ALREADY_CONNECTED;
++	case -ENOTCONN:
++		return MGMT_STATUS_DISCONNECTED;
 +	}
 +
-+	if (skb_queue_empty(&req->cmd_q))
-+		bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
-+
-+	bt_cb(skb)->hci.req_event = event;
-+
-+	skb_queue_tail(&req->cmd_q, skb);
++	return MGMT_STATUS_FAILED;
 +}
 +
-+static int hci_cmd_sync_run(struct hci_request *req)
++static u8 mgmt_status(int err)
 +{
-+	struct hci_dev *hdev = req->hdev;
-+	struct sk_buff *skb;
-+	unsigned long flags;
++	if (err < 0)
++		return mgmt_errno_status(err);
 +
-+	bt_dev_dbg(hdev, "length %u", skb_queue_len(&req->cmd_q));
-+
-+	/* If an error occurred during request building, remove all HCI
-+	 * commands queued on the HCI request queue.
-+	 */
-+	if (req->err) {
-+		skb_queue_purge(&req->cmd_q);
-+		return req->err;
-+	}
-+
-+	/* Do not allow empty requests */
-+	if (skb_queue_empty(&req->cmd_q))
-+		return -ENODATA;
-+
-+	skb = skb_peek_tail(&req->cmd_q);
-+	bt_cb(skb)->hci.req_complete_skb = hci_cmd_sync_complete;
-+	bt_cb(skb)->hci.req_flags |= HCI_REQ_SKB;
-+
-+	spin_lock_irqsave(&hdev->cmd_q.lock, flags);
-+	skb_queue_splice_tail(&req->cmd_q, &hdev->cmd_q);
-+	spin_unlock_irqrestore(&hdev->cmd_q.lock, flags);
-+
-+	queue_work(hdev->workqueue, &hdev->cmd_work);
++	if (err < ARRAY_SIZE(mgmt_status_table))
++		return mgmt_status_table[err];
+ 
+ 	return MGMT_STATUS_FAILED;
+ }
+@@ -951,25 +980,23 @@ bool mgmt_get_connectable(struct hci_dev *hdev)
+ 	return hci_dev_test_flag(hdev, HCI_CONNECTABLE);
+ }
+ 
++static int service_cache_sync(struct hci_dev *hdev, void *data)
++{
++	hci_update_eir_sync(hdev);
++	hci_update_class_sync(hdev);
 +
 +	return 0;
 +}
 +
-+/* This function requires the caller holds hdev->req_lock. */
-+struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				  const void *param, u8 event, u32 timeout,
-+				  struct sock *sk)
-+{
-+	struct hci_request req;
-+	struct sk_buff *skb;
+ static void service_cache_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    service_cache.work);
+-	struct hci_request req;
+ 
+ 	if (!hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE))
+ 		return;
+ 
+-	hci_req_init(&req, hdev);
+-
+-	hci_dev_lock(hdev);
+-
+-	__hci_req_update_eir(&req);
+-	__hci_req_update_class(&req);
+-
+-	hci_dev_unlock(hdev);
+-
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, service_cache_sync, NULL, NULL);
+ }
+ 
+ static void rpa_expired(struct work_struct *work)
+@@ -2075,37 +2102,33 @@ static u8 get_uuid_size(const u8 *uuid)
+ 	return 16;
+ }
+ 
+-static void mgmt_class_complete(struct hci_dev *hdev, u16 mgmt_op, u8 status)
++static void mgmt_class_complete(struct hci_dev *hdev, void *data, int err)
+ {
+-	struct mgmt_pending_cmd *cmd;
+-
+-	hci_dev_lock(hdev);
++	struct mgmt_pending_cmd *cmd = data;
+ 
+-	cmd = pending_find(mgmt_op, hdev);
+-	if (!cmd)
+-		goto unlock;
++	bt_dev_dbg(hdev, "err %d", err);
+ 
+ 	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode,
+-			  mgmt_status(status), hdev->dev_class, 3);
++			  mgmt_status(err), hdev->dev_class, 3);
+ 
+-	mgmt_pending_remove(cmd);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
++	mgmt_pending_free(cmd);
+ }
+ 
+-static void add_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int add_uuid_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
++	int err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_ADD_UUID, status);
++	err = hci_update_class_sync(hdev);
++	if (err)
++		return err;
++
++	return hci_update_eir_sync(hdev);
+ }
+ 
+ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_uuid *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	struct bt_uuid *uuid;
+ 	int err;
+ 
+@@ -2131,28 +2154,17 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	list_add_tail(&uuid->list, &hdev->uuids);
+ 
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, add_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto failed;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_UUID, 0,
+-					hdev->dev_class, 3);
+-		goto failed;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_UUID, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_ADD_UUID, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, add_uuid_sync, cmd, mgmt_class_complete);
++	if (err < 0) {
++		mgmt_pending_free(cmd);
++		goto failed;
++	}
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
+@@ -2173,11 +2185,15 @@ static bool enable_service_cache(struct hci_dev *hdev)
+ 	return false;
+ }
+ 
+-static void remove_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int remove_uuid_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
++	int err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_REMOVE_UUID, status);
++	err = hci_update_class_sync(hdev);
++	if (err)
++		return err;
++
++	return hci_update_eir_sync(hdev);
+ }
+ 
+ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -2187,7 +2203,6 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_pending_cmd *cmd;
+ 	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+-	struct hci_request req;
+ 	int err, found;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2231,39 +2246,35 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ update_class:
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, remove_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_UUID, 0,
+-					hdev->dev_class, 3);
+-		goto unlock;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, remove_uuid_sync, cmd,
++				 mgmt_class_complete);
++	if (err < 0)
++		mgmt_pending_free(cmd);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
+ }
+ 
+-static void set_class_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int set_class_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
 +	int err = 0;
 +
-+	bt_dev_dbg(hdev, "");
++	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
++		cancel_delayed_work_sync(&hdev->service_cache);
++		err = hci_update_eir_sync(hdev);
++	}
 +
-+	hci_req_init(&req, hdev);
-+
-+	hci_cmd_sync_add(&req, opcode, plen, param, event, sk);
-+
-+	hdev->req_status = HCI_REQ_PEND;
-+
-+	err = hci_cmd_sync_run(&req);
++	if (err)
++		return err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_SET_DEV_CLASS, status);
++	return hci_update_class_sync(hdev);
+ }
+ 
+ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -2271,7 +2282,6 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_set_dev_class *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2303,34 +2313,16 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
+-
+-	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
+-		hci_dev_unlock(hdev);
+-		cancel_delayed_work_sync(&hdev->service_cache);
+-		hci_dev_lock(hdev);
+-		__hci_req_update_eir(&req);
+-	}
+-
+-	__hci_req_update_class(&req);
+-
+-	err = hci_req_run(&req, set_class_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEV_CLASS, 0,
+-					hdev->dev_class, 3);
+-		goto unlock;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, set_class_sync, cmd,
++				 mgmt_class_complete);
 +	if (err < 0)
-+		return ERR_PTR(err);
-+
-+	err = wait_event_interruptible_timeout(hdev->req_wait_q,
-+					       hdev->req_status != HCI_REQ_PEND,
-+					       timeout);
-+
-+	if (err == -ERESTARTSYS)
-+		return ERR_PTR(-EINTR);
-+
-+	switch (hdev->req_status) {
-+	case HCI_REQ_DONE:
-+		err = -bt_to_errno(hdev->req_result);
-+		break;
-+
-+	case HCI_REQ_CANCELED:
-+		err = -hdev->req_result;
-+		break;
-+
-+	default:
-+		err = -ETIMEDOUT;
-+		break;
-+	}
-+
-+	hdev->req_status = 0;
-+	hdev->req_result = 0;
-+	skb = hdev->req_skb;
-+	hdev->req_skb = NULL;
-+
-+	bt_dev_dbg(hdev, "end: err %d", err);
-+
-+	if (err < 0) {
-+		kfree_skb(skb);
-+		return ERR_PTR(err);
-+	}
-+
-+	if (!skb)
-+		return ERR_PTR(-ENODATA);
-+
-+	return skb;
-+}
-+EXPORT_SYMBOL(__hci_cmd_sync_sk);
-+
-+/* This function requires the caller holds hdev->req_lock. */
-+struct sk_buff *__hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			       const void *param, u32 timeout)
++		mgmt_pending_free(cmd);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -5494,11 +5486,15 @@ static int unblock_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static int set_device_id_sync(struct hci_dev *hdev, void *data)
 +{
-+	return __hci_cmd_sync_sk(hdev, opcode, plen, param, 0, timeout, NULL);
++	return hci_update_eir_sync(hdev);
 +}
-+EXPORT_SYMBOL(__hci_cmd_sync);
 +
-+/* Send HCI command and wait for command complete event */
-+struct sk_buff *hci_cmd_sync(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			     const void *param, u32 timeout)
+ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_device_id *cp = data;
+-	struct hci_request req;
+ 	int err;
+ 	__u16 source;
+ 
+@@ -5520,9 +5516,7 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_ID, 0,
+ 				NULL, 0);
+ 
+-	hci_req_init(&req, hdev);
+-	__hci_req_update_eir(&req);
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, set_device_id_sync, NULL, NULL);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index 0d0a6d77b9e8..83875f2a0604 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -227,7 +227,7 @@ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 	}
+ }
+ 
+-struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
++struct mgmt_pending_cmd *mgmt_pending_new(struct sock *sk, u16 opcode,
+ 					  struct hci_dev *hdev,
+ 					  void *data, u16 len)
+ {
+@@ -251,6 +251,19 @@ struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 	cmd->sk = sk;
+ 	sock_hold(sk);
+ 
++	return cmd;
++}
++
++struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
++					  struct hci_dev *hdev,
++					  void *data, u16 len)
 +{
-+	struct sk_buff *skb;
++	struct mgmt_pending_cmd *cmd;
 +
-+	if (!test_bit(HCI_UP, &hdev->flags))
-+		return ERR_PTR(-ENETDOWN);
++	cmd = mgmt_pending_new(sk, opcode, hdev, data, len);
++	if (!cmd)
++		return NULL;
 +
-+	bt_dev_dbg(hdev, "opcode 0x%4.4x plen %d", opcode, plen);
-+
-+	hci_req_sync_lock(hdev);
-+	skb = __hci_cmd_sync(hdev, opcode, plen, param, timeout);
-+	hci_req_sync_unlock(hdev);
-+
-+	return skb;
-+}
-+EXPORT_SYMBOL(hci_cmd_sync);
-+
-+/* This function requires the caller holds hdev->req_lock. */
-+struct sk_buff *__hci_cmd_sync_ev(struct hci_dev *hdev, u16 opcode, u32 plen,
-+				  const void *param, u8 event, u32 timeout)
-+{
-+	return __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout,
-+				 NULL);
-+}
-+EXPORT_SYMBOL(__hci_cmd_sync_ev);
-+
-+/* This function requires the caller holds hdev->req_lock. */
-+int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			     const void *param, u8 event, u32 timeout,
-+			     struct sock *sk)
-+{
-+	struct sk_buff *skb;
-+	u8 status;
-+
-+	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
-+	if (IS_ERR_OR_NULL(skb)) {
-+		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
-+			   PTR_ERR(skb));
-+		return PTR_ERR(skb);
-+	}
-+
-+	status = skb->data[0];
-+
-+	kfree_skb(skb);
-+
-+	return status;
-+}
-+EXPORT_SYMBOL(__hci_cmd_sync_status_sk);
-+
-+int __hci_cmd_sync_status(struct hci_dev *hdev, u16 opcode, u32 plen,
-+			  const void *param, u32 timeout)
-+{
-+	return __hci_cmd_sync_status_sk(hdev, opcode, plen, param, 0, timeout,
-+					NULL);
-+}
-+EXPORT_SYMBOL(__hci_cmd_sync_status);
-+
-+static void hci_cmd_sync_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_work);
-+	struct hci_cmd_sync_work_entry *entry;
-+	hci_cmd_sync_work_func_t func;
-+	hci_cmd_sync_work_destroy_t destroy;
-+	void *data;
-+
-+	bt_dev_dbg(hdev, "");
-+
-+	mutex_lock(&hdev->cmd_sync_work_lock);
-+	entry = list_first_entry(&hdev->cmd_sync_work_list,
-+				 struct hci_cmd_sync_work_entry, list);
-+	if (entry) {
-+		list_del(&entry->list);
-+		func = entry->func;
-+		data = entry->data;
-+		destroy = entry->destroy;
-+		kfree(entry);
-+	} else {
-+		func = NULL;
-+		data = NULL;
-+		destroy = NULL;
-+	}
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+
-+	if (func) {
-+		int err;
-+
-+		hci_req_sync_lock(hdev);
-+
-+		err = func(hdev, data);
-+
-+		if (destroy)
-+			destroy(hdev, data, err);
-+
-+		hci_req_sync_unlock(hdev);
-+	}
-+}
-+
-+void hci_cmd_sync_init(struct hci_dev *hdev)
-+{
-+	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
-+	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
-+	mutex_init(&hdev->cmd_sync_work_lock);
-+}
-+
-+void hci_cmd_sync_clear(struct hci_dev *hdev)
-+{
-+	struct hci_cmd_sync_work_entry *entry, *tmp;
-+
-+	cancel_work_sync(&hdev->cmd_sync_work);
-+
-+	list_for_each_entry_safe(entry, tmp, &hdev->cmd_sync_work_list, list) {
-+		if (entry->destroy)
-+			entry->destroy(hdev, entry->data, -ECANCELED);
-+
-+		list_del(&entry->list);
-+		kfree(entry);
-+	}
-+}
-+
-+int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
-+		       void *data, hci_cmd_sync_work_destroy_t destroy)
-+{
-+	struct hci_cmd_sync_work_entry *entry;
-+
-+	entry = kmalloc(sizeof(*entry), GFP_KERNEL);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	entry->func = func;
-+	entry->data = data;
-+	entry->destroy = destroy;
-+
-+	mutex_lock(&hdev->cmd_sync_work_lock);
-+	list_add_tail(&entry->list, &hdev->cmd_sync_work_list);
-+	mutex_unlock(&hdev->cmd_sync_work_lock);
-+
-+	queue_work(hdev->req_workqueue, &hdev->cmd_sync_work);
-+
-+	return 0;
-+}
-+EXPORT_SYMBOL(hci_cmd_sync_queue);
+ 	list_add(&cmd->list, &hdev->mgmt_pending);
+ 
+ 	return cmd;
+diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
+index 6559f189213c..9dc24ba0d51a 100644
+--- a/net/bluetooth/mgmt_util.h
++++ b/net/bluetooth/mgmt_util.h
+@@ -49,5 +49,8 @@ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 					  struct hci_dev *hdev,
+ 					  void *data, u16 len);
++struct mgmt_pending_cmd *mgmt_pending_new(struct sock *sk, u16 opcode,
++					  struct hci_dev *hdev,
++					  void *data, u16 len);
+ void mgmt_pending_free(struct mgmt_pending_cmd *cmd);
+ void mgmt_pending_remove(struct mgmt_pending_cmd *cmd);
 -- 
 2.31.1
 
