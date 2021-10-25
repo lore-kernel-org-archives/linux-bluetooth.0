@@ -2,63 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C92D8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 04:47:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CAF18C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 04:47:31 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A3C6A60FBF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 04:47:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AF5B560FBF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 04:47:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231831AbhJYEtu (ORCPT
+        id S232073AbhJYEtv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Oct 2021 00:49:50 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48228 "EHLO
+        Mon, 25 Oct 2021 00:49:51 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48232 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229678AbhJYEtt (ORCPT
+        with ESMTP id S231613AbhJYEtu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Oct 2021 00:49:49 -0400
-Received: from mail-pg1-x534.google.com (mail-pg1-x534.google.com [IPv6:2607:f8b0:4864:20::534])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 309F3C061745
+        Mon, 25 Oct 2021 00:49:50 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7A74C061745
         for <linux-bluetooth@vger.kernel.org>; Sun, 24 Oct 2021 21:47:28 -0700 (PDT)
-Received: by mail-pg1-x534.google.com with SMTP id r2so9678481pgl.10
+Received: by mail-pl1-x631.google.com with SMTP id c4so3164694plg.13
         for <linux-bluetooth@vger.kernel.org>; Sun, 24 Oct 2021 21:47:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=GN64q4nuu6zkiuwohx69Zu7UQYLWgsXgndnImWCPccA=;
-        b=kUJy2KoQbWBBlw3dSaqeCHZjREFkGq/akTqxmvcriEwLkjg+IHhZXKL5o6HwXfIyJg
-         Kagka173v9T7uiJHYWsbiDX/RdOoqGaExUdbWlrjLxka9xlH8uk5QRN/0lTZUSHwuoSM
-         Zr6q83B+qIFqVYfbxOTcd53ttjrX7jedPxhURmjZNY0j53/8fLtI/Pti4jRcyCECZKlU
-         LAWhPnEKSWkCwsG3X3M+nWvI3bVovyGm6QiT0QMIB1RoYiLRmHKcEPbJzRKfpyVCZzEV
-         TPd+uIalGNWKYy+ErkYjoR0a5+peeireV3SOXyXw35T8q9kv77qwO19AviLucf4jsBxX
-         g7BA==
+        bh=a92ewmJCIhCXFTeCxJwy0bcIgrcxBRq6irNBLVf+kLY=;
+        b=LRRE5JScnNOJBKhSA4SadiOMHAn/vF/BgE9ty8CJvxOJn2SwS/OMEnjEXh9CJVZDKl
+         c+Ejv91DHo8nSyltMCzaarDyWcMjvOt8mRguCZHnq7PmLZbbMYX/7OHjZtLW13qwdX+q
+         F2qmcY+QVPJ6tAapwr+0iKf7kU5QqFQNdXy055Rsg4vf8ylNi/cGJDAEMjlAsIXXbsE2
+         shTvxnRZ6+DCftdvh9d7OqbwZAG4zZ1JcJPnYSL40Ll/T6Y6D+runBRXac59NJ9VpPiN
+         GnZif+ZBwMTfW+qtAVC++6ZZsCkO/saUv4HxZNhOQGb0B7hZX10mAUhHNURmo7vNZXgk
+         nI3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GN64q4nuu6zkiuwohx69Zu7UQYLWgsXgndnImWCPccA=;
-        b=tSXtRHlOv8Iyjanu/WBjacXlUlvFbOF9LW+Z02P9Ij7E0ps0A/S4MomgOtoeM7OiIt
-         g6SFBQ37F1DXHAgC8YJejiudF2uhhtbuGJvVC1dSo6W9lkiemVOavft9owAFtwnLjQkn
-         t4e0smF4/gLT4QUJhkr9SpN+4lSx/2xtfhmW0OjUlM3cZRGqsMYL1XlrOzuLTz0brVi3
-         k3f3ve/Qj89e8RuR++bl35UAUkrVJS+KOmbM6VsHBidM3gYe7e+gdONsi8YkKloSFtKW
-         1RFN7G7HN1WVBHkHlykVM1bJiMwkyAH0LEs6n1D3/g9WUlMPyddEix0fuMBa4JH1eSvl
-         JDUg==
-X-Gm-Message-State: AOAM533vx/OTX6Pob6gexygb/4P7dFrS/E7yMPrOJqGUMbWdgKoyaZys
-        HBnaLglXkW5P/FfxUrvU++p+31WYyk4ozA==
-X-Google-Smtp-Source: ABdhPJwr/clZcO5XZHfbYu4WqkVs6yB0sYyGLnbqk15jQGMcS7L0JYsGJfF6/UHCvHIstZN9fwZKQA==
-X-Received: by 2002:a05:6a00:24c1:b0:44d:3047:4229 with SMTP id d1-20020a056a0024c100b0044d30474229mr15690312pfv.70.1635137247322;
-        Sun, 24 Oct 2021 21:47:27 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=a92ewmJCIhCXFTeCxJwy0bcIgrcxBRq6irNBLVf+kLY=;
+        b=d5gJNPYF0xPdGFZnJ0T/XAutPzsRd1cet3qbmf/ZuIqxZe3UHbmEjKh0nCje15fNnj
+         TPmP+IjSRF1Tg7S9EgnJAyYFgkBSlGFztakumiZatgoxtwKQ70+keyH6aet3LWZczPiE
+         63CTSzsK5BkpWVJIbzkWuN2as5gwLlm2ZMQAGvN6q8kd5lair29KnGRxcS98O2lZlYOg
+         qbJS8gMMzbf0gIaJMLKd2W9N+iLA1cQcyGDzDu5savDBlITn43DMG0MBH8Yxe85cYPob
+         UyrkAKaWI1T9I8HaXdPMDVpDgHBWvQ8G3xhTvzPJaJG4Kyqi1aL/EM8JfppM2Ol0eaod
+         jfyQ==
+X-Gm-Message-State: AOAM530eC2LpOqKY8p8Apx/T+RMBREkrq0zcYjnwry1HW7juVl/qxpOt
+        buaq1h+feTFtdT8Lay+m0G2nDrpl/58leA==
+X-Google-Smtp-Source: ABdhPJyTsEh3MwwtejlBDpZVP6PNyCeFZcQ34UkH+MKhm/xUzJqtv9I3jqjUYiu3qS4NmNgz6aJpTQ==
+X-Received: by 2002:a17:90a:530f:: with SMTP id x15mr17992339pjh.156.1635137248193;
+        Sun, 24 Oct 2021 21:47:28 -0700 (PDT)
 Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:d228:1bef:af2a:db8e])
-        by smtp.gmail.com with ESMTPSA id a17sm13926204pfv.64.2021.10.24.21.47.26
+        by smtp.gmail.com with ESMTPSA id a17sm13926204pfv.64.2021.10.24.21.47.27
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 24 Oct 2021 21:47:26 -0700 (PDT)
+        Sun, 24 Oct 2021 21:47:27 -0700 (PDT)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH 1/4] emulator: Add support to config the accept and resolve list
-Date:   Sun, 24 Oct 2021 21:47:22 -0700
-Message-Id: <20211025044725.482641-1-hj.tedd.an@gmail.com>
+Subject: [BlueZ PATCH 2/4] emulator: bthost: Add support LE Ext Adv Report
+Date:   Sun, 24 Oct 2021 21:47:23 -0700
+Message-Id: <20211025044725.482641-2-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20211025044725.482641-1-hj.tedd.an@gmail.com>
+References: <20211025044725.482641-1-hj.tedd.an@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,208 +69,219 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-This patch adds interfaces to config the accept list and resolve list in
-the btdev.
+This patch adds support LE_Extended_Advertising_Report Eevnt in bthost.
 ---
- emulator/btdev.c  | 37 +++++++++++++++++++++++++++++--------
- emulator/btdev.h  |  4 ++++
- emulator/hciemu.c | 28 ++++++++++++++++++++++++++++
- emulator/hciemu.h |  4 ++++
- 4 files changed, 65 insertions(+), 8 deletions(-)
+ emulator/bthost.c | 118 ++++++++++++++++++++++++++++++++++++++++++++++
+ emulator/bthost.h |   5 ++
+ 2 files changed, 123 insertions(+)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 03003d949..1ae71765d 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -198,6 +198,10 @@ struct btdev {
- 	} __attribute__ ((packed)) le_cig;
- 	uint8_t  le_iso_path[2];
+diff --git a/emulator/bthost.c b/emulator/bthost.c
+index 4f1598f0d..61f1cd361 100644
+--- a/emulator/bthost.c
++++ b/emulator/bthost.c
+@@ -25,6 +25,7 @@
  
-+	/* Real time length of AL array */
-+	uint8_t le_al_len;
-+	/* Real time length of RL array */
-+	uint8_t le_rl_len;
- 	struct btdev_al le_al[AL_SIZE];
- 	struct btdev_rl le_rl[RL_SIZE];
- 	uint8_t  le_rl_enable;
-@@ -482,6 +486,18 @@ static void rl_clear(struct btdev *dev)
- 		rl_reset(&dev->le_rl[i]);
- }
+ #include "src/shared/util.h"
+ #include "src/shared/tester.h"
++#include "src/shared/queue.h"
+ #include "monitor/bt.h"
+ #include "monitor/rfcomm.h"
+ #include "bthost.h"
+@@ -187,6 +188,15 @@ struct rfcomm_connection_data {
+ 	void *user_data;
+ };
  
-+/* Set the real time length of AL array */
-+void btdev_set_al_len(struct btdev *btdev, uint8_t len)
-+{
-+	btdev->le_al_len = len;
-+}
++struct le_ext_adv {
++	struct bthost *bthost;
++	uint16_t event_type;
++	uint8_t  addr_type;
++	uint8_t  addr[6];
++	uint8_t  direct_addr_type;
++	uint8_t  direct_addr[6];
++};
 +
-+/* Set the real time length of RL array */
-+void btdev_set_rl_len(struct btdev *btdev, uint8_t len)
-+{
-+	btdev->le_rl_len = len;
-+}
+ struct bthost {
+ 	bool ready;
+ 	bthost_ready_cb ready_cb;
+@@ -215,6 +225,8 @@ struct bthost {
+ 	bool le;
+ 	bool sc;
+ 
++	struct queue *le_ext_adv;
 +
- static void btdev_reset(struct btdev *btdev)
- {
- 	/* FIXME: include here clearing of all states that should be
-@@ -493,6 +509,9 @@ static void btdev_reset(struct btdev *btdev)
- 
- 	al_clear(btdev);
- 	rl_clear(btdev);
-+
-+	btdev->le_al_len = AL_SIZE;
-+	btdev->le_rl_len = RL_SIZE;
- }
- 
- static int cmd_reset(struct btdev *dev, const void *data, uint8_t len)
-@@ -3578,7 +3597,7 @@ static int cmd_read_al_size(struct btdev *dev, const void *data, uint8_t len)
- 	struct bt_hci_rsp_le_read_accept_list_size rsp;
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
--	rsp.size = AL_SIZE;
-+	rsp.size = dev->le_al_len;
- 	cmd_complete(dev, BT_HCI_CMD_LE_READ_ACCEPT_LIST_SIZE, &rsp,
- 						sizeof(rsp));
- 
-@@ -3665,7 +3684,7 @@ static int cmd_add_al(struct btdev *dev, const void *data, uint8_t len)
- 	if (cmd->addr_type > 0x01)
- 		return -EINVAL;
- 
--	for (i = 0; i < AL_SIZE; i++) {
-+	for (i = 0; i < dev->le_al_len; i++) {
- 		struct btdev_al *al = &dev->le_al[i];
- 
- 		if (AL_ADDR_EQUAL(al, cmd->addr_type, &cmd->addr)) {
-@@ -3716,7 +3735,7 @@ static int cmd_remove_al(struct btdev *dev, const void *data, uint8_t len)
- 	if (cmd->addr_type > 0x01)
- 		return -EINVAL;
- 
--	for (i = 0; i < AL_SIZE; i++) {
-+	for (i = 0; i < dev->le_al_len; i++) {
- 		struct btdev_al *al = &dev->le_al[i];
- 
- 		ba2str(&al->addr, addr);
-@@ -3731,7 +3750,7 @@ static int cmd_remove_al(struct btdev *dev, const void *data, uint8_t len)
- 		}
+ 	bthost_debug_func_t debug_callback;
+ 	bthost_destroy_func_t debug_destroy;
+ 	void *debug_data;
+@@ -234,6 +246,8 @@ struct bthost *bthost_create(void)
+ 		return NULL;
  	}
  
--	if (i == AL_SIZE)
-+	if (i == dev->le_al_len)
- 		return -EINVAL;
++	bthost->le_ext_adv = queue_new();
++
+ 	/* Set defaults */
+ 	bthost->io_capability = 0x03;
  
- 	status = BT_HCI_ERR_SUCCESS;
-@@ -3762,7 +3781,7 @@ static int cmd_add_rl(struct btdev *dev, const void *data, uint8_t len)
- 	if (cmd->addr_type > 0x01)
- 		return -EINVAL;
- 
--	for (i = 0; i < RL_SIZE; i++) {
-+	for (i = 0; i < dev->le_rl_len; i++) {
- 		struct btdev_rl *rl = &dev->le_rl[i];
- 
- 		if (RL_ADDR_EQUAL(rl, cmd->addr_type, &cmd->addr)) {
-@@ -3813,7 +3832,7 @@ static int cmd_remove_rl(struct btdev *dev, const void *data, uint8_t len)
- 	if (cmd->addr_type > 0x01)
- 		return -EINVAL;
- 
--	for (i = 0; i < RL_SIZE; i++) {
-+	for (i = 0; i < dev->le_rl_len; i++) {
- 		struct btdev_rl *rl = &dev->le_rl[i];
- 
- 		if (RL_ADDR_EQUAL(rl, cmd->addr_type, &cmd->addr)) {
-@@ -3822,7 +3841,7 @@ static int cmd_remove_rl(struct btdev *dev, const void *data, uint8_t len)
- 		}
- 	}
- 
--	if (i == RL_SIZE)
-+	if (i == dev->le_rl_len)
- 		return -EINVAL;
- 
- 	status = BT_HCI_ERR_SUCCESS;
-@@ -3860,7 +3879,7 @@ static int cmd_read_rl_size(struct btdev *dev, const void *data, uint8_t len)
- 	struct bt_hci_rsp_le_read_resolv_list_size rsp;
- 
- 	rsp.status = BT_HCI_ERR_SUCCESS;
--	rsp.size = RL_SIZE;
-+	rsp.size = dev->le_rl_len;
- 
- 	cmd_complete(dev, BT_HCI_CMD_LE_READ_RESOLV_LIST_SIZE,
- 							&rsp, sizeof(rsp));
-@@ -6310,6 +6329,8 @@ struct btdev *btdev_create(enum btdev_type type, uint16_t id)
- 	btdev->conns = queue_new();
- 	btdev->le_ext_adv = queue_new();
- 
-+	btdev->le_al_len = AL_SIZE;
-+	btdev->le_rl_len = RL_SIZE;
- 	return btdev;
+@@ -403,6 +417,32 @@ static struct rfcomm_conn_cb_data *bthost_find_rfcomm_cb_by_channel(
+ 	return NULL;
  }
  
-diff --git a/emulator/btdev.h b/emulator/btdev.h
-index 412bfd158..b5f9979a8 100644
---- a/emulator/btdev.h
-+++ b/emulator/btdev.h
-@@ -80,6 +80,10 @@ uint8_t btdev_get_le_scan_enable(struct btdev *btdev);
- 
- void btdev_set_le_states(struct btdev *btdev, const uint8_t *le_states);
- 
-+void btdev_set_al_len(struct btdev *btdev, uint8_t len);
-+
-+void btdev_set_rl_len(struct btdev *btdev, uint8_t len);
-+
- void btdev_set_command_handler(struct btdev *btdev, btdev_command_func handler,
- 							void *user_data);
- 
-diff --git a/emulator/hciemu.c b/emulator/hciemu.c
-index 4752c8a4d..1f7af3b93 100644
---- a/emulator/hciemu.c
-+++ b/emulator/hciemu.c
-@@ -601,6 +601,34 @@ void hciemu_set_central_le_states(struct hciemu *hciemu,
- 	btdev_set_le_states(dev, le_states);
- }
- 
-+void hciemu_set_central_le_al_len(struct hciemu *hciemu, uint8_t len)
++static struct le_ext_adv *le_ext_adv_new(struct bthost *bthost)
 +{
-+	struct btdev *dev;
++	struct le_ext_adv *ext_adv;
 +
-+	if (!hciemu || !hciemu->vhci)
-+		return;
++	ext_adv = new0(struct le_ext_adv, 1);
++	ext_adv->bthost = bthost;
 +
-+	dev = vhci_get_btdev(hciemu->vhci);
-+	if (!dev)
-+		return;
++	/* Add to queue */
++	if (!queue_push_tail(bthost->le_ext_adv, ext_adv)) {
++		free(ext_adv);
++		return NULL;
++	}
 +
-+	btdev_set_al_len(dev, len);
++	return ext_adv;
 +}
 +
-+void hciemu_set_central_le_rl_len(struct hciemu *hciemu, uint8_t len)
++static void le_ext_adv_free(void *data)
 +{
-+	struct btdev *dev;
++	struct le_ext_adv *ext_adv = data;
 +
-+	if (!hciemu || !hciemu->vhci)
-+		return;
++	/* Remove from queue */
++	queue_remove(ext_adv->bthost->le_ext_adv, ext_adv);
 +
-+	dev = vhci_get_btdev(hciemu->vhci);
-+	if (!dev)
-+		return;
-+
-+	btdev_set_rl_len(dev, len);
++	free(ext_adv);
 +}
 +
- bool hciemu_add_central_post_command_hook(struct hciemu *hciemu,
- 			hciemu_command_func_t function, void *user_data)
+ void bthost_destroy(struct bthost *bthost)
  {
-diff --git a/emulator/hciemu.h b/emulator/hciemu.h
-index 338fa844d..2a49d8bad 100644
---- a/emulator/hciemu.h
-+++ b/emulator/hciemu.h
-@@ -61,6 +61,10 @@ uint8_t hciemu_get_central_le_scan_enable(struct hciemu *hciemu);
- void hciemu_set_central_le_states(struct hciemu *hciemu,
- 						const uint8_t *le_states);
+ 	if (!bthost)
+@@ -449,6 +489,8 @@ void bthost_destroy(struct bthost *bthost)
  
-+void hciemu_set_central_le_al_len(struct hciemu *hciemu, uint8_t len);
+ 	smp_stop(bthost->smp_data);
+ 
++	queue_destroy(bthost->le_ext_adv, le_ext_adv_free);
 +
-+void hciemu_set_central_le_rl_len(struct hciemu *hciemu, uint8_t len);
+ 	free(bthost);
+ }
+ 
+@@ -1306,6 +1348,38 @@ static void evt_le_cis_req(struct bthost *bthost, const void *data, uint8_t len)
+ 	send_command(bthost, BT_HCI_CMD_LE_ACCEPT_CIS, &cmd, sizeof(cmd));
+ }
+ 
++static void evt_le_ext_adv_report(struct bthost *bthost, const void *data,
++								uint8_t len)
++{
++	const struct bt_hci_evt_le_ext_adv_report *ev = data;
++	const struct bt_hci_le_ext_adv_report *report;
++	struct le_ext_adv *le_ext_adv;
++	int i;
 +
- typedef void (*hciemu_command_func_t)(uint16_t opcode, const void *data,
- 						uint8_t len, void *user_data);
++	data += sizeof(ev->num_reports);
++
++	for (i = 0; i < ev->num_reports; i++) {
++		char addr_str[18];
++
++		report = data;
++		ba2str((bdaddr_t *) report->addr, addr_str);
++
++		bthost_debug(bthost, "le ext adv report: %s (0x%02x)",
++						addr_str, report->addr_type);
++
++		/* Add ext event to the queue */
++		le_ext_adv = le_ext_adv_new(bthost);
++		if (le_ext_adv) {
++			le_ext_adv->addr_type = report->addr_type;
++			memcpy(le_ext_adv->addr, report->addr, 6);
++			le_ext_adv->direct_addr_type = report->direct_addr_type;
++			memcpy(le_ext_adv->direct_addr, report->direct_addr, 6);
++		}
++
++		data += (sizeof(*report) + report->data_len);
++	}
++}
++
+ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 								uint8_t len)
+ {
+@@ -1333,6 +1407,9 @@ static void evt_le_meta_event(struct bthost *bthost, const void *data,
+ 	case BT_HCI_EVT_LE_ENHANCED_CONN_COMPLETE:
+ 		evt_le_ext_conn_complete(bthost, evt_data, len - 1);
+ 		break;
++	case BT_HCI_EVT_LE_EXT_ADV_REPORT:
++		evt_le_ext_adv_report(bthost, evt_data, len - 1);
++		break;
+ 	case BT_HCI_EVT_LE_CIS_REQ:
+ 		evt_le_cis_req(bthost, evt_data, len - 1);
+ 		break;
+@@ -2583,6 +2660,29 @@ void bthost_set_adv_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_ADV_ENABLE, &enable, 1);
+ }
+ 
++void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
++				uint8_t addr_type, uint8_t filter_policy)
++{
++	struct bt_hci_cmd_le_set_scan_parameters cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.type = scan_type;
++	cp.own_addr_type = addr_type;
++	cp.filter_policy = filter_policy;
++	send_command(bthost, BT_HCI_CMD_LE_SET_SCAN_PARAMETERS,
++							&cp, sizeof(cp));
++}
++
++void bthost_set_scan_enable(struct bthost *bthost, uint8_t enable)
++{
++	struct bt_hci_cmd_le_set_scan_enable cp;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.enable = enable;
++	send_command(bthost, BT_HCI_CMD_LE_SET_SCAN_ENABLE,
++							&cp, sizeof(cp));
++}
++
+ void bthost_set_ext_adv_params(struct bthost *bthost)
+ {
+ 	struct bt_hci_cmd_le_set_ext_adv_params cp;
+@@ -2612,6 +2712,24 @@ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable)
+ 	send_command(bthost, BT_HCI_CMD_LE_SET_EXT_ADV_ENABLE, cp, 6);
+ }
+ 
++bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr)
++{
++	const struct queue_entry *entry;
++
++	if (queue_isempty(bthost->le_ext_adv))
++		return false;
++
++	for (entry = queue_get_entries(bthost->le_ext_adv); entry;
++							entry = entry->next) {
++		struct le_ext_adv *le_ext_adv = entry->data;
++
++		if (!memcmp(le_ext_adv->addr, addr, 6))
++			return true;
++	}
++
++	return false;
++}
++
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode)
+ {
+ 	send_command(bthost, BT_HCI_CMD_WRITE_SIMPLE_PAIRING_MODE, &mode, 1);
+diff --git a/emulator/bthost.h b/emulator/bthost.h
+index 3dec44514..868af5469 100644
+--- a/emulator/bthost.h
++++ b/emulator/bthost.h
+@@ -84,6 +84,11 @@ void bthost_set_ext_adv_data(struct bthost *bthost, const uint8_t *data,
+ 								uint8_t len);
+ void bthost_set_ext_adv_params(struct bthost *bthost);
+ void bthost_set_ext_adv_enable(struct bthost *bthost, uint8_t enable);
++bool bthost_search_ext_adv_addr(struct bthost *bthost, const uint8_t *addr);
++
++void bthost_set_scan_params(struct bthost *bthost, uint8_t scan_type,
++				uint8_t addr_type, uint8_t filter_policy);
++void bthost_set_scan_enable(struct bthost *bthost, uint8_t enable);
+ 
+ void bthost_write_ssp_mode(struct bthost *bthost, uint8_t mode);
  
 -- 
 2.25.1
