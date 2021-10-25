@@ -2,73 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E6F4DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 13:03:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFEF9C4332F
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 13:05:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C160560F46
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 13:03:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 94B446023E
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 25 Oct 2021 13:05:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233181AbhJYNF1 (ORCPT
+        id S233464AbhJYNHj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 25 Oct 2021 09:05:27 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:59972 "EHLO
+        Mon, 25 Oct 2021 09:07:39 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:55526 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233119AbhJYNF1 (ORCPT
+        with ESMTP id S233460AbhJYNHj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 25 Oct 2021 09:05:27 -0400
+        Mon, 25 Oct 2021 09:07:39 -0400
 Received: from smtpclient.apple (p4ff9f2d2.dip0.t-ipconnect.de [79.249.242.210])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 12726CED17;
-        Mon, 25 Oct 2021 15:03:03 +0200 (CEST)
+        by mail.holtmann.org (Postfix) with ESMTPSA id A49AACED17;
+        Mon, 25 Oct 2021 15:05:15 +0200 (CEST)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 14.0 \(3654.120.0.1.13\))
-Subject: Re: [PATCH v2] Bluetooth: cmtp: fix possible panic when
- cmtp_init_sockets() fails
+Subject: Re: [PATCH] Bluetooth: fix division by zero in send path
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211025131012.2771062-1-wanghai38@huawei.com>
-Date:   Mon, 25 Oct 2021 15:03:02 +0200
-Cc:     Karsten Keil <isdn@linux-pingi.de>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
+In-Reply-To: <20211025113944.4350-1-johan@kernel.org>
+Date:   Mon, 25 Oct 2021 15:05:15 +0200
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "David S. Miller" <davem@davemloft.net>, kuba@kernel.org,
-        cascardo@canonical.com, netdev@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org
+        linux-bluetooth@vger.kernel.org, linux-usb@vger.kernel.org,
+        linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Content-Transfer-Encoding: 7bit
-Message-Id: <0A1C459E-C477-431B-8338-3F281BBED207@holtmann.org>
-References: <20211025131012.2771062-1-wanghai38@huawei.com>
-To:     Wang Hai <wanghai38@huawei.com>
+Message-Id: <608F4C62-7E22-4736-B032-13F4F3BE563D@holtmann.org>
+References: <20211025113944.4350-1-johan@kernel.org>
+To:     Johan Hovold <johan@kernel.org>
 X-Mailer: Apple Mail (2.3654.120.0.1.13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Wang,
+Hi Johan,
 
-> I got a kernel BUG report when doing fault injection test:
+> Add the missing bulk-out endpoint sanity check to probe() to avoid
+> division by zero in bfusb_send_frame() in case a malicious device has
+> broken descriptors (or when doing descriptor fuzz testing).
 > 
-> ------------[ cut here ]------------
-> kernel BUG at lib/list_debug.c:45!
-> ...
-> RIP: 0010:__list_del_entry_valid.cold+0x12/0x4d
-> ...
-> Call Trace:
-> proto_unregister+0x83/0x220
-> cmtp_cleanup_sockets+0x37/0x40 [cmtp]
-> cmtp_exit+0xe/0x1f [cmtp]
-> do_syscall_64+0x35/0xb0
-> entry_SYSCALL_64_after_hwframe+0x44/0xae
+> Note that USB core will reject URBs submitted for endpoints with zero
+> wMaxPacketSize but that drivers doing packet-size calculations still
+> need to handle this (cf. commit 2548288b4fb0 ("USB: Fix: Don't skip
+> endpoint descriptors with maxpacket=0")).
 > 
-> If cmtp_init_sockets() in cmtp_init() fails, cmtp_init() still returns
-> success. This will cause a kernel bug when accessing uncreated ctmp
-> related data when the module exits.
-> 
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: Hulk Robot <hulkci@huawei.com>
-> Signed-off-by: Wang Hai <wanghai38@huawei.com>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Johan Hovold <johan@kernel.org>
 > ---
-> v1->v2: remove the temporary variable "err"
-> net/bluetooth/cmtp/core.c | 4 +---
-> 1 file changed, 1 insertion(+), 3 deletions(-)
+> drivers/bluetooth/bfusb.c | 2 ++
+> 1 file changed, 2 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
