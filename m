@@ -2,159 +2,183 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C6CBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 14:43:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CC4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 16:25:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 33D1360F70
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 14:43:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E417060527
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 16:25:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236876AbhJZOpW (ORCPT
+        id S236405AbhJZQ10 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 10:45:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58878 "EHLO
+        Tue, 26 Oct 2021 12:27:26 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54354 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236881AbhJZOpV (ORCPT
+        with ESMTP id S237483AbhJZQ1B (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 10:45:21 -0400
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72883C061243
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 07:42:57 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id bi35so13191591lfb.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 07:42:57 -0700 (PDT)
+        Tue, 26 Oct 2021 12:27:01 -0400
+Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E56CC061237
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 09:24:35 -0700 (PDT)
+Received: by mail-pf1-x436.google.com with SMTP id 127so16779pfu.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 09:24:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=IeDPLqe3LBKUpRJz9gheIRoaNjTzo/azi2xTKJ59u4Q=;
-        b=rtTjZwJ3hBs0LVsm1btVhVOPMJ9I5MezaBoSmoqbce3/qjWaQC2+rhDsqRinNFpWQ9
-         XEIv2SKGN2wjW6chPzCLFT9zXOXt09mKGJ/wp/DNysqfz/QAU71tshSVm8II8W/47Zro
-         fFViFfYJTYFIggox35NWeXMsLXyiHz4KJZOhp09/tVEVgiKZNFcmb7ZD3JDtHb1fBhVQ
-         yS2F4rXj6uNpRlrHm4EgqyOu1tCiRlDKS7dy0yVGyj64Vd+6Vc46iZY7ovCpsczbeLZF
-         xEdJJP60JLVtl8SPNzMqy327fFe1kk/K19U6B1zRdDm/RDl/oaOFpQn9GHaOGF5wYdRV
-         5zfA==
+        d=chromium.org; s=google;
+        h=date:from:to:cc:subject:message-id:references:mime-version
+         :content-disposition:in-reply-to;
+        bh=q7Maw+sMF3Q6N+ptoNDxzqCK96vnCGLnGzCFF2robfg=;
+        b=GrlvUUDsDZCc4Noh/EpeKHDMxftQ31Xq7/gSooGwllD3Sl0nKzM5Otw5mVQyM3dqDR
+         6h2SAjkMi0yojVE0Z9F0/IpE5nu5RnWJt33MQ1XpOj/Y8KkCLObUYsJjnJjX/SCSnvEb
+         j0OBM7vNTetfxokbGlBbCwLr//JdztO7pwWMc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=IeDPLqe3LBKUpRJz9gheIRoaNjTzo/azi2xTKJ59u4Q=;
-        b=aeNvZ4b8ge2MjVEpmzNhVggGq4pE95afjmCsanZ4DL07HEURk3okY1/1RFOw3ULey5
-         ljec/RwyP3P8YPXYK+5zTvyuMDM7seS6jI/a05qAS4U8ZPIf6hzeUWzbe5RCxc0NDp9s
-         zFXbJVQZMVwKGMJTvEho4gf9gJqIZ0m9a349XODY1DQT/pL9UYUu8pzvrvC9SuB5Qwf+
-         6tfli6oTPp+qyxemvX5HSWYmKvlK5sVQGFyWAkvG6Fbby6IKhSjMvqfEcGJZ8PhPpwRU
-         QyZ1ppBlkrKWeCgkO/gEi4KN2CyrOut5MOoihIzqkRkTVkZNKKMF/rOY0lboNgwgqEyP
-         1NVQ==
-X-Gm-Message-State: AOAM532dFgkAlI054syD9uZPhY0KPaCgy/91Me0kBgJGsjkS0Hby3Q77
-        bhKWr9KLYQmMKrFvt/ajyHOtEA==
-X-Google-Smtp-Source: ABdhPJzbC4V4BOc77PUffVI7AxDyDMkYAgocDN0aDe9m5/bXIjvUGOQ5RhLNx5fCyuk5xWO+M9NHyA==
-X-Received: by 2002:a05:6512:3407:: with SMTP id i7mr24013249lfr.563.1635259375652;
-        Tue, 26 Oct 2021 07:42:55 -0700 (PDT)
-Received: from [192.168.1.211] ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id bi9sm2256901lfb.40.2021.10.26.07.42.54
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:in-reply-to;
+        bh=q7Maw+sMF3Q6N+ptoNDxzqCK96vnCGLnGzCFF2robfg=;
+        b=67+myvxujJfruozhV6banU96aT3jxS3jZ70tfN4js335vJHbQC8qqDycUWZIx5ZZzD
+         DlQwDPnm+0fW0d/7NbOlses8arJ4e5BUgtRgH2uBqoS1dNESpD6vUsTJ+0w5vk/nvSOl
+         p7fp6aCuFjMQUOGZvB2gqx9sW/ARbxogK6I5FVEDayrMlgmghKA3OtGAO/ZRO7lEKxI2
+         lEEqMI3wyZFq7dT6I45fvWCbmwaoOo0tX6Xnsnk8UXfzLQpKRypucWL8ZZAm2tFD/eA0
+         AVa6gLhZRauf0osrzbF0krELNXwxAxQ+yVATxVmlGmuAzD6cbVYZmOxr4xjJPmbT2ha3
+         yz2Q==
+X-Gm-Message-State: AOAM530sCzSrBcp9zbswBQS1gikv4XKd/f+T6mCunOT3XApozFMdiQk6
+        uwOIU8Xduw6+JyYqd22UfcVYLQ==
+X-Google-Smtp-Source: ABdhPJyCY1M7KA9vxuG5wk3czomxfeK9zodk1ezqbTLfWzkoa0cpMyKyH69tTww+DJIHrT6KxsicOQ==
+X-Received: by 2002:a63:8c4f:: with SMTP id q15mr15040959pgn.225.1635265473926;
+        Tue, 26 Oct 2021 09:24:33 -0700 (PDT)
+Received: from localhost ([2620:15c:202:201:8854:dee7:f36d:b5da])
+        by smtp.gmail.com with UTF8SMTPSA id q6sm19344307pgc.1.2021.10.26.09.24.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 07:42:55 -0700 (PDT)
-Subject: Re: [PATCH v1 01/15] dt-bindings: add pwrseq device tree bindings
-To:     Rob Herring <robh@kernel.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        linux-arm-msm@vger.kernel.org, linux-mmc@vger.kernel.org,
+        Tue, 26 Oct 2021 09:24:33 -0700 (PDT)
+Date:   Tue, 26 Oct 2021 09:24:32 -0700
+From:   Matthias Kaehlcke <mka@chromium.org>
+To:     tjiang@codeaurora.org
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        ath10k@lists.infradead.org, linux-wireless@vger.kernel.org,
-        netdev@vger.kernel.org
-References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
- <20211006035407.1147909-2-dmitry.baryshkov@linaro.org>
- <YXf6TbV2IpPbB/0Y@robh.at.kernel.org>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Message-ID: <37b26090-945f-1e17-f6ab-52552a4b6d89@linaro.org>
-Date:   Tue, 26 Oct 2021 17:42:54 +0300
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
+        rjliao@codeaurora.org, zijuhu@codeaurora.org
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add support for variant WCN6855 by
+ using different nvm
+Message-ID: <YXgrwKUZwUWuWfG4@google.com>
+References: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
 MIME-Version: 1.0
-In-Reply-To: <YXf6TbV2IpPbB/0Y@robh.at.kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 26/10/2021 15:53, Rob Herring wrote:
-> On Wed, Oct 06, 2021 at 06:53:53AM +0300, Dmitry Baryshkov wrote:
->> Add device tree bindings for the new power sequencer subsystem.
->> Consumers would reference pwrseq nodes using "foo-pwrseq" properties.
->> Providers would use '#pwrseq-cells' property to declare the amount of
->> cells in the pwrseq specifier.
+On Fri, Oct 22, 2021 at 01:35:38PM +0800, tjiang@codeaurora.org wrote:
+> the RF performance of wcn6855 soc chip from different foundries will be
+> difference, so we should use different nvm to configure them.
 > 
-> Please use get_maintainers.pl.
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> ---
+>  drivers/bluetooth/btusb.c | 55
+> +++++++++++++++++++++++++++++++++++------------
+>  1 file changed, 41 insertions(+), 14 deletions(-)
 > 
-> This is not a pattern I want to encourage, so NAK on a common binding.
-
-
-Could you please spend a few more words, describing what is not 
-encouraged? The whole foo-subsys/#subsys-cells structure?
-
-Or just specifying the common binding?
-
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 87b71740fad8..a5fe57e7cd7e 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -3195,6 +3195,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev
+> *hdev,
+>  #define QCA_DFU_TIMEOUT		3000
+>  #define QCA_FLAG_MULTI_NVM      0x80
 > 
->>
->> Signed-off-by: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
->> ---
->>   .../bindings/power/pwrseq/pwrseq.yaml         | 32 +++++++++++++++++++
->>   1 file changed, 32 insertions(+)
->>   create mode 100644 Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
->>
->> diff --git a/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml b/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
->> new file mode 100644
->> index 000000000000..4a8f6c0218bf
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/power/pwrseq/pwrseq.yaml
->> @@ -0,0 +1,32 @@
->> +# SPDX-License-Identifier: GPL-2.0
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/power/pwrseq/pwrseq.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Power Sequencer devices
->> +
->> +maintainers:
->> +  - Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
->> +
->> +properties:
->> +  "#powerseq-cells":
->> +    description:
->> +      Number of cells in a pwrseq specifier.
->> +
->> +patternProperties:
->> +  ".*-pwrseq$":
->> +    description: Power sequencer supply phandle(s) for this node
->> +
->> +additionalProperties: true
->> +
->> +examples:
->> +  - |
->> +    qca_pwrseq: qca-pwrseq {
->> +      #pwrseq-cells = <1>;
->> +    };
->> +
->> +    bluetooth {
->> +      bt-pwrseq = <&qca_pwrseq 1>;
->> +    };
->> +...
->> -- 
->> 2.33.0
->>
->>
+> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
+> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
+> +
+>  struct qca_version {
+>  	__le32	rom_version;
+>  	__le32	patch_version;
+> @@ -3226,6 +3229,7 @@ static const struct qca_device_info
+> qca_devices_table[] = {
+>  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
+>  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
+>  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
+> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
+>  };
+> 
+>  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
+> @@ -3380,6 +3384,42 @@ static int btusb_setup_qca_load_rampatch(struct
+> hci_dev *hdev,
+>  	return err;
+>  }
+> 
+> +static void btusb_generate_qca_nvm_name(char *fwname,
+> +					size_t max_size,
+> +					const struct qca_version *ver)
+> +{
+> +	u32 rom_version = le32_to_cpu(ver->rom_version);
+> +	u16 flag = le16_to_cpu(ver->flag);
+> +
+> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> +		u16 board_id = le16_to_cpu(ver->board_id);
+> +		u32 ram_version = le32_to_cpu(ver->ram_version);
+> +		const char *variant = NULL;
 
+This assignement was introduced in v3, it isn't really useful since the
+variable is always assigned to a value in the switch statement below.
 
--- 
-With best wishes
-Dmitry
+btw, why did you reset the patch version numbers, earlier they went up
+to v11? This is confusing, e.g. when someone mentions v3 of this patch,
+are they referring to this version or to
+https://patchwork.kernel.org/project/bluetooth/patch/1628758216-3201-1-git-send-email-zijuhu@codeaurora.org/?
+
+> +
+> +		switch (ram_version) {
+> +		case WCN6855_2_0_RAM_VERSION_GF:
+> +		case WCN6855_2_1_RAM_VERSION_GF:
+> +			variant = "_gf";
+> +			break;
+> +		default:
+> +			variant = "";
+> +			break;
+> +		}
+> +
+> +		if (board_id == 0) {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
+> +				rom_version, variant);
+> +		} else {
+> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
+> +				rom_version, variant, board_id);
+> +		}
+> +	} else {
+> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
+> +			rom_version);
+> +	}
+> +
+> +}
+> +
+>  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
+>  				    struct qca_version *ver,
+>  				    const struct qca_device_info *info)
+> @@ -3388,20 +3428,7 @@ static int btusb_setup_qca_load_nvm(struct hci_dev
+> *hdev,
+>  	char fwname[64];
+>  	int err;
+> 
+> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		/* if boardid equal 0, use default nvm without surfix */
+> -		if (le16_to_cpu(ver->board_id) == 0x0) {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -				 le32_to_cpu(ver->rom_version));
+> -		} else {
+> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
+> -				le32_to_cpu(ver->rom_version),
+> -				le16_to_cpu(ver->board_id));
+> -		}
+> -	} else {
+> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
+> -			 le32_to_cpu(ver->rom_version));
+> -	}
+> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
+> 
+>  	err = request_firmware(&fw, fwname, &hdev->dev);
+>  	if (err) {
+> -- 
+> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a
+> Linux Foundation Collaborative Project
