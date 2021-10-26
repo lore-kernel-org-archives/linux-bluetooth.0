@@ -2,52 +2,52 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62152C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A9879C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4F60060F9B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8D0C8610E5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240200AbhJZXGI (ORCPT
+        id S240183AbhJZXGJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 19:06:08 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60790 "EHLO
+        Tue, 26 Oct 2021 19:06:09 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240180AbhJZXGF (ORCPT
+        with ESMTP id S240181AbhJZXGG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:06:05 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E531C061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:41 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id ls14-20020a17090b350e00b001a00e2251c8so630205pjb.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:41 -0700 (PDT)
+        Tue, 26 Oct 2021 19:06:06 -0400
+Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1613FC061767
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:42 -0700 (PDT)
+Received: by mail-pj1-x1032.google.com with SMTP id y1-20020a17090a134100b001a27a7e9c8dso3166554pjf.3
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=jy5V3j9rKv6dilRdQQnoozhHsc8LCB/Mawx5jZGGANY=;
-        b=jdJIjPqz5ccnWCMeDu5h6w+xBeUkYKxomzu4VSinhQbEXVPJyGhKGOF2NO8oXz8bEP
-         vwTHlrYFIJqqO0gCX+BtJio2JsHaCzM3d2dLra1gCuT3zcFctv42saKcukJuwbN7iZme
-         qrmhYaDq3kul5xS9UfAWNR1M0S53poJR2eihNTw0bfeC5Zt0OgOIvT2hPoNDl6opZX+3
-         Zw//jHeaL1ru044WNHGFLRRx89iMGN2YzRyiiYpWuqURlyn3BgVaXxx3ACrpP6spFBbK
-         AwlmmNC9uf1kp2uVjx5jF0aHgxSYSdUSNgoF3O+EjqLlXTBXwBrrkhKk/edvgn5vbfwm
-         xWNw==
+        bh=V1ZgTLkk9AWmWliAzoFzQFkR/qzvpzHog73LJmcY6B8=;
+        b=LVUrqQqWiizl7Or/I9PL2LTCSYXi2S/iL/IZfRKxXh4gDxRrfpGKad1HY41kHpEnWh
+         4HzUriHqNRij3rs22Ruu2QZOSVV29KxDBYxbsR/UA2yqHuXMu1YC3egdJApjS3w0Cb5W
+         NYvjz38Pu+ewNlaZP5HbcM+5eFryV18r3DEXwuAFwm6BADR0pN/kTS4ClseNhGHkjwUO
+         d46duh87IFPYdsOrb5QQu6r49CtoTz2+3aivWjqdh4oOupz96uZjxUJ/IV3gRAVeCjvR
+         Lh3fMXppodgd3nJAzck4s88WgP/C0OzW6u292aklX09So38wqP2YxfkgxifKIOiHcXX4
+         YoHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=jy5V3j9rKv6dilRdQQnoozhHsc8LCB/Mawx5jZGGANY=;
-        b=OgQOT3W7zmxf3xXaU0JIsNIcabDXcYTrj9XvYhNihpG+WTt89jcqov767qXRYoI8Om
-         fRo34b/GGEb9yxyGFRJl/z0s+2Xo/yIjuHERDUdO0vRATO1+FKPmD8qJK/Hsx7KaOP55
-         q7r+J/hJLrHN5hglmxQOPfzop1WJVI7lG2RyQBQlDKZqLBsh8bPuUfdeo0Ky7WLYIrhe
-         PHmWPeyquBgjFXPG4rRaNdCHDFm8Xm7kahzQGkeNAB7bh0h+1gEAu5I9HkrGRMwhRkvD
-         7kowl/mXeF3NO+gNMd6h/k7xCbD6FJz/2AwunT6Z0dFqFNgcaZr2YuUqGgz4mxmcpCq0
-         7koQ==
-X-Gm-Message-State: AOAM533VrNWYn0WJ4oDDQhnOJHjvcCaGI96mW1MwwEkdVJaskJtw8HYe
-        f0xRUYe/HVEkJj+CQPIrzEN2ECv0WPw=
-X-Google-Smtp-Source: ABdhPJy6tWWTunVcl5ue/wHhJ/jPqSuSNTT4tv6ZYIlIUWCDQAn3Hg8pQyiwFbpolf3FhTDXX8XGXA==
-X-Received: by 2002:a17:902:8f90:b0:13e:a44e:2d3c with SMTP id z16-20020a1709028f9000b0013ea44e2d3cmr25196024plo.85.1635289420513;
-        Tue, 26 Oct 2021 16:03:40 -0700 (PDT)
+        bh=V1ZgTLkk9AWmWliAzoFzQFkR/qzvpzHog73LJmcY6B8=;
+        b=RGcvNpMyBinICsET33Ow0r1cQWzzxcpgkQrXC1vpg7cC1V4d33hSqM/73hVQBAloVX
+         kNjPW6jgCon9PYoAh5UAZso+/7AIIcWRiJHfmf1d6OT0kEvZ6zj6CDEsSTP2wuGmaUdv
+         OEVtGZ0tqeG7JLa1qy+HEaqRZNC1obSyBa6EbqHp+liRzEYQyqmVmgC1dg6njkuE1bOO
+         +tVeNQb6/ukna06EZKJ6sgKB6hdWWreOAFK+Th/DSB8yfvfrwcguQvmWpi6ge7cr9R7l
+         YZJ1x7uuZErELojWXz/PrzcPF8qOsgW2TET4W7Kjk27T5Y1c9McWuF2U3f7sGNksmdGk
+         QCsQ==
+X-Gm-Message-State: AOAM5309+26NDW6DsaT52/F1cRWJbta4gftc+2BHkFDE2F4K8uNp37O7
+        Ykxp+0d5xkRloXELTFo0ojcLmpxIy5Q=
+X-Google-Smtp-Source: ABdhPJzZy8XCbyFQLDqdxJ8FXG1khDiLlQZVLrcttbovNiwuZU3x5Bnv+CUrs0zJj8CZCenpV8slFQ==
+X-Received: by 2002:a17:902:c410:b0:13e:cfac:45ad with SMTP id k16-20020a170902c41000b0013ecfac45admr25316141plk.68.1635289421381;
+        Tue, 26 Oct 2021 16:03:41 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
         by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.40
         for <linux-bluetooth@vger.kernel.org>
@@ -55,9 +55,9 @@ Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71
         Tue, 26 Oct 2021 16:03:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 19/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
-Date:   Tue, 26 Oct 2021 16:03:20 -0700
-Message-Id: <20211026230324.1533907-20-luiz.dentz@gmail.com>
+Subject: [PATCH v6 20/23] Bluetooth: hci_sync: Convert adv_expire
+Date:   Tue, 26 Oct 2021 16:03:21 -0700
+Message-Id: <20211026230324.1533907-21-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211026230324.1533907-1-luiz.dentz@gmail.com>
 References: <20211026230324.1533907-1-luiz.dentz@gmail.com>
@@ -70,183 +70,117 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Brian Gix <brian.gix@intel.com>
 
 mgmt-test paths:
-Set powered on - Privacy and Advertising
-Set Advertising on - Success 2
 Set Advertising on - Appearance 1
 Set Advertising on - Local name 1
 Set Advertising on - Name + Appear 1
-Add Advertising - Success 4
-Add Advertising - Success 5
-Add Ext Advertising - Success 4
-Add Ext Advertising - Success 5
+Set Local Name - Success 2
+Set Local Name - Success 3
+Add Advertising - Success (Empty ScRsp)
+Add Advertising - Success (ScRsp appear)
+Add Advertising - Invalid Params (ScRsp appear long)
+Add Advertising - Success (Complete name)
+Add Advertising - Success (Shortened name)
+Add Advertising - Success (Short name)
+Add Advertising - Success (Name + data)
+Add Advertising - Invalid Params (Name + data)
+Add Advertising - Success (Name+data+appear)
+Set appearance - BR/EDR LE
+Set appearance - LE only
+Add Ext Advertising - Success (Empty ScRsp)
+Add Ext Advertising - Success (ScRsp appear)
+Add Ext Advertising - Invalid Params (ScRsp appear long)
+Add Ext Advertising - Success (Complete name)
+Add Ext Advertising - Success (Shortened name)
+Add Ext Advertising - Success (Short name)
+Add Ext Advertising - Success (Name + data)
+Add Ext Advertising - Invalid Params (Name + data)
+Add Ext Advertising - Success (Name+data+appear)
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- net/bluetooth/mgmt.c | 103 ++++++++++++++++++++-----------------------
- 1 file changed, 48 insertions(+), 55 deletions(-)
+ net/bluetooth/mgmt.c | 33 +++++++++++++++++++--------------
+ 1 file changed, 19 insertions(+), 14 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 5b1aaf74b93b..22c6e4aab926 100644
+index 22c6e4aab926..a14d3c26331c 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5609,29 +5609,25 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -3218,33 +3218,32 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
+ 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
+ }
+ 
+-static void adv_expire(struct hci_dev *hdev, u32 flags)
++static int adv_expire_sync(struct hci_dev *hdev, u32 flags)
+ {
+ 	struct adv_info *adv_instance;
+-	struct hci_request req;
+-	int err;
+ 
+ 	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
+ 	if (!adv_instance)
+-		return;
++		return 0;
+ 
+ 	/* stop if current instance doesn't need to be changed */
+ 	if (!(adv_instance->flags & flags))
+-		return;
++		return 0;
+ 
+ 	cancel_adv_timeout(hdev);
+ 
+ 	adv_instance = hci_get_next_instance(hdev, adv_instance->instance);
+ 	if (!adv_instance)
+-		return;
++		return 0;
+ 
+-	hci_req_init(&req, hdev);
+-	err = __hci_req_schedule_adv_instance(&req, adv_instance->instance,
+-					      true);
+-	if (err)
+-		return;
++	hci_schedule_adv_instance_sync(hdev, adv_instance->instance, true);
+ 
+-	hci_req_run(&req, NULL);
++	return 0;
++}
++
++static int name_changed_sync(struct hci_dev *hdev, void *data)
++{
++	return adv_expire_sync(hdev, MGMT_ADV_FLAG_LOCAL_NAME);
+ }
+ 
+ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+@@ -3263,7 +3262,7 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+ 				  cp, sizeof(*cp));
+ 
+ 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-			adv_expire(hdev, MGMT_ADV_FLAG_LOCAL_NAME);
++			hci_cmd_sync_queue(hdev, name_changed_sync, NULL, NULL);
+ 	}
+ 
+ 	mgmt_pending_remove(cmd);
+@@ -3348,6 +3347,11 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
  	return err;
  }
  
--static void enable_advertising_instance(struct hci_dev *hdev, u8 status,
--					u16 opcode)
-+static void enable_advertising_instance(struct hci_dev *hdev, int err)
- {
--	bt_dev_dbg(hdev, "status %u", status);
-+	if (err)
-+		bt_dev_err(hdev, "failed to re-configure advertising %d", err);
-+	else
-+		bt_dev_dbg(hdev, "status %d", err);
- }
- 
--static void set_advertising_complete(struct hci_dev *hdev, u8 status,
--				     u16 opcode)
-+static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
- {
- 	struct cmd_lookup match = { NULL, hdev };
--	struct hci_request req;
- 	u8 instance;
- 	struct adv_info *adv_instance;
--	int err;
--
--	hci_dev_lock(hdev);
-+	u8 status = mgmt_status(err);
- 
- 	if (status) {
--		u8 mgmt_err = mgmt_status(status);
--
- 		mgmt_pending_foreach(MGMT_OP_SET_ADVERTISING, hdev,
--				     cmd_status_rsp, &mgmt_err);
--		goto unlock;
-+				     cmd_status_rsp, &status);
-+		return;
- 	}
- 
- 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
-@@ -5663,30 +5659,55 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status,
- 	 */
- 	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
- 	    list_empty(&hdev->adv_instances))
--		goto unlock;
-+		return;
- 
- 	instance = hdev->cur_adv_instance;
- 	if (!instance) {
- 		adv_instance = list_first_entry_or_null(&hdev->adv_instances,
- 							struct adv_info, list);
- 		if (!adv_instance)
--			goto unlock;
-+			return;
- 
- 		instance = adv_instance->instance;
- 	}
- 
--	hci_req_init(&req, hdev);
-+	err = hci_schedule_adv_instance_sync(hdev, instance, true);
-+
-+	enable_advertising_instance(hdev, err);
-+}
- 
--	err = __hci_req_schedule_adv_instance(&req, instance, true);
-+static int set_adv_sync(struct hci_dev *hdev, void *data)
++static int appearance_changed_sync(struct hci_dev *hdev, void *data)
 +{
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_mode *cp = cmd->param;
-+	u8 val = !!cp->val;
- 
--	if (!err)
--		err = hci_req_run(&req, enable_advertising_instance);
-+	if (cp->val == 0x02)
-+		hci_dev_set_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
-+	else
-+		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
- 
--	if (err)
--		bt_dev_err(hdev, "failed to re-configure advertising");
-+	cancel_adv_timeout(hdev);
- 
--unlock:
--	hci_dev_unlock(hdev);
-+	if (val) {
-+		/* Switch to instance "0" for the Set Advertising setting.
-+		 * We cannot use update_[adv|scan_rsp]_data() here as the
-+		 * HCI_ADVERTISING flag is not yet set.
-+		 */
-+		hdev->cur_adv_instance = 0x00;
++	return adv_expire_sync(hdev, MGMT_ADV_FLAG_APPEARANCE);
++}
 +
-+		if (ext_adv_capable(hdev)) {
-+			hci_start_ext_adv_sync(hdev, 0x00);
-+		} else {
-+			hci_update_adv_data_sync(hdev, 0x00);
-+			hci_update_scan_rsp_data_sync(hdev, 0x00);
-+			hci_enable_advertising_sync(hdev);
-+		}
-+	} else {
-+		hci_disable_advertising_sync(hdev);
-+	}
-+
-+	return 0;
- }
- 
- static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
-@@ -5694,7 +5715,6 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ static int set_appearance(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
  {
- 	struct mgmt_mode *cp = data;
- 	struct mgmt_pending_cmd *cmd;
--	struct hci_request req;
- 	u8 val, status;
- 	int err;
+@@ -3369,7 +3373,8 @@ static int set_appearance(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		hdev->appearance = appearance;
  
-@@ -5760,40 +5780,13 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-			adv_expire(hdev, MGMT_ADV_FLAG_APPEARANCE);
++			hci_cmd_sync_queue(hdev, appearance_changed_sync, NULL,
++					   NULL);
+ 
+ 		ext_info_changed(hdev, sk);
  	}
- 
- 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_ADVERTISING, hdev, data, len);
--	if (!cmd) {
-+	if (!cmd)
- 		err = -ENOMEM;
--		goto unlock;
--	}
--
--	hci_req_init(&req, hdev);
--
--	if (cp->val == 0x02)
--		hci_dev_set_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
- 	else
--		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
--
--	cancel_adv_timeout(hdev);
-+		err = hci_cmd_sync_queue(hdev, set_adv_sync, cmd,
-+					 set_advertising_complete);
- 
--	if (val) {
--		/* Switch to instance "0" for the Set Advertising setting.
--		 * We cannot use update_[adv|scan_rsp]_data() here as the
--		 * HCI_ADVERTISING flag is not yet set.
--		 */
--		hdev->cur_adv_instance = 0x00;
--
--		if (ext_adv_capable(hdev)) {
--			__hci_req_start_ext_adv(&req, 0x00);
--		} else {
--			__hci_req_update_adv_data(&req, 0x00);
--			__hci_req_update_scan_rsp_data(&req, 0x00);
--			__hci_req_enable_advertising(&req);
--		}
--	} else {
--		__hci_req_disable_advertising(&req);
--	}
--
--	err = hci_req_run(&req, set_advertising_complete);
--	if (err < 0)
-+	if (err < 0 && cmd)
- 		mgmt_pending_remove(cmd);
- 
- unlock:
 -- 
 2.31.1
 
