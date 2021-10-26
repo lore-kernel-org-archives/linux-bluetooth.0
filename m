@@ -2,158 +2,171 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5FEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 17:03:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 715D6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:18:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B38B360F90
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 17:03:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4DEC36103C
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:18:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237578AbhJZRFp (ORCPT
+        id S238168AbhJZSUm (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 13:05:45 -0400
-Received: from mout.gmx.net ([212.227.17.21]:52011 "EHLO mout.gmx.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232003AbhJZRFo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 13:05:44 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
-        s=badeba3b8450; t=1635267799;
-        bh=bMk0HwvIJYuOseMUHE7Jex1ly5iyMOvFt+r2HNEu+t4=;
-        h=X-UI-Sender-Class:To:From:Subject:Date;
-        b=ZG7tNdS+F0+W0RU/Jqg84iD43e0NLbYiWkeGRe1rB3nQX5RAlAtK7z+1GURTunpFl
-         BkYEzvTp2bYyDBpc4sbnZdhb8rXwu4EjRKNaifK66uLyQ3UWT6ySdnELPCTwTtl6N+
-         QJ5esPSg4wLf5VuCxBuiIvSMejpQR9wtIeSxyhmg=
-X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
-Received: from [172.18.113.121] ([46.183.103.8]) by mail.gmx.net (mrgmx104
- [212.227.17.168]) with ESMTPSA (Nemesis) id 1N0X8u-1mttnW2Khg-00wWi0 for
- <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 19:03:18 +0200
+        Tue, 26 Oct 2021 14:20:42 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52498 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232565AbhJZSUl (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 26 Oct 2021 14:20:41 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE946C061745
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:18:17 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id e65so332276pgc.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:18:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NIeNnJ5W6b4+YeAyS5Pxz8PSsVa7R+WTUVg6MGAyzWE=;
+        b=cxmDUdNPaBnisTfw1z8G5mHMD5Y7sFvmOQaeQ3mHr25bTXC1x4lo55GDpLAXTKRNYb
+         kmHW68KPU6vtNm4g8ebEzC5CCJjF30+fcq0aUXYywnhuW1QKsVvHX1gXqOYp13fnfvSs
+         GXWUbSxpWbYXbEOO5wVzZvwV8EYFH29hzYOUHLPa2egsFprUQn4fBS6B4fVHiaqNJGS/
+         eh8vtHfgLXizcvkqPilpHUSK4LU1+cZVyFRNkou5ZkuZPoVTsM12FXMhRpfAGUwC3/BB
+         42A5TpBMuV6UzPfJjJlzrzn3Q3SOyvC9tfAreZdb9qGphpjMkkHZm4KWjzxYocBhkz+S
+         XGYA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=NIeNnJ5W6b4+YeAyS5Pxz8PSsVa7R+WTUVg6MGAyzWE=;
+        b=8RxIEkdxSjgYQjYLlZzrWH8MiSiJryGCk7RAoGd8tBAhuYBlKMS/XpSeTGXQvlg/yi
+         BM+hudxV9PxqqDRARiAHv9VhUzx54nEZhMra/6oCZ2KG1acKB53jHeyp168At1AlxWMV
+         Wb8TWn+Tb1LGYUPooz/YcbEfkeKV4MRgnGwiVR28cY42QjbaprJKDZVAXGG3K9ecrGpS
+         33PAVE6WBTeGJkbrD0A21BBjJotbahCOBWCTL1BkM/mFwHO7oSxHa2pWvuUnrA+b8vEq
+         LpPKh3Ovc6NWP2GwU/RJCQBTVqMbIFJXaBdWH0jNaPiNFnLCB2NMRN+nubUGGMm9uwHy
+         uBhA==
+X-Gm-Message-State: AOAM5330rUZmes2bErySNfdSUdfyWcyT9ATSgG88pLQ9VmeesH+brPE4
+        Fi9Rm5wQNAiKgq6Y86jVgvJ0qURy4ks=
+X-Google-Smtp-Source: ABdhPJwx1LI+FwRf5a3ofMSr4ECJZUIK0rWMwVocdwsM+YfmbkqwqL+stz7NHf21PIHu/nrKZk1Gxg==
+X-Received: by 2002:a63:8c14:: with SMTP id m20mr11678871pgd.109.1635272296819;
+        Tue, 26 Oct 2021 11:18:16 -0700 (PDT)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id x202sm7677983pfc.170.2021.10.26.11.18.16
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 26 Oct 2021 11:18:16 -0700 (PDT)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-From:   Martin <hier-bei-mir@gmx.net>
-Subject: Problem Pairing Dell XPS 13 7390 Intel bluetooth btusb with some
- Headset / Speakers
-Message-ID: <0925c7f0-1866-3e8d-10c7-4827cbbe0b87@gmx.net>
-Date:   Tue, 26 Oct 2021 19:03:13 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.13.0
+Subject: [PATCH BlueZ 1/2] Makefile: Fix code style
+Date:   Tue, 26 Oct 2021 11:18:14 -0700
+Message-Id: <20211026181815.1305602-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: base64
-Content-Language: en-US
-X-Provags-ID: V03:K1:gUNzXxwZGCFGzGV99A3PU3k9SJ0pIIfSPa4wwLPhtQLePxx1yM2
- 8/+5g82ewumP9qdHEUPoMUvGi0e7zXpxM8NEbasFGUS64etWO+FQMyAGsXg2gkq83xskBkI
- Sv8ZiH9p+0ob03qv+OK7Ap4t4/bB0LjQWoFONKXQe4hFqzET+uS1evDSCdNq9Qr7C6OINnP
- BfzY5H5VFkxeLBbHKGA8A==
-X-UI-Out-Filterresults: notjunk:1;V03:K0:XZvPHTqX7F8=:U1LPtzUl0yXPCwANrH2u0T
- PPv2LvdzxuQOglixwsBVOH47R9kYv1ScSKtQpJI50WpbENkFLlxM+K3QD8DQGckV5fUYpcTU/
- L1C7WgwXEAyp88VrziLT9eUh6gPz45sxRDO0ExX0mbX3VRZzU6Nh9RZhYfgxHSkU6xgCwI0gA
- lO/4QZ6Jh70VDJrOvwYN3A6HzDHglvC/5jRMhQ3rKJ2xrnmOM/WMGhmEnh904bI6rLaSPekov
- OQIqDe0RR9daXMN+Ejc6fwoxJSfmUyvq1CDO9Z1VtBk/L7FSbCIUQu0E2oPZvDRVbqCY/IBfO
- TlZmhJncVHj/gSbSyJWLWu5kmnoQjzDqsjS9b4Qa4jjXOaZlXkPur0hJnukoPg02/1XnfDU0o
- quJPLEm1EC3Qt61d3xOK2s6O0YrczN63PSZxkbXyQKk6jYeZ5KoDRiIRpCOwIVhoNO/eWz0qa
- EqNtmrzWmvsLSr3Jfv5nuZ48X4TlBTSh8ObAAPWwrlp/Ea8VuN35lRYXix6AWKFCTvtyJmBM9
- LIFFjYpBvkln0WDT3CeEP3wAcKw2lwiSHu8gd5ofMgvZfqkktt9Kkjzb7xtkttMMp+VHN1js4
- TKCgtx4MDobdNVjMI7CLoh8ODN7BstQtXW2TdjOdk7QUzDoQkILwvhdyT5vZ3tVTHJFLTkiSl
- ZlDWikf2Xg/4DqHBW7HzJppkk3HfortSdLNauDPw7TLVFmv7mP/QTRoyvza2c+POpvm0kgss7
- HHgBgJ0XsvjaX5yshXC2dCDawMZqSYhWWB50cePKEsBE3syeENuL2/mz0V0EMAJzNMWdAGoQk
- yivLZZyLEIrRglNjQh65xbHNXlq5flR3C2AbR+aaNcXBPUj9iMqkzkGBg5PYoK/je3C84qJAT
- a+a5+rl72dSGBTpha1F9SvTQ7A4G0vhgv80naaVUM8Y3VXHljURqeHHqUxF/+bSohg8UIjxed
- yf+wpNNC66xmjBLPipsU8W44ZyuclR7euJNk44yR3OaI10eXNWTs1jMEIePyvtsjFrYv7q1Ry
- iKdRG5xHhbdezXtwQGeN3FYUY+paZjQrpT2DWYXuo6EuSVZK2JddOocd/Io2IQ0aqyq9gx1J0
- PnDjuPuuQ7DlYk=
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-RGVhciBhbGwsDQoNCkkgZG8gaGF2ZSBhIERlbGwgWFBTIDEzIDczOTAgbGFwdG9wIHJ1bm5pbmcg
-VWJ1bnR1IDIwLjA0Og0KTGludXggbWFydGluLVhQUy0xMy03MzkwIDUuMTEuMC0zOC1nZW5lcmlj
-ICM0Mn4yMC4wNC4xLVVidW50dSBTTVAgVHVlIA0KU2VwIDI4IDIwOjQxOjA3IFVUQyAyMDIxIHg4
-Nl82NCB4ODZfNjQgeDg2XzY0IEdOVS9MaW51eA0Kd2l0aCBJbnRlbCBibHVldG9vdGggY2FyZC4g
-ZG1lc2cgcmVjb2duaXplcyBpdCBhczoNCnVzYiAxLTc6IE5ldyBVU0IgZGV2aWNlIGZvdW5kLCBp
-ZFZlbmRvcj04MDg3LCBpZFByb2R1Y3Q9MDAyOSwgYmNkRGV2aWNlPSANCjAuMDENCkl0IHVzZXMg
-dGhlIGJ0dXNiIGRyaXZlci4NClRoZSBkcml2ZXIgLyBjaGlwIGhhcyBwcm9ibGVtcyB0byBjb25u
-ZWN0IC8gcGFpciB3aXRoIHNvbWUgaGVhZHNldHMgLyANCnNwZWFrZXJzLiBOYW1lbHkgdGhlIFNv
-bnkgU1JTLVhCMTIgTWluaSBzcGVha2VyIGFuZCB0aGUgVGV1ZmVsIFRydWUgQWlyeSANCldpcmVs
-ZXNzIGhlYWRzZXQuDQpQYWlyaW5nIG90aGVyIHNwZWFrZXIgZGV2aWNlcyB3aXRoIHRoZSBYUFMg
-d29ya3MgZmluZSBhbmQgdGhlIFNvbnkgYW5kIA0KVGV1ZmVsIGl0c2VsZiBwYWlyIGZpbmUgd2l0
-aCBvdGhlciBsaW51eCBsYXB0b3BzIC8gYW5kcm9pZCBzbWFydHBob25lcy4gDQpJJ2QgbGlrZSB0
-byBjb25jZW50cmF0ZSBvbiB0aGUgVGV1ZmVsLCBhcyBJIGhhdmUgbG9nZ2VkIHRoZSBwYWlyaW5n
-IA0KY29udmVyc2F0aW9uLg0KSXQgbG9va3MgbGlrZSB0aGlzIG9uIGJ0bW9uOg0KDQpAIE1HTVQg
-Q29tbWFuZDogUGFpciBEZXZpY2UgKDB4MDAxOSkgcGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgwqDC
-oCB7MHgwMDAxfSBbaGNpMF0gDQo4LjgyMjAwMg0KIMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRy
-ZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKg
-wqDCoMKgwqAgQ2FwYWJpbGl0eTogS2V5Ym9hcmREaXNwbGF5ICgweDA0KQ0KPCBIQ0kgQ29tbWFu
-ZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzwqDCoMKgwqDCoCAjMjIg
-W2hjaTBdIA0KOC44MjIwNDENCiDCoMKgwqDCoMKgwqDCoCBBZGRyZXNzOiAwMDowMDpCMDowNTo2
-NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgUGFja2V0IHR5
-cGU6IDB4Y2MxOA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBETTEgbWF5IGJlIHVzZWQNCiDCoMKgwqDC
-oMKgwqDCoMKgwqAgREgxIG1heSBiZSB1c2VkDQogwqDCoMKgwqDCoMKgwqDCoMKgIERNMyBtYXkg
-YmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBESDMgbWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKg
-wqDCoMKgwqAgRE01IG1heSBiZSB1c2VkDQogwqDCoMKgwqDCoMKgwqDCoMKgIERINSBtYXkgYmUg
-dXNlZA0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiByZXBldGl0aW9uIG1vZGU6IFIyICgweDAy
-KQ0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBtb2RlOiBNYW5kYXRvcnkgKDB4MDApDQogwqDC
-oMKgwqDCoMKgwqAgQ2xvY2sgb2Zmc2V0OiAweDAwMDANCiDCoMKgwqDCoMKgwqDCoCBSb2xlIHN3
-aXRjaDogQWxsb3cgc2xhdmUgKDB4MDEpDQogPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgw
-eDBmKSBwbGVuIDTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIzIzIFtoY2kw
-XSANCjguODIyMzUyDQogwqDCoMKgwqDCoCBDcmVhdGUgQ29ubmVjdGlvbiAoMHgwMXwweDAwMDUp
-IG5jbWQgMQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkNCiA+IEhDSSBF
-dmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMcKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqAgIzI4IFtoY2kwXSANCjM5Ljg5MTQ1Nw0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czog
-TE1QIFJlc3BvbnNlIFRpbWVvdXQgLyBMTCBSZXNwb25zZSBUaW1lb3V0ICgweDIyKQ0KIMKgwqDC
-oMKgwqDCoMKgIEhhbmRsZTogNjU1MzUNCiDCoMKgwqDCoMKgwqDCoCBBZGRyZXNzOiAwMDowMDpC
-MDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgTGlu
-ayB0eXBlOiBBQ0wgKDB4MDEpDQogwqDCoMKgwqDCoMKgwqAgRW5jcnlwdGlvbjogRGlzYWJsZWQg
-KDB4MDApDQpAIE1HTVQgRXZlbnQ6IENvbm5lY3QgRmFpbGVkICgweDAwMGQpIHBsZW4gOMKgwqDC
-oMKgwqDCoMKgwqDCoCB7MHgwMDAyfSBbaGNpMF0gDQozOS44OTE1NDkNCiDCoMKgwqDCoMKgwqDC
-oCBCUi9FRFIgQWRkcmVzczogMDA6MDA6QjA6MDU6NjU6NjcgKFJORC1SQUQgTkVUV09SSyBERVZJ
-Q0VTKQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czogVGltZW91dCAoMHgwOCkNCkAgTUdNVCBFdmVu
-dDogQ29ubmVjdCBGYWlsZWQgKDB4MDAwZCkgcGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgIHsweDAw
-MDF9IFtoY2kwXSANCjM5Ljg5MTU0OQ0KIMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRyZXNzOiAw
-MDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKg
-wqAgU3RhdHVzOiBUaW1lb3V0ICgweDA4KQ0KQCBNR01UIEV2ZW50OiBDb21tYW5kIENvbXBsZXRl
-ICgweDAwMDEpIHBsZW4gMTDCoMKgwqDCoMKgwqAgezB4MDAwMX0gW2hjaTBdIA0KMzkuODkxNTc1
-DQogwqDCoMKgwqDCoCBQYWlyIERldmljZSAoMHgwMDE5KSBwbGVuIDcNCiDCoMKgwqDCoMKgwqDC
-oCBTdGF0dXM6IFRpbWVvdXQgKDB4MDgpDQogwqDCoMKgwqDCoMKgwqAgQlIvRURSIEFkZHJlc3M6
-IDAwOjAwOkIwOjA1OjY1OjY3IChSTkQtUkFEIE5FVFdPUksgREVWSUNFUykNCg0KU28gaXQgcHJl
-dHR5IG11Y2ggbG9va3MgbGlrZSB0aGUgbGFwdG9wIHNlbmRzIGEgY29ubmVjdGlvbiByZXF1ZXN0
-LCBidXQgDQpuZXZlciBzZWVzIGEgcmVwbHkgZnJvbSB0aGUgVGV1ZmVsIGhlYWRzZXQuDQoNClNh
-bWUgY29udmVyc2F0aW9uIGZvciBhIFN1cmZhY2UgUHJvIDMgbGFwdG9wICh3aXRoIHNvbWUgYnJv
-YWRjb20gDQpibHVldG9vdGggY2hpcCBpZiBJIHJlbWVtYmVyIGNvcnJlY3RseSwgYWxzbyB1c2lu
-ZyBidHVzYiBkcml2ZXIpOg0KDQpAIE1HTVQgQ29tbWFuZDogUGFpciBEZXZpY2UgKDB4MDAxOSkg
-cGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB7MHgwMDAxfSBbaGNpMF0gDQo0LjkyNTgxMQ0K
-IMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRyZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJB
-RCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgQ2FwYWJpbGl0eTogRGlzcGxheVll
-c05vICgweDAxKQ0KPCBIQ0kgQ29tbWFuZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1
-KSBwbGVuIDEzwqDCoMKgwqDCoCAjNTAgW2hjaTBdIA0KNC45MjU4MzENCiDCoMKgwqDCoMKgwqDC
-oCBBZGRyZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQog
-wqDCoMKgwqDCoMKgwqAgUGFja2V0IHR5cGU6IDB4Y2MxOA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBE
-TTEgbWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKgwqDCoMKgwqAgREgxIG1heSBiZSB1c2VkDQogwqDC
-oMKgwqDCoMKgwqDCoMKgIERNMyBtYXkgYmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBESDMg
-bWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKgwqDCoMKgwqAgRE01IG1heSBiZSB1c2VkDQogwqDCoMKg
-wqDCoMKgwqDCoMKgIERINSBtYXkgYmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBy
-ZXBldGl0aW9uIG1vZGU6IFIyICgweDAyKQ0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBtb2Rl
-OiBNYW5kYXRvcnkgKDB4MDApDQogwqDCoMKgwqDCoMKgwqAgQ2xvY2sgb2Zmc2V0OiAweDAwMDAN
-CiDCoMKgwqDCoMKgwqDCoCBSb2xlIHN3aXRjaDogQWxsb3cgc2xhdmUgKDB4MDEpDQogPiBIQ0kg
-RXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDTCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgwqAgIzUxIFtoY2kwXSANCjQuOTI4OTI3DQogwqDCoMKgwqDCoCBDcmVhdGUg
-Q29ubmVjdGlvbiAoMHgwMXwweDAwMDUpIG5jbWQgMQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czog
-U3VjY2VzcyAoMHgwMCkNCiA+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxl
-biAxMcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAjNTQgW2hjaTBdIA0KNS4wNzc5NjEN
-CiDCoMKgwqDCoMKgwqDCoCBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApDQogwqDCoMKgwqDCoMKgwqAg
-SGFuZGxlOiAxDQogwqDCoMKgwqDCoMKgwqAgQWRkcmVzczogMDA6MDA6QjA6MDU6NjU6NjcgKFJO
-RC1SQUQgTkVUV09SSyBERVZJQ0VTKQ0KIMKgwqDCoMKgwqDCoMKgIExpbmsgdHlwZTogQUNMICgw
-eDAxKQ0KIMKgwqDCoMKgwqDCoMKgIEVuY3J5cHRpb246IERpc2FibGVkICgweDAwKQ0KPCBIQ0kg
-Q29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9ydGUuLiAoMHgwMXwweDAwMWIpIHBsZW4gMsKgICM1
-NSBbaGNpMF0gDQo1LjA3ODE3OQ0KIMKgwqDCoMKgwqDCoMKgIEhhbmRsZTogMQ0KID4gSENJIEV2
-ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
-wqDCoMKgwqDCoMKgICM1NiBbaGNpMF0gDQo1LjA3ODkyOA0KIMKgwqDCoMKgwqAgUmVhZCBSZW1v
-dGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikgbmNtZCAxDQogwqDCoMKgwqDCoMKg
-wqAgU3RhdHVzOiBTdWNjZXNzICgweDAwKQ0KWy4uLl0NCg0KV2hhdCBjb3VsZCBjYXVzZSB0aGUg
-SW50ZWwgODA4NyAvIDAwMjkgYmx1ZXRvb3RoIGNoaXAgLyBkcml2ZXIgbm90IGJlaW5nIA0KYWJs
-ZSB0byBjb25uZWN0IHRvIHRoZSBUZXVmZWwgc3BlYWtlcnM/DQoNClRoZXJlIGlzIGFsc28gYW5v
-dGhlciByZXBvcnQgd2l0aCBhIHNpbWlsYXIgcHJvYmxlbSBoZXJlOiANCmh0dHBzOi8vYXNrdWJ1
-bnR1LmNvbS9xdWVzdGlvbnMvMTAyMDU4NC9hcHBsZS1rZXlib2FyZC1hMTAxNi1wYWlyaW5nLWZh
-aWxzDQpIb3cgdG8gZnVydGhlciBkZWJ1ZyB0aGlzIHByb2JsZW0/DQpJcyBpdCBuZWNlc3Nhcnkg
-dG8gYnV5IHNvbWUgYnQgc25pZmZlciBoYXJkd2FyZSB0byBnZXQgdG8gdGhlIGJvdHRvbSBvZiAN
-CnRoaXM/IEkgd291bGQgaW52ZXN0IGluIGEgY2hlYXBvIDEw4oKsIHNuaWZmZXIgbGlrZSB0aGlz
-IA0KaHR0cHM6Ly93d3cuYW1hem9uLmNvbS8tL2VuL2RwL0IwODFXUkdMMzEgYnV0IEkgYW0gbm90
-IHN1cmUgaWYgdGhleSBhcmUgDQpzdWZmaWNpZW50IHRvIGNhcHR1cmUgdGhlIHBhaXJpbmcgcHJv
-Y2Vzcy4NCg0Ka2luZCByZWdhcmRzDQpNYXJ0aW4NCg==
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+
+Fix lines going over 80 columns.
+---
+ Makefile.am    |  3 ++-
+ Makefile.obexd |  3 ++-
+ configure.ac   | 20 ++++++++++++--------
+ 3 files changed, 16 insertions(+), 10 deletions(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index a9439588a..7985db090 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -24,7 +24,8 @@ pkgincludedir = $(includedir)/bluetooth
+ 
+ pkginclude_HEADERS =
+ 
+-AM_CFLAGS = $(WARNING_CFLAGS) $(MISC_CFLAGS) $(UDEV_CFLAGS) $(LIBEBOOK_CFLAGS) $(LIBEDATASERVER_CFLAGS) $(ell_cflags)
++AM_CFLAGS = $(WARNING_CFLAGS) $(MISC_CFLAGS) $(UDEV_CFLAGS) $(LIBEBOOK_CFLAGS) \
++				$(LIBEDATASERVER_CFLAGS) $(ell_cflags)
+ AM_LDFLAGS = $(MISC_LDFLAGS)
+ 
+ if DATAFILES
+diff --git a/Makefile.obexd b/Makefile.obexd
+index 2c0d19518..b9fbc9b3b 100644
+--- a/Makefile.obexd
++++ b/Makefile.obexd
+@@ -80,7 +80,8 @@ obexd_src_obexd_SOURCES = $(btio_sources) $(gobex_sources) \
+ 			obexd/src/map_ap.h
+ obexd_src_obexd_LDADD = lib/libbluetooth-internal.la \
+ 			gdbus/libgdbus-internal.la \
+-			$(ICAL_LIBS) $(DBUS_LIBS) $(LIBEBOOK_LIBS) $(LIBEDATASERVER_LIBS) $(GLIB_LIBS) -ldl
++			$(ICAL_LIBS) $(DBUS_LIBS) $(LIBEBOOK_LIBS) \
++			$(LIBEDATASERVER_LIBS) $(GLIB_LIBS) -ldl
+ 
+ obexd_src_obexd_LDFLAGS = $(AM_LDFLAGS) -Wl,--export-dynamic
+ 
+diff --git a/configure.ac b/configure.ac
+index 0c0418452..0329095ee 100644
+--- a/configure.ac
++++ b/configure.ac
+@@ -242,7 +242,7 @@ AM_CONDITIONAL(MIDI, test "${enable_midi}" = "yes")
+ 
+ if (test "${enable_midi}" = "yes"); then
+ 	PKG_CHECK_MODULES(ALSA, alsa, dummy=yes,
+-				AC_MSG_ERROR(ALSA lib is required for MIDI support))
++			AC_MSG_ERROR(ALSA lib is required for MIDI support))
+ 	AC_SUBST(ALSA_CFLAGS)
+ 	AC_SUBST(ALSA_LIBS)
+ fi
+@@ -333,7 +333,8 @@ if (test "${enable_manpages}" != "no"); then
+ 	fi
+ fi
+ AM_CONDITIONAL(MANPAGES, test "${enable_manpages}" != "no")
+-AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" != "no" && test "${RST2MAN}" != "no")
++AM_CONDITIONAL(RUN_RST2MAN, test "${enable_manpages}" != "no" &&
++				test "${RST2MAN}" != "no")
+ 
+ AC_ARG_ENABLE(testing, AC_HELP_STRING([--enable-testing],
+ 			[enable testing tools]),
+@@ -405,14 +406,14 @@ AM_CONDITIONAL(ANDROID, test "${enable_android}" = "yes")
+ 
+ if (test "${enable_android}" = "yes"); then
+ 	PKG_CHECK_MODULES(SBC, sbc >= 1.2, dummy=yes,
+-					AC_MSG_ERROR(SBC library >= 1.2 is required))
++			AC_MSG_ERROR(SBC library >= 1.2 is required))
+ 	AC_SUBST(SBC_CFLAGS)
+ 	AC_SUBST(SBC_LIBS)
+ fi
+ 
+ if (test "${enable_android}" = "yes"); then
+ 	PKG_CHECK_MODULES(SPEEXDSP, speexdsp >= 1.2, dummy=yes,
+-					AC_MSG_ERROR(SPEEXDSP library >= 1.2 is required))
++			AC_MSG_ERROR(SPEEXDSP library >= 1.2 is required))
+ 	AC_SUBST(SPEEXDSP_CFLAGS)
+ 	AC_SUBST(SPEEXDSP_LIBS)
+ fi
+@@ -421,17 +422,20 @@ AC_DEFINE_UNQUOTED(ANDROID_STORAGEDIR, "${storagedir}/android",
+ 			[Directory for the Android daemon storage files])
+ 
+ AC_ARG_WITH([phonebook], AC_HELP_STRING([--with-phonebook=PLUGIN],
+-				[obexd phonebook plugin (default=dummy)]),
+-					[plugin_phonebook=${withval}])
++			[obexd phonebook plugin (default=dummy)]),
++			[plugin_phonebook=${withval}])
+ if (test -z "${plugin_phonebook}"); then
+ 	plugin_phonebook=dummy
+ fi
+ 
+ if (test "${plugin_phonebook}" = "ebook"); then
+-	PKG_CHECK_MODULES(LIBEBOOK, [libebook-1.2 >= 3.3], dummy=yes, AC_MSG_ERROR(libebook >= 3.3 is required))
++	PKG_CHECK_MODULES(LIBEBOOK, [libebook-1.2 >= 3.3], dummy=yes,
++			AC_MSG_ERROR(libebook >= 3.3 is required))
+ 	AC_SUBST(LIBEBOOK_CFLAGS)
+ 	AC_SUBST(LIBEBOOK_LIBS)
+-	PKG_CHECK_MODULES(LIBEDATESERVER, [libedataserver-1.2 >= 3.3], dummy=yes, AC_MSG_ERROR(libedataserver >= 3.3 is required))
++	PKG_CHECK_MODULES(LIBEDATESERVER, [libedataserver-1.2 >= 3.3],
++			dummy=yes,
++			AC_MSG_ERROR(libedataserver >= 3.3 is required))
+ 	AC_SUBST(LIBEDATESERVER_CFLAGS)
+ 	AC_SUBST(LIBEDATESERVER_LIBS)
+ fi
+-- 
+2.31.1
+
