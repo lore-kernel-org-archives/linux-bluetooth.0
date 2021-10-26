@@ -2,94 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0C6EC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:18:20 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4427C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B1CA660C4B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:18:20 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A8B1C61040
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 18:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238172AbhJZSUn (ORCPT
+        id S238358AbhJZSoV (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 14:20:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52502 "EHLO
+        Tue, 26 Oct 2021 14:44:21 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57954 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238171AbhJZSUm (ORCPT
+        with ESMTP id S235794AbhJZSoU (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 14:20:42 -0400
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFEFDC061745
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:18:18 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id m21so284709pgu.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:18:18 -0700 (PDT)
+        Tue, 26 Oct 2021 14:44:20 -0400
+Received: from mail-qt1-x82f.google.com (mail-qt1-x82f.google.com [IPv6:2607:f8b0:4864:20::82f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88E16C061745
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:41:56 -0700 (PDT)
+Received: by mail-qt1-x82f.google.com with SMTP id c28so112778qtv.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 11:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=pz7hA7yOHbAtOlqe5LGP5QJScgQrTEj6RuUnKh0e6Jk=;
-        b=N54CzwbtCXn/4cJ8D+M98bStaJqD43sFK0osIycSqpC78dkM3DTqUO5v1daUAhG5sX
-         /HKcHLrOcnSfGmhmzrjTlBfXJTLKDfOMJSL5k3SGtwpEh1vPULwOAr5AfLt27tIakx+y
-         ae6JE3UuZYdwIeY5HLHNTmXOYJ2UJvn1S+fufX5Lp1YGCko9xJOYro2cvQfboQpkvFDv
-         dLoDqwI5bdVcUyGRB5OF+Qi8ORfo3nqG5Opm1Z2Y7kc61P2yo5qQScIW2KrOzK/4Nmca
-         yGl82e6i9g4/AlmqPxJlAxVrVI1D0I6hebTYKnunzmbUchylYT8bODJ07bd6G4K30+AA
-         +OEg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=hhZXeo3kDGvjzmjVCFhOoA68QDviKqHasK4kh5ft+g4=;
+        b=TluayF5FUJBMWxdridtvk83aFi8WIkyRrKLgxlJtdW8dVMsiWJU8DiRO4zC97esErf
+         kY4bNv/m7ShtWNTiscAzijAHLRRxgYHvZwRogHRHtYuoVSKDzmtJxikBqHQHP4nI7cRN
+         g2HlGrOXCp/phETwW1GX+VKRk3JsaKPh8MXfe+AXyO8PlScZvc8NTFxxiOfDvVVQcsPX
+         9NqCPZRfokDIrMi9TJh83DqOIxame1B3ODdxURzXnOcWC06fvUKjMNEbCreXrQ6Cbiqu
+         tPhn5Fp6GkuHQvzps3L3pPOpiKiV4mOgjEqYO3+idu9GLqakvQfa40GXnu8U7JrvOD03
+         PHyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=pz7hA7yOHbAtOlqe5LGP5QJScgQrTEj6RuUnKh0e6Jk=;
-        b=WfCUuTYPgnVUy8Q8Wkgm96eP8WuVtLN3tRFTihCT6aFvzg/tdNXfXPN63F0cEY+RMb
-         ZbcWajz9jURuyDectG3N7xnIFp3Jq4NzCM26BR2jX/vno9EzuHUenkpIEW9TW5UN4PTd
-         uqQqNjqBkKBpT503m82vEY76O10MK7a1UKLXepkLE84YTFbg8hggMBsHzoN506epIv4u
-         ij7TvA87A2k5hGqU3HcgOWeZTO2ct3Kyzz3++GJi1MAztoQR5uGxlBMZrJpqU+5y1r6q
-         URhAtfkU2ljD268D2v5O15L+ng8ADUax7WQkjXabV9UC6PlXSm9WFQXRxXTN8Ovum8gC
-         IrUA==
-X-Gm-Message-State: AOAM531AT3cLBf1TebxB2DnMRwcqXcVF1Sid7hoHtuQOGea33e5S7jko
-        2TDT2h+1o18tJNOUUPLGmAhgQUjsJsE=
-X-Google-Smtp-Source: ABdhPJzO7n5wfCG/jCxjg9DfxPzthHU+kN1+8XNAAJValwZoLmLU8z5NPrB3wplMHeFatMz6oon6Vg==
-X-Received: by 2002:a05:6a00:1147:b029:3e0:8c37:938e with SMTP id b7-20020a056a001147b02903e08c37938emr27442736pfm.65.1635272297960;
-        Tue, 26 Oct 2021 11:18:17 -0700 (PDT)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x202sm7677983pfc.170.2021.10.26.11.18.17
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=hhZXeo3kDGvjzmjVCFhOoA68QDviKqHasK4kh5ft+g4=;
+        b=z4RaV2iRFofVlDN66cFK5hV0moVeCatu/uviLcxA53i0+VUkT+fNebcgVV859uMwOv
+         i5eijccP63gNaLv4D5oMZXI1oe2HBTw+K11boduTs0p4waN3lLRnfZsUI1GUTdxyxFu0
+         RPC5XzPi1Vfln2o17lGtGW0n/fk8nC4jf1EypnnPbZxFDH/7zi/C4l83VykSXfrhUEwr
+         S/0/i8O2jc8VNtvWZ15eYVIrPrJigE5KSPlNsG8IquZzFtKn5nzzjG4nJy4gQQY7QNMg
+         mxPaGvOynf6P3O+1aFTfHiJn1mE0TLHeXYAR4qP32dJwP+EbpdgrQLG0EsOZxVl/CJsL
+         ISVQ==
+X-Gm-Message-State: AOAM532WvMnAKwQBBEnewY1FJvfDGtyd+VHbq3D26BsZ9asHqDxbc8HJ
+        qYlbGUJk9zhirc4QxoQLob9GPARAqcpZGg==
+X-Google-Smtp-Source: ABdhPJzn4qNjws8vNz7wf7hICzY4b8S+rIg5dJ1tFTaLFVXb+RT/CaxxOXMxKxBr/wiYUmBgYDxbCA==
+X-Received: by 2002:ac8:6158:: with SMTP id d24mr26558661qtm.115.1635273715612;
+        Tue, 26 Oct 2021 11:41:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.114.188.56])
+        by smtp.gmail.com with ESMTPSA id k8sm10791819qkk.37.2021.10.26.11.41.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 11:18:17 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 2/2] obexd: Add missing phonebook backends
-Date:   Tue, 26 Oct 2021 11:18:15 -0700
-Message-Id: <20211026181815.1305602-2-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 26 Oct 2021 11:41:55 -0700 (PDT)
+Message-ID: <61784bf3.1c69fb81.18660.8cd6@mx.google.com>
+Date:   Tue, 26 Oct 2021 11:41:55 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============6392800116022099843=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ,1/2] Makefile: Fix code style
+Reply-To: linux-bluetooth@vger.kernel.org
 In-Reply-To: <20211026181815.1305602-1-luiz.dentz@gmail.com>
 References: <20211026181815.1305602-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============6392800116022099843==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds missing phonebook backends to EXTRA_DIST so they can be build
-from tarballs.
+This is automated email and please do not reply to this email!
 
-Fixes: https://github.com/bluez/bluez/issues/222
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=570633
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      2.98 seconds
+GitLint                       PASS      1.96 seconds
+Prep - Setup ELL              PASS      52.53 seconds
+Build - Prep                  PASS      0.53 seconds
+Build - Configure             PASS      9.97 seconds
+Build - Make                  PASS      216.18 seconds
+Make Check                    PASS      9.08 seconds
+Make Distcheck                PASS      243.89 seconds
+Build w/ext ELL - Configure   PASS      9.39 seconds
+Build w/ext ELL - Make        PASS      184.54 seconds
+
+
+
 ---
- Makefile.obexd | 2 ++
- 1 file changed, 2 insertions(+)
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.obexd b/Makefile.obexd
-index b9fbc9b3b..37a133455 100644
---- a/Makefile.obexd
-+++ b/Makefile.obexd
-@@ -42,6 +42,8 @@ obexd_builtin_sources += obexd/plugins/pbap.c \
- 				obexd/plugins/vcard.h obexd/plugins/vcard.c \
- 				obexd/plugins/phonebook.h \
- 				obexd/plugins/phonebook-@PLUGIN_PHONEBOOK@.c
-+EXTRA_DIST += obexd/plugins/phonebook-dummy.c obexd/plugins/phonebook-ebook.c \
-+				obexd/plugins/phonebook-tracker.c
- 
- obexd_builtin_modules += mas
- obexd_builtin_sources += obexd/plugins/mas.c obexd/src/map_ap.h \
--- 
-2.31.1
 
+--===============6392800116022099843==--
