@@ -2,63 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 329FDC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6106CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0B8BD610A0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:29 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3A322610E5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240138AbhJZXFv (ORCPT
+        id S240153AbhJZXFx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 19:05:51 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60684 "EHLO
+        Tue, 26 Oct 2021 19:05:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60696 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237238AbhJZXFu (ORCPT
+        with ESMTP id S237238AbhJZXFw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:05:50 -0400
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A559C061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:26 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id 187so861484pfc.10
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:26 -0700 (PDT)
+        Tue, 26 Oct 2021 19:05:52 -0400
+Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8DDE8C061570
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:28 -0700 (PDT)
+Received: by mail-pf1-x430.google.com with SMTP id y7so876186pfg.8
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=LdcYLFA0f47AHcX/3ua4TjqtVQ2ovlHA5WeMOuB4QSc=;
-        b=bsPVg6wMk2sW/MnTUdYNg64Y69A4/4aPIY5kgD2m6WwfrtqvybRyj72M+aYns451hl
-         y+oV8RJEAH7CadE+Ylqwng8seYnwY1Z7rca/3C/wn6Jls8am7omMUJT57QFmNOIGGAzv
-         hvNN1DrQKI7HQK5x3bl+6PtU+F1rcxqmnjFEhF3nWFn5RPScJKG7GbXHyCIGL2yqRzkI
-         CAueUeYPaNBwffVS+0kgGnv+vtXwv1kJ53ZWRalW5zmKOzMwskeguy5JJWq5QdGUU+vR
-         fksUuLPteXRO1i4CCt421II03i96ez+F9AfPo/2OJfcBvxAkkMZCzrcGWF7J8dvi8geP
-         V1qQ==
+        bh=VnhR5kNuH0dTcJMt94ZEOssw4aW9JZKLXTbRp6RlD4c=;
+        b=H3Y47wgU62SkaIroYhEHsWdgJlyEa9c2ugmjmiVp12u+pbOs/7SuF/IwmVwrwGNNGC
+         GKgCdB1+YSqVhb27l6vHnPx//B7p1NqDeYTeh3LiXlQa/vKbv8B2X2PRB8VVGnBvWvEP
+         uGg0FxLTfJaAWgwG3Wsx5FuvFWMlqUxpreb4vsk55pL9DDbqYL5/nEL0MgnmAEGAD5/D
+         BIav2P4EqkSWL0Uj5T7TCWQvuVtaRIXYkBPczrJB333VLOvHq+C3jECUUozljc0+1rbZ
+         zuMEZq1ag5PrMqHY5zu/8SVV9lLwN497M4Wtfbv4eBYOuylvQcQY/MzfFK37QXluBlzj
+         SIXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=LdcYLFA0f47AHcX/3ua4TjqtVQ2ovlHA5WeMOuB4QSc=;
-        b=oB+iUY5mIMSTpCNnPeSur7itdXhY+ogl2nXJa5FNDO8bH1JBYXOGzJw1M+ViSSIYDJ
-         nXeuN7LHnFCEGVgumes4TL1/Nv4pgeUtlpHmNCR5M4TTTPkSGJYKMTZa5BMILBHwMiTX
-         cIRNhOpAxStXhm3O88xxynKteRUJR0bGC/9dypIqQ08MEuwsIsruybf/QC1VixkQtI5Z
-         ZN3molRKN82fgV9QdGPsra9u3rQC4UN9IywwF9psmJJ+oQXkv6emt6ZfkxDIaWS+c6ao
-         zytTnzQeg3QGEz39qlMLJhi9Cj/yrsF3oEbtDXUZdVR2FeTvA5TbSbz21qMKf9Qc40hJ
-         3nFw==
-X-Gm-Message-State: AOAM533q1TQaILHz9ASQ/2MS+pA5TUOnGJA5TbOeJ81gG2km6d279YR+
-        sgHC02g+et+TXp0fXVb9sf8xg5uDYjU=
-X-Google-Smtp-Source: ABdhPJwgi1bXBB9T7NFFUACfR7XFs1k2ubg8y/sA9dx8T+bOayb88lgzvaSV4vYm0xZa0gjz1PaVvw==
-X-Received: by 2002:aa7:90d0:0:b0:44d:b8a:8837 with SMTP id k16-20020aa790d0000000b0044d0b8a8837mr28973815pfk.47.1635289405590;
-        Tue, 26 Oct 2021 16:03:25 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=VnhR5kNuH0dTcJMt94ZEOssw4aW9JZKLXTbRp6RlD4c=;
+        b=yoTv+72MCYcAGafFEs+zopXChcTxNNJULmXtfiT+j9o7806ODxgVbTBuOsj+iwKAEo
+         W7ZLX6g7fi1Kxm2dhwbWbig4wGvyfSlHFC9Q+rqA0QD69MBcRqjQ3BagPIdtVR7ue7ap
+         NPaiM17nSa3apSzLZ850h0VVO+PZbMlusZlQkQV+Q/jyajymlU/VjK7xtNKdG+E/oZ5C
+         2T8hUSWqYO5AIEh/l/UBB1UXkAcY4Cj9I1dbYANpg/J3lOI33NxgXD4OK5/HuQGfVwl6
+         LSU9GlJDt5/OVAbyhRg95REQdSH6Bk+xbfMXWsrtNtCNiTjc7rbKNK3s8TfmdiXZFqPL
+         9ZUw==
+X-Gm-Message-State: AOAM533m37XZP7a/wN2mrXToFYzJPNMkyXyEZSaEC8wmCZ4m/NLHF3GI
+        nhIZLgKoasXOP8nYpJWUiU4v0rAfeCE=
+X-Google-Smtp-Source: ABdhPJwAmR7RTKMMnNfSUTRxDEg7i9RmbaYv50FbFxFPjMc25IMmbq/PqOQGEyqm2xcGp5xndj9D4Q==
+X-Received: by 2002:a05:6a00:b83:b0:47b:fbb3:9265 with SMTP id g3-20020a056a000b8300b0047bfbb39265mr13737612pfj.79.1635289407527;
+        Tue, 26 Oct 2021 16:03:27 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.24
+        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.26
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 16:03:24 -0700 (PDT)
+        Tue, 26 Oct 2021 16:03:27 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 00/23] Bluetooth: HCI command synchronization
-Date:   Tue, 26 Oct 2021 16:03:01 -0700
-Message-Id: <20211026230324.1533907-1-luiz.dentz@gmail.com>
+Subject: [PATCH v6 02/23] Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
+Date:   Tue, 26 Oct 2021 16:03:03 -0700
+Message-Id: <20211026230324.1533907-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211026230324.1533907-1-luiz.dentz@gmail.com>
+References: <20211026230324.1533907-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,81 +69,585 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This is the initial work to move away from the current design of
-batch up commands with hci_req_run to be executed asynchronously to
-instead run them synchronously which enables handling errors properly.
+This make use of hci_cmd_sync_queue for the following MGMT commands:
 
-It specially targets enabling the so called LL Privacy feature and
-simplifying Suspend/Resume code paths since those are the most
-complicated ones involving multiple state machines (Connection,
-Advertising, Scanning and Adv Monitor) which requires a bunch commands
-to be send making the code very complicated to follow.
+Set Device Class
+Set Device ID
+Add UUID
+Remove UUID
 
-As a result of these changes the LL Privacy is enabled for the
-peripheral role, previously only central role had support for it, so it
-is possible to have advertising sets when LL Privacy is enabled.
+tools/mgmt-tester -s "Set Device Class"
 
-Suspend/Resume have been reworked so it no longer needs a state machine
-to track its progress, the whole process of suspending is handled by
-hci_suspend_sync and hci_resume_sync for resuming, we also took the time
-to document the source code to make clear what is their expected behavior.
+Test Summary
+------------
+Set Device Class - Success 1                         Passed
+Set Device Class - Success 2                         Passed
+Set Device Class - Invalid parameters 1              Passed
+Total: 3, Passed: 3 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.0599 seconds
 
-In order to properly test these changes a number of new tests are being
-introduced see:
+tools/mgmt-tester -s "Set Device ID"
 
-https://patchwork.kernel.org/project/bluetooth/list/?series=565857
+Test Summary
+------------
+Set Device ID - Success 1                            Passed
+Set Device ID - Success 2                            Passed
+Set Device ID - Disable                              Passed
+Set Device ID - Power off and Power on               Passed
+Set Device ID - SSP off and Power on                 Passed
+Set Device ID - Invalid Parameter                    Passed
+Total: 6, Passed: 6 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.107 seconds
 
-v6: Fix CI findings, fix using ERR_PTR/PTR_ERR to pass parameters as user_data
-and change the use of hci_dev *dev to hci_dev *hdev.
+tools/mgmt-tester -s "Add UUID"
 
-Brian Gix (13):
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
-  Bluetooth: hci_sync: Enable synch'd set_bredr
-  Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
-  Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
-  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
-  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
-  Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
-  Bluetooth: hci_sync: Convert adv_expire
-  Bluetooth: hci_sync: Convert MGMT_OP_SSP
+Test Summary
+------------
+Add UUID - UUID-16 1                                 Passed
+Add UUID - UUID-16 multiple 1                        Passed
+Add UUID - UUID-16 partial 1                         Passed
+Add UUID - UUID-32 1                                 Passed
+Add UUID - UUID-32 multiple 1                        Passed
+Add UUID - UUID-32 partial 1                         Passed
+Add UUID - UUID-128 1                                Passed
+Add UUID - UUID-128 multiple 1                       Passed
+Add UUID - UUID-128 partial 1                        Passed
+Add UUID - UUID mix                                  Passed
+Total: 10, Passed: 10 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.198 seconds
 
-Luiz Augusto von Dentz (9):
-  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
-  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
-  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
-  Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
-  Bluetooth: hci_sync: Rework background scan
-  Bluetooth: hci_sync: Convert MGMT_SET_POWERED
-  Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
-  Bluetooth: hci_sync: Rework init stages
-  Bluetooth: hci_sync: Rework hci_suspend_notifier
+tools/mgmt-tester -s "Remove UUID"
 
-Marcel Holtmann (1):
-  Bluetooth: Add helper for serialized HCI command execution
+Test Summary
+------------
+Remove UUID - Success 1                              Passed
+Remove UUID - All UUID - Success 2                   Passed
+Remove UUID - Power Off - Success 3                  Passed
+Remove UUID - Power Off and On - Success 4           Passed
+Remove UUID - Not Exist - Invalid Params 1           Passed
+Total: 5, Passed: 5 (100.0%), Failed: 0, Not Run: 0
+Overall execution time: 0.0908 seconds
 
- include/net/bluetooth/bluetooth.h |    2 +
- include/net/bluetooth/hci_core.h  |   21 +-
- include/net/bluetooth/hci_sync.h  |   98 +
- net/bluetooth/Makefile            |    2 +-
- net/bluetooth/hci_conn.c          |   20 +-
- net/bluetooth/hci_core.c          | 1333 +-------
- net/bluetooth/hci_event.c         |  153 +-
- net/bluetooth/hci_request.c       |  338 +-
- net/bluetooth/hci_request.h       |   10 +
- net/bluetooth/hci_sync.c          | 4788 +++++++++++++++++++++++++++++
- net/bluetooth/mgmt.c              | 2050 ++++++------
- net/bluetooth/mgmt_util.c         |   15 +-
- net/bluetooth/mgmt_util.h         |    4 +
- net/bluetooth/msft.c              |  511 +--
- net/bluetooth/msft.h              |   15 +-
- 15 files changed, 6370 insertions(+), 2990 deletions(-)
- create mode 100644 include/net/bluetooth/hci_sync.h
- create mode 100644 net/bluetooth/hci_sync.c
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_sync.h |   3 +
+ net/bluetooth/hci_request.c      |   4 +-
+ net/bluetooth/hci_request.h      |   6 +
+ net/bluetooth/hci_sync.c         |  72 ++++++++++++
+ net/bluetooth/mgmt.c             | 192 +++++++++++++++----------------
+ net/bluetooth/mgmt_util.c        |  15 ++-
+ net/bluetooth/mgmt_util.h        |   3 +
+ 7 files changed, 193 insertions(+), 102 deletions(-)
 
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index fcfdeb3cbd7c..fe77ff97bc8e 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -40,3 +40,6 @@ void hci_cmd_sync_clear(struct hci_dev *hdev);
+ 
+ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 		       void *data, hci_cmd_sync_work_destroy_t destroy);
++
++int hci_update_eir_sync(struct hci_dev *hdev);
++int hci_update_class_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index c98340bba5c7..b1b33432c68d 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -97,8 +97,8 @@ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete)
+ 	return req_run(req, NULL, complete);
+ }
+ 
+-static void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+-				  struct sk_buff *skb)
++void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
++			   struct sk_buff *skb)
+ {
+ 	bt_dev_dbg(hdev, "result 0x%2.2x", result);
+ 
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 74c5de5970a7..ba75c2da70f4 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -22,6 +22,10 @@
+ 
+ #include <asm/unaligned.h>
+ 
++#define HCI_REQ_DONE	  0
++#define HCI_REQ_PEND	  1
++#define HCI_REQ_CANCELED  2
++
+ #define hci_req_sync_lock(hdev)   mutex_lock(&hdev->req_lock)
+ #define hci_req_sync_unlock(hdev) mutex_unlock(&hdev->req_lock)
+ 
+@@ -44,6 +48,8 @@ void hci_req_purge(struct hci_request *req);
+ bool hci_req_status_pend(struct hci_dev *hdev);
+ int hci_req_run(struct hci_request *req, hci_req_complete_t complete);
+ int hci_req_run_skb(struct hci_request *req, hci_req_complete_skb_t complete);
++void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
++			   struct sk_buff *skb);
+ void hci_req_add(struct hci_request *req, u16 opcode, u32 plen,
+ 		 const void *param);
+ void hci_req_add_ev(struct hci_request *req, u16 opcode, u32 plen,
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index b2048287fe90..8546cbcae10c 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -11,6 +11,7 @@
+ 
+ #include "hci_request.h"
+ #include "smp.h"
++#include "eir.h"
+ 
+ static void hci_cmd_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
+ 				  struct sk_buff *skb)
+@@ -328,3 +329,74 @@ int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
+ 	return 0;
+ }
+ EXPORT_SYMBOL(hci_cmd_sync_queue);
++
++int hci_update_eir_sync(struct hci_dev *hdev)
++{
++	struct hci_cp_write_eir cp;
++
++	bt_dev_dbg(hdev, "");
++
++	if (!hdev_is_powered(hdev))
++		return 0;
++
++	if (!lmp_ext_inq_capable(hdev))
++		return 0;
++
++	if (!hci_dev_test_flag(hdev, HCI_SSP_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++
++	eir_create(hdev, cp.data);
++
++	if (memcmp(cp.data, hdev->eir, sizeof(cp.data)) == 0)
++		return 0;
++
++	memcpy(hdev->eir, cp.data, sizeof(cp.data));
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_EIR, sizeof(cp), &cp,
++				     HCI_CMD_TIMEOUT);
++}
++
++static u8 get_service_classes(struct hci_dev *hdev)
++{
++	struct bt_uuid *uuid;
++	u8 val = 0;
++
++	list_for_each_entry(uuid, &hdev->uuids, list)
++		val |= uuid->svc_hint;
++
++	return val;
++}
++
++int hci_update_class_sync(struct hci_dev *hdev)
++{
++	u8 cod[3];
++
++	bt_dev_dbg(hdev, "");
++
++	if (!hdev_is_powered(hdev))
++		return 0;
++
++	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED))
++		return 0;
++
++	if (hci_dev_test_flag(hdev, HCI_SERVICE_CACHE))
++		return 0;
++
++	cod[0] = hdev->minor_class;
++	cod[1] = hdev->major_class;
++	cod[2] = get_service_classes(hdev);
++
++	if (hci_dev_test_flag(hdev, HCI_LIMITED_DISCOVERABLE))
++		cod[1] |= 0x20;
++
++	if (memcmp(cod, hdev->dev_class, 3) == 0)
++		return 0;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_WRITE_CLASS_OF_DEV,
++				     sizeof(cod), cod, HCI_CMD_TIMEOUT);
++}
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index 44683443300c..ec6aa7af482f 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -276,10 +276,39 @@ static const u8 mgmt_status_table[] = {
+ 	MGMT_STATUS_CONNECT_FAILED,	/* MAC Connection Failed */
+ };
+ 
+-static u8 mgmt_status(u8 hci_status)
++static u8 mgmt_errno_status(int err)
+ {
+-	if (hci_status < ARRAY_SIZE(mgmt_status_table))
+-		return mgmt_status_table[hci_status];
++	switch (err) {
++	case 0:
++		return MGMT_STATUS_SUCCESS;
++	case -EPERM:
++		return MGMT_STATUS_REJECTED;
++	case -EINVAL:
++		return MGMT_STATUS_INVALID_PARAMS;
++	case -EOPNOTSUPP:
++		return MGMT_STATUS_NOT_SUPPORTED;
++	case -EBUSY:
++		return MGMT_STATUS_BUSY;
++	case -ETIMEDOUT:
++		return MGMT_STATUS_AUTH_FAILED;
++	case -ENOMEM:
++		return MGMT_STATUS_NO_RESOURCES;
++	case -EISCONN:
++		return MGMT_STATUS_ALREADY_CONNECTED;
++	case -ENOTCONN:
++		return MGMT_STATUS_DISCONNECTED;
++	}
++
++	return MGMT_STATUS_FAILED;
++}
++
++static u8 mgmt_status(int err)
++{
++	if (err < 0)
++		return mgmt_errno_status(err);
++
++	if (err < ARRAY_SIZE(mgmt_status_table))
++		return mgmt_status_table[err];
+ 
+ 	return MGMT_STATUS_FAILED;
+ }
+@@ -951,25 +980,23 @@ bool mgmt_get_connectable(struct hci_dev *hdev)
+ 	return hci_dev_test_flag(hdev, HCI_CONNECTABLE);
+ }
+ 
++static int service_cache_sync(struct hci_dev *hdev, void *data)
++{
++	hci_update_eir_sync(hdev);
++	hci_update_class_sync(hdev);
++
++	return 0;
++}
++
+ static void service_cache_off(struct work_struct *work)
+ {
+ 	struct hci_dev *hdev = container_of(work, struct hci_dev,
+ 					    service_cache.work);
+-	struct hci_request req;
+ 
+ 	if (!hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE))
+ 		return;
+ 
+-	hci_req_init(&req, hdev);
+-
+-	hci_dev_lock(hdev);
+-
+-	__hci_req_update_eir(&req);
+-	__hci_req_update_class(&req);
+-
+-	hci_dev_unlock(hdev);
+-
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, service_cache_sync, NULL, NULL);
+ }
+ 
+ static void rpa_expired(struct work_struct *work)
+@@ -2075,37 +2102,33 @@ static u8 get_uuid_size(const u8 *uuid)
+ 	return 16;
+ }
+ 
+-static void mgmt_class_complete(struct hci_dev *hdev, u16 mgmt_op, u8 status)
++static void mgmt_class_complete(struct hci_dev *hdev, void *data, int err)
+ {
+-	struct mgmt_pending_cmd *cmd;
+-
+-	hci_dev_lock(hdev);
++	struct mgmt_pending_cmd *cmd = data;
+ 
+-	cmd = pending_find(mgmt_op, hdev);
+-	if (!cmd)
+-		goto unlock;
++	bt_dev_dbg(hdev, "err %d", err);
+ 
+ 	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode,
+-			  mgmt_status(status), hdev->dev_class, 3);
++			  mgmt_status(err), hdev->dev_class, 3);
+ 
+-	mgmt_pending_remove(cmd);
+-
+-unlock:
+-	hci_dev_unlock(hdev);
++	mgmt_pending_free(cmd);
+ }
+ 
+-static void add_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int add_uuid_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
++	int err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_ADD_UUID, status);
++	err = hci_update_class_sync(hdev);
++	if (err)
++		return err;
++
++	return hci_update_eir_sync(hdev);
+ }
+ 
+ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ {
+ 	struct mgmt_cp_add_uuid *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	struct bt_uuid *uuid;
+ 	int err;
+ 
+@@ -2131,28 +2154,17 @@ static int add_uuid(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 
+ 	list_add_tail(&uuid->list, &hdev->uuids);
+ 
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, add_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto failed;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_UUID, 0,
+-					hdev->dev_class, 3);
+-		goto failed;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_ADD_UUID, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_ADD_UUID, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, add_uuid_sync, cmd, mgmt_class_complete);
++	if (err < 0) {
++		mgmt_pending_free(cmd);
++		goto failed;
++	}
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
+@@ -2173,11 +2185,15 @@ static bool enable_service_cache(struct hci_dev *hdev)
+ 	return false;
+ }
+ 
+-static void remove_uuid_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int remove_uuid_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
++	int err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_REMOVE_UUID, status);
++	err = hci_update_class_sync(hdev);
++	if (err)
++		return err;
++
++	return hci_update_eir_sync(hdev);
+ }
+ 
+ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -2187,7 +2203,6 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	struct mgmt_pending_cmd *cmd;
+ 	struct bt_uuid *match, *tmp;
+ 	u8 bt_uuid_any[] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+-	struct hci_request req;
+ 	int err, found;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2231,39 +2246,35 @@ static int remove_uuid(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ update_class:
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_update_class(&req);
+-	__hci_req_update_eir(&req);
+-
+-	err = hci_req_run(&req, remove_uuid_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_REMOVE_UUID, 0,
+-					hdev->dev_class, 3);
+-		goto unlock;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_REMOVE_UUID, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, remove_uuid_sync, cmd,
++				 mgmt_class_complete);
++	if (err < 0)
++		mgmt_pending_free(cmd);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
+ }
+ 
+-static void set_class_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static int set_class_sync(struct hci_dev *hdev, void *data)
+ {
+-	bt_dev_dbg(hdev, "status 0x%02x", status);
++	int err = 0;
++
++	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
++		cancel_delayed_work_sync(&hdev->service_cache);
++		err = hci_update_eir_sync(hdev);
++	}
++
++	if (err)
++		return err;
+ 
+-	mgmt_class_complete(hdev, MGMT_OP_SET_DEV_CLASS, status);
++	return hci_update_class_sync(hdev);
+ }
+ 
+ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -2271,7 +2282,6 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ {
+ 	struct mgmt_cp_set_dev_class *cp = data;
+ 	struct mgmt_pending_cmd *cmd;
+-	struct hci_request req;
+ 	int err;
+ 
+ 	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -2303,34 +2313,16 @@ static int set_dev_class(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
+-
+-	if (hci_dev_test_and_clear_flag(hdev, HCI_SERVICE_CACHE)) {
+-		hci_dev_unlock(hdev);
+-		cancel_delayed_work_sync(&hdev->service_cache);
+-		hci_dev_lock(hdev);
+-		__hci_req_update_eir(&req);
+-	}
+-
+-	__hci_req_update_class(&req);
+-
+-	err = hci_req_run(&req, set_class_complete);
+-	if (err < 0) {
+-		if (err != -ENODATA)
+-			goto unlock;
+-
+-		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEV_CLASS, 0,
+-					hdev->dev_class, 3);
+-		goto unlock;
+-	}
+-
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_SET_DEV_CLASS, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+ 	}
+ 
+-	err = 0;
++	err = hci_cmd_sync_queue(hdev, set_class_sync, cmd,
++				 mgmt_class_complete);
++	if (err < 0)
++		mgmt_pending_free(cmd);
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -5494,11 +5486,15 @@ static int unblock_device(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static int set_device_id_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_update_eir_sync(hdev);
++}
++
+ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			 u16 len)
+ {
+ 	struct mgmt_cp_set_device_id *cp = data;
+-	struct hci_request req;
+ 	int err;
+ 	__u16 source;
+ 
+@@ -5520,9 +5516,7 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_SET_DEVICE_ID, 0,
+ 				NULL, 0);
+ 
+-	hci_req_init(&req, hdev);
+-	__hci_req_update_eir(&req);
+-	hci_req_run(&req, NULL);
++	hci_cmd_sync_queue(hdev, set_device_id_sync, NULL, NULL);
+ 
+ 	hci_dev_unlock(hdev);
+ 
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index 0d0a6d77b9e8..83875f2a0604 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -227,7 +227,7 @@ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 	}
+ }
+ 
+-struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
++struct mgmt_pending_cmd *mgmt_pending_new(struct sock *sk, u16 opcode,
+ 					  struct hci_dev *hdev,
+ 					  void *data, u16 len)
+ {
+@@ -251,6 +251,19 @@ struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 	cmd->sk = sk;
+ 	sock_hold(sk);
+ 
++	return cmd;
++}
++
++struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
++					  struct hci_dev *hdev,
++					  void *data, u16 len)
++{
++	struct mgmt_pending_cmd *cmd;
++
++	cmd = mgmt_pending_new(sk, opcode, hdev, data, len);
++	if (!cmd)
++		return NULL;
++
+ 	list_add(&cmd->list, &hdev->mgmt_pending);
+ 
+ 	return cmd;
+diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
+index 6559f189213c..9dc24ba0d51a 100644
+--- a/net/bluetooth/mgmt_util.h
++++ b/net/bluetooth/mgmt_util.h
+@@ -49,5 +49,8 @@ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ struct mgmt_pending_cmd *mgmt_pending_add(struct sock *sk, u16 opcode,
+ 					  struct hci_dev *hdev,
+ 					  void *data, u16 len);
++struct mgmt_pending_cmd *mgmt_pending_new(struct sock *sk, u16 opcode,
++					  struct hci_dev *hdev,
++					  void *data, u16 len);
+ void mgmt_pending_free(struct mgmt_pending_cmd *cmd);
+ void mgmt_pending_remove(struct mgmt_pending_cmd *cmd);
 -- 
 2.31.1
 
