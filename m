@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CB778C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE01BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:35 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AB1EA610A0
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:34 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C88C7610A0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:35 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240156AbhJZXF4 (ORCPT
+        id S240172AbhJZXF7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 19:05:56 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60708 "EHLO
+        Tue, 26 Oct 2021 19:05:59 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60722 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240157AbhJZXFz (ORCPT
+        with ESMTP id S240159AbhJZXF5 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:05:55 -0400
-Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ECFB7C061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:30 -0700 (PDT)
-Received: by mail-pl1-x62e.google.com with SMTP id v16so620965ple.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:30 -0700 (PDT)
+        Tue, 26 Oct 2021 19:05:57 -0400
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 12614C061745
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:33 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id n11so642939plf.4
+        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ER/QoWi97OOcrEISYz3Do5i1iNKkEcOL8+aW6XyKeFo=;
-        b=W2/p3VLdOcfu9mL+MQlhTQasBhPvc0A00cP8X/eAmm4zDbfwHvrgGKYyiaI7fSjR2A
-         /azzP88e8NzvVqXfZnZ0KZUv7HrtTvk3m2UkA95GsO/Bk7B5FKD2xPkyyh6XaMZfLa+4
-         c6Y5fybxVyMxTPF8WdW7/DLX9fecINar5Z7z9DXI92GrZCRfzt4w5MF05zyfbmNSRnOu
-         8KmepbXjxyNKNCPpV1MqvLn7jQdAERTGs4wvNr9iOEnrNSjXsaX49jXGMwnuFfCrPjHt
-         mjGN0/dufSMw9x4BhbdkHUVyve1ViVPLVjKgXkBZ15Obd1E0qYdwWjSBEmxV5QR4UxQN
-         X3Pg==
+        bh=GbX85W/YGaYvNA0IpzNqt4m0nOtyaoxDSWZRLuKJtWc=;
+        b=D/8NGKeMjZv9QTFVbcfez+tk4/wjI6I4D8XF0vNLV+5JM0RgVPNEarToaWe1QmGDYf
+         8njmXZVQ6RRWVtOijdoXBRv9EAgbOpeY5oWmnv7zwAxaCGEEEdDV7VnEFaBJroYdk+2N
+         zei68utanraifCXgBObOlg4858T/6/azfMQj90Z7DyPsnMAuf7nirNg/neDKbvVwV/bT
+         W+yWHg31O2RBATwR+vR5dlmmflfy7rGgacdCELYObtg13r5rkUggFepmwYBu3dc5Y+Sm
+         gn16fju/fvwWpWmWlU/mSxTwD7F0xAYnrASNhrGhJpYm82YtrMTnsOpYA0BaxZptNOYf
+         wKVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ER/QoWi97OOcrEISYz3Do5i1iNKkEcOL8+aW6XyKeFo=;
-        b=VcHCzXqEKRLNeI7B2UmLh+l3wdSGy2rqJmxVzubdEl43J1P2nIRqkOEg5L2Y3Uf4uG
-         j7OCm5h9FColLK6/BP3TMolrXlqDgR3nZAk3PGRTIisb9er81c2tdaO92urmitZpczKG
-         h3lwbHP//iBjW4hijQjtk2ouRwDLI421SBNdUp4jtJ718hIugrBvaNaOcZJgcfCWPfi3
-         Ifl9Yw75yq5ZAbhlNQE3I6k6LEO2WyglgLgn5HkprQ0ZaDY2lnaBMLjH2nM5SDB5XQyq
-         6RG/KYiKcIEppiqoymJUeBBWld8/NtlkiRDZX85kZATmclW4ezDuU90qcNiU091Svl+U
-         haJw==
-X-Gm-Message-State: AOAM5301UWeajDYFRqoggUo4KGbrM6HQ9ObAuzVpC10bqTO541/UpdHP
-        GjNQbEccwwbPeoB4uQ/bUAkfQM5j810=
-X-Google-Smtp-Source: ABdhPJx94hf11NvZD4XqbiXydrkVr+lzSU/FW51w3HebEdlg/wRt98DhkUHDLhg5WS/5xLzpVguROA==
-X-Received: by 2002:a17:902:9007:b0:13d:e735:443e with SMTP id a7-20020a170902900700b0013de735443emr24775496plp.74.1635289409771;
-        Tue, 26 Oct 2021 16:03:29 -0700 (PDT)
+        bh=GbX85W/YGaYvNA0IpzNqt4m0nOtyaoxDSWZRLuKJtWc=;
+        b=OLUl7JyheO4Kt2Y2YgAmxfR6A79Y41/Tlm9xdQ+n2Pjt/FN5AE9FMpeQPtmCoXtCOd
+         hJXnSaXDZaCZh3iq5wTp8mmDk/PvbzkdNPUXMQfmauTci+OnTzREVXiVjPozJ7blqcqM
+         EiGGW6gf4BahywcJCPV7623sGNlueucqBshZZ45EDB/amnOisDauY7lhBdtaAnSMd/fG
+         Lqm9K/JK6iJHQ4u6DLadpkNMLCzGmQyIkyQhVGnTkioHQz/Kl5unTo8/6BbuNjw5h8/B
+         zArqR1r8R7Nx47Xcq39e/uge7PKjBOEkGOODnvi6ncYmUPDwKAhjjrU0pKOvtiOwGECG
+         D6xQ==
+X-Gm-Message-State: AOAM532kUZARSBIwlIihUMqebEV9CKnbQ1uSYBDOGM4VOdmmmwT3kOGl
+        uwymMtZRc4dLc8g/T2Cqw6xfo7IaNTM=
+X-Google-Smtp-Source: ABdhPJzmudr0hpIwvq1ukayrVflQXVS2afU8F0HSuJTyhRaS7djL9RYUGaaHiYZ10OxW7yzCrXxStw==
+X-Received: by 2002:a17:902:b68b:b0:13a:1239:b8d9 with SMTP id c11-20020a170902b68b00b0013a1239b8d9mr25165838pls.25.1635289412056;
+        Tue, 26 Oct 2021 16:03:32 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.29
+        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.31
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 16:03:29 -0700 (PDT)
+        Tue, 26 Oct 2021 16:03:31 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 05/23] Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
-Date:   Tue, 26 Oct 2021 16:03:06 -0700
-Message-Id: <20211026230324.1533907-6-luiz.dentz@gmail.com>
+Subject: [PATCH v6 08/23] Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
+Date:   Tue, 26 Oct 2021 16:03:09 -0700
+Message-Id: <20211026230324.1533907-9-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211026230324.1533907-1-luiz.dentz@gmail.com>
 References: <20211026230324.1533907-1-luiz.dentz@gmail.com>
@@ -69,771 +69,650 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This enables advertising when LL privacy is enabled and changes the
-command sequence when resolving list is updated to also account for when
-advertising is enabled using the following sequence:
-
-If there are devices to scan:
-
-Disable Scanning -> Update Accept List ->
-use_ll_privacy((Disable Advertising) -> Disable Resolving List ->
-Update Resolving List -> Enable Resolving List -> (Enable Advertising)) ->
-Enable Scanning
-
-Otherwise:
-
-Disable Scanning
-
-Errors during the Update Accept List stage are handled gracefully by
-restoring any previous state (e.g. advertising) and disabling the use of
-accept list as either accept list or resolving list could not be
-updated.
+This make use of hci_cmd_sync_queue for MGMT_OP_START_DISCOVERY,
+MGMT_OP_START_SERVICE_DISCOVERY and MGMT_OP_STOP_DISCOVERY to use
+hci_cmd_sync_queue so they no longer depend on hdev->discov_update work
+to send any commands.
 
 Tested with:
 
-mgmt-tester -s "LL Privacy"
+tools/mgmt-tester -s "Start Discovery"
 
 Test Summary
 ------------
-LL Privacy - Add Device 1 (Add to WL)                Passed       0.018 seconds
-LL Privacy - Add Device 2 (Add to RL)                Passed       0.020 seconds
-LL Privacy - Add Device 3 (Enable RL)                Passed       0.021 seconds
-LL Privacy - Add Device 4 (2 Devices to WL)          Passed       0.021 seconds
-LL Privacy - Add Device 5 (2 Devices to RL)          Passed       0.021 seconds
-LL Privacy - Add Device 6 (RL is full)               Passed       0.022 seconds
-LL Privacy - Add Device 7 (WL is full)               Passed       0.023 seconds
-LL Privacy - Add Device 8 (Disable Adv)              Passed       0.020 seconds
-LL Privacy - Add Device 9 (Multi Adv)                Passed       0.024 seconds
-LL Privacy - Add Device 10 (Multi Dev and Multi Adv) Passed       0.025 seconds
-LL Privacy - Remove Device 1 (Remove from WL)        Passed       0.022 seconds
-LL Privacy - Remove Device 2 (Remove from RL)        Passed       0.023 seconds
-LL Privacy - Remove Device 3 (Disable RL)            Passed       0.022 seconds
-LL Privacy - Remove Device 4 (Disable Adv)           Passed       0.025 seconds
-LL Privacy - Remove Device 5 (Multi Adv)             Passed       0.029 seconds
-LL Privacy - Start Discovery 1 (Disable RL)          Passed       0.019 seconds
-LL Privacy - Start Discovery 2 (Disable RL)          Passed       0.024 seconds
-Total: 18, Passed: 18 (100.0%), Failed: 0, Not Run: 0
-Overall execution time: 0.493 seconds
+Start Discovery - Not powered 1                      Passed
+Start Discovery - Invalid parameters 1               Passed
+Start Discovery - Not supported 1                    Passed
+Start Discovery - Success 1                          Passed
+Start Discovery - Success 2                          Passed
+Start Discovery - Power Off 1                        Passed
+Start Discovery BREDR LE - (Ext Scan Enable)         Passed
+Start Discovery LE - (Ext Scan Enable)               Passed
+Start Discovery LE - (Ext Scan Param)                Passed
+Start Discovery - (2m, Scan Param)                   Passed
+Start Discovery - (coded, Scan Param)                Passed
+Start Discovery - (1m, 2m, coded, Scan Param)        Passed
+LL Privacy - Start Discovery 1 (Disable RL)          Passed
+LL Privacy - Start Discovery 2 (Disable RL)          Passed
+Total: 14, Passed: 14 (100.0%), Failed: 0, Not Run: 0
+
+tools/mgmt-tester -s "Start Service"
+
+Test Summary
+------------
+Start Service Discovery - Not powered 1              Passed
+Start Service Discovery - Invalid parameters 1       Passed
+Start Service Discovery - Not supported 1            Passed
+Start Service Discovery - Success 1                  Passed
+Start Service Discovery - Success 2                  Passed
+Total: 5, Passed: 5 (100.0%), Failed: 0, Not Run: 0
+
+tools/mgmt-tester -s "Stop Discovery"
+
+Test Summary
+------------
+Stop Discovery - Success 1                           Passed
+Stop Discovery - BR/EDR (Inquiry) Success 1          Passed
+Stop Discovery - Rejected 1                          Passed
+Stop Discovery - Invalid parameters 1                Passed
+Stop Discovery - (Ext Scan Disable)                  Passed
+Total: 5, Passed: 5 (100.0%), Failed: 0, Not Run: 0
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/hci_core.h |   5 +-
- include/net/bluetooth/hci_sync.h |   1 +
- net/bluetooth/hci_event.c        |   4 +-
- net/bluetooth/hci_request.c      |  26 +--
- net/bluetooth/hci_sync.c         | 268 ++++++++++++++++++++++---------
- net/bluetooth/mgmt.c             |  39 +----
- 6 files changed, 213 insertions(+), 130 deletions(-)
+ include/net/bluetooth/hci_sync.h |   4 +
+ net/bluetooth/hci_conn.c         |   4 +-
+ net/bluetooth/hci_event.c        |  15 +-
+ net/bluetooth/hci_sync.c         | 238 +++++++++++++++++++++++++++++--
+ net/bluetooth/mgmt.c             | 105 ++++++++++----
+ 5 files changed, 310 insertions(+), 56 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 17ddea51d161..a6b075203cbe 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -1465,8 +1465,11 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define scan_coded(dev) (((dev)->le_tx_def_phys & HCI_LE_SET_PHY_CODED) || \
- 			 ((dev)->le_rx_def_phys & HCI_LE_SET_PHY_CODED))
- 
-+#define ll_privacy_capable(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
-+
- /* Use LL Privacy based address resolution if supported */
--#define use_ll_privacy(dev) ((dev)->le_features[0] & HCI_LE_LL_PRIVACY)
-+#define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
-+			     hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY))
- 
- /* Use enhanced synchronous connection if command is supported */
- #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index b0708f900d89..ec727eb18e90 100644
+index 00203077e656..c4fa77321b31 100644
 --- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -65,3 +65,4 @@ int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
- int hci_disable_advertising_sync(struct hci_dev *hdev);
+@@ -59,6 +59,7 @@ int hci_setup_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance);
+ int hci_start_ext_adv_sync(struct hci_dev *hdev, u8 instance);
+ int hci_enable_ext_advertising_sync(struct hci_dev *hdev, u8 instance);
+ int hci_enable_advertising_sync(struct hci_dev *hdev);
++int hci_enable_advertising(struct hci_dev *hdev);
  
- int hci_update_passive_scan_sync(struct hci_dev *hdev);
-+int hci_update_passive_scan(struct hci_dev *hdev);
+ int hci_remove_advertising_sync(struct hci_dev *hdev, struct sock *sk,
+ 				u8 instance, bool force);
+@@ -72,3 +73,6 @@ int hci_dev_close_sync(struct hci_dev *hdev);
+ 
+ int hci_powered_update_sync(struct hci_dev *hdev);
+ int hci_set_powered_sync(struct hci_dev *hdev, u8 val);
++
++int hci_start_discovery_sync(struct hci_dev *hdev);
++int hci_stop_discovery_sync(struct hci_dev *hdev);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index 1783ec5f6e3e..dbd737b62f98 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -915,10 +915,10 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ 	 */
+ 	hci_update_passive_scan(hdev);
+ 
+-	/* Re-enable advertising in case this was a failed connection
++	/* Enable advertising in case this was a failed connection
+ 	 * attempt as a peripheral.
+ 	 */
+-	hci_req_reenable_advertising(hdev);
++	hci_enable_advertising(hdev);
+ }
+ 
+ static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
 diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 15f1546908b4..502478a210e0 100644
+index c4b588ace96d..64f4b5edb721 100644
 --- a/net/bluetooth/hci_event.c
 +++ b/net/bluetooth/hci_event.c
-@@ -5499,9 +5499,7 @@ static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
+@@ -1512,16 +1512,10 @@ static void le_set_scan_enable_complete(struct hci_dev *hdev, u8 enable)
+ 
+ 		/* The HCI_LE_SCAN_INTERRUPTED flag indicates that we
+ 		 * interrupted scanning due to a connect request. Mark
+-		 * therefore discovery as stopped. If this was not
+-		 * because of a connect request advertising might have
+-		 * been disabled because of active scanning, so
+-		 * re-enable it again if necessary.
++		 * therefore discovery as stopped.
+ 		 */
+ 		if (hci_dev_test_and_clear_flag(hdev, HCI_LE_SCAN_INTERRUPTED))
+ 			hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
+-		else if (!hci_dev_test_flag(hdev, HCI_LE_ADV) &&
+-			 hdev->discovery.state == DISCOVERY_FINDING)
+-			hci_req_reenable_advertising(hdev);
+ 
+ 		break;
+ 
+@@ -2438,7 +2432,7 @@ static void hci_cs_disconnect(struct hci_dev *hdev, u8 status)
+ 
+ 		if (conn->type == LE_LINK && conn->role == HCI_ROLE_SLAVE) {
+ 			hdev->cur_adv_instance = conn->adv_instance;
+-			hci_req_reenable_advertising(hdev);
++			hci_enable_advertising(hdev);
+ 		}
+ 
+ 		/* If the disconnection failed for any reason, the upper layer
+@@ -3048,7 +3042,7 @@ static void hci_disconn_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 	 */
+ 	if (conn->type == LE_LINK && conn->role == HCI_ROLE_SLAVE) {
+ 		hdev->cur_adv_instance = conn->adv_instance;
+-		hci_req_reenable_advertising(hdev);
++		hci_enable_advertising(hdev);
+ 	}
+ 
+ 	hci_conn_del(conn);
+@@ -5498,9 +5492,6 @@ static void hci_le_enh_conn_complete_evt(struct hci_dev *hdev,
+ 			     le16_to_cpu(ev->interval),
  			     le16_to_cpu(ev->latency),
  			     le16_to_cpu(ev->supervision_timeout));
- 
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
-+	if (hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
- 		hci_req_disable_address_resolution(hdev);
+-
+-	if (hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
+-		hci_req_disable_address_resolution(hdev);
  }
  
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index b1b33432c68d..cb36b2bd1109 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -511,9 +511,7 @@ void hci_req_add_le_scan_disable(struct hci_request *req, bool rpa_le_conn)
- 	}
- 
- 	/* Disable address resolution */
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--	    hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
-+	if (hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION) && !rpa_le_conn) {
- 		__u8 enable = 0x00;
- 
- 		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
-@@ -532,8 +530,7 @@ static void del_from_accept_list(struct hci_request *req, bdaddr_t *bdaddr,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_DEL_FROM_ACCEPT_LIST, sizeof(cp), &cp);
- 
--	if (use_ll_privacy(req->hdev) &&
--	    hci_dev_test_flag(req->hdev, HCI_ENABLE_LL_PRIVACY)) {
-+	if (use_ll_privacy(req->hdev)) {
- 		struct smp_irk *irk;
- 
- 		irk = hci_find_irk_by_addr(req->hdev, bdaddr, bdaddr_type);
-@@ -586,8 +583,7 @@ static int add_to_accept_list(struct hci_request *req,
- 		   cp.bdaddr_type);
- 	hci_req_add(req, HCI_OP_LE_ADD_TO_ACCEPT_LIST, sizeof(cp), &cp);
- 
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY)) {
-+	if (use_ll_privacy(hdev)) {
- 		struct smp_irk *irk;
- 
- 		irk = hci_find_irk_by_addr(hdev, &params->addr,
-@@ -626,8 +622,7 @@ static u8 update_accept_list(struct hci_request *req)
- 	 */
- 	bool allow_rpa = hdev->suspended;
- 
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+	if (use_ll_privacy(hdev))
- 		allow_rpa = true;
- 
- 	/* Go through the current accept list programmed into the
-@@ -716,9 +711,7 @@ static void hci_req_start_scan(struct hci_request *req, u8 type, u16 interval,
- 		return;
- 	}
- 
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--	    addr_resolv) {
-+	if (use_ll_privacy(hdev) && addr_resolv) {
- 		u8 enable = 0x01;
- 
- 		hci_req_add(req, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE, 1, &enable);
-@@ -1480,8 +1473,7 @@ void hci_req_disable_address_resolution(struct hci_dev *hdev)
- 	struct hci_request req;
- 	__u8 enable = 0x00;
- 
--	if (!use_ll_privacy(hdev) &&
--	    !hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
-+	if (!hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
- 		return;
- 
- 	hci_req_init(&req, hdev);
-@@ -1624,8 +1616,7 @@ int hci_get_random_address(struct hci_dev *hdev, bool require_privacy,
- 		/* If Controller supports LL Privacy use own address type is
- 		 * 0x03
- 		 */
--		if (use_ll_privacy(hdev) &&
--		    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+		if (use_ll_privacy(hdev))
- 			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
- 		else
- 			*own_addr_type = ADDR_LE_DEV_RANDOM;
-@@ -2092,8 +2083,7 @@ int hci_update_random_address(struct hci_request *req, bool require_privacy,
- 		/* If Controller supports LL Privacy use own address type is
- 		 * 0x03
- 		 */
--		if (use_ll_privacy(hdev) &&
--		    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+		if (use_ll_privacy(hdev))
- 			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
- 		else
- 			*own_addr_type = ADDR_LE_DEV_RANDOM;
+ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 94667efc4395..c9aba2fd0301 100644
+index 0645804ee242..471ee5bc5665 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -517,8 +517,7 @@ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
- 		/* If Controller supports LL Privacy use own address type is
- 		 * 0x03
- 		 */
--		if (use_ll_privacy(hdev) &&
--		    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+		if (use_ll_privacy(hdev))
- 			*own_addr_type = ADDR_LE_DEV_RANDOM_RESOLVED;
- 		else
- 			*own_addr_type = ADDR_LE_DEV_RANDOM;
-@@ -931,6 +930,10 @@ int hci_enable_advertising_sync(struct hci_dev *hdev)
- 	u32 flags;
+@@ -189,9 +189,6 @@ struct sk_buff *__hci_cmd_sync_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+ 		return ERR_PTR(err);
+ 	}
+ 
+-	if (!skb)
+-		return ERR_PTR(-ENODATA);
+-
+ 	return skb;
+ }
+ EXPORT_SYMBOL(__hci_cmd_sync_sk);
+@@ -241,12 +238,19 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
  	u8 status;
  
-+	if (ext_adv_capable(hdev))
-+		return hci_enable_ext_advertising_sync(hdev,
-+						       hdev->cur_adv_instance);
-+
- 	flags = hci_adv_instance_flags(hdev, hdev->cur_adv_instance);
- 	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
+ 	skb = __hci_cmd_sync_sk(hdev, opcode, plen, param, event, timeout, sk);
+-	if (IS_ERR_OR_NULL(skb)) {
++	if (IS_ERR(skb)) {
+ 		bt_dev_err(hdev, "Opcode 0x%4x failed: %ld", opcode,
+ 			   PTR_ERR(skb));
+ 		return PTR_ERR(skb);
+ 	}
  
-@@ -943,11 +946,9 @@ int hci_enable_advertising_sync(struct hci_dev *hdev)
- 	if (!is_advertising_allowed(hdev, connectable))
- 		return -EINVAL;
- 
--	if (hci_dev_test_flag(hdev, HCI_LE_ADV)) {
--		status = hci_disable_advertising_sync(hdev);
--		if (status)
--			return status;
--	}
-+	status = hci_disable_advertising_sync(hdev);
-+	if (status)
-+		return status;
- 
- 	/* Clear the HCI_LE_ADV bit temporarily so that the
- 	 * hci_update_random_address knows that it's safe to go ahead
-@@ -1284,6 +1285,10 @@ int hci_disable_advertising_sync(struct hci_dev *hdev)
- {
- 	u8 enable = 0x00;
- 
-+	/* If controller is not advertising we are done. */
-+	if (!hci_dev_test_flag(hdev, HCI_LE_ADV))
++	/* If command return a status event skb will be set to NULL as there are
++	 * no parameters, in case of failure IS_ERR(skb) would have be set to
++	 * the actual error would be found with PTR_ERR(skb).
++	 */
++	if (!skb)
 +		return 0;
 +
- 	if (ext_adv_capable(hdev))
- 		return hci_disable_ext_adv_instance_sync(hdev, 0x00);
+ 	status = skb->data[0];
  
-@@ -1322,15 +1327,18 @@ static int hci_le_set_scan_enable_sync(struct hci_dev *hdev, u8 val,
- 
- static int hci_le_set_addr_resolution_enable_sync(struct hci_dev *hdev, u8 val)
- {
--	if (!use_ll_privacy(hdev) ||
--	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+	if (!use_ll_privacy(hdev))
-+		return 0;
-+
-+	/* If controller is not/already resolving we are done. */
-+	if (val == hci_dev_test_flag(hdev, HCI_LL_RPA_RESOLUTION))
- 		return 0;
- 
- 	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADDR_RESOLV_ENABLE,
- 				     sizeof(val), &val, HCI_CMD_TIMEOUT);
+ 	kfree_skb(skb);
+@@ -1017,8 +1021,22 @@ int hci_enable_advertising_sync(struct hci_dev *hdev)
+ 				     sizeof(enable), &enable, HCI_CMD_TIMEOUT);
  }
  
--int hci_scan_disable_sync(struct hci_dev *hdev, bool rpa_le_conn)
-+int hci_scan_disable_sync(struct hci_dev *hdev)
+-static int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
+-					    struct sock *sk)
++static int enable_advertising_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_enable_advertising_sync(hdev);
++}
++
++int hci_enable_advertising(struct hci_dev *hdev)
++{
++	if (!hci_dev_test_flag(hdev, HCI_ADVERTISING) &&
++	    list_empty(&hdev->adv_instances))
++		return 0;
++
++	return hci_cmd_sync_queue(hdev, enable_advertising_sync, NULL, NULL);
++}
++
++int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
++				     struct sock *sk)
  {
  	int err;
  
-@@ -1352,13 +1360,6 @@ int hci_scan_disable_sync(struct hci_dev *hdev, bool rpa_le_conn)
+@@ -1622,7 +1640,7 @@ static int hci_pause_advertising_sync(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
+-/* This function disables all user advertising instances (excluding 0x00) */
++/* This function enables all user advertising instances (excluding 0x00) */
+ static int hci_resume_advertising_sync(struct hci_dev *hdev)
+ {
+ 	struct adv_info *adv, *tmp;
+@@ -1870,7 +1888,8 @@ static int hci_le_set_scan_param_sync(struct hci_dev *hdev, u8 type,
+ }
+ 
+ static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
+-			       u16 window, u8 own_addr_type, u8 filter_policy)
++			       u16 window, u8 own_addr_type, u8 filter_policy,
++			       u8 filter_dup)
+ {
+ 	int err;
+ 
+@@ -1884,8 +1903,7 @@ static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
+ 	if (err)
  		return err;
- 	}
  
--	if (rpa_le_conn) {
--		err = hci_le_set_addr_resolution_enable_sync(hdev, 0x00);
--		if (err)
--			bt_dev_err(hdev, "Unable to disable LL privacy: %d",
--				   err);
--	}
--
- 	return err;
+-	return hci_le_set_scan_enable_sync(hdev, LE_SCAN_ENABLE,
+-					   LE_SCAN_FILTER_DUP_ENABLE);
++	return hci_le_set_scan_enable_sync(hdev, LE_SCAN_ENABLE, filter_dup);
  }
  
-@@ -1426,8 +1427,7 @@ static int hci_le_del_resolve_list_sync(struct hci_dev *hdev,
- 	struct hci_cp_le_del_from_resolv_list cp;
- 	struct bdaddr_list_with_irk *entry;
+ int hci_passive_scan_sync(struct hci_dev *hdev)
+@@ -1960,7 +1978,8 @@ int hci_passive_scan_sync(struct hci_dev *hdev)
+ 	bt_dev_dbg(hdev, "LE passive scan with acceptlist = %d", filter_policy);
  
--	if (!use_ll_privacy(hdev) ||
--	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+	if (!use_ll_privacy(hdev))
- 		return 0;
- 
- 	/* Check if the IRK has been programmed */
-@@ -1456,6 +1456,11 @@ static int hci_le_del_accept_list_sync(struct hci_dev *hdev,
- 	cp.bdaddr_type = bdaddr_type;
- 	bacpy(&cp.bdaddr, bdaddr);
- 
-+	/* Ignore errors when removing from resolving list as that is likely
-+	 * that the device was never added.
-+	 */
-+	hci_le_del_resolve_list_sync(hdev, &cp.bdaddr, cp.bdaddr_type);
-+
- 	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_DEL_FROM_ACCEPT_LIST,
- 				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- 	if (err) {
-@@ -1466,7 +1471,7 @@ static int hci_le_del_accept_list_sync(struct hci_dev *hdev,
- 	bt_dev_dbg(hdev, "Remove %pMR (0x%x) from allow list", &cp.bdaddr,
- 		   cp.bdaddr_type);
- 
--	return hci_le_del_resolve_list_sync(hdev, &cp.bdaddr, cp.bdaddr_type);
-+	return 0;
+ 	return hci_start_scan_sync(hdev, LE_SCAN_PASSIVE, interval, window,
+-				   own_addr_type, filter_policy);
++				   own_addr_type, filter_policy,
++				   LE_SCAN_FILTER_DUP_ENABLE);
  }
  
- /* Adds connection to resolve list if needed.*/
-@@ -1477,8 +1482,7 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
- 	struct smp_irk *irk;
- 	struct bdaddr_list_with_irk *entry;
+ /* This function controls the passive scanning based on hdev->pend_le_conns
+@@ -2419,7 +2438,7 @@ static int hci_remote_name_cancel_sync(struct hci_dev *hdev, bdaddr_t *addr)
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
  
--	if (!use_ll_privacy(hdev) ||
--	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
-+	if (!use_ll_privacy(hdev))
- 		return 0;
- 
- 	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
-@@ -1510,7 +1514,7 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
-  */
- static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
- 				       struct hci_conn_params *params,
--				       u8 *num_entries, bool allow_rpa)
-+				       u8 *num_entries)
+-static int hci_stop_discovery_sync(struct hci_dev *hdev)
++int hci_stop_discovery_sync(struct hci_dev *hdev)
  {
- 	struct hci_cp_le_add_to_accept_list cp;
- 	int err;
-@@ -1525,8 +1529,7 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
- 		return -ENOSPC;
- 
- 	/* Accept list can not be used with RPAs */
--	if (!allow_rpa &&
--	    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
-+	if (!use_ll_privacy(hdev) &&
- 	    hci_find_irk_by_addr(hdev, &params->addr, params->addr_type)) {
- 		return -EINVAL;
+ 	struct discovery_state *d = &hdev->discovery;
+ 	struct inquiry_entry *e;
+@@ -2450,6 +2469,10 @@ static int hci_stop_discovery_sync(struct hci_dev *hdev)
+ 			return err;
  	}
-@@ -1536,6 +1539,16 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
- 						   params->current_flags))
- 		return 0;
  
-+	/* Attempt to program the device in the resolving list first to avoid
-+	 * having to rollback in case it fails since the resolving list is
-+	 * dynamic it can probably be smaller than the accept list.
++	/* Resume advertising if it was paused */
++	if (use_ll_privacy(hdev))
++		hci_resume_advertising_sync(hdev);
++
+ 	/* No further actions needed for LE-only discovery */
+ 	if (d->type == DISCOV_TYPE_LE)
+ 		return 0;
+@@ -2617,3 +2640,194 @@ int hci_set_powered_sync(struct hci_dev *hdev, u8 val)
+ 
+ 	return hci_power_off_sync(hdev);
+ }
++
++static int hci_inquiry_sync(struct hci_dev *hdev, u8 length)
++{
++	const u8 giac[3] = { 0x33, 0x8b, 0x9e };
++	const u8 liac[3] = { 0x00, 0x8b, 0x9e };
++	struct hci_cp_inquiry cp;
++
++	bt_dev_dbg(hdev, "");
++
++	if (hci_dev_test_flag(hdev, HCI_INQUIRY))
++		return 0;
++
++	hci_dev_lock(hdev);
++	hci_inquiry_cache_flush(hdev);
++	hci_dev_unlock(hdev);
++
++	memset(&cp, 0, sizeof(cp));
++
++	if (hdev->discovery.limited)
++		memcpy(&cp.lap, liac, sizeof(cp.lap));
++	else
++		memcpy(&cp.lap, giac, sizeof(cp.lap));
++
++	cp.length = length;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_INQUIRY,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
++static int hci_active_scan_sync(struct hci_dev *hdev, uint16_t interval)
++{
++	u8 own_addr_type;
++	/* Accept list is not used for discovery */
++	u8 filter_policy = 0x00;
++	/* Default is to enable duplicates filter */
++	u8 filter_dup = LE_SCAN_FILTER_DUP_ENABLE;
++	int err;
++
++	bt_dev_dbg(hdev, "");
++
++	/* If controller is scanning, it means the passive scanning is
++	 * running. Thus, we should temporarily stop it in order to set the
++	 * discovery scanning parameters.
 +	 */
-+	err = hci_le_add_resolve_list_sync(hdev, params);
++	err = hci_scan_disable_sync(hdev);
 +	if (err) {
-+		bt_dev_err(hdev, "Unable to add to resolve list: %d", err);
++		bt_dev_err(hdev, "Unable to disable scanning: %d", err);
 +		return err;
 +	}
 +
- 	*num_entries += 1;
- 	cp.bdaddr_type = params->addr_type;
- 	bacpy(&cp.bdaddr, &params->addr);
-@@ -1544,31 +1557,129 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
- 				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
- 	if (err) {
- 		bt_dev_err(hdev, "Unable to add to allow list: %d", err);
-+		/* Rollback the device from the resolving list */
-+		hci_le_del_resolve_list_sync(hdev, &cp.bdaddr, cp.bdaddr_type);
- 		return err;
- 	}
- 
- 	bt_dev_dbg(hdev, "Add %pMR (0x%x) to allow list", &cp.bdaddr,
- 		   cp.bdaddr_type);
- 
--	return hci_le_add_resolve_list_sync(hdev, params);
-+	return 0;
-+}
++	cancel_interleave_scan(hdev);
 +
-+/* This function disables all advertising instances (including 0x00) */
-+static int hci_pause_advertising_sync(struct hci_dev *hdev)
-+{
-+	int err;
-+
-+	/* If there are no instances or advertising has already been paused
-+	 * there is nothing to do.
++	/* Pause advertising since active scanning disables address resolution
++	 * which advertising depend on in order to generate its RPAs.
 +	 */
-+	if (!hdev->adv_instance_cnt || hdev->advertising_paused)
-+		return 0;
-+
-+	bt_dev_dbg(hdev, "Pausing advertising instances");
-+
-+	/* Call to disable any advertisements active on the controller.
-+	 * This will succeed even if no advertisements are configured.
-+	 */
-+	err = hci_disable_advertising_sync(hdev);
-+	if (err)
-+		return err;
-+
-+	/* If we are using software rotation, pause the loop */
-+	if (!ext_adv_capable(hdev))
-+		cancel_adv_timeout(hdev);
-+
-+	hdev->advertising_paused = true;
-+
-+	return 0;
- }
- 
-+/* This function disables all user advertising instances (excluding 0x00) */
-+static int hci_resume_advertising_sync(struct hci_dev *hdev)
-+{
-+	struct adv_info *adv, *tmp;
-+	int err;
-+
-+	/* If advertising has not been paused there is nothing  to do. */
-+	if (!hdev->advertising_paused)
-+		return 0;
-+
-+	bt_dev_dbg(hdev, "Resuming advertising instances");
-+
-+	if (ext_adv_capable(hdev)) {
-+		/* Call for each tracked instance to be re-enabled */
-+		list_for_each_entry_safe(adv, tmp, &hdev->adv_instances, list) {
-+			err = hci_enable_ext_advertising_sync(hdev,
-+							      adv->instance);
-+			if (!err)
-+				continue;
-+
-+			/* If the instance cannot be resumed remove it */
-+			hci_remove_ext_adv_instance_sync(hdev, adv->instance,
-+							 NULL);
-+		}
-+	} else {
-+		/* Schedule for most recent instance to be restarted and begin
-+		 * the software rotation loop
-+		 */
-+		err = hci_schedule_adv_instance_sync(hdev,
-+						     hdev->cur_adv_instance,
-+						     true);
-+	}
-+
-+	hdev->advertising_paused = false;
-+
-+	return err;
-+}
-+
-+/* Device must not be scanning when updating the accept list.
-+ *
-+ * Update is done using the following sequence:
-+ *
-+ * use_ll_privacy((Disable Advertising) -> Disable Resolving List) ->
-+ * Remove Devices From Accept List ->
-+ * (has IRK && use_ll_privacy(Remove Devices From Resolving List))->
-+ * Add Devices to Accept List ->
-+ * (has IRK && use_ll_privacy(Remove Devices From Resolving List)) ->
-+ * use_ll_privacy(Enable Resolving List -> (Enable Advertising)) ->
-+ * Enable Scanning
-+ *
-+ * In case of failure advertising shall be restored to its original state and
-+ * return would disable accept list since either accept or resolving list could
-+ * not be programmed.
-+ *
-+ */
- static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- {
- 	struct hci_conn_params *params;
- 	struct bdaddr_list *b, *t;
- 	u8 num_entries = 0;
- 	bool pend_conn, pend_report;
--	/* We allow acceptlisting even with RPAs in suspend. In the worst case,
--	 * we won't be able to wake from devices that use the privacy1.2
--	 * features. Additionally, once we support privacy1.2 and IRK
--	 * offloading, we can update this to also check for those conditions.
-+	int err;
-+
-+	/* Pause advertising if resolving list can be used as controllers are
-+	 * cannot accept resolving list modifications while advertising.
- 	 */
--	bool allow_rpa = hdev->suspended;
 +	if (use_ll_privacy(hdev)) {
 +		err = hci_pause_advertising_sync(hdev);
 +		if (err) {
 +			bt_dev_err(hdev, "pause advertising failed: %d", err);
-+			return 0x00;
++			goto failed;
 +		}
 +	}
- 
--	if (use_ll_privacy(hdev) &&
--	    hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		allow_rpa = true;
-+	/* Disable address resolution while reprogramming accept list since
-+	 * devices that do have an IRK will be programmed in the resolving list
-+	 * when LL Privacy is enabled.
++
++	/* Disable address resolution while doing active scanning since the
++	 * accept list shall not be used and all reports shall reach the host
++	 * anyway.
 +	 */
 +	err = hci_le_set_addr_resolution_enable_sync(hdev, 0x00);
 +	if (err) {
-+		bt_dev_err(hdev, "Unable to disable LL privacy: %d", err);
-+		goto done;
++		bt_dev_err(hdev, "Unable to disable Address Resolution: %d",
++			   err);
++		goto failed;
 +	}
- 
- 	/* Go through the current accept list programmed into the
- 	 * controller one by one and check if that address is still
-@@ -1593,13 +1704,6 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 			continue;
- 		}
- 
--		/* Accept list can not be used with RPAs */
--		if (!allow_rpa &&
--		    !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY) &&
--		    hci_find_irk_by_addr(hdev, &b->bdaddr, b->bdaddr_type)) {
--			return 0x00;
--		}
--
- 		num_entries++;
- 	}
- 
-@@ -1614,9 +1718,9 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	 * accept list.
- 	 */
- 	list_for_each_entry(params, &hdev->pend_le_conns, action) {
--		if (hci_le_add_accept_list_sync(hdev, params, &num_entries,
--						allow_rpa))
--			return 0x00;
-+		err = hci_le_add_accept_list_sync(hdev, params, &num_entries);
-+		if (err)
-+			goto done;
- 	}
- 
- 	/* After adding all new pending connections, walk through
-@@ -1624,9 +1728,9 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	 * accept list if there is still space. Abort if space runs out.
- 	 */
- 	list_for_each_entry(params, &hdev->pend_le_reports, action) {
--		if (hci_le_add_accept_list_sync(hdev, params, &num_entries,
--						allow_rpa))
--			return 0x00;
-+		err = hci_le_add_accept_list_sync(hdev, params, &num_entries);
-+		if (err)
-+			goto done;
- 	}
- 
- 	/* Use the allowlist unless the following conditions are all true:
-@@ -1637,10 +1741,20 @@ static u8 hci_update_accept_list_sync(struct hci_dev *hdev)
- 	if (!idr_is_empty(&hdev->adv_monitors_idr) && !hdev->suspended &&
- 	    hci_get_adv_monitor_offload_ext(hdev) == HCI_ADV_MONITOR_EXT_NONE &&
- 	    hdev->interleave_scan_state != INTERLEAVE_SCAN_ALLOWLIST)
--		return 0x00;
-+		err = -EINVAL;
 +
-+done:
-+	/* Enable address resolution when LL Privacy is enabled. */
-+	err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
-+	if (err)
-+		bt_dev_err(hdev, "Unable to enable LL privacy: %d", err);
++	/* All active scans will be done with either a resolvable private
++	 * address (when privacy feature has been enabled) or non-resolvable
++	 * private address.
++	 */
++	err = hci_update_random_address_sync(hdev, true, scan_use_rpa(hdev),
++					     &own_addr_type);
++	if (err < 0)
++		own_addr_type = ADDR_LE_DEV_PUBLIC;
 +
++	if (hci_is_adv_monitoring(hdev)) {
++		/* Duplicate filter should be disabled when some advertisement
++		 * monitor is activated, otherwise AdvMon can only receive one
++		 * advertisement for one peer(*) during active scanning, and
++		 * might report loss to these peers.
++		 *
++		 * Note that different controllers have different meanings of
++		 * |duplicate|. Some of them consider packets with the same
++		 * address as duplicate, and others consider packets with the
++		 * same address and the same RSSI as duplicate. Although in the
++		 * latter case we don't need to disable duplicate filter, but
++		 * it is common to have active scanning for a short period of
++		 * time, the power impact should be neglectable.
++		 */
++		filter_dup = LE_SCAN_FILTER_DUP_DISABLE;
++	}
++
++	err = hci_start_scan_sync(hdev, LE_SCAN_ACTIVE, interval,
++				  hdev->le_scan_window_discovery,
++				  own_addr_type, filter_policy, filter_dup);
++	if (!err)
++		return err;
++
++failed:
 +	/* Resume advertising if it was paused */
 +	if (use_ll_privacy(hdev))
 +		hci_resume_advertising_sync(hdev);
- 
- 	/* Select filter policy to use accept list */
--	return 0x01;
-+	return err ? 0x00 : 0x01;
- }
- 
- /* Returns true if an le connection is in the scanning state */
-@@ -1731,8 +1845,7 @@ static int hci_le_set_scan_param_sync(struct hci_dev *hdev, u8 type,
- }
- 
- static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
--			       u16 window, u8 own_addr_type, u8 filter_policy,
--			       bool addr_resolv)
-+			       u16 window, u8 own_addr_type, u8 filter_policy)
- {
- 	int err;
- 
-@@ -1741,12 +1854,6 @@ static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
- 		return 0;
- 	}
- 
--	if (addr_resolv) {
--		err = hci_le_set_addr_resolution_enable_sync(hdev, 0x01);
--		if (err)
--			return err;
--	}
--
- 	err = hci_le_set_scan_param_sync(hdev, type, interval, window,
- 					 own_addr_type, filter_policy);
- 	if (err)
-@@ -1756,22 +1863,24 @@ static int hci_start_scan_sync(struct hci_dev *hdev, u8 type, u16 interval,
- 					   LE_SCAN_FILTER_DUP_ENABLE);
- }
- 
--/* Ensure to call hci_scan_disable_sync first to disable the controller based
-- * address resolution to be able to reconfigure resolving list.
-- */
- int hci_passive_scan_sync(struct hci_dev *hdev)
- {
- 	u8 own_addr_type;
- 	u8 filter_policy;
- 	u16 window, interval;
--	/* Background scanning should run with address resolution */
--	bool addr_resolv = true;
++
++	/* Resume passive scanning */
++	hci_update_passive_scan_sync(hdev);
++	return err;
++}
++
++static int hci_start_interleaved_discovery_sync(struct hci_dev *hdev)
++{
 +	int err;
- 
- 	if (hdev->scanning_paused) {
- 		bt_dev_dbg(hdev, "Scanning is paused for suspend");
- 		return 0;
- 	}
- 
-+	err = hci_scan_disable_sync(hdev);
-+	if (err) {
-+		bt_dev_err(hdev, "disable scanning failed: %d", err);
++
++	bt_dev_dbg(hdev, "");
++
++	err = hci_active_scan_sync(hdev, hdev->le_scan_int_discovery * 2);
++	if (err)
 +		return err;
++
++	return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN);
++}
++
++int hci_start_discovery_sync(struct hci_dev *hdev)
++{
++	unsigned long timeout;
++	int err;
++
++	bt_dev_dbg(hdev, "type %u", hdev->discovery.type);
++
++	switch (hdev->discovery.type) {
++	case DISCOV_TYPE_BREDR:
++		return hci_inquiry_sync(hdev, DISCOV_BREDR_INQUIRY_LEN);
++	case DISCOV_TYPE_INTERLEAVED:
++		/* When running simultaneous discovery, the LE scanning time
++		 * should occupy the whole discovery time sine BR/EDR inquiry
++		 * and LE scanning are scheduled by the controller.
++		 *
++		 * For interleaving discovery in comparison, BR/EDR inquiry
++		 * and LE scanning are done sequentially with separate
++		 * timeouts.
++		 */
++		if (test_bit(HCI_QUIRK_SIMULTANEOUS_DISCOVERY,
++			     &hdev->quirks)) {
++			timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
++			/* During simultaneous discovery, we double LE scan
++			 * interval. We must leave some time for the controller
++			 * to do BR/EDR inquiry.
++			 */
++			err = hci_start_interleaved_discovery_sync(hdev);
++			break;
++		}
++
++		timeout = msecs_to_jiffies(hdev->discov_interleaved_timeout);
++		err = hci_active_scan_sync(hdev, hdev->le_scan_int_discovery);
++		break;
++	case DISCOV_TYPE_LE:
++		timeout = msecs_to_jiffies(DISCOV_LE_TIMEOUT);
++		err = hci_active_scan_sync(hdev, hdev->le_scan_int_discovery);
++		break;
++	default:
++		return -EINVAL;
 +	}
 +
- 	/* Set require_privacy to false since no SCAN_REQ are send
- 	 * during passive scanning. Not using an non-resolvable address
- 	 * here is important so that peer devices using direct
-@@ -1787,6 +1896,7 @@ int hci_passive_scan_sync(struct hci_dev *hdev)
- 		return 0;
- 
- 	bt_dev_dbg(hdev, "interleave state %d", hdev->interleave_scan_state);
++	if (err)
++		return err;
 +
- 	/* Adding or removing entries from the accept list must
- 	 * happen before enabling scanning. The controller does
- 	 * not allow accept list modification while scanning.
-@@ -1825,12 +1935,23 @@ int hci_passive_scan_sync(struct hci_dev *hdev)
- 	bt_dev_dbg(hdev, "LE passive scan with acceptlist = %d", filter_policy);
- 
- 	return hci_start_scan_sync(hdev, LE_SCAN_PASSIVE, interval, window,
--				   own_addr_type, filter_policy, addr_resolv);
-+				   own_addr_type, filter_policy);
- }
- 
- /* This function controls the passive scanning based on hdev->pend_le_conns
-  * list. If there are pending LE connection we start the background scanning,
-- * otherwise we stop it.
-+ * otherwise we stop it in the following sequence:
-+ *
-+ * If there are devices to scan:
-+ *
-+ * Disable Scanning -> Update Accept List ->
-+ * use_ll_privacy((Disable Advertising) -> Disable Resolving List ->
-+ * Update Resolving List -> Enable Resolving List -> (Enable Advertising)) ->
-+ * Enable Scanning
-+ *
-+ * Otherwise:
-+ *
-+ * Disable Scanning
-  */
- int hci_update_passive_scan_sync(struct hci_dev *hdev)
- {
-@@ -1874,7 +1995,7 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
- 
- 		bt_dev_dbg(hdev, "stopping background scanning");
- 
--		err = hci_scan_disable_sync(hdev, false);
-+		err = hci_scan_disable_sync(hdev);
- 		if (err)
- 			bt_dev_err(hdev, "stop background scanning failed: %d",
- 				   err);
-@@ -1890,13 +2011,6 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
- 		if (hci_lookup_le_connect(hdev))
- 			return 0;
- 
--		err = hci_scan_disable_sync(hdev, false);
--		if (err) {
--			bt_dev_err(hdev, "stop background scanning failed: %d",
--				   err);
--			return err;
--		}
--
- 		bt_dev_dbg(hdev, "start background scanning");
- 
- 		err = hci_passive_scan_sync(hdev);
-@@ -1907,3 +2021,13 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev)
- 
- 	return err;
- }
++	bt_dev_dbg(hdev, "timeout %u ms", jiffies_to_msecs(timeout));
 +
-+static int update_passive_scan_sync(struct hci_dev *hdev, void *data)
-+{
-+	return hci_update_passive_scan_sync(hdev);
-+}
++	/* When service discovery is used and the controller has a
++	 * strict duplicate filter, it is important to remember the
++	 * start and duration of the scan. This is required for
++	 * restarting scanning during the discovery phase.
++	 */
++	if (test_bit(HCI_QUIRK_STRICT_DUPLICATE_FILTER, &hdev->quirks) &&
++	    hdev->discovery.result_filtering) {
++		hdev->discovery.scan_start = jiffies;
++		hdev->discovery.scan_duration = timeout;
++	}
 +
-+int hci_update_passive_scan(struct hci_dev *hdev)
-+{
-+	return hci_cmd_sync_queue(hdev, update_passive_scan_sync, NULL, NULL);
++	queue_delayed_work(hdev->req_workqueue, &hdev->le_scan_disable,
++			   timeout);
++
++	return 0;
 +}
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index ef61b152c627..ca2273a8979d 100644
+index 9490663ee3fb..663049821bed 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -839,12 +839,7 @@ static u32 get_supported_settings(struct hci_dev *hdev)
- 		settings |= MGMT_SETTING_SECURE_CONN;
- 		settings |= MGMT_SETTING_PRIVACY;
- 		settings |= MGMT_SETTING_STATIC_ADDRESS;
--
--		/* When the experimental feature for LL Privacy support is
--		 * enabled, then advertising is no longer supported.
--		 */
--		if (!hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--			settings |= MGMT_SETTING_ADVERTISING;
-+		settings |= MGMT_SETTING_ADVERTISING;
+@@ -5111,6 +5111,32 @@ static bool discovery_type_is_valid(struct hci_dev *hdev, uint8_t type,
+ 	return true;
+ }
+ 
++static void start_discovery_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct mgmt_pending_cmd *cmd = data;
++
++	bt_dev_dbg(hdev, "err %d", err);
++
++	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(err),
++			  cmd->param, 1);
++	mgmt_pending_free(cmd);
++
++	/* Handle suspend notifier */
++	if (test_and_clear_bit(SUSPEND_UNPAUSE_DISCOVERY,
++			       hdev->suspend_tasks)) {
++		bt_dev_dbg(hdev, "Unpaused discovery");
++		wake_up(&hdev->suspend_wait_q);
++	}
++
++	hci_discovery_set_state(hdev, err ? DISCOVERY_STOPPED:
++				DISCOVERY_FINDING);
++}
++
++static int start_discovery_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_start_discovery_sync(hdev);
++}
++
+ static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
+ 				    u16 op, void *data, u16 len)
+ {
+@@ -5162,17 +5188,20 @@ static int start_discovery_internal(struct sock *sk, struct hci_dev *hdev,
+ 	else
+ 		hdev->discovery.limited = false;
+ 
+-	cmd = mgmt_pending_add(sk, op, hdev, data, len);
++	cmd = mgmt_pending_new(sk, op, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
  	}
  
- 	if (test_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks) ||
-@@ -3846,7 +3841,7 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
- 		idx++;
+-	cmd->cmd_complete = generic_cmd_complete;
++	err = hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
++				 start_discovery_complete);
++	if (err < 0) {
++		mgmt_pending_free(cmd);
++		goto failed;
++	}
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+-	queue_work(hdev->req_workqueue, &hdev->discov_update);
+-	err = 0;
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
+@@ -5194,13 +5223,6 @@ static int start_limited_discovery(struct sock *sk, struct hci_dev *hdev,
+ 					data, len);
+ }
+ 
+-static int service_discovery_cmd_complete(struct mgmt_pending_cmd *cmd,
+-					  u8 status)
+-{
+-	return mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status,
+-				 cmd->param, 1);
+-}
+-
+ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 				   void *data, u16 len)
+ {
+@@ -5269,15 +5291,13 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		goto failed;
  	}
  
--	if (hdev && use_ll_privacy(hdev)) {
-+	if (hdev && ll_privacy_capable(hdev)) {
- 		if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
- 			flags = BIT(0) | BIT(1);
- 		else
-@@ -5621,13 +5616,6 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
- 				       status);
+-	cmd = mgmt_pending_add(sk, MGMT_OP_START_SERVICE_DISCOVERY,
++	cmd = mgmt_pending_new(sk, MGMT_OP_START_SERVICE_DISCOVERY,
+ 			       hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto failed;
+ 	}
  
--	/* Enabling the experimental LL Privay support disables support for
--	 * advertising.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
--				       MGMT_STATUS_NOT_SUPPORTED);
+-	cmd->cmd_complete = service_discovery_cmd_complete;
 -
- 	if (cp->val != 0x00 && cp->val != 0x01 && cp->val != 0x02)
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_ADVERTISING,
- 				       MGMT_STATUS_INVALID_PARAMS);
-@@ -7723,13 +7711,6 @@ static int read_adv_features(struct sock *sk, struct hci_dev *hdev,
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES,
- 				       MGMT_STATUS_REJECTED);
+ 	/* Clear the discovery filter first to free any previously
+ 	 * allocated memory for the UUID list.
+ 	 */
+@@ -5301,9 +5321,14 @@ static int start_service_discovery(struct sock *sk, struct hci_dev *hdev,
+ 		}
+ 	}
  
--	/* Enabling the experimental LL Privay support disables support for
--	 * advertising.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_READ_ADV_FEATURES,
--				       MGMT_STATUS_NOT_SUPPORTED);
++	err = hci_cmd_sync_queue(hdev, start_discovery_sync, cmd,
++				 start_discovery_complete);
++	if (err < 0) {
++		mgmt_pending_free(cmd);
++		goto failed;
++	}
++
+ 	hci_discovery_set_state(hdev, DISCOVERY_STARTING);
+-	queue_work(hdev->req_workqueue, &hdev->discov_update);
+-	err = 0;
+ 
+ failed:
+ 	hci_dev_unlock(hdev);
+@@ -5333,6 +5358,31 @@ void mgmt_stop_discovery_complete(struct hci_dev *hdev, u8 status)
+ 	}
+ }
+ 
++static void stop_discovery_complete(struct hci_dev *hdev, void *data, int err)
++{
++	struct mgmt_pending_cmd *cmd = data;
++
++	bt_dev_dbg(hdev, "err %d", err);
++
++	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, mgmt_status(err),
++			  cmd->param, 1);
++	mgmt_pending_free(cmd);
++
++	/* Handle suspend notifier */
++	if (test_and_clear_bit(SUSPEND_PAUSE_DISCOVERY, hdev->suspend_tasks)) {
++		bt_dev_dbg(hdev, "Paused discovery");
++		wake_up(&hdev->suspend_wait_q);
++	}
++
++	if (!err)
++		hci_discovery_set_state(hdev, DISCOVERY_STOPPED);
++}
++
++static int stop_discovery_sync(struct hci_dev *hdev, void *data)
++{
++	return hci_stop_discovery_sync(hdev);
++}
++
+ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 			  u16 len)
+ {
+@@ -5358,17 +5408,20 @@ static int stop_discovery(struct sock *sk, struct hci_dev *hdev, void *data,
+ 		goto unlock;
+ 	}
+ 
+-	cmd = mgmt_pending_add(sk, MGMT_OP_STOP_DISCOVERY, hdev, data, len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_STOP_DISCOVERY, hdev, data, len);
+ 	if (!cmd) {
+ 		err = -ENOMEM;
+ 		goto unlock;
+ 	}
+ 
+-	cmd->cmd_complete = generic_cmd_complete;
++	err = hci_cmd_sync_queue(hdev, stop_discovery_sync, cmd,
++				 stop_discovery_complete);
++	if (err < 0) {
++		mgmt_pending_free(cmd);
++		goto unlock;
++	}
+ 
+ 	hci_discovery_set_state(hdev, DISCOVERY_STOPPING);
+-	queue_work(hdev->req_workqueue, &hdev->discov_update);
+-	err = 0;
+ 
+ unlock:
+ 	hci_dev_unlock(hdev);
+@@ -5803,16 +5856,8 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+ 	 * loaded.
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
+-	    hdev->discovery.state == DISCOVERY_STOPPED) {
+-		struct hci_request req;
 -
- 	hci_dev_lock(hdev);
- 
- 	rp_len = sizeof(*rp) + hdev->adv_instance_cnt;
-@@ -7969,13 +7950,6 @@ static int add_advertising(struct sock *sk, struct hci_dev *hdev,
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				       status);
- 
--	/* Enabling the experimental LL Privay support disables support for
--	 * advertising.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
--				       MGMT_STATUS_NOT_SUPPORTED);
+-		hci_req_init(&req, hdev);
 -
- 	if (cp->instance < 1 || cp->instance > hdev->le_num_of_adv_sets)
- 		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_ADD_ADVERTISING,
- 				       MGMT_STATUS_INVALID_PARAMS);
-@@ -8471,13 +8445,6 @@ static int remove_advertising(struct sock *sk, struct hci_dev *hdev,
- 
- 	bt_dev_dbg(hdev, "sock %p", sk);
- 
--	/* Enabling the experimental LL Privay support disables support for
--	 * advertising.
--	 */
--	if (hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY))
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_REMOVE_ADVERTISING,
--				       MGMT_STATUS_NOT_SUPPORTED);
+-		hci_req_add_le_scan_disable(&req, false);
+-		hci_req_add_le_passive_scan(&req);
 -
- 	hci_dev_lock(hdev);
- 
- 	if (cp->instance && !hci_find_adv_instance(hdev, cp->instance)) {
-@@ -8788,7 +8755,7 @@ void mgmt_power_on(struct hci_dev *hdev, int err)
- 
- 	if (!err) {
- 		restart_le_actions(hdev);
--		hci_update_background_scan(hdev);
+-		hci_req_run(&req, NULL);
+-	}
++	    hdev->discovery.state == DISCOVERY_STOPPED)
 +		hci_update_passive_scan(hdev);
- 	}
  
- 	mgmt_pending_foreach(MGMT_OP_SET_POWERED, hdev, settings_rsp, &match);
+ 	hci_dev_unlock(hdev);
+ 
 -- 
 2.31.1
 
