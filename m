@@ -2,183 +2,158 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 09CC4C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 16:25:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CF5FEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 17:03:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E417060527
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 16:25:03 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B38B360F90
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 17:03:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236405AbhJZQ10 (ORCPT
+        id S237578AbhJZRFp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 12:27:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54354 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237483AbhJZQ1B (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 12:27:01 -0400
-Received: from mail-pf1-x436.google.com (mail-pf1-x436.google.com [IPv6:2607:f8b0:4864:20::436])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E56CC061237
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 09:24:35 -0700 (PDT)
-Received: by mail-pf1-x436.google.com with SMTP id 127so16779pfu.1
-        for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 09:24:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=q7Maw+sMF3Q6N+ptoNDxzqCK96vnCGLnGzCFF2robfg=;
-        b=GrlvUUDsDZCc4Noh/EpeKHDMxftQ31Xq7/gSooGwllD3Sl0nKzM5Otw5mVQyM3dqDR
-         6h2SAjkMi0yojVE0Z9F0/IpE5nu5RnWJt33MQ1XpOj/Y8KkCLObUYsJjnJjX/SCSnvEb
-         j0OBM7vNTetfxokbGlBbCwLr//JdztO7pwWMc=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=q7Maw+sMF3Q6N+ptoNDxzqCK96vnCGLnGzCFF2robfg=;
-        b=67+myvxujJfruozhV6banU96aT3jxS3jZ70tfN4js335vJHbQC8qqDycUWZIx5ZZzD
-         DlQwDPnm+0fW0d/7NbOlses8arJ4e5BUgtRgH2uBqoS1dNESpD6vUsTJ+0w5vk/nvSOl
-         p7fp6aCuFjMQUOGZvB2gqx9sW/ARbxogK6I5FVEDayrMlgmghKA3OtGAO/ZRO7lEKxI2
-         lEEqMI3wyZFq7dT6I45fvWCbmwaoOo0tX6Xnsnk8UXfzLQpKRypucWL8ZZAm2tFD/eA0
-         AVa6gLhZRauf0osrzbF0krELNXwxAxQ+yVATxVmlGmuAzD6cbVYZmOxr4xjJPmbT2ha3
-         yz2Q==
-X-Gm-Message-State: AOAM530sCzSrBcp9zbswBQS1gikv4XKd/f+T6mCunOT3XApozFMdiQk6
-        uwOIU8Xduw6+JyYqd22UfcVYLQ==
-X-Google-Smtp-Source: ABdhPJyCY1M7KA9vxuG5wk3czomxfeK9zodk1ezqbTLfWzkoa0cpMyKyH69tTww+DJIHrT6KxsicOQ==
-X-Received: by 2002:a63:8c4f:: with SMTP id q15mr15040959pgn.225.1635265473926;
-        Tue, 26 Oct 2021 09:24:33 -0700 (PDT)
-Received: from localhost ([2620:15c:202:201:8854:dee7:f36d:b5da])
-        by smtp.gmail.com with UTF8SMTPSA id q6sm19344307pgc.1.2021.10.26.09.24.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 26 Oct 2021 09:24:33 -0700 (PDT)
-Date:   Tue, 26 Oct 2021 09:24:32 -0700
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     tjiang@codeaurora.org
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add support for variant WCN6855 by
- using different nvm
-Message-ID: <YXgrwKUZwUWuWfG4@google.com>
-References: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
+        Tue, 26 Oct 2021 13:05:45 -0400
+Received: from mout.gmx.net ([212.227.17.21]:52011 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232003AbhJZRFo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 26 Oct 2021 13:05:44 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1635267799;
+        bh=bMk0HwvIJYuOseMUHE7Jex1ly5iyMOvFt+r2HNEu+t4=;
+        h=X-UI-Sender-Class:To:From:Subject:Date;
+        b=ZG7tNdS+F0+W0RU/Jqg84iD43e0NLbYiWkeGRe1rB3nQX5RAlAtK7z+1GURTunpFl
+         BkYEzvTp2bYyDBpc4sbnZdhb8rXwu4EjRKNaifK66uLyQ3UWT6ySdnELPCTwTtl6N+
+         QJ5esPSg4wLf5VuCxBuiIvSMejpQR9wtIeSxyhmg=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from [172.18.113.121] ([46.183.103.8]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1N0X8u-1mttnW2Khg-00wWi0 for
+ <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 19:03:18 +0200
+To:     linux-bluetooth@vger.kernel.org
+From:   Martin <hier-bei-mir@gmx.net>
+Subject: Problem Pairing Dell XPS 13 7390 Intel bluetooth btusb with some
+ Headset / Speakers
+Message-ID: <0925c7f0-1866-3e8d-10c7-4827cbbe0b87@gmx.net>
+Date:   Tue, 26 Oct 2021 19:03:13 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: base64
+Content-Language: en-US
+X-Provags-ID: V03:K1:gUNzXxwZGCFGzGV99A3PU3k9SJ0pIIfSPa4wwLPhtQLePxx1yM2
+ 8/+5g82ewumP9qdHEUPoMUvGi0e7zXpxM8NEbasFGUS64etWO+FQMyAGsXg2gkq83xskBkI
+ Sv8ZiH9p+0ob03qv+OK7Ap4t4/bB0LjQWoFONKXQe4hFqzET+uS1evDSCdNq9Qr7C6OINnP
+ BfzY5H5VFkxeLBbHKGA8A==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:XZvPHTqX7F8=:U1LPtzUl0yXPCwANrH2u0T
+ PPv2LvdzxuQOglixwsBVOH47R9kYv1ScSKtQpJI50WpbENkFLlxM+K3QD8DQGckV5fUYpcTU/
+ L1C7WgwXEAyp88VrziLT9eUh6gPz45sxRDO0ExX0mbX3VRZzU6Nh9RZhYfgxHSkU6xgCwI0gA
+ lO/4QZ6Jh70VDJrOvwYN3A6HzDHglvC/5jRMhQ3rKJ2xrnmOM/WMGhmEnh904bI6rLaSPekov
+ OQIqDe0RR9daXMN+Ejc6fwoxJSfmUyvq1CDO9Z1VtBk/L7FSbCIUQu0E2oPZvDRVbqCY/IBfO
+ TlZmhJncVHj/gSbSyJWLWu5kmnoQjzDqsjS9b4Qa4jjXOaZlXkPur0hJnukoPg02/1XnfDU0o
+ quJPLEm1EC3Qt61d3xOK2s6O0YrczN63PSZxkbXyQKk6jYeZ5KoDRiIRpCOwIVhoNO/eWz0qa
+ EqNtmrzWmvsLSr3Jfv5nuZ48X4TlBTSh8ObAAPWwrlp/Ea8VuN35lRYXix6AWKFCTvtyJmBM9
+ LIFFjYpBvkln0WDT3CeEP3wAcKw2lwiSHu8gd5ofMgvZfqkktt9Kkjzb7xtkttMMp+VHN1js4
+ TKCgtx4MDobdNVjMI7CLoh8ODN7BstQtXW2TdjOdk7QUzDoQkILwvhdyT5vZ3tVTHJFLTkiSl
+ ZlDWikf2Xg/4DqHBW7HzJppkk3HfortSdLNauDPw7TLVFmv7mP/QTRoyvza2c+POpvm0kgss7
+ HHgBgJ0XsvjaX5yshXC2dCDawMZqSYhWWB50cePKEsBE3syeENuL2/mz0V0EMAJzNMWdAGoQk
+ yivLZZyLEIrRglNjQh65xbHNXlq5flR3C2AbR+aaNcXBPUj9iMqkzkGBg5PYoK/je3C84qJAT
+ a+a5+rl72dSGBTpha1F9SvTQ7A4G0vhgv80naaVUM8Y3VXHljURqeHHqUxF/+bSohg8UIjxed
+ yf+wpNNC66xmjBLPipsU8W44ZyuclR7euJNk44yR3OaI10eXNWTs1jMEIePyvtsjFrYv7q1Ry
+ iKdRG5xHhbdezXtwQGeN3FYUY+paZjQrpT2DWYXuo6EuSVZK2JddOocd/Io2IQ0aqyq9gx1J0
+ PnDjuPuuQ7DlYk=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Fri, Oct 22, 2021 at 01:35:38PM +0800, tjiang@codeaurora.org wrote:
-> the RF performance of wcn6855 soc chip from different foundries will be
-> difference, so we should use different nvm to configure them.
-> 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
-> ---
->  drivers/bluetooth/btusb.c | 55
-> +++++++++++++++++++++++++++++++++++------------
->  1 file changed, 41 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index 87b71740fad8..a5fe57e7cd7e 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -3195,6 +3195,9 @@ static int btusb_set_bdaddr_wcn6855(struct hci_dev
-> *hdev,
->  #define QCA_DFU_TIMEOUT		3000
->  #define QCA_FLAG_MULTI_NVM      0x80
-> 
-> +#define WCN6855_2_0_RAM_VERSION_GF 0x400c1200
-> +#define WCN6855_2_1_RAM_VERSION_GF 0x400c1211
-> +
->  struct qca_version {
->  	__le32	rom_version;
->  	__le32	patch_version;
-> @@ -3226,6 +3229,7 @@ static const struct qca_device_info
-> qca_devices_table[] = {
->  	{ 0x00000302, 28, 4, 16 }, /* Rome 3.2 */
->  	{ 0x00130100, 40, 4, 16 }, /* WCN6855 1.0 */
->  	{ 0x00130200, 40, 4, 16 }, /* WCN6855 2.0 */
-> +	{ 0x00130201, 40, 4, 16 }, /* WCN6855 2.1 */
->  };
-> 
->  static int btusb_qca_send_vendor_req(struct usb_device *udev, u8 request,
-> @@ -3380,6 +3384,42 @@ static int btusb_setup_qca_load_rampatch(struct
-> hci_dev *hdev,
->  	return err;
->  }
-> 
-> +static void btusb_generate_qca_nvm_name(char *fwname,
-> +					size_t max_size,
-> +					const struct qca_version *ver)
-> +{
-> +	u32 rom_version = le32_to_cpu(ver->rom_version);
-> +	u16 flag = le16_to_cpu(ver->flag);
-> +
-> +	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> +		u16 board_id = le16_to_cpu(ver->board_id);
-> +		u32 ram_version = le32_to_cpu(ver->ram_version);
-> +		const char *variant = NULL;
-
-This assignement was introduced in v3, it isn't really useful since the
-variable is always assigned to a value in the switch statement below.
-
-btw, why did you reset the patch version numbers, earlier they went up
-to v11? This is confusing, e.g. when someone mentions v3 of this patch,
-are they referring to this version or to
-https://patchwork.kernel.org/project/bluetooth/patch/1628758216-3201-1-git-send-email-zijuhu@codeaurora.org/?
-
-> +
-> +		switch (ram_version) {
-> +		case WCN6855_2_0_RAM_VERSION_GF:
-> +		case WCN6855_2_1_RAM_VERSION_GF:
-> +			variant = "_gf";
-> +			break;
-> +		default:
-> +			variant = "";
-> +			break;
-> +		}
-> +
-> +		if (board_id == 0) {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s.bin",
-> +				rom_version, variant);
-> +		} else {
-> +			snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
-> +				rom_version, variant, board_id);
-> +		}
-> +	} else {
-> +		snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin",
-> +			rom_version);
-> +	}
-> +
-> +}
-> +
->  static int btusb_setup_qca_load_nvm(struct hci_dev *hdev,
->  				    struct qca_version *ver,
->  				    const struct qca_device_info *info)
-> @@ -3388,20 +3428,7 @@ static int btusb_setup_qca_load_nvm(struct hci_dev
-> *hdev,
->  	char fwname[64];
->  	int err;
-> 
-> -	if (((ver->flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
-> -		/* if boardid equal 0, use default nvm without surfix */
-> -		if (le16_to_cpu(ver->board_id) == 0x0) {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -				 le32_to_cpu(ver->rom_version));
-> -		} else {
-> -			snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x_%04x.bin",
-> -				le32_to_cpu(ver->rom_version),
-> -				le16_to_cpu(ver->board_id));
-> -		}
-> -	} else {
-> -		snprintf(fwname, sizeof(fwname), "qca/nvm_usb_%08x.bin",
-> -			 le32_to_cpu(ver->rom_version));
-> -	}
-> +	btusb_generate_qca_nvm_name(fwname, sizeof(fwname), ver);
-> 
->  	err = request_firmware(&fw, fwname, &hdev->dev);
->  	if (err) {
-> -- 
-> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a
-> Linux Foundation Collaborative Project
+RGVhciBhbGwsDQoNCkkgZG8gaGF2ZSBhIERlbGwgWFBTIDEzIDczOTAgbGFwdG9wIHJ1bm5pbmcg
+VWJ1bnR1IDIwLjA0Og0KTGludXggbWFydGluLVhQUy0xMy03MzkwIDUuMTEuMC0zOC1nZW5lcmlj
+ICM0Mn4yMC4wNC4xLVVidW50dSBTTVAgVHVlIA0KU2VwIDI4IDIwOjQxOjA3IFVUQyAyMDIxIHg4
+Nl82NCB4ODZfNjQgeDg2XzY0IEdOVS9MaW51eA0Kd2l0aCBJbnRlbCBibHVldG9vdGggY2FyZC4g
+ZG1lc2cgcmVjb2duaXplcyBpdCBhczoNCnVzYiAxLTc6IE5ldyBVU0IgZGV2aWNlIGZvdW5kLCBp
+ZFZlbmRvcj04MDg3LCBpZFByb2R1Y3Q9MDAyOSwgYmNkRGV2aWNlPSANCjAuMDENCkl0IHVzZXMg
+dGhlIGJ0dXNiIGRyaXZlci4NClRoZSBkcml2ZXIgLyBjaGlwIGhhcyBwcm9ibGVtcyB0byBjb25u
+ZWN0IC8gcGFpciB3aXRoIHNvbWUgaGVhZHNldHMgLyANCnNwZWFrZXJzLiBOYW1lbHkgdGhlIFNv
+bnkgU1JTLVhCMTIgTWluaSBzcGVha2VyIGFuZCB0aGUgVGV1ZmVsIFRydWUgQWlyeSANCldpcmVs
+ZXNzIGhlYWRzZXQuDQpQYWlyaW5nIG90aGVyIHNwZWFrZXIgZGV2aWNlcyB3aXRoIHRoZSBYUFMg
+d29ya3MgZmluZSBhbmQgdGhlIFNvbnkgYW5kIA0KVGV1ZmVsIGl0c2VsZiBwYWlyIGZpbmUgd2l0
+aCBvdGhlciBsaW51eCBsYXB0b3BzIC8gYW5kcm9pZCBzbWFydHBob25lcy4gDQpJJ2QgbGlrZSB0
+byBjb25jZW50cmF0ZSBvbiB0aGUgVGV1ZmVsLCBhcyBJIGhhdmUgbG9nZ2VkIHRoZSBwYWlyaW5n
+IA0KY29udmVyc2F0aW9uLg0KSXQgbG9va3MgbGlrZSB0aGlzIG9uIGJ0bW9uOg0KDQpAIE1HTVQg
+Q29tbWFuZDogUGFpciBEZXZpY2UgKDB4MDAxOSkgcGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgwqDC
+oCB7MHgwMDAxfSBbaGNpMF0gDQo4LjgyMjAwMg0KIMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRy
+ZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKg
+wqDCoMKgwqAgQ2FwYWJpbGl0eTogS2V5Ym9hcmREaXNwbGF5ICgweDA0KQ0KPCBIQ0kgQ29tbWFu
+ZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1KSBwbGVuIDEzwqDCoMKgwqDCoCAjMjIg
+W2hjaTBdIA0KOC44MjIwNDENCiDCoMKgwqDCoMKgwqDCoCBBZGRyZXNzOiAwMDowMDpCMDowNTo2
+NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgUGFja2V0IHR5
+cGU6IDB4Y2MxOA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBETTEgbWF5IGJlIHVzZWQNCiDCoMKgwqDC
+oMKgwqDCoMKgwqAgREgxIG1heSBiZSB1c2VkDQogwqDCoMKgwqDCoMKgwqDCoMKgIERNMyBtYXkg
+YmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBESDMgbWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKg
+wqDCoMKgwqAgRE01IG1heSBiZSB1c2VkDQogwqDCoMKgwqDCoMKgwqDCoMKgIERINSBtYXkgYmUg
+dXNlZA0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiByZXBldGl0aW9uIG1vZGU6IFIyICgweDAy
+KQ0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBtb2RlOiBNYW5kYXRvcnkgKDB4MDApDQogwqDC
+oMKgwqDCoMKgwqAgQ2xvY2sgb2Zmc2V0OiAweDAwMDANCiDCoMKgwqDCoMKgwqDCoCBSb2xlIHN3
+aXRjaDogQWxsb3cgc2xhdmUgKDB4MDEpDQogPiBIQ0kgRXZlbnQ6IENvbW1hbmQgU3RhdHVzICgw
+eDBmKSBwbGVuIDTCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqAgIzIzIFtoY2kw
+XSANCjguODIyMzUyDQogwqDCoMKgwqDCoCBDcmVhdGUgQ29ubmVjdGlvbiAoMHgwMXwweDAwMDUp
+IG5jbWQgMQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czogU3VjY2VzcyAoMHgwMCkNCiA+IEhDSSBF
+dmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxlbiAxMcKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqAgIzI4IFtoY2kwXSANCjM5Ljg5MTQ1Nw0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czog
+TE1QIFJlc3BvbnNlIFRpbWVvdXQgLyBMTCBSZXNwb25zZSBUaW1lb3V0ICgweDIyKQ0KIMKgwqDC
+oMKgwqDCoMKgIEhhbmRsZTogNjU1MzUNCiDCoMKgwqDCoMKgwqDCoCBBZGRyZXNzOiAwMDowMDpC
+MDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgTGlu
+ayB0eXBlOiBBQ0wgKDB4MDEpDQogwqDCoMKgwqDCoMKgwqAgRW5jcnlwdGlvbjogRGlzYWJsZWQg
+KDB4MDApDQpAIE1HTVQgRXZlbnQ6IENvbm5lY3QgRmFpbGVkICgweDAwMGQpIHBsZW4gOMKgwqDC
+oMKgwqDCoMKgwqDCoCB7MHgwMDAyfSBbaGNpMF0gDQozOS44OTE1NDkNCiDCoMKgwqDCoMKgwqDC
+oCBCUi9FRFIgQWRkcmVzczogMDA6MDA6QjA6MDU6NjU6NjcgKFJORC1SQUQgTkVUV09SSyBERVZJ
+Q0VTKQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czogVGltZW91dCAoMHgwOCkNCkAgTUdNVCBFdmVu
+dDogQ29ubmVjdCBGYWlsZWQgKDB4MDAwZCkgcGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgIHsweDAw
+MDF9IFtoY2kwXSANCjM5Ljg5MTU0OQ0KIMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRyZXNzOiAw
+MDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKg
+wqAgU3RhdHVzOiBUaW1lb3V0ICgweDA4KQ0KQCBNR01UIEV2ZW50OiBDb21tYW5kIENvbXBsZXRl
+ICgweDAwMDEpIHBsZW4gMTDCoMKgwqDCoMKgwqAgezB4MDAwMX0gW2hjaTBdIA0KMzkuODkxNTc1
+DQogwqDCoMKgwqDCoCBQYWlyIERldmljZSAoMHgwMDE5KSBwbGVuIDcNCiDCoMKgwqDCoMKgwqDC
+oCBTdGF0dXM6IFRpbWVvdXQgKDB4MDgpDQogwqDCoMKgwqDCoMKgwqAgQlIvRURSIEFkZHJlc3M6
+IDAwOjAwOkIwOjA1OjY1OjY3IChSTkQtUkFEIE5FVFdPUksgREVWSUNFUykNCg0KU28gaXQgcHJl
+dHR5IG11Y2ggbG9va3MgbGlrZSB0aGUgbGFwdG9wIHNlbmRzIGEgY29ubmVjdGlvbiByZXF1ZXN0
+LCBidXQgDQpuZXZlciBzZWVzIGEgcmVwbHkgZnJvbSB0aGUgVGV1ZmVsIGhlYWRzZXQuDQoNClNh
+bWUgY29udmVyc2F0aW9uIGZvciBhIFN1cmZhY2UgUHJvIDMgbGFwdG9wICh3aXRoIHNvbWUgYnJv
+YWRjb20gDQpibHVldG9vdGggY2hpcCBpZiBJIHJlbWVtYmVyIGNvcnJlY3RseSwgYWxzbyB1c2lu
+ZyBidHVzYiBkcml2ZXIpOg0KDQpAIE1HTVQgQ29tbWFuZDogUGFpciBEZXZpY2UgKDB4MDAxOSkg
+cGxlbiA4wqDCoMKgwqDCoMKgwqDCoMKgwqDCoCB7MHgwMDAxfSBbaGNpMF0gDQo0LjkyNTgxMQ0K
+IMKgwqDCoMKgwqDCoMKgIEJSL0VEUiBBZGRyZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJB
+RCBORVRXT1JLIERFVklDRVMpDQogwqDCoMKgwqDCoMKgwqAgQ2FwYWJpbGl0eTogRGlzcGxheVll
+c05vICgweDAxKQ0KPCBIQ0kgQ29tbWFuZDogQ3JlYXRlIENvbm5lY3Rpb24gKDB4MDF8MHgwMDA1
+KSBwbGVuIDEzwqDCoMKgwqDCoCAjNTAgW2hjaTBdIA0KNC45MjU4MzENCiDCoMKgwqDCoMKgwqDC
+oCBBZGRyZXNzOiAwMDowMDpCMDowNTo2NTo2NyAoUk5ELVJBRCBORVRXT1JLIERFVklDRVMpDQog
+wqDCoMKgwqDCoMKgwqAgUGFja2V0IHR5cGU6IDB4Y2MxOA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBE
+TTEgbWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKgwqDCoMKgwqAgREgxIG1heSBiZSB1c2VkDQogwqDC
+oMKgwqDCoMKgwqDCoMKgIERNMyBtYXkgYmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgwqDCoCBESDMg
+bWF5IGJlIHVzZWQNCiDCoMKgwqDCoMKgwqDCoMKgwqAgRE01IG1heSBiZSB1c2VkDQogwqDCoMKg
+wqDCoMKgwqDCoMKgIERINSBtYXkgYmUgdXNlZA0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBy
+ZXBldGl0aW9uIG1vZGU6IFIyICgweDAyKQ0KIMKgwqDCoMKgwqDCoMKgIFBhZ2Ugc2NhbiBtb2Rl
+OiBNYW5kYXRvcnkgKDB4MDApDQogwqDCoMKgwqDCoMKgwqAgQ2xvY2sgb2Zmc2V0OiAweDAwMDAN
+CiDCoMKgwqDCoMKgwqDCoCBSb2xlIHN3aXRjaDogQWxsb3cgc2xhdmUgKDB4MDEpDQogPiBIQ0kg
+RXZlbnQ6IENvbW1hbmQgU3RhdHVzICgweDBmKSBwbGVuIDTCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgwqAgIzUxIFtoY2kwXSANCjQuOTI4OTI3DQogwqDCoMKgwqDCoCBDcmVhdGUg
+Q29ubmVjdGlvbiAoMHgwMXwweDAwMDUpIG5jbWQgMQ0KIMKgwqDCoMKgwqDCoMKgIFN0YXR1czog
+U3VjY2VzcyAoMHgwMCkNCiA+IEhDSSBFdmVudDogQ29ubmVjdCBDb21wbGV0ZSAoMHgwMykgcGxl
+biAxMcKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoCAjNTQgW2hjaTBdIA0KNS4wNzc5NjEN
+CiDCoMKgwqDCoMKgwqDCoCBTdGF0dXM6IFN1Y2Nlc3MgKDB4MDApDQogwqDCoMKgwqDCoMKgwqAg
+SGFuZGxlOiAxDQogwqDCoMKgwqDCoMKgwqAgQWRkcmVzczogMDA6MDA6QjA6MDU6NjU6NjcgKFJO
+RC1SQUQgTkVUV09SSyBERVZJQ0VTKQ0KIMKgwqDCoMKgwqDCoMKgIExpbmsgdHlwZTogQUNMICgw
+eDAxKQ0KIMKgwqDCoMKgwqDCoMKgIEVuY3J5cHRpb246IERpc2FibGVkICgweDAwKQ0KPCBIQ0kg
+Q29tbWFuZDogUmVhZCBSZW1vdGUgU3VwcG9ydGUuLiAoMHgwMXwweDAwMWIpIHBsZW4gMsKgICM1
+NSBbaGNpMF0gDQo1LjA3ODE3OQ0KIMKgwqDCoMKgwqDCoMKgIEhhbmRsZTogMQ0KID4gSENJIEV2
+ZW50OiBDb21tYW5kIFN0YXR1cyAoMHgwZikgcGxlbiA0wqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqDCoMKgwqDCoMKgICM1NiBbaGNpMF0gDQo1LjA3ODkyOA0KIMKgwqDCoMKgwqAgUmVhZCBSZW1v
+dGUgU3VwcG9ydGVkIEZlYXR1cmVzICgweDAxfDB4MDAxYikgbmNtZCAxDQogwqDCoMKgwqDCoMKg
+wqAgU3RhdHVzOiBTdWNjZXNzICgweDAwKQ0KWy4uLl0NCg0KV2hhdCBjb3VsZCBjYXVzZSB0aGUg
+SW50ZWwgODA4NyAvIDAwMjkgYmx1ZXRvb3RoIGNoaXAgLyBkcml2ZXIgbm90IGJlaW5nIA0KYWJs
+ZSB0byBjb25uZWN0IHRvIHRoZSBUZXVmZWwgc3BlYWtlcnM/DQoNClRoZXJlIGlzIGFsc28gYW5v
+dGhlciByZXBvcnQgd2l0aCBhIHNpbWlsYXIgcHJvYmxlbSBoZXJlOiANCmh0dHBzOi8vYXNrdWJ1
+bnR1LmNvbS9xdWVzdGlvbnMvMTAyMDU4NC9hcHBsZS1rZXlib2FyZC1hMTAxNi1wYWlyaW5nLWZh
+aWxzDQpIb3cgdG8gZnVydGhlciBkZWJ1ZyB0aGlzIHByb2JsZW0/DQpJcyBpdCBuZWNlc3Nhcnkg
+dG8gYnV5IHNvbWUgYnQgc25pZmZlciBoYXJkd2FyZSB0byBnZXQgdG8gdGhlIGJvdHRvbSBvZiAN
+CnRoaXM/IEkgd291bGQgaW52ZXN0IGluIGEgY2hlYXBvIDEw4oKsIHNuaWZmZXIgbGlrZSB0aGlz
+IA0KaHR0cHM6Ly93d3cuYW1hem9uLmNvbS8tL2VuL2RwL0IwODFXUkdMMzEgYnV0IEkgYW0gbm90
+IHN1cmUgaWYgdGhleSBhcmUgDQpzdWZmaWNpZW50IHRvIGNhcHR1cmUgdGhlIHBhaXJpbmcgcHJv
+Y2Vzcy4NCg0Ka2luZCByZWdhcmRzDQpNYXJ0aW4NCg==
