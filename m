@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D27BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A2DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 866E560F9B
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:43 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B0B54610A0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240189AbhJZXGG (ORCPT
+        id S240178AbhJZXGH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 19:06:06 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60780 "EHLO
+        Tue, 26 Oct 2021 19:06:07 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60786 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240195AbhJZXGE (ORCPT
+        with ESMTP id S240159AbhJZXGF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:06:04 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 362B6C061570
+        Tue, 26 Oct 2021 19:06:05 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CAF31C061570
         for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:40 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id t5-20020a17090a4e4500b001a0a284fcc2so3561962pjl.2
+Received: by mail-pg1-x529.google.com with SMTP id c4so982296pgv.11
         for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=F7cJHGAcgxJlTUlA/SN+6Ig6kX9KPutn7QRZg/oU0JA=;
-        b=HJZsKmTK4kwJH56sz8+mzzDJdCOqUSTVvfUTzNpTuwQ6phXFaI1OaMaRuuzTg4jakv
-         zvMRk3BQSPJkKCzfeCcXOSfaGJgipUfEUtKdCPTeTTMalsTc7Zf/a9a4nzEohcNlmXkP
-         0FI7ro9AzHh5fXKeUKq2kl/vZaIUM5Rvbl5N7BrXVBegISBMEhUnRpeVAX+Glnj9O3QK
-         H4d86SF18cjUDGPyGiio+WmO6NN2v7AhGCajVjk7G70isRkYK5qZWP/NMN1VCD2OyuKS
-         8xrMEXg7QYlkRdHmVsinhcXoKKr3Pruzi9uMDEM8fwjWBxGJt6beeymEj+zF+kD8pz6c
-         g/TA==
+        bh=SR97X65z6qOjGu0rfqwlaIbvmTLthgUCqeIXFdLOjKc=;
+        b=lcL+viDnDYTeIfxnRb+24Mcce/rAkFWvBac3U9zp49KmKf5mfsXpiylMnMDmMuPckt
+         Hnf1KCt9NgJ71UvtH0pXU3bq1zBXbFy3AbGbxLIZ1ba4TLekWzRwjdzthhldaPSGTZQ/
+         0LPcjmxZlVlzNH4wG1gg/HDJpsyapWuqnKh18ZfJ2fhKLe+xxyVbkSxe7b9Pq2LNqtgu
+         eF20xL4wP7Qo2ixcj5HVIYHls4KZ36axLDfOCmYeubQg4ucsT2aT4cW+CBou3OSSkuzv
+         ZvhxqCAem4Ub/gRiqNYaZ3Ngr8aQvbMozND9RINcmhzbvslC4lz8rzO44LUjyAd6aHsH
+         rSqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=F7cJHGAcgxJlTUlA/SN+6Ig6kX9KPutn7QRZg/oU0JA=;
-        b=Rc4+HW1PElrVMlOii1rWuP5ALFT28k6zXNYNtSukA9cx5qe7QZNg46GGhgZBQp0OWv
-         gDK8A/qOAU5S1UIB2soJAWNgwvACvZCedO1M4iJTmRXAmIlDkRbZ9YhVfpWmZmoIiOyX
-         VTsantMLiPhgwxILHiNLGIMN0w/CcWby8cj2FUPatmRiOKYdLVNI2yQ6IoUhwNz0Oz/S
-         cGv+RGW2yHGaJBldQyTSIl6oSuGJz2dQJuESYUFXyLD9HQM2r9l8v5Lc3FuMc0x6flWe
-         YLIq0usO9RllaTtrPj7f6Hb0rq9iN9pA+r0B6bNMw5K0mLZzBn4WSohu/3Op8xDG2axH
-         iapw==
-X-Gm-Message-State: AOAM530gEkUFXv15rwn4rxMt07zjbBIGdYZU5Y3a0+4erOcCs0ENJv4z
-        WQ4uNIr1O5ODwVw+G5VX0lA2LYkkieA=
-X-Google-Smtp-Source: ABdhPJyFwQCdGgdePabt3U7Y/XBP5+1rdEmHIUaFkBu0QjppLbuytHbYCnMDM9Ka3hs8xxmO0w78BQ==
-X-Received: by 2002:a17:902:9887:b0:13f:7704:425f with SMTP id s7-20020a170902988700b0013f7704425fmr24943813plp.20.1635289419321;
+        bh=SR97X65z6qOjGu0rfqwlaIbvmTLthgUCqeIXFdLOjKc=;
+        b=4gvd1tjj84kCnSjr1NyWO0YBx1bN8VYgWm+OasCoO9nHDiCErDTEqx+97c6BL5aoZ+
+         G6EDrAT//70+qnGGJlI3kYLaXgVSxPYEUzE8d4XJlIJKtr4j0GVKSHKUrlRUGO5HubRq
+         5HTQk0FEJ0eKUQBz/6p6Yerakui69H3MC/0SKqNaWkges9W3CVvXUYPzMnHc3tsAc6lD
+         1KV7uYkGOOT2Lp7saAJyBIvIdGmyd9phPp7koAAIPaWHGUvWV5FcN5lzS4WzLbVoduFo
+         SK6V8JsDuu/S3heEgY4w+BaSqAKcLNoVnWUCO+WeYKvvuy8NZV4Xcm/8M2hPNye96dWT
+         fzHg==
+X-Gm-Message-State: AOAM531xdhnHlw1pcuAko5kN3FXzp1j77Ze0hPAzYDP61qVi2nJJUPFr
+        Ruj8TgDTFDP9FXKIUWXmXtQr+5jSr6M=
+X-Google-Smtp-Source: ABdhPJwXEe6OwLbwQix9h8iVBqAuOHZ9TWZqje00qYQUmldvYteX8B1ojEPpPGk9rsH55omtne90rw==
+X-Received: by 2002:a63:9b0a:: with SMTP id r10mr20940984pgd.389.1635289419931;
         Tue, 26 Oct 2021 16:03:39 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.38
+        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.39
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 16:03:38 -0700 (PDT)
+        Tue, 26 Oct 2021 16:03:39 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 17/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
-Date:   Tue, 26 Oct 2021 16:03:18 -0700
-Message-Id: <20211026230324.1533907-18-luiz.dentz@gmail.com>
+Subject: [PATCH v6 18/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
+Date:   Tue, 26 Oct 2021 16:03:19 -0700
+Message-Id: <20211026230324.1533907-19-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211026230324.1533907-1-luiz.dentz@gmail.com>
 References: <20211026230324.1533907-1-luiz.dentz@gmail.com>
@@ -69,173 +69,180 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-Uses existing *_sync functions, but made hci_update_name_sync
-non-static.
-
 mgmt-test paths:
-Set Advertising on - Local name 1
-Set Advertising on - Name + Appear 1
-Set Local Name - Success 1
-Set Local Name - Success 2
-Set Local Name - Success 3
-Add Advertising - Success (Empty ScRsp)
-Add Advertising - Success (Complete name)
-Add Advertising - Success (Shortened name)
-Add Advertising - Success (Short name)
-Add Advertising - Success (Name + data)
-Add Advertising - Invalid Params (Name + data)
-Add Advertising - Success (Name+data+appear)
-Read Ext Controller Info 3
-Read Ext Controller Info 4
-Read Ext Controller Info 5
-Add Ext Advertising - Success (Empty ScRsp)
-Add Ext Advertising - Success (Complete name)
-Add Ext Advertising - Success (Shortened name)
-Add Ext Advertising - Success (Short name)
-Add Ext Advertising - Success (Name + data)
-Add Ext Advertising - Invalid Params (Name + data)
-Add Ext Advertising - Success (Name+data+appear)
+Set PHY 2m Success
+Set PHY coded Succcess
+Set PHY 1m 2m coded Succcess
+Set PHY 2m tx success
+Set PHY 2m rx success
+Set PHY Invalid Param
+Start Discovery - (2m, Scan Param)
+Start Discovery - (coded, Scan Param)
+Start Discovery - (1m, 2m, coded, Scan Param)
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_sync.c         |  2 +-
- net/bluetooth/mgmt.c             | 65 ++++++++++++++++----------------
- 3 files changed, 34 insertions(+), 34 deletions(-)
+ net/bluetooth/mgmt.c | 116 ++++++++++++++++++++++++-------------------
+ 1 file changed, 66 insertions(+), 50 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index a381621a56a1..d9f2e3182ed8 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -46,6 +46,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
- 
- int hci_update_eir_sync(struct hci_dev *hdev);
- int hci_update_class_sync(struct hci_dev *hdev);
-+int hci_update_name_sync(struct hci_dev *hdev);
- 
- int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
- 				   bool rpa, u8 *own_addr_type);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 7e56294de790..a86cbe4a6315 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -2341,7 +2341,7 @@ int hci_update_scan_sync(struct hci_dev *hdev)
- 	return hci_write_scan_enable_sync(hdev, scan);
- }
- 
--static int hci_update_name_sync(struct hci_dev *hdev)
-+int hci_update_name_sync(struct hci_dev *hdev)
- {
- 	struct hci_cp_write_local_name cp;
- 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 20cefd3e2295..dcdd3f4dab34 100644
+index dcdd3f4dab34..5b1aaf74b93b 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3247,24 +3247,17 @@ static void adv_expire(struct hci_dev *hdev, u32 flags)
- 	hci_req_run(&req, NULL);
+@@ -3415,23 +3415,26 @@ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
+ 			  sizeof(ev), skip);
  }
  
--static void set_name_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+static void set_name_complete(struct hci_dev *hdev, void *data, int err)
+-static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
+-				     u16 opcode, struct sk_buff *skb)
++static void set_default_phy_complete(struct hci_dev *hdev, void *data, int err)
  {
--	struct mgmt_cp_set_local_name *cp;
 -	struct mgmt_pending_cmd *cmd;
 -
 -	bt_dev_dbg(hdev, "status 0x%02x", status);
--
--	hci_dev_lock(hdev);
--
--	cmd = pending_find(MGMT_OP_SET_LOCAL_NAME, hdev);
--	if (!cmd)
--		goto unlock;
 +	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_set_local_name *cp = cmd->param;
++	struct sk_buff *skb = cmd->skb;
 +	u8 status = mgmt_status(err);
  
--	cp = cmd->param;
-+	bt_dev_dbg(hdev, "err %d", err);
+-	hci_dev_lock(hdev);
++	if (!status) {
++		if (!skb)
++			status = MGMT_STATUS_FAILED;
++		else if (IS_ERR(skb))
++			status = mgmt_status(PTR_ERR(skb));
++		else
++			status = mgmt_status(skb->data[0]);
++	}
+ 
+-	cmd = pending_find(MGMT_OP_SET_PHY_CONFIGURATION, hdev);
+-	if (!cmd)
+-		goto unlock;
++	bt_dev_dbg(hdev, "status %d", status);
  
  	if (status) {
- 		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME,
--			        mgmt_status(status));
-+				status);
+ 		mgmt_cmd_status(cmd->sk, hdev->id,
+-				MGMT_OP_SET_PHY_CONFIGURATION,
+-				mgmt_status(status));
++				MGMT_OP_SET_PHY_CONFIGURATION, status);
  	} else {
- 		mgmt_cmd_complete(cmd->sk, hdev->id, MGMT_OP_SET_LOCAL_NAME, 0,
- 				  cp, sizeof(*cp));
-@@ -3274,9 +3267,22 @@ static void set_name_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 		mgmt_cmd_complete(cmd->sk, hdev->id,
+ 				  MGMT_OP_SET_PHY_CONFIGURATION, 0,
+@@ -3440,19 +3443,56 @@ static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
+ 		mgmt_phy_configuration_changed(hdev, cmd->sk);
  	}
  
++	if (skb && !IS_ERR(skb))
++		kfree_skb(skb);
++
  	mgmt_pending_remove(cmd);
 +}
  
 -unlock:
 -	hci_dev_unlock(hdev);
-+static int set_name_sync(struct hci_dev *hdev, void *data)
++static int set_default_phy_sync(struct hci_dev *hdev, void *data)
 +{
-+	if (lmp_bredr_capable(hdev)) {
-+		hci_update_name_sync(hdev);
-+		hci_update_eir_sync(hdev);
-+	}
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_cp_set_phy_configuration *cp = cmd->param;
++	struct hci_cp_le_set_default_phy cp_phy;
++	u32 selected_phys = __le32_to_cpu(cp->selected_phys);
 +
-+	/* The name is stored in the scan response data and so
-+	 * no need to update the advertising data here.
-+	 */
-+	if (lmp_le_capable(hdev) && hci_dev_test_flag(hdev, HCI_ADVERTISING))
-+		hci_update_scan_rsp_data_sync(hdev, hdev->cur_adv_instance);
++	memset(&cp_phy, 0, sizeof(cp_phy));
++
++	if (!(selected_phys & MGMT_PHY_LE_TX_MASK))
++		cp_phy.all_phys |= 0x01;
++
++	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
++		cp_phy.all_phys |= 0x02;
++
++	if (selected_phys & MGMT_PHY_LE_1M_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
++
++	if (selected_phys & MGMT_PHY_LE_2M_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
++
++	if (selected_phys & MGMT_PHY_LE_CODED_TX)
++		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
++
++	if (selected_phys & MGMT_PHY_LE_1M_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
++
++	if (selected_phys & MGMT_PHY_LE_2M_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
++
++	if (selected_phys & MGMT_PHY_LE_CODED_RX)
++		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
++
++	cmd->skb =  __hci_cmd_sync(hdev, HCI_OP_LE_SET_DEFAULT_PHY,
++				   sizeof(cp_phy), &cp_phy, HCI_CMD_TIMEOUT);
 +
 +	return 0;
  }
  
- static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
-@@ -3284,7 +3290,6 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 				 void *data, u16 len)
  {
- 	struct mgmt_cp_set_local_name *cp = data;
+ 	struct mgmt_cp_set_phy_configuration *cp = data;
+-	struct hci_cp_le_set_default_phy cp_phy;
  	struct mgmt_pending_cmd *cmd;
 -	struct hci_request req;
- 	int err;
+ 	u32 selected_phys, configurable_phys, supported_phys, unconfigure_phys;
+ 	u16 pkt_type = (HCI_DH1 | HCI_DM1);
+ 	bool changed = false;
+@@ -3556,44 +3596,20 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
  
- 	bt_dev_dbg(hdev, "sock %p", sk);
-@@ -3320,29 +3325,23 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
- 	}
- 
- 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LOCAL_NAME, hdev, data, len);
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_PHY_CONFIGURATION, hdev, data,
+ 			       len);
 -	if (!cmd) {
 +	if (!cmd)
  		err = -ENOMEM;
--		goto failed;
+-		goto unlock;
 -	}
+-
+-	hci_req_init(&req, hdev);
+-
+-	memset(&cp_phy, 0, sizeof(cp_phy));
+-
+-	if (!(selected_phys & MGMT_PHY_LE_TX_MASK))
+-		cp_phy.all_phys |= 0x01;
+-
+-	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
+-		cp_phy.all_phys |= 0x02;
+-
+-	if (selected_phys & MGMT_PHY_LE_1M_TX)
+-		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
+-
+-	if (selected_phys & MGMT_PHY_LE_2M_TX)
+-		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
+-
+-	if (selected_phys & MGMT_PHY_LE_CODED_TX)
+-		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
+-
+-	if (selected_phys & MGMT_PHY_LE_1M_RX)
+-		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
+-
+-	if (selected_phys & MGMT_PHY_LE_2M_RX)
+-		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
+-
+-	if (selected_phys & MGMT_PHY_LE_CODED_RX)
+-		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
 +	else
-+		err = hci_cmd_sync_queue(hdev, set_name_sync, cmd,
-+					 set_name_complete);
++		err = hci_cmd_sync_queue(hdev, set_default_phy_sync, cmd,
++					 set_default_phy_complete);
  
--	memcpy(hdev->dev_name, cp->name, sizeof(hdev->dev_name));
+-	hci_req_add(&req, HCI_OP_LE_SET_DEFAULT_PHY, sizeof(cp_phy), &cp_phy);
 +	if (err < 0) {
-+		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_LOCAL_NAME,
++		err = mgmt_cmd_status(sk, hdev->id,
++				      MGMT_OP_SET_PHY_CONFIGURATION,
 +				      MGMT_STATUS_FAILED);
  
--	hci_req_init(&req, hdev);
-+		if (cmd)
-+			mgmt_pending_remove(cmd);
- 
--	if (lmp_bredr_capable(hdev)) {
--		__hci_req_update_name(&req);
--		__hci_req_update_eir(&req);
-+		goto failed;
- 	}
- 
--	/* The name is stored in the scan response data and so
--	 * no need to update the advertising data here.
--	 */
--	if (lmp_le_capable(hdev) && hci_dev_test_flag(hdev, HCI_ADVERTISING))
--		__hci_req_update_scan_rsp_data(&req, hdev->cur_adv_instance);
--
--	err = hci_req_run(&req, set_name_complete);
+-	err = hci_req_run_skb(&req, set_default_phy_complete);
 -	if (err < 0)
 -		mgmt_pending_remove(cmd);
-+	memcpy(hdev->dev_name, cp->name, sizeof(hdev->dev_name));
++		if (cmd)
++			mgmt_pending_remove(cmd);
++	}
  
- failed:
+ unlock:
  	hci_dev_unlock(hdev);
 -- 
 2.31.1
