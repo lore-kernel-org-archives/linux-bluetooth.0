@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A9879C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3A649C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8D0C8610E5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1CEFD610A0
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 26 Oct 2021 23:03:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240183AbhJZXGJ (ORCPT
+        id S240207AbhJZXGK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 26 Oct 2021 19:06:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60792 "EHLO
+        Tue, 26 Oct 2021 19:06:10 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60802 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240181AbhJZXGG (ORCPT
+        with ESMTP id S240182AbhJZXGH (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 26 Oct 2021 19:06:06 -0400
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1613FC061767
+        Tue, 26 Oct 2021 19:06:07 -0400
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3BD2C061570
         for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:42 -0700 (PDT)
-Received: by mail-pj1-x1032.google.com with SMTP id y1-20020a17090a134100b001a27a7e9c8dso3166554pjf.3
+Received: by mail-pf1-x433.google.com with SMTP id 187so861971pfc.10
         for <linux-bluetooth@vger.kernel.org>; Tue, 26 Oct 2021 16:03:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=V1ZgTLkk9AWmWliAzoFzQFkR/qzvpzHog73LJmcY6B8=;
-        b=LVUrqQqWiizl7Or/I9PL2LTCSYXi2S/iL/IZfRKxXh4gDxRrfpGKad1HY41kHpEnWh
-         4HzUriHqNRij3rs22Ruu2QZOSVV29KxDBYxbsR/UA2yqHuXMu1YC3egdJApjS3w0Cb5W
-         NYvjz38Pu+ewNlaZP5HbcM+5eFryV18r3DEXwuAFwm6BADR0pN/kTS4ClseNhGHkjwUO
-         d46duh87IFPYdsOrb5QQu6r49CtoTz2+3aivWjqdh4oOupz96uZjxUJ/IV3gRAVeCjvR
-         Lh3fMXppodgd3nJAzck4s88WgP/C0OzW6u292aklX09So38wqP2YxfkgxifKIOiHcXX4
-         YoHA==
+        bh=n4dEeco4D3Z0jZm1wn7veN7mp/TPNK/WgruKy/VmXIE=;
+        b=YIppoEWiDAsTcLuDPsKQTmX7qUmQQ/TYvE1+N2VSfqA1/XeDox3Cl0GRSKUKKH1e+h
+         1jGGIRqhEescKruz/ULf9pbIldkf8YBkWrd66VTagO5yP/XOSTP0BO93y5T+CtXcYB7K
+         Yk2mNTRN7MlGWW88u0uuyFR0E5vHtQ6RhMDn9CiqtpalMi2wM5F6uOW6kgAtypuFw9qe
+         I8JZ4YvJ6lgoVbz6tWNFs12Qrhr9ldE7ahyR1RyiyI0l/V7t9faUJPLplaRym5LEnM9g
+         MEGu8P68AYBhaA2z4XGTt/rN73xv2QuG06v/g6ZFNmUuCPi4lNg4kyjwfoVhK51Bv7Ma
+         vnLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=V1ZgTLkk9AWmWliAzoFzQFkR/qzvpzHog73LJmcY6B8=;
-        b=RGcvNpMyBinICsET33Ow0r1cQWzzxcpgkQrXC1vpg7cC1V4d33hSqM/73hVQBAloVX
-         kNjPW6jgCon9PYoAh5UAZso+/7AIIcWRiJHfmf1d6OT0kEvZ6zj6CDEsSTP2wuGmaUdv
-         OEVtGZ0tqeG7JLa1qy+HEaqRZNC1obSyBa6EbqHp+liRzEYQyqmVmgC1dg6njkuE1bOO
-         +tVeNQb6/ukna06EZKJ6sgKB6hdWWreOAFK+Th/DSB8yfvfrwcguQvmWpi6ge7cr9R7l
-         YZJ1x7uuZErELojWXz/PrzcPF8qOsgW2TET4W7Kjk27T5Y1c9McWuF2U3f7sGNksmdGk
-         QCsQ==
-X-Gm-Message-State: AOAM5309+26NDW6DsaT52/F1cRWJbta4gftc+2BHkFDE2F4K8uNp37O7
-        Ykxp+0d5xkRloXELTFo0ojcLmpxIy5Q=
-X-Google-Smtp-Source: ABdhPJzZy8XCbyFQLDqdxJ8FXG1khDiLlQZVLrcttbovNiwuZU3x5Bnv+CUrs0zJj8CZCenpV8slFQ==
-X-Received: by 2002:a17:902:c410:b0:13e:cfac:45ad with SMTP id k16-20020a170902c41000b0013ecfac45admr25316141plk.68.1635289421381;
-        Tue, 26 Oct 2021 16:03:41 -0700 (PDT)
+        bh=n4dEeco4D3Z0jZm1wn7veN7mp/TPNK/WgruKy/VmXIE=;
+        b=thv/DhygAa1BxT7IqnTkxK+ecXJmtwt6/VQhz0nU3qP32YF0hq+VoUobSGErRaq3og
+         uqj+pXSI8T3T3q+mg5WuvlNHSK2AT5JA3uflUczh2IZtWUrKo883WldCgm00CNV1D2C2
+         ZjijL8Gk+rlJsiELTiCY6dpnR0a1KfXjAZXbmCajdIIeCMqRfCGMT++ZiVUphqD/syJl
+         wBVeiqrqzz/RzwCkMQI2bh4GCugAhIS3KWYeFg2WPnam+VTpadqexsIRvWgd+lH5hFRM
+         NlmNNo4hSMFPJm/CmVlYcN6fc3mQ0H6zontc+CsNFMWOul8Bty+uoi0zOznGzsAplnK8
+         cz6Q==
+X-Gm-Message-State: AOAM532hayK5MJH/QUZkBcbkrQWW5zNBU6PAD67v0Cbca516HWqD2r7d
+        Ixy7YOnNrdthqcrEKascktz/LQPOk20=
+X-Google-Smtp-Source: ABdhPJyVTW6G50xqU8beyobN6KlbWk4HXGGq5j+vsAxIvwMC5FA25WkdPr8kgZiHkXSNEmqt/RcT/w==
+X-Received: by 2002:a63:790e:: with SMTP id u14mr21971198pgc.478.1635289422129;
+        Tue, 26 Oct 2021 16:03:42 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.40
+        by smtp.gmail.com with ESMTPSA id a2sm20697558pgn.20.2021.10.26.16.03.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 26 Oct 2021 16:03:40 -0700 (PDT)
+        Tue, 26 Oct 2021 16:03:41 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v6 20/23] Bluetooth: hci_sync: Convert adv_expire
-Date:   Tue, 26 Oct 2021 16:03:21 -0700
-Message-Id: <20211026230324.1533907-21-luiz.dentz@gmail.com>
+Subject: [PATCH v6 21/23] Bluetooth: hci_sync: Convert MGMT_OP_SSP
+Date:   Tue, 26 Oct 2021 16:03:22 -0700
+Message-Id: <20211026230324.1533907-22-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211026230324.1533907-1-luiz.dentz@gmail.com>
 References: <20211026230324.1533907-1-luiz.dentz@gmail.com>
@@ -69,118 +69,261 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-mgmt-test paths:
-Set Advertising on - Appearance 1
-Set Advertising on - Local name 1
-Set Advertising on - Name + Appear 1
-Set Local Name - Success 2
-Set Local Name - Success 3
-Add Advertising - Success (Empty ScRsp)
-Add Advertising - Success (ScRsp appear)
-Add Advertising - Invalid Params (ScRsp appear long)
-Add Advertising - Success (Complete name)
-Add Advertising - Success (Shortened name)
-Add Advertising - Success (Short name)
-Add Advertising - Success (Name + data)
-Add Advertising - Invalid Params (Name + data)
-Add Advertising - Success (Name+data+appear)
-Set appearance - BR/EDR LE
-Set appearance - LE only
-Add Ext Advertising - Success (Empty ScRsp)
-Add Ext Advertising - Success (ScRsp appear)
-Add Ext Advertising - Invalid Params (ScRsp appear long)
-Add Ext Advertising - Success (Complete name)
-Add Ext Advertising - Success (Shortened name)
-Add Ext Advertising - Success (Short name)
-Add Ext Advertising - Success (Name + data)
-Add Ext Advertising - Invalid Params (Name + data)
-Add Ext Advertising - Success (Name+data+appear)
+mgmt-tester paths:
+Set SSP on - Success 2
+Set Device ID - SSP off and Power on
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- net/bluetooth/mgmt.c | 33 +++++++++++++++++++--------------
- 1 file changed, 19 insertions(+), 14 deletions(-)
+ include/net/bluetooth/hci_core.h |   1 -
+ include/net/bluetooth/hci_sync.h |   1 +
+ net/bluetooth/hci_event.c        |   4 +-
+ net/bluetooth/hci_sync.c         |   7 +-
+ net/bluetooth/mgmt.c             | 150 +++++++++++++++----------------
+ 5 files changed, 80 insertions(+), 83 deletions(-)
 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 22c6e4aab926..a14d3c26331c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3218,33 +3218,32 @@ static int user_passkey_neg_reply(struct sock *sk, struct hci_dev *hdev,
- 				 HCI_OP_USER_PASSKEY_NEG_REPLY, 0);
- }
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index a6b075203cbe..3e53c845ab0e 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -1806,7 +1806,6 @@ int mgmt_user_passkey_notify(struct hci_dev *hdev, bdaddr_t *bdaddr,
+ 			     u8 entered);
+ void mgmt_auth_failed(struct hci_conn *conn, u8 status);
+ void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status);
+-void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status);
+ void mgmt_set_class_of_dev_complete(struct hci_dev *hdev, u8 *dev_class,
+ 				    u8 status);
+ void mgmt_set_local_name_complete(struct hci_dev *hdev, u8 *name, u8 status);
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index d9f2e3182ed8..db96546d40c8 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -47,6 +47,7 @@ int hci_update_class_sync(struct hci_dev *hdev);
+ int hci_update_eir_sync(struct hci_dev *hdev);
+ int hci_update_class_sync(struct hci_dev *hdev);
+ int hci_update_name_sync(struct hci_dev *hdev);
++int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode);
  
--static void adv_expire(struct hci_dev *hdev, u32 flags)
-+static int adv_expire_sync(struct hci_dev *hdev, u32 flags)
- {
- 	struct adv_info *adv_instance;
--	struct hci_request req;
--	int err;
- 
- 	adv_instance = hci_find_adv_instance(hdev, hdev->cur_adv_instance);
- 	if (!adv_instance)
--		return;
-+		return 0;
- 
- 	/* stop if current instance doesn't need to be changed */
- 	if (!(adv_instance->flags & flags))
--		return;
-+		return 0;
- 
- 	cancel_adv_timeout(hdev);
- 
- 	adv_instance = hci_get_next_instance(hdev, adv_instance->instance);
- 	if (!adv_instance)
--		return;
-+		return 0;
- 
--	hci_req_init(&req, hdev);
--	err = __hci_req_schedule_adv_instance(&req, adv_instance->instance,
--					      true);
--	if (err)
--		return;
-+	hci_schedule_adv_instance_sync(hdev, adv_instance->instance, true);
- 
--	hci_req_run(&req, NULL);
-+	return 0;
-+}
-+
-+static int name_changed_sync(struct hci_dev *hdev, void *data)
-+{
-+	return adv_expire_sync(hdev, MGMT_ADV_FLAG_LOCAL_NAME);
- }
- 
- static void set_name_complete(struct hci_dev *hdev, void *data, int err)
-@@ -3263,7 +3262,7 @@ static void set_name_complete(struct hci_dev *hdev, void *data, int err)
- 				  cp, sizeof(*cp));
- 
- 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
--			adv_expire(hdev, MGMT_ADV_FLAG_LOCAL_NAME);
-+			hci_cmd_sync_queue(hdev, name_changed_sync, NULL, NULL);
+ int hci_update_random_address_sync(struct hci_dev *hdev, bool require_privacy,
+ 				   bool rpa, u8 *own_addr_type);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 64f4b5edb721..4c51f6af61be 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -545,9 +545,7 @@ static void hci_cc_write_ssp_mode(struct hci_dev *hdev, struct sk_buff *skb)
+ 			hdev->features[1][0] &= ~LMP_HOST_SSP;
  	}
  
- 	mgmt_pending_remove(cmd);
-@@ -3348,6 +3347,11 @@ static int set_local_name(struct sock *sk, struct hci_dev *hdev, void *data,
+-	if (hci_dev_test_flag(hdev, HCI_MGMT))
+-		mgmt_ssp_enable_complete(hdev, sent->mode, status);
+-	else if (!status) {
++	if (!status) {
+ 		if (sent->mode)
+ 			hci_dev_set_flag(hdev, HCI_SSP_ENABLED);
+ 		else
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index a86cbe4a6315..d126d7062dcb 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -2142,7 +2142,7 @@ int hci_write_sc_support_sync(struct hci_dev *hdev, u8 val)
  	return err;
  }
  
-+static int appearance_changed_sync(struct hci_dev *hdev, void *data)
+-static int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode)
++int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode)
+ {
+ 	int err;
+ 
+@@ -2150,6 +2150,11 @@ static int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode)
+ 	    lmp_host_ssp_capable(hdev))
+ 		return 0;
+ 
++	if (!mode && hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS)) {
++		__hci_cmd_sync_status(hdev, HCI_OP_WRITE_SSP_DEBUG_MODE,
++				      sizeof(mode), &mode, HCI_CMD_TIMEOUT);
++	}
++
+ 	err = __hci_cmd_sync_status(hdev, HCI_OP_WRITE_SSP_MODE,
+ 				    sizeof(mode), &mode, HCI_CMD_TIMEOUT);
+ 	if (err)
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index a14d3c26331c..8f38bd97330c 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -1760,6 +1760,69 @@ static int set_link_security(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
+ }
+ 
++static void set_ssp_complete(struct hci_dev *hdev, void *data, int err)
 +{
-+	return adv_expire_sync(hdev, MGMT_ADV_FLAG_APPEARANCE);
++	struct cmd_lookup match = { NULL, hdev };
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_mode *cp = cmd->param;
++	u8 enable = cp->val;
++	bool changed;
++
++	if (err) {
++		u8 mgmt_err = mgmt_status(err);
++
++		if (enable && hci_dev_test_and_clear_flag(hdev,
++							  HCI_SSP_ENABLED)) {
++			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
++			new_settings(hdev, NULL);
++		}
++
++		mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, cmd_status_rsp,
++				     &mgmt_err);
++		return;
++	}
++
++	if (enable) {
++		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
++	} else {
++		changed = hci_dev_test_and_clear_flag(hdev, HCI_SSP_ENABLED);
++
++		if (!changed)
++			changed = hci_dev_test_and_clear_flag(hdev,
++							      HCI_HS_ENABLED);
++		else
++			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
++	}
++
++	mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, settings_rsp, &match);
++
++	if (changed)
++		new_settings(hdev, match.sk);
++
++	if (match.sk)
++		sock_put(match.sk);
++
++	hci_update_eir_sync(hdev);
 +}
 +
- static int set_appearance(struct sock *sk, struct hci_dev *hdev, void *data,
- 			  u16 len)
++static int set_ssp_sync(struct hci_dev *hdev, void *data)
++{
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_mode *cp = cmd->param;
++	bool changed = false;
++	int err;
++
++	if (cp->val)
++		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
++
++	err = hci_write_ssp_mode_sync(hdev, cp->val);
++
++	if (!err && changed)
++		hci_dev_clear_flag(hdev, HCI_SSP_ENABLED);
++
++	return err;
++}
++
+ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  {
-@@ -3369,7 +3373,8 @@ static int set_appearance(struct sock *sk, struct hci_dev *hdev, void *data,
- 		hdev->appearance = appearance;
- 
- 		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
--			adv_expire(hdev, MGMT_ADV_FLAG_APPEARANCE);
-+			hci_cmd_sync_queue(hdev, appearance_changed_sync, NULL,
-+					   NULL);
- 
- 		ext_info_changed(hdev, sk);
+ 	struct mgmt_mode *cp = data;
+@@ -1821,19 +1884,18 @@ static int set_ssp(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_SSP, hdev, data, len);
+-	if (!cmd) {
++	if (!cmd)
+ 		err = -ENOMEM;
+-		goto failed;
+-	}
+-
+-	if (!cp->val && hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS))
+-		hci_send_cmd(hdev, HCI_OP_WRITE_SSP_DEBUG_MODE,
+-			     sizeof(cp->val), &cp->val);
++	else
++		err = hci_cmd_sync_queue(hdev, set_ssp_sync, cmd,
++					 set_ssp_complete);
+ 
+-	err = hci_send_cmd(hdev, HCI_OP_WRITE_SSP_MODE, 1, &cp->val);
+ 	if (err < 0) {
+-		mgmt_pending_remove(cmd);
+-		goto failed;
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_SSP,
++				      MGMT_STATUS_FAILED);
++
++		if (cmd)
++			mgmt_pending_remove(cmd);
+ 	}
+ 
+ failed:
+@@ -9310,74 +9372,6 @@ void mgmt_auth_enable_complete(struct hci_dev *hdev, u8 status)
+ 		sock_put(match.sk);
+ }
+ 
+-static void clear_eir(struct hci_request *req)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	struct hci_cp_write_eir cp;
+-
+-	if (!lmp_ext_inq_capable(hdev))
+-		return;
+-
+-	memset(hdev->eir, 0, sizeof(hdev->eir));
+-
+-	memset(&cp, 0, sizeof(cp));
+-
+-	hci_req_add(req, HCI_OP_WRITE_EIR, sizeof(cp), &cp);
+-}
+-
+-void mgmt_ssp_enable_complete(struct hci_dev *hdev, u8 enable, u8 status)
+-{
+-	struct cmd_lookup match = { NULL, hdev };
+-	struct hci_request req;
+-	bool changed = false;
+-
+-	if (status) {
+-		u8 mgmt_err = mgmt_status(status);
+-
+-		if (enable && hci_dev_test_and_clear_flag(hdev,
+-							  HCI_SSP_ENABLED)) {
+-			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
+-			new_settings(hdev, NULL);
+-		}
+-
+-		mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, cmd_status_rsp,
+-				     &mgmt_err);
+-		return;
+-	}
+-
+-	if (enable) {
+-		changed = !hci_dev_test_and_set_flag(hdev, HCI_SSP_ENABLED);
+-	} else {
+-		changed = hci_dev_test_and_clear_flag(hdev, HCI_SSP_ENABLED);
+-		if (!changed)
+-			changed = hci_dev_test_and_clear_flag(hdev,
+-							      HCI_HS_ENABLED);
+-		else
+-			hci_dev_clear_flag(hdev, HCI_HS_ENABLED);
+-	}
+-
+-	mgmt_pending_foreach(MGMT_OP_SET_SSP, hdev, settings_rsp, &match);
+-
+-	if (changed)
+-		new_settings(hdev, match.sk);
+-
+-	if (match.sk)
+-		sock_put(match.sk);
+-
+-	hci_req_init(&req, hdev);
+-
+-	if (hci_dev_test_flag(hdev, HCI_SSP_ENABLED)) {
+-		if (hci_dev_test_flag(hdev, HCI_USE_DEBUG_KEYS))
+-			hci_req_add(&req, HCI_OP_WRITE_SSP_DEBUG_MODE,
+-				    sizeof(enable), &enable);
+-		__hci_req_update_eir(&req);
+-	} else {
+-		clear_eir(&req);
+-	}
+-
+-	hci_req_run(&req, NULL);
+-}
+-
+ static void sk_lookup(struct mgmt_pending_cmd *cmd, void *data)
+ {
+ 	struct cmd_lookup *match = data;
 -- 
 2.31.1
 
