@@ -2,102 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE95C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:38:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 92FD9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 21:54:17 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 24A4560FBF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:38:57 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7BE49610CB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 21:54:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240554AbhJ0UlW (ORCPT
+        id S229748AbhJ0V4j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Oct 2021 16:41:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44700 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235613AbhJ0UlV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Oct 2021 16:41:21 -0400
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D80C061570
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
-Received: by mail-qt1-x82c.google.com with SMTP id h4so3162234qth.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=vfE+GpH58SfPG+nauBKAXbh9ln28F4F7C9SEjF9njTs=;
-        b=nY7jvB+fyNY9wHjCXiBqWnCOaRNW1MmLjIHSbMIubtjmQVOU7Al6/NKgPu/lzgDpoR
-         qHEUcdSmb1dhqqg9mxi8lF4ii8VMZHvAjO8fp9hv4+xJM/KWWXDr6CmzJqmVyQUbic99
-         lzauuWVGzyyjF998t7Mc3tjnIY2FOYdQaRN6wg8544OGsmDNBpJxmy5Eb45oqjvq/HOL
-         Ttv45nfG5WlaNzk0vSdWqw6L9DfvcJ8R4fc4MElnhjr1JN/YN3Ba7yKsSLTGBqHgz3la
-         CE7Nv/bISdqhwwhxBfZWpBQqNgi3RQKpiEJm1UeB+H++PhKeqfdpaYIwCWwpjdDL7IzH
-         +r+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=vfE+GpH58SfPG+nauBKAXbh9ln28F4F7C9SEjF9njTs=;
-        b=CAD5N66Og5Gg1/zMi2bcO5Ok4jYreWFjXMo1hglISEiUcjXyfGecABJTKrac5VfPsF
-         rRexJVZIe0a1GNxtqVgMRjG6mwmxcSIpLMHcUEQ4PFFhiQSZ5OQMyJTmWMR7ADnFkPJY
-         PitBF2bs8rhC+Cqc6XeK0wSXxbrm6fg8ufIfPSXZiXV9DgMrfm0+PTs1Mez367R1gmZv
-         2oE/NuGI0L9lEbtbkGWU+Txs83g5lRUbcS1cjhPu047iQM+mfAKCcArS9rN8/93WctT+
-         ojRV7oOO8DV7epSnQ8MmUimdybBqoka4D3/wLFl1lEECuSjMxcTHNKh/L6uGiT9G5+KY
-         rxtg==
-X-Gm-Message-State: AOAM532km+SPGxoAvX2EXTabe7ISuKV2fu6FpE/EOgySIDJhBFkwCCBR
-        hn35vziNfS2JgO6bk0w9HIUrP5Owsd8tyQ==
-X-Google-Smtp-Source: ABdhPJzvTJej3iQ00u0ejPaYaPXPls2/6O38QNkd0Ujg4dL2QbITi2IinwxX5TuGzR/8fmrAnu81Ww==
-X-Received: by 2002:ac8:5a07:: with SMTP id n7mr52287qta.304.1635367135004;
-        Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
-Received: from [172.17.0.2] ([20.185.185.114])
-        by smtp.gmail.com with ESMTPSA id a15sm650512qkp.17.2021.10.27.13.38.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 13:38:54 -0700 (PDT)
-Message-ID: <6179b8de.1c69fb81.de3e3.58be@mx.google.com>
-Date:   Wed, 27 Oct 2021 13:38:54 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============2615879028939127869=="
+        Wed, 27 Oct 2021 17:56:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:44074 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229705AbhJ0V4i (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 27 Oct 2021 17:56:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id D5D5B610CA;
+        Wed, 27 Oct 2021 21:54:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635371652;
+        bh=P97TBuOSU6VCfn0fOqxvrzobUnZ38EQAx73aJ380G0I=;
+        h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+        b=M3VfebhT9aqmPN+g46qbnnrewNbanEgi94dTcPhTU7mpjH5jB8Y7+HKwlB8s7jjVw
+         AhPYMHtft/LjFNLK9Hsgj2L68/zVZEBGbpWec7MeDUupldbzjTlVnOAleK8/azkKW8
+         iFoc69n5G3V3irQEsvfGSmy36nnA8Gg9ufrGzY2OC7kVp2uH4tt5vzrFHWkHMKIJj/
+         7wTkzJE1LXtsccFy9kec2XLrFpEWyaIMu7GE41Q4IEaMYAg7teyu8b/AaSKfJARIyI
+         Nlg/tP+rBkWt+6QT1/8s4X3SDvNG/rDkbALb4JlBMtTBjRHbngtdRbmIuIn7wfMf0g
+         O4mAIg9NwhW1g==
+Received: by mail-ed1-f53.google.com with SMTP id h7so16646998ede.8;
+        Wed, 27 Oct 2021 14:54:12 -0700 (PDT)
+X-Gm-Message-State: AOAM530fbq34jSycT0x21NOeLtHrwJpN0NtDgzse7kJYY+zas2mkQlcW
+        hSJ/zyTxheAeFH+pDZuyIBkq+j0spsetsTO7wA==
+X-Google-Smtp-Source: ABdhPJz4kxW1DR4UGq5S1PijHQ34O4WuSLKy+4MFc+0p8RGDh6RSrjWvUEec/qgQMkxVs4c2i1XYv6o1JFKR1o6WZok=
+X-Received: by 2002:a17:907:7f10:: with SMTP id qf16mr244409ejc.390.1635371651311;
+ Wed, 27 Oct 2021 14:54:11 -0700 (PDT)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] device: Fix not clearing error on update_bredr_services
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211027201103.1668266-1-luiz.dentz@gmail.com>
-References: <20211027201103.1668266-1-luiz.dentz@gmail.com>
+References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
+ <20211006035407.1147909-2-dmitry.baryshkov@linaro.org> <YXf6TbV2IpPbB/0Y@robh.at.kernel.org>
+ <37b26090-945f-1e17-f6ab-52552a4b6d89@linaro.org>
+In-Reply-To: <37b26090-945f-1e17-f6ab-52552a4b6d89@linaro.org>
+From:   Rob Herring <robh@kernel.org>
+Date:   Wed, 27 Oct 2021 16:53:59 -0500
+X-Gmail-Original-Message-ID: <CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com>
+Message-ID: <CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com>
+Subject: Re: [PATCH v1 01/15] dt-bindings: add pwrseq device tree bindings
+To:     Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+Cc:     Andy Gross <agross@kernel.org>,
+        Bjorn Andersson <bjorn.andersson@linaro.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Kalle Valo <kvalo@codeaurora.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Stanimir Varbanov <svarbanov@mm-sol.com>,
+        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
+        linux-mmc <linux-mmc@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
+        ath10k@lists.infradead.org,
+        linux-wireless <linux-wireless@vger.kernel.org>,
+        netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2615879028939127869==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+On Tue, Oct 26, 2021 at 9:42 AM Dmitry Baryshkov
+<dmitry.baryshkov@linaro.org> wrote:
+>
+> On 26/10/2021 15:53, Rob Herring wrote:
+> > On Wed, Oct 06, 2021 at 06:53:53AM +0300, Dmitry Baryshkov wrote:
+> >> Add device tree bindings for the new power sequencer subsystem.
+> >> Consumers would reference pwrseq nodes using "foo-pwrseq" properties.
+> >> Providers would use '#pwrseq-cells' property to declare the amount of
+> >> cells in the pwrseq specifier.
+> >
+> > Please use get_maintainers.pl.
+> >
+> > This is not a pattern I want to encourage, so NAK on a common binding.
+>
+>
+> Could you please spend a few more words, describing what is not
+> encouraged? The whole foo-subsys/#subsys-cells structure?
 
-This is automated email and please do not reply to this email!
+No, that's generally how common provider/consumer style bindings work.
 
-Dear submitter,
+> Or just specifying the common binding?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=571395
+If we could do it again, I would not have mmc pwrseq binding. The
+properties belong in the device's node. So don't generalize the mmc
+pwrseq binding.
 
----Test result---
+It's a kernel problem if the firmware says there's a device on a
+'discoverable' bus and the kernel can't discover it. I know you have
+the added complication of a device with 2 interfaces, but please,
+let's solve one problem at a time.
 
-Test Summary:
-CheckPatch                    PASS      1.38 seconds
-GitLint                       PASS      0.88 seconds
-Prep - Setup ELL              PASS      52.02 seconds
-Build - Prep                  PASS      0.48 seconds
-Build - Configure             PASS      9.53 seconds
-Build - Make                  PASS      220.14 seconds
-Make Check                    PASS      10.02 seconds
-Make Distcheck                PASS      254.72 seconds
-Build w/ext ELL - Configure   PASS      8.72 seconds
-Build w/ext ELL - Make        PASS      208.22 seconds
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============2615879028939127869==--
+Rob
