@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9F5DBC4332F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 665D3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:20 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 8C6F9610CB
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 558EA610CB
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229801AbhJ1ABo (ORCPT
+        id S229809AbhJ1ABp (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Oct 2021 20:01:44 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33504 "EHLO
+        Wed, 27 Oct 2021 20:01:45 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33510 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbhJ1ABl (ORCPT
+        with ESMTP id S229851AbhJ1ABm (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Oct 2021 20:01:41 -0400
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F24F0C0613B9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:15 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id s24so3201725plp.0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:15 -0700 (PDT)
+        Wed, 27 Oct 2021 20:01:42 -0400
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B290FC061570
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:16 -0700 (PDT)
+Received: by mail-pj1-x1033.google.com with SMTP id x1-20020a17090a530100b001a1efa4ebe6so4267125pjh.0
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=KqCSnk9X7JexBPsKor61tfqCadTRKqAKFlEiy7ZXZ+0=;
-        b=HM/61oLUdgRDTYclUAXSFM8J4V4vIkjPoRLBE8Tu0Qxp4KHDmk3k+9Z06Rj6GNuhZ/
-         BgDu04CWqldOITRbKJJEOnELv20uHpOiaDVa4IgvEAfFPRHTTwrFji1B8UQmLj6UjZ5t
-         aaGbRiFOh6SIt+2t+CL8t6aKxXLFTgBrDQVTk4JREm5GgAsY8e3GteeAQY1q4iJ567YY
-         +fAl6wp3z88QKxUZecBEj7chTfHDZ7Rqp0Mg0laEz4hw6C8FZUu4VJdOAZ7UvFhkuKL9
-         ZEVREAKWWzug4NThEIDU164jyKGcJI3JiZVGXMTmbSHXGXyg88KGoGQ9z1z0zaCWqyfe
-         C3XA==
+        bh=SnpMS++cCYXfwph5XGo9bbK6dqtEMa0JZnYAsH4roZw=;
+        b=OTeBNEeORR1Zr5krTVqeTTdJjClrbuRd8kP+rM5b3hq+96KgT6GoQiPilT7BHUjLcx
+         2AQ1l2k847M+ytvs/Km/rQtYR/pFGiPnO1Aj0npN5yOFCiOPdAJTYJKh52Zvgl/h3ONm
+         HcbpEzbDhyx43zr8idYBNeQVwigoLlFIVvuDaSk+7n28uasO/XFWXrJSgAPgGpOphOh0
+         SyuhiZUOkWFyfk8n5wp59nWKUWlXTjVnBqAkQU708eqt9zvQjpuEVsXh1rPAWBlyTArh
+         b21/t12TlwpAmIvD+yA8wI47AKUwHJnPfFf9etpflBGnQw+3ySpGW9lmeHJdErR2f1jS
+         ECNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=KqCSnk9X7JexBPsKor61tfqCadTRKqAKFlEiy7ZXZ+0=;
-        b=Yy/9rOQZIUdejo54tEkES4oE2I1NBcFUoIzxpWHIrHPRYOzwlEH2I2O9mK9nvV+zRH
-         5DdJ155sN/sPU56SKHboz1EcNEYGNv+iJJ9s2X0KIUqrvwSzR6HlaGKKY43pH7EWmCpE
-         UmNOZLZZY7flgiRN/lkzoc0x3Dw45TQP/+2N3DTLSSlCuisRz4LPSjDW6MPYuz1l+NJw
-         pF6k9OfNDmHLcyB+FKMAYJ43PgLiTTpGV6eid5qIFFyteylwq/F3GCev9Lyl36mftkCO
-         gj78fjlNEZIkFizEL4IbUKdLMkP2HTSzn1+UZs95t+d8rXRIsmblbBw6+iqoepW8qrVj
-         JJNg==
-X-Gm-Message-State: AOAM530bJ9xMbMfvVzMQK0IiQqZABY/TEfCTcZwMK8DYaRWm8kLoT4qS
-        JkjjBU1+4ZNFP6FuDnhzsxxrq0b+VAM=
-X-Google-Smtp-Source: ABdhPJxb/5Mt0SajDIsqMStrXVHYtW7uoC0E5cXeldMbTWkiljp0dqw3lCMBBtMQTsEPkZIlqnA+BA==
-X-Received: by 2002:a17:902:900c:b0:13f:974c:19b0 with SMTP id a12-20020a170902900c00b0013f974c19b0mr673769plp.12.1635379155223;
+        bh=SnpMS++cCYXfwph5XGo9bbK6dqtEMa0JZnYAsH4roZw=;
+        b=BxvWWIxWuQuy4ELcb/evPA/lUy5xsWu7bb1BM03NQodOmlQ7jbJNcjbt8HuyUKpO9C
+         sYfpmk8hNhuE4tZaunKEqZw0Di8+/v59gPVW+BBK233vGlDhrCMmq9VkgkPVI2hV1ZTJ
+         e3tcEK4crBTahdtgQfySzyv4deu9a57vHKwNYrHLgFu6XBCjxZn4lI9OsBQ7mRNLpWkA
+         BoL2lanjTMSy7zLOp6nWoSCdjKEaGkOOKkQOuIQ38v1F7PfynK09JNrkWfDyxkAAcDd3
+         gbVnY9/5peY/MpPrqYg/K0KXVp4oIUiiauAMck+Ivgxgrw2jMTNmB6DH7TIkMDSsG+PY
+         YAqw==
+X-Gm-Message-State: AOAM530j49siQ4GR908cR/VIsgEBOVHILfNODTdl+zZD4welVf8zm4Yq
+        71YHNP5wkckvYa00PJcji+gXyvv7pxw=
+X-Google-Smtp-Source: ABdhPJznh72X4C7neSx4yNdZVXyW5zIVPNBN7Y7aiYl8radfSZreJ8iQ2oOCRYpx375U529rg3TyqQ==
+X-Received: by 2002:a17:902:da88:b0:141:636e:46fb with SMTP id j8-20020a170902da8800b00141636e46fbmr852737plx.26.1635379155987;
         Wed, 27 Oct 2021 16:59:15 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.14
+        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.15
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 16:59:14 -0700 (PDT)
+        Wed, 27 Oct 2021 16:59:15 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 18/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
-Date:   Wed, 27 Oct 2021 16:58:55 -0700
-Message-Id: <20211027235900.1882863-19-luiz.dentz@gmail.com>
+Subject: [PATCH v8 19/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
+Date:   Wed, 27 Oct 2021 16:58:56 -0700
+Message-Id: <20211027235900.1882863-20-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211027235900.1882863-1-luiz.dentz@gmail.com>
 References: <20211027235900.1882863-1-luiz.dentz@gmail.com>
@@ -70,128 +70,142 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 From: Brian Gix <brian.gix@intel.com>
 
 mgmt-test paths:
-Set PHY 2m Success
-Set PHY coded Succcess
-Set PHY 1m 2m coded Succcess
-Set PHY 2m tx success
-Set PHY 2m rx success
-Set PHY Invalid Param
-Start Discovery - (2m, Scan Param)
-Start Discovery - (coded, Scan Param)
-Start Discovery - (1m, 2m, coded, Scan Param)
+Set powered on - Privacy and Advertising
+Set Advertising on - Success 2
+Set Advertising on - Appearance 1
+Set Advertising on - Local name 1
+Set Advertising on - Name + Appear 1
+Add Advertising - Success 4
+Add Advertising - Success 5
+Add Ext Advertising - Success 4
+Add Ext Advertising - Success 5
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- net/bluetooth/mgmt.c | 116 ++++++++++++++++++++++++-------------------
- 1 file changed, 66 insertions(+), 50 deletions(-)
+ net/bluetooth/mgmt.c | 103 ++++++++++++++++++++-----------------------
+ 1 file changed, 48 insertions(+), 55 deletions(-)
 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 2585eab1fe21..b8b3176e05b6 100644
+index b8b3176e05b6..48a901c93141 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -3414,23 +3414,26 @@ int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip)
- 			  sizeof(ev), skip);
+@@ -5608,29 +5608,25 @@ static int set_device_id(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	return err;
  }
  
--static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
--				     u16 opcode, struct sk_buff *skb)
-+static void set_default_phy_complete(struct hci_dev *hdev, void *data, int err)
+-static void enable_advertising_instance(struct hci_dev *hdev, u8 status,
+-					u16 opcode)
++static void enable_advertising_instance(struct hci_dev *hdev, int err)
  {
--	struct mgmt_pending_cmd *cmd;
+-	bt_dev_dbg(hdev, "status %u", status);
++	if (err)
++		bt_dev_err(hdev, "failed to re-configure advertising %d", err);
++	else
++		bt_dev_dbg(hdev, "status %d", err);
+ }
+ 
+-static void set_advertising_complete(struct hci_dev *hdev, u8 status,
+-				     u16 opcode)
++static void set_advertising_complete(struct hci_dev *hdev, void *data, int err)
+ {
+ 	struct cmd_lookup match = { NULL, hdev };
+-	struct hci_request req;
+ 	u8 instance;
+ 	struct adv_info *adv_instance;
+-	int err;
 -
--	bt_dev_dbg(hdev, "status 0x%02x", status);
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct sk_buff *skb = cmd->skb;
+-	hci_dev_lock(hdev);
 +	u8 status = mgmt_status(err);
  
--	hci_dev_lock(hdev);
-+	if (!status) {
-+		if (!skb)
-+			status = MGMT_STATUS_FAILED;
-+		else if (IS_ERR(skb))
-+			status = mgmt_status(PTR_ERR(skb));
-+		else
-+			status = mgmt_status(skb->data[0]);
-+	}
- 
--	cmd = pending_find(MGMT_OP_SET_PHY_CONFIGURATION, hdev);
--	if (!cmd)
--		goto unlock;
-+	bt_dev_dbg(hdev, "status %d", status);
- 
  	if (status) {
- 		mgmt_cmd_status(cmd->sk, hdev->id,
--				MGMT_OP_SET_PHY_CONFIGURATION,
--				mgmt_status(status));
-+				MGMT_OP_SET_PHY_CONFIGURATION, status);
- 	} else {
- 		mgmt_cmd_complete(cmd->sk, hdev->id,
- 				  MGMT_OP_SET_PHY_CONFIGURATION, 0,
-@@ -3439,19 +3442,56 @@ static void set_default_phy_complete(struct hci_dev *hdev, u8 status,
- 		mgmt_phy_configuration_changed(hdev, cmd->sk);
+-		u8 mgmt_err = mgmt_status(status);
+-
+ 		mgmt_pending_foreach(MGMT_OP_SET_ADVERTISING, hdev,
+-				     cmd_status_rsp, &mgmt_err);
+-		goto unlock;
++				     cmd_status_rsp, &status);
++		return;
  	}
  
-+	if (skb && !IS_ERR(skb))
-+		kfree_skb(skb);
+ 	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+@@ -5662,30 +5658,55 @@ static void set_advertising_complete(struct hci_dev *hdev, u8 status,
+ 	 */
+ 	if (hci_dev_test_flag(hdev, HCI_ADVERTISING) ||
+ 	    list_empty(&hdev->adv_instances))
+-		goto unlock;
++		return;
+ 
+ 	instance = hdev->cur_adv_instance;
+ 	if (!instance) {
+ 		adv_instance = list_first_entry_or_null(&hdev->adv_instances,
+ 							struct adv_info, list);
+ 		if (!adv_instance)
+-			goto unlock;
++			return;
+ 
+ 		instance = adv_instance->instance;
+ 	}
+ 
+-	hci_req_init(&req, hdev);
++	err = hci_schedule_adv_instance_sync(hdev, instance, true);
 +
- 	mgmt_pending_remove(cmd);
++	enable_advertising_instance(hdev, err);
 +}
+ 
+-	err = __hci_req_schedule_adv_instance(&req, instance, true);
++static int set_adv_sync(struct hci_dev *hdev, void *data)
++{
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_mode *cp = cmd->param;
++	u8 val = !!cp->val;
+ 
+-	if (!err)
+-		err = hci_req_run(&req, enable_advertising_instance);
++	if (cp->val == 0x02)
++		hci_dev_set_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
++	else
++		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
+ 
+-	if (err)
+-		bt_dev_err(hdev, "failed to re-configure advertising");
++	cancel_adv_timeout(hdev);
  
 -unlock:
 -	hci_dev_unlock(hdev);
-+static int set_default_phy_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_set_phy_configuration *cp = cmd->param;
-+	struct hci_cp_le_set_default_phy cp_phy;
-+	u32 selected_phys = __le32_to_cpu(cp->selected_phys);
++	if (val) {
++		/* Switch to instance "0" for the Set Advertising setting.
++		 * We cannot use update_[adv|scan_rsp]_data() here as the
++		 * HCI_ADVERTISING flag is not yet set.
++		 */
++		hdev->cur_adv_instance = 0x00;
 +
-+	memset(&cp_phy, 0, sizeof(cp_phy));
-+
-+	if (!(selected_phys & MGMT_PHY_LE_TX_MASK))
-+		cp_phy.all_phys |= 0x01;
-+
-+	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
-+		cp_phy.all_phys |= 0x02;
-+
-+	if (selected_phys & MGMT_PHY_LE_1M_TX)
-+		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
-+
-+	if (selected_phys & MGMT_PHY_LE_2M_TX)
-+		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
-+
-+	if (selected_phys & MGMT_PHY_LE_CODED_TX)
-+		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
-+
-+	if (selected_phys & MGMT_PHY_LE_1M_RX)
-+		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
-+
-+	if (selected_phys & MGMT_PHY_LE_2M_RX)
-+		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
-+
-+	if (selected_phys & MGMT_PHY_LE_CODED_RX)
-+		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
-+
-+	cmd->skb =  __hci_cmd_sync(hdev, HCI_OP_LE_SET_DEFAULT_PHY,
-+				   sizeof(cp_phy), &cp_phy, HCI_CMD_TIMEOUT);
++		if (ext_adv_capable(hdev)) {
++			hci_start_ext_adv_sync(hdev, 0x00);
++		} else {
++			hci_update_adv_data_sync(hdev, 0x00);
++			hci_update_scan_rsp_data_sync(hdev, 0x00);
++			hci_enable_advertising_sync(hdev);
++		}
++	} else {
++		hci_disable_advertising_sync(hdev);
++	}
 +
 +	return 0;
  }
  
- static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
- 				 void *data, u16 len)
+ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -5693,7 +5714,6 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
  {
- 	struct mgmt_cp_set_phy_configuration *cp = data;
--	struct hci_cp_le_set_default_phy cp_phy;
+ 	struct mgmt_mode *cp = data;
  	struct mgmt_pending_cmd *cmd;
 -	struct hci_request req;
- 	u32 selected_phys, configurable_phys, supported_phys, unconfigure_phys;
- 	u16 pkt_type = (HCI_DH1 | HCI_DM1);
- 	bool changed = false;
-@@ -3555,44 +3595,20 @@ static int set_phy_configuration(struct sock *sk, struct hci_dev *hdev,
+ 	u8 val, status;
+ 	int err;
  
- 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_PHY_CONFIGURATION, hdev, data,
- 			       len);
+@@ -5759,40 +5779,13 @@ static int set_advertising(struct sock *sk, struct hci_dev *hdev, void *data,
+ 	}
+ 
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_ADVERTISING, hdev, data, len);
 -	if (!cmd) {
 +	if (!cmd)
  		err = -ENOMEM;
@@ -200,50 +214,39 @@ index 2585eab1fe21..b8b3176e05b6 100644
 -
 -	hci_req_init(&req, hdev);
 -
--	memset(&cp_phy, 0, sizeof(cp_phy));
+-	if (cp->val == 0x02)
+-		hci_dev_set_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
+ 	else
+-		hci_dev_clear_flag(hdev, HCI_ADVERTISING_CONNECTABLE);
 -
--	if (!(selected_phys & MGMT_PHY_LE_TX_MASK))
--		cp_phy.all_phys |= 0x01;
--
--	if (!(selected_phys & MGMT_PHY_LE_RX_MASK))
--		cp_phy.all_phys |= 0x02;
--
--	if (selected_phys & MGMT_PHY_LE_1M_TX)
--		cp_phy.tx_phys |= HCI_LE_SET_PHY_1M;
--
--	if (selected_phys & MGMT_PHY_LE_2M_TX)
--		cp_phy.tx_phys |= HCI_LE_SET_PHY_2M;
--
--	if (selected_phys & MGMT_PHY_LE_CODED_TX)
--		cp_phy.tx_phys |= HCI_LE_SET_PHY_CODED;
--
--	if (selected_phys & MGMT_PHY_LE_1M_RX)
--		cp_phy.rx_phys |= HCI_LE_SET_PHY_1M;
--
--	if (selected_phys & MGMT_PHY_LE_2M_RX)
--		cp_phy.rx_phys |= HCI_LE_SET_PHY_2M;
--
--	if (selected_phys & MGMT_PHY_LE_CODED_RX)
--		cp_phy.rx_phys |= HCI_LE_SET_PHY_CODED;
-+	else
-+		err = hci_cmd_sync_queue(hdev, set_default_phy_sync, cmd,
-+					 set_default_phy_complete);
+-	cancel_adv_timeout(hdev);
++		err = hci_cmd_sync_queue(hdev, set_adv_sync, cmd,
++					 set_advertising_complete);
  
--	hci_req_add(&req, HCI_OP_LE_SET_DEFAULT_PHY, sizeof(cp_phy), &cp_phy);
-+	if (err < 0) {
-+		err = mgmt_cmd_status(sk, hdev->id,
-+				      MGMT_OP_SET_PHY_CONFIGURATION,
-+				      MGMT_STATUS_FAILED);
- 
--	err = hci_req_run_skb(&req, set_default_phy_complete);
+-	if (val) {
+-		/* Switch to instance "0" for the Set Advertising setting.
+-		 * We cannot use update_[adv|scan_rsp]_data() here as the
+-		 * HCI_ADVERTISING flag is not yet set.
+-		 */
+-		hdev->cur_adv_instance = 0x00;
+-
+-		if (ext_adv_capable(hdev)) {
+-			__hci_req_start_ext_adv(&req, 0x00);
+-		} else {
+-			__hci_req_update_adv_data(&req, 0x00);
+-			__hci_req_update_scan_rsp_data(&req, 0x00);
+-			__hci_req_enable_advertising(&req);
+-		}
+-	} else {
+-		__hci_req_disable_advertising(&req);
+-	}
+-
+-	err = hci_req_run(&req, set_advertising_complete);
 -	if (err < 0)
--		mgmt_pending_remove(cmd);
-+		if (cmd)
-+			mgmt_pending_remove(cmd);
-+	}
++	if (err < 0 && cmd)
+ 		mgmt_pending_remove(cmd);
  
  unlock:
- 	hci_dev_unlock(hdev);
 -- 
 2.31.1
 
