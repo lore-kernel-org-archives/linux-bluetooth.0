@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0BCDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 22C39C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:15 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BCDE06109F
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:13 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0C0C7610C7
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229760AbhJ1ABi (ORCPT
+        id S229784AbhJ1ABj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Oct 2021 20:01:38 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33476 "EHLO
+        Wed, 27 Oct 2021 20:01:39 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33482 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229642AbhJ1ABi (ORCPT
+        with ESMTP id S229764AbhJ1ABi (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
         Wed, 27 Oct 2021 20:01:38 -0400
-Received: from mail-pg1-x52c.google.com (mail-pg1-x52c.google.com [IPv6:2607:f8b0:4864:20::52c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D484C061570
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D979CC061570
         for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:12 -0700 (PDT)
-Received: by mail-pg1-x52c.google.com with SMTP id 83so4566246pgc.8
+Received: by mail-pf1-x42e.google.com with SMTP id a26so4212132pfr.11
         for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=N5D/HQgG7DuQ1D8jGz8QdjvwrD/AAGmRkPeg1zrEIYs=;
-        b=lM5BLl7KXLBpkvFKegL26bSRPEeXL00/Pvl3yNxs9s6yyVUxOzIgkPZ0B9P3MwA78H
-         tIUs7OPa3/nCKkxvpA7RkJCSlb4iRYt1zETe72u7KWD22gUd6C0Xr81tt9YjoHyISilZ
-         oYXaa7RlWCSj0+JVXX4hkq5SPyId3AEpG2MFYsC8S62jY3tZGuAr1lOKog7vWemor2aP
-         4dniSko23tZEqD6pgQkGUsIT8/Ol1KLah8gliEtp9IYTjwvuNl+yqApaRrsJft1KsScR
-         gAJFo98ungVjypvC92++zdi5bts9SILg5lFZ+6l6naqqkBP47jUKj32uWrnT0VXo4tP8
-         YpUA==
+        bh=rwgS3Jv6wCmSCyGUIB34+aoZhmeTgsI6cDJkPqaotgE=;
+        b=qAzQmQMg1FlNc5NKptFlWWQS6S5YIizwQzgBn7D2nZ9ZlVCM1ZTFlmY+Rzh7h+eF5d
+         AQauaIlzAwPOPCf7RS/2gqUC1nH1I68cY/+bgOiZJwzHsfnlDgrWVNssto/Au1jpLFA0
+         o+EkCHYcxrMec0yEe05nI+CNuxAeVpqsKekRZuYnvmIUehVXcEaIIFWgVMSU7VgiG3t+
+         6rJKurrCMS6aq15TiilZYze83xaa/7FPygnKgzL/c6yob6+fPm5Fqw5Gd8krJNoVrCqT
+         Wz5vYLoAlNUSIpRXIWaBy55fsE8PxSgvXtAdlKMOvoKhOmLx2ACoDhdvp5XgDq+STjJG
+         NZvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=N5D/HQgG7DuQ1D8jGz8QdjvwrD/AAGmRkPeg1zrEIYs=;
-        b=WJUpDvFlNGczY8qlLtxzdUvjLe7XNtaZBRGJtV5oLxCVLUcHbXmZ2fc3MMvXh8vDXO
-         mBJrmNylDrlmE19LCxPrM9pA1vLQ6gNQHP9gTiAL74Si6DPPaNEawz9O/wkr9PC85jb/
-         eYivlDPM1b9J+GaWRDxs0RMfg8LO4+6XWUJ3AKKL4E1Wfl8z90SXXxXh3WU4Y4ysiCZJ
-         eU3cAGdHYXPVMcFg6D+shuR8UFpQqJi5Z+826XOGwnW/kOAAj680GoB1YTQ/Bn+8FbDp
-         x0n0HrtK5CwS+teHcK1iS+bfwlcNkFDaKLJ+z1zHnkOiS27VGO/slQreDNoFJ/stPpZ/
-         +wsg==
-X-Gm-Message-State: AOAM533HzD1A8s54v0LYl5VV2ZsDg0RpZvnAsszetTfcRuPcNR3l6v5j
-        D/8ItbNogcN0/IKSsz7QhzvJfx/77yE=
-X-Google-Smtp-Source: ABdhPJzCWYnA81eg2vBSQ6l/nH1ZjEvwfAyNr2O5Zt9GtcQomP+9yt89qo+fZqNQMTo8g9XxpHfeAg==
-X-Received: by 2002:a63:2d46:: with SMTP id t67mr659949pgt.15.1635379151295;
-        Wed, 27 Oct 2021 16:59:11 -0700 (PDT)
+        bh=rwgS3Jv6wCmSCyGUIB34+aoZhmeTgsI6cDJkPqaotgE=;
+        b=OJVnOA57/mxMT3u+mD3DfoDIXdBQMnzB2nlkfMcsVTvLevQ8wgtIPTp2geF6k2+AI5
+         /+wyRedPbCQCX3SYSnH32LS/bi7pl+T1Oz/kbYwuXYDs6YR3e5sg/JOqG53Q170W8Yqt
+         d8iYmVxB2ihLG6RZxoij4XvyUAU4DpgUJnLg8aOPvQ88q6psLq/+nisTtEij96HvDZsr
+         sq5lPP/1aZf/Rq13No7/o8Exfog3qf03Sucp+V+zgGf0RXS6Tp/WiF+hHvaGvDSo2Axi
+         hoNp3gayZFoAlp7BcEdmwhrRQD5o7toTar/VAoIfLhFVnPIZgab68STo22NFbL5OP3q/
+         eqMQ==
+X-Gm-Message-State: AOAM530DuEaeZxp3rutQyruUO9juCiE1upC39XAnuEhhUsvyKUp2df5v
+        cIJkPwxfpahbtMs3hSAj7xl2m+yftcQ=
+X-Google-Smtp-Source: ABdhPJz5sxFxjVp3j12TQFCoIwTzFcYyc14BT+VxfzBruhLct0pcqiKNs3LcP0pGpbGcR1WhWA9FIg==
+X-Received: by 2002:a63:5714:: with SMTP id l20mr657862pgb.121.1635379152097;
+        Wed, 27 Oct 2021 16:59:12 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.10
+        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.11
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 16:59:10 -0700 (PDT)
+        Wed, 27 Oct 2021 16:59:11 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 13/23] Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
-Date:   Wed, 27 Oct 2021 16:58:50 -0700
-Message-Id: <20211027235900.1882863-14-luiz.dentz@gmail.com>
+Subject: [PATCH v8 14/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
+Date:   Wed, 27 Oct 2021 16:58:51 -0700
+Message-Id: <20211027235900.1882863-15-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211027235900.1882863-1-luiz.dentz@gmail.com>
 References: <20211027235900.1882863-1-luiz.dentz@gmail.com>
@@ -69,228 +69,189 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-Synchronous version of MGMT_OP_GET_CLOCK_INFO.
+Uses:
+  hci_disable_advertising_sync
+  hci_remove_ext_adv_instance_sync
+  hci_write_le_host_supported_sync
+  hci_setup_ext_adv_instance_sync
+  hci_update_scan_rsp_data_sync
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |   1 +
- net/bluetooth/hci_sync.c         |   6 ++
- net/bluetooth/mgmt.c             | 121 +++++++++++++------------------
- 3 files changed, 58 insertions(+), 70 deletions(-)
+ include/net/bluetooth/hci_sync.h |  4 ++
+ net/bluetooth/hci_sync.c         |  3 +-
+ net/bluetooth/mgmt.c             | 85 ++++++++++++++++----------------
+ 3 files changed, 48 insertions(+), 44 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 4b27a89cc57e..cf54f8f14edb 100644
+index cf54f8f14edb..d969693c33b5 100644
 --- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -70,6 +70,7 @@ int hci_update_passive_scan(struct hci_dev *hdev);
- int hci_read_rssi_sync(struct hci_dev *hdev, __le16 handle);
- int hci_read_tx_power_sync(struct hci_dev *hdev, __le16 handle, u8 type);
- int hci_write_sc_support_sync(struct hci_dev *hdev, u8 val);
-+int hci_read_clock_sync(struct hci_dev *hdev, struct hci_cp_read_clock *cp);
- 
+@@ -75,6 +75,10 @@ int hci_read_clock_sync(struct hci_dev *hdev, struct hci_cp_read_clock *cp);
  int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable);
  int hci_update_scan_sync(struct hci_dev *hdev);
+ 
++int hci_write_le_host_supported_sync(struct hci_dev *hdev, u8 le, u8 simul);
++int hci_remove_ext_adv_instance_sync(struct hci_dev *hdev, u8 instance,
++				     struct sock *sk);
++
+ int hci_dev_open_sync(struct hci_dev *hdev);
+ int hci_dev_close_sync(struct hci_dev *hdev);
+ 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index dc27d6652188..37595b393ac1 100644
+index 37595b393ac1..877f5b97a0f2 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -1318,6 +1318,12 @@ int hci_read_rssi_sync(struct hci_dev *hdev, __le16 handle)
- 					sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+@@ -2149,8 +2149,7 @@ static int hci_write_ssp_mode_sync(struct hci_dev *hdev, u8 mode)
+ 	return hci_write_sc_support_sync(hdev, 0x01);
  }
  
-+int hci_read_clock_sync(struct hci_dev *hdev, struct hci_cp_read_clock *cp)
-+{
-+	return __hci_cmd_sync_status(hdev, HCI_OP_READ_CLOCK,
-+					sizeof(*cp), cp, HCI_CMD_TIMEOUT);
-+}
-+
- int hci_read_tx_power_sync(struct hci_dev *hdev, __le16 handle, u8 type)
+-static int hci_write_le_host_supported_sync(struct hci_dev *hdev, u8 le,
+-					    u8 simul)
++int hci_write_le_host_supported_sync(struct hci_dev *hdev, u8 le, u8 simul)
  {
- 	struct hci_cp_read_tx_power cp;
+ 	struct hci_cp_write_le_host_supported cp;
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 656e34617029..7ee0a4beab08 100644
+index 7ee0a4beab08..82369db92bb8 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -927,13 +927,6 @@ static struct mgmt_pending_cmd *pending_find(u16 opcode, struct hci_dev *hdev)
- 	return mgmt_pending_find(HCI_CHANNEL_CONTROL, opcode, hdev);
- }
- 
--static struct mgmt_pending_cmd *pending_find_data(u16 opcode,
--						  struct hci_dev *hdev,
--						  const void *data)
--{
--	return mgmt_pending_find_data(HCI_CHANNEL_CONTROL, opcode, hdev, data);
--}
--
- u8 mgmt_get_adv_discov_flags(struct hci_dev *hdev)
- {
- 	struct mgmt_pending_cmd *cmd;
-@@ -6702,82 +6695,76 @@ static int get_conn_info(struct sock *sk, struct hci_dev *hdev, void *data,
+@@ -1902,18 +1902,17 @@ static int set_hs(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  	return err;
  }
  
--static int clock_info_cmd_complete(struct mgmt_pending_cmd *cmd, u8 status)
-+static void get_clock_info_complete(struct hci_dev *hdev, void *data, int err)
+-static void le_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void set_le_complete(struct hci_dev *hdev, void *data, int err)
  {
--	struct hci_conn *conn = cmd->user_data;
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_get_clock_info *cp = cmd->param;
- 	struct mgmt_rp_get_clock_info rp;
--	struct hci_dev *hdev;
--	int err;
-+	struct hci_conn *conn = cmd->user_data;
+ 	struct cmd_lookup match = { NULL, hdev };
 +	u8 status = mgmt_status(err);
-+
-+	bt_dev_dbg(hdev, "err %d", err);
- 
- 	memset(&rp, 0, sizeof(rp));
--	memcpy(&rp.addr, cmd->param, sizeof(rp.addr));
-+	bacpy(&rp.addr.bdaddr, &cp->addr.bdaddr);
-+	rp.addr.type = cp->addr.type;
- 
--	if (status)
-+	if (err)
- 		goto complete;
- 
--	hdev = hci_dev_get(cmd->index);
--	if (hdev) {
--		rp.local_clock = cpu_to_le32(hdev->clock);
--		hci_dev_put(hdev);
--	}
-+	rp.local_clock = cpu_to_le32(hdev->clock);
- 
- 	if (conn) {
- 		rp.piconet_clock = cpu_to_le32(conn->clock);
- 		rp.accuracy = cpu_to_le16(conn->clock_accuracy);
--	}
--
--complete:
--	err = mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status, &rp,
--				sizeof(rp));
--
--	if (conn) {
- 		hci_conn_drop(conn);
- 		hci_conn_put(conn);
- 	}
- 
--	return err;
-+complete:
-+	mgmt_cmd_complete(cmd->sk, cmd->index, cmd->opcode, status, &rp,
-+			  sizeof(rp));
-+
-+	mgmt_pending_free(cmd);
- }
- 
--static void get_clock_info_complete(struct hci_dev *hdev, u8 status, u16 opcode)
-+static int get_clock_info_sync(struct hci_dev *hdev, void *data)
- {
--	struct hci_cp_read_clock *hci_cp;
--	struct mgmt_pending_cmd *cmd;
--	struct hci_conn *conn;
--
--	bt_dev_dbg(hdev, "status %u", status);
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_cp_get_clock_info *cp = cmd->param;
-+	struct hci_cp_read_clock hci_cp;
-+	struct hci_conn *conn = cmd->user_data;
-+	int err;
  
 -	hci_dev_lock(hdev);
-+	memset(&hci_cp, 0, sizeof(hci_cp));
-+	err = hci_read_clock_sync(hdev, &hci_cp);
++	bt_dev_dbg(hdev, "err %d", err);
  
--	hci_cp = hci_sent_cmd_data(hdev, HCI_OP_READ_CLOCK);
--	if (!hci_cp)
+ 	if (status) {
+-		u8 mgmt_err = mgmt_status(status);
+-
+ 		mgmt_pending_foreach(MGMT_OP_SET_LE, hdev, cmd_status_rsp,
+-				     &mgmt_err);
 -		goto unlock;
-+	if (conn) {
-+		/* Make sure connection still exists */
-+		conn = hci_conn_hash_lookup_ba(hdev, ACL_LINK,
-+					       &cp->addr.bdaddr);
- 
--	if (hci_cp->which) {
--		u16 handle = __le16_to_cpu(hci_cp->handle);
--		conn = hci_conn_hash_lookup_handle(hdev, handle);
--	} else {
--		conn = NULL;
-+		if (conn && conn == cmd->user_data &&
-+		    conn->state == BT_CONNECTED) {
-+			hci_cp.handle = cpu_to_le16(conn->handle);
-+			hci_cp.which = 0x01; /* Piconet clock */
-+			err = hci_read_clock_sync(hdev, &hci_cp);
-+		} else if (cmd->user_data) {
-+			hci_conn_drop(cmd->user_data);
-+			hci_conn_put(cmd->user_data);
-+			cmd->user_data = NULL;
-+		}
++							&status);
++		return;
  	}
  
--	cmd = pending_find_data(MGMT_OP_GET_CLOCK_INFO, hdev, conn);
--	if (!cmd)
--		goto unlock;
--
--	cmd->cmd_complete(cmd, mgmt_status(status));
--	mgmt_pending_remove(cmd);
--
+ 	mgmt_pending_foreach(MGMT_OP_SET_LE, hdev, settings_rsp, &match);
+@@ -1922,39 +1921,54 @@ static void le_enable_complete(struct hci_dev *hdev, u8 status, u16 opcode)
+ 
+ 	if (match.sk)
+ 		sock_put(match.sk);
++}
++
++static int set_le_sync(struct hci_dev *hdev, void *data)
++{
++	struct mgmt_pending_cmd *cmd = data;
++	struct mgmt_mode *cp = cmd->param;
++	u8 val = !!cp->val;
++	int err;
++
++	if (!val) {
++		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
++			hci_disable_advertising_sync(hdev);
++
++		if (ext_adv_capable(hdev))
++			hci_remove_ext_adv_instance_sync(hdev, 0, cmd->sk);
++	} else {
++		hci_dev_set_flag(hdev, HCI_LE_ENABLED);
++	}
++
++	err = hci_write_le_host_supported_sync(hdev, val, 0);
+ 
+ 	/* Make sure the controller has a good default for
+ 	 * advertising data. Restrict the update to when LE
+ 	 * has actually been enabled. During power on, the
+ 	 * update in powered_update_hci will take care of it.
+ 	 */
+-	if (hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+-		struct hci_request req;
+-		hci_req_init(&req, hdev);
++	if (!err && hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+ 		if (ext_adv_capable(hdev)) {
+-			int err;
++			int status;
+ 
+-			err = __hci_req_setup_ext_adv_instance(&req, 0x00);
+-			if (!err)
+-				__hci_req_update_scan_rsp_data(&req, 0x00);
++			status = hci_setup_ext_adv_instance_sync(hdev, 0x00);
++			if (!status)
++				hci_update_scan_rsp_data_sync(hdev, 0x00);
+ 		} else {
+-			__hci_req_update_adv_data(&req, 0x00);
+-			__hci_req_update_scan_rsp_data(&req, 0x00);
++			hci_update_adv_data_sync(hdev, 0x00);
++			hci_update_scan_rsp_data_sync(hdev, 0x00);
+ 		}
+-		hci_req_run(&req, NULL);
++
+ 		hci_update_passive_scan(hdev);
+ 	}
+ 
 -unlock:
 -	hci_dev_unlock(hdev);
 +	return err;
  }
  
- static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
--			 u16 len)
-+								u16 len)
+ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  {
- 	struct mgmt_cp_get_clock_info *cp = data;
- 	struct mgmt_rp_get_clock_info rp;
--	struct hci_cp_read_clock hci_cp;
+ 	struct mgmt_mode *cp = data;
+-	struct hci_cp_write_le_host_supported hci_cp;
  	struct mgmt_pending_cmd *cmd;
 -	struct hci_request req;
- 	struct hci_conn *conn;
  	int err;
+ 	u8 val, enabled;
  
-@@ -6815,31 +6802,25 @@ static int get_clock_info(struct sock *sk, struct hci_dev *hdev, void *data,
- 		conn = NULL;
+@@ -2024,33 +2038,20 @@ static int set_le(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  	}
  
--	cmd = mgmt_pending_add(sk, MGMT_OP_GET_CLOCK_INFO, hdev, data, len);
+ 	cmd = mgmt_pending_add(sk, MGMT_OP_SET_LE, hdev, data, len);
 -	if (!cmd) {
-+	cmd = mgmt_pending_new(sk, MGMT_OP_GET_CLOCK_INFO, hdev, data, len);
 +	if (!cmd)
  		err = -ENOMEM;
 -		goto unlock;
 -	}
 -
--	cmd->cmd_complete = clock_info_cmd_complete;
-+	else
-+		err = hci_cmd_sync_queue(hdev, get_clock_info_sync, cmd,
-+					 get_clock_info_complete);
- 
 -	hci_req_init(&req, hdev);
-+	if (err < 0) {
-+		err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_GET_CLOCK_INFO,
-+					MGMT_STATUS_FAILED, &rp, sizeof(rp));
- 
--	memset(&hci_cp, 0, sizeof(hci_cp));
--	hci_req_add(&req, HCI_OP_READ_CLOCK, sizeof(hci_cp), &hci_cp);
-+		if (cmd)
-+			mgmt_pending_free(cmd);
- 
--	if (conn) {
-+	} else if (conn) {
- 		hci_conn_hold(conn);
- 		cmd->user_data = hci_conn_get(conn);
 -
--		hci_cp.handle = cpu_to_le16(conn->handle);
--		hci_cp.which = 0x01; /* Piconet clock */
--		hci_req_add(&req, HCI_OP_READ_CLOCK, sizeof(hci_cp), &hci_cp);
+-	memset(&hci_cp, 0, sizeof(hci_cp));
++	else
++		err = hci_cmd_sync_queue(hdev, set_le_sync, cmd,
++					 set_le_complete);
+ 
+-	if (val) {
+-		hci_cp.le = val;
+-		hci_cp.simul = 0x00;
+-	} else {
+-		if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-			__hci_req_disable_advertising(&req);
++	if (err < 0) {
++		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_LE,
++				      MGMT_STATUS_FAILED);
+ 
+-		if (ext_adv_capable(hdev))
+-			__hci_req_clear_ext_adv_sets(&req);
++		if (cmd)
++			mgmt_pending_remove(cmd);
  	}
  
--	err = hci_req_run(&req, get_clock_info_complete);
+-	hci_req_add(&req, HCI_OP_WRITE_LE_HOST_SUPPORTED, sizeof(hci_cp),
+-		    &hci_cp);
+-
+-	err = hci_req_run(&req, le_enable_complete);
 -	if (err < 0)
 -		mgmt_pending_remove(cmd);
- 
+-
  unlock:
  	hci_dev_unlock(hdev);
+ 	return err;
 -- 
 2.31.1
 
