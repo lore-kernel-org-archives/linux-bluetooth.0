@@ -2,130 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12C7FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:11:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3EE95C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:38:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F08C8610A6
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:11:17 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 24A4560FBF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 20:38:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243957AbhJ0UNm (ORCPT
+        id S240554AbhJ0UlW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Oct 2021 16:13:42 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38200 "EHLO
+        Wed, 27 Oct 2021 16:41:22 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44700 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237112AbhJ0UNc (ORCPT
+        with ESMTP id S235613AbhJ0UlV (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Oct 2021 16:13:32 -0400
-Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5BABC061570
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:11:06 -0700 (PDT)
-Received: by mail-pg1-x52d.google.com with SMTP id m21so4018503pgu.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:11:06 -0700 (PDT)
+        Wed, 27 Oct 2021 16:41:21 -0400
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4D80C061570
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id h4so3162234qth.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9wp42jdzlxwEdRFspy4+GyKXkZ/9tORYCiZe+BJe7mg=;
-        b=m61kcHUxSUMNn9Av0rdYtQDqYdIdCpS2pbom9VsbxohSORY2Ev9RDIjqHfOh8jnqNw
-         nb8XoWaHVYFfFvrxv1zl3ifBzK2U55XAF6h8XwTsfXJtwf8YF9bQ/9FACrcq3/t0kwfy
-         +bu3Srb6LDM8MCUROZfBOJbAizf341/AGxeYK8y2QJLDLiluqcNqPns6l5LKV5u/Z6qM
-         lGkKOcIzXeiP5fb05HQk+YosnnVYr/hTdVhh+xfQ1PPVixkWcp30UR/9K1fyIp0YG9hp
-         jC5shhteUPGFUtUVwAC/QBtf/JpkZf5YjcRriLOl8MYURaMlXRgQpJmMPNGALtiHyDYT
-         eqRw==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=vfE+GpH58SfPG+nauBKAXbh9ln28F4F7C9SEjF9njTs=;
+        b=nY7jvB+fyNY9wHjCXiBqWnCOaRNW1MmLjIHSbMIubtjmQVOU7Al6/NKgPu/lzgDpoR
+         qHEUcdSmb1dhqqg9mxi8lF4ii8VMZHvAjO8fp9hv4+xJM/KWWXDr6CmzJqmVyQUbic99
+         lzauuWVGzyyjF998t7Mc3tjnIY2FOYdQaRN6wg8544OGsmDNBpJxmy5Eb45oqjvq/HOL
+         Ttv45nfG5WlaNzk0vSdWqw6L9DfvcJ8R4fc4MElnhjr1JN/YN3Ba7yKsSLTGBqHgz3la
+         CE7Nv/bISdqhwwhxBfZWpBQqNgi3RQKpiEJm1UeB+H++PhKeqfdpaYIwCWwpjdDL7IzH
+         +r+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=9wp42jdzlxwEdRFspy4+GyKXkZ/9tORYCiZe+BJe7mg=;
-        b=jKB2AG/i9x7dVdkvy0v00igZduCDdDlSn1aS3pi3aB7NyPLHJmomC3THxTDiQ0kU2C
-         dERCVexAgMHUZbj2TCWpHPZD2y7E/wDappZD+WHTp5xlv8UGouW4k4xAD7pl/DOAoVvs
-         PI+CS3VNonmhCo86KVl9leNEa0dlV7aMWgAbcaFf5VPP7OpOqnxvA3QVfB5MApF92MUk
-         VNXj7QDIRST8wqab5qjgcFI6t0grmJpbyuxq8oCmW4tCxMrVmPRN6NauUdnHwP/RJd6d
-         /cvwGkL/BUG05CU5uBnYUeMTDxiIhXzrCVYhlK0zF+n5RL0cLfI4i90U7e0xofhu46N+
-         JQbQ==
-X-Gm-Message-State: AOAM530Mv/ichMAoQnCHJdGy162LtcG11Wgm0T8jR+gxxlBLZAg/4SEx
-        3ELPTQ2Puta6IsFezxG3jKwJOsBCRlo=
-X-Google-Smtp-Source: ABdhPJwQxkNEc8mVXBNj2aoeAgcLRDPEMkjos6croeboFNLOSUDuIwVuqKtjE9AntRGqyKQLRmoejQ==
-X-Received: by 2002:a05:6a00:2146:b0:44c:2922:8abf with SMTP id o6-20020a056a00214600b0044c29228abfmr34935969pfk.27.1635365465917;
-        Wed, 27 Oct 2021 13:11:05 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id y16sm737592pfl.198.2021.10.27.13.11.05
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=vfE+GpH58SfPG+nauBKAXbh9ln28F4F7C9SEjF9njTs=;
+        b=CAD5N66Og5Gg1/zMi2bcO5Ok4jYreWFjXMo1hglISEiUcjXyfGecABJTKrac5VfPsF
+         rRexJVZIe0a1GNxtqVgMRjG6mwmxcSIpLMHcUEQ4PFFhiQSZ5OQMyJTmWMR7ADnFkPJY
+         PitBF2bs8rhC+Cqc6XeK0wSXxbrm6fg8ufIfPSXZiXV9DgMrfm0+PTs1Mez367R1gmZv
+         2oE/NuGI0L9lEbtbkGWU+Txs83g5lRUbcS1cjhPu047iQM+mfAKCcArS9rN8/93WctT+
+         ojRV7oOO8DV7epSnQ8MmUimdybBqoka4D3/wLFl1lEECuSjMxcTHNKh/L6uGiT9G5+KY
+         rxtg==
+X-Gm-Message-State: AOAM532km+SPGxoAvX2EXTabe7ISuKV2fu6FpE/EOgySIDJhBFkwCCBR
+        hn35vziNfS2JgO6bk0w9HIUrP5Owsd8tyQ==
+X-Google-Smtp-Source: ABdhPJzvTJej3iQ00u0ejPaYaPXPls2/6O38QNkd0Ujg4dL2QbITi2IinwxX5TuGzR/8fmrAnu81Ww==
+X-Received: by 2002:ac8:5a07:: with SMTP id n7mr52287qta.304.1635367135004;
+        Wed, 27 Oct 2021 13:38:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.185.185.114])
+        by smtp.gmail.com with ESMTPSA id a15sm650512qkp.17.2021.10.27.13.38.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 13:11:05 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] device: Fix not clearing error on update_bredr_services
-Date:   Wed, 27 Oct 2021 13:11:03 -0700
-Message-Id: <20211027201103.1668266-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Wed, 27 Oct 2021 13:38:54 -0700 (PDT)
+Message-ID: <6179b8de.1c69fb81.de3e3.58be@mx.google.com>
+Date:   Wed, 27 Oct 2021 13:38:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2615879028939127869=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] device: Fix not clearing error on update_bredr_services
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211027201103.1668266-1-luiz.dentz@gmail.com>
+References: <20211027201103.1668266-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============2615879028939127869==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-When trying to loads contents from file using g_key_file_load_from_file
-it may cause an error which needs to be cleared since the gerr is
-reused, also make sure the file is always created upfront to avoid
-having such error when storage has not been initialized.
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=571395
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.38 seconds
+GitLint                       PASS      0.88 seconds
+Prep - Setup ELL              PASS      52.02 seconds
+Build - Prep                  PASS      0.48 seconds
+Build - Configure             PASS      9.53 seconds
+Build - Make                  PASS      220.14 seconds
+Make Check                    PASS      10.02 seconds
+Make Distcheck                PASS      254.72 seconds
+Build w/ext ELL - Configure   PASS      8.72 seconds
+Build w/ext ELL - Make        PASS      208.22 seconds
+
+
+
 ---
- src/device.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/src/device.c b/src/device.c
-index 8ad338419..612d093a5 100644
---- a/src/device.c
-+++ b/src/device.c
-@@ -4998,22 +4998,28 @@ static void update_bredr_services(struct browse_req *req, sdp_list_t *recs)
- 
- 	snprintf(sdp_file, PATH_MAX, STORAGEDIR "/%s/cache/%s", srcaddr,
- 								dstaddr);
-+	create_file(sdp_file, 0600);
- 
- 	sdp_key_file = g_key_file_new();
- 	if (!g_key_file_load_from_file(sdp_key_file, sdp_file, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", sdp_file,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
-+		g_key_file_free(sdp_key_file);
-+		sdp_key_file = NULL;
- 	}
- 
- 	snprintf(att_file, PATH_MAX, STORAGEDIR "/%s/%s/attributes", srcaddr,
- 								dstaddr);
-+	create_file(att_file, 0600);
- 
- 	att_key_file = g_key_file_new();
- 	if (!g_key_file_load_from_file(att_key_file, att_file, 0, &gerr)) {
- 		error("Unable to load key file from %s: (%s)", att_file,
- 								gerr->message);
--		g_error_free(gerr);
-+		g_clear_error(&gerr);
-+		g_key_file_free(att_key_file);
-+		att_key_file = NULL;
- 	}
- 
- 	for (seq = recs; seq; seq = seq->next) {
-@@ -5068,7 +5074,6 @@ next:
- 	if (sdp_key_file) {
- 		data = g_key_file_to_data(sdp_key_file, &length, NULL);
- 		if (length > 0) {
--			create_file(sdp_file, 0600);
- 			if (!g_file_set_contents(sdp_file, data, length,
- 								&gerr)) {
- 				error("Unable set contents for %s: (%s)",
-@@ -5084,7 +5089,6 @@ next:
- 	if (att_key_file) {
- 		data = g_key_file_to_data(att_key_file, &length, NULL);
- 		if (length > 0) {
--			create_file(att_file, 0600);
- 			if (!g_file_set_contents(att_file, data, length,
- 								&gerr)) {
- 				error("Unable set contents for %s: (%s)",
--- 
-2.31.1
 
+--===============2615879028939127869==--
