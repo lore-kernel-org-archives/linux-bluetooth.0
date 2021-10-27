@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 666FEC4167B
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31C4DC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4CF19610CA
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 186F4610CA
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 27 Oct 2021 23:59:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229723AbhJ1ABf (ORCPT
+        id S229641AbhJ1ABg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 27 Oct 2021 20:01:35 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33458 "EHLO
+        Wed, 27 Oct 2021 20:01:36 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229641AbhJ1ABe (ORCPT
+        with ESMTP id S229698AbhJ1ABf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 27 Oct 2021 20:01:34 -0400
-Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC0D8C061570
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:08 -0700 (PDT)
-Received: by mail-pg1-x52f.google.com with SMTP id r2so4543138pgl.10
-        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:08 -0700 (PDT)
+        Wed, 27 Oct 2021 20:01:35 -0400
+Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94E78C061570
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:09 -0700 (PDT)
+Received: by mail-pg1-x529.google.com with SMTP id e65so4577852pgc.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 27 Oct 2021 16:59:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=ErfpEAGdAV6BUHXdX62d/I0u6g1ukiWTa+wLB+nhdRw=;
-        b=iDO2NsMpT6eTBbp/kGZtWLaO9gKd24dRXNk2F4lMjq80d6DFmJvS6dsTN4vyGeXico
-         xhDGudNKF4vAbaZ6rwObae3orXCzJBL3YXCRSb7pIXaeyYYMLORCIr3BT+NNpWsZIVFJ
-         Dr6IIPNJLQceAU22ajuUN4iFdHrbsPMJy92dtHHhHLWIqA/GwHwLbpr2UUXKTg0OnM+r
-         ealwEEtRufLFbJsMAy/5/RdyCe0wOJyhwDrfQQoTCaUFW0glr1AXm4ZH4QkpV2oMLMLq
-         uDaEN+JCpLsyq8DbMaZtuZ6GqJVJcnpm2Cg6j+Pa/Y/L/HZ3HOxWOGGgxsq41DRW5zDy
-         a9dQ==
+        bh=e4FUs4lF1jIMQpAS7BNHvQOHH0aPkYTQBYo8RdJaRL4=;
+        b=XowRBjj5HVJlTC8XMmhBh8tBzaimVmdznljtGz68MPxRhPnQcekYfP37HZRiAz+otK
+         l+ZkD0FiEIBcLea5oQIXO36+w8iuRcEfp8+uiIliXbvFsgeaeHdWpt573eeYfZ0f9qWs
+         jAFNkmFvP8m4m6pevxfy+YoUKpNpbCiZCiE9Hx9N/Zamc0WK/10AnQr2CUQZpXToxoMx
+         w8hejqNH9eZnSOnQ0Kt7GSegRVdTffJkBXGmq7iTkvCdMLx1Q/amiISDCjxTG4kPhhha
+         BDgYo7F59hZtlAuJNAmjD05rU8FHwDD1rSw7WDotRU+2p30cqg4j8uIp0blkwcitokyf
+         xgkQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=ErfpEAGdAV6BUHXdX62d/I0u6g1ukiWTa+wLB+nhdRw=;
-        b=21kwEI9sXDnFwXLZ7oq3x5DcyjioGcWaYiNeGyAzHmP5UC0QPu25YtGHfmCdvwkE73
-         Kvpdf7/MJeyll0LbjiFZ0J84/OCxCSNl5r6EgTIPPca/JtQZE2rudWyqPS9I4iVHu4CE
-         G7fascLHb4I2IJjDKQwCefS9UDIkM6thIjzTPPv4pjwV/nLisj5CtYjRRywqyO1FKooq
-         OqHQlN0Ubgp1XAtQdBYvIek9oQQhuJz4/xc2kiO4EevZbDA8HROpxPGezgMWE56kD9Xr
-         e7uj9fIXHGX1k9mhgvTuBR/CIHO+71CQIb866ZLuROniDhlIKdBDFJVGsyOn20nlNitu
-         qIbA==
-X-Gm-Message-State: AOAM5329wUB0rO1Fm285xHFB9Co4fNQ9UUa5WYE4sVM9jXBUydWbAYxd
-        C6F0mNLOWRUk3sbb7gby49tN7CFpq4g=
-X-Google-Smtp-Source: ABdhPJwryQc/iLXAweUctj4SsSkdaY5g/qe1SuudBZpSqBmJt3NSaOwHw36CU8JkMghf7aCHHFBRWQ==
-X-Received: by 2002:a05:6a00:1504:b0:47c:28f5:7b8f with SMTP id q4-20020a056a00150400b0047c28f57b8fmr896231pfu.45.1635379148077;
+        bh=e4FUs4lF1jIMQpAS7BNHvQOHH0aPkYTQBYo8RdJaRL4=;
+        b=6Dk0JE1ICGZFgL5KFf/gWw1CLIedjufeEq6H25OKfys4oNp0Fp5SPrMEtdub4nBeOq
+         H80NhoAyfczy+ppXqapUtY9Zen/016azz0zbu0c+q7KFVJfB6LR22QQlHEJuyfmc7aRP
+         B4mqB1923+xqge2GoCKRRF3WLXVWbTWJOG1ooi4+VtHJJq4ZqgBuK8bK/p79gTMlp5yb
+         WmeuKe9DkFnXAXhFkeqcuzK+tdWFGwoYxCPIXWAC9Lu7d7d9kg02kQQcPKld2oAsAoV5
+         ddqrq4mQyYZOluZ2+UJLeWlIAFrSre2Y+LS7+c6ooozZ3sC3TuCqPn2PuUj4MNBzwX3t
+         O8iw==
+X-Gm-Message-State: AOAM531EOYMlThfazeptVhi+ya1Zpy5KsLNWfnYdiiCrqA9h0s9aKIpA
+        22nAQVZ6Jtkq1Wm9GO+fDSWvT4MMJ+A=
+X-Google-Smtp-Source: ABdhPJxVt7WQOG/Z339AZwa9Y1cxCTy8XG3CyNl+dLGu4DEga9pdPWEuG6/GfUcwiw7BgPH8bpYhhg==
+X-Received: by 2002:a63:9d0b:: with SMTP id i11mr648624pgd.429.1635379148867;
         Wed, 27 Oct 2021 16:59:08 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.07
+        by smtp.gmail.com with ESMTPSA id 142sm807908pgh.22.2021.10.27.16.59.08
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 27 Oct 2021 16:59:07 -0700 (PDT)
+        Wed, 27 Oct 2021 16:59:08 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v8 09/23] Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
-Date:   Wed, 27 Oct 2021 16:58:46 -0700
-Message-Id: <20211027235900.1882863-10-luiz.dentz@gmail.com>
+Subject: [PATCH v8 10/23] Bluetooth: hci_sync: Enable synch'd set_bredr
+Date:   Wed, 27 Oct 2021 16:58:47 -0700
+Message-Id: <20211027235900.1882863-11-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20211027235900.1882863-1-luiz.dentz@gmail.com>
 References: <20211027235900.1882863-1-luiz.dentz@gmail.com>
@@ -69,53 +69,53 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Brian Gix <brian.gix@intel.com>
 
-This creates a synchronized Write Fast Connectable call and attaches it
-to the MGMT_OP_SET_FAST_CONNECTABLE management opcode.
+Uses previously written:
+  hci_write_fast_connectable_sync
+  hci_update_scan_sync
+  hci_update_adv_data_sync
 
 Signed-off-by: Brian Gix <brian.gix@intel.com>
 ---
- include/net/bluetooth/hci_sync.h |  2 +
+ include/net/bluetooth/hci_sync.h |  1 +
  net/bluetooth/hci_sync.c         |  2 +-
- net/bluetooth/mgmt.c             | 70 ++++++++++++++------------------
- 3 files changed, 33 insertions(+), 41 deletions(-)
+ net/bluetooth/mgmt.c             | 72 ++++++++++++++++----------------
+ 3 files changed, 37 insertions(+), 38 deletions(-)
 
 diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index c4fa77321b31..1fb66b6f8a34 100644
+index 1fb66b6f8a34..03ffe95415fc 100644
 --- a/include/net/bluetooth/hci_sync.h
 +++ b/include/net/bluetooth/hci_sync.h
-@@ -68,6 +68,8 @@ int hci_disable_advertising_sync(struct hci_dev *hdev);
- int hci_update_passive_scan_sync(struct hci_dev *hdev);
+@@ -69,6 +69,7 @@ int hci_update_passive_scan_sync(struct hci_dev *hdev);
  int hci_update_passive_scan(struct hci_dev *hdev);
  
-+int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable);
-+
+ int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable);
++int hci_update_scan_sync(struct hci_dev *hdev);
+ 
  int hci_dev_open_sync(struct hci_dev *hdev);
  int hci_dev_close_sync(struct hci_dev *hdev);
- 
 diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 2f988d7f0008..f7c30b4e9aca 100644
+index f7c30b4e9aca..39fdb51c9698 100644
 --- a/net/bluetooth/hci_sync.c
 +++ b/net/bluetooth/hci_sync.c
-@@ -2193,7 +2193,7 @@ static int hci_write_auth_enable_sync(struct hci_dev *hdev)
- 				     HCI_CMD_TIMEOUT);
+@@ -2262,7 +2262,7 @@ static int hci_write_scan_enable_sync(struct hci_dev *hdev, u8 val)
+ 					    HCI_CMD_TIMEOUT);
  }
  
--static int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable)
-+int hci_write_fast_connectable_sync(struct hci_dev *hdev, bool enable)
+-static int hci_update_scan_sync(struct hci_dev *hdev)
++int hci_update_scan_sync(struct hci_dev *hdev)
  {
- 	struct hci_cp_write_page_scan_activity cp;
- 	u8 type;
+ 	u8 scan;
+ 
 diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index db2e5a2f4e03..098ce324f20f 100644
+index 098ce324f20f..1e244783c5e1 100644
 --- a/net/bluetooth/mgmt.c
 +++ b/net/bluetooth/mgmt.c
-@@ -5864,22 +5864,15 @@ static int set_scan_params(struct sock *sk, struct hci_dev *hdev,
+@@ -5953,20 +5953,14 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
  	return err;
  }
  
--static void fast_connectable_complete(struct hci_dev *hdev, u8 status,
--				      u16 opcode)
-+static void fast_connectable_complete(struct hci_dev *hdev, void *data, int err)
+-static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void set_bredr_complete(struct hci_dev *hdev, void *data, int err)
  {
 -	struct mgmt_pending_cmd *cmd;
 -
@@ -124,20 +124,19 @@ index db2e5a2f4e03..098ce324f20f 100644
 -	hci_dev_lock(hdev);
 +	struct mgmt_pending_cmd *cmd = data;
  
--	cmd = pending_find(MGMT_OP_SET_FAST_CONNECTABLE, hdev);
+-	cmd = pending_find(MGMT_OP_SET_BREDR, hdev);
 -	if (!cmd)
 -		goto unlock;
 +	bt_dev_dbg(hdev, "err %d", err);
  
 -	if (status) {
+-		u8 mgmt_err = mgmt_status(status);
 +	if (err) {
- 		mgmt_cmd_status(cmd->sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
--			        mgmt_status(status));
-+				mgmt_status(err));
- 	} else {
- 		struct mgmt_mode *cp = cmd->param;
++		u8 mgmt_err = mgmt_status(err);
  
-@@ -5892,10 +5885,15 @@ static void fast_connectable_complete(struct hci_dev *hdev, u8 status,
+ 		/* We need to restore the flag if related HCI commands
+ 		 * failed.
+@@ -5979,17 +5973,31 @@ static void set_bredr_complete(struct hci_dev *hdev, u8 status, u16 opcode)
  		new_settings(hdev, cmd->sk);
  	}
  
@@ -147,16 +146,25 @@ index db2e5a2f4e03..098ce324f20f 100644
  
 -unlock:
 -	hci_dev_unlock(hdev);
-+static int write_fast_connectable_sync(struct hci_dev *hdev, void *data)
++static int set_bredr_sync(struct hci_dev *hdev, void *data)
 +{
-+	struct mgmt_pending_cmd *cmd = data;
-+	struct mgmt_mode *cp = cmd->param;
++	int status;
 +
-+	return hci_write_fast_connectable_sync(hdev, cp->val);
++	status = hci_write_fast_connectable_sync(hdev, false);
++
++	if (!status)
++		status = hci_update_scan_sync(hdev);
++
++	/* Since only the advertising data flags will change, there
++	 * is no need to update the scan response data.
++	 */
++	if (!status)
++		status = hci_update_adv_data_sync(hdev, hdev->cur_adv_instance);
++
++	return status;
  }
  
- static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
-@@ -5903,58 +5901,50 @@ static int set_fast_connectable(struct sock *sk, struct hci_dev *hdev,
+ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
  {
  	struct mgmt_mode *cp = data;
  	struct mgmt_pending_cmd *cmd;
@@ -164,74 +172,55 @@ index db2e5a2f4e03..098ce324f20f 100644
  	int err;
  
  	bt_dev_dbg(hdev, "sock %p", sk);
+@@ -6061,15 +6069,19 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 		}
+ 	}
  
- 	if (!hci_dev_test_flag(hdev, HCI_BREDR_ENABLED) ||
- 	    hdev->hci_ver < BLUETOOTH_VER_1_2)
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
-+		return mgmt_cmd_status(sk, hdev->id,
-+				       MGMT_OP_SET_FAST_CONNECTABLE,
- 				       MGMT_STATUS_NOT_SUPPORTED);
- 
- 	if (cp->val != 0x00 && cp->val != 0x01)
--		return mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
-+		return mgmt_cmd_status(sk, hdev->id,
-+				       MGMT_OP_SET_FAST_CONNECTABLE,
- 				       MGMT_STATUS_INVALID_PARAMS);
- 
- 	hci_dev_lock(hdev);
- 
--	if (pending_find(MGMT_OP_SET_FAST_CONNECTABLE, hdev)) {
--		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
+-	if (pending_find(MGMT_OP_SET_BREDR, hdev)) {
+-		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
 -				      MGMT_STATUS_BUSY);
 -		goto unlock;
 -	}
 -
- 	if (!!cp->val == hci_dev_test_flag(hdev, HCI_FAST_CONNECTABLE)) {
--		err = send_settings_rsp(sk, MGMT_OP_SET_FAST_CONNECTABLE,
--					hdev);
-+		err = send_settings_rsp(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev);
- 		goto unlock;
- 	}
- 
- 	if (!hdev_is_powered(hdev)) {
- 		hci_dev_change_flag(hdev, HCI_FAST_CONNECTABLE);
--		err = send_settings_rsp(sk, MGMT_OP_SET_FAST_CONNECTABLE,
--					hdev);
-+		err = send_settings_rsp(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev);
- 		new_settings(hdev, sk);
- 		goto unlock;
- 	}
- 
--	cmd = mgmt_pending_add(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev,
--			       data, len);
+-	cmd = mgmt_pending_add(sk, MGMT_OP_SET_BREDR, hdev, data, len);
 -	if (!cmd) {
-+	cmd = mgmt_pending_new(sk, MGMT_OP_SET_FAST_CONNECTABLE, hdev, data,
-+			       len);
++	cmd = mgmt_pending_new(sk, MGMT_OP_SET_BREDR, hdev, data, len);
 +	if (!cmd)
  		err = -ENOMEM;
--		goto unlock;
--	}
 +	else
-+		err = hci_cmd_sync_queue(hdev, write_fast_connectable_sync, cmd,
-+					 fast_connectable_complete);
- 
--	hci_req_init(&req, hdev);
++		err = hci_cmd_sync_queue(hdev, set_bredr_sync, cmd,
++					 set_bredr_complete);
++
 +	if (err < 0) {
-+		mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
++		mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_BREDR,
 +				MGMT_STATUS_FAILED);
- 
--	__hci_req_write_fast_connectable(&req, cp->val);
- 
--	err = hci_req_run(&req, fast_connectable_complete);
--	if (err < 0) {
--		err = mgmt_cmd_status(sk, hdev->id, MGMT_OP_SET_FAST_CONNECTABLE,
--				      MGMT_STATUS_FAILED);
--		mgmt_pending_remove(cmd);
 +		if (cmd)
 +			mgmt_pending_free(cmd);
++
+ 		goto unlock;
  	}
  
+@@ -6078,20 +6090,6 @@ static int set_bredr(struct sock *sk, struct hci_dev *hdev, void *data, u16 len)
+ 	 */
+ 	hci_dev_set_flag(hdev, HCI_BREDR_ENABLED);
+ 
+-	hci_req_init(&req, hdev);
+-
+-	__hci_req_write_fast_connectable(&req, false);
+-	__hci_req_update_scan(&req);
+-
+-	/* Since only the advertising data flags will change, there
+-	 * is no need to update the scan response data.
+-	 */
+-	__hci_req_update_adv_data(&req, hdev->cur_adv_instance);
+-
+-	err = hci_req_run(&req, set_bredr_complete);
+-	if (err < 0)
+-		mgmt_pending_remove(cmd);
+-
  unlock:
+ 	hci_dev_unlock(hdev);
+ 	return err;
 -- 
 2.31.1
 
