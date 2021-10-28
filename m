@@ -2,287 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 43AC1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Oct 2021 08:12:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BD8F3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2942960F9B
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Oct 2021 08:12:15 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 99F7260FF2
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 28 Oct 2021 11:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229868AbhJ1IOk (ORCPT
+        id S230250AbhJ1LT6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Oct 2021 04:14:40 -0400
-Received: from vps.xff.cz ([195.181.215.36]:41332 "EHLO vps.xff.cz"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229626AbhJ1IOk (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Oct 2021 04:14:40 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=xff.cz; s=mail;
-        t=1635408732; bh=2LgnHICk1t4WEfAbEZ1eGdS28PBfhtqMRTeXwypmDbw=;
-        h=Date:From:To:Cc:Subject:X-My-GPG-KeyId:References:From;
-        b=GiXkEsP8dIaBOY5U9y8oUmCTP7hUnfE6NhC9wRcqsJMBBF1x+eR9Jusgyhum78FUS
-         ZYQJE70Sme9FrDKeCd7sV/YD4plipZKF7We910IPvMIUH7SU2fyWpC+aBuT9AruSBb
-         r25wY03goz4ewqzrS4+3YBHJZxFNpSS1U5/bXbP8=
-Date:   Thu, 28 Oct 2021 10:12:12 +0200
-From:   =?utf-8?Q?Ond=C5=99ej?= Jirman <megi@xff.cz>
-To:     Archie Pusaka <apusaka@google.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Hilda Wu <hildawu@realtek.com>,
+        Thu, 28 Oct 2021 07:19:58 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43270 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230177AbhJ1LT5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Oct 2021 07:19:57 -0400
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAE83C061745
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Oct 2021 04:17:30 -0700 (PDT)
+Received: by mail-pj1-x1049.google.com with SMTP id i1-20020a17090a4b8100b001a40857e556so2130213pjh.3
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Oct 2021 04:17:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=GLQ+L+UcYTSp2/Y+0P8XzAsQnHNY9bHOBMNnmhNwbDQ=;
+        b=d3NIcIwokIWonEmbf7MookaznzBcbbR/xPmbVwrpZ6ARy7MF/d2Cq7YDB37xDmq7GG
+         QL8l7FWYMHnfPHZsKHYBX3bpVUXUn57ihZLs2kPlkv/uMVBplpS+T2YC2unVWRalQnOn
+         JgugvJoAURa8Qt9vvQqvXurReq0r5yZybIbrvMOsiZZLimJgc07FE11UwNRe8qBqj+q4
+         sQKoznSpZ/FWXU0bCBzRG4y2/f89a2Sl3E/Letp2Oj7bZ72+1wwIv1tAYeRBRxB3QLFB
+         4XDu9RGA49JXcsxzZNm8RmXGHoCdTcY3SaXfASICvJ5hmNuvuB5vsn5zMpeja6pQKKMd
+         ffaQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=GLQ+L+UcYTSp2/Y+0P8XzAsQnHNY9bHOBMNnmhNwbDQ=;
+        b=BeS0poyUeb6ANS88TPipIgQEMdy5K2VQoo8K6enIjyUFtGDiWCJZPjStjQ8fuA/QZW
+         XYeyFJFKkAbGvVFcf5Oj5U1aUmUUJjbn78rio2H01bfPQ6FeSAXKJx9fDeGGXigp5m+f
+         nQs3v9bWlhS6BSvFOuuaZtn+KyS6AzxW54RiT7NK0WhnsYf7G0UGJ0dfHmlg8hWddPyz
+         CvBkIB9BQiT4n9RqCt1SASiMjdW4MvB50aFF7IOhnEA7MveeMreVaj9DzBjzQMy5pdWz
+         3N95F6yQFClU9Q8AdJefE69ATopFwNFFHg2p2xh3/oXIQskIVo1mrRiVYr0s3wnU9DYy
+         761w==
+X-Gm-Message-State: AOAM533M6lN7DQDv2iKets8XaLgoF0VpjcL11ztB3Y6WqXJdfJ2Ii5q7
+        ddmjuwXLhlw+ujFNiPXTd8nuEN6v6pevXdfFFfsEp/fRtmSM7IHMQTR69pzUNaPay9voapta9wA
+        4eF5z5WoisroV1qPaXSMRBhs5DD6kFCviJTU7qF1I+LqocOWPKMv9YJm0iXSWX1zPYBPrjeUhFN
+        bB
+X-Google-Smtp-Source: ABdhPJzEqxn6IlTlcgdVmZzZkIoBUXuXH7A8M3mYc2iyg5hmt+gKEEUQiKxEpUouvDg+fQsOv6AiTHJj1x0U
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:a9d:c667:f9ff:b40e])
+ (user=apusaka job=sendgmr) by 2002:a17:902:7608:b0:141:9a53:ceff with SMTP id
+ k8-20020a170902760800b001419a53ceffmr779355pll.78.1635419850277; Thu, 28 Oct
+ 2021 04:17:30 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 19:17:25 +0800
+Message-Id: <20211028191723.1.I94a358fc5abdb596412a2e22dd2b73b71f56fa82@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.0.1079.g6e70778dc9-goog
+Subject: [PATCH] Bluetooth: Fix removing adv when processing cmd complete
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 3/3] Bluetooth: hci_h5: Add runtime suspend
-Message-ID: <20211028081212.puugl7keomly56ll@core>
-Mail-Followup-To: =?utf-8?Q?Ond=C5=99ej?= Jirman <megi@xff.cz>,
-        Archie Pusaka <apusaka@google.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Hilda Wu <hildawu@realtek.com>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org
-X-My-GPG-KeyId: EBFBDDE11FB918D44D1F56C1F9F0A873BE9777ED
- <https://xff.cz/key.txt>
-References: <20210723193137.v3.1.I68649745bd11a83265f1e816bf34ecc82775e95a@changeid>
- <20210723193137.v3.3.I4b323d2adf1dca62777c41de344a7d2f79b7f908@changeid>
- <20211027222326.e55g26ezaxpk7kkm@core>
- <20211027234722.2rjmxhivrkae2fai@core>
- <CAJQfnxFt5OVs1Tw9q6JVkQeKpEFfjyX6MM4qLkDLf02rRL7gew@mail.gmail.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJQfnxFt5OVs1Tw9q6JVkQeKpEFfjyX6MM4qLkDLf02rRL7gew@mail.gmail.com>
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hell Archie,
+From: Archie Pusaka <apusaka@chromium.org>
 
-On Thu, Oct 28, 2021 at 10:06:58AM +0800, Archie Pusaka wrote:
-> Hi Ondrej,
-> 
-> There's a mistake on my side with the WAKEUP_DISABLE flag, but it's
-> fixed by Hans in this patch.
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/commit/drivers/bluetooth/hci_h5.c?id=9a9023f314873241a43b5a2b96e9c0caaa958433
-> Could you try and see whether that fixes your issue?
+If we remove one instance of adv using Set Extended Adv Enable, there
+is a possibility of issue occurs when processing the Command Complete
+event. Especially, the adv_info might not be found since we already
+remove it in hci_req_clear_adv_instance() -> hci_remove_adv_instance().
+If that's the case, we will mistakenly proceed to remove all adv
+instances instead of just one single instance.
 
-Yes, that fixes the issue. Thanks. :)
+This patch fixes the issue by checking the content of the HCI command
+instead of checking whether the adv_info is found.
 
-kind regards,
-	o.
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 
-> Thanks,
-> Archie
-> 
-> 
-> On Thu, 28 Oct 2021 at 07:47, Ondřej Jirman <megi@xff.cz> wrote:
-> >
-> > On Thu, Oct 28, 2021 at 12:23:26AM +0200, megi xff wrote:
-> > > Hello Archie,
-> > >
-> > > On Fri, Jul 23, 2021 at 07:31:57PM +0800, Archie Pusaka wrote:
-> > > > From: Archie Pusaka <apusaka@chromium.org>
-> > > >
-> > > > This patch allows the controller to suspend after a short period of
-> > > > inactivity.
-> > >
-> > > I see this pattern in dmesg after this patch: (I've added printks
-> > > to many hci_h5 functions to see what's going on)
-> > >
-> > > [  493.150325] h5_dequeue
-> > > [  493.150332] h5_dequeue
-> > > [  493.150336] h5_dequeue
-> > > [  493.150340] h5_dequeue
-> > > [  493.150370] h5_dequeue
-> > > [  493.150547] h5_recv
-> > > [  493.150863] h5_recv
-> > > [  493.150878] h5_dequeue
-> > > [  493.150885] h5_dequeue
-> > > [  493.150888] h5_dequeue
-> > > [  493.151315] h5_enqueue
-> > > [  493.151328] h5_dequeue
-> > > [  493.151350] h5_dequeue
-> > > [  493.151447] h5_dequeue
-> > > [  493.151612] h5_recv
-> > > [  493.151945] h5_recv
-> > > [  493.151961] h5_dequeue
-> > > [  493.151967] h5_dequeue
-> > > [  493.151970] h5_dequeue
-> > > [  495.171812] h5_flush
-> > > [  495.171845] h5_flush
-> > > [  499.267473] h5_serdev_suspend
-> > > [  499.267490] h5_btrtl_suspend
-> > > [  499.273784] h5_recv
-> > > [  499.273828] h5_serdev_resume
-> > > [  499.273833] h5_btrtl_resume
-> > > [  499.273837] h5_btrtl_resume / reprobe
-> > > [  499.273855] h5_btrtl_reprobe_worker
-> > > [  499.273913] h5_serdev_remove
-> > > [  499.274997] h5_close
-> > > [  499.275010] h5_btrtl_close
-> > > [  499.275624] h5_serdev_probe
-> > > [  499.276126] h5_open
-> > > [  499.276132] h5_btrtl_open
-> > > [  499.915820] h5_dequeue
-> > > [  499.915857] h5_dequeue
-> > > [  499.915863] h5_dequeue
-> > > [  499.916212] h5_dequeue
-> > > [  499.919643] h5_recv
-> > > [  499.919675] h5_dequeue
-> > > [  499.919682] h5_dequeue
-> > > [  499.919687] h5_dequeue
-> > > [  499.919692] h5_dequeue
-> > >
-> > > repeating ad nauseam every 6s.
-> > >
-> > > Basically bluetooth device reprobes every 6s. Looks like h5_recv call
-> > > after h5_btrtl_suspend wakes the device immediately after suspend.
-> > >
-> > > (there are no users of bluetooth in my userspace) I'd expect the
-> > > device to stay suspended after suspend.
-> > >
-> > > I have some extra patches to support 8723cs but nothing that
-> > > would affect this codepath. https://megous.com/git/linux/log/?h=bt-5.15
-> > >
-> > > I assume it will have the same behavior with 8723bs which is already
-> > > mainline. I guess this issue is specific to devices with H5_INFO_WAKEUP_DISABLE
-> > > flag set.
-> > >
-> > > Do you have any ideas?
-> >
-> > I've added dump_stack() to first h5_recv call after suspend (the one
-> > that's causing the immediate wakeup after runtime PM suspend), and it returns:
-> >
-> > [    5.938258] recv
-> > [   13.377775] suspend
-> > [   13.384106] recv
-> > [   13.384120] CPU: 1 PID: 83 Comm: kworker/u8:1 Tainted: G         C        5.15.0-rc7-00002-g64f2c49e8400 #23
-> > [   13.384141] Hardware name: Pine64 PinePhone (1.2) (DT)
-> > [   13.384151] Workqueue: events_unbound flush_to_ldisc
-> > [   13.384196] Call trace:
-> > [   13.384199]  dump_backtrace+0x0/0x15c
-> > [   13.384224]  show_stack+0x14/0x20
-> > [   13.384232]  dump_stack_lvl+0x64/0x7c
-> > [   13.384250]  dump_stack+0x14/0x2c
-> > [   13.384258]  h5_recv+0x44/0xdbc [hci_uart]
-> > [   13.384288]  hci_uart_receive_buf+0x6c/0x94 [hci_uart]
-> > [   13.384298]  ttyport_receive_buf+0x60/0xf4
-> > [   13.384318]  flush_to_ldisc+0xb0/0x160
-> > [   13.384324]  process_one_work+0x1d8/0x380
-> > [   13.384339]  worker_thread+0x178/0x4e0
-> > [   13.384348]  kthread+0x11c/0x130
-> > [   13.384359]  ret_from_fork+0x10/0x20
-> >
-> > It's comming from here https://elixir.bootlin.com/linux/latest/source/drivers/tty/tty_buffer.c#L510
-> >
-> > Which can be scheduled from these places:
-> >
-> > - https://elixir.bootlin.com/linux/latest/source/drivers/tty/tty_buffer.c#L65
-> > - https://elixir.bootlin.com/linux/latest/source/drivers/tty/tty_buffer.c#L413
-> >
-> > And that's where I lose a thread of what can be happening. :)
-> >
-> > Maybe h5_recv is not a good function to mark activity on the device,
-> > due to tty_buffer code just calling it to check if some data are
-> > available, even if none are? Even if nothing uses bluetooth from
-> > userspace...
-> >
-> > kind regards,
-> >         o.
-> >
-> > > kind regards,
-> > >       o.
-> > >
-> > >
-> > > > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> > > > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-> > > > Reviewed-by: Hilda Wu <hildawu@realtek.com>
-> > > >
-> > > > ---
-> > > >
-> > > > Changes in v3:
-> > > > * Reordering #include
-> > > >
-> > > >  drivers/bluetooth/hci_h5.c | 20 ++++++++++++++++++++
-> > > >  1 file changed, 20 insertions(+)
-> > > >
-> > > > diff --git a/drivers/bluetooth/hci_h5.c b/drivers/bluetooth/hci_h5.c
-> > > > index cbc63b057f33..0c0dedece59c 100644
-> > > > --- a/drivers/bluetooth/hci_h5.c
-> > > > +++ b/drivers/bluetooth/hci_h5.c
-> > > > @@ -12,6 +12,7 @@
-> > > >  #include <linux/kernel.h>
-> > > >  #include <linux/mod_devicetable.h>
-> > > >  #include <linux/of_device.h>
-> > > > +#include <linux/pm_runtime.h>
-> > > >  #include <linux/serdev.h>
-> > > >  #include <linux/skbuff.h>
-> > > >
-> > > > @@ -21,6 +22,8 @@
-> > > >  #include "btrtl.h"
-> > > >  #include "hci_uart.h"
-> > > >
-> > > > +#define SUSPEND_TIMEOUT_MS 6000
-> > > > +
-> > > >  #define HCI_3WIRE_ACK_PKT  0
-> > > >  #define HCI_3WIRE_LINK_PKT 15
-> > > >
-> > > > @@ -584,6 +587,10 @@ static int h5_recv(struct hci_uart *hu, const void *data, int count)
-> > > >             count -= processed;
-> > > >     }
-> > > >
-> > > > +   pm_runtime_get(&hu->serdev->dev);
-> > > > +   pm_runtime_mark_last_busy(&hu->serdev->dev);
-> > > > +   pm_runtime_put_autosuspend(&hu->serdev->dev);
-> > > > +
-> > > >     return 0;
-> > > >  }
-> > > >
-> > > > @@ -620,6 +627,10 @@ static int h5_enqueue(struct hci_uart *hu, struct sk_buff *skb)
-> > > >             break;
-> > > >     }
-> > > >
-> > > > +   pm_runtime_get_sync(&hu->serdev->dev);
-> > > > +   pm_runtime_mark_last_busy(&hu->serdev->dev);
-> > > > +   pm_runtime_put_autosuspend(&hu->serdev->dev);
-> > > > +
-> > > >     return 0;
-> > > >  }
-> > > >
-> > > > @@ -951,6 +962,12 @@ static void h5_btrtl_open(struct h5 *h5)
-> > > >     serdev_device_set_parity(h5->hu->serdev, SERDEV_PARITY_EVEN);
-> > > >     serdev_device_set_baudrate(h5->hu->serdev, 115200);
-> > > >
-> > > > +   pm_runtime_set_active(&h5->hu->serdev->dev);
-> > > > +   pm_runtime_use_autosuspend(&h5->hu->serdev->dev);
-> > > > +   pm_runtime_set_autosuspend_delay(&h5->hu->serdev->dev,
-> > > > +                                    SUSPEND_TIMEOUT_MS);
-> > > > +   pm_runtime_enable(&h5->hu->serdev->dev);
-> > > > +
-> > > >     /* The controller needs up to 500ms to wakeup */
-> > > >     gpiod_set_value_cansleep(h5->enable_gpio, 1);
-> > > >     gpiod_set_value_cansleep(h5->device_wake_gpio, 1);
-> > > > @@ -959,6 +976,8 @@ static void h5_btrtl_open(struct h5 *h5)
-> > > >
-> > > >  static void h5_btrtl_close(struct h5 *h5)
-> > > >  {
-> > > > +   pm_runtime_disable(&h5->hu->serdev->dev);
-> > > > +
-> > > >     gpiod_set_value_cansleep(h5->device_wake_gpio, 0);
-> > > >     gpiod_set_value_cansleep(h5->enable_gpio, 0);
-> > > >  }
-> > > > @@ -1066,6 +1085,7 @@ MODULE_DEVICE_TABLE(acpi, h5_acpi_match);
-> > > >
-> > > >  static const struct dev_pm_ops h5_serdev_pm_ops = {
-> > > >     SET_SYSTEM_SLEEP_PM_OPS(h5_serdev_suspend, h5_serdev_resume)
-> > > > +   SET_RUNTIME_PM_OPS(h5_serdev_suspend, h5_serdev_resume, NULL)
-> > > >  };
-> > > >
-> > > >  static const struct of_device_id rtl_bluetooth_of_match[] = {
-> > > > --
-> > > > 2.32.0.432.gabb21c7263-goog
-> > > >
+---
+
+ net/bluetooth/hci_event.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 3cba2bbefcd6..894670419a27 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1326,8 +1326,10 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
+ 					   &conn->le_conn_timeout,
+ 					   conn->conn_timeout);
+ 	} else {
+-		if (adv) {
+-			adv->enabled = false;
++		if (cp->num_of_sets) {
++			if (adv)
++				adv->enabled = false;
++
+ 			/* If just one instance was disabled check if there are
+ 			 * any other instance enabled before clearing HCI_LE_ADV
+ 			 */
+-- 
+2.33.0.1079.g6e70778dc9-goog
+
