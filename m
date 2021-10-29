@@ -2,312 +2,129 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2F9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 06:13:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A1B94C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 06:35:26 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81DED60FF2
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 06:13:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 83AFD61166
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 06:35:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231961AbhJ2GQT (ORCPT
+        id S232110AbhJ2Ghw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Oct 2021 02:16:19 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45934 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231774AbhJ2GQS (ORCPT
+        Fri, 29 Oct 2021 02:37:52 -0400
+Received: from mail-il1-f199.google.com ([209.85.166.199]:37761 "EHLO
+        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232100AbhJ2Ghs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Oct 2021 02:16:18 -0400
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CD28C061570
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Oct 2021 23:13:50 -0700 (PDT)
-Received: by mail-pj1-x1033.google.com with SMTP id t5-20020a17090a4e4500b001a0a284fcc2so9805508pjl.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Oct 2021 23:13:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yVbBNlcH8Du6P6FZ6xZpuNsX+i4q1Tn0d6nGipaE1mk=;
-        b=q0mOS8bwUWNb21UYRKsP0SENOqwZNCuTgLIAdx2J68Kia6hXCuhzjLR8FxZ1a20AIM
-         L4Xwb98HuHAucmKjD/DByyNYMkQRgVQGBSZUJteHc2u2TyIUfB2cwxd4j48zUlMWI2jN
-         ucD9VEgLBItWtgoXqiw2rr62UfUB5qlsIM8SE14wz4NYbXazbStcY6aIAsGk8oxJD5Rr
-         DeKMp1ZZWdILXwaT43MKnVH5XAxbvgOHx2h61wKMJBI9hkITqvnZK6JmtOL+i8h9TGIL
-         uzdvyYeeaDxbiM8ufMNkDLIobgPcbuzDOXkL2uq0oA/FQPwCB14Si39bwD3QQkWiOuTB
-         c11w==
+        Fri, 29 Oct 2021 02:37:48 -0400
+Received: by mail-il1-f199.google.com with SMTP id x5-20020a056e021bc500b0025a9bf89937so5425319ilv.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 28 Oct 2021 23:35:20 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=yVbBNlcH8Du6P6FZ6xZpuNsX+i4q1Tn0d6nGipaE1mk=;
-        b=CfJvCv5Tmmg0l8ROWdA+ILPlCBKg1w37LHMdbKLbiJJ+mrdmlTu9sqvPj+NT+n0pgl
-         aEokjQewJT1Ml1soYjvcB5RPM7uklTFXrYBIOsofSJx2aUKUBP6ULhGkQ+c4VpEgQbsb
-         4dzYprwa5uzKTLsA7r+1uks9/+oA0G5fVU7jGAHbQN3LBG5r+PU0KxEnXUejifGhAyJU
-         LLm5Wijt51QkPM00gMwBepTCNEDrWkQ0V65Dcb68lIKzyRBSw3BfozEeDCUYwmGGQlBW
-         JsekA3POjPSPbfrSf0mAEmpu9G0TyWHmea7ZwQEmYN9fqTyZRh0byfYWSbUbVmWjAhS2
-         mfTQ==
-X-Gm-Message-State: AOAM533BLzfGHiVzoADp/kHWfKfY9IBH5BHbwGMnVgZHL3QmnyPt+xI8
-        ds8r34xl+zwXTZkREip4h2v6fZgZPxNo3A==
-X-Google-Smtp-Source: ABdhPJz3WhG3+iWL4aZfM9qSzO72g4uhZovLZtjtih8BkFuQedzLPXkLxFkPKB9uXt5Ox8FAc22crA==
-X-Received: by 2002:a17:902:c102:b0:13f:5507:bdc9 with SMTP id 2-20020a170902c10200b0013f5507bdc9mr8031762pli.8.1635488029456;
-        Thu, 28 Oct 2021 23:13:49 -0700 (PDT)
-Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:11f1:754d:5bb:5f40])
-        by smtp.gmail.com with ESMTPSA id h10sm6012991pfc.104.2021.10.28.23.13.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 28 Oct 2021 23:13:48 -0700 (PDT)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [RFC PATCH] Bluetooth: vhci: Add new packet type for VHCI
-Date:   Thu, 28 Oct 2021 23:13:45 -0700
-Message-Id: <20211029061345.676005-1-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=J5Iak1jbzsXlXScJo28fGKWHSz8PYkl1htafvPcEf8I=;
+        b=KF2XE1xdi8L51WnAoYRpSwONwtdaiSKS9iXREpxYh6e2tGCQo4FKMZJcZQm/E060jZ
+         qjGw1rWW+Gyoh7qpXz6na2Moa0m2cJe4lCkcPbpLO+t+2YUoSxoqvMjf4oyNJhVNxxQW
+         vhF3/kUh2gfuDURwNRXVn7nn/5pIdSKdMdq7gEIXmFmGxfftIqpH1yAIaOjQAl6OSUnL
+         zbVdjU53mRwuaz3G45tre7HziCSeMAznLLp9DUd09oINFckYE5CKRsokAgOFg9SpPvxs
+         HZWAnVXBBi2I48ErHlNpMSzUsVDn369nvf+/29EeNaS2dfqbw278rS5nKrYEdFMNpc3t
+         9GMg==
+X-Gm-Message-State: AOAM5302Ww/DRdp7cI8YjkE3MjDATIx23vyz1b/Ywk/QfZTDJTBUXZgV
+        df7gulCrPywlpEt5Jzhjd7Qq0OW3XvS+3tmYolD4D0fzhn83
+X-Google-Smtp-Source: ABdhPJwzYUNIF+88XIaTqHIhDJWNunmOteoFoXYLDu2GKr0U5jX/3QDj8NPfXuUrl/5cxz0sS4nqjr/7x0IzsCXdyOoNSnO14VCV
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a92:d752:: with SMTP id e18mr6445635ilq.31.1635489320130;
+ Thu, 28 Oct 2021 23:35:20 -0700 (PDT)
+Date:   Thu, 28 Oct 2021 23:35:20 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f5dc0805cf7807a7@google.com>
+Subject: [syzbot] KMSAN: uninit-value in hci_conn_request_evt
+From:   syzbot <syzbot+8f84cf3ec5c288e779ef@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, glider@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hello,
 
-Current implementation uses the Vendor packet type (0xff) with opcode
-parameter. But there is no way to expand the opcode and no available bits
-to use. Also it cannot be changed due to the backward compatibility
-with older kernel.
+syzbot found the following issue on:
 
-So, this patch adds new packet type dedicated for VHCI(0xfe) to support
-configuring the VHCI device with quarks and flags while creating the
-VHCI driver.
+HEAD commit:    82e66ad2e586 kmsan: core: better comment
+git tree:       https://github.com/google/kmsan.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=157ae0e2b00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=3ea742e10a5398fb
+dashboard link: https://syzkaller.appspot.com/bug?extid=8f84cf3ec5c288e779ef
+compiler:       clang version 14.0.0 (git@github.com:llvm/llvm-project.git 0996585c8e3b3d409494eb5f1cad714b9e1f7fb5), GNU ld (GNU Binutils for Debian) 2.35.2
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8f84cf3ec5c288e779ef@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in hci_proto_connect_ind include/net/bluetooth/hci_core.h:1460 [inline]
+BUG: KMSAN: uninit-value in hci_conn_request_evt+0x220/0x1290 net/bluetooth/hci_event.c:2783
+ hci_proto_connect_ind include/net/bluetooth/hci_core.h:1460 [inline]
+ hci_conn_request_evt+0x220/0x1290 net/bluetooth/hci_event.c:2783
+ hci_event_packet+0x1489/0x22e0 net/bluetooth/hci_event.c:6315
+ hci_rx_work+0x6ae/0xd10 net/bluetooth/hci_core.c:5136
+ process_one_work+0xdc7/0x1760 kernel/workqueue.c:2297
+ worker_thread+0x1101/0x22b0 kernel/workqueue.c:2444
+ kthread+0x66b/0x780 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30
+
+Uninit was created at:
+ slab_alloc_node mm/slub.c:3221 [inline]
+ __kmalloc_node_track_caller+0x8d2/0x1340 mm/slub.c:4955
+ kmalloc_reserve net/core/skbuff.c:355 [inline]
+ __alloc_skb+0x4db/0xe40 net/core/skbuff.c:426
+ alloc_skb include/linux/skbuff.h:1116 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:389 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:165 [inline]
+ vhci_write+0x182/0x8f0 drivers/bluetooth/hci_vhci.c:285
+ call_write_iter include/linux/fs.h:2163 [inline]
+ new_sync_write fs/read_write.c:507 [inline]
+ vfs_write+0x1295/0x1f20 fs/read_write.c:594
+ ksys_write+0x28c/0x520 fs/read_write.c:647
+ __do_sys_write fs/read_write.c:659 [inline]
+ __se_sys_write fs/read_write.c:656 [inline]
+ __x64_sys_write+0xdb/0x120 fs/read_write.c:656
+ do_syscall_x64 arch/x86/entry/common.c:51 [inline]
+ do_syscall_64+0x54/0xd0 arch/x86/entry/common.c:82
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+=====================================================
+Kernel panic - not syncing: panic_on_kmsan set ...
+CPU: 1 PID: 6390 Comm: kworker/u5:1 Tainted: G    B             5.15.0-rc2-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x1ff/0x28e lib/dump_stack.c:106
+ dump_stack+0x25/0x28 lib/dump_stack.c:113
+ panic+0x44f/0xdeb kernel/panic.c:232
+ kmsan_report+0x2ee/0x300 mm/kmsan/report.c:168
+ __msan_warning+0xb4/0x100 mm/kmsan/instrumentation.c:199
+ hci_proto_connect_ind include/net/bluetooth/hci_core.h:1460 [inline]
+ hci_conn_request_evt+0x220/0x1290 net/bluetooth/hci_event.c:2783
+ hci_event_packet+0x1489/0x22e0 net/bluetooth/hci_event.c:6315
+ hci_rx_work+0x6ae/0xd10 net/bluetooth/hci_core.c:5136
+ process_one_work+0xdc7/0x1760 kernel/workqueue.c:2297
+ worker_thread+0x1101/0x22b0 kernel/workqueue.c:2444
+ kthread+0x66b/0x780 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30
+Kernel Offset: disabled
+Rebooting in 86400 seconds..
+
+
 ---
- drivers/bluetooth/hci_vhci.c | 161 ++++++++++++++++++++++++++++++-----
- include/net/bluetooth/hci.h  |   1 +
- 2 files changed, 140 insertions(+), 22 deletions(-)
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 49ac884d996e..4ae1e861b3a8 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -30,6 +30,20 @@
- 
- static bool amp;
- 
-+struct vhci_ext_create_device_req {
-+	__u8	dev_type;
-+	__u32	flags;
-+} __packed;
-+
-+#define VHCI_FLAG_QUIRK_RAW_DEVICE		0x01
-+#define VHCI_FLAG_QUIRK_EXTERNAL_CONFIG		0x02
-+#define VHCI_FLAG_QUIRKS_INVALID_BDADDR		0x04
-+
-+struct vhci_ext_create_device_resp {
-+	__u8	dev_type;
-+	__u16	index;
-+} __packed;
-+
- struct vhci_data {
- 	struct hci_dev *hdev;
- 
-@@ -278,6 +292,38 @@ static int vhci_setup(struct hci_dev *hdev)
- 	return 0;
- }
- 
-+static void vhci_create_debugfs(struct hci_dev *hdev)
-+{
-+	struct vhci_data *data = hci_get_drvdata(hdev);
-+
-+	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
-+			    &force_suspend_fops);
-+
-+	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
-+			    &force_wakeup_fops);
-+
-+	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
-+		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
-+				    &msft_opcode_fops);
-+
-+	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
-+		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
-+				    &aosp_capable_fops);
-+}
-+
-+static void vhci_setup_hdev(struct hci_dev *hdev)
-+{
-+	hdev->open  = vhci_open_dev;
-+	hdev->close = vhci_close_dev;
-+	hdev->flush = vhci_flush;
-+	hdev->send  = vhci_send_frame;
-+	hdev->get_data_path_id = vhci_get_data_path_id;
-+	hdev->get_codec_config_data = vhci_get_codec_config_data;
-+	hdev->wakeup = vhci_wakeup;
-+	hdev->setup = vhci_setup;
-+	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
-+}
-+
- static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- {
- 	struct hci_dev *hdev;
-@@ -313,15 +359,7 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	hdev->dev_type = dev_type;
- 	hci_set_drvdata(hdev, data);
- 
--	hdev->open  = vhci_open_dev;
--	hdev->close = vhci_close_dev;
--	hdev->flush = vhci_flush;
--	hdev->send  = vhci_send_frame;
--	hdev->get_data_path_id = vhci_get_data_path_id;
--	hdev->get_codec_config_data = vhci_get_codec_config_data;
--	hdev->wakeup = vhci_wakeup;
--	hdev->setup = vhci_setup;
--	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
-+	vhci_setup_hdev(hdev);
- 
- 	/* bit 6 is for external configuration */
- 	if (opcode & 0x40)
-@@ -339,19 +377,7 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 		return -EBUSY;
- 	}
- 
--	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
--			    &force_suspend_fops);
--
--	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
--			    &force_wakeup_fops);
--
--	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
--		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
--				    &msft_opcode_fops);
--
--	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
--		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
--				    &aosp_capable_fops);
-+	vhci_create_debugfs(hdev);
- 
- 	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
- 
-@@ -364,6 +390,67 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	return 0;
- }
- 
-+static int __vhci_ext_create_device(struct vhci_data *data, __u8 dev_type,
-+								__u32 flags)
-+{
-+	struct hci_dev *hdev;
-+	struct sk_buff *skb;
-+	struct vhci_ext_create_device_resp *resp;
-+
-+	if (data->hdev)
-+		return -EBADFD;
-+
-+	if (dev_type != HCI_PRIMARY && dev_type != HCI_AMP)
-+		return -EINVAL;
-+
-+	skb = bt_skb_alloc(sizeof(*resp) + 1, GFP_KERNEL);
-+	if (!skb)
-+		return -ENOMEM;
-+
-+	hdev = hci_alloc_dev();
-+	if (!hdev) {
-+		kfree_skb(skb);
-+		return -ENOMEM;
-+	}
-+
-+	data->hdev = hdev;
-+
-+	hdev->bus = HCI_VIRTUAL;
-+	hdev->dev_type = dev_type;
-+	hci_set_drvdata(hdev, data);
-+
-+	vhci_setup_hdev(hdev);
-+
-+	/* Check quirks and set it for hdev */
-+	if (flags & VHCI_FLAG_QUIRK_EXTERNAL_CONFIG)
-+		set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
-+
-+	if (flags & VHCI_FLAG_QUIRK_RAW_DEVICE)
-+		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
-+
-+	if (flags & VHCI_FLAG_QUIRKS_INVALID_BDADDR)
-+		set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
-+
-+	if (hci_register_dev(hdev) < 0) {
-+		BT_ERR("Can't register HCI device");
-+		hci_free_dev(hdev);
-+		data->hdev = NULL;
-+		kfree_skb(skb);
-+		return -EBUSY;
-+	}
-+
-+	vhci_create_debugfs(hdev);
-+
-+	hci_skb_pkt_type(skb) = HCI_VHCI_PKT;
-+	skb_put_u8(skb, HCI_VHCI_PKT);
-+	skb_put_u8(skb, dev_type);
-+	put_unaligned_le16(hdev->id, skb_put(skb, 2));
-+	skb_queue_tail(&data->readq, skb);
-+
-+	wake_up_interruptible(&data->read_wait);
-+	return 0;
-+}
-+
- static int vhci_create_device(struct vhci_data *data, __u8 opcode)
- {
- 	int err;
-@@ -375,6 +462,18 @@ static int vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	return err;
- }
- 
-+static int vhci_ext_create_device(struct vhci_data *data, __u8 dev_type,
-+								__u32 flags)
-+{
-+	int err;
-+
-+	mutex_lock(&data->open_mutex);
-+	err = __vhci_ext_create_device(data, dev_type, flags);
-+	mutex_unlock(&data->open_mutex);
-+
-+	return err;
-+}
-+
- static inline ssize_t vhci_get_user(struct vhci_data *data,
- 				    struct iov_iter *from)
- {
-@@ -429,6 +528,24 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
- 		ret = vhci_create_device(data, opcode);
- 		break;
- 
-+	/* This packet type is for VHCI specific command */
-+	case HCI_VHCI_PKT:
-+		cancel_delayed_work_sync(&data->open_timeout);
-+		struct vhci_ext_create_device_req *req;
-+
-+		if (skb->len != sizeof(*req)) {
-+			kfree_skb(skb);
-+			return -EINVAL;
-+		}
-+
-+		req = (void *)skb->data;
-+		skb_pull(skb, sizeof(*req));
-+
-+		ret = vhci_ext_create_device(data, req->dev_type, req->flags);
-+
-+		kfree_skb(skb);
-+		break;
-+
- 	default:
- 		kfree_skb(skb);
- 		return -EINVAL;
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 63065bc01b76..35d720f9e17a 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -355,6 +355,7 @@ enum {
- #define HCI_EVENT_PKT		0x04
- #define HCI_ISODATA_PKT		0x05
- #define HCI_DIAG_PKT		0xf0
-+#define HCI_VHCI_PKT		0xfe
- #define HCI_VENDOR_PKT		0xff
- 
- /* HCI packet types */
--- 
-2.25.1
-
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
