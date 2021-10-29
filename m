@@ -2,122 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EACD1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 14:54:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 53138C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 17:23:36 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C3F12610FD
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 14:54:30 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 36EDC60FF2
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 17:23:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229635AbhJ2O46 convert rfc822-to-8bit (ORCPT
+        id S230044AbhJ2R0D (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Oct 2021 10:56:58 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:42025 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229549AbhJ2O46 (ORCPT
+        Fri, 29 Oct 2021 13:26:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57094 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230070AbhJ2R0A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Oct 2021 10:56:58 -0400
-Received: from smtpclient.apple (p4ff9fd51.dip0.t-ipconnect.de [79.249.253.81])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7E52ACED18;
-        Fri, 29 Oct 2021 16:54:28 +0200 (CEST)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v8 00/23] Bluetooth: HCI command synchronization
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211027235900.1882863-1-luiz.dentz@gmail.com>
-Date:   Fri, 29 Oct 2021 16:54:27 +0200
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <4633683C-42A0-47AE-94B1-9938CD5BCE82@holtmann.org>
-References: <20211027235900.1882863-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Fri, 29 Oct 2021 13:26:00 -0400
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8D5EC061570
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 10:23:31 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id j9so2372087pgh.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 10:23:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=a/FAL83tocLfRMIigxN3uatvf6Jyivl60CZmVMLFfss=;
+        b=dSEu/uCa5ZAUrY8jZbmb8jgcNaU9SdgWcnGkL0c/qSQySIR/AoMwbLSfHZYKMde5lG
+         XHmDs5hDiiqyL+F8gMbqNhm2e/7UQUR5+lUYEd6EPmOlOO8h8A9WmqeUzLP/B2IbJe+M
+         x6oaT5H/dW4YOBc5SWgYLn5JA5W9CqnS/hASKElvQHWqEnL4NXCujnvvYrVmR3i+9d0v
+         C2jVi8Dn2FmeafWmm8Z6h5HcM+I/dzzT0bFweaQZ5hY5qlpWHThud/k0nrrleUw6WFMU
+         yySS5alzFfhGfZ5ga+MBUMcKav4O7qU6fZ6VtvudmnVSOpVJ1CZ6jjojvqag/cx6cgSA
+         Xvig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=a/FAL83tocLfRMIigxN3uatvf6Jyivl60CZmVMLFfss=;
+        b=0Lakb6Y+9Z8AbOjZ4UlwH9ZxMiT5fE3MMWb5kGhPi9q7R7jUVuojupKDF/OkkDljFp
+         C8g03t4PlsPHvZIJGmbnN9L/c24bcEXg5LdLPw4rM7RQI5N/0znlP+kXU30cTuI70AjB
+         G3ULnCcDwpPCi/bSoWZJEQQnvUXWsW9EFE+fG/O3b4mfsb50XXGVeV4GRbZs6442lxjj
+         fVBjL8D7ys6prg9WsdvCnzqq07681WFa0DcFajmL5GFwliSQRwQ9l4NV/6lUnBfU5l0T
+         3F7kvNEpbWA+Ko2Nooy8xxfMASp29p2yYnczLjsfJWVh+YqJY8cHUps7wUjIX8/Nj1Zo
+         M8fg==
+X-Gm-Message-State: AOAM533YFc86hsseUgH3lte0O5a2Bf7yY2PNGkpo5mLsfauEA7iyrBYP
+        n7zDLtCJH0QgVQnykyN601bsl+4hHBGmvw==
+X-Google-Smtp-Source: ABdhPJzeF0xxkLLq1WEVMgxeX+Kte/ciB+eQumfX2kK5jpyZrjfVOWoxRjnuWCdJZs087dsaNRAnWg==
+X-Received: by 2002:a05:6a00:14c2:b0:47c:2c90:df4f with SMTP id w2-20020a056a0014c200b0047c2c90df4fmr12044131pfu.63.1635528210759;
+        Fri, 29 Oct 2021 10:23:30 -0700 (PDT)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:11f1:754d:5bb:5f40])
+        by smtp.gmail.com with ESMTPSA id ne7sm2160743pjb.36.2021.10.29.10.23.29
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 29 Oct 2021 10:23:29 -0700 (PDT)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [BlueZ PATCH v15 1/2] tools/mgmt-tester: Update the expected manufacturer of emulator
+Date:   Fri, 29 Oct 2021 10:23:27 -0700
+Message-Id: <20211029172328.703752-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-> This is the initial work to move away from the current design of
-> batch up commands with hci_req_run to be executed asynchronously to
-> instead run them synchronously which enables handling errors properly.
-> 
-> It specially targets enabling the so called LL Privacy feature and
-> simplifying Suspend/Resume code paths since those are the most
-> complicated ones involving multiple state machines (Connection,
-> Advertising, Scanning and Adv Monitor) which requires a bunch commands
-> to be send making the code very complicated to follow.
-> 
-> As a result of these changes the LL Privacy is enabled for the
-> peripheral role, previously only central role had support for it, so it
-> is possible to have advertising sets when LL Privacy is enabled.
-> 
-> Suspend/Resume have been reworked so it no longer needs a state machine
-> to track its progress, the whole process of suspending is handled by
-> hci_suspend_sync and hci_resume_sync for resuming, we also took the time
-> to document the source code to make clear what is their expected behavior.
-> 
-> In order to properly test these changes a number of new tests are being
-> introduced see:
-> 
-> https://patchwork.kernel.org/project/bluetooth/list/?series=565857
-> 
-> v6: Fix CI findings, fix using ERR_PTR/PTR_ERR to pass parameters as user_data
-> and change the use of hci_dev *dev to hci_dev *hdev.
-> v7: More fixes for CI findings.
-> v8: Even more fixes for CI findings.
-> 
-> Brian Gix (13):
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
->  Bluetooth: hci_sync: Enable synch'd set_bredr
->  Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
->  Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
->  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
->  Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
->  Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
->  Bluetooth: hci_sync: Convert adv_expire
->  Bluetooth: hci_sync: Convert MGMT_OP_SSP
-> 
-> Luiz Augusto von Dentz (9):
->  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
->  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
->  Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
->  Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
->  Bluetooth: hci_sync: Rework background scan
->  Bluetooth: hci_sync: Convert MGMT_SET_POWERED
->  Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
->  Bluetooth: hci_sync: Rework init stages
->  Bluetooth: hci_sync: Rework hci_suspend_notifier
-> 
-> Marcel Holtmann (1):
->  Bluetooth: Add helper for serialized HCI command execution
-> 
-> include/net/bluetooth/bluetooth.h |    2 +
-> include/net/bluetooth/hci_core.h  |   21 +-
-> include/net/bluetooth/hci_sync.h  |   98 +
-> net/bluetooth/Makefile            |    2 +-
-> net/bluetooth/hci_conn.c          |   20 +-
-> net/bluetooth/hci_core.c          | 1333 +-------
-> net/bluetooth/hci_event.c         |  153 +-
-> net/bluetooth/hci_request.c       |  338 +-
-> net/bluetooth/hci_request.h       |   10 +
-> net/bluetooth/hci_sync.c          | 4788 +++++++++++++++++++++++++++++
-> net/bluetooth/mgmt.c              | 2050 ++++++------
-> net/bluetooth/mgmt_util.c         |   15 +-
-> net/bluetooth/mgmt_util.h         |    4 +
-> net/bluetooth/msft.c              |  511 +--
-> net/bluetooth/msft.h              |   15 +-
-> 15 files changed, 6370 insertions(+), 2990 deletions(-)
-> create mode 100644 include/net/bluetooth/hci_sync.h
-> create mode 100644 net/bluetooth/hci_sync.c
+This patch updates the expected manufacturer of the emulator for the
+following test cases:
 
-all 23 patches have been applied to bluetooth-next tree.
+> Read Ext Controller Info 1                           Failed
+> Read Ext Controller Info 2                           Failed
+> Read Ext Controller Info 3                           Failed
+> Read Ext Controller Info 4                           Failed
+> Read Ext Controller Info 5                           Failed
+---
+ tools/mgmt-tester.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Regards
-
-Marcel
+diff --git a/tools/mgmt-tester.c b/tools/mgmt-tester.c
+index 1ccce0ad6..ab3c81530 100644
+--- a/tools/mgmt-tester.c
++++ b/tools/mgmt-tester.c
+@@ -5669,7 +5669,7 @@ static const struct generic_data conn_central_adv_non_connectable_test = {
+ static const char ext_ctrl_info1[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+-	0x3f, 0x00, /* manufacturer */
++	0xf1, 0x05, /* manufacturer */
+ 	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x00, 0x00, 0x00, /* current settings */
+ 	0x09, 0x00, /* eir length */
+@@ -5714,7 +5714,7 @@ static const struct setup_mgmt_cmd set_dev_class_cmd_arr1[] = {
+ static const char ext_ctrl_info2[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+-	0x3f, 0x00, /* manufacturer */
++	0xf1, 0x05, /* manufacturer */
+ 	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x0D, 0x00, /* eir length */
+@@ -5745,7 +5745,7 @@ static const struct generic_data read_ext_ctrl_info2 = {
+ static const char ext_ctrl_info3[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+-	0x3f, 0x00, /* manufacturer */
++	0xf1, 0x05, /* manufacturer */
+ 	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x16, 0x00, /* eir length */
+@@ -5780,7 +5780,7 @@ static const struct generic_data read_ext_ctrl_info3 = {
+ static const char ext_ctrl_info4[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+-	0x3f, 0x00, /* manufacturer */
++	0xf1, 0x05, /* manufacturer */
+ 	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x80, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir length */
+@@ -5839,7 +5839,7 @@ static const struct setup_mgmt_cmd set_dev_class_cmd_arr2[] = {
+ static const char ext_ctrl_info5[] = {
+ 	0x00, 0x00, 0x00, 0x01, 0xaa, 0x00, /* btaddr */
+ 	0x09, /* version */
+-	0x3f, 0x00, /* manufacturer */
++	0xf1, 0x05, /* manufacturer */
+ 	0xff, 0xbf, 0x01, 0x00, /* supported settings */
+ 	0x81, 0x02, 0x00, 0x00, /* current settings */
+ 	0x1a, 0x00, /* eir len */
+-- 
+2.25.1
 
