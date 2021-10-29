@@ -2,223 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C69DCC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 11:00:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CC82EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 14:13:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9F5DD610CF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 11:00:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B26FE61175
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 14:13:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231872AbhJ2LCn (ORCPT
+        id S231631AbhJ2OPw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 29 Oct 2021 07:02:43 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53842 "EHLO
+        Fri, 29 Oct 2021 10:15:52 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41794 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231820AbhJ2LCk (ORCPT
+        with ESMTP id S231635AbhJ2OP2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 29 Oct 2021 07:02:40 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DCFAC061714
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 04:00:12 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 192so6968231wme.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 04:00:12 -0700 (PDT)
+        Fri, 29 Oct 2021 10:15:28 -0400
+Received: from mail-yb1-xb33.google.com (mail-yb1-xb33.google.com [IPv6:2607:f8b0:4864:20::b33])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A291C061714
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 07:13:00 -0700 (PDT)
+Received: by mail-yb1-xb33.google.com with SMTP id t127so24419943ybf.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 07:13:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc:content-transfer-encoding;
-        bh=O3oaDN2gpxryQcZbqbv+wyWbmX+dh9L0V5UJG38mn1g=;
-        b=flCgF7AmI58fDgqUzP7e4Us8VWrnow4KebbSQzVnOxr3F4YNjpk6Dg3qW+/Ai9684t
-         34KwUB9oajdImvPjBsMcI6ELBoaouFdO+cE/Sg/CC+vyED7hIxMbV0iSqHZrUdMOUWvr
-         anJRwKMkR2CzHG2Si5Fq1FlkUIjR10rO9IkAEPdZr2u4OD+e8flAPehf+BjYz4r8t7ux
-         puvaj0ySwfkm+UPyNWORajjj1FEL68PRsyxEdw6YWZqe+Z3NRrplCdBPL8d5CCaYTLLy
-         w7VhccfNk78AcIZeuBa61O0uHgiD2icuurk2qs6irkHFMQBAVWkyYxgV4q9Fqb9i58K1
-         gJHg==
+        bh=+rJt4ov4+izLAsb0pyA43/TdrlqNH3tPdm5bor1QYag=;
+        b=RfMZgD1sXygGqupmqGoOYrDXBXbPUKH0bdt+a/UhJ8fRgCpBQoHMkrXn/7I3Mo4HbT
+         GZF7D2mdtynEEgLNZRWycZTP77wwgzEFPtK4/deRFqk1IO5efyMfKf8vqg5qJJpiOLBO
+         HFhfDqDJDagSYR/eSVl7Wj2lOljnO7kdlKjEON4bHpOf0fGETJKvwJK2ji6tY/mQITXQ
+         bBQ4MR/6WbcreUb1dTZwvtuQLthFbY7O7OE3XbbrUkeQvTMkw1fpcybEVBZkZqK2SW5y
+         5bNZJ9zP1pdPigzeY73yS93QlPMfpL5i6Bf3RCEvcODuLzTY2xDAaUehAE3UUX+8/m/G
+         mVwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc:content-transfer-encoding;
-        bh=O3oaDN2gpxryQcZbqbv+wyWbmX+dh9L0V5UJG38mn1g=;
-        b=LphV/WvIVUAetQbiQM4uCVblXq694+1lH7/e7urOLMntVXR9MfAUegkP0b7NS1tQsF
-         n2tM6QVlF8prlxMFlDtXJG+KsSZUE8ClhtcuBpz/3fC9Brcw34e61E1v3n6Dh/w5keSf
-         yH/m9UhwXWexB/cwm6/CKtAF58oGuQctPUh4AdB09ZYObNNCHMuRV5ifktXCXm1GGg7a
-         NHMijIVkmT+Y4XLDdtTu2sG4R3FntImanwQscF/DPRtS/fE3+KES2Otgf3wLs996Pkbz
-         ugsHNZoZpjcQtoF5O6UnpgOYV4bsekX/BGCySrSw4beke3urEdw4RL+ppo+EKeeVtb2R
-         ZbYw==
-X-Gm-Message-State: AOAM530Wh2FtX557bC2KDdG8V8Ka6sj8zPNbnwM1tpkezWU4NyoaT915
-        9GX0zaYnphNmUrHxaEsKhfzHOOTWqsvUg3OmVC79+A==
-X-Google-Smtp-Source: ABdhPJzp3HpqOSlplACd7S5Zr4Q/rHXMCrVSWbXT+dp44F1UF8VRvaixwQVERUzCgLKyBTopiL0CGIgZ7KCJwEzyXZg=
-X-Received: by 2002:a1c:158:: with SMTP id 85mr11988175wmb.182.1635505210272;
- Fri, 29 Oct 2021 04:00:10 -0700 (PDT)
+        bh=+rJt4ov4+izLAsb0pyA43/TdrlqNH3tPdm5bor1QYag=;
+        b=IQ5kLOfIhlDH4jyV+40ftfRTZ1sGNV3F1+kzLAMzcYNaFJnsFuJbcY7OeOw7OH3QYy
+         ovN2R2zCjIpuw+1SeESpcc2M133FCIODXrHiMVyaEyX2BBZXLST9PIf8MaIsIVrfkrxF
+         NFITUubfIK4K+WjWF2HDkDXnHPfRK5m4zRDlslJPim6El6/2+IfBezbbGgdGpKjdLOx5
+         lM3VfjzWHPJKELEJVFCA5fR6aS6djXRgpGgz3xskKW6uoLoQr3lLtGmOJfyRcCdT79Kk
+         hnpr83E4xzeJ1JfA0bkQUV11/lQ8IQy3F5MogDD0A/VICsonUAh/rkSPnu7sTovEZugU
+         5lhA==
+X-Gm-Message-State: AOAM5338CvHY3FQBd92KwJqXot6tbFglouZNRBf7zHlsFiLQaWMtfH/S
+        SddX7OFMW/+h9+qdUJdWV5Sl1jDx0C72es/z5MOxCQ==
+X-Google-Smtp-Source: ABdhPJz8mkH0/PwXRtut74eX9v8EiIMUP7B3CU3hsMNud3yektEYYX5kvaF4lsgAfBKhhBDn0kaWfEHFNpyRfsKohRk=
+X-Received: by 2002:a25:3817:: with SMTP id f23mr11736645yba.436.1635516779311;
+ Fri, 29 Oct 2021 07:12:59 -0700 (PDT)
 MIME-Version: 1.0
-References: <20211028191805.1.I35b7f3a496f834de6b43a32f94b6160cb1467c94@changeid>
- <180B4F43-B60A-4326-A463-327645BA8F1B@holtmann.org> <CABBYNZKpcXGD6=RrVRGiAtHM+cfKEOL=-_tER1ow_VPrm6fFhQ@mail.gmail.com>
- <CAJQfnxH=hN7ZzqNzyKqzb=wSCNktUiSnMeh77fghsudvzJyVvg@mail.gmail.com>
- <E68EB205-8B05-4A44-933A-06C5955F561A@holtmann.org> <CAJQfnxHn51XRywv68xcL4u=qERyi2S0boLBOGBnBbUfu9pQWGQ@mail.gmail.com>
- <BEAEDCF9-75D7-4D34-B272-AD044533B311@holtmann.org>
-In-Reply-To: <BEAEDCF9-75D7-4D34-B272-AD044533B311@holtmann.org>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Fri, 29 Oct 2021 18:59:59 +0800
-Message-ID: <CAJQfnxEyd54v=CJTwE6rdZ7a0Hbh4A1cK=VUYSqteU9f8hpWrw@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Limit duration of Remote Name Resolve
+References: <20211021230356.v6.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
+ <20211021230356.v6.3.I257ac5cfaf955d15670479efc311bbab702397f4@changeid>
+ <AB7796C2-6543-43CD-8FA3-DAF57AB68767@holtmann.org> <CAHFy41_y8LS81gTHNidMdrD9tpeXf0YyvHaTKZJU+jmjuFgYXQ@mail.gmail.com>
+ <92566E17-4D3A-4FB5-83B2-E2B9D4BBE2EF@holtmann.org>
+In-Reply-To: <92566E17-4D3A-4FB5-83B2-E2B9D4BBE2EF@holtmann.org>
+From:   Joseph Hwang <josephsih@google.com>
+Date:   Fri, 29 Oct 2021 22:12:48 +0800
+Message-ID: <CAHFy419JNEh6DZ68+JBLFOyp_jJgWv9nSy1ejvD1hECsDgbT6A@mail.gmail.com>
+Subject: Re: [PATCH v6 3/3] Bluetooth: btusb: enable Mediatek to support AOSP extension
 To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        pali@kernel.org, chromeos-bluetooth-upstreaming@chromium.org,
         Miao-chen Chou <mcchou@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+        linux-kernel@vger.kernel.org,
+        =?UTF-8?B?TWFyay1ZVyBDaGVuICjpmbPmj5rmlocp?= 
+        <Mark-YW.Chen@mediatek.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Marcel:
 
+  I see your point. Thank you for letting us know the right way to go.
+I will discuss with Mediatek and request them to implement their
+specific setup() for the purpose. And then they will submit a new
+patch to enable AOSP extensions for their hardware.
 
-On Fri, 29 Oct 2021 at 18:11, Marcel Holtmann <marcel@holtmann.org> wrote:
+Thanks and regards,
+Joseph
+
+On Fri, Oct 29, 2021 at 4:21 PM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
 >
-> Hi Archie,
+> Hi Joseph,
 >
-> >>>>>> When doing remote name request, we cannot scan. In the normal case=
- it's
-> >>>>>> OK since we can expect it to finish within a short amount of time.
-> >>>>>> However, there is a possibility to scan lots of devices that
-> >>>>>> (1) requires Remote Name Resolve
-> >>>>>> (2) is unresponsive to Remote Name Resolve
-> >>>>>> When this happens, we are stuck to do Remote Name Resolve until al=
-l is
-> >>>>>> done before continue scanning.
-> >>>>>>
-> >>>>>> This patch adds a time limit to stop us spending too long on remot=
-e
-> >>>>>> name request. The limit is increased for every iteration where we =
-fail
-> >>>>>> to complete the RNR in order to eventually solve all names.
-> >>>>>>
-> >>>>>> Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-> >>>>>> Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> >>>>>>
-> >>>>>> ---
-> >>>>>> Hi maintainers, we found one instance where a test device spends ~=
-90
-> >>>>>> seconds to do Remote Name Resolving, hence this patch.
-> >>>>>> I think it's better if we reset the time limit to the default valu=
-e
-> >>>>>> at some point, but I don't have a good proposal where to do that, =
-so
-> >>>>>> in the end I didn't.
-> >>>>>
-> >>>>> do you have a btmon trace for this as well?
-> >>>>>
-> >>> Yes, but only from the scanning device side. It's all lined up with
-> >>> your expectation (e.g. receiving Page Timeout in RNR Complete event).
-> >>>
-> >>>>> The HCI Remote Name Request is essentially a paging procedure and t=
-hen a few LMP messages. It is fundamentally a connection request inside BR/=
-EDR and if you have a remote device that has page scan disabled, but inquir=
-y scan enabled, then you get into this funky situation. Sadly, the BR/EDR p=
-arts don=E2=80=99t give you any hint on this weird combination. You can't c=
-onfigure BlueZ that way since it is really stupid setup and I remember that=
- GAP doesn=E2=80=99t have this case either, but it can happen. So we might =
-want to check if that is what happens. And of course it needs to be a Bluet=
-ooth 2.0 device or a device that doesn=E2=80=99t support Secure Simple Pair=
-ing. There is a chance of really bad radio interference, but that is then j=
-ust bad luck and is only going to happen every once in a blue moon.
-> >>>>
-> >>> It might be the case. I don't know the peer device, but it looks like
-> >>> the user has a lot of these exact peer devices sitting in the same
-> >>> room.
-> >>> Or another possibility would be the user just turned bluetooth off fo=
-r
-> >>> these devices just after we scan them, such that they don't answer th=
-e
-> >>> RNR.
-> >>>
-> >>>> I wonder what does the remote sets as Page_Scan_Repetition_Mode in t=
-he
-> >>>> Inquiry Result, it seems quite weird that the specs allows such stag=
-e
-> >>>> but it doesn't have a value to represent in the inquiry result, anyw=
-ay
-> >>>> I guess changing that now wouldn't really make any different given
-> >>>> such device is probably never gonna update.
-> >>>>
-> >>> The page scan repetition mode is R1
-> >>
-> >> not sure if this actually matters if your clock drifted too much apart=
+> > Some of Mediatek's controllers/firmwares do NOT support AOSP extensions=
 .
-> >>
-> >>>>> That said, you should receive a Page Timeout in the Remote Name Req=
-uest Complete event for what you describe. Or you just use HCI Remote Name =
-Request Cancel to abort the paging. If I remember correctly then the settin=
-g for Page Timeout is also applied to Remote Name resolving procedure. So w=
-e could tweak that value. Actually once we get the =E2=80=9Csync=E2=80=9D w=
-ork merged, we could configure different Page Timeout for connection reques=
-ts and name resolving if that would help. Not sure if this is worth it, sin=
-ce we could as simple just cancel the request.
-> >>>>
-> >>>> If I recall this correctly we used to have something like that back =
-in
-> >>>> the days the daemon had control over the discovery, the logic was th=
-at
-> >>>> each round of discovery including the name resolving had a fixed tim=
-e
-> >>>> e.g. 10 sec, so if not all device found had their name resolved we
-> >>>> would stop and proceed to the next round that way we avoid this
-> >>>> problem of devices not resolving and nothing being discovered either=
-.
-> >>>> Luckily today there might not be many devices around without EIR
-> >>>> including their names but still I think it would be better to limit
-> >>>> the amount time we spend resolving names, also it looks like it sets
-> >>>> NAME_NOT_KNOWN when RNR fails and it never proceeds to request the
-> >>>> name again so I wonder why would it be waiting ~90 seconds, we don't
-> >>>> seem to change the page timeout so it should be using the default
-> >>>> which is 5.12s so I think there is something else at play.
-> >>>>
-> >>> Yeah, we received the Page Timeout after 5s, but then we proceed to
-> >>> continue RNR the next device, which takes another 5s, and so on.
-> >>> A couple of these devices can push waiting time over 90s.
-> >>> Looking at this, I don't think cancelling RNR would help much.
-> >>> This patch would like to reintroduce the time limit, but I decided to
-> >>> make the time limit grow, otherwise the bad RNR might take the whole
-> >>> time limit and we can't resolve any names.
-> >>
-> >> I am wondering if we should add a new flag to Device Found that will i=
-ndicate Name Resolving Failed after the first Page Timeout and then bluetoo=
-thd can decide via Confirm Name mgmt command to trigger the resolving or no=
-t. We can even add a 0x02 for Don=E2=80=99t Care About The Name.
-> >>
-> > This is a great idea.
-> > However I checked that we remove the discovered device cache after
-> > every scan iteration.
-> > While I am not clear about the purpose of the cache cleanup, I had
-> > assumed that keeping a list of devices with bad RNR record would go
-> > against the intention of cleaning up the cache.
 > >
-> > If we are to bookkeep the list of bad devices, we might as well take
-> > this record into account when sorting the RNR queue, so the bad
-> > devices will be sent to the back of the queue regardless how good the
-> > RSSI is.
+> > Please refer to this Gerrit patch review link for chrome os
+> > (https://chromium-review.googlesource.com/c/chromiumos/third_party/kern=
+el/+/3054233/8/drivers/bluetooth/btusb.c)
+> > which was reviewed by Mark-YW Chen, Mediatek's engineer.
+> >
+> > As an example, MediaTek MT7615E does not support the AOSP extensions.
+> >
+> > That was why I used a new BTUSB_QUALITY_REPORT flag in the changes v4
+> > and earlier ones.
+> >
+> > Please let me know how you would like to proceed with this patch.
 >
-> the inquiry cache is solely for name resolving and connection request so =
-that you are able to fill in the right values to speed up the paging.
+> I want that inside the Mediatek specific hdev->setup() procedure, they de=
+cide if AOSP extensions are supported or not. The BTUSB flag business is ge=
+tting out of hand. I really don=E2=80=99t want that in btusb.c anymore. I m=
+oved Intel over to do that in btintel.c and also Realtek is doing it in btr=
+tl.c for their hardware with the MSFT extensions.
 >
-> I think it is just enough to include a flag hinting the resolving failure=
- into the Device Found message. We are sending two Device Found anyway on s=
-uccess. So now we get one on failure as well. And then lets bluetoothd do a=
-ll the caching if it wants to.
+> We are not doing try-and-error of HCI commands. Just keep that in mind si=
+nce I said that multiple times now.
 >
-Oh, I see what you mean.
-Then I shall implement this solution.
-
 > Regards
 >
 > Marcel
 >
 
-Thanks,
-Archie
+
+--=20
+
+Joseph Shyh-In Hwang
+Email: josephsih@google.com
