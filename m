@@ -2,99 +2,124 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CED46C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 02:02:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17563C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 03:09:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A7F8060F4B
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 02:02:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E3032610A0
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 29 Oct 2021 03:09:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231356AbhJ2CFU (ORCPT
+        id S231636AbhJ2DLv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 28 Oct 2021 22:05:20 -0400
-Received: from mail.kernel.org ([198.145.29.99]:37772 "EHLO mail.kernel.org"
+        Thu, 28 Oct 2021 23:11:51 -0400
+Received: from m43-7.mailgun.net ([69.72.43.7]:14970 "EHLO m43-7.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229950AbhJ2CFT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 28 Oct 2021 22:05:19 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 1AA4661107
-        for <linux-bluetooth@vger.kernel.org>; Fri, 29 Oct 2021 02:02:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635472972;
-        bh=4gvIwBufdvvnxSr00XI/k5Ylmv+9i+VqrXsKt8ISObE=;
-        h=From:To:Subject:Date:From;
-        b=p1Xy5f+O9f4vFEI5bzv881Dr2tHOn/ORAowbMRwOhzdmRxnIZx800seFIhbKHVwxT
-         mzgAA9oJCg1GVQJE4VdMiqA80P1zSRGNlhI+kS3zxlHcQ9mJbKEkFoBUy/69UuWzwq
-         NkvsjHZso1XkKZaBbVq9kl+BpMtm7b25xqaubA2UpAKNsjbLOXHBBYK2X766EnGU/3
-         taEpR2bL7UCXie48gG2/L5YHyGV83x+T0FmX3LbrUWo+vrn4pCqvc1qZMft59dUm0W
-         8SsMnpToYstl+Jhfd1ASjgt/5YwpD7qsY3+gw+r75+PDhNTEdJr0Aou31AM4KX7g+t
-         yS83DmlR1Koiw==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 214863] New: Intel AX200 "Bluetooth: hci0: failed to restart LE
- scan: status 31"
-Date:   Fri, 29 Oct 2021 02:02:51 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kai.heng.feng@canonical.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-214863-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        id S231558AbhJ2DLu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 28 Oct 2021 23:11:50 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1635476962; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=HU9WzdznsyNXwZ00GJMZALNrQCaBt7USfMvElBn+TRI=;
+ b=rFR4EEfTCLHHIsydoC3sEF/PdTvEk2AN0AEXCadTeRDjBEGTF5/Fc6D5gqveuj64tpGmXrXr
+ 104oDMkXu7wTHLm2H8tKN279kptZ8PNoYwqmaebLhXAqUJ5nV9iENU0JI2kjSYq+PSriYYCe
+ MuLCT3ULXUPVhuJaRzg4vdprbyQ=
+X-Mailgun-Sending-Ip: 69.72.43.7
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
+ 617b65e1c8c1b282a543a9f0 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 29 Oct 2021 03:09:21
+ GMT
+Sender: tjiang=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 3DDEAC4360D; Fri, 29 Oct 2021 03:09:21 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: tjiang)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id A8848C4338F;
+        Fri, 29 Oct 2021 03:09:20 +0000 (UTC)
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8;
+ format=flowed
+Content-Transfer-Encoding: 8bit
+Date:   Fri, 29 Oct 2021 11:09:20 +0800
+From:   tjiang@codeaurora.org
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        Rocky Liao <rjliao@codeaurora.org>, zijuhu@codeaurora.org
+Subject: Re: [PATCH v3] Bluetooth: btusb: Add support for variant WCN6855 by
+ using different nvm
+In-Reply-To: <68A15E46-C716-4324-8B5D-C71C9D2753C5@holtmann.org>
+References: <1d19afff955cdc8d47582297a26246d9@codeaurora.org>
+ <YXgrwKUZwUWuWfG4@google.com>
+ <fe118b60df5881b0e9938f57aae6f87e@codeaurora.org>
+ <YXl3S7TT30PFfyB8@google.com>
+ <68A15E46-C716-4324-8B5D-C71C9D2753C5@holtmann.org>
+Message-ID: <807e0545d14144d2fa8ed8b54041529f@codeaurora.org>
+X-Sender: tjiang@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D214863
+Thanks Marcel for the reply, I will do as what you said , thank you.
 
-            Bug ID: 214863
-           Summary: Intel AX200 "Bluetooth: hci0: failed to restart LE
-                    scan: status 31"
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: mainline, bluetooh-next
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: normal
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: kai.heng.feng@canonical.com
-        Regression: No
+regards.
+tim
 
-Device: AX200
-Bus 001 Device 002: ID 8087:0029 Intel Corp.=20
 
-Kernel: bluetooth-next
-HEAD 2128939fe2e771645dd88e1938c27fdf96bd1cd0 ("Bluetooth: Fix removing adv
-when processing cmd complete")
-
-Reproduce step:
-1) Open GNOME Settings' Bluetooh panel and let it continuously scan
-2) Keep `rkfill block` and `rfkill unblock` loop.
-
-Result:
-Bluetooth stops working:
-[   29.706981] Bluetooth: hci0: failed to restart LE scan: status 31
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+On 2021-10-28 22:00, Marcel Holtmann wrote:
+> Hi Matthias,
+> 
+>>>  the previous patch is submitted by zijun , as he is not working on 
+>>> this
+>>> project, I take over his job, so can we assume abandon the previous 
+>>> patch,
+>>> using my new patch ? thank you.
+>>> regards.
+>> 
+>> Your patch is clearly based on zijun's one, it even has the same 
+>> subject. A
+>> change of authorship shouldn't result in resetting the version number, 
+>> it's
+>> still the same patch/series. You can always add a 'Co-developed-by:' 
+>> tag to
+>> indicate that someone else contributed to a patch, or use a 'From:' 
+>> tag if
+>> you only made minor changes on top of someone else's work.
+> 
+> I really don’t care much since that is for them and their company
+> policy to figure out.
+> 
+>> Not sure how to proceed best with the version number, especially since 
+>> there
+>> are already 3 versions of the 'new' patch. Either option can create 
+>> confusion,
+>> I guess you can continue with the new scheme, it seems the patch is 
+>> almost
+>> ready to land anyway.
+> 
+> It is a total mess already for a dead simple patch like this. And they
+> keep messing it up differently every time.
+> 
+> I provided a btusb_generate_qca_nvm_name() in one of my replies, where
+> the variant variable was declared without NULL assignment and the
+> ram_version was converted from little endian in place. That was 28th
+> of September and 4 patches later the patch is still not ready to be
+> merged. The maintainer hands you the recipe and you still screw up the
+> cake multiple times; I am just done with this.
+> 
+> The next version would be a v16 btw. So seriously, how can we have 15
+> revisions so far and still not have this in a mergable state?
+> 
+> Regards
+> 
+> Marcel
