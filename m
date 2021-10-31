@@ -2,68 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E2B4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 18:49:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7A3ABC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 20:16:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49A3660F4F
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 18:49:14 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5D52A60F4A
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 20:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230400AbhJaSvp (ORCPT
+        id S230049AbhJaUSt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 Oct 2021 14:51:45 -0400
-Received: from mail-il1-f197.google.com ([209.85.166.197]:45813 "EHLO
-        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229732AbhJaSvo (ORCPT
+        Sun, 31 Oct 2021 16:18:49 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40966 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229939AbhJaUSs (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 Oct 2021 14:51:44 -0400
-Received: by mail-il1-f197.google.com with SMTP id q14-20020a92750e000000b002589d954013so8709790ilc.12
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 11:49:12 -0700 (PDT)
+        Sun, 31 Oct 2021 16:18:48 -0400
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FE7CC061570;
+        Sun, 31 Oct 2021 13:16:16 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id k13so26100549ljj.12;
+        Sun, 31 Oct 2021 13:16:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :references:from:in-reply-to;
+        bh=lKxvlWC3ChNGIziUsunH7azTCso8Biwy2rrv88iSo4M=;
+        b=RwI6CF+hgc6m3XF4pRsGtPnwHyNHHy9R+GVlFQ2seypV1PbWoKZ1HIIEkySwqJVrGP
+         6CcCW4dzGm6VgM+LlGIkn7wxkdBVOwUM79QqbvcNMB3zWiC7t+vCgodDcfTtjaoT3vVe
+         olTZi9PwUFn8VF9IBYw7j/Mmo7IgxB1eAAcSCcsZg7mZ4QNnGYG+ITkQPpaojhd/5SzJ
+         OJhYSvZXz93nT31ERSHZTS3qyjKxb4o5B8sXTbMca8cRm5X3awHOY1P/NnrcMSFokpqD
+         nFoAd9tytF/ScneeuMqNvXamOwJnFKlGzUhkR4mFaOabBvrmecOAkxqG+LyVL7vP7IV5
+         JI6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=EDfj5ne47rqVe1CydX+aYgYdcHr5k4W7I1Ib2hSVKPQ=;
-        b=NVBEDz6KWQ044FMkO9qn4ON2JkCPqxo0AmV4joi1ii+Pw6JCbLHWTxK8yDstblAuD5
-         PTvqazU0Y1bdE5CtO1yKrqnomSjbOeeuG/kaZbMCKwjQxE0inVbx+OveSh+Djj1Q56b0
-         xiXlj8TVRdDA4lzbxVMncrKlcP9IJQ87/6+ElJ9J+8akWW5IYudQjlTvSLhs+WrtwxXN
-         nuVYw9EcJJJxEBWXadpQ/+V2K90sszQ+/WVipWUKma20tMSe/zdfNgO7aGTmUvvTSdVg
-         v26+2HIMh22Lbg57mBYjmOO6nIosE6WsWPNeLUKObZPJfOvd319/Vxbwld4Q6SeBUH9S
-         DjjQ==
-X-Gm-Message-State: AOAM533fQvyCpUIBbnBCNbb4tuWGOeKre/6zny7Qe2UJQ0ecenaMG7w6
-        Hww3DYwa7Rp2O9QQz6v5rkSakCaaGFjslxkq0MTDZY3wO8kx
-X-Google-Smtp-Source: ABdhPJyOG+lTecw5XF3nfkAPSpnl6M8hQQ/dDGVasqzB2YT8aLiWoViqcJHVGaVKr5kPojVr1ebi8CChphSOdx01Y5mQi4o/Pg9s
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:references:from:in-reply-to;
+        bh=lKxvlWC3ChNGIziUsunH7azTCso8Biwy2rrv88iSo4M=;
+        b=kKMlwS/uKs6CQv4I6gwOBBVYZ7ZkE77UYNOl/ERQQjmDyBVf3wei/M4FbEKAS8MO8n
+         Xc36XMUdwZoXvfVJbR6R9hm4SYxSnBI4O7TNqdQA88zobYY00hjM4wisGPfyHFxfRdDa
+         SHrCyCBk+ZmPt+gF6A5cZTd6IbkYjxuyC/Fi/TjE4OmHMBzaTJL3SWepHgThyb8LvGHu
+         Kq3m5LGpH+016Tq/dZjQW7hCpp7IUafZDm7y8+QFQoe2VMc8dlP/8F83Ey0oeIzCfW11
+         arJZn+QGqwSbFOr4eSYZ7xzyIR2oF92ghrTBbA811HacV7MKqs9ww6oOtAfstkriwvD8
+         S2iQ==
+X-Gm-Message-State: AOAM532G/o2U9fDgxZDDavg8B93jI7B7krZEhmfj6mp3eez5tE9v+Yz0
+        76W6wleWaMVKwSHoQzGe5ZsK2wX1qMvH/A==
+X-Google-Smtp-Source: ABdhPJxk6nHMr461mBuXT6XhZdocynQGf4bM8Z7MkBzvY0ciyF2gEyicAs1iMEfrVof0Sl3K19EMkA==
+X-Received: by 2002:a2e:9d05:: with SMTP id t5mr5729698lji.433.1635711374582;
+        Sun, 31 Oct 2021 13:16:14 -0700 (PDT)
+Received: from [192.168.1.11] ([94.103.235.8])
+        by smtp.gmail.com with ESMTPSA id e11sm19827ljj.99.2021.10.31.13.16.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 31 Oct 2021 13:16:13 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="------------SfNDH39slPPO9sbrxHVe2Rgq"
+Message-ID: <4b2b9c55-e2e0-a149-7dfe-ca36244d2245@gmail.com>
+Date:   Sun, 31 Oct 2021 23:16:12 +0300
 MIME-Version: 1.0
-X-Received: by 2002:a6b:650f:: with SMTP id z15mr11810710iob.27.1635706152392;
- Sun, 31 Oct 2021 11:49:12 -0700 (PDT)
-Date:   Sun, 31 Oct 2021 11:49:12 -0700
-In-Reply-To: <dd579644-7ef9-f005-0275-b7384ca731a5@gmail.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000002ba17d05cfaa8446@google.com>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
 Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in hci_le_meta_evt (2)
-From:   syzbot <syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+Content-Language: en-US
+To:     syzbot <syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com>,
+        davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        paskripkin@gmail.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+        syzkaller-bugs@googlegroups.com
+References: <0000000000002ba17d05cfaa8446@google.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <0000000000002ba17d05cfaa8446@google.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This is a multi-part message in MIME format.
+--------------SfNDH39slPPO9sbrxHVe2Rgq
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+On 10/31/21 21:49, syzbot wrote:
+> Hello,
+> 
+> syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+> 
+> Reported-and-tested-by: syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
+> 
+> Tested on:
+> 
+> commit:         180eca54 Merge tag 'scsi-fixes' of git://git.kernel.or..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=6362530af157355b
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e3fcb9c4f3c2a931dc40
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+> patch:          https://syzkaller.appspot.com/x/patch.diff?x=1295a186b00000
+> 
+> Note: testing is done by a robot and is best-effort only.
+> 
 
-Reported-and-tested-by: syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
+Ok, let's check more corner cases. Looks like nothing checks them.
 
-Tested on:
+#syz test
+git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
 
-commit:         180eca54 Merge tag 'scsi-fixes' of git://git.kernel.or..
-git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=6362530af157355b
-dashboard link: https://syzkaller.appspot.com/bug?extid=e3fcb9c4f3c2a931dc40
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=1295a186b00000
 
-Note: testing is done by a robot and is best-effort only.
+
+
+With regards,
+Pavel Skripkin
+--------------SfNDH39slPPO9sbrxHVe2Rgq
+Content-Type: text/plain; charset=UTF-8; name="ph"
+Content-Disposition: attachment; filename="ph"
+Content-Transfer-Encoding: base64
+
+ZGlmZiAtLWdpdCBhL25ldC9ibHVldG9vdGgvaGNpX2V2ZW50LmMgYi9uZXQvYmx1ZXRvb3Ro
+L2hjaV9ldmVudC5jCmluZGV4IDBiY2EwMzViZjJkYy4uNTBkMWQ2MmMxNWVjIDEwMDY0NAot
+LS0gYS9uZXQvYmx1ZXRvb3RoL2hjaV9ldmVudC5jCisrKyBiL25ldC9ibHVldG9vdGgvaGNp
+X2V2ZW50LmMKQEAgLTU3ODAsNyArNTc4MCw4IEBAIHN0YXRpYyB2b2lkIGhjaV9sZV9hZHZf
+cmVwb3J0X2V2dChzdHJ1Y3QgaGNpX2RldiAqaGRldiwgc3RydWN0IHNrX2J1ZmYgKnNrYikK
+IAkJc3RydWN0IGhjaV9ldl9sZV9hZHZlcnRpc2luZ19pbmZvICpldiA9IHB0cjsKIAkJczgg
+cnNzaTsKIAotCQlpZiAoZXYtPmxlbmd0aCA8PSBIQ0lfTUFYX0FEX0xFTkdUSCkgeworCQlp
+ZiAoZXYtPmxlbmd0aCA8PSBIQ0lfTUFYX0FEX0xFTkdUSCAmJgorCQkgICAgZXYtPmRhdGEg
+KyBldi0+bGVuZ3RoIDw9IHNrYl90YWlsX3BvaW50ZXIoc2tiKSkgewogCQkJcnNzaSA9IGV2
+LT5kYXRhW2V2LT5sZW5ndGhdOwogCQkJcHJvY2Vzc19hZHZfcmVwb3J0KGhkZXYsIGV2LT5l
+dnRfdHlwZSwgJmV2LT5iZGFkZHIsCiAJCQkJCSAgIGV2LT5iZGFkZHJfdHlwZSwgTlVMTCwg
+MCwgcnNzaSwKQEAgLTU3OTAsNiArNTc5MSwxMSBAQCBzdGF0aWMgdm9pZCBoY2lfbGVfYWR2
+X3JlcG9ydF9ldnQoc3RydWN0IGhjaV9kZXYgKmhkZXYsIHN0cnVjdCBza19idWZmICpza2Ip
+CiAJCX0KIAogCQlwdHIgKz0gc2l6ZW9mKCpldikgKyBldi0+bGVuZ3RoICsgMTsKKworCQlp
+ZiAocHRyID4gKHZvaWQgKikgc2tiX3RhaWxfcG9pbnRlcihza2IpIC0gc2l6ZW9mKCpldikp
+IHsKKwkJCWJ0X2Rldl9lcnIoaGRldiwgIk1hbGljaW91cyBhZHZlcnRpc2luZyBkYXRhLiBT
+dG9wcGluZyBwcm9jZXNzaW5nIik7CisJCQlicmVhazsKKwkJfQogCX0KIAogCWhjaV9kZXZf
+dW5sb2NrKGhkZXYpOwo=
+--------------SfNDH39slPPO9sbrxHVe2Rgq--
+
