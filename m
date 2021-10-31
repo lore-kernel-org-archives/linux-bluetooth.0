@@ -2,416 +2,202 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C29B4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 10:31:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0922BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 17:40:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9671860F02
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 10:31:22 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E54B760F70
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 31 Oct 2021 17:40:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229798AbhJaKdw (ORCPT
+        id S230274AbhJaRnC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 Oct 2021 06:33:52 -0400
-Received: from mga03.intel.com ([134.134.136.65]:16187 "EHLO mga03.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229638AbhJaKdv (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 Oct 2021 06:33:51 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10153"; a="230826182"
-X-IronPort-AV: E=Sophos;i="5.87,197,1631602800"; 
-   d="scan'208";a="230826182"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2021 03:31:20 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,197,1631602800"; 
-   d="scan'208";a="488248354"
-Received: from lkp-server02.sh.intel.com (HELO c20d8bc80006) ([10.239.97.151])
-  by orsmga007.jf.intel.com with ESMTP; 31 Oct 2021 03:31:18 -0700
-Received: from kbuild by c20d8bc80006 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1mh87R-0002MI-Lv; Sun, 31 Oct 2021 10:31:17 +0000
-Date:   Sun, 31 Oct 2021 18:31:08 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS WITH WARNING
- d6cba4e6d0e202276b81117b96106859a4e2d56e
-Message-ID: <617e706c.VRjQNYAVXf4mv29D%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Sun, 31 Oct 2021 13:43:02 -0400
+Received: from mail-io1-f72.google.com ([209.85.166.72]:41705 "EHLO
+        mail-io1-f72.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229993AbhJaRnA (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 31 Oct 2021 13:43:00 -0400
+Received: by mail-io1-f72.google.com with SMTP id j19-20020a0566022cd300b005e1816be9abso3352608iow.8
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 10:40:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=7M1VeV5Puogy1Aa38S5xLZtrD8M6xbycaErzb+ZqLJk=;
+        b=NYrs7FS2QVpppg/erI7JTYRQs3amSh7G5rM1WuNpmuYEYS7N5Bhe1naNQE0vIeCRuA
+         b0MhoRjEbCC+aAjlqdfoLKegVXJzYEkSr5zXfX61v1VUK6zgSjVcSAtPTLBtPorlVisI
+         lUQt0Gffzqd+p9E12QPoD1tW1FZW0HWSUuKl92FjhgMuqHOvtZxcIVLX4knRIgb0mXch
+         WEIWzAY9JnsPjJHXlwvk+G4F6jkQS6+Rgu/liCRe4+AsMZqVQeG8TqS7UmSKmvLnzKYz
+         R3+GFplhD16X3Rak4f0kjuuOhbwLt4Okgx+eaUhr6iIQr4eOUvOwqFRNBAJIYQ/T9OXm
+         3GcA==
+X-Gm-Message-State: AOAM532YXkx6volWwVWAPBZoYJrL7O9WApXEUytZCstn948hPun2cowI
+        NzQ+EazVxj6F93oo2u7gwSzOdeZ37V0+HzRvq0IcZbJjJkFr
+X-Google-Smtp-Source: ABdhPJxl9h4UvTixmRZjoZ4XRQXq8YzoiNVLBOoyjHr4IJkAOBDsUCqLLrO70nd8cxZTyidaqz7J8lqO/6HYRQB6zWVb6MrwRB+c
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:cb4e:: with SMTP id f14mr15507720ilq.109.1635702025869;
+ Sun, 31 Oct 2021 10:40:25 -0700 (PDT)
+Date:   Sun, 31 Oct 2021 10:40:25 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000035de5905cfa98e03@google.com>
+Subject: [syzbot] KASAN: slab-out-of-bounds Read in hci_le_meta_evt (2)
+From:   syzbot <syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: d6cba4e6d0e202276b81117b96106859a4e2d56e  Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+Hello,
 
-Warning reports:
+syzbot found the following issue on:
 
-https://lore.kernel.org/linux-bluetooth/202110301017.z9Vi8icx-lkp@intel.com
-https://lore.kernel.org/llvm/202110301521.vOSfbIOB-lkp@intel.com
+HEAD commit:    119c85055d86 Merge tag 'powerpc-5.15-6' of git://git.kerne..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1453e1f4b00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6362530af157355b
+dashboard link: https://syzkaller.appspot.com/bug?extid=e3fcb9c4f3c2a931dc40
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1128465cb00000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1431dfe2b00000
 
-Warning in current branch:
+Bisection is inconclusive: the issue happens on the oldest tested release.
 
-net/bluetooth/hci_sync.c:1333:5: warning: no previous prototype for 'hci_scan_disable_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1333:5: warning: no previous prototype for function 'hci_scan_disable_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1400:5: warning: no previous prototype for 'hci_scan_disable_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1400:5: warning: no previous prototype for function 'hci_scan_disable_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1762:5: warning: no previous prototype for 'hci_passive_scan_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1762:5: warning: no previous prototype for function 'hci_passive_scan_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1971:5: warning: no previous prototype for 'hci_passive_scan_sync' [-Wmissing-prototypes]
-net/bluetooth/hci_sync.c:1971:5: warning: no previous prototype for function 'hci_passive_scan_sync' [-Wmissing-prototypes]
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=10f27096b00000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=12f27096b00000
+console output: https://syzkaller.appspot.com/x/log.txt?x=14f27096b00000
 
-Warning ids grouped by kconfigs:
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
 
-gcc_recent_errors
-|-- alpha-randconfig-c023-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- alpha-randconfig-m031-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- alpha-randconfig-r001-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- alpha-randconfig-r004-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arc-randconfig-r036-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm-bcm2835_defconfig
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm-defconfig
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm-exynos_defconfig
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm-magician_defconfig
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm64-defconfig
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- arm64-randconfig-r032-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- h8300-randconfig-r023-20211030
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- h8300-randconfig-r033-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- i386-randconfig-a014-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- i386-randconfig-c024-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- i386-randconfig-m021-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- i386-randconfig-m021-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- i386-randconfig-s002-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- ia64-randconfig-m031-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- m68k-randconfig-r015-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- microblaze-randconfig-r032-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- mips-randconfig-m031-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- mips-randconfig-r034-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- openrisc-randconfig-c024-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- openrisc-randconfig-r031-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- parisc-randconfig-r013-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- sh-randconfig-r014-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- sparc64-randconfig-r034-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a004-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a005-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a006-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a011-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a014-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-a015-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-c002-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-m001-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-randconfig-s021-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-rhel-8.3
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-rhel-8.3-func
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-|-- x86_64-rhel-8.3-kselftests
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
-`-- xtensa-randconfig-p001-20211030
-    |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_passive_scan_sync
-    `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-hci_scan_disable_sync
+Bluetooth: hci0: unknown advertising packet type: 0x90
+Bluetooth: hci0: Dropping invalid advertising data
+==================================================================
+BUG: KASAN: slab-out-of-bounds in hci_le_adv_report_evt net/bluetooth/hci_event.c:5783 [inline]
+BUG: KASAN: slab-out-of-bounds in hci_le_meta_evt+0x3e27/0x46d0 net/bluetooth/hci_event.c:6104
+Read of size 1 at addr ffff888079314e03 by task kworker/u5:2/6459
 
-clang_recent_errors
-|-- arm-randconfig-r012-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- arm-randconfig-r035-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- hexagon-randconfig-r045-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a001-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a002-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a005-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a006-20211029
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a011-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- i386-randconfig-a015-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- x86_64-randconfig-a013-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-|-- x86_64-randconfig-c007-20211028
-|   |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-|   `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
-`-- x86_64-randconfig-r015-20211028
-    |-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_passive_scan_sync
-    `-- net-bluetooth-hci_sync.c:warning:no-previous-prototype-for-function-hci_scan_disable_sync
+CPU: 1 PID: 6459 Comm: kworker/u5:2 Not tainted 5.15.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci0 hci_rx_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ print_address_description.constprop.0.cold+0x6c/0x2d6 mm/kasan/report.c:256
+ __kasan_report mm/kasan/report.c:442 [inline]
+ kasan_report.cold+0x83/0xdf mm/kasan/report.c:459
+ hci_le_adv_report_evt net/bluetooth/hci_event.c:5783 [inline]
+ hci_le_meta_evt+0x3e27/0x46d0 net/bluetooth/hci_event.c:6104
+ hci_event_packet+0x5d9/0x7cf0 net/bluetooth/hci_event.c:6445
+ hci_rx_work+0x4fa/0xd30 net/bluetooth/hci_core.c:5136
+ process_one_work+0x9bf/0x16b0 kernel/workqueue.c:2297
+ worker_thread+0x658/0x11f0 kernel/workqueue.c:2444
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
 
-elapsed time: 2301m
+Allocated by task 6453:
+ kasan_save_stack+0x1b/0x40 mm/kasan/common.c:38
+ kasan_set_track mm/kasan/common.c:46 [inline]
+ set_alloc_info mm/kasan/common.c:434 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:513 [inline]
+ ____kasan_kmalloc mm/kasan/common.c:472 [inline]
+ __kasan_kmalloc+0xa1/0xd0 mm/kasan/common.c:522
+ kmalloc_reserve net/core/skbuff.c:356 [inline]
+ __alloc_skb+0xde/0x340 net/core/skbuff.c:427
+ alloc_skb include/linux/skbuff.h:1116 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:389 [inline]
+ vhci_get_user drivers/bluetooth/hci_vhci.c:165 [inline]
+ vhci_write+0xbd/0x450 drivers/bluetooth/hci_vhci.c:285
+ call_write_iter include/linux/fs.h:2163 [inline]
+ new_sync_write+0x429/0x660 fs/read_write.c:507
+ vfs_write+0x7cf/0xae0 fs/read_write.c:594
+ ksys_write+0x12d/0x250 fs/read_write.c:647
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-configs tested: 172
-configs skipped: 3
+The buggy address belongs to the object at ffff888079314c00
+ which belongs to the cache kmalloc-512 of size 512
+The buggy address is located 3 bytes to the right of
+ 512-byte region [ffff888079314c00, ffff888079314e00)
+The buggy address belongs to the page:
+page:ffffea0001e4c500 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x79314
+flags: 0xfff00000000200(slab|node=0|zone=1|lastcpupid=0x7ff)
+raw: 00fff00000000200 ffffea00005ef948 ffffea0000768f08 ffff888010c40600
+raw: 0000000000000000 ffff888079314000 0000000100000004 0000000000000000
+page dumped because: kasan: bad access detected
+page_owner tracks the page as allocated
+page last allocated via order 0, migratetype Unmovable, gfp_mask 0x2420c0(__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_COMP|__GFP_THISNODE), pid 1, ts 20947704734, free_ts 20947079890
+ prep_new_page mm/page_alloc.c:2426 [inline]
+ get_page_from_freelist+0xa72/0x2f80 mm/page_alloc.c:4155
+ __alloc_pages+0x1b2/0x500 mm/page_alloc.c:5381
+ __alloc_pages_node include/linux/gfp.h:570 [inline]
+ kmem_getpages mm/slab.c:1377 [inline]
+ cache_grow_begin+0x75/0x460 mm/slab.c:2593
+ cache_alloc_refill+0x27f/0x380 mm/slab.c:2965
+ ____cache_alloc mm/slab.c:3048 [inline]
+ ____cache_alloc mm/slab.c:3031 [inline]
+ __do_cache_alloc mm/slab.c:3275 [inline]
+ slab_alloc mm/slab.c:3316 [inline]
+ kmem_cache_alloc_trace+0x38c/0x480 mm/slab.c:3573
+ kmalloc include/linux/slab.h:591 [inline]
+ kzalloc include/linux/slab.h:721 [inline]
+ kernfs_fop_open+0x2c5/0xd40 fs/kernfs/file.c:628
+ do_dentry_open+0x4c8/0x11d0 fs/open.c:822
+ do_open fs/namei.c:3428 [inline]
+ path_openat+0x1c9a/0x2740 fs/namei.c:3561
+ do_filp_open+0x1aa/0x400 fs/namei.c:3588
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1200
+ do_sys_open fs/open.c:1216 [inline]
+ __do_sys_open fs/open.c:1224 [inline]
+ __se_sys_open fs/open.c:1220 [inline]
+ __x64_sys_open+0x119/0x1c0 fs/open.c:1220
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
+page last free stack trace:
+ reset_page_owner include/linux/page_owner.h:24 [inline]
+ free_pages_prepare mm/page_alloc.c:1340 [inline]
+ free_pcp_prepare+0x2c5/0x780 mm/page_alloc.c:1391
+ free_unref_page_prepare mm/page_alloc.c:3317 [inline]
+ free_unref_page+0x19/0x690 mm/page_alloc.c:3396
+ selinux_genfs_get_sid security/selinux/hooks.c:1378 [inline]
+ inode_doinit_with_dentry+0x868/0x12e0 security/selinux/hooks.c:1573
+ selinux_d_instantiate+0x23/0x30 security/selinux/hooks.c:6448
+ security_d_instantiate+0x50/0xe0 security/security.c:2039
+ d_splice_alias+0x8c/0xc60 fs/dcache.c:3064
+ kernfs_iop_lookup+0x22d/0x2c0 fs/kernfs/dir.c:1137
+ lookup_open.isra.0+0x69f/0x13d0 fs/namei.c:3260
+ open_last_lookups fs/namei.c:3352 [inline]
+ path_openat+0x9a5/0x2740 fs/namei.c:3558
+ do_filp_open+0x1aa/0x400 fs/namei.c:3588
+ do_sys_openat2+0x16d/0x4d0 fs/open.c:1200
+ do_sys_open fs/open.c:1216 [inline]
+ __do_sys_open fs/open.c:1224 [inline]
+ __se_sys_open fs/open.c:1220 [inline]
+ __x64_sys_open+0x119/0x1c0 fs/open.c:1220
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x35/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x44/0xae
 
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20211028
-powerpc              randconfig-c003-20211028
-s390                       zfcpdump_defconfig
-powerpc                 mpc8272_ads_defconfig
-arc                              alldefconfig
-sh                            shmin_defconfig
-powerpc                 canyonlands_defconfig
-mips                        vocore2_defconfig
-sh                          landisk_defconfig
-um                           x86_64_defconfig
-sh                           se7751_defconfig
-arm                          exynos_defconfig
-m68k                          multi_defconfig
-powerpc               mpc834x_itxgp_defconfig
-m68k                         amcore_defconfig
-sh                        apsh4ad0a_defconfig
-arm                        magician_defconfig
-mips                   sb1250_swarm_defconfig
-arm                       omap2plus_defconfig
-powerpc                     redwood_defconfig
-m68k                          atari_defconfig
-mips                        jmr3927_defconfig
-arm                    vt8500_v6_v7_defconfig
-openrisc                         alldefconfig
-arm                         bcm2835_defconfig
-sh                          kfr2r09_defconfig
-parisc                generic-32bit_defconfig
-sh                             shx3_defconfig
-mips                      fuloong2e_defconfig
-arm                           h3600_defconfig
-arm                         s5pv210_defconfig
-s390                             alldefconfig
-riscv                    nommu_k210_defconfig
-m68k                       m5475evb_defconfig
-sh                           se7724_defconfig
-powerpc                    mvme5100_defconfig
-m68k                        mvme147_defconfig
-arm                             pxa_defconfig
-sh                          polaris_defconfig
-mips                          rm200_defconfig
-mips                malta_qemu_32r6_defconfig
-arm                         shannon_defconfig
-powerpc                     tqm8541_defconfig
-sh                          rsk7269_defconfig
-sh                               j2_defconfig
-arm                        multi_v5_defconfig
-openrisc                  or1klitex_defconfig
-sh                           sh2007_defconfig
-arm                          ixp4xx_defconfig
-powerpc                  iss476-smp_defconfig
-powerpc                  mpc885_ads_defconfig
-powerpc                      ppc64e_defconfig
-microblaze                          defconfig
-sh                        edosk7705_defconfig
-powerpc                 mpc837x_rdb_defconfig
-arm                  randconfig-c002-20211028
-arm                  randconfig-c002-20211029
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                                defconfig
-m68k                             allmodconfig
-m68k                             allyesconfig
-nios2                               defconfig
-nds32                             allnoconfig
-nds32                               defconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-nios2                            allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-xtensa                           allyesconfig
-parisc                              defconfig
-s390                                defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                              debian-10.3
-i386                             allyesconfig
-arc                              allyesconfig
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                           allnoconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-x86_64               randconfig-a002-20211028
-x86_64               randconfig-a004-20211028
-x86_64               randconfig-a005-20211028
-x86_64               randconfig-a001-20211028
-x86_64               randconfig-a006-20211028
-x86_64               randconfig-a003-20211028
-i386                 randconfig-a004-20211028
-i386                 randconfig-a003-20211028
-i386                 randconfig-a002-20211028
-i386                 randconfig-a006-20211028
-i386                 randconfig-a001-20211028
-i386                 randconfig-a005-20211028
-x86_64               randconfig-a015-20211029
-x86_64               randconfig-a013-20211029
-x86_64               randconfig-a011-20211029
-x86_64               randconfig-a014-20211029
-x86_64               randconfig-a012-20211029
-x86_64               randconfig-a016-20211029
-i386                 randconfig-a012-20211029
-i386                 randconfig-a013-20211029
-i386                 randconfig-a011-20211029
-i386                 randconfig-a015-20211029
-i386                 randconfig-a016-20211029
-i386                 randconfig-a014-20211029
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allyesconfig
-riscv                            allmodconfig
-x86_64                    rhel-8.3-kselftests
-um                             i386_defconfig
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-x86_64                           allyesconfig
+Memory state around the buggy address:
+ ffff888079314d00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+ ffff888079314d80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+>ffff888079314e00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+                   ^
+ ffff888079314e80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+ ffff888079314f00: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+==================================================================
 
-clang tested configs:
-arm                  randconfig-c002-20211028
-powerpc              randconfig-c003-20211028
-riscv                randconfig-c006-20211028
-x86_64               randconfig-c007-20211028
-mips                 randconfig-c004-20211028
-s390                 randconfig-c005-20211028
-i386                 randconfig-c001-20211028
-arm                  randconfig-c002-20211029
-powerpc              randconfig-c003-20211029
-riscv                randconfig-c006-20211029
-x86_64               randconfig-c007-20211029
-mips                 randconfig-c004-20211029
-s390                 randconfig-c005-20211029
-i386                 randconfig-c001-20211029
-x86_64               randconfig-a005-20211030
-x86_64               randconfig-a004-20211030
-x86_64               randconfig-a002-20211030
-x86_64               randconfig-a003-20211030
-x86_64               randconfig-a001-20211030
-x86_64               randconfig-a006-20211030
-i386                 randconfig-a004-20211029
-i386                 randconfig-a003-20211029
-i386                 randconfig-a002-20211029
-i386                 randconfig-a001-20211029
-i386                 randconfig-a006-20211029
-i386                 randconfig-a005-20211029
-x86_64               randconfig-a015-20211028
-x86_64               randconfig-a013-20211028
-x86_64               randconfig-a011-20211028
-x86_64               randconfig-a014-20211028
-x86_64               randconfig-a012-20211028
-x86_64               randconfig-a016-20211028
-i386                 randconfig-a012-20211028
-i386                 randconfig-a013-20211028
-i386                 randconfig-a011-20211028
-i386                 randconfig-a015-20211028
-i386                 randconfig-a016-20211028
-i386                 randconfig-a014-20211028
-hexagon              randconfig-r045-20211028
-riscv                randconfig-r042-20211028
-s390                 randconfig-r044-20211028
-hexagon              randconfig-r041-20211028
-hexagon              randconfig-r045-20211029
-hexagon              randconfig-r041-20211029
 
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+syzbot can test patches for this issue, for details see:
+https://goo.gl/tpsmEJ#testing-patches
