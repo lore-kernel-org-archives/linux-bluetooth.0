@@ -2,100 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 47442C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 05:00:21 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AE15C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:07:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 28B3060FD9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 05:00:21 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DBBBF6108F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:07:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229560AbhKAFCw (ORCPT
+        id S230451AbhKAGKG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Nov 2021 01:02:52 -0400
-Received: from mail-io1-f71.google.com ([209.85.166.71]:54225 "EHLO
-        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229502AbhKAFCw (ORCPT
+        Mon, 1 Nov 2021 02:10:06 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55338 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229949AbhKAGKB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Nov 2021 01:02:52 -0400
-Received: by mail-io1-f71.google.com with SMTP id m5-20020a0566022e8500b005e192595a3dso2641219iow.20
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 22:00:19 -0700 (PDT)
+        Mon, 1 Nov 2021 02:10:01 -0400
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A34BAC079781
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:06:49 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id v133-20020a25c58b000000b005c20153475dso13729587ybe.17
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:06:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=v0aCId91YUIOcgru+L1HRukGZnNCqeqwEdd8IkAfGUw=;
+        b=qjY14zW0WJR//wl9IPRAJzMc6CYtSdTqhE2PFiDodr5iuk8E6PGbPAdejPN9qUrYAk
+         78POFcJjeHQjpvrF/zNmZ+PkDwamlYKRPJXFhedN+k3ve/h1Ybc4PIDllekcwItB5AYl
+         6jBNRs01Pso3Vr65PoANwa4Kod5yMwFgK2Z/K/W+LTxOVqfF9Dqw2rZjjAG7WGijv2Qq
+         NERvT/dqIn9j/d56yT2TXgOxVomvknbGNNh+7eyowTyR2KftZccYTnnvDsMJHoBMUR6r
+         kkNsAcMNyXUKPPhJ+/ZrPiPAdNa9QHAf/f5nwG6I0V+LaZnacLuNoMcZXCRixEhqOuFf
+         olQQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
-        bh=8kbiHxOD2R5Kq+0WAmJMkHoocjtefmqjMs5G+/Y1aAA=;
-        b=Dr2L27jd3m80FSUGrHUHal4HUWGbMkOkTvNvLL8K90PsxIJQQ+umfIjhuvWOm5X41v
-         0AiGIlhca0vYep0KW354bQ5sW7bJGRcbxaHYdYnfh9fYX/Ri5V4TjrUp/STOf30oH4kA
-         mRIi9fihV/JRP9e+GaW9ucxgFJox2P1Jn1JWT/Nfov/ZHSFgvPOA98Whf4qaKtGckPgK
-         hsLKSl4S2CGN6OG3IqS6mhnNuPoNb5aeATGaegJHcD0TtM4qi1UyiMQkRObfjAth/NWS
-         4PbZ+PbqU7IDA4dsSS7Y0MWca+UI7Kkf5EIeltp+tc4Ds7uIhBqTQcd5C1V4/zUbl5C8
-         r7xQ==
-X-Gm-Message-State: AOAM533AyQ2+93aHUProeElYfXZoYA6ADaagGQaoXUr1I30tqaPYArBd
-        yLlHrunZKq2CIsaampBIv781a5awBlLjEPp410dFjkD7R2rz
-X-Google-Smtp-Source: ABdhPJyWZCUoBUEwmt0F5ibRDQL3QZG8mGbbVoHRLj5BWXhBbWPu/W5Hf3le/6CuHAd8Au/fs+ACLBcCPTpom4yOF9WfjYewpKRc
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:df1:: with SMTP id m17mr17705480ilj.125.1635742819571;
- Sun, 31 Oct 2021 22:00:19 -0700 (PDT)
-Date:   Sun, 31 Oct 2021 22:00:19 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000b45deb05cfb30d1c@google.com>
-Subject: [syzbot] INFO: trying to register non-static key in
- hci_uart_send_frame (3)
-From:   syzbot <syzbot+944c82cd12dd1db5b05f@syzkaller.appspotmail.com>
-To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=v0aCId91YUIOcgru+L1HRukGZnNCqeqwEdd8IkAfGUw=;
+        b=OfTwaAeSeGFCZB1yeGy+RgQeKiqOZHNSg1QWvHTEmLAHwn/qGb01GYhYiqmsvb9EyR
+         pOwMqDFo94xoOjQ2VshtgDniuayhZwbmBpDDkMFbrng/4V4Wwh4ag5LDLOqAX0YRJ6s6
+         P/zuNnvr53FQUvxNQpUwdlxHEix24rp2eFtkvL4Dk46kgtXpWX049qtjwgM1FIvJQaok
+         qpk7gSVvHni+EhOGPCF6CABy+HjaGQuzCGqB4DPClOy2wrjzgqRapYF/REPxa5rKnJYB
+         IQsKAiUTFMVBVoBrgAdsJBZvHK+V/sTlZ3pJAJg+FR/nroQPuBwJKsFwkpCrJtIwzHYn
+         HoJw==
+X-Gm-Message-State: AOAM530u1JbXidhcFfkOku9YgXG2jaN80EUs9UBzyFUz2n8kAAuWFZCW
+        kBLuDexJTDJTmMXkX3i4tFQojenj02r9X1Mw+DWxTlIPFw4jnUu6DeB/zf3pmu8YleHULsIbYSu
+        6QgWRFnRhOQ3BXWPRZOqo8rRB96pC5kX4faXXbqPLPnQPDZDO+cWfi2bKm6Tkf85E0DKJK46G9Z
+        41
+X-Google-Smtp-Source: ABdhPJy7+aVgAAt82mmjlLV1jmpSysO3aBiBjBwkDw5EAZqidd/2pPel7WARLLiE+2WRB6XMxf/+79ULEHYe
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:93ab:332e:48e3:1733])
+ (user=apusaka job=sendgmr) by 2002:a25:328b:: with SMTP id
+ y133mr16589670yby.233.1635746808821; Sun, 31 Oct 2021 23:06:48 -0700 (PDT)
+Date:   Mon,  1 Nov 2021 14:06:26 +0800
+In-Reply-To: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+Message-Id: <20211101140544.Bluez.3.Idb95ae18113225915b97a4f06983e1e41a7f7a2e@changeid>
+Mime-Version: 1.0
+References: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [Bluez PATCH 3/3] adapter: Remove "Master" entry from LTK storage
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+From: Archie Pusaka <apusaka@chromium.org>
 
-syzbot found the following issue on:
-
-HEAD commit:    1fc596a56b33 Merge tag 'trace-v5.15-rc6' of git://git.kern..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=12b58364b00000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=b160d0631c7a8f26
-dashboard link: https://syzkaller.appspot.com/bug?extid=944c82cd12dd1db5b05f
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+944c82cd12dd1db5b05f@syzkaller.appspotmail.com
-
-INFO: trying to register non-static key.
-The code is fine but needs lockdep annotation, or maybe
-you didn't initialize this object before use?
-turning off the locking correctness validator.
-CPU: 1 PID: 150 Comm: kworker/u5:0 Not tainted 5.15.0-rc7-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
-Workqueue: hci7 hci_cmd_work
-Call Trace:
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
- assign_lock_key kernel/locking/lockdep.c:939 [inline]
- register_lock_class+0xf79/0x10c0 kernel/locking/lockdep.c:1251
- __lock_acquire+0x105/0x54a0 kernel/locking/lockdep.c:4894
- lock_acquire kernel/locking/lockdep.c:5625 [inline]
- lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
- percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
- hci_uart_send_frame+0x8e/0x6c0 drivers/bluetooth/hci_ldisc.c:279
- hci_send_frame+0x1c0/0x380 net/bluetooth/hci_core.c:4244
- hci_cmd_work+0x202/0x390 net/bluetooth/hci_core.c:5177
- process_one_work+0x9bf/0x16b0 kernel/workqueue.c:2297
- worker_thread+0x658/0x11f0 kernel/workqueue.c:2444
- kthread+0x3e5/0x4d0 kernel/kthread.c:319
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
-Bluetooth: hci6: sending frame failed (-49)
-Bluetooth: hci6: sending frame failed (-49)
-
-
+The entry has been deprecated since 2014 and it's time to remove them
+altogether.
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Hi maintainers,
+While cleaning this entry, I found that this entry is involved in some
+kind of storage file conversion, probably when upgrading BlueZ 4 to 5.
+Should we also remove the file conversion too, since it's dated to
+2014 as well?
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+ src/adapter.c | 12 ------------
+ 1 file changed, 12 deletions(-)
+
+diff --git a/src/adapter.c b/src/adapter.c
+index 6b12c9e793..3a3c957a6c 100644
+--- a/src/adapter.c
++++ b/src/adapter.c
+@@ -3779,8 +3779,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
+ 					uint8_t peer_type, const char *group)
+ {
+ 	struct smp_ltk_info *ltk = NULL;
+-	GError *gerr = NULL;
+-	bool central;
+ 	char *key;
+ 	char *rand = NULL;
+ 
+@@ -3836,12 +3834,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
+ 									NULL);
+ 	ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
+ 
+-	central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
+-	if (gerr)
+-		g_error_free(gerr);
+-	else
+-		ltk->central = central;
+-
+ 	ltk->is_blocked = is_blocked_key(HCI_BLOCKED_KEY_TYPE_LTK,
+ 								ltk->val);
+ 
+@@ -5904,7 +5896,6 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
+ 	g_free(str);
+ 
+ 	g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
+-	g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
+ 	g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
+ 	g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
+ 
+@@ -8445,9 +8436,6 @@ static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
+ 		g_error_free(gerr);
+ 	}
+ 
+-	/* Old files may contain this so remove it in case it exists */
+-	g_key_file_remove_key(key_file, "LongTermKey", "Master", NULL);
+-
+ 	for (i = 0; i < 16; i++)
+ 		sprintf(key_str + (i * 2), "%2.2X", key[i]);
+ 
+-- 
+2.33.1.1089.g2158813163f-goog
+
