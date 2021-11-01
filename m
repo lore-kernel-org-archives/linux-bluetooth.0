@@ -2,160 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CBDD4C43217
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:07:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A56D3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:41:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A8B6461101
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:07:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 76CE160F4F
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 06:41:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229865AbhKAGKJ (ORCPT
+        id S230097AbhKAGo3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Nov 2021 02:10:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55344 "EHLO
+        Mon, 1 Nov 2021 02:44:29 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35218 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231176AbhKAGKB (ORCPT
+        with ESMTP id S229938AbhKAGo2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Nov 2021 02:10:01 -0400
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2059C061A0E
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:06:34 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id z2-20020a254c02000000b005b68ef4fe24so24612213yba.11
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:06:34 -0700 (PDT)
+        Mon, 1 Nov 2021 02:44:28 -0400
+Received: from mail-qk1-x734.google.com (mail-qk1-x734.google.com [IPv6:2607:f8b0:4864:20::734])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 190BAC061714
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:41:56 -0700 (PDT)
+Received: by mail-qk1-x734.google.com with SMTP id bp7so10425773qkb.10
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 23:41:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=Zoa2fAXM28rUtlN/ISSvLdAbfkRTXQYLDwy+ZQkaVpU=;
-        b=JanpAjZ54bDdYnwxbmStfu/fWjIk9VlZip/2ICVrA5Fu4NYCpGT9xjQEXL8X01ZcqC
-         KywLcBzUYB9JWZH7ehuY07ydf93/K1Vi9BSefOdID86G5r7bZiv6VMffCIo69EqWpwFD
-         fB99JfRqdQEL8R5L9jXjmR++ZBtfolLf6iP2hEvdW/YDBd25QetwWMP8HcHzAx2Au5Md
-         GyEaKwNALvHi6+/yfKtbMBNwfeibcnPqyYG0WJfkFzNB83kgj60QR9gvzAfEIz0Q6h0c
-         tCxKZwQtyO0shYWgeYU0q1l5orRGFu3mHBIimnsgaH1J3TNL4qGB6bYZetZjPIf6sAsb
-         pXcQ==
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=BO2v0JTeBweGhuVnoy0dTehpO7VcFlDSNN5SwWPLKgU=;
+        b=WlWGE4WiQk128RUAT1OL9NdGPiiSBbKZcLOzRi2ulS03u2SF/jEryU3sm561o1iS2v
+         ep6UNKiDnbcystuELgzf96Za3xVJEQcCn6VW/4ZfSIVzDaMBDhC7SZ9+1KLEBU3Rbrpz
+         yaDgS1VbpG0RcBbjK6NfHJpLshLC2PwDDGSglzNpVAEzouRWdXHWrD4NOBLSoV97dCJf
+         HOoqfx9ZgysOXvypEXfJaIHPLZzittKHVqdYFcbqf9HPG1WFO2s+c1jKseu5dAgLAr4N
+         SdUMOhsbWUFNv1ayXGwZnlaCWK0QEZNqt24uYMhsZprVtaPdQ17LFHuwNGocsMFGJaX6
+         VrYQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=Zoa2fAXM28rUtlN/ISSvLdAbfkRTXQYLDwy+ZQkaVpU=;
-        b=KTk8dypuqfQc+I+pkelSADUrl7K95QQCJ0O9ZR/gUh7mBp8D9k3yBno1U3Wcj2dK/P
-         pBg5b/in92bflqqCg0rxQbQvWEkiUXb0r46jndw+C+FyMNL2gTRRvR6VuC7Aq1Sn70nB
-         qEH7KBqK4gV9atkbIkC1bIOGjpv1lrOH3Wakowo4szPEArHLHIT1FTlnNddxUlfc9Oqw
-         CYfKg7x3w3zAbNrVlN7Qwu/c11diDfJIDyFBj+bFZ78PhFB1NttSaKSSSeghsuF8vd3B
-         5jrU9AsZ7hOEbu1JxUyJ/cfVQRJcF1s69kwleoPp2hL7UTHXQSTiXGU3Sj5C+D4mH5kN
-         ZGow==
-X-Gm-Message-State: AOAM531Z2VvLwkWq1jJIqoLIVFaf6Sk3sPkgELEzJWC8rqIMk2JHIW6o
-        GvpbA1Hmz7kDDOrRmO1MpYNLkZwQAJLePLPX4XpPltlaaEvLsqFSFROOypd+sroN6NW7AdA5agV
-        qoLxdXuQweHroaG9qTfN27faCwFpwDaoLv78nFBBdQvtwUlppkM8PKvvsMl4tolN5ELzp70s/V6
-        09
-X-Google-Smtp-Source: ABdhPJxuiv1u5QlziHNRW3ip4TMax+nO8Xlwh8Irov/00oSHRChEwcLF/NNDApft/rVdq3g/bBjsMJUAxv9J
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:93ab:332e:48e3:1733])
- (user=apusaka job=sendgmr) by 2002:a25:6152:: with SMTP id
- v79mr28722879ybb.400.1635746793861; Sun, 31 Oct 2021 23:06:33 -0700 (PDT)
-Date:   Mon,  1 Nov 2021 14:06:24 +0800
-Message-Id: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [Bluez PATCH 1/3] adapter: Use PeripheralLongTermKey to store LTK
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=BO2v0JTeBweGhuVnoy0dTehpO7VcFlDSNN5SwWPLKgU=;
+        b=F5B+jvoOitE8mTmqQghYCGKB1Ko2RnE4GK0MOnIMPOM2dapY7Ent/FQ7dIHty4xlaB
+         CM4dNydi6K8rwp1Za1g/0NMjaCY0xRNkm8VdwPEG4W+jonYQ2AjKrNf4PW4Zuv359PB/
+         bCi68QLb7MTuH/dA74Ugo8nqxiySxOznHjFluhUUpnQChQJByYcgWYjyUqocsgQ7h/XC
+         +66QpujsbpDeBums0WGNy+FLdjwdQanc/pO7a3uqxqKg4vSAZNdhKJsyO9cGf0T6wPmK
+         wPpfwDQoh6CspAs/yJJheVI47vp/sdPJDVfi2zMVHG8hZXQld4/2ZVtxP/EFNNnqJ57z
+         k5nQ==
+X-Gm-Message-State: AOAM531YIUGdODS6gNBSbQfs7GHCdcglO87nfi8H8mEs7SfqIOEW+DVb
+        x40fl9toynAajWBz5BOP1WoYhU5y8bD3dA==
+X-Google-Smtp-Source: ABdhPJxJqb5SLezOfsnmrN1rYdpCUtx8TC6hZCIT5xcKKTiTuq4QOHE6AtDSIBD8W3ZseTIhxOyS1g==
+X-Received: by 2002:a05:620a:16d6:: with SMTP id a22mr6966022qkn.261.1635748915158;
+        Sun, 31 Oct 2021 23:41:55 -0700 (PDT)
+Received: from [172.17.0.2] ([20.110.190.121])
+        by smtp.gmail.com with ESMTPSA id v15sm10258026qkl.91.2021.10.31.23.41.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 31 Oct 2021 23:41:54 -0700 (PDT)
+Message-ID: <617f8c32.1c69fb81.8d919.e570@mx.google.com>
+Date:   Sun, 31 Oct 2021 23:41:54 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============2386146915397749538=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
+Subject: RE: [Bluez,1/3] adapter: Use PeripheralLongTermKey to store LTK
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+References: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+--===============2386146915397749538==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-Introducing PeripheralLongTermKey group for storing LTK info to
-replace the less inclusive term. Currently we still need to write/read
-from both to ensure smooth transition, but later we should deprecate
-the old term.
+This is automated email and please do not reply to this email!
 
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=573377
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      4.10 seconds
+GitLint                       PASS      2.80 seconds
+Prep - Setup ELL              PASS      42.57 seconds
+Build - Prep                  PASS      0.50 seconds
+Build - Configure             PASS      7.91 seconds
+Build - Make                  PASS      182.22 seconds
+Make Check                    PASS      9.23 seconds
+Make Distcheck                PASS      218.49 seconds
+Build w/ext ELL - Configure   PASS      8.01 seconds
+Build w/ext ELL - Make        PASS      173.06 seconds
+
+
+
 ---
+Regards,
+Linux Bluetooth
 
- src/adapter.c | 41 ++++++++++++++++++++++++++++++++---------
- 1 file changed, 32 insertions(+), 9 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d0d38621b8..6b12c9e793 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3868,7 +3868,11 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
- 
- 	DBG("%s", peer);
- 
--	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-+	/* Read from both entries. Later we should deprecate Slave. */
-+	ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
-+	if (!ltk)
-+		ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-+
- 	if (ltk)
- 		ltk->central = false;
- 
-@@ -8415,13 +8419,12 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
- 	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
- }
- 
--static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
-+static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
- 				uint8_t bdaddr_type, const unsigned char *key,
--				uint8_t central, uint8_t authenticated,
-+				const char *group, uint8_t authenticated,
- 				uint8_t enc_size, uint16_t ediv,
- 				uint64_t rand)
- {
--	const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
- 	char device_addr[18];
- 	char filename[PATH_MAX];
- 	GKeyFile *key_file;
-@@ -8431,11 +8434,6 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	char *str;
- 	int i;
- 
--	if (central != 0x00 && central != 0x01) {
--		error("Unsupported LTK type %u", central);
--		return;
--	}
--
- 	ba2str(peer, device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-@@ -8475,6 +8473,31 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	g_key_file_free(key_file);
- }
- 
-+static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
-+				uint8_t bdaddr_type, const unsigned char *key,
-+				uint8_t central, uint8_t authenticated,
-+				uint8_t enc_size, uint16_t ediv,
-+				uint64_t rand)
-+{
-+	if (central != 0x00 && central != 0x01) {
-+		error("Unsupported LTK type %u", central);
-+		return;
-+	}
-+
-+	if (central) {
-+		store_ltk_group(adapter, peer, bdaddr_type, key, "LongTermKey",
-+				authenticated, enc_size, ediv, rand);
-+	} else {
-+		/* Store duplicates for now. Later we should deprecate Slave. */
-+		store_ltk_group(adapter, peer, bdaddr_type, key,
-+				"PeripheralLongTermKey", authenticated,
-+				enc_size, ediv, rand);
-+		store_ltk_group(adapter, peer, bdaddr_type, key,
-+				"SlaveLongTermKey", authenticated,
-+				enc_size, ediv, rand);
-+	}
-+}
-+
- static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
- {
--- 
-2.33.1.1089.g2158813163f-goog
-
+--===============2386146915397749538==--
