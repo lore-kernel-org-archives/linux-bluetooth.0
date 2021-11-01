@@ -2,62 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F04BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 16:43:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1D1D0C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 16:52:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E9930611AE
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 16:43:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 006DA611C9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 16:52:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231388AbhKAQqX (ORCPT
+        id S231405AbhKAQzQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 1 Nov 2021 12:46:23 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58922 "EHLO
+        Mon, 1 Nov 2021 12:55:16 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231303AbhKAQqX (ORCPT
+        with ESMTP id S231135AbhKAQzP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 1 Nov 2021 12:46:23 -0400
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD8ADC061714
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 09:43:49 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id t11so11905869plq.11
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 09:43:49 -0700 (PDT)
+        Mon, 1 Nov 2021 12:55:15 -0400
+Received: from mail-pg1-x533.google.com (mail-pg1-x533.google.com [IPv6:2607:f8b0:4864:20::533])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61D65C061767
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 09:52:42 -0700 (PDT)
+Received: by mail-pg1-x533.google.com with SMTP id a9so7192429pgg.7
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 09:52:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=cRzJB3hcj9QyTgdXCXFF8QeC+qBtBzgubQUHBkJbkzY=;
-        b=Fll/quKkMLk2VOcNpzaXtxhtWJbD89GoHxrXHzS2/pahYmuabVUavbVbPIuCLpJlUI
-         /xMAT7ouAIH5CQGh5QjXdyIBwv23lccLAGQI5vKpvbYdVlg8nI7xh8uvEB+mqWHAFWLW
-         MTbk+eZ7LMagNPG3pObfFDYcHfuiLNOngpz+Uy+xdmiGbp+d6MWShD6AuLN60g8AHyUl
-         mf5FTTklLLwUY1OIXb+VTmWMt5meUPwSnfw6YrFiSgDjXw8qHKax8Y7O8PNxLoQo3+Tl
-         P/0DXONGnHdd3fQvz3wqIFymGylmfFnKNNzN+JkydYdC8kvWqx58oIf1Nj1GKsncwzSz
-         vrgw==
+        bh=qSJb4EHFpcg31hSEerygHqT9wyQWv1SThBibu9vMDPc=;
+        b=V41OFns1fatfwcfSwjpIH/fDRP02f6uNlTzHg/p5qQS1vcCRzuHFVpo3pXxJkDVHua
+         RwZ2tS6V/BTJThIo+0RB54jFQRGRgeEp06F4q2sM22dnhbCqU0cJjkj6v9h2MboaVxjj
+         F+k+bp9psjDJuODFWJEkdO4CmgameJSq8o98CWxO0jYSM+Bxp3PV5hH1TaoOR4lDF2LD
+         +7jRddlqO34TW/E2z06V4LE6Ll7vZtD90G2w8O9+nMMiIaLj8PASco/sBfiecpDR9nzo
+         ikRrJ+avGj5msdDUSEOCm5B5eCvvj2+UZvZfhO6//iEdNDyvDye8I9uYSdvhqXFwfRkf
+         7PxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=cRzJB3hcj9QyTgdXCXFF8QeC+qBtBzgubQUHBkJbkzY=;
-        b=TZEQTNk85rKETL14VlBGb70uyu7mCgU5DQrO/wYO7jGx4Vf2vqGkfwWdqizUY5MZAP
-         C0NT5vRkSRR90D718CuTlUTFiJ5KkiHEJG/ZO/0Tw/Jk28KJeyD0G7XgXAq1AkrkEA1S
-         NUlq3Fs0tfJNct4C/VDgZQBlew+0TXE075xfsbxKbnkNicoDO6l6JYx0aeDA27tkscZ8
-         rnvNsEKe1vZ5ZMepwkUynxo7O1ghpJWeuvQKfmTkAR81GFtpV/BruuCbVkWmMmab/QeX
-         WQEgnwPgpNbpEsgWWxoXrQPx9nUVIriIl5thZvJjuP4VAie1+UEHUOKeG9wEpk1L65dC
-         CmXQ==
-X-Gm-Message-State: AOAM531ueQ5y1faaTPorXlyVIspHTFpXZwq5mNNQiadVx4PKbHTvP6G4
-        8j+2q6tJ+yi6FWe3GEOn6oi3vlHwc1s=
-X-Google-Smtp-Source: ABdhPJzqAE9Riu3oIUYApdRdU8ffXpdK3NIWU08odzSX33vlkTCP2gqVVpLrwVnEwoyMtEuBzukMwA==
-X-Received: by 2002:a17:902:e88a:b0:141:dfde:eed7 with SMTP id w10-20020a170902e88a00b00141dfdeeed7mr8672818plg.17.1635785028737;
-        Mon, 01 Nov 2021 09:43:48 -0700 (PDT)
+        bh=qSJb4EHFpcg31hSEerygHqT9wyQWv1SThBibu9vMDPc=;
+        b=dHdl6sVJZQaL+4bIJcY/wyvQYEP/pMR5HR3ihhiQ4QiVzo1IMfYG2ui9E+xA+pp0rr
+         NxtQIpwqC5THuD4aTZMleWGylxqxUyveW9ETic+CGF/1290sUda9OFrYP412lTPhmhlJ
+         fZjhdcG5Z8xdrBkUAHcFQPtTcxvAcei7feQneDUhnSto8l33jkOsl2gYXpmIx6ypc/vX
+         Q/kocmpX7yk9UoIWE70xEKauXTPZ4oPhGC7RxClj/QxlEHtR8g+4vXbJ9KHmS7Q+R4wR
+         A08LxxONIIbi2vHWFU11YmQL+Ql4PqKUEefW567kDT6a2gjrBAyWelT76N3Lt+sLdk7A
+         APfA==
+X-Gm-Message-State: AOAM532C8zLWbjnl9OLgT9GfoT+S70mKCu/zWzTyBMDUkbD9OR/Kn6N+
+        bdzdmDGMZJ/Xrk2cSsvqUwY5e6JlvEw=
+X-Google-Smtp-Source: ABdhPJw3HlWu0Q75l5IGa+9I4HkrgF8cz6/ZpPXfxG7LyNacoADmPBhY5sIM2YiUgJ4Rbn6vCUuVfQ==
+X-Received: by 2002:a63:89c3:: with SMTP id v186mr8262032pgd.57.1635785561539;
+        Mon, 01 Nov 2021 09:52:41 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p3sm15518027pfb.205.2021.11.01.09.43.48
+        by smtp.gmail.com with ESMTPSA id f8sm12690818pfj.36.2021.11.01.09.52.41
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 09:43:48 -0700 (PDT)
+        Mon, 01 Nov 2021 09:52:41 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_sync: Fix missing static warnings
-Date:   Mon,  1 Nov 2021 09:43:47 -0700
-Message-Id: <20211101164347.2675973-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2] Bluetooth: hci_sync: Fix missing static warnings
+Date:   Mon,  1 Nov 2021 09:52:40 -0700
+Message-Id: <20211101165240.2707193-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -78,6 +78,7 @@ This fixes the following warnings:
     1762 | int hci_passive_scan_sync(struct hci_dev *hdev)
          |     ^~~~~~~~~~~~~~~~~~~~~
 
+Fixes: e8907f76544f ("Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3")
 Reported-by: kernel test robot <lkp@intel.com>
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
