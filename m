@@ -2,50 +2,48 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F412C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 00:10:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 47442C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 05:00:21 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id F16CE61051
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 00:10:09 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 28B3060FD9
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  1 Nov 2021 05:00:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230222AbhKAAMl (ORCPT
+        id S229560AbhKAFCw (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 31 Oct 2021 20:12:41 -0400
-Received: from mail-il1-f198.google.com ([209.85.166.198]:42747 "EHLO
-        mail-il1-f198.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230121AbhKAAMk (ORCPT
+        Mon, 1 Nov 2021 01:02:52 -0400
+Received: from mail-io1-f71.google.com ([209.85.166.71]:54225 "EHLO
+        mail-io1-f71.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229502AbhKAFCw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 31 Oct 2021 20:12:40 -0400
-Received: by mail-il1-f198.google.com with SMTP id w1-20020a056e021c8100b00266694bb43cso1733264ill.9
-        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 17:10:08 -0700 (PDT)
+        Mon, 1 Nov 2021 01:02:52 -0400
+Received: by mail-io1-f71.google.com with SMTP id m5-20020a0566022e8500b005e192595a3dso2641219iow.20
+        for <linux-bluetooth@vger.kernel.org>; Sun, 31 Oct 2021 22:00:19 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=Afp5EW5NkKvo/CTFXhPj0ythG6Ja27sM8OR5KgU1Xu8=;
-        b=z6uY78Wa9Ek0UDCda5XHmWyhBwVIbd5HBwKkuJqksnoiLQtTReSfikOIdBK0m0I2O8
-         fa0q/SWQ4Y36VeMF5Z76KeH9fc5dxw8w1Wv0xYzNxp1VG3HCExKcUv4CHMaQ01KBJTCu
-         fDPvOjcaHIXopWNzUEnhY8/v6RIzRf4SUixpDih4dZl1bhX4WhANeZN0sd4MrSwH8pyb
-         FVj2nCqOV9i7GUylTl+H65+HKbCWJv3pflPsq8wnCXe7WgsLiSeGctA/KMxmoAc2SVcm
-         53o/LwUlWsCx3ltrdzHPbFkrAwk01gLkzjB7+/QJGWUBycRJDq4W6MWc7H0xkddu0xsB
-         Ttrg==
-X-Gm-Message-State: AOAM533BWyseClf++K3Fcg2+a0ZyKXusp35voJHdexEyaMTLAIHUU1Wo
-        1MUcZXevETNCoOkm86NwfC8364/3cj5oMndvWmL5Y5SwmU5R
-X-Google-Smtp-Source: ABdhPJzvDiSWpENrfpgFn60q4qjm7mMvncZKK3Plr617y0m1LtDCp5/53EwucWc1koNxoVvq4ESrYzdTCQ+mYziVq0qcr6T4SxXP
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=8kbiHxOD2R5Kq+0WAmJMkHoocjtefmqjMs5G+/Y1aAA=;
+        b=Dr2L27jd3m80FSUGrHUHal4HUWGbMkOkTvNvLL8K90PsxIJQQ+umfIjhuvWOm5X41v
+         0AiGIlhca0vYep0KW354bQ5sW7bJGRcbxaHYdYnfh9fYX/Ri5V4TjrUp/STOf30oH4kA
+         mRIi9fihV/JRP9e+GaW9ucxgFJox2P1Jn1JWT/Nfov/ZHSFgvPOA98Whf4qaKtGckPgK
+         hsLKSl4S2CGN6OG3IqS6mhnNuPoNb5aeATGaegJHcD0TtM4qi1UyiMQkRObfjAth/NWS
+         4PbZ+PbqU7IDA4dsSS7Y0MWca+UI7Kkf5EIeltp+tc4Ds7uIhBqTQcd5C1V4/zUbl5C8
+         r7xQ==
+X-Gm-Message-State: AOAM533AyQ2+93aHUProeElYfXZoYA6ADaagGQaoXUr1I30tqaPYArBd
+        yLlHrunZKq2CIsaampBIv781a5awBlLjEPp410dFjkD7R2rz
+X-Google-Smtp-Source: ABdhPJyWZCUoBUEwmt0F5ibRDQL3QZG8mGbbVoHRLj5BWXhBbWPu/W5Hf3le/6CuHAd8Au/fs+ACLBcCPTpom4yOF9WfjYewpKRc
 MIME-Version: 1.0
-X-Received: by 2002:a05:6638:3488:: with SMTP id t8mr4452286jal.139.1635725408206;
- Sun, 31 Oct 2021 17:10:08 -0700 (PDT)
-Date:   Sun, 31 Oct 2021 17:10:08 -0700
-In-Reply-To: <4b2b9c55-e2e0-a149-7dfe-ca36244d2245@gmail.com>
+X-Received: by 2002:a05:6e02:df1:: with SMTP id m17mr17705480ilj.125.1635742819571;
+ Sun, 31 Oct 2021 22:00:19 -0700 (PDT)
+Date:   Sun, 31 Oct 2021 22:00:19 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000e805e605cfaefff1@google.com>
-Subject: Re: [syzbot] KASAN: slab-out-of-bounds Read in hci_le_meta_evt (2)
-From:   syzbot <syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com>
-To:     davem@davemloft.net, johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org, netdev@vger.kernel.org,
-        paskripkin@gmail.com, syzkaller-bugs@googlegroups.com
+Message-ID: <000000000000b45deb05cfb30d1c@google.com>
+Subject: [syzbot] INFO: trying to register non-static key in
+ hci_uart_send_frame (3)
+From:   syzbot <syzbot+944c82cd12dd1db5b05f@syzkaller.appspotmail.com>
+To:     johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -53,17 +51,51 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hello,
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+syzbot found the following issue on:
 
-Reported-and-tested-by: syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         8bb7eca9 Linux 5.15
+HEAD commit:    1fc596a56b33 Merge tag 'trace-v5.15-rc6' of git://git.kern..
 git tree:       upstream
-kernel config:  https://syzkaller.appspot.com/x/.config?x=afe4479d781b5f2b
-dashboard link: https://syzkaller.appspot.com/bug?extid=e3fcb9c4f3c2a931dc40
+console output: https://syzkaller.appspot.com/x/log.txt?x=12b58364b00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=b160d0631c7a8f26
+dashboard link: https://syzkaller.appspot.com/bug?extid=944c82cd12dd1db5b05f
 compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=15bd0e6ab00000
 
-Note: testing is done by a robot and is best-effort only.
+Unfortunately, I don't have any reproducer for this issue yet.
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+944c82cd12dd1db5b05f@syzkaller.appspotmail.com
+
+INFO: trying to register non-static key.
+The code is fine but needs lockdep annotation, or maybe
+you didn't initialize this object before use?
+turning off the locking correctness validator.
+CPU: 1 PID: 150 Comm: kworker/u5:0 Not tainted 5.15.0-rc7-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+Workqueue: hci7 hci_cmd_work
+Call Trace:
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xcd/0x134 lib/dump_stack.c:106
+ assign_lock_key kernel/locking/lockdep.c:939 [inline]
+ register_lock_class+0xf79/0x10c0 kernel/locking/lockdep.c:1251
+ __lock_acquire+0x105/0x54a0 kernel/locking/lockdep.c:4894
+ lock_acquire kernel/locking/lockdep.c:5625 [inline]
+ lock_acquire+0x1ab/0x510 kernel/locking/lockdep.c:5590
+ percpu_down_read include/linux/percpu-rwsem.h:51 [inline]
+ hci_uart_send_frame+0x8e/0x6c0 drivers/bluetooth/hci_ldisc.c:279
+ hci_send_frame+0x1c0/0x380 net/bluetooth/hci_core.c:4244
+ hci_cmd_work+0x202/0x390 net/bluetooth/hci_core.c:5177
+ process_one_work+0x9bf/0x16b0 kernel/workqueue.c:2297
+ worker_thread+0x658/0x11f0 kernel/workqueue.c:2444
+ kthread+0x3e5/0x4d0 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:295
+Bluetooth: hci6: sending frame failed (-49)
+Bluetooth: hci6: sending frame failed (-49)
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
