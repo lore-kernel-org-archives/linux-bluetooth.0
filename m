@@ -2,115 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 24813C43217
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:18:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D01C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:08 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0180960F56
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:18:45 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 49CAD60F02
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:08 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231165AbhKBHVS convert rfc822-to-8bit (ORCPT
+        id S231220AbhKBHVl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 03:21:18 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:34606 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbhKBHVQ (ORCPT
+        Tue, 2 Nov 2021 03:21:41 -0400
+Received: from so254-9.mailgun.net ([198.61.254.9]:15259 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231145AbhKBHVk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 03:21:16 -0400
-Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CC821CECE9;
-        Tue,  2 Nov 2021 08:18:40 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH] Bluetooth: hci_sync: Set Privacy Mode when updating the
- resolving list
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211102055116.2898794-1-luiz.dentz@gmail.com>
-Date:   Tue, 2 Nov 2021 08:18:40 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6313C3AD-AEA9-4E4E-98C4-3F1C62DE04CA@holtmann.org>
-References: <20211102055116.2898794-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Tue, 2 Nov 2021 03:21:40 -0400
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1635837546; h=Content-Transfer-Encoding: Content-Type:
+ In-Reply-To: MIME-Version: Date: Message-ID: References: Cc: To:
+ Subject: From: Sender; bh=y6Sz6xkt/HSEuNS0flTXHuzKjPeOjD94Xhcr7nenToU=;
+ b=S5lSnoZa0VrENqPxzaTyYk5IFGMK+ZCAEOHmZXavKSw2orC1G/v0TWNaAGuIGty0XcGZmX5H
+ 4BJSjnY/Zsd0FH8DXgrGmWYOLoDsr/Bt+IL7mVmmhF0FWW2rBf0f9UJnry8xEK9dqLO4lK6a
+ myWB3rYcrjlNUMvKIWxLfRAqDjM=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
+ 6180e65caeb239055603ddb7 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 02 Nov 2021 07:18:52
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 56A90C4338F; Tue,  2 Nov 2021 07:18:52 +0000 (UTC)
+Received: from [192.168.0.104] (unknown [183.195.15.125])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+        (No client certificate requested)
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 28A10C4360C;
+        Tue,  2 Nov 2021 07:18:48 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 28A10C4360C
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+Subject: Re: [PATCH v1] serdev: Add interface serdev_device_ioctl
+To:     Greg KH <gregkh@linuxfoundation.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     robh@kernel.org, jirislaby@kernel.org,
+        linux-serial@vger.kernel.org,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Zijun Hu <quic_zijuhu@quicinc.com>
+References: <1635753048-5289-1-git-send-email-zijuhu@codeaurora.org>
+ <YX+eRgCrUs2Y5iaX@kroah.com>
+ <fe5a8bec-b186-c719-5f02-a0a67eb8862f@codeaurora.org>
+ <YX+mDGr8tDzVT4Hr@kroah.com>
+ <573d3640-2e8b-9266-4205-755ac0951abd@codeaurora.org>
+ <YX/M/MZL8jbu7p7I@kroah.com>
+ <DC399B43-DB1E-42AC-8A31-3A2C9407EE6D@holtmann.org>
+ <YX/VYUC3ngOf5bX5@kroah.com>
+Message-ID: <787fa2b6-146a-16b1-e304-c7e3b26dbf99@codeaurora.org>
+Date:   Tue, 2 Nov 2021 15:18:46 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
+MIME-Version: 1.0
+In-Reply-To: <YX/VYUC3ngOf5bX5@kroah.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
 
-> This adds support for Set Privacy Mode when updating the resolving list
-> when HCI_LIMITED_PRIVACY so the controller shall use Device Mode for
-> devices programmed in the resolving list, Device Mode is actually
-> required when the remote device are not able to use RPA as otherwise the
-> default mode is Network Privacy Mode in which only RPA are allowed thus
-> the controller would filter out advertisement using the identity address
-> for which there is an IRK.
+
+On 11/1/2021 7:54 PM, Greg KH wrote:
+> On Mon, Nov 01, 2021 at 12:45:36PM +0100, Marcel Holtmann wrote:
+>> Hi Greg,
+>>
+>>>>>>>> For serdev_device which is mounted at virtual tty port, tty ioctl()
+>>>>>>>> maybe be used to make serdev_device ready to talk with tty port, so
+>>>>>>>> add interface serdev_device_ioctl().
+>>>>>>>>
+>>>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>>>>>>>> ---
+>>>>>>>> drivers/tty/serdev/core.c           | 11 +++++++++++
+>>>>>>>> drivers/tty/serdev/serdev-ttyport.c | 12 ++++++++++++
+>>>>>>>> include/linux/serdev.h              |  9 +++++++++
+>>>>>>>> 3 files changed, 32 insertions(+)
+>>>>>>>>
+>>>>>>>> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
+>>>>>>>> index f1324fe99378..c0f6cd64716b 100644
+>>>>>>>> --- a/drivers/tty/serdev/core.c
+>>>>>>>> +++ b/drivers/tty/serdev/core.c
+>>>>>>>> @@ -405,6 +405,17 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
+>>>>>>>> }
+>>>>>>>> EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
+>>>>>>>>
+>>>>>>>> +int serdev_device_ioctl(struct serdev_device *serdev, unsigned int cmd, unsigned long arg)
+>>>>>>>> +{
+>>>>>>>> +	struct serdev_controller *ctrl = serdev->ctrl;
+>>>>>>>> +
+>>>>>>>> +	if (!ctrl || !ctrl->ops->ioctl)
+>>>>>>>> +		return -EOPNOTSUPP;
+>>>>>>>
+>>>>>>> Wrong error for returning that an ioctl is not handled :(
+>>>>>> checkpatch.pl always reports below WARNING when i use ENOTSUPP as present interfaces
+>>>>>> do. so i change error code to EOPNOTSUPP.
+>>>>>>
+>>>>>> #28: FILE: drivers/tty/serdev/core.c:412:
+>>>>>> +               return -ENOTSUPP;
+>>>>>>
+>>>>>> WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
+>>>>>
+>>>>> Both of them are not the correct error to return when an ioctl is not
+>>>>> supported.
+>>>>>
+>>>> is ENODEV okay?
+>>>
+>>> No, -ENOTTY is the correct one as per the documentation, right?
+>>>
+>>>>>>> Anyway, what in-tree driver needs this functionality?  Why does serdev
+>>>>>>> need any ioctl commands?
+>>>>>>>
+>>>>>> i am developing driver for a special bluetooth controller which is integrated within SOC,
+>>>>>> and it does not connect with the BT HOST with UART as normal controller do, but it has very
+>>>>>> similar features as the BT controller with UART I/F. it is mounted on a virtual serial port
+>>>>>> driven by a tty driver developed. but it need to call tty ioctl to make the 
+>>>>>> special BT controller ready to talk with tty port. so i add this interface.
+>>>>>
+>>>>> Please submit this change when you submit your driver that uses it at
+>>>>> the same time so we can review them all at once.  We do not add apis
+>>>>> that are not used in the kernel tree.
+>>>>>
+>>>> okay
+>>>>>> as you known, the main purpose of ioctl is to achieve MISC and irregular control. so it is useful
+>>>>>> for these irregular devices.
+>>>>>
+>>>>> For tty devices, "custom" ioctls are not ok, use the standard tty
+>>>>> commands and you should be fine for everything you need to do.
+>>>>>
+>>>>> If not, then perhaps your design is incorrect?
+>>>>>
+>>>> i just want to refer bt_ioctl within https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
+>>>> by serdev. so add this interface.
+>>>
+>>> The 5.4 kernel is not relevant here, so I do not understand.
+>>>
+>>>> are there any other good solution to advise?
+>>>
+>>> Why not work with the bluetooth developers on this?
+>>
+>> if this is just to have some hackish Bluetooth driver, then NAK from my side. Since we have serdev, we have no need for, or requirements for any ioctl anymore. If such thing is needed, it is a bad design.
 > 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> include/net/bluetooth/hci.h |  7 ++++++
-> net/bluetooth/hci_sync.c    | 48 ++++++++++++++++++++++++++++++++-----
-> 2 files changed, 49 insertions(+), 6 deletions(-)
+> Thanks for the confirmation, seems sane to me!
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 63065bc01b76..aa856dfd5b9f 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1930,6 +1930,13 @@ struct hci_rp_le_read_transmit_power {
-> 	__s8  max_le_tx_power;
-> } __packed;
+> Zijun, please fix up your driver and submit it to be merged and all
+> should be fine, no need for any custom ioctls.
 > 
-> +#define HCI_OP_LE_SET_PRIVACY_MODE	0x204e
-> +struct hci_cp_le_set_privacy_mode {
-> +	__u8  bdaddr_type;
-> +	bdaddr_t  bdaddr;
-> +	__u8  mode;
-> +} __packed;
-> +
-> #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
-> struct hci_rp_le_read_buffer_size_v2 {
-> 	__u8    status;
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index b794605dc882..43173d645436 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1580,8 +1580,37 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
-> 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> }
+ thank you Greg, i have submitted all changes to support the special BT controller, certainly, it includes this serdev change.
+> thanks,
 > 
-> +/* Set Device Privacy Mode. */
-> +static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
-> +					struct hci_conn_params *params)
-> +{
-> +	struct hci_cp_le_set_privacy_mode cp;
-> +	struct smp_irk *irk;
-> +
-> +	/* Set Privacy Mode requires the use of resolving list (aka. LL Privacy)
-> +	 * by default Network Mode is used so only really send the command if
-> +	 * Device Mode is required (HCI_LIMITED_PRIVACY).
-> +	 */
-> +	if (!use_ll_privacy(hdev) ||
-> +	    !hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
-> +		return 0;
-> +
-> +	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
-> +	if (!irk)
-> +		return 0;
-> +
-> +	memset(&cp, 0, sizeof(cp));
-> +	cp.bdaddr_type = irk->addr_type;
-> +	bacpy(&cp.bdaddr, &irk->bdaddr);
-> +	cp.mode = 0x01;
-> +
-
-you need to check if this command is actually supported.
-
-I think the best option is to add it to Set Device Flags and let bluetoothd set it on a per device basis like it does with the wakeup flag.
-
-Trying to tie it to the Limited Privacy mode seems weird. Since that is for discoverability and this is for outgoing connections.
-
-Regards
-
-Marcel
-
+> greg k-h
+> 
