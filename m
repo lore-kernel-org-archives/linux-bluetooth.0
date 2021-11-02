@@ -2,271 +2,191 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E5D1BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:01:27 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B47EC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:10:30 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D163760F58
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:01:27 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 1A8D060EDF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:10:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230321AbhKBJEA (ORCPT
+        id S229778AbhKBJND (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 05:04:00 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:64992 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229920AbhKBJD7 (ORCPT
+        Tue, 2 Nov 2021 05:13:03 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54004 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229577AbhKBJNB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 05:03:59 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1635843684; h=Content-Transfer-Encoding: Content-Type:
- In-Reply-To: MIME-Version: Date: Message-ID: From: References: Cc: To:
- Subject: Sender; bh=MKIGHTj70nAolEW2rA4sbifPLMVD7Mn6LCqOQv0iyEY=; b=fYqUgOjnAhUZyGdo0ZSP4rzWvv14DCj35kVWt8dhAXSgtwSR5vdJE2e0GLvnhjJx7sSWaYAV
- ExGlPsVgSFP/1x3wzv5FyabnKOthZCB5HIM7IYHI/U9kFxpXORbmUfRJxhrkZN/i6cbbbWBN
- oCO6HFJYs/jkrnUKsewxWrMU+hI=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n01.prod.us-west-2.postgun.com with SMTP id
- 6180fe4cc8c1b282a5202d68 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 02 Nov 2021 09:01:00
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 096A5C43617; Tue,  2 Nov 2021 09:00:59 +0000 (UTC)
-Received: from [192.168.0.104] (unknown [183.195.15.125])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id BD971C4338F;
-        Tue,  2 Nov 2021 09:00:55 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org BD971C4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: Add support for QTI bluetooth
- MAPLE
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Greg KH <gregkh@linuxfoundation.org>
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Rocky Liao <rjliao@codeaurora.org>,
-        Zijun Hu <quic_zijuhu@quicinc.com>
-References: <1635837177-1341-1-git-send-email-zijuhu@codeaurora.org>
- <YYDqW6ewycWP1Y7a@kroah.com>
- <4f6aee28-4d86-116c-6c47-bfce5de6551b@codeaurora.org>
- <YYD1PJrFw/xmEXIW@kroah.com>
- <432B905E-5263-47A6-95AA-7F43715BE196@holtmann.org>
-From:   Zijun Hu <zijuhu@codeaurora.org>
-Message-ID: <18e1cb9d-39e5-3953-6f32-faea6b2dee47@codeaurora.org>
-Date:   Tue, 2 Nov 2021 17:00:53 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Tue, 2 Nov 2021 05:13:01 -0400
+Received: from mail-wr1-x436.google.com (mail-wr1-x436.google.com [IPv6:2a00:1450:4864:20::436])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DD07BC061714
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 02:10:26 -0700 (PDT)
+Received: by mail-wr1-x436.google.com with SMTP id c4so2164022wrd.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 02:10:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=PsDeslGfzneJWylkhs49aT8wbPp678a9lKNoJmw/U8A=;
+        b=nTjfDIECjpb+ZauBMLbfldThBzGmXhciP5Z+kJL6abNeEywDqnEjgboejy3sBS+t9v
+         PYiVojh2m8M3kgd+l7NMywurdcOFAAssSbBvF3n67NmoDRA9phEEzG1keyRzb02PvB4c
+         wVbNhKVfyfvnYqln4YSfzyZsdpie6pKPYR413W3Rue07+0BQd25sBvN4d231sGmElL1y
+         23oSpGyL8EQHdhGwVyPCG8Uery0EIcyEw+lAyd/T3/2MCbi8AVHuuIi/OgE6ynB/QbR/
+         XKghEiJ2aazKg6MgIXpX0+h3yHppoP/vNM2ShhQ1xs3CT+4oFDuHa5FPYA1euMCmXLjK
+         tISA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=PsDeslGfzneJWylkhs49aT8wbPp678a9lKNoJmw/U8A=;
+        b=zpfTHTUn2LzRjJ6s72eTrowq5s7GIacQry98bXx1lFGt8ByHYleUAhN4CLAqkSTW5x
+         uevrEAg6gp5Roy2224jwBu99ZPjg6SEGw4/gnOuWIs1UG8/z2bu3S28MdZU5C2BhXveV
+         1nNNtrwoBdQR0VTOhCVf2f59ZXSE/B0nK7FRwtF7Ag+BS653Z0oMt4nndkSSZHzlro5n
+         IfT5hyzRXzc/rS3v0GHp5WODnhgBXT+Iyyl6wqIYK2+Mc79l0G6EauxkB+pMxrzL7mgs
+         ak6VMPgtihlyawG4jnIl9PKYKIqgsXtxwc1gGk4zuHGZ2Ogp58IDs/6fiZ4MInr82irw
+         6hrw==
+X-Gm-Message-State: AOAM531w0H0QhQq6925yjD8YhJde3t5YB0+X1DtYotB3PxOzvcAt0ADz
+        nxf1qgG++AIhCcPCf7vMPgj1TuzxqTQBw07MGOFYqA==
+X-Google-Smtp-Source: ABdhPJzBXYvfSwo7/DDcWe+/8XUaIdqP9DzHdbrhZDNHBJ3WxcDWHds6DycB0tjdgG4KAhaUf7MnfSjoudGrMehzKSU=
+X-Received: by 2002:a5d:64c8:: with SMTP id f8mr46054643wri.398.1635844225029;
+ Tue, 02 Nov 2021 02:10:25 -0700 (PDT)
 MIME-Version: 1.0
-In-Reply-To: <432B905E-5263-47A6-95AA-7F43715BE196@holtmann.org>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
+References: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+ <CABBYNZJg=Acx_BLyq=RzbkvfWOj-Rik3t7B1Z-XZqemo2LMykQ@mail.gmail.com>
+In-Reply-To: <CABBYNZJg=Acx_BLyq=RzbkvfWOj-Rik3t7B1Z-XZqemo2LMykQ@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Tue, 2 Nov 2021 17:10:14 +0800
+Message-ID: <CAJQfnxHP0dRzahhcK2S6sN-e1ssk1S2BZB3Nzs+SCTXufBVfGA@mail.gmail.com>
+Subject: Re: [Bluez PATCH 1/3] adapter: Use PeripheralLongTermKey to store LTK
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Luiz,
 
 
-On 11/2/2021 4:38 PM, Marcel Holtmann wrote:
-> Hi Greg,
-> 
->>>>> Add support for MAPLE integrated within SOC, it is mounted on
->>>>> a virtual tty port and powered on/off via relevant IOCTL, neither
->>>>> IBS nor RAMPATCH downloading is not required.
->>>>>
->>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>> ---
->>>>> drivers/bluetooth/btqca.c   | 13 ++++++++++++-
->>>>> drivers/bluetooth/btqca.h   | 13 +++++++++++++
->>>>> drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++++++++++++++++++++++++++-
->>>>> 3 files changed, 71 insertions(+), 2 deletions(-)
->>>>>
->>>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->>>>> index be04d74037d2..b83d2ecefe5d 100644
->>>>> --- a/drivers/bluetooth/btqca.c
->>>>> +++ b/drivers/bluetooth/btqca.c
->>>>> @@ -255,6 +255,8 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
->>>>> 		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
->>>>> 		BT_DBG("Length\t\t : %d bytes", length);
->>>>>
->>>>> +		if (qca_is_maple(soc_type))
->>>>> +			break;
->>>>> 		idx = 0;
->>>>> 		data = tlv->data;
->>>>> 		while (idx < length) {
->>>>> @@ -552,6 +554,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>>>> 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
->>>>>
->>>>> 	/* Download rampatch file */
->>>>> +	if (qca_is_maple(soc_type))
->>>>> +		goto download_nvm;
->>>>> +
->>>>> 	config.type = TLV_TYPE_PATCH;
->>>>> 	if (qca_is_wcn399x(soc_type)) {
->>>>> 		snprintf(config.fwname, sizeof(config.fwname),
->>>>> @@ -580,6 +585,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>>>> 	/* Give the controller some time to get ready to receive the NVM */
->>>>> 	msleep(10);
->>>>>
->>>>> +download_nvm:
->>>>> 	/* Download NVM configuration */
->>>>> 	config.type = TLV_TYPE_NVM;
->>>>> 	if (firmware_name)
->>>>> @@ -597,6 +603,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>>>> 	else if (soc_type == QCA_QCA6390)
->>>>> 		snprintf(config.fwname, sizeof(config.fwname),
->>>>> 			 "qca/htnv%02x.bin", rom_ver);
->>>>> +	else if (qca_is_maple(soc_type))
->>>>> +		snprintf(config.fwname, sizeof(config.fwname),
->>>>> +			 "qca/mpnv%02x.bin", rom_ver);
->>>>> 	else if (soc_type == QCA_WCN6750)
->>>>> 		snprintf(config.fwname, sizeof(config.fwname),
->>>>> 			 "qca/msnv%02x.bin", rom_ver);
->>>>> @@ -609,6 +618,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>>>> 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
->>>>> 		return err;
->>>>> 	}
->>>>> +	if (qca_is_maple(soc_type))
->>>>> +		msleep(MAPLE_NVM_READY_DELAY_MS);
->>>>>
->>>>> 	if (soc_type >= QCA_WCN3991) {
->>>>> 		err = qca_disable_soc_logging(hdev);
->>>>> @@ -637,7 +648,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->>>>> 		return err;
->>>>> 	}
->>>>>
->>>>> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
->>>>> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || qca_is_maple(soc_type)) {
->>>>> 		/* get fw build info */
->>>>> 		err = qca_read_fw_build_info(hdev);
->>>>> 		if (err < 0)
->>>>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
->>>>> index 30afa7703afd..0a5a7d1daa71 100644
->>>>> --- a/drivers/bluetooth/btqca.h
->>>>> +++ b/drivers/bluetooth/btqca.h
->>>>> @@ -46,6 +46,8 @@
->>>>>
->>>>> #define QCA_FW_BUILD_VER_LEN		255
->>>>>
->>>>> +#define MAPLE_NVM_READY_DELAY_MS        1500
->>>>> +#define MAPLE_POWER_CONTROL_DELAY_MS    50
->>>>>
->>>>> enum qca_baudrate {
->>>>> 	QCA_BAUDRATE_115200 	= 0,
->>>>> @@ -145,6 +147,7 @@ enum qca_btsoc_type {
->>>>> 	QCA_WCN3991,
->>>>> 	QCA_QCA6390,
->>>>> 	QCA_WCN6750,
->>>>> +	QCA_MAPLE,
->>>>> };
->>>>>
->>>>> #if IS_ENABLED(CONFIG_BT_QCA)
->>>>> @@ -167,6 +170,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->>>>> 	return soc_type == QCA_WCN6750;
->>>>> }
->>>>>
->>>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
->>>>> +{
->>>>> +	return soc_type == QCA_MAPLE;
->>>>> +}
->>>>> +
->>>>> #else
->>>>>
->>>>> static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->>>>> @@ -204,6 +212,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->>>>> 	return false;
->>>>> }
->>>>>
->>>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
->>>>> +{
->>>>> +	return false;
->>>>> +}
->>>>> +
->>>>> static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->>>>> {
->>>>> 	return -EOPNOTSUPP;
->>>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->>>>> index dd768a8ed7cb..f1d9670719c4 100644
->>>>> --- a/drivers/bluetooth/hci_qca.c
->>>>> +++ b/drivers/bluetooth/hci_qca.c
->>>>> @@ -70,6 +70,10 @@
->>>>> #define QCA_CRASHBYTE_PACKET_LEN	1096
->>>>> #define QCA_MEMDUMP_BYTE		0xFB
->>>>>
->>>>> +#ifndef IOCTL_IPC_BOOT
->>>>> +#define IOCTL_IPC_BOOT                  0xBE
->>>>> +#endif
->>>>
->>>> You send this command, but never use it.  Where is the driver code that
->>>> uses this command?
->>>>
->>> qca_maple_power_control() will use it.  this driver depends on bt_tty kernel module
->>> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
->>
->> You can not add code to the kernel that is not used by the kernel
->> itself.  That driver needs to be in the tree as well, why is it not
->> submitted now too?
->>
->>>> And why not tabs?
->>>>
->>>> And why is this patch series not properly threaded so tools can pick it
->>>> up and find them?
->>>>
->>>> And why the odd named ioctl that is different from other ones in this
->>>> file?
->>>>
->>> that IOCTL name is defined by that module.
->>> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/include/linux/bt.h?h=NHSS.QSDK.11.5.0.5.r2
->>
->> Again, it needs to be in the tree.
->>
->>>> And why not just use normal power management hooks for doing things like
->>>> turning on and off the hardware like all other drivers?
->>>>
->>> this device is special.
->>
->> All drivers and devices are special and unique.  Just like all of them :)
->>
->> What is so odd about this device that it can not work with the existing
->> infrastructure that the kernel has for all of the hundreds of thousands
->> of other devices it supports?
->>
->>> it seems BT maintainer decides to drop this patch.
->>
->> Of course, at the very least because there is no in-kernel user, why
->> would you accept such a patch if you were the maintainer?
->>
->> Please submit your driver first.
-> 
-> this power on via ioctl is nasty business. I am so happy that we got rid of
-> the crucks when we finally landed serdev.
-> 
-> Some people are working on power sequence support and alike. This needs to
-> use proper infrastructure or extend existing infrastructure. To fit the
-> needs.
-> 
-> I am just 100% certain, that booting an IPC via an ioctl isn’t it. We
-> really suffered through it in the 2.4 kernel days. The hardware needs to
-> be described properly in device tree and the kernel needs to take all
-> the appropriate actions if a Bluetooth device is powered on via its
-> standard power on procedure. And that is through bluetoothd (or if you
-> use some other Bluetooth userspace) via the exposed API from the kernel.
-> 
-thank you. the IOCTL purpose is to bootup the special bluetooth controller.
-i have verified this change.
-i will submit this change to linux-ipq-5.4 firstly even if need to pick up many changes firstly.
+On Tue, 2 Nov 2021 at 14:17, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Sun, Oct 31, 2021 at 11:06 PM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > Introducing PeripheralLongTermKey group for storing LTK info to
+> > replace the less inclusive term. Currently we still need to write/read
+> > from both to ensure smooth transition, but later we should deprecate
+> > the old term.
+> >
+> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> > ---
+> >
+> >  src/adapter.c | 41 ++++++++++++++++++++++++++++++++---------
+> >  1 file changed, 32 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index d0d38621b8..6b12c9e793 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -3868,7 +3868,11 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
+> >
+> >         DBG("%s", peer);
+> >
+> > -       ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+> > +       /* Read from both entries. Later we should deprecate Slave. */
+> > +       ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
+> > +       if (!ltk)
+> > +               ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+>
+> If you find the old name being used you better replace it with the new
+> one and erase the old.
+>
+> >         if (ltk)
+> >                 ltk->central = false;
+> >
+> > @@ -8415,13 +8419,12 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+> >         bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
+> >  }
+> >
+> > -static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> > +static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
+> >                                 uint8_t bdaddr_type, const unsigned char *key,
+> > -                               uint8_t central, uint8_t authenticated,
+> > +                               const char *group, uint8_t authenticated,
+> >                                 uint8_t enc_size, uint16_t ediv,
+> >                                 uint64_t rand)
+> >  {
+> > -       const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
+> >         char device_addr[18];
+> >         char filename[PATH_MAX];
+> >         GKeyFile *key_file;
+> > @@ -8431,11 +8434,6 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> >         char *str;
+> >         int i;
+> >
+> > -       if (central != 0x00 && central != 0x01) {
+> > -               error("Unsupported LTK type %u", central);
+> > -               return;
+> > -       }
+> > -
+> >         ba2str(peer, device_addr);
+> >
+> >         snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
+> > @@ -8475,6 +8473,31 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> >         g_key_file_free(key_file);
+> >  }
+> >
+> > +static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> > +                               uint8_t bdaddr_type, const unsigned char *key,
+> > +                               uint8_t central, uint8_t authenticated,
+> > +                               uint8_t enc_size, uint16_t ediv,
+> > +                               uint64_t rand)
+> > +{
+> > +       if (central != 0x00 && central != 0x01) {
+> > +               error("Unsupported LTK type %u", central);
+> > +               return;
+> > +       }
+> > +
+> > +       if (central) {
+> > +               store_ltk_group(adapter, peer, bdaddr_type, key, "LongTermKey",
+> > +                               authenticated, enc_size, ediv, rand);
+> > +       } else {
+> > +               /* Store duplicates for now. Later we should deprecate Slave. */
+> > +               store_ltk_group(adapter, peer, bdaddr_type, key,
+> > +                               "PeripheralLongTermKey", authenticated,
+> > +                               enc_size, ediv, rand);
+> > +               store_ltk_group(adapter, peer, bdaddr_type, key,
+> > +                               "SlaveLongTermKey", authenticated,
+> > +                               enc_size, ediv, rand);
+>
+> In not following why you want to keep duplicate entries?
+>
+Based on the discussion in the other thread with Marcel, we don't want
+to immediately remove the old entry since this would cause friction
+when people are switching around between the newer and older version
+of BlueZ.
+Instead, for some time we would keep both entries alive, and only
+after that we remove the old entry.
 
+> > +       }
+> > +}
+> > +
+> >  static void new_long_term_key_callback(uint16_t index, uint16_t length,
+> >                                         const void *param, void *user_data)
+> >  {
+> > --
+> > 2.33.1.1089.g2158813163f-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-> Regards
-> 
-> Marcel
-> 
+Thanks,
+Archie
