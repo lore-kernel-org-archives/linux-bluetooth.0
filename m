@@ -2,110 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12620C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 22:10:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D426C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 22:36:54 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E31D660FC4
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 22:10:50 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 712856109D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 22:36:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229525AbhKBWNZ (ORCPT
+        id S229736AbhKBWj2 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 18:13:25 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35758 "EHLO
+        Tue, 2 Nov 2021 18:39:28 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41584 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229636AbhKBWNZ (ORCPT
+        with ESMTP id S230293AbhKBWj1 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 18:13:25 -0400
-Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C47BBC061714
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 15:10:49 -0700 (PDT)
-Received: by mail-pl1-x62b.google.com with SMTP id n8so1047726plf.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 15:10:49 -0700 (PDT)
+        Tue, 2 Nov 2021 18:39:27 -0400
+Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83EF2C061714
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 15:36:52 -0700 (PDT)
+Received: by mail-pl1-x631.google.com with SMTP id o14so1125443plg.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 15:36:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bcxWBJkF0ymGM00bcxzE4hfHy91O95ng8k4cnvawLyQ=;
-        b=mjmIgUMywQaPx6pBkhUKbPOQSQEyUQmn+ImVQyR0Zi6/FLGg73otz4UBre8p0iPAzQ
-         BAxKeQC7ZwC6W2OMnfRO1t7P3QwBSfYEITGPzHmEYKEzZ134tgW0K7pdxbpF46RzDTqM
-         wo2TKj3Waon4zjE4vzU5hokoM2eUZVsAghz1T2WQv+7XqjcnhhLNhREW0ZwLafjVYH0T
-         gfHL9wvfeIry5w89YpcKm4IVU+pLgflCjgst2/NGxfjG2hvytzHrEkgS3O4kiYs4spUf
-         sNk5Z1GMJVrmt8yYbipMexyqcAzEKF7ht/Hf9mkF/jmiTQed57/KDfx/U3wgvaQ8SMp3
-         YtqQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=IdlXh3FFePIHwOwOiG0a8VB/mgLzHjViNmw5yAuCgAw=;
+        b=MKcaf2DFbKIBWPlZXuTZtiM/CxuzQES4R8W3QmkbAKknsl5m86dSgfDRudZ+3Etn6W
+         pAkGw5+jajuiTuRUfaGqz0Ez9sa/0XL8SJsqyADBT12BAETQf6cRZlxDYB5EgNHSuVfi
+         FLGwZyr2WhWUsEYr3ybOCThgvIimkTT4ONJq619dMqDzEQ9ZeLfTuFW/JiSj9J3bnG8u
+         lnQq6BAhpBBRLgc+wBGKzMFRMVH+LZb8fjtVyQMFpnlrXNc43F4mXEvrGus8urpOGYd2
+         0I2slIea7cmUEjIew5k2PtUX2Iw5FFjWkergOe0jR0T25CCVMjMo7qnUjUbBg3U/7RRz
+         H/5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=bcxWBJkF0ymGM00bcxzE4hfHy91O95ng8k4cnvawLyQ=;
-        b=q8iqMve00uBFYphFzIsC4lfGoG3WZkp/7GIYGDo1Elu7xUqn6o91U58YAkpBXSVTEM
-         umkZVgvLloVyoypm2YfoP6QcX77YkyR1ug8UZa4o/jOcogkmycEmwYAfIoW1pmUs2oVd
-         ePZOdonb4LHz4gLfBJJa+nzsBRYeB0wv0GeA6HKvZmYnpCFxvf4X5kEOEUkWjz2e7hPC
-         n+3vk/IC+SAnjUCGwkXYe70IjBRssZCF9xZMt/TiWViV/4zctzUPiiZReUkr1k+Rvzsb
-         4bgmZL4SNo69IYYO4GXdAg5N0lFvqeuPqTcWC80i9tR/pZLahf1DvfNHBGb/zVa3zMaD
-         rIbw==
-X-Gm-Message-State: AOAM5313F4lv69PwxmUBpR9CyPGgmaciMjSGdlN7SuUG4zAgCNqSB3kO
-        vIqI+IrhhJOOfF1YK/NsAho2uq8YdRw=
-X-Google-Smtp-Source: ABdhPJzv6ISWga8pyZOjulc/eL5pHdXxAI6E4uJnwGSWuKcF7rp2Z0ZqyJ2pTJ4dMXM1X5/YIou0Pw==
-X-Received: by 2002:a17:902:cecf:b0:141:e15d:4a2a with SMTP id d15-20020a170902cecf00b00141e15d4a2amr16591335plg.66.1635891048907;
-        Tue, 02 Nov 2021 15:10:48 -0700 (PDT)
-Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id f8sm156450pfj.36.2021.11.02.15.10.48
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=IdlXh3FFePIHwOwOiG0a8VB/mgLzHjViNmw5yAuCgAw=;
+        b=MX1bj5Q1wwCV8fXjHOYzB2qOA0lzEiQy/kih3gnXqaG91+94MKREPYoHtHBkSbCmht
+         8x43Xqq7St4dOBacEjAjV3dGwTF/H3VpnD4sETFbdIbpEU5JVwv/i757IhuDa8R+SBNK
+         VY32ptyZ4becCiVUdTN5NiH3g/NXnqsBgisWJNEdvoLi8rLxHTSXSGyoDbsuXQj76HFr
+         T2txSyk0hHzlW4laWpKSg16x16/G+g1LOju2fPUS0U47mzJhFCF/+OPLl5Lx4IEW0Zsn
+         fhBz5lN2oY+KN/WhC2EssUjjvKJWFUYdd9ZDm1xa/KM7k75OD/aPgZVRFfrCHeJh4+MR
+         k8pQ==
+X-Gm-Message-State: AOAM532bfo1/Rfj4nxFeapWlH30qg+0ERYOgspEssjJE30+mx+qBA9MR
+        aBr3bk92fjnfrrUMcgGa5jgnIRQKLTGFxQ==
+X-Google-Smtp-Source: ABdhPJxC95mfwBmWsHZt8TjPUkkPJGSi+wSliBQE/ubMHybW4w8m28s/j5hAeke3nagGTHKj7v5J0g==
+X-Received: by 2002:a17:90a:d582:: with SMTP id v2mr10229093pju.46.1635892611760;
+        Tue, 02 Nov 2021 15:36:51 -0700 (PDT)
+Received: from [172.17.0.2] ([52.183.8.20])
+        by smtp.gmail.com with ESMTPSA id d6sm176861pfa.39.2021.11.02.15.36.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 02 Nov 2021 15:10:48 -0700 (PDT)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] mgmt-api: Add new action to Add Device
-Date:   Tue,  2 Nov 2021 15:10:46 -0700
-Message-Id: <20211102221046.23293-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 02 Nov 2021 15:36:51 -0700 (PDT)
+Message-ID: <6181bd83.1c69fb81.ceedf.0f7a@mx.google.com>
+Date:   Tue, 02 Nov 2021 15:36:51 -0700 (PDT)
+Content-Type: multipart/mixed; boundary="===============5131136197724820362=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] mgmt-api: Add new action to Add Device
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211102221046.23293-1-luiz.dentz@gmail.com>
+References: <20211102221046.23293-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============5131136197724820362==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This adds a new action, Action 3, to Add Device command so it is
-possible to set the Device Privacy Mode which allows to connect when the
-remote device uses either identity or random address.
+This is automated email and please do not reply to this email!
 
-Since Network Privacy Mode is assumed to be the default Action 2 has
-been updates to state that would be used when the device is using
-privacy.
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=574409
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      0.42 seconds
+GitLint                       PASS      0.28 seconds
+Prep - Setup ELL              PASS      44.42 seconds
+Build - Prep                  PASS      0.26 seconds
+Build - Configure             PASS      7.85 seconds
+Build - Make                  PASS      189.35 seconds
+Make Check                    PASS      9.16 seconds
+Make Distcheck                PASS      226.19 seconds
+Build w/ext ELL - Configure   PASS      7.99 seconds
+Build w/ext ELL - Make        PASS      177.76 seconds
+
+
+
 ---
- doc/mgmt-api.txt | 10 ++++++++--
- 1 file changed, 8 insertions(+), 2 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index 97d33e30a..ea91155b0 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -2027,7 +2027,8 @@ Add Device Command
- 	Possible values for the Action parameter:
- 		0	Background scan for device
- 		1	Allow incoming connection
--		2	Auto-connect remote device
-+		2	Auto-connect remote devices using Network Privacy Mode
-+		3	Auto-connect remote devices using Device Privacy Mode
- 
- 	With the Action 0, when the device is found, a new Device Found
- 	event will be sent indicating this device is available. This
-@@ -2041,7 +2042,12 @@ Add Device Command
- 
- 	With the Action 2, when the device is found, it will be connected
- 	and if successful a Device Connected event will be sent. This
--	action is only valid for LE Public and LE Random address types.
-+	action is only valid for LE Public and LE Random address types using
-+	Network Privacy Mode.
-+
-+	With the Action 3, works like Action 2 but instead uses Device Privacy
-+	Mode for devices using LE Random address which allows the use of both
-+	random and identity addresses.
- 
- 	When a device is blocked using Block Device command, then it is
- 	valid to add the device here, but all actions will be ignored
--- 
-2.31.1
 
+--===============5131136197724820362==--
