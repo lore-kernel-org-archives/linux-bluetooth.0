@@ -2,65 +2,64 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEC3CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 05:49:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E936CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 05:51:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AA3EB60F70
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 05:49:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id BED8260F4B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 05:51:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229699AbhKBFwa (ORCPT
+        id S229541AbhKBFxx (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 01:52:30 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36454 "EHLO
+        Tue, 2 Nov 2021 01:53:53 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229486AbhKBFw2 (ORCPT
+        with ESMTP id S229486AbhKBFxw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 01:52:28 -0400
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66F98C061714
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 22:49:54 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id t21so14283426plr.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 22:49:54 -0700 (PDT)
+        Tue, 2 Nov 2021 01:53:52 -0400
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09FABC061714
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 22:51:18 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id 127so18540025pfu.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 22:51:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=HwQq8DK/IihAc0GEYkL4N4lIvsDCiGDVQs+nB9fwibo=;
-        b=Lz9UEgp/dHif4+nnriWPv/UC3BAIrH8bSZfC58WbFc5OOOXx2lEh00pgXIzdBmxpLI
-         nQ+JaPLItPLek8n9NbSeoODrmsI1vV4cnhgYlkv5R69IT86jthf3NhFwohXVLBAW+xTX
-         630+fWkEfNo+QIMzmkbsJdPBXNgNgcG7gvpWHMURdHm6bayGgiy6kwfYSJpbBI91H6Bq
-         pYAYsZzmvbIhBGpl1fOGE3Sq4yixlB2h/5LWms3tix3oMikcAuSItXgI3CfgtLlg6GAp
-         613A8NMWMfcZgQaSvRG0hOGOFRlhPzWsSCucB5qjC3OxaiPhxeLe1imYok0cdgr3aYKv
-         1FVQ==
+        bh=glQswEOcHw9XGuPa3ESO7PVEzT52H3+EJo0OoWVWAOg=;
+        b=eABnaUabcLnK7/9yHXuGP8gprCcpDPXrajOS5Q80WXvEpLjOO14mF9huSdqZO0wF4U
+         vwqSNd9XoUIyTCj4eI0OEeaKk8y58bEDo1c3UeFfdjxe0lg9zA8RPe/WCxgAsuD0UyiR
+         R4YAOl7sln8wdlHxfTRq3t63n/ERL4ALxv5pz8iNkdTHPvKYh4cIY6IdS6tImlJech9v
+         IJuvcRQF4RwE9pM7gHZ6g0fQMP0rTk2DeNM97WjBBFUEg/0cBlpGfdU0HKTNNzEHuOj4
+         4t5OdCHaZN9rCe4RJZITe3m9pzCGJZ+RW7auBhP93tuMUi4aIuy1GJU8jqXsW6OR99eL
+         +dqg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=HwQq8DK/IihAc0GEYkL4N4lIvsDCiGDVQs+nB9fwibo=;
-        b=xsIyK5f8c3Dr621EZLKTIWw5M0wDAQDNhyp8ltzfDKE3D/KJxmVrRdLOMMDGkRfPmt
-         nG5dxE+ecOMj5DuJ4gy+GNwNtLAX12mJ48wIsgh6iMu3+trWNj3GtXDWwkTHLFW5yxRe
-         yusFw296ZFZ7mQn03sSJWlUC+LFSRjw921lzlVFWx0CkxVfLePWOM5fxoIP6VRelQCu8
-         zR5rjcVNa15Mbw+DqSTPPnZREsHQsCBWd5L2Hw39X+179ax3gGnd409Npu4hrfx1Hm2x
-         ENohEY5HEbKbumqvSgGqymVYOTo3+VJJ3s+2Kp+ZfgHec2BQw6zyIWrnrXLDUjnKGW7A
-         iO3g==
-X-Gm-Message-State: AOAM531f2JC9FY13qtFYCqzcOsrePR7JLcs2UX11XoWGZBCIAIgLqraf
-        qW1qh2GLf7O7SXBKebf+ff5SN5UPkrQ=
-X-Google-Smtp-Source: ABdhPJxSDSCz1NTEZorsvKTfWYRPTQsurCSnSO6esCpHprYRTK/bNWV5DfKC9jkAszkz//pgNLuMFA==
-X-Received: by 2002:a17:902:ab53:b0:141:7167:1c4f with SMTP id ij19-20020a170902ab5300b0014171671c4fmr29483276plb.30.1635832193429;
-        Mon, 01 Nov 2021 22:49:53 -0700 (PDT)
+        bh=glQswEOcHw9XGuPa3ESO7PVEzT52H3+EJo0OoWVWAOg=;
+        b=6bOtHdXJO3ajvkGDL8tFlgLin4vjuUDygKZ9IhFXAh0k9urA64gDZOuxirNAuCq4XU
+         WZ5G9Z6O1a1w2zCKFIgRb+umX2Ay9V0O3oxMrwGOjV3MFPs6WaOsL4B7/lrETEyDu+Mr
+         6aOvZHmCzteYdtbDzLxL7tRWf68vUIREbZE93etkjGr9euQE6B064mkuarAAPANHpcYR
+         KzSi8Bp6ULuWMvBhFs0eT3OUMD8brFxRTJ2S48XvnZkv4Cnv7nk24ABGa/b0H66j6clQ
+         kPLRf+u3T/pttLfh8xat0gKl6PxPfFOswxUaq4Z7+0qVj932ssLKBTXPLzAZnJe0GKAg
+         aQ3Q==
+X-Gm-Message-State: AOAM530f8uKMGZHVNVdRQodrG3s9VoHBSjl6bfkli3ApJLZx0jRIQw5S
+        RPmf+mBaOKYROd2yxb+zcQ9rE6F/qfE=
+X-Google-Smtp-Source: ABdhPJxPi7RmzZVZD95r6WvjG9r0V1n0UMKKW140G8OaXIy5ze6gB0R3ztkdhrNb2ffOybhoA1uVdg==
+X-Received: by 2002:a05:6a00:2353:b0:47e:64c3:57c3 with SMTP id j19-20020a056a00235300b0047e64c357c3mr28340849pfj.72.1635832277320;
+        Mon, 01 Nov 2021 22:51:17 -0700 (PDT)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id t7sm1212428pjs.45.2021.11.01.22.49.52
+        by smtp.gmail.com with ESMTPSA id u12sm17377862pfi.18.2021.11.01.22.51.16
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 01 Nov 2021 22:49:53 -0700 (PDT)
+        Mon, 01 Nov 2021 22:51:17 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ 1/2] btdev: Add support for LE Set Privacy mode
-Date:   Mon,  1 Nov 2021 22:49:51 -0700
-Message-Id: <20211102054952.2898328-1-luiz.dentz@gmail.com>
+Subject: [PATCH] Bluetooth: hci_sync: Set Privacy Mode when updating the resolving list
+Date:   Mon,  1 Nov 2021 22:51:16 -0700
+Message-Id: <20211102055116.2898794-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -68,90 +67,112 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for LE Set Privacy mode which is required when using
-Device Privacy mode:
+This adds support for Set Privacy Mode when updating the resolving list
+when HCI_LIMITED_PRIVACY so the controller shall use Device Mode for
+devices programmed in the resolving list, Device Mode is actually
+required when the remote device are not able to use RPA as otherwise the
+default mode is Network Privacy Mode in which only RPA are allowed thus
+the controller would filter out advertisement using the identity address
+for which there is an IRK.
 
-< HCI Command: LE Set Priva.. (0x08|0x004e) plen 8
-        Peer Identity address type: Public (0x00)
-        Peer Identity address: BC:9A:78:56:34:12 (OUI BC-9A-78)
-        Privacy Mode: Use Device Privacy (0x01)
-> HCI Event: Command Complete (0x0e) plen 4
-      LE Set Privacy Mode (0x08|0x004e) ncmd 1
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- emulator/btdev.c | 46 +++++++++++++++++++++++++++++++++++++++++++++-
- 1 file changed, 45 insertions(+), 1 deletion(-)
+ include/net/bluetooth/hci.h |  7 ++++++
+ net/bluetooth/hci_sync.c    | 48 ++++++++++++++++++++++++++++++++-----
+ 2 files changed, 49 insertions(+), 6 deletions(-)
 
-diff --git a/emulator/btdev.c b/emulator/btdev.c
-index 7b311f347..50de186be 100644
---- a/emulator/btdev.c
-+++ b/emulator/btdev.c
-@@ -72,6 +72,7 @@ struct btdev_al {
- struct btdev_rl {
- 	uint8_t type;
- 	bdaddr_t addr;
-+	uint8_t mode;
- 	uint8_t peer_irk[16];
- 	uint8_t local_irk[16];
- };
-@@ -5336,6 +5337,48 @@ static int cmd_read_tx_power(struct btdev *dev, const void *data, uint8_t len)
- 	return 0;
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 63065bc01b76..aa856dfd5b9f 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1930,6 +1930,13 @@ struct hci_rp_le_read_transmit_power {
+ 	__s8  max_le_tx_power;
+ } __packed;
+ 
++#define HCI_OP_LE_SET_PRIVACY_MODE	0x204e
++struct hci_cp_le_set_privacy_mode {
++	__u8  bdaddr_type;
++	bdaddr_t  bdaddr;
++	__u8  mode;
++} __packed;
++
+ #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
+ struct hci_rp_le_read_buffer_size_v2 {
+ 	__u8    status;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index b794605dc882..43173d645436 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1580,8 +1580,37 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
  }
  
-+static int cmd_set_privacy_mode(struct btdev *dev, const void *data,
-+							uint8_t len)
++/* Set Device Privacy Mode. */
++static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
++					struct hci_conn_params *params)
 +{
-+	const struct bt_hci_cmd_le_set_priv_mode *cmd = data;
-+	const struct btdev_rl *rl;
-+	uint8_t status;
++	struct hci_cp_le_set_privacy_mode cp;
++	struct smp_irk *irk;
 +
-+	/* This command shall not be used when address resolution is enabled in
-+	 * the Controller and:
-+	 * • Advertising (other than periodic advertising) is enabled,
-+	 * • Scanning is enabled, or
-+	 * • an HCI_LE_Create_Connection, HCI_LE_Extended_Create_Connection,
-+	 * or HCI_LE_Periodic_Advertising_Create_Sync command is pending.
++	/* Set Privacy Mode requires the use of resolving list (aka. LL Privacy)
++	 * by default Network Mode is used so only really send the command if
++	 * Device Mode is required (HCI_LIMITED_PRIVACY).
 +	 */
-+	if (dev->le_rl_enable || dev->le_adv_enable || dev->le_scan_enable) {
-+		status = BT_HCI_ERR_COMMAND_DISALLOWED;
-+		goto done;
-+	}
++	if (!use_ll_privacy(hdev) ||
++	    !hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
++		return 0;
 +
-+	/* If the device is not on the resolving list, the Controller shall
-+	 * return the error code Unknown Connection Identifier (0x02).
-+	 */
-+	rl = rl_find(dev, cmd->peer_id_addr_type, cmd->peer_id_addr);
-+	if (!rl) {
-+		status = BT_HCI_ERR_UNKNOWN_CONN_ID;
-+		goto done;
-+	}
++	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
++	if (!irk)
++		return 0;
 +
-+	if (cmd->priv_mode > 0x01) {
-+		status = BT_HCI_ERR_INVALID_PARAMETERS;
-+		goto done;
-+	}
++	memset(&cp, 0, sizeof(cp));
++	cp.bdaddr_type = irk->addr_type;
++	bacpy(&cp.bdaddr, &irk->bdaddr);
++	cp.mode = 0x01;
 +
-+	((struct btdev_rl *)rl)->mode = cmd->priv_mode;
-+	status = BT_HCI_ERR_SUCCESS;
-+
-+done:
-+	cmd_complete(dev, BT_HCI_CMD_LE_SET_PRIV_MODE, &status, sizeof(status));
-+
-+	return 0;
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PRIVACY_MODE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
 +}
 +
- #define CMD_LE_50 \
- 	CMD(BT_HCI_CMD_LE_SET_DEFAULT_PHY, cmd_set_default_phy,	NULL), \
- 	CMD(BT_HCI_CMD_LE_SET_ADV_SET_RAND_ADDR, cmd_set_adv_rand_addr, NULL), \
-@@ -5372,7 +5415,8 @@ static int cmd_read_tx_power(struct btdev *dev, const void *data, uint8_t len)
- 	CMD(BT_HCI_CMD_LE_CLEAR_PERIODIC_ADV_LIST, cmd_per_adv_clear, NULL), \
- 	CMD(BT_HCI_CMD_LE_READ_PERIODIC_ADV_LIST_SIZE, \
- 					cmd_read_per_adv_list_size, NULL), \
--	CMD(BT_HCI_CMD_LE_READ_TX_POWER, cmd_read_tx_power, NULL)
-+	CMD(BT_HCI_CMD_LE_READ_TX_POWER, cmd_read_tx_power, NULL), \
-+	CMD(BT_HCI_CMD_LE_SET_PRIV_MODE, cmd_set_privacy_mode, NULL)
+ /* Adds connection to allow list if needed, if the device uses RPA (has IRK)
+- * this attempts to program the device in the resolving list as well.
++ * this attempts to program the device in the resolving list as well and
++ * properly set the privacy mode.
+  */
+ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 				       struct hci_conn_params *params,
+@@ -1590,11 +1619,6 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 	struct hci_cp_le_add_to_accept_list cp;
+ 	int err;
  
- static const struct btdev_cmd cmd_le_5_0[] = {
- 	CMD_COMMON_ALL,
+-	/* Already in accept list */
+-	if (hci_bdaddr_list_lookup(&hdev->le_accept_list, &params->addr,
+-				   params->addr_type))
+-		return 0;
+-
+ 	/* Select filter policy to accept all advertising */
+ 	if (*num_entries >= hdev->le_accept_list_size)
+ 		return -ENOSPC;
+@@ -1620,6 +1644,18 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 		return err;
+ 	}
+ 
++	/* Set Privacy Mode */
++	err = hci_le_set_privacy_mode_sync(hdev, params);
++	if (err) {
++		bt_dev_err(hdev, "Unable to set privacy mode: %d", err);
++		return err;
++	}
++
++	/* Check if already in accept list */
++	if (hci_bdaddr_list_lookup(&hdev->le_accept_list, &params->addr,
++				   params->addr_type))
++		return 0;
++
+ 	*num_entries += 1;
+ 	cp.bdaddr_type = params->addr_type;
+ 	bacpy(&cp.bdaddr, &params->addr);
 -- 
 2.31.1
 
