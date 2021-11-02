@@ -2,65 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B3B1DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 06:13:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 83CC2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 06:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 946E660EB9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 06:13:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4F9B360C51
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 06:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229510AbhKBGQM (ORCPT
+        id S229510AbhKBGUF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 02:16:12 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41696 "EHLO
+        Tue, 2 Nov 2021 02:20:05 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42528 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229497AbhKBGQK (ORCPT
+        with ESMTP id S229497AbhKBGUF (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 02:16:10 -0400
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6DAE2C061714
-        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 23:13:36 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id v20so35968272uaj.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 23:13:36 -0700 (PDT)
+        Tue, 2 Nov 2021 02:20:05 -0400
+Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 09D3BC061714
+        for <linux-bluetooth@vger.kernel.org>; Mon,  1 Nov 2021 23:17:31 -0700 (PDT)
+Received: by mail-ua1-x929.google.com with SMTP id ay21so15520105uab.12
+        for <linux-bluetooth@vger.kernel.org>; Mon, 01 Nov 2021 23:17:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=G6Yad7puWQwWtkvh/WEGeT+Dug1fEBf8eSfMTl14pcc=;
-        b=dwqFaBbqAjHfflqB16RlY3Rz3Sa0zHjh2SrLXP4C4tF98GTEx25ylTkFECQBL8yVAs
-         AflvymD81VBlJueSsJCrNu69+QSIGryFPC045gKNiN/+TdCNtmIrQi1YMpmHM6gI7YHk
-         zaQleSezaOUnIaEig6aIQ68rRGShB4wg1nhiPFASsPVRLqZ85BY/mpvETtFxBWd3irzF
-         2aHA7lj6SSR6FQVFWSH6PBTAg/mRhAnNbb1uXV43yTzRCO22QR7u0Ry/zKJ8h1cDsZkT
-         txIHRbLNYXDt4T1ddD4aUe2gUuChByfAvUR4ge3JJ5d0xli1XWxllTmEAzWK2N8suZzW
-         tdQw==
+        bh=Ke6hiNo7XHR6PYDgJ5iqRU5+cSdYDtmCtmixxUDM878=;
+        b=GNkHavLzzjUgpbpUihDFAIjOa1SIkAja/IX1zUXVMvUs9Uk9T8/ij+bHmkKJ451uxQ
+         cJy2euWtt4kYe/PIg7HvPNAUjR4gHlruwb9GGcIm33s7aNDTtiWBCdzdKxkJ5UIwEdh5
+         92MsWl5heYz4/RKLoirMVitWdltnNROwRSOpyzTMif72KfdME5NnCP1kJQVchHwjNizg
+         1JjhySJ5mzaYn4L+VdsbC9Bt8H3dyZuID0l05W39c51kg5184d4spFIMlh/+znfQ3dA1
+         EYueleEH58w3mZQ709CJMPGLF0RQlu7H0mllwR6m/Ai9RKtBlj3NJw3iRm7MNDwQuZE/
+         R8Rw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=G6Yad7puWQwWtkvh/WEGeT+Dug1fEBf8eSfMTl14pcc=;
-        b=ZiOSa+xolNCQtGBwH2i0FBYhXApeGy3/AOEPjBQPAH4UgnAZw1OQo1ZU/rfqtJOzoJ
-         Wae2SA3N3Krd58+72/ZX13XR+5JbJHaz3ZBvAPSbWjFxD6QXO8L33UjbCaf0G/gHl6xN
-         c41IvhN7z7ncAQA56EpjoOfpH4bFbo3ERrPMm3p/Q2KPYsEcueBzRsH0M2ou0vEz1BjF
-         QbT73/6ZWqvh9lMUcxT+UO0VXxv27uRLlPjBxRgZKHwjge191AKOJ8RkeZZh9TqzxwaP
-         E0cmy4al3QFtKJkfsV1SlCzD/Tr1MTwVG4Mc1L/FpMw7FTiejoTLnwk++NqvhLlp1QxX
-         qq2Q==
-X-Gm-Message-State: AOAM533HCDLNb7jGJ3E2ybzuJeoQ8JZra0VQ4T3d4tPqeONol/RC5rDk
-        4czxTkh8gjzTqDcDFXVuyliPOKMoIUYcyjy8CjQ=
-X-Google-Smtp-Source: ABdhPJz1YN/jkbcEjM+hEYMM5EVSkxILoQR11LWrHAospYrFeZfzruA0shN6fgdkE52Fm28zwc05AQkCtKAEwQ1h/Sg=
-X-Received: by 2002:a67:b844:: with SMTP id o4mr37322213vsh.61.1635833615279;
- Mon, 01 Nov 2021 23:13:35 -0700 (PDT)
+        bh=Ke6hiNo7XHR6PYDgJ5iqRU5+cSdYDtmCtmixxUDM878=;
+        b=GiqkupgUebLaw45pZ6/dT4LGliY/2m/EF/2tVMpBr3kvxJdPJcOYw/CoY6kSV654yw
+         W+TbqO9jZdA2RkOP46nCSba+gDG2c2Dpa9kBARdiPuxX1x5u5T2VKZlygDnr4GAdkQUE
+         n6PJ4SZdg80c6zch4+9S1eXZjxuDqCX/oYPIYy8LjH0g4Vk/Malm8/jqMOB3CqEr8fx1
+         s68jOan9vRUhMbQvtU/tTZcFu/RRQt27VBUVz2ndDHtb3/3jAgtuwN+udVW0/0ubgVoe
+         Ivqna2v8JRVM+ydbDsY+2axqjIJONo6IkjuiEt3azvRXLjpHaQ7J0uf1HJnUSh146zt5
+         eNoA==
+X-Gm-Message-State: AOAM530GAZWIbjeSq4svSUVWHjmF3oHZp2qMbkz0t10MxYP5R51sVzYr
+        qx5hYEnJuA5Ux93W8zgKvJ/ZBPV3lLyUBqf+6mM=
+X-Google-Smtp-Source: ABdhPJxjiez0jDsRXezy4Srq3xkX/WTYGAb+7U3jPNrN+8RZtuhDwtIUG2QtZkgSlepZL3Pt3s8WP+Ww6MlXVpEEz8M=
+X-Received: by 2002:ab0:3e3:: with SMTP id 90mr34487778uau.102.1635833850007;
+ Mon, 01 Nov 2021 23:17:30 -0700 (PDT)
 MIME-Version: 1.0
 References: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
- <20211101140544.Bluez.3.Idb95ae18113225915b97a4f06983e1e41a7f7a2e@changeid>
-In-Reply-To: <20211101140544.Bluez.3.Idb95ae18113225915b97a4f06983e1e41a7f7a2e@changeid>
+In-Reply-To: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 1 Nov 2021 23:13:24 -0700
-Message-ID: <CABBYNZJqFBgAvQY5hD6LbouiEiFA0DqYaU_50z5PEGHHxctQug@mail.gmail.com>
-Subject: Re: [Bluez PATCH 3/3] adapter: Remove "Master" entry from LTK storage
+Date:   Mon, 1 Nov 2021 23:17:19 -0700
+Message-ID: <CABBYNZJg=Acx_BLyq=RzbkvfWOj-Rik3t7B1Z-XZqemo2LMykQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH 1/3] adapter: Use PeripheralLongTermKey to store LTK
 To:     Archie Pusaka <apusaka@google.com>
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Marcel Holtmann <marcel@holtmann.org>,
         CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
+        Archie Pusaka <apusaka@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -72,69 +72,100 @@ On Sun, Oct 31, 2021 at 11:06 PM Archie Pusaka <apusaka@google.com> wrote:
 >
 > From: Archie Pusaka <apusaka@chromium.org>
 >
-> The entry has been deprecated since 2014 and it's time to remove them
-> altogether.
-> ---
-> Hi maintainers,
-> While cleaning this entry, I found that this entry is involved in some
-> kind of storage file conversion, probably when upgrading BlueZ 4 to 5.
-> Should we also remove the file conversion too, since it's dated to
-> 2014 as well?
-
-Perhaps we can but I'd had such cleanup as a separate patch then.
-
+> Introducing PeripheralLongTermKey group for storing LTK info to
+> replace the less inclusive term. Currently we still need to write/read
+> from both to ensure smooth transition, but later we should deprecate
+> the old term.
 >
->  src/adapter.c | 12 ------------
->  1 file changed, 12 deletions(-)
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> ---
+>
+>  src/adapter.c | 41 ++++++++++++++++++++++++++++++++---------
+>  1 file changed, 32 insertions(+), 9 deletions(-)
 >
 > diff --git a/src/adapter.c b/src/adapter.c
-> index 6b12c9e793..3a3c957a6c 100644
+> index d0d38621b8..6b12c9e793 100644
 > --- a/src/adapter.c
 > +++ b/src/adapter.c
-> @@ -3779,8 +3779,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
->                                         uint8_t peer_type, const char *group)
+> @@ -3868,7 +3868,11 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
+>
+>         DBG("%s", peer);
+>
+> -       ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+> +       /* Read from both entries. Later we should deprecate Slave. */
+> +       ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
+> +       if (!ltk)
+> +               ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
+
+If you find the old name being used you better replace it with the new
+one and erase the old.
+
+>         if (ltk)
+>                 ltk->central = false;
+>
+> @@ -8415,13 +8419,12 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
+>         bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
+>  }
+>
+> -static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> +static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
+>                                 uint8_t bdaddr_type, const unsigned char *key,
+> -                               uint8_t central, uint8_t authenticated,
+> +                               const char *group, uint8_t authenticated,
+>                                 uint8_t enc_size, uint16_t ediv,
+>                                 uint64_t rand)
 >  {
->         struct smp_ltk_info *ltk = NULL;
-> -       GError *gerr = NULL;
-> -       bool central;
->         char *key;
->         char *rand = NULL;
+> -       const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
+>         char device_addr[18];
+>         char filename[PATH_MAX];
+>         GKeyFile *key_file;
+> @@ -8431,11 +8434,6 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+>         char *str;
+>         int i;
 >
-> @@ -3836,12 +3834,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
->                                                                         NULL);
->         ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
->
-> -       central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
-> -       if (gerr)
-> -               g_error_free(gerr);
-> -       else
-> -               ltk->central = central;
+> -       if (central != 0x00 && central != 0x01) {
+> -               error("Unsupported LTK type %u", central);
+> -               return;
+> -       }
 > -
->         ltk->is_blocked = is_blocked_key(HCI_BLOCKED_KEY_TYPE_LTK,
->                                                                 ltk->val);
+>         ba2str(peer, device_addr);
 >
-> @@ -5904,7 +5896,6 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
->         g_free(str);
+>         snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
+> @@ -8475,6 +8473,31 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+>         g_key_file_free(key_file);
+>  }
 >
->         g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
-> -       g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
+> +static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
+> +                               uint8_t bdaddr_type, const unsigned char *key,
+> +                               uint8_t central, uint8_t authenticated,
+> +                               uint8_t enc_size, uint16_t ediv,
+> +                               uint64_t rand)
+> +{
+> +       if (central != 0x00 && central != 0x01) {
+> +               error("Unsupported LTK type %u", central);
+> +               return;
+> +       }
+> +
+> +       if (central) {
+> +               store_ltk_group(adapter, peer, bdaddr_type, key, "LongTermKey",
+> +                               authenticated, enc_size, ediv, rand);
+> +       } else {
+> +               /* Store duplicates for now. Later we should deprecate Slave. */
+> +               store_ltk_group(adapter, peer, bdaddr_type, key,
+> +                               "PeripheralLongTermKey", authenticated,
+> +                               enc_size, ediv, rand);
+> +               store_ltk_group(adapter, peer, bdaddr_type, key,
+> +                               "SlaveLongTermKey", authenticated,
+> +                               enc_size, ediv, rand);
 
-Weird that it still was setting the "Master" even though this is meant
-to convert the old format into the new one.
+In not following why you want to keep duplicate entries?
 
->         g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
->         g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
->
-> @@ -8445,9 +8436,6 @@ static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
->                 g_error_free(gerr);
->         }
->
-> -       /* Old files may contain this so remove it in case it exists */
-> -       g_key_file_remove_key(key_file, "LongTermKey", "Master", NULL);
-> -
->         for (i = 0; i < 16; i++)
->                 sprintf(key_str + (i * 2), "%2.2X", key[i]);
->
+> +       }
+> +}
+> +
+>  static void new_long_term_key_callback(uint16_t index, uint16_t length,
+>                                         const void *param, void *user_data)
+>  {
 > --
 > 2.33.1.1089.g2158813163f-goog
 >
