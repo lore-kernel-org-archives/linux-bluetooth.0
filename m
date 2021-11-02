@@ -2,154 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 46499C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 15:26:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 462C6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 16:45:37 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 2D74060F02
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 15:26:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2B0B460524
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 16:45:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232999AbhKBP30 (ORCPT
+        id S235064AbhKBQsL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 11:29:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55224 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234309AbhKBP3Y (ORCPT
+        Tue, 2 Nov 2021 12:48:11 -0400
+Received: from tropek.jajcus.net ([31.179.132.94]:46212 "EHLO
+        tropek.jajcus.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235083AbhKBQr3 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 11:29:24 -0400
-Received: from mail-lj1-x22d.google.com (mail-lj1-x22d.google.com [IPv6:2a00:1450:4864:20::22d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A232C061767
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 08:26:49 -0700 (PDT)
-Received: by mail-lj1-x22d.google.com with SMTP id 1so29658576ljv.2
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 08:26:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=subject:to:cc:references:from:message-id:date:user-agent
-         :mime-version:in-reply-to:content-language:content-transfer-encoding;
-        bh=fxVnPZH6b6L2I7aYk+0v0By0qTM5ney7UTSCmiLQK+A=;
-        b=x5JmB/0OUUm0n3pUNm0d3bDFVZ9zoYTwmC68+WhMKiYCDd8J6meh19KGHZHjteCmGj
-         Gb+poFRw+Q5O4+zzJh7M1JgxVnp1aEyWS9A6EwcLLgY1LpLfVZUgGn2Yl2smq1KttslG
-         jPUkrYMvywbQCMzI5XmPp3b7So9dWZKEff10PaYosjnRDQLTQFGGPrDw8wBORG8lCbKW
-         055tT1pMfjVah6HOGuwIlD2rt3+wAoJcH5D10pnUSYQaFdjeh/fCItdq489Cn5qMhSnu
-         pXYuysYzaAZvTPJAXCBoDBvy2nCrHmK0DLmb5ukSGYKQGQKHUnB+TYuHVt5IerDWDAHS
-         SkwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:subject:to:cc:references:from:message-id:date
-         :user-agent:mime-version:in-reply-to:content-language
-         :content-transfer-encoding;
-        bh=fxVnPZH6b6L2I7aYk+0v0By0qTM5ney7UTSCmiLQK+A=;
-        b=ypKTyW1hnJ3LgAPOFFEQEV5U/l2viBbYWJv7VDMGfvlJ2FIEVqG3/Nip9evspfV0Z4
-         m3wmN7Sa/ZRShWxpBFcRQ+/g+5s41K5SMXxR6g1SY6uwgIH62ezu6H4aUAXSS5417yxc
-         Q+/l3WkQ3ndkMwNU7DvvOmF7XLOHLTK0cdQg6Cmns6/R8pSp1Q+7lZn/RrH9sM48OvHi
-         JhEYfix2b94w0XTRnPj1/5Ah/BTAGztz/xv+62HH/c2b9Lms2CAuWY0bBnK8ZGce69Rk
-         UYLMJ6dllOJmkRUiAsDf8JJtRTqlaUWO2FJQM/K+6QVPHb5e4AxUQ95rgbFrASOIsqGu
-         nnDA==
-X-Gm-Message-State: AOAM530AWq3FOJYQqDGdDwDX71RiU6tmBpi3ClVUQJ9Iv7gGI0VZiesU
-        jH50gcXzmjKJzs/Fwe3PptSorw==
-X-Google-Smtp-Source: ABdhPJywD1fXGsmUvzlGsbwzhNq/8e0eLaGhh844IKPxeN7lhccCNTjpZy9biEo0Bug7ay78GS+QVg==
-X-Received: by 2002:a2e:7210:: with SMTP id n16mr29186843ljc.155.1635866807510;
-        Tue, 02 Nov 2021 08:26:47 -0700 (PDT)
-Received: from [192.168.1.211] ([37.153.55.125])
-        by smtp.gmail.com with ESMTPSA id c1sm1844823ljr.111.2021.11.02.08.26.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 02 Nov 2021 08:26:46 -0700 (PDT)
-Subject: Re: [PATCH v1 01/15] dt-bindings: add pwrseq device tree bindings
-To:     Rob Herring <robh@kernel.org>
-Cc:     Andy Gross <agross@kernel.org>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Ulf Hansson <ulf.hansson@linaro.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Kalle Valo <kvalo@codeaurora.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Stanimir Varbanov <svarbanov@mm-sol.com>,
-        linux-arm-msm <linux-arm-msm@vger.kernel.org>,
-        linux-mmc <linux-mmc@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "open list:BLUETOOTH DRIVERS" <linux-bluetooth@vger.kernel.org>,
-        ath10k@lists.infradead.org,
-        linux-wireless <linux-wireless@vger.kernel.org>,
-        netdev <netdev@vger.kernel.org>
-References: <20211006035407.1147909-1-dmitry.baryshkov@linaro.org>
- <20211006035407.1147909-2-dmitry.baryshkov@linaro.org>
- <YXf6TbV2IpPbB/0Y@robh.at.kernel.org>
- <37b26090-945f-1e17-f6ab-52552a4b6d89@linaro.org>
- <CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com>
-From:   Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
-Message-ID: <31792ef1-20b0-b801-23b7-29f303b91def@linaro.org>
-Date:   Tue, 2 Nov 2021 18:26:45 +0300
+        Tue, 2 Nov 2021 12:47:29 -0400
+Received: from [10.253.0.4] (tropek.jajcus.net [31.179.132.94])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by tropek.jajcus.net (Postfix) with ESMTPSA id 84AFC84F62;
+        Tue,  2 Nov 2021 17:20:10 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=jajcus.net; s=mail;
+        t=1635870010; bh=eH6GF405Svn0dyssGrU8IqIDyNYqcQZSkJqTyLUaY2I=;
+        h=To:Cc:References:From:Subject:Date:In-Reply-To:From;
+        b=t9ia3wA4NvWOToYNSrnplNxtqv6NKbI4vt1LMZe5n7C+yNAJ71somoLFCIE0EFPI+
+         aRv/kFYx9Wd6mOpua/0Gf32D5N+YSEBzbeza3b/HCMCKwuIlMVd8MAbGSFarZ45EVW
+         tEMVgcs40zXKWkuGLwM7wGNH5BlqaUcz2Q9XjP0DmzKuM2L3J87EfS4ZMgFfAsFVjj
+         7AZQrpi8oZ1mfLzAffKsbeqOaWpJWT0VrG6UwM0LZhz3r9K2aZEGAz0BApTeQSBtl+
+         bg/c7/2Dx/kJuYf+mdjeDk4xH9jmgG5taiTHlVxc2rexnYle+/sHadaqe2JaJRn+fa
+         W75ZNruPYJanQ==
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+References: <585f70ee-e8f0-dfbc-6d61-f5082a1c18aa@jajcus.net>
+ <0CC57655-ABBE-49A9-88F2-92AE313B7968@holtmann.org>
+From:   Jacek Konieczny <jajcus@jajcus.net>
+Subject: Re: Is there a way to force legacy LE pairing for a device
+Message-ID: <7493ca64-e4e5-49bb-0d11-719dc212a6bc@jajcus.net>
+Date:   Tue, 2 Nov 2021 17:20:09 +0100
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+ Thunderbird/78.13.0
 MIME-Version: 1.0
-In-Reply-To: <CAL_JsqLAnJqZ95_bf6_fFmPJFMjuy43UfP2UxzEmFMNnG_t-Ug@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <0CC57655-ABBE-49A9-88F2-92AE313B7968@holtmann.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 28/10/2021 00:53, Rob Herring wrote:
-> On Tue, Oct 26, 2021 at 9:42 AM Dmitry Baryshkov
-> <dmitry.baryshkov@linaro.org> wrote:
->>
->> On 26/10/2021 15:53, Rob Herring wrote:
->>> On Wed, Oct 06, 2021 at 06:53:53AM +0300, Dmitry Baryshkov wrote:
->>>> Add device tree bindings for the new power sequencer subsystem.
->>>> Consumers would reference pwrseq nodes using "foo-pwrseq" properties.
->>>> Providers would use '#pwrseq-cells' property to declare the amount of
->>>> cells in the pwrseq specifier.
->>>
->>> Please use get_maintainers.pl.
->>>
->>> This is not a pattern I want to encourage, so NAK on a common binding.
->>
->>
->> Could you please spend a few more words, describing what is not
->> encouraged? The whole foo-subsys/#subsys-cells structure?
-> 
-> No, that's generally how common provider/consumer style bindings work.
-> 
->> Or just specifying the common binding?
-> 
-> If we could do it again, I would not have mmc pwrseq binding. The
-> properties belong in the device's node. So don't generalize the mmc
-> pwrseq binding.
-> 
-> It's a kernel problem if the firmware says there's a device on a
-> 'discoverable' bus and the kernel can't discover it. I know you have
-> the added complication of a device with 2 interfaces, but please,
-> let's solve one problem at a time.
+Hi Marcel,
 
-The PCI bus handling is a separate topic for now (as you have seen from 
-the clearly WIP patches targeting just testing of qca6390's wifi part).
+On 11/2/21 9:43 AM, Marcel Holtmann wrote:
+> you can use btmgmt tool from bluez.git to force Secure Connections off. I am not sure if that sticks when starting bluetoothd, but then you need to hack it out there.
 
-For me there are three parts of the device:
-- power regulator / device embedded power domain.
-- WiFi
-- Bluetooth
+Thank you! This works. I had to run 'btmgmt sc off' after starting
+bluetoothd, before 'power on', but then I was able to pair with my
+device. When paired MIDI over Bluetooth is working properly.
 
-With the power regulator being a complex and a bit nasty beast. It has 
-several regulators beneath, which have to be powered up in a proper way.
-Next platforms might bring additional requirements common to both WiFi 
-and BT parts (like having additional clocks, etc). It is externally 
-controlled (after providing power to it you have to tell, which part of 
-the chip is required by pulling up the WiFi and/or BT enable GPIOs.
+Even after I re-enable SC the connection with the already-paired device
+works.
 
-Having to duplicate this information in BT and WiFi cases results in 
-non-aligned bindings (with WiFi and BT parts using different set of 
-properties and different property names) and non-algined drivers (so the 
-result of the powerup would depend on the order of drivers probing).
+I think I can work with that.
 
-So far I still suppose that having a single separate entity controlling 
-the powerup of such chips is the right thing to do.
+> I am really not sure how your device can be a qualified Bluetooth device and fail here. The handling of the flags has actually proper test cases to ensure that this does’t happen.
 
-I'd prefer to use the power-domain bindings (as the idea seems to be 
-aligned here), but as the power-domain is used for the in-chip power 
-domains, we had to invent the pwrseq name.
+That would not be a first time when a device is compatible with the
+standard it is advertised with. Especially that for this one this is
+extra feature hardly anyone uses and the manufacturer does not even
+support their own software properly (the Android app just doesn't work)
+and usually the USB interface would be rather used than BT, anyway.
 
--- 
-With best wishes
-Dmitry
+What is interesting this amplifier has two different BT adapters. It can
+function as a 'bluetooth speaker' and this seems to be working without
+any issue. It is the 'regular Bluetooth', not LE. This one feature would
+be probably enough to call this Bluetooth device.
+
+The other function is amplifier remote control via MIDI over Bluetooth.
+This seems to be a separate BLE interface and works as I described. It
+does not even have any special 'pairing mode' (the 'speaker' function
+requires pressing a button on the device) or pairing verification, so
+anyone can pair with the amplifier at any time (unless already someone
+else uses the BLE interface) and change its settings. It would be quite
+an interesting attack if anyone used those devices on stage. Using SC or
+not probably does not matter at this point at all.
+
+Greets,
+Jacek
