@@ -2,158 +2,250 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8D32EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:17:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5BBD4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:22:28 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 721D360EE5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:17:36 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 3CF4360F24
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 09:22:28 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229778AbhKBJUK (ORCPT
+        id S229800AbhKBJZB convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 05:20:10 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55602 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229783AbhKBJUJ (ORCPT
+        Tue, 2 Nov 2021 05:25:01 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:55209 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229505AbhKBJZB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 05:20:09 -0400
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DEA20C061714
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 02:17:33 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id j128-20020a1c2386000000b003301a98dd62so1247354wmj.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 02:17:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=Tv5wqMmti+wo3yukgN4+tpFUpJlmsSDKWuQ6B9rwAis=;
-        b=Y6ndBeUjWHXgl1/b07tJJzlWuY8PxZ6qmXoSNo0QuPrSUAOaLjwy+FOvOCxw1j18RZ
-         zNRwbMdb+lL00L/Tjca5NuDPFd6oaRW91Ope+hBJjPYoO0w5qO93SG0PGNKtEPMc/yoZ
-         pdmOTGq+zU/bmf0mWNcY1oN5elWIqClDulwB6RYDbda5696Nd1GUHn/vaPGszUJWImXE
-         GCplMDdqhsg1BOKcLGtiYPlCCM1UY7XGQWMZgph+LXU110+jyhx0Gag7ppvc6PXTJGIN
-         FNBwvdWnctZ6Z46DEvYarOmfEWc/08Q3HDVuMphkAJp+iD2Hb3YPLH/oB+E0L47o+AYB
-         zrSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=Tv5wqMmti+wo3yukgN4+tpFUpJlmsSDKWuQ6B9rwAis=;
-        b=nYiIhn0F8PzmLOIEWNJ5HbMpkAhIc1nx7GjUlu8Rl69xwgaeUwDKYN3MPXczkJvd2+
-         1wj5w9XF4g+6vPCIWNBQFpAIA36b5ip+NfynWyhMR97pzGW1Sbsff/JY/FjyPZ5DmLjL
-         TqSotJgY6wb7B0hnNCh3r/WBcF33qGe7CY0i86rYrv7GK+dSB2cv/fqfA4+sbvVP/Biz
-         c5d7nzdnS1gDoz8q5hgGZczNgcOAOxZoJVHSN+Qvw978D1JbOU4AhhR+EhUC4w6syN2h
-         6UQYTWwy2HODflyyUYplx6urV85KHOe7zRPFkZfXDIAAHz3SfU7d0M7khfW/5Dn8KLVN
-         ZLIQ==
-X-Gm-Message-State: AOAM532pVox+ate8wIM4gImJCcFvIsJ9H+XHt7DNLJ/hqHAnuEaNf3nY
-        Op2gNysTcvARtnqquqJbMBYMZYKRqiyHQ3/Mw+7XIw==
-X-Google-Smtp-Source: ABdhPJzl5C8lRFJ/BEhMXKYsAFMOsHs7hm7shL20c3AVOxqfe6ZaQX6o+9bEXENQYg++7+RIS2zLWva5/JqfL6sXwuU=
-X-Received: by 2002:a1c:f207:: with SMTP id s7mr5416906wmc.179.1635844652081;
- Tue, 02 Nov 2021 02:17:32 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211101140544.Bluez.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
- <20211101140544.Bluez.3.Idb95ae18113225915b97a4f06983e1e41a7f7a2e@changeid> <CABBYNZJqFBgAvQY5hD6LbouiEiFA0DqYaU_50z5PEGHHxctQug@mail.gmail.com>
-In-Reply-To: <CABBYNZJqFBgAvQY5hD6LbouiEiFA0DqYaU_50z5PEGHHxctQug@mail.gmail.com>
-From:   Archie Pusaka <apusaka@google.com>
-Date:   Tue, 2 Nov 2021 17:17:21 +0800
-Message-ID: <CAJQfnxGd0-VauhimW0fS1FzjbO4PRK0McYCaxzXAMUkQrUTL_Q@mail.gmail.com>
-Subject: Re: [Bluez PATCH 3/3] adapter: Remove "Master" entry from LTK storage
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 2 Nov 2021 05:25:01 -0400
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 13208CECEB;
+        Tue,  2 Nov 2021 10:22:25 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: Add support for QTI bluetooth
+ MAPLE
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <18e1cb9d-39e5-3953-6f32-faea6b2dee47@codeaurora.org>
+Date:   Tue, 2 Nov 2021 10:22:24 +0100
+Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rocky Liao <rjliao@codeaurora.org>,
+        Zijun Hu <quic_zijuhu@quicinc.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <24F36C9D-6219-4A0B-A798-029ED4EEAB06@holtmann.org>
+References: <1635837177-1341-1-git-send-email-zijuhu@codeaurora.org>
+ <YYDqW6ewycWP1Y7a@kroah.com>
+ <4f6aee28-4d86-116c-6c47-bfce5de6551b@codeaurora.org>
+ <YYD1PJrFw/xmEXIW@kroah.com>
+ <432B905E-5263-47A6-95AA-7F43715BE196@holtmann.org>
+ <18e1cb9d-39e5-3953-6f32-faea6b2dee47@codeaurora.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Zijun,
 
-On Tue, 2 Nov 2021 at 14:13, Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Archie,
->
-> On Sun, Oct 31, 2021 at 11:06 PM Archie Pusaka <apusaka@google.com> wrote:
-> >
-> > From: Archie Pusaka <apusaka@chromium.org>
-> >
-> > The entry has been deprecated since 2014 and it's time to remove them
-> > altogether.
-> > ---
-> > Hi maintainers,
-> > While cleaning this entry, I found that this entry is involved in some
-> > kind of storage file conversion, probably when upgrading BlueZ 4 to 5.
-> > Should we also remove the file conversion too, since it's dated to
-> > 2014 as well?
->
-> Perhaps we can but I'd had such cleanup as a separate patch then.
->
-Got it. Then I would prefer to wait until this series of patches is
-merged before removing the file conversion.
+>>>>>> Add support for MAPLE integrated within SOC, it is mounted on
+>>>>>> a virtual tty port and powered on/off via relevant IOCTL, neither
+>>>>>> IBS nor RAMPATCH downloading is not required.
+>>>>>> 
+>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+>>>>>> ---
+>>>>>> drivers/bluetooth/btqca.c   | 13 ++++++++++++-
+>>>>>> drivers/bluetooth/btqca.h   | 13 +++++++++++++
+>>>>>> drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++++++++++++++++++++++++++-
+>>>>>> 3 files changed, 71 insertions(+), 2 deletions(-)
+>>>>>> 
+>>>>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>>>>> index be04d74037d2..b83d2ecefe5d 100644
+>>>>>> --- a/drivers/bluetooth/btqca.c
+>>>>>> +++ b/drivers/bluetooth/btqca.c
+>>>>>> @@ -255,6 +255,8 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+>>>>>> 		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
+>>>>>> 		BT_DBG("Length\t\t : %d bytes", length);
+>>>>>> 
+>>>>>> +		if (qca_is_maple(soc_type))
+>>>>>> +			break;
+>>>>>> 		idx = 0;
+>>>>>> 		data = tlv->data;
+>>>>>> 		while (idx < length) {
+>>>>>> @@ -552,6 +554,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>>>> 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+>>>>>> 
+>>>>>> 	/* Download rampatch file */
+>>>>>> +	if (qca_is_maple(soc_type))
+>>>>>> +		goto download_nvm;
+>>>>>> +
+>>>>>> 	config.type = TLV_TYPE_PATCH;
+>>>>>> 	if (qca_is_wcn399x(soc_type)) {
+>>>>>> 		snprintf(config.fwname, sizeof(config.fwname),
+>>>>>> @@ -580,6 +585,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>>>> 	/* Give the controller some time to get ready to receive the NVM */
+>>>>>> 	msleep(10);
+>>>>>> 
+>>>>>> +download_nvm:
+>>>>>> 	/* Download NVM configuration */
+>>>>>> 	config.type = TLV_TYPE_NVM;
+>>>>>> 	if (firmware_name)
+>>>>>> @@ -597,6 +603,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>>>> 	else if (soc_type == QCA_QCA6390)
+>>>>>> 		snprintf(config.fwname, sizeof(config.fwname),
+>>>>>> 			 "qca/htnv%02x.bin", rom_ver);
+>>>>>> +	else if (qca_is_maple(soc_type))
+>>>>>> +		snprintf(config.fwname, sizeof(config.fwname),
+>>>>>> +			 "qca/mpnv%02x.bin", rom_ver);
+>>>>>> 	else if (soc_type == QCA_WCN6750)
+>>>>>> 		snprintf(config.fwname, sizeof(config.fwname),
+>>>>>> 			 "qca/msnv%02x.bin", rom_ver);
+>>>>>> @@ -609,6 +618,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>>>> 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+>>>>>> 		return err;
+>>>>>> 	}
+>>>>>> +	if (qca_is_maple(soc_type))
+>>>>>> +		msleep(MAPLE_NVM_READY_DELAY_MS);
+>>>>>> 
+>>>>>> 	if (soc_type >= QCA_WCN3991) {
+>>>>>> 		err = qca_disable_soc_logging(hdev);
+>>>>>> @@ -637,7 +648,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>>>> 		return err;
+>>>>>> 	}
+>>>>>> 
+>>>>>> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
+>>>>>> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || qca_is_maple(soc_type)) {
+>>>>>> 		/* get fw build info */
+>>>>>> 		err = qca_read_fw_build_info(hdev);
+>>>>>> 		if (err < 0)
+>>>>>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>>>>>> index 30afa7703afd..0a5a7d1daa71 100644
+>>>>>> --- a/drivers/bluetooth/btqca.h
+>>>>>> +++ b/drivers/bluetooth/btqca.h
+>>>>>> @@ -46,6 +46,8 @@
+>>>>>> 
+>>>>>> #define QCA_FW_BUILD_VER_LEN		255
+>>>>>> 
+>>>>>> +#define MAPLE_NVM_READY_DELAY_MS        1500
+>>>>>> +#define MAPLE_POWER_CONTROL_DELAY_MS    50
+>>>>>> 
+>>>>>> enum qca_baudrate {
+>>>>>> 	QCA_BAUDRATE_115200 	= 0,
+>>>>>> @@ -145,6 +147,7 @@ enum qca_btsoc_type {
+>>>>>> 	QCA_WCN3991,
+>>>>>> 	QCA_QCA6390,
+>>>>>> 	QCA_WCN6750,
+>>>>>> +	QCA_MAPLE,
+>>>>>> };
+>>>>>> 
+>>>>>> #if IS_ENABLED(CONFIG_BT_QCA)
+>>>>>> @@ -167,6 +170,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+>>>>>> 	return soc_type == QCA_WCN6750;
+>>>>>> }
+>>>>>> 
+>>>>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
+>>>>>> +{
+>>>>>> +	return soc_type == QCA_MAPLE;
+>>>>>> +}
+>>>>>> +
+>>>>>> #else
+>>>>>> 
+>>>>>> static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+>>>>>> @@ -204,6 +212,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+>>>>>> 	return false;
+>>>>>> }
+>>>>>> 
+>>>>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
+>>>>>> +{
+>>>>>> +	return false;
+>>>>>> +}
+>>>>>> +
+>>>>>> static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+>>>>>> {
+>>>>>> 	return -EOPNOTSUPP;
+>>>>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>>>>> index dd768a8ed7cb..f1d9670719c4 100644
+>>>>>> --- a/drivers/bluetooth/hci_qca.c
+>>>>>> +++ b/drivers/bluetooth/hci_qca.c
+>>>>>> @@ -70,6 +70,10 @@
+>>>>>> #define QCA_CRASHBYTE_PACKET_LEN	1096
+>>>>>> #define QCA_MEMDUMP_BYTE		0xFB
+>>>>>> 
+>>>>>> +#ifndef IOCTL_IPC_BOOT
+>>>>>> +#define IOCTL_IPC_BOOT                  0xBE
+>>>>>> +#endif
+>>>>> 
+>>>>> You send this command, but never use it.  Where is the driver code that
+>>>>> uses this command?
+>>>>> 
+>>>> qca_maple_power_control() will use it.  this driver depends on bt_tty kernel module
+>>>> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
+>>> 
+>>> You can not add code to the kernel that is not used by the kernel
+>>> itself.  That driver needs to be in the tree as well, why is it not
+>>> submitted now too?
+>>> 
+>>>>> And why not tabs?
+>>>>> 
+>>>>> And why is this patch series not properly threaded so tools can pick it
+>>>>> up and find them?
+>>>>> 
+>>>>> And why the odd named ioctl that is different from other ones in this
+>>>>> file?
+>>>>> 
+>>>> that IOCTL name is defined by that module.
+>>>> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/include/linux/bt.h?h=NHSS.QSDK.11.5.0.5.r2
+>>> 
+>>> Again, it needs to be in the tree.
+>>> 
+>>>>> And why not just use normal power management hooks for doing things like
+>>>>> turning on and off the hardware like all other drivers?
+>>>>> 
+>>>> this device is special.
+>>> 
+>>> All drivers and devices are special and unique.  Just like all of them :)
+>>> 
+>>> What is so odd about this device that it can not work with the existing
+>>> infrastructure that the kernel has for all of the hundreds of thousands
+>>> of other devices it supports?
+>>> 
+>>>> it seems BT maintainer decides to drop this patch.
+>>> 
+>>> Of course, at the very least because there is no in-kernel user, why
+>>> would you accept such a patch if you were the maintainer?
+>>> 
+>>> Please submit your driver first.
+>> 
+>> this power on via ioctl is nasty business. I am so happy that we got rid of
+>> the crucks when we finally landed serdev.
+>> 
+>> Some people are working on power sequence support and alike. This needs to
+>> use proper infrastructure or extend existing infrastructure. To fit the
+>> needs.
+>> 
+>> I am just 100% certain, that booting an IPC via an ioctl isn’t it. We
+>> really suffered through it in the 2.4 kernel days. The hardware needs to
+>> be described properly in device tree and the kernel needs to take all
+>> the appropriate actions if a Bluetooth device is powered on via its
+>> standard power on procedure. And that is through bluetoothd (or if you
+>> use some other Bluetooth userspace) via the exposed API from the kernel.
+>> 
+> thank you. the IOCTL purpose is to bootup the special bluetooth controller.
+> i have verified this change.
+> i will submit this change to linux-ipq-5.4 firstly even if need to pick up many changes firstly.
 
-> >
-> >  src/adapter.c | 12 ------------
-> >  1 file changed, 12 deletions(-)
-> >
-> > diff --git a/src/adapter.c b/src/adapter.c
-> > index 6b12c9e793..3a3c957a6c 100644
-> > --- a/src/adapter.c
-> > +++ b/src/adapter.c
-> > @@ -3779,8 +3779,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
-> >                                         uint8_t peer_type, const char *group)
-> >  {
-> >         struct smp_ltk_info *ltk = NULL;
-> > -       GError *gerr = NULL;
-> > -       bool central;
-> >         char *key;
-> >         char *rand = NULL;
-> >
-> > @@ -3836,12 +3834,6 @@ static struct smp_ltk_info *get_ltk(GKeyFile *key_file, const char *peer,
-> >                                                                         NULL);
-> >         ltk->ediv = g_key_file_get_integer(key_file, group, "EDiv", NULL);
-> >
-> > -       central = g_key_file_get_boolean(key_file, group, "Master", &gerr);
-> > -       if (gerr)
-> > -               g_error_free(gerr);
-> > -       else
-> > -               ltk->central = central;
-> > -
-> >         ltk->is_blocked = is_blocked_key(HCI_BLOCKED_KEY_TYPE_LTK,
-> >                                                                 ltk->val);
-> >
-> > @@ -5904,7 +5896,6 @@ static void convert_ltk_entry(GKeyFile *key_file, void *value)
-> >         g_free(str);
-> >
-> >         g_key_file_set_integer(key_file, "LongTermKey", "Authenticated", auth);
-> > -       g_key_file_set_integer(key_file, "LongTermKey", "Master", central);
->
-> Weird that it still was setting the "Master" even though this is meant
-> to convert the old format into the new one.
->
-Probably these "convert" methods precedes the "split LTK entries into
-central and peripheral" decision, and this setting is unintentionally
-left out when splitting LTKs.
+I am not sure this is fully understood yet. Do _not_ use an ioctl to boot the Bluetooth
+controller. Power on/off of Bluetooth hardware happens via the standard interface used
+by bluetoothd. The Bluetooth transport driver (in your case hci_qca) has to do everything
+needed when a) serdev->probe is called and b) hdev->open is called. Any other path to
+power your hardware is (bluntly put) wrong.
 
-> >         g_key_file_set_integer(key_file, "LongTermKey", "EncSize", enc_size);
-> >         g_key_file_set_integer(key_file, "LongTermKey", "EDiv", ediv);
-> >
-> > @@ -8445,9 +8436,6 @@ static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
-> >                 g_error_free(gerr);
-> >         }
-> >
-> > -       /* Old files may contain this so remove it in case it exists */
-> > -       g_key_file_remove_key(key_file, "LongTermKey", "Master", NULL);
-> > -
-> >         for (i = 0; i < 16; i++)
-> >                 sprintf(key_str + (i * 2), "%2.2X", key[i]);
-> >
-> > --
-> > 2.33.1.1089.g2158813163f-goog
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+Regards
 
-Thanks,
-Archie
+Marcel
+
