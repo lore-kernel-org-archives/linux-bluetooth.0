@@ -2,169 +2,221 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E3E3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 21:02:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1F83C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 21:33:25 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3C98E61073
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 21:02:48 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C819D61051
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 21:33:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230338AbhKBVFW (ORCPT
+        id S230409AbhKBVgA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 17:05:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48754 "EHLO
+        Tue, 2 Nov 2021 17:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55504 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229931AbhKBVFV (ORCPT
+        with ESMTP id S229981AbhKBVf7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 17:05:21 -0400
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F5D0C061714
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 14:02:46 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id e144so313563iof.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 14:02:46 -0700 (PDT)
+        Tue, 2 Nov 2021 17:35:59 -0400
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41641C061714;
+        Tue,  2 Nov 2021 14:33:24 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id x5so520506pgk.11;
+        Tue, 02 Nov 2021 14:33:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=OWk6VkjEqDQMgcSH1NKNiNArGE7q0k4XXTRdXdjpK4U=;
-        b=SKDGHh46XMH/v2jpDORT18PjQ+dEEHz7eYMYOrlj0PEElaOJzyty5KqQk3A/lCNfX8
-         XLlG5tuu2Xpzfvq0s0pJBtP2juaCX45O91eTEG2M3eK/H3B75Au4L2x79X+Rjjg6MJCL
-         M8bgMlJnLdXSz5kTOpV1J5kxGNnIBJrprp1Uu8q9Z3mAmk3uiz1EGileO1BagFOn0AU5
-         NfZX0MHZIGC5ICGNKc8cclGyjgDrD6FzcSuSmlKyG4HF7logtPI1q7UTJBvfK5zCbjnx
-         Xy0tMZhNt0uffsjn3bbSIOcaMTC6TpB4p76xJ9+v1xAADJRyZkDt5u2SE8HhtuIUwIiq
-         o2/g==
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QnSteGxAFHSw1ZyOWwG9tukkuQKGwDiAkMIV0ek4uDo=;
+        b=Kin2jlsMX4gpoVmUfOPt/XW13fjmopXT/rM65RZcYhlPJI61ISceEKfyVVfnQ6SxQX
+         UAAH3+aMVtIsYWEM5Wvpdmvw5H5kDkLj8M0DPPcqwRzIpdHemB2CSGgq83p4YUogSIeO
+         jPEs1EY5fL5gCVZvpQbMntikyNclY5rlBJKIJAaI7SHOyFHV6AgWFnnbOAzfjhMQVHD2
+         WD/HYzwxjzNOd0CMnIPfzZx14Eg7F8rdtDGiXMrwpWWz8JXw38g3kkWPRQS1IuQ6gu3N
+         L6leUAErreyjV0wtwmgsuMT/tHpSbudBRiGH+/YsErgY537mBNgQGhDYxtOwQAG14f7u
+         viqA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=OWk6VkjEqDQMgcSH1NKNiNArGE7q0k4XXTRdXdjpK4U=;
-        b=7zWb3JjntmNB6jee4VwsAGnSzaPoq4Cf5YemgCrgpLXw4/urXyfm57nlj2BOm2+Jp6
-         Ea0fMpRftfxWrISHJMnwvozRdYxbk60CnryfdFm3H68qeoQwxH4IJBhPj5iYPl7PFt6w
-         becKroUhRKyfa4szS+hPGaxrAVo0JqyML6a8TVS5kaCoZOQzTAaZ3DGvdivRBXf3bvZ2
-         pGqn9yZZuDh5kZsXKMQsYi7e+KXWSwtHzYm72pa0Y0VVl7i4p9SZdzmrvZMMyGWtCy0/
-         uo9VTTELbxbam4AWCV2pwMn+jQv6r+HmP5I8HZWBa+fVa30Om3NRB+z6UCCsKJt3nRJ4
-         /01w==
-X-Gm-Message-State: AOAM530QcfJR888gedh6QAVllzo6HO6S/keBjKhLsP/ElYP09L/qzGAD
-        a8KvGON46ghygY4xNuWbeHfCzhYnH0vqJritYEq3eLqCCto=
-X-Google-Smtp-Source: ABdhPJwQlXTJ870q/k6ldljrbIbi0dmN+85EC1bUEy27U3wmZMVgK/1VXrnhRdqC1TH+1LxW5lKmGCL0JR18utMPFso=
-X-Received: by 2002:a6b:f816:: with SMTP id o22mr29398147ioh.106.1635886965586;
- Tue, 02 Nov 2021 14:02:45 -0700 (PDT)
-MIME-Version: 1.0
-References: <20211102055116.2898794-1-luiz.dentz@gmail.com> <6313C3AD-AEA9-4E4E-98C4-3F1C62DE04CA@holtmann.org>
-In-Reply-To: <6313C3AD-AEA9-4E4E-98C4-3F1C62DE04CA@holtmann.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=QnSteGxAFHSw1ZyOWwG9tukkuQKGwDiAkMIV0ek4uDo=;
+        b=DGiHSyGuz5gUN2BAjsDfN4TNc4RzqbcQDkbf7ZbNI3jRnUu8mK0MsK0zxR/21+cU8n
+         YVZZS6DMHTBSqi5VY6x+YNAvqIS207Sq0KP6iKD0TLjQy8FOnO1DHOwxIfSDp3i9bQQv
+         qyHoUDt4/FT0IR4WTvaJ/P9K6B5NooEe+j1k6Nd7GhD+ETf8YDY9gr1Ex+ENviuLT80b
+         LkRapldyXXv0pWb1KItmyGONo8LgO8I1+ZyqnGwSSLZ7ycCUoIyYGFAPEBlgU0MBFfEo
+         +iVju+19hc8l8rVgdBZoLNIgK5Hhfn+DlzHjzVO7FnzeFvdR7DMIQshwVbB6UDgrsYr5
+         +f6w==
+X-Gm-Message-State: AOAM530ytxdW2ApM9JKlERnBTFAU05VNfMoQz22FV1dSoj+FBp3mfbEm
+        wWPiHKLfvJJZ3DKWj2ViLQXJsnNJBOY=
+X-Google-Smtp-Source: ABdhPJy92RTup1wxM5v8pp5TcmFinXved9BFyDbed4Kp7lbdwOLVTqTDK/l0eANYuUJdjoKVf8UcwQ==
+X-Received: by 2002:a63:5c13:: with SMTP id q19mr14927067pgb.350.1635888803630;
+        Tue, 02 Nov 2021 14:33:23 -0700 (PDT)
+Received: from localhost.localdomain (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id c21sm107979pfv.119.2021.11.02.14.33.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 14:33:23 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 2 Nov 2021 14:02:34 -0700
-Message-ID: <CABBYNZLbU=qUa91Nj45B2nD=GHbAu6j=mCWP+ZkA23a733rfww@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: hci_sync: Set Privacy Mode when updating the
- resolving list
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2021-11-02
+Date:   Tue,  2 Nov 2021 14:33:21 -0700
+Message-Id: <20211102213321.18680-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+The following changes since commit d0f1c248b4ff71cada1b9e4ed61a1992cd94c3df:
 
-On Tue, Nov 2, 2021 at 12:18 AM Marcel Holtmann <marcel@holtmann.org> wrote:
->
-> Hi Luiz,
->
-> > This adds support for Set Privacy Mode when updating the resolving list
-> > when HCI_LIMITED_PRIVACY so the controller shall use Device Mode for
-> > devices programmed in the resolving list, Device Mode is actually
-> > required when the remote device are not able to use RPA as otherwise the
-> > default mode is Network Privacy Mode in which only RPA are allowed thus
-> > the controller would filter out advertisement using the identity address
-> > for which there is an IRK.
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> > include/net/bluetooth/hci.h |  7 ++++++
-> > net/bluetooth/hci_sync.c    | 48 ++++++++++++++++++++++++++++++++-----
-> > 2 files changed, 49 insertions(+), 6 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> > index 63065bc01b76..aa856dfd5b9f 100644
-> > --- a/include/net/bluetooth/hci.h
-> > +++ b/include/net/bluetooth/hci.h
-> > @@ -1930,6 +1930,13 @@ struct hci_rp_le_read_transmit_power {
-> >       __s8  max_le_tx_power;
-> > } __packed;
-> >
-> > +#define HCI_OP_LE_SET_PRIVACY_MODE   0x204e
-> > +struct hci_cp_le_set_privacy_mode {
-> > +     __u8  bdaddr_type;
-> > +     bdaddr_t  bdaddr;
-> > +     __u8  mode;
-> > +} __packed;
-> > +
-> > #define HCI_OP_LE_READ_BUFFER_SIZE_V2 0x2060
-> > struct hci_rp_le_read_buffer_size_v2 {
-> >       __u8    status;
-> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> > index b794605dc882..43173d645436 100644
-> > --- a/net/bluetooth/hci_sync.c
-> > +++ b/net/bluetooth/hci_sync.c
-> > @@ -1580,8 +1580,37 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
-> >                                    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> > }
-> >
-> > +/* Set Device Privacy Mode. */
-> > +static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
-> > +                                     struct hci_conn_params *params)
-> > +{
-> > +     struct hci_cp_le_set_privacy_mode cp;
-> > +     struct smp_irk *irk;
-> > +
-> > +     /* Set Privacy Mode requires the use of resolving list (aka. LL Privacy)
-> > +      * by default Network Mode is used so only really send the command if
-> > +      * Device Mode is required (HCI_LIMITED_PRIVACY).
-> > +      */
-> > +     if (!use_ll_privacy(hdev) ||
-> > +         !hci_dev_test_flag(hdev, HCI_LIMITED_PRIVACY))
-> > +             return 0;
-> > +
-> > +     irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
-> > +     if (!irk)
-> > +             return 0;
-> > +
-> > +     memset(&cp, 0, sizeof(cp));
-> > +     cp.bdaddr_type = irk->addr_type;
-> > +     bacpy(&cp.bdaddr, &irk->bdaddr);
-> > +     cp.mode = 0x01;
-> > +
->
-> you need to check if this command is actually supported.
+  Merge tag 'for-net-next-2021-10-01' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next (2021-10-05 07:41:16 -0700)
 
-The spec suggests it is mandatory if LL Privacy is supported:
+are available in the Git repository at:
 
-'C9: Mandatory if LE Feature (LL Privacy) is supported, otherwise excluded.'
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-11-02
 
-> I think the best option is to add it to Set Device Flags and let bluetoothd set it on a per device basis like it does with the wakeup flag.
+for you to fetch changes up to 258f56d11bbbf39df5bc5faf0119d28be528f27d:
 
-Got it, I guess
+  Bluetooth: aosp: Support AOSP Bluetooth Quality Report (2021-11-02 19:37:52 +0100)
 
-> Trying to tie it to the Limited Privacy mode seems weird. Since that is for discoverability and this is for outgoing connections.
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
 
-Hmm, I'm afraid this wouldn't follow the spec to the letter then since
-it doesn't actually split Incoming/advertising and Outgoing/scanning
-privacy, it does seems to be global so if we go with different
-settings to control each direction separately we may end up with a
-custom mode e.g: limited discoverability for advertising vs network
-privacy mode for scanning, for instance limited discoverability does
-blast the public address while discoverable and bondable but both
-privacy modes seems to require the use of RPA, anyway it would
-probably be a good idea to document the interactions, also main.conf
-seem to have gone with privacy from the specification so we may either
-need add more modes:
+ - Add support for AOSP Bluetooth Quality Report
+ - Rework of HCI command execution serialization
 
-Privacy:
-"on"/"network": Apply Network Privacy Mode both for advertising and scanning
-"limited-network": Apply Limited Discoverable Mode to advertising and
-Network Privacy Mode for scanning
-"device": Apply Device Privacy Mode both for advertising and scanning
-"limited-device": Apply Limited Discoverable Mode to advertising and
-Device Privacy Mode for scanning
+----------------------------------------------------------------
+Archie Pusaka (1):
+      Bluetooth: Fix removing adv when processing cmd complete
 
--- 
-Luiz Augusto von Dentz
+Brian Gix (13):
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
+      Bluetooth: hci_sync: Enable synch'd set_bredr
+      Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
+      Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
+      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
+      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
+      Bluetooth: hci_sync: Convert adv_expire
+      Bluetooth: hci_sync: Convert MGMT_OP_SSP
+
+David Yang (1):
+      Bluetooth: btusb: Fix application of sizeof to pointer
+
+Johan Hovold (1):
+      Bluetooth: bfusb: fix division by zero in send path
+
+Joseph Hwang (2):
+      Bluetooth: Add struct of reading AOSP vendor capabilities
+      Bluetooth: aosp: Support AOSP Bluetooth Quality Report
+
+Kiran K (2):
+      Bluetooth: Read codec capabilities only if supported
+      Bluetooth: btintel: Fix bdaddress comparison with garbage value
+
+Kyle Copperfield (1):
+      Bluetooth: btsdio: Do not bind to non-removable BCM4345 and BCM43455
+
+Luiz Augusto von Dentz (16):
+      Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
+      Bluetooth: Fix handling of SUSPEND_DISCONNECTING
+      Bluetooth: L2CAP: Fix not initializing sk_peer_pid
+      Bluetooth: vhci: Add support for setting msft_opcode and aosp_capable
+      Bluetooth: vhci: Fix checking of msft_opcode
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
+      Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
+      Bluetooth: hci_sync: Rework background scan
+      Bluetooth: hci_sync: Convert MGMT_SET_POWERED
+      Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
+      Bluetooth: hci_sync: Rework init stages
+      Bluetooth: hci_sync: Rework hci_suspend_notifier
+      Bluetooth: hci_sync: Fix missing static warnings
+      Bluetooth: hci_sync: Fix not setting adv set duration
+
+Marcel Holtmann (1):
+      Bluetooth: Add helper for serialized HCI command execution
+
+Mark-YW.Chen (1):
+      Bluetooth: btusb: fix memory leak in btusb_mtk_submit_wmt_recv_urb()
+
+Mark-yw Chen (1):
+      Bluetooth: btmtksdio: transmit packet according to status TX_EMPTY
+
+Nguyen Dinh Phi (1):
+      Bluetooth: hci_sock: purge socket queues in the destruct() callback
+
+Paul Cercueil (1):
+      Bluetooth: hci_bcm: Remove duplicated entry in OF table
+
+Sean Wang (9):
+      Bluetooth: mediatek: add BT_MTK module
+      Bluetooth: btmtksido: rely on BT_MTK module
+      Bluetooth: btmtksdio: add .set_bdaddr support
+      Bluetooth: btmtksdio: explicitly set WHISR as write-1-clear
+      Bluetooth: btmtksdio: move interrupt service to work
+      Bluetooth: btmtksdio: update register CSDIOCSR operation
+      Bluetooth: btmtksdio: use register CRPLR to read packet length
+      mmc: add MT7921 SDIO identifiers for MediaTek Bluetooth devices
+      Bluetooth: btmtksdio: add MT7921s Bluetooth support
+
+Soenke Huster (1):
+      Bluetooth: virtio_bt: fix memory leak in virtbt_rx_handle()
+
+Tedd Ho-Jeong An (2):
+      Bluetooth: hci_vhci: Fix to set the force_wakeup value
+      Bluetooth: mgmt: Fix Experimental Feature Changed event
+
+Tim Jiang (1):
+      Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+
+Wang Hai (1):
+      Bluetooth: cmtp: fix possible panic when cmtp_init_sockets() fails
+
+Wei Yongjun (2):
+      Bluetooth: Fix debugfs entry leak in hci_register_dev()
+      Bluetooth: Fix memory leak of hci device
+
+ drivers/bluetooth/Kconfig         |    6 +
+ drivers/bluetooth/Makefile        |    1 +
+ drivers/bluetooth/bfusb.c         |    3 +
+ drivers/bluetooth/btintel.c       |   22 +-
+ drivers/bluetooth/btmtk.c         |  289 +++
+ drivers/bluetooth/btmtk.h         |  111 +
+ drivers/bluetooth/btmtksdio.c     |  496 ++--
+ drivers/bluetooth/btsdio.c        |    2 +
+ drivers/bluetooth/btusb.c         |  389 +--
+ drivers/bluetooth/hci_bcm.c       |    1 -
+ drivers/bluetooth/hci_vhci.c      |  120 +-
+ drivers/bluetooth/virtio_bt.c     |    3 +
+ include/linux/mmc/sdio_ids.h      |    1 +
+ include/net/bluetooth/bluetooth.h |    2 +
+ include/net/bluetooth/hci_core.h  |   22 +-
+ include/net/bluetooth/hci_sync.h  |   97 +
+ net/bluetooth/Makefile            |    2 +-
+ net/bluetooth/aosp.c              |  168 +-
+ net/bluetooth/aosp.h              |   13 +
+ net/bluetooth/cmtp/core.c         |    4 +-
+ net/bluetooth/hci_codec.c         |   18 +-
+ net/bluetooth/hci_conn.c          |   20 +-
+ net/bluetooth/hci_core.c          | 1334 +----------
+ net/bluetooth/hci_event.c         |  159 +-
+ net/bluetooth/hci_request.c       |  338 +--
+ net/bluetooth/hci_request.h       |   10 +
+ net/bluetooth/hci_sock.c          |   11 +-
+ net/bluetooth/hci_sync.c          | 4799 +++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_sysfs.c         |    2 +
+ net/bluetooth/l2cap_sock.c        |   19 +
+ net/bluetooth/mgmt.c              | 2086 ++++++++--------
+ net/bluetooth/mgmt_util.c         |   15 +-
+ net/bluetooth/mgmt_util.h         |    4 +
+ net/bluetooth/msft.c              |  511 ++--
+ net/bluetooth/msft.h              |   15 +-
+ 35 files changed, 7472 insertions(+), 3621 deletions(-)
+ create mode 100644 drivers/bluetooth/btmtk.c
+ create mode 100644 drivers/bluetooth/btmtk.h
+ create mode 100644 include/net/bluetooth/hci_sync.h
+ create mode 100644 net/bluetooth/hci_sync.c
