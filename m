@@ -2,165 +2,225 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 68D01C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B9AC5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 49CAD60F02
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:08 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9EE7161051
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:19:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231220AbhKBHVl (ORCPT
+        id S231165AbhKBHWL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 03:21:41 -0400
-Received: from so254-9.mailgun.net ([198.61.254.9]:15259 "EHLO
-        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231145AbhKBHVk (ORCPT
+        Tue, 2 Nov 2021 03:22:11 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56606 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231366AbhKBHWL (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 03:21:40 -0400
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1635837546; h=Content-Transfer-Encoding: Content-Type:
- In-Reply-To: MIME-Version: Date: Message-ID: References: Cc: To:
- Subject: From: Sender; bh=y6Sz6xkt/HSEuNS0flTXHuzKjPeOjD94Xhcr7nenToU=;
- b=S5lSnoZa0VrENqPxzaTyYk5IFGMK+ZCAEOHmZXavKSw2orC1G/v0TWNaAGuIGty0XcGZmX5H
- 4BJSjnY/Zsd0FH8DXgrGmWYOLoDsr/Bt+IL7mVmmhF0FWW2rBf0f9UJnry8xEK9dqLO4lK6a
- myWB3rYcrjlNUMvKIWxLfRAqDjM=
-X-Mailgun-Sending-Ip: 198.61.254.9
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n04.prod.us-west-2.postgun.com with SMTP id
- 6180e65caeb239055603ddb7 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 02 Nov 2021 07:18:52
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id 56A90C4338F; Tue,  2 Nov 2021 07:18:52 +0000 (UTC)
-Received: from [192.168.0.104] (unknown [183.195.15.125])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 28A10C4360C;
-        Tue,  2 Nov 2021 07:18:48 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 28A10C4360C
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-Subject: Re: [PATCH v1] serdev: Add interface serdev_device_ioctl
-To:     Greg KH <gregkh@linuxfoundation.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     robh@kernel.org, jirislaby@kernel.org,
-        linux-serial@vger.kernel.org,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Zijun Hu <quic_zijuhu@quicinc.com>
-References: <1635753048-5289-1-git-send-email-zijuhu@codeaurora.org>
- <YX+eRgCrUs2Y5iaX@kroah.com>
- <fe5a8bec-b186-c719-5f02-a0a67eb8862f@codeaurora.org>
- <YX+mDGr8tDzVT4Hr@kroah.com>
- <573d3640-2e8b-9266-4205-755ac0951abd@codeaurora.org>
- <YX/M/MZL8jbu7p7I@kroah.com>
- <DC399B43-DB1E-42AC-8A31-3A2C9407EE6D@holtmann.org>
- <YX/VYUC3ngOf5bX5@kroah.com>
-Message-ID: <787fa2b6-146a-16b1-e304-c7e3b26dbf99@codeaurora.org>
-Date:   Tue, 2 Nov 2021 15:18:46 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.1
+        Tue, 2 Nov 2021 03:22:11 -0400
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 77B13C061766
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 00:19:36 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id v20so14611280plo.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 00:19:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=13hwNJhXlqX8JgwEFp5btGd3IwvyshzRtY7S25HF1qw=;
+        b=BPhvzgTwlZ7Qm0RyfCGd9rZvJLsOUTM6VKeVo1esXSU+M5dLJx7kBKTpLV1k2/8+21
+         OhHc6N36a9Nqr9SUV3dxmCldra070wcKEeAmmBrsAVhevWELaLMi2Ytb5h0mPXN6euWL
+         wSH0CCJ5Ccc3PK9weYfwX7nFiftqo4RzjKTsk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=13hwNJhXlqX8JgwEFp5btGd3IwvyshzRtY7S25HF1qw=;
+        b=yqxU2N/aty5Qqogc1r2Jnp1mRbuz1ctjhz23Zn39QSLUIdxfSkh1398PJT6zYmWxJ1
+         Ud2z4+o7pY70mmZYtInkJVTqspOhQhQUlu6+gktuN7W//RYfjUlw8hUEROMkBFVfxkMY
+         SRHZDGjVy5umAlKU1Vw8f0gVCDnr3YwxaRzlwPLEsoJsX38Eh8d9Gc5oq+ucSu8GXz4f
+         +cHLvG7gnYsJEUvvAgZWcxCXn+mwfFh8HLFjkv5mEdPw8XbBCB8rycieYhwS0fjgldLY
+         vTMwJ9ipIXkcgYAbCk64l38Ka7m+AE8wDoO9P5pDspJ0W4JV8uXIZrpVc2ahjW61gklm
+         RstA==
+X-Gm-Message-State: AOAM530ZJlZkgZORWh29DPRoBv20X9Ok2ipsVbVyVTh5p/FDG2OCJ+3q
+        DnZ6yx8qx7EIHAsJlMUxbcOu7O2EvsBMhA==
+X-Google-Smtp-Source: ABdhPJwQBUfENhnIvKd37TimZ4NnOPVuIT54Tuf6+ai+5Z3rnRqReGJXsd3zQzQ7DfvfkENGreEpyA==
+X-Received: by 2002:a17:90b:1bd2:: with SMTP id oa18mr4628798pjb.212.1635837575410;
+        Tue, 02 Nov 2021 00:19:35 -0700 (PDT)
+Received: from josephsih-z840.tpe.corp.google.com ([2401:fa00:1:10:df29:c6df:4e78:cf45])
+        by smtp.gmail.com with ESMTPSA id b13sm7165243pfv.186.2021.11.02.00.19.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 02 Nov 2021 00:19:34 -0700 (PDT)
+From:   Joseph Hwang <josephsih@chromium.org>
+To:     linux-bluetooth@vger.kernel.org, marcel@holtmann.org,
+        luiz.dentz@gmail.com, pali@kernel.org
+Cc:     chromeos-bluetooth-upstreaming@chromium.org, josephsih@google.com,
+        Joseph Hwang <josephsih@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v7 1/2] Bluetooth: Add struct of reading AOSP vendor capabilities
+Date:   Tue,  2 Nov 2021 15:19:28 +0800
+Message-Id: <20211102151908.v7.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
 MIME-Version: 1.0
-In-Reply-To: <YX/VYUC3ngOf5bX5@kroah.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+This patch adds the struct of reading AOSP vendor capabilities.
+New capabilities are added incrementally. Note that the
+version_supported octets will be used to determine whether a
+capability has been defined for the version.
 
+Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 
-On 11/1/2021 7:54 PM, Greg KH wrote:
-> On Mon, Nov 01, 2021 at 12:45:36PM +0100, Marcel Holtmann wrote:
->> Hi Greg,
->>
->>>>>>>> For serdev_device which is mounted at virtual tty port, tty ioctl()
->>>>>>>> maybe be used to make serdev_device ready to talk with tty port, so
->>>>>>>> add interface serdev_device_ioctl().
->>>>>>>>
->>>>>>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->>>>>>>> ---
->>>>>>>> drivers/tty/serdev/core.c           | 11 +++++++++++
->>>>>>>> drivers/tty/serdev/serdev-ttyport.c | 12 ++++++++++++
->>>>>>>> include/linux/serdev.h              |  9 +++++++++
->>>>>>>> 3 files changed, 32 insertions(+)
->>>>>>>>
->>>>>>>> diff --git a/drivers/tty/serdev/core.c b/drivers/tty/serdev/core.c
->>>>>>>> index f1324fe99378..c0f6cd64716b 100644
->>>>>>>> --- a/drivers/tty/serdev/core.c
->>>>>>>> +++ b/drivers/tty/serdev/core.c
->>>>>>>> @@ -405,6 +405,17 @@ int serdev_device_set_tiocm(struct serdev_device *serdev, int set, int clear)
->>>>>>>> }
->>>>>>>> EXPORT_SYMBOL_GPL(serdev_device_set_tiocm);
->>>>>>>>
->>>>>>>> +int serdev_device_ioctl(struct serdev_device *serdev, unsigned int cmd, unsigned long arg)
->>>>>>>> +{
->>>>>>>> +	struct serdev_controller *ctrl = serdev->ctrl;
->>>>>>>> +
->>>>>>>> +	if (!ctrl || !ctrl->ops->ioctl)
->>>>>>>> +		return -EOPNOTSUPP;
->>>>>>>
->>>>>>> Wrong error for returning that an ioctl is not handled :(
->>>>>> checkpatch.pl always reports below WARNING when i use ENOTSUPP as present interfaces
->>>>>> do. so i change error code to EOPNOTSUPP.
->>>>>>
->>>>>> #28: FILE: drivers/tty/serdev/core.c:412:
->>>>>> +               return -ENOTSUPP;
->>>>>>
->>>>>> WARNING: ENOTSUPP is not a SUSV4 error code, prefer EOPNOTSUPP
->>>>>
->>>>> Both of them are not the correct error to return when an ioctl is not
->>>>> supported.
->>>>>
->>>> is ENODEV okay?
->>>
->>> No, -ENOTTY is the correct one as per the documentation, right?
->>>
->>>>>>> Anyway, what in-tree driver needs this functionality?  Why does serdev
->>>>>>> need any ioctl commands?
->>>>>>>
->>>>>> i am developing driver for a special bluetooth controller which is integrated within SOC,
->>>>>> and it does not connect with the BT HOST with UART as normal controller do, but it has very
->>>>>> similar features as the BT controller with UART I/F. it is mounted on a virtual serial port
->>>>>> driven by a tty driver developed. but it need to call tty ioctl to make the 
->>>>>> special BT controller ready to talk with tty port. so i add this interface.
->>>>>
->>>>> Please submit this change when you submit your driver that uses it at
->>>>> the same time so we can review them all at once.  We do not add apis
->>>>> that are not used in the kernel tree.
->>>>>
->>>> okay
->>>>>> as you known, the main purpose of ioctl is to achieve MISC and irregular control. so it is useful
->>>>>> for these irregular devices.
->>>>>
->>>>> For tty devices, "custom" ioctls are not ok, use the standard tty
->>>>> commands and you should be fine for everything you need to do.
->>>>>
->>>>> If not, then perhaps your design is incorrect?
->>>>>
->>>> i just want to refer bt_ioctl within https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
->>>> by serdev. so add this interface.
->>>
->>> The 5.4 kernel is not relevant here, so I do not understand.
->>>
->>>> are there any other good solution to advise?
->>>
->>> Why not work with the bluetooth developers on this?
->>
->> if this is just to have some hackish Bluetooth driver, then NAK from my side. Since we have serdev, we have no need for, or requirements for any ioctl anymore. If such thing is needed, it is a bad design.
-> 
-> Thanks for the confirmation, seems sane to me!
-> 
-> Zijun, please fix up your driver and submit it to be merged and all
-> should be fine, no need for any custom ioctls.
-> 
- thank you Greg, i have submitted all changes to support the special BT controller, certainly, it includes this serdev change.
-> thanks,
-> 
-> greg k-h
-> 
+---
+
+Changes in v7:
+- Use the full struct aosp_rp_le_get_vendor_capa. If the
+  version_supported is >= 98, check bluetooth_quality_report_support.
+- Use __le16 and __le32.
+- Use proper bt_dev_err and bt_dev_warn per review comments.
+- Skip unnecessary bt_dev_dbg.
+- Remove unnecessary rp->status check.
+- Skip unnecessary check about version_supported on versions that we
+  do not care about. For now, we only care about quality report support.
+- Add the define for the length of the struct.
+- Mediatek will submit a separate patch to enable aosp.
+
+Changes in v6:
+- Add historical versions of struct aosp_rp_le_get_vendor_capabilities.
+- Perform the basic check about the struct length.
+- Through the version, bluetooth_quality_report_support can be checked.
+
+Changes in v5:
+- This is a new patch.
+- Add struct aosp_rp_le_get_vendor_capabilities so that next patch
+  can determine whether a particular capability is supported or not.
+
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/aosp.c             | 83 +++++++++++++++++++++++++++++++-
+ 2 files changed, 83 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 53a8c7d3a4bf..b5f061882c10 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -603,6 +603,7 @@ struct hci_dev {
+ 
+ #if IS_ENABLED(CONFIG_BT_AOSPEXT)
+ 	bool			aosp_capable;
++	bool			aosp_quality_report;
+ #endif
+ 
+ 	int (*open)(struct hci_dev *hdev);
+diff --git a/net/bluetooth/aosp.c b/net/bluetooth/aosp.c
+index a1b7762335a5..0d4f1702ce35 100644
+--- a/net/bluetooth/aosp.c
++++ b/net/bluetooth/aosp.c
+@@ -8,9 +8,43 @@
+ 
+ #include "aosp.h"
+ 
++/* Command complete parameters of LE_Get_Vendor_Capabilities_Command
++ * The parameters grow over time. The base version that declares the
++ * version_supported field is v0.95. Refer to
++ * https://cs.android.com/android/platform/superproject/+/master:system/
++ *         bt/gd/hci/controller.cc;l=452?q=le_get_vendor_capabilities_handler
++ */
++struct aosp_rp_le_get_vendor_capa {
++	/* v0.95: 15 octets */
++	__u8	status;
++	__u8	max_advt_instances;
++	__u8	offloaded_resolution_of_private_address;
++	__le16	total_scan_results_storage;
++	__u8	max_irk_list_sz;
++	__u8	filtering_support;
++	__u8	max_filter;
++	__u8	activity_energy_info_support;
++	__le16	version_supported;
++	__le16	total_num_of_advt_tracked;
++	__u8	extended_scan_support;
++	__u8	debug_logging_supported;
++	/* v0.96: 16 octets */
++	__u8	le_address_generation_offloading_support;
++	/* v0.98: 21 octets */
++	__le32	a2dp_source_offload_capability_mask;
++	__u8	bluetooth_quality_report_support;
++	/* v1.00: 25 octets */
++	__le32	dynamic_audio_buffer_support;
++} __packed;
++
++#define VENDOR_CAPA_BASE_SIZE		15
++#define VENDOR_CAPA_0_98_SIZE		21
++
+ void aosp_do_open(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
++	struct aosp_rp_le_get_vendor_capa *rp;
++	u16 version_supported;
+ 
+ 	if (!hdev->aosp_capable)
+ 		return;
+@@ -20,9 +54,56 @@ void aosp_do_open(struct hci_dev *hdev)
+ 	/* LE Get Vendor Capabilities Command */
+ 	skb = __hci_cmd_sync(hdev, hci_opcode_pack(0x3f, 0x153), 0, NULL,
+ 			     HCI_CMD_TIMEOUT);
+-	if (IS_ERR(skb))
++	if (IS_ERR(skb)) {
++		bt_dev_err(hdev, "AOSP get vendor capabilities (%ld)",
++			   PTR_ERR(skb));
+ 		return;
++	}
++
++	/* A basic length check */
++	if (skb->len < VENDOR_CAPA_BASE_SIZE)
++		goto length_error;
++
++	rp = (struct aosp_rp_le_get_vendor_capa *)skb->data;
++
++	version_supported = le16_to_cpu(rp->version_supported);
++	/* AOSP displays the verion number like v0.98, v1.00, etc. */
++	bt_dev_info(hdev, "AOSP version v%u.%02u",
++		    version_supported >> 8, version_supported & 0xff);
++
++	/* Do not support very old versions. */
++	if (version_supported < 95) {
++		bt_dev_warn(hdev, "AOSP capabilities version %u too old",
++			    version_supported);
++		goto done;
++	}
++
++	if (version_supported >= 95 && version_supported < 98) {
++		bt_dev_warn(hdev, "AOSP quality report is not supported");
++		goto done;
++	}
++
++	if (version_supported >= 98) {
++		if (skb->len < VENDOR_CAPA_0_98_SIZE)
++			goto length_error;
++
++		/* The bluetooth_quality_report_support is defined at version
++		 * v0.98. Refer to
++		 * https://cs.android.com/android/platform/superproject/+/
++		 *         master:system/bt/gd/hci/controller.cc;l=477
++		 */
++		if (rp->bluetooth_quality_report_support) {
++			hdev->aosp_quality_report = true;
++			bt_dev_info(hdev, "AOSP quality report is supported");
++		}
++	}
++
++	goto done;
++
++length_error:
++	bt_dev_err(hdev, "AOSP capabilities length %d too short", skb->len);
+ 
++done:
+ 	kfree_skb(skb);
+ }
+ 
+-- 
+2.33.1.1089.g2158813163f-goog
+
