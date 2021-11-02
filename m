@@ -2,151 +2,224 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 63283C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 11:27:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E25D6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 13:23:07 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4696A60EB9
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 11:27:53 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B9D6C610E5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 13:23:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbhKBLa0 (ORCPT
+        id S231176AbhKBNZl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 07:30:26 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56652 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229778AbhKBLaZ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 07:30:25 -0400
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37FC3C061766
-        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 04:27:51 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id f92-20020a25a465000000b005bea37bc0baso30673615ybi.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 04:27:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=5sNj/QMNumolMMKBSDqH1xGPUsCbMl4BcAinNLIbYXg=;
-        b=VcO4Edxounpwoi+o3qO80QAHh3/I9FHDEEh2AYQDpy3BjUxtS6wbaU7yV+FC2T6bUA
-         r/mEmzTMWXobeOCey3elwWdyP/W9dAvytqbEbMeBaykIb6Zpzz73sjPcgkocA0mVzR9h
-         O8LXHV03WuWqYlxwu4HuyJpl6UMozUM1MGRmMOvNuPgZTtiiiwbuX8EuixDIu8uKa2em
-         Lkm+E9Qv/N7phZYkwrMnUrrGmrM4rX8bt1GcB1JFE43+Y4s5K60vfqsJSl8eahy4e2SJ
-         LY/AynJERtWfXG3STizwLCao8yQCVXJDqPHOrJxXf5z29N8rkaNgRDCd22+6oR2VA0AX
-         bldA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=5sNj/QMNumolMMKBSDqH1xGPUsCbMl4BcAinNLIbYXg=;
-        b=Bwp/GtQvm3KlBqk5MUrS2eOfCqPy1iTWAt9ACCRD7T1/iVgFv8J02zoVwPELA5xH/9
-         jx//gj8eh7CpRhfjPbz2pv7c/exeqMoWw7AtdwY4MVkP7mzIppQoLcEhEotpyg2d5r2K
-         RXTr/8RghKELsspbhgBvmjr9IbgvirAOSCQJKsGw2xkCBp7xFViN23lnNc2gzIR2U3e5
-         82FEkumthqlGQDTqAgzo5zYVVYDc2WMV3/RvxySAPt/dA5+hIay04UqMNX2MVN3JYECT
-         gioc+YlS9z5Bmwq0+EwUSrJ+PtS1GTbLnKY/E+iT8SdPnPkLGsTBKIppIsXU28Npkvlg
-         11gg==
-X-Gm-Message-State: AOAM533AhokDXvc1KBadN6cDRLllM7ZLsHjWvC5s4f0mgYQdN02wGxC8
-        m5V3kZ3VwYbQazbPUig/kNF2NOjwK8Ynl9b00hdrMd8NZD5lkWKXKC340dJfFo94QBISSnvurZi
-        vE5nfFhDQDaaqyCOPIR8xzbAX+0fCxciYoaghgymAc8ZM1jKwdHfCA0O+pEETcXlG2MpYcqYihH
-        +U
-X-Google-Smtp-Source: ABdhPJyyBzQNUjoWuSZ3gyw7veG9oOSrnNzZtUmfTxbYxxCAoNEAILEzxY31ZTBCTXC7pnCkdJW78OTX/qIW
-X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:e184:a33f:252b:7530])
- (user=apusaka job=sendgmr) by 2002:a25:ada5:: with SMTP id
- z37mr7407492ybi.93.1635852470289; Tue, 02 Nov 2021 04:27:50 -0700 (PDT)
-Date:   Tue,  2 Nov 2021 19:27:44 +0800
-Message-Id: <20211102192742.1.I3ba1a76d72da5a813cf6e6f219838c9ef28c5eaa@changeid>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [PATCH] Bluetooth: Fix receiving HCI_LE_Advertising_Set_Terminated event
-From:   Archie Pusaka <apusaka@google.com>
-To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>,
-        Alain Michaud <alainm@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Tue, 2 Nov 2021 09:25:41 -0400
+Received: from mail.kernel.org ([198.145.29.99]:43798 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229924AbhKBNZl (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Nov 2021 09:25:41 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 5C62E60E74;
+        Tue,  2 Nov 2021 13:23:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+        s=korg; t=1635859386;
+        bh=YSlNiHdFLNLpeqGWMGeoCbpNuiS7/1dGHPuVR53S5WE=;
+        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+        b=ogjOOHCX5jR3hSEkx8RtPmV+wKbiuSHTJqNh/atHq9JEHRAIjYxs6Tg65ImM4QHaZ
+         5CqQtqIWuWyBbLt8AYwgb7jUhJgUfIixIv925ImioAXiIR6UBIu/ZptPzNGCbANlsz
+         mnuQzXxYhAQnVMQUeICr9LOAK1JA5Jqm9emM4EVE=
+Date:   Tue, 2 Nov 2021 14:23:03 +0100
+From:   Greg KH <gregkh@linuxfoundation.org>
+To:     Zijun Hu <zijuhu@codeaurora.org>
+Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
+        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
+        rjliao@codeaurora.org, Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: Add support for QTI bluetooth
+ MAPLE
+Message-ID: <YYE7t6GJa+cXIyrx@kroah.com>
+References: <1635837177-1341-1-git-send-email-zijuhu@codeaurora.org>
+ <YYDqW6ewycWP1Y7a@kroah.com>
+ <4f6aee28-4d86-116c-6c47-bfce5de6551b@codeaurora.org>
+ <YYD1PJrFw/xmEXIW@kroah.com>
+ <bba14dcb-7c42-ee36-514c-46ed54ef497b@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bba14dcb-7c42-ee36-514c-46ed54ef497b@codeaurora.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Archie Pusaka <apusaka@chromium.org>
+On Tue, Nov 02, 2021 at 04:54:23PM +0800, Zijun Hu wrote:
+> 
+> 
+> On 11/2/2021 4:22 PM, Greg KH wrote:
+> > On Tue, Nov 02, 2021 at 03:53:33PM +0800, Zijun Hu wrote:
+> >>
+> >>
+> >> On 11/2/2021 3:35 PM, Greg KH wrote:
+> >>> On Tue, Nov 02, 2021 at 03:12:57PM +0800, Zijun Hu wrote:
+> >>>> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> >>>>
+> >>>> Add support for MAPLE integrated within SOC, it is mounted on
+> >>>> a virtual tty port and powered on/off via relevant IOCTL, neither
+> >>>> IBS nor RAMPATCH downloading is not required.
+> >>>>
+> >>>> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> >>>> ---
+> >>>>  drivers/bluetooth/btqca.c   | 13 ++++++++++++-
+> >>>>  drivers/bluetooth/btqca.h   | 13 +++++++++++++
+> >>>>  drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++++++++++++++++++++++++++-
+> >>>>  3 files changed, 71 insertions(+), 2 deletions(-)
+> >>>>
+> >>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+> >>>> index be04d74037d2..b83d2ecefe5d 100644
+> >>>> --- a/drivers/bluetooth/btqca.c
+> >>>> +++ b/drivers/bluetooth/btqca.c
+> >>>> @@ -255,6 +255,8 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
+> >>>>  		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
+> >>>>  		BT_DBG("Length\t\t : %d bytes", length);
+> >>>>  
+> >>>> +		if (qca_is_maple(soc_type))
+> >>>> +			break;
+> >>>>  		idx = 0;
+> >>>>  		data = tlv->data;
+> >>>>  		while (idx < length) {
+> >>>> @@ -552,6 +554,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> >>>>  	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+> >>>>  
+> >>>>  	/* Download rampatch file */
+> >>>> +	if (qca_is_maple(soc_type))
+> >>>> +		goto download_nvm;
+> >>>> +
+> >>>>  	config.type = TLV_TYPE_PATCH;
+> >>>>  	if (qca_is_wcn399x(soc_type)) {
+> >>>>  		snprintf(config.fwname, sizeof(config.fwname),
+> >>>> @@ -580,6 +585,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> >>>>  	/* Give the controller some time to get ready to receive the NVM */
+> >>>>  	msleep(10);
+> >>>>  
+> >>>> +download_nvm:
+> >>>>  	/* Download NVM configuration */
+> >>>>  	config.type = TLV_TYPE_NVM;
+> >>>>  	if (firmware_name)
+> >>>> @@ -597,6 +603,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> >>>>  	else if (soc_type == QCA_QCA6390)
+> >>>>  		snprintf(config.fwname, sizeof(config.fwname),
+> >>>>  			 "qca/htnv%02x.bin", rom_ver);
+> >>>> +	else if (qca_is_maple(soc_type))
+> >>>> +		snprintf(config.fwname, sizeof(config.fwname),
+> >>>> +			 "qca/mpnv%02x.bin", rom_ver);
+> >>>>  	else if (soc_type == QCA_WCN6750)
+> >>>>  		snprintf(config.fwname, sizeof(config.fwname),
+> >>>>  			 "qca/msnv%02x.bin", rom_ver);
+> >>>> @@ -609,6 +618,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> >>>>  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
+> >>>>  		return err;
+> >>>>  	}
+> >>>> +	if (qca_is_maple(soc_type))
+> >>>> +		msleep(MAPLE_NVM_READY_DELAY_MS);
+> >>>>  
+> >>>>  	if (soc_type >= QCA_WCN3991) {
+> >>>>  		err = qca_disable_soc_logging(hdev);
+> >>>> @@ -637,7 +648,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+> >>>>  		return err;
+> >>>>  	}
+> >>>>  
+> >>>> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
+> >>>> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || qca_is_maple(soc_type)) {
+> >>>>  		/* get fw build info */
+> >>>>  		err = qca_read_fw_build_info(hdev);
+> >>>>  		if (err < 0)
+> >>>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+> >>>> index 30afa7703afd..0a5a7d1daa71 100644
+> >>>> --- a/drivers/bluetooth/btqca.h
+> >>>> +++ b/drivers/bluetooth/btqca.h
+> >>>> @@ -46,6 +46,8 @@
+> >>>>  
+> >>>>  #define QCA_FW_BUILD_VER_LEN		255
+> >>>>  
+> >>>> +#define MAPLE_NVM_READY_DELAY_MS        1500
+> >>>> +#define MAPLE_POWER_CONTROL_DELAY_MS    50
+> >>>>  
+> >>>>  enum qca_baudrate {
+> >>>>  	QCA_BAUDRATE_115200 	= 0,
+> >>>> @@ -145,6 +147,7 @@ enum qca_btsoc_type {
+> >>>>  	QCA_WCN3991,
+> >>>>  	QCA_QCA6390,
+> >>>>  	QCA_WCN6750,
+> >>>> +	QCA_MAPLE,
+> >>>>  };
+> >>>>  
+> >>>>  #if IS_ENABLED(CONFIG_BT_QCA)
+> >>>> @@ -167,6 +170,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+> >>>>  	return soc_type == QCA_WCN6750;
+> >>>>  }
+> >>>>  
+> >>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
+> >>>> +{
+> >>>> +	return soc_type == QCA_MAPLE;
+> >>>> +}
+> >>>> +
+> >>>>  #else
+> >>>>  
+> >>>>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
+> >>>> @@ -204,6 +212,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
+> >>>>  	return false;
+> >>>>  }
+> >>>>  
+> >>>> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
+> >>>> +{
+> >>>> +	return false;
+> >>>> +}
+> >>>> +
+> >>>>  static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+> >>>>  {
+> >>>>  	return -EOPNOTSUPP;
+> >>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+> >>>> index dd768a8ed7cb..f1d9670719c4 100644
+> >>>> --- a/drivers/bluetooth/hci_qca.c
+> >>>> +++ b/drivers/bluetooth/hci_qca.c
+> >>>> @@ -70,6 +70,10 @@
+> >>>>  #define QCA_CRASHBYTE_PACKET_LEN	1096
+> >>>>  #define QCA_MEMDUMP_BYTE		0xFB
+> >>>>  
+> >>>> +#ifndef IOCTL_IPC_BOOT
+> >>>> +#define IOCTL_IPC_BOOT                  0xBE
+> >>>> +#endif
+> >>>
+> >>> You send this command, but never use it.  Where is the driver code that
+> >>> uses this command?
+> >>>
+> >> qca_maple_power_control() will use it.  this driver depends on bt_tty kernel module
+> >> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
+> > 
+> > You can not add code to the kernel that is not used by the kernel
+> > itself.  That driver needs to be in the tree as well, why is it not
+> > submitted now too?
+> > 
+>   the bt_tty driver module is not developed and maintained by me.
+>   bluetooth driver code of linux-ipq-5.4 stopped update at Sep 15 2019.
+>   many relevant changes need to be picked up from bluetooth-next if apply this patch int to linux-ipq-5.4
+> 
+> >>> And why not tabs?
+> >>>
+> >>> And why is this patch series not properly threaded so tools can pick it
+> >>> up and find them?
+> >>>
+> >>> And why the odd named ioctl that is different from other ones in this
+> >>> file?
+> >>>
+> >> that IOCTL name is defined by that module.
+> >> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/include/linux/bt.h?h=NHSS.QSDK.11.5.0.5.r2
+> > 
+> > Again, it needs to be in the tree.
+> > 
+>   make sense, i will try to submit this change to linux-ipq-5.4
 
-This event is received when the controller stops advertising,
-specifically for these three reasons:
-(a) Connection is successfully created (success).
-(b) Timeout is reached (error).
-(c) Number of advertising events is reached (error).
-(*) This event is NOT generated when the host stops the advertisement.
-Refer to the BT spec ver 5.3 vol 4 part E sec 7.7.65.18. Note that the
-section was revised from BT spec ver 5.0 vol 2 part E sec 7.7.65.18
-which was ambiguous about (*).
+"linux-ipq-5.4" has NOTHING to do with the upstream kernel development
+process here.  Please work with the developers at your company to
+understand how the kernel development process works to help understand
+this correctly, before submitting patches again.
 
-Some chips (e.g. RTL8822CE) send this event when the host stops the
-advertisement with status = HCI_ERROR_CANCELLED_BY_HOST (due to (*)
-above). This is treated as an error and the advertisement will be
-removed and userspace will be informed via MGMT event.
+thanks,
 
-On suspend, we are supposed to temporarily disable advertisements,
-and continue advertising on resume. However, due to the behavior
-above, the advertisements are removed instead.
-
-This patch returns early if HCI_ERROR_CANCELLED_BY_HOST is received.
-
-Additionally, this patch also clear HCI_LE_ADV if there are no more
-advertising instances after receiving other errors.
-
-Signed-off-by: Archie Pusaka <apusaka@chromium.org>
-Reviewed-by: Alain Michaud <alainm@chromium.org>
-
----
-
- include/net/bluetooth/hci.h |  1 +
- net/bluetooth/hci_event.c   | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
-
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index 63065bc01b76..84db6b275231 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -566,6 +566,7 @@ enum {
- #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
- #define HCI_ERROR_UNSPECIFIED		0x1f
- #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
-+#define HCI_ERROR_CANCELLED_BY_HOST	0x44
- 
- /* Flow control modes */
- #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index d4b75a6cfeee..150b50677790 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -5538,6 +5538,14 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 
- 	adv = hci_find_adv_instance(hdev, ev->handle);
- 
-+	/* Some chips (e.g. RTL8822CE) emit HCI_ERROR_CANCELLED_BY_HOST. This
-+	 * event is being fired as a result of a hci_cp_le_set_ext_adv_enable
-+	 * disable request, which will have its own callback and cleanup via
-+	 * the hci_cc_le_set_ext_adv_enable path.
-+	 */
-+	if (ev->status == HCI_ERROR_CANCELLED_BY_HOST)
-+		return;
-+
- 	if (ev->status) {
- 		if (!adv)
- 			return;
-@@ -5546,6 +5554,10 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		hci_remove_adv_instance(hdev, ev->handle);
- 		mgmt_advertising_removed(NULL, hdev, ev->handle);
- 
-+		/* If we are no longer advertising, clear HCI_LE_ADV */
-+		if (list_empty(&hdev->adv_instances))
-+			hci_dev_clear_flag(hdev, HCI_LE_ADV);
-+
- 		return;
- 	}
- 
--- 
-2.33.1.1089.g2158813163f-goog
-
+greg k-h
