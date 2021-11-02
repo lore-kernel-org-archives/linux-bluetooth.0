@@ -2,225 +2,247 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D06A7C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 08:22:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 46431C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 08:31:18 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AFB7D60F56
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 08:22:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2261260F70
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 08:31:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230411AbhKBIZM (ORCPT
+        id S231145AbhKBIdu convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 04:25:12 -0400
-Received: from mail.kernel.org ([198.145.29.99]:35520 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229924AbhKBIY4 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 04:24:56 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPSA id E659F60F56;
-        Tue,  2 Nov 2021 08:22:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-        s=korg; t=1635841342;
-        bh=OlufxP2/b5AJ7f2PZ8iRRthfSpRo/3L6cs+0T238eAo=;
-        h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-        b=ATCZf01PmmeXolcv8LWG1fPWIRiMrS/Egb1hTFg8vR+Na0ZI0o7cCbZ2kUwpp4yf8
-         SWEzSxCnF6y4xG0++3J8tcIP+YE0unRBIc4kcgFr0dkcO6HvqxRA2FsXUv0Sccz7jT
-         r+CSBdfkb5JX6PVOD13czdRmQSJDwtApSHL5n5Ls=
-Date:   Tue, 2 Nov 2021 09:22:20 +0100
-From:   Greg KH <gregkh@linuxfoundation.org>
-To:     Zijun Hu <zijuhu@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: Add support for QTI bluetooth
- MAPLE
-Message-ID: <YYD1PJrFw/xmEXIW@kroah.com>
-References: <1635837177-1341-1-git-send-email-zijuhu@codeaurora.org>
- <YYDqW6ewycWP1Y7a@kroah.com>
- <4f6aee28-4d86-116c-6c47-bfce5de6551b@codeaurora.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4f6aee28-4d86-116c-6c47-bfce5de6551b@codeaurora.org>
+        Tue, 2 Nov 2021 04:33:50 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:35665 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229505AbhKBIds (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 2 Nov 2021 04:33:48 -0400
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 38E60CECEA;
+        Tue,  2 Nov 2021 09:31:13 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [RFC PATCH V2] Bluetooth: vhci: Add support extended opcode for
+ HCI Vendor packet
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211102025623.826277-1-hj.tedd.an@gmail.com>
+Date:   Tue, 2 Nov 2021 09:31:12 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F77C7BC5-4C6E-439F-8FEC-209E54F7BAAC@holtmann.org>
+References: <20211102025623.826277-1-hj.tedd.an@gmail.com>
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, Nov 02, 2021 at 03:53:33PM +0800, Zijun Hu wrote:
+Hi Tedd,
+
+> Current implementation uses the Vendor packet type (0xff) with opcode
+> parameter. But there is no way to expand the opcode and no available bits
+> to use. Also it cannot be changed due to the backward compatibility
+> with older kernel.
 > 
+> THis patch adds new opcode(0x03) for HCI Vendor packet for VHCI for
+> extended device creation. This new opcode will not conflict with
+> existing legacy opcode because the legacy expects to set either bit 0 or
+> bit 1, but not both of bits.
 > 
-> On 11/2/2021 3:35 PM, Greg KH wrote:
-> > On Tue, Nov 02, 2021 at 03:12:57PM +0800, Zijun Hu wrote:
-> >> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> >>
-> >> Add support for MAPLE integrated within SOC, it is mounted on
-> >> a virtual tty port and powered on/off via relevant IOCTL, neither
-> >> IBS nor RAMPATCH downloading is not required.
-> >>
-> >> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
-> >> ---
-> >>  drivers/bluetooth/btqca.c   | 13 ++++++++++++-
-> >>  drivers/bluetooth/btqca.h   | 13 +++++++++++++
-> >>  drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++++++++++++++++++++++++++-
-> >>  3 files changed, 71 insertions(+), 2 deletions(-)
-> >>
-> >> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> >> index be04d74037d2..b83d2ecefe5d 100644
-> >> --- a/drivers/bluetooth/btqca.c
-> >> +++ b/drivers/bluetooth/btqca.c
-> >> @@ -255,6 +255,8 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
-> >>  		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
-> >>  		BT_DBG("Length\t\t : %d bytes", length);
-> >>  
-> >> +		if (qca_is_maple(soc_type))
-> >> +			break;
-> >>  		idx = 0;
-> >>  		data = tlv->data;
-> >>  		while (idx < length) {
-> >> @@ -552,6 +554,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> >>  	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> >>  
-> >>  	/* Download rampatch file */
-> >> +	if (qca_is_maple(soc_type))
-> >> +		goto download_nvm;
-> >> +
-> >>  	config.type = TLV_TYPE_PATCH;
-> >>  	if (qca_is_wcn399x(soc_type)) {
-> >>  		snprintf(config.fwname, sizeof(config.fwname),
-> >> @@ -580,6 +585,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> >>  	/* Give the controller some time to get ready to receive the NVM */
-> >>  	msleep(10);
-> >>  
-> >> +download_nvm:
-> >>  	/* Download NVM configuration */
-> >>  	config.type = TLV_TYPE_NVM;
-> >>  	if (firmware_name)
-> >> @@ -597,6 +603,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> >>  	else if (soc_type == QCA_QCA6390)
-> >>  		snprintf(config.fwname, sizeof(config.fwname),
-> >>  			 "qca/htnv%02x.bin", rom_ver);
-> >> +	else if (qca_is_maple(soc_type))
-> >> +		snprintf(config.fwname, sizeof(config.fwname),
-> >> +			 "qca/mpnv%02x.bin", rom_ver);
-> >>  	else if (soc_type == QCA_WCN6750)
-> >>  		snprintf(config.fwname, sizeof(config.fwname),
-> >>  			 "qca/msnv%02x.bin", rom_ver);
-> >> @@ -609,6 +618,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> >>  		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
-> >>  		return err;
-> >>  	}
-> >> +	if (qca_is_maple(soc_type))
-> >> +		msleep(MAPLE_NVM_READY_DELAY_MS);
-> >>  
-> >>  	if (soc_type >= QCA_WCN3991) {
-> >>  		err = qca_disable_soc_logging(hdev);
-> >> @@ -637,7 +648,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> >>  		return err;
-> >>  	}
-> >>  
-> >> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
-> >> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || qca_is_maple(soc_type)) {
-> >>  		/* get fw build info */
-> >>  		err = qca_read_fw_build_info(hdev);
-> >>  		if (err < 0)
-> >> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> >> index 30afa7703afd..0a5a7d1daa71 100644
-> >> --- a/drivers/bluetooth/btqca.h
-> >> +++ b/drivers/bluetooth/btqca.h
-> >> @@ -46,6 +46,8 @@
-> >>  
-> >>  #define QCA_FW_BUILD_VER_LEN		255
-> >>  
-> >> +#define MAPLE_NVM_READY_DELAY_MS        1500
-> >> +#define MAPLE_POWER_CONTROL_DELAY_MS    50
-> >>  
-> >>  enum qca_baudrate {
-> >>  	QCA_BAUDRATE_115200 	= 0,
-> >> @@ -145,6 +147,7 @@ enum qca_btsoc_type {
-> >>  	QCA_WCN3991,
-> >>  	QCA_QCA6390,
-> >>  	QCA_WCN6750,
-> >> +	QCA_MAPLE,
-> >>  };
-> >>  
-> >>  #if IS_ENABLED(CONFIG_BT_QCA)
-> >> @@ -167,6 +170,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
-> >>  	return soc_type == QCA_WCN6750;
-> >>  }
-> >>  
-> >> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
-> >> +{
-> >> +	return soc_type == QCA_MAPLE;
-> >> +}
-> >> +
-> >>  #else
-> >>  
-> >>  static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
-> >> @@ -204,6 +212,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
-> >>  	return false;
-> >>  }
-> >>  
-> >> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
-> >> +{
-> >> +	return false;
-> >> +}
-> >> +
-> >>  static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
-> >>  {
-> >>  	return -EOPNOTSUPP;
-> >> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-> >> index dd768a8ed7cb..f1d9670719c4 100644
-> >> --- a/drivers/bluetooth/hci_qca.c
-> >> +++ b/drivers/bluetooth/hci_qca.c
-> >> @@ -70,6 +70,10 @@
-> >>  #define QCA_CRASHBYTE_PACKET_LEN	1096
-> >>  #define QCA_MEMDUMP_BYTE		0xFB
-> >>  
-> >> +#ifndef IOCTL_IPC_BOOT
-> >> +#define IOCTL_IPC_BOOT                  0xBE
-> >> +#endif
-> > 
-> > You send this command, but never use it.  Where is the driver code that
-> > uses this command?
-> > 
-> qca_maple_power_control() will use it.  this driver depends on bt_tty kernel module
-> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/drivers/soc/qcom/bt_tty.c?h=NHSS.QSDK.11.5.0.5.r2
+> It aslo requires new extra parameters for device type and flags to apply
+> to the VHCI device.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> ---
+> drivers/bluetooth/hci_vhci.c | 65 ++++++++++++++++++++++++++++++++----
+> 1 file changed, 58 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+> index 49ac884d996e..5fccab136543 100644
+> --- a/drivers/bluetooth/hci_vhci.c
+> +++ b/drivers/bluetooth/hci_vhci.c
+> @@ -30,6 +30,16 @@
+> 
+> static bool amp;
+> 
+> +#define VHCI_EXT_OPCODE				0x03
+> +struct vhci_ext_config {
+> +	__u8  dev_type;
+> +	__u32 flags;
+> +} __packed;
+> +
+> +#define VHCI_FLAG_QUIRK_RAW_DEVICE		0x01
+> +#define VHCI_FLAG_QUIRK_EXTERNAL_CONFIG		0x02
+> +#define VHCI_FLAG_QUIRKS_INVALID_BDADDR		0x04
+> +
+> struct vhci_data {
+> 	struct hci_dev *hdev;
+> 
+> @@ -278,7 +288,8 @@ static int vhci_setup(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> -static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> +static int __vhci_create_device(struct vhci_data *data, __u8 opcode,
+> +				struct vhci_ext_config *ext_config)
+> {
+> 	struct hci_dev *hdev;
+> 	struct sk_buff *skb;
+> @@ -287,8 +298,20 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> 	if (data->hdev)
+> 		return -EBADFD;
+> 
+> -	/* bits 0-1 are dev_type (Primary or AMP) */
+> -	dev_type = opcode & 0x03;
+> +	/* In case of legacy opcode, it doesn't allow to have 0x03 as an opcode,
+> +	 * So, it is ok to assume that device is in the extended device
+> +	 * creation mode when the opcode is 0x03. Also, it is required to have
+> +	 * a ext_config and check it here.
+> +	 */
+> +	if (ext_config && opcode != VHCI_EXT_OPCODE)
+> +		return -EINVAL;
+> +
+> +	if (opcode == VHCI_EXT_OPCODE)
+> +		dev_type = ext_config->dev_type;
+> +	else {
+> +		/* bits 0-1 are dev_type (Primary or AMP) */
+> +		dev_type = opcode & 0x03;
+> +	}
+> 
+> 	if (dev_type != HCI_PRIMARY && dev_type != HCI_AMP)
+> 		return -EINVAL;
+> @@ -331,6 +354,16 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> 	if (opcode & 0x80)
+> 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+> 
+> +	/* Flags for extended configuration */
+> +	if (ext_config && opcode == VHCI_EXT_OPCODE) {
+> +		if (ext_config->flags & VHCI_FLAG_QUIRK_EXTERNAL_CONFIG)
+> +			set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
+> +		if (ext_config->flags & VHCI_FLAG_QUIRK_RAW_DEVICE)
+> +			set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+> +		if (ext_config->flags & VHCI_FLAG_QUIRKS_INVALID_BDADDR)
+> +			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +	}
+> +
+> 	if (hci_register_dev(hdev) < 0) {
+> 		BT_ERR("Can't register HCI device");
+> 		hci_free_dev(hdev);
+> @@ -364,12 +397,13 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> 	return 0;
+> }
+> 
+> -static int vhci_create_device(struct vhci_data *data, __u8 opcode)
+> +static int vhci_create_device(struct vhci_data *data, __u8 opcode,
+> +			      struct vhci_ext_config *ext_config)
+> {
+> 	int err;
+> 
+> 	mutex_lock(&data->open_mutex);
+> -	err = __vhci_create_device(data, opcode);
+> +	err = __vhci_create_device(data, opcode, ext_config);
+> 	mutex_unlock(&data->open_mutex);
+> 
+> 	return err;
+> @@ -379,6 +413,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+> 				    struct iov_iter *from)
+> {
+> 	size_t len = iov_iter_count(from);
+> +	struct vhci_ext_config *ext_config;
+> 	struct sk_buff *skb;
+> 	__u8 pkt_type, opcode;
+> 	int ret;
+> @@ -419,6 +454,21 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+> 		opcode = *((__u8 *) skb->data);
+> 		skb_pull(skb, 1);
+> 
+> +		/* This opcode(0x03) is for extended device creation and it
+> +		 * requires the extra parameters for extra configuration.
+> +		 */
+> +		if (opcode == 0x03) {
+> +			if (skb->len != sizeof(*ext_config)) {
+> +				kfree_skb(skb);
+> +				return -EINVAL;
+> +			}
+> +
+> +			ext_config = (void *) (skb->data);
+> +			ret = vhci_create_device(data, opcode, ext_config);
+> +			kfree_skb(skb);
+> +			goto done;
+> +		}
+> +
+> 		if (skb->len > 0) {
+> 			kfree_skb(skb);
+> 			return -EINVAL;
+> @@ -426,7 +476,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+> 
+> 		kfree_skb(skb);
+> 
+> -		ret = vhci_create_device(data, opcode);
+> +		ret = vhci_create_device(data, opcode, NULL);
+> 		break;
+> 
+> 	default:
+> @@ -434,6 +484,7 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+> 		return -EINVAL;
+> 	}
+> 
+> +done:
+> 	return (ret < 0) ? ret : len;
+> }
+> 
+> @@ -526,7 +577,7 @@ static void vhci_open_timeout(struct work_struct *work)
+> 	struct vhci_data *data = container_of(work, struct vhci_data,
+> 					      open_timeout.work);
+> 
+> -	vhci_create_device(data, amp ? HCI_AMP : HCI_PRIMARY);
+> +	vhci_create_device(data, amp ? HCI_AMP : HCI_PRIMARY, NULL);
+> }
 
-You can not add code to the kernel that is not used by the kernel
-itself.  That driver needs to be in the tree as well, why is it not
-submitted now too?
+I think this is a bit convoluted in the end.
 
-> > And why not tabs?
-> > 
-> > And why is this patch series not properly threaded so tools can pick it
-> > up and find them?
-> > 
-> > And why the odd named ioctl that is different from other ones in this
-> > file?
-> > 
-> that IOCTL name is defined by that module.
-> https://source.codeaurora.org/quic/qsdk/oss/kernel/linux-ipq-5.4/tree/include/linux/bt.h?h=NHSS.QSDK.11.5.0.5.r2
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 49ac884d996e..ce33ed63d021 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -419,14 +419,22 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+                opcode = *((__u8 *) skb->data);
+                skb_pull(skb, 1);
+ 
+-               if (skb->len > 0) {
+-                       kfree_skb(skb);
+-                       return -EINVAL;
++               /* The dev_type 3 is used as an escape opcode for extension
++                * handling. If dev_type is set to 3 all other bits must be
++                * set to zero.
++                */
++               if (opcode == 0x03) {
++                       if (skb->len < 1)
++                               ret = -EINVAL;
++                       else
++                               ret = vhci_create_extended_device(data, skb);
++               } else {
++                       if (skb->len > 0)
++                               ret = -EINVAL;
++                       else
++                               ret = vhci_create_device(data, opcode);
+                }
+-
+                kfree_skb(skb);
+-
+-               ret = vhci_create_device(data, opcode);
+                break;
+ 
+I don’t fully like the nesting yet, but I would do it something like that.
 
-Again, it needs to be in the tree.
+Main point is that we keep the old way as it is and create a new clean path since otherwise the code becomes really hard to follow if you have to look at it in a few month.
 
-> > And why not just use normal power management hooks for doing things like
-> > turning on and off the hardware like all other drivers?
-> > 
-> this device is special.
+I would also just include virtio_bt.h since that is actually an UAPI header and shared with userspace properly. I currently made extension struct just >= 1 and that might be good enough. We can check what the flags size is in virtio space. Otherwise we might just to a flexible flags array after 0x03 opcode.
 
-All drivers and devices are special and unique.  Just like all of them :)
+Something that Bluetooth uses for EIR/AD flags data type. So you have {opcode}, {flag_len}, {flags}[0..n], {bt_config} as your structure. That means the default is then 0x03, 0x00, 0x00 packet to be sent. And if you want to enable AOSP, you send 0x03, 0x01, 0x04, 0x00.
 
-What is so odd about this device that it can not work with the existing
-infrastructure that the kernel has for all of the hundreds of thousands
-of other devices it supports?
+Regards
 
-> it seems BT maintainer decides to drop this patch.
+Marcel
 
-Of course, at the very least because there is no in-kernel user, why
-would you accept such a patch if you were the maintainer?
-
-Please submit your driver first.
-
-thanks,
-
-greg k-h
