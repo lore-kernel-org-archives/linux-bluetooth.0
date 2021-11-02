@@ -2,194 +2,215 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E8489C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:40:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C555DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:51:50 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id C7D1061050
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:40:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B1A7B60F70
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  2 Nov 2021 07:51:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230140AbhKBHnY convert rfc822-to-8bit (ORCPT
+        id S229924AbhKBHyS convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 03:43:24 -0400
-Received: from coyote.holtmann.net ([212.227.132.17]:53142 "EHLO
+        Tue, 2 Nov 2021 03:54:18 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:54886 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229577AbhKBHnX (ORCPT
+        with ESMTP id S229720AbhKBHyQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 03:43:23 -0400
+        Tue, 2 Nov 2021 03:54:16 -0400
 Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 971E6CECE9;
-        Tue,  2 Nov 2021 08:40:47 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 50A05CECE9;
+        Tue,  2 Nov 2021 08:51:38 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v1 3/3] Bluetooth: hci_qca: Add support for QTI bluetooth
- MAPLE
+Subject: Re: [PATCH v7 1/2] Bluetooth: Add struct of reading AOSP vendor
+ capabilities
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <YYDqW6ewycWP1Y7a@kroah.com>
-Date:   Tue, 2 Nov 2021 08:40:47 +0100
-Cc:     Zijun Hu <zijuhu@codeaurora.org>,
+In-Reply-To: <20211102151908.v7.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
+Date:   Tue, 2 Nov 2021 08:51:37 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        =?utf-8?Q?Pali_Roh=C3=A1r?= <pali@kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Joseph Hwang <josephsih@google.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
-        Matthias Kaehlcke <mka@chromium.org>, rjliao@codeaurora.org,
-        Zijun Hu <quic_zijuhu@quicinc.com>
+        netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <E6F26BE9-1C2E-4E38-B5A4-A7F06301CC7A@holtmann.org>
-References: <1635837177-1341-1-git-send-email-zijuhu@codeaurora.org>
- <YYDqW6ewycWP1Y7a@kroah.com>
-To:     Greg KH <gregkh@linuxfoundation.org>
+Message-Id: <8C7862EB-01EB-463E-AC20-AF1D8BCC1FFB@holtmann.org>
+References: <20211102151908.v7.1.I139e71adfd3f00b88fe9edb63d013f9cd3e24506@changeid>
+To:     Joseph Hwang <josephsih@chromium.org>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Greg,
+Hi Joseph,
 
->> Add support for MAPLE integrated within SOC, it is mounted on
->> a virtual tty port and powered on/off via relevant IOCTL, neither
->> IBS nor RAMPATCH downloading is not required.
->> 
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->> drivers/bluetooth/btqca.c   | 13 ++++++++++++-
->> drivers/bluetooth/btqca.h   | 13 +++++++++++++
->> drivers/bluetooth/hci_qca.c | 47 ++++++++++++++++++++++++++++++++++++++++++++-
->> 3 files changed, 71 insertions(+), 2 deletions(-)
->> 
->> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
->> index be04d74037d2..b83d2ecefe5d 100644
->> --- a/drivers/bluetooth/btqca.c
->> +++ b/drivers/bluetooth/btqca.c
->> @@ -255,6 +255,8 @@ static void qca_tlv_check_data(struct hci_dev *hdev,
->> 		BT_DBG("TLV Type\t\t : 0x%x", type_len & 0x000000ff);
->> 		BT_DBG("Length\t\t : %d bytes", length);
->> 
->> +		if (qca_is_maple(soc_type))
->> +			break;
->> 		idx = 0;
->> 		data = tlv->data;
->> 		while (idx < length) {
->> @@ -552,6 +554,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->> 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
->> 
->> 	/* Download rampatch file */
->> +	if (qca_is_maple(soc_type))
->> +		goto download_nvm;
->> +
->> 	config.type = TLV_TYPE_PATCH;
->> 	if (qca_is_wcn399x(soc_type)) {
->> 		snprintf(config.fwname, sizeof(config.fwname),
->> @@ -580,6 +585,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->> 	/* Give the controller some time to get ready to receive the NVM */
->> 	msleep(10);
->> 
->> +download_nvm:
->> 	/* Download NVM configuration */
->> 	config.type = TLV_TYPE_NVM;
->> 	if (firmware_name)
->> @@ -597,6 +603,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->> 	else if (soc_type == QCA_QCA6390)
->> 		snprintf(config.fwname, sizeof(config.fwname),
->> 			 "qca/htnv%02x.bin", rom_ver);
->> +	else if (qca_is_maple(soc_type))
->> +		snprintf(config.fwname, sizeof(config.fwname),
->> +			 "qca/mpnv%02x.bin", rom_ver);
->> 	else if (soc_type == QCA_WCN6750)
->> 		snprintf(config.fwname, sizeof(config.fwname),
->> 			 "qca/msnv%02x.bin", rom_ver);
->> @@ -609,6 +618,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->> 		bt_dev_err(hdev, "QCA Failed to download NVM (%d)", err);
->> 		return err;
->> 	}
->> +	if (qca_is_maple(soc_type))
->> +		msleep(MAPLE_NVM_READY_DELAY_MS);
->> 
->> 	if (soc_type >= QCA_WCN3991) {
->> 		err = qca_disable_soc_logging(hdev);
->> @@ -637,7 +648,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
->> 		return err;
->> 	}
->> 
->> -	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750) {
->> +	if (soc_type == QCA_WCN3991 || soc_type == QCA_WCN6750 || qca_is_maple(soc_type)) {
->> 		/* get fw build info */
->> 		err = qca_read_fw_build_info(hdev);
->> 		if (err < 0)
->> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
->> index 30afa7703afd..0a5a7d1daa71 100644
->> --- a/drivers/bluetooth/btqca.h
->> +++ b/drivers/bluetooth/btqca.h
->> @@ -46,6 +46,8 @@
->> 
->> #define QCA_FW_BUILD_VER_LEN		255
->> 
->> +#define MAPLE_NVM_READY_DELAY_MS        1500
->> +#define MAPLE_POWER_CONTROL_DELAY_MS    50
->> 
->> enum qca_baudrate {
->> 	QCA_BAUDRATE_115200 	= 0,
->> @@ -145,6 +147,7 @@ enum qca_btsoc_type {
->> 	QCA_WCN3991,
->> 	QCA_QCA6390,
->> 	QCA_WCN6750,
->> +	QCA_MAPLE,
->> };
->> 
->> #if IS_ENABLED(CONFIG_BT_QCA)
->> @@ -167,6 +170,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->> 	return soc_type == QCA_WCN6750;
->> }
->> 
->> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
->> +{
->> +	return soc_type == QCA_MAPLE;
->> +}
->> +
->> #else
->> 
->> static inline int qca_set_bdaddr_rome(struct hci_dev *hdev, const bdaddr_t *bdaddr)
->> @@ -204,6 +212,11 @@ static inline bool qca_is_wcn6750(enum qca_btsoc_type soc_type)
->> 	return false;
->> }
->> 
->> +static inline bool qca_is_maple(enum qca_btsoc_type soc_type)
->> +{
->> +	return false;
->> +}
->> +
->> static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
->> {
->> 	return -EOPNOTSUPP;
->> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
->> index dd768a8ed7cb..f1d9670719c4 100644
->> --- a/drivers/bluetooth/hci_qca.c
->> +++ b/drivers/bluetooth/hci_qca.c
->> @@ -70,6 +70,10 @@
->> #define QCA_CRASHBYTE_PACKET_LEN	1096
->> #define QCA_MEMDUMP_BYTE		0xFB
->> 
->> +#ifndef IOCTL_IPC_BOOT
->> +#define IOCTL_IPC_BOOT                  0xBE
->> +#endif
+> This patch adds the struct of reading AOSP vendor capabilities.
+> New capabilities are added incrementally. Note that the
+> version_supported octets will be used to determine whether a
+> capability has been defined for the version.
 > 
-> You send this command, but never use it.  Where is the driver code that
-> uses this command?
+> Signed-off-by: Joseph Hwang <josephsih@chromium.org>
 > 
-> And why not tabs?
+> ---
 > 
-> And why is this patch series not properly threaded so tools can pick it
-> up and find them?
+> Changes in v7:
+> - Use the full struct aosp_rp_le_get_vendor_capa. If the
+>  version_supported is >= 98, check bluetooth_quality_report_support.
+> - Use __le16 and __le32.
+> - Use proper bt_dev_err and bt_dev_warn per review comments.
+> - Skip unnecessary bt_dev_dbg.
+> - Remove unnecessary rp->status check.
+> - Skip unnecessary check about version_supported on versions that we
+>  do not care about. For now, we only care about quality report support.
+> - Add the define for the length of the struct.
+> - Mediatek will submit a separate patch to enable aosp.
 > 
-> And why the odd named ioctl that is different from other ones in this
-> file?
+> Changes in v6:
+> - Add historical versions of struct aosp_rp_le_get_vendor_capabilities.
+> - Perform the basic check about the struct length.
+> - Through the version, bluetooth_quality_report_support can be checked.
 > 
-> And why not just use normal power management hooks for doing things like
-> turning on and off the hardware like all other drivers?
+> Changes in v5:
+> - This is a new patch.
+> - Add struct aosp_rp_le_get_vendor_capabilities so that next patch
+>  can determine whether a particular capability is supported or not.
+> 
+> include/net/bluetooth/hci_core.h |  1 +
+> net/bluetooth/aosp.c             | 83 +++++++++++++++++++++++++++++++-
+> 2 files changed, 83 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 53a8c7d3a4bf..b5f061882c10 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -603,6 +603,7 @@ struct hci_dev {
+> 
+> #if IS_ENABLED(CONFIG_BT_AOSPEXT)
+> 	bool			aosp_capable;
+> +	bool			aosp_quality_report;
+> #endif
+> 
+> 	int (*open)(struct hci_dev *hdev);
+> diff --git a/net/bluetooth/aosp.c b/net/bluetooth/aosp.c
+> index a1b7762335a5..0d4f1702ce35 100644
+> --- a/net/bluetooth/aosp.c
+> +++ b/net/bluetooth/aosp.c
+> @@ -8,9 +8,43 @@
+> 
+> #include "aosp.h"
+> 
+> +/* Command complete parameters of LE_Get_Vendor_Capabilities_Command
+> + * The parameters grow over time. The base version that declares the
+> + * version_supported field is v0.95. Refer to
+> + * https://cs.android.com/android/platform/superproject/+/master:system/
+> + *         bt/gd/hci/controller.cc;l=452?q=le_get_vendor_capabilities_handler
+> + */
+> +struct aosp_rp_le_get_vendor_capa {
+> +	/* v0.95: 15 octets */
+> +	__u8	status;
+> +	__u8	max_advt_instances;
+> +	__u8	offloaded_resolution_of_private_address;
+> +	__le16	total_scan_results_storage;
+> +	__u8	max_irk_list_sz;
+> +	__u8	filtering_support;
+> +	__u8	max_filter;
+> +	__u8	activity_energy_info_support;
+> +	__le16	version_supported;
+> +	__le16	total_num_of_advt_tracked;
+> +	__u8	extended_scan_support;
+> +	__u8	debug_logging_supported;
+> +	/* v0.96: 16 octets */
+> +	__u8	le_address_generation_offloading_support;
+> +	/* v0.98: 21 octets */
+> +	__le32	a2dp_source_offload_capability_mask;
+> +	__u8	bluetooth_quality_report_support;
+> +	/* v1.00: 25 octets */
+> +	__le32	dynamic_audio_buffer_support;
+> +} __packed;
+> +
+> +#define VENDOR_CAPA_BASE_SIZE		15
+> +#define VENDOR_CAPA_0_98_SIZE		21
+> +
+> void aosp_do_open(struct hci_dev *hdev)
+> {
+> 	struct sk_buff *skb;
+> +	struct aosp_rp_le_get_vendor_capa *rp;
+> +	u16 version_supported;
+> 
+> 	if (!hdev->aosp_capable)
+> 		return;
+> @@ -20,9 +54,56 @@ void aosp_do_open(struct hci_dev *hdev)
+> 	/* LE Get Vendor Capabilities Command */
+> 	skb = __hci_cmd_sync(hdev, hci_opcode_pack(0x3f, 0x153), 0, NULL,
+> 			     HCI_CMD_TIMEOUT);
+> -	if (IS_ERR(skb))
+> +	if (IS_ERR(skb)) {
+> +		bt_dev_err(hdev, "AOSP get vendor capabilities (%ld)",
+> +			   PTR_ERR(skb));
+> 		return;
+> +	}
+> +
+> +	/* A basic length check */
+> +	if (skb->len < VENDOR_CAPA_BASE_SIZE)
+> +		goto length_error;
+> +
+> +	rp = (struct aosp_rp_le_get_vendor_capa *)skb->data;
+> +
+> +	version_supported = le16_to_cpu(rp->version_supported);
+> +	/* AOSP displays the verion number like v0.98, v1.00, etc. */
+> +	bt_dev_info(hdev, "AOSP version v%u.%02u",
+> +		    version_supported >> 8, version_supported & 0xff);
 
-I am not merging this. We are not starting an IPC via an external ioctl.
+call it "AOSP extensions ..” to not confused it with the AOSP release version. I can also fix myself before applying if you like.
+
+> +
+> +	/* Do not support very old versions. */
+> +	if (version_supported < 95) {
+> +		bt_dev_warn(hdev, "AOSP capabilities version %u too old",
+> +			    version_supported);
+> +		goto done;
+> +	}
+> +
+> +	if (version_supported >= 95 && version_supported < 98) {
+> +		bt_dev_warn(hdev, "AOSP quality report is not supported");
+> +		goto done;
+> +	}
+
+I think you are bit too pedantic. Not that this bad in general, but you already established that your are >= 95 with the check above. So not need to repeat that here.
+
+> +
+> +	if (version_supported >= 98) {
+
+Same here. You already established that you are >= 98 with the check above.
+
+> +		if (skb->len < VENDOR_CAPA_0_98_SIZE)
+> +			goto length_error;
+> +
+> +		/* The bluetooth_quality_report_support is defined at version
+> +		 * v0.98. Refer to
+> +		 * https://cs.android.com/android/platform/superproject/+/
+> +		 *         master:system/bt/gd/hci/controller.cc;l=477
+> +		 */
+> +		if (rp->bluetooth_quality_report_support) {
+> +			hdev->aosp_quality_report = true;
+> +			bt_dev_info(hdev, "AOSP quality report is supported");
+> +		}
+> +	}
+> +
+> +	goto done;
+> +
+> +length_error:
+> +	bt_dev_err(hdev, "AOSP capabilities length %d too short", skb->len);
+> 
+> +done:
+> 	kfree_skb(skb);
+> }
+
+Rest looks great. Either send me a new version or I fix it before applying.
 
 Regards
 
