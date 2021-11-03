@@ -2,113 +2,206 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 38D16C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 08:05:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 114AAC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 08:08:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1FD5961183
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 08:05:19 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id DE25A60F90
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 08:08:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231716AbhKCIHy (ORCPT
+        id S231338AbhKCIKr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Nov 2021 04:07:54 -0400
-Received: from mga05.intel.com ([192.55.52.43]:4512 "EHLO mga05.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231332AbhKCIHx (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Nov 2021 04:07:53 -0400
-X-IronPort-AV: E=McAfee;i="6200,9189,10156"; a="317654522"
-X-IronPort-AV: E=Sophos;i="5.87,205,1631602800"; 
-   d="scan'208";a="317654522"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2021 01:05:17 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,205,1631602800"; 
-   d="scan'208";a="500939938"
-Received: from lkp-server02.sh.intel.com (HELO c20d8bc80006) ([10.239.97.151])
-  by orsmga008.jf.intel.com with ESMTP; 03 Nov 2021 01:05:16 -0700
-Received: from kbuild by c20d8bc80006 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1miBGl-0005NW-Oc; Wed, 03 Nov 2021 08:05:15 +0000
-Date:   Wed, 03 Nov 2021 16:04:50 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 258f56d11bbbf39df5bc5faf0119d28be528f27d
-Message-ID: <618242a2.FqvcHy1YuRmsp94y%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Wed, 3 Nov 2021 04:10:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55436 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230025AbhKCIKr (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Nov 2021 04:10:47 -0400
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B73A7C061203
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 01:08:10 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id j128-20020a1c2386000000b003301a98dd62so3860024wmj.5
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Nov 2021 01:08:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=y+h6ogY2iFX9VezgygiGlqtRgxxUVwR6ulA1k3hBo7w=;
+        b=OHisHYZRhq5lsyMbcUfFslcsN7JkTBjw4xufAleoROAYHMtNzqjLMvnQgZpFwJuBy+
+         ZbGNJJpbKU1mNkOpiOjfueRuzyPDY4XsXcmAyWqBYFZZHqicVjKJWfhJqmklA6Zi3Y8G
+         DwJ81jU4WCHgAZyLi9BW5PokXg1fP/eGVhy/6CN2KCATQdOxRdZq9q9o6s/jB5h08Cex
+         GV/nc0kJ83etEqs1p8B9Zbndo/Z6FCFOOcoKpEmtgQ8icDJdfqig2D1Ei8CjOXA6zyCa
+         etJPosWh0QP44YzVFwyBfJDgjaPTpJIhNoMMazfIEFjBv93gpt84quog84P3/MJtgLlj
+         cmIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=y+h6ogY2iFX9VezgygiGlqtRgxxUVwR6ulA1k3hBo7w=;
+        b=lcLv3EN4C1SHDOjnpdb347oLJuKarc/WCou81s/CjheNgm0CNZ2MQCdgMnZR/BOdCz
+         YdB57DKG90E+ZgVppT5yl9ikADLeaPkbM3ZbHOZct95bwyfGeVd2zMJSguSaigAkJtfI
+         0w92m5q6Ksm0TjLFTLn5MaazXrBu6EbWtXNCLXil6bhqg4zGhGQIHGcWiqRaIg3p8bVk
+         ZfnLSkGr3WWogr4jpKN/JPiJdvg2Ya/muw0ly9NSur7TmNXi7I3/GmrWByh/hNeetkGc
+         wtsVOhaCo40Y6ffVX5f9QxQge9fNL6gDZ4EJIjYsx4Fcg0E9uOBxFJ+uHG4/OJKIqCA8
+         iCAw==
+X-Gm-Message-State: AOAM532jJOz2G21aBBY2VvvkwOl6T+UjkR3QSHsqxKsn7aGdpu65m1JE
+        t2SzQZEiOuUkNgCpfyPknJoJEEHlms8XA0VczekPspm1UT4=
+X-Google-Smtp-Source: ABdhPJydxpJleTtHMM1rdITnTQNqXOqaqV+zjrYGIl6eHPiP/Tk8I+O+dfPeGWvmpr+a1HX+rwsbSjdS7mF2pJbxVFc=
+X-Received: by 2002:a05:600c:2308:: with SMTP id 8mr2934903wmo.179.1635926888930;
+ Wed, 03 Nov 2021 01:08:08 -0700 (PDT)
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+References: <20211102192742.1.I3ba1a76d72da5a813cf6e6f219838c9ef28c5eaa@changeid>
+ <4049F5B5-D5A7-4F60-A33D-F22B601E7064@holtmann.org>
+In-Reply-To: <4049F5B5-D5A7-4F60-A33D-F22B601E7064@holtmann.org>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Wed, 3 Nov 2021 16:07:58 +0800
+Message-ID: <CAJQfnxG=TF1G3yqiok1m6bcU7LT3p+PGCAhFQsi4W1hBpg2hnA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: Fix receiving HCI_LE_Advertising_Set_Terminated
+ event
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        Alain Michaud <alainm@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 258f56d11bbbf39df5bc5faf0119d28be528f27d  Bluetooth: aosp: Support AOSP Bluetooth Quality Report
+Hi Marcel,
 
-elapsed time: 722m
+Thanks for your reply.
+I've sent a v2 patch to incorporate your suggestions.
 
-configs tested: 53
-configs skipped: 3
+Regards,
+Archie
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nios2                               defconfig
-nds32                             allnoconfig
-arc                              allyesconfig
-nds32                               defconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-nios2                            allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-xtensa                           allyesconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                              debian-10.3
-mips                             allyesconfig
-mips                             allmodconfig
-powerpc                           allnoconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-um                           x86_64_defconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+On Tue, 2 Nov 2021 at 22:00, Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Archie,
+>
+> > This event is received when the controller stops advertising,
+> > specifically for these three reasons:
+> > (a) Connection is successfully created (success).
+> > (b) Timeout is reached (error).
+> > (c) Number of advertising events is reached (error).
+> > (*) This event is NOT generated when the host stops the advertisement.
+> > Refer to the BT spec ver 5.3 vol 4 part E sec 7.7.65.18. Note that the
+> > section was revised from BT spec ver 5.0 vol 2 part E sec 7.7.65.18
+> > which was ambiguous about (*).
+> >
+> > Some chips (e.g. RTL8822CE) send this event when the host stops the
+> > advertisement with status =3D HCI_ERROR_CANCELLED_BY_HOST (due to (*)
+> > above). This is treated as an error and the advertisement will be
+> > removed and userspace will be informed via MGMT event.
+> >
+> > On suspend, we are supposed to temporarily disable advertisements,
+> > and continue advertising on resume. However, due to the behavior
+> > above, the advertisements are removed instead.
+> >
+> > This patch returns early if HCI_ERROR_CANCELLED_BY_HOST is received.
+>
+> lets include a btmon snippet here to show the faulty behavior.
+>
+> >
+> > Additionally, this patch also clear HCI_LE_ADV if there are no more
+> > advertising instances after receiving other errors.
+>
+> Does this really belong in this patch? I think it warrants a separate pat=
+ch with an appropriate Fixes: tag. Especially in the case we are working ar=
+ound a firmware bug, this should be separate. It gives us a better chance t=
+o bisect anything if we ever have to.
+>
+> >
+> > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
+> > Reviewed-by: Alain Michaud <alainm@chromium.org>
+> >
+> > ---
+> >
+> > include/net/bluetooth/hci.h |  1 +
+> > net/bluetooth/hci_event.c   | 12 ++++++++++++
+> > 2 files changed, 13 insertions(+)
+> >
+> > diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+> > index 63065bc01b76..84db6b275231 100644
+> > --- a/include/net/bluetooth/hci.h
+> > +++ b/include/net/bluetooth/hci.h
+> > @@ -566,6 +566,7 @@ enum {
+> > #define HCI_ERROR_INVALID_LL_PARAMS   0x1e
+> > #define HCI_ERROR_UNSPECIFIED         0x1f
+> > #define HCI_ERROR_ADVERTISING_TIMEOUT 0x3c
+> > +#define HCI_ERROR_CANCELLED_BY_HOST  0x44
+> >
+> > /* Flow control modes */
+> > #define HCI_FLOW_CTL_MODE_PACKET_BASED        0x00
+> > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> > index d4b75a6cfeee..150b50677790 100644
+> > --- a/net/bluetooth/hci_event.c
+> > +++ b/net/bluetooth/hci_event.c
+> > @@ -5538,6 +5538,14 @@ static void hci_le_ext_adv_term_evt(struct hci_d=
+ev *hdev, struct sk_buff *skb)
+> >
+> >       adv =3D hci_find_adv_instance(hdev, ev->handle);
+> >
+> > +     /* Some chips (e.g. RTL8822CE) emit HCI_ERROR_CANCELLED_BY_HOST. =
+This
+> > +      * event is being fired as a result of a hci_cp_le_set_ext_adv_en=
+able
+> > +      * disable request, which will have its own callback and cleanup =
+via
+> > +      * the hci_cc_le_set_ext_adv_enable path.
+> > +      */
+>
+> I am not in favor of pointing fingers at bad hardware in the source code =
+of core (that belongs in a commit message). Blaming hardware is really up t=
+o the drivers. So I would rather phrase it like this:
+>
+>         /* The Bluetooth Core 5.3 specification clearly states that this =
+event
+>          * shall not be sent when the Host disables the advertising set. =
+So in
+>          * case of HCI_ERROR_CANCELLED_BY_HOST, just ignore the event.
+>          *
+>          * When the Host disables an advertising set, all cleanup is done=
+ via
+>          * its command callback and not needed to be duplicated here.
+>          */
+>
+> > +     if (ev->status =3D=3D HCI_ERROR_CANCELLED_BY_HOST)
+> > +             return;
+> > +
+>
+> And since this is clearly an implementation issue, the manufactures can i=
+ssue a firmware fix for this. So lets be verbose and complain about it.
+>
+>         if (ev->status =3D=3D HCI_ERRROR..) {
+>                 bt_dev_warn_ratelimited(hdev, =E2=80=9CUnexpected adverti=
+sing set terminated event=E2=80=9D);
+>                 return;
+>         }
+>
+> >       if (ev->status) {
+> >               if (!adv)
+> >                       return;
+> > @@ -5546,6 +5554,10 @@ static void hci_le_ext_adv_term_evt(struct hci_d=
+ev *hdev, struct sk_buff *skb)
+> >               hci_remove_adv_instance(hdev, ev->handle);
+> >               mgmt_advertising_removed(NULL, hdev, ev->handle);
+> >
+> > +             /* If we are no longer advertising, clear HCI_LE_ADV */
+> > +             if (list_empty(&hdev->adv_instances))
+> > +                     hci_dev_clear_flag(hdev, HCI_LE_ADV);
+> > +
+>
+> See comment above why this might be better suited for a separate patch.
+>
+> Regards
+>
+> Marcel
+>
