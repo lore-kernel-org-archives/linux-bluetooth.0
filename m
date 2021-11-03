@@ -2,120 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB3BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:56:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84A82C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 18:23:05 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4483E60EDF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:56:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 61A5561053
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 18:23:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229885AbhKCR7S (ORCPT
+        id S230198AbhKCSZl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Nov 2021 13:59:18 -0400
-Received: from mail.kernel.org ([198.145.29.99]:58304 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229558AbhKCR7R (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Nov 2021 13:59:17 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id C617161157
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 17:56:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635962200;
-        bh=3G4P9Pf7YA5Xevw3LdlApGgszV2bFf0gq/HkZuGFC8o=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=uRzxvigYypKr1u7ZTtnfoToRiIlBpGn5qUeKaVn4Ayq4Zvl5UF9D87dT2GXThZ0bY
-         hQY4Kud361JIwGvtbSl8Ml0R3vpWgKrDjw2VgFZlmjp2szuHrqsOTE69pTm0XVd9hR
-         MHR88nRRPuOxeiFcjuhbGu41dAFvSIuYed6nCw4DdwVu+T3KoNdr7WLkwgWXdWTw96
-         9lVaWT+iyLgYzwSb+F7x/R4JJJ4EmjEZr4Q2MKDMqiSb7bhYm3mIsgzC96VvSX+DWb
-         Q16dxPU5ptPRyjfn57jbQCHg0DCAn/BFoQYZaHMG9DLphEax4LeMEjrtqiou3HtiBB
-         IaDeYjhwBkC7w==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 03 Nov 2021 17:56:37 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: luisoropeza113@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-YEWYCBG9xb@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 3 Nov 2021 14:25:41 -0400
+Received: from netrider.rowland.org ([192.131.102.5]:36151 "HELO
+        netrider.rowland.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with SMTP id S229999AbhKCSZk (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Nov 2021 14:25:40 -0400
+Received: (qmail 1532068 invoked by uid 1000); 3 Nov 2021 14:23:03 -0400
+Date:   Wed, 3 Nov 2021 14:23:03 -0400
+From:   Alan Stern <stern@rowland.harvard.edu>
+To:     Benjamin Berg <benjamin@sipsolutions.net>
+Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: Userspace enumeration hang while btusb tries to load firmware of
+ removed device
+Message-ID: <20211103182303.GB1529362@rowland.harvard.edu>
+References: <df021873788acdb64e1311289e9ca6dc3f169616.camel@sipsolutions.net>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <df021873788acdb64e1311289e9ca6dc3f169616.camel@sipsolutions.net>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+On Wed, Nov 03, 2021 at 03:55:31PM +0100, Benjamin Berg wrote:
+> Hi,
+> 
+> a user is seeing a hang in fprintd while enumerating devices which
+> appears to be caused by an interaction of:
+> 
+> * system is resuming from S3
+> * btusb starts loading firmware
+> * bluetooth device disappears (probably thinkpad_acpi rfkill)
+> * libusb enumerates USB devices (fprintd in this case)
+> 
+> When this happens, the firmware load fails after a timeout of 10s. It
+> appears that if userspace queries information about the root hub in
+> question during this time, it will hang until the btusb firmware load
+> has timed out.
+> 
+> Attaching the full kernel log, below an excerpt, you can see:
+>  * At :12 device removal: "usb 5-4: USB disconnect, device number 33"
+>  * libusb enumeration retrieves information about the usb5 root hub,
+>    and blocks on this
+>  * At :14 there is a tx timeout on hci0
+>  * At :23 the firmware load finally fails
+>  * Then usb_disable_device happens
+>  * libusb/fprintd gets the usb5 HUB information and continues its
+>    enumeration
+> 
+> As I see it, there may be two issues:
+> 1. userspace should not block due to the firmware load hanging
+> 2. btusb should give up more quickly when the device disappears
+> 
+> Does anyone have a good idea about the possible cause or how we can fix
+> the problem?
+> 
+> Downstream issue: https://bugzilla.redhat.com/show_bug.cgi?id=2019857
 
---- Comment #205 from Luis Oropeza (luisoropeza113@gmail.com) ---
+I'm not familiar with the btusb driver, so someone on the 
+linux-bluetooth mailing list would have a better idea about this. 
+However, it does look as though btusb keeps the device locked during the 
+entire 10-second period while it tries to send over the firmware, and it 
+doesn't abort the procedure when it starts getting disconnection errors 
+but instead persists until a timeout expires.  Keeping the device locked 
+would certainly block lsusb.
 
+In general, locking the device during a firmware upload seems like
+the right thing to do -- you don't want extraneous transfers from
+other processes messing up the firmware!  So overall, it appears that
+the whole problem would be solved if the firmware transfer were
+aborted as soon as the -ENODEV errors start appearing.
 
-(In reply to guimarcalsilva from comment #204)
-> (In reply to Luis Oropeza from comment #203)
-> > Hi, I'm facing this issue when my bluetooth dongle does not work in lin=
-ux.
-> > I'm not much handy when it comes to doing complicated things in linux,
-> > messing with the kernel and stuff like that. I can't find information on
-> how
-> > to use this patch and also what is the actual patch.=20
-> >=20
-> > My adapter id is the following: 0a12:0001
-> >=20
-> > When I try to turn on bluetooth with bluetoothctl I recive this output:=
- "no
-> > default controller available"
-> >=20
-> > and the output of hciconfig is the following:
-> >=20
-> > hci0: Type: Primary  Bus: USB
-> >       BD Address: 00:1A:7D:DA:71:12  ACL MTU: 679:8  SCO MTU: 48:16
-> >       DOWN=20
-> >       RX bytes:367 acl:0 sco:0 events:12 errors:0
-> >       TX bytes:37 acl:0 sco:0 commands:12 errors:0
-> >=20
-> > I can't turn it up :(
-> >=20
-> > English is not my first language so I'm sorry for any grammatical error=
-, if
-> > anyone could guide me in how to start and how to apply the patch I'd be=
- on
-> > your debt
->=20
-> I also can't get it to work even with the patches, but the patch should be
-> already available by default starting from linux 5.14.
->=20
-> To know your kernel version, just type in a terminal
->=20
-> uname -r
->=20
-> If your kernel is older than version 5.14, you can try updating your dist=
-ro
-> or trying another with a more recent kernel like Fedora or Manjaro. You c=
-an
-> simply boot with USB without installing and test your Bluetooth dongle.
-
-I've been using fedora 34, and there was no use, yesterday I updated to fed=
-ora
-35 and the issue remains. I try using manjaro in live usb mode but is the s=
-ame,
-I can't get it to work. My kernel version 5.14.10-300.fc35.x86_64
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+Alan Stern
