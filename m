@@ -2,109 +2,164 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7CC76C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 01:26:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 61F9EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 05:33:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B23C610E8
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 01:26:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 401DE6109F
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 05:33:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232830AbhKCB2f (ORCPT
+        id S230389AbhKCFgA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 2 Nov 2021 21:28:35 -0400
-Received: from mail.kernel.org ([198.145.29.99]:33254 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230479AbhKCB2d (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 2 Nov 2021 21:28:33 -0400
-Received: by mail.kernel.org (Postfix) with ESMTPS id 34E56611C1
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 01:25:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1635902758;
-        bh=N+MbK13P/7EuALQQzQFKgpmYq3rALcr7rD/+n32ZMDM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=OPlnR5APsUUG4RD+0LagFzT+p+KaAsy3mf+M4nHpV190RH8NUibd2ODSLBFWIR8Wh
-         NO14IqQkKqZKMIHpmzMmyQ5kO2c9npEh2EsWiQup7iCJERl01W5336MdYvEObZ1NOH
-         Hx47j4WSDvY7rwOzyzLQKCjU5xayPmLqOuTZEm/kvIP9+wAa9iWHwnsP7elikZtMZE
-         9N2m9xCuF88ym/0MMwkNezAj+tjqnq/lC58SfMZUnoR5dZmvpOoLiCTqdPManVo3M3
-         AUP61pdTAym5kQEy8uPms2/9VRmFHjx5xjWN1CdEj20pB01FZUeqMRuO+J5P0njPel
-         jtuWsi/gzKb5A==
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
- Bluetooth Dongle unusable
-Date:   Wed, 03 Nov 2021 01:25:54 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: guimarcalsilva@gmail.com
-X-Bugzilla-Status: REOPENED
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-60824-62941-E2jjxOkfuE@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
-References: <bug-60824-62941@https.bugzilla.kernel.org/>
+        Wed, 3 Nov 2021 01:36:00 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48992 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230059AbhKCFf7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Nov 2021 01:35:59 -0400
+Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7BD7C061205
+        for <linux-bluetooth@vger.kernel.org>; Tue,  2 Nov 2021 22:33:23 -0700 (PDT)
+Received: by mail-yb1-xb4a.google.com with SMTP id d9-20020a251d09000000b005c208092922so2530797ybd.20
+        for <linux-bluetooth@vger.kernel.org>; Tue, 02 Nov 2021 22:33:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=xs0T0WVw07avkfyokmmkdCQmH6GIfXLpMlnt8tnR1gM=;
+        b=YEa6S5jxUvaRXnXk6KYLcnE93FShL1ZE72b/FVSD34hL3j8YB4vC9QiWItu9YAS+yS
+         mcQiPv56PH0TVoAgfZkApROCJVL1O2RrJah4Y2uVt1YD5Ye/dh8I16FxdTrhPxvDVJAN
+         VNs6s47NqqPhQPUzNkvteUFgRZ1Tw4bYYkSIs8CP8X/AqGsOjypIuc+Sq4MgsY2owWGp
+         csYCpv1qhV81L+6UZWFZE9uNElVtHXpk/Wnk/7DVf5yfVE+/FjY8o1+5eC56sRu+AaAi
+         1UBI9Ic8EBg7b5HstspzA4GHwZVEI3/fAmz2jVGRyp2zGB1cB8pUEeHdPstvegT33AGS
+         uLuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=xs0T0WVw07avkfyokmmkdCQmH6GIfXLpMlnt8tnR1gM=;
+        b=YeOKQzAdeKT8Qw7EH3zxhoWvD9Y32XX3YeNg7wgjfy+hlxZfZo0JmSEWfeqqBa5mt8
+         YLKjFcQzf67OtwwF3YOg3nAvQv6KfeEIAnRcqLWzXZEh2z+CchRzup+sp3kwWM5nzzr/
+         Ol0Q8y3cdSSzDs3VgU5I12NQSjIrq83SgZW9LbB7VSP6v7081RoG7CmhdK/cvziB2/2h
+         KQqkJRxwxmjMBRFBs+4CwqA0+6sExhRvJ/mW7PHIU/Ki795VewZpsGLNyx3mUcFXDPmK
+         OJCnQjbBpAvG1NTZUhG8J+LZFtNiCY1WhheI4678SdTToQq2wZOOpQQvL35YpcCZ17wv
+         nCFg==
+X-Gm-Message-State: AOAM533aS5gL0LIHBDu6bisVoUIICpF5jXPk8TXMJMqtZV5HPM4a236c
+        L73WplVi/ft3hGWFPfYiZ1mw9Dh658pg6pz8JGJSHvgmNEHfhs237JBaIvtYZlWltT80ZNWuIEa
+        fX6x7p4WmdxoFM+j1eEJ1d/ofnYtB7dxgATOOx8rXefJsOQhnc76c2/Z2IDX6U2oDoyLIhZEYQ4
+        nL
+X-Google-Smtp-Source: ABdhPJwSvjB5cPYxJxzN/oBjy/POAcp2ZMLNYY9yCfCgcipAK6CWpatsZlfm0N6cRGHW3xDfEvyYuIQ7KhpX
+X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:7af7:a937:5810:b542])
+ (user=apusaka job=sendgmr) by 2002:a25:d6c6:: with SMTP id
+ n189mr22646041ybg.272.1635917602348; Tue, 02 Nov 2021 22:33:22 -0700 (PDT)
+Date:   Wed,  3 Nov 2021 13:33:14 +0800
+Message-Id: <20211103133225.v2.1.I3ba1a76d72da5a813cf6e6f219838c9ef28c5eaa@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
+Subject: [PATCH v2 1/2] Bluetooth: Ignore HCI_ERROR_CANCELLED_BY_HOST on adv
+ set terminated event
+From:   Archie Pusaka <apusaka@google.com>
+To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>
+Cc:     CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
+From: Archie Pusaka <apusaka@chromium.org>
 
---- Comment #204 from guimarcalsilva@gmail.com ---
-(In reply to Luis Oropeza from comment #203)
-> Hi, I'm facing this issue when my bluetooth dongle does not work in linux.
-> I'm not much handy when it comes to doing complicated things in linux,
-> messing with the kernel and stuff like that. I can't find information on =
-how
-> to use this patch and also what is the actual patch.=20
->=20
-> My adapter id is the following: 0a12:0001
->=20
-> When I try to turn on bluetooth with bluetoothctl I recive this output: "=
-no
-> default controller available"
->=20
-> and the output of hciconfig is the following:
->=20
-> hci0: Type: Primary  Bus: USB
->       BD Address: 00:1A:7D:DA:71:12  ACL MTU: 679:8  SCO MTU: 48:16
->       DOWN=20
->       RX bytes:367 acl:0 sco:0 events:12 errors:0
->       TX bytes:37 acl:0 sco:0 commands:12 errors:0
->=20
-> I can't turn it up :(
->=20
-> English is not my first language so I'm sorry for any grammatical error, =
-if
-> anyone could guide me in how to start and how to apply the patch I'd be on
-> your debt
+This event is received when the controller stops advertising,
+specifically for these three reasons:
+(a) Connection is successfully created (success).
+(b) Timeout is reached (error).
+(c) Number of advertising events is reached (error).
+(*) This event is NOT generated when the host stops the advertisement.
+Refer to the BT spec ver 5.3 vol 4 part E sec 7.7.65.18. Note that the
+section was revised from BT spec ver 5.0 vol 2 part E sec 7.7.65.18
+which was ambiguous about (*).
 
-I also can't get it to work even with the patches, but the patch should be
-already available by default starting from linux 5.14.
+Some chips (e.g. RTL8822CE) send this event when the host stops the
+advertisement with status = HCI_ERROR_CANCELLED_BY_HOST (due to (*)
+above). This is treated as an error and the advertisement will be
+removed and userspace will be informed via MGMT event.
 
-To know your kernel version, just type in a terminal
+On suspend, we are supposed to temporarily disable advertisements,
+and continue advertising on resume. However, due to the behavior
+above, the advertisements are removed instead.
 
-uname -r
+This patch returns early if HCI_ERROR_CANCELLED_BY_HOST is received.
 
-If your kernel is older than version 5.14, you can try updating your distro=
- or
-trying another with a more recent kernel like Fedora or Manjaro. You can si=
-mply
-boot with USB without installing and test your Bluetooth dongle.
+Btmon snippet of the unexpected behavior:
+@ MGMT Command: Remove Advertising (0x003f) plen 1
+        Instance: 1
+< HCI Command: LE Set Extended Advertising Enable (0x08|0x0039) plen 6
+        Extended advertising: Disabled (0x00)
+        Number of sets: 1 (0x01)
+        Entry 0
+          Handle: 0x01
+          Duration: 0 ms (0x00)
+          Max ext adv events: 0
+> HCI Event: LE Meta Event (0x3e) plen 6
+      LE Advertising Set Terminated (0x12)
+        Status: Operation Cancelled by Host (0x44)
+        Handle: 1
+        Connection handle: 0
+        Number of completed extended advertising events: 5
+> HCI Event: Command Complete (0x0e) plen 4
+      LE Set Extended Advertising Enable (0x08|0x0039) ncmd 2
+        Status: Success (0x00)
 
---=20
-You may reply to this email to add a comment.
+Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+---
+
+Changes in v2:
+* Split clearing HCI_LE_ADV into its own patch
+* Reword comments
+
+ include/net/bluetooth/hci.h |  1 +
+ net/bluetooth/hci_event.c   | 12 ++++++++++++
+ 2 files changed, 13 insertions(+)
+
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 63065bc01b76..84db6b275231 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -566,6 +566,7 @@ enum {
+ #define HCI_ERROR_INVALID_LL_PARAMS	0x1e
+ #define HCI_ERROR_UNSPECIFIED		0x1f
+ #define HCI_ERROR_ADVERTISING_TIMEOUT	0x3c
++#define HCI_ERROR_CANCELLED_BY_HOST	0x44
+ 
+ /* Flow control modes */
+ #define HCI_FLOW_CTL_MODE_PACKET_BASED	0x00
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d4b75a6cfeee..7d875927c48b 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5538,6 +5538,18 @@ static void hci_le_ext_adv_term_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	adv = hci_find_adv_instance(hdev, ev->handle);
+ 
++	/* The Bluetooth Core 5.3 specification clearly states that this event
++	 * shall not be sent when the Host disables the advertising set. So in
++	 * case of HCI_ERROR_CANCELLED_BY_HOST, just ignore the event.
++	 *
++	 * When the Host disables an advertising set, all cleanup is done via
++	 * its command callback and not needed to be duplicated here.
++	 */
++	if (ev->status == HCI_ERROR_CANCELLED_BY_HOST) {
++		bt_dev_warn_ratelimited(hdev, "Unexpected advertising set terminated event");
++		return;
++	}
++
+ 	if (ev->status) {
+ 		if (!adv)
+ 			return;
+-- 
+2.33.1.1089.g2158813163f-goog
+
