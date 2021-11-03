@@ -2,102 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 644C1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:38:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 446DBC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 14:24:58 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3A30B6112D
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:38:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 2C54961053
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 14:24:58 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231760AbhKCJlY (ORCPT
+        id S231705AbhKCO1d convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Nov 2021 05:41:24 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:48102 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231721AbhKCJlC (ORCPT
+        Wed, 3 Nov 2021 10:27:33 -0400
+Received: from coyote.holtmann.net ([212.227.132.17]:44428 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231476AbhKCO1d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Nov 2021 05:41:02 -0400
-Received: from mail-qv1-xf2b.google.com (mail-qv1-xf2b.google.com [IPv6:2607:f8b0:4864:20::f2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C67C061714
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 02:38:26 -0700 (PDT)
-Received: by mail-qv1-xf2b.google.com with SMTP id g25so2337186qvf.13
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Nov 2021 02:38:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=RR6UJ/edQJbA+PzeKKIBZ56Z7Bu9MIpcbKOnSWZbwoU=;
-        b=DeAUWydt/z54eZW+tKgxjH2+qTbiUT5woCH8Er5IYLROpjt9HoDchDY6fmar8POKTC
-         6D3iJIMJPVHKMWaNGmJRymKGHrpUj8WGtam2573R84LDahr4bB+wXR2xankkd+u7ayk3
-         sOvPA7nPKUVLowI5k7ak6gf0hPnPia+eL3Wkw9mKvCYDR6HUm0i5/gYugr2eJeAcEX7+
-         6cgVqbQiCdcygo8Ao/TTVFLA1885Jeza/e2CfY5ii13fQOShbBX3MYWGq0VDMtrwB+ZV
-         p+xrYH6mW/fhaKzHzHYgz6Z3ruwty44GgzHNlv7Ws3MFhbH2GpPm2JT1g8UB5Fi1DfnY
-         lC3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=RR6UJ/edQJbA+PzeKKIBZ56Z7Bu9MIpcbKOnSWZbwoU=;
-        b=bz5DrTCYfMB+rjzupoYxLHk0g7beiEkqlNeRhNappx4k2+f6znTXcaCR9/6O8/FRyq
-         8w/Q1KdVFvBAq3Axm9DAiIPUKGKtgfkIT4ehvnmVrR/WoNfJ537wfNOHnEmHx1Q4HbGr
-         cH8qoav+3TLebGUsvScPQpQQY1kD//vscI3j2P2LGYTexiCBcPcOidEt7GOwWHduz4Hr
-         RaK+OtJQZV2xkP8jThI+q4Cl2crdkbrz1t3rzq6LnifTxwd56CfNuHObAdLd49u2GjRu
-         9zJ+oG4I1RCcuqQvEc3/DT8z00f/z2J9rnL+rd38oxPxu6olIfFnYWejRGnG+MYFkGdO
-         TRIw==
-X-Gm-Message-State: AOAM532N3nGxNm7cmRmAnfnGU19CQTJIZleOri6Igw/+ATEE7S2/FZU7
-        /A+T/BmhgX7VgcWc7WsV2i609Y+opakQ+Q==
-X-Google-Smtp-Source: ABdhPJy8h617JVLQi+CrbR4D0iaywZ+sokvMyGPnNhD4UodFHv+59RimRHGGXzadDPUgjPJx5M9TqA==
-X-Received: by 2002:ac8:5cc5:: with SMTP id s5mr44090437qta.256.1635932305415;
-        Wed, 03 Nov 2021 02:38:25 -0700 (PDT)
-Received: from [172.17.0.2] ([20.110.147.79])
-        by smtp.gmail.com with ESMTPSA id v19sm1326454qtk.6.2021.11.03.02.38.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 02:38:25 -0700 (PDT)
-Message-ID: <61825891.1c69fb81.61efa.6759@mx.google.com>
-Date:   Wed, 03 Nov 2021 02:38:25 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============6007471115369070531=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, apusaka@google.com
-Subject: RE: [Bluez,v2,1/3] adapter: Use PeripheralLongTermKey to store LTK
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211103170206.Bluez.v2.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
-References: <20211103170206.Bluez.v2.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+        Wed, 3 Nov 2021 10:27:33 -0400
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9F9D9CED12;
+        Wed,  3 Nov 2021 15:24:53 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH v2] Bluetooth: btusb: using big-endian definition for
+ board_id in struct qca_version
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <c92c38b60b1b55b5d72f7f1c718641e1@codeaurora.org>
+Date:   Wed, 3 Nov 2021 15:24:53 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        c-hbandi@codeaurora.org, Hemantg <hemantg@codeaurora.org>,
+        Matthias Kaehlcke <mka@chromium.org>,
+        Rocky Liao <rjliao@codeaurora.org>, zijuhu@codeaurora.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <90D7F483-BCD9-430C-94EA-4018237ABE36@holtmann.org>
+References: <c92c38b60b1b55b5d72f7f1c718641e1@codeaurora.org>
+To:     tjiang@codeaurora.org
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============6007471115369070531==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Tim,
 
-This is automated email and please do not reply to this email!
+> As we name nvm file by using big-endian for boardID, so align host with it.
+> 
+> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
+> ---
+> drivers/bluetooth/btusb.c | 4 ++--
+> 1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 46d892bbde62..08a1c6d8390f 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2883,7 +2883,7 @@ struct qca_version {
+> 	__le32	rom_version;
+> 	__le32	patch_version;
+> 	__le32	ram_version;
+> -	__le16	board_id;
+> +	__be16	board_id;
+> 	__le16	flag;
+> 	__u8	reserved[4];
+> } __packed;
+> @@ -3072,7 +3072,7 @@ static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
+> 	u16 flag = le16_to_cpu(ver->flag);
+> 
+> 	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
+> -		u16 board_id = le16_to_cpu(ver->board_id);
+> +		u16 board_id = be16_to_cpu(ver->board_id);
+> 		const char *variant;
 
-Dear submitter,
+my original comment still stands. Are you sure you are doing this correctly. The in-memory layout of your NVM is mixed little-endian and big-endian? Really? Or do you want to convert back from host endian to big endian?
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=574639
+You commit message text suggest that you have to do this:
 
----Test result---
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 46d892bbde62..55a33a5fea56 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -3090,7 +3090,7 @@ static void btusb_generate_qca_nvm_name(char *fwname, size_t max_size,
+                                rom_version, variant);
+                } else {
+                        snprintf(fwname, max_size, "qca/nvm_usb_%08x%s_%04x.bin",
+-                               rom_version, variant, board_id);
++                               rom_version, variant, cpu_to_be16(board_id));
+                }
+        } else {
+                snprintf(fwname, max_size, "qca/nvm_usb_%08x.bin”,
 
-Test Summary:
-CheckPatch                    PASS      4.46 seconds
-GitLint                       PASS      3.02 seconds
-Prep - Setup ELL              PASS      49.79 seconds
-Build - Prep                  PASS      0.54 seconds
-Build - Configure             PASS      9.54 seconds
-Build - Make                  PASS      216.71 seconds
-Make Check                    PASS      9.87 seconds
-Make Distcheck                PASS      251.91 seconds
-Build w/ext ELL - Configure   PASS      8.81 seconds
-Build w/ext ELL - Make        PASS      198.37 seconds
+And really, I can not do this anymore. Write lengthy commit messages explaining your change in detail. I am not looking a patches anymore until they have a proper paragraph explaining the change and why it is correct.
 
+Also this change had v16 before I merged and even in that version I had to fix issues. Please stop wasting my time. I have no idea why this wasn’t caught earlier. It is a fundamental flaw. I am close to just reverting the previous patch since it seems it clearly needs more testing.
 
+Regards
 
----
-Regards,
-Linux Bluetooth
+Marcel
 
-
---===============6007471115369070531==--
