@@ -2,58 +2,62 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C68DC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:03:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B232C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 0F1B6611C9
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:03:10 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66C42611F0
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 09:03:14 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231755AbhKCJFl (ORCPT
+        id S232011AbhKCJFr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Nov 2021 05:05:41 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39890 "EHLO
+        Wed, 3 Nov 2021 05:05:47 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39918 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231709AbhKCJFk (ORCPT
+        with ESMTP id S231986AbhKCJFp (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Nov 2021 05:05:40 -0400
+        Wed, 3 Nov 2021 05:05:45 -0400
 Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EAB3C061714
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 02:03:04 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id h185-20020a256cc2000000b005bdce4db0easo3131178ybc.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Nov 2021 02:03:04 -0700 (PDT)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53165C061205
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 02:03:09 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id b126-20020a251b84000000b005bd8aca71a2so3206416ybb.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Nov 2021 02:03:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
-        h=date:message-id:mime-version:subject:from:to:cc;
-        bh=bIe43DMC+hVNx274dZvwV5NiQPHCOMhtMi2x8daakaQ=;
-        b=AVcdizCpSpMltW+Xut7W/8Irq/gOAvqCgt0LOINzK9fS2/lSmreNX1MjyvVnspq18E
-         U2FSkApiD5zgsNjfBAPKaElaM1uW4/cKKn1bYEaMnEe7IkVXiL1YhxVZjO+YVNjz152T
-         dsYk32ZlDHsbGiHvbBw10lpEy+eIFnlYGqRonE4HBIATYof+axhfpBK82C9xTZYkYfiC
-         eGedDsA3Z/jiXuaNwsZfXB6zjAVr7EUn5U2160kaLtakAXbTX+lK3p6yhE1CVUeHLAI+
-         /ramtb0M1viDtCChJoZJWUy+RXtIQS7olK/I3RBIvXMonujG3R9cR1hwXeKtjrqjNp3G
-         mpyQ==
+        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
+         :cc;
+        bh=1ba15R92iDLtdAosS9I3xgQG4qhaOlyBbyIkYWCKw8I=;
+        b=LF8jocn0iekS/C3t/RX1cGOuwesZ4e8To2amBbMwtKK+r23hpXu6AEDfYDASEKa4iP
+         9bqn+bBZ0bSrN7guhv3IJI9MRzAIguRm0KDDHqMMpzlK4oATvxXNcpy/spiNxk4ULZU2
+         wHVtRAIyQ1cXPVtsUVHhum+Bs7vaUiWDicMSK5QIUo9zc+IzqsG5fOuVt3YuMdq3Es7W
+         ZY2+jJAoK7E58EtckMUD1XBxtjqriEYddAaN+mqt7LcEpgrgYdLC2wQUZESQSql6WVL7
+         gqzRwWNaiRIsktMOTPWtxJvrtM/7iPntfnxG9XIUsTPmGP/G/ejK9wY1utdOZHK/wn4n
+         Hopw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
-        bh=bIe43DMC+hVNx274dZvwV5NiQPHCOMhtMi2x8daakaQ=;
-        b=feQJfGYcgAAeI46PBTcUHT0jfbPScMGYLyx+eO5ivzFhTdesc43xCWDmHCs+dWMoNF
-         6BuqBNeDg6GcQ+pambxFBaxqluHDAXXZPlL6oGmcnFFBPsH/bBlC/NP+Q6E+jMdlCUDZ
-         WRxbCUbKtR+O6YQiOHBp8+7VMyCPOKLtokb7CZWzkzedPWCrBsPbRZzdU/ClTXU0Jj3Z
-         oa+TEUshbQQwdUhWvZG/X916b4qRihaKKO2nvXfN7tKXiPQvZg7J4/c/aRpcxC+4f/7N
-         tf+cLh0Fl3T2QurFimxjeG44xGldYnQ1mUD0ek9xuM183WjAeFu1mwLHC8KUTQynRI1B
-         DGcg==
-X-Gm-Message-State: AOAM532cEXtIG+aFG3tGpXzN3JqegvaznBuYsUWyg0RUgCKFuG/VUC7s
-        z74qwD2LFF/zVj+6lUXxmxAjsl+GQdw7RQlkQTsZ6Sk6f6KDtpcMpLSCIIEVSQZVLuLzwx4KPzj
-        IuKcc7XWFsT+cDRVTbj8QaA8Dx/4yq50GTP6YxCFnbBI1Rjqx54sr7mHBLnhDg+io0bSeqoVBak
-        6b
-X-Google-Smtp-Source: ABdhPJx8gsKPIhWShNSrImJpq4Bf/u4PHiLnczpAtBssuvzQDAAblcynhdtNXz7/03LvAfNEGKZ9Qv3k1FGO
+        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
+         :references:subject:from:to:cc;
+        bh=1ba15R92iDLtdAosS9I3xgQG4qhaOlyBbyIkYWCKw8I=;
+        b=eAm9iPJMzCKpQVJp2xLyKla8qd5OJ/cvkv+xRHVHY5lozeF8TzNbTz62N+OiFVUj3x
+         KAJVCkoGpou5VPNRfz32MKOCpvEBQeAnWaYdCt4HxF8oZ3ojViX33G3DmQ9vS76SPDOd
+         dOuJREG6JV2b9n/RJCtCWJ79CKDy8toiRDC6ll0Z0rfCR4HsZYIO+k7522n5A2HXur8o
+         fcbyrMmcFt7SoI+i5ml00+0pWWwXaQzDqyQIQvjl8eL7A1M72F9qY843EQCOarFYSAhS
+         BRJixUvcB5QsIehZGlec3sRtOy/Kdp4ozS05xpfWZTOx76L/VtSpaTjx4P7blTDkNiN3
+         6vpA==
+X-Gm-Message-State: AOAM531n0lyQegxL7ldzgYsx8DkAmSMD/9chSbyyfjDL+FV56OeIQ1iK
+        W33PG5RPOtkzXaAgR9kKg7OT2AbOGMUtIpjhtSVsDq1NJcr/JHHtzmlasDlAXBpn4I8J27DkXIF
+        TBdnXNq4TmAsOtkkG16hLjeELdQD2MqTtgKx2N4UOi1TBL9roINl7Q7zEyJ6HnaxPHSQKLd6dy8
+        ML
+X-Google-Smtp-Source: ABdhPJwgIuRMrKckuisCSKiBQPxntjEDm8ekiRE3+ZcnlK3+BU6U1SOVrLZFCDsU5UdaGA9aFc7gSnlMSMJ9
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:7af7:a937:5810:b542])
- (user=apusaka job=sendgmr) by 2002:a25:b9cd:: with SMTP id
- y13mr7266461ybj.407.1635930183482; Wed, 03 Nov 2021 02:03:03 -0700 (PDT)
-Date:   Wed,  3 Nov 2021 17:02:53 +0800
-Message-Id: <20211103170206.Bluez.v2.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+ (user=apusaka job=sendgmr) by 2002:a25:a268:: with SMTP id
+ b95mr44659568ybi.35.1635930188549; Wed, 03 Nov 2021 02:03:08 -0700 (PDT)
+Date:   Wed,  3 Nov 2021 17:02:54 +0800
+In-Reply-To: <20211103170206.Bluez.v2.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
+Message-Id: <20211103170206.Bluez.v2.2.I1e75e215e52ece8017840d4df309c4ba4ac84510@changeid>
 Mime-Version: 1.0
+References: <20211103170206.Bluez.v2.1.I515833d2764b8ec2ac2bb1f87313de80ebb497cd@changeid>
 X-Mailer: git-send-email 2.33.1.1089.g2158813163f-goog
-Subject: [Bluez PATCH v2 1/3] adapter: Use PeripheralLongTermKey to store LTK
+Subject: [Bluez PATCH v2 2/3] doc: Add PeripheralLongTermKey for storing LTK
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -68,103 +72,32 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Introducing PeripheralLongTermKey group for storing LTK info to
-replace the less inclusive term. Currently we still need to write/read
-from both to ensure smooth transition, but later we should deprecate
-the old term.
+Update doc to reflect update in adapter.c.
 
 Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
 
-Changes in v2:
-- Add reason to keep duplicates as comment
+(no changes since v1)
 
- src/adapter.c | 47 ++++++++++++++++++++++++++++++++++++++---------
- 1 file changed, 38 insertions(+), 9 deletions(-)
+ doc/settings-storage.txt | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/src/adapter.c b/src/adapter.c
-index d0d38621b8..114ae84c10 100644
---- a/src/adapter.c
-+++ b/src/adapter.c
-@@ -3868,7 +3868,14 @@ static struct smp_ltk_info *get_peripheral_ltk_info(GKeyFile *key_file,
+diff --git a/doc/settings-storage.txt b/doc/settings-storage.txt
+index 1d96cd66d9..3c637c3521 100644
+--- a/doc/settings-storage.txt
++++ b/doc/settings-storage.txt
+@@ -314,9 +314,9 @@ Long term key) related to a remote device.
+   Rand			Integer		Randomizer
  
- 	DBG("%s", peer);
  
--	ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-+	/* Peripheral* is the proper term, but for now read both entries
-+	 * so it won't break when user up/downgrades. Remove the other
-+	 * term after a few releases.
-+	 */
-+	ltk = get_ltk(key_file, peer, bdaddr_type, "PeripheralLongTermKey");
-+	if (!ltk)
-+		ltk = get_ltk(key_file, peer, bdaddr_type, "SlaveLongTermKey");
-+
- 	if (ltk)
- 		ltk->central = false;
+-[SlaveLongTermKey] group contains:
++[PeripheralLongTermKey] group contains:
  
-@@ -8415,13 +8422,12 @@ static void new_link_key_callback(uint16_t index, uint16_t length,
- 	bonding_complete(adapter, &addr->bdaddr, addr->type, 0);
- }
+-  Same as the [LongTermKey] group, except for slave keys.
++  Same as the [LongTermKey] group, except for peripheral keys.
  
--static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
-+static void store_ltk_group(struct btd_adapter *adapter, const bdaddr_t *peer,
- 				uint8_t bdaddr_type, const unsigned char *key,
--				uint8_t central, uint8_t authenticated,
-+				const char *group, uint8_t authenticated,
- 				uint8_t enc_size, uint16_t ediv,
- 				uint64_t rand)
- {
--	const char *group = central ? "LongTermKey" : "SlaveLongTermKey";
- 	char device_addr[18];
- 	char filename[PATH_MAX];
- 	GKeyFile *key_file;
-@@ -8431,11 +8437,6 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	char *str;
- 	int i;
  
--	if (central != 0x00 && central != 0x01) {
--		error("Unsupported LTK type %u", central);
--		return;
--	}
--
- 	ba2str(peer, device_addr);
- 
- 	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/%s/info",
-@@ -8475,6 +8476,34 @@ static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
- 	g_key_file_free(key_file);
- }
- 
-+static void store_longtermkey(struct btd_adapter *adapter, const bdaddr_t *peer,
-+				uint8_t bdaddr_type, const unsigned char *key,
-+				uint8_t central, uint8_t authenticated,
-+				uint8_t enc_size, uint16_t ediv,
-+				uint64_t rand)
-+{
-+	if (central != 0x00 && central != 0x01) {
-+		error("Unsupported LTK type %u", central);
-+		return;
-+	}
-+
-+	if (central) {
-+		store_ltk_group(adapter, peer, bdaddr_type, key, "LongTermKey",
-+				authenticated, enc_size, ediv, rand);
-+	} else {
-+		/* Peripheral* is the proper term, but for now keep duplicates
-+		 * so it won't break when user up/downgrades. Remove the other
-+		 * term after a few releases.
-+		 */
-+		store_ltk_group(adapter, peer, bdaddr_type, key,
-+				"PeripheralLongTermKey", authenticated,
-+				enc_size, ediv, rand);
-+		store_ltk_group(adapter, peer, bdaddr_type, key,
-+				"SlaveLongTermKey", authenticated,
-+				enc_size, ediv, rand);
-+	}
-+}
-+
- static void new_long_term_key_callback(uint16_t index, uint16_t length,
- 					const void *param, void *user_data)
- {
+ [ConnectionParameters] group contains:
 -- 
 2.33.1.1089.g2158813163f-goog
 
