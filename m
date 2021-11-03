@@ -2,102 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC1FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:46:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DB3BC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:56:42 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9EEB060F58
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:46:02 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4483E60EDF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  3 Nov 2021 17:56:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232079AbhKCRsh (ORCPT
+        id S229885AbhKCR7S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 3 Nov 2021 13:48:37 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47550 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231745AbhKCRsZ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 3 Nov 2021 13:48:25 -0400
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 639B9C06120B
-        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 10:45:48 -0700 (PDT)
-Received: by mail-pj1-x102a.google.com with SMTP id om14so1789521pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 03 Nov 2021 10:45:48 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=Ii83+DHe6HlRNsKYfq+c0Z3BZ6cWA7+o+awBm6fG3AE=;
-        b=nJ1imoSGEIPwBIU1cp4JhiNbV8UEr81Gok1hRm0H75ST8y6p69q2selH9xTz2tkGji
-         lM7SvlDI1sGRo62zXTi5J01YcuEyx8G5bCa2i2DOue13VygbfRBafkw+NpMpiRl39Kgq
-         jOdaeBfQVt74Fdm/q/p4h105GbLHxEcqnG5IwhP4qhlo7yTxn6RfKZ2vzZHFPXdIpXpf
-         djVinl0C7/9F5YayCT6728QDs9kChODT7SDFHxRYwckyo3ymtqjX5+eBXykFBWkmsBnP
-         md0gMTKsAeszAeLjV6DRkY87w8D04SqQz7yju+UY+M6TTl4dPt40pzL6dG7bNXzxqz85
-         yxlg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=Ii83+DHe6HlRNsKYfq+c0Z3BZ6cWA7+o+awBm6fG3AE=;
-        b=y9Jdrh6r2jjvftfVCu0vHIuQhZLrOHT6qQc58IJPw0zsbqJUaxIymmex9MHD5yVWXS
-         TgnC9+pde3TXb92dHKhNajF0rZm0yE/iAEGS5NKP4dCMaEdAcEE7Gdb4cAP7otCWGjNz
-         FM9pg1GzAvEh6z1wCDCAAUltuddjbpBgK0fUL2jM1ujZMKmaQal2HAkYwVuLhZaQ2xwY
-         3POfmTEUAuUX5ahO2tnetZCUpGYt55wjSM03Mxe0uj4MsytSE/eSOpRR8qK/96n+IFwt
-         /7cSxuC9VzMA5MxcqGGlvY4cxYegg9xqFEhUbVy+nOKYER9oaTdQ1WafdlC+SuDnzBmJ
-         yQyA==
-X-Gm-Message-State: AOAM532BIr1qxVslMt/17zMvOa1U8gBiejBYmSNYSAlUZFcfyQRwofy5
-        Y2SbGMKy39Hr/vADKwmJFTNZZ4Rf89E=
-X-Google-Smtp-Source: ABdhPJxIBe3pBJBD+pxWuRE8SwRpI1+dCaqWHexoFhZfQdUq448r8802FU9Uz8sdStta3PAZzlyxQA==
-X-Received: by 2002:a17:902:b097:b0:141:ec7d:a055 with SMTP id p23-20020a170902b09700b00141ec7da055mr20020839plr.3.1635961547555;
-        Wed, 03 Nov 2021 10:45:47 -0700 (PDT)
-Received: from [172.17.0.2] ([20.112.94.170])
-        by smtp.gmail.com with ESMTPSA id p9sm2904799pfn.7.2021.11.03.10.45.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 03 Nov 2021 10:45:47 -0700 (PDT)
-Message-ID: <6182cacb.1c69fb81.7541.9135@mx.google.com>
-Date:   Wed, 03 Nov 2021 10:45:47 -0700 (PDT)
-Content-Type: multipart/mixed; boundary="===============0459110713513536903=="
+        Wed, 3 Nov 2021 13:59:18 -0400
+Received: from mail.kernel.org ([198.145.29.99]:58304 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229558AbhKCR7R (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 3 Nov 2021 13:59:17 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id C617161157
+        for <linux-bluetooth@vger.kernel.org>; Wed,  3 Nov 2021 17:56:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1635962200;
+        bh=3G4P9Pf7YA5Xevw3LdlApGgszV2bFf0gq/HkZuGFC8o=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=uRzxvigYypKr1u7ZTtnfoToRiIlBpGn5qUeKaVn4Ayq4Zvl5UF9D87dT2GXThZ0bY
+         hQY4Kud361JIwGvtbSl8Ml0R3vpWgKrDjw2VgFZlmjp2szuHrqsOTE69pTm0XVd9hR
+         MHR88nRRPuOxeiFcjuhbGu41dAFvSIuYed6nCw4DdwVu+T3KoNdr7WLkwgWXdWTw96
+         9lVaWT+iyLgYzwSb+F7x/R4JJJ4EmjEZr4Q2MKDMqiSb7bhYm3mIsgzC96VvSX+DWb
+         Q16dxPU5ptPRyjfn57jbQCHg0DCAn/BFoQYZaHMG9DLphEax4LeMEjrtqiou3HtiBB
+         IaDeYjhwBkC7w==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 60824] [PATCH][regression] Cambridge Silicon Radio, Ltd
+ Bluetooth Dongle unusable
+Date:   Wed, 03 Nov 2021 17:56:37 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: luisoropeza113@gmail.com
+X-Bugzilla-Status: REOPENED
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-60824-62941-YEWYCBG9xb@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-60824-62941@https.bugzilla.kernel.org/>
+References: <bug-60824-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] btdev: Add support for LE Set Privacy mode
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211102054952.2898328-1-luiz.dentz@gmail.com>
-References: <20211102054952.2898328-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0459110713513536903==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+https://bugzilla.kernel.org/show_bug.cgi?id=3D60824
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=573885
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      0.90 seconds
-GitLint                       PASS      0.56 seconds
-Prep - Setup ELL              PASS      39.92 seconds
-Build - Prep                  PASS      0.18 seconds
-Build - Configure             PASS      7.64 seconds
-Build - Make                  PASS      168.24 seconds
-Make Check                    PASS      9.04 seconds
-Make Distcheck                PASS      204.89 seconds
-Build w/ext ELL - Configure   PASS      7.26 seconds
-Build w/ext ELL - Make        PASS      157.88 seconds
+--- Comment #205 from Luis Oropeza (luisoropeza113@gmail.com) ---
 
 
+(In reply to guimarcalsilva from comment #204)
+> (In reply to Luis Oropeza from comment #203)
+> > Hi, I'm facing this issue when my bluetooth dongle does not work in lin=
+ux.
+> > I'm not much handy when it comes to doing complicated things in linux,
+> > messing with the kernel and stuff like that. I can't find information on
+> how
+> > to use this patch and also what is the actual patch.=20
+> >=20
+> > My adapter id is the following: 0a12:0001
+> >=20
+> > When I try to turn on bluetooth with bluetoothctl I recive this output:=
+ "no
+> > default controller available"
+> >=20
+> > and the output of hciconfig is the following:
+> >=20
+> > hci0: Type: Primary  Bus: USB
+> >       BD Address: 00:1A:7D:DA:71:12  ACL MTU: 679:8  SCO MTU: 48:16
+> >       DOWN=20
+> >       RX bytes:367 acl:0 sco:0 events:12 errors:0
+> >       TX bytes:37 acl:0 sco:0 commands:12 errors:0
+> >=20
+> > I can't turn it up :(
+> >=20
+> > English is not my first language so I'm sorry for any grammatical error=
+, if
+> > anyone could guide me in how to start and how to apply the patch I'd be=
+ on
+> > your debt
+>=20
+> I also can't get it to work even with the patches, but the patch should be
+> already available by default starting from linux 5.14.
+>=20
+> To know your kernel version, just type in a terminal
+>=20
+> uname -r
+>=20
+> If your kernel is older than version 5.14, you can try updating your dist=
+ro
+> or trying another with a more recent kernel like Fedora or Manjaro. You c=
+an
+> simply boot with USB without installing and test your Bluetooth dongle.
 
----
-Regards,
-Linux Bluetooth
+I've been using fedora 34, and there was no use, yesterday I updated to fed=
+ora
+35 and the issue remains. I try using manjaro in live usb mode but is the s=
+ame,
+I can't get it to work. My kernel version 5.14.10-300.fc35.x86_64
 
+--=20
+You may reply to this email to add a comment.
 
---===============0459110713513536903==--
+You are receiving this mail because:
+You are the assignee for the bug.=
