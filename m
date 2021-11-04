@@ -2,148 +2,217 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D658C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 09:34:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C42EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 11:10:02 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 83C3060E9B
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 09:34:32 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 37CAB6120F
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 11:10:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231160AbhKDJhJ (ORCPT
+        id S231379AbhKDLMj (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Nov 2021 05:37:09 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:32996 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230365AbhKDJhI (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Nov 2021 05:37:08 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9FF0AC061714;
-        Thu,  4 Nov 2021 02:34:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Content-Transfer-Encoding:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-To:Resent-Cc:Resent-Message-ID;
-        bh=OPpNag35nq3f5jzKifHa8+MYq8ja7qLgXfeSwdatLt4=; t=1636018470; x=1637228070; 
-        b=o1fkXhK/UwTWcgaah0Rk8CiyqvxL3L1Fg+7O9JmRPvqc+TwQiDP+tzyCVr3CJvvEOW4jfPLNY6V
-        E9og1UEizSQN2ub5j76g57F1em26AKntQ3AigOedN1b3EtDg1OsTPKHGjpefeorHx/TnK1sm0ROV1
-        RBfHZaBRn8LO0hDienMJMY+2QxgGZ6F4rU+gnjl5GJzxyhpbTue6/RGRrkazhOZHQ4bTe7vc5PWlv
-        crNlMS8SYmk7SFRLOcBQSNcdCiRzGuXhIhmhx+agHGTOpFOq9rhDr1stMWuN/mz0aztEEadQ/abNn
-        sjuMikfIHJVdjPM2mkTPXJ79BvPbd/CacO7Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <benjamin@sipsolutions.net>)
-        id 1miZ8a-00As0y-PU;
-        Thu, 04 Nov 2021 10:34:24 +0100
-Message-ID: <fae44c06e8e8d24b21b60a096e7294bc37444b12.camel@sipsolutions.net>
-Subject: Re: Userspace enumeration hang while btusb tries to load firmware
- of removed device
-From:   Benjamin Berg <benjamin@sipsolutions.net>
-To:     Marcel Holtmann <marcel@holtmann.org>,
-        Alan Stern <stern@rowland.harvard.edu>
-Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date:   Thu, 04 Nov 2021 10:34:22 +0100
-In-Reply-To: <BCD95F43-3C6E-4B50-9228-9F2AD93BBBA4@holtmann.org>
-References: <df021873788acdb64e1311289e9ca6dc3f169616.camel@sipsolutions.net>
-         <20211103182303.GB1529362@rowland.harvard.edu>
-         <BCD95F43-3C6E-4B50-9228-9F2AD93BBBA4@holtmann.org>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-/EP9GhlX6OidL7rLeMc8"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Thu, 4 Nov 2021 07:12:39 -0400
+Received: from mail.kernel.org ([198.145.29.99]:48386 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231365AbhKDLMi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 4 Nov 2021 07:12:38 -0400
+Received: by mail.kernel.org (Postfix) with ESMTPS id AF9CF611C9
+        for <linux-bluetooth@vger.kernel.org>; Thu,  4 Nov 2021 11:10:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1636024200;
+        bh=inxcjaPkVcj1sp+tcFTar+PKynq9upmLqqDhuaxPf+s=;
+        h=From:To:Subject:Date:From;
+        b=jZ/D6NQYsn5xkvvGSD2yr5gIOxhaEdmppR3F7Lbyd3ITgsYeHLMMLOtzd8IIWQsY5
+         38pVlNQeTvfXmNuLOvwGMcnUFFLrKteWylvICJmILu2XDDkQc0w7f41PGAaaeMOyCP
+         SsQ+cggo1wyJs1WcQV/CyoGQH2+yC7UH7HuQUvK85XxCLT+2EMcSa0syosjWXGpuZC
+         chyIoaXuza0jyYsellpVZ88JhZhrUG1YsV10Aqxed0aUfz6qoq6b9JASnsb08j2U9G
+         3sKlNgD5DXsT+wNSsCPw9KuQ3mM96UHxpJNH7uDOwg10EGvLml/ZDskfLNJgmOVgGF
+         RCY5sxFsWkWew==
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 214943] New: Issue Microphone Bluetooth is not detect
+Date:   Thu, 04 Nov 2021 11:10:00 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: sergio@iskynet.es
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression
+Message-ID: <bug-214943-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-malware-bazaar-2: OK
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+https://bugzilla.kernel.org/show_bug.cgi?id=3D214943
 
---=-/EP9GhlX6OidL7rLeMc8
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+            Bug ID: 214943
+           Summary: Issue Microphone Bluetooth is not detect
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.11.0.-38-generic
+          Hardware: All
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: normal
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: sergio@iskynet.es
+        Regression: No
 
-Hi Marcel and Alan,
+SUMMARY
+I have a bluetooth headset connect to my PC.=20
 
-On Wed, 2021-11-03 at 20:31 +0100, Marcel Holtmann wrote:
-> > I'm not familiar with the btusb driver, so someone on the=20
-> > linux-bluetooth mailing list would have a better idea about this.=20
-> > However, it does look as though btusb keeps the device locked during th=
-e=20
-> > entire 10-second period while it tries to send over the firmware, and i=
-t=20
-> > doesn't abort the procedure when it starts getting disconnection errors=
-=20
-> > but instead persists until a timeout expires.  Keeping the device locke=
-d=20
-> > would certainly block lsusb.
-> >=20
-> > In general, locking the device during a firmware upload seems like
-> > the right thing to do -- you don't want extraneous transfers from
-> > other processes messing up the firmware!  So overall, it appears that
-> > the whole problem would be solved if the firmware transfer were
-> > aborted as soon as the -ENODEV errors start appearing.
->=20
-> the problem seems to be that we hitting HCI command timeout. So the
-> firmware download is done via HCI commands. These commands are send
-> to the transport driver btusb.c via hdev->send (as btusb_send_frame).
-> This triggers the usb_submit_urb or queues them via data->deferred
-> anchor. All this reports back the error properly except that nobody
-> does anything with it.
->=20
-> See hci_send_frame() last portion:
->=20
->         err =3D hdev->send(hdev, skb);                                   =
-         =20
->         if (err < 0) {                                                   =
-       =20
->                 bt_dev_err(hdev, "sending frame failed (%d)", err);      =
-       =20
->                 kfree_skb(skb);                                          =
-       =20
->         }
->=20
-> And that is it. We are not checking for ENODEV or any error here.
-> That means the failure of the HCI command gets only caught via the
-> HCI command timeout. I don=E2=80=99t know how to do this yet, but you wou=
-ld
-> have to look there to fail HCI command right away instead of waiting
-> for the timeout.
+It is connect ok. I can listen audio but the microphone is not detect by KD=
+E.
+On the other hand, the browsers detecting the microphone but it don't work =
+it.
 
-Hmm, true, I don't see a "sending frame failed" error message during
-the firmware download though. You are right that this codepath is
-loosing the error, but this does not seem to be the scenario we are
-running into while loading the firmware. This error only happens later
-on from the btintel_reset_to_bootloader function.
+--------------------------------------
 
-What seems to happen in the posted log is that the URB is initially
-submitted just fine and the transfer errors out afterwards.
-Unfortunately, the btusb_tx_complete is only used for statistics
-(stat.err_tx is increased) and has no further error handling that could
-abort the firmware upload.
+$pactl list | grep -i bluetooth=20
+        Nombre: module-bluetooth-policy
+                module.description =3D "Policy module to make using bluetoo=
+th
+devices out-of-the-box easier"
+        Nombre: module-bluetooth-discover
+                module.description =3D "Detect available Bluetooth daemon a=
+nd
+load the corresponding discovery module"
+                module.description =3D "Detect available BlueZ 5 Bluetooth =
+audio
+devices and load BlueZ 5 Bluetooth audio drivers"
+                module.description =3D "BlueZ 5 Bluetooth audio sink and so=
+urce"
+        Descripci=C3=B3n: Mi Bluetooth Headset Basic
+                bluetooth.protocol =3D "a2dp_sink"
+                device.description =3D "Mi Bluetooth Headset Basic"
+                device.bus =3D "bluetooth"
+                bluez.alias =3D "Mi Bluetooth Headset Basic"
+                device.icon_name =3D "audio-headset-bluetooth"
+        Descripci=C3=B3n: Monitor of Mi Bluetooth Headset Basic
+                device.description =3D "Monitor of Mi Bluetooth Headset Bas=
+ic"
+                device.bus =3D "bluetooth"
+                bluez.alias =3D "Mi Bluetooth Headset Basic"
+                device.icon_name =3D "audio-headset-bluetooth"
+                device.description =3D "Mi Bluetooth Headset Basic"
+                device.bus =3D "bluetooth"
+                bluez.alias =3D "Mi Bluetooth Headset Basic"
+                device.icon_name =3D "audio-headset-bluetooth"
 
-Benjamin
+--------------------------------------
 
---=-/EP9GhlX6OidL7rLeMc8
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+$pacmd list-cards
+index: 3
+        name: <bluez_card.E8_EC_A3_1E_69_88>
+        driver: <module-bluez5-device.c>
+        owner module: 29
+        properties:
+                device.description =3D "Mi Bluetooth Headset Basic"
+                device.string =3D "E8:EC:A3:1E:69:88"
+                device.api =3D "bluez"
+                device.class =3D "sound"
+                device.bus =3D "bluetooth"
+                device.form_factor =3D "headset"
+                bluez.path =3D "/org/bluez/hci0/dev_E8_EC_A3_1E_69_88"
+                bluez.class =3D "0x240404"
+                bluez.alias =3D "Mi Bluetooth Headset Basic"
+                device.icon_name =3D "audio-headset-bluetooth"
+                device.intended_roles =3D "phone"
+        profiles:
+                headset_head_unit: Unidad de auriculares de diadema  (HSP/H=
+FP)
+(priority 30, available: unknown)
+                a2dp_sink: Reproducci=C3=B3n de alta fidelidad (destino A2D=
+P)
+(priority 40, available: unknown)
+                off: Apagado (priority 0, available: yes)
+        active profile: <a2dp_sink>
+        sinks:
+                bluez_sink.E8_EC_A3_1E_69_88.a2dp_sink/#6: Mi Bluetooth Hea=
+dset
+Basic
+        sources:
+                bluez_sink.E8_EC_A3_1E_69_88.a2dp_sink.monitor/#11: Monitor=
+ of
+Mi Bluetooth Headset Basic
+        ports:
+                headset-output: Auriculares (priority 0, latency offset 0 u=
+sec,
+available: unknown)
+                        properties:
 
------BEGIN PGP SIGNATURE-----
+                headset-input: Auriculares (priority 0, latency offset 0 us=
+ec,
+available: unknown)
+                        properties:
 
-iQIzBAABCAAdFiEED2NO4vMS33W8E4AFq6ZWhpmFY3AFAmGDqR4ACgkQq6ZWhpmF
-Y3BychAAhhFMMj35ScIRH8jiPNBevER5QhbsjsRfBPZdYJHdr3TDfKjG//cI1kvT
-DMWMR5b1kqxumDzR1wPDYtBajYDUyfA46Lz1o/BvnGQK+wX2Qn4hzIcjUEfulhgt
-PgEVFhpZcqCFKaPfLDZGWkg2hXDZ6IjIRecsFk0mhb7X/1JbYWET72wCN7fepjwy
-aoMIPR61gzN3D7HOdADtwKTO9KlC68I5/HmUNqGCx/yC2lfaxi3Q/9brYgB14qlA
-UXh0tBWSINli6Ob+Nadbsf5/WiCOTqjaK2QSUkzUOAiNeyvMqzbXe1ld6/9nimNp
-wBiFJqp4shQiKP306GPONPyEgXJT2ncmx4N5db/MAMhm5shI9QMZpa4J6zOCEP/j
-/RNqj+JZBT7UZNhS6pd9jabaBu+EtBLHcsLJzex7Fr7dlRpF4vhwFj2OBtq218hx
-931JK2V3TxT+0iP286yUiVjXLE8xrT1gD5yM8/TA596Dix+Xzdb1h4G65BmQOArE
-iWHKYgim519c0sB7Rw+GUysSs/F+9/Jmdu0XTpOdlAW90UnbFiw9ZzZSmvmRVwFB
-rtZKWHe0M9YMNt+St+lpVKjm68LA94MAXvyrxgRApGu1yfiPfYGkvI1L8K6YCSpC
-SAkbm8kv3tT90wQBWGidn4gI4Ogbzhs8LdFHLebOwwnoTZnebEc=
-=Tora
------END PGP SIGNATURE-----
+--------------------------------------
 
---=-/EP9GhlX6OidL7rLeMc8--
 
+STEPS TO REPRODUCE
+1. Connect device to PC with Bluetooth.
+
+OBSERVED RESULT
+It plays sound but the microphone does not work. The Microphone is not dete=
+cted
+in KDE Plasma.
+
+EXPECTED RESULT
+Audio playback and microphone detection
+
+SOFTWARE/OS VERSIONS
+Operating System: KDE neon 5.23
+KDE Plasma Version: 5.23.2
+KDE Frameworks Version: 5.87.0
+Qt Version: 5.15.3
+Kernel Version: 5.11.0-38-generic (64-bit)
+Graphics Platform: X11
+Processors: 12 =C3=97 Intel=C2=AE Core=E2=84=A2 i7-8750H CPU @ 2.20GHz
+Memory: 15.5 GiB of RAM
+Graphics Processor: NVIDIA GeForce RTX 2060/PCIe/SSE2
+
+
+--------------------------------------
+
+dmesg command get this information:
+
+[ 9507.995592] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9507.995599] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9507.995601] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9508.005618] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9508.005621] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9513.035725] Bluetooth: hci0: SCO packet for unknown connection handle 260
+[ 9519.311014] Bluetooth: hci0: urb 00000000bb9f4530 submission failed (90)
+[ 9519.311038] Bluetooth: hci0: sending frame failed (-90)
+[ 9519.311051] Bluetooth: hci0: urb 00000000bb9f4530 submission failed (90)
+[ 9519.311060] Bluetooth: hci0: sending frame failed (-90)
+[ 9519.321578] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9519.321583] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9519.321584] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9519.331592] Bluetooth: hci0: SCO packet for unknown connection handle 0
+[ 9531.572022] Bluetooth: hci0: SCO packet for unknown connection handle 261
+[ 9531.572036] Bluetooth: hci0: SCO packet for unknown connection handle 261
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
