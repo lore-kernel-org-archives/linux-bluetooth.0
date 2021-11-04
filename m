@@ -2,183 +2,413 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 986C4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 14:21:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BDE16C43219
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 17:26:41 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 81273611C3
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 14:21:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A6CA2610D0
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  4 Nov 2021 17:26:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232241AbhKDOYP (ORCPT
+        id S232397AbhKDR3S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 4 Nov 2021 10:24:15 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41508 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232124AbhKDOYK (ORCPT
+        Thu, 4 Nov 2021 13:29:18 -0400
+Received: from cloudserver094114.home.pl ([79.96.170.134]:58034 "EHLO
+        cloudserver094114.home.pl" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234086AbhKDR3I (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 4 Nov 2021 10:24:10 -0400
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E43E7C061195;
-        Thu,  4 Nov 2021 07:19:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Content-Transfer-Encoding:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-To:Resent-Cc:Resent-Message-ID;
-        bh=WN/ujEcHjPq3/eyCBRPoMjOxpmZhIyjhS0FG0tklxYs=; t=1636035568; x=1637245168; 
-        b=Rfk3fE6jmgfrdntpO8GiIfu6xViU/14LsmrIf6/oXUU3SpeM4uREI4fSYRACdcxxkeNahGqIt5W
-        AQM660hlPspShX6KttKrlQFESP/PHDkSgn8nbPX0x0n/8lS6s895bUCDzZoyiPg2O26IoDLOIhUhc
-        xdcWqlA42D5Rfoy5/RW7KCHLOLYr4gtDQB6m3oXQgfAyYVFiyQYdaZ2K4bVb7IdQGDbA6HCzRsrMQ
-        cnuDZTH8q9MMAHeXRObKKfoqOhj705UeRFzldxY/nPqZowSYDFa7eWiW/GrEwmV6AD48VnBnOYsgg
-        jY6HrjKgvkWpTTrdsdizQGJnakTjk1objwog==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <benjamin@sipsolutions.net>)
-        id 1midaM-00AxDe-D8;
-        Thu, 04 Nov 2021 15:19:22 +0100
-Message-ID: <3f318d3b8b03c6cde8a871e802689fa4e90107be.camel@sipsolutions.net>
-Subject: Re: Userspace enumeration hang while btusb tries to load firmware
- of removed device
-From:   Benjamin Berg <benjamin@sipsolutions.net>
-To:     Alan Stern <stern@rowland.harvard.edu>
-Cc:     Marcel Holtmann <marcel@holtmann.org>, linux-usb@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org
-Date:   Thu, 04 Nov 2021 15:19:20 +0100
-In-Reply-To: <20211104132828.GA1557201@rowland.harvard.edu>
-References: <df021873788acdb64e1311289e9ca6dc3f169616.camel@sipsolutions.net>
-         <20211103182303.GB1529362@rowland.harvard.edu>
-         <BCD95F43-3C6E-4B50-9228-9F2AD93BBBA4@holtmann.org>
-         <fae44c06e8e8d24b21b60a096e7294bc37444b12.camel@sipsolutions.net>
-         <20211104132828.GA1557201@rowland.harvard.edu>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-pu7SQGswM4zvicT9p32a"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Thu, 4 Nov 2021 13:29:08 -0400
+Received: from localhost (127.0.0.1) (HELO v370.home.net.pl)
+ by /usr/run/smtp (/usr/run/postfix/private/idea_relay_lmtp) via UNIX with SMTP (IdeaSmtpServer 3.0.0)
+ id ed74e2e5bd630b5f; Thu, 4 Nov 2021 18:26:28 +0100
+Received: from kreacher.localnet (unknown [213.134.162.27])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        by v370.home.net.pl (Postfix) with ESMTPSA id BF3BB663097;
+        Thu,  4 Nov 2021 18:26:27 +0100 (CET)
+From:   "Rafael J. Wysocki" <rjw@rjwysocki.net>
+To:     Linux PM <linux-pm@vger.kernel.org>
+Cc:     LKML <linux-kernel@vger.kernel.org>,
+        Ulf Hansson <ulf.hansson@linaro.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        linux-bluetooth@vger.kernel.org,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Subject: [PATCH] PM: sleep: Avoid calling put_device() under dpm_list_mtx
+Date:   Thu, 04 Nov 2021 18:26:26 +0100
+Message-ID: <4693240.31r3eYUQgx@kreacher>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-malware-bazaar-2: OK
+Content-Transfer-Encoding: 7Bit
+Content-Type: text/plain; charset="UTF-8"
+X-CLIENT-IP: 213.134.162.27
+X-CLIENT-HOSTNAME: 213.134.162.27
+X-VADE-SPAMSTATE: clean
+X-VADE-SPAMCAUSE: gggruggvucftvghtrhhoucdtuddrgedvuddrtdeggdelhecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfjqffogffrnfdpggftiffpkfenuceurghilhhouhhtmecuudehtdenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvufffkfgggfgtsehtufertddttdejnecuhfhrohhmpedftfgrfhgrvghlucflrdcuhgihshhotghkihdfuceorhhjfiesrhhjfiihshhotghkihdrnhgvtheqnecuggftrfgrthhtvghrnhephfegtdffjeehkeegleejveevtdeugfffieeijeduuddtkefgjedvheeujeejtedvnecukfhppedvudefrddufeegrdduiedvrddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvudefrddufeegrdduiedvrddvjedphhgvlhhopehkrhgvrggthhgvrhdrlhhotggrlhhnvghtpdhmrghilhhfrhhomhepfdftrghfrggvlhculfdrucghhihsohgtkhhifdcuoehrjhifsehrjhifhihsohgtkhhirdhnvghtqedprhgtphhtthhopehlihhnuhigqdhpmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehulhhfrdhhrghnshhsohhnsehlihhnrghrohdrohhrghdprhgtphhtthhopehsthgvrhhnsehrohiflhgrnhgurdhhrghrvhgrrhgurdgvughupdhrtghpthhtoheplhhinhhugidqsghluhgvthhoohht
+ hhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehmrghrtggvlheshhholhhtmhgrnhhnrdhorhhgpdhrtghpthhtohepjhhohhgrnhdrhhgvuggsvghrghesghhmrghilhdrtghomhdprhgtphhtthhopehluhhiiidruggvnhhtiiesghhmrghilhdrtghomh
+X-DCC--Metrics: v370.home.net.pl 1024; Body=8 Fuz1=8 Fuz2=8
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+From: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
 
---=-pu7SQGswM4zvicT9p32a
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+It is generally unsafe to call put_device() with dpm_list_mtx held,
+because the given device's release routine may carry out an action
+depending on that lock which then may deadlock, so modify the
+system-wide suspend and resume of devices to always drop dpm_list_mtx
+before calling put_device() (and adjust white space somewhat while
+at it).
 
-On Thu, 2021-11-04 at 09:28 -0400, Alan Stern wrote:
-> On Thu, Nov 04, 2021 at 10:34:22AM +0100, Benjamin Berg wrote:
-> > Hi Marcel and Alan,
-> >=20
-> > On Wed, 2021-11-03 at 20:31 +0100, Marcel Holtmann wrote:
-> > > > I'm not familiar with the btusb driver, so someone on the=20
-> > > > linux-bluetooth mailing list would have a better idea about this.=
-=20
-> > > > However, it does look as though btusb keeps the device locked durin=
-g the=20
-> > > > entire 10-second period while it tries to send over the firmware, a=
-nd it=20
-> > > > doesn't abort the procedure when it starts getting disconnection er=
-rors=20
-> > > > but instead persists until a timeout expires.  Keeping the device l=
-ocked=20
-> > > > would certainly block lsusb.
-> > > >=20
-> > > > In general, locking the device during a firmware upload seems like
-> > > > the right thing to do -- you don't want extraneous transfers from
-> > > > other processes messing up the firmware!  So overall, it appears th=
-at
-> > > > the whole problem would be solved if the firmware transfer were
-> > > > aborted as soon as the -ENODEV errors start appearing.
-> > >=20
-> > > the problem seems to be that we hitting HCI command timeout. So the
-> > > firmware download is done via HCI commands. These commands are send
-> > > to the transport driver btusb.c via hdev->send (as btusb_send_frame).
-> > > This triggers the usb_submit_urb or queues them via data->deferred
-> > > anchor. All this reports back the error properly except that nobody
-> > > does anything with it.
-> > >=20
-> > > See hci_send_frame() last portion:
-> > >=20
-> > >         err =3D hdev->send(hdev, skb);                               =
-             =20
-> > >         if (err < 0) {                                               =
-           =20
-> > >                 bt_dev_err(hdev, "sending frame failed (%d)", err);  =
-           =20
-> > >                 kfree_skb(skb);                                      =
-           =20
-> > >         }
-> > >=20
-> > > And that is it. We are not checking for ENODEV or any error here.
-> > > That means the failure of the HCI command gets only caught via the
-> > > HCI command timeout. I don=E2=80=99t know how to do this yet, but you=
- would
-> > > have to look there to fail HCI command right away instead of waiting
-> > > for the timeout.
-> >=20
-> > Hmm, true, I don't see a "sending frame failed" error message during
-> > the firmware download though.
->=20
-> It is in the log you posted:
->=20
-> [Mi Nov 3 11:55:23 2021] Bluetooth: hci0: Failed to send firmware data (-=
-110)
-> [Mi Nov 3 11:55:23 2021] Bluetooth: hci0: sending frame failed (-19)
->=20
-> But this occurred after the timeout, so maybe you had in mind something=
-=20
-> occurring earlier.
+For instance, this prevents the following splat from showing up in
+the kernel log after a system resume in certain configurations:
 
-Yep, that one happens when the driver tries to reset the device. We
-need to catch the error earlier in order to avoid the 10s wait.
+[ 3290.969514] ======================================================
+[ 3290.969517] WARNING: possible circular locking dependency detected
+[ 3290.969519] 5.15.0+ #2420 Tainted: G S               
+[ 3290.969523] ------------------------------------------------------
+[ 3290.969525] systemd-sleep/4553 is trying to acquire lock:
+[ 3290.969529] ffff888117ab1138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: flush_workqueue+0x87/0x4a0
+[ 3290.969554] 
+               but task is already holding lock:
+[ 3290.969556] ffffffff8280fca8 (dpm_list_mtx){+.+.}-{3:3}, at: dpm_resume+0x12e/0x3e0
+[ 3290.969571] 
+               which lock already depends on the new lock.
 
-> >  You are right that this codepath is
-> > loosing the error, but this does not seem to be the scenario we are
-> > running into while loading the firmware. This error only happens later
-> > on from the btintel_reset_to_bootloader function.
-> >=20
-> > What seems to happen in the posted log is that the URB is initially
-> > submitted just fine and the transfer errors out afterwards.
-> > Unfortunately, the btusb_tx_complete is only used for statistics
-> > (stat.err_tx is increased) and has no further error handling that could
-> > abort the firmware upload.
->=20
-> While detecting the errors during URB completion would be nice, it isn't=
-=20
-> necessary.  Things would work just as well if the disconnect error were=
-=20
-> detected during submission of the following URB.
+[ 3290.969573] 
+               the existing dependency chain (in reverse order) is:
+[ 3290.969575] 
+               -> #3 (dpm_list_mtx){+.+.}-{3:3}:
+[ 3290.969583]        __mutex_lock+0x9d/0xa30
+[ 3290.969591]        device_pm_add+0x2e/0xe0
+[ 3290.969597]        device_add+0x4d5/0x8f0
+[ 3290.969605]        hci_conn_add_sysfs+0x43/0xb0 [bluetooth]
+[ 3290.969689]        hci_conn_complete_evt.isra.71+0x124/0x750 [bluetooth]
+[ 3290.969747]        hci_event_packet+0xd6c/0x28a0 [bluetooth]
+[ 3290.969798]        hci_rx_work+0x213/0x640 [bluetooth]
+[ 3290.969842]        process_one_work+0x2aa/0x650
+[ 3290.969851]        worker_thread+0x39/0x400
+[ 3290.969859]        kthread+0x142/0x170
+[ 3290.969865]        ret_from_fork+0x22/0x30
+[ 3290.969872] 
+               -> #2 (&hdev->lock){+.+.}-{3:3}:
+[ 3290.969881]        __mutex_lock+0x9d/0xa30
+[ 3290.969887]        hci_event_packet+0xba/0x28a0 [bluetooth]
+[ 3290.969935]        hci_rx_work+0x213/0x640 [bluetooth]
+[ 3290.969978]        process_one_work+0x2aa/0x650
+[ 3290.969985]        worker_thread+0x39/0x400
+[ 3290.969993]        kthread+0x142/0x170
+[ 3290.969999]        ret_from_fork+0x22/0x30
+[ 3290.970004] 
+               -> #1 ((work_completion)(&hdev->rx_work)){+.+.}-{0:0}:
+[ 3290.970013]        process_one_work+0x27d/0x650
+[ 3290.970020]        worker_thread+0x39/0x400
+[ 3290.970028]        kthread+0x142/0x170
+[ 3290.970033]        ret_from_fork+0x22/0x30
+[ 3290.970038] 
+               -> #0 ((wq_completion)hci0#2){+.+.}-{0:0}:
+[ 3290.970047]        __lock_acquire+0x15cb/0x1b50
+[ 3290.970054]        lock_acquire+0x26c/0x300
+[ 3290.970059]        flush_workqueue+0xae/0x4a0
+[ 3290.970066]        drain_workqueue+0xa1/0x130
+[ 3290.970073]        destroy_workqueue+0x34/0x1f0
+[ 3290.970081]        hci_release_dev+0x49/0x180 [bluetooth]
+[ 3290.970130]        bt_host_release+0x1d/0x30 [bluetooth]
+[ 3290.970195]        device_release+0x33/0x90
+[ 3290.970201]        kobject_release+0x63/0x160
+[ 3290.970211]        dpm_resume+0x164/0x3e0
+[ 3290.970215]        dpm_resume_end+0xd/0x20
+[ 3290.970220]        suspend_devices_and_enter+0x1a4/0xba0
+[ 3290.970229]        pm_suspend+0x26b/0x310
+[ 3290.970236]        state_store+0x42/0x90
+[ 3290.970243]        kernfs_fop_write_iter+0x135/0x1b0
+[ 3290.970251]        new_sync_write+0x125/0x1c0
+[ 3290.970257]        vfs_write+0x360/0x3c0
+[ 3290.970263]        ksys_write+0xa7/0xe0
+[ 3290.970269]        do_syscall_64+0x3a/0x80
+[ 3290.970276]        entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 3290.970284] 
+               other info that might help us debug this:
 
-Ah, good point. The in-flight interrupt URB responsible of retrieving
-the event from the device will fail. It should be sufficient to inject
-a hardware error event at that point in order to fix this.
+[ 3290.970285] Chain exists of:
+                 (wq_completion)hci0#2 --> &hdev->lock --> dpm_list_mtx
 
-As such, a simple solution may be to call hci_reset_dev from inside
-btusb_intr_complete and btusb_submit_intr_urb when the URB submission
-fails (for "err !=3D -EPERM").
+[ 3290.970297]  Possible unsafe locking scenario:
 
-Benjamin
+[ 3290.970299]        CPU0                    CPU1
+[ 3290.970300]        ----                    ----
+[ 3290.970302]   lock(dpm_list_mtx);
+[ 3290.970306]                                lock(&hdev->lock);
+[ 3290.970310]                                lock(dpm_list_mtx);
+[ 3290.970314]   lock((wq_completion)hci0#2);
+[ 3290.970319] 
+                *** DEADLOCK ***
 
---=-pu7SQGswM4zvicT9p32a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
+[ 3290.970321] 7 locks held by systemd-sleep/4553:
+[ 3290.970325]  #0: ffff888103bcd448 (sb_writers#4){.+.+}-{0:0}, at: ksys_write+0xa7/0xe0
+[ 3290.970341]  #1: ffff888115a14488 (&of->mutex){+.+.}-{3:3}, at: kernfs_fop_write_iter+0x103/0x1b0
+[ 3290.970355]  #2: ffff888100f719e0 (kn->active#233){.+.+}-{0:0}, at: kernfs_fop_write_iter+0x10c/0x1b0
+[ 3290.970369]  #3: ffffffff82661048 (autosleep_lock){+.+.}-{3:3}, at: state_store+0x12/0x90
+[ 3290.970384]  #4: ffffffff82658ac8 (system_transition_mutex){+.+.}-{3:3}, at: pm_suspend+0x9f/0x310
+[ 3290.970399]  #5: ffffffff827f2a48 (acpi_scan_lock){+.+.}-{3:3}, at: acpi_suspend_begin+0x4c/0x80
+[ 3290.970416]  #6: ffffffff8280fca8 (dpm_list_mtx){+.+.}-{3:3}, at: dpm_resume+0x12e/0x3e0
+[ 3290.970428] 
+               stack backtrace:
+[ 3290.970431] CPU: 3 PID: 4553 Comm: systemd-sleep Tainted: G S                5.15.0+ #2420
+[ 3290.970438] Hardware name: Dell Inc. XPS 13 9380/0RYJWW, BIOS 1.5.0 06/03/2019
+[ 3290.970441] Call Trace:
+[ 3290.970446]  dump_stack_lvl+0x44/0x57
+[ 3290.970454]  check_noncircular+0x105/0x120
+[ 3290.970468]  ? __lock_acquire+0x15cb/0x1b50
+[ 3290.970474]  __lock_acquire+0x15cb/0x1b50
+[ 3290.970487]  lock_acquire+0x26c/0x300
+[ 3290.970493]  ? flush_workqueue+0x87/0x4a0
+[ 3290.970503]  ? __raw_spin_lock_init+0x3b/0x60
+[ 3290.970510]  ? lockdep_init_map_type+0x58/0x240
+[ 3290.970519]  flush_workqueue+0xae/0x4a0
+[ 3290.970526]  ? flush_workqueue+0x87/0x4a0
+[ 3290.970544]  ? drain_workqueue+0xa1/0x130
+[ 3290.970552]  drain_workqueue+0xa1/0x130
+[ 3290.970561]  destroy_workqueue+0x34/0x1f0
+[ 3290.970572]  hci_release_dev+0x49/0x180 [bluetooth]
+[ 3290.970624]  bt_host_release+0x1d/0x30 [bluetooth]
+[ 3290.970687]  device_release+0x33/0x90
+[ 3290.970695]  kobject_release+0x63/0x160
+[ 3290.970705]  dpm_resume+0x164/0x3e0
+[ 3290.970710]  ? dpm_resume_early+0x251/0x3b0
+[ 3290.970718]  dpm_resume_end+0xd/0x20
+[ 3290.970723]  suspend_devices_and_enter+0x1a4/0xba0
+[ 3290.970737]  pm_suspend+0x26b/0x310
+[ 3290.970746]  state_store+0x42/0x90
+[ 3290.970755]  kernfs_fop_write_iter+0x135/0x1b0
+[ 3290.970764]  new_sync_write+0x125/0x1c0
+[ 3290.970777]  vfs_write+0x360/0x3c0
+[ 3290.970785]  ksys_write+0xa7/0xe0
+[ 3290.970794]  do_syscall_64+0x3a/0x80
+[ 3290.970803]  entry_SYSCALL_64_after_hwframe+0x44/0xae
+[ 3290.970811] RIP: 0033:0x7f41b1328164
+[ 3290.970819] Code: 00 f7 d8 64 89 02 48 c7 c0 ff ff ff ff eb b7 0f 1f 80 00 00 00 00 8b 05 4a d2 2c 00 48 63 ff 85 c0 75 13 b8 01 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 54 f3 c3 66 90 55 53 48 89 d5 48 89 f3 48 83
+[ 3290.970824] RSP: 002b:00007ffe6ae21b28 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+[ 3290.970831] RAX: ffffffffffffffda RBX: 0000000000000004 RCX: 00007f41b1328164
+[ 3290.970836] RDX: 0000000000000004 RSI: 000055965e651070 RDI: 0000000000000004
+[ 3290.970839] RBP: 000055965e651070 R08: 000055965e64f390 R09: 00007f41b1e3d1c0
+[ 3290.970843] R10: 000000000000000a R11: 0000000000000246 R12: 0000000000000004
+[ 3290.970846] R13: 0000000000000001 R14: 000055965e64f2b0 R15: 0000000000000004
 
------BEGIN PGP SIGNATURE-----
+Cc: All applicable <stable@vger.kernel.org>
+Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+---
+ drivers/base/power/main.c |   84 +++++++++++++++++++++++++++++++---------------
+ 1 file changed, 57 insertions(+), 27 deletions(-)
 
-iQIzBAABCAAdFiEED2NO4vMS33W8E4AFq6ZWhpmFY3AFAmGD6+gACgkQq6ZWhpmF
-Y3AkQhAAzRq4lXZtxK94NtTtW9Ttz29oPk7qz6F+KCukh2FnOXbWUGe9RoymEDto
-fukQ7nbAtR13+oEQS7kxgFLzlKug8eYAAm4Zl33n1tHaEj/XZFXnwLhEUsInre0w
-Mo8OQ+WveebOtyrfSSaFH/kTVqr0Vjin6bcSZs/A3rQCgJVDuiU2l4qf41FhKSEk
-H2U7xtvq8vEjrXNMLjb3amaHBkt1SP3pDulf6vSd7ZmLoVrql8g2668634oiMM0R
-iLkS+b6zqOwy+p6BLP8QNzCDAQ2tdTuQuAD/6WJyoHqDAyw847mfmMOTxEhJqi7w
-yMz/EIBrlJItc2eL+jNRdlmEnvXZEIo8Jhgu8mR+dzAr4IK6F1aebhz7xC60tVDF
-qqyvneRxKxae8TvRvJX4Krm0QyDzSPRmsiVjOC548MauIr5V0SPsMFCiULM1GiBC
-a3U2JuW0vkCtO6gh1c50PUbDxv89LC+EogTf7fCEIuYLvW8J9rtnXJgm8XMlmHZe
-C3w5jOIK1PWKaQg4ZjpNe2XSB411SfPLc/bhzpKrAsMVzPMRmwsB3rrZ+yKSfJYQ
-wFeVK1SSzksWNdakTGuQUCPJeGFxdHzgcG+6eH0Tjn2EsmjeQfM43aiOnSORM90W
-LUMuFq6XxxlTaGTDMV4XUl36e88SnXl8JehB4OQJJvTzhIrcVsM=
-=WDUA
------END PGP SIGNATURE-----
+Index: linux-pm/drivers/base/power/main.c
+===================================================================
+--- linux-pm.orig/drivers/base/power/main.c
++++ linux-pm/drivers/base/power/main.c
+@@ -710,6 +710,7 @@ static void dpm_noirq_resume_devices(pm_
+ 		dev = to_device(dpm_noirq_list.next);
+ 		get_device(dev);
+ 		list_move_tail(&dev->power.entry, &dpm_late_early_list);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		if (!is_async(dev)) {
+@@ -724,8 +725,9 @@ static void dpm_noirq_resume_devices(pm_
+ 			}
+ 		}
+ 
+-		mutex_lock(&dpm_list_mtx);
+ 		put_device(dev);
++
++		mutex_lock(&dpm_list_mtx);
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+ 	async_synchronize_full();
+@@ -849,6 +851,7 @@ void dpm_resume_early(pm_message_t state
+ 		dev = to_device(dpm_late_early_list.next);
+ 		get_device(dev);
+ 		list_move_tail(&dev->power.entry, &dpm_suspended_list);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		if (!is_async(dev)) {
+@@ -862,8 +865,10 @@ void dpm_resume_early(pm_message_t state
+ 				pm_dev_err(dev, state, " early", error);
+ 			}
+ 		}
+-		mutex_lock(&dpm_list_mtx);
++
+ 		put_device(dev);
++
++		mutex_lock(&dpm_list_mtx);
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+ 	async_synchronize_full();
+@@ -1026,7 +1031,12 @@ void dpm_resume(pm_message_t state)
+ 		}
+ 		if (!list_empty(&dev->power.entry))
+ 			list_move_tail(&dev->power.entry, &dpm_prepared_list);
++
++		mutex_unlock(&dpm_list_mtx);
++
+ 		put_device(dev);
++
++		mutex_lock(&dpm_list_mtx);
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+ 	async_synchronize_full();
+@@ -1104,14 +1114,16 @@ void dpm_complete(pm_message_t state)
+ 		get_device(dev);
+ 		dev->power.is_prepared = false;
+ 		list_move(&dev->power.entry, &list);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		trace_device_pm_callback_start(dev, "", state.event);
+ 		device_complete(dev, state);
+ 		trace_device_pm_callback_end(dev, 0);
+ 
+-		mutex_lock(&dpm_list_mtx);
+ 		put_device(dev);
++
++		mutex_lock(&dpm_list_mtx);
+ 	}
+ 	list_splice(&list, &dpm_list);
+ 	mutex_unlock(&dpm_list_mtx);
+@@ -1296,17 +1308,21 @@ static int dpm_noirq_suspend_devices(pm_
+ 		error = device_suspend_noirq(dev);
+ 
+ 		mutex_lock(&dpm_list_mtx);
++
+ 		if (error) {
+ 			pm_dev_err(dev, state, " noirq", error);
+ 			dpm_save_failed_dev(dev_name(dev));
+-			put_device(dev);
+-			break;
+-		}
+-		if (!list_empty(&dev->power.entry))
++		} else if (!list_empty(&dev->power.entry)) {
+ 			list_move(&dev->power.entry, &dpm_noirq_list);
++		}
++
++		mutex_unlock(&dpm_list_mtx);
++
+ 		put_device(dev);
+ 
+-		if (async_error)
++		mutex_lock(&dpm_list_mtx);
++
++		if (error || async_error)
+ 			break;
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+@@ -1471,23 +1487,28 @@ int dpm_suspend_late(pm_message_t state)
+ 		struct device *dev = to_device(dpm_suspended_list.prev);
+ 
+ 		get_device(dev);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		error = device_suspend_late(dev);
+ 
+ 		mutex_lock(&dpm_list_mtx);
++
+ 		if (!list_empty(&dev->power.entry))
+ 			list_move(&dev->power.entry, &dpm_late_early_list);
+ 
+ 		if (error) {
+ 			pm_dev_err(dev, state, " late", error);
+ 			dpm_save_failed_dev(dev_name(dev));
+-			put_device(dev);
+-			break;
+ 		}
++
++		mutex_unlock(&dpm_list_mtx);
++
+ 		put_device(dev);
+ 
+-		if (async_error)
++		mutex_lock(&dpm_list_mtx);
++
++		if (error || async_error)
+ 			break;
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+@@ -1747,21 +1768,27 @@ int dpm_suspend(pm_message_t state)
+ 		struct device *dev = to_device(dpm_prepared_list.prev);
+ 
+ 		get_device(dev);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		error = device_suspend(dev);
+ 
+ 		mutex_lock(&dpm_list_mtx);
++
+ 		if (error) {
+ 			pm_dev_err(dev, state, "", error);
+ 			dpm_save_failed_dev(dev_name(dev));
+-			put_device(dev);
+-			break;
+-		}
+-		if (!list_empty(&dev->power.entry))
++		} else if (!list_empty(&dev->power.entry)) {
+ 			list_move(&dev->power.entry, &dpm_suspended_list);
++		}
++
++		mutex_unlock(&dpm_list_mtx);
++
+ 		put_device(dev);
+-		if (async_error)
++
++		mutex_lock(&dpm_list_mtx);
++
++		if (error || async_error)
+ 			break;
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+@@ -1878,6 +1905,7 @@ int dpm_prepare(pm_message_t state)
+ 		struct device *dev = to_device(dpm_list.next);
+ 
+ 		get_device(dev);
++
+ 		mutex_unlock(&dpm_list_mtx);
+ 
+ 		trace_device_pm_callback_start(dev, "", state.event);
+@@ -1885,21 +1913,23 @@ int dpm_prepare(pm_message_t state)
+ 		trace_device_pm_callback_end(dev, error);
+ 
+ 		mutex_lock(&dpm_list_mtx);
+-		if (error) {
+-			if (error == -EAGAIN) {
+-				put_device(dev);
+-				error = 0;
+-				continue;
+-			}
++
++		if (!error) {
++			dev->power.is_prepared = true;
++			if (!list_empty(&dev->power.entry))
++				list_move_tail(&dev->power.entry, &dpm_prepared_list);
++		} else if (error == -EAGAIN) {
++			error = 0;
++		} else {
+ 			dev_info(dev, "not prepared for power transition: code %d\n",
+ 				 error);
+-			put_device(dev);
+-			break;
+ 		}
+-		dev->power.is_prepared = true;
+-		if (!list_empty(&dev->power.entry))
+-			list_move_tail(&dev->power.entry, &dpm_prepared_list);
++
++		mutex_unlock(&dpm_list_mtx);
++
+ 		put_device(dev);
++
++		mutex_lock(&dpm_list_mtx);
+ 	}
+ 	mutex_unlock(&dpm_list_mtx);
+ 	trace_suspend_resume(TPS("dpm_prepare"), state.event, false);
 
---=-pu7SQGswM4zvicT9p32a--
+
 
