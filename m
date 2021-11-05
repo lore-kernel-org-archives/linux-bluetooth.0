@@ -2,63 +2,65 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12EC5C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Nov 2021 22:27:43 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 71ADEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Nov 2021 22:27:44 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E80196112D
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Nov 2021 22:27:42 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 4FF5B60EE9
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  5 Nov 2021 22:27:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233380AbhKEWaW (ORCPT
+        id S233416AbhKEWaX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 5 Nov 2021 18:30:22 -0400
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50500 "EHLO
+        Fri, 5 Nov 2021 18:30:23 -0400
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50506 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230498AbhKEWaV (ORCPT
+        with ESMTP id S230498AbhKEWaW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 5 Nov 2021 18:30:21 -0400
-Received: from mail-pj1-x1030.google.com (mail-pj1-x1030.google.com [IPv6:2607:f8b0:4864:20::1030])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 597F1C061570
-        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Nov 2021 15:27:41 -0700 (PDT)
-Received: by mail-pj1-x1030.google.com with SMTP id x16-20020a17090a789000b001a69735b339so4340750pjk.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Nov 2021 15:27:41 -0700 (PDT)
+        Fri, 5 Nov 2021 18:30:22 -0400
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D5E7C061570
+        for <linux-bluetooth@vger.kernel.org>; Fri,  5 Nov 2021 15:27:42 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id r5so11963399pls.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 05 Nov 2021 15:27:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
+        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=GXh6LcS8WuM/Nwc8Y03F4QEMAbQojxTk3+OuikepvHY=;
-        b=DnVix+6uvn02irV3C14RRJmMPY7AgRPkO2brsTMAj0SLdMHta2SjYV/s34Ky0Gqt4M
-         5qQ06S3JqwC0q2Etk6WM4fF38v3Ll84pQWzfFQhKPJ1dSLL6hRQvSUqi9HTyJ7JqyA58
-         AlAuUlqcHU2L8pz3+cFSnjdkVv7lkb7fYSS/YGZc+5HZwWqe1/c/zUoSWH1pg0zJi1P5
-         rmN7DTWDLya1aNYGuQ+R7xRkcxSN1TDmvxo+7HbFU9IpFXgef4HfxPtaDsuwr2mSPCBB
-         9KONlfdpxt5s7JT8HITI/bQQ7Me8iOKrAN3q5zEUvkdHFayvzBwhr4+DHZc+xpBqUeYp
-         /I4g==
+        bh=wXT0AE6KNJe4yO+T+2zaKcXRVTLor83ZdZ3JBqCmjHY=;
+        b=T8HWe7lPxz5avy9M36xfGCoL9sWFYPC7g4d3kTDLl/f4Dk5ltfM8kNCBNgXX5hlIr+
+         N+Jvv8YK+j5eykp3mvPsJi4LB3iLDkDb/gMAZ6+upKjlAZRPnbEMstS+B51zGr5U2GEr
+         xqA+4MSqA9eJ8iy8hJgmXtkSOOKdb2kaUcw1/9oksWZelkT9NE4ZXDx3wvHts0dV/CMS
+         iRrl+ZyjKXEic7fo6PDTG44H+CM9hd1mmN5Nd2VfuXbEzK1DddPo4HXZRMHeJ8DH1cdb
+         P+i22+xnJZ1GarSZcUjh+gyP8LMIZGPKMuHPTXvUeCFo9v4bplMJxel+ih4AkPSqWhRU
+         Z5Qg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=GXh6LcS8WuM/Nwc8Y03F4QEMAbQojxTk3+OuikepvHY=;
-        b=B/s4cj0xQobPv3ewhRqPlt2hjrM0qJ09sIVtiKU6Dy3xyx8xD0rN07fCXwCFhjR8TC
-         u5tTYooWv5ps0JDO4DdKmeGTpKow+2fNo84ybAaKXZlUxtrdfUxrx/8DPnnt5wKSU1El
-         CD+Q5jXlKaevIj9M9rzyV+sOMpO4Fnvgr+KJIG8yk6j+4KAJF6SYC7LPierPGkAyCt3r
-         eacp+Z5HCJTVhjmqUzKeCd93x9cqHoGuxUy7mO1WG9g9b/dKCPdfGQkdFOCNGWfUgAfC
-         iDD62AP4y7kraQAkyQ5hSoD7vBhXVK3rYOvX5UzhVCbh/m/ryeEoIfeLyGv+jLAjxhKA
-         xCkA==
-X-Gm-Message-State: AOAM530FyLjqJKH0HKSHo0jV5SfqdL9ysA4TKT7bUTkgu1RBq/qJrj5R
-        02/JeEDN1/lTw7usui7EVCM8jl6tXNY=
-X-Google-Smtp-Source: ABdhPJwdcC16IXXpUk6MAVbeOMdbIDjuaC0HTQVWeWeLb6vtFNinymY2T4swpKauO1EeFgfNNM4CFw==
-X-Received: by 2002:a17:90b:38c1:: with SMTP id nn1mr33050552pjb.91.1636151260546;
-        Fri, 05 Nov 2021 15:27:40 -0700 (PDT)
+        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=wXT0AE6KNJe4yO+T+2zaKcXRVTLor83ZdZ3JBqCmjHY=;
+        b=abuPU8Vtt5FI7J8OLnnIgjiYgPcbqMSU/h8VAp5R6yzCbI4shrbqILG1VeQfjuCgYT
+         neYrU8bIuXjFAr5+pQUbk4xoxucDCFw/HQvb2x4CWKXCIGpxQbkTOaHusOBIyaFiD7rb
+         JDhIYDhhnIiz0sBx1m7zeP2okagtx4oEv5W/K/Kc557eO+XufytjTb/9Q/+QwEAytfh2
+         vu3bhEg4ZqMMNSrLU2GAjuDsgli+Snb8d7F0QwyLYt5aUaJp+Rxls0/5XvZ0rv4Xz2GQ
+         dpn9BopONVMms/Z6apzzZS+eR2fPUgtqpam7/rg49kyQcoW+5eYafJtUN0d9oQB4IiM2
+         a4XQ==
+X-Gm-Message-State: AOAM5339EANv8qmM0ZTuSnoZzM97+wpN5K0jVHwHc2gXxXlMKymcNwru
+        w8bXgCTcq7o84XdZ7DJ6U70icYMMEJs=
+X-Google-Smtp-Source: ABdhPJyBeMygm1GmJW8di9jkkbbd4BL59KvVKUaMBgywCpqqawhUY2L7p6r5lDUchsq2kneu4zgRAg==
+X-Received: by 2002:a17:90a:fe84:: with SMTP id co4mr33099983pjb.211.1636151261485;
+        Fri, 05 Nov 2021 15:27:41 -0700 (PDT)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id m22sm8027683pfo.71.2021.11.05.15.27.39
+        by smtp.gmail.com with ESMTPSA id m22sm8027683pfo.71.2021.11.05.15.27.40
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Fri, 05 Nov 2021 15:27:40 -0700 (PDT)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 1/2] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY device flag
-Date:   Fri,  5 Nov 2021 15:27:38 -0700
-Message-Id: <20211105222739.461398-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/2] Bluetooth: hci_sync: Set Privacy Mode when updating the resolving list
+Date:   Fri,  5 Nov 2021 15:27:39 -0700
+Message-Id: <20211105222739.461398-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.31.1
+In-Reply-To: <20211105222739.461398-1-luiz.dentz@gmail.com>
+References: <20211105222739.461398-1-luiz.dentz@gmail.com>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
@@ -67,104 +69,181 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
-userspace to indicate to the controller to use Device Privacy Mode to a
-specific device.
+This adds support for Set Privacy Mode when updating the resolving list
+when HCI_CONN_FLAG_DEVICE_PRIVACY so the controller shall use Device
+Mode for devices programmed in the resolving list, Device Mode is
+actually required when the remote device are not able to use RPA as
+otherwise the default mode is Network Privacy Mode in which only
+allows RPAs thus the controller would filter out advertisement using
+identity addresses for which there is an IRK.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
-v2: Fix marking Device Privacy Flag even when adapter is not capable of
-handling Set Privacy Mode.
+ include/net/bluetooth/hci.h      | 10 ++++++
+ include/net/bluetooth/hci_core.h |  1 +
+ net/bluetooth/hci_event.c        | 29 +++++++++++++++++
+ net/bluetooth/hci_sync.c         | 53 ++++++++++++++++++++++++++++----
+ 4 files changed, 87 insertions(+), 6 deletions(-)
 
- include/net/bluetooth/hci_core.h |  4 ++++
- net/bluetooth/mgmt.c             | 24 ++++++++++++++++++++----
- 2 files changed, 24 insertions(+), 4 deletions(-)
-
+diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
+index 63065bc01b76..979da5179ff4 100644
+--- a/include/net/bluetooth/hci.h
++++ b/include/net/bluetooth/hci.h
+@@ -1930,6 +1930,16 @@ struct hci_rp_le_read_transmit_power {
+ 	__s8  max_le_tx_power;
+ } __packed;
+ 
++#define HCI_NETWORK_PRIVACY		0x00
++#define HCI_DEVICE_PRIVACY		0x01
++
++#define HCI_OP_LE_SET_PRIVACY_MODE	0x204e
++struct hci_cp_le_set_privacy_mode {
++	__u8  bdaddr_type;
++	bdaddr_t  bdaddr;
++	__u8  mode;
++} __packed;
++
+ #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
+ struct hci_rp_le_read_buffer_size_v2 {
+ 	__u8    status;
 diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index b5f061882c10..07d2d099dc2a 100644
+index 07d2d099dc2a..cb5684da3ed4 100644
 --- a/include/net/bluetooth/hci_core.h
 +++ b/include/net/bluetooth/hci_core.h
-@@ -160,6 +160,7 @@ struct bdaddr_list_with_flags {
+@@ -758,6 +758,7 @@ struct hci_conn_params {
  
- enum hci_conn_flags {
- 	HCI_CONN_FLAG_REMOTE_WAKEUP,
-+	HCI_CONN_FLAG_DEVICE_PRIVACY,
- 	HCI_CONN_FLAG_MAX
+ 	struct hci_conn *conn;
+ 	bool explicit_connect;
++	uint8_t privacy_mode;
+ 	u32 current_flags;
  };
  
-@@ -1468,6 +1469,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
- #define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
- 			     hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY))
- 
-+#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
-+				   (hdev->commands[39] & 0x04))
-+
- /* Use enhanced synchronous connection if command is supported */
- #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
- 
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 06384d761928..8a8376d32be3 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -4350,7 +4350,16 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
- 			       MGMT_STATUS_NOT_SUPPORTED);
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index d4b75a6cfeee..9cadc543abcb 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -1300,6 +1300,31 @@ static void hci_cc_le_read_transmit_power(struct hci_dev *hdev,
+ 	hdev->max_le_tx_power = rp->max_le_tx_power;
  }
  
--#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
-+static u32 supported_device_flags(struct hci_dev *hdev)
++static void hci_cc_le_set_privacy_mode(struct hci_dev *hdev,
++				       struct sk_buff *skb)
 +{
-+	u32 flags = BIT(HCI_CONN_FLAG_MAX) - 1;
++	__u8 status = *((__u8 *)skb->data);
++	struct hci_cp_le_set_privacy_mode *cp;
++	struct hci_conn_params *params;
 +
-+	/* Check if Privacy Mode can be set */
-+	if (!privacy_mode_capable(hdev))
-+		flags &= ~BIT(HCI_CONN_FLAG_DEVICE_PRIVACY);
++	bt_dev_dbg(hdev, "status 0x%2.2x", status);
 +
-+	return flags;
++	if (status)
++		return;
++
++	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_PRIVACY_MODE);
++	if (!cp)
++		return;
++
++	hci_dev_lock(hdev);
++
++	params = hci_conn_params_lookup(hdev, &cp->bdaddr, cp->bdaddr_type);
++	if (params)
++		params->privacy_mode = cp->mode;
++
++	hci_dev_unlock(hdev);
 +}
- 
- static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 			    u16 data_len)
-@@ -4359,7 +4368,7 @@ static int get_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct mgmt_rp_get_device_flags rp;
- 	struct bdaddr_list_with_flags *br_params;
- 	struct hci_conn_params *params;
--	u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
-+	u32 supported_flags = supported_device_flags(hdev);
- 	u32 current_flags = 0;
- 	u8 status = MGMT_STATUS_INVALID_PARAMS;
- 
-@@ -4423,7 +4432,7 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 	struct bdaddr_list_with_flags *br_params;
- 	struct hci_conn_params *params;
- 	u8 status = MGMT_STATUS_INVALID_PARAMS;
--	u32 supported_flags = SUPPORTED_DEVICE_FLAGS();
-+	u32 supported_flags = supported_device_flags(hdev);
- 	u32 current_flags = __le32_to_cpu(cp->current_flags);
- 
- 	bt_dev_dbg(hdev, "Set device flags %pMR (type 0x%x) = 0x%x",
-@@ -4456,6 +4465,13 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (params) {
- 			params->current_flags = current_flags;
- 			status = MGMT_STATUS_SUCCESS;
 +
-+			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
-+			 * has been set.
-+			 */
-+			if (hci_conn_test_flag(HCI_CONN_FLAG_DEVICE_PRIVACY,
-+					       params->current_flags))
-+				hci_update_passive_scan(hdev);
- 		} else {
- 			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
- 				    &cp->addr.bdaddr,
-@@ -7061,7 +7077,7 @@ static int add_device(struct sock *sk, struct hci_dev *hdev,
- added:
- 	device_added(sk, hdev, &cp->addr.bdaddr, cp->addr.type, cp->action);
- 	device_flags_changed(NULL, hdev, &cp->addr.bdaddr, cp->addr.type,
--			     SUPPORTED_DEVICE_FLAGS(), current_flags);
-+			     supported_device_flags(hdev), current_flags);
+ static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	__u8 *sent, status = *((__u8 *) skb->data);
+@@ -3812,6 +3837,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
+ 		hci_cc_le_read_transmit_power(hdev, skb);
+ 		break;
  
- 	err = mgmt_cmd_complete(sk, hdev->id, MGMT_OP_ADD_DEVICE,
- 				MGMT_STATUS_SUCCESS, &cp->addr,
++	case HCI_OP_LE_SET_PRIVACY_MODE:
++		hci_cc_le_set_privacy_mode(hdev, skb);
++		break;
++
+ 	default:
+ 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
+ 		break;
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index b794605dc882..32ed7da3b6dd 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1580,8 +1580,42 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
+ 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
+ }
+ 
++/* Set Device Privacy Mode. */
++static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
++					struct hci_conn_params *params)
++{
++	struct hci_cp_le_set_privacy_mode cp;
++	struct smp_irk *irk;
++
++	/* If device privacy mode has already been set there is nothing to do */
++	if (params->privacy_mode == HCI_DEVICE_PRIVACY)
++		return 0;
++
++	/* Set Privacy Mode requires the use of resolving list (aka. LL Privacy)
++	 * by default Network Mode is used so only really send the command if
++	 * Device Mode is required (HCI_CONN_FLAG_DEVICE_PRIVACY).
++	 */
++	if (!privacy_mode_capable(hdev) ||
++	    !hci_conn_test_flag(HCI_CONN_FLAG_DEVICE_PRIVACY,
++				params->current_flags))
++		return 0;
++
++	irk = hci_find_irk_by_addr(hdev, &params->addr, params->addr_type);
++	if (!irk)
++		return 0;
++
++	memset(&cp, 0, sizeof(cp));
++	cp.bdaddr_type = irk->addr_type;
++	bacpy(&cp.bdaddr, &irk->bdaddr);
++	cp.mode = HCI_DEVICE_PRIVACY;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_PRIVACY_MODE,
++				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++}
++
+ /* Adds connection to allow list if needed, if the device uses RPA (has IRK)
+- * this attempts to program the device in the resolving list as well.
++ * this attempts to program the device in the resolving list as well and
++ * properly set the privacy mode.
+  */
+ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 				       struct hci_conn_params *params,
+@@ -1590,11 +1624,6 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 	struct hci_cp_le_add_to_accept_list cp;
+ 	int err;
+ 
+-	/* Already in accept list */
+-	if (hci_bdaddr_list_lookup(&hdev->le_accept_list, &params->addr,
+-				   params->addr_type))
+-		return 0;
+-
+ 	/* Select filter policy to accept all advertising */
+ 	if (*num_entries >= hdev->le_accept_list_size)
+ 		return -ENOSPC;
+@@ -1620,6 +1649,18 @@ static int hci_le_add_accept_list_sync(struct hci_dev *hdev,
+ 		return err;
+ 	}
+ 
++	/* Set Privacy Mode */
++	err = hci_le_set_privacy_mode_sync(hdev, params);
++	if (err) {
++		bt_dev_err(hdev, "Unable to set privacy mode: %d", err);
++		return err;
++	}
++
++	/* Check if already in accept list */
++	if (hci_bdaddr_list_lookup(&hdev->le_accept_list, &params->addr,
++				   params->addr_type))
++		return 0;
++
+ 	*num_entries += 1;
+ 	cp.bdaddr_type = params->addr_type;
+ 	bacpy(&cp.bdaddr, &params->addr);
 -- 
 2.31.1
 
