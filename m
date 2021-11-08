@@ -2,205 +2,126 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84641C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:17:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33941C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:33:06 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 621E9617E4
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:17:55 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 175D160555
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:33:06 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236259AbhKHTUj (ORCPT
+        id S237505AbhKHTft (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 14:20:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:50540 "EHLO
+        Mon, 8 Nov 2021 14:35:49 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236872AbhKHTUi (ORCPT
+        with ESMTP id S230136AbhKHTft (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 14:20:38 -0500
-Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0207CC061714
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 11:17:54 -0800 (PST)
-Received: by mail-pj1-x1033.google.com with SMTP id h24so7780418pjq.2
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 11:17:53 -0800 (PST)
+        Mon, 8 Nov 2021 14:35:49 -0500
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9107CC061570
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 11:33:04 -0800 (PST)
+Received: by mail-qt1-x82a.google.com with SMTP id o12so14771857qtv.4
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 11:33:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=b0CC5A2DRcBB1LqP28NkgRfky2KgWTkZ+NSz3pqnvq8=;
-        b=bho3AgXwL+IdhrxVxFprz/yf8RAG5y/fuuZtuMgfjmePGOueghSdXGXPNV4eEr7oLw
-         Ttia38Jh8tj98HHpWJc1y3znAGblenapQYaTQe3VQCktu3zPFP1o3nUSdagfth/zF25l
-         DfD8hI5f0EP5Ro9hYH03pUq7JHDkWb4j3nqC4gErOeR5fYuD1y/jKLXJV1hSuG5U3KnA
-         CVIRfFjceFXhfugX6XAoLlfmAi1WXw8X8WFJCPCUDHRVjXpeENamivfV88YdF1E/xtcX
-         ojxg7HCoen56EejUtuizURuofkZOx4WeV9wECWoo8NoA4+0WjopbsS1vUJrifZWbff+8
-         gRLg==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=/3GrRjEl2OkVG40YWS6EtTTstQTt3Svv1MxOlPk+guQ=;
+        b=BzfxSTyvhFRtwmJyqsSEAbmy1+jFMNRCuwjWIevfWmBOU/ILfHX+eB5rQr2i1URB6h
+         Yt2mymo6qluVYilEoc6yYXE3Ts20jHSaVEfmjEnDuDcZxrjalUG6v9cCBW7q7aA0bLk4
+         Kae7g/LEphsshiiUuTn8AKiucK4fIwvHa7L6zpF62bP/YV60i/r30M0CcBP9LNj8XaYl
+         tIOoNRHlYq35Xhh66by6MePksEZQa3k1JIt9YJjMjhUppamfqCgMm1+O003GioZiPCbd
+         fBwsLHeaNCAAKXsvsZa3MdanNKgJCtL3PQhxbO8jW8heyqVa0zfBYfZsnxus4hrDah3j
+         h05g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=b0CC5A2DRcBB1LqP28NkgRfky2KgWTkZ+NSz3pqnvq8=;
-        b=wEA8xjF0xYv/AZyF56kzU7A2AC7mirRRpCr54qCfW80/8OnoeOnT5xE3utREyjFCwC
-         UasOr0Cx1uYq3pErsu8YSPPQK6R1djyezy9x3zM29BnE3o/05Ndi9/MkdVtgOWjbyDiL
-         n9a1hYX4gGNlbbw9fT6YnGdA3Xjoo6Iwl5eyfUfnjNp8HD99utJsA+wWPsyQTLA8O0H8
-         P/J0c+xlbsb068KT+Pt3zX7YWH34U/vqOColA03dMdq0I6nD37qKiifr23jSmp28s7fi
-         0xTg2aTj/uFM8TQk6IzlNrHCvTE8F9hj7vHrql7Bc/nMR1zSWWz3t1nFeyXggmCqw2mL
-         Moog==
-X-Gm-Message-State: AOAM533ffH6w/TZtFiB62fml3k3b2p+9XuHGXujsimeAJhZhWe98RB6I
-        jrQVDkGKfCyk5eAWFUkXhghHDhJKBfY=
-X-Google-Smtp-Source: ABdhPJz3+uByTWFTvNItQt/W1gsYrtv5vpavAqTEuvSeaomTnCsA92+2blBVaQtuQ5UD2nxcz1TYAw==
-X-Received: by 2002:a17:902:e302:b0:141:ba08:2e44 with SMTP id q2-20020a170902e30200b00141ba082e44mr1282452plc.81.1636399073176;
-        Mon, 08 Nov 2021 11:17:53 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id c8sm118902pjr.38.2021.11.08.11.17.52
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=/3GrRjEl2OkVG40YWS6EtTTstQTt3Svv1MxOlPk+guQ=;
+        b=dDSsoCgPAXSdw32IFrKImldKVlTH5OBPY5aB0h3LTAl3bLqF0GJ4dwONCZzW9dwGcu
+         SfLa3cN+KaI8rqEb9U4F8kWzFRV5w4uh/rgHDYCZGYIWtcnI20ITkXKz0pKBw+ymX5t+
+         28sYNM525saKn5wCrqxdVAm5epGzXcXaKehIiCNnobEzE+QzIxQt2+0BK6RCKWKoQdlc
+         gEpzGxFT8PEPfk0f5BfrAN4aBkT8zX2yOVzSGtoN1NvtQYNe+hofpAdA/zL1DeVP0V6h
+         El0HPqB8Ab3FRPZsHmYzrzZgeWCCqKbrqvi9NUSU3Mj6A+4JcZ7e+Jb0nYljtRkkVHTS
+         QCEw==
+X-Gm-Message-State: AOAM530pmSgINHTDtAWOkoL4MI33lnrgiIUPB6IYNgum6jZ6dFu+ntTb
+        HPtz/LDduMST3hIzQz1oESm5REL+axY8ng==
+X-Google-Smtp-Source: ABdhPJxjaOa/H4+9Mli+W70oABziDSy3zVqBqHwaKZqc5V8PXFq+PHQCdso6T+wAAuFpJ3ds3k48fg==
+X-Received: by 2002:a05:622a:118f:: with SMTP id m15mr2105257qtk.81.1636399983610;
+        Mon, 08 Nov 2021 11:33:03 -0800 (PST)
+Received: from [172.17.0.2] ([13.92.195.45])
+        by smtp.gmail.com with ESMTPSA id y73sm1768533qkb.113.2021.11.08.11.33.03
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 11:17:52 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] client/gatt: Fix using atoi
-Date:   Mon,  8 Nov 2021 11:17:52 -0800
-Message-Id: <20211108191752.895782-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.31.1
+        Mon, 08 Nov 2021 11:33:03 -0800 (PST)
+Message-ID: <61897b6f.1c69fb81.62006.a2f2@mx.google.com>
+Date:   Mon, 08 Nov 2021 11:33:03 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============1306479338077971868=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] client/gatt: Fix using atoi
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211108191752.895782-1-luiz.dentz@gmail.com>
+References: <20211108191752.895782-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============1306479338077971868==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-atoi doesn't support values entered in hexadecimal (0x...) which is
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=577055
+
+---Test result---
+
+Test Summary:
+CheckPatch                    FAIL      1.51 seconds
+GitLint                       PASS      0.93 seconds
+Prep - Setup ELL              PASS      51.58 seconds
+Build - Prep                  PASS      0.47 seconds
+Build - Configure             PASS      9.50 seconds
+Build - Make                  PASS      215.23 seconds
+Make Check                    PASS      9.67 seconds
+Make Distcheck                PASS      256.66 seconds
+Build w/ext ELL - Configure   PASS      9.57 seconds
+Build w/ext ELL - Make        PASS      204.08 seconds
+
+Details
+##############################
+Test: CheckPatch - FAIL
+Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+Output:
+[BlueZ] client/gatt: Fix using atoi
+WARNING:TYPO_SPELLING: 'prefered' may be misspelled - perhaps 'preferred'?
+#84: 
 likely the prefered format for the likes of handles, etc, so this
-replaces the uses of atoi with strtol.
+           ^^^^^^^^
+
+/github/workspace/src/12608969.patch total: 0 errors, 1 warnings, 117 lines checked
+
+NOTE: For some of the reported defects, checkpatch may be able to
+      mechanically convert to the typical style using --fix or --fix-inplace.
+
+/github/workspace/src/12608969.patch has style problems, please review.
+
+NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+
+NOTE: If any of the errors are false positives, please report
+      them to the maintainer, see CHECKPATCH in MAINTAINERS.
+
+
+
+
 ---
- client/gatt.c | 71 +++++++++++++++++++++++++++++++++++++++++++--------
- 1 file changed, 60 insertions(+), 11 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/client/gatt.c b/client/gatt.c
-index 21fd38ecf..12e213d0f 100644
---- a/client/gatt.c
-+++ b/client/gatt.c
-@@ -650,19 +650,27 @@ static void read_attribute(GDBusProxy *proxy, uint16_t offset)
- void gatt_read_attribute(GDBusProxy *proxy, int argc, char *argv[])
- {
- 	const char *iface;
--	uint16_t offset = 0;
-+	long offset = 0;
- 
- 	iface = g_dbus_proxy_get_interface(proxy);
- 	if (!strcmp(iface, "org.bluez.GattCharacteristic1") ||
- 				!strcmp(iface, "org.bluez.GattDescriptor1")) {
- 
--		if (argc == 2)
--			offset = atoi(argv[1]);
-+		if (argc == 2) {
-+			char *endptr = NULL;
-+
-+			offset = strtol(argv[1], &endptr, 0);
-+			if (!endptr || *endptr != '\0' || offset > UINT16_MAX) {
-+				bt_shell_printf("Invalid offload: %s", argv[1]);
-+				goto done;
-+			}
-+		}
- 
- 		read_attribute(proxy, offset);
- 		return;
- 	}
- 
-+done:
- 	bt_shell_printf("Unable to read attribute %s\n",
- 						g_dbus_proxy_get_path(proxy));
- 	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-@@ -805,8 +813,18 @@ void gatt_write_attribute(GDBusProxy *proxy, int argc, char *argv[])
- 				!strcmp(iface, "org.bluez.GattDescriptor1")) {
- 		data.iov.iov_base = str2bytearray(argv[1], &data.iov.iov_len);
- 
--		if (argc > 2)
--			data.offset = atoi(argv[2]);
-+		if (argc > 2) {
-+			char *endptr = NULL;
-+			long offset;
-+
-+			offset = strtol(argv[1], &endptr, 0);
-+			if (!endptr || *endptr != '\0' || offset > UINT16_MAX) {
-+				bt_shell_printf("Invalid offload: %s", argv[1]);
-+				goto fail;
-+			}
-+
-+			data.offset = offset;
-+		}
- 
- 		if (argc > 3)
- 			data.type = argv[3];
-@@ -815,6 +833,7 @@ void gatt_write_attribute(GDBusProxy *proxy, int argc, char *argv[])
- 		return;
- 	}
- 
-+fail:
- 	bt_shell_printf("Unable to write attribute %s\n",
- 						g_dbus_proxy_get_path(proxy));
- 
-@@ -1482,8 +1501,18 @@ void gatt_register_service(DBusConnection *conn, GDBusProxy *proxy,
- 					g_list_length(local_services));
- 	service->primary = primary;
- 
--	if (argc > 2)
--		service->handle = atoi(argv[2]);
-+	if (argc > 2) {
-+		char *endptr = NULL;
-+		long handle;
-+
-+		handle = strtol(argv[2], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
-+			bt_shell_printf("Invalid handle: %s", argv[2]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		service->handle = handle;
-+	}
- 
- 	if (g_dbus_register_interface(conn, service->path,
- 					SERVICE_INTERFACE, NULL, NULL,
-@@ -2574,8 +2603,18 @@ void gatt_register_chrc(DBusConnection *conn, GDBusProxy *proxy,
- 	chrc->flags = g_strsplit(argv[2], ",", -1);
- 	chrc->authorization_req = attr_authorization_flag_exists(chrc->flags);
- 
--	if (argc > 3)
--		chrc->handle = atoi(argv[3]);
-+	if (argc > 3) {
-+		char *endptr = NULL;
-+		long handle;
-+
-+		handle = strtol(argv[3], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
-+			bt_shell_printf("Invalid handle: %s", argv[3]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		chrc->handle = handle;
-+	}
- 
- 	if (g_dbus_register_interface(conn, chrc->path, CHRC_INTERFACE,
- 					chrc_methods, NULL, chrc_properties,
-@@ -2851,8 +2890,18 @@ void gatt_register_desc(DBusConnection *conn, GDBusProxy *proxy,
- 					g_list_length(desc->chrc->descs));
- 	desc->flags = g_strsplit(argv[2], ",", -1);
- 
--	if (argc > 3)
--		desc->handle = atoi(argv[3]);
-+	if (argc > 3) {
-+		char *endptr = NULL;
-+		long handle;
-+
-+		handle = strtol(argv[3], &endptr, 0);
-+		if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
-+			bt_shell_printf("Invalid handle: %s", argv[3]);
-+			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-+		}
-+
-+		desc->handle = handle;
-+	}
- 
- 	if (g_dbus_register_interface(conn, desc->path, DESC_INTERFACE,
- 					desc_methods, NULL, desc_properties,
--- 
-2.31.1
 
+--===============1306479338077971868==--
