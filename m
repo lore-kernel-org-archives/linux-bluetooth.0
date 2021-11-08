@@ -2,126 +2,119 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 33941C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:33:06 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 95A99C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 20:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 175D160555
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 19:33:06 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6EDAD619E5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 20:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237505AbhKHTft (ORCPT
+        id S237800AbhKHUEG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 14:35:49 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54032 "EHLO
+        Mon, 8 Nov 2021 15:04:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60362 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230136AbhKHTft (ORCPT
+        with ESMTP id S238108AbhKHUEE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 14:35:49 -0500
-Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9107CC061570
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 11:33:04 -0800 (PST)
-Received: by mail-qt1-x82a.google.com with SMTP id o12so14771857qtv.4
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 11:33:04 -0800 (PST)
+        Mon, 8 Nov 2021 15:04:04 -0500
+Received: from mail-il1-x135.google.com (mail-il1-x135.google.com [IPv6:2607:f8b0:4864:20::135])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0986BC061746
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 12:01:17 -0800 (PST)
+Received: by mail-il1-x135.google.com with SMTP id j28so18244483ila.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 12:01:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=/3GrRjEl2OkVG40YWS6EtTTstQTt3Svv1MxOlPk+guQ=;
-        b=BzfxSTyvhFRtwmJyqsSEAbmy1+jFMNRCuwjWIevfWmBOU/ILfHX+eB5rQr2i1URB6h
-         Yt2mymo6qluVYilEoc6yYXE3Ts20jHSaVEfmjEnDuDcZxrjalUG6v9cCBW7q7aA0bLk4
-         Kae7g/LEphsshiiUuTn8AKiucK4fIwvHa7L6zpF62bP/YV60i/r30M0CcBP9LNj8XaYl
-         tIOoNRHlYq35Xhh66by6MePksEZQa3k1JIt9YJjMjhUppamfqCgMm1+O003GioZiPCbd
-         fBwsLHeaNCAAKXsvsZa3MdanNKgJCtL3PQhxbO8jW8heyqVa0zfBYfZsnxus4hrDah3j
-         h05g==
+        d=chromium.org; s=google;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3VkkpMgbgETGhkWrLjDuy7MIX7ArbNiB9xjyPcashqk=;
+        b=QmhBF3VeCGi6qNjxFLNXIop7sMD9HhUt8pqWdlvEBJS+zy1GyWs/acy9z8GMukQvOr
+         l9C1xS5FCFKmG0mlqXx/Ihhrlz67+nkSXiO69iDPyZCRKQCvSCy2DLYjEwxeh0E84RJw
+         OROMeAlYwOQMYykFkvChrLEtDJKp4K3+oBmws=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=/3GrRjEl2OkVG40YWS6EtTTstQTt3Svv1MxOlPk+guQ=;
-        b=dDSsoCgPAXSdw32IFrKImldKVlTH5OBPY5aB0h3LTAl3bLqF0GJ4dwONCZzW9dwGcu
-         SfLa3cN+KaI8rqEb9U4F8kWzFRV5w4uh/rgHDYCZGYIWtcnI20ITkXKz0pKBw+ymX5t+
-         28sYNM525saKn5wCrqxdVAm5epGzXcXaKehIiCNnobEzE+QzIxQt2+0BK6RCKWKoQdlc
-         gEpzGxFT8PEPfk0f5BfrAN4aBkT8zX2yOVzSGtoN1NvtQYNe+hofpAdA/zL1DeVP0V6h
-         El0HPqB8Ab3FRPZsHmYzrzZgeWCCqKbrqvi9NUSU3Mj6A+4JcZ7e+Jb0nYljtRkkVHTS
-         QCEw==
-X-Gm-Message-State: AOAM530pmSgINHTDtAWOkoL4MI33lnrgiIUPB6IYNgum6jZ6dFu+ntTb
-        HPtz/LDduMST3hIzQz1oESm5REL+axY8ng==
-X-Google-Smtp-Source: ABdhPJxjaOa/H4+9Mli+W70oABziDSy3zVqBqHwaKZqc5V8PXFq+PHQCdso6T+wAAuFpJ3ds3k48fg==
-X-Received: by 2002:a05:622a:118f:: with SMTP id m15mr2105257qtk.81.1636399983610;
-        Mon, 08 Nov 2021 11:33:03 -0800 (PST)
-Received: from [172.17.0.2] ([13.92.195.45])
-        by smtp.gmail.com with ESMTPSA id y73sm1768533qkb.113.2021.11.08.11.33.03
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=3VkkpMgbgETGhkWrLjDuy7MIX7ArbNiB9xjyPcashqk=;
+        b=vF4psAWvLyJlYm7Kv0fBJWlNhjuJICz57GyaXMgKX2sFMRkzriZeacT8OgTxrnklKr
+         Ft8FV7ZAAaI1AbctDB6MxyXG1DOniW1RnSTxBFg3VnYc6OoDeagFiVK/YWavdi39SFnj
+         vtNoEQ6O+ffEGsxL9PVFvZTpkBM9LG3cKrQX7Nhp5zIQeBoSCuVGLv+REN6FFkMyQgas
+         xBgy9XCSrj5GerEw/f+dV/Ii7Y1uj4fiNwtetU8nSBiDDAD8Xjfk1k0celtDmH5ukE8O
+         h7vkxdDVlneyvXjEYwC61PXbxN8ASD09q4x58kY3n10hls33nmjPFehPJ0oVJShopEHT
+         yOcQ==
+X-Gm-Message-State: AOAM5313S7cZg8OHa3M4J8rJEU4sHPjY24eGjTHXyAqLoYhx6RMFUxK1
+        nnlSjVGKSeGvjqcdMOSLnTvjBlmKPgUKiA==
+X-Google-Smtp-Source: ABdhPJwbjVG4yL2cXb08CXlv5Fi08RcrfCPB6jvIaj8FgLPJ3zvf2VJlBti+h4gNR1iq7RuqD0pZ0A==
+X-Received: by 2002:a05:6e02:2166:: with SMTP id s6mr1200086ilv.170.1636401676182;
+        Mon, 08 Nov 2021 12:01:16 -0800 (PST)
+Received: from melhuishj.c.googlers.com.com (161.74.123.34.bc.googleusercontent.com. [34.123.74.161])
+        by smtp.gmail.com with ESMTPSA id r14sm10682100iov.14.2021.11.08.12.01.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 08 Nov 2021 11:33:03 -0800 (PST)
-Message-ID: <61897b6f.1c69fb81.62006.a2f2@mx.google.com>
-Date:   Mon, 08 Nov 2021 11:33:03 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============1306479338077971868=="
+        Mon, 08 Nov 2021 12:01:15 -0800 (PST)
+From:   Jesse Melhuish <melhuishj@chromium.org>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Jesse Melhuish <melhuishj@chromium.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: Don't initialize msft/aosp when using user channel
+Date:   Mon,  8 Nov 2021 20:01:06 +0000
+Message-Id: <20211108200058.v2.1.Ide934b992a0b54085a6be469d3687963a245dba9@changeid>
+X-Mailer: git-send-email 2.31.0
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ] client/gatt: Fix using atoi
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211108191752.895782-1-luiz.dentz@gmail.com>
-References: <20211108191752.895782-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============1306479338077971868==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+A race condition is triggered when usermode control is given to
+userspace before the kernel's MSFT query responds, resulting in an
+unexpected response to userspace's reset command.
 
-This is automated email and please do not reply to this email!
+Issue can be observed in btmon:
+< HCI Command: Vendor (0x3f|0x001e) plen 2                    #3 [hci0]
+        05 01                                            ..
+@ USER Open: bt_stack_manage (privileged) version 2.22  {0x0002} [hci0]
+< HCI Command: Reset (0x03|0x0003) plen 0                     #4 [hci0]
+> HCI Event: Command Complete (0x0e) plen 5                   #5 [hci0]
+      Vendor (0x3f|0x001e) ncmd 1
+	Status: Command Disallowed (0x0c)
+	05                                               .
+> HCI Event: Command Complete (0x0e) plen 4                   #6 [hci0]
+      Reset (0x03|0x0003) ncmd 2
+	Status: Success (0x00)
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=577055
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.51 seconds
-GitLint                       PASS      0.93 seconds
-Prep - Setup ELL              PASS      51.58 seconds
-Build - Prep                  PASS      0.47 seconds
-Build - Configure             PASS      9.50 seconds
-Build - Make                  PASS      215.23 seconds
-Make Check                    PASS      9.67 seconds
-Make Distcheck                PASS      256.66 seconds
-Build w/ext ELL - Configure   PASS      9.57 seconds
-Build w/ext ELL - Make        PASS      204.08 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ] client/gatt: Fix using atoi
-WARNING:TYPO_SPELLING: 'prefered' may be misspelled - perhaps 'preferred'?
-#84: 
-likely the prefered format for the likes of handles, etc, so this
-           ^^^^^^^^
-
-/github/workspace/src/12608969.patch total: 0 errors, 1 warnings, 117 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12608969.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
+Signed-off-by: Jesse Melhuish <melhuishj@chromium.org>
+Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 ---
-Regards,
-Linux Bluetooth
 
+Changes in v2:
+- Moved guard to the new home for this code.
 
---===============1306479338077971868==--
+ net/bluetooth/hci_sync.c | 6 ++++--
+ 1 file changed, 4 insertions(+), 2 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index b794605dc882..5f1f59ac1813 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -3887,8 +3887,10 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+ 	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+ 		ret = hdev->set_diag(hdev, true);
+ 
+-	msft_do_open(hdev);
+-	aosp_do_open(hdev);
++	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
++		msft_do_open(hdev);
++		aosp_do_open(hdev);
++	}
+ 
+ 	clear_bit(HCI_INIT, &hdev->flags);
+ 
+-- 
+2.31.0
+
