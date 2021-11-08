@@ -2,232 +2,317 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2674BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 22:57:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A634C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 23:02:13 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 07E5C610E9
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 22:57:31 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 46F6860FDA
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  8 Nov 2021 23:02:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240823AbhKHXAO (ORCPT
+        id S240753AbhKHXE5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 18:00:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43390 "EHLO
+        Mon, 8 Nov 2021 18:04:57 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44462 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238608AbhKHXAO (ORCPT
+        with ESMTP id S238462AbhKHXE4 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 18:00:14 -0500
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1538FC061570
-        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 14:57:29 -0800 (PST)
-Received: by mail-ua1-x930.google.com with SMTP id t13so19440566uad.9
-        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 14:57:29 -0800 (PST)
+        Mon, 8 Nov 2021 18:04:56 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2BC21C061570
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 15:02:12 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id r5so17374276pls.1
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 15:02:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=8gvudBlq00RPJx0RI3bC28Axhgn2KcupwJb79TPX3AQ=;
-        b=I9os+Ykxr3MhVXaStRof8lxye/gpR6HtlZCAL60ZWzhX4tbOaO8lW63nJ0UVOROYjl
-         D37r3ieep0ldXj4hX4nXWPWr4LfmzYAVIgiaL1PzQSLsJ3Wz+3S/sEg2UBPej6uu64/A
-         IngVSKA2sTFcCGot/T6vdUFW8BKuXQ7uT9D3oqW2SWACmzkD+Zz5UA7N21hAHFxqaGpK
-         EZc9SYBpRO2N2TiLUJlxpyS+qdjC2E9Ibxv0uJ5ZeAxq7PWCZLbhqWr4Zk/AuEqD40Sz
-         Tb5xpTH5ax4bAETgYcsiivz1aVdJQcF9z/HSGEJyLIuNerW6dt0BiXhjwPQ3Hncm4rkY
-         4qUA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XkZ4dR8VU8zFaDsWkHNkhfNBSaxZA8t4kmXkh/+ETj4=;
+        b=BVLUx8SLS6ELcJSHjRbXe439H8XsIzmBDcE53JBzD6NzExWf9NVdO+Z327npRidA+M
+         g4y5hCHWqofYWo/vb+9a5bAJ9rAiExYunvhUqbTjO1UspZ21/XZgMxe8fE00dH6Z134e
+         G+WQ/zWG/sVKaKHYyDxo7qzsoskCKaodS1NRuSDDuVwBso1kT0SDcaPTUT3FEDP5PM7/
+         goe7Jq6pVKxjtf4A+5JnkqaqsDeFQ2ACjA1HGnyi6dsT/X6A3H/g97ATBIRMrvxl9Hzr
+         2fWGejHoGrqvfwwUtFoYL1k0+V3JWvrOFl1VdwLaclBO2e8K/1VOUQXKsDHBrtD14+aX
+         4Ftg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=8gvudBlq00RPJx0RI3bC28Axhgn2KcupwJb79TPX3AQ=;
-        b=HgD20Yb6bipNcJee3fpSnXA2nC/Dm7locIxDMwRJlCl+0ec59B0V2hiPjLF1F7s3o7
-         QxBCH9D9KaEI0dmMaheeiHgfR7N3dNrYVQr+XOh3VI2rKjGnYTdYc8HDTrm0R1tfy3Nz
-         WUBh1RMNCPYFqUDcNJETEIRs9fdX4DDhY8q8M3OO074zc2cJa0YM2UYi52P31zaG1kJl
-         eYWLIG5ehbjgj7xMw616ujuc7+dBlI0PA0XOajhQqV+ZBWOxe9HFNz8bd/izFwt9pUPt
-         k0Ds5x34yURw9XYwXL3pIZxntrOyQSlBC4NS5T2eBx1eHlSQmZPmrZ20japUngcz7qs4
-         x7tQ==
-X-Gm-Message-State: AOAM533QMp5GGZbRGHPe6qAlHGfJXRfR2C8uq2Fa96d0G+5oEX1yyCHl
-        n2B6sVrTCahONJY1FmpAovGYGLb5cQLhFR8C6AI=
-X-Google-Smtp-Source: ABdhPJwrsM31MfCPZLsmm31eGTjcnpT58TUXKWsfEnvezXxVHg8BJz+Gx72ME/xLW5FQLwFDTeHFv6TdBrpIGcxAhDg=
-X-Received: by 2002:a67:b844:: with SMTP id o4mr111423794vsh.61.1636412248110;
- Mon, 08 Nov 2021 14:57:28 -0800 (PST)
-MIME-Version: 1.0
-References: <20211025191811.3575708-1-mmandlik@google.com> <20211025121343.BlueZ.v4.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
- <577458A3-49B9-416B-A35B-58F174CC88F8@holtmann.org> <CAGPPCLBNN+Eg92=GnmbMBfngLEb=BL6sSkx7O19rYOydAkO8HA@mail.gmail.com>
- <BACB0D21-AB8E-47F2-8CAC-B5E574B8A85C@holtmann.org> <CAGPPCLD+pYQtK8G303gr_F7xqTvuSXA+4FTRiVf0OzAEUrDgjw@mail.gmail.com>
-In-Reply-To: <CAGPPCLD+pYQtK8G303gr_F7xqTvuSXA+4FTRiVf0OzAEUrDgjw@mail.gmail.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=XkZ4dR8VU8zFaDsWkHNkhfNBSaxZA8t4kmXkh/+ETj4=;
+        b=mGxlWk67HgfzwNsU0OC/ZXhjKnTchZni9XfUQIahmaQh0bS9zTmBVvckqrNCMDorKA
+         SwoDm6XI0rd4cZMdU+xyM80ooXfhz+8+Y8XMbhz+Y+y5R1YTC4vVdcfSonKTiBbKGVTf
+         3JseVqOVzeNw/H9ME+0c2ziYiE2HHtIdQiwD3mci96HwR9pySrlDDSQryDD94QdVUOuT
+         jTWMlBvwqOVNhdTADajYnXk52nD0BhuWlax8GkO62tlL0XZzwx6ESYjjYonMaR8WnWOS
+         rn4Td22qb/+AU0R8augkVgBEFQ7tp6VfYZg9Go0zpXK1yHCHEiFHdmMgPQImMPj8oVcW
+         JRuQ==
+X-Gm-Message-State: AOAM531UJFK4MgLAFtGDYLOoGgDZuQ8kyLodsvoP5EFKEuLxj8c+4Thq
+        nN0/djF/pTfJ9yBplS8yQTN9RYstPmE=
+X-Google-Smtp-Source: ABdhPJx4+VglTfB71qXwr7kBVuUXhJ9zooDEryFrh/vfoZBlDIYy/orISujxlxBKWsTJagVKZRIW1A==
+X-Received: by 2002:a17:902:ce85:b0:141:de7d:514e with SMTP id f5-20020a170902ce8500b00141de7d514emr2963780plg.0.1636412531322;
+        Mon, 08 Nov 2021 15:02:11 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id h134sm5750156pfe.67.2021.11.08.15.02.10
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Nov 2021 15:02:10 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 8 Nov 2021 14:57:17 -0800
-Message-ID: <CABBYNZLnjgizrau7qYWsHfhW+6eg_goSCLubXe13t+zng+GUsw@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v4 1/3] doc: Introduce the Adv Monitor Device
- Found/Lost events
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH] Bluetooth: btusb: Add support for queuing during polling interval
+Date:   Mon,  8 Nov 2021 15:02:10 -0800
+Message-Id: <20211108230210.931731-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Sun, Oct 31, 2021 at 10:53 PM Manish Mandlik <mmandlik@google.com> wrote=
-:
->
-> Hi Marcel,
->
->
-> On Tue, Oct 26, 2021 at 4:33 AM Marcel Holtmann <marcel@holtmann.org> wro=
-te:
->>
->> Hi Manish,
->>
->> > >
->> > > Example
->> > > @@ -4910,3 +4911,50 @@ Controller Resume Event
->> > >       Address_Type. Otherwise, Address and Address_Type will both be=
- zero.
->> > >
->> > >       This event will be sent to all management sockets.
->> > > +
->> > > +
->> > > +Advertisement Monitor Device Found Event
->> > > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->> > > +
->> > > +     Event code:             0x002f
->> > > +     Controller Index:       <controller_id>
->> > > +     Event Parameters:       Monitor_Handle (2 Octets)
->> > > +                             Address (6 Octets)
->> > > +                             Address_Type (1 Octet)
->> > > +
->> > > +     This event indicates that the controller has started tracking =
-a device
->> > > +     matching an Advertisement Monitor with handle Monitor_Handle.
->> > > +
->> > > +     The address of the device being tracked will be shared in Addr=
-ess and
->> > > +     Address_Type.
->> > > +
->> > > +     Possible values for the Address_Type parameter:
->> > > +             0       Reserved (not in use)
->> > > +             1       LE Public
->> > > +             2       LE Random
->> > > +
->> > > +     This event will be sent to all management sockets.
->> >
->> > My initial thought was actually to include all the fields from Device =
-Found Event here as well. So that in case we are using advertising monitor,=
- we just need to worry about this event only. Thoughts?
->> > The controller sends advertising reports in addition to the MSFT_Monit=
-or_Device event. This event is reported only twice per bt-device (at start =
-and at end of the monitoring); and it includes only the device addr and add=
-r type [1]. To include other fields from the Device Found event, we need to=
- buffer MSFT_Monitor_Device in the kernel and wait for the subsequent adver=
-tising report before we can send it to the bluetoothd. I feel this will unn=
-ecessarily complicate the logic in the kernel.
->> >
->> > This event will be used to invoke DeviceFound/Lost on the interface on=
-ly when we are completely offloading monitoring to the controller (i.e. whe=
-n the Sampling_Period is set to 0xFF). When the Sampling_Period is set to 0=
-xFF, the controller sends only one advertisement report per monitoring peri=
-od [2]. So, we need to rely on the MSFT_Monitor_Device controller event for=
- RSSI and timeouts tracking. In other cases, as the bluetoothd receives mor=
-e than one advertisement report, it can perform RSSI and timeouts tracking.
->> >
->> > So, I think it is better to pass on this event as it is to the bluetoo=
-thd and let the advertisement monitoring in the bluetoothd handle it. Let m=
-e know what you think about this?
->>
->> the kernel has to buffer events related to advertising reports and inqui=
-ry results already anyway. That is just the cost of business and it is the =
-job of the kernel to do exactly that.
->>
->> I do not want to dumb down the kernel into a vendor extension passthroug=
-h since that is always going to come back and bite you. My current thinking=
- is actually that unless Start Discovery triggers a discovery procedure, de=
-vice that are monitored, should get its own report out path via mgmt.
->>
->> So the kernel would send Advertising Monitor Device Found Event (most li=
-kely with a flag for tracking started) and subsequence events of the same t=
-ype whenever it gets updated. I mean, the kernel should track the state whe=
-n a device is tracked anyway. It has to keep track of these things. In case=
- of power down or reset or anything, the kernel needs to generate the Devic=
-e Lost event to keeps this all in sync. Otherwise userspace is left to figu=
-re out what happens. We can not have that. This is similar to when a proces=
-s dies, the kernel cleans up all open file descriptors. That is the basic p=
-aradigm that we have enforced with mgmt. If bluetoothd dies or restarts, we=
- can get back to a state where we now all the details without having to har=
-d reset hardware.
->>
->> One way to lock at this is always from the point of something that is no=
-t bluetoothd. Any other user of mgmt API needs to be sound and have a good =
-API contract as well. Kernel APIs that are only designed with one daemon in=
- mind are awful and cause major problems along the road.
->>
->> That all said, we can do this as above, but I would explore the option o=
-f doing it with my proposal and really focus on completely offload of the m=
-onitoring the controller.
->
->
-> Thanks for the explanation. I see your point. Based on that I=E2=80=99d l=
-ike to propose the following changes to the bluetooth kernel and user space=
- to take all the advantages of the controller offloading whenever available=
-. Let me know if it sounds good?
->
-> Existing controller behavior (based on the MSFT extension specification):
-> - Whenever the controller starts monitoring a device, it first sends the =
-MSFT_Monitor_Device event with Monitor_State as 1 and provides the matched =
-Monitor_Id and device address.
-> - Based on the Sampling_Period configured, it then sends one or more LE A=
-dvertisement Reports for that device during the monitoring period.
-> - Whenever the controller stops monitoring a device, it again sends the M=
-SFT_Monitor_Device event but with Monitor_State as 0 and provides the Monit=
-or_Id and device address of the device that was being tracked.
->
-> Proposed kernel behavior:
-> - Upon receipt of the MSFT_Monitor_Device event with Monitor_State 1, the=
- kernel will buffer this event until it receives the subsequent LE Advertis=
-ement Report(s).
-> - After receiving the first advertisement report for the monitored device=
-, kernel will generate the =E2=80=9CAdv Monitor Device Found=E2=80=9D MGMT =
-event which is identical to the =E2=80=9CDevice Found=E2=80=9D MGMT event, =
-but will have additional Monitor_Handle information for the matched monitor=
-.
-> - A separate Device_Tracked flag is not required since this event itself =
-indicates that the device is being tracked.
-> - If the active scanning is in progress, the existing =E2=80=9CDevice Fou=
-nd=E2=80=9D event will also be generated before generating the =E2=80=9CAdv=
- Monitor Device Found=E2=80=9D event.
-> - For the subsequent advertisement reports (if any) for the monitored dev=
-ice, if the active scanning is in progress, only the existing "Device Found=
-" event will be generated; else, only the "Adv Monitor Device Found" event =
-will be generated.
-> - Upon receipt of the MSFT_Monitor_Device event with Monitor_State 0, the=
- kernel will generate the =E2=80=9CAdv Monitor Device Lost=E2=80=9D MGMT ev=
-ent with the Monitor_Handle and device address of the device that was being=
- tracked.
-> - Also, in case of power down or reset, the kernel will generate the "Adv=
- Monitor Device Lost" event for the monitored devices.
->
-> Proposed user space behavior:
-> - Whenever the controller offloading is available, bluetoothd will only u=
-se the =E2=80=9CAdv Monitor Device Found=E2=80=9D and =E2=80=9CAdv Monitor =
-Device Lost=E2=80=9D event for performing monitoring related functions and =
-SW based filtering will be completely disabled as Monitor_Handle will be av=
-ailable from the kernel/controller and can be used to notify respective app=
-lications on DeviceFound/DeviceLost.
-> - Whenever the controller offloading is NOT available, bluetoothd will us=
-e the existing =E2=80=9CDevice Found=E2=80=9D event and perform SW based fi=
-ltering as it is doing right now.
-> - =E2=80=9CAdv Monitor Device Found=E2=80=9D event will also be used to c=
-reate/update the found device when active scanning is NOT in progress.
+This makes btusb to queue ACL and events during a polling interval
+by using of a delayed work, with the interval working as a time window
+where frames received from different endpoints are considered to be
+arrived at same time and then attempt to resolve potential conflics by
+processing the events ahead of ACL packets.
 
-Are you still working on this or are you waiting for some feedback on
-the above, at first glance it looks proper. Btw, it would be great if
-these changes are accompanied with mgmt-tester tests since vhci has
-support for MSFT commands and we can emulate such code paths.
+It worth noting though that priorizing events over ACL data may result
+in inverting the order compared to how they appeared over the air, for
+instance there may be packets received before a disconnect event that
+will be discarded and unencrypted packets received before encryption
+change which would considered encrypted, because of these potential
+changes on the order the support for queuing during the polling
+interval is not enabled by default so platforms have the following
+means to enable it:
 
+At runtime with use of module option:
 
---=20
-Luiz Augusto von Dentz
+    enable_poll_sync
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ drivers/bluetooth/btusb.c | 89 +++++++++++++++++++++++++++++++++------
+ 1 file changed, 77 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 46d892bbde62..29aa0f346ace 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -31,7 +31,7 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+-
++static bool enable_poll_sync;
+ static bool reset = true;
+ 
+ static struct usb_driver btusb_driver;
+@@ -550,8 +550,12 @@ struct btusb_data {
+ 
+ 	unsigned long flags;
+ 
+-	struct work_struct work;
+-	struct work_struct waker;
++	int intr_interval;
++	struct work_struct  work;
++	struct work_struct  waker;
++	struct delayed_work rx_work;
++
++	struct sk_buff_head acl_q;
+ 
+ 	struct usb_anchor deferred;
+ 	struct usb_anchor tx_anchor;
+@@ -588,8 +592,8 @@ struct btusb_data {
+ 	int isoc_altsetting;
+ 	int suspend_count;
+ 
+-	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
+ 	int (*recv_acl)(struct hci_dev *hdev, struct sk_buff *skb);
++	int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
+ 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+ 
+ 	int (*setup_on_usb)(struct hci_dev *hdev);
+@@ -761,7 +765,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_event(data->hdev, skb);
++			data->recv_event(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -772,6 +776,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 	return err;
+ }
+ 
++static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (!enable_poll_sync)
++		return data->recv_acl(data->hdev, skb);
++
++	skb_queue_tail(&data->acl_q, skb);
++
++	schedule_delayed_work(&data->rx_work, data->intr_interval);
++
++	return 0;
++}
++
+ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -819,7 +835,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_acl(data->hdev, skb);
++			btusb_recv_acl(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -971,6 +987,19 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
++	/* The units are frames (milliseconds) for full and low speed devices,
++	 * and microframes (1/8 millisecond) for highspeed and SuperSpeed
++	 * devices.
++	 */
++	switch (urb->dev->speed) {
++	case USB_SPEED_SUPER_PLUS:
++	case USB_SPEED_SUPER:	/* units are 125us */
++		data->intr_interval = usecs_to_jiffies(urb->interval * 125);
++		break;
++	default:
++		data->intr_interval = msecs_to_jiffies(urb->interval);
++	}
++
+ 	usb_free_urb(urb);
+ 
+ 	return err;
+@@ -1430,9 +1459,12 @@ static int btusb_close(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
+ 	cancel_work_sync(&data->work);
+ 	cancel_work_sync(&data->waker);
+ 
++	skb_queue_purge(&data->acl_q);
++
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+@@ -1464,6 +1496,10 @@ static int btusb_flush(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
++
++	skb_queue_purge(&data->acl_q);
++
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 	btusb_free_frags(data);
+ 
+@@ -1827,6 +1863,17 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++static void btusb_rx_work(struct work_struct *work)
++{
++	struct btusb_data *data = container_of(work, struct btusb_data,
++					       rx_work.work);
++	struct sk_buff *skb;
++
++	/* Dequeue ACL data received during the interval */
++	while ((skb = skb_dequeue(&data->acl_q)))
++		data->recv_acl(data->hdev, skb);
++}
++
+ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -2028,9 +2075,9 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
+ 	return btusb_recv_bulk(data, buffer, count);
+ }
+ 
+-static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
++static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
+ {
+-	if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
++	if (btintel_test_flag(data->hdev, INTEL_BOOTLOADER)) {
+ 		struct hci_event_hdr *hdr = (void *)skb->data;
+ 
+ 		if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
+@@ -2044,7 +2091,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 				 * the device sends a vendor specific event
+ 				 * indicating that the bootup completed.
+ 				 */
+-				btintel_bootup(hdev, ptr, len);
++				btintel_bootup(data->hdev, ptr, len);
+ 				break;
+ 			case 0x06:
+ 				/* When the firmware loading completes the
+@@ -2052,13 +2099,14 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+ 				 * indicating the result of the firmware
+ 				 * loading.
+ 				 */
+-				btintel_secure_send_result(hdev, ptr, len);
++				btintel_secure_send_result(data->hdev, ptr,
++							   len);
+ 				break;
+ 			}
+ 		}
+ 	}
+ 
+-	return hci_recv_frame(hdev, skb);
++	return hci_recv_frame(data->hdev, skb);
+ }
+ 
+ static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+@@ -3372,6 +3420,16 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (enable_poll_sync) {
++		/* Trigger dequeue immediatelly if an event is received */
++		schedule_delayed_work(&data->rx_work, 0);
++	}
++
++	return hci_recv_frame(data->hdev, skb);
++}
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -3455,6 +3513,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
++	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
++
++	skb_queue_head_init(&data->acl_q);
++
+ 	init_usb_anchor(&data->deferred);
+ 	init_usb_anchor(&data->tx_anchor);
+ 	spin_lock_init(&data->txlock);
+@@ -3468,7 +3530,7 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	priv_size = 0;
+ 
+-	data->recv_event = hci_recv_frame;
++	data->recv_event = btusb_recv_evt;
+ 	data->recv_bulk = btusb_recv_bulk;
+ 
+ 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
+@@ -3942,6 +4004,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+ module_param(enable_autosuspend, bool, 0644);
+ MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+ 
++module_param(enable_poll_sync, bool, 0644);
++MODULE_PARM_DESC(enable_poll_sync, "Enable URB polling interval synchronization");
++
+ module_param(reset, bool, 0644);
+ MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+ 
+-- 
+2.31.1
+
