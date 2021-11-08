@@ -2,45 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 991FFC43217
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 00:59:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BA20FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:03:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 808CC61A07
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 00:59:54 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id A523361452
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:03:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241478AbhKIBCi (ORCPT
+        id S239320AbhKIBF5 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 20:02:38 -0500
-Received: from mail.kernel.org ([198.145.29.99]:58428 "EHLO mail.kernel.org"
+        Mon, 8 Nov 2021 20:05:57 -0500
+Received: from mail.kernel.org ([198.145.29.99]:33370 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241453AbhKIBCe (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 20:02:34 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 69F12611BD;
-        Tue,  9 Nov 2021 00:59:48 +0000 (UTC)
+        id S238209AbhKIBE3 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Nov 2021 20:04:29 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 95BBF61452;
+        Tue,  9 Nov 2021 01:01:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636419589;
-        bh=avAAGN5EkykCH99Df14J6Rgv0P1Mu556HWaJrlB2Xhk=;
+        s=k20201202; t=1636419696;
+        bh=uV6izsrE9C2hoMbs7TvmWhBvrq4cb9kTBqrL5NKqgMY=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=reZJrJ0xwwv22gAv6HHRF5JIliyJ756/Lnesx+rDuoVbv8iGuPfWOGyzE4WdjFdmT
-         QzN5VwyBCGzrWytjFRsf7SJB8/d+pyz6/7GFTRrvymIo9b+2ryqdYZUn7NLXKJagzw
-         +BNFAnkYep5dq+5dqMCGQrzo1RjH3IWAK+bsMxfPbm9Z1cuh9L63OcVmsI9Yno3qnJ
-         NfxA04GHWs9ugUKYTtCg9mUsNLZUGNg8HZWhUsKNvcpPP/iWOGXHsUEFgRqKZVGsnK
-         s7Y60R97SF154xhQB36cmOKxdRkJbGhCKO3SKs7oHXP94ol5GBXHIHe0G0gdJgjkNl
-         b4iY8By1ZFPqw==
+        b=A28mJ7Hrv31sl6Hsfeu0j5GrP3bragELSXYFRwvYZDCAsFbxAOGn/N+WcPtlJIj7S
+         ruD4vDEVTDnQZIBkMETRPzq3be+BJCoLXCTIKRmWMVMkv2MuZrKbFgZoe7NU75kBxH
+         AGT21NOvhnlCaOOPL7SAXOPP06cPLOI+VrVgXVT+zRSo3vPEIV4tl7hFiXwP22iSDp
+         hnnQUFZWhsL3+AL8ajmoSpCvYQbOVJyRi2XZTWHmA9ULcEB76zh8cnVZ8u+evFG4Sp
+         wDz6OcTNE4dOFn9vEweltIsn/8E6Re/hPvAbBXf9oY7JUGZDjp7oCpeL8TY1tC0pMO
+         z8ZV/z6+hjBHQ==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Sasha Levin <sashal@kernel.org>, marcel@holtmann.org,
-        johan.hedberg@gmail.com, luiz.dentz@gmail.com, davem@davemloft.net,
-        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
-        netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 007/146] Bluetooth: call sock_hold earlier in sco_conn_del
-Date:   Mon,  8 Nov 2021 12:42:34 -0500
-Message-Id: <20211108174453.1187052-7-sashal@kernel.org>
+Cc:     Takashi Iwai <tiwai@suse.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
+        luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.14 005/138] Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
+Date:   Mon,  8 Nov 2021 12:44:31 -0500
+Message-Id: <20211108174644.1187889-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211108174453.1187052-1-sashal@kernel.org>
-References: <20211108174453.1187052-1-sashal@kernel.org>
+In-Reply-To: <20211108174644.1187889-1-sashal@kernel.org>
+References: <20211108174644.1187889-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -49,45 +48,94 @@ Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
+From: Takashi Iwai <tiwai@suse.de>
 
-[ Upstream commit f4712fa993f688d0a48e0c28728fcdeb88c1ea58 ]
+[ Upstream commit 99c23da0eed4fd20cae8243f2b51e10e66aa0951 ]
 
-In sco_conn_del, conn->sk is read while holding on to the
-sco_conn.lock to avoid races with a socket that could be released
-concurrently.
+The sco_send_frame() also takes lock_sock() during memcpy_from_msg()
+call that may be endlessly blocked by a task with userfaultd
+technique, and this will result in a hung task watchdog trigger.
 
-However, in between unlocking sco_conn.lock and calling sock_hold,
-it's possible for the socket to be freed, which would cause a
-use-after-free write when sock_hold is finally called.
+Just like the similar fix for hci_sock_sendmsg() in commit
+92c685dc5de0 ("Bluetooth: reorganize functions..."), this patch moves
+the  memcpy_from_msg() out of lock_sock() for addressing the hang.
 
-To fix this, the reference count of the socket should be increased
-while the sco_conn.lock is still held.
+This should be the last piece for fixing CVE-2021-3640 after a few
+already queued fixes.
 
-Signed-off-by: Desmond Cheong Zhi Xi <desmondcheongzx@gmail.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Takashi Iwai <tiwai@suse.de>
+Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/bluetooth/sco.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/bluetooth/sco.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index b62c91c627e2c..4a057f99b60aa 100644
+index 110cfd6aa2b77..2766faf95c534 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -187,10 +187,11 @@ static void sco_conn_del(struct hci_conn *hcon, int err)
- 	/* Kill socket */
- 	sco_conn_lock(conn);
- 	sk = conn->sk;
-+	if (sk)
-+		sock_hold(sk);
- 	sco_conn_unlock(conn);
+@@ -281,7 +281,8 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
+ 	return err;
+ }
  
- 	if (sk) {
--		sock_hold(sk);
- 		lock_sock(sk);
- 		sco_sock_clear_timer(sk);
- 		sco_chan_del(sk, err);
+-static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
++static int sco_send_frame(struct sock *sk, void *buf, int len,
++			  unsigned int msg_flags)
+ {
+ 	struct sco_conn *conn = sco_pi(sk)->conn;
+ 	struct sk_buff *skb;
+@@ -293,15 +294,11 @@ static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
+ 
+ 	BT_DBG("sk %p len %d", sk, len);
+ 
+-	skb = bt_skb_send_alloc(sk, len, msg->msg_flags & MSG_DONTWAIT, &err);
++	skb = bt_skb_send_alloc(sk, len, msg_flags & MSG_DONTWAIT, &err);
+ 	if (!skb)
+ 		return err;
+ 
+-	if (memcpy_from_msg(skb_put(skb, len), msg, len)) {
+-		kfree_skb(skb);
+-		return -EFAULT;
+-	}
+-
++	memcpy(skb_put(skb, len), buf, len);
+ 	hci_send_sco(conn->hcon, skb);
+ 
+ 	return len;
+@@ -726,6 +723,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 			    size_t len)
+ {
+ 	struct sock *sk = sock->sk;
++	void *buf;
+ 	int err;
+ 
+ 	BT_DBG("sock %p, sk %p", sock, sk);
+@@ -737,14 +735,24 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
++	buf = kmalloc(len, GFP_KERNEL);
++	if (!buf)
++		return -ENOMEM;
++
++	if (memcpy_from_msg(buf, msg, len)) {
++		kfree(buf);
++		return -EFAULT;
++	}
++
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = sco_send_frame(sk, msg, len);
++		err = sco_send_frame(sk, buf, len, msg->msg_flags);
+ 	else
+ 		err = -ENOTCONN;
+ 
+ 	release_sock(sk);
++	kfree(buf);
+ 	return err;
+ }
+ 
 -- 
 2.33.0
 
