@@ -2,31 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 862EBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:12:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C173C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:16:19 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7114F6124D
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:12:56 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 046276128B
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:16:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241198AbhKIBNJ (ORCPT
+        id S241979AbhKIBSH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 20:13:09 -0500
-Received: from mail.kernel.org ([198.145.29.99]:38612 "EHLO mail.kernel.org"
+        Mon, 8 Nov 2021 20:18:07 -0500
+Received: from mail.kernel.org ([198.145.29.99]:38626 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S241766AbhKIBKo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 20:10:44 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 81A8661A83;
-        Tue,  9 Nov 2021 01:04:34 +0000 (UTC)
+        id S242075AbhKIBMw (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Nov 2021 20:12:52 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 55F6861AA4;
+        Tue,  9 Nov 2021 01:05:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636419875;
-        bh=RKEmarnTG58voAI1wWvxQd9ErnZyKMcBBb43H0ND5QI=;
+        s=k20201202; t=1636419920;
+        bh=EIKbLTBPPM0/lQsDrGZx6RkLmFP69ANDVIhAw+JHHGI=;
         h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=uf5imTuwjIvRMSWUVFU49vvEmaKqHXq+pyB0kgklOSrHbMWhz7F4H9T/GxfG24Xox
-         NaMdiD03iG3Dy0YNM7M9OuU5a54ob26xF1yuIlDZd2LZNjOhxs1dKYkfWMYO/guOuX
-         0Gr9zJgoGkYHEKywt1CHNgTE4xRrlHFmvYHTTD4OhrFia2C+gkXi/YOgE4Bc8f+eAP
-         Z8Ym+6axcyLb9cbVVcww5Q3pM/kVvxXQdsmF0qMp2ubHd+58uhJGhNx7zR3mNHX0++
-         9eu+uAoOGY4X4Ds74PZ+MMWGsANI1Kbo7dJAse0MIWwOHi5ctItw+bi68CJRKDqYAB
-         z+ort9uqyvRyQ==
+        b=Kz6ALRNAhFPyiRXzlGGNn5E9ZjRU8ASFT+CRu/wTxFzPsJ8iU79RdwchS3kjiwiXc
+         p5Od+L+tNENf/n0yjBoNsgPtPVDJXMns5YqO1n7D2eRzSHEIIaORU5abi3KQJQAa3S
+         Pq1WtHQbghtE08QZRwtypdxAnUuhFOEMl2weuSyPiPqseM1MFCYPSjPxYmejiPH/qA
+         fPEQBvKkwvmmoEfhhRDPtY86dNnbrv2z+X3f4hrZ3YidgayRWvY+QzKbUcAuRcorD1
+         lEZUO4yZEKGmyRPtFnwtQmeVVGfwoStS+9IcWOHyOVo0DQXNihnwfbvOGwMcMpqsLR
+         nE7YdvvdgMJIg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Wang ShaoBo <bobo.shaobowang@huawei.com>,
@@ -35,12 +35,12 @@ Cc:     Wang ShaoBo <bobo.shaobowang@huawei.com>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.4 06/74] Bluetooth: fix use-after-free error in lock_sock_nested()
-Date:   Mon,  8 Nov 2021 12:48:33 -0500
-Message-Id: <20211108174942.1189927-6-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 03/47] Bluetooth: fix use-after-free error in lock_sock_nested()
+Date:   Mon,  8 Nov 2021 12:49:47 -0500
+Message-Id: <20211108175031.1190422-3-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211108174942.1189927-1-sashal@kernel.org>
-References: <20211108174942.1189927-1-sashal@kernel.org>
+In-Reply-To: <20211108175031.1190422-1-sashal@kernel.org>
+References: <20211108175031.1190422-1-sashal@kernel.org>
 MIME-Version: 1.0
 X-stable: review
 X-Patchwork-Hint: Ignore
@@ -145,10 +145,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 9 insertions(+), 1 deletion(-)
 
 diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 82e76ff01267a..08e9f332adad3 100644
+index 967a9bb144157..d938311c58a8d 100644
 --- a/net/bluetooth/l2cap_sock.c
 +++ b/net/bluetooth/l2cap_sock.c
-@@ -1347,6 +1347,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan *chan)
+@@ -1328,6 +1328,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan *chan)
  {
  	struct sock *sk = chan->data;
  
@@ -158,7 +158,7 @@ index 82e76ff01267a..08e9f332adad3 100644
  	l2cap_sock_kill(sk);
  }
  
-@@ -1355,6 +1358,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
+@@ -1336,6 +1339,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
  	struct sock *sk = chan->data;
  	struct sock *parent;
  
@@ -168,7 +168,7 @@ index 82e76ff01267a..08e9f332adad3 100644
  	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
  
  	/* This callback can be called both for server (BT_LISTEN)
-@@ -1538,8 +1544,10 @@ static void l2cap_sock_destruct(struct sock *sk)
+@@ -1519,8 +1525,10 @@ static void l2cap_sock_destruct(struct sock *sk)
  {
  	BT_DBG("sk %p", sk);
  
