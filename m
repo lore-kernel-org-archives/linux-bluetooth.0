@@ -2,31 +2,31 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AFF93C4332F
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 459BBC433FE
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:22:57 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9D1636052B
+	by mail.kernel.org (Postfix) with ESMTP id 2E6B06052B
 	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:22:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242189AbhKIBZj (ORCPT
+        id S242076AbhKIBZh (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 20:25:39 -0500
-Received: from mail.kernel.org ([198.145.29.99]:50110 "EHLO mail.kernel.org"
+        Mon, 8 Nov 2021 20:25:37 -0500
+Received: from mail.kernel.org ([198.145.29.99]:44356 "EHLO mail.kernel.org"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243189AbhKIBVN (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 20:21:13 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 59FC861381;
-        Tue,  9 Nov 2021 01:08:09 +0000 (UTC)
+        id S242267AbhKIBRL (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Nov 2021 20:17:11 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id 8BF4161ACE;
+        Tue,  9 Nov 2021 01:06:51 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636420090;
-        bh=F3dmZxdvQ2jpzrZHz4xGkd3iVO1+ehXqGikQQadSO3s=;
+        s=k20201202; t=1636420012;
+        bh=tAeMvQvi+vg3kKnhpw01b73sBeDIm/BIgffhPNvBl1w=;
         h=From:To:Cc:Subject:Date:From;
-        b=pk7qwIG5U+vvRXld++/R9E3QXuPrZeKEZ4cr62l1IvJVoDgciuXhsbjCZfVgjKI5E
-         kQUhm1GyhBw19i9rJ5uPk1u5NzIOseKfHYBRVshky3aioMXQ+I3f4+H2n/EohwU1r4
-         k6fOp+AkLTTejXmp8zJVCD+9E9h49o4Zv83H6c6NucuVixPfVE40YyzfHf1NgJufRy
-         jLRz5vS0Ql+Dr6GhjJHQqKRjnN9y7Apqv0ivoLvdDX/CauHPF1x8b9ZRjfihGoPbDu
-         EYdf/616FfAdFsNvA/MaMA0JLwsncLsaMjFawxbZDQwY6LyKfIPdMFXVizi0sZ7/3e
-         J4suoHFHzSxPQ==
+        b=AGpminiHhbD/FxdnRC4F3mb4HzgDcYEfoNjd9BvUIQSB1f+sG4ReH60LH49CZS+ut
+         fVKSBsFRLBWp8Zc6wrHEBFaKqAnJIvIiFkA6qDZx0LsoY+yphXykjTwp5WAy8cBhEG
+         7KBgrdrJnigtys6liyZOU9FyKzMJQ5MgeamzUZZwsetkT7CwD+SUg4RUkK7o0wPptC
+         2XqeuJFEylzgHYJGAgP1hzagOaaP4uORXPRt2yni10wPV6cdFY0lDtAc7yIeNod2CY
+         H8NRyfqh0UYkO8/x6fh3G0oMSpxaiN7OEqobMiF/anv6odtKO06sAv0PTMviU2XEmm
+         xjUoHhfTL9mLg==
 From:   Sasha Levin <sashal@kernel.org>
 To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
 Cc:     Takashi Iwai <tiwai@suse.de>,
@@ -34,9 +34,9 @@ Cc:     Takashi Iwai <tiwai@suse.de>,
         Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
         luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.9 01/33] Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
-Date:   Mon,  8 Nov 2021 20:07:35 -0500
-Message-Id: <20211109010807.1191567-1-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.14 01/39] Bluetooth: sco: Fix lock_sock() blockage by memcpy_from_msg()
+Date:   Mon,  8 Nov 2021 20:06:11 -0500
+Message-Id: <20211109010649.1191041-1-sashal@kernel.org>
 X-Mailer: git-send-email 2.33.0
 MIME-Version: 1.0
 X-stable: review
@@ -69,10 +69,10 @@ Signed-off-by: Sasha Levin <sashal@kernel.org>
  1 file changed, 16 insertions(+), 8 deletions(-)
 
 diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index 77f88c7df6053..b3b4ffaa394f6 100644
+index f681e7ce89457..a5cc8942fc3f8 100644
 --- a/net/bluetooth/sco.c
 +++ b/net/bluetooth/sco.c
-@@ -254,7 +254,8 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
+@@ -255,7 +255,8 @@ static int sco_connect(struct hci_dev *hdev, struct sock *sk)
  	return err;
  }
  
@@ -82,7 +82,7 @@ index 77f88c7df6053..b3b4ffaa394f6 100644
  {
  	struct sco_conn *conn = sco_pi(sk)->conn;
  	struct sk_buff *skb;
-@@ -266,15 +267,11 @@ static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
+@@ -267,15 +268,11 @@ static int sco_send_frame(struct sock *sk, struct msghdr *msg, int len)
  
  	BT_DBG("sk %p len %d", sk, len);
  
@@ -100,7 +100,7 @@ index 77f88c7df6053..b3b4ffaa394f6 100644
  	hci_send_sco(conn->hcon, skb);
  
  	return len;
-@@ -693,6 +690,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+@@ -692,6 +689,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  			    size_t len)
  {
  	struct sock *sk = sock->sk;
@@ -108,7 +108,7 @@ index 77f88c7df6053..b3b4ffaa394f6 100644
  	int err;
  
  	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -704,14 +702,24 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+@@ -703,14 +701,24 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
  	if (msg->msg_flags & MSG_OOB)
  		return -EOPNOTSUPP;
  
