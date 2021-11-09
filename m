@@ -2,121 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAD3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6B427C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 23:06:23 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AEBB961073
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:12 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 42A7260E73
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 23:06:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236847AbhKIW76 (ORCPT
+        id S232830AbhKIXJJ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Nov 2021 17:59:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
+        Tue, 9 Nov 2021 18:09:09 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33386 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238015AbhKIW7x (ORCPT
+        with ESMTP id S230221AbhKIXJI (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Nov 2021 17:59:53 -0500
-Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8110CC0797B3
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Nov 2021 14:46:59 -0800 (PST)
-Received: by mail-ua1-x92e.google.com with SMTP id t13so826906uad.9
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Nov 2021 14:46:59 -0800 (PST)
+        Tue, 9 Nov 2021 18:09:08 -0500
+Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F42FC061764
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Nov 2021 15:06:21 -0800 (PST)
+Received: by mail-ua1-x934.google.com with SMTP id p2so886031uad.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Nov 2021 15:06:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=KhyFE/RGDybH9ShWGQp+pQA8mmNWmFEU12x/hwGiWdY=;
-        b=FuaqUTaXd6M0QhUHWV64AHVpTWHh4j2GNoScbvXF3cNbW2kwnVTwq9w0wvrgiMxanq
-         wMb/3l5iueZbJcU5q6yK0Y70HVB003YbwQUk3mCCqndtASy13DYl0M1rOr8qBgWZXnb1
-         Ki2JxqNBHKuYNnzAbD+hgnlnkOGo7SOGavnf+VehUb99KnASz0scB5RPQp+KQ10VXxo5
-         ptHk1Vv6LOXUPzXC/O4WTkAqodY6Y+vl0Azmmjmc9XmjMpfewKfvgITx5aE8e1cFGCVU
-         hXNUhbnTTt7P8y8v26IZAf4XfCAiFp/HuqMRYRJv90HIHCrWtIn6Lx7E2k5IWoR//5YM
-         lHMQ==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=evvnNIXIXqMxBwj2wmg0jO7ZdU7NdxXmiu/zqKM7Vi8=;
+        b=hwiRBF91JwpEXimV8QyJJ3xh6jaLDgbYZ7bESdD/rT4ABufO3Vb8blv9NaqH8Gpqd0
+         +r2w1bPpWGUYq0sUZF9fg5FK1Dj7c+AYHmzgZ+gByZpHx4RqmvgCZ9pqbPKzgZcA6ylx
+         WSdPzXQVoJ4coddHU6InrWBmQt73AgbrPwk+x0u/a8jh6utSESCMJkhQF9lgUpy7qTfV
+         z2MPQNcDFyFHp7YZR/UO9SptNXWyk57UcmnMSxYOI8IqY6qOE7IcAVj2V9mW2gN23vwG
+         GoWDsyh4eaSrUYLlAgGvtGZGrcr/8Gs86BtCX8bPU0wbJFn+U3s8KINtZnnLChLdiSik
+         8Crg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=KhyFE/RGDybH9ShWGQp+pQA8mmNWmFEU12x/hwGiWdY=;
-        b=M5HjtHLVLjmKmC/IAE+z+EAlbrc4F86i4wRQ0O5xmLvMPkIc1xyMlzky7kooNXvU6S
-         E+ZvyIx2BT+wF8L0R0d5uIsoPhhiwncXdTi3FiyTPvNrvtUBMjiYZ7/DiVpw0pqXvexM
-         +1u5A1quyYq9j3CwM8ccZAM9bVMiOLBlJF4fk/xGe/LKrPWaN0aE0Je+XUxpv8Ew6bJz
-         YsyqhcwV55xzR282ccvkFgtZZsGOZpVdqJxBFp1ua9a4JScBqsL437V+jqIqqk2xpktt
-         AGRZVOlDeCMBIqFwq1nAu627woirOwfADzfPCQi8U7IT0JpwPfuxBqie+bYhR8kYymvO
-         01zg==
-X-Gm-Message-State: AOAM533WvRQja6t1kvOuGb2f69daV7WGVrI2mzFm2ApfmUG/iKPsDEn1
-        dzdZxu51u0a9RtfYPVxgY0Z3rAjUG8ee50ru2yeK6xYb
-X-Google-Smtp-Source: ABdhPJz++sxm/aE+T5SKJkyh1r4Mh9kpDxSX0Xdn3GId4ll2A6f6CRmLyToRv8RUuZyAahmRYGPYpDKPXaqD+rSPB+M=
-X-Received: by 2002:a67:d893:: with SMTP id f19mr5226667vsj.39.1636498015536;
- Tue, 09 Nov 2021 14:46:55 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=evvnNIXIXqMxBwj2wmg0jO7ZdU7NdxXmiu/zqKM7Vi8=;
+        b=jpFILt3BlwEdI9ZNUgDqqhISiqwfo45wfY/IiKS/8T38N5tzOyGe7X2ZwJCADxsPsb
+         T7M8ncmne5zp8bXVMdvi5PVoOK53927wLj74RjUSIStPL+jVv8uAvrA/zE67kjQz4s6J
+         4E015TTdhxxgWmcwj2CdgBVsZIbHfAdfe/FN/1inFZS7P13+CpjOUnWgKW+qythnAAJI
+         whayWKxMgfO0wbHmdgmOiMgUO525/Kg3VhYX9RCgCY8B4Y2qaEXqBeRtMotEsgnH8ODU
+         njP+6DhP2ZJEqvjmYuqdWGojiILBXvIG28VShxd+B3FYYAG4eL4bdBvnl9uvlJe66tUF
+         w5YA==
+X-Gm-Message-State: AOAM533zfWxmGZD7gEfjSDGsL7hqi49RcOXCH6kO52mqDtlDMMLbKlcv
+        ydOVETVxrVakWyYO19SsY59TDlevpp9y6yIW1vzVq/Zh
+X-Google-Smtp-Source: ABdhPJwXtKEsZsSTekUlKxJEUEQPn8tIxzKCOZmxReJmzABNUtgJiReMpQIzERI7YnHz0pUr2u/fsS8k4TDzDBwU/Lo=
+X-Received: by 2002:a67:fd90:: with SMTP id k16mr17532471vsq.39.1636499180490;
+ Tue, 09 Nov 2021 15:06:20 -0800 (PST)
 MIME-Version: 1.0
-References: <20211109213721.1121677-1-luiz.dentz@gmail.com> <618aee11.1c69fb81.4dc68.a49d@mx.google.com>
-In-Reply-To: <618aee11.1c69fb81.4dc68.a49d@mx.google.com>
+References: <20211109164113.65981-1-benjamin@sipsolutions.net> <20211109164113.65981-3-benjamin@sipsolutions.net>
+In-Reply-To: <20211109164113.65981-3-benjamin@sipsolutions.net>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 9 Nov 2021 14:46:44 -0800
-Message-ID: <CABBYNZLA09hUE-sraBrjQ6PEcozjz45GffrF-bEKd6Pf=_xbXQ@mail.gmail.com>
-Subject: Re: [v2,BlueZ] client/gatt: Fix using atoi
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Tue, 9 Nov 2021 15:06:09 -0800
+Message-ID: <CABBYNZKajx0FhVwDqHDWN1WfkM83NN41RR7OzkbgbKYqqn3F6g@mail.gmail.com>
+Subject: Re: [PATCH 2/4] Bluetooth: Add new hci_tx_error function
+To:     Benjamin Berg <benjamin@sipsolutions.net>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Benjamin Berg <bberg@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Benjamin,
 
-On Tue, Nov 9, 2021 at 1:54 PM <bluez.test.bot@gmail.com> wrote:
+On Tue, Nov 9, 2021 at 2:35 PM Benjamin Berg <benjamin@sipsolutions.net> wrote:
 >
-> This is automated email and please do not reply to this email!
+> From: Benjamin Berg <bberg@redhat.com>
 >
-> Dear submitter,
+> Currently this function only cancels any synchronous operation that
+> might be ongoing. Adding this function allows aborting synchronous
+> commands in case of low level TX/RX issues. A common example for this is
+> that the device has been removed.
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=577649
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    FAIL      1.46 seconds
-> GitLint                       PASS      0.90 seconds
-> Prep - Setup ELL              PASS      40.77 seconds
-> Build - Prep                  PASS      0.47 seconds
-> Build - Configure             PASS      7.68 seconds
-> Build - Make                  PASS      175.76 seconds
-> Make Check                    PASS      9.67 seconds
-> Make Distcheck                PASS      208.11 seconds
-> Build w/ext ELL - Configure   PASS      7.83 seconds
-> Build w/ext ELL - Make        PASS      166.39 seconds
->
-> Details
-> ##############################
-> Test: CheckPatch - FAIL
-> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-> Output:
-> [v2,BlueZ] client/gatt: Fix using atoi
-> WARNING:TYPO_SPELLING: 'prefered' may be misspelled - perhaps 'preferred'?
-> #84:
-> likely the prefered format for the likes of handles, etc, so this
->            ^^^^^^^^
->
-> /github/workspace/src/12611125.patch total: 0 errors, 1 warnings, 126 lines checked
->
-> NOTE: For some of the reported defects, checkpatch may be able to
->       mechanically convert to the typical style using --fix or --fix-inplace.
->
-> /github/workspace/src/12611125.patch has style problems, please review.
->
-> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
->
-> NOTE: If any of the errors are false positives, please report
->       them to the maintainer, see CHECKPATCH in MAINTAINERS.
->
->
->
->
+> Signed-off-by: Benjamin Berg <bberg@redhat.com>
 > ---
-> Regards,
-> Linux Bluetooth
+>  include/net/bluetooth/hci_core.h | 1 +
+>  net/bluetooth/hci_core.c         | 7 +++++++
+>  2 files changed, 8 insertions(+)
+>
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index dd8840e70e25..542f5a37b9d0 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -1267,6 +1267,7 @@ void hci_release_dev(struct hci_dev *hdev);
+>  int hci_suspend_dev(struct hci_dev *hdev);
+>  int hci_resume_dev(struct hci_dev *hdev);
+>  int hci_reset_dev(struct hci_dev *hdev);
+> +void hci_tx_error(struct hci_dev *hdev, int err);
+>  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb);
+>  int hci_recv_diag(struct hci_dev *hdev, struct sk_buff *skb);
+>  __printf(2, 3) void hci_set_hw_info(struct hci_dev *hdev, const char *fmt, ...);
+> diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+> index 8d33aa64846b..bbb35188e41f 100644
+> --- a/net/bluetooth/hci_core.c
+> +++ b/net/bluetooth/hci_core.c
+> @@ -4069,6 +4069,13 @@ int hci_reset_dev(struct hci_dev *hdev)
+>  }
+>  EXPORT_SYMBOL(hci_reset_dev);
+>
+> +/* Reset HCI device */
+> +void hci_tx_error(struct hci_dev *hdev, int err)
+> +{
+> +       hci_req_sync_cancel(hdev, err);
+> +}
+> +EXPORT_SYMBOL(hci_tx_error);
 
-Pushed.
+I think we might be better off having such functionality exposed by
+hci_sync.h since that should be accessible by driver nowadays, at
+least that seems cleaner than having to introduce yet another public
+function in hci_core.h just to interface with the likes of
+hci_req_sync_cancel, that said we are also deprecating hci_request.h
+in favor of hci_sync.h so we might as well move the likes of
+hci_req_sync_cancel to hci_sync.h renaming it to hci_cmd_sync_cancel
+so it is inline with naming we are using in hci_sync.h.
+
+>  /* Receive frame from HCI drivers */
+>  int hci_recv_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>  {
+> --
+> 2.31.1
+>
+
 
 -- 
 Luiz Augusto von Dentz
