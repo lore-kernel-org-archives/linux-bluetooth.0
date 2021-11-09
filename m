@@ -2,285 +2,298 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C42B8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 08:04:49 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 36E30C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 09:35:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id AE5E761105
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 08:04:49 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 0DC5961177
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 09:35:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243914AbhKIIHe (ORCPT
+        id S244960AbhKIJiL convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Nov 2021 03:07:34 -0500
-Received: from mail-eopbgr60100.outbound.protection.outlook.com ([40.107.6.100]:23299
-        "EHLO EUR04-DB3-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S236699AbhKIIHd (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Nov 2021 03:07:33 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oRG2XwvsVFhdjbjI/vTPbfJD+Chu02TL/1lWkVvPTqMK/OVoClwv/iuCQGtDuh9XHNAd1Z+JZ5EmxDwirMIz1O7ZuiejV9NS1/+wN/8QjrBPrPfBnyMWMTPk9Jk1N9piH4iOHdpCSX2eUhB2lqrqhuCHcf3svpTODKJ4EjrwGCrOr1CEEUbByOHmByQGtE7/lilIsfN/vdpmcJyW08+OXYx7XY5SzBSAObFzUckAhJnTIpnD/xyYUMh/XrwsoVM+trDffsZTT6Akn/AqkMdhfqpB3dIsuDZfLuAcAMXQ77w9XDIclph1uuu9avKKE1yrY82bPe6SmXnpL1Kr6UThEw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=D+dCxBN4ZXijHJHJ2fRfLe08jCexH+EMvHXKE2KIS04=;
- b=JhlbqBcaKSUGkhldtkfTyyeilmjaoxixI61on2VKtjwF5OKXhK1Vn4rE1axNcskAoCYuaEum46b9NQZSW4Om/LFDQ/CQrqXVYGWfFuyxGny70kYD1dvO1zjhR3aNFryNGawr2SDpcimqP3r+nZzkWmsKfe95EAfm9jjLB+UWjMT2E2C9yrytn4Q2JjP4Dt1rqBXdD1076W5e0lc/60ooXBYEHxxrLT4P/Fx771tuZ1Ow3Uh2qI+kN1f3IMNmhG6+/r5eevS+0eUcj0UguclsGyxD9P04OqfsvFN7d3zFu5g0NIqZKrvTpQkm0gWNxzg6orMmr7DhXccNzG9Oe9aGCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=victronenergy.com; dmarc=pass action=none
- header.from=victronenergy.com; dkim=pass header.d=victronenergy.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=victronenergy.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=D+dCxBN4ZXijHJHJ2fRfLe08jCexH+EMvHXKE2KIS04=;
- b=W6jp49I9EwdsClkLlLsawEdsFSGTnvpSguarDVSYR+uwNpHyz0ugBJOi5R2l0lMHMc7SdkkCxiPaQYn2BVbJEF6u2548oNYLYZnxXm0xu+nG2nw3V6cwYXOjPOMEz1uY5239MisZkrKpZWCCxboce+pWXSS6xjbnFX/uwdDc+9k=
-Received: from AM0PR07MB4131.eurprd07.prod.outlook.com (2603:10a6:208:4b::27)
- by AM4PR07MB3492.eurprd07.prod.outlook.com (2603:10a6:205:b::29) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4690.12; Tue, 9 Nov
- 2021 08:04:46 +0000
-Received: from AM0PR07MB4131.eurprd07.prod.outlook.com
- ([fe80::1061:7da4:23ad:41ee]) by AM0PR07MB4131.eurprd07.prod.outlook.com
- ([fe80::1061:7da4:23ad:41ee%6]) with mapi id 15.20.4690.015; Tue, 9 Nov 2021
- 08:04:45 +0000
-From:   Thiemo van Engelen <tvanengelen@victronenergy.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-CC:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Subject: RE: [PATCH BlueZ] client/gatt: Fix using atoi
-Thread-Topic: [PATCH BlueZ] client/gatt: Fix using atoi
-Thread-Index: AQHX1NWHjESn24mDCkqvOyuVf6kttKv61RCw
-Date:   Tue, 9 Nov 2021 08:04:45 +0000
-Message-ID: <AM0PR07MB4131776DEB5C241B869CA071AF929@AM0PR07MB4131.eurprd07.prod.outlook.com>
-References: <20211108191752.895782-1-luiz.dentz@gmail.com>
-In-Reply-To: <20211108191752.895782-1-luiz.dentz@gmail.com>
-Accept-Language: en-NL, en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=victronenergy.com;
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: 257ea2c9-3323-4ec4-37bb-08d9a3579820
-x-ms-traffictypediagnostic: AM4PR07MB3492:
-x-microsoft-antispam-prvs: <AM4PR07MB3492510A428565DCD91E1576AF929@AM4PR07MB3492.eurprd07.prod.outlook.com>
-x-ms-oob-tlc-oobclassifiers: OLM:1051;
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: DkoyrLZDUwSXaXNxEgqbZHX2ewl9fRBm4/iI9hB7quWvqpulZyRigDd0tyyByhWM5CiFL0EFL1GUenNb+j2CufhmDHTcUJ9rMgVUENEdnnH/59iIF8hfhnF66BxOKRZHXgQ11gIo7xxr6NdlG7CmOxqC91CDVrp5WFMFd4foekzUoH+4KtDKabFhk+zbz5/33+AImqSZ2RKZfhPPmItn28MGvqEQwA5umRsf2R5Rtq7EWtqKUxIampaHTqWqoFXLrFZkGl60Tze7j7GbA/C0Dww7HRpxCOKi15/qZZWkxwExnZXWqwB40UJdymFJbmccho1TYY522OGCrIFei2R0WjWPE89pNWo8A5O5rr6km7uPQ//fmHmbPU21SqYLv/JgPw/SJyn54DQqHKFQWNg1E4WpIdzMXR3uzBiDkgjbaYY5N9DWTRYAbrir7ABlQQ7oJSqnIsEqIRuVQ4axos9FBzlillZ/fQf8dYTKy5ZHY75pjhV0MdWT03znkOte+D/3ka0an707hVnjiXHA7yGXtt59KsZzs+ShzVcOO8o4UPUA4QdhKBw0bt6ZbPZCSsisxsh6Jyaj7KQFf3ZuHcTQqzR13ryZzHHhTXzcsOmXLEvFyZL3ag9MxI3LrlVrR/BHWvz0+Zo0JbfGJRKq8btJHf2QG71GozbbMQu7HYz0sn9jN8cQPMgPLhD6OU0JgB8vWpPoJ/J1Phf51w+tJOzr9w==
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR07MB4131.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(4636009)(366004)(6916009)(38100700002)(66446008)(508600001)(9686003)(2906002)(4326008)(316002)(86362001)(186003)(5660300002)(55016002)(53546011)(33656002)(7696005)(71200400001)(8676002)(52536014)(66556008)(64756008)(38070700005)(83380400001)(76116006)(66946007)(122000001)(66476007)(8936002)(26005)(6506007);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?b/aEiBsvcOORcbnFLRrPi68DKbriAZGp/HN3pnTv9zXcnAL3KUe59zMtsxS1?=
- =?us-ascii?Q?6PLOfnZN04HC0FbVoowQaH5WXDZyupRrCkb+OzPB8Xl6ltkinWj3aodMSRk2?=
- =?us-ascii?Q?qM8ZIKOK9Zmkg87Q9WGdPJBU6MlWxVIM2ROhVa+QkH0/om5K6zwKmRHLpFr/?=
- =?us-ascii?Q?Dg1IkTcOMKpWY2Ga1NCFyRkLR1lI+zmCrb/Sv/R+h51SPTRGQbkhXcp1usGE?=
- =?us-ascii?Q?t6acDZB4RIN86pdm9OajI+vqedQX35bsNwqiYLVy2fdjMWc8s0bYP7yYSKRW?=
- =?us-ascii?Q?7kgwF9206/YlxiUguTrQldaJUyH32oeYq5bnGBW/4/PFzyXE3wHa1ACZmOVI?=
- =?us-ascii?Q?urDJKagQ+r/utNatsgp3PyhPhx+JNwWzbIyI2EQpAUXXkR7kB7Jzm8ZlHPyD?=
- =?us-ascii?Q?EofIE3gvivA9hol31NJthQ8aiDPzG1LcGUI7iAI9JwbqJ3jRh5WG50cc5Djp?=
- =?us-ascii?Q?88a5xspS6vuS0EieBgoWhT7/fpWCESzoFVz/l6LbOIZK2KaMYKFwPE+nMJFq?=
- =?us-ascii?Q?Ygh79IHhGU0VPV9+UAeSzOg2XNtH0dGwnJ21lpRtkft4JJOfJu/4CiY5Rv4H?=
- =?us-ascii?Q?54DiWDs2vJqxG1rhioatVIWUFG8aGbju6G0zAaxEKETeHzvtGglPtgV4i4NU?=
- =?us-ascii?Q?Tp5G6hJ6Hyx80+C2edWcCaBb/aZ0jryQ2kZkMLRXQD/8kZCTgM+IQR5VZV/Y?=
- =?us-ascii?Q?U0oFEro5BfVZuPjozD8fgppIuiNUzpb3Vp2FserctyRUJD76Imx2cNu1/zAT?=
- =?us-ascii?Q?WFGdkOhxIJiQqOEBu42iwKPc96CdY/S3kUH+mKYAXXVaI0pUVhmgVuR5+CqN?=
- =?us-ascii?Q?xfP2Z4tkBOm18IcqSdQ71U7IpOco0n7z4qw8GnNn4fdqDKF1eKfFK/9m6dtZ?=
- =?us-ascii?Q?LThQGDp4TdWV+gKhuggyi7FDS/z5dyZBh1Rl3IwCIDn5wZk+BKAu65SlcRdZ?=
- =?us-ascii?Q?oXblNT64VofWqkJhkqP7aLPLYIktJ8lwKyIrfMUNjVEarOaesnUYTrRW01md?=
- =?us-ascii?Q?XLvw3MK9Fj8FtLYo9EnWXUoPSP7Y1Y3U/OakOInvaLq29T/JHO3kudtnXZOM?=
- =?us-ascii?Q?yLcLC7mlTdBZ6S2OKDzN6aOjnIg5dtmIrCjxRRU4IEWYa5OUUE/Ox1U340oc?=
- =?us-ascii?Q?8LpGlHC1nqVGhMxc/gTRuZryDLTWMBnXU9bQSsnGfQwq7SgqEZKfaZP6pfFy?=
- =?us-ascii?Q?JBEKiO7wfjK/U4x0dNCaL1xLcxmI39NHKXQj3ddaCX+SzAkwH7McTtaFyeIc?=
- =?us-ascii?Q?RaX2VqsgtKJSaDsxnSClQvkMnuckISKUjijItCnVp9Fxz2sXofta4vUTf+w3?=
- =?us-ascii?Q?07V3Lp+Aqt1c0L0r7D1K/IGCD5z89+QgzV66fSXC9B2+8o0ZsE+yUBHtE/fc?=
- =?us-ascii?Q?brQ7REDB9g0dwXDTRqsFeXkNT5Va/ABoJcyEXmNH7fxvzD9fnKY6hXLl1Obz?=
- =?us-ascii?Q?h+ljbZk9clPSePB2rOjNgQPtbkfmKw/wp4iHq0wgbzWJG+n2Ebkk6DIdn5Sv?=
- =?us-ascii?Q?FdHWIxySvBts4MopAtX/oap3mDfIbx/3Fw1eL2v3ultcud0qMMv9EMH3naTa?=
- =?us-ascii?Q?tM5bhfCVaMsu5zU5ttlLuxPNXCxjDRGN4UifEaMCtstUHUTUWyOvs9MzXrkj?=
- =?us-ascii?Q?bS5RhQHa3I8YuNkzJ3Y026vVGesSZbDH+Nox4CXRkWHM9iNXAaplq6QDUcf6?=
- =?us-ascii?Q?p7BI7w=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
-MIME-Version: 1.0
-X-OriginatorOrg: victronenergy.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR07MB4131.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 257ea2c9-3323-4ec4-37bb-08d9a3579820
-X-MS-Exchange-CrossTenant-originalarrivaltime: 09 Nov 2021 08:04:45.8256
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 60b95f08-3558-4e94-b0f8-d690c498e225
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: PqwhlhK04riL0opBjgIkCisKu/WdAaqzIjZRJyum8QvEpuhGARPVEZ4SuJKGztRd94GZXKaQEEDcH6bgyoC7FyF0qGQOXvIX2VBkXNvYWuw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM4PR07MB3492
+        Tue, 9 Nov 2021 04:38:11 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:47617 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244931AbhKIJiH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 9 Nov 2021 04:38:07 -0500
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id BD971CED1E;
+        Tue,  9 Nov 2021 10:35:20 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [RFC PATCH V5] Bluetooth: vhci: Add support creating extended
+ device mode
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211109031343.87728-1-hj.tedd.an@gmail.com>
+Date:   Tue, 9 Nov 2021 10:35:20 +0100
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>
+Content-Transfer-Encoding: 8BIT
+Message-Id: <FFABFC0E-7ED7-417D-9AEF-DDD9D09FF77D@holtmann.org>
+References: <20211109031343.87728-1-hj.tedd.an@gmail.com>
+To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Tedd,
 
-> -----Original Message-----
-> From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-> Sent: maandag 8 november 2021 20:18
-> To: linux-bluetooth@vger.kernel.org
-> Subject: [PATCH BlueZ] client/gatt: Fix using atoi
->=20
-> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->=20
-> atoi doesn't support values entered in hexadecimal (0x...) which is likel=
-y the
-> prefered format for the likes of handles, etc, so this replaces the uses =
-of atoi
-> with strtol.
+> This patch adds new opcode(0x03) for HCI Vendor packet to support
+> creating extended device mode. In order to avoid the conflict with the
+> legacy opcode, it has to be 0x03 only and all other bits must be set to
+> zero.
+> 
+> Then, it is followed by the extended configuration data that contains
+> the device type and the flags to be used.
+> 
+> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 > ---
->  client/gatt.c | 71 +++++++++++++++++++++++++++++++++++++++++++----
-> ----
->  1 file changed, 60 insertions(+), 11 deletions(-)
->=20
-> diff --git a/client/gatt.c b/client/gatt.c index 21fd38ecf..12e213d0f 100=
-644
-> --- a/client/gatt.c
-> +++ b/client/gatt.c
-> @@ -650,19 +650,27 @@ static void read_attribute(GDBusProxy *proxy,
-> uint16_t offset)  void gatt_read_attribute(GDBusProxy *proxy, int argc, c=
-har
-> *argv[])  {
->  	const char *iface;
-> -	uint16_t offset =3D 0;
-> +	long offset =3D 0;
->=20
->  	iface =3D g_dbus_proxy_get_interface(proxy);
->  	if (!strcmp(iface, "org.bluez.GattCharacteristic1") ||
->  				!strcmp(iface, "org.bluez.GattDescriptor1")) {
->=20
-> -		if (argc =3D=3D 2)
-> -			offset =3D atoi(argv[1]);
-> +		if (argc =3D=3D 2) {
-> +			char *endptr =3D NULL;
+> drivers/bluetooth/hci_vhci.c | 200 ++++++++++++++++++++++++++++-------
+> 1 file changed, 162 insertions(+), 38 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+> index 49ac884d996e..4c0cfb29c0e8 100644
+> --- a/drivers/bluetooth/hci_vhci.c
+> +++ b/drivers/bluetooth/hci_vhci.c
+> @@ -30,6 +30,24 @@
+> 
+> static bool amp;
+> 
+> +/* This is the struct for extended device configuration.
+> + * The opcode 0x03 is used for creating an extended device and followed by
+> + * the configuration data below.
+> + * dev_type is Primay or AMP.
+> + * flag_len is the length of flag array
+> + * flag array contains the flag to use/set while creating the device.
+> + */
+> +struct vhci_ext_config {
+> +	__u8	dev_type;
+> +	__u8	flag_len;
+> +	__u8	flags[0];
+> +};
 > +
-> +			offset =3D strtol(argv[1], &endptr, 0);
+> +#define VHCI_EXT_FLAG_ENABLE_AOSP		0x01
+> +#define VHCI_EXT_FLAG_QUIRK_RAW_DEVICE		0x02
+> +#define VHCI_EXT_FLAG_QUIARK_EXTERNAL_CONFIG	0x03
+> +#define VHCI_EXT_FLAG_QUIRK_INVALID_BDADDR	0x04
 
-Perhaps it is better to use strtoul and make offset an unsigned long or che=
-ck for < 0 when C99 is not used as read_attribute takes it as a uint16_t?
-And from the naming of the other variables that are assigned using strtol I=
- would guess more or less the same applies to those strtol calls.
+QUIARK ;)
 
-> +			if (!endptr || *endptr !=3D '\0' || offset >
-> UINT16_MAX) {
-> +				bt_shell_printf("Invalid offload: %s", argv[1]);
-> +				goto done;
-> +			}
-> +		}
->=20
->  		read_attribute(proxy, offset);
->  		return;
->  	}
->=20
-> +done:
->  	bt_shell_printf("Unable to read attribute %s\n",
->=20
-> 	g_dbus_proxy_get_path(proxy));
->  	return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> @@ -805,8 +813,18 @@ void gatt_write_attribute(GDBusProxy *proxy, int
-> argc, char *argv[])
->  				!strcmp(iface, "org.bluez.GattDescriptor1")) {
->  		data.iov.iov_base =3D str2bytearray(argv[1], &data.iov.iov_len);
->=20
-> -		if (argc > 2)
-> -			data.offset =3D atoi(argv[2]);
-> +		if (argc > 2) {
-> +			char *endptr =3D NULL;
-> +			long offset;
 > +
-> +			offset =3D strtol(argv[1], &endptr, 0);
-> +			if (!endptr || *endptr !=3D '\0' || offset >
-> UINT16_MAX) {
-> +				bt_shell_printf("Invalid offload: %s", argv[1]);
-> +				goto fail;
-> +			}
+> struct vhci_data {
+> 	struct hci_dev *hdev;
+> 
+> @@ -278,11 +296,52 @@ static int vhci_setup(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +static int vhci_register_hdev(struct hci_dev *hdev, __u8 opcode)
+> +{
+> +	struct vhci_data *data = hci_get_drvdata(hdev);
+> +	struct sk_buff *skb;
 > +
-> +			data.offset =3D offset;
-> +		}
->=20
->  		if (argc > 3)
->  			data.type =3D argv[3];
-> @@ -815,6 +833,7 @@ void gatt_write_attribute(GDBusProxy *proxy, int
-> argc, char *argv[])
->  		return;
->  	}
->=20
-> +fail:
->  	bt_shell_printf("Unable to write attribute %s\n",
->=20
-> 	g_dbus_proxy_get_path(proxy));
->=20
-> @@ -1482,8 +1501,18 @@ void gatt_register_service(DBusConnection
-> *conn, GDBusProxy *proxy,
->  					g_list_length(local_services));
->  	service->primary =3D primary;
->=20
-> -	if (argc > 2)
-> -		service->handle =3D atoi(argv[2]);
-> +	if (argc > 2) {
-> +		char *endptr =3D NULL;
-> +		long handle;
+> +	skb = bt_skb_alloc(4, GFP_KERNEL);
+> +	if (!skb)
+> +		return -ENOMEM;
 > +
-> +		handle =3D strtol(argv[2], &endptr, 0);
-> +		if (!endptr || *endptr !=3D '\0' || handle > UINT16_MAX) {
-> +			bt_shell_printf("Invalid handle: %s", argv[2]);
-> +			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +		}
-> +
-> +		service->handle =3D handle;
+> +	if (hci_register_dev(hdev) < 0) {
+> +		BT_ERR("Can't register HCI device");
+> +		kfree_skb(skb);
+> +		return -EBUSY;
 > +	}
->=20
->  	if (g_dbus_register_interface(conn, service->path,
->  					SERVICE_INTERFACE, NULL, NULL,
-> @@ -2574,8 +2603,18 @@ void gatt_register_chrc(DBusConnection *conn,
-> GDBusProxy *proxy,
->  	chrc->flags =3D g_strsplit(argv[2], ",", -1);
->  	chrc->authorization_req =3D attr_authorization_flag_exists(chrc-
-> >flags);
->=20
-> -	if (argc > 3)
-> -		chrc->handle =3D atoi(argv[3]);
-> +	if (argc > 3) {
-> +		char *endptr =3D NULL;
-> +		long handle;
 > +
-> +		handle =3D strtol(argv[3], &endptr, 0);
-> +		if (!endptr || *endptr !=3D '\0' || handle > UINT16_MAX) {
-> +			bt_shell_printf("Invalid handle: %s", argv[3]);
-> +			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +		}
+> +	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
+> +			    &force_suspend_fops);
 > +
-> +		chrc->handle =3D handle;
-> +	}
->=20
->  	if (g_dbus_register_interface(conn, chrc->path, CHRC_INTERFACE,
->  					chrc_methods, NULL, chrc_properties,
-> @@ -2851,8 +2890,18 @@ void gatt_register_desc(DBusConnection *conn,
-> GDBusProxy *proxy,
->  					g_list_length(desc->chrc->descs));
->  	desc->flags =3D g_strsplit(argv[2], ",", -1);
->=20
-> -	if (argc > 3)
-> -		desc->handle =3D atoi(argv[3]);
-> +	if (argc > 3) {
-> +		char *endptr =3D NULL;
-> +		long handle;
+> +	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
+> +			    &force_wakeup_fops);
 > +
-> +		handle =3D strtol(argv[3], &endptr, 0);
-> +		if (!endptr || *endptr !=3D '\0' || handle > UINT16_MAX) {
-> +			bt_shell_printf("Invalid handle: %s", argv[3]);
-> +			return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +		}
+> +	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
+> +		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
+> +				    &msft_opcode_fops);
 > +
-> +		desc->handle =3D handle;
-> +	}
->=20
->  	if (g_dbus_register_interface(conn, desc->path, DESC_INTERFACE,
->  					desc_methods, NULL,
-> desc_properties,
-> --
-> 2.31.1
+> +	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
+> +		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
+> +				    &aosp_capable_fops);
+> +
+> +	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+> +
+> +	skb_put_u8(skb, 0xff);
+> +	skb_put_u8(skb, opcode);
+> +	put_unaligned_le16(hdev->id, skb_put(skb, 2));
+> +	skb_queue_tail(&data->readq, skb);
+> +
+> +	wake_up_interruptible(&data->read_wait);
+> +
+> +	return 0;
+> +}
+> +
 
-Kind regards,
-Thiemo
+I don’t think it is the best idea to generalize this. I have the feeling we need to discuss the return packet and format as well. So in the initial patch, I would not much mess with existing code. We can optimize that once we have a good handle on this. Especially since this makes the review more complicated.
+
+That said, I was also keeping in mind something Luiz and I discussed a while back that we might want to use the 0xff channel (or some other defined channel) for extra protocols running between hci_vhci and btvirt.
+
+> static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> {
+> 	struct hci_dev *hdev;
+> -	struct sk_buff *skb;
+> 	__u8 dev_type;
+> +	int ret;
+> 
+> 	if (data->hdev)
+> 		return -EBADFD;
+> @@ -297,15 +356,9 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> 	if (opcode & 0x3c)
+> 		return -EINVAL;
+> 
+> -	skb = bt_skb_alloc(4, GFP_KERNEL);
+> -	if (!skb)
+> -		return -ENOMEM;
+> -
+> 	hdev = hci_alloc_dev();
+> -	if (!hdev) {
+> -		kfree_skb(skb);
+> +	if (!hdev)
+> 		return -ENOMEM;
+> -	}
+> 
+> 	data->hdev = hdev;
+> 
+> @@ -331,45 +384,108 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+> 	if (opcode & 0x80)
+> 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+> 
+> -	if (hci_register_dev(hdev) < 0) {
+> -		BT_ERR("Can't register HCI device");
+> +	/* Legacy method returns opcode instead of dev type */
+> +	ret = vhci_register_hdev(hdev, opcode);
+> +	if (ret < 0) {
+> 		hci_free_dev(hdev);
+> 		data->hdev = NULL;
+> -		kfree_skb(skb);
+> -		return -EBUSY;
+> 	}
+> 
+> -	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
+> -			    &force_suspend_fops);
+> +	return ret;
+> +}
+> 
+> -	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
+> -			    &force_wakeup_fops);
+> +static int vhci_create_device(struct vhci_data *data, __u8 opcode)
+> +{
+> +	int err;
+> 
+> -	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
+> -		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
+> -				    &msft_opcode_fops);
+> +	mutex_lock(&data->open_mutex);
+> +	err = __vhci_create_device(data, opcode);
+> +	mutex_unlock(&data->open_mutex);
+> 
+> -	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
+> -		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
+> -				    &aosp_capable_fops);
+> +	return err;
+> +}
+> 
+> -	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
+> +static int __vhci_create_extended_device(struct vhci_data *data,
+> +							struct sk_buff *skb)
+> +{
+> +	struct hci_dev *hdev;
+> +	struct vhci_ext_config *config;
+> +	int i, ret;
+> +	__u8 flag;
+> 
+> -	skb_put_u8(skb, 0xff);
+> -	skb_put_u8(skb, opcode);
+> -	put_unaligned_le16(hdev->id, skb_put(skb, 2));
+> -	skb_queue_tail(&data->readq, skb);
+> +	if (data->hdev)
+> +		return -EBADFD;
+> 
+> -	wake_up_interruptible(&data->read_wait);
+> -	return 0;
+> +	/* Make sure the skb has a minimum valid length */
+> +	if (skb->len < sizeof(*config))
+> +		return -EINVAL;
+> +
+> +	config = (void *)(skb->data);
+> +	if (skb->len < sizeof(*config) + config->flag_len)
+> +		return -EINVAL;
+> +
+> +	if (config->dev_type != HCI_PRIMARY && config->dev_type != HCI_AMP)
+> +		return -EINVAL;
+> +
+> +	hdev = hci_alloc_dev();
+> +	if (!hdev)
+> +		return -ENOMEM;
+> +
+> +	data->hdev = hdev;
+> +
+> +	hdev->bus = HCI_VIRTUAL;
+> +	hdev->dev_type = config->dev_type;
+> +	hci_set_drvdata(hdev, data);
+> +
+> +	hdev->open  = vhci_open_dev;
+> +	hdev->close = vhci_close_dev;
+> +	hdev->flush = vhci_flush;
+> +	hdev->send  = vhci_send_frame;
+> +	hdev->get_data_path_id = vhci_get_data_path_id;
+> +	hdev->get_codec_config_data = vhci_get_codec_config_data;
+> +	hdev->wakeup = vhci_wakeup;
+> +	hdev->setup = vhci_setup;
+> +	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
+> +
+> +	for (i = 0; i < config->flag_len; i++) {
+> +		flag = config->flags[i];
+> +		switch (flag) {
+> +		case VHCI_EXT_FLAG_ENABLE_AOSP:
+> +			data->aosp_capable = 1;
+> +			break;
+> +		case VHCI_EXT_FLAG_QUIRK_RAW_DEVICE:
+> +			set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+> +			break;
+> +		case VHCI_EXT_FLAG_QUIARK_EXTERNAL_CONFIG:
+> +			set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
+> +			break;
+> +		case VHCI_EXT_FLAG_QUIRK_INVALID_BDADDR:
+> +			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
+> +			break;
+> +		default:
+> +			BT_ERR("Invalid flag");
+> +			hci_free_dev(hdev);
+> +			data->hdev = NULL;
+> +			return -EINVAL;
+> +		}
+> +	}
+
+So this part, I think you misunderstood me.
+
+struct virtio_bt_config {
+	__u8  type;
+	__u16 vendor;
+	__u16 msft_opcode;
+} __attribute__((packed));
+
+This part above is a flexible struct. I can be extended over time. However the validity of fields are defined by flags.
+
+/* Feature bits */
+#define VIRTIO_BT_F_VND_HCI	0	/* Indicates vendor command support */
+#define VIRTIO_BT_F_MSFT_EXT	1	/* Indicates MSFT vendor support */
+#define VIRTIO_BT_F_AOSP_EXT	2	/* Indicates AOSP vendor support */
+
+These feature bits need to have its space. If we want more features, then we should add them here and also enable in virtio_bt.
+
+With that in mind, scrap EXTERNAL_CONFIG and RAW_DEVICE since that you can do via existing legacy mode. And also they make no real sense. The raw device part is really legacy that I rather completely remove. We have User Channel these days and that is a lot better. The external config is something we haven’t used at all and so keep it in the legacy realm.
+
+For the invalid bd_addr quirk, I need to consider if it is better to say 00:00:.. address is concluded as invalid or we allow providing a magic invalid address to match against or just a flag as above. The problem is also that we need to define the vendor opcode that is used to set the public address. Otherwise such a flag is useless.
+
+Regards
+
+Marcel
+
