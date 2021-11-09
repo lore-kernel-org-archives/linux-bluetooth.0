@@ -2,58 +2,58 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BE9E0C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CEAD3C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9299961073
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:11 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id AEBB961073
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 22:57:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231249AbhKIW75 (ORCPT
+        id S236847AbhKIW76 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Nov 2021 17:59:57 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58248 "EHLO
+        Tue, 9 Nov 2021 17:59:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58256 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236847AbhKIW7v (ORCPT
+        with ESMTP id S238015AbhKIW7x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Nov 2021 17:59:51 -0500
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 593D1C09A7A6
-        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Nov 2021 14:46:32 -0800 (PST)
-Received: by mail-ua1-x929.google.com with SMTP id az37so781147uab.13
-        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Nov 2021 14:46:32 -0800 (PST)
+        Tue, 9 Nov 2021 17:59:53 -0500
+Received: from mail-ua1-x92e.google.com (mail-ua1-x92e.google.com [IPv6:2607:f8b0:4864:20::92e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8110CC0797B3
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Nov 2021 14:46:59 -0800 (PST)
+Received: by mail-ua1-x92e.google.com with SMTP id t13so826906uad.9
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Nov 2021 14:46:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=8k2yjqam7W3V/Bv0R/FkAdRGvK3HnXJ0fj7tlPbANNw=;
-        b=ZViqxlKWDN9vxB9K1TeOmPMd6/XxEW0zlowH5VlGPTtJRCIkTiQ9VWrjCFGtX/duXQ
-         sKfsCRpDkqjJsQDZA+G6Q2F5btMrKFfW47al6CnkPCLhFMTvfWO6icLl9/kdv0nqblIq
-         Oxzvvd3ssan7bU96pq6k37f+xcecqfxmSTVkomCDKBucg+hibao58z0IPzhwVm7JOdZa
-         6ZHwXDNFEOJ95RjCKwYxzLdtyI9i/uHhaiN2DMMbyO8cZSj6AG+4IZ8ro5nIDiX09qzg
-         PjEgY+4sb6l5YtZf4AruQuzPIKMz7CZfMO/23PV66ZrOfqQOVjT1G+y8vs2AwP+8d3E7
-         TIfg==
+        bh=KhyFE/RGDybH9ShWGQp+pQA8mmNWmFEU12x/hwGiWdY=;
+        b=FuaqUTaXd6M0QhUHWV64AHVpTWHh4j2GNoScbvXF3cNbW2kwnVTwq9w0wvrgiMxanq
+         wMb/3l5iueZbJcU5q6yK0Y70HVB003YbwQUk3mCCqndtASy13DYl0M1rOr8qBgWZXnb1
+         Ki2JxqNBHKuYNnzAbD+hgnlnkOGo7SOGavnf+VehUb99KnASz0scB5RPQp+KQ10VXxo5
+         ptHk1Vv6LOXUPzXC/O4WTkAqodY6Y+vl0Azmmjmc9XmjMpfewKfvgITx5aE8e1cFGCVU
+         hXNUhbnTTt7P8y8v26IZAf4XfCAiFp/HuqMRYRJv90HIHCrWtIn6Lx7E2k5IWoR//5YM
+         lHMQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to;
-        bh=8k2yjqam7W3V/Bv0R/FkAdRGvK3HnXJ0fj7tlPbANNw=;
-        b=jqzx5N0juTVMI9BARXsHwMkkd2GIhP1/4IQQcV08QRWvPWXo1MAKFgS+AhMAkUYokA
-         SGMKTkM4EiBCGOPiIhgrU2JGGrZIiC7aQ4ytxdbkWAJ4O+eLA3Say5hb8hL/m/JnX4VV
-         oFpP0tMXrVIyZf2n5BBddtTRrRGMHBckeBRQaciuNP2bpZSueml2VMGdayF29JGoLq7T
-         c4s2eR/eaY6gF8e/UuHdd2cLh9d2+wKRXnNtAr/YOKXErKvQ6SnsAxhw6J2ipGW/7P/e
-         /V89V1VBIIblxzDJUQsWXfu1RmDivpC9Dhzcm5t69gV1ccDaO8f60lNZM5wUrnj7RaXE
-         mmPQ==
-X-Gm-Message-State: AOAM531XCqUrUNjKGDtDSNloL7ByTB6h/d1iJPOESlX9FuHqNaNMjYbO
-        1WwFyySb+Y1kDgqtf9LEnPdZuV1yCUof5ze3WtGwNQGs
-X-Google-Smtp-Source: ABdhPJyU3jKpD5z8NiaC1hoZQFyIrhlynZUPs4SghoPhK5J2fTbs9BBOMzNAl0Nu/DMGyKrcO3tUqwHM9UsLLQjqgd4=
-X-Received: by 2002:ab0:5b99:: with SMTP id y25mr15178581uae.47.1636497991364;
- Tue, 09 Nov 2021 14:46:31 -0800 (PST)
+        bh=KhyFE/RGDybH9ShWGQp+pQA8mmNWmFEU12x/hwGiWdY=;
+        b=M5HjtHLVLjmKmC/IAE+z+EAlbrc4F86i4wRQ0O5xmLvMPkIc1xyMlzky7kooNXvU6S
+         E+ZvyIx2BT+wF8L0R0d5uIsoPhhiwncXdTi3FiyTPvNrvtUBMjiYZ7/DiVpw0pqXvexM
+         +1u5A1quyYq9j3CwM8ccZAM9bVMiOLBlJF4fk/xGe/LKrPWaN0aE0Je+XUxpv8Ew6bJz
+         YsyqhcwV55xzR282ccvkFgtZZsGOZpVdqJxBFp1ua9a4JScBqsL437V+jqIqqk2xpktt
+         AGRZVOlDeCMBIqFwq1nAu627woirOwfADzfPCQi8U7IT0JpwPfuxBqie+bYhR8kYymvO
+         01zg==
+X-Gm-Message-State: AOAM533WvRQja6t1kvOuGb2f69daV7WGVrI2mzFm2ApfmUG/iKPsDEn1
+        dzdZxu51u0a9RtfYPVxgY0Z3rAjUG8ee50ru2yeK6xYb
+X-Google-Smtp-Source: ABdhPJz++sxm/aE+T5SKJkyh1r4Mh9kpDxSX0Xdn3GId4ll2A6f6CRmLyToRv8RUuZyAahmRYGPYpDKPXaqD+rSPB+M=
+X-Received: by 2002:a67:d893:: with SMTP id f19mr5226667vsj.39.1636498015536;
+ Tue, 09 Nov 2021 14:46:55 -0800 (PST)
 MIME-Version: 1.0
-References: <20211109215322.1124566-1-luiz.dentz@gmail.com> <618af832.1c69fb81.e5dd0.6ba1@mx.google.com>
-In-Reply-To: <618af832.1c69fb81.e5dd0.6ba1@mx.google.com>
+References: <20211109213721.1121677-1-luiz.dentz@gmail.com> <618aee11.1c69fb81.4dc68.a49d@mx.google.com>
+In-Reply-To: <618aee11.1c69fb81.4dc68.a49d@mx.google.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 9 Nov 2021 14:46:20 -0800
-Message-ID: <CABBYNZJ-cpSGgW_TsgcqkXDLT-yZajSf0N0QYO5behvKCt=pxQ@mail.gmail.com>
-Subject: Re: [BlueZ] media: Fix memory leak
+Date:   Tue, 9 Nov 2021 14:46:44 -0800
+Message-ID: <CABBYNZLA09hUE-sraBrjQ6PEcozjz45GffrF-bEKd6Pf=_xbXQ@mail.gmail.com>
+Subject: Re: [v2,BlueZ] client/gatt: Fix using atoi
 To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
@@ -62,7 +62,7 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi,
 
-On Tue, Nov 9, 2021 at 2:37 PM <bluez.test.bot@gmail.com> wrote:
+On Tue, Nov 9, 2021 at 1:54 PM <bluez.test.bot@gmail.com> wrote:
 >
 > This is automated email and please do not reply to this email!
 >
@@ -70,21 +70,45 @@ On Tue, Nov 9, 2021 at 2:37 PM <bluez.test.bot@gmail.com> wrote:
 >
 > Thank you for submitting the patches to the linux bluetooth mailing list.
 > This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=577661
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=577649
 >
 > ---Test result---
 >
 > Test Summary:
-> CheckPatch                    PASS      1.30 seconds
-> GitLint                       PASS      0.87 seconds
-> Prep - Setup ELL              PASS      49.54 seconds
-> Build - Prep                  PASS      0.46 seconds
-> Build - Configure             PASS      9.05 seconds
-> Build - Make                  PASS      204.90 seconds
-> Make Check                    PASS      9.80 seconds
-> Make Distcheck                PASS      244.96 seconds
-> Build w/ext ELL - Configure   PASS      9.09 seconds
-> Build w/ext ELL - Make        PASS      194.61 seconds
+> CheckPatch                    FAIL      1.46 seconds
+> GitLint                       PASS      0.90 seconds
+> Prep - Setup ELL              PASS      40.77 seconds
+> Build - Prep                  PASS      0.47 seconds
+> Build - Configure             PASS      7.68 seconds
+> Build - Make                  PASS      175.76 seconds
+> Make Check                    PASS      9.67 seconds
+> Make Distcheck                PASS      208.11 seconds
+> Build w/ext ELL - Configure   PASS      7.83 seconds
+> Build w/ext ELL - Make        PASS      166.39 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL
+> Desc: Run checkpatch.pl script with rule in .checkpatch.conf
+> Output:
+> [v2,BlueZ] client/gatt: Fix using atoi
+> WARNING:TYPO_SPELLING: 'prefered' may be misspelled - perhaps 'preferred'?
+> #84:
+> likely the prefered format for the likes of handles, etc, so this
+>            ^^^^^^^^
+>
+> /github/workspace/src/12611125.patch total: 0 errors, 1 warnings, 126 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12611125.patch has style problems, please review.
+>
+> NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
 >
 >
 >
