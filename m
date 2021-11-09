@@ -2,136 +2,240 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 643C8C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 17:03:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 07B47C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 19:43:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 4DE6961152
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 17:03:58 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E24AB61175
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 19:43:21 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240708AbhKIRGn (ORCPT
+        id S243853AbhKITqG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 9 Nov 2021 12:06:43 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36134 "EHLO
+        Tue, 9 Nov 2021 14:46:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43930 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S239427AbhKIRGm (ORCPT
+        with ESMTP id S237907AbhKITqE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 9 Nov 2021 12:06:42 -0500
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACEFFC061764;
-        Tue,  9 Nov 2021 09:03:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=MIME-Version:Content-Type:References:
-        In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Content-Transfer-Encoding:
-        Sender:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-        Resent-To:Resent-Cc:Resent-Message-ID;
-        bh=4ZefLbsNKRWIJeD/uc4IHUZbZRNto2H4EeJCNxjeN1k=; t=1636477436; x=1637687036; 
-        b=Ef2ORtNj/IJpaCmraDm3mwymqpK6VT/SnG19OVTzoU5hiOCXjPJlCcpGQqV7NHaQqsdnTIunWf9
-        LI74SHqp/i2lsdFy6J24TQMrm2wCP1OUmn3Y3fPAjx811LLXF3Y9/NmZr8ybuAn7tNoxfjDIY89x8
-        l6bwMmrSmUEudJsjaOSRgd1/qTGPsjQYP27b6m8mWRAOadr14PAQOXJaN+3cuCRinSTopBckh1TsU
-        WWDLOV+KYzO5ubqOZgmjfADRPygWvReDnwyL9KEaAwo98a6oA/URDZDQi/7uKFK4AOiXsr3FBJ+2w
-        JU/bB1Ict0KeZ/Vf6LvUoIt/tEtOyBE3io/Q==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <benjamin@sipsolutions.net>)
-        id 1mkUXH-00D227-Ev;
-        Tue, 09 Nov 2021 18:03:51 +0100
-Message-ID: <76ff2cb3f687fdf0ca271fe0fe084371c4288c33.camel@sipsolutions.net>
-Subject: Re: Userspace enumeration hang while btusb tries to load firmware
- of removed device
-From:   Benjamin Berg <benjamin@sipsolutions.net>
-To:     Alan Stern <stern@rowland.harvard.edu>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-usb@vger.kernel.org, linux-bluetooth@vger.kernel.org
-Date:   Tue, 09 Nov 2021 18:03:48 +0100
-In-Reply-To: <20211103201138.GC1529362@rowland.harvard.edu>
-References: <df021873788acdb64e1311289e9ca6dc3f169616.camel@sipsolutions.net>
-         <20211103182303.GB1529362@rowland.harvard.edu>
-         <BCD95F43-3C6E-4B50-9228-9F2AD93BBBA4@holtmann.org>
-         <20211103201138.GC1529362@rowland.harvard.edu>
-Content-Type: multipart/signed; micalg="pgp-sha256";
-        protocol="application/pgp-signature"; boundary="=-s4OlCZHD6ZVRueWwyarj"
-User-Agent: Evolution 3.40.4 (3.40.4-2.fc34) 
+        Tue, 9 Nov 2021 14:46:04 -0500
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37C8FC061764
+        for <linux-bluetooth@vger.kernel.org>; Tue,  9 Nov 2021 11:43:18 -0800 (PST)
+Received: by mail-ua1-x92f.google.com with SMTP id b3so40843228uam.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 09 Nov 2021 11:43:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=dLW3FKwNRcw6X/ewgEn9wbsfnf+v9s0zmEJvSP58kGE=;
+        b=ambZ1T3cXE0oRNb/G0erFw3jIU/H6KkSI8hDb0nudjGD4Ywa6WYz1tVeT/vpcGLJ4c
+         AD/3ietghQy4+7bFMPcYtfkhw85hhiRhF0KWl7dknlKGZacDDhiCealoSIBxdI83lRLu
+         xVKhyuZsSUkD3IlP57G0Bk0r3bhvbl1fo35nir5sRXaHcCDFkErAddgh5YtaZ6gwZYGk
+         s0RtH3jqUCkFaOy25hmUzxW2QC1xrR5KcRNse65pNOQt6jZWGYjd+su3YFEmXiCgE0EC
+         TJtRremHxutjvNFM+/JCxwR3Khxm2kQAH7URPIvQGLN/LH1UDe/1TA6MoDSx5vhyEfWi
+         RvHQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=dLW3FKwNRcw6X/ewgEn9wbsfnf+v9s0zmEJvSP58kGE=;
+        b=eubxVO8zbXncB9evb0CcdIzfSez8JQZ9GuFQo0Sjb6S7OfGtB/BIKwo0qE+CkEjihH
+         V3+JzqqpdlkN4aAbnMrAFhHxWAd7IaaDB0u3Vr/OxpNB21hNolcNabgZxppa3I5VGGN3
+         fujX7nSgTHkSSqGdsJbKIc1s1YSMsqvT+5XoLC5WIbtUtb9M0yFZPwM4UWO0J+4PSnZY
+         8GuNHnr3s0F4Tvi1OsALv5fWSwd0uh74VjNO90icwC99bVUO0LCiEgyfNE7Zcu8evWFf
+         eYFgTy2Zyi3MH03uPFmYgNvTSt9PLg3wOPxvlLwNZAuZi4mfuaYRlWc3dDP1PEjOmBcr
+         eUnA==
+X-Gm-Message-State: AOAM532cBhnIYfmX89O/xAFjxiPM3r4SSWZerIVuUZboJsMBa/3gmkzc
+        kjnJbJSbkM8p2nIWnbU4s4/nJMuA8tFZPhYY7pz20K03
+X-Google-Smtp-Source: ABdhPJxe0tw7dZDrWD/VEFpI/91+HnOf8rhA9LSHirfUkQygb1dpSafEIWianS3B/qNGAZfPepZIy9n2FED+jywXYUo=
+X-Received: by 2002:a05:6102:5109:: with SMTP id bm9mr28383728vsb.10.1636486997069;
+ Tue, 09 Nov 2021 11:43:17 -0800 (PST)
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
-X-malware-bazaar-2: OK
+References: <20211108191752.895782-1-luiz.dentz@gmail.com> <AM0PR07MB4131776DEB5C241B869CA071AF929@AM0PR07MB4131.eurprd07.prod.outlook.com>
+In-Reply-To: <AM0PR07MB4131776DEB5C241B869CA071AF929@AM0PR07MB4131.eurprd07.prod.outlook.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 9 Nov 2021 11:43:06 -0800
+Message-ID: <CABBYNZ+q9xn5wHHUCMEDoy-WMBj3AHbJOXYtUnKbt3QM=ushsg@mail.gmail.com>
+Subject: Re: [PATCH BlueZ] client/gatt: Fix using atoi
+To:     Thiemo van Engelen <tvanengelen@victronenergy.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Thiemo,
 
---=-s4OlCZHD6ZVRueWwyarj
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+On Tue, Nov 9, 2021 at 12:04 AM Thiemo van Engelen
+<tvanengelen@victronenergy.com> wrote:
+>
+> Hi Luiz,
+>
+> > -----Original Message-----
+> > From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+> > Sent: maandag 8 november 2021 20:18
+> > To: linux-bluetooth@vger.kernel.org
+> > Subject: [PATCH BlueZ] client/gatt: Fix using atoi
+> >
+> > From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >
+> > atoi doesn't support values entered in hexadecimal (0x...) which is likely the
+> > prefered format for the likes of handles, etc, so this replaces the uses of atoi
+> > with strtol.
+> > ---
+> >  client/gatt.c | 71 +++++++++++++++++++++++++++++++++++++++++++----
+> > ----
+> >  1 file changed, 60 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/client/gatt.c b/client/gatt.c index 21fd38ecf..12e213d0f 100644
+> > --- a/client/gatt.c
+> > +++ b/client/gatt.c
+> > @@ -650,19 +650,27 @@ static void read_attribute(GDBusProxy *proxy,
+> > uint16_t offset)  void gatt_read_attribute(GDBusProxy *proxy, int argc, char
+> > *argv[])  {
+> >       const char *iface;
+> > -     uint16_t offset = 0;
+> > +     long offset = 0;
+> >
+> >       iface = g_dbus_proxy_get_interface(proxy);
+> >       if (!strcmp(iface, "org.bluez.GattCharacteristic1") ||
+> >                               !strcmp(iface, "org.bluez.GattDescriptor1")) {
+> >
+> > -             if (argc == 2)
+> > -                     offset = atoi(argv[1]);
+> > +             if (argc == 2) {
+> > +                     char *endptr = NULL;
+> > +
+> > +                     offset = strtol(argv[1], &endptr, 0);
+>
+> Perhaps it is better to use strtoul and make offset an unsigned long or check for < 0 when C99 is not used as read_attribute takes it as a uint16_t?
+> And from the naming of the other variables that are assigned using strtol I would guess more or less the same applies to those strtol calls.
 
-Hi,
+Yep, I forgot about strtoul existed but you are right that for these
+values we can definitely use it.
 
-On Wed, 2021-11-03 at 16:11 -0400, Alan Stern wrote:
-> On Wed, Nov 03, 2021 at 08:31:03PM +0100, Marcel Holtmann wrote:
-> > the problem seems to be that we hitting HCI command timeout. So the=20
-> > firmware download is done via HCI commands. These commands are send to=
-=20
-> > the transport driver btusb.c via hdev->send (as btusb_send_frame).=20
-> > This triggers the usb_submit_urb or queues them via data->deferred=20
-> > anchor. All this reports back the error properly except that nobody=20
-> > does anything with it.
-> >=20
-> > See hci_send_frame() last portion:
-> >=20
-> >         err =3D hdev->send(hdev, skb);
-> >         if (err < 0) {
-> >                 bt_dev_err(hdev, "sending frame failed (%d)", err);
-> >                 kfree_skb(skb);
-> >         }
-> >=20
-> > And that is it. We are not checking for ENODEV or any error here. That=
-=20
-> > means the failure of the HCI command gets only caught via the HCI=20
-> > command timeout. I don=E2=80=99t know how to do this yet, but you would=
- have=20
-> > to look there to fail HCI command right away instead of waiting for=20
-> > the timeout.
->=20
-> I have no idea how all the different layers work here.  Clearly=20
-> something has to signal hdev->req_wait_q after setting hdev->req_status=
-=20
-> to some appropriate value.  Can this be done in btusb.c, either when the=
-=20
-> URB is submitted or when it completes?  Or in hci_send_frame?
+> > +                     if (!endptr || *endptr != '\0' || offset >
+> > UINT16_MAX) {
+> > +                             bt_shell_printf("Invalid offload: %s", argv[1]);
+> > +                             goto done;
+> > +                     }
+> > +             }
+> >
+> >               read_attribute(proxy, offset);
+> >               return;
+> >       }
+> >
+> > +done:
+> >       bt_shell_printf("Unable to read attribute %s\n",
+> >
+> >       g_dbus_proxy_get_path(proxy));
+> >       return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > @@ -805,8 +813,18 @@ void gatt_write_attribute(GDBusProxy *proxy, int
+> > argc, char *argv[])
+> >                               !strcmp(iface, "org.bluez.GattDescriptor1")) {
+> >               data.iov.iov_base = str2bytearray(argv[1], &data.iov.iov_len);
+> >
+> > -             if (argc > 2)
+> > -                     data.offset = atoi(argv[2]);
+> > +             if (argc > 2) {
+> > +                     char *endptr = NULL;
+> > +                     long offset;
+> > +
+> > +                     offset = strtol(argv[1], &endptr, 0);
+> > +                     if (!endptr || *endptr != '\0' || offset >
+> > UINT16_MAX) {
+> > +                             bt_shell_printf("Invalid offload: %s", argv[1]);
+> > +                             goto fail;
+> > +                     }
+> > +
+> > +                     data.offset = offset;
+> > +             }
+> >
+> >               if (argc > 3)
+> >                       data.type = argv[3];
+> > @@ -815,6 +833,7 @@ void gatt_write_attribute(GDBusProxy *proxy, int
+> > argc, char *argv[])
+> >               return;
+> >       }
+> >
+> > +fail:
+> >       bt_shell_printf("Unable to write attribute %s\n",
+> >
+> >       g_dbus_proxy_get_path(proxy));
+> >
+> > @@ -1482,8 +1501,18 @@ void gatt_register_service(DBusConnection
+> > *conn, GDBusProxy *proxy,
+> >                                       g_list_length(local_services));
+> >       service->primary = primary;
+> >
+> > -     if (argc > 2)
+> > -             service->handle = atoi(argv[2]);
+> > +     if (argc > 2) {
+> > +             char *endptr = NULL;
+> > +             long handle;
+> > +
+> > +             handle = strtol(argv[2], &endptr, 0);
+> > +             if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
+> > +                     bt_shell_printf("Invalid handle: %s", argv[2]);
+> > +                     return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > +             }
+> > +
+> > +             service->handle = handle;
+> > +     }
+> >
+> >       if (g_dbus_register_interface(conn, service->path,
+> >                                       SERVICE_INTERFACE, NULL, NULL,
+> > @@ -2574,8 +2603,18 @@ void gatt_register_chrc(DBusConnection *conn,
+> > GDBusProxy *proxy,
+> >       chrc->flags = g_strsplit(argv[2], ",", -1);
+> >       chrc->authorization_req = attr_authorization_flag_exists(chrc-
+> > >flags);
+> >
+> > -     if (argc > 3)
+> > -             chrc->handle = atoi(argv[3]);
+> > +     if (argc > 3) {
+> > +             char *endptr = NULL;
+> > +             long handle;
+> > +
+> > +             handle = strtol(argv[3], &endptr, 0);
+> > +             if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
+> > +                     bt_shell_printf("Invalid handle: %s", argv[3]);
+> > +                     return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > +             }
+> > +
+> > +             chrc->handle = handle;
+> > +     }
+> >
+> >       if (g_dbus_register_interface(conn, chrc->path, CHRC_INTERFACE,
+> >                                       chrc_methods, NULL, chrc_properties,
+> > @@ -2851,8 +2890,18 @@ void gatt_register_desc(DBusConnection *conn,
+> > GDBusProxy *proxy,
+> >                                       g_list_length(desc->chrc->descs));
+> >       desc->flags = g_strsplit(argv[2], ",", -1);
+> >
+> > -     if (argc > 3)
+> > -             desc->handle = atoi(argv[3]);
+> > +     if (argc > 3) {
+> > +             char *endptr = NULL;
+> > +             long handle;
+> > +
+> > +             handle = strtol(argv[3], &endptr, 0);
+> > +             if (!endptr || *endptr != '\0' || handle > UINT16_MAX) {
+> > +                     bt_shell_printf("Invalid handle: %s", argv[3]);
+> > +                     return bt_shell_noninteractive_quit(EXIT_FAILURE);
+> > +             }
+> > +
+> > +             desc->handle = handle;
+> > +     }
+> >
+> >       if (g_dbus_register_interface(conn, desc->path, DESC_INTERFACE,
+> >                                       desc_methods, NULL,
+> > desc_properties,
+> > --
+> > 2.31.1
+>
+> Kind regards,
+> Thiemo
 
-I submitted
-  https://patchwork.kernel.org/project/bluetooth/list/?series=3D577565
-for this now.
 
-The patchset pretty much calls hci_req_sync_cancel to set req_status
-and signal req_wait_q. Doing this and hooking it up in various location
-appears to work reasonably well for the synchronous commands.
 
-Benjamin
-
-PS: The user now reported that TLP is blocking the rfkill switch after
-resume. So an good workaround is to just not use TLP.
-
---=-s4OlCZHD6ZVRueWwyarj
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part
-Content-Transfer-Encoding: 7bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEED2NO4vMS33W8E4AFq6ZWhpmFY3AFAmGKqfQACgkQq6ZWhpmF
-Y3BO8g/+J5w8LRcVVM8jUDu+KP+kJhy9bOXENEmanf2j2QgnMY1nOi/E/VYnQ/jC
-DGFxp49Y/SIDpFOvjQ+xOd9/Q22kiN6Uyz1m1/jV0ubBpkb0FxueoIdl1Kq/vSgF
-sZSVGSNJrNMSgd9NSi1MyZiWI5mm02nSy/XOCrQGNn5qgmIUAYteuRz4x815Hqqd
-ibelL1P5pGVwD19dKSRCH0aW7u4KWrhBKlcMtyOo1RmLQaJZ2bmAtBZoIiENEYTf
-Uqs5EqPFuHLIBWX6hi4wl2r/1XwGNrWQTU9+zmCIDvs9F7NMW6jv36O+686lqSI2
-H0SYV/wOvCM3mzWsCZ06rbRo2v33UhTwlp7w9z8zFPjtNRpz9eWEGFbiyZJWhwha
-8HPR66UmkP9dycJfO4bXg63hKes9HQmMfI8PYHs5Hgw4vOnpIUg7a6WSGo2Ql/ae
-f7d0en34fS0oOW20QEth8g/R3lUjOP9xdoT7XfN8o19yjY8GDHJ5j1RpzISzG7se
-peCyOWQxsIMkbgLfz0kboB52J4QTBAQnPXrodOl5GiEU8nzveOvEJDjEJ/97invr
-svpq4IHz1ztjsf5Fs2G77Fwsr9e6DvFJYhzDU7U5gZ/Bl7YprVWP5O9XU2Ek5Uaz
-AZdAcKcHME5g23jE6FGPAy0XFEm+Vb/rxXDq8Pwmyb5SrlCAMtA=
-=uOcD
------END PGP SIGNATURE-----
-
---=-s4OlCZHD6ZVRueWwyarj--
-
+-- 
+Luiz Augusto von Dentz
