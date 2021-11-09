@@ -2,184 +2,346 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 317CAC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:23:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 97766C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 03:13:49 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 1BCAE610A2
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 01:23:04 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 7A7C56112D
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  9 Nov 2021 03:13:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242252AbhKIBZp (ORCPT
+        id S234758AbhKIDQd (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 8 Nov 2021 20:25:45 -0500
-Received: from mail.kernel.org ([198.145.29.99]:53756 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S243814AbhKIBXp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 8 Nov 2021 20:23:45 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPSA id 3EDC761B31;
-        Tue,  9 Nov 2021 01:09:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1636420162;
-        bh=L60SYoxM50Bm3Zl6D63vFZQ4bvhxyLQMqp39x1ok3Oc=;
-        h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-        b=tskUeGslbDZ3bA9utO3mVKWWqWz1ASrugZI3WlY4NWruOlLnv59la5o9vqxnihy+w
-         iuU6swIJ5uguwRowMjZPdmEEpZlErrSBmN2qKgfF2llEC9cFfZB36i0GOnKkbQY4xM
-         7rum+v0lknV1Nh0Q4tguCUVnCNxSnozv0yVnllyhEo1dWMao8IFqAPxcIcew24GTB7
-         gjfl2RAMoxWe0VRtMrWCQeAJMG+q566jmb95PhJlgVmca6Fq6TawnlJO0FP/O1Xn0n
-         xDqepADSC+l7WK86ijGxD971SMX/1cF925FG53BNt+rmEfZpUUPI/uts3BPMbeWAU9
-         Ubnp8/fSgTKNQ==
-From:   Sasha Levin <sashal@kernel.org>
-To:     linux-kernel@vger.kernel.org, stable@vger.kernel.org
-Cc:     Wang ShaoBo <bobo.shaobowang@huawei.com>,
-        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Sasha Levin <sashal@kernel.org>, johan.hedberg@gmail.com,
-        luiz.dentz@gmail.com, davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.4 02/30] Bluetooth: fix use-after-free error in lock_sock_nested()
-Date:   Mon,  8 Nov 2021 20:08:50 -0500
-Message-Id: <20211109010918.1192063-2-sashal@kernel.org>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20211109010918.1192063-1-sashal@kernel.org>
-References: <20211109010918.1192063-1-sashal@kernel.org>
+        Mon, 8 Nov 2021 22:16:33 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45768 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233004AbhKIDQd (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 8 Nov 2021 22:16:33 -0500
+Received: from mail-pl1-x630.google.com (mail-pl1-x630.google.com [IPv6:2607:f8b0:4864:20::630])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C867C061570
+        for <linux-bluetooth@vger.kernel.org>; Mon,  8 Nov 2021 19:13:48 -0800 (PST)
+Received: by mail-pl1-x630.google.com with SMTP id b13so18373714plg.2
+        for <linux-bluetooth@vger.kernel.org>; Mon, 08 Nov 2021 19:13:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PUuJFJ2hSAxTW+fGBPAYkkGsvphsBrBvwfnmxmIkLhM=;
+        b=bSrlBXej2snI+mjFJz9JLbRex/nbXAFUF228Ur00qy1uJ1lLANli8MXHafBBMwIV5E
+         bxJYYT8AKLn4W+91s43q2dgsVcD85Be64iATuqBc3BiDbJgbOw/q4/Pdpl6OnBNn4Ttg
+         CLBbYhIKP6VoEAH7kDAYlqsL8K++c2BfUEgbQ6uK5+m2/T3qt59IY8Xmg9NQ1g2cfQcw
+         i1lIGE6HySgYfF4OH+A0SQQDqK/E3yXIlL3jm5+oxUZn0gm1Sm5OeTBrkE1Cz71w8/fS
+         KlnFX3f+b2xyHV6f82qd6jOJeEFgjAIgfKjzhfecsgw7jzLHig2PnIS3gyXXb1Iv83GB
+         G1Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=PUuJFJ2hSAxTW+fGBPAYkkGsvphsBrBvwfnmxmIkLhM=;
+        b=MhqLxQEh/njSSCwOZk0pH+J2PdlgFUljKRpoc+6JFip8ASyKHPsZmHDc12zFFMZhSu
+         iHKdhXvTTEkXIKDNf8lyDSgX+j99FeGLcD7klmai6dj8VI+uYpHfBWTdedDdu7vbCTMX
+         03DXwqlr1lxI2wUcSJFWxEmMe3VgiRzvNUmBBxvZ76KTBJ+JYSEeo1tobMYecPXHeifl
+         dxxwagxYwjRMTptxD0lCp3pTI4ksX7ROYn+ltvlbH/pyxvMlfkVEr4c0wv/BP9M895Ft
+         3ThOeSZ9A4vJ6+TfICqzkQ4hFxMTc/q1cFZ15INABXRd/r+ZtIxxPS64ns7IXoX7dKcm
+         Rt0A==
+X-Gm-Message-State: AOAM530JBBaXwiRPIrsQrN9CqC5qWr/6mGNhhi7f33/4o+gAYx3KgEdY
+        xZuhm4miejVu+pft/YmGktSAmrpkL6I=
+X-Google-Smtp-Source: ABdhPJz0rIl1U5eaOa7SdwyST//atTpL90pt7peoxD1Yv5vTelEBHgIxsAzi8kJwgiv2wEIBuTJbaw==
+X-Received: by 2002:a17:903:1111:b0:13f:d1d7:fb67 with SMTP id n17-20020a170903111100b0013fd1d7fb67mr4093781plh.85.1636427627493;
+        Mon, 08 Nov 2021 19:13:47 -0800 (PST)
+Received: from han1-NUC8i7BEH.hsd1.or.comcast.net ([2601:1c0:6a01:d830:5b7c:ac95:861:aaca])
+        by smtp.gmail.com with ESMTPSA id n13sm3770518pfj.188.2021.11.08.19.13.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 08 Nov 2021 19:13:46 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [RFC PATCH V5] Bluetooth: vhci: Add support creating extended device mode
+Date:   Mon,  8 Nov 2021 19:13:43 -0800
+Message-Id: <20211109031343.87728-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-X-stable: review
-X-Patchwork-Hint: Ignore
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Wang ShaoBo <bobo.shaobowang@huawei.com>
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
-[ Upstream commit 1bff51ea59a9afb67d2dd78518ab0582a54a472c ]
+This patch adds new opcode(0x03) for HCI Vendor packet to support
+creating extended device mode. In order to avoid the conflict with the
+legacy opcode, it has to be 0x03 only and all other bits must be set to
+zero.
 
-use-after-free error in lock_sock_nested is reported:
+Then, it is followed by the extended configuration data that contains
+the device type and the flags to be used.
 
-[  179.140137][ T3731] =====================================================
-[  179.142675][ T3731] BUG: KMSAN: use-after-free in lock_sock_nested+0x280/0x2c0
-[  179.145494][ T3731] CPU: 4 PID: 3731 Comm: kworker/4:2 Not tainted 5.12.0-rc6+ #54
-[  179.148432][ T3731] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.13.0-1ubuntu1.1 04/01/2014
-[  179.151806][ T3731] Workqueue: events l2cap_chan_timeout
-[  179.152730][ T3731] Call Trace:
-[  179.153301][ T3731]  dump_stack+0x24c/0x2e0
-[  179.154063][ T3731]  kmsan_report+0xfb/0x1e0
-[  179.154855][ T3731]  __msan_warning+0x5c/0xa0
-[  179.155579][ T3731]  lock_sock_nested+0x280/0x2c0
-[  179.156436][ T3731]  ? kmsan_get_metadata+0x116/0x180
-[  179.157257][ T3731]  l2cap_sock_teardown_cb+0xb8/0x890
-[  179.158154][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
-[  179.159141][ T3731]  ? kmsan_get_metadata+0x116/0x180
-[  179.159994][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
-[  179.160959][ T3731]  ? l2cap_sock_recv_cb+0x420/0x420
-[  179.161834][ T3731]  l2cap_chan_del+0x3e1/0x1d50
-[  179.162608][ T3731]  ? kmsan_get_metadata+0x116/0x180
-[  179.163435][ T3731]  ? kmsan_get_shadow_origin_ptr+0x84/0xb0
-[  179.164406][ T3731]  l2cap_chan_close+0xeea/0x1050
-[  179.165189][ T3731]  ? kmsan_internal_unpoison_shadow+0x42/0x70
-[  179.166180][ T3731]  l2cap_chan_timeout+0x1da/0x590
-[  179.167066][ T3731]  ? __msan_metadata_ptr_for_load_8+0x10/0x20
-[  179.168023][ T3731]  ? l2cap_chan_create+0x560/0x560
-[  179.168818][ T3731]  process_one_work+0x121d/0x1ff0
-[  179.169598][ T3731]  worker_thread+0x121b/0x2370
-[  179.170346][ T3731]  kthread+0x4ef/0x610
-[  179.171010][ T3731]  ? process_one_work+0x1ff0/0x1ff0
-[  179.171828][ T3731]  ? kthread_blkcg+0x110/0x110
-[  179.172587][ T3731]  ret_from_fork+0x1f/0x30
-[  179.173348][ T3731]
-[  179.173752][ T3731] Uninit was created at:
-[  179.174409][ T3731]  kmsan_internal_poison_shadow+0x5c/0xf0
-[  179.175373][ T3731]  kmsan_slab_free+0x76/0xc0
-[  179.176060][ T3731]  kfree+0x3a5/0x1180
-[  179.176664][ T3731]  __sk_destruct+0x8af/0xb80
-[  179.177375][ T3731]  __sk_free+0x812/0x8c0
-[  179.178032][ T3731]  sk_free+0x97/0x130
-[  179.178686][ T3731]  l2cap_sock_release+0x3d5/0x4d0
-[  179.179457][ T3731]  sock_close+0x150/0x450
-[  179.180117][ T3731]  __fput+0x6bd/0xf00
-[  179.180787][ T3731]  ____fput+0x37/0x40
-[  179.181481][ T3731]  task_work_run+0x140/0x280
-[  179.182219][ T3731]  do_exit+0xe51/0x3e60
-[  179.182930][ T3731]  do_group_exit+0x20e/0x450
-[  179.183656][ T3731]  get_signal+0x2dfb/0x38f0
-[  179.184344][ T3731]  arch_do_signal_or_restart+0xaa/0xe10
-[  179.185266][ T3731]  exit_to_user_mode_prepare+0x2d2/0x560
-[  179.186136][ T3731]  syscall_exit_to_user_mode+0x35/0x60
-[  179.186984][ T3731]  do_syscall_64+0xc5/0x140
-[  179.187681][ T3731]  entry_SYSCALL_64_after_hwframe+0x44/0xae
-[  179.188604][ T3731] =====================================================
-
-In our case, there are two Thread A and B:
-
-Context: Thread A:              Context: Thread B:
-
-l2cap_chan_timeout()            __se_sys_shutdown()
-  l2cap_chan_close()              l2cap_sock_shutdown()
-    l2cap_chan_del()                l2cap_chan_close()
-      l2cap_sock_teardown_cb()        l2cap_sock_teardown_cb()
-
-Once l2cap_sock_teardown_cb() excuted, this sock will be marked as SOCK_ZAPPED,
-and can be treated as killable in l2cap_sock_kill() if sock_orphan() has
-excuted, at this time we close sock through sock_close() which end to call
-l2cap_sock_kill() like Thread C:
-
-Context: Thread C:
-
-sock_close()
-  l2cap_sock_release()
-    sock_orphan()
-    l2cap_sock_kill()  #free sock if refcnt is 1
-
-If C completed, Once A or B reaches l2cap_sock_teardown_cb() again,
-use-after-free happened.
-
-We should set chan->data to NULL if sock is destructed, for telling teardown
-operation is not allowed in l2cap_sock_teardown_cb(), and also we should
-avoid killing an already killed socket in l2cap_sock_close_cb().
-
-Signed-off-by: Wang ShaoBo <bobo.shaobowang@huawei.com>
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Signed-off-by: Marcel Holtmann <marcel@holtmann.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
 ---
- net/bluetooth/l2cap_sock.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_vhci.c | 200 ++++++++++++++++++++++++++++-------
+ 1 file changed, 162 insertions(+), 38 deletions(-)
 
-diff --git a/net/bluetooth/l2cap_sock.c b/net/bluetooth/l2cap_sock.c
-index 30731ce390ba0..eddf67a3dbdcb 100644
---- a/net/bluetooth/l2cap_sock.c
-+++ b/net/bluetooth/l2cap_sock.c
-@@ -1309,6 +1309,9 @@ static void l2cap_sock_close_cb(struct l2cap_chan *chan)
- {
- 	struct sock *sk = chan->data;
+diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
+index 49ac884d996e..4c0cfb29c0e8 100644
+--- a/drivers/bluetooth/hci_vhci.c
++++ b/drivers/bluetooth/hci_vhci.c
+@@ -30,6 +30,24 @@
  
-+	if (!sk)
-+		return;
+ static bool amp;
+ 
++/* This is the struct for extended device configuration.
++ * The opcode 0x03 is used for creating an extended device and followed by
++ * the configuration data below.
++ * dev_type is Primay or AMP.
++ * flag_len is the length of flag array
++ * flag array contains the flag to use/set while creating the device.
++ */
++struct vhci_ext_config {
++	__u8	dev_type;
++	__u8	flag_len;
++	__u8	flags[0];
++};
 +
- 	l2cap_sock_kill(sk);
++#define VHCI_EXT_FLAG_ENABLE_AOSP		0x01
++#define VHCI_EXT_FLAG_QUIRK_RAW_DEVICE		0x02
++#define VHCI_EXT_FLAG_QUIARK_EXTERNAL_CONFIG	0x03
++#define VHCI_EXT_FLAG_QUIRK_INVALID_BDADDR	0x04
++
+ struct vhci_data {
+ 	struct hci_dev *hdev;
+ 
+@@ -278,11 +296,52 @@ static int vhci_setup(struct hci_dev *hdev)
+ 	return 0;
  }
  
-@@ -1317,6 +1320,9 @@ static void l2cap_sock_teardown_cb(struct l2cap_chan *chan, int err)
- 	struct sock *sk = chan->data;
- 	struct sock *parent;
- 
-+	if (!sk)
-+		return;
++static int vhci_register_hdev(struct hci_dev *hdev, __u8 opcode)
++{
++	struct vhci_data *data = hci_get_drvdata(hdev);
++	struct sk_buff *skb;
 +
- 	BT_DBG("chan %p state %s", chan, state_to_string(chan->state));
- 
- 	/* This callback can be called both for server (BT_LISTEN)
-@@ -1486,8 +1492,10 @@ static void l2cap_sock_destruct(struct sock *sk)
- {
- 	BT_DBG("sk %p", sk);
- 
--	if (l2cap_pi(sk)->chan)
-+	if (l2cap_pi(sk)->chan) {
-+		l2cap_pi(sk)->chan->data = NULL;
- 		l2cap_chan_put(l2cap_pi(sk)->chan);
++	skb = bt_skb_alloc(4, GFP_KERNEL);
++	if (!skb)
++		return -ENOMEM;
++
++	if (hci_register_dev(hdev) < 0) {
++		BT_ERR("Can't register HCI device");
++		kfree_skb(skb);
++		return -EBUSY;
 +	}
++
++	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
++			    &force_suspend_fops);
++
++	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
++			    &force_wakeup_fops);
++
++	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
++		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
++				    &msft_opcode_fops);
++
++	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
++		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
++				    &aosp_capable_fops);
++
++	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
++
++	skb_put_u8(skb, 0xff);
++	skb_put_u8(skb, opcode);
++	put_unaligned_le16(hdev->id, skb_put(skb, 2));
++	skb_queue_tail(&data->readq, skb);
++
++	wake_up_interruptible(&data->read_wait);
++
++	return 0;
++}
++
+ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ {
+ 	struct hci_dev *hdev;
+-	struct sk_buff *skb;
+ 	__u8 dev_type;
++	int ret;
  
- 	if (l2cap_pi(sk)->rx_busy_skb) {
- 		kfree_skb(l2cap_pi(sk)->rx_busy_skb);
+ 	if (data->hdev)
+ 		return -EBADFD;
+@@ -297,15 +356,9 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	if (opcode & 0x3c)
+ 		return -EINVAL;
+ 
+-	skb = bt_skb_alloc(4, GFP_KERNEL);
+-	if (!skb)
+-		return -ENOMEM;
+-
+ 	hdev = hci_alloc_dev();
+-	if (!hdev) {
+-		kfree_skb(skb);
++	if (!hdev)
+ 		return -ENOMEM;
+-	}
+ 
+ 	data->hdev = hdev;
+ 
+@@ -331,45 +384,108 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
+ 	if (opcode & 0x80)
+ 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
+ 
+-	if (hci_register_dev(hdev) < 0) {
+-		BT_ERR("Can't register HCI device");
++	/* Legacy method returns opcode instead of dev type */
++	ret = vhci_register_hdev(hdev, opcode);
++	if (ret < 0) {
+ 		hci_free_dev(hdev);
+ 		data->hdev = NULL;
+-		kfree_skb(skb);
+-		return -EBUSY;
+ 	}
+ 
+-	debugfs_create_file("force_suspend", 0644, hdev->debugfs, data,
+-			    &force_suspend_fops);
++	return ret;
++}
+ 
+-	debugfs_create_file("force_wakeup", 0644, hdev->debugfs, data,
+-			    &force_wakeup_fops);
++static int vhci_create_device(struct vhci_data *data, __u8 opcode)
++{
++	int err;
+ 
+-	if (IS_ENABLED(CONFIG_BT_MSFTEXT))
+-		debugfs_create_file("msft_opcode", 0644, hdev->debugfs, data,
+-				    &msft_opcode_fops);
++	mutex_lock(&data->open_mutex);
++	err = __vhci_create_device(data, opcode);
++	mutex_unlock(&data->open_mutex);
+ 
+-	if (IS_ENABLED(CONFIG_BT_AOSPEXT))
+-		debugfs_create_file("aosp_capable", 0644, hdev->debugfs, data,
+-				    &aosp_capable_fops);
++	return err;
++}
+ 
+-	hci_skb_pkt_type(skb) = HCI_VENDOR_PKT;
++static int __vhci_create_extended_device(struct vhci_data *data,
++							struct sk_buff *skb)
++{
++	struct hci_dev *hdev;
++	struct vhci_ext_config *config;
++	int i, ret;
++	__u8 flag;
+ 
+-	skb_put_u8(skb, 0xff);
+-	skb_put_u8(skb, opcode);
+-	put_unaligned_le16(hdev->id, skb_put(skb, 2));
+-	skb_queue_tail(&data->readq, skb);
++	if (data->hdev)
++		return -EBADFD;
+ 
+-	wake_up_interruptible(&data->read_wait);
+-	return 0;
++	/* Make sure the skb has a minimum valid length */
++	if (skb->len < sizeof(*config))
++		return -EINVAL;
++
++	config = (void *)(skb->data);
++	if (skb->len < sizeof(*config) + config->flag_len)
++		return -EINVAL;
++
++	if (config->dev_type != HCI_PRIMARY && config->dev_type != HCI_AMP)
++		return -EINVAL;
++
++	hdev = hci_alloc_dev();
++	if (!hdev)
++		return -ENOMEM;
++
++	data->hdev = hdev;
++
++	hdev->bus = HCI_VIRTUAL;
++	hdev->dev_type = config->dev_type;
++	hci_set_drvdata(hdev, data);
++
++	hdev->open  = vhci_open_dev;
++	hdev->close = vhci_close_dev;
++	hdev->flush = vhci_flush;
++	hdev->send  = vhci_send_frame;
++	hdev->get_data_path_id = vhci_get_data_path_id;
++	hdev->get_codec_config_data = vhci_get_codec_config_data;
++	hdev->wakeup = vhci_wakeup;
++	hdev->setup = vhci_setup;
++	set_bit(HCI_QUIRK_NON_PERSISTENT_SETUP, &hdev->quirks);
++
++	for (i = 0; i < config->flag_len; i++) {
++		flag = config->flags[i];
++		switch (flag) {
++		case VHCI_EXT_FLAG_ENABLE_AOSP:
++			data->aosp_capable = 1;
++			break;
++		case VHCI_EXT_FLAG_QUIRK_RAW_DEVICE:
++			set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
++			break;
++		case VHCI_EXT_FLAG_QUIARK_EXTERNAL_CONFIG:
++			set_bit(HCI_QUIRK_EXTERNAL_CONFIG, &hdev->quirks);
++			break;
++		case VHCI_EXT_FLAG_QUIRK_INVALID_BDADDR:
++			set_bit(HCI_QUIRK_INVALID_BDADDR, &hdev->quirks);
++			break;
++		default:
++			BT_ERR("Invalid flag");
++			hci_free_dev(hdev);
++			data->hdev = NULL;
++			return -EINVAL;
++		}
++	}
++
++	/* Extended method returns the fixed extension opcode 0x03 */
++	ret = vhci_register_hdev(hdev, 0x03);
++	if (ret < 0) {
++		hci_free_dev(hdev);
++		data->hdev = NULL;
++	}
++
++	return ret;
+ }
+ 
+-static int vhci_create_device(struct vhci_data *data, __u8 opcode)
++static int vhci_create_extended_device(struct vhci_data *data,
++							struct sk_buff *skb)
+ {
+ 	int err;
+-
+ 	mutex_lock(&data->open_mutex);
+-	err = __vhci_create_device(data, opcode);
++	err = __vhci_create_extended_device(data, skb);
+ 	mutex_unlock(&data->open_mutex);
+ 
+ 	return err;
+@@ -419,14 +535,22 @@ static inline ssize_t vhci_get_user(struct vhci_data *data,
+ 		opcode = *((__u8 *) skb->data);
+ 		skb_pull(skb, 1);
+ 
+-		if (skb->len > 0) {
+-			kfree_skb(skb);
+-			return -EINVAL;
++		/* The dev_type 3 is used as an escape opcode for extension
++		 * handling. If dev_type is set to 3 all other bits must be
++		 * set to zero.
++		 */
++		if (opcode == 0x03) {
++			if (skb->len < 1)
++				ret = -EINVAL;
++			else
++				ret = vhci_create_extended_device(data, skb);
++		} else {
++			if (skb->len > 0)
++				ret = -EINVAL;
++			else
++				ret = vhci_create_device(data, opcode);
+ 		}
+-
+ 		kfree_skb(skb);
+-
+-		ret = vhci_create_device(data, opcode);
+ 		break;
+ 
+ 	default:
 -- 
-2.33.0
+2.25.1
 
