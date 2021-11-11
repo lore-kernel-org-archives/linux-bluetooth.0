@@ -2,121 +2,130 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94FF6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 16:35:47 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 4C3C8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 18:23:24 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 695DF61252
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 16:35:47 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 25E2561268
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 18:23:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234205AbhKKQif convert rfc822-to-8bit (ORCPT
+        id S232930AbhKKS0M (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 11 Nov 2021 11:38:35 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:36685 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233128AbhKKQid (ORCPT
+        Thu, 11 Nov 2021 13:26:12 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53670 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232203AbhKKS0L (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 11 Nov 2021 11:38:33 -0500
-Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 01D4ACECD0;
-        Thu, 11 Nov 2021 17:35:42 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [Bluez PATCH 3/3] doc: Add Name Resolve Fail flag in device found
- event
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211111195423.Bluez.3.I29367ca288fc8f4fcc3b4063425b791501c6534c@changeid>
-Date:   Thu, 11 Nov 2021 17:35:42 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Thu, 11 Nov 2021 13:26:11 -0500
+Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 988FAC061766
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Nov 2021 10:23:22 -0800 (PST)
+Received: by mail-oi1-x234.google.com with SMTP id r26so13129353oiw.5
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Nov 2021 10:23:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=m7ZNzHH3aITCjNcGHNzHisUUYbiJGzkSNsCnNbeBhS8=;
+        b=EOEBrF1H7JDGijAd7i3c/0rF52elvRBGSRif5o2ADDVOVN3rT4Y1CPndrfmURpFMbV
+         fn3Z7edOE925wcgEYnN3HkW67maRAcjQHnpTsmVLXCjyVYcaPilEJPAdHO+e/SFxExns
+         oYt5oCVszuCtxcju3iyceTgRzKvWgC8OcWrPQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=m7ZNzHH3aITCjNcGHNzHisUUYbiJGzkSNsCnNbeBhS8=;
+        b=EzCdpJliSCVvGEKi3jAF/+ZUXSXBWx19g3JWvO+oJY5d1nqdw6LWFWa76NvG+qK1zL
+         kr4hb1i8beWDl0/+CswwdoJpSjOdN9z4qfwUcd+Hgo7veqUdOSBVxDIWkCmMKsmAdK66
+         7Vp0EeKhTF8LWvgwN9Z2pDAHDzz9P8GHQJ5ek3Yw9F1ACj0sQyxnmI/HFFS7QcQwWKXk
+         08IqAPJl/sUsvwnw04HT7erlXlpNmfgDAaHawtxObsjviKZmnrY/st44JPOmnfnTpotO
+         AHW97mYuA0yL/L4LaOEJgksl4xd62yDUrAJtY2zYq5Lu7G2EwC1uts45n4CIbCGZ4ou0
+         qBqQ==
+X-Gm-Message-State: AOAM530kaGQ7gvO+x8nIrBg9ayk1ZmZigXoIKBX2rhc1VpvQDSGaJRJQ
+        r1dwZ3xVF835OBhG4VdwdFmEZVR1vh4jSQ==
+X-Google-Smtp-Source: ABdhPJwcDjKr01uuROkbP1qS07dhIA3gFqeJOHsO+jO6JKLExtsBUkMHaENlWbKHzpjTzALflsr5Gg==
+X-Received: by 2002:a05:6808:150c:: with SMTP id u12mr7669913oiw.6.1636655001660;
+        Thu, 11 Nov 2021 10:23:21 -0800 (PST)
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com. [209.85.210.43])
+        by smtp.gmail.com with ESMTPSA id n67sm832867oib.42.2021.11.11.10.23.21
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 11 Nov 2021 10:23:21 -0800 (PST)
+Received: by mail-ot1-f43.google.com with SMTP id p11-20020a9d4e0b000000b0055a5741bff7so10209376otf.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 11 Nov 2021 10:23:21 -0800 (PST)
+X-Received: by 2002:a9d:5185:: with SMTP id y5mr7328544otg.110.1636655000514;
+ Thu, 11 Nov 2021 10:23:20 -0800 (PST)
+MIME-Version: 1.0
+References: <20211108200058.v2.1.Ide934b992a0b54085a6be469d3687963a245dba9@changeid>
+In-Reply-To: <20211108200058.v2.1.Ide934b992a0b54085a6be469d3687963a245dba9@changeid>
+From:   Jesse Melhuish <melhuishj@chromium.org>
+Date:   Thu, 11 Nov 2021 12:23:10 -0600
+X-Gmail-Original-Message-ID: <CACGnfjS5OOWsdBQNpmJ7DFWTYkH0vYDmVeW71xY0h3LsNut1Mw@mail.gmail.com>
+Message-ID: <CACGnfjS5OOWsdBQNpmJ7DFWTYkH0vYDmVeW71xY0h3LsNut1Mw@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Don't initialize msft/aosp when using user channel
+To:     Jesse Melhuish <melhuishj@chromium.org>
+Cc:     linux-bluetooth@vger.kernel.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
-        Archie Pusaka <apusaka@chromium.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <AD8BC81A-9D68-459D-921A-C764DC4216AA@holtmann.org>
-References: <20211111195423.Bluez.1.I9fc087b25433a9347b2d8c8ff7a25fadf448ef49@changeid>
- <20211111195423.Bluez.3.I29367ca288fc8f4fcc3b4063425b791501c6534c@changeid>
-To:     Archie Pusaka <apusaka@google.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Marcel Holtmann <marcel@holtmann.org>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Archie,
+Pinging. LMK if something is wrong or missing here. Thanks!
 
-> Userspace should use this new flag to decide whether to do the remote
-> name resolving or not, by sending Confirm Name MGMT command and set
-> the appropriate flag.
-> 
-> This patch also extends the Confirm Name command by allowing userspace
-> to send 0x02 to show it doesn't care about the peer devices names.
+On Mon, Nov 8, 2021 at 2:01 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
+>
+> A race condition is triggered when usermode control is given to
+> userspace before the kernel's MSFT query responds, resulting in an
+> unexpected response to userspace's reset command.
+>
+> Issue can be observed in btmon:
+> < HCI Command: Vendor (0x3f|0x001e) plen 2                    #3 [hci0]
+>         05 01                                            ..
+> @ USER Open: bt_stack_manage (privileged) version 2.22  {0x0002} [hci0]
+> < HCI Command: Reset (0x03|0x0003) plen 0                     #4 [hci0]
+> > HCI Event: Command Complete (0x0e) plen 5                   #5 [hci0]
+>       Vendor (0x3f|0x001e) ncmd 1
+>         Status: Command Disallowed (0x0c)
+>         05                                               .
+> > HCI Event: Command Complete (0x0e) plen 4                   #6 [hci0]
+>       Reset (0x03|0x0003) ncmd 2
+>         Status: Success (0x00)
+>
+> Signed-off-by: Jesse Melhuish <melhuishj@chromium.org>
+> Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
 > ---
-> 
-> doc/mgmt-api.txt | 18 +++++++++++++-----
-> 1 file changed, 13 insertions(+), 5 deletions(-)
-> 
-> diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-> index 97d33e30a1..e4c8de39f0 100644
-> --- a/doc/mgmt-api.txt
-> +++ b/doc/mgmt-api.txt
-> @@ -1493,7 +1493,7 @@ Confirm Name Command
-> 	Controller Index:	<controller id>
-> 	Command Parameters:	Address (6 Octets)
-> 				Address_Type (1 Octet)
-> -				Name_Known (1 Octet)
-> +				Name_State (1 Octet)
-> 	Return Parameters:	Address (6 Octets)
-> 				Address_Type (1 Octet)
-> 
-> @@ -1506,10 +1506,11 @@ Confirm Name Command
-> 		1	LE Public
-> 		2	LE Random
-> 
-> -	The Name_Known parameter should be set to 0x01 if user space
-> -	knows the name for the device and 0x00 if it doesn't. If set to
-> -	0x00 the kernel will perform a name resolving procedure for the
-> -	device in question.
-> +	The Name_State parameter should be set to 0x00 if user space
-> +	doesn't know the name for the device to make the kernel
-> +	perform a name resolving procedure for the device in question.
-> +	Otherwise, set to 0x01 if user space already knew the device's
-> +	name, or 0x02 if it doesn't care.
-
-I am a bit worried about userspace sending a 0x02 for a kernel that doesn’t understand it. Do you think the kernel can make use of this “don’t care” information? Or should we just keep it to userspace to send 0x01 / 0x00 based on its policy.
-
-> 
-> 	This command can only be used when the controller is powered.
-> 
-> @@ -4089,6 +4090,7 @@ Device Connected Event
-> 		1	Legacy Pairing
-> 		2	Reserved (not in use)
-> 		3	Initiated Connection
-> +		4	Reserved (not in use)
-> 
-> 
-> Device Disconnected Event
-> @@ -4263,6 +4265,7 @@ Device Found Event
-> 		1	Legacy Pairing
-> 		2	Not Connectable
-> 		3	Reserved (not in use)
-> +		4	Name Resolve Fail
-
-I would do “Name Request Failed” here. Just to be a bit inline what the spec term is.
-
-> 
-> 	For the RSSI field a value of 127 indicates that the RSSI is
-> 	not available. That can happen with Bluetooth 1.1 and earlier
-> @@ -4285,6 +4288,11 @@ Device Found Event
-> 	accept any connections. This can be indicated by Low Energy
-> 	devices that are in broadcaster role.
-> 
-> +	The Name Resolve Fail flag indicates that name resolving
-> +	procedure has ended with failure for this device. The user space
-> +	should use this information to determine when is a good time to
-> +	retry the name resolving procedure.
-> +
-> 
-
-Regards
-
-Marcel
-
+>
+> Changes in v2:
+> - Moved guard to the new home for this code.
+>
+>  net/bluetooth/hci_sync.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> index b794605dc882..5f1f59ac1813 100644
+> --- a/net/bluetooth/hci_sync.c
+> +++ b/net/bluetooth/hci_sync.c
+> @@ -3887,8 +3887,10 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+>             hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+>                 ret = hdev->set_diag(hdev, true);
+>
+> -       msft_do_open(hdev);
+> -       aosp_do_open(hdev);
+> +       if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> +               msft_do_open(hdev);
+> +               aosp_do_open(hdev);
+> +       }
+>
+>         clear_bit(HCI_INIT, &hdev->flags);
+>
+> --
+> 2.31.0
+>
