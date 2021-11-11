@@ -2,97 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BD84EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 00:26:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AA2D9C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 00:29:29 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id A4B4C6124D
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 00:26:24 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 858AD6124D
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 11 Nov 2021 00:29:29 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232126AbhKKA3L (ORCPT
+        id S231367AbhKKAcQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 10 Nov 2021 19:29:11 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37628 "EHLO
+        Wed, 10 Nov 2021 19:32:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38364 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232187AbhKKA3K (ORCPT
+        with ESMTP id S230344AbhKKAcP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 10 Nov 2021 19:29:10 -0500
-Received: from mail-vk1-xa34.google.com (mail-vk1-xa34.google.com [IPv6:2607:f8b0:4864:20::a34])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415EFC061766
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Nov 2021 16:26:22 -0800 (PST)
-Received: by mail-vk1-xa34.google.com with SMTP id b125so2343072vkb.9
-        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Nov 2021 16:26:22 -0800 (PST)
+        Wed, 10 Nov 2021 19:32:15 -0500
+Received: from mail-ua1-x936.google.com (mail-ua1-x936.google.com [IPv6:2607:f8b0:4864:20::936])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABD3AC061766
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Nov 2021 16:29:27 -0800 (PST)
+Received: by mail-ua1-x936.google.com with SMTP id l43so8521379uad.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 10 Nov 2021 16:29:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to;
-        bh=GnQZu8/mCVC8YOPTYFngCXPybM8+AnREaKgDouCkJMg=;
-        b=JeXd3pId404rGc0fDJrkEVQBU9yrCtA2BSaMVbBGraIcQstSq6eMJh0SD+o4Z8/EMp
-         6jUNMjVN7xkmYEry/dL9GrXQDwI+Uzhu/PeDoiHGC7f0bHOmApomeXIn5BnLi5aHm6yw
-         DR2I4MtpGVmGSNtuuxxCtLvskVNCgSnf93dtJ7Ie2vEFhIAlW5hfCvPrSEzv4xW4q52r
-         9s5V9KJkMGheuN19QLWsbejaMLJtiMlskrgA+irkg7NTuo7F6LLaLerzZDhlbXCqdS4X
-         IEYhU3bJGsKDIjDWiKFIN+LQen59HzfcImiUG/EzsnaBkRv7jzcEZUjITI7To+OqLSb/
-         +kag==
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=k3IcMLP/5aZqm0TMfrySdAWaqIHXGMzcO1toMn7PdmY=;
+        b=hUt+3Qifl3zdcnEEdEotxgMDNqlmt+NIu50tLEjpIly8GcxioAWBWNG6o45nVC6VNk
+         LgMgGFtW1H7cyKYQMaZaewymf1c6uEjkzEfbp8G3GYdpNn77oxoLg6fjHj7KeiF3TbSL
+         9F7admy5H5raVRIMPh9bVNTimHrQ0fRNN1o8Y51Bg/RuEzLlFtAL/eOIllLdFiZC1uxm
+         JAgH22lfyXoEcr8dQNI4AKbwWrrenzdBlPnFwnUibqKEWNqiVf9KTC+56P0qn4FWOSiQ
+         TxmlyNU6/6+wxB7zXyXEPQC+hMSXZh+r1G1UtHTvN4ABvMa2O/6wjGKPbCU3nkSF/Yqv
+         HbqQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to;
-        bh=GnQZu8/mCVC8YOPTYFngCXPybM8+AnREaKgDouCkJMg=;
-        b=1C7hDbFAWpINCvt7ZMxA9Rd2MoeFJKIDuC8RgP/ETlgUUwHhIBxUeI+wLOBpgUivri
-         Z5iz7jkNOozeMOf98+HP7TAJ24KmarniZIG/iPwMmLCJ+p2VDzH1gOlpq29mD16OxxQE
-         AzDMRjLXKTpzkEru7s0YAuh/rE35VMLBkhaR3kMtDt8cuk9PLpohW2FAYpFyv4e06308
-         RGHBwnhdQtB5HeGlYSalcUaF+Dw1azr84jzBmXPozdAT96oJ6AG+wvIvA3YGK0q5S2Ag
-         GFcED5tc1mmwHBKQ7H8kk7VtvlgQs57WVv6sb6xWGutQnjsgDVCVWx03yOSrmizxvttC
-         6FQg==
-X-Gm-Message-State: AOAM531XYggkQvIEencrx75n8u07ZRBH/l9ETprbGE8i0XW6MXi6QMcR
-        wpmawiTzKPDU7r2M1ddAOsncz6s6YFquYlqCwr+mPIJq
-X-Google-Smtp-Source: ABdhPJw4mHKS3jo7RRfgmyaA38ySEbSDhcVu3q0p+cU4TixvfYhfSWZgHZemtaHAojldxwJPr2OcZ3bZfnW8rRliaeU=
-X-Received: by 2002:a1f:9803:: with SMTP id a3mr4402099vke.6.1636590380754;
- Wed, 10 Nov 2021 16:26:20 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=k3IcMLP/5aZqm0TMfrySdAWaqIHXGMzcO1toMn7PdmY=;
+        b=UZz1uw7L2amQXGUdFIJ6CfY0JZ1ZYBNlEtUgDXbNrVr8RztlnPr8CnKtkkubNvyRCL
+         j0EAJd95N09Edpacm/YOxqW4pgpqLkKR6GREM2ylEhDWrH7sl8yAmnZwzgMvLAPzlnUO
+         yEjAOTw5x4NKezFceQ2IwSOKwyCd9jk3P7mxbp3WaoNsTuJ3L2QjOOhFOLDhKmA7tXjq
+         NBx/Ov2NOlenrOiXrK0YnDrd6s1GvOoQvJedmnqtN29KsnPB2WfaJxNPZhFkl4tyiezZ
+         irtPFkahA/ndBCVkX91/M2dbKBsq2ir9/B3lIL0sktgppTw39n1/cHO1jWHuOfY8Dngb
+         iR/g==
+X-Gm-Message-State: AOAM532dHv8tGaB7PzzN0645sm7BYntxZ7h+LjQxPMGhm8mThT+Mc2v9
+        +xS/QlKLxxEHoZyg2iuuU9SNm88C/tDX+/DKxlMvzehxrCg=
+X-Google-Smtp-Source: ABdhPJyZA7HXd7d+EAZ368j9eadgUVMdAhGmQj7ezF2SNlu1gnh+8fWk3gSXzi31x3Kh/r1Kz+5GVjHHbOYH/w7voD8=
+X-Received: by 2002:a05:6102:c06:: with SMTP id x6mr4354372vss.23.1636590566582;
+ Wed, 10 Nov 2021 16:29:26 -0800 (PST)
 MIME-Version: 1.0
-References: <20211105211245.424024-1-luiz.dentz@gmail.com> <618c1200.1c69fb81.c5125.18bf@mx.google.com>
-In-Reply-To: <618c1200.1c69fb81.c5125.18bf@mx.google.com>
+References: <f657c955-2a04-d6ae-cc10-3b0476a33fa3@systech.com>
+In-Reply-To: <f657c955-2a04-d6ae-cc10-3b0476a33fa3@systech.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 10 Nov 2021 16:26:10 -0800
-Message-ID: <CABBYNZLX_j+379jNZps5goorCV6U6NrUTPN3WfgooS1s6jWoWw@mail.gmail.com>
-Subject: Re: [BlueZ,1/6] btdev: Add support for LE Set Privacy mode
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Wed, 10 Nov 2021 16:29:15 -0800
+Message-ID: <CABBYNZLcCEPUuqrzeQRiOWh34Z+E6wAJB8u4tfwX3Pog9N5=tg@mail.gmail.com>
+Subject: Re: BlueZ hciconfig: Segmentation Fault
+To:     Jay Foster <jay.foster@systech.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi,
+Hi Jay,
 
-On Wed, Nov 10, 2021 at 10:40 AM <bluez.test.bot@gmail.com> wrote:
+On Wed, Nov 10, 2021 at 7:47 AM Jay Foster <jay.foster@systech.com> wrote:
 >
-> This is automated email and please do not reply to this email!
+> From: Jay Foster <jay.foster@systech.com>
 >
-> Dear submitter,
+> hciconfig segfaults in the Bluez 5.62 release.
 >
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=576261
+> The 'hciconfig lm' command, used to show the current link mode settings,
+> de-references a NULL pointer when calling strcasestr().  This results in
+> a segmentation fault.  This is a regression in release 5.62 from the updates
+> to implement the appropriate language changes.
 >
-> ---Test result---
+> The hci_str2bit() function handles a NULL str value, but strcasestr()
+> does not.
 >
-> Test Summary:
-> CheckPatch                    PASS      3.26 seconds
-> GitLint                       PASS      1.89 seconds
-> Prep - Setup ELL              PASS      52.41 seconds
-> Build - Prep                  PASS      0.26 seconds
-> Build - Configure             PASS      9.43 seconds
-> Build - Make                  PASS      224.72 seconds
-> Make Check                    PASS      9.45 seconds
-> Make Distcheck                PASS      261.29 seconds
-> Build w/ext ELL - Configure   PASS      9.39 seconds
-> Build w/ext ELL - Make        PASS      210.38 seconds
+> Signed-off-by: Jay Foster <jay.foster@systech.com>
 >
+> --- a/lib/hci.c    2021-10-13 11:38:34.000000000 -0700
+> +++ b/lib/hci.c    2021-11-08 09:19:59.880207913 -0800
+> @@ -323,7 +323,7 @@ int hci_strtolm(char *str, unsigned int
+>       int ret = hci_str2bit(link_mode_map, str, val);
 >
->
-> ---
-> Regards,
-> Linux Bluetooth
+>       /* Deprecated name. Kept for compatibility. */
+> -    if (strcasestr(str, "MASTER")) {
+> +    if (str && strcasestr(str, "MASTER")) {
+>           ret = 1;
+>           *val |= HCI_LM_MASTER;
+>       }
 
-Pushed.
+You will probably need to rebase:
+
+Applying: BlueZ hciconfig: Segmentation Fault
+error: lib/hci.c    2021-11-08 09:19:59.880207913 -0800: does not exist in index
+Patch failed at 0001 BlueZ hciconfig: Segmentation Fault
 
 
 -- 
