@@ -2,142 +2,138 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 79C94C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Nov 2021 22:38:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 94B35C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Nov 2021 22:50:27 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 5B60260F93
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Nov 2021 22:38:26 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 705A061054
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 12 Nov 2021 22:50:27 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235814AbhKLWlQ (ORCPT
+        id S231968AbhKLWxR (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 12 Nov 2021 17:41:16 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39624 "EHLO
+        Fri, 12 Nov 2021 17:53:17 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42464 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229634AbhKLWlP (ORCPT
+        with ESMTP id S233308AbhKLWxP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 12 Nov 2021 17:41:15 -0500
-Received: from mail-pg1-x532.google.com (mail-pg1-x532.google.com [IPv6:2607:f8b0:4864:20::532])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9B87C061766
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Nov 2021 14:38:24 -0800 (PST)
-Received: by mail-pg1-x532.google.com with SMTP id 200so9224625pga.1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Nov 2021 14:38:24 -0800 (PST)
+        Fri, 12 Nov 2021 17:53:15 -0500
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC754C061767
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Nov 2021 14:50:23 -0800 (PST)
+Received: by mail-oi1-x22e.google.com with SMTP id bf8so20605240oib.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Nov 2021 14:50:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=NzxJ/P5xI8k/+8qyQkcuciv21kLf2JEVcGByzZ1EjNM=;
-        b=Q70wAJz8x8FvqF8iVhYP8VBTcj8bxcjwI5ZJsOE4vfEm+80LfnD8H+gXxjVzRHODMV
-         qNV0SwvoNE78XgAnWpvh+a1Y0PLEU7oISSfp8JyJ0YzgKnrUqPUQAneSQLCX39Ag7WFE
-         x+JoxDciiuNu/XI6qaEwDwQ6o/xIaTg8L+ydh7uUi99Qam17i0QojB/b3jWb/adJQcrq
-         UE9X7/owK4pFFr120iSpkHQ/MIfaAT1j53wpRD09a2tPSvN5JuoV6zdottSElHod32NG
-         TkViQTrgyR7lnfzyzHswhct7dUJUj/wkc2ljqsLdxtfm2xdurLJztzc+bjnOicVFEADz
-         rVPQ==
+        d=chromium.org; s=google;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=vODi7QdVsXr5ltMsHWp2FnleR3mjZRfOo8/CUw9j+es=;
+        b=M8edBYX7AF53kHQELBSlm84mGncbdzrpwtmcNx6TcpAU6cijvGMOcynVW5F0IdglzE
+         p7UL1KV57VrYCFjmjBl0iheYUMGwJaL4sqfIFhCTIBIwfhUczA63C6gf2f3CBjRRkXd5
+         NHsBF9M+k2vtvhKS0FWv5qoy+TjF0ZmRIaXvw=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=NzxJ/P5xI8k/+8qyQkcuciv21kLf2JEVcGByzZ1EjNM=;
-        b=ntEw8tJ1Mi/ef7SgrB5jrONdTniNUjL1MPBGoUXgtP919C/eWU+7nOpYlWAzq44L78
-         dt+smNlFGBmn3NLBsby3eiVLaIwpFDS0UEsPuVJPcADul4AgYuJNaw9vfZvie+SaYfhT
-         2mFXWs9QBAs99eP7oYtvfqQtBkRoVaXujjleAZ5gDw8Zx8P60JT+uVgGpyQbG+WPYQxL
-         L89+R0XpJGogNcC9xIGoIPNatdWFwlPr277/terU4OM5YHSkKs3DN6Q05393CxPbAnZy
-         Tk5Wzz+Moj+FVjSWIylXxvOCW610kduakWymWC6IIy7cd+Dsv8FbMgT8P4NzevyVI70T
-         9DKA==
-X-Gm-Message-State: AOAM531U2wx2lv3qtYAvIigmzsK8gRgxcc4OVI9vA3InvyEvX2d4NG21
-        7/bwRNVUO9uQAjSh69nepJfXo3KKwWI=
-X-Google-Smtp-Source: ABdhPJypoSf+1rMUKxkMkqmM7OR85srgL+08UvwloivveZlUb6xXQGYYxEVph9OzKyIzBE1mwkImXg==
-X-Received: by 2002:a63:fe41:: with SMTP id x1mr12110728pgj.272.1636756704137;
-        Fri, 12 Nov 2021 14:38:24 -0800 (PST)
-Received: from [172.17.0.2] ([20.83.108.189])
-        by smtp.gmail.com with ESMTPSA id f21sm2667650pfe.69.2021.11.12.14.38.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 12 Nov 2021 14:38:23 -0800 (PST)
-Message-ID: <618eecdf.1c69fb81.dd4d3.7201@mx.google.com>
-Date:   Fri, 12 Nov 2021 14:38:23 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5707790505440990457=="
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=vODi7QdVsXr5ltMsHWp2FnleR3mjZRfOo8/CUw9j+es=;
+        b=db12uOByfrTE5ZRP7uL9OHljrVHvebuq1ZFVt61pMB0YoxpMO8q8xzr2mrndw0woA9
+         8k7VJ75dqechMJVFO8yxTb4XkMDHY/HSmpmq7VyxecH/2ZP4cjBfgVqbiIl22k1uub6x
+         eTGmryn9gcgQ0DdQoUC6aLY/g+UA+XvXVnonlfqYzq5vK5bI6o5eQI7jw+bGs0fg3Ttn
+         GUdVo8AqAI4Kr6Fgx16U7c/1iCQpzrbHjMgVHkEQK43kyFP1VlCnc0fTHOnuZsNMUP82
+         z77/EuwrLfZGXqZTzVyXr3cDNkh3IAOwIdCMEJSlT5Jz3qyRC0je00fM5l7puqMsrk7x
+         mhcA==
+X-Gm-Message-State: AOAM530bp+vS540PPNiIM0ngB+MMD1FpoCWYVLwye/dDdB+qfqizGsrd
+        1CQWAcfedRKs6nzKziBJWDQfpXu1aVtR2g==
+X-Google-Smtp-Source: ABdhPJyK785+SbxRoWnhM7FhsCpZBxRxeZivrWoYtWyfp4JPCt9xG8ub6i/RFpAsXggBb3HE697lBw==
+X-Received: by 2002:a05:6808:11c6:: with SMTP id p6mr16002369oiv.158.1636757422464;
+        Fri, 12 Nov 2021 14:50:22 -0800 (PST)
+Received: from mail-ot1-f51.google.com (mail-ot1-f51.google.com. [209.85.210.51])
+        by smtp.gmail.com with ESMTPSA id t12sm1473836oth.21.2021.11.12.14.50.20
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 12 Nov 2021 14:50:21 -0800 (PST)
+Received: by mail-ot1-f51.google.com with SMTP id o15-20020a9d410f000000b0055c942cc7a0so16036295ote.8
+        for <linux-bluetooth@vger.kernel.org>; Fri, 12 Nov 2021 14:50:20 -0800 (PST)
+X-Received: by 2002:a9d:6c2:: with SMTP id 60mr14670064otx.279.1636757420114;
+ Fri, 12 Nov 2021 14:50:20 -0800 (PST)
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [BlueZ,1/2] sdpd: Fix leaking buffers stored in cstates cache
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211112220538.310085-1-luiz.dentz@gmail.com>
-References: <20211112220538.310085-1-luiz.dentz@gmail.com>
+References: <20211108200058.v2.1.Ide934b992a0b54085a6be469d3687963a245dba9@changeid>
+ <17BDA821-9D4A-46C9-8C0E-F7DB35D50033@holtmann.org>
+In-Reply-To: <17BDA821-9D4A-46C9-8C0E-F7DB35D50033@holtmann.org>
+From:   Jesse Melhuish <melhuishj@chromium.org>
+Date:   Fri, 12 Nov 2021 16:50:08 -0600
+X-Gmail-Original-Message-ID: <CACGnfjTBtZ+1ey6+wF7hAVX23ty7yS9qEH0b6p+vzCLBWWPW0Q@mail.gmail.com>
+Message-ID: <CACGnfjTBtZ+1ey6+wF7hAVX23ty7yS9qEH0b6p+vzCLBWWPW0Q@mail.gmail.com>
+Subject: Re: [PATCH v2] Bluetooth: Don't initialize msft/aosp when using user channel
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Jesse Melhuish <melhuishj@chromium.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        Sonny Sasaka <sonnysasaka@chromium.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5707790505440990457==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hi Marcel,
 
-This is automated email and please do not reply to this email!
+No problem, thanks. Happy to extend userchan-tester; do you mind if we
+continue reviewing this patch for approval in the meantime so we can
+mitigate the issue on our end?
 
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=579439
-
----Test result---
-
-Test Summary:
-CheckPatch                    FAIL      1.25 seconds
-GitLint                       PASS      0.64 seconds
-Prep - Setup ELL              PASS      51.41 seconds
-Build - Prep                  PASS      0.24 seconds
-Build - Configure             PASS      9.30 seconds
-Build - Make                  PASS      218.48 seconds
-Make Check                    PASS      9.70 seconds
-Make Distcheck                PASS      262.91 seconds
-Build w/ext ELL - Configure   PASS      9.61 seconds
-Build w/ext ELL - Make        PASS      209.93 seconds
-
-Details
-##############################
-Test: CheckPatch - FAIL
-Desc: Run checkpatch.pl script with rule in .checkpatch.conf
-Output:
-[BlueZ,1/2] sdpd: Fix leaking buffers stored in cstates cache
-WARNING:NEW_TYPEDEFS: do not add new typedefs
-#110: FILE: src/sdpd-request.c:45:
-+typedef struct sdp_cont_info sdp_cont_info_t;
-
-/github/workspace/src/12617365.patch total: 0 errors, 1 warnings, 393 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12617365.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-[BlueZ,2/2] shared/gatt-server: Fix heap overflow when appending prepare writes
-WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
-#89: 
-Fixes https://github.com/bluez/bluez/security/advisories/GHSA-479m-xcq5-9g2q
-
-/github/workspace/src/12617367.patch total: 0 errors, 1 warnings, 40 lines checked
-
-NOTE: For some of the reported defects, checkpatch may be able to
-      mechanically convert to the typical style using --fix or --fix-inplace.
-
-/github/workspace/src/12617367.patch has style problems, please review.
-
-NOTE: Ignored message types: COMMIT_MESSAGE COMPLEX_MACRO CONST_STRUCT FILE_PATH_CHANGES MISSING_SIGN_OFF PREFER_PACKED SPDX_LICENSE_TAG SPLIT_STRING SSCANF_TO_KSTRTO
-
-NOTE: If any of the errors are false positives, please report
-      them to the maintainer, see CHECKPATCH in MAINTAINERS.
-
-
-
-
----
-Regards,
-Linux Bluetooth
-
-
---===============5707790505440990457==--
+On Thu, Nov 11, 2021 at 12:43 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Jesse,
+>
+> > A race condition is triggered when usermode control is given to
+> > userspace before the kernel's MSFT query responds, resulting in an
+> > unexpected response to userspace's reset command.
+> >
+> > Issue can be observed in btmon:
+> > < HCI Command: Vendor (0x3f|0x001e) plen 2                    #3 [hci0]
+> >        05 01                                            ..
+> > @ USER Open: bt_stack_manage (privileged) version 2.22  {0x0002} [hci0]
+> > < HCI Command: Reset (0x03|0x0003) plen 0                     #4 [hci0]
+> >> HCI Event: Command Complete (0x0e) plen 5                   #5 [hci0]
+> >      Vendor (0x3f|0x001e) ncmd 1
+> >       Status: Command Disallowed (0x0c)
+> >       05                                               .
+> >> HCI Event: Command Complete (0x0e) plen 4                   #6 [hci0]
+> >      Reset (0x03|0x0003) ncmd 2
+> >       Status: Success (0x00)
+> >
+> > Signed-off-by: Jesse Melhuish <melhuishj@chromium.org>
+> > Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
+> > Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
+> > ---
+> >
+> > Changes in v2:
+> > - Moved guard to the new home for this code.
+> >
+> > net/bluetooth/hci_sync.c | 6 ++++--
+> > 1 file changed, 4 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+> > index b794605dc882..5f1f59ac1813 100644
+> > --- a/net/bluetooth/hci_sync.c
+> > +++ b/net/bluetooth/hci_sync.c
+> > @@ -3887,8 +3887,10 @@ int hci_dev_open_sync(struct hci_dev *hdev)
+> >           hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
+> >               ret = hdev->set_diag(hdev, true);
+> >
+> > -     msft_do_open(hdev);
+> > -     aosp_do_open(hdev);
+> > +     if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
+> > +             msft_do_open(hdev);
+> > +             aosp_do_open(hdev);
+> > +     }
+>
+> but then you need to do the same on hci_dev_close. Also it would be good to extend userchan-tester with test cases for this.
+>
+> Regards
+>
+> Marcel
+>
