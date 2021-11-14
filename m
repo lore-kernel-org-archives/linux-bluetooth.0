@@ -2,106 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0E8DBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Nov 2021 12:34:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E42A1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Nov 2021 12:46:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id EF8726112E
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Nov 2021 12:34:51 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C7E6660EE4
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 14 Nov 2021 12:46:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230267AbhKNMho (ORCPT
+        id S235685AbhKNMtk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 14 Nov 2021 07:37:44 -0500
-Received: from m43-7.mailgun.net ([69.72.43.7]:22336 "EHLO m43-7.mailgun.net"
+        Sun, 14 Nov 2021 07:49:40 -0500
+Received: from m43-7.mailgun.net ([69.72.43.7]:17951 "EHLO m43-7.mailgun.net"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S236075AbhKNMhe (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 14 Nov 2021 07:37:34 -0500
+        id S229563AbhKNMth (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 14 Nov 2021 07:49:37 -0500
 DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1636893264; h=Message-ID: References: In-Reply-To: Subject:
- Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
- MIME-Version: Sender; bh=HVRsN9vwc/sETBKRnZmJjyWP055/SwC0n0BaeHe47UE=;
- b=FhRmIzhBeMHK3PdD79U2RHMKKmXwQFpUtLahGnTFz6UfJHR9AtDPGHXnyPL9Z5kd3OA6MSoL
- 8FMu9/e+wgUXYHrtEIXJ+Unw50VthNv5OfdSr1FIVDDeSaaXvk4WzuwNB1wQYDgNqDLQ+KNS
- NIUoOpnLucZ6vusFwOU+/T0YIjw=
+ s=smtp; t=1636894003; h=Content-Transfer-Encoding: Content-Type:
+ In-Reply-To: MIME-Version: Date: Message-ID: From: References: Cc: To:
+ Subject: Sender; bh=mC3LjhRSX3c0QTWBp0qcXjBnbouZr3462yGwYzm+tFU=; b=fiM+yUwgIkUpmAsB9/Nh2OLgQdXn3+gCih8OuwEb+2MGuaNHSWbwbYJFMXQ0hzX0d4k6t1Dq
+ Fk1/t5FiNXVgmZd/oDpkwu1Ba8W4Fas4B5DDVEyECRDqU26KBS2YeKtgjSIo11XW2j1iTRCh
+ KaPa+t9/JsumJQ0cxIh7XruHFHQ=
 X-Mailgun-Sending-Ip: 69.72.43.7
 X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
 Received: from smtp.codeaurora.org
  (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
- 6191023de10f164c25b3019a (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Sun, 14 Nov 2021 12:34:05
+ smtp-out-n06.prod.us-west-2.postgun.com with SMTP id
+ 61910527c48ba48884f0b041 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Sun, 14 Nov 2021 12:46:31
  GMT
 Sender: zijuhu=codeaurora.org@mg.codeaurora.org
 Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id E7562C43460; Sun, 14 Nov 2021 12:34:03 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        id 4AAB1C4360D; Sun, 14 Nov 2021 12:46:31 +0000 (UTC)
+Received: from [192.168.0.104] (unknown [183.195.15.125])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
         (No client certificate requested)
         (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id C97C0C4338F;
-        Sun, 14 Nov 2021 12:34:01 +0000 (UTC)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 09536C4338F;
+        Sun, 14 Nov 2021 12:46:27 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 09536C4338F
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+Subject: Re: [PATCH v1] Bluetooth: hci_h4: Fix padding calculation error
+ within h4_recv_buf()
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
+        hemantg@codeaurora.org, rjliao@codeaurora.org,
+        Zijun Hu <quic_zijuhu@quicinc.com>
+References: <1636546159-8339-1-git-send-email-zijuhu@codeaurora.org>
+From:   Zijun Hu <zijuhu@codeaurora.org>
+Message-ID: <97e8c186-3c4f-a3ff-8389-e15ea476280e@codeaurora.org>
+Date:   Sun, 14 Nov 2021 20:46:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.1
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+In-Reply-To: <1636546159-8339-1-git-send-email-zijuhu@codeaurora.org>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-US
 Content-Transfer-Encoding: 7bit
-Date:   Sun, 14 Nov 2021 20:34:01 +0800
-From:   zijuhu@codeaurora.org
-To:     Rob Herring <robh@kernel.org>
-Cc:     davem@davemloft.net, rjliao@codeaurora.org, kuba@kernel.org,
-        bgodavar@codeaurora.org, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        devicetree@vger.kernel.org, Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: Re: [PATCH v1 2/3] dt-bindings: net: bluetooth: Add device tree
- bindings for QTI bluetooth MAPLE
-In-Reply-To: <YY6eD/r3ddU7PUxJ@robh.at.kernel.org>
-References: <1635837069-1293-1-git-send-email-zijuhu@codeaurora.org>
- <YY6eD/r3ddU7PUxJ@robh.at.kernel.org>
-Message-ID: <18c17ac0a622f6d0b86b39b28cecea5f@codeaurora.org>
-X-Sender: zijuhu@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 2021-11-13 01:02, Rob Herring wrote:
-> On Tue, Nov 02, 2021 at 03:11:09PM +0800, Zijun Hu wrote:
->> From: Zijun Hu <quic_zijuhu@quicinc.com>
-> 
-> Subject space is valuable, don't say things twice:
-> 
-> dt-bindings: net: bluetooth: Add Qualcomm MAPLE
-> 
-> Is MAPLE an SoC? Everything else used part numbers, why not here?
-> 
-thanks for your reply, please ignore this patch bcz part of the patch 
-series is refused.
+could you please code review for this patch?
 
-MAPLE is a name of BT controller which is integrated within a Soc, so it 
-doesn't regular part number.
-
->> 
->> Add device tree bindings for QTI bluetooth MAPLE.
->> 
->> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
->> ---
->>  Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml | 1 +
->>  1 file changed, 1 insertion(+)
->> 
->> diff --git 
->> a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml 
->> b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->> index f93c6e7a1b59..9f0508c4dd16 100644
->> --- a/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->> +++ b/Documentation/devicetree/bindings/net/qualcomm-bluetooth.yaml
->> @@ -23,6 +23,7 @@ properties:
->>        - qcom,wcn3998-bt
->>        - qcom,qca6390-bt
->>        - qcom,wcn6750-bt
->> +      - qcom,maple-bt
->> 
->>    enable-gpios:
->>      maxItems: 1
->> --
->> The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
->> Forum, a Linux Foundation Collaborative Project
->> 
->> 
+On 11/10/2021 8:09 PM, Zijun Hu wrote:
+> From: Zijun Hu <quic_zijuhu@quicinc.com>
+> 
+> it is erroneous to calculate padding by subtracting length of type
+> indication from skb->len, it will cause data analysis error for
+> alignment which is greater than 1, so fixed by adding length of type
+> indication with skb->len.
+> 
+> Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+> ---
+>  drivers/bluetooth/hci_h4.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/hci_h4.c b/drivers/bluetooth/hci_h4.c
+> index 4b3b14a34794..1d0cdf023243 100644
+> --- a/drivers/bluetooth/hci_h4.c
+> +++ b/drivers/bluetooth/hci_h4.c
+> @@ -252,7 +252,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+>  			}
+>  
+>  			if (!dlen) {
+> -				hu->padding = (skb->len - 1) % alignment;
+> +				hu->padding = (skb->len + 1) % alignment;
+>  				hu->padding = (alignment - hu->padding) % alignment;
+>  
+>  				/* No more data, complete frame */
+> @@ -260,7 +260,7 @@ struct sk_buff *h4_recv_buf(struct hci_dev *hdev, struct sk_buff *skb,
+>  				skb = NULL;
+>  			}
+>  		} else {
+> -			hu->padding = (skb->len - 1) % alignment;
+> +			hu->padding = (skb->len + 1) % alignment;
+>  			hu->padding = (alignment - hu->padding) % alignment;
+>  
+>  			/* Complete frame */
+> 
