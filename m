@@ -2,121 +2,111 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D7778C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 17:06:35 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 74247C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 17:29:47 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id BD19C61A0D
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 17:06:35 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5CDDF6329C
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 17:29:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231693AbhKORJK convert rfc822-to-8bit (ORCPT
+        id S232435AbhKORck convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Nov 2021 12:09:10 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56780 "EHLO
+        Mon, 15 Nov 2021 12:32:40 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:47475 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232083AbhKORIu (ORCPT
+        with ESMTP id S237137AbhKORab (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Nov 2021 12:08:50 -0500
+        Mon, 15 Nov 2021 12:30:31 -0500
 Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 49BCCCED36;
-        Mon, 15 Nov 2021 18:05:34 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id D2B04CED38;
+        Mon, 15 Nov 2021 18:27:33 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH] Bluetooth: Fix adv set removal processing.
+Subject: Re: [PATCH] bluetooth: fix uninitialized variables notify_evt
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211115135114.2763223-1-alainm@chromium.org>
-Date:   Mon, 15 Nov 2021 18:05:33 +0100
-Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        mcchou@chromium.org
+In-Reply-To: <20211115085613.1924762-1-liu.yun@linux.dev>
+Date:   Mon, 15 Nov 2021 18:27:33 +0100
+Cc:     "Tumkur Narayan, Chethan" <chethan.tumkur.narayan@intel.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C44D0F6E-CF4F-44BC-BE13-43F62D083774@holtmann.org>
-References: <20211115135114.2763223-1-alainm@chromium.org>
-To:     Alain Michaud <alainm@chromium.org>
+Message-Id: <73AF4476-F5B2-4E83-9F43-72D98B4615FF@holtmann.org>
+References: <20211115085613.1924762-1-liu.yun@linux.dev>
+To:     Jackie Liu <liu.yun@linux.dev>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Alain,
+Hi Jackie,
 
-> When multiple advertisement sets are active and a single instance is
-> removed, the processing of hci_cc_le_set_ext_adv_enable will result in
-> considering all advertisements as disabled since the instance has
-> already been removed from the list.
+> Coverity Scan report:
 > 
-> The fix is to use the command parameters to validate the intent rather
-> than making an assumption based on the validity of the adv set.
+> [...]
+> *** CID 1493985:  Uninitialized variables  (UNINIT)
+> /net/bluetooth/hci_event.c: 4535 in hci_sync_conn_complete_evt()
+> 4529
+> 4530     	/* Notify only in case of SCO over HCI transport data path which
+> 4531     	 * is zero and non-zero value shall be non-HCI transport data path
+> 4532     	 */
+> 4533     	if (conn->codec.data_path == 0) {
+> 4534     		if (hdev->notify)
+>>>>    CID 1493985:  Uninitialized variables  (UNINIT)
+>>>>    Using uninitialized value "notify_evt" when calling "*hdev->notify".
+> 4535     			hdev->notify(hdev, notify_evt);
+> 4536     	}
+> 4537
+> 4538     	hci_connect_cfm(conn, ev->status);
+> 4539     	if (ev->status)
+> 4540     		hci_conn_del(conn);
+> [...]
 > 
-> remove_advertising() hci0
+> Although only btusb uses air_mode, and he only handles HCI_NOTIFY_ENABLE_SCO_CVSD
+> and HCI_NOTIFY_ENABLE_SCO_TRANSP, there is still a very small chance that
+> ev->air_mode is not equal to 0x2 and 0x3, but notify_evt is initialized to
+> HCI_NOTIFY_ENABLE_SCO_CVSD or HCI_NOTIFY_ENABLE_SCO_TRANSP. the context is
+> maybe not correct.
 > 
-> hci_req_add_ev() hci0 opcode 0x2039 plen 6
-> hci_req_add_ev() hci0 opcode 0x203c plen 1
+> In order to ensure 100% correctness, we directly give him a default value 0.
 > 
-> hci_remove_adv_instance() hci0 removing 2MR
-> <-- This removes instance 2 from the adv_instances list
-> 
-> hci_cc_le_set_ext_adv_enable() hci0 status 0x00
-> hci_sent_cmd_data() hci0 opcode 0x2039
-> hci_cc_le_set_ext_adv_enable() adv instance 0, enabled 0
-> <-- This incorrectly assumes that all instances are
->    being disabled while only handle 2 is being disabled.
-> 
-> hci_cc_le_set_ext_adv_enable() adv instance list status - before
-> hci_cc_le_set_ext_adv_enable() adv instance 3 is 1
-> hci_cc_le_set_ext_adv_enable() adv instance 1 is 1
-> hci_cc_le_set_ext_adv_enable() HCI_LE_ADV state before: 1
-> hci_cc_le_set_ext_adv_enable() adv instance list status - after
-> hci_cc_le_set_ext_adv_enable() adv instance 3 is 0
-> hci_cc_le_set_ext_adv_enable() adv instance 1 is 0
-> hci_cc_le_set_ext_adv_enable() HCI_LE_ADV state after: 0
-> <-- This is incorrect since handle 1 and 3 are still enabled
->    in the controller
-> 
-> The fix was validated by running the ChromeOS bluetooth_AdapterAdvHealth
-> test suite.
-> 
-> Reviewed-by: mcchou@chromium.org
-
-we need clear name and email in the tags please. And I also like to have Fixes: tags here as well.
-
-> Signed-off-by: Alain Michaud <alainm@chromium.org>
-> 
+> Addresses-Coverity: ("Uninitialized variables")
+> Fixes: f4f9fa0c07bb ("Bluetooth: Allow usb to auto-suspend when SCO use	non-HCI transport")
+> Signed-off-by: Jackie Liu <liuyun01@kylinos.cn>
 > ---
-> 
-> net/bluetooth/hci_event.c | 8 +++++---
-> 1 file changed, 5 insertions(+), 3 deletions(-)
+> net/bluetooth/hci_event.c | 2 +-
+> 1 file changed, 1 insertion(+), 1 deletion(-)
 > 
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index d4b75a6cfeee..52161d04136f 100644
+> index 7d0db1ca1248..f898fa42a183 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -1385,14 +1385,16 @@ static void hci_cc_le_set_ext_adv_enable(struct hci_dev *hdev,
-> 				if (adv->enabled)
-> 					goto unlock;
-> 			}
-> -		} else {
-> +
-> +			hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> +		} else if (!cp->num_of_sets || !set->handle) {
-> 			/* All instances shall be considered disabled */
-> 			list_for_each_entry_safe(adv, n, &hdev->adv_instances,
-> 						 list)
-> 				adv->enabled = false;
-> -		}
+> @@ -4445,7 +4445,7 @@ static void hci_sync_conn_complete_evt(struct hci_dev *hdev,
+> {
+> 	struct hci_ev_sync_conn_complete *ev = (void *) skb->data;
+> 	struct hci_conn *conn;
+> -	unsigned int notify_evt;
+> +	unsigned int notify_evt = 0;
 > 
-> -		hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> +			hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> +		}
-> 	}
+> 	BT_DBG("%s status 0x%2.2x", hdev->name, ev->status);
 
-Just checking if this wouldn’t be cleaner:
+lets modify the switch statement and add a default case. And then lets add a check to notify_evt != 0.
 
-		} else {
-			if (foo)
-				bar;
+With that in mind, I wonder if this is not better
 
-			hci_dev_clear_flag(hdev, HCI_LE_ADV);
+        /* Notify only in case of SCO over HCI transport data path which
+         * is zero and non-zero value shall be non-HCI transport data path
+         */ 
+	if (conn->codec.data_path == 0 && hdev->notify) {
+		switch (ev->air_mode) {
+		case 0x02:
+			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_CVSD);
+			break;
+		case 0x03:
+			hdev->notify(hdev, HCI_NOTIFY_ENABLE_SCO_TRANSP);
+			break;
 		}
+	}
 
 Regards
 
