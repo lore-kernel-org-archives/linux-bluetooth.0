@@ -2,74 +2,289 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5F667C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 03:05:37 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D5352C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 06:43:46 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 3783B61425
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 03:05:37 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B8ED361BFA
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 06:43:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231716AbhKODI1 (ORCPT
+        id S229780AbhKOGqk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 14 Nov 2021 22:08:27 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42346 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230167AbhKODIV (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 14 Nov 2021 22:08:21 -0500
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:e::133])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 330EBC061746;
-        Sun, 14 Nov 2021 19:05:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-        MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-        Content-ID:Content-Description:In-Reply-To:References;
-        bh=IMQeoZL0qGwZKQl++ld8piwgfGGupQVBvi8sKONISxs=; b=3ry5KtbwHJ57NfBbh0gvJTuCMv
-        ZS5cRZ3twUKYFjFASPmk4G2i5InsIp2WJJ/OxdMeZLyCzcUnamv/YSgxJLyflnEvd7GnrldgxYJ+Q
-        OLX/YtT0SGZv3n2Ccho/Z/lTWOAuXk2i7lpi2VQUlaN34sjo1vqwWk+szz4wCVTnJdofo6xN5WiP9
-        HxLg351HBOWE1E7Rpzsn/We0JZQ185PjJ0QuNLgaxo4H+xi1vlPpXpxOwcuEzB87iaeIBeMS10sFE
-        qdhmKyCh/0yAdTRiZ+LIVhwYx2pWDM8Tc7m+n91gqjd4Onox6gXOxUyV4O7ImrwzRZpY1VvbcHPhj
-        nnsJd6xg==;
-Received: from [2601:1c0:6280:3f0::aa0b] (helo=bombadil.infradead.org)
-        by bombadil.infradead.org with esmtpsa (Exim 4.94.2 #2 (Red Hat Linux))
-        id 1mmSJ4-00EI7w-7n; Mon, 15 Nov 2021 03:05:18 +0000
-From:   Randy Dunlap <rdunlap@infradead.org>
-To:     linux-kernel@vger.kernel.org
-Cc:     Randy Dunlap <rdunlap@infradead.org>,
-        kernel test robot <lkp@intel.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: btmrvl_main: repair a non-kernel-doc comment
-Date:   Sun, 14 Nov 2021 19:05:17 -0800
-Message-Id: <20211115030517.17931-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.31.1
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Mon, 15 Nov 2021 01:46:40 -0500
+Received: from mga02.intel.com ([134.134.136.20]:7177 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229648AbhKOGqf (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Nov 2021 01:46:35 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10168"; a="220598218"
+X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
+   d="scan'208";a="220598218"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 14 Nov 2021 22:43:40 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,235,1631602800"; 
+   d="scan'208";a="453725941"
+Received: from intel-lenovo-legion-y540-15irh-pg0.iind.intel.com ([10.224.186.95])
+  by orsmga003.jf.intel.com with ESMTP; 14 Nov 2021 22:43:38 -0800
+From:   Kiran K <kiran.k@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     ravishankar.srivatsa@intel.com, chethan.tumkur.narayan@intel.com,
+        luiz.von.dentz@intel.com, Kiran K <kiran.k@intel.com>
+Subject: [PATCH v3 01/13] Bluetooth: Refactor code to read supported codecs in getsockopt
+Date:   Mon, 15 Nov 2021 12:19:02 +0530
+Message-Id: <20211115064914.2345-1-kiran.k@intel.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Do not use "/**" to begin a non-kernel-doc comment.
-Fixes this build warning:
+This patch moves reading of supported codecs from cache to a new
+function to reuse over L2CAP sockets to be used in a2dp offload
+use case.
 
-drivers/bluetooth/btmrvl_main.c:2: warning: This comment starts with '/**', but isn't a kernel-doc comment. Refer Documentation/doc-guide/kernel-doc.rst
-
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Cc: Marcel Holtmann <marcel@holtmann.org>
-Cc: Johan Hedberg <johan.hedberg@gmail.com>
-Cc: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org
+Signed-off-by: Kiran K <kiran.k@intel.com>
+Reviewed-by: Chethan T N <chethan.tumkur.narayan@intel.com>
+Reviewed-by: Srivatsa Ravishankar <ravishankar.srivatsa@intel.com>
 ---
- drivers/bluetooth/btmrvl_main.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ net/bluetooth/hci_codec.c | 88 +++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_codec.h |  2 +
+ net/bluetooth/sco.c       | 98 +++------------------------------------
+ 3 files changed, 96 insertions(+), 92 deletions(-)
 
---- linux-next-20211102.orig/drivers/bluetooth/btmrvl_main.c
-+++ linux-next-20211102/drivers/bluetooth/btmrvl_main.c
-@@ -1,4 +1,4 @@
--/**
-+/*
-  * Marvell Bluetooth driver
-  *
-  * Copyright (C) 2009, Marvell International Ltd.
+diff --git a/net/bluetooth/hci_codec.c b/net/bluetooth/hci_codec.c
+index 38201532f58e..f4d8d3a253d8 100644
+--- a/net/bluetooth/hci_codec.c
++++ b/net/bluetooth/hci_codec.c
+@@ -250,3 +250,91 @@ void hci_read_supported_codecs_v2(struct hci_dev *hdev)
+ error:
+ 	kfree_skb(skb);
+ }
++
++int hci_get_supported_codecs(struct hci_dev *hdev, u8 type, char __user *optval,
++			     int __user *optlen, int len)
++{
++	int n = 0, buf_len = 0, err = 0;
++	struct hci_codec_caps *caps;
++	struct bt_codec codec;
++	u8 num_codecs = 0, i, __user *ptr;
++	struct codec_list *c;
++
++	if (!hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED)) {
++		err = -EOPNOTSUPP;
++		goto error;
++	}
++
++	if (!hdev->get_data_path_id) {
++		err = -EOPNOTSUPP;
++		goto error;
++	}
++
++	/* find total buffer size required to copy codec + capabilities */
++	hci_dev_lock(hdev);
++	list_for_each_entry(c, &hdev->local_codecs, list) {
++		if (c->transport != type)
++			continue;
++		num_codecs++;
++		for (i = 0, caps = c->caps; i < c->num_caps; i++) {
++			buf_len += 1 + caps->len;
++			caps = (void *)&caps->data[caps->len];
++		}
++		buf_len += sizeof(struct bt_codec);
++	}
++	hci_dev_unlock(hdev);
++
++	buf_len += sizeof(struct bt_codecs);
++	if (buf_len > len) {
++		err = -ENOBUFS;
++		goto error;
++	}
++	ptr = optval;
++
++	if (put_user(num_codecs, ptr)) {
++		err = -EFAULT;
++		goto error;
++	}
++	ptr += sizeof(num_codecs);
++
++	/* Iterate over all the codecs on required transport */
++	hci_dev_lock(hdev);
++	list_for_each_entry(c, &hdev->local_codecs, list) {
++		if (c->transport != type)
++			continue;
++
++		codec.id = c->id;
++		codec.cid = c->cid;
++		codec.vid = c->vid;
++		err = hdev->get_data_path_id(hdev, &codec.data_path);
++		if (err < 0)
++			break;
++		codec.num_caps = c->num_caps;
++		if (copy_to_user(ptr, &codec, sizeof(codec))) {
++			err = -EFAULT;
++			break;
++		}
++		ptr += sizeof(codec);
++
++		/* find codec capabilities data length */
++		n = 0;
++		for (i = 0, caps = c->caps; i < c->num_caps; i++) {
++			n += 1 + caps->len;
++			caps = (void *)&caps->data[caps->len];
++		}
++
++		/* copy codec capabilities data */
++		if (n && copy_to_user(ptr, c->caps, n)) {
++			err = -EFAULT;
++			break;
++		}
++		ptr += n;
++	}
++	hci_dev_unlock(hdev);
++
++	if (!err && put_user(buf_len, optlen))
++		err = -EFAULT;
++
++error:
++	return err;
++}
+diff --git a/net/bluetooth/hci_codec.h b/net/bluetooth/hci_codec.h
+index a2751930f123..6e849c7d75b9 100644
+--- a/net/bluetooth/hci_codec.h
++++ b/net/bluetooth/hci_codec.h
+@@ -5,3 +5,5 @@
+ void hci_read_supported_codecs(struct hci_dev *hdev);
+ void hci_read_supported_codecs_v2(struct hci_dev *hdev);
+ void hci_codec_list_clear(struct list_head *codec_list);
++int hci_get_supported_codecs(struct hci_dev *hdev, u8 type, char __user *optval,
++			     int __user *optlen, int len);
+diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
+index 8eabf41b2993..0af814c13b5f 100644
+--- a/net/bluetooth/sco.c
++++ b/net/bluetooth/sco.c
+@@ -33,6 +33,8 @@
+ #include <net/bluetooth/hci_core.h>
+ #include <net/bluetooth/sco.h>
+ 
++#include "hci_codec.h"
++
+ static bool disable_esco;
+ 
+ static const struct proto_ops sco_sock_ops;
+@@ -1032,12 +1034,7 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 	struct bt_voice voice;
+ 	u32 phys;
+ 	int pkt_status;
+-	int buf_len;
+-	struct codec_list *c;
+-	u8 num_codecs, i, __user *ptr;
+ 	struct hci_dev *hdev;
+-	struct hci_codec_caps *caps;
+-	struct bt_codec codec;
+ 
+ 	BT_DBG("sk %p", sk);
+ 
+@@ -1103,98 +1100,15 @@ static int sco_sock_getsockopt(struct socket *sock, int level, int optname,
+ 		break;
+ 
+ 	case BT_CODEC:
+-		num_codecs = 0;
+-		buf_len = 0;
+-
+-		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src, BDADDR_BREDR);
++		hdev = hci_get_route(&sco_pi(sk)->dst, &sco_pi(sk)->src,
++				     BDADDR_BREDR);
+ 		if (!hdev) {
+ 			err = -EBADFD;
+ 			break;
+ 		}
+-
+-		if (!hci_dev_test_flag(hdev, HCI_OFFLOAD_CODECS_ENABLED)) {
+-			hci_dev_put(hdev);
+-			err = -EOPNOTSUPP;
+-			break;
+-		}
+-
+-		if (!hdev->get_data_path_id) {
+-			hci_dev_put(hdev);
+-			err = -EOPNOTSUPP;
+-			break;
+-		}
+-
+-		/* find total buffer size required to copy codec + caps */
+-		hci_dev_lock(hdev);
+-		list_for_each_entry(c, &hdev->local_codecs, list) {
+-			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
+-				continue;
+-			num_codecs++;
+-			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
+-				buf_len += 1 + caps->len;
+-				caps = (void *)&caps->data[caps->len];
+-			}
+-			buf_len += sizeof(struct bt_codec);
+-		}
+-		hci_dev_unlock(hdev);
+-
+-		buf_len += sizeof(struct bt_codecs);
+-		if (buf_len > len) {
+-			hci_dev_put(hdev);
+-			err = -ENOBUFS;
+-			break;
+-		}
+-		ptr = optval;
+-
+-		if (put_user(num_codecs, ptr)) {
+-			hci_dev_put(hdev);
+-			err = -EFAULT;
+-			break;
+-		}
+-		ptr += sizeof(num_codecs);
+-
+-		/* Iterate all the codecs supported over SCO and populate
+-		 * codec data
+-		 */
+-		hci_dev_lock(hdev);
+-		list_for_each_entry(c, &hdev->local_codecs, list) {
+-			if (c->transport != HCI_TRANSPORT_SCO_ESCO)
+-				continue;
+-
+-			codec.id = c->id;
+-			codec.cid = c->cid;
+-			codec.vid = c->vid;
+-			err = hdev->get_data_path_id(hdev, &codec.data_path);
+-			if (err < 0)
+-				break;
+-			codec.num_caps = c->num_caps;
+-			if (copy_to_user(ptr, &codec, sizeof(codec))) {
+-				err = -EFAULT;
+-				break;
+-			}
+-			ptr += sizeof(codec);
+-
+-			/* find codec capabilities data length */
+-			len = 0;
+-			for (i = 0, caps = c->caps; i < c->num_caps; i++) {
+-				len += 1 + caps->len;
+-				caps = (void *)&caps->data[caps->len];
+-			}
+-
+-			/* copy codec capabilities data */
+-			if (len && copy_to_user(ptr, c->caps, len)) {
+-				err = -EFAULT;
+-				break;
+-			}
+-			ptr += len;
+-		}
+-
+-		if (!err && put_user(buf_len, optlen))
+-			err = -EFAULT;
+-
+-		hci_dev_unlock(hdev);
++		err = hci_get_supported_codecs(hdev, HCI_TRANSPORT_SCO_ESCO,
++					       optval, optlen, len);
+ 		hci_dev_put(hdev);
+-
+ 		break;
+ 
+ 	default:
+-- 
+2.17.1
+
