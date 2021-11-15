@@ -2,134 +2,72 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AF87DC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 22:52:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8F11C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 00:17:32 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9885E6324A
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 15 Nov 2021 22:52:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 91822614C8
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 00:17:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233559AbhKOWzo (ORCPT
+        id S1351087AbhKPAU1 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Nov 2021 17:55:44 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53714 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1347878AbhKOWse (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Nov 2021 17:48:34 -0500
-Received: from mail-il1-x12d.google.com (mail-il1-x12d.google.com [IPv6:2607:f8b0:4864:20::12d])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2149C07978E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Nov 2021 14:01:02 -0800 (PST)
-Received: by mail-il1-x12d.google.com with SMTP id i9so18232569ilu.8
-        for <linux-bluetooth@vger.kernel.org>; Mon, 15 Nov 2021 14:01:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QzueYWxy8dLImh7cCYYdS3GsWWCRwq/RzqiWPZWYfQc=;
-        b=DpUkAzJjsCVWwr6xiKlHOJbMkFdZMrMTQLr/TUMHFRGtfKJCKafbykmPsMMARFhtg5
-         G6K1QOh2Ymly7eeYK52rvkI4+m8NhdXn/8QwaPFP6/ZPvgJ3DjmrU4HZSmAqmTkvuGnh
-         nD/BtiEmbVW2rYwNzw/adflbl91XBT913bFoY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=QzueYWxy8dLImh7cCYYdS3GsWWCRwq/RzqiWPZWYfQc=;
-        b=oSspqN7GHqxSrq3O8yfiRdA4WR+ayN6QOUFurzNOEDyIEsK4517DbhCGkzUt64HX98
-         KvePFCxH9+PvHEu6pHkvkBMNOfXfE6ZZcVaWtQj+3sCzvLTYlrjmNDWJfSgmrQPTUhML
-         1+CmceeNZiIMd4yQEvJjbPmKYFRTYLaG8jjrRb+AcQj/TQEb7frCtOcRUbEq2JdqkBc6
-         35PYChSXb6rI9ZJpiQmwEk8Ryic1N1wtGAM9FpLP1jbwDqtBPFrPFiXHK3eni619ipgG
-         H7n9IPiUz1dJlz95teuikx/VvzQvi2kg09iB28naT0kiMM4W/GYyZ5v5h0KldCDeWVAl
-         eAdw==
-X-Gm-Message-State: AOAM532DJ+9OI/G4ZKQFLcU8fbHiGWIivSj0y9VlTgYqosULh3xpLIPk
-        lUzXJzWGMDovFjeqhxEOD3Sj70H3wlOM7w==
-X-Google-Smtp-Source: ABdhPJyA3i8n7ZKbPb+ib9Zyp+wG/d9GT1lDpobG+WuC9dDKipMtVqcOfUikuUdQ6OJ+Y7rRMz8vPg==
-X-Received: by 2002:a05:6e02:1ba4:: with SMTP id n4mr1333561ili.305.1637013662089;
-        Mon, 15 Nov 2021 14:01:02 -0800 (PST)
-Received: from melhuishj.c.googlers.com.com (161.74.123.34.bc.googleusercontent.com. [34.123.74.161])
-        by smtp.gmail.com with ESMTPSA id i7sm10855048ilu.24.2021.11.15.14.01.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 15 Nov 2021 14:01:01 -0800 (PST)
-From:   Jesse Melhuish <melhuishj@chromium.org>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Jesse Melhuish <melhuishj@chromium.org>,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Sonny Sasaka <sonnysasaka@chromium.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH v3] Bluetooth: Don't initialize msft/aosp when using user channel
-Date:   Mon, 15 Nov 2021 22:00:52 +0000
-Message-Id: <20211115220021.v3.1.I2a8b2f2e52d05ae9ead3f3dcc1dd90ef47a7acd7@changeid>
-X-Mailer: git-send-email 2.31.0
+        Mon, 15 Nov 2021 19:20:27 -0500
+Received: from mail.kernel.org ([198.145.29.99]:56864 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1347416AbhKOVMg (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 15 Nov 2021 16:12:36 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPSA id A6BDA61B4B;
+        Mon, 15 Nov 2021 21:09:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637010579;
+        bh=om6FJZiL4uGOCVc3SoVSzocZS9dT+KxiCifRHEJEPTM=;
+        h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+        b=bgVNozWD99+bIi8/alyDJ5eLhftjUfKPjoKoBrawkB+MjDjOOeoM9SOmw+pSfTaoT
+         P43bALStKm3iHQ7NSA66v4Glug2+uLbax5zN+SzWjrM1LuYmFJUNGxxZbxSuSJ2p5S
+         Wy7Q9zsw+yhDvN01GaYbYwAz/EgPOf2NOqvNErnfjQnyfMO6GJqyCZW3SlhmkVM8Hi
+         DZzeoL3dxTrA13+oUSs8DzZcZNXk+lorBgWv8P1XcCPjlvB5UG6l8hu0y9+vVvb/dr
+         7KbmozRpN6oVvTnY16rZdmUdwnprOt53KuzawkVVB/YYqck3PRc63cEJES2/87JqXi
+         cLBBpTDiV5a+w==
+Date:   Mon, 15 Nov 2021 13:09:38 -0800
+From:   Jakub Kicinski <kuba@kernel.org>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     David Miller <davem@davemloft.net>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: pull request: bluetooth 2021-11-02
+Message-ID: <20211115130938.49b97c8f@kicinski-fedora-pc1c0hjn.dhcp.thefacebook.com>
+In-Reply-To: <CABBYNZJPanQzSx=Nf9mgORvqixbgwd6ypx=irGiQ3CEr6xUT1A@mail.gmail.com>
+References: <20211102213321.18680-1-luiz.dentz@gmail.com>
+        <CABBYNZ+i4aR5OjMppG+3+EkaOyFh06p18u6FNr6pZA8wws-hpg@mail.gmail.com>
+        <CABBYNZJPanQzSx=Nf9mgORvqixbgwd6ypx=irGiQ3CEr6xUT1A@mail.gmail.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-A race condition is triggered when usermode control is given to
-userspace before the kernel's MSFT query responds, resulting in an
-unexpected response to userspace's reset command.
+On Mon, 15 Nov 2021 11:53:15 -0800 Luiz Augusto von Dentz wrote:
+> > Any chance to get these changes in before the merge window closes?  
+> 
+> I guess these won't be able to be merged after all, is there a define
+> process on how/when pull-request shall be sent to net-next, Ive assume
+> next-next is freezed now the documentation says the the merge window
+> lasts for approximately two weeks but I guess that is for the Linus
+> tree not net-next?
 
-Issue can be observed in btmon:
-< HCI Command: Vendor (0x3f|0x001e) plen 2                    #3 [hci0]
-        05 01                                            ..
-@ USER Open: bt_stack_manage (privileged) version 2.22  {0x0002} [hci0]
-< HCI Command: Reset (0x03|0x0003) plen 0                     #4 [hci0]
-> HCI Event: Command Complete (0x0e) plen 5                   #5 [hci0]
-      Vendor (0x3f|0x001e) ncmd 1
-	Status: Command Disallowed (0x0c)
-	05                                               .
-> HCI Event: Command Complete (0x0e) plen 4                   #6 [hci0]
-      Reset (0x03|0x0003) ncmd 2
-	Status: Success (0x00)
-Reviewed-by: Abhishek Pandit-Subedi <abhishekpandit@chromium.org>
-Reviewed-by: Sonny Sasaka <sonnysasaka@chromium.org>
-Signed-off-by: Jesse Melhuish <melhuishj@chromium.org>
----
+I'm not sure what the exact rules are for net-next.
 
-Changes in v3:
-- Added guard around *_close calls as well.
+We had some glitches this time around, IMHO. Here is what I have in
+mind for the next merge window but note that I haven't had a chance 
+to discuss it with Dave yet, so it's more of me blabbering at this
+point than a plan:
+ - net-next would not apply patches posted after Linus cuts final;
+ - make sure all trees feeding net-next submit their changes around
+   rc6 time so that we don't get a large code dump right as the merge
+   window opens;
+ - any last minute net-next PRs should be ready by Monday night PST;
+ - we'd give the tree one day to settle, have build issues reported etc
+   and submit PR on Wednesday.
 
-Changes in v2:
-- Moved guard to the new home for this code.
-
- net/bluetooth/hci_sync.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
-
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index b794605dc882..06d08dc6ad22 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -3887,8 +3887,10 @@ int hci_dev_open_sync(struct hci_dev *hdev)
- 	    hci_dev_test_flag(hdev, HCI_VENDOR_DIAG) && hdev->set_diag)
- 		ret = hdev->set_diag(hdev, true);
- 
--	msft_do_open(hdev);
--	aosp_do_open(hdev);
-+	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		msft_do_open(hdev);
-+		aosp_do_open(hdev);
-+	}
- 
- 	clear_bit(HCI_INIT, &hdev->flags);
- 
-@@ -4031,8 +4033,10 @@ int hci_dev_close_sync(struct hci_dev *hdev)
- 
- 	hci_sock_dev_event(hdev, HCI_DEV_DOWN);
- 
--	aosp_do_close(hdev);
--	msft_do_close(hdev);
-+	if (!hci_dev_test_flag(hdev, HCI_USER_CHANNEL)) {
-+		aosp_do_close(hdev);
-+		msft_do_close(hdev);
-+	}
- 
- 	if (hdev->flush)
- 		hdev->flush(hdev);
--- 
-2.31.0
-
+If we go with a more structured timeline along these lines I'll try 
+to send reminders.
