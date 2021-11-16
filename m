@@ -2,95 +2,265 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B49C6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 09:26:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0AA45C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 10:08:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 88CCD61C14
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 09:26:33 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id E1A6B61AD2
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 10:08:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232999AbhKPJ33 (ORCPT
+        id S233779AbhKPKLL (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Nov 2021 04:29:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54792 "EHLO
+        Tue, 16 Nov 2021 05:11:11 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36176 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232697AbhKPJ31 (ORCPT
+        with ESMTP id S233807AbhKPKLJ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Nov 2021 04:29:27 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F78CC061570;
-        Tue, 16 Nov 2021 01:26:30 -0800 (PST)
-Received: from ip4d173d4a.dynamic.kabel-deutschland.de ([77.23.61.74] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1mmujP-0003C7-Uz; Tue, 16 Nov 2021 10:26:24 +0100
-Message-ID: <e75bf933-9b93-89d2-d73f-f85af65093c8@leemhuis.info>
-Date:   Tue, 16 Nov 2021 10:26:23 +0100
+        Tue, 16 Nov 2021 05:11:09 -0500
+Received: from mail-wr1-x42d.google.com (mail-wr1-x42d.google.com [IPv6:2a00:1450:4864:20::42d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06E8FC061746
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Nov 2021 02:08:13 -0800 (PST)
+Received: by mail-wr1-x42d.google.com with SMTP id d5so36456793wrc.1
+        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Nov 2021 02:08:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=3hUFYka7hT4QTVxRXPUnxsQTJicYLbW9pJazItGrKBk=;
+        b=I3ocltNdalspXZMjB9g+P7oDUkZ8SjYnM9rdhH8B2d90vfb5j6NmwmW/7aZzTVQA7u
+         80iThgyAsHaStB+TXiqJSUtJxHQg0C2BLvsHjSIjKI00ocMHIioWb9pa40EQ77obNzsM
+         Zd/veebYOC3GaeeRTQtf140yeXL4HpBUHvV3goieo6Ndrwiv2jBOleVRzS99c2kM/aa6
+         Y7NqX3rKHSiWx9+rao+UQWadanSzVk35XeR8NDZdRjdiAiGqA8sbK6p6JNrdodT2boEc
+         jiFT8bQt6CNIPhHkhYSkSbzU0wg2g7kCBheFCOtbfsW07OuW1tQu6ol5siEd6bP7tEUZ
+         iuVg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=3hUFYka7hT4QTVxRXPUnxsQTJicYLbW9pJazItGrKBk=;
+        b=rWwhak8UeShgoBH4wvddfHpg9+2+tTax8IY/fKox7BCCApLNVj0YnD2CyNXdt9SR2j
+         48jjDgPaub4AvXRurI9M0d0+bBm8Z3wIymHsinzD3ob8Gyzu1rZLfefLM6cmox6/wYxj
+         WmmR4QfVjAM9dXi4JXElC0cIpIE4T/WWGa+is7Q2Jy42KiO11gyxyJ9A2Alccm6tVhnw
+         jMb12r+G1RqlYJ3cfZDpRTjlzFPhYzZ+iCpW/lfIHTZuWKLWRidfu5g+He53FoxpiE4K
+         maNSKhjb8MUeM4jkXyiZfe4oE9AUsTphij1gvQX5nPcZ14jOW1XtYtVEz+D55CdpHZ8z
+         pgPA==
+X-Gm-Message-State: AOAM530waVShAa6Fyc8wnvA6BJd2ef9Q52k8kf4Lpxnk+TIAfNbNQ58F
+        ukPA/IzTPocM5GoTjFtrOPhGYPfQGr/xV+jY7QVQXA==
+X-Google-Smtp-Source: ABdhPJzgQbcLxud/rD3vI60l7uS2dEtvlOSWnR+KrCgBqaICtfUBc0uB7vBNd/3QLIbykGJHeyL8XXXLzuog1QRX6ZU=
+X-Received: by 2002:a5d:68ce:: with SMTP id p14mr7720724wrw.116.1637057291160;
+ Tue, 16 Nov 2021 02:08:11 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCHv2] Bluetooth: quirk disabling LE Read Transmit Power
-Content-Language: en-BS
-To:     Orlando Chamberlain <redecorating@protonmail.com>
-Cc:     danielwinkler@google.com, gargaditya08@live.com,
-        gregkh@linuxfoundation.org, johan.hedberg@intel.com,
-        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
-        luiz.dentz@gmail.com, marcel@holtmann.org,
-        regressions@lists.linux.dev, sonnysasaka@chromium.org
-References: <4970a940-211b-25d6-edab-21a815313954@protonmail.com>
- <275acce4-9eab-9cba-7145-5a75a69ca530@protonmail.com>
- <20211001083412.3078-1-redecorating@protonmail.com>
- <CABBYNZLjSfcG_KqTEbL6NOSvHhA5-b1t_S=3FQP4=GwW21kuzg@mail.gmail.com>
- <972034A8-4B22-4FEE-9B37-C0A7C7ADD60C@live.com> <YYZr14zwHnd52rQ7@kroah.com>
- <829A2DF8-818E-4AF1-84F9-49B5822F9146@live.com> <YYePw07y2DzEPSBR@kroah.com>
- <70a875d0-7162-d149-dbc1-c2f5e1a8e701@leemhuis.info>
- <20211116090128.17546-1-redecorating@protonmail.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <20211116090128.17546-1-redecorating@protonmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1637054791;0c66314f;
-X-HE-SMSGID: 1mmujP-0003C7-Uz
+References: <20211115172714.Bluez.v3.1.I9fc087b25433a9347b2d8c8ff7a25fadf448ef49@changeid>
+ <CABBYNZJ+gnw_BCkLUaxQ5c6aViqcroWU1FuHnhK01=+m6Mwq3g@mail.gmail.com>
+In-Reply-To: <CABBYNZJ+gnw_BCkLUaxQ5c6aViqcroWU1FuHnhK01=+m6Mwq3g@mail.gmail.com>
+From:   Archie Pusaka <apusaka@google.com>
+Date:   Tue, 16 Nov 2021 18:08:03 +0800
+Message-ID: <CAJQfnxGkeHRvLm+TMP_LPCxnj6tLuTNPCPzWVxrdZUDshJYrcQ@mail.gmail.com>
+Subject: Re: [Bluez PATCH v3 1/3] Listen and process remote name resolving failure
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
+        Archie Pusaka <apusaka@chromium.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On 16.11.21 10:02, Orlando Chamberlain wrote:
->> Bluetooth maintainers, what's the status here? The proposed patch is
->> fixing a regression. It's not a recent one (it afaics was introduced in
->> v5.11-rc1). Nevertheless it would be good to get this finally resolved.
->> But this thread seems inactive for more than a week now. Or was progress
->> made, but is only visible somewhere else?
-> 
-> I think the best solution is getting broadcom to update their firmware,
-> I've just sent them a message through a form on their website, I couldn't
-> seem to get it to tell me "Your message has been sent", so it's possible
-> that it didn't submit (more likely I've sent the same message several times).
-> 
-> If I hear back from them I'll send something here.
+Hi Luiz,
 
-Thx for that. But FWIW: from the point of the regression tracker that's
-not the best solution, as according to your report this is a regression.
-IOW: we deal with something that used to up to a certain kernel version
-and was broken by a change to the kernel. That is something frown upon
-in Linux kernel development, hence changes introducing regression are
-often quickly reverted, if they can't get fixed by follow up change quickly.
+On Tue, 16 Nov 2021 at 07:50, Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Archie,
+>
+> On Mon, Nov 15, 2021 at 1:27 AM Archie Pusaka <apusaka@google.com> wrote:
+> >
+> > From: Archie Pusaka <apusaka@chromium.org>
+> >
+> > When Remote Name Resolve ends with failure, record this occurrence and
+> > prevent remote name resolving for the same device for some time.
+> > Increase the time duration for subsequent failures.
+> > ---
+> > Hi maintainers,
+> >
+> > This is the patch series for remote name request as was discussed here.
+> > https://patchwork.kernel.org/project/bluetooth/patch/20211028191805.1.I35b7f3a496f834de6b43a32f94b6160cb1467c94@changeid/
+> > Please also review the corresponding kernel space change.
+> >
+> > Changes in v3:
+> > * Rename MGMT const to align with the doc
+> >
+> > Changes in v2:
+> > * Stay silent instead of sending MGMT_OP_CONFIRM_NAME with DONT_CARE flag.
+> >
+> >  lib/mgmt.h    |  1 +
+> >  src/adapter.c | 15 +++++++++++++--
+> >  src/device.c  | 23 +++++++++++++++++++++++
+> >  src/device.h  |  2 ++
+> >  4 files changed, 39 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/lib/mgmt.h b/lib/mgmt.h
+> > index 0d1678f01d..d860b27401 100644
+> > --- a/lib/mgmt.h
+> > +++ b/lib/mgmt.h
+> > @@ -856,6 +856,7 @@ struct mgmt_ev_auth_failed {
+> >  #define MGMT_DEV_FOUND_CONFIRM_NAME    0x01
+> >  #define MGMT_DEV_FOUND_LEGACY_PAIRING  0x02
+> >  #define MGMT_DEV_FOUND_NOT_CONNECTABLE 0x04
+> > +#define MGMT_DEV_FOUND_NAME_REQUEST_FAILED 0x10
+> >
+> >  #define MGMT_EV_DEVICE_FOUND           0x0012
+> >  struct mgmt_ev_device_found {
+> > diff --git a/src/adapter.c b/src/adapter.c
+> > index d0d38621b8..6100448b5f 100644
+> > --- a/src/adapter.c
+> > +++ b/src/adapter.c
+> > @@ -6989,6 +6989,7 @@ static void update_found_devices(struct btd_adapter *adapter,
+> >                                         uint8_t bdaddr_type, int8_t rssi,
+> >                                         bool confirm, bool legacy,
+> >                                         bool not_connectable,
+> > +                                       bool name_resolve_failed,
+> >                                         const uint8_t *data, uint8_t data_len)
+> >  {
+> >         struct btd_device *dev;
+> > @@ -7081,6 +7082,9 @@ static void update_found_devices(struct btd_adapter *adapter,
+> >
+> >         device_set_legacy(dev, legacy);
+> >
+> > +       if (name_resolve_failed)
+> > +               device_name_resolve_fail(dev);
+> > +
+> >         if (adapter->filtered_discovery)
+> >                 device_set_rssi_with_delta(dev, rssi, 0);
+> >         else
+> > @@ -7151,7 +7155,10 @@ static void update_found_devices(struct btd_adapter *adapter,
+> >         if (g_slist_find(adapter->discovery_found, dev))
+> >                 return;
+> >
+> > -       if (confirm)
+> > +       /* If name is unknown but it's not allowed to resolve, don't send
+> > +        * MGMT_OP_CONFIRM_NAME.
+> > +        */
+> > +       if (confirm && (name_known || device_name_resolve_allowed(dev)))
+> >                 confirm_name(adapter, bdaddr, bdaddr_type, name_known);
+> >
+> >         adapter->discovery_found = g_slist_prepend(adapter->discovery_found,
+> > @@ -7201,6 +7208,8 @@ static void device_found_callback(uint16_t index, uint16_t length,
+> >         uint32_t flags;
+> >         bool confirm_name;
+> >         bool legacy;
+> > +       bool not_connectable;
+> > +       bool name_resolve_failed;
+> >         char addr[18];
+> >
+> >         if (length < sizeof(*ev)) {
+> > @@ -7230,10 +7239,12 @@ static void device_found_callback(uint16_t index, uint16_t length,
+> >
+> >         confirm_name = (flags & MGMT_DEV_FOUND_CONFIRM_NAME);
+> >         legacy = (flags & MGMT_DEV_FOUND_LEGACY_PAIRING);
+> > +       not_connectable = (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE);
+> > +       name_resolve_failed = (flags & MGMT_DEV_FOUND_NAME_REQUEST_FAILED);
+> >
+> >         update_found_devices(adapter, &ev->addr.bdaddr, ev->addr.type,
+> >                                         ev->rssi, confirm_name, legacy,
+> > -                                       flags & MGMT_DEV_FOUND_NOT_CONNECTABLE,
+> > +                                       not_connectable, name_resolve_failed,
+> >                                         eir, eir_len);
+> >  }
+> >
+> > diff --git a/src/device.c b/src/device.c
+> > index fdc2d50a47..699faeba3b 100644
+> > --- a/src/device.c
+> > +++ b/src/device.c
+> > @@ -79,6 +79,8 @@
+> >  #define GATT_INCLUDE_UUID_STR "2802"
+> >  #define GATT_CHARAC_UUID_STR "2803"
+> >
+> > +#define NAME_RESOLVE_RETRY_DELAY       120 /* seconds */
+>
+> I'd make this configurable since on headless systems it might be a
+> good idea to have an option to disable the retrying logic.
+>
+Ack. Will be revised.
 
-That sentence has two "quickly", as we want to prevent more people
-running into the issue, resulting in a loss of trust. But that's what
-will happen if we wait for a firmware update to get developed, tested,
-published, and rolled out. And even then we can't expect users to have
-the latest firmware installed when they switch to a new kernel.
+> >  static DBusConnection *dbus_conn = NULL;
+> >  static unsigned service_state_cb_id;
+> >
+> > @@ -272,6 +274,9 @@ struct btd_device {
+> >
+> >         GIOChannel      *att_io;
+> >         guint           store_id;
+> > +
+> > +       time_t          name_resolve_earliest_allow_time;
+> > +       uint8_t         name_resolve_fail_count;
+> >  };
+> >
+> >  static const uint16_t uuid_list[] = {
+> > @@ -4361,6 +4366,24 @@ bool device_name_known(struct btd_device *device)
+> >         return device->name[0] != '\0';
+> >  }
+> >
+> > +bool device_name_resolve_allowed(struct btd_device *device)
+> > +{
+> > +       return time(NULL) >= device->name_resolve_earliest_allow_time;
+> > +}
+> > +
+> > +void device_name_resolve_fail(struct btd_device *device)
+> > +{
+> > +       if (!device)
+> > +               return;
+> > +
+> > +       /* Punish this device by not allowing name resolve for some time.
+> > +        * increase punishment time for subsequent failures.
+> > +        */
+> > +       device->name_resolve_fail_count++;
+> > +       device->name_resolve_earliest_allow_time = time(NULL) +
+> > +               NAME_RESOLVE_RETRY_DELAY * device->name_resolve_fail_count;
+>
+> Like I said above we should probably make the number of retries and
+> intervals configurable, have a look how it was done for reconnections
+> in the policy plugin since I believe this would look very similar to
+> that. Anyway we can't really use the system time as that can be
+> modified causing jumps backward or forward in time so you must use
+> CLOCK_MONOTONIC if you don't want it to be affected by system time
+> changes.
+>
+Good point! Will be revised.
 
-Hence the best solution *afaics* might be: fix this in the kernel
-somehow now with a workaround; once the firmware update is out, change
-the kernel again to only apply the workaround if the old firmware is in use.
+> The other possible solution would be not to have any retry logic since
+> those device are likely to fail resolving their names on each retry,
+> or we are doing this because we now properly abort the name
+> resolution?
+>
+This might also be caused by the peer device suddenly losing power or
+moving away, therefore is unresponsive to the name resolve request. As
+such, I think it's important to retry at some point.
 
-At least that's how it looks to me from the outside. But as mentioned
-earlier already: as a Linux kernel regression tracker I'm getting a lot
-of reports on my table. I can only look briefly into most of them.
-Therefore I unfortunately will get things wrong or miss something
-important. I hope that's not the case here; if you think it is, don't
-hesitate to tell me about it in a public reply. That's in everyone's
-interest, as what I wrote above might be misleading to everyone reading
-this, which is something I'd like to avoid.
+> > +}
+> > +
+> >  void device_set_class(struct btd_device *device, uint32_t class)
+> >  {
+> >         if (device->class == class)
+> > diff --git a/src/device.h b/src/device.h
+> > index 5f615cb4b6..76d79855f8 100644
+> > --- a/src/device.h
+> > +++ b/src/device.h
+> > @@ -25,6 +25,8 @@ void btd_device_device_set_name(struct btd_device *device, const char *name);
+> >  void device_store_cached_name(struct btd_device *dev, const char *name);
+> >  void device_get_name(struct btd_device *device, char *name, size_t len);
+> >  bool device_name_known(struct btd_device *device);
+> > +bool device_name_resolve_allowed(struct btd_device *device);
+> > +void device_name_resolve_fail(struct btd_device *device);
+> >  void device_set_class(struct btd_device *device, uint32_t class);
+> >  void device_update_addr(struct btd_device *device, const bdaddr_t *bdaddr,
+> >                                                         uint8_t bdaddr_type);
+> > --
+> > 2.34.0.rc1.387.gb447b232ab-goog
+> >
+>
+>
+> --
+> Luiz Augusto von Dentz
 
-Ciao, Thorsten (carrying his Linux kernel regression tracker hat)
+Thanks,
+Archie
