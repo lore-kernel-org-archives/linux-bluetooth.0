@@ -2,113 +2,132 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9D1B0C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 04:49:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D6FBAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 05:52:10 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7791460EFD
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 04:49:52 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id B261A60FBF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 05:52:10 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238248AbhKPEwq (ORCPT
+        id S238182AbhKPFzD (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 15 Nov 2021 23:52:46 -0500
-Received: from m43-7.mailgun.net ([69.72.43.7]:29079 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343620AbhKPEwT (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 15 Nov 2021 23:52:19 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1637038131; h=Message-ID: Subject: Cc: To: From: Date:
- Content-Transfer-Encoding: Content-Type: MIME-Version: Sender;
- bh=C6dta68YCuwcmrwbqCnIM+uu0DuHMK2MLotTOPhNpns=; b=Q/dnfGfpMP9PmP4B9fIxtjz5CF85aXRwv384/zwY4hvbgk242VbbfDfQVtKK0tH2yRL8r+gy
- N1T3oJ8u4gvX1/UHmpcjKqQ4fWmFGuomyOADPYDx+Z3pb57NXON7U0BzShIQG5MO4w91SBMU
- /u3NPXf32x8ktnXbhdP3HPvRLhk=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n05.prod.us-west-2.postgun.com with SMTP id
- 619338334db4233966b20121 (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 16 Nov 2021 04:48:51
- GMT
-Sender: tjiang=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id D6E47C43617; Tue, 16 Nov 2021 04:48:50 +0000 (UTC)
-Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
-        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        (Authenticated sender: tjiang)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 16926C43460;
-        Tue, 16 Nov 2021 04:48:50 +0000 (UTC)
+        Tue, 16 Nov 2021 00:55:03 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33182 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238014AbhKPFy7 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Nov 2021 00:54:59 -0500
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E207C0AD840;
+        Mon, 15 Nov 2021 21:02:54 -0800 (PST)
+Received: by mail-lj1-x233.google.com with SMTP id 1so40524768ljv.2;
+        Mon, 15 Nov 2021 21:02:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:user-agent:subject:content-language:to
+         :cc:references:from:in-reply-to:content-transfer-encoding;
+        bh=33rumaWr9qlBk+pQo3yKk/+p7rzkpn3TeXUIKcpGn90=;
+        b=ZZcnmPT6yr1WWiYgp3t9VKZYYUeqJRqwj68snZsmqMJT8TQwx1VuCQm0iZb3MPMIPF
+         vwjDjthny4ctrdpHlKOC7Dyu2hyJmvTDzc8uH/t/z7yFAvMvavdiE8NNTuWPlwi+bK08
+         3Vu/5T5D7FKry3UZDL4oZJw0adBtq1U7KUD3AwVQgH7jvDKlFe7xzbRpTZ2hg/tbwlp+
+         dBtAXjSSSzg67LDcqePVi8MQgKVbIYwhIWtyAP0uhSHzR4ug8PQAuUi0zETD0FTKCSWP
+         CXA8IuvPmicuHCxh3+OQhP98MrVzawxMsdPsrHz4wI3AW+a15S2v0l6kttQ1T5neag2C
+         CqEA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:user-agent:subject
+         :content-language:to:cc:references:from:in-reply-to
+         :content-transfer-encoding;
+        bh=33rumaWr9qlBk+pQo3yKk/+p7rzkpn3TeXUIKcpGn90=;
+        b=RcGK25HkAX0EN+TJpUQ+mwPWEI7eE1QttEvCy5rVoJJ2i7s9QmCCQt/tjoNbNVIyPf
+         HfkkOmRUgorc/3rbNHNDP9/0U7RuXhCZcxMIVpsTa2sa/5xGFnEI8Aw9ibljdTbsBjaG
+         09qbHWY10YK920Z73AWc5mPd6u2zvNzmnccBXBf5R7W5OnJbsysNmyTvLcl7Wa21MADm
+         a2LKC5toFs7sXZe1ysjlvVxJZ2UtEZ7S92M+ZnAx4IRKG8HJ8bgJqvFM23/XF6rkt0kv
+         anoiznubQnPXJ1LhOx3kv0wjTyVFH6vbeseypCC/kTTYuG4FE8yfPPq463kHP3Mdh4n1
+         F1hw==
+X-Gm-Message-State: AOAM532H87RkPWXY883ncwmoSVl5P5gBjVb1VyOP+On2XCDLixgug2kN
+        pzXcVHiq3Ja3LOpNUrYXNG0PKMy41bk=
+X-Google-Smtp-Source: ABdhPJwn9PgAvM9s7iicfRfP1tRs6kfQFtDJqhWAwv+au+FNtXm533o1AnM4aVEVobt12OKxQCSQIw==
+X-Received: by 2002:a2e:bf12:: with SMTP id c18mr4312498ljr.462.1637038972312;
+        Mon, 15 Nov 2021 21:02:52 -0800 (PST)
+Received: from [172.28.2.233] ([46.61.204.60])
+        by smtp.gmail.com with ESMTPSA id y28sm1634285lfa.92.2021.11.15.21.02.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 15 Nov 2021 21:02:51 -0800 (PST)
+Message-ID: <afe5d0f0-f02f-e970-cc16-6cbe2b2dd971@gmail.com>
+Date:   Tue, 16 Nov 2021 08:02:50 +0300
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.1.0
+Subject: Re: [PATCH] Bluetooth: stop proccessing malicious adv data
+Content-Language: en-US
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org,
+        syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
+References: <20211101071212.15355-1-paskripkin@gmail.com>
+From:   Pavel Skripkin <paskripkin@gmail.com>
+In-Reply-To: <20211101071212.15355-1-paskripkin@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Date:   Tue, 16 Nov 2021 12:48:49 +0800
-From:   tjiang@codeaurora.org
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org, tjiang@codeaurora.org
-Subject: [PATCH v4] Bluetooth: btusb: re-definition for board_id in struct 
- qca_version
-Message-ID: <2659a5743ab560b2c89e341fc61d9cc4@codeaurora.org>
-X-Sender: tjiang@codeaurora.org
-User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The board ID should be split into two bytes.
-The 1st byte is chip ID, and the 2nd byte is platform ID.
-For example, board ID 0x010A, 0x01 is platform ID. 0x0A is chip ID.
-we have several platforms, and platform IDs are continuously added.
-We would not distinguish different chips if we get these mixed up.
-Platform ID:
-0x00 is for Mobile
-0x01 is for X86
-0x02 is for Automotive
-0x03 is for Consumer electronic
+On 11/1/21 10:12, Pavel Skripkin wrote:
+> Syzbot reported slab-out-of-bounds read in hci_le_adv_report_evt(). The
+> problem was in missing validaion check.
+> 
+> We should check if data is not malicious and we can read next data block.
+> If we won't check ptr validness, code can read a way beyond skb->end and
+> it can cause problems, of course.
+> 
+> Fixes: e95beb414168 ("Bluetooth: hci_le_adv_report_evt code refactoring")
+> Reported-and-tested-by: syzbot+e3fcb9c4f3c2a931dc40@syzkaller.appspotmail.com
+> Signed-off-by: Pavel Skripkin <paskripkin@gmail.com>
+> ---
 
-Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
----
-  drivers/bluetooth/btusb.c | 15 +++++++++++++--
-  1 file changed, 13 insertions(+), 2 deletions(-)
+Hi, Bluetooth maintainers!
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 46d892bbde62..c2a48824ab1e 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2883,7 +2883,8 @@ struct qca_version {
-  	__le32	rom_version;
-  	__le32	patch_version;
-  	__le32	ram_version;
--	__le16	board_id;
-+	__u8	chip_id;
-+	__u8	platform_id;
-  	__le16	flag;
-  	__u8	reserved[4];
-  } __packed;
-@@ -3072,7 +3073,17 @@ static void btusb_generate_qca_nvm_name(char 
-*fwname, size_t max_size,
-  	u16 flag = le16_to_cpu(ver->flag);
+friendly ping :)
 
-  	if (((flag >> 8) & 0xff) == QCA_FLAG_MULTI_NVM) {
--		u16 board_id = le16_to_cpu(ver->board_id);
-+		/* The board_id should be split into two bytes
-+		 * The 1st byte is chip ID, and the 2nd byte is platform ID
-+		 * For example, board ID 0x010A, 0x01 is platform ID. 0x0A is chip ID
-+		 * Currently we have several platforms, and platform IDs are 
-continuously added.
-+		 * Platform ID:
-+		 * 0x00 is for Mobile
-+		 * 0x01 is for X86
-+		 * 0x02 is for Automotive
-+		 * 0x03 is for Consumer electronic
-+		 */
-+		u16 board_id = (ver->chip_id << 8) + ver->platform_id;
-  		const char *variant;
 
-  		switch (le32_to_cpu(ver->ram_version)) {
--- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora 
-Forum, a Linux Foundation Collaborative Project
+If anything is wrong with this one, please, let me know
+
+
+With regards,
+Pavel Skripkin
+
+
+>   net/bluetooth/hci_event.c | 8 +++++++-
+>   1 file changed, 7 insertions(+), 1 deletion(-)
+> 
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 0bca035bf2dc..50d1d62c15ec 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -5780,7 +5780,8 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>   		struct hci_ev_le_advertising_info *ev = ptr;
+>   		s8 rssi;
+>   
+> -		if (ev->length <= HCI_MAX_AD_LENGTH) {
+> +		if (ev->length <= HCI_MAX_AD_LENGTH &&
+> +		    ev->data + ev->length <= skb_tail_pointer(skb)) {
+>   			rssi = ev->data[ev->length];
+>   			process_adv_report(hdev, ev->evt_type, &ev->bdaddr,
+>   					   ev->bdaddr_type, NULL, 0, rssi,
+> @@ -5790,6 +5791,11 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+>   		}
+>   
+>   		ptr += sizeof(*ev) + ev->length + 1;
+> +
+> +		if (ptr > (void *) skb_tail_pointer(skb) - sizeof(*ev)) {
+> +			bt_dev_err(hdev, "Malicious advertising data. Stopping processing");
+> +			break;
+> +		}
+>   	}
+>   
+>   	hci_dev_unlock(hdev);
+> 
+
+
