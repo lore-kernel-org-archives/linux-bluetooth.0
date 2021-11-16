@@ -2,185 +2,248 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01490C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 20:50:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 87857C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 21:33:16 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id D3DD563215
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 20:50:23 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6057663225
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 21:33:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231375AbhKPUxO (ORCPT
+        id S230215AbhKPVgN (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Nov 2021 15:53:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43206 "EHLO
+        Tue, 16 Nov 2021 16:36:13 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229527AbhKPUxN (ORCPT
+        with ESMTP id S229556AbhKPVgM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Nov 2021 15:53:13 -0500
-Received: from mail-il1-x12e.google.com (mail-il1-x12e.google.com [IPv6:2607:f8b0:4864:20::12e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3AF3DC061570
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Nov 2021 12:50:16 -0800 (PST)
-Received: by mail-il1-x12e.google.com with SMTP id l8so509908ilv.3
-        for <linux-bluetooth@vger.kernel.org>; Tue, 16 Nov 2021 12:50:16 -0800 (PST)
+        Tue, 16 Nov 2021 16:36:12 -0500
+Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FFF5C061570;
+        Tue, 16 Nov 2021 13:33:15 -0800 (PST)
+Received: by mail-pj1-x1035.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so3402791pja.1;
+        Tue, 16 Nov 2021 13:33:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=efqFHOeANayC0baa4+ILoJW70HiGRxSCs5RfDwIXPis=;
-        b=NuRY3L7Akac8I9t/0ACCZTF9c/xmNs/MMOU3PlcMDH/AYY3OWWgxQSLEyqNveJyo/4
-         7Aw9ks9oQFkwzc156afAA8E/eYVtNEsxaauyywJHGssLqFtc536lrADDHH3Fw/sGNevS
-         BuxAV8fe9FVjsOG4DMTdU+yUpIulFrAuqcQbyawW5/sFnglG84EayWNCTlb1nTL9yDmK
-         8u36AQrl5PCcblByYt0lsfJvZDrDMup0OSTQDA0ZzdCs7fossZ+nuBTyAG5BB+dU4jUz
-         fsrXC+lYlXNY+OuNHKet5F/+ZoC1R9GidTJzHS8W0lzs2xB33X/BsabFJW6kIquiYykU
-         5/jA==
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qTG9SIjYHX6f62hW4bNeP6RLfo5ctIgsWr+bGCNsOlY=;
+        b=MhKu/CYBNf+saex87/tXWsDJdhpD6mZNR3kwzJ7CQu2VSnxk/1LrNy4zDJHilz2yG8
+         xdRrpycybl4GR3d/CkPYlfWzC+hzmjD2PA2CfxwMo/91LdhSM3/0YhdBiOTiGDj48Lvm
+         u6r+WLgqSU6iKBs+MtKTbZw78lB5zLc0L3Qnga8pyQjC5VpqhRKQ+bSBI5HPsgHNp3X8
+         rh0bVmf8nEDoqMMIzWyz1XzibrVM8nYcnNmUAkuy36lsJ53kzEc0ad+ITNanE/dXHwNG
+         ilj+Peys+yEx2jKP1u3MZiMq0kTmoyT6CHdLIligsNdH9QSBTB7aTWp2IJi1FYMOwZS6
+         VkwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=efqFHOeANayC0baa4+ILoJW70HiGRxSCs5RfDwIXPis=;
-        b=f2H2SjDXTnLJKWTyn26SvUcfy9qgy/cwUZBqGuMpO+yyT/DVD9YJmpudu/3qw/IDqN
-         Xjd7CVYhhOCResH7cs0/aYGSsX6l0XRE6Dtp81MVUPIQlW80+grr40e5vloleppMC3GL
-         D+17OAVVVUgm5g7QphjUNoregbD6TpbHAxfKXt1dhOy+IS5nYNdB220GSb1H9jCmBYR6
-         nqbUov9NRenhoA4i3VAmmbg/RPZ90hsINVkIeEAKLWelmVGQsuR4cHFOedco5DmUzk9M
-         DATILPTCloi4YLg+rWefHIqu7WLaF1kLdu8g6m8nFUAOr13ul16wLieI3Zj3RbjdZB+G
-         vsqQ==
-X-Gm-Message-State: AOAM532z1YU1v82naTo17idkwHkMufy7+ek+mffuTwmc8WfA7Aezovbs
-        BPUX1QNYKwGbUP9rQsae6/vDR0A93VJ+hC47pCmQ+g==
-X-Google-Smtp-Source: ABdhPJwX+ls5ym4u7u5B/c8jfLkoZzv5JbR59xfADRFlVRh7Q37GlLSOu/E90WGG0TZNs/iv06IKsucAbOietxF6Dn4=
-X-Received: by 2002:a92:6f0c:: with SMTP id k12mr6386747ilc.240.1637095815401;
- Tue, 16 Nov 2021 12:50:15 -0800 (PST)
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=qTG9SIjYHX6f62hW4bNeP6RLfo5ctIgsWr+bGCNsOlY=;
+        b=HohwXKuXCGu9KOWkwwGTgrbUy6hO99u1zg9ZrAhESnhhV0LrHF9VZnc5bH2wN8979Z
+         E5/Rf1w1plZNHphoAmvL+FRZOMmKVFUnmCzVLjcThoLdJECtX42zKn92HfzLLpEA2h/U
+         UWk0pGkgRWNXgj+01hzbnnqDNApbcnKfXiH6FEmXXjxDYfUJ15bJcZSqAu9C+yxhMvxr
+         Nz8hCbcYP7J1w3L1Jtv4wKYCNR50M7CHh9pkSqH4BjCV0BojArB84Z7n7y/B6bQodTUC
+         LWm/v7mUglA9UyIvp+BxLRuqdnpiLJZudLFiWkcQthBg7ts5WYufKO1iop6gkd6+cMIW
+         nfAw==
+X-Gm-Message-State: AOAM5325JlBNxeNGOqMik8vUcI9vjOtHf0cgudq/rEVolW4iP/Rnysmu
+        jqCszZeJsvG71wsHn/8fZBU=
+X-Google-Smtp-Source: ABdhPJxXIY2FPncmcDyIy6JGacSPiQQVckJTPpcNt4j0LnKjskb4gAu+gGq2k1NfpAuYO/48sUJqcw==
+X-Received: by 2002:a17:903:120c:b0:13f:d043:3477 with SMTP id l12-20020a170903120c00b0013fd0433477mr48986152plh.89.1637098394731;
+        Tue, 16 Nov 2021 13:33:14 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p35sm17667pgm.15.2021.11.16.13.33.14
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 16 Nov 2021 13:33:14 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     davem@davemloft.net, kuba@kernel.org
+Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: pull request: bluetooth 2021-11-16
+Date:   Tue, 16 Nov 2021 13:33:13 -0800
+Message-Id: <20211116213313.985961-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-References: <20211115135114.2763223-1-alainm@chromium.org> <C44D0F6E-CF4F-44BC-BE13-43F62D083774@holtmann.org>
- <CABBYNZJFZnpGWQJ5Qi=bBPRcjqot10ZODk71Ls-5+GYmgqCo-w@mail.gmail.com>
-In-Reply-To: <CABBYNZJFZnpGWQJ5Qi=bBPRcjqot10ZODk71Ls-5+GYmgqCo-w@mail.gmail.com>
-From:   Alain Michaud <alainmichaud@google.com>
-Date:   Tue, 16 Nov 2021 15:49:58 -0500
-Message-ID: <CALWDO_U2kW51P4zbK86yXYTfyX_jsp2F6DBKTJB5qLwein6x4A@mail.gmail.com>
-Subject: Re: [PATCH] Bluetooth: Fix adv set removal processing.
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Alain Michaud <alainm@chromium.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@chromium.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-HI Luiz,
+The following changes since commit d0f1c248b4ff71cada1b9e4ed61a1992cd94c3df:
 
+  Merge tag 'for-net-next-2021-10-01' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next (2021-10-05 07:41:16 -0700)
 
+are available in the Git repository at:
 
-On Mon, Nov 15, 2021 at 2:35 PM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Alain,
->
-> On Mon, Nov 15, 2021 at 9:07 AM Marcel Holtmann <marcel@holtmann.org> wro=
-te:
-> >
-> > Hi Alain,
-> >
-> > > When multiple advertisement sets are active and a single instance is
-> > > removed, the processing of hci_cc_le_set_ext_adv_enable will result i=
-n
-> > > considering all advertisements as disabled since the instance has
-> > > already been removed from the list.
-> > >
-> > > The fix is to use the command parameters to validate the intent rathe=
-r
-> > > than making an assumption based on the validity of the adv set.
-> > >
-> > > remove_advertising() hci0
-> > >
-> > > hci_req_add_ev() hci0 opcode 0x2039 plen 6
-> > > hci_req_add_ev() hci0 opcode 0x203c plen 1
-> > >
-> > > hci_remove_adv_instance() hci0 removing 2MR
-> > > <-- This removes instance 2 from the adv_instances list
-> > >
-> > > hci_cc_le_set_ext_adv_enable() hci0 status 0x00
-> > > hci_sent_cmd_data() hci0 opcode 0x2039
-> > > hci_cc_le_set_ext_adv_enable() adv instance 0, enabled 0
-> > > <-- This incorrectly assumes that all instances are
-> > >    being disabled while only handle 2 is being disabled.
-> > >
-> > > hci_cc_le_set_ext_adv_enable() adv instance list status - before
-> > > hci_cc_le_set_ext_adv_enable() adv instance 3 is 1
-> > > hci_cc_le_set_ext_adv_enable() adv instance 1 is 1
-> > > hci_cc_le_set_ext_adv_enable() HCI_LE_ADV state before: 1
-> > > hci_cc_le_set_ext_adv_enable() adv instance list status - after
-> > > hci_cc_le_set_ext_adv_enable() adv instance 3 is 0
-> > > hci_cc_le_set_ext_adv_enable() adv instance 1 is 0
-> > > hci_cc_le_set_ext_adv_enable() HCI_LE_ADV state after: 0
-> > > <-- This is incorrect since handle 1 and 3 are still enabled
-> > >    in the controller
-> > >
-> > > The fix was validated by running the ChromeOS bluetooth_AdapterAdvHea=
-lth
-> > > test suite.
-> > >
-> > > Reviewed-by: mcchou@chromium.org
-> >
-> > we need clear name and email in the tags please. And I also like to hav=
-e Fixes: tags here as well.
-> >
-> > > Signed-off-by: Alain Michaud <alainm@chromium.org>
-> > >
-> > > ---
-> > >
-> > > net/bluetooth/hci_event.c | 8 +++++---
-> > > 1 file changed, 5 insertions(+), 3 deletions(-)
-> > >
-> > > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> > > index d4b75a6cfeee..52161d04136f 100644
-> > > --- a/net/bluetooth/hci_event.c
-> > > +++ b/net/bluetooth/hci_event.c
-> > > @@ -1385,14 +1385,16 @@ static void hci_cc_le_set_ext_adv_enable(stru=
-ct hci_dev *hdev,
-> > >                               if (adv->enabled)
-> > >                                       goto unlock;
-> > >                       }
-> > > -             } else {
-> > > +
-> > > +                     hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> > > +             } else if (!cp->num_of_sets || !set->handle) {
-> > >                       /* All instances shall be considered disabled *=
-/
-> > >                       list_for_each_entry_safe(adv, n, &hdev->adv_ins=
-tances,
-> > >                                                list)
-> > >                               adv->enabled =3D false;
-> > > -             }
-> > >
-> > > -             hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> > > +                     hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> > > +             }
-> > >       }
-> >
-> > Just checking if this wouldn=E2=80=99t be cleaner:
-> >
-> >                 } else {
-> >                         if (foo)
-> >                                 bar;
-> >
-> >                         hci_dev_clear_flag(hdev, HCI_LE_ADV);
-> >                 }
->
-> Actually this seems to already have been fixed by:
->
-> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.=
-git/commit/?id=3D2128939fe2e771645dd88e1938c27fdf96bd1cd0
->
-> Perhaps the Chrome OS tree is outdated?
-You are right, looks like this would fix it and it was indeed not
-merged to the chromium tree.  Please ignore this patch.
->
-> > Regards
-> >
-> > Marcel
-> >
->
->
-> --
-> Luiz Augusto von Dentz
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-11-16
+
+for you to fetch changes up to 28491d7ef4af471841e454f8c1f77384f93c6fef:
+
+  Bluetooth: btusb: enable Mediatek to support AOSP extension (2021-11-16 16:16:23 +0100)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add support for AOSP Bluetooth Quality Report
+ - Enables AOSP extension for Mediatek Chip (MT7921 & MT7922)
+ - Rework of HCI command execution serialization
+
+----------------------------------------------------------------
+Archie Pusaka (3):
+      Bluetooth: Fix removing adv when processing cmd complete
+      Bluetooth: Ignore HCI_ERROR_CANCELLED_BY_HOST on adv set terminated event
+      Bluetooth: Attempt to clear HCI_LE_ADV on adv set terminated error event
+
+Brian Gix (13):
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
+      Bluetooth: hci_sync: Enable synch'd set_bredr
+      Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
+      Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
+      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
+      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
+      Bluetooth: hci_sync: Convert adv_expire
+      Bluetooth: hci_sync: Convert MGMT_OP_SSP
+
+David Yang (1):
+      Bluetooth: btusb: Fix application of sizeof to pointer
+
+Jackie Liu (1):
+      Bluetooth: fix uninitialized variables notify_evt
+
+Jesse Melhuish (1):
+      Bluetooth: Don't initialize msft/aosp when using user channel
+
+Johan Hovold (1):
+      Bluetooth: bfusb: fix division by zero in send path
+
+Joseph Hwang (2):
+      Bluetooth: Add struct of reading AOSP vendor capabilities
+      Bluetooth: aosp: Support AOSP Bluetooth Quality Report
+
+Kiran K (2):
+      Bluetooth: Read codec capabilities only if supported
+      Bluetooth: btintel: Fix bdaddress comparison with garbage value
+
+Kyle Copperfield (1):
+      Bluetooth: btsdio: Do not bind to non-removable BCM4345 and BCM43455
+
+Luiz Augusto von Dentz (19):
+      Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
+      Bluetooth: Fix handling of SUSPEND_DISCONNECTING
+      Bluetooth: L2CAP: Fix not initializing sk_peer_pid
+      Bluetooth: vhci: Add support for setting msft_opcode and aosp_capable
+      Bluetooth: vhci: Fix checking of msft_opcode
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
+      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
+      Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
+      Bluetooth: hci_sync: Rework background scan
+      Bluetooth: hci_sync: Convert MGMT_SET_POWERED
+      Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
+      Bluetooth: hci_sync: Rework init stages
+      Bluetooth: hci_sync: Rework hci_suspend_notifier
+      Bluetooth: hci_sync: Fix missing static warnings
+      Bluetooth: hci_sync: Fix not setting adv set duration
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_DISCOVERABLE to use cmd_sync
+      Bluetooth: hci_sync: Convert MGMT_OP_SET_CONNECTABLE to use cmd_sync
+      Bluetooth: hci_request: Remove bg_scan_update work
+
+Marcel Holtmann (1):
+      Bluetooth: Add helper for serialized HCI command execution
+
+Mark-YW.Chen (1):
+      Bluetooth: btusb: fix memory leak in btusb_mtk_submit_wmt_recv_urb()
+
+Mark-yw Chen (1):
+      Bluetooth: btmtksdio: transmit packet according to status TX_EMPTY
+
+Nguyen Dinh Phi (1):
+      Bluetooth: hci_sock: purge socket queues in the destruct() callback
+
+Paul Cercueil (1):
+      Bluetooth: hci_bcm: Remove duplicated entry in OF table
+
+Pavel Skripkin (1):
+      Bluetooth: stop proccessing malicious adv data
+
+Randy Dunlap (1):
+      Bluetooth: btmrvl_main: repair a non-kernel-doc comment
+
+Sean Wang (9):
+      Bluetooth: mediatek: add BT_MTK module
+      Bluetooth: btmtksido: rely on BT_MTK module
+      Bluetooth: btmtksdio: add .set_bdaddr support
+      Bluetooth: btmtksdio: explicitly set WHISR as write-1-clear
+      Bluetooth: btmtksdio: move interrupt service to work
+      Bluetooth: btmtksdio: update register CSDIOCSR operation
+      Bluetooth: btmtksdio: use register CRPLR to read packet length
+      mmc: add MT7921 SDIO identifiers for MediaTek Bluetooth devices
+      Bluetooth: btmtksdio: add MT7921s Bluetooth support
+
+Soenke Huster (1):
+      Bluetooth: virtio_bt: fix memory leak in virtbt_rx_handle()
+
+Tedd Ho-Jeong An (2):
+      Bluetooth: hci_vhci: Fix to set the force_wakeup value
+      Bluetooth: mgmt: Fix Experimental Feature Changed event
+
+Tim Jiang (1):
+      Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
+
+Wang Hai (1):
+      Bluetooth: cmtp: fix possible panic when cmtp_init_sockets() fails
+
+Wei Yongjun (2):
+      Bluetooth: Fix debugfs entry leak in hci_register_dev()
+      Bluetooth: Fix memory leak of hci device
+
+Zijun Hu (1):
+      Bluetooth: hci_h4: Fix padding calculation error within h4_recv_buf()
+
+mark-yw.chen (1):
+      Bluetooth: btusb: enable Mediatek to support AOSP extension
+
+ drivers/bluetooth/Kconfig         |    6 +
+ drivers/bluetooth/Makefile        |    1 +
+ drivers/bluetooth/bfusb.c         |    3 +
+ drivers/bluetooth/btintel.c       |   22 +-
+ drivers/bluetooth/btmrvl_main.c   |    2 +-
+ drivers/bluetooth/btmtk.c         |  289 +++
+ drivers/bluetooth/btmtk.h         |  111 +
+ drivers/bluetooth/btmtksdio.c     |  496 ++--
+ drivers/bluetooth/btsdio.c        |    2 +
+ drivers/bluetooth/btusb.c         |  390 +--
+ drivers/bluetooth/hci_bcm.c       |    1 -
+ drivers/bluetooth/hci_h4.c        |    4 +-
+ drivers/bluetooth/hci_vhci.c      |  120 +-
+ drivers/bluetooth/virtio_bt.c     |    3 +
+ include/linux/mmc/sdio_ids.h      |    1 +
+ include/net/bluetooth/bluetooth.h |    2 +
+ include/net/bluetooth/hci.h       |    1 +
+ include/net/bluetooth/hci_core.h  |   27 +-
+ include/net/bluetooth/hci_sync.h  |  102 +
+ net/bluetooth/Makefile            |    2 +-
+ net/bluetooth/aosp.c              |  168 +-
+ net/bluetooth/aosp.h              |   13 +
+ net/bluetooth/cmtp/core.c         |    4 +-
+ net/bluetooth/hci_codec.c         |   18 +-
+ net/bluetooth/hci_conn.c          |   20 +-
+ net/bluetooth/hci_core.c          | 1334 +---------
+ net/bluetooth/hci_event.c         |  211 +-
+ net/bluetooth/hci_request.c       |  500 +---
+ net/bluetooth/hci_request.h       |   15 +-
+ net/bluetooth/hci_sock.c          |   11 +-
+ net/bluetooth/hci_sync.c          | 4922 +++++++++++++++++++++++++++++++++++++
+ net/bluetooth/hci_sysfs.c         |    2 +
+ net/bluetooth/l2cap_sock.c        |   19 +
+ net/bluetooth/mgmt.c              | 2155 ++++++++--------
+ net/bluetooth/mgmt_util.c         |   15 +-
+ net/bluetooth/mgmt_util.h         |    4 +
+ net/bluetooth/msft.c              |  511 ++--
+ net/bluetooth/msft.h              |   15 +-
+ 38 files changed, 7675 insertions(+), 3847 deletions(-)
+ create mode 100644 drivers/bluetooth/btmtk.c
+ create mode 100644 drivers/bluetooth/btmtk.h
+ create mode 100644 include/net/bluetooth/hci_sync.h
+ create mode 100644 net/bluetooth/hci_sync.c
