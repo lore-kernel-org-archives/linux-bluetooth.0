@@ -2,31 +2,30 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 3B0CFC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 14:07:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 9CF28C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 14:11:48 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 20D1761BE6
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 14:07:59 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 8278763238
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 14:11:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237114AbhKPOKw convert rfc822-to-8bit (ORCPT
+        id S237259AbhKPOOn convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Nov 2021 09:10:52 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:59986 "EHLO
+        Tue, 16 Nov 2021 09:14:43 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46169 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237032AbhKPOKu (ORCPT
+        with ESMTP id S237247AbhKPOOl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Nov 2021 09:10:50 -0500
+        Tue, 16 Nov 2021 09:14:41 -0500
 Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 65929CECD7;
-        Tue, 16 Nov 2021 15:07:52 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 54CB7CECD7;
+        Tue, 16 Nov 2021 15:11:43 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Send device found event on name resolve
- failure
+Subject: Re: [PATCH v2 2/2] Bluetooth: Limit duration of Remote Name Resolve
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211115171726.v2.1.Id7366eb14b6f48173fcbf17846ace59479179c7c@changeid>
-Date:   Tue, 16 Nov 2021 15:07:51 +0100
+In-Reply-To: <20211115171726.v2.2.I35b7f3a496f834de6b43a32f94b6160cb1467c94@changeid>
+Date:   Tue, 16 Nov 2021 15:11:42 +0100
 Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         CrosBT Upstreaming <chromeos-bluetooth-upstreaming@chromium.org>,
@@ -37,8 +36,9 @@ Cc:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <44A01538-D569-464C-B716-24DC00D92907@holtmann.org>
+Message-Id: <19C4C970-8259-46EF-B56C-15658F58EABC@holtmann.org>
 References: <20211115171726.v2.1.Id7366eb14b6f48173fcbf17846ace59479179c7c@changeid>
+ <20211115171726.v2.2.I35b7f3a496f834de6b43a32f94b6160cb1467c94@changeid>
 To:     Archie Pusaka <apusaka@google.com>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
@@ -47,115 +47,79 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 Hi Archie,
 
-> Introducing CONFIRM_NAME_FAILED flag that will be sent together with
-> device found event on name resolve failure. This will provide the
-> userspace with an information so it can decide not to resolve the
-> name for these devices in the future.
+> When doing remote name request, we cannot scan. In the normal case it's
+> OK since we can expect it to finish within a short amount of time.
+> However, there is a possibility to scan lots of devices that
+> (1) requires Remote Name Resolve
+> (2) is unresponsive to Remote Name Resolve
+> When this happens, we are stuck to do Remote Name Resolve until all is
+> done before continue scanning.
+> 
+> This patch adds a time limit to stop us spending too long on remote
+> name request.
 > 
 > Signed-off-by: Archie Pusaka <apusaka@chromium.org>
 > Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
-> 
 > ---
-> Hi maintainers,
 > 
-> This is the patch series for remote name request as was discussed here.
-> https://patchwork.kernel.org/project/bluetooth/patch/20211028191805.1.I35b7f3a496f834de6b43a32f94b6160cb1467c94@changeid/
-> Please also review the corresponding userspace change.
+> (no changes since v1)
 > 
-> Thanks,
-> Archie
+> include/net/bluetooth/hci_core.h | 3 +++
+> net/bluetooth/hci_event.c        | 7 +++++++
+> 2 files changed, 10 insertions(+)
 > 
-> Changes in v2:
-> * Remove the part which accepts DONT_CARE flag in MGMT_OP_CONFIRM_NAME
-> * Rename MGMT constant to conform with the docs
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index b5f061882c10..4112907bb49d 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -88,6 +88,7 @@ struct discovery_state {
+> 	u8			(*uuids)[16];
+> 	unsigned long		scan_start;
+> 	unsigned long		scan_duration;
+> +	unsigned long		name_resolve_timeout;
+> };
 > 
-> include/net/bluetooth/mgmt.h |  1 +
-> net/bluetooth/hci_event.c    | 11 ++++-------
-> net/bluetooth/mgmt.c         | 11 ++++++++---
-> 3 files changed, 13 insertions(+), 10 deletions(-)
+> #define SUSPEND_NOTIFIER_TIMEOUT	msecs_to_jiffies(2000) /* 2 seconds */
+> @@ -1762,6 +1763,8 @@ void hci_mgmt_chan_unregister(struct hci_mgmt_chan *c);
+> #define DISCOV_LE_FAST_ADV_INT_MIN	0x00A0	/* 100 msec */
+> #define DISCOV_LE_FAST_ADV_INT_MAX	0x00F0	/* 150 msec */
 > 
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 23a0524061b7..3cda081ed6d0 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -940,6 +940,7 @@ struct mgmt_ev_auth_failed {
-> #define MGMT_DEV_FOUND_LEGACY_PAIRING  0x02
-> #define MGMT_DEV_FOUND_NOT_CONNECTABLE 0x04
-> #define MGMT_DEV_FOUND_INITIATED_CONN  0x08
-> +#define MGMT_DEV_FOUND_NAME_REQUEST_FAILED 0x10
+> +#define NAME_RESOLVE_DURATION		msecs_to_jiffies(10240)	/* msec */
+> +
 
-please indent the other defines to match this one.
+It is nice that you define the unit here, but we also want the amount. So 10.24 seconds.
 
-> 
-> #define MGMT_EV_DEVICE_FOUND		0x0012
-> struct mgmt_ev_device_found {
+> void mgmt_fill_version_info(void *ver);
+> int mgmt_new_settings(struct hci_dev *hdev);
+> void mgmt_index_added(struct hci_dev *hdev);
 > diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index d4b75a6cfeee..2de3080659f9 100644
+> index 2de3080659f9..6180ab0e8b8d 100644
 > --- a/net/bluetooth/hci_event.c
 > +++ b/net/bluetooth/hci_event.c
-> @@ -2175,13 +2175,10 @@ static void hci_check_pending_name(struct hci_dev *hdev, struct hci_conn *conn,
-> 		return;
+> @@ -2129,6 +2129,12 @@ static bool hci_resolve_next_name(struct hci_dev *hdev)
+> 	if (list_empty(&discov->resolve))
+> 		return false;
 > 
-> 	list_del(&e->list);
-> -	if (name) {
-> -		e->name_state = NAME_KNOWN;
-> -		mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00,
-> -				 e->data.rssi, name, name_len);
-> -	} else {
-> -		e->name_state = NAME_NOT_KNOWN;
-> -	}
+> +	/* We should stop if we already spent too much time resolving names. */
+> +	if (time_after(jiffies, discov->name_resolve_timeout)) {
+> +		bt_dev_dbg(hdev, "Name resolve takes too long, stopping.");
+
+I might be better to have bt_dev_warn_ratelimited here. I mean if this happens, you want to have something actionable in your logs. Or if you don’t care, then also scrap the message and include more details in the comments that you just abort since it is taking too long.
+
+> +		return false;
+> +	}
 > +
-> +	e->name_state = name ? NAME_KNOWN : NAME_NOT_KNOWN;
-> +	mgmt_remote_name(hdev, bdaddr, ACL_LINK, 0x00, e->data.rssi,
-> +			 name, name_len);
-> 
-> 	if (hci_resolve_next_name(hdev))
-> 		return;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index 06384d761928..0d77c010b391 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -9615,7 +9615,8 @@ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-> {
-> 	struct mgmt_ev_device_found *ev;
-> 	char buf[sizeof(*ev) + HCI_MAX_NAME_LENGTH + 2];
-> -	u16 eir_len;
-> +	u16 eir_len = 0;
-> +	u32 flags = 0;
-> 
-> 	ev = (struct mgmt_ev_device_found *) buf;
-> 
-> @@ -9625,10 +9626,14 @@ void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-> 	ev->addr.type = link_to_bdaddr(link_type, addr_type);
-> 	ev->rssi = rssi;
-> 
-> -	eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE, name,
-> -				  name_len);
-> +	if (name)
-> +		eir_len = eir_append_data(ev->eir, 0, EIR_NAME_COMPLETE, name,
-> +					  name_len);
-> +	else
-> +		flags |= MGMT_DEV_FOUND_NAME_REQUEST_FAILED;
-
-So instead of initializing a variable, I prefer to set them where they are used.
-
-	if (name) {
-		eir_len = eir_..
-		flags = 0;
-	} else {
-		eir_len = 0;
-		flags = MGMT_DEV_FOUND_NAME_REQUEST_FAILED;
-	}
-
-This way, the compiler will complain loudly if we change things and forget to set any of these two variables.
-
-> 
-> 	ev->eir_len = cpu_to_le16(eir_len);
-> +	ev->flags = cpu_to_le32(flags);
-> 
-> 	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, sizeof(*ev) + eir_len, NULL);
-> }
-> -- 
+> 	e = hci_inquiry_cache_lookup_resolve(hdev, BDADDR_ANY, NAME_NEEDED);
+> 	if (!e)
+> 		return false;
+> @@ -2716,6 +2722,7 @@ static void hci_inquiry_complete_evt(struct hci_dev *hdev, struct sk_buff *skb)
+> 	if (e && hci_resolve_name(hdev, e) == 0) {
+> 		e->name_state = NAME_PENDING;
+> 		hci_discovery_set_state(hdev, DISCOVERY_RESOLVING);
+> +		discov->name_resolve_timeout = jiffies + NAME_RESOLVE_DURATION;
+> 	} else {
+> 		/* When BR/EDR inquiry is active and no LE scanning is in
+> 		 * progress, then change discovery state to indicate completion.
 
 Regards
 
