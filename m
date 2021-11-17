@@ -2,70 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 836B1C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 15:00:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 93EC6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 19:01:22 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 64A9361B54
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 15:00:46 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 6E4F861A58
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 19:01:22 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232481AbhKQPDn (ORCPT
+        id S231810AbhKQTET convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Nov 2021 10:03:43 -0500
-Received: from mail.kernel.org ([198.145.29.99]:34864 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238760AbhKQPDM (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Nov 2021 10:03:12 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 4FD6361BFA;
-        Wed, 17 Nov 2021 15:00:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637161214;
-        bh=c63/pgJA5nk2NtTu8mB9XVzWIrs4e6E6AgDEI5EG0hQ=;
-        h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-        b=UnvN3xULMq1PnYqTSePEleB4cC4NWJjDxLN4vabok09VIREHiIPiQB3NCSrZS6cVI
-         0Q5lLpb7nQq5Sms17hRBWAmqv/JM6vx9XKI9nEQbEAOkJJbmamIH6hn53msuSrY4H0
-         VIBPtFPtE49fI773etwOGz0A0ma/w0QQRq2YJNEykZv0fmgRlwQXxD3ixA5iiPQYEI
-         wh5WC13KcR0H/zKHF9KxM94N29seRgQI1AxnOF3kvAljmgVjZrlaX1+2bqcFZSnHKq
-         xa5VI7k3cT1V2J/uAtBa0WODwT6o7SsCgeRV6m+BCxGLGIPkg2JNX0AqpMSf+c1DYw
-         yvcSe+5QAZIcg==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull request: bluetooth 2021-11-16
-From:   patchwork-bot+netdevbpf@kernel.org
-Message-Id: <163716121428.17032.4368994013199405510.git-patchwork-notify@kernel.org>
-Date:   Wed, 17 Nov 2021 15:00:14 +0000
-References: <20211116213313.985961-1-luiz.dentz@gmail.com>
-In-Reply-To: <20211116213313.985961-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+        Wed, 17 Nov 2021 14:04:19 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:40956 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229580AbhKQTES (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 17 Nov 2021 14:04:18 -0500
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id AE6D9CECF6;
+        Wed, 17 Nov 2021 20:01:17 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCHv2] Bluetooth: quirk disabling LE Read Transmit Power
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211117124717.12352-1-redecorating@protonmail.com>
+Date:   Wed, 17 Nov 2021 20:01:17 +0100
+Cc:     regressions@leemhuis.info, danielwinkler@google.com,
+        gargaditya08@live.com, gregkh@linuxfoundation.org,
+        Johan Hedberg <johan.hedberg@intel.com>,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        regressions@lists.linux.dev, sonnysasaka@chromium.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <F8D12EA8-4B37-4887-998E-DC0EBE60E730@holtmann.org>
+References: <20211001083412.3078-1-redecorating@protonmail.com>
+ <YYePw07y2DzEPSBR@kroah.com>
+ <70a875d0-7162-d149-dbc1-c2f5e1a8e701@leemhuis.info>
+ <20211116090128.17546-1-redecorating@protonmail.com>
+ <e75bf933-9b93-89d2-d73f-f85af65093c8@leemhuis.info>
+ <3B8E16FA-97BF-40E5-9149-BBC3E2A245FE@live.com> <YZSuWHB6YCtGclLs@kroah.com>
+ <52DEDC31-EEB2-4F39-905F-D5E3F2BBD6C0@live.com>
+ <8919a36b-e485-500a-2722-529ffa0d2598@leemhuis.info>
+ <20211117124717.12352-1-redecorating@protonmail.com>
+To:     Orlando Chamberlain <redecorating@protonmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello:
+Hi Orlando,
 
-This pull request was applied to netdev/net-next.git (master)
-by David S. Miller <davem@davemloft.net>:
-
-On Tue, 16 Nov 2021 13:33:13 -0800 you wrote:
-> The following changes since commit d0f1c248b4ff71cada1b9e4ed61a1992cd94c3df:
+>> So if this just affects two macs, why can't the fix be realized as a
+>> quirk that is only enabled on those two systems? Or are they impossible
+>> to detect clearly via DMI data or something like that?
 > 
->   Merge tag 'for-net-next-2021-10-01' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next (2021-10-05 07:41:16 -0700)
+> I think we should be able to quirk based off the acpi _CID "apple-uart-blth"
+> or _HID "BCM2E7C". Marcel suggested quirking based of the acpi table here
+> https://lore.kernel.org/linux-bluetooth/1D2217A9-EA73-4D93-8D0B-5BC2718D4788@holtmann.org/
 > 
-> are available in the Git repository at:
+> This would catch some unaffected Macs, but they don't support the LE Read
+> Transmit Power command anyway (the affected macs were released after it
+> was added to the Bluetooth spec, while the unaffected Macs were released
+> before it was added to the spec, and thus don't support it).
 > 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-11-16
+> I'm not sure how to go about applying a quirk based off this, there are
+> quirks in drivers/bluetooth/hci_bcm.c (no_early_set_baudrate and
+> drive_rts_on_open), but they don't seem to be based off acpi ids.
 > 
-> [...]
+> It might be simpler to make it ignore the Unknown Command error, like
+> in this patch https://lore.kernel.org/linux-bluetooth/CABBYNZLjSfcG_KqTEbL6NOSvHhA5-b1t_S=3FQP4=GwW21kuzg@mail.gmail.com/
+> however that only applies on bluetooth-next and needed the status it
+> checks for to be -56, not 0x01.
 
-Here is the summary with links:
-  - pull request: bluetooth 2021-11-16
-    https://git.kernel.org/netdev/net-next/c/b32563b6ccba
+so we abstain from try-and-error sending of commands. The Bluetooth spec
+has a list of supported commands that a host can query for a reason. This
+is really broken behavior of the controller and needs to be pointed out as
+such.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+The question is just how we quirk it.
 
+Regards
+
+Marcel
 
