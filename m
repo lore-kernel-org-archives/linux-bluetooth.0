@@ -2,248 +2,234 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 87857C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 21:33:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31648C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 03:27:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 6057663225
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 16 Nov 2021 21:33:16 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 00954613A3
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 03:27:37 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230215AbhKPVgN (ORCPT
+        id S231903AbhKQDaf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 16 Nov 2021 16:36:13 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52916 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229556AbhKPVgM (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 16 Nov 2021 16:36:12 -0500
-Received: from mail-pj1-x1035.google.com (mail-pj1-x1035.google.com [IPv6:2607:f8b0:4864:20::1035])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FFF5C061570;
-        Tue, 16 Nov 2021 13:33:15 -0800 (PST)
-Received: by mail-pj1-x1035.google.com with SMTP id n15-20020a17090a160f00b001a75089daa3so3402791pja.1;
-        Tue, 16 Nov 2021 13:33:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qTG9SIjYHX6f62hW4bNeP6RLfo5ctIgsWr+bGCNsOlY=;
-        b=MhKu/CYBNf+saex87/tXWsDJdhpD6mZNR3kwzJ7CQu2VSnxk/1LrNy4zDJHilz2yG8
-         xdRrpycybl4GR3d/CkPYlfWzC+hzmjD2PA2CfxwMo/91LdhSM3/0YhdBiOTiGDj48Lvm
-         u6r+WLgqSU6iKBs+MtKTbZw78lB5zLc0L3Qnga8pyQjC5VpqhRKQ+bSBI5HPsgHNp3X8
-         rh0bVmf8nEDoqMMIzWyz1XzibrVM8nYcnNmUAkuy36lsJ53kzEc0ad+ITNanE/dXHwNG
-         ilj+Peys+yEx2jKP1u3MZiMq0kTmoyT6CHdLIligsNdH9QSBTB7aTWp2IJi1FYMOwZS6
-         VkwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=qTG9SIjYHX6f62hW4bNeP6RLfo5ctIgsWr+bGCNsOlY=;
-        b=HohwXKuXCGu9KOWkwwGTgrbUy6hO99u1zg9ZrAhESnhhV0LrHF9VZnc5bH2wN8979Z
-         E5/Rf1w1plZNHphoAmvL+FRZOMmKVFUnmCzVLjcThoLdJECtX42zKn92HfzLLpEA2h/U
-         UWk0pGkgRWNXgj+01hzbnnqDNApbcnKfXiH6FEmXXjxDYfUJ15bJcZSqAu9C+yxhMvxr
-         Nz8hCbcYP7J1w3L1Jtv4wKYCNR50M7CHh9pkSqH4BjCV0BojArB84Z7n7y/B6bQodTUC
-         LWm/v7mUglA9UyIvp+BxLRuqdnpiLJZudLFiWkcQthBg7ts5WYufKO1iop6gkd6+cMIW
-         nfAw==
-X-Gm-Message-State: AOAM5325JlBNxeNGOqMik8vUcI9vjOtHf0cgudq/rEVolW4iP/Rnysmu
-        jqCszZeJsvG71wsHn/8fZBU=
-X-Google-Smtp-Source: ABdhPJxXIY2FPncmcDyIy6JGacSPiQQVckJTPpcNt4j0LnKjskb4gAu+gGq2k1NfpAuYO/48sUJqcw==
-X-Received: by 2002:a17:903:120c:b0:13f:d043:3477 with SMTP id l12-20020a170903120c00b0013fd0433477mr48986152plh.89.1637098394731;
-        Tue, 16 Nov 2021 13:33:14 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id p35sm17667pgm.15.2021.11.16.13.33.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 16 Nov 2021 13:33:14 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     davem@davemloft.net, kuba@kernel.org
-Cc:     linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: pull request: bluetooth 2021-11-16
-Date:   Tue, 16 Nov 2021 13:33:13 -0800
-Message-Id: <20211116213313.985961-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Tue, 16 Nov 2021 22:30:35 -0500
+Received: from mga14.intel.com ([192.55.52.115]:35071 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231166AbhKQDae (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 16 Nov 2021 22:30:34 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10170"; a="234110254"
+X-IronPort-AV: E=Sophos;i="5.87,240,1631602800"; 
+   d="scan'208";a="234110254"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Nov 2021 19:27:36 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,240,1631602800"; 
+   d="scan'208";a="672227434"
+Received: from lkp-server02.sh.intel.com (HELO c20d8bc80006) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 16 Nov 2021 19:27:35 -0800
+Received: from kbuild by c20d8bc80006 with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mnBbi-00019y-N1; Wed, 17 Nov 2021 03:27:34 +0000
+Date:   Wed, 17 Nov 2021 11:27:27 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     linux-bluetooth@vger.kernel.org
+Subject: [bluetooth-next:master] BUILD SUCCESS
+ 28491d7ef4af471841e454f8c1f77384f93c6fef
+Message-ID: <6194769f.3ap5ifVNV6jBOafP%lkp@intel.com>
+User-Agent: Heirloom mailx 12.5 6/20/10
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The following changes since commit d0f1c248b4ff71cada1b9e4ed61a1992cd94c3df:
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+branch HEAD: 28491d7ef4af471841e454f8c1f77384f93c6fef  Bluetooth: btusb: enable Mediatek to support AOSP extension
 
-  Merge tag 'for-net-next-2021-10-01' of git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next (2021-10-05 07:41:16 -0700)
+elapsed time: 726m
 
-are available in the Git repository at:
+configs tested: 169
+configs skipped: 3
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2021-11-16
+The following configs have been built successfully.
+More configs may be tested in the coming days.
 
-for you to fetch changes up to 28491d7ef4af471841e454f8c1f77384f93c6fef:
+gcc tested configs:
+arm                                 defconfig
+arm64                            allyesconfig
+arm64                               defconfig
+arm                              allyesconfig
+arm                              allmodconfig
+i386                 randconfig-c001-20211116
+mips                 randconfig-c004-20211116
+powerpc                 mpc836x_rdk_defconfig
+arm                             pxa_defconfig
+powerpc                 mpc8313_rdb_defconfig
+sh                          r7785rp_defconfig
+s390                             allmodconfig
+microblaze                      mmu_defconfig
+mips                         tb0287_defconfig
+sh                   sh7724_generic_defconfig
+m68k                       m5249evb_defconfig
+arm                        cerfcube_defconfig
+powerpc                       eiger_defconfig
+mips                     loongson2k_defconfig
+powerpc                    socrates_defconfig
+xtensa                       common_defconfig
+mips                  decstation_64_defconfig
+powerpc                         ps3_defconfig
+sh                      rts7751r2d1_defconfig
+sh                            titan_defconfig
+um                             i386_defconfig
+ia64                             allyesconfig
+ia64                        generic_defconfig
+powerpc                     tqm8555_defconfig
+xtensa                  audio_kc705_defconfig
+sh                              ul2_defconfig
+mips                      maltasmvp_defconfig
+powerpc                      ppc44x_defconfig
+s390                       zfcpdump_defconfig
+arm                        mini2440_defconfig
+microblaze                          defconfig
+sh                          landisk_defconfig
+arm                         at91_dt_defconfig
+m68k                        m5407c3_defconfig
+openrisc                            defconfig
+mips                 decstation_r4k_defconfig
+powerpc                     pq2fads_defconfig
+powerpc                      walnut_defconfig
+arm                             mxs_defconfig
+mips                          ath79_defconfig
+powerpc                      makalu_defconfig
+mips                   sb1250_swarm_defconfig
+arm                            hisi_defconfig
+ia64                            zx1_defconfig
+arc                          axs103_defconfig
+arm                         axm55xx_defconfig
+arm                           sama5_defconfig
+mips                          rm200_defconfig
+arm                           stm32_defconfig
+arm                       spear13xx_defconfig
+ia64                             alldefconfig
+arm                       aspeed_g4_defconfig
+arm                       imx_v6_v7_defconfig
+powerpc                 mpc832x_mds_defconfig
+s390                             alldefconfig
+arm                          exynos_defconfig
+m68k                          hp300_defconfig
+arm                            qcom_defconfig
+arm                      tct_hammer_defconfig
+arm                        oxnas_v6_defconfig
+arm                            lart_defconfig
+powerpc                     pseries_defconfig
+sh                            hp6xx_defconfig
+mips                      maltaaprp_defconfig
+nios2                         3c120_defconfig
+arm                       mainstone_defconfig
+powerpc                         wii_defconfig
+powerpc                     mpc512x_defconfig
+powerpc                 mpc85xx_cds_defconfig
+mips                         rt305x_defconfig
+riscv                             allnoconfig
+arm                            mps2_defconfig
+xtensa                  cadence_csp_defconfig
+sh                         ap325rxa_defconfig
+m68k                         amcore_defconfig
+arm                        mvebu_v7_defconfig
+sh                        dreamcast_defconfig
+sh                          urquell_defconfig
+sh                           se7751_defconfig
+arm                       cns3420vb_defconfig
+arm                    vt8500_v6_v7_defconfig
+arc                        nsim_700_defconfig
+arm                   milbeaut_m10v_defconfig
+sh                   sh7770_generic_defconfig
+xtensa                         virt_defconfig
+ia64                          tiger_defconfig
+arm                  randconfig-c002-20211116
+ia64                             allmodconfig
+ia64                                defconfig
+m68k                             allmodconfig
+m68k                                defconfig
+m68k                             allyesconfig
+nds32                             allnoconfig
+nios2                               defconfig
+arc                              allyesconfig
+nds32                               defconfig
+nios2                            allyesconfig
+csky                                defconfig
+alpha                               defconfig
+alpha                            allyesconfig
+xtensa                           allyesconfig
+h8300                            allyesconfig
+arc                                 defconfig
+sh                               allmodconfig
+parisc                              defconfig
+s390                             allyesconfig
+parisc                           allyesconfig
+s390                                defconfig
+i386                             allyesconfig
+sparc                            allyesconfig
+sparc                               defconfig
+i386                                defconfig
+i386                              debian-10.3
+mips                             allyesconfig
+mips                             allmodconfig
+powerpc                          allyesconfig
+powerpc                          allmodconfig
+powerpc                           allnoconfig
+x86_64               randconfig-a015-20211116
+x86_64               randconfig-a013-20211116
+x86_64               randconfig-a012-20211116
+x86_64               randconfig-a011-20211116
+x86_64               randconfig-a016-20211116
+x86_64               randconfig-a014-20211116
+i386                 randconfig-a014-20211116
+i386                 randconfig-a016-20211116
+i386                 randconfig-a012-20211116
+i386                 randconfig-a013-20211116
+i386                 randconfig-a011-20211116
+i386                 randconfig-a015-20211116
+arc                  randconfig-r043-20211116
+s390                 randconfig-r044-20211116
+riscv                randconfig-r042-20211116
+riscv                    nommu_k210_defconfig
+riscv                            allyesconfig
+riscv                    nommu_virt_defconfig
+riscv                               defconfig
+riscv                          rv32_defconfig
+riscv                            allmodconfig
+x86_64                    rhel-8.3-kselftests
+um                           x86_64_defconfig
+x86_64                           allyesconfig
+x86_64                              defconfig
+x86_64                               rhel-8.3
+x86_64                          rhel-8.3-func
+x86_64                                  kexec
 
-  Bluetooth: btusb: enable Mediatek to support AOSP extension (2021-11-16 16:16:23 +0100)
+clang tested configs:
+x86_64               randconfig-c007-20211116
+i386                 randconfig-c001-20211116
+arm                  randconfig-c002-20211116
+riscv                randconfig-c006-20211116
+powerpc              randconfig-c003-20211116
+s390                 randconfig-c005-20211116
+mips                 randconfig-c004-20211116
+x86_64               randconfig-a005-20211116
+x86_64               randconfig-a003-20211116
+x86_64               randconfig-a001-20211116
+x86_64               randconfig-a002-20211116
+x86_64               randconfig-a006-20211116
+x86_64               randconfig-a004-20211116
+i386                 randconfig-a006-20211116
+i386                 randconfig-a003-20211116
+i386                 randconfig-a005-20211116
+i386                 randconfig-a001-20211116
+i386                 randconfig-a004-20211116
+i386                 randconfig-a002-20211116
+hexagon              randconfig-r045-20211116
+hexagon              randconfig-r041-20211116
 
-----------------------------------------------------------------
-bluetooth-next pull request for net-next:
-
- - Add support for AOSP Bluetooth Quality Report
- - Enables AOSP extension for Mediatek Chip (MT7921 & MT7922)
- - Rework of HCI command execution serialization
-
-----------------------------------------------------------------
-Archie Pusaka (3):
-      Bluetooth: Fix removing adv when processing cmd complete
-      Bluetooth: Ignore HCI_ERROR_CANCELLED_BY_HOST on adv set terminated event
-      Bluetooth: Attempt to clear HCI_LE_ADV on adv set terminated error event
-
-Brian Gix (13):
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_FAST_CONNECTABLE
-      Bluetooth: hci_sync: Enable synch'd set_bredr
-      Bluetooth: hci_sync: Convert MGMT_OP_GET_CONN_INFO
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_SECURE_CONN
-      Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_LE
-      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_DATA
-      Bluetooth: hci_sync: Convert MGMT_OP_READ_LOCAL_OOB_EXT_DATA
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_LOCAL_NAME
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_PHY_CONFIGURATION
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_ADVERTISING
-      Bluetooth: hci_sync: Convert adv_expire
-      Bluetooth: hci_sync: Convert MGMT_OP_SSP
-
-David Yang (1):
-      Bluetooth: btusb: Fix application of sizeof to pointer
-
-Jackie Liu (1):
-      Bluetooth: fix uninitialized variables notify_evt
-
-Jesse Melhuish (1):
-      Bluetooth: Don't initialize msft/aosp when using user channel
-
-Johan Hovold (1):
-      Bluetooth: bfusb: fix division by zero in send path
-
-Joseph Hwang (2):
-      Bluetooth: Add struct of reading AOSP vendor capabilities
-      Bluetooth: aosp: Support AOSP Bluetooth Quality Report
-
-Kiran K (2):
-      Bluetooth: Read codec capabilities only if supported
-      Bluetooth: btintel: Fix bdaddress comparison with garbage value
-
-Kyle Copperfield (1):
-      Bluetooth: btsdio: Do not bind to non-removable BCM4345 and BCM43455
-
-Luiz Augusto von Dentz (19):
-      Bluetooth: hci_vhci: Fix calling hci_{suspend,resume}_dev
-      Bluetooth: Fix handling of SUSPEND_DISCONNECTING
-      Bluetooth: L2CAP: Fix not initializing sk_peer_pid
-      Bluetooth: vhci: Add support for setting msft_opcode and aosp_capable
-      Bluetooth: vhci: Fix checking of msft_opcode
-      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 1
-      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 2
-      Bluetooth: hci_sync: Make use of hci_cmd_sync_queue set 3
-      Bluetooth: hci_sync: Enable advertising when LL privacy is enabled
-      Bluetooth: hci_sync: Rework background scan
-      Bluetooth: hci_sync: Convert MGMT_SET_POWERED
-      Bluetooth: hci_sync: Convert MGMT_OP_START_DISCOVERY
-      Bluetooth: hci_sync: Rework init stages
-      Bluetooth: hci_sync: Rework hci_suspend_notifier
-      Bluetooth: hci_sync: Fix missing static warnings
-      Bluetooth: hci_sync: Fix not setting adv set duration
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_DISCOVERABLE to use cmd_sync
-      Bluetooth: hci_sync: Convert MGMT_OP_SET_CONNECTABLE to use cmd_sync
-      Bluetooth: hci_request: Remove bg_scan_update work
-
-Marcel Holtmann (1):
-      Bluetooth: Add helper for serialized HCI command execution
-
-Mark-YW.Chen (1):
-      Bluetooth: btusb: fix memory leak in btusb_mtk_submit_wmt_recv_urb()
-
-Mark-yw Chen (1):
-      Bluetooth: btmtksdio: transmit packet according to status TX_EMPTY
-
-Nguyen Dinh Phi (1):
-      Bluetooth: hci_sock: purge socket queues in the destruct() callback
-
-Paul Cercueil (1):
-      Bluetooth: hci_bcm: Remove duplicated entry in OF table
-
-Pavel Skripkin (1):
-      Bluetooth: stop proccessing malicious adv data
-
-Randy Dunlap (1):
-      Bluetooth: btmrvl_main: repair a non-kernel-doc comment
-
-Sean Wang (9):
-      Bluetooth: mediatek: add BT_MTK module
-      Bluetooth: btmtksido: rely on BT_MTK module
-      Bluetooth: btmtksdio: add .set_bdaddr support
-      Bluetooth: btmtksdio: explicitly set WHISR as write-1-clear
-      Bluetooth: btmtksdio: move interrupt service to work
-      Bluetooth: btmtksdio: update register CSDIOCSR operation
-      Bluetooth: btmtksdio: use register CRPLR to read packet length
-      mmc: add MT7921 SDIO identifiers for MediaTek Bluetooth devices
-      Bluetooth: btmtksdio: add MT7921s Bluetooth support
-
-Soenke Huster (1):
-      Bluetooth: virtio_bt: fix memory leak in virtbt_rx_handle()
-
-Tedd Ho-Jeong An (2):
-      Bluetooth: hci_vhci: Fix to set the force_wakeup value
-      Bluetooth: mgmt: Fix Experimental Feature Changed event
-
-Tim Jiang (1):
-      Bluetooth: btusb: Add support using different nvm for variant WCN6855 controller
-
-Wang Hai (1):
-      Bluetooth: cmtp: fix possible panic when cmtp_init_sockets() fails
-
-Wei Yongjun (2):
-      Bluetooth: Fix debugfs entry leak in hci_register_dev()
-      Bluetooth: Fix memory leak of hci device
-
-Zijun Hu (1):
-      Bluetooth: hci_h4: Fix padding calculation error within h4_recv_buf()
-
-mark-yw.chen (1):
-      Bluetooth: btusb: enable Mediatek to support AOSP extension
-
- drivers/bluetooth/Kconfig         |    6 +
- drivers/bluetooth/Makefile        |    1 +
- drivers/bluetooth/bfusb.c         |    3 +
- drivers/bluetooth/btintel.c       |   22 +-
- drivers/bluetooth/btmrvl_main.c   |    2 +-
- drivers/bluetooth/btmtk.c         |  289 +++
- drivers/bluetooth/btmtk.h         |  111 +
- drivers/bluetooth/btmtksdio.c     |  496 ++--
- drivers/bluetooth/btsdio.c        |    2 +
- drivers/bluetooth/btusb.c         |  390 +--
- drivers/bluetooth/hci_bcm.c       |    1 -
- drivers/bluetooth/hci_h4.c        |    4 +-
- drivers/bluetooth/hci_vhci.c      |  120 +-
- drivers/bluetooth/virtio_bt.c     |    3 +
- include/linux/mmc/sdio_ids.h      |    1 +
- include/net/bluetooth/bluetooth.h |    2 +
- include/net/bluetooth/hci.h       |    1 +
- include/net/bluetooth/hci_core.h  |   27 +-
- include/net/bluetooth/hci_sync.h  |  102 +
- net/bluetooth/Makefile            |    2 +-
- net/bluetooth/aosp.c              |  168 +-
- net/bluetooth/aosp.h              |   13 +
- net/bluetooth/cmtp/core.c         |    4 +-
- net/bluetooth/hci_codec.c         |   18 +-
- net/bluetooth/hci_conn.c          |   20 +-
- net/bluetooth/hci_core.c          | 1334 +---------
- net/bluetooth/hci_event.c         |  211 +-
- net/bluetooth/hci_request.c       |  500 +---
- net/bluetooth/hci_request.h       |   15 +-
- net/bluetooth/hci_sock.c          |   11 +-
- net/bluetooth/hci_sync.c          | 4922 +++++++++++++++++++++++++++++++++++++
- net/bluetooth/hci_sysfs.c         |    2 +
- net/bluetooth/l2cap_sock.c        |   19 +
- net/bluetooth/mgmt.c              | 2155 ++++++++--------
- net/bluetooth/mgmt_util.c         |   15 +-
- net/bluetooth/mgmt_util.h         |    4 +
- net/bluetooth/msft.c              |  511 ++--
- net/bluetooth/msft.h              |   15 +-
- 38 files changed, 7675 insertions(+), 3847 deletions(-)
- create mode 100644 drivers/bluetooth/btmtk.c
- create mode 100644 drivers/bluetooth/btmtk.h
- create mode 100644 include/net/bluetooth/hci_sync.h
- create mode 100644 net/bluetooth/hci_sync.c
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
