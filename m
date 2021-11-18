@@ -2,113 +2,270 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D1BF3C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 17:19:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 311B7C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 21:50:01 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id B569D61154
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 17:19:28 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 08C8E61A8C
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 21:50:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234079AbhKRRW1 convert rfc822-to-8bit (ORCPT
+        id S229972AbhKRVxA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 18 Nov 2021 12:22:27 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:40066 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234101AbhKRRW0 (ORCPT
+        Thu, 18 Nov 2021 16:53:00 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60980 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229457AbhKRVw7 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 18 Nov 2021 12:22:26 -0500
-Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ABA94CED10;
-        Thu, 18 Nov 2021 18:19:25 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v2 1/2] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY
- device flag
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <CABBYNZKZBrTnOoo9yGyYP7i8N9EzcmPpy_-FPngouZOzu+gUJA@mail.gmail.com>
-Date:   Thu, 18 Nov 2021 18:19:25 +0100
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <B47FBB15-3593-43AB-BA21-E08B34DE3C1F@holtmann.org>
-References: <20211105222739.461398-1-luiz.dentz@gmail.com>
- <411F0489-163E-4809-B20F-282311A5BC36@holtmann.org>
- <CABBYNZKZBrTnOoo9yGyYP7i8N9EzcmPpy_-FPngouZOzu+gUJA@mail.gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Thu, 18 Nov 2021 16:52:59 -0500
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9451C061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Nov 2021 13:49:58 -0800 (PST)
+Received: by mail-pl1-x62f.google.com with SMTP id n8so6455992plf.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 18 Nov 2021 13:49:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZjHRoERsj6fqnTT2GOZn77CXHT34lzJ7DxMccGTq0SE=;
+        b=pbi6x9RD3fAyhq+RSj3CEmFZAmZwFofUVvsyaPGsghpBYCgSW5+MN9oFGiNtbnLVxd
+         v4qOvUWEwr/c7x5ESBGi/KIybvySu+We/pJ0tOYBNVOLANY64mUCI+mhrtSASAZS6xZt
+         1aRi+183sxCtsxmKXMHhFJJdAlPZ2XagA/ypXwlCZRhxkach1G0+VDZqjX0DKFcmG6yf
+         KZKTdR0xVivksI4Ll1CinRpoBwlukxMzsHl/xJ0yGMmSI0GqjW97K9Js7FNr6P9Ff20y
+         G52Ox2KKTiEAfA00B77lokI1mYoJOVVe7QhchNuAuuSr8URVY9ZJ5pJYCJcZdVttONYZ
+         Wpcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZjHRoERsj6fqnTT2GOZn77CXHT34lzJ7DxMccGTq0SE=;
+        b=v0evnO4nCBs3021VBulobjdPApOFRE3SKDpo/oDqz9M/KuOvJTI80zKaqMwNI1wret
+         Ovm5d6AI0aAMoxv2z8UaLlKJ/qS/5c29L2OzQELNddmDUTPdjDSXx+9ziIoZ1xkweKt+
+         3JY/AfJU2htne5tb+bp5IXkt/UOO5j+R2onZGieBA2qgDeEbCdLIWG/PcB75SGTPAaR9
+         HPmirlnp2vNnzPDjbcflnDNgruk/tLGWFe0fWWnArp40OFvfZs5zHJwsmxnEYmn+ntmT
+         zukyOjdnC6jLGjPywpC/jfTjPW8X5FPQS5THYcXlyumLpa/7WVBbaVsE1/p86p70JLB/
+         hh+g==
+X-Gm-Message-State: AOAM531yNIB809eQm9DGa+XjavYiKjBvovFoKk4FGgZSucp7O9b8qR1P
+        q82lI0YcrETDS2cf19WPa0j7vII0S9w=
+X-Google-Smtp-Source: ABdhPJym8VJAFBpjwLomMiJ2SoMyShmp4rkoSKthShKxwr9j2qy/pIQRIwxh+SUulj/cp8YZnwii/g==
+X-Received: by 2002:a17:902:6b47:b0:142:82e1:6c92 with SMTP id g7-20020a1709026b4700b0014282e16c92mr70808967plt.84.1637272198046;
+        Thu, 18 Nov 2021 13:49:58 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p21sm579328pfh.43.2021.11.18.13.49.56
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 18 Nov 2021 13:49:57 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2] Bluetooth: btusb: Add support for queuing during polling interval
+Date:   Thu, 18 Nov 2021 13:49:56 -0800
+Message-Id: <20211118214956.946365-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
->>> This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
->>> userspace to indicate to the controller to use Device Privacy Mode to a
->>> specific device.
->>> 
->>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
->>> ---
->>> v2: Fix marking Device Privacy Flag even when adapter is not capable of
->>> handling Set Privacy Mode.
->>> 
->>> include/net/bluetooth/hci_core.h |  4 ++++
->>> net/bluetooth/mgmt.c             | 24 ++++++++++++++++++++----
->>> 2 files changed, 24 insertions(+), 4 deletions(-)
->>> 
->>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
->>> index b5f061882c10..07d2d099dc2a 100644
->>> --- a/include/net/bluetooth/hci_core.h
->>> +++ b/include/net/bluetooth/hci_core.h
->>> @@ -160,6 +160,7 @@ struct bdaddr_list_with_flags {
->>> 
->>> enum hci_conn_flags {
->>>      HCI_CONN_FLAG_REMOTE_WAKEUP,
->>> +     HCI_CONN_FLAG_DEVICE_PRIVACY,
->>>      HCI_CONN_FLAG_MAX
->>> };
->>> 
->>> @@ -1468,6 +1469,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
->>> #define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
->>>                           hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY))
->>> 
->>> +#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
->>> +                                (hdev->commands[39] & 0x04))
->>> +
->>> /* Use enhanced synchronous connection if command is supported */
->>> #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
->>> 
->>> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
->>> index 06384d761928..8a8376d32be3 100644
->>> --- a/net/bluetooth/mgmt.c
->>> +++ b/net/bluetooth/mgmt.c
->>> @@ -4350,7 +4350,16 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
->>>                             MGMT_STATUS_NOT_SUPPORTED);
->>> }
->>> 
->>> -#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
->>> +static u32 supported_device_flags(struct hci_dev *hdev)
->>> +{
->>> +     u32 flags = BIT(HCI_CONN_FLAG_MAX) - 1;
->>> +
->>> +     /* Check if Privacy Mode can be set */
->>> +     if (!privacy_mode_capable(hdev))
->>> +             flags &= ~BIT(HCI_CONN_FLAG_DEVICE_PRIVACY);
->>> +
->>> +     return flags;
->>> +}
->> 
->> I am lost on what we are doing, I know that SUPPORTED_DEVICE_FLAGS was introduced by 4c54bf2b093bb from Abhishek, but I fail to reason now why it is correct.
-> 
-> But we don't set the HCI_CONN_FLAG_DEVICE_PRIVACY is hdev is not
-> capable of setting it, anyway the general idea of the supported_flags
-> is to indicate to userspace what flags the kernel is capable of
-> settings, so yeah I would expected it to be capable of setting every
-> flag except for those the controller don't have proper support for.
-> Maybe you got confused by the logic of first enabling everything and
-> then toggle back the bits that are not supported by the hdev.
+This makes btusb to queue ACL and events during a polling interval
+by using of a delayed work, with the interval working as a time window
+where frames received from different endpoints are considered to be
+arrived at same time and then attempt to resolve potential conflics by
+processing the events ahead of ACL packets.
 
-and I think that is wrong. We should only set the bits that the hardware and/or kernel supports. I have no idea on how I missed this in the review back then. I am trying to figure it out, but I am failing to follow this logic.
+It worth noting though that priorizing events over ACL data may result
+in inverting the order compared to how they appeared over the air, for
+instance there may be packets received before a disconnect event that
+will be discarded and unencrypted packets received before encryption
+change which would considered encrypted, because of these potential
+changes on the order the support for queuing during the polling
+interval is not enabled by default so platforms have the following
+means to enable it:
 
-Regards
+With use of module option:
 
-Marcel
+    enable_poll_sync
+
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Check for intr_interval instead of enable_poll_sync when dispatching
+since the former can only be changed on open/resume.
+
+ drivers/bluetooth/btusb.c | 81 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 76 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 30a057e1d4e3..272faa40b11c 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -31,7 +31,7 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+-
++static bool enable_poll_sync;
+ static bool reset = true;
+ 
+ static struct usb_driver btusb_driver;
+@@ -550,8 +550,12 @@ struct btusb_data {
+ 
+ 	unsigned long flags;
+ 
+-	struct work_struct work;
+-	struct work_struct waker;
++	int intr_interval;
++	struct work_struct  work;
++	struct work_struct  waker;
++	struct delayed_work rx_work;
++
++	struct sk_buff_head acl_q;
+ 
+ 	struct usb_anchor deferred;
+ 	struct usb_anchor tx_anchor;
+@@ -716,6 +720,15 @@ static inline void btusb_free_frags(struct btusb_data *data)
+ 	spin_unlock_irqrestore(&data->rxlock, flags);
+ }
+ 
++static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (data->intr_interval)
++		/* Trigger dequeue immediatelly if an event is received */
++		schedule_delayed_work(&data->rx_work, 0);
++
++	return data->recv_event(data->hdev, skb);
++}
++
+ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -761,7 +774,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_event(data->hdev, skb);
++			btusb_recv_event(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -772,6 +785,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 	return err;
+ }
+ 
++static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (!data->intr_interval)
++		return data->recv_acl(data->hdev, skb);
++
++	skb_queue_tail(&data->acl_q, skb);
++
++	schedule_delayed_work(&data->rx_work, data->intr_interval);
++
++	return 0;
++}
++
+ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -819,7 +844,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_acl(data->hdev, skb);
++			btusb_recv_acl(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -971,6 +996,27 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
++	/* Only initialize intr_interval if URB poll sync is enabled */
++	if (!enable_poll_sync)
++		goto done;
++
++	/* The units are frames (milliseconds) for full and low speed devices,
++	 * and microframes (1/8 millisecond) for highspeed and SuperSpeed
++	 * devices.
++	 *
++	 * This is done once on open/resume so it shouldn't change even if
++	 * enable_poll_sync changes.
++	 */
++	switch (urb->dev->speed) {
++	case USB_SPEED_SUPER_PLUS:
++	case USB_SPEED_SUPER:	/* units are 125us */
++		data->intr_interval = usecs_to_jiffies(urb->interval * 125);
++		break;
++	default:
++		data->intr_interval = msecs_to_jiffies(urb->interval);
++	}
++
++done:
+ 	usb_free_urb(urb);
+ 
+ 	return err;
+@@ -1430,9 +1476,12 @@ static int btusb_close(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
+ 	cancel_work_sync(&data->work);
+ 	cancel_work_sync(&data->waker);
+ 
++	skb_queue_purge(&data->acl_q);
++
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+@@ -1464,6 +1513,10 @@ static int btusb_flush(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
++
++	skb_queue_purge(&data->acl_q);
++
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 	btusb_free_frags(data);
+ 
+@@ -1827,6 +1880,17 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++static void btusb_rx_work(struct work_struct *work)
++{
++	struct btusb_data *data = container_of(work, struct btusb_data,
++					       rx_work.work);
++	struct sk_buff *skb;
++
++	/* Dequeue ACL data received during the interval */
++	while ((skb = skb_dequeue(&data->acl_q)))
++		data->recv_acl(data->hdev, skb);
++}
++
+ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -3456,6 +3520,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
++	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
++
++	skb_queue_head_init(&data->acl_q);
++
+ 	init_usb_anchor(&data->deferred);
+ 	init_usb_anchor(&data->tx_anchor);
+ 	spin_lock_init(&data->txlock);
+@@ -3943,6 +4011,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+ module_param(enable_autosuspend, bool, 0644);
+ MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+ 
++module_param(enable_poll_sync, bool, 0644);
++MODULE_PARM_DESC(enable_poll_sync, "Enable URB polling interval synchronization");
++
+ module_param(reset, bool, 0644);
+ MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
+ 
+-- 
+2.33.1
 
