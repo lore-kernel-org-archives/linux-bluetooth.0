@@ -2,424 +2,303 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A582FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 21:43:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F03E3C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 04:39:55 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 7EE8561BC1
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 17 Nov 2021 21:43:00 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id C540361AA5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 18 Nov 2021 04:39:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240740AbhKQVp6 (ORCPT
+        id S243001AbhKREmv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 17 Nov 2021 16:45:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43502 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231839AbhKQVp6 (ORCPT
+        Wed, 17 Nov 2021 23:42:51 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:44515 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S242993AbhKREmr (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 17 Nov 2021 16:45:58 -0500
-Received: from mail-vk1-xa2b.google.com (mail-vk1-xa2b.google.com [IPv6:2607:f8b0:4864:20::a2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 460EEC061570
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Nov 2021 13:42:59 -0800 (PST)
-Received: by mail-vk1-xa2b.google.com with SMTP id a129so2541500vkb.8
-        for <linux-bluetooth@vger.kernel.org>; Wed, 17 Nov 2021 13:42:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=fpnMHgP0OWWnK21bg7YGqnhJqvldn1vQD+JY0t37Lxw=;
-        b=cwvql51TK8Wk+hMhq65lQsjrY7nAUxvrgB4C+yjTM6Gg2waih+fOJuLdjLXIqZ0/Bt
-         n6aED50mS0jJxJeYnOxJf0GGvUEVBuQ/mdF+0KYtGgYgQw7VR2gOkSuUFd8A2CucVJuz
-         6/b2qW4GEuYswbDIcZjHcVR3BIdnW9jurclNG2BDRkJJhCfE9D02guiNxI2MreEoEDd3
-         FsOpoOwwEBJBm3+5BPteFj6VsWW6Qhh5EItz8AghPrxrhnCgBjdMy12T+jChESzUPysI
-         iY4jlB5/X6LvMYZWGthOjIHsSYBbXPT0z5FuziYE5bAK4R+jJZ9EHt4QwVwr7P6xfrgJ
-         lVkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=fpnMHgP0OWWnK21bg7YGqnhJqvldn1vQD+JY0t37Lxw=;
-        b=EtowcRJVd9iVrF9MZlVAxZSGmaHAXq4PtQaPByLwIWbLNNf61D2NFTxksPVfJIzOpB
-         jn08BWlN2P/acrxzXPDVynSE8SqCtnbJT7LD8ODDwQMHaVhLQT7qZ6h/4xg2tyJ+wOtH
-         L0PhzJs+OruKIsjKZWyDyRsyGy2F1IJ+t1jRkvqR5Xal04Gexsgm9LYDJybWi9rThS4+
-         LFPQtYN/KmYo1RAtx8O62kNMq9bTY32u79nNh0LAbPv2dMIfYeKMI95Ra2H1xy1wYX/B
-         o7/M8S4EjfOLUCvsxtJQV2dZKim3hECZNXx1mFc+2T7Lsc8VE+smG0mKXTqqpY6kJ4ID
-         3UDQ==
-X-Gm-Message-State: AOAM5316zaSbJEq2EWA4wNzyIF+5EKenkAugohyaN+eDFAi9N07IVjer
-        4xEDlNXpFq/IbuudF+WObb2MUDsgyasQSCK7+vY=
-X-Google-Smtp-Source: ABdhPJwqZprbfhO56SV4/TzmVRor4LE8xgn/0Jzlxg1vwGf3w246fh4XmDcEyQCCSlJrX7VG69HNhVES/gRQjuRe/c4=
-X-Received: by 2002:a05:6122:2005:: with SMTP id l5mr94668377vkd.4.1637185378180;
- Wed, 17 Nov 2021 13:42:58 -0800 (PST)
-MIME-Version: 1.0
-References: <20211117110627.BlueZ.v5.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
- <20211117110627.BlueZ.v5.3.I68039747acc3c63f758278452889d6ed2bfff065@changeid>
-In-Reply-To: <20211117110627.BlueZ.v5.3.I68039747acc3c63f758278452889d6ed2bfff065@changeid>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 17 Nov 2021 13:42:47 -0800
-Message-ID: <CABBYNZJR+0u53GuBPe-C3KSALxFo5Dn0FLRvCObYCq8Q8QLj7Q@mail.gmail.com>
-Subject: Re: [BlueZ PATCH v5 3/6] adv_monitor: Receive the Device Found/Lost events
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Miao-chen Chou <mcchou@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+        Wed, 17 Nov 2021 23:42:47 -0500
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 2A7F2CED01;
+        Thu, 18 Nov 2021 05:39:46 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for queuing during polling
+ interval
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211108230210.931731-1-luiz.dentz@gmail.com>
+Date:   Thu, 18 Nov 2021 05:39:45 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <949D7592-D56E-486D-BD59-F10D346C92DD@holtmann.org>
+References: <20211108230210.931731-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Luiz,
 
-On Wed, Nov 17, 2021 at 11:15 AM Manish Mandlik <mmandlik@google.com> wrote=
-:
->
-> This patch registers callback functions to receive the Advertisement
-> Monitor Device Found and Device Lost events. It also disables software
-> based filtering whenever controller offloading support is available.
->
-> Test performed:
-> - Verified by logs that the MSFT Monitor Device is received from the
->   controller and the bluetoothd is notified whenever the controller
->   starts/stops monitoring a device.
->
-> Reviewed-by: Miao-chen Chou <mcchou@google.com>
+> This makes btusb to queue ACL and events during a polling interval
+> by using of a delayed work, with the interval working as a time window
+> where frames received from different endpoints are considered to be
+> arrived at same time and then attempt to resolve potential conflics by
+> processing the events ahead of ACL packets.
+> 
+> It worth noting though that priorizing events over ACL data may result
+> in inverting the order compared to how they appeared over the air, for
+> instance there may be packets received before a disconnect event that
+> will be discarded and unencrypted packets received before encryption
+> change which would considered encrypted, because of these potential
+> changes on the order the support for queuing during the polling
+> interval is not enabled by default so platforms have the following
+> means to enable it:
+> 
+> At runtime with use of module option:
+> 
+>    enable_poll_sync
+
+is this still needed?
+
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
->
-> Changes in v5:
-> - Update the Adv Monitor Device Found event to include fields from the
->   existing Device Found event and update the device object.
-> - Disable the software based filtering whenever controller offloading is
->   available.
->
-> Changes in v4:
-> - Add Advertisement Monitor Device Found event.
->
-> Changes in v3:
-> - Fix indentation of the adv_monitor_device_lost_callback() name and
->   it's arguments.
->
-> Changes in v2:
-> - Update function name adv_monitor_tracking_callback() to
->   adv_monitor_device_lost_callback() as it will receive only Device Lost
->   event.
->
->  src/adapter.c     | 47 +++++++++++++-----------
->  src/adapter.h     |  8 +++++
->  src/adv_monitor.c | 91 +++++++++++++++++++++++++++++++++++++++++++++++
->  src/adv_monitor.h |  2 ++
->  4 files changed, 128 insertions(+), 20 deletions(-)
->
-> diff --git a/src/adapter.c b/src/adapter.c
-> index d0d38621b..42463a3c1 100644
-> --- a/src/adapter.c
-> +++ b/src/adapter.c
-> @@ -6984,12 +6984,13 @@ static bool device_is_discoverable(struct btd_ada=
-pter *adapter,
->         return discoverable;
->  }
->
-> -static void update_found_devices(struct btd_adapter *adapter,
-> +void btd_adapter_update_found_device(struct btd_adapter *adapter,
->                                         const bdaddr_t *bdaddr,
->                                         uint8_t bdaddr_type, int8_t rssi,
->                                         bool confirm, bool legacy,
->                                         bool not_connectable,
-> -                                       const uint8_t *data, uint8_t data=
-_len)
-> +                                       const uint8_t *data, uint8_t data=
-_len,
-> +                                       bool monitoring)
->  {
->         struct btd_device *dev;
->         struct bt_ad *ad =3D NULL;
-> @@ -6999,20 +7000,24 @@ static void update_found_devices(struct btd_adapt=
-er *adapter,
->         bool duplicate =3D false;
->         struct queue *matched_monitors =3D NULL;
->
-> -       if (bdaddr_type !=3D BDADDR_BREDR)
-> -               ad =3D bt_ad_new_with_data(data_len, data);
-> +       if (!btd_adv_monitor_offload_supported(adapter->adv_monitor_manag=
-er)) {
-> +               if (bdaddr_type !=3D BDADDR_BREDR)
-> +                       ad =3D bt_ad_new_with_data(data_len, data);
->
-> -       /* During the background scanning, update the device only when th=
-e data
-> -        * match at least one Adv monitor
-> -        */
-> -       if (ad) {
-> -               matched_monitors =3D btd_adv_monitor_content_filter(
-> -                                       adapter->adv_monitor_manager, ad)=
-;
-> -               bt_ad_unref(ad);
-> -               ad =3D NULL;
-> +               /* During the background scanning, update the device only=
- when
-> +                * the data match at least one Adv monitor
-> +                */
-> +               if (ad) {
-> +                       matched_monitors =3D btd_adv_monitor_content_filt=
-er(
-> +                                               adapter->adv_monitor_mana=
-ger,
-> +                                               ad);
-> +                       bt_ad_unref(ad);
-> +                       ad =3D NULL;
-> +                       monitoring =3D matched_monitors ? true : false;
-> +               }
->         }
->
-> -       if (!adapter->discovering && !matched_monitors)
-> +       if (!adapter->discovering && !monitoring)
->                 return;
->
->         memset(&eir_data, 0, sizeof(eir_data));
-> @@ -7025,7 +7030,7 @@ static void update_found_devices(struct btd_adapter=
- *adapter,
->
->         dev =3D btd_adapter_find_device(adapter, bdaddr, bdaddr_type);
->         if (!dev) {
-> -               if (!discoverable && !matched_monitors) {
-> +               if (!discoverable && !monitoring) {
->                         eir_data_free(&eir_data);
->                         return;
->                 }
-> @@ -7064,7 +7069,7 @@ static void update_found_devices(struct btd_adapter=
- *adapter,
->          */
->         if (!btd_device_is_connected(dev) &&
->                 (device_is_temporary(dev) && !adapter->discovery_list) &&
-> -               !matched_monitors) {
-> +               !monitoring) {
->                 eir_data_free(&eir_data);
->                 return;
->         }
-> @@ -7072,7 +7077,7 @@ static void update_found_devices(struct btd_adapter=
- *adapter,
->         /* If there is no matched Adv monitors, don't continue if not
->          * discoverable or if active discovery filter don't match.
->          */
-> -       if (!matched_monitors && (!discoverable ||
-> +       if (!monitoring && (!discoverable ||
->                 (adapter->filtered_discovery && !is_filter_match(
->                                 adapter->discovery_list, &eir_data, rssi)=
-))) {
->                 eir_data_free(&eir_data);
-> @@ -7202,6 +7207,7 @@ static void device_found_callback(uint16_t index, u=
-int16_t length,
->         bool confirm_name;
->         bool legacy;
->         char addr[18];
-> +       bool not_connectable;
->
->         if (length < sizeof(*ev)) {
->                 btd_error(adapter->dev_id,
-> @@ -7230,11 +7236,12 @@ static void device_found_callback(uint16_t index,=
- uint16_t length,
->
->         confirm_name =3D (flags & MGMT_DEV_FOUND_CONFIRM_NAME);
->         legacy =3D (flags & MGMT_DEV_FOUND_LEGACY_PAIRING);
-> +       not_connectable =3D (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE);
->
-> -       update_found_devices(adapter, &ev->addr.bdaddr, ev->addr.type,
-> -                                       ev->rssi, confirm_name, legacy,
-> -                                       flags & MGMT_DEV_FOUND_NOT_CONNEC=
-TABLE,
-> -                                       eir, eir_len);
-> +       btd_adapter_update_found_device(adapter, &ev->addr.bdaddr,
-> +                                       ev->addr.type, ev->rssi, confirm_=
-name,
-> +                                       legacy, not_connectable, eir, eir=
-_len,
-> +                                       false);
->  }
->
->  struct agent *adapter_get_agent(struct btd_adapter *adapter)
-> diff --git a/src/adapter.h b/src/adapter.h
-> index db3c17f23..cd0d037af 100644
-> --- a/src/adapter.h
-> +++ b/src/adapter.h
-> @@ -87,6 +87,14 @@ struct btd_device *btd_adapter_find_device(struct btd_=
-adapter *adapter,
->  struct btd_device *btd_adapter_find_device_by_path(struct btd_adapter *a=
-dapter,
->                                                    const char *path);
->
-> +void btd_adapter_update_found_device(struct btd_adapter *adapter,
-> +                                       const bdaddr_t *bdaddr,
-> +                                       uint8_t bdaddr_type, int8_t rssi,
-> +                                       bool confirm, bool legacy,
-> +                                       bool not_connectable,
-> +                                       const uint8_t *data, uint8_t data=
-_len,
-> +                                       bool monitored);
+> drivers/bluetooth/btusb.c | 89 +++++++++++++++++++++++++++++++++------
+> 1 file changed, 77 insertions(+), 12 deletions(-)
+> 
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index 46d892bbde62..29aa0f346ace 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -31,7 +31,7 @@
+> static bool disable_scofix;
+> static bool force_scofix;
+> static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+> -
+> +static bool enable_poll_sync;
+> static bool reset = true;
+> 
+> static struct usb_driver btusb_driver;
+> @@ -550,8 +550,12 @@ struct btusb_data {
+> 
+> 	unsigned long flags;
+> 
+> -	struct work_struct work;
+> -	struct work_struct waker;
+> +	int intr_interval;
+> +	struct work_struct  work;
+> +	struct work_struct  waker;
+> +	struct delayed_work rx_work;
 > +
->  const char *adapter_get_path(struct btd_adapter *adapter);
->  const bdaddr_t *btd_adapter_get_address(struct btd_adapter *adapter);
->  uint8_t btd_adapter_get_address_type(struct btd_adapter *adapter);
-> diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-> index a3b33188b..e5bdfb6ef 100644
-> --- a/src/adv_monitor.c
-> +++ b/src/adv_monitor.c
-> @@ -1531,6 +1531,78 @@ static void adv_monitor_removed_callback(uint16_t =
-index, uint16_t length,
->                 ev->monitor_handle);
->  }
->
-> +/* Processes Adv Monitor Device Found event from kernel */
-> +static void adv_monitor_device_found_callback(uint16_t index, uint16_t l=
-ength,
-> +                                               const void *param,
-> +                                               void *user_data)
+> +	struct sk_buff_head acl_q;
+> 
+> 	struct usb_anchor deferred;
+> 	struct usb_anchor tx_anchor;
+> @@ -588,8 +592,8 @@ struct btusb_data {
+> 	int isoc_altsetting;
+> 	int suspend_count;
+> 
+> -	int (*recv_event)(struct hci_dev *hdev, struct sk_buff *skb);
+> 	int (*recv_acl)(struct hci_dev *hdev, struct sk_buff *skb);
+> +	int (*recv_event)(struct btusb_data *data, struct sk_buff *skb);
+
+This change is a bit unfortunate since I really wanted to allow recv_event = hci_recv_frame assignment.
+
+> 	int (*recv_bulk)(struct btusb_data *data, void *buffer, int count);
+> 
+> 	int (*setup_on_usb)(struct hci_dev *hdev);
+> @@ -761,7 +765,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+> 
+> 		if (!hci_skb_expect(skb)) {
+> 			/* Complete frame */
+> -			data->recv_event(data->hdev, skb);
+> +			data->recv_event(data, skb);
+> 			skb = NULL;
+> 		}
+> 	}
+> @@ -772,6 +776,18 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+> 	return err;
+> }
+> 
+> +static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
 > +{
-> +       const struct mgmt_ev_adv_monitor_device_found *ev =3D param;
-> +       struct btd_adv_monitor_manager *manager =3D user_data;
-> +       uint16_t handle =3D le16_to_cpu(ev->monitor_handle);
-
-Make sure each patch don't break the build:
-
-src/adv_monitor.c: In function =E2=80=98adv_monitor_device_found_callback=
-=E2=80=99:
-src/adv_monitor.c:1541:18: error: unused variable =E2=80=98handle=E2=80=99
-[-Werror=3Dunused-variable]
- 1541 |         uint16_t handle =3D le16_to_cpu(ev->monitor_handle);
-      |
-
-> +       const uint16_t adapter_id =3D manager->adapter_id;
-> +       struct btd_adapter *adapter =3D manager->adapter;
-> +       const uint8_t *ad_data =3D NULL;
-> +       uint16_t ad_data_len;
-> +       uint32_t flags;
-> +       bool confirm_name;
-> +       bool legacy;
-> +       char addr[18];
-> +       bool not_connectable;
+> +	if (!enable_poll_sync)
+> +		return data->recv_acl(data->hdev, skb);
 > +
-> +       if (length < sizeof(*ev)) {
-> +               btd_error(adapter_id,
-> +                               "Too short Adv Monitor Device Found event=
-");
-> +               return;
-> +       }
+> +	skb_queue_tail(&data->acl_q, skb);
 > +
-> +       ad_data_len =3D btohs(ev->ad_data_len);
-> +       if (length !=3D sizeof(*ev) + ad_data_len) {
-> +               btd_error(adapter_id,
-> +                               "Wrong size of Adv Monitor Device Found e=
-vent");
-> +               return;
-> +       }
+> +	schedule_delayed_work(&data->rx_work, data->intr_interval);
 > +
-> +       if (ad_data_len > 0)
-> +               ad_data =3D ev->ad_data;
-> +
-> +       flags =3D btohl(ev->flags);
-> +
-> +       ba2str(&ev->addr.bdaddr, addr);
-> +       DBG("hci%u addr %s, rssi %d flags 0x%04x ad_data_len %u",
-> +                       index, addr, ev->rssi, flags, ad_data_len);
-> +
-> +       confirm_name =3D (flags & MGMT_DEV_FOUND_CONFIRM_NAME);
-> +       legacy =3D (flags & MGMT_DEV_FOUND_LEGACY_PAIRING);
-> +       not_connectable =3D (flags & MGMT_DEV_FOUND_NOT_CONNECTABLE);
-> +
-> +       btd_adapter_update_found_device(adapter, &ev->addr.bdaddr,
-> +                                       ev->addr.type, ev->rssi, confirm_=
-name,
-> +                                       legacy, not_connectable, ad_data,
-> +                                       ad_data_len, true);
+> +	return 0;
 > +}
 > +
-> +/* Processes Adv Monitor Device Lost event from kernel */
-> +static void adv_monitor_device_lost_callback(uint16_t index, uint16_t le=
-ngth,
-> +                                               const void *param,
-> +                                               void *user_data)
+
+Starting to think about this, I really have a problem with these massive if-one-or-another checks in the main receive path. The idea was really that only hardware that needs special handling assigns different callbacks.
+
+This means if we really want to support this, then we need to have independent recv_acl and recv_event callbacks depending on sync_poll behavior is enabled or not.
+
+We also need to bind switching the behavior to controllers that are powered down. Otherwise this really becomes a mess. Checking a module parameter variable on every receiving packet is not a good idea.
+
+> static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> {
+> 	struct sk_buff *skb;
+> @@ -819,7 +835,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+> 
+> 		if (!hci_skb_expect(skb)) {
+> 			/* Complete frame */
+> -			data->recv_acl(data->hdev, skb);
+> +			btusb_recv_acl(data, skb);
+> 			skb = NULL;
+> 		}
+> 	}
+> @@ -971,6 +987,19 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
+> 		usb_unanchor_urb(urb);
+> 	}
+> 
+> +	/* The units are frames (milliseconds) for full and low speed devices,
+> +	 * and microframes (1/8 millisecond) for highspeed and SuperSpeed
+> +	 * devices.
+> +	 */
+> +	switch (urb->dev->speed) {
+> +	case USB_SPEED_SUPER_PLUS:
+> +	case USB_SPEED_SUPER:	/* units are 125us */
+> +		data->intr_interval = usecs_to_jiffies(urb->interval * 125);
+> +		break;
+> +	default:
+> +		data->intr_interval = msecs_to_jiffies(urb->interval);
+> +	}
+> +
+> 	usb_free_urb(urb);
+> 
+> 	return err;
+> @@ -1430,9 +1459,12 @@ static int btusb_close(struct hci_dev *hdev)
+> 
+> 	BT_DBG("%s", hdev->name);
+> 
+> +	cancel_delayed_work(&data->rx_work);
+> 	cancel_work_sync(&data->work);
+> 	cancel_work_sync(&data->waker);
+> 
+> +	skb_queue_purge(&data->acl_q);
+> +
+> 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+> 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+> 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+> @@ -1464,6 +1496,10 @@ static int btusb_flush(struct hci_dev *hdev)
+> 
+> 	BT_DBG("%s", hdev->name);
+> 
+> +	cancel_delayed_work(&data->rx_work);
+> +
+> +	skb_queue_purge(&data->acl_q);
+> +
+> 	usb_kill_anchored_urbs(&data->tx_anchor);
+> 	btusb_free_frags(data);
+> 
+> @@ -1827,6 +1863,17 @@ static void btusb_waker(struct work_struct *work)
+> 	usb_autopm_put_interface(data->intf);
+> }
+> 
+> +static void btusb_rx_work(struct work_struct *work)
 > +{
-> +       struct btd_adv_monitor_manager *manager =3D user_data;
-> +       const struct mgmt_ev_adv_monitor_device_lost *ev =3D param;
-> +       uint16_t handle =3D le16_to_cpu(ev->monitor_handle);
-> +       const uint16_t adapter_id =3D manager->adapter_id;
-> +       char addr[18];
+> +	struct btusb_data *data = container_of(work, struct btusb_data,
+> +					       rx_work.work);
+> +	struct sk_buff *skb;
 > +
-> +       if (length < sizeof(*ev)) {
-> +               btd_error(adapter_id,
-> +                               "Wrong size of Adv Monitor Device Lost ev=
-ent");
-> +               return;
-> +       }
-> +
-> +       ba2str(&ev->addr.bdaddr, addr);
-> +       DBG("Adv Monitor with handle 0x%04x stopped tracking the device %=
-s",
-> +               handle, addr);
+> +	/* Dequeue ACL data received during the interval */
+> +	while ((skb = skb_dequeue(&data->acl_q)))
+> +		data->recv_acl(data->hdev, skb);
 > +}
 > +
->  /* Allocates a manager object */
->  static struct btd_adv_monitor_manager *manager_new(
->                                                 struct btd_adapter *adapt=
-er,
-> @@ -1555,6 +1627,14 @@ static struct btd_adv_monitor_manager *manager_new=
-(
->                         manager->adapter_id, adv_monitor_removed_callback=
-,
->                         manager, NULL);
->
-> +       mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-> +                       manager->adapter_id, adv_monitor_device_found_cal=
-lback,
-> +                       manager, NULL);
-> +
-> +       mgmt_register(manager->mgmt, MGMT_EV_ADV_MONITOR_DEVICE_LOST,
-> +                       manager->adapter_id, adv_monitor_device_lost_call=
-back,
-> +                       manager, NULL);
-> +
->         return manager;
->  }
->
-> @@ -1666,6 +1746,17 @@ void btd_adv_monitor_manager_destroy(struct btd_ad=
-v_monitor_manager *manager)
->         manager_destroy(manager);
->  }
->
-> +bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *m=
-anager)
+> static int btusb_setup_bcm92035(struct hci_dev *hdev)
+> {
+> 	struct sk_buff *skb;
+> @@ -2028,9 +2075,9 @@ static int btusb_recv_bulk_intel(struct btusb_data *data, void *buffer,
+> 	return btusb_recv_bulk(data, buffer, count);
+> }
+> 
+> -static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> +static int btusb_recv_event_intel(struct btusb_data *data, struct sk_buff *skb)
+> {
+> -	if (btintel_test_flag(hdev, INTEL_BOOTLOADER)) {
+> +	if (btintel_test_flag(data->hdev, INTEL_BOOTLOADER)) {
+> 		struct hci_event_hdr *hdr = (void *)skb->data;
+> 
+> 		if (skb->len > HCI_EVENT_HDR_SIZE && hdr->evt == 0xff &&
+> @@ -2044,7 +2091,7 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> 				 * the device sends a vendor specific event
+> 				 * indicating that the bootup completed.
+> 				 */
+> -				btintel_bootup(hdev, ptr, len);
+> +				btintel_bootup(data->hdev, ptr, len);
+> 				break;
+> 			case 0x06:
+> 				/* When the firmware loading completes the
+> @@ -2052,13 +2099,14 @@ static int btusb_recv_event_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> 				 * indicating the result of the firmware
+> 				 * loading.
+> 				 */
+> -				btintel_secure_send_result(hdev, ptr, len);
+> +				btintel_secure_send_result(data->hdev, ptr,
+> +							   len);
+> 				break;
+> 			}
+> 		}
+> 	}
+> 
+> -	return hci_recv_frame(hdev, skb);
+> +	return hci_recv_frame(data->hdev, skb);
+> }
+> 
+> static int btusb_send_frame_intel(struct hci_dev *hdev, struct sk_buff *skb)
+> @@ -3372,6 +3420,16 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
+> 	return 0;
+> }
+> 
+> +static int btusb_recv_evt(struct btusb_data *data, struct sk_buff *skb)
 > +{
-> +       if (!manager) {
-> +               error("Manager is NULL, get offload support failed");
-> +               return false;
-> +       }
+> +	if (enable_poll_sync) {
+> +		/* Trigger dequeue immediatelly if an event is received */
+> +		schedule_delayed_work(&data->rx_work, 0);
+> +	}
 > +
-> +       return !!(manager->enabled_features &
-> +                               MGMT_ADV_MONITOR_FEATURE_MASK_OR_PATTERNS=
-);
+> +	return hci_recv_frame(data->hdev, skb);
 > +}
 > +
->  /* Processes the content matching based pattern(s) of a monitor */
->  static void adv_match_per_monitor(void *data, void *user_data)
->  {
-> diff --git a/src/adv_monitor.h b/src/adv_monitor.h
-> index d9cb9ccbb..bed6572d0 100644
-> --- a/src/adv_monitor.h
-> +++ b/src/adv_monitor.h
-> @@ -27,6 +27,8 @@ struct btd_adv_monitor_manager *btd_adv_monitor_manager=
-_create(
->                                                 struct mgmt *mgmt);
->  void btd_adv_monitor_manager_destroy(struct btd_adv_monitor_manager *man=
-ager);
->
-> +bool btd_adv_monitor_offload_supported(struct btd_adv_monitor_manager *m=
-anager);
+> static int btusb_probe(struct usb_interface *intf,
+> 		       const struct usb_device_id *id)
+> {
+> @@ -3455,6 +3513,10 @@ static int btusb_probe(struct usb_interface *intf,
+> 
+> 	INIT_WORK(&data->work, btusb_work);
+> 	INIT_WORK(&data->waker, btusb_waker);
+> +	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
 > +
->  struct queue *btd_adv_monitor_content_filter(
->                                 struct btd_adv_monitor_manager *manager,
->                                 struct bt_ad *ad);
-> --
-> 2.34.0.rc1.387.gb447b232ab-goog
->
+> +	skb_queue_head_init(&data->acl_q);
+> +
+> 	init_usb_anchor(&data->deferred);
+> 	init_usb_anchor(&data->tx_anchor);
+> 	spin_lock_init(&data->txlock);
+> @@ -3468,7 +3530,7 @@ static int btusb_probe(struct usb_interface *intf,
+> 
+> 	priv_size = 0;
+> 
+> -	data->recv_event = hci_recv_frame;
+> +	data->recv_event = btusb_recv_evt;
+> 	data->recv_bulk = btusb_recv_bulk;
+> 
+> 	if (id->driver_info & BTUSB_INTEL_COMBINED) {
+> @@ -3942,6 +4004,9 @@ MODULE_PARM_DESC(force_scofix, "Force fixup of wrong SCO buffers size");
+> module_param(enable_autosuspend, bool, 0644);
+> MODULE_PARM_DESC(enable_autosuspend, "Enable USB autosuspend by default");
+> 
+> +module_param(enable_poll_sync, bool, 0644);
+> +MODULE_PARM_DESC(enable_poll_sync, "Enable URB polling interval synchronization");
+> +
+> module_param(reset, bool, 0644);
+> MODULE_PARM_DESC(reset, "Send HCI reset command on initialization");
 
+Regards
 
---=20
-Luiz Augusto von Dentz
+Marcel
+
