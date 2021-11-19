@@ -2,169 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B783C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:02:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FB6C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:06:12 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 65E4361B44
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:02:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 5F6FF61A53
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:06:12 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232249AbhKSKFm convert rfc822-to-8bit (ORCPT
+        id S234108AbhKSKJM convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 05:05:42 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:53524 "EHLO
+        Fri, 19 Nov 2021 05:09:12 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:55819 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229998AbhKSKFl (ORCPT
+        with ESMTP id S229879AbhKSKJM (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 05:05:41 -0500
+        Fri, 19 Nov 2021 05:09:12 -0500
 Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 7E3FCCED22;
-        Fri, 19 Nov 2021 11:02:39 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 258CDCED22;
+        Fri, 19 Nov 2021 11:06:10 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v2 2/2] Bluetooth: hci_sync: Set Privacy Mode when
- updating the resolving list
+Subject: Re: [PATCH v2 1/9] adapter: Enable MSFT a2dp offload codec when
+ Experimental is set
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211118231302.1000168-2-luiz.dentz@gmail.com>
-Date:   Fri, 19 Nov 2021 11:02:39 +0100
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211119094235.2432-1-kiran.k@intel.com>
+Date:   Fri, 19 Nov 2021 11:06:09 +0100
+Cc:     linux-bluetooth@vger.kernel.org, ravishankar.srivatsa@intel.com,
+        chethan.tumkur.narayan@intel.com,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 Content-Transfer-Encoding: 8BIT
-Message-Id: <7E27934B-018E-462D-8593-A873C0206A7D@holtmann.org>
-References: <20211118231302.1000168-1-luiz.dentz@gmail.com>
- <20211118231302.1000168-2-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <089A59F0-C858-43BF-80AC-0C384799A87F@holtmann.org>
+References: <20211119094235.2432-1-kiran.k@intel.com>
+To:     Kiran K <kiran.k@intel.com>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Kiran,
 
-> This adds support for Set Privacy Mode when updating the resolving list
-> when HCI_CONN_FLAG_DEVICE_PRIVACY so the controller shall use Device
-> Mode for devices programmed in the resolving list, Device Mode is
-> actually required when the remote device are not able to use RPA as
-> otherwise the default mode is Network Privacy Mode in which only
-> allows RPAs thus the controller would filter out advertisement using
-> identity addresses for which there is an IRK.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> This enables codec offload experimental feature if its UUIDs has been
+> enabled by main.conf:Experimental or -E has been passed in the command
+> line.
 > ---
-> include/net/bluetooth/hci.h      | 10 ++++++
-> include/net/bluetooth/hci_core.h |  1 +
-> net/bluetooth/hci_event.c        | 29 +++++++++++++++++
-> net/bluetooth/hci_sync.c         | 53 ++++++++++++++++++++++++++++----
-> 4 files changed, 87 insertions(+), 6 deletions(-)
+> src/adapter.c | 43 +++++++++++++++++++++++++++++++++++++++++++
+> src/main.c    |  1 +
+> src/main.conf |  1 +
+> 3 files changed, 45 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 84db6b275231..7444d286e6be 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1931,6 +1931,16 @@ struct hci_rp_le_read_transmit_power {
-> 	__s8  max_le_tx_power;
-> } __packed;
-> 
-> +#define HCI_NETWORK_PRIVACY		0x00
-> +#define HCI_DEVICE_PRIVACY		0x01
-> +
-> +#define HCI_OP_LE_SET_PRIVACY_MODE	0x204e
-> +struct hci_cp_le_set_privacy_mode {
-> +	__u8  bdaddr_type;
-> +	bdaddr_t  bdaddr;
-> +	__u8  mode;
-> +} __packed;
-> +
-> #define HCI_OP_LE_READ_BUFFER_SIZE_V2	0x2060
-> struct hci_rp_le_read_buffer_size_v2 {
-> 	__u8    status;
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 42ba40df6e20..0b3de5411948 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -755,6 +755,7 @@ struct hci_conn_params {
-> 
-> 	struct hci_conn *conn;
-> 	bool explicit_connect;
-> +	u8  privacy_mode;
-> 	u32 current_flags;
+> diff --git a/src/adapter.c b/src/adapter.c
+> index 309956bbb5be..1627cc127057 100644
+> --- a/src/adapter.c
+> +++ b/src/adapter.c
+> @@ -142,6 +142,13 @@ static const struct mgmt_exp_uuid codec_offload_uuid = {
+> 	.str = "a6695ace-ee7f-4fb9-881a-5fac66c629af"
 > };
 > 
-> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-> index efc5458b1345..51c88f4f1274 100644
-> --- a/net/bluetooth/hci_event.c
-> +++ b/net/bluetooth/hci_event.c
-> @@ -1300,6 +1300,31 @@ static void hci_cc_le_read_transmit_power(struct hci_dev *hdev,
-> 	hdev->max_le_tx_power = rp->max_le_tx_power;
+> +/* 0cc2131f-96f0-4cd1-b313-b97e7cbc8335 */
+> +static const struct mgmt_exp_uuid msft_a2dp_offload_codecs_uuid = {
+> +	.val = { 0x35, 0x83, 0xbc, 0x7c, 0x7e, 0xb9, 0x13, 0xb3,
+> +		0xd1, 0x4c, 0xf0, 0x96, 0x1f, 0x13, 0xc2, 0x0c},
+> +	.str = "0cc2131f-96f0-4cd1-b313-b97e7cbc8335"
+> +};
+> +
+> static DBusConnection *dbus_conn = NULL;
+> 
+> static uint32_t kernel_features = 0;
+> @@ -9789,6 +9796,41 @@ static void codec_offload_func(struct btd_adapter *adapter, uint8_t action)
+> 	btd_error(adapter->dev_id, "Failed to set Codec Offload");
 > }
 > 
-> +static void hci_cc_le_set_privacy_mode(struct hci_dev *hdev,
-> +				       struct sk_buff *skb)
+> +static void msft_a2dp_offload_complete(uint8_t status, uint16_t len,
+> +				       const void *param, void *user_data)
 > +{
-> +	__u8 status = *((__u8 *)skb->data);
-> +	struct hci_cp_le_set_privacy_mode *cp;
-> +	struct hci_conn_params *params;
+> +	struct btd_adapter *adapter = user_data;
+> +	uint8_t action = btd_opts.experimental ? 0x01 : 0x00;
 > +
-> +	bt_dev_dbg(hdev, "status 0x%2.2x", status);
-> +
-> +	if (status)
+> +	if (status != 0) {
+> +		error("Set MSFT a2dp offload codec failed with status 0x%02x (%s)",
+> +		       status, mgmt_errstr(status));
 > +		return;
+> +	}
 > +
-> +	cp = hci_sent_cmd_data(hdev, HCI_OP_LE_SET_PRIVACY_MODE);
-> +	if (!cp)
-> +		return;
+> +	DBG("MSFT a2dp offload codecs successfully set");
+
+we need to switch to using btd_debug or DBG_IDX to include the index number in the traces.
+
 > +
-> +	hci_dev_lock(hdev);
-> +
-> +	params = hci_conn_params_lookup(hdev, &cp->bdaddr, cp->bdaddr_type);
-> +	if (params)
-> +		params->privacy_mode = cp->mode;
-> +
-> +	hci_dev_unlock(hdev);
+> +	if (action)
+> +		queue_push_tail(adapter->exps,
+> +				(void *)msft_a2dp_offload_codecs_uuid.val);
 > +}
 > +
-> static void hci_cc_le_set_adv_enable(struct hci_dev *hdev, struct sk_buff *skb)
-> {
-> 	__u8 *sent, status = *((__u8 *) skb->data);
-> @@ -3812,6 +3837,10 @@ static void hci_cmd_complete_evt(struct hci_dev *hdev, struct sk_buff *skb,
-> 		hci_cc_le_read_transmit_power(hdev, skb);
-> 		break;
-> 
-> +	case HCI_OP_LE_SET_PRIVACY_MODE:
-> +		hci_cc_le_set_privacy_mode(hdev, skb);
-> +		break;
-> +
-> 	default:
-> 		BT_DBG("%s opcode 0x%4.4x", hdev->name, *opcode);
-> 		break;
-> diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-> index ad86caf41f91..08acd664590b 100644
-> --- a/net/bluetooth/hci_sync.c
-> +++ b/net/bluetooth/hci_sync.c
-> @@ -1580,8 +1580,42 @@ static int hci_le_add_resolve_list_sync(struct hci_dev *hdev,
-> 				     sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-> }
-> 
-> +/* Set Device Privacy Mode. */
-> +static int hci_le_set_privacy_mode_sync(struct hci_dev *hdev,
-> +					struct hci_conn_params *params)
+> +static void msft_a2dp_offload_func(struct btd_adapter *adapter, uint8_t action)
 > +{
-> +	struct hci_cp_le_set_privacy_mode cp;
-> +	struct smp_irk *irk;
+> +	struct mgmt_cp_set_exp_feature cp;
 > +
-> +	/* If device privacy mode has already been set there is nothing to do */
-> +	if (params->privacy_mode == HCI_DEVICE_PRIVACY)
-> +		return 0;
+> +	memset(&cp, 0, sizeof(cp));
+> +	memcpy(cp.uuid, msft_a2dp_offload_codecs_uuid.val, 16);
+> +	cp.action = action;
 > +
-> +	/* Set Privacy Mode requires the use of resolving list (aka. LL Privacy)
-> +	 * by default Network Mode is used so only really send the command if
-> +	 * Device Mode is required (HCI_CONN_FLAG_DEVICE_PRIVACY).
-> +	 */
-> +	if (!privacy_mode_capable(hdev) ||
-> +	    !hci_conn_test_flag(HCI_CONN_FLAG_DEVICE_PRIVACY,
-> +				params->current_flags))
-> +		return 0;
+> +	if (mgmt_send(adapter->mgmt, MGMT_OP_SET_EXP_FEATURE,
+> +		      adapter->dev_id, sizeof(cp), &cp,
+> +		      msft_a2dp_offload_complete, adapter, NULL) > 0)
+> +		return;
+> +
+> +	btd_error(adapter->dev_id, "Failed to set RPA Resolution");
+> +}
 
-does this also account for the fact that LL Privacy is behind an experimental option. I think in the previous patch it is more important to check if LL Privacy is actually enabled via experimental setting.
+We are no longer dealing with the blunt copy-and-paste mistakes, please do a proper review before sending any patch.
 
 Regards
 
