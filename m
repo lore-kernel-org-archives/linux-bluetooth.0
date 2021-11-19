@@ -2,155 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A54AAC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:39:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7E9F5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:41:11 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 9496B61283
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:39:38 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 66B4A61283
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:41:11 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236083AbhKSTmi (ORCPT
+        id S235324AbhKSToC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 14:42:38 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45790 "EHLO
+        Fri, 19 Nov 2021 14:44:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46102 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236047AbhKSTmg (ORCPT
+        with ESMTP id S235994AbhKSTnw (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 14:42:36 -0500
-Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75299C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:39:34 -0800 (PST)
-Received: by mail-ua1-x932.google.com with SMTP id t13so23368181uad.9
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:39:34 -0800 (PST)
+        Fri, 19 Nov 2021 14:43:52 -0500
+Received: from mail-vk1-xa35.google.com (mail-vk1-xa35.google.com [IPv6:2607:f8b0:4864:20::a35])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19F05C06173E
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:40:47 -0800 (PST)
+Received: by mail-vk1-xa35.google.com with SMTP id j1so6573392vkr.1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:40:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=MkztbDI+eaM9k0H1MIWK3V0FbajuuEYTQpE8Ux23bPU=;
-        b=CF3Dxgn8b5sz2wfFxsqaUH6Ey22ii3jDt7DT/gLzFTZNRmupsduqFlu65OLzp+Srqa
-         oGp5Z/NDX47BqCJCSLMncW3fnJrlTg49tnLs4f6yotRPhvWPf2SlEVWhoh34jtavYH2X
-         v32v0Tgm5wo7pXOZhIj+kjeClhsp6Ih+ynIBaLxF9djvmZgZYscKGjhOycGQhjSBGfy2
-         VRmbHt/WGSfSfwtVO7dsyxMMiCepbTlFtN26sOHXz0NtQGGQwgAdoHh6V7Ujy046qEjS
-         WTU/f84hYl/O2YZu7IpYs+zjijAqr9STq9yX5jEz8NK4KhQ9PoZxzA5ZLBi2GsbK7Ak8
-         GcRQ==
+         :cc;
+        bh=SmtLGkWgpK9Trsmaw0yWBVoQyG6pJWEIwY4tb8nm798=;
+        b=YTlkMips8EN63BUWsnLG6WaYt7p/nso+I+WSTbZ8DZrAkH2Kmr5Q5XBdqi+IHDmLLr
+         7UozbXzkavPnh/YnVX8wLX87rsfXsahWR9pjsi+AtAnZYPMnoU0y60Ye7o7VTa+ZxMtD
+         MVnO1WMJKJ5QAIekrjudZh4VzmlazXti/21QeeRW3iubSns/8m6gsB9XrPKimJWkPQFh
+         KtCsdKDOaUEcz3nosekg+lzBBTrdB7Su/bx0vGngmLWzA/Q7g8quVLySCHGw2fog6uCY
+         e0wfG9afHVu8Cq83lj6zaBLLWoad8MkPkd9bpzFbka/Dg5JWwD0mgwQDp+r3zRQF60bI
+         G9qQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=MkztbDI+eaM9k0H1MIWK3V0FbajuuEYTQpE8Ux23bPU=;
-        b=YYC4Eslhk3LB++RKVnaUDn5jazwTSi5NfkaNORgaYeI4h9oSRYMpldjqYcbk/NTUrU
-         krYEKluOhxZ7nFhxoYXpvtCEH53T5GAV3sSqmJejP6jK4YunPvOmSM9QPv0xiReCjIDU
-         HwMoyvQW93waSAhchuP1VxvxZIHblddTazfX8DJabw7RQp9GLXOFdG+ilXxLpHOwUE6N
-         NsEncYGuFa8H5j4A1y31zncm9OZj93j79gpNO5fgl12+pw4I3bx1vy99654F4LE4aG1o
-         icdFtcHMbUrcuPotAsRUcyjUCNwhN1Lr+VmzJyosUhIr+sdYw8dfwhfLXi6ADb1DJAHQ
-         M89A==
-X-Gm-Message-State: AOAM530LldQ4Dks0SzpWJQm+miGpco8YwACtWcsOG4jlFAklYgXCqORm
-        dSBk5edexOB/5bRvhp5TGWKRxxvapdWzBxK2OdiAupvf
-X-Google-Smtp-Source: ABdhPJz4KFB34avJsBZ27lGmVNVTL9o+oZggmz5oqvyUezfI9BtGXZXMCfKsiOKLPP8W5lLMvK1vOK3ral557T+vzwA=
-X-Received: by 2002:ab0:4465:: with SMTP id m92mr52552759uam.47.1637350773345;
- Fri, 19 Nov 2021 11:39:33 -0800 (PST)
+         :message-id:subject:to:cc;
+        bh=SmtLGkWgpK9Trsmaw0yWBVoQyG6pJWEIwY4tb8nm798=;
+        b=1GtZe/e6H2FucCejeytUZvMQAN841WZJl4zYLUNM/3RkaAaXGyB60sGMxNR22hPW4+
+         22LavOP1vrFv+h6Wy2lVYtfPiJ2P31mRjw0hYcxO/rbxIG3ovzfBsEduamaOTtouXP4W
+         jbmCW3fldK3FVOLAOfd5LknWO/rFd2mS8jYUQfoh6CyerfZh/F2lI2toVGUOcMAoB1hg
+         kRxCRJMq7mcYPiM/El+kY3aYMuVcvw8QtPFeSeuldcXO+ApFNJfm5eTz33S8qH1to5Tn
+         AsyUEG70hPfxRx6++W0Di3cGnCqvxz+UKeWij97LyFcnWVZzWeZdLthaB+Jrg2g59Hhp
+         iuqQ==
+X-Gm-Message-State: AOAM5315YxBNOKju7nx6ol7dEcEr8WO0BThKSODNumQZXuFBeaBrt6d2
+        Jxb4eFwQZp9bJB1QsGHNI4h4cREW5vcYMosU2ow=
+X-Google-Smtp-Source: ABdhPJwxDAAeGlBQ+0gpHnSiOnZWHXGcfUtcqrP3vQ4fKvGZR/ZMi3WUfJDZXT51tTLh9PhQCpliJ65dvNpMQIGISfQ=
+X-Received: by 2002:a05:6122:d05:: with SMTP id az5mr122353682vkb.9.1637350846152;
+ Fri, 19 Nov 2021 11:40:46 -0800 (PST)
 MIME-Version: 1.0
-References: <20211118231302.1000168-1-luiz.dentz@gmail.com> <BA3F20E5-3D85-4513-ADB2-B2F03163A1C6@holtmann.org>
-In-Reply-To: <BA3F20E5-3D85-4513-ADB2-B2F03163A1C6@holtmann.org>
+References: <20211117110627.BlueZ.v5.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+ <20211117110627.BlueZ.v5.6.I363090b80e59a3cda134c9bd2df0b3bca2cb527b@changeid>
+ <CABBYNZL994EW-=6xrknc3LK0sRv4pv7OReKiWzC3eF54MBK0xw@mail.gmail.com> <CAGPPCLB9KSDG1LFYeeKnPjtD001Q00PXgkRnh8Xz_9N=zB+mqg@mail.gmail.com>
+In-Reply-To: <CAGPPCLB9KSDG1LFYeeKnPjtD001Q00PXgkRnh8Xz_9N=zB+mqg@mail.gmail.com>
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 19 Nov 2021 11:39:22 -0800
-Message-ID: <CABBYNZ+vfSYHHddLCS2+tUKYHju4cf_NrFo7Ue8TJO1JBU7R1g@mail.gmail.com>
-Subject: Re: [PATCH v2 1/2] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY
- device flag
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Date:   Fri, 19 Nov 2021 11:40:35 -0800
+Message-ID: <CABBYNZJrV6w5=-FP7WPE9CytgNs+4sbTwV+iOF04N2u+CxYiuQ@mail.gmail.com>
+Subject: Re: [BlueZ PATCH v5 6/6] core: Update default advmon Sampling_Period
+ to 0xFF
+To:     Manish Mandlik <mmandlik@google.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        ChromeOS Bluetooth Upstreaming 
+        <chromeos-bluetooth-upstreaming@chromium.org>,
+        Miao-chen Chou <mcchou@google.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Marcel,
+Hi Manish,
 
-On Fri, Nov 19, 2021 at 2:01 AM Marcel Holtmann <marcel@holtmann.org> wrote=
-:
+On Fri, Nov 19, 2021 at 11:06 AM Manish Mandlik <mmandlik@google.com> wrote:
 >
 > Hi Luiz,
 >
-> > This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
-> > userspace to indicate to the controller to use Device Privacy Mode to a
-> > specific device.
-> >
-> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> > ---
-> > v2: Fix supported flags not actually checking if the hdev really
-> > supports the flags.
-> >
-> > include/net/bluetooth/hci_core.h |  4 ++++
-> > net/bluetooth/mgmt.c             | 30 ++++++++++++++++++++++++++----
-> > 2 files changed, 30 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index 2560cfe80db8..42ba40df6e20 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -160,6 +160,7 @@ struct bdaddr_list_with_flags {
-> >
-> > enum hci_conn_flags {
-> >       HCI_CONN_FLAG_REMOTE_WAKEUP,
-> > +     HCI_CONN_FLAG_DEVICE_PRIVACY,
-> >       HCI_CONN_FLAG_MAX
-> > };
-> >
-> > @@ -1465,6 +1466,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
-> > #define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
-> >                            hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY=
-))
-> >
-> > +#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
-> > +                                (hdev->commands[39] & 0x04))
-> > +
-> > /* Use enhanced synchronous connection if command is supported */
-> > #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
-> >
-> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> > index f8f74d344297..d82d1a62754a 100644
-> > --- a/net/bluetooth/mgmt.c
-> > +++ b/net/bluetooth/mgmt.c
-> > @@ -4349,7 +4349,22 @@ static int set_exp_feature(struct sock *sk, stru=
-ct hci_dev *hdev,
-> >                              MGMT_STATUS_NOT_SUPPORTED);
-> > }
-> >
-> > -#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
-> > +static u32 supported_device_flags(struct hci_dev *hdev)
-> > +{
-> > +     u32 flags =3D 0;
-> > +
-> > +     /* Check if adapter can wakeup the system */
-> > +     if (hdev->wakeup && hdev->wakeup(hdev))
-> > +             flags |=3D BIT(HCI_CONN_FLAG_REMOTE_WAKEUP);
 >
-> I would do this change as a separate patch since it has nothing to do wit=
-h the device privacy setting.
-
-Will do.
-
-> Do we have to call hdev->wakeup() as well here? Isn=E2=80=99t the existen=
-ce of the callback enough indication.
-
-Hmm, right I guess we want to know if the driver is capable of waking
-up, not that it is actually enabled at that point since we are
-evaluating if it is supported. I will change that.
-
-> That also said, doesn=E2=80=99t it make sense to store the supported_flag=
-s in the device params struct. It would make it certainly easy to return. P=
-otentially we have a few calls to Get Device Flags and its notifications th=
-at have to rebuild this flags field over and over again.
-
-But we only perform a lookup, so in case there are no hci_conn_params
-we would have to store it somewhere else, perhaps in hci_dev?
-
-> Regards
+> On Wed, Nov 17, 2021 at 4:09 PM Luiz Augusto von Dentz <luiz.dentz@gmail.com> wrote:
+>>
+>> Hi Manish,
+>>
+>> On Wed, Nov 17, 2021 at 11:15 AM Manish Mandlik <mmandlik@google.com> wrote:
+>> >
+>> > Update default Advertisemet Monitor Sampling_Period to 0xFF. It
+>> > indicates that controller will report only one advertisement per
+>> > monitoring period for a device. This will help reduce the power
+>> > consumption drastically.
+>> >
+>> > Reviewed-by: Miao-chen Chou <mcchou@google.com>
+>> > ---
+>> >
+>> > Changes in v5:
+>> > - New patch in the series. Update default Sampling_Period to 0xFF.
+>> >
+>> >  src/main.c    | 2 +-
+>> >  src/main.conf | 2 +-
+>> >  2 files changed, 2 insertions(+), 2 deletions(-)
+>> >
+>> > diff --git a/src/main.c b/src/main.c
+>> > index 5ca8d5644..1f852fdf6 100644
+>> > --- a/src/main.c
+>> > +++ b/src/main.c
+>> > @@ -932,7 +932,7 @@ static void init_defaults(void)
+>> >         btd_opts.avdtp.session_mode = BT_IO_MODE_BASIC;
+>> >         btd_opts.avdtp.stream_mode = BT_IO_MODE_BASIC;
+>> >
+>> > -       btd_opts.advmon.rssi_sampling_period = 0;
+>> > +       btd_opts.advmon.rssi_sampling_period = 0xFF;
+>> >  }
+>> >
+>> >  static void log_handler(const gchar *log_domain, GLogLevelFlags log_level,
+>> > diff --git a/src/main.conf b/src/main.conf
+>> > index e05291d8e..e49259453 100644
+>> > --- a/src/main.conf
+>> > +++ b/src/main.conf
+>> > @@ -260,5 +260,5 @@
+>> >  [AdvMon]
+>> >  # Default RSSI Sampling Period. This is used when a client registers an
+>> >  # advertisement monitor and leaves the RSSISamplingPeriod unset.
+>> > -# Default: 0
+>> > +# Default: 0xFF (Report only one Adv per device during the monitoring period)
+>> >  #RSSISamplingPeriod=0
+>>
+>> While at it it would be good to explain what is the unit used here,
+>> also it is common practice to have the default on the commented entry.
 >
-> Marcel
+> Ack. I'll update this in the next revision.
 >
+>>
+>>
+>> > --
+>> > 2.34.0.rc1.387.gb447b232ab-goog
+>> >
+>>
+>>
+>> --
+>> Luiz Augusto von Dentz
+>
+>
+> Can you please review the other patches as well and let me know if they look good? I'll send all the required changes in the next revision together.
+
+Other patches look good.
 
 
---=20
+-- 
 Luiz Augusto von Dentz
