@@ -2,146 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 175AAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 09:55:42 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3005DC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:01:04 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id E8B8860273
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 09:55:41 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id F3E0D61B1E
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 10:01:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230064AbhKSJ6m (ORCPT
+        id S229879AbhKSKEE convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 04:58:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53308 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229457AbhKSJ6m (ORCPT
+        Fri, 19 Nov 2021 05:04:04 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:40478 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229501AbhKSKEE (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 04:58:42 -0500
-Received: from mail-qk1-x731.google.com (mail-qk1-x731.google.com [IPv6:2607:f8b0:4864:20::731])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5582C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 01:55:40 -0800 (PST)
-Received: by mail-qk1-x731.google.com with SMTP id q64so9647215qkd.5
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 01:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=AVqbds9IezGl6tDiRuRiKBggmNETQ8geRa0Ho/LVOnk=;
-        b=bsNDQNPu8GEooLJIv3xbmlbEJCi6KWimLJHMY/tuR24bRSjkYpT+zkkqeQWfMdWYZB
-         5cy1IhbpU7cvHSzfLTNWZFzlr615jqRTjOK/YymRIhsYrmmv3vF9YEjZ41HD6Pbsv4tU
-         Q07vOEOluJiYcsKzSHPFOzfHXpRvgee5o+WvOPmhhIS2KP99Snolus+It93zBSspkRih
-         EPLoCHelQVZYIK8MkZrY6y/qLWWfKmgJlwr5k6xrbm8IqBD7GQkk8I8pHBIrVdRplzeR
-         aJUPDrRxJ5E65t5CEw2g/aJKg1fAxcIouoHeFTbLMkECRnbOeLl3pjgugQHYo6hL2PIL
-         6HlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=AVqbds9IezGl6tDiRuRiKBggmNETQ8geRa0Ho/LVOnk=;
-        b=i+/nk7BORyDt1/5pFjZ7vlszoxrTdc1PU4EKDFsPGUutEnUPCsGPL71eaeeyNgG1Sn
-         c1MJfLzOJkld6o2wDJNMO8vdS+wQp/kZ2LWySd3tO9owYdTqkknukUEs82wV0sbznbfO
-         7rIzduYJfokQPBFflGNyq/BzSC56u/xYLjhmExCc8nDUF3P/rPypRTLJ0blO9heKt03D
-         YpQNUDofw/DmSTqR8/Us6uEK2hx7djWjTIVuxVMtX9GahhE9EIkX6gZKaBNqsCKEEja5
-         qOIec+agHnhT1q8sGLd5ikbjT13F13KP9uvSxblVbCLZHuHb/k1/GHqhnWBwzlqfew4R
-         xFEw==
-X-Gm-Message-State: AOAM531K3JORS0fHsYmDeP1IwnY5p/8CuGP2UrsXelFka0AD2hyZj6/8
-        E8zqkG6CVzE0phHlZ6lGCdVnMgN3zGj4NqZZ
-X-Google-Smtp-Source: ABdhPJx8p2ubO4/9ez3HiHViAa9VFwGZdluQ4kV7LCpz8UyBTt0IEoIqVCpIdsGbxfPWHqiYzZgqmg==
-X-Received: by 2002:a37:f619:: with SMTP id y25mr26827836qkj.201.1637315739234;
-        Fri, 19 Nov 2021 01:55:39 -0800 (PST)
-Received: from [172.17.0.2] ([20.119.217.120])
-        by smtp.gmail.com with ESMTPSA id t15sm1332270qta.45.2021.11.19.01.55.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 01:55:38 -0800 (PST)
-Message-ID: <6197749a.1c69fb81.b8201.8248@mx.google.com>
-Date:   Fri, 19 Nov 2021 01:55:38 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============5731389825600000469=="
-MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, kiran.k@intel.com
-Subject: RE: [v2,1/9] adapter: Enable MSFT a2dp offload codec when Experimental is set
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211119094235.2432-1-kiran.k@intel.com>
-References: <20211119094235.2432-1-kiran.k@intel.com>
+        Fri, 19 Nov 2021 05:04:04 -0500
+Received: from smtpclient.apple (p4fefc15c.dip0.t-ipconnect.de [79.239.193.92])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 13197CED22;
+        Fri, 19 Nov 2021 11:01:02 +0100 (CET)
+Content-Type: text/plain;
+        charset=utf-8
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
+Subject: Re: [PATCH v2 1/2] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY
+ device flag
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <20211118231302.1000168-1-luiz.dentz@gmail.com>
+Date:   Fri, 19 Nov 2021 11:01:01 +0100
+Cc:     linux-bluetooth@vger.kernel.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <BA3F20E5-3D85-4513-ADB2-B2F03163A1C6@holtmann.org>
+References: <20211118231302.1000168-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============5731389825600000469==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+Hi Luiz,
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NTgyOTQ1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBGQUlMICAgICAgMTMuNDUgc2Vjb25kcwpHaXRMaW50ICAgICAgICAgICAgICAgICAgICAgICBQ
-QVNTICAgICAgOC45NyBzZWNvbmRzClByZXAgLSBTZXR1cCBFTEwgICAgICAgICAgICAgIFBBU1Mg
-ICAgICA0MS42MiBzZWNvbmRzCkJ1aWxkIC0gUHJlcCAgICAgICAgICAgICAgICAgIFBBU1MgICAg
-ICAwLjY1IHNlY29uZHMKQnVpbGQgLSBDb25maWd1cmUgICAgICAgICAgICAgUEFTUyAgICAgIDcu
-OTEgc2Vjb25kcwpCdWlsZCAtIE1ha2UgICAgICAgICAgICAgICAgICBGQUlMICAgICAgMTM4Ljkz
-IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDEuNjYgc2Vj
-b25kcwpNYWtlIERpc3RjaGVjayAgICAgICAgICAgICAgICBQQVNTICAgICAgMjE3LjMzIHNlY29u
-ZHMKQnVpbGQgdy9leHQgRUxMIC0gQ29uZmlndXJlICAgUEFTUyAgICAgIDguMTMgc2Vjb25kcwpC
-dWlsZCB3L2V4dCBFTEwgLSBNYWtlICAgICAgICBGQUlMICAgICAgMTI3LjM1IHNlY29uZHMKCkRl
-dGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IENoZWNrUGF0Y2ggLSBG
-QUlMCkRlc2M6IFJ1biBjaGVja3BhdGNoLnBsIHNjcmlwdCB3aXRoIHJ1bGUgaW4gLmNoZWNrcGF0
-Y2guY29uZgpPdXRwdXQ6Clt2MiwxLzldIGFkYXB0ZXI6IEVuYWJsZSBNU0ZUIGEyZHAgb2ZmbG9h
-ZCBjb2RlYyB3aGVuIEV4cGVyaW1lbnRhbCBpcyBzZXQKV0FSTklORzpMT05HX0xJTkVfU1RSSU5H
-OiBsaW5lIGxlbmd0aCBvZiA4MyBleGNlZWRzIDgwIGNvbHVtbnMKIzg5OiBGSUxFOiBzcmMvYWRh
-cHRlci5jOjk4MDY6CisJCWVycm9yKCJTZXQgTVNGVCBhMmRwIG9mZmxvYWQgY29kZWMgZmFpbGVk
-IHdpdGggc3RhdHVzIDB4JTAyeCAoJXMpIiwKCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjYyODU1
-MS5wYXRjaCB0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDc1IGxpbmVzIGNoZWNrZWQKCk5P
-VEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBh
-YmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVz
-aW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvMTI2Mjg1
-NTEucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3Jl
-ZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVD
-VCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9M
-SUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9m
-IHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KClt2Miw2
-LzldIGF2ZHRwOiBBZGQgc3VwcG9ydCBmb3Igb2ZmbG9hZCBNU0ZUIG9wZW4gY29tbWFuZApXQVJO
-SU5HOlBSRUZFUl9ERUZJTkVEX0FUVFJJQlVURV9NQUNSTzogUHJlZmVyIF9fcGFja2VkIG92ZXIg
-X19hdHRyaWJ1dGVfXygocGFja2VkKSkKIzcyOiBGSUxFOiBsaWIvYmx1ZXRvb3RoLmg6MTY2Ogor
-fSBfX2F0dHJpYnV0ZV9fKChwYWNrZWQpKTsKCi9naXRodWIvd29ya3NwYWNlL3NyYy8xMjYyODU2
-MS5wYXRjaCB0b3RhbDogMCBlcnJvcnMsIDEgd2FybmluZ3MsIDcxIGxpbmVzIGNoZWNrZWQKCk5P
-VEU6IEZvciBzb21lIG9mIHRoZSByZXBvcnRlZCBkZWZlY3RzLCBjaGVja3BhdGNoIG1heSBiZSBh
-YmxlIHRvCiAgICAgIG1lY2hhbmljYWxseSBjb252ZXJ0IHRvIHRoZSB0eXBpY2FsIHN0eWxlIHVz
-aW5nIC0tZml4IG9yIC0tZml4LWlucGxhY2UuCgovZ2l0aHViL3dvcmtzcGFjZS9zcmMvMTI2Mjg1
-NjEucGF0Y2ggaGFzIHN0eWxlIHByb2JsZW1zLCBwbGVhc2UgcmV2aWV3LgoKTk9URTogSWdub3Jl
-ZCBtZXNzYWdlIHR5cGVzOiBDT01NSVRfTUVTU0FHRSBDT01QTEVYX01BQ1JPIENPTlNUX1NUUlVD
-VCBGSUxFX1BBVEhfQ0hBTkdFUyBNSVNTSU5HX1NJR05fT0ZGIFBSRUZFUl9QQUNLRUQgU1BEWF9M
-SUNFTlNFX1RBRyBTUExJVF9TVFJJTkcgU1NDQU5GX1RPX0tTVFJUTwoKTk9URTogSWYgYW55IG9m
-IHRoZSBlcnJvcnMgYXJlIGZhbHNlIHBvc2l0aXZlcywgcGxlYXNlIHJlcG9ydAogICAgICB0aGVt
-IHRvIHRoZSBtYWludGFpbmVyLCBzZWUgQ0hFQ0tQQVRDSCBpbiBNQUlOVEFJTkVSUy4KCgojIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogQnVpbGQgLSBNYWtlIC0gRkFJTApEZXNj
-OiBCdWlsZCB0aGUgQmx1ZVogc291cmNlIHRyZWUKT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0
-cC5jOiBJbiBmdW5jdGlvbiDigJhhdmR0cF9uZXfigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6
-MjQ3Nzo4OiBlcnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmHVzZV9vZmZsb2Fk4oCZIFstV2Vycm9y
-PXVudXNlZC12YXJpYWJsZV0KIDI0NzcgfCAgY2hhciAqdXNlX29mZmxvYWQ7CiAgICAgIHwgICAg
-ICAgIF5+fn5+fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3Jz
-Cm1ha2VbMV06ICoqKiBbTWFrZWZpbGU6ODY0MDogcHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1h
-dmR0cC5vXSBFcnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6NDE3NTogYWxsXSBFcnJvciAyCgoK
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IE1ha2UgQ2hlY2sgLSBGQUlMCkRl
-c2M6IFJ1biAnbWFrZSBjaGVjaycKT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0cC5jOiBJbiBm
-dW5jdGlvbiDigJhhdmR0cF9uZXfigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MjQ3Nzo4OiBl
-cnJvcjogdW51c2VkIHZhcmlhYmxlIOKAmHVzZV9vZmZsb2Fk4oCZIFstV2Vycm9yPXVudXNlZC12
-YXJpYWJsZV0KIDI0NzcgfCAgY2hhciAqdXNlX29mZmxvYWQ7CiAgICAgIHwgICAgICAgIF5+fn5+
-fn5+fn5+CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06
-ICoqKiBbTWFrZWZpbGU6ODY0MDogcHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1hdmR0cC5vXSBF
-cnJvciAxCm1ha2U6ICoqKiBbTWFrZWZpbGU6MTA1MDE6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIHcvZXh0IEVMTCAtIE1ha2UgLSBG
-QUlMCkRlc2M6IEJ1aWxkIEJsdWVaIHNvdXJjZSB3aXRoICctLWVuYWJsZS1leHRlcm5hbC1lbGwn
-IGNvbmZpZ3VyYXRpb24KT3V0cHV0Ogpwcm9maWxlcy9hdWRpby9hdmR0cC5jOiBJbiBmdW5jdGlv
-biDigJhhdmR0cF9uZXfigJk6CnByb2ZpbGVzL2F1ZGlvL2F2ZHRwLmM6MjQ3Nzo4OiBlcnJvcjog
-dW51c2VkIHZhcmlhYmxlIOKAmHVzZV9vZmZsb2Fk4oCZIFstV2Vycm9yPXVudXNlZC12YXJpYWJs
-ZV0KIDI0NzcgfCAgY2hhciAqdXNlX29mZmxvYWQ7CiAgICAgIHwgICAgICAgIF5+fn5+fn5+fn5+
-CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBb
-TWFrZWZpbGU6ODY0MDogcHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1hdmR0cC5vXSBFcnJvciAx
-Cm1ha2U6ICoqKiBbTWFrZWZpbGU6NDE3NTogYWxsXSBFcnJvciAyCgoKCgotLS0KUmVnYXJkcywK
-TGludXggQmx1ZXRvb3RoCgo=
+> This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
+> userspace to indicate to the controller to use Device Privacy Mode to a
+> specific device.
+> 
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
+> v2: Fix supported flags not actually checking if the hdev really
+> supports the flags.
+> 
+> include/net/bluetooth/hci_core.h |  4 ++++
+> net/bluetooth/mgmt.c             | 30 ++++++++++++++++++++++++++----
+> 2 files changed, 30 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+> index 2560cfe80db8..42ba40df6e20 100644
+> --- a/include/net/bluetooth/hci_core.h
+> +++ b/include/net/bluetooth/hci_core.h
+> @@ -160,6 +160,7 @@ struct bdaddr_list_with_flags {
+> 
+> enum hci_conn_flags {
+> 	HCI_CONN_FLAG_REMOTE_WAKEUP,
+> +	HCI_CONN_FLAG_DEVICE_PRIVACY,
+> 	HCI_CONN_FLAG_MAX
+> };
+> 
+> @@ -1465,6 +1466,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+> #define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
+> 			     hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY))
+> 
+> +#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
+> +				   (hdev->commands[39] & 0x04))
+> +
+> /* Use enhanced synchronous connection if command is supported */
+> #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
+> 
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index f8f74d344297..d82d1a62754a 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4349,7 +4349,22 @@ static int set_exp_feature(struct sock *sk, struct hci_dev *hdev,
+> 			       MGMT_STATUS_NOT_SUPPORTED);
+> }
+> 
+> -#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
+> +static u32 supported_device_flags(struct hci_dev *hdev)
+> +{
+> +	u32 flags = 0;
+> +
+> +	/* Check if adapter can wakeup the system */
+> +	if (hdev->wakeup && hdev->wakeup(hdev))
+> +		flags |= BIT(HCI_CONN_FLAG_REMOTE_WAKEUP);
 
---===============5731389825600000469==--
+I would do this change as a separate patch since it has nothing to do with the device privacy setting.
+
+Do we have to call hdev->wakeup() as well here? Isn’t the existence of the callback enough indication.
+
+That also said, doesn’t it make sense to store the supported_flags in the device params struct. It would make it certainly easy to return. Potentially we have a few calls to Get Device Flags and its notifications that have to rebuild this flags field over and over again.
+
+Regards
+
+Marcel
+
