@@ -2,147 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from mail.kernel.org (mail.kernel.org [198.145.29.99])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BBCC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 16:59:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A54AAC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:39:38 +0000 (UTC)
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by mail.kernel.org (Postfix) with ESMTP id 05B3661A3A
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 16:59:40 +0000 (UTC)
+	by mail.kernel.org (Postfix) with ESMTP id 9496B61283
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 19:39:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236354AbhKSRCk (ORCPT
+        id S236083AbhKSTmi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 12:02:40 -0500
-Received: from mail-bo1ind01olkn0168.outbound.protection.outlook.com ([104.47.101.168]:7890
-        "EHLO IND01-BO1-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234030AbhKSRCj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 12:02:39 -0500
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ESq7YlKXl+EmAB4cMPti7xf/8xlYUZ6jL1JCObWXJn2yWDpFhyEn83AgH0RCR1fSwY9gSdQZTIiKEEJAVUoLPC52lxPHLSCIRZljk8CpPukGC8TDRTSOMpiMvlOaJHLMTE8wLeXFfkcT0nOI+tSrfkabxU1vir6C8psf72SJ/k96nO2u+PwIXknWS2fcDG4NMhCugGfc2SXOeDIqwyWoGg6C/8NkleksNIgEGuKdEjbzTOnCnuzkbRTbjyZEtwcPR8GQ3xwvspvKeYS0TfUh5QMKbBVU92LWqFjEft/WXCN7HoFJaU+o8SuJrMZnERGo5Hxr9/oxr1HZfUzmbgGtHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=u1WZ20gIs8SqMhtqEtCg+PkcoYpk9zK+UKo58u2vcP4=;
- b=cbBTU1/HmsnYi6ArfivJ/sWX5rnzGEsCj1kyLY5UQXlOmtk3lsPQGOHvZtnd537pyXW4QWnCMNbRVQQTKsY52GkRrQfKvnmhfoBnZq6a+62VwPsgLUqgZGr6O8mdD7g9FSFlvlV2mCy74AgjATurro+RMrkwsXAF1oePMblL8jQ8giEfJ0l760gT6X3zec87TX9eVmRMquRgJmhbKKvqOPN0twdt+RNhFRQ5peOf4AdqZrYonC8f15CnBXaUmnyaZ7M5shpPLm6wLdC2a2f63pzCBYjSeI+EbUpyupdzxPA9DyYS2Rjs4Yz1LUkjIcGj7B7KwgfvejoJyAbE3Tc8eg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=u1WZ20gIs8SqMhtqEtCg+PkcoYpk9zK+UKo58u2vcP4=;
- b=awyORlJMJA3OXf1/Cc3Px6d8T/zrmImSSqNLrS5VwkGZQ5DxlltWAKw008vf+9SlW8ycXO2tzXARlEjSHxwHc71zCBzVRqOCrHF6cHhqk6WqQFZSI8U8sywuD6RexN2JeRWx81imexWEaWMgkdKOPcTT0OIY6Q1oykyKKPumFs6L7sQ59f66dMeJiF6U121Z+fILlPIWSOuI3608udbY+UWTO3IzY7Qn2o2MVT055qZei6YOAaKra46ucavP/gEHWgf/7UPrBe2PjatPQgn+X0vvCWjDTE/Oi3VJ241Mrkc2wN7GjNQvvtg4wtCpB/9Mqk8rwoK+gNIsj89Z/6NxwQ==
-Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:1b::13)
- by PN2PR01MB5256.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:5a::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4713.19; Fri, 19 Nov
- 2021 16:59:32 +0000
-Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::cdc4:def5:dc73:28f7]) by PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
- ([fe80::cdc4:def5:dc73:28f7%7]) with mapi id 15.20.4690.029; Fri, 19 Nov 2021
- 16:59:32 +0000
-From:   Aditya Garg <gargaditya08@live.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-CC:     Orlando Chamberlain <redecorating@protonmail.com>,
-        Thorsten Leemhuis <regressions@leemhuis.info>,
-        Daniel Winkler <danielwinkler@google.com>,
-        Greg KH <gregkh@linuxfoundation.org>,
-        Johan Hedberg <johan.hedberg@intel.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-        "sonnysasaka@chromium.org" <sonnysasaka@chromium.org>
-Subject: Re: [PATCHv2] Bluetooth: quirk disabling LE Read Transmit Power
-Thread-Topic: [PATCHv2] Bluetooth: quirk disabling LE Read Transmit Power
-Thread-Index: AQHX0vJ15A6zQVMGfEiNGmUN6kF0hKv3vuGAgA4gSACAAAxJAIAABrOAgAEuUwCAAEInAIAAIdSAgAAEmwCAADPsAIAAaCCAgAMCoIA=
-Date:   Fri, 19 Nov 2021 16:59:32 +0000
-Message-ID: <40550C00-4EE5-480F-AFD4-A2ACA01F9DBB@live.com>
-References: <20211001083412.3078-1-redecorating@protonmail.com>
- <YYePw07y2DzEPSBR@kroah.com>
- <70a875d0-7162-d149-dbc1-c2f5e1a8e701@leemhuis.info>
- <20211116090128.17546-1-redecorating@protonmail.com>
- <e75bf933-9b93-89d2-d73f-f85af65093c8@leemhuis.info>
- <3B8E16FA-97BF-40E5-9149-BBC3E2A245FE@live.com> <YZSuWHB6YCtGclLs@kroah.com>
- <52DEDC31-EEB2-4F39-905F-D5E3F2BBD6C0@live.com>
- <8919a36b-e485-500a-2722-529ffa0d2598@leemhuis.info>
- <20211117124717.12352-1-redecorating@protonmail.com>
- <F8D12EA8-4B37-4887-998E-DC0EBE60E730@holtmann.org>
-In-Reply-To: <F8D12EA8-4B37-4887-998E-DC0EBE60E730@holtmann.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach: 
-X-MS-TNEF-Correlator: 
-x-ms-exchange-messagesentrepresentingtype: 1
-x-tmn:  [Dq6e8ab1WhxuAnggjNla7NOSUdljpyA3zCPAilLa/8ZcZHCG9wHjuO1S2v+HbGA5]
-x-ms-publictraffictype: Email
-x-ms-office365-filtering-correlation-id: bb3f7af7-d8d2-459f-330a-08d9ab7df56e
-x-ms-traffictypediagnostic: PN2PR01MB5256:
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: F2VFo6sabM8eZcnNkec+2SuJ0Xxd6AyIu+qGDQCjrPev7doF5Sz7OZCMYD7V9V/eFGGymv7M74BpQ709Spj9Ct2tAVXBLDB5wYLDeNFzE1kgAUJYJEYUlmF8LK+P6eIYPgZ4lFAIWVmjrzvmGeD72MmSF9Sq9Rf73Dzou5kUajqUCaM60N+nTAOaJOwzOAIgkOWvXea+W3aL+qfBJyS5OLHMQ4ZdzkwYo0sqAOLcmIoTyBQzgD1yag4+sEAi83JK08n4l9PT9wvrUYriTOGm3T45ds4X7xSwTHtQdMxi7kcADSGMbfKcr8yqBRyXYxkeYbGBqjzovcx05ITH8K+9ldqbbC1Ig5e70DZH29qaYEsO4IJkxcXzd21WGztwF47fu7Rr7BWNeAAGXKpAjDpqafZdviail70W5HerfJxqLx8qkD6aK+Rj0yGIMh0n8WsNkgXr8fC4j2C1p5OLXgsI9wnwjEx1D0aJdDL2g6XxazwMTwLjC5cbCBiPV55vg8HL5PRyHb7PVfVnLebX2J2zTeR+mGprYud74hfiePhi5IBA2cpSto7ud3zd0I1bkl5e9rgIvpJAyLeEwhkWprg+eQ==
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: IICF0/hyHBwiYvHKd2HOnG9uGguQlcKAR2ZyLXQ1BRIw3P3lVTwLsqStUe8AEhfaFRuZ3srx6XJjTxHugNVN7cBhYmC47VUp2AD7fnHWslLdvHCQiPRSczmBtRjgCbvyNfly7W7ucmNtjo3Ja+trOjwnnvfPUZ4PSJXC4VVMgXffa+vbOeSW1HnDn4a69i2928lE3TP7GjCvmvY2ovXmGmKVUUCC+l5iQKGASaSIvZaKqlwkEJzorpWLJrpeFFpl4EDwNUj6VwjepbgTTuSgU6gEN67cHFHtWx5aQv9lJb5AsfHi5U8cYBu0Z5UAYMxO1YE4gVlBNCueygRTNf2ugmFDrFTyztL9IdT8iNkGBPFO4Q1qy0jJ2NWFQPW+wgjjfz0AJlguy4NR0N/tEHlvne0AXT37y5uvlFvsQbf6gz30YVkDUvxjgmGoMEqK3WZ4DkTEakmiDRiX20XsyFSuNJuap4laXHbmMnQM8chsR5aEkPmDZbTdtgRVrP4VMEN+Aqt8ZHcCYOdfio53cV5pRw1zGnqjW7je23QvPneHYsglx7UQDETDCYSpRpKV24I9GztUPwS3/6zUk6iB7cBGK+iy+RCBW2fD0fHvXe57vVCOx/bT6cZWBUptu2aPEZbVL1LIlUmfgjpfvZkO2jl2Ye4lVWeZgfVW2zhpuqANf6Ag6MJqxApwiURHg7DOqWvOC1GUvO8nfWqKkomWjGNEwqPCn1mPVMM3dXQBR0BPMuXWGjE+WD+fqPVTgjIO7/eaQcZzarFwJL5JVSDmz7Q69Q==
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <E0631C0AB96C4D4BB50251C598AB6F99@INDPRD01.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: quoted-printable
+        Fri, 19 Nov 2021 14:42:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45790 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236047AbhKSTmg (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 19 Nov 2021 14:42:36 -0500
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 75299C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:39:34 -0800 (PST)
+Received: by mail-ua1-x932.google.com with SMTP id t13so23368181uad.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 11:39:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=MkztbDI+eaM9k0H1MIWK3V0FbajuuEYTQpE8Ux23bPU=;
+        b=CF3Dxgn8b5sz2wfFxsqaUH6Ey22ii3jDt7DT/gLzFTZNRmupsduqFlu65OLzp+Srqa
+         oGp5Z/NDX47BqCJCSLMncW3fnJrlTg49tnLs4f6yotRPhvWPf2SlEVWhoh34jtavYH2X
+         v32v0Tgm5wo7pXOZhIj+kjeClhsp6Ih+ynIBaLxF9djvmZgZYscKGjhOycGQhjSBGfy2
+         VRmbHt/WGSfSfwtVO7dsyxMMiCepbTlFtN26sOHXz0NtQGGQwgAdoHh6V7Ujy046qEjS
+         WTU/f84hYl/O2YZu7IpYs+zjijAqr9STq9yX5jEz8NK4KhQ9PoZxzA5ZLBi2GsbK7Ak8
+         GcRQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=MkztbDI+eaM9k0H1MIWK3V0FbajuuEYTQpE8Ux23bPU=;
+        b=YYC4Eslhk3LB++RKVnaUDn5jazwTSi5NfkaNORgaYeI4h9oSRYMpldjqYcbk/NTUrU
+         krYEKluOhxZ7nFhxoYXpvtCEH53T5GAV3sSqmJejP6jK4YunPvOmSM9QPv0xiReCjIDU
+         HwMoyvQW93waSAhchuP1VxvxZIHblddTazfX8DJabw7RQp9GLXOFdG+ilXxLpHOwUE6N
+         NsEncYGuFa8H5j4A1y31zncm9OZj93j79gpNO5fgl12+pw4I3bx1vy99654F4LE4aG1o
+         icdFtcHMbUrcuPotAsRUcyjUCNwhN1Lr+VmzJyosUhIr+sdYw8dfwhfLXi6ADb1DJAHQ
+         M89A==
+X-Gm-Message-State: AOAM530LldQ4Dks0SzpWJQm+miGpco8YwACtWcsOG4jlFAklYgXCqORm
+        dSBk5edexOB/5bRvhp5TGWKRxxvapdWzBxK2OdiAupvf
+X-Google-Smtp-Source: ABdhPJz4KFB34avJsBZ27lGmVNVTL9o+oZggmz5oqvyUezfI9BtGXZXMCfKsiOKLPP8W5lLMvK1vOK3ral557T+vzwA=
+X-Received: by 2002:ab0:4465:: with SMTP id m92mr52552759uam.47.1637350773345;
+ Fri, 19 Nov 2021 11:39:33 -0800 (PST)
 MIME-Version: 1.0
-X-OriginatorOrg: sct-15-20-3174-20-msonline-outlook-a1a1a.templateTenant
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: bb3f7af7-d8d2-459f-330a-08d9ab7df56e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 19 Nov 2021 16:59:32.5073
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN2PR01MB5256
+References: <20211118231302.1000168-1-luiz.dentz@gmail.com> <BA3F20E5-3D85-4513-ADB2-B2F03163A1C6@holtmann.org>
+In-Reply-To: <BA3F20E5-3D85-4513-ADB2-B2F03163A1C6@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 19 Nov 2021 11:39:22 -0800
+Message-ID: <CABBYNZ+vfSYHHddLCS2+tUKYHju4cf_NrFo7Ue8TJO1JBU7R1g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/2] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY
+ device flag
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
+Hi Marcel,
 
+On Fri, Nov 19, 2021 at 2:01 AM Marcel Holtmann <marcel@holtmann.org> wrote=
+:
+>
+> Hi Luiz,
+>
+> > This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
+> > userspace to indicate to the controller to use Device Privacy Mode to a
+> > specific device.
+> >
+> > Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> > ---
+> > v2: Fix supported flags not actually checking if the hdev really
+> > supports the flags.
+> >
+> > include/net/bluetooth/hci_core.h |  4 ++++
+> > net/bluetooth/mgmt.c             | 30 ++++++++++++++++++++++++++----
+> > 2 files changed, 30 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
+ci_core.h
+> > index 2560cfe80db8..42ba40df6e20 100644
+> > --- a/include/net/bluetooth/hci_core.h
+> > +++ b/include/net/bluetooth/hci_core.h
+> > @@ -160,6 +160,7 @@ struct bdaddr_list_with_flags {
+> >
+> > enum hci_conn_flags {
+> >       HCI_CONN_FLAG_REMOTE_WAKEUP,
+> > +     HCI_CONN_FLAG_DEVICE_PRIVACY,
+> >       HCI_CONN_FLAG_MAX
+> > };
+> >
+> > @@ -1465,6 +1466,9 @@ void hci_conn_del_sysfs(struct hci_conn *conn);
+> > #define use_ll_privacy(dev) (ll_privacy_capable(dev) && \
+> >                            hci_dev_test_flag(dev, HCI_ENABLE_LL_PRIVACY=
+))
+> >
+> > +#define privacy_mode_capable(dev) (use_ll_privacy(dev) && \
+> > +                                (hdev->commands[39] & 0x04))
+> > +
+> > /* Use enhanced synchronous connection if command is supported */
+> > #define enhanced_sco_capable(dev) ((dev)->commands[29] & 0x08)
+> >
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index f8f74d344297..d82d1a62754a 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -4349,7 +4349,22 @@ static int set_exp_feature(struct sock *sk, stru=
+ct hci_dev *hdev,
+> >                              MGMT_STATUS_NOT_SUPPORTED);
+> > }
+> >
+> > -#define SUPPORTED_DEVICE_FLAGS() ((1U << HCI_CONN_FLAG_MAX) - 1)
+> > +static u32 supported_device_flags(struct hci_dev *hdev)
+> > +{
+> > +     u32 flags =3D 0;
+> > +
+> > +     /* Check if adapter can wakeup the system */
+> > +     if (hdev->wakeup && hdev->wakeup(hdev))
+> > +             flags |=3D BIT(HCI_CONN_FLAG_REMOTE_WAKEUP);
+>
+> I would do this change as a separate patch since it has nothing to do wit=
+h the device privacy setting.
 
-> On 18-Nov-2021, at 12:31 AM, Marcel Holtmann <marcel@holtmann.org> wrote:
->=20
-> Hi Orlando,
->=20
->>> So if this just affects two macs, why can't the fix be realized as a
->>> quirk that is only enabled on those two systems? Or are they impossible
->>> to detect clearly via DMI data or something like that?
->>=20
->> I think we should be able to quirk based off the acpi _CID "apple-uart-b=
-lth"
->> or _HID "BCM2E7C". Marcel suggested quirking based of the acpi table her=
-e
->> https://lore.kernel.org/linux-bluetooth/1D2217A9-EA73-4D93-8D0B-5BC2718D=
-4788@holtmann.org/
->>=20
->> This would catch some unaffected Macs, but they don't support the LE Rea=
-d
->> Transmit Power command anyway (the affected macs were released after it
->> was added to the Bluetooth spec, while the unaffected Macs were released
->> before it was added to the spec, and thus don't support it).
->>=20
->> I'm not sure how to go about applying a quirk based off this, there are
->> quirks in drivers/bluetooth/hci_bcm.c (no_early_set_baudrate and
->> drive_rts_on_open), but they don't seem to be based off acpi ids.
->>=20
->> It might be simpler to make it ignore the Unknown Command error, like
->> in this patch https://lore.kernel.org/linux-bluetooth/CABBYNZLjSfcG_KqTE=
-bL6NOSvHhA5-b1t_S=3D3FQP4=3DGwW21kuzg@mail.gmail.com/
->> however that only applies on bluetooth-next and needed the status it
->> checks for to be -56, not 0x01.
->=20
-> so we abstain from try-and-error sending of commands. The Bluetooth spec
-> has a list of supported commands that a host can query for a reason. This
-> is really broken behavior of the controller and needs to be pointed out a=
-s
-> such.
-Well all I can do is provide you any logs or information I can. But we do r=
-eally wish to get this regression fixed soon.
->=20
-> The question is just how we quirk it.
->=20
+Will do.
+
+> Do we have to call hdev->wakeup() as well here? Isn=E2=80=99t the existen=
+ce of the callback enough indication.
+
+Hmm, right I guess we want to know if the driver is capable of waking
+up, not that it is actually enabled at that point since we are
+evaluating if it is supported. I will change that.
+
+> That also said, doesn=E2=80=99t it make sense to store the supported_flag=
+s in the device params struct. It would make it certainly easy to return. P=
+otentially we have a few calls to Get Device Flags and its notifications th=
+at have to rebuild this flags field over and over again.
+
+But we only perform a lookup, so in case there are no hci_conn_params
+we would have to store it somewhere else, perhaps in hci_dev?
+
 > Regards
->=20
+>
 > Marcel
->=20
+>
 
+
+--=20
+Luiz Augusto von Dentz
