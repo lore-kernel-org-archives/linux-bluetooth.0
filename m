@@ -2,150 +2,199 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2F8C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 12:27:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 15DE8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 15:29:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237417AbhKTMa3 (ORCPT
+        id S231390AbhKTPc6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Nov 2021 07:30:29 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
+        Sat, 20 Nov 2021 10:32:58 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52496 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230381AbhKTMa2 (ORCPT
+        with ESMTP id S230038AbhKTPc6 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Nov 2021 07:30:28 -0500
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8896AC061574
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 04:27:25 -0800 (PST)
-Received: by mail-wr1-x42e.google.com with SMTP id i5so23127265wrb.2
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 04:27:25 -0800 (PST)
+        Sat, 20 Nov 2021 10:32:58 -0500
+Received: from mail-pj1-x1049.google.com (mail-pj1-x1049.google.com [IPv6:2607:f8b0:4864:20::1049])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB890C061574
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:29:54 -0800 (PST)
+Received: by mail-pj1-x1049.google.com with SMTP id lj10-20020a17090b344a00b001a653d07ad8so8559332pjb.3
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:29:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:user-agent:content-language:to:from
-         :subject:content-transfer-encoding;
-        bh=0yVyHhwMyG5w2QIf7rUI09FwosPiE+aqr4nKlqMiBzs=;
-        b=SCrJXi4lbf+Vk2j+tHxo7DlaH0qrkpwqPMRuP3gFUX/EmPYgOcFdFwhv+037DbHrcv
-         UWoivUy+p3/Ufuu20dppotTb+ECmxVkc2gba+yVRQXeE7RAdIkvwvC/ipq4uJhuZj+Bv
-         etLYRO1Yiefs+9hn+x9jSeyN/pfo2091cksBNVoSL4iCz0Npro868TUbIXh7Bxfx3DNV
-         LG2uEBtNHL6HexBjNQGHoYmLK/I7NsEz1a7my7kfgZVzUSGjqi+8hAgb10Yn/eXRZimo
-         7kiL5oxaPJe3+aZYz2SQV+CNxSq9AzRfkW8wep6uKBb1AYSn/eoBr2SfbEvRXKn67cVk
-         0u1A==
+        d=google.com; s=20210112;
+        h=date:message-id:mime-version:subject:from:to:cc;
+        bh=CYpmfPbN3C/XAnsKeNyp26vn7Ku9902if6kiPcHTnMA=;
+        b=laFLdRc24VNgngtSgCx1BZGvpOkmcudjOBDl4DMu2aTmKNYpl706EjrvwP0fFOTH/8
+         23YgPRyg0WTF8SApYM5Nl/HuQHguqBnBzftDU/g/wJnr3f0hZ16mpVXk32k8eMlcVY7K
+         xY59qDTS3blyo6EqB1pVapuVftZQ9ZT4IEFC/3l+iKtWSnlf7q510Bb9q8Tunh2exoCW
+         Z6YebxUYubiRp39HFQwt5HJhbpf6g4y3/nrkGPT0K3xu5O378imcY3C/5aTw33fISKuO
+         zQ5jFB8RunucWao3TLNPK+VLeK4ScVUqMRZJyCSLlGioRV6zVwsiIwIA+MwAgxsZb4A4
+         xqXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:user-agent
-         :content-language:to:from:subject:content-transfer-encoding;
-        bh=0yVyHhwMyG5w2QIf7rUI09FwosPiE+aqr4nKlqMiBzs=;
-        b=GIrszlJKzakxj2MroX7ub4kUYtUIIOSeziZOIfOgY8GjulzxkbV1/ZdmULHags32aO
-         728VZwBXR32E21wOxD8MRnwrMiLLTyUGiYti/IJZ3zN7QXRDd7coaAPH+I2O0x4Wicz8
-         MlQ/75lVMzMLZKooOxyYgn/saY+IB7zYoMxHaqFmRFWbMWidMBo4lHOgU6wAme5mSfiG
-         rdiNp69wbjPhh46Xus74/wUomicEBXZkEdB4p7GERXlouOCz+10HWjtHNIRXUCqvqkoG
-         7uX4u0FipNOK66IvCdde+v2fezqO+htK4hrkPAxy+h3e41WqgHJ+4c+poAB7YwPjvSqI
-         xyJw==
-X-Gm-Message-State: AOAM531oJvCDAclePXStMF+27kkVtD//2qzWcXy5sMn0JGalAbu38LUV
-        i7SwnT3jy3FDyXW+NiQFBWpFeDoFjPIuNg==
-X-Google-Smtp-Source: ABdhPJzMkAg7StWhl5MWV4pla/n8FUTJL54/nJZIbKCMMvw/HNKZkU+OWHinVmR0xgGfXFFs1Rzfug==
-X-Received: by 2002:adf:f7c2:: with SMTP id a2mr17792939wrq.71.1637411243382;
-        Sat, 20 Nov 2021 04:27:23 -0800 (PST)
-Received: from ?IPV6:2a02:908:1980:7720::d962? ([2a02:908:1980:7720::d962])
-        by smtp.gmail.com with ESMTPSA id o5sm2574424wrx.83.2021.11.20.04.27.22
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 20 Nov 2021 04:27:22 -0800 (PST)
-Message-ID: <23143ae3-1a00-8e77-c66c-ad0e473585bb@gmail.com>
-Date:   Sat, 20 Nov 2021 13:27:22 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Content-Language: en-US
-To:     linux-bluetooth@vger.kernel.org
-From:   Julian Sikorski <belegdol@gmail.com>
-Subject: No sound when connecting Sennheiser M2 AEBT for the first time since
- Fedora 35 upgrade
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+        h=x-gm-message-state:date:message-id:mime-version:subject:from:to:cc;
+        bh=CYpmfPbN3C/XAnsKeNyp26vn7Ku9902if6kiPcHTnMA=;
+        b=ogOQKHtBO81S4eFiBBrcjKjNRmfb8FTxtrjlzfW6szKoBYT1WC8tu26vcbt/NLz4IS
+         5LqHYCEH2juYF6NZr0+JDK4fVkQx8Lf4llooAKiPvUlfqogy6+dJi/Ivz0qtThhjAjxt
+         V+IN3TGop96D/d6QBzEomLc6VUHPfytFmzLBi8FxucOZKD3m58/dow9jpEAx1Xv97hZQ
+         z7jEpTgk2Vbak/RqdBq0yTUiCYwpcp5biNUUlgKd2OWMjym7VmQf7y3T7u4uch300VHS
+         /ZBZ6pUpGpa0R5shtF+yL6+5QQ/rFG6c5z4Tm0X1lrhXnf6rSb3pe5Fo7USUX/ZxMaQi
+         hBnQ==
+X-Gm-Message-State: AOAM530hPIrQ1Q05MkDuwN5ViHffQNyg1FP4uyY5H9FvvQSWDXNDs01C
+        enWCGa083YRlek5F2yjuY1JQD7djG+reOA==
+X-Google-Smtp-Source: ABdhPJwUY0pSz5rpdjZoj8hR7cz/xueqe/jDsfk8JbhAUoBBzgeRP5+A7/qOT8DrDWRaljAZn5MPF3q47sqUCw==
+X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:8437:70f3:c03b:1c71])
+ (user=mmandlik job=sendgmr) by 2002:a65:50c6:: with SMTP id
+ s6mr23074422pgp.352.1637422194400; Sat, 20 Nov 2021 07:29:54 -0800 (PST)
+Date:   Sat, 20 Nov 2021 07:29:36 -0800
+Message-Id: <20211120072449.BlueZ.v6.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
+Subject: [BlueZ PATCH v6 1/6] doc: Introduce the Adv Monitor Device Found/Lost events
+From:   Manish Mandlik <mmandlik@google.com>
+To:     marcel@holtmann.org, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        Manish Mandlik <mmandlik@google.com>,
+        Miao-chen Chou <mcchou@google.com>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hello,
+This patch introduces two new MGMT events
+MGMT_EV_ADV_MONITOR_DEVICE_FOUND and MGMT_EV_ADV_MONITOR_DEVICE_LOST to
+indicate that the controller has started/stopped tracking a particular
+device matching one of the already added Advertisement Monitor.
 
-since I upgraded to Fedora 35, am having the following issue with my 
-Sennheiser M2 AEBT headphones: upon first connection, the audio will not 
-play. I have to go to gnome-control-center, disconnect and reconnect the 
-headset, then audio plays normally. The following can be found in the log:
+If the controller offloading support is not available,
+MGMT_EV_ADV_MONITOR_DEVICE_FOUND event is also used to report all
+advertisements to perform software based filtering whenever we are not
+active scanning.
 
-Nov 20 12:48:34 snowball3 kernel: input: MOMENTUM M2 AEBT (AVRCP) as 
-/devices/virtual/input/input19
+Reviewed-by: Miao-chen Chou <mcchou@google.com>
+---
+Hello Bt-Maintainers,
 
-Nov 20 12:48:35 snowball3 bluetoothd[10741]: 
-src/service.c:btd_service_connect() a2dp-sink profile connect failed for 
-00:1B:66:81:8D:76: Device or resource busy
+Bluetooth Advertisement Monitor API was introduced to support background
+scanning and proximity detection based on the application specified RSSI
+thresholds and content filters on LE advertisement packets.
 
-Nov 20 12:48:35 snowball3 bluetoothd[10741]: 
-profiles/audio/avdtp.c:avdtp_parse_rej() OPEN request rejected: Bad 
-State (49)
+To optimize the power consumption, the API offloads the content
+filtering and RSSI tracking to the controller if the controller
+offloading support is available. However, this monitoring is not
+completely offloaded as the bluetoothd also handles RSSI thresholds and
+timeouts in order to fulfill high/low thresholds/timeouts filtering with
+D-bus clients.
 
-Nov 20 12:48:35 snowball3 wireplumber[1924]: failed to switch codec 
-(-19), setting fallback profile
+There is further room to achieve better power optimization by supporting
+the controller event HCI_VS_MSFT_LE_Monitor_Device_Event to fulfill true
+monitor offloading. This is currently not supported as it was originally
+desired to minimize the changes to the MGMT interface and reuse the
+existing MGMT_EV_DEVICE_FOUND event to pass advertisements to the
+bluetoothd and let bluetoothd handle the RSSI thresholds and timeouts in
+order to fulfill the D-bus API requirements for the client.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
-for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Did not 
-receive a reply. Possible causes include: the remote application did not 
-send a reply, the message bus security policy blocked the reply, the 
-reply timeout expired, or the network connection was broken.)
+This patch series introduces MGMT events MGMT_EV_ADV_MONITOR_DEVICE_FOUND
+and MGMT_EV_ADV_MONITOR_DEVICE_LOST to indicate that the controller has
+started/stopped monitoring a particular device.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
-command 2: Eingabe-/Ausgabefehler
+Please let me know what you think about this or if you have any further
+questions.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: 
-(bluez_output.00_1B_66_81_8D_76.a2dp-sink-18) suspended -> error (Start 
-error: Eingabe-/Ausgabefehler)
+Thanks,
+Manish.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: unknown AT+IPHONEACCEV 
-key:2 value:0
+(no changes since v5)
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
-for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Operation 
-Not Authorized)
+Changes in v5:
+- Update the Adv Monitor Device Found event to include fields from the
+  existing Device Found event.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
-command 2: Eingabe-/Ausgabefehler
+Changes in v4:
+- Add Advertisement Monitor Device Found event, make Address_Type 0 as
+  reserved.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
-for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Operation 
-Not Authorized)
+Changes in v3:
+- Discard changes to the Device Found event and notify bluetoothd only
+  when the controller stops monitoring the device via new Device Lost
+  event.
 
-Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
-command 2: Eingabe-/Ausgabefehler
+Changes in v2:
+- Instead of creating a new 'Device Tracking' event, add a flag 'Device
+  Tracked' in the existing 'Device Found' event and add a new 'Device
+  Lost' event to indicate that the controller has stopped tracking that
+  device.
 
-Nov 20 12:49:23 snowball3 kernel: Bluetooth: hci0: Ignoring error of 
-Inquiry Cancel command
+ doc/mgmt-api.txt | 60 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
 
-Nov 20 12:49:24 snowball3 bluetoothd[10741]: 
-/org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd4: fd(42) ready
+diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
+index 97d33e30a..8e7b5ef70 100644
+--- a/doc/mgmt-api.txt
++++ b/doc/mgmt-api.txt
+@@ -4910,3 +4910,63 @@ Controller Resume Event
+ 	Address_Type. Otherwise, Address and Address_Type will both be zero.
+ 
+ 	This event will be sent to all management sockets.
++
++
++Advertisement Monitor Device Found Event
++========================================
++
++	Event code:		0x002f
++	Controller Index:	<controller_id>
++	Event Parameters:	Monitor_Handle (2 Octets)
++				Address (6 Octets)
++				Address_Type (1 Octet)
++				RSSI (1 Octet)
++				Flags (4 Octets)
++				AD_Data_Length (2 Octets)
++				AD_Data (0-65535 Octets)
++
++	This event indicates that the controller has started tracking a device
++	matching an Advertisement Monitor with handle Monitor_Handle.
++
++	Monitor_Handle 0 indicates that we are not active scanning and this
++	is a subsequent advertisement report for already matched Advertisement
++	Monitor or the controller offloading support is not available so need
++	to report all advertisements for software based filtering.
++
++	The address of the device being tracked will be shared in Address and
++	Address_Type.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	For the RSSI field a value of 127 indicates that the RSSI is
++	not available. That can happen with Bluetooth 1.1 and earlier
++	controllers or with bad radio conditions.
++
++	This event will be sent to all management sockets.
++
++
++Advertisement Monitor Device Lost Event
++=======================================
++
++	Event code:		0x0030
++	Controller Index:	<controller_id>
++	Event Parameters:	Monitor_Handle (2 Octets)
++				Address (6 Octets)
++				Address_Type (1 Octet)
++
++	This event indicates that the controller has stopped tracking a device
++	that was being tracked by an Advertisement Monitor with the handle
++	Monitor_Handle.
++
++	The address of the device being tracked will be shared in Address and
++	Address_Type.
++
++	Possible values for the Address_Type parameter:
++		0	Reserved (not in use)
++		1	LE Public
++		2	LE Random
++
++	This event will be sent to all management sockets.
+-- 
+2.34.0.rc2.393.gf8c9666880-goog
 
-Nov 20 12:49:24 snowball3 wireplumber[1924]: set volume 94 failed for 
-transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd4 (No such 
-property 'Volume')
-
-Nov 20 12:49:24 snowball3 kernel: input: MOMENTUM M2 AEBT (AVRCP) as 
-/devices/virtual/input/input20
-
-Nov 20 12:49:29 snowball3 wireplumber[1924]: unknown AT+IPHONEACCEV 
-key:2 value:0
-
-Nov 20 12:56:34 snowball3 wireplumber[1924]: 
-<WpDefaultProfile:0x561f0874c260> failed to get current profile on 
-device: pipewire proxy destroyed before finishing
-
-Nov 20 12:56:34 snowball3 bluetoothd[10741]: 
-src/profile.c:ext_io_disconnected() Unable to get io data for Hands-Free 
-Voice gateway: getpeername: Transport endpoint is not connected (107)
-
-
-
-I am not sure whether this is a bluetooth, pipewire, wireplumber or 
-firefox issue. It happens when I try to play a youtube video on firefox 
-via the headphones.
-
-Best regards,
-Julian
