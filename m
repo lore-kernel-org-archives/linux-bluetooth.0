@@ -2,122 +2,150 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E50D9C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 01:24:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DA2F8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 12:27:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235050AbhKTB14 (ORCPT
+        id S237417AbhKTMa3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 20:27:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38262 "EHLO
+        Sat, 20 Nov 2021 07:30:29 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:41014 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233897AbhKTB1z (ORCPT
+        with ESMTP id S230381AbhKTMa2 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 20:27:55 -0500
-Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADACC061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 17:24:51 -0800 (PST)
-Received: by mail-pg1-x52a.google.com with SMTP id r5so10047578pgi.6
-        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 17:24:51 -0800 (PST)
+        Sat, 20 Nov 2021 07:30:28 -0500
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8896AC061574
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 04:27:25 -0800 (PST)
+Received: by mail-wr1-x42e.google.com with SMTP id i5so23127265wrb.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 04:27:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=7sVyhecDpvB3AeKnp1qw4KudX1dTM8aYUdTupqO00vg=;
-        b=BklFX7RWUmz8YZtN9rZ/PM+fNNyPqymtUTFEd0EHl4/YFbhQ3nujeGSTJkEaBCG+bg
-         CI3jCgVmBsVkg8K7+5dqKK8kDQ5xzbMB/ttnT5K+1x75seNbFX1Dr4NjzX52V4LkHowS
-         GBWT2llvCzbRTJXrDa87dFYcvQXCTC+/NQZA81ksfzvJA4f2yRzF5OCePzs73xOFYn/u
-         /B0AIPNr7LJxmj8Z6uk8krpv9d69xclDcFZzchWh2voqXf4uRg2lWA/KQlMr/G5PThUp
-         cGe+S+wyMuveptD3BWcWIoIoSevaSRev0fZevBImbwrCqjkxRLW8NupFFv47Ullv+RDs
-         LVeg==
+        h=message-id:date:mime-version:user-agent:content-language:to:from
+         :subject:content-transfer-encoding;
+        bh=0yVyHhwMyG5w2QIf7rUI09FwosPiE+aqr4nKlqMiBzs=;
+        b=SCrJXi4lbf+Vk2j+tHxo7DlaH0qrkpwqPMRuP3gFUX/EmPYgOcFdFwhv+037DbHrcv
+         UWoivUy+p3/Ufuu20dppotTb+ECmxVkc2gba+yVRQXeE7RAdIkvwvC/ipq4uJhuZj+Bv
+         etLYRO1Yiefs+9hn+x9jSeyN/pfo2091cksBNVoSL4iCz0Npro868TUbIXh7Bxfx3DNV
+         LG2uEBtNHL6HexBjNQGHoYmLK/I7NsEz1a7my7kfgZVzUSGjqi+8hAgb10Yn/eXRZimo
+         7kiL5oxaPJe3+aZYz2SQV+CNxSq9AzRfkW8wep6uKBb1AYSn/eoBr2SfbEvRXKn67cVk
+         0u1A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=7sVyhecDpvB3AeKnp1qw4KudX1dTM8aYUdTupqO00vg=;
-        b=bg9EZxdtG8KKcQ5l3tc49+GF3nx3+YFhQduJ+huZjsN5K2V5E1XHS+AjbQznRxlr9v
-         zBRLdOzwRTufV12A+4ARwSYjKG5rHvdVdqSJH1ThcfUPlFFC5kMtH5pvZhv2OOht2zdR
-         dbjLIimUE9BpQrXzZUiCRkCFwLiB4CvTC+tBe9pxONZW/Locb3BlagupZ9caip62I3x6
-         HeXShkeXcwUgjseXKUGKMXkQLDR8X+xQDwSqHim9ugwDv/m+LCJcbK+BA4CJFyKufznx
-         szD/c/r8oOusN2duzX7DSeehmXcpt4MtFmvkAGrLRBpdcthlqUxGrlPizvTa88VWG9Zk
-         cdHw==
-X-Gm-Message-State: AOAM533knDbyooVfAY9I6mz0YwBQ1yLYww2Yp1OJRSYgoLM/AC7b6h8Y
-        ya6fuy6FEMyJbxRp0GnWTyvH6rtQD1M=
-X-Google-Smtp-Source: ABdhPJzTfd9UnXW3mjlfFll21e+2LLOhXTwD7MJxyTKjdIIhZYHKOayOef8O3Y72LnGgtQH2z//EMw==
-X-Received: by 2002:aa7:87c5:0:b0:4a0:25d0:d88c with SMTP id i5-20020aa787c5000000b004a025d0d88cmr68352112pfo.43.1637371490986;
-        Fri, 19 Nov 2021 17:24:50 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id c2sm801970pfv.112.2021.11.19.17.24.50
+        h=x-gm-message-state:message-id:date:mime-version:user-agent
+         :content-language:to:from:subject:content-transfer-encoding;
+        bh=0yVyHhwMyG5w2QIf7rUI09FwosPiE+aqr4nKlqMiBzs=;
+        b=GIrszlJKzakxj2MroX7ub4kUYtUIIOSeziZOIfOgY8GjulzxkbV1/ZdmULHags32aO
+         728VZwBXR32E21wOxD8MRnwrMiLLTyUGiYti/IJZ3zN7QXRDd7coaAPH+I2O0x4Wicz8
+         MlQ/75lVMzMLZKooOxyYgn/saY+IB7zYoMxHaqFmRFWbMWidMBo4lHOgU6wAme5mSfiG
+         rdiNp69wbjPhh46Xus74/wUomicEBXZkEdB4p7GERXlouOCz+10HWjtHNIRXUCqvqkoG
+         7uX4u0FipNOK66IvCdde+v2fezqO+htK4hrkPAxy+h3e41WqgHJ+4c+poAB7YwPjvSqI
+         xyJw==
+X-Gm-Message-State: AOAM531oJvCDAclePXStMF+27kkVtD//2qzWcXy5sMn0JGalAbu38LUV
+        i7SwnT3jy3FDyXW+NiQFBWpFeDoFjPIuNg==
+X-Google-Smtp-Source: ABdhPJzMkAg7StWhl5MWV4pla/n8FUTJL54/nJZIbKCMMvw/HNKZkU+OWHinVmR0xgGfXFFs1Rzfug==
+X-Received: by 2002:adf:f7c2:: with SMTP id a2mr17792939wrq.71.1637411243382;
+        Sat, 20 Nov 2021 04:27:23 -0800 (PST)
+Received: from ?IPV6:2a02:908:1980:7720::d962? ([2a02:908:1980:7720::d962])
+        by smtp.gmail.com with ESMTPSA id o5sm2574424wrx.83.2021.11.20.04.27.22
         for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 19 Nov 2021 17:24:50 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v3 3/4] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY device flag
-Date:   Fri, 19 Nov 2021 17:24:47 -0800
-Message-Id: <20211120012448.1476960-3-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211120012448.1476960-1-luiz.dentz@gmail.com>
-References: <20211120012448.1476960-1-luiz.dentz@gmail.com>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 20 Nov 2021 04:27:22 -0800 (PST)
+Message-ID: <23143ae3-1a00-8e77-c66c-ad0e473585bb@gmail.com>
+Date:   Sat, 20 Nov 2021 13:27:22 +0100
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.0
+Content-Language: en-US
+To:     linux-bluetooth@vger.kernel.org
+From:   Julian Sikorski <belegdol@gmail.com>
+Subject: No sound when connecting Sennheiser M2 AEBT for the first time since
+ Fedora 35 upgrade
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hello,
 
-This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
-userspace to indicate to the controller to use Device Privacy Mode to a
-specific device.
+since I upgraded to Fedora 35, am having the following issue with my 
+Sennheiser M2 AEBT headphones: upon first connection, the audio will not 
+play. I have to go to gnome-control-center, disconnect and reconnect the 
+headset, then audio plays normally. The following can be found in the log:
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- include/net/bluetooth/hci_core.h |  1 +
- net/bluetooth/mgmt.c             | 12 ++++++++++++
- 2 files changed, 13 insertions(+)
+Nov 20 12:48:34 snowball3 kernel: input: MOMENTUM M2 AEBT (AVRCP) as 
+/devices/virtual/input/input19
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index fc93a1907c90..9c94d1c49b25 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -153,6 +153,7 @@ struct bdaddr_list_with_irk {
- 
- enum hci_conn_flags {
- 	HCI_CONN_FLAG_REMOTE_WAKEUP,
-+	HCI_CONN_FLAG_DEVICE_PRIVACY,
- 
- 	__HCI_CONN_NUM_FLAGS,
- };
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index 0f4b620bc630..925a549e448c 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -3978,6 +3978,11 @@ static int exp_ll_privacy_feature_changed(bool enabled, struct hci_dev *hdev,
- 	memcpy(ev.uuid, rpa_resolution_uuid, 16);
- 	ev.flags = cpu_to_le32((enabled ? BIT(0) : 0) | BIT(1));
- 
-+	if (enabled && privacy_mode_capable(hdev))
-+		set_bit(HCI_CONN_FLAG_DEVICE_PRIVACY, hdev->conn_flags);
-+	else
-+		clear_bit(HCI_CONN_FLAG_DEVICE_PRIVACY, hdev->conn_flags);
-+
- 	return mgmt_limited_event(MGMT_EV_EXP_FEATURE_CHANGED, hdev,
- 				  &ev, sizeof(ev),
- 				  HCI_MGMT_EXP_FEATURE_EVENTS, skip);
-@@ -4461,6 +4466,13 @@ static int set_device_flags(struct sock *sk, struct hci_dev *hdev, void *data,
- 		if (params) {
- 			bitmap_from_u64(params->flags, current_flags);
- 			status = MGMT_STATUS_SUCCESS;
-+
-+			/* Update passive scan if HCI_CONN_FLAG_DEVICE_PRIVACY
-+			 * has been set.
-+			 */
-+			if (test_bit(HCI_CONN_FLAG_DEVICE_PRIVACY,
-+				     params->flags))
-+				hci_update_passive_scan(hdev);
- 		} else {
- 			bt_dev_warn(hdev, "No such LE device %pMR (0x%x)",
- 				    &cp->addr.bdaddr,
--- 
-2.33.1
+Nov 20 12:48:35 snowball3 bluetoothd[10741]: 
+src/service.c:btd_service_connect() a2dp-sink profile connect failed for 
+00:1B:66:81:8D:76: Device or resource busy
 
+Nov 20 12:48:35 snowball3 bluetoothd[10741]: 
+profiles/audio/avdtp.c:avdtp_parse_rej() OPEN request rejected: Bad 
+State (49)
+
+Nov 20 12:48:35 snowball3 wireplumber[1924]: failed to switch codec 
+(-19), setting fallback profile
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
+for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Did not 
+receive a reply. Possible causes include: the remote application did not 
+send a reply, the message bus security policy blocked the reply, the 
+reply timeout expired, or the network connection was broken.)
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
+command 2: Eingabe-/Ausgabefehler
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: 
+(bluez_output.00_1B_66_81_8D_76.a2dp-sink-18) suspended -> error (Start 
+error: Eingabe-/Ausgabefehler)
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: unknown AT+IPHONEACCEV 
+key:2 value:0
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
+for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Operation 
+Not Authorized)
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
+command 2: Eingabe-/Ausgabefehler
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: Transport Acquire() failed 
+for transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd3 (Operation 
+Not Authorized)
+
+Nov 20 12:49:00 snowball3 wireplumber[1924]: 0x561f089d5bf8: can't send 
+command 2: Eingabe-/Ausgabefehler
+
+Nov 20 12:49:23 snowball3 kernel: Bluetooth: hci0: Ignoring error of 
+Inquiry Cancel command
+
+Nov 20 12:49:24 snowball3 bluetoothd[10741]: 
+/org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd4: fd(42) ready
+
+Nov 20 12:49:24 snowball3 wireplumber[1924]: set volume 94 failed for 
+transport /org/bluez/hci0/dev_00_1B_66_81_8D_76/sep1/fd4 (No such 
+property 'Volume')
+
+Nov 20 12:49:24 snowball3 kernel: input: MOMENTUM M2 AEBT (AVRCP) as 
+/devices/virtual/input/input20
+
+Nov 20 12:49:29 snowball3 wireplumber[1924]: unknown AT+IPHONEACCEV 
+key:2 value:0
+
+Nov 20 12:56:34 snowball3 wireplumber[1924]: 
+<WpDefaultProfile:0x561f0874c260> failed to get current profile on 
+device: pipewire proxy destroyed before finishing
+
+Nov 20 12:56:34 snowball3 bluetoothd[10741]: 
+src/profile.c:ext_io_disconnected() Unable to get io data for Hands-Free 
+Voice gateway: getpeername: Transport endpoint is not connected (107)
+
+
+
+I am not sure whether this is a bluetooth, pipewire, wireplumber or 
+firefox issue. It happens when I try to play a youtube video on firefox 
+via the headphones.
+
+Best regards,
+Julian
