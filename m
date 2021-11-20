@@ -2,30 +2,30 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84FB8C43219
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 19:47:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 156E4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 20:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231332AbhKTTu2 (ORCPT
+        id S230011AbhKTUPb (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Nov 2021 14:50:28 -0500
-Received: from mga14.intel.com ([192.55.52.115]:13857 "EHLO mga14.intel.com"
+        Sat, 20 Nov 2021 15:15:31 -0500
+Received: from mga06.intel.com ([134.134.136.31]:58982 "EHLO mga06.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230337AbhKTTu0 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Nov 2021 14:50:26 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10174"; a="234837550"
+        id S229488AbhKTUPa (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 20 Nov 2021 15:15:30 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10174"; a="295414895"
 X-IronPort-AV: E=Sophos;i="5.87,251,1631602800"; 
-   d="gz'50?scan'50,208,50";a="234837550"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2021 11:47:22 -0800
+   d="gz'50?scan'50,208,50";a="295414895"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Nov 2021 12:12:26 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.87,251,1631602800"; 
-   d="gz'50?scan'50,208,50";a="605937051"
+   d="gz'50?scan'50,208,50";a="648070228"
 Received: from lkp-server02.sh.intel.com (HELO c20d8bc80006) ([10.239.97.151])
-  by orsmga004.jf.intel.com with ESMTP; 20 Nov 2021 11:47:16 -0800
+  by fmsmga001.fm.intel.com with ESMTP; 20 Nov 2021 12:12:22 -0800
 Received: from kbuild by c20d8bc80006 with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1moWKR-0006Dq-PZ; Sat, 20 Nov 2021 19:47:15 +0000
-Date:   Sun, 21 Nov 2021 03:47:07 +0800
+        id 1moWij-0006Ep-LY; Sat, 20 Nov 2021 20:12:21 +0000
+Date:   Sun, 21 Nov 2021 04:12:03 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
         luiz.dentz@gmail.com
@@ -37,20 +37,21 @@ Cc:     kbuild-all@lists.01.org,
         Jakub Kicinski <kuba@kernel.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v5 1/2] bluetooth: Handle MSFT Monitor Device Event
-Message-ID: <202111210333.gMFggGmd-lkp@intel.com>
-References: <20211120084022.v5.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
+Subject: Re: [PATCH v5 2/2] bluetooth: Add MGMT Adv Monitor Device Found/Lost
+ events
+Message-ID: <202111210419.f0XT7Mt0-lkp@intel.com>
+References: <20211120084022.v5.2.I9eda306e4c542010535dc49b5488946af592795e@changeid>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="9amGYk9869ThD9tj"
+Content-Type: multipart/mixed; boundary="5mCyUwZo2JvN/JJP"
 Content-Disposition: inline
-In-Reply-To: <20211120084022.v5.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
+In-Reply-To: <20211120084022.v5.2.I9eda306e4c542010535dc49b5488946af592795e@changeid>
 User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 
---9amGYk9869ThD9tj
+--5mCyUwZo2JvN/JJP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 
@@ -72,10 +73,10 @@ compiler: m68k-linux-gcc (GCC) 11.2.0
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/7965690cffd0ffe53b33e1cebc2d0388322cc42e
+        # https://github.com/0day-ci/linux/commit/9d49f17ae7d7c8f17e51a8d1e0fece8f76cc2dd6
         git remote add linux-review https://github.com/0day-ci/linux
         git fetch --no-tags linux-review Manish-Mandlik/bluetooth-Handle-MSFT-Monitor-Device-Event/20211121-004127
-        git checkout 7965690cffd0ffe53b33e1cebc2d0388322cc42e
+        git checkout 9d49f17ae7d7c8f17e51a8d1e0fece8f76cc2dd6
         # save the attached .config to linux build tree
         COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross ARCH=m68k 
 
@@ -84,42 +85,84 @@ Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
-   In file included from net/bluetooth/msft.c:6:
-   net/bluetooth/msft.c: In function 'msft_monitor_device_evt':
->> include/net/bluetooth/bluetooth.h:212:16: warning: format '%x' expects a matching 'unsigned int' argument [-Wformat=]
-     212 |         BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-         |                ^~~~~~
-   include/net/bluetooth/bluetooth.h:199:40: note: in definition of macro 'BT_ERR'
-     199 | #define BT_ERR(fmt, ...)        bt_err(fmt "\n", ##__VA_ARGS__)
-         |                                        ^~~
-   net/bluetooth/msft.c:692:17: note: in expansion of macro 'bt_dev_err'
-     692 |                 bt_dev_err(hdev,
-         |                 ^~~~~~~~~~
+>> net/bluetooth/mgmt.c:9542:6: warning: no previous prototype for 'mgmt_adv_monitor_device_found' [-Wmissing-prototypes]
+    9542 | void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
+         |      ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-vim +212 include/net/bluetooth/bluetooth.h
+vim +/mgmt_adv_monitor_device_found +9542 net/bluetooth/mgmt.c
 
-^1da177e4c3f41 Linus Torvalds 2005-04-16  206  
-6f558b70fb39fc Loic Poulain   2015-08-30  207  #define bt_dev_info(hdev, fmt, ...)				\
-6f558b70fb39fc Loic Poulain   2015-08-30  208  	BT_INFO("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-594b31ea7dc610 Frederic Danis 2015-09-23  209  #define bt_dev_warn(hdev, fmt, ...)				\
-594b31ea7dc610 Frederic Danis 2015-09-23  210  	BT_WARN("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70fb39fc Loic Poulain   2015-08-30  211  #define bt_dev_err(hdev, fmt, ...)				\
-6f558b70fb39fc Loic Poulain   2015-08-30 @212  	BT_ERR("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70fb39fc Loic Poulain   2015-08-30  213  #define bt_dev_dbg(hdev, fmt, ...)				\
-6f558b70fb39fc Loic Poulain   2015-08-30  214  	BT_DBG("%s: " fmt, (hdev)->name, ##__VA_ARGS__)
-6f558b70fb39fc Loic Poulain   2015-08-30  215  
+  9541	
+> 9542	void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
+  9543					   struct mgmt_ev_device_found *ev,
+  9544					   size_t ev_size, bool discovering)
+  9545	{
+  9546		char buf[518];
+  9547		struct mgmt_ev_adv_monitor_device_found *advmon_ev = (void *)buf;
+  9548		size_t advmon_ev_size;
+  9549		struct monitored_device *dev, *tmp;
+  9550		bool matched = false;
+  9551		bool notified = false;
+  9552	
+  9553		/* Make sure that the buffer is big enough */
+  9554		advmon_ev_size = ev_size + (sizeof(*advmon_ev) - sizeof(*ev));
+  9555		if (advmon_ev_size > sizeof(buf))
+  9556			return;
+  9557	
+  9558		/* ADV_MONITOR_DEVICE_FOUND is similar to DEVICE_FOUND event except
+  9559		 * that it also has 'monitor_handle'. Make a copy of DEVICE_FOUND and
+  9560		 * store monitor_handle of the matched monitor.
+  9561		 */
+  9562		memcpy(&advmon_ev->addr, ev, ev_size);
+  9563	
+  9564		hdev->advmon_pend_notify = false;
+  9565	
+  9566		list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices, list) {
+  9567			if (!bacmp(&dev->bdaddr, &advmon_ev->addr.bdaddr)) {
+  9568				matched = true;
+  9569	
+  9570				if (!dev->notified) {
+  9571					advmon_ev->monitor_handle =
+  9572							cpu_to_le16(dev->handle);
+  9573	
+  9574					mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
+  9575						   hdev, advmon_ev, advmon_ev_size,
+  9576						   NULL);
+  9577	
+  9578					notified = true;
+  9579					dev->notified = true;
+  9580				}
+  9581			}
+  9582	
+  9583			if (!dev->notified)
+  9584				hdev->advmon_pend_notify = true;
+  9585		}
+  9586	
+  9587		if (!discovering &&
+  9588		    ((matched && !notified) || !msft_monitor_supported(hdev))) {
+  9589			/* Handle 0 indicates that we are not active scanning and this
+  9590			 * is a subsequent advertisement report for an already matched
+  9591			 * Advertisement Monitor or the controller offloading support
+  9592			 * is not available.
+  9593			 */
+  9594			advmon_ev->monitor_handle = 0;
+  9595	
+  9596			mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND, hdev, advmon_ev,
+  9597				   advmon_ev_size, NULL);
+  9598		}
+  9599	}
+  9600	
 
 ---
 0-DAY CI Kernel Test Service, Intel Corporation
 https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
 
---9amGYk9869ThD9tj
+--5mCyUwZo2JvN/JJP
 Content-Type: application/gzip
 Content-Disposition: attachment; filename=".config.gz"
 Content-Transfer-Encoding: base64
 
-H4sICARHmWEAAy5jb25maWcAnDxbc9u20u/9FZr0pX1oa1m2k8w3fgBBUEJFEjQAyrJfMIqj
+H4sICMZQmWEAAy5jb25maWcAnDxbc9u20u/9FZr0pX1oa1m2k8w3fgBBUEJFEjQAyrJfMIqj
 pJ7aVsaW2/Tfn13wBoCg2/k6c07M3cVtd7E3APrxhx9n5PV4eNwd7+92Dw//zL7un/bPu+P+
 8+zL/cP+/2apmJVCz1jK9a9AnN8/vX7/7fHiw5+z81/n57+ezNb756f9w4wenr7cf32FpveH
 px9+/IGKMuNLQ6nZMKm4KI1mW335Dpv+8oC9/PL17m7205LSn2fz+a+nv568cxpxZQBz+U8H
@@ -690,4 +733,4 @@ AQpV+aNZHv4Cn+YYX1kwEOs6IaP23HE6MSw3WC+qHQTFEMauCNd5e0Q2AYB7SbmSe8m36whj
 fQPNGRPAtNQrJyxBgNwQl2u5krrKEvl4W+DnYmXKlG8FrWeM0XaoTrAnkE9rrCsp4zbHpGok
 rSUnm6eS1rQnmaPx/z+V4K/edekBAA==
 
---9amGYk9869ThD9tj--
+--5mCyUwZo2JvN/JJP--
