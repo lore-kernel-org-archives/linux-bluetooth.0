@@ -2,110 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 895A4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 19 Nov 2021 22:26:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AFC83C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 01:24:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236125AbhKSW3I (ORCPT
+        id S233135AbhKTB1x (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 19 Nov 2021 17:29:08 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:53464 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S236108AbhKSW3H (ORCPT
+        Fri, 19 Nov 2021 20:27:53 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38246 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232053AbhKTB1w (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 19 Nov 2021 17:29:07 -0500
-X-UUID: a5b5d440cfe24b6fbe26ea75fc57eeb6-20211120
-X-UUID: a5b5d440cfe24b6fbe26ea75fc57eeb6-20211120
-Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 276726196; Sat, 20 Nov 2021 06:26:02 +0800
-Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
- mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Sat, 20 Nov 2021 06:26:01 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
- (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 20 Nov
- 2021 06:25:55 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 20 Nov 2021 06:25:54 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Mark-yw Chen <mark-yw.chen@mediatek.com>
-Subject: [PATCH 4/4] Bluetooth: btmtksdio: add support of processing firmware coredump and log
-Date:   Sat, 20 Nov 2021 06:25:46 +0800
-Message-ID: <e8480933f01de26143d466b69ab5d0fa70e84ace.1637360076.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <4176102d8bbc36e5156e348df666a3e12c5a3d75.1637360076.git.objelf@gmail.com>
-References: <4176102d8bbc36e5156e348df666a3e12c5a3d75.1637360076.git.objelf@gmail.com>
+        Fri, 19 Nov 2021 20:27:52 -0500
+Received: from mail-pj1-x1033.google.com (mail-pj1-x1033.google.com [IPv6:2607:f8b0:4864:20::1033])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BC2EC061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 17:24:50 -0800 (PST)
+Received: by mail-pj1-x1033.google.com with SMTP id cq22-20020a17090af99600b001a9550a17a5so12225956pjb.2
+        for <linux-bluetooth@vger.kernel.org>; Fri, 19 Nov 2021 17:24:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ykUhzNI/cNQOTH0C22kn8IQFNGkRRVLhOnTQMfHkHBU=;
+        b=aR98BecnUAr032FphLNv4zPLt2KsrP34SAXYw6u5zIEQ6yik1hddMIj5VfwBWQNVwl
+         0/6/ZQM1wouwG1UYESrXYM7+9Ahm+kLGfM1BqFbr5W2PG8EqpFyIwqkpIcGj4l1e3+u0
+         SF4ePpkfDAsKrlQ92XkAxX53ntPytgDOR7J6dG9zNB48R4W1uoM4oOJpAF1ckrkt+6y3
+         N1ErO2nwYT7ohr1mxxr7Ww2lnto3XjVS0zI0MCtYDUzkYIcNeYL3leoNwI873GaFQ3MR
+         dfCWa/zATxRmmz+pA0DtEaHS61yzZqqkN7YgjnCzPFKUzNvOyph3ThAsv+4M+c1rVS/S
+         YS7w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ykUhzNI/cNQOTH0C22kn8IQFNGkRRVLhOnTQMfHkHBU=;
+        b=aP1afk2U2CQfNOJ0pekGXNRQZmPnpX2+6yG4jdTiCJIIdKCmfNANgjfvD/AFpSTzQ7
+         J9q+uxgRx73OQrMVv9+mP8r5xd4xDSEpG9l+vzWUnOezkh3tTPkEDNcm+EFSNJvu+au8
+         VxoYPGzMNu/Ib0JDKv0aY76gUN1GRPTV4z4SHFf7ciFcj4sPGgSnlLg+ibQZ6C5biKCO
+         z9JFriUhfnrNlLFkNukLicIyAiRspHcaeLlnXfdKFvaCJ9S/9Q/izkdmpmJUtmjirZmA
+         R7109/yCJQEMELJDkxAHw8Md0uzGXlbaQgCNRMaCXJKAFCCkRjGJ7KIR5H58QmzWr6wc
+         f32w==
+X-Gm-Message-State: AOAM532R1eisxlRyqGqZKW/wOgzxVLaFfvEeobBIA7t6Y4vNcSnv3Ys8
+        mWt1/7D9MJSclFD1TlCiIWQV+MYldv4=
+X-Google-Smtp-Source: ABdhPJy0Ry150h+F5I/ho6hy+FYBpErJbUYD3+Uwbxtyca2hLCJrPoHPPjYGosBQwTy/dEG/YKlCXw==
+X-Received: by 2002:a17:90a:fd93:: with SMTP id cx19mr5230380pjb.190.1637371489398;
+        Fri, 19 Nov 2021 17:24:49 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id c2sm801970pfv.112.2021.11.19.17.24.48
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 19 Nov 2021 17:24:48 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v3 1/4] Bluetooth: MGMT: Use hci_dev_test_and_{set,clear}_flag
+Date:   Fri, 19 Nov 2021 17:24:45 -0800
+Message-Id: <20211120012448.1476960-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Add support of processing the firmware coredump and log for the diagnostic
-purpose.
+This make use of hci_dev_test_and_{set,clear}_flag instead of doing 2
+operations in a row.
 
-Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- drivers/bluetooth/btmtksdio.c | 23 ++++++++++++++++++++++-
- 1 file changed, 22 insertions(+), 1 deletion(-)
+v2: Fix marking Device Privacy Flag even when adapter is not capable of
+handling Set Privacy Mode.
+v3: Add patch for using hci_dev_test_and_{set,clear}_flag and split
+changes reworking how HCI_CONN_FLAG_REMOTE_WAKEUP is set and make use of
+bitmap to store the supported flags.
 
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index cae1fcd15512..adf9c89648cc 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -324,8 +324,29 @@ static int btmtksdio_recv_event(struct hci_dev *hdev, struct sk_buff *skb)
- 	return err;
- }
+ net/bluetooth/mgmt.c | 14 +++++++-------
+ 1 file changed, 7 insertions(+), 7 deletions(-)
+
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index f8f74d344297..0f91bf15e260 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -4041,10 +4041,10 @@ static int set_zero_key_func(struct sock *sk, struct hci_dev *hdev,
+ #endif
  
-+static int btmtksdio_recv_acl(struct hci_dev *hdev, struct sk_buff *skb)
-+{
-+	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-+	u16 handle = le16_to_cpu(hci_acl_hdr(skb)->handle);
-+
-+	switch (handle) {
-+	case 0xfc6f:
-+		/* Firmware dump from device: when the firmware hangs, the
-+		 * device can no longer suspend and thus disable auto-suspend.
-+		 */
-+		pm_runtime_forbid(bdev->dev);
-+		fallthrough;
-+	case 0x05ff:
-+	case 0x05fe:
-+		/* Firmware debug logging */
-+		return hci_recv_diag(hdev, skb);
-+	}
-+
-+	return hci_recv_frame(hdev, skb);
-+}
-+
- static const struct h4_recv_pkt mtk_recv_pkts[] = {
--	{ H4_RECV_ACL,      .recv = hci_recv_frame },
-+	{ H4_RECV_ACL,      .recv = btmtksdio_recv_acl },
- 	{ H4_RECV_SCO,      .recv = hci_recv_frame },
- 	{ H4_RECV_EVENT,    .recv = btmtksdio_recv_event },
- };
+ 	if (hdev && use_ll_privacy(hdev) && !hdev_is_powered(hdev)) {
+-		bool changed = hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+-
+-		hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++		bool changed;
+ 
++		changed = hci_dev_test_and_clear_flag(hdev,
++						      HCI_ENABLE_LL_PRIVACY);
+ 		if (changed)
+ 			exp_ll_privacy_feature_changed(false, hdev, sk);
+ 	}
+@@ -4139,15 +4139,15 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
+ 	val = !!cp->param[0];
+ 
+ 	if (val) {
+-		changed = !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+-		hci_dev_set_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++		changed = !hci_dev_test_and_set_flag(hdev,
++						     HCI_ENABLE_LL_PRIVACY);
+ 		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
+ 
+ 		/* Enable LL privacy + supported settings changed */
+ 		flags = BIT(0) | BIT(1);
+ 	} else {
+-		changed = hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+-		hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
++		changed = hci_dev_test_and_clear_flag(hdev,
++						      HCI_ENABLE_LL_PRIVACY);
+ 
+ 		/* Disable LL privacy + supported settings changed */
+ 		flags = BIT(1);
 -- 
-2.25.1
+2.33.1
 
