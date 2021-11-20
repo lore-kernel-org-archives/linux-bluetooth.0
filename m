@@ -2,251 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A26DDC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 15:30:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1E7E4C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 20 Nov 2021 15:30:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236254AbhKTPdF (ORCPT
+        id S237479AbhKTPdG (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 20 Nov 2021 10:33:05 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52524 "EHLO
+        Sat, 20 Nov 2021 10:33:06 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52532 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237027AbhKTPdE (ORCPT
+        with ESMTP id S237027AbhKTPdG (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 20 Nov 2021 10:33:04 -0500
-Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D9E8C061574
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:30:01 -0800 (PST)
-Received: by mail-qt1-x849.google.com with SMTP id v32-20020a05622a18a000b002b04d0d410dso8947534qtc.11
-        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:30:01 -0800 (PST)
+        Sat, 20 Nov 2021 10:33:06 -0500
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC9F0C061574
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:30:02 -0800 (PST)
+Received: by mail-pl1-x649.google.com with SMTP id e4-20020a170902b78400b00143c2e300ddso5793873pls.17
+        for <linux-bluetooth@vger.kernel.org>; Sat, 20 Nov 2021 07:30:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=ZRxuidxB40H/T2WQ7bK2a/emOFuJ6J+zg0ZcDF0pEew=;
-        b=ZLIHqI4iqVcaCd2vjgWSj6QGyH1mJ6BjPuZriK04QuFOozTD2sCtPaBm7mXjeKkpVI
-         Mf7ed4LKkniBHjVhcE+2NPU+CVIvPD9SdVKPFWr5Bos3Ko0LZoN/Yn25Ohe7MCCnBh3I
-         NEmdstQ1qzpZwE30oH5lQoIPx81RnERoiLJdPJHd4Jw1OI69Q2dfW577f9Tl7Y/q+4b7
-         OFwrbr1HtoQ+gmlQJNV9P/cFT79AV60njiP3zlsquBRKrKCIttYLANfb72fpH4j2DwMB
-         v5cxsFMSb65fXsGAgrOXCUYaXOs9kUK88uFk8zXE4OXTMvOb83x75wgUQ62ROKtOTnG1
-         kxuQ==
+        bh=jmpCJe5TKrx6C8LTBNW6hibZhG79HzwFdwgGf0nOh30=;
+        b=J7l3Vuu/5S2YbzMd60qnM+r+LR8kQz1pFZ/jgU1QwNyk51lFf4c+7Mm13YrHF1dJeb
+         jGE0+rZdw+r9zD4Mq2gpE8NPCqJqPa2RZWjlJCAyu8gjiQ/G3SnKZvM2srvDefoHVGnv
+         06pGdip7wX3UfrIKNFKffyhxy8621lW2bKxtQm1Hta+RoY2xYbi7TpWkNT1exgFdS31G
+         ieb+QONseSBsZEBx5XB8EC8W0M8cWvkT8zxVonoL9t2xdu2qzUWHtHIS20bgTj65Vv7X
+         WtoNmSGEXBMNcQy0FQ+f86FO6Lr6aFpEGaG21N9dGAyTf+GZMKl7GJo5ZdeALpCAmx4Q
+         0eyw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=ZRxuidxB40H/T2WQ7bK2a/emOFuJ6J+zg0ZcDF0pEew=;
-        b=p69cPRaO7DgIiZPrimMDJtJWR79BpKHJjCBP3IZJLD2asVTs00zfvcm1l8heMXEtlV
-         sI1Qi2Ka5sHhSIuoPAbMxG2bdSzHrws0+csS1+Cyx+BWs/qUH8I1goRjkkiU+gWVoH6K
-         77Z4WpGJ+EA6u9cgsSEPdrzrE3LJz8eJ3ZcG76D7YjBhVcpZW9vCnTHJBTV7zQMnmu2V
-         KJtPTgku8mp4EWICW6B3Aqi4wqoH/jC4kAt7tBOIOO2rnyCN22n3Hp1mUZchnutLw3Lz
-         /Wq9KphBNAbFx8nIilyeWye49kn8ko+EIrEKWvuAWia1dniU2EZZZcJBnlrjMZPxiGJ1
-         synQ==
-X-Gm-Message-State: AOAM531QrbsqS8fbm0VPnRR4ktGd/nUY3FtvYUpqa1r+PNRmEvfsDuBl
-        HrUtBTCbYFPK+N4ljjSfu9uwsFaemXGaWQ==
-X-Google-Smtp-Source: ABdhPJxG/uP9Si6D9pqu7mLSInGUhg54egFKFqwIX8rZPdXvqq9ALE6OoaX+RPv9LadFoI4Fs21B/c6GHt/Zvw==
+        bh=jmpCJe5TKrx6C8LTBNW6hibZhG79HzwFdwgGf0nOh30=;
+        b=CoJ9Cx7IS5tsiGMXAuRNfWRVvaCLW5kTTGyliri4C4zNdBehz/SeRIXXAxah31cGIC
+         aJk5hDUfQVNyGrshFS/Ww+j6NI4sfPpRB8kLKAxVQHH3DT0FJQfMLkkVlzRSgaXYbehz
+         z/4hAB0Lzf4JhInJNQtTzpjGjMYCoS/YDT8z85/reBqa+9ET1kRwDqegylzRI7UZrvte
+         HDZNvOyl5l7+Um9D0GlFkOoOfTvshC5684qrcDFtnaHdfveyKNxfHyszl9uC31nMgHDu
+         FKahGPLJ6YQCezb6QctgrLNwcvK4nj28pW4B7G0rF6PL7TLJ8GO6Z6OuIVP4HOOMWxe0
+         J+rg==
+X-Gm-Message-State: AOAM532cEGUv0r4WPGFw/QWANt11WvskNTQqL23RchrsqrmWzK8uiQWM
+        3cMcoj3PlXSu+QTf0hOHBfnwsg/2/reSPA==
+X-Google-Smtp-Source: ABdhPJwkCCBgaEsdMATrkJG159LAtlQTbqXc6UZu0ih+wrzsR8up25SJIsKLzEQkl3Vvao8klxbSZ+PJGBj9mw==
 X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:8437:70f3:c03b:1c71])
- (user=mmandlik job=sendgmr) by 2002:a05:622a:1115:: with SMTP id
- e21mr15376830qty.315.1637422200216; Sat, 20 Nov 2021 07:30:00 -0800 (PST)
-Date:   Sat, 20 Nov 2021 07:29:39 -0800
+ (user=mmandlik job=sendgmr) by 2002:a17:902:d114:b0:142:3934:be82 with SMTP
+ id w20-20020a170902d11400b001423934be82mr87809355plw.40.1637422202328; Sat,
+ 20 Nov 2021 07:30:02 -0800 (PST)
+Date:   Sat, 20 Nov 2021 07:29:40 -0800
 In-Reply-To: <20211120072449.BlueZ.v6.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
-Message-Id: <20211120072449.BlueZ.v6.4.If3927b0228004494a5eb09d9226370119ddf4d8b@changeid>
+Message-Id: <20211120072449.BlueZ.v6.5.Ib85d2d946d853ea8c879dc922ad8e47587d3c603@changeid>
 Mime-Version: 1.0
 References: <20211120072449.BlueZ.v6.1.I7f6bdb9282c1e12ffc6c662674678f2b1cb69182@changeid>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [BlueZ PATCH v6 4/6] adv_monitor: Invoke DeviceFound/Lost on tracked monitors
+Subject: [BlueZ PATCH v6 5/6] adv_monitor: Change sampling period to uint16_t
 From:   Manish Mandlik <mmandlik@google.com>
 To:     marcel@holtmann.org, luiz.dentz@gmail.com
 Cc:     linux-bluetooth@vger.kernel.org,
         chromeos-bluetooth-upstreaming@chromium.org,
         Manish Mandlik <mmandlik@google.com>,
+        Archie Pusaka <apusaka@google.com>,
         Miao-chen Chou <mcchou@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch delivers DeviceFound/DeviceLost events to apps over D-Bus
-whenever controller starts/stops tracking a device.
+In the Advertisement Monitor API, RSSISamplingPeriod is an unsigned
+value. Change sampling_period variable to uint16_t in the code.
 
-Tests performed:
-- Add a monitor and verify that DeviceFound/DeviceLost events are
-  received whenever controller starts/stops monitoring.
-- Verify from logs that only one Adv Report is received from the
-  controller when Sampling_Period is set to 0xFF and the
-  DeviceFound/DeviceLost functionality still works as intended.
-- Verify that DeviceFound/DeviceLost is reported appropriately even
-  when the Active Scanning is in progress.
-- Verify that the reconnection also works properly with and without
-  any active Advertisement Monitor.
+More info: doc/advertisement-monitor-api.txt
 
+Reviewed-by: Archie Pusaka <apusaka@google.com>
 Reviewed-by: Miao-chen Chou <mcchou@google.com>
 ---
 
-Changes in v6:
-- Moved the definition of 'handle' variable to this patch
+(no changes since v5)
 
 Changes in v5:
-- Add this new patch in series to deliver DeviceFound/Lost to apps
+- New patch in the series. Update 'sampling_period' data type to the
+  correct type.
 
- src/adv_monitor.c | 104 ++++++++++++++++++++++++++++++++++++++++++----
- 1 file changed, 96 insertions(+), 8 deletions(-)
+ src/adv_monitor.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/src/adv_monitor.c b/src/adv_monitor.c
-index ca8aa976c..27d5f3308 100644
+index 27d5f3308..bf7f2bed3 100644
 --- a/src/adv_monitor.c
 +++ b/src/adv_monitor.c
-@@ -174,6 +174,11 @@ struct adv_rssi_filter_info {
- 	int8_t rssi;
- };
+@@ -772,7 +772,7 @@ static bool parse_rssi_and_timeout(struct adv_monitor *monitor,
+ 	int16_t l_rssi = ADV_MONITOR_UNSET_RSSI;
+ 	uint16_t h_rssi_timeout = ADV_MONITOR_UNSET_TIMEOUT;
+ 	uint16_t l_rssi_timeout = ADV_MONITOR_UNSET_TIMEOUT;
+-	int16_t sampling_period = ADV_MONITOR_UNSET_SAMPLING_PERIOD;
++	uint16_t sampling_period = ADV_MONITOR_UNSET_SAMPLING_PERIOD;
+ 	uint16_t adapter_id = monitor->app->manager->adapter_id;
  
-+struct monitored_device_info {
-+	uint16_t monitor_handle;	/* Kernel Monitor Handle */
-+	struct btd_device *device;
-+};
-+
- static void monitor_device_free(void *data);
- static void adv_monitor_filter_rssi(struct adv_monitor *monitor,
- 					struct btd_device *device, int8_t rssi);
-@@ -1531,6 +1536,39 @@ static void adv_monitor_removed_callback(uint16_t index, uint16_t length,
- 		ev->monitor_handle);
- }
- 
-+/* Includes found/lost device's object path into the dbus message */
-+static void report_device_state_setup(DBusMessageIter *iter, void *user_data)
-+{
-+	const char *path = device_get_path(user_data);
-+
-+	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
-+}
-+
-+/* Invokes DeviceFound on the matched monitor */
-+static void notify_device_found_per_monitor(void *data, void *user_data)
-+{
-+	struct adv_monitor *monitor = data;
-+	struct monitored_device_info *info = user_data;
-+
-+	if (monitor->merged_pattern->monitor_handle == info->monitor_handle) {
-+		DBG("Calling DeviceFound() on Adv Monitor of owner %s "
-+		    "at path %s", monitor->app->owner, monitor->path);
-+
-+		g_dbus_proxy_method_call(monitor->proxy, "DeviceFound",
-+					 report_device_state_setup, NULL,
-+					 info->device, NULL);
-+	}
-+}
-+
-+/* Checks all monitors for match in the app to invoke DeviceFound */
-+static void notify_device_found_per_app(void *data, void *user_data)
-+{
-+	struct adv_monitor_app *app = data;
-+
-+	queue_foreach(app->monitors, notify_device_found_per_monitor,
-+		      user_data);
-+}
-+
- /* Processes Adv Monitor Device Found event from kernel */
- static void adv_monitor_device_found_callback(uint16_t index, uint16_t length,
- 						const void *param,
-@@ -1540,6 +1578,8 @@ static void adv_monitor_device_found_callback(uint16_t index, uint16_t length,
- 	struct btd_adv_monitor_manager *manager = user_data;
- 	const uint16_t adapter_id = manager->adapter_id;
- 	struct btd_adapter *adapter = manager->adapter;
-+	uint16_t handle = le16_to_cpu(ev->monitor_handle);
-+	struct monitored_device_info info;
- 	const uint8_t *ad_data = NULL;
- 	uint16_t ad_data_len;
- 	uint32_t flags;
-@@ -1578,6 +1618,49 @@ static void adv_monitor_device_found_callback(uint16_t index, uint16_t length,
- 					ev->addr.type, ev->rssi, confirm_name,
- 					legacy, not_connectable, ad_data,
- 					ad_data_len, true);
-+
-+	if (handle) {
-+		DBG("Adv Monitor with handle 0x%04x started tracking "
-+		    "the device %s", handle, addr);
-+
-+		info.device = btd_adapter_find_device(adapter, &ev->addr.bdaddr,
-+						      ev->addr.type);
-+		if (!info.device) {
-+			btd_error(adapter_id, "Device object not found for %s",
-+				  addr);
-+			return;
-+		}
-+
-+		/* Check for matched monitor in all apps */
-+		info.monitor_handle = handle;
-+		queue_foreach(manager->apps, notify_device_found_per_app,
-+			      &info);
-+	}
-+}
-+
-+/* Invokes DeviceLost on the matched monitor */
-+static void notify_device_lost_per_monitor(void *data, void *user_data)
-+{
-+	struct adv_monitor *monitor = data;
-+	struct monitored_device_info *info = user_data;
-+
-+	if (monitor->merged_pattern->monitor_handle == info->monitor_handle) {
-+		DBG("Calling DeviceLost() on Adv Monitor of owner %s "
-+		    "at path %s", monitor->app->owner, monitor->path);
-+
-+		g_dbus_proxy_method_call(monitor->proxy, "DeviceLost",
-+					 report_device_state_setup, NULL,
-+					 info->device, NULL);
-+	}
-+}
-+
-+/* Checks all monitors for match in the app to invoke DeviceLost */
-+static void notify_device_lost_per_app(void *data, void *user_data)
-+{
-+	struct adv_monitor_app *app = data;
-+
-+	queue_foreach(app->monitors, notify_device_lost_per_monitor,
-+		      user_data);
- }
- 
- /* Processes Adv Monitor Device Lost event from kernel */
-@@ -1589,6 +1672,8 @@ static void adv_monitor_device_lost_callback(uint16_t index, uint16_t length,
- 	const struct mgmt_ev_adv_monitor_device_lost *ev = param;
- 	uint16_t handle = le16_to_cpu(ev->monitor_handle);
- 	const uint16_t adapter_id = manager->adapter_id;
-+	struct btd_adapter *adapter = manager->adapter;
-+	struct monitored_device_info info;
- 	char addr[18];
- 
- 	if (length < sizeof(*ev)) {
-@@ -1600,6 +1685,17 @@ static void adv_monitor_device_lost_callback(uint16_t index, uint16_t length,
- 	ba2str(&ev->addr.bdaddr, addr);
- 	DBG("Adv Monitor with handle 0x%04x stopped tracking the device %s",
- 		handle, addr);
-+
-+	info.device = btd_adapter_find_device(adapter, &ev->addr.bdaddr,
-+					      ev->addr.type);
-+	if (!info.device) {
-+		btd_error(adapter_id, "Device object not found for %s", addr);
-+		return;
-+	}
-+
-+	/* Check for matched monitor in all apps */
-+	info.monitor_handle = handle;
-+	queue_foreach(manager->apps, notify_device_lost_per_app, &info);
- }
- 
- /* Allocates a manager object */
-@@ -1961,14 +2057,6 @@ static struct adv_monitor_device *monitor_device_create(
- 	return dev;
- }
- 
--/* Includes found/lost device's object path into the dbus message */
--static void report_device_state_setup(DBusMessageIter *iter, void *user_data)
--{
--	const char *path = device_get_path(user_data);
--
--	dbus_message_iter_append_basic(iter, DBUS_TYPE_OBJECT_PATH, &path);
--}
--
- /* Handles a situation where the device goes offline/out-of-range */
- static bool handle_device_lost_timeout(gpointer user_data)
- {
+ 	/* Extract RSSIHighThreshold */
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
