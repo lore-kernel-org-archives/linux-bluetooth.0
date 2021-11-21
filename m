@@ -2,105 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B251EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Nov 2021 15:55:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5388CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 21 Nov 2021 16:59:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238417AbhKUP6K (ORCPT
+        id S237755AbhKURCF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 21 Nov 2021 10:58:10 -0500
-Received: from mail.kernel.org ([198.145.29.99]:35428 "EHLO mail.kernel.org"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S238424AbhKUP6K (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 21 Nov 2021 10:58:10 -0500
-Received: by mail.kernel.org (Postfix) with ESMTPS id 1070860698
-        for <linux-bluetooth@vger.kernel.org>; Sun, 21 Nov 2021 15:55:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1637510105;
-        bh=Q9H9wm89scTmsSQBs9zwFvmHtDzQ1KmLLbtJxeJhOjM=;
-        h=From:To:Subject:Date:From;
-        b=MNRjsgkEvgPDwOZvQcGqfta4HgGnA6yRyas5xBSw8MuDLG0irECXh+z+tGxLBmsOr
-         uXx82Imu7YBIA4yBCbvK28fSg0AQl70QhWAWfJHtEdJ7ItI9Ii5buanQBTk51Bx9Su
-         NrJ3QeV3Xaoc1/050OVA+jYHwzZRtbmENpRT/b04L30TktdUlmSg9p8Z0QszoMdzdk
-         iq+9XDHDTM/XwWgmrq9yQOdSxbir7DELYKEsmzPSJ44BuB6m1SaiO7QQllMFPcwATq
-         sZ9Gi0ouq91c2/XIi6qq7maS+64nsKEeI1LQHZkLo6CJ9j3RLbugKUhOWqHPDw5ACD
-         2rZyQVQi/xmcA==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id F0AE060ED3; Sun, 21 Nov 2021 15:55:04 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215089] New: local struct uinput_event inconsistency with
- kernel y2038 safe struct input_event: AVRCP events vanish on 32-bit
-Date:   Sun, 21 Nov 2021 15:55:04 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: new
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: high
-X-Bugzilla-Who: spam@ipik.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: bug_id short_desc product version
- cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
- priority component assigned_to reporter cf_regression
-Message-ID: <bug-215089-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Sun, 21 Nov 2021 12:02:05 -0500
+Received: from p-impout008aa.msg.pkvw.co.charter.net ([47.43.26.139]:57928
+        "EHLO p-impout008.msg.pkvw.co.charter.net" rhost-flags-OK-OK-OK-FAIL)
+        by vger.kernel.org with ESMTP id S237885AbhKURCF (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 21 Nov 2021 12:02:05 -0500
+X-Greylist: delayed 428 seconds by postgrey-1.27 at vger.kernel.org; Sun, 21 Nov 2021 12:02:05 EST
+Received: from localhost.localdomain ([24.31.246.181])
+        by cmsmtp with ESMTP
+        id oq4EmHvDbbK8ooq4EmOejG; Sun, 21 Nov 2021 16:51:52 +0000
+X-Authority-Analysis: v=2.4 cv=PveA0iA3 c=1 sm=1 tr=0 ts=619a7928
+ a=cAe/7qmlxnd6JlJqP68I9A==:117 a=cAe/7qmlxnd6JlJqP68I9A==:17 a=yQdBAQUQAAAA:8
+ a=VwQbUJbxAAAA:8 a=-WocqkAZUEuR14uManwA:9 a=SzazLyfi1tnkUD6oumHU:22
+ a=AjGcO6oz07-iQ99wixmX:22
+From:   Larry Finger <Larry.Finger@lwfinger.net>
+To:     Marcel Holtmann <marcel@holtmann.org>,
+        Gustavo Padovan <gustavo@padovan.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     linux-bluetooth@vger.kernel.org, Hilda Wu <hildawu@realtek.com>,
+        Larry Finger <Larry.Finger@lwfinger.net>,
+        Stable <stable@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Add one more Bluetooth part for the Realtek RTL8852AE
+Date:   Sun, 21 Nov 2021 10:51:48 -0600
+Message-Id: <20211121165148.25355-1-Larry.Finger@lwfinger.net>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfKV9saZ9q6SP6pynCnWQatQXwwBaW9VLMEHB1IFT4Gdq8xd+uoSYMvKC5kbDPWhv0BYFqTAJeu6HedbGHRpGUdL8H9WsvkEzJTWr+AX8MvApyH0tC+Nl
+ 78ADisXTrPfIu59KPXbj6i72frHFApSSBqW+bToBmUnuj+1Iesgj1t0OJjLubXEoeN175OROU3rvXnCVnGvUTVbWoDW9eoqVWb01zt9keKm6dIEMAtEVbhWf
+ XUlcQPf7CGdwWJQCuQDhvXArhd1GzWg4mKmvT5Ailr/OXlS2A7NuzYMA9sJWvfYQv8XnxZ9s8ZJn9mCB+9wdQQNXAnW0BDrsmMqDv6AV7iTJqU+aba7SPzTo
+ tAijt97t4hHD7UpSOJ5xosWggEG4RoTUj0DUTykZGO8hQaYs2pS9Fey2E8DZn6+SncSYE16R
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215089
+The Realtek RTL8852AE has both wifi and BT components. The latter reports
+a USB ID of 0bda:385a, which is not in the table.
 
-            Bug ID: 215089
-           Summary: local struct uinput_event inconsistency with kernel
-                    y2038 safe struct input_event: AVRCP events vanish on
-                    32-bit
-           Product: Drivers
-           Version: 2.5
-    Kernel Version: 5.10
-          Hardware: All
-                OS: Linux
-              Tree: Mainline
-            Status: NEW
-          Severity: high
-          Priority: P1
-         Component: Bluetooth
-          Assignee: linux-bluetooth@vger.kernel.org
-          Reporter: spam@ipik.org
-        Regression: No
+The portion of /sys/kernel/debug/usb/devices pertaining to this device is
 
-Under bluez (up to 5.62) compiled with time64 support (like musl1.2 or poss=
-ibly
-newer glibc with __USE_TIME_BITS64) on 32-bit systems (x86 or armhf for
-instance), AVRCP events just never show-up on input device.
+T:  Bus=01 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  3 Spd=12   MxCh= 0
+D:  Ver= 1.00 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0bda ProdID=385a Rev= 0.00
+S:  Manufacturer=Realtek
+S:  Product=Bluetooth Radio
+S:  SerialNumber=00e04c000001
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
 
-Tools like evtest will not report any event upon bluetooth headset media bu=
-tton
-keypress, whereas btmon sees them flowing through.
+Signed-off-by: Larry Finger <Larry.Finger@lwfinger.net>
+Cc: Stable <stable@vger.kernel.org>
+---
+ drivers/bluetooth/btusb.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This bug does not hit x86-64 releases, only 32-bit are affected.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 75c83768c257..274fb857e98e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -384,6 +384,8 @@ static const struct usb_device_id blacklist_table[] = {
+ 	/* Realtek 8852AE Bluetooth devices */
+ 	{ USB_DEVICE(0x0bda, 0xc852), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
++	{ USB_DEVICE(0x0bda, 0x385a), .driver_info = BTUSB_REALTEK |
++						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x0bda, 0x4852), .driver_info = BTUSB_REALTEK |
+ 						     BTUSB_WIDEBAND_SPEECH },
+ 	{ USB_DEVICE(0x04c5, 0x165c), .driver_info = BTUSB_REALTEK |
+-- 
+2.33.1
 
-Issue has been discussed here [1], with a simple & replicable Alpinelinux 3=
-.14
-test case (based on musl 1.2).
-Legacy local uinput_event struct might not play well with newer time64-aware
-input_event kernel structure.
-
-
-
-[1] https://github.com/bluez/bluez/issues/84#issuecomment-942155841
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
