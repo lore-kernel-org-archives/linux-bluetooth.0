@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82CB6C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Nov 2021 21:15:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AB855C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 22 Nov 2021 21:17:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240234AbhKVVST (ORCPT
+        id S231327AbhKVVUT (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 22 Nov 2021 16:18:19 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54194 "EHLO
+        Mon, 22 Nov 2021 16:20:19 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54630 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234063AbhKVVSS (ORCPT
+        with ESMTP id S229836AbhKVVUQ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 22 Nov 2021 16:18:18 -0500
-Received: from mail-pj1-x1036.google.com (mail-pj1-x1036.google.com [IPv6:2607:f8b0:4864:20::1036])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8DAAC061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Nov 2021 13:15:11 -0800 (PST)
-Received: by mail-pj1-x1036.google.com with SMTP id iq11so14823710pjb.3
-        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Nov 2021 13:15:11 -0800 (PST)
+        Mon, 22 Nov 2021 16:20:16 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10E6C061574
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Nov 2021 13:17:09 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id y7so15271763plp.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 22 Nov 2021 13:17:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=xN0nztUGMZWHzm/rqFtS/jpqB9XAmgCpryioRRAxZEM=;
-        b=bw9nfyNEm/ieEG05/Pt0zzoJ0c2WzTJTRHhiSEEgb/hZRJtZ5zN3WH/OULIkpOL5da
-         bWiwUJW1bBnJO0GBxrzv8buteoMmGCD5PX+Sp8NfqOVgleU2YL/Mxdj7qNVrnetrhZpd
-         mG9aLN1I3PRy72BTB5J/aAfgaWZXGkxnekcefeB68Ht9nhHLPHBHd2QYqxRDrIY+U6Ye
-         nQ9BvypBHSfjSpmGvs36NuA7B8eF14JYeluRBnsSEaN2+/26EOmCJpYd6qKBRf5b+VAL
-         4xmR7tmMG3HmYKaVYxn7olObkYYsIRm8zb+/hPJ3PT0tjVNJkpHeS6hrMpuCcyoozelK
-         1RzA==
+        bh=wDSVJqzBALYKp2X5NH6gB9CebriBpswNkvlIm83z31Y=;
+        b=ivs95tGHKxybr9BhhdFsBfTHBWoDJVgAEBVuqlD0tm7SiazjTR57Utg+DzfHrSo9jX
+         7KJp84clsOhT7yWcN8/aC1dUhhFoUcLNVzd+IrmIwFyhIglyqd6H/NYOA5/S2epZmZtY
+         I5L4J/YKpiuXMg7jzB/guDjH1dHNY8x4yqGzaA8hg+G2bDlq6IpCutTN5xCpLpNqx55f
+         UQN5QbyzKYqgtxBpsSknJEaywCYJZScM3wovf80TD4E6Sbi+XI8/g7ruepoKkLlVDlR6
+         MP5uKKNgoFr+G8sv4cnFKiWR7QDOayT94QK0QsIMu9hxFGaqfPqIlHiacSb/As8IkQuP
+         L/7g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:mime-version
          :content-transfer-encoding;
-        bh=xN0nztUGMZWHzm/rqFtS/jpqB9XAmgCpryioRRAxZEM=;
-        b=yoM7qns3LlA0JOyIVMkjWlp00Uw3gRSTXP9edRX56lujbi1E4NHQCurEKYg33nBr9D
-         6fs9p+G/Vql8/RiK6KKlU6fMpVUjfXqZpuWWmwKm6Z1DxuPR2eUybxHjgwLmP5XjED6/
-         okzhwm+B5jLrMyJRznmChywqMBH9c/G25VlbGwewHOjCpGpgfuuwtrYzAFwBl3Nihf9z
-         qhwXNYq+889tufIUhFnm4DD/05viZ/TyEHMRkj9faG8qhSVDO/Saf2msXODpyyEsACaY
-         rmQE8Hd/XwcJmJ42wk6FLe7cqTHHjmwtL/yJDdwt86ndh+l5jWZmY3aVAmtEKJhGPfjG
-         8nAg==
-X-Gm-Message-State: AOAM531Qmhbj8aQNq7O3hfMXO5rrcmnuK6OyEH9GI5GU7zEvOtlBtbNT
-        y6LBM2x79cmzSmdrnyedBUKTArwOsgY=
-X-Google-Smtp-Source: ABdhPJx1iCUBdlgnTdfS897uiDvgIDvvK+AtIgvGAG7+AnnQ0YL43/IOQPIsX8j1fu1lF/sQxpXYJA==
-X-Received: by 2002:a17:90b:2389:: with SMTP id mr9mr36605096pjb.152.1637615710432;
-        Mon, 22 Nov 2021 13:15:10 -0800 (PST)
+        bh=wDSVJqzBALYKp2X5NH6gB9CebriBpswNkvlIm83z31Y=;
+        b=h7qQXjw9aLpE8qLFAxIA5stHl1A8xSEfAk39/afdKYTq9tdimDjJuuvshXjcXx7ppP
+         8R93nRRoc3zTxhAqaUgeTOeurf3fGUg/GadNBqV3lnZL2Uz4Y+Ql6zmaaV2cIAPRLLWs
+         YL4S3QOiJR1QqAAUnKSj2rduMY9D9Ds8zEuowNDMtPo8mlBOXHcB5/dhOL7OEftqTeiW
+         DmXdQUwZijDnY2ohRfFiqlnJbrIai2BPq1DrBFkLvaoNKAOn2hAAnN6//YhDtdYwMMLC
+         UNKzPL087PvruGAkFEMZ1dcDze//OIirSsy5uDSFk0HXZct+UHks6iFxHRJj9mbAxdSe
+         NFzA==
+X-Gm-Message-State: AOAM533JBtB/f5HpFpyOCOdTi1iID/PzikMPDjrnqS/Q0vhkejF9p/P4
+        O0rVxp7kO9a1/e/XMgd7o+MtU1Zp8Ts=
+X-Google-Smtp-Source: ABdhPJwOYRN4ZWUqp0DXZ4rvKbaK163UwSkWCwYFlgZZaJVVsq/VzbF8EiYcITEJ69oWFdZNTsjI2Q==
+X-Received: by 2002:a17:90b:2502:: with SMTP id ns2mr35182476pjb.51.1637615828929;
+        Mon, 22 Nov 2021 13:17:08 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id h36sm7414763pgb.9.2021.11.22.13.15.09
+        by smtp.gmail.com with ESMTPSA id z7sm10243406pfe.77.2021.11.22.13.17.08
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 22 Nov 2021 13:15:10 -0800 (PST)
+        Mon, 22 Nov 2021 13:17:08 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] uhid: Remove local copy of uhid header
-Date:   Mon, 22 Nov 2021 13:15:09 -0800
-Message-Id: <20211122211509.2216902-1-luiz.dentz@gmail.com>
+Subject: [PATCH v2] uhid: Remove local copy of uhid header
+Date:   Mon, 22 Nov 2021 13:17:07 -0800
+Message-Id: <20211122211707.2219208-1-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
@@ -68,11 +68,25 @@ uhid.h is part of kernel uapi nowadays so it can be included
 directly from linux/uhid.h so this removes the local copy to use it
 instead.
 ---
+ Makefile.plugins           |   2 +-
  profiles/input/uhid_copy.h | 199 -------------------------------------
  src/shared/uhid.h          |   3 +-
- 2 files changed, 1 insertion(+), 201 deletions(-)
+ 3 files changed, 2 insertions(+), 202 deletions(-)
  delete mode 100644 profiles/input/uhid_copy.h
 
+diff --git a/Makefile.plugins b/Makefile.plugins
+index 69fb01001..7693c767f 100644
+--- a/Makefile.plugins
++++ b/Makefile.plugins
+@@ -68,7 +68,7 @@ endif
+ 
+ if HOG
+ builtin_modules += hog
+-builtin_sources += profiles/input/hog.c profiles/input/uhid_copy.h \
++builtin_sources += profiles/input/hog.c \
+ 			profiles/input/hog-lib.c profiles/input/hog-lib.h \
+ 			profiles/deviceinfo/dis.c profiles/deviceinfo/dis.h \
+ 			profiles/battery/bas.c profiles/battery/bas.h \
 diff --git a/profiles/input/uhid_copy.h b/profiles/input/uhid_copy.h
 deleted file mode 100644
 index 0ef73d4cc..000000000
