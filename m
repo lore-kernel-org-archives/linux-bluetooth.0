@@ -2,95 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FB3FC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Nov 2021 21:34:53 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 17899C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 23 Nov 2021 21:54:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233690AbhKWViB (ORCPT
+        id S230026AbhKWV5h (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 23 Nov 2021 16:38:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:49610 "EHLO
+        Tue, 23 Nov 2021 16:57:37 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53950 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229586AbhKWViA (ORCPT
+        with ESMTP id S229633AbhKWV5g (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 23 Nov 2021 16:38:00 -0500
-Received: from mail-pj1-x102c.google.com (mail-pj1-x102c.google.com [IPv6:2607:f8b0:4864:20::102c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C0BC061574
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Nov 2021 13:34:52 -0800 (PST)
-Received: by mail-pj1-x102c.google.com with SMTP id x7so620761pjn.0
-        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Nov 2021 13:34:52 -0800 (PST)
+        Tue, 23 Nov 2021 16:57:36 -0500
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29F74C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Nov 2021 13:54:28 -0800 (PST)
+Received: by mail-qk1-x72d.google.com with SMTP id 132so627993qkj.11
+        for <linux-bluetooth@vger.kernel.org>; Tue, 23 Nov 2021 13:54:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1+u3JusoKBNium7ZrBf77ToKNjAXgQWgfFTp4Jc6mIE=;
-        b=oOGBZ9FtOXAuW5hZ4nTIL8I6oyl1HDbmlJQbR1yOgqB5PSZV3zFCqtpN3tZZfxaelQ
-         y8V3jfAhDUzrT6bFK8FZpWw/3+PYAFj84kLFsutWNHEcf/2m+oGzGlnFU+at6/yEAtm7
-         knxwtjlLWE6d0OiIkQ62iD65njwQbrZkCY2JLRMs8GTDYSoLReCuQUSniq7lqRWDJNoU
-         IEgj4brxFZpy6VG9wyHua7N0NrBKOwQ6bxO7nnXvXg+kbUbHeU6nmR0me8ZVRYylhf26
-         HblXOMDMmcAGR8gea6TdCnrrrz+iDG9yRI6BEzcMBZ7zDF/lX+xdM44kgxrdSHtrfhtU
-         8VkQ==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=/xtuRr53Eqp6M8EGF8aQteUHIIs5n/oK3Obbl6z4+5E=;
+        b=lsacGS6zhoczV4oeXCX5hWNszHmbjBstD9AqRR/Z6r3e585BRd1+zucJoJcsjpX5dF
+         nZeRRT+C2QQObjsWJqFtwhFMHMzDnBeCxrShSLmlcy9NY4lYyOrNLECyGBNpPPBpB8EN
+         a2c5z0UQuQNtDrEjU2kXcJ99XvvitkNQKJqIDRWNqpIEfDr0G0VXqMwnvYslQy0+pPa2
+         maHlJHdMCRvCuUsrcZWjjDiYm/hZH7CCq5GBHZRZ3OOe9vEaI/SWzsiHTd3WdAKzLxlW
+         Fjvvf7APt8Q7H9ESBMhiIYHObcgBhLtiSgh+scke0aDBHfvnA2CYQItrmx4y7fvnG6tU
+         rQUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=1+u3JusoKBNium7ZrBf77ToKNjAXgQWgfFTp4Jc6mIE=;
-        b=zWBbzZpCmFHViAFaILsdPTgxznuMg0pNYjwX0DdrpB5sxLZaxaEOv7cL9YQyxCCbJl
-         KGaL8oEgxVufaiAPUJ1q6yoKCvXir/2shwYcvLy9M9/fslSZM3r2k60tYo7foZFtIB0E
-         Yub5untLPqXNEzJD2vUonHLP13L/uTWDYOZHECDD9jBJGYnjhzeoqji3/Kw+nvnwGE4w
-         BegdykivT7y01uX9/FZytnfryDOhfWoPfDuehiiJ8tf/h4jBKZoRPvkzkhrEdI83OxIS
-         PqVJD/r/Mw3U9KS8LVyU6SFnBhHQmOQLLExUvksiiwc9hr/rare2+cv8SihOtMAP2rxn
-         fhNg==
-X-Gm-Message-State: AOAM530Uy6tK6N00yAtfj0Uv668LU7LNNHbh6jfpnBqP8FCnpMTn52UK
-        xM7a1pIz4fdZFRck53AsQELJ0oWHuU4=
-X-Google-Smtp-Source: ABdhPJwuso+kwr9++zFIKJ9T4A9mO76FE1JvAoKMouzc8VcERj/VXGB1o8MAgk6VHjk2FRuEUbRCSA==
-X-Received: by 2002:a17:902:7284:b0:142:728b:46a6 with SMTP id d4-20020a170902728400b00142728b46a6mr11035277pll.45.1637703291519;
-        Tue, 23 Nov 2021 13:34:51 -0800 (PST)
-Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z3sm14060709pfh.79.2021.11.23.13.34.50
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=/xtuRr53Eqp6M8EGF8aQteUHIIs5n/oK3Obbl6z4+5E=;
+        b=sRs/0D/DdsMBInNrHdjA+/p7lMxuEVX42QtjXRW0YLkMG5PrJkQoYbOFqiyp4H4hA5
+         i+IlAugurpe3jVT1IEMqmZvcSUFXdzkeKjHTsRZpGy+5VmaETVoz1LocuOXspOTg9LWS
+         jccyPKo/3bcSaozTJMJZ+sT0xOQjh5rpryiOcGq9eM/RhvIGteBL7wDg5VsYy7LguYq8
+         1w+rRAftthN1ZznE4X3Qvd8bEC/5JHG79FGzKvSwIEav2Wc++PhTiuOa2iYI42C7H4SS
+         0aLd1H9eb9NymRaJ68WTXqsyfSWWl0iJlQAhjd55zGLXwvLLKTg/bquGk+YkliPTUVMa
+         OF3A==
+X-Gm-Message-State: AOAM532yDaF5nRk/3D6GfvU7HzeO4YyT2nI/mCNGrQA2EZ1C8cqCp88/
+        8RNu3Dgye2Pb1gKMrJN0ZTcd44V5SGvS+pfV
+X-Google-Smtp-Source: ABdhPJzefyswtYn1gvqQc08ufbYvVOzsJK31UPhntMVub0Bmp5b2uZtrqms+W5IsLdCf4OwqHDOUQA==
+X-Received: by 2002:a05:620a:d96:: with SMTP id q22mr673546qkl.219.1637704467170;
+        Tue, 23 Nov 2021 13:54:27 -0800 (PST)
+Received: from [172.17.0.2] ([20.122.51.211])
+        by smtp.gmail.com with ESMTPSA id i23sm6604371qkl.101.2021.11.23.13.54.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 23 Nov 2021 13:34:51 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH BlueZ] build: Check for linux/uinput.h and linux/uhid.h
-Date:   Tue, 23 Nov 2021 13:34:50 -0800
-Message-Id: <20211123213450.2595964-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Tue, 23 Nov 2021 13:54:26 -0800 (PST)
+Message-ID: <619d6312.1c69fb81.7a59.37dc@mx.google.com>
+Date:   Tue, 23 Nov 2021 13:54:26 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3554765279675850340=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [BlueZ] build: Check for linux/uinput.h and linux/uhid.h
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211123213450.2595964-1-luiz.dentz@gmail.com>
+References: <20211123213450.2595964-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+--===============3554765279675850340==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This makes configure to check the presence of linux/uinput.h and
-linux/uhid.h kernel uapi headers since the code no longer contain copies
-of them and otherwise the code cannot be build without them:
+This is automated email and please do not reply to this email!
 
-checking linux/uinput.h usability... yes
-checking linux/uinput.h presence... yes
-checking for linux/uinput.h... yes
-checking linux/uhid.h usability... yes
-checking linux/uhid.h presence... yes
-checking for linux/uhid.h... yes
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=584863
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.38 seconds
+GitLint                       PASS      0.93 seconds
+Prep - Setup ELL              PASS      42.36 seconds
+Build - Prep                  PASS      0.48 seconds
+Build - Configure             PASS      8.05 seconds
+Build - Make                  PASS      179.89 seconds
+Make Check                    PASS      9.19 seconds
+Make Distcheck                PASS      214.98 seconds
+Build w/ext ELL - Configure   PASS      8.16 seconds
+Build w/ext ELL - Make        PASS      171.20 seconds
+
+
+
 ---
- configure.ac | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/configure.ac b/configure.ac
-index 0329095ee..2674e30d3 100644
---- a/configure.ac
-+++ b/configure.ac
-@@ -63,7 +63,7 @@ AC_CHECK_LIB(pthread, pthread_create, dummy=yes,
- AC_CHECK_LIB(dl, dlopen, dummy=yes,
- 			AC_MSG_ERROR(dynamic linking loader is required))
- 
--AC_CHECK_HEADERS(linux/types.h linux/if_alg.h)
-+AC_CHECK_HEADERS(linux/types.h linux/if_alg.h linux/uinput.h linux/uhid.h)
- 
- PKG_CHECK_MODULES(GLIB, glib-2.0 >= 2.28, dummy=yes,
- 				AC_MSG_ERROR(GLib >= 2.28 is required))
--- 
-2.33.1
 
+--===============3554765279675850340==--
