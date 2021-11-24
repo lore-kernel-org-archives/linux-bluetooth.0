@@ -2,122 +2,77 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 74C39C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 15:34:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A29E5C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 18:50:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241414AbhKXPhs (ORCPT
+        id S233572AbhKXSx7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Nov 2021 10:37:48 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:35022 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241381AbhKXPhg (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Nov 2021 10:37:36 -0500
-Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id BAB76CED24;
-        Wed, 24 Nov 2021 16:34:25 +0100 (CET)
-Content-Type: text/plain;
-        charset=us-ascii
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH v3] Bluetooth: btusb: Add the new support IDs for WCN6855
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <c3f2783ddb0ac0bbcaae70b57c6afdfd@codeaurora.org>
-Date:   Wed, 24 Nov 2021 16:34:25 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
-        c-hbandi@codeaurora.org, hemantg@codeaurora.org, mka@chromium.org,
-        rjliao@codeaurora.org, zijuhu@codeaurora.org
-Content-Transfer-Encoding: 7bit
-Message-Id: <7268E5CB-5429-49CA-9832-A8E1C121920A@holtmann.org>
-References: <c3f2783ddb0ac0bbcaae70b57c6afdfd@codeaurora.org>
-To:     tjiang@codeaurora.org
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Wed, 24 Nov 2021 13:53:59 -0500
+Received: from mga11.intel.com ([192.55.52.93]:37466 "EHLO mga11.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S229704AbhKXSx7 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 24 Nov 2021 13:53:59 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10178"; a="232842413"
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="232842413"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 10:50:49 -0800
+X-IronPort-AV: E=Sophos;i="5.87,261,1631602800"; 
+   d="scan'208";a="741298141"
+Received: from sdpoduri-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.212.157.122])
+  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Nov 2021 10:50:48 -0800
+From:   Brian Gix <brian.gix@intel.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     marcel@holtmann.org, paskripkin@gmail.com, brian.gix@gmail.com,
+        Brian Gix <brian.gix@intel.com>
+Subject: [PATCH] Bluetooth: refactor malicious adv data check
+Date:   Wed, 24 Nov 2021 10:50:27 -0800
+Message-Id: <20211124185027.395186-1-brian.gix@intel.com>
+X-Mailer: git-send-email 2.31.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tim,
+Check for out-of-bound read was being performed at the end of while
+num_reports loop, and would fill journal with false positives. Added
+check to beginning of loop processing so that it doesn't get checked
+after ptr has been advanced.
 
-> Add the more IDs of HP to usb_device_id table for WCN6855.
-> 
-> -Device(0489:e0cc) from /sys/kernel/debug/usb/devices
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e0cc Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> 
-> -Device(0489:e0d6) from /sys/kernel/debug/usb/devices
-> T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-> D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-> P:  Vendor=0489 ProdID=e0d6 Rev= 0.01
-> C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-> E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-> I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-> E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-> 
-> Signed-off-by: Tim Jiang <tjiang@codeaurora.org>
-> ---
-> drivers/bluetooth/btusb.c | 8 +++++++-
-> 1 file changed, 7 insertions(+), 1 deletion(-)
+Signed-off-by: Brian Gix <brian.gix@intel.com>
+---
+ net/bluetooth/hci_event.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-patch has been applied to bluetooth-next tree.
-
-Regards
-
-Marcel
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index efc5458b1345..7017805fb698 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -5920,6 +5920,11 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		struct hci_ev_le_advertising_info *ev = ptr;
+ 		s8 rssi;
+ 
++		if (ptr > (void *) skb_tail_pointer(skb) - sizeof(*ev)) {
++			bt_dev_err(hdev, "Malicious advertising data.");
++			break;
++		}
++
+ 		if (ev->length <= HCI_MAX_AD_LENGTH &&
+ 		    ev->data + ev->length <= skb_tail_pointer(skb)) {
+ 			rssi = ev->data[ev->length];
+@@ -5931,11 +5936,6 @@ static void hci_le_adv_report_evt(struct hci_dev *hdev, struct sk_buff *skb)
+ 		}
+ 
+ 		ptr += sizeof(*ev) + ev->length + 1;
+-
+-		if (ptr > (void *) skb_tail_pointer(skb) - sizeof(*ev)) {
+-			bt_dev_err(hdev, "Malicious advertising data. Stopping processing");
+-			break;
+-		}
+ 	}
+ 
+ 	hci_dev_unlock(hdev);
+-- 
+2.31.1
 
