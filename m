@@ -2,82 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B4FE4C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 14:51:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3CFD1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 14:53:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353653AbhKXOyd convert rfc822-to-8bit (ORCPT
+        id S1349552AbhKXO4f convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Nov 2021 09:54:33 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33197 "EHLO
+        Wed, 24 Nov 2021 09:56:35 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:47846 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353715AbhKXOy1 (ORCPT
+        with ESMTP id S1348525AbhKXO4e (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Nov 2021 09:54:27 -0500
+        Wed, 24 Nov 2021 09:56:34 -0500
 Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 56AD8CED24;
-        Wed, 24 Nov 2021 15:51:12 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9C0A8CED24;
+        Wed, 24 Nov 2021 15:53:23 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH] Bluetooth: HCI: Fix definition of
- bt_hci_rsp_read_stored_link_key
+Subject: Re: [PATCH 2/4] Bluetooth: btmtksdio: handle runtime pm only when
+ sdio_func is available
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211124021734.2769798-1-luiz.dentz@gmail.com>
-Date:   Wed, 24 Nov 2021 15:51:11 +0100
-Cc:     linux-bluetooth@vger.kernel.org
+In-Reply-To: <07cd9db8ef295bfe3e6b42796ccb8c9fb59dd9ba.1637360076.git.objelf@gmail.com>
+Date:   Wed, 24 Nov 2021 15:53:23 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
+        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
+        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
+        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
+        km.lin@mediatek.com, robin.chiu@mediatek.com,
+        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
+        posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
+        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <41622024-3262-4E65-93D7-ADB3227FFAE3@holtmann.org>
-References: <20211124021734.2769798-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Message-Id: <74A2D0D6-6A65-4832-BAFC-BCBA68F8DE78@holtmann.org>
+References: <4176102d8bbc36e5156e348df666a3e12c5a3d75.1637360076.git.objelf@gmail.com>
+ <07cd9db8ef295bfe3e6b42796ccb8c9fb59dd9ba.1637360076.git.objelf@gmail.com>
+To:     Sean Wang <sean.wang@mediatek.com>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Sean,
 
-> Both max_num_keys and num_key are 2 octects:
+> Runtime pm ops is not aware the sdio_func status that is probably
+> being disabled by btmtksdio_close. Thus, we are only able to access the
+> sdio_func for the runtime pm operations only when the sdio_func is
+> available.
 > 
-> BLUETOOTH CORE SPECIFICATION Version 5.3 | Vol 4, Part E
-> page 1985:
-> 
->  Max_Num_Keys:
->  Size: 2 octets
->  Range: 0x0000 to 0xFFFF
-> 
->  Num_Keys_Read:
->  Size: 2 octets
->  Range: 0x0000 to 0xFFFF
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
+> Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+> Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 > ---
-> include/net/bluetooth/hci.h | 4 ++--
-> 1 file changed, 2 insertions(+), 2 deletions(-)
+> drivers/bluetooth/btmtksdio.c | 6 ++++++
+> 1 file changed, 6 insertions(+)
 > 
-> diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-> index 84db6b275231..5f95de7367d5 100644
-> --- a/include/net/bluetooth/hci.h
-> +++ b/include/net/bluetooth/hci.h
-> @@ -1047,8 +1047,8 @@ struct hci_cp_read_stored_link_key {
-> } __packed;
-> struct hci_rp_read_stored_link_key {
-> 	__u8     status;
-> -	__u8     max_keys;
-> -	__u8     num_keys;
-> +	__u16    max_keys;
-> +	__u16    num_keys;
-> } __packed;
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index 4f3412ad8fca..4c46c62e4623 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -1037,6 +1037,9 @@ static int btmtksdio_runtime_suspend(struct device *dev)
+> 	if (!bdev)
+> 		return 0;
 > 
-> #define HCI_OP_DELETE_STORED_LINK_KEY	0x0c12
+> +	if (!test_bit(HCI_RUNNING, &bdev->hdev->flags))
+> +		return 0;
+> +
+> 	sdio_claim_host(bdev->func);
+> 
+> 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
+> @@ -1064,6 +1067,9 @@ static int btmtksdio_runtime_resume(struct device *dev)
+> 	if (!bdev)
+> 		return 0;
+> 
+> +	if (!test_bit(HCI_RUNNING, &bdev->hdev->flags))
+> +		return 0;
+> +
+> 	sdio_claim_host(bdev->func);
+> 
+> 	sdio_writel(bdev->func, C_FW_OWN_REQ_CLR, MTK_REG_CHLPCR, &err);
 
-I have no idea on how this could be wrong all these years. I added this back in 2015 :(
-
-However, you also need to touch the user of it
-
-       if (!rp->status && sent->read_all == 0x01) {
-                hdev->stored_max_keys = rp->max_keys;
-                hdev->stored_num_keys = rp->num_keys;
-       }
+I dislike looking at HCI_RUNNING since that check should be removed from a driver. Do you really need it? I mean, a driver should now if it is running or not.
 
 Regards
 
