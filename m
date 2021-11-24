@@ -2,80 +2,95 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A2D6FC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 15:21:09 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EA8A6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 24 Nov 2021 15:22:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234424AbhKXPYS convert rfc822-to-8bit (ORCPT
+        id S234800AbhKXPZe convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 24 Nov 2021 10:24:18 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:59754 "EHLO
+        Wed, 24 Nov 2021 10:25:34 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:54787 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234269AbhKXPYR (ORCPT
+        with ESMTP id S229866AbhKXPZe (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 24 Nov 2021 10:24:17 -0500
+        Wed, 24 Nov 2021 10:25:34 -0500
 Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id ED7DECED24;
-        Wed, 24 Nov 2021 16:21:05 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id BDF77CED24;
+        Wed, 24 Nov 2021 16:22:23 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH 3/4] Bluetooth: btmtksdio: fix resume failure
+Subject: Re: [PATCH v3 1/4] Bluetooth: MGMT: Use
+ hci_dev_test_and_{set,clear}_flag
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <8a0a4db81b6aede029701cd4db734aaf9bd37ee7.1637360076.git.objelf@gmail.com>
-Date:   Wed, 24 Nov 2021 16:21:05 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
-        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
-        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
-        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
-        km.lin@mediatek.com, robin.chiu@mediatek.com,
-        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
-        posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
-        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+In-Reply-To: <20211120012448.1476960-1-luiz.dentz@gmail.com>
+Date:   Wed, 24 Nov 2021 16:22:23 +0100
+Cc:     linux-bluetooth@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <C3BBFD94-0A2A-4BA1-9892-86CB2956F982@holtmann.org>
-References: <4176102d8bbc36e5156e348df666a3e12c5a3d75.1637360076.git.objelf@gmail.com>
- <8a0a4db81b6aede029701cd4db734aaf9bd37ee7.1637360076.git.objelf@gmail.com>
-To:     Sean Wang <sean.wang@mediatek.com>
+Message-Id: <317EAEE4-7B9C-4DF6-8968-F93421B85E6F@holtmann.org>
+References: <20211120012448.1476960-1-luiz.dentz@gmail.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 X-Mailer: Apple Mail (2.3693.20.0.1.32)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sean,
+Hi Luiz,
 
-> btmtksdio have to rely on MMC_PM_KEEP_POWER in pm_flags to avoid that
-> SDIO power is being shut off during the device is in suspend. That fixes
-> the SDIO command fails to access the bus after the device is resumed.
+> This make use of hci_dev_test_and_{set,clear}_flag instead of doing 2
+> operations in a row.
+
+I really Fixes: tags for these.
+
 > 
-> Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
-> Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-> Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 > ---
-> drivers/bluetooth/btmtksdio.c | 2 ++
-> 1 file changed, 2 insertions(+)
+> v2: Fix marking Device Privacy Flag even when adapter is not capable of
+> handling Set Privacy Mode.
+> v3: Add patch for using hci_dev_test_and_{set,clear}_flag and split
+> changes reworking how HCI_CONN_FLAG_REMOTE_WAKEUP is set and make use of
+> bitmap to store the supported flags.
 > 
-> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-> index 4c46c62e4623..cae1fcd15512 100644
-> --- a/drivers/bluetooth/btmtksdio.c
-> +++ b/drivers/bluetooth/btmtksdio.c
-> @@ -1040,6 +1040,8 @@ static int btmtksdio_runtime_suspend(struct device *dev)
-> 	if (!test_bit(HCI_RUNNING, &bdev->hdev->flags))
-> 		return 0;
+> net/bluetooth/mgmt.c | 14 +++++++-------
+> 1 file changed, 7 insertions(+), 7 deletions(-)
 > 
-> +	sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
-> +
-> 	sdio_claim_host(bdev->func);
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index f8f74d344297..0f91bf15e260 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -4041,10 +4041,10 @@ static int set_zero_key_func(struct sock *sk, struct hci_dev *hdev,
+> #endif
 > 
-> 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
-
-if this makes sense without 2/4 patch, then please re-send.
+> 	if (hdev && use_ll_privacy(hdev) && !hdev_is_powered(hdev)) {
+> -		bool changed = hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> -
+> -		hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> +		bool changed;
+> 
+> +		changed = hci_dev_test_and_clear_flag(hdev,
+> +						      HCI_ENABLE_LL_PRIVACY);
+> 		if (changed)
+> 			exp_ll_privacy_feature_changed(false, hdev, sk);
+> 	}
+> @@ -4139,15 +4139,15 @@ static int set_rpa_resolution_func(struct sock *sk, struct hci_dev *hdev,
+> 	val = !!cp->param[0];
+> 
+> 	if (val) {
+> -		changed = !hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> -		hci_dev_set_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> +		changed = !hci_dev_test_and_set_flag(hdev,
+> +						     HCI_ENABLE_LL_PRIVACY);
+> 		hci_dev_clear_flag(hdev, HCI_ADVERTISING);
+> 
+> 		/* Enable LL privacy + supported settings changed */
+> 		flags = BIT(0) | BIT(1);
+> 	} else {
+> -		changed = hci_dev_test_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> -		hci_dev_clear_flag(hdev, HCI_ENABLE_LL_PRIVACY);
+> +		changed = hci_dev_test_and_clear_flag(hdev,
+> +						      HCI_ENABLE_LL_PRIVACY);
+> 
+> 		/* Disable LL privacy + supported settings changed */
+> 		flags = BIT(1);
 
 Regards
 
