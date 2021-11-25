@@ -2,110 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A73ACC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 08:24:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 33C1CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 12:21:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1349514AbhKYI1T (ORCPT
+        id S1350999AbhKYMZF (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Nov 2021 03:27:19 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:53770 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S236816AbhKYIZT (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Nov 2021 03:25:19 -0500
-X-UUID: 49045217f8b14659bd3be9f39c3a9638-20211125
-X-UUID: 49045217f8b14659bd3be9f39c3a9638-20211125
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1131555005; Thu, 25 Nov 2021 16:22:06 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by
- mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Thu, 25 Nov 2021 16:22:04 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 25 Nov 2021 16:22:04 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/4] Bluetooth: btmtksdio: handle runtime pm only when sdio_func is available
-Date:   Thu, 25 Nov 2021 16:22:03 +0800
-Message-ID: <1637828523-31925-1-git-send-email-sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <74A2D0D6-6A65-4832-BAFC-BCBA68F8DE78@holtmann.org--annotate>
-References: <74A2D0D6-6A65-4832-BAFC-BCBA68F8DE78@holtmann.org--annotate>
+        Thu, 25 Nov 2021 07:25:05 -0500
+Received: from mail.kernel.org ([198.145.29.99]:35368 "EHLO mail.kernel.org"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S1349036AbhKYMXF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 25 Nov 2021 07:23:05 -0500
+Received: by mail.kernel.org (Postfix) with ESMTPS id E315561156
+        for <linux-bluetooth@vger.kernel.org>; Thu, 25 Nov 2021 12:19:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1637842793;
+        bh=KsIGIu1sOU2JqFvKf4kvi5ih4tE6UWCQNzhVevEbWR4=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=MeZ3gQQhptFdpCiyAi2Rjw+9O1WRVY+7Vyskaj37mmWD/pGq06xvnuuH2Wn/HtpYx
+         SLxBqKzDhUVCpJKGw1NMRQ+t7R/jy9eb4WRxXnPyfvK1QbhKMYWP2JGAF8ndTnZ2Nx
+         01k/t6d53ssGAv24qIwU5yM4PEMmFz/7cKRmCPUhi79Pehm+t3OuIkFqCr8a0Eqfcu
+         f5zFJGiR8TtMvJht54uEOtoX1zRI2TL46mV3aeCTnETK5LQVN1nGojPY06eXaUMqje
+         pcebRJFgv6NYhm1JVV26VXouAimLdwvhMQqiZS6ZzLTvf6jz6/0lAwAbgZ8YPH0zsP
+         6k0abpYMH0bWw==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id E04C7610E5; Thu, 25 Nov 2021 12:19:53 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 213829] Intel AX210 Bluetooth controller doesn't start from
+ warm boot
+Date:   Thu, 25 Nov 2021 12:19:52 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: crodjer@protonmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-213829-62941-FGE7c8W0fX@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-213829-62941@https.bugzilla.kernel.org/>
+References: <bug-213829-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D213829
 
->>Hi Sean,
->
->> Runtime pm ops is not aware the sdio_func status that is probably
->> being disabled by btmtksdio_close. Thus, we are only able to access
->> the sdio_func for the runtime pm operations only when the sdio_func is
->> available.
->>
->> Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to
->> SDIO based Bluetooth")
->> Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
->> Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
->> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->> ---
->> drivers/bluetooth/btmtksdio.c | 6 ++++++
->> 1 file changed, 6 insertions(+)
->>
->> diff --git a/drivers/bluetooth/btmtksdio.c
->> b/drivers/bluetooth/btmtksdio.c index 4f3412ad8fca..4c46c62e4623
->> 100644
->> --- a/drivers/bluetooth/btmtksdio.c
->> +++ b/drivers/bluetooth/btmtksdio.c
->> @@ -1037,6 +1037,9 @@ static int btmtksdio_runtime_suspend(struct device *dev)
->>	if (!bdev)
->>		return 0;
->>
->> +	if (!test_bit(HCI_RUNNING, &bdev->hdev->flags))
->> +		return 0;
->> +
->>	sdio_claim_host(bdev->func);
->>
->>	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err); @@
->> -1064,6 +1067,9 @@ static int btmtksdio_runtime_resume(struct device *dev)
->>	if (!bdev)
->>		return 0;
->>
->> +	if (!test_bit(HCI_RUNNING, &bdev->hdev->flags))
->> +		return 0;
->> +
->>	sdio_claim_host(bdev->func);
->>
->>	sdio_writel(bdev->func, C_FW_OWN_REQ_CLR, MTK_REG_CHLPCR, &err);
->
->I dislike looking at HCI_RUNNING since that check should be removed from a driver. Do you really need it? I mean, a driver should now if it is running or not.
+Rohan (crodjer@protonmail.com) changed:
 
-We don't really need it, instead we can use internal flags in the driver to know the status. I will do this in v2.
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |crodjer@protonmail.com
 
-	Sean
->
->Regards
->
->Marcel
->
+--- Comment #39 from Rohan (crodjer@protonmail.com) ---
+I faced a similar issue
+(https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=3D1000403) on Debian uns=
+table,
+but only with v5.15.3. When I built v5.15.4 of the kernel, it went away.
+
+> It is fixed in Arch Linux though.
+> I'm using 5.15.4.arch1-1, not the zen kernel.
+>=20
+> See
+> https://github.com/archlinux/linux/commit/
+> 236027c0ae73217898ac8249e44394cc1026dada
+
+Applying this patch on 5.15.3 didn't resolve this for me, but simply moving=
+ to
+5.15.4 did.
+
+>=20
+> Let's hope it will soon land in the mainline kernel too.
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
