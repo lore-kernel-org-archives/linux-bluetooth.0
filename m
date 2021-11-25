@@ -2,66 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4367BC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 13:19:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BFDD6C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 14:08:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1355166AbhKYNWp (ORCPT
+        id S1355535AbhKYOLu (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Nov 2021 08:22:45 -0500
-Received: from alexa-out.qualcomm.com ([129.46.98.28]:23253 "EHLO
+        Thu, 25 Nov 2021 09:11:50 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:33636 "EHLO
         alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1344193AbhKYNUo (ORCPT
+        with ESMTP id S232810AbhKYOJt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Nov 2021 08:20:44 -0500
-Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
-  by alexa-out.qualcomm.com with ESMTP; 25 Nov 2021 05:17:33 -0800
+        Thu, 25 Nov 2021 09:09:49 -0500
+Received: from ironmsg07-lv.qualcomm.com ([10.47.202.151])
+  by alexa-out.qualcomm.com with ESMTP; 25 Nov 2021 06:06:38 -0800
 X-QCInternal: smtphost
 Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
-  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 25 Nov 2021 05:17:31 -0800
+  by ironmsg07-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 25 Nov 2021 06:06:36 -0800
 X-QCInternal: smtphost
-Received: from hyd-lablnx229.qualcomm.com ([10.204.179.152])
-  by ironmsg01-blr.qualcomm.com with ESMTP; 25 Nov 2021 18:47:14 +0530
-Received: by hyd-lablnx229.qualcomm.com (Postfix, from userid 2390365)
-        id 81B9D2126C; Thu, 25 Nov 2021 18:47:12 +0530 (IST)
-From:   pharish <pharish@codeaurora.org>
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 25 Nov 2021 19:36:22 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 2256C2132F; Thu, 25 Nov 2021 19:36:21 +0530 (IST)
+From:   saluvala <saluvala@codeaurora.org>
 To:     marcel@holtmann.org, johan.hedberg@gmail.com
 Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
         linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
         linux-arm-msm@vger.kernel.org, bgodavar@codeaurora.org,
         rjliao@codeaurora.org, hbandi@codeaurora.org,
         abhishekpandit@chromium.org, mcchou@chromium.org,
-        saluvala@codeaurora.org, pharish <pharish@codeaurora.org>
-Subject: [PATCH v1] Bluetooth: hci_qca: Stop IBS timer during BT OFF
-Date:   Thu, 25 Nov 2021 18:47:10 +0530
-Message-Id: <1637846230-4798-2-git-send-email-pharish@codeaurora.org>
+        saluvala@codeaurora.org
+Subject: [RFC PATCH v1] Bluetooth: hci_qca: Add new hci_uart proto callback to power off voltage sources
+Date:   Thu, 25 Nov 2021 19:36:19 +0530
+Message-Id: <1637849179-18382-1-git-send-email-saluvala@codeaurora.org>
 X-Mailer: git-send-email 2.7.4
-In-Reply-To: <1637846230-4798-1-git-send-email-pharish@codeaurora.org>
-References: <1637846230-4798-1-git-send-email-pharish@codeaurora.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change stops IBS timers during BT OFF.
+This change adds a new hci_uart proto callback entry i.e., power off.
+This poweroff Callback is exposed to the drivers and called during BT OFF
+immediately after port close. This will ensure that Voltages sources are
+powered off after sending all the data before port close. Previously as
+part of hdev shutdown callback, voltages sources are powered off. But we
+have seen cases where post shutdown sequence completion some packets which
+are already queued are sent to UART. As controller is powered off, UART
+can’t send the data out or it is sending partial data due RTS line high.
 
-Signed-off-by: pharish <pharish@codeaurora.org>
+Signed-off-by: saluvala <saluvala@codeaurora.org>
 ---
- drivers/bluetooth/hci_qca.c | 3 +++
- 1 file changed, 3 insertions(+)
+ drivers/bluetooth/hci_qca.c    | 26 +++++++++++++++++++-------
+ drivers/bluetooth/hci_serdev.c |  3 +++
+ drivers/bluetooth/hci_uart.h   |  1 +
+ 3 files changed, 23 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
-index dd768a8..6f44b26 100644
+index dd768a8..e1dee75 100644
 --- a/drivers/bluetooth/hci_qca.c
 +++ b/drivers/bluetooth/hci_qca.c
-@@ -1928,6 +1928,9 @@ static int qca_power_off(struct hci_dev *hdev)
- 	hu->hdev->hw_error = NULL;
- 	hu->hdev->cmd_timeout = NULL;
+@@ -231,6 +231,7 @@ static int qca_regulator_enable(struct qca_serdev *qcadev);
+ static void qca_regulator_disable(struct qca_serdev *qcadev);
+ static void qca_power_shutdown(struct hci_uart *hu);
+ static int qca_power_off(struct hci_dev *hdev);
++static int qca_power_off_reg(struct hci_uart *hu);
+ static void qca_controller_memdump(struct work_struct *work);
  
-+	mod_timer(&qca->tx_idle_timer, 0);
-+	mod_timer(&qca->wake_retrans_timer, 0);
+ static enum qca_btsoc_type qca_soc_type(struct hci_uart *hu)
+@@ -554,7 +555,6 @@ static void qca_controller_memdump_timeout(struct work_struct *work)
+ 	mutex_unlock(&qca->hci_memdump_lock);
+ }
+ 
+-
+ /* Initialize protocol */
+ static int qca_open(struct hci_uart *hu)
+ {
+@@ -1815,6 +1815,7 @@ static const struct hci_uart_proto qca_proto = {
+ 	.flush		= qca_flush,
+ 	.setup		= qca_setup,
+ 	.recv		= qca_recv,
++	.poweroff	= qca_power_off_reg,
+ 	.enqueue	= qca_enqueue,
+ 	.dequeue	= qca_dequeue,
+ };
+@@ -1881,7 +1882,6 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 	struct qca_data *qca = hu->priv;
+ 	unsigned long flags;
+ 	enum qca_btsoc_type soc_type = qca_soc_type(hu);
+-	bool sw_ctrl_state;
+ 
+ 	/* From this point we go into power off state. But serial port is
+ 	 * still open, stop queueing the IBS data and flush all the buffered
+@@ -1904,7 +1904,22 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 		host_set_baudrate(hu, 2400);
+ 		qca_send_power_pulse(hu, false);
+ 		qca_regulator_disable(qcadev);
+-	} else if (soc_type == QCA_WCN6750) {
++	} else if (qcadev->bt_en) {
++		gpiod_set_value_cansleep(qcadev->bt_en, 0);
++	}
 +
- 	/* Stop sending shutdown command if soc crashes. */
- 	if (soc_type != QCA_ROME
- 		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
++	set_bit(QCA_BT_OFF, &qca->flags);
++}
++
++static int qca_power_off_reg(struct hci_uart *hu)
++{
++	struct qca_serdev *qcadev;
++	enum qca_btsoc_type soc_type = qca_soc_type(hu);
++	bool sw_ctrl_state;
++
++	qcadev = serdev_device_get_drvdata(hu->serdev);
++
++	if (soc_type == QCA_WCN6750) {
+ 		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 		msleep(100);
+ 		qca_regulator_disable(qcadev);
+@@ -1912,11 +1927,8 @@ static void qca_power_shutdown(struct hci_uart *hu)
+ 			sw_ctrl_state = gpiod_get_value_cansleep(qcadev->sw_ctrl);
+ 			bt_dev_dbg(hu->hdev, "SW_CTRL is %d", sw_ctrl_state);
+ 		}
+-	} else if (qcadev->bt_en) {
+-		gpiod_set_value_cansleep(qcadev->bt_en, 0);
+ 	}
+-
+-	set_bit(QCA_BT_OFF, &qca->flags);
++	return 0;
+ }
+ 
+ static int qca_power_off(struct hci_dev *hdev)
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 3b00d82..b3fec15 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -157,6 +157,9 @@ static int hci_uart_close(struct hci_dev *hdev)
+ 		serdev_device_close(hu->serdev);
+ 	}
+ 
++	if (hu->proto->poweroff)
++		hu->proto->poweroff(hu);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/bluetooth/hci_uart.h b/drivers/bluetooth/hci_uart.h
+index fb4a2d0..fc3cd77f 100644
+--- a/drivers/bluetooth/hci_uart.h
++++ b/drivers/bluetooth/hci_uart.h
+@@ -59,6 +59,7 @@ struct hci_uart_proto {
+ 	int (*recv)(struct hci_uart *hu, const void *data, int len);
+ 	int (*enqueue)(struct hci_uart *hu, struct sk_buff *skb);
+ 	struct sk_buff *(*dequeue)(struct hci_uart *hu);
++	int (*poweroff)(struct hci_uart *hu);
+ };
+ 
+ struct hci_uart {
 -- 
 QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc. is a member 
 of Code Aurora Forum, hosted by The Linux Foundation
