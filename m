@@ -2,60 +2,60 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 44806C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 07:08:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F953C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 25 Nov 2021 07:08:54 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1353483AbhKYHL6 (ORCPT
+        id S1353067AbhKYHME (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 25 Nov 2021 02:11:58 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46290 "EHLO
+        Thu, 25 Nov 2021 02:12:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45860 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348674AbhKYHJ5 (ORCPT
+        with ESMTP id S1353110AbhKYHKD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 25 Nov 2021 02:09:57 -0500
+        Thu, 25 Nov 2021 02:10:03 -0500
 Received: from mail-qt1-x849.google.com (mail-qt1-x849.google.com [IPv6:2607:f8b0:4864:20::849])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48C7AC0613E0
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Nov 2021 23:06:45 -0800 (PST)
-Received: by mail-qt1-x849.google.com with SMTP id h8-20020a05622a170800b002acc8656e05so5187092qtk.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Nov 2021 23:06:45 -0800 (PST)
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5E8BFC0613E1
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Nov 2021 23:06:51 -0800 (PST)
+Received: by mail-qt1-x849.google.com with SMTP id s6-20020a05622a018600b002b2d93b9c73so5186099qtw.9
+        for <linux-bluetooth@vger.kernel.org>; Wed, 24 Nov 2021 23:06:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=date:in-reply-to:message-id:mime-version:references:subject:from:to
          :cc;
-        bh=JVVmti1TF4GHlNN4453/y/m8aUQmdPpZK7g3QRcNjfg=;
-        b=RRLbabke3uOltGkI4HXHdBLLDD/J3v3jKSIMitbT7iojTmSQEIQyle6U6uYNwW5PKp
-         OygKWk8XZii+9KRwnO7W5MLI8JggPM7GFWk0py4fbT6wzLOgWLSFDQhCRLhgbfIjME8n
-         CS9Ado2tT/Yt1pzMZtFMCetjtUa+eYYcwSpXnPieP9W+LXeeT/j4bVV+qBe6Wj4x0/b1
-         poNit4M+d5KZWEF8NlwURFBCtidQozMYzue+MYLuPVkf+RJjCi057+ZfhSsZqNzylWR6
-         rJVBf5M9D/wLwOT0HJTvJ/XtfD+bLl5m4nsQz88KBysGkBOUp26htniHWXrmEiUaL8rR
-         jpPQ==
+        bh=1JmPv41Z91ArBPDE/8zSxUM+kn7GRxB8GbDn4MVqK9I=;
+        b=ckKDwxCAHL6iEO781TGHX9QR6KGRLAKqWAsOwzRV4TVwRClzjhgOuh+gFvk5dqnKx6
+         wIfZDfuq8Sh+whE8qD5ycCNS3HoCm2YBz0MV5UDV1n6IkzDhkcTZGXTHqn1z7P8KYLFe
+         ugNvcXKQ7cH5HEVMw+mJOo40g0Lx1Rd2/ZoGdWZV3lj64X/HMbJ1tEyhpY4NyzI4JWy1
+         eROL/GUrT62CGknISDAD8DKb9mHhVc6ZE3J1qRT0BNnPdQCDRP+B5fq9YsFsatAk8iV0
+         AiPcTPfjsd8AvjCSgjfEXKvi7Pu1gQ0wLCenwW7B4HS5avGShTnomiedT/cnNh/B6sZK
+         grjw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:date:in-reply-to:message-id:mime-version
          :references:subject:from:to:cc;
-        bh=JVVmti1TF4GHlNN4453/y/m8aUQmdPpZK7g3QRcNjfg=;
-        b=2ACeqhVmif1aJDMLL82521w09eOhZOxe2VDX95nYYWnyjBByjqcE5dMcVFT1+dQIZn
-         FINCOOp92di6pZe0AR0ZF1qGwPqe3pg82ds7rMqqcZFtA1prHXq5YY//tpgvqvzI9rLH
-         Fqa+MkWLD6R3Zuz4yiuv4XrGtQu5/+TpFpS0z23+ibAnNf0ZcJHc0MmqPOZu7EjsBK7F
-         VXWc1A4U2otWdA17ftqEMLkl79OdK+qW/wq8NJkF+9ltmBOxWjwm0uSjgKg1tFU7K6NB
-         sQztLbY07Wyk6XhampFyy03aVZIT+8Gp/5J/LcMO63IbQPKtJVPcBAi2HK0nMaKUpi1S
-         L94Q==
-X-Gm-Message-State: AOAM532RRAP3r6QXbocXXgUFGF0HwGCjSQ98cK0VszH+FUtWBprmDHVe
-        1VJI89cRLCIhrcj6w/IIBUI94L5qCk1LM5C+BAXmrPEjRNuwTsLGttmGPRZB8qic9UKte4awj7o
-        zdgQL/txbe4Gwseul5SxpCR6mmsLS+1gQ5mXtbQ7xihYQ4jgcV1fVBx0koxrnpKLGZOw15+Djv8
-        AH
-X-Google-Smtp-Source: ABdhPJxQKLePo8y6Qsv6mGMYHVmmrIZjJjPlrvxuIJUac40AzF9UhGoberfIpp3vpqc+N+niQXUJYiXuGDc+
+        bh=1JmPv41Z91ArBPDE/8zSxUM+kn7GRxB8GbDn4MVqK9I=;
+        b=MSeHDHYTvmKD8oVHRTeJdmkhZQmb4CKJtSGLdc3AQdHNs8UyBeR2nCgb42SihNHU4Y
+         y4MHNZYCrvaZrnF7cYDKN89+ku6IzGVpz9zKA4GBmfnlaJoiJUUmFedtLEzNmH+U8I0B
+         ofdXmAA5EJgKadDGaEETyALgeE7uEJgMNcAQ/hsJ6ge5HlFNW88TDf2IwGvg1ItyDhwl
+         JCd3dDy5g3LrqvqJbEceGZLapxii70jUmtG8SBPxQhImMuByc6TfXjuLv1f6whwJAHxU
+         GwfTa/f4iy0NQlTRF8stCHBN0bY9Ns4bISYTZtmVaOHcvi/gmXDrOvkImoaqmo6I71cA
+         JXLw==
+X-Gm-Message-State: AOAM532Z86jFPE1DdIcQAsKyGxCVC8pXtBg+rniL00otVPnrYu7gbkfF
+        YVwfeGD0JoWyfkepCJR6lVQ1Ei1RBle58YT6PO2VbJvbMGk27NCcciGbs8AsAQTOGvC0dRXpETU
+        q4e4yPsdBa4lsvbcXYq6hunmeYY6KN1ruKB6Jptmv1ZA2H9b4T1yVD/jyBCKF19WB2v/wpFihK6
+        QY
+X-Google-Smtp-Source: ABdhPJxDGLEc9gkieENdvQUV6ZIi89Lcd1wOTKhbCE7ayxYvIn1FsutSHeiOVtfA4uh8UUspFZrgJetF4iD7
 X-Received: from apusaka-p920.tpe.corp.google.com ([2401:fa00:1:10:a5d9:6769:9abb:6b2])
- (user=apusaka job=sendgmr) by 2002:a25:b911:: with SMTP id
- x17mr3955460ybj.247.1637824004438; Wed, 24 Nov 2021 23:06:44 -0800 (PST)
-Date:   Thu, 25 Nov 2021 15:06:25 +0800
+ (user=apusaka job=sendgmr) by 2002:a5b:783:: with SMTP id b3mr3784586ybq.328.1637824010485;
+ Wed, 24 Nov 2021 23:06:50 -0800 (PST)
+Date:   Thu, 25 Nov 2021 15:06:26 +0800
 In-Reply-To: <20211125150558.Bluez.v4.1.I78857808e0b20c6e4dd934b174d3f1106fe3402d@changeid>
-Message-Id: <20211125150558.Bluez.v4.3.I08d192861aa6b2025fbc575a7e0caffaa6170ed5@changeid>
+Message-Id: <20211125150558.Bluez.v4.4.Ia861c62203f9201b657a6e81f7612c5db415ac2c@changeid>
 Mime-Version: 1.0
 References: <20211125150558.Bluez.v4.1.I78857808e0b20c6e4dd934b174d3f1106fe3402d@changeid>
 X-Mailer: git-send-email 2.34.0.rc2.393.gf8c9666880-goog
-Subject: [Bluez PATCH v4 3/5] device: Save remote name request attempts into
- cache file
+Subject: [Bluez PATCH v4 4/5] main: add configurable RemoteNameRequestRetryDelay
+ parameter
 From:   Archie Pusaka <apusaka@google.com>
 To:     linux-bluetooth <linux-bluetooth@vger.kernel.org>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
@@ -70,168 +70,125 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Archie Pusaka <apusaka@chromium.org>
 
-Since a peer device is potentially removed if not discovered for more
-than 30 seconds, we would lost the remote name request activity when
-the device is rediscovered. This could end up with a remote name
-request much sooner than we intend it to be.
+This specifies how long will the userspace ignore a peer with an
+unknown name after a failed remote name resolving procedure.
 
-Therefore, put the RNR record into a cache file, so we can recover it
-when the peer device is rediscovered.
+The peer device can still be connected, this only prevents the remote
+name resolving procedure retry.
 
 Reviewed-by: Miao-chen Chou <mcchou@chromium.org>
 ---
 
 Changes in v4:
-* Modify cache to support changes in previous patch
+* New in this version.
 
- src/device.c | 94 ++++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 91 insertions(+), 3 deletions(-)
+ src/btd.h     |  1 +
+ src/device.c  |  4 +---
+ src/main.c    | 19 ++++++++++++++++---
+ src/main.conf |  5 +++++
+ 4 files changed, 23 insertions(+), 6 deletions(-)
 
+diff --git a/src/btd.h b/src/btd.h
+index ff9f082f19..a805a40d7d 100644
+--- a/src/btd.h
++++ b/src/btd.h
+@@ -104,6 +104,7 @@ struct btd_opts {
+ 	uint32_t	tmpto;
+ 	uint8_t		privacy;
+ 	bool		device_privacy;
++	uint32_t	name_request_retry_delay;
+ 
+ 	struct btd_defaults defaults;
+ 
 diff --git a/src/device.c b/src/device.c
-index a83cb61f8c..44450b1132 100644
+index 44450b1132..0e2612825b 100644
 --- a/src/device.c
 +++ b/src/device.c
-@@ -567,6 +567,59 @@ void device_store_cached_name(struct btd_device *dev, const char *name)
- 	g_key_file_free(key_file);
+@@ -79,8 +79,6 @@
+ #define GATT_INCLUDE_UUID_STR "2802"
+ #define GATT_CHARAC_UUID_STR "2803"
+ 
+-#define NAME_RESOLVE_RETRY_DELAY	300 /* seconds */
+-
+ static DBusConnection *dbus_conn = NULL;
+ static unsigned service_state_cb_id;
+ 
+@@ -4489,7 +4487,7 @@ bool device_is_name_resolve_allowed(struct btd_device *device)
+ 	 */
+ 	return now.tv_sec < device->name_resolve_failed_time ||
+ 		now.tv_sec >= device->name_resolve_failed_time +
+-						NAME_RESOLVE_RETRY_DELAY;
++					btd_opts.name_request_retry_delay;
  }
  
-+static void device_store_cached_name_resolve(struct btd_device *dev)
-+{
-+	char filename[PATH_MAX];
-+	char d_addr[18];
-+	GKeyFile *key_file;
-+	GError *gerr = NULL;
-+	char *data;
-+	char *data_old;
-+	gsize length = 0;
-+	gsize length_old = 0;
-+	uint64_t failed_time;
-+
-+	if (device_address_is_private(dev)) {
-+		DBG("Can't store name resolve for private addressed device %s",
-+								dev->path);
-+		return;
-+	}
-+
-+	ba2str(&dev->bdaddr, d_addr);
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s",
-+			btd_adapter_get_storage_dir(dev->adapter), d_addr);
-+	create_file(filename, 0600);
-+
-+	key_file = g_key_file_new();
-+	if (!g_key_file_load_from_file(key_file, filename, 0, &gerr)) {
-+		error("Unable to load key file from %s: (%s)", filename,
-+								gerr->message);
-+		g_error_free(gerr);
-+	}
-+
-+	failed_time = (uint64_t) dev->name_resolve_failed_time;
-+
-+	data_old = g_key_file_to_data(key_file, &length_old, NULL);
-+
-+	g_key_file_set_uint64(key_file, "NameResolving", "FailedTime",
-+								failed_time);
-+
-+	data = g_key_file_to_data(key_file, &length, NULL);
-+
-+	if ((length != length_old) || (memcmp(data, data_old, length))) {
-+		if (!g_file_set_contents(filename, data, length, &gerr)) {
-+			error("Unable set contents for %s: (%s)", filename,
-+								gerr->message);
-+			g_error_free(gerr);
-+		}
-+	}
-+
-+	g_free(data);
-+	g_free(data_old);
-+
-+	g_key_file_free(key_file);
-+}
-+
- static void browse_request_free(struct browse_req *req)
- {
- 	struct btd_device *device = req->device;
-@@ -3304,6 +3357,32 @@ failed:
- 	return str;
- }
+ void device_name_resolve_fail(struct btd_device *device)
+diff --git a/src/main.c b/src/main.c
+index 3adcdc1087..8cc2dfca61 100644
+--- a/src/main.c
++++ b/src/main.c
+@@ -55,9 +55,10 @@
  
-+static void load_cached_name_resolve(struct btd_device *device,
-+					const char *local, const char *peer)
-+{
-+	char filename[PATH_MAX];
-+	GKeyFile *key_file;
-+	uint64_t failed_time;
-+
-+	if (device_address_is_private(device))
-+		return;
-+
-+	snprintf(filename, PATH_MAX, STORAGEDIR "/%s/cache/%s", local, peer);
-+
-+	key_file = g_key_file_new();
-+
-+	if (!g_key_file_load_from_file(key_file, filename, 0, NULL))
-+		goto failed;
-+
-+	failed_time = g_key_file_get_uint64(key_file, "NameResolving",
-+							"FailedTime", NULL);
-+
-+	device->name_resolve_failed_time = failed_time;
-+
-+failed:
-+	g_key_file_free(key_file);
-+}
-+
- static struct csrk_info *load_csrk(GKeyFile *key_file, const char *group)
- {
- 	struct csrk_info *csrk;
-@@ -4311,6 +4390,7 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	struct btd_device *device;
- 	char dst[18];
- 	char *str;
-+	const char *storage_dir;
+ #define BLUEZ_NAME "org.bluez"
  
- 	ba2str(bdaddr, dst);
- 	DBG("dst %s", dst);
-@@ -4326,13 +4406,15 @@ struct btd_device *device_create(struct btd_adapter *adapter,
- 	else
- 		device->le = true;
+-#define DEFAULT_PAIRABLE_TIMEOUT       0 /* disabled */
+-#define DEFAULT_DISCOVERABLE_TIMEOUT 180 /* 3 minutes */
+-#define DEFAULT_TEMPORARY_TIMEOUT     30 /* 30 seconds */
++#define DEFAULT_PAIRABLE_TIMEOUT           0 /* disabled */
++#define DEFAULT_DISCOVERABLE_TIMEOUT     180 /* 3 minutes */
++#define DEFAULT_TEMPORARY_TIMEOUT         30 /* 30 seconds */
++#define DEFAULT_NAME_REQUEST_RETRY_DELAY 300 /* 5 minutes */
  
--	str = load_cached_name(device, btd_adapter_get_storage_dir(adapter),
--									dst);
-+	storage_dir = btd_adapter_get_storage_dir(adapter);
-+	str = load_cached_name(device, storage_dir, dst);
- 	if (str) {
- 		strcpy(device->name, str);
- 		g_free(str);
+ #define SHUTDOWN_GRACE_SECONDS 10
+ 
+@@ -82,6 +83,7 @@ static const char *supported_options[] = {
+ 	"JustWorksRepairing",
+ 	"TemporaryTimeout",
+ 	"Experimental",
++	"RemoteNameRequestRetryDelay",
+ 	NULL
+ };
+ 
+@@ -816,6 +818,16 @@ static void parse_config(GKeyFile *config)
+ 		g_strfreev(strlist);
  	}
  
-+	load_cached_name_resolve(device, storage_dir, dst);
++	val = g_key_file_get_integer(config, "General",
++					"RemoteNameRequestRetryDelay", &err);
++	if (err) {
++		DBG("%s", err->message);
++		g_clear_error(&err);
++	} else {
++		DBG("RemoteNameRequestRetryDelay=%d", val);
++		btd_opts.name_request_retry_delay = val;
++	}
 +
- 	return device;
- }
+ 	str = g_key_file_get_string(config, "GATT", "Cache", &err);
+ 	if (err) {
+ 		DBG("%s", err->message);
+@@ -927,6 +939,7 @@ static void init_defaults(void)
+ 	btd_opts.name_resolv = TRUE;
+ 	btd_opts.debug_keys = FALSE;
+ 	btd_opts.refresh_discovery = TRUE;
++	btd_opts.name_request_retry_delay = DEFAULT_NAME_REQUEST_RETRY_DELAY;
  
-@@ -4401,7 +4483,12 @@ bool device_is_name_resolve_allowed(struct btd_device *device)
- 		return false;
+ 	btd_opts.defaults.num_entries = 0;
+ 	btd_opts.defaults.br.page_scan_type = 0xFFFF;
+diff --git a/src/main.conf b/src/main.conf
+index 0c41d77420..49b9e67550 100644
+--- a/src/main.conf
++++ b/src/main.conf
+@@ -119,6 +119,11 @@
+ # Defaults to false.
+ #Experimental = false
  
- 	clock_gettime(CLOCK_MONOTONIC, &now);
--	return now.tv_sec >= device->name_resolve_failed_time +
++# The duration to avoid retrying to resolve a peer's name, if the previous
++# try failed.
++# The value is in seconds. Default is 300, i.e. 5 minutes.
++#RemoteNameRequestRetryDelay = 300
 +
-+	/* If now < failed_time, it means the clock has somehow turned back,
-+	 * possibly because of system restart. Allow name request in this case.
-+	 */
-+	return now.tv_sec < device->name_resolve_failed_time ||
-+		now.tv_sec >= device->name_resolve_failed_time +
- 						NAME_RESOLVE_RETRY_DELAY;
- }
- 
-@@ -4414,6 +4501,7 @@ void device_name_resolve_fail(struct btd_device *device)
- 
- 	clock_gettime(CLOCK_MONOTONIC, &now);
- 	device->name_resolve_failed_time = now.tv_sec;
-+	device_store_cached_name_resolve(device);
- }
- 
- void device_set_class(struct btd_device *device, uint32_t class)
+ [BR]
+ # The following values are used to load default adapter parameters for BR/EDR.
+ # BlueZ loads the values into the kernel before the adapter is powered if the
 -- 
 2.34.0.rc2.393.gf8c9666880-goog
 
