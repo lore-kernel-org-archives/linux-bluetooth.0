@@ -2,99 +2,102 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B97CAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 27 Nov 2021 23:52:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id AC057C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 28 Nov 2021 09:24:25 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1356604AbhK0X4K (ORCPT
+        id S1356812AbhK1J1e (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 27 Nov 2021 18:56:10 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45640 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230082AbhK0XyJ (ORCPT
+        Sun, 28 Nov 2021 04:27:34 -0500
+Received: from mail-il1-f197.google.com ([209.85.166.197]:52885 "EHLO
+        mail-il1-f197.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233127AbhK1JZd (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 27 Nov 2021 18:54:09 -0500
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AAFBC061574
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Nov 2021 15:50:54 -0800 (PST)
-Received: by mail-qv1-xf31.google.com with SMTP id kl8so10616553qvb.3
-        for <linux-bluetooth@vger.kernel.org>; Sat, 27 Nov 2021 15:50:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=8BBtcq/Xu53rbPLWo6wgbDd2j3SlCnqr6HCR0su9dCs=;
-        b=YP4VmPDHLE9sg3okn6R5vT8/K/i3R5rAiDR8GtqLdzhKaYm462is6oyEa8uw7s4Zf5
-         xNiPwgW8bLlJYW04GZrdI+ZkVHObfnF0AJhgF9VzRLk9hDM0fIN2u1XVRL4xDx+IVuNN
-         VBD0N15jJYk2X6pP/aidbsJqPesDzyJ6EjkRk9PFzu4UVrJ2sZGfkMuRRurPkZ4vBUaX
-         gKsD+NjQDM3JHWROvDgc7MzxxQNQYpffBBjAn9MhRk/g4nIJA9VvpjhQH6UZQ9Yem0s7
-         7DuEHhqV9I1QfG5t6VwUWU2hgIZ7sitHBiyVH+LoDOm4hAxPrbuXgDciq5R75ccmeZiz
-         7M2w==
+        Sun, 28 Nov 2021 04:25:33 -0500
+Received: by mail-il1-f197.google.com with SMTP id y3-20020a056e021be300b0029f6c440695so19878194ilv.19
+        for <linux-bluetooth@vger.kernel.org>; Sun, 28 Nov 2021 01:22:17 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=8BBtcq/Xu53rbPLWo6wgbDd2j3SlCnqr6HCR0su9dCs=;
-        b=NDMKsYplpFBHM2yzitDgmypxeHfhh+ckDcdVz1H3foZQBTh+RjkVrnfp/Y1tER8C9F
-         aKzFs5X/ZLD37IAS7WAqTslr1SBfq+++pRRQDZzERbgu6FHo3eWSxqKo2JaJDDhjzn/h
-         5EwIQUJ2d9RDVsy3BH2SS8oK1w3HezGfWq+54QsXAMmMOR+uNDR9MFFCMdaMEPsbsELL
-         W2SnQoCLap2+K5+fe6nQbfuPtMwsF77LiEzQcgjRZIQhYH7kJ6YEmeI9zdw48fJ2pfhp
-         aj8er4Xcf7t0aCVebMr8FEKXc2wh2GD8WizMcysKZ15/sM12jNOLKmQ/JumJvou+VUO5
-         y++g==
-X-Gm-Message-State: AOAM530Af/pq8Xi6jp/Zl+AGBSpok6FdMAV/8abaXMy3n4jNz6OiMyMW
-        3RXbSG3b4bTYB1bVRXf3b3NUSpfkijw=
-X-Google-Smtp-Source: ABdhPJx6BP5cYN/k810GSgg0NRVquMHvGuvIPAo82m9CSo8yVeowUA0ltRoJ4zQyhbezg+61dW3giQ==
-X-Received: by 2002:a05:6214:c47:: with SMTP id r7mr34089500qvj.51.1638057053135;
-        Sat, 27 Nov 2021 15:50:53 -0800 (PST)
-Received: from [172.17.0.2] ([52.149.181.23])
-        by smtp.gmail.com with ESMTPSA id a17sm4698098qkp.108.2021.11.27.15.50.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 27 Nov 2021 15:50:52 -0800 (PST)
-Message-ID: <61a2c45c.1c69fb81.b79eb.6ab4@mx.google.com>
-Date:   Sat, 27 Nov 2021 15:50:52 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============4004468836938962090=="
+        h=x-gm-message-state:mime-version:date:message-id:subject:from:to;
+        bh=/gh/RIirNb12dG3VUXwDsG22Fm8KS1ZnNB70KsKbfa8=;
+        b=JoXGEW0u8panMkSexXMan6If5RsXXjRkTBp64tcS2OyuDYS1TgpnB4HPVDOWMlfI7h
+         LNdJX0a3j67V8Bdszdi9LV4aPCJOQ1NKyJTzWOOZFU9rgD5m0bbjkQS/iEedr2kLCA/0
+         216Eb1kxR2XnyhfSx+jXRGAzR6MYf1yTCKZPHAOOrIirYB3a/eJ5DScmUyTunxNn/rUy
+         hhF5mcnpWk+rqwYMdJaSX5V3IPqkLNqCA6U3L86oOKk/JJvyhBWhzAz+R6efLmw8+rhN
+         Q5AQ4KtDBq9dDneoFeuIfgqT2gjPQTK994FtbOffxTexXJisXMP0C9qkB5t7TuNOfCWf
+         35Rw==
+X-Gm-Message-State: AOAM530erURE4mdEanmjC4CX1v0uwk65bQkwAvvN5RJKyhBhaib/P3H5
+        cnm/e0ElxeGhuoOOufU0NxEEJs/AxGqnkPxZ5NBYs0prvS1G
+X-Google-Smtp-Source: ABdhPJye5Ui+qEY5l/8O444JqqbQhowZO9TRfMvoZ72SWuUt2trfxS5NlwmhUs8VBemz4qXCkJV/M6A/y+rgmfwxJT06ZJUxsouY
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, dev.git@javispedro.com
-Subject: RE: gatt-client: when disconnected return default MTU for GattCharacteristic1.MTU
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211127222132.14351-1-dev.git@javispedro.com>
-References: <20211127222132.14351-1-dev.git@javispedro.com>
+X-Received: by 2002:a05:6e02:148c:: with SMTP id n12mr10574733ilk.209.1638091337453;
+ Sun, 28 Nov 2021 01:22:17 -0800 (PST)
+Date:   Sun, 28 Nov 2021 01:22:17 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000047549805d1d5dcdc@google.com>
+Subject: [syzbot] KMSAN: uninit-value in hci_conn_complete_evt
+From:   syzbot <syzbot+dcb7d98a388eafb85ecb@syzkaller.appspotmail.com>
+To:     davem@davemloft.net, glider@google.com, johan.hedberg@gmail.com,
+        kuba@kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        marcel@holtmann.org, netdev@vger.kernel.org,
+        syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============4004468836938962090==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+Hello,
 
-This is automated email and please do not reply to this email!
+syzbot found the following issue on:
 
-Dear submitter,
+HEAD commit:    a535b0caaa2f Revert "DO-NOT-SUBMIT: kmsan: suppress a repo..
+git tree:       https://github.com/google/kmsan.git master
+console output: https://syzkaller.appspot.com/x/log.txt?x=10becf06b00000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=2d142cdf4204061
+dashboard link: https://syzkaller.appspot.com/bug?extid=dcb7d98a388eafb85ecb
+compiler:       clang version 14.0.0 (git@github.com:llvm/llvm-project.git 0996585c8e3b3d409494eb5f1cad714b9e1f7fb5), GNU ld (GNU Binutils for Debian) 2.35.2
 
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=586773
+Unfortunately, I don't have any reproducer for this issue yet.
 
----Test result---
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+dcb7d98a388eafb85ecb@syzkaller.appspotmail.com
 
-Test Summary:
-CheckPatch                    PASS      1.34 seconds
-GitLint                       PASS      0.93 seconds
-Prep - Setup ELL              PASS      51.78 seconds
-Build - Prep                  PASS      0.51 seconds
-Build - Configure             PASS      9.44 seconds
-Build - Make                  PASS      222.52 seconds
-Make Check                    PASS      9.90 seconds
-Make Distcheck                PASS      263.17 seconds
-Build w/ext ELL - Configure   PASS      9.56 seconds
-Build w/ext ELL - Make        PASS      209.87 seconds
+=====================================================
+BUG: KMSAN: uninit-value in hci_conn_complete_evt+0x8e7/0x1de0 net/bluetooth/hci_event.c:2668
+ hci_conn_complete_evt+0x8e7/0x1de0 net/bluetooth/hci_event.c:2668
+ hci_event_packet+0x1670/0x22e0 net/bluetooth/hci_event.c:6311
+ hci_rx_work+0x6ae/0xd10 net/bluetooth/hci_core.c:5136
+ process_one_work+0xdc7/0x1760 kernel/workqueue.c:2297
+ worker_thread+0x1101/0x22b0 kernel/workqueue.c:2444
+ kthread+0x66b/0x780 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30
 
+Uninit was created at:
+ slab_post_alloc_hook mm/slab.h:524 [inline]
+ slab_alloc_node mm/slub.c:3227 [inline]
+ __kmalloc_node_track_caller+0xa3b/0x13c0 mm/slub.c:4962
+ kmalloc_reserve net/core/skbuff.c:356 [inline]
+ __alloc_skb+0x4db/0xe40 net/core/skbuff.c:427
+ alloc_skb include/linux/skbuff.h:1116 [inline]
+ bt_skb_alloc include/net/bluetooth/bluetooth.h:389 [inline]
+ bcsp_recv+0x1550/0x2120 drivers/bluetooth/hci_bcsp.c:673
+ hci_uart_tty_receive+0x345/0x7a0 drivers/bluetooth/hci_ldisc.c:613
+ tty_ldisc_receive_buf+0x32a/0x390 drivers/tty/tty_buffer.c:475
+ tty_port_default_receive_buf+0x14b/0x1e0 drivers/tty/tty_port.c:39
+ receive_buf drivers/tty/tty_buffer.c:491 [inline]
+ flush_to_ldisc+0x3b5/0x940 drivers/tty/tty_buffer.c:543
+ process_one_work+0xdc7/0x1760 kernel/workqueue.c:2297
+ worker_thread+0x1101/0x22b0 kernel/workqueue.c:2444
+ kthread+0x66b/0x780 kernel/kthread.c:319
+ ret_from_fork+0x1f/0x30
+=====================================================
 
 
 ---
-Regards,
-Linux Bluetooth
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-
---===============4004468836938962090==--
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
