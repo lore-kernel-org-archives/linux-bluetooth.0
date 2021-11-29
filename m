@@ -2,34 +2,43 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 70E2CC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 09:06:38 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0B135C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 09:07:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241559AbhK2JJy (ORCPT
+        id S243040AbhK2JLB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Nov 2021 04:09:54 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52838 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S240013AbhK2JHy (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Nov 2021 04:07:54 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 31224C0619E6;
-        Mon, 29 Nov 2021 00:52:48 -0800 (PST)
-Received: from [77.23.61.74] (helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1mrcOw-0003yU-Ib; Mon, 29 Nov 2021 09:52:42 +0100
-Message-ID: <50735c6a-6a33-e4b8-a15a-b9efec933bef@leemhuis.info>
-Date:   Mon, 29 Nov 2021 09:52:42 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Subject: Re: [PATCH v3 1/2] Bluetooth: add quirk disabling LE Read Transmit
- Power
-Content-Language: en-BS
-To:     Aditya Garg <gargaditya08@live.com>,
-        Marcel Holtmann <marcel@holtmann.org>
-Cc:     Greg KH <gregkh@linuxfoundation.org>,
+        Mon, 29 Nov 2021 04:11:01 -0500
+Received: from mail-ma1ind01olkn0146.outbound.protection.outlook.com ([104.47.100.146]:6371
+        "EHLO IND01-MA1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S241070AbhK2JJA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 29 Nov 2021 04:09:00 -0500
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZmvlkHYDIDPVD2a/PO9UkZaAPmfW/tG7R2Q0Kc17EbLO8QhpAqiT91m7cUEquDZp0u56wF2zCggV1FWwlNzR5+ZC4wnHwTicupV0pie5UzhpJwuMhJEoJf6c7lXAq7Ql4nipFzF9wHDSia5pw3da2JHwaYI5vOgTWk6IPyunHhJFw0l0/vkA6uGhxxfqEC02e2PZCQjuiMoPXVD7na4O7bxEnKL8SKQVwM7+KHLzBjrnhsZ4SUU1/FlcC7ccAZE3XUg2R8DZzY2gjuexO4rhsaO2Phi/ACKl1q0tPmxzGr3ToLnzTonEV1JERsrVdz2F/y4IktP+vrfWCzKXKwLeAg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=yXrJyNtiDcy/cJvDLC2DrBzU6GcLXoroBbdHjk4gHgU=;
+ b=ONJEkEIciZgD07SkQpCpxTc609zIoMJAYkDed0kwmp3PJEXt94T6pKSjxxjwNAdJWbiiJPmWn/qwotn8ZuUWl8HQk+8+1C6OhWlB4WI+3oREO97h1NXDiCTczo3KJaJSuNh5zp9+AAtVw6y1qTpBG0Xk/z98ArLFwa7m3lQ9sKM8ANyYtJCYCCrSJk4+tyVW3pyRLbXHHcCwSVNM2/oEHJqgiUyvGVks0Y5M/ZG4F+bmskYJAQd0467kVxpOPkyLK7LSAMO8+TIg/HSVYfEuNPhmAQHDyA1CdAd2/SX2hX5x45thXt2R/jHRPrdpRsfQy0FasniHW9B1+gs050NgVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=live.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=yXrJyNtiDcy/cJvDLC2DrBzU6GcLXoroBbdHjk4gHgU=;
+ b=gQBBMBar7G9lTuWSNlBIobO8zPl+s161cWphAWb29JrYlF6bofrNn6Ob/FacpreFJg75HoXYf8L62Co2F7IiPelUV6t1ab552ON+CJ98N0JR6f30k31w5PcnHZ9oX7RQPalBtbCWLQIx/J78E56b3uGizD8dwASrKFF59RR/zC9MAF6WOjaPby83prSAT3lPasxTIvqWr9QOPkBZTCpDRgC1OgfigIP355hjszprAU+A4rBxyJSKxHxROH0mHX8SFBZVnA5hsQdt5kSMLbbHcBGNMgXCfrbLFj7A1hTJKN0v7KA/d6Y0rRLrlotqcndnJXYUSIN6pjqlN82E++mOUQ==
+Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:1b::13)
+ by PN3PR01MB7822.INDPRD01.PROD.OUTLOOK.COM (2603:1096:c01:9c::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23; Mon, 29 Nov
+ 2021 09:05:03 +0000
+Received: from PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+ ([fe80::7ca6:9165:19ec:4cd7]) by PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+ ([fe80::7ca6:9165:19ec:4cd7%5]) with mapi id 15.20.4734.024; Mon, 29 Nov 2021
+ 09:05:03 +0000
+From:   Aditya Garg <gargaditya08@live.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+CC:     Greg KH <gregkh@linuxfoundation.org>,
+        Thorsten Leemhuis <regressions@leemhuis.info>,
         Orlando Chamberlain <redecorating@protonmail.com>,
         Daniel Winkler <danielwinkler@google.com>,
         Johan Hedberg <johan.hedberg@intel.com>,
@@ -39,6 +48,13 @@ Cc:     Greg KH <gregkh@linuxfoundation.org>,
         "regressions@lists.linux.dev" <regressions@lists.linux.dev>,
         "sonnysasaka@chromium.org" <sonnysasaka@chromium.org>,
         "stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: [PATCH v4 2/2] btbcm: disable read tx power for affected Macs with
+ the T2 Security chip
+Thread-Topic: [PATCH v4 2/2] btbcm: disable read tx power for affected Macs
+ with the T2 Security chip
+Thread-Index: AQHX5QAxoEYALVxXVEOSEdj7Vglnwg==
+Date:   Mon, 29 Nov 2021 09:05:02 +0000
+Message-ID: <3EA0850B-7D40-4B21-85A5-B42C4CE8A942@live.com>
 References: <3B8E16FA-97BF-40E5-9149-BBC3E2A245FE@live.com>
  <YZSuWHB6YCtGclLs@kroah.com> <52DEDC31-EEB2-4F39-905F-D5E3F2BBD6C0@live.com>
  <8919a36b-e485-500a-2722-529ffa0d2598@leemhuis.info>
@@ -51,84 +67,122 @@ References: <3B8E16FA-97BF-40E5-9149-BBC3E2A245FE@live.com>
  <287DE71A-2BF2-402D-98C8-24A9AEEE55CB@live.com>
  <42E2EC08-1D09-4DDE-B8B8-7855379C23C5@holtmann.org>
  <6ABF3770-A9E8-4DAF-A22D-DA7113F444F3@live.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-In-Reply-To: <6ABF3770-A9E8-4DAF-A22D-DA7113F444F3@live.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1638175968;360f7ded;
-X-HE-SMSGID: 1mrcOw-0003yU-Ib
+ <A003A45E-EE35-43EC-879F-3395CCB5EF59@live.com>
+ <6326984F-8428-4A3D-9734-1A408B9E82BB@live.com>
+In-Reply-To: <6326984F-8428-4A3D-9734-1A408B9E82BB@live.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-messagesentrepresentingtype: 1
+x-tmn:  [IrC6vBjd1lUrYiE+VR/J/RB5z8zWWF4cHKlgUzz0n5VrhF4gKK4LJm/BSo+ajXv+]
+x-ms-publictraffictype: Email
+x-ms-office365-filtering-correlation-id: c0694153-d0a6-4ed7-e68f-08d9b3175463
+x-ms-traffictypediagnostic: PN3PR01MB7822:
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: TiV6sXXMrhBhglwy76I9T7oc8TA99eJBqyKfuSYb7YkvKeI0JfXtkM8TfjauRAnga5A0RaiApNJfiwQR9IOeLjeJuemfTEbuB7cCQm4+h11Tm4LdU8QSJREb0ZSGd657352MwmLyZoDH/n4NxAhm7compIzIYI6HG5tCYldUmGetfKA9jTv6OHDwCjP1FP5n1xx+b3bvHbTVFuKyFQROon+snxLsQ0eAoVHCke3jpTq0Z+SyT/wY+o2xkYF9UnY3/hJ+j3hp5t7UTH8gyirNvbawts9cS59Eu1AyNAq4OD9d6wWfhMr6igZ7cMEJy0lQ7BT2Vk6BO5VqEjT5iEyasED48x6pO45rcSEUGyGOhnPDksVyiQTuH5LtonV8wl/FsUlWxkeBN6fpapuJquZ3GS7CDs2J7cXoIkIs0IktSTNp8RFvC29x0AACiyBFW0vpelP9IzZuAXpHgou4XEyRls5Aqr35JzKgeGuIbkzhYmOpMOKxQBkWTasqYOcX67gkvSJf/La+HCMX/h9PGJpr6yT8gJ9oI6so/jwvntYdHtXXZMrMGZKWnzAgpbXrHPLqs19NYwkBswZ7jAwzHDqRgfg0MfuoFuM+ABsWu7X0yOYsrTN/UKebl29ngyyjfjc1
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: FQHlw/zVztPi/qSlQvvXHrqRIMW6emeSbl1l9rFtJGFswysqsx/icr/v22M5QqQZ+uhyRmV/HZjQb1fLvx3EoqREMGRzYEEdbwYkN3pgJXZJY/FvArzzuJJWZCytc68Z8aCWnltWYM2+pQyrMAk2JBo1Wb74eCa+Dp48WR4rJiS4X7Jqr0bDDbKZ+dOlkMxYq90/iE84BsQWef+2zLsdjmi8ySEPeRaamV8d0ovR8xGDCJo3uR8WqzTPELttvHPDpDsZFgjiwXFo8SFfe5RQzLJ74p9GiK/bsbw21wgbZReqIzAYQ/V3WJMtXHgP61LpeDk9xo6+5G67+VyvWs5UqC68PpxspoHMNf2ocyKdGCo1dU4EM+vtBe+ZmWGZ5r8vTmVjEg/pLGzncuaodapDezP+3mMztOCr6b0Gu20ggN29cBu2PWoeHxCVXd7LTAj+IoGFZGCTrk6AlMDna9Xld6a1q+x0qhPd7sW+wIxGprUh7cubV1pkDetzt1xEZ6CeaAWFE3IecFmSHc61BG1NnEvDd+lKx26qOTFw3K6Ep5jFdwUFg45GpPACz9wSrcOlTUkouzeVmWPzewh32L6sLia7XQyEM4U9Vjd+cAKIUAEc00h7R4fDa3MSpfVN7PD4YB9WqFWZCHGmvuleuNSN53s7KJyy1NgH6r1SUCaxZkCCctFPVkf87k2Q1oADQSfh88HDxvmv828oKfzYDRo4ilW/pplJ2a7PyOxVsaFDLH5offAT35hFrVOnPbmgVC6MW+tp9FgA/yzptmclzYr1yA==
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <19AAC14BF22538458AC73444F1429249@INDPRD01.PROD.OUTLOOK.COM>
+Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-OriginatorOrg: sct-15-20-3174-20-msonline-outlook-a1a1a.templateTenant
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PNZPR01MB4415.INDPRD01.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-CrossTenant-Network-Message-Id: c0694153-d0a6-4ed7-e68f-08d9b3175463
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Nov 2021 09:05:02.9993
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PN3PR01MB7822
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi! Great to see progress for this regression.
+From: Aditya Garg <gargaditya08@live.com>
 
-On 29.11.21 09:32, Aditya Garg wrote:
-> From: Aditya Garg <gargaditya08@live.com>
-> 
-> Some devices have a bug causing them to not work if they query 
-> LE tx power on startup. Thus we add a quirk in order to not query it 
-> and default min/max tx power values to HCI_TX_POWER_INVALID.
-> 
-> Signed-off-by: Aditya Garg <gargaditya08@live.com>
-> ---
+Some Macs with the T2 security chip had Bluetooth not working.
+To fix it we add DMI based quirks to disable querying of LE Tx power.
 
-FWIW: In case you need to send an improved patch, could you please add
-this after your 'Signed-off-by:' (see at (¹) below for the reasoning):
-
+Signed-off-by: Aditya Garg <gargaditya08@live.com>
 Reported-by: Orlando Chamberlain <redecorating@protonmail.com>
 Link:
-https://lore.kernel.org/r/4970a940-211b-25d6-edab-21a815313954@protonmail.com
+https://lore.kernel.org/r/4970a940-211b-25d6-edab-21a815313954@protonmail.c=
+om
 Fixes: 7c395ea521e6 ("Bluetooth: Query LE tx power on startup")
+---
+drivers/bluetooth/btbcm.c | 40 +++++++++++++++++++++++++++++++++++++++
+1 file changed, 40 insertions(+)
 
-And if the patch is already good to go: could the subsystem maintainer
-please add it when applying? See (¹) for the reasoning.
+diff --git a/drivers/bluetooth/btbcm.c b/drivers/bluetooth/btbcm.c
+index e4182acee488c5..40f7c9c5cf0a5a 100644
+--- a/drivers/bluetooth/btbcm.c
++++ b/drivers/bluetooth/btbcm.c
+@@ -8,6 +8,7 @@
 
-Ciao, Thorsten, your Linux kernel regression tracker.
+#include <linux/module.h>
+#include <linux/firmware.h>
++#include <linux/dmi.h>
+#include <asm/unaligned.h>
 
+#include <net/bluetooth/bluetooth.h>
+@@ -343,9 +344,44 @@ static struct sk_buff *btbcm_read_usb_product(struct h=
+ci_dev *hdev)
+	return skb;
+}
 
-(¹) Long story: The commit message would benefit from a link to the
-regression report, for reasons explained in
-Documentation/process/submitting-patches.rst. To quote:
++static const struct dmi_system_id disable_broken_read_transmit_power[] =3D=
+ {
++	{
++		 .matches =3D {
++			DMI_MATCH(DMI_BOARD_VENDOR, "Apple Inc."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro16,1"),
++		},
++	},
++	{
++		 .matches =3D {
++			DMI_MATCH(DMI_BOARD_VENDOR, "Apple Inc."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro16,2"),
++		},
++	},
++	{
++		 .matches =3D {
++			DMI_MATCH(DMI_BOARD_VENDOR, "Apple Inc."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "MacBookPro16,4"),
++		},
++	},
++	{
++		 .matches =3D {
++			DMI_MATCH(DMI_BOARD_VENDOR, "Apple Inc."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "iMac20,1"),
++		},
++	},
++	{
++		 .matches =3D {
++			DMI_MATCH(DMI_BOARD_VENDOR, "Apple Inc."),
++			DMI_MATCH(DMI_PRODUCT_NAME, "iMac20,2"),
++		},
++	},
++	{ }
++};
++
+static int btbcm_read_info(struct hci_dev *hdev)
+{
+	struct sk_buff *skb;
++	const struct dmi_system_id *dmi_id;
 
-```
-If related discussions or any other background information behind the
-change can be found on the web, add 'Link:' tags pointing to it. In case
-your patch fixes a bug, for example, add a tag with a URL referencing
-the report in the mailing list archives or a bug tracker;
-```
+	/* Read Verbose Config Version Info */
+	skb =3D btbcm_read_verbose_config(hdev);
+@@ -363,6 +399,10 @@ static int btbcm_read_info(struct hci_dev *hdev)
+	bt_dev_info(hdev, "BCM: features 0x%2.2x", skb->data[1]);
+	kfree_skb(skb);
 
-This concept is old, but the text was reworked recently to make this use
-case for the Link: tag clearer. For details see:
-https://git.kernel.org/linus/1f57bd42b77c
-
-Yes, that "Link:" is not really crucial; but it's good to have if
-someone needs to look into the backstory of this change sometime in the
-future. But I care for a different reason. I'm tracking this regression
-(and others) with regzbot, my Linux kernel regression tracking bot. This
-bot will notice if a patch with a Link: tag to a tracked regression gets
-posted and record that, which allowed anyone looking into the regression
-to quickly gasp the current status from regzbot's webui
-(https://linux-regtracking.leemhuis.info/regzbot ) or its reports. The
-bot will also notice if a commit with a Link: tag to a regression report
-is applied by Linus and then automatically mark the regression as
-resolved then.
-
-IOW: this tag makes my life a regression tracker a lot easier, as I
-otherwise have to tell regzbot manually when the fix lands. :-/
-
-
-P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-on my table. I can only look briefly into most of them. Unfortunately
-therefore I sometimes will get things wrong or miss something important.
-I hope that's not the case here; if you think it is, don't hesitate to
-tell me about it in a public reply. That's in everyone's interest, as
-what I wrote above might be misleading to everyone reading this; any
-suggestion I gave they thus might sent someone reading this down the
-wrong rabbit hole, which none of us wants.
-
-BTW, I have no personal interest in this issue, which is tracked using
-regzbot, my Linux kernel regression tracking bot
-(https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-this mail to get things rolling again and hence don't need to be CC on
-all further activities wrt to this regression.
++	/* Read DMI and disable broken Read LE Min/Max Tx Power */
++	if (dmi_first_match(disable_broken_read_transmit_power))
++		set_bit(HCI_QUIRK_BROKEN_READ_TRANSMIT_POWER, &hdev->quirks);
++
+	return 0;
+}=
