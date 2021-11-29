@@ -2,143 +2,96 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C2F9FC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 22:53:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B43C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 23:03:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235331AbhK2W5C (ORCPT
+        id S236886AbhK2XG7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Nov 2021 17:57:02 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:37688 "EHLO
+        Mon, 29 Nov 2021 18:06:59 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40558 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235589AbhK2W4d (ORCPT
+        with ESMTP id S237334AbhK2XGZ (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Nov 2021 17:56:33 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 640D1C061A16
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 13:58:48 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id B014ECE13DF
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:58:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DB752C53FD0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:58:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638223124;
-        bh=+rK3fWveB9nVpZbuXZ4/Nu0EE9OPbGe1SFH70HVVkJ0=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=qUpLdxyhEYq9OWf8G21WVgEaq1OqlcpTbHHdam3j1wT4QhL/nxsRQ6QWYKyvI5bMv
-         uanxkE8Do0pOFVWK+L72kI9j5ENnfKRaW6nQkvzh9eDuEU2zY6E9kz0+TbPMBdHpZl
-         6jCK5CfEyMq0B2pUDuSxAkjWOcua4+s+Ruq7uCRAwh0Kkb8ukAMoxfsQuC9OFUuevP
-         azorzEIlQf57vWARpNwcgTriF1d16goBfT+fbUrdlnXO8dX1wuk0Kaqhr5B2u2PjUj
-         SyiHK4hfPnHefp4vKkJDIBqZMZzDXINOfvCE440o7B/76+c4xso8BytyLGJ2jxSEkt
-         kyJe3D414kXiw==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id C724160F26; Mon, 29 Nov 2021 21:58:44 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Mon, 29 Nov 2021 21:58:44 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: tech@reachthetribes.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215167-62941-uzq2HwvBiQ@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
-References: <bug-215167-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 29 Nov 2021 18:06:25 -0500
+Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B3DC201453
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 13:17:38 -0800 (PST)
+Received: by mail-ua1-x929.google.com with SMTP id i6so36957877uae.6
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 13:17:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=V9L3jrYI5WGPQyqtKmqjZQMYlqPQP9W8iXaJoJzfEjM=;
+        b=UVdhUSD0nRbqX5rlNwyuv1JzVhVKTSNaMtsS2tbfsIBwm0J7aubQn3zwLYGI9kGiUC
+         biEiQP9jDKZGzqF44huPRsmZeZEgSd07gKp8GeaIpejRCLhakMp7Y4KSGl04bRm5FOO+
+         1ZAV3jQ1WQIT36mzCGBQ8nJNOGxpVheNFlGynzwzqsVWU1jVcHiGvqbpiMjG5qaZJPSd
+         qF8ujTdwLo1lvyM8D1WiN3QyQKh6oAYqHNA03HHsDnnj5YCWcDkwBpc/MmFJb4DaoqAw
+         pJQk5HIlqd4sPOHSufGA48y4hD9Yfi1ASDx9dvpD5VL3q8/Y73Pj5nB6EtOkO7t+PrGI
+         9y+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=V9L3jrYI5WGPQyqtKmqjZQMYlqPQP9W8iXaJoJzfEjM=;
+        b=NmDr6RiEyakdvv/Tt6d5gCmuwjA6yATZSAOiJY626qt47GaSW6DpU+7Bolnk7/0HJW
+         KyTZgSFZgtht8Mt0zRRNSugbSeB8Mf+EuwgH9jXjVHS7WJUc1rexz1EuKenwuuLMucAM
+         TxdppR0dATBsJS4B62uleKvW+VcbeR24RheJBxNT7/rCblAEdJU/LQkkewwSHa2ruarB
+         0SgeOtHREpVyGfypTrJIgFhllceXtRcOZJE5l/mUX/UMqx4INRDMEcDmvd+8Y7WE0AaX
+         TXyCvDyNJwLERHdbPPK5MDRQHNzoa+++rWF8DWFl6y8GwoWRNUOrAq2EC89z4c82rK9l
+         rxww==
+X-Gm-Message-State: AOAM530gXFCj7yrngvuptZimAff56OqzCVPcDSHYnPtSy7iqempe4dHt
+        sMemOwoEg1g5YLetJcJjRg5BGro9lao6bZ4TETEqUvfJ
+X-Google-Smtp-Source: ABdhPJyr3yUhbf0Khcb5qn/h+5cwdDB5b3qk6ACVHLOUvijRVFuVlkUdAVniv14cR8UlKpjN5ybgln3GiC0bcRFeSRI=
+X-Received: by 2002:a67:b103:: with SMTP id w3mr35731632vsl.84.1638220656909;
+ Mon, 29 Nov 2021 13:17:36 -0800 (PST)
 MIME-Version: 1.0
+References: <20211127222132.14351-1-dev.git@javispedro.com> <61a2c45c.1c69fb81.b79eb.6ab4@mx.google.com>
+In-Reply-To: <61a2c45c.1c69fb81.b79eb.6ab4@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Mon, 29 Nov 2021 13:17:26 -0800
+Message-ID: <CABBYNZLBvhGTni-33_zHPr4qz9byvNgo7HbTH-U4hgmNiqic_w@mail.gmail.com>
+Subject: Re: gatt-client: when disconnected return default MTU for GattCharacteristic1.MTU
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     dev.git@javispedro.com
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+Hi Javier,
 
---- Comment #8 from George Olson (tech@reachthetribes.org) ---
-when I boot with 5.15.3 kernel, btusb is not loaded onto the kernel.
+On Mon, Nov 29, 2021 at 1:14 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=586773
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    PASS      1.34 seconds
+> GitLint                       PASS      0.93 seconds
+> Prep - Setup ELL              PASS      51.78 seconds
+> Build - Prep                  PASS      0.51 seconds
+> Build - Configure             PASS      9.44 seconds
+> Build - Make                  PASS      222.52 seconds
+> Make Check                    PASS      9.90 seconds
+> Make Distcheck                PASS      263.17 seconds
+> Build w/ext ELL - Configure   PASS      9.56 seconds
+> Build w/ext ELL - Make        PASS      209.87 seconds
+>
+>
+>
+> ---
+> Regards,
+> Linux Bluetooth
 
-Results after modprobe btusb:
-> lsmod | grep bt
-btusb                  65536  0
-btrtl                  28672  1 btusb
-btbcm                  20480  1 btusb
-btintel                45056  1 btusb
-bluetooth             729088  4 btrtl,btintel,btbcm,btusb
-usbcore               372736  6 xhci_hcd,usbhid,typec,uvcvideo,btusb,xhci_p=
-ci
+Applied, thanks.
 
-> journalctl -b | egrep -i hci
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: xHCI Host
-Controller
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: new USB bus
-registered, assigned bus number 1
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: hcc params
-0x20007fc1 hci version 0x120 quirks 0x0000000200009810
-Nov 29 15:37:25 asustribetrek kernel: usb usb1: Product: xHCI Host Controll=
-er
-Nov 29 15:37:25 asustribetrek kernel: usb usb1: Manufacturer: Linux
-5.15.3-1-default xhci-hcd
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: xHCI Host
-Controller
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: new USB bus
-registered, assigned bus number 2
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:0d.0: Host supports =
-USB
-3.1 Enhanced SuperSpeed
-Nov 29 15:37:25 asustribetrek kernel: usb usb2: Product: xHCI Host Controll=
-er
-Nov 29 15:37:25 asustribetrek kernel: usb usb2: Manufacturer: Linux
-5.15.3-1-default xhci-hcd
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: xHCI Host
-Controller
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: new USB bus
-registered, assigned bus number 3
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: hcc params
-0x20007fc1 hci version 0x120 quirks 0x0000000000009810
-Nov 29 15:37:25 asustribetrek kernel: usb usb3: Product: xHCI Host Controll=
-er
-Nov 29 15:37:25 asustribetrek kernel: usb usb3: Manufacturer: Linux
-5.15.3-1-default xhci-hcd
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: xHCI Host
-Controller
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: new USB bus
-registered, assigned bus number 4
-Nov 29 15:37:25 asustribetrek kernel: xhci_hcd 0000:00:14.0: Host supports =
-USB
-3.1 Enhanced SuperSpeed
-Nov 29 15:37:25 asustribetrek kernel: usb usb4: Product: xHCI Host Controll=
-er
-Nov 29 15:37:25 asustribetrek kernel: usb usb4: Manufacturer: Linux
-5.15.3-1-default xhci-hcd
-Nov 29 15:37:26 asustribetrek kernel: usb 3-1: new full-speed USB device nu=
-mber
-2 using xhci_hcd
-Nov 29 15:37:26 asustribetrek kernel: usb 3-5: new high-speed USB device nu=
-mber
-3 using xhci_hcd
-Nov 29 15:37:34 asustribetrek sddm-helper[1600]: Adding cookie to
-"/run/user/1000/xauth_HCineT"
-Nov 29 15:56:37 asustribetrek kernel: Bluetooth: HCI device and connection
-manager initialized
-Nov 29 15:56:37 asustribetrek kernel: Bluetooth: HCI socket layer initializ=
-ed
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
+-- 
+Luiz Augusto von Dentz
