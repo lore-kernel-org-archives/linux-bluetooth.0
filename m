@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 37611C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 21:56:36 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 397BCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 21:56:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231354AbhK2V7x (ORCPT
+        id S232568AbhK2WAQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Nov 2021 16:59:53 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:46060 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229446AbhK2V5x (ORCPT
+        Mon, 29 Nov 2021 17:00:16 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:48506 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232829AbhK2V6Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Nov 2021 16:57:53 -0500
+        Mon, 29 Nov 2021 16:58:16 -0500
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 4C35FB80E60
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:54:34 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0F783C53FD0
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:54:33 +0000 (UTC)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 34AE4CE1689
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:54:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6693AC53FCF
+        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 21:54:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638222873;
-        bh=W4Fn7b4xaTtQug9Tb706cm8y45wk0nhLTtAWU2+y8oc=;
+        s=k20201202; t=1638222895;
+        bh=f9fW/TUtmi6KVIGhdNPwQ2/qO31NRmMHtJzPRtSpAcU=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=lPW4Gc7oUHHLLCmsRzvcRcnenpLafPyoqKboToK+QS42rRKGtk4g60/5pVnmqVAKL
-         rJik2/BW8TJ6wSB8afIzGbBQXSyaexdw6KG8yqWPTqvsifmdhSDyclRCsFSYtGuZaj
-         L4/WePU9j8q26kPR0l733dSeHVArXU4cCPYw2ZqcejTyfzSpRqQaZG22ccp2YcpYn/
-         nQNECo7Js53CR+TtNCBAaE/gbOeqB1JZya/j47YKdPLXeiIT1HXRfFtDelH7O/FGBC
-         FSGmd9vHahQ2Zgoe/b4qRwTaYKgVEpnk1mwMo+VyIe8NJVoAEJDEXSS5o8fEZiMrdu
-         XZdM2847p28FA==
+        b=XPwxQFxMR5iuOGhYp5Ci8dxd3ot4RDYL44h6l9d8kJ4b7jojys8HH4wosa4v/lBbP
+         mZKPcssE01W+8cZnZgXhplbUGprrIDmm++Tm/wY0qkXRJYEHS+vMAUuZx0Ms0Pe8wT
+         uDZFDyA4cJtMplwuS2cCQfBj/od/BIKSGnTKXQ0jKy9XW9CgwPH6R0CvsNrDsTlCHY
+         K9UQrJRABRdEXdKl6R0LIWnicfLzMKEFMG/jIojMSRNSRjHD0m0MelqIpb/K+hjUw+
+         eY80WYyP50PV0WWTDNKe7jQ+OApaKDss/og+WnTwkoMJ+nMfRXCJHONyuDB7AxAnKj
+         NR23e4Gij0bMw==
 Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id F27C460F26; Mon, 29 Nov 2021 21:54:32 +0000 (UTC)
+        id 54A5E60F26; Mon, 29 Nov 2021 21:54:55 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Mon, 29 Nov 2021 21:54:32 +0000
+Date:   Mon, 29 Nov 2021 21:54:54 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -51,7 +51,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-215167-62941-3NbdTUrjqf@https.bugzilla.kernel.org/>
+Message-ID: <bug-215167-62941-k9gMK6UqEM@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
 References: <bug-215167-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -65,10 +65,10 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
 
---- Comment #6 from George Olson (tech@reachthetribes.org) ---
-Created attachment 299785
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D299785&action=3Dedit
-hwinfo on kernel 5.14.14 bluetooth works
+--- Comment #7 from George Olson (tech@reachthetribes.org) ---
+Created attachment 299787
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D299787&action=3Dedit
+hwinfo on kernel 5.15.3 bluetooth fails
 
 --=20
 You may reply to this email to add a comment.
