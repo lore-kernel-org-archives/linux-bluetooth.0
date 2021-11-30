@@ -2,75 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B2A09C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Nov 2021 16:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 146ABC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Nov 2021 19:21:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238933AbhK3QWb (ORCPT
+        id S245736AbhK3TYy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Nov 2021 11:22:31 -0500
-Received: from mail-il1-f199.google.com ([209.85.166.199]:38906 "EHLO
-        mail-il1-f199.google.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238928AbhK3QWa (ORCPT
+        Tue, 30 Nov 2021 14:24:54 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39200 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S239820AbhK3TYt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Nov 2021 11:22:30 -0500
-Received: by mail-il1-f199.google.com with SMTP id b4-20020a92c564000000b002a252da46e2so11523931ilj.5
-        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Nov 2021 08:19:10 -0800 (PST)
+        Tue, 30 Nov 2021 14:24:49 -0500
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D794C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Nov 2021 11:21:30 -0800 (PST)
+Received: by mail-vk1-xa32.google.com with SMTP id m16so13353409vkl.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Nov 2021 11:21:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=MiYbwBmtbSsXpHUUEQNeg4dK5IGAcozBcNLr8SXE45o=;
+        b=jq/tnpzaOHDMYbBO6sDFVKk1nwjGzk4dHMAfQaIMEU/8ztzJil2uPxUy8Bp/dyQTNw
+         W5Qz2eugbUdZmj1ZMpjnyBkw9Z4rL3Xn0jRZeXiGgdelz/gexSbxgDvOAnB7FFUlOtmp
+         GMQgMRexl2LXKnOmEyXwst1ArUdZwtRPOK6PEFgx3ZfEJt1yns8mK2NHAKtOEdLjbtl0
+         2Ibdf2ZxUQpSNbwBoiCgYRnx2Xduq8adOVlUgdPBX4Doc5MZJhnQyGAm8YRhG5fMOF8Q
+         6tBaHzKPCqYNl5QVhxKiJ8NJAsxT8yxmdXcDw7N3dITQ0fjuWbXEMfa8MEXRau4rM3Nj
+         XFTw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:date:in-reply-to:message-id:subject
-         :from:to;
-        bh=82PcJsGJmWA9J7EfSsaBo8R7BvPCcHNRldX54MbqtUk=;
-        b=sMWbWqeG3wRmUcDyIcpLLzRN7+OnCaS5h+KBmRrl66UKv2bhMPsdl/j6huLrAw6P6g
-         +EC+HQNaBWH4EqDh5tqMaeh/Jvv1PGFpQ1cpkJjBxdDyNwt58WKPjdy0v+ISHVfTYIP4
-         N5eIHKNKUoD90y5yv3/NcwITlfcUffzkGl33XLpRLXYNHrXl65FlMJG48ufeNpfSU8kI
-         MGrb6FA1iXg4moAP+w0sQYEbHCxIy1jdTEXVHXC98AlODW5rYqcoRqB8PTvNr2st5mzn
-         bslPgSpmThBspE9m6LoaU9QNEiO4hhQmHOTeRdeMC3uJvNrul7SeyTfwAnUZFC3frsGG
-         4NIw==
-X-Gm-Message-State: AOAM531GLTCUuvLmcnn0pEuGYazr66NnuWZVz6SDmyfyHkawdOcwZmBc
-        E0x0tSWynvyMDptRfjiCoqQTGfT7erS1dy+xmXZ4l8PpXlz4
-X-Google-Smtp-Source: ABdhPJyxuzWxbXXQxXt/uLUyAQu5gmBfd3on9w/gXZzhkfqblOPzJkm/nRXJfXP2GwX0YVZSMLpgNz44tT0MMcAsVMq1dotg6xoH
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=MiYbwBmtbSsXpHUUEQNeg4dK5IGAcozBcNLr8SXE45o=;
+        b=qfhs8iJ6BgtiIJtEh4af0NIa7D2iqFhvQII970Nm4H3zoKJzOS6rUXY5lTWpJiar3k
+         FwCFEP9Rtg00EykeK8Jey2JejHe30Xso2hIlG5ImJHs1+lfKSXWm+RMRrBeeZHC5ME1L
+         KiUCvgdBV/c5jmJsMrYNGj1n6LHoIy7BYr577w0SXiyZj7Mv2fhM8ketRNhEs5bHDsuX
+         XY/kseTYyTLaCFVhqpCbX9icDhl72HYUNAKYSGAGiiHb++Zyh6dzYtSFJ/IPS4S6bN/h
+         G9gRnQ3T51mleHrXz/GRvlzHP+774uqMcUZYhhdSzXSktwLrvBSR6zRcVhvyVeq4UUne
+         Qs6Q==
+X-Gm-Message-State: AOAM531pE/Gl+GTgTH0EIfBSbqAbzQPaNk0nSXNEwTGTbi0Y/tQkXlcq
+        IvDRosGMuTSbV2gJvOKL3idNMElk4WCq+DFoq24bBdu6
+X-Google-Smtp-Source: ABdhPJxGdC/Hxd0QIMxQcgObx1zPEaU/3AIHefwjoY8ltTSFaxBExr4R/v2W73P8yGhRwfr2QvOL3O7vwGQ9eNtsGVg=
+X-Received: by 2002:a05:6122:d8d:: with SMTP id bc13mr1747847vkb.22.1638300088452;
+ Tue, 30 Nov 2021 11:21:28 -0800 (PST)
 MIME-Version: 1.0
-X-Received: by 2002:a92:d8cf:: with SMTP id l15mr1635ilo.59.1638289150573;
- Tue, 30 Nov 2021 08:19:10 -0800 (PST)
-Date:   Tue, 30 Nov 2021 08:19:10 -0800
-In-Reply-To: <000000000000f5964705b7d47d8c@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000dc091705d203eac6@google.com>
-Subject: Re: [syzbot] INFO: trying to register non-static key in l2cap_sock_teardown_cb
-From:   syzbot <syzbot+a41dfef1d2e04910eb2e@syzkaller.appspotmail.com>
-To:     a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org,
-        bobo.shaobowang@huawei.com, davem@davemloft.net, hdanton@sina.com,
-        johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
-        luiz.von.dentz@intel.com, marcel@holtmann.org,
-        mareklindner@neomailbox.ch, miklos@szeredi.hu, mszeredi@redhat.com,
-        netdev@vger.kernel.org, sw@simonwunderlich.de,
-        syzkaller-bugs@googlegroups.com
+References: <20211130095643.3140-1-sathish.narasimman@intel.com>
+In-Reply-To: <20211130095643.3140-1-sathish.narasimman@intel.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Tue, 30 Nov 2021 11:21:17 -0800
+Message-ID: <CABBYNZJhV3yq6ZExkzFj2-QC-YbJL-6Ywu4j_vNjeHFDHiW6YA@mail.gmail.com>
+Subject: Re: [PATCH] Bluetooth: HCI: Fix authentication failure error during pairing
+To:     Sathish Narasimman <sathish.narasimman@intel.com>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        "Srivatsa, Ravishankar" <ravishankar.srivatsa@intel.com>,
+        Chethan T N <chethan.tumkur.narayan@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-syzbot suspects this issue was fixed by commit:
+Hi Sathish,
 
-commit 1bff51ea59a9afb67d2dd78518ab0582a54a472c
-Author: Wang ShaoBo <bobo.shaobowang@huawei.com>
-Date:   Wed Sep 1 00:35:37 2021 +0000
+On Tue, Nov 30, 2021 at 7:23 AM Sathish Narasimman
+<sathish.narasimman@intel.com> wrote:
+>
+> When Experimental LL_Privacy enabled & Privacy is set to device mode the
+> pairing of 2 linux devices fails with authentication failure error. This
+> happens only on the 2nd attempt when we swap the advertiser/initiator
+> role. This is because the init_addr is updated with dev->rpa which still
+> holds the previous connection RPA. This patch fixes the issue when
+> ll_privacy is enabled.
 
-    Bluetooth: fix use-after-free error in lock_sock_nested()
+What does the previous RPA has to do with the 2nd connection? This
+doesn't explain exactly what is the problem, does this means that
+local_rpa is not used on the 2nd connection? And why would the
+controller not set a local_rpa?
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=134c881eb00000
-start commit:   73b7a6047971 net: dsa: bcm_sf2: support BCM4908's integrat..
-git tree:       net-next
-kernel config:  https://syzkaller.appspot.com/x/.config?x=9ce34124da4c882b
-dashboard link: https://syzkaller.appspot.com/bug?extid=a41dfef1d2e04910eb2e
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166ee4cf500000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1337172f500000
+> Signed-off-by: Sathish Narasimman <sathish.narasimman@intel.com>
+> ---
+>  net/bluetooth/hci_event.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+> index 9d8d2d9e5d1f..bd40d8cedc27 100644
+> --- a/net/bluetooth/hci_event.c
+> +++ b/net/bluetooth/hci_event.c
+> @@ -5314,8 +5314,10 @@ static void le_conn_update_addr(struct hci_conn *conn, bdaddr_t *bdaddr,
+>                         conn->init_addr_type = ADDR_LE_DEV_RANDOM;
+>                         bacpy(&conn->init_addr, local_rpa);
+>                 } else if (hci_dev_test_flag(conn->hdev, HCI_PRIVACY)) {
+> -                       conn->init_addr_type = ADDR_LE_DEV_RANDOM;
+> -                       bacpy(&conn->init_addr, &conn->hdev->rpa);
+> +                       if (!use_ll_privacy(conn->hdev)) {
+> +                               conn->init_addr_type = ADDR_LE_DEV_RANDOM;
+> +                               bacpy(&conn->init_addr, &conn->hdev->rpa);
+> +                       }
 
-If the result looks correct, please mark the issue as fixed by replying with:
+This can't be right, first it doesn't set any init address and second
+I would expect the controller to always set a local_rpa when LL
+Privacy is enabled. I suspect the controller is either getting
+confused with the first pairing and then the swapping of the roles
+with the removal of the devices or there is some else at play because
+neither local_rpa or hdev->rpa seems to be set in the init_addr.
 
-#syz fix: Bluetooth: fix use-after-free error in lock_sock_nested()
+>                 } else {
+>                         hci_copy_identity_address(conn->hdev, &conn->init_addr,
+>                                                   &conn->init_addr_type);
+> --
+> 2.17.1
+>
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+-- 
+Luiz Augusto von Dentz
