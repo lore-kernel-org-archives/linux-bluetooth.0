@@ -2,96 +2,149 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E9B43C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 29 Nov 2021 23:03:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8A317C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Nov 2021 08:00:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236886AbhK2XG7 (ORCPT
+        id S239315AbhK3IDv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 29 Nov 2021 18:06:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:40558 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237334AbhK2XGZ (ORCPT
+        Tue, 30 Nov 2021 03:03:51 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:34596 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S234489AbhK3IDu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 29 Nov 2021 18:06:25 -0500
-Received: from mail-ua1-x929.google.com (mail-ua1-x929.google.com [IPv6:2607:f8b0:4864:20::929])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 18B3DC201453
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 13:17:38 -0800 (PST)
-Received: by mail-ua1-x929.google.com with SMTP id i6so36957877uae.6
-        for <linux-bluetooth@vger.kernel.org>; Mon, 29 Nov 2021 13:17:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=V9L3jrYI5WGPQyqtKmqjZQMYlqPQP9W8iXaJoJzfEjM=;
-        b=UVdhUSD0nRbqX5rlNwyuv1JzVhVKTSNaMtsS2tbfsIBwm0J7aubQn3zwLYGI9kGiUC
-         biEiQP9jDKZGzqF44huPRsmZeZEgSd07gKp8GeaIpejRCLhakMp7Y4KSGl04bRm5FOO+
-         1ZAV3jQ1WQIT36mzCGBQ8nJNOGxpVheNFlGynzwzqsVWU1jVcHiGvqbpiMjG5qaZJPSd
-         qF8ujTdwLo1lvyM8D1WiN3QyQKh6oAYqHNA03HHsDnnj5YCWcDkwBpc/MmFJb4DaoqAw
-         pJQk5HIlqd4sPOHSufGA48y4hD9Yfi1ASDx9dvpD5VL3q8/Y73Pj5nB6EtOkO7t+PrGI
-         9y+Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=V9L3jrYI5WGPQyqtKmqjZQMYlqPQP9W8iXaJoJzfEjM=;
-        b=NmDr6RiEyakdvv/Tt6d5gCmuwjA6yATZSAOiJY626qt47GaSW6DpU+7Bolnk7/0HJW
-         KyTZgSFZgtht8Mt0zRRNSugbSeB8Mf+EuwgH9jXjVHS7WJUc1rexz1EuKenwuuLMucAM
-         TxdppR0dATBsJS4B62uleKvW+VcbeR24RheJBxNT7/rCblAEdJU/LQkkewwSHa2ruarB
-         0SgeOtHREpVyGfypTrJIgFhllceXtRcOZJE5l/mUX/UMqx4INRDMEcDmvd+8Y7WE0AaX
-         TXyCvDyNJwLERHdbPPK5MDRQHNzoa+++rWF8DWFl6y8GwoWRNUOrAq2EC89z4c82rK9l
-         rxww==
-X-Gm-Message-State: AOAM530gXFCj7yrngvuptZimAff56OqzCVPcDSHYnPtSy7iqempe4dHt
-        sMemOwoEg1g5YLetJcJjRg5BGro9lao6bZ4TETEqUvfJ
-X-Google-Smtp-Source: ABdhPJyr3yUhbf0Khcb5qn/h+5cwdDB5b3qk6ACVHLOUvijRVFuVlkUdAVniv14cR8UlKpjN5ybgln3GiC0bcRFeSRI=
-X-Received: by 2002:a67:b103:: with SMTP id w3mr35731632vsl.84.1638220656909;
- Mon, 29 Nov 2021 13:17:36 -0800 (PST)
+        Tue, 30 Nov 2021 03:03:50 -0500
+X-UUID: d7b937f007eb4fc0bca4e15665ae95c2-20211130
+X-UUID: d7b937f007eb4fc0bca4e15665ae95c2-20211130
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 2002383739; Tue, 30 Nov 2021 16:00:27 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
+ mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ 15.2.792.15; Tue, 30 Nov 2021 16:00:26 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Tue, 30 Nov
+ 2021 16:00:25 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Tue, 30 Nov 2021 16:00:25 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
+        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
+        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <jemele@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Mark Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH] Bluetooth: btmtksdio: add the support of wake on bluetooth
+Date:   Tue, 30 Nov 2021 16:00:23 +0800
+Message-ID: <b9d604e7789aab33dafdf258b80a3bba268b39d1.1638259039.git.objelf@gmail.com>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-References: <20211127222132.14351-1-dev.git@javispedro.com> <61a2c45c.1c69fb81.b79eb.6ab4@mx.google.com>
-In-Reply-To: <61a2c45c.1c69fb81.b79eb.6ab4@mx.google.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Mon, 29 Nov 2021 13:17:26 -0800
-Message-ID: <CABBYNZLBvhGTni-33_zHPr4qz9byvNgo7HbTH-U4hgmNiqic_w@mail.gmail.com>
-Subject: Re: gatt-client: when disconnected return default MTU for GattCharacteristic1.MTU
-To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     dev.git@javispedro.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Javier,
+From: Mark Chen <mark-yw.chen@mediatek.com>
 
-On Mon, Nov 29, 2021 at 1:14 PM <bluez.test.bot@gmail.com> wrote:
->
-> This is automated email and please do not reply to this email!
->
-> Dear submitter,
->
-> Thank you for submitting the patches to the linux bluetooth mailing list.
-> This is a CI test results with your patch series:
-> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=586773
->
-> ---Test result---
->
-> Test Summary:
-> CheckPatch                    PASS      1.34 seconds
-> GitLint                       PASS      0.93 seconds
-> Prep - Setup ELL              PASS      51.78 seconds
-> Build - Prep                  PASS      0.51 seconds
-> Build - Configure             PASS      9.44 seconds
-> Build - Make                  PASS      222.52 seconds
-> Make Check                    PASS      9.90 seconds
-> Make Distcheck                PASS      263.17 seconds
-> Build w/ext ELL - Configure   PASS      9.56 seconds
-> Build w/ext ELL - Make        PASS      209.87 seconds
->
->
->
-> ---
-> Regards,
-> Linux Bluetooth
+Add the support to enable wake on bluetooth
 
-Applied, thanks.
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+---
+ drivers/bluetooth/btmtk.h     |  8 ++++++++
+ drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
+ 2 files changed, 38 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 6e7b0c7567c0..2be1d2680ad8 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+ 	u8 time_compensation;
+ } __packed;
+ 
++struct btmtk_wakeon {
++	u8 mode;
++	u8 gpo;
++	u8 active_high;
++	__le16 enable_delay;
++	__le16 wakeup_delay;
++} __packed;
++
+ struct btmtk_hci_wmt_params {
+ 	u8 op;
+ 	u8 flag;
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index d9cf0c492e29..bdd2afccc32e 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -951,6 +951,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
++{
++	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	bool may_wakeup = device_may_wakeup(bdev->dev);
++	struct btmtk_wakeon bt_awake = {
++		.mode = 0x1,
++		.gpo = 0,
++		.active_high = 0x1,
++		.enable_delay = cpu_to_le16(0xc80),
++		.wakeup_delay = cpu_to_le16(0x20)
++	};
++	struct sk_buff *skb;
++
++	if (may_wakeup &&
++	    bdev->data->chipid == 0x7921) {
++		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
++				      &bt_awake, HCI_CMD_TIMEOUT);
++		if (IS_ERR(skb))
++			may_wakeup = false;
++	}
++
++	return may_wakeup;
++}
++
+ static int btmtksdio_probe(struct sdio_func *func,
+ 			   const struct sdio_device_id *id)
+ {
+@@ -991,6 +1015,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	hdev->shutdown = btmtksdio_shutdown;
+ 	hdev->send     = btmtksdio_send_frame;
+ 	hdev->set_bdaddr = btmtk_set_bdaddr;
++	hdev->wakeup = btmtk_sdio_wakeup;
+ 
+ 	SET_HCIDEV_DEV(hdev, &func->dev);
+ 
+@@ -1025,7 +1050,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	 */
+ 	pm_runtime_put_noidle(bdev->dev);
+ 
+-	return 0;
++	err = device_init_wakeup(bdev->dev, true);
++	if (err)
++		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
++
++	return err;
+ }
+ 
+ static void btmtksdio_remove(struct sdio_func *func)
 -- 
-Luiz Augusto von Dentz
+2.25.1
+
