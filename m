@@ -2,101 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EAD98C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Nov 2021 23:14:22 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D677CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 30 Nov 2021 23:38:49 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236851AbhK3XRk (ORCPT
+        id S1345317AbhK3XmI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Nov 2021 18:17:40 -0500
-Received: from mga02.intel.com ([134.134.136.20]:4001 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231514AbhK3XRj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Nov 2021 18:17:39 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10184"; a="223565979"
-X-IronPort-AV: E=Sophos;i="5.87,277,1631602800"; 
-   d="scan'208";a="223565979"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2021 15:14:19 -0800
-X-IronPort-AV: E=Sophos;i="5.87,277,1631602800"; 
-   d="scan'208";a="609312241"
-Received: from timothyo-mobl1.amr.corp.intel.com (HELO istotlan-desk.intel.com) ([10.212.60.104])
-  by orsmga004-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2021 15:14:18 -0800
-From:   Inga Stotland <inga.stotland@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     brian.gix@intel.com, Inga Stotland <inga.stotland@intel.com>
-Subject: [PATCH BlueZ] mesh: Don't log error for false positive mkdir failure
-Date:   Tue, 30 Nov 2021 15:14:12 -0800
-Message-Id: <20211130231412.97437-1-inga.stotland@intel.com>
-X-Mailer: git-send-email 2.31.1
+        Tue, 30 Nov 2021 18:42:08 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42616 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1345282AbhK3XmH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 30 Nov 2021 18:42:07 -0500
+Received: from mail-qv1-xf29.google.com (mail-qv1-xf29.google.com [IPv6:2607:f8b0:4864:20::f29])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792D5C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Nov 2021 15:38:47 -0800 (PST)
+Received: by mail-qv1-xf29.google.com with SMTP id b11so19717690qvm.7
+        for <linux-bluetooth@vger.kernel.org>; Tue, 30 Nov 2021 15:38:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=IPbq5R8njkUvkQfqMc1RHkuh8IDJuUyhdUq2so7Q8Z8=;
+        b=VUy4ikFK8lh83gcN1kAC2bQzUuKueI/j6HuWyThNPlEUzGqUOnTgamzUZ58wEDDxHB
+         uoVGDvlm4/mBTgwS6ZyEboHbMzDKjKlqhl+OAtbqOQ4stAkJ5o5AsqDFgLi53T0vYQwn
+         25fF+E1UAudpFBTqEemSR0QYoQhzfpJxfc1wwItGnRV7Sh7eUQ9VBBvSWIsK5hjFubSU
+         aFl48qtA6pZzZS/hPSDcdlG0tPDVMwaWWmSmbAFLu/P83vNtPPzo93FuGlXUWGJ0/tER
+         6z1jXROR0zK9k/kaM3LhMJSky/Poe0/Eq8iDGA5dpntrKOatRQl+uss/0FkXpc/6RnQC
+         1+XA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=IPbq5R8njkUvkQfqMc1RHkuh8IDJuUyhdUq2so7Q8Z8=;
+        b=7Jh1zzRA03pijoum2ZkaOLDE5L4CtHuZEzndpZpjPh8xbF4aOmZLSKMeuYfCwqYset
+         G4cXRMSfq0Kl5wSZqAzQEXfpwEGfdS6wMYdcBpfYSYp1NX6LL02p4Hhw0zDsFG0JHQ7X
+         2axqTcBQR2B8pc5VMCay/5aFUy4u4tFWdWHKhWp68O0rnM/eHfnc6Sy4K8Ih83n5amYr
+         vaVtbLRxcHpFsuk3/jy8VU5RAKAzXo3l0N2tHEpQrh0LQePgTTgcHiSvXnRXGuojC1yo
+         Xc6w431+/ekn6U0pfr3S0LAvfh/Tyqz0GOFVkBVcNvPlgO+EgguNwDPiEt84b+/cJr4B
+         R0Iw==
+X-Gm-Message-State: AOAM532qkdL9tMaolYU3ZXUL6pt/zXxaTpBHTD56DDFTlRM87NELAlqE
+        QHVJRadXyTCNy/PT2Tt/7TfNy7vfVQIVeQ==
+X-Google-Smtp-Source: ABdhPJx17MiyyIwIIiVegfUZD/JNbb5ZudgP12nqG0K7R9NVBnsSoFcyLkHKFyhRobdgPSTUEBfgAQ==
+X-Received: by 2002:a05:6214:e49:: with SMTP id o9mr2688712qvc.74.1638315526354;
+        Tue, 30 Nov 2021 15:38:46 -0800 (PST)
+Received: from [172.17.0.2] ([20.115.11.182])
+        by smtp.gmail.com with ESMTPSA id s10sm9979353qke.132.2021.11.30.15.38.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 30 Nov 2021 15:38:45 -0800 (PST)
+Message-ID: <61a6b605.1c69fb81.eee49.4bc2@mx.google.com>
+Date:   Tue, 30 Nov 2021 15:38:45 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============5372027833290398471=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, inga.stotland@intel.com
+Subject: RE: [BlueZ] mesh: Don't log error for false positive mkdir failure
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211130231412.97437-1-inga.stotland@intel.com>
+References: <20211130231412.97437-1-inga.stotland@intel.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-When invoking mkdir() for mesh configuration storage, do not
-report an error if a target directory already exists.
+--===============5372027833290398471==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
+
+This is automated email and please do not reply to this email!
+
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=588207
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      1.33 seconds
+GitLint                       PASS      0.89 seconds
+Prep - Setup ELL              PASS      52.68 seconds
+Build - Prep                  PASS      0.44 seconds
+Build - Configure             PASS      9.91 seconds
+Build - Make                  PASS      220.95 seconds
+Make Check                    PASS      10.23 seconds
+Make Distcheck                PASS      266.36 seconds
+Build w/ext ELL - Configure   PASS      10.03 seconds
+Build w/ext ELL - Make        PASS      208.33 seconds
+
+
+
 ---
- mesh/keyring.c | 2 +-
- mesh/rpl.c     | 4 ++--
- mesh/util.c    | 4 ++--
- 3 files changed, 5 insertions(+), 5 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/mesh/keyring.c b/mesh/keyring.c
-index 51621777d..b44091154 100644
---- a/mesh/keyring.c
-+++ b/mesh/keyring.c
-@@ -50,7 +50,7 @@ static int open_key_file(struct mesh_node *node, const char *key_dir,
- 
- 	if (flags & O_CREAT) {
- 		snprintf(fname, PATH_MAX, "%s%s", node_path, key_dir);
--		if (mkdir(fname, 0755) != 0)
-+		if (mkdir(fname, 0755) != 0 && errno != EEXIST)
- 			l_error("Failed to create dir(%d): %s", errno, fname);
- 	}
- 
-diff --git a/mesh/rpl.c b/mesh/rpl.c
-index 9a99afe7b..6bb3532b2 100644
---- a/mesh/rpl.c
-+++ b/mesh/rpl.c
-@@ -255,7 +255,7 @@ void rpl_update(struct mesh_node *node, uint32_t cur)
- 
- 	/* Make sure path exists */
- 	snprintf(path, PATH_MAX, "%s%s", node_path, rpl_dir);
--	if (mkdir(path, 0755) != 0)
-+	if (mkdir(path, 0755) != 0 && errno != EEXIST)
- 		l_error("Failed to create dir(%d): %s", errno, path);
- 
- 	dir = opendir(path);
-@@ -293,7 +293,7 @@ bool rpl_init(const char *node_path)
- 		return false;
- 
- 	snprintf(path, PATH_MAX, "%s%s", node_path, rpl_dir);
--	if (mkdir(path, 0755) != 0)
-+	if (mkdir(path, 0755) != 0 && errno != EEXIST)
- 		l_error("Failed to create dir(%d): %s", errno, path);
- 	return true;
- }
-diff --git a/mesh/util.c b/mesh/util.c
-index d505e7a0c..82b57f642 100644
---- a/mesh/util.c
-+++ b/mesh/util.c
-@@ -118,13 +118,13 @@ int create_dir(const char *dir_name)
- 		}
- 
- 		strncat(dir, prev + 1, next - prev);
--		if (mkdir(dir, 0755) != 0)
-+		if (mkdir(dir, 0755) != 0 && errno != EEXIST)
- 			l_error("Failed to create dir(%d): %s", errno, dir);
- 
- 		prev = next;
- 	}
- 
--	if (mkdir(dir_name, 0755) != 0)
-+	if (mkdir(dir_name, 0755) != 0 && errno != EEXIST)
- 		l_error("Failed to create dir(%d): %s", errno, dir_name);
- 
- 	return 0;
--- 
-2.31.1
 
+--===============5372027833290398471==--
