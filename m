@@ -2,30 +2,33 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD80C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:20:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 78642C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:28:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243657AbhLASYQ (ORCPT
+        id S240070AbhLASbi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:24:16 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:43154 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S233861AbhLASYP (ORCPT
+        Wed, 1 Dec 2021 13:31:38 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:58436 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S233912AbhLASbh (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:24:15 -0500
-X-UUID: b241a674144a42e7951c2f09331832ec-20211202
-X-UUID: b241a674144a42e7951c2f09331832ec-20211202
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
+        Wed, 1 Dec 2021 13:31:37 -0500
+X-UUID: 059f3091e9cc431492de5e88eb0234a2-20211202
+X-UUID: 059f3091e9cc431492de5e88eb0234a2-20211202
+Received: from mtkmbs10n2.mediatek.inc [(172.21.101.183)] by mailgw02.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 1478577706; Thu, 02 Dec 2021 02:20:50 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+        with ESMTP id 2122000294; Thu, 02 Dec 2021 02:28:12 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
  mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
- Thu, 2 Dec 2021 02:20:48 +0800
+ Thu, 2 Dec 2021 02:28:11 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 2 Dec
+ 2021 02:28:10 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 2 Dec 2021 02:20:48 +0800
+ Transport; Thu, 2 Dec 2021 02:28:10 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -42,10 +45,11 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btmtksdio: enable AOSP extension for MT7921
-Date:   Thu, 2 Dec 2021 02:20:47 +0800
-Message-ID: <a37f06cbc8ee0024d35c020a40808d657767e4c9.1638382621.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>,
+        Mark-yw Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH v3 1/2] Bluetooth: btmtksdio: handle runtime pm only when sdio_func is available
+Date:   Thu, 2 Dec 2021 02:28:08 +0800
+Message-ID: <5c34f6c5529b6a8f8df893cd1fc1b0e628edf8a4.1638383119.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
 Content-Type: text/plain
@@ -56,27 +60,71 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-Similar to MT7921 btusb, we enable AOSP extension for MT7921 btmtksdio
-as well.
+Runtime pm ops is not aware the sdio_func status that is probably
+being disabled by btmtksdio_close. Thus, we are only able to access the
+sdio_func for the runtime pm operations only when the sdio_func is
+available.
 
+Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
+Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
+Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 ---
- drivers/bluetooth/btmtksdio.c | 2 ++
- 1 file changed, 2 insertions(+)
+v2: not check HCI_RUNNING from a driver, use an internal flag instead
+v3: fix the title
+---
+ drivers/bluetooth/btmtksdio.c | 10 ++++++++++
+ 1 file changed, 10 insertions(+)
 
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index d9cf0c492e29..13f78ba1a978 100644
+index d9cf0c492e29..fc6317e519e9 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -787,6 +787,8 @@ static int mt79xx_setup(struct hci_dev *hdev, const char *fwname)
- 		return err;
- 	}
+@@ -99,6 +99,7 @@ MODULE_DEVICE_TABLE(sdio, btmtksdio_table);
  
-+	hci_set_aosp_capable(hdev);
+ #define BTMTKSDIO_TX_WAIT_VND_EVT	1
+ #define BTMTKSDIO_HW_TX_READY		2
++#define BTMTKSDIO_FUNC_ENABLED		3
+ 
+ struct mtkbtsdio_hdr {
+ 	__le16	len;
+@@ -539,6 +540,8 @@ static int btmtksdio_open(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		goto err_release_host;
+ 
++	set_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state);
 +
- 	return err;
- }
+ 	/* Get ownership from the device */
+ 	sdio_writel(bdev->func, C_FW_OWN_REQ_CLR, MTK_REG_CHLPCR, &err);
+ 	if (err < 0)
+@@ -640,6 +643,7 @@ static int btmtksdio_close(struct hci_dev *hdev)
+ 	if (err < 0)
+ 		bt_dev_err(bdev->hdev, "Cannot return ownership to device");
  
++	clear_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state);
+ 	sdio_disable_func(bdev->func);
+ 
+ 	sdio_release_host(bdev->func);
+@@ -1058,6 +1062,9 @@ static int btmtksdio_runtime_suspend(struct device *dev)
+ 	if (!bdev)
+ 		return 0;
+ 
++	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
++		return 0;
++
+ 	sdio_claim_host(bdev->func);
+ 
+ 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
+@@ -1085,6 +1092,9 @@ static int btmtksdio_runtime_resume(struct device *dev)
+ 	if (!bdev)
+ 		return 0;
+ 
++	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
++		return 0;
++
+ 	sdio_claim_host(bdev->func);
+ 
+ 	sdio_writel(bdev->func, C_FW_OWN_REQ_CLR, MTK_REG_CHLPCR, &err);
 -- 
 2.25.1
 
