@@ -2,90 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0D1E2C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:28:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7BBC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:29:55 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243650AbhLASbm (ORCPT
+        id S244886AbhLASdO (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:31:42 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:50190 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S242067AbhLASbk (ORCPT
+        Wed, 1 Dec 2021 13:33:14 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45674 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244805AbhLASdO (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:31:40 -0500
-X-UUID: eab11d5b99fc43f0bf5a6f0754d8432e-20211202
-X-UUID: eab11d5b99fc43f0bf5a6f0754d8432e-20211202
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 1400254163; Thu, 02 Dec 2021 02:28:15 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Thu, 2 Dec 2021 02:28:13 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 2 Dec 2021 02:28:13 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Mark-yw Chen <mark-yw.chen@mediatek.com>
-Subject: [PATCH v3 2/2] Bluetooth: btmtksdio: fix resume failure
-Date:   Thu, 2 Dec 2021 02:28:09 +0800
-Message-ID: <6c659099972f1d3ab76087140ddb3c8e13eea923.1638383119.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <5c34f6c5529b6a8f8df893cd1fc1b0e628edf8a4.1638383119.git.objelf@gmail.com>
-References: <5c34f6c5529b6a8f8df893cd1fc1b0e628edf8a4.1638383119.git.objelf@gmail.com>
+        Wed, 1 Dec 2021 13:33:14 -0500
+Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7FAC061574;
+        Wed,  1 Dec 2021 10:29:52 -0800 (PST)
+Received: by mail-vk1-xa32.google.com with SMTP id h1so9591264vkh.0;
+        Wed, 01 Dec 2021 10:29:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=7YiLFaDW4iChA8JpdI7VPAA6isWGCIppNw13QoZmyEk=;
+        b=SLQdLRUtyVoaauNtG/k/G9iJjG/Sr8aAIGu9Im5JB3HIywJTuhpX0h5zkuUaEatssx
+         /FDi9/0oi4p0lvT9l2518WoH5Gi7ZJaj6VY6GANu/h+eV1St+neOEPsWZEbLKMEcRtn6
+         Y3RjObaI+JHfAPfztB/DqUZ8OCmCBvpBiVgVRizPnUdFACddXh2rSbyc8xUwMJzsJPwE
+         BZ0Hd8TM/PDIhCbJdJtltjgqISA8LQoI5/qCJxLGa093AZEasFN2GMVRH34jWNAi5HXW
+         s5iNomGlO174ORAnU7jQ+Wdcl/tpLQsawp2kSxLRAEGkL3s2CQn9Tri8W1qLdtybPuGX
+         jLnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=7YiLFaDW4iChA8JpdI7VPAA6isWGCIppNw13QoZmyEk=;
+        b=4ZhPtmx1Lck6O8BTM37RsXDRTb7zuaMiMCgcTIcgPjgHPkH8sZlYdAALPpkhjzIvKg
+         zAbI0OouBCuhW9nTgyzsSAC5X1jKfSmxlAJNyeSDU2CP6mOWOQqMKCgSOMAwmoQnPKXt
+         dwNKbuRRCKXsEY9I2zVdRedml/CJoHxYyLQdA4f8reW0tx5NATV3d34jywsa/G14wIC4
+         n55CkBrcBHSA2Qw9ZH/GO7Sp/hRywXdPv5oJOXnVqe26kiaUKAIyPj5oEdfNqH355YiL
+         j4zO+C2zEPFs05yKv6FT7IZZwWYmpBX4jie2KsifmeOyKwR2mlo/n+uhUJMHBTzj4MH6
+         q7hg==
+X-Gm-Message-State: AOAM532ld9CpGGRqxFwmn9tVDCD9yWC+5qnuNsxqxHtB3lzecEd3pN/K
+        //mg4l/ultZxNnj/oKUE8jcB8hPevkmbTHr4Pmn0DgNL
+X-Google-Smtp-Source: ABdhPJxPA5BsSpCURbtGt16DVQnyhPWdSV3tWFRgY1WsDmbKzIqZhoN1CpMkODZfAxUw6Z1sNpY+Iy5C0p84Uuuxzm0=
+X-Received: by 2002:a05:6122:1813:: with SMTP id ay19mr10772881vkb.10.1638383391601;
+ Wed, 01 Dec 2021 10:29:51 -0800 (PST)
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+In-Reply-To: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 1 Dec 2021 10:29:40 -0800
+Message-ID: <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
+Subject: Re: Unable to transfer big files to Nokia N9
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        LKML <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+Hi Paul,
 
-btmtksdio have to rely on MMC_PM_KEEP_POWER in pm_flags to avoid that
-SDIO power is being shut off during the device is in suspend. That fixes
-the SDIO command fails to access the bus after the device is resumed.
+On Wed, Dec 1, 2021 at 9:39 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Linux folks,
+>
+>
+> For the first time, I wanted to transfer a 2 MB PDF file from a Dell
+> Latitude E7250 with Debian sid/unstable with Linux 5.16-rc1 to a Nokia
+> N9 (MeeGo/Harmattan). Using the package *bluez-obexd* 5.61-1 and GNOME
+> 41, the device was found, and paired fine. Then I selected to transfer
+> the 2 MB file, and after starting for a second, it timed out after the
+> progress bar moves forward ones and failed.
+>
+> The systemd journal contains:
+>
+>      obexd[21139]: Transfer(0x56243fe4f790) Error: Timed out waiting for
+> response
+>
+> Testing with a a 5 byte test text file, worked fine. Also testing with a
+> Galaly M32, both files were transferred without problems (though slowly
+> with 32 KB/s.)
+>
+> Trying to connect to the device with bluetoothctl failed for me, and the
+> journal contained, it failed.
+>
+>      $ bluetoothctl
+>      Agent registered
+>      [bluetooth]# connect 40:98:4E:5B:CE:XX
+>      Attempting to connect to 40:98:4E:5B:CE:XX
+>      Failed to connect: org.bluez.Error.Failed
+>
+>      bluetoothd[21104]: src/service.c:btd_service_connect() a2dp-source
+> profile connect failed for 40:98:4E:5B:CE:B3: Protocol not available
+>
+> As the Nokia N9 was once pretty popular in the Linux community, I am
+> pretty sure, it used to work fine in the past, and there is some
+> regression. It=E2=80=99d be great, if you could give me some hints how to
+> further debug the issue.
 
-Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
-Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
-v2: rebase and resend
-v3: no change
----
- drivers/bluetooth/btmtksdio.c | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index fc6317e519e9..143404745240 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -1065,6 +1065,8 @@ static int btmtksdio_runtime_suspend(struct device *dev)
- 	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
- 		return 0;
- 
-+	sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
-+
- 	sdio_claim_host(bdev->func);
- 
- 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
--- 
-2.25.1
-
+We will need some logs, obexd and btmon, if possible.
