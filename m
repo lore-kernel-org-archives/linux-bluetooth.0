@@ -2,105 +2,107 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5D7BBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:29:55 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 34B80C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:55:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244886AbhLASdO (ORCPT
+        id S1352125AbhLAS6j (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:33:14 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45674 "EHLO
+        Wed, 1 Dec 2021 13:58:39 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51468 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244805AbhLASdO (ORCPT
+        with ESMTP id S241454AbhLAS6a (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:33:14 -0500
-Received: from mail-vk1-xa32.google.com (mail-vk1-xa32.google.com [IPv6:2607:f8b0:4864:20::a32])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF7FAC061574;
-        Wed,  1 Dec 2021 10:29:52 -0800 (PST)
-Received: by mail-vk1-xa32.google.com with SMTP id h1so9591264vkh.0;
-        Wed, 01 Dec 2021 10:29:52 -0800 (PST)
+        Wed, 1 Dec 2021 13:58:30 -0500
+Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79D88C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Dec 2021 10:55:08 -0800 (PST)
+Received: by mail-pg1-x530.google.com with SMTP id r5so24510576pgi.6
+        for <linux-bluetooth@vger.kernel.org>; Wed, 01 Dec 2021 10:55:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc:content-transfer-encoding;
-        bh=7YiLFaDW4iChA8JpdI7VPAA6isWGCIppNw13QoZmyEk=;
-        b=SLQdLRUtyVoaauNtG/k/G9iJjG/Sr8aAIGu9Im5JB3HIywJTuhpX0h5zkuUaEatssx
-         /FDi9/0oi4p0lvT9l2518WoH5Gi7ZJaj6VY6GANu/h+eV1St+neOEPsWZEbLKMEcRtn6
-         Y3RjObaI+JHfAPfztB/DqUZ8OCmCBvpBiVgVRizPnUdFACddXh2rSbyc8xUwMJzsJPwE
-         BZ0Hd8TM/PDIhCbJdJtltjgqISA8LQoI5/qCJxLGa093AZEasFN2GMVRH34jWNAi5HXW
-         s5iNomGlO174ORAnU7jQ+Wdcl/tpLQsawp2kSxLRAEGkL3s2CQn9Tri8W1qLdtybPuGX
-         jLnA==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=udrJx+Qh3tZxayN1NJvUCgIu4rLRnuuu2wiCQutY5qQ=;
+        b=q6V7rAYZOa+luldq1gylSZ28jAbGiqMt+NNUCIup2I7kueGy3nl/5CS0Pa5h9UpwH8
+         8gcDuKfVMKkIEQxR7QSSJ+7c62V9yrGe1Ng/X8HjBFReaYr5OXwBbW0ilaG9bVpNPngY
+         L5QkyVEIMtl/Er9Q8F+e+fJ0W7u0Mvi0kcDMTaoJlSJ2+sU97TgVvlGaAPdOpH1DOJe9
+         4YHLVpcx5zwJXjhSnv4PD+COWMWOcmTlPGOEedIMfJ2KXNng925/BBAyglxe6+8SF1SH
+         RRFC45J7wekSr/CrDBOE80fqpC60R2qRwHHSeWO4oyLEovmy9Iimyvn13J42rxmlriSu
+         BqyQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc:content-transfer-encoding;
-        bh=7YiLFaDW4iChA8JpdI7VPAA6isWGCIppNw13QoZmyEk=;
-        b=4ZhPtmx1Lck6O8BTM37RsXDRTb7zuaMiMCgcTIcgPjgHPkH8sZlYdAALPpkhjzIvKg
-         zAbI0OouBCuhW9nTgyzsSAC5X1jKfSmxlAJNyeSDU2CP6mOWOQqMKCgSOMAwmoQnPKXt
-         dwNKbuRRCKXsEY9I2zVdRedml/CJoHxYyLQdA4f8reW0tx5NATV3d34jywsa/G14wIC4
-         n55CkBrcBHSA2Qw9ZH/GO7Sp/hRywXdPv5oJOXnVqe26kiaUKAIyPj5oEdfNqH355YiL
-         j4zO+C2zEPFs05yKv6FT7IZZwWYmpBX4jie2KsifmeOyKwR2mlo/n+uhUJMHBTzj4MH6
-         q7hg==
-X-Gm-Message-State: AOAM532ld9CpGGRqxFwmn9tVDCD9yWC+5qnuNsxqxHtB3lzecEd3pN/K
-        //mg4l/ultZxNnj/oKUE8jcB8hPevkmbTHr4Pmn0DgNL
-X-Google-Smtp-Source: ABdhPJxPA5BsSpCURbtGt16DVQnyhPWdSV3tWFRgY1WsDmbKzIqZhoN1CpMkODZfAxUw6Z1sNpY+Iy5C0p84Uuuxzm0=
-X-Received: by 2002:a05:6122:1813:: with SMTP id ay19mr10772881vkb.10.1638383391601;
- Wed, 01 Dec 2021 10:29:51 -0800 (PST)
-MIME-Version: 1.0
-References: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
-In-Reply-To: <eb6d86eb-d156-d7ac-0965-181719023d51@molgen.mpg.de>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=udrJx+Qh3tZxayN1NJvUCgIu4rLRnuuu2wiCQutY5qQ=;
+        b=BzoybHOHdlZlePaN0EZ0vT7qWHzHo0+qjgtC4slOOD5SrPrb+rpKPIt1zNOG3dDuN5
+         b49QVcQB0Gk/RjyYbgDJbn2/RWCQeeI548rB+Y6KYg0T/fqcLfDEAj2M9ZAS+UYU1sUA
+         B89Gxf9oJdt+EKL3ik9gFiqRxBqC07cvNYRD7fQ8xGb3RpbtWa/8giV2x89V8nqUg9Wa
+         yzklUdB5Kg1TJMGtLopbku/Vl8xhnae9ZHv50fWNYP3wuvO+FEzJtc7mTU8qdoAnqb9E
+         1GpMxYHLBkLis23FQ7FlVhtqPPW573bjyMf/nvFZYRcy9HQ6mpr7Rz9OgN0NJU79oWz7
+         t85Q==
+X-Gm-Message-State: AOAM533U7NI4PrVeMFUkVXvZEU1T2qKal15FFAkOIG7Rdw1RRL3CLNtj
+        /l3g/aNCdpOxBEPbw05siHKgWZlITtc=
+X-Google-Smtp-Source: ABdhPJxg+zgW2YSVp1rWc1+ISlq8SeJh5scBVqv0Fyq/QlsuY+lrEVYz6iLQaeXXc570wRWj4SJMpw==
+X-Received: by 2002:a05:6a00:23c4:b0:49f:e054:84cb with SMTP id g4-20020a056a0023c400b0049fe05484cbmr7757047pfc.63.1638384907778;
+        Wed, 01 Dec 2021 10:55:07 -0800 (PST)
+Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id e19sm359391pgt.49.2021.12.01.10.55.07
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 01 Dec 2021 10:55:07 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 1 Dec 2021 10:29:40 -0800
-Message-ID: <CABBYNZLENxvXMCh6XbBSnu0jasV1F0QestEK5v2mnNUpJdw3Vw@mail.gmail.com>
-Subject: Re: Unable to transfer big files to Nokia N9
-To:     Paul Menzel <pmenzel@molgen.mpg.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        LKML <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 00/15] Rework parsing of HCI events
+Date:   Wed,  1 Dec 2021 10:54:51 -0800
+Message-Id: <20211201185506.1421186-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Paul,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Dec 1, 2021 at 9:39 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
->
-> Dear Linux folks,
->
->
-> For the first time, I wanted to transfer a 2 MB PDF file from a Dell
-> Latitude E7250 with Debian sid/unstable with Linux 5.16-rc1 to a Nokia
-> N9 (MeeGo/Harmattan). Using the package *bluez-obexd* 5.61-1 and GNOME
-> 41, the device was found, and paired fine. Then I selected to transfer
-> the 2 MB file, and after starting for a second, it timed out after the
-> progress bar moves forward ones and failed.
->
-> The systemd journal contains:
->
->      obexd[21139]: Transfer(0x56243fe4f790) Error: Timed out waiting for
-> response
->
-> Testing with a a 5 byte test text file, worked fine. Also testing with a
-> Galaly M32, both files were transferred without problems (though slowly
-> with 32 KB/s.)
->
-> Trying to connect to the device with bluetoothctl failed for me, and the
-> journal contained, it failed.
->
->      $ bluetoothctl
->      Agent registered
->      [bluetooth]# connect 40:98:4E:5B:CE:XX
->      Attempting to connect to 40:98:4E:5B:CE:XX
->      Failed to connect: org.bluez.Error.Failed
->
->      bluetoothd[21104]: src/service.c:btd_service_connect() a2dp-source
-> profile connect failed for 40:98:4E:5B:CE:B3: Protocol not available
->
-> As the Nokia N9 was once pretty popular in the Linux community, I am
-> pretty sure, it used to work fine in the past, and there is some
-> regression. It=E2=80=99d be great, if you could give me some hints how to
-> further debug the issue.
+This reworks the parsing of HCI events using skb_pull_data to check
+event length, in addition to that it does introduce function tables to
+handle events, LE subevents, Command Complete and Command Status which
+simplify the callback by adding a common code that uses skb_pull_data
+when parsing such events.
 
-We will need some logs, obexd and btmon, if possible.
+v2: Fix declaration of hci_event_func.
+
+Luiz Augusto von Dentz (15):
+  skbuff: introduce skb_pull_data
+  Bluetooth: HCI: Use skb_pull_data to parse BR/EDR events
+  Bluetooth: HCI: Use skb_pull_data to parse Command Complete event
+  Bluetooth: HCI: Use skb_pull_data to parse Number of Complete Packets
+    event
+  Bluetooth: HCI: Use skb_pull_data to parse Inquiry Result event
+  Bluetooth: HCI: Use skb_pull_data to parse Inquiry Result with RSSI
+    event
+  Bluetooth: HCI: Use skb_pull_data to parse Extended Inquiry Result
+    event
+  Bluetooth: HCI: Use skb_pull_data to parse LE Metaevents
+  Bluetooth: HCI: Use skb_pull_data to parse LE Advertising Report event
+  Bluetooth: HCI: Use skb_pull_data to parse LE Ext Advertising Report
+    event
+  Bluetooth: HCI: Use skb_pull_data to parse LE Direct Advertising
+    Report event
+  Bluetooth: hci_event: Use of a function table to handle HCI events
+  Bluetooth: hci_event: Use of a function table to handle LE subevents
+  Bluetooth: hci_event: Use of a function table to handle Command
+    Complete
+  Bluetooth: hci_event: Use of a function table to handle Command Status
+
+ include/linux/skbuff.h      |    2 +
+ include/net/bluetooth/hci.h |   59 +-
+ net/bluetooth/hci_event.c   | 3031 +++++++++++++++++++----------------
+ net/bluetooth/msft.c        |    2 +-
+ net/bluetooth/msft.h        |    2 +-
+ net/core/skbuff.c           |   23 +
+ 6 files changed, 1689 insertions(+), 1430 deletions(-)
+
+-- 
+2.33.1
+
