@@ -2,300 +2,147 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C8178C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 03:23:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id A8E6EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 05:20:38 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1346429AbhLAD0Z (ORCPT
+        id S231335AbhLAFX6 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 30 Nov 2021 22:26:25 -0500
-Received: from mga06.intel.com ([134.134.136.31]:62636 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1346328AbhLAD0Y (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 30 Nov 2021 22:26:24 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10184"; a="297177250"
-X-IronPort-AV: E=Sophos;i="5.87,277,1631602800"; 
-   d="scan'208";a="297177250"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Nov 2021 19:23:03 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,277,1631602800"; 
-   d="scan'208";a="677102410"
-Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 30 Nov 2021 19:23:01 -0800
-Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1msGCy-000E8R-AE; Wed, 01 Dec 2021 03:23:00 +0000
-Date:   Wed, 1 Dec 2021 11:22:04 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
-        kuba@kernel.org
-Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org,
+        Wed, 1 Dec 2021 00:23:58 -0500
+Received: from mx0b-00069f02.pphosted.com ([205.220.177.32]:31972 "EHLO
+        mx0b-00069f02.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229463AbhLAFX5 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 1 Dec 2021 00:23:57 -0500
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+        by mx0b-00069f02.pphosted.com (8.16.1.2/8.16.1.2) with SMTP id 1B14j0AJ007291;
+        Wed, 1 Dec 2021 05:20:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2021-07-09;
+ bh=ByO4DXcb24a95O2TJihWwnHqGog4UStGC9bf1kL/fzM=;
+ b=pvM2pJKVOB0tHDVd0N+58OFdmCmwSp3ljrwPCuoVMVEWq2A0Dd5vV672zjhP0GDf5O10
+ qAVwxgPw6TbyOO/gWakZLTssonHsx3a5TPeI+RqJJjEH9ePYTUrnoj7S16oGy6RamNC2
+ rBmb8Mgcq/qWB44pn6gMiZVCnkdIdS1NYMa6DD2rTLxtJcr8b4Vhe6zlWw9k22UDNSqb
+ cHTfuiuyXTYrN6xuiLnHqJpCIYTQtiL0wB8UH2MMxqLwjGIyVX3JQ8iRPEd3ChwwyDMN
+ xh5IbI6AIJHEys61KJRixeLcBggWkjBoZ0yRW0aR7zXCha+oirGhbmSF3k+EZkcixFa7 wg== 
+Received: from aserp3030.oracle.com (aserp3030.oracle.com [141.146.126.71])
+        by mx0b-00069f02.pphosted.com with ESMTP id 3cmuc9xgmb-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 01 Dec 2021 05:20:30 +0000
+Received: from pps.filterd (aserp3030.oracle.com [127.0.0.1])
+        by aserp3030.oracle.com (8.16.1.2/8.16.1.2) with SMTP id 1B15F7sj195092;
+        Wed, 1 Dec 2021 05:20:29 GMT
+Received: from nam11-co1-obe.outbound.protection.outlook.com (mail-co1nam11lp2172.outbound.protection.outlook.com [104.47.56.172])
+        by aserp3030.oracle.com with ESMTP id 3ckaqfxv0m-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 01 Dec 2021 05:20:29 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=L3xL4FBjonKI+G0M8RWBy4Ib0kWanf7XnWM7EP7e9sp+TGXk4Nh8q0Q/jZfZPTeLdB7r2DrvXCN85Zx1rmT4J6SWSMbdlro7QSwpt99K46D+67RQUBG7MFhz4k0zg5H1awepnZW2wVxZeCzp+Ui6KFhlhCZu3N16/ZDPAcu4D+qBJdnMLa/VYV5a8mmeVLQQi0jT3WFnt6x6fapCHRwHfL1L6uoSx4YzRGlsmY1YmKLV9QDNjPukjMd5DDdrbXtq64iwpQt+wB0uekPM6wMGUnQL8LBbH7TiRy4IQ6q7ysDJELfeZey7sh4dhyzQvZV6n0lKEkq1yHwAHOF4C63bRw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ByO4DXcb24a95O2TJihWwnHqGog4UStGC9bf1kL/fzM=;
+ b=ld4OI1amqiN0KfEHX1aCRKjrO9dxQRM/TSmitqgleB1xBlozVxltBkSqifCmW1XRHVcUHVWRBE73s/fQHgIFQq0mtFBm+bUrP5vrijvhHahblYiFTqmXsDqgPbOB/9FODuW1wQAoasDAKQM8/jVe7vVeBxrmrLQtIxaklZqt3Uat2ycJaLXHSqCdffFCK9ZtBAlEdXCo/zIkH2OKMgPxWt6vpiazf3sDdTGMyTy17OWS4qubB1hYXarS00eLXfkS/NO7iIaeElqYcwZ+Nc0WwETu6PEtQnDb40I/MADV3ZV0/vAEBWOfaZi8DV7UBKo9HduoDCPtdXayOsRiuBB9OA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ByO4DXcb24a95O2TJihWwnHqGog4UStGC9bf1kL/fzM=;
+ b=VpbUZ0Ps/o2D0VOfmuju5SZJR15DB4WSqxM1KyXCcgBihs6CN/l40vItJiegfuHFT1aGKCws8g18NnbZRYO2sPO5W3T5Oi4VJRjNjAaEqn8dRmg07/iIOOVUrodsshZTaWQcs0QbHNCTukWN3DILC5RW6pxl7dINKy9JBDM3X1s=
+Received: from CY4PR1001MB2358.namprd10.prod.outlook.com
+ (2603:10b6:910:4a::32) by CY4PR10MB1863.namprd10.prod.outlook.com
+ (2603:10b6:903:11e::21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.24; Wed, 1 Dec
+ 2021 05:20:27 +0000
+Received: from CY4PR1001MB2358.namprd10.prod.outlook.com
+ ([fe80::b0e9:35ff:73d:b96]) by CY4PR1001MB2358.namprd10.prod.outlook.com
+ ([fe80::b0e9:35ff:73d:b96%3]) with mapi id 15.20.4734.024; Wed, 1 Dec 2021
+ 05:20:27 +0000
+Date:   Wed, 1 Dec 2021 08:20:08 +0300
+From:   Dan Carpenter <dan.carpenter@oracle.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     davem@davemloft.net, kuba@kernel.org,
         linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
-        dan.carpenter@oracle.com,
         Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Subject: Re: [PATCH 12/15] Bluetooth: hci_event: Use of a function table to
- handle HCI events
-Message-ID: <202112011149.SZaZiW8X-lkp@intel.com>
-References: <20211201000215.1134831-13-luiz.dentz@gmail.com>
-MIME-Version: 1.0
+Subject: Re: [PATCH 01/15] skbuff: introduce skb_pull_data
+Message-ID: <20211201052008.GA18178@kadam>
+References: <20211201000215.1134831-1-luiz.dentz@gmail.com>
+ <20211201000215.1134831-2-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20211201000215.1134831-13-luiz.dentz@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20211201000215.1134831-2-luiz.dentz@gmail.com>
+User-Agent: Mutt/1.9.4 (2018-02-28)
+X-ClientProxiedBy: JNAP275CA0061.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4f::19)
+ To CY4PR1001MB2358.namprd10.prod.outlook.com (2603:10b6:910:4a::32)
+MIME-Version: 1.0
+Received: from kadam (102.222.70.114) by JNAP275CA0061.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4f::19) with Microsoft SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.4734.23 via Frontend Transport; Wed, 1 Dec 2021 05:20:22 +0000
+X-MS-PublicTrafficType: Email
+X-MS-Office365-Filtering-Correlation-Id: c2610327-806d-4d81-34c2-08d9b48a48e2
+X-MS-TrafficTypeDiagnostic: CY4PR10MB1863:
+X-Microsoft-Antispam-PRVS: <CY4PR10MB1863A874F2A586EAABAAD4478E689@CY4PR10MB1863.namprd10.prod.outlook.com>
+X-MS-Oob-TLC-OOBClassifiers: OLM:5516;
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: HiTQfK3jDH6atTSoEbOz3CF7CS5ycKAXHl6rDcNMDLkYUSEFxBh+tHvQPDrfDDi96b1DVoPnQwNwGRMfXz1HgiVAXmDC5ow6l2knRBuowWybxsBR7fFsFVb63iHfrq1PLMSiTK2XExVZxnVoYcn9kPr0UiWalzJZJQgfN+2UtHdgPVB71tbTLz57XKH9xDOV0ldfZ7/gm6ypge8m2A5b+O99WS/9iz30Q3OX5VeWYICvGyva8bc1JmdQp2sRQGR8TXQaxTgN+e4UCFFV1ktJyQKWMG0XAG3uaBZ5wnM1Dk+ns4zSn33wPyFaKwftiB0XsWw7FLMWkRe3dRTttjOrlDsDFyEGTZjwix1vLYcUDngf1EdOoyvVPwOjE02yTRPxWOYCaGMFo1NOXAF1aYr8aDsS8SHAAwtMl+u9KBuzAZqv4jitFe9zoVcilhNI1myVK6IcEOfwyElJipc6D5WgrEXYXlRrAy42rxv0BO1bkL5itPoguwinbq5I+j2EFnxVCQHaQLAq7WQ7HKuF+AMzbaJkFqz/7UFJEZ451RrG3QP0BInJPWQXMxBqBfMMK+7onq25875uyp05au2Oln3bSjTCxs7P8B38Rp7Ezsodihs4kbc6SFlkoyrkjkntOUhP5uQokWnDJZKNKbOUi5dhibkDWkL3PlzHdqM/xQF5gu6C6b3By2tJkLUkuY9sLax+cym+x98hl3FwOdXfJigIEQ==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY4PR1001MB2358.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(366004)(9686003)(26005)(6496006)(1076003)(956004)(38100700002)(38350700002)(52116002)(8676002)(2906002)(316002)(66946007)(66476007)(33716001)(66556008)(6916009)(5660300002)(6666004)(4326008)(86362001)(508600001)(9576002)(186003)(33656002)(44832011)(55016003)(558084003)(8936002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VliB3Mz60JKLjtAynsz44qUaazeLW0lqopISi3y3POAj96Fgk04UPnNKNQj+?=
+ =?us-ascii?Q?OGTw0QFSfR72cs8KKA293iQ5eV+Ir2MtoMJk9Gtgq7MIwXJ3OzLiCu+e7uVJ?=
+ =?us-ascii?Q?jQL9Fczj//7icSm0jEnDY4oBk0E3ROLzXXRYI7ahRvBoJzNv7mJT5Go5Krfq?=
+ =?us-ascii?Q?gDY8re5GWfUyA5pRBoob1sukCYVaxjMrZJ2Xd+SEY5RHyfA2sSEtM9kTlXVL?=
+ =?us-ascii?Q?TlFP72tDMO3pLviot2+MmScHEDeTB53Y8T/BG82GQ7wdNI/6lVd5BuqYj498?=
+ =?us-ascii?Q?mf+tEfpziXdaKhHLDwLFGIlUZ9YXiRHOAm2oq35RQ0iTFZqsz01GmOnUK4Sg?=
+ =?us-ascii?Q?WfP1BWTUUMBctfiT4L+bAnG8MqhLz/al8fxLVRzNK27BrxUqHsRlP7uR+OL4?=
+ =?us-ascii?Q?roSRRCI2Bjg/o+An5FxWRe4bZ6zgY99EGFLD03v9nErwsyIA6u6MeGdh9+kv?=
+ =?us-ascii?Q?X0ud9EwWy/Sb5D5/9umoCEecPss1YPiMqSvBMAZYgJU3tHBHmqykKmRNdtDc?=
+ =?us-ascii?Q?cIu5VZI5TqxRzAJlruY9IecvVBcmEExMHL5cRI792DErJjSn1iLwfieARiow?=
+ =?us-ascii?Q?UWXVBU0g/KC64IPviWQDiGW7R/IsOu55RigxG6n2WPguTfRU3lNHebd/1wQo?=
+ =?us-ascii?Q?4HNi9MkQj928cEBtVotspNhIkjAZvhUgrrun/ZjypYhR3gibywYkS4sB1XT+?=
+ =?us-ascii?Q?CcVLvP8Fc3Zkg6W1GslNwcmbMW5q8+73t25rPj/FH3wn/olsIYpVgCiTC4Q2?=
+ =?us-ascii?Q?LPrQE4AG+M5v5ma1en9yCUYKf4dAyRRHoo9T2OsOJFJjBgeAshfzjXZTlEB8?=
+ =?us-ascii?Q?kcBZ2um262zdY4NN2PyvBmRjN1/79vD9Z8XxD7ZUBwEyczNzlvLXa+TYUUGB?=
+ =?us-ascii?Q?9Ijw9KgTiNT0useDtSiLHnh0JyLqx2SPhNPh3RQ7+SxGUrv5jloNRAFslNEQ?=
+ =?us-ascii?Q?QrEdazcKLofdUu/4gQwyX/z7rKIUv5L/bAFt7kY8BzucM9y1Y9CHILiClv1L?=
+ =?us-ascii?Q?JsrbuOeXiDrJJfb7am8wpxSL0sC1dhnN6vS5xBgkCzxp2jyNQo/ngHYUGsbz?=
+ =?us-ascii?Q?EHs036Jw1T/5OPCJJH2UqQ3rvSZhaetXdRyb90GuSSyaFhrc29bbHCH83MbA?=
+ =?us-ascii?Q?CQTYRlFyABgaaRuShWzW/tzOjbcD/DyUhocsVmH4Px8EtAnLJ/J8OLhf8T1C?=
+ =?us-ascii?Q?AwBnxpkhccL6r9OGbyaOHi/Tmgt2cHf+cgiQviwlfEuyYGLFJWQKIXCptsic?=
+ =?us-ascii?Q?fLlFFQQCvAzgEC8D4dHxQC4kRligMb963sYOILfBHpiyanTCvrI1WbSwp0Uf?=
+ =?us-ascii?Q?x69fUJhJl7Hfrz9YoNCcQtemmRmx4RewuBtbj9pMdlh0lYp/ak9W2re3h3u+?=
+ =?us-ascii?Q?h1oe1O+5/bi4XaW8kWWhrXd9vYDUXgUrHFFVyQgl8FBdmfILGedIsfHOvQIz?=
+ =?us-ascii?Q?ByU1jaCcLGqSi1X+uJaZr9FDPzY+rKN3r9yQQPXUZyWt2GamKccRlVbAPfsf?=
+ =?us-ascii?Q?/z80nEIn1mycw0AuzE7MRgSNTg60nj+f5DLjOvpVHNLX1cObea7jX6SNzKwz?=
+ =?us-ascii?Q?xRwFl55n7t2Rq7gWI5LA1lf4h93ZgBVb1ZGVER5am3IPLUnf7NdqXkEMK6gw?=
+ =?us-ascii?Q?KhfTXQIPO2nVxnlkuSJ3OxeL4R0d2JVIQn2CyuhlylkE2RUSg5BIEvkjZI/N?=
+ =?us-ascii?Q?MqDWdILg9x798ECeQLC0n66UCO0=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c2610327-806d-4d81-34c2-08d9b48a48e2
+X-MS-Exchange-CrossTenant-AuthSource: CY4PR1001MB2358.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Dec 2021 05:20:27.3515
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IoFShMGjv+lMT9EY53zpcmEnqJXCeCcrOHzMRTmWMlSiKAvAwL5an35yPBAoiALSiZIBLURaMjqxoJ2FHBFubVg6W1XVeBE7oQyR4eWOWz0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY4PR10MB1863
+X-Proofpoint-Virus-Version: vendor=nai engine=6300 definitions=10184 signatures=668683
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 mlxscore=0
+ suspectscore=0 mlxlogscore=909 spamscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2110150000
+ definitions=main-2112010030
+X-Proofpoint-GUID: xvXAwABqtC8a3iK5XS3AzNqJwb_RHaYw
+X-Proofpoint-ORIG-GUID: xvXAwABqtC8a3iK5XS3AzNqJwb_RHaYw
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Thanks for following up on this!  I had forgotten about it.  I'm really
+happy this is going forward.
 
-I love your patch! Yet something to improve:
+regards,
+dan carpenter
 
-[auto build test ERROR on bluetooth-next/master]
-[also build test ERROR on next-20211130]
-[cannot apply to net-next/master net/master linus/master bluetooth/master v5.16-rc3]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Luiz-Augusto-von-Dentz/Rework-parsing-of-HCI-events/20211201-080632
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: hexagon-randconfig-r026-20211130 (https://download.01.org/0day-ci/archive/20211201/202112011149.SZaZiW8X-lkp@intel.com/config)
-compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 25eb7fa01d7ebbe67648ea03841cda55b4239ab2)
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/bd4b2eeacef50f9df8f08056e9f6523083ac96f3
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Rework-parsing-of-HCI-events/20211201-080632
-        git checkout bd4b2eeacef50f9df8f08056e9f6523083ac96f3
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=hexagon SHELL=/bin/bash net/bluetooth/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All error/warnings (new ones prefixed by >>):
-
->> net/bluetooth/hci_event.c:7129:24: error: incompatible function pointer types initializing 'void (*)(struct hci_dev *, void *, struct sk_buff *)' with an expression of type 'void (struct hci_dev *, struct sk_buff *)' [-Werror,-Wincompatible-function-pointer-types]
-           HCI_EV(HCI_EV_VENDOR, msft_vendor_evt, 0),
-                                 ^~~~~~~~~~~~~~~
-   net/bluetooth/hci_event.c:6958:17: note: expanded from macro 'HCI_EV'
-           HCI_EV_VL(_op, _func, _len, _len)
-                          ^~~~~
-   net/bluetooth/hci_event.c:6952:10: note: expanded from macro 'HCI_EV_VL'
-           .func = _func, \
-                   ^~~~~
->> net/bluetooth/hci_event.c:7132:6: warning: no previous prototype for function 'hci_event_func' [-Wmissing-prototypes]
-   void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
-        ^
-   net/bluetooth/hci_event.c:7132:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
-   void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
-   ^
-   static 
-   1 warning and 1 error generated.
-
-
-vim +7129 net/bluetooth/hci_event.c
-
-  6970	
-  6971	#define HCI_EV_REQ(_op, _func, _len) \
-  6972		HCI_EV_REQ_VL(_op, _func, _len, _len)
-  6973	
-  6974	/* Entries in this table shall have their position according to the event opcode
-  6975	 * they handle so the use of the macros above is recommend since it does attempt
-  6976	 * to initialize at its proper index using Designated Initializers that way
-  6977	 * events without a callback function don't have entered.
-  6978	 */
-  6979	static const struct hci_ev {
-  6980		bool req;
-  6981		union {
-  6982			void (*func)(struct hci_dev *hdev, void *data,
-  6983				     struct sk_buff *skb);
-  6984			void (*func_req)(struct hci_dev *hdev, void *data,
-  6985					 struct sk_buff *skb, u16 *opcode, u8 *status,
-  6986					 hci_req_complete_t *req_complete,
-  6987					 hci_req_complete_skb_t *req_complete_skb);
-  6988		};
-  6989		u16  min_len;
-  6990		u16  max_len;
-  6991	} hci_ev_table[U8_MAX + 1] = {
-  6992		/* [0x01 = HCI_EV_INQUIRY_COMPLETE] */
-  6993		HCI_EV_STATUS(HCI_EV_INQUIRY_COMPLETE, hci_inquiry_complete_evt),
-  6994		/* [0x02 = HCI_EV_INQUIRY_RESULT] */
-  6995		HCI_EV_VL(HCI_EV_INQUIRY_RESULT, hci_inquiry_result_evt,
-  6996			  sizeof(struct hci_ev_inquiry_result), HCI_MAX_EVENT_SIZE),
-  6997		/* [0x03 = HCI_EV_CONN_COMPLETE] */
-  6998		HCI_EV(HCI_EV_CONN_COMPLETE, hci_conn_complete_evt,
-  6999		       sizeof(struct hci_ev_conn_complete)),
-  7000		/* [0x04 = HCI_EV_CONN_REQUEST] */
-  7001		HCI_EV(HCI_EV_CONN_REQUEST, hci_conn_request_evt,
-  7002		       sizeof(struct hci_ev_conn_request)),
-  7003		/* [0x05 = HCI_EV_DISCONN_COMPLETE] */
-  7004		HCI_EV(HCI_EV_DISCONN_COMPLETE, hci_disconn_complete_evt,
-  7005		       sizeof(struct hci_ev_disconn_complete)),
-  7006		/* [0x06 = HCI_EV_AUTH_COMPLETE] */
-  7007		HCI_EV(HCI_EV_AUTH_COMPLETE, hci_auth_complete_evt,
-  7008		       sizeof(struct hci_ev_auth_complete)),
-  7009		/* [0x07 = HCI_EV_REMOTE_NAME] */
-  7010		HCI_EV(HCI_EV_REMOTE_NAME, hci_remote_name_evt,
-  7011		       sizeof(struct hci_ev_remote_name)),
-  7012		/* [0x08 = HCI_EV_ENCRYPT_CHANGE] */
-  7013		HCI_EV(HCI_EV_ENCRYPT_CHANGE, hci_encrypt_change_evt,
-  7014		       sizeof(struct hci_ev_encrypt_change)),
-  7015		/* [0x09 = HCI_EV_CHANGE_LINK_KEY_COMPLETE] */
-  7016		HCI_EV(HCI_EV_CHANGE_LINK_KEY_COMPLETE,
-  7017		       hci_change_link_key_complete_evt,
-  7018		       sizeof(struct hci_ev_change_link_key_complete)),
-  7019		/* [0x0b = HCI_EV_REMOTE_FEATURES] */
-  7020		HCI_EV(HCI_EV_REMOTE_FEATURES, hci_remote_features_evt,
-  7021		       sizeof(struct hci_ev_remote_features)),
-  7022		/* [0x0e = HCI_EV_CMD_COMPLETE] */
-  7023		HCI_EV_REQ_VL(HCI_EV_CMD_COMPLETE, hci_cmd_complete_evt,
-  7024			      sizeof(struct hci_ev_cmd_complete), HCI_MAX_EVENT_SIZE),
-  7025		/* [0x0f = HCI_EV_CMD_STATUS] */
-  7026		HCI_EV_REQ(HCI_EV_CMD_STATUS, hci_cmd_status_evt,
-  7027			   sizeof(struct hci_ev_cmd_status)),
-  7028		/* [0x10 = HCI_EV_CMD_STATUS] */
-  7029		HCI_EV(HCI_EV_HARDWARE_ERROR, hci_hardware_error_evt,
-  7030		       sizeof(struct hci_ev_hardware_error)),
-  7031		/* [0x12 = HCI_EV_ROLE_CHANGE] */
-  7032		HCI_EV(HCI_EV_ROLE_CHANGE, hci_role_change_evt,
-  7033		       sizeof(struct hci_ev_role_change)),
-  7034		/* [0x13 = HCI_EV_NUM_COMP_PKTS] */
-  7035		HCI_EV_VL(HCI_EV_NUM_COMP_PKTS, hci_num_comp_pkts_evt,
-  7036			  sizeof(struct hci_ev_num_comp_pkts), HCI_MAX_EVENT_SIZE),
-  7037		/* [0x14 = HCI_EV_MODE_CHANGE] */
-  7038		HCI_EV(HCI_EV_MODE_CHANGE, hci_mode_change_evt,
-  7039		       sizeof(struct hci_ev_mode_change)),
-  7040		/* [0x16 = HCI_EV_PIN_CODE_REQ] */
-  7041		HCI_EV(HCI_EV_PIN_CODE_REQ, hci_pin_code_request_evt,
-  7042		       sizeof(struct hci_ev_pin_code_req)),
-  7043		/* [0x17 = HCI_EV_LINK_KEY_REQ] */
-  7044		HCI_EV(HCI_EV_LINK_KEY_REQ, hci_link_key_request_evt,
-  7045		       sizeof(struct hci_ev_link_key_req)),
-  7046		/* [0x18 = HCI_EV_LINK_KEY_NOTIFY] */
-  7047		HCI_EV(HCI_EV_LINK_KEY_NOTIFY, hci_link_key_notify_evt,
-  7048		       sizeof(struct hci_ev_link_key_notify)),
-  7049		/* [0x1c = HCI_EV_CLOCK_OFFSET] */
-  7050		HCI_EV(HCI_EV_CLOCK_OFFSET, hci_clock_offset_evt,
-  7051		       sizeof(struct hci_ev_clock_offset)),
-  7052		/* [0x1d = HCI_EV_PKT_TYPE_CHANGE] */
-  7053		HCI_EV(HCI_EV_PKT_TYPE_CHANGE, hci_pkt_type_change_evt,
-  7054		       sizeof(struct hci_ev_pkt_type_change)),
-  7055		/* [0x20 = HCI_EV_PSCAN_REP_MODE] */
-  7056		HCI_EV(HCI_EV_PSCAN_REP_MODE, hci_pscan_rep_mode_evt,
-  7057		       sizeof(struct hci_ev_pscan_rep_mode)),
-  7058		/* [0x22 = HCI_EV_INQUIRY_RESULT_WITH_RSSI] */
-  7059		HCI_EV_VL(HCI_EV_INQUIRY_RESULT_WITH_RSSI,
-  7060			  hci_inquiry_result_with_rssi_evt,
-  7061			  sizeof(struct hci_ev_inquiry_result_rssi),
-  7062			  HCI_MAX_EVENT_SIZE),
-  7063		/* [0x23 = HCI_EV_REMOTE_EXT_FEATURES] */
-  7064		HCI_EV(HCI_EV_REMOTE_EXT_FEATURES, hci_remote_ext_features_evt,
-  7065		       sizeof(struct hci_ev_remote_ext_features)),
-  7066		/* [0x2c = HCI_EV_SYNC_CONN_COMPLETE] */
-  7067		HCI_EV(HCI_EV_SYNC_CONN_COMPLETE, hci_sync_conn_complete_evt,
-  7068		       sizeof(struct hci_ev_sync_conn_complete)),
-  7069		/* [0x2d = HCI_EV_EXTENDED_INQUIRY_RESULT] */
-  7070		HCI_EV_VL(HCI_EV_EXTENDED_INQUIRY_RESULT,
-  7071			  hci_extended_inquiry_result_evt,
-  7072			  sizeof(struct hci_ev_ext_inquiry_result), HCI_MAX_EVENT_SIZE),
-  7073		/* [0x30 = HCI_EV_KEY_REFRESH_COMPLETE] */
-  7074		HCI_EV(HCI_EV_KEY_REFRESH_COMPLETE, hci_key_refresh_complete_evt,
-  7075		       sizeof(struct hci_ev_key_refresh_complete)),
-  7076		/* [0x31 = HCI_EV_IO_CAPA_REQUEST] */
-  7077		HCI_EV(HCI_EV_IO_CAPA_REQUEST, hci_io_capa_request_evt,
-  7078		       sizeof(struct hci_ev_io_capa_request)),
-  7079		/* [0x32 = HCI_EV_IO_CAPA_REPLY] */
-  7080		HCI_EV(HCI_EV_IO_CAPA_REPLY, hci_io_capa_reply_evt,
-  7081		       sizeof(struct hci_ev_io_capa_reply)),
-  7082		/* [0x33 = HCI_EV_USER_CONFIRM_REQUEST] */
-  7083		HCI_EV(HCI_EV_USER_CONFIRM_REQUEST, hci_user_confirm_request_evt,
-  7084		       sizeof(struct hci_ev_user_confirm_req)),
-  7085		/* [0x34 = HCI_EV_USER_PASSKEY_REQUEST] */
-  7086		HCI_EV(HCI_EV_USER_PASSKEY_REQUEST, hci_user_passkey_request_evt,
-  7087		       sizeof(struct hci_ev_user_passkey_req)),
-  7088		/* [0x35 = HCI_EV_REMOTE_OOB_DATA_REQUEST] */
-  7089		HCI_EV(HCI_EV_REMOTE_OOB_DATA_REQUEST, hci_remote_oob_data_request_evt,
-  7090		       sizeof(struct hci_ev_remote_oob_data_request)),
-  7091		/* [0x36 = HCI_EV_SIMPLE_PAIR_COMPLETE] */
-  7092		HCI_EV(HCI_EV_SIMPLE_PAIR_COMPLETE, hci_simple_pair_complete_evt,
-  7093		       sizeof(struct hci_ev_simple_pair_complete)),
-  7094		/* [0x3b = HCI_EV_USER_PASSKEY_NOTIFY] */
-  7095		HCI_EV(HCI_EV_USER_PASSKEY_NOTIFY, hci_user_passkey_notify_evt,
-  7096		       sizeof(struct hci_ev_user_passkey_notify)),
-  7097		/* [0x3c = HCI_EV_KEYPRESS_NOTIFY] */
-  7098		HCI_EV(HCI_EV_KEYPRESS_NOTIFY, hci_keypress_notify_evt,
-  7099		       sizeof(struct hci_ev_keypress_notify)),
-  7100		/* [0x3d = HCI_EV_REMOTE_HOST_FEATURES] */
-  7101		HCI_EV(HCI_EV_REMOTE_HOST_FEATURES, hci_remote_host_features_evt,
-  7102		       sizeof(struct hci_ev_remote_host_features)),
-  7103		/* [0x3e = HCI_EV_LE_META] */
-  7104		HCI_EV_VL(HCI_EV_LE_META, hci_le_meta_evt,
-  7105			  sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_SIZE),
-  7106	#if IS_ENABLED(CONFIG_BT_HS)
-  7107		/* [0x40 = HCI_EV_PHY_LINK_COMPLETE] */
-  7108		HCI_EV(HCI_EV_PHY_LINK_COMPLETE, hci_phy_link_complete_evt,
-  7109		       sizeof(struct hci_ev_phy_link_complete)),
-  7110		/* [0x41 = HCI_EV_CHANNEL_SELECTED] */
-  7111		HCI_EV(HCI_EV_CHANNEL_SELECTED, hci_chan_selected_evt,
-  7112		       sizeof(struct hci_ev_channel_selected)),
-  7113		/* [0x42 = HCI_EV_DISCONN_PHY_LINK_COMPLETE] */
-  7114		HCI_EV(HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE,
-  7115		       hci_disconn_loglink_complete_evt,
-  7116		       sizeof(struct hci_ev_disconn_logical_link_complete)),
-  7117		/* [0x45 = HCI_EV_LOGICAL_LINK_COMPLETE] */
-  7118		HCI_EV(HCI_EV_LOGICAL_LINK_COMPLETE, hci_loglink_complete_evt,
-  7119		       sizeof(struct hci_ev_logical_link_complete)),
-  7120		/* [0x46 = HCI_EV_DISCONN_LOGICAL_LINK_COMPLETE] */
-  7121		HCI_EV(HCI_EV_DISCONN_PHY_LINK_COMPLETE,
-  7122		       hci_disconn_phylink_complete_evt,
-  7123		       sizeof(struct hci_ev_disconn_phy_link_complete)),
-  7124	#endif
-  7125		/* [0x48 = HCI_EV_NUM_COMP_BLOCKS] */
-  7126		HCI_EV(HCI_EV_NUM_COMP_BLOCKS, hci_num_comp_blocks_evt,
-  7127		       sizeof(struct hci_ev_num_comp_blocks)),
-  7128		/* [0xff = HCI_EV_VENDOR] */
-> 7129		HCI_EV(HCI_EV_VENDOR, msft_vendor_evt, 0),
-  7130	};
-  7131	
-> 7132	void hci_event_func(struct hci_dev *hdev, u8 event, struct sk_buff *skb,
-  7133			    u16 *opcode, u8 *status, hci_req_complete_t *req_complete,
-  7134			    hci_req_complete_skb_t *req_complete_skb)
-  7135	{
-  7136		const struct hci_ev *ev = &hci_ev_table[event];
-  7137		void *data;
-  7138	
-  7139		if (!ev->func)
-  7140			return;
-  7141	
-  7142		if (skb->len < ev->min_len) {
-  7143			bt_dev_err(hdev, "unexpected event 0x%2.2x length: %u < %u",
-  7144				   event, skb->len, ev->min_len);
-  7145			return;
-  7146		}
-  7147	
-  7148		/* Just warn if the length is over max_len size it still be
-  7149		 * possible to partially parse the event so leave to callback to
-  7150		 * decide if that is acceptable.
-  7151		 */
-  7152		if (skb->len > ev->max_len)
-  7153			bt_dev_warn(hdev, "unexpected event 0x%2.2x length: %u > %u",
-  7154				    event, skb->len, ev->max_len);
-  7155	
-  7156		data = hci_ev_skb_pull(hdev, skb, event, ev->min_len);
-  7157		if (!data)
-  7158			return;
-  7159	
-  7160		if (ev->req)
-  7161			ev->func_req(hdev, data, skb, opcode, status, req_complete,
-  7162				     req_complete_skb);
-  7163		else
-  7164			ev->func(hdev, data, skb);
-  7165	}
-  7166	
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
