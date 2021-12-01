@@ -2,76 +2,91 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BC2E9C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 14:57:26 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 58755C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 15:06:47 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350170AbhLAPAq (ORCPT
+        id S235596AbhLAPJ7 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 10:00:46 -0500
-Received: from sin.source.kernel.org ([145.40.73.55]:50556 "EHLO
-        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350140AbhLAPAq (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 10:00:46 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id 8C185CE1F6E
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Dec 2021 14:57:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DF53DC53FAD
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Dec 2021 14:57:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638370642;
-        bh=Oof8pe523IKIqxcNLVupuUv7aOyz7rhcjn9gNLttWJw=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=OPCwKyttJuqkM4SAK3s/GtmTyOlEmc390ZXtWSUTU/p2yrv5J6L4FtntWm6WIb53q
-         n2kSmMkn8OQFtRMBmu7ZpOcGk9o93Z9XqG7r4R/ZUNBeNm5mHQGWXAVkxEevfcDtSg
-         E70FawJZRsSAM5NA7CEhLtkbxoQInbgD1mQcJ2wB0d0d6+xrAI1/wGirm3s2yw0Gi6
-         DJS0//1lkDX9yk+hRm4dAdSqvfvKLox+Ex9yy4OQ3NGoCdzgXKW4QlCAAj7/GJkder
-         ql2qLMeeH71DaZmdo5dzocP7+zZWdiwbr8RQoqXz8+p0XgQmJU8vcnNtjYYBpVevPd
-         uC14Je0462HZQ==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id C069F60EE6; Wed,  1 Dec 2021 14:57:22 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Wed, 01 Dec 2021 14:57:22 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: tiwai@suse.de
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215167-62941-K8ps7Dr6Fg@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
-References: <bug-215167-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Wed, 1 Dec 2021 10:09:59 -0500
+Received: from mga02.intel.com ([134.134.136.20]:31466 "EHLO mga02.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235152AbhLAPJ6 (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 1 Dec 2021 10:09:58 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10184"; a="223704308"
+X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
+   d="scan'208";a="223704308"
+Received: from orsmga005.jf.intel.com ([10.7.209.41])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Dec 2021 07:06:37 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.87,278,1631602800"; 
+   d="scan'208";a="677287331"
+Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
+  by orsmga005.jf.intel.com with ESMTP; 01 Dec 2021 07:06:35 -0800
+Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1msRBq-000F3A-GW; Wed, 01 Dec 2021 15:06:34 +0000
+Date:   Wed, 1 Dec 2021 23:06:25 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+        kuba@kernel.org
+Cc:     kbuild-all@lists.01.org, linux-bluetooth@vger.kernel.org,
+        netdev@vger.kernel.org, dan.carpenter@oracle.com,
+        Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Subject: Re: [PATCH 02/15] Bluetooth: HCI: Use skb_pull_data to parse BR/EDR
+ events
+Message-ID: <202112012251.iGUVb22U-lkp@intel.com>
+References: <20211201000215.1134831-3-luiz.dentz@gmail.com>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211201000215.1134831-3-luiz.dentz@gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+Hi Luiz,
 
---- Comment #9 from Takashi Iwai (tiwai@suse.de) ---
-It was confirmed that reverting all btintel.c changes from 5.15.x makes the
-device working again.  So it's a regression in btintel.c change between 5.14
-and 5.15.
+I love your patch! Yet something to improve:
 
---=20
-You may reply to this email to add a comment.
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on net-next/master net/master linus/master bluetooth/master v5.16-rc3 next-20211201]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+url:    https://github.com/0day-ci/linux/commits/Luiz-Augusto-von-Dentz/Rework-parsing-of-HCI-events/20211201-080632
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+config: nios2-randconfig-r004-20211201 (https://download.01.org/0day-ci/archive/20211201/202112012251.iGUVb22U-lkp@intel.com/config)
+compiler: nios2-linux-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/ccec11fda2c9e92440427cb397e3fdd8e46b2827
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Rework-parsing-of-HCI-events/20211201-080632
+        git checkout ccec11fda2c9e92440427cb397e3fdd8e46b2827
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=nios2 SHELL=/bin/bash
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>, old ones prefixed by <<):
+
+ERROR: modpost: "__mulsi3" [net/vmw_vsock/vsock.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/mac802154/mac802154.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/ieee802154/ieee802154.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/atm/lec.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/atm/atm.ko] undefined!
+>> ERROR: modpost: "skb_pull_data" [net/bluetooth/bluetooth.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/bluetooth/bluetooth.ko] undefined!
+ERROR: modpost: "__mulsi3" [net/lapb/lapb.ko] undefined!
+ERROR: modpost: "__mulsi3" [sound/virtio/virtio_snd.ko] undefined!
+ERROR: modpost: "__mulsi3" [sound/hda/snd-hda-core.ko] undefined!
+WARNING: modpost: suppressed 804 unresolved symbol warnings because there were too many)
+
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
