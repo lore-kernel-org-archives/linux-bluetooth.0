@@ -2,30 +2,30 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 9B4DBC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:03:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 6DD80C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  1 Dec 2021 18:20:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244038AbhLASGT (ORCPT
+        id S243657AbhLASYQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 13:06:19 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:53680 "EHLO
+        Wed, 1 Dec 2021 13:24:16 -0500
+Received: from mailgw01.mediatek.com ([60.244.123.138]:43154 "EHLO
         mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229975AbhLASGS (ORCPT
+        with ESMTP id S233861AbhLASYP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 13:06:18 -0500
-X-UUID: 93758ccca5aa42c1af2aabedde230b39-20211202
-X-UUID: 93758ccca5aa42c1af2aabedde230b39-20211202
+        Wed, 1 Dec 2021 13:24:15 -0500
+X-UUID: b241a674144a42e7951c2f09331832ec-20211202
+X-UUID: b241a674144a42e7951c2f09331832ec-20211202
 Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 414245700; Thu, 02 Dec 2021 02:02:55 +0800
+        with ESMTP id 1478577706; Thu, 02 Dec 2021 02:20:50 +0800
 Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Thu, 2 Dec 2021 02:02:52 +0800
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Thu, 2 Dec 2021 02:20:48 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 2 Dec 2021 02:02:52 +0800
+ Transport; Thu, 2 Dec 2021 02:20:48 +0800
 From:   <sean.wang@mediatek.com>
 To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
 CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
@@ -42,14 +42,11 @@ CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
         <mcchou@chromium.org>, <shawnku@google.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Mark-yw Chen <mark-yw.chen@mediatek.com>
-Subject: [PATCH v2 2/2] Bluetooth: btmtksdio: fix resume failure
-Date:   Thu, 2 Dec 2021 02:02:47 +0800
-Message-ID: <7da7852d8fc936c97a0fe4cd00c723e42b889c84.1638381385.git.objelf@gmail.com>
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btmtksdio: enable AOSP extension for MT7921
+Date:   Thu, 2 Dec 2021 02:20:47 +0800
+Message-ID: <a37f06cbc8ee0024d35c020a40808d657767e4c9.1638382621.git.objelf@gmail.com>
 X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <73960845c299e2cd22c11b84014ff6ba4758e9bb.1638381385.git.objelf@gmail.com>
-References: <73960845c299e2cd22c11b84014ff6ba4758e9bb.1638381385.git.objelf@gmail.com>
 MIME-Version: 1.0
 Content-Type: text/plain
 X-MTK:  N
@@ -59,33 +56,27 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
-btmtksdio have to rely on MMC_PM_KEEP_POWER in pm_flags to avoid that
-SDIO power is being shut off during the device is in suspend. That fixes
-the SDIO command fails to access the bus after the device is resumed.
+Similar to MT7921 btusb, we enable AOSP extension for MT7921 btmtksdio
+as well.
 
-Fixes: 7f3c563c575e7 ("Bluetooth: btmtksdio: Add runtime PM support to SDIO based Bluetooth")
-Co-developed-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
-Signed-off-by: Mark-yw Chen <mark-yw.chen@mediatek.com>
 Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
-v2: rebase and resend
 ---
  drivers/bluetooth/btmtksdio.c | 2 ++
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index fc6317e519e9..143404745240 100644
+index d9cf0c492e29..13f78ba1a978 100644
 --- a/drivers/bluetooth/btmtksdio.c
 +++ b/drivers/bluetooth/btmtksdio.c
-@@ -1065,6 +1065,8 @@ static int btmtksdio_runtime_suspend(struct device *dev)
- 	if (!test_bit(BTMTKSDIO_FUNC_ENABLED, &bdev->tx_state))
- 		return 0;
+@@ -787,6 +787,8 @@ static int mt79xx_setup(struct hci_dev *hdev, const char *fwname)
+ 		return err;
+ 	}
  
-+	sdio_set_host_pm_flags(func, MMC_PM_KEEP_POWER);
++	hci_set_aosp_capable(hdev);
 +
- 	sdio_claim_host(bdev->func);
+ 	return err;
+ }
  
- 	sdio_writel(bdev->func, C_FW_OWN_REQ_SET, MTK_REG_CHLPCR, &err);
 -- 
 2.25.1
 
