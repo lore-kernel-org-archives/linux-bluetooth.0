@@ -2,80 +2,80 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E621EC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Dec 2021 00:08:40 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5A265C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Dec 2021 09:33:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1354068AbhLBAL7 (ORCPT
+        id S1356550AbhLBJgo (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 1 Dec 2021 19:11:59 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38840 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1354268AbhLBALw (ORCPT
+        Thu, 2 Dec 2021 04:36:44 -0500
+Received: from so254-9.mailgun.net ([198.61.254.9]:24096 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1356538AbhLBJgk (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 1 Dec 2021 19:11:52 -0500
-Received: from sin.source.kernel.org (sin.source.kernel.org [IPv6:2604:1380:40e1:4800::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61712C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed,  1 Dec 2021 16:08:28 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Thu, 2 Dec 2021 04:36:40 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1638437598; h=Message-Id: Date: Subject: Cc: To: From:
+ Sender; bh=WPa8QM7TiHznVMzVYKuk2L9NKcSm2U7NIvrXT4MjL58=; b=FhVmCRaLVrdzH9olKvTSDaPtza9bId7UfDWnmGK7J/ODe2UU8mVJl7lnR7fetqFd/goq+Nfl
+ 0s6bIfrMNvVA8w3WWiOg9R+yDWBuhph7AU72JogsLlfeTttP1cZWYjI+hkTdnvqVPkhfnLzc
+ pqnzFdU7nxEcyWnTjzKTZ2nXZWo=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n05.prod.us-east-1.postgun.com with SMTP id
+ 61a892dde7d68470af9bf12d (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Thu, 02 Dec 2021 09:33:17
+ GMT
+Sender: zijuhu=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id 4AA62C43639; Thu,  2 Dec 2021 09:33:16 +0000 (UTC)
+Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
         (No client certificate requested)
-        by sin.source.kernel.org (Postfix) with ESMTPS id AB5A4CE2138
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Dec 2021 00:08:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id DC4EBC53FAD
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Dec 2021 00:08:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638403704;
-        bh=mjSmj20N/hLxnl5f3JNkNhY90SvDEAt5PHSJlks7DDo=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=FRAw7/dFL46RnQUcveSGD7wjnhbta0S4sKRT/zbZ9ZZMN19GZZGpywvJFzmZThMRX
-         QykddopBLPmq2pQ9YCpfTOBC7pgZV78hvnNW3hhlCKlBEEsRyCyGItoZ0jfX7gm4FD
-         5diFNIcILCxbOeIKaNU5BtX5p4W6vuCq791ok0Ci8d5UV0/PRifRant9K1Yi0CnoWC
-         5ATwsPjxsbzuUBdiE4wbM4uKdLuh7TfI/+Era5vVUAexPaoX4+eDVqeQyIfCYk63Oz
-         L56pbtCJ3ZimmqmIvUryGRRjFJQZ9R1F+heKGHwGar6x2bCo3ljXLuXco+gaOdAapD
-         e9bUlvmQ9kH+Q==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id BF22260F46; Thu,  2 Dec 2021 00:08:24 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215197] Memory leaks show up a while after usung Edimax Wi-Fi
- N150 Bluetooth4.0 USB Adapter (rtl8723be)
-Date:   Thu, 02 Dec 2021 00:08:24 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: erhard_f@mailbox.org
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: attachments.created
-Message-ID: <bug-215197-62941-OPnkQG9ZKe@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215197-62941@https.bugzilla.kernel.org/>
-References: <bug-215197-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+        (Authenticated sender: zijuhu)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 33EC3C4361A;
+        Thu,  2 Dec 2021 09:33:11 +0000 (UTC)
+DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 33EC3C4361A
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
+Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
+From:   Zijun Hu <zijuhu@codeaurora.org>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
+        hemantg@codeaurora.org, rjliao@codeaurora.org,
+        zijuhu@codeaurora.org, tjiang@codeaurora.org,
+        Zijun Hu <quic_zijuhu@quicinc.com>
+Subject: [PATCH v1] Bluetooth: btusb: Add one more Bluetooth part for WCN6855
+Date:   Thu,  2 Dec 2021 17:33:08 +0800
+Message-Id: <1638437588-19087-1-git-send-email-zijuhu@codeaurora.org>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215197
+From: Zijun Hu <quic_zijuhu@quicinc.com>
 
---- Comment #3 from Erhard F. (erhard_f@mailbox.org) ---
-Created attachment 299829
-  --> https://bugzilla.kernel.org/attachment.cgi?id=3D299829&action=3Dedit
-kernel netconsole.log (5.16-rc3, AMD FX-8370)
+Add a USB ID 0bda:385a to usb_device_id table for WCN6855.
 
---=20
-You may reply to this email to add a comment.
+Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ab169fc673ea..bf980f2c2101 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -302,6 +302,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0489, 0xe0d6), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0e2), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-- 
+The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+
