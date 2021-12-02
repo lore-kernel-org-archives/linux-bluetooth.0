@@ -2,117 +2,104 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 01DC9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Dec 2021 16:58:03 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EE3FAC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  2 Dec 2021 18:54:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1359799AbhLBRBZ (ORCPT
+        id S231654AbhLBS6H (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 2 Dec 2021 12:01:25 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:37995 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S1348240AbhLBRBZ (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 2 Dec 2021 12:01:25 -0500
-Received: from [192.168.0.2] (ip5f5aeaa8.dynamic.kabel-deutschland.de [95.90.234.168])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Thu, 2 Dec 2021 13:58:07 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:57648 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234634AbhLBS6G (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 2 Dec 2021 13:58:06 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id B93CC61EA1927;
-        Thu,  2 Dec 2021 17:58:01 +0100 (CET)
-Message-ID: <6191d067-4eae-4776-5840-1d826113a6d5@molgen.mpg.de>
-Date:   Thu, 2 Dec 2021 17:58:01 +0100
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 2FEE462784
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Dec 2021 18:54:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8A3AEC00446
+        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Dec 2021 18:54:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638471282;
+        bh=A3CqVXVbzLmILOfYb/ytVQj4ip0GnO5RFa0WMlRAiz0=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=UW+3XUbAOg7xNJwpvXqvaIGH6hb+E2UJngkmSkZ980wJVUbhPIL/WN6UWiJABhB2B
+         tBEO32EWc1pgkhKMOBXlnFaNf1Dhn2IjHhNkHbyAplVicE/3vOkRhJpoaIaMqBcB/v
+         A83l3IWq3PvUZpwoeHXM4OHAUz5AM4JTeLWxVbK+S0B82FR+1D+bng9Qm5i4/YzISE
+         Ux6usu6ZihUI1BNoqVyXNuwNVIhm13l79s9Y6dc+9rFN4pAsTNmJLWncCumw9zqgYb
+         OH2nN7tDCc84wANIAxWQUiz9oX7RdafeqVHMucosVlTFs5MQezR2ja4BcJzewgq59Y
+         /NSMo6JwXCJug==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 62DEE60F46; Thu,  2 Dec 2021 18:54:42 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215187] btintel: AX201: missing firmware ibt-19-16-0.sfi
+Date:   Thu, 02 Dec 2021 18:54:42 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nozzy123nozzy@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215187-62941-JJSZQUcy0K@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215187-62941@https.bugzilla.kernel.org/>
+References: <bug-215187-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.2
-Subject: Re: [PATCH] Bluetooth: Apply initial command workaround for more
- Intel chips
-Content-Language: en-US
-To:     Takashi Iwai <tiwai@suse.de>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Tedd Ho-Jeong An <tedd.an@intel.com>,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
-References: <20211202162256.31837-1-tiwai@suse.de>
- <acc7b5b4-72cc-9f3b-90a6-6fbf6c3a71e7@molgen.mpg.de>
- <s5h7dcnt0lp.wl-tiwai@suse.de>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <s5h7dcnt0lp.wl-tiwai@suse.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Takashi,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215187
+
+--- Comment #1 from Takahide Nojima (nozzy123nozzy@gmail.com) ---
+Hello,
+
+ After I did some try and error, I suppose the version of Bluetooth firmwar=
+e of
+AX201 depends on the version of iwlwifi firmware. Then I think this issue is
+simply missing the 'intel/ibt-19-16-0.sfi' in
+git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git.
 
 
-Am 02.12.21 um 17:47 schrieb Takashi Iwai:
-> On Thu, 02 Dec 2021 17:32:14 +0100, Paul Menzel wrote:
+ I let the Linux-5.16-rc3 load the latest iwlwifi firmware
+'iwlwifi-QuZ-a0-hr-b0-67.ucode'. Then I found an error about missing the
+Bluetooth firmware in dmesg, as I reported before.
 
->> Am 02.12.21 um 17:22 schrieb Takashi Iwai:
->>> It seems that a few more Intel chips require the workaround for the
->>> broken initial command.  At least, per openSUSE Bugzilla reports,
->>> 8087:0a2a and 8087:0026 need BTUSB_INTEL_BROKEN_INITIAL_NCMD flag.
->>>
->>> Fixes: 83f2dafe2a62 ("Bluetooth: btintel: Refactoring setup routine for legacy ROM sku")
->>> Buglink: https://bugzilla.opensuse.org/show_bug.cgi?id=1193124
->>> Signed-off-by: Takashi Iwai <tiwai@suse.de>
->>>
->>
->> […]
->>
->> I have a Dell Latitude E7250 with
->>
->>      Bus 001 Device 003: ID 8087:0a2a Intel Corp. Bluetooth wireless interface
->>
->> and Bluetooth seems to work fine minus some Linux warnings [1] and a
->> problem transferring greater than some bytes files with the Nokia N9
->> [2].
->>
->> Linux 5.16-rc3, Dell Inc. Latitude E7250/0TVD2T, BIOS A19 01/23/2018:
->>
->> ```
->> $ sudo dmesg | grep -i bluet
->> [    8.173417] calling  bt_init+0x0/0xb3 [bluetooth] @ 301
->> [    8.173439] Bluetooth: Core ver 2.22
->> [    8.173463] NET: Registered PF_BLUETOOTH protocol family
->> [    8.173464] Bluetooth: HCI device and connection manager initialized
->> [    8.173467] Bluetooth: HCI socket layer initialized
->> [    8.173470] Bluetooth: L2CAP socket layer initialized
->> [    8.173473] Bluetooth: SCO socket layer initialized
->> [    8.173475] initcall bt_init+0x0/0xb3 [bluetooth] returned 0 after 35 usecs
->> [    8.216875] Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
->> [    8.233515] bluetooth hci0: firmware: direct-loading firmware intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
->> [    8.233520] Bluetooth: hci0: Intel Bluetooth firmware file: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
->> [    8.540884] Bluetooth: hci0: unexpected event for opcode 0xfc2f
->> [    8.558942] Bluetooth: hci0: Intel BT fw patch 0x32 completed & activated
->> ```
-> 
-> Thanks, so this seems depending on the hardware, maybe a subtle
-> difference matters.  As far as I read the code changes, the workaround
-> was applied in the past unconditionally, so it must be fairly safe
-> even if the chip works as is.
+ Next, I let Linux-5.16-rc3 load the older firmware
+'iwlwifi-QuZ-a0-hr-b0-63.ucode', then I found the Linux loaded successfully=
+ the
+Bluetooth firmware shown as below,
+----------here-------------
+kernel: Bluetooth hci0: firmware: direct-loading firmware intel/ibt-19-0-4.=
+sfi
+kernel: Bluetooth: hci0: Found device firmware: intel/ibt-19-0-4.sfi
+----------here-------------
+This message was the same as reported when I tested Linux-5.15.5.
 
-Maybe add that to the commit message?
+ I have reported this to the intel support community. I'll wait for them to=
+ put
+the intel/ibt-19-16-0.sfi to
+git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git.
 
-> Or, for avoiding the unnecessarily application of the workaround,
-> should it be changed as a fallback after the failure at the first
-> try...?
+---
+Takahide Nojima
 
-Reading through the openSUSE Bugzilla issue, the failure is:
+--=20
+You may reply to this email to add a comment.
 
-     Bluetooth: hci0: Reading Intel version command failed (-110)
-     Bluetooth: hci0: command 0xfc05 tx timeout
-
-I couldn’t find the report for 8087:0a2a in the issue. Can you check, 
-what firmware is used?
-
-If the functionality of 5.14 is restored by your patch, then it should 
-work I guess. I didn’t use Bluetooth for file transfers in the past and 
-only for connecting to external speakers.
-
-
-Kind regards,
-
-Paul
+You are receiving this mail because:
+You are the assignee for the bug.=
