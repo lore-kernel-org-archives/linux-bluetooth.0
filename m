@@ -2,170 +2,123 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7F7A0C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 21:40:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id F1D83C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 21:41:59 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383214AbhLCVnx convert rfc822-to-8bit (ORCPT
+        id S1383214AbhLCVpX (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 16:43:53 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:48236 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229665AbhLCVnw (ORCPT
+        Fri, 3 Dec 2021 16:45:23 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39676 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S240809AbhLCVpX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 16:43:52 -0500
-Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 95E0ECED20;
-        Fri,  3 Dec 2021 22:40:26 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [RFC] Bluetooth: mgmt: Introduce mgmt_alloc_skb and
- mgmt_send_event_skb
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211203192529.2199867-1-luiz.dentz@gmail.com>
-Date:   Fri, 3 Dec 2021 22:40:26 +0100
-Cc:     linux-bluetooth@vger.kernel.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <360C8200-95D7-4596-A39B-40703E99E92B@holtmann.org>
-References: <20211203192529.2199867-1-luiz.dentz@gmail.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Fri, 3 Dec 2021 16:45:23 -0500
+Received: from mail-ua1-x92f.google.com (mail-ua1-x92f.google.com [IPv6:2607:f8b0:4864:20::92f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E56BC061751
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Dec 2021 13:41:58 -0800 (PST)
+Received: by mail-ua1-x92f.google.com with SMTP id az37so7954881uab.13
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Dec 2021 13:41:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=lb0V5Ql4JVotHnIB4saXtIFV6mhw9E9UWo2gomIQIvs=;
+        b=gTDqf5Za+LKuMBMWtIlTa6h9r5UHyFsDlMazLLyytfM0PnyCPu1OIkWC98PSlCXZ1a
+         u5hZzI2HDVoe/a/5zK53Wy+uDCEtAHWyx+l+YjBEbdux5sqPGa9J9DC/ktyuxhNGmy09
+         AkwNVNZwXt2cDpkz70s1u37KiYASeUmXAn7tuhza8b6+u0oI0bNl1Ekg0fiuF/pVEDIg
+         TbzOzTOBlmJ4nWbiznl8ncTtjxpcCKQ9ZzuuUHh+G89R77mZlLPCh70B+2jl97WlQsOv
+         k5fBB4g92fZm/8IfBq5amCjWjBbUKcv8B7Gr9oybbjz3KnL2XPPs+QY/UADGhV/EPl6J
+         13gQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=lb0V5Ql4JVotHnIB4saXtIFV6mhw9E9UWo2gomIQIvs=;
+        b=rJ8B5ciSCX5bdLaXnFZPmm+Vb6Z04Vq20iUbOkOThdTnBrQlgK4ACmH/T/yg1Hq6BG
+         +Ywv8VpEvCku/x5Tz0NMO+yr6SowJTywjiPTyhCfVN59IEpwwhmc5OmCk5gCuyUJGUMs
+         QaXQUFmFO7BwMg1h0J2o6v5embDEkcMOd4x8h/cZRjupdhv2AzMzy48dylIopz5BxvTE
+         mkNHdbYi25MvRij1K0aNWWVUJWzY3KbNo+C7VJxDb611+TSmYinaV1CzMypXBFoJP/7+
+         ezfKzSuvojNZL1so9t+UpVdq7sKqQlbSRBp/TFAjPu5Z8SSUbLjvM9+uUoNylsISWZPa
+         TEPA==
+X-Gm-Message-State: AOAM532MaWIdmqam89onsjh1x0GEbr80ekgJPNCYbq5nYUy3s/aNhxe4
+        pT2vbxLroDA9cvYcNjN3slPLIO3C0R2pvmDSsh1tWLIc
+X-Google-Smtp-Source: ABdhPJx3ywOR3bT9X+wKS+S+jJERZlLnf4K3jfKHOPVcYCflOB2XLDzE04K0OqMhCL88egZ/cTPxHjiE+hQApIOx8TI=
+X-Received: by 2002:a67:5f45:: with SMTP id t66mr23754551vsb.64.1638567717719;
+ Fri, 03 Dec 2021 13:41:57 -0800 (PST)
+MIME-Version: 1.0
+References: <20211120012448.1476960-1-luiz.dentz@gmail.com>
+ <20211120012448.1476960-3-luiz.dentz@gmail.com> <0B2956DC-56B1-43A2-BB4A-CF42ABFC9C30@holtmann.org>
+ <CABBYNZKZ-VNtMDDAJrEokVUHqh8MSrZ8eR9mJaoX7ASrOt3tRQ@mail.gmail.com> <B7D70E25-E96B-4309-8EA3-00D8B9BF5F41@holtmann.org>
+In-Reply-To: <B7D70E25-E96B-4309-8EA3-00D8B9BF5F41@holtmann.org>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 3 Dec 2021 13:41:46 -0800
+Message-ID: <CABBYNZLsEYAWriqGnEOis0TMkNpPk3-xPzcCrBneNBcGyhC97Q@mail.gmail.com>
+Subject: Re: [PATCH v3 3/4] Bluetooth: Introduce HCI_CONN_FLAG_DEVICE_PRIVACY
+ device flag
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+Hi Marcel,
 
-> This introduces mgmt_alloc_skb and mgmt_send_event_skb which are
-> convenient when building MGMT events that have variable length as the
-> likes of skb_put_data can be used to insert portion directly on the skb
-> instead of having to first build an intermediate buffer just to be
-> copied over the skb.
-> 
-> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-> ---
-> net/bluetooth/mgmt_util.c | 54 +++++++++++++++++++++++++++------------
-> net/bluetooth/mgmt_util.h |  3 +++
-> 2 files changed, 40 insertions(+), 17 deletions(-)
-> 
-> diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
-> index 83875f2a0604..4774e993d774 100644
-> --- a/net/bluetooth/mgmt_util.c
-> +++ b/net/bluetooth/mgmt_util.c
-> @@ -56,40 +56,60 @@ static struct sk_buff *create_monitor_ctrl_event(__le16 index, u32 cookie,
-> 	return skb;
-> }
-> 
-> -int mgmt_send_event(u16 event, struct hci_dev *hdev, unsigned short channel,
-> -		    void *data, u16 data_len, int flag, struct sock *skip_sk)
-> +struct sk_buff *mgmt_alloc_skb(unsigned int size)
-> {
-> 	struct sk_buff *skb;
-> +
-> +	skb = alloc_skb(sizeof(struct mgmt_hdr) + size, GFP_KERNEL);
-> +	if (skb)
-> +		skb_reserve(skb, sizeof(struct mgmt_hdr));
-> +
-> +	return skb;
-> +}
-> +
-> +int mgmt_send_event_skb(u16 event, struct hci_dev *hdev, unsigned short channel,
-> +			struct sk_buff *skb, int flag, struct sock *skip_sk)
-> +{
-> 	struct mgmt_hdr *hdr;
-> +	int len = skb->len;
-> 
-> -	skb = alloc_skb(sizeof(*hdr) + data_len, GFP_KERNEL);
-> -	if (!skb)
-> -		return -ENOMEM;
-> +	/* Time stamp */
-> +	__net_timestamp(skb);
-> 
-> -	hdr = skb_put(skb, sizeof(*hdr));
-> +	/* Send just the data, without headers, to the monitor */
-> +	if (channel == HCI_CHANNEL_CONTROL)
-> +		hci_send_monitor_ctrl_event(hdev, event, skb->data, skb->len,
-> +					    skb_get_ktime(skb), flag, skip_sk);
-> +
-> +	hdr = skb_push(skb, sizeof(*hdr));
-> 	hdr->opcode = cpu_to_le16(event);
-> 	if (hdev)
-> 		hdr->index = cpu_to_le16(hdev->id);
-> 	else
-> 		hdr->index = cpu_to_le16(MGMT_INDEX_NONE);
-> -	hdr->len = cpu_to_le16(data_len);
-> -
-> -	if (data)
-> -		skb_put_data(skb, data, data_len);
-> -
-> -	/* Time stamp */
-> -	__net_timestamp(skb);
-> +	hdr->len = cpu_to_le16(len);
-> 
-> 	hci_send_to_channel(channel, skb, flag, skip_sk);
-> 
-> -	if (channel == HCI_CHANNEL_CONTROL)
-> -		hci_send_monitor_ctrl_event(hdev, event, data, data_len,
-> -					    skb_get_ktime(skb), flag, skip_sk);
-> -
-> 	kfree_skb(skb);
-> 	return 0;
-> }
-> 
-> +int mgmt_send_event(u16 event, struct hci_dev *hdev, unsigned short channel,
-> +		    void *data, u16 data_len, int flag, struct sock *skip_sk)
-> +{
-> +	struct sk_buff *skb;
-> +
-> +	skb = mgmt_alloc_skb(data_len);
-> +	if (!skb)
-> +		return -ENOMEM;
-> +
-> +	if (data)
-> +		skb_put_data(skb, data, data_len);
-> +
-> +	return mgmt_send_event_skb(event, hdev, channel, skb, flag, skip_sk);
-> +}
-> +
-> int mgmt_cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status)
-> {
-> 	struct sk_buff *skb, *mskb;
-> diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
-> index 63b965eaaaac..9f8692d4ce90 100644
-> --- a/net/bluetooth/mgmt_util.h
-> +++ b/net/bluetooth/mgmt_util.h
-> @@ -32,6 +32,9 @@ struct mgmt_pending_cmd {
-> 	int (*cmd_complete)(struct mgmt_pending_cmd *cmd, u8 status);
-> };
-> 
-> +struct sk_buff *mgmt_alloc_skb(unsigned int size);
-> +int mgmt_send_event_skb(u16 event, struct hci_dev *hdev, unsigned short channel,
-> +			struct sk_buff *skb, int flag, struct sock *skip_sk);
-> int mgmt_send_event(u16 event, struct hci_dev *hdev, unsigned short channel,
-> 		    void *data, u16 data_len, int flag, struct sock *skip_sk);
-> int mgmt_cmd_status(struct sock *sk, u16 index, u16 cmd, u8 status);
+On Fri, Dec 3, 2021 at 1:12 PM Marcel Holtmann <marcel@holtmann.org> wrote:
+>
+> Hi Luiz,
+>
+> >>> This introduces HCI_CONN_FLAG_DEVICE_PRIVACY which can be used by
+> >>> userspace to indicate to the controller to use Device Privacy Mode to=
+ a
+> >>> specific device.
+> >>>
+> >>> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> >>> ---
+> >>> include/net/bluetooth/hci_core.h |  1 +
+> >>> net/bluetooth/mgmt.c             | 12 ++++++++++++
+> >>> 2 files changed, 13 insertions(+)
+> >>>
+> >>> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth=
+/hci_core.h
+> >>> index fc93a1907c90..9c94d1c49b25 100644
+> >>> --- a/include/net/bluetooth/hci_core.h
+> >>> +++ b/include/net/bluetooth/hci_core.h
+> >>> @@ -153,6 +153,7 @@ struct bdaddr_list_with_irk {
+> >>>
+> >>> enum hci_conn_flags {
+> >>>      HCI_CONN_FLAG_REMOTE_WAKEUP,
+> >>> +     HCI_CONN_FLAG_DEVICE_PRIVACY,
+> >>
+> >> coming this now, I wonder if we better call them FLAG_REMOTE_WAKEUP_SU=
+PPORT and FLAG_DEVICE_PRIVACY_SUPPORT. If I am not mistaken, then these are=
+ for indicating support for it.
+> >
+> > These flags are used in multiple places:
+> >
+> > hci_dev->conn_flags
+> > hci_conn_params->conn_flags
+> > bdaddr_list_with_flags->flags
+> >
+> > Which is one of the reason I made them all use  DECLARE_BITMAP(flags,
+> > __HCI_CONN_NUM_FLAGS) so they are in sync, the use of them in
+> > hci_dev->conn_flags means they are supported but in the other 2 it
+> > means they are in use, so I prefer leave as they are.
+>
+> is my comment wrong? Don=E2=80=99t they always indicate the support for i=
+t?
 
-this altogether doesn’t create nicer to read code. What about doing this:
+Support vs Use, anyway I always think about the shortest form for
+defines and having some term like SUPPORT sounds a little superfluous
+for me, but I'm fine adding it if you really think that is necessary
+in this case.
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 2f31e571f34c..fd0a114a69c6 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -399,6 +399,7 @@ struct bt_skb_cb {
-                struct l2cap_ctrl l2cap;
-                struct sco_ctrl sco;
-                struct hci_ctrl hci;
-+               struct mgmt_ctrl mgmt;
-        };
- };
+> Regards
+>
+> Marcel
+>
 
-And then adding hci_dev and event to mgmt_ctrl. So you can do something like:
 
-struct sk_buff *mgmt_alloc_skb(struct hci_dev *hdev, u16 event, unsigned int size);
-
-Then the send_event becomes easier to read. Right now it is total mess with the allocated skb parameter in the middle. It should be first and center to make sure that is the one that matter.
-
-Regards
-
-Marcel
-
+--=20
+Luiz Augusto von Dentz
