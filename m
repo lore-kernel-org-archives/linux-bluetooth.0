@@ -2,113 +2,116 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD2A2C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 10:01:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 31D70C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 14:59:13 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1351071AbhLCKFL (ORCPT
+        id S1381630AbhLCPCg (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 05:05:11 -0500
-Received: from m43-7.mailgun.net ([69.72.43.7]:28088 "EHLO m43-7.mailgun.net"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1379717AbhLCKFK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 05:05:10 -0500
-DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
- s=smtp; t=1638525707; h=Message-Id: Date: Subject: Cc: To: From:
- Sender; bh=Poi3Lwtka2EuPzEFZWmwCPLGlrT4nP9Y1F6XL+xb49g=; b=Vq9olqc8PkQ8eJyVNzeINbustxbS29LUQX5Z3/znk4vDXSA3TScU1cXOlAvbQJLiK/mOZmUg
- rur/X56E4E6ppcrbJ6DLLWvzX3i4rjjlU3SBrGddGWJYHXALfw0sshJsvkZ33dIlFxnALrx1
- dsKi9sRvInxDbnVvsB+4QWKBWAk=
-X-Mailgun-Sending-Ip: 69.72.43.7
-X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
-Received: from smtp.codeaurora.org
- (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
- smtp-out-n02.prod.us-east-1.postgun.com with SMTP id
- 61a9eb09135a8a9d0e08cf5d (version=TLS1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Fri, 03 Dec 2021 10:01:45
- GMT
-Sender: zijuhu=codeaurora.org@mg.codeaurora.org
-Received: by smtp.codeaurora.org (Postfix, from userid 1001)
-        id E9D37C43616; Fri,  3 Dec 2021 10:01:44 +0000 (UTC)
-Received: from zijuhu-gv.qualcomm.com (unknown [180.166.53.21])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES128-SHA256 (128/128 bits))
-        (No client certificate requested)
-        (Authenticated sender: zijuhu)
-        by smtp.codeaurora.org (Postfix) with ESMTPSA id 9E861C4338F;
-        Fri,  3 Dec 2021 10:01:41 +0000 (UTC)
-DMARC-Filter: OpenDMARC Filter v1.4.1 smtp.codeaurora.org 9E861C4338F
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; dmarc=none (p=none dis=none) header.from=codeaurora.org
-Authentication-Results: aws-us-west-2-caf-mail-1.web.codeaurora.org; spf=fail smtp.mailfrom=codeaurora.org
-From:   Zijun Hu <zijuhu@codeaurora.org>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
-Cc:     linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        linux-arm-msm@vger.kernel.org, c-hbandi@codeaurora.org,
-        hemantg@codeaurora.org, rjliao@codeaurora.org,
-        zijuhu@codeaurora.org, tjiang@codeaurora.org,
-        Zijun Hu <quic_zijuhu@quicinc.com>
-Subject: [PATCH v3] Bluetooth: btusb: Add one more Bluetooth part for WCN6855
-Date:   Fri,  3 Dec 2021 18:01:37 +0800
-Message-Id: <1638525697-12436-1-git-send-email-zijuhu@codeaurora.org>
-X-Mailer: git-send-email 2.7.4
+        Fri, 3 Dec 2021 10:02:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60358 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1381627AbhLCPCf (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 3 Dec 2021 10:02:35 -0500
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37557C061359
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Dec 2021 06:59:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
+        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender
+        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+        Resent-Cc:Resent-Message-ID; bh=vDsOiCXIJOBMs2DG8p+Cbmag+JNpQHQD0sNjbqaOyGU=;
+        t=1638543551; x=1639753151; b=JqW8zOAqHbhmNfJYrWW7QjVV2eFt+mcllf6AHpEM8hcGof2
+        ++yyYBzXk1sR46cJusWaVOWp+EHIFqGmmgckUd3f7XBnsy6ksVCeVIYlkb0iDESb7Kvq7v9IVI6E5
+        zcIp6RngFN/6Y8TpIPp8EqZuS4bTzp4DqDX2/rlDl4rjP8dTkjy4F67ne9nrTmPZwTEbcm8oxNnfH
+        IOYE9fMTb2EEdn/D+pVfgqR08yKkRf4RtfU5KyVxRKvUJLVjwM8iFTMQuvNXy4Qfv4WVZjz59mZLT
+        5rOvLrRBqsx/0vZ3BkAvfakIJ5osA7tdcqJFKinEtfFocFHiJFRBuSwoIomjulOg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+        (Exim 4.95)
+        (envelope-from <benjamin@sipsolutions.net>)
+        id 1mtA1l-006QDV-Ew;
+        Fri, 03 Dec 2021 15:59:09 +0100
+From:   Benjamin Berg <benjamin@sipsolutions.net>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Benjamin Berg <bberg@redhat.com>
+Subject: [PATCH v2 3/4] Bluetooth: hci_core: Cancel sync command if sending a frame failed
+Date:   Fri,  3 Dec 2021 15:59:01 +0100
+Message-Id: <20211203145902.3223861-4-benjamin@sipsolutions.net>
+X-Mailer: git-send-email 2.33.1
+In-Reply-To: <20211203145902.3223861-1-benjamin@sipsolutions.net>
+References: <20211203145902.3223861-1-benjamin@sipsolutions.net>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Zijun Hu <quic_zijuhu@quicinc.com>
+From: Benjamin Berg <bberg@redhat.com>
 
-Add a USB ID 0489:e0e3 of HP to usb_device_id table for WCN6855.
+If sending a frame failed any sync command associated with it will never
+be completed. As such, cancel any such command immediately to avoid
+timing out.
 
--Device(0489:e0e3) from /sys/kernel/debug/usb/devices
-T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=12   MxCh= 0
-D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
-P:  Vendor=0489 ProdID=e0e3 Rev= 0.01
-C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
-I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
-E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
-I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
-I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
-I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
-I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
-I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
-I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
-I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
-I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
-E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
-E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+Signed-off-by: Benjamin Berg <bberg@redhat.com>
 
-Signed-off-by: Zijun Hu <quic_zijuhu@quicinc.com>
 ---
- drivers/bluetooth/btusb.c | 3 +++
- 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ab169fc673ea..c0037932ecee 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -302,6 +302,9 @@ static const struct usb_device_id blacklist_table[] = {
- 	{ USB_DEVICE(0x0489, 0xe0d6), .driver_info = BTUSB_QCA_WCN6855 |
- 						     BTUSB_WIDEBAND_SPEECH |
- 						     BTUSB_VALID_LE_STATES },
-+	{ USB_DEVICE(0x0489, 0xe0e3), .driver_info = BTUSB_QCA_WCN6855 |
-+						     BTUSB_WIDEBAND_SPEECH |
-+						     BTUSB_VALID_LE_STATES },
+v2:
+ * Pass error up and cancel sync command from hci_cmd_work
+---
+ net/bluetooth/hci_core.c | 14 +++++++++++---
+ 1 file changed, 11 insertions(+), 3 deletions(-)
+
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index fdc0dcf8ee36..5cadecd31f66 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2906,7 +2906,7 @@ int hci_unregister_cb(struct hci_cb *cb)
+ }
+ EXPORT_SYMBOL(hci_unregister_cb);
  
- 	/* Broadcom BCM2035 */
- 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
++static int hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ {
+ 	int err;
+ 
+@@ -2929,14 +2929,17 @@ static void hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 
+ 	if (!test_bit(HCI_RUNNING, &hdev->flags)) {
+ 		kfree_skb(skb);
+-		return;
++		return -EINVAL;
+ 	}
+ 
+ 	err = hdev->send(hdev, skb);
+ 	if (err < 0) {
+ 		bt_dev_err(hdev, "sending frame failed (%d)", err);
+ 		kfree_skb(skb);
++		return err;
+ 	}
++
++	return 0;
+ }
+ 
+ /* Send HCI command */
+@@ -3843,10 +3846,15 @@ static void hci_cmd_work(struct work_struct *work)
+ 
+ 		hdev->sent_cmd = skb_clone(skb, GFP_KERNEL);
+ 		if (hdev->sent_cmd) {
++			int res;
+ 			if (hci_req_status_pend(hdev))
+ 				hci_dev_set_flag(hdev, HCI_CMD_PENDING);
+ 			atomic_dec(&hdev->cmd_cnt);
+-			hci_send_frame(hdev, skb);
++
++			res = hci_send_frame(hdev, skb);
++			if (res < 0)
++				hci_cmd_sync_cancel(hdev, -res);
++
+ 			if (test_bit(HCI_RESET, &hdev->flags))
+ 				cancel_delayed_work(&hdev->cmd_timer);
+ 			else
 -- 
-The Qualcomm Innovation Center, Inc. is a member of the Code Aurora Forum, a Linux Foundation Collaborative Project
+2.33.1
 
