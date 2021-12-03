@@ -2,153 +2,105 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D3BCAC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 14:59:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82665C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 16:09:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1381638AbhLCPCk (ORCPT
+        id S1382046AbhLCQMl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 10:02:40 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60352 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1381622AbhLCPCf (ORCPT
+        Fri, 3 Dec 2021 11:12:41 -0500
+Received: from smtp202-pc.aruba.it ([62.149.157.202]:36567 "EHLO
+        smtp200-pc.aruba.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1382066AbhLCQMj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 10:02:35 -0500
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F78AC061751
-        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Dec 2021 06:59:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender
-        :Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-        Resent-Cc:Resent-Message-ID; bh=IIcDy0f1QPrDBuQZeQYfUX+PfDG6D7KTDR5HCwg2u4w=;
-        t=1638543551; x=1639753151; b=gJt8AZy8fgfZH+T2sVaFRsRqzz3nrDgSZc2nHghH+PE4md/
-        nE8FprF4CBklTqap0zQtIB0n8fnQ7S3wGOEwNIQXIDxcj52aBDbpAFLRLDIBoeMY+x5DGjGDFxT+B
-        p8TzN+MfAUNfI9hevfkHkGpPpnwR/vi7fQWIWOErfduUqg0chPeqfi/4j5/OpzweknN3QYuym1VSw
-        yF2/TTub1itO5m4jrfVrXy8G602mcMYRO7z6g9PkpRGsS0+mdaa+8oNulsda0HftmHpsv6G8dKBBE
-        JyuuGnTLGrwcY5T4E6U4FZJPzMK8zdF9REUPiI92WK52wBwhU6a6Xo9aDyDEepnA==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <benjamin@sipsolutions.net>)
-        id 1mtA1l-006QDV-4K;
-        Fri, 03 Dec 2021 15:59:09 +0100
-From:   Benjamin Berg <benjamin@sipsolutions.net>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        Benjamin Berg <bberg@redhat.com>
-Subject: [PATCH v2 2/4] Bluetooth: Add hci_cmd_sync_cancel to public API
-Date:   Fri,  3 Dec 2021 15:59:00 +0100
-Message-Id: <20211203145902.3223861-3-benjamin@sipsolutions.net>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211203145902.3223861-1-benjamin@sipsolutions.net>
-References: <20211203145902.3223861-1-benjamin@sipsolutions.net>
+        Fri, 3 Dec 2021 11:12:39 -0500
+Received: from danbia2MBL ([188.217.48.39])
+        by Aruba Outgoing Smtp  with ESMTPSA
+        id tB0imxNzZrBxFtB0lmsYJL; Fri, 03 Dec 2021 17:02:11 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+        t=1638547331; bh=inxXi/2Ljmo41vlZVsG5c/isk9xC8rGDJWxaFKcyY6g=;
+        h=From:To:Subject:Date:MIME-Version:Content-Type;
+        b=E7GPCRD8SDUbSWwu7vrShuhDu0O5P0zMQUXr8jAnEHVsPmgNVDrZuHZQ2VEwryE6f
+         8ZT/cNTGraMuWkGTYhSu0WKp7hajpy+VSqkqtVgiusgFW2fy29dIin8pB1YbIIhFEx
+         rh6bWgWh4VAYVvW87EMuCqRCavBh+0aGtI4letwGxtlokr4eyKBS4yJ9iqVkNwFWGn
+         ZUbUDXbwPZeShFaDR+S+Sx/jZNQV3RMDkKNyFRic/6it3E4GoyHP3Ebu/4IZxryKyG
+         Ji7JGtDJm5XdlOwj1jmPtdL48MvEVrWUBmPbjl//lEKvlEBI5vGeQD0jIlF3UyciMB
+         073K93bv72A7w==
+From:   <daniele.biagetti@cblelectronics.com>
+To:     <linux-bluetooth@vger.kernel.org>
+Subject: [PATCH 1/6] tools/mesh-gatt: Add onoff set unack message to onoff client model
+Date:   Fri, 3 Dec 2021 17:02:10 +0100
+Message-ID: <000501d7e85f$2105e2d0$6311a870$@cblelectronics.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain;
+        charset="us-ascii"
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AdfoXvYc6r6XD9G+SoyL3P0w05mzBQ==
+Content-Language: it
+X-CMAE-Envelope: MS4xfF3cbRY1IExUTsa8XkcX1hn3XGTVIs94MpoLCroyiDhFw2UDoZAuhsZ/Wr93fkd/0PeIrcts8IjLGtDpYRFJN77hngk2usYjLLYNgc7p8QKumH3IIncF
+ moCB8Utrfqz26pZTsM1bkDen0scUWELtuAk+j2FtXFSv/8EdUGiwfBQJ8xh8ORvBybw1E20/2wZrGM0stN0gXnkBVNrmHbWZpmx+RZC54NQkJnwU8BULiDPV
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Benjamin Berg <bberg@redhat.com>
-
-After transfer errors it makes sense to cancel an ongoing synchronous
-command that cannot complete anymore. To permit this, export the old
-hci_req_sync_cancel function as hci_cmd_sync_cancel in the API.
-
-Signed-off-by: Benjamin Berg <bberg@redhat.com>
 ---
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_request.c      | 18 +-----------------
- net/bluetooth/hci_request.h      |  1 -
- net/bluetooth/hci_sync.c         | 17 +++++++++++++++++
- 4 files changed, 19 insertions(+), 18 deletions(-)
+ tools/mesh-gatt/onoff-model.c | 23 +++++++++++++++++------
+ 1 file changed, 17 insertions(+), 6 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index 0336c1bc5d25..f4034bf8f1ce 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -37,6 +37,7 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
+diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
+index 9dfedd85a..13ff4bbe3 100644
+--- a/tools/mesh-gatt/onoff-model.c
++++ b/tools/mesh-gatt/onoff-model.c
+@@ -226,6 +226,8 @@ static void cmd_set(int argc, char *argv[])
+ 	uint16_t n;
+ 	uint8_t msg[32];
+ 	struct mesh_node *node;
++	int np;
++	uint32_t opcode;
  
- void hci_cmd_sync_init(struct hci_dev *hdev);
- void hci_cmd_sync_clear(struct hci_dev *hdev);
-+void hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
+ 	if (IS_UNASSIGNED(target)) {
+ 		bt_shell_printf("Destination not set\n");
+@@ -237,13 +239,22 @@ static void cmd_set(int argc, char *argv[])
+ 	if (!node)
+ 		return;
  
- int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 		       void *data, hci_cmd_sync_work_destroy_t destroy);
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 58d640a31bde..a2607db44404 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -111,22 +111,6 @@ void hci_req_sync_complete(struct hci_dev *hdev, u8 result, u16 opcode,
- 	}
- }
- 
--void hci_req_sync_cancel(struct hci_dev *hdev, int err)
--{
--	bt_dev_dbg(hdev, "err 0x%2.2x", err);
--
--	if (hdev->req_status == HCI_REQ_PEND) {
--		hdev->req_result = err;
--		hdev->req_status = HCI_REQ_CANCELED;
--
--		cancel_delayed_work_sync(&hdev->cmd_timer);
--		cancel_delayed_work_sync(&hdev->ncmd_timer);
--		atomic_set(&hdev->cmd_cnt, 1);
--
--		wake_up_interruptible(&hdev->req_wait_q);
--	}
--}
--
- /* Execute request and wait for completion. */
- int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 						     unsigned long opt),
-@@ -2708,7 +2692,7 @@ void hci_request_setup(struct hci_dev *hdev)
- 
- void hci_request_cancel_all(struct hci_dev *hdev)
- {
--	hci_req_sync_cancel(hdev, ENODEV);
-+	hci_cmd_sync_cancel(hdev, ENODEV);
- 
- 	cancel_work_sync(&hdev->discov_update);
- 	cancel_work_sync(&hdev->scan_update);
-diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
-index 5f8e8846ec74..8d39e9416861 100644
---- a/net/bluetooth/hci_request.h
-+++ b/net/bluetooth/hci_request.h
-@@ -64,7 +64,6 @@ int hci_req_sync(struct hci_dev *hdev, int (*req)(struct hci_request *req,
- int __hci_req_sync(struct hci_dev *hdev, int (*func)(struct hci_request *req,
- 						     unsigned long opt),
- 		   unsigned long opt, u32 timeout, u8 *hci_status);
--void hci_req_sync_cancel(struct hci_dev *hdev, int err);
- 
- struct sk_buff *hci_prepare_cmd(struct hci_dev *hdev, u16 opcode, u32 plen,
- 				const void *param);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index ad86caf41f91..7ac6c170ec49 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -335,6 +335,23 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
- 	}
- }
- 
-+void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
-+{
-+	bt_dev_dbg(hdev, "err 0x%2.2x", err);
-+
-+	if (hdev->req_status == HCI_REQ_PEND) {
-+		hdev->req_result = err;
-+		hdev->req_status = HCI_REQ_CANCELED;
-+
-+		cancel_delayed_work_sync(&hdev->cmd_timer);
-+		cancel_delayed_work_sync(&hdev->ncmd_timer);
-+		atomic_set(&hdev->cmd_cnt, 1);
-+
-+		wake_up_interruptible(&hdev->req_wait_q);
+-	if ((read_input_parameters(argc, argv) != 1) &&
+-					parms[0] != 0 && parms[0] != 1) {
+-		bt_shell_printf("Bad arguments: Expecting \"0\" or
+\"1\"\n");
+-		return bt_shell_noninteractive_quit(EXIT_FAILURE);
++	np = read_input_parameters(argc, argv);
++	if ((np != 1) && (np != 2) &&
++		parms[0] != 0 && parms[0] != 1 &&
++		parms[1] != 0 && parms[1] != 1) {
++	bt_shell_printf("Bad arguments: Expecting \"0\" or \"1\" "
++		"and an optional \"0\" or \"1\" as unack\n");
++	return bt_shell_noninteractive_quit(EXIT_FAILURE);
 +	}
-+}
-+EXPORT_SYMBOL(hci_cmd_sync_cancel);
 +
- int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 		       void *data, hci_cmd_sync_work_destroy_t destroy)
- {
++	if( (np==2) && parms[1] ){
++		opcode = OP_GENERIC_ONOFF_SET_UNACK;
++	}else{
++		opcode = OP_GENERIC_ONOFF_SET;
+ 	}
+ 
+-	n = mesh_opcode_set(OP_GENERIC_ONOFF_SET, msg);
++	n = mesh_opcode_set(opcode, msg);
+ 	msg[n++] = parms[0];
+ 	msg[n++] = trans_id++;
+ 
+@@ -263,7 +274,7 @@ static const struct bt_shell_menu onoff_menu = {
+ 						"Set node to configure"},
+ 	{"get",			NULL,
+cmd_get_status,
+ 						"Get ON/OFF status"},
+-	{"onoff",		"<0/1>",			cmd_set,
++	{"onoff",		"<0/1> [unack]",		cmd_set,
+ 						"Send \"SET ON/OFF\"
+command"},
+ 	{} },
+ };
 -- 
-2.33.1
+2.25.1
+
 
