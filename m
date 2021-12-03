@@ -2,334 +2,145 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 00FA0C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 07:16:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CB9C4C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 07:24:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1378810AbhLCHTv (ORCPT
+        id S1378853AbhLCH2C (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 02:19:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:38632 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1378807AbhLCHTt (ORCPT
+        Fri, 3 Dec 2021 02:28:02 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:38808 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1378789AbhLCH2A (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 02:19:49 -0500
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FAADC061757
-        for <linux-bluetooth@vger.kernel.org>; Thu,  2 Dec 2021 23:16:26 -0800 (PST)
-Received: by mail-yb1-xb4a.google.com with SMTP id l28-20020a25b31c000000b005c27dd4987bso4803442ybj.18
-        for <linux-bluetooth@vger.kernel.org>; Thu, 02 Dec 2021 23:16:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20210112;
-        h=date:in-reply-to:message-id:mime-version:references:subject:from:to
-         :cc;
-        bh=WhJguX8Ta68Bo3GnbuOksU+mTXJqJNlPBne7/4PbINY=;
-        b=QZJGPz2h2/MpCk/LKPgyTIhuG2iVkm/kvdYlUdoaozVMlhYFYbYZuB5cCfaa/S0MB2
-         iqsSVvR4spVrjZJqxG+Ik5zJN9nhkigb2za10KWXBAXh7q6WtNxVGAVcllkI1MgSRUKc
-         pdfwj5KUVGAjQmJLEBLewjujYhSEDphtCPdA/xBACf1v1sshjCKrT513qC90So/Glr2r
-         jrCE4FiOlF1i/cbF3GgQkqecYZ6SXJOYyXO0F3QGRAXxvk8EPq6rekDMVtI0uaHwmb2d
-         I7RoyV7m+p37bhh31KpaLFwQhsyBYeDWF+gP1xd2xMStik2Tnr+HQWxYPfDcarDl26Ov
-         rqzQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:in-reply-to:message-id:mime-version
-         :references:subject:from:to:cc;
-        bh=WhJguX8Ta68Bo3GnbuOksU+mTXJqJNlPBne7/4PbINY=;
-        b=X1heAeyLZADHcowigs191jPsLLf1dKVnEdTktRPbMMolPAiZ+epS5U+XYpk4JHqy8Z
-         tM5a213zk3tlo0cJraKQiG9GeG0YrRj4x29q5LU6YSQ0GJk+yGu9NiO44CGxXi82tRBZ
-         87vM9eLqdDsxIm6pfSH2BZVX19/x1M+mpS299plCTZPgCOo7rbEUJ2GlA3GY4l9NIlB7
-         Ey2wrNM83oYqbE3ZDh7ld6JOJJSmUW9fAPK7wboYw/4A/F7WHw8i9CMlkjhSCB4ZQOkw
-         LNUZc+NPzyWW4RVGsVBuXoxD9YhpTprrKF1htArMXCzUrKzI3QGrnyXN/G1xdrXJwI17
-         BsLg==
-X-Gm-Message-State: AOAM531HFPue8DfgE5bANmcRW1pU1/NsNVeRjmpijNwR2Kinkaxnrwa/
-        xRcFicBqP6z5eP8ucuIAdlvMV1m8DL0XwQ==
-X-Google-Smtp-Source: ABdhPJypgyJP2LOY2hry7buGHId+2wFXKM+52fI06fbU+TnGUcieHeakDkkHQopycBp/eXWoyX2Sj8n55X0F7w==
-X-Received: from mmandlik.mtv.corp.google.com ([2620:15c:202:201:adf:ab3:651b:12a])
- (user=mmandlik job=sendgmr) by 2002:a25:820e:: with SMTP id
- q14mr20933920ybk.396.1638515785606; Thu, 02 Dec 2021 23:16:25 -0800 (PST)
-Date:   Thu,  2 Dec 2021 23:16:18 -0800
-In-Reply-To: <20211202231123.v7.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
-Message-Id: <20211202231123.v7.2.I9eda306e4c542010535dc49b5488946af592795e@changeid>
-Mime-Version: 1.0
-References: <20211202231123.v7.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
-X-Mailer: git-send-email 2.34.0.384.gca35af8252-goog
-Subject: [PATCH v7 2/2] bluetooth: Add MGMT Adv Monitor Device Found/Lost events
-From:   Manish Mandlik <mmandlik@google.com>
-To:     marcel@holtmann.org, luiz.dentz@gmail.com
-Cc:     linux-bluetooth@vger.kernel.org,
-        chromeos-bluetooth-upstreaming@chromium.org,
-        Manish Mandlik <mmandlik@google.com>,
-        Miao-chen Chou <mcchou@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
+        Fri, 3 Dec 2021 02:28:00 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id E0D861FD26;
+        Fri,  3 Dec 2021 07:24:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1638516274; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QBjoxSsVEMiXtuxhCfB1dUzRJfZQ7g8TNALH5iYrLKU=;
+        b=0zhmch4x2xHvxbTuzp+msPSWwCnURnfqferI1fberwmsGs70aCAAPodxemwMFpk/ApeP53
+        AMM1x+GA3/ieX3EinCvkIwwxMz71mp4gZY1gay9fh+gbFCPQxMJFQvL93PtqfPxB2NS/7a
+        SjGVGZMURS/D+XGB7V3m3GcR7OvOaRU=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1638516274;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=QBjoxSsVEMiXtuxhCfB1dUzRJfZQ7g8TNALH5iYrLKU=;
+        b=cTSQcsCZreqbzxZeWsySclokPRMMZCHd374cQZcQwmYE4YandhT4Nx/JQI0kWKJDkKxOcn
+        RQBk/Fwrbr0nA8Dw==
+Received: from alsa1.suse.de (alsa1.suse.de [10.160.4.42])
+        by relay2.suse.de (Postfix) with ESMTP id D3D06A3B83;
+        Fri,  3 Dec 2021 07:24:34 +0000 (UTC)
+Date:   Fri, 03 Dec 2021 08:24:34 +0100
+Message-ID: <s5h4k7qtakt.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Takashi Iwai <tiwai@suse.de>,
+        Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Apply initial command workaround for more Intel chips
+In-Reply-To: <6191d067-4eae-4776-5840-1d826113a6d5@molgen.mpg.de>
+References: <20211202162256.31837-1-tiwai@suse.de>
+        <acc7b5b4-72cc-9f3b-90a6-6fbf6c3a71e7@molgen.mpg.de>
+        <s5h7dcnt0lp.wl-tiwai@suse.de>
+        <6191d067-4eae-4776-5840-1d826113a6d5@molgen.mpg.de>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
+ (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This patch introduces two new MGMT events for notifying the bluetoothd
-whenever the controller starts/stops monitoring a device.
+On Thu, 02 Dec 2021 17:58:01 +0100,
+Paul Menzel wrote:
+> 
+> Dear Takashi,
+> 
+> 
+> Am 02.12.21 um 17:47 schrieb Takashi Iwai:
+> > On Thu, 02 Dec 2021 17:32:14 +0100, Paul Menzel wrote:
+> 
+> >> Am 02.12.21 um 17:22 schrieb Takashi Iwai:
+> >>> It seems that a few more Intel chips require the workaround for the
+> >>> broken initial command.  At least, per openSUSE Bugzilla reports,
+> >>> 8087:0a2a and 8087:0026 need BTUSB_INTEL_BROKEN_INITIAL_NCMD flag.
+> >>>
+> >>> Fixes: 83f2dafe2a62 ("Bluetooth: btintel: Refactoring setup routine for legacy ROM sku")
+> >>> Buglink: https://bugzilla.opensuse.org/show_bug.cgi?id=1193124
+> >>> Signed-off-by: Takashi Iwai <tiwai@suse.de>
+> >>>
+> >>
+> >> […]
+> >>
+> >> I have a Dell Latitude E7250 with
+> >>
+> >>      Bus 001 Device 003: ID 8087:0a2a Intel Corp. Bluetooth wireless interface
+> >>
+> >> and Bluetooth seems to work fine minus some Linux warnings [1] and a
+> >> problem transferring greater than some bytes files with the Nokia N9
+> >> [2].
+> >>
+> >> Linux 5.16-rc3, Dell Inc. Latitude E7250/0TVD2T, BIOS A19 01/23/2018:
+> >>
+> >> ```
+> >> $ sudo dmesg | grep -i bluet
+> >> [    8.173417] calling  bt_init+0x0/0xb3 [bluetooth] @ 301
+> >> [    8.173439] Bluetooth: Core ver 2.22
+> >> [    8.173463] NET: Registered PF_BLUETOOTH protocol family
+> >> [    8.173464] Bluetooth: HCI device and connection manager initialized
+> >> [    8.173467] Bluetooth: HCI socket layer initialized
+> >> [    8.173470] Bluetooth: L2CAP socket layer initialized
+> >> [    8.173473] Bluetooth: SCO socket layer initialized
+> >> [    8.173475] initcall bt_init+0x0/0xb3 [bluetooth] returned 0 after 35 usecs
+> >> [    8.216875] Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
+> >> [    8.233515] bluetooth hci0: firmware: direct-loading firmware intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> >> [    8.233520] Bluetooth: hci0: Intel Bluetooth firmware file: intel/ibt-hw-37.8.10-fw-1.10.3.11.e.bseq
+> >> [    8.540884] Bluetooth: hci0: unexpected event for opcode 0xfc2f
+> >> [    8.558942] Bluetooth: hci0: Intel BT fw patch 0x32 completed & activated
+> >> ```
+> >
+> > Thanks, so this seems depending on the hardware, maybe a subtle
+> > difference matters.  As far as I read the code changes, the workaround
+> > was applied in the past unconditionally, so it must be fairly safe
+> > even if the chip works as is.
+> 
+> Maybe add that to the commit message?
 
-Test performed:
-- Verified by logs that the MSFT Monitor Device is received from the
-  controller and the bluetoothd is notified whenever the controller
-  starts/stops monitoring a device.
+Maybe, if the upstream agrees with that.  More comments needed from
+Intel, as it's a kind of black magic.
 
-Signed-off-by: Manish Mandlik <mmandlik@google.com>
-Reviewed-by: Miao-chen Chou <mcchou@google.com>
+> > Or, for avoiding the unnecessarily application of the workaround,
+> > should it be changed as a fallback after the failure at the first
+> > try...?
+> 
+> Reading through the openSUSE Bugzilla issue, the failure is:
+> 
+>     Bluetooth: hci0: Reading Intel version command failed (-110)
+>     Bluetooth: hci0: command 0xfc05 tx timeout
+> 
+> I couldn’t find the report for 8087:0a2a in the issue.
 
----
+There two different machines in the report.
 
-Changes in v7:
-- Refactor mgmt_device_found() to fix stack frame size limit
+> Can you check,
+> what firmware is used?
 
-Changes in v6:
-- Fix compiler warning for mgmt_adv_monitor_device_found().
+It's the place before loading the firmware, so the firmware version
+doesn't matter.
 
-Changes in v5:
-- New patch in the series. Split previous patch into two.
-- Update the Device Found logic to send existing Device Found event or
-  Adv Monitor Device Found event depending on the active scanning state.
 
- include/net/bluetooth/hci_core.h |   3 +
- include/net/bluetooth/mgmt.h     |  16 +++++
- net/bluetooth/mgmt.c             | 106 +++++++++++++++++++++++++++++--
- net/bluetooth/msft.c             |  15 ++++-
- 4 files changed, 134 insertions(+), 6 deletions(-)
+thanks,
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 5ccd19dec77c..3b53214ff49f 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -599,6 +599,7 @@ struct hci_dev {
- 	struct delayed_work	interleave_scan;
- 
- 	struct list_head	monitored_devices;
-+	bool			advmon_pend_notify;
- 
- #if IS_ENABLED(CONFIG_BT_LEDS)
- 	struct led_trigger	*power_led;
-@@ -1847,6 +1848,8 @@ void mgmt_adv_monitor_removed(struct hci_dev *hdev, u16 handle);
- int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
- int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
- int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
-+void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
-+				  bdaddr_t *bdaddr, u8 addr_type);
- 
- u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
- 		      u16 to_multiplier);
-diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-index 107b25deae68..99266f7aebdc 100644
---- a/include/net/bluetooth/mgmt.h
-+++ b/include/net/bluetooth/mgmt.h
-@@ -1104,3 +1104,19 @@ struct mgmt_ev_controller_resume {
- #define MGMT_WAKE_REASON_NON_BT_WAKE		0x0
- #define MGMT_WAKE_REASON_UNEXPECTED		0x1
- #define MGMT_WAKE_REASON_REMOTE_WAKE		0x2
-+
-+#define MGMT_EV_ADV_MONITOR_DEVICE_FOUND	0x002f
-+struct mgmt_ev_adv_monitor_device_found {
-+	__le16 monitor_handle;
-+	struct mgmt_addr_info addr;
-+	__s8   rssi;
-+	__le32 flags;
-+	__le16 eir_len;
-+	__u8   eir[0];
-+} __packed;
-+
-+#define MGMT_EV_ADV_MONITOR_DEVICE_LOST		0x0030
-+struct mgmt_ev_adv_monitor_device_lost {
-+	__le16 monitor_handle;
-+	struct mgmt_addr_info addr;
-+} __packed;
-diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-index bf989ae03f9f..06e0769f350d 100644
---- a/net/bluetooth/mgmt.c
-+++ b/net/bluetooth/mgmt.c
-@@ -174,6 +174,8 @@ static const u16 mgmt_events[] = {
- 	MGMT_EV_ADV_MONITOR_REMOVED,
- 	MGMT_EV_CONTROLLER_SUSPEND,
- 	MGMT_EV_CONTROLLER_RESUME,
-+	MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-+	MGMT_EV_ADV_MONITOR_DEVICE_LOST,
- };
- 
- static const u16 mgmt_untrusted_commands[] = {
-@@ -9524,6 +9526,100 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
- 	return true;
- }
- 
-+void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
-+				  bdaddr_t *bdaddr, u8 addr_type)
-+{
-+	struct mgmt_ev_adv_monitor_device_lost ev;
-+
-+	ev.monitor_handle = cpu_to_le16(handle);
-+	bacpy(&ev.addr.bdaddr, bdaddr);
-+	ev.addr.type = addr_type;
-+
-+	mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_LOST, hdev, &ev, sizeof(ev),
-+		   NULL);
-+}
-+
-+static void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
-+					  struct mgmt_ev_device_found *ev,
-+					  size_t ev_size, bool discovering)
-+{
-+	char buf[518];
-+	struct mgmt_ev_adv_monitor_device_found *advmon_ev = (void *)buf;
-+	size_t advmon_ev_size;
-+	struct monitored_device *dev, *tmp;
-+	bool matched = false;
-+	bool notified = false;
-+
-+	/* We have received the Advertisement Report because:
-+	 * 1. the kernel has initiated active discovery
-+	 * 2. if not, we have pend_le_reports > 0 in which case we are doing
-+	 *    passive scanning
-+	 * 3. if none of the above is true, we have one or more active
-+	 *    Advertisement Monitor
-+	 *
-+	 * For case 1 and 2, report all advertisements via MGMT_EV_DEVICE_FOUND
-+	 * and report ONLY one advertisement per device for the matched Monitor
-+	 * via MGMT_EV_ADV_MONITOR_DEVICE_FOUND event.
-+	 *
-+	 * For case 3, since we are not active scanning and all advertisements
-+	 * received are due to a matched Advertisement Monitor, report all
-+	 * advertisements ONLY via MGMT_EV_ADV_MONITOR_DEVICE_FOUND event.
-+	 */
-+	if (discovering) {
-+		mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
-+
-+		if (!hdev->advmon_pend_notify)
-+			return;
-+	}
-+
-+	/* Make sure that the buffer is big enough */
-+	advmon_ev_size = ev_size + (sizeof(*advmon_ev) - sizeof(*ev));
-+	if (advmon_ev_size > sizeof(buf))
-+		return;
-+
-+	/* ADV_MONITOR_DEVICE_FOUND is similar to DEVICE_FOUND event except
-+	 * that it also has 'monitor_handle'. Make a copy of DEVICE_FOUND and
-+	 * store monitor_handle of the matched monitor.
-+	 */
-+	memcpy(&advmon_ev->addr, ev, ev_size);
-+
-+	hdev->advmon_pend_notify = false;
-+
-+	list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices, list) {
-+		if (!bacmp(&dev->bdaddr, &advmon_ev->addr.bdaddr)) {
-+			matched = true;
-+
-+			if (!dev->notified) {
-+				advmon_ev->monitor_handle =
-+						cpu_to_le16(dev->handle);
-+
-+				mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-+					   hdev, advmon_ev, advmon_ev_size,
-+					   NULL);
-+
-+				notified = true;
-+				dev->notified = true;
-+			}
-+		}
-+
-+		if (!dev->notified)
-+			hdev->advmon_pend_notify = true;
-+	}
-+
-+	if (!discovering &&
-+	    ((matched && !notified) || !msft_monitor_supported(hdev))) {
-+		/* Handle 0 indicates that we are not active scanning and this
-+		 * is a subsequent advertisement report for an already matched
-+		 * Advertisement Monitor or the controller offloading support
-+		 * is not available.
-+		 */
-+		advmon_ev->monitor_handle = 0;
-+
-+		mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND, hdev, advmon_ev,
-+			   advmon_ev_size, NULL);
-+	}
-+}
-+
- void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 		       u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
- 		       u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
-@@ -9531,6 +9627,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	char buf[512];
- 	struct mgmt_ev_device_found *ev = (void *)buf;
- 	size_t ev_size;
-+	bool report_device_found = hci_discovery_active(hdev);
- 
- 	/* Don't send events for a non-kernel initiated discovery. With
- 	 * LE one exception is if we have pend_le_reports > 0 in which
-@@ -9539,11 +9636,10 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	if (!hci_discovery_active(hdev)) {
- 		if (link_type == ACL_LINK)
- 			return;
--		if (link_type == LE_LINK &&
--		    list_empty(&hdev->pend_le_reports) &&
--		    !hci_is_adv_monitoring(hdev)) {
-+		if (link_type == LE_LINK && !list_empty(&hdev->pend_le_reports))
-+			report_device_found = true;
-+		else if (!hci_is_adv_monitoring(hdev))
- 			return;
--		}
- 	}
- 
- 	if (hdev->discovery.result_filtering) {
-@@ -9606,7 +9702,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
- 	ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
- 	ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
- 
--	mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
-+	mgmt_adv_monitor_device_found(hdev, ev, ev_size, report_device_found);
- }
- 
- void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index aadabe78baf6..3e2385562d2b 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -579,8 +579,16 @@ void msft_do_close(struct hci_dev *hdev)
- 
- 	hci_dev_lock(hdev);
- 
--	/* Clear any devices that are being monitored */
-+	/* Clear any devices that are being monitored and notify device lost */
-+
-+	hdev->advmon_pend_notify = false;
-+
- 	list_for_each_entry_safe(dev, tmp_dev, &hdev->monitored_devices, list) {
-+		if (dev->notified)
-+			mgmt_adv_monitor_device_lost(hdev, dev->handle,
-+						     &dev->bdaddr,
-+						     dev->addr_type);
-+
- 		list_del(&dev->list);
- 		kfree(dev);
- 	}
-@@ -639,6 +647,7 @@ static void msft_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 
- 	INIT_LIST_HEAD(&dev->list);
- 	list_add(&dev->list, &hdev->monitored_devices);
-+	hdev->advmon_pend_notify = true;
- }
- 
- /* This function requires the caller holds hdev->lock */
-@@ -649,6 +658,10 @@ static void msft_device_lost(struct hci_dev *hdev, bdaddr_t *bdaddr,
- 
- 	list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices, list) {
- 		if (dev->handle == mgmt_handle) {
-+			if (dev->notified)
-+				mgmt_adv_monitor_device_lost(hdev, mgmt_handle,
-+							     bdaddr, addr_type);
-+
- 			list_del(&dev->list);
- 			kfree(dev);
- 
--- 
-2.34.0.384.gca35af8252-goog
-
+Takashi
