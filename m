@@ -2,143 +2,112 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 45401C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 16:09:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 23862C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 16:09:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1382058AbhLCQMm (ORCPT
+        id S1382104AbhLCQMy (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 11:12:42 -0500
-Received: from smtp202-pc.aruba.it ([62.149.157.202]:36198 "EHLO
+        Fri, 3 Dec 2021 11:12:54 -0500
+Received: from smtp202-pc.aruba.it ([62.149.157.202]:54421 "EHLO
         smtp200-pc.aruba.it" rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org
-        with ESMTP id S1382077AbhLCQMj (ORCPT
+        with ESMTP id S1382063AbhLCQMn (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 11:12:39 -0500
+        Fri, 3 Dec 2021 11:12:43 -0500
+X-Greylist: delayed 420 seconds by postgrey-1.27 at vger.kernel.org; Fri, 03 Dec 2021 11:12:37 EST
 Received: from danbia2MBL ([188.217.48.39])
         by Aruba Outgoing Smtp  with ESMTPSA
-        id tB0imxNzZrBxFtB0omsYKy; Fri, 03 Dec 2021 17:02:14 +0100
+        id tB0imxNzZrBxFtB0smsYMG; Fri, 03 Dec 2021 17:02:18 +0100
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-        t=1638547334; bh=0N9A8HEtNgE0tJ8W97u9axtv58jzcGRcijZ/Nfpgj5s=;
+        t=1638547338; bh=yOXpZilRtFzwUD8zDuZCx1oJ0FszD4bQpIKcFQHM54c=;
         h=From:To:Subject:Date:MIME-Version:Content-Type;
-        b=mk4D91qYla52PNwQcOZtkuEMHj4aKDNpA7/PVtPyP7SPn0p6wh8TR5dJwioTiG9Cf
-         C1BvN6KOQFoxxYiWfx/9Ow3iWCuKOkEn1rPZpfTFw1Mf5BwyjaWAXR8RXC/OkPS0x3
-         aiW8fafnWxVRZ5RA1zwXzjC5fLSBD4x0obeXMXzzNBt07+d1gvFf5hZe1HxfXiaRGD
-         SdqLCK3dTwcdcW+cB+KOv8qkVQd52YtIP5G3yYn12WLVhjjo9epp549NbuNQunhzvo
-         RVA/6Ze0wxKEjTxRHSYN5eHGruvY+nB0JqZPdKx0/0T1hWMF7GsFMpEkmEj/eSy4R1
-         rQKtV7apMUx3w==
+        b=DNR44fHVlFdcriDMwgURoChgELZDS20mylOas2L6SdB4JdNc9N7H33dbaAbVCOk5T
+         JolsgiZUigSrcGmDZNe/pRcWx4PUIAlDorhw+fDGMnUcsBDOLnFSRaE/uOIUWiWVN4
+         JH98gnOSjJdurfmq73iTtmmP+9G2T4Sh1ipsRHqlA6Worh4Ry1uYSzz/JBP4zkpicN
+         J8t56zaYefeW7UioDj9kbivv2IK0f1h5GIDFbtW+LP/NXskF5rqdkIxaOM2rAi3OxD
+         OpisZgwyR3Wz0GzpwagHta/eHeaKaBg59wagejiGBKyWGX3XntjpPek/FQSAi/mM23
+         nAoFzP/YOTs9g==
 From:   <daniele.biagetti@cblelectronics.com>
 To:     <linux-bluetooth@vger.kernel.org>
-Subject: [PATCH 2/6] tools/mesh-gatt: Fix status messages processing
-Date:   Fri, 3 Dec 2021 17:02:12 +0100
-Message-ID: <000601d7e85f$228e7ea0$67ab7be0$@cblelectronics.com>
+Subject: [PATCH 4/6] tools/mesh-gatt: Add subscription delete message to config client model
+Date:   Fri, 3 Dec 2021 17:02:17 +0100
+Message-ID: <000801d7e85f$251aa7c0$6f4ff740$@cblelectronics.com>
 MIME-Version: 1.0
 Content-Type: text/plain;
         charset="us-ascii"
 Content-Transfer-Encoding: 7bit
 X-Mailer: Microsoft Outlook 16.0
-Thread-Index: AdfoXhoSvPDwxinGTn6eFFOONeASOg==
+Thread-Index: AdfoXnOKPcaZMa9gRYmgsvtpIEz4Cg==
 Content-Language: it
-X-CMAE-Envelope: MS4xfLi5yG4h1Fim+3qL6+VNFCkA3JR8q2JA/Jsb3z7QXxSPx50jOIAa1exTloc0QGftqINohpjvCX7UEzXArHWA4EY7XLQiAsEvlAC7sM+HmAigKEkdrv9a
- uI8YjSNtE+lCzeGNilIjIUxxGUfu2uR/xwmBktda4S6XJfaCy+kCO9QNBMMc/GWuUtFKL39FZExIt4Q5NJ64djnYJgwYjzhgZmWMSNi8/9Y7xpoDEwaMYG7u
+X-CMAE-Envelope: MS4xfNzmIgnB3GF9p4T0UfMgrb+aIKMwqgkFKm0louqXqEnNnLWb4H23GjouaOIxPskYqI2O1KAvY9kvNFoTzcYOG9AAbyx4bKfJ55p6MOmB1r0MkLzTp4Ax
+ 8EpWoggTF3Qx6cketCQeHLfBdplyCy3euVxFTlz053q95AesDQM9hTVw/uE2X59iepppdoNM1qbGhWcogKsHSWImgrjByDrMgZfVrSMCS2QwHNS5nCGNP58Y
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-The status messages was processed and displayed even if they do
-not belong to the present model. This fix ensure that the status
-messages are processed only if they have the correct opcode.
 ---
- tools/mesh-gatt/node.c        | 11 +++++++++++
- tools/mesh-gatt/onoff-model.c | 23 ++++++++++++-----------
- 2 files changed, 23 insertions(+), 11 deletions(-)
+ tools/mesh-gatt/config-client.c | 40 +++++++++++++++++++++++++++++++++
+ 1 file changed, 40 insertions(+)
 
-diff --git a/tools/mesh-gatt/node.c b/tools/mesh-gatt/node.c
-index 356e1cd1a..4d0cc21e9 100644
---- a/tools/mesh-gatt/node.c
-+++ b/tools/mesh-gatt/node.c
-@@ -470,6 +470,8 @@ static bool deliver_model_data(struct mesh_element*
-element, uint16_t src,
- 				uint16_t app_idx, uint8_t *data, uint16_t
-len)
- {
- 	GList *l;
-+	uint32_t opcode;
-+	int n;
- 
- 	for(l = element->models; l; l = l->next) {
- 		struct mesh_model *model = l->data;
-@@ -482,6 +484,15 @@ static bool deliver_model_data(struct mesh_element*
-element, uint16_t src,
- 			return true;
- 	}
- 
-+	if (mesh_opcode_get(data, len, &opcode, &n)) {
-+		len -= n;
-+		data += n;
-+	} else
-+		return false;
-+	bt_shell_printf("Unknown Model Message received (%d) opcode %x\n",
-+						len, opcode);
-+	print_byte_array("\t",data, len);
-+
- 	return false;
+diff --git a/tools/mesh-gatt/config-client.c
+b/tools/mesh-gatt/config-client.c
+index 7bdd028d2..c61908b4e 100644
+--- a/tools/mesh-gatt/config-client.c
++++ b/tools/mesh-gatt/config-client.c
+@@ -1037,6 +1037,44 @@ static void cmd_sub_get(int argc, char *argv[])
+ 	return bt_shell_noninteractive_quit(EXIT_SUCCESS);
  }
  
-diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
-index 13ff4bbe3..1c9676e03 100644
---- a/tools/mesh-gatt/onoff-model.c
-+++ b/tools/mesh-gatt/onoff-model.c
-@@ -99,6 +99,7 @@ static bool client_msg_recvd(uint16_t src, uint8_t *data,
- {
- 	uint32_t opcode;
- 	int n;
-+	char s[128];
- 
- 	if (mesh_opcode_get(data, len, &opcode, &n)) {
- 		len -= n;
-@@ -106,27 +107,27 @@ static bool client_msg_recvd(uint16_t src, uint8_t
-*data,
- 	} else
- 		return false;
- 
--	bt_shell_printf("On Off Model Message received (%d) opcode %x\n",
--								len,
-opcode);
--	print_byte_array("\t",data, len);
--
- 	switch (opcode) {
- 	default:
- 		return false;
- 
- 	case OP_GENERIC_ONOFF_STATUS:
-+		bt_shell_printf("On Off Model Message received (%d) opcode
-%x\n",
-+			len, opcode);
-+		print_byte_array("\t",data, len);
- 		if (len != 1 && len != 3)
- 			break;
- 
--		bt_shell_printf("Node %4.4x: Off Status present = %s",
--						src, data[0] ? "ON" :
-"OFF");
--
-+		snprintf(s, sizeof(s), "Node %4.4x: On Off Status present =
-%s",
-+			src, data[0] ? "ON" : "OFF");
- 		if (len == 3) {
--			bt_shell_printf(", target = %s",
--					data[1] ? "ON" : "OFF");
-+			snprintf(s + strlen(s), sizeof(s), ", target = %s",
-+				data[1] ? "ON" : "OFF");
-+			bt_shell_printf("%s\n", s);
- 			print_remaining_time(data[2]);
--		} else
--			bt_shell_printf("\n");
-+		}else
-+			bt_shell_printf("%s\n", s);
++static void cmd_sub_del(int argc, char *argv[])
++{
++        uint16_t n;
++        uint8_t msg[32];
++        int parm_cnt;
 +
- 		break;
- 	}
- 
++        if (IS_UNASSIGNED(target)) {
++                bt_shell_printf("Destination not set\n");
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        n = mesh_opcode_set(OP_CONFIG_MODEL_SUB_DELETE, msg);
++
++        parm_cnt = read_input_parameters(argc, argv);
++        if (parm_cnt != 3) {
++                bt_shell_printf("Bad arguments: %s\n", argv[1]);
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        /* Per Mesh Profile 4.3.2.19 */
++        /* Element Address */
++        put_le16(parms[0], msg + n);
++        n += 2;
++        /* Subscription Address */
++        put_le16(parms[1], msg + n);
++        n += 2;
++        /* SIG Model ID */
++        put_le16(parms[2], msg + n);
++        n += 2;
++
++        if (!config_send(msg, n)) {
++                bt_shell_printf("Failed to send \"DELETE
+SUBSCRIPTION\"\n");
++                return bt_shell_noninteractive_quit(EXIT_FAILURE);
++        }
++
++        return bt_shell_noninteractive_quit(EXIT_SUCCESS);
++}
++
+ static void cmd_mod_appidx_get(int argc, char *argv[])
+ {
+ 	uint16_t n;
+@@ -1232,6 +1270,8 @@ static const struct bt_shell_menu cfg_menu = {
+ 				cmd_sub_add,    "Add subscription"},
+ 	{"sub-get", "<ele_addr> <model id>",
+ 				cmd_sub_get,    "Get subscription"},
++	{"sub-del", "<ele_addr> <sub_addr> <model id>",
++				cmd_sub_del,    "Delete subscription"},
+ 	{"node-reset",		NULL,                    cmd_node_reset,
+ 				"Reset a node and remove it from network"},
+ 	{} },
 -- 
 2.25.1
 
