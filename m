@@ -2,353 +2,328 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1469CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 22:19:13 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 504EEC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri,  3 Dec 2021 22:38:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1383412AbhLCWWf (ORCPT
+        id S1383433AbhLCWlk (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 3 Dec 2021 17:22:35 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:47986 "EHLO
+        Fri, 3 Dec 2021 17:41:40 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52164 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1353945AbhLCWWd (ORCPT
+        with ESMTP id S1359252AbhLCWlj (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 3 Dec 2021 17:22:33 -0500
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D263C061751;
-        Fri,  3 Dec 2021 14:19:08 -0800 (PST)
-Received: by mail-ua1-x930.google.com with SMTP id az37so8098408uab.13;
-        Fri, 03 Dec 2021 14:19:08 -0800 (PST)
+        Fri, 3 Dec 2021 17:41:39 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B09BC061751
+        for <linux-bluetooth@vger.kernel.org>; Fri,  3 Dec 2021 14:38:15 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id s137so4453016pgs.5
+        for <linux-bluetooth@vger.kernel.org>; Fri, 03 Dec 2021 14:38:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=masP0cFTPX/N7wimV/849n2/YOA6AN3STexl3vTV2nI=;
-        b=kwHXoI1HV9yrGkRbGynCGaWB7iKVd7jhBG9G2I/cEIdj6wFpNIpbHutRte4eIR9z/M
-         yRAtmW3mT0bjDqA9/F+mUTR52hy+FqwzDosm2Xc0lmn34CyYLot1ZLZj8O3I1G2TzL20
-         lwJytK1femmBD3qqxxESeg1P7duF6bg0Unsn/MyKdJ3zA9ANNsSitiLq5DSaBLW9vwva
-         SPumbT1locLsNkKfLpXeDKk/fvOWDZ67Q6P9U5sh7m/WyrYIsVR8o7bxzwl/mKCBN9n0
-         aixZh8eCltmpC6/ZN7eZPOXk7ECXxnf9O2GDH/gNB63hgwj+9HQYsG7QAyontmeJzyGE
-         cw8A==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=55NxvElenEkteRCV9GpdgLFdp1nzahbHZFMTJhgArtY=;
+        b=Y43TUnAbvZlQu4qQp0GAoxA61mMZY7rM8OlCXBTftvIquojRyM5Lk9PrHf853UH31y
+         p2QKZRK3ZAXa3TmzsRRsa/Gk8RhAaaFxxjR8h0+prihPJoaDne+jRrYS4oRe245RdU6P
+         qRVQW1f1rC2NbcliodR3A7QnyHeCZ36av41SZS+MfKNAAQM0GS/+Ql5x9AeOWkL/ZLe2
+         R1W3182Tg2sKOo0ppcgHLFV73JJxq61XxBiEbt7xfVU2eVlYigeuZdG7tmZtcZ6qBhiB
+         RAW+pYqOzUbAJTA4EDVTAEaiDGXZijC7okKIBZMAHTSUY+kZhp/n+y2s4GFgMzrUHtyR
+         fTrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=masP0cFTPX/N7wimV/849n2/YOA6AN3STexl3vTV2nI=;
-        b=LqoC0WRNj5lGe5/a9KruAx+j59hOVxOjsQveeKZO3Y9ZKlETXnDCQLJx/LWhWdfukG
-         P1o56jdJwqQfCoHI3VAgGwyO+BiQUONkcKhuS7pX2f5kZ+SrZs0f9gVkBd9L1v9l56P7
-         wlZQRWAXowxrN6EF+Og7/tPZSgGRfCS9aqfem9STNtVrJETucgWnROwj8PkX4Y/hBf8r
-         a7AsFKLtM0RDn8WAWUhHLZce0cl2jlZG+IoaTlnkWulu4wsFSlKCP2Doe2Lih/d2Nbdr
-         4pRagBYc0Te+xwoVE0jlGJIWTj3Et1VNcnlyeu5Hz82NcC5JRiEGggWKtFazz01HacFu
-         99Lw==
-X-Gm-Message-State: AOAM53379ccpm4XzFs0YXiiI41BckW4TfzV2EuVBAx4JCQkYg/b20n8S
-        fRRQV3lakcBQ3D026pe36Pe3CJyJ/yXp89TkSFN2kNo3cOM=
-X-Google-Smtp-Source: ABdhPJzaIkQ0vROD+9s9Iyh6B4kphKHiRJIL6/b6llJJaRsO2haPgz7SJ58IpHn/EowMynaMsfBLi8HY1btMZS+QEP0=
-X-Received: by 2002:a67:e0d6:: with SMTP id m22mr24471940vsl.15.1638569947604;
- Fri, 03 Dec 2021 14:19:07 -0800 (PST)
-MIME-Version: 1.0
-References: <20211202231123.v7.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
- <20211202231123.v7.2.I9eda306e4c542010535dc49b5488946af592795e@changeid>
-In-Reply-To: <20211202231123.v7.2.I9eda306e4c542010535dc49b5488946af592795e@changeid>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=55NxvElenEkteRCV9GpdgLFdp1nzahbHZFMTJhgArtY=;
+        b=UrtrBhHBKUcC3w/xrqwcn+qgTpACuHsihwXqCLCldw65iJhYULrtgGMWmuCrevmd9e
+         vKWMFXeUnAt2TP9rlY41UlhHrCTmxN+alpKkimZP3tsXm3ONDOfPFTnQ+YpxEr/1siZM
+         3DMCweKPIqv5e/blwYpE9pbnyb2Gzu3JIR3J68aiRZSO1bT7SjIU9HL+iU3cZ14mNJEB
+         sBTEMIyE7hCNO3G4gTFWF20Tg/NiuMEtLszU07rwimcxrBAx8/lgiKn26ITiWkZqws4V
+         21TnmqQej8nqaSStDxFz19XcZzfyq6GYEsoCNxZcSvgWm9PKnwaniMC8qnWpOQBwMD1H
+         JY0Q==
+X-Gm-Message-State: AOAM533CLNUu8UgF4GiS+Znp/ifCIHad89i3VuPr368WTzlJyG9hmRRX
+        +f3LlfEeoL0368PxrMHcR2PkgpTFl74=
+X-Google-Smtp-Source: ABdhPJx5XAs6tC0OuOjak+ClffgzkVsG4xXso/VxRj+dn0qqiJcxqQOfJbEP5S5hXQt224RH+Saz2g==
+X-Received: by 2002:a63:570b:: with SMTP id l11mr6667955pgb.480.1638571094504;
+        Fri, 03 Dec 2021 14:38:14 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id p124sm4153090pfg.110.2021.12.03.14.38.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 03 Dec 2021 14:38:14 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Fri, 3 Dec 2021 14:18:56 -0800
-Message-ID: <CABBYNZJPEhALUyevLAAP9Nhzda8M0emmsPwaXCcQWOSD+ytm5A@mail.gmail.com>
-Subject: Re: [PATCH v7 2/2] bluetooth: Add MGMT Adv Monitor Device Found/Lost events
-To:     Manish Mandlik <mmandlik@google.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        Miao-chen Chou <mcchou@google.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v4] Bluetooth: btusb: Add support for queuing during polling interval
+Date:   Fri,  3 Dec 2021 14:38:13 -0800
+Message-Id: <20211203223813.2326558-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Thu, Dec 2, 2021 at 11:16 PM Manish Mandlik <mmandlik@google.com> wrote:
->
-> This patch introduces two new MGMT events for notifying the bluetoothd
-> whenever the controller starts/stops monitoring a device.
->
-> Test performed:
-> - Verified by logs that the MSFT Monitor Device is received from the
->   controller and the bluetoothd is notified whenever the controller
->   starts/stops monitoring a device.
->
-> Signed-off-by: Manish Mandlik <mmandlik@google.com>
-> Reviewed-by: Miao-chen Chou <mcchou@google.com>
->
-> ---
->
-> Changes in v7:
-> - Refactor mgmt_device_found() to fix stack frame size limit
->
-> Changes in v6:
-> - Fix compiler warning for mgmt_adv_monitor_device_found().
->
-> Changes in v5:
-> - New patch in the series. Split previous patch into two.
-> - Update the Device Found logic to send existing Device Found event or
->   Adv Monitor Device Found event depending on the active scanning state.
->
->  include/net/bluetooth/hci_core.h |   3 +
->  include/net/bluetooth/mgmt.h     |  16 +++++
->  net/bluetooth/mgmt.c             | 106 +++++++++++++++++++++++++++++--
->  net/bluetooth/msft.c             |  15 ++++-
->  4 files changed, 134 insertions(+), 6 deletions(-)
->
-> diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-> index 5ccd19dec77c..3b53214ff49f 100644
-> --- a/include/net/bluetooth/hci_core.h
-> +++ b/include/net/bluetooth/hci_core.h
-> @@ -599,6 +599,7 @@ struct hci_dev {
->         struct delayed_work     interleave_scan;
->
->         struct list_head        monitored_devices;
-> +       bool                    advmon_pend_notify;
->
->  #if IS_ENABLED(CONFIG_BT_LEDS)
->         struct led_trigger      *power_led;
-> @@ -1847,6 +1848,8 @@ void mgmt_adv_monitor_removed(struct hci_dev *hdev, u16 handle);
->  int mgmt_phy_configuration_changed(struct hci_dev *hdev, struct sock *skip);
->  int mgmt_add_adv_patterns_monitor_complete(struct hci_dev *hdev, u8 status);
->  int mgmt_remove_adv_monitor_complete(struct hci_dev *hdev, u8 status);
-> +void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
-> +                                 bdaddr_t *bdaddr, u8 addr_type);
->
->  u8 hci_le_conn_update(struct hci_conn *conn, u16 min, u16 max, u16 latency,
->                       u16 to_multiplier);
-> diff --git a/include/net/bluetooth/mgmt.h b/include/net/bluetooth/mgmt.h
-> index 107b25deae68..99266f7aebdc 100644
-> --- a/include/net/bluetooth/mgmt.h
-> +++ b/include/net/bluetooth/mgmt.h
-> @@ -1104,3 +1104,19 @@ struct mgmt_ev_controller_resume {
->  #define MGMT_WAKE_REASON_NON_BT_WAKE           0x0
->  #define MGMT_WAKE_REASON_UNEXPECTED            0x1
->  #define MGMT_WAKE_REASON_REMOTE_WAKE           0x2
-> +
-> +#define MGMT_EV_ADV_MONITOR_DEVICE_FOUND       0x002f
-> +struct mgmt_ev_adv_monitor_device_found {
-> +       __le16 monitor_handle;
-> +       struct mgmt_addr_info addr;
-> +       __s8   rssi;
-> +       __le32 flags;
-> +       __le16 eir_len;
-> +       __u8   eir[0];
-> +} __packed;
-> +
-> +#define MGMT_EV_ADV_MONITOR_DEVICE_LOST                0x0030
-> +struct mgmt_ev_adv_monitor_device_lost {
-> +       __le16 monitor_handle;
-> +       struct mgmt_addr_info addr;
-> +} __packed;
-> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
-> index bf989ae03f9f..06e0769f350d 100644
-> --- a/net/bluetooth/mgmt.c
-> +++ b/net/bluetooth/mgmt.c
-> @@ -174,6 +174,8 @@ static const u16 mgmt_events[] = {
->         MGMT_EV_ADV_MONITOR_REMOVED,
->         MGMT_EV_CONTROLLER_SUSPEND,
->         MGMT_EV_CONTROLLER_RESUME,
-> +       MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-> +       MGMT_EV_ADV_MONITOR_DEVICE_LOST,
->  };
->
->  static const u16 mgmt_untrusted_commands[] = {
-> @@ -9524,6 +9526,100 @@ static bool is_filter_match(struct hci_dev *hdev, s8 rssi, u8 *eir,
->         return true;
->  }
->
-> +void mgmt_adv_monitor_device_lost(struct hci_dev *hdev, u16 handle,
-> +                                 bdaddr_t *bdaddr, u8 addr_type)
-> +{
-> +       struct mgmt_ev_adv_monitor_device_lost ev;
-> +
-> +       ev.monitor_handle = cpu_to_le16(handle);
-> +       bacpy(&ev.addr.bdaddr, bdaddr);
-> +       ev.addr.type = addr_type;
-> +
-> +       mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_LOST, hdev, &ev, sizeof(ev),
-> +                  NULL);
-> +}
-> +
-> +static void mgmt_adv_monitor_device_found(struct hci_dev *hdev,
-> +                                         struct mgmt_ev_device_found *ev,
-> +                                         size_t ev_size, bool discovering)
-> +{
-> +       char buf[518];
+This makes btusb to queue ACL and events during a polling interval
+by using of a delayed work, with the interval working as a time window
+where frames received from different endpoints are considered to be
+arrived at same time and then attempt to resolve potential conflics by
+processing the events ahead of ACL packets.
 
-We should try to avoid declaring such big stack variable, instead Im
-working on a set the should enable you to use skb_put/skb_put_data
-directly into the skb, here are the current changes I have for
-device_found:
+It worth noting though that priorizing events over ACL data may result
+in inverting the order compared to how they appeared over the air, for
+instance there may be packets received before a disconnect event that
+will be discarded and unencrypted packets received before encryption
+change which would considered encrypted, because of these potential
+changes on the order the support for queuing during the polling
+interval is not enabled by default so it requires setting
+force_poll_sync debugfs while the adapter is down.
 
-https://gist.github.com/Vudentz/ffce584912eb7dc4add9c3bb25466fa5
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Check for intr_interval instead of enable_poll_sync when dispatching
+since the former can only be changed on open/resume.
+v3: Change the way the feature is enabled from module parameter to debugfs
+entry and rename it from enable_poll_sync to force_poll_sync.
+v4: Cosmetic changes to address comments.
 
-I'm addressing Marcel's comments and will send the set to the list later today.
+ drivers/bluetooth/btusb.c | 129 ++++++++++++++++++++++++++++++++++++--
+ 1 file changed, 124 insertions(+), 5 deletions(-)
 
-> +       struct mgmt_ev_adv_monitor_device_found *advmon_ev = (void *)buf;
-> +       size_t advmon_ev_size;
-> +       struct monitored_device *dev, *tmp;
-> +       bool matched = false;
-> +       bool notified = false;
-> +
-> +       /* We have received the Advertisement Report because:
-> +        * 1. the kernel has initiated active discovery
-> +        * 2. if not, we have pend_le_reports > 0 in which case we are doing
-> +        *    passive scanning
-> +        * 3. if none of the above is true, we have one or more active
-> +        *    Advertisement Monitor
-> +        *
-> +        * For case 1 and 2, report all advertisements via MGMT_EV_DEVICE_FOUND
-> +        * and report ONLY one advertisement per device for the matched Monitor
-> +        * via MGMT_EV_ADV_MONITOR_DEVICE_FOUND event.
-> +        *
-> +        * For case 3, since we are not active scanning and all advertisements
-> +        * received are due to a matched Advertisement Monitor, report all
-> +        * advertisements ONLY via MGMT_EV_ADV_MONITOR_DEVICE_FOUND event.
-> +        */
-> +       if (discovering) {
-> +               mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
-> +
-> +               if (!hdev->advmon_pend_notify)
-> +                       return;
-> +       }
-> +
-> +       /* Make sure that the buffer is big enough */
-> +       advmon_ev_size = ev_size + (sizeof(*advmon_ev) - sizeof(*ev));
-> +       if (advmon_ev_size > sizeof(buf))
-> +               return;
-> +
-> +       /* ADV_MONITOR_DEVICE_FOUND is similar to DEVICE_FOUND event except
-> +        * that it also has 'monitor_handle'. Make a copy of DEVICE_FOUND and
-> +        * store monitor_handle of the matched monitor.
-> +        */
-> +       memcpy(&advmon_ev->addr, ev, ev_size);
-> +
-> +       hdev->advmon_pend_notify = false;
-> +
-> +       list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices, list) {
-> +               if (!bacmp(&dev->bdaddr, &advmon_ev->addr.bdaddr)) {
-> +                       matched = true;
-> +
-> +                       if (!dev->notified) {
-> +                               advmon_ev->monitor_handle =
-> +                                               cpu_to_le16(dev->handle);
-> +
-> +                               mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND,
-> +                                          hdev, advmon_ev, advmon_ev_size,
-> +                                          NULL);
-> +
-> +                               notified = true;
-> +                               dev->notified = true;
-> +                       }
-> +               }
-> +
-> +               if (!dev->notified)
-> +                       hdev->advmon_pend_notify = true;
-> +       }
-> +
-> +       if (!discovering &&
-> +           ((matched && !notified) || !msft_monitor_supported(hdev))) {
-> +               /* Handle 0 indicates that we are not active scanning and this
-> +                * is a subsequent advertisement report for an already matched
-> +                * Advertisement Monitor or the controller offloading support
-> +                * is not available.
-> +                */
-> +               advmon_ev->monitor_handle = 0;
-> +
-> +               mgmt_event(MGMT_EV_ADV_MONITOR_DEVICE_FOUND, hdev, advmon_ev,
-> +                          advmon_ev_size, NULL);
-> +       }
-> +}
-> +
->  void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->                        u8 addr_type, u8 *dev_class, s8 rssi, u32 flags,
->                        u8 *eir, u16 eir_len, u8 *scan_rsp, u8 scan_rsp_len)
-> @@ -9531,6 +9627,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->         char buf[512];
->         struct mgmt_ev_device_found *ev = (void *)buf;
->         size_t ev_size;
-> +       bool report_device_found = hci_discovery_active(hdev);
->
->         /* Don't send events for a non-kernel initiated discovery. With
->          * LE one exception is if we have pend_le_reports > 0 in which
-> @@ -9539,11 +9636,10 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->         if (!hci_discovery_active(hdev)) {
->                 if (link_type == ACL_LINK)
->                         return;
-> -               if (link_type == LE_LINK &&
-> -                   list_empty(&hdev->pend_le_reports) &&
-> -                   !hci_is_adv_monitoring(hdev)) {
-> +               if (link_type == LE_LINK && !list_empty(&hdev->pend_le_reports))
-> +                       report_device_found = true;
-> +               else if (!hci_is_adv_monitoring(hdev))
->                         return;
-> -               }
->         }
->
->         if (hdev->discovery.result_filtering) {
-> @@ -9606,7 +9702,7 @@ void mgmt_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
->         ev->eir_len = cpu_to_le16(eir_len + scan_rsp_len);
->         ev_size = sizeof(*ev) + eir_len + scan_rsp_len;
->
-> -       mgmt_event(MGMT_EV_DEVICE_FOUND, hdev, ev, ev_size, NULL);
-> +       mgmt_adv_monitor_device_found(hdev, ev, ev_size, report_device_found);
->  }
->
->  void mgmt_remote_name(struct hci_dev *hdev, bdaddr_t *bdaddr, u8 link_type,
-> diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-> index aadabe78baf6..3e2385562d2b 100644
-> --- a/net/bluetooth/msft.c
-> +++ b/net/bluetooth/msft.c
-> @@ -579,8 +579,16 @@ void msft_do_close(struct hci_dev *hdev)
->
->         hci_dev_lock(hdev);
->
-> -       /* Clear any devices that are being monitored */
-> +       /* Clear any devices that are being monitored and notify device lost */
-> +
-> +       hdev->advmon_pend_notify = false;
-> +
->         list_for_each_entry_safe(dev, tmp_dev, &hdev->monitored_devices, list) {
-> +               if (dev->notified)
-> +                       mgmt_adv_monitor_device_lost(hdev, dev->handle,
-> +                                                    &dev->bdaddr,
-> +                                                    dev->addr_type);
-> +
->                 list_del(&dev->list);
->                 kfree(dev);
->         }
-> @@ -639,6 +647,7 @@ static void msft_device_found(struct hci_dev *hdev, bdaddr_t *bdaddr,
->
->         INIT_LIST_HEAD(&dev->list);
->         list_add(&dev->list, &hdev->monitored_devices);
-> +       hdev->advmon_pend_notify = true;
->  }
->
->  /* This function requires the caller holds hdev->lock */
-> @@ -649,6 +658,10 @@ static void msft_device_lost(struct hci_dev *hdev, bdaddr_t *bdaddr,
->
->         list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices, list) {
->                 if (dev->handle == mgmt_handle) {
-> +                       if (dev->notified)
-> +                               mgmt_adv_monitor_device_lost(hdev, mgmt_handle,
-> +                                                            bdaddr, addr_type);
-> +
->                         list_del(&dev->list);
->                         kfree(dev);
->
-> --
-> 2.34.0.384.gca35af8252-goog
->
-
-
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 974b36a02375..fda5622b1d6e 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -16,6 +16,7 @@
+ #include <linux/of_irq.h>
+ #include <linux/suspend.h>
+ #include <linux/gpio/consumer.h>
++#include <linux/debugfs.h>
+ #include <asm/unaligned.h>
+ 
+ #include <net/bluetooth/bluetooth.h>
+@@ -31,7 +32,6 @@
+ static bool disable_scofix;
+ static bool force_scofix;
+ static bool enable_autosuspend = IS_ENABLED(CONFIG_BT_HCIBTUSB_AUTOSUSPEND);
+-
+ static bool reset = true;
+ 
+ static struct usb_driver btusb_driver;
+@@ -561,8 +561,13 @@ struct btusb_data {
+ 
+ 	unsigned long flags;
+ 
+-	struct work_struct work;
+-	struct work_struct waker;
++	bool poll_sync;
++	int intr_interval;
++	struct work_struct  work;
++	struct work_struct  waker;
++	struct delayed_work rx_work;
++
++	struct sk_buff_head acl_q;
+ 
+ 	struct usb_anchor deferred;
+ 	struct usb_anchor tx_anchor;
+@@ -727,6 +732,16 @@ static inline void btusb_free_frags(struct btusb_data *data)
+ 	spin_unlock_irqrestore(&data->rxlock, flags);
+ }
+ 
++static int btusb_recv_event(struct btusb_data *data, struct sk_buff *skb)
++{
++	if (data->intr_interval) {
++		/* Trigger dequeue immediatelly if an event is received */
++		schedule_delayed_work(&data->rx_work, 0);
++	}
++
++	return data->recv_event(data->hdev, skb);
++}
++
+ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -772,7 +787,7 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_event(data->hdev, skb);
++			btusb_recv_event(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -783,6 +798,20 @@ static int btusb_recv_intr(struct btusb_data *data, void *buffer, int count)
+ 	return err;
+ }
+ 
++static int btusb_recv_acl(struct btusb_data *data, struct sk_buff *skb)
++{
++	/* Only queue ACL packet if intr_interval is set as it means
++	 * force_poll_sync has been enabled.
++	 */
++	if (!data->intr_interval)
++		return data->recv_acl(data->hdev, skb);
++
++	skb_queue_tail(&data->acl_q, skb);
++	schedule_delayed_work(&data->rx_work, data->intr_interval);
++
++	return 0;
++}
++
+ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ {
+ 	struct sk_buff *skb;
+@@ -830,7 +859,7 @@ static int btusb_recv_bulk(struct btusb_data *data, void *buffer, int count)
+ 
+ 		if (!hci_skb_expect(skb)) {
+ 			/* Complete frame */
+-			data->recv_acl(data->hdev, skb);
++			btusb_recv_acl(data, skb);
+ 			skb = NULL;
+ 		}
+ 	}
+@@ -986,6 +1015,28 @@ static int btusb_submit_intr_urb(struct hci_dev *hdev, gfp_t mem_flags)
+ 		usb_unanchor_urb(urb);
+ 	}
+ 
++	/* Only initialize intr_interval if URB poll sync is enabled */
++	if (!data->poll_sync)
++		goto done;
++
++	/* The units are frames (milliseconds) for full and low speed devices,
++	 * and microframes (1/8 millisecond) for highspeed and SuperSpeed
++	 * devices.
++	 *
++	 * This is done once on open/resume so it shouldn't change even if
++	 * force_poll_sync changes.
++	 */
++	switch (urb->dev->speed) {
++	case USB_SPEED_SUPER_PLUS:
++	case USB_SPEED_SUPER:	/* units are 125us */
++		data->intr_interval = usecs_to_jiffies(urb->interval * 125);
++		break;
++	default:
++		data->intr_interval = msecs_to_jiffies(urb->interval);
++		break;
++	}
++
++done:
+ 	usb_free_urb(urb);
+ 
+ 	return err;
+@@ -1448,9 +1499,12 @@ static int btusb_close(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
+ 	cancel_work_sync(&data->work);
+ 	cancel_work_sync(&data->waker);
+ 
++	skb_queue_purge(&data->acl_q);
++
+ 	clear_bit(BTUSB_ISOC_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_BULK_RUNNING, &data->flags);
+ 	clear_bit(BTUSB_INTR_RUNNING, &data->flags);
+@@ -1482,6 +1536,10 @@ static int btusb_flush(struct hci_dev *hdev)
+ 
+ 	BT_DBG("%s", hdev->name);
+ 
++	cancel_delayed_work(&data->rx_work);
++
++	skb_queue_purge(&data->acl_q);
++
+ 	usb_kill_anchored_urbs(&data->tx_anchor);
+ 	btusb_free_frags(data);
+ 
+@@ -1845,6 +1903,17 @@ static void btusb_waker(struct work_struct *work)
+ 	usb_autopm_put_interface(data->intf);
+ }
+ 
++static void btusb_rx_work(struct work_struct *work)
++{
++	struct btusb_data *data = container_of(work, struct btusb_data,
++					       rx_work.work);
++	struct sk_buff *skb;
++
++	/* Dequeue ACL data received during the interval */
++	while ((skb = skb_dequeue(&data->acl_q)))
++		data->recv_acl(data->hdev, skb);
++}
++
+ static int btusb_setup_bcm92035(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -3402,6 +3471,49 @@ static int btusb_shutdown_qca(struct hci_dev *hdev)
+ 	return 0;
+ }
+ 
++static ssize_t force_poll_sync_read(struct file *file, char __user *user_buf,
++				    size_t count, loff_t *ppos)
++{
++	struct btusb_data *data = file->private_data;
++	char buf[3];
++
++	buf[0] = data->poll_sync ? 'Y' : 'N';
++	buf[1] = '\n';
++	buf[2] = '\0';
++	return simple_read_from_buffer(user_buf, count, ppos, buf, 2);
++}
++
++static ssize_t force_poll_sync_write(struct file *file,
++				     const char __user *user_buf,
++				     size_t count, loff_t *ppos)
++{
++	struct btusb_data *data = file->private_data;
++	bool enable;
++	int err;
++
++	err = kstrtobool_from_user(user_buf, count, &enable);
++	if (err)
++		return err;
++
++	/* Only allow changes while the adapter is down */
++	if (test_bit(HCI_UP, &data->hdev->flags))
++		return -EPERM;
++
++	if (data->poll_sync == enable)
++		return -EALREADY;
++
++	data->poll_sync = enable;
++
++	return count;
++}
++
++static const struct file_operations force_poll_sync_fops = {
++	.open		= simple_open,
++	.read		= force_poll_sync_read,
++	.write		= force_poll_sync_write,
++	.llseek		= default_llseek,
++};
++
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -3485,6 +3597,10 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	INIT_WORK(&data->work, btusb_work);
+ 	INIT_WORK(&data->waker, btusb_waker);
++	INIT_DELAYED_WORK(&data->rx_work, btusb_rx_work);
++
++	skb_queue_head_init(&data->acl_q);
++
+ 	init_usb_anchor(&data->deferred);
+ 	init_usb_anchor(&data->tx_anchor);
+ 	spin_lock_init(&data->txlock);
+@@ -3750,6 +3866,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	usb_set_intfdata(intf, data);
+ 
++	debugfs_create_file("force_poll_sync", 0644, hdev->debugfs, data,
++			    &force_poll_sync_fops);
++
+ 	return 0;
+ 
+ out_free_dev:
 -- 
-Luiz Augusto von Dentz
+2.33.1
+
