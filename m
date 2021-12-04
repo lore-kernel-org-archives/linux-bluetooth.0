@@ -2,73 +2,70 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E489C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Dec 2021 09:32:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 90433C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat,  4 Dec 2021 09:48:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1384475AbhLDJfj (ORCPT
+        id S1384531AbhLDJvl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 4 Dec 2021 04:35:39 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:53204 "EHLO
+        Sat, 4 Dec 2021 04:51:41 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56764 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245490AbhLDJfi (ORCPT
+        with ESMTP id S1384527AbhLDJvl (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 4 Dec 2021 04:35:38 -0500
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FADDC061751
-        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Dec 2021 01:32:13 -0800 (PST)
-Received: by mail-oi1-x234.google.com with SMTP id bf8so10893340oib.6
-        for <linux-bluetooth@vger.kernel.org>; Sat, 04 Dec 2021 01:32:13 -0800 (PST)
+        Sat, 4 Dec 2021 04:51:41 -0500
+Received: from mail-oi1-x230.google.com (mail-oi1-x230.google.com [IPv6:2607:f8b0:4864:20::230])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 027CBC0611F7
+        for <linux-bluetooth@vger.kernel.org>; Sat,  4 Dec 2021 01:48:15 -0800 (PST)
+Received: by mail-oi1-x230.google.com with SMTP id m6so10965202oim.2
+        for <linux-bluetooth@vger.kernel.org>; Sat, 04 Dec 2021 01:48:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=google.com; s=20210112;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=dp2mOcmnCUzYV/E9OQFo/xxl9rHZk/eGzBOBjZN1XYM=;
-        b=WSTQ5SrqnlJYb5MwWXeSFWwAIj+R4+Bn1eUxHR+003PnwHgtvHR/tKMkX4wh48f4ud
-         nlReAt7US/Ey/8pQ203BdU5uK7s5ZiQd6d6Fieh1nqfKJChGXOU4GE7yrmDfpHX9n0W0
-         7SpCq7c28PvftiP9zRbNIpzjnQoe2Z4IDYL10DdcNFGAarkTJWcEBVw3HzTneEfkXGFz
-         kEga0ebNY2oOFHlh4KbYekS7mA8PiehapP3sOnumOMu6QIWZJtzZVYY4y04W1Ti7Xxr7
-         tRfo/2ISAGL5qK3E8WskkTo6NNmQrKkh5XM/80FMs9ji48HtM8UkEmnZi883zYj15RVH
-         F6lA==
+        bh=bOAkXZDiyTsKYfGEC23YRLp6n8iiidS662e1ynxgsxA=;
+        b=WNErxpaJ0vt9GBbdqCxCm7NrYJDMBAl8LPN1SiLwt3loHe/k206b12pHYF3Yx/xmEg
+         pLJcdL9Xch8oLQXlTwN35R2wEE0Ko/K28/LeEyS3cMg4VdHEsYEEn5PCot9EdNmYdc55
+         C4cSFD9Qqdj6zuZXFkxqQsivgdk+Z2YRI650E53U5DqSv5aCklUh6UCyR0WA7TsD8GJi
+         eQ5M9p4tMrbWcVZXmYdROE7HOTUWc+v6YtF2HwXKraubXnyR2Mt3D+fxwXwWy3hNe1T1
+         vinQjMCt9bkRCl3OpwbZctWQZG1cVCj20qb4CMg37elx1ZlQ3uWo+cQXAyDkFZSG1+3D
+         Fhrw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=dp2mOcmnCUzYV/E9OQFo/xxl9rHZk/eGzBOBjZN1XYM=;
-        b=L3IIa1QumL+64t7vxVrHQq1AkGXkip+xUaSTHcM7+j8Bx1Usqjzlizklhb21grZARK
-         q8YjZQODYyYRfnjlJ0PIh9rfJIf+M2c6Y1BGM4T6vZJPdAL6pFIEzOyNobRF93j8Atjd
-         t7hbUE4X5oFksXfgiPapNLabmNsAZeTdb46HtGUFvJW1OpJ6nksTunM+i9rJBTfMlfuH
-         VJZOhKnc2Scq9wxnRHIFkw6z+L36voAk9uDKNC+P2sT8qk5a/0sU3UQAHacLWthJEv7Z
-         7j1mAMUJjWbvZs9RwqptjHL63n7oatqVVsq8IV2xoFuBEFhKSlIpErNN+bkmKuG5UVl2
-         DO7A==
-X-Gm-Message-State: AOAM533GerrOn3vRLA2DIs2TAZIgkDJcnzkfRk3vSmH5LF7Exv3EwEC1
-        7yEE5uUHrfipD+tGtFp9WCNPcFzG69x5yoEA3O+DJw==
-X-Google-Smtp-Source: ABdhPJwHT61kOEJ6OKmVIbikhcKXSAgYjacMdWWfxmWruZekkbmJkcsbN+UN0YGjvX52pd7TgLy63T2wrCG4P4k6CM0=
-X-Received: by 2002:a05:6808:120b:: with SMTP id a11mr14692196oil.128.1638610330910;
- Sat, 04 Dec 2021 01:32:10 -0800 (PST)
+        bh=bOAkXZDiyTsKYfGEC23YRLp6n8iiidS662e1ynxgsxA=;
+        b=N6q13Bvc2kGwi/p3kAkN7mQx7fHpHinY+UZ2VjCcjk0UJul+iaEmMab5ifUtEeR1KH
+         w8r8ibuVyw34yB3OlRJk7QFjv0UI6q8lMVXP3hUBjxxJwz4pVSM8JQ2Tt25cYkq8X3R9
+         N1KRQ7/xUviiN0PnkJpgbjadc9raP1aLNM4zUhFuYjqlx9hUITFpX0WtYAF0t4W106zp
+         t7cayQP9wvhVP8W2HUx0bgCm/i74N9wtLrjQ/EnTewCTGIZJZWu8JnpB3/nFptT0HgYA
+         ns0ziRsG7DXQzDR6NIxD3KCNioGC9DPfM4KY5c+JIv5IS5HQAELqVRTtBxSxD0Xwo2ao
+         orWA==
+X-Gm-Message-State: AOAM532nubvI5N+/a7ZqOVHHIO4liUf+5LYGaUfVCYUg/dCkpDb4jMhp
+        QuHa8zQBr9yXEpoXScuAG95f9ms3/prUErNIxNemKNoy6FXJJg==
+X-Google-Smtp-Source: ABdhPJxKiMFgxJ5zcd3V9wHDP+cMEBZxSFcKc2VU3eqKSIdvXpYm+andMC88m4jlKzdjIBB7Rx1ycGPNnDJpKj4FBu8=
+X-Received: by 2002:aca:b843:: with SMTP id i64mr14560842oif.109.1638611294801;
+ Sat, 04 Dec 2021 01:48:14 -0800 (PST)
 MIME-Version: 1.0
-References: <000000000000f5964705b7d47d8c@google.com> <000000000000dc091705d203eac6@google.com>
-In-Reply-To: <000000000000dc091705d203eac6@google.com>
+References: <0000000000000a389a05ac5a9864@google.com> <00000000000091c45705d1b3d7ea@google.com>
+In-Reply-To: <00000000000091c45705d1b3d7ea@google.com>
 From:   Dmitry Vyukov <dvyukov@google.com>
-Date:   Sat, 4 Dec 2021 10:32:00 +0100
-Message-ID: <CACT4Y+bN9OX1t4v80n5OPN68fySSVWxx0FKOsTHRTff9Xuokng@mail.gmail.com>
-Subject: Re: [syzbot] INFO: trying to register non-static key in l2cap_sock_teardown_cb
-To:     syzbot <syzbot+a41dfef1d2e04910eb2e@syzkaller.appspotmail.com>
-Cc:     a@unstable.cc, b.a.t.m.a.n@lists.open-mesh.org,
-        bobo.shaobowang@huawei.com, davem@davemloft.net, hdanton@sina.com,
+Date:   Sat, 4 Dec 2021 10:48:03 +0100
+Message-ID: <CACT4Y+YQC1eFH9BsrPnRaGW_H+_jzpELWuiBa9n+paB7-3k4HA@mail.gmail.com>
+Subject: Re: [syzbot] KASAN: null-ptr-deref Write in l2cap_chan_put
+To:     syzbot <syzbot+452e9465a3b2817fa4c2@syzkaller.appspotmail.com>
+Cc:     anant.thazhemadam@gmail.com, bobo.shaobowang@huawei.com,
+        cobranza@ingcoecuador.com, davem@davemloft.net, ducheng2@gmail.com,
         johan.hedberg@gmail.com, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-        linux-kernel@vger.kernel.org, luiz.dentz@gmail.com,
+        linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
         luiz.von.dentz@intel.com, marcel@holtmann.org,
-        mareklindner@neomailbox.ch, miklos@szeredi.hu, mszeredi@redhat.com,
-        netdev@vger.kernel.org, sw@simonwunderlich.de,
-        syzkaller-bugs@googlegroups.com
+        netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Tue, 30 Nov 2021 at 17:19, syzbot
-<syzbot+a41dfef1d2e04910eb2e@syzkaller.appspotmail.com> wrote:
+On Fri, 26 Nov 2021 at 17:47, syzbot
+<syzbot+452e9465a3b2817fa4c2@syzkaller.appspotmail.com> wrote:
 >
 > syzbot suspects this issue was fixed by commit:
 >
@@ -78,13 +75,12 @@ On Tue, 30 Nov 2021 at 17:19, syzbot
 >
 >     Bluetooth: fix use-after-free error in lock_sock_nested()
 >
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=134c881eb00000
-> start commit:   73b7a6047971 net: dsa: bcm_sf2: support BCM4908's integrat..
-> git tree:       net-next
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=9ce34124da4c882b
-> dashboard link: https://syzkaller.appspot.com/bug?extid=a41dfef1d2e04910eb2e
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=166ee4cf500000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1337172f500000
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=141cfa45b00000
+> start commit:   c70672d8d316 Merge tag 's390-5.9-5' of git://git.kernel.or..
+> git tree:       upstream
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=bd46548257448703
+> dashboard link: https://syzkaller.appspot.com/bug?extid=452e9465a3b2817fa4c2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=152f31f9900000
 >
 > If the result looks correct, please mark the issue as fixed by replying with:
 >
@@ -92,8 +88,6 @@ On Tue, 30 Nov 2021 at 17:19, syzbot
 >
 > For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-A use-after-free can lead to other random consequences, and there
-actually was a KASAN report after the lockdep report in the original
-report. So w/o a better candidate let's do:
+Looks reasonable:
 
 #syz fix: Bluetooth: fix use-after-free error in lock_sock_nested()
