@@ -2,85 +2,115 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id DB737C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Dec 2021 09:25:56 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2F0C2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Dec 2021 09:50:43 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240658AbhLFJ3Y (ORCPT
+        id S241479AbhLFJyK (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Dec 2021 04:29:24 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:44262 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S240600AbhLFJ3X (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Dec 2021 04:29:23 -0500
-X-UUID: 345462dc4d974bffab457c69e00633ea-20211206
-X-UUID: 345462dc4d974bffab457c69e00633ea-20211206
-Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
-        (envelope-from <mark-yw.chen@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1631942379; Mon, 06 Dec 2021 17:25:53 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Mon, 6 Dec 2021 17:25:51 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Mon, 6 Dec 2021 17:25:51 +0800
-From:   <mark-yw.chen@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <mark-yw.chen@mediatek.com>, <aaron.hou@mediatek.com>,
-        <kaichuan.hsieh@canonical.com>, <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH] Bluetooth: btusb: Handle download_firmware failure cases.
-Date:   Mon, 6 Dec 2021 17:25:46 +0800
-Message-ID: <20211206092546.27216-1-mark-yw.chen@mediatek.com>
-X-Mailer: git-send-email 2.18.0
+        Mon, 6 Dec 2021 04:54:10 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:40137 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S241503AbhLFJyK (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 6 Dec 2021 04:54:10 -0500
+Received: from [192.168.0.2] (ip5f5aea86.dynamic.kabel-deutschland.de [95.90.234.134])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id CA94B61E5FE00;
+        Mon,  6 Dec 2021 10:50:39 +0100 (CET)
+Message-ID: <61e772a7-6e46-7c0f-32ba-b3e3ad88062c@molgen.mpg.de>
+Date:   Mon, 6 Dec 2021 10:50:39 +0100
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.3.2
+Subject: Re: [PATCH] Bluetooth: btusb: Handle download_firmware failure cases.
+Content-Language: en-US
+To:     mark-yw.chen@mediatek.com
+Cc:     aaron.hou@mediatek.com, kaichuan.hsieh@canonical.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org,
+        marcel@holtmann.org, johan.hedberg@gmail.com,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Sean Wang <sean.wang@mediatek.com>
+References: <20211206092546.27216-1-mark-yw.chen@mediatek.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <20211206092546.27216-1-mark-yw.chen@mediatek.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: mark-yw.chen <mark-yw.chen@mediatek.com>
+Dear Mark,
 
-For Mediatek chipset, if there are no firmware bin or command_timeout,
-the process should be terminated in btusb_mtk_setup().
 
-Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
-Change-Id: I99f1d7b72fa70643d9123e7e6cdc8d0b4369ce52
----
- drivers/bluetooth/btmtk.c | 1 +
- drivers/bluetooth/btusb.c | 4 ++++
- 2 files changed, 5 insertions(+)
+Some small nitpicks:
 
-diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
-index c2ee5c4b975a..526dfdf1fe01 100644
---- a/drivers/bluetooth/btmtk.c
-+++ b/drivers/bluetooth/btmtk.c
-@@ -121,6 +121,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
- 				} else {
- 					bt_dev_err(hdev, "Failed wmt patch dwnld status (%d)",
- 						   status);
-+					err = -EIO;
- 					goto err_release_fw;
- 				}
- 			}
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index ab169fc673ea..3ea04b1d0750 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -2554,6 +2554,10 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
- 			 dev_id & 0xffff, (fw_version & 0xff) + 1);
- 		err = btmtk_setup_firmware_79xx(hdev, fw_bin_name,
- 						btusb_mtk_hci_wmt_sync);
-+		if (err < 0) {
-+			bt_dev_err(hdev, "Failed to setup firmware (%d)", err);
-+			return err;
-+		}
- 
- 		/* It's Device EndPoint Reset Option Register */
- 		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
--- 
-2.18.0
+Am 06.12.21 um 10:25 schrieb mark-yw.chen@mediatek.com:
+> From: mark-yw.chen <mark-yw.chen@mediatek.com>
 
+Instead of the user name, maybe you can use Mark Chen (or the whole name)?
+
+     $ git config --global user.name "Mark Chen"
+     $ git commit --amend --reset-author="Mark Chen 
+<mark-yw.chen@mediatek.com>"
+
+Also could you please remove the trailing dot/period at the end of the 
+git commit message summary?
+
+> For Mediatek chipset, if there are no firmware bin or command_timeout,
+> the process should be terminated in btusb_mtk_setup().
+
+Otherwise what happens?
+
+> Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+> Change-Id: I99f1d7b72fa70643d9123e7e6cdc8d0b4369ce52
+
+To what Gerrit instance does the Change-Id belong? Without that 
+information (Reviewed-on tag?), it should be removed?
+
+> ---
+>   drivers/bluetooth/btmtk.c | 1 +
+>   drivers/bluetooth/btusb.c | 4 ++++
+>   2 files changed, 5 insertions(+)
+> 
+> diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+> index c2ee5c4b975a..526dfdf1fe01 100644
+> --- a/drivers/bluetooth/btmtk.c
+> +++ b/drivers/bluetooth/btmtk.c
+> @@ -121,6 +121,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+>   				} else {
+>   					bt_dev_err(hdev, "Failed wmt patch dwnld status (%d)",
+>   						   status);
+> +					err = -EIO;
+>   					goto err_release_fw;
+>   				}
+>   			}
+> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> index ab169fc673ea..3ea04b1d0750 100644
+> --- a/drivers/bluetooth/btusb.c
+> +++ b/drivers/bluetooth/btusb.c
+> @@ -2554,6 +2554,10 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+>   			 dev_id & 0xffff, (fw_version & 0xff) + 1);
+>   		err = btmtk_setup_firmware_79xx(hdev, fw_bin_name,
+>   						btusb_mtk_hci_wmt_sync);
+> +		if (err < 0) {
+> +			bt_dev_err(hdev, "Failed to setup firmware (%d)", err);
+
+The verb is spelled with a space: set up.
+
+Also, this error message seems unrelated to the patch in question. Maybe 
+add it in a separate commit?
+
+> +			return err;
+> +		}
+>   
+>   		/* It's Device EndPoint Reset Option Register */
+>   		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
+> 
+
+
+Kind regards,
+
+Paul
