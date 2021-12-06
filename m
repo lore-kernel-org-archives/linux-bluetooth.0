@@ -2,89 +2,85 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82395C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Dec 2021 07:20:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id DB737C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Dec 2021 09:25:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238438AbhLFHXa (ORCPT
+        id S240658AbhLFJ3Y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Dec 2021 02:23:30 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:47962 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238367AbhLFHX3 (ORCPT
+        Mon, 6 Dec 2021 04:29:24 -0500
+Received: from mailgw01.mediatek.com ([60.244.123.138]:44262 "EHLO
+        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S240600AbhLFJ3X (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Dec 2021 02:23:29 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B9FB61174
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Dec 2021 07:20:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D81EC341C1
-        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Dec 2021 07:20:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1638775200;
-        bh=myvxbjdrQ5XC6gIlAW09lyDy+Kekom/CgPKZFD55xjM=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=sf8/M5Xj24Qq0sDQOI0CP3VGCYEiXA73pP7zqRhsIGrFk/mKllaImv/GnLqfXa2tw
-         2+tFy+KFq6QLbj4mwfJys018mrBYUiwuThj37Abc+IGh5tEA6FScjHRFPA3Gql7ezn
-         FwIsQCrJEBKPA+GAUDEHw79n6NnWhV8qPwbvR5b/A1/jzDQ3ZVeiZ8RtWcLuz05Uz5
-         gV3dhV0cLIjNLFPBM/azMbHD0T2OYpz6xKXdjjHN+LRJ1bz7iLED59QdGFwYkoGGPY
-         tC3dYS9tVW75ATdaVm9P3XirA3Z6LxjlRsjNd+VRaISKq+LVSWUTEVRg9/sSQwHbDy
-         7BZxMCaPoBJLw==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 31A4661158; Mon,  6 Dec 2021 07:20:00 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215187] btintel: AX201: missing firmware ibt-19-16-0.sfi
-Date:   Mon, 06 Dec 2021 07:19:59 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: kiran.k@intel.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: cc
-Message-ID: <bug-215187-62941-GYKYU5bhBa@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215187-62941@https.bugzilla.kernel.org/>
-References: <bug-215187-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        Mon, 6 Dec 2021 04:29:23 -0500
+X-UUID: 345462dc4d974bffab457c69e00633ea-20211206
+X-UUID: 345462dc4d974bffab457c69e00633ea-20211206
+Received: from mtkexhb01.mediatek.inc [(172.21.101.102)] by mailgw01.mediatek.com
+        (envelope-from <mark-yw.chen@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1631942379; Mon, 06 Dec 2021 17:25:53 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Mon, 6 Dec 2021 17:25:51 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Mon, 6 Dec 2021 17:25:51 +0800
+From:   <mark-yw.chen@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <mark-yw.chen@mediatek.com>, <aaron.hou@mediatek.com>,
+        <kaichuan.hsieh@canonical.com>, <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: [PATCH] Bluetooth: btusb: Handle download_firmware failure cases.
+Date:   Mon, 6 Dec 2021 17:25:46 +0800
+Message-ID: <20211206092546.27216-1-mark-yw.chen@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 MIME-Version: 1.0
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215187
+From: mark-yw.chen <mark-yw.chen@mediatek.com>
 
-Kiran (kiran.k@intel.com) changed:
+For Mediatek chipset, if there are no firmware bin or command_timeout,
+the process should be terminated in btusb_mtk_setup().
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-                 CC|                            |kiran.k@intel.com
+Signed-off-by: mark-yw.chen <mark-yw.chen@mediatek.com>
+Change-Id: I99f1d7b72fa70643d9123e7e6cdc8d0b4369ce52
+---
+ drivers/bluetooth/btmtk.c | 1 +
+ drivers/bluetooth/btusb.c | 4 ++++
+ 2 files changed, 5 insertions(+)
 
---- Comment #2 from Kiran (kiran.k@intel.com) ---
-Hi Takahide Nojima,
+diff --git a/drivers/bluetooth/btmtk.c b/drivers/bluetooth/btmtk.c
+index c2ee5c4b975a..526dfdf1fe01 100644
+--- a/drivers/bluetooth/btmtk.c
++++ b/drivers/bluetooth/btmtk.c
+@@ -121,6 +121,7 @@ int btmtk_setup_firmware_79xx(struct hci_dev *hdev, const char *fwname,
+ 				} else {
+ 					bt_dev_err(hdev, "Failed wmt patch dwnld status (%d)",
+ 						   status);
++					err = -EIO;
+ 					goto err_release_fw;
+ 				}
+ 			}
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index ab169fc673ea..3ea04b1d0750 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2554,6 +2554,10 @@ static int btusb_mtk_setup(struct hci_dev *hdev)
+ 			 dev_id & 0xffff, (fw_version & 0xff) + 1);
+ 		err = btmtk_setup_firmware_79xx(hdev, fw_bin_name,
+ 						btusb_mtk_hci_wmt_sync);
++		if (err < 0) {
++			bt_dev_err(hdev, "Failed to setup firmware (%d)", err);
++			return err;
++		}
+ 
+ 		/* It's Device EndPoint Reset Option Register */
+ 		btusb_mtk_uhw_reg_write(data, MTK_EP_RST_OPT, MTK_EP_RST_IN_OUT_OPT);
+-- 
+2.18.0
 
-Could you please check with 22.80 version of firmware for AX201 ? One issue
-related to firmware version got fixed in below release
-
-https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
-/commit/?id=3D142174abc58e4529d5c4ec410a955bf0885dbe6f
-
-Thanks,
-Kiran
-
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
