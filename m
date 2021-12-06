@@ -2,199 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 84177C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sun,  5 Dec 2021 10:59:29 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 82395C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon,  6 Dec 2021 07:20:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233029AbhLELCz (ORCPT
+        id S238438AbhLFHXa (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sun, 5 Dec 2021 06:02:55 -0500
-Received: from mga06.intel.com ([134.134.136.31]:63929 "EHLO mga06.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232844AbhLELCz (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sun, 5 Dec 2021 06:02:55 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10188"; a="297976220"
-X-IronPort-AV: E=Sophos;i="5.87,289,1631602800"; 
-   d="scan'208";a="297976220"
-Received: from orsmga005.jf.intel.com ([10.7.209.41])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Dec 2021 02:59:28 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,289,1631602800"; 
-   d="scan'208";a="678655419"
-Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by orsmga005.jf.intel.com with ESMTP; 05 Dec 2021 02:59:27 -0800
-Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1mtpEs-000K4E-Gf; Sun, 05 Dec 2021 10:59:26 +0000
-Date:   Sun, 05 Dec 2021 18:58:58 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Marcel Holtmann <marcel@holtmann.org>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- aeb8b133415a7de34e66d1da42c9824248b212cc
-Message-ID: <61ac9b72.gGE6DzSr06kYAJXZ%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Mon, 6 Dec 2021 02:23:30 -0500
+Received: from dfw.source.kernel.org ([139.178.84.217]:47962 "EHLO
+        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238367AbhLFHX3 (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Mon, 6 Dec 2021 02:23:29 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 0B9FB61174
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Dec 2021 07:20:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5D81EC341C1
+        for <linux-bluetooth@vger.kernel.org>; Mon,  6 Dec 2021 07:20:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638775200;
+        bh=myvxbjdrQ5XC6gIlAW09lyDy+Kekom/CgPKZFD55xjM=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=sf8/M5Xj24Qq0sDQOI0CP3VGCYEiXA73pP7zqRhsIGrFk/mKllaImv/GnLqfXa2tw
+         2+tFy+KFq6QLbj4mwfJys018mrBYUiwuThj37Abc+IGh5tEA6FScjHRFPA3Gql7ezn
+         FwIsQCrJEBKPA+GAUDEHw79n6NnWhV8qPwbvR5b/A1/jzDQ3ZVeiZ8RtWcLuz05Uz5
+         gV3dhV0cLIjNLFPBM/azMbHD0T2OYpz6xKXdjjHN+LRJ1bz7iLED59QdGFwYkoGGPY
+         tC3dYS9tVW75ATdaVm9P3XirA3Z6LxjlRsjNd+VRaISKq+LVSWUTEVRg9/sSQwHbDy
+         7BZxMCaPoBJLw==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 31A4661158; Mon,  6 Dec 2021 07:20:00 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215187] btintel: AX201: missing firmware ibt-19-16-0.sfi
+Date:   Mon, 06 Dec 2021 07:19:59 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: kiran.k@intel.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: cc
+Message-ID: <bug-215187-62941-GYKYU5bhBa@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215187-62941@https.bugzilla.kernel.org/>
+References: <bug-215187-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: aeb8b133415a7de34e66d1da42c9824248b212cc  Bluetooth: hci_sync: Set Privacy Mode when updating the resolving list
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215187
 
-elapsed time: 1059m
+Kiran (kiran.k@intel.com) changed:
 
-configs tested: 140
-configs skipped: 3
+           What    |Removed                     |Added
+----------------------------------------------------------------------------
+                 CC|                            |kiran.k@intel.com
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
+--- Comment #2 from Kiran (kiran.k@intel.com) ---
+Hi Takahide Nojima,
 
-gcc tested configs:
-arm64                            allyesconfig
-arm                              allyesconfig
-arm                              allmodconfig
-arm                                 defconfig
-arm64                               defconfig
-powerpc                     mpc5200_defconfig
-sh                      rts7751r2d1_defconfig
-nios2                               defconfig
-arm                        clps711x_defconfig
-arc                              allyesconfig
-sh                            hp6xx_defconfig
-riscv                    nommu_k210_defconfig
-openrisc                         alldefconfig
-sh                        sh7785lcr_defconfig
-arm                         axm55xx_defconfig
-powerpc                 mpc832x_rdb_defconfig
-m68k                          atari_defconfig
-powerpc                     tqm8560_defconfig
-sh                     sh7710voipgw_defconfig
-arm                       aspeed_g5_defconfig
-powerpc                      cm5200_defconfig
-powerpc                     skiroot_defconfig
-arm                           sunxi_defconfig
-arm                          ep93xx_defconfig
-m68k                            mac_defconfig
-arm                          badge4_defconfig
-arc                     nsimosci_hs_defconfig
-mips                      pic32mzda_defconfig
-powerpc                     tqm8541_defconfig
-powerpc                      tqm8xx_defconfig
-powerpc                      walnut_defconfig
-m68k                        m5407c3_defconfig
-ia64                          tiger_defconfig
-xtensa                       common_defconfig
-sh                   sh7724_generic_defconfig
-powerpc                    socrates_defconfig
-sh                           se7712_defconfig
-arm                           stm32_defconfig
-arm                      integrator_defconfig
-sh                           se7780_defconfig
-arm                         lubbock_defconfig
-s390                       zfcpdump_defconfig
-sh                        sh7757lcr_defconfig
-sh                           se7721_defconfig
-um                           x86_64_defconfig
-arm                            qcom_defconfig
-powerpc                 mpc8272_ads_defconfig
-arm                        mvebu_v5_defconfig
-arm                            mps2_defconfig
-arm                         cm_x300_defconfig
-powerpc                    amigaone_defconfig
-powerpc                     mpc83xx_defconfig
-m68k                           sun3_defconfig
-sh                              ul2_defconfig
-arm                          moxart_defconfig
-h8300                    h8300h-sim_defconfig
-powerpc                     mpc512x_defconfig
-sh                         apsh4a3a_defconfig
-powerpc                          g5_defconfig
-sh                            migor_defconfig
-arm                  randconfig-c002-20211205
-ia64                             allmodconfig
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nds32                             allnoconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-h8300                            allyesconfig
-xtensa                           allyesconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allmodconfig
-mips                             allyesconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a006-20211205
-x86_64               randconfig-a005-20211205
-x86_64               randconfig-a001-20211205
-x86_64               randconfig-a002-20211205
-x86_64               randconfig-a004-20211205
-x86_64               randconfig-a003-20211205
-i386                 randconfig-a001-20211205
-i386                 randconfig-a005-20211205
-i386                 randconfig-a003-20211205
-i386                 randconfig-a002-20211205
-i386                 randconfig-a006-20211205
-i386                 randconfig-a004-20211205
-i386                 randconfig-a001-20211203
-i386                 randconfig-a005-20211203
-i386                 randconfig-a002-20211203
-i386                 randconfig-a003-20211203
-i386                 randconfig-a006-20211203
-i386                 randconfig-a004-20211203
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
+Could you please check with 22.80 version of firmware for AX201 ? One issue
+related to firmware version got fixed in below release
 
-clang tested configs:
-x86_64               randconfig-a016-20211205
-x86_64               randconfig-a011-20211205
-x86_64               randconfig-a013-20211205
-x86_64               randconfig-a015-20211205
-x86_64               randconfig-a012-20211205
-x86_64               randconfig-a014-20211205
-i386                 randconfig-a013-20211205
-i386                 randconfig-a016-20211205
-i386                 randconfig-a011-20211205
-i386                 randconfig-a014-20211205
-i386                 randconfig-a012-20211205
-i386                 randconfig-a015-20211205
-hexagon              randconfig-r045-20211205
-s390                 randconfig-r044-20211205
-riscv                randconfig-r042-20211205
-hexagon              randconfig-r041-20211205
+https://git.kernel.org/pub/scm/linux/kernel/git/firmware/linux-firmware.git=
+/commit/?id=3D142174abc58e4529d5c4ec410a955bf0885dbe6f
 
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Thanks,
+Kiran
+
+--=20
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.=
