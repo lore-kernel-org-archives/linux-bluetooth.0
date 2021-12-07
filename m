@@ -2,109 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 22780C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Dec 2021 02:34:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99969C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue,  7 Dec 2021 05:39:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243794AbhLGChi (ORCPT
+        id S235959AbhLGFnI (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 6 Dec 2021 21:37:38 -0500
-Received: from mga02.intel.com ([134.134.136.20]:31924 "EHLO mga02.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S232285AbhLGChi (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 6 Dec 2021 21:37:38 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10190"; a="224732061"
-X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="224732061"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2021 18:34:08 -0800
-X-IronPort-AV: E=Sophos;i="5.87,293,1631602800"; 
-   d="scan'208";a="748520897"
-Received: from mzeuthen-mobl.amr.corp.intel.com (HELO [10.252.128.173]) ([10.252.128.173])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Dec 2021 18:34:07 -0800
-Message-ID: <7a1cfaac41ddbe617a6a6c283cb82b0baba0bda3.camel@linux.intel.com>
-Subject: Re: [PATCH 1/6] tools/mesh-gatt: Add onoff set unack message to
- onoff client model
-From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
-To:     daniele.biagetti@cblelectronics.com,
-        linux-bluetooth@vger.kernel.org
-Date:   Mon, 06 Dec 2021 18:34:07 -0800
-In-Reply-To: <000501d7e85f$2105e2d0$6311a870$@cblelectronics.com>
-References: <000501d7e85f$2105e2d0$6311a870$@cblelectronics.com>
-Organization: Intel Corporation
-Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.40.4 (3.40.4-1.fc34) 
+        Tue, 7 Dec 2021 00:43:08 -0500
+Received: from so254-9.mailgun.net ([198.61.254.9]:49501 "EHLO
+        so254-9.mailgun.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234147AbhLGFnH (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 7 Dec 2021 00:43:07 -0500
+DKIM-Signature: a=rsa-sha256; v=1; c=relaxed/relaxed; d=mg.codeaurora.org; q=dns/txt;
+ s=smtp; t=1638855578; h=Message-ID: References: In-Reply-To: Subject:
+ Cc: To: From: Date: Content-Transfer-Encoding: Content-Type:
+ MIME-Version: Sender; bh=UKewAIFiJrkQQJEmsNAIUgWl1Cnv1mvrzX9VaOWue/w=;
+ b=fKxpk2me6t6HHkNSppsQSlnkFRgcY4Hk/yHVUKtSfJgXexS4M8Ek5bekYMS7/9GaFvS/bvcz
+ 1xsrrJaWjmWiBwo3kbwJZS90nXEM0bk2kmvfWx8h+9KdsZ2GLlIjDx6CF4Wk/C/P67pwVabt
+ vF3/pXA/9O4A5W9X65DnmlzlP8s=
+X-Mailgun-Sending-Ip: 198.61.254.9
+X-Mailgun-Sid: WyI2MTA3ZSIsICJsaW51eC1ibHVldG9vdGhAdmdlci5rZXJuZWwub3JnIiwgImJlOWU0YSJd
+Received: from smtp.codeaurora.org
+ (ec2-35-166-182-171.us-west-2.compute.amazonaws.com [35.166.182.171]) by
+ smtp-out-n03.prod.us-east-1.postgun.com with SMTP id
+ 61aef399df12ba53c4d6a621 (version=TLS1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256); Tue, 07 Dec 2021 05:39:37
+ GMT
+Sender: pharish=codeaurora.org@mg.codeaurora.org
+Received: by smtp.codeaurora.org (Postfix, from userid 1001)
+        id AC2BFC43616; Tue,  7 Dec 2021 05:39:36 +0000 (UTC)
+Received: from mail.codeaurora.org (localhost.localdomain [127.0.0.1])
+        (using TLSv1 with cipher ECDHE-RSA-AES256-SHA (256/256 bits))
+        (No client certificate requested)
+        (Authenticated sender: pharish)
+        by smtp.codeaurora.org (Postfix) with ESMTPSA id 11B9EC4338F;
+        Tue,  7 Dec 2021 05:39:35 +0000 (UTC)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+Date:   Tue, 07 Dec 2021 11:09:35 +0530
+From:   pharish@codeaurora.org
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
+        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
+        hemantg@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        bgodavar@codeaurora.org, rjliao@codeaurora.org,
+        hbandi@codeaurora.org, abhishekpandit@chromium.org,
+        mcchou@chromium.org, saluvala@codeaurora.org
+Subject: Re: [PATCH v1] Bluetooth: hci_qca: Stop IBS timer during BT OFF
+In-Reply-To: <A078C973-AAAF-4BD2-85DA-F8017CE89012@holtmann.org>
+References: <1637846230-4798-1-git-send-email-pharish@codeaurora.org>
+ <1637846230-4798-2-git-send-email-pharish@codeaurora.org>
+ <A078C973-AAAF-4BD2-85DA-F8017CE89012@holtmann.org>
+Message-ID: <c767becd1ded90dc0cf4b76f38d779b0@codeaurora.org>
+X-Sender: pharish@codeaurora.org
+User-Agent: Roundcube Webmail/1.3.9
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Daniel,
-
-Please add the commit message for each patches.
-And the CI bot was not able to apply the patch. Please resubmit after
-rebasing to the tip.
-
-Regards,
-Tedd
-
-On Fri, 2021-12-03 at 17:02 +0100, daniele.biagetti@cblelectronics.com wrote:
-> ---
->  tools/mesh-gatt/onoff-model.c | 23 +++++++++++++++++------
->  1 file changed, 17 insertions(+), 6 deletions(-)
+On 2021-11-26 00:12, Marcel Holtmann wrote:
+> Hi,
 > 
-> diff --git a/tools/mesh-gatt/onoff-model.c b/tools/mesh-gatt/onoff-model.c
-> index 9dfedd85a..13ff4bbe3 100644
-> --- a/tools/mesh-gatt/onoff-model.c
-> +++ b/tools/mesh-gatt/onoff-model.c
-> @@ -226,6 +226,8 @@ static void cmd_set(int argc, char *argv[])
->         uint16_t n;
->         uint8_t msg[32];
->         struct mesh_node *node;
-> +       int np;
-> +       uint32_t opcode;
->  
->         if (IS_UNASSIGNED(target)) {
->                 bt_shell_printf("Destination not set\n");
-> @@ -237,13 +239,22 @@ static void cmd_set(int argc, char *argv[])
->         if (!node)
->                 return;
->  
-> -       if ((read_input_parameters(argc, argv) != 1) &&
-> -                                       parms[0] != 0 && parms[0] != 1) {
-> -               bt_shell_printf("Bad arguments: Expecting \"0\" or
-> \"1\"\n");
-> -               return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       np = read_input_parameters(argc, argv);
-> +       if ((np != 1) && (np != 2) &&
-> +               parms[0] != 0 && parms[0] != 1 &&
-> +               parms[1] != 0 && parms[1] != 1) {
-> +       bt_shell_printf("Bad arguments: Expecting \"0\" or \"1\" "
-> +               "and an optional \"0\" or \"1\" as unack\n");
-> +       return bt_shell_noninteractive_quit(EXIT_FAILURE);
-> +       }
-> +
-> +       if( (np==2) && parms[1] ){
-> +               opcode = OP_GENERIC_ONOFF_SET_UNACK;
-> +       }else{
-> +               opcode = OP_GENERIC_ONOFF_SET;
->         }
->  
-> -       n = mesh_opcode_set(OP_GENERIC_ONOFF_SET, msg);
-> +       n = mesh_opcode_set(opcode, msg);
->         msg[n++] = parms[0];
->         msg[n++] = trans_id++;
->  
-> @@ -263,7 +274,7 @@ static const struct bt_shell_menu onoff_menu = {
->                                                 "Set node to configure"},
->         {"get",                 NULL,
-> cmd_get_status,
->                                                 "Get ON/OFF status"},
-> -       {"onoff",               "<0/1>",                        cmd_set,
-> +       {"onoff",               "<0/1> [unack]",                cmd_set,
->                                                 "Send \"SET ON/OFF\"
-> command"},
->         {} },
->  };
+>> This change stops IBS timers during BT OFF.
+>> 
+>> Signed-off-by: pharish <pharish@codeaurora.org>
+> 
+> clear name please.
 
+[Harish]: will update
 
+> 
+>> ---
+>> drivers/bluetooth/hci_qca.c | 3 +++
+>> 1 file changed, 3 insertions(+)
+>> 
+>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>> index dd768a8..6f44b26 100644
+>> --- a/drivers/bluetooth/hci_qca.c
+>> +++ b/drivers/bluetooth/hci_qca.c
+>> @@ -1928,6 +1928,9 @@ static int qca_power_off(struct hci_dev *hdev)
+>> 	hu->hdev->hw_error = NULL;
+>> 	hu->hdev->cmd_timeout = NULL;
+>> 
+>> +	mod_timer(&qca->tx_idle_timer, 0);
+>> +	mod_timer(&qca->wake_retrans_timer, 0);
+>> +
+> 
+> And I would really prefer if this gets changed to use a workqueue
+> instead of a timer.
+
+[Harish]: The full implementation of IBS is based on timers
+to that reason I have switched to timers.
+
+> 
+> Regards
+> 
+> Marcel
