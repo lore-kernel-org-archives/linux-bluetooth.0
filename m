@@ -2,83 +2,98 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 98271C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 21:10:59 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8059CC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 21:49:53 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237030AbhLHVOa (ORCPT
+        id S237614AbhLHVxZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 16:14:30 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51132 "EHLO
+        Wed, 8 Dec 2021 16:53:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:59780 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236037AbhLHVOa (ORCPT
+        with ESMTP id S237597AbhLHVxY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 16:14:30 -0500
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E939EC061746
-        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 13:10:57 -0800 (PST)
-Received: by mail-ua1-x934.google.com with SMTP id ay21so7038345uab.12
-        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Dec 2021 13:10:57 -0800 (PST)
+        Wed, 8 Dec 2021 16:53:24 -0500
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9848C061746
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 13:49:51 -0800 (PST)
+Received: by mail-pl1-x62c.google.com with SMTP id p18so2414283plf.13
+        for <linux-bluetooth@vger.kernel.org>; Wed, 08 Dec 2021 13:49:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
-         :cc;
-        bh=kltfpp/isGbgdVHChNfcr0yQ+v0QnIuq75sSENxfFbs=;
-        b=bPyDNJ7ggynYkgThwj59A7bC8UBhiiHwNLbmZrX8bZQGvTO0+F+57/5svcKAuiWqNl
-         RenEgngEKfRIoMjNBh9d+nmVPR6/2VeWZfvtJSvI+JBurTk0Ir2WykHO1sfgZqHB6GoZ
-         vj2QaHflW7UKjIQj4XkBRXw/mgpt72Zo1XEZN++EjZAppSZ5BrPpHaG8TjhcBvXY/pAW
-         M9QjfQPFJHjP9mHiesmURM/BZKUS6pq9zNcHNh/OPGtfJvoxNgPR6tfbQDFbX46FWmXG
-         /cFXjOqcBIahbWECJwmNBoYMat3/Y+5RExpybcbSL7kyqtaSXf/pUy+4w0Ag3YwF2eAm
-         DKYg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aa+hIvKdopvGH/i1zdQNveafW35HYLtARPAC9bdhulM=;
+        b=X3ONIPL4DW3eGzoWe5V+MkWqePLrSItBG4yf4Mf5iNbTmFnfQQ1X8xXwL0/2lu3QLt
+         ompYPRg8AmoY7TXqSprU0Jm8Rz1seLYflxl3IPQxioJDMQETsf00YsEEihxC5ylXSFuH
+         wpQLhaw4syVUpnfONafPBOgSrJApC2+GV0rIi3WkannGvftqvrDhpBRwogEo9YyxAok6
+         GNwtRKiz8fFrvTeK1AmpodZgzA2vLAZB6ecr+OgZK7pnvDsMUXMhhB7f8vUoIeoAfCXv
+         i+Azm3nc7jEeotHblQPVE0BM8t/lXyOeOwKRCRICzN0lu/2OAmUpApGk+tKnIHTi5F/4
+         VtcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
-         :message-id:subject:to:cc;
-        bh=kltfpp/isGbgdVHChNfcr0yQ+v0QnIuq75sSENxfFbs=;
-        b=PD9i3X8xcftWsU31Mko8tCffkOSvyv+PUoqcZ/uRtP+qW9z0RXNXUPmjYCGz/MszW8
-         2A787AhyIIEnJz1k1XS9ppJH26dEZ1xLhBRU/tHL66MoOmLs3/c0/SszNrEbXxX8Q/xp
-         sn5HSWz11oODASyHkoIi6Yaf09bj0iakC+r8Q+7hWw6qe409fUScCDqYrxfPui0eu3ap
-         lHDWfffLJkg63ey5waG8AA8yndON3jltD86NGRqwqrWYJ7/NT8H6faAm0Qe3cD4Wjbig
-         95VFWnzwG9oeoKMVc2GfgYJktCSbQMp5V/ULh6U0JUVjEPf7u/iPfRy+5KVnwchABuXM
-         GFYQ==
-X-Gm-Message-State: AOAM533YwMDUToh3Ou6C9O8+FWMEPKUcx3t6KMe4EDA97Tu4QdYoirVS
-        KLXF9rE53fISVs/CNRxdooHNXvBeZm/8GWXx21t2k443
-X-Google-Smtp-Source: ABdhPJzfKHVqXaVR+gO73KA6lTz1L3/Of9/cYNXerg+WkPoUYFhaj5AbwWJKR8Nx1PsCLsb+lL24H+VyL6vUyoxSj2A=
-X-Received: by 2002:a67:3093:: with SMTP id w141mr1507296vsw.24.1638997857032;
- Wed, 08 Dec 2021 13:10:57 -0800 (PST)
-MIME-Version: 1.0
-References: <202112062257.1B6MvJMT374832@d7010.compata.com> <202112080601.1B861HZC669128@d7010.compata.com>
-In-Reply-To: <202112080601.1B861HZC669128@d7010.compata.com>
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=aa+hIvKdopvGH/i1zdQNveafW35HYLtARPAC9bdhulM=;
+        b=pC4Su2wY9Xokeuck4XjPkzYhuh9rVI6qZj06xP/SHA7Tv1uBOwZBP9TovHoyIpXKK6
+         4kTXi7g8EhwQf3ZLtCyzS41f/A2xv2Aq8UZpLxGHcjGaltmkmqsGkAxZeJx83xWP6yTW
+         78pYp1iOi7qQYdQIBfzwHYJIQT6IDkwl9+M+s8h7rFRWL9kFNnAvJbA1Ef+Rxe9+mkkI
+         cLWMicLviJj3aZuFaN0WvEZtbO3Icw5v/fdOdNh0qgpYXOQw9EEpKF+7IEx/LynIcDp3
+         ctp5LaIA5pldWC4vbCDLOnnMO3LtGwnq0FXmF0EDkJBwpz609rMAyYwYvhJZfYQOwQxS
+         2z+A==
+X-Gm-Message-State: AOAM530447TRfVtca0Tmt9Q6Otr6OX6WPhOP6A73EpguXQqnfeQ+abd1
+        U7JdDyqzzzLKMAZvAt7eiZ7yUvaDfDI=
+X-Google-Smtp-Source: ABdhPJytV5gI89VWnN7lmrCrZy/DpBEPXvjegyhNeOov1tVL5EvfYG59UnhvI5krCvkT0gzYAK1Nsw==
+X-Received: by 2002:a17:90a:7086:: with SMTP id g6mr10410654pjk.34.1639000190982;
+        Wed, 08 Dec 2021 13:49:50 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id f19sm4504464pfv.76.2021.12.08.13.49.50
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 08 Dec 2021 13:49:50 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Wed, 8 Dec 2021 13:10:46 -0800
-Message-ID: <CABBYNZJBnFAxt+97w804gWpYca+f-Tn8Pq6gr5bUnx5kcwJDpw@mail.gmail.com>
-Subject: Re: hcidump replacement
-To:     Dave Close <dave@compata.com>
-Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH v2 1/2] Bluetooth: hci_sync: Fix not always pausing advertising when necessary
+Date:   Wed,  8 Dec 2021 13:49:48 -0800
+Message-Id: <20211208214949.455089-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Dave,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-On Wed, Dec 8, 2021 at 1:32 AM Dave Close <dave@compata.com> wrote:
->
-> I wrote:
->
-> >I've been recording data from a sensor using a script like this --
-> >
-> >  while read a; do
-> >    grep <pattern> $a
-> >    # do my stuff
-> >  done < <( hcidump -R )
-> >
-> >Reading tons of web pages and mailing list entries, I still haven't
-> >found anything equivalent that doesn't use the deprecated hcidump.
-> >Suggestions appreciated.
->
-> Is this the wrong list for my question?
+hci_pause_advertising_sync shall always pause advertising until
+hci_resume_advertising_sync but instance 0x00 doesn't count
+in adv_instance_cnt so it was causing it to be skipped.
 
-Check out btmon.
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+v2: Add fix for l2cap-tester direct advertising test cases which was caused
+by hci_pause_advertising_sync not pausing advertising when instance 0x00 is
+used.
 
+ net/bluetooth/hci_sync.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
+
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 3d28ca7ebe45..fd15fb37a52a 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -1701,10 +1701,8 @@ static int hci_pause_advertising_sync(struct hci_dev *hdev)
+ 	int err;
+ 	int old_state;
+ 
+-	/* If there are no instances or advertising has already been paused
+-	 * there is nothing to do.
+-	 */
+-	if (!hdev->adv_instance_cnt || hdev->advertising_paused)
++	/* If already been paused there is nothing to do. */
++	if (hdev->advertising_paused)
+ 		return 0;
+ 
+ 	bt_dev_dbg(hdev, "Pausing directed advertising");
 -- 
-Luiz Augusto von Dentz
+2.33.1
+
