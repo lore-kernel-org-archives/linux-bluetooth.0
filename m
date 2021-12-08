@@ -2,172 +2,135 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4F6ACC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 14:48:14 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C4608C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 17:16:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233026AbhLHOvp convert rfc822-to-8bit (ORCPT
+        id S234599AbhLHRUC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 09:51:45 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:56592 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231411AbhLHOvo (ORCPT
+        Wed, 8 Dec 2021 12:20:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52862 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232640AbhLHRUB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 09:51:44 -0500
-Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 18D3DCED27;
-        Wed,  8 Dec 2021 15:48:11 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.20.0.1.32\))
-Subject: Re: [PATCH] Bluetooth: btqca: sequential validation
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1638952007-32222-1-git-send-email-quic_saluvala@quicinc.com>
-Date:   Wed, 8 Dec 2021 15:48:10 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        quic_hemantg@quicinc.com, MSM <linux-arm-msm@vger.kernel.org>,
-        quic_bgodavar@quicinc.com, Rocky Liao <rjliao@codeaurora.org>,
-        hbandi@codeaurora.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        Miao-chen Chou <mcchou@chromium.org>, quic_pharish@quicinc.com
-Content-Transfer-Encoding: 8BIT
-Message-Id: <2DFAE4A9-5101-49B9-86BB-2D82883E930C@holtmann.org>
-References: <1638952007-32222-1-git-send-email-quic_saluvala@quicinc.com>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
-X-Mailer: Apple Mail (2.3693.20.0.1.32)
+        Wed, 8 Dec 2021 12:20:01 -0500
+Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5AA3C061746
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 09:16:29 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by ams.source.kernel.org (Postfix) with ESMTPS id 6C59EB821C8
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 17:16:28 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 19E98C341C7
+        for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 17:16:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1638983787;
+        bh=iF5cGwZXJBKiiAGMQ9kJ7loE5P9AVHtL8q4cPgYehpw=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=A2UuKobicM5+fv5QIV0b/kYi+P374SMZES/nMJMVVxaFNHDGjicYjSM4jYH2zpbNP
+         EGfKk1xW6NMQIg9jErFH0FaEI4r8RM4hsMouBIrBZG9l2AjTPo9V/2JNDvHPiXAlvA
+         ELDA4O1JUrMGnQx3hOY2efLrxcNDtJP3WETsP9QdfXtaJmIIHTNpkV8wmoH2j3WasM
+         Nb5Vnm/tIBsxWG8DFzWORrZ+YLfmfHCalewN76L02UZvWsTAOfaMFTSERvfnm8RpXv
+         tAhvVSJ8EofqC531Bv2IdABFnVUfCuRDTPDE1EkiPbWb+iQ9HjX2JIfXmTBWKzudW+
+         1M03lcphi72+g==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 0078560F48; Wed,  8 Dec 2021 17:16:26 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215187] btintel: AX201: missing firmware ibt-19-16-0.sfi
+Date:   Wed, 08 Dec 2021 17:16:26 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: normal
+X-Bugzilla-Who: nozzy123nozzy@gmail.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215187-62941-rNQUYn5L1C@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215187-62941@https.bugzilla.kernel.org/>
+References: <bug-215187-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
+MIME-Version: 1.0
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sai,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215187
 
-> This change will have sequential validation support
-> & patch config command is added
-> 
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
-> ---
-> drivers/bluetooth/btqca.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btqca.h |  3 +++
-> 2 files changed, 48 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index be04d74..9a2fd17 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -141,6 +141,49 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
-> 	return err;
-> }
-> 
-> +int qca_send_patch_config_cmd(struct hci_dev *hdev, enum qca_btsoc_type soc_type)
-> +{
+--- Comment #3 from Takahide Nojima (nozzy123nozzy@gmail.com) ---
+Hi Kiran,
 
-look, I have limited understanding for people ignoring warnings. The missing static declaration is obvious and when you compile the code it will actually tell you about it.
+  I removed the whole /lib/firmware directory and put 22.80 to  /lib/firmwa=
+re.
+I  booted again with 5.16-rc3.
 
-> +	struct sk_buff *skb;
-> +	int err = 0;
-> +	u8 cmd[5] = {EDL_PATCH_CONFIG_CMD, 0x01, 0, 0, 0};
+ As a result, the kernel loaded "iwlwifi-Quiz-a0-hr-b0-63.ucode", but the
+kernel tried to load a different version of Bluetooth firmware than before.=
+ The
+kernel became to load "intel/ibt-19-16-0.sfi". Before this test, whenever t=
+he
+kernel loaded "iwlwifi-Quiz-a0-hr-b0-63.ucode", it try loading
+intel/ibt-19-0-4.sfi. I will dmesg of this time test as below.
+-----here--------------
+ernel: iwlwifi 0000:00:14.3: firmware: failed to load
+iwlwifi-QuZ-a0-hr-b0-67.ucode (-2)
+kernel: iwlwifi 0000:00:14.3: Direct firmware load for
+iwlwifi-QuZ-a0-hr-b0-67.ucode failed with error -2
+kernel: iwlwifi 0000:00:14.3: firmware: failed to load
+iwlwifi-QuZ-a0-hr-b0-66.ucode (-2)
+kernel: iwlwifi 0000:00:14.3: Direct firmware load for
+iwlwifi-QuZ-a0-hr-b0-66.ucode failed with error -2
+kernel: iwlwifi 0000:00:14.3: firmware: failed to load
+iwlwifi-QuZ-a0-hr-b0-65.ucode (-2)
+kernel: iwlwifi 0000:00:14.3: Direct firmware load for
+iwlwifi-QuZ-a0-hr-b0-65.ucode failed with error -2
+kernel: iwlwifi 0000:00:14.3: firmware: failed to load
+iwlwifi-QuZ-a0-hr-b0-64.ucode (-2)
+kernel: iwlwifi 0000:00:14.3: Direct firmware load for
+iwlwifi-QuZ-a0-hr-b0-64.ucode failed with error -2
+kernel: iwlwifi 0000:00:14.3: firmware: direct-loading firmware
+iwlwifi-QuZ-a0-hr-b0-63.ucode
+kernel: iwlwifi 0000:00:14.3: api flags index 2 larger than supported by dr=
+iver
+kernel: iwlwifi 0000:00:14.3: TLV_FW_FSEQ_VERSION: FSEQ Version: 89.3.35.37
+kernel: iwlwifi 0000:00:14.3: loaded firmware version 63.c04f3485.0
+QuZ-a0-hr-b0-63.ucode op_mode iwlmvm
+kernel: iwlwifi 0000:00:14.3: firmware: failed to load iwl-debug-yoyo.bin (=
+-2)
+kernel: Bluetooth: Core ver 2.22
+kernel: NET: Registered PF_BLUETOOTH protocol family
+kernel: Bluetooth: HCI device and connection manager initialized
+kernel: Bluetooth: HCI socket layer initialized
+kernel: Bluetooth: L2CAP socket layer initialized
+kernel: Bluetooth: SCO socket layer initialized
+kernel: iwlwifi 0000:00:14.3: Detected Intel(R) Wi-Fi 6 AX201 160MHz, REV=
+=3D0x354
+kernel: bluetooth hci0: firmware: failed to load intel/ibt-19-16-0.sfi (-2)
+-------------here--------------------
 
-const u8 cmd[] = { EDL.., .., 0 };
+As written above, the kernel still failed to load intel/ibt-19-16-0.sfi bec=
+ause
+the 22.80 firmware tree doesn't have it.
 
-> +	u8 rlen = 0x02;
-> +	struct edl_event_hdr *edl;
-> +	u8 rtype = EDL_PATCH_CONFIG_CMD;
-> +
-> +	bt_dev_dbg(hdev, "QCA Patch config");
-> +
-> +	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CONFIG_CMD_LEN,
+=E3=80=80I guess basically  the 5.16-rc3 with "iwlwifi-Quiz-a0-hr-b0-63.uco=
+de" supposes
+to load "intel/ibt-19-16-4.sfi"? The 22.80 firmware includes it. In other
+words, does the "ver->fw_revision" in "btintel.c" supposes to be 4 after the
+kernel with "iwlwifi-Quiz-a0-hr-b0-63.ucode" sends 0xfc05 to AX201?
 
-sizeof(cmd)
+--=20
+You may reply to this email to add a comment.
 
-> +			cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-
-Indentation is wrong.
-
-> +	if (IS_ERR(skb)) {
-> +		err = PTR_ERR(skb);
-> +		bt_dev_err(hdev, "Sending QCA Patch config failed (%d)", err);
-> +		return err;
-> +	}
-> +	if (skb->len != rlen) {
-> +		bt_dev_err(hdev, "QCA Patch config cmd size mismatch len %d", skb->len);
-> +		err = -EILSEQ;
-> +		goto out;
-> +	}
-
-Extra empty line,
-
-> +	edl = (struct edl_event_hdr *)(skb->data);
-> +	if (!edl) {
-> +		bt_dev_err(hdev, "QCA Patch config with no header");
-> +		err = -EILSEQ;
-> +		goto out;
-> +	}
-
-Here as well.
-
-> +	if (edl->cresp != EDL_PATCH_CONFIG_RES_EVT || edl->rtype != rtype) {
-> +		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
-> +		 edl->rtype);
-
-Wrong indentation.
-
-> +		err = -EIO;
-> +		goto out;
-> +	}
-> +out:
-> +	kfree(skb);
-> +	if (err)
-> +		bt_dev_err(hdev, "QCA Patch config cmd failed (%d)", err);
-> +
-> +	return err;
-> +}
-> +
-> static int qca_send_reset(struct hci_dev *hdev)
-> {
-> 	struct sk_buff *skb;
-> @@ -551,6 +594,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
-> 	 */
-> 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
-> 
-> +	if (soc_type == QCA_WCN6750)
-> +		qca_send_patch_config_cmd(hdev, soc_type);
-
-Extra empty line.
-
-If you are not using the soc_type, then don’t add it as parameter.
-
-
-> 	/* Download rampatch file */
-> 	config.type = TLV_TYPE_PATCH;
-> 	if (qca_is_wcn399x(soc_type)) {
-> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-> index 30afa77..8fbb4c7 100644
-> --- a/drivers/bluetooth/btqca.h
-> +++ b/drivers/bluetooth/btqca.h
-> @@ -13,6 +13,8 @@
-> #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
-> #define EDL_GET_BUILD_INFO_CMD		(0x20)
-> #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
-> +#define EDL_PATCH_CONFIG_CMD_LEN	(0x05)
-
-Not needed.
-
-> +#define EDL_PATCH_CONFIG_CMD		(0x28)
-> #define MAX_SIZE_PER_TLV_SEGMENT	(243)
-> #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
-> #define QCA_DISABLE_LOGGING		(0xFC17)
-> @@ -24,6 +26,7 @@
-> #define EDL_CMD_EXE_STATUS_EVT		(0x00)
-> #define EDL_SET_BAUDRATE_RSP_EVT	(0x92)
-> #define EDL_NVM_ACCESS_CODE_EVT		(0x0B)
-> +#define EDL_PATCH_CONFIG_RES_EVT	(0x00)
-> #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
-> 
-> #define EDL_TAG_ID_HCI			(17)
-
-Regards
-
-Marcel
-
+You are receiving this mail because:
+You are the assignee for the bug.=
