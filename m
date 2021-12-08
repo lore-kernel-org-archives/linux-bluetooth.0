@@ -2,132 +2,88 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id AD51EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 06:33:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5805BC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 07:20:45 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240264AbhLHGhD (ORCPT
+        id S244498AbhLHHYP (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 01:37:03 -0500
-Received: from mga14.intel.com ([192.55.52.115]:51906 "EHLO mga14.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S235346AbhLHGhC (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 01:37:02 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10191"; a="237994724"
-X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
-   d="scan'208";a="237994724"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Dec 2021 22:33:31 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.87,296,1631602800"; 
-   d="scan'208";a="462649131"
-Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 07 Dec 2021 22:33:28 -0800
-Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1muqW8-0000AR-22; Wed, 08 Dec 2021 06:33:28 +0000
-Date:   Wed, 8 Dec 2021 14:32:53 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org
-Cc:     kbuild-all@lists.01.org
-Subject: Re: [PATCH] Bluetooth: hci_sync: Add hci_le_create_conn_sync
-Message-ID: <202112081458.7Shk6qTD-lkp@intel.com>
-References: <20211208020553.219387-1-luiz.dentz@gmail.com>
+        Wed, 8 Dec 2021 02:24:15 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54832 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S244493AbhLHHYP (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 8 Dec 2021 02:24:15 -0500
+Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1ACBC061574;
+        Tue,  7 Dec 2021 23:20:43 -0800 (PST)
+Received: by mail-ed1-x536.google.com with SMTP id r11so5109509edd.9;
+        Tue, 07 Dec 2021 23:20:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZiQZUZ4Jp9rh3Rck4fCei07yCzSzqa5hdHX2zLrQJwY=;
+        b=kCEcjy+tbsyg22IbRbPqIl1LwBtIa1X3q+YMPu/jhnYMqakPqvm+mm6b3pld52mJkX
+         qKsJm4TDfh1a9BFl+zcBYuxPs9bcozWh3BKtrKsOi94t7PHFeVhitzk2hNsbZlQbWEr+
+         4nF54YOOiQanFiNnVgscU9dGEIZW/wZolos0iBE+wW9hn5fNreNgdcdj/oYlHHVYv83P
+         /ihu7kg5Uo60rWClETe3MkNJxGlc/CTu4oCrkqdCyQZLwJlJX9nfwkBq57+/RWUv3L4P
+         DVCwQLvIcEF5PjZhDoWKQ3xwZBHnuh1KUN6mdo6yvqpjMTbeiM8HY9M5/lIQFrlXYg5V
+         RJBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=ZiQZUZ4Jp9rh3Rck4fCei07yCzSzqa5hdHX2zLrQJwY=;
+        b=wO1PiSBqfuTxF0EJ9JrWu+qG2ua8WI0MkNpPik/jQ0XitDB0k9nBMxnNkHHjpyCSDU
+         ta4J3dZb6tWKk18aHf9l3hXXqFa5aGTvmGBI/j7SNzg3hQjRJV6/B6igGpBBKaHisdFb
+         6EjQfd01vIWGAwmk/8NMfY97AzXdpheTylApmE3BZxo9yjokfVErth+zn8V772+WqTRb
+         /1BL7W9Ki0mxFkb3hJwLaiahbsH/ujvlD6IdypLruzZiLrZ/ieGvTdRosTPwMOl/9dQu
+         4zHiBuvYQIsvpyxHF19o0rnDAHdbPzl7VVU1vOntOobnnAVhF9OqkKsD0Eli1CIwKheI
+         Ddqw==
+X-Gm-Message-State: AOAM531QJw0QA1fPqZziHjw2Nt/Plfrt55i0NsbClM7uIsdlqeoi/MDu
+        Ger3CUoQQGw1JbwYueao2SvK+xZLwJKYMQ==
+X-Google-Smtp-Source: ABdhPJxpyHAt6KP4n1940eTrjggh4myqcf6FdPfXNmSYSCvNa+tANrPtaaEcuF2LoOH5pZdlwmgvZg==
+X-Received: by 2002:a17:907:94c6:: with SMTP id dn6mr5313796ejc.490.1638948042155;
+        Tue, 07 Dec 2021 23:20:42 -0800 (PST)
+Received: from localhost ([81.17.18.62])
+        by smtp.gmail.com with ESMTPSA id a68sm1297305edf.41.2021.12.07.23.20.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 07 Dec 2021 23:20:41 -0800 (PST)
+From:   =?UTF-8?q?J=CE=B5an=20Sacren?= <sakiwit@gmail.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        davem@davemloft.net, kuba@kernel.org,
+        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+Subject: [PATCH net-next] net: bluetooth: clean up harmless false expression
+Date:   Wed,  8 Dec 2021 00:20:24 -0700
+Message-Id: <20211208024732.142541-4-sakiwit@gmail.com>
+X-Mailer: git-send-email 2.32.0
+X-Mailer: git-send-email 2.32.0
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20211208020553.219387-1-luiz.dentz@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Luiz,
+From: Jean Sacren <sakiwit@gmail.com>
 
-I love your patch! Perhaps something to improve:
+scid is u16 with a range from 0x0000 to 0xffff.  L2CAP_CID_DYN_END is
+0xffff.  We should drop the false check of (scid > L2CAP_CID_DYN_END).
 
-[auto build test WARNING on bluetooth-next/master]
-[also build test WARNING on next-20211207]
-[cannot apply to bluetooth/master v5.16-rc4]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch]
-
-url:    https://github.com/0day-ci/linux/commits/Luiz-Augusto-von-Dentz/Bluetooth-hci_sync-Add-hci_le_create_conn_sync/20211208-100714
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: arc-buildonly-randconfig-r002-20211207 (https://download.01.org/0day-ci/archive/20211208/202112081458.7Shk6qTD-lkp@intel.com/config)
-compiler: arceb-elf-gcc (GCC) 11.2.0
-reproduce (this is a W=1 build):
-        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
-        chmod +x ~/bin/make.cross
-        # https://github.com/0day-ci/linux/commit/edb4c612dda2cb67f35cfe5a1c3bd0b38918aa80
-        git remote add linux-review https://github.com/0day-ci/linux
-        git fetch --no-tags linux-review Luiz-Augusto-von-Dentz/Bluetooth-hci_sync-Add-hci_le_create_conn_sync/20211208-100714
-        git checkout edb4c612dda2cb67f35cfe5a1c3bd0b38918aa80
-        # save the config file to linux build tree
-        mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arc SHELL=/bin/bash net/bluetooth/
-
-If you fix the issue, kindly add following tag as appropriate
-Reported-by: kernel test robot <lkp@intel.com>
-
-All warnings (new ones prefixed by >>):
-
->> net/bluetooth/hci_sync.c:5120:5: warning: no previous prototype for 'hci_le_ext_create_conn_sync' [-Wmissing-prototypes]
-    5120 | int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/hci_le_ext_create_conn_sync +5120 net/bluetooth/hci_sync.c
-
-  5119	
-> 5120	int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
-  5121					u8 own_addr_type)
-  5122	{
-  5123		struct hci_cp_le_ext_create_conn *cp;
-  5124		struct hci_cp_le_ext_conn_param *p;
-  5125		u8 data[sizeof(*cp) + sizeof(*p) * 3];
-  5126		u32 plen;
-  5127	
-  5128		cp = (void *) data;
-  5129		p = (void *) cp->data;
-  5130	
-  5131		memset(cp, 0, sizeof(*cp));
-  5132	
-  5133		bacpy(&cp->peer_addr, &conn->dst);
-  5134		cp->peer_addr_type = conn->dst_type;
-  5135		cp->own_addr_type = own_addr_type;
-  5136	
-  5137		plen = sizeof(*cp);
-  5138	
-  5139		if (scan_1m(hdev)) {
-  5140			cp->phys |= LE_SCAN_PHY_1M;
-  5141			set_ext_conn_params(conn, p);
-  5142	
-  5143			p++;
-  5144			plen += sizeof(*p);
-  5145		}
-  5146	
-  5147		if (scan_2m(hdev)) {
-  5148			cp->phys |= LE_SCAN_PHY_2M;
-  5149			set_ext_conn_params(conn, p);
-  5150	
-  5151			p++;
-  5152			plen += sizeof(*p);
-  5153		}
-  5154	
-  5155		if (scan_coded(hdev)) {
-  5156			cp->phys |= LE_SCAN_PHY_CODED;
-  5157			set_ext_conn_params(conn, p);
-  5158	
-  5159			plen += sizeof(*p);
-  5160		}
-  5161	
-  5162		return __hci_cmd_sync_status(hdev, HCI_OP_LE_EXT_CREATE_CONN,
-  5163					     plen, data, HCI_CMD_TIMEOUT);
-  5164	}
-  5165	
-
+Signed-off-by: Jean Sacren <sakiwit@gmail.com>
 ---
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+ net/bluetooth/l2cap_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+index 4f8f37599962..fe5f455646f6 100644
+--- a/net/bluetooth/l2cap_core.c
++++ b/net/bluetooth/l2cap_core.c
+@@ -4118,7 +4118,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
+ 	result = L2CAP_CR_NO_MEM;
+ 
+ 	/* Check for valid dynamic CID range (as per Erratum 3253) */
+-	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
++	if (scid < L2CAP_CID_DYN_START) {
+ 		result = L2CAP_CR_INVALID_SCID;
+ 		goto response;
+ 	}
