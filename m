@@ -2,88 +2,146 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5805BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 07:20:45 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E100C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 08:27:30 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244498AbhLHHYP (ORCPT
+        id S244748AbhLHIbA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 02:24:15 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54832 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S244493AbhLHHYP (ORCPT
+        Wed, 8 Dec 2021 03:31:00 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:34718 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231783AbhLHIbA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 02:24:15 -0500
-Received: from mail-ed1-x536.google.com (mail-ed1-x536.google.com [IPv6:2a00:1450:4864:20::536])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1ACBC061574;
-        Tue,  7 Dec 2021 23:20:43 -0800 (PST)
-Received: by mail-ed1-x536.google.com with SMTP id r11so5109509edd.9;
-        Tue, 07 Dec 2021 23:20:43 -0800 (PST)
+        Wed, 8 Dec 2021 03:31:00 -0500
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZiQZUZ4Jp9rh3Rck4fCei07yCzSzqa5hdHX2zLrQJwY=;
-        b=kCEcjy+tbsyg22IbRbPqIl1LwBtIa1X3q+YMPu/jhnYMqakPqvm+mm6b3pld52mJkX
-         qKsJm4TDfh1a9BFl+zcBYuxPs9bcozWh3BKtrKsOi94t7PHFeVhitzk2hNsbZlQbWEr+
-         4nF54YOOiQanFiNnVgscU9dGEIZW/wZolos0iBE+wW9hn5fNreNgdcdj/oYlHHVYv83P
-         /ihu7kg5Uo60rWClETe3MkNJxGlc/CTu4oCrkqdCyQZLwJlJX9nfwkBq57+/RWUv3L4P
-         DVCwQLvIcEF5PjZhDoWKQ3xwZBHnuh1KUN6mdo6yvqpjMTbeiM8HY9M5/lIQFrlXYg5V
-         RJBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=ZiQZUZ4Jp9rh3Rck4fCei07yCzSzqa5hdHX2zLrQJwY=;
-        b=wO1PiSBqfuTxF0EJ9JrWu+qG2ua8WI0MkNpPik/jQ0XitDB0k9nBMxnNkHHjpyCSDU
-         ta4J3dZb6tWKk18aHf9l3hXXqFa5aGTvmGBI/j7SNzg3hQjRJV6/B6igGpBBKaHisdFb
-         6EjQfd01vIWGAwmk/8NMfY97AzXdpheTylApmE3BZxo9yjokfVErth+zn8V772+WqTRb
-         /1BL7W9Ki0mxFkb3hJwLaiahbsH/ujvlD6IdypLruzZiLrZ/ieGvTdRosTPwMOl/9dQu
-         4zHiBuvYQIsvpyxHF19o0rnDAHdbPzl7VVU1vOntOobnnAVhF9OqkKsD0Eli1CIwKheI
-         Ddqw==
-X-Gm-Message-State: AOAM531QJw0QA1fPqZziHjw2Nt/Plfrt55i0NsbClM7uIsdlqeoi/MDu
-        Ger3CUoQQGw1JbwYueao2SvK+xZLwJKYMQ==
-X-Google-Smtp-Source: ABdhPJxpyHAt6KP4n1940eTrjggh4myqcf6FdPfXNmSYSCvNa+tANrPtaaEcuF2LoOH5pZdlwmgvZg==
-X-Received: by 2002:a17:907:94c6:: with SMTP id dn6mr5313796ejc.490.1638948042155;
-        Tue, 07 Dec 2021 23:20:42 -0800 (PST)
-Received: from localhost ([81.17.18.62])
-        by smtp.gmail.com with ESMTPSA id a68sm1297305edf.41.2021.12.07.23.20.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Dec 2021 23:20:41 -0800 (PST)
-From:   =?UTF-8?q?J=CE=B5an=20Sacren?= <sakiwit@gmail.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
-        davem@davemloft.net, kuba@kernel.org,
-        linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-Subject: [PATCH net-next] net: bluetooth: clean up harmless false expression
-Date:   Wed,  8 Dec 2021 00:20:24 -0700
-Message-Id: <20211208024732.142541-4-sakiwit@gmail.com>
-X-Mailer: git-send-email 2.32.0
-X-Mailer: git-send-email 2.32.0
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1638952049; x=1670488049;
+  h=from:to:cc:subject:date:message-id;
+  bh=07rYLKZoPVhTW49a+38rxxijE9s6Ji8YzFDjY44poMI=;
+  b=rndiCqOFye0cQYpAb1bDgdiza0biPxcCn1aF8hC36AbYBt2jbwwBaV+8
+   Yw9xBk7zF0yTXv5PduAgOgxdcPlMuhQTCwZ8Rn0P70kauGOfDeTTZQJ77
+   pN7NChncZyZEkXRgQAgwnbGwq2pthSkCvF+dhBQcgrS5WQZW7LY6/9ZV2
+   0=;
+Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
+  by alexa-out.qualcomm.com with ESMTP; 08 Dec 2021 00:27:28 -0800
+X-QCInternal: smtphost
+Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
+  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 08 Dec 2021 00:27:26 -0800
+X-QCInternal: smtphost
+Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
+  by ironmsg02-blr.qualcomm.com with ESMTP; 08 Dec 2021 13:57:08 +0530
+Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
+        id 921DF210F6; Wed,  8 Dec 2021 13:57:07 +0530 (IST)
+From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        quic_pharish@quicinc.com,
+        Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Subject: [PATCH] Bluetooth: btqca: sequential validation
+Date:   Wed,  8 Dec 2021 13:56:47 +0530
+Message-Id: <1638952007-32222-1-git-send-email-quic_saluvala@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Jean Sacren <sakiwit@gmail.com>
+This change will have sequential validation support
+& patch config command is added
 
-scid is u16 with a range from 0x0000 to 0xffff.  L2CAP_CID_DYN_END is
-0xffff.  We should drop the false check of (scid > L2CAP_CID_DYN_END).
-
-Signed-off-by: Jean Sacren <sakiwit@gmail.com>
+Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
 ---
- net/bluetooth/l2cap_core.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/bluetooth/btqca.c | 45 +++++++++++++++++++++++++++++++++++++++++++++
+ drivers/bluetooth/btqca.h |  3 +++
+ 2 files changed, 48 insertions(+)
 
-diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
-index 4f8f37599962..fe5f455646f6 100644
---- a/net/bluetooth/l2cap_core.c
-+++ b/net/bluetooth/l2cap_core.c
-@@ -4118,7 +4118,7 @@ static struct l2cap_chan *l2cap_connect(struct l2cap_conn *conn,
- 	result = L2CAP_CR_NO_MEM;
+diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+index be04d74..9a2fd17 100644
+--- a/drivers/bluetooth/btqca.c
++++ b/drivers/bluetooth/btqca.c
+@@ -141,6 +141,49 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
+ 	return err;
+ }
  
- 	/* Check for valid dynamic CID range (as per Erratum 3253) */
--	if (scid < L2CAP_CID_DYN_START || scid > L2CAP_CID_DYN_END) {
-+	if (scid < L2CAP_CID_DYN_START) {
- 		result = L2CAP_CR_INVALID_SCID;
- 		goto response;
- 	}
++int qca_send_patch_config_cmd(struct hci_dev *hdev, enum qca_btsoc_type soc_type)
++{
++	struct sk_buff *skb;
++	int err = 0;
++	u8 cmd[5] = {EDL_PATCH_CONFIG_CMD, 0x01, 0, 0, 0};
++	u8 rlen = 0x02;
++	struct edl_event_hdr *edl;
++	u8 rtype = EDL_PATCH_CONFIG_CMD;
++
++	bt_dev_dbg(hdev, "QCA Patch config");
++
++	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, EDL_PATCH_CONFIG_CMD_LEN,
++			cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
++	if (IS_ERR(skb)) {
++		err = PTR_ERR(skb);
++		bt_dev_err(hdev, "Sending QCA Patch config failed (%d)", err);
++		return err;
++	}
++	if (skb->len != rlen) {
++		bt_dev_err(hdev, "QCA Patch config cmd size mismatch len %d", skb->len);
++		err = -EILSEQ;
++		goto out;
++	}
++	edl = (struct edl_event_hdr *)(skb->data);
++	if (!edl) {
++		bt_dev_err(hdev, "QCA Patch config with no header");
++		err = -EILSEQ;
++		goto out;
++	}
++	if (edl->cresp != EDL_PATCH_CONFIG_RES_EVT || edl->rtype != rtype) {
++		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
++		 edl->rtype);
++		err = -EIO;
++		goto out;
++	}
++out:
++	kfree(skb);
++	if (err)
++		bt_dev_err(hdev, "QCA Patch config cmd failed (%d)", err);
++
++	return err;
++}
++
+ static int qca_send_reset(struct hci_dev *hdev)
+ {
+ 	struct sk_buff *skb;
+@@ -551,6 +594,8 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+ 	 */
+ 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
+ 
++	if (soc_type == QCA_WCN6750)
++		qca_send_patch_config_cmd(hdev, soc_type);
+ 	/* Download rampatch file */
+ 	config.type = TLV_TYPE_PATCH;
+ 	if (qca_is_wcn399x(soc_type)) {
+diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+index 30afa77..8fbb4c7 100644
+--- a/drivers/bluetooth/btqca.h
++++ b/drivers/bluetooth/btqca.h
+@@ -13,6 +13,8 @@
+ #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
+ #define EDL_GET_BUILD_INFO_CMD		(0x20)
+ #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
++#define EDL_PATCH_CONFIG_CMD_LEN	(0x05)
++#define EDL_PATCH_CONFIG_CMD		(0x28)
+ #define MAX_SIZE_PER_TLV_SEGMENT	(243)
+ #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
+ #define QCA_DISABLE_LOGGING		(0xFC17)
+@@ -24,6 +26,7 @@
+ #define EDL_CMD_EXE_STATUS_EVT		(0x00)
+ #define EDL_SET_BAUDRATE_RSP_EVT	(0x92)
+ #define EDL_NVM_ACCESS_CODE_EVT		(0x0B)
++#define EDL_PATCH_CONFIG_RES_EVT	(0x00)
+ #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
+ 
+ #define EDL_TAG_ID_HCI			(17)
+-- 
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+
