@@ -2,122 +2,99 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C823AC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 00:54:58 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 96EB8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 01:31:00 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238913AbhLHA62 (ORCPT
+        id S239289AbhLHBea (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 7 Dec 2021 19:58:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:52908 "EHLO
+        Tue, 7 Dec 2021 20:34:30 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60928 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238856AbhLHA61 (ORCPT
+        with ESMTP id S237018AbhLHBea (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 7 Dec 2021 19:58:27 -0500
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87301C061574
-        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Dec 2021 16:54:56 -0800 (PST)
-Received: by mail-pj1-x1031.google.com with SMTP id y14-20020a17090a2b4e00b001a5824f4918so3157200pjc.4
-        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Dec 2021 16:54:56 -0800 (PST)
+        Tue, 7 Dec 2021 20:34:30 -0500
+Received: from mail-qt1-x82e.google.com (mail-qt1-x82e.google.com [IPv6:2607:f8b0:4864:20::82e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FD3FC061574
+        for <linux-bluetooth@vger.kernel.org>; Tue,  7 Dec 2021 17:30:59 -0800 (PST)
+Received: by mail-qt1-x82e.google.com with SMTP id m25so918057qtq.13
+        for <linux-bluetooth@vger.kernel.org>; Tue, 07 Dec 2021 17:30:59 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=RInqyw9zZIqeT0BZBcJLRmW4AvPHDt4uFyn3ne7vqec=;
-        b=puUsFnAJQ2AEEgtiWlPMDkB3SwIRoCxJ2aRhHjoAr1hxD7Tx2nQKIPcGaErj1VLa5b
-         5YXXQYmipICj4nE45hagzH2TTrw1qsrzer41rvJ6v44kjPJ0gvGMZl7ernRD7CWyirxf
-         dVvaIn5qi/qHbtXlmZjEBndRtjg4p8k9rwR+wUwdZFtfXnrdVoWnhAkVL3FiCeaLp9QL
-         a9PAKLDZ6hkmq5ql5VFYlsHCFxO9/CpoEQs2KDyDjte+c/i9vuD7KrByXt6465SqH2b2
-         CWGt1Lu79s01zg/syeoQamP8LLI00y5K1JegDNMtcjleTZySm2DznpRS65RnYt7ZT8kQ
-         SCaA==
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=Z478CKRuA9y5dCxgm+TOOq9VpFg/HCyL72e3VZJ659Q=;
+        b=OLZyHsoXFumVrVJ0r0WlP8I9BFmodz7Pev25wqG/BI4/W8RMpCMUURV3GW+3AbeNyU
+         3UPo3oqVj8l3Rcs7qXPn4W2DFmSdBBeR0PWwVRWFTAHkrfQms3GbZ+zRgjRwDqhF2mLg
+         78b1KD79OdDks6u3LhxozU1wGn3eapTK3yS6ZW4o6k8W1d2/l+kWtq7r9huoBKFbMA8y
+         Nhv4phdNbMuaMU7j2OgzXEv6IqZTxTIjCcrTczO5rQPHm21r6noX31KOZWfzroF2opuF
+         x1n96dry756waEzEcfDRfoSFpWYsFq9iphD0T7DgJjghZsABX8dphQAR2DSKOqyA1//G
+         6z5Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=RInqyw9zZIqeT0BZBcJLRmW4AvPHDt4uFyn3ne7vqec=;
-        b=Ti9/Q2sKfWPxQxkxPur/epk2f03UReVZCWMzorZ4nqF0MDV5/nSMcOe36/0hcUOaYL
-         HbMS9kfgykdJAkj4KRUEpMCd5Wf9gQgo2dtIKLeqtGhm6R4Uca/drgB6lgroe2QeVT3y
-         wMebb545HwoHm5YtsS0MMWf4pM9NkfVr+3KsAmvaNohN4Yo4YJW/cTRRTGsaHxLGhuJ0
-         +bhYUBRorXbae3pJ7r9/1IDllryOE2xh8N82WZBt1N87SJmJKSSP89Trh+p6CHLt3Ff3
-         GHv+OQ9YN+1lfDZWfidpYxchzaWDr4Jdx9MyksvhkUpcOGAwG+zlzPLFaDHbfjRDVpDX
-         BDPQ==
-X-Gm-Message-State: AOAM532wS9XHc+7754a3QK86E8JKgZ/N1mlpuJTUqXvoktortoAsT5Ar
-        fkFh5JYw2E5sS+3HAoJXqvFykaWpJC8=
-X-Google-Smtp-Source: ABdhPJyoubMx4Nsa+/J1PuyI5ZWF4kSxFdDRrUg15Dpl1sNSMw1VIqvKYjUHBxF64P2eC4vwdCVJfQ==
-X-Received: by 2002:a17:902:e74a:b0:142:114c:1f1e with SMTP id p10-20020a170902e74a00b00142114c1f1emr55195331plf.78.1638924895818;
-        Tue, 07 Dec 2021 16:54:55 -0800 (PST)
-Received: from localhost.localdomain ([2601:1c0:6a01:d830:52cb:f76a:51b5:e541])
-        by smtp.gmail.com with ESMTPSA id d195sm604191pga.41.2021.12.07.16.54.55
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=Z478CKRuA9y5dCxgm+TOOq9VpFg/HCyL72e3VZJ659Q=;
+        b=7GIQ15hPEp4wLx+g2R75Tyy69a5oG9EW1w/hDCt8W5VTpHljdMp75UWQVe3LE3U9hZ
+         nhmDKOn6Ky3l5mDcnx25fnWJju+Ie096IMAiFAvJmB87djRPh6hPaFM3yJBMl/1P/cYY
+         +O5RYv5CkpR2mowIfoPrWhd1qtnGhHeZGDXeMjCW7zPfh1ZNnnf27ooaztM/cTpbzLis
+         eEVvuN+YXQnB5H/iC4D8tj/NcX9+peiY4CT1gD8zK1+Q4V9z8+88C4/hYgl/4sr+G68Y
+         pHPd54Y+mCLoGVkiaLKUkPSwGeAuhFehCze7N7PhJbJmNXw29Ggr3fYUSHtgirlqLXe5
+         d1hA==
+X-Gm-Message-State: AOAM532Svo+ddXk2WID69SMapbdbqd31ntUvTrlTveEah9vOIdeR2lTY
+        GeggQqJUw0c1BAzhVidBBRXw7avq0lzP7g==
+X-Google-Smtp-Source: ABdhPJyEKuQ+R2rnlOMiummrjSAzuCuTGpa581Hf60hms6iTVXMwBhumUPwnwzMh0FAMXDVLjFOWVQ==
+X-Received: by 2002:ac8:7d4d:: with SMTP id h13mr3892742qtb.448.1638927058629;
+        Tue, 07 Dec 2021 17:30:58 -0800 (PST)
+Received: from [172.17.0.2] ([13.92.211.52])
+        by smtp.gmail.com with ESMTPSA id n74sm680993qkn.83.2021.12.07.17.30.57
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 07 Dec 2021 16:54:55 -0800 (PST)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ PATCH 5/5] profiles/health: Replace random number generation function
-Date:   Tue,  7 Dec 2021 16:54:46 -0800
-Message-Id: <20211208005446.196637-6-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211208005446.196637-1-hj.tedd.an@gmail.com>
-References: <20211208005446.196637-1-hj.tedd.an@gmail.com>
+        Tue, 07 Dec 2021 17:30:57 -0800 (PST)
+Message-ID: <61b00ad1.1c69fb81.1179.40c4@mx.google.com>
+Date:   Tue, 07 Dec 2021 17:30:57 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============3881879912636984348=="
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, hj.tedd.an@gmail.com
+Subject: RE: Replace random number generation function
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211208005446.196637-2-hj.tedd.an@gmail.com>
+References: <20211208005446.196637-2-hj.tedd.an@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+--===============3881879912636984348==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
-This patch replaces the rand() function to the l_getrandom() from ELL,
-which uses the getrandom() system call.
+This is automated email and please do not reply to this email!
 
-It was reported by the Coverity scan
-  rand() should not be used for security-related applications, because
-  linear congruential algorithms are too easy to break
+Dear submitter,
+
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=591967
+
+---Test result---
+
+Test Summary:
+CheckPatch                    PASS      6.41 seconds
+GitLint                       PASS      4.35 seconds
+Prep - Setup ELL              PASS      43.18 seconds
+Build - Prep                  PASS      0.47 seconds
+Build - Configure             PASS      8.22 seconds
+Build - Make                  PASS      186.52 seconds
+Make Check                    PASS      9.53 seconds
+Make Distcheck                PASS      222.57 seconds
+Build w/ext ELL - Configure   PASS      8.31 seconds
+Build w/ext ELL - Make        PASS      176.44 seconds
+
+
+
 ---
- Makefile.plugins      | 1 +
- profiles/health/hdp.c | 8 ++++----
- 2 files changed, 5 insertions(+), 4 deletions(-)
+Regards,
+Linux Bluetooth
 
-diff --git a/Makefile.plugins b/Makefile.plugins
-index c771b2dfb..7817035c6 100644
---- a/Makefile.plugins
-+++ b/Makefile.plugins
-@@ -87,6 +87,7 @@ builtin_sources += profiles/health/mcap.h profiles/health/mcap.c \
- 			profiles/health/hdp_manager.c \
- 			profiles/health/hdp.h profiles/health/hdp.c \
- 			profiles/health/hdp_util.h profiles/health/hdp_util.c
-+builtin_ldadd += src/libshared-ell.la $(ell_ldadd)
- endif
- 
- builtin_modules += gap
-diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
-index 6bc41946f..e77f963a4 100644
---- a/profiles/health/hdp.c
-+++ b/profiles/health/hdp.c
-@@ -16,6 +16,7 @@
- #include <stdint.h>
- #include <stdbool.h>
- #include <unistd.h>
-+#include <ell/ell.h>
- 
- #include <glib.h>
- 
-@@ -1484,13 +1485,12 @@ static void destroy_create_dc_data(gpointer data)
- static void *generate_echo_packet(void)
- {
- 	uint8_t *buf;
--	int i;
- 
- 	buf = g_malloc(HDP_ECHO_LEN);
--	srand(time(NULL));
-+	if (buf == NULL)
-+		return NULL;
- 
--	for(i = 0; i < HDP_ECHO_LEN; i++)
--		buf[i] = rand() % UINT8_MAX;
-+	l_getrandom(buf, HDP_ECHO_LEN);
- 
- 	return buf;
- }
--- 
-2.25.1
 
+--===============3881879912636984348==--
