@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D41D6C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 22:39:31 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id ABC8FC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 22:39:32 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240640AbhLHWnD (ORCPT
+        id S237976AbhLHWnE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 17:43:03 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42732 "EHLO
+        Wed, 8 Dec 2021 17:43:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:42740 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S237997AbhLHWnC (ORCPT
+        with ESMTP id S240637AbhLHWnD (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 17:43:02 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3936AC0617A1
+        Wed, 8 Dec 2021 17:43:03 -0500
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA16EC061746
         for <linux-bluetooth@vger.kernel.org>; Wed,  8 Dec 2021 14:39:30 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id u17so2509022plg.9
+Received: by mail-pj1-x102d.google.com with SMTP id nh10-20020a17090b364a00b001a69adad5ebso3310731pjb.2
         for <linux-bluetooth@vger.kernel.org>; Wed, 08 Dec 2021 14:39:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=MrWtMuKZpMCN25LN/8i3Rj+4vnCyRyifo7BdIBg+8Ys=;
-        b=G4wOsBmvtACCPUiJxqHWgrXDeqlz/nRU6NDbQ222pvwT4epOMiOCrmYuJjQmTPib79
-         Cw/OXmpuC8BiFpfXG6xYsV1LWNL3IIRM5H6MlsQW8pCaCO3kf2JeirEjtbYl0aWmssoD
-         qbOVi8sDX9SgB+hVEWhRl0oJ6uxvKl1UsEEvF9zkCQiL4a13mm786C413VsJxcuTVlih
-         12Fz5kqUZ+ifH1DAZ2pH13DxUc4mwDpbWlqBMk4Wwwb8Z8NpWEGIRYKoTTfFA1wTVnQc
-         ATpbhRtH7D+BiRFtWlGb20/TmAthN6sN4ZmsYPIKNI7nE4+se0NhpUNiKoQme/rH2d2p
-         6vew==
+        bh=Xs0aHye2yddwEZkszgswHNqyiNadnHO4Kp4zkIjmceU=;
+        b=qYrHZn4P9VIktrEWPBD02PGnSXtWYaRqRS7JaDokLrLh8vuCHYIEUNIl5zO3tqZ5C7
+         OX4pehzpnwjhzYmTSrJ9CsU9+UcVQXktfOjLn5D/qN/vrnXyxi5KEMF6V4eB3SqR68V+
+         4/ssyNKG0oyXfznXDgwz7tFELbQohMUDRFwiZyHmYKLIcmMkcRSOk9z6s+VbGNHO0Wvf
+         K+wcv1elTKKTl09UniuQ2KacdSkpoETQonqNXHqR9D+KR7+sNkEFizuUsmM7zLiXqRbg
+         Ri57/8s4qKXxPRLLlikFKv19JIYQ4Ax/OKw+2TorZ8sYfhPLqpgqx6UF/rqOc1CMGzX2
+         F4gw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=MrWtMuKZpMCN25LN/8i3Rj+4vnCyRyifo7BdIBg+8Ys=;
-        b=sROjlwWCfzmFKYme91pDVvh5g/P8UsQfqgnY2/j2GZWFnAcnfFeAUp4sRF7gPbS1gQ
-         GX/oh66EqBLqZ3ucpVVKt8OZWKABEVp06zE8HENVXnKCjlICJmdt4eBFI6lYLGTEZhNA
-         WMLTH5x0hPXckFlV6KrY9t1wbNwFjUSoDb5eCurNv2m8iDgdcGJvdH8JMjreIk4oiuva
-         vGoMyCYp3ogad+j1LupW9SI6++s7lIury2hS7Z2eAqCOHnPmWt4ahG9EFxhy3Jmr0wZ/
-         AgKqSoXObasPkZUpvJFYRbk0v4BggJpLR+6Msg3jB2vggW/y/9rWx4Aq4R7ldfRJa8da
-         iP8Q==
-X-Gm-Message-State: AOAM53334uDk7OzTQeTw2ikKyI4O45UxyKQuedR03moaKhEtdfTPNGY/
-        KLCIUWL0yHUxiVQtCcgxpCKzo04BVLE=
-X-Google-Smtp-Source: ABdhPJz+wNfGqowas+VWj38Npm7b801O2jmshPc8uXnW8ZXPRcsgY1csNnMpa4nxou9oy/oAyBzODQ==
-X-Received: by 2002:a17:90b:4d0e:: with SMTP id mw14mr10674564pjb.43.1639003169534;
-        Wed, 08 Dec 2021 14:39:29 -0800 (PST)
+        bh=Xs0aHye2yddwEZkszgswHNqyiNadnHO4Kp4zkIjmceU=;
+        b=KCGO/bL/N4stBvwUC9Rjt+OgTSeYxAtgqcUQm1XuJyAsWnjn5nWIh8CyCQltt3uv/6
+         wXj6ifzcm8KWro8t9atn4qxPOoRH58Ltn/NQYPx3RUxqNFvUu8J/mDWM8bwZ0vvY3ac8
+         cvH6gUvUnt+kcsgqtGF8k3riOJ7wBQ+hasL9Kte3s79wqY6FiSXEMTeMTKRDshMWzOCE
+         rF3xHG/6f0L7FBBH/lVi5EVpQnM59bSnIKY0+TwDWxe/MtHx+zpECp9qa320Agniufo+
+         LwbN7gTnPkQZJrekh/ok+Ccg+D0GHv/3CEiwFAXiXeW1x/1Y1Qc54kCuw7BczXTSpQho
+         EiEA==
+X-Gm-Message-State: AOAM5314BXOcCal4/hVGK5lyxattsgKHmq2Rxd7mwwM0sK9+VbrDnLqO
+        xB36DjXVmLJCFYfqmLxft3BunpiNMV0=
+X-Google-Smtp-Source: ABdhPJxVDUN4hNGIQvBhi3OvbW56xTHQpYB/eiuKT/3duZszaOoTJlawjEakskZWKJeZAiOrBho3MQ==
+X-Received: by 2002:a17:90b:33d0:: with SMTP id lk16mr10807812pjb.7.1639003170212;
+        Wed, 08 Dec 2021 14:39:30 -0800 (PST)
 Received: from localhost.localdomain ([2601:1c0:6a01:d830:6e9a:66a9:f3af:51f3])
-        by smtp.gmail.com with ESMTPSA id n16sm3757948pja.46.2021.12.08.14.39.28
+        by smtp.gmail.com with ESMTPSA id n16sm3757948pja.46.2021.12.08.14.39.29
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 08 Dec 2021 14:39:29 -0800 (PST)
 From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [BlueZ V2 PATCH 4/5] plugins: Replace random number generation function
-Date:   Wed,  8 Dec 2021 14:39:22 -0800
-Message-Id: <20211208223923.519664-5-hj.tedd.an@gmail.com>
+Subject: [BlueZ V2 PATCH 5/5] profiles/health: Replace random number generation function
+Date:   Wed,  8 Dec 2021 14:39:23 -0800
+Message-Id: <20211208223923.519664-6-hj.tedd.an@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20211208223923.519664-1-hj.tedd.an@gmail.com>
 References: <20211208223923.519664-1-hj.tedd.an@gmail.com>
@@ -72,43 +72,98 @@ It was reported by the Coverity scan
   rand() should not be used for security-related applications, because
   linear congruential algorithms are too easy to break
 ---
- plugins/autopair.c | 8 +++++++-
- 1 file changed, 7 insertions(+), 1 deletion(-)
+ profiles/health/hdp.c  | 11 +++++++----
+ profiles/health/mcap.c | 17 +++++++++++++++--
+ 2 files changed, 22 insertions(+), 6 deletions(-)
 
-diff --git a/plugins/autopair.c b/plugins/autopair.c
-index 665a4f4a6..a75ecebe4 100644
---- a/plugins/autopair.c
-+++ b/plugins/autopair.c
-@@ -17,6 +17,7 @@
- #include <fcntl.h>
+diff --git a/profiles/health/hdp.c b/profiles/health/hdp.c
+index 6bc41946f..40b6cc18a 100644
+--- a/profiles/health/hdp.c
++++ b/profiles/health/hdp.c
+@@ -16,6 +16,7 @@
+ #include <stdint.h>
+ #include <stdbool.h>
  #include <unistd.h>
- #include <errno.h>
 +#include <sys/random.h>
  
  #include <glib.h>
  
-@@ -49,6 +50,7 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
- 	char pinstr[7];
- 	char name[25];
- 	uint32_t class;
-+	uint32_t val;
+@@ -1484,13 +1485,15 @@ static void destroy_create_dc_data(gpointer data)
+ static void *generate_echo_packet(void)
+ {
+ 	uint8_t *buf;
+-	int i;
  
- 	ba2str(device_get_address(device), addr);
+ 	buf = g_malloc(HDP_ECHO_LEN);
+-	srand(time(NULL));
++	if (!buf)
++		return NULL;
  
-@@ -129,8 +131,12 @@ static ssize_t autopair_pincb(struct btd_adapter *adapter,
- 			if (attempt >= 4)
- 				return 0;
+-	for(i = 0; i < HDP_ECHO_LEN; i++)
+-		buf[i] = rand() % UINT8_MAX;
++	if (getrandom(buf, HDP_ECHO_LEN, 0) < 0) {
++		g_free(buf);
++		return NULL;
++	}
  
-+			if (getrandom(&val, sizeof(val), 0) < 0) {
-+				error("Failed to get a random pincode");
-+				return 0;
-+			}
- 			snprintf(pinstr, sizeof(pinstr), "%06u",
--						rand() % 1000000);
-+						val % 1000000);
- 			*display = true;
- 			memcpy(pinbuf, pinstr, 6);
- 			return 6;
+ 	return buf;
+ }
+diff --git a/profiles/health/mcap.c b/profiles/health/mcap.c
+index 5161ef77c..aad0a08a3 100644
+--- a/profiles/health/mcap.c
++++ b/profiles/health/mcap.c
+@@ -19,6 +19,7 @@
+ #include <errno.h>
+ #include <unistd.h>
+ #include <time.h>
++#include <sys/random.h>
+ 
+ #include <glib.h>
+ 
+@@ -1888,6 +1889,7 @@ gboolean mcap_create_mcl(struct mcap_instance *mi,
+ {
+ 	struct mcap_mcl *mcl;
+ 	struct connect_mcl *con;
++	uint16_t val;
+ 
+ 	mcl = find_mcl(mi->mcls, addr);
+ 	if (mcl) {
+@@ -1903,7 +1905,12 @@ gboolean mcap_create_mcl(struct mcap_instance *mi,
+ 		mcl->state = MCL_IDLE;
+ 		bacpy(&mcl->addr, addr);
+ 		set_default_cb(mcl);
+-		mcl->next_mdl = (rand() % MCAP_MDLID_FINAL) + 1;
++		if (getrandom(&val, sizeof(val), 0) < 0) {
++			mcap_instance_unref(mcl->mi);
++			g_free(mcl);
++			return FALSE;
++		}
++		mcl->next_mdl = (val % MCAP_MDLID_FINAL) + 1;
+ 	}
+ 
+ 	mcl->ctrl |= MCAP_CTRL_CONN;
+@@ -2013,6 +2020,7 @@ static void connect_mcl_event_cb(GIOChannel *chan, GError *gerr,
+ 	bdaddr_t dst;
+ 	char address[18], srcstr[18];
+ 	GError *err = NULL;
++	uint16_t val;
+ 
+ 	if (gerr)
+ 		return;
+@@ -2041,7 +2049,12 @@ static void connect_mcl_event_cb(GIOChannel *chan, GError *gerr,
+ 		mcl->mi = mcap_instance_ref(mi);
+ 		bacpy(&mcl->addr, &dst);
+ 		set_default_cb(mcl);
+-		mcl->next_mdl = (rand() % MCAP_MDLID_FINAL) + 1;
++		if (getrandom(&val, sizeof(val), 0) < 0) {
++			mcap_instance_unref(mcl->mi);
++			g_free(mcl);
++			goto drop;
++		}
++		mcl->next_mdl = (val % MCAP_MDLID_FINAL) + 1;
+ 	}
+ 
+ 	set_mcl_conf(chan, mcl);
 -- 
 2.25.1
 
