@@ -2,40 +2,40 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A3DDFC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 13:28:50 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B7D2EC433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed,  8 Dec 2021 13:51:18 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233020AbhLHNcV (ORCPT
+        id S234415AbhLHNyt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 8 Dec 2021 08:32:21 -0500
-Received: from mga01.intel.com ([192.55.52.88]:64107 "EHLO mga01.intel.com"
+        Wed, 8 Dec 2021 08:54:49 -0500
+Received: from mga02.intel.com ([134.134.136.20]:9516 "EHLO mga02.intel.com"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229747AbhLHNcV (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 8 Dec 2021 08:32:21 -0500
-X-IronPort-AV: E=McAfee;i="6200,9189,10191"; a="261904785"
+        id S232916AbhLHNyt (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 8 Dec 2021 08:54:49 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10191"; a="225089517"
 X-IronPort-AV: E=Sophos;i="5.88,189,1635231600"; 
-   d="scan'208";a="261904785"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2021 05:28:48 -0800
+   d="scan'208";a="225089517"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Dec 2021 05:50:53 -0800
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="5.88,189,1635231600"; 
-   d="scan'208";a="462759940"
+   d="scan'208";a="564104799"
 Received: from lkp-server02.sh.intel.com (HELO 9e1e9f9b3bcb) ([10.239.97.151])
-  by orsmga006.jf.intel.com with ESMTP; 08 Dec 2021 05:28:45 -0800
+  by fmsmga008.fm.intel.com with ESMTP; 08 Dec 2021 05:50:45 -0800
 Received: from kbuild by 9e1e9f9b3bcb with local (Exim 4.92)
         (envelope-from <lkp@intel.com>)
-        id 1mux00-0000b2-5s; Wed, 08 Dec 2021 13:28:44 +0000
-Date:   Wed, 8 Dec 2021 21:27:46 +0800
+        id 1muxLI-0000cC-JB; Wed, 08 Dec 2021 13:50:44 +0000
+Date:   Wed, 8 Dec 2021 21:50:04 +0800
 From:   kernel test robot <lkp@intel.com>
 To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>, marcel@holtmann.org,
         johan.hedberg@gmail.com
-Cc:     kbuild-all@lists.01.org, mka@chromium.org,
+Cc:     llvm@lists.linux.dev, kbuild-all@lists.01.org, mka@chromium.org,
         linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
         quic_hemantg@quicinc.com, linux-arm-msm@vger.kernel.org,
         quic_bgodavar@quicinc.com, rjliao@codeaurora.org,
         hbandi@codeaurora.org
 Subject: Re: [PATCH] Bluetooth: btqca: sequential validation
-Message-ID: <202112082154.jFxxuDI4-lkp@intel.com>
+Message-ID: <202112082116.coCA1rOT-lkp@intel.com>
 References: <1638952007-32222-1-git-send-email-quic_saluvala@quicinc.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
@@ -52,15 +52,14 @@ Thank you for the patch! Perhaps something to improve:
 
 [auto build test WARNING on bluetooth-next/master]
 [also build test WARNING on linux/master linus/master v5.16-rc4 next-20211208]
-[cannot apply to bluetooth/master]
 [If your patch is applied to the wrong git tree, kindly drop us a note.
 And when submitting patch, we suggest to use '--base' as documented in
 https://git-scm.com/docs/git-format-patch]
 
 url:    https://github.com/0day-ci/linux/commits/Sai-Teja-Aluvala/Bluetooth-btqca-sequential-validation/20211208-162834
 base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-config: nds32-allyesconfig (https://download.01.org/0day-ci/archive/20211208/202112082154.jFxxuDI4-lkp@intel.com/config)
-compiler: nds32le-linux-gcc (GCC) 11.2.0
+config: x86_64-randconfig-a015-20211207 (https://download.01.org/0day-ci/archive/20211208/202112082116.coCA1rOT-lkp@intel.com/config)
+compiler: clang version 14.0.0 (https://github.com/llvm/llvm-project 097a1cb1d5ebb3a0ec4bcaed8ba3ff6a8e33c00a)
 reproduce (this is a W=1 build):
         wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
         chmod +x ~/bin/make.cross
@@ -70,16 +69,21 @@ reproduce (this is a W=1 build):
         git checkout 1d58d86c5374c4c82aa1ec8638036667c114f83e
         # save the config file to linux build tree
         mkdir build_dir
-        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=nds32 SHELL=/bin/bash drivers/bluetooth/
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=clang make.cross W=1 O=build_dir ARCH=x86_64 SHELL=/bin/bash drivers/bluetooth/
 
 If you fix the issue, kindly add following tag as appropriate
 Reported-by: kernel test robot <lkp@intel.com>
 
 All warnings (new ones prefixed by >>):
 
->> drivers/bluetooth/btqca.c:144:5: warning: no previous prototype for 'qca_send_patch_config_cmd' [-Wmissing-prototypes]
-     144 | int qca_send_patch_config_cmd(struct hci_dev *hdev, enum qca_btsoc_type soc_type)
-         |     ^~~~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/bluetooth/btqca.c:144:5: warning: no previous prototype for function 'qca_send_patch_config_cmd' [-Wmissing-prototypes]
+   int qca_send_patch_config_cmd(struct hci_dev *hdev, enum qca_btsoc_type soc_type)
+       ^
+   drivers/bluetooth/btqca.c:144:1: note: declare 'static' if the function is not intended to be used outside of this translation unit
+   int qca_send_patch_config_cmd(struct hci_dev *hdev, enum qca_btsoc_type soc_type)
+   ^
+   static 
+   1 warning generated.
 
 
 vim +/qca_send_patch_config_cmd +144 drivers/bluetooth/btqca.c
