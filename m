@@ -2,109 +2,106 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6A5DBC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Dec 2021 20:00:52 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 634FFC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Dec 2021 20:15:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231422AbhLIUEZ (ORCPT
+        id S231805AbhLIUSs (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Dec 2021 15:04:25 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:58078 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231417AbhLIUEY (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Dec 2021 15:04:24 -0500
-Received: from mail-pg1-x529.google.com (mail-pg1-x529.google.com [IPv6:2607:f8b0:4864:20::529])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37B43C061746
-        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Dec 2021 12:00:51 -0800 (PST)
-Received: by mail-pg1-x529.google.com with SMTP id g16so6077522pgi.1
-        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Dec 2021 12:00:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:cc:subject:date:message-id:in-reply-to:references
-         :mime-version:content-transfer-encoding;
-        bh=UDEwuTZjHqekOo8wdieoZ8RAC3Iz36aYVeZnZooCtIA=;
-        b=XCAgz5ZLvxH9H7iMEtGenw2ZL5vn20sBXqodeTo6tACuP8fpQV+qZZOrU402psjTEx
-         hhBoikDw1W0iXCVCbcedOqzjoXqR6btbtWfasYWMjdHsxTt9Ea3aJDTSg9EA8FF6vQ1W
-         BQGn9DE0Dg7Phm70B97LRD4+HAa0uP7IRZ+oqWx6RG1IzEsJSE3vBoPwknOB/2F7Ya3w
-         uLgtIa1+UzkN3fJhfggF9iezMqzMYK/AEHTjM2ccJqJEIk4ZT/pajeILJmuqp/NEjwja
-         Z4SaPqUsYjjgLoxUwRzuRFbcq2PZ+K7azHrNCUyviFZD1PkzZ3lKhiEcTp2gIxHKAKW0
-         T9pg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=UDEwuTZjHqekOo8wdieoZ8RAC3Iz36aYVeZnZooCtIA=;
-        b=gWcvtJDFS98EHAFLG3AQy4JyLFGzFUBrtoxpL8eo6k0uDkUhmuRE2Sb0KZB7BIDX+o
-         BhLaPJIr9hjB9eUcfJR1qObJPQqXGTwbm5SVhW/kZCVNE6r+TZiGzism/D6/bDbrBhRM
-         UrrCunPouj3EhO+06jvLKmHOxIKxaOLh2pumgkKFhjMqZhu7eyf0RphrwluJg2Rf8FXm
-         TLKaV8lRWQDvElNBqoFgLzPpC1kghpdb+luQgkKqg2smQs4n6GVtNs7ArbYtuOKwhSlY
-         hZJNvGRrH9/G1bJQABrI9akU4KQ9WeUGpfbjG4HiRVpfaFEV8yjfaQQgY39O7rmBSym3
-         TzVQ==
-X-Gm-Message-State: AOAM530RIG56I+hW4LH8nqo+w+s61KoKrwEVdERbSJSaOnjhALHWZZon
-        SKc9QIeWa+ZjgmQToPWR+UXiIIeN7FM=
-X-Google-Smtp-Source: ABdhPJyo0WfVweUjrosJpacUZvJeMsPOeYYXxPJ0Xyfps/7iAQ3Psk3/F9At5jVAIenXsyzsxEtsEg==
-X-Received: by 2002:a05:6a00:181d:b0:4b0:4648:43bc with SMTP id y29-20020a056a00181d00b004b0464843bcmr4228178pfa.6.1639080050500;
-        Thu, 09 Dec 2021 12:00:50 -0800 (PST)
-Received: from localhost.localdomain ([2601:1c0:6a01:d830:d0d6:ba5:fd1c:15de])
-        by smtp.gmail.com with ESMTPSA id b2sm531440pfv.198.2021.12.09.12.00.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 09 Dec 2021 12:00:49 -0800 (PST)
-From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
-Subject: [PATCH DNM 3/3] Bluetooth: DO NOT MERGE: The Third Test Patch
-Date:   Thu,  9 Dec 2021 12:00:42 -0800
-Message-Id: <20211209200042.737140-3-hj.tedd.an@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20211209200042.737140-1-hj.tedd.an@gmail.com>
-References: <20211209200042.737140-1-hj.tedd.an@gmail.com>
+        Thu, 9 Dec 2021 15:18:48 -0500
+Received: from mga14.intel.com ([192.55.52.115]:32874 "EHLO mga14.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231796AbhLIUSq (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 9 Dec 2021 15:18:46 -0500
+X-IronPort-AV: E=McAfee;i="6200,9189,10193"; a="238422613"
+X-IronPort-AV: E=Sophos;i="5.88,193,1635231600"; 
+   d="scan'208";a="238422613"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 12:15:11 -0800
+X-IronPort-AV: E=Sophos;i="5.88,193,1635231600"; 
+   d="scan'208";a="564949130"
+Received: from csadams-mobl3.amr.corp.intel.com (HELO [10.209.101.33]) ([10.209.101.33])
+  by fmsmga008-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Dec 2021 12:15:10 -0800
+Message-ID: <34192a7d9103c17c7c0a4397ac114e984e44e6f9.camel@linux.intel.com>
+Subject: Re: [PATCH BlueZ 0/6] tools/mesh-gatt meshctl tool improvements
+From:   Tedd Ho-Jeong An <tedd.an@linux.intel.com>
+To:     Daniele Biagetti <dbiagio79@gmail.com>,
+        linux-bluetooth@vger.kernel.org
+Cc:     Daniele Biagetti <daniele.biagetti@cblelectronics.com>
+Date:   Thu, 09 Dec 2021 12:15:10 -0800
+In-Reply-To: <20211207225604.35156-1-daniele.biagetti@cblelectronics.com>
+References: <20211207225604.35156-1-daniele.biagetti@cblelectronics.com>
+Organization: Intel Corporation
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.40.4 (3.40.4-1.fc34) 
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Tedd Ho-Jeong An <tedd.an@intel.com>
+Hi Daniele,
 
-Test patch 3
+It seems like the patches has some format issues. Please check the test report
+email for details or run checkpatch script.
 
-Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
----
- drivers/bluetooth/btintel.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+Also, please include the commit message in each patch.
 
-diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-index f35cdd382aa4..32ef9ef99362 100644
---- a/drivers/bluetooth/btintel.c
-+++ b/drivers/bluetooth/btintel.c
-@@ -1174,7 +1174,8 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
- 			return -EINVAL;
- 
- 		/* Check if the CSS Header version is ECDSA(0x00020000) */
--		css_header_ver = get_unaligned_le32(fw->data + ECDSA_OFFSET + CSS_HEADER_OFFSET);
-+		css_header_ver = get_unaligned_le32(
-+				fw->data + ECDSA_OFFSET + CSS_HEADER_OFFSET);
- 		if (css_header_ver != 0x00020000) {
- 			bt_dev_err(hdev, "Invalid CSS Header version");
- 			return -EINVAL;
-@@ -1186,7 +1187,7 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
- 				return err;
- 
- 			err = btintel_download_firmware_payload(hdev, fw,
--								RSA_HEADER_LEN + ECDSA_HEADER_LEN);
-+					RSA_HEADER_LEN + ECDSA_HEADER_LEN);
- 			if (err)
- 				return err;
- 		} else if (sbe_type == 0x01) {
-@@ -1195,7 +1196,7 @@ static int btintel_download_fw_tlv(struct hci_dev *hdev,
- 				return err;
- 
- 			err = btintel_download_firmware_payload(hdev, fw,
--								RSA_HEADER_LEN + ECDSA_HEADER_LEN);
-+					RSA_HEADER_LEN + ECDSA_HEADER_LEN);
- 			if (err)
- 				return err;
- 		}
--- 
-2.25.1
+On Tue, 2021-12-07 at 23:55 +0100, Daniele Biagetti wrote:
+> Hi all,
+> 
+> The present patch series adds some functionalities and improvements to the meshctl tool.
+> More precisely:
+> - Add onoff set unacknowledge message to onoff client model
+> 
+> - Fix status messages processing
+>    The status messages was processed and displayed even if they do
+>    not belong to the present model. This fix ensure that the status
+>    messages are processed only if they have the correct opcode.
+> 
+> - Fix unwanted return in onoff client model
+>    Replaced the return statement with a warning message in case of
+>    transmission or reception of messages coming from unknown addresses
+>    (such as group addresses)
+> 
+> - Add subscription delete message to config client model
+> 
+> - Generic level model
+>    Limited to the following messages:
+>    * Generic Level Get
+>    * Generic Level Set
+>    * Generic LevelSet Unacknowledge
+>    * Generic Level Status
+> 
+> - Generic OnPowerUp model
+> 
+> Best regards
+> 
+> Daniele Biagetti (6):
+>   tools/mesh-gatt: Add onoff set unack message to onoff client model
+>   tools/mesh-gatt: Fix status messages processing
+>   tools/mesh-gatt: Fix unwanted return in onoff client model
+>   tools/mesh-gatt: Add subscription delete message to config client
+>     model
+>   tools/mesh-gatt: Add generic level model support
+>   tools/mesh-gatt: Add generic power onoff client model
+> 
+>  Makefile.tools                    |   6 +-
+>  tools/mesh-gatt/config-client.c   |  40 +++++
+>  tools/mesh-gatt/level-model.c     | 288 ++++++++++++++++++++++++++++++
+>  tools/mesh-gatt/level-model.h     |  21 +++
+>  tools/mesh-gatt/local_node.json   |  10 +-
+>  tools/mesh-gatt/node.c            |  11 ++
+>  tools/mesh-gatt/onoff-model.c     |  56 +++---
+>  tools/mesh-gatt/onpowerup-model.c | 250 ++++++++++++++++++++++++++
+>  tools/mesh-gatt/onpowerup-model.h |  21 +++
+>  tools/meshctl.c                   |   8 +
+>  10 files changed, 688 insertions(+), 23 deletions(-)
+>  create mode 100644 tools/mesh-gatt/level-model.c
+>  create mode 100644 tools/mesh-gatt/level-model.h
+>  create mode 100644 tools/mesh-gatt/onpowerup-model.c
+>  create mode 100644 tools/mesh-gatt/onpowerup-model.h
+> 
+
+Regards,
+Tedd
 
