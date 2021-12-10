@@ -2,127 +2,113 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 014A9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 09:16:54 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C396BC4332F
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 13:23:20 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234225AbhLJJU2 (ORCPT
+        id S241654AbhLJN0y (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Dec 2021 04:20:28 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:39298 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229605AbhLJJU2 (ORCPT
+        Fri, 10 Dec 2021 08:26:54 -0500
+Received: from smtp-out2.suse.de ([195.135.220.29]:56326 "EHLO
+        smtp-out2.suse.de" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S238220AbhLJN0x (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Dec 2021 04:20:28 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 986F8C061746;
-        Fri, 10 Dec 2021 01:16:53 -0800 (PST)
-Received: from ip4d173d4a.dynamic.kabel-deutschland.de ([77.23.61.74] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1mvc1K-0001df-T4; Fri, 10 Dec 2021 10:16:50 +0100
-Message-ID: <e3e7147e-dd4c-59a9-5dba-5ddcd2e3130f@leemhuis.info>
-Date:   Fri, 10 Dec 2021 10:16:50 +0100
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.3.0
-Content-Language: en-BS
-To:     "An, Tedd" <tedd.an@intel.com>,
-        "kai.heng.feng@canonical.com" <kai.heng.feng@canonical.com>,
-        "andypalmadi@gmail.com" <andypalmadi@gmail.com>,
-        "marcel@holtmann.org" <marcel@holtmann.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Cc:     "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
-References: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
- <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
-Subject: Re: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth:
- Move shutdown callback before flushing tx and rx queue"
-In-Reply-To: <fbc36e8ebdd9222f84322d54d9114f58c225547e.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1639127813;281fdd00;
-X-HE-SMSGID: 1mvc1K-0001df-T4
+        Fri, 10 Dec 2021 08:26:53 -0500
+Received: from relay2.suse.de (relay2.suse.de [149.44.160.134])
+        by smtp-out2.suse.de (Postfix) with ESMTP id 5BD3A1F3A1;
+        Fri, 10 Dec 2021 13:23:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+        t=1639142597; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UukKNe8s3kw52iaVXTrsFvvPIdEJe65NFYa97yPi3Vg=;
+        b=ZpBH+BqUvDU5O07JuozPlEbqlqBFL1blX6i4jrdxNO/+0dA0P8eN38WVErrqJpoqUyRB1B
+        O+zJjvBU2fDlKJiQBBw38i0LOh12hBSf4XVNz9UE5M2TmVIlLr4FO1I0U0Uw6BE+ugsIZw
+        hmbq6tvmNSwJURq80BfjBv5gIHnEtf0=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+        s=susede2_ed25519; t=1639142597;
+        h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+         mime-version:mime-version:content-type:content-type:
+         in-reply-to:in-reply-to:references:references;
+        bh=UukKNe8s3kw52iaVXTrsFvvPIdEJe65NFYa97yPi3Vg=;
+        b=7tFH6a7zRjq11BuAgJGAQR+rlLiFOfSgpnvNVwI4gUSSrLPJ5CgcYz/Ia16f2IulaJluAC
+        0LVu0yg6c2n5aJCA==
+Received: from alsa1.suse.de (alsa1.suse.de [10.160.4.42])
+        by relay2.suse.de (Postfix) with ESMTP id 18054A3B81;
+        Fri, 10 Dec 2021 13:23:17 +0000 (UTC)
+Date:   Fri, 10 Dec 2021 14:23:17 +0100
+Message-ID: <s5hk0gch9ve.wl-tiwai@suse.de>
+From:   Takashi Iwai <tiwai@suse.de>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Fernando Ramos <greenfoo@u92.eu>, Takashi Iwai <tiwai@suse.de>,
+        Paul Menzel <pmenzel@molgen.mpg.de>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        Tedd Ho-Jeong An <tedd.an@intel.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: Apply initial command workaround for more Intel chips
+In-Reply-To: <1D49EE9C-42D4-45C9-AE37-F4C508FD2D64@holtmann.org>
+References: <20211202162256.31837-1-tiwai@suse.de>
+        <acc7b5b4-72cc-9f3b-90a6-6fbf6c3a71e7@molgen.mpg.de>
+        <s5h7dcnt0lp.wl-tiwai@suse.de>
+        <YayVYIAi56097Ltl@zacax395.localdomain>
+        <1D49EE9C-42D4-45C9-AE37-F4C508FD2D64@holtmann.org>
+User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI/1.14.6 (Maruoka)
+ FLIM/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL/10.8 Emacs/25.3
+ (x86_64-suse-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+MIME-Version: 1.0 (generated by SEMI 1.14.6 - "Maruoka")
+Content-Type: text/plain; charset=US-ASCII
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi, this is your Linux kernel regression tracker speaking.
+On Tue, 07 Dec 2021 17:14:02 +0100,
+Marcel Holtmann wrote:
+> 
+> Hi Fernando,
+> 
+> >> Thanks, so this seems depending on the hardware, maybe a subtle
+> >> difference matters.  As far as I read the code changes, the workaround
+> >> was applied in the past unconditionally, so it must be fairly safe
+> >> even if the chip works as is.
+> >> 
+> >> Or, for avoiding the unnecessarily application of the workaround,
+> >> should it be changed as a fallback after the failure at the first
+> >> try...?
+> > 
+> > I don't know if this helps, but I started experiencing this same issue ("hci0:
+> > command 0xfc05 tx timeout") yesterday after a kernel upgrade.
+> > 
+> > My controller is a different one:
+> > 
+> >    8087:0025 Intel Corp. Wireless-AC 9260 Bluetooth Adapter
+> >    ^^^^^^^^^
+> > 
+> > I tried with different (older) versions of the v5.15.x kernel but none worked.
+> > 
+> > Now, this is the interesting (?) part: today, when I switched on the computer
+> > to keep testing, the bluetooth was *already* working once again.
+> > 
+> > I have reviewed my bash history to try to figure out what is it that I did, and
+> > the only thing I see is that yesterday, before going to sleep, I did a full
+> > poweroff instead of a reset (which is what I used yesterday to try different
+> > kernels).
+> > 
+> > This does not make any sense... but then I found this [1] post from someone else
+> > who experienced the same.
+> > 
+> > Is there any reasonable explanation for this? Could this be the reason why you
+> > seem to have different results with the same controller (8087:0a2a)?
+> 
+> we trying to figure out what went wrong here. This should be really only an issue on the really early Intel hardware like Wilkens Peak. However it seems it slipped into later parts now as well. We are investigating what happened and see if this can be fixed via a firmware update or if we really have to mark this hardware as having a broken boot loader.
 
-On 10.12.21 02:10, An, Tedd wrote:
-> On Fri, 2021-12-10 at 01:36 +0200, coldolt wrote:
->> After a restart, bluetooth doesn't work since commit 0ea53674d07f
->> "Bluetooth: Move shutdown callback before flushing tx and rx queue"
->>
->> bluetoothctl doesn't list any controllers and I get the following in
->> dmesg | grep -i bluetooth
->>
->> [    2.634812] Bluetooth: Core ver 2.22
->> [    2.634843] NET: Registered PF_BLUETOOTH protocol family
->> [    2.634845] Bluetooth: HCI device and connection manager initialized
->> [    2.634850] Bluetooth: HCI socket layer initialized
->> [    2.634853] Bluetooth: L2CAP socket layer initialized
->> [    2.634858] Bluetooth: SCO socket layer initialized
->> [    4.077788] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
->> [    4.077794] Bluetooth: BNEP filters: protocol multicast
->> [    4.077799] Bluetooth: BNEP socket layer initialized
->> [    4.078219] random: bluetoothd: uninitialized urandom read (4 bytes read)
->> [    4.852835] Bluetooth: hci0: Reading Intel version command failed (-110)
->> [    4.852838] Bluetooth: hci0: command 0xfc05 tx timeout
->>
->> However, it works after a cold start or after putting the computer to sleep.
->>
->> Before 83f2dafe2a62 "Bluetooth: btintel: Refactoring setup routine for
->> legacy ROM sku", it always works after a restart, but from that commit
->> up until before 0ea53674d07f it either works or doesn't work after a
->> restart depending on if before restart it was working or not, meaning
->> it stays working or stays not working.
->>
->> Also on the first restart from before 83f2dafe2a62 into 0ea53674d07f
->> or later it works, but then restarting again into 0ea53674d07f or
->> later it no longer works. So it seems that 0ea53674d07f and later puts
->> the bluetooth in a nonworking state if you restart from it, but before
->> 83f2dafe2a62 it puts it back into a working state at startup, and in
->> between it doesn't do either, i.e. it stays the way it was.
->>
->> I have a Dell Latitude E5550 laptop with an Intel 7265 wifi/bluetooth
->> card REV=0x210 firmware version 29.4063824552.0 7265D-29. I'm on Arch
->> Linux, the problem is still there on 5.16-rc4.
->>
->> Here is a thread on the Arch Linux forums with several people with the
->> same problem, for some of them it got fixed with a kernel update or by
->> reloading modules, but not for everybody, including me
->> https://bbs.archlinux.org/viewtopic.php?id=271459
->>
->> #regzbot introduced 0ea53674d07f
+The upstream bugzilla indicates that 8087:0aa7 seems hitting the same
+problem:
+  https://bugzilla.kernel.org/show_bug.cgi?id=215167
 
-Many thx for directly getting regzbot involved! :-D
+OTOH, on openSUSE Bugzilla, there has been a report that applying the
+workaround for 8087:0026 may cause another issue about the reset
+error, so the entry for 8087:0026 should be dropped.
 
-> This issue is under investigation to find the root cause and proper solution.
 
-Only internally? Or are there any other related public discussions that
-are relevant to this and thus good to be aware of?
-
-> The downloaded firmware breaks the behavior though, we need to investigate
-> further to see if it can be fixed in firmware or fix in the driver.
-
-The answer from my point is simple: it needs to be fixed in the kernel,
-not just in the firmware, otherwise people that update the kernel
-without updating the firmware at the same time will run into a
-regression -- and that is not acceptable by kernel development standards.
-
-Ciao, Thorsten
-
-P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-on my table. I can only look briefly into most of them. Unfortunately
-therefore I sometimes will get things wrong or miss something important.
-I hope that's not the case here; if you think it is, don't hesitate to
-tell me about it in a public reply. That's in everyone's interest, as
-what I wrote above might be misleading to everyone reading this; any
-suggestion I gave they thus might sent someone reading this down the
-wrong rabbit hole, which none of us wants.
-
-BTW, I have no personal interest in this issue, which is tracked using
-regzbot, my Linux kernel regression tracking bot
-(https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-this mail to get things rolling again and hence don't need to be CC on
-all further activities wrt to this regression.
+Takashi
