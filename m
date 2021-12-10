@@ -2,102 +2,839 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id C594CC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu,  9 Dec 2021 23:36:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id EEEF0C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 00:31:51 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234403AbhLIXkH (ORCPT
+        id S234840AbhLJAfZ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 9 Dec 2021 18:40:07 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51250 "EHLO
+        Thu, 9 Dec 2021 19:35:25 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35262 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229760AbhLIXkG (ORCPT
+        with ESMTP id S231372AbhLJAfY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 9 Dec 2021 18:40:06 -0500
-Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D70EC061746;
-        Thu,  9 Dec 2021 15:36:32 -0800 (PST)
-Received: by mail-lj1-x232.google.com with SMTP id p8so11403167ljo.5;
-        Thu, 09 Dec 2021 15:36:32 -0800 (PST)
+        Thu, 9 Dec 2021 19:35:24 -0500
+Received: from mail-pl1-x632.google.com (mail-pl1-x632.google.com [IPv6:2607:f8b0:4864:20::632])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04456C061746
+        for <linux-bluetooth@vger.kernel.org>; Thu,  9 Dec 2021 16:31:50 -0800 (PST)
+Received: by mail-pl1-x632.google.com with SMTP id b11so5136750pld.12
+        for <linux-bluetooth@vger.kernel.org>; Thu, 09 Dec 2021 16:31:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
-        h=mime-version:from:date:message-id:subject:to:cc;
-        bh=F8boScU7PkpLy5I01OwUQvLADtvtEkn8BzfdBWDEDcY=;
-        b=q4XxCaU4czP1BeRuh/U1Da9cRVNH1Rq3z1/WNTaj88K+UGWfKa6yV85JcVeNQSqaUt
-         iKvkwx79/DlRJSvMww4HroTv+tB1pfH9v4lywRhkVtdGMiGFj1v6bKcXZg1hyENS3arn
-         pc6YBECRfRyPLzGpMNwZjiQAo9gMuzTsp0PyqFJoyd70IicIqMwfGTJXqpRcqX/4itWK
-         5/bC/V1QSTB5UPnZO5VUVI7YmL0FoAklls7qpB3RmKBsQuPmwnX9izQoYQnX2JMKcZ12
-         sF1807fmH/fTi9t6HlbWhNssLYh8+GtWAP8Mv8BcFxCJggSPD2rjmSJ88QpCc4FT4St3
-         nFgg==
+        h=from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iQSCdedttnCtfMlEeeIaWEO+bF4vrDbQyWbNbl8vRmg=;
+        b=jWJAPmlpVXLeF9uqQYOz9zzOzB2UowFebcjKjnAnsO5UFMnJ9TvW3PhKnS3lrVp9WL
+         8Uy8C4jYlWaVZzZv3ndnejc6G+Lq+VWB6iDiu5xg25T+SBkvNeye/tQDAdrteQ+fEfne
+         gnEzXYBwQQHmmc2jKeULJ7jFZDtu98gcXeJ65YJZ7vwnVq2fI6cNzEZY2Cf1FuHl2jsQ
+         7mYHuMmb61D7vw9ZzLRXMEl9SbisXIclXccBBuNtbU+TYtq4RzB5yEU+NMlM4hBOtuBC
+         QZ8EhOI7RRgXKfwEof42aPLj8bORyR2XWYWdNNT1uTHXwXNkf7EXNB7q9yqHydb3w7Ff
+         wROQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:mime-version:from:date:message-id:subject:to:cc;
-        bh=F8boScU7PkpLy5I01OwUQvLADtvtEkn8BzfdBWDEDcY=;
-        b=Cva5BqufOSYH0gBBQUwZgmmNX93MtzfHiqVmpKMPRq/sdV8s2sLj/AFPi4jhPaH+2Q
-         QhDHxpclcBWzrMsNFPGcOghye3w8h75gQDJyQ7KZ5cGwU1/PQPKIzT7gcGR9CL5KbLEk
-         o5+k5Mt+vKK/dSfMM0WwxKy3JCGilMsecgS1yLqaM2NO3OrHC6JNPAdsPfVxDn5wXFbH
-         FFa0xWR+Jah6P89mP1dcs4KIah/7DrvYdNyHtdI4ccr4Dj0XqMkiPpjdOOmTcP1VERj6
-         5H3Nyl1UWuJkaDUMvwqfbu38G80nDFolbWQBypMQRMF/9BCQdsvujBSfBeU1CDpokgrW
-         caEQ==
-X-Gm-Message-State: AOAM533j9pzt51J9vlMAuRZwZn+G7VCisvLV+o+rmZV5hMAfgU29w4t2
-        E7Fvw54hs7S75bGzKkjvqZp2aqqmzDUuGDH7zrk=
-X-Google-Smtp-Source: ABdhPJx2AU7IRNZHdt1Ln3B0zqHP/c6Gv3XpXJyJv4OKtRNw/C2tcCV0Xz0ZnCQClkwMAXzkDBg++JinGDj3OM01SNk=
-X-Received: by 2002:a2e:6e15:: with SMTP id j21mr9488073ljc.195.1639092990871;
- Thu, 09 Dec 2021 15:36:30 -0800 (PST)
+        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=iQSCdedttnCtfMlEeeIaWEO+bF4vrDbQyWbNbl8vRmg=;
+        b=D9j7FMCLwRoemF/lkUiHVZq4JGkk1CLK/8hfXtVCoqB1AQXnuT/C2G+hV3Tl5X2KBL
+         g9YnMG65WECj87EdJZhlYOaR6jHfBRTNkP5TkdHgO567rW0zPGcGb2F+zwSaeIXOuLnW
+         3Mi05KMlUGybvtYJIhvmOixg3kVCgJHrYNQuCU8tNeg3jUBKmkaI32f1xSRK4jFs9N7d
+         ILmgg55udi5dsk4rZRQCuwhHp1ADYCDWKpnXvJF8YWx0M9M/uAcnAoKlgwd7+ONb1eFZ
+         Eskrz7znAFS1XbU8vQjn16cryLVcs0EMVkV+JLouqeotGCqPW+Go9pM4PxdpOkmVSYV+
+         piIg==
+X-Gm-Message-State: AOAM530oGNtWOv7UUx2Mh+hwO73dd2l7lyf88BsMAupSA9/Zfl1LqcmU
+        QMpWKiE5m7E+ctepACZVKCosDVCI6tI=
+X-Google-Smtp-Source: ABdhPJyjFjOFVyjgD12zm+QmPz6WQZ9E1QCm4fBhJiMsLI+L1KHs1soZtbBVY8QIdRZmgpKEfxWftg==
+X-Received: by 2002:a17:902:c404:b0:142:4c7e:ab8b with SMTP id k4-20020a170902c40400b001424c7eab8bmr71999698plk.10.1639096308723;
+        Thu, 09 Dec 2021 16:31:48 -0800 (PST)
+Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
+        by smtp.gmail.com with ESMTPSA id u11sm850720pfg.120.2021.12.09.16.31.47
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 09 Dec 2021 16:31:47 -0800 (PST)
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Subject: [PATCH 1/3] Bluetooth: hci_sync: Add hci_le_create_conn_sync
+Date:   Thu,  9 Dec 2021 16:31:43 -0800
+Message-Id: <20211210003147.836584-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.33.1
 MIME-Version: 1.0
-From:   coldolt <andypalmadi@gmail.com>
-Date:   Fri, 10 Dec 2021 01:36:28 +0200
-Message-ID: <CAJvGw+AJ5dHSb50RtJHnjbhMVQa+rJgYznFV4t-iaO0qx+W-jw@mail.gmail.com>
-Subject: [REGRESSION] Bluetooth not working on 5.15+ since "Bluetooth: Move
- shutdown callback before flushing tx and rx queue"
-To:     marcel@holtmann.org, kai.heng.feng@canonical.com,
-        tedd.an@intel.com, linux-bluetooth@vger.kernel.org
-Cc:     linux-kernel@vger.kernel.org, regressions@lists.linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-After a restart, bluetooth doesn't work since commit 0ea53674d07f
-"Bluetooth: Move shutdown callback before flushing tx and rx queue"
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-bluetoothctl doesn't list any controllers and I get the following in
-dmesg | grep -i bluetooth
+This adds hci_le_create_conn_sync and make hci_le_connect use it instead
+of queueing multiple commands which may conflict with the likes of
+hci_update_passive_scan which uses hci_cmd_sync_queue.
 
-[    2.634812] Bluetooth: Core ver 2.22
-[    2.634843] NET: Registered PF_BLUETOOTH protocol family
-[    2.634845] Bluetooth: HCI device and connection manager initialized
-[    2.634850] Bluetooth: HCI socket layer initialized
-[    2.634853] Bluetooth: L2CAP socket layer initialized
-[    2.634858] Bluetooth: SCO socket layer initialized
-[    4.077788] Bluetooth: BNEP (Ethernet Emulation) ver 1.3
-[    4.077794] Bluetooth: BNEP filters: protocol multicast
-[    4.077799] Bluetooth: BNEP socket layer initialized
-[    4.078219] random: bluetoothd: uninitialized urandom read (4 bytes read)
-[    4.852835] Bluetooth: hci0: Reading Intel version command failed (-110)
-[    4.852838] Bluetooth: hci0: command 0xfc05 tx timeout
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+---
+ include/net/bluetooth/hci_core.h |   1 +
+ include/net/bluetooth/hci_sync.h |   4 +
+ net/bluetooth/hci_conn.c         | 304 ++-----------------------------
+ net/bluetooth/hci_request.c      |  50 -----
+ net/bluetooth/hci_request.h      |   2 -
+ net/bluetooth/hci_sync.c         | 295 ++++++++++++++++++++++++++++++
+ 6 files changed, 315 insertions(+), 341 deletions(-)
 
-However, it works after a cold start or after putting the computer to sleep.
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 4d69dcfebd63..c41ad7847d9d 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -646,6 +646,7 @@ struct hci_conn {
+ 	__u8		init_addr_type;
+ 	bdaddr_t	resp_addr;
+ 	__u8		resp_addr_type;
++	bdaddr_t	direct_rpa;
+ 	__u8		adv_instance;
+ 	__u16		handle;
+ 	__u16		state;
+diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
+index f4034bf8f1ce..0d2a75d88e7c 100644
+--- a/include/net/bluetooth/hci_sync.h
++++ b/include/net/bluetooth/hci_sync.h
+@@ -101,3 +101,7 @@ int hci_stop_discovery_sync(struct hci_dev *hdev);
+ 
+ int hci_suspend_sync(struct hci_dev *hdev);
+ int hci_resume_sync(struct hci_dev *hdev);
++
++struct hci_conn;
++
++int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
+index cd6e1cf7e396..254c0e4ed181 100644
+--- a/net/bluetooth/hci_conn.c
++++ b/net/bluetooth/hci_conn.c
+@@ -911,267 +911,45 @@ void hci_le_conn_failed(struct hci_conn *conn, u8 status)
+ 	hci_enable_advertising(hdev);
+ }
+ 
+-static void create_le_conn_complete(struct hci_dev *hdev, u8 status, u16 opcode)
++static void create_le_conn_complete(struct hci_dev *hdev, void *data, int err)
+ {
+-	struct hci_conn *conn;
++	struct hci_conn *conn = data;
+ 
+ 	hci_dev_lock(hdev);
+ 
+-	conn = hci_lookup_le_connect(hdev);
+-
+-	if (hdev->adv_instance_cnt)
+-		hci_req_resume_adv_instances(hdev);
+-
+-	if (!status) {
++	if (!err) {
+ 		hci_connect_le_scan_cleanup(conn);
+ 		goto done;
+ 	}
+ 
+-	bt_dev_err(hdev, "request failed to create LE connection: "
+-		   "status 0x%2.2x", status);
++	bt_dev_err(hdev, "request failed to create LE connection: err %d", err);
+ 
+ 	if (!conn)
+ 		goto done;
+ 
+-	hci_le_conn_failed(conn, status);
++	hci_le_conn_failed(conn, err);
+ 
+ done:
+ 	hci_dev_unlock(hdev);
+ }
+ 
+-static bool conn_use_rpa(struct hci_conn *conn)
++static int hci_connect_le_sync(struct hci_dev *hdev, void *data)
+ {
+-	struct hci_dev *hdev = conn->hdev;
++	struct hci_conn *conn = data;
+ 
+-	return hci_dev_test_flag(hdev, HCI_PRIVACY);
+-}
++	bt_dev_dbg(hdev, "conn %p", conn);
+ 
+-static void set_ext_conn_params(struct hci_conn *conn,
+-				struct hci_cp_le_ext_conn_param *p)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-
+-	memset(p, 0, sizeof(*p));
+-
+-	p->scan_interval = cpu_to_le16(hdev->le_scan_int_connect);
+-	p->scan_window = cpu_to_le16(hdev->le_scan_window_connect);
+-	p->conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+-	p->conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+-	p->conn_latency = cpu_to_le16(conn->le_conn_latency);
+-	p->supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
+-	p->min_ce_len = cpu_to_le16(0x0000);
+-	p->max_ce_len = cpu_to_le16(0x0000);
+-}
+-
+-static void hci_req_add_le_create_conn(struct hci_request *req,
+-				       struct hci_conn *conn,
+-				       bdaddr_t *direct_rpa)
+-{
+-	struct hci_dev *hdev = conn->hdev;
+-	u8 own_addr_type;
+-
+-	/* If direct address was provided we use it instead of current
+-	 * address.
+-	 */
+-	if (direct_rpa) {
+-		if (bacmp(&req->hdev->random_addr, direct_rpa))
+-			hci_req_add(req, HCI_OP_LE_SET_RANDOM_ADDR, 6,
+-								direct_rpa);
+-
+-		/* direct address is always RPA */
+-		own_addr_type = ADDR_LE_DEV_RANDOM;
+-	} else {
+-		/* Update random address, but set require_privacy to false so
+-		 * that we never connect with an non-resolvable address.
+-		 */
+-		if (hci_update_random_address(req, false, conn_use_rpa(conn),
+-					      &own_addr_type))
+-			return;
+-	}
+-
+-	if (use_ext_conn(hdev)) {
+-		struct hci_cp_le_ext_create_conn *cp;
+-		struct hci_cp_le_ext_conn_param *p;
+-		u8 data[sizeof(*cp) + sizeof(*p) * 3];
+-		u32 plen;
+-
+-		cp = (void *) data;
+-		p = (void *) cp->data;
+-
+-		memset(cp, 0, sizeof(*cp));
+-
+-		bacpy(&cp->peer_addr, &conn->dst);
+-		cp->peer_addr_type = conn->dst_type;
+-		cp->own_addr_type = own_addr_type;
+-
+-		plen = sizeof(*cp);
+-
+-		if (scan_1m(hdev)) {
+-			cp->phys |= LE_SCAN_PHY_1M;
+-			set_ext_conn_params(conn, p);
+-
+-			p++;
+-			plen += sizeof(*p);
+-		}
+-
+-		if (scan_2m(hdev)) {
+-			cp->phys |= LE_SCAN_PHY_2M;
+-			set_ext_conn_params(conn, p);
+-
+-			p++;
+-			plen += sizeof(*p);
+-		}
+-
+-		if (scan_coded(hdev)) {
+-			cp->phys |= LE_SCAN_PHY_CODED;
+-			set_ext_conn_params(conn, p);
+-
+-			plen += sizeof(*p);
+-		}
+-
+-		hci_req_add(req, HCI_OP_LE_EXT_CREATE_CONN, plen, data);
+-
+-	} else {
+-		struct hci_cp_le_create_conn cp;
+-
+-		memset(&cp, 0, sizeof(cp));
+-
+-		cp.scan_interval = cpu_to_le16(hdev->le_scan_int_connect);
+-		cp.scan_window = cpu_to_le16(hdev->le_scan_window_connect);
+-
+-		bacpy(&cp.peer_addr, &conn->dst);
+-		cp.peer_addr_type = conn->dst_type;
+-		cp.own_address_type = own_addr_type;
+-		cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
+-		cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
+-		cp.conn_latency = cpu_to_le16(conn->le_conn_latency);
+-		cp.supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
+-		cp.min_ce_len = cpu_to_le16(0x0000);
+-		cp.max_ce_len = cpu_to_le16(0x0000);
+-
+-		hci_req_add(req, HCI_OP_LE_CREATE_CONN, sizeof(cp), &cp);
+-	}
+-
+-	conn->state = BT_CONNECT;
+-	clear_bit(HCI_CONN_SCANNING, &conn->flags);
+-}
+-
+-static void hci_req_directed_advertising(struct hci_request *req,
+-					 struct hci_conn *conn)
+-{
+-	struct hci_dev *hdev = req->hdev;
+-	u8 own_addr_type;
+-	u8 enable;
+-
+-	if (ext_adv_capable(hdev)) {
+-		struct hci_cp_le_set_ext_adv_params cp;
+-		bdaddr_t random_addr;
+-
+-		/* Set require_privacy to false so that the remote device has a
+-		 * chance of identifying us.
+-		 */
+-		if (hci_get_random_address(hdev, false, conn_use_rpa(conn), NULL,
+-					   &own_addr_type, &random_addr) < 0)
+-			return;
+-
+-		memset(&cp, 0, sizeof(cp));
+-
+-		cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_DIRECT_IND);
+-		cp.own_addr_type = own_addr_type;
+-		cp.channel_map = hdev->le_adv_channel_map;
+-		cp.tx_power = HCI_TX_POWER_INVALID;
+-		cp.primary_phy = HCI_ADV_PHY_1M;
+-		cp.secondary_phy = HCI_ADV_PHY_1M;
+-		cp.handle = 0; /* Use instance 0 for directed adv */
+-		cp.own_addr_type = own_addr_type;
+-		cp.peer_addr_type = conn->dst_type;
+-		bacpy(&cp.peer_addr, &conn->dst);
+-
+-		/* As per Core Spec 5.2 Vol 2, PART E, Sec 7.8.53, for
+-		 * advertising_event_property LE_LEGACY_ADV_DIRECT_IND
+-		 * does not supports advertising data when the advertising set already
+-		 * contains some, the controller shall return erroc code 'Invalid
+-		 * HCI Command Parameters(0x12).
+-		 * So it is required to remove adv set for handle 0x00. since we use
+-		 * instance 0 for directed adv.
+-		 */
+-		__hci_req_remove_ext_adv_instance(req, cp.handle);
+-
+-		hci_req_add(req, HCI_OP_LE_SET_EXT_ADV_PARAMS, sizeof(cp), &cp);
+-
+-		if (own_addr_type == ADDR_LE_DEV_RANDOM &&
+-		    bacmp(&random_addr, BDADDR_ANY) &&
+-		    bacmp(&random_addr, &hdev->random_addr)) {
+-			struct hci_cp_le_set_adv_set_rand_addr cp;
+-
+-			memset(&cp, 0, sizeof(cp));
+-
+-			cp.handle = 0;
+-			bacpy(&cp.bdaddr, &random_addr);
+-
+-			hci_req_add(req,
+-				    HCI_OP_LE_SET_ADV_SET_RAND_ADDR,
+-				    sizeof(cp), &cp);
+-		}
+-
+-		__hci_req_enable_ext_advertising(req, 0x00);
+-	} else {
+-		struct hci_cp_le_set_adv_param cp;
+-
+-		/* Clear the HCI_LE_ADV bit temporarily so that the
+-		 * hci_update_random_address knows that it's safe to go ahead
+-		 * and write a new random address. The flag will be set back on
+-		 * as soon as the SET_ADV_ENABLE HCI command completes.
+-		 */
+-		hci_dev_clear_flag(hdev, HCI_LE_ADV);
+-
+-		/* Set require_privacy to false so that the remote device has a
+-		 * chance of identifying us.
+-		 */
+-		if (hci_update_random_address(req, false, conn_use_rpa(conn),
+-					      &own_addr_type) < 0)
+-			return;
+-
+-		memset(&cp, 0, sizeof(cp));
+-
+-		/* Some controllers might reject command if intervals are not
+-		 * within range for undirected advertising.
+-		 * BCM20702A0 is known to be affected by this.
+-		 */
+-		cp.min_interval = cpu_to_le16(0x0020);
+-		cp.max_interval = cpu_to_le16(0x0020);
+-
+-		cp.type = LE_ADV_DIRECT_IND;
+-		cp.own_address_type = own_addr_type;
+-		cp.direct_addr_type = conn->dst_type;
+-		bacpy(&cp.direct_addr, &conn->dst);
+-		cp.channel_map = hdev->le_adv_channel_map;
+-
+-		hci_req_add(req, HCI_OP_LE_SET_ADV_PARAM, sizeof(cp), &cp);
+-
+-		enable = 0x01;
+-		hci_req_add(req, HCI_OP_LE_SET_ADV_ENABLE, sizeof(enable),
+-			    &enable);
+-	}
+-
+-	conn->state = BT_CONNECT;
++	return hci_le_create_conn_sync(hdev, conn);
+ }
+ 
+ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 				u8 dst_type, bool dst_resolved, u8 sec_level,
+ 				u16 conn_timeout, u8 role, bdaddr_t *direct_rpa)
+ {
+-	struct hci_conn_params *params;
+ 	struct hci_conn *conn;
+ 	struct smp_irk *irk;
+-	struct hci_request req;
+ 	int err;
+ 
+-	/* This ensures that during disable le_scan address resolution
+-	 * will not be disabled if it is followed by le_create_conn
+-	 */
+-	bool rpa_le_conn = true;
+-
+ 	/* Let's make sure that le is enabled.*/
+ 	if (!hci_dev_test_flag(hdev, HCI_LE_ENABLED)) {
+ 		if (lmp_le_capable(hdev))
+@@ -1230,68 +1008,16 @@ struct hci_conn *hci_connect_le(struct hci_dev *hdev, bdaddr_t *dst,
+ 	conn->sec_level = BT_SECURITY_LOW;
+ 	conn->conn_timeout = conn_timeout;
+ 
+-	hci_req_init(&req, hdev);
+-
+-	/* Disable advertising if we're active. For central role
+-	 * connections most controllers will refuse to connect if
+-	 * advertising is enabled, and for peripheral role connections we
+-	 * anyway have to disable it in order to start directed
+-	 * advertising. Any registered advertisements will be
+-	 * re-enabled after the connection attempt is finished.
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_LE_ADV))
+-		__hci_req_pause_adv_instances(&req);
+-
+-	/* If requested to connect as peripheral use directed advertising */
+-	if (conn->role == HCI_ROLE_SLAVE) {
+-		/* If we're active scanning most controllers are unable
+-		 * to initiate advertising. Simply reject the attempt.
+-		 */
+-		if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
+-		    hdev->le_scan_type == LE_SCAN_ACTIVE) {
+-			hci_req_purge(&req);
+-			hci_conn_del(conn);
+-			return ERR_PTR(-EBUSY);
+-		}
+-
+-		hci_req_directed_advertising(&req, conn);
+-		goto create_conn;
+-	}
+-
+-	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+-	if (params) {
+-		conn->le_conn_min_interval = params->conn_min_interval;
+-		conn->le_conn_max_interval = params->conn_max_interval;
+-		conn->le_conn_latency = params->conn_latency;
+-		conn->le_supv_timeout = params->supervision_timeout;
+-	} else {
+-		conn->le_conn_min_interval = hdev->le_conn_min_interval;
+-		conn->le_conn_max_interval = hdev->le_conn_max_interval;
+-		conn->le_conn_latency = hdev->le_conn_latency;
+-		conn->le_supv_timeout = hdev->le_supv_timeout;
+-	}
+-
+-	/* If controller is scanning, we stop it since some controllers are
+-	 * not able to scan and connect at the same time. Also set the
+-	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
+-	 * handler for scan disabling knows to set the correct discovery
+-	 * state.
+-	 */
+-	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
+-		hci_req_add_le_scan_disable(&req, rpa_le_conn);
+-		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
+-	}
++	if (direct_rpa)
++		bacpy(&conn->direct_rpa, direct_rpa);
+ 
+-	hci_req_add_le_create_conn(&req, conn, direct_rpa);
++	conn->state = BT_CONNECT;
++	clear_bit(HCI_CONN_SCANNING, &conn->flags);
+ 
+-create_conn:
+-	err = hci_req_run(&req, create_le_conn_complete);
++	err = hci_cmd_sync_queue(hdev, hci_connect_le_sync, conn,
++				 create_le_conn_complete);
+ 	if (err) {
+ 		hci_conn_del(conn);
+-
+-		if (hdev->adv_instance_cnt)
+-			hci_req_resume_adv_instances(hdev);
+-
+ 		return ERR_PTR(err);
+ 	}
+ 
+diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
+index 329c66456cf1..b61373ac7bb7 100644
+--- a/net/bluetooth/hci_request.c
++++ b/net/bluetooth/hci_request.c
+@@ -818,56 +818,6 @@ static void cancel_adv_timeout(struct hci_dev *hdev)
+ 	}
+ }
+ 
+-/* This function requires the caller holds hdev->lock */
+-void __hci_req_pause_adv_instances(struct hci_request *req)
+-{
+-	bt_dev_dbg(req->hdev, "Pausing advertising instances");
+-
+-	/* Call to disable any advertisements active on the controller.
+-	 * This will succeed even if no advertisements are configured.
+-	 */
+-	__hci_req_disable_advertising(req);
+-
+-	/* If we are using software rotation, pause the loop */
+-	if (!ext_adv_capable(req->hdev))
+-		cancel_adv_timeout(req->hdev);
+-}
+-
+-/* This function requires the caller holds hdev->lock */
+-static void __hci_req_resume_adv_instances(struct hci_request *req)
+-{
+-	struct adv_info *adv;
+-
+-	bt_dev_dbg(req->hdev, "Resuming advertising instances");
+-
+-	if (ext_adv_capable(req->hdev)) {
+-		/* Call for each tracked instance to be re-enabled */
+-		list_for_each_entry(adv, &req->hdev->adv_instances, list) {
+-			__hci_req_enable_ext_advertising(req,
+-							 adv->instance);
+-		}
+-
+-	} else {
+-		/* Schedule for most recent instance to be restarted and begin
+-		 * the software rotation loop
+-		 */
+-		__hci_req_schedule_adv_instance(req,
+-						req->hdev->cur_adv_instance,
+-						true);
+-	}
+-}
+-
+-/* This function requires the caller holds hdev->lock */
+-int hci_req_resume_adv_instances(struct hci_dev *hdev)
+-{
+-	struct hci_request req;
+-
+-	hci_req_init(&req, hdev);
+-	__hci_req_resume_adv_instances(&req);
+-
+-	return hci_req_run(&req, NULL);
+-}
+-
+ static bool adv_cur_instance_is_scannable(struct hci_dev *hdev)
+ {
+ 	return hci_adv_instance_is_scannable(hdev, hdev->cur_adv_instance);
+diff --git a/net/bluetooth/hci_request.h b/net/bluetooth/hci_request.h
+index 8d39e9416861..7f8df258e295 100644
+--- a/net/bluetooth/hci_request.h
++++ b/net/bluetooth/hci_request.h
+@@ -80,8 +80,6 @@ void hci_req_add_le_passive_scan(struct hci_request *req);
+ void hci_req_prepare_suspend(struct hci_dev *hdev, enum suspended_state next);
+ 
+ void hci_req_disable_address_resolution(struct hci_dev *hdev);
+-void __hci_req_pause_adv_instances(struct hci_request *req);
+-int hci_req_resume_adv_instances(struct hci_dev *hdev);
+ void hci_req_reenable_advertising(struct hci_dev *hdev);
+ void __hci_req_enable_advertising(struct hci_request *req);
+ void __hci_req_disable_advertising(struct hci_request *req);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index fd15fb37a52a..57a96a66f007 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -4974,3 +4974,298 @@ int hci_resume_sync(struct hci_dev *hdev)
+ 
+ 	return 0;
+ }
++
++static bool conn_use_rpa(struct hci_conn *conn)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	return hci_dev_test_flag(hdev, HCI_PRIVACY);
++}
++
++static int hci_le_ext_directed_advertising_sync(struct hci_dev *hdev,
++						struct hci_conn *conn)
++{
++	struct hci_cp_le_set_ext_adv_params cp;
++	int err;
++	bdaddr_t random_addr;
++	u8 own_addr_type;
++
++	err = hci_update_random_address_sync(hdev, false, conn_use_rpa(conn),
++					     &own_addr_type);
++	if (err)
++		return err;
++
++	/* Set require_privacy to false so that the remote device has a
++	 * chance of identifying us.
++	 */
++	err = hci_get_random_address(hdev, false, conn_use_rpa(conn), NULL,
++				     &own_addr_type, &random_addr);
++	if (err)
++		return err;
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.evt_properties = cpu_to_le16(LE_LEGACY_ADV_DIRECT_IND);
++	cp.own_addr_type = own_addr_type;
++	cp.channel_map = hdev->le_adv_channel_map;
++	cp.tx_power = HCI_TX_POWER_INVALID;
++	cp.primary_phy = HCI_ADV_PHY_1M;
++	cp.secondary_phy = HCI_ADV_PHY_1M;
++	cp.handle = 0x00; /* Use instance 0 for directed adv */
++	cp.own_addr_type = own_addr_type;
++	cp.peer_addr_type = conn->dst_type;
++	bacpy(&cp.peer_addr, &conn->dst);
++
++	/* As per Core Spec 5.2 Vol 2, PART E, Sec 7.8.53, for
++	 * advertising_event_property LE_LEGACY_ADV_DIRECT_IND
++	 * does not supports advertising data when the advertising set already
++	 * contains some, the controller shall return erroc code 'Invalid
++	 * HCI Command Parameters(0x12).
++	 * So it is required to remove adv set for handle 0x00. since we use
++	 * instance 0 for directed adv.
++	 */
++	err = hci_remove_ext_adv_instance_sync(hdev, cp.handle, NULL);
++	if (err)
++		return err;
++
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_EXT_ADV_PARAMS,
++				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	if (err)
++		return err;
++
++	/* Check if random address need to be updated */
++	if (own_addr_type == ADDR_LE_DEV_RANDOM &&
++	    bacmp(&random_addr, BDADDR_ANY) &&
++	    bacmp(&random_addr, &hdev->random_addr)) {
++		err = hci_set_adv_set_random_addr_sync(hdev, 0x00,
++						       &random_addr);
++		if (err)
++			return err;
++	}
++
++	return hci_enable_ext_advertising_sync(hdev, 0x00);
++}
++
++static int hci_le_directed_advertising_sync(struct hci_dev *hdev,
++					    struct hci_conn *conn)
++{
++	struct hci_cp_le_set_adv_param cp;
++	u8 status;
++	u8 own_addr_type;
++	u8 enable;
++
++	if (ext_adv_capable(hdev))
++		return hci_le_ext_directed_advertising_sync(hdev, conn);
++
++	/* Clear the HCI_LE_ADV bit temporarily so that the
++	 * hci_update_random_address knows that it's safe to go ahead
++	 * and write a new random address. The flag will be set back on
++	 * as soon as the SET_ADV_ENABLE HCI command completes.
++	 */
++	hci_dev_clear_flag(hdev, HCI_LE_ADV);
++
++	/* Set require_privacy to false so that the remote device has a
++	 * chance of identifying us.
++	 */
++	status = hci_update_random_address_sync(hdev, false, conn_use_rpa(conn),
++						&own_addr_type);
++	if (status)
++		return status;
++
++	memset(&cp, 0, sizeof(cp));
++
++	/* Some controllers might reject command if intervals are not
++	 * within range for undirected advertising.
++	 * BCM20702A0 is known to be affected by this.
++	 */
++	cp.min_interval = cpu_to_le16(0x0020);
++	cp.max_interval = cpu_to_le16(0x0020);
++
++	cp.type = LE_ADV_DIRECT_IND;
++	cp.own_address_type = own_addr_type;
++	cp.direct_addr_type = conn->dst_type;
++	bacpy(&cp.direct_addr, &conn->dst);
++	cp.channel_map = hdev->le_adv_channel_map;
++
++	status = __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_PARAM,
++				       sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++	if (status)
++		return status;
++
++	enable = 0x01;
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_SET_ADV_ENABLE,
++				     sizeof(enable), &enable, HCI_CMD_TIMEOUT);
++}
++
++static void set_ext_conn_params(struct hci_conn *conn,
++				struct hci_cp_le_ext_conn_param *p)
++{
++	struct hci_dev *hdev = conn->hdev;
++
++	memset(p, 0, sizeof(*p));
++
++	p->scan_interval = cpu_to_le16(hdev->le_scan_int_connect);
++	p->scan_window = cpu_to_le16(hdev->le_scan_window_connect);
++	p->conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	p->conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
++	p->conn_latency = cpu_to_le16(conn->le_conn_latency);
++	p->supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
++	p->min_ce_len = cpu_to_le16(0x0000);
++	p->max_ce_len = cpu_to_le16(0x0000);
++}
++
++int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
++				u8 own_addr_type)
++{
++	struct hci_cp_le_ext_create_conn *cp;
++	struct hci_cp_le_ext_conn_param *p;
++	u8 data[sizeof(*cp) + sizeof(*p) * 3];
++	u32 plen;
++
++	cp = (void *)data;
++	p = (void *)cp->data;
++
++	memset(cp, 0, sizeof(*cp));
++
++	bacpy(&cp->peer_addr, &conn->dst);
++	cp->peer_addr_type = conn->dst_type;
++	cp->own_addr_type = own_addr_type;
++
++	plen = sizeof(*cp);
++
++	if (scan_1m(hdev)) {
++		cp->phys |= LE_SCAN_PHY_1M;
++		set_ext_conn_params(conn, p);
++
++		p++;
++		plen += sizeof(*p);
++	}
++
++	if (scan_2m(hdev)) {
++		cp->phys |= LE_SCAN_PHY_2M;
++		set_ext_conn_params(conn, p);
++
++		p++;
++		plen += sizeof(*p);
++	}
++
++	if (scan_coded(hdev)) {
++		cp->phys |= LE_SCAN_PHY_CODED;
++		set_ext_conn_params(conn, p);
++
++		plen += sizeof(*p);
++	}
++
++	return __hci_cmd_sync_status(hdev, HCI_OP_LE_EXT_CREATE_CONN,
++				     plen, data, HCI_CMD_TIMEOUT);
++}
++
++int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
++{
++	struct hci_cp_le_create_conn cp;
++	struct hci_conn_params *params;
++	u8 own_addr_type;
++	int err;
++
++	/* Disable advertising if we're active. For central role
++	 * connections most controllers will refuse to connect if
++	 * advertising is enabled, and for peripheral role connections we
++	 * anyway have to disable it in order to start directed
++	 * advertising. Any registered advertisements will be
++	 * re-enabled after the connection attempt is finished.
++	 */
++	hci_pause_advertising_sync(hdev);
++
++	/* If requested to connect as peripheral use directed advertising */
++	if (conn->role == HCI_ROLE_SLAVE) {
++		/* If we're active scanning most controllers are unable
++		 * to initiate advertising. Simply reject the attempt.
++		 */
++		if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
++		    hdev->le_scan_type == LE_SCAN_ACTIVE) {
++			hci_conn_del(conn);
++			return -EBUSY;
++		}
++
++		err = hci_le_directed_advertising_sync(hdev, conn);
++		goto done;
++	}
++
++	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
++	if (params) {
++		conn->le_conn_min_interval = params->conn_min_interval;
++		conn->le_conn_max_interval = params->conn_max_interval;
++		conn->le_conn_latency = params->conn_latency;
++		conn->le_supv_timeout = params->supervision_timeout;
++	} else {
++		conn->le_conn_min_interval = hdev->le_conn_min_interval;
++		conn->le_conn_max_interval = hdev->le_conn_max_interval;
++		conn->le_conn_latency = hdev->le_conn_latency;
++		conn->le_supv_timeout = hdev->le_supv_timeout;
++	}
++
++	/* If direct address was provided we use it instead of current
++	 * address.
++	 */
++	if (bacmp(&conn->direct_rpa, BDADDR_ANY)) {
++		if (bacmp(&hdev->random_addr, &conn->direct_rpa)) {
++			err = __hci_cmd_sync_status(hdev,
++						    HCI_OP_LE_SET_RANDOM_ADDR,
++						    6, &conn->direct_rpa,
++						    HCI_CMD_TIMEOUT);
++			if (err)
++				return err;
++		}
++
++		/* direct address is always RPA */
++		own_addr_type = ADDR_LE_DEV_RANDOM;
++	} else {
++		/* Update random address, but set require_privacy to false so
++		 * that we never connect with an non-resolvable address.
++		 */
++		err = hci_update_random_address_sync(hdev, false,
++						     conn_use_rpa(conn),
++						     &own_addr_type);
++		if (err)
++			return err;
++	}
++
++	/* If controller is scanning, we stop it since some controllers are
++	 * not able to scan and connect at the same time. Also set the
++	 * HCI_LE_SCAN_INTERRUPTED flag so that the command complete
++	 * handler for scan disabling knows to set the correct discovery
++	 * state.
++	 */
++	if (hci_dev_test_flag(hdev, HCI_LE_SCAN)) {
++		hci_scan_disable_sync(hdev);
++		hci_dev_set_flag(hdev, HCI_LE_SCAN_INTERRUPTED);
++	}
++
++	if (use_ext_conn(hdev)) {
++		err = hci_le_ext_create_conn_sync(hdev, conn, own_addr_type);
++		goto done;
++	}
++
++	memset(&cp, 0, sizeof(cp));
++
++	cp.scan_interval = cpu_to_le16(hdev->le_scan_int_connect);
++	cp.scan_window = cpu_to_le16(hdev->le_scan_window_connect);
++
++	bacpy(&cp.peer_addr, &conn->dst);
++	cp.peer_addr_type = conn->dst_type;
++	cp.own_address_type = own_addr_type;
++	cp.conn_interval_min = cpu_to_le16(conn->le_conn_min_interval);
++	cp.conn_interval_max = cpu_to_le16(conn->le_conn_max_interval);
++	cp.conn_latency = cpu_to_le16(conn->le_conn_latency);
++	cp.supervision_timeout = cpu_to_le16(conn->le_supv_timeout);
++	cp.min_ce_len = cpu_to_le16(0x0000);
++	cp.max_ce_len = cpu_to_le16(0x0000);
++
++	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_CONN,
++				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
++
++done:
++	hci_resume_advertising_sync(hdev);
++	return err;
++}
+-- 
+2.33.1
 
-Before 83f2dafe2a62 "Bluetooth: btintel: Refactoring setup routine for
-legacy ROM sku", it always works after a restart, but from that commit
-up until before 0ea53674d07f it either works or doesn't work after a
-restart depending on if before restart it was working or not, meaning
-it stays working or stays not working.
-
-Also on the first restart from before 83f2dafe2a62 into 0ea53674d07f
-or later it works, but then restarting again into 0ea53674d07f or
-later it no longer works. So it seems that 0ea53674d07f and later puts
-the bluetooth in a nonworking state if you restart from it, but before
-83f2dafe2a62 it puts it back into a working state at startup, and in
-between it doesn't do either, i.e. it stays the way it was.
-
-I have a Dell Latitude E5550 laptop with an Intel 7265 wifi/bluetooth
-card REV=0x210 firmware version 29.4063824552.0 7265D-29. I'm on Arch
-Linux, the problem is still there on 5.16-rc4.
-
-Here is a thread on the Arch Linux forums with several people with the
-same problem, for some of them it got fixed with a kernel update or by
-reloading modules, but not for everybody, including me
-https://bbs.archlinux.org/viewtopic.php?id=271459
-
-#regzbot introduced 0ea53674d07f
