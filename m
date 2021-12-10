@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B16C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 23:37:15 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id BF514C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 23:37:16 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345166AbhLJXku (ORCPT
+        id S1345173AbhLJXkv (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Dec 2021 18:40:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44326 "EHLO
+        Fri, 10 Dec 2021 18:40:51 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44338 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243792AbhLJXkt (ORCPT
+        with ESMTP id S1345168AbhLJXkv (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 10 Dec 2021 18:40:49 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CA1C0617A1
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:13 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so10526689pju.3
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:13 -0800 (PST)
+        Fri, 10 Dec 2021 18:40:51 -0500
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95FC6C061746
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:15 -0800 (PST)
+Received: by mail-pg1-x52b.google.com with SMTP id m15so9295174pgu.11
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=kCOvBiHpWr3CNJwBaWDIRj0DbgyvViq6zeLQRm7COMQ=;
-        b=cQz2SZkvc8Q8RB/Me9+14PWxLh03iXKvAcgeYdUR30AbCcOMb6J2rBu+TrY/sERrio
-         wWIKg4pIT3VeLhfiLCS3aCfyrZgyawfn++6F9xVxEuRiLcZ7Cx4guTjKf6RQ0rMfBM/J
-         H/dBUjt806KWd5UY/dvJQWYdJCwy0ObmCTkvXK5a4ylHSduf5cd89AXK7oS8hHEN31nl
-         zLkLW3TSaghTPkvXYhqXzC7pZwoqiZave1rSLszrbzlLsVbYeFRbM3Ddmtq0tsBHr8Nf
-         kYWzFneQQqqP3eKRw12B0zrH3OdmQK9vdOcWdErJvB3ffXG7ixdMy/Zwi8yP1mmJQdfr
-         h66A==
+        bh=wFS+eUhVu1r688H6iZb+IHI07r1kNM1rXHX2GUMneJQ=;
+        b=QQEZyRN6ZisPUBnrXJilQmeUhKPMgY20o7TDqH4OXj5Jamk3diWpRfitzUgydfhWGu
+         F+oZnGv2yQ4YOiznj5ioFebLjEcgHMbEQfxQnVYHvGN/yVhdftBozcZG5IKGJoJKtaSI
+         LrRN6nZhx9gcdEXCuyfm/GXjHL6wpkSD0J6dizzsepyACeHnAfr6iv/+2ETovSY0HdDD
+         YuH8/pfqKH2/iwx0P/I75MtoMG4ko657vmFNcWj08fFx36wRTRNvLgj5UJ5lgmzz6gEh
+         orzuY9wrX4M4FU1hYg4pmvJag+Anoj9Yi3I5widVR4hkuBCq4g0vpWDSxBT41qe0lt2d
+         QlOA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=kCOvBiHpWr3CNJwBaWDIRj0DbgyvViq6zeLQRm7COMQ=;
-        b=YGifstYoi1Jy5pLzW8dtTviTgkhR/0aC1ryVqHNX+D3d4ayEa4QcqSufPosV/D3N6P
-         IS1iFSU54VOj8YdI5K5aOFvx+8lLZq+j6HaPVHBBriLAF93m4YGccwWYwcuF8L57kHL7
-         czOiPAJmJlLFSuD2bsvaXXmOB4NbajKEwyQvOSImiFZ6LKaEjei397KEnmlgAYiJ82cp
-         ZQYhYCerR8sJT4iKvb9q3C000V5EBEbZzcfm3l9bZZNlFvXguHPiDLRJS2uEc727nlBT
-         wetsNcAjwrjqwlIzxqzmeyj0lYcRNhKiz7TS2ar14tWSIdHrU+3h7uSdtw0i3dK8GH+Z
-         o2lw==
-X-Gm-Message-State: AOAM5338jihNhTDhUJd5/ztfz6X7EjFmWNttcOrtw4NAl6S+JWmeAX+2
-        kiFA+yCHj3ahKMramWQncaQp7MVUPek=
-X-Google-Smtp-Source: ABdhPJxdAlR2QjdOe+1O2jQTUj2Rdq2NFqHZhs6eqgLXplGibqTexjzXSxaL3lCstSOeBdx7kRBL7g==
-X-Received: by 2002:a17:90a:c091:: with SMTP id o17mr27786185pjs.35.1639179433214;
-        Fri, 10 Dec 2021 15:37:13 -0800 (PST)
+        bh=wFS+eUhVu1r688H6iZb+IHI07r1kNM1rXHX2GUMneJQ=;
+        b=oAtt2Ilp1jAgdFGGpNA6guo2byDKI6AMyAEGx01j8elCTWUAtCk7+uNiQ+h5oU6WVs
+         xYXMRGigBLp/86oAqO1GbnuZN4KAzNCFnubkJ83vFHd/ngc0c7IKGbZbUd8/4c9zEsfl
+         6lC+V2LeCwtMYBdUIwqlG03k4QPOyVIAPmfxqFmlikg37vSQlxYCdUC7ZN2SOCAuHs0U
+         BTmMnjiIFaT/Y0UGrxeVKfPyTnz2WMzdIERDa4zmzkisoOu29bF3zCqcOxZq/8D2RmbL
+         Fpt+HLa/wXtgGyoeNV7UkLKF6GlRIAPEGLjeLUuVFS9e5oHT1bg1ixfQICMx8hs2xFlH
+         tmDg==
+X-Gm-Message-State: AOAM5316gGR9j7do/1sgyMiH1W+nrneBVBB001GRl6ArdNLGKVeSQZ8U
+        8OMuRd0bktaGSpqVY+QaNzW7qw3vtng=
+X-Google-Smtp-Source: ABdhPJzP7GCiImwweYlFIBLJBZ5mT9yC09fVcBK/emWYJWEYnrHnO5y/b3tp+aBkjnWAR019O0vGqw==
+X-Received: by 2002:a63:8f05:: with SMTP id n5mr2778879pgd.606.1639179434770;
+        Fri, 10 Dec 2021 15:37:14 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b1sm3659885pgk.37.2021.12.10.15.37.12
+        by smtp.gmail.com with ESMTPSA id b1sm3659885pgk.37.2021.12.10.15.37.14
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Dec 2021 15:37:12 -0800 (PST)
+        Fri, 10 Dec 2021 15:37:14 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 2/4] Bluetooth: hci_sync: Add support for waiting specific LE subevents
-Date:   Fri, 10 Dec 2021 15:37:08 -0800
-Message-Id: <20211210233710.1190040-2-luiz.dentz@gmail.com>
+Subject: [PATCH v2 4/4] Bluetooth: hci_sync: Add check simultaneous roles support
+Date:   Fri, 10 Dec 2021 15:37:10 -0800
+Message-Id: <20211210233710.1190040-4-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210233710.1190040-1-luiz.dentz@gmail.com>
 References: <20211210233710.1190040-1-luiz.dentz@gmail.com>
@@ -66,123 +66,104 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This adds support for waiting for specific LE subevents instead of
-waiting for the command status which may only indicate that the commands
-in in progress and a different event is used to complete the operation.
+This attempts to check if the controller can act as both central and
+peripheral simultaneously and in case it does skip suspending
+advertising or in case of directed advertising don't fail if scanning.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- include/net/bluetooth/bluetooth.h |  1 +
- net/bluetooth/hci_event.c         | 41 ++++++++++++++++++++-----------
- net/bluetooth/hci_sync.c          |  2 +-
- 3 files changed, 28 insertions(+), 16 deletions(-)
+ include/net/bluetooth/hci_core.h |  6 ++++++
+ net/bluetooth/hci_sync.c         | 24 ++++++++++++------------
+ net/bluetooth/mgmt.c             |  5 +----
+ 3 files changed, 19 insertions(+), 16 deletions(-)
 
-diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
-index 77906832353f..4b3d0b16c185 100644
---- a/include/net/bluetooth/bluetooth.h
-+++ b/include/net/bluetooth/bluetooth.h
-@@ -412,6 +412,7 @@ struct bt_skb_cb {
- #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
- #define hci_skb_expect(skb) bt_cb((skb))->expect
- #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
-+#define hci_skb_event(skb) bt_cb((skb))->hci.req_event
- #define hci_skb_sk(skb) bt_cb((skb))->hci.sk
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 1e479ba25c31..cc95b6c3f839 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -782,6 +782,12 @@ extern struct mutex hci_cb_list_lock;
+ 		hci_dev_clear_flag(hdev, HCI_QUALITY_REPORT);	\
+ 	} while (0)
  
- static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 7632f3a2a292..9151d70b36b0 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4038,15 +4038,14 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
- 	 * (since for this kind of commands there will not be a command
- 	 * complete event).
- 	 */
--	if (ev->status ||
--	    (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->hci.req_event))
-+	if (ev->status || (hdev->sent_cmd && !hci_skb_event(hdev->sent_cmd))) {
- 		hci_req_cmd_complete(hdev, *opcode, ev->status, req_complete,
- 				     req_complete_skb);
--
--	if (hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
--		bt_dev_err(hdev,
--			   "unexpected event for opcode 0x%4.4x", *opcode);
--		return;
-+		if (hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
-+			bt_dev_err(hdev, "unexpected event for opcode 0x%4.4x",
-+				   *opcode);
-+			return;
-+		}
- 	}
- 
- 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
-@@ -6448,13 +6447,24 @@ static const struct hci_le_ev {
- };
- 
- static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
--			    struct sk_buff *skb)
-+			    struct sk_buff *skb, u16 *opcode, u8 *status,
-+			    hci_req_complete_t *req_complete,
-+			    hci_req_complete_skb_t *req_complete_skb)
- {
- 	struct hci_ev_le_meta *ev = data;
- 	const struct hci_le_ev *subev;
- 
- 	bt_dev_dbg(hdev, "subevent 0x%2.2x", ev->subevent);
- 
-+	/* Only match event if command OGF is for LE */
-+	if (hdev->sent_cmd &&
-+	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) == 0x08 &&
-+	    hci_skb_event(hdev->sent_cmd) == ev->subevent) {
-+		*opcode = hci_skb_opcode(hdev->sent_cmd);
-+		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
-+				     req_complete_skb);
-+	}
++#define hci_dev_le_state_simultaneous(hdev) \
++	(test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) && \
++	 (hdev->le_states[4] & 0x08) &&	/* Central */ \
++	 (hdev->le_states[4] & 0x40) &&	/* Peripheral */ \
++	 (hdev->le_states[3] & 0x10))	/* Simultaneous */
 +
- 	subev = &hci_le_ev_table[ev->subevent];
- 	if (!subev->func)
- 		return;
-@@ -6748,8 +6758,8 @@ static const struct hci_ev {
- 	HCI_EV(HCI_EV_REMOTE_HOST_FEATURES, hci_remote_host_features_evt,
- 	       sizeof(struct hci_ev_remote_host_features)),
- 	/* [0x3e = HCI_EV_LE_META] */
--	HCI_EV_VL(HCI_EV_LE_META, hci_le_meta_evt,
--		  sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_SIZE),
-+	HCI_EV_REQ_VL(HCI_EV_LE_META, hci_le_meta_evt,
-+		      sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_SIZE),
- #if IS_ENABLED(CONFIG_BT_HS)
- 	/* [0x40 = HCI_EV_PHY_LINK_COMPLETE] */
- 	HCI_EV(HCI_EV_PHY_LINK_COMPLETE, hci_phy_link_complete_evt,
-@@ -6833,11 +6843,12 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ /* ----- HCI interface to upper protocols ----- */
+ int l2cap_connect_ind(struct hci_dev *hdev, bdaddr_t *bdaddr);
+ int l2cap_disconn_ind(struct hci_conn *hcon);
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 28d62273d67c..6abcf966d001 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -5170,30 +5170,29 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ 	u8 own_addr_type;
+ 	int err;
+ 
+-	/* Disable advertising if we're active. For central role
+-	 * connections most controllers will refuse to connect if
+-	 * advertising is enabled, and for peripheral role connections we
+-	 * anyway have to disable it in order to start directed
+-	 * advertising. Any registered advertisements will be
+-	 * re-enabled after the connection attempt is finished.
+-	 */
+-	hci_pause_advertising_sync(hdev);
+-
+ 	/* If requested to connect as peripheral use directed advertising */
+ 	if (conn->role == HCI_ROLE_SLAVE) {
+-		/* If we're active scanning most controllers are unable
+-		 * to initiate advertising. Simply reject the attempt.
++		/* If we're active scanning and the controller doesn't support
++		 * simultaneous roles simply reject the attempt.
+ 		 */
+ 		if (hci_dev_test_flag(hdev, HCI_LE_SCAN) &&
+-		    hdev->le_scan_type == LE_SCAN_ACTIVE) {
++		    hdev->le_scan_type == LE_SCAN_ACTIVE &&
++		    !hci_dev_le_state_simultaneous(hdev)) {
+ 			hci_conn_del(conn);
+ 			return -EBUSY;
+ 		}
+ 
++		/* Pause advertising while doing directed advertising. */
++		hci_pause_advertising_sync(hdev);
++
+ 		err = hci_le_directed_advertising_sync(hdev, conn);
  		goto done;
  	}
  
--	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
--		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
--		opcode = __le16_to_cpu(cmd_hdr->opcode);
--		hci_req_cmd_complete(hdev, opcode, status, &req_complete,
--				     &req_complete_skb);
-+	/* Only match event if command OGF is not for LE */
-+	if (hdev->sent_cmd &&
-+	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) != 0x08 &&
-+	    hci_skb_event(hdev->sent_cmd) == event) {
-+		hci_req_cmd_complete(hdev, hci_skb_opcode(hdev->sent_cmd),
-+				     status, &req_complete, &req_complete_skb);
- 		req_evt = event;
- 	}
++	/* Disable advertising if simultaneous roles is not supported. */
++	if (!hci_dev_le_state_simultaneous(hdev))
++		hci_pause_advertising_sync(hdev);
++
+ 	params = hci_conn_params_lookup(hdev, &conn->dst, conn->dst_type);
+ 	if (params) {
+ 		conn->le_conn_min_interval = params->conn_min_interval;
+@@ -5251,6 +5250,7 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
+ 				       HCI_CMD_TIMEOUT, NULL);
  
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 19d9a95b305a..917652b67194 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -103,7 +103,7 @@ static void hci_cmd_sync_add(struct hci_request *req, u16 opcode, u32 plen,
- 	if (skb_queue_empty(&req->cmd_q))
- 		bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
- 
--	bt_cb(skb)->hci.req_event = event;
-+	hci_skb_event(skb) = event;
- 
- 	skb_queue_tail(&req->cmd_q, skb);
+ done:
++	/* Re-enable advertising after the connection attempt is finished. */
+ 	hci_resume_advertising_sync(hdev);
+ 	return err;
  }
+diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+index e931e417d3e1..4e1557281956 100644
+--- a/net/bluetooth/mgmt.c
++++ b/net/bluetooth/mgmt.c
+@@ -3916,10 +3916,7 @@ static int read_exp_features_info(struct sock *sk, struct hci_dev *hdev,
+ #endif
+ 
+ 	if (hdev) {
+-		if (test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks) &&
+-		    (hdev->le_states[4] & 0x08) &&	/* Central */
+-		    (hdev->le_states[4] & 0x40) &&	/* Peripheral */
+-		    (hdev->le_states[3] & 0x10))	/* Simultaneous */
++		if (hci_dev_le_state_simultaneous(hdev))
+ 			flags = BIT(0);
+ 		else
+ 			flags = 0;
 -- 
 2.33.1
 
