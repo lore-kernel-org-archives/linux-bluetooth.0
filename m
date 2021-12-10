@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 323B4C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 23:37:16 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 55B16C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 10 Dec 2021 23:37:15 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345170AbhLJXkv (ORCPT
+        id S1345166AbhLJXku (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 10 Dec 2021 18:40:51 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44328 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S243792AbhLJXku (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Fri, 10 Dec 2021 18:40:50 -0500
-Received: from mail-pj1-x1032.google.com (mail-pj1-x1032.google.com [IPv6:2607:f8b0:4864:20::1032])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B8135C061746
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:14 -0800 (PST)
-Received: by mail-pj1-x1032.google.com with SMTP id j6-20020a17090a588600b001a78a5ce46aso10583858pji.0
-        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:14 -0800 (PST)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:44326 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S243792AbhLJXkt (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 10 Dec 2021 18:40:49 -0500
+Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3CA1C0617A1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:13 -0800 (PST)
+Received: by mail-pj1-x102a.google.com with SMTP id p18-20020a17090ad31200b001a78bb52876so10526689pju.3
+        for <linux-bluetooth@vger.kernel.org>; Fri, 10 Dec 2021 15:37:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=Wthr/D2H4eVeDvnmZp/LJ4QsADlMdM8XxZk8hLPMMs8=;
-        b=MncqbjyRp8LGa+4qCMgOWDb/sqYrz/L8w7yP/RTIZjvcQrz5OHLZkmWRNKOiliSw+g
-         3UuxJ0ph64kRmeHmLimQfpPdvOCXo3wd/v90B69G4TeGg4shDXdjMy/CyyWJdfDbmaIf
-         JST/Fp5wf+fLTym32RpN6T0TXufXlO/MCEpYU3ggvjm/v5wNFmZIURYe7HC4NIk8o8eF
-         l5XoBmOKDLdzrHLAlhMcK6lMprEyTj//76WwMTZt4rTrXwv7T6w31XYsrAKR+P30FXnJ
-         XY2t5Q2oQyuoqoBqxyVk7cJtfNuIdcCJ7I9z5G5OV3ybwElAYyuKXQpdkT0ReFocf9t6
-         hONg==
+        bh=kCOvBiHpWr3CNJwBaWDIRj0DbgyvViq6zeLQRm7COMQ=;
+        b=cQz2SZkvc8Q8RB/Me9+14PWxLh03iXKvAcgeYdUR30AbCcOMb6J2rBu+TrY/sERrio
+         wWIKg4pIT3VeLhfiLCS3aCfyrZgyawfn++6F9xVxEuRiLcZ7Cx4guTjKf6RQ0rMfBM/J
+         H/dBUjt806KWd5UY/dvJQWYdJCwy0ObmCTkvXK5a4ylHSduf5cd89AXK7oS8hHEN31nl
+         zLkLW3TSaghTPkvXYhqXzC7pZwoqiZave1rSLszrbzlLsVbYeFRbM3Ddmtq0tsBHr8Nf
+         kYWzFneQQqqP3eKRw12B0zrH3OdmQK9vdOcWdErJvB3ffXG7ixdMy/Zwi8yP1mmJQdfr
+         h66A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=Wthr/D2H4eVeDvnmZp/LJ4QsADlMdM8XxZk8hLPMMs8=;
-        b=iNu+kTAxK728m6YFtLahz/pDneblLch1DV9srGb+slajigpHIdlAgQokOCHH7/J1mx
-         ObJc/ui4r6i/ddaxtMxMbxLl106HzfFWOqimh2DWtI/OI78HOdUC92iX3BXwQRi2uYkk
-         Dyr7fs+rTRPmByTxhQudMQX1GKpwIzvBERRyn4ppySioQV9sgFQXFUGUZXo20OHlMr3/
-         L9kFCinNO2v+Kq+0O8Hq0PfgvXh+hiaUsSrULBe3zf6yhqbLo3WaKHOimr7PCr6ws1ft
-         agAHJDDmnunZJ3ag+i63801su0Y4zL4uGxn8MARLjxsUA1nhTf9EpPvVOD1bLpY+RhEO
-         g5qQ==
-X-Gm-Message-State: AOAM5325/rti7YRs73RCq9hCd8SE8JT9/2udGIy099kCDlHlSXqcth26
-        n5B5FbEGFvd7bvN0nri79OSfHdsHYXk=
-X-Google-Smtp-Source: ABdhPJxZhqwxof4vxCUFCkYm/4nJI1HayFU9LKilxzLH9dFh61lBGz19/J4OrOWkuDADoN+kcn2ZIg==
-X-Received: by 2002:a17:90b:224f:: with SMTP id hk15mr28106234pjb.173.1639179434005;
-        Fri, 10 Dec 2021 15:37:14 -0800 (PST)
+        bh=kCOvBiHpWr3CNJwBaWDIRj0DbgyvViq6zeLQRm7COMQ=;
+        b=YGifstYoi1Jy5pLzW8dtTviTgkhR/0aC1ryVqHNX+D3d4ayEa4QcqSufPosV/D3N6P
+         IS1iFSU54VOj8YdI5K5aOFvx+8lLZq+j6HaPVHBBriLAF93m4YGccwWYwcuF8L57kHL7
+         czOiPAJmJlLFSuD2bsvaXXmOB4NbajKEwyQvOSImiFZ6LKaEjei397KEnmlgAYiJ82cp
+         ZQYhYCerR8sJT4iKvb9q3C000V5EBEbZzcfm3l9bZZNlFvXguHPiDLRJS2uEc727nlBT
+         wetsNcAjwrjqwlIzxqzmeyj0lYcRNhKiz7TS2ar14tWSIdHrU+3h7uSdtw0i3dK8GH+Z
+         o2lw==
+X-Gm-Message-State: AOAM5338jihNhTDhUJd5/ztfz6X7EjFmWNttcOrtw4NAl6S+JWmeAX+2
+        kiFA+yCHj3ahKMramWQncaQp7MVUPek=
+X-Google-Smtp-Source: ABdhPJxdAlR2QjdOe+1O2jQTUj2Rdq2NFqHZhs6eqgLXplGibqTexjzXSxaL3lCstSOeBdx7kRBL7g==
+X-Received: by 2002:a17:90a:c091:: with SMTP id o17mr27786185pjs.35.1639179433214;
+        Fri, 10 Dec 2021 15:37:13 -0800 (PST)
 Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id b1sm3659885pgk.37.2021.12.10.15.37.13
+        by smtp.gmail.com with ESMTPSA id b1sm3659885pgk.37.2021.12.10.15.37.12
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 10 Dec 2021 15:37:13 -0800 (PST)
+        Fri, 10 Dec 2021 15:37:12 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v2 3/4] Bluetooth: hci_sync: Wait for proper events when connecting LE
-Date:   Fri, 10 Dec 2021 15:37:09 -0800
-Message-Id: <20211210233710.1190040-3-luiz.dentz@gmail.com>
+Subject: [PATCH v2 2/4] Bluetooth: hci_sync: Add support for waiting specific LE subevents
+Date:   Fri, 10 Dec 2021 15:37:08 -0800
+Message-Id: <20211210233710.1190040-2-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211210233710.1190040-1-luiz.dentz@gmail.com>
 References: <20211210233710.1190040-1-luiz.dentz@gmail.com>
@@ -66,44 +66,123 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-When using HCI_OP_LE_CREATE_CONN wait for HCI_EV_LE_CONN_COMPLETE before
-completing it and for HCI_OP_LE_EXT_CREATE_CONN wait for
-HCI_EV_LE_ENHANCED_CONN_COMPLETE before resuming advertising.
+This adds support for waiting for specific LE subevents instead of
+waiting for the command status which may only indicate that the commands
+in in progress and a different event is used to complete the operation.
 
 Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 ---
- net/bluetooth/hci_sync.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/hci_event.c         | 41 ++++++++++++++++++++-----------
+ net/bluetooth/hci_sync.c          |  2 +-
+ 3 files changed, 28 insertions(+), 16 deletions(-)
 
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index 917652b67194..28d62273d67c 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -5157,8 +5157,10 @@ int hci_le_ext_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn,
- 		plen += sizeof(*p);
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 77906832353f..4b3d0b16c185 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -412,6 +412,7 @@ struct bt_skb_cb {
+ #define hci_skb_pkt_type(skb) bt_cb((skb))->pkt_type
+ #define hci_skb_expect(skb) bt_cb((skb))->expect
+ #define hci_skb_opcode(skb) bt_cb((skb))->hci.opcode
++#define hci_skb_event(skb) bt_cb((skb))->hci.req_event
+ #define hci_skb_sk(skb) bt_cb((skb))->hci.sk
+ 
+ static inline struct sk_buff *bt_skb_alloc(unsigned int len, gfp_t how)
+diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
+index 7632f3a2a292..9151d70b36b0 100644
+--- a/net/bluetooth/hci_event.c
++++ b/net/bluetooth/hci_event.c
+@@ -4038,15 +4038,14 @@ static void hci_cmd_status_evt(struct hci_dev *hdev, void *data,
+ 	 * (since for this kind of commands there will not be a command
+ 	 * complete event).
+ 	 */
+-	if (ev->status ||
+-	    (hdev->sent_cmd && !bt_cb(hdev->sent_cmd)->hci.req_event))
++	if (ev->status || (hdev->sent_cmd && !hci_skb_event(hdev->sent_cmd))) {
+ 		hci_req_cmd_complete(hdev, *opcode, ev->status, req_complete,
+ 				     req_complete_skb);
+-
+-	if (hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
+-		bt_dev_err(hdev,
+-			   "unexpected event for opcode 0x%4.4x", *opcode);
+-		return;
++		if (hci_dev_test_flag(hdev, HCI_CMD_PENDING)) {
++			bt_dev_err(hdev, "unexpected event for opcode 0x%4.4x",
++				   *opcode);
++			return;
++		}
  	}
  
--	return __hci_cmd_sync_status(hdev, HCI_OP_LE_EXT_CREATE_CONN,
--				     plen, data, HCI_CMD_TIMEOUT);
-+	return __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_EXT_CREATE_CONN,
-+					plen, data,
-+					HCI_EV_LE_ENHANCED_CONN_COMPLETE,
-+					HCI_CMD_TIMEOUT, NULL);
+ 	if (atomic_read(&hdev->cmd_cnt) && !skb_queue_empty(&hdev->cmd_q))
+@@ -6448,13 +6447,24 @@ static const struct hci_le_ev {
+ };
+ 
+ static void hci_le_meta_evt(struct hci_dev *hdev, void *data,
+-			    struct sk_buff *skb)
++			    struct sk_buff *skb, u16 *opcode, u8 *status,
++			    hci_req_complete_t *req_complete,
++			    hci_req_complete_skb_t *req_complete_skb)
+ {
+ 	struct hci_ev_le_meta *ev = data;
+ 	const struct hci_le_ev *subev;
+ 
+ 	bt_dev_dbg(hdev, "subevent 0x%2.2x", ev->subevent);
+ 
++	/* Only match event if command OGF is for LE */
++	if (hdev->sent_cmd &&
++	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) == 0x08 &&
++	    hci_skb_event(hdev->sent_cmd) == ev->subevent) {
++		*opcode = hci_skb_opcode(hdev->sent_cmd);
++		hci_req_cmd_complete(hdev, *opcode, 0x00, req_complete,
++				     req_complete_skb);
++	}
++
+ 	subev = &hci_le_ev_table[ev->subevent];
+ 	if (!subev->func)
+ 		return;
+@@ -6748,8 +6758,8 @@ static const struct hci_ev {
+ 	HCI_EV(HCI_EV_REMOTE_HOST_FEATURES, hci_remote_host_features_evt,
+ 	       sizeof(struct hci_ev_remote_host_features)),
+ 	/* [0x3e = HCI_EV_LE_META] */
+-	HCI_EV_VL(HCI_EV_LE_META, hci_le_meta_evt,
+-		  sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_SIZE),
++	HCI_EV_REQ_VL(HCI_EV_LE_META, hci_le_meta_evt,
++		      sizeof(struct hci_ev_le_meta), HCI_MAX_EVENT_SIZE),
+ #if IS_ENABLED(CONFIG_BT_HS)
+ 	/* [0x40 = HCI_EV_PHY_LINK_COMPLETE] */
+ 	HCI_EV(HCI_EV_PHY_LINK_COMPLETE, hci_phy_link_complete_evt,
+@@ -6833,11 +6843,12 @@ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb)
+ 		goto done;
+ 	}
+ 
+-	if (hdev->sent_cmd && bt_cb(hdev->sent_cmd)->hci.req_event == event) {
+-		struct hci_command_hdr *cmd_hdr = (void *) hdev->sent_cmd->data;
+-		opcode = __le16_to_cpu(cmd_hdr->opcode);
+-		hci_req_cmd_complete(hdev, opcode, status, &req_complete,
+-				     &req_complete_skb);
++	/* Only match event if command OGF is not for LE */
++	if (hdev->sent_cmd &&
++	    hci_opcode_ogf(hci_skb_opcode(hdev->sent_cmd)) != 0x08 &&
++	    hci_skb_event(hdev->sent_cmd) == event) {
++		hci_req_cmd_complete(hdev, hci_skb_opcode(hdev->sent_cmd),
++				     status, &req_complete, &req_complete_skb);
+ 		req_evt = event;
+ 	}
+ 
+diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
+index 19d9a95b305a..917652b67194 100644
+--- a/net/bluetooth/hci_sync.c
++++ b/net/bluetooth/hci_sync.c
+@@ -103,7 +103,7 @@ static void hci_cmd_sync_add(struct hci_request *req, u16 opcode, u32 plen,
+ 	if (skb_queue_empty(&req->cmd_q))
+ 		bt_cb(skb)->hci.req_flags |= HCI_REQ_START;
+ 
+-	bt_cb(skb)->hci.req_event = event;
++	hci_skb_event(skb) = event;
+ 
+ 	skb_queue_tail(&req->cmd_q, skb);
  }
- 
- int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
-@@ -5244,8 +5246,9 @@ int hci_le_create_conn_sync(struct hci_dev *hdev, struct hci_conn *conn)
- 	cp.min_ce_len = cpu_to_le16(0x0000);
- 	cp.max_ce_len = cpu_to_le16(0x0000);
- 
--	err = __hci_cmd_sync_status(hdev, HCI_OP_LE_CREATE_CONN,
--				    sizeof(cp), &cp, HCI_CMD_TIMEOUT);
-+	err = __hci_cmd_sync_status_sk(hdev, HCI_OP_LE_CREATE_CONN,
-+				       sizeof(cp), &cp, HCI_EV_LE_CONN_COMPLETE,
-+				       HCI_CMD_TIMEOUT, NULL);
- 
- done:
- 	hci_resume_advertising_sync(hdev);
 -- 
 2.33.1
 
