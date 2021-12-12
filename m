@@ -2,106 +2,76 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B0FAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 11 Dec 2021 12:39:19 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 43EB2C43217
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 12 Dec 2021 05:41:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229943AbhLKMjS (ORCPT
+        id S229629AbhLLFlB (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 11 Dec 2021 07:39:18 -0500
-Received: from ams.source.kernel.org ([145.40.68.75]:57116 "EHLO
-        ams.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229668AbhLKMjS (ORCPT
+        Sun, 12 Dec 2021 00:41:01 -0500
+Received: from relay.wiredblade.com ([168.235.105.136]:54289 "EHLO
+        relay.wiredblade.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229511AbhLLFlA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 11 Dec 2021 07:39:18 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id 56C23B80108
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Dec 2021 12:39:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 11764C341CC
-        for <linux-bluetooth@vger.kernel.org>; Sat, 11 Dec 2021 12:39:16 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639226356;
-        bh=gB1RTof0RmpyxOK2cfNUdcPbqe4/Ya0DGT4kjBtxZDs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=S4yLPfPf4uncRisLxtdzxAH+nDMY5Y+oQIM01tpHcRyX55xtth8OvAnUoQ8oeqgHe
-         O7+6tpG+HHjI1B6rsnIGKJODp3o2nSBuj58OLNZFCN/biwKWKzkGSjavyG9oWI6tVM
-         VZuo1YtHw7HqffeiWrMU8MJtvDC12THhLuqHSgZeahM+got5YkTKFraOCPTJ0gezv8
-         yAG8+jb8zUeAcHV7NNlpSCXlluW++lvTkO8MB56j14dYF8lkiwdMr0NejcYJTcaY4q
-         lQubdDn3hbHaEpfMM2XVgS7jT9O2IMODIPmd4hquRoBXwTBOWEnyTqGCQTLvkjgDeJ
-         TN31rpcPG+g8w==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id EE10861101; Sat, 11 Dec 2021 12:39:15 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Sun, 12 Dec 2021 00:41:00 -0500
+dkim-signature: v=1; a=rsa-sha256; d=relay.compata.com; s=mail;
+        c=relaxed/relaxed; q=dns/txt; h=From:Reply-To:Subject:Date:Message-ID:To:MIME-Version:Content-Type;
+        bh=eZSJd1eJPcNUK8fAKQGnrXr73p9G43NdcKGG6LJz2mQ=;
+        b=q1kWGE7fpm2pDsFiwQMRkXFx7AatFLSbC0JOrMIOh8xxlGhgZ2Ubu2+EaXO+UuUz4QoXXD0448NtlWRck2EBd/J6Ga66sIzwy5qC5aKxCxbZ1+Rpa52K0zmK+Ai/fLH0OfcafQOvpGfqfmI3t0HK96o+jbs3ByTYaIYqZscn2q1n30TPwgIdXknjfSPLYHL7YPxlnVlyDMJUjLN1aoGNrY9ZCegf35XtFAGmJiRoAk/HVcfHutRkCkB/Kz
+        SmGrB3TAt8GzO+HQQHsxYHjGF5J40zeNwqnlUKF9rsSYjV10Is8uQXzUqIQvqiXgcGCGPW2e+LbL9x5QPH08Yy/cuHtA==
+Received: from compata.com (ip68-5-142-19.oc.oc.cox.net [68.5.142.19]) by relay.wiredblade.com
+ with ESMTPSA (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256)
+ ; Sun, 12 Dec 2021 05:40:58 +0000
+Received: from d7010.compata.com ([192.168.44.19]) by compata.com (8.16.1/8.16.1) with
+ ESMTP id 1BC5evbU710558 for <linux-bluetooth@vger.kernel.org>; Sat, 11 Dec
+ 2021 21:40:58 -0800
+Received: from d7010 (localhost [127.0.0.1]) by d7010.compata.com (8.16.1/8.15.2) with
+ ESMTP id 1BC5evj82621220 for <linux-bluetooth@vger.kernel.org>; Sat, 11
+ Dec 2021 21:40:57 -0800
+Message-Id: <202112120540.1BC5evj82621220@d7010.compata.com>
+X-Mailer: exmh version 2.9.0 11/07/2018 with nmh-1.7.1
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215167] Bluetooth: hci0: command 0xfc05 tx timeout
-Date:   Sat, 11 Dec 2021 12:39:15 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: erik@rigtorp.se
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215167-62941-RE2gKJRQQl@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215167-62941@https.bugzilla.kernel.org/>
-References: <bug-215167-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
-MIME-Version: 1.0
+reply-To: linux-bluetooth@vger.kernel.org
+Subject: Reconciling hcidump output with btmon
+From:   Dave Close <dave@compata.com>
+X-Face: $?&5f7w4GjUJOb-[FmngebA}V`5Dv)QEdHg|d%mytVRm]'o}*{J6:PP%(LfN
+ LmOcb#>"^wDF*|ZzuS??S*vLH[.miV(<v!QArMJG;~Mx<jl!LQ3)Gy9xw7w!EBQx9H~*[
+ *XF#\wyQK,dciSN=F_gd#{`rb43?hn5C9I&@Q2C+epIAS
+Mime-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Date:   Sat, 11 Dec 2021 21:40:57 -0800
+X-Scanned-By: MIMEDefang 2.85 on 192.168.44.23
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215167
+When I run "hcidump -R", I see (among other output) lines like these,
 
---- Comment #17 from Erik Rigtorp (erik@rigtorp.se) ---
-(In reply to Takashi Iwai from comment #16)
-> When you add the BTUSB_INTEL_BROKEN_INITIAL_NCMD flag for your device
-> (8087:0aa7) in the blacklist_table[] in btusb.c as in comment 13, does it
-> fix the problem?
+  > 04 3E 26 02 01 03 01 69 57 93 F1 99 F8 1A 02 01 04 09 09 39
+    36 37 35 39 39 38 46 07 16 09 18 EB 03 00 FE 04 16 0F 18 3E
+    A5
 
-Yes, running 5.15.16 tag from linux stable repo with this patch on top fixes
-the issue:
-diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-index 79d0db542da3..0ed04061823b 100644
---- a/drivers/bluetooth/btusb.c
-+++ b/drivers/bluetooth/btusb.c
-@@ -368,7 +368,8 @@ static const struct usb_device_id blacklist_table[] =3D=
- {
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-BTUSB_INTEL_BROKEN_INITIAL_NCMD },
-        { USB_DEVICE(0x8087, 0x0a2a), .driver_info =3D BTUSB_INTEL_COMBINED=
- },
-        { USB_DEVICE(0x8087, 0x0a2b), .driver_info =3D BTUSB_INTEL_COMBINED=
- },
--       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =3D BTUSB_INTEL_COMBINED=
- },
-+       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =3D BTUSB_INTEL_COMBINED=
- |
-+=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=20=
-=20=20
-BTUSB_INTEL_BROKEN_INITIAL_NCMD},
-        { USB_DEVICE(0x8087, 0x0aaa), .driver_info =3D BTUSB_INTEL_COMBINED=
- },
+But trying every available option for "btmon", I can't find anything
+remotely similar. How can I get this information using "btmon"? Or can
+I -- does "btmon" show this type of information? Is there some other
+command that would be more appropriate?
 
-        /* Other Intel Bluetooth devices */
+I understand that "hcidump" has been deprecated for several years. Yet
+the output of "btmon" seems to imply that it is calling "hcidump". That
+doesn't make sense to me. For example,
 
---=20
-You may reply to this email to add a comment.
+  @ RAW Open: hcidump (privileged) version 2.22 {0x0002} [hci0] 1.894682
+  @ RAW Open: hcidump (privileged) version 2.22 {0x0003} 1.894702
+  @ RAW Close: hcidump                          {0x0003} 1.894708
+  @ RAW Close: hcidump                          {0x0002} [hci0] 1.894718
 
-You are receiving this mail because:
-You are the assignee for the bug.=
+My system is running Fedora 34 with these packages:
+
+  bluez-5.62-2.fc34.x86_64 (includes /usr/bin/btmon)
+  bluez-deprecated-5.62-2.fc34.x86_64 (includes /usr/bin/hcidump)
+  bluez-hcidump-2.5-18.fc34.x86_64 (includes /usr/sbin/hcidump)
+-- 
+Dave Close, Compata, Irvine CA      "Curiosity is insubordination
+dave@compata.com, +1 714 434 7359    in its purest form."
+dhclose@alumni.caltech.edu             -- Vladimir Nabokov
+
+
