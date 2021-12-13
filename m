@@ -2,114 +2,127 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id EF7FAC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Dec 2021 21:39:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8BD91C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 13 Dec 2021 23:57:44 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242909AbhLMVjA (ORCPT
+        id S242754AbhLMX5o (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 13 Dec 2021 16:39:00 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56474 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S242947AbhLMVjA (ORCPT
+        Mon, 13 Dec 2021 18:57:44 -0500
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:28843 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235661AbhLMX5n (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 13 Dec 2021 16:39:00 -0500
-Received: from mail-pj1-x102a.google.com (mail-pj1-x102a.google.com [IPv6:2607:f8b0:4864:20::102a])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0F9AC061574
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Dec 2021 13:38:59 -0800 (PST)
-Received: by mail-pj1-x102a.google.com with SMTP id v23so12790485pjr.5
-        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Dec 2021 13:38:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=BEXaedUJRVwWvaV5+UNIhAI2QJKsPXAblefkp9KOo/s=;
-        b=bXSaKkGabwnG6ZkQsAtPpV7WR30ucuNPw7bYd81LRssfTgkpxp1ozdqYncHDlvqSoI
-         bLHYRyp+Nm73Kc7Ytxj6Bk+xts2oReeedFuGEpwObJXFCuTUwFP5eG+s2H+T7LE7Dtac
-         F3nbIornhu7C8w/xImH2Jvi6tl61KNIk+/PwmEdnJWZFGYDf3/6qpWkJrCVcwgOFPrpn
-         qtdZBoTRhzeNMO/dsFr4fkqu5jLCKgkjxC6IZu/FOn2Gddi8FAfudYzqSSu4jHzsUPVx
-         MKTs7gCD33dfAjFjaJ3KEKnZXQGfoQxyxbysBP9yJTn5exEz98f4+c8AFQt1y1B9Do04
-         ecUg==
+        Mon, 13 Dec 2021 18:57:43 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1639439862;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=itrWj/FNXzyg2IvEE5KBOWVxQH40piGIDy+/PNdSvak=;
+        b=CTrwYzMHTo8GBeK+IGtCtBjtMsLskR/a4qBL+4C/FHmjstC5CCQdic6MuVO7Vdh2gGdZXl
+        eteEGIgVa5x3aTBzqg6yvKrOl6YcsGL8a0uoF+sUacfCRdwOC7N6woBEOQNWAVHs9IfnX0
+        2fGB8ELg0zxb0ddfJGa6vOuwR3f0O0c=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-483-5M1Ljq3ZO5qs0SRwjUQXEw-1; Mon, 13 Dec 2021 18:57:41 -0500
+X-MC-Unique: 5M1Ljq3ZO5qs0SRwjUQXEw-1
+Received: by mail-wm1-f71.google.com with SMTP id 201-20020a1c04d2000000b003335bf8075fso10446147wme.0
+        for <linux-bluetooth@vger.kernel.org>; Mon, 13 Dec 2021 15:57:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:mime-version
-         :content-transfer-encoding;
-        bh=BEXaedUJRVwWvaV5+UNIhAI2QJKsPXAblefkp9KOo/s=;
-        b=FzZPHymFg6lFwzLG87tV9gEBKJSkl9/Xly9wSBdhGuUAmnwNwXUP3hu9+/BNfqjrd+
-         vmvuk2Ila1gjXpeLt5Nq4R4ovRAvRJ9NwScDISL25Y5lUO1wAqRnyR2OTEMWLCs3TOfQ
-         6tTv2QplAnb0oW6j4TKM9ThnnHoMmfqzvAOzzCkIJZfYqIlkTiOVVC5pzATHOsO8g+h2
-         gIrJNLee1fAaijwMHYemRLGzYheCTYwdO9m5I8Yk/nvWG/JV8Bu6kjqg4BauPLHjds0L
-         K5mSiP8IBz3n6oxzeoWFiHv5LlIHxz4GGGTZKeFay0eRh2B3WCCelieMfdmY6NnbA1dc
-         k2gA==
-X-Gm-Message-State: AOAM531Oam7H5CU8LHXsZZ4nnbD7kWeaTlfpwtzhWfKZqSaTaDwveuYb
-        AEY0HJSda+dAk+Wz8y7ungnqgDUXa8A=
-X-Google-Smtp-Source: ABdhPJy4HyxNvPj1NwP1VFWs4gKZ0QvwDqTZYOZA5Fueyr67OpTd3qQIVzJ4el08uD+qWt04nPGWbQ==
-X-Received: by 2002:a17:90a:384d:: with SMTP id l13mr1013260pjf.104.1639431539126;
-        Mon, 13 Dec 2021 13:38:59 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id z2sm13321247pff.107.2021.12.13.13.38.58
-        for <linux-bluetooth@vger.kernel.org>
+        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
+         :mime-version:content-disposition:content-transfer-encoding
+         :in-reply-to;
+        bh=itrWj/FNXzyg2IvEE5KBOWVxQH40piGIDy+/PNdSvak=;
+        b=AbyQfVn04XPpY+UqBMZTqcIytmaiNwbPJTKdXQ7dGUWMYqw6YTfSDHyJ5c6qN1wNKi
+         cTdbGW17h/v+TjIvwFrsgtXufWXUWaO93H5oqA5HOS4G3BS45XDj2cFNinzlzlbCloAk
+         WXc3s3583wvamgqtEz5o1SW0PjuZJeWOA0V/SXy7duIb1pqe54y3MklFMSA4Aq2nCbv0
+         qv1uOiteq3u3e9ObdzX7TmLFl6xgrQ8QWEheLJof0R5HLhSthdqwo6tjF8BMpK+WxcN1
+         g6FraQ1P99ia8bNLxhmC9sFjYssrIE1cT50cgrW5cdSwSlrYqk+s6K2qAF0bc9KHAAjf
+         jlyw==
+X-Gm-Message-State: AOAM532kZUXdHj2PAfovRlDAn2CgJiC/2by5r20InoYA26up6kZ039p+
+        W5gKc6c42J2wvCR4oRreMUY2wxVFS4gA+sBKrywYNlfvGJc1XzAERB4HOzmT8Cn7kLFUTjKL3xV
+        UvamL8vP87rocTvTFtxoppQEDLce9
+X-Received: by 2002:adf:e484:: with SMTP id i4mr1813514wrm.49.1639439860255;
+        Mon, 13 Dec 2021 15:57:40 -0800 (PST)
+X-Google-Smtp-Source: ABdhPJx/Pj4Z/yXyapvNcqdg05CqU9fiI6m5P/+rM1Krrug9bUUnGSeBImkdL/PcJ3lT1z6hNseTtw==
+X-Received: by 2002:adf:e484:: with SMTP id i4mr1813502wrm.49.1639439860103;
+        Mon, 13 Dec 2021 15:57:40 -0800 (PST)
+Received: from redhat.com ([2a03:c5c0:207d:b931:2ce5:ef76:2d17:5466])
+        by smtp.gmail.com with ESMTPSA id v9sm10203463wrb.107.2021.12.13.15.57.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 13 Dec 2021 13:38:58 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH] Bluetooth: hci_event: Use skb_pull_data when processing inquiry results
-Date:   Mon, 13 Dec 2021 13:38:57 -0800
-Message-Id: <20211213213857.2069824-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
+        Mon, 13 Dec 2021 15:57:39 -0800 (PST)
+Date:   Mon, 13 Dec 2021 18:57:35 -0500
+From:   "Michael S. Tsirkin" <mst@redhat.com>
+To:     Marcel Holtmann <marcel@holtmann.org>
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
+Subject: Re: [PATCH] Bluetooth: virtio_bt: fix device removal
+Message-ID: <20211213185620-mutt-send-email-mst@kernel.org>
+References: <20211125174200.133230-1-mst@redhat.com>
+ <F52F65FE-6A07-486B-8E84-684ED85709E9@holtmann.org>
+ <20211209162149-mutt-send-email-mst@kernel.org>
+ <20211213054357-mutt-send-email-mst@kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20211213054357-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+On Mon, Dec 13, 2021 at 05:44:13AM -0500, Michael S. Tsirkin wrote:
+> On Thu, Dec 09, 2021 at 04:22:58PM -0500, Michael S. Tsirkin wrote:
+> > On Thu, Nov 25, 2021 at 09:02:01PM +0100, Marcel Holtmann wrote:
+> > > Hi Michael,
+> > > 
+> > > > Device removal is clearly out of virtio spec: it attempts to remove
+> > > > unused buffers from a VQ before invoking device reset. To fix, make
+> > > > open/close NOPs and do all cleanup/setup in probe/remove.
+> > > 
+> > > so the virtbt_{open,close} as NOP is not really what a driver is suppose
+> > > to be doing. These are transport enable/disable callbacks from the BT
+> > > Core towards the driver. It maps to a device being enabled/disabled by
+> > > something like bluetoothd for example. So if disabled, I expect that no
+> > > resources/queues are in use.
+> > > 
+> > > Maybe I misunderstand the virtio spec in that regard, but I would like
+> > > to keep this fundamental concept of a Bluetooth driver. It does work
+> > > with all other transports like USB, SDIO, UART etc.
+> > > 
+> > > > The cost here is a single skb wasted on an unused bt device - which
+> > > > seems modest.
+> > > 
+> > > There should be no buffer used if the device is powered off. We also don’t
+> > > have any USB URBs in-flight if the transport is not active.
+> > > 
+> > > > NB: with this fix in place driver still suffers from a race condition if
+> > > > an interrupt triggers while device is being reset. Work on a fix for
+> > > > that issue is in progress.
+> > > 
+> > > In the virtbt_close() callback we should deactivate all interrupts.
+> > > 
+> > > Regards
+> > > 
+> > > Marcel
+> > 
+> > So Marcel, do I read it right that you are working on a fix
+> > and I can drop this patch for now?
+> 
+> ping
 
-This makes each result entry to be checked using skb_pull_data instead
-of acessing them by index.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- net/bluetooth/hci_event.c | 20 ++++++++++++++++++--
- 1 file changed, 18 insertions(+), 2 deletions(-)
+If I don't hear otherwise I'll queue my version - it might not
+be ideal but it at least does not violate the spec.
+We can work on not allocating/freeing buffers later
+as appropriate.
 
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 9151d70b36b0..f1082b7c0218 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4530,7 +4530,15 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 		for (i = 0; i < ev->res2->num; i++) {
- 			u32 flags;
- 
--			info = &ev->res2->info[i];
-+			info = hci_ev_skb_pull(hdev, skb,
-+					       HCI_EV_INQUIRY_RESULT_WITH_RSSI,
-+					       sizeof(*info));
-+			if (!info) {
-+				bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
-+					   HCI_EV_INQUIRY_RESULT_WITH_RSSI);
-+				return;
-+			}
-+
- 			bacpy(&data.bdaddr, &info->bdaddr);
- 			data.pscan_rep_mode	= info->pscan_rep_mode;
- 			data.pscan_period_mode	= info->pscan_period_mode;
-@@ -4552,7 +4560,15 @@ static void hci_inquiry_result_with_rssi_evt(struct hci_dev *hdev, void *edata,
- 		for (i = 0; i < ev->res1->num; i++) {
- 			u32 flags;
- 
--			info = &ev->res1->info[i];
-+			info = hci_ev_skb_pull(hdev, skb,
-+					       HCI_EV_INQUIRY_RESULT_WITH_RSSI,
-+					       sizeof(*info));
-+			if (!info) {
-+				bt_dev_err(hdev, "Malformed HCI Event: 0x%2.2x",
-+					   HCI_EV_INQUIRY_RESULT_WITH_RSSI);
-+				return;
-+			}
-+
- 			bacpy(&data.bdaddr, &info->bdaddr);
- 			data.pscan_rep_mode	= info->pscan_rep_mode;
- 			data.pscan_period_mode	= info->pscan_period_mode;
--- 
-2.33.1
+> > -- 
+> > MST
 
