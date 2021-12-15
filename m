@@ -2,74 +2,108 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E11A6C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Dec 2021 17:57:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 18B4AC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 15 Dec 2021 18:05:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S245330AbhLOR5e (ORCPT
+        id S238624AbhLOSFf (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 15 Dec 2021 12:57:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43692 "EHLO
+        Wed, 15 Dec 2021 13:05:35 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45592 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S245258AbhLOR5d (ORCPT
+        with ESMTP id S238548AbhLOSFf (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 15 Dec 2021 12:57:33 -0500
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD90AC06173E
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Dec 2021 09:57:30 -0800 (PST)
-Received: by mail-pj1-x102b.google.com with SMTP id np6-20020a17090b4c4600b001a90b011e06so19948582pjb.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Dec 2021 09:57:30 -0800 (PST)
+        Wed, 15 Dec 2021 13:05:35 -0500
+Received: from mail-qk1-x730.google.com (mail-qk1-x730.google.com [IPv6:2607:f8b0:4864:20::730])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65A24C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Dec 2021 10:05:34 -0800 (PST)
+Received: by mail-qk1-x730.google.com with SMTP id p4so20869201qkm.7
+        for <linux-bluetooth@vger.kernel.org>; Wed, 15 Dec 2021 10:05:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=0UQwrR8nztzBdJpsrXKSkivXvI2bisLviWSkYI1RuFg=;
-        b=h5WpgU54efXlAJPt2ZOWqh39VhVF4Mj8ZdNpmFs6ohI1LO1pGXiEKyNDDDGLz1P4mO
-         DWQOHKkzMdAosYip2+m2ylFEMYAeBlzKogFNXCUDcBmvAd5RZidSVPZzn2EtUPci+Gk9
-         iqHTI86k2N2fL3bvSQSMXM9avR0LE83ASJCTw=
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WzxZL4l5R6ts/fPpupWhyxWlsIqZXsvO0znib5BYagY=;
+        b=cixRL60axijsWU7DIzBwT97S4/c+yjmUIsFnZ6yoviOv/waRDAyCSV4sWXgDiRjAf1
+         O7svbxL5x3F/o4iho2+7lBYItvgmKjliS7UjIr0G83jcy8RTzdAqsZ3c5rdZKto0Lytk
+         +2vtMZivs0c+e71mxWc6hMkh2B9qZ3htg70AzGRjyNPTa6q7c9Heea+CyNGOiNflgzhf
+         rojtSfT+g12Ulvkd3FyowAovnY9QVz31AJrtwUwvbg9AfN9vKOzA0558slTXVzwjoeTg
+         hNsZWUVo2UzePxrA1Vzm4tVNEg56/GbaFP5LFAmQRG52+iyg+Goh6whtb8N6BYvp3mwy
+         Ujng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=0UQwrR8nztzBdJpsrXKSkivXvI2bisLviWSkYI1RuFg=;
-        b=tqq7p6asMFAiYc+ceSQBii0fM0V8lbFu6B2moVGZZxoCHH3Wu+taXMwCOdICQWULJT
-         YCmYdjqmxY010uOpR4U8q21MMXYuZE/DAQHriKxKFS8A8tnvv6WVPWXbL4HrFMXPAeDh
-         +NRcaMSmEOxFAnlkvjQfyW8xGS8kz+aVM28ZHcWrtRoCGCIZxD9onNw0UC8aZS/XrGT5
-         3UNArq+YphX8fGGpR9UGGbFuNX51AbuOQvhdVrCEHchoCc8/hl/j2fjL4uS4XlzrRFo0
-         Cjgdmyrwc7OkOK4pDUtPAsBG1fJ8pgFY77G6La2iia7/o7DLbSHdKHQTw7XeEo2ZmKl+
-         b8BA==
-X-Gm-Message-State: AOAM532Ziff0AHXuK220w/wOB58LF/B1tqNlO5rEB+YGiBVvLf7m8A0M
-        VFGXUwI9Bo4ue1U1/GcQnnt4Lg==
-X-Google-Smtp-Source: ABdhPJy/WFxlvXktRBoFkIxaqTD1Pgc2S0N0D3YDLYBKkEC/1cFQNSjmztuXkGwnzEEDmx1OzjC+yg==
-X-Received: by 2002:a17:902:bd44:b0:148:a2e8:2c51 with SMTP id b4-20020a170902bd4400b00148a2e82c51mr5382642plx.160.1639591050392;
-        Wed, 15 Dec 2021 09:57:30 -0800 (PST)
-Received: from localhost ([2620:15c:202:201:4570:3a38:a59b:d420])
-        by smtp.gmail.com with UTF8SMTPSA id bt2sm2892224pjb.57.2021.12.15.09.57.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 15 Dec 2021 09:57:30 -0800 (PST)
-Date:   Wed, 15 Dec 2021 09:57:28 -0800
-From:   Matthias Kaehlcke <mka@chromium.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
-Cc:     marcel@holtmann.org, johan.hedberg@gmail.com,
-        bjorn.andersson@linaro.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, hemantg@codeaurora.org,
-        linux-arm-msm@vger.kernel.org, rjliao@codeaurora.org,
-        hbandi@codeaurora.org, abhishekpandit@chromium.org,
-        mcchou@chromium.org, saluvala@codeaurora.org
-Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on
- SC7280 IDP boards
-Message-ID: <YbosiM3ZZl5zrZcV@google.com>
-References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=WzxZL4l5R6ts/fPpupWhyxWlsIqZXsvO0znib5BYagY=;
+        b=b75RjE9lDoa8IicTWcmKGzBlUsTBTySmVAHbnMCtC/EgfvMWeKO/K/Z+vR91DGF8tw
+         YdvDggRno9S2P1HpvZ7+64/LJ+2OmartC/robdTJlauGRFhLCVWJdTAH+128rUe8EF0/
+         KVPHRO7wUIq0+gExuVQ50OwoIdojoRaQfXeW4Re+SrQ6HAOLcl+K4ocoOq6DIR4uxLHl
+         2ciOcVndQYBSuONuQY/RivKAkg/1XjcTkP8E9lSrH+bgfN7Hory0iDX+2p3P79dc9IVF
+         SUPwMrw9C5NTnm8h5P+bjhaKX/bdf/0fjb/nhG03E+by7N61ZA8MCvkns7/K5FNQQzUB
+         ZLbw==
+X-Gm-Message-State: AOAM533siNclujKt5SQVOMGi7aZ3h+pVrRdQUGjFGoKvdnsd3GhsPjon
+        t5vUVR65rVGNDyshI4X7tlrHkJmIIbaAtw==
+X-Google-Smtp-Source: ABdhPJyqJ/etDdZv6J8bYLMzuysR0R7IHnJmVPYVpIEohYV2E/A1nB6onpXBSep8K/+rq547JBb3LQ==
+X-Received: by 2002:a05:620a:2494:: with SMTP id i20mr9676259qkn.624.1639591533091;
+        Wed, 15 Dec 2021 10:05:33 -0800 (PST)
+Received: from muritiba.. ([2001:1284:f034:8983:27b8:3d96:8ad9:6154])
+        by smtp.googlemail.com with ESMTPSA id y12sm1438755qko.36.2021.12.15.10.05.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 15 Dec 2021 10:05:32 -0800 (PST)
+From:   Claudio Takahasi <claudio.takahasi@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Claudio Takahasi <claudio.takahasi@gmail.com>
+Subject: [PATCH BlueZ] advertising: Fix reporting advertising properties
+Date:   Wed, 15 Dec 2021 15:05:27 -0300
+Message-Id: <20211215180527.886481-1-claudio.takahasi@gmail.com>
+X-Mailer: git-send-email 2.30.2
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed, Dec 15, 2021 at 10:36:03PM +0530, Balakrishna Godavarthi wrote:
-> Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
-> 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+InterfacesAdded signal for LEAdvertisingManager1 might be emitted
+containing initial/default properties values and property changed is
+not emitted after reading advertising features. This patch registers
+the interface (LEAdvertisingManager1) after reading advertising features
+from kernel.
+---
+ src/advertising.c | 15 +++++++--------
+ 1 file changed, 7 insertions(+), 8 deletions(-)
 
-Reviewed-by: Matthias Kaehlcke <mka@chromium.org>
+diff --git a/src/advertising.c b/src/advertising.c
+index 41b818650..2110f17c9 100644
+--- a/src/advertising.c
++++ b/src/advertising.c
+@@ -1786,6 +1786,13 @@ static void read_adv_features_callback(uint8_t status, uint16_t length,
+ 	manager->max_ads = feat->max_instances;
+ 	manager->supported_flags |= feat->supported_flags;
+ 
++	/* Registering interface after querying properties */
++	if (!g_dbus_register_interface(btd_get_dbus_connection(),
++				       adapter_get_path(manager->adapter),
++				       LE_ADVERTISING_MGR_IFACE, methods,
++				       NULL, properties, manager, NULL))
++		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
++
+ 	if (manager->max_ads == 0)
+ 		return;
+ 
+@@ -1861,14 +1868,6 @@ static struct btd_adv_manager *manager_create(struct btd_adapter *adapter,
+ 	manager->min_tx_power = ADV_TX_POWER_NO_PREFERENCE;
+ 	manager->max_tx_power = ADV_TX_POWER_NO_PREFERENCE;
+ 
+-	if (!g_dbus_register_interface(btd_get_dbus_connection(),
+-					adapter_get_path(manager->adapter),
+-					LE_ADVERTISING_MGR_IFACE, methods,
+-					NULL, properties, manager, NULL)) {
+-		error("Failed to register " LE_ADVERTISING_MGR_IFACE);
+-		goto fail;
+-	}
+-
+ 	if (!mgmt_send(manager->mgmt, MGMT_OP_READ_ADV_FEATURES,
+ 				manager->mgmt_index, 0, NULL,
+ 				read_adv_features_callback, manager, NULL)) {
+-- 
+2.30.2
+
