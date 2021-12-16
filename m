@@ -2,91 +2,157 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E02C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 19:58:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B5F6C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 21:10:05 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241161AbhLPT6e convert rfc822-to-8bit (ORCPT
+        id S236918AbhLPVKE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Dec 2021 14:58:34 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:49704 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S241140AbhLPT6d (ORCPT
+        Thu, 16 Dec 2021 16:10:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:54198 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S235211AbhLPVKB (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Dec 2021 14:58:33 -0500
-Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 58604CED18;
-        Thu, 16 Dec 2021 20:58:32 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH] Bluetooth: virtio_bt: fix device removal
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <20211213185620-mutt-send-email-mst@kernel.org>
-Date:   Thu, 16 Dec 2021 20:58:31 +0100
-Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        linux-bluetooth@vger.kernel.org,
-        virtualization@lists.linux-foundation.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <FF8BA713-6DD2-485B-9ADC-02006126BC60@holtmann.org>
-References: <20211125174200.133230-1-mst@redhat.com>
- <F52F65FE-6A07-486B-8E84-684ED85709E9@holtmann.org>
- <20211209162149-mutt-send-email-mst@kernel.org>
- <20211213054357-mutt-send-email-mst@kernel.org>
- <20211213185620-mutt-send-email-mst@kernel.org>
-To:     "Michael S. Tsirkin" <mst@redhat.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Thu, 16 Dec 2021 16:10:01 -0500
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B697EC061574
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Dec 2021 13:10:01 -0800 (PST)
+Received: by mail-pf1-x433.google.com with SMTP id o4so391218pfp.13
+        for <linux-bluetooth@vger.kernel.org>; Thu, 16 Dec 2021 13:10:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4Rd5ms9VA7V8O9YMkrdKm7pKS0l7CkzSVHVXoVsLmX8=;
+        b=N68084ZnDGLdjfBQfEKC0cxTFgyzHD7FBNFBcGj+7hlOlbOrk0Epx3fcJ+wnZlSgQz
+         QoNFM/H2/Pdj4gcf23DDy3j3gbaUL7O+HAZ0q3TPv2kaCHuco4gc/AUdXSE7Ulguag/a
+         zMIXsdBLMXUpmQmKfU4yYFyLEDdmcdqTbhUkX/viWAW0oXDlbw/WiRrlWs3e57rsEO5S
+         atEfR5Fj1tXCtuKnlQkw75AGP4oSeOEoaHuUEPy31QySq2qu3tWFWanxz5mCesrGDqTx
+         DAFSCzS5sOo1qBR9XcmaLWM4FYc+XXPPKl3YST6p281qPo0oZL6swz6fInDBIgoT+RUF
+         tUdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:mime-version
+         :content-transfer-encoding;
+        bh=4Rd5ms9VA7V8O9YMkrdKm7pKS0l7CkzSVHVXoVsLmX8=;
+        b=tPhkMTOt83ascb2JlF9AHbpciLL2GNXM7hdKflFQLd7hSBe5unwBX7D1gOgSO2z3Mi
+         cGieyzG77Uv16Fwyw3n+he+o5KQkMTtDJREa2rXuiJRLTO3/kPPsQnaDWq/G9HrfQvWO
+         VJGuFcRCu+VUKiDlFpDMzx7fzebUs72fYiEDLuWlJoQMbP3FOxC/C/oD3d21exqCKZp4
+         wer4L79MplcknOJ5VEyTh5X6T361wehHhAhFppH3kpKYYYtfLj/3ovmEg6mdAv/66GQq
+         GMK2uXHn4eIHMANneih00AG5WZt7PWgYUnz9lfHBc/KJ2fVGu5e8JM9PzsDEtoIEiDM7
+         QxHg==
+X-Gm-Message-State: AOAM530NQgZ7lOBIEcs5wG5KyS0zioBjmrcY2yu5RzU+hJDwUyVS44H0
+        PyhRgKEARo9HkspSRKtFVKn4bwU43js=
+X-Google-Smtp-Source: ABdhPJxHvKnqhxtqbffWz/n8DqkTvtATMkxe6oeSKn4iFFxe0u6ZVEA06iYZ9tL5SyKSLNSrRKxH4A==
+X-Received: by 2002:a63:784:: with SMTP id 126mr13995870pgh.530.1639689000952;
+        Thu, 16 Dec 2021 13:10:00 -0800 (PST)
+Received: from localhost.localdomain ([2601:1c0:6a01:d830:6d63:f74:75a0:361e])
+        by smtp.gmail.com with ESMTPSA id a23sm6161239pgh.35.2021.12.16.13.09.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 16 Dec 2021 13:10:00 -0800 (PST)
+From:   Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+To:     linux-bluetooth@vger.kernel.org
+Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>
+Subject: [RFC PATCH v2] Bluetooth: btintel: Fix broken LED quirk for legacy ROM devices
+Date:   Thu, 16 Dec 2021 13:09:58 -0800
+Message-Id: <20211216210958.62129-1-hj.tedd.an@gmail.com>
+X-Mailer: git-send-email 2.25.1
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Michael,
+From: Tedd Ho-Jeong An <tedd.an@intel.com>
 
->>>>> Device removal is clearly out of virtio spec: it attempts to remove
->>>>> unused buffers from a VQ before invoking device reset. To fix, make
->>>>> open/close NOPs and do all cleanup/setup in probe/remove.
->>>> 
->>>> so the virtbt_{open,close} as NOP is not really what a driver is suppose
->>>> to be doing. These are transport enable/disable callbacks from the BT
->>>> Core towards the driver. It maps to a device being enabled/disabled by
->>>> something like bluetoothd for example. So if disabled, I expect that no
->>>> resources/queues are in use.
->>>> 
->>>> Maybe I misunderstand the virtio spec in that regard, but I would like
->>>> to keep this fundamental concept of a Bluetooth driver. It does work
->>>> with all other transports like USB, SDIO, UART etc.
->>>> 
->>>>> The cost here is a single skb wasted on an unused bt device - which
->>>>> seems modest.
->>>> 
->>>> There should be no buffer used if the device is powered off. We also don’t
->>>> have any USB URBs in-flight if the transport is not active.
->>>> 
->>>>> NB: with this fix in place driver still suffers from a race condition if
->>>>> an interrupt triggers while device is being reset. Work on a fix for
->>>>> that issue is in progress.
->>>> 
->>>> In the virtbt_close() callback we should deactivate all interrupts.
->>>> 
->>>> Regards
->>>> 
->>>> Marcel
->>> 
->>> So Marcel, do I read it right that you are working on a fix
->>> and I can drop this patch for now?
->> 
->> ping
-> 
-> 
-> If I don't hear otherwise I'll queue my version - it might not
-> be ideal but it at least does not violate the spec.
-> We can work on not allocating/freeing buffers later
-> as appropriate.
+This patch fixes the broken LED quirk for Intel legacy ROM devices.
+To fix the LED issue that doesn't turn off immediately, the host sends
+the SW RFKILL command while shutting down the interface and it puts the
+devices in an asserted state.
 
-I have a patch, but it is not fully tested yet.
+Once the device is in SW RFKILL state, it can only accept HCI_Reset to
+exit from the SW RFKILL state. This patch checks the quirk and sends the
+HCI_Reset before sending the HCI_Intel_Read_Version command.
 
-Regards
+The affected legacy ROM devices are
+ - 8087:0a2a
+ - 8087:0aa7
 
-Marcel
+fixes: ffcba827c0a1d ("Bluetooth: btintel: Fix the LED is not turning off immediately")
+
+Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+---
+ drivers/bluetooth/btintel.c | 13 ++++++-------
+ drivers/bluetooth/btusb.c   | 10 ++++++++--
+ 2 files changed, 14 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
+index e1f96df847b8..75f8d7aceb35 100644
+--- a/drivers/bluetooth/btintel.c
++++ b/drivers/bluetooth/btintel.c
+@@ -2355,8 +2355,13 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 	 * As a workaround, send HCI Reset command first which will reset the
+ 	 * number of completed commands and allow normal command processing
+ 	 * from now on.
++	 *
++	 * For INTEL_BROKEN_LED, these devices have an issue with LED which
++	 * doesn't go off immediately during shutdown. Set the flag here to send
++	 * the LED OFF command during shutdown.
+ 	 */
+-	if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD)) {
++	if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD) ||
++				btintel_test_flag(hdev, INTEL_BROKEN_LED)) {
+ 		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
+ 				     HCI_INIT_TIMEOUT);
+ 		if (IS_ERR(skb)) {
+@@ -2428,12 +2433,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
+ 				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
+ 					&hdev->quirks);
+ 
+-			/* These devices have an issue with LED which doesn't
+-			 * go off immediately during shutdown. Set the flag
+-			 * here to send the LED OFF command during shutdown.
+-			 */
+-			btintel_set_flag(hdev, INTEL_BROKEN_LED);
+-
+ 			err = btintel_legacy_rom_setup(hdev, &ver);
+ 			break;
+ 		case 0x0b:      /* SfP */
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index d1bd9ee0a6ab..c6a070d5284f 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -60,6 +60,7 @@ static struct usb_driver btusb_driver;
+ #define BTUSB_WIDEBAND_SPEECH	0x400000
+ #define BTUSB_VALID_LE_STATES   0x800000
+ #define BTUSB_QCA_WCN6855	0x1000000
++#define BTUSB_INTEL_BROKEN_LED	0x2000000
+ #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
+ 
+ static const struct usb_device_id btusb_table[] = {
+@@ -382,9 +383,11 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
+ 	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
+ 						     BTUSB_INTEL_BROKEN_INITIAL_NCMD },
+-	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
++	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
++						     BTUSB_INTEL_BROKEN_LED },
+ 	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_COMBINED },
+-	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED },
++	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
++						     BTUSB_INTEL_BROKEN_LED },
+ 	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_COMBINED },
+ 
+ 	/* Other Intel Bluetooth devices */
+@@ -3724,6 +3727,9 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 		if (id->driver_info & BTUSB_INTEL_BROKEN_INITIAL_NCMD)
+ 			btintel_set_flag(hdev, INTEL_BROKEN_INITIAL_NCMD);
++
++		if (id->driver_info & BTUSB_INTEL_BROKEN_LED)
++			btintel_set_flag(hdev, INTEL_BROKEN_LED);
+ 	}
+ 
+ 	if (id->driver_info & BTUSB_MARVELL)
+-- 
+2.25.1
 
