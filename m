@@ -2,148 +2,317 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D5ED3C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 07:52:18 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 362B3C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 10:09:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234559AbhLPHwS (ORCPT
+        id S235720AbhLPKJA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Dec 2021 02:52:18 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:59569 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S231932AbhLPHwR (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Dec 2021 02:52:17 -0500
-Received: from [192.168.0.3] (ip5f5aecd0.dynamic.kabel-deutschland.de [95.90.236.208])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1AF5D61E64846;
-        Thu, 16 Dec 2021 08:52:15 +0100 (CET)
-Message-ID: <904d134a-a672-72a9-dddb-1c48d151e62e@molgen.mpg.de>
-Date:   Thu, 16 Dec 2021 08:52:14 +0100
+        Thu, 16 Dec 2021 05:09:00 -0500
+Received: from mga05.intel.com ([192.55.52.43]:21580 "EHLO mga05.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S235690AbhLPKJA (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 16 Dec 2021 05:09:00 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1639649340; x=1671185340;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tqah6DYJkyMXNTY6GJFvv3m8z80hgcgkKkPwKQQ0upY=;
+  b=QVdyg9O/Z5eDKPDZMzckj1S5zbBsSmNmPOYuFeNY/YlQlwq2suAX97HO
+   b+Dvb74YBp8TbSvdMdza1WYaoqfV6hwSAG/SZ3TE3sw8jgnNucCWnPYaL
+   OAsFzdEVEYe/7K+dRklySo3QJVEQ/1L4R7P7x6ia2BNNh98ki/2m7Y/pt
+   NBlm+A8q6jVzwaOkXhtpwOURySyedDRQVa9FQSlBowUBpIgO9lFtqFK1c
+   dyI0p1iboQwdC88RHxWW1m/Lujr6PYykHgrPNfIq3NouPh6HKRZ9qhl3z
+   3yOLUj84z5YcHaqhUWrcflFdP17JdvGMwKmQDMyu9G+jymOEJBpWpoSxg
+   A==;
+X-IronPort-AV: E=McAfee;i="6200,9189,10199"; a="325735012"
+X-IronPort-AV: E=Sophos;i="5.88,211,1635231600"; 
+   d="scan'208";a="325735012"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 16 Dec 2021 02:08:59 -0800
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="5.88,211,1635231600"; 
+   d="scan'208";a="464620434"
+Received: from lkp-server02.sh.intel.com (HELO 9f38c0981d9f) ([10.239.97.151])
+  by orsmga003.jf.intel.com with ESMTP; 16 Dec 2021 02:08:56 -0800
+Received: from kbuild by 9f38c0981d9f with local (Exim 4.92)
+        (envelope-from <lkp@intel.com>)
+        id 1mxnh1-00030I-KV; Thu, 16 Dec 2021 10:08:55 +0000
+Date:   Thu, 16 Dec 2021 18:08:46 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Manish Mandlik <mmandlik@google.com>, marcel@holtmann.org,
+        luiz.dentz@gmail.com
+Cc:     kbuild-all@lists.01.org,
+        chromeos-bluetooth-upstreaming@chromium.org,
+        linux-bluetooth@vger.kernel.org,
+        Manish Mandlik <mmandlik@google.com>,
+        Miao-chen Chou <mcchou@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v8 1/3] bluetooth: msft: Handle MSFT Monitor Device Event
+Message-ID: <202112161736.WMgjxclO-lkp@intel.com>
+References: <20211215203919.v8.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH] Bluetooth: btintel: Fix broken LED quirk for legacy
- ROM device
-Content-Language: en-US
-To:     Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-Cc:     Tedd Ho-Jeong An <tedd.an@intel.com>,
-        linux-bluetooth@vger.kernel.org
-References: <20211216033453.9806-1-hj.tedd.an@gmail.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20211216033453.9806-1-hj.tedd.an@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20211215203919.v8.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
+User-Agent: Mutt/1.10.1 (2018-07-13)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Tedd,
+Hi Manish,
+
+Thank you for the patch! Yet something to improve:
+
+[auto build test ERROR on bluetooth-next/master]
+[also build test ERROR on next-20211215]
+[cannot apply to bluetooth/master v5.16-rc5]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch]
+
+url:    https://github.com/0day-ci/linux/commits/Manish-Mandlik/bluetooth-msft-Handle-MSFT-Monitor-Device-Event/20211216-124056
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
+config: arc-randconfig-r043-20211216 (https://download.01.org/0day-ci/archive/20211216/202112161736.WMgjxclO-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 11.2.0
+reproduce (this is a W=1 build):
+        wget https://raw.githubusercontent.com/intel/lkp-tests/master/sbin/make.cross -O ~/bin/make.cross
+        chmod +x ~/bin/make.cross
+        # https://github.com/0day-ci/linux/commit/db0604d7b0d0308963bdc1465b486be11d5fdcb6
+        git remote add linux-review https://github.com/0day-ci/linux
+        git fetch --no-tags linux-review Manish-Mandlik/bluetooth-msft-Handle-MSFT-Monitor-Device-Event/20211216-124056
+        git checkout db0604d7b0d0308963bdc1465b486be11d5fdcb6
+        # save the config file to linux build tree
+        mkdir build_dir
+        COMPILER_INSTALL_PATH=$HOME/0day COMPILER=gcc-11.2.0 make.cross O=build_dir ARCH=arc SHELL=/bin/bash net/bluetooth/
+
+If you fix the issue, kindly add following tag as appropriate
+Reported-by: kernel test robot <lkp@intel.com>
+
+All errors (new ones prefixed by >>):
+
+   In file included from include/linux/wait.h:7,
+                    from include/linux/poll.h:8,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   net/bluetooth/msft.c: In function 'msft_le_cancel_monitor_advertisement_cb':
+>> net/bluetooth/msft.c:306:42: error: 'dev' undeclared (first use in this function); did you mean 'hdev'?
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                                          ^~~
+   include/linux/list.h:717:14: note: in definition of macro 'list_for_each_entry_safe'
+     717 |         for (pos = list_first_entry(head, typeof(*pos), member),        \
+         |              ^~~
+   net/bluetooth/msft.c:306:42: note: each undeclared identifier is reported only once for each function it appears in
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                                          ^~~
+   include/linux/list.h:717:14: note: in definition of macro 'list_for_each_entry_safe'
+     717 |         for (pos = list_first_entry(head, typeof(*pos), member),        \
+         |              ^~~
+   In file included from arch/arc/include/asm/cache.h:28,
+                    from include/linux/cache.h:6,
+                    from include/linux/time.h:5,
+                    from include/linux/ktime.h:24,
+                    from include/linux/poll.h:7,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   include/linux/compiler_types.h:276:27: error: expression in static assertion is not an integer
+     276 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:19:9: note: in expansion of macro 'static_assert'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:19:23: note: in expansion of macro '__same_type'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   include/linux/list.h:513:9: note: in expansion of macro 'container_of'
+     513 |         container_of(ptr, type, member)
+         |         ^~~~~~~~~~~~
+   include/linux/list.h:524:9: note: in expansion of macro 'list_entry'
+     524 |         list_entry((ptr)->next, type, member)
+         |         ^~~~~~~~~~
+   include/linux/list.h:717:20: note: in expansion of macro 'list_first_entry'
+     717 |         for (pos = list_first_entry(head, typeof(*pos), member),        \
+         |                    ^~~~~~~~~~~~~~~~
+   net/bluetooth/msft.c:306:17: note: in expansion of macro 'list_for_each_entry_safe'
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/wait.h:7,
+                    from include/linux/poll.h:8,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+>> net/bluetooth/msft.c:306:47: error: 'tmp' undeclared (first use in this function); did you mean 'tm'?
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                                               ^~~
+   include/linux/list.h:718:17: note: in definition of macro 'list_for_each_entry_safe'
+     718 |                 n = list_next_entry(pos, member);                       \
+         |                 ^
+   In file included from arch/arc/include/asm/cache.h:28,
+                    from include/linux/cache.h:6,
+                    from include/linux/time.h:5,
+                    from include/linux/ktime.h:24,
+                    from include/linux/poll.h:7,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   include/linux/compiler_types.h:276:27: error: expression in static assertion is not an integer
+     276 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:19:9: note: in expansion of macro 'static_assert'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:19:23: note: in expansion of macro '__same_type'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   include/linux/list.h:513:9: note: in expansion of macro 'container_of'
+     513 |         container_of(ptr, type, member)
+         |         ^~~~~~~~~~~~
+   include/linux/list.h:557:9: note: in expansion of macro 'list_entry'
+     557 |         list_entry((pos)->member.next, typeof(*(pos)), member)
+         |         ^~~~~~~~~~
+   include/linux/list.h:718:21: note: in expansion of macro 'list_next_entry'
+     718 |                 n = list_next_entry(pos, member);                       \
+         |                     ^~~~~~~~~~~~~~~
+   net/bluetooth/msft.c:306:17: note: in expansion of macro 'list_for_each_entry_safe'
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/wait.h:7,
+                    from include/linux/poll.h:8,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   include/linux/list.h:717:64: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     717 |         for (pos = list_first_entry(head, typeof(*pos), member),        \
+         |                                                                ^
+   net/bluetooth/msft.c:306:17: note: in expansion of macro 'list_for_each_entry_safe'
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from arch/arc/include/asm/cache.h:28,
+                    from include/linux/cache.h:6,
+                    from include/linux/time.h:5,
+                    from include/linux/ktime.h:24,
+                    from include/linux/poll.h:7,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   include/linux/compiler_types.h:276:27: error: expression in static assertion is not an integer
+     276 | #define __same_type(a, b) __builtin_types_compatible_p(typeof(a), typeof(b))
+         |                           ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/build_bug.h:78:56: note: in definition of macro '__static_assert'
+      78 | #define __static_assert(expr, msg, ...) _Static_assert(expr, msg)
+         |                                                        ^~~~
+   include/linux/container_of.h:19:9: note: in expansion of macro 'static_assert'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |         ^~~~~~~~~~~~~
+   include/linux/container_of.h:19:23: note: in expansion of macro '__same_type'
+      19 |         static_assert(__same_type(*(ptr), ((type *)0)->member) ||       \
+         |                       ^~~~~~~~~~~
+   include/linux/list.h:513:9: note: in expansion of macro 'container_of'
+     513 |         container_of(ptr, type, member)
+         |         ^~~~~~~~~~~~
+   include/linux/list.h:557:9: note: in expansion of macro 'list_entry'
+     557 |         list_entry((pos)->member.next, typeof(*(pos)), member)
+         |         ^~~~~~~~~~
+   include/linux/list.h:720:27: note: in expansion of macro 'list_next_entry'
+     720 |              pos = n, n = list_next_entry(n, member))
+         |                           ^~~~~~~~~~~~~~~
+   net/bluetooth/msft.c:306:17: note: in expansion of macro 'list_for_each_entry_safe'
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from include/linux/wait.h:7,
+                    from include/linux/poll.h:8,
+                    from include/net/bluetooth/bluetooth.h:28,
+                    from net/bluetooth/msft.c:6:
+   include/linux/list.h:720:21: warning: left-hand operand of comma expression has no effect [-Wunused-value]
+     720 |              pos = n, n = list_next_entry(n, member))
+         |                     ^
+   net/bluetooth/msft.c:306:17: note: in expansion of macro 'list_for_each_entry_safe'
+     306 |                 list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Am 16.12.21 um 04:34 schrieb Tedd Ho-Jeong An:
-> From: Tedd Ho-Jeong An <tedd.an@intel.com>
-> 
-> This patch fix the broken LED quirk for Intel legacy ROM devices.
+vim +306 net/bluetooth/msft.c
 
-fix*es*
+   265	
+   266	static void msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
+   267							    u8 status, u16 opcode,
+   268							    struct sk_buff *skb)
+   269	{
+   270		struct msft_cp_le_cancel_monitor_advertisement *cp;
+   271		struct msft_rp_le_cancel_monitor_advertisement *rp;
+   272		struct adv_monitor *monitor;
+   273		struct msft_monitor_advertisement_handle_data *handle_data;
+   274		struct msft_data *msft = hdev->msft_data;
+   275		int err;
+   276		bool pending;
+   277	
+   278		if (status)
+   279			goto done;
+   280	
+   281		rp = (struct msft_rp_le_cancel_monitor_advertisement *)skb->data;
+   282		if (skb->len < sizeof(*rp)) {
+   283			status = HCI_ERROR_UNSPECIFIED;
+   284			goto done;
+   285		}
+   286	
+   287		hci_dev_lock(hdev);
+   288	
+   289		cp = hci_sent_cmd_data(hdev, hdev->msft_opcode);
+   290		handle_data = msft_find_handle_data(hdev, cp->handle, false);
+   291	
+   292		if (handle_data) {
+   293			monitor = idr_find(&hdev->adv_monitors_idr,
+   294					   handle_data->mgmt_handle);
+   295	
+   296			if (monitor && monitor->state == ADV_MONITOR_STATE_OFFLOADED)
+   297				monitor->state = ADV_MONITOR_STATE_REGISTERED;
+   298	
+   299			/* Do not free the monitor if it is being removed due to
+   300			 * suspend. It will be re-monitored on resume.
+   301			 */
+   302			if (monitor && !msft->suspending)
+   303				hci_free_adv_monitor(hdev, monitor);
+   304	
+   305			/* Clear any monitored devices by this Adv Monitor */
+ > 306			list_for_each_entry_safe(dev, tmp, &hdev->monitored_devices,
+   307						 list) {
+   308				if (dev->handle == handle_data->mgmt_handle) {
+   309					list_del(&dev->list);
+   310					kfree(dev);
+   311				}
+   312			}
+   313	
+   314			list_del(&handle_data->list);
+   315			kfree(handle_data);
+   316		}
+   317	
+   318		/* If remove all monitors is required, we need to continue the process
+   319		 * here because the earlier it was paused when waiting for the
+   320		 * response from controller.
+   321		 */
+   322		if (msft->pending_remove_handle == 0) {
+   323			pending = hci_remove_all_adv_monitor(hdev, &err);
+   324			if (pending) {
+   325				hci_dev_unlock(hdev);
+   326				return;
+   327			}
+   328	
+   329			if (err)
+   330				status = HCI_ERROR_UNSPECIFIED;
+   331		}
+   332	
+   333		hci_dev_unlock(hdev);
+   334	
+   335	done:
+   336		if (!msft->suspending)
+   337			hci_remove_adv_monitor_complete(hdev, status);
+   338	}
+   339	
 
-Excuse my ignorance, but what are Intel legacy ROM devices? Maybe also 
-mention the IDs 0x0a2a and 0x0aa7 in the commit message?
-
-> Legacy device sends the SW RFKILL while shutting down the device (like
-> HCI interface down) to turn off the LED by putting the device in assert.
-> 
-> Once the SW RFKILL is on, it needs the HCI_Reset to exit from the SW
-> RFKILL state. This patch checks the quirk and send the HCI_Reset before
-
-send*s*
-
-> sending the HCI_Intel_Read_Version command.
-
-Is that document in some datasheet/specification? If so, please mention it.
-
-Also, in the commit message summary you write “Fix”. If it fixes an old 
-commit, please add a Fixes: tag.
-
-> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
-> ---
->   drivers/bluetooth/btintel.c | 13 ++++++-------
->   drivers/bluetooth/btusb.c   | 10 ++++++++--
->   2 files changed, 14 insertions(+), 9 deletions(-)
-
-I have a Dell Latitude E7250 with the 8087:0a2a. How can I test this?
-
-> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
-> index 8f9109b40961..0a5aa637bf6f 100644
-> --- a/drivers/bluetooth/btintel.c
-> +++ b/drivers/bluetooth/btintel.c
-> @@ -2355,8 +2355,13 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   	 * As a workaround, send HCI Reset command first which will reset the
->   	 * number of completed commands and allow normal command processing
->   	 * from now on.
-> +	 *
-> +	 * For INTEL_BROKEN_LED, these devices have an issue with LED which
-> +	 * doesn't go off immediately during shutdown. Set the flag
-> +	 * here to send the LED OFF command during shutdown.
-
-Please reflow all lines for the allowed line length limit (doesn’t fits 
-on the line above).
-
->   	 */
-> -	if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD)) {
-> +	if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD) ||
-> +				btintel_test_flag(hdev, INTEL_BROKEN_LED)) {
->   		skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
->   				     HCI_INIT_TIMEOUT);
->   		if (IS_ERR(skb)) {
-> @@ -2428,12 +2433,6 @@ static int btintel_setup_combined(struct hci_dev *hdev)
->   				set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
->   					&hdev->quirks);
->   
-> -			/* These devices have an issue with LED which doesn't
-> -			 * go off immediately during shutdown. Set the flag
-> -			 * here to send the LED OFF command during shutdown.
-> -			 */
-> -			btintel_set_flag(hdev, INTEL_BROKEN_LED);
-> -
->   			err = btintel_legacy_rom_setup(hdev, &ver);
->   			break;
->   		case 0x0b:      /* SfP */
-> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> index d1bd9ee0a6ab..c6a070d5284f 100644
-> --- a/drivers/bluetooth/btusb.c
-> +++ b/drivers/bluetooth/btusb.c
-> @@ -60,6 +60,7 @@ static struct usb_driver btusb_driver;
->   #define BTUSB_WIDEBAND_SPEECH	0x400000
->   #define BTUSB_VALID_LE_STATES   0x800000
->   #define BTUSB_QCA_WCN6855	0x1000000
-> +#define BTUSB_INTEL_BROKEN_LED	0x2000000
->   #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
->   
->   static const struct usb_device_id btusb_table[] = {
-> @@ -382,9 +383,11 @@ static const struct usb_device_id blacklist_table[] = {
->   	{ USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
->   	{ USB_DEVICE(0x8087, 0x07dc), .driver_info = BTUSB_INTEL_COMBINED |
->   						     BTUSB_INTEL_BROKEN_INITIAL_NCMD },
-> -	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED },
-> +	{ USB_DEVICE(0x8087, 0x0a2a), .driver_info = BTUSB_INTEL_COMBINED |
-> +						     BTUSB_INTEL_BROKEN_LED },
->   	{ USB_DEVICE(0x8087, 0x0a2b), .driver_info = BTUSB_INTEL_COMBINED },
-> -	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED },
-> +	{ USB_DEVICE(0x8087, 0x0aa7), .driver_info = BTUSB_INTEL_COMBINED |
-> +						     BTUSB_INTEL_BROKEN_LED },
->   	{ USB_DEVICE(0x8087, 0x0aaa), .driver_info = BTUSB_INTEL_COMBINED },
->   
->   	/* Other Intel Bluetooth devices */
-> @@ -3724,6 +3727,9 @@ static int btusb_probe(struct usb_interface *intf,
->   
->   		if (id->driver_info & BTUSB_INTEL_BROKEN_INITIAL_NCMD)
->   			btintel_set_flag(hdev, INTEL_BROKEN_INITIAL_NCMD);
-> +
-> +		if (id->driver_info & BTUSB_INTEL_BROKEN_LED)
-> +			btintel_set_flag(hdev, INTEL_BROKEN_LED);
->   	}
->   
->   	if (id->driver_info & BTUSB_MARVELL)
+---
+0-DAY CI Kernel Test Service, Intel Corporation
+https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
