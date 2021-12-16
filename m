@@ -2,83 +2,89 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 0BCD9C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 19:57:07 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 99E02C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 16 Dec 2021 19:58:34 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S241152AbhLPT5G convert rfc822-to-8bit (ORCPT
+        id S241161AbhLPT6e convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 16 Dec 2021 14:57:06 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:33591 "EHLO
+        Thu, 16 Dec 2021 14:58:34 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49704 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229909AbhLPT5F (ORCPT
+        with ESMTP id S241140AbhLPT6d (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 16 Dec 2021 14:57:05 -0500
+        Thu, 16 Dec 2021 14:58:33 -0500
 Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id A628FCED18;
-        Thu, 16 Dec 2021 20:57:03 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 58604CED18;
+        Thu, 16 Dec 2021 20:58:32 +0100 (CET)
 Content-Type: text/plain;
-        charset=us-ascii
+        charset=utf-8
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH v3] Bluetooth: btqca: sequential validation
+Subject: Re: [PATCH] Bluetooth: virtio_bt: fix device removal
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1639570900-24509-1-git-send-email-quic_saluvala@quicinc.com>
-Date:   Thu, 16 Dec 2021 20:57:03 +0100
-Cc:     Johan Hedberg <johan.hedberg@gmail.com>, mka@chromium.org,
-        linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org,
-        quic_hemantg@quicinc.com, linux-arm-msm@vger.kernel.org,
-        quic_bgodavar@quicinc.com, rjliao@codeaurora.org,
-        hbandi@codeaurora.org, abhishekpandit@chromium.org,
-        mcchou@chromium.org, quic_pharish@quicinc.com
+In-Reply-To: <20211213185620-mutt-send-email-mst@kernel.org>
+Date:   Thu, 16 Dec 2021 20:58:31 +0100
+Cc:     Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+        linux-bluetooth@vger.kernel.org,
+        virtualization@lists.linux-foundation.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <5F7F1736-3B51-48DE-9DEF-89774353A85C@holtmann.org>
-References: <1639570900-24509-1-git-send-email-quic_saluvala@quicinc.com>
-To:     Sai Teja Aluvala <quic_saluvala@quicinc.com>
+Message-Id: <FF8BA713-6DD2-485B-9ADC-02006126BC60@holtmann.org>
+References: <20211125174200.133230-1-mst@redhat.com>
+ <F52F65FE-6A07-486B-8E84-684ED85709E9@holtmann.org>
+ <20211209162149-mutt-send-email-mst@kernel.org>
+ <20211213054357-mutt-send-email-mst@kernel.org>
+ <20211213185620-mutt-send-email-mst@kernel.org>
+To:     "Michael S. Tsirkin" <mst@redhat.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Sai,
+Hi Michael,
 
-> Added Sequential validation support
-> & patch command config
+>>>>> Device removal is clearly out of virtio spec: it attempts to remove
+>>>>> unused buffers from a VQ before invoking device reset. To fix, make
+>>>>> open/close NOPs and do all cleanup/setup in probe/remove.
+>>>> 
+>>>> so the virtbt_{open,close} as NOP is not really what a driver is suppose
+>>>> to be doing. These are transport enable/disable callbacks from the BT
+>>>> Core towards the driver. It maps to a device being enabled/disabled by
+>>>> something like bluetoothd for example. So if disabled, I expect that no
+>>>> resources/queues are in use.
+>>>> 
+>>>> Maybe I misunderstand the virtio spec in that regard, but I would like
+>>>> to keep this fundamental concept of a Bluetooth driver. It does work
+>>>> with all other transports like USB, SDIO, UART etc.
+>>>> 
+>>>>> The cost here is a single skb wasted on an unused bt device - which
+>>>>> seems modest.
+>>>> 
+>>>> There should be no buffer used if the device is powered off. We also don’t
+>>>> have any USB URBs in-flight if the transport is not active.
+>>>> 
+>>>>> NB: with this fix in place driver still suffers from a race condition if
+>>>>> an interrupt triggers while device is being reset. Work on a fix for
+>>>>> that issue is in progress.
+>>>> 
+>>>> In the virtbt_close() callback we should deactivate all interrupts.
+>>>> 
+>>>> Regards
+>>>> 
+>>>> Marcel
+>>> 
+>>> So Marcel, do I read it right that you are working on a fix
+>>> and I can drop this patch for now?
+>> 
+>> ping
 > 
-> Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
 > 
-> v3:
-> * removed rlen,rtype
-> * Replaced kfree with kfree_skb
-> 
-> v2:
-> * Added static declaration
-> * Addressed wrong indentation
-> * Removed EDL_PATCH_CONFIG_CMD_LEN
-> *
-> 
-> v1:
-> *Initial patch
-> ---
-> drivers/bluetooth/btqca.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
-> drivers/bluetooth/btqca.h |  2 ++
-> 2 files changed, 50 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-> index be04d74..21830c6 100644
-> --- a/drivers/bluetooth/btqca.c
-> +++ b/drivers/bluetooth/btqca.c
-> @@ -141,6 +141,51 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
-> 	return err;
-> }
-> 
-> +static int qca_send_patch_config_cmd(struct hci_dev *hdev)
-> +{
-> +	struct sk_buff *skb;
-> +	int err = 0;
-> +	u8 cmd[] = {EDL_PATCH_CONFIG_CMD, 0x01, 0, 0, 0};
+> If I don't hear otherwise I'll queue my version - it might not
+> be ideal but it at least does not violate the spec.
+> We can work on not allocating/freeing buffers later
+> as appropriate.
 
-I am going to stop looking at this patch now. You are not able to address review comments.
-
-From now on, I am only going to review QCA patches from people that are able to handle review comments.
+I have a patch, but it is not fully tested yet.
 
 Regards
 
