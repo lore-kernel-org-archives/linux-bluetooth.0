@@ -2,210 +2,120 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 6E546C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 21:25:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id C9A27C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 22:43:04 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229600AbhLQVZv (ORCPT
+        id S231234AbhLQWnE (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Dec 2021 16:25:51 -0500
-Received: from mga12.intel.com ([192.55.52.136]:11976 "EHLO mga12.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S229596AbhLQVZu (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Dec 2021 16:25:50 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1639776350; x=1671312350;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=NfoM1ATLlJZccZJieE3y8Q4MjiYoeg5NyXe9R5qP0QI=;
-  b=jWARuU+ZxiNsJ+Ig5KzRPuvjTSfTiuBjwiDZHvgDUPI8t5mspMg5W62y
-   biRWj3mRXaT/ej3G29m5Kr/dNv0HpKh+V+gv8LAEmqJcgRkIGSOmXAwqJ
-   60ENYD+JvwDBr+8h6FWdQQvYrP3kBVO/icwS4jacCkmA2RwznJrGx6A8q
-   aYQQI/QPpfvLZc7O1jn8gcnxzUlI+X0UWzzmYtXg2y4jQa47KJUF34tcu
-   3HJ+Lho1Z/mCQjnlY16ELD+kgqUmDsFG8Q3d0cGOZH5asoBFHHn6zUN2B
-   Pg1Oi2BymvMi8fNnXEbKJ631Yh7rDSBc2SE6znU7ovmiGSIT+cvrwg4c2
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10201"; a="219850411"
-X-IronPort-AV: E=Sophos;i="5.88,214,1635231600"; 
-   d="scan'208";a="219850411"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2021 13:25:50 -0800
-X-IronPort-AV: E=Sophos;i="5.88,214,1635231600"; 
-   d="scan'208";a="546524864"
-Received: from emace-mobl1.amr.corp.intel.com (HELO bgi1-mobl2.amr.corp.intel.com) ([10.209.103.155])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 17 Dec 2021 13:25:50 -0800
-From:   Brian Gix <brian.gix@intel.com>
-To:     linux-bluetooth@vger.kernel.org
-Cc:     luiz.dentz@gmail.com, brian.gix@intel.com,
-        luiz.von.dentz@intel.com, marcel@holtmann.org
-Subject: [RFC BlueZ] Bluetooth: Add support for Mesh Scanning and Sending
-Date:   Fri, 17 Dec 2021 13:25:42 -0800
-Message-Id: <20211217212542.372210-1-brian.gix@intel.com>
-X-Mailer: git-send-email 2.31.1
+        Fri, 17 Dec 2021 17:43:04 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45380 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230518AbhLQWnE (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 Dec 2021 17:43:04 -0500
+Received: from mail-yb1-xb2c.google.com (mail-yb1-xb2c.google.com [IPv6:2607:f8b0:4864:20::b2c])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C930FC061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 14:43:03 -0800 (PST)
+Received: by mail-yb1-xb2c.google.com with SMTP id d10so10687484ybn.0
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 14:43:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=tH8+7OpMWoBniz8eYkzcpbmOwm+ECuFr8ZLJ8/1RoJI=;
+        b=ZFAiRo6ff6Xca30+5sK0kCBOGyVG8ar4h2jLOdZxyizcu0QIsM7vLJ3u1kYwrk9UJG
+         9HdSWWpwMfBThVsIW4M5PgCETDZA8mmYkM4P0v4iKZHpOP1PGLaLsE5x1MBKntejDx41
+         afa+7d1Ii2KD2GtxeIb7jjGEzxAvLQ05TsthJ7CK4Es6MRn7701d7F5+Hg2sncAT5QVq
+         9pfSJbeMf0rnOCzMKyPQtbAlGgnt2N5sfx18fvfyt05BgiNQ7kX9FohOqx3ZhlxZD1Ri
+         KZlYRRcok2tFD84j2A3zFClOZO2oq9XSs3wcNdx3kowBQwRAYOl23wWiV15SVUNgEdTR
+         yv/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=tH8+7OpMWoBniz8eYkzcpbmOwm+ECuFr8ZLJ8/1RoJI=;
+        b=sq76QxxoiF5iGPMBRCKvRz5x6yXxRNQq7Rr2gs8qc3JD8lVc5EHYIOl3ne4I35e62U
+         LrZXFbEhqrE6d63I8YcTGo30qy1Tvp2u7ehOg7Epi5k4v3C3PQElQz431cu8ZA5SUZWC
+         abxIJwO5yJps8ZJRQ6arVbJZbZElln8KQk5sGPSQUum0sDof1cCz8gDo+Q3ZwxDfOeVO
+         iT9F4dNYtOjdcOu1ETt9vpgD9L6VOuoZRDIPfmQuSLb+iBeZlWU/augHCYMYJNox99x7
+         FRHslwKz2NFc1pShJr8EhIu6LgSFYDQiNmWLvJ8NydLfXkkagS5h11iWy68UMn2V2+lp
+         E3tg==
+X-Gm-Message-State: AOAM533ujUO1T6S7ziONA1PehDjEnIZHJ+lrdZ1R47u9+WouTpcdlcLE
+        eAJfVmY77TDpb1b2EBxE/yO3suGoKCm6oCMZe5sj+iQV
+X-Google-Smtp-Source: ABdhPJyR6QqL3HIAbHn4GNw74iMz9mk8MpMne4Sbns67hbyvRzoLESbCryAKvWEAlcz54czOVgOj+oKu6y/PgMX2Kxs=
+X-Received: by 2002:a25:b096:: with SMTP id f22mr5494443ybj.284.1639780982694;
+ Fri, 17 Dec 2021 14:43:02 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211213212650.2067066-1-luiz.dentz@gmail.com> <61b7c408.1c69fb81.22a92.79f9@mx.google.com>
+In-Reply-To: <61b7c408.1c69fb81.22a92.79f9@mx.google.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 17 Dec 2021 14:42:51 -0800
+Message-ID: <CABBYNZ+4CAg=4V7DHHws3J8T1LfVGJ8S91gCEgg-bQuSebkEAw@mail.gmail.com>
+Subject: Re: Bluetooth: mgmt: Fix mgmt_device_found panic
+To:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+Cc:     Marcel Holtmann <marcel@holtmann.org>
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Adds two new MGMT Commands:
-	- MESH_MODE - Enable Mesh Mode with either Active or Passive
-	scanning for a list of AD Types (Mesh and/or Extended Mesh).
+Hi Marcel,
 
-	- MESH_SEND - Send a requested Mesh Packet on a non-resolvable
-	random address, perhaps with a specific fine-timed delay.
+On Mon, Dec 13, 2021 at 2:07 PM <bluez.test.bot@gmail.com> wrote:
+>
+> This is automated email and please do not reply to this email!
+>
+> Dear submitter,
+>
+> Thank you for submitting the patches to the linux bluetooth mailing list.
+> This is a CI test results with your patch series:
+> PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=595033
+>
+> ---Test result---
+>
+> Test Summary:
+> CheckPatch                    FAIL      1.63 seconds
+> GitLint                       FAIL      0.92 seconds
+> BuildKernel                   PASS      317.18 seconds
+> Incremental Build with patchesPASS      321.54 seconds
+> TestRunner: Setup             PASS      454.37 seconds
+> TestRunner: l2cap-tester      PASS      11.79 seconds
+> TestRunner: bnep-tester       PASS      5.89 seconds
+> TestRunner: mgmt-tester       PASS      112.27 seconds
+> TestRunner: rfcomm-tester     PASS      7.41 seconds
+> TestRunner: sco-tester        PASS      7.54 seconds
+> TestRunner: smp-tester        PASS      7.34 seconds
+> TestRunner: userchan-tester   PASS      6.14 seconds
+>
+> Details
+> ##############################
+> Test: CheckPatch - FAIL - 1.63 seconds
+> Run checkpatch.pl script with rule in .checkpatch.conf
+> Bluetooth: mgmt: Fix mgmt_device_found panic\WARNING:COMMIT_LOG_LONG_LINE: Possible unwrapped commit description (prefer a maximum 75 chars per line)
+> #103:
+> FS:  0000000000000000(0000) GS:ffffffff8c097000(0000) knlGS:0000000000000000
+>
+> total: 0 errors, 1 warnings, 0 checks, 16 lines checked
+>
+> NOTE: For some of the reported defects, checkpatch may be able to
+>       mechanically convert to the typical style using --fix or --fix-inplace.
+>
+> /github/workspace/src/12674615.patch has style problems, please review.
+>
+> NOTE: Ignored message types: UNKNOWN_COMMIT_ID
+>
+> NOTE: If any of the errors are false positives, please report
+>       them to the maintainer, see CHECKPATCH in MAINTAINERS.
+>
+>
+> ##############################
+> Test: GitLint - FAIL - 0.92 seconds
+> Run gitlint with rule in .gitlint
+> Bluetooth: mgmt: Fix mgmt_device_found panic
+> 77: B1 Line exceeds max length (97>80): "Fixes: 2023db7e3a343 ("Bluetooth: mgmt: Make use of mgmt_send_event_skb in MGMT_EV_DEVICE_FOUND")"
 
-Adds one new MGMT Event:
-	- MESH_DEVICE_FOUND - Returned when Mesh is enabled, and one of
-	  the requested AD Types is detected in an incoming
-	  Advertisement.
+Can you please fixup/squash this one, this is breaking inquiry
+response processing.
 
-Signed-off-by: Brian Gix <brian.gix@intel.com>
----
- doc/mgmt-api.txt | 119 +++++++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 119 insertions(+)
-
-diff --git a/doc/mgmt-api.txt b/doc/mgmt-api.txt
-index ebe56afa4..3c34d6fb9 100644
---- a/doc/mgmt-api.txt
-+++ b/doc/mgmt-api.txt
-@@ -332,6 +332,7 @@ Read Controller Information Command
- 		15	Static Address
- 		16	PHY Configuration
- 		17	Wideband Speech
-+		18	Mesh Mode
- 
- 	This command generates a Command Complete event on success or
- 	a Command Status event on failure.
-@@ -3858,6 +3859,90 @@ Add Advertisement Patterns Monitor With RSSI Threshold Command
- 				Invalid Parameters
- 
- 
-+Set controller to Mesh mode Command
-+==============================================================
-+
-+	Command Code:		0x0057
-+	Controller Index:	<controller id>
-+	Command Parameters:	Enable (1 Octet)
-+				Active (1 Octet)
-+				AD Types { }
-+	Return Parameters:	Available Slots (1 Octet)
-+
-+	This command Enables or Disables Mesh Mode. Mesh mode, when enabled
-+	keeps the controller passivly or actively scanning for LE Advertising
-+	messgaes. To enable Mesh, LE must be enabled.
-+
-+	The Active parameter when set to 0x01, will cause the controller to
-+	perform active scanning, as opposed to passive scanning, when the
-+	parameter is set to 0x00.
-+
-+	The AD Types parameter, if present, will filter Advertising and Scan
-+	responses by AD type. reponses that do not contain at least one of the
-+	requested AD types will be discarded. response results will be delivered
-+	with the Mesh Device Found event.
-+
-+	This command may be called redundantly to switch between Active and
-+	Passive scanning, without disabling Mesh mode. If Mesh mode is disabled,
-+	all active outbound Mesh Packet Send requests will return fail codes.
-+
-+	The returned parameter Available Slots returns the number of
-+	simultaneous outbound packets that may to queued for delivery.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
-+Mesh Packet Send Command
-+==============================================================
-+
-+	Command Code:		0x0058
-+	Controller Index:	<controller id>
-+	Command Parameters:	Reference (1 Octets)
-+				Instant (4 Octets)
-+				Delay (2 Octets)
-+				Count (1 Octets)
-+				Data { }
-+	Return Parameters:	Status, Reference Value
-+
-+	This command sends a Mesh Packet as a NONCONN LE Advertisement. Mesh
-+	mode must be enabled.
-+
-+	The Reference value is Host defined, and will be returned with the
-+	status, so that the Host may have multiple requests outstanding at
-+	the same time. The Reference value will not be interpretted by the
-+	kernel.
-+
-+	The Instant parameter is used in combination with the Delay
-+	parameter, to finely time the sending of the Advertising packet. It
-+	should be set to the Instant value tag of a received incoming
-+	Mesh Device Found Event. It is only useful in POLL-RESPONSE situations
-+	where a response must be sent within a negotiated time window. The value
-+	of the Instant parameter should not be interpreted by the host, and
-+	only has meaning to the controller.
-+
-+	The Delay parameter, if 0x0000, will cause the packet to be sent
-+	immediately, or at the earliest opportunity. If non-Zero, it will
-+	attempt to send the packet the requested number of milliseconds after
-+	the instant in time represented by the Instant parameter.
-+
-+	The Count parameter must be sent to a non-Zero value indicating the
-+	number of times this packet will be sent before transmission completes.
-+	If the Delay parameter is non-Zero, then Count must be 1 only.
-+
-+	The Data parameter is an octet array of the AD Type and Mesh Packet.
-+
-+	This command will return only after the outbound packet has been sent,
-+	or it fails.
-+
-+	Possible errors:	Failed
-+				Busy
-+				No Resources
-+				Invalid Parameters
-+
-+
- Command Complete Event
- ======================
- 
-@@ -4978,3 +5063,37 @@ Advertisement Monitor Device Lost Event
- 		2	LE Random
- 
- 	This event will be sent to all management sockets.
-+
-+Mesh Device Found Event
-+========================================
-+
-+	Event code:		0x0031
-+	Controller Index:	<controller_id>
-+	Event Parameters:	Address (6 Octets)
-+				Address_Type (1 Octet)
-+				RSSI (1 Octet)
-+				Flags (4 Octets)
-+				Instant (4 Octets)
-+				AD_Data_Length (2 Octets)
-+				AD_Data (0-65535 Octets)
-+
-+	This event indicates that the controller has received an Advertisement
-+	or Scan Result containing an AD Type matching the Mesh scan set.
-+
-+	The address of the sending device is returned, and must be a valid LE
-+	Address_Type.
-+
-+	Possible values for the Address_Type parameter:
-+		0	Reserved (not in use)
-+		1	LE Public
-+		2	LE Random
-+
-+	The RSSI field is a signed octet, and is the RSSI reported by the
-+	receiving controller.
-+
-+	The Instant field is 32 bit value that represents the instant in time
-+	the packet was received. It's value is not intended to be interpretted
-+	by the host, and is only useful if the host wants to make a timed
-+	response to the received packet. (i.e. a Poll/Response)
-+
-+	This event will be sent to all management sockets.
 -- 
-2.31.1
-
+Luiz Augusto von Dentz
