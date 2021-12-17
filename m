@@ -2,185 +2,125 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id CFE01C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 15:28:32 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 509A1C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 19:27:36 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S238164AbhLQP2c (ORCPT
+        id S240623AbhLQT1g (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Dec 2021 10:28:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:56434 "EHLO
+        Fri, 17 Dec 2021 14:27:36 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57152 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229689AbhLQP2b (ORCPT
+        with ESMTP id S240622AbhLQT1f (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Dec 2021 10:28:31 -0500
-Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A8D1C061574
-        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 07:28:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-        d=sipsolutions.net; s=mail; h=Content-Transfer-Encoding:MIME-Version:
-        Message-Id:Date:Subject:Cc:To:From:Content-Type:Sender:Reply-To:Content-ID:
-        Content-Description:Resent-Date:Resent-From:Resent-To:Resent-Cc:
-        Resent-Message-ID:In-Reply-To:References;
-        bh=xFXF0rCP6ZeBg1z4cYYrIN0rFi4iFnaE2/zMkJOH9q4=; t=1639754911; x=1640964511; 
-        b=UTlNNBBpaiX99xg4Bi/6DULrvLbS6tEzeCfqLVQ9jOdh4+9X8u/5+sJkTubmc3uLaF4S8aQKuuL
-        KLK157fcyqFJHDcNIpatjhiU0ypeIL/jHBsZTGAJFKoqm2rB0aCuixQb2YadIuWxsL7AVDv76Jen7
-        s13ri9LEB3x75G1puV7WTaIEjUkPpGFYzoZdkxZPvdzID57e0dlAUZz+pNK/YIBJY729MMnNVCuH1
-        l+mNJ4WXfSphG24DGsmu8YY9a/ZXWCT5Re1SVN12PZwZ0B894QmvQsFKAgWuqcqt01H0KWEl7UapS
-        dE2HG64rbQGV5IF4TK8G+GpwX07B2uoh+kDg==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-        (Exim 4.95)
-        (envelope-from <benjamin@sipsolutions.net>)
-        id 1myF9o-00CnTI-Ic;
-        Fri, 17 Dec 2021 16:28:28 +0100
-From:   Benjamin Berg <benjamin@sipsolutions.net>
-To:     Oliver Neukum <oneukum@suse.com>,
-        Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        syzbot <syzbot+485cc00ea7cf41dfdbf1@syzkaller.appspotmail.com>,
-        syzkaller-bugs@googlegroups.com, Benjamin Berg <bberg@redhat.com>
-Subject: [PATCH v2] Bluetooth: hci_sync: Push sync command cancellation to workqueue
-Date:   Fri, 17 Dec 2021 16:28:09 +0100
-Message-Id: <20211217152809.671966-1-benjamin@sipsolutions.net>
-X-Mailer: git-send-email 2.33.1
+        Fri, 17 Dec 2021 14:27:35 -0500
+Received: from mail-yb1-xb2f.google.com (mail-yb1-xb2f.google.com [IPv6:2607:f8b0:4864:20::b2f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB2EC061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 11:27:35 -0800 (PST)
+Received: by mail-yb1-xb2f.google.com with SMTP id j2so9272395ybg.9
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 11:27:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc:content-transfer-encoding;
+        bh=kCahGUhidLE3kuPHRlloa9GCpAycESM9Ccryl21WtHA=;
+        b=ZFBf3jCGpXY3N8hg/aUWABTY763PW0O63O4AU8MtZwFaln35LfgY5FF06EM/5eJI3d
+         6trbBt8ULo/2nbRnSCGD+IWpCGXhmF0CVqKJfnMzkxSMYx7hKTguydleJe75Fxda2rWe
+         o0uuxMnNM0LZxnFqUAdmdIkXvhFqwl/IHptlS24tJMI/BOlV5p6G0u3+V0VPw01N7RXk
+         5cevnXdkggyWv3x0fMW0QyIl1x6WuyzF8ai0Q5JHhHViAk54WTVhF2pBtzBeGbEcer1a
+         zj3r1pbWMoO8PsvygCqIulsih6C8Nb4yshDisQtposttYlODVgI0VBaAk4xPp7xRsbx6
+         HdgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc:content-transfer-encoding;
+        bh=kCahGUhidLE3kuPHRlloa9GCpAycESM9Ccryl21WtHA=;
+        b=giQhNr/XMhwPZQqbt0695QgZ16Si4kNjQzwFpa8rJnyuiRCt3yOS51uvepeqiqwxVH
+         ioOWdXsokvmpQUkBHqDPvp7a0rnxd8L33qv1v0v74+tZFiwXfxIlAbKOf/jg7+ruovbD
+         jC+Y4IKukocHzdMUmRxs/t2FdlFHRFMM0PzH+GWdonbj6gAD1dbtEROeJmpwZYLqIc4h
+         kQ7G9aelQpZrCoHCghE0TZqoLCZJJ5rEoE4Yg04LK0afoyTexiE5+j635HAKn/wjVJ+m
+         dPpzE/fwMzeCaxvjpZDaqdXBIARqrDWITgPuZJ85PgM/eON60jqTdUqAwfrIdcucz9A0
+         CeVw==
+X-Gm-Message-State: AOAM532JwSUGDeG870dAwyDAoVchkGmOvTdZh2mx7oNtOB1+7RbJekT9
+        1yaPuDVJ3iqWzuqk3pgiYjJHYKcecM0W0/G0IJk7VlfU
+X-Google-Smtp-Source: ABdhPJyrmtE3cajk/ybzERpGwuMCwlZA+8+J+31iZ7vnbSvHvCM+SJ9GfCztE6klRKOWWuPszCMfrpc6/176Fr8i1f4=
+X-Received: by 2002:a25:9bc9:: with SMTP id w9mr6252954ybo.398.1639769254583;
+ Fri, 17 Dec 2021 11:27:34 -0800 (PST)
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20211216033453.9806-1-hj.tedd.an@gmail.com> <904d134a-a672-72a9-dddb-1c48d151e62e@molgen.mpg.de>
+ <7bca0b8840cc1bab1c7ea7f25d8cca6ee41ecb04.camel@intel.com> <3ae32390-a8e5-9b65-6252-9e7f201bd08a@molgen.mpg.de>
+In-Reply-To: <3ae32390-a8e5-9b65-6252-9e7f201bd08a@molgen.mpg.de>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Fri, 17 Dec 2021 11:27:23 -0800
+Message-ID: <CABBYNZJSF6CEU+oJHeKtU5Z-pqL5rn_pO9CxaDwbuWeATBk-QA@mail.gmail.com>
+Subject: Re: [RFC PATCH] Bluetooth: btintel: Fix broken LED quirk for legacy
+ ROM device
+To:     Paul Menzel <pmenzel@molgen.mpg.de>
+Cc:     Tedd An <tedd.an@intel.com>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
+        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Benjamin Berg <bberg@redhat.com>
+Hi Paul,
 
-syzbot reported that hci_cmd_sync_cancel may sleep from the wrong
-context. To avoid this, create a new work item that pushes the relevant
-parts into a different context.
+On Fri, Dec 17, 2021 at 7:33 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+>
+> Dear Tedd,
+>
+>
+> Am 16.12.21 um 19:38 schrieb An, Tedd:
+>
+> > On Thu, 2021-12-16 at 08:52 +0100, Paul Menzel wrote:
+>
+> >> Am 16.12.21 um 04:34 schrieb Tedd Ho-Jeong An:
+> >>> From: Tedd Ho-Jeong An <tedd.an@intel.com>
+> >>>
+> >>> This patch fix the broken LED quirk for Intel legacy ROM devices.
+> >>
+> >> fix*es*
+> >>
+> >> Excuse my ignorance, but what are Intel legacy ROM devices? Maybe also
+> >> mention the IDs 0x0a2a and 0x0aa7 in the commit message?
+> >>
+> >>> Legacy device sends the SW RFKILL while shutting down the device (lik=
+e
+> >>> HCI interface down) to turn off the LED by putting the device in asse=
+rt.
+> >>>
+> >>> Once the SW RFKILL is on, it needs the HCI_Reset to exit from the SW
+> >>> RFKILL state. This patch checks the quirk and send the HCI_Reset befo=
+re
+> >>
+> >> send*s*
+> >>
+> >>> sending the HCI_Intel_Read_Version command.
+> >>
+> >> Is that document in some datasheet/specification? If so, please mentio=
+n it.
+> >>
+> >> Also, in the commit message summary you write =E2=80=9CFix=E2=80=9D. I=
+f it fixes an old
+> >> commit, please add a Fixes: tag.
+> >>
+> >>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
+> >>> ---
+> >>>    drivers/bluetooth/btintel.c | 13 ++++++-------
+> >>>    drivers/bluetooth/btusb.c   | 10 ++++++++--
+> >>>    2 files changed, 14 insertions(+), 9 deletions(-)
+> >>
+> >> I have a Dell Latitude E7250 with the 8087:0a2a. How can I test this?
+> >
+> > Apply this patch on top of the bluetooth-next (or current mainline)
+> > The BT interface should be available after reboot.
+>
+> On the laptop, I do not have any problems with missing BT interface
+> after reboot with Linux 5.16-rc5. Are not all devices affected?
 
-Note that we keep the old implementation with the name
-__hci_cmd_sync_cancel as the sleeping behaviour is desired in some
-cases.
+If the problem is fixed for you please confirm it by replying with a
+Tested-by line.
 
-Reported-and-tested-by: syzbot+485cc00ea7cf41dfdbf1@syzkaller.appspotmail.com
-Fixes: c97a747efc93 ("Bluetooth: btusb: Cancel sync commands for certain URB errors")
-Signed-off-by: Benjamin Berg <bberg@redhat.com>
-
----
-
-v2:
- - Add Signed-off-by and changed email address
----
- include/net/bluetooth/hci_core.h |  1 +
- include/net/bluetooth/hci_sync.h |  1 +
- net/bluetooth/hci_core.c         |  2 +-
- net/bluetooth/hci_request.c      |  2 +-
- net/bluetooth/hci_sync.c         | 27 ++++++++++++++++++++++++++-
- 5 files changed, 30 insertions(+), 3 deletions(-)
-
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 4d69dcfebd63..6509109c2413 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -480,6 +480,7 @@ struct hci_dev {
- 	struct work_struct	cmd_sync_work;
- 	struct list_head	cmd_sync_work_list;
- 	struct mutex		cmd_sync_work_lock;
-+	struct work_struct	cmd_sync_cancel_work;
- 
- 	__u16			discov_timeout;
- 	struct delayed_work	discov_off;
-diff --git a/include/net/bluetooth/hci_sync.h b/include/net/bluetooth/hci_sync.h
-index f4034bf8f1ce..435674cf388e 100644
---- a/include/net/bluetooth/hci_sync.h
-+++ b/include/net/bluetooth/hci_sync.h
-@@ -38,6 +38,7 @@ int __hci_cmd_sync_status_sk(struct hci_dev *hdev, u16 opcode, u32 plen,
- void hci_cmd_sync_init(struct hci_dev *hdev);
- void hci_cmd_sync_clear(struct hci_dev *hdev);
- void hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
-+void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err);
- 
- int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
- 		       void *data, hci_cmd_sync_work_destroy_t destroy);
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index 38063bf1fdc5..2b7bd3655b07 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3859,7 +3859,7 @@ static void hci_cmd_work(struct work_struct *work)
- 
- 			res = hci_send_frame(hdev, skb);
- 			if (res < 0)
--				hci_cmd_sync_cancel(hdev, -res);
-+				__hci_cmd_sync_cancel(hdev, -res);
- 
- 			if (test_bit(HCI_RESET, &hdev->flags))
- 				cancel_delayed_work(&hdev->cmd_timer);
-diff --git a/net/bluetooth/hci_request.c b/net/bluetooth/hci_request.c
-index 329c66456cf1..ef5ced467f75 100644
---- a/net/bluetooth/hci_request.c
-+++ b/net/bluetooth/hci_request.c
-@@ -2692,7 +2692,7 @@ void hci_request_setup(struct hci_dev *hdev)
- 
- void hci_request_cancel_all(struct hci_dev *hdev)
- {
--	hci_cmd_sync_cancel(hdev, ENODEV);
-+	__hci_cmd_sync_cancel(hdev, ENODEV);
- 
- 	cancel_work_sync(&hdev->discov_update);
- 	cancel_work_sync(&hdev->scan_update);
-diff --git a/net/bluetooth/hci_sync.c b/net/bluetooth/hci_sync.c
-index fd15fb37a52a..2fb8bc496d18 100644
---- a/net/bluetooth/hci_sync.c
-+++ b/net/bluetooth/hci_sync.c
-@@ -313,11 +313,24 @@ static void hci_cmd_sync_work(struct work_struct *work)
- 	}
- }
- 
-+static void hci_cmd_sync_cancel_work(struct work_struct *work)
-+{
-+	struct hci_dev *hdev = container_of(work, struct hci_dev, cmd_sync_cancel_work);
-+
-+	cancel_delayed_work_sync(&hdev->cmd_timer);
-+	cancel_delayed_work_sync(&hdev->ncmd_timer);
-+	atomic_set(&hdev->cmd_cnt, 1);
-+
-+	wake_up_interruptible(&hdev->req_wait_q);
-+}
-+
- void hci_cmd_sync_init(struct hci_dev *hdev)
- {
- 	INIT_WORK(&hdev->cmd_sync_work, hci_cmd_sync_work);
- 	INIT_LIST_HEAD(&hdev->cmd_sync_work_list);
- 	mutex_init(&hdev->cmd_sync_work_lock);
-+
-+	INIT_WORK(&hdev->cmd_sync_cancel_work, hci_cmd_sync_cancel_work);
- }
- 
- void hci_cmd_sync_clear(struct hci_dev *hdev)
-@@ -335,7 +348,7 @@ void hci_cmd_sync_clear(struct hci_dev *hdev)
- 	}
- }
- 
--void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
-+void __hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
- {
- 	bt_dev_dbg(hdev, "err 0x%2.2x", err);
- 
-@@ -350,6 +363,18 @@ void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
- 		wake_up_interruptible(&hdev->req_wait_q);
- 	}
- }
-+
-+void hci_cmd_sync_cancel(struct hci_dev *hdev, int err)
-+{
-+	bt_dev_dbg(hdev, "err 0x%2.2x", err);
-+
-+	if (hdev->req_status == HCI_REQ_PEND) {
-+		hdev->req_result = err;
-+		hdev->req_status = HCI_REQ_CANCELED;
-+
-+		queue_work(hdev->workqueue, &hdev->cmd_sync_cancel_work);
-+	}
-+}
- EXPORT_SYMBOL(hci_cmd_sync_cancel);
- 
- int hci_cmd_sync_queue(struct hci_dev *hdev, hci_cmd_sync_work_func_t func,
--- 
-2.33.1
-
+--=20
+Luiz Augusto von Dentz
