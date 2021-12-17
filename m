@@ -2,94 +2,128 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B5959C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 11:39:46 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2580CC433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 17 Dec 2021 11:42:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235575AbhLQLjp (ORCPT
+        id S235559AbhLQLmr (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Dec 2021 06:39:45 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:42461 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S233856AbhLQLjp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Dec 2021 06:39:45 -0500
-Received: from [192.168.0.3] (ip5f5aed08.dynamic.kabel-deutschland.de [95.90.237.8])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        Fri, 17 Dec 2021 06:42:47 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:60264 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233856AbhLQLmr (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 17 Dec 2021 06:42:47 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7F1FC061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 03:42:46 -0800 (PST)
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id F0F7A61EA192F;
-        Fri, 17 Dec 2021 12:39:42 +0100 (CET)
-Message-ID: <3ae32390-a8e5-9b65-6252-9e7f201bd08a@molgen.mpg.de>
-Date:   Fri, 17 Dec 2021 12:39:42 +0100
+        by dfw.source.kernel.org (Postfix) with ESMTPS id 41DAF620EE
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 11:42:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 97577C36AE1
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 11:42:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639741365;
+        bh=cf864/VPhrt3uyBbq6NCSxfw8XXuS0vUJlskVOJd9vA=;
+        h=From:To:Subject:Date:From;
+        b=Df+8qlzTBANxvId9MM+vNYEY0bb3FaIZIPCCqemXW0uDdY6shREFNk7Z0iqz6Y1rp
+         LJyxOdm2fBLhlF0ps/L+fr8YdU0f7Vo4hsu9llWugzzBJvyrx2KU9DXMZ9Xt2xoacJ
+         Fi/VKON37G7lAf+085YOZ5FVWeBzkXwyLWjb3iV6T30X25POpEvApJeJRHm4BU8VqC
+         W7e6q7EibogD2AVnVw2uF29ch4smiFJEj1M6E1wp6crb22VWts0VORouJ2P8g8cWPX
+         1y8MbNQB+tnFqlUjm80qn92TPiMHaHV9Ke+Uqce7iTPB16DR8i/52iTmLPr2aMhPWZ
+         RpZgFP2I7WIOQ==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 7282260F4D; Fri, 17 Dec 2021 11:42:45 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215347] New: btintel: AX200 (8087:0029): hci crashed and can't
+ recover after repeated rfkill on/off
+Date:   Fri, 17 Dec 2021 11:42:45 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: new
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: hui.wang@canonical.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: bug_id short_desc product version
+ cf_kernel_version rep_platform op_sys cf_tree bug_status bug_severity
+ priority component assigned_to reporter cf_regression attachments.created
+Message-ID: <bug-215347-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [RFC PATCH] Bluetooth: btintel: Fix broken LED quirk for legacy
- ROM device
-Content-Language: en-US
-To:     Tedd An <tedd.an@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-References: <20211216033453.9806-1-hj.tedd.an@gmail.com>
- <904d134a-a672-72a9-dddb-1c48d151e62e@molgen.mpg.de>
- <7bca0b8840cc1bab1c7ea7f25d8cca6ee41ecb04.camel@intel.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <7bca0b8840cc1bab1c7ea7f25d8cca6ee41ecb04.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Tedd,
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215347
+
+            Bug ID: 215347
+           Summary: btintel: AX200 (8087:0029): hci crashed and can't
+                    recover after repeated rfkill on/off
+           Product: Drivers
+           Version: 2.5
+    Kernel Version: 5.16-rc5
+          Hardware: Intel
+                OS: Linux
+              Tree: Mainline
+            Status: NEW
+          Severity: blocking
+          Priority: P1
+         Component: Bluetooth
+          Assignee: linux-bluetooth@vger.kernel.org
+          Reporter: hui.wang@canonical.com
+        Regression: No
+
+Created attachment 300051
+  --> https://bugzilla.kernel.org/attachment.cgi?id=3D300051&action=3Dedit
+testing script
+
+We have a couple of Lenovo machines which have Bluetooth hci (8087:0029), I=
+f we
+run a script like below:
+for a in {1..100}
+do
+    echo $a
+    rfkill block $HCI0_ID
+    sleep 1
+    rfkill unblock $HCI0_ID
+    sleep 1
+done
+
+The kernel will print "hci0: Failed to read MSFT supported features (-110)"
+after several round of rfkill block/unblock, and the bluetooth driver can't
+work anymore from that moment. Sometimes 'rmmod btusb;modprobe btusb" could
+make the bluetooth driver work again, sometimes need to reboot.
+
+We already updated the kernel and linux-firmware to the latest, but still c=
+ould
+reproduce above issue.
+
+And we run the same test on other machines with different Bluetooth hci like
+8087:0026, they all work well with the testing script.
+
+The 8087:0029 hci loads the intel/ibt-20-1-3.sfi, we suspect this is an iss=
+ue
+on the bluetooth firmware ibt-20-1-3.sfi, since 8087:0026 shares the same
+kernel driver with 0029, but only 0029 has this issue.
 
 
-Am 16.12.21 um 19:38 schrieb An, Tedd:
+And the testing script is attached.
 
-> On Thu, 2021-12-16 at 08:52 +0100, Paul Menzel wrote:
+--=20
+You may reply to this email to add a comment.
 
->> Am 16.12.21 um 04:34 schrieb Tedd Ho-Jeong An:
->>> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->>>
->>> This patch fix the broken LED quirk for Intel legacy ROM devices.
->>
->> fix*es*
->>
->> Excuse my ignorance, but what are Intel legacy ROM devices? Maybe also
->> mention the IDs 0x0a2a and 0x0aa7 in the commit message?
->>
->>> Legacy device sends the SW RFKILL while shutting down the device (like
->>> HCI interface down) to turn off the LED by putting the device in assert.
->>>
->>> Once the SW RFKILL is on, it needs the HCI_Reset to exit from the SW
->>> RFKILL state. This patch checks the quirk and send the HCI_Reset before
->>
->> send*s*
->>
->>> sending the HCI_Intel_Read_Version command.
->>
->> Is that document in some datasheet/specification? If so, please mention it.
->>
->> Also, in the commit message summary you write “Fix”. If it fixes an old
->> commit, please add a Fixes: tag.
->>
->>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
->>> ---
->>>    drivers/bluetooth/btintel.c | 13 ++++++-------
->>>    drivers/bluetooth/btusb.c   | 10 ++++++++--
->>>    2 files changed, 14 insertions(+), 9 deletions(-)
->>
->> I have a Dell Latitude E7250 with the 8087:0a2a. How can I test this?
-> 
-> Apply this patch on top of the bluetooth-next (or current mainline)
-> The BT interface should be available after reboot.
-
-On the laptop, I do not have any problems with missing BT interface 
-after reboot with Linux 5.16-rc5. Are not all devices affected?
-
-[…]
-
-
-Kind regards,
-
-Paul
+You are receiving this mail because:
+You are the assignee for the bug.=
