@@ -2,108 +2,82 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5E210C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 01:09:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 01CE5C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 06:12:50 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231601AbhLRBJF (ORCPT
+        id S232176AbhLRGMt (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 17 Dec 2021 20:09:05 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:51892 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S231573AbhLRBJD (ORCPT
+        Sat, 18 Dec 2021 01:12:49 -0500
+Received: from sin.source.kernel.org ([145.40.73.55]:35476 "EHLO
+        sin.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232156AbhLRGMt (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 17 Dec 2021 20:09:03 -0500
-X-UUID: 3b317627985d4d47925dfb618e668cc4-20211218
-X-UUID: 3b317627985d4d47925dfb618e668cc4-20211218
-Received: from mtkexhb02.mediatek.inc [(172.21.101.103)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1963180912; Sat, 18 Dec 2021 09:09:00 +0800
-Received: from mtkexhb02.mediatek.inc (172.21.101.103) by
- mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
- 15.0.1497.2; Sat, 18 Dec 2021 09:08:58 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb02.mediatek.inc
- (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Sat, 18 Dec
- 2021 09:08:58 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Sat, 18 Dec 2021 09:08:57 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: [PATCH 3/3] Bluetooth: btmtksdio: move struct reg_read_cmd to common file
-Date:   Sat, 18 Dec 2021 09:08:53 +0800
-Message-ID: <35a5f37a702aa21383092534f42c01fa55eaddb0.1639787634.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <632534014b9b8a38e81dfb5749dcd75e2088adb1.1639787634.git.objelf@gmail.com>
-References: <632534014b9b8a38e81dfb5749dcd75e2088adb1.1639787634.git.objelf@gmail.com>
+        Sat, 18 Dec 2021 01:12:49 -0500
+Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
+        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        (No client certificate requested)
+        by sin.source.kernel.org (Postfix) with ESMTPS id 8B65CCE0B52
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:12:47 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 87699C36AE0
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:12:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+        s=k20201202; t=1639807965;
+        bh=dOm63E89msFP0It6PLEgfGUviZUzuHR11F3uIBXXXe8=;
+        h=From:To:Subject:Date:In-Reply-To:References:From;
+        b=OvpdOhNz7oIPSgx5jC89Deu4kEhpwq5nPbeKe/IPlpp290eB0SH5DHcCGUDLuhI4A
+         dSTo0R2jQkwKGRHIsSg4mD1KCFZJDdlxyli209/zEEclqqIBvkQUbwjdvQIvMjZXGV
+         qIVB6uqe7HmsPG0Cd9voHrR8b88ELeEmJXzBHDcupzj5tngFQzkZcc3yuB9HhPnyCh
+         az3iZV2MNK3iU6IRu71UDBUFbbXHGHVPX2JRMr/vjvkszqaZHyjCNyTlmVKiSlRv+t
+         CtkXTBOH+ZvO/BN8spLTFcU99XSPaY/43SJVWdoVNCvyBLRcfUpnjuyintRkPwJzOu
+         R8UE/4QknGWTQ==
+Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
+        id 5EA1060F55; Sat, 18 Dec 2021 06:12:45 +0000 (UTC)
+From:   bugzilla-daemon@bugzilla.kernel.org
+To:     linux-bluetooth@vger.kernel.org
+Subject: [Bug 215347] btintel: AX200 (8087:0029): hci crashes and can't
+ recover after repeated rfkill on/off
+Date:   Sat, 18 Dec 2021 06:12:45 +0000
+X-Bugzilla-Reason: AssignedTo
+X-Bugzilla-Type: changed
+X-Bugzilla-Watch-Reason: None
+X-Bugzilla-Product: Drivers
+X-Bugzilla-Component: Bluetooth
+X-Bugzilla-Version: 2.5
+X-Bugzilla-Keywords: 
+X-Bugzilla-Severity: blocking
+X-Bugzilla-Who: hui.wang@canonical.com
+X-Bugzilla-Status: NEW
+X-Bugzilla-Resolution: 
+X-Bugzilla-Priority: P1
+X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
+X-Bugzilla-Flags: 
+X-Bugzilla-Changed-Fields: 
+Message-ID: <bug-215347-62941-PrkiQKSbrV@https.bugzilla.kernel.org/>
+In-Reply-To: <bug-215347-62941@https.bugzilla.kernel.org/>
+References: <bug-215347-62941@https.bugzilla.kernel.org/>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Bugzilla-URL: https://bugzilla.kernel.org/
+Auto-Submitted: auto-generated
 MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+https://bugzilla.kernel.org/show_bug.cgi?id=3D215347
 
-move struct reg_read_cmd to btmtk.h to allow other mtk drivers refer to.
+--- Comment #2 from Hui Wang (hui.wang@canonical.com) ---
+Hi Tedd,
 
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
----
- drivers/bluetooth/btmtk.h     | 7 +++++++
- drivers/bluetooth/btmtksdio.c | 7 +------
- 2 files changed, 8 insertions(+), 6 deletions(-)
+Forgot to mention, before running the bttest.sh, need to open the gnmoe
+bluetooth setting, so the testing steps are:
+- boot the system
+- open a terminal and run 'dmesg -w'
+- run gnome-settings->bluetooth (please see the attached picture)
+- run bttest.sh
 
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index fc57ef09d132..fb76d9765ce0 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -87,6 +87,13 @@ struct btmtk_sco {
- 	u8 channel_select_config;
- } __packed;
- 
-+struct reg_read_cmd {
-+	u8 type;
-+	u8 rsv;
-+	u8 num;
-+	__le32 addr;
-+} __packed;
-+
- struct reg_write_cmd {
- 	u8 type;
- 	u8 rsv;
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index 8e4d8c2da824..884678a3951d 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -800,12 +800,7 @@ static int mt79xx_setup(struct hci_dev *hdev, const char *fwname)
- static int btsdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
- {
- 	struct btmtk_hci_wmt_params wmt_params;
--	struct reg_read_cmd {
--		u8 type;
--		u8 rsv;
--		u8 num;
--		__le32 addr;
--	} __packed reg_read = {
-+	struct reg_read_cmd reg_read = {
- 		.type = 1,
- 		.num = 1,
- 	};
--- 
-2.25.1
+--=20
+You may reply to this email to add a comment.
 
+You are receiving this mail because:
+You are the assignee for the bug.=
