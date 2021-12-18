@@ -2,103 +2,161 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 8FD81C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 10:20:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 330E2C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 10:26:42 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232662AbhLRKUs (ORCPT
+        id S229988AbhLRK0l (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 18 Dec 2021 05:20:48 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:48371 "EHLO mx1.molgen.mpg.de"
+        Sat, 18 Dec 2021 05:26:41 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:38605 "EHLO mx1.molgen.mpg.de"
         rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229779AbhLRKUr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 18 Dec 2021 05:20:47 -0500
+        id S229536AbhLRK0k (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sat, 18 Dec 2021 05:26:40 -0500
 Received: from [192.168.0.3] (ip5f5aecf3.dynamic.kabel-deutschland.de [95.90.236.243])
         (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
          key-exchange X25519 server-signature RSA-PSS (2048 bits))
         (No client certificate requested)
         (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 49BEA61E5FE02;
-        Sat, 18 Dec 2021 11:20:45 +0100 (CET)
-Message-ID: <82abfb3e-2e70-736f-95dc-b3cb88b952bb@molgen.mpg.de>
-Date:   Sat, 18 Dec 2021 11:20:44 +0100
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id DA4BE61E5FE00;
+        Sat, 18 Dec 2021 11:26:38 +0100 (CET)
+Message-ID: <67f062f9-293b-78aa-6474-f018d4bd269c@molgen.mpg.de>
+Date:   Sat, 18 Dec 2021 11:26:38 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.4.0
-Subject: Re: [RFC PATCH] Bluetooth: btintel: Fix broken LED quirk for legacy
- ROM device
+Subject: Re: [PATCH RESEND 1/3] Bluetooth: btmtksdio: add the support of wake
+ on bluetooth
 Content-Language: en-US
-To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc:     Tedd An <tedd.an@intel.com>, linux-bluetooth@vger.kernel.org,
-        Tedd Ho-Jeong An <hj.tedd.an@gmail.com>
-References: <20211216033453.9806-1-hj.tedd.an@gmail.com>
- <904d134a-a672-72a9-dddb-1c48d151e62e@molgen.mpg.de>
- <7bca0b8840cc1bab1c7ea7f25d8cca6ee41ecb04.camel@intel.com>
- <3ae32390-a8e5-9b65-6252-9e7f201bd08a@molgen.mpg.de>
- <CABBYNZJSF6CEU+oJHeKtU5Z-pqL5rn_pO9CxaDwbuWeATBk-QA@mail.gmail.com>
+To:     Sean Wang <sean.wang@mediatek.com>,
+        Mark Chen <Mark-YW.Chen@mediatek.com>
+Cc:     Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
+        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
+        Deren.Wu@mediatek.com, km.lin@mediatek.com,
+        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
+        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
+        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <632534014b9b8a38e81dfb5749dcd75e2088adb1.1639787634.git.objelf@gmail.com>
 From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <CABBYNZJSF6CEU+oJHeKtU5Z-pqL5rn_pO9CxaDwbuWeATBk-QA@mail.gmail.com>
+In-Reply-To: <632534014b9b8a38e81dfb5749dcd75e2088adb1.1639787634.git.objelf@gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Luiz, dear Tedd,
+Dear Sean, dear Mark,
 
 
-Am 17.12.21 um 20:27 schrieb Luiz Augusto von Dentz:
+Am 18.12.21 um 02:08 schrieb sean.wang@mediatek.com:
+> From: Mark Chen <mark-yw.chen@mediatek.com>
 
-> On Fri, Dec 17, 2021 at 7:33 AM Paul Menzel <pmenzel@molgen.mpg.de> wrote:
+Shorter summary: Bluetooth: btmtksdio: Support wake on bluetooth
 
->> Am 16.12.21 um 19:38 schrieb An, Tedd:
->>
->>> On Thu, 2021-12-16 at 08:52 +0100, Paul Menzel wrote:
->>
->>>> Am 16.12.21 um 04:34 schrieb Tedd Ho-Jeong An:
->>>>> From: Tedd Ho-Jeong An <tedd.an@intel.com>
->>>>>
->>>>> This patch fix the broken LED quirk for Intel legacy ROM devices.
->>>>
->>>> fix*es*
->>>>
->>>> Excuse my ignorance, but what are Intel legacy ROM devices? Maybe also
->>>> mention the IDs 0x0a2a and 0x0aa7 in the commit message?
->>>>
->>>>> Legacy device sends the SW RFKILL while shutting down the device (like
->>>>> HCI interface down) to turn off the LED by putting the device in assert.
->>>>>
->>>>> Once the SW RFKILL is on, it needs the HCI_Reset to exit from the SW
->>>>> RFKILL state. This patch checks the quirk and send the HCI_Reset before
->>>>
->>>> send*s*
->>>>
->>>>> sending the HCI_Intel_Read_Version command.
->>>>
->>>> Is that document in some datasheet/specification? If so, please mention it.
->>>>
->>>> Also, in the commit message summary you write “Fix”. If it fixes an old
->>>> commit, please add a Fixes: tag.
->>>>
->>>>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
->>>>> ---
->>>>>     drivers/bluetooth/btintel.c | 13 ++++++-------
->>>>>     drivers/bluetooth/btusb.c   | 10 ++++++++--
->>>>>     2 files changed, 14 insertions(+), 9 deletions(-)
->>>>
->>>> I have a Dell Latitude E7250 with the 8087:0a2a. How can I test this?
->>>
->>> Apply this patch on top of the bluetooth-next (or current mainline)
->>> The BT interface should be available after reboot.
->>
->> On the laptop, I do not have any problems with missing BT interface
->> after reboot with Linux 5.16-rc5. Are not all devices affected?
+> Add the support to enable wake on bluetooth
+
+Can you please list the datasheet name and revision used for the 
+implementation.
+
+Please document how you tested this.
+
+> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+> ---
+>   drivers/bluetooth/btmtk.h     |  8 ++++++++
+>   drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
+>   2 files changed, 38 insertions(+), 1 deletion(-)
 > 
-> If the problem is fixed for you please confirm it by replying with a
-> Tested-by line.
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index 6e7b0c7567c0..2be1d2680ad8 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+>   	u8 time_compensation;
+>   } __packed;
+>   
+> +struct btmtk_wakeon {
+> +	u8 mode;
+> +	u8 gpo;
+> +	u8 active_high;
+> +	__le16 enable_delay;
+> +	__le16 wakeup_delay;
+> +} __packed;
+> +
+>   struct btmtk_hci_wmt_params {
+>   	u8 op;
+>   	u8 flag;
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index b5ea8d3bffaa..771733ce362b 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>   	return 0;
+>   }
+>   
+> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
+> +{
+> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+> +	bool may_wakeup = device_may_wakeup(bdev->dev);
+> +	struct btmtk_wakeon bt_awake = {
+> +		.mode = 0x1,
+> +		.gpo = 0,
+> +		.active_high = 0x1,
+> +		.enable_delay = cpu_to_le16(0xc80),
+> +		.wakeup_delay = cpu_to_le16(0x20)
+> +	};
+> +	struct sk_buff *skb;
+> +
+> +	if (may_wakeup &&
+> +	    bdev->data->chipid == 0x7921) {
 
-Sorry, there seems to be a misunderstanding. I do not know what the 
-problem is in the first place. On the Dell Latitude E7250 with Linux 
-5.16-rc5 the Bluetooth interface shows up after a warm reboot just fine.
+Why the check for 0x7921? Is that device only supported? The commit 
+message does not say anything about it.
+
+> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
+> +				      &bt_awake, HCI_CMD_TIMEOUT);
+> +		if (IS_ERR(skb))
+> +			may_wakeup = false;
+> +	}
+> +
+> +	return may_wakeup;
+> +}
+> +
+>   static int btmtksdio_probe(struct sdio_func *func,
+>   			   const struct sdio_device_id *id)
+>   {
+> @@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>   	hdev->shutdown = btmtksdio_shutdown;
+>   	hdev->send     = btmtksdio_send_frame;
+>   	hdev->set_bdaddr = btmtk_set_bdaddr;
+> +	hdev->wakeup = btmtk_sdio_wakeup;
+>   
+>   	SET_HCIDEV_DEV(hdev, &func->dev);
+>   
+> @@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+>   	 */
+>   	pm_runtime_put_noidle(bdev->dev);
+>   
+> -	return 0;
+> +	err = device_init_wakeup(bdev->dev, true);
+> +	if (err)
+> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
+
+Could the error message be extended, so normal users know what to do? 
+Currently it’s only useful for developers.
+
+> +
+> +	return err;
+>   }
+>   
+>   static void btmtksdio_remove(struct sdio_func *func)
 
 
 Kind regards,
