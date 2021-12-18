@@ -2,41 +2,44 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2E2EEC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 06:36:25 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 465D7C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 06:46:23 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232199AbhLRGgY (ORCPT
+        id S232206AbhLRGqW (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 18 Dec 2021 01:36:24 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:38356 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232191AbhLRGgX (ORCPT
+        Sat, 18 Dec 2021 01:46:22 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36694 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232199AbhLRGqW (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 18 Dec 2021 01:36:23 -0500
+        Sat, 18 Dec 2021 01:46:22 -0500
+Received: from dfw.source.kernel.org (dfw.source.kernel.org [IPv6:2604:1380:4641:c500::1])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23C82C061574
+        for <linux-bluetooth@vger.kernel.org>; Fri, 17 Dec 2021 22:46:22 -0800 (PST)
 Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
         (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
         (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 76D2C60959
-        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:36:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C93B3C36AE0
-        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:36:22 +0000 (UTC)
+        by dfw.source.kernel.org (Postfix) with ESMTPS id ECFE760959
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:46:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 583E9C36AE8
+        for <linux-bluetooth@vger.kernel.org>; Sat, 18 Dec 2021 06:46:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1639809382;
-        bh=bQpMtqE1FvVTqBQOrJ/jzNU4JddFML6hloyghLnMGlQ=;
+        s=k20201202; t=1639809980;
+        bh=VUZ7qpgOPVCRTt9wKw6KsioX6sOHyl1Un7WgHVkw1A8=;
         h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=BBB9OrA4iHZjMPhV94J8NwTMoOCs8jtbMuZROuvJKiz6OuAEVejefSrGc98MqUHlq
-         3tMx8jtbyMho+bpxaIm8DL3UkNSpyO+ryouK0uHbbgIWYE9XTtc9HQUAXdqq3y3yIE
-         wNeluSi4Uy3ILv1rWmyDSmN9v+O1r/9Gedl8mr0GESUwCh+TlHzXK9pgqL+sEx/aYo
-         RFgyPTJe9eQTZOIYc9jt97LtEZG4ZyDdwnPoCLIuam2Oz2CT8CBf9EKmWy0BO+IESR
-         QN4WgqZ0BNBI+Yp9AuWphTlwvbmIFq0bKCGIaCvUhkX0xr3FqxFHgvFarc3oBg9K+L
-         IyyQEgHuPIhZg==
+        b=fS4o0aDXyDLEthRuawR30vQP2oudmkoyzoALKat1ov4gITEGd0cywTy2C5eUE6+8N
+         JXTvmOQ+4CBLZEvqzHWdeqPAj4xQiGUEuIwKRd1BWm41AKx3IAiFrviLSc/yrrjn/8
+         sjzApyUTv7dABrXexvU4vOzcs1QOB79DVaP+EefzpQVqtg7S/wyeZ8VGQhoAsrCzlx
+         Tw2WokKK8IqZX01xl9nar8luoHxb5H+L2gWnxXvv7P17UHbk89MK6gQBxmo2FfyDvR
+         Zs8CZ0Xu1up0hKE2NzxQ6a+U62okopfSjaBrQYD41M/2xePvJbI3ooSGFOIiNkwCOz
+         dfrz6+V9U9yVA==
 Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 9F6AD60F55; Sat, 18 Dec 2021 06:36:22 +0000 (UTC)
+        id 37E1B60F55; Sat, 18 Dec 2021 06:46:20 +0000 (UTC)
 From:   bugzilla-daemon@bugzilla.kernel.org
 To:     linux-bluetooth@vger.kernel.org
 Subject: [Bug 215347] btintel: AX200 (8087:0029): hci crashes and can't
  recover after repeated rfkill on/off
-Date:   Sat, 18 Dec 2021 06:36:22 +0000
+Date:   Sat, 18 Dec 2021 06:46:20 +0000
 X-Bugzilla-Reason: AssignedTo
 X-Bugzilla-Type: changed
 X-Bugzilla-Watch-Reason: None
@@ -52,7 +55,7 @@ X-Bugzilla-Priority: P1
 X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
 X-Bugzilla-Flags: 
 X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215347-62941-H2321OTBdp@https.bugzilla.kernel.org/>
+Message-ID: <bug-215347-62941-u69FSklbZG@https.bugzilla.kernel.org/>
 In-Reply-To: <bug-215347-62941@https.bugzilla.kernel.org/>
 References: <bug-215347-62941@https.bugzilla.kernel.org/>
 Content-Type: text/plain; charset="UTF-8"
@@ -66,15 +69,20 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 https://bugzilla.kernel.org/show_bug.cgi?id=3D215347
 
---- Comment #6 from Hui Wang (hui.wang@canonical.com) ---
-And if the desktop is not gnome, we could replace "gnome-settings->bluetoot=
-h"
-with a command-line "bluetoothctl scan on", so the test steps are:
-- boot the system
-- open a terminal and run 'dmesg -w'
-- open another terminal and run 'bluetoothctl scan on' and wait for 5 secon=
-ds
-- run bttest.sh
+--- Comment #7 from Hui Wang (hui.wang@canonical.com) ---
+(In reply to Hui Wang from comment #6)
+> And if the desktop is not gnome, we could replace
+> "gnome-settings->bluetooth" with a command-line "bluetoothctl scan on", so
+> the test steps are:
+> - boot the system
+> - open a terminal and run 'dmesg -w'
+> - open another terminal and run 'bluetoothctl scan on' and wait for 5 sec=
+onds
+> - run bttest.sh
+
+Please ignore this comment, "bluetoothctl scan on" doesn't help reproduce t=
+he
+crashing.
 
 --=20
 You may reply to this email to add a comment.
