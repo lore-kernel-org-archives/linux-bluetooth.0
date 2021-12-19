@@ -2,223 +2,155 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 94CF9C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Sat, 18 Dec 2021 10:30:12 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 7DE44C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Sun, 19 Dec 2021 22:42:03 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231592AbhLRKaJ (ORCPT
+        id S230301AbhLSWmC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Sat, 18 Dec 2021 05:30:09 -0500
-Received: from mx3.molgen.mpg.de ([141.14.17.11]:57477 "EHLO mx1.molgen.mpg.de"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229536AbhLRKaF (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Sat, 18 Dec 2021 05:30:05 -0500
-Received: from [192.168.0.3] (ip5f5aecf3.dynamic.kabel-deutschland.de [95.90.236.243])
-        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-         key-exchange X25519 server-signature RSA-PSS (2048 bits))
-        (No client certificate requested)
-        (Authenticated sender: pmenzel)
-        by mx.molgen.mpg.de (Postfix) with ESMTPSA id 6A60661E5FE00;
-        Sat, 18 Dec 2021 11:30:03 +0100 (CET)
-Message-ID: <638a2506-c410-d98c-b704-6f16f72e0bc6@molgen.mpg.de>
-Date:   Sat, 18 Dec 2021 11:30:03 +0100
+        Sun, 19 Dec 2021 17:42:02 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:45212 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S229552AbhLSWmC (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Sun, 19 Dec 2021 17:42:02 -0500
+Received: from mail-ed1-x52a.google.com (mail-ed1-x52a.google.com [IPv6:2a00:1450:4864:20::52a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D293DC061574
+        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Dec 2021 14:42:01 -0800 (PST)
+Received: by mail-ed1-x52a.google.com with SMTP id z5so31046110edd.3
+        for <linux-bluetooth@vger.kernel.org>; Sun, 19 Dec 2021 14:42:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:from:date:message-id:subject:to;
+        bh=rdm+XPWdUTW9XBuM/z4dDE5n/0HU9NRKXZpF1Mk1bGE=;
+        b=EIlZwhqlE9pjvD9ZRB/vzd85xKLNjQV679gj3BONRdQy8qPmAFkLc4lW/zuXYzy3B1
+         MRa7vydgms50QkrwM7eqCG3psMZlkHI6Pg3Xf63bYBbzVSyO3HqwlPRCW+lraW6Sf+mT
+         jTkum1EETs9engj0e6OK8P8MuDXKsl+bPFVOTiTLJO8e1j7GRGBwEYG9ACYpbU02X1Sv
+         LSHJzGqBvP3ioEw6CXaTsxkWsdTmxO3OgBp5++H/P7X4uiUzDIk/bNQp+gOJza5T66Jl
+         Y2P5HT030imJRgV2Dp6pSg/bgsZdrQfRRsKGOTgyvq3GQXLGqhzsgKItMewWhMuazptM
+         G9Nw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:from:date:message-id:subject:to;
+        bh=rdm+XPWdUTW9XBuM/z4dDE5n/0HU9NRKXZpF1Mk1bGE=;
+        b=BLeg+/sla8YH33R4b7ZjvZI9cSGohn1yqBTKp1MVAxQllV9gxbScj/DzR6EfTPrclI
+         8ZC7KK7dTJYzZx9rwMQzGQ0NioW31e1u7FcsVvIpf9XP1TZcrlpAGXRKsiltWkvvVAD0
+         aV4NyxMW43b+mU/mf8W4Oq0S/NZnXmw9nXCPS9cLTGtkilljew8wobbpU/3ShWoEHzyM
+         kfErn4F4Krt1LyexRECQgaqrCJGNmw5vPKJebswr6oXXtbvDeXlLzhUB9TTWpeAS7zRo
+         +WMC7gegd4aB92QLweet4Rrv4Niq45x5tBXa5/L+TM+LzoE0VLup0+NKsYfEgo4CWMZs
+         LfIg==
+X-Gm-Message-State: AOAM530YmhL2bwiWlw4A+5Acfw/csK+66E/qR5+jhVgSmABPy+aDY5qP
+        UmUUXEd5stAIkty4RcAdZ5G84gIKP2XnLXS/WrPe5m3WMaU=
+X-Google-Smtp-Source: ABdhPJwMX+EaewouXJYkDzNtzU3aG7/JRoAbZJKcR+wj198Psw4sZ46/s7xuR6cEFRlXSIjuWYnWtto4zP60Y90ULOE=
+X-Received: by 2002:aa7:cd9a:: with SMTP id x26mr13213999edv.159.1639953720122;
+ Sun, 19 Dec 2021 14:42:00 -0800 (PST)
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
-Subject: Re: [PATCH 2/3] Bluetooth: btmtksdio: Enable SCO over I2S function
-Content-Language: en-US
-To:     Sean Wang <sean.wang@mediatek.com>,
-        Mark Chen <mark-yw.chen@mediatek.com>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Soul.Huang@mediatek.com, YN.Chen@mediatek.com,
-        Leon.Yen@mediatek.com, Eric-SY.Chang@mediatek.com,
-        Deren.Wu@mediatek.com, km.lin@mediatek.com,
-        robin.chiu@mediatek.com, Eddie.Chen@mediatek.com,
-        ch.yeh@mediatek.com, posh.sun@mediatek.com, ted.huang@mediatek.com,
-        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
-        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
-        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
-        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
-        linux-bluetooth@vger.kernel.org,
-        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
-References: <632534014b9b8a38e81dfb5749dcd75e2088adb1.1639787634.git.objelf@gmail.com>
- <e17b4b3aec942828ef017592df155e554a3d766b.1639787634.git.objelf@gmail.com>
-From:   Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <e17b4b3aec942828ef017592df155e554a3d766b.1639787634.git.objelf@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+From:   Jeremy Slemp <slempjeremy68@gmail.com>
+Date:   Sun, 19 Dec 2021 14:41:49 -0800
+Message-ID: <CAHtsx2rK9SE5fn=1hnEZ_GZV6EPVvFLM-O+0HPAk+h+LvsxL2w@mail.gmail.com>
+Subject: Trouble parsing HID reports from PDP PS4 remote
+To:     linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Dear Sean, dear Mark,
+I bought a PDP Bluetooth PS4 remote[0] in the hopes of using it to
+send keypress events to my Python script via evdev[1].  I found that
+some of the buttons on the remote generate HID events that are seen by
+evdev, but others do not.  So I'd like to figure out the best way to
+receive events from the currently-unsupported buttons.
+
+bluetoothctl describes the device as:
+
+Device 3E:09:EC:xx:xx:xx (public)
+Name: PDP Media Remote
+Alias: PDP Media Remote
+Class: 0x0000250c
+Paired: yes
+Trusted: yes
+Blocked: no
+Connected: yes
+LegacyPairing: no
+UUID: Human Interface Device... (00001124-0000-1000-8000-00805f9b34fb)
+UUID: PnP Information           (00001200-0000-1000-8000-00805f9b34fb)
+
+The main module inside the device is an BTM0612C2P[2].
 
 
-Am 18.12.21 um 02:08 schrieb sean.wang@mediatek.com:
-> From: Mark Chen <mark-yw.chen@mediatek.com>
-> 
-> For MediaTek chipset, the driver has to issue the specific command to
-> enable Bluetooth SCO support over the I2S/PCM interface.
+The "good" buttons flip a bit in a mask in bytes 2-5:
 
-Please document the datasheet name, revision and section, where this is 
-described.
+SHARE button, press/release:
 
-Please add how SCO support can be tested. Are all Mediatek chipsets 
-supported?
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2232 [hci0] 4474.225390
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 10 00 09 00 16 73 47 06                 ........sG.
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2233 [hci0] 4474.355396
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 09 00 89 24 5e 56                 ........$^V
 
-> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
-> ---
->   drivers/bluetooth/btmtk.h     | 20 +++++++++
->   drivers/bluetooth/btmtksdio.c | 76 +++++++++++++++++++++++++++++++++++
->   2 files changed, 96 insertions(+)
-> 
-> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-> index 2be1d2680ad8..fc57ef09d132 100644
-> --- a/drivers/bluetooth/btmtk.h
-> +++ b/drivers/bluetooth/btmtk.h
-> @@ -7,8 +7,12 @@
->   
->   #define HCI_WMT_MAX_EVENT_SIZE		64
->   
-> +#define BTMTK_WMT_REG_WRITE 0x1
->   #define BTMTK_WMT_REG_READ 0x2
->   
-> +#define MT7921_PINMUX_0 0x70005050
-> +#define MT7921_PINMUX_1 0x70005054
-> +
->   enum {
->   	BTMTK_WMT_PATCH_DWNLD = 0x1,
->   	BTMTK_WMT_TEST = 0x2,
-> @@ -76,6 +80,22 @@ struct btmtk_wakeon {
->   	__le16 wakeup_delay;
->   } __packed;
->   
-> +struct btmtk_sco {
-> +	u8 clock_config;
-> +	u8 transmit_format_config;
-> +	u8 channel_format_config;
-> +	u8 channel_select_config;
-> +} __packed;
-> +
-> +struct reg_write_cmd {
-> +	u8 type;
-> +	u8 rsv;
-> +	u8 num;
-> +	__le32 addr;
-> +	__le32 data;
-> +	__le32 mask;
-> +} __packed;
-> +
->   struct btmtk_hci_wmt_params {
->   	u8 op;
->   	u8 flag;
-> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-> index 771733ce362b..8e4d8c2da824 100644
-> --- a/drivers/bluetooth/btmtksdio.c
-> +++ b/drivers/bluetooth/btmtksdio.c
-> @@ -830,6 +830,74 @@ static int btsdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
->   	return err;
->   }
->   
-> +static int btsdio_mtk_reg_write(struct hci_dev *hdev, u32 reg, u32 val, u32 mask)
-> +{
-> +	struct btmtk_hci_wmt_params wmt_params;
-> +	struct reg_write_cmd reg_write = {
-> +		.type = 1,
-> +		.num = 1,
-> +		.addr = cpu_to_le32(reg),
-> +		.data = cpu_to_le32(val),
-> +		.mask = cpu_to_le32(mask),
-> +	};
-> +	int err, status;
-> +
-> +	wmt_params.op = BTMTK_WMT_REGISTER;
-> +	wmt_params.flag = BTMTK_WMT_REG_WRITE;
-> +	wmt_params.dlen = sizeof(reg_write);
-> +	wmt_params.data = &reg_write;
-> +	wmt_params.status = &status;
-> +
-> +	err = mtk_hci_wmt_sync(hdev, &wmt_params);
-> +	if (err < 0)
-> +		bt_dev_err(hdev, "Failed to write reg(%d)", err);
-> +
-> +	return err;
-> +}
-> +
-> +static int btsdio_mtk_sco_setting(struct hci_dev *hdev)
-> +{
-> +	struct btmtk_sco sco_setting = {
-> +		.clock_config = 0x49,
-> +		.channel_format_config = 0x80,
-> +	};
-> +	struct sk_buff *skb;
-> +	u32 val;
-> +	int err;
-> +
-> +	/* Enable SCO over i2s/pcm for Mediatek Chipset */
+UP ARROW, press/release:
 
-s/Chipset/chipset/
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2240 [hci0] 4536.493867
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 00 00 00 0a 00 8b 3c 03 4d                 ........<.M
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2241 [hci0] 4536.727587
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
 
-> +	skb =  __hci_cmd_sync(hdev, 0xfc72, sizeof(sco_setting),
-> +			      &sco_setting, HCI_CMD_TIMEOUT);
-> +	if (IS_ERR(skb))
-> +		return PTR_ERR(skb);
-> +
-> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_0, &val);
-> +	if (err < 0) {
-> +		bt_dev_err(hdev, "Failed to read register (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	val |= 0x11000000;
-> +	err = btsdio_mtk_reg_write(hdev, MT7921_PINMUX_0, val, ~0);
-> +	if (err < 0) {
-> +		bt_dev_err(hdev, "Failed to write register (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_1, &val);
-> +	if (err < 0) {
-> +		bt_dev_err(hdev, "Failed to read register (%d)", err);
-> +		return err;
-> +	}
-> +
-> +	val |= 0x00000101;
-> +	err = btsdio_mtk_reg_write(hdev, MT7921_PINMUX_1, val, ~0);
-> +	if (err < 0)
-> +		bt_dev_err(hdev, "Failed to write register (%d)", err);
-> +
-> +	return err;
-> +}
-> +
->   static int btmtksdio_setup(struct hci_dev *hdev)
->   {
->   	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-> @@ -862,6 +930,14 @@ static int btmtksdio_setup(struct hci_dev *hdev)
->   		err = mt79xx_setup(hdev, fwname);
->   		if (err < 0)
->   			return err;
-> +
-> +		/* Enable sco over i2s/pcm */
+PINK SQUARE, press/release:
 
-s/sco/SCO/
-
-> +		err = btsdio_mtk_sco_setting(hdev);
-> +		if (err < 0) {
-> +			bt_dev_err(hdev, "Failed to enable sco setting (%d)", err);
-
-s/sco/SCO/
-
-> +			return err;
-> +		}
-> +
->   		break;
->   	case 0x7663:
->   	case 0x7668:
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2259 [hci0] 4676.429686
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 18 00 00 0a 00 c8 e0 93 1d                 ...........
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2260 [hci0] 4676.639687
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
 
 
-Kind regards,
+The "bad" buttons seem to transmit a constant in byte 6 instead of a
+bitmask in bytes 2-5:
 
-Paul
+REWIND, press/release:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2261 [hci0] 4696.955007
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 17 8d f2 a0 fe                 ...........
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2262 [hci0] 4697.163765
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
+
+PLAY, press/release:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2264 [hci0] 4710.348944
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 16 1b c2 a7 89                 ...........
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2265 [hci0] 4710.531446
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
+
+PAUSE, press/release:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2266 [hci0] 4717.501552
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 1a 30 8e 11 80                 .......0...
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2267 [hci0] 4717.685317
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
+
+ENTER, press/release:
+
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2293 [hci0] 4844.683443
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 0d f7 0b c2 03                 ...........
+> ACL Data RX: Handle 11 flags 0x02 dlen 15                           #2294 [hci0] 4844.867210
+      Channel: 65 len 11 [PSM 19 mode 0] {chan 1}
+        a1 01 08 00 00 0a 00 4a 77 73 7d                 .......Jws}
+
+I tried to decode these reports according to the USB HID spec but they
+didn't make much sense to me beyond the "collection (application)"
+part.  Can anyone help understand what this remote is doing?
+
+
+[0] https://www.amazon.com/dp/B072C7YZFC
+[1] https://python-evdev.readthedocs.io/en/latest/
+[2] https://www.oemblue.com/download/BTM0612C2P%20Hardware%20Datasheet.pdf
