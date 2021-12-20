@@ -2,30 +2,29 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 12B54C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Dec 2021 17:52:39 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id CE5C6C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 20 Dec 2021 18:34:31 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S240286AbhLTRwi (ORCPT
+        id S240391AbhLTSe3 (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 20 Dec 2021 12:52:38 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:36440 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S229633AbhLTRwh (ORCPT
+        Mon, 20 Dec 2021 13:34:29 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:54076 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S236184AbhLTSe0 (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 20 Dec 2021 12:52:37 -0500
-X-UUID: ce36ff468cfd424ca9d6e550672011ca-20211221
-X-UUID: ce36ff468cfd424ca9d6e550672011ca-20211221
-Received: from mtkcas11.mediatek.inc [(172.21.101.40)] by mailgw01.mediatek.com
+        Mon, 20 Dec 2021 13:34:26 -0500
+X-UUID: 977b4c7051e54f368b980866f32bd4d2-20211221
+X-UUID: 977b4c7051e54f368b980866f32bd4d2-20211221
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
         (envelope-from <sean.wang@mediatek.com>)
         (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1693687402; Tue, 21 Dec 2021 01:52:34 +0800
+        with ESMTP id 1143960005; Tue, 21 Dec 2021 02:34:20 +0800
 Received: from mtkcas10.mediatek.inc (172.21.101.39) by
- mtkmbs10n1.mediatek.inc (172.21.101.34) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.792.15; Tue, 21 Dec 2021 01:52:33 +0800
+ mtkmbs07n1.mediatek.inc (172.21.101.16) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Tue, 21 Dec 2021 02:34:19 +0800
 Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
  (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Tue, 21 Dec 2021 01:52:32 +0800
+ Transport; Tue, 21 Dec 2021 02:34:18 +0800
 From:   <sean.wang@mediatek.com>
 To:     <pmenzel@molgen.mpg.de>
 CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
@@ -44,14 +43,15 @@ CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
         <linux-bluetooth@vger.kernel.org>,
         <linux-mediatek@lists.infradead.org>,
         <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH 2/3] Bluetooth: btmtksdio: Enable SCO over I2S function
-Date:   Tue, 21 Dec 2021 01:52:30 +0800
-Message-ID: <1640022750-16263-1-git-send-email-sean.wang@mediatek.com>
+Subject: =?UTF-8?q?Re=3A=20=5BPATCH=20RESEND=201/3=5D=20Bluetooth=3A=20btmtksdio=3A=20add=20the=20support=20of=20wake=20on=20bluetooth?=
+Date:   Tue, 21 Dec 2021 02:34:17 +0800
+Message-ID: <1640025257-18029-1-git-send-email-sean.wang@mediatek.com>
 X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <638a2506-c410-d98c-b704-6f16f72e0bc6@molgen.mpg.de--annotate>
-References: <638a2506-c410-d98c-b704-6f16f72e0bc6@molgen.mpg.de--annotate>
+In-Reply-To: <67f062f9-293b-78aa-6474-f018d4bd269c@molgen.mpg.de--annotate>
+References: <67f062f9-293b-78aa-6474-f018d4bd269c@molgen.mpg.de--annotate>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
@@ -59,190 +59,130 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Sean Wang <sean.wang@mediatek.com>
 
+
 >Dear Sean, dear Mark,
 >
 >
 >Am 18.12.21 um 02:08 schrieb sean.wang@mediatek.com:
 >> From: Mark Chen <mark-yw.chen@mediatek.com>
->>
->> For MediaTek chipset, the driver has to issue the specific command to
->> enable Bluetooth SCO support over the I2S/PCM interface.
 >
->Please document the datasheet name, revision and section, where this is described.
+>Shorter summary: Bluetooth: btmtksdio: Support wake on bluetooth
+
+seemed nice to me, will do in the next version
+
+>
+>> Add the support to enable wake on bluetooth
+>
+>Can you please list the datasheet name and revision used for the implementation.
 
 the datasheet is not released in public so Mark and I cannot provide the detail here, but we will make the patch easy to review and understand.
 
->
->Please add how SCO support can be tested. Are all Mediatek chipsets supported?
+>Please document how you tested this.
 
-the SCO profile was tested by setting up a VOIP application, connected to HFP device, checked telephony function can work normally.
-
-currently, SCO is only supported by mt7921, we will change the subject to "Bluetooth: mt7921s: Enable SCO over I2S function" to avoid any misunderstanding.
+It was tested by setting up an HID or HOGP profile to connect a Bluetooth keyboard and mouse,  then putting the system to suspend, then trying to wake up the system by moving the Bluetooth keyboard or mouse, and then checking if the system can be waken up and be brought back to the normal state.
 
 >
 >> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
 >> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
 >> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
 >> ---
->>   drivers/bluetooth/btmtk.h     | 20 +++++++++
->>   drivers/bluetooth/btmtksdio.c | 76 +++++++++++++++++++++++++++++++++++
->>   2 files changed, 96 insertions(+)
+>>   drivers/bluetooth/btmtk.h     |  8 ++++++++
+>>   drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
+>>   2 files changed, 38 insertions(+), 1 deletion(-)
 >>
 >> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
->> index 2be1d2680ad8..fc57ef09d132 100644
+>> index 6e7b0c7567c0..2be1d2680ad8 100644
 >> --- a/drivers/bluetooth/btmtk.h
 >> +++ b/drivers/bluetooth/btmtk.h
->> @@ -7,8 +7,12 @@
->>
->>   #define HCI_WMT_MAX_EVENT_SIZE		64
->>
->> +#define BTMTK_WMT_REG_WRITE 0x1
->>   #define BTMTK_WMT_REG_READ 0x2
->>
->> +#define MT7921_PINMUX_0 0x70005050
->> +#define MT7921_PINMUX_1 0x70005054
->> +
->>   enum {
->>	BTMTK_WMT_PATCH_DWNLD = 0x1,
->>	BTMTK_WMT_TEST = 0x2,
->> @@ -76,6 +80,22 @@ struct btmtk_wakeon {
->>	__le16 wakeup_delay;
+>> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+>>	u8 time_compensation;
 >>   } __packed;
 >>
->> +struct btmtk_sco {
->> +	u8 clock_config;
->> +	u8 transmit_format_config;
->> +	u8 channel_format_config;
->> +	u8 channel_select_config;
->> +} __packed;
->> +
->> +struct reg_write_cmd {
->> +	u8 type;
->> +	u8 rsv;
->> +	u8 num;
->> +	__le32 addr;
->> +	__le32 data;
->> +	__le32 mask;
+>> +struct btmtk_wakeon {
+>> +	u8 mode;
+>> +	u8 gpo;
+>> +	u8 active_high;
+>> +	__le16 enable_delay;
+>> +	__le16 wakeup_delay;
 >> +} __packed;
 >> +
 >>   struct btmtk_hci_wmt_params {
 >>	u8 op;
 >>	u8 flag;
 >> diff --git a/drivers/bluetooth/btmtksdio.c
->> b/drivers/bluetooth/btmtksdio.c index 771733ce362b..8e4d8c2da824
+>> b/drivers/bluetooth/btmtksdio.c index b5ea8d3bffaa..771733ce362b
 >> 100644
 >> --- a/drivers/bluetooth/btmtksdio.c
 >> +++ b/drivers/bluetooth/btmtksdio.c
->> @@ -830,6 +830,74 @@ static int btsdio_mtk_reg_read(struct hci_dev *hdev, u32 reg, u32 *val)
->>	return err;
+>> @@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>>	return 0;
 >>   }
 >>
->> +static int btsdio_mtk_reg_write(struct hci_dev *hdev, u32 reg, u32
->> +val, u32 mask) {
->> +	struct btmtk_hci_wmt_params wmt_params;
->> +	struct reg_write_cmd reg_write = {
->> +		.type = 1,
->> +		.num = 1,
->> +		.addr = cpu_to_le32(reg),
->> +		.data = cpu_to_le32(val),
->> +		.mask = cpu_to_le32(mask),
->> +	};
->> +	int err, status;
->> +
->> +	wmt_params.op = BTMTK_WMT_REGISTER;
->> +	wmt_params.flag = BTMTK_WMT_REG_WRITE;
->> +	wmt_params.dlen = sizeof(reg_write);
->> +	wmt_params.data = &reg_write;
->> +	wmt_params.status = &status;
->> +
->> +	err = mtk_hci_wmt_sync(hdev, &wmt_params);
->> +	if (err < 0)
->> +		bt_dev_err(hdev, "Failed to write reg(%d)", err);
->> +
->> +	return err;
->> +}
->> +
->> +static int btsdio_mtk_sco_setting(struct hci_dev *hdev) {
->> +	struct btmtk_sco sco_setting = {
->> +		.clock_config = 0x49,
->> +		.channel_format_config = 0x80,
+>> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev) {
+>> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+>> +	bool may_wakeup = device_may_wakeup(bdev->dev);
+>> +	struct btmtk_wakeon bt_awake = {
+>> +		.mode = 0x1,
+>> +		.gpo = 0,
+>> +		.active_high = 0x1,
+>> +		.enable_delay = cpu_to_le16(0xc80),
+>> +		.wakeup_delay = cpu_to_le16(0x20)
 >> +	};
 >> +	struct sk_buff *skb;
->> +	u32 val;
->> +	int err;
 >> +
->> +	/* Enable SCO over i2s/pcm for Mediatek Chipset */
+>> +	if (may_wakeup &&
+>> +	    bdev->data->chipid == 0x7921) {
 >
->s/Chipset/chipset/
+>Why the check for 0x7921? Is that device only supported? The commit message does not say anything about it.
 
-will do in the next version
+currently, wake on bt is only supported by mt7921, we will change the subject to "Bluetooth: mt7921s: Support wake on bluetooth"
+and refine the message body to reflect the fact.
 
 >
->> +	skb =  __hci_cmd_sync(hdev, 0xfc72, sizeof(sco_setting),
->> +			      &sco_setting, HCI_CMD_TIMEOUT);
->> +	if (IS_ERR(skb))
->> +		return PTR_ERR(skb);
->> +
->> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_0, &val);
->> +	if (err < 0) {
->> +		bt_dev_err(hdev, "Failed to read register (%d)", err);
->> +		return err;
+>> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
+>> +				      &bt_awake, HCI_CMD_TIMEOUT);
+>> +		if (IS_ERR(skb))
+>> +			may_wakeup = false;
 >> +	}
 >> +
->> +	val |= 0x11000000;
->> +	err = btsdio_mtk_reg_write(hdev, MT7921_PINMUX_0, val, ~0);
->> +	if (err < 0) {
->> +		bt_dev_err(hdev, "Failed to write register (%d)", err);
->> +		return err;
->> +	}
->> +
->> +	err = btsdio_mtk_reg_read(hdev, MT7921_PINMUX_1, &val);
->> +	if (err < 0) {
->> +		bt_dev_err(hdev, "Failed to read register (%d)", err);
->> +		return err;
->> +	}
->> +
->> +	val |= 0x00000101;
->> +	err = btsdio_mtk_reg_write(hdev, MT7921_PINMUX_1, val, ~0);
->> +	if (err < 0)
->> +		bt_dev_err(hdev, "Failed to write register (%d)", err);
->> +
->> +	return err;
+>> +	return may_wakeup;
 >> +}
 >> +
->>   static int btmtksdio_setup(struct hci_dev *hdev)
+>>   static int btmtksdio_probe(struct sdio_func *func,
+>>			   const struct sdio_device_id *id)
 >>   {
->>	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev); @@ -862,6
->> +930,14 @@ static int btmtksdio_setup(struct hci_dev *hdev)
->>		err = mt79xx_setup(hdev, fwname);
->>		if (err < 0)
->>			return err;
+>> @@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>>	hdev->shutdown = btmtksdio_shutdown;
+>>	hdev->send     = btmtksdio_send_frame;
+>>	hdev->set_bdaddr = btmtk_set_bdaddr;
+>> +	hdev->wakeup = btmtk_sdio_wakeup;
+>>
+>>	SET_HCIDEV_DEV(hdev, &func->dev);
+>>
+>> @@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+>>	 */
+>>	pm_runtime_put_noidle(bdev->dev);
+>>
+>> -	return 0;
+>> +	err = device_init_wakeup(bdev->dev, true);
+>> +	if (err)
+>> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
+>
+>Could the error message be extended, so normal users know what to do?
+>Currently it’s only useful for developers.
+
+That is done by referring to btusb.c. I have willing to enhance the part along with btusb.c if Marcel has any idea about that.
+
+>
 >> +
->> +		/* Enable sco over i2s/pcm */
->
->s/sco/SCO/
-
-ditto
-
->
->> +		err = btsdio_mtk_sco_setting(hdev);
->> +		if (err < 0) {
->> +			bt_dev_err(hdev, "Failed to enable sco setting (%d)", err);
->
->s/sco/SCO/
-
-ditto
-
->
->> +			return err;
->> +		}
->> +
->>		break;
->>	case 0x7663:
->>	case 0x7668:
+>> +	return err;
+>>   }
+>>
+>>   static void btmtksdio_remove(struct sdio_func *func)
 >
 >
 >Kind regards,
 >
 >Paul
+>
 >
