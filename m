@@ -2,153 +2,179 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2084EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Dec 2021 21:56:51 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FAA8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 21 Dec 2021 22:28:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237332AbhLUV4u (ORCPT
+        id S237773AbhLUW2Q (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Dec 2021 16:56:50 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36916 "EHLO
+        Tue, 21 Dec 2021 17:28:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43942 "EHLO
         lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230251AbhLUV4t (ORCPT
+        with ESMTP id S230085AbhLUW2Q (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Dec 2021 16:56:49 -0500
-Received: from mail-yb1-xb35.google.com (mail-yb1-xb35.google.com [IPv6:2607:f8b0:4864:20::b35])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51542C061574;
-        Tue, 21 Dec 2021 13:56:49 -0800 (PST)
-Received: by mail-yb1-xb35.google.com with SMTP id d10so613952ybn.0;
-        Tue, 21 Dec 2021 13:56:49 -0800 (PST)
+        Tue, 21 Dec 2021 17:28:16 -0500
+Received: from mail-ot1-x32a.google.com (mail-ot1-x32a.google.com [IPv6:2607:f8b0:4864:20::32a])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F2672C061574
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Dec 2021 14:28:15 -0800 (PST)
+Received: by mail-ot1-x32a.google.com with SMTP id r10-20020a056830080a00b0055c8fd2cebdso312207ots.6
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Dec 2021 14:28:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
+        d=chromium.org; s=google;
         h=mime-version:references:in-reply-to:from:date:message-id:subject:to
          :cc;
-        bh=nH5deYnY1F+nFd2Y1Uyf515q7YwKeWK3mKwSxQWbEyc=;
-        b=b1kd8BudFlrruJSAJZ5gb3m3crA+JNARA6Iw+Mvqs+ksg5BPcU8ZCxuPE+Y6kDVNvM
-         cVX1Ili0M6zSt2zF8l/ZqqBZR0ZROyA78zYdfr0DGKf1P4tWhUAdPpfdiiUex3jd6woh
-         UUtSyko9ZW5SRC0H274qX11uPZZpyCJZLqBzgO0gshcoVtoHzNsaWnuIEN6DPzKIa3Dj
-         6LnV6SEmtV5/baKo1MaSx2+q8DxKf/2vJRV2+GQK5NOTkS48MYEvcKFGK1L6EbnHlT33
-         y7fLEu9rKjtVeyhCLo//wwERcJyaFWemz/Wk//PMEPO9ok4FK2ZWsLoMMk9VpU9XqJDv
-         TjyA==
+        bh=+/jD1R8ooE+g/wsy904oM8VEhejh9ghsy5ZVHMnyuQE=;
+        b=b2ip01hNv0lAOHyiqlrKOIu/ma9DLKJLxnHeg2UtjfvL047yilPm6WbhssxMw27xOz
+         onfXR0pyMQYWxK8bTGiQduFYYR/EO9iNc5JLaL5GQ5HYcsOLzZ7EVabBa5H7MvnHzKsc
+         GnqUSPr+gAA7ptZF+FaqJq4L3aaREAq+wvDfk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:mime-version:references:in-reply-to:from:date
          :message-id:subject:to:cc;
-        bh=nH5deYnY1F+nFd2Y1Uyf515q7YwKeWK3mKwSxQWbEyc=;
-        b=KAkK9YQOsgiKj0udFYt7MqwMBhQYNdFzim1Ig22SaQ7ysLTkqZMSZocXCABDATf5V9
-         SdXzLVwY9GKjXiimeOMxhL8/9kdX2/xuvqZrwIvtxSfTvPOUcUOVO0ONivv0ZdIrjUUG
-         SyxwChw+/8z4fP2TtVgp+vIkXxjKfVc44OklT1g54DyEDwgUl/PsY14jsBmoQaSjHFfm
-         oKm6qsxXauJbnN0ieAmC53j+H3T2P0TzSWAR0bFKyXOXIuKPjO55ZXh7/bj0r6P9sF+l
-         mYQEVJz01QJT0i2mpuX5wmrVuPAdOUPvQobKiWezzpIVJFBJF8womUgJUlDjT2fpj9cM
-         2VpQ==
-X-Gm-Message-State: AOAM530CIHg85u6Fk7wAR2Rk+vMk9fInKN9UjcXw1bPGW+PK9Z6SfBja
-        dsANJD/DiG9wUHAaKeOlv1nbVfPOK2k2Vuy3nNg=
-X-Google-Smtp-Source: ABdhPJyWp+tcos8RglvIuOvmkPeM/jkjRDtdU6lOBCtRSyS0bLAiW5Ii0Op2ac9aMWD7PIcmQXv3XuyrZjK5cimrh7k=
-X-Received: by 2002:a05:6902:722:: with SMTP id l2mr392530ybt.573.1640123808421;
- Tue, 21 Dec 2021 13:56:48 -0800 (PST)
+        bh=+/jD1R8ooE+g/wsy904oM8VEhejh9ghsy5ZVHMnyuQE=;
+        b=dDqpduIErB7TBMTNsj0IuFwA2Xb7D6+5wnzE/NcvgPIP72FF0Eh3d/+0bl22Y2pTDS
+         l8djir/IUu78/2YRv+viSp+Tpbf6OaQTlmkM0SHrENYfPh3JdgtX6f+FUSgOcoS4SO59
+         ZcBJZW/nCKDKlfELWodX1oF9aMZEqXnRQ6JThShLsRMbH7Z3AwpbiMj1iyJl53N1l1Na
+         cXSlNYF8dMelKQg2b1tKsw22de6q35Gcn5a20mdrearq8cR0lK+Epotbm44+WVQz2PBB
+         RT5/+cxsRyYHlXG9MCylSFCbraSI2bTMEeJwrNqun144GHUW8KJJ+pcJjYyo16XcbIVC
+         QXsw==
+X-Gm-Message-State: AOAM530lUz98WqYpBUvI1cV4VJD8erY6/3EquJz9CrvrwU1xCLEzYMz9
+        MZ0kSSJXzbg66FhCncxr+BwvOrKtU7+fiw==
+X-Google-Smtp-Source: ABdhPJzt8Z7AidJHehftT1PmHzXXkjVLYS7KQbHu4kfoiVCBD5nlnHvfOxAPSeh2YPJCdGN41EZWYg==
+X-Received: by 2002:a9d:c69:: with SMTP id 96mr56265otr.191.1640125694773;
+        Tue, 21 Dec 2021 14:28:14 -0800 (PST)
+Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com. [209.85.167.171])
+        by smtp.gmail.com with ESMTPSA id y22sm4928ots.40.2021.12.21.14.28.13
+        for <linux-bluetooth@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 21 Dec 2021 14:28:14 -0800 (PST)
+Received: by mail-oi1-f171.google.com with SMTP id s73so968430oie.5
+        for <linux-bluetooth@vger.kernel.org>; Tue, 21 Dec 2021 14:28:13 -0800 (PST)
+X-Received: by 2002:a54:4190:: with SMTP id 16mr363095oiy.139.1640125693098;
+ Tue, 21 Dec 2021 14:28:13 -0800 (PST)
 MIME-Version: 1.0
-References: <20211216044839.v9.1.Ic0a40b84dee3825302890aaea690e73165c71820@changeid>
- <202112171439.KaggScQN-lkp@intel.com>
-In-Reply-To: <202112171439.KaggScQN-lkp@intel.com>
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date:   Tue, 21 Dec 2021 13:56:37 -0800
-Message-ID: <CABBYNZ+hvtsA=i2mgJnuzR3B6Byku8t+wHBuSW3_5eG4KSHy-w@mail.gmail.com>
-Subject: Re: [kbuild] Re: [PATCH v9 1/3] bluetooth: msft: Handle MSFT Monitor
- Device Event
-To:     Dan Carpenter <dan.carpenter@oracle.com>
-Cc:     kbuild@lists.01.org, Manish Mandlik <mmandlik@google.com>,
-        Marcel Holtmann <marcel@holtmann.org>,
-        kbuild test robot <lkp@intel.com>, kbuild-all@lists.01.org,
-        ChromeOS Bluetooth Upstreaming 
-        <chromeos-bluetooth-upstreaming@chromium.org>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>,
-        Miao-chen Chou <mcchou@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+References: <61c10192.1c69fb81.96a67.06a8@mx.google.com> <CABBYNZLQ_b8Aw21QnUzmuEedny4wh4LSu6DLQvw1pynFGvHMTA@mail.gmail.com>
+ <CACGnfjRA2Co6OpTJfosbx0GdLJwk3dVHQ8edWPqkKSo_q4JyPQ@mail.gmail.com> <CABBYNZK+32F-AxVsFYXKXWfzbFRDoR9PXJNL6UOvKv8+H+DoUw@mail.gmail.com>
+In-Reply-To: <CABBYNZK+32F-AxVsFYXKXWfzbFRDoR9PXJNL6UOvKv8+H+DoUw@mail.gmail.com>
+From:   Jesse Melhuish <melhuishj@chromium.org>
+Date:   Tue, 21 Dec 2021 16:27:59 -0600
+X-Gmail-Original-Message-ID: <CACGnfjTJm4GP9kTbUgAnxO=+RrLWEq+=EfMLh5=DAQmJBuBnQg@mail.gmail.com>
+Message-ID: <CACGnfjTJm4GP9kTbUgAnxO=+RrLWEq+=EfMLh5=DAQmJBuBnQg@mail.gmail.com>
+Subject: Re: [RFC BlueZ PATCH] Bluetooth: Use driver status and experiment
+ value for central-peripheral support.
+To:     Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc:     Jesse Melhuish <melhuishj@chromium.org>,
+        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Manish,
+Hi Luiz,
 
-On Thu, Dec 16, 2021 at 11:18 PM Dan Carpenter <dan.carpenter@oracle.com> wrote:
->
-> Hi Manish,
->
-> url:    https://github.com/0day-ci/linux/commits/Manish-Mandlik/bluetooth-msft-Handle-MSFT-Monitor-Device-Event/20211216-205227
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git  master
-> config: i386-randconfig-m021-20211216 (https://download.01.org/0day-ci/archive/20211217/202112171439.KaggScQN-lkp@intel.com/config )
-> compiler: gcc-9 (Debian 9.3.0-22) 9.3.0
->
-> If you fix the issue, kindly add following tag as appropriate
-> Reported-by: kernel test robot <lkp@intel.com>
-> Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
->
-> smatch warnings:
-> net/bluetooth/msft.c:757 msft_vendor_evt() warn: inconsistent returns '&hdev->lock'.
->
-> vim +757 net/bluetooth/msft.c
->
-> 3e54c5890c87a30 Luiz Augusto von Dentz 2021-12-01  714  void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  715  {
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  716          struct msft_data *msft = hdev->msft_data;
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  717          u8 *evt_prefix;
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  718          u8 *evt;
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  719
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  720          if (!msft)
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  721                  return;
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  722
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  723          /* When the extension has defined an event prefix, check that it
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  724           * matches, and otherwise just return.
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  725           */
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  726          if (msft->evt_prefix_len > 0) {
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  727                  evt_prefix = msft_skb_pull(hdev, skb, 0, msft->evt_prefix_len);
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  728                  if (!evt_prefix)
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  729                          return;
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  730
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  731                  if (memcmp(evt_prefix, msft->evt_prefix, msft->evt_prefix_len))
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  732                          return;
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  733          }
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  734
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  735          /* Every event starts at least with an event code and the rest of
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  736           * the data is variable and depends on the event code.
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  737           */
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  738          if (skb->len < 1)
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  739                  return;
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  740
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  741          hci_dev_lock(hdev);
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  742
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  743          evt = msft_skb_pull(hdev, skb, 0, sizeof(*evt));
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  744          if (!evt)
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  745                  return;
->
-> Missing hci_dev_unlock(hdev);
->
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  746
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  747          switch (*evt) {
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  748          case MSFT_EV_LE_MONITOR_DEVICE:
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  749                  msft_monitor_device_evt(hdev, skb);
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  750                  break;
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  751
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  752          default:
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  753                  bt_dev_dbg(hdev, "MSFT vendor event 0x%02x", *evt);
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  754                  break;
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  755          }
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16  756
-> e5af6a85decc8c1 Manish Mandlik         2021-12-16 @757          hci_dev_unlock(hdev);
-> 145373cb1b1fcdb Miao-chen Chou         2020-04-03  758  }
->
-> ---
-> 0-DAY CI Kernel Test Service, Intel Corporation
-> https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
-> _______________________________________________
-> kbuild mailing list -- kbuild@lists.01.org
-> To unsubscribe send an email to kbuild-leave@lists.01.org
+That looks good to me. I will verify and send a patch. Thanks!
 
-Are you working on fixing the above problems?
-
-
--- 
-Luiz Augusto von Dentz
+On Tue, Dec 21, 2021 at 3:35 PM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Jesse,
+>
+> On Tue, Dec 21, 2021 at 1:20 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
+> >
+> > Hi Luiz,
+> >
+> > Thanks for looking at this. I did see the main.conf file, and the
+> > documentation is fairly clear, but I think there is still a bug here.
+> > Mainly: if one enables the experiment via main.conf, but the driver
+> > for the kernel has not set the relevant quirk indicating that the
+> > device supports the functionality, we are still seeing
+> > "central-peripheral" listed as supported. Ultimately this leads to
+> > test failures for us as, believing that the functionality is
+> > supported, we execute tests that then fail (this is reproducible if
+> > you modify a test device's driver to not support this feature (for
+> > btusb I removed BTUSB_VALID_LE_STATES as an attribute) and enable the
+> > feature via main.conf). In code, I think the culprit is seen in this
+> > function in that the value of "action" is set exclusively by the
+> > main.conf file, and is then passed into "feat->func" which adds it to
+> > "adapter->exps" (at least for this feature). Given what you've said
+> > here, I believe the right solution would be to require that both the
+> > feature be supported (as derived from the driver) and enabled (as
+> > derived from main.conf) in order to consider the feature enabled (as
+> > reported to peers/via query).
+>
+> This might be a kernel bug then, the UUID shall be omitted if not
+> supported, if it is being returned by MGMT_OP_READ_EXP_FEATURES_INFO
+> then bluetoothd will consider it supported thus causing the problem
+> you are describing:
+>
+> https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/mgmt.c#n3919
+>
+> It looks like only it is indeed a problem for
+> simult_central_periph_uuid, so we shall probably change it to:
+>
+> diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> index c8baf6141026..28b873df9084 100644
+> --- a/net/bluetooth/mgmt.c
+> +++ b/net/bluetooth/mgmt.c
+> @@ -3921,7 +3921,7 @@ static int read_exp_features_info(struct sock
+> *sk, struct hci_dev *hdev,
+>         }
+>  #endif
+>
+> -       if (hdev) {
+> +       if (hdev & test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks)) {
+>                 if (hci_dev_le_state_simultaneous(hdev))
+>                         flags = BIT(0);
+>                 else
+>
+> > On Tue, Dec 21, 2021 at 2:57 PM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Jesse,
+> > >
+> > > On Mon, Dec 20, 2021 at 5:59 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
+> > > >
+> > > > ---
+> > > > The observed behavior without any change is that support for the
+> > > > central-peripheral role can be enabled through an experiment flag in
+> > > > BlueZ regardless of whether the controller can actually support it.
+> > > > Additionally, if the controller has enabled this feature but the
+> > > > experiment flag has not been set the central-peripheral role is not
+> > > > listed as supported. I'm not certain what the expected behavior should
+> > > > be, but enabling if either source says to enable (this patch) or only
+> > > > when both enable the feature both seem like reasonable options to start
+> > > > with.
+> > > >
+> > > >  src/adapter.c | 3 ++-
+> > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > >
+> > > > diff --git a/src/adapter.c b/src/adapter.c
+> > > > index 9fc6853c9..60325015b 100644
+> > > > --- a/src/adapter.c
+> > > > +++ b/src/adapter.c
+> > > > @@ -10434,7 +10434,8 @@ static void read_exp_features_complete(uint8_t status, uint16_t length,
+> > > >                         }
+> > > >
+> > > >                         if (feat->func)
+> > > > -                               feat->func(adapter, action);
+> > > > +                               feat->func(adapter, action ||
+> > > > +                                       (rp->features[i].flags & BIT(0)));
+> > >
+> > > Feature being supported doesn't mean the system wants it to be enabled
+> > > since this is experimental after all there could be side effects, the
+> > > proper way to enable it is via main.conf:
+> > >
+> > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/main.conf#n115
+> > >
+> > > >                 }
+> > > >         }
+> > > >  }
+> > > > --
+> > > > 2.31.0
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
