@@ -2,186 +2,185 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F20C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 19:54:24 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 2916CC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 20:12:17 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345346AbhLVTyY (ORCPT
+        id S237864AbhLVUMQ (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 14:54:24 -0500
-Received: from mailgw02.mediatek.com ([210.61.82.184]:42842 "EHLO
-        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S230053AbhLVTyX (ORCPT
+        Wed, 22 Dec 2021 15:12:16 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:55432 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S236592AbhLVUMP (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 14:54:23 -0500
-X-UUID: 229e633909b64cc5abbe047a43d98acd-20211223
-X-UUID: 229e633909b64cc5abbe047a43d98acd-20211223
-Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
-        with ESMTP id 1106698377; Thu, 23 Dec 2021 03:54:21 +0800
-Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
- Thu, 23 Dec 2021 03:54:20 +0800
-Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
- (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 23 Dec
- 2021 03:54:19 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Thu, 23 Dec 2021 03:54:19 +0800
-From:   <sean.wang@mediatek.com>
-To:     <pmenzel@molgen.mpg.de>
-CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
-        <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>
-Subject: =?UTF-8?q?Re=3A=20=5BPATCH=20v2=201/3=5D=20Bluetooth=3A=20mt7921s=3A=20Support=20wake=20on=20bluetooth?=
-Date:   Thu, 23 Dec 2021 03:54:18 +0800
-Message-ID: <1640202858-15180-1-git-send-email-sean.wang@mediatek.com>
-X-Mailer: git-send-email 1.7.9.5
-In-Reply-To: <f6baa415-b078-4308-e31d-6b44e748c1c5@molgen.mpg.de--annotate>
-References: <f6baa415-b078-4308-e31d-6b44e748c1c5@molgen.mpg.de--annotate>
+        Wed, 22 Dec 2021 15:12:15 -0500
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24190C061574
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 12:12:15 -0800 (PST)
+Received: by mail-yb1-xb2e.google.com with SMTP id e136so9977324ybc.4
+        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 12:12:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=mime-version:references:in-reply-to:from:date:message-id:subject:to
+         :cc;
+        bh=DZi+NoCdSdjviEIJP93cRVKpcJFyI4n0uTcTLXZbFWc=;
+        b=Z/xHmg4oLH4CL2BH6Eqm6mr3nwFbOQGQ4Bj70LnC/Zhw6DzGVZsbKZPPNAXWu7Gqtz
+         VNhes2qEhtaCiBKbmLmBdoWa/hftPshgzwr57/xTlT4sF1pXrxyYHGFFPRPrIYCcRHeu
+         GtdgD0+HyRGEEsnH7MbPFo0AUyWagdEiQ5EOmX/TojdRDSK84dsNRN5pxRp5YoxisTac
+         elMPxywEopQ03k1nTT6eVSe3WhAcoYWVeuN7jK7oJQDZ1sBZJx/sI4StBRPUbTi8F/Jz
+         h6zwmJpUmwqlzDqko9T6fykl1l3ohZc1spu5JVDzNpk2XetnlK9kB9Oe+51bvpt1wMAr
+         JcmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:mime-version:references:in-reply-to:from:date
+         :message-id:subject:to:cc;
+        bh=DZi+NoCdSdjviEIJP93cRVKpcJFyI4n0uTcTLXZbFWc=;
+        b=J44me41iJu7BMOLWoNkV20d0cJpmLUrD6jSQQCvrPEvJjoyICmoLm24sDJCEAvj5HD
+         EsAjdb75RlYyAAB74Bm1vCj0jZUMvP1RdIOJ4Gw3xBlIG3edk6O11NPlQEii88p3jsyA
+         fXyRACHQGRUaXAUT7tp4NarFGYa+2WU0nwZgfvAc0rEy1X0BTTmldx5wA53ODBjvcYVW
+         hzcEWo0xdKWlS7D5gs+ww9LdyeYiC5w6GQX4FB9iIJqD8rC/pLbz2gXgMp6geK80AiFA
+         MHPFjHDuTFX2trqu5K2DVOeMb6pLKw6pYdzi2sXt4xD+4TsSNTaj5SEwAxh16VF8d2PX
+         Elbg==
+X-Gm-Message-State: AOAM5317d9Afag2n9W9Uzlgny+j6EVGP1o8PZUO5iZoNogWBGNPXGXmm
+        PC0xt37ZtwiFPjyrQQlG/0uN7Xd3tmCcMj86mb4KTL9MmBc=
+X-Google-Smtp-Source: ABdhPJyilZ4G/1DnIrMDDpSGeYfebXh7GP5MnzepzCBvRJAlb0PaYl5ofVb0CSTF4mJ7MQOW64IDq0BPBQ9n9mtkZO8=
+X-Received: by 2002:a25:3dc2:: with SMTP id k185mr6457544yba.733.1640203934045;
+ Wed, 22 Dec 2021 12:12:14 -0800 (PST)
 MIME-Version: 1.0
+References: <61c10192.1c69fb81.96a67.06a8@mx.google.com> <CABBYNZLQ_b8Aw21QnUzmuEedny4wh4LSu6DLQvw1pynFGvHMTA@mail.gmail.com>
+ <CACGnfjRA2Co6OpTJfosbx0GdLJwk3dVHQ8edWPqkKSo_q4JyPQ@mail.gmail.com>
+ <CABBYNZK+32F-AxVsFYXKXWfzbFRDoR9PXJNL6UOvKv8+H+DoUw@mail.gmail.com> <CACGnfjTJm4GP9kTbUgAnxO=+RrLWEq+=EfMLh5=DAQmJBuBnQg@mail.gmail.com>
+In-Reply-To: <CACGnfjTJm4GP9kTbUgAnxO=+RrLWEq+=EfMLh5=DAQmJBuBnQg@mail.gmail.com>
+From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date:   Wed, 22 Dec 2021 12:12:03 -0800
+Message-ID: <CABBYNZJcMheKKrxJr2p7XAYVZ+v9n11mLRYGbyTo3ucP3MxioQ@mail.gmail.com>
+Subject: Re: [RFC BlueZ PATCH] Bluetooth: Use driver status and experiment
+ value for central-peripheral support.
+To:     Jesse Melhuish <melhuishj@chromium.org>
+Cc:     "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Sean Wang <sean.wang@mediatek.com>
+HI Jesse,
 
->Dear Sean,
+On Tue, Dec 21, 2021 at 2:28 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
 >
->Am 22.12.21 um 04:11 schrieb sean.wang@mediatek.com:
->> From: Mark Chen <mark-yw.chen@mediatek.com>
->>
->> Enable wake on bluetooth on mt7921s that can be supported since the
->> firmware with version 20211129211059 was added, and the patch would
->> not cause any harm even when the old firmware is applied.
+> Hi Luiz,
 >
->Maybe print a notice level message, if the firmware is too old, and the feature cannot be supported?
+> That looks good to me. I will verify and send a patch. Thanks!
 >
+> On Tue, Dec 21, 2021 at 3:35 PM Luiz Augusto von Dentz
+> <luiz.dentz@gmail.com> wrote:
+> >
+> > Hi Jesse,
+> >
+> > On Tue, Dec 21, 2021 at 1:20 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
+> > >
+> > > Hi Luiz,
+> > >
+> > > Thanks for looking at this. I did see the main.conf file, and the
+> > > documentation is fairly clear, but I think there is still a bug here.
+> > > Mainly: if one enables the experiment via main.conf, but the driver
+> > > for the kernel has not set the relevant quirk indicating that the
+> > > device supports the functionality, we are still seeing
+> > > "central-peripheral" listed as supported. Ultimately this leads to
+> > > test failures for us as, believing that the functionality is
+> > > supported, we execute tests that then fail (this is reproducible if
+> > > you modify a test device's driver to not support this feature (for
+> > > btusb I removed BTUSB_VALID_LE_STATES as an attribute) and enable the
+> > > feature via main.conf). In code, I think the culprit is seen in this
+> > > function in that the value of "action" is set exclusively by the
+> > > main.conf file, and is then passed into "feat->func" which adds it to
+> > > "adapter->exps" (at least for this feature). Given what you've said
+> > > here, I believe the right solution would be to require that both the
+> > > feature be supported (as derived from the driver) and enabled (as
+> > > derived from main.conf) in order to consider the feature enabled (as
+> > > reported to peers/via query).
+> >
+> > This might be a kernel bug then, the UUID shall be omitted if not
+> > supported, if it is being returned by MGMT_OP_READ_EXP_FEATURES_INFO
+> > then bluetoothd will consider it supported thus causing the problem
+> > you are describing:
+> >
+> > https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git/tree/net/bluetooth/mgmt.c#n3919
+> >
+> > It looks like only it is indeed a problem for
+> > simult_central_periph_uuid, so we shall probably change it to:
 
-mt7921 firmware will be updated regularly to add features or fix bugs, so I would try to avoid adding such
-message related to firmware to make the driver look messy.
+I end up sending a patch myself:
 
->> The patch was tested by setting up an HID or HOGP profile to connect a
->> Bluetooth keyboard and mouse, then putting the system to suspend, then
->> trying to wake up the system by moving the Bluetooth keyboard or
->> mouse, and then checking if the system can wake up and be brought back
->> to the normal state.
->
->I’d still would like to see the datasheet name, revision, and section in the commit message, even though the datasheet is not public.
->
+https://patchwork.kernel.org/project/bluetooth/patch/20211221223357.742863-4-luiz.dentz@gmail.com/
 
-actually the hardware datasheet doesn't mention the things regarding wake on bluetooth because that is a totally software feature
-extended from the previous firmware.
+> > diff --git a/net/bluetooth/mgmt.c b/net/bluetooth/mgmt.c
+> > index c8baf6141026..28b873df9084 100644
+> > --- a/net/bluetooth/mgmt.c
+> > +++ b/net/bluetooth/mgmt.c
+> > @@ -3921,7 +3921,7 @@ static int read_exp_features_info(struct sock
+> > *sk, struct hci_dev *hdev,
+> >         }
+> >  #endif
+> >
+> > -       if (hdev) {
+> > +       if (hdev & test_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks)) {
+> >                 if (hci_dev_le_state_simultaneous(hdev))
+> >                         flags = BIT(0);
+> >                 else
+> >
+> > > On Tue, Dec 21, 2021 at 2:57 PM Luiz Augusto von Dentz
+> > > <luiz.dentz@gmail.com> wrote:
+> > > >
+> > > > Hi Jesse,
+> > > >
+> > > > On Mon, Dec 20, 2021 at 5:59 PM Jesse Melhuish <melhuishj@chromium.org> wrote:
+> > > > >
+> > > > > ---
+> > > > > The observed behavior without any change is that support for the
+> > > > > central-peripheral role can be enabled through an experiment flag in
+> > > > > BlueZ regardless of whether the controller can actually support it.
+> > > > > Additionally, if the controller has enabled this feature but the
+> > > > > experiment flag has not been set the central-peripheral role is not
+> > > > > listed as supported. I'm not certain what the expected behavior should
+> > > > > be, but enabling if either source says to enable (this patch) or only
+> > > > > when both enable the feature both seem like reasonable options to start
+> > > > > with.
+> > > > >
+> > > > >  src/adapter.c | 3 ++-
+> > > > >  1 file changed, 2 insertions(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/src/adapter.c b/src/adapter.c
+> > > > > index 9fc6853c9..60325015b 100644
+> > > > > --- a/src/adapter.c
+> > > > > +++ b/src/adapter.c
+> > > > > @@ -10434,7 +10434,8 @@ static void read_exp_features_complete(uint8_t status, uint16_t length,
+> > > > >                         }
+> > > > >
+> > > > >                         if (feat->func)
+> > > > > -                               feat->func(adapter, action);
+> > > > > +                               feat->func(adapter, action ||
+> > > > > +                                       (rp->features[i].flags & BIT(0)));
+> > > >
+> > > > Feature being supported doesn't mean the system wants it to be enabled
+> > > > since this is experimental after all there could be side effects, the
+> > > > proper way to enable it is via main.conf:
+> > > >
+> > > > https://git.kernel.org/pub/scm/bluetooth/bluez.git/tree/src/main.conf#n115
+> > > >
+> > > > >                 }
+> > > > >         }
+> > > > >  }
+> > > > > --
+> > > > > 2.31.0
+> > > >
+> > > > --
+> > > > Luiz Augusto von Dentz
+> >
+> >
+> >
+> > --
+> > Luiz Augusto von Dentz
 
->> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
->> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
->> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
->> ---
->> v2: refine the git message
->> ---
->>   drivers/bluetooth/btmtk.h     |  8 ++++++++
->>   drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
->>   2 files changed, 38 insertions(+), 1 deletion(-)
->>
->> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
->> index 6e7b0c7567c0..2be1d2680ad8 100644
->> --- a/drivers/bluetooth/btmtk.h
->> +++ b/drivers/bluetooth/btmtk.h
->> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
->>	u8 time_compensation;
->>   } __packed;
->>
->> +struct btmtk_wakeon {
->> +	u8 mode;
->> +	u8 gpo;
->> +	u8 active_high;
->> +	__le16 enable_delay;
->> +	__le16 wakeup_delay;
->> +} __packed;
->> +
->>   struct btmtk_hci_wmt_params {
->>	u8 op;
->>	u8 flag;
->> diff --git a/drivers/bluetooth/btmtksdio.c
->> b/drivers/bluetooth/btmtksdio.c index b5ea8d3bffaa..771733ce362b
->> 100644
->> --- a/drivers/bluetooth/btmtksdio.c
->> +++ b/drivers/bluetooth/btmtksdio.c
->> @@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
->>	return 0;
->>   }
->>
->> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev) {
->> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
->> +	bool may_wakeup = device_may_wakeup(bdev->dev);
->> +	struct btmtk_wakeon bt_awake = {
->> +		.mode = 0x1,
->> +		.gpo = 0,
->> +		.active_high = 0x1,
->> +		.enable_delay = cpu_to_le16(0xc80),
->> +		.wakeup_delay = cpu_to_le16(0x20)
->> +	};
->> +	struct sk_buff *skb;
->> +
->> +	if (may_wakeup &&
->> +	    bdev->data->chipid == 0x7921) {
->> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
->> +				      &bt_awake, HCI_CMD_TIMEOUT);
->> +		if (IS_ERR(skb))
->> +			may_wakeup = false;
->> +	}
->> +
->> +	return may_wakeup;
->> +}
->> +
->>   static int btmtksdio_probe(struct sdio_func *func,
->>			   const struct sdio_device_id *id)
->>   {
->> @@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
->>	hdev->shutdown = btmtksdio_shutdown;
->>	hdev->send     = btmtksdio_send_frame;
->>	hdev->set_bdaddr = btmtk_set_bdaddr;
->> +	hdev->wakeup = btmtk_sdio_wakeup;
->
->Just a nit, that two and three lines above, the equal signs are aligned.
 
-thanks, I will do it with another patch
 
->
->>	SET_HCIDEV_DEV(hdev, &func->dev);
->>
->> @@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
->>	 */
->>	pm_runtime_put_noidle(bdev->dev);
->>
->> -	return 0;
->> +	err = device_init_wakeup(bdev->dev, true);
->> +	if (err)
->> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
->> +
->> +	return err;
->>   }
->>
->>   static void btmtksdio_remove(struct sdio_func *func)
->
->
->Kind regards,
->
->Paul
+-- 
+Luiz Augusto von Dentz
