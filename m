@@ -2,159 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id A84D4C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 03:12:04 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 8B212C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 07:29:48 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S242072AbhLVDME (ORCPT
+        id S242995AbhLVH3r (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 21 Dec 2021 22:12:04 -0500
-Received: from mailgw01.mediatek.com ([60.244.123.138]:44414 "EHLO
-        mailgw01.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
-        with ESMTP id S242067AbhLVDMC (ORCPT
+        Wed, 22 Dec 2021 02:29:47 -0500
+Received: from alexa-out.qualcomm.com ([129.46.98.28]:5768 "EHLO
+        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S231422AbhLVH3r (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 21 Dec 2021 22:12:02 -0500
-X-UUID: 13a403c1e5464b43888c7ff10c8836a3-20211222
-X-UUID: 13a403c1e5464b43888c7ff10c8836a3-20211222
-Received: from mtkmbs10n1.mediatek.inc [(172.21.101.34)] by mailgw01.mediatek.com
-        (envelope-from <sean.wang@mediatek.com>)
-        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-        with ESMTP id 99995609; Wed, 22 Dec 2021 11:11:57 +0800
-Received: from mtkexhb02.mediatek.inc (172.21.101.103) by
- mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
- Wed, 22 Dec 2021 11:11:56 +0800
-Received: from mtkcas11.mediatek.inc (172.21.101.40) by mtkexhb02.mediatek.inc
- (172.21.101.103) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Wed, 22 Dec
- 2021 11:11:49 +0800
-Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas11.mediatek.inc
- (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
- Transport; Wed, 22 Dec 2021 11:11:49 +0800
-From:   <sean.wang@mediatek.com>
-To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
-CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
-        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
-        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
-        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
-        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
-        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
-        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
-        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
-        <steve.lee@mediatek.com>, <jsiuda@google.com>,
-        <frankgor@google.com>, <jemele@google.com>,
-        <abhishekpandit@google.com>, <michaelfsun@google.com>,
-        <mcchou@chromium.org>, <shawnku@google.com>,
-        <linux-bluetooth@vger.kernel.org>,
-        <linux-mediatek@lists.infradead.org>,
-        <linux-kernel@vger.kernel.org>,
-        Mark Chen <mark-yw.chen@mediatek.com>
-Subject: [PATCH v2 1/3] Bluetooth: mt7921s: Support wake on bluetooth
-Date:   Wed, 22 Dec 2021 11:11:45 +0800
-Message-ID: <ef0603f2553d09fb84043704e4726d0ab98aa63b.1640141813.git.objelf@gmail.com>
-X-Mailer: git-send-email 1.7.9.5
-MIME-Version: 1.0
-Content-Type: text/plain
-X-MTK:  N
+        Wed, 22 Dec 2021 02:29:47 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
+  t=1640158187; x=1671694187;
+  h=from:to:cc:subject:date:message-id;
+  bh=0ejRRfqIpyGBT+yHRzGWEvQYeapOKIN/RtCAbWM4Mb0=;
+  b=KItuY1bXLSXt/1Lj6auD+AFHqeHU5PK8xZzU9IsAyMbamQ/CxV8lMa1j
+   uPlkUQHDvumwUhkyKoBp8MJNABVW44e+LI1ea6ebo3Gy3S9LE1t7gYZk+
+   UNCJAg9g8w1UZin86kCcSPSD6OUCtPe347z6AuZ2IizaYEr5N7MNMIZ1r
+   U=;
+Received: from ironmsg08-lv.qualcomm.com ([10.47.202.152])
+  by alexa-out.qualcomm.com with ESMTP; 21 Dec 2021 23:29:46 -0800
+X-QCInternal: smtphost
+Received: from ironmsg01-blr.qualcomm.com ([10.86.208.130])
+  by ironmsg08-lv.qualcomm.com with ESMTP/TLS/AES256-SHA; 21 Dec 2021 23:29:44 -0800
+X-QCInternal: smtphost
+Received: from hyd-lablnx229.qualcomm.com ([10.204.179.152])
+  by ironmsg01-blr.qualcomm.com with ESMTP; 22 Dec 2021 12:59:27 +0530
+Received: by hyd-lablnx229.qualcomm.com (Postfix, from userid 2390365)
+        id 25F4C215DB; Wed, 22 Dec 2021 12:59:26 +0530 (IST)
+From:   Panicker Harish <quic_pharish@quicinc.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com
+Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
+        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
+        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
+        rjliao@codeaurora.org, hbandi@codeaurora.org,
+        abhishekpandit@chromium.org, mcchou@chromium.org,
+        quic_saluvala@quicinc.com,
+        Panicker Harish <quic_pharish@quicinc.com>
+Subject: [PATCH v4] Bluetooth: hci_qca: Stop IBS timer during BT OFF
+Date:   Wed, 22 Dec 2021 12:59:05 +0530
+Message-Id: <1640158145-24569-1-git-send-email-quic_pharish@quicinc.com>
+X-Mailer: git-send-email 2.7.4
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Mark Chen <mark-yw.chen@mediatek.com>
+The IBS timers are not stopped properly once BT OFF is triggered.
+we could see IBS commands being sent along with version command,
+so stopped IBS timers while Bluetooth is off.
 
-Enable wake on bluetooth on mt7921s that can be supported since the
-firmware with version 20211129211059 was added, and the patch would
-not cause any harm even when the old firmware is applied.
+Fixes: 3e4be65eb82c ("Bluetooth: hci_qca: Add poweroff support during hci down for wcn3990")
 
-The patch was tested by setting up an HID or HOGP profile to connect a
-Bluetooth keyboard and mouse, then putting the system to suspend, then
-trying to wake up the system by moving the Bluetooth keyboard or mouse,
-and then checking if the system can wake up and be brought back to
-the normal state.
+Signed-off-by: Panicker Harish <quic_pharish@quicinc.com>
+----
+v4:
+  * Used del_timer_sync() instead of mod_timer() to stop the timer and
+    to make sure the handler has finished executing on other CPUs.
 
-Co-developed-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Sean Wang <sean.wang@mediatek.com>
-Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+v3:
+  *Addressed reviewers comments
+  *updated commit message
+
+v2:
+  * Addressed the username
+  * The full implementation of IBS is based on timers
+    to that reason we have used timers.
+
+v1: initial patch
 ---
-v2: refine the git message
----
- drivers/bluetooth/btmtk.h     |  8 ++++++++
- drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
- 2 files changed, 38 insertions(+), 1 deletion(-)
+ drivers/bluetooth/hci_qca.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
-index 6e7b0c7567c0..2be1d2680ad8 100644
---- a/drivers/bluetooth/btmtk.h
-+++ b/drivers/bluetooth/btmtk.h
-@@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
- 	u8 time_compensation;
- } __packed;
+diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+index dd768a8..9e99311 100644
+--- a/drivers/bluetooth/hci_qca.c
++++ b/drivers/bluetooth/hci_qca.c
+@@ -1928,6 +1928,9 @@ static int qca_power_off(struct hci_dev *hdev)
+ 	hu->hdev->hw_error = NULL;
+ 	hu->hdev->cmd_timeout = NULL;
  
-+struct btmtk_wakeon {
-+	u8 mode;
-+	u8 gpo;
-+	u8 active_high;
-+	__le16 enable_delay;
-+	__le16 wakeup_delay;
-+} __packed;
++	del_timer_sync(&qca->wake_retrans_timer);
++	del_timer_sync(&qca->tx_idle_timer);
 +
- struct btmtk_hci_wmt_params {
- 	u8 op;
- 	u8 flag;
-diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
-index b5ea8d3bffaa..771733ce362b 100644
---- a/drivers/bluetooth/btmtksdio.c
-+++ b/drivers/bluetooth/btmtksdio.c
-@@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
- }
- 
-+static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
-+{
-+	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
-+	bool may_wakeup = device_may_wakeup(bdev->dev);
-+	struct btmtk_wakeon bt_awake = {
-+		.mode = 0x1,
-+		.gpo = 0,
-+		.active_high = 0x1,
-+		.enable_delay = cpu_to_le16(0xc80),
-+		.wakeup_delay = cpu_to_le16(0x20)
-+	};
-+	struct sk_buff *skb;
-+
-+	if (may_wakeup &&
-+	    bdev->data->chipid == 0x7921) {
-+		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
-+				      &bt_awake, HCI_CMD_TIMEOUT);
-+		if (IS_ERR(skb))
-+			may_wakeup = false;
-+	}
-+
-+	return may_wakeup;
-+}
-+
- static int btmtksdio_probe(struct sdio_func *func,
- 			   const struct sdio_device_id *id)
- {
-@@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	hdev->shutdown = btmtksdio_shutdown;
- 	hdev->send     = btmtksdio_send_frame;
- 	hdev->set_bdaddr = btmtk_set_bdaddr;
-+	hdev->wakeup = btmtk_sdio_wakeup;
- 
- 	SET_HCIDEV_DEV(hdev, &func->dev);
- 
-@@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
- 	 */
- 	pm_runtime_put_noidle(bdev->dev);
- 
--	return 0;
-+	err = device_init_wakeup(bdev->dev, true);
-+	if (err)
-+		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
-+
-+	return err;
- }
- 
- static void btmtksdio_remove(struct sdio_func *func)
+ 	/* Stop sending shutdown command if soc crashes. */
+ 	if (soc_type != QCA_ROME
+ 		&& qca->memdump_state == QCA_MEMDUMP_IDLE) {
 -- 
-2.25.1
+QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
 
