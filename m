@@ -2,91 +2,92 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 2C098C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 20:22:10 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0C7E7C433FE
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 22:02:52 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1345411AbhLVUWJ (ORCPT
+        id S236054AbhLVWCv convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 15:22:09 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:57650 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S238079AbhLVUWI (ORCPT
+        Wed, 22 Dec 2021 17:02:51 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:49058 "EHLO
+        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S230328AbhLVWCu (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 15:22:08 -0500
-Received: from mail-pj1-x1029.google.com (mail-pj1-x1029.google.com [IPv6:2607:f8b0:4864:20::1029])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 859CBC061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 12:22:08 -0800 (PST)
-Received: by mail-pj1-x1029.google.com with SMTP id z9-20020a17090a7b8900b001b13558eadaso6873691pjc.4
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 12:22:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=from:to:subject:date:message-id:in-reply-to:references:mime-version
-         :content-transfer-encoding;
-        bh=qTrx+L6FW9g7yqhhKCHYnn1SvK/9FgnPwBFbiQtz+K8=;
-        b=mgFAbjCeWPK869b9aXUO5AMD2Ro3Is+3nMWztfTVRriavuKRmaaN1hu3evn9fEqM+A
-         xQKacLlU6nCHUp6Hg6bWoibrIG30GSVONgoj26dEp79kLojsBPv9VRhUtfNuLGr8MPRF
-         6tov70yocnvRbabFaP2dte+frjeQleUvaOgq8GXSj/WMpwxN0yNEBMfZN1N3nMatvqsH
-         AsmVRnkONo0pl7Xsfhi5I7ncGgYdler/050+m9QN0QF9pSRBAgBXD3zS+Acb1bDx22lF
-         lH+CkbHdx6OJbqkvAZquzld/U/GsVAAseiD64G9kSMMUW+LYaCNLjQZypt8+iDWHAFmp
-         soHg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
-         :references:mime-version:content-transfer-encoding;
-        bh=qTrx+L6FW9g7yqhhKCHYnn1SvK/9FgnPwBFbiQtz+K8=;
-        b=Gl8yMj1a761Cpl1ywZl7xAV99nmxRSq9ZRkiuwLBWs6k2jI2iXOvWoGd9yGQ9zaG9K
-         kgIWrl0JwQElFYQ99JkMSuaWN6tvXHfCSXJoCMEVao7abKeXQnAH2iLlnbxhSpGwZI45
-         X9loFIiwJIwEcjocxMuUCLwK0m/CbFEKXbf9gqxFWXA2II+AhIA2oikB9lsbheL/HVV3
-         bUceWjeYXGauEYoHKzb2PkYAZoncKaIaC9Y/wabIMldqORntH5a5fUFzvUjO7DhGlmEf
-         YCeEiZU+xDMV7oQa3LlYCCS+OjotSwF7bCDU6Vj83IAuLJVjoErXFPW0W/CD+7wXzS6o
-         WIFg==
-X-Gm-Message-State: AOAM533C/npcnnu013c8CHOjbjh3dQsFq5PcRWZzMSHjk8LR3luxtuTr
-        z29b3AZ9kR9/Zjt//taUR2LdFHyasC4=
-X-Google-Smtp-Source: ABdhPJz2bIu92aEQ7Vnz0fqZW7Cr7BQXXUpIm4xV6ShxeR1LOcGtAAweE0w7QFQlRBx3kt9wcWaGBg==
-X-Received: by 2002:a17:902:cd18:b0:149:3573:a9c8 with SMTP id g24-20020a170902cd1800b001493573a9c8mr4021865ply.17.1640204527755;
-        Wed, 22 Dec 2021 12:22:07 -0800 (PST)
-Received: from lvondent-mobl4.. (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id x25sm1285266pfu.113.2021.12.22.12.22.06
-        for <linux-bluetooth@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 12:22:07 -0800 (PST)
-From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v5 6/6] Bluetooth: vhci: Set HCI_QUIRK_VALID_LE_STATES
-Date:   Wed, 22 Dec 2021 12:22:01 -0800
-Message-Id: <20211222202201.977779-6-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.33.1
-In-Reply-To: <20211222202201.977779-1-luiz.dentz@gmail.com>
-References: <20211222202201.977779-1-luiz.dentz@gmail.com>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+        Wed, 22 Dec 2021 17:02:50 -0500
+Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
+        by mail.holtmann.org (Postfix) with ESMTPSA id 9030FCED16;
+        Wed, 22 Dec 2021 23:02:46 +0100 (CET)
+Content-Type: text/plain;
+        charset=us-ascii
+Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
+Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
+ IDP boards
+From:   Marcel Holtmann <marcel@holtmann.org>
+In-Reply-To: <YcNVRNqAbfAYpCWH@ripper>
+Date:   Wed, 22 Dec 2021 23:02:46 +0100
+Cc:     Matthias Kaehlcke <mka@chromium.org>,
+        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>,
+        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        Hemantg <hemantg@codeaurora.org>,
+        MSM <linux-arm-msm@vger.kernel.org>,
+        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
+        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
+        mcchou@chromium.org, saluvala@codeaurora.org
+Content-Transfer-Encoding: 8BIT
+Message-Id: <A24CF0E8-AA9A-48B8-AE50-74F86F600825@holtmann.org>
+References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
+ <580E8974-EB7F-4493-BECC-4B09765A954D@holtmann.org>
+ <YcNOvlVQaT80qPsx@google.com> <YcNVRNqAbfAYpCWH@ripper>
+To:     Bjorn Andersson <bjorn.andersson@linaro.org>
+X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Hi Bjorn,
 
-This set HCI_QUIRK_VALID_LE_STATES quirk which is required for the likes
-of experimental LE simultaneous roles.
+>>>> Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
+>>>> 
+>>>> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+>>>> ---
+>>>> v4:
+>>>> * updated commit subject
+>>>> * Removed drive strength for bt_en
+>>>> * updated swctrl_gpio name to sw_ctrl
+>>>> 
+>>>> v3:
+>>>> * Addressed reviewers comments
+>>>> * Added pin config for sw_ctrl line.
+>>>> v2:
+>>>> * merged two patches into one
+>>>> * Removed unused comments
+>>>> * Removed pinmux & pin conf.
+>>>> * Addressed reviewers comments
+>>>> 
+>>>> v1: initial patch
+>>>> ---
+>>>> arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  4 ++++
+>>>> arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 36 ++++++++++++++++++++++++++++++++
+>>>> arch/arm64/boot/dts/qcom/sc7280-idp2.dts |  4 ++++
+>>>> 3 files changed, 44 insertions(+)
+>>> 
+>>> patch has been applied to bluetooth-next tree.
+>> 
+>> Thanks!
+>> 
+>> I would have expected though that a device tree change goes through
+>> the qcom tree. Maybe Bjorn should pick it too to avoid possible
+>> conflicts?
+> 
+> That would be preferable, I've picked a few patches in these files for
+> v5.17, so there's a risk for conflict as this reaches Linus.
+> 
+> Marcel, let me know if you drop this and I should pick it up.
 
-Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
----
- drivers/bluetooth/hci_vhci.c | 2 ++
- 1 file changed, 2 insertions(+)
+ok, dropped the patch.
 
-diff --git a/drivers/bluetooth/hci_vhci.c b/drivers/bluetooth/hci_vhci.c
-index 49ac884d996e..c443c3b0a4da 100644
---- a/drivers/bluetooth/hci_vhci.c
-+++ b/drivers/bluetooth/hci_vhci.c
-@@ -331,6 +331,8 @@ static int __vhci_create_device(struct vhci_data *data, __u8 opcode)
- 	if (opcode & 0x80)
- 		set_bit(HCI_QUIRK_RAW_DEVICE, &hdev->quirks);
- 
-+	set_bit(HCI_QUIRK_VALID_LE_STATES, &hdev->quirks);
-+
- 	if (hci_register_dev(hdev) < 0) {
- 		BT_ERR("Can't register HCI device");
- 		hci_free_dev(hdev);
--- 
-2.33.1
+Regards
+
+Marcel
 
