@@ -2,73 +2,93 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id D9B1AC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 07:55:00 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 1CFABC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 07:57:56 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S243102AbhLVHy7 convert rfc822-to-8bit (ORCPT
+        id S239374AbhLVH5z (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 02:54:59 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:41931 "EHLO
+        Wed, 22 Dec 2021 02:57:55 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:46706 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231422AbhLVHy6 (ORCPT
+        with ESMTP id S231532AbhLVH5z (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 02:54:58 -0500
+        Wed, 22 Dec 2021 02:57:55 -0500
 Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 26DC1CED08;
-        Wed, 22 Dec 2021 08:54:57 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id C4254CED08;
+        Wed, 22 Dec 2021 08:57:53 +0100 (CET)
 Content-Type: text/plain;
         charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280
- IDP boards
+Subject: Re: [PATCH] Bluetooth: btusb: Add support for Foxconn MT7922A
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
-Date:   Wed, 22 Dec 2021 08:54:56 +0100
+In-Reply-To: <20211217095150.424097-1-aaron.ma@canonical.com>
+Date:   Wed, 22 Dec 2021 08:57:53 +0100
 Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
-        Bjorn Andersson <bjorn.andersson@linaro.org>,
-        Matthias Kaehlcke <mka@chromium.org>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+        Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
         linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        mcchou@chromium.org, saluvala@codeaurora.org
-Content-Transfer-Encoding: 8BIT
-Message-Id: <580E8974-EB7F-4493-BECC-4B09765A954D@holtmann.org>
-References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
-To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>
+        linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <A6C7EA23-FD91-40BF-9F69-FA0A93F0FDBA@holtmann.org>
+References: <20211217095150.424097-1-aaron.ma@canonical.com>
+To:     Aaron Ma <aaron.ma@canonical.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Balakrishna,
+Hi Aaron,
 
-> Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
+> Add 2 USB IDs for MT7922A chip.
+> These 2 devices got the same description.
 > 
-> Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
+> T:  Bus=01 Lev=01 Prnt=01 Port=02 Cnt=01 Dev#=  2 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e0d8 Rev= 1.00
+> 
+> T:  Bus=03 Lev=01 Prnt=01 Port=02 Cnt=02 Dev#=  3 Spd=480  MxCh= 0
+> D:  Ver= 2.10 Cls=ef(misc ) Sub=02 Prot=01 MxPS=64 #Cfgs=  1
+> P:  Vendor=0489 ProdID=e0d9 Rev= 1.00
+> S:  Manufacturer=MediaTek Inc.
+> S:  Product=Wireless_Device
+> S:  SerialNumber=000000000
+> C:* #Ifs= 3 Cfg#= 1 Atr=e0 MxPwr=100mA
+> A:  FirstIf#= 0 IfCount= 3 Cls=e0(wlcon) Sub=01 Prot=01
+> I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=125us
+> E:  Ad=82(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
+> I:* If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+> I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+> I:  If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+> I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+> I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+> I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+> I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+> E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+> I:* If#= 2 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS=  64 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS=  64 Ivl=125us
+> I:  If#= 2 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=(none)
+> E:  Ad=8a(I) Atr=03(Int.) MxPS= 512 Ivl=125us
+> E:  Ad=0a(O) Atr=03(Int.) MxPS= 512 Ivl=125us
+> 
+> Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
 > ---
-> v4:
->  * updated commit subject
->  * Removed drive strength for bt_en
->  * updated swctrl_gpio name to sw_ctrl
-> 
-> v3:
->  * Addressed reviewers comments
->  * Added pin config for sw_ctrl line.
-> v2:
->  * merged two patches into one
->  * Removed unused comments
->  * Removed pinmux & pin conf.
->  * Addressed reviewers comments
-> 
-> v1: initial patch
-> ---
-> arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  4 ++++
-> arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 36 ++++++++++++++++++++++++++++++++
-> arch/arm64/boot/dts/qcom/sc7280-idp2.dts |  4 ++++
-> 3 files changed, 44 insertions(+)
+> drivers/bluetooth/btusb.c | 8 ++++++++
+> 1 file changed, 8 insertions(+)
 
 patch has been applied to bluetooth-next tree.
 
