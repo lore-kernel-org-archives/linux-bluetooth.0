@@ -2,163 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 1FB21C433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 12:01:11 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D41DCC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 14:25:02 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S244754AbhLVMBK (ORCPT
+        id S241012AbhLVOZC (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 07:01:10 -0500
-Received: from alexa-out.qualcomm.com ([129.46.98.28]:44831 "EHLO
-        alexa-out.qualcomm.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S235474AbhLVMBJ (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 07:01:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=quicinc.com; i=@quicinc.com; q=dns/txt; s=qcdkim;
-  t=1640174470; x=1671710470;
-  h=from:to:cc:subject:date:message-id;
-  bh=o55U/4pnFLIo4sAG3BA6KooL0dSILvHheNBtvDCnyy8=;
-  b=Ey6paIFbVDpqTTOIQtZ0o3HuMd/KLCgN06Q2lfuLSorJhOZuwiJvje4h
-   KvrGndiXvtPXsgK5XoRVsbgANJDGv/82Ffd00gfW5jatDhceN5v9FiHyP
-   luk7D9b2eBtYl/Cd84Pv9AWSjvIJowTTL/pm9c6AV76e5MWpwL2N7EOuZ
-   g=;
-Received: from ironmsg-lv-alpha.qualcomm.com ([10.47.202.13])
-  by alexa-out.qualcomm.com with ESMTP; 22 Dec 2021 04:01:09 -0800
-X-QCInternal: smtphost
-Received: from ironmsg02-blr.qualcomm.com ([10.86.208.131])
-  by ironmsg-lv-alpha.qualcomm.com with ESMTP/TLS/AES256-SHA; 22 Dec 2021 04:01:07 -0800
-X-QCInternal: smtphost
-Received: from hyd-lablnx377.qualcomm.com ([10.204.178.226])
-  by ironmsg02-blr.qualcomm.com with ESMTP; 22 Dec 2021 17:30:50 +0530
-Received: by hyd-lablnx377.qualcomm.com (Postfix, from userid 4035820)
-        id 37A7821435; Wed, 22 Dec 2021 17:30:49 +0530 (IST)
-From:   Sai Teja Aluvala <quic_saluvala@quicinc.com>
-To:     marcel@holtmann.org, johan.hedberg@gmail.com
-Cc:     mka@chromium.org, linux-kernel@vger.kernel.org,
-        linux-bluetooth@vger.kernel.org, quic_hemantg@quicinc.com,
-        linux-arm-msm@vger.kernel.org, quic_bgodavar@quicinc.com,
-        rjliao@codeaurora.org, hbandi@codeaurora.org,
-        abhishekpandit@chromium.org, mcchou@chromium.org,
-        quic_pharish@quicinc.com,
-        Sai Teja Aluvala <quic_saluvala@quicinc.com>
-Subject: [PATCH v4] Bluetooth: btqca: sequential validation
-Date:   Wed, 22 Dec 2021 17:30:44 +0530
-Message-Id: <1640174444-28561-1-git-send-email-quic_saluvala@quicinc.com>
-X-Mailer: git-send-email 2.7.4
+        Wed, 22 Dec 2021 09:25:02 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:45465 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S233186AbhLVOZB (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Wed, 22 Dec 2021 09:25:01 -0500
+Received: from [192.168.0.2] (ip5f5aeac8.dynamic.kabel-deutschland.de [95.90.234.200])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits))
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id F34BD61EA1935;
+        Wed, 22 Dec 2021 15:24:58 +0100 (CET)
+Message-ID: <f6baa415-b078-4308-e31d-6b44e748c1c5@molgen.mpg.de>
+Date:   Wed, 22 Dec 2021 15:24:58 +0100
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v2 1/3] Bluetooth: mt7921s: Support wake on bluetooth
+Content-Language: en-US
+To:     Sean Wang <sean.wang@mediatek.com>,
+        Marcel Holtmann <marcel@holtmann.org>,
+        Johan Hedberg <johan.hedberg@gmail.com>
+Cc:     Mark-YW.Chen@mediatek.com, Soul.Huang@mediatek.com,
+        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
+        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
+        km.lin@mediatek.com, robin.chiu@mediatek.com,
+        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
+        posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
+        michaelfsun@google.com, mcchou@chromium.org, shawnku@google.com,
+        linux-bluetooth@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <ef0603f2553d09fb84043704e4726d0ab98aa63b.1640141813.git.objelf@gmail.com>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
+In-Reply-To: <ef0603f2553d09fb84043704e4726d0ab98aa63b.1640141813.git.objelf@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-This change will have sequential validation support
-& patch config command is added
+Dear Sean,
 
-Signed-off-by: Sai Teja Aluvala <quic_saluvala@quicinc.com>
 
-v4:
-* addressed the change from u8 cmd to const u8 cmd
+Am 22.12.21 um 04:11 schrieb sean.wang@mediatek.com:
+> From: Mark Chen <mark-yw.chen@mediatek.com>
+> 
+> Enable wake on bluetooth on mt7921s that can be supported since the
+> firmware with version 20211129211059 was added, and the patch would
+> not cause any harm even when the old firmware is applied.
 
-v3:
-* removed rlen,rtype
-* Replaced kfree with kfree_skb
+Maybe print a notice level message, if the firmware is too old, and the 
+feature cannot be supported?
 
-v2:
-* Added static declaration
-* Addressed wrong indentation
-* Removed EDL_PATCH_CONFIG_CMD_LEN
+> The patch was tested by setting up an HID or HOGP profile to connect a
+> Bluetooth keyboard and mouse, then putting the system to suspend, then
+> trying to wake up the system by moving the Bluetooth keyboard or mouse,
+> and then checking if the system can wake up and be brought back to
+> the normal state.
 
-v1:
-*Initial patch
----
- drivers/bluetooth/btqca.c | 48 +++++++++++++++++++++++++++++++++++++++++++++++
- drivers/bluetooth/btqca.h |  2 ++
- 2 files changed, 50 insertions(+)
+I’d still would like to see the datasheet name, revision, and section in 
+the commit message, even though the datasheet is not public.
 
-diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
-index be04d74..9091a88 100644
---- a/drivers/bluetooth/btqca.c
-+++ b/drivers/bluetooth/btqca.c
-@@ -141,6 +141,51 @@ static int qca_read_fw_build_info(struct hci_dev *hdev)
- 	return err;
- }
- 
-+static int qca_send_patch_config_cmd(struct hci_dev *hdev)
-+{
-+	struct sk_buff *skb;
-+	int err = 0;
-+	const u8 cmd[] = {EDL_PATCH_CONFIG_CMD, 0x01, 0, 0, 0};
-+	struct edl_event_hdr *edl;
-+
-+	bt_dev_dbg(hdev, "QCA Patch config");
-+
-+	skb = __hci_cmd_sync_ev(hdev, EDL_PATCH_CMD_OPCODE, sizeof(cmd),
-+				cmd, HCI_EV_VENDOR, HCI_INIT_TIMEOUT);
-+	if (IS_ERR(skb)) {
-+		err = PTR_ERR(skb);
-+		bt_dev_err(hdev, "Sending QCA Patch config failed (%d)", err);
-+		return err;
-+	}
-+
-+	if (skb->len != 2) {
-+		bt_dev_err(hdev, "QCA Patch config cmd size mismatch len %d", skb->len);
-+		err = -EILSEQ;
-+		goto out;
-+	}
-+
-+	edl = (struct edl_event_hdr *)(skb->data);
-+	if (!edl) {
-+		bt_dev_err(hdev, "QCA Patch config with no header");
-+		err = -EILSEQ;
-+		goto out;
-+	}
-+
-+	if (edl->cresp != EDL_PATCH_CONFIG_RES_EVT || edl->rtype != EDL_PATCH_CONFIG_CMD) {
-+		bt_dev_err(hdev, "QCA Wrong packet received %d %d", edl->cresp,
-+			   edl->rtype);
-+		err = -EIO;
-+		goto out;
-+	}
-+
-+out:
-+	kfree_skb(skb);
-+	if (err)
-+		bt_dev_err(hdev, "QCA Patch config cmd failed (%d)", err);
-+
-+	return err;
-+}
-+
- static int qca_send_reset(struct hci_dev *hdev)
- {
- 	struct sk_buff *skb;
-@@ -551,6 +596,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
- 	 */
- 	rom_ver = ((soc_ver & 0x00000f00) >> 0x04) | (soc_ver & 0x0000000f);
- 
-+	if (soc_type == QCA_WCN6750)
-+		qca_send_patch_config_cmd(hdev);
-+
- 	/* Download rampatch file */
- 	config.type = TLV_TYPE_PATCH;
- 	if (qca_is_wcn399x(soc_type)) {
-diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
-index 30afa77..61e9a50 100644
---- a/drivers/bluetooth/btqca.h
-+++ b/drivers/bluetooth/btqca.h
-@@ -13,6 +13,7 @@
- #define EDL_PATCH_TLV_REQ_CMD		(0x1E)
- #define EDL_GET_BUILD_INFO_CMD		(0x20)
- #define EDL_NVM_ACCESS_SET_REQ_CMD	(0x01)
-+#define EDL_PATCH_CONFIG_CMD		(0x28)
- #define MAX_SIZE_PER_TLV_SEGMENT	(243)
- #define QCA_PRE_SHUTDOWN_CMD		(0xFC08)
- #define QCA_DISABLE_LOGGING		(0xFC17)
-@@ -24,6 +25,7 @@
- #define EDL_CMD_EXE_STATUS_EVT		(0x00)
- #define EDL_SET_BAUDRATE_RSP_EVT	(0x92)
- #define EDL_NVM_ACCESS_CODE_EVT		(0x0B)
-+#define EDL_PATCH_CONFIG_RES_EVT	(0x00)
- #define QCA_DISABLE_LOGGING_SUB_OP	(0x14)
- 
- #define EDL_TAG_ID_HCI			(17)
--- 
-QUALCOMM INDIA, on behalf of Qualcomm Innovation Center, Inc.
+> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+> ---
+> v2: refine the git message
+> ---
+>   drivers/bluetooth/btmtk.h     |  8 ++++++++
+>   drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
+>   2 files changed, 38 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index 6e7b0c7567c0..2be1d2680ad8 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+>   	u8 time_compensation;
+>   } __packed;
+>   
+> +struct btmtk_wakeon {
+> +	u8 mode;
+> +	u8 gpo;
+> +	u8 active_high;
+> +	__le16 enable_delay;
+> +	__le16 wakeup_delay;
+> +} __packed;
+> +
+>   struct btmtk_hci_wmt_params {
+>   	u8 op;
+>   	u8 flag;
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index b5ea8d3bffaa..771733ce362b 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>   	return 0;
+>   }
+>   
+> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
+> +{
+> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+> +	bool may_wakeup = device_may_wakeup(bdev->dev);
+> +	struct btmtk_wakeon bt_awake = {
+> +		.mode = 0x1,
+> +		.gpo = 0,
+> +		.active_high = 0x1,
+> +		.enable_delay = cpu_to_le16(0xc80),
+> +		.wakeup_delay = cpu_to_le16(0x20)
+> +	};
+> +	struct sk_buff *skb;
+> +
+> +	if (may_wakeup &&
+> +	    bdev->data->chipid == 0x7921) {
+> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
+> +				      &bt_awake, HCI_CMD_TIMEOUT);
+> +		if (IS_ERR(skb))
+> +			may_wakeup = false;
+> +	}
+> +
+> +	return may_wakeup;
+> +}
+> +
+>   static int btmtksdio_probe(struct sdio_func *func,
+>   			   const struct sdio_device_id *id)
+>   {
+> @@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>   	hdev->shutdown = btmtksdio_shutdown;
+>   	hdev->send     = btmtksdio_send_frame;
+>   	hdev->set_bdaddr = btmtk_set_bdaddr;
+> +	hdev->wakeup = btmtk_sdio_wakeup;
 
+Just a nit, that two and three lines above, the equal signs are aligned.
+
+>   	SET_HCIDEV_DEV(hdev, &func->dev);
+>   
+> @@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+>   	 */
+>   	pm_runtime_put_noidle(bdev->dev);
+>   
+> -	return 0;
+> +	err = device_init_wakeup(bdev->dev, true);
+> +	if (err)
+> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
+> +
+> +	return err;
+>   }
+>   
+>   static void btmtksdio_remove(struct sdio_func *func)
+
+
+Kind regards,
+
+Paul
