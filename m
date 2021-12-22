@@ -2,122 +2,186 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 08CDCC433FE
-	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 16:40:44 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D0F20C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Wed, 22 Dec 2021 19:54:24 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S237450AbhLVQkm (ORCPT
+        id S1345346AbhLVTyY (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 11:40:42 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:35524 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231835AbhLVQkm (ORCPT
+        Wed, 22 Dec 2021 14:54:24 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:42842 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S230053AbhLVTyX (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 11:40:42 -0500
-Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDFD6C06173F
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 08:40:34 -0800 (PST)
-Received: by mail-oo1-xc2b.google.com with SMTP id q14-20020a056820028e00b002da9808b90fso982253ood.7
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 08:40:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google;
-        h=date:from:to:cc:subject:message-id:references:mime-version
-         :content-disposition:in-reply-to;
-        bh=WyvrfuTJK2VZi0nK8upiFXDjt5MhcCRbIpxv5amoqxw=;
-        b=G/22C9dgcx+k06yyQPtPgTl49SmY8WAzFIim/iFlJ4bHgRzvL19vqPZdNcGlFCRJGQ
-         sqsUXLIdrwFDmC3EIqUIZJbAFS7IhpuFlzmdXiYV2TWKAQsYAIKXxBT6ENGPtMkNa54o
-         S+DL5FMNTN16mMzzdGxbH8UeU+LTCQXs6DMRHAQ1NEKjIbeSZcOSKKJk3H2yFa2Ew7Cf
-         UtoGwG9tA3l8dv0EJQsohdh8LmB/7b4NJA14ziBmsDI5UCb+2yixVpwUOoLzi5PrIizX
-         qPBMBCve5TUx88PbREcgZkrPNL8T0BsYUtNu0yJ6ORAodV+ZWocfBItGcVfXXoYs+pZV
-         dNYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:date:from:to:cc:subject:message-id:references
-         :mime-version:content-disposition:in-reply-to;
-        bh=WyvrfuTJK2VZi0nK8upiFXDjt5MhcCRbIpxv5amoqxw=;
-        b=wGfDEI88dgxB8LZekWFTEE++WZt4dkGexCpmRNyREsDUr/wYJ/T/3wAG0uoKc/949u
-         UQ6XJ+maATz3DwBLjoFNL5bs+vUT0NCTAhPL9e7/ntWDKGsk8X0scFaYCPGHaQDD+z5R
-         cUwIl/gpqgWPUyJR02s43DDm3XlhIzN3Fv7DeqWodZf2IGF8UDZ2wzu2ZvL0Fi3QbWxl
-         Vt7CHGQIBCjk+KfT789RQ5Dgne/cCJ0QhIpP3MWrp5QENAK6qJpOUPOStiZ92wawABZo
-         vb+hWp9L8M2VBoAmAJ7SE1jlDiXpA+qo1foA6br9Z8IPGKWb/2cHE9jtSOO/dZJaGMu9
-         8Xcw==
-X-Gm-Message-State: AOAM530/VKaH8DtcpkjG5wzMP1fIE759my+OGSxComgx6eiAMU6JbX/c
-        1rzvBHTEPr96XGyv+kXVYbpQIw==
-X-Google-Smtp-Source: ABdhPJy+Cm1ygkkBAzM6nABs5piYt4o6uY4mKXGDO2c3sPUSC2VOIp2B1xGhvGOYpSNc9Ppx+yV18w==
-X-Received: by 2002:a4a:d98c:: with SMTP id k12mr2334018oou.82.1640191234159;
-        Wed, 22 Dec 2021 08:40:34 -0800 (PST)
-Received: from ripper (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
-        by smtp.gmail.com with ESMTPSA id j29sm420034ots.68.2021.12.22.08.40.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 08:40:33 -0800 (PST)
-Date:   Wed, 22 Dec 2021 08:41:40 -0800
-From:   Bjorn Andersson <bjorn.andersson@linaro.org>
-To:     Matthias Kaehlcke <mka@chromium.org>
-Cc:     Marcel Holtmann <marcel@holtmann.org>,
-        Balakrishna Godavarthi <bgodavar@codeaurora.org>,
-        Johan Hedberg <johan.hedberg@gmail.com>,
-        Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
-        Hemantg <hemantg@codeaurora.org>,
-        MSM <linux-arm-msm@vger.kernel.org>,
-        Rocky Liao <rjliao@codeaurora.org>, hbandi@codeaurora.org,
-        Abhishek Pandit-Subedi <abhishekpandit@chromium.org>,
-        mcchou@chromium.org, saluvala@codeaurora.org
-Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on
- SC7280 IDP boards
-Message-ID: <YcNVRNqAbfAYpCWH@ripper>
-References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
- <580E8974-EB7F-4493-BECC-4B09765A954D@holtmann.org>
- <YcNOvlVQaT80qPsx@google.com>
+        Wed, 22 Dec 2021 14:54:23 -0500
+X-UUID: 229e633909b64cc5abbe047a43d98acd-20211223
+X-UUID: 229e633909b64cc5abbe047a43d98acd-20211223
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 1106698377; Thu, 23 Dec 2021 03:54:21 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
+ mtkmbs10n2.mediatek.inc (172.21.101.183) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.792.3;
+ Thu, 23 Dec 2021 03:54:20 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 23 Dec
+ 2021 03:54:19 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 23 Dec 2021 03:54:19 +0800
+From:   <sean.wang@mediatek.com>
+To:     <pmenzel@molgen.mpg.de>
+CC:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>,
+        <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
+        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
+        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <jemele@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>
+Subject: =?UTF-8?q?Re=3A=20=5BPATCH=20v2=201/3=5D=20Bluetooth=3A=20mt7921s=3A=20Support=20wake=20on=20bluetooth?=
+Date:   Thu, 23 Dec 2021 03:54:18 +0800
+Message-ID: <1640202858-15180-1-git-send-email-sean.wang@mediatek.com>
+X-Mailer: git-send-email 1.7.9.5
+In-Reply-To: <f6baa415-b078-4308-e31d-6b44e748c1c5@molgen.mpg.de--annotate>
+References: <f6baa415-b078-4308-e31d-6b44e748c1c5@molgen.mpg.de--annotate>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <YcNOvlVQaT80qPsx@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-On Wed 22 Dec 08:13 PST 2021, Matthias Kaehlcke wrote:
+From: Sean Wang <sean.wang@mediatek.com>
 
-> On Wed, Dec 22, 2021 at 08:54:56AM +0100, Marcel Holtmann wrote:
-> > Hi Balakrishna,
-> > 
-> > > Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
-> > > 
-> > > Signed-off-by: Balakrishna Godavarthi <bgodavar@codeaurora.org>
-> > > ---
-> > > v4:
-> > >  * updated commit subject
-> > >  * Removed drive strength for bt_en
-> > >  * updated swctrl_gpio name to sw_ctrl
-> > > 
-> > > v3:
-> > >  * Addressed reviewers comments
-> > >  * Added pin config for sw_ctrl line.
-> > > v2:
-> > >  * merged two patches into one
-> > >  * Removed unused comments
-> > >  * Removed pinmux & pin conf.
-> > >  * Addressed reviewers comments
-> > > 
-> > > v1: initial patch
-> > > ---
-> > > arch/arm64/boot/dts/qcom/sc7280-idp.dts  |  4 ++++
-> > > arch/arm64/boot/dts/qcom/sc7280-idp.dtsi | 36 ++++++++++++++++++++++++++++++++
-> > > arch/arm64/boot/dts/qcom/sc7280-idp2.dts |  4 ++++
-> > > 3 files changed, 44 insertions(+)
-> > 
-> > patch has been applied to bluetooth-next tree.
-> 
-> Thanks!
-> 
-> I would have expected though that a device tree change goes through
-> the qcom tree. Maybe Bjorn should pick it too to avoid possible
-> conflicts?
+>Dear Sean,
+>
+>Am 22.12.21 um 04:11 schrieb sean.wang@mediatek.com:
+>> From: Mark Chen <mark-yw.chen@mediatek.com>
+>>
+>> Enable wake on bluetooth on mt7921s that can be supported since the
+>> firmware with version 20211129211059 was added, and the patch would
+>> not cause any harm even when the old firmware is applied.
+>
+>Maybe print a notice level message, if the firmware is too old, and the feature cannot be supported?
+>
 
-That would be preferable, I've picked a few patches in these files for
-v5.17, so there's a risk for conflict as this reaches Linus.
+mt7921 firmware will be updated regularly to add features or fix bugs, so I would try to avoid adding such
+message related to firmware to make the driver look messy.
 
-Marcel, let me know if you drop this and I should pick it up.
+>> The patch was tested by setting up an HID or HOGP profile to connect a
+>> Bluetooth keyboard and mouse, then putting the system to suspend, then
+>> trying to wake up the system by moving the Bluetooth keyboard or
+>> mouse, and then checking if the system can wake up and be brought back
+>> to the normal state.
+>
+>I’d still would like to see the datasheet name, revision, and section in the commit message, even though the datasheet is not public.
+>
 
-Thanks,
-Bjorn
+actually the hardware datasheet doesn't mention the things regarding wake on bluetooth because that is a totally software feature
+extended from the previous firmware.
+
+>> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+>> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+>> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+>> ---
+>> v2: refine the git message
+>> ---
+>>   drivers/bluetooth/btmtk.h     |  8 ++++++++
+>>   drivers/bluetooth/btmtksdio.c | 31 ++++++++++++++++++++++++++++++-
+>>   2 files changed, 38 insertions(+), 1 deletion(-)
+>>
+>> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+>> index 6e7b0c7567c0..2be1d2680ad8 100644
+>> --- a/drivers/bluetooth/btmtk.h
+>> +++ b/drivers/bluetooth/btmtk.h
+>> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+>>	u8 time_compensation;
+>>   } __packed;
+>>
+>> +struct btmtk_wakeon {
+>> +	u8 mode;
+>> +	u8 gpo;
+>> +	u8 active_high;
+>> +	__le16 enable_delay;
+>> +	__le16 wakeup_delay;
+>> +} __packed;
+>> +
+>>   struct btmtk_hci_wmt_params {
+>>	u8 op;
+>>	u8 flag;
+>> diff --git a/drivers/bluetooth/btmtksdio.c
+>> b/drivers/bluetooth/btmtksdio.c index b5ea8d3bffaa..771733ce362b
+>> 100644
+>> --- a/drivers/bluetooth/btmtksdio.c
+>> +++ b/drivers/bluetooth/btmtksdio.c
+>> @@ -958,6 +958,30 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+>>	return 0;
+>>   }
+>>
+>> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev) {
+>> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+>> +	bool may_wakeup = device_may_wakeup(bdev->dev);
+>> +	struct btmtk_wakeon bt_awake = {
+>> +		.mode = 0x1,
+>> +		.gpo = 0,
+>> +		.active_high = 0x1,
+>> +		.enable_delay = cpu_to_le16(0xc80),
+>> +		.wakeup_delay = cpu_to_le16(0x20)
+>> +	};
+>> +	struct sk_buff *skb;
+>> +
+>> +	if (may_wakeup &&
+>> +	    bdev->data->chipid == 0x7921) {
+>> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
+>> +				      &bt_awake, HCI_CMD_TIMEOUT);
+>> +		if (IS_ERR(skb))
+>> +			may_wakeup = false;
+>> +	}
+>> +
+>> +	return may_wakeup;
+>> +}
+>> +
+>>   static int btmtksdio_probe(struct sdio_func *func,
+>>			   const struct sdio_device_id *id)
+>>   {
+>> @@ -998,6 +1022,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+>>	hdev->shutdown = btmtksdio_shutdown;
+>>	hdev->send     = btmtksdio_send_frame;
+>>	hdev->set_bdaddr = btmtk_set_bdaddr;
+>> +	hdev->wakeup = btmtk_sdio_wakeup;
+>
+>Just a nit, that two and three lines above, the equal signs are aligned.
+
+thanks, I will do it with another patch
+
+>
+>>	SET_HCIDEV_DEV(hdev, &func->dev);
+>>
+>> @@ -1032,7 +1057,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+>>	 */
+>>	pm_runtime_put_noidle(bdev->dev);
+>>
+>> -	return 0;
+>> +	err = device_init_wakeup(bdev->dev, true);
+>> +	if (err)
+>> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
+>> +
+>> +	return err;
+>>   }
+>>
+>>   static void btmtksdio_remove(struct sdio_func *func)
+>
+>
+>Kind regards,
+>
+>Paul
