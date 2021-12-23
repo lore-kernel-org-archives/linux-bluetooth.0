@@ -2,82 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 25BBBC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 13:42:41 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id E3790C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 17:50:57 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1348681AbhLWNmj (ORCPT
+        id S244659AbhLWRux (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Dec 2021 08:42:39 -0500
-Received: from dfw.source.kernel.org ([139.178.84.217]:59928 "EHLO
-        dfw.source.kernel.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1348680AbhLWNmf (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Dec 2021 08:42:35 -0500
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-        (No client certificate requested)
-        by dfw.source.kernel.org (Postfix) with ESMTPS id 2026B61E67
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 13:42:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 787C1C36AEA
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 13:42:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640266954;
-        bh=PAJhWXV5eFigvRv/VWPzhCw0Msll4fpCidnNWW6GLUs=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=Fz7d+vp1nOI8ju6pYtsCSOfe/DH2lxRIWA707wqscxwy+Dg8YhvLVrVeO4Ujf7Omj
-         biZa89a31kjQzHBsu+gNiUkUi0siIIRBkgL3Irq9yNXgexb+gzl4BIO3b136N+Gcwj
-         wWTi5d09wgCwALN6fqidQoOOxpo61fFIfVWD34LB5bPdFxMyiphGVj8QKGWWNchxU/
-         pCacZqHcN60HyQUgZbSrg0fOVNgyYuU5BoaCoJ6Oag7RzTByps31VnI/ZtBYMgGk7m
-         oFGwcYbHVixK5pWueVBSu4Evl3JMJWYEgA3T3erH615gz/TIcifbYZGztdclx5NpJh
-         SgzCXGCaSA1gw==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id 45CC860E8C; Thu, 23 Dec 2021 13:42:34 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
+        Thu, 23 Dec 2021 12:50:53 -0500
+Received: from mout.gmx.net ([212.227.17.22]:48923 "EHLO mout.gmx.net"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S244637AbhLWRuo (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Dec 2021 12:50:44 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=gmx.net;
+        s=badeba3b8450; t=1640281841;
+        bh=8uV5Y2W0LnBGoknT+kOFKWwuA3zaQI0JS9pZm0AIfLg=;
+        h=X-UI-Sender-Class:From:To:Cc:Subject:Date;
+        b=O6IUrGtyYwboHIhwWVFX5ZyjxH8ItEr5l8aeoN6loxLqhDk/p3kudKRtvOCCe1TSR
+         6q538W1916BDvmlDY90rdUl5+gr1wxlsJAeqwJEkKuvGqJa+g3O6xkHgUpG8iRwj6j
+         i876Jtvc9Y5cTXgvYvxellEoDncsgX6A+SFV+8Ck=
+X-UI-Sender-Class: 01bb95c1-4bf8-414a-932a-4f6e2808ef9c
+Received: from madeye.fritz.box ([37.4.228.18]) by mail.gmx.net (mrgmx104
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1MVNB1-1mrPOg0ZFv-00SNEh; Thu, 23
+ Dec 2021 18:50:41 +0100
+From:   Nicolas Fella <nicolas.fella@gmx.de>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215347] btintel: AX200 (8087:0029): hci crashes and can't
- recover after repeated rfkill on/off
-Date:   Thu, 23 Dec 2021 13:42:33 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: blocking
-X-Bugzilla-Who: hui.wang@canonical.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: 
-Message-ID: <bug-215347-62941-acJPoaWYK0@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215347-62941@https.bugzilla.kernel.org/>
-References: <bug-215347-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+Cc:     Nicolas Fella <nicolas.fella@gmx.de>
+Subject: [PATCH BlueZ] Use audio-card-bluetooth icon
+Date:   Thu, 23 Dec 2021 18:50:05 +0100
+Message-Id: <20211223175005.52976-1-nicolas.fella@gmx.de>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:dMmA0ZRpbr6ZHGPDTIcJK3rTbFU1+YN/Qrf3qBxswOmkx2TaCFk
+ nbZADyucYGENl4onz0WUR+yBi0Fm1uA2uUUUJMYejkqkfXfd9ikmK6Abi5FH62f7/2ZerDk
+ hwKHXweiDZIulfAI4sheUMoHmXioo2lzNYjvrVwcZDDJKvnohrFezRQbWFoiVKbi3XA5w6z
+ woF6A/DCerpB3mIRJRAjQ==
+X-UI-Out-Filterresults: notjunk:1;V03:K0:rBAsVXXQmv4=:amgBu4O34Ekd8qV/yB1BiW
+ yRZqiBL11AFEDv0k9rPG5tn36mYYjoAv8Qr6hkSTfFtBt427vAsONdQRBNzzw3C/iPHQ4WGOW
+ caFPKSZkgteROOHEj8q/JH2IfXQhHiZUogB9Y/yAAhlNqmcFnbBa5J7tQwQTqUIHkvTtugswX
+ gSraWU+2x9yh22Zq1k6bpYEsqHbDRl8900sTzfkMpE64971yJMC0JhKDV+Cm3l7SZRbSNtmcu
+ kGH7cbS4wBenAUlK4S3BMxPLX1Xi9mWRlrRcJM6FAwLQyKXgIP8DozT84JwAen5L373Gr++Lx
+ HHByegD9ahhN0xdER/gN8zE2nRWhgLCKmEWFdn+Vju3UE/hY3xfJGfB2pXym1gx7AwaMbTj3M
+ GDZZBamadCGqAtqrDoRlwmQfJP+4XB3wCv5OCs0f6dY3CqllzrQqwnLMyBAzK51P/cvhMvjZs
+ frj2bDsLBUoDQI1BHe8Svtr6wJrpD+53iu+mIKQQ92aiKxsvnJndZpBDIZx8Jm/ym9Rfwt+s5
+ NmKgHmvbTQ7KV/jJNQlSeGw5KEr/tDe3uMGdFyELYDRiOJHLnKfwhKyLQtDpGRDqjDOW50eG6
+ ZhtbgAPBrcTcfwZPK4Bmy4TJOJQOqX12qn85B9ck5evjnFQIGCV37BPsr9MoQk9elMIrHKU6b
+ bMK6qkncMNmoXuVp+LxMP/u1UJpxvoL9RizC6iQJwiPKtxMlil209KwkaBgfescTgt3zAmlD7
+ O1bvDuNZSiGsEsK3ig0OfERQ2Cm2yxggBvgXK98jAXk99Pa8d9pru0VjaZho1eoApqL+oOVRy
+ KLYe+OzdFwR7I5v9g4qqONGR2dbxGDsAXtd9u9YgFtVCHjri94iIXDz5sCx3bNmRkPyKwbFqP
+ ToY3024xEe1Zz19L/l9vUmBLapB0qjgL8wDgMnsNzTu9VLgOpj0NdJn7oNUEGJt/cWj7INZdI
+ 5YVPVngFFtwQB0phuO5v5L1xkeQsiOYK77jgS+99HobsB/A12VYRBBdx4VYqKiF5penJJy1vs
+ cegRPfeSWO+W2ikDHk0ro7BXyiDjHujsodK6ph2oMralRJy3JEIkbeExR0hOO2lUE0wlgcogr
+ bj5c4gcdaAUzCk=
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215347
+PulseAudio uses this icon for this kind of device
 
---- Comment #11 from Hui Wang (hui.wang@canonical.com) ---
-Indeed, if kernel oops doesn't happen, this issue can't be reproduced with
-bluetooth-next kernel anymore.
+Let's be consistent
 
-I will bisect kernel to find the fixing commit/commits for this bug, then c=
-lose
-this bug.
+Users will gracefully fall back to audio-card if audio-card-bluetooth
+is not found
+=2D--
+ src/dbus-common.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-Thanks.
+diff --git a/src/dbus-common.c b/src/dbus-common.c
+index 5e2c83d52..3611cb013 100644
+=2D-- a/src/dbus-common.c
++++ b/src/dbus-common.c
+@@ -80,7 +80,7 @@ const char *class_to_icon(uint32_t class)
+ 		case 0x0d: /* Camcorder */
+ 			return "camera-video";
+ 		default:
+-			return "audio-card";	/* Other audio device */
++			return "audio-card-bluetooth";	/* Other audio device */
+ 		}
+ 		break;
+ 	case 0x05:
+=2D-
+2.34.1
 
---=20
-You may reply to this email to add a comment.
-
-You are receiving this mail because:
-You are the assignee for the bug.=
