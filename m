@@ -2,189 +2,165 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 4D30BC433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 01:01:57 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B1302C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 02:56:19 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232952AbhLWBB4 (ORCPT
+        id S1345934AbhLWC4S (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Wed, 22 Dec 2021 20:01:56 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36402 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S230041AbhLWBB4 (ORCPT
+        Wed, 22 Dec 2021 21:56:18 -0500
+Received: from mailgw02.mediatek.com ([210.61.82.184]:60908 "EHLO
+        mailgw02.mediatek.com" rhost-flags-OK-FAIL-OK-FAIL) by vger.kernel.org
+        with ESMTP id S1345958AbhLWC4R (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Wed, 22 Dec 2021 20:01:56 -0500
-Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3131C061574
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 17:01:55 -0800 (PST)
-Received: by mail-qt1-x82c.google.com with SMTP id 8so3529829qtx.5
-        for <linux-bluetooth@vger.kernel.org>; Wed, 22 Dec 2021 17:01:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=n3p7MxKUNQKwwNQtxo3BWlZCmqk0yNeMtVyCjWE0bHY=;
-        b=OcVNIsdmh/5iPUoEEFO2hUTwZOc3nuqU85nP4SsClgEbr8cG7puiPP5pnDhS0R3j2S
-         wGU7jBeNHxTBSgnJbwqGy6SNMA96hWAXwJb6kMy4/I46bAYtwVkGhAQ7X+C9luP/QXtH
-         2erYPmtb1R4msB3KhROFBw0AEHAjKLB9OEoTIALr1mm3igzaxs6UUpN3tw3WvbVbtMSq
-         +SWJ/rbfmyXD5c9zzGBEAxW/rlSl7fuhARYC96Q14/HRfUKAvfRBZt4SniCGZfPNxd04
-         WuAn+6nzq2w5+tJudidhnGFTN5hu6Xm1rmvLg9K0HSex2RRCi7OaDCc1PVwAFmQZTpFK
-         91Pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=n3p7MxKUNQKwwNQtxo3BWlZCmqk0yNeMtVyCjWE0bHY=;
-        b=SMsScUlWH75+9j+3jpxNg90ViNefLkoEjB+kJbYNsVk4FUurkCLZXMPUb1j+S9urA/
-         CESbr+dojHDO5D4hzd/n84gO3XvedpQn0D7aXHHmdajtRCJId+P4CEiLps6t0zfscogV
-         RP7267uAH+4+E2bk+dQKv1OmpGPnRJh62W7s9Upd0CmBfyDXBf91VqF7ZPGckiDV8XED
-         sONpVzWK1NMN7c/uOpqrEf97gf1EngwX05FQH1Y7CcZs+3SbD6AeOkwMmmlQ4D0jdN1A
-         fyaGTitqZ1IpsU/K1K4jEpz5n3euzDT4iDrnwQDd5heoD1fmaZRcXUqurR21FLuG+OJH
-         DiZA==
-X-Gm-Message-State: AOAM532wReuwjZfHxHxeGgu/PNc7MP0UawbDzG3Kdjg3hugguNlDP7s/
-        7T2T21sxV53GSX0Ealrr5jFN/2NsGIKQKA==
-X-Google-Smtp-Source: ABdhPJxOnDk7mCy+Av0QwjIrVNqFWkbQjBri20RNJO/66PUrXP/zSxU/J3HgDnLC0PeQRQJzMzl3mg==
-X-Received: by 2002:a05:622a:48e:: with SMTP id p14mr189895qtx.553.1640221314160;
-        Wed, 22 Dec 2021 17:01:54 -0800 (PST)
-Received: from [172.17.0.2] ([20.122.11.38])
-        by smtp.gmail.com with ESMTPSA id bq43sm3126115qkb.32.2021.12.22.17.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Dec 2021 17:01:53 -0800 (PST)
-Message-ID: <61c3ca81.1c69fb81.c1c22.0bdc@mx.google.com>
-Date:   Wed, 22 Dec 2021 17:01:53 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============2614464520479526615=="
+        Wed, 22 Dec 2021 21:56:17 -0500
+X-UUID: a2f085106f5f48eda74aeacc3d538755-20211223
+X-UUID: a2f085106f5f48eda74aeacc3d538755-20211223
+Received: from mtkcas10.mediatek.inc [(172.21.101.39)] by mailgw02.mediatek.com
+        (envelope-from <sean.wang@mediatek.com>)
+        (Generic MTA with TLSv1.2 ECDHE-RSA-AES256-SHA384 256/256)
+        with ESMTP id 2052840300; Thu, 23 Dec 2021 10:56:13 +0800
+Received: from mtkexhb01.mediatek.inc (172.21.101.102) by
+ mtkmbs07n2.mediatek.inc (172.21.101.141) with Microsoft SMTP Server (TLS) id
+ 15.0.1497.2; Thu, 23 Dec 2021 10:56:12 +0800
+Received: from mtkcas10.mediatek.inc (172.21.101.39) by mtkexhb01.mediatek.inc
+ (172.21.101.102) with Microsoft SMTP Server (TLS) id 15.0.1497.2; Thu, 23 Dec
+ 2021 10:56:11 +0800
+Received: from mtkswgap22.mediatek.inc (172.21.77.33) by mtkcas10.mediatek.inc
+ (172.21.101.73) with Microsoft SMTP Server id 15.0.1497.2 via Frontend
+ Transport; Thu, 23 Dec 2021 10:56:11 +0800
+From:   <sean.wang@mediatek.com>
+To:     <marcel@holtmann.org>, <johan.hedberg@gmail.com>
+CC:     <Mark-YW.Chen@mediatek.com>, <sean.wang@mediatek.com>,
+        <Soul.Huang@mediatek.com>, <YN.Chen@mediatek.com>,
+        <Leon.Yen@mediatek.com>, <Eric-SY.Chang@mediatek.com>,
+        <Deren.Wu@mediatek.com>, <km.lin@mediatek.com>,
+        <robin.chiu@mediatek.com>, <Eddie.Chen@mediatek.com>,
+        <ch.yeh@mediatek.com>, <posh.sun@mediatek.com>,
+        <ted.huang@mediatek.com>, <Eric.Liang@mediatek.com>,
+        <Stella.Chang@mediatek.com>, <Tom.Chou@mediatek.com>,
+        <steve.lee@mediatek.com>, <jsiuda@google.com>,
+        <frankgor@google.com>, <jemele@google.com>,
+        <abhishekpandit@google.com>, <michaelfsun@google.com>,
+        <mcchou@chromium.org>, <shawnku@google.com>,
+        <linux-bluetooth@vger.kernel.org>,
+        <linux-mediatek@lists.infradead.org>,
+        <linux-kernel@vger.kernel.org>,
+        Mark Chen <mark-yw.chen@mediatek.com>
+Subject: [PATCH v3 1/3] Bluetooth: mt7921s: Support wake on bluetooth
+Date:   Thu, 23 Dec 2021 10:56:07 +0800
+Message-ID: <ceafc644ca9ce926a9fb07f7b3f4e2f701e69c8d.1640165092.git.sean.wang@kernel.org>
+X-Mailer: git-send-email 1.7.9.5
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v3,1/4] build: Add sanitizer options
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211222234204.1455901-1-luiz.dentz@gmail.com>
-References: <20211222234204.1455901-1-luiz.dentz@gmail.com>
+Content-Type: text/plain
+X-MTK:  N
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============2614464520479526615==
-Content-Type: text/plain; charset="utf-8"
-MIME-Version: 1.0
-Content-Transfer-Encoding: base64
+From: Mark Chen <mark-yw.chen@mediatek.com>
 
-VGhpcyBpcyBhdXRvbWF0ZWQgZW1haWwgYW5kIHBsZWFzZSBkbyBub3QgcmVwbHkgdG8gdGhpcyBl
-bWFpbCEKCkRlYXIgc3VibWl0dGVyLAoKVGhhbmsgeW91IGZvciBzdWJtaXR0aW5nIHRoZSBwYXRj
-aGVzIHRvIHRoZSBsaW51eCBibHVldG9vdGggbWFpbGluZyBsaXN0LgpUaGlzIGlzIGEgQ0kgdGVz
-dCByZXN1bHRzIHdpdGggeW91ciBwYXRjaCBzZXJpZXM6ClBXIExpbms6aHR0cHM6Ly9wYXRjaHdv
-cmsua2VybmVsLm9yZy9wcm9qZWN0L2JsdWV0b290aC9saXN0Lz9zZXJpZXM9NjAwODg1CgotLS1U
-ZXN0IHJlc3VsdC0tLQoKVGVzdCBTdW1tYXJ5OgpDaGVja1BhdGNoICAgICAgICAgICAgICAgICAg
-ICBQQVNTICAgICAgNS40OCBzZWNvbmRzCkdpdExpbnQgICAgICAgICAgICAgICAgICAgICAgIFBB
-U1MgICAgICAzLjg2IHNlY29uZHMKUHJlcCAtIFNldHVwIEVMTCAgICAgICAgICAgICAgUEFTUyAg
-ICAgIDQxLjU2IHNlY29uZHMKQnVpbGQgLSBQcmVwICAgICAgICAgICAgICAgICAgUEFTUyAgICAg
-IDAuNjEgc2Vjb25kcwpCdWlsZCAtIENvbmZpZ3VyZSAgICAgICAgICAgICBQQVNTICAgICAgOC4z
-OCBzZWNvbmRzCkJ1aWxkIC0gTWFrZSAgICAgICAgICAgICAgICAgIEZBSUwgICAgICAxMjkwLjM5
-IHNlY29uZHMKTWFrZSBDaGVjayAgICAgICAgICAgICAgICAgICAgRkFJTCAgICAgIDIuMjUgc2Vj
-b25kcwpNYWtlIERpc3RjaGVjayAgICAgICAgICAgICAgICBQQVNTICAgICAgMjI4LjIxIHNlY29u
-ZHMKQnVpbGQgdy9leHQgRUxMIC0gQ29uZmlndXJlICAgUEFTUyAgICAgIDguNjIgc2Vjb25kcwpC
-dWlsZCB3L2V4dCBFTEwgLSBNYWtlICAgICAgICBGQUlMICAgICAgMTI3Ny4xMyBzZWNvbmRzCklu
-Y3JlbWVudGFsIEJ1aWxkIHdpdGggcGF0Y2hlc0ZBSUwgICAgICAxNzIwLjgwIHNlY29uZHMKCkRl
-dGFpbHMKIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIC0gTWFrZSAt
-IEZBSUwKRGVzYzogQnVpbGQgdGhlIEJsdWVaIHNvdXJjZSB0cmVlCk91dHB1dDoKdG9vbHMvbWdt
-dC10ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzox
-MjM2NDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg
-4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQg
-fCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQv
-dGVzdC1hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3
-NjY6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKA
-mC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwg
-aW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rl
-c3QtYXZyY3AuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5
-OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgt
-ZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGlu
-dCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KSW4gZmlsZSBp
-bmNsdWRlZCBmcm9tIC91c3IvaW5jbHVkZS9zdHJpbmcuaDo0OTUsCiAgICAgICAgICAgICAgICAg
-ZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9ndGVzdHV0aWxzLmg6MzAsCiAgICAgICAg
-ICAgICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi5oOjg1LAogICAgICAgICAg
-ICAgICAgIGZyb20gcHJvZmlsZXMvYXVkaW8vYXZjdHAuYzozMDoKSW4gZnVuY3Rpb24g4oCYc3Ry
-bmNweeKAmSwKICAgIGlubGluZWQgZnJvbSDigJh1aW5wdXRfY3JlYXRlLmNvbnN0cHJvcOKAmSBh
-dCBwcm9maWxlcy9hdWRpby9hdmN0cC5jOjExODA6MzoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51
-eC1nbnUvYml0cy9zdHJpbmdfZm9ydGlmaWVkLmg6MTA2OjEwOiBlcnJvcjog4oCYX19idWlsdGlu
-X3N0cm5jcHnigJkgc3BlY2lmaWVkIGJvdW5kIDgwIGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFst
-V2Vycm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgMTA2IHwgICByZXR1cm4gX19idWlsdGluX19f
-c3RybmNweV9jaGsgKF9fZGVzdCwgX19zcmMsIF9fbGVuLCBfX2JvcyAoX19kZXN0KSk7CiAgICAg
-IHwgICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJv
-cnMKbWFrZVsxXTogKioqIFtNYWtlZmlsZTo5NTAxOiBwcm9maWxlcy9hdWRpby9ibHVldG9vdGhk
-LWF2Y3RwLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MzAyOiBhbGxdIEVycm9yIDIK
-CgojIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMKVGVzdDogTWFrZSBDaGVjayAtIEZBSUwK
-RGVzYzogUnVuICdtYWtlIGNoZWNrJwpPdXRwdXQ6CkluIGZpbGUgaW5jbHVkZWQgZnJvbSAvdXNy
-L2luY2x1ZGUvc3RyaW5nLmg6NDk1LAogICAgICAgICAgICAgICAgIGZyb20gL3Vzci9pbmNsdWRl
-L2dsaWItMi4wL2dsaWIvZ3Rlc3R1dGlscy5oOjMwLAogICAgICAgICAgICAgICAgIGZyb20gL3Vz
-ci9pbmNsdWRlL2dsaWItMi4wL2dsaWIuaDo4NSwKICAgICAgICAgICAgICAgICBmcm9tIHByb2Zp
-bGVzL2F1ZGlvL2F2Y3RwLmM6MzA6CkluIGZ1bmN0aW9uIOKAmHN0cm5jcHnigJksCiAgICBpbmxp
-bmVkIGZyb20g4oCYdWlucHV0X2NyZWF0ZS5jb25zdHByb3DigJkgYXQgcHJvZmlsZXMvYXVkaW8v
-YXZjdHAuYzoxMTgwOjM6Ci91c3IvaW5jbHVkZS94ODZfNjQtbGludXgtZ251L2JpdHMvc3RyaW5n
-X2ZvcnRpZmllZC5oOjEwNjoxMDogZXJyb3I6IOKAmF9fYnVpbHRpbl9zdHJuY3B54oCZIHNwZWNp
-ZmllZCBib3VuZCA4MCBlcXVhbHMgZGVzdGluYXRpb24gc2l6ZSBbLVdlcnJvcj1zdHJpbmdvcC10
-cnVuY2F0aW9uXQogIDEwNiB8ICAgcmV0dXJuIF9fYnVpbHRpbl9fX3N0cm5jcHlfY2hrIChfX2Rl
-c3QsIF9fc3JjLCBfX2xlbiwgX19ib3MgKF9fZGVzdCkpOwogICAgICB8ICAgICAgICAgIF5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-CmNjMTogYWxsIHdhcm5pbmdzIGJlaW5nIHRyZWF0ZWQgYXMgZXJyb3JzCm1ha2VbMV06ICoqKiBb
-TWFrZWZpbGU6OTUwMTogcHJvZmlsZXMvYXVkaW8vYmx1ZXRvb3RoZC1hdmN0cC5vXSBFcnJvciAx
-Cm1ha2U6ICoqKiBbTWFrZWZpbGU6MTEzMDY6IGNoZWNrXSBFcnJvciAyCgoKIyMjIyMjIyMjIyMj
-IyMjIyMjIyMjIyMjIyMjIyMjClRlc3Q6IEJ1aWxkIHcvZXh0IEVMTCAtIE1ha2UgLSBGQUlMCkRl
-c2M6IEJ1aWxkIEJsdWVaIHNvdXJjZSB3aXRoICctLWVuYWJsZS1leHRlcm5hbC1lbGwnIGNvbmZp
-Z3VyYXRpb24KT3V0cHV0Ogp0b29scy9tZ210LXRlc3Rlci5jOiBJbiBmdW5jdGlvbiDigJhtYWlu
-4oCZOgp0b29scy9tZ210LXRlc3Rlci5jOjEyMzY0OjU6IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5n
-IHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZhci10cmFja2luZy1hc3NpZ25tZW50c+KA
-mSwgcmV0cnlpbmcgd2l0aG91dAoxMjM2NCB8IGludCBtYWluKGludCBhcmdjLCBjaGFyICphcmd2
-W10pCiAgICAgIHwgICAgIF5+fn4KdW5pdC90ZXN0LWF2ZHRwLmM6IEluIGZ1bmN0aW9uIOKAmG1h
-aW7igJk6CnVuaXQvdGVzdC1hdmR0cC5jOjc2Njo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBz
-aXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCYLWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJks
-IHJldHJ5aW5nIHdpdGhvdXQKICA3NjYgfCBpbnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltd
-KQogICAgICB8ICAgICBefn5+CnVuaXQvdGVzdC1hdnJjcC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu
-4oCZOgp1bml0L3Rlc3QtYXZyY3AuYzo5ODk6NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6
-ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1mdmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCBy
-ZXRyeWluZyB3aXRob3V0CiAgOTg5IHwgaW50IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkK
-ICAgICAgfCAgICAgXn5+fgpJbiBmaWxlIGluY2x1ZGVkIGZyb20gL3Vzci9pbmNsdWRlL3N0cmlu
-Zy5oOjQ5NSwKICAgICAgICAgICAgICAgICBmcm9tIC91c3IvaW5jbHVkZS9nbGliLTIuMC9nbGli
-L2d0ZXN0dXRpbHMuaDozMCwKICAgICAgICAgICAgICAgICBmcm9tIC91c3IvaW5jbHVkZS9nbGli
-LTIuMC9nbGliLmg6ODUsCiAgICAgICAgICAgICAgICAgZnJvbSBwcm9maWxlcy9hdWRpby9hdmN0
-cC5jOjMwOgpJbiBmdW5jdGlvbiDigJhzdHJuY3B54oCZLAogICAgaW5saW5lZCBmcm9tIOKAmHVp
-bnB1dF9jcmVhdGUuY29uc3Rwcm9w4oCZIGF0IHByb2ZpbGVzL2F1ZGlvL2F2Y3RwLmM6MTE4MDoz
-OgovdXNyL2luY2x1ZGUveDg2XzY0LWxpbnV4LWdudS9iaXRzL3N0cmluZ19mb3J0aWZpZWQuaDox
-MDY6MTA6IGVycm9yOiDigJhfX2J1aWx0aW5fc3RybmNweeKAmSBzcGVjaWZpZWQgYm91bmQgODAg
-ZXF1YWxzIGRlc3RpbmF0aW9uIHNpemUgWy1XZXJyb3I9c3RyaW5nb3AtdHJ1bmNhdGlvbl0KICAx
-MDYgfCAgIHJldHVybiBfX2J1aWx0aW5fX19zdHJuY3B5X2NoayAoX19kZXN0LCBfX3NyYywgX19s
-ZW4sIF9fYm9zIChfX2Rlc3QpKTsKICAgICAgfCAgICAgICAgICBefn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fgpjYzE6IGFsbCB3YXJu
-aW5ncyBiZWluZyB0cmVhdGVkIGFzIGVycm9ycwptYWtlWzFdOiAqKiogW01ha2VmaWxlOjk1MDE6
-IHByb2ZpbGVzL2F1ZGlvL2JsdWV0b290aGQtYXZjdHAub10gRXJyb3IgMQptYWtlOiAqKiogW01h
-a2VmaWxlOjQzMDI6IGFsbF0gRXJyb3IgMgoKCiMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMj
-IwpUZXN0OiBJbmNyZW1lbnRhbCBCdWlsZCB3aXRoIHBhdGNoZXMgLSBGQUlMCkRlc2M6IEluY3Jl
-bWVudGFsIGJ1aWxkIHBlciBwYXRjaCBpbiB0aGUgc2VyaWVzCk91dHB1dDoKdG9vbHMvbWdtdC10
-ZXN0ZXIuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdG9vbHMvbWdtdC10ZXN0ZXIuYzoxMjM2
-NDo1OiBub3RlOiB2YXJpYWJsZSB0cmFja2luZyBzaXplIGxpbWl0IGV4Y2VlZGVkIHdpdGgg4oCY
-LWZ2YXItdHJhY2tpbmctYXNzaWdubWVudHPigJksIHJldHJ5aW5nIHdpdGhvdXQKMTIzNjQgfCBp
-bnQgbWFpbihpbnQgYXJnYywgY2hhciAqYXJndltdKQogICAgICB8ICAgICBefn5+CnVuaXQvdGVz
-dC1hdmR0cC5jOiBJbiBmdW5jdGlvbiDigJhtYWlu4oCZOgp1bml0L3Rlc3QtYXZkdHAuYzo3NjY6
-NTogbm90ZTogdmFyaWFibGUgdHJhY2tpbmcgc2l6ZSBsaW1pdCBleGNlZWRlZCB3aXRoIOKAmC1m
-dmFyLXRyYWNraW5nLWFzc2lnbm1lbnRz4oCZLCByZXRyeWluZyB3aXRob3V0CiAgNzY2IHwgaW50
-IG1haW4oaW50IGFyZ2MsIGNoYXIgKmFyZ3ZbXSkKICAgICAgfCAgICAgXn5+fgp1bml0L3Rlc3Qt
-YXZyY3AuYzogSW4gZnVuY3Rpb24g4oCYbWFpbuKAmToKdW5pdC90ZXN0LWF2cmNwLmM6OTg5OjU6
-IG5vdGU6IHZhcmlhYmxlIHRyYWNraW5nIHNpemUgbGltaXQgZXhjZWVkZWQgd2l0aCDigJgtZnZh
-ci10cmFja2luZy1hc3NpZ25tZW50c+KAmSwgcmV0cnlpbmcgd2l0aG91dAogIDk4OSB8IGludCBt
-YWluKGludCBhcmdjLCBjaGFyICphcmd2W10pCiAgICAgIHwgICAgIF5+fn4KSW4gZmlsZSBpbmNs
-dWRlZCBmcm9tIC91c3IvaW5jbHVkZS9zdHJpbmcuaDo0OTUsCiAgICAgICAgICAgICAgICAgZnJv
-bSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi9ndGVzdHV0aWxzLmg6MzAsCiAgICAgICAgICAg
-ICAgICAgZnJvbSAvdXNyL2luY2x1ZGUvZ2xpYi0yLjAvZ2xpYi5oOjg1LAogICAgICAgICAgICAg
-ICAgIGZyb20gcHJvZmlsZXMvYXVkaW8vYXZjdHAuYzozMDoKSW4gZnVuY3Rpb24g4oCYc3RybmNw
-eeKAmSwKICAgIGlubGluZWQgZnJvbSDigJh1aW5wdXRfY3JlYXRlLmNvbnN0cHJvcOKAmSBhdCBw
-cm9maWxlcy9hdWRpby9hdmN0cC5jOjExODA6MzoKL3Vzci9pbmNsdWRlL3g4Nl82NC1saW51eC1n
-bnUvYml0cy9zdHJpbmdfZm9ydGlmaWVkLmg6MTA2OjEwOiBlcnJvcjog4oCYX19idWlsdGluX3N0
-cm5jcHnigJkgc3BlY2lmaWVkIGJvdW5kIDgwIGVxdWFscyBkZXN0aW5hdGlvbiBzaXplIFstV2Vy
-cm9yPXN0cmluZ29wLXRydW5jYXRpb25dCiAgMTA2IHwgICByZXR1cm4gX19idWlsdGluX19fc3Ry
-bmNweV9jaGsgKF9fZGVzdCwgX19zcmMsIF9fbGVuLCBfX2JvcyAoX19kZXN0KSk7CiAgICAgIHwg
-ICAgICAgICAgXn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+fn5+
-fn5+fn5+fn5+fn5+fn4KY2MxOiBhbGwgd2FybmluZ3MgYmVpbmcgdHJlYXRlZCBhcyBlcnJvcnMK
-bWFrZVsxXTogKioqIFtNYWtlZmlsZTo5NTAxOiBwcm9maWxlcy9hdWRpby9ibHVldG9vdGhkLWF2
-Y3RwLm9dIEVycm9yIDEKbWFrZTogKioqIFtNYWtlZmlsZTo0MzAyOiBhbGxdIEVycm9yIDIKCgoK
-Ci0tLQpSZWdhcmRzLApMaW51eCBCbHVldG9vdGgKCg==
+Enable wake on bluetooth on mt7921s that can be supported since the
+firmware with version 20211129211059 was added, and the patch would
+not cause any harm even when the old firmware is applied.
 
---===============2614464520479526615==--
+The patch was tested by setting up an HID or HOGP profile to connect a
+Bluetooth keyboard and mouse, then putting the system to suspend, then
+trying to wake up the system by moving the Bluetooth keyboard or mouse,
+and then checking if the system can wake up and be brought back to
+the normal state.
+
+Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+---
+v2: refine the git message
+v3:
+    1. fit to single line as possible
+    2. move the skb variable into local scope
+    3. free skb after calling __hci_cmd_sync
+    4. make bt_awake as const struct btmtk_wakeon
+---
+ drivers/bluetooth/btmtk.h     |  8 ++++++++
+ drivers/bluetooth/btmtksdio.c | 33 ++++++++++++++++++++++++++++++++-
+ 2 files changed, 40 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+index 6e7b0c7567c0..2be1d2680ad8 100644
+--- a/drivers/bluetooth/btmtk.h
++++ b/drivers/bluetooth/btmtk.h
+@@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+ 	u8 time_compensation;
+ } __packed;
+ 
++struct btmtk_wakeon {
++	u8 mode;
++	u8 gpo;
++	u8 active_high;
++	__le16 enable_delay;
++	__le16 wakeup_delay;
++} __packed;
++
+ struct btmtk_hci_wmt_params {
+ 	u8 op;
+ 	u8 flag;
+diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+index b5ea8d3bffaa..b79cee84f590 100644
+--- a/drivers/bluetooth/btmtksdio.c
++++ b/drivers/bluetooth/btmtksdio.c
+@@ -958,6 +958,32 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+ 	return 0;
+ }
+ 
++static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
++{
++	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
++	bool may_wakeup = device_may_wakeup(bdev->dev);
++	const struct btmtk_wakeon bt_awake = {
++		.mode = 0x1,
++		.gpo = 0,
++		.active_high = 0x1,
++		.enable_delay = cpu_to_le16(0xc80),
++		.wakeup_delay = cpu_to_le16(0x20)
++	};
++
++	if (may_wakeup && bdev->data->chipid == 0x7921) {
++		struct sk_buff *skb;
++
++		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
++				      &bt_awake, HCI_CMD_TIMEOUT);
++		if (IS_ERR(skb))
++			may_wakeup = false;
++
++		kfree_skb(skb);
++	}
++
++	return may_wakeup;
++}
++
+ static int btmtksdio_probe(struct sdio_func *func,
+ 			   const struct sdio_device_id *id)
+ {
+@@ -998,6 +1024,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	hdev->shutdown = btmtksdio_shutdown;
+ 	hdev->send     = btmtksdio_send_frame;
+ 	hdev->set_bdaddr = btmtk_set_bdaddr;
++	hdev->wakeup = btmtk_sdio_wakeup;
+ 
+ 	SET_HCIDEV_DEV(hdev, &func->dev);
+ 
+@@ -1032,7 +1059,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+ 	 */
+ 	pm_runtime_put_noidle(bdev->dev);
+ 
+-	return 0;
++	err = device_init_wakeup(bdev->dev, true);
++	if (err)
++		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
++
++	return err;
+ }
+ 
+ static void btmtksdio_remove(struct sdio_func *func)
+-- 
+2.25.1
+
