@@ -2,59 +2,59 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 82778C4332F
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 19:50:08 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id D08B4C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 19:50:07 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350171AbhLWTuI (ORCPT
+        id S1350173AbhLWTuH (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Dec 2021 14:50:08 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33562 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350174AbhLWTuH (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
         Thu, 23 Dec 2021 14:50:07 -0500
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60CC1C061401
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 11:50:07 -0800 (PST)
-Received: by mail-pl1-x636.google.com with SMTP id w7so4584103plp.13
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 11:50:07 -0800 (PST)
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:33560 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S1350170AbhLWTuG (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Dec 2021 14:50:06 -0500
+Received: from mail-pl1-x62e.google.com (mail-pl1-x62e.google.com [IPv6:2607:f8b0:4864:20::62e])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6C38C061401
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 11:50:06 -0800 (PST)
+Received: by mail-pl1-x62e.google.com with SMTP id j13so5133866plx.4
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 11:50:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=gmail.com; s=20210112;
         h=from:to:subject:date:message-id:in-reply-to:references:mime-version
          :content-transfer-encoding;
-        bh=9ihzvmfL1JKR63zuErQK+qR+qt0qyup6+/MlQjMaiNo=;
-        b=OTkXxK2yRnb1cD636Xr0YoBRLHOtcwQJa9+RSicFMC7EGY39ZwXS1Nqqxs18P/1ybP
-         EDtaP4okx25FPYoeXixSUaS9g+sGFQ1pCohrNjRs3o4XKbcS8zsUrG5CTBWPZsSjcuiz
-         dQY1Ym6z+Nxjq6IbwTDNlD1QwSxor+xSANxjpH+RH1V726s8iCBlb67ifx010Ol+xHs0
-         2gNi5fiQnlcGU7kjjFuE8IFzutKX+T7sFUfaBn/mmsm8tvDgeiNXOuS89JcDedQlQ+Lg
-         xLel99zKW3fQx+VYo+nl+WfgnwvYpGT6WSTnhkd6RI9fI+y0RSQ46thR7hexIz//n5wC
-         /GOA==
+        bh=Y1ismcWgDnFFXISLA/l57y2B3Rq2xdUkaw18gPCSGm0=;
+        b=J2lS0iRw5GOOkYspCEPwL67WJGoMMJgZHxHo5YI4B40OVQ8x0JVrF5X7snviYiRxBm
+         6Mj9UigBFR+mcFKAdpMhRQRGAI5TkwMx30Pw9z8kRUsy/0tk/SkRrGdBh8YDLlEUtarK
+         5Wf+xvDhCHGb1gWxDOO6JrlcrILFYbbD5I8aJHEcknoHNadtkShay1Uh9B9CkUYqi/fR
+         6ErAjh1NOj4Wi44OAIkmWi0Djpzbx7KuFtLwmXiQTRjYYx/6P8fScVt7lSmC6CNrUxME
+         HvV9rn9nlcZKHeWbaWD+Ms50k7R8i+miOm9ypPFlV6ZcaC8tKmOGWer0AGIDpRson0k5
+         LtdA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20210112;
         h=x-gm-message-state:from:to:subject:date:message-id:in-reply-to
          :references:mime-version:content-transfer-encoding;
-        bh=9ihzvmfL1JKR63zuErQK+qR+qt0qyup6+/MlQjMaiNo=;
-        b=jzkTHzo/Wq2yULtRls/yGIqL7X+EMEsPl7vdeQO+JYEKxDjU/vOaIOiX4Us793mizk
-         woEJjcvUFJc24JTaR+NZKwv8AteRiTRuib/Ij3n3mjBPzdOtRiXgUWcQ/R6j1V64YcrB
-         PUv7BVcGa+rVAyni7qpDfW6uEvx8qVSt93xzJnIdpEv+C/BplqJAup/kohHwsqNVxvYW
-         Qn6/5gVG7N3+K4vDorhwdgrkWQWyAguiOOolnprFtZxm7RAM+66O0dpW64oNQDu/FwdT
-         snT2fESiF434k4HinGbzLWwX/tVnqNUOW5oU2n2gZDfU/Xw5kVlnDC1OOsW1GzimlDUx
-         pgKg==
-X-Gm-Message-State: AOAM530GoVbG7W5yJqabj4NhNlNDdAWccjQMHHutwmxyCYD5NtVvXlTY
-        CX/EcF2csScQFSM8El8HB8T8nvgXs0s=
-X-Google-Smtp-Source: ABdhPJxYarq5ZTuDZXV1fTBsMOiFKCOpQXQ9rwEAMrd0i9nitC8InIUOmgXgH4pTlePCfuTpcIphWw==
-X-Received: by 2002:a17:90b:4390:: with SMTP id in16mr4228620pjb.14.1640289006584;
+        bh=Y1ismcWgDnFFXISLA/l57y2B3Rq2xdUkaw18gPCSGm0=;
+        b=VkjHwYucSEC9lwaM0L6MbmTE9pVOdN0Q/GSr4NR0KHNlr6Tj0tM7tnnBkU6YgREBuA
+         KIReBI1p5qVNCn3x74N50N47VK+pI2MaZHXLk3xmtg2duvbGT0eeCvzLGhGR0V8fbyQl
+         thrMumh6jlN3KAK1rRT2eCCrCT3zmtgkcQHzJJ+Ch3HVm9BKXrauGPXqmkXNRiMyI05N
+         /3Z+yk7A/e8FAaexDIRFduiOQ1t4tqymz1Ve3sBWOd0h/RcriLuZjNdmp1DgWhDnhWch
+         AQQJmV6iQ4oieI6RgdQfhN7H9ANgEG0fI9iwLQYLM3yQzlIiYWWW6kn10o44xDk/eDZZ
+         n55w==
+X-Gm-Message-State: AOAM530jFQk+hVCnm1tARvzAbanIqz+MeHSG1OnRyQli5gWEvVqx9pI4
+        w1uJffGZ3RSGB91kwXi8p1QOwDe3as4=
+X-Google-Smtp-Source: ABdhPJz6j0EmrEFzEXlo/H0D0gyJNlEAKSbauzgiquuqffrES3L57HllHBUI+1sc00vOAYbGGs4xKg==
+X-Received: by 2002:a17:90a:aa95:: with SMTP id l21mr4171312pjq.215.1640289006014;
         Thu, 23 Dec 2021 11:50:06 -0800 (PST)
 Received: from lvondent-mobl4.intel.com (c-71-56-157-77.hsd1.or.comcast.net. [71.56.157.77])
-        by smtp.gmail.com with ESMTPSA id mu2sm6631894pjb.43.2021.12.23.11.50.06
+        by smtp.gmail.com with ESMTPSA id mu2sm6631894pjb.43.2021.12.23.11.50.05
         for <linux-bluetooth@vger.kernel.org>
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 11:50:06 -0800 (PST)
+        Thu, 23 Dec 2021 11:50:05 -0800 (PST)
 From:   Luiz Augusto von Dentz <luiz.dentz@gmail.com>
 To:     linux-bluetooth@vger.kernel.org
-Subject: [PATCH v4 4/4] gattrib: Fix passing NULL to memcpy
-Date:   Thu, 23 Dec 2021 11:50:03 -0800
-Message-Id: <20211223195003.1647434-4-luiz.dentz@gmail.com>
+Subject: [PATCH v4 3/4] bootstrap-configure: Enable sanitizer options
+Date:   Thu, 23 Dec 2021 11:50:02 -0800
+Message-Id: <20211223195003.1647434-3-luiz.dentz@gmail.com>
 X-Mailer: git-send-email 2.33.1
 In-Reply-To: <20211223195003.1647434-1-luiz.dentz@gmail.com>
 References: <20211223195003.1647434-1-luiz.dentz@gmail.com>
@@ -66,29 +66,25 @@ X-Mailing-List: linux-bluetooth@vger.kernel.org
 
 From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-This fixes the following runtime error:
-
-  attrib/gattrib.c:198:2: runtime error: null pointer passed as
-  argument 2, which is declared to never be null
+This makes bootstrap-configure enables all sanitizers.
 ---
- attrib/gattrib.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
+ bootstrap-configure | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/attrib/gattrib.c b/attrib/gattrib.c
-index 270a37ebe..041b9d289 100644
---- a/attrib/gattrib.c
-+++ b/attrib/gattrib.c
-@@ -195,7 +195,9 @@ static uint8_t *construct_full_pdu(uint8_t opcode, const void *pdu,
- 		return NULL;
- 
- 	buf[0] = opcode;
--	memcpy(buf + 1, pdu, length);
-+
-+	if (pdu && length)
-+		memcpy(buf + 1, pdu, length);
- 
- 	return buf;
- }
+diff --git a/bootstrap-configure b/bootstrap-configure
+index a34be8320..8172840d5 100755
+--- a/bootstrap-configure
++++ b/bootstrap-configure
+@@ -28,6 +28,9 @@ fi
+ 		--enable-btpclient \
+ 		--enable-logger \
+ 		--enable-pie \
++		--enable-asan \
++		--enable-lsan \
++		--enable-ubsan \
+ 		--enable-cups \
+ 		--enable-library \
+ 		--enable-admin \
 -- 
 2.33.1
 
