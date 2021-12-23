@@ -2,225 +2,100 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 5887EC433F5
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 21:24:17 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0123C433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 22:12:33 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1350343AbhLWVYQ convert rfc822-to-8bit (ORCPT
+        id S234631AbhLWWMc (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Dec 2021 16:24:16 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:54905 "EHLO
-        mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S1350340AbhLWVYQ (ORCPT
+        Thu, 23 Dec 2021 17:12:32 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36236 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S234511AbhLWWMb (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Dec 2021 16:24:16 -0500
-Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id CC932CED2E;
-        Thu, 23 Dec 2021 22:24:13 +0100 (CET)
-Content-Type: text/plain;
-        charset=utf-8
-Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [RFC PATCH v2] Bluetooth: btintel: Fix broken LED quirk for
- legacy ROM devices
-From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <5b0ddedd9c6c119d4c3c4b65adaabe5d86bd166f.camel@intel.com>
-Date:   Thu, 23 Dec 2021 22:24:13 +0100
-Cc:     "hj.tedd.an@gmail.com" <hj.tedd.an@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
-Content-Transfer-Encoding: 8BIT
-Message-Id: <6EBC0BA5-E39D-4C9F-849D-C7972BDD9582@holtmann.org>
-References: <20211216210958.62129-1-hj.tedd.an@gmail.com>
- <B5187291-3173-4BFB-8465-25AB75BA328E@holtmann.org>
- <39a9b9c68cdb9fbf32f3c6023c0272b53d37d668.camel@intel.com>
- <768826DA-51CF-4EA2-B582-89BFE843EBAE@holtmann.org>
- <f1ffad7eebc385d43f4f48d138021860f8e582cd.camel@intel.com>
- <F93FE723-881E-45D6-8A43-379B0ABAC363@holtmann.org>
- <5b0ddedd9c6c119d4c3c4b65adaabe5d86bd166f.camel@intel.com>
-To:     "An, Tedd" <tedd.an@intel.com>
-X-Mailer: Apple Mail (2.3693.40.0.1.81)
+        Thu, 23 Dec 2021 17:12:31 -0500
+Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D41FC061401
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 14:12:31 -0800 (PST)
+Received: by mail-qk1-x72f.google.com with SMTP id 131so6805619qkk.2
+        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 14:12:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20210112;
+        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
+         :references;
+        bh=mTTyYfcP/ojZZl1vuL3IIFjd7Mjcnnu8W+X+TEnGgqE=;
+        b=Coo0oajbQ2py4wzmRWpdTO1e/yLGGS8Z5V8fQ5RWYjo3YQr1X3nakO166mIVmFhlF6
+         uNEvjvPel/AKJIQTKrli/0FskLRfHrepSCg619CGsTzseVGrgvOgbP8q+ltyQ+tmh7IO
+         89F729bdX4K8XSZ5uVwAiAHkl+oECOhs2dIacOgFXmOEbTD0oyt6nbZidfHGdNpbrUAr
+         8WWvpRrvc56w0JRO0VQIwu0kIqmTF5eAZkqzccZ7iKk3BlymJu+x2K+SbFHeJn166FKO
+         TlR9bqeb8mUIS5wgSy/z+ZUPmaqvXkS9h9pQWLZKysJSFIOWKL4O0zzgZg3Vu3ANszVr
+         N2sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
+         :reply-to:in-reply-to:references;
+        bh=mTTyYfcP/ojZZl1vuL3IIFjd7Mjcnnu8W+X+TEnGgqE=;
+        b=7lbiF4vj35hUl7On9xH9jefHeGIzChzQuGCfDeAQ60NPACs2w2EuI38YIfLO+XrraF
+         fU/5kDe5qaQfGmPJykxa494rgfT06Acos1RemQXChYI/HFcrc6Lk45yoTqfnvnNt9pim
+         m1/hPvSx+Z0bSkNEuFvnbC51IwPShKVpU2lIw9NBA11EIIq+pjtSaUnopTJNViDA8R7v
+         FPmoQS/TbZvo7/9HbdUlJXOMYvjIXiMti3ylalQ60fwy7UG2BlOiL52q20lRxT3a5AEL
+         haqiRYh/7CsQUsra/Z4GqHS8hv8rcdutEAenHDFlPXjfDR4E7ntWhtyy1uiBWk/lAxO7
+         o09g==
+X-Gm-Message-State: AOAM530NSELrmiiwesV+AvwFGKZb2codot8RlvS0p8sIH6jIHRJXodSV
+        La8jLAob8YHbtWP7kkGU+w15rd7614hMrA==
+X-Google-Smtp-Source: ABdhPJwEov5duQTglH3bsm3yZNsqiVXfpKjWy0fWb/7gMsTdLcp5UjQlbxV/az66R5OPpkFZwnyLjA==
+X-Received: by 2002:a05:620a:288c:: with SMTP id j12mr2894373qkp.66.1640297550566;
+        Thu, 23 Dec 2021 14:12:30 -0800 (PST)
+Received: from [172.17.0.2] ([20.122.142.171])
+        by smtp.gmail.com with ESMTPSA id s8sm5471331qkp.110.2021.12.23.14.12.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Dec 2021 14:12:30 -0800 (PST)
+Message-ID: <61c4f44e.1c69fb81.b9e4a.c3d0@mx.google.com>
+Date:   Thu, 23 Dec 2021 14:12:30 -0800 (PST)
+Content-Type: multipart/mixed; boundary="===============0135122632399305020=="
+MIME-Version: 1.0
+From:   bluez.test.bot@gmail.com
+To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Subject: RE: [v4,1/4] build: Add sanitizer options
+Reply-To: linux-bluetooth@vger.kernel.org
+In-Reply-To: <20211223195003.1647434-1-luiz.dentz@gmail.com>
+References: <20211223195003.1647434-1-luiz.dentz@gmail.com>
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+--===============0135122632399305020==
+Content-Type: text/plain; charset="us-ascii"
+MIME-Version: 1.0
+Content-Transfer-Encoding: 7bit
 
->>>>>>> This patch fixes the broken LED quirk for Intel legacy ROM devices.
->>>>>>> To fix the LED issue that doesn't turn off immediately, the host
->>>>>>> sends
->>>>>>> the SW RFKILL command while shutting down the interface and it puts
->>>>>>> the
->>>>>>> devices in an asserted state.
->>>>>>> 
->>>>>>> Once the device is in SW RFKILL state, it can only accept HCI_Reset
->>>>>>> to
->>>>>>> exit from the SW RFKILL state. This patch checks the quirk and sends
->>>>>>> the
->>>>>>> HCI_Reset before sending the HCI_Intel_Read_Version command.
->>>>>>> 
->>>>>>> The affected legacy ROM devices are
->>>>>>> - 8087:0a2a
->>>>>>> - 8087:0aa7
->>>>>>> 
->>>>>>> fixes: ffcba827c0a1d ("Bluetooth: btintel: Fix the LED is not
->>>>>>> turning
->>>>>>> off
->>>>>>> immediately")
->>>>>>> 
->>>>>>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
->>>>>>> ---
->>>>>>> drivers/bluetooth/btintel.c | 13 ++++++-------
->>>>>>> drivers/bluetooth/btusb.c   | 10 ++++++++--
->>>>>>> 2 files changed, 14 insertions(+), 9 deletions(-)
->>>>>>> 
->>>>>>> diff --git a/drivers/bluetooth/btintel.c
->>>>>>> b/drivers/bluetooth/btintel.c
->>>>>>> index e1f96df847b8..75f8d7aceb35 100644
->>>>>>> --- a/drivers/bluetooth/btintel.c
->>>>>>> +++ b/drivers/bluetooth/btintel.c
->>>>>>> @@ -2355,8 +2355,13 @@ static int btintel_setup_combined(struct
->>>>>>> hci_dev
->>>>>>> *hdev)
->>>>>>>          * As a workaround, send HCI Reset command first which will
->>>>>>> reset the
->>>>>>>          * number of completed commands and allow normal command
->>>>>>> processing
->>>>>>>          * from now on.
->>>>>>> +        *
->>>>>>> +        * For INTEL_BROKEN_LED, these devices have an issue with
->>>>>>> LED
->>>>>>> which
->>>>>>> +        * doesn't go off immediately during shutdown. Set the flag
->>>>>>> here
->>>>>>> to
->>>>>>> send
->>>>>>> +        * the LED OFF command during shutdown.
->>>>>>>          */
->>>>>>> -       if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD)) {
->>>>>>> +       if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD) ||
->>>>>>> +                               btintel_test_flag(hdev,
->>>>>>> INTEL_BROKEN_LED)) {
->>>>>>>                 skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
->>>>>>>                                      HCI_INIT_TIMEOUT);
->>>>>>>                 if (IS_ERR(skb)) {
->>>>>>> @@ -2428,12 +2433,6 @@ static int btintel_setup_combined(struct
->>>>>>> hci_dev
->>>>>>> *hdev)
->>>>>>>                                
->>>>>>> set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
->>>>>>>                                         &hdev->quirks);
->>>>>>> 
->>>>>>> -                       /* These devices have an issue with LED
->>>>>>> which
->>>>>>> doesn't
->>>>>>> -                        * go off immediately during shutdown. Set
->>>>>>> the
->>>>>>> flag
->>>>>>> -                        * here to send the LED OFF command during
->>>>>>> shutdown.
->>>>>>> -                        */
->>>>>>> -                       btintel_set_flag(hdev, INTEL_BROKEN_LED);
->>>>>>> -
->>>>>>>                         err = btintel_legacy_rom_setup(hdev, &ver);
->>>>>>>                         break;
->>>>>>>                 case 0x0b:      /* SfP */
->>>>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>>>>> index d1bd9ee0a6ab..c6a070d5284f 100644
->>>>>>> --- a/drivers/bluetooth/btusb.c
->>>>>>> +++ b/drivers/bluetooth/btusb.c
->>>>>>> @@ -60,6 +60,7 @@ static struct usb_driver btusb_driver;
->>>>>>> #define BTUSB_WIDEBAND_SPEECH   0x400000
->>>>>>> #define BTUSB_VALID_LE_STATES   0x800000
->>>>>>> #define BTUSB_QCA_WCN6855       0x1000000
->>>>>>> +#define BTUSB_INTEL_BROKEN_LED 0x2000000
->>>>>>> #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
->>>>>>> 
->>>>>>> static const struct usb_device_id btusb_table[] = {
->>>>>>> @@ -382,9 +383,11 @@ static const struct usb_device_id
->>>>>>> blacklist_table[]
->>>>>>> = {
->>>>>>>         { USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
->>>>>>>         { USB_DEVICE(0x8087, 0x07dc), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED |
->>>>>>>                                                     
->>>>>>> BTUSB_INTEL_BROKEN_INITIAL_NCMD },
->>>>>>> -       { USB_DEVICE(0x8087, 0x0a2a), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED },
->>>>>>> +       { USB_DEVICE(0x8087, 0x0a2a), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED |
->>>>>>> +                                                   
->>>>>>> BTUSB_INTEL_BROKEN_LED },
->>>>>>>         { USB_DEVICE(0x8087, 0x0a2b), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED },
->>>>>>> -       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED },
->>>>>>> +       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED |
->>>>>>> +                                                   
->>>>>>> BTUSB_INTEL_BROKEN_LED },
->>>>>>>         { USB_DEVICE(0x8087, 0x0aaa), .driver_info =
->>>>>>> BTUSB_INTEL_COMBINED },
->>>>>> 
->>>>>> this is the part that I tried to avoid.
->>>>> 
->>>>> I remembered it but I couldn't find any other way. 
->>>>> 
->>>>> I already tried the method below but it didn't work especially for the
->>>>> reboot
->>>>> (warm boot) case becase the platform keeps the USB power while rebooting
->>>>> the
->>>>> system and BT device is still in the SW RFKILL state. 
->>>>> The flag sets in the btintel_shutdown_combined() doesn't stay because
->>>>> the
->>>>> HDEV
->>>>> and the driver data are freed and allocated again while rebooting. So
->>>>> the
->>>>> intel_flag_test_and_clear(INTEL_SHUTDOWN_EXECUTED) is never TRUE.
->>>> 
->>>> this is the part that I don’t grok. So how do we reset the USB power while
->>>> still keeping it. Does this mean we see a USB Disconnect and USB Reconnect
->>>> happening, but the second time around we enter btusb_probe() we come from
->>>> a
->>>> total different state?
->>>> 
->>>> And how does it make sense that calling hdev->shutdown() ends up in
->>>> btusb_remove() + btusb_probe(). I am confused.
->>> 
->>> I think I didn't explan the test case enough. There is no issue if the HCI
->>> is up
->>> before rebooting the system. The issue is reproducible only when the HCI
->>> interface is down and reboot.
->>> 
->>> For example, the steps are:
->>> 1. Bluetooth daemon is not running (actually it doesn't matter)
->>> 2. Put HCI Down and it causes hdev->shutdown()->btintel_shutdown_combined()
->>> 3. Now StP is in SW RFKILL state
->>> 4. Reboot
->>> 5. btintel_setup_combined() is called
->>> 6. HCI_Intel_Read_Version command failed.
->>> 
->>> So, the flag value set before the reboot is no longer available/valid after
->>> reboot. Also, while rebooting, I don't see USB disconnect and the device
->>> state
->>> is same as before the reboot.
->> 
->> ok, but this sounds like something we could fix internally in our btintel.c
->> code. If hci_dev struct is still present we should be able to persist flags
->> across ->shutdown and ->setup. If we clear them, then it is our issue. No need
->> to get btusb.c blacklist table involved. What am I missing?
-> 
-> Yes, if hci_dev struct is valid, then we can use the flag.
-> The problem is btintel.c doesn't know whcih SKU it has with until it reads the
-> HCI_Intel_Read_Version command, but this command fails due to SW RFKILL. The
-> only way to tell what SKU has without reading the version command is blacklist
-> table.
-> 
-> One other option is remove the LED quirk for StP/SdP. This is a cosmatic issue
-> and I believe it wouldn't affect any BT functionality.
+This is automated email and please do not reply to this email!
 
-but we succeed with HCI_Intel_Read_Version on a cold boot. So that means it is just that we have to make this one flag persistent. So it is valid even when no HCI_Intel_Read_Version is read. Or just make it a bool variable in the btintel internal struct.
+Dear submitter,
 
-I am failing to see why this wouldn’t work. And I fully realize that I am pedantic here, but I really want to confine these things to internal handling and not have them bleed into the driver.
+Thank you for submitting the patches to the linux bluetooth mailing list.
+This is a CI test results with your patch series:
+PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=601103
 
-Regards
+---Test result---
 
-Marcel
+Test Summary:
+CheckPatch                    PASS      5.43 seconds
+GitLint                       PASS      3.74 seconds
+Prep - Setup ELL              PASS      42.12 seconds
+Build - Prep                  PASS      0.61 seconds
+Build - Configure             PASS      8.43 seconds
+Build - Make                  PASS      1390.99 seconds
+Make Check                    PASS      11.98 seconds
+Make Distcheck                PASS      227.47 seconds
+Build w/ext ELL - Configure   PASS      8.57 seconds
+Build w/ext ELL - Make        PASS      1367.60 seconds
+Incremental Build with patchesPASS      3218.00 seconds
 
+
+
+---
+Regards,
+Linux Bluetooth
+
+
+--===============0135122632399305020==--
