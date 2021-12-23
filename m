@@ -2,186 +2,152 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 7B227C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 08:36:30 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 3684EC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 08:38:26 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1347220AbhLWIg3 convert rfc822-to-8bit (ORCPT
+        id S1347242AbhLWIiZ convert rfc822-to-8bit (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Dec 2021 03:36:29 -0500
-Received: from coyote.holtmann.net ([212.227.132.17]:42617 "EHLO
+        Thu, 23 Dec 2021 03:38:25 -0500
+Received: from coyote.holtmann.net ([212.227.132.17]:39432 "EHLO
         mail.holtmann.org" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S229785AbhLWIg3 (ORCPT
+        with ESMTP id S229785AbhLWIiY (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Dec 2021 03:36:29 -0500
+        Thu, 23 Dec 2021 03:38:24 -0500
 Received: from smtpclient.apple (p5b3d2e91.dip0.t-ipconnect.de [91.61.46.145])
-        by mail.holtmann.org (Postfix) with ESMTPSA id 68914CED21;
-        Thu, 23 Dec 2021 09:36:27 +0100 (CET)
+        by mail.holtmann.org (Postfix) with ESMTPSA id 22EF4CED21;
+        Thu, 23 Dec 2021 09:38:23 +0100 (CET)
 Content-Type: text/plain;
-        charset=utf-8
+        charset=us-ascii
 Mime-Version: 1.0 (Mac OS X Mail 15.0 \(3693.40.0.1.81\))
-Subject: Re: [RFC PATCH v2] Bluetooth: btintel: Fix broken LED quirk for
- legacy ROM devices
+Subject: Re: [PATCH v3 1/3] Bluetooth: mt7921s: Support wake on bluetooth
 From:   Marcel Holtmann <marcel@holtmann.org>
-In-Reply-To: <f1ffad7eebc385d43f4f48d138021860f8e582cd.camel@intel.com>
-Date:   Thu, 23 Dec 2021 09:36:26 +0100
-Cc:     "hj.tedd.an@gmail.com" <hj.tedd.an@gmail.com>,
-        "linux-bluetooth@vger.kernel.org" <linux-bluetooth@vger.kernel.org>
+In-Reply-To: <ceafc644ca9ce926a9fb07f7b3f4e2f701e69c8d.1640165092.git.sean.wang@kernel.org>
+Date:   Thu, 23 Dec 2021 09:38:22 +0100
+Cc:     Johan Hedberg <johan.hedberg@gmail.com>,
+        =?utf-8?B?Ik1hcmstWVcgQ2hlbiAo6Zmz5o+a5paHKSI=?= 
+        <Mark-YW.Chen@mediatek.com>, Soul.Huang@mediatek.com,
+        YN.Chen@mediatek.com, Leon.Yen@mediatek.com,
+        Eric-SY.Chang@mediatek.com, Deren.Wu@mediatek.com,
+        km.lin@mediatek.com, robin.chiu@mediatek.com,
+        Eddie.Chen@mediatek.com, ch.yeh@mediatek.com,
+        posh.sun@mediatek.com, ted.huang@mediatek.com,
+        Eric.Liang@mediatek.com, Stella.Chang@mediatek.com,
+        Tom.Chou@mediatek.com, steve.lee@mediatek.com, jsiuda@google.com,
+        frankgor@google.com, jemele@google.com, abhishekpandit@google.com,
+        Michael Sun <michaelfsun@google.com>,
+        Miao-chen Chou <mcchou@chromium.org>, shawnku@google.com,
+        linux-bluetooth <linux-bluetooth@vger.kernel.org>,
+        linux-mediatek@lists.infradead.org, linux-kernel@vger.kernel.org
 Content-Transfer-Encoding: 8BIT
-Message-Id: <F93FE723-881E-45D6-8A43-379B0ABAC363@holtmann.org>
-References: <20211216210958.62129-1-hj.tedd.an@gmail.com>
- <B5187291-3173-4BFB-8465-25AB75BA328E@holtmann.org>
- <39a9b9c68cdb9fbf32f3c6023c0272b53d37d668.camel@intel.com>
- <768826DA-51CF-4EA2-B582-89BFE843EBAE@holtmann.org>
- <f1ffad7eebc385d43f4f48d138021860f8e582cd.camel@intel.com>
-To:     "An, Tedd" <tedd.an@intel.com>
+Message-Id: <3ED64734-D1D6-4DC3-8065-849AFC79866B@holtmann.org>
+References: <ceafc644ca9ce926a9fb07f7b3f4e2f701e69c8d.1640165092.git.sean.wang@kernel.org>
+To:     Sean Wang <sean.wang@mediatek.com>
 X-Mailer: Apple Mail (2.3693.40.0.1.81)
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-Hi Tedd,
+Hi Sean,
 
->>>>> This patch fixes the broken LED quirk for Intel legacy ROM devices.
->>>>> To fix the LED issue that doesn't turn off immediately, the host sends
->>>>> the SW RFKILL command while shutting down the interface and it puts the
->>>>> devices in an asserted state.
->>>>> 
->>>>> Once the device is in SW RFKILL state, it can only accept HCI_Reset to
->>>>> exit from the SW RFKILL state. This patch checks the quirk and sends the
->>>>> HCI_Reset before sending the HCI_Intel_Read_Version command.
->>>>> 
->>>>> The affected legacy ROM devices are
->>>>> - 8087:0a2a
->>>>> - 8087:0aa7
->>>>> 
->>>>> fixes: ffcba827c0a1d ("Bluetooth: btintel: Fix the LED is not turning
->>>>> off
->>>>> immediately")
->>>>> 
->>>>> Signed-off-by: Tedd Ho-Jeong An <tedd.an@intel.com>
->>>>> ---
->>>>> drivers/bluetooth/btintel.c | 13 ++++++-------
->>>>> drivers/bluetooth/btusb.c   | 10 ++++++++--
->>>>> 2 files changed, 14 insertions(+), 9 deletions(-)
->>>>> 
->>>>> diff --git a/drivers/bluetooth/btintel.c b/drivers/bluetooth/btintel.c
->>>>> index e1f96df847b8..75f8d7aceb35 100644
->>>>> --- a/drivers/bluetooth/btintel.c
->>>>> +++ b/drivers/bluetooth/btintel.c
->>>>> @@ -2355,8 +2355,13 @@ static int btintel_setup_combined(struct hci_dev
->>>>> *hdev)
->>>>>          * As a workaround, send HCI Reset command first which will
->>>>> reset the
->>>>>          * number of completed commands and allow normal command
->>>>> processing
->>>>>          * from now on.
->>>>> +        *
->>>>> +        * For INTEL_BROKEN_LED, these devices have an issue with LED
->>>>> which
->>>>> +        * doesn't go off immediately during shutdown. Set the flag here
->>>>> to
->>>>> send
->>>>> +        * the LED OFF command during shutdown.
->>>>>          */
->>>>> -       if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD)) {
->>>>> +       if (btintel_test_flag(hdev, INTEL_BROKEN_INITIAL_NCMD) ||
->>>>> +                               btintel_test_flag(hdev,
->>>>> INTEL_BROKEN_LED)) {
->>>>>                 skb = __hci_cmd_sync(hdev, HCI_OP_RESET, 0, NULL,
->>>>>                                      HCI_INIT_TIMEOUT);
->>>>>                 if (IS_ERR(skb)) {
->>>>> @@ -2428,12 +2433,6 @@ static int btintel_setup_combined(struct hci_dev
->>>>> *hdev)
->>>>>                                
->>>>> set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED,
->>>>>                                         &hdev->quirks);
->>>>> 
->>>>> -                       /* These devices have an issue with LED which
->>>>> doesn't
->>>>> -                        * go off immediately during shutdown. Set the
->>>>> flag
->>>>> -                        * here to send the LED OFF command during
->>>>> shutdown.
->>>>> -                        */
->>>>> -                       btintel_set_flag(hdev, INTEL_BROKEN_LED);
->>>>> -
->>>>>                         err = btintel_legacy_rom_setup(hdev, &ver);
->>>>>                         break;
->>>>>                 case 0x0b:      /* SfP */
->>>>> diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
->>>>> index d1bd9ee0a6ab..c6a070d5284f 100644
->>>>> --- a/drivers/bluetooth/btusb.c
->>>>> +++ b/drivers/bluetooth/btusb.c
->>>>> @@ -60,6 +60,7 @@ static struct usb_driver btusb_driver;
->>>>> #define BTUSB_WIDEBAND_SPEECH   0x400000
->>>>> #define BTUSB_VALID_LE_STATES   0x800000
->>>>> #define BTUSB_QCA_WCN6855       0x1000000
->>>>> +#define BTUSB_INTEL_BROKEN_LED 0x2000000
->>>>> #define BTUSB_INTEL_BROKEN_INITIAL_NCMD 0x4000000
->>>>> 
->>>>> static const struct usb_device_id btusb_table[] = {
->>>>> @@ -382,9 +383,11 @@ static const struct usb_device_id blacklist_table[]
->>>>> = {
->>>>>         { USB_DEVICE(0x8087, 0x07da), .driver_info = BTUSB_CSR },
->>>>>         { USB_DEVICE(0x8087, 0x07dc), .driver_info =
->>>>> BTUSB_INTEL_COMBINED |
->>>>>                                                     
->>>>> BTUSB_INTEL_BROKEN_INITIAL_NCMD },
->>>>> -       { USB_DEVICE(0x8087, 0x0a2a), .driver_info =
->>>>> BTUSB_INTEL_COMBINED },
->>>>> +       { USB_DEVICE(0x8087, 0x0a2a), .driver_info =
->>>>> BTUSB_INTEL_COMBINED |
->>>>> +                                                   
->>>>> BTUSB_INTEL_BROKEN_LED },
->>>>>         { USB_DEVICE(0x8087, 0x0a2b), .driver_info =
->>>>> BTUSB_INTEL_COMBINED },
->>>>> -       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =
->>>>> BTUSB_INTEL_COMBINED },
->>>>> +       { USB_DEVICE(0x8087, 0x0aa7), .driver_info =
->>>>> BTUSB_INTEL_COMBINED |
->>>>> +                                                   
->>>>> BTUSB_INTEL_BROKEN_LED },
->>>>>         { USB_DEVICE(0x8087, 0x0aaa), .driver_info =
->>>>> BTUSB_INTEL_COMBINED },
->>>> 
->>>> this is the part that I tried to avoid.
->>> 
->>> I remembered it but I couldn't find any other way. 
->>> 
->>> I already tried the method below but it didn't work especially for the
->>> reboot
->>> (warm boot) case becase the platform keeps the USB power while rebooting the
->>> system and BT device is still in the SW RFKILL state. 
->>> The flag sets in the btintel_shutdown_combined() doesn't stay because the
->>> HDEV
->>> and the driver data are freed and allocated again while rebooting. So the
->>> intel_flag_test_and_clear(INTEL_SHUTDOWN_EXECUTED) is never TRUE.
->> 
->> this is the part that I don’t grok. So how do we reset the USB power while
->> still keeping it. Does this mean we see a USB Disconnect and USB Reconnect
->> happening, but the second time around we enter btusb_probe() we come from a
->> total different state?
->> 
->> And how does it make sense that calling hdev->shutdown() ends up in
->> btusb_remove() + btusb_probe(). I am confused.
+> Enable wake on bluetooth on mt7921s that can be supported since the
+> firmware with version 20211129211059 was added, and the patch would
+> not cause any harm even when the old firmware is applied.
 > 
-> I think I didn't explan the test case enough. There is no issue if the HCI is up
-> before rebooting the system. The issue is reproducible only when the HCI
-> interface is down and reboot.
+> The patch was tested by setting up an HID or HOGP profile to connect a
+> Bluetooth keyboard and mouse, then putting the system to suspend, then
+> trying to wake up the system by moving the Bluetooth keyboard or mouse,
+> and then checking if the system can wake up and be brought back to
+> the normal state.
 > 
-> For example, the steps are:
-> 1. Bluetooth daemon is not running (actually it doesn't matter)
-> 2. Put HCI Down and it causes hdev->shutdown()->btintel_shutdown_combined()
-> 3. Now StP is in SW RFKILL state
-> 4. Reboot
-> 5. btintel_setup_combined() is called
-> 6. HCI_Intel_Read_Version command failed.
+> Co-developed-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Sean Wang <sean.wang@mediatek.com>
+> Signed-off-by: Mark Chen <mark-yw.chen@mediatek.com>
+> ---
+> v2: refine the git message
+> v3:
+>    1. fit to single line as possible
+>    2. move the skb variable into local scope
+>    3. free skb after calling __hci_cmd_sync
+>    4. make bt_awake as const struct btmtk_wakeon
+> ---
+> drivers/bluetooth/btmtk.h     |  8 ++++++++
+> drivers/bluetooth/btmtksdio.c | 33 ++++++++++++++++++++++++++++++++-
+> 2 files changed, 40 insertions(+), 1 deletion(-)
 > 
-> So, the flag value set before the reboot is no longer available/valid after
-> reboot. Also, while rebooting, I don't see USB disconnect and the device state
-> is same as before the reboot.
+> diff --git a/drivers/bluetooth/btmtk.h b/drivers/bluetooth/btmtk.h
+> index 6e7b0c7567c0..2be1d2680ad8 100644
+> --- a/drivers/bluetooth/btmtk.h
+> +++ b/drivers/bluetooth/btmtk.h
+> @@ -68,6 +68,14 @@ struct btmtk_tci_sleep {
+> 	u8 time_compensation;
+> } __packed;
+> 
+> +struct btmtk_wakeon {
+> +	u8 mode;
+> +	u8 gpo;
+> +	u8 active_high;
+> +	__le16 enable_delay;
+> +	__le16 wakeup_delay;
+> +} __packed;
+> +
+> struct btmtk_hci_wmt_params {
+> 	u8 op;
+> 	u8 flag;
+> diff --git a/drivers/bluetooth/btmtksdio.c b/drivers/bluetooth/btmtksdio.c
+> index b5ea8d3bffaa..b79cee84f590 100644
+> --- a/drivers/bluetooth/btmtksdio.c
+> +++ b/drivers/bluetooth/btmtksdio.c
+> @@ -958,6 +958,32 @@ static int btmtksdio_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
+> 	return 0;
+> }
+> 
+> +static bool btmtk_sdio_wakeup(struct hci_dev *hdev)
+> +{
+> +	struct btmtksdio_dev *bdev = hci_get_drvdata(hdev);
+> +	bool may_wakeup = device_may_wakeup(bdev->dev);
+> +	const struct btmtk_wakeon bt_awake = {
+> +		.mode = 0x1,
+> +		.gpo = 0,
+> +		.active_high = 0x1,
+> +		.enable_delay = cpu_to_le16(0xc80),
+> +		.wakeup_delay = cpu_to_le16(0x20)
+> +	};
+> +
+> +	if (may_wakeup && bdev->data->chipid == 0x7921) {
+> +		struct sk_buff *skb;
+> +
+> +		skb =  __hci_cmd_sync(hdev, 0xfc27, sizeof(bt_awake),
+> +				      &bt_awake, HCI_CMD_TIMEOUT);
+> +		if (IS_ERR(skb))
+> +			may_wakeup = false;
+> +
+> +		kfree_skb(skb);
+> +	}
+> +
+> +	return may_wakeup;
+> +}
+> +
+> static int btmtksdio_probe(struct sdio_func *func,
+> 			   const struct sdio_device_id *id)
+> {
+> @@ -998,6 +1024,7 @@ static int btmtksdio_probe(struct sdio_func *func,
+> 	hdev->shutdown = btmtksdio_shutdown;
+> 	hdev->send     = btmtksdio_send_frame;
+> 	hdev->set_bdaddr = btmtk_set_bdaddr;
+> +	hdev->wakeup = btmtk_sdio_wakeup;
+> 
+> 	SET_HCIDEV_DEV(hdev, &func->dev);
+> 
+> @@ -1032,7 +1059,11 @@ static int btmtksdio_probe(struct sdio_func *func,
+> 	 */
+> 	pm_runtime_put_noidle(bdev->dev);
+> 
+> -	return 0;
+> +	err = device_init_wakeup(bdev->dev, true);
+> +	if (err)
+> +		bt_dev_err(hdev, "%s: failed to init_wakeup", __func__);
 
-ok, but this sounds like something we could fix internally in our btintel.c code. If hci_dev struct is still present we should be able to persist flags across ->shutdown and ->setup. If we clear them, then it is our issue. No need to get btusb.c blacklist table involved. What am I missing?
+I missed this the first time around, no __func__ in error messages. Write a proper English one.
 
 Regards
 
