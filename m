@@ -2,243 +2,84 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 62379C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Dec 2021 08:36:48 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 0F72DC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Dec 2021 18:10:39 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S1352020AbhLXIgs (ORCPT
+        id S1353408AbhLXSKi (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Fri, 24 Dec 2021 03:36:48 -0500
-Received: from mga09.intel.com ([134.134.136.24]:5371 "EHLO mga09.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S1343611AbhLXIgr (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
-        Fri, 24 Dec 2021 03:36:47 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1640335007; x=1671871007;
-  h=date:from:to:cc:subject:message-id:mime-version:
-   content-transfer-encoding;
-  bh=dduCqlx1XKHhyI7i6W7ta+LlSuL85xwNIDVYzTpn4PM=;
-  b=XBT55YoVLRtondXi/uc6oi4/QqeKVK9uGR7/rJLuu8ekEK9ve5EPjLHP
-   y05cEsl4Nf4/+uppb7XOprzkVNtnVLngAABBttORPR/Yql/RJcjLC8zCE
-   1gBJQyRhLGKnRv+wZhIlEOyh4kV6QZkcNFVxyV/+N35MS9SgX7TYv9UaO
-   uYuDKxjjVJ1rLoI4lIdRK+h7rapjQ7RcfDLZG3Z9zc0aUyGF/7X5E/ln/
-   CN/vLLima+XExbXlj40tise9EU8D1xo4d404NfTiTah0ohdKIi1bHKNJU
-   JTk7qbTIAAFEF12aYN33vob88cr/55eiYrC9gmYhcH8yR08CKF7giAUkL
-   w==;
-X-IronPort-AV: E=McAfee;i="6200,9189,10207"; a="240753111"
-X-IronPort-AV: E=Sophos;i="5.88,232,1635231600"; 
-   d="scan'208";a="240753111"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Dec 2021 00:36:46 -0800
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="5.88,231,1635231600"; 
-   d="scan'208";a="551589872"
-Received: from lkp-server01.sh.intel.com (HELO e357b3ef1427) ([10.239.97.150])
-  by orsmga001.jf.intel.com with ESMTP; 24 Dec 2021 00:36:45 -0800
-Received: from kbuild by e357b3ef1427 with local (Exim 4.92)
-        (envelope-from <lkp@intel.com>)
-        id 1n0g4C-0002px-GY; Fri, 24 Dec 2021 08:36:44 +0000
-Date:   Fri, 24 Dec 2021 16:36:30 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc:     linux-bluetooth@vger.kernel.org
-Subject: [bluetooth-next:master] BUILD SUCCESS
- 5d1dd2e5a681b126a04192e37abb2011c2fb719c
-Message-ID: <61c5868e.wRpQQHaQAVPYC4pn%lkp@intel.com>
-User-Agent: Heirloom mailx 12.5 6/20/10
+        Fri, 24 Dec 2021 13:10:38 -0500
+Received: from lindbergh.monkeyblade.net ([23.128.96.19]:43218 "EHLO
+        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232241AbhLXSKi (ORCPT
+        <rfc822;linux-bluetooth@vger.kernel.org>);
+        Fri, 24 Dec 2021 13:10:38 -0500
+Received: from mail-ot1-x331.google.com (mail-ot1-x331.google.com [IPv6:2607:f8b0:4864:20::331])
+        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA3C0C061401
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Dec 2021 10:10:37 -0800 (PST)
+Received: by mail-ot1-x331.google.com with SMTP id r10-20020a056830080a00b0055c8fd2cebdso11829794ots.6
+        for <linux-bluetooth@vger.kernel.org>; Fri, 24 Dec 2021 10:10:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google;
+        h=from:to:cc:subject:date:message-id:in-reply-to:references
+         :mime-version:content-transfer-encoding;
+        bh=fLFVp95LvwfjyR+KbQEFvb9sj3HyMK7EBdO7Z8mOWJ4=;
+        b=moFRveX0iHUjFFgrslSifCTpmVDUF7jars4wCTBHstuwpYkAr2DkS7C1UnNUb2z89V
+         Omd7PJg8D45AXjX7nfOFUAkoKBKrKbZfgb22EtEyRi4oN0KP3vwc27e78DXvIKBy+EqI
+         h3AVRZX/+HHL1H5nARZ037d4mDc7Dk9ZrBqIP95eAA5U4TeAy2HizIrNnEji3ozvQwLf
+         e36hUeQvS2rRwLqx/UF0OrgIj4hMpQXuJcMjjwTqfY6WCrprP1erJmzjCgvyUN47pIW/
+         MaQ+Dp7ElNJUAowXwDHTqEcnK7gRWzFAe5I3blrbNEuaJrX7+oeKZ8w/FiOQQGsi2JOR
+         70/A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20210112;
+        h=x-gm-message-state:from:to:cc:subject:date:message-id:in-reply-to
+         :references:mime-version:content-transfer-encoding;
+        bh=fLFVp95LvwfjyR+KbQEFvb9sj3HyMK7EBdO7Z8mOWJ4=;
+        b=Mix6VUyJwZcFlafJvnBbu4BXX2ifCSOEVQNPcj7+XpUHJ/lyl7NDVYcMB0ItrMlFCB
+         bT2A/SqDxbT695Y5k88+YXV3gqfVxRHUxfTbh8YioeP+l9AUqq6ZnoMrEZLb+btYvAxW
+         +w0Od4Ls8qBSX0urGYMjtpp81/omCKBC9cLtN5GX8RLuvGiD3FmwCKqbStf/d4xTlwca
+         D4e4/jfLqvBTW4mz12co6ztQtbdrLtLL/U7pz7aRv2ySfdKZxTsdzIPE01vytPsipYPC
+         DSlOZefhhF97uI6tCXxn1pTGTUyiI5xxQ6s2VCud8gZQZ4jdbz4xJ4I3mTNYd5GkPUVn
+         rLnA==
+X-Gm-Message-State: AOAM531XnWn+rHvXWlSEYJsjm1vqQF2m8vrNpg7NH1Dq4rR8G6+CHFHl
+        UpmajyywfxSu+ARfPy3nOp9UAA==
+X-Google-Smtp-Source: ABdhPJwt8ZpC0gO3Hj/CsSjentOytlb/CCiNa8BQo4TVDmOwQ+Of3Ht85zvz/BJgtCE/KscYd3VVmw==
+X-Received: by 2002:a05:6830:314b:: with SMTP id c11mr5294889ots.178.1640369437101;
+        Fri, 24 Dec 2021 10:10:37 -0800 (PST)
+Received: from builder.lan (104-57-184-186.lightspeed.austtx.sbcglobal.net. [104.57.184.186])
+        by smtp.gmail.com with ESMTPSA id o19sm1785949oiw.22.2021.12.24.10.10.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Dec 2021 10:10:36 -0800 (PST)
+From:   Bjorn Andersson <bjorn.andersson@linaro.org>
+To:     Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+        johan.hedberg@gmail.com, marcel@holtmann.org
+Cc:     rjliao@codeaurora.org, linux-arm-msm@vger.kernel.org,
+        abhishekpandit@chromium.org, saluvala@codeaurora.org,
+        linux-kernel@vger.kernel.org, hbandi@codeaurora.org,
+        linux-bluetooth@vger.kernel.org, mcchou@chromium.org,
+        hemantg@codeaurora.org, mka@chromium.org
+Subject: Re: [PATCH v4] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 IDP boards
+Date:   Fri, 24 Dec 2021 12:10:31 -0600
+Message-Id: <164036941060.3935440.13095761506560620701.b4-ty@linaro.org>
+X-Mailer: git-send-email 2.32.0
+In-Reply-To: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
+References: <1639587963-22503-1-git-send-email-bgodavar@codeaurora.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git master
-branch HEAD: 5d1dd2e5a681b126a04192e37abb2011c2fb719c  Bluetooth: MGMT: Fix spelling mistake "simultanous" -> "simultaneous"
+On Wed, 15 Dec 2021 22:36:03 +0530, Balakrishna Godavarthi wrote:
+> Add bluetooth SoC WCN6750 node for SC7280 IDP boards.
+> 
+> 
 
-elapsed time: 721m
+Applied, thanks!
 
-configs tested: 171
-configs skipped: 3
+[1/1] arm64: dts: qcom: sc7280: Add bluetooth node on SC7280 IDP boards
+      commit: 3a89ff3087c03c2295250c07234efa75873c7b51
 
-The following configs have been built successfully.
-More configs may be tested in the coming days.
-
-gcc tested configs:
-arm                                 defconfig
-arm64                            allyesconfig
-arm64                               defconfig
-arm                              allyesconfig
-arm                              allmodconfig
-i386                 randconfig-c001-20211223
-xtensa                         virt_defconfig
-m68k                        m5307c3_defconfig
-csky                             alldefconfig
-sh                              ul2_defconfig
-sh                      rts7751r2d1_defconfig
-arm                   milbeaut_m10v_defconfig
-m68k                        mvme147_defconfig
-arm                            qcom_defconfig
-arm                          iop32x_defconfig
-arc                          axs103_defconfig
-powerpc                      mgcoge_defconfig
-powerpc                    mvme5100_defconfig
-m68k                         amcore_defconfig
-um                           x86_64_defconfig
-mips                           ip27_defconfig
-arc                              alldefconfig
-sh                            migor_defconfig
-sh                            hp6xx_defconfig
-arm                       spear13xx_defconfig
-arm                          gemini_defconfig
-arm                         bcm2835_defconfig
-powerpc                     rainier_defconfig
-sh                            shmin_defconfig
-sh                           se7721_defconfig
-m68k                            q40_defconfig
-arc                      axs103_smp_defconfig
-arm                            mmp2_defconfig
-arm                           omap1_defconfig
-mips                            e55_defconfig
-alpha                            alldefconfig
-sh                           se7343_defconfig
-arm                      integrator_defconfig
-mips                        vocore2_defconfig
-arm                          simpad_defconfig
-powerpc                      ep88xc_defconfig
-mips                     decstation_defconfig
-arc                            hsdk_defconfig
-powerpc                      pmac32_defconfig
-arm                        oxnas_v6_defconfig
-powerpc                     ppa8548_defconfig
-mips                         tb0219_defconfig
-powerpc                      pcm030_defconfig
-powerpc                    amigaone_defconfig
-powerpc                      arches_defconfig
-sh                        apsh4ad0a_defconfig
-arm                           sunxi_defconfig
-arm                           corgi_defconfig
-powerpc                     redwood_defconfig
-arm                         lubbock_defconfig
-powerpc                 mpc836x_mds_defconfig
-powerpc                 linkstation_defconfig
-arm                           u8500_defconfig
-arm                            xcep_defconfig
-um                               alldefconfig
-mips                 decstation_r4k_defconfig
-sh                          rsk7203_defconfig
-powerpc                 mpc832x_rdb_defconfig
-mips                       capcella_defconfig
-mips                         tb0226_defconfig
-xtensa                           alldefconfig
-ia64                             allmodconfig
-sh                           se7724_defconfig
-mips                     loongson1b_defconfig
-powerpc                 mpc8313_rdb_defconfig
-arm                     eseries_pxa_defconfig
-powerpc64                           defconfig
-arm                        neponset_defconfig
-arm                         lpc18xx_defconfig
-sh                ecovec24-romimage_defconfig
-m68k                            mac_defconfig
-arm                          exynos_defconfig
-sh                          lboxre2_defconfig
-arm                         palmz72_defconfig
-arm                  randconfig-c002-20211224
-arm                  randconfig-c002-20211223
-ia64                                defconfig
-ia64                             allyesconfig
-m68k                             allmodconfig
-m68k                                defconfig
-m68k                             allyesconfig
-nds32                             allnoconfig
-nios2                               defconfig
-arc                              allyesconfig
-nds32                               defconfig
-nios2                            allyesconfig
-csky                                defconfig
-alpha                               defconfig
-alpha                            allyesconfig
-xtensa                           allyesconfig
-h8300                            allyesconfig
-arc                                 defconfig
-sh                               allmodconfig
-parisc                              defconfig
-s390                             allyesconfig
-s390                             allmodconfig
-parisc                           allyesconfig
-s390                                defconfig
-i386                             allyesconfig
-sparc                            allyesconfig
-sparc                               defconfig
-i386                                defconfig
-i386                   debian-10.3-kselftests
-i386                              debian-10.3
-mips                             allmodconfig
-mips                             allyesconfig
-powerpc                          allyesconfig
-powerpc                          allmodconfig
-powerpc                           allnoconfig
-x86_64               randconfig-a013-20211223
-x86_64               randconfig-a015-20211223
-x86_64               randconfig-a014-20211223
-x86_64               randconfig-a011-20211223
-x86_64               randconfig-a012-20211223
-x86_64               randconfig-a016-20211223
-i386                 randconfig-a012-20211223
-i386                 randconfig-a011-20211223
-i386                 randconfig-a014-20211223
-i386                 randconfig-a016-20211223
-i386                 randconfig-a015-20211223
-i386                 randconfig-a013-20211223
-arc                  randconfig-r043-20211223
-riscv                randconfig-r042-20211223
-s390                 randconfig-r044-20211223
-riscv                    nommu_k210_defconfig
-riscv                            allyesconfig
-riscv                    nommu_virt_defconfig
-riscv                             allnoconfig
-riscv                               defconfig
-riscv                          rv32_defconfig
-riscv                            allmodconfig
-um                             i386_defconfig
-x86_64                           allyesconfig
-x86_64                    rhel-8.3-kselftests
-x86_64                              defconfig
-x86_64                               rhel-8.3
-x86_64                          rhel-8.3-func
-x86_64                                  kexec
-
-clang tested configs:
-x86_64               randconfig-a001-20211223
-x86_64               randconfig-a003-20211223
-x86_64               randconfig-a005-20211223
-x86_64               randconfig-a006-20211223
-x86_64               randconfig-a004-20211223
-x86_64               randconfig-a002-20211223
-i386                 randconfig-a006-20211223
-i386                 randconfig-a004-20211223
-i386                 randconfig-a002-20211223
-i386                 randconfig-a003-20211223
-i386                 randconfig-a005-20211223
-i386                 randconfig-a001-20211223
-x86_64               randconfig-a013-20211224
-x86_64               randconfig-a014-20211224
-x86_64               randconfig-a015-20211224
-x86_64               randconfig-a012-20211224
-x86_64               randconfig-a011-20211224
-x86_64               randconfig-a016-20211224
-i386                 randconfig-a012-20211224
-i386                 randconfig-a011-20211224
-i386                 randconfig-a014-20211224
-i386                 randconfig-a016-20211224
-i386                 randconfig-a015-20211224
-i386                 randconfig-a013-20211224
-hexagon              randconfig-r041-20211224
-hexagon              randconfig-r045-20211224
-s390                 randconfig-r044-20211224
-riscv                randconfig-r042-20211224
-
----
-0-DAY CI Kernel Test Service, Intel Corporation
-https://lists.01.org/hyperkitty/list/kbuild-all@lists.01.org
+Best regards,
+-- 
+Bjorn Andersson <bjorn.andersson@linaro.org>
