@@ -2,100 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0123C433EF
-	for <linux-bluetooth@archiver.kernel.org>; Thu, 23 Dec 2021 22:12:33 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 02050C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Fri, 24 Dec 2021 02:53:41 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S234631AbhLWWMc (ORCPT
+        id S1351029AbhLXCxl (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Thu, 23 Dec 2021 17:12:32 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:36236 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S234511AbhLWWMb (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Thu, 23 Dec 2021 17:12:31 -0500
-Received: from mail-qk1-x72f.google.com (mail-qk1-x72f.google.com [IPv6:2607:f8b0:4864:20::72f])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D41FC061401
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 14:12:31 -0800 (PST)
-Received: by mail-qk1-x72f.google.com with SMTP id 131so6805619qkk.2
-        for <linux-bluetooth@vger.kernel.org>; Thu, 23 Dec 2021 14:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20210112;
-        h=message-id:date:mime-version:from:to:subject:reply-to:in-reply-to
-         :references;
-        bh=mTTyYfcP/ojZZl1vuL3IIFjd7Mjcnnu8W+X+TEnGgqE=;
-        b=Coo0oajbQ2py4wzmRWpdTO1e/yLGGS8Z5V8fQ5RWYjo3YQr1X3nakO166mIVmFhlF6
-         uNEvjvPel/AKJIQTKrli/0FskLRfHrepSCg619CGsTzseVGrgvOgbP8q+ltyQ+tmh7IO
-         89F729bdX4K8XSZ5uVwAiAHkl+oECOhs2dIacOgFXmOEbTD0oyt6nbZidfHGdNpbrUAr
-         8WWvpRrvc56w0JRO0VQIwu0kIqmTF5eAZkqzccZ7iKk3BlymJu+x2K+SbFHeJn166FKO
-         TlR9bqeb8mUIS5wgSy/z+ZUPmaqvXkS9h9pQWLZKysJSFIOWKL4O0zzgZg3Vu3ANszVr
-         N2sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20210112;
-        h=x-gm-message-state:message-id:date:mime-version:from:to:subject
-         :reply-to:in-reply-to:references;
-        bh=mTTyYfcP/ojZZl1vuL3IIFjd7Mjcnnu8W+X+TEnGgqE=;
-        b=7lbiF4vj35hUl7On9xH9jefHeGIzChzQuGCfDeAQ60NPACs2w2EuI38YIfLO+XrraF
-         fU/5kDe5qaQfGmPJykxa494rgfT06Acos1RemQXChYI/HFcrc6Lk45yoTqfnvnNt9pim
-         m1/hPvSx+Z0bSkNEuFvnbC51IwPShKVpU2lIw9NBA11EIIq+pjtSaUnopTJNViDA8R7v
-         FPmoQS/TbZvo7/9HbdUlJXOMYvjIXiMti3ylalQ60fwy7UG2BlOiL52q20lRxT3a5AEL
-         haqiRYh/7CsQUsra/Z4GqHS8hv8rcdutEAenHDFlPXjfDR4E7ntWhtyy1uiBWk/lAxO7
-         o09g==
-X-Gm-Message-State: AOAM530NSELrmiiwesV+AvwFGKZb2codot8RlvS0p8sIH6jIHRJXodSV
-        La8jLAob8YHbtWP7kkGU+w15rd7614hMrA==
-X-Google-Smtp-Source: ABdhPJwEov5duQTglH3bsm3yZNsqiVXfpKjWy0fWb/7gMsTdLcp5UjQlbxV/az66R5OPpkFZwnyLjA==
-X-Received: by 2002:a05:620a:288c:: with SMTP id j12mr2894373qkp.66.1640297550566;
-        Thu, 23 Dec 2021 14:12:30 -0800 (PST)
-Received: from [172.17.0.2] ([20.122.142.171])
-        by smtp.gmail.com with ESMTPSA id s8sm5471331qkp.110.2021.12.23.14.12.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Dec 2021 14:12:30 -0800 (PST)
-Message-ID: <61c4f44e.1c69fb81.b9e4a.c3d0@mx.google.com>
-Date:   Thu, 23 Dec 2021 14:12:30 -0800 (PST)
-Content-Type: multipart/mixed; boundary="===============0135122632399305020=="
+        Thu, 23 Dec 2021 21:53:41 -0500
+Received: from smtp25.cstnet.cn ([159.226.251.25]:49598 "EHLO cstnet.cn"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S1351000AbhLXCxj (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Thu, 23 Dec 2021 21:53:39 -0500
+Received: from localhost.localdomain (unknown [124.16.138.126])
+        by APP-05 (Coremail) with SMTP id zQCowAD3_wMfNsVh7TXHBA--.5387S2;
+        Fri, 24 Dec 2021 10:53:19 +0800 (CST)
+From:   Jiasheng Jiang <jiasheng@iscas.ac.cn>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com
+Cc:     linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org,
+        Jiasheng Jiang <jiasheng@iscas.ac.cn>
+Subject: [PATCH] Bluetooth: hci_bcm: Check for error irq
+Date:   Fri, 24 Dec 2021 10:53:18 +0800
+Message-Id: <20211224025318.1541232-1-jiasheng@iscas.ac.cn>
+X-Mailer: git-send-email 2.25.1
 MIME-Version: 1.0
-From:   bluez.test.bot@gmail.com
-To:     linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
-Subject: RE: [v4,1/4] build: Add sanitizer options
-Reply-To: linux-bluetooth@vger.kernel.org
-In-Reply-To: <20211223195003.1647434-1-luiz.dentz@gmail.com>
-References: <20211223195003.1647434-1-luiz.dentz@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID: zQCowAD3_wMfNsVh7TXHBA--.5387S2
+X-Coremail-Antispam: 1UD129KBjvdXoW7JF48ur15ur43CryfCF47CFg_yoWkZFg_uw
+        1kuFy3Jr48ArsavFnrtw13urZayws5WFn7Wrn3Xa4fXryUG342qr17XFn8Ca13u3y8KFyU
+        CFyDuF4fAr1S9jkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+        9fnUUIcSsGvfJTRUUUbcAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2IYs7xG
+        6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48ve4kI8w
+        A2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI0_Gr0_
+        Cr1l84ACjcxK6I8E87Iv67AKxVWxJr0_GcWl84ACjcxK6I8E87Iv6xkF7I0E14v26F4UJV
+        W0owAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+        I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+        4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwCY02Avz4vE14v_Gr1l
+        42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJV
+        WUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r126r1DMIIYrxkI7VAK
+        I48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F
+        4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AKxVWUJVW8JwCI
+        42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUojg4DUUUU
+X-Originating-IP: [124.16.138.126]
+X-CM-SenderInfo: pmld2xxhqjqxpvfd2hldfou0/
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
---===============0135122632399305020==
-Content-Type: text/plain; charset="us-ascii"
-MIME-Version: 1.0
-Content-Transfer-Encoding: 7bit
+For the possible failure of the platform_get_irq(), the returned irq
+could be error number and will finally cause the failure of the
+request_irq().
+Consider that platform_get_irq() can now in certain cases return
+-EPROBE_DEFER, and the consequences of letting request_irq() effectively
+convert that into -EINVAL, even at probe time rather than later on.
+So it might be better to check just now.
 
-This is automated email and please do not reply to this email!
-
-Dear submitter,
-
-Thank you for submitting the patches to the linux bluetooth mailing list.
-This is a CI test results with your patch series:
-PW Link:https://patchwork.kernel.org/project/bluetooth/list/?series=601103
-
----Test result---
-
-Test Summary:
-CheckPatch                    PASS      5.43 seconds
-GitLint                       PASS      3.74 seconds
-Prep - Setup ELL              PASS      42.12 seconds
-Build - Prep                  PASS      0.61 seconds
-Build - Configure             PASS      8.43 seconds
-Build - Make                  PASS      1390.99 seconds
-Make Check                    PASS      11.98 seconds
-Make Distcheck                PASS      227.47 seconds
-Build w/ext ELL - Configure   PASS      8.57 seconds
-Build w/ext ELL - Make        PASS      1367.60 seconds
-Incremental Build with patchesPASS      3218.00 seconds
-
-
-
+Fixes: 0395ffc1ee05 ("Bluetooth: hci_bcm: Add PM for BCM devices")
+Signed-off-by: Jiasheng Jiang <jiasheng@iscas.ac.cn>
 ---
-Regards,
-Linux Bluetooth
+ drivers/bluetooth/hci_bcm.c | 7 ++++++-
+ 1 file changed, 6 insertions(+), 1 deletion(-)
 
+diff --git a/drivers/bluetooth/hci_bcm.c b/drivers/bluetooth/hci_bcm.c
+index 3cd57fc56ade..3f939fe89998 100644
+--- a/drivers/bluetooth/hci_bcm.c
++++ b/drivers/bluetooth/hci_bcm.c
+@@ -1182,7 +1182,12 @@ static int bcm_probe(struct platform_device *pdev)
+ 		return -ENOMEM;
+ 
+ 	dev->dev = &pdev->dev;
+-	dev->irq = platform_get_irq(pdev, 0);
++
++	ret = platform_get_irq(pdev, 0);
++	if (ret < 0)
++		return ret;
++
++	dev->irq = ret;
+ 
+ 	/* Initialize routing field to an unused value */
+ 	dev->pcm_int_params[0] = 0xff;
+-- 
+2.25.1
 
---===============0135122632399305020==--
