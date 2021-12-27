@@ -2,83 +2,101 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id 21C27C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Dec 2021 10:23:02 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 116E8C433F5
+	for <linux-bluetooth@archiver.kernel.org>; Mon, 27 Dec 2021 10:30:01 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S236012AbhL0KXB (ORCPT
+        id S236036AbhL0KaA (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Mon, 27 Dec 2021 05:23:01 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:51662 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S236007AbhL0KXB (ORCPT
+        Mon, 27 Dec 2021 05:30:00 -0500
+Received: from smtp-relay-canonical-0.canonical.com ([185.125.188.120]:58666
+        "EHLO smtp-relay-canonical-0.canonical.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S236030AbhL0KaA (ORCPT
         <rfc822;linux-bluetooth@vger.kernel.org>);
-        Mon, 27 Dec 2021 05:23:01 -0500
-Received: from ams.source.kernel.org (ams.source.kernel.org [IPv6:2604:1380:4601:e00::1])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 32AC0C06173E
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Dec 2021 02:23:01 -0800 (PST)
-Received: from smtp.kernel.org (relay.kernel.org [52.25.139.140])
-        (using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+        Mon, 27 Dec 2021 05:30:00 -0500
+Received: from localhost.localdomain (unknown [222.129.35.96])
+        (using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
         (No client certificate requested)
-        by ams.source.kernel.org (Postfix) with ESMTPS id F20F0B80E52
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Dec 2021 10:22:59 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id CA451C36AE7
-        for <linux-bluetooth@vger.kernel.org>; Mon, 27 Dec 2021 10:22:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-        s=k20201202; t=1640600578;
-        bh=nycqIDejaYwnaHU/Xmqqai+kDGYvns+GJe6hFEsU/wU=;
-        h=From:To:Subject:Date:In-Reply-To:References:From;
-        b=cOdBSLQ7Fh+iOVdSadM8D31kBJCG+3ULJSRBlf7Y/LvQTcMuwsoo3UZVh0Vb4xIu1
-         X+JQ2nUp4dNbmzDXB4CjkqG3rGhbhbZA2u1es4cQ8laGXFIVpoAu3XPIj7tDGi+gvT
-         xKEkdWSYqI5BRZ8hE3D4OuZ3roeO7ioNuAg+GMgNW8rDm9RySIuYHOnPI8I+i0TCXE
-         1f1/xiQpbIpIa/X8cqvfmkRLm3Y0e+36CDBTnMDXUdKQtClJD374LL3Vn7NouEgp0h
-         jFrZt6plVOKPeUy25Rq8FcPuS4xZGh37otlb52kHJuDclcdzutFaxxN7FNeCrbfe6l
-         57ARdv9vvuj1Q==
-Received: by pdx-korg-bugzilla-2.web.codeaurora.org (Postfix, from userid 48)
-        id B88EF60F9E; Mon, 27 Dec 2021 10:22:58 +0000 (UTC)
-From:   bugzilla-daemon@bugzilla.kernel.org
-To:     linux-bluetooth@vger.kernel.org
-Subject: [Bug 215425] Intel Bluetooth: hci0: Timed out waiting for suspend
- events
-Date:   Mon, 27 Dec 2021 10:22:58 +0000
-X-Bugzilla-Reason: AssignedTo
-X-Bugzilla-Type: changed
-X-Bugzilla-Watch-Reason: None
-X-Bugzilla-Product: Drivers
-X-Bugzilla-Component: Bluetooth
-X-Bugzilla-Version: 2.5
-X-Bugzilla-Keywords: 
-X-Bugzilla-Severity: normal
-X-Bugzilla-Who: aros@gmx.com
-X-Bugzilla-Status: NEW
-X-Bugzilla-Resolution: 
-X-Bugzilla-Priority: P1
-X-Bugzilla-Assigned-To: linux-bluetooth@vger.kernel.org
-X-Bugzilla-Flags: 
-X-Bugzilla-Changed-Fields: short_desc
-Message-ID: <bug-215425-62941-rzUTH31JS0@https.bugzilla.kernel.org/>
-In-Reply-To: <bug-215425-62941@https.bugzilla.kernel.org/>
-References: <bug-215425-62941@https.bugzilla.kernel.org/>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Bugzilla-URL: https://bugzilla.kernel.org/
-Auto-Submitted: auto-generated
+        by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id B42763F1DF;
+        Mon, 27 Dec 2021 10:29:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+        s=20210705; t=1640600998;
+        bh=Y2UnV7M80+g2ZN4FJOTnLD7c81Y9JVWXQE8KdwRybLU=;
+        h=From:To:Subject:Date:Message-Id:MIME-Version;
+        b=BOjNDfgQF67Rq96FrVYfRjSb1D3qASnEnUCVpT9x45gJnq4OX3bJMrjFmvaogS1ez
+         tDj9ToTK6kFLgcMt/LC31Z/nXjzNBQ853G4GVxEwc3vUW7nawSeK/CFZFKQ5IiEg5v
+         KpTtk3yC7gpFVUrtTocdP/9ZATBkjsDlyMwMZNwIlW9pvp5w3QVQ2puPCgem1ATcTD
+         0AkKu2DZEhJrz1877GXAcogWbNtbVoFBgC1pgE0YYUV0MWpO+9YwgxrhHMciy7FLc/
+         Sq2H/FuiRoMATn5ypjWy4PupdqdsiD4YbPk40wE2pZlqpkI3N5jtmZjCP/UbxNIDkV
+         MUsv0dYyjGczQ==
+From:   Aaron Ma <aaron.ma@canonical.com>
+To:     marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+        matthias.bgg@gmail.com, linux-bluetooth@vger.kernel.org,
+        linux-kernel@vger.kernel.org, aaron.ma@canonical.com
+Subject: [PATCH] Bluetooth: btusb: Add support for Foxconn QCA 0xe0d0
+Date:   Mon, 27 Dec 2021 18:29:50 +0800
+Message-Id: <20211227102950.17968-1-aaron.ma@canonical.com>
+X-Mailer: git-send-email 2.34.1
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-https://bugzilla.kernel.org/show_bug.cgi?id=3D215425
+Add an ID of Qualcomm Bluetooth SoC WCN6855.
 
-Artem S. Tashkinov (aros@gmx.com) changed:
+T:  Bus=05 Lev=01 Prnt=01 Port=03 Cnt=02 Dev#=  4 Spd=12   MxCh= 0
+D:  Ver= 1.10 Cls=e0(wlcon) Sub=01 Prot=01 MxPS=64 #Cfgs=  1
+P:  Vendor=0489 ProdID=e0d0 Rev= 0.01
+C:* #Ifs= 2 Cfg#= 1 Atr=e0 MxPwr=100mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=81(I) Atr=03(Int.) MxPS=  16 Ivl=1ms
+E:  Ad=82(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:  If#= 1 Alt= 0 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   0 Ivl=1ms
+I:  If#= 1 Alt= 1 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=   9 Ivl=1ms
+I:* If#= 1 Alt= 2 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  17 Ivl=1ms
+I:  If#= 1 Alt= 3 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  25 Ivl=1ms
+I:  If#= 1 Alt= 4 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  33 Ivl=1ms
+I:  If#= 1 Alt= 5 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  49 Ivl=1ms
+I:  If#= 1 Alt= 6 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  63 Ivl=1ms
+I:  If#= 1 Alt= 7 #EPs= 2 Cls=e0(wlcon) Sub=01 Prot=01 Driver=btusb
+E:  Ad=83(I) Atr=01(Isoc) MxPS=  65 Ivl=1ms
+E:  Ad=03(O) Atr=01(Isoc) MxPS=  65 Ivl=1ms
 
-           What    |Removed                     |Added
-----------------------------------------------------------------------------
-            Summary|Bluetooth: hci0: Timed out  |Intel Bluetooth: hci0:
-                   |waiting for suspend events  |Timed out waiting for
-                   |                            |suspend events
+Signed-off-by: Aaron Ma <aaron.ma@canonical.com>
+---
+ drivers/bluetooth/btusb.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
---=20
-You may reply to this email to add a comment.
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index c6a325fd5d5e..df25360979e8 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -295,6 +295,9 @@ static const struct usb_device_id blacklist_table[] = {
+ 	{ USB_DEVICE(0x0cf3, 0xe600), .driver_info = BTUSB_QCA_WCN6855 |
+ 						     BTUSB_WIDEBAND_SPEECH |
+ 						     BTUSB_VALID_LE_STATES },
++	{ USB_DEVICE(0x0489, 0xe0d0), .driver_info = BTUSB_QCA_WCN6855 |
++						     BTUSB_WIDEBAND_SPEECH |
++						     BTUSB_VALID_LE_STATES },
+ 
+ 	/* Broadcom BCM2035 */
+ 	{ USB_DEVICE(0x0a5c, 0x2009), .driver_info = BTUSB_BCM92035 },
+-- 
+2.30.2
 
-You are receiving this mail because:
-You are the assignee for the bug.=
