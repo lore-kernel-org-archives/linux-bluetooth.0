@@ -2,141 +2,83 @@ Return-Path: <linux-bluetooth-owner@kernel.org>
 X-Spam-Checker-Version: SpamAssassin 3.4.0 (2014-02-07) on
 	aws-us-west-2-korg-lkml-1.web.codeaurora.org
 Received: from vger.kernel.org (vger.kernel.org [23.128.96.18])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id BFAE1C433F5
-	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Dec 2021 07:20:34 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B72AFC433EF
+	for <linux-bluetooth@archiver.kernel.org>; Tue, 28 Dec 2021 10:46:46 +0000 (UTC)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S235251AbhL1HUe (ORCPT
+        id S236284AbhL1Kqq (ORCPT
         <rfc822;linux-bluetooth@archiver.kernel.org>);
-        Tue, 28 Dec 2021 02:20:34 -0500
-Received: from lindbergh.monkeyblade.net ([23.128.96.19]:46666 "EHLO
-        lindbergh.monkeyblade.net" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S233631AbhL1HUd (ORCPT
-        <rfc822;linux-bluetooth@vger.kernel.org>);
-        Tue, 28 Dec 2021 02:20:33 -0500
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [IPv6:2a01:488:42:1000:50ed:8234::])
-        by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B600C061574;
-        Mon, 27 Dec 2021 23:20:33 -0800 (PST)
-Received: from ip4d173d4a.dynamic.kabel-deutschland.de ([77.23.61.74] helo=[192.168.66.200]); authenticated
-        by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-        id 1n26mc-0001nQ-DB; Tue, 28 Dec 2021 08:20:30 +0100
-Message-ID: <246bd180-4d8f-ae2b-1b51-90eaf194803c@leemhuis.info>
-Date:   Tue, 28 Dec 2021 08:20:29 +0100
+        Tue, 28 Dec 2021 05:46:46 -0500
+Received: from mx3.molgen.mpg.de ([141.14.17.11]:49855 "EHLO mx1.molgen.mpg.de"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S236282AbhL1Kqp (ORCPT <rfc822;linux-bluetooth@vger.kernel.org>);
+        Tue, 28 Dec 2021 05:46:45 -0500
+Received: from [192.168.0.2] (ip5f5aecda.dynamic.kabel-deutschland.de [95.90.236.218])
+        (using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
+         key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+        (No client certificate requested)
+        (Authenticated sender: pmenzel)
+        by mx.molgen.mpg.de (Postfix) with ESMTPSA id A71EA61EA1928;
+        Tue, 28 Dec 2021 11:46:43 +0100 (CET)
+Message-ID: <c26d4792-0efa-d661-faec-cb00c68132e0@molgen.mpg.de>
+Date:   Tue, 28 Dec 2021 11:46:43 +0100
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.0
+ Thunderbird/91.4.1
 Subject: Re: [PATCH] fix 5.15 init regression for Intel Bluetooth
-Content-Language: en-BS
-To:     =?UTF-8?Q?Ortwin_Gl=c3=bcck?= <ortwin.glueck@logobject.ch>,
-        linux-kernel@vger.kernel.org
+Content-Language: en-US
+To:     =?UTF-8?Q?Ortwin_Gl=c3=bcck?= <ortwin.glueck@logobject.ch>
 Cc:     linux-bluetooth@vger.kernel.org,
         Marcel Holtmann <marcel@holtmann.org>,
         Johan Hedberg <johan.hedberg@gmail.com>,
         Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-        "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+        linux-kernel@vger.kernel.org
 References: <856c5dc7-9fb4-8438-3451-7b369832056a@odi.ch>
  <b0f6f66b-28aa-9d43-0aab-e6887ee0fda8@logobject.ch>
-From:   Thorsten Leemhuis <regressions@leemhuis.info>
+From:   Paul Menzel <pmenzel@molgen.mpg.de>
 In-Reply-To: <b0f6f66b-28aa-9d43-0aab-e6887ee0fda8@logobject.ch>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1640676033;8f57e958;
-X-HE-SMSGID: 1n26mc-0001nQ-DB
 Precedence: bulk
 List-ID: <linux-bluetooth.vger.kernel.org>
 X-Mailing-List: linux-bluetooth@vger.kernel.org
 
-[TLDR: I'm adding this regression to regzbot, the Linux kernel
-regression tracking bot; most text you find below is compiled from a few
-templates paragraphs some of you might have seen already.]
+Dear Ortwin,
 
-On 27.12.21 11:26, Ortwin Glück wrote:
-> 
-> On all 5.15 kernels the Intel Bluetooth no longer works. All was fine in
+
+Am 27.12.21 um 11:26 schrieb Ortwin Glück:
+
+> On all 5.15 kernels the Intel Bluetooth no longer works. All was fine in 
 > 5.14.
 > Apparently the quirk is needed for this device.
 > 
 > vanilla 5.15.5:
->    Bluetooth: hci0: Reading Intel version command failed (-110)
->    Bluetooth: hci0: command tx timeout
+>     Bluetooth: hci0: Reading Intel version command failed (-110)
+>     Bluetooth: hci0: command tx timeout
 > 
 > with patch:
->    Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
->    Bluetooth: hci0: Intel device is already patched. patch num: 32
+>     Bluetooth: hci0: Legacy ROM 2.5 revision 1.0 build 3 week 17 2014
+>     Bluetooth: hci0: Intel device is already patched. patch num: 32
 > 
 > Please apply to stable too.
 
-Hi, this is your Linux kernel regression tracker speaking.
+This has been already reported in *[PATCH] Bluetooth: Apply initial 
+command workaround for more Intel chips* [1].
 
-Thanks for the report.
+As I replied there, on what device do you experience this, and how can 
+it be reproduced?
 
-Adding the regression mailing list to the list of recipients, as it
-should be in the loop for all regressions, as explained here:
-https://www.kernel.org/doc/html/latest/admin-guide/reporting-issues.html
+I have a Dell Latitude E7250 with the Bluetooth device 0x0a2a, and 
+everything works fine under Debian sid/unstable with Linux 5.15 up to 
+5.16-rc6.
 
-To be sure this issue doesn't fall through the cracks unnoticed, I'm
-adding it to regzbot, my Linux kernel regression tracking bot:
+     Bus 002 Device 003: ID 8087:0a2a Intel Corp. Bluetooth wireless 
+interface
 
-#regzbot ^introduced v5.14..v5.15
-#regzbot title bluetooth: Intel Bluetooth no longer works
-#regzbot ignore-activity
 
-Reminder: when fixing the issue, please add a 'Link:' tag with the URL
-to the report (the parent of this mail) using the kernel.org redirector,
-as explained in 'Documentation/process/submitting-patches.rst'. Regzbot
-then will automatically mark the regression as resolved once the fix
-lands in the appropriate tree. For more details about regzbot see footer.
+Kind regards,
 
-Sending this to everyone that got the initial report, to make all aware
-of the tracking. I also hope that messages like this motivate people to
-directly get at least the regression mailing list and ideally even
-regzbot involved when dealing with regressions, as messages like this
-wouldn't be needed then.
+Paul
 
-Don't worry, I'll send further messages wrt to this regression just to
-the lists (with a tag in the subject so people can filter them away), as
-long as they are intended just for regzbot. With a bit of luck no such
-messages will be needed anyway.
 
-Ciao, Thorsten (wearing his 'Linux kernel regression tracker' hat).
-
-P.S.: As a Linux kernel regression tracker I'm getting a lot of reports
-on my table. I can only look briefly into most of them. Unfortunately
-therefore I sometimes will get things wrong or miss something important.
-I hope that's not the case here; if you think it is, don't hesitate to
-tell me about it in a public reply. That's in everyone's interest, as
-what I wrote above might be misleading to everyone reading this; any
-suggestion I gave thus might sent someone reading this down the wrong
-rabbit hole, which none of us wants.
-
-BTW, I have no personal interest in this issue, which is tracked using
-regzbot, my Linux kernel regression tracking bot
-(https://linux-regtracking.leemhuis.info/regzbot/). I'm only posting
-this mail to get things rolling again and hence don't need to be CC on
-all further activities wrt to this regression.
-
----
-Additional information about regzbot:
-
-If you want to know more about regzbot, check out its web-interface, the
-getting start guide, and/or the references documentation:
-
-https://linux-regtracking.leemhuis.info/regzbot/
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/getting_started.md
-https://gitlab.com/knurd42/regzbot/-/blob/main/docs/reference.md
-
-The last two documents will explain how you can interact with regzbot
-yourself if your want to.
-
-Hint for reporters: when reporting a regression it's in your interest to
-tell #regzbot about it in the report, as that will ensure the regression
-gets on the radar of regzbot and the regression tracker. That's in your
-interest, as they will make sure the report won't fall through the
-cracks unnoticed.
-
-Hint for developers: you normally don't need to care about regzbot once
-it's involved. Fix the issue as you normally would, just remember to
-include a 'Link:' tag to the report in the commit message, as explained
-in Documentation/process/submitting-patches.rst
-That aspect was recently was made more explicit in commit 1f57bd42b77c:
-https://git.kernel.org/linus/1f57bd42b77c
-
+[1]: 
+https://lore.kernel.org/linux-bluetooth/20211202162256.31837-1-tiwai@suse.de/
